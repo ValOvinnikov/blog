@@ -13,9 +13,9 @@
     "tenantDomain": "Domain · Admin",
     "features": "Features · Admin"
   },
-  "unauthorizedPage": {
-    "heading": "Not authorized",
-    "description": "Your account does not have access to this application."
+  "workspacePendingPage": {
+    "heading": "Your workspace isn't ready yet",
+    "description": "This can happen while a workspace is being set up, or if something went wrong along the way. Try refreshing in a few minutes, or contact whoever invited you if it keeps happening."
   },
   "sidebar": {
     "brandName": "Valstack",
@@ -318,7 +318,10 @@
     "heading": "Add tenant",
     "railAriaLabel": "Provisioning steps",
     "steps": {
-      "details": { "title": "Details", "description": "Name, slug, plan" },
+      "details": {
+        "title": "Details",
+        "description": "Name, slug, plan"
+      },
       "sanityProject": {
         "title": "Sanity project",
         "description": "Create + configure"

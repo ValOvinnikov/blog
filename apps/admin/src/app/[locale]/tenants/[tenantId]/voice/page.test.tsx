@@ -48,12 +48,12 @@ describe(`<${VoicePage.name}/>`, () => {
     getTenantByIdMock.mockResolvedValue({ id: 'tenant-1', slug: 'acme' });
   });
 
-  it('redirects to /unauthorized when the signed-in user has no admins row', async () => {
+  it('404s when the signed-in user has no admins row', async () => {
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
-    expect(redirect).toHaveBeenCalledWith('/unauthorized');
+    expect(redirect).not.toHaveBeenCalled();
     expect(getSiteConfigMock).not.toHaveBeenCalled();
   });
 

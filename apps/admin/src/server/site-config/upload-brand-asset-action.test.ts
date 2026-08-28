@@ -323,7 +323,7 @@ describe(uploadBrandAssetAction, () => {
     }
   });
 
-  it('propagates the unauthenticated/unauthorized redirect the tenant gate throws', async () => {
+  it('propagates the sign-in redirect the tenant gate throws when unauthenticated', async () => {
     requireTenantMembershipMock.mockImplementation(() => {
       throw new Error('NEXT_REDIRECT');
     });
@@ -335,6 +335,22 @@ describe(uploadBrandAssetAction, () => {
         makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
       ),
     ).rejects.toThrow('NEXT_REDIRECT');
+
+    expect(putMock).not.toHaveBeenCalled();
+  });
+
+  it('propagates the 404 the tenant gate throws when the session has no membership', async () => {
+    requireTenantMembershipMock.mockImplementation(() => {
+      throw new Error('NEXT_NOT_FOUND');
+    });
+
+    await expect(
+      uploadBrandAssetAction(
+        'acme',
+        'logo',
+        makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
+      ),
+    ).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(putMock).not.toHaveBeenCalled();
   });

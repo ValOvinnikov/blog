@@ -4,7 +4,7 @@
  */
 export const adminRoutes = {
   signIn: () => '/api/auth/signin',
-  unauthorized: () => '/unauthorized',
+  workspacePending: () => '/workspace-pending',
   tenants: (options?: { archived?: boolean }) =>
     options?.archived ? '/tenants?archived=1' : '/tenants',
   newTenant: () => '/tenants/new',

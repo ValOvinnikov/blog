@@ -62,7 +62,7 @@ describe('GET /api/dashboard/select-tenant', () => {
     expect(getMembershipMock).not.toHaveBeenCalled();
   });
 
-  it('redirects to /unauthorized without setting a cookie when the session has no membership on the requested tenant and is not a SUPERADMIN', async () => {
+  it('returns 404 without setting a cookie or naming an authorization route when the session has no membership on the requested tenant and is not a SUPERADMIN', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getMembershipMock.mockResolvedValue(undefined);
     getAdminByUserIdMock.mockResolvedValue(undefined);
@@ -78,13 +78,12 @@ describe('GET /api/dashboard/select-tenant', () => {
       'user-1',
       'someone-elses-tenant',
     );
-    expect(response.headers.get('location')).toBe(
-      'https://admin.example.com/unauthorized',
-    );
+    expect(response.status).toBe(404);
+    expect(response.headers.get('location')).toBeNull();
     expect(response.cookies.get('admin-active-tenant')).toBeUndefined();
   });
 
-  it('redirects to /unauthorized when a SUPERADMIN names a tenant that does not exist', async () => {
+  it('returns 404 when a SUPERADMIN names a tenant that does not exist', async () => {
     authMock.mockResolvedValue({ user: { id: 'super-1' } });
     getMembershipMock.mockResolvedValue(undefined);
     getAdminByUserIdMock.mockResolvedValue({
@@ -100,9 +99,8 @@ describe('GET /api/dashboard/select-tenant', () => {
       ),
     );
 
-    expect(response.headers.get('location')).toBe(
-      'https://admin.example.com/unauthorized',
-    );
+    expect(response.status).toBe(404);
+    expect(response.headers.get('location')).toBeNull();
     expect(response.cookies.get('admin-active-tenant')).toBeUndefined();
   });
 

@@ -15,15 +15,15 @@ export type TTenantMembershipContext = {
 };
 
 /**
- * The Tenant-section gate: no session redirects to sign-in, an unknown
- * tenant slug 404s, and a session with no `memberships` row for that tenant
- * redirects to `/unauthorized` — unless the session has any `admins` row,
- * which gets a virtual OWNER-level membership on any existing tenant
- * instead, regardless of any real `memberships` row or admin role. This
- * matches `requireAdmin`'s own floor: any admin role can reverse an
- * in-app-state edit. Called from a layout (not a page) so every route
- * nested under a gated tenant segment is protected by existing there, never
- * by a per-page check someone could forget to add.
+ * The Tenant-section gate: no session redirects to sign-in; an unknown
+ * tenant slug and a session with no `memberships` row for a real tenant both
+ * 404, indistinguishably — unless the session has any `admins` row, which
+ * gets a virtual OWNER-level membership on any existing tenant instead,
+ * regardless of any real `memberships` row or admin role. This matches
+ * `requireAdmin`'s own floor: any admin role can reverse an in-app-state
+ * edit. Called from a layout (not a page) so every route nested under a
+ * gated tenant segment is protected by existing there, never by a per-page
+ * check someone could forget to add.
  */
 export const requireTenantMembership = async (
   tenantSlug: string,
@@ -53,7 +53,7 @@ export const requireTenantMembership = async (
   const membership = await queries.memberships.getMembership(userId, tenant.id);
 
   if (!membership) {
-    redirect(adminRoutes.unauthorized());
+    notFound();
   }
 
   return { tenant, membership };
