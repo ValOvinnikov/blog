@@ -1,4 +1,4 @@
-# Admin Panel (`apps/admin`) — Product & Page Design
+# Admin Panel (`apps/platform`) — Product & Page Design
 
 > **Companion to**
 > `docs/superpowers/specs/2026-08-13-tenant-config-postgres-admin-design.md`
@@ -6,7 +6,7 @@
 > is the product surface — what pages exist, who sees them, and the
 > interaction patterns that make this a purpose-built tool rather than a
 > generic settings form. Intended as the design-implementation brief for
-> whoever (agent or human) builds `apps/admin`'s UI.
+> whoever (agent or human) builds `apps/platform`'s UI.
 
 ## Read these three together — this doc alone is not sufficient
 
@@ -30,7 +30,7 @@ the corrections brief first.
 
 ## Two personas, two sections — not one flat app
 
-`apps/admin` serves two different people with two different role systems
+`apps/platform` serves two different people with two different role systems
 already designed elsewhere in this repo — the nav is built around that split
 from day one, not discovered later:
 
@@ -170,7 +170,7 @@ comments, approve/mark-spam/delete via server actions, reusing the pure
 `CommentItem` component's `actions` slot so the queue and the public thread
 render identically. #1097 currently assumes `/admin/comments` lives inside
 `apps/web`; it needs the same rescoping #1204 already got (see the companion
-doc) to target `apps/admin` instead, once that app exists.
+doc) to target `apps/platform` instead, once that app exists.
 
 ### Team (not this milestone — design the shape now)
 
@@ -188,14 +188,14 @@ consistency with an established pattern in this codebase.
 ## Component library — Base UI for behavior, `@blog/ui` for appearance
 
 **Decision (2026-08-13): adopt Base UI (`@base-ui/react`, v1.6.0+) in
-`apps/admin`.** It is the successor to Radix rather than a competitor — built
+`apps/platform`.** It is the successor to Radix rather than a competitor — built
 by the teams behind Radix, Floating UI, and Material UI — and covers every gap
 the admin panel has: `tabs`, `slider`, `switch`, `select`, `radio-group`,
 `dialog`, `alert-dialog`, `toggle-group`, `number-field`. It also ships
 `Field`/`Fieldset`/`Form` primitives, which matter here because this app is
 almost entirely forms; Radix has no equivalent.
 
-**Where it lives: entirely in `apps/admin`.** Install Base UI there and style
+**Where it lives: entirely in `apps/platform`.** Install Base UI there and style
 its parts with Tailwind directly. There is no shell layer, no wrapper
 components, and nothing added to `@blog/ui` for this.
 
@@ -210,7 +210,7 @@ wired via Base UI's `render` prop. That was wrong and is withdrawn** (the
 shells were built, reviewed, and closed unmerged — PR #1443, issues
 #1435–#1438).
 
-The reasoning that killed it: `apps/admin` is the only consumer, and **a
+The reasoning that killed it: `apps/platform` is the only consumer, and **a
 component with one consumer isn't shared — it's misfiled.** Putting it in the
 design system buys nothing and costs an indirection layer whose only content is
 a class string. This repo had already settled the same question in **#1157** —
@@ -264,5 +264,5 @@ revisiting once built).
 ## Spec sync when built
 
 Same retention rule as the companion doc — this doc is deleted once
-`apps/admin`'s pages ship and `SPEC.md`/`docs/context/content-model.md`
+`apps/platform`'s pages ship and `SPEC.md`/`docs/context/content-model.md`
 reflect the final shape.

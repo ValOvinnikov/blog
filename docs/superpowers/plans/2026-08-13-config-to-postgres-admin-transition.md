@@ -1,4 +1,4 @@
-# Config → Postgres + `apps/admin` — Transition Plan
+# Config → Postgres + `apps/platform` — Transition Plan
 
 > **Program transition plan, not a bite-sized TDD task plan.** It sequences the
 > pivot into ordered **epics + per-layer sub-issues** ready for `board-keeper`
@@ -7,7 +7,7 @@
 > earlier ones' real outcomes. Don't pre-expand them here.
 
 **Goal:** Move theme, voice, and (later) feature configuration out of Sanity
-singletons into tenant-scoped Postgres rows edited through a new `apps/admin`
+singletons into tenant-scoped Postgres rows edited through a new `apps/platform`
 workspace — without the live site's rendered output changing at any point.
 
 **Architecture:** A `tenants` registry lands first so `site_config.tenantId` is
@@ -46,7 +46,7 @@ _Every epic's sub-issues implicitly include these._
 - **Sanity production content migrations** are human-gated: dry-run → backup →
   approved run, per `apps/cms/migrations/README.md`.
 - **`@blog/db` is a sibling to `@blog/service`** — it never imports it or is
-  imported by it. Only `apps/web` and `apps/admin` consume `db`.
+  imported by it. Only `apps/web` and `apps/platform` consume `db`.
 - **Verify + review gates** each epic: `pnpm type-check` + `pnpm lint` +
   `pnpm test` via `verify-runner`, then `reviewer` (+ `a11y-reviewer` for
   ui/web, `seo-auditor` for routes/metadata) → `APPROVE` before push. Push and
@@ -66,7 +66,7 @@ _Every epic's sub-issues implicitly include these._
 | `PRESET_REGISTRY`, voice packs, `deepMergePartial`        | Shipped (#1419). **Storage-agnostic — unaffected by this pivot**          |
 | `tenants` / `tenant_domains` / `memberships`              | Do not exist                                                              |
 | `site_config`                                             | Does not exist                                                            |
-| `apps/admin`                                              | Does not exist                                                            |
+| `apps/platform`                                           | Does not exist                                                            |
 
 **Open issues needing disposition** (see E-nil below): #1420, #1422, #1423,
 #1204, #1097.
@@ -107,11 +107,11 @@ values so the row holds real data from day one.
 **Acceptance:** `site_config` holds one row whose values match production's
 live `settings_theme` exactly; still nothing reads it; `apps/web` unchanged.
 
-### E2 — `apps/admin` workspace, auth, shell
+### E2 — `apps/platform` workspace, auth, shell
 
 The app exists and you can log into it. No settings editing yet.
 
-- **config** — workspace alias wiring (`@admin/*`), tsconfig `paths` + vitest
+- **config** — workspace alias wiring (`@platform/*`), tsconfig `paths` + vitest
   aliases per `CLAUDE.md`'s alias rule.
 - **web/admin** — Next.js workspace; shared Auth.js session (`.valstack.dev`
   cookie); the two-section nav; `admins`-gated Platform section and
@@ -200,8 +200,8 @@ dispatch.
 | #1420       | Open, stopped     | **Keep as-is.** Storage-agnostic; resume any time. Prerequisite for E4/E5 to mean anything |
 | #1422       | Open, stopped     | **Close as superseded.** A `@blog/service` voice fetcher is obsolete — E1/E5 replace it    |
 | #1423       | Open              | **Rescope.** Voice ladder still needed; override layer now comes from `@blog/db`           |
-| #1204       | Ticketed          | **Rescope** from `apps/web` `/admin` route-group to `apps/admin` (spec already says so)    |
-| #1097       | Ticketed          | **Rescope** `/admin/comments` to `apps/admin`                                              |
+| #1204       | Ticketed          | **Rescope** from `apps/web` `/admin` route-group to `apps/platform` (spec already says so) |
+| #1097       | Ticketed          | **Rescope** `/admin/comments` to `apps/platform`                                           |
 | #1421       | Closed, merged    | Leave closed. Its undo is E6, not a reopen                                                 |
 | #1419       | Closed, merged    | **Unaffected** — code-owned, storage-agnostic                                              |
 | #1415–#1417 | Ticketed          | **Unaffected** — component composition, not storage                                        |
@@ -213,10 +213,10 @@ dispatch.
 
 ## Decisions still open (settle before the epic that needs them)
 
-1. **Which Neon branch does `apps/admin` write to in preview deploys?** Writing
+1. **Which Neon branch does `apps/platform` write to in preview deploys?** Writing
    to production config from a preview deployment would let an unreviewed
    branch mutate the live site's theme. Needed by **E2**.
-2. **Does `apps/admin` get its own Vercel project?** The spec assumes
+2. **Does `apps/platform` get its own Vercel project?** The spec assumes
    `admin.valstack.dev`; whether that's a separate project or a domain on the
    existing one affects env wiring and the deploy pipeline. Needed by **E2**.
 3. **Full-page preview mechanism** — iframe of the live site needs either a

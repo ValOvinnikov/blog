@@ -28,7 +28,7 @@ adds the not-found path as a genuine addition, not a rewrite.
 
 ## Architecture
 
-**Provisioning flow (`apps/admin/src/server/tenants/create-tenant-action.ts`).**
+**Provisioning flow (`apps/platform/src/server/tenants/create-tenant-action.ts`).**
 The owner-email lookup (`queries.users.getUserByEmail`) stays first and
 unchanged for the found case — real user, immediate `memberships` row with
 `role: OWNER`, exactly as today. Only the not-found branch changes:
@@ -111,7 +111,7 @@ New `db` queries: `createMembershipInvite`, `findPendingInviteByEmail`,
   magic-link provider's `sendVerificationRequest` gains the pending-invite
   lookup for invite-flavored copy. Both are legal — `auth → db` is an
   existing contract edge.
-- **`apps/admin`** — `create-tenant-action.ts`'s not-found branch; the
+- **`apps/platform`** — `create-tenant-action.ts`'s not-found branch; the
   Details-step wizard UI (soft confirmation instead of hard error); a status
   badge on `ProvisioningStatusView`.
 - **`@blog/config`, `@blog/service`, `@blog/ui`, `apps/web`, `apps/cms`** —
@@ -138,7 +138,7 @@ email)` constraint — the action treats that as idempotent ("invite already
 Testing: `db` unit tests for the new queries, the unique-constraint
 idempotency case, and `consumeMembershipInvite`'s transactional insert;
 `auth` unit tests for the `events.signIn` hook (mocked db) and the
-invite-vs-generic email copy branch; `admin-app` Server Action tests for both
+invite-vs-generic email copy branch; `platform-app` Server Action tests for both
 the found and not-found branches, plus the wizard's soft-confirmation copy.
 
 ## Non-goals
