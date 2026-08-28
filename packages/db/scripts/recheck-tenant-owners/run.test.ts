@@ -1,4 +1,7 @@
-import { TENANT_STATUS } from '@blog/db/constants';
+import {
+  TENANT_STATUS,
+  type TElevateTenantOwnerOutcome,
+} from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 import { hasSystemicFailures, runRecheck } from './run';
@@ -14,6 +17,10 @@ const { reportOwnerElevationOutcomeMock } = vi.hoisted(() => ({
   reportOwnerElevationOutcomeMock: vi.fn(),
 }));
 
+const { notifyOperatorsOfOwnerElevationOutcomeMock } = vi.hoisted(() => ({
+  notifyOperatorsOfOwnerElevationOutcomeMock: vi.fn(),
+}));
+
 vi.mock('@blog/db/queries/tenants', () => ({
   listTenantsPendingOwnerElevation: listTenantsPendingOwnerElevationMock,
 }));
@@ -23,10 +30,29 @@ vi.mock('../provision-tenant/lib/report-owner-elevation-outcome', () => ({
 vi.mock('../provision-tenant/steps/elevate-tenant-owner', () => ({
   elevateTenantOwner: elevateTenantOwnerMock,
 }));
+// `isNotifiableOutcome` is left as the real implementation — only the send
+// itself is mocked — so this file exercises the actual de-dup condition
+// `recheckOne` runs, not a stubbed stand-in for it.
+vi.mock('./lib/notify-operators', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('./lib/notify-operators')>();
+  return {
+    ...actual,
+    notifyOperatorsOfOwnerElevationOutcome:
+      notifyOperatorsOfOwnerElevationOutcomeMock,
+  };
+});
 
-const env = { sanityManagementToken: 'sanity-token' };
+const env = {
+  sanityManagementToken: 'sanity-token',
+  resendApiKey: 'resend-key',
+};
 
-function tenant(id: string, slug: string): TTenant {
+function tenant(
+  id: string,
+  slug: string,
+  previousOwnerElevationOutcome?: TElevateTenantOwnerOutcome,
+): TTenant {
   return {
     id,
     slug,
@@ -39,7 +65,14 @@ function tenant(id: string, slug: string): TTenant {
     plan: 'FREE',
     status: TENANT_STATUS.ACTIVE,
     provisioningStatus: 'READY',
-    provisioningSteps: null,
+    provisioningSteps: previousOwnerElevationOutcome
+      ? {
+          OWNER_ELEVATION: {
+            status: 'DONE',
+            detail: previousOwnerElevationOutcome,
+          },
+        }
+      : null,
     studioVercelProjectId: null,
     seededAt: null,
     webhookCreatedAt: null,
@@ -53,6 +86,9 @@ beforeEach(() => {
   listTenantsPendingOwnerElevationMock.mockReset().mockResolvedValue([]);
   elevateTenantOwnerMock.mockReset();
   reportOwnerElevationOutcomeMock.mockReset().mockResolvedValue(undefined);
+  notifyOperatorsOfOwnerElevationOutcomeMock
+    .mockReset()
+    .mockResolvedValue(undefined);
 });
 
 describe(runRecheck, () => {
@@ -169,6 +205,59 @@ describe(runRecheck, () => {
       expect.anything(),
     );
   });
+
+  it('notifies operators when a tenant newly transitions into STALLED', async () => {
+    const tenants = [tenant('t1', 'acme')];
+    listTenantsPendingOwnerElevationMock.mockResolvedValue(tenants);
+    elevateTenantOwnerMock.mockResolvedValueOnce('STALLED');
+
+    await runRecheck(env);
+
+    expect(notifyOperatorsOfOwnerElevationOutcomeMock).toHaveBeenCalledTimes(1);
+    expect(notifyOperatorsOfOwnerElevationOutcomeMock).toHaveBeenCalledWith({
+      tenant: tenants[0],
+      outcome: 'STALLED',
+      resendApiKey: 'resend-key',
+    });
+  });
+
+  it('does not re-notify a tenant already STALLED on a prior sweep that is still STALLED', async () => {
+    const tenants = [tenant('t1', 'acme', 'STALLED')];
+    listTenantsPendingOwnerElevationMock.mockResolvedValue(tenants);
+    elevateTenantOwnerMock.mockResolvedValueOnce('STALLED');
+
+    await runRecheck(env);
+
+    expect(notifyOperatorsOfOwnerElevationOutcomeMock).not.toHaveBeenCalled();
+  });
+
+  it('notifies again when a tenant transitions from STALLED to AMBIGUOUS_MEMBERSHIP', async () => {
+    const tenants = [tenant('t1', 'acme', 'STALLED')];
+    listTenantsPendingOwnerElevationMock.mockResolvedValue(tenants);
+    elevateTenantOwnerMock.mockResolvedValueOnce('AMBIGUOUS_MEMBERSHIP');
+
+    await runRecheck(env);
+
+    expect(notifyOperatorsOfOwnerElevationOutcomeMock).toHaveBeenCalledTimes(1);
+    expect(notifyOperatorsOfOwnerElevationOutcomeMock).toHaveBeenCalledWith({
+      tenant: tenants[0],
+      outcome: 'AMBIGUOUS_MEMBERSHIP',
+      resendApiKey: 'resend-key',
+    });
+  });
+
+  it.each(['ELEVATED', 'ALREADY_ADMINISTRATOR', 'PENDING_ACCEPTANCE'] as const)(
+    'never notifies for outcome %s',
+    async (outcome) => {
+      const tenants = [tenant('t1', 'acme')];
+      listTenantsPendingOwnerElevationMock.mockResolvedValue(tenants);
+      elevateTenantOwnerMock.mockResolvedValueOnce(outcome);
+
+      await runRecheck(env);
+
+      expect(notifyOperatorsOfOwnerElevationOutcomeMock).not.toHaveBeenCalled();
+    },
+  );
 });
 
 describe(hasSystemicFailures, () => {
