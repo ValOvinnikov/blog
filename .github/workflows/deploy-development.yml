@@ -389,7 +389,7 @@ jobs:
       # Variables (not Secrets) so they stay inspectable in run logs.
       VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
       # Distinct GitHub Environment variable from deploy-web's VERCEL_PROJECT_ID
-      # (admin-dev is its own Vercel project, rooted at apps/platform) — mapped to
+      # (platform-dev is its own Vercel project, rooted at apps/platform) — mapped to
       # the local name the Vercel CLI actually reads.
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_ADMIN }}
     steps:
@@ -404,13 +404,13 @@ jobs:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
 
-      # Deploys `admin-dev` via the Vercel CLI (its Git auto-deploy is disabled,
-      # same as web and cms). For `admin-dev`, Vercel "production" = main, so
+      # Deploys `platform-dev` via the Vercel CLI (its Git auto-deploy is disabled,
+      # same as web and cms). For `platform-dev`, Vercel "production" = main, so
       # --prod targets its main URL. Guarded on VERCEL_PROJECT_ID (not
       # VERCEL_TOKEN, which deploy-web already has configured) so this stays a
-      # true no-op until the admin-dev Vercel project exists and
+      # true no-op until the platform-dev Vercel project exists and
       # VERCEL_PROJECT_ID_ADMIN is set.
-      - name: Deploy to Vercel (admin-dev)
+      - name: Deploy to Vercel (platform-dev)
         if: ${{ env.VERCEL_PROJECT_ID != '' }}
         run: |
           set -euo pipefail
