@@ -11,11 +11,13 @@ self-serve-provisioning requirement promoted two former Non-goals (self-serve
 signup, billing) into scope; three further decisions (8–10) were added the same
 day, and decisions 11–12 plus a new §7 on the same date.
 
-> **State as of 2026-08-28: decisions 1–11 are all resolved.** Two gaps are
-> recorded deliberately rather than defaulted — the **data-retention window**
-> for a lapsed tenant (decision 10) and the fate of the **production
+> **State as of 2026-08-28: decisions 1–11 are all resolved.** One gap remains,
+> recorded deliberately rather than defaulted — the fate of the **production
 > pre-tenancy project** (decision 12, which must not be adopted or repointed
-> until settled). Everything else is ready for implementation epics.
+> until settled). Decision 10 carries a **prerequisite** rather than a gap: its
+> retention policy cannot be honoured until a Sanity deletion path exists,
+> since deprovisioning archives rather than deletes today. Everything else is
+> ready for implementation epics.
 
 > **Naming note — this document uses post-rename names throughout.** Settled
 > 2026-08-28: the marketing workspace is **`apps/marketing`** (apex domain),
@@ -893,8 +895,7 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    since operator notification is a new capability rather than part of the
    grant.
 
-10. **Trial lifecycle & abandoned-tenant reclamation — RESOLVED 2026-08-28,
-    except the retention window.** Sanity imposes no project-count limit (confirmed by the
+10. **Trial lifecycle & abandoned-tenant reclamation — RESOLVED 2026-08-28.** Sanity imposes no project-count limit (confirmed by the
     project owner, 2026-08-28), so trials need not conserve projects and a
     no-card trial is viable. Recommendation: **one project per tenant from
     signup, promoted in place** — trial and paid are the same project,
@@ -918,7 +919,7 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
     `TRIAL` and `PAST_DUE` are absent today (`ACTIVE | SUSPENDED | ARCHIVED`).
     Both are `pgEnum`-backed, so a change needs a generated migration.
 
-    **RESOLVED 2026-08-28, with one number outstanding.** Signed off as
+    **RESOLVED 2026-08-28.** Signed off as
     recommended: **one project per tenant from signup, promoted in place** —
     trial and paid are the same project and conversion is a `plan` flip; no
     recycling of used projects and no trial→paid content copy; a lapsed
@@ -926,9 +927,44 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
     `TENANT_STATUS` gains **`TRIAL`** and **`PAST_DUE`** alongside
     `ACTIVE | SUSPENDED | ARCHIVED`.
 
-    **Still open: the retention window itself.** It is both a product promise
-    and a GDPR-shaped commitment, so it is recorded as a deliberate gap rather
-    than defaulted. Settle it before the lifecycle is implemented.
+    **Retention — two clocks, not one (settled 2026-08-28).** A single number
+    left it ambiguous whether a lapsed tenant's site is still publicly serving
+    on day 20. The approved `TENANT_STATUS` values already imply the shape:
+
+    | Status      | Site     | Data   | Clock                          |
+    | ----------- | -------- | ------ | ------------------------------ |
+    | `PAST_DUE`  | still up | intact | ~14 days grace, dunning        |
+    | `SUSPENDED` | parked   | intact | **30 days**, then deletion     |
+    | `ARCHIVED`  | gone     | inert  | until the delete actually runs |
+
+    Taking a customer's site down the moment a card fails causes avoidable
+    churn; leaving a non-paying tenant publicly serving for thirty days gives
+    the product away. Splitting the clocks resolves both, and the window is
+    short enough that "I forgot to pay, let me come back" still works — which
+    is the revenue argument for having a retention window at all.
+
+    **Prerequisite — nothing currently deletes.** `deprovision-tenant`'s Sanity
+    step _archives_ (`PATCH isDisabledByUser: true`) and its own comment is
+    explicit that it does so **because** deletion needs an org billing
+    permission the token deliberately lacks. Today's real behaviour is
+    therefore "archived indefinitely", not "deleted after 30 days". A public
+    30-day deletion promise **cannot be honoured until a deletion path with an
+    elevated credential exists** — so either build that as part of this
+    lifecycle work, or state the policy as what is actually true ("archived and
+    inaccessible after 30 days; permanently deleted on request"). Publishing a
+    promise the system structurally cannot keep is worse than publishing a
+    vaguer one.
+
+    **Required regardless of the number:** GDPR obliges erasure _on demand_,
+    which is a shorter clock than 30 days, so a manual delete path is needed
+    whatever policy is chosen. It is the same mechanism as the automated one —
+    an argument for building it once, properly, rather than treating deletion
+    as a later problem.
+
+    Note the window is not cost-driven: Sanity projects are unlimited on the
+    free tier and an archived project stops billing, so retention costs
+    effectively nothing. Choose the number on customer-experience and legal
+    grounds only.
 
 11. **Marketing project schema — resolved 2026-08-28: reuse `apps/cms`'s
     schema.** One CMS serves the marketing project and every tenant project.
