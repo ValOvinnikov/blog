@@ -48,6 +48,11 @@ jobs:
     timeout-minutes: 10
     # Reuses the same production GitHub Environment every other prod-affecting
     # job in this repo uses — see provision-tenant.yml's own comment on this.
+    # Unlike those, this job's trigger is `schedule:`, with no human present
+    # to satisfy a required-reviewer rule — if one is ever added to this
+    # shared environment, this workflow would silently stall forever rather
+    # than run unattended. Give this job its own environment first if that
+    # protection is ever configured.
     environment: production
     env:
       SANITY_MANAGEMENT_TOKEN: ${{ secrets.SANITY_MANAGEMENT_TOKEN }}

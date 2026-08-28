@@ -25,8 +25,10 @@ export type TElevateTenantOwnerOutcome =
   (typeof ELEVATE_TENANT_OWNER_OUTCOME)[keyof typeof ELEVATE_TENANT_OWNER_OUTCOME];
 
 /**
- * Runs after the core provisioning steps: promotes the tenant owner from
- * `viewer` to `administrator` once they've accepted their Sanity invite.
+ * Promotes the tenant owner from `viewer` to `administrator` once they've
+ * accepted their Sanity invite. Called once, right after core provisioning,
+ * by `provision-tenant/run.ts`, and again on a recurring schedule by
+ * `scripts/recheck-tenant-owners/run.ts` for owners who accept later.
  * A pending invitee never appears in the ACL listing, so its absence is not
  * an error — this reports a time-bound PENDING_ACCEPTANCE/STALLED outcome
  * instead of throwing, so a slow (or never) acceptance can never fail an

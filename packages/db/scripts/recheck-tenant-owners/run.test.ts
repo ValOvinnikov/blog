@@ -1,7 +1,7 @@
 import { TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
-import { runRecheck } from './run';
+import { hasSystemicFailures, runRecheck } from './run';
 
 const { listTenantsPendingOwnerElevationMock } = vi.hoisted(() => ({
   listTenantsPendingOwnerElevationMock: vi.fn(),
@@ -98,6 +98,7 @@ describe(runRecheck, () => {
       errors: 0,
     });
     expect(elevateTenantOwnerMock).toHaveBeenCalledTimes(5);
+    expect(hasSystemicFailures(summary)).toBe(false);
   });
 
   it('counts a thrown error without stopping the sweep for later candidates', async () => {
@@ -124,5 +125,36 @@ describe(runRecheck, () => {
       errors: 1,
     });
     expect(elevateTenantOwnerMock).toHaveBeenCalledTimes(3);
+    expect(hasSystemicFailures(summary)).toBe(true);
+  });
+});
+
+describe(hasSystemicFailures, () => {
+  it('is false when every candidate resolved to an expected outcome', () => {
+    expect(
+      hasSystemicFailures({
+        checked: 4,
+        elevated: 1,
+        alreadyAdministrator: 1,
+        pendingAcceptance: 1,
+        stalled: 1,
+        ambiguous: 0,
+        errors: 0,
+      }),
+    ).toBe(false);
+  });
+
+  it('is true when at least one candidate threw', () => {
+    expect(
+      hasSystemicFailures({
+        checked: 4,
+        elevated: 3,
+        alreadyAdministrator: 0,
+        pendingAcceptance: 0,
+        stalled: 0,
+        ambiguous: 0,
+        errors: 1,
+      }),
+    ).toBe(true);
   });
 });

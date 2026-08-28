@@ -122,9 +122,22 @@ export async function runRecheck(env: TRecheckEnv): Promise<TRecheckSummary> {
   return summary;
 }
 
+// Exported for direct testing of the exit-code decision without also
+// exercising env loading or the sweep itself. `errors` means the per-tenant
+// call itself threw (e.g. a network/API failure) — the expected
+// STALLED/PENDING_ACCEPTANCE/AMBIGUOUS_MEMBERSHIP outcomes never count
+// here, since `recheckOne` already tallies those separately and they are
+// not failures.
+export function hasSystemicFailures(summary: TRecheckSummary): boolean {
+  return summary.errors > 0;
+}
+
 async function main(): Promise<void> {
   const env = loadRecheckEnv();
-  await runRecheck(env);
+  const summary = await runRecheck(env);
+  if (hasSystemicFailures(summary)) {
+    process.exitCode = 1;
+  }
 }
 
 // Only auto-run when this file is the CLI entrypoint (`tsx run.ts`) — guards
