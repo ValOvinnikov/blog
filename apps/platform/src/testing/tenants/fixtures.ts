@@ -23,6 +23,7 @@ export const idleProvisioningSteps = (): TTenantProvisioningSteps => {
     [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: idle,
     [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: idle,
     [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: idle,
+    [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: idle,
   };
 };
 

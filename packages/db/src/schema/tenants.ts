@@ -1,6 +1,7 @@
 import {
   TENANT_PLAN,
   TENANT_STATUS,
+  type TElevateTenantOwnerOutcome,
   type TTenantPlan,
   type TTenantProvisioningStatus,
   type TTenantProvisioningStep,
@@ -29,6 +30,10 @@ export const tenantStatusEnum = pgEnum(
 export type TProvisioningStepState = {
   status: TTenantProvisioningStepStatus;
   error?: string;
+  // Currently only ever set on the `OWNER_ELEVATION` step, carrying
+  // `elevateTenantOwner`'s outcome. Typed as the outcome union (not `string`)
+  // so an exhaustive downstream switch/map over it stays checked by `tsc`.
+  detail?: TElevateTenantOwnerOutcome;
 };
 
 export type TTenantProvisioningSteps = Record<

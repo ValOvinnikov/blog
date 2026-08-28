@@ -1,4 +1,5 @@
 import type {
+  TElevateTenantOwnerOutcome,
   TTenantProvisioningStep,
   TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
@@ -11,6 +12,7 @@ export type TReportStepStatusInput = {
   step: TTenantProvisioningStep;
   status: TTenantProvisioningStepStatus;
   error?: string;
+  detail?: TElevateTenantOwnerOutcome;
 };
 
 /**
@@ -24,7 +26,7 @@ export type TReportStepStatusInput = {
 export async function reportStepStatus(
   input: TReportStepStatusInput,
 ): Promise<void> {
-  const { tenantId, step, status, error } = input;
+  const { tenantId, step, status, error, detail } = input;
   const provisioningStatus = overallStatusFor(step, status);
 
   const result = await updateProvisioningStep({
@@ -32,6 +34,7 @@ export async function reportStepStatus(
     step,
     status,
     ...(error === undefined ? {} : { error }),
+    ...(detail === undefined ? {} : { detail }),
     ...(provisioningStatus === undefined ? {} : { provisioningStatus }),
   });
 

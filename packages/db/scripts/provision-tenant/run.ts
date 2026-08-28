@@ -18,6 +18,7 @@
 import { pathToFileURL } from 'node:url';
 
 import {
+  ELEVATE_TENANT_OWNER_OUTCOME,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStep,
@@ -28,14 +29,12 @@ import { unarchiveSanityProject } from '@blog/db/utils/sanity-management-client/
 import { sanitizeLogMessage } from '@blog/insight';
 
 import { loadProvisionEnv, type TProvisionEnv } from './lib/env';
+import { reportOwnerElevationOutcome } from './lib/report-owner-elevation-outcome';
 import { reportStepStatus } from './lib/report-step-status';
 import { createTenantRevalidateWebhook } from './steps/create-revalidate-webhook';
 import { createTenantSanityProject } from './steps/create-sanity-project';
 import { createTenantStudio } from './steps/create-studio-vercel-project';
-import {
-  ELEVATE_TENANT_OWNER_OUTCOME,
-  elevateTenantOwner,
-} from './steps/elevate-tenant-owner';
+import { elevateTenantOwner } from './steps/elevate-tenant-owner';
 import { mapTenantDomain } from './steps/map-domain';
 import { persistTenantSanityToken } from './steps/persist-sanity-token';
 import { seedTenantContent } from './steps/seed-content';
@@ -160,6 +159,8 @@ export async function runSteps(
   // outcomes, not failures.
   try {
     const outcome = await elevateTenantOwner(tenant, env);
+    await reportOwnerElevationOutcome(tenantId, outcome);
+
     if (outcome === ELEVATE_TENANT_OWNER_OUTCOME.STALLED) {
       console.error(
         `provision-tenant: tenant "${tenantId}"'s owner still hasn't accepted their Sanity invite — administrator grant is stalled, not failed.`,

@@ -64,7 +64,6 @@ vi.mock('./steps/create-revalidate-webhook', () => ({
   createTenantRevalidateWebhook: createTenantRevalidateWebhookMock,
 }));
 vi.mock('./steps/elevate-tenant-owner', () => ({
-  ELEVATE_TENANT_OWNER_OUTCOME: { PENDING_ACCEPTANCE: 'PENDING_ACCEPTANCE' },
   elevateTenantOwner: elevateTenantOwnerMock,
 }));
 

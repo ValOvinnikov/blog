@@ -4,7 +4,9 @@ import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
+  type TElevateTenantOwnerOutcome,
   type TTenantProvisioningStatus,
+  type TTenantProvisioningStep,
   type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
 import type {
@@ -24,9 +26,20 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState, useEffect, useRef, useTransition } from 'react';
 
-// Object key insertion order matches the config-declared step sequence, so
-// this can't drift if a step is ever reordered there.
-export const STEP_ORDER = Object.values(TENANT_PROVISIONING_STEP);
+// The six core provisioning steps `run.ts`'s workflow actually sequences —
+// hardcoded rather than derived from `TENANT_PROVISIONING_STEP` (which also
+// carries `OWNER_ELEVATION`, a recurring post-provisioning check with no
+// step-count or ordering role in this UI) so this list can't silently pick
+// up a future unrelated step key. Mirrors `tenant-field-locks.ts`'s own
+// `CORE_PROVISIONING_STEPS` allowlist.
+export const STEP_ORDER: TTenantProvisioningStep[] = [
+  TENANT_PROVISIONING_STEP.SANITY_PROJECT,
+  TENANT_PROVISIONING_STEP.SEED_CONTENT,
+  TENANT_PROVISIONING_STEP.DEPLOY_STUDIO,
+  TENANT_PROVISIONING_STEP.PERSIST_TOKEN,
+  TENANT_PROVISIONING_STEP.MAP_DOMAIN,
+  TENANT_PROVISIONING_STEP.CREATE_WEBHOOK,
+];
 
 // Highest-priority status wins: any FAILED step outranks a RUNNING one, which
 // outranks a still-IDLE one, so the overall status always reflects the most
@@ -127,6 +140,8 @@ export type TUseProvisioningPollResult = {
   failedStepError: string | undefined;
   errorKind: TProvisioningErrorKind | undefined;
   domainStatus: TDomainVerificationStatus;
+  /** The most recent `elevateTenantOwner` check's outcome, independent of the six-step sequence above. `undefined` before any check has run. */
+  ownerElevationOutcome: TElevateTenantOwnerOutcome | undefined;
 };
 
 /**
@@ -333,6 +348,9 @@ export const useProvisioningPoll = (
     ? classifyProvisioningError(failedStepError)
     : undefined;
 
+  const ownerElevationOutcome =
+    provisioningSteps?.[TENANT_PROVISIONING_STEP.OWNER_ELEVATION]?.detail;
+
   // A dispatch has been requested but the runner hasn't reported a step yet
   // — `provisioningStatus` itself won't reflect this until the Server
   // Action's own `beginTenantProvisioning` call resolves and a refresh (or
@@ -408,5 +426,6 @@ export const useProvisioningPoll = (
     failedStepError,
     errorKind,
     domainStatus,
+    ownerElevationOutcome,
   };
 };

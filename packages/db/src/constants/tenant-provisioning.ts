@@ -18,6 +18,12 @@ export const TENANT_PROVISIONING_STEP = {
   PERSIST_TOKEN: 'PERSIST_TOKEN',
   MAP_DOMAIN: 'MAP_DOMAIN',
   CREATE_WEBHOOK: 'CREATE_WEBHOOK',
+  // Not one of the six core provisioning steps `overallStatusFor` and the
+  // operator UI's step sequencing reason about — a recurring
+  // post-provisioning check (`elevateTenantOwner`) that never touches the
+  // tenant's overall `provisioningStatus`. See `TElevateTenantOwnerOutcome`
+  // for its own outcome vocabulary, carried in this step's `detail`.
+  OWNER_ELEVATION: 'OWNER_ELEVATION',
 } as const;
 
 export type TTenantProvisioningStep = TValueOf<typeof TENANT_PROVISIONING_STEP>;
@@ -31,4 +37,21 @@ export const TENANT_PROVISIONING_STEP_STATUS = {
 
 export type TTenantProvisioningStepStatus = TValueOf<
   typeof TENANT_PROVISIONING_STEP_STATUS
+>;
+
+// Outcome of one `elevateTenantOwner` check, reported as the
+// `OWNER_ELEVATION` step's `detail` (always alongside status DONE — a
+// stall or an ambiguous membership is a completed check, not a failed
+// step). Read by both `scripts/provision-tenant` and
+// `scripts/recheck-tenant-owners`, and (via the tenant row) `apps/platform`.
+export const ELEVATE_TENANT_OWNER_OUTCOME = {
+  ELEVATED: 'ELEVATED',
+  ALREADY_ADMINISTRATOR: 'ALREADY_ADMINISTRATOR',
+  PENDING_ACCEPTANCE: 'PENDING_ACCEPTANCE',
+  STALLED: 'STALLED',
+  AMBIGUOUS_MEMBERSHIP: 'AMBIGUOUS_MEMBERSHIP',
+} as const;
+
+export type TElevateTenantOwnerOutcome = TValueOf<
+  typeof ELEVATE_TENANT_OWNER_OUTCOME
 >;

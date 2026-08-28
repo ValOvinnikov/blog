@@ -107,6 +107,7 @@ function stepsWith(
     PERSIST_TOKEN: idle,
     MAP_DOMAIN: idle,
     CREATE_WEBHOOK: idle,
+    OWNER_ELEVATION: idle,
     ...overrides,
   };
 }
@@ -307,6 +308,7 @@ describe(updateTenantDetails, () => {
         PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        OWNER_ELEVATION: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
       },
     });
 
@@ -368,6 +370,7 @@ describe(updateTenantDetails, () => {
         PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        OWNER_ELEVATION: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
       },
     });
 
@@ -394,6 +397,7 @@ describe(updateTenantDetails, () => {
         PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        OWNER_ELEVATION: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
       },
     });
 
@@ -431,6 +435,7 @@ describe(updateTenantDetails, () => {
         PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        OWNER_ELEVATION: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
       },
     });
 
@@ -806,6 +811,7 @@ describe(updateTenantDetails, () => {
         PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        OWNER_ELEVATION: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
       },
     });
     await insertOwnerInvite(tenantId, 'owner@example.com');

@@ -40,6 +40,20 @@ export type TUpdateTenantDetailsResult =
 // never by position in the sequence.
 type TProvisioningState = 'IDLE' | 'RUNNING' | 'FAILED' | 'SUCCEEDED';
 
+// The six core provisioning steps `run.ts`'s workflow actually sequences —
+// hardcoded rather than derived from `TENANT_PROVISIONING_STEP` (which also
+// carries `OWNER_ELEVATION`, a recurring post-provisioning check with no
+// bearing on this state machine) so this fold can't silently pick up a
+// future unrelated step key the same way.
+const CORE_PROVISIONING_STEPS: TTenantProvisioningStep[] = [
+  TENANT_PROVISIONING_STEP.SANITY_PROJECT,
+  TENANT_PROVISIONING_STEP.SEED_CONTENT,
+  TENANT_PROVISIONING_STEP.DEPLOY_STUDIO,
+  TENANT_PROVISIONING_STEP.PERSIST_TOKEN,
+  TENANT_PROVISIONING_STEP.MAP_DOMAIN,
+  TENANT_PROVISIONING_STEP.CREATE_WEBHOOK,
+];
+
 function deriveProvisioningState(
   provisioningStatus: TTenant['provisioningStatus'],
   steps: TTenant['provisioningSteps'],
@@ -53,7 +67,9 @@ function deriveProvisioningState(
     return 'RUNNING';
   }
 
-  const stepStates = Object.values(steps ?? {});
+  const stepStates = CORE_PROVISIONING_STEPS.map(
+    (step) => steps?.[step],
+  ).filter((state) => state !== undefined);
 
   if (
     stepStates.length === 0 ||

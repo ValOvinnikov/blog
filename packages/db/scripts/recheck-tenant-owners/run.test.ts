@@ -10,17 +10,17 @@ const { elevateTenantOwnerMock } = vi.hoisted(() => ({
   elevateTenantOwnerMock: vi.fn(),
 }));
 
+const { reportOwnerElevationOutcomeMock } = vi.hoisted(() => ({
+  reportOwnerElevationOutcomeMock: vi.fn(),
+}));
+
 vi.mock('@blog/db/queries/tenants', () => ({
   listTenantsPendingOwnerElevation: listTenantsPendingOwnerElevationMock,
 }));
+vi.mock('../provision-tenant/lib/report-owner-elevation-outcome', () => ({
+  reportOwnerElevationOutcome: reportOwnerElevationOutcomeMock,
+}));
 vi.mock('../provision-tenant/steps/elevate-tenant-owner', () => ({
-  ELEVATE_TENANT_OWNER_OUTCOME: {
-    ELEVATED: 'ELEVATED',
-    ALREADY_ADMINISTRATOR: 'ALREADY_ADMINISTRATOR',
-    PENDING_ACCEPTANCE: 'PENDING_ACCEPTANCE',
-    STALLED: 'STALLED',
-    AMBIGUOUS_MEMBERSHIP: 'AMBIGUOUS_MEMBERSHIP',
-  },
   elevateTenantOwner: elevateTenantOwnerMock,
 }));
 
@@ -52,6 +52,7 @@ function tenant(id: string, slug: string): TTenant {
 beforeEach(() => {
   listTenantsPendingOwnerElevationMock.mockReset().mockResolvedValue([]);
   elevateTenantOwnerMock.mockReset();
+  reportOwnerElevationOutcomeMock.mockReset().mockResolvedValue(undefined);
 });
 
 describe(runRecheck, () => {
@@ -99,6 +100,32 @@ describe(runRecheck, () => {
     });
     expect(elevateTenantOwnerMock).toHaveBeenCalledTimes(5);
     expect(hasSystemicFailures(summary)).toBe(false);
+    expect(reportOwnerElevationOutcomeMock).toHaveBeenCalledTimes(5);
+    expect(reportOwnerElevationOutcomeMock).toHaveBeenNthCalledWith(
+      1,
+      't1',
+      'ELEVATED',
+    );
+    expect(reportOwnerElevationOutcomeMock).toHaveBeenNthCalledWith(
+      2,
+      't2',
+      'ALREADY_ADMINISTRATOR',
+    );
+    expect(reportOwnerElevationOutcomeMock).toHaveBeenNthCalledWith(
+      3,
+      't3',
+      'PENDING_ACCEPTANCE',
+    );
+    expect(reportOwnerElevationOutcomeMock).toHaveBeenNthCalledWith(
+      4,
+      't4',
+      'STALLED',
+    );
+    expect(reportOwnerElevationOutcomeMock).toHaveBeenNthCalledWith(
+      5,
+      't5',
+      'AMBIGUOUS_MEMBERSHIP',
+    );
   });
 
   it('counts a thrown error without stopping the sweep for later candidates', async () => {
@@ -126,6 +153,21 @@ describe(runRecheck, () => {
     });
     expect(elevateTenantOwnerMock).toHaveBeenCalledTimes(3);
     expect(hasSystemicFailures(summary)).toBe(true);
+    // The throwing candidate (t2) never reaches `reportOwnerElevationOutcome`
+    // — only the two that resolved do.
+    expect(reportOwnerElevationOutcomeMock).toHaveBeenCalledTimes(2);
+    expect(reportOwnerElevationOutcomeMock).toHaveBeenCalledWith(
+      't1',
+      'ELEVATED',
+    );
+    expect(reportOwnerElevationOutcomeMock).toHaveBeenCalledWith(
+      't3',
+      'ALREADY_ADMINISTRATOR',
+    );
+    expect(reportOwnerElevationOutcomeMock).not.toHaveBeenCalledWith(
+      't2',
+      expect.anything(),
+    );
   });
 });
 

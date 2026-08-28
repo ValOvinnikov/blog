@@ -1,3 +1,7 @@
+import {
+  ELEVATE_TENANT_OWNER_OUTCOME,
+  type TElevateTenantOwnerOutcome,
+} from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 import type { TProvisionEnv } from '../lib/env';
@@ -12,17 +16,6 @@ const OWNER_ELEVATION_ROLE = 'administrator';
 // than PENDING_ACCEPTANCE — long enough that a same-day signup isn't flagged,
 // short enough that a quiet non-acceptance still surfaces promptly.
 export const OWNER_ACCEPTANCE_STALL_THRESHOLD_MS = 1000 * 60 * 60 * 24 * 3;
-
-export const ELEVATE_TENANT_OWNER_OUTCOME = {
-  ELEVATED: 'ELEVATED',
-  ALREADY_ADMINISTRATOR: 'ALREADY_ADMINISTRATOR',
-  PENDING_ACCEPTANCE: 'PENDING_ACCEPTANCE',
-  STALLED: 'STALLED',
-  AMBIGUOUS_MEMBERSHIP: 'AMBIGUOUS_MEMBERSHIP',
-} as const;
-
-export type TElevateTenantOwnerOutcome =
-  (typeof ELEVATE_TENANT_OWNER_OUTCOME)[keyof typeof ELEVATE_TENANT_OWNER_OUTCOME];
 
 /**
  * Promotes the tenant owner from `viewer` to `administrator` once they've

@@ -30,6 +30,7 @@ async function insertDraftTenant(): Promise<string> {
         PERSIST_TOKEN: { status: 'IDLE' },
         MAP_DOMAIN: { status: 'IDLE' },
         CREATE_WEBHOOK: { status: 'IDLE' },
+        OWNER_ELEVATION: { status: 'IDLE' },
       },
     })
     .returning();
@@ -69,6 +70,7 @@ describe(updateProvisioningStep, () => {
       PERSIST_TOKEN: { status: 'IDLE' },
       MAP_DOMAIN: { status: 'IDLE' },
       CREATE_WEBHOOK: { status: 'IDLE' },
+      OWNER_ELEVATION: { status: 'IDLE' },
     });
   });
 
@@ -94,6 +96,7 @@ describe(updateProvisioningStep, () => {
       PERSIST_TOKEN: { status: 'IDLE' },
       MAP_DOMAIN: { status: 'IDLE' },
       CREATE_WEBHOOK: { status: 'IDLE' },
+      OWNER_ELEVATION: { status: 'IDLE' },
     });
   });
 
@@ -111,6 +114,38 @@ describe(updateProvisioningStep, () => {
     expect(result.data.provisioningSteps?.['SANITY_PROJECT']).toEqual({
       status: 'FAILED',
       error: 'Sanity Projects API returned 429',
+    });
+  });
+
+  it('stores the detail only when one is supplied', async () => {
+    const tenantId = await insertDraftTenant();
+
+    const result = await updateProvisioningStep({
+      tenantId,
+      step: 'OWNER_ELEVATION',
+      status: 'DONE',
+      detail: 'STALLED',
+    });
+
+    if (!result.ok) throw new Error('expected ok:true');
+    expect(result.data.provisioningSteps?.['OWNER_ELEVATION']).toEqual({
+      status: 'DONE',
+      detail: 'STALLED',
+    });
+  });
+
+  it('omits detail entirely when not supplied, leaving prior step state unaffected', async () => {
+    const tenantId = await insertDraftTenant();
+
+    const result = await updateProvisioningStep({
+      tenantId,
+      step: 'SANITY_PROJECT',
+      status: 'DONE',
+    });
+
+    if (!result.ok) throw new Error('expected ok:true');
+    expect(result.data.provisioningSteps?.['SANITY_PROJECT']).toEqual({
+      status: 'DONE',
     });
   });
 

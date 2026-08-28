@@ -30,6 +30,7 @@ async function insertDraftTenant(): Promise<string> {
         PERSIST_TOKEN: { status: 'IDLE' },
         MAP_DOMAIN: { status: 'IDLE' },
         CREATE_WEBHOOK: { status: 'IDLE' },
+        OWNER_ELEVATION: { status: 'IDLE' },
       },
     })
     .returning();

@@ -17,14 +17,13 @@
  */
 import { pathToFileURL } from 'node:url';
 
+import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
 import { listTenantsPendingOwnerElevation } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
 
-import {
-  ELEVATE_TENANT_OWNER_OUTCOME,
-  elevateTenantOwner,
-} from '../provision-tenant/steps/elevate-tenant-owner';
+import { reportOwnerElevationOutcome } from '../provision-tenant/lib/report-owner-elevation-outcome';
+import { elevateTenantOwner } from '../provision-tenant/steps/elevate-tenant-owner';
 
 import { loadRecheckEnv, type TRecheckEnv } from './lib/env';
 
@@ -68,6 +67,8 @@ async function recheckOne(
       tenant,
       env as TElevateTenantOwnerEnv,
     );
+    await reportOwnerElevationOutcome(tenant.id, outcome);
+
     switch (outcome) {
       case ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED:
         summary.elevated += 1;
