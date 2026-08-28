@@ -26,7 +26,7 @@ vi.mock('resend', () => ({
   },
 }));
 
-function tenant(): TTenant {
+function tenant(overrides: Partial<TTenant> = {}): TTenant {
   return {
     id: 't1',
     slug: 'acme',
@@ -46,6 +46,7 @@ function tenant(): TTenant {
     deprovisionedAt: null,
     createdAt: new Date('2026-01-01T00:00:00.000Z'),
     updatedAt: new Date('2026-01-01T00:00:00.000Z'),
+    ...overrides,
   } as TTenant;
 }
 
@@ -101,6 +102,22 @@ describe(notifyOperatorsOfOwnerElevationOutcome, () => {
         to: ['super-one@example.com', 'super-two@example.com'],
         subject: expect.stringContaining('Acme'),
       }),
+    );
+  });
+
+  it('escapes HTML-significant characters in operator-entered tenant fields', async () => {
+    await notifyOperatorsOfOwnerElevationOutcome({
+      tenant: tenant({ name: '<script>alert(1)</script> & "Co" \'s' }),
+      outcome: 'STALLED',
+      resendApiKey: 'resend-key',
+    });
+
+    const [call] = sendMock.mock.calls;
+    const html = (call as [{ html: string }])[0].html;
+
+    expect(html).not.toContain('<script>');
+    expect(html).toContain(
+      '&lt;script&gt;alert(1)&lt;/script&gt; &amp; &quot;Co&quot; &#39;s',
     );
   });
 

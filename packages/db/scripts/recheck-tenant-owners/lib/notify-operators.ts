@@ -13,6 +13,18 @@ import { Resend } from 'resend';
 // `*_FROM_ADDRESS` env var of its own.
 const DEFAULT_FROM_ADDRESS = 'Tenant Alerts <onboarding@resend.dev>';
 
+// `tenant.name` is operator-entered (the "Add tenant" form) and gets
+// interpolated straight into this email's HTML body — escape every
+// interpolated field rather than trust any one of them individually.
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // The only two outcomes this function is ever called with — the caller
 // guarantees it, since the other three outcomes are never actionable.
 export type TNotifiableOutcome = Extract<
@@ -75,7 +87,7 @@ export async function notifyOperatorsOfOwnerElevationOutcome({
       from: DEFAULT_FROM_ADDRESS,
       to: recipients,
       subject: `Tenant "${tenant.name}" (${tenant.slug}) needs owner-elevation attention`,
-      html: `<p>Tenant <strong>${tenant.name}</strong> (slug <code>${tenant.slug}</code>, id <code>${tenant.id}</code>) — ${OUTCOME_COPY[outcome]}</p><p>See the tenant's provisioning page in the platform admin panel for detail.</p>`,
+      html: `<p>Tenant <strong>${escapeHtml(tenant.name)}</strong> (slug <code>${escapeHtml(tenant.slug)}</code>, id <code>${escapeHtml(tenant.id)}</code>) — ${OUTCOME_COPY[outcome]}</p><p>See the tenant's provisioning page in the platform admin panel for detail.</p>`,
     });
 
     if (error) {
