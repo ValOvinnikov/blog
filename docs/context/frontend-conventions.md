@@ -8,7 +8,7 @@
 
 ```
 web → ui, service, db, auth, config, utils
-admin → db, auth, config, utils   (+ @blog/ui, scoped to look-preview/preview-sample/)
+platform → db, auth, config, utils   (+ @blog/ui, scoped to look-preview/preview-sample/)
 service → config, utils   (no React, ever)
 db → config, utils        (no React, no Sanity SDK — sibling to service, not a dependent)
 ui → config               (no Sanity, no data fetching — stays publishable)
@@ -23,7 +23,7 @@ feature needing both joins them in `web`. Internal packages ship raw
 TypeScript (Just-in-Time pattern) and are transpiled by the web app via
 `transpilePackages`.
 
-`admin` (`apps/platform`) never consumes `service` or Sanity — it owns its own
+`platform` (`apps/platform`) never consumes `service` or Sanity — it owns its own
 presentational and interactive primitives, styled from its own token layer
 rather than `@blog/ui`. The one exception is
 `apps/platform/src/components/features/look/look-preview/preview-sample/`,

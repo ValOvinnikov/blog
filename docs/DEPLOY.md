@@ -122,22 +122,22 @@ Three projects per environment — a web project, a Studio project (replacing
   **Node.js 22.x**; Framework Preset **Other** (the build/output commands
   come from `apps/cms/vercel.json`, not framework auto-detection).
 - **Admin:** `admin-dev`, `admin-prod` — same import flow; **Root Directory
-  `apps/admin`** + tick _"Include files outside of the root directory"_;
+  `apps/platform`** + tick _"Include files outside of the root directory"_;
   **Node.js 22.x**. A separate project rather than a second domain on
   `blog-dev`/`blog-prod`: a Vercel project has exactly one Root Directory,
-  and the panel is a second Next.js app under `apps/admin`.
+  and the panel is a second Next.js app under `apps/platform`.
 
 All six projects have Vercel's Git auto-deploy **disabled** — every deploy
 goes through a CI-gated GitHub Actions job (no pre-merge/preview deploys,
 nothing deploys before checks pass). This is set **once, in code**, via each
 app's own `vercel.json`'s `git.deploymentEnabled: false` (`apps/web`,
-`apps/cms`, `apps/admin`) — since the two projects sharing a Root Directory
+`apps/cms`, `apps/platform`) — since the two projects sharing a Root Directory
 get the same committed file, it can't silently drift the way a per-project
 console toggle (the old "Ignored Build Step" setting) could — a missed
 one-time click on `blog-prod` once meant it deployed on every branch push,
 uncontrolled, until #445 replaced it with this file.
 
-`apps/admin` was considered for branch previews (a panel whose purpose is
+`apps/platform` was considered for branch previews (a panel whose purpose is
 _saving_ config is the one surface a pre-merge preview would genuinely help
 review) and deliberately left disabled: each preview gets its own
 `*.vercel.app` hostname, and signing in on one would mean registering that
@@ -391,7 +391,7 @@ not fully functional until they are set:
 | `AUTH_GOOGLE_ID` / `_SECRET`       | Google sign-in (`@blog/auth`)                                        |
 | `MAGIC_LINK_FROM_ADDRESS`          | magic-link sender address (`@blog/auth`)                             |
 | `AUTH_COOKIE_DOMAIN`               | shares one session with `apps/web` — see below                       |
-| `RESEND_API_KEY`                   | delivers the magic-link email (`apps/admin`'s own `sendEmail`)       |
+| `RESEND_API_KEY`                   | delivers the magic-link email (`apps/platform`'s own `sendEmail`)    |
 | `BLOB_READ_WRITE_TOKEN`            | Look tab's logo/favicon uploads (`@vercel/blob`)                     |
 | `WEB_APP_URL`                      | `apps/web` origin the Look/Voice saves call to revalidate its cache  |
 | `SITE_CONFIG_REVALIDATE_SECRET`    | bearer token for that call — byte-identical to `apps/web`'s own      |
@@ -424,7 +424,7 @@ behaviour and is safe; you just sign in twice.
 
 #### OAuth callback URLs for the admin origin
 
-`apps/admin` hosts sign-in too — its URL can be shared as a link or typed
+`apps/platform` hosts sign-in too — its URL can be shared as a link or typed
 directly, which is why it carries the full provider set rather than a
 session-reader subset. The **GitHub and Google OAuth applications therefore
 need the admin origin's callback URL added** alongside the existing web one:
@@ -481,7 +481,7 @@ job resolves its own project's id + token:
       deploys run.
 
 `.github/workflows/provision-tenant.yml`/`deprovision-tenant.yml`
-(`workflow_dispatch` only, the former triggered from `apps/admin`'s "Add
+(`workflow_dispatch` only, the former triggered from `apps/platform`'s "Add
 tenant" wizard) also run in this same `production` environment — the
 Sanity/Vercel credentials below are singleton (one org, one Vercel team), so
 this isn't a new environment, just the same store gaining a few more
@@ -525,7 +525,7 @@ environment` rather than silently falling through to the wrong branch.
       as the `blog-prod`/`cms-prod`-adjacent Vercel env var of the same name
       (see the `@blog/db` env vars table above). `setTenantSanityToken`
       throws without it.
-- [ ] Variable `ADMIN_APP_BASE_URL` — the deployed `apps/admin` origin (no
+- [ ] Variable `ADMIN_APP_BASE_URL` — the deployed `apps/platform` origin (no
       trailing slash/path), e.g. `https://admin.{your-hosting}`. Used as the
       CORS origin step 1 adds to each new tenant's Sanity project. Must match
       the domain on the `admin-prod` Vercel project exactly (§3 above).
@@ -534,16 +534,16 @@ environment` rather than silently falling through to the wrong branch.
 - [ ] Variable `PLATFORM_DOMAIN` — the platform domain each tenant's Studio
       subdomain is minted under (`studio-<slug>.<PLATFORM_DOMAIN>`), e.g.
       `valstack.dev` in production.
-- [ ] `apps/admin`'s own Vercel project (not this GitHub Actions
+- [ ] `apps/platform`'s own Vercel project (not this GitHub Actions
       environment) needs env var `TENANT_PROVISIONING_GITHUB_REPO` = `<owner>/<repo>`
       (e.g. `ValOvinnikov/blog`), paired with its own
       `TENANT_PROVISIONING_GITHUB_TOKEN` — the "Add tenant" wizard's and the
       tenant status page's "Deprovision tenant" control's Server Actions
       dispatch `provision-tenant.yml`/`deprovision-tenant.yml` directly
-      against the GitHub API from `apps/admin` itself, not from a CI job, so
+      against the GitHub API from `apps/platform` itself, not from a CI job, so
       there's no `GITHUB_REPOSITORY`-style var to infer this from. See
       `docs/context/environment-variables.md`.
-- [ ] Optional: `apps/admin`'s own Vercel project can also set env var
+- [ ] Optional: `apps/platform`'s own Vercel project can also set env var
       `TENANT_PROVISIONING_DATASET` (`development` or `production`) to pick
       which dataset that deployment's provisioning runs create in — a
       manually-set, per-deployment opt-in, same posture as `apps/web`'s
@@ -1011,7 +1011,7 @@ production deployment before `VERCEL_GIT_PREVIOUS_SHA` has anything to hold.
 Promote an existing successful preview deployment to production in the
 dashboard — a console action, like everything else in this doc.
 
-Because `apps/web`, `apps/cms` and `apps/admin`'s primary projects all set
+Because `apps/web`, `apps/cms` and `apps/platform`'s primary projects all set
 `git.deploymentEnabled: false` (CI-gated pipeline), these two Storybook
 projects are the **only** ones that preview-deploy on a PR. Deploy volume is
 therefore already minimal — each builds only when genuinely affected. When a

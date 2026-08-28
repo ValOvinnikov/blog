@@ -334,7 +334,7 @@ shared-secret (`SITE_CONFIG_REVALIDATE_SECRET`, byte-identical between the
 two apps, same posture as `AUTH_SECRET`) service-to-service call between the
 two apps' own deployments — not a Sanity webhook, so it doesn't reuse
 `@sanity/webhook`'s HMAC verification. Calling it is best-effort from the
-admin side: a failure (missing config, network error, non-2xx) is logged and
+platform side: a failure (missing config, network error, non-2xx) is logged and
 swallowed, never thrown, since the save itself has already succeeded and the
 3600s window still covers it. See
 [`docs/context/environment-variables.md`](./docs/context/environment-variables.md)

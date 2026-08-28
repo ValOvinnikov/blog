@@ -20,7 +20,7 @@ combined. It is not the assertions that are slow.
 
 ## Root cause
 
-`apps/web`, `apps/admin` and `packages/ui` set `environment: 'jsdom'` for
+`apps/web`, `apps/platform` and `packages/ui` set `environment: 'jsdom'` for
 **every** test file. With `isolate: true` (the default) each test file gets a
 fresh module registry, so each one re-imports the jsdom module.
 
@@ -30,11 +30,11 @@ import is the cost, not the DOM itself.
 
 Most of those files never touch a DOM:
 
-| workspace     | total test files | need no DOM                                     |
-| ------------- | ---------------- | ----------------------------------------------- |
-| `apps/web`    | 151              | **62**                                          |
-| `apps/admin`  | 78               | ~35                                             |
-| `packages/ui` | 63               | 3 (correctly jsdom — it is a component library) |
+| workspace       | total test files | need no DOM                                     |
+| --------------- | ---------------- | ----------------------------------------------- |
+| `apps/web`      | 151              | **62**                                          |
+| `apps/platform` | 78               | ~35                                             |
+| `packages/ui`   | 63               | 3 (correctly jsdom — it is a component library) |
 
 ## Validated fix: run non-DOM tests on the node environment
 

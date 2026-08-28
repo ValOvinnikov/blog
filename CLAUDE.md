@@ -14,7 +14,7 @@ content; a Next.js 16 App Router site renders it; types flow end-to-end.
 
 ```
 web → ui, service, db, auth, config, utils   service → config, utils (no React)
-admin → db, auth, config, utils             cms → config (types via typegen)
+platform → db, auth, config, utils          cms → config (types via typegen)
 ui → config (no Sanity/fetch)               configs/* → consumed by all
 db → config, utils (no React/Sanity)        auth → db, config, utils
 insight → nothing (base of graph, like config/utils)
