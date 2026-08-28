@@ -42,7 +42,7 @@ export async function GET(request: Request): Promise<NextResponse> {
       (await queries.tenants.listTenantsByIds([tenantId])).length > 0;
 
   if (!authorized) {
-    return NextResponse.redirect(new URL(adminRoutes.unauthorized(), url));
+    return NextResponse.json(null, { status: 404 });
   }
 
   const response = NextResponse.redirect(new URL(adminRoutes.dashboard(), url));

@@ -58,18 +58,18 @@ describe(requireTenantMembership, () => {
     expect(getAdminByUserIdMock).not.toHaveBeenCalled();
   });
 
-  it('redirects to /unauthorized when the signed-in user has no admins row and no membership on that tenant', async () => {
+  it('404s — the same outcome as an unknown slug — when the signed-in user has no admins row and no membership on that tenant', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getTenantBySlugMock.mockResolvedValue({ id: 'tenant-1', slug: 'acme' });
     getAdminByUserIdMock.mockResolvedValue(undefined);
     getMembershipMock.mockResolvedValue(undefined);
 
     await expect(requireTenantMembership('acme')).rejects.toThrow(
-      'NEXT_REDIRECT',
+      'NEXT_NOT_FOUND',
     );
 
     expect(getMembershipMock).toHaveBeenCalledWith('user-1', 'tenant-1');
-    expect(redirect).toHaveBeenCalledWith('/unauthorized');
+    expect(redirect).not.toHaveBeenCalled();
   });
 
   it.each(['ADMIN', 'MODERATOR', 'SUPERADMIN'])(

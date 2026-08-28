@@ -1,6 +1,6 @@
 import { usePathname } from '@admin/i18n/navigation';
 import { customRenderAsync, screen } from '@admin/testing/custom-render';
-import { redirect, useParams } from 'next/navigation';
+import { notFound, redirect, useParams } from 'next/navigation';
 import type { ComponentPropsWithoutRef } from 'react';
 
 import PlatformLayout from './layout';
@@ -38,6 +38,9 @@ vi.mock('next/navigation', () => ({
   redirect: vi.fn(() => {
     throw new Error('NEXT_REDIRECT');
   }),
+  notFound: vi.fn(() => {
+    throw new Error('NEXT_NOT_FOUND');
+  }),
   useParams: vi.fn(() => ({})),
 }));
 
@@ -50,6 +53,7 @@ describe(`<${PlatformLayout.name}/>`, () => {
     authMock.mockReset();
     getAdminByUserIdMock.mockReset();
     vi.mocked(redirect).mockClear();
+    vi.mocked(notFound).mockClear();
     vi.mocked(usePathname).mockReturnValue('/tenants');
     vi.mocked(useParams).mockReturnValue({});
   });
@@ -63,14 +67,14 @@ describe(`<${PlatformLayout.name}/>`, () => {
     expect(getAdminByUserIdMock).not.toHaveBeenCalled();
   });
 
-  it('redirects to /unauthorized when the signed-in user has no admins row', async () => {
+  it('404s when the signed-in user has no admins row', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(getAdminByUserIdMock).toHaveBeenCalledWith('user-1');
-    expect(vi.mocked(redirect)).toHaveBeenCalledWith('/unauthorized');
+    expect(vi.mocked(redirect)).not.toHaveBeenCalled();
   });
 
   it('renders the gated content for a signed-in admin', async () => {

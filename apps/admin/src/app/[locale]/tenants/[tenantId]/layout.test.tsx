@@ -44,13 +44,13 @@ describe(`<${TenantByIdLayout.name}/>`, () => {
     expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 
-  it('redirects to /unauthorized when the signed-in user has no admins row', async () => {
+  it('404s when the signed-in user has no admins row', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
-    expect(redirect).toHaveBeenCalledWith('/unauthorized');
+    expect(redirect).not.toHaveBeenCalled();
     expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 

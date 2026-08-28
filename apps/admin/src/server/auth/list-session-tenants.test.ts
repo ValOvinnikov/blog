@@ -50,19 +50,19 @@ describe(listSessionTenants, () => {
     expect(listMembershipsForUserMock).not.toHaveBeenCalled();
   });
 
-  it('redirects to /unauthorized when the signed-in user has zero memberships and is not a SUPERADMIN', async () => {
+  it('redirects to /workspace-pending when the signed-in user has zero memberships and is not a SUPERADMIN', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
     listMembershipsForUserMock.mockResolvedValue([]);
 
     await expect(listSessionTenants()).rejects.toThrow('NEXT_REDIRECT');
 
-    expect(redirect).toHaveBeenCalledWith('/unauthorized');
+    expect(redirect).toHaveBeenCalledWith('/workspace-pending');
     expect(listTenantsByIdsMock).not.toHaveBeenCalled();
   });
 
   it.each(['ADMIN', 'MODERATOR'])(
-    'redirects to /unauthorized for a %s admins row with zero memberships',
+    'redirects to /workspace-pending for a %s admins row with zero memberships',
     async (role) => {
       authMock.mockResolvedValue({ user: { id: 'user-1' } });
       getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role });
@@ -70,7 +70,7 @@ describe(listSessionTenants, () => {
 
       await expect(listSessionTenants()).rejects.toThrow('NEXT_REDIRECT');
 
-      expect(redirect).toHaveBeenCalledWith('/unauthorized');
+      expect(redirect).toHaveBeenCalledWith('/workspace-pending');
       expect(listTenantsMock).not.toHaveBeenCalled();
     },
   );

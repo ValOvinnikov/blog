@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 import { resolveDashboardTenant } from './resolve-dashboard-tenant';
 
@@ -39,6 +39,20 @@ describe(resolveDashboardTenant, () => {
     listSessionTenantsMock.mockReset();
     cookiesMock.mockReset();
     vi.mocked(redirect).mockClear();
+    vi.mocked(notFound).mockClear();
+  });
+
+  it('404s when the single membership points at a tenant that no longer exists', async () => {
+    listSessionTenantsMock.mockResolvedValue({
+      userId: 'user-1',
+      memberships: [membership1],
+      tenants: [],
+    });
+
+    await expect(resolveDashboardTenant()).rejects.toThrow('NEXT_NOT_FOUND');
+
+    expect(cookiesMock).not.toHaveBeenCalled();
+    expect(redirect).not.toHaveBeenCalled();
   });
 
   it('resolves directly with exactly one membership, without reading the active-tenant cookie', async () => {

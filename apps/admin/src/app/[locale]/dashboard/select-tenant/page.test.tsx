@@ -47,13 +47,13 @@ describe(`<${SelectTenantPage.name}/>`, () => {
     expect(redirect).toHaveBeenCalledWith('/api/auth/signin');
   });
 
-  it('redirects to /unauthorized with zero memberships', async () => {
+  it('redirects to /workspace-pending with zero memberships', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listMembershipsForUserMock.mockResolvedValue([]);
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
-    expect(redirect).toHaveBeenCalledWith('/unauthorized');
+    expect(redirect).toHaveBeenCalledWith('/workspace-pending');
   });
 
   it('redirects straight to /dashboard for exactly one membership — nothing to pick', async () => {

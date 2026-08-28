@@ -62,10 +62,10 @@ describe(`<${TenantDomainPage.name}/>`, () => {
     expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 
-  it('redirects to /unauthorized when the signed-in user has no admins row', async () => {
+  it('404s when the signed-in user has no admins row', async () => {
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
     expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 

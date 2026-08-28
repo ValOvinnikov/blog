@@ -5,7 +5,7 @@ import { adminRoutes } from '@admin/utils/routes/routes';
 import type { TMembership } from '@blog/db/schema/memberships';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 import { listSessionTenants } from './list-session-tenants';
 
@@ -20,11 +20,12 @@ export type TDashboardTenantContext = {
  * The slug-free `/dashboard` tree's tenant gate — the counterpart to
  * `requireTenantMembership`, but resolving "which tenant" from the session's
  * own `memberships` instead of a URL param. Exactly one membership resolves
- * directly; more than one requires an "active tenant" cookie set by
- * `/api/dashboard/select-tenant` — missing, or naming a tenant the session no
- * longer has a membership for, redirects to the picker at
- * `/dashboard/select-tenant` rather than guessing. Called from a layout so
- * every route nested under the gated segment is protected by existing there.
+ * directly, 404ing if it points at a tenant that no longer exists; more than
+ * one requires an "active tenant" cookie set by `/api/dashboard/select-tenant`
+ * — missing, or naming a tenant the session no longer has a membership for,
+ * redirects to the picker at `/dashboard/select-tenant` rather than
+ * guessing. Called from a layout so every route nested under the gated
+ * segment is protected by existing there.
  */
 export const resolveDashboardTenant =
   async (): Promise<TDashboardTenantContext> => {
@@ -36,7 +37,7 @@ export const resolveDashboardTenant =
       const tenant = tenantById.get(membership.tenantId);
 
       if (!tenant) {
-        redirect(adminRoutes.unauthorized());
+        notFound();
       }
 
       return { tenant, membership, tenants };

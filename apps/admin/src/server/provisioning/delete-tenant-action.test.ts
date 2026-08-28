@@ -1,6 +1,5 @@
-import { adminRoutes } from '@admin/utils/routes/routes';
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 const {
   requireSuperAdminMock,
@@ -78,17 +77,17 @@ describe('deleteTenantAction', () => {
     expect(deleteTenantMock).not.toHaveBeenCalled();
   });
 
-  it("rejects an ADMIN-role caller via requireSuperAdmin's /unauthorized redirect, before touching the tenant", async () => {
+  it("rejects an ADMIN-role caller via requireSuperAdmin's 404, before touching the tenant", async () => {
     requireSuperAdminMock.mockImplementation(() => {
-      redirect(adminRoutes.unauthorized());
+      notFound();
     });
     const { deleteTenantAction } = await import('./delete-tenant-action');
 
     await expect(
       deleteTenantAction('tenant-1', { confirm: 'Acme Inc.' }),
-    ).rejects.toThrow('NEXT_REDIRECT');
+    ).rejects.toThrow('NEXT_NOT_FOUND');
 
-    expect(redirect).toHaveBeenCalledWith(adminRoutes.unauthorized());
+    expect(redirect).not.toHaveBeenCalled();
     expect(listTenantsByIdsMock).not.toHaveBeenCalled();
     expect(deleteTenantMock).not.toHaveBeenCalled();
   });

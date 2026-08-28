@@ -35,7 +35,9 @@ supplies authentication only — it has no opinion on either.
   - `dashboard/(tenant)/` and `t/[tenantSlug]/` — `memberships`-gated tenant
     routes (Look/Voice settings), reached with and without an explicit tenant
     slug in the URL.
-  - `unauthorized/` — the page shown when a signed-in session fails a gate.
+  - `workspace-pending/` — session-gated page for a signed-in user with no
+    `admins` row and no `memberships` rows: a workspace still provisioning,
+    or one whose provisioning failed.
 - `src/app/api/` — Route Handlers: the Auth.js catch-all, the dashboard
   tenant-select endpoint, and the tenant-provisioning status callback.
 - `src/components/` — one folder per component (component file,
