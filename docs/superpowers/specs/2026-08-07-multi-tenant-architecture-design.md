@@ -9,7 +9,8 @@ see that section for the final call on each. **Two of them — 3 (Studio
 hosting) and 5 (URL scheme) — were reopened on 2026-08-28**, after a
 self-serve-provisioning requirement promoted two former Non-goals (self-serve
 signup, billing) into scope; three further decisions (8–10) were added the same
-day. Phase 0 (tenant registry) has
+day, and decisions 11–12 plus a new §7 (platform app) on the same date.
+Phase 0 (tenant registry) has
 already shipped; epic 2a (per-tenant content reads infrastructure) has
 shipped too, proven on one loader — epic 2b (migrating the remaining
 `service.*` loaders) is next and unblocked.
@@ -261,6 +262,56 @@ per font (Console's stay `true`, Editorial's are `false`) — see Open
 decision 7 below for what this means once tenants (and their font choices)
 multiply.
 
+### 7. Platform app — marketing, signup, billing (decided 2026-08-28)
+
+The public face of the platform — company/marketing pages, pricing, and the
+signup/signin entry point — lives in a **new `apps/platform`**, not in
+`apps/web` or `apps/admin`.
+
+- **Not `apps/web`.** Its value in this architecture is that it renders
+  _tenants, uniformly_. Platform-only routes (pricing backed by live plan data,
+  signup, checkout) break that uniformity and put platform code in every tenant
+  request path; a marketing bug would take every tenant site down with it.
+- **Not `apps/admin`.** Wrong on four axes at once: authenticated-only, an
+  operator/owner audience rather than prospects, no SEO/metadata/OG/sitemap
+  infrastructure, and an ESLint guard that deliberately confines it away from
+  `@blog/ui`.
+
+Funnel: `platform.<domain>` (marketing + signup) → `admin.<domain>` (the
+owner's dashboard). Cross-app session is already solved — `@blog/auth` plus
+`AUTH_COOKIE_DOMAIN` is exactly this case, and both existing apps already call
+their own `NextAuth()`.
+
+**Layer contract:** `platform → ui, service, db, auth, config, utils, insight`
+— identical to `apps/web`'s. `SPEC.md` §4 and CLAUDE.md's layer map both need
+the new row when this lands.
+
+**Marketing content is CMS-authored in its own Sanity project (decided
+2026-08-28)**, not hand-built pages — read through `@blog/service` with an
+env-configured project id, the single-project shape `apps/web` used before
+tenancy. `apps/platform` is genuinely single-site, so it does **not** need
+tenant resolution. Once §5's shared Studio lands, this project is simply one
+more project that Studio serves; it needs no Studio of its own.
+
+**Known costs, recorded so they are not discovered late:**
+
+- A fourth Next app means two more Vercel projects, another deploy job, another
+  `.env.example`, and another `turbo.json` build-env set. Note that
+  `scripts/check-turbo-env-sync.mjs` hardcodes an `APPS` list (currently `web`
+  and `admin`) — a fourth app needs an entry there, or turbo strict mode
+  silently strips its vars at build time.
+- It needs its own scoped subagent (`.claude/agents/platform-app.md`) per
+  CLAUDE.md's delegation rule.
+- `NEXT_PUBLIC_SANITY_PROJECT_ID` would mean "the marketing project" in
+  `apps/platform` and "the pre-tenancy fallback project" in `apps/web` — one
+  name, two meanings, across apps. Feed this into the env-naming work (#1647)
+  rather than letting it land unnoticed.
+- **Pricing drift.** The enforced entitlement ceiling is `PLAN_REGISTRY` in
+  `packages/db/src/constants/tenant.ts`. A CMS-authored pricing page can
+  silently disagree with what the code actually grants. Render tier
+  capabilities _from_ `PLAN_REGISTRY`, or add a check that fails when the two
+  diverge — do not hand-author both.
+
 ## Provisioning a tenant (onboarding flow)
 
 An admin/automation flow, not a hot path:
@@ -486,6 +537,48 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
     Both are `pgEnum`-backed, so a change needs a generated migration.
     **Needs sign-off.**
 
+11. **Marketing project schema — OPEN (raised 2026-08-28).** Does the marketing
+    Sanity project (§7) reuse `apps/cms`'s existing schema, or get its own?
+    Recommendation: **reuse it.** Zero new schema work, it dogfoods the
+    page-builder module catalogue, and it keeps typegen single-output
+    (`packages/config/src/sanity/generated/types.ts` is generated from one
+    schema; a second schema means a second output and real complexity). The
+    cost is cosmetic — the marketing project's Studio lists blog document types
+    it will not use. If marketing genuinely outgrows the catalogue, that is
+    signal to extend the shared modules, which benefits tenants too.
+    **Needs sign-off.**
+
+12. **Incumbent (pre-tenancy) project adoption — PARTLY DEFERRED
+    (2026-08-28).** Two Sanity projects predate tenancy, one per environment.
+    Both are still served by the fallback branch in
+    `packages/service/src/sanity/client.ts` and `image-base-url.ts`
+    (`tenant?.projectId ?? env.NEXT_PUBLIC_SANITY_PROJECT_ID`) — that `??` _is_
+    the incumbent sites' code path.
+
+    _Mechanism (needs no new provisioning logic):_ pre-insert a `tenants` row
+    with `sanityProjectId`, `sanityDataset` and `seededAt` already set, then run
+    provisioning normally. `createTenantSanityProject` skips creation when
+    `tenant.sanityProjectId` is set, `seedTenantContent` returns early on
+    `seededAt`, and the remaining steps (dataset check, CORS, token mint, domain
+    map, webhook) are individually idempotent. A small `db:adopt-tenant` script
+    that inserts the row is the whole of the net-new work. Each row goes in its
+    own environment's registry branch.
+
+    _Development project:_ becomes a development-registry test tenant — useful
+    for exercising the provisioning flow against something real.
+
+    _Production project:_ **deferred, undecided (2026-08-28).** It is the
+    project owner's own blog; whether it stays live and becomes tenant #1, or is
+    replaced by the marketing site, is not settled. **Do not adopt or repoint it
+    until it is.**
+
+    _Sequencing when it does happen:_ after epic 2b, or the site half-reads from
+    the registry and half from the env var. Retire `SANITY_API_READ_TOKEN` for
+    that site once the per-tenant encrypted token takes over, and verify the
+    hand-created revalidate webhook matches what the idempotent `create-webhook`
+    step looks for — otherwise you end up with two. **Needs sign-off
+    (production half).**
+
 ## Non-goals (recorded so epics don't sprawl)
 
 - ~~**Billing/subscription integration**~~ — **promoted to in-scope
@@ -521,8 +614,11 @@ rules. **Gate on Feature 2 (theme-as-content) for per-tenant branding.**
 5. **Provisioning automation** — the onboarding script (Projects API, seed,
    registry, domain) + the per-project migration runner.
 6. **Studio-per-tenant** — per the §5 hosting decision.
-7. **Self-serve signup + billing** — promoted from Non-goals 2026-08-28;
-   gated on §Open decisions 8–10. **Later:** cross-tenant admin.
+7. **Platform app** — `apps/platform` (§7): marketing + pricing + signup,
+   with its own Sanity project for content. Gated on nothing; can start
+   independently.
+8. **Self-serve signup + billing** — promoted from Non-goals 2026-08-28;
+   gated on §Open decisions 8–10 and on epic 7. **Later:** cross-tenant admin.
 
 **Timing note vs. M5:** epic 3 wants the engagement tables empty. **`bookmarks`
 and `subscribers` already exist in `@blog/db`**, so that window may already be
