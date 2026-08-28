@@ -890,10 +890,19 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    mechanism, only a scheduled read.
 
    The state itself is already captured: `reportStepStatus` writes each step's
-   status directly to Postgres and deliberately never throws. What is missing
-   is surfacing it (#2266) and pushing it to a human — tracked separately,
-   since operator notification is a new capability rather than part of the
-   grant.
+   status directly to Postgres and deliberately never throws. #2266 ships the
+   **detection only**: `elevateTenantOwner` returns `ELEVATED` /
+   `ALREADY_ADMINISTRATOR` / `PENDING_ACCEPTANCE` / `STALLED` /
+   `AMBIGUOUS_MEMBERSHIP` (a second human member — e.g. a superadmin who
+   self-joined through Manage — so the owner cannot be identified by
+   exclusion), decided on elapsed time rather than on an error, and writes it
+   to the provisioning run's console. It is deliberately **not** persisted —
+   routing the outcome through `reportStepStatus` needs a new
+   `TENANT_PROVISIONING_STEP` member, and every such member crosses into
+   `apps/admin`, which is mid-rename.
+   Persisting the outcome and rendering it for an operator is therefore a
+   follow-up, as is pushing it to a human, since operator notification is a
+   new capability rather than part of the grant.
 
 10. **Trial lifecycle & abandoned-tenant reclamation — RESOLVED 2026-08-28.** Sanity imposes no project-count limit (confirmed by the
     project owner, 2026-08-28), so trials need not conserve projects and a

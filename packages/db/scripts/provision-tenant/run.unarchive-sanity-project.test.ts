@@ -35,6 +35,9 @@ const { mapTenantDomainMock } = vi.hoisted(() => ({
 const { createTenantRevalidateWebhookMock } = vi.hoisted(() => ({
   createTenantRevalidateWebhookMock: vi.fn(),
 }));
+const { elevateTenantOwnerMock } = vi.hoisted(() => ({
+  elevateTenantOwnerMock: vi.fn(),
+}));
 
 vi.mock('@blog/db/queries/tenants', () => ({
   reactivateTenant: reactivateTenantMock,
@@ -59,6 +62,10 @@ vi.mock('./steps/map-domain', () => ({
 }));
 vi.mock('./steps/create-revalidate-webhook', () => ({
   createTenantRevalidateWebhook: createTenantRevalidateWebhookMock,
+}));
+vi.mock('./steps/elevate-tenant-owner', () => ({
+  ELEVATE_TENANT_OWNER_OUTCOME: { PENDING_ACCEPTANCE: 'PENDING_ACCEPTANCE' },
+  elevateTenantOwner: elevateTenantOwnerMock,
 }));
 
 const fetchMock = vi.fn();
@@ -116,6 +123,7 @@ beforeEach(() => {
   persistTenantSanityTokenMock.mockReset().mockResolvedValue(undefined);
   mapTenantDomainMock.mockReset().mockResolvedValue(undefined);
   createTenantRevalidateWebhookMock.mockReset().mockResolvedValue(undefined);
+  elevateTenantOwnerMock.mockReset().mockResolvedValue('PENDING_ACCEPTANCE');
 });
 
 afterEach(() => {

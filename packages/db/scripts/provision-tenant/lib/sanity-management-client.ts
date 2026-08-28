@@ -241,6 +241,46 @@ export async function createSanityProjectInvite(input: {
   );
 }
 
+export type TSanityAclRole = { name: string };
+
+export type TSanityAclEntry = {
+  projectUserId: string;
+  roles: TSanityAclRole[];
+  isRobot: boolean;
+};
+
+// A pending invitee never shows up here — only once they accept does Sanity
+// create their project-user entry — so this listing doubles as the
+// acceptance signal, no separate mechanism needed.
+export async function listSanityProjectAcl(input: {
+  token: string;
+  projectId: string;
+}): Promise<TSanityAclEntry[]> {
+  return sanityManagementRequest<TSanityAclEntry[]>(
+    `/projects/${input.projectId}/acl/`,
+    input.token,
+  );
+}
+
+// Only the legacy Roles API this file's default base already targets
+// (`v2021-06-07`) permits granting `administrator` here — the newer Access
+// API 403s even for a token that owns the project. Key on `projectUserId`
+// (`p…`) from `listSanityProjectAcl`, never a `sanityUserId` (`g…`) from
+// elsewhere — the latter 400s. Roles are additive: this never revokes an
+// existing role.
+export async function grantSanityProjectRole(input: {
+  token: string;
+  projectId: string;
+  projectUserId: string;
+  role: TSanityProjectMemberRole;
+}): Promise<void> {
+  await sanityManagementRequest(
+    `/projects/${input.projectId}/acl/${input.projectUserId}`,
+    input.token,
+    { method: 'PUT', body: JSON.stringify({ roleName: input.role }) },
+  );
+}
+
 // Webhooks are documented against the project-scoped host
 // (`{projectId}.api.sanity.io`), unlike every endpoint above, which all work
 // against the generic `api.sanity.io` host — see
