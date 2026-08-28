@@ -48,6 +48,12 @@ D | grep -nE '^(<<<<<<<|>>>>>>>)'
 # Secrets / env files
 D | grep -nE '^\+.*(_TOKEN|_SECRET|API_KEY)\s*[:=]'
 git diff "$BASE"...HEAD --name-only | grep -E '^\.env'
+
+# Real-looking Sanity project id pasted into a fixture (#2268) — a hit here
+# isn't automatically a violation (the id could already be an intentional
+# fake), but it flags the exact injection vector for a manual look: a real
+# Access API error string copy-pasted into a test.
+D | grep -nE '^\+.*/access/project/[a-z0-9]{8}/'
 ```
 
 Also scan the diff by eye for commented-out code blocks — grep can't catch
@@ -57,6 +63,16 @@ up at lint time; the grep pass exists so review catches what config misses.
 Expected false positives: a diff that edits this skill (or other docs quoting
 these patterns) will hit its own example strings. Hits inside documentation
 code fences are not findings — report only hits in real code.
+
+**Why not a repo-wide CI grep for "id-shaped" strings (#2268 AC4).** A general
+pattern match for any 8-character lowercase-alphanumeric string would flag
+routine mock ids, hashes, and slugs across the whole test suite — the false
+positive rate makes it worse than no check at all. Real Sanity project ids
+are also provisioned per-tenant at runtime, so there is no fixed denylist to
+grep for. The narrow, precedent-matching mechanical grep above (scoped to the
+literal `/access/project/<id>/` URL shape that caused this leak) catches a
+recurrence of the same mistake without that blast radius; a broader
+CI-enforced guard was deliberately not added.
 
 ## 1. Layer boundaries (blocking)
 
