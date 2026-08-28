@@ -1,9 +1,9 @@
+import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 import type { TProvisionEnv } from '../lib/env';
 
 import {
-  ELEVATE_TENANT_OWNER_OUTCOME,
   elevateTenantOwner,
   OWNER_ACCEPTANCE_STALL_THRESHOLD_MS,
 } from './elevate-tenant-owner';

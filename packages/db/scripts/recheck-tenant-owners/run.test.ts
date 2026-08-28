@@ -10,17 +10,17 @@ const { elevateTenantOwnerMock } = vi.hoisted(() => ({
   elevateTenantOwnerMock: vi.fn(),
 }));
 
+const { reportOwnerElevationOutcomeMock } = vi.hoisted(() => ({
+  reportOwnerElevationOutcomeMock: vi.fn(),
+}));
+
 vi.mock('@blog/db/queries/tenants', () => ({
   listTenantsPendingOwnerElevation: listTenantsPendingOwnerElevationMock,
 }));
+vi.mock('../provision-tenant/lib/report-owner-elevation-outcome', () => ({
+  reportOwnerElevationOutcome: reportOwnerElevationOutcomeMock,
+}));
 vi.mock('../provision-tenant/steps/elevate-tenant-owner', () => ({
-  ELEVATE_TENANT_OWNER_OUTCOME: {
-    ELEVATED: 'ELEVATED',
-    ALREADY_ADMINISTRATOR: 'ALREADY_ADMINISTRATOR',
-    PENDING_ACCEPTANCE: 'PENDING_ACCEPTANCE',
-    STALLED: 'STALLED',
-    AMBIGUOUS_MEMBERSHIP: 'AMBIGUOUS_MEMBERSHIP',
-  },
   elevateTenantOwner: elevateTenantOwnerMock,
 }));
 
@@ -52,6 +52,7 @@ function tenant(id: string, slug: string): TTenant {
 beforeEach(() => {
   listTenantsPendingOwnerElevationMock.mockReset().mockResolvedValue([]);
   elevateTenantOwnerMock.mockReset();
+  reportOwnerElevationOutcomeMock.mockReset().mockResolvedValue(undefined);
 });
 
 describe(runRecheck, () => {

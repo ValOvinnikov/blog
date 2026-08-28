@@ -70,13 +70,6 @@ vi.mock('./steps/create-revalidate-webhook', () => ({
   createTenantRevalidateWebhook: createTenantRevalidateWebhookMock,
 }));
 vi.mock('./steps/elevate-tenant-owner', () => ({
-  ELEVATE_TENANT_OWNER_OUTCOME: {
-    ELEVATED: 'ELEVATED',
-    ALREADY_ADMINISTRATOR: 'ALREADY_ADMINISTRATOR',
-    PENDING_ACCEPTANCE: 'PENDING_ACCEPTANCE',
-    STALLED: 'STALLED',
-    AMBIGUOUS_MEMBERSHIP: 'AMBIGUOUS_MEMBERSHIP',
-  },
   elevateTenantOwner: elevateTenantOwnerMock,
 }));
 
@@ -185,6 +178,10 @@ describe(runSteps, () => {
       ],
       [
         TENANT_PROVISIONING_STEP.CREATE_WEBHOOK,
+        TENANT_PROVISIONING_STEP_STATUS.DONE,
+      ],
+      [
+        TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
         TENANT_PROVISIONING_STEP_STATUS.DONE,
       ],
     ]);
