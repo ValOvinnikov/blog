@@ -897,12 +897,12 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    `AMBIGUOUS_MEMBERSHIP` (a second human member — e.g. a superadmin who
    self-joined through Manage — so the owner cannot be identified by
    exclusion), decided on elapsed time rather than on an error, and writes it
-   to the provisioning run's console. It is deliberately **not** persisted —
-   routing the outcome through `reportStepStatus` needs a new
-   `TENANT_PROVISIONING_STEP` member, and every such member crosses into
-   `apps/platform`, which is mid-rename.
-   Persisting the outcome and rendering it for an operator is therefore a
-   follow-up, as is pushing it to a human, since operator notification is a
+   to the provisioning run's console. At the time #2266 shipped, that outcome
+   was deliberately **not** persisted — routing it through `reportStepStatus`
+   needed a new `TENANT_PROVISIONING_STEP` member, and every such member
+   crosses into `apps/platform`, which was mid-rename at the time. Persisting
+   the outcome and rendering it for an operator was therefore split out as a
+   follow-up, as was pushing it to a human, since operator notification is a
    new capability rather than part of the grant.
 
    **The scheduled read now exists (#2275).** `elevateTenantOwner` originally
@@ -912,9 +912,20 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    sweeps every `ACTIVE`/`READY` tenant every 6 hours and re-runs
    `elevateTenantOwner` per candidate — ~12 checks within the 3-day stall
    threshold, cheap even for a tenant that never accepts (one ACL read,
-   no-op once already `administrator`). Still not persisted to the
-   `tenants` row or pushed to a human — #2274 and #2272 remain the
-   follow-ups for that.
+   no-op once already `administrator`).
+
+   **Persistence and rendering now exist too (#2274).** `TENANT_PROVISIONING_STEP`
+   gained an `OWNER_ELEVATION` member — a recurring post-provisioning check,
+   not one of the six core sequenced steps, so it never touches the tenant's
+   overall `provisioningStatus`. Both `provision-tenant/run.ts` and the
+   `recheck-tenant-owners` sweep report through `reportStepStatus` on every
+   check, always as `status: DONE` (never `RUNNING`/`FAILED` — a stall or an
+   ambiguous membership is a completed check with an outcome, not a failed
+   step) carrying the outcome itself in a new `detail` field. `apps/platform`
+   renders a secondary badge on the tenant overview once core provisioning is
+   `READY`, only for the two outcomes an operator can act on (`STALLED` /
+   `AMBIGUOUS_MEMBERSHIP`) — the other three render quietly or not at all.
+   Pushing a stalled acceptance to a human remains #2272's follow-up.
 
 10. **Trial lifecycle & abandoned-tenant reclamation — RESOLVED 2026-08-28.** Sanity imposes no project-count limit (confirmed by the
     project owner, 2026-08-28), so trials need not conserve projects and a
