@@ -239,13 +239,13 @@ jobs:
         run: |
           set -euo pipefail
           if [ -z "${PRODUCTION_DB_HOST:-}" ]; then
-            echo "::error::PRODUCTION_DB_HOST is unset — refusing to migrate without the production-host guard in place. Set it as a Variable on the development Environment (see docs/DEPLOY.md)." >&2
+            echo "::error::PRODUCTION_DB_HOST is unset — refusing to migrate without the production-host guard in place. Set it as a repo-level Variable (see docs/DEPLOY.md)." >&2
             exit 1
           fi
           # A bare hostname is letters/digits/dots/hyphens only — a scheme,
           # '@', ':', or '/' means someone pasted a full connection string.
           if ! [[ "$PRODUCTION_DB_HOST" =~ ^[A-Za-z0-9.-]+$ ]]; then
-            echo "::error::PRODUCTION_DB_HOST does not look like a bare hostname — it may hold a full connection string. Expected only the host portion (e.g. ep-xxxx.us-east-2.aws.neon.tech). Check the development Environment's Variable." >&2
+            echo "::error::PRODUCTION_DB_HOST does not look like a bare hostname — it may hold a full connection string. Expected only the host portion (e.g. ep-xxxx.us-east-2.aws.neon.tech). Check the repo-level Variable." >&2
             exit 1
           fi
           host=$(node -e "console.log(new URL(process.env.DATABASE_URL_UNPOOLED).hostname)") || {

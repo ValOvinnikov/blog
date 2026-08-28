@@ -207,7 +207,7 @@ generate`) diffs the schema against the last migration and writes a new
    `PRODUCTION_DB_HOST`), and fails loudly too if that Variable is unset or
    malformed — it can no longer be left silently inert. See
    `docs/DEPLOY.md`'s "Repo level — production-target guard for
-   `migrate-db`".
+   `migrate-db` (both directions)".
 4. **Back up before applying to the shared/production branch.** The
    production CI job (below) does this automatically via `pg_dump` against
    `DATABASE_URL_UNPOOLED`, uploaded as a 30-day CI artifact, mirroring
@@ -225,13 +225,17 @@ generate`) diffs the schema against the last migration and writes a new
    `needs: verify`) — `pg_dump` backup (artifact) → `pnpm --filter @blog/db
 db:migrate` — gated behind a `vX.Y.Z` tag push **and** the `production`
    GitHub Environment's required-reviewer approval (the same gate every
-   other production job reuses, not a second mechanism). Every step is
-   guarded on `DATABASE_URL_UNPOOLED`, so the job stays a no-op until that
-   secret is configured. Only `deploy-web` `needs` this job (apps/cms never
-   touches Postgres). See `docs/DEPLOY.md`'s "How a deploy happens" and
-   `docs/context/ci-automation.md` for the full description; do not run
-   `db:migrate` against the shared/production branch by hand outside this
-   gated CI path.
+   other production job reuses, not a second mechanism). The job opens with
+   the mirror-image of the dev guard above: it fails loudly if
+   `DATABASE_URL_UNPOOLED` resolves to anything **other than** the repo
+   Variable `PRODUCTION_DB_HOST`, so a mis-set production secret can no
+   longer migrate the wrong branch — or nothing at all — while reporting
+   success. Every step is guarded on `DATABASE_URL_UNPOOLED`, so the job
+   stays a no-op until that secret is configured. Only `deploy-web` `needs`
+   this job (apps/cms never touches Postgres). See `docs/DEPLOY.md`'s "How a
+   deploy happens" and `docs/context/ci-automation.md` for the full
+   description; do not run `db:migrate` against the shared/production branch
+   by hand outside this gated CI path.
 6. **Never hand-edit a migration file once it has been applied anywhere
    shared** (dev or prod) — this desyncs drizzle-kit's journal from reality.
    If a mistake surfaces after the fact, write a **new** corrective migration;
