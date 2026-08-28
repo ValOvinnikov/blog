@@ -592,12 +592,15 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    decrypting its registry row, not from a shared env var. Encryption-at-rest
    mechanism (KMS-backed vs. app-level) and rotation flow are epic-2
    implementation details, not further open decisions here.
-3. **Studio hosting — REOPENED 2026-08-28.** (Was: resolved 2026-08-14 as
-   shape (a), one Studio codebase built + deployed per tenant.) Shape (a) was
-   never actually implemented — no fan-out redeploy step exists, so tenant
-   Studios are frozen at their provisioning commit — and it is incompatible
-   with self-serve provisioning. Direction is shape (b), pending the
-   Next-hosted-Studio spike. Full rationale in §5. **Needs sign-off.**
+3. **Studio hosting — RESOLVED 2026-08-28: shape (b), mounted as routes inside
+   the admin app.** Full rationale and the route table are in §5; the
+   resolution detail and its consequences are at the end of this item.
+
+   _History._ Resolved 2026-08-14 as shape (a) (one Studio codebase built and
+   deployed per tenant), then reopened 2026-08-28: shape (a) was never actually
+   implemented — no fan-out redeploy step exists, so tenant Studios are frozen
+   at their provisioning commit — and it is incompatible with self-serve
+   provisioning.
 
    **Spike done 2026-08-28 (#2260): shape (b) is proven — it still needs the
    sign-off.** One deployment served two real tenant projects, selected per
