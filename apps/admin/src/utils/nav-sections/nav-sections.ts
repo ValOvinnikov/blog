@@ -8,7 +8,7 @@ export type TNavTranslator = (
   values?: Record<string, string | number>,
 ) => string;
 
-export const platformNavSections = (
+export const operatorNavSections = (
   t: TNavTranslator,
 ): TSidebarNavSection[] => [
   {

@@ -3,7 +3,7 @@ import { createTranslator } from 'next-intl';
 
 import {
   dashboardNavSections,
-  platformNavSections,
+  operatorNavSections,
   tenantNavSections,
   type TNavTranslator,
 } from './nav-sections';
@@ -14,9 +14,9 @@ const t = createTranslator({
   namespace: 'navSections',
 }) as unknown as TNavTranslator;
 
-describe('platformNavSections', () => {
+describe('operatorNavSections', () => {
   it('gives both Tenants and Add tenant real hrefs', () => {
-    const [platform] = platformNavSections(t);
+    const [platform] = operatorNavSections(t);
     const tenants = platform!.items.find((item) => item.label === 'Tenants');
     const addTenant = platform!.items.find(
       (item) => item.label === 'Add tenant',

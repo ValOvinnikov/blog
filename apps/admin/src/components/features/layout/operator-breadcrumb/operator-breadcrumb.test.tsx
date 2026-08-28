@@ -2,7 +2,7 @@ import { usePathname } from '@admin/i18n/navigation';
 import { renderWithIntl, screen } from '@admin/testing/custom-render';
 import type { ComponentPropsWithoutRef } from 'react';
 
-import { PlatformBreadcrumb } from './platform-breadcrumb';
+import { OperatorBreadcrumb } from './operator-breadcrumb';
 
 // Links through `@admin/i18n/navigation`'s `Link`/`usePathname`, mocked the
 // same way as `sidebar.test.tsx`/`topbar-nav-menu.test.tsx`.
@@ -21,11 +21,11 @@ vi.mock('@admin/i18n/navigation', () => ({
 
 const render = renderWithIntl;
 
-describe(PlatformBreadcrumb, () => {
+describe(OperatorBreadcrumb, () => {
   it('renders the 2-segment trail on the tenants list, with Tenants as the current item', () => {
     vi.mocked(usePathname).mockReturnValue('/tenants');
 
-    render(<PlatformBreadcrumb />);
+    render(<OperatorBreadcrumb />);
 
     expect(screen.getByText('Platform')).toBeVisible();
     expect(screen.queryByRole('link', { name: 'Platform' })).toBeNull();
@@ -36,7 +36,7 @@ describe(PlatformBreadcrumb, () => {
   it('renders a 3-segment trail with a linked Tenants on the add-tenant route', () => {
     vi.mocked(usePathname).mockReturnValue('/add-tenant');
 
-    render(<PlatformBreadcrumb />);
+    render(<OperatorBreadcrumb />);
 
     expect(screen.getByRole('link', { name: 'Tenants' })).toHaveAttribute(
       'href',

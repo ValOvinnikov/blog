@@ -9,11 +9,11 @@ import { adminRoutes } from '@admin/utils/routes/routes';
 import { useTranslations } from 'next-intl';
 
 /**
- * `(platform)/layout.tsx`'s breadcrumb — every route under that segment is
+ * `(operator)/layout.tsx`'s breadcrumb — every route under that segment is
  * tenant-agnostic (`/tenants`, `/add-tenant`); a specific tenant's pages live
  * under `tenants/[tenantId]/layout.tsx`'s own `TenantBreadcrumb` instead.
  */
-export const PlatformBreadcrumb = () => {
+export const OperatorBreadcrumb = () => {
   const pathname = usePathname();
   const t = useTranslations('navSections');
   const tTopbar = useTranslations('topbar');

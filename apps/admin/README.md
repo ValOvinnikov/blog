@@ -31,7 +31,7 @@ supplies authentication only — it has no opinion on either.
 - `src/app/[locale]/` — routes. The `[locale]` segment is single-locale
   (`next-intl` with `localePrefix: 'never'`), used to route UI copy through
   message catalogs rather than to serve multiple languages.
-  - `(platform)/` — `admins`-gated routes (tenant list, add-tenant wizard).
+  - `(operator)/` — `admins`-gated routes (tenant list, add-tenant wizard).
   - `dashboard/(tenant)/` and `t/[tenantSlug]/` — `memberships`-gated tenant
     routes (Look/Voice settings), reached with and without an explicit tenant
     slug in the URL.
