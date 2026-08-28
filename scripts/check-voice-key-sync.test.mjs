@@ -19,7 +19,7 @@ import {
 } from './check-voice-key-sync.mjs';
 
 const CMS_FIXTURE = `
-  import { titleField } from '@cms/schema-types/helpers/title-field';
+  import { titleField } from '@blog/studio/schema-types/helpers/title-field';
   import { defineField, defineType } from 'sanity';
 
   export const voiceSchema = defineType({

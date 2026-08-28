@@ -42,7 +42,7 @@
   verbs, …) stay as declarations.
 - Per-layer subpaths that compose `base.js` (and, where relevant,
   `no-upstream-imports.js`) with that layer's own constraints — `./config`,
-  `./utils`, `./insight`, `./service`, `./db`, `./ui`, `./web`, `./cms`,
+  `./utils`, `./insight`, `./service`, `./db`, `./ui`, `./web`, `./studio`,
   `./auth`, `./platform` — each imported by that workspace's own
   `eslint.config.js`. `./insight` composes `./utils` and exempts its own
   `src/**` from the repo-wide `no-console` ban — `files` patterns resolve
@@ -57,7 +57,7 @@
 Every package and app workspace, plus `configs/tailwind` and
 `configs/vitest`: `packages/config`, `packages/utils`, `packages/insight`,
 `packages/service`, `packages/db`, `packages/auth`, `packages/ui`,
-`apps/web`, `apps/cms`, `apps/platform`, `configs/tailwind`, `configs/vitest`.
+`apps/web`, `packages/studio`, `apps/platform`, `configs/tailwind`, `configs/vitest`.
 
 ## Further reading
 

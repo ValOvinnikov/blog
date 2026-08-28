@@ -1,0 +1,40 @@
+#!/usr/bin/env node
+/**
+ * Regenerate Sanity types into `@blog/config` — two `sanity` CLI steps run
+ * in sequence: `schema extract` (writes schema.json into the generated dir)
+ * then `typegen generate` (reads it back out to produce types.ts). Kept as
+ * one script, not a bare `&&` in package.json, so a failure in either step
+ * fails loudly with its own labeled log line instead of a single opaque
+ * inline command.
+ *
+ *   pnpm --filter @blog/studio typegen
+ *
+ * Invoked by the root `pnpm typegen` (`turbo run typegen`) — see
+ * `turbo.json`'s `typegen` task for the cache/env/outputs config.
+ */
+import { execFileSync } from 'node:child_process';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const studioDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+// Sanity's CLI re-joins an absolute --path onto its own cwd rather than
+// using it as-is, so this must stay relative (matching the pre-#1038 inline
+// command) or the extract silently writes into a bogus nested directory.
+const schemaPath = join(
+  '../../packages/config/src/sanity/generated/schema.json',
+);
+
+const runSanity = (args) => {
+  execFileSync('pnpm', ['exec', 'sanity', ...args], {
+    cwd: studioDir,
+    stdio: 'inherit',
+  });
+};
+
+console.log(`Extracting schema -> ${schemaPath}`);
+runSanity(['schema', 'extract', '--path', schemaPath, '--force']);
+
+console.log('Generating types from extracted schema...');
+runSanity(['typegen', 'generate']);
+
+console.log('Typegen complete.');
