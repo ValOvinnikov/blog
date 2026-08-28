@@ -13,6 +13,7 @@ export * from './get-tenant-provisioning-status';
 export * from './get-tenant-sanity-credentials';
 export * from './list-tenants';
 export * from './list-tenants-by-ids';
+export * from './list-tenants-pending-owner-elevation';
 export * from './reactivate-tenant';
 export * from './set-tenant-provisioning-status';
 export * from './set-tenant-sanity-project';
