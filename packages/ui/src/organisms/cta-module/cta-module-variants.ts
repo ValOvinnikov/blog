@@ -101,27 +101,27 @@ export const ctaModuleVariants = tv({
     {
       variant: [CTA_VARIANT.SPLIT, CTA_VARIANT.CALLOUT],
       tone: BRAND_VARIANT.PRIMARY,
-      class: { root: 'bg-primary' },
+      class: { root: ['bg-primary'] },
     },
     {
       variant: [CTA_VARIANT.SPLIT, CTA_VARIANT.CALLOUT],
       tone: BRAND_VARIANT.SECONDARY,
-      class: { root: 'bg-secondary' },
+      class: { root: ['bg-secondary'] },
     },
     {
       variant: [CTA_VARIANT.SPLIT, CTA_VARIANT.CALLOUT],
       tone: BRAND_VARIANT.BRAND_PRIMARY,
-      class: { root: 'bg-brand-primary-muted' },
+      class: { root: ['bg-brand-primary-muted'] },
     },
     {
       variant: CTA_VARIANT.BANNER,
       tone: BRAND_VARIANT.BRAND_PRIMARY,
-      class: { overlay: AZURE_SCRIM },
+      class: { overlay: [AZURE_SCRIM] },
     },
     {
       variant: CTA_VARIANT.BANNER,
       tone: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
-      class: { overlay: NEUTRAL_SCRIM },
+      class: { overlay: [NEUTRAL_SCRIM] },
     },
     // A centered Callout still reads lists left-aligned within the centered
     // block — a fully centered list separates markers from their text.
@@ -129,7 +129,9 @@ export const ctaModuleVariants = tv({
       variant: CTA_VARIANT.CALLOUT,
       align: HEADING_ALIGN.CENTER,
       class: {
-        text: '[&_ul]:inline-block [&_ol]:inline-block [&_ul]:text-left [&_ol]:text-left',
+        text: [
+          '[&_ul]:inline-block [&_ol]:inline-block [&_ul]:text-left [&_ol]:text-left',
+        ],
       },
     },
   ],
