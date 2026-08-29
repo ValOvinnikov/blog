@@ -3,8 +3,8 @@ name: Deprovision Tenant
 # Reverses `provision-tenant.yml` for one tenant — removes its custom domain
 # from the shared `apps/web` Vercel project, archives its Sanity project so
 # it stops billing, clears its persisted Sanity credentials, and archives
-# (never hard-deletes) the
-# `tenants` row. The Sanity project is archived rather than deleted because
+# (never hard-deletes) the `tenants` row. The Sanity project is archived
+# rather than deleted because
 # deleting one needs an org billing permission this token deliberately
 # lacks; the project and its dataset survive for a later permanent delete.
 #

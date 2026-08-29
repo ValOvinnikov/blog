@@ -570,9 +570,7 @@ environment` rather than silently falling through to the wrong branch.
       to `development` now points its provisioning/deprovisioning dispatches
       at the `development` tenant registry too, not just the Sanity dataset.
       See `docs/context/environment-variables.md`.
-- [ ] `VERCEL_TOKEN` / `VERCEL_ORG_ID` / `VERCEL_PROJECT_ID` above are reused
-      as-is: `VERCEL_TOKEN` needs project-creation scope (not just deploy
-      scope) for this workflow to create each tenant's Studio Vercel project;
+- [ ] `VERCEL_TOKEN` / `VERCEL_PROJECT_ID` above are reused as-is.
       `VERCEL_PROJECT_ID` here means the **shared web** project (`blog-prod`)
       — the one the "Map domain" step adds every tenant's custom domain to,
       never a per-tenant project.
