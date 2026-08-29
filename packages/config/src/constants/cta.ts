@@ -28,3 +28,10 @@ export const CTA_ACTION_APPEARANCE = {
 } as const;
 
 export type TCtaActionAppearance = TValueOf<typeof CTA_ACTION_APPEARANCE>;
+
+export const CTA_ACTION_VARIANT = {
+  PRIMARY: 'PRIMARY',
+  SECONDARY: 'SECONDARY',
+} as const;
+
+export type TCtaActionVariant = TValueOf<typeof CTA_ACTION_VARIANT>;

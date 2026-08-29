@@ -1,5 +1,7 @@
 import { asideSchema } from './aside';
 import { blockTextSchema } from './block-text';
+import { actionGroupSchema, ctaActionSchema } from './blocks/action-group';
+import { basicTextSchema } from './blocks/basic-text';
 import { bodyImageSchema } from './body-image';
 import { brandSchema } from './brand';
 import { heroLayoutSchema } from './hero-layout';
@@ -27,8 +29,11 @@ export const objects = [
   asideSchema,
   richTextSchema,
   blockTextSchema,
+  basicTextSchema,
   socialLinkSchema,
   linkSchema,
+  ctaActionSchema,
+  actionGroupSchema,
   openGraphSchema,
   seoSchema,
   specLineSchema,

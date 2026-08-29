@@ -197,11 +197,46 @@ export type OpenGraph = {
   ogImage?: ImageWithAlt;
 };
 
+export type ActionGroup = {
+  _type: 'actionGroup';
+  actions?: Array<
+    {
+      _key: string;
+    } & CtaAction
+  >;
+};
+
+export type CtaAction = {
+  _type: 'ctaAction';
+  variant?: 'PRIMARY' | 'SECONDARY';
+  appearance?: 'CONTAINED' | 'INLINE';
+  link?: Link;
+};
+
 export type SocialLink = {
   _type: 'socialLink';
   platform?: string;
   url?: string;
 };
+
+export type BasicText = Array<{
+  children?: Array<{
+    marks?: Array<string>;
+    text?: string;
+    _type: 'span';
+    _key: string;
+  }>;
+  style?: 'normal';
+  listItem?: 'bullet' | 'number';
+  markDefs?: Array<
+    {
+      _key: string;
+    } & Link
+  >;
+  level?: number;
+  _type: 'block';
+  _key: string;
+}>;
 
 export type BlockText = Array<{
   children?: Array<{
@@ -863,7 +898,10 @@ export type AllSanitySchemaTypes =
   | SpecLine
   | Seo
   | OpenGraph
+  | ActionGroup
+  | CtaAction
   | SocialLink
+  | BasicText
   | BlockText
   | Aside
   | SanityImageAssetReference
