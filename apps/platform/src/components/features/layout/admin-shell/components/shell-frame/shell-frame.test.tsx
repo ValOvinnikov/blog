@@ -43,9 +43,39 @@ describe(ShellFrame, () => {
       </ShellFrame>,
     );
 
-    const root = screen.getByText('Sidebar').closest('aside')?.parentElement;
+    // Two hops up: `<aside>`'s immediate parent is `SidebarCollapseProvider`'s
+    // `display: contents` wrapper, which the browser box tree — but not
+    // `Element.parentElement` — treats as absent.
+    const root = screen.getByText('Sidebar').closest('aside')
+      ?.parentElement?.parentElement;
     expect(root).not.toHaveClass('overflow-hidden');
     expect(root).not.toHaveClass('h-dvh');
     expect(root).toHaveClass('min-h-dvh');
+  });
+
+  it('seeds the sidebar-collapse boundary from isSidebarInitiallyCollapsed', () => {
+    renderWithIntl(
+      <ShellFrame
+        sidebar={<aside>Sidebar</aside>}
+        topbar={<p>Topbar</p>}
+        isSidebarInitiallyCollapsed={true}
+      >
+        <p>Page content</p>
+      </ShellFrame>,
+    );
+
+    const boundary = screen.getByText('Sidebar').parentElement;
+    expect(boundary).toHaveAttribute('data-collapsed', 'true');
+  });
+
+  it('defaults the sidebar-collapse boundary to expanded when the prop is omitted', () => {
+    renderWithIntl(
+      <ShellFrame sidebar={<aside>Sidebar</aside>} topbar={<p>Topbar</p>}>
+        <p>Page content</p>
+      </ShellFrame>,
+    );
+
+    const boundary = screen.getByText('Sidebar').parentElement;
+    expect(boundary).not.toHaveAttribute('data-collapsed');
   });
 });

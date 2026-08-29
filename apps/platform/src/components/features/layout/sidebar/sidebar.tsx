@@ -8,6 +8,7 @@ import {
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
+import { SidebarCollapseToggle } from './components/sidebar-collapse-toggle';
 import { SidebarNavLink } from './sidebar-nav-link';
 import { sidebarVariants } from './sidebar-variants';
 
@@ -65,6 +66,7 @@ export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
     brandMeta,
     brandName,
     brandTagline,
+    toggle,
     switcherSlot,
     section,
     sectionLabel,
@@ -86,6 +88,7 @@ export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
           <span className={brandName()}>{t('brandName')}</span>
           <span className={brandTagline()}>{t('brandTagline')}</span>
         </div>
+        <SidebarCollapseToggle className={toggle()} />
       </div>
 
       {switcher && <div className={switcherSlot()}>{switcher}</div>}

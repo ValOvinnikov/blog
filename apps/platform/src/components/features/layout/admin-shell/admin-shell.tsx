@@ -16,6 +16,12 @@ export type TAdminShellProps = {
   /** A rendered breadcrumb trail — see `@platform/components/shared/breadcrumbs`. */
   crumb: ReactNode;
   roleChip: TRoleChipProps;
+  /**
+   * Seeded from `resolveIsSidebarCollapsed`, read by the caller (not here) so
+   * this component stays a synchronous Server Component — a plain render in
+   * a test can't await a nested async component the way Next.js can.
+   */
+  isSidebarInitiallyCollapsed?: boolean;
   children: ReactNode;
 };
 
@@ -31,10 +37,12 @@ export const AdminShell = ({
   switcher,
   crumb,
   roleChip,
+  isSidebarInitiallyCollapsed = false,
   children,
 }: TAdminShellProps) => {
   return (
     <ShellFrame
+      isSidebarInitiallyCollapsed={isSidebarInitiallyCollapsed}
       sidebar={<Sidebar sections={sections} switcher={switcher} />}
       topbar={
         <Topbar

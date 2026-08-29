@@ -5,6 +5,7 @@ import { TenantSwitcher } from '@platform/components/features/layout/tenant-swit
 import { auth } from '@platform/server/auth/auth';
 import { isVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { resolveDashboardTenant } from '@platform/server/auth/resolve-dashboard-tenant';
+import { resolveIsSidebarCollapsed } from '@platform/server/layout/resolve-is-sidebar-collapsed';
 import {
   dashboardNavSections,
   type TNavTranslator,
@@ -29,6 +30,7 @@ type TProps = {
 export default async function DashboardTenantLayout({ children }: TProps) {
   const { tenant, membership, tenants } = await resolveDashboardTenant();
   const session = await auth();
+  const isSidebarInitiallyCollapsed = await resolveIsSidebarCollapsed();
   const tNavSections = (await getTranslations(
     'navSections',
   )) as unknown as TNavTranslator;
@@ -43,6 +45,7 @@ export default async function DashboardTenantLayout({ children }: TProps) {
 
   return (
     <AdminShell
+      isSidebarInitiallyCollapsed={isSidebarInitiallyCollapsed}
       sections={dashboardNavSections(tNavSections)}
       switcher={
         tenants.length > 1 ? (

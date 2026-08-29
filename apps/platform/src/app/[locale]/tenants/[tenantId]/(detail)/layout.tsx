@@ -3,6 +3,7 @@ import { TenantBreadcrumb } from '@platform/components/features/layout/tenant-br
 import { TenantSwitcher } from '@platform/components/features/layout/tenant-switcher';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
+import { resolveIsSidebarCollapsed } from '@platform/server/layout/resolve-is-sidebar-collapsed';
 import {
   operatorNavSections,
   tenantNavSections,
@@ -25,6 +26,7 @@ export default async function TenantDetailLayout({ children, params }: TProps) {
   const { tenantId } = await params;
   const { tenant, admin } = await requireTenantById(tenantId);
   const session = await auth();
+  const isSidebarInitiallyCollapsed = await resolveIsSidebarCollapsed();
   const t = await getTranslations('tenantLayout');
   const tNavSections = (await getTranslations(
     'navSections',
@@ -32,6 +34,7 @@ export default async function TenantDetailLayout({ children, params }: TProps) {
 
   return (
     <AdminShell
+      isSidebarInitiallyCollapsed={isSidebarInitiallyCollapsed}
       sections={[
         ...operatorNavSections(tNavSections),
         ...tenantNavSections(tNavSections, tenant.id, tenant.name),

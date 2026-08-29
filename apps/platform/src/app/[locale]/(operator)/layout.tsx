@@ -2,6 +2,7 @@ import { AdminShell } from '@platform/components/features/layout/admin-shell';
 import { OperatorBreadcrumb } from '@platform/components/features/layout/operator-breadcrumb';
 import { auth } from '@platform/server/auth/auth';
 import { requireAdmin } from '@platform/server/auth/require-admin';
+import { resolveIsSidebarCollapsed } from '@platform/server/layout/resolve-is-sidebar-collapsed';
 import {
   operatorNavSections,
   type TNavTranslator,
@@ -27,12 +28,14 @@ type TProps = {
 export default async function OperatorLayout({ children }: TProps) {
   const admin = await requireAdmin();
   const session = await auth();
+  const isSidebarInitiallyCollapsed = await resolveIsSidebarCollapsed();
   const tNavSections = (await getTranslations(
     'navSections',
   )) as unknown as TNavTranslator;
 
   return (
     <AdminShell
+      isSidebarInitiallyCollapsed={isSidebarInitiallyCollapsed}
       sections={operatorNavSections(tNavSections)}
       crumb={<OperatorBreadcrumb />}
       roleChip={{
