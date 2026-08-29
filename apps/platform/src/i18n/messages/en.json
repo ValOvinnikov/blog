@@ -357,7 +357,7 @@
     "description": "The fast part. Everything after this runs automatically, each step resumable on failure.",
     "nameLabel": "Tenant name",
     "slugLabel": "Slug",
-    "slugHint": "Becomes the Studio's own hostname, e.g. studio-yourslug.valstack.dev — never the public site address.",
+    "slugHint": "A unique identifier for this tenant — you'll type it to confirm destructive actions. Never part of a web address.",
     "domainLabel": "Domain",
     "domainHint": "The public domain this tenant's site will answer to.",
     "planLabel": "Plan",
