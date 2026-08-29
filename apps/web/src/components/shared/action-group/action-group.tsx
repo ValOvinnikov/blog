@@ -10,7 +10,7 @@ type TActionButtonVariant = 'primary' | 'ghost' | 'link';
 
 export interface IActionGroupProps {
   actions: TCtaAction[];
-  /** Reverses non-primary buttons to white — Banner's dark scrim (D15). */
+  /** Reverses non-primary button colors for use on a dark or image background. */
   isOnDark?: boolean;
 }
 
@@ -28,12 +28,9 @@ export const toIsReversedOnDark = (
 ): boolean => Boolean(isOnDark) && variant !== 'primary';
 
 /**
- * ActionGroup — renders a CTA module's authored actions in order (already
- * validated Primary-first by the Studio schema), mapping each item's
- * variant/appearance onto a `Button` variant. Forwards the authored
- * `ariaLabel` through to the rendered link's `aria-label`, so screen readers
- * get a distinguishing accessible name when several actions share generic
- * link text (e.g. two "Learn more" buttons).
+ * Renders a list of link-shaped actions in authored order, mapping each
+ * item's variant/appearance to a `Button` style and forwarding its
+ * `ariaLabel` through for a distinguishing accessible name.
  */
 export const ActionGroup = ({ actions, isOnDark }: IActionGroupProps) => (
   <>
