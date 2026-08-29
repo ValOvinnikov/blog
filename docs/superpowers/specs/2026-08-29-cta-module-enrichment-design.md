@@ -200,46 +200,56 @@ Field visibility uses Sanity `hidden: ({ parent }) => …` keyed on `variant`. `
 
 ## 5. `actionGroup` — the reusable actions object
 
-**Decision (D8 ✔).** Actions are **not** modelled as an array of `{ variant, link }` with an ordering validator, and **not** as fields inlined on `module_cta`. They are a **standalone reusable object** with **named slots**, placed under `objects/blocks/` so Hero, Newsletter, and future modules adopt the same one.
+**Decision (D8 ✔, reverted 2026-08-29 — see D14).** Actions are a **standalone reusable object** placed under `objects/blocks/` so Hero, Newsletter, and future modules adopt the same one — that half of D8 stands. The **shape inside it is an array, not named slots** — see D14 below for why, and for what actually shipped in #2309/PR #2312 before this correction (named `primary`/`secondary` fields, `secondaryAppearance` hidden for primary). That version is being reverted.
 
-Two things drove this:
-
-1. **Reuse.** The primary/secondary button pair is not CTA-specific. Hero already has `primaryActionLabel` + `secondaryAction`; Newsletter will want the same. Outsourcing it to one object means one Studio UX, one projection fragment, one `ActionGroup` renderer.
-2. **Named slots beat an ordered array.** With `primary` and `secondary` as distinct fields, "max 2", "each variant at most once", and "Primary must be first" are all _unrepresentable_ rather than validated — no custom validator, no error copy, no ordering test matrix, and no drag-to-reorder footgun in the Studio.
+**Decision (D14 ✔).** Each action is its own array item with its own `variant` (`PRIMARY`/`SECONDARY`) and its own `appearance` — **appearance is available on both variants**, not hidden for `PRIMARY`. Max 2 items; a `PRIMARY` item is required and must be first; `SECONDARY` is optional. This is the shape the epic's original spec draft proposed (`ctaAction`/`ctaActions`) — D8's "named slots avoid a validator" reasoning was mine, not confirmed, and the array shape is what's actually wanted. The one residual validator (max 2 / unique variants / Primary-first) is accepted as the cost of this shape, not avoided.
 
 ### 5.1 Shape (`objects/blocks/action-group.ts`)
 
+Two object types: `ctaAction` (one item) and `actionGroup` (the validated array wrapper).
+
 ```ts
-import { CTA_ACTION_APPEARANCE } from '@blog/config/constants';
+// objects/blocks/action-group.ts
+import {
+  CTA_ACTION_APPEARANCE,
+  CTA_ACTION_VARIANT,
+} from '@blog/config/constants';
 import { toTitleCase } from '@blog/utils/primitives';
 import { linkSchema } from '@blog/studio/schema-types/objects/link';
 import { MousePointerClick } from 'lucide-react';
-import { defineField, defineType } from 'sanity';
+import { defineArrayMember, defineField, defineType } from 'sanity';
 
-export const actionGroupSchema = defineType({
-  name: 'actionGroup',
-  title: 'Actions',
+export const ctaActionSchema = defineType({
+  name: 'ctaAction',
+  title: 'Action',
   type: 'object',
   icon: MousePointerClick,
+  initialValue: {
+    variant: CTA_ACTION_VARIANT.PRIMARY,
+    appearance: CTA_ACTION_APPEARANCE.CONTAINED,
+  },
   fields: [
     defineField({
-      name: 'primary',
-      title: 'Primary Action',
-      type: linkSchema.name,
-      description: 'The main action — always a filled button.',
-    }),
-    defineField({
-      name: 'secondary',
-      title: 'Secondary Action',
-      type: linkSchema.name,
-      description: 'Optional supporting action. Requires a primary action.',
-    }),
-    defineField({
-      name: 'secondaryAppearance',
-      title: 'Secondary Appearance',
+      name: 'variant',
+      title: 'Variant',
       type: 'string',
       description:
-        'How the secondary action looks: Contained (bordered button) or Inline (text link).',
+        'Primary is the main action. Secondary is the supporting action.',
+      options: {
+        layout: 'radio',
+        list: Object.values(CTA_ACTION_VARIANT).map((value) => ({
+          title: toTitleCase(value),
+          value,
+        })),
+      },
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'appearance',
+      title: 'Appearance',
+      type: 'string',
+      description:
+        'How this action looks: Contained (filled/bordered button) or Inline (text link). Available on both Primary and Secondary.',
       options: {
         layout: 'radio',
         list: Object.values(CTA_ACTION_APPEARANCE).map((value) => ({
@@ -248,19 +258,64 @@ export const actionGroupSchema = defineType({
         })),
       },
       initialValue: CTA_ACTION_APPEARANCE.CONTAINED,
-      hidden: ({ parent }) => !parent?.secondary,
+    }),
+    defineField({
+      name: 'link',
+      title: 'Link',
+      type: linkSchema.name,
+      validation: (rule) => rule.required(),
     }),
   ],
-  validation: (rule) =>
-    rule.custom((value) =>
-      value?.secondary && !value?.primary
-        ? 'A secondary action needs a primary action. Add a primary action first.'
-        : true,
-    ),
   preview: {
-    select: { primary: 'primary.label', secondary: 'secondary.label' },
-    prepare({ primary, secondary }) {
-      const labels = [primary, secondary].filter(Boolean).map(String);
+    select: {
+      label: 'link.label',
+      variant: 'variant',
+      appearance: 'appearance',
+    },
+    prepare({ label, variant, appearance }) {
+      return {
+        title: String(label ?? 'Action'),
+        subtitle: `${toTitleCase(String(variant ?? ''))} · ${toTitleCase(String(appearance ?? ''))}`,
+      };
+    },
+  },
+});
+
+type TActionItem = { _key?: string; variant?: string };
+
+export const actionGroupSchema = defineType({
+  name: 'actionGroup',
+  title: 'Actions',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'actions',
+      title: 'Actions',
+      type: 'array',
+      description:
+        'Up to two actions. Primary is required and comes first; Secondary is optional.',
+      of: [defineArrayMember({ type: ctaActionSchema.name })],
+      validation: (rule) =>
+        rule.max(2).custom((value) => {
+          const items = (value ?? []) as TActionItem[];
+          if (items.length === 0) return true;
+
+          const variants = items.map((i) => i?.variant);
+
+          if (new Set(variants).size !== variants.length) {
+            return 'Each action variant (Primary, Secondary) can be used only once.';
+          }
+          if (variants[0] !== CTA_ACTION_VARIANT.PRIMARY) {
+            return 'A Primary action is required and must be first.';
+          }
+          return true;
+        }),
+    }),
+  ],
+  preview: {
+    select: { a0: 'actions.0.link.label', a1: 'actions.1.link.label' },
+    prepare({ a0, a1 }) {
+      const labels = [a0, a1].filter(Boolean).map(String);
       return {
         title: labels.length ? labels.join('  ·  ') : 'No actions',
         subtitle: `${labels.length} action${labels.length === 1 ? '' : 's'}`,
@@ -270,41 +325,32 @@ export const actionGroupSchema = defineType({
 });
 ```
 
-One constant is needed:
+**New constant needed, not yet shipped.** `#2301` (config layer, merged) shipped `CTA_ACTION_APPEARANCE` but not `CTA_ACTION_VARIANT` — the named-slots version didn't need a variant enum (the field name itself said which slot), the array version does:
 
 ```ts
-export const CTA_ACTION_APPEARANCE = {
-  CONTAINED: 'CONTAINED',
-  INLINE: 'INLINE',
+export const CTA_ACTION_VARIANT = {
+  PRIMARY: 'PRIMARY',
+  SECONDARY: 'SECONDARY',
 } as const;
-export type TCtaActionAppearance = TValueOf<typeof CTA_ACTION_APPEARANCE>;
+export type TCtaActionVariant = TValueOf<typeof CTA_ACTION_VARIANT>;
 ```
 
-A helper mirrors the existing `sectionHeaderField()` convention:
+A follow-up config-layer change, dispatched to the `config` agent before the studio rework — same layer-routing rule as everything else, a one-constant addition doesn't earn a hand-edit.
 
-```ts
-// helpers/action-group-field.ts
-export const actionGroupField = (options: { title?: string } = {}) =>
-  defineField({
-    name: 'actions',
-    title: options.title ?? 'Actions',
-    type: actionGroupSchema.name,
-  });
-```
+The `helpers/action-group-field.ts` field helper (already shipped in #2309) is unaffected — it still returns a field named `actions` typed as `actionGroupSchema.name`; only what's _inside_ `actionGroupSchema` changes.
 
-**One residual validation rule** — secondary-requires-primary — remains, because it is a genuine cross-field constraint that naming alone cannot express. Everything else the array shape needed is gone.
-
-**Link-library readiness.** Both slots are typed as the inline `link` object today. When the link library lands, each slot's type changes from `link` to `linkRef` in **one file** — module consumers, the `ActionGroup` renderer, and the view-model shape are untouched, because they already read a normalised link. That is the "cleaner once the link library exists" property this shape is designed for.
+**Link-library readiness.** `ctaAction.link` is typed as the inline `link` object today. When the link library lands, that one field's type changes from `link` to `linkRef` — `ctaAction`, `actionGroup`, and every consumer are otherwise untouched.
 
 ### 5.2 Appearance → button variant mapping
 
-The web layer maps each action onto the existing `@blog/ui` `Button` variants — no new button styles:
+The web layer maps each action onto the existing `@blog/ui` `Button` variants — no new button styles. Applies per-item now, not just to the secondary slot:
 
-| Action                    | Renders as `Button variant`                |
-| ------------------------- | ------------------------------------------ |
-| `primary`                 | `primary` — filled `--brand-primary-solid` |
-| `secondary` + `CONTAINED` | `ghost` — `--border-strong`, hover brand   |
-| `secondary` + `INLINE`    | `link` — underlined `--brand-primary`      |
+| Action variant | Appearance  | Renders as `Button variant`                |
+| -------------- | ----------- | ------------------------------------------ |
+| `PRIMARY`      | `CONTAINED` | `primary` — filled `--brand-primary-solid` |
+| `PRIMARY`      | `INLINE`    | `link` — underlined `--brand-primary`      |
+| `SECONDARY`    | `CONTAINED` | `ghost` — `--border-strong`, hover brand   |
+| `SECONDARY`    | `INLINE`    | `link` — underlined `--brand-primary`      |
 
 ---
 
@@ -395,47 +441,37 @@ Reading order is fixed **content → media** in the DOM for every variant; visua
 
 `LinkButton` (`packages/ui/src/molecules/link-button/`) already exists and is exactly the primitive needed: polymorphic via `as`, applies `buttonVariants` to whatever element it's given. `Hero.Cta` (`HeroCta`) is a plain styled `<div>` slot — it never constructs a link itself. Building a new `packages/ui` molecule that duplicates this would be more machinery than the codebase's own established pattern uses, and `packages/ui` cannot import `next/link` at all (`CLAUDE.md`) — `LinkButton` is deliberately how it avoids ever needing to.
 
-So `ActionGroup` is a **web-layer shared component**, `apps/web/src/components/shared/action-group/`, alongside `smart-link/` and `section/`. It is the one place the §5.2 appearance-mapping table lives, so it isn't duplicated at every call site:
+So `ActionGroup` is a **web-layer shared component**, `apps/web/src/components/shared/action-group/`, alongside `smart-link/` and `section/`. It is the one place the §5.2 appearance-mapping table lives, so it isn't duplicated at every call site. It takes the **array** the service layer projects (§8) — already validated primary-first by the schema, so `ActionGroup` just renders in order, it doesn't re-derive ordering:
 
 ```tsx
 // apps/web/src/components/shared/action-group/action-group.tsx (sketch)
-export const ActionGroup = ({
-  primary,
-  secondary,
-  secondaryAppearance,
-}: TActionGroupProps) => (
+const toButtonVariant = (
+  variant: TCtaActionVariant,
+  appearance: TCtaActionAppearance,
+): TButtonVariant => {
+  if (appearance === CTA_ACTION_APPEARANCE.INLINE) return 'link';
+  return variant === CTA_ACTION_VARIANT.PRIMARY ? 'primary' : 'ghost';
+};
+
+export const ActionGroup = ({ actions }: TActionGroupProps) => (
   <>
-    {primary && (
+    {actions.map((action) => (
       <LinkButton
+        key={action.link.href}
         as={SmartLink}
-        href={primary.href}
-        target={primary.target}
-        ariaLabel={primary.ariaLabel}
-        variant="primary"
+        href={action.link.href}
+        target={action.link.target}
+        ariaLabel={action.link.ariaLabel}
+        variant={toButtonVariant(action.variant, action.appearance)}
       >
-        {primary.label}
+        {action.link.label}
       </LinkButton>
-    )}
-    {secondary && (
-      <LinkButton
-        as={SmartLink}
-        href={secondary.href}
-        target={secondary.target}
-        ariaLabel={secondary.ariaLabel}
-        variant={
-          secondaryAppearance === CTA_ACTION_APPEARANCE.INLINE
-            ? 'link'
-            : 'ghost'
-        }
-      >
-        {secondary.label}
-      </LinkButton>
-    )}
+    ))}
   </>
 );
 ```
 
-`cta-module-view.tsx` imports it, builds it from `actions.primary` / `actions.secondary` / `actions.secondaryAppearance`, and passes the result as `CtaModule`'s `actions` prop — the same shape `HeroModuleView` already passes into `Hero.Cta`, just factored into a named, reusable component instead of repeated inline JSX, since CTA's mapping (appearance → variant) is one step more than Hero's.
+`cta-module-view.tsx` imports it, passes `actions` (the projected array) straight through, and passes the result as `CtaModule`'s `actions` prop — the same shape `HeroModuleView` already passes into `Hero.Cta`, just factored into a named, reusable component instead of repeated inline JSX, since CTA's mapping (variant + appearance → button variant) is one step more than Hero's.
 
 **Scope note:** this ticket does not migrate `HeroModuleView` onto `ActionGroup` — that inline JSX keeps working as-is. Adopting it there is a natural follow-up, not part of this epic; call it out separately if wanted rather than expanding this PR's diff.
 
@@ -443,7 +479,7 @@ export const ActionGroup = ({
 
 ## 8. Web & service wiring
 
-- **Service (`packages/service/src/features/modules/cta/`)** — the CTA feature slice is `adaptor/{query,loader,transformer,types}.ts` + `application/service.ts` (plus tests), not a single projection file. Extend the query to select `variant`, `eyebrow`, `sectionHeader { heading, supportingText, align }`, `content` (Portable Text), `image` (+ alt), `imageSide`, `mobileMediaOrder`, `actions { primary, secondary, secondaryAppearance }`, `footnote`, `brandVariant`, `layout`. The existing `linkFragment` is reused for both action slots — it already projects `accessibleLabel`, which is what §8.1 depends on. Add a shared `actionGroupFragment` next to `linkFragment` so Hero/Newsletter reuse it if they later adopt the Studio `actionGroup` object.
+- **Service (`packages/service/src/features/modules/cta/`)** — the CTA feature slice is `adaptor/{query,loader,transformer,types}.ts` + `application/service.ts` (plus tests), not a single projection file. Extend the query to select `variant`, `eyebrow`, `sectionHeader { heading, supportingText, align }`, `content` (Portable Text), `image` (+ alt), `imageSide`, `mobileMediaOrder`, `actions[] { variant, appearance, link }`, `footnote`, `brandVariant`, `layout`. Each array item's `link` field is projected with the existing `linkFragment` — it already projects `accessibleLabel`, which is what §8.1 depends on. Add a shared `actionGroupFragment` (projecting the whole `actions[]` array) next to `linkFragment` so Hero/Newsletter reuse it if they later adopt the Studio `actionGroup` object.
 - **Web (`apps/web/src/modules/cta/`)** — `cta-module-view.tsx` renders the `Section` landmark pinned to `brandVariant={PRIMARY}` (§3.2), builds the image node, renders optional `content` via Portable Text, builds `<ActionGroup>` (§7.2), and passes everything to `CtaModule` including `tone={brandVariant}`.
 
 ### 8.1 #1861 — the dropped `ariaLabel` (closed by this work)
@@ -481,17 +517,21 @@ _(This section previously specified a full migration. That was written before th
 
 ## 10. Validation summary
 
-| Rule                            | Where                                                       | Message                                                                  |
-| ------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------ |
-| Secondary requires primary      | `actionGroup` custom                                        | "A secondary action needs a primary action. Add a primary action first." |
-| `label` ≤ 40 per action         | inherited from `link`                                       | (existing)                                                               |
-| Image required for Banner/Split | `module_cta.image` custom                                   | "Banner and Split need an image."                                        |
-| `heading` required, ≤ 80        | `sectionHeader.heading` (in `requiredHeadingSectionHeader`) | (existing)                                                               |
-| `eyebrow` ≤ 40                  | `module_cta.eyebrow`                                        | (max)                                                                    |
-| `footnote` ≤ 120                | `module_cta.footnote`                                       | (max)                                                                    |
-| `content` ≤ 6 blocks            | `basicText`                                                 | (max)                                                                    |
+| Rule                            | Where                                                       | Message                                                           |
+| ------------------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------- |
+| ≤ 2 actions                     | `actionGroup.actions` `rule.max(2)`                         | (built-in)                                                        |
+| Each variant once               | `actionGroup.actions` custom                                | "Each action variant (Primary, Secondary) can be used only once." |
+| Primary present & first         | `actionGroup.actions` custom                                | "A Primary action is required and must be first."                 |
+| `variant` required per action   | `ctaAction.variant`                                         | (required)                                                        |
+| `link` required per action      | `ctaAction.link`                                            | (required)                                                        |
+| `label` ≤ 40 per action         | inherited from `link`                                       | (existing)                                                        |
+| Image required for Banner/Split | `module_cta.image` custom                                   | "Banner and Split need an image."                                 |
+| `heading` required, ≤ 80        | `sectionHeader.heading` (in `requiredHeadingSectionHeader`) | (existing)                                                        |
+| `eyebrow` ≤ 40                  | `module_cta.eyebrow`                                        | (max)                                                             |
+| `footnote` ≤ 120                | `module_cta.footnote`                                       | (max)                                                             |
+| `content` ≤ 6 blocks            | `basicText`                                                 | (max)                                                             |
 
-Note how much shorter this is than the array shape would need: max-2, variant-uniqueness, and Primary-first are all gone, enforced by the model instead (§5).
+Three of these (max-2, variant-uniqueness, Primary-first) are the cost of the array shape (D14) — the earlier named-slots version avoided them, but that version is what's being reverted.
 
 ---
 
@@ -517,12 +557,15 @@ Note how much shorter this is than the array shape would need: max-2, variant-un
 - **D5 ✔** — Rich text is a **separate** `content` field, distinct from the plain `sectionHeader.supportingText`. §4.3, §6.
 - **D6 ✔** — Centered variant named **Callout** (over Stack / Centered). §2.
 - **D7 ✔** — Optional text under the actions named **`footnote`**.
-- **D8 ✔** — Actions live in a **reusable `actionGroup` object with named `primary` / `secondary` slots**, under `objects/blocks/`, adopted by CTA first and by Hero / Newsletter / future modules after. Not an ordered array, not module-inlined fields. §5.
+- **D8 ✔ (reuse half stands; shape half reverted — see D14)** — Actions live in a **reusable `actionGroup` object**, under `objects/blocks/`, adopted by CTA first and by Hero / Newsletter / future modules after — not module-inlined fields. §5.
 - **D9 ✔** — The basic rich-text block is named **`basicText`**, not `ctaContent`, because the gap it fills is generic. §6.
 - **D10 ✔** — **`--shadow-card` is a new token** added to `configs/tailwind/theme.css` in both themes, as a config-layer prerequisite. §4.1.
 - **D11 ✔** — #1861's `ariaLabel` fix is absorbed into this work's web layer; its sibling-module sweep becomes a separate follow-up issue. §8.1.
 - **D12 ✔** — **No data migration.** Both datasets hold zero `module_cta` documents, so `action` is removed outright rather than migrated. §9 carries the evidence and the one caveat.
 - **D13 ✔, revised 2026-08-29** — **Banner is full-bleed, not a contained card.** It breaks out of `Section`'s always-constrained `inner` div itself (`left-1/2 w-screen -translate-x-1/2`, plus dropping the card's border/radius/shadow), rather than modifying `Section` to support an image background — same "the module owns its presentation" principle D1 already applies to Split/Callout, extended consistently to a full-bleed case instead of only a contained one. `Section` itself needs zero changes. Split and Callout are unaffected — still contained cards. §2, §3.2a.
+- **D14 ✔, 2026-08-29** — **`actionGroup` holds an array of `ctaAction` items, not named `primary`/`secondary` slots.** Reverts D8's shape half. Each item carries its own `variant` (`PRIMARY`/`SECONDARY`) and its own `appearance` — **appearance is available on both**, not hidden for `PRIMARY`. Max 2 items; a `PRIMARY` item is required and must be first; `SECONDARY` is optional; a validator enforces this (max-2 / unique variants / Primary-first) — this is the confirmed shape, and the earlier "named slots avoid a validator" reasoning (D8) was never actually confirmed against an unresolved `AskUserQuestion` answer. Requires a new config-layer constant, `CTA_ACTION_VARIANT`, not shipped in #2301. §5. **#2309/PR #2312 shipped the named-slots version before this correction — that work is being reverted and rebuilt.**
+
+**Still open:**
 
 - **D5a** — Centered Callout lists: left-align inside the centered block (recommended, and what the mock does) vs. force the whole block left when a list is present.
 
