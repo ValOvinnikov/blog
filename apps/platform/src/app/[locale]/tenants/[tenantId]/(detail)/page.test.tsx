@@ -164,7 +164,7 @@ describe(TenantOverviewPage, () => {
   });
 
   it('shows "Open Studio" only for a super admin viewer', async () => {
-    const tenant = makeTenant({ slug: 'acme' });
+    const tenant = makeTenant();
     listTenantsByIdsMock.mockResolvedValue([tenant]);
     getAdminByUserIdMock.mockResolvedValue({
       id: 'admin-1',
@@ -177,7 +177,7 @@ describe(TenantOverviewPage, () => {
 
     expect(screen.getByRole('link', { name: 'Open Studio ↗' })).toHaveAttribute(
       'href',
-      'https://studio-acme.valstack.dev',
+      '/tenants/tenant-1/studio',
     );
   });
 

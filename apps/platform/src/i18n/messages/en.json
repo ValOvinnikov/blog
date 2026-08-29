@@ -154,7 +154,6 @@
     "platformBadge": "platform",
     "sanityProjectLabel": "Sanity project",
     "datasetLabel": "Dataset",
-    "studioLabel": "Studio",
     "readTokenLabel": "Read token",
     "readTokenStored": "Stored",
     "readTokenNotSet": "Not set",

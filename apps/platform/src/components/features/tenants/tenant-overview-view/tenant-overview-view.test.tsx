@@ -387,8 +387,8 @@ describe(TenantOverviewView, () => {
     expect(link).toHaveAttribute('target', '_blank');
   });
 
-  it('renders "Open Studio", linking to the tenant\'s Studio host, only for a super admin', () => {
-    const tenant = makeTenant({ slug: 'acme' });
+  it('renders "Open Studio", linking to the tenant\'s in-app Studio route, only for a super admin', () => {
+    const tenant = makeTenant({ id: 'tenant-1' });
     render(
       <TenantOverviewView
         tenant={tenant}
@@ -403,7 +403,7 @@ describe(TenantOverviewView, () => {
 
     expect(screen.getByRole('link', { name: 'Open Studio ↗' })).toHaveAttribute(
       'href',
-      'https://studio-acme.valstack.dev',
+      '/tenants/tenant-1/studio',
     );
   });
 

@@ -10,6 +10,7 @@ import { useProvisioningPoll } from '@platform/components/features/tenants/provi
 import { RecentActivityCard } from '@platform/components/features/tenants/recent-activity-card';
 import { TenantDetailsPanel } from '@platform/components/features/tenants/tenant-details-panel';
 import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
+import { LinkButton } from '@platform/components/shared/link-button';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import type { TDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
@@ -81,11 +82,9 @@ export const TenantOverviewView = ({
               {t('openSiteAction')}
             </ExternalLinkButton>
             {isSuperAdmin && (
-              <ExternalLinkButton
-                href={`https://studio-${tenant.slug}.valstack.dev`}
-              >
+              <LinkButton href={adminRoutes.tenantStudio(tenant.id)}>
                 {t('openStudioAction')}
-              </ExternalLinkButton>
+              </LinkButton>
             )}
           </>
         }
