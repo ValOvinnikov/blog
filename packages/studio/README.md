@@ -53,8 +53,8 @@ Studio from one deployment.
   desk structure + plugins into a Sanity `Config`, directive-free so it can
   be called from both the plain CLI config and the client-mounted component
 - `src/studio-mount.tsx` — `StudioMount`, the only `'use client'` file in
-  this package; calls `buildStudioConfig` and renders `next-sanity`'s
-  `NextStudio`
+  this package; calls `buildStudioConfig` and renders `sanity`'s
+  `StudioProvider`/`StudioLayout`
 - `sanity.config.ts`, `sanity.cli.ts` — Studio and CLI config, including the
   typegen input/output paths (root-level by Sanity CLI convention, not under
   `src/`)
