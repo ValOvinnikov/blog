@@ -18,20 +18,26 @@ export const buildContentSecurityPolicy = ({
 
   return [
     "default-src 'self'",
-    // `img-src` allows two external origins beyond 'self': the Vercel Blob
+    // `img-src` allows three external origins beyond 'self': the Vercel Blob
     // public storage host the Look tab's logo/favicon thumbnails load from
     // (a public-access Blob store's pathname is per-store, not fixed, hence
-    // the wildcard subdomain), and authjs.dev, which Auth.js's built-in
+    // the wildcard subdomain), authjs.dev, which Auth.js's built-in
     // sign-in page (no custom `pages.signIn` is configured) loads each OAuth
-    // provider's logo SVG from.
-    "img-src 'self' https://*.blob.vercel-storage.com https://authjs.dev",
+    // provider's logo SVG from, and cdn.sanity.io, which the embedded
+    // Studio's asset previews load from regardless of which tenant project
+    // is mounted (one fixed CDN host for every project).
+    "img-src 'self' https://*.blob.vercel-storage.com https://authjs.dev https://cdn.sanity.io",
     scriptSrc,
     // 'unsafe-inline' is required because Next.js and Tailwind inject inline
     // <style> tags at runtime; there is no static, hashable set of style
     // content to allow-list instead.
     "style-src 'self' 'unsafe-inline'",
     "font-src 'self'",
-    "connect-src 'self'",
+    // The embedded Studio talks directly to its tenant's own Sanity project
+    // host (`<projectId>.api.sanity.io`) for data, assets, and realtime
+    // listeners — `projectId` is resolved per request, so this can't be a
+    // fixed hostname the way `img-src`'s CDN entry is.
+    "connect-src 'self' https://*.api.sanity.io",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     // Auth.js's built-in sign-in page (no custom `pages.signIn` is

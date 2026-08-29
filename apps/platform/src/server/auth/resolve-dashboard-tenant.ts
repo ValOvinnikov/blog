@@ -6,6 +6,7 @@ import { ACTIVE_TENANT_COOKIE } from '@platform/utils/active-tenant-cookie/activ
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
+import { cache } from 'react';
 
 import { listSessionTenants } from './list-session-tenants';
 
@@ -25,9 +26,12 @@ export type TDashboardTenantContext = {
  * — missing, or naming a tenant the session no longer has a membership for,
  * redirects to the picker at `/dashboard/select-tenant` rather than
  * guessing. Called from a layout so every route nested under the gated
- * segment is protected by existing there.
+ * segment is protected by existing there. Wrapped in `cache()` so a route
+ * that calls it from both its layout and its page — the Studio route,
+ * which has no other channel to pass the resolved tenant down — shares one
+ * fetch per request instead of resolving twice.
  */
-export const resolveDashboardTenant =
+export const resolveDashboardTenant = cache(
   async (): Promise<TDashboardTenantContext> => {
     const { memberships, tenants } = await listSessionTenants();
     const tenantById = new Map(tenants.map((tenant) => [tenant.id, tenant]));
@@ -56,4 +60,5 @@ export const resolveDashboardTenant =
     }
 
     return { tenant: activeTenant, membership: activeMembership, tenants };
-  };
+  },
+);
