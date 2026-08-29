@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
 /**
  * Studio owns everything under this catch-all with its own client-side
  * router — `params.tool` is never read here. `resolveDashboardTenant` is
- * `cache()`-wrapped, so this reuses the enclosing `(studio)/layout.tsx`'s
+ * `cache()`-wrapped, so this reuses the enclosing `(tenant)/layout.tsx`'s
  * fetch rather than resolving the tenant twice.
  */
 export default async function DashboardStudioPage() {

@@ -33,9 +33,10 @@ type TTenantNavHrefs = {
   voice: string;
   features: string;
   domain: string;
+  studio: string;
 };
 
-/** The four tenant-facing destinations that route somewhere today, shared by the `/tenants/{id}` and slug-free `/dashboard` sidebars — only the hrefs (and, via the caller, the section label) differ between them. Danger zone is deliberately excluded: it's platform-only and never appears in the owner-facing `/dashboard` tree. */
+/** The tenant-facing destinations that route somewhere today, shared by the `/tenants/{id}` and slug-free `/dashboard` sidebars — only the hrefs (and, via the caller, the section label) differ between them. Danger zone is deliberately excluded: it's platform-only and never appears in the owner-facing `/dashboard` tree. Studio carries neither the "this milestone" badge below nor a "later" one — it's live and routable today. */
 const shippingTenantNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
   const shipping = { label: t('badgeThisMilestone'), tone: 'neutral' } as const;
 
@@ -63,6 +64,11 @@ const shippingTenantNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
       icon: ICONS.GLOBE,
       href: hrefs.domain,
       badge: shipping,
+    },
+    {
+      label: t('studio'),
+      icon: ICONS.STUDIO,
+      href: hrefs.studio,
     },
   ];
 };
@@ -104,6 +110,7 @@ export const tenantNavSections = (
           voice: adminRoutes.voice(tenantId),
           features: adminRoutes.features(tenantId),
           domain: adminRoutes.tenantDomain(tenantId),
+          studio: adminRoutes.tenantStudio(tenantId),
         }),
         ...laterPlatformNavItems(t),
       ],
@@ -128,7 +135,7 @@ export const tenantNavSections = (
   ];
 };
 
-/** The slug-free counterpart to `tenantNavSections`'s tenant-facing section — same four shipping destinations, routed under `/dashboard` instead of `/tenants/{id}`, labeled generically since the whole point of this tree is not naming the tenant in anything the URL-shy owner sees. Owners never get the Overview item (there's nothing at slug-free `/dashboard` distinct from the section itself), the platform-only Provisioning/Danger zone section, or the four not-yet-owner-actionable items (Email, Subscribers, Comments, Team) — those are dropped entirely rather than shown as a permanently inert "later" badge. */
+/** The slug-free counterpart to `tenantNavSections`'s tenant-facing section — same shipping destinations, routed under `/dashboard` instead of `/tenants/{id}`, labeled generically since the whole point of this tree is not naming the tenant in anything the URL-shy owner sees. Owners never get the Overview item (there's nothing at slug-free `/dashboard` distinct from the section itself), the platform-only Provisioning/Danger zone section, or the four not-yet-owner-actionable items (Email, Subscribers, Comments, Team) — those are dropped entirely rather than shown as a permanently inert "later" badge. */
 export const dashboardNavSections = (
   t: TNavTranslator,
 ): TSidebarNavSection[] => [
@@ -139,6 +146,7 @@ export const dashboardNavSections = (
       voice: adminRoutes.dashboardVoice(),
       features: adminRoutes.dashboardFeatures(),
       domain: adminRoutes.dashboardDomain(),
+      studio: adminRoutes.dashboardStudio(),
     }),
   },
 ];

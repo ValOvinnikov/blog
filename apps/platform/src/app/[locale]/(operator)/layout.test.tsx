@@ -42,6 +42,7 @@ vi.mock('next/navigation', () => ({
     throw new Error('NEXT_NOT_FOUND');
   }),
   useParams: vi.fn(() => ({})),
+  useSelectedLayoutSegment: vi.fn(() => null),
 }));
 
 const setup = customRenderAsync(OperatorLayout, {

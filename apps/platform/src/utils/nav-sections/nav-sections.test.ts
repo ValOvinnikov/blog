@@ -86,7 +86,15 @@ describe('tenantNavSections', () => {
     }
   });
 
-  it('lists the nine main-section destinations, Overview first and no Danger zone', () => {
+  it('gives Studio a real href with no badge at all — it is live and routable, unlike the "this milestone"/"later" items around it', () => {
+    const [tenant] = tenantNavSections(t, 'tenant-1', 'Acme Co');
+    const studio = tenant!.items.find((item) => item.label === 'Studio');
+
+    expect(studio?.href).toBe('/tenants/tenant-1/studio');
+    expect(studio?.badge).toBeUndefined();
+  });
+
+  it('lists the ten main-section destinations, Overview first and no Danger zone', () => {
     const [tenant] = tenantNavSections(t, 'tenant-1', 'Acme Co');
 
     expect(tenant!.items.map((item) => item.label)).toEqual([
@@ -95,6 +103,7 @@ describe('tenantNavSections', () => {
       'Voice',
       'Features',
       'Domain',
+      'Studio',
       'Email',
       'Subscribers',
       'Comments',
@@ -121,17 +130,20 @@ describe('tenantNavSections', () => {
 });
 
 describe('dashboardNavSections', () => {
-  it('gives Look, Voice, Features and Domain their slug-free /dashboard hrefs', () => {
+  it('gives Look, Voice, Features, Domain and Studio their slug-free /dashboard hrefs', () => {
     const [dashboard] = dashboardNavSections(t);
     const look = dashboard!.items.find((item) => item.label === 'Look');
     const voice = dashboard!.items.find((item) => item.label === 'Voice');
     const features = dashboard!.items.find((item) => item.label === 'Features');
     const domain = dashboard!.items.find((item) => item.label === 'Domain');
+    const studio = dashboard!.items.find((item) => item.label === 'Studio');
 
     expect(look?.href).toBe('/dashboard/look');
     expect(voice?.href).toBe('/dashboard/voice');
     expect(features?.href).toBe('/dashboard/features');
     expect(domain?.href).toBe('/dashboard/domain');
+    expect(studio?.href).toBe('/dashboard/studio');
+    expect(studio?.badge).toBeUndefined();
   });
 
   it('never includes Overview, Provisioning or Danger zone — those are platform-only', () => {
@@ -153,7 +165,7 @@ describe('dashboardNavSections', () => {
     expect(labels).not.toContain('Team');
   });
 
-  it('lists exactly the four shipping tenant-facing destinations', () => {
+  it('lists exactly the five shipping tenant-facing destinations', () => {
     const [dashboard] = dashboardNavSections(t);
 
     expect(dashboard!.items.map((item) => item.label)).toEqual([
@@ -161,6 +173,7 @@ describe('dashboardNavSections', () => {
       'Voice',
       'Features',
       'Domain',
+      'Studio',
     ]);
   });
 });

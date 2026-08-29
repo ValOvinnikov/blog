@@ -12,6 +12,7 @@ import Palette from '@platform/assets/icons/palette.svg';
 import Plus from '@platform/assets/icons/plus.svg';
 import Quote from '@platform/assets/icons/quote.svg';
 import Settings from '@platform/assets/icons/settings.svg';
+import Studio from '@platform/assets/icons/studio.svg';
 import Users from '@platform/assets/icons/users.svg';
 import Warning from '@platform/assets/icons/warning.svg';
 import type { FC, SVGProps } from 'react';
@@ -32,6 +33,7 @@ export const ICON_REGISTRY: Partial<Record<TIconName, TGlyph>> = {
   [ICONS.PLUS]: Plus,
   [ICONS.QUOTE]: Quote,
   [ICONS.SETTINGS]: Settings,
+  [ICONS.STUDIO]: Studio,
   [ICONS.USERS]: Users,
   [ICONS.WARNING]: Warning,
 };
