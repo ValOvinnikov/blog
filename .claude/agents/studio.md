@@ -85,7 +85,7 @@ why that breaks the build.
 ## The client boundary (critical — read before touching studio-mount)
 
 **This is the one package in the repo permitted a `'use client'` directive.**
-`@blog/ui` is still forbidden it. The mount component carries it because
+`@blog/ui` is still forbidden the directive. The mount component carries it because
 Sanity's Studio is irreducibly client-side.
 
 The load-bearing requirement is that the mount component **calls the config

@@ -1,7 +1,7 @@
 import { ICONS, type TIconName } from '@blog/config';
 
 // The CMS `socialLink.platform` field is free-text (see
-// `apps/cms/src/schema-types/objects/social-link.ts`), not a constrained
+// `packages/studio/src/schema-types/objects/social-link.ts`), not a constrained
 // enum — so this maps by matching known platform names case-insensitively
 // rather than a direct lookup against `ICONS`.
 const SOCIAL_ICON_NAME_BY_PLATFORM: Record<string, TIconName> = {

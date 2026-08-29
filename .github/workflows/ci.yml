@@ -175,12 +175,12 @@ jobs:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
 
-      # The "voice" override vocabulary is hand-duplicated across the cms
+      # The "voice" override vocabulary is hand-duplicated across the studio
       # schema, the platform editor's field groups, and web's message-merge
       # paths, with nothing else catching one drifting out of sync with the
       # other two. Parses all three as a TypeScript AST and compares the
       # extracted key sets. Read-only; nothing is committed.
-      - name: Voice-override keys (cms/platform/web in sync)
+      - name: Voice-override keys (studio/platform/web in sync)
         run: pnpm check:voice-sync
 
       # Fixture-based unit tests for the extraction + comparison helpers, same

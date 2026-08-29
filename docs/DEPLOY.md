@@ -357,10 +357,11 @@ Provisioning notes for recreating this from scratch:
       mis-set `production` secret fails it loudly instead of silently
       migrating the wrong branch (or nothing at all) while reporting success.
 
-**Studio** (`cms-dev` / `cms-prod`, Production scope — `vercel pull
---environment=production` in CI only reads that scope): `sanity build`
-(invoked by `apps/cms/vercel.json`'s `buildCommand`) loads `sanity.cli.ts`,
-which requires these two:
+**Studio** (`cms-dev` / `cms-prod`) — **no longer built or deployed.** The
+Studio ships as the `@blog/studio` package and is mounted by the platform
+app, so nothing runs `sanity build` in CI and `apps/cms/vercel.json` is gone.
+These two projects and the values below are retained only until they are
+decommissioned; setting them on a fresh environment achieves nothing:
 
 | Key                        | `cms-dev` value    | `cms-prod` value   |
 | -------------------------- | ------------------ | ------------------ |
@@ -695,7 +696,7 @@ Create **two** (the route `/api/revalidate` already exists):
 Once `studio.{your-hosting}` / `studio-dev.{your-hosting}` are live and verified
 (Studio loads, signs in, and can read/write the correct dataset):
 
-- [ ] From `apps/cms`, with each project's env pointed at it (`SANITY_STUDIO_HOSTNAME`
+- [ ] From `packages/studio`, with each project's env pointed at it (`SANITY_STUDIO_HOSTNAME`
       is required here — `sanity undeploy` errors with "No application ID or
       studio host provided" without it, even though nothing deploys with it
       set anymore):
@@ -712,7 +713,7 @@ Once `studio.{your-hosting}` / `studio-dev.{your-hosting}` are live and verified
 
 Local dev points at the **dev** project (`<DEV_PROJECT_ID>`):
 
-- [ ] `apps/cms/.env` (gitignored): `SANITY_STUDIO_PROJECT_ID=<DEV_PROJECT_ID>`,
+- [ ] `packages/studio/.env` (gitignored): `SANITY_STUDIO_PROJECT_ID=<DEV_PROJECT_ID>`,
       `SANITY_STUDIO_DATASET=development`.
 - [ ] `apps/web/.env.local` (gitignored): `NEXT_PUBLIC_SANITY_PROJECT_ID=<DEV_PROJECT_ID>`,
       `NEXT_PUBLIC_SANITY_DATASET=development`, and optionally
@@ -859,10 +860,10 @@ pre-migration shapes that no longer match the deployed schema:
 2. Actions → **Refresh Dev Dataset** → **Run workflow** (`main`).
 3. The job exports `production` (published-only), wipes every document in
    `development`, then imports — direction is hardcoded in
-   `apps/cms/scripts/refresh-dev-dataset-lib.mjs`'s safety guard, so a
+   `packages/studio/scripts/refresh-dev-dataset-lib.mjs`'s safety guard, so a
    misconfigured environment fails loudly rather than silently reversing.
 
-See `apps/cms/migrations/README.md` for the underlying script details.
+See `packages/studio/migrations/README.md` for the underlying script details.
 
 ---
 
@@ -917,7 +918,7 @@ _before_ it merges, which a post-merge-only deploy would defeat. See
 for the full design discussion.
 
 Build/output/skip-when-unaffected config is in code
-(`packages/ui/vercel.json`), same philosophy as `apps/web`/`apps/cms`'s
+(`packages/ui/vercel.json`), same philosophy as `apps/web`/`apps/platform`'s
 `vercel.json`; only project creation, domain, and confirming Git
 integration stays **on** are human-gated console steps:
 
@@ -1035,7 +1036,7 @@ production deployment before `VERCEL_GIT_PREVIOUS_SHA` has anything to hold.
 Promote an existing successful preview deployment to production in the
 dashboard — a console action, like everything else in this doc.
 
-Because `apps/web`, `apps/cms` and `apps/platform`'s primary projects all set
+Because `apps/web` and `apps/platform`'s primary projects both set
 `git.deploymentEnabled: false` (CI-gated pipeline), these two Storybook
 projects are the **only** ones that preview-deploy on a PR. Deploy volume is
 therefore already minimal — each builds only when genuinely affected. When a
