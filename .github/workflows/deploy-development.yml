@@ -1,14 +1,16 @@
 name: Deploy Development
 
-# The dev Studio, dev web app and dev admin panel deploy from here on merge to
-# `main` — but only the app(s) whose turbo graph the merge actually touched (see
-# the `changes` job), and ONLY after the `verify` gate (type-check/lint/test/build
-# on the merged commit) passes. Vercel's native Git integration is disabled for
-# all three projects declaratively via each app's own vercel.json
-# `git.deploymentEnabled: false` (#445) so nothing deploys pre-merge or ungated —
-# every dev deploy goes through this workflow. Mirrors deploy-production.yml,
-# which deploys all three apps unconditionally (a tag is a deliberate full
-# release).
+# The dev web app and dev admin panel deploy from here on merge to `main` — but
+# only the app(s) whose turbo graph the merge actually touched (see the `changes`
+# job), and ONLY after the `verify` gate (type-check/lint/test/build on the
+# merged commit) passes. The Studio is not deployed: it ships as the
+# `@blog/studio` package and is mounted by the admin panel, so `changes` tracks
+# it only to decide whether the Sanity content migration needs to run. Vercel's
+# native Git integration is disabled for both deployed projects declaratively via
+# each app's own vercel.json `git.deploymentEnabled: false` (#445) so nothing
+# deploys pre-merge or ungated — every dev deploy goes through this workflow.
+# Mirrors deploy-production.yml, which deploys both apps unconditionally (a tag
+# is a deliberate full release).
 on:
   push:
     branches: [main]
@@ -342,7 +344,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       # Deploys `platform-dev` via the Vercel CLI (its Git auto-deploy is disabled,
-      # same as web and cms). For `platform-dev`, Vercel "production" = main, so
+      # same as web). For `platform-dev`, Vercel "production" = main, so
       # --prod targets its main URL. Guarded on VERCEL_PROJECT_ID (not
       # VERCEL_TOKEN, which deploy-web already has configured) so this stays a
       # true no-op until the platform-dev Vercel project exists and

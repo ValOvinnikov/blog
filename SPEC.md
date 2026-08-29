@@ -513,14 +513,11 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
 | Sanity project           | separate dev project (id via env) | separate prod project (id via env) |
 | Sanity dataset           | `development`                     | `production`                       |
 | Neon branch (`@blog/db`) | `development`                     | `production`                       |
-| Studio hostname          | `studio-dev{your_hosting}`        | `studio.{your-hosting}`            |
 | Vercel project (web)     | `blog-dev`                        | `blog-prod`                        |
-| Vercel project (studio)  | `cms-dev`                         | `cms-prod`                         |
 | Vercel project (admin)   | `admin-dev`                       | `admin-prod`                       |
 | Admin hostname           | `admin-dev.{your-hosting}`        | `admin.{your-hosting}`             |
 | Deploy trigger           | push/merge to `main`              | push git tag `v*`                  |
 | Web deploy mechanism     | Vercel CLI in GitHub Actions      | Vercel CLI in GitHub Actions       |
-| Studio deploy mechanism  | Vercel CLI in GitHub Actions      | Vercel CLI in GitHub Actions       |
 | Admin deploy mechanism   | Vercel CLI in GitHub Actions      | Vercel CLI in GitHub Actions       |
 | Revalidation webhook     | dev webhook → dev site            | prod webhook → prod site           |
 
@@ -556,14 +553,15 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   See `docs/DEPLOY.md`'s Neon Postgres section for the full state and open
   items.
 - **Each environment is a separate Sanity project** with its own env-driven,
-  never-committed project id and tokens; **six fully isolated Vercel
-  projects** (a web project, a Studio project and an admin-panel project per
-  environment), all with Git auto-deploy disabled via their own
-  `vercel.json`'s `git.deploymentEnabled: false` — deploys only run via the
-  Vercel CLI from GitHub Actions, so there are no PR preview deploys and a
-  `main` push can never reach production. The Studio is a static
-  `sanity build` export served from its Vercel project — no `*.sanity.studio`
-  hosting or `sanity deploy` anymore.
+  never-committed project id and tokens; **four fully isolated Vercel
+  projects** (a web project and an admin-panel project per environment), all
+  with Git auto-deploy disabled via their own `vercel.json`'s
+  `git.deploymentEnabled: false` — deploys only run via the Vercel CLI from
+  GitHub Actions, so there are no PR preview deploys and a `main` push can
+  never reach production. The Studio has no Vercel project, hostname or
+  deploy job of its own: it ships as the `@blog/studio` package and is
+  mounted by the admin panel, which is what lets one Studio serve every
+  tenant. Neither `*.sanity.studio` hosting nor `sanity deploy` is used.
 - `@blog/ui`'s Storybook is hosted separately (`blog-storybook` Vercel
   project, `ui-library.{your-hosting}`) via Vercel's Git integration with PR
   previews — a deliberate exception to the CI-gated, no-preview pattern
