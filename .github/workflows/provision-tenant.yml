@@ -71,9 +71,8 @@ jobs:
       SANITY_MANAGEMENT_TOKEN: ${{ secrets.SANITY_MANAGEMENT_TOKEN }}
       SANITY_ORGANIZATION_ID: ${{ vars.SANITY_ORGANIZATION_ID }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
       VERCEL_TEAM_ID: ${{ vars.VERCEL_TEAM_ID }}
-      # The *shared* apps/web Vercel project — step 5 adds every tenant's
+      # The *shared* apps/web Vercel project — step 4 adds every tenant's
       # custom domain to this one project, never a per-tenant project.
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
       # Overridable per-dispatch via the adminAppBaseUrl input (e.g. a local
@@ -81,7 +80,6 @@ jobs:
       # dispatch-provisioning-workflow.ts never set this input, so they
       # always fall back to the production Environment value unaffected.
       ADMIN_APP_BASE_URL: ${{ inputs.adminAppBaseUrl || vars.ADMIN_APP_BASE_URL }}
-      PLATFORM_DOMAIN: ${{ vars.PLATFORM_DOMAIN }}
       # Each tenant's own Sanity project gets exactly one dataset, named to
       # match whichever environment provisioned it — externalized here
       # rather than hardcoded in TS. Overridable per-dispatch via the

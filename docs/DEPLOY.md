@@ -549,9 +549,6 @@ environment` rather than silently falling through to the wrong branch.
       the domain on the `admin-prod` Vercel project exactly (§3 above).
 - [ ] Variable `VERCEL_TEAM_ID` — only needed if the Vercel account is
       team-owned; omit otherwise.
-- [ ] Variable `PLATFORM_DOMAIN` — the platform domain each tenant's Studio
-      subdomain is minted under (`studio-<slug>.<PLATFORM_DOMAIN>`), e.g.
-      `valstack.dev` in production.
 - [ ] `apps/platform`'s own Vercel project (not this GitHub Actions
       environment) needs env var `TENANT_PROVISIONING_GITHUB_REPO` = `<owner>/<repo>`
       (e.g. `ValOvinnikov/blog`), paired with its own
