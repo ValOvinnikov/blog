@@ -1,0 +1,467 @@
+# CTA Module — Enrichment & Variant System
+
+**Status:** Design spec (schema + component contract; no code yet).
+**Date:** 2026-08-29
+**Pairs with:** `docs/design-reference/cta-module-system.html` — the visual mock this spec formalises (Banner / Split / Callout, shared options, both themes).
+**Token source of truth:** `configs/tailwind/theme.css`. This spec maps the module onto existing semantic tokens (`bg-primary`, `bg-secondary`, `bg-brand-primary-muted`, `--brand-primary-solid`, the button variants, `--font-display` / `--font-read` / `--font-mono`, `--radius-*`) and adds exactly one new token — see §4.1.
+**Repo layout:** the CMS Studio lives in `packages/studio` (import alias `@blog/studio/schema-types/…`); UI in `packages/ui`, web in `apps/web`, shared types in `packages/service`, tokens/constants in `packages/config` + `configs/`.
+**Folds in:** #1861 (`CtaModuleView` drops the authored action `ariaLabel`) — see §8.1.
+**Followed by:** `docs/superpowers/specs/2026-08-29-link-library-blocks-design.md` — reusable link documents. This spec ships on the inline `link` object; §5 is shaped so adopting library references later is additive.
+
+---
+
+## 1. Summary
+
+Today `module_cta` renders a heading, an optional supporting string, and exactly one action, on a full-bleed `Section` band. This spec turns it into a small, deliberate **variant system**: three contained layout variants (**Banner**, **Split**, **Callout**), an optional image, a separate optional rich-text block, a reusable **action group** object, an optional footnote, and the three brand tones the other page-builder modules already carry.
+
+### Goals
+
+- Replace the single `action` link with a **reusable `actionGroup` object** (§5) — owned by no single module, adopted by CTA first and by Hero / Newsletter / future modules after.
+- Three layout variants selectable per instance; each exposing only the options that make sense for it.
+- Add a **separate** optional rich-text `content` field (lists, bold, italic, inline links); the title's supporting text stays plain — §6.
+- Render the module as a **contained** block, not a full-bleed band — §3.
+- Keep `CtaModule` (`packages/ui`) presentation-only; the web layer maps Sanity data → props, as it does today.
+- Close #1861 by construction: the new action rendering forwards `ariaLabel` — §8.1.
+
+### Non-goals
+
+- No new **colour** tokens. Brand tone selection stays limited to the three existing `BRAND_VARIANT` values. (One new _shadow_ token is required — §4.1.)
+- No icon media. An earlier exploration had an icon-chip option in the centered variant; **dropped** — Callout supports an optional **image** only.
+- No animation beyond the existing `--ease-console` hover transitions on buttons.
+- Not the link library. Links stay inline objects here.
+
+---
+
+## 2. The three variants
+
+All three are **contained modules**: a bounded, rounded (`--radius-xl`), bordered block with the card shadow, sitting inside the content column with page margins around it — not a full-bleed band (§3).
+
+| Variant     | Media                                                                         | Alignment                                       | Distinctive options                                                    |
+| ----------- | ----------------------------------------------------------------------------- | ----------------------------------------------- | ---------------------------------------------------------------------- |
+| **Banner**  | Background image + overlay scrim, text reversed to white. **Image required.** | `align`: left / center / right                  | Overlay tint follows the brand tone (§3.3).                            |
+| **Split**   | Image in a side slot. **Image required.**                                     | Fixed (content in its column)                   | `imageSide`: left / right · `mobileMediaOrder`: last (default) / first |
+| **Callout** | Optional image **above** the content.                                         | `align`: left / center / right (default center) | The default variant; works with no image at all.                       |
+
+The centered variant is named **Callout** (D6 ✔; renamed from the working name "Stack"). "Centered" was rejected because it collides with the `align: center` value and reads ambiguously. _Note: the mock's CSS still uses `.cta--stack` internally — cosmetic, not a contract._
+
+Shared by every variant: optional **eyebrow**, required **heading**, optional plain **supporting text**, optional rich **content** (§6), optional **actions** (§5), optional **footnote**, and the **brand tone**.
+
+---
+
+## 3. Containment & brand tone
+
+### 3.1 The change
+
+`Section` is currently the sole per-module landmark and paints `brandVariant` full-bleed (`bg-primary` / `bg-secondary` / `bg-brand-primary-muted`) edge to edge, wrapping a constrained inner `<div>`. A contained CTA needs the tone to fill a **bounded container** with a border/shadow and page-gutter margins, not the viewport width.
+
+`Section` lives at **`apps/web/src/components/shared/section/`** — it is a web-layer landmark, not a `@blog/ui` export. `CtaModule` (in `packages/ui`) therefore cannot and must not import it; the composition happens in `cta-module-view.tsx`.
+
+### 3.2 Decision (D1 ✔) — `CtaModule` paints its own contained card; `Section` is unchanged
+
+Both Hero and CTA already wrap in the shared full-bleed `Section` landmark (`hero-module-view.tsx`, `cta-module-view.tsx`), which paints `brandVariant` edge to edge. Full-bleed is the established pattern — **`Section` is not modified, and no new `contained` mode is invented.**
+
+The contained look is owned by `CtaModule` itself: it renders the bounded card (border, `--radius-xl`, card shadow, its own padding and max-width, centered) and fills it with the theme tone. This is the one place CTA diverges from the other modules — unlike them, `CtaModule` reads the tone and paints its own background — which is the accepted cost of a self-contained presentation.
+
+```ts
+// cta-module-variants.ts (sketch) — the module owns the card + tone
+export const ctaModuleVariants = tv({
+  slots: {
+    root: [
+      'mx-auto w-full max-w-4xl',
+      'rounded-xl border border-border shadow-card',
+      'px-6 py-8 sm:px-8 sm:py-10',
+    ],
+    // …heading / text / media / actions slots
+  },
+  variants: {
+    tone: {
+      PRIMARY: { root: ['bg-primary'] },
+      SECONDARY: { root: ['bg-secondary'] },
+      BRAND_PRIMARY: { root: ['bg-brand-primary-muted'] },
+    },
+    variant: { BANNER: {/* … */}, SPLIT: {/* … */}, CALLOUT: {/* … */} },
+  },
+});
+```
+
+**The wrapping `Section` stays neutral.** `cta-module-view.tsx` passes the authored `brandVariant` to `CtaModule` (the card tone) and pins the surrounding `Section` to `PRIMARY` — the page tone — so there is no competing full-bleed band behind the card; `Section` still contributes only the landmark, vertical spacing, and container width it already owns:
+
+```tsx
+<Section brandVariant={BRAND_VARIANT.PRIMARY} layout={layout} titleId={titleId}>
+  <CtaModule tone={brandVariant} variant={variant} /* … */ />
+</Section>
+```
+
+(Banner is the exception: its tone is an image overlay — §3.3 — not a card fill.)
+
+**Rejected:** adding a `contained` mode to `Section`. It would modify the shared landmark every module depends on to serve one module's presentation — more blast radius than letting the CTA own its own card.
+
+**Known cost — `brandVariant` is semantically overloaded on this module.** Everywhere else the field means "the full-bleed band tone behind this section"; here it means "the card fill", and the band is force-pinned to `PRIMARY`. An author who understands the field from Hero will mis-predict it here. Accepted rather than renamed, because a module-specific field name (`cardTone`) would break the uniform `brandVariantField()` helper every module shares and complicate the projection. The Studio `description` on this module's field must say so explicitly.
+
+### 3.3 Tone on Banner (D2 ✔ — resolved)
+
+Banner is always image-filled with a dark overlay, so a surface fill is not visible. There the brand tone drives the **overlay tint**, not a background colour:
+
+- `BRAND_PRIMARY` → azure scrim
+- `PRIMARY` / `SECONDARY` → neutral-dark scrim
+
+Both are shown side by side in the mock's Banner section. The scrim is a gradient composed from existing `oklch` brand values at opacity — no new colour token (see the mock's `.cta--banner::after` and `.tint-neutral::after`).
+
+### 3.4 Primary tone as a contained card
+
+Because `--primary` equals the page background, a Primary-tone contained module reads as an **elevated near-white card** — its border and shadow define it against the faintly-tinted page. Secondary (grey) and Brand Primary (pale azure) separate on fill alone. Verified in both themes in the mock.
+
+---
+
+## 4. Content model — module fields
+
+### 4.1 Required config-layer change: the card shadow token
+
+`configs/tailwind/theme.css` has **no `--shadow-*` token group** — the repo uses stock Tailwind `shadow-sm` / `shadow-md` / `shadow-lg`. The contained card needs a softer, wider elevation than any of those, and the mock defines it:
+
+```css
+/* light */
+--shadow-card:
+  0 1px 2px oklch(0.2 0.02 250 / 0.05), 0 14px 34px oklch(0.2 0.04 250 / 0.07);
+/* dark */
+--shadow-card: 0 1px 2px oklch(0 0 0 / 0.3), 0 16px 40px oklch(0 0 0 / 0.35);
+```
+
+Add `--shadow-card` (both themes) to `configs/tailwind/theme.css` and expose it as `shadow-card` via the `@theme inline` block, as a **config-layer** change ahead of the UI work. Without it, `shadow-card` in §3.2 is a silent no-op class.
+
+### 4.2 New constants (`packages/config/src/constants/`)
+
+```ts
+export const CTA_VARIANT = {
+  BANNER: 'BANNER',
+  SPLIT: 'SPLIT',
+  CALLOUT: 'CALLOUT',
+} as const;
+export type TCtaVariant = TValueOf<typeof CTA_VARIANT>;
+
+export const CTA_IMAGE_SIDE = { LEFT: 'LEFT', RIGHT: 'RIGHT' } as const;
+export type TCtaImageSide = TValueOf<typeof CTA_IMAGE_SIDE>;
+
+export const CTA_MOBILE_MEDIA_ORDER = { LAST: 'LAST', FIRST: 'FIRST' } as const;
+export type TCtaMobileMediaOrder = TValueOf<typeof CTA_MOBILE_MEDIA_ORDER>;
+```
+
+Plus the action-group constant in §5. `TValueOf` is imported from `@blog/config/utils`.
+
+### 4.3 `module_cta` fields
+
+Reusing the existing `requiredHeadingSectionHeader` object (heading + supporting text + align) plus the new fields:
+
+| Field              | Type                                                               | Req                         | Applies to                                   | Notes                                                                           |
+| ------------------ | ------------------------------------------------------------------ | --------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------- |
+| `title`            | `titleField()`                                                     | ✓                           | all                                          | internal, unchanged                                                             |
+| `variant`          | string `CTA_VARIANT`                                               | ✓                           | all                                          | default `CALLOUT`                                                               |
+| `brandVariant`     | `brandVariantField({ list: [BRAND_PRIMARY, PRIMARY, SECONDARY] })` | ✓                           | all                                          | the **card tone** (§3.2); description must state the divergence                 |
+| `eyebrow`          | string (max 40)                                                    | –                           | all                                          | optional kicker label                                                           |
+| `sectionHeader`    | `sectionHeaderField({ requireHeading: true })`                     | ✓                           | all                                          | existing object → **heading** (required), **supportingText** (plain), **align** |
+| `content`          | `basicText`                                                        | –                           | all                                          | **separate** optional rich block — §6                                           |
+| `image`            | `imageWithAlt`                                                     | ✓ Banner & Split; – Callout | Banner (bg) · Split (side) · Callout (above) | `hidden` + custom-required per `variant`                                        |
+| `imageSide`        | string `CTA_IMAGE_SIDE`                                            | –                           | Split                                        | default `RIGHT`; hidden unless `variant === SPLIT`                              |
+| `mobileMediaOrder` | string `CTA_MOBILE_MEDIA_ORDER`                                    | –                           | Split                                        | default `LAST`; hidden unless `variant === SPLIT`                               |
+| `actions`          | `actionGroupField()` → `actionGroup`                               | –                           | all                                          | §5                                                                              |
+| `footnote`         | string (max 120)                                                   | –                           | all                                          | optional text below the actions                                                 |
+| `layout`           | `layoutField`                                                      | –                           | all                                          | unchanged                                                                       |
+
+**Content alignment (D3 ✔).** There is no separate `contentAlign` field — the existing `sectionHeader.align` (`HEADING_ALIGN`) _is_ the content alignment. The component applies a per-variant default when unset: **Banner → LEFT, Callout → CENTER**; **Split ignores alignment** (content sits in its grid cell).
+
+**Supporting text vs. content (D5 ✔).** `sectionHeader.supportingText` stays the short **plain** subtitle. The rich block is the **separate** `content` field (§6). _The mock's intro caption calls the supporting text "rich" — that caption predates D5 and is stale; the mock's own markup already renders `content` as the rich region._
+
+Field visibility uses Sanity `hidden: ({ parent }) => …` keyed on `variant`. `image` requiredness is enforced with a custom validation that only fires for Banner/Split — Sanity cannot make `.required()` conditional on a sibling field.
+
+---
+
+## 5. `actionGroup` — the reusable actions object
+
+**Decision (D8 ✔).** Actions are **not** modelled as an array of `{ variant, link }` with an ordering validator, and **not** as fields inlined on `module_cta`. They are a **standalone reusable object** with **named slots**, placed under `objects/blocks/` so Hero, Newsletter, and future modules adopt the same one.
+
+Two things drove this:
+
+1. **Reuse.** The primary/secondary button pair is not CTA-specific. Hero already has `primaryActionLabel` + `secondaryAction`; Newsletter will want the same. Outsourcing it to one object means one Studio UX, one projection fragment, one `ActionGroup` renderer.
+2. **Named slots beat an ordered array.** With `primary` and `secondary` as distinct fields, "max 2", "each variant at most once", and "Primary must be first" are all _unrepresentable_ rather than validated — no custom validator, no error copy, no ordering test matrix, and no drag-to-reorder footgun in the Studio.
+
+### 5.1 Shape (`objects/blocks/action-group.ts`)
+
+```ts
+import { CTA_ACTION_APPEARANCE } from '@blog/config/constants';
+import { toTitleCase } from '@blog/utils/primitives';
+import { linkSchema } from '@blog/studio/schema-types/objects/link';
+import { MousePointerClick } from 'lucide-react';
+import { defineField, defineType } from 'sanity';
+
+export const actionGroupSchema = defineType({
+  name: 'actionGroup',
+  title: 'Actions',
+  type: 'object',
+  icon: MousePointerClick,
+  fields: [
+    defineField({
+      name: 'primary',
+      title: 'Primary Action',
+      type: linkSchema.name,
+      description: 'The main action — always a filled button.',
+    }),
+    defineField({
+      name: 'secondary',
+      title: 'Secondary Action',
+      type: linkSchema.name,
+      description: 'Optional supporting action. Requires a primary action.',
+    }),
+    defineField({
+      name: 'secondaryAppearance',
+      title: 'Secondary Appearance',
+      type: 'string',
+      description:
+        'How the secondary action looks: Contained (bordered button) or Inline (text link).',
+      options: {
+        layout: 'radio',
+        list: Object.values(CTA_ACTION_APPEARANCE).map((value) => ({
+          title: toTitleCase(value),
+          value,
+        })),
+      },
+      initialValue: CTA_ACTION_APPEARANCE.CONTAINED,
+      hidden: ({ parent }) => !parent?.secondary,
+    }),
+  ],
+  validation: (rule) =>
+    rule.custom((value) =>
+      value?.secondary && !value?.primary
+        ? 'A secondary action needs a primary action. Add a primary action first.'
+        : true,
+    ),
+  preview: {
+    select: { primary: 'primary.label', secondary: 'secondary.label' },
+    prepare({ primary, secondary }) {
+      const labels = [primary, secondary].filter(Boolean).map(String);
+      return {
+        title: labels.length ? labels.join('  ·  ') : 'No actions',
+        subtitle: `${labels.length} action${labels.length === 1 ? '' : 's'}`,
+      };
+    },
+  },
+});
+```
+
+One constant is needed:
+
+```ts
+export const CTA_ACTION_APPEARANCE = {
+  CONTAINED: 'CONTAINED',
+  INLINE: 'INLINE',
+} as const;
+export type TCtaActionAppearance = TValueOf<typeof CTA_ACTION_APPEARANCE>;
+```
+
+A helper mirrors the existing `sectionHeaderField()` convention:
+
+```ts
+// helpers/action-group-field.ts
+export const actionGroupField = (options: { title?: string } = {}) =>
+  defineField({
+    name: 'actions',
+    title: options.title ?? 'Actions',
+    type: actionGroupSchema.name,
+  });
+```
+
+**One residual validation rule** — secondary-requires-primary — remains, because it is a genuine cross-field constraint that naming alone cannot express. Everything else the array shape needed is gone.
+
+**Link-library readiness.** Both slots are typed as the inline `link` object today. When the link library lands, each slot's type changes from `link` to `linkRef` in **one file** — module consumers, the `ActionGroup` renderer, and the view-model shape are untouched, because they already read a normalised link. That is the "cleaner once the link library exists" property this shape is designed for.
+
+### 5.2 Appearance → button variant mapping
+
+The web layer maps each action onto the existing `@blog/ui` `Button` variants — no new button styles:
+
+| Action                    | Renders as `Button variant`                |
+| ------------------------- | ------------------------------------------ |
+| `primary`                 | `primary` — filled `--brand-primary-solid` |
+| `secondary` + `CONTAINED` | `ghost` — `--border-strong`, hover brand   |
+| `secondary` + `INLINE`    | `link` — underlined `--brand-primary`      |
+
+---
+
+## 6. Optional `content` — basic rich text (D5)
+
+Per D5 the rich text is a **separate** field from the title's supporting text:
+
+- **`sectionHeader.supportingText`** — short **plain** subtitle. Unchanged (`type: 'text'`, max 300).
+- **`content`** — a **separate, optional** basic rich-text block: bullet / numbered lists, **bold**, _italic_, and inline links.
+
+The repo has two block objects: `richText` (full — H2–H4, quote, `bodyImage`, `code`, `aside`) and `blockText` (`array of block`, Sanity defaults). Neither is "basic prose", so add a third. **It is named `basicText`, not `ctaContent`** — the gap it fills is generic, and Hero/Newsletter should be able to adopt it without importing a CTA-branded type.
+
+```ts
+// objects/blocks/basic-text.ts
+import { linkSchema } from '@blog/studio/schema-types/objects/link';
+import { defineArrayMember, defineType } from 'sanity';
+
+export const basicTextSchema = defineType({
+  name: 'basicText',
+  title: 'Basic Text',
+  type: 'array',
+  of: [
+    defineArrayMember({
+      type: 'block',
+      styles: [{ title: 'Normal', value: 'normal' }], // no headings
+      lists: [
+        { title: 'Bullet', value: 'bullet' },
+        { title: 'Numbered', value: 'number' },
+      ],
+      marks: {
+        decorators: [
+          { title: 'Bold', value: 'strong' },
+          { title: 'Italic', value: 'em' },
+        ],
+        // D4 ✔ — reuse the EXISTING link object as the inline annotation
+        annotations: [{ type: linkSchema.name }],
+      },
+    }),
+  ],
+  validation: (rule) => rule.max(6), // CTAs stay short
+});
+```
+
+Rendered on web with `@portabletext/react`: `strong` / `em`, `ul` / `ol` (bullet markers in `--brand-primary`), and `link` annotations resolved through the **same** `SmartLink` (`apps/web/src/components/shared/smart-link/`) the actions use — one link object, one renderer, everywhere. In a centered **Callout**, lists left-align inside the centered block (D5a — still open, see §12).
+
+---
+
+## 7. Component layer (`packages/ui`)
+
+### 7.1 `CtaModule` props
+
+```ts
+type TCtaModuleProps = {
+  variant: TCtaVariant;
+  tone: TBrandVariant; // card fill — the module paints its own container (§3.2)
+  eyebrow?: string;
+  heading: string;
+  headingId?: string;
+  supportingText?: string; // plain subtitle (sectionHeader.supportingText)
+  content?: ReactNode; // pre-rendered basic Portable Text
+  image?: ReactNode; // pre-rendered <img>/next Image, or null
+  actions?: ReactNode; // pre-rendered <ActionGroup/>, built by web
+  footnote?: string;
+  align?: THeadingAlign; // Banner + Callout; named to match sectionHeader.align (D3)
+  imageSide?: TCtaImageSide;
+  mobileMediaOrder?: TCtaMobileMediaOrder;
+  isWrapped?: boolean; // as today — drops own outer spacing under Section
+};
+```
+
+Consistent with today's pattern: **the web layer builds the anchors/images** and passes rendered nodes; `CtaModule` never constructs a link. `cta-module-variants.ts` grows the card `root` (border, radius, shadow, max-width — §3.2), a `tone` variant for the fill, and `variant` / `align` / `imageSide` / `mobileMediaOrder` slots.
+
+Reading order is fixed **content → media** in the DOM for every variant; visual side is CSS `order` only, so keyboard and screen-reader order always hits heading → text → actions before a decorative image. `mobileMediaOrder: FIRST` is the sole opt-in that moves the image ahead on mobile.
+
+### 7.2 `ActionGroup` molecule
+
+A `packages/ui` molecule taking the normalised actions and rendering the buttons with the §5.2 mapping. **Generalise the existing `packages/ui/src/organisms/hero/components/cta/hero-cta.tsx`** — a styled div slot for the hero's buttons — rather than adding a parallel component beside it; `HeroCta` becomes a thin alias or is retired in favour of `ActionGroup`.
+
+`cta-module-view.tsx` maps `actions.primary` / `actions.secondary` → `ActionGroup` items (each becoming a `SmartLink` inside the right `Button` variant), then passes the group as `actions`.
+
+---
+
+## 8. Web & service wiring
+
+- **Service (`packages/service/src/features/modules/cta/`)** — the CTA feature slice is `adaptor/{query,loader,transformer,types}.ts` + `application/service.ts` (plus tests), not a single projection file. Extend the query to select `variant`, `eyebrow`, `sectionHeader { heading, supportingText, align }`, `content` (Portable Text), `image` (+ alt), `imageSide`, `mobileMediaOrder`, `actions { primary, secondary, secondaryAppearance }`, `footnote`, `brandVariant`, `layout`. The existing `linkFragment` is reused for both action slots — it already projects `accessibleLabel`, which is what §8.1 depends on. Add a shared `actionGroupFragment` next to `linkFragment` so Hero/Newsletter reuse it.
+- **Web (`apps/web/src/modules/cta/`)** — `cta-module-view.tsx` renders the `Section` landmark pinned to `brandVariant={PRIMARY}` (§3.2), builds the image node, renders optional `content` via Portable Text, builds `<ActionGroup>`, and passes everything to `CtaModule` including `tone={brandVariant}`.
+
+### 8.1 #1861 — the dropped `ariaLabel` (closed by this work)
+
+`CtaModuleView` currently builds `<SmartLink href={action.href} target={action.target}>{action.label}</SmartLink>` and silently drops `action.ariaLabel`, so an editor's authored accessible label has no effect. The rewrite in §7.2/§8 replaces exactly this code path, so the fix lands by construction:
+
+- Every action rendered through `ActionGroup` forwards `ariaLabel` to its `SmartLink`.
+- Per the repo a11y convention the prop is named **`ariaLabel`**, never a hardcoded `aria-label` string at the call site. Confirm `SmartLink`'s prop contract exposes the pass-through; if it does not, that wiring is part of this work.
+- Co-located test coverage must assert the authored `ariaLabel` reaches the rendered link's accessible name, and **must fail without the fix** — verified against a stubbed implementation, not assumed.
+
+**Out of scope here, tracked separately:** #1861 also asks whether sibling `*ModuleView` components under `apps/web/src/modules/` drop the same prop. That sweep is broader than the CTA module and gets its own follow-up issue rather than inflating this diff.
+
+---
+
+## 9. Migration — none required (verified)
+
+**There are no `module_cta` documents in any dataset, so no data migration is needed.** Verified 2026-08-29 by querying both content lakes directly:
+
+| Dataset                    | Total docs | `module_cta` | Module types actually present                                                                     |
+| -------------------------- | ---------- | ------------ | ------------------------------------------------------------------------------------------------- |
+| `50l5r0vs` / `development` | 122        | **0**        | `module_hero`, `module_newsletter`, `module_postLatest`, `module_postList`, `module_taxonomyList` |
+| `7fuqzuyl` / `production`  | 69         | **0**        | `module_content`, `module_hero`, `module_postList`                                                |
+
+Both queries returned real content (so the zero is a genuine absence, not an access failure). `module_cta` is a schema type that has never been authored against.
+
+**Consequences:**
+
+- The required `action` field can be **removed outright** in the same change that adds `actions`. Nothing orphans.
+- No `sanity/migrate` transform, no dry-run, no backup, no human-gated production run.
+- The "deprecate-then-delete across two releases" caution that would otherwise apply is moot.
+
+**The one caveat:** this holds only while the count stays zero. If a CTA is authored between now and the schema landing, re-check before removing `action` — a single `count(*[_type == "module_cta"])` against both datasets is enough. Ship the schema promptly rather than leaving it staged for weeks.
+
+_(This section previously specified a full migration. That was written before the datasets were checked; the check found nothing to migrate.)_
+
+## 10. Validation summary
+
+| Rule                            | Where                                                       | Message                                                                  |
+| ------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Secondary requires primary      | `actionGroup` custom                                        | "A secondary action needs a primary action. Add a primary action first." |
+| `label` ≤ 40 per action         | inherited from `link`                                       | (existing)                                                               |
+| Image required for Banner/Split | `module_cta.image` custom                                   | "Banner and Split need an image."                                        |
+| `heading` required, ≤ 80        | `sectionHeader.heading` (in `requiredHeadingSectionHeader`) | (existing)                                                               |
+| `eyebrow` ≤ 40                  | `module_cta.eyebrow`                                        | (max)                                                                    |
+| `footnote` ≤ 120                | `module_cta.footnote`                                       | (max)                                                                    |
+| `content` ≤ 6 blocks            | `basicText`                                                 | (max)                                                                    |
+
+Note how much shorter this is than the array shape would need: max-2, variant-uniqueness, and Primary-first are all gone, enforced by the model instead (§5).
+
+---
+
+## 11. Accessibility
+
+- One `<h2>` per module (`heading`), wired to `Section`'s `aria-labelledby` as today.
+- DOM order content-before-media (§7.1); decorative images get empty `alt` unless authored otherwise via `imageWithAlt`.
+- Banner text sits on an overlay scrim tuned to clear WCAG 1.4.3 (4.5:1) over the image; the overlay guarantees contrast independent of the uploaded image.
+- Button focus rings inherit the global `--ring` / `focus-visible` treatment already in `buttonVariants`.
+- `INLINE`-appearance secondary actions remain real anchors (underlined), not ambiguous buttons.
+- Authored `ariaLabel` reaches the rendered accessible name — §8.1 / #1861.
+
+---
+
+## 12. Decisions
+
+**Resolved:**
+
+- **D1 ✔** — Containment: `CtaModule` paints its own contained card; `Section` is unchanged (full-bleed landmark), pinned to `PRIMARY` for the CTA so no band competes. §3.2. Known cost: `brandVariant` is overloaded on this module, accepted and documented rather than renamed.
+- **D2 ✔** — Banner brand tone drives the **overlay tint** (Primary / Secondary → neutral-dark scrim; Brand Primary → azure scrim), not a surface fill. §3.3, shown in the mock.
+- **D3 ✔** — Content alignment is `sectionHeader.align`; component defaults **Banner LEFT, Callout CENTER**; Split ignores it. The `CtaModule` prop is named `align` to match. §4.3, §7.1.
+- **D4 ✔** — Reuse the existing `linkSchema` everywhere: Hero `secondaryAction` (already), both `actionGroup` slots, and the inline `content` annotation. One link object, one `SmartLink` renderer. §5–§6.
+- **D5 ✔** — Rich text is a **separate** `content` field, distinct from the plain `sectionHeader.supportingText`. §4.3, §6.
+- **D6 ✔** — Centered variant named **Callout** (over Stack / Centered). §2.
+- **D7 ✔** — Optional text under the actions named **`footnote`**.
+- **D8 ✔** — Actions live in a **reusable `actionGroup` object with named `primary` / `secondary` slots**, under `objects/blocks/`, adopted by CTA first and by Hero / Newsletter / future modules after. Not an ordered array, not module-inlined fields. §5.
+- **D9 ✔** — The basic rich-text block is named **`basicText`**, not `ctaContent`, because the gap it fills is generic. §6.
+- **D10 ✔** — **`--shadow-card` is a new token** added to `configs/tailwind/theme.css` in both themes, as a config-layer prerequisite. §4.1.
+- **D11 ✔** — #1861's `ariaLabel` fix is absorbed into this work's web layer; its sibling-module sweep becomes a separate follow-up issue. §8.1.
+- **D12 ✔** — **No data migration.** Both datasets hold zero `module_cta` documents, so `action` is removed outright rather than migrated. §9 carries the evidence and the one caveat.
+
+**Still open:**
+
+- **D5a** — Centered Callout lists: left-align inside the centered block (recommended, and what the mock does) vs. force the whole block left when a list is present.
+
+---
+
+## 13. Rollout & testing
+
+Dependency order, one PR per layer where each merges green on its own:
+
+`config` (tokens + constants) → `studio` (schema + migration) → `service` (projection) → `ui` (`CtaModule` + `ActionGroup`) → `web` (view, closes #1861).
+
+- **Config:** `--shadow-card` renders in both themes; new constants exported.
+- **Schema:** unit-test the `actionGroup` validator (empty, primary-only, primary+secondary, secondary-only → reject) and the Banner/Split image requirement.
+- **Component:** Storybook stories per variant × tone × action shape; visual check of the contained card in light and dark against the mock.
+- **Migration:** none — re-confirm `count(*[_type == "module_cta"])` is still 0 in both datasets immediately before the schema PR merges (§9).
+- **A11y:** axe pass on each variant; manual keyboard/reading-order check that actions precede a decorative image; the #1861 `ariaLabel` regression test must fail without the fix.
+
+_Reference mock: `docs/design-reference/cta-module-system.html`._
