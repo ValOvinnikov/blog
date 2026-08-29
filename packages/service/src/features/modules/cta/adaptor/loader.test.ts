@@ -1,5 +1,8 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawCtaModule } from '@blog/service/testing/modules/fixtures';
+import {
+  makeRawCtaAction,
+  makeRawCtaModule,
+} from '@blog/service/testing/modules/fixtures';
 
 import { getCta } from './loader';
 
@@ -10,12 +13,14 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
 
 describe('getCta', () => {
   it('maps the cta module document', async () => {
-    mockRun.mockResolvedValueOnce(makeRawCtaModule());
+    mockRun.mockResolvedValueOnce(
+      makeRawCtaModule({ actions: { actions: [makeRawCtaAction()] } }),
+    );
 
     const cta = await getCta('cta-1');
 
     expect(cta.sectionHeader.heading).toBe('Subscribe to the newsletter');
-    expect(cta.action?.href).toBe('/newsletter');
+    expect(cta.actions?.[0]?.link.href).toBe('/newsletter');
   });
 
   it('propagates when the module document is missing', async () => {
@@ -24,7 +29,7 @@ describe('getCta', () => {
     await expect(getCta('missing')).rejects.toThrow();
   });
 
-  it('tags the query with every type its action can reference internally', async () => {
+  it('tags the query with every type its actions can reference internally', async () => {
     mockRun.mockResolvedValueOnce(makeRawCtaModule());
 
     await getCta('cta-1');

@@ -1,6 +1,16 @@
-import { BRAND_VARIANT, HERO_FIELD_MODE, TLINK_TYPE } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CTA_ACTION_APPEARANCE,
+  CTA_ACTION_VARIANT,
+  CTA_VARIANT,
+  HERO_FIELD_MODE,
+  TLINK_TYPE,
+} from '@blog/config';
 import type { TRawContentModule } from '@blog/service/features/modules/content/adaptor/transformer';
-import type { TRawCtaModule } from '@blog/service/features/modules/cta/adaptor/transformer';
+import type {
+  TRawCtaAction,
+  TRawCtaModule,
+} from '@blog/service/features/modules/cta/adaptor/transformer';
 import type { TRawHeroModule } from '@blog/service/features/modules/hero/adaptor/transformer';
 import type { TRawNewsletterModule } from '@blog/service/features/modules/newsletter/adaptor/transformer';
 import type { TRawPostLatestModule } from '@blog/service/features/modules/post-latest/adaptor/transformer';
@@ -74,13 +84,32 @@ export function makeRawCtaModule(
   overrides: Partial<TRawCtaModule> = {},
 ): TRawCtaModule {
   return {
+    variant: CTA_VARIANT.CALLOUT,
     brandVariant: BRAND_VARIANT.PRIMARY,
+    eyebrow: null,
     sectionHeader: {
       heading: 'Subscribe to the newsletter',
       supportingText: 'Get new posts in your inbox.',
       align: null,
     },
-    action: {
+    content: null,
+    image: null,
+    imageSide: null,
+    mobileMediaOrder: null,
+    actions: null,
+    footnote: null,
+    layout: null,
+    ...overrides,
+  };
+}
+
+export function makeRawCtaAction(
+  overrides: Partial<TRawCtaAction> = {},
+): TRawCtaAction {
+  return {
+    variant: CTA_ACTION_VARIANT.PRIMARY,
+    appearance: CTA_ACTION_APPEARANCE.CONTAINED,
+    link: {
       label: 'Subscribe',
       linkType: TLINK_TYPE.EXTERNAL,
       url: '/newsletter',
@@ -89,7 +118,6 @@ export function makeRawCtaModule(
       platform: null,
       accessibleLabel: null,
     },
-    layout: null,
     ...overrides,
   };
 }

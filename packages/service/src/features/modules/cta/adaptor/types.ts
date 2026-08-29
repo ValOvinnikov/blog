@@ -1,18 +1,38 @@
 import type {
+  BasicText,
   ILink,
+  ISanityImage,
   TBrandVariantOf,
+  TCtaActionAppearance,
+  TCtaActionVariant,
+  TCtaImageSide,
+  TCtaMobileMediaOrder,
+  TCtaVariant,
   THeadingAlign,
   TLayout,
   TMaybeUndefined,
 } from '@blog/config';
 
+export type TCtaAction = {
+  variant: TCtaActionVariant;
+  appearance: TMaybeUndefined<TCtaActionAppearance>;
+  link: ILink;
+};
+
 export type TCtaModule = {
-  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  variant: TCtaVariant;
+  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY'>;
+  eyebrow: TMaybeUndefined<string>;
   sectionHeader: {
     heading: string;
     supportingText: TMaybeUndefined<string>;
     align: TMaybeUndefined<THeadingAlign>;
   };
-  action: TMaybeUndefined<ILink>;
+  content: TMaybeUndefined<BasicText>;
+  image: TMaybeUndefined<ISanityImage>;
+  imageSide: TMaybeUndefined<TCtaImageSide>;
+  mobileMediaOrder: TMaybeUndefined<TCtaMobileMediaOrder>;
+  actions: TMaybeUndefined<TCtaAction[]>;
+  footnote: TMaybeUndefined<string>;
   layout: TMaybeUndefined<TLayout>;
 };
