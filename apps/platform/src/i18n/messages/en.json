@@ -11,7 +11,8 @@
     "tenantProvisioning": "Provisioning · Admin",
     "tenantDanger": "Danger zone · Admin",
     "tenantDomain": "Domain · Admin",
-    "features": "Features · Admin"
+    "features": "Features · Admin",
+    "studio": "Studio · Admin"
   },
   "workspacePendingPage": {
     "heading": "Your workspace isn't ready yet",
@@ -430,6 +431,10 @@
   "tenantDangerPage": {
     "title": "Danger zone",
     "description": "Irreversible actions for this tenant. Restricted to superadmins."
+  },
+  "studioPage": {
+    "notProvisionedTitle": "Studio isn't ready yet",
+    "notProvisionedDescription": "This tenant's Sanity project hasn't finished provisioning. Try again once provisioning completes."
   },
   "tenantDetailsPanel": {
     "heading": "Tenant details",

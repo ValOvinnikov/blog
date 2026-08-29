@@ -6,6 +6,7 @@ import { ACTIVE_TENANT_COOKIE } from '@platform/utils/active-tenant-cookie/activ
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
+import { cache } from 'react';
 
 import { listSessionTenants } from './list-session-tenants';
 
@@ -17,17 +18,13 @@ export type TDashboardTenantContext = {
 };
 
 /**
- * The slug-free `/dashboard` tree's tenant gate — the counterpart to
- * `requireTenantMembership`, but resolving "which tenant" from the session's
- * own `memberships` instead of a URL param. Exactly one membership resolves
- * directly, 404ing if it points at a tenant that no longer exists; more than
- * one requires an "active tenant" cookie set by `/api/dashboard/select-tenant`
- * — missing, or naming a tenant the session no longer has a membership for,
- * redirects to the picker at `/dashboard/select-tenant` rather than
- * guessing. Called from a layout so every route nested under the gated
- * segment is protected by existing there.
+ * The slug-free `/dashboard` tree's tenant gate — resolves "which tenant"
+ * from the session's own `memberships` instead of a URL param. Several
+ * memberships require the "active tenant" cookie rather than guessing one.
+ * `cache()`-wrapped: a layout can't pass this down to its page, so a
+ * route's layout and page would otherwise each resolve it separately.
  */
-export const resolveDashboardTenant =
+export const resolveDashboardTenant = cache(
   async (): Promise<TDashboardTenantContext> => {
     const { memberships, tenants } = await listSessionTenants();
     const tenantById = new Map(tenants.map((tenant) => [tenant.id, tenant]));
@@ -56,4 +53,5 @@ export const resolveDashboardTenant =
     }
 
     return { tenant: activeTenant, membership: activeMembership, tenants };
-  };
+  },
+);

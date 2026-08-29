@@ -71,10 +71,7 @@
       // import graph can't see a bare string naming a package. Strict pnpm
       // (no hoisting) still requires it as a real apps/platform devDependency so
       // Turbopack can resolve it.
-      //
-      // @blog/studio: alias-wired so a route can mount the Studio, but no
-      // route imports it yet — knip's import graph sees no consumer.
-      "ignoreDependencies": ["@svgr/webpack", "@blog/studio"],
+      "ignoreDependencies": ["@svgr/webpack"],
       // next-intl navigation helpers (Link/usePathname), scaffolded to
       // mirror apps/web's i18n/navigation.ts but not yet consumed by any
       // component. Mark it an entry so its exports aren't reported unused;
