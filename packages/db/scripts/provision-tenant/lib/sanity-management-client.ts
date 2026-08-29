@@ -138,7 +138,7 @@ export type TSanityRobotToken = { id: string; token: string };
 
 // Mints a project-scoped "robot" token via Sanity's Access API
 // (`POST /access/project/:projectId/robots`) — the same mechanism
-// `sanity tokens create` uses under the hood. `viewer` (read-only, step 4's
+// `sanity tokens create` uses under the hood. `viewer` (read-only, step 3's
 // persisted token) and `editor` (write, step 2's transient seed token) are
 // the two roles this workflow ever mints, passed as a single-element
 // `roleNames` membership rather than the old flat `role` field.

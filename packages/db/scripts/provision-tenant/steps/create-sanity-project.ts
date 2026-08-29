@@ -40,7 +40,7 @@ const TENANT_PROJECT_MEMBER_ROLE = 'viewer';
  * must be able to find a project it already created rather than re-minting one.
  *
  * Does NOT mint a token — see `steps/persist-sanity-token.ts` for why that's
- * step 4's job, not this one.
+ * step 3's job, not this one.
  */
 export async function createTenantSanityProject(
   tenant: TTenant,

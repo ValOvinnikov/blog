@@ -19,7 +19,6 @@ const env: TProvisionEnv = {
   vercelTeamId: undefined,
   vercelWebProjectId: 'prj_web',
   adminAppBaseUrl: 'https://admin.example.com',
-  platformDomain: 'example.com',
   tenantSanityDataset: 'test-dataset',
   webAppBaseUrl: 'https://example.com',
   revalidateSecret: 'revalidate-shh',

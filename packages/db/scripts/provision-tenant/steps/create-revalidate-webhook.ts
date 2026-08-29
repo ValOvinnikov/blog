@@ -14,7 +14,7 @@ export function revalidateWebhookUrl(webAppBaseUrl: string): string {
 }
 
 /**
- * Step 6 — creates a Sanity webhook on the tenant's project pointing at the
+ * Step 5 — creates a Sanity webhook on the tenant's project pointing at the
  * shared `apps/web` revalidation endpoint. One URL and secret work for every
  * tenant: that route reads Sanity's own `sanity-project-id` header to
  * tenant-scope its cache tags, so nothing here needs to be tenant-specific

@@ -17,13 +17,12 @@ export type TProvisionEnv = {
   vercelToken: string;
   // Only needed when the Vercel account is team-owned.
   vercelTeamId: string | undefined;
-  // The *shared* `apps/web` Vercel project id — step 5 adds every tenant's
+  // The *shared* `apps/web` Vercel project id — step 4 adds every tenant's
   // custom domain to this one project, never a per-tenant project.
   vercelWebProjectId: string;
   // Base origin of the deployed `apps/platform` app (no trailing slash/path) —
   // the Sanity CORS origin step 1 adds.
   adminAppBaseUrl: string;
-  platformDomain: string;
   // Name of the Sanity dataset created for each tenant's project.
   tenantSanityDataset: string;
   // Base origin of the deployed, shared `apps/web` app (no trailing
@@ -45,7 +44,6 @@ export function loadProvisionEnv(): TProvisionEnv {
     vercelTeamId: process.env['VERCEL_TEAM_ID'],
     vercelWebProjectId: requireEnv('VERCEL_PROJECT_ID'),
     adminAppBaseUrl: requireEnv('ADMIN_APP_BASE_URL'),
-    platformDomain: requireEnv('PLATFORM_DOMAIN'),
     tenantSanityDataset: requireEnv('TENANT_SANITY_DATASET'),
     webAppBaseUrl: requireEnv('WEB_APP_URL'),
     revalidateSecret: requireEnv('SANITY_REVALIDATE_SECRET'),
