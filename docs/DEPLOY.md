@@ -7,10 +7,13 @@ How this blog deploys, and the one-time setup that makes the pipeline live.
 - **Push a `vX.Y.Z` git tag** → **production** environment (`production`
   dataset).
 
-On a `main` merge, the Sanity **Studio**, the Next.js **web app** and the
-**admin panel** each deploy only when the merge touches their turbo graph
-(`turbo-ignore`; a manual `workflow_dispatch` run deploys all three). A
-production tag always deploys all three.
+On a `main` merge, the Next.js **web app** and the **admin panel** each deploy
+only when the merge touches their turbo graph (`turbo-ignore`; a manual
+`workflow_dispatch` run deploys both). A production tag has no such gate and
+always deploys both. The Studio is not a deploy target — it ships as the
+`@blog/studio` package and is mounted by the admin panel; change detection
+still tracks it, but only to decide whether the Sanity content-migration job
+needs to run.
 Architecture rationale lives in `SPEC.md` §13 and
 `docs/archive/superpowers/specs/2026-07-13-multi-env-release-pipeline-design.md`.
 
@@ -31,15 +34,12 @@ Architecture rationale lives in `SPEC.md` §13 and
 | ---------------------- | --------------------------------- | ---------------------------------- |
 | Sanity project         | separate dev project (id via env) | separate prod project (id via env) |
 | Sanity dataset         | `development`                     | `production`                       |
-| Studio hostname        | `studio-dev.{your-hosting}`       | `studio.{your-hosting}`            |
 | Vercel project (web)   | `blog-dev`                        | `blog-prod`                        |
-| Vercel project (cms)   | `cms-dev`                         | `cms-prod`                         |
 | Vercel project (admin) | `admin-dev`                       | `admin-prod`                       |
 | Web URL (initial)      | `<DEV_WEB_URL>`                   | `<PRD_WEB_URL>`                    |
 | Admin URL (initial)    | `<DEV_ADMIN_URL>`                 | `<PRD_ADMIN_URL>`                  |
 | Deploy trigger         | push/merge to `main`              | push git tag `v*`                  |
 | Web deploy             | Vercel CLI (GitHub Actions)       | Vercel CLI (GitHub Actions)        |
-| Studio deploy          | Vercel CLI (GitHub Actions)       | Vercel CLI (GitHub Actions)        |
 | Admin deploy           | Vercel CLI (GitHub Actions)       | Vercel CLI (GitHub Actions)        |
 | CI gate before deploy  | `verify` job on `main`            | `verify` job on the `v*` tag       |
 | Revalidation webhook   | dev → dev site                    | prod → prod site                   |
@@ -69,12 +69,13 @@ within this doc; the real values live in GitHub / Vercel / local `.env` and are
 | Sanity **Migrate** token (Editor)          | `<DEV_MIGRATE_TOKEN>`     | `<PRD_MIGRATE_TOKEN>`     |
 | Revalidate secret (`openssl rand -hex 32`) | `<DEV_REVALIDATE_SECRET>` | `<PRD_REVALIDATE_SECRET>` |
 
-Vercel (needed for **both** environments — web and Studio each deploy via the
-Vercel CLI in CI): `<VERCEL_TOKEN>` (account token) and `<VERCEL_ORG_ID>` are
-shared across all four projects; `<VERCEL_PROJECT_ID>` is **per project**
-(`blog-dev` / `blog-prod` from `vercel link`, `cms-dev` / `cms-prod`
-likewise) — the web and Studio project ids are stored as two distinct
-GitHub Environment variables (`VERCEL_PROJECT_ID` / `VERCEL_PROJECT_ID_CMS`).
+Vercel (needed for **both** environments — the web app and the admin panel each
+deploy via the Vercel CLI in CI): `<VERCEL_TOKEN>` (account token) and
+`<VERCEL_ORG_ID>` are shared across all four projects; `<VERCEL_PROJECT_ID>` is
+**per project** (`blog-dev` / `blog-prod` and `admin-dev` / `admin-prod`, each
+read from `vercel link`) — the web and admin project ids are stored as two
+distinct GitHub Environment variables (`VERCEL_PROJECT_ID` /
+`VERCEL_PROJECT_ID_ADMIN`).
 
 ---
 
@@ -97,9 +98,9 @@ project-scoped, so mint them **inside** the matching project):
         (Content migrations mutate documents; a read-only token can't. Least
         privilege, scoped to migrations only.)
 
-> No `ci-deploy` / Deploy-Studio token anymore — Studio no longer deploys via
-> `sanity deploy`, it's a static `sanity build` output served from Vercel (see
-> below), so nothing needs Sanity's own deploy permission. If a project still
+> No `ci-deploy` / Deploy-Studio token anymore — the Studio is not deployed at
+> all: it ships as the `@blog/studio` package and is mounted by the admin
+> panel, so nothing needs Sanity's own deploy permission. If a project still
 > has an old `ci-deploy` token from before this change, it can be revoked.
 
 ### 2. Secrets to generate locally
@@ -109,33 +110,23 @@ openssl rand -hex 32   # → DEV_REVALIDATE_SECRET
 openssl rand -hex 32   # → PRD_REVALIDATE_SECRET
 ```
 
-### 3. Vercel — six projects · https://vercel.com
+### 3. Vercel — four projects · https://vercel.com
 
-Three projects per environment — a web project, a Studio project (replacing
-`*.sanity.studio` hosting), and an admin-panel project:
+Two projects per environment — a web project and an admin-panel project. The
+Studio is no longer a deploy target of its own: it ships as the `@blog/studio`
+package and is mounted by the admin panel, so it has no project, no hostname
+and no deploy job.
 
 - **Web:** `blog-dev`, `blog-prod` — Add New → Project → import
   `{github_account}/blog`; **Root Directory `apps/web`** + tick _"Include files
   outside of the root directory"_; **Node.js 22.x**.
-- **Studio:** `cms-dev`, `cms-prod` — **broken, pending decommission.** The
-  Studio stopped being its own app: it ships as the `@blog/studio` package
-  and is mounted by the platform app, so its CI deploy jobs and `vercel.json`
-  are gone. Deleting that `vercel.json` also removed the
-  `git.deploymentEnabled: false` that had been suppressing Git auto-deploy,
-  so these projects now **attempt a build on every PR and fail** with
-  `The specified Root Directory "apps/cms" does not exist`. Two further
-  projects, `studio-demo` and `studio-demo-1`, fail the same way. None of
-  this blocks a merge — no Vercel check is a required status check — but it
-  is four permanently-red checks until the projects have their Git
-  integration disabled or are deleted in the console.
 - **Admin:** `admin-dev`, `admin-prod` — same import flow; **Root Directory
   `apps/platform`** + tick _"Include files outside of the root directory"_;
   **Node.js 22.x**. A separate project rather than a second domain on
   `blog-dev`/`blog-prod`: a Vercel project has exactly one Root Directory,
   and the panel is a second Next.js app under `apps/platform`.
 
-`blog-*` and `admin-*` have Vercel's Git auto-deploy **disabled**
-(`cms-dev`/`cms-prod` no longer do — see the Studio bullet above) — every deploy
+`blog-*` and `admin-*` have Vercel's Git auto-deploy **disabled** — every deploy
 goes through a CI-gated GitHub Actions job (no pre-merge/preview deploys,
 nothing deploys before checks pass). This is set **once, in code**, via each
 app's own `vercel.json`'s `git.deploymentEnabled: false` (`apps/web`,
@@ -157,6 +148,15 @@ in to can't be reviewed, so previews would cost a standing OAuth chore and a
 new grant of preview database access while delivering nothing. Admin changes
 are reviewed on `admin-dev`, which deploys automatically on merge.
 
+> **Legacy projects still in the console.** `cms-dev`, `cms-prod`,
+> `studio-demo` and `studio-demo-1` predate the Studio becoming a package.
+> They have no Root Directory to build (`apps/cms` is gone) and, because the
+> `vercel.json` that carried `git.deploymentEnabled: false` went with it,
+> they attempt a build on every PR and fail. Nothing blocks a merge — no
+> Vercel check is required — but they show as four permanently-red checks
+> until their Git integration is disabled or the projects are deleted. That
+> console work is tracked separately in the decommissioning ticket, not here.
+
 Nothing to set per project in the dashboard for this anymore; only project
 linking + domains remain:
 
@@ -168,20 +168,6 @@ linking + domains remain:
   - [ ] From repo root: `npx vercel link` → select `blog-prod`. Read the ids
         from `.vercel/project.json` → `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
         (Then delete the local `.vercel/` dir — it's gitignored scratch.)
-- [ ] **`cms-dev`**
-  - [ ] From repo root: `npx vercel link` → select `cms-dev`. Read
-        `VERCEL_PROJECT_ID` from `.vercel/project.json` (`VERCEL_ORG_ID` is the
-        same value already recorded for `blog-dev` — one Vercel account/team).
-        (Then delete the local `.vercel/` dir.)
-  - [ ] Settings → Domains → add `studio-dev.{your-hosting}`; add the DNS record
-        it shows you (CNAME to `cname.vercel-dns.com`, or per Vercel's
-        instructions) at whatever registrar/DNS host manages `{your-hosting}`.
-- [ ] **`cms-prod`**
-  - [ ] From repo root: `npx vercel link` → select `cms-prod`. Read
-        `VERCEL_PROJECT_ID` from `.vercel/project.json`.
-        (Then delete the local `.vercel/` dir.)
-  - [ ] Settings → Domains → add `studio.{your-hosting}`; add the DNS record it
-        shows you, same as above.
 - [ ] **`admin-dev`**
   - [ ] From repo root: `npx vercel link` → select `admin-dev`. Read
         `VERCEL_PROJECT_ID` from `.vercel/project.json` → this is
@@ -205,7 +191,7 @@ and `deploy-production.yml` both run `vercel pull --environment=production`
 before `vercel build`, so a var scoped only to Preview/Development is never
 pulled, and — for a required key like `DATABASE_URL` — the app fails at its
 eager `@blog/db` validation rather than silently degrading; same reasoning as
-the Studio scope note below) — same five keys per project; each project
+the Preview-scope note below) — same five keys per project; each project
 points at its **own** Sanity project, so the id / dataset / URL / tokens all
 differ:
 
@@ -220,7 +206,7 @@ differ:
 > `SANITY_API_READ_TOKEN` is server-only (never exposed to the browser). Each
 > project uses the Viewer token minted in its own Sanity project.
 
-> **Nothing here belongs in the Preview scope.** All six pipeline projects
+> **Nothing here belongs in the Preview scope.** All four pipeline projects
 > disable Git auto-deploy, so none of them ever produces a preview
 > deployment — a Preview-scoped value would simply never be read. This also
 > means no unreviewed branch has ever been able to reach a database through
@@ -364,18 +350,6 @@ Provisioning notes for recreating this from scratch:
       mis-set `production` secret fails it loudly instead of silently
       migrating the wrong branch (or nothing at all) while reporting success.
 
-**Studio** (`cms-dev` / `cms-prod`) — **no longer built by CI.** The Studio
-ships as the `@blog/studio` package and is mounted by the platform app, so
-no CI job runs `sanity build` and `apps/cms/vercel.json` is gone. The
-projects themselves still auto-deploy from Git and fail, per the Studio
-bullet in §2. The values below are retained only until the projects are
-decommissioned; setting them on a fresh environment achieves nothing:
-
-| Key                        | `cms-dev` value    | `cms-prod` value   |
-| -------------------------- | ------------------ | ------------------ |
-| `SANITY_STUDIO_PROJECT_ID` | `<DEV_PROJECT_ID>` | `<PRD_PROJECT_ID>` |
-| `SANITY_STUDIO_DATASET`    | `development`      | `production`       |
-
 **Admin** (`admin-dev` / `admin-prod`, Production scope). The panel runs its
 **own** Node process, so it needs
 its own copy of every variable it reads: `@blog/auth` declares the auth set
@@ -437,8 +411,8 @@ behaviour and is safe; you just sign in twice.
 > `TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE` is a local-dev escape hatch and
 > must **never** be set on `admin-prod`.
 
-> Every key above is **Production scope only**, same as the web and Studio
-> projects — see the Preview-scope note under the web keys above.
+> Every key above is **Production scope only**, same as the web projects — see
+> the Preview-scope note under the web keys above.
 
 #### OAuth callback URLs for the admin origin
 
@@ -473,7 +447,6 @@ job resolves its own project's id + token:
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
 - [ ] Variable `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (**blog-dev**)
-- [ ] Variable `VERCEL_PROJECT_ID_CMS` = `<VERCEL_PROJECT_ID>` (**cms-dev**)
 - [ ] Variable `VERCEL_PROJECT_ID_ADMIN` = `<VERCEL_PROJECT_ID>` (**admin-dev**)
       — the `deploy-admin` job's target; until it's set that job no-ops green.
 
@@ -492,7 +465,6 @@ job resolves its own project's id + token:
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
 - [ ] Variable `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (**blog-prod**)
-- [ ] Variable `VERCEL_PROJECT_ID_CMS` = `<VERCEL_PROJECT_ID>` (**cms-prod**)
 - [ ] Variable `VERCEL_PROJECT_ID_ADMIN` = `<VERCEL_PROJECT_ID>` (**admin-prod**)
       — the `deploy-admin` job's target; until it's set that job no-ops green.
 - [ ] (Optional) require a reviewer on `production` for a manual gate before prod
@@ -540,7 +512,7 @@ environment` rather than silently falling through to the wrong branch.
       without it the project is silently created in whichever org the
       token's owner defaults to, not necessarily this one.
 - [ ] Secret `TENANT_TOKEN_ENCRYPTION_KEY` — the **same** value already set
-      as the `blog-prod`/`cms-prod`-adjacent Vercel env var of the same name
+      as the `blog-prod`-adjacent Vercel env var of the same name
       (see the `@blog/db` env vars table above). `setTenantSanityToken`
       throws without it.
 - [ ] Variable `ADMIN_APP_BASE_URL` — the deployed `apps/platform` origin (no
@@ -685,19 +657,27 @@ Create **two** (the route `/api/revalidate` already exists):
 ### 6. Sanity — CORS origins · API → CORS origins
 
 - [ ] `http://localhost:3333` — credentials **on** (local Studio).
-- [ ] `https://studio-dev.{your-hosting}` — credentials **on** (dev project).
-- [ ] `https://studio.{your-hosting}` — credentials **on** (prod project).
+- [ ] `http://localhost:3001` — credentials **on** (the Studio mounted in a
+      locally-running `apps/platform`).
+- [ ] `https://admin-dev.{your-hosting}` — credentials **on** (the dev admin
+      panel, which mounts the Studio).
+- [ ] `https://admin.{your-hosting}` — credentials **on** (the prod admin panel).
 - [ ] `https://<DEV_WEB_URL>` — credentials **off** (token reads).
 - [ ] `https://<PRD_WEB_URL>` — credentials **off**.
 - [ ] Remove the old `https://valovinnikov-blog-dev.sanity.studio` /
-      `https://valovinnikov-blog.sanity.studio` origins once the Vercel-hosted
-      Studio at the new domain is confirmed working (see "Decommissioning the
-      old `*.sanity.studio` Studio" below).
+      `https://valovinnikov-blog.sanity.studio` origins (see "Decommissioning
+      the old `*.sanity.studio` Studio" below).
+
+> The Studio is served from the admin panel's own origin, so its CORS origin is
+> the admin panel's — there is no separate Studio hostname to allow. Per-tenant
+> Sanity projects get this same origin registered automatically by
+> `provision-tenant`; the two rows above are for the dev/prod projects, which
+> predate provisioning and are set by hand.
 
 ### 6a. Decommissioning the old `*.sanity.studio` Studio
 
-Once `studio.{your-hosting}` / `studio-dev.{your-hosting}` are live and verified
-(Studio loads, signs in, and can read/write the correct dataset):
+Once the Studio mounted in the admin panel is live and verified (it loads,
+signs in, and can read/write the correct dataset):
 
 - [ ] From `packages/studio`, with each project's env pointed at it (`SANITY_STUDIO_HOSTNAME`
       is required here — `sanity undeploy` errors with "No application ID or
@@ -739,13 +719,15 @@ Local dev points at the **dev** project (`<DEV_PROJECT_ID>`):
 ### Development — on merge to `main`
 
 `.github/workflows/deploy-development.yml` (Vercel's `main` auto-deploy is
-disabled on all three projects, so this is the **only** path onto dev — nothing
-deploys before checks pass):
+disabled on both deployed projects, so this is the **only** path onto dev —
+nothing deploys before checks pass):
 
-1. **`changes` gate** runs `turbo-ignore` per app (`cms`, `web`, `admin`) — a
-   deploy job only runs when the merge affects that app's turbo graph
-   (`workflow_dispatch` forces all three; a no-op merge skips everything,
-   including `verify`).
+1. **`changes` gate** runs `turbo-ignore` per target (`@blog/studio`, `web`,
+   `platform`) — a downstream job only runs when the merge affects its
+   target's turbo graph (a no-op merge skips everything, including `verify`;
+   a manual `workflow_dispatch` bypasses the gate on every job, so all of them
+   run). `@blog/studio` gates the Sanity `migrate` job rather than a deploy —
+   the Studio ships as a package and is not deployed on its own.
 2. **`verify` gate** re-runs `type-check` / `lint` / `test` / `build` on the
    merged commit.
 3. **`migrate`** (`environment: development`) applies any un-applied migrations
@@ -891,8 +873,8 @@ commit or redeploy a prior Vercel build.
 - [ ] Home page renders (hero + latest posts) with `cdn.sanity.io` images.
 - [ ] Response headers include the CSP / security headers (`next.config.ts`).
 - [ ] A merge to `main` runs `Deploy Development` → `verify` passes → the
-      affected app(s) among Studio / web / admin deploy (no deploy runs before
-      `verify` is green, and no PR deploys web or the Studio).
+      affected app(s) among web / admin deploy (no deploy runs before `verify`
+      is green, and no PR deploys either of them).
 - [ ] Publishing in the Studio updates the corresponding site within seconds
       (webhook). Dev publishes hit the dev site; prod publishes hit prod.
 - [ ] **Sign in on the admin domain.** A green deploy proves none of the auth
@@ -911,7 +893,7 @@ Unlike everything above, this is **not** part of the dev/prod pipeline — no
 Sanity project, no dataset, no CI-gated migration. It's a single Vercel
 project hosting `@blog/ui`'s Storybook build for visual PR review, and it
 deliberately uses Vercel's Git integration with PR previews **enabled** —
-the opposite of `blog-dev`/`blog-prod`/`cms-dev`/`cms-prod`, whose Git
+the opposite of `blog-dev`/`blog-prod`/`admin-dev`/`admin-prod`, whose Git
 integration is disabled in favor of a CI-gated deploy. That's intentional:
 `@blog/ui` is pure and prop-driven (no `service`/Sanity import), so there's
 no content or credentials a pre-merge preview could leak — and the entire
