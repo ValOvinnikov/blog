@@ -231,13 +231,17 @@ every field** (`.notNull()` or `.nullable(true)`).
 
 ## Comments
 
-- Write a comment only when it explains something the code cannot — a groqd
-  gotcha, a non-obvious cast, a business rule. Skip comments that restate what
-  the code already says (`// title is required`) — they rot and mislead.
-- When a doc comment is warranted, keep it short — one or two sentences of
-  genuine _why_, never a listing of props/return shape (the types already
-  say that) and never a decision-history walkthrough of every issue number
-  that touched the file. If it reads like a changelog, cut it down.
+- **Inline comments are forbidden by default.** No comment inside a query/
+  fetch function body narrating what a line does (`// title is required`
+  restates what the code already says — never write that). The single
+  narrow exception: one line for something the code truly cannot express on
+  its own — a groqd gotcha, a non-obvious cast, a business rule.
+- **A doc comment is the only other kind allowed — at most one per function,
+  and only when the name doesn't already make the purpose obvious.** State
+  what it's **for**, in one short sentence — never how it works internally:
+  never a listing of props/return shape (the types already say that), never
+  a decision-history walkthrough of every issue number that touched the
+  file. If it reads like a changelog, cut it down.
 
 **Never reference project-management state in a comment.** No
 `docs/superpowers/**` path, no roadmap phase ("Phase 0", "Phase 8", "this

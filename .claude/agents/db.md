@@ -262,11 +262,18 @@ the access-convention rules (validated entry points only, never raw
 
 ## Comments
 
-Default to none. A comment earns its place only for a genuine non-obvious
-_why_ — a locking/concurrency subtlety, a schema constraint the types can't
-express, an Auth.js adapter requirement. Never restate what a query already
-says, never list out every field/param, never narrate a decision history by
-issue number — one or two sentences at most.
+**Inline comments are forbidden by default.** No comment inside a query/
+mutation body narrating what a step does — if that feels necessary,
+restructure the code or rename something instead. The single narrow
+exception: one line for a genuine non-obvious constraint the code can't
+express on its own — a locking/concurrency subtlety, a schema constraint the
+types can't express, an Auth.js adapter requirement.
+
+**A doc comment is the only other kind allowed — at most one per
+function, and only when the name doesn't already make the purpose obvious.**
+State what it's **for**, in one short sentence — never how it works
+internally: never restate what a query already says, never list out every
+field/param, never narrate a decision history by issue number.
 
 **Never reference project-management state in a comment.** No
 `docs/superpowers/**` path, no roadmap phase ("Phase 0", "Phase 8", "this

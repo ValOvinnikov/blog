@@ -107,10 +107,18 @@ archived brief.
 
 ## Comments
 
-Default to none. A comment earns its place only for a genuine non-obvious
-_why_ — a hidden constraint, a real gotcha, a workaround for a specific bug.
-Never restate what the code already says, never list out every prop/param,
-never narrate a decision history — one or two sentences at most.
+**Inline comments are forbidden by default.** No comment inside a component
+body narrating what a line/branch does — if that feels necessary,
+restructure the code or rename something instead. The single narrow
+exception: one line for a genuine non-obvious constraint the code can't
+express on its own — a hidden constraint, a real gotcha, a workaround for a
+specific bug.
+
+**A doc comment is the only other kind allowed — at most one per component,
+and only when the name doesn't already make the purpose obvious.** State
+what it's **for**, in one short sentence — never how it works internally:
+never restate what the code already says, never list out every prop/param,
+never narrate a decision history.
 
 **Never reference project-management state in a comment.** No
 `docs/superpowers/**` path, no roadmap phase ("Phase 0", "Phase 8", "this
