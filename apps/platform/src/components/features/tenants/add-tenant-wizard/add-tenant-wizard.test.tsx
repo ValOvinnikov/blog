@@ -20,7 +20,7 @@ describe(AddTenantWizard, () => {
     ).toBeVisible();
   });
 
-  it('renders the six-step rail with Details as the active step', () => {
+  it('renders the five-step rail with Details as the active step', () => {
     render(<AddTenantWizard />);
 
     const rail = screen.getByRole('navigation', {
@@ -28,12 +28,11 @@ describe(AddTenantWizard, () => {
     });
     const items = screen.getAllByRole('listitem');
 
-    expect(items).toHaveLength(6);
+    expect(items).toHaveLength(5);
     expect(items[0]).toHaveAttribute('aria-current', 'step');
     expect(rail).toHaveTextContent('Details');
     expect(rail).toHaveTextContent('Sanity project');
     expect(rail).toHaveTextContent('Seed content');
-    expect(rail).toHaveTextContent('Deploy Studio');
     expect(rail).toHaveTextContent('Registry rows');
     expect(rail).toHaveTextContent('Map domain');
   });

@@ -343,10 +343,6 @@
         "title": "Seed content",
         "description": "Starter documents"
       },
-      "deployStudio": {
-        "title": "Deploy Studio",
-        "description": "Vercel deploy"
-      },
       "registryRows": {
         "title": "Registry rows",
         "description": "tenants + memberships"
@@ -383,7 +379,6 @@
     "stepLabel": {
       "SANITY_PROJECT": "Create the content workspace",
       "SEED_CONTENT": "Add starter content",
-      "DEPLOY_STUDIO": "Deploy the content editor",
       "PERSIST_TOKEN": "Connect the site to its content",
       "MAP_DOMAIN": "Connect the custom domain",
       "CREATE_WEBHOOK": "Wire up the CMS to the site"

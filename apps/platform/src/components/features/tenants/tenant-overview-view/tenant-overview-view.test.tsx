@@ -214,12 +214,8 @@ describe(TenantOverviewView, () => {
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
   });
 
-  it('locks only the field a completed step already consumed once provisioning has FAILED, leaving the field that caused the failure editable', () => {
-    // Mirrors the real 409 case: DEPLOY_STUDIO completed (locking slug), but
-    // MAP_DOMAIN itself failed — so primaryDomain, the field that actually
-    // caused the failure, stays editable.
+  it('locks primaryDomain once MAP_DOMAIN has completed and a later step failed, leaving the field that caused the failure editable', () => {
     const tenant = makeTenant({
-      primaryDomain: 'taken-domain.example.com',
       provisioningSteps: {
         ...idleProvisioningSteps(),
         [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
@@ -228,15 +224,15 @@ describe(TenantOverviewView, () => {
         [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
           status: TENANT_PROVISIONING_STEP_STATUS.DONE,
         },
-        [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
         [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
           status: TENANT_PROVISIONING_STEP_STATUS.DONE,
         },
         [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
+        [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
           status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error: 'Vercel deploy failed: 409 domain_already_in_use',
+          error: 'boom',
         },
       },
     });
@@ -252,16 +248,15 @@ describe(TenantOverviewView, () => {
       />,
     );
 
-    const slugInput = screen.getByRole('textbox', { name: 'Slug' });
-    expect(slugInput).toBeDisabled();
-    expect(slugInput).toHaveAccessibleDescription(
-      'Locked — the "Deploy the content editor" step has already completed and used this value.',
-    );
-
     const domainInput = screen.getByRole('textbox', {
       name: 'Primary domain',
     });
-    expect(domainInput).not.toBeDisabled();
+    expect(domainInput).toBeDisabled();
+    expect(domainInput).toHaveAccessibleDescription(
+      'Locked — the "Connect the custom domain" step has already completed and used this value.',
+    );
+
+    expect(screen.getByRole('textbox', { name: 'Slug' })).not.toBeDisabled();
     expect(screen.getByRole('textbox', { name: 'Name' })).not.toBeDisabled();
   });
 
@@ -327,7 +322,7 @@ describe(TenantOverviewView, () => {
       />,
     );
 
-    expect(screen.getByText('Provisioning — step 2 of 6')).toBeVisible();
+    expect(screen.getByText('Provisioning — step 2 of 5')).toBeVisible();
     expect(
       screen.getByRole('textbox', { name: 'Slug' }),
     ).toHaveAccessibleDescription('Locked while provisioning is running.');
