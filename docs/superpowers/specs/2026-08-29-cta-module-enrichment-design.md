@@ -343,7 +343,7 @@ type TCtaModuleProps = {
   supportingText?: string; // plain subtitle (sectionHeader.supportingText)
   content?: ReactNode; // pre-rendered basic Portable Text
   image?: ReactNode; // pre-rendered <img>/next Image, or null
-  actions?: ReactNode; // pre-rendered <ActionGroup/>, built by web
+  actions?: ReactNode; // pre-rendered <ActionGroup/>, built by web — §7.2
   footnote?: string;
   align?: THeadingAlign; // Banner + Callout; named to match sectionHeader.align (D3)
   imageSide?: TCtaImageSide;
@@ -352,28 +352,82 @@ type TCtaModuleProps = {
 };
 ```
 
-Consistent with today's pattern: **the web layer builds the anchors/images** and passes rendered nodes; `CtaModule` never constructs a link. `cta-module-variants.ts` grows the card `root` (border, radius, shadow, max-width — §3.2), a `tone` variant for the fill, and `variant` / `align` / `imageSide` / `mobileMediaOrder` slots.
+Consistent with today's pattern: **the web layer builds the anchors/images** and passes rendered nodes; `CtaModule` never constructs a link, never imports `next/link`, and has no molecule of its own for this. `cta-module-variants.ts` grows the card `root` (border, radius, shadow, max-width — §3.2), a `tone` variant for the fill, and `variant` / `align` / `imageSide` / `mobileMediaOrder` slots. `actions` is a plain `ReactNode` slot, styled by the card's own `cta__actions`-equivalent layout row — no different in kind from how `Hero` takes its `Hero.Cta` children today.
 
 Reading order is fixed **content → media** in the DOM for every variant; visual side is CSS `order` only, so keyboard and screen-reader order always hits heading → text → actions before a decorative image. `mobileMediaOrder: FIRST` is the sole opt-in that moves the image ahead on mobile.
 
-### 7.2 `ActionGroup` molecule
+### 7.2 `ActionGroup` — a web-layer shared component (D8 revised — see below)
 
-A `packages/ui` molecule taking the normalised actions and rendering the buttons with the §5.2 mapping. **Generalise the existing `packages/ui/src/organisms/hero/components/cta/hero-cta.tsx`** — a styled div slot for the hero's buttons — rather than adding a parallel component beside it; `HeroCta` becomes a thin alias or is retired in favour of `ActionGroup`.
+**Not a `packages/ui` molecule.** Investigated 2026-08-29 by reading how `Hero` — CTA's closest sibling in the module registry — actually builds its own actions today (`apps/web/src/modules/hero/hero-module-view.tsx`):
 
-`cta-module-view.tsx` maps `actions.primary` / `actions.secondary` → `ActionGroup` items (each becoming a `SmartLink` inside the right `Button` variant), then passes the group as `actions`.
+```tsx
+<LinkButton
+  as={SmartLink}
+  href={primaryAction.href}
+  target={primaryAction.target}
+>
+  {primaryAction.label}
+</LinkButton>
+```
+
+`LinkButton` (`packages/ui/src/molecules/link-button/`) already exists and is exactly the primitive needed: polymorphic via `as`, applies `buttonVariants` to whatever element it's given. `Hero.Cta` (`HeroCta`) is a plain styled `<div>` slot — it never constructs a link itself. Building a new `packages/ui` molecule that duplicates this would be more machinery than the codebase's own established pattern uses, and `packages/ui` cannot import `next/link` at all (`CLAUDE.md`) — `LinkButton` is deliberately how it avoids ever needing to.
+
+So `ActionGroup` is a **web-layer shared component**, `apps/web/src/components/shared/action-group/`, alongside `smart-link/` and `section/`. It is the one place the §5.2 appearance-mapping table lives, so it isn't duplicated at every call site:
+
+```tsx
+// apps/web/src/components/shared/action-group/action-group.tsx (sketch)
+export const ActionGroup = ({
+  primary,
+  secondary,
+  secondaryAppearance,
+}: TActionGroupProps) => (
+  <>
+    {primary && (
+      <LinkButton
+        as={SmartLink}
+        href={primary.href}
+        target={primary.target}
+        ariaLabel={primary.ariaLabel}
+        variant="primary"
+      >
+        {primary.label}
+      </LinkButton>
+    )}
+    {secondary && (
+      <LinkButton
+        as={SmartLink}
+        href={secondary.href}
+        target={secondary.target}
+        ariaLabel={secondary.ariaLabel}
+        variant={
+          secondaryAppearance === CTA_ACTION_APPEARANCE.INLINE
+            ? 'link'
+            : 'ghost'
+        }
+      >
+        {secondary.label}
+      </LinkButton>
+    )}
+  </>
+);
+```
+
+`cta-module-view.tsx` imports it, builds it from `actions.primary` / `actions.secondary` / `actions.secondaryAppearance`, and passes the result as `CtaModule`'s `actions` prop — the same shape `HeroModuleView` already passes into `Hero.Cta`, just factored into a named, reusable component instead of repeated inline JSX, since CTA's mapping (appearance → variant) is one step more than Hero's.
+
+**Scope note:** this ticket does not migrate `HeroModuleView` onto `ActionGroup` — that inline JSX keeps working as-is. Adopting it there is a natural follow-up, not part of this epic; call it out separately if wanted rather than expanding this PR's diff.
 
 ---
 
 ## 8. Web & service wiring
 
-- **Service (`packages/service/src/features/modules/cta/`)** — the CTA feature slice is `adaptor/{query,loader,transformer,types}.ts` + `application/service.ts` (plus tests), not a single projection file. Extend the query to select `variant`, `eyebrow`, `sectionHeader { heading, supportingText, align }`, `content` (Portable Text), `image` (+ alt), `imageSide`, `mobileMediaOrder`, `actions { primary, secondary, secondaryAppearance }`, `footnote`, `brandVariant`, `layout`. The existing `linkFragment` is reused for both action slots — it already projects `accessibleLabel`, which is what §8.1 depends on. Add a shared `actionGroupFragment` next to `linkFragment` so Hero/Newsletter reuse it.
-- **Web (`apps/web/src/modules/cta/`)** — `cta-module-view.tsx` renders the `Section` landmark pinned to `brandVariant={PRIMARY}` (§3.2), builds the image node, renders optional `content` via Portable Text, builds `<ActionGroup>`, and passes everything to `CtaModule` including `tone={brandVariant}`.
+- **Service (`packages/service/src/features/modules/cta/`)** — the CTA feature slice is `adaptor/{query,loader,transformer,types}.ts` + `application/service.ts` (plus tests), not a single projection file. Extend the query to select `variant`, `eyebrow`, `sectionHeader { heading, supportingText, align }`, `content` (Portable Text), `image` (+ alt), `imageSide`, `mobileMediaOrder`, `actions { primary, secondary, secondaryAppearance }`, `footnote`, `brandVariant`, `layout`. The existing `linkFragment` is reused for both action slots — it already projects `accessibleLabel`, which is what §8.1 depends on. Add a shared `actionGroupFragment` next to `linkFragment` so Hero/Newsletter reuse it if they later adopt the Studio `actionGroup` object.
+- **Web (`apps/web/src/modules/cta/`)** — `cta-module-view.tsx` renders the `Section` landmark pinned to `brandVariant={PRIMARY}` (§3.2), builds the image node, renders optional `content` via Portable Text, builds `<ActionGroup>` (§7.2), and passes everything to `CtaModule` including `tone={brandVariant}`.
 
 ### 8.1 #1861 — the dropped `ariaLabel` (closed by this work)
 
 `CtaModuleView` currently builds `<SmartLink href={action.href} target={action.target}>{action.label}</SmartLink>` and silently drops `action.ariaLabel`, so an editor's authored accessible label has no effect. The rewrite in §7.2/§8 replaces exactly this code path, so the fix lands by construction:
 
-- Every action rendered through `ActionGroup` forwards `ariaLabel` to its `SmartLink`.
+- Every action rendered through the new `ActionGroup` (§7.2) forwards `ariaLabel` to its `LinkButton`/`SmartLink`, exactly as `HeroModuleView`'s secondary action already does (`aria-label={secondaryAction.ariaLabel}`) — the working sibling pattern this module was missing.
 - Per the repo a11y convention the prop is named **`ariaLabel`**, never a hardcoded `aria-label` string at the call site. Confirm `SmartLink`'s prop contract exposes the pass-through; if it does not, that wiring is part of this work.
 - Co-located test coverage must assert the authored `ariaLabel` reaches the rendered link's accessible name, and **must fail without the fix** — verified against a stubbed implementation, not assumed.
 
