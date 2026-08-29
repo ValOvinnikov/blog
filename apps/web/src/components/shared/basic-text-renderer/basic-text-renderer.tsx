@@ -46,11 +46,9 @@ const components: PortableTextComponents = {
 };
 
 /**
- * BasicTextRenderer — renders the CTA module's optional `content` field, a
- * narrower Portable Text shape than the post body's full `RichText`
- * (paragraphs, lists, bold/italic, and inline links only — no headings,
- * images, code, or asides). `link` annotations route through the same
- * `SmartLink` the module's actions use.
+ * Renders a constrained Portable Text shape — paragraphs, lists, bold/italic,
+ * and inline links only (no headings, images, code, or asides). `link`
+ * annotations route through `SmartLink`.
  */
 export const BasicTextRenderer = ({ value }: IBasicTextRendererProps) => (
   <PortableText value={value} components={components} />

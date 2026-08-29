@@ -8,9 +8,8 @@ import type { ReactNode } from 'react';
 
 import { CtaModuleView } from './cta-module-view';
 
-// Faking `Section` exposes the `brandVariant` it receives as a `data-*`
-// attribute, so the pinning assertion below reads the actual prop value
-// instead of the rendered `tv()` background class.
+// Fakes `Section` so the pinning assertion reads `brandVariant` from a
+// `data-*` attribute instead of the rendered `tv()` background class.
 vi.mock('@web/components/shared/section', () => ({
   Section: ({
     brandVariant,
@@ -41,7 +40,7 @@ const setup = customRender(CtaModuleView, {
   image: undefined,
   imageSide: undefined,
   mobileMediaOrder: undefined,
-  actions: undefined,
+  actions: [],
   footnote: undefined,
   layout: undefined,
   baseUrl: 'https://cdn.sanity.io/images/test-project/test-dataset/',

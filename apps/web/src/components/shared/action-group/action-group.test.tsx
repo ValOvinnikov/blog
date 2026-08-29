@@ -46,9 +46,7 @@ describe(ActionGroup, () => {
     expect(links[1]).toHaveTextContent('Learn more');
   });
 
-  // Checked against a stub that omits `aria-label` — that version fails
-  // this assertion, confirming the test exercises the forwarding rather
-  // than passing unconditionally.
+  // Fails against a stub that omits `aria-label`, confirming this checks forwarding.
   it('forwards the authored ariaLabel to the rendered link accessible name', () => {
     setup();
 

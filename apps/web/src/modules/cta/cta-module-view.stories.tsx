@@ -42,7 +42,7 @@ type TStory = StoryObj<typeof meta>;
 export const Callout: TStory = {};
 
 export const WithoutActions: TStory = {
-  args: { actions: undefined },
+  args: { actions: [] },
 };
 
 export const WithContent: TStory = {

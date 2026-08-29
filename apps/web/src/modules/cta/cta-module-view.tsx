@@ -15,7 +15,7 @@ export interface ICtaModuleViewProps extends TCtaModule {
  * Pure view for `CtaModule` — wraps the `CtaModule` organism in a `Section`
  * landmark pinned to `PRIMARY` (never the authored tone) so no full-bleed
  * band competes with the card `CtaModule` paints itself; the authored
- * `brandVariant` flows down as the card/overlay tone instead (§3.2).
+ * `brandVariant` flows down as the card/overlay tone instead.
  */
 export const CtaModuleView = ({
   id,
@@ -62,7 +62,7 @@ export const CtaModuleView = ({
           ) : undefined
         }
         actions={
-          actions ? (
+          actions.length > 0 ? (
             <ActionGroup
               actions={actions}
               isOnDark={variant === CTA_VARIANT.BANNER}
