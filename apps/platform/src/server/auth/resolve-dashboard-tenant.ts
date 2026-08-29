@@ -18,18 +18,11 @@ export type TDashboardTenantContext = {
 };
 
 /**
- * The slug-free `/dashboard` tree's tenant gate — the counterpart to
- * `requireTenantMembership`, but resolving "which tenant" from the session's
- * own `memberships` instead of a URL param — called from a layout so every
- * route nested under the gated segment is protected by existing there, and
- * `cache()`-wrapped so a route whose page also needs the resolved tenant
- * (the Studio route, which has no other channel to receive it) shares this
- * fetch instead of resolving twice. Exactly one membership resolves
- * directly, 404ing if it points at a tenant that no longer exists; more than
- * one requires an "active tenant" cookie set by `/api/dashboard/select-tenant`
- * — missing, or naming a tenant the session no longer has a membership for,
- * redirects to the picker at `/dashboard/select-tenant` rather than
- * guessing.
+ * The slug-free `/dashboard` tree's tenant gate — resolves "which tenant"
+ * from the session's own `memberships` instead of a URL param. Several
+ * memberships require the "active tenant" cookie rather than guessing one.
+ * `cache()`-wrapped: a layout can't pass this down to its page, so a
+ * route's layout and page would otherwise each resolve it separately.
  */
 export const resolveDashboardTenant = cache(
   async (): Promise<TDashboardTenantContext> => {

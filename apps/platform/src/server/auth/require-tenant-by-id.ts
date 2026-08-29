@@ -14,14 +14,11 @@ export type TTenantByIdContext = {
 };
 
 /**
- * The platform-operator counterpart to `requireTenantMembership`: gated on
- * being in `admins` (via `requireAdmin`), not on a `memberships` row for the
- * routed tenant — the `/tenants/{id}/*` tree is for operators acting on any
- * tenant, unlike the tenant's own `memberships`-gated section; an id with no
- * tenant row 404s. `cache()`-wrapped so the ancestor `[tenantId]` layout's
- * gating call and a page below it — `(detail)`'s chrome layout, or the
- * bare Studio page, neither of which has another channel to receive the
- * resolved tenant — share one fetch per request.
+ * The platform-operator counterpart to `requireTenantMembership`: the
+ * `/tenants/{id}/*` tree is for operators acting on any tenant, unlike the
+ * tenant's own `memberships`-gated section. `cache()`-wrapped because a
+ * layout can't pass this down to its page, so the ancestor gate and the
+ * `(detail)`/Studio pages below it would otherwise each resolve it separately.
  */
 export const requireTenantById = cache(
   async (tenantId: string): Promise<TTenantByIdContext> => {
