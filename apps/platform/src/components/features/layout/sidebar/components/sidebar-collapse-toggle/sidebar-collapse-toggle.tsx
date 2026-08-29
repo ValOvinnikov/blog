@@ -12,10 +12,10 @@ export type TSidebarCollapseToggleProps = {
 };
 
 /**
- * The sidebar's own collapse control, at the top-right of its brand row —
- * `Sidebar`'s only client leaf besides `SidebarNavLink`. Reads and flips
- * `SidebarCollapseProvider`'s state directly rather than taking it as props,
- * since `Sidebar` (its parent's render tree) stays a Server Component.
+ * The sidebar's own collapse control, at the top-right of its brand row.
+ * Reads and flips `SidebarCollapseProvider`'s state directly rather than
+ * taking it as props, since `Sidebar` (its parent's render tree) stays a
+ * Server Component.
  */
 export const SidebarCollapseToggle = ({
   className,

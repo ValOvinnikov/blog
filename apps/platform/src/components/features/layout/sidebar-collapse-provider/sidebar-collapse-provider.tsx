@@ -32,9 +32,9 @@ export type TSidebarCollapseProviderProps = {
 /**
  * Wraps `Sidebar` and the rest of `ShellFrame`'s content in a single
  * `data-collapsed`-carrying element, so `Sidebar`'s own server-rendered
- * markup can react to collapse state through a `group-data-*` selector
- * without `Sidebar` itself needing a client boundary — only this provider
- * and the toggle button that calls `useSidebarCollapse` do.
+ * markup can react to collapse state through a `group-data-*` selector —
+ * `Sidebar` itself never needs a client boundary for this; the toggle
+ * button (`useSidebarCollapse`) and this provider are what do.
  *
  * This state, not the cookie, is authoritative for the rest of the session:
  * a Next.js layout doesn't re-render on client-side navigation, so writing
