@@ -34,13 +34,13 @@ Today `module_cta` renders a heading, an optional supporting string, and exactly
 
 ## 2. The three variants
 
-All three are **contained modules**: a bounded, rounded (`--radius-xl`), bordered block with the card shadow, sitting inside the content column with page margins around it — not a full-bleed band (§3).
+**Split and Callout are contained modules**: bounded, rounded (`--radius-xl`), bordered blocks with the card shadow, sitting inside the content column with page margins around it. **Banner is full-bleed** (D13 ✔, revised 2026-08-29) — it spans edge to edge like the `Section` landmark itself, not a card (§3.2a).
 
-| Variant     | Media                                                                         | Alignment                                       | Distinctive options                                                    |
-| ----------- | ----------------------------------------------------------------------------- | ----------------------------------------------- | ---------------------------------------------------------------------- |
-| **Banner**  | Background image + overlay scrim, text reversed to white. **Image required.** | `align`: left / center / right                  | Overlay tint follows the brand tone (§3.3).                            |
-| **Split**   | Image in a side slot. **Image required.**                                     | Fixed (content in its column)                   | `imageSide`: left / right · `mobileMediaOrder`: last (default) / first |
-| **Callout** | Optional image **above** the content.                                         | `align`: left / center / right (default center) | The default variant; works with no image at all.                       |
+| Variant     | Media                                                                                                                         | Alignment                                       | Distinctive options                                                    |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- | ---------------------------------------------------------------------- |
+| **Banner**  | Background image + overlay scrim, text reversed to white, **full-bleed** (spans the full viewport width). **Image required.** | `align`: left / center / right                  | Overlay tint follows the brand tone (§3.3).                            |
+| **Split**   | Image in a side slot. **Image required.**                                                                                     | Fixed (content in its column)                   | `imageSide`: left / right · `mobileMediaOrder`: last (default) / first |
+| **Callout** | Optional image **above** the content.                                                                                         | `align`: left / center / right (default center) | The default variant; works with no image at all.                       |
 
 The centered variant is named **Callout** (D6 ✔; renamed from the working name "Stack"). "Centered" was rejected because it collides with the `align: center` value and reads ambiguously. _Note: the mock's CSS still uses `.cta--stack` internally — cosmetic, not a contract._
 
@@ -60,7 +60,30 @@ Shared by every variant: optional **eyebrow**, required **heading**, optional pl
 
 Both Hero and CTA already wrap in the shared full-bleed `Section` landmark (`hero-module-view.tsx`, `cta-module-view.tsx`), which paints `brandVariant` edge to edge. Full-bleed is the established pattern — **`Section` is not modified, and no new `contained` mode is invented.**
 
-The contained look is owned by `CtaModule` itself: it renders the bounded card (border, `--radius-xl`, card shadow, its own padding and max-width, centered) and fills it with the theme tone. This is the one place CTA diverges from the other modules — unlike them, `CtaModule` reads the tone and paints its own background — which is the accepted cost of a self-contained presentation.
+The contained look is owned by `CtaModule` itself: it renders the bounded card (border, `--radius-xl`, card shadow, its own padding and max-width, centered) and fills it with the theme tone. This is the one place CTA diverges from the other modules — unlike them, `CtaModule` reads the tone and paints its own background — which is the accepted cost of a self-contained presentation. **This applies to Split and Callout. Banner is the exception — see §3.2a.**
+
+### 3.2a Decision (D13 ✔, revised 2026-08-29) — Banner is full-bleed; still no change to `Section`
+
+Confirmed by reading `Section`'s own implementation (`apps/web/src/components/shared/section/section.tsx` + `section-variants.ts`): it renders `<section className={root}><div className={inner}>{children}</div></section>`, where `root` paints `brandVariant` edge to edge but `inner` is **always** constrained — `mx-auto px-gutter` plus a `containerWidth` variant whose narrowest option (`FULL`) is still `max-w-page`, never unconstrained. There is no existing Section option that lets `children` span the true viewport width — so achieving Banner's full-bleed image requires either modifying `Section` (rejected in D1, same reasoning: touches every module for one variant's sake) or a **breakout** owned entirely by `CtaModule`.
+
+**Chosen: `CtaModule` breaks out of `Section`'s `inner` constraint itself, for the Banner variant only.** A standard CSS technique — escape the ancestor's `mx-auto max-w-*` box via a full-viewport-width element centered independently of it:
+
+```ts
+// cta-module-variants.ts (sketch) — Banner-only breakout, added to §3.2's tv() config
+variant: {
+  BANNER: {
+    root: ['relative left-1/2 w-screen -translate-x-1/2', 'rounded-none border-none shadow-none'],
+  },
+  SPLIT: {/* … */},
+  CALLOUT: {/* … */},
+},
+```
+
+`left-1/2 w-screen -translate-x-1/2` is independent of whatever ancestor constrains it, so it escapes `Section`'s `inner` `max-w-page`/`px-gutter` regardless of viewport or nesting — no coordinate math tied to `Section`'s specific padding values, so it keeps working if those change. Banner also drops the card treatment entirely for this variant (`rounded-none border-none shadow-none` overriding the shared `root` slot) since it's no longer a card.
+
+**`Section` itself needs zero changes** — same principle D1 already established for Split/Callout, applied consistently: the module owns its own presentation, including breaking out of the landmark's constraint, rather than growing the shared landmark's API for one variant. `Section` stays pinned to `PRIMARY` for Banner too (§3.2's JSX below, unchanged) — its own paint becomes invisible once `CtaModule`'s breakout covers the width, so there's no visual difference from pinning it to the authored tone instead; PRIMARY is chosen only for uniformity across all three variants.
+
+**Vertical spacing is a separate, already-solved axis.** The breakout only escapes horizontal constraint — `Section`'s own `pt-*`/`pb-*` (via `layout.spacingTop`/`spacingBottom`) still wraps it vertically by default, same rhythm as every other module. An author who wants the image flush against neighbouring sections (no gap above/below) can already set `spacingTop`/`spacingBottom` to `NONE` on that module instance — this is an existing per-module `layout` field, not a new one Banner needs.
 
 ```ts
 // cta-module-variants.ts (sketch) — the module owns the card + tone
@@ -92,11 +115,11 @@ export const ctaModuleVariants = tv({
 </Section>
 ```
 
-(Banner is the exception: its tone is an image overlay — §3.3 — not a card fill.)
+(Banner is the double exception: it isn't a card at all — it breaks out to full-bleed §3.2a — and its tone drives an image overlay §3.3, not a fill.)
 
-**Rejected:** adding a `contained` mode to `Section`. It would modify the shared landmark every module depends on to serve one module's presentation — more blast radius than letting the CTA own its own card.
+**Rejected:** adding a `contained` mode, or an image-background capability, to `Section`. Either would modify the shared landmark every module depends on to serve one variant's presentation — more blast radius than letting the CTA own its own presentation, contained or full-bleed (§3.2a).
 
-**Known cost — `brandVariant` is semantically overloaded on this module.** Everywhere else the field means "the full-bleed band tone behind this section"; here it means "the card fill", and the band is force-pinned to `PRIMARY`. An author who understands the field from Hero will mis-predict it here. Accepted rather than renamed, because a module-specific field name (`cardTone`) would break the uniform `brandVariantField()` helper every module shares and complicate the projection. The Studio `description` on this module's field must say so explicitly.
+**Known cost — `brandVariant` is semantically overloaded on this module.** Everywhere else the field means "the full-bleed band tone behind this section"; here it means "the card fill" for Split/Callout or "the overlay tint" for Banner (§3.3), and the band is force-pinned to `PRIMARY` for all three. An author who understands the field from Hero will mis-predict it here. Accepted rather than renamed, because a module-specific field name (`cardTone`) would break the uniform `brandVariantField()` helper every module shares and complicate the projection. The Studio `description` on this module's field must say so explicitly.
 
 ### 3.3 Tone on Banner (D2 ✔ — resolved)
 
@@ -107,9 +130,9 @@ Banner is always image-filled with a dark overlay, so a surface fill is not visi
 
 Both are shown side by side in the mock's Banner section. The scrim is a gradient composed from existing `oklch` brand values at opacity — no new colour token (see the mock's `.cta--banner::after` and `.tint-neutral::after`).
 
-### 3.4 Primary tone as a contained card
+### 3.4 Primary tone as a contained card (Split / Callout only)
 
-Because `--primary` equals the page background, a Primary-tone contained module reads as an **elevated near-white card** — its border and shadow define it against the faintly-tinted page. Secondary (grey) and Brand Primary (pale azure) separate on fill alone. Verified in both themes in the mock.
+Because `--primary` equals the page background, a Primary-tone contained module reads as an **elevated near-white card** — its border and shadow define it against the faintly-tinted page. Secondary (grey) and Brand Primary (pale azure) separate on fill alone. Verified in both themes in the mock. Doesn't apply to Banner — it has no card fill to separate from the page (§3.2a/§3.3).
 
 ---
 
@@ -336,7 +359,7 @@ Rendered on web with `@portabletext/react`: `strong` / `em`, `ul` / `ol` (bullet
 ```ts
 type TCtaModuleProps = {
   variant: TCtaVariant;
-  tone: TBrandVariant; // card fill — the module paints its own container (§3.2)
+  tone: TBrandVariant; // card fill (Split/Callout, §3.2) or overlay tint (Banner, §3.2a/§3.3)
   eyebrow?: string;
   heading: string;
   headingId?: string;
@@ -487,7 +510,7 @@ Note how much shorter this is than the array shape would need: max-2, variant-un
 
 **Resolved:**
 
-- **D1 ✔** — Containment: `CtaModule` paints its own contained card; `Section` is unchanged (full-bleed landmark), pinned to `PRIMARY` for the CTA so no band competes. §3.2. Known cost: `brandVariant` is overloaded on this module, accepted and documented rather than renamed.
+- **D1 ✔** — Containment: for Split/Callout, `CtaModule` paints its own contained card; `Section` is unchanged (full-bleed landmark), pinned to `PRIMARY` for the CTA so no band competes. §3.2. Known cost: `brandVariant` is overloaded on this module, accepted and documented rather than renamed. Banner is the exception — see D13.
 - **D2 ✔** — Banner brand tone drives the **overlay tint** (Primary / Secondary → neutral-dark scrim; Brand Primary → azure scrim), not a surface fill. §3.3, shown in the mock.
 - **D3 ✔** — Content alignment is `sectionHeader.align`; component defaults **Banner LEFT, Callout CENTER**; Split ignores it. The `CtaModule` prop is named `align` to match. §4.3, §7.1.
 - **D4 ✔** — Reuse the existing `linkSchema` everywhere: Hero `secondaryAction` (already), both `actionGroup` slots, and the inline `content` annotation. One link object, one `SmartLink` renderer. §5–§6.
@@ -499,8 +522,7 @@ Note how much shorter this is than the array shape would need: max-2, variant-un
 - **D10 ✔** — **`--shadow-card` is a new token** added to `configs/tailwind/theme.css` in both themes, as a config-layer prerequisite. §4.1.
 - **D11 ✔** — #1861's `ariaLabel` fix is absorbed into this work's web layer; its sibling-module sweep becomes a separate follow-up issue. §8.1.
 - **D12 ✔** — **No data migration.** Both datasets hold zero `module_cta` documents, so `action` is removed outright rather than migrated. §9 carries the evidence and the one caveat.
-
-**Still open:**
+- **D13 ✔, revised 2026-08-29** — **Banner is full-bleed, not a contained card.** It breaks out of `Section`'s always-constrained `inner` div itself (`left-1/2 w-screen -translate-x-1/2`, plus dropping the card's border/radius/shadow), rather than modifying `Section` to support an image background — same "the module owns its presentation" principle D1 already applies to Split/Callout, extended consistently to a full-bleed case instead of only a contained one. `Section` itself needs zero changes. Split and Callout are unaffected — still contained cards. §2, §3.2a.
 
 - **D5a** — Centered Callout lists: left-align inside the centered block (recommended, and what the mock does) vs. force the whole block left when a list is present.
 

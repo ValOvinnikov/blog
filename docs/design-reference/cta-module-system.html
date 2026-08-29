@@ -445,6 +445,25 @@
         padding: clamp(2rem, 5vw, 3.25rem) clamp(1.75rem, 5vw, 3rem);
         isolation: isolate;
       }
+      /* Full-bleed (D13) — escapes .page's max-width the same way CtaModule
+         escapes Section's `inner` div: independent of the ancestor's own
+         padding/max-width, so it keeps working regardless of either. */
+      .cta--banner-fullbleed {
+        position: relative;
+        left: 50%;
+        width: 100vw;
+        transform: translateX(-50%);
+        max-width: none;
+        margin-inline: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .cta--banner.cta--banner-fullbleed .cta__body {
+        max-width: 1120px;
+        margin-inline: auto;
+        padding-inline: clamp(1rem, 5vw, 2.5rem);
+        width: 100%;
+      }
       .cta--banner .cta__bg {
         position: absolute;
         inset: 0;
@@ -619,14 +638,15 @@
         <span class="vtag">variant = banner</span>
       </div>
       <p class="section-sub">
-        Background image behind an azure overlay, text reversed to white.
-        Content align <code>left / center / right</code>; eyebrow optional. (Theme
-        tone drives the overlay tint — Brand Primary shown.)
+        <strong>Full-bleed</strong> (D13) — spans the viewport edge to edge, not
+        inset in a page band like Split/Callout. Background image behind an
+        azure overlay, text reversed to white. Content align
+        <code>left / center / right</code>; eyebrow optional. (Theme tone
+        drives the overlay tint — Brand Primary shown.)
       </p>
 
-      <div class="caption">Content align: left · with eyebrow</div>
-      <div class="band">
-        <div class="cta cta--banner align-left">
+      <div class="caption">Content align: left · with eyebrow · full-bleed</div>
+      <div class="cta cta--banner cta--banner-fullbleed align-left">
           <div class="cta__bg"><svg viewBox="0 0 1200 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Abstract azure banner background">
   <defs>
     <linearGradient id="gc" x1="0" y1="0" x2="1" y2="1">
@@ -656,12 +676,10 @@
             </div>
             <p class="cta__footnote">Ships worldwide · 30-day returns</p>
           </div>
-        </div>
       </div>
 
-      <div class="caption">Content align: center · no eyebrow</div>
-      <div class="band">
-        <div class="cta cta--banner align-center">
+      <div class="caption">Content align: center · no eyebrow · full-bleed</div>
+      <div class="cta cta--banner cta--banner-fullbleed align-center">
           <div class="cta__bg"><svg viewBox="0 0 1200 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Abstract azure banner background">
   <defs>
     <linearGradient id="gc2" x1="0" y1="0" x2="1" y2="1">
@@ -688,12 +706,10 @@
               <a class="btn btn--primary" href="#">Start reading</a>
             </div>
           </div>
-        </div>
       </div>
 
-      <div class="caption">Content align: right · secondary as link</div>
-      <div class="band">
-        <div class="cta cta--banner align-right">
+      <div class="caption">Content align: right · secondary as link · full-bleed</div>
+      <div class="cta cta--banner cta--banner-fullbleed align-right">
           <div class="cta__bg"><svg viewBox="0 0 1200 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Abstract azure banner background">
   <defs>
     <linearGradient id="gc3" x1="0" y1="0" x2="1" y2="1">
@@ -722,13 +738,15 @@
               <a class="btn btn--link" href="#">See the schedule</a>
             </div>
           </div>
-        </div>
       </div>
 
       <p class="section-sub" style="margin-top: 1.6rem">
         <strong>Overlay tint follows the theme (D2).</strong> Banner is
         image-filled, so the brand tone tints the <em>scrim</em> rather than a
         surface: Brand&nbsp;Primary → azure, Primary/Secondary → neutral-dark.
+        The two side-by-side comparisons below are shown at a constrained
+        width purely so both tints fit on screen together — in production
+        Banner is always full-bleed, as shown in the three examples above.
       </p>
 
       <div class="grid2">
