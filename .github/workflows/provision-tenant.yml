@@ -1,7 +1,7 @@
 name: Provision Tenant
 
-# Provisions one tenant end to end — Sanity project, seeded starter content,
-# Studio deployment, and domain mapping — for a `tenants` row already
+# Provisions one tenant end to end — Sanity project, seeded starter
+# content, and domain mapping — for a `tenants` row already
 # inserted by `apps/platform`'s "Add tenant" wizard Server Action. Dispatched
 # via the GitHub API by `apps/platform/src/server/provisioning/dispatch-provisioning-workflow.ts`,
 # never by hand from the Actions UI in normal operation (though a human can
@@ -91,7 +91,7 @@ jobs:
       # Reuses the same variable/secret names `apps/platform`/`apps/web` already
       # use for the same values (not new var names) — see
       # docs/context/environment-variables.md's `WEB_APP_URL`/
-      # `SANITY_REVALIDATE_SECRET` rows. Step 6 creates each new tenant's
+      # `SANITY_REVALIDATE_SECRET` rows. Step 5 creates each new tenant's
       # Sanity webhook pointing at `${WEB_APP_URL}/api/revalidate`, signed
       # with this same secret so `apps/web`'s route can verify it.
       WEB_APP_URL: ${{ vars.WEB_APP_URL }}
@@ -101,9 +101,6 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      # pnpm + node on PATH — also what `vercel build`/`sanity build` (run
-      # from inside the provisioning script's Studio-deploy step) need to
-      # install the workspace deps.
       - uses: ./.github/actions/setup
         with:
           pnpm-version: ${{ env.PNPM_VERSION }}
