@@ -13,7 +13,7 @@ them.
 ## Layer contract
 
 - **Depends on:** nothing (no workspace dependencies).
-- **Consumed by:** `@blog/service`, `@blog/db`, `@blog/ui`, `apps/web`, `apps/cms`, `apps/platform`.
+- **Consumed by:** `@blog/service`, `@blog/db`, `@blog/ui`, `@blog/studio`, `apps/web`, `apps/platform`.
 - **Never imports:** `@blog/service`, `@blog/ui`, or any app — enforced by
   `configs/eslint/no-upstream-imports.js` in this package's own
   `eslint.config.js`.

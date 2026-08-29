@@ -12,7 +12,7 @@ setup file on top, pure logic packages use it with `environment: 'node'`.
 ## Consumed by
 
 `packages/ui`, `packages/service`, `packages/db`, `packages/config`,
-`packages/auth`, `apps/web`, `apps/cms`, `apps/platform`. (`packages/utils`
+`packages/auth`, `packages/studio`, `apps/web`, `apps/platform`. (`packages/utils`
 configures Vitest directly rather than merging this preset.)
 
 ## Scripts
