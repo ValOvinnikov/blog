@@ -1,44 +1,78 @@
+import { BRAND_VARIANT, CTA_VARIANT } from '@blog/config';
 import type { TCtaModule } from '@blog/service';
 import { CtaModule as CtaModuleUi } from '@blog/ui/organisms/cta-module';
+import { ActionGroup } from '@web/components/shared/action-group';
+import { BasicTextRenderer } from '@web/components/shared/basic-text-renderer';
+import { SanityImage } from '@web/components/shared/sanity-image';
 import { Section } from '@web/components/shared/section';
-import { SmartLink } from '@web/components/shared/smart-link';
 
 export interface ICtaModuleViewProps extends TCtaModule {
   id: string;
+  baseUrl: string;
 }
 
 /**
- * Pure view for `CtaModule` — the `Section` full-bleed landmark around the
- * `CtaModule` organism, with the action link built from a `SmartLink`.
+ * Pure view for `CtaModule` — wraps the `CtaModule` organism in a `Section`
+ * landmark pinned to `PRIMARY` (never the authored tone) so no full-bleed
+ * band competes with the card `CtaModule` paints itself; the authored
+ * `brandVariant` flows down as the card/overlay tone instead (§3.2).
  */
 export const CtaModuleView = ({
   id,
+  variant,
   brandVariant,
+  eyebrow,
   sectionHeader,
-  action,
+  content,
+  image,
+  imageSide,
+  mobileMediaOrder,
+  actions,
+  footnote,
   layout,
+  baseUrl,
 }: ICtaModuleViewProps) => {
   const titleId = `cta-${id}`;
+  const { heading, supportingText, align } = sectionHeader;
 
   return (
     <Section
-      brandVariant={brandVariant}
+      brandVariant={BRAND_VARIANT.PRIMARY}
       layout={layout}
       titleId={titleId}
       dataTestId={`cta-module-${id}`}
     >
       <CtaModuleUi
-        heading={sectionHeader.heading}
+        variant={variant}
+        tone={brandVariant}
+        eyebrow={eyebrow}
+        heading={heading}
         headingId={titleId}
-        supportingText={sectionHeader.supportingText}
-        align={sectionHeader.align}
-        action={
-          action ? (
-            <SmartLink href={action.href} target={action.target}>
-              {action.label}
-            </SmartLink>
-          ) : null
+        supportingText={supportingText}
+        content={content ? <BasicTextRenderer value={content} /> : undefined}
+        image={
+          image ? (
+            <SanityImage
+              image={image}
+              baseUrl={baseUrl}
+              width={1200}
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              loading="lazy"
+            />
+          ) : undefined
         }
+        actions={
+          actions ? (
+            <ActionGroup
+              actions={actions}
+              isOnDark={variant === CTA_VARIANT.BANNER}
+            />
+          ) : undefined
+        }
+        footnote={footnote}
+        align={align}
+        imageSide={imageSide}
+        mobileMediaOrder={mobileMediaOrder}
         isWrapped={true}
       />
     </Section>
