@@ -34,9 +34,11 @@ const components: PortableTextComponents = {
       children,
       value: annotation,
     }: PortableTextMarkComponentProps<Link>) =>
-      // Only `EXTERNAL` links carry a usable `url` here — `content`'s
-      // markDefs aren't deref-projected, so an `INTERNAL` reference has no
-      // resolved href to route through.
+      // Both `EXTERNAL` and `INTERNAL` links carry a resolved `url` here —
+      // the service derefs `content`'s markDefs before this component ever
+      // sees them, same as CTA `actions`. The plain-text fallback below is
+      // for the remaining case: an `INTERNAL` reference that failed to
+      // resolve (e.g. a deleted target).
       annotation?.url ? (
         <ProseLink as={SmartLink} href={annotation.url}>
           {children}
