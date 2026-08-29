@@ -117,18 +117,25 @@ Three projects per environment — a web project, a Studio project (replacing
 - **Web:** `blog-dev`, `blog-prod` — Add New → Project → import
   `{github_account}/blog`; **Root Directory `apps/web`** + tick _"Include files
   outside of the root directory"_; **Node.js 22.x**.
-- **Studio:** `cms-dev`, `cms-prod` — **no longer deployed to.** The Studio
-  stopped being its own app: it ships as the `@blog/studio` package and is
-  mounted by the platform app, so its CI deploy jobs and `vercel.json` are
-  gone. These two projects still exist in the Vercel console and are
-  decommissioned separately — until then they simply receive nothing.
+- **Studio:** `cms-dev`, `cms-prod` — **broken, pending decommission.** The
+  Studio stopped being its own app: it ships as the `@blog/studio` package
+  and is mounted by the platform app, so its CI deploy jobs and `vercel.json`
+  are gone. Deleting that `vercel.json` also removed the
+  `git.deploymentEnabled: false` that had been suppressing Git auto-deploy,
+  so these projects now **attempt a build on every PR and fail** with
+  `The specified Root Directory "apps/cms" does not exist`. Two further
+  projects, `studio-demo` and `studio-demo-1`, fail the same way. None of
+  this blocks a merge — no Vercel check is a required status check — but it
+  is four permanently-red checks until the projects have their Git
+  integration disabled or are deleted in the console.
 - **Admin:** `admin-dev`, `admin-prod` — same import flow; **Root Directory
   `apps/platform`** + tick _"Include files outside of the root directory"_;
   **Node.js 22.x**. A separate project rather than a second domain on
   `blog-dev`/`blog-prod`: a Vercel project has exactly one Root Directory,
   and the panel is a second Next.js app under `apps/platform`.
 
-All of these projects have Vercel's Git auto-deploy **disabled** — every deploy
+`blog-*` and `admin-*` have Vercel's Git auto-deploy **disabled**
+(`cms-dev`/`cms-prod` no longer do — see the Studio bullet above) — every deploy
 goes through a CI-gated GitHub Actions job (no pre-merge/preview deploys,
 nothing deploys before checks pass). This is set **once, in code**, via each
 app's own `vercel.json`'s `git.deploymentEnabled: false` (`apps/web`,
@@ -357,10 +364,11 @@ Provisioning notes for recreating this from scratch:
       mis-set `production` secret fails it loudly instead of silently
       migrating the wrong branch (or nothing at all) while reporting success.
 
-**Studio** (`cms-dev` / `cms-prod`) — **no longer built or deployed.** The
-Studio ships as the `@blog/studio` package and is mounted by the platform
-app, so nothing runs `sanity build` in CI and `apps/cms/vercel.json` is gone.
-These two projects and the values below are retained only until they are
+**Studio** (`cms-dev` / `cms-prod`) — **no longer built by CI.** The Studio
+ships as the `@blog/studio` package and is mounted by the platform app, so
+no CI job runs `sanity build` and `apps/cms/vercel.json` is gone. The
+projects themselves still auto-deploy from Git and fail, per the Studio
+bullet in §2. The values below are retained only until the projects are
 decommissioned; setting them on a fresh environment achieves nothing:
 
 | Key                        | `cms-dev` value    | `cms-prod` value   |
