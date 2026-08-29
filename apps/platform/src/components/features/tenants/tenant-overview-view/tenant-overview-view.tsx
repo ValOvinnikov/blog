@@ -10,7 +10,6 @@ import { useProvisioningPoll } from '@platform/components/features/tenants/provi
 import { RecentActivityCard } from '@platform/components/features/tenants/recent-activity-card';
 import { TenantDetailsPanel } from '@platform/components/features/tenants/tenant-details-panel';
 import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
-import { LinkButton } from '@platform/components/shared/link-button';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import type { TDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
@@ -28,7 +27,6 @@ export type TTenantOverviewViewProps = {
   ownerJoinedAt: string | undefined;
   ownerJoinedAtIso: string | undefined;
   auditEvents: TAuditEvent[];
-  isSuperAdmin: boolean;
 };
 
 /**
@@ -46,7 +44,6 @@ export const TenantOverviewView = ({
   ownerJoinedAt,
   ownerJoinedAtIso,
   auditEvents,
-  isSuperAdmin,
 }: TTenantOverviewViewProps) => {
   const tTenantsTable = useTranslations('tenantsTable');
   const t = useTranslations('tenantOverviewPage');
@@ -77,16 +74,9 @@ export const TenantOverviewView = ({
           </>
         }
         actions={
-          <>
-            <ExternalLinkButton href={`https://${tenant.primaryDomain}`}>
-              {t('openSiteAction')}
-            </ExternalLinkButton>
-            {isSuperAdmin && (
-              <LinkButton href={adminRoutes.tenantStudio(tenant.id)}>
-                {t('openStudioAction')}
-              </LinkButton>
-            )}
-          </>
+          <ExternalLinkButton href={`https://${tenant.primaryDomain}`}>
+            {t('openSiteAction')}
+          </ExternalLinkButton>
         }
       />
 

@@ -79,6 +79,15 @@ describe(TenantBreadcrumb, () => {
     expect(screen.getByText('Domain')).toBeVisible();
   });
 
+  it('shows Studio as the current item on the studio route', () => {
+    vi.mocked(usePathname).mockReturnValue('/tenants/tenant-1/studio');
+
+    render(<TenantBreadcrumb tenantId="tenant-1" tenantName="Acme Inc." />);
+
+    expect(screen.getByText('Studio')).toBeVisible();
+    expect(screen.queryByRole('link', { name: 'Studio' })).toBeNull();
+  });
+
   it('shows Provisioning as the current item on the provisioning route', () => {
     vi.mocked(usePathname).mockReturnValue('/tenants/tenant-1/provisioning');
 
@@ -95,5 +104,15 @@ describe(TenantBreadcrumb, () => {
 
     expect(screen.getByText('Danger zone')).toBeVisible();
     expect(screen.queryByRole('link', { name: 'Danger zone' })).toBeNull();
+  });
+
+  it("omits the leaf entirely on an unmatched route, rather than defaulting to any label — the tenant name becomes the trail's current item", () => {
+    vi.mocked(usePathname).mockReturnValue('/tenants/tenant-1/unlisted');
+
+    render(<TenantBreadcrumb tenantId="tenant-1" tenantName="Acme Inc." />);
+
+    expect(screen.getByText('Acme Inc.')).toBeVisible();
+    expect(screen.queryByRole('link', { name: 'Acme Inc.' })).toBeNull();
+    expect(screen.queryByText('Features')).not.toBeInTheDocument();
   });
 });
