@@ -23,11 +23,8 @@ export type TRawCtaContentMarkDef = NonNullable<
 >[number];
 type TCtaContentMarkDef = NonNullable<BasicText[number]['markDefs']>[number];
 
-// `content` only allows the `link` annotation (`basicText.ts`'s schema), so
-// every `markDefs` entry resolves through the same internal/external logic
-// `toLink` uses for actions — but unlike an action, a malformed link here
-// degrades to plain text (renderer checks `annotation.url`) rather than
-// dropping the block, so the annotation is always kept.
+// Unlike an action, a malformed content link degrades to plain text rather
+// than dropping the block — the renderer already handles a missing `url`.
 function toContentLinkAnnotation(
   raw: TRawCtaContentMarkDef,
 ): TCtaContentMarkDef {
@@ -71,15 +68,13 @@ function toCtaAction(raw: TRawCtaAction): TCtaAction | undefined {
   };
 }
 
-function toCtaActions(raw: TRawCtaModule['actions']): TCtaAction[] | undefined {
+function toCtaActions(raw: TRawCtaModule['actions']): TCtaAction[] {
   const items = raw?.actions;
-  if (!items || items.length === 0) return undefined;
+  if (!items || items.length === 0) return [];
 
-  const actions = items
+  return items
     .map(toCtaAction)
     .filter((action): action is TCtaAction => action !== undefined);
-
-  return actions.length > 0 ? actions : undefined;
 }
 
 export function toCtaModule(raw: TRawCtaModule): TCtaModule {

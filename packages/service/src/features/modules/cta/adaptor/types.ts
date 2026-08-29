@@ -32,7 +32,7 @@ export type TCtaModule = {
   image: TMaybeUndefined<ISanityImage>;
   imageSide: TMaybeUndefined<TCtaImageSide>;
   mobileMediaOrder: TMaybeUndefined<TCtaMobileMediaOrder>;
-  actions: TMaybeUndefined<TCtaAction[]>;
+  actions: TCtaAction[];
   footnote: TMaybeUndefined<string>;
   layout: TMaybeUndefined<TLayout>;
 };

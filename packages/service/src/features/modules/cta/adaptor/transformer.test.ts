@@ -245,20 +245,20 @@ describe('toCtaModule', () => {
     });
   });
 
-  it('leaves actions undefined for an empty/absent array (no faked default)', () => {
+  it('returns an empty array for an absent actions field', () => {
     const raw = makeRawCtaModule({ actions: null });
 
     const cta = toCtaModule(raw);
 
-    expect(cta.actions).toBeUndefined();
+    expect(cta.actions).toEqual([]);
   });
 
-  it('leaves actions undefined when the actions array is present but empty', () => {
+  it('returns an empty array when the actions array is present but empty', () => {
     const raw = makeRawCtaModule({ actions: { actions: [] } });
 
     const cta = toCtaModule(raw);
 
-    expect(cta.actions).toBeUndefined();
+    expect(cta.actions).toEqual([]);
   });
 
   it('maps a single PRIMARY action', () => {
@@ -353,7 +353,7 @@ describe('toCtaModule', () => {
 
     const cta = toCtaModule(raw);
 
-    expect(cta.actions).toBeUndefined();
+    expect(cta.actions).toEqual([]);
   });
 
   it('survives accessibleLabel into the view-model as ariaLabel', () => {

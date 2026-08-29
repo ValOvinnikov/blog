@@ -18,11 +18,8 @@ export const ctaModuleQuery = q
       .field('sectionHeader')
       .project(requiredSectionHeaderFragment)
       .notNull(),
-    // Blocks are Sanity's built-in Portable Text shape, so `'...': true`
-    // spreads them as-is; only `markDefs` is re-projected, to deref `link`
-    // annotations' `internalReference` the same way `linkFragment` does for
-    // actions (`content` allows only the `link` annotation, so every entry
-    // matches `linkFragment`'s shape).
+    // Blocks are spread as-is (`'...': true`); only `markDefs` is
+    // re-projected, to deref `link` annotations' `internalReference`.
     content: sub
       .field('content[]')
       .project((blockSub) => ({
@@ -37,9 +34,8 @@ export const ctaModuleQuery = q
           .nullable(true),
       }))
       .nullable(true),
-    // Not `.notNull()` — required only for Banner/Split, enforced by a
-    // custom Studio validator, not `.required()`, so it is genuinely
-    // absent for Callout.
+    // Not `.notNull()` — required only for Banner/Split via a custom
+    // validator, not `.required()`, so it's genuinely absent for Callout.
     image: sub.field('image').project(sanityImageFragment).nullable(true),
     imageSide: sub.field('imageSide').nullable(true),
     mobileMediaOrder: sub.field('mobileMediaOrder').nullable(true),
