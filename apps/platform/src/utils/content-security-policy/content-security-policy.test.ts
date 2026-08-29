@@ -21,7 +21,7 @@ describe(buildContentSecurityPolicy, () => {
       'script-src': "'self' 'unsafe-inline'",
       'style-src': "'self' 'unsafe-inline'",
       'font-src': "'self'",
-      'connect-src': "'self' https://*.api.sanity.io",
+      'connect-src': "'self' https://*.api.sanity.io https://sanity-cdn.com",
       'frame-ancestors': "'none'",
       'base-uri': "'self'",
       'form-action': "'self' https://github.com https://accounts.google.com",
@@ -57,5 +57,13 @@ describe(buildContentSecurityPolicy, () => {
 
     expect(directives['img-src']).toContain('https://cdn.sanity.io');
     expect(directives['connect-src']).toContain('https://*.api.sanity.io');
+  });
+
+  it('allows the embedded Studio to reach sanity-cdn.com for its own version check', () => {
+    const { 'connect-src': connectSrc } = parseDirectives(
+      buildContentSecurityPolicy({ isDev: false }),
+    );
+
+    expect(connectSrc).toContain('https://sanity-cdn.com');
   });
 });

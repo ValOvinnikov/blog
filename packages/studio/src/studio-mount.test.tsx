@@ -20,25 +20,33 @@ vi.mock('@sanity/code-input', () => ({
   codeInput: () => ({ name: 'codeInput' }),
 }));
 
-vi.mock('next-sanity/studio', () => ({
-  NextStudio: ({
-    config,
-  }: {
-    config: {
-      projectId: string;
-      dataset: string;
-      basePath?: string;
-      title: string;
-    };
-  }) => (
-    <div data-testid="studio-mock">
-      {config.projectId}:{config.dataset}:{config.basePath}:{config.title}
-    </div>
-  ),
-}));
+vi.mock('sanity', async () => {
+  const actual = await vi.importActual<Record<string, unknown>>('sanity');
+  return {
+    ...actual,
+    StudioProvider: ({
+      config,
+      children,
+    }: {
+      config: {
+        projectId: string;
+        dataset: string;
+        basePath?: string;
+        title: string;
+      };
+      children: React.ReactNode;
+    }) => (
+      <div data-testid="studio-provider-mock">
+        {config.projectId}:{config.dataset}:{config.basePath}:{config.title}
+        {children}
+      </div>
+    ),
+    StudioLayout: () => <div data-testid="studio-layout-mock" />,
+  };
+});
 
 describe(StudioMount, () => {
-  it('builds the config internally from plain string props and passes it to NextStudio', () => {
+  it('builds the config internally from plain string props and passes it to StudioProvider/StudioLayout', () => {
     const html = renderToStaticMarkup(
       <StudioMount
         projectId="test-project"
@@ -51,5 +59,6 @@ describe(StudioMount, () => {
     expect(html).toContain(
       'test-project:test-dataset:/dashboard/studio:Test Studio',
     );
+    expect(html).toContain('studio-layout-mock');
   });
 });

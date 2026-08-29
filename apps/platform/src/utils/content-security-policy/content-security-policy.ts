@@ -36,8 +36,9 @@ export const buildContentSecurityPolicy = ({
     // The embedded Studio talks directly to its tenant's own Sanity project
     // host (`<projectId>.api.sanity.io`) for data, assets, and realtime
     // listeners — `projectId` is resolved per request, so this can't be a
-    // fixed hostname the way `img-src`'s CDN entry is.
-    "connect-src 'self' https://*.api.sanity.io",
+    // fixed hostname the way `img-src`'s CDN entry is. `sanity-cdn.com` is
+    // the fixed host Studio checks for its own available-version updates.
+    "connect-src 'self' https://*.api.sanity.io https://sanity-cdn.com",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     // Auth.js's built-in sign-in page (no custom `pages.signIn` is
