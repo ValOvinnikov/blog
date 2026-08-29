@@ -38,10 +38,11 @@
   "navSections": {
     "platformLabel": "Platform",
     "platformSectionLabel": "Platform actions",
+    "contentSectionLabel": "Content",
+    "configurationSectionLabel": "Configuration",
     "tenants": "Tenants",
     "addTenant": "Add tenant",
     "tenantLabel": "Tenant · {tenantName}",
-    "dashboardLabel": "Workspace",
     "overview": "Overview",
     "look": "Look",
     "voice": "Voice",
@@ -134,7 +135,6 @@
   },
   "tenantOverviewPage": {
     "openSiteAction": "Open site ↗",
-    "openStudioAction": "Open Studio →",
     "domainCardTitle": "Domain",
     "dnsLinkButton": "DNS →",
     "publicDomainLabel": "Public domain",
