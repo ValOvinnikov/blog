@@ -1,3 +1,4 @@
+import { CTA_ACTION_VARIANT } from '@blog/config/constants';
 import { actionGroupSchema } from '@blog/studio/schema-types/objects/blocks/action-group';
 
 type TCustomFn = (value: unknown) => string | true;
@@ -62,21 +63,24 @@ describe('actionGroupSchema actions validation', () => {
   it('is valid with a single Primary action', () => {
     const validate = getActionsValidator();
 
-    expect(validate([{ variant: 'PRIMARY' }])).toBe(true);
+    expect(validate([{ variant: CTA_ACTION_VARIANT.PRIMARY }])).toBe(true);
   });
 
   it('is valid with Primary followed by Secondary', () => {
     const validate = getActionsValidator();
 
-    expect(validate([{ variant: 'PRIMARY' }, { variant: 'SECONDARY' }])).toBe(
-      true,
-    );
+    expect(
+      validate([
+        { variant: CTA_ACTION_VARIANT.PRIMARY },
+        { variant: CTA_ACTION_VARIANT.SECONDARY },
+      ]),
+    ).toBe(true);
   });
 
   it('rejects a Secondary action alone', () => {
     const validate = getActionsValidator();
 
-    expect(validate([{ variant: 'SECONDARY' }])).toBe(
+    expect(validate([{ variant: CTA_ACTION_VARIANT.SECONDARY }])).toBe(
       'A Primary action is required and must be first.',
     );
   });
@@ -84,17 +88,23 @@ describe('actionGroupSchema actions validation', () => {
   it('rejects two Primary actions', () => {
     const validate = getActionsValidator();
 
-    expect(validate([{ variant: 'PRIMARY' }, { variant: 'PRIMARY' }])).toBe(
-      'Each action variant (Primary, Secondary) can be used only once.',
-    );
+    expect(
+      validate([
+        { variant: CTA_ACTION_VARIANT.PRIMARY },
+        { variant: CTA_ACTION_VARIANT.PRIMARY },
+      ]),
+    ).toBe('Each action variant (Primary, Secondary) can be used only once.');
   });
 
   it('rejects Secondary before Primary', () => {
     const validate = getActionsValidator();
 
-    expect(validate([{ variant: 'SECONDARY' }, { variant: 'PRIMARY' }])).toBe(
-      'A Primary action is required and must be first.',
-    );
+    expect(
+      validate([
+        { variant: CTA_ACTION_VARIANT.SECONDARY },
+        { variant: CTA_ACTION_VARIANT.PRIMARY },
+      ]),
+    ).toBe('A Primary action is required and must be first.');
   });
 
   it('rejects three actions', () => {
@@ -102,9 +112,9 @@ describe('actionGroupSchema actions validation', () => {
 
     expect(
       validate([
-        { variant: 'PRIMARY' },
-        { variant: 'SECONDARY' },
-        { variant: 'PRIMARY' },
+        { variant: CTA_ACTION_VARIANT.PRIMARY },
+        { variant: CTA_ACTION_VARIANT.SECONDARY },
+        { variant: CTA_ACTION_VARIANT.PRIMARY },
       ]),
     ).toBe('Each action variant (Primary, Secondary) can be used only once.');
   });
