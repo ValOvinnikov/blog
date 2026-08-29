@@ -21,7 +21,14 @@
       // entries — rather than ignoring them — keeps their own imports analysed.
       // This replaces the default `{index,cli,main}` entry patterns, which match
       // nothing here; the Sanity plugin still contributes sanity.{config,cli}.ts.
-      "entry": ["migrations/*/index.ts"]
+      //
+      // schema-types/helpers/action-group-field.ts: a field helper built
+      // ahead of its call site — module_cta doesn't consume it yet. Mark it
+      // an entry for the same reason as the apps/platform primitives below.
+      "entry": [
+        "migrations/*/index.ts",
+        "src/schema-types/helpers/action-group-field.ts"
+      ]
     },
     "packages/service": {
       // Reachable only through a string in vitest.config.ts's `resolve.alias`,
