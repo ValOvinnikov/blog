@@ -34,6 +34,7 @@ export const ICONS = {
   PALETTE: 'PALETTE',
   QUOTE: 'QUOTE',
   GLOBE: 'GLOBE',
+  STUDIO: 'STUDIO',
   COMMENT: 'COMMENT',
   USERS: 'USERS',
 } as const;
