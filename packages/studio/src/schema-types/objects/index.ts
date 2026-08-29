@@ -1,6 +1,6 @@
 import { asideSchema } from './aside';
 import { blockTextSchema } from './block-text';
-import { actionGroupSchema } from './blocks/action-group';
+import { actionGroupSchema, ctaActionSchema } from './blocks/action-group';
 import { basicTextSchema } from './blocks/basic-text';
 import { bodyImageSchema } from './body-image';
 import { brandSchema } from './brand';
@@ -32,6 +32,7 @@ export const objects = [
   basicTextSchema,
   socialLinkSchema,
   linkSchema,
+  ctaActionSchema,
   actionGroupSchema,
   openGraphSchema,
   seoSchema,

@@ -1,38 +1,43 @@
-import { CTA_ACTION_APPEARANCE } from '@blog/config/constants';
+import {
+  CTA_ACTION_APPEARANCE,
+  CTA_ACTION_VARIANT,
+} from '@blog/config/constants';
 import { linkSchema } from '@blog/studio/schema-types/objects/link';
 import { toTitleCase } from '@blog/utils/primitives';
 import { MousePointerClick } from 'lucide-react';
-import { defineField, defineType } from 'sanity';
+import { defineArrayMember, defineField, defineType } from 'sanity';
 
-type TActionGroupValue = {
-  primary?: unknown;
-  secondary?: unknown;
-};
-
-export const actionGroupSchema = defineType({
-  name: 'actionGroup',
-  title: 'Actions',
+export const ctaActionSchema = defineType({
+  name: 'ctaAction',
+  title: 'Action',
   type: 'object',
   icon: MousePointerClick,
+  initialValue: {
+    variant: CTA_ACTION_VARIANT.PRIMARY,
+    appearance: CTA_ACTION_APPEARANCE.CONTAINED,
+  },
   fields: [
     defineField({
-      name: 'primary',
-      title: 'Primary Action',
-      type: linkSchema.name,
-      description: 'The main action — always a filled button.',
-    }),
-    defineField({
-      name: 'secondary',
-      title: 'Secondary Action',
-      type: linkSchema.name,
-      description: 'Optional supporting action. Requires a primary action.',
-    }),
-    defineField({
-      name: 'secondaryAppearance',
-      title: 'Secondary Appearance',
+      name: 'variant',
+      title: 'Variant',
       type: 'string',
       description:
-        'How the secondary action looks: Contained (bordered button) or Inline (text link).',
+        'Primary is the main action. Secondary is the supporting action.',
+      options: {
+        layout: 'radio',
+        list: Object.values(CTA_ACTION_VARIANT).map((value) => ({
+          title: toTitleCase(value),
+          value,
+        })),
+      },
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'appearance',
+      title: 'Appearance',
+      type: 'string',
+      description:
+        'How this action looks: Contained (filled/bordered button) or Inline (text link). Available on both Primary and Secondary.',
       options: {
         layout: 'radio',
         list: Object.values(CTA_ACTION_APPEARANCE).map((value) => ({
@@ -41,20 +46,64 @@ export const actionGroupSchema = defineType({
         })),
       },
       initialValue: CTA_ACTION_APPEARANCE.CONTAINED,
-      hidden: ({ parent }) =>
-        !(parent as TActionGroupValue | undefined)?.secondary,
+    }),
+    defineField({
+      name: 'link',
+      title: 'Link',
+      type: linkSchema.name,
+      validation: (rule) => rule.required(),
     }),
   ],
-  validation: (rule) =>
-    rule.custom((value: TActionGroupValue | undefined) =>
-      value?.secondary && !value?.primary
-        ? 'A secondary action needs a primary action. Add a primary action first.'
-        : true,
-    ),
   preview: {
-    select: { primary: 'primary.label', secondary: 'secondary.label' },
-    prepare({ primary, secondary }: { primary?: string; secondary?: string }) {
-      const labels = [primary, secondary].filter(Boolean);
+    select: {
+      label: 'link.label',
+      variant: 'variant',
+      appearance: 'appearance',
+    },
+    prepare({ label, variant, appearance }) {
+      return {
+        title: String(label ?? 'Action'),
+        subtitle: `${toTitleCase(String(variant ?? ''))} · ${toTitleCase(String(appearance ?? ''))}`,
+      };
+    },
+  },
+});
+
+type TActionItem = { _key?: string; variant?: string };
+
+export const actionGroupSchema = defineType({
+  name: 'actionGroup',
+  title: 'Actions',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'actions',
+      title: 'Actions',
+      type: 'array',
+      description:
+        'Up to two actions. Primary is required and comes first; Secondary is optional.',
+      of: [defineArrayMember({ type: ctaActionSchema.name })],
+      validation: (rule) =>
+        rule.max(2).custom((value) => {
+          const items = (value ?? []) as TActionItem[];
+          if (items.length === 0) return true;
+
+          const variants = items.map((item) => item?.variant);
+
+          if (new Set(variants).size !== variants.length) {
+            return 'Each action variant (Primary, Secondary) can be used only once.';
+          }
+          if (variants[0] !== CTA_ACTION_VARIANT.PRIMARY) {
+            return 'A Primary action is required and must be first.';
+          }
+          return true;
+        }),
+    }),
+  ],
+  preview: {
+    select: { a0: 'actions.0.link.label', a1: 'actions.1.link.label' },
+    prepare({ a0, a1 }) {
+      const labels = [a0, a1].filter(Boolean).map(String);
 
       return {
         title: labels.length ? labels.join('  ·  ') : 'No actions',

@@ -3,19 +3,36 @@ import { actionGroupSchema } from '@blog/studio/schema-types/objects/blocks/acti
 type TCustomFn = (value: unknown) => string | true;
 
 /**
- * `actionGroupSchema`'s object-level `validation` builder registers a
- * `rule.custom(fn)`; a minimal chainable mock rule captures that function
- * the same way other schema tests capture a document/field custom
- * validator (see `topic.test.ts`).
+ * The `actions` field's `validation` builder chains `rule.max(2).custom(fn)`;
+ * a minimal chainable mock rule captures `fn` the same way other schema
+ * tests capture a field-level custom validator.
  */
-const getSecondaryRequiresPrimaryValidator = (): TCustomFn => {
-  if (!actionGroupSchema.validation) {
-    throw new Error('Expected actionGroupSchema to define validation.');
+const getActionsField = () => {
+  const actionsField = actionGroupSchema.fields?.find(
+    (field): field is typeof field & { name: 'actions' } =>
+      'name' in field && field.name === 'actions',
+  );
+
+  if (
+    !actionsField ||
+    !('validation' in actionsField) ||
+    !actionsField.validation
+  ) {
+    throw new Error(
+      'Expected actionGroupSchema to define an actions field with validation.',
+    );
   }
+
+  return actionsField;
+};
+
+const getActionsValidator = (): TCustomFn => {
+  const actionsField = getActionsField();
 
   let customFn: TCustomFn | undefined;
 
   const rule = {
+    max: () => rule,
     custom: (fn: TCustomFn) => {
       customFn = fn;
       return rule;
@@ -23,47 +40,91 @@ const getSecondaryRequiresPrimaryValidator = (): TCustomFn => {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (actionGroupSchema.validation as any)(rule);
+  (actionsField.validation as any)(rule);
 
   if (!customFn) {
     throw new Error(
-      'Expected actionGroupSchema validation to register a custom() rule.',
+      'Expected actions field validation to register a custom() rule.',
     );
   }
 
   return customFn;
 };
 
-describe('actionGroupSchema validation', () => {
-  it('is valid with neither a primary nor a secondary action', () => {
-    const validate = getSecondaryRequiresPrimaryValidator();
+describe('actionGroupSchema actions validation', () => {
+  it('is valid with an empty array', () => {
+    const validate = getActionsValidator();
 
     expect(validate(undefined)).toBe(true);
-    expect(validate({})).toBe(true);
+    expect(validate([])).toBe(true);
   });
 
-  it('is valid with only a primary action', () => {
-    const validate = getSecondaryRequiresPrimaryValidator();
+  it('is valid with a single Primary action', () => {
+    const validate = getActionsValidator();
 
-    expect(validate({ primary: { label: 'Get started' } })).toBe(true);
+    expect(validate([{ variant: 'PRIMARY' }])).toBe(true);
   });
 
-  it('is valid with a primary and a secondary action', () => {
-    const validate = getSecondaryRequiresPrimaryValidator();
+  it('is valid with Primary followed by Secondary', () => {
+    const validate = getActionsValidator();
+
+    expect(validate([{ variant: 'PRIMARY' }, { variant: 'SECONDARY' }])).toBe(
+      true,
+    );
+  });
+
+  it('rejects a Secondary action alone', () => {
+    const validate = getActionsValidator();
+
+    expect(validate([{ variant: 'SECONDARY' }])).toBe(
+      'A Primary action is required and must be first.',
+    );
+  });
+
+  it('rejects two Primary actions', () => {
+    const validate = getActionsValidator();
+
+    expect(validate([{ variant: 'PRIMARY' }, { variant: 'PRIMARY' }])).toBe(
+      'Each action variant (Primary, Secondary) can be used only once.',
+    );
+  });
+
+  it('rejects Secondary before Primary', () => {
+    const validate = getActionsValidator();
+
+    expect(validate([{ variant: 'SECONDARY' }, { variant: 'PRIMARY' }])).toBe(
+      'A Primary action is required and must be first.',
+    );
+  });
+
+  it('rejects three actions', () => {
+    const validate = getActionsValidator();
 
     expect(
-      validate({
-        primary: { label: 'Get started' },
-        secondary: { label: 'Learn more' },
-      }),
-    ).toBe(true);
+      validate([
+        { variant: 'PRIMARY' },
+        { variant: 'SECONDARY' },
+        { variant: 'PRIMARY' },
+      ]),
+    ).toBe('Each action variant (Primary, Secondary) can be used only once.');
   });
 
-  it('rejects a secondary action without a primary action', () => {
-    const validate = getSecondaryRequiresPrimaryValidator();
+  it('caps the array at 2 via rule.max(2)', () => {
+    const actionsField = getActionsField();
 
-    expect(validate({ secondary: { label: 'Learn more' } })).toBe(
-      'A secondary action needs a primary action. Add a primary action first.',
-    );
+    let maxArg: number | undefined;
+
+    const rule = {
+      max: (n: number) => {
+        maxArg = n;
+        return rule;
+      },
+      custom: () => rule,
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (actionsField.validation as any)(rule);
+
+    expect(maxArg).toBe(2);
   });
 });
