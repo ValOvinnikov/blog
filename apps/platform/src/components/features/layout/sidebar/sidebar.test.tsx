@@ -146,6 +146,40 @@ describe(Sidebar, () => {
     );
   });
 
+  it('marks Studio active when its own route is open, same as any other nav item', () => {
+    setPathname('/tenants/tenant-1/studio');
+
+    render(
+      <Sidebar
+        sections={[
+          {
+            label: 'Tenant · acme',
+            items: [
+              {
+                label: 'Studio',
+                icon: ICONS.STUDIO,
+                href: '/tenants/tenant-1/studio',
+              },
+              {
+                label: 'Look',
+                icon: ICONS.PALETTE,
+                href: '/tenants/tenant-1/look',
+              },
+            ],
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByRole('link', { name: 'Studio' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(screen.getByRole('link', { name: 'Look' })).not.toHaveAttribute(
+      'aria-current',
+    );
+  });
+
   it('switches which item is active when the route changes — the case a shared href could not express', () => {
     setPathname('/tenants/tenant-1/voice');
 

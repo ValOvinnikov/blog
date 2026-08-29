@@ -2,7 +2,6 @@ import { ALERT_TYPE } from '@blog/config';
 import { queries } from '@blog/db';
 import { StudioMount } from '@blog/studio';
 import { Alert } from '@platform/components/shared/alert';
-import { StudioShell } from '@platform/components/shared/studio-shell';
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { Metadata } from 'next';
@@ -42,13 +41,11 @@ export default async function TenantStudioPage({ params }: TProps) {
   }
 
   return (
-    <StudioShell>
-      <StudioMount
-        projectId={credentials.projectId}
-        dataset={credentials.dataset}
-        basePath={adminRoutes.tenantStudio(tenant.id)}
-        title={tenant.name}
-      />
-    </StudioShell>
+    <StudioMount
+      projectId={credentials.projectId}
+      dataset={credentials.dataset}
+      basePath={adminRoutes.tenantStudio(tenant.id)}
+      title={tenant.name}
+    />
   );
 }
