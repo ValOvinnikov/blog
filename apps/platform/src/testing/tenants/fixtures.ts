@@ -4,7 +4,7 @@ import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   TENANT_STATUS,
-} from '@blog/db';
+} from '@blog/db/constants';
 import type {
   TProvisioningStepState,
   TTenant,

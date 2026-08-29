@@ -81,6 +81,33 @@ export default mergeConfig(
           inline: ['next-intl'],
         },
       },
+      // Constructing a jsdom environment is the single most expensive thing
+      // this suite does — each isolated test file re-imports the jsdom module
+      // (~1-10s), while the DOM it then builds costs ~0.2s. Only the files
+      // that render need it, so `.ts` tests run on `node` and `.tsx` tests on
+      // `jsdom`. The handful of `.ts` files that still need a DOM opt back in
+      // with their own `@vitest-environment jsdom` docblock.
+      //
+      // Split via `exclude`, not `include`: a project's `include` is merged
+      // with the inherited one rather than replacing it, so an `include` here
+      // would widen each project to the whole suite instead of narrowing it.
+      projects: [
+        {
+          extends: true,
+          test: {
+            name: 'node',
+            environment: 'node',
+            exclude: ['**/node_modules/**', 'src/**/*.test.tsx'],
+          },
+        },
+        {
+          extends: true,
+          test: {
+            name: 'jsdom',
+            exclude: ['**/node_modules/**', 'src/**/*.test.ts'],
+          },
+        },
+      ],
     },
   }),
 );
