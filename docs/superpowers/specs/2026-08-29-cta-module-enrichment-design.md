@@ -461,7 +461,7 @@ export const ActionGroup = ({ actions, onDark }: TActionGroupProps) => (
         as={SmartLink}
         href={action.link.href}
         target={action.link.target}
-        ariaLabel={action.link.ariaLabel}
+        aria-label={action.link.ariaLabel}
         variant={toButtonVariant(action.variant, action.appearance)}
         className={
           onDark ? 'border-white/55 text-white hover:border-white' : undefined
@@ -491,8 +491,7 @@ export const ActionGroup = ({ actions, onDark }: TActionGroupProps) => (
 
 `CtaModuleView` currently builds `<SmartLink href={action.href} target={action.target}>{action.label}</SmartLink>` and silently drops `action.ariaLabel`, so an editor's authored accessible label has no effect. The rewrite in §7.2/§8 replaces exactly this code path, so the fix lands by construction:
 
-- Every action rendered through the new `ActionGroup` (§7.2) forwards `ariaLabel` to its `LinkButton`/`SmartLink`, exactly as `HeroModuleView`'s secondary action already does (`aria-label={secondaryAction.ariaLabel}`) — the working sibling pattern this module was missing.
-- Per the repo a11y convention the prop is named **`ariaLabel`**, never a hardcoded `aria-label` string at the call site. Confirm `SmartLink`'s prop contract exposes the pass-through; if it does not, that wiring is part of this work.
+- Every action rendered through the new `ActionGroup` (§7.2) forwards the authored value to its `LinkButton`/`SmartLink` via the **native `aria-label` prop**, exactly as `HeroModuleView`'s secondary action already does (`aria-label={secondaryAction.ariaLabel}`) — `LinkButton`'s polymorphic props (`TPolymorphicProps`) inherit the underlying element's native props rather than declaring its own custom `ariaLabel` prop, so `aria-label` (not camelCase `ariaLabel`) is the correct call-site prop name here — confirmed against `packages/config/src/react/polymorphic.ts` and Hero's own working usage. The repo's a11y convention ("never hardcode an `aria-label` string, pass the value through a prop") is satisfied because the _value_ comes from `action.link.ariaLabel`, not a literal string — the convention is about the value's source, not the JSX prop's spelling. Confirm `SmartLink`'s prop contract exposes the pass-through; if it does not, that wiring is part of this work.
 - Co-located test coverage must assert the authored `ariaLabel` reaches the rendered link's accessible name, and **must fail without the fix** — verified against a stubbed implementation, not assumed.
 
 **Out of scope here, tracked separately:** #1861 also asks whether sibling `*ModuleView` components under `apps/web/src/modules/` drop the same prop. That sweep is broader than the CTA module and gets its own follow-up issue rather than inflating this diff.
