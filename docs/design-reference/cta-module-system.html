@@ -1,0 +1,1048 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CTA Module — Variant System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ── Tokens 1:1 from configs/tailwind/theme.css (Console / azure) ── */
+      :root {
+        color-scheme: light;
+        --primary: oklch(0.99 0.002 250);
+        --primary-subtle: oklch(0.965 0.003 250);
+        --secondary: oklch(0.91 0.004 250);
+        --surface: oklch(1 0 0);
+        --surface-2: oklch(0.975 0.003 250);
+        --border: oklch(0.9 0.004 250);
+        --border-strong: oklch(0.8 0.006 250);
+        --border-emphasis: oklch(0.62 0.006 250);
+        --text: oklch(0.2 0.01 250);
+        --text-muted: oklch(0.46 0.01 250);
+        --text-subtle: oklch(0.6 0.008 250);
+        --brand-primary: oklch(0.53 0.17 250);
+        --brand-primary-hover: oklch(0.47 0.17 250);
+        --brand-primary-muted: oklch(0.95 0.03 250);
+        --brand-primary-contrast: oklch(0.99 0 0);
+        --brand-primary-solid: oklch(0.55 0.17 250);
+        --brand-primary-solid-hover: oklch(0.49 0.17 250);
+        --font-display: "Space Grotesk", system-ui, sans-serif;
+        --font-read: "Newsreader", Georgia, serif;
+        --font-mono: "JetBrains Mono", ui-monospace, monospace;
+        --radius-sm: 3px;
+        --radius-md: 6px;
+        --radius-lg: 10px;
+        --radius-xl: 12px;
+        --tracking-eyebrow: 0.14em;
+        --ease-console: cubic-bezier(0.2, 0, 0, 1);
+        --shadow-card:
+          0 1px 2px oklch(0.2 0.02 250 / 0.05),
+          0 14px 34px oklch(0.2 0.04 250 / 0.07);
+      }
+      .dark {
+        color-scheme: dark;
+        --primary: oklch(0.17 0.006 250);
+        --primary-subtle: oklch(0.2 0.006 250);
+        --secondary: oklch(0.24 0.007 250);
+        --surface: oklch(0.21 0.007 250);
+        --surface-2: oklch(0.24 0.008 250);
+        --border: oklch(0.3 0.008 250);
+        --border-strong: oklch(0.42 0.01 250);
+        --border-emphasis: oklch(0.55 0.01 250);
+        --text: oklch(0.95 0.004 250);
+        --text-muted: oklch(0.72 0.008 250);
+        --text-subtle: oklch(0.56 0.008 250);
+        --brand-primary: oklch(0.7 0.16 250);
+        --brand-primary-hover: oklch(0.76 0.16 250);
+        --brand-primary-muted: oklch(0.3 0.06 250);
+        --brand-primary-contrast: oklch(0.16 0.006 250);
+        --brand-primary-solid: oklch(0.7 0.16 250);
+        --brand-primary-solid-hover: oklch(0.76 0.16 250);
+        --shadow-card:
+          0 1px 2px oklch(0 0 0 / 0.3),
+          0 16px 40px oklch(0 0 0 / 0.35);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        background: var(--primary);
+        color: var(--text);
+      }
+      body {
+        margin: 0;
+        background: var(--primary);
+        color: var(--text);
+        font-family: var(--font-read);
+        -webkit-font-smoothing: antialiased;
+      }
+      ::selection {
+        background: var(--brand-primary-muted);
+        color: var(--brand-primary);
+      }
+
+      /* ── Gallery chrome ── */
+      .page {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0 clamp(1rem, 5vw, 2.5rem) 6rem;
+      }
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.85rem clamp(1rem, 5vw, 2.5rem);
+        background: color-mix(in oklch, var(--primary) 82%, transparent);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border);
+      }
+      .topbar h1 {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin: 0;
+        color: var(--text-muted);
+      }
+      .toggle {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.04em;
+        border: 1px solid var(--border-strong);
+        background: transparent;
+        color: var(--text);
+        padding: 0.5rem 0.85rem;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: all 200ms var(--ease-console);
+      }
+      .toggle:hover {
+        border-color: var(--brand-primary);
+        color: var(--brand-primary);
+      }
+      .intro {
+        padding: 3rem 0 0.5rem;
+      }
+      .intro h2 {
+        font-family: var(--font-display);
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        font-size: clamp(1.8rem, 1.4rem + 1.6vw, 2.4rem);
+        margin: 0 0 0.75rem;
+      }
+      .intro p {
+        max-width: 64ch;
+        color: var(--text-muted);
+        font-size: 1.0625rem;
+        line-height: 1.7;
+        margin: 0 0 0.5rem;
+      }
+      code {
+        font-family: var(--font-mono);
+        font-size: 0.85em;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 0.05em 0.35em;
+      }
+      .section-head {
+        margin: 3.5rem 0 0.4rem;
+        padding-top: 1.75rem;
+        border-top: 2px solid var(--border-strong);
+        display: flex;
+        align-items: baseline;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+      .section-head .vname {
+        font-family: var(--font-display);
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        font-size: 1.6rem;
+        margin: 0;
+      }
+      .section-head .vtag {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--brand-primary);
+        border: 1px solid var(--brand-primary);
+        border-radius: 999px;
+        padding: 0.15rem 0.6rem;
+      }
+      .section-sub {
+        margin: 0.5rem 0 0;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        max-width: 70ch;
+      }
+      .caption {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--text-subtle);
+        margin: 1.4rem 0 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+      }
+      .swatch {
+        width: 0.7rem;
+        height: 0.7rem;
+        border-radius: 2px;
+        border: 1px solid var(--border-strong);
+      }
+
+      /* Page band = full page width; CTA sits inset inside it */
+      .band {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        margin-bottom: 1rem;
+        background: var(--primary-subtle);
+        padding: clamp(1.75rem, 4vw, 2.75rem) clamp(1rem, 5vw, 2.5rem);
+      }
+      .grid2 {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: 1fr;
+      }
+      @media (min-width: 900px) {
+        .grid2 {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      /* ════════════════ CTA — contained module ════════════════ */
+      .cta {
+        max-width: 940px;
+        margin-inline: auto;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-card);
+        padding: clamp(1.6rem, 3.5vw, 2.75rem);
+        overflow: hidden;
+      }
+      /* Theme variants — fill the MODULE container */
+      .theme-primary {
+        background: var(--primary);
+      }
+      .theme-secondary {
+        background: var(--secondary);
+      }
+      .theme-brand {
+        background: var(--brand-primary-muted);
+      }
+      .cta__eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: var(--tracking-eyebrow);
+        text-transform: uppercase;
+        color: var(--brand-primary);
+        margin: 0 0 0.7rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .cta__heading {
+        font-family: var(--font-display);
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+        font-size: clamp(1.55rem, 1.25rem + 1.2vw, 2rem);
+        margin: 0;
+        color: var(--text);
+      }
+      /* supporting text = rich text (p / ul / ol / sub / strong / a) */
+      .cta__text {
+        font-family: var(--font-read);
+        font-size: 1.0625rem;
+        line-height: 1.7;
+        color: var(--text-muted);
+        max-width: 56ch;
+        margin: 0.8rem 0 0;
+      }
+      .cta__text > :first-child {
+        margin-top: 0;
+      }
+      .cta__text p {
+        margin: 0.6rem 0 0;
+      }
+      .cta__text ul,
+      .cta__text ol {
+        margin: 0.6rem 0 0;
+        padding-left: 1.3rem;
+      }
+      .cta__text li {
+        margin: 0.28rem 0;
+      }
+      .cta__text ul li::marker {
+        color: var(--brand-primary);
+      }
+      .cta__text a {
+        color: var(--brand-primary);
+        text-underline-offset: 2px;
+      }
+      .cta__text sub {
+        font-size: 0.72em;
+        color: var(--text-subtle);
+      }
+      .cta__actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 1.35rem;
+      }
+      /* footnote = optional text below the CTA buttons */
+      .cta__footnote {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--text-subtle);
+        margin: 0.85rem 0 0;
+      }
+      .cta__media {
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: var(--surface-2);
+        aspect-ratio: 4 / 3;
+      }
+      .cta__media svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* Buttons — @blog/ui button variants */
+      .btn {
+        font-family: var(--font-display);
+        font-weight: 500;
+        font-size: 0.875rem;
+        min-height: 2.25rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45rem;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-sm);
+        border: 1px solid transparent;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 200ms var(--ease-console);
+      }
+      .btn--primary {
+        background: var(--brand-primary-solid);
+        color: var(--brand-primary-contrast);
+      }
+      .btn--primary:hover {
+        background: var(--brand-primary-solid-hover);
+      }
+      .btn--ghost {
+        border-color: var(--border-strong);
+        background: transparent;
+        color: var(--text);
+      }
+      .btn--ghost:hover {
+        border-color: var(--brand-primary);
+        color: var(--brand-primary);
+      }
+      .btn--link {
+        background: transparent;
+        color: var(--brand-primary);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        padding: 0.5rem 0.25rem;
+      }
+      .btn--link:hover {
+        color: var(--brand-primary-hover);
+      }
+
+      /* ── SPLIT ── */
+      .cta--split {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: clamp(1.5rem, 4vw, 2.5rem);
+        align-items: center;
+      }
+      .cta--split.media-left .cta__body {
+        order: 2;
+      }
+      @media (max-width: 720px) {
+        .cta--split {
+          grid-template-columns: 1fr;
+        }
+        .cta--split.media-left .cta__body {
+          order: 0;
+        }
+        .cta--split.mobile-media-first .cta__media {
+          order: -1;
+        }
+        .cta__media {
+          aspect-ratio: 16 / 9;
+        }
+      }
+
+      /* ── STACK (centered, default) ── */
+      .cta--stack {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .cta--stack .cta__text {
+        max-width: 52ch;
+      }
+      .cta--stack .cta__actions {
+        justify-content: center;
+      }
+      .cta--stack .cta__eyebrow {
+        justify-content: center;
+      }
+      .cta--stack .cta__media {
+        width: min(100%, 420px);
+        margin: 0 auto 1.4rem;
+        aspect-ratio: 16 / 9;
+      }
+      .cta--stack .cta__text ul,
+      .cta--stack .cta__text ol {
+        text-align: left;
+        display: inline-block;
+      }
+      .icon-chip {
+        display: inline-flex;
+        width: 2.75rem;
+        height: 2.75rem;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-md);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        margin-bottom: 1.1rem;
+      }
+
+      /* ── BANNER (background image + overlay) ── */
+      .cta--banner {
+        position: relative;
+        color: #fff;
+        min-height: 280px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border: none;
+        padding: clamp(2rem, 5vw, 3.25rem) clamp(1.75rem, 5vw, 3rem);
+        isolation: isolate;
+      }
+      .cta--banner .cta__bg {
+        position: absolute;
+        inset: 0;
+        z-index: -2;
+      }
+      .cta--banner .cta__bg svg {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .cta--banner::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        /* default = Brand Primary → azure scrim */
+        background: linear-gradient(
+          105deg,
+          oklch(0.2 0.06 250 / 0.92) 0%,
+          oklch(0.35 0.12 250 / 0.72) 55%,
+          oklch(0.45 0.14 250 / 0.4) 100%
+        );
+      }
+      /* D2 — theme drives the overlay tint */
+      .cta--banner.tint-neutral::after {
+        background: linear-gradient(
+          105deg,
+          oklch(0.18 0.01 250 / 0.9) 0%,
+          oklch(0.26 0.015 250 / 0.68) 55%,
+          oklch(0.32 0.02 250 / 0.4) 100%
+        );
+      }
+      .cta--banner .cta__heading,
+      .cta--banner .cta__eyebrow {
+        color: #fff;
+      }
+      .cta--banner .cta__text {
+        color: rgba(255, 255, 255, 0.86);
+      }
+      .cta--banner .cta__footnote {
+        color: rgba(255, 255, 255, 0.7);
+      }
+      .cta--banner .btn--ghost {
+        border-color: rgba(255, 255, 255, 0.55);
+        color: #fff;
+      }
+      .cta--banner .btn--ghost:hover {
+        border-color: #fff;
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+      }
+      .cta--banner .btn--link {
+        color: #fff;
+      }
+
+      /* content align (banner + stack share these) */
+      .align-left {
+        text-align: left;
+        align-items: flex-start;
+      }
+      .align-left .cta__eyebrow,
+      .align-left .cta__actions {
+        justify-content: flex-start;
+      }
+      .align-center {
+        text-align: center;
+        align-items: center;
+      }
+      .align-center .cta__body {
+        margin: 0 auto;
+      }
+      .align-center .cta__eyebrow,
+      .align-center .cta__actions {
+        justify-content: center;
+      }
+      .align-center .cta__text {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .align-right {
+        text-align: right;
+        align-items: flex-end;
+      }
+      .align-right .cta__body {
+        margin-left: auto;
+      }
+      .align-right .cta__eyebrow,
+      .align-right .cta__actions {
+        justify-content: flex-end;
+      }
+      .align-right .cta__text {
+        margin-left: auto;
+      }
+      .cta--banner .cta__body {
+        max-width: 46ch;
+      }
+
+      /* controls */
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.6rem;
+        margin: 0.4rem 0 0.75rem;
+        padding: 0.6rem 0.75rem;
+        border: 1px dashed var(--border-strong);
+        border-radius: var(--radius-md);
+        background: var(--surface-2);
+      }
+      .controls__label {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--text-subtle);
+      }
+      .seg {
+        display: inline-flex;
+        border: 1px solid var(--border-strong);
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+      }
+      .seg button {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        border: none;
+        background: transparent;
+        color: var(--text-muted);
+        padding: 0.4rem 0.7rem;
+        cursor: pointer;
+        transition: all 160ms var(--ease-console);
+      }
+      .seg button + button {
+        border-left: 1px solid var(--border);
+      }
+      .seg button.is-active {
+        background: var(--brand-primary-solid);
+        color: var(--brand-primary-contrast);
+      }
+      .controls__hint {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        color: var(--text-subtle);
+        flex-basis: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <h1>CtaModule · variant system · Banner / Split / Callout</h1>
+      <button class="toggle" id="themeToggle" type="button">◐ Dark</button>
+    </div>
+
+    <div class="page">
+      <section class="intro">
+        <h2>Three module variants, shared options</h2>
+        <p>
+          Locked to the direction from your spec. Every variant is a
+          <strong>contained module</strong> (bounded, rounded, tone-filled),
+          shown inset in a page band. Shared across all three:
+          <strong>optional eyebrow</strong>; <strong>rich supporting text</strong>
+          (lists, sub, links); <strong>up to two actions</strong> (primary +
+          secondary, secondary as button or link); an optional
+          <code>footnote</code> under the buttons; and the
+          <strong>Primary / Secondary / Brand&nbsp;Primary</strong> theme tones.
+        </p>
+      </section>
+
+      <!-- ═══════════════════ BANNER ═══════════════════ -->
+      <div class="section-head">
+        <h3 class="vname">Banner</h3>
+        <span class="vtag">variant = banner</span>
+      </div>
+      <p class="section-sub">
+        Background image behind an azure overlay, text reversed to white.
+        Content align <code>left / center / right</code>; eyebrow optional. (Theme
+        tone drives the overlay tint — Brand Primary shown.)
+      </p>
+
+      <div class="caption">Content align: left · with eyebrow</div>
+      <div class="band">
+        <div class="cta cta--banner align-left">
+          <div class="cta__bg"><svg viewBox="0 0 1200 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Abstract azure banner background">
+  <defs>
+    <linearGradient id="gc" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="oklch(0.42 0.13 255)"/>
+      <stop offset="0.6" stop-color="oklch(0.55 0.16 250)"/>
+      <stop offset="1" stop-color="oklch(0.7 0.14 245)"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="400" fill="url(#gc)"/>
+  <g fill="none" stroke="#fff" stroke-width="1.5" opacity="0.14">
+    <path d="M0 300 Q 300 180 600 260 T 1200 220"/>
+    <path d="M0 340 Q 300 220 600 300 T 1200 260"/>
+    <path d="M0 260 Q 300 140 600 220 T 1200 180"/>
+  </g>
+  <g opacity="0.9">
+    <circle cx="930" cy="120" r="150" fill="oklch(0.72 0.13 245)" opacity="0.35"/>
+    <circle cx="1080" cy="300" r="200" fill="oklch(0.45 0.14 258)" opacity="0.4"/>
+  </g>
+</svg></div>
+          <div class="cta__body">
+            <p class="cta__eyebrow">Get the book</p>
+            <h2 class="cta__heading">The whole system, on paper</h2>
+            <div class="cta__text"><p>320 pages on building a writing practice that lasts. Print and ebook, DRM-free.</p></div>
+            <div class="cta__actions">
+              <a class="btn btn--primary" href="#">Buy now — £24</a>
+              <a class="btn btn--ghost" href="#">Preview chapter one</a>
+            </div>
+            <p class="cta__footnote">Ships worldwide · 30-day returns</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="caption">Content align: center · no eyebrow</div>
+      <div class="band">
+        <div class="cta cta--banner align-center">
+          <div class="cta__bg"><svg viewBox="0 0 1200 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Abstract azure banner background">
+  <defs>
+    <linearGradient id="gc2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="oklch(0.42 0.13 255)"/>
+      <stop offset="0.6" stop-color="oklch(0.55 0.16 250)"/>
+      <stop offset="1" stop-color="oklch(0.7 0.14 245)"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="400" fill="url(#gc2)"/>
+  <g fill="none" stroke="#fff" stroke-width="1.5" opacity="0.14">
+    <path d="M0 300 Q 300 180 600 260 T 1200 220"/>
+    <path d="M0 340 Q 300 220 600 300 T 1200 260"/>
+    <path d="M0 260 Q 300 140 600 220 T 1200 180"/>
+  </g>
+  <g opacity="0.9">
+    <circle cx="930" cy="120" r="150" fill="oklch(0.72 0.13 245)" opacity="0.35"/>
+    <circle cx="1080" cy="300" r="200" fill="oklch(0.45 0.14 258)" opacity="0.4"/>
+  </g>
+</svg></div>
+          <div class="cta__body">
+            <h2 class="cta__heading">Join 12,000 readers</h2>
+            <div class="cta__text"><p>A calmer way to keep up with what matters in tech and craft.</p></div>
+            <div class="cta__actions">
+              <a class="btn btn--primary" href="#">Start reading</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="caption">Content align: right · secondary as link</div>
+      <div class="band">
+        <div class="cta cta--banner align-right">
+          <div class="cta__bg"><svg viewBox="0 0 1200 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Abstract azure banner background">
+  <defs>
+    <linearGradient id="gc3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="oklch(0.42 0.13 255)"/>
+      <stop offset="0.6" stop-color="oklch(0.55 0.16 250)"/>
+      <stop offset="1" stop-color="oklch(0.7 0.14 245)"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="400" fill="url(#gc3)"/>
+  <g fill="none" stroke="#fff" stroke-width="1.5" opacity="0.14">
+    <path d="M0 300 Q 300 180 600 260 T 1200 220"/>
+    <path d="M0 340 Q 300 220 600 300 T 1200 260"/>
+    <path d="M0 260 Q 300 140 600 220 T 1200 180"/>
+  </g>
+  <g opacity="0.9">
+    <circle cx="930" cy="120" r="150" fill="oklch(0.72 0.13 245)" opacity="0.35"/>
+    <circle cx="1080" cy="300" r="200" fill="oklch(0.45 0.14 258)" opacity="0.4"/>
+  </g>
+</svg></div>
+          <div class="cta__body">
+            <p class="cta__eyebrow">Workshop</p>
+            <h2 class="cta__heading">Two days, one craft</h2>
+            <div class="cta__text"><p>A hands-on writing intensive. Small cohort, live feedback.</p></div>
+            <div class="cta__actions">
+              <a class="btn btn--primary" href="#">Reserve a seat</a>
+              <a class="btn btn--link" href="#">See the schedule</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="section-sub" style="margin-top: 1.6rem">
+        <strong>Overlay tint follows the theme (D2).</strong> Banner is
+        image-filled, so the brand tone tints the <em>scrim</em> rather than a
+        surface: Brand&nbsp;Primary → azure, Primary/Secondary → neutral-dark.
+      </p>
+
+      <div class="grid2">
+        <div>
+          <div class="caption"><span class="swatch" style="background: var(--brand-primary-muted)"></span> theme = Brand Primary → azure scrim</div>
+          <div class="band">
+            <div class="cta cta--banner" style="min-height: 200px">
+              <div class="cta__bg"><svg viewBox="0 0 1200 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="gt1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="oklch(0.42 0.13 255)"/><stop offset="1" stop-color="oklch(0.7 0.14 245)"/></linearGradient></defs><rect width="1200" height="400" fill="url(#gt1)"/><circle cx="980" cy="140" r="170" fill="oklch(0.72 0.13 245)" opacity="0.35"/></svg></div>
+              <div class="cta__body">
+                <p class="cta__eyebrow">Brand Primary</p>
+                <h2 class="cta__heading" style="font-size: 1.5rem">Azure scrim</h2>
+                <div class="cta__actions"><a class="btn btn--primary" href="#">Action</a></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="caption"><span class="swatch" style="background: var(--secondary)"></span> theme = Primary / Secondary → neutral-dark scrim</div>
+          <div class="band">
+            <div class="cta cta--banner tint-neutral" style="min-height: 200px">
+              <div class="cta__bg"><svg viewBox="0 0 1200 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="gt2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="oklch(0.42 0.13 255)"/><stop offset="1" stop-color="oklch(0.7 0.14 245)"/></linearGradient></defs><rect width="1200" height="400" fill="url(#gt2)"/><circle cx="980" cy="140" r="170" fill="oklch(0.72 0.13 245)" opacity="0.35"/></svg></div>
+              <div class="cta__body">
+                <p class="cta__eyebrow">Primary / Secondary</p>
+                <h2 class="cta__heading" style="font-size: 1.5rem">Neutral scrim</h2>
+                <div class="cta__actions"><a class="btn btn--primary" href="#">Action</a></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════ SPLIT ═══════════════════ -->
+      <div class="section-head">
+        <h3 class="vname">Split</h3>
+        <span class="vtag">variant = split</span>
+      </div>
+      <p class="section-sub">
+        Content beside a media slot. Image align <code>left / right</code>; on
+        mobile the media collapses <strong>last by default</strong> (toggleable
+        in settings). Interactive below.
+      </p>
+
+      <div class="controls" id="ctaSplitControls">
+        <span class="controls__label">Settings:</span>
+        <div class="seg" data-prop="side">
+          <button data-val="right" class="is-active" type="button">Image right</button>
+          <button data-val="left" type="button">Image left</button>
+        </div>
+        <div class="seg" data-prop="mobile">
+          <button data-val="last" class="is-active" type="button">Mobile media: last</button>
+          <button data-val="first" type="button">Mobile media: first</button>
+        </div>
+        <span class="controls__hint">↳ narrow the window to see the mobile-media setting take effect.</span>
+      </div>
+
+      <div class="caption"><span class="swatch" style="background: var(--primary)"></span> theme = Primary · rich text with a bullet list · footnote</div>
+      <div class="band">
+        <div class="cta cta--split theme-primary" id="ctaSplit">
+          <div class="cta__body">
+            <p class="cta__eyebrow">Pro plan</p>
+            <h2 class="cta__heading">Publish without the busywork</h2>
+            <div class="cta__text">
+              <p>Everything a growing publication needs:</p>
+              <ul>
+                <li>Scheduling for posts &amp; newsletters</li>
+                <li>Audience analytics dashboard</li>
+                <li>Two editor seats included</li>
+              </ul>
+            </div>
+            <div class="cta__actions">
+              <a class="btn btn--primary" href="#">Start 14-day trial</a>
+              <a class="btn btn--ghost" href="#">Compare plans</a>
+            </div>
+            <p class="cta__footnote">No card required · cancel anytime</p>
+          </div>
+          <div class="cta__media"><svg viewBox="0 0 300 300" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Abstract analytics dashboard illustration">
+  <rect width="300" height="300" fill="oklch(0.965 0.008 250)"/>
+  <rect x="30" y="34" width="240" height="232" rx="12" fill="oklch(1 0 0)" stroke="oklch(0.9 0.004 250)"/>
+  <rect x="48" y="54" width="90" height="10" rx="5" fill="oklch(0.8 0.02 250)"/>
+  <g>
+    <rect x="48" y="196" width="30" height="50" rx="4" fill="oklch(0.8 0.09 250)"/>
+    <rect x="90" y="166" width="30" height="80" rx="4" fill="oklch(0.66 0.13 250)"/>
+    <rect x="132" y="132" width="30" height="114" rx="4" fill="oklch(0.55 0.17 250)"/>
+    <rect x="174" y="180" width="30" height="66" rx="4" fill="oklch(0.7 0.11 250)"/>
+    <rect x="216" y="150" width="30" height="96" rx="4" fill="oklch(0.6 0.15 250)"/>
+  </g>
+  <path d="M48 120 L110 96 L150 108 L210 72 L250 88" fill="none" stroke="oklch(0.53 0.17 250)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="oklch(0.53 0.17 250)"><circle cx="110" cy="96" r="4"/><circle cx="210" cy="72" r="4"/></g>
+</svg></div>
+        </div>
+      </div>
+
+      <div class="caption"><span class="swatch" style="background: var(--secondary)"></span> theme = Secondary · image left · secondary as link</div>
+      <div class="band">
+        <div class="cta cta--split media-left theme-secondary">
+          <div class="cta__body">
+            <p class="cta__eyebrow">Membership</p>
+            <h2 class="cta__heading">Support independent writing</h2>
+            <div class="cta__text"><p>Members keep the archive open and ad-free, and get early access to new pieces.</p></div>
+            <div class="cta__actions">
+              <a class="btn btn--primary" href="#">Become a member</a>
+              <a class="btn btn--link" href="#">What you get</a>
+            </div>
+          </div>
+          <div class="cta__media"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Abstract membership illustration">
+  <rect width="400" height="300" fill="oklch(0.965 0.01 250)"/>
+  <g>
+    <rect x="70" y="118" width="200" height="120" rx="10" fill="oklch(0.8 0.09 250)" transform="rotate(-8 170 178)"/>
+    <rect x="95" y="98" width="200" height="120" rx="10" fill="oklch(0.66 0.14 250)" transform="rotate(-2 195 158)"/>
+    <rect x="120" y="82" width="200" height="120" rx="10" fill="oklch(0.54 0.17 252)"/>
+    <circle cx="150" cy="112" r="12" fill="#fff" opacity="0.9"/>
+    <rect x="140" y="150" width="150" height="8" rx="4" fill="#fff" opacity="0.55"/>
+    <rect x="140" y="168" width="110" height="8" rx="4" fill="#fff" opacity="0.35"/>
+  </g>
+</svg></div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════ CALLOUT ═══════════════════ -->
+      <div class="section-head">
+        <h3 class="vname">Callout</h3>
+        <span class="vtag">variant = callout · default</span>
+      </div>
+      <p class="section-sub">
+        The default: a centered, single-column module. Optional
+        <strong>image above</strong> the content (image only — no icon). Content
+        align inherits <code>left / center / right</code> (center by default).
+        Named <em>Callout</em> (renamed from Stack; avoids clash with the center-align value).
+      </p>
+
+      <div class="grid2">
+        <div>
+          <div class="caption"><span class="swatch" style="background: var(--brand-primary-muted)"></span> Brand Primary · with image · footnote</div>
+          <div class="band">
+            <div class="cta cta--stack theme-brand">
+              <div class="cta__media"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Abstract membership illustration">
+  <rect width="400" height="300" fill="oklch(0.965 0.01 250)"/>
+  <rect x="70" y="118" width="200" height="120" rx="10" fill="oklch(0.8 0.09 250)" transform="rotate(-8 170 178)"/>
+  <rect x="95" y="98" width="200" height="120" rx="10" fill="oklch(0.66 0.14 250)" transform="rotate(-2 195 158)"/>
+  <rect x="120" y="82" width="200" height="120" rx="10" fill="oklch(0.54 0.17 252)"/>
+  <circle cx="150" cy="112" r="12" fill="#fff" opacity="0.9"/>
+  <rect x="140" y="150" width="150" height="8" rx="4" fill="#fff" opacity="0.55"/>
+  <rect x="140" y="168" width="110" height="8" rx="4" fill="#fff" opacity="0.35"/>
+</svg></div>
+              <h2 class="cta__heading">Never miss a post</h2>
+              <div class="cta__text"><p>Get new essays the morning they go live.</p></div>
+              <div class="cta__actions">
+                <a class="btn btn--primary" href="#">Subscribe by email</a>
+                <a class="btn btn--ghost" href="#">Copy RSS link</a>
+              </div>
+              <p class="cta__footnote">2,400+ readers · one email a week</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="caption"><span class="swatch" style="background: var(--primary)"></span> Primary · with image · single action</div>
+          <div class="band">
+            <div class="cta cta--stack theme-primary">
+              <div class="cta__media"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Abstract newsletter illustration">
+  <defs>
+    <linearGradient id="ga" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="oklch(0.62 0.15 250)"/>
+      <stop offset="1" stop-color="oklch(0.5 0.17 255)"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="oklch(0.95 0.03 250)"/>
+  <g fill="none" stroke="oklch(0.62 0.13 250)" stroke-width="1.5" opacity="0.5">
+    <path d="M-20 60 Q 200 -20 420 80"/><path d="M-20 110 Q 200 30 420 130"/>
+    <path d="M-20 160 Q 200 80 420 180"/><path d="M-20 210 Q 200 130 420 230"/>
+  </g>
+  <rect x="112" y="96" width="176" height="118" rx="8" fill="url(#ga)"/>
+  <path d="M120 108 L200 158 L280 108" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+  <circle cx="316" cy="92" r="16" fill="oklch(0.7 0.14 250)"/>
+</svg></div>
+              <p class="cta__eyebrow">Newsletter</p>
+              <h2 class="cta__heading">Ideas worth your inbox</h2>
+              <div class="cta__text"><p>One considered essay a week. No noise.</p></div>
+              <div class="cta__actions">
+                <a class="btn btn--primary" href="#">Subscribe</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="caption"><span class="swatch" style="background: var(--secondary)"></span> Secondary · minimal (no eyebrow, no media) · numbered rich text</div>
+      <div class="band">
+        <div class="cta cta--stack theme-secondary">
+          <h2 class="cta__heading">Getting started takes three steps</h2>
+          <div class="cta__text">
+            <ol>
+              <li>Create your publication</li>
+              <li>Import or write your first post</li>
+              <li>Share the link — that's it</li>
+            </ol>
+          </div>
+          <div class="cta__actions">
+            <a class="btn btn--primary" href="#">Create publication</a>
+            <a class="btn btn--link" href="#">Read the guide</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════ SHARED OPTIONS ═══════════════════ -->
+      <div class="section-head">
+        <h3 class="vname">Shared options</h3>
+        <span class="vtag">all variants</span>
+      </div>
+      <p class="section-sub">
+        The four cross-cutting options, isolated. These apply to Banner, Split,
+        and Callout alike.
+      </p>
+
+      <div class="caption">1 · Theme tones — Primary / Secondary / Brand Primary</div>
+      <div class="band">
+        <div style="display: grid; gap: 1rem; grid-template-columns: 1fr">
+          <div class="cta cta--stack theme-primary" style="box-shadow: none; max-width: none">
+            <p class="cta__eyebrow">Primary</p>
+            <h2 class="cta__heading" style="font-size: 1.3rem">Primary tone</h2>
+            <div class="cta__actions"><a class="btn btn--primary" href="#">Action</a><a class="btn btn--ghost" href="#">Secondary</a></div>
+          </div>
+          <div class="cta cta--stack theme-secondary" style="box-shadow: none; max-width: none">
+            <p class="cta__eyebrow">Secondary</p>
+            <h2 class="cta__heading" style="font-size: 1.3rem">Secondary tone</h2>
+            <div class="cta__actions"><a class="btn btn--primary" href="#">Action</a><a class="btn btn--ghost" href="#">Secondary</a></div>
+          </div>
+          <div class="cta cta--stack theme-brand" style="box-shadow: none; max-width: none">
+            <p class="cta__eyebrow">Brand Primary</p>
+            <h2 class="cta__heading" style="font-size: 1.3rem">Brand Primary tone</h2>
+            <div class="cta__actions"><a class="btn btn--primary" href="#">Action</a><a class="btn btn--ghost" href="#">Secondary</a></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <div class="caption">2 · Secondary action — button</div>
+          <div class="band">
+            <div class="cta cta--stack theme-primary" style="max-width: none">
+              <h2 class="cta__heading" style="font-size: 1.3rem">Two buttons</h2>
+              <div class="cta__actions">
+                <a class="btn btn--primary" href="#">Primary</a>
+                <a class="btn btn--ghost" href="#">Secondary</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="caption">2 · Secondary action — link</div>
+          <div class="band">
+            <div class="cta cta--stack theme-primary" style="max-width: none">
+              <h2 class="cta__heading" style="font-size: 1.3rem">Button + link</h2>
+              <div class="cta__actions">
+                <a class="btn btn--primary" href="#">Primary</a>
+                <a class="btn btn--link" href="#">Secondary link →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <div class="caption">3 · Eyebrow — optional (with)</div>
+          <div class="band">
+            <div class="cta cta--stack theme-secondary" style="max-width: none">
+              <p class="cta__eyebrow">Eyebrow label</p>
+              <h2 class="cta__heading" style="font-size: 1.3rem">With eyebrow</h2>
+              <div class="cta__actions"><a class="btn btn--primary" href="#">Action</a></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="caption">4 · Footnote — optional text under buttons</div>
+          <div class="band">
+            <div class="cta cta--stack theme-secondary" style="max-width: none">
+              <h2 class="cta__heading" style="font-size: 1.3rem">With footnote</h2>
+              <div class="cta__actions"><a class="btn btn--primary" href="#">Action</a></div>
+              <p class="cta__footnote">Free · no credit card · cancel anytime</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p style="margin-top: 3.5rem; color: var(--text-subtle); font-family: var(--font-mono); font-size: 0.72rem; text-align: center">
+        Mock only · not wired to the codebase · tokens from configs/tailwind/theme.css
+      </p>
+    </div>
+
+    <script>
+      const btn = document.getElementById("themeToggle");
+      btn.addEventListener("click", () => {
+        const dark = document.documentElement.classList.toggle("dark");
+        btn.textContent = dark ? "◑ Light" : "◐ Dark";
+      });
+
+      const split = document.getElementById("ctaSplit");
+      const apply = {
+        side: (v) => split.classList.toggle("media-left", v === "left"),
+        mobile: (v) => split.classList.toggle("mobile-media-first", v === "first"),
+      };
+      document
+        .getElementById("ctaSplitControls")
+        .querySelectorAll(".seg")
+        .forEach((seg) => {
+          const prop = seg.dataset.prop;
+          seg.addEventListener("click", (e) => {
+            const b = e.target.closest("button");
+            if (!b) return;
+            seg.querySelectorAll("button").forEach((x) => x.classList.remove("is-active"));
+            b.classList.add("is-active");
+            apply[prop](b.dataset.val);
+          });
+        });
+    </script>
+  </body>
+</html>
