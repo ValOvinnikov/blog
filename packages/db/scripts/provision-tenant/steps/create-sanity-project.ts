@@ -29,7 +29,7 @@ const TENANT_PROJECT_MEMBER_ROLE = 'viewer';
  * `env.tenantSanityDataset`), a CORS entry for the admin app's origin, and
  * invites the tenant owner (resolved from their OWNER `memberships` row) as
  * a project member — Sanity Studio's login flow requires project
- * membership, so without this the owner could never sign into the deployed
+ * membership, so without this the owner could never sign in to their
  * Studio. The platform superadmin is not invited here: unlike the owner,
  * they're already in the Sanity organization and can add themselves to any
  * tenant project as administrator via the Sanity Manage UI, so a `viewer`
