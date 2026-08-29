@@ -6,24 +6,18 @@ import { makeTenant } from '@platform/testing/tenants/fixtures';
 import TenantOverviewPage from './page';
 
 const {
-  authMock,
   listTenantsByIdsMock,
   getTenantOwnerEmailMock,
   getTenantOwnerMembershipMock,
   listAuditEventsForTargetMock,
   getDomainVerificationStatusMock,
-  getAdminByUserIdMock,
 } = vi.hoisted(() => ({
-  authMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
   getTenantOwnerEmailMock: vi.fn(),
   getTenantOwnerMembershipMock: vi.fn(),
   listAuditEventsForTargetMock: vi.fn(),
   getDomainVerificationStatusMock: vi.fn(),
-  getAdminByUserIdMock: vi.fn(),
 }));
-
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -34,7 +28,6 @@ vi.mock('@blog/db', async () => ({
       getTenantOwnerMembership: getTenantOwnerMembershipMock,
     },
     auditEvents: { listAuditEventsForTarget: listAuditEventsForTargetMock },
-    admins: { getAdminByUserId: getAdminByUserIdMock },
   },
 }));
 
@@ -70,15 +63,6 @@ const setup = customRenderAsync(TenantOverviewPage, {
 
 describe(TenantOverviewPage, () => {
   beforeEach(() => {
-    authMock.mockReset();
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getAdminByUserIdMock.mockReset();
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      userId: 'user-1',
-      role: 'ADMIN',
-      createdAt: new Date(),
-    });
     listTenantsByIdsMock.mockReset();
     getTenantOwnerEmailMock.mockReset();
     getTenantOwnerEmailMock.mockResolvedValue('owner@example.com');
@@ -148,12 +132,6 @@ describe(TenantOverviewPage, () => {
   it('always shows "Open site", pointing at the tenant\'s live domain', async () => {
     const tenant = makeTenant({ primaryDomain: 'acme.example.com' });
     listTenantsByIdsMock.mockResolvedValue([tenant]);
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      userId: 'user-1',
-      role: 'MODERATOR',
-      createdAt: new Date(),
-    });
 
     await setup();
 
@@ -163,33 +141,9 @@ describe(TenantOverviewPage, () => {
     );
   });
 
-  it('shows "Open Studio" only for a super admin viewer', async () => {
+  it('never shows an "Open Studio" action — the sidebar is the only entry point to Studio', async () => {
     const tenant = makeTenant();
     listTenantsByIdsMock.mockResolvedValue([tenant]);
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      userId: 'user-1',
-      role: 'SUPERADMIN',
-      createdAt: new Date(),
-    });
-
-    await setup();
-
-    expect(screen.getByRole('link', { name: 'Open Studio →' })).toHaveAttribute(
-      'href',
-      '/tenants/tenant-1/studio',
-    );
-  });
-
-  it('hides "Open Studio" for a plain ADMIN/MODERATOR viewer', async () => {
-    const tenant = makeTenant({ slug: 'acme' });
-    listTenantsByIdsMock.mockResolvedValue([tenant]);
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      userId: 'user-1',
-      role: 'ADMIN',
-      createdAt: new Date(),
-    });
 
     await setup();
 

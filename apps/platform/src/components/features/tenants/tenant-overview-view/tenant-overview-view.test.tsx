@@ -94,7 +94,6 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
-        isSuperAdmin={false}
       />,
     );
 
@@ -120,7 +119,6 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
-        isSuperAdmin={false}
       />,
     );
 
@@ -160,7 +158,6 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
-        isSuperAdmin={false}
       />,
     );
 
@@ -177,7 +174,6 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
-        isSuperAdmin={false}
       />,
     );
 
@@ -202,7 +198,6 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
-        isSuperAdmin={false}
       />,
     );
 
@@ -244,7 +239,6 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
-        isSuperAdmin={false}
       />,
     );
 
@@ -276,7 +270,6 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
-        isSuperAdmin={false}
       />,
     );
 
@@ -318,7 +311,6 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
-        isSuperAdmin={false}
       />,
     );
 
@@ -358,7 +350,6 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[makeEvent()]}
-        isSuperAdmin={false}
       />,
     );
 
@@ -378,7 +369,6 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
-        isSuperAdmin={false}
       />,
     );
 
@@ -387,27 +377,7 @@ describe(TenantOverviewView, () => {
     expect(link).toHaveAttribute('target', '_blank');
   });
 
-  it('renders "Open Studio", linking to the tenant\'s in-app Studio route, only for a super admin', () => {
-    const tenant = makeTenant({ id: 'tenant-1' });
-    render(
-      <TenantOverviewView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-        ownerJoinedAt="Aug 12, 2026"
-        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[]}
-        isSuperAdmin={true}
-      />,
-    );
-
-    expect(screen.getByRole('link', { name: 'Open Studio →' })).toHaveAttribute(
-      'href',
-      '/tenants/tenant-1/studio',
-    );
-  });
-
-  it('omits "Open Studio" for a non-super-admin viewer', () => {
+  it('never renders an "Open Studio" action — the sidebar is the only entry point to Studio', () => {
     const tenant = makeTenant({ slug: 'acme' });
     render(
       <TenantOverviewView
@@ -417,7 +387,6 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
-        isSuperAdmin={false}
       />,
     );
 
