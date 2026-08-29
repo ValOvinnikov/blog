@@ -4,15 +4,23 @@ import { redirect } from 'next/navigation';
 
 import TenantDetailLayout from './layout';
 
-const { authMock, getAdminByUserIdMock, getTenantByIdMock } = vi.hoisted(
-  () => ({
-    authMock: vi.fn(),
-    getAdminByUserIdMock: vi.fn(),
-    getTenantByIdMock: vi.fn(),
-  }),
-);
+const {
+  authMock,
+  getAdminByUserIdMock,
+  getTenantByIdMock,
+  resolveIsSidebarCollapsedMock,
+} = vi.hoisted(() => ({
+  authMock: vi.fn(),
+  getAdminByUserIdMock: vi.fn(),
+  getTenantByIdMock: vi.fn(),
+  resolveIsSidebarCollapsedMock: vi.fn(),
+}));
 
 vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+
+vi.mock('@platform/server/layout/resolve-is-sidebar-collapsed', () => ({
+  resolveIsSidebarCollapsed: resolveIsSidebarCollapsedMock,
+}));
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -32,6 +40,8 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
     authMock.mockReset();
     getAdminByUserIdMock.mockReset();
     getTenantByIdMock.mockReset();
+    resolveIsSidebarCollapsedMock.mockReset();
+    resolveIsSidebarCollapsedMock.mockResolvedValue(false);
     vi.mocked(redirect).mockClear();
   });
 

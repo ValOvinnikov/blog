@@ -11,6 +11,7 @@ const {
   listTenantsMock,
   getAdminByUserIdMock,
   cookiesMock,
+  resolveIsSidebarCollapsedMock,
 } = vi.hoisted(() => ({
   authMock: vi.fn(),
   listMembershipsForUserMock: vi.fn(),
@@ -18,9 +19,14 @@ const {
   listTenantsMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
   cookiesMock: vi.fn(),
+  resolveIsSidebarCollapsedMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+
+vi.mock('@platform/server/layout/resolve-is-sidebar-collapsed', () => ({
+  resolveIsSidebarCollapsed: resolveIsSidebarCollapsedMock,
+}));
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -80,6 +86,8 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     getAdminByUserIdMock.mockReset();
     getAdminByUserIdMock.mockResolvedValue(undefined);
     cookiesMock.mockReset();
+    resolveIsSidebarCollapsedMock.mockReset();
+    resolveIsSidebarCollapsedMock.mockResolvedValue(false);
     vi.mocked(redirect).mockClear();
   });
 

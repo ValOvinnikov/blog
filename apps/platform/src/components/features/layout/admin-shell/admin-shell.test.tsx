@@ -108,4 +108,28 @@ describe(AdminShell, () => {
     expect(screen.getByRole('link', { name: 'Tenants' })).toBeVisible();
     expect(screen.getByText('Studio content')).toBeVisible();
   });
+
+  it('seeds the sidebar as collapsed when isSidebarInitiallyCollapsed is true', () => {
+    render(
+      <AdminShell
+        sections={[
+          {
+            label: 'Platform section',
+            items: [{ label: 'Tenants', icon: ICONS.GRID, href: '/tenants' }],
+          },
+        ]}
+        isSidebarInitiallyCollapsed={true}
+        crumb={<p>Platform</p>}
+        roleChip={roleChip}
+      >
+        <p>Tenants page</p>
+      </AdminShell>,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Expand sidebar' }),
+    ).toHaveAttribute('aria-expanded', 'false');
+    // The nav link's accessible name survives the collapse.
+    expect(screen.getByRole('link', { name: 'Tenants' })).toBeVisible();
+  });
 });

@@ -20,7 +20,9 @@
   },
   "sidebar": {
     "brandName": "Valstack",
-    "brandTagline": "admin"
+    "brandTagline": "admin",
+    "collapseToggle": "Collapse sidebar",
+    "expandToggle": "Expand sidebar"
   },
   "toastProvider": {
     "viewportAriaLabel": "Notifications",

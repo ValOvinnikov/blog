@@ -5,12 +5,18 @@ import type { ComponentPropsWithoutRef } from 'react';
 
 import OperatorLayout from './layout';
 
-const { authMock, getAdminByUserIdMock } = vi.hoisted(() => ({
-  authMock: vi.fn(),
-  getAdminByUserIdMock: vi.fn(),
-}));
+const { authMock, getAdminByUserIdMock, resolveIsSidebarCollapsedMock } =
+  vi.hoisted(() => ({
+    authMock: vi.fn(),
+    getAdminByUserIdMock: vi.fn(),
+    resolveIsSidebarCollapsedMock: vi.fn(),
+  }));
 
 vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+
+vi.mock('@platform/server/layout/resolve-is-sidebar-collapsed', () => ({
+  resolveIsSidebarCollapsed: resolveIsSidebarCollapsedMock,
+}));
 
 vi.mock('@blog/db', () => ({
   queries: { admins: { getAdminByUserId: getAdminByUserIdMock } },
@@ -53,6 +59,8 @@ describe(`<${OperatorLayout.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
     getAdminByUserIdMock.mockReset();
+    resolveIsSidebarCollapsedMock.mockReset();
+    resolveIsSidebarCollapsedMock.mockResolvedValue(false);
     vi.mocked(redirect).mockClear();
     vi.mocked(notFound).mockClear();
     vi.mocked(usePathname).mockReturnValue('/tenants');
