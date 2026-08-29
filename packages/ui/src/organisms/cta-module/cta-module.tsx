@@ -1,4 +1,19 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import {
+  CTA_IMAGE_SIDE,
+  CTA_MOBILE_MEDIA_ORDER,
+  CTA_VARIANT,
+  HEADING_ALIGN,
+  type IWithClassName,
+  type IWithDataTestId,
+  type TBrandVariant,
+  type TCtaImageSide,
+  type TCtaMobileMediaOrder,
+  type TCtaVariant,
+  type THeadingAlign,
+} from '@blog/config';
+import { Eyebrow } from '@blog/ui/atoms/eyebrow';
+import { Heading } from '@blog/ui/atoms/heading';
+import { Prose } from '@blog/ui/atoms/prose';
 import type { ReactNode } from 'react';
 
 import {
@@ -8,47 +23,101 @@ import {
 
 export type TCtaModuleProps = IWithClassName &
   IWithDataTestId & {
-    heading?: string;
+    variant: TCtaVariant;
+    /** Card fill for Split/Callout, or the background-image overlay tint for Banner. */
+    tone: TBrandVariant;
+    eyebrow?: string;
+    heading: string;
     headingId?: string;
     supportingText?: string;
-    action?: ReactNode;
-    align?: TCtaModuleVariants['align'];
+    /** Pre-rendered basic Portable Text, built by the web layer. */
+    content?: ReactNode;
+    /** Pre-rendered `<img>`/`next/image`, required by the schema for Banner and Split. */
+    image?: ReactNode;
+    /** Pre-rendered action buttons/links, built by the web layer — a plain slot. */
+    actions?: ReactNode;
+    footnote?: string;
+    /** Banner and Callout only; Split ignores this and lays content out in its own grid cell. */
+    align?: THeadingAlign;
+    /** Split only. Defaults to `RIGHT`. */
+    imageSide?: TCtaImageSide;
+    /** Split only. Defaults to `LAST` (image collapses below content on mobile). */
+    mobileMediaOrder?: TCtaMobileMediaOrder;
     /**
-     * Drops this component's own top margin and vertical padding. Set when a
-     * parent (e.g. `Section`) already owns the vertical spacing around it, so
-     * the two don't stack.
+     * Drops this component's own top margin. Set when a parent (e.g. `Section`)
+     * already owns the vertical spacing around it, so the two don't stack.
      */
     isWrapped?: TCtaModuleVariants['wrapped'];
   };
 
 /**
- * CtaModule — page-builder organism rendering an optional heading, optional
- * supporting text, and an optional action slot. `action` is a fully rendered
- * link/button passed in by the web layer — this component never builds the
- * anchor itself. The heading/action wrappers are omitted entirely when
- * absent.
+ * CtaModule — page-builder organism rendering a call-to-action in one of three
+ * layouts: Banner (full-bleed background image with a tinted scrim), Split
+ * (side-by-side image and content), and Callout (centered, with an optional
+ * image above the content). Paints its own contained card for Split/Callout
+ * and breaks out to full viewport width for Banner; `content`/`image`/
+ * `actions` are all pre-rendered nodes the web layer builds — this component
+ * never constructs a link or an image itself.
+ *
+ * DOM order is always heading/text/actions before the image, for every
+ * variant — `imageSide`/`mobileMediaOrder` only change the *visual* position
+ * via CSS `order`, so reading and keyboard order never puts a decorative
+ * image ahead of the content that explains it.
  */
 export const CtaModule = ({
+  variant,
+  tone,
+  eyebrow,
   heading,
   headingId,
   supportingText,
-  action,
+  content,
+  image,
+  actions,
+  footnote,
   align,
+  imageSide,
+  mobileMediaOrder,
+  isWrapped,
   className,
   dataTestId,
-  isWrapped,
 }: TCtaModuleProps) => {
-  const s = ctaModuleVariants({ wrapped: isWrapped, align });
+  const isSplit = variant === CTA_VARIANT.SPLIT;
+  const isBanner = variant === CTA_VARIANT.BANNER;
+  const resolvedAlign = isSplit
+    ? undefined
+    : (align ?? (isBanner ? HEADING_ALIGN.LEFT : HEADING_ALIGN.CENTER));
+
+  const s = ctaModuleVariants({
+    variant,
+    tone,
+    align: resolvedAlign,
+    imageSide: isSplit ? (imageSide ?? CTA_IMAGE_SIDE.RIGHT) : undefined,
+    mobileMediaOrder: isSplit
+      ? (mobileMediaOrder ?? CTA_MOBILE_MEDIA_ORDER.LAST)
+      : undefined,
+    wrapped: isWrapped,
+  });
 
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>
-      {heading && (
-        <h2 id={headingId} className={s.heading()}>
+      <div className={s.body()}>
+        {eyebrow && <Eyebrow className={s.eyebrow()}>{eyebrow}</Eyebrow>}
+        <Heading
+          id={headingId}
+          level={2}
+          visual="section"
+          className={s.heading()}
+        >
           {heading}
-        </h2>
-      )}
-      {supportingText && <p className={s.supportingText()}>{supportingText}</p>}
-      {action && <div className={s.action()}>{action}</div>}
+        </Heading>
+        {supportingText && <p className={s.text()}>{supportingText}</p>}
+        {content && <Prose className={s.text()}>{content}</Prose>}
+        {actions && <div className={s.actions()}>{actions}</div>}
+        {footnote && <p className={s.footnote()}>{footnote}</p>}
+      </div>
+      {image && <div className={s.media()}>{image}</div>}
+      {isBanner && <div className={s.overlay()} aria-hidden="true" />}
     </div>
   );
 };
