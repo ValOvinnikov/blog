@@ -2,6 +2,7 @@ import { q } from '@blog/service/sanity/query';
 import { actionGroupFragment } from '@blog/service/shared/fragments/action-group';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image';
 import { layoutFragment } from '@blog/service/shared/fragments/layout';
+import { linkFragment } from '@blog/service/shared/fragments/link';
 import { requiredSectionHeaderFragment } from '@blog/service/shared/fragments/section-header';
 
 export const ctaModuleQuery = q
@@ -17,7 +18,25 @@ export const ctaModuleQuery = q
       .field('sectionHeader')
       .project(requiredSectionHeaderFragment)
       .notNull(),
-    content: sub.field('content[]').nullable(true),
+    // Blocks are Sanity's built-in Portable Text shape, so `'...': true`
+    // spreads them as-is; only `markDefs` is re-projected, to deref `link`
+    // annotations' `internalReference` the same way `linkFragment` does for
+    // actions (`content` allows only the `link` annotation, so every entry
+    // matches `linkFragment`'s shape).
+    content: sub
+      .field('content[]')
+      .project((blockSub) => ({
+        '...': true,
+        markDefs: blockSub
+          .field('markDefs[]')
+          .project({
+            _key: true,
+            _type: true,
+            ...linkFragment,
+          })
+          .nullable(true),
+      }))
+      .nullable(true),
     // Not `.notNull()` — required only for Banner/Split, enforced by a
     // custom Studio validator, not `.required()`, so it is genuinely
     // absent for Callout.

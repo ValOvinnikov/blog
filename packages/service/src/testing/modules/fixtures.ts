@@ -9,6 +9,8 @@ import {
 import type { TRawContentModule } from '@blog/service/features/modules/content/adaptor/transformer';
 import type {
   TRawCtaAction,
+  TRawCtaContentBlock,
+  TRawCtaContentMarkDef,
   TRawCtaModule,
 } from '@blog/service/features/modules/cta/adaptor/transformer';
 import type { TRawHeroModule } from '@blog/service/features/modules/hero/adaptor/transformer';
@@ -118,6 +120,36 @@ export function makeRawCtaAction(
       platform: null,
       accessibleLabel: null,
     },
+    ...overrides,
+  };
+}
+
+export function makeRawContentMarkDef(
+  overrides: Partial<TRawCtaContentMarkDef> = {},
+): TRawCtaContentMarkDef {
+  return {
+    _key: 'mark-1',
+    _type: 'link',
+    label: 'Learn more',
+    linkType: TLINK_TYPE.EXTERNAL,
+    url: 'https://example.com',
+    internalReference: null,
+    openInNewTab: null,
+    platform: null,
+    accessibleLabel: null,
+    ...overrides,
+  };
+}
+
+export function makeRawContentBlock(
+  overrides: Partial<TRawCtaContentBlock> = {},
+): TRawCtaContentBlock {
+  return {
+    _type: 'block',
+    _key: 'block-1',
+    style: 'normal',
+    children: [{ _type: 'span', _key: 'span-1', text: 'Hi.' }],
+    markDefs: null,
     ...overrides,
   };
 }

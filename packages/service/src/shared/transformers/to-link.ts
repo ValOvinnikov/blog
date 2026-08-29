@@ -9,7 +9,7 @@ import type { InferFragmentType } from 'groqd';
 
 export type TRawLink = InferFragmentType<typeof linkFragment>;
 
-type TInternalReference = NonNullable<TRawLink['internalReference']>;
+export type TInternalReference = NonNullable<TRawLink['internalReference']>;
 
 // Keyed by the generated document `_type` union rather than a hand-typed
 // switch: renaming/removing one of these types in the schema (link.ts's
@@ -28,7 +28,9 @@ const INTERNAL_HREF_BUILDERS: Record<
   page_blog: () => routes.blogIndex(),
 };
 
-function toInternalHref(raw: TInternalReference): TMaybeUndefined<string> {
+export function toInternalHref(
+  raw: TInternalReference,
+): TMaybeUndefined<string> {
   // `_type` is typed as the reference union, but it comes from Sanity at
   // runtime and could fall outside it (unexpected reference target / schema
   // drift) — return undefined rather than crash, mirroring the old switch's

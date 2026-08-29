@@ -8,6 +8,8 @@ import {
   TLINK_TYPE,
 } from '@blog/config';
 import {
+  makeRawContentBlock,
+  makeRawContentMarkDef,
   makeRawCtaAction,
   makeRawCtaModule,
 } from '@blog/service/testing/modules/fixtures';
@@ -106,20 +108,118 @@ describe('toCtaModule', () => {
     expect(cta.content).toBeUndefined();
   });
 
-  it('passes content through as raw Portable Text blocks when authored', () => {
+  it('passes a plain block through unchanged when it has no markDefs', () => {
     const body = [
       {
         _type: 'block' as const,
         _key: 'block-1',
         style: 'normal' as const,
         children: [{ _type: 'span' as const, _key: 'span-1', text: 'Hi.' }],
+        markDefs: null,
       },
     ];
     const raw = makeRawCtaModule({ content: body });
 
     const cta = toCtaModule(raw);
 
-    expect(cta.content).toEqual(body);
+    expect(cta.content).toEqual([{ ...body[0], markDefs: undefined }]);
+  });
+
+  it('resolves an internal-document link inside content to a real href', () => {
+    const raw = makeRawCtaModule({
+      content: [
+        makeRawContentBlock({
+          markDefs: [
+            makeRawContentMarkDef({
+              linkType: TLINK_TYPE.INTERNAL,
+              internalReference: { _type: 'blog_post', slug: 'hello-world' },
+            }),
+          ],
+        }),
+      ],
+    });
+
+    const cta = toCtaModule(raw);
+
+    expect(cta.content?.[0]?.markDefs?.[0]).toMatchObject({
+      _key: 'mark-1',
+      _type: 'link',
+      url: '/blog/hello-world',
+    });
+  });
+
+  it('resolves an internal blog_topic and page_generic reference the same way toLink does', () => {
+    const topicRaw = makeRawCtaModule({
+      content: [
+        makeRawContentBlock({
+          markDefs: [
+            makeRawContentMarkDef({
+              linkType: TLINK_TYPE.INTERNAL,
+              internalReference: { _type: 'blog_topic', slug: 'engineering' },
+            }),
+          ],
+        }),
+      ],
+    });
+    const pageRaw = makeRawCtaModule({
+      content: [
+        makeRawContentBlock({
+          markDefs: [
+            makeRawContentMarkDef({
+              linkType: TLINK_TYPE.INTERNAL,
+              internalReference: { _type: 'page_generic', slug: 'about' },
+            }),
+          ],
+        }),
+      ],
+    });
+
+    expect(toCtaModule(topicRaw).content?.[0]?.markDefs?.[0]?.url).toBe(
+      '/topics/engineering',
+    );
+    expect(toCtaModule(pageRaw).content?.[0]?.markDefs?.[0]?.url).toBe(
+      '/about',
+    );
+  });
+
+  it('keeps an external content link working as before', () => {
+    const raw = makeRawCtaModule({
+      content: [
+        makeRawContentBlock({
+          markDefs: [
+            makeRawContentMarkDef({
+              linkType: TLINK_TYPE.EXTERNAL,
+              url: 'https://example.com',
+            }),
+          ],
+        }),
+      ],
+    });
+
+    const cta = toCtaModule(raw);
+
+    expect(cta.content?.[0]?.markDefs?.[0]?.url).toBe('https://example.com');
+  });
+
+  it('degrades a malformed content link (no url, no reference) to an unresolved url rather than throwing', () => {
+    const raw = makeRawCtaModule({
+      content: [
+        makeRawContentBlock({
+          markDefs: [
+            makeRawContentMarkDef({
+              linkType: TLINK_TYPE.INTERNAL,
+              internalReference: null,
+              url: null,
+            }),
+          ],
+        }),
+      ],
+    });
+
+    expect(() => toCtaModule(raw)).not.toThrow();
+    const cta = toCtaModule(raw);
+    expect(cta.content?.[0]?.markDefs?.[0]?.url).toBeUndefined();
+    expect(cta.content?.[0]?.markDefs?.[0]?._key).toBe('mark-1');
   });
 
   it('leaves image undefined when unset', () => {
