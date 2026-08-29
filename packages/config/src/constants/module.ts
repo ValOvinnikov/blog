@@ -4,7 +4,7 @@ import type { TValueOf } from '@blog/config/utils';
 /**
  * Union of every module document `_type`, derived from the generated Sanity
  * types rather than hand-maintained — the schema's own `name:` field is the
- * single source of truth for these values (see `apps/cms/src/schema-types/modules`).
+ * single source of truth for these values (see `packages/studio/src/schema-types/modules`).
  */
 export type TModuleType = Extract<
   AllSanitySchemaTypes,

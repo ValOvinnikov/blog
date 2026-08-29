@@ -98,6 +98,9 @@ importers:
       '@blog/insight':
         specifier: workspace:*
         version: link:../../packages/insight
+      '@blog/studio':
+        specifier: workspace:*
+        version: link:../../packages/studio
       '@blog/tailwind-config':
         specifier: workspace:*
         version: link:../../configs/tailwind
