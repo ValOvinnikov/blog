@@ -401,7 +401,7 @@ describe(TenantOverviewView, () => {
       />,
     );
 
-    expect(screen.getByRole('link', { name: 'Open Studio ↗' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Open Studio →' })).toHaveAttribute(
       'href',
       '/tenants/tenant-1/studio',
     );
@@ -422,7 +422,7 @@ describe(TenantOverviewView, () => {
     );
 
     expect(
-      screen.queryByRole('link', { name: 'Open Studio ↗' }),
+      screen.queryByRole('link', { name: 'Open Studio →' }),
     ).not.toBeInTheDocument();
   });
 });

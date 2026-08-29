@@ -320,7 +320,8 @@ describe(ProvisioningStatusView, () => {
         ...idleProvisioningSteps(),
         [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
           status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error: 'Vercel deploy failed: build error',
+          error:
+            'Vercel API POST /v9/projects/prj_web/domains failed: 500 internal_server_error',
         },
       },
     });
@@ -348,7 +349,8 @@ describe(ProvisioningStatusView, () => {
         ...idleProvisioningSteps(),
         [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
           status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error: 'Vercel deploy failed: build error',
+          error:
+            'Vercel API POST /v9/projects/prj_web/domains failed: 500 internal_server_error',
         },
       },
     });
@@ -358,7 +360,7 @@ describe(ProvisioningStatusView, () => {
 
     expect(
       within(screen.getByRole('complementary')).queryByText(
-        'Vercel deploy failed: build error',
+        'Vercel API POST /v9/projects/prj_web/domains failed: 500 internal_server_error',
       ),
     ).not.toBeInTheDocument();
   });
