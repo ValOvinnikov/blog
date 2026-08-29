@@ -164,7 +164,7 @@ describe(TenantOverviewPage, () => {
   });
 
   it('shows "Open Studio" only for a super admin viewer', async () => {
-    const tenant = makeTenant({ slug: 'acme' });
+    const tenant = makeTenant();
     listTenantsByIdsMock.mockResolvedValue([tenant]);
     getAdminByUserIdMock.mockResolvedValue({
       id: 'admin-1',
@@ -175,9 +175,9 @@ describe(TenantOverviewPage, () => {
 
     await setup();
 
-    expect(screen.getByRole('link', { name: 'Open Studio ↗' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Open Studio →' })).toHaveAttribute(
       'href',
-      'https://studio-acme.valstack.dev',
+      '/tenants/tenant-1/studio',
     );
   });
 
@@ -194,7 +194,7 @@ describe(TenantOverviewPage, () => {
     await setup();
 
     expect(
-      screen.queryByRole('link', { name: 'Open Studio ↗' }),
+      screen.queryByRole('link', { name: 'Open Studio →' }),
     ).not.toBeInTheDocument();
   });
 });

@@ -15,7 +15,7 @@ const defaultDeps: TPersistSanityTokenDeps = {
 };
 
 /**
- * Step 4 — mints this tenant's long-lived, read-only (`viewer`) Sanity
+ * Step 3 — mints this tenant's long-lived, read-only (`viewer`) Sanity
  * token and persists it encrypted via `setTenantSanityToken` (which handles
  * the AES-256-GCM encryption itself).
  *

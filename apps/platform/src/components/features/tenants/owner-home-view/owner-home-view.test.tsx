@@ -122,7 +122,7 @@ describe(OwnerHomeView, () => {
       screen.queryByRole('heading', { name: 'Recent activity' }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('link', { name: 'Open Studio ↗' }),
+      screen.queryByRole('link', { name: 'Open Studio →' }),
     ).not.toBeInTheDocument();
   });
 });

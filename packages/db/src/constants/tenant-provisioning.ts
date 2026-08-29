@@ -14,11 +14,10 @@ export type TTenantProvisioningStatus = TValueOf<
 export const TENANT_PROVISIONING_STEP = {
   SANITY_PROJECT: 'SANITY_PROJECT',
   SEED_CONTENT: 'SEED_CONTENT',
-  DEPLOY_STUDIO: 'DEPLOY_STUDIO',
   PERSIST_TOKEN: 'PERSIST_TOKEN',
   MAP_DOMAIN: 'MAP_DOMAIN',
   CREATE_WEBHOOK: 'CREATE_WEBHOOK',
-  // Not one of the six core provisioning steps `overallStatusFor` and the
+  // Not one of the five core provisioning steps `overallStatusFor` and the
   // operator UI's step sequencing reason about — a recurring
   // post-provisioning check (`elevateTenantOwner`) that never touches the
   // tenant's overall `provisioningStatus`. See `TElevateTenantOwnerOutcome`

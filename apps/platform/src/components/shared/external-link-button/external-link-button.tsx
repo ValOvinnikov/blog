@@ -18,10 +18,10 @@ export type TExternalLinkButtonProps = {
 
 /**
  * A button-styled link to a destination this app doesn't control — the
- * tenant's live site, its Sanity Studio — as opposed to `LinkButton`, which
- * navigates within this app. Always opens in a new tab with
- * `rel="noopener noreferrer"`, matching this repo's other genuine
- * external-link components (e.g. `packages/ui`'s `ShareLink`).
+ * tenant's live site — as opposed to `LinkButton`, which navigates within
+ * this app. Always opens in a new tab with `rel="noopener noreferrer"`,
+ * matching this repo's other genuine external-link components (e.g.
+ * `packages/ui`'s `ShareLink`).
  */
 export const ExternalLinkButton = ({
   href,

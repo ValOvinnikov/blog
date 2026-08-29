@@ -40,9 +40,6 @@ async function insertProvisionedTenant(): Promise<string> {
         [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
           status: TENANT_PROVISIONING_STEP_STATUS.DONE,
         },
-        [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
         [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
           status: TENANT_PROVISIONING_STEP_STATUS.DONE,
         },

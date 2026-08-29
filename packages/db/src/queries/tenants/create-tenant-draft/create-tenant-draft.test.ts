@@ -66,7 +66,6 @@ describe(createTenantDraft, () => {
     expect(result.data.provisioningSteps).toEqual({
       SANITY_PROJECT: { status: 'IDLE' },
       SEED_CONTENT: { status: 'IDLE' },
-      DEPLOY_STUDIO: { status: 'IDLE' },
       PERSIST_TOKEN: { status: 'IDLE' },
       MAP_DOMAIN: { status: 'IDLE' },
       CREATE_WEBHOOK: { status: 'IDLE' },

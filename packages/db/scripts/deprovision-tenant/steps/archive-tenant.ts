@@ -5,7 +5,7 @@ import type { TDeprovisionEnv } from '../lib/env';
 import { recordArchiveAuditEvent } from '../lib/record-archive-audit-event';
 
 /**
- * Step 5 — soft-deletes the `tenants` row by stamping `deprovisionedAt`,
+ * Step 4 — soft-deletes the `tenants` row by stamping `deprovisionedAt`,
  * never a hard delete. Idempotent: skips once already set (the top-level
  * `main()` guard already short-circuits on this, but the check stays here
  * too so the step is safe to call in isolation).

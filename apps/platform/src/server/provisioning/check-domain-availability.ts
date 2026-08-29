@@ -57,7 +57,7 @@ const buildProjectDomainsUrl = (
 /**
  * Advisory pre-check run at tenant-creation time, before provisioning ever
  * starts. Mirrors the rule `mapTenantDomain` (`packages/db`) enforces at
- * provisioning step 5: every tenant domain is added to the one shared
+ * provisioning step 4: every tenant domain is added to the one shared
  * `apps/web` Vercel project, so a domain already attached to any *other*
  * project can never be mapped there and would wedge the tenant partway
  * through provisioning. Never a hard blocker — absent credentials, an

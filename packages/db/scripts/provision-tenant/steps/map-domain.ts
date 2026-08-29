@@ -7,7 +7,7 @@ import {
 } from '../lib/vercel-client';
 
 /**
- * Step 5 — adds the tenant's custom domain to the *shared* web app's
+ * Step 4 — adds the tenant's custom domain to the *shared* web app's
  * existing Vercel project (never a per-tenant project — the frontend is one
  * shared deployment every tenant's domain routes into).
  *

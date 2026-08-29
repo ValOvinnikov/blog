@@ -32,7 +32,7 @@ const ALL_LOCKED_RUNNING: TTenantFieldLocks = {
   ownerEmail: { kind: 'running' },
 };
 const SLUG_LOCKED: TTenantFieldLocks = {
-  slug: { kind: 'step', step: TENANT_PROVISIONING_STEP.DEPLOY_STUDIO },
+  slug: { kind: 'step', step: TENANT_PROVISIONING_STEP.MAP_DOMAIN },
 };
 
 // Applies the same wrapper on mount and on every `rerender()` call, so the
@@ -470,14 +470,11 @@ describe(TenantDetailsPanel, () => {
       expect(slugInput).toHaveValue('acme');
       expect(slugInput).toBeDisabled();
       expect(slugInput).toHaveAccessibleDescription(
-        'Locked — the "Deploy the content editor" step has already completed and used this value.',
+        'Locked — the "Connect the custom domain" step has already completed and used this value.',
       );
     });
 
-    it('renders every other field, including the one that actually caused the failure, as editable', () => {
-      // Mirrors the real 409 case: MAP_DOMAIN itself failed, so
-      // primaryDomain — the field that caused the failure — stays editable
-      // even though slug (an earlier, completed step) is locked.
+    it('renders every other field as editable when only one field is locked', () => {
       const tenant = makeTenant({
         name: 'Acme Inc.',
         primaryDomain: 'acme.example.com',
@@ -674,8 +671,8 @@ describe(TenantDetailsPanel, () => {
         'acme-unsaved-edit',
       );
 
-      // A background poll discovers DEPLOY_STUDIO has completed, locking
-      // slug — while the operator's unsaved edit above is still showing.
+      // A background poll discovers a step has completed, locking slug —
+      // while the operator's unsaved edit above is still showing.
       rerender(
         withIntl(
           <TenantDetailsPanel

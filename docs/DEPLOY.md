@@ -549,9 +549,6 @@ environment` rather than silently falling through to the wrong branch.
       the domain on the `admin-prod` Vercel project exactly (§3 above).
 - [ ] Variable `VERCEL_TEAM_ID` — only needed if the Vercel account is
       team-owned; omit otherwise.
-- [ ] Variable `PLATFORM_DOMAIN` — the platform domain each tenant's Studio
-      subdomain is minted under (`studio-<slug>.<PLATFORM_DOMAIN>`), e.g.
-      `valstack.dev` in production.
 - [ ] `apps/platform`'s own Vercel project (not this GitHub Actions
       environment) needs env var `TENANT_PROVISIONING_GITHUB_REPO` = `<owner>/<repo>`
       (e.g. `ValOvinnikov/blog`), paired with its own
@@ -573,9 +570,7 @@ environment` rather than silently falling through to the wrong branch.
       to `development` now points its provisioning/deprovisioning dispatches
       at the `development` tenant registry too, not just the Sanity dataset.
       See `docs/context/environment-variables.md`.
-- [ ] `VERCEL_TOKEN` / `VERCEL_ORG_ID` / `VERCEL_PROJECT_ID` above are reused
-      as-is: `VERCEL_TOKEN` needs project-creation scope (not just deploy
-      scope) for this workflow to create each tenant's Studio Vercel project;
+- [ ] `VERCEL_TOKEN` / `VERCEL_PROJECT_ID` above are reused as-is.
       `VERCEL_PROJECT_ID` here means the **shared web** project (`blog-prod`)
       — the one the "Map domain" step adds every tenant's custom domain to,
       never a per-tenant project.

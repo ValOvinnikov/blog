@@ -4,7 +4,7 @@ import { archiveSanityProject } from '@blog/db/utils/sanity-management-client/sa
 import type { TDeprovisionEnv } from '../lib/env';
 
 /**
- * Step 3 — archives the tenant's own Sanity project rather than deleting
+ * Step 2 — archives the tenant's own Sanity project rather than deleting
  * it: `PATCH isDisabledByUser: true` stops it billing without needing the
  * org billing permission project cancellation requires, so unlike
  * deletion this step has no permission-block case to tolerate. Idempotent:

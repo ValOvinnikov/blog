@@ -40,10 +40,4 @@ describe(ContentWorkspaceCard, () => {
     expect(screen.getByText('Active')).toBeVisible();
     expect(screen.getByText('proj-1')).toBeVisible();
   });
-
-  it('renders the studio hostname derived from the tenant slug', () => {
-    render(<ContentWorkspaceCard tenant={makeTenant({ slug: 'northwind' })} />);
-
-    expect(screen.getByText('studio-northwind.valstack.dev')).toBeVisible();
-  });
 });

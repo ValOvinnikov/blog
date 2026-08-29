@@ -9,7 +9,7 @@ import { useTranslations } from 'next-intl';
 import { addTenantWizardVariants } from './add-tenant-wizard-variants';
 
 /**
- * The `/tenants/new` page body — the "Add tenant" H1 and the six-step
+ * The `/tenants/new` page body — the "Add tenant" H1 and the five-step
  * provisioning rail around the Details step, which is the only step an
  * operator interacts with directly; everything after it runs automatically
  * once `TenantDetailsForm` submits.
@@ -30,10 +30,6 @@ export const AddTenantWizard = () => {
     {
       title: t('steps.seedContent.title'),
       description: t('steps.seedContent.description'),
-    },
-    {
-      title: t('steps.deployStudio.title'),
-      description: t('steps.deployStudio.description'),
     },
     {
       title: t('steps.registryRows.title'),

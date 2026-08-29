@@ -16,16 +16,12 @@ const env: TProvisionEnv = {
   sanityManagementToken: 'mgmt-token',
   sanityOrganizationId: 'org-abc',
   vercelToken: 'v-token',
-  vercelOrgId: 'org_1',
   vercelTeamId: undefined,
   vercelWebProjectId: 'prj_web',
-  vercelCliVersion: '48.0.0',
   adminAppBaseUrl: 'https://admin.example.com',
-  platformDomain: 'example.com',
   tenantSanityDataset: 'test-dataset',
   webAppBaseUrl: 'https://example.com',
   revalidateSecret: 'revalidate-shh',
-  githubRepository: 'acme/blog',
 };
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {

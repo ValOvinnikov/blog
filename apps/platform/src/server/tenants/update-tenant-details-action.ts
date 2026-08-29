@@ -53,9 +53,9 @@ export type TUpdateTenantDetailsActionResult =
  * whenever the panel that calls it shows any editable field: every step
  * `IDLE`, or FAILED with a field an already-completed step hasn't locked.
  * The client only ever submits a locked field's unchanged value, but that's
- * a UX affordance, not an authorization boundary — the `slug-locked`/
- * `domain-locked` outcomes below are the real enforcement, re-checked here
- * against the current db row regardless of what the client sends.
+ * a UX affordance, not an authorization boundary — the `domain-locked`
+ * outcome below is the real enforcement, re-checked here against the
+ * current db row regardless of what the client sends.
  */
 export const updateTenantDetailsAction = async (
   tenantId: string,
@@ -102,18 +102,6 @@ export const updateTenantDetailsAction = async (
           ok: false,
           fieldErrors: { primaryDomain: 'This domain is already in use.' },
         };
-      case 'slug-locked': {
-        const t = await getTranslations('tenantDetailsPanel');
-        const tSteps = await getTranslations('provisioningStatusView');
-        return {
-          ok: false,
-          fieldErrors: {
-            slug: t('fieldLockedReasonStep', {
-              step: tSteps(`stepLabel.${result.blockingStep}`),
-            }),
-          },
-        };
-      }
       case 'domain-locked': {
         const t = await getTranslations('tenantDetailsPanel');
         const tSteps = await getTranslations('provisioningStatusView');
