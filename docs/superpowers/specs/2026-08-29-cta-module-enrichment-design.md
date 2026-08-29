@@ -12,14 +12,14 @@
 
 ## 1. Summary
 
-Today `module_cta` renders a heading, an optional supporting string, and exactly one action, on a full-bleed `Section` band. This spec turns it into a small, deliberate **variant system**: three contained layout variants (**Banner**, **Split**, **Callout**), an optional image, a separate optional rich-text block, a reusable **action group** object, an optional footnote, and the three brand tones the other page-builder modules already carry.
+Today `module_cta` renders a heading, an optional supporting string, and exactly one action, on a full-bleed `Section` band. This spec turns it into a small, deliberate **variant system**: three layout variants (**Banner**, **Split**, **Callout**) — Split and Callout contained, Banner full-bleed (D13) — an optional image, a separate optional rich-text block, a reusable **action group** object, an optional footnote, and the three brand tones the other page-builder modules already carry.
 
 ### Goals
 
 - Replace the single `action` link with a **reusable `actionGroup` object** (§5) — owned by no single module, adopted by CTA first and by Hero / Newsletter / future modules after.
 - Three layout variants selectable per instance; each exposing only the options that make sense for it.
 - Add a **separate** optional rich-text `content` field (lists, bold, italic, inline links); the title's supporting text stays plain — §6.
-- Render the module as a **contained** block, not a full-bleed band — §3.
+- Render Split and Callout as **contained** blocks; Banner as **full-bleed** — §3.
 - Keep `CtaModule` (`packages/ui`) presentation-only; the web layer maps Sanity data → props, as it does today.
 - Close #1861 by construction: the new action rendering forwards `ariaLabel` — §8.1.
 
@@ -536,7 +536,7 @@ Dependency order, one PR per layer where each merges green on its own:
 
 - **Config:** `--shadow-card` renders in both themes; new constants exported.
 - **Schema:** unit-test the `actionGroup` validator (empty, primary-only, primary+secondary, secondary-only → reject) and the Banner/Split image requirement.
-- **Component:** Storybook stories per variant × tone × action shape; visual check of the contained card in light and dark against the mock.
+- **Component:** Storybook stories per variant × tone × action shape; visual check of the contained card (Split/Callout) and the full-bleed breakout (Banner) in light and dark against the mock.
 - **Migration:** none — re-confirm `count(*[_type == "module_cta"])` is still 0 in both datasets immediately before the schema PR merges (§9).
 - **A11y:** axe pass on each variant; manual keyboard/reading-order check that actions precede a decorative image; the #1861 `ariaLabel` regression test must fail without the fix.
 
