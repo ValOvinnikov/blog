@@ -34,8 +34,8 @@ each requiring explicit user approval. Never bundle them. See
   `board-keeper` dispatch). Working an _existing_ issue that already spans
   layers doesn't retroactively need this — it only applies when you're the one
   filing the ticket.
-- **Prefer one PR per layer** (`config → cms → service → ui → web` when config
-  changes are involved, otherwise `cms → service → ui → web`; dependency
+- **Prefer one PR per layer** (`config → studio → service → ui → web` when config
+  changes are involved, otherwise `studio → service → ui → web`; dependency
   order) so each review stays small — **but split only when each layer merges
   to `main` green on its own** (typically additive changes). Keep a single PR
   when a partial merge would break the build: e.g. renaming a shared `_type`
@@ -48,7 +48,7 @@ each requiring explicit user approval. Never bundle them. See
   and acceptance criteria — don't rely solely on what the user said in the prompt.
 - Restate the task and acceptance criteria. Read `SPEC.md` for the contracts.
 - Locate the affected files/layers. Identify which workspaces change:
-  `config` (`packages/config`, `packages/utils`, `configs/*`), `cms`,
+  `config` (`packages/config`, `packages/utils`, `configs/*`), `studio`,
   `service`, `ui`, `web`.
 - **`explore` vs. inline `Bash`/`Read` — decide by whether the target path is
   already known, not by query count.** Dispatch the **`explore` subagent**
@@ -90,7 +90,7 @@ each requiring explicit user approval. Never bundle them. See
   `superpowers:brainstorming` **before** writing the plan — explore intent,
   constraints, and design decisions first.
 - Write the change as ordered steps **in dependency order**:
-  `config → cms → types(typegen) → service → ui → web` (drop `config` if it
+  `config → studio → types(typegen) → service → ui → web` (drop `config` if it
   has no changes). Never reverse it.
 - Explicitly mark which layers are **unaffected** — those agents are skipped
   entirely. Do not invoke an agent whose layer has no changes.
@@ -99,7 +99,7 @@ each requiring explicit user approval. Never bundle them. See
   explicit step — which documents/fields change, the `sanity/migrate` transform,
   and the dry-run → backup → human-gated run sequence — and **prompt the user
   with that migration plan** before implementing (the live-data change is theirs
-  to approve, like a deploy). Follow `apps/cms/migrations/README.md`. Sequence it
+  to approve, like a deploy). Follow `packages/studio/migrations/README.md`. Sequence it
   right after the schema+typegen step and before the `service` layer consumes the
   new shape.
 
@@ -124,7 +124,7 @@ below for why this discipline matters just as much before dispatching
 | Layer / work                                                 | Agent          | Skill it should apply                                                               |
 | ------------------------------------------------------------ | -------------- | ----------------------------------------------------------------------------------- |
 | Constants, `routes`, shared types, `configs/*`, alias wiring | `config`       | —                                                                                   |
-| Sanity schema + `pnpm typegen`                               | `cms`          | `cms-schema-practices`                                                              |
+| Sanity schema + `pnpm typegen`                               | `studio`       | `studio-schema-practices`                                                           |
 | GROQ + typed fetcher                                         | `service`      | `add-content-type`, `testing-practices`                                             |
 | Drizzle schema, migrations, typed queries                    | `db`           | `testing-practices`                                                                 |
 | Shared Auth.js config (providers, adapter, session, cookies) | `auth`         | `testing-practices`                                                                 |
@@ -137,7 +137,7 @@ below for why this discipline matters just as much before dispatching
 that chain. `db` and `platform-app` are siblings to `service` and `web`
 respectively, `auth` is a thin layer above `db`, `insight` is independent (like
 `config`/`utils`), and none of the four consumes Sanity.
-`config → db → auth → platform-app` runs in parallel to `cms → service → ui → web`,
+`config → db → auth → platform-app` runs in parallel to `studio → service → ui → web`,
 not after it. `insight` has no upstream and no downstream in this chain today
 — dispatch it standalone when the work is genuinely `packages/insight`'s.
 
@@ -226,13 +226,13 @@ _before_ dispatching `verify-runner` for the remaining checks.
   `pnpm --filter <pkg> lint`, `pnpm --filter <pkg> test` (stop-on-first-failure).
 - All three must pass before moving to self-review.
 
-**CMS-only task (schema changed)**:
+**Studio-only task (schema changed)**:
 
 1. Run `pnpm typegen` yourself, inline — regenerates the types in
    `packages/config/src/sanity/generated/` from the updated schema. Typegen
    can be non-deterministic — re-run until the diff is minimal.
-2. Dispatch `verify-runner` with: `pnpm --filter cms type-check`,
-   `pnpm --filter cms lint` (stop-on-first-failure) — verify the studio
+2. Dispatch `verify-runner` with: `pnpm --filter @blog/studio type-check`,
+   `pnpm --filter @blog/studio lint` (stop-on-first-failure) — verify the studio
    itself is clean.
 
 - No web build needed; downstream packages are unchanged.
@@ -519,7 +519,7 @@ writing to a directory before touching it.
 
 ## 9. Deploy — human-gated, never automatic
 
-- `sanity deploy` (cms) and Vercel deploys are **manual, human-run** steps. Do
+- `sanity deploy` (`@blog/studio`) and Vercel deploys are **manual, human-run** steps. Do
   not run them. At most, remind the user of the commands (`docs/DEPLOY.md`).
 
 ## Guardrails

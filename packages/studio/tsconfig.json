@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@blog/tsconfig/base.json",
+  "compilerOptions": {
+    "paths": {
+      "@blog/studio/*": ["./src/*"],
+      "@blog/config/*": ["../../packages/config/src/*"],
+      "@blog/utils/*": ["../../packages/utils/src/*"]
+    },
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "noEmit": true,
+    "tsBuildInfoFile": "tsconfig.tsbuildinfo",
+    // Declare the vitest globals ambient types explicitly — test files rely on
+    // `globals: true` (configs/vitest/preset.ts) and no longer import
+    // describe/it/expect from 'vitest' directly.
+    "types": ["vitest/globals"]
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", "dist", ".sanity"]
+}

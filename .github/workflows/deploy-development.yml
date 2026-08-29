@@ -37,12 +37,10 @@ env:
   VERCEL_CLI_VERSION: 48.0.0
   # Keep in lockstep with the `turbo` devDependency version.
   TURBO_IGNORE_VERSION: 2.10.4
-  # `sanity build` (run by the verify job's `pnpm build`) loads sanity.cli.ts,
-  # which requires these. Sourced from repo Variables like ci.yml; the
-  # deploy-studio job overrides SANITY_STUDIO_PROJECT_ID from its
-  # environment-scoped variable and hardcodes SANITY_STUDIO_DATASET (no
-  # environment-scoped variable exists for it — see deploy-studio's own env
-  # block below for why).
+  # Sanity project/dataset defaults, sourced from repo Variables like ci.yml.
+  # The content `migrate` job overrides both explicitly, and nothing builds
+  # the Studio in CI any more — `packages/studio` ships as a library and has
+  # no `build` script — so these are a fallback rather than load-bearing.
   SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
   SANITY_STUDIO_DATASET: ${{ vars.SANITY_STUDIO_DATASET }}
   # Vercel Remote Cache — lets verify replay task artifacts already built by PR
@@ -64,7 +62,7 @@ jobs:
       group: deploy-dev-changes
       cancel-in-progress: true
     outputs:
-      cms: ${{ steps.cms.outputs.changed }}
+      studio: ${{ steps.studio.outputs.changed }}
       web: ${{ steps.web.outputs.changed }}
       admin: ${{ steps.admin.outputs.changed }}
     steps:
@@ -73,11 +71,11 @@ jobs:
           persist-credentials: false
           fetch-depth: 2
 
-      - name: Is cms affected?
-        id: cms
+      - name: Is studio affected?
+        id: studio
         run: |
           set -uo pipefail
-          if npx --yes "turbo-ignore@${TURBO_IGNORE_VERSION}" cms --fallback=HEAD^1; then
+          if npx --yes "turbo-ignore@${TURBO_IGNORE_VERSION}" @blog/studio --fallback=HEAD^1; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -111,7 +109,7 @@ jobs:
     needs: changes
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.cms == 'true' ||
+      needs.changes.outputs.studio == 'true' ||
       needs.changes.outputs.web == 'true' ||
       needs.changes.outputs.admin == 'true'
     runs-on: ubuntu-latest
@@ -142,7 +140,7 @@ jobs:
   # schema+migration merge can't leave dev's data behind its code (the #355
   # failure mode). No artifact backup here — dev is the disposable staging line
   # (also refreshed from prod by #363); prod keeps the backup + approval gate.
-  # Gated on cms||web — the union of the jobs that `needs` it — rather than on
+  # Gated on studio||web — the union of the jobs that `needs` it — rather than on
   # `verify`'s wider condition, so an admin-only merge doesn't run a Sanity
   # migration for an app that never touches Sanity; migrate is still never
   # skipped out from under a deploy that depends on it. migrate:deploy is a
@@ -153,7 +151,7 @@ jobs:
     needs: [changes, verify]
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.cms == 'true' ||
+      needs.changes.outputs.studio == 'true' ||
       needs.changes.outputs.web == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -167,10 +165,9 @@ jobs:
     env:
       SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
       SANITY_STUDIO_DATASET: development
-      # Content mutations need an Editor (write) token; the deploy token only has
-      # Deploy-Studio permission and gets "permission update required" on a real
-      # migration run. Least-privilege: a dedicated migrate token, separate from
-      # deploy-studio's deploy-only token.
+      # Content mutations need an Editor (write) token; a deploy-scoped token
+      # gets "permission update required" on a real migration run.
+      # Least-privilege: a dedicated migrate token.
       SANITY_AUTH_TOKEN: ${{ secrets.SANITY_MIGRATE_TOKEN }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -182,7 +179,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
       - name: Apply pending migrations
         if: ${{ env.SANITY_AUTH_TOKEN != '' }}
-        working-directory: apps/cms
+        working-directory: packages/studio
         run: pnpm migrate:deploy --yes
 
   # Apply Drizzle/db schema migrations to the dev Neon branch BEFORE dev
@@ -190,9 +187,8 @@ jobs:
   # migration" discipline as the content `migrate` job above, for the
   # separate relational store (`packages/db`, see .claude/agents/db.md's
   # "Migrations" section). `deploy-web` and `deploy-admin` both depend on
-  # `@blog/db` (apps/cms never touches Postgres), so this is gated on
-  # web||admin, not `cms`, and only those two (not `deploy-studio`) need it
-  # below. No artifact backup here — dev is the disposable staging line, same
+  # `@blog/db` (the Studio never touches Postgres), so this is gated on
+  # web||admin, not `studio`, and only those two need it below. No artifact backup here — dev is the disposable staging line, same
   # stance as the content migrate job. `drizzle-kit migrate` is a no-op when nothing is
   # pending, and the apply step is guarded on DATABASE_URL_UNPOOLED so the
   # job is inert until that secret is configured. No approval gate on dev,
@@ -263,65 +259,6 @@ jobs:
       - name: Apply pending db migrations
         if: ${{ env.DATABASE_URL_UNPOOLED != '' }}
         run: pnpm --filter @blog/db db:migrate
-
-  deploy-studio:
-    name: Deploy dev Studio
-    needs: [changes, verify, migrate]
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.cms == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    concurrency:
-      group: deploy-dev-studio
-      cancel-in-progress: true
-    environment: development
-    env:
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      # Org/project ids are not sensitive — they live as environment-scoped
-      # Variables (not Secrets) so they stay inspectable in run logs.
-      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
-      # Distinct GitHub Environment variable from deploy-web's VERCEL_PROJECT_ID
-      # (cms-dev is its own Vercel project) — mapped to the local name the
-      # Vercel CLI actually reads.
-      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_CMS }}
-      # The `development` GitHub Environment only defines SANITY_STUDIO_PROJECT_ID
-      # as an environment-scoped variable, not SANITY_STUDIO_DATASET — this
-      # currently resolves correctly by coincidence (the repo-level default
-      # happens to be "development" too), but pin it explicitly so it can't
-      # silently break if that repo-level default ever changes. Mirrors the
-      # equivalent override on deploy-production.yml's deploy-studio job.
-      SANITY_STUDIO_DATASET: development
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      # pnpm + node on PATH so `vercel build` can install the workspace deps
-      # (Vercel detects pnpm-lock.yaml and shells out to `pnpm`).
-      - uses: ./.github/actions/setup
-        with:
-          pnpm-version: ${{ env.PNPM_VERSION }}
-          node-version: ${{ env.NODE_VERSION }}
-
-      # Deploys `cms-dev` (static `sanity build` output, apps/cms/vercel.json)
-      # via the Vercel CLI — its Git auto-deploy is disabled, same as web.
-      # Guarded on VERCEL_PROJECT_ID (not VERCEL_TOKEN, which deploy-web
-      # already has configured) so this stays a true no-op until the cms-dev
-      # Vercel project exists and VERCEL_PROJECT_ID_CMS is set.
-      # For `cms-dev`, Vercel "production" = main, so --prod targets its main
-      # URL, same as deploy-web.
-      - name: Deploy to Vercel (cms-dev)
-        if: ${{ env.VERCEL_PROJECT_ID != '' }}
-        run: |
-          set -euo pipefail
-          : "${VERCEL_TOKEN:?empty — set the VERCEL_TOKEN secret on the development environment}"
-          : "${VERCEL_ORG_ID:?empty — set the VERCEL_ORG_ID Variable on the development environment}"
-          # npx (not `npm install -g`) keeps zizmor's ad-hoc-install audit
-          # green; the package is cached after the first resolution.
-          npx --yes "vercel@${VERCEL_CLI_VERSION}" pull --yes --environment=production --token="$VERCEL_TOKEN"
-          npx --yes "vercel@${VERCEL_CLI_VERSION}" build --prod --token="$VERCEL_TOKEN"
-          npx --yes "vercel@${VERCEL_CLI_VERSION}" deploy --prebuilt --prod --token="$VERCEL_TOKEN"
 
   deploy-web:
     name: Deploy dev web

@@ -8,7 +8,7 @@ description: >-
   functions. The sibling to `service` for non-Sanity data: same contract
   (typed async functions, no React), different store (Neon, not Sanity).
   Consumed by the two apps (`apps/web`, `apps/platform`) and by `@blog/auth`,
-  which binds the Auth.js adapter to its tables — never by `cms`, `service`,
+  which binds the Auth.js adapter to its tables — never by `studio`, `service`,
   or `ui`, and never importing `@blog/auth` back.
 tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
 model: sonnet
@@ -93,7 +93,7 @@ relative paths only within a single slice (`./schema`, `./queries/comments`).
   operator/tenant admin panel, owned by the `platform-app` agent), and
   `@blog/auth`, which binds the Auth.js adapter to your tables. **`@blog/db`
   must never import `@blog/auth`** — the tables live here and `auth` reaches
-  for them, never the reverse. `cms`, `service`, and `ui` never import this
+  for them, never the reverse. `studio`, `service`, and `ui` never import this
   package at all — if one of them appears to need relational data, that is a
   design smell to flag back to the orchestrator, not a reason to add the
   import.
@@ -174,7 +174,7 @@ studio`, local inspection only).
 ## Migrations (the mechanism this repo needs before any table exists)
 
 Drizzle schema migrations are a **different mechanism from the Sanity content
-migrations** in `apps/cms/migrations/` — those transform existing _documents_
+migrations** in `packages/studio/migrations/` — those transform existing _documents_
 when a schema's _shape_ changes; these transform the Postgres _table
 structure_ itself, generated as SQL from a diff against the previous schema.
 Same underlying discipline (review before you touch shared data, back up
@@ -198,7 +198,7 @@ generate`) diffs the schema against the last migration and writes a new
    automatically on merge to `main`** — `deploy-development.yml`'s
    `migrate-db` job (`environment: development`, no approval gate, guarded on
    the `DATABASE_URL_UNPOOLED` GitHub Environment secret), gated on
-   `web` having turbo-ignore-detected changes (apps/cms never touches
+   `web` having turbo-ignore-detected changes (packages/studio never touches
    Postgres) and `needs`-ed by `deploy-web` (not `deploy-studio`) — so code
    never ships ahead of a pending dev schema change. A local apply is still
    fine/normal for iterating before a merge. The job opens with a guard step
@@ -211,7 +211,7 @@ generate`) diffs the schema against the last migration and writes a new
 4. **Back up before applying to the shared/production branch.** The
    production CI job (below) does this automatically via `pg_dump` against
    `DATABASE_URL_UNPOOLED`, uploaded as a 30-day CI artifact, mirroring
-   `pnpm --filter cms dataset:export`'s role for content migrations. Doing
+   `pnpm --filter @blog/studio dataset:export`'s role for content migrations. Doing
    this by hand ad hoc (e.g. investigating outside a normal release) can use
    the same `pg_dump` command, or a Neon branch snapshot
    (`neonctl branches create --parent production --name backup-<date>`) —
@@ -232,7 +232,7 @@ db:migrate` — gated behind a `vX.Y.Z` tag push **and** the `production`
    longer migrate the wrong branch — or nothing at all — while reporting
    success. Every step is guarded on `DATABASE_URL_UNPOOLED`, so the job
    stays a no-op until that secret is configured. Only `deploy-web` `needs`
-   this job (apps/cms never touches Postgres). See `docs/DEPLOY.md`'s "How a
+   this job (packages/studio never touches Postgres). See `docs/DEPLOY.md`'s "How a
    deploy happens" and `docs/context/ci-automation.md` for the full
    description; do not run `db:migrate` against the shared/production branch
    by hand outside this gated CI path.

@@ -11,7 +11,7 @@
     "./db": "./db.js",
     "./ui": "./ui.js",
     "./web": "./web.js",
-    "./cms": "./cms.js",
+    "./studio": "./studio.js",
     "./auth": "./auth.js",
     "./platform": "./platform.js"
   },

@@ -369,7 +369,7 @@ toasts. `src/utils/apply-voice-overrides/apply-voice-overrides.ts` maps each
 override key to its i18n path. When a new i18n key is genuinely that kind of
 copy (not a nav label, breadcrumb, or `ariaLabel` — those stay i18n-only),
 add its mapping there too, and coordinate the matching field in
-`apps/cms/src/schema-types/documents/settings/voice.ts` and
+`packages/studio/src/schema-types/documents/settings/voice.ts` and
 `apps/platform/src/utils/voice-fields/voice-fields.ts` (`platform-app` owns that
 half). No `packages/db` migration is needed — the column is open-ended JSONB.
 

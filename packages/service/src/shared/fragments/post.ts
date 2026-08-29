@@ -8,7 +8,7 @@ import { topicFragment } from './topic';
 import { WORD_COUNT_EXPRESSION, wordCountParser } from './word-count';
 
 // `skim` carries no `.required()` validation in the schema — the whole
-// object, and every field inside it, is optional (see `apps/cms/src/schema-types/objects/skim.ts`).
+// object, and every field inside it, is optional (see `packages/studio/src/schema-types/objects/skim.ts`).
 const skimFragment = q.fragmentForType<'skim'>().project((sub) => ({
   takeaways: sub.field('takeaways[]').nullable(true),
   generatedAt: sub.field('generatedAt').nullable(true),

@@ -1,0 +1,59 @@
+{
+  "name": "@blog/studio",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "dev": "sanity dev --port 3333",
+    "typegen": "node scripts/typegen.mjs",
+    "lint": "eslint .",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
+    "format": "prettier --write .",
+    "migrate:list": "sanity migrations list",
+    "migrate:new": "node scripts/migrate.mjs new",
+    "migrate:track": "node scripts/migrate.mjs track",
+    "migrate:current": "node scripts/migrate.mjs current",
+    "migrate:dry": "node scripts/migrate.mjs dry",
+    "migrate:run": "node scripts/migrate.mjs run",
+    "migrate:deploy": "node scripts/migrate.mjs deploy",
+    "migrate:backfill": "node scripts/migrate.mjs deploy --backfill",
+    "dataset:export": "node scripts/migrate.mjs export",
+    "dataset:refresh-dev": "node scripts/refresh-dev-dataset.mjs"
+  },
+  "dependencies": {
+    "@blog/config": "workspace:*",
+    "@blog/utils": "workspace:*",
+    "@sanity/code-input": "^7.2.10",
+    "@sanity/ui": "^3.5.1",
+    "@sanity/vision": "^6.8.0",
+    "lucide-react": "^1.24.0",
+    "next-sanity": "^13.1.1",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "sanity": "^6.8.0",
+    "sanity-plugin-media": "^6.0.9",
+    "styled-components": "^6.1.15"
+  },
+  "devDependencies": {
+    "@blog/eslint-config": "workspace:*",
+    "@blog/prettier-config": "workspace:*",
+    "@blog/tsconfig": "workspace:*",
+    "@blog/vitest-config": "workspace:*",
+    "@sanity/cli": "^7.7.1",
+    "@sanity/client": "^7.23.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "catalog:",
+    "groq-js": "^1.30.3",
+    "prettier": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

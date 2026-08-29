@@ -30,7 +30,7 @@ D() { git diff "$BASE"...HEAD; git diff; }
 # (src/utils/logger/logger.ts, wrapping createLogger from @blog/insight);
 # service/db/auth never log at all — they return the error to the caller.
 # Exempt: packages/insight/src/** (the logger itself), <repo-root>/scripts/**,
-# apps/cms/scripts/**, packages/db/scripts/**, packages/db/drizzle.config.ts
+# packages/studio/scripts/**, packages/db/scripts/**, packages/db/drizzle.config.ts
 # (stdout IS the interface), *.test.ts(x), and apps/web/e2e/**.
 D | grep -nE '^\+.*console\.(log|info|debug|trace|warn|error)'
 D | grep -nE '^\+.*\bdebugger\b'
@@ -91,7 +91,7 @@ CI-enforced guard was deliberately not added.
   site — `SmartLink` is the one link component (`@web/i18n/navigation` still
   provides `permanentRedirect`/`usePathname`).
 - Dependency graph stays acyclic: `web → ui/service/config/utils`,
-  `service → config/utils`, `ui → config`, `cms → config (types via typegen)`.
+  `service → config/utils`, `ui → config`, `studio → config, utils (typegen source)`.
 
 ## 2. Type safety (blocking)
 
@@ -110,7 +110,7 @@ CI-enforced guard was deliberately not added.
   non-null and throws at `.parse()` on null data → 404. Flag any
   `sub.field(...)` not terminated by `.notNull()`/`.nullable()`, and any
   `.notNull()` on a schema-optional field that should fall back rather than 404.
-- **CMS schema/migration diffs** hold the `cms-schema-practices` bar:
+- **Studio schema/migration diffs** hold the `studio-schema-practices` bar:
   - No stored-value or `_type` literal repeated across files — constants from
     `@blog/config` (renaming a stored value must be a one-file change).
   - Repeated field patterns (e.g. mode+custom pairs) extracted into a schema

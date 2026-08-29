@@ -14,7 +14,7 @@ content; a Next.js 16 App Router site renders it; types flow end-to-end.
 
 ```
 web → ui, service, db, auth, config, utils   service → config, utils (no React)
-platform → db, auth, config, utils          cms → config (types via typegen)
+platform → db, auth, config, utils, studio   studio → config, utils (typegen source)
 ui → config (no Sanity/fetch)               configs/* → consumed by all
 db → config, utils (no React/Sanity)        auth → db, config, utils
 insight → nothing (base of graph, like config/utils)
@@ -46,8 +46,12 @@ graph is acyclic
   two independently maintained configs drift silently. See
   `.claude/agents/auth.md`.
 - `apps/platform` is a separate Next.js app (its own deployment and domain) for
-  the operator/tenant admin panel — it consumes `db`, `auth`, `config`, and
-  `utils`, and **never Sanity or `@blog/service`**. It owns its own
+  the operator/tenant admin panel — it consumes `db`, `auth`, `config`,
+  `utils` and `@blog/studio`, and **never Sanity or `@blog/service`
+  directly**. It reaches the Studio only through `@blog/studio`'s mount
+  component, which builds the Sanity config internally, so the ESLint
+  `no-restricted-imports` group still bans `sanity`, `next-sanity`,
+  `@sanity/*`, `groqd` and `@blog/service` under `apps/platform`. It owns its own
   presentational primitives (Text, Card, Icon, Button, …) as well as its
   interactive ones, all built on Base UI and styled in-app; nothing is added
   to `@blog/ui` for it. The one exception is
@@ -57,6 +61,17 @@ graph is acyclic
   actually looks like — an ESLint `no-restricted-imports` guard confines
   `@blog/ui` imports under `apps/platform` to that one directory. See
   `.claude/agents/platform-app.md`.
+- `@blog/studio` (`packages/studio`) is the Sanity Studio: schema types (the
+  source of truth for every content shape), desk structure, content
+  migrations, and a `StudioMount` component that takes plain strings
+  (`projectId`, `dataset`, `basePath`, `title`), builds the Studio config
+  **internally**, and renders it. It is a **package, not a deployed app** —
+  `apps/platform` mounts it, which is what lets one Studio serve every tenant.
+  Upstream is `config` and `utils` only. Nothing may export a _built_ config
+  object out of the package: a Server Component calling the builder drags the
+  Sanity SDK into the RSC graph, where `swr`, `sanity`'s bundled CSS and
+  `sanity-plugin-media` all break under the `react-server` condition. See
+  `.claude/agents/studio.md`.
 - `@blog/insight` (`packages/insight`) holds the structured logger core —
   `createLogger`, `LOG_LEVEL`, and `sanitizeLogMessage`. Sits at the base of
   the dependency graph alongside `config`/`utils` — depends on nothing.
@@ -140,10 +155,10 @@ self-reported judgment call is a flag to raise, not a decision to rubber-stamp.
 ## Use the scoped agents
 
 Delegate layer work to the matching subagent in `.claude/agents/`, in dependency
-order (`config → cms → service → ui → web` when config changes are involved,
-otherwise `cms → service → ui → web`):
+order (`config → studio → service → ui → web` when config changes are involved,
+otherwise `studio → service → ui → web`):
 `config` (`packages/config`, `packages/utils`, `configs/*` — constants, route
-helpers, shared config packages, alias wiring, guards typegen output), `cms`
+helpers, shared config packages, alias wiring, guards typegen output), `studio`
 (schemas/typegen), `service` (Sanity data layer), `ui` (design system), `web`
 (frontend/SEO + composition).
 
@@ -154,7 +169,7 @@ upstream layer of its own beyond `config`. Its consumers are the two apps plus
 `@blog/auth`, which binds the Auth.js adapter to its tables.
 Dispatch it whenever config/utils changes are settled and before the app work
 that composes its queries: `config → db → web` (parallel to, not blocking,
-`cms → service → ui`) when a feature touches both a Sanity-backed and a
+`studio → service → ui`) when a feature touches both a Sanity-backed and a
 Neon-backed concern. See `.claude/agents/db.md`.
 
 `auth` (`packages/auth`, the shared Auth.js configuration — providers, the
@@ -168,7 +183,7 @@ whether a signed-in user may see a page is each app's decision, made against an
 app, its own deployment and domain) is a **sibling to `web`, not a step in the
 chain either**. Its only upstreams are `config`, `db`, and `auth`, so its
 dispatch order is `config → db → auth → platform-app`; it never waits on
-`cms`/`service`, which it does not consume. Base UI is installed and styled inside that app,
+`studio`/`service`, which it does not consume. Base UI is installed and styled inside that app,
 and it owns its own presentational primitives too — do not route its
 components through the `ui` agent. The one exception is
 `look-preview/preview-sample/`, an ESLint-guarded directory allowed to
@@ -185,7 +200,7 @@ how an app _uses_ the logger belongs to `web`/`platform-app`. See
 
 **Delegating in-scope work to its sub-agent is REQUIRED, not optional — for the
 whole lifecycle, not just the first draft.** Every file that lives in a
-sub-agent's domain (`config`/`cms`/`service`/`ui`/`web`/`db`/`platform-app`/`auth`/`insight` per the map above) is
+sub-agent's domain (`config`/`studio`/`service`/`ui`/`web`/`db`/`platform-app`/`auth`/`insight` per the map above) is
 written, changed, fixed, renamed, and reworked **by that sub-agent** — the
 initial implementation, every review-remediation, every follow-up tweak, every
 "it's one line" edit. The orchestrator _orchestrates_; it does not hand-author
@@ -216,7 +231,7 @@ direct orchestrator edit.
 When a review turns up a blocking finding in a layer file, or a rename / knip /
 lint nit needs a two-line change, patching it inline _feels_ faster than
 re-dispatching the owning agent. That feeling is the rationalization this rule
-exists to stop: a two-line orchestrator edit to a `config`/`cms`/`service`/`ui`/
+exists to stop: a two-line orchestrator edit to a `config`/`studio`/`service`/`ui`/
 `web`/`db`/`platform-app`/`auth` file is still the orchestrator doing a sub-agent's job. Route the fix to
 the owning agent (dispatch, or `SendMessage` it), let it re-export, then
 re-verify and re-review. "Small", "mechanical", "the agent already did the hard
@@ -301,7 +316,7 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
 
 - `develop-feature` at the start of any non-trivial task (lifecycle + delegation).
 - `add-content-type` when a change spans more than one workspace.
-- `cms-schema-practices` when touching `apps/cms` schemas or migrations.
+- `studio-schema-practices` when touching `packages/studio` schemas or migrations.
 - `ui-library-practices` when touching `packages/ui`.
 - `web-component-practices` when building or editing an interactive component in
   `apps/web` (popover/menu/disclosure/clipboard/focus) or composing `@blog/ui`
@@ -390,7 +405,7 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
 - **Absolute imports via per-workspace aliases.** Internal imports use the
   workspace's **own name** as the alias — `@blog/{pkg}/*` for packages
   (`@blog/config`, `@blog/service`, `@blog/ui`), `@{app}/*` for apps
-  (`@web/*`, `@cms/*`). Same-directory `./` stays relative; **never**
+  (`@web/*`, `@platform/*`). Same-directory `./` stays relative; **never**
   parent-traversal `../`, and **never** a shared `#/`/`@/` (a shared prefix
   hijacks a dependency's identically-named alias across packages, and breaks
   the Turbopack build / cross-package type-check). Each workspace's
@@ -432,7 +447,7 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
   keyed by step) and it makes no difference. The counter-example is
   `PRESET_ID` / `FONT_CHOICE` / `RADIUS_SCALE` / `DENSITY`: they _do_ back
   `pgEnum` columns in `site-config.ts`, yet stay in `@blog/config` because
-  `apps/cms` reads all four and `apps/web` / `@blog/service` read some.
+  `packages/studio` reads all four and `apps/web` / `@blog/service` read some.
   Backing a `pgEnum` neither qualifies a const nor disqualifies one.
 
   **`AUDIT_ACTION` / `AUDIT_TARGET_TYPE` are a deliberate exception** and stay
@@ -452,7 +467,10 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
   moves. "Only one app happens to use it today" is not enough — the layer has
   to be where the values are actually persisted.
 
-- `'use client'` never in `@blog/ui` (it stays pure and prop-driven). In
+- `'use client'` never in `@blog/ui` (it stays pure and prop-driven). The one
+  package that may carry it is `@blog/studio`, whose mount component is
+  irreducibly client-side; that exception is scoped to that component and does
+  not license the directive anywhere else in `packages/*`. In
   `apps/web` it IS the right tool — add it at the _leaf boundary_ that
   genuinely needs the client: React hooks (`useState`/`useEffect`), browser
   APIs, event handlers, or wrapping a third-party component that uses hooks
@@ -484,7 +502,7 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   against the consuming workspace and not the repo root — `insight.js` for the
   logger itself, `db.js` for that package's `scripts/**` and
   `drizzle.config.ts`, `web.js` for `e2e/**`, each being a place where stdout
-  _is_ the interface. Root and `apps/cms` scripts need no entry: they are
+  _is_ the interface. Root and `packages/studio` scripts need no entry: they are
   `.mjs`, outside the rule's `.ts`/`.tsx` scope.
   Event names are static, lowercase and dot-namespaced; dynamic values go in
   the context object, never interpolated into the name.
@@ -504,7 +522,7 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   not an obstacle to route around — a shell write (`echo >`, `sed -i`) is not
   blocked, but it is still wrong: a hand-edit is silently undone by the next
   `pnpm typegen` and caught by CI's typegen drift guard. If a generated type is
-  wrong, the **schema** in `apps/cms` is wrong — fix it there and regenerate.
+  wrong, the **schema** in `packages/studio` is wrong — fix it there and regenerate.
 - **Check for migrations.** Content is live in the `production` dataset, so any
   change that alters an _existing_ shape — renaming/removing/moving a field,
   renaming a `_type`, restructuring a document — orphans data unless existing
@@ -513,7 +531,7 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   documents/fields change, the `sanity/migrate` transform, dry-run → backup →
   human-gated run) — do not just change the schema. Additive, optional-only
   changes need no migration; say so explicitly. Use the tooling and workflow in
-  `apps/cms/migrations/` (`README.md` + `migrate:dry`/`migrate:run`/`dataset:export`).
+  `packages/studio/migrations/` (`README.md` + `migrate:dry`/`migrate:run`/`dataset:export`).
   Migrations against `production` are human-gated like `sanity deploy`.
 - **Check for `db` (Neon/Drizzle) migrations too.** Any change to a
   `packages/db/src/schema/*.ts` table needs a generated migration — a schema
@@ -547,8 +565,8 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   `chore(deps): …` messages are not separately exempted — they pass because
   they're already conventional.
 - **Prefer per-layer PRs.** Split a multi-layer feature into separate PRs per
-  layer (`config → cms → service → ui → web` when config changes are involved,
-  otherwise `cms → service → ui → web`; dependency order) so each review stays
+  layer (`config → studio → service → ui → web` when config changes are involved,
+  otherwise `studio → service → ui → web`; dependency order) so each review stays
   small and focused. **Split only when each layer's PR merges to `main` green
   on its own** (typically additive changes). Keep it a single PR when a partial
   merge would break the build — e.g. renaming a shared `_type` or generated

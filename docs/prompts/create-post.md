@@ -4,7 +4,7 @@ Paste everything below the line into any capable AI agent (Claude, etc.) when yo
 want to draft a new post for this blog. It teaches the agent the **exact content
 model** of this CMS, the **relations** a post needs, what the **body** can
 contain, and the **output format** to produce. It is deliberately CMS-accurate:
-every field, limit, and relation matches `apps/cms/src/schema-types/`.
+every field, limit, and relation matches `packages/studio/src/schema-types/`.
 
 > Output target: **Markdown draft + a field sheet** (a table of every CMS field),
 > **image specs** (alt text + a generation prompt) for each image slot, **and an
@@ -158,7 +158,7 @@ body capabilities above:
   `highlight: [lines]` in a comment line above the fence when you want them, e.g.
 
   ````
-  <!-- filename: apps/cms/.../post.ts | highlight: [4] -->
+  <!-- filename: packages/studio/.../post.ts | highlight: [4] -->
   ```ts
   …
   ```

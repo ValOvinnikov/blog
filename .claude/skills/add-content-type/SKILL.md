@@ -17,17 +17,17 @@ let each layer's agent own its step. Architecture rules live in `SPEC.md`.
 ## The flow (always this direction)
 
 ```
-cms (schema) ──typegen──► @blog/config ──► @blog/service ──► apps/web ──props──► @blog/ui
+studio (schema) ──typegen──► @blog/config ──► @blog/service ──► apps/web ──props──► @blog/ui
 ```
 
 Build in dependency order. Never skip a layer; never reverse the arrows.
 
-## Step 1 — Schema (`apps/cms`) · agent: `cms`
+## Step 1 — Schema (`packages/studio`) · agent: `studio`
 
 - **Migration check first:** if the change alters an _existing_ shape, surface
-  a migration plan (`apps/cms/migrations/README.md`) before touching the
+  a migration plan (`packages/studio/migrations/README.md`) before touching the
   schema. Additive optional-only changes need none — say so explicitly.
-- Define/extend the type in `apps/cms/src/schema-types/` with
+- Define/extend the type in `packages/studio/src/schema-types/` with
   `defineType`/`defineField`; follow the `{group}_{name}` naming convention.
 - Add `validation: rule => rule.required()` on any field consumers will assume;
   images get `options: { hotspot: true }` + a required `alt`. Enum-ish stored
@@ -37,9 +37,9 @@ Build in dependency order. Never skip a layer; never reverse the arrows.
   workflow is uncertain, use the `use-context7` skill to fetch Sanity v6 docs
   before writing schema code.
 
-## Step 2 — Typegen (`apps/cms`) · agent: `cms`
+## Step 2 — Typegen (`packages/studio`) · agent: `studio`
 
-- Run `pnpm --filter cms typegen`. Confirm the shape appears in
+- Run `pnpm --filter @blog/studio typegen`. Confirm the shape appears in
   `packages/config/src/sanity/generated/types.ts`. Typegen can be
   non-deterministic — re-run until the diff is minimal. **Commit the generated
   files.**
@@ -54,7 +54,7 @@ Build in dependency order. Never skip a layer; never reverse the arrows.
 - Return types derive from the generated types in `@blog/config` (or
   `InferResultType`/`InferFragmentType`); no `any`. **No React import.**
 - **Imports use the workspace alias** (`@blog/service/*` here, `@web/*` in web,
-  `@cms/*` in cms, …), never parent-traversal `../` — see CLAUDE.md →
+  `@blog/studio` in studio, …), never parent-traversal `../` — see CLAUDE.md →
   Conventions. If a layer starts importing a package it didn't before, add that
   dependency's alias to the consumer's `tsconfig` `paths` **and**
   `vitest.config.ts` alias, or type-check/test/build will fail.

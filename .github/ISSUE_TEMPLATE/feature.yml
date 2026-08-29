@@ -18,10 +18,10 @@ body:
     attributes:
       label: Layers touched
       description: >-
-        Which workspaces change (drives delegation order cms → service → ui →
-        web and the per-layer PR split).
+        Which workspaces change (drives delegation order studio → service → ui
+        → web and the per-layer PR split).
       options:
-        - label: cms (apps/cms — schemas, desk, migrations)
+        - label: studio (packages/studio — schemas, desk, migrations)
         - label: service (packages/service — GROQ, fetchers)
         - label: ui (packages/ui — design system)
         - label: web (apps/web — routes, SEO, composition)

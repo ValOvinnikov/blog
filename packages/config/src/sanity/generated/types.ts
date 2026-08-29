@@ -14,7 +14,7 @@
 
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
-// Source: ../../packages/config/src/sanity/generated/schema.json
+// Source: ../config/src/sanity/generated/schema.json
 export type Module_newsletter = {
   _id: string;
   _type: 'module_newsletter';

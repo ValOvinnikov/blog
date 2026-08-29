@@ -117,21 +117,22 @@ Three projects per environment — a web project, a Studio project (replacing
 - **Web:** `blog-dev`, `blog-prod` — Add New → Project → import
   `{github_account}/blog`; **Root Directory `apps/web`** + tick _"Include files
   outside of the root directory"_; **Node.js 22.x**.
-- **Studio:** `cms-dev`, `cms-prod` — same import flow; **Root Directory
-  `apps/cms`** + tick _"Include files outside of the root directory"_;
-  **Node.js 22.x**; Framework Preset **Other** (the build/output commands
-  come from `apps/cms/vercel.json`, not framework auto-detection).
+- **Studio:** `cms-dev`, `cms-prod` — **no longer deployed to.** The Studio
+  stopped being its own app: it ships as the `@blog/studio` package and is
+  mounted by the platform app, so its CI deploy jobs and `vercel.json` are
+  gone. These two projects still exist in the Vercel console and are
+  decommissioned separately — until then they simply receive nothing.
 - **Admin:** `admin-dev`, `admin-prod` — same import flow; **Root Directory
   `apps/platform`** + tick _"Include files outside of the root directory"_;
   **Node.js 22.x**. A separate project rather than a second domain on
   `blog-dev`/`blog-prod`: a Vercel project has exactly one Root Directory,
   and the panel is a second Next.js app under `apps/platform`.
 
-All six projects have Vercel's Git auto-deploy **disabled** — every deploy
+All of these projects have Vercel's Git auto-deploy **disabled** — every deploy
 goes through a CI-gated GitHub Actions job (no pre-merge/preview deploys,
 nothing deploys before checks pass). This is set **once, in code**, via each
 app's own `vercel.json`'s `git.deploymentEnabled: false` (`apps/web`,
-`apps/cms`, `apps/platform`) — since the two projects sharing a Root Directory
+`apps/platform`) — since the two projects sharing a Root Directory
 get the same committed file, it can't silently drift the way a per-project
 console toggle (the old "Ignored Build Step" setting) could — a missed
 one-time click on `blog-prod` once meant it deployed on every branch push,
@@ -356,10 +357,11 @@ Provisioning notes for recreating this from scratch:
       mis-set `production` secret fails it loudly instead of silently
       migrating the wrong branch (or nothing at all) while reporting success.
 
-**Studio** (`cms-dev` / `cms-prod`, Production scope — `vercel pull
---environment=production` in CI only reads that scope): `sanity build`
-(invoked by `apps/cms/vercel.json`'s `buildCommand`) loads `sanity.cli.ts`,
-which requires these two:
+**Studio** (`cms-dev` / `cms-prod`) — **no longer built or deployed.** The
+Studio ships as the `@blog/studio` package and is mounted by the platform
+app, so nothing runs `sanity build` in CI and `apps/cms/vercel.json` is gone.
+These two projects and the values below are retained only until they are
+decommissioned; setting them on a fresh environment achieves nothing:
 
 | Key                        | `cms-dev` value    | `cms-prod` value   |
 | -------------------------- | ------------------ | ------------------ |
@@ -694,7 +696,7 @@ Create **two** (the route `/api/revalidate` already exists):
 Once `studio.{your-hosting}` / `studio-dev.{your-hosting}` are live and verified
 (Studio loads, signs in, and can read/write the correct dataset):
 
-- [ ] From `apps/cms`, with each project's env pointed at it (`SANITY_STUDIO_HOSTNAME`
+- [ ] From `packages/studio`, with each project's env pointed at it (`SANITY_STUDIO_HOSTNAME`
       is required here — `sanity undeploy` errors with "No application ID or
       studio host provided" without it, even though nothing deploys with it
       set anymore):
@@ -711,7 +713,7 @@ Once `studio.{your-hosting}` / `studio-dev.{your-hosting}` are live and verified
 
 Local dev points at the **dev** project (`<DEV_PROJECT_ID>`):
 
-- [ ] `apps/cms/.env` (gitignored): `SANITY_STUDIO_PROJECT_ID=<DEV_PROJECT_ID>`,
+- [ ] `packages/studio/.env` (gitignored): `SANITY_STUDIO_PROJECT_ID=<DEV_PROJECT_ID>`,
       `SANITY_STUDIO_DATASET=development`.
 - [ ] `apps/web/.env.local` (gitignored): `NEXT_PUBLIC_SANITY_PROJECT_ID=<DEV_PROJECT_ID>`,
       `NEXT_PUBLIC_SANITY_DATASET=development`, and optionally
@@ -746,11 +748,10 @@ deploys before checks pass):
 3. **`migrate`** (`environment: development`) applies any un-applied migrations
    to the **development** dataset via `migrate:deploy` (a no-op when none are
    pending), so dev's data never lags its code — the #355 failure mode. It is
-   gated on `cms`-or-`web` — the union of the jobs that depend on it, narrower
+   gated on `studio`-or-`web` — the union of the jobs that depend on it, narrower
    than `verify`'s condition, so an admin-only merge doesn't run a Sanity
    migration for an app that never touches Sanity, while still never being
-   skipped out from under a deploy that needs it. `deploy-studio` `needs:
-[changes, verify, migrate]` and `deploy-web` `needs: [changes, verify,
+   skipped out from under a deploy that needs it. `deploy-web` `needs: [changes, verify,
 migrate, migrate-db]` (see step 4 below for `migrate-db`). No
    artifact backup here — dev is the disposable staging line (see "Refreshing
    development from production"
@@ -761,9 +762,9 @@ migrate, migrate-db]` (see step 4 below for `migrate-db`). No
    above, for the separate `@blog/db` (Drizzle/Neon) relational store: applies
    any un-applied schema migrations to the **development** Neon branch via
    `pnpm --filter @blog/db db:migrate` (`drizzle-kit migrate`, a no-op when
-   none are pending). Gated on `web`-or-`admin` (apps/cms never touches
-   Postgres, so a cms-only change doesn't trigger it); `deploy-web` and
-   `deploy-admin` `need` it, `deploy-studio` doesn't. No artifact backup here,
+   none are pending). Gated on `web`-or-`admin` (the Studio never touches
+   Postgres, so a studio-only change doesn't trigger it); `deploy-web` and
+   `deploy-admin` `need` it. No artifact backup here,
    same disposable-staging-line stance as `migrate`; guarded on
    `DATABASE_URL_UNPOOLED`, so it's inert until that secret exists. Before
    applying, a guard step compares the resolved connection host against the
@@ -773,11 +774,9 @@ migrate, migrate-db]` (see step 4 below for `migrate-db`). No
    skips) if that Variable is unset or malformed. **No approval gate on
    dev.** See
    `.claude/agents/db.md`'s "Migrations" section.
-5. **`deploy-studio`** → `cms-dev` via the Vercel CLI (`studio-dev.{your-hosting}`),
-   same mechanism as `deploy-web`.
-6. **`deploy-web`** → `blog-dev` via the Vercel CLI
+5. **`deploy-web`** → `blog-dev` via the Vercel CLI
    (`vercel pull → build --prod → deploy --prebuilt --prod`).
-7. **`deploy-admin`** → `admin-dev` via the Vercel CLI, same mechanism.
+6. **`deploy-admin`** → `admin-dev` via the Vercel CLI, same mechanism.
    `needs: [changes, verify, migrate-db]` — it depends on `@blog/db` (it
    writes `site_config`), so it is at least as exposed to schema drift as the
    public site is, but not on `migrate`, since it never reads Sanity.
@@ -786,7 +785,7 @@ Concurrency is scoped **per job**, not workflow-wide. `changes` / `verify` /
 `deploy-*` each keep `cancel-in-progress: true`, so a newer merge still
 supersedes an in-flight build/deploy — "latest merge wins" still holds. (The
 supersede is slightly lazier than the old workflow-level cancel: a per-job
-group cancels an older run's `deploy-web`/`deploy-studio` only once the newer
+group cancels an older run's `deploy-web`/`deploy-admin` only once the newer
 run's _same_ job is ready to start — i.e. after the newer run clears its own
 `changes` → `verify` → `migrate`/`migrate-db` chain — so an old deploy can
 finish before being superseded rather than being cut off the instant a new
@@ -828,17 +827,15 @@ There are **no PR preview deployments** — deploys happen only on merge to `mai
    guard step itself fails the job (not silently skips) if that Variable is
    unset or malformed. Every step is guarded on `DATABASE_URL_UNPOOLED`, so
    the job is a **no-op until that secret is configured** — safe to ship
-   ahead of setup. `deploy-web` and `deploy-admin` `need` it (apps/cms never
+   ahead of setup. `deploy-web` and `deploy-admin` `need` it (the Studio never
    touches Postgres). See `.claude/agents/db.md`'s "Migrations" section.
-4. **`deploy-studio`** → `cms-prod` via the Vercel CLI (`studio.{your-hosting}`),
-   same mechanism as `deploy-web`.
-5. **`deploy-web`** → `blog-prod` via the Vercel CLI
+4. **`deploy-web`** → `blog-prod` via the Vercel CLI
    (`vercel pull → build --prod → deploy --prebuilt --prod`).
-6. **`deploy-admin`** → `admin-prod` via the Vercel CLI, same mechanism. A tag
-   is a deliberate full release, so all three apps deploy — there is no change
+5. **`deploy-admin`** → `admin-prod` via the Vercel CLI, same mechanism. A tag
+   is a deliberate full release, so both apps deploy — there is no change
    detection on the production side.
 
-`deploy-studio` `needs: [verify, migrate]`; `deploy-web` `needs: [verify,
+`deploy-web` `needs: [verify,
 migrate, migrate-db]`; `deploy-admin` `needs: [verify, migrate-db]` — so **new
 code is never served before pending migrations run**; a failed or
 reviewer-rejected `migrate`/`migrate-db` skips the deploy(s) that depend on
@@ -863,10 +860,10 @@ pre-migration shapes that no longer match the deployed schema:
 2. Actions → **Refresh Dev Dataset** → **Run workflow** (`main`).
 3. The job exports `production` (published-only), wipes every document in
    `development`, then imports — direction is hardcoded in
-   `apps/cms/scripts/refresh-dev-dataset-lib.mjs`'s safety guard, so a
+   `packages/studio/scripts/refresh-dev-dataset-lib.mjs`'s safety guard, so a
    misconfigured environment fails loudly rather than silently reversing.
 
-See `apps/cms/migrations/README.md` for the underlying script details.
+See `packages/studio/migrations/README.md` for the underlying script details.
 
 ---
 
@@ -921,7 +918,7 @@ _before_ it merges, which a post-merge-only deploy would defeat. See
 for the full design discussion.
 
 Build/output/skip-when-unaffected config is in code
-(`packages/ui/vercel.json`), same philosophy as `apps/web`/`apps/cms`'s
+(`packages/ui/vercel.json`), same philosophy as `apps/web`/`apps/platform`'s
 `vercel.json`; only project creation, domain, and confirming Git
 integration stays **on** are human-gated console steps:
 
@@ -1039,7 +1036,7 @@ production deployment before `VERCEL_GIT_PREVIOUS_SHA` has anything to hold.
 Promote an existing successful preview deployment to production in the
 dashboard — a console action, like everything else in this doc.
 
-Because `apps/web`, `apps/cms` and `apps/platform`'s primary projects all set
+Because `apps/web` and `apps/platform`'s primary projects both set
 `git.deploymentEnabled: false` (CI-gated pipeline), these two Storybook
 projects are the **only** ones that preview-deploy on a PR. Deploy volume is
 therefore already minimal — each builds only when genuinely affected. When a

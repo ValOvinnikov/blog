@@ -9,7 +9,7 @@
 # the orchestrator to hand to the owning layer agent, never be applied here.
 #
 # Wired in test-writer's frontmatter only, so it fires exclusively for that
-# agent's Edit/Write calls; layer agents (cms/service/ui/web) never see it.
+# agent's Edit/Write calls; layer agents (studio/service/ui/web) never see it.
 #
 # This is one half of the boundary, not the whole thing: Edit/Write are both
 # in the session-wide allow-list regardless of `permissionMode`, so this hook

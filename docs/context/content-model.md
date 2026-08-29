@@ -4,7 +4,7 @@
 > Referenced from `SPEC.md` §6. Update this file (not a duplicate) whenever
 > the Sanity schema changes shape.
 
-Source of truth: `apps/cms/src/schema-types/` (documents grouped `blog/`,
+Source of truth: `packages/studio/src/schema-types/` (documents grouped `blog/`,
 `pages/`, `settings/`; shared `objects/`; `modules/` — standalone,
 cross-referenceable page-builder documents, not embedded objects). Naming
 convention `{group}_{name}` is being applied incrementally (#251):
@@ -29,7 +29,7 @@ than a `modules[]` array, so none can reach `ModuleRenderer`. Exclusion there
 does **not** exempt them from `REVALIDATE_TAGS`, which requires an entry for
 every module type.
 
-**Module documents** (`apps/cms/src/schema-types/modules/`)
+**Module documents** (`packages/studio/src/schema-types/modules/`)
 
 - `module_hero` (`heroSchema`) — internal `title`, `featuredPost` (ref to
   `post`, warning-only — falls back to the newest featured post), four
@@ -244,7 +244,7 @@ changing a schema does **not** change existing documents.
   `_type`, restructure a document) **requires a content migration** — decide
   this before implementing, and surface the plan to the user. Additive,
   optional-only changes need none (say so explicitly).
-- Tooling lives in `apps/cms/migrations/` (`README.md`) with helper scripts:
+- Tooling lives in `packages/studio/migrations/` (`README.md`) with helper scripts:
   `migrate:new` (folders are now UTC-timestamped, `YYYYMMDDTHHmm-<slug>`, for
   deterministic run order) / `migrate:dry` / `migrate:run` / `dataset:export`.
 - Workflow: **dry-run → dataset export (backup) → human-gated run**. Running
@@ -264,12 +264,11 @@ changing a schema does **not** change existing documents.
   token — dry-runs each one read-only. It never mutates data.
 - `migrate:deploy --yes` is automated as part of the deploy pipeline: dev runs
   it via `deploy-development.yml`'s `migrate` job on merges to `main` that
-  touch `cms` or `web` (an admin-only merge skips it, since neither changed —
-  this condition is broader than `deploy-studio`'s `cms`-only gate, since a
-  web-only change also needs the migration), production runs it
+  touch `studio` or `web` (an admin-only merge skips it, since neither changed;
+  a web-only change still needs the migration), production runs it
   unconditionally via `deploy-production.yml` on a `vX.Y.Z` tag push, after a
   dataset export backup and behind the `production` Environment's
   required-reviewer gate, same as `sanity deploy`. Both commands remain
   available to run manually (e.g.
-  `SANITY_STUDIO_DATASET=development pnpm --filter cms migrate:deploy`) for
+  `SANITY_STUDIO_DATASET=development pnpm --filter @blog/studio migrate:deploy`) for
   local rehearsal or backfilling a dataset outside the pipeline.

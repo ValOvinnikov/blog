@@ -4,7 +4,7 @@
 > Referenced from `SPEC.md` §5.
 
 ```
-Sanity Studio (apps/cms)
+Sanity Studio (packages/studio)
       │  pnpm typegen  (sanity schema extract → schema.json,
       │                 sanity typegen generate → types.ts)
       ▼
@@ -20,8 +20,8 @@ apps/web
   └─ per-module component  fetches service.modules.<type>, maps view-model ──plain typed props──►  @blog/ui organism
 ```
 
-- Typegen config lives in `apps/cms/sanity.cli.ts`; the script is
-  `pnpm --filter cms typegen`. **Commit the generated files.**
+- Typegen config lives in `packages/studio/sanity.cli.ts`; the script is
+  `pnpm --filter @blog/studio typegen`. **Commit the generated files.**
 - Typegen output can be non-deterministic across runs — if the diff churns,
   re-run until minimal before committing.
 - Generated types mark **every** field optional (validation is runtime-only).

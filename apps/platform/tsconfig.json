@@ -13,7 +13,8 @@
       "@blog/auth/*": ["../../packages/auth/src/*"],
       "@blog/insight/*": ["../../packages/insight/src/*"],
       "@blog/config/*": ["../../packages/config/src/*"],
-      "@blog/ui/*": ["../../packages/ui/src/*"]
+      "@blog/ui/*": ["../../packages/ui/src/*"],
+      "@blog/studio/*": ["../../packages/studio/src/*"]
     },
     "plugins": [
       {

@@ -3,7 +3,7 @@
  * static route in Next.js route priority (static > dynamic > catch-all).
  * A generic content page (routed by the `/[slug]` catch-all)
  * slugged with one of these values would be silently unreachable, so both
- * `apps/cms` (slug validation) and `apps/web` (route-subset coverage) consume
+ * `packages/studio` (slug validation) and `apps/web` (route-subset coverage) consume
  * this as the single source of truth.
  */
 export const RESERVED_SLUGS = [

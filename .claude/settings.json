@@ -80,7 +80,7 @@
       "Bash(mv *.env*)",
       "Bash(printenv:*)",
       "Bash(env)",
-      "Bash(pnpm --filter cms deploy:*)",
+      "Bash(pnpm --filter @blog/studio deploy:*)",
       "Bash(npx sanity deploy:*)",
       "Bash(vercel --prod:*)",
       "Bash(vercel deploy --prod:*)",
