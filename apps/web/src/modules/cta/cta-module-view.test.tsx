@@ -4,8 +4,28 @@ import {
   ctaActionsDemo,
   ctaContentDemo,
 } from '@web/testing/modules/cta/fixtures';
+import type { ReactNode } from 'react';
 
 import { CtaModuleView } from './cta-module-view';
+
+// Faking `Section` exposes the `brandVariant` it receives as a `data-*`
+// attribute, so the pinning assertion below reads the actual prop value
+// instead of the rendered `tv()` background class.
+vi.mock('@web/components/shared/section', () => ({
+  Section: ({
+    brandVariant,
+    titleId,
+    children,
+  }: {
+    brandVariant: string;
+    titleId?: string;
+    children?: ReactNode;
+  }) => (
+    <section aria-labelledby={titleId} data-brand-variant={brandVariant}>
+      {children}
+    </section>
+  ),
+}));
 
 const setup = customRender(CtaModuleView, {
   id: 'cta-1',
@@ -61,8 +81,10 @@ describe(CtaModuleView, () => {
     const section = screen
       .getByRole('heading', { level: 2 })
       .closest('section');
-    expect(section).toHaveClass('bg-primary');
-    expect(section).not.toHaveClass('bg-brand-primary-muted');
+    expect(section).toHaveAttribute(
+      'data-brand-variant',
+      BRAND_VARIANT.PRIMARY,
+    );
   });
 
   it('renders authored actions through ActionGroup, in order', () => {

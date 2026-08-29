@@ -14,7 +14,7 @@ export interface IActionGroupProps {
   isOnDark?: boolean;
 }
 
-const toButtonVariant = (
+export const toButtonVariant = (
   variant: TCtaAction['variant'],
   appearance: TCtaAction['appearance'],
 ): TActionButtonVariant => {
@@ -22,12 +22,18 @@ const toButtonVariant = (
   return variant === CTA_ACTION_VARIANT.PRIMARY ? 'primary' : 'ghost';
 };
 
+export const toIsReversedOnDark = (
+  isOnDark: boolean | undefined,
+  variant: TActionButtonVariant,
+): boolean => Boolean(isOnDark) && variant !== 'primary';
+
 /**
  * ActionGroup — renders a CTA module's authored actions in order (already
  * validated Primary-first by the Studio schema), mapping each item's
  * variant/appearance onto a `Button` variant. Forwards the authored
- * `ariaLabel` through to the rendered link's native `aria-label` — closes
- * #1861.
+ * `ariaLabel` through to the rendered link's `aria-label`, so screen readers
+ * get a distinguishing accessible name when several actions share generic
+ * link text (e.g. two "Learn more" buttons).
  */
 export const ActionGroup = ({ actions, isOnDark }: IActionGroupProps) => (
   <>
@@ -43,7 +49,7 @@ export const ActionGroup = ({ actions, isOnDark }: IActionGroupProps) => (
           aria-label={action.link.ariaLabel}
           variant={variant}
           className={actionGroupVariants({
-            isOnDark: Boolean(isOnDark) && variant !== 'primary',
+            isOnDark: toIsReversedOnDark(isOnDark, variant),
           })}
         >
           {action.link.label}

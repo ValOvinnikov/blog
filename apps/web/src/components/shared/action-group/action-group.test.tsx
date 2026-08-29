@@ -1,7 +1,11 @@
 import { CTA_ACTION_APPEARANCE, CTA_ACTION_VARIANT } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 
-import { ActionGroup } from './action-group';
+import {
+  ActionGroup,
+  toButtonVariant,
+  toIsReversedOnDark,
+} from './action-group';
 
 const primaryAction = {
   variant: CTA_ACTION_VARIANT.PRIMARY,
@@ -42,11 +46,9 @@ describe(ActionGroup, () => {
     expect(links[1]).toHaveTextContent('Learn more');
   });
 
-  // Regression for #1861: CtaModuleView used to build its action link
-  // straight from `SmartLink`, silently dropping the authored `ariaLabel`.
-  // Verified against a pre-fix stub omitting `aria-label` — that version
-  // fails this assertion (no accessible name match), confirming the test
-  // actually exercises the fix rather than passing unconditionally.
+  // Checked against a stub that omits `aria-label` — that version fails
+  // this assertion, confirming the test exercises the forwarding rather
+  // than passing unconditionally.
   it('forwards the authored ariaLabel to the rendered link accessible name', () => {
     setup();
 
@@ -62,50 +64,50 @@ describe(ActionGroup, () => {
 
     expect(screen.getByRole('link', { name: 'Subscribe now' })).toBeVisible();
   });
+});
 
-  it('maps a PRIMARY + CONTAINED action to the primary button treatment', () => {
-    setup();
-
-    expect(screen.getByRole('link', { name: 'Subscribe now' })).toHaveClass(
-      'bg-brand-primary-solid',
-    );
-  });
-
-  it('maps a SECONDARY + CONTAINED action to the ghost button treatment', () => {
-    setup();
-
+describe(toButtonVariant, () => {
+  it('maps a PRIMARY + CONTAINED action to the primary button variant', () => {
     expect(
-      screen.getByRole('link', {
-        name: 'Learn more about our subscription plans',
-      }),
-    ).toHaveClass('border-border-strong');
+      toButtonVariant(
+        CTA_ACTION_VARIANT.PRIMARY,
+        CTA_ACTION_APPEARANCE.CONTAINED,
+      ),
+    ).toBe('primary');
   });
 
-  it('maps an INLINE appearance action (either variant) to the link button treatment', () => {
-    setup({
-      actions: [
-        {
-          ...primaryAction,
-          appearance: CTA_ACTION_APPEARANCE.INLINE,
-        },
-      ],
-    });
-
-    expect(screen.getByRole('link', { name: 'Subscribe now' })).toHaveClass(
-      'underline',
-    );
-  });
-
-  it('reverses non-primary buttons to white when isOnDark is set, leaving primary untouched', () => {
-    setup({ isOnDark: true });
-
-    expect(screen.getByRole('link', { name: 'Subscribe now' })).not.toHaveClass(
-      'text-white',
-    );
+  it('maps a SECONDARY + CONTAINED action to the ghost button variant', () => {
     expect(
-      screen.getByRole('link', {
-        name: 'Learn more about our subscription plans',
-      }),
-    ).toHaveClass('text-white');
+      toButtonVariant(
+        CTA_ACTION_VARIANT.SECONDARY,
+        CTA_ACTION_APPEARANCE.CONTAINED,
+      ),
+    ).toBe('ghost');
+  });
+
+  it('maps an INLINE appearance action to the link variant regardless of its variant', () => {
+    expect(
+      toButtonVariant(CTA_ACTION_VARIANT.PRIMARY, CTA_ACTION_APPEARANCE.INLINE),
+    ).toBe('link');
+    expect(
+      toButtonVariant(
+        CTA_ACTION_VARIANT.SECONDARY,
+        CTA_ACTION_APPEARANCE.INLINE,
+      ),
+    ).toBe('link');
+  });
+});
+
+describe(toIsReversedOnDark, () => {
+  it('reverses a non-primary button when isOnDark is set', () => {
+    expect(toIsReversedOnDark(true, 'ghost')).toBe(true);
+  });
+
+  it('leaves the primary button untouched even when isOnDark is set', () => {
+    expect(toIsReversedOnDark(true, 'primary')).toBe(false);
+  });
+
+  it('does not reverse a non-primary button when isOnDark is not set', () => {
+    expect(toIsReversedOnDark(undefined, 'ghost')).toBe(false);
   });
 });
