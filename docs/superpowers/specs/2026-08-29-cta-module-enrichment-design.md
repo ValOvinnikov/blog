@@ -381,18 +381,26 @@ A `packages/ui` molecule taking the normalised actions and rendering the buttons
 
 ---
 
-## 9. Migration
+## 9. Migration — none required (verified)
 
-Existing `module_cta` documents have a required single `action: link` and a plain `sectionHeader.supportingText`. A Sanity migration under `packages/studio/migrations/`:
+**There are no `module_cta` documents in any dataset, so no data migration is needed.** Verified 2026-08-29 by querying both content lakes directly:
 
-1. `variant` → `CALLOUT` (closest to today's single-column band); `brandVariant` unchanged.
-2. `action` → `actions.primary = <old action>`, then remove `action`. `secondaryAppearance` is left unset (it defaults to `CONTAINED` and is hidden with no secondary).
-3. `sectionHeader` is **kept as-is** — `heading`, `supportingText` (plain), and `align` need no transform. The new `content` field starts empty; editors add rich content where wanted.
-4. No image is added (Callout's image is optional).
+| Dataset                    | Total docs | `module_cta` | Module types actually present                                                                     |
+| -------------------------- | ---------- | ------------ | ------------------------------------------------------------------------------------------------- |
+| `50l5r0vs` / `development` | 122        | **0**        | `module_hero`, `module_newsletter`, `module_postLatest`, `module_postList`, `module_taxonomyList` |
+| `7fuqzuyl` / `production`  | 69         | **0**        | `module_content`, `module_hero`, `module_postList`                                                |
 
-Ship the schema + migration together. The old `action` field is removed only once the migration has run — deprecate-then-delete across two releases if content is live. Per `CLAUDE.md`, a migration against `production` is **human-gated**: `db`-style dry-run → backup → explicit approval → run.
+Both queries returned real content (so the zero is a genuine absence, not an access failure). `module_cta` is a schema type that has never been authored against.
 
----
+**Consequences:**
+
+- The required `action` field can be **removed outright** in the same change that adds `actions`. Nothing orphans.
+- No `sanity/migrate` transform, no dry-run, no backup, no human-gated production run.
+- The "deprecate-then-delete across two releases" caution that would otherwise apply is moot.
+
+**The one caveat:** this holds only while the count stays zero. If a CTA is authored between now and the schema landing, re-check before removing `action` — a single `count(*[_type == "module_cta"])` against both datasets is enough. Ship the schema promptly rather than leaving it staged for weeks.
+
+_(This section previously specified a full migration. That was written before the datasets were checked; the check found nothing to migrate.)_
 
 ## 10. Validation summary
 
@@ -436,6 +444,7 @@ Note how much shorter this is than the array shape would need: max-2, variant-un
 - **D9 ✔** — The basic rich-text block is named **`basicText`**, not `ctaContent`, because the gap it fills is generic. §6.
 - **D10 ✔** — **`--shadow-card` is a new token** added to `configs/tailwind/theme.css` in both themes, as a config-layer prerequisite. §4.1.
 - **D11 ✔** — #1861's `ariaLabel` fix is absorbed into this work's web layer; its sibling-module sweep becomes a separate follow-up issue. §8.1.
+- **D12 ✔** — **No data migration.** Both datasets hold zero `module_cta` documents, so `action` is removed outright rather than migrated. §9 carries the evidence and the one caveat.
 
 **Still open:**
 
@@ -452,7 +461,7 @@ Dependency order, one PR per layer where each merges green on its own:
 - **Config:** `--shadow-card` renders in both themes; new constants exported.
 - **Schema:** unit-test the `actionGroup` validator (empty, primary-only, primary+secondary, secondary-only → reject) and the Banner/Split image requirement.
 - **Component:** Storybook stories per variant × tone × action shape; visual check of the contained card in light and dark against the mock.
-- **Migration:** dry-run against a content export; assert every legacy `action` becomes `actions.primary`, and that `sectionHeader` is untouched.
+- **Migration:** none — re-confirm `count(*[_type == "module_cta"])` is still 0 in both datasets immediately before the schema PR merges (§9).
 - **A11y:** axe pass on each variant; manual keyboard/reading-order check that actions precede a decorative image; the #1861 `ariaLabel` regression test must fail without the fix.
 
 _Reference mock: `docs/design-reference/cta-module-system.html`._
