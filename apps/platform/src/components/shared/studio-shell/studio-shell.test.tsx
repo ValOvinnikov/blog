@@ -12,14 +12,4 @@ describe(StudioShell, () => {
 
     expect(screen.getByText('studio content')).toBeVisible();
   });
-
-  it('renders without throwing', () => {
-    expect(() =>
-      render(
-        <StudioShell>
-          <span>content</span>
-        </StudioShell>,
-      ),
-    ).not.toThrow();
-  });
 });

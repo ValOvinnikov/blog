@@ -18,13 +18,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /**
- * `requireTenantById` — not a `memberships` check — gates this: any
- * `admins` row may open any tenant's Studio here, regardless of whether
- * that admin also holds a `memberships` row for it. An owner with no
- * `admins` row 404s at the ancestor layout before the tenant is even
- * looked up here, so editing the `tenantId` in the URL can't reach another
- * tenant's Studio. `requireTenantById` is `cache()`-wrapped, so this reuses
- * the ancestor layout's fetch rather than resolving the tenant twice.
+ * `requireTenantById` — not a `memberships` check — gates this: any `admins`
+ * row may open any tenant's Studio here regardless of whether that admin
+ * also holds a `memberships` row for it, and an owner with no `admins` row
+ * 404s at the ancestor layout before the tenant is even looked up here, so
+ * editing the `tenantId` in the URL can't reach another tenant's Studio.
+ * `requireTenantById` is `cache()`-wrapped, so this reuses the ancestor
+ * layout's fetch rather than resolving the tenant twice.
  */
 export default async function TenantStudioPage({ params }: TProps) {
   const { tenantId } = await params;
