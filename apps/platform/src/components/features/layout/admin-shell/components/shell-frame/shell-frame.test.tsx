@@ -33,4 +33,19 @@ describe(ShellFrame, () => {
     expect(screen.getByText('Topbar')).toBeVisible();
     expect(screen.getByText('Studio content')).toBeVisible();
   });
+
+  it('never clips the column holding the sidebar in full-bleed mode, so a sidebar taller than the viewport stays reachable by document scroll', () => {
+    vi.mocked(useSelectedLayoutSegment).mockReturnValue('studio');
+
+    renderWithIntl(
+      <ShellFrame sidebar={<aside>Sidebar</aside>} topbar={<p>Topbar</p>}>
+        <p>Studio content</p>
+      </ShellFrame>,
+    );
+
+    const root = screen.getByText('Sidebar').closest('aside')?.parentElement;
+    expect(root).not.toHaveClass('overflow-hidden');
+    expect(root).not.toHaveClass('h-dvh');
+    expect(root).toHaveClass('min-h-dvh');
+  });
 });
