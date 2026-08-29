@@ -25,9 +25,6 @@ const { createTenantSanityProjectMock } = vi.hoisted(() => ({
 const { seedTenantContentMock } = vi.hoisted(() => ({
   seedTenantContentMock: vi.fn(),
 }));
-const { createTenantStudioMock } = vi.hoisted(() => ({
-  createTenantStudioMock: vi.fn(),
-}));
 const { persistTenantSanityTokenMock } = vi.hoisted(() => ({
   persistTenantSanityTokenMock: vi.fn(),
 }));
@@ -59,9 +56,6 @@ vi.mock('./steps/create-sanity-project', () => ({
 vi.mock('./steps/seed-content', () => ({
   seedTenantContent: seedTenantContentMock,
 }));
-vi.mock('./steps/create-studio-vercel-project', () => ({
-  createTenantStudio: createTenantStudioMock,
-}));
 vi.mock('./steps/persist-sanity-token', () => ({
   persistTenantSanityToken: persistTenantSanityTokenMock,
 }));
@@ -85,16 +79,13 @@ const env = {
   sanityManagementToken: 'sanity-token',
   sanityOrganizationId: 'org-abc',
   vercelToken: 'vercel-token',
-  vercelOrgId: 'org-1',
   vercelTeamId: undefined,
   vercelWebProjectId: 'proj-1',
-  vercelCliVersion: '48.0.0',
   adminAppBaseUrl: 'https://admin.example.com',
   platformDomain: 'example.com',
   tenantSanityDataset: 'test-dataset',
   webAppBaseUrl: 'https://example.com',
   revalidateSecret: 'revalidate-shh',
-  githubRepository: 'acme/blog',
 };
 
 beforeEach(() => {
@@ -107,7 +98,6 @@ beforeEach(() => {
   reportStepStatusMock.mockReset().mockResolvedValue(undefined);
   createTenantSanityProjectMock.mockReset();
   seedTenantContentMock.mockReset().mockResolvedValue(undefined);
-  createTenantStudioMock.mockReset();
   persistTenantSanityTokenMock.mockReset().mockResolvedValue(undefined);
   mapTenantDomainMock.mockReset().mockResolvedValue(undefined);
   createTenantRevalidateWebhookMock.mockReset().mockResolvedValue(undefined);
@@ -117,14 +107,12 @@ beforeEach(() => {
 describe(runSteps, () => {
   it('reports RUNNING then DONE for every step, in order, on a clean run', async () => {
     createTenantSanityProjectMock.mockResolvedValue({});
-    createTenantStudioMock.mockResolvedValue({});
 
     const result = await runSteps('tenant-1', env);
 
     expect(result).toEqual({ ok: true });
     expect(createTenantSanityProjectMock).toHaveBeenCalledTimes(1);
     expect(seedTenantContentMock).toHaveBeenCalledTimes(1);
-    expect(createTenantStudioMock).toHaveBeenCalledTimes(1);
     expect(persistTenantSanityTokenMock).toHaveBeenCalledTimes(1);
     expect(mapTenantDomainMock).toHaveBeenCalledTimes(1);
     expect(createTenantRevalidateWebhookMock).toHaveBeenCalledTimes(1);
@@ -148,14 +136,6 @@ describe(runSteps, () => {
       ],
       [
         TENANT_PROVISIONING_STEP.SEED_CONTENT,
-        TENANT_PROVISIONING_STEP_STATUS.DONE,
-      ],
-      [
-        TENANT_PROVISIONING_STEP.DEPLOY_STUDIO,
-        TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-      ],
-      [
-        TENANT_PROVISIONING_STEP.DEPLOY_STUDIO,
         TENANT_PROVISIONING_STEP_STATUS.DONE,
       ],
       [
@@ -193,9 +173,6 @@ describe(runSteps, () => {
     createTenantSanityProjectMock.mockResolvedValue({
       sanityProjectId: 'proj-abc',
     });
-    createTenantStudioMock.mockResolvedValue({
-      studioVercelProjectId: 'studio-abc',
-    });
 
     await runSteps('tenant-1', env);
 
@@ -206,7 +183,6 @@ describe(runSteps, () => {
       .calls[0] as [TTenant];
     expect(tenantSeenByPersist).toMatchObject({
       sanityProjectId: 'proj-abc',
-      studioVercelProjectId: 'studio-abc',
     });
   });
 
@@ -217,7 +193,6 @@ describe(runSteps, () => {
     const result = await runSteps('tenant-1', env);
 
     expect(result).toEqual({ ok: false });
-    expect(createTenantStudioMock).not.toHaveBeenCalled();
     expect(persistTenantSanityTokenMock).not.toHaveBeenCalled();
     expect(mapTenantDomainMock).not.toHaveBeenCalled();
     expect(createTenantRevalidateWebhookMock).not.toHaveBeenCalled();
@@ -247,7 +222,6 @@ describe(runSteps, () => {
       },
     });
     createTenantSanityProjectMock.mockResolvedValue({});
-    createTenantStudioMock.mockResolvedValue({});
 
     const result = await runSteps('tenant-1', env);
 
@@ -266,7 +240,6 @@ describe(runSteps, () => {
       data: { ...baseTenant, sanityProjectId: 'proj-abc' },
     });
     createTenantSanityProjectMock.mockResolvedValue({});
-    createTenantStudioMock.mockResolvedValue({});
 
     const result = await runSteps('tenant-1', env);
 
@@ -287,7 +260,6 @@ describe(runSteps, () => {
 
   it('does not attempt to un-archive a first-time provision with no existing Sanity project', async () => {
     createTenantSanityProjectMock.mockResolvedValue({});
-    createTenantStudioMock.mockResolvedValue({});
 
     await runSteps('tenant-1', env);
 
@@ -323,7 +295,6 @@ describe(runSteps, () => {
 
   it('elevates the tenant owner once every core step succeeds', async () => {
     createTenantSanityProjectMock.mockResolvedValue({});
-    createTenantStudioMock.mockResolvedValue({});
     elevateTenantOwnerMock.mockResolvedValue('ELEVATED');
 
     const result = await runSteps('tenant-1', env);
@@ -336,7 +307,6 @@ describe(runSteps, () => {
 
   it('still reports ok:true when the owner has not yet accepted (PENDING_ACCEPTANCE/STALLED)', async () => {
     createTenantSanityProjectMock.mockResolvedValue({});
-    createTenantStudioMock.mockResolvedValue({});
     elevateTenantOwnerMock.mockResolvedValue('STALLED');
 
     const result = await runSteps('tenant-1', env);
@@ -346,7 +316,6 @@ describe(runSteps, () => {
 
   it('still reports ok:true when membership is ambiguous (more than one human member)', async () => {
     createTenantSanityProjectMock.mockResolvedValue({});
-    createTenantStudioMock.mockResolvedValue({});
     elevateTenantOwnerMock.mockResolvedValue('AMBIGUOUS_MEMBERSHIP');
 
     const result = await runSteps('tenant-1', env);
@@ -356,7 +325,6 @@ describe(runSteps, () => {
 
   it('still reports ok:true when elevating the owner throws unexpectedly', async () => {
     createTenantSanityProjectMock.mockResolvedValue({});
-    createTenantStudioMock.mockResolvedValue({});
     elevateTenantOwnerMock.mockRejectedValue(new Error('acl fetch failed'));
 
     const result = await runSteps('tenant-1', env);
@@ -382,7 +350,6 @@ describe(runSteps, () => {
     'persists %s as the OWNER_ELEVATION step detail, always alongside DONE',
     async (outcome: TElevateTenantOwnerOutcome) => {
       createTenantSanityProjectMock.mockResolvedValue({});
-      createTenantStudioMock.mockResolvedValue({});
       elevateTenantOwnerMock.mockResolvedValue(outcome);
 
       await runSteps('tenant-1', env);
@@ -398,7 +365,6 @@ describe(runSteps, () => {
 
   it('never reports the OWNER_ELEVATION step when elevating the owner throws', async () => {
     createTenantSanityProjectMock.mockResolvedValue({});
-    createTenantStudioMock.mockResolvedValue({});
     elevateTenantOwnerMock.mockRejectedValue(new Error('acl fetch failed'));
 
     await runSteps('tenant-1', env);

@@ -45,7 +45,7 @@ describe(overallStatusFor, () => {
   it('returns undefined for an earlier step failing (resumable, not terminal)', () => {
     expect(
       overallStatusFor(
-        TENANT_PROVISIONING_STEP.DEPLOY_STUDIO,
+        TENANT_PROVISIONING_STEP.PERSIST_TOKEN,
         TENANT_PROVISIONING_STEP_STATUS.FAILED,
       ),
     ).toBeUndefined();

@@ -48,14 +48,3 @@ export async function deleteVercelProjectDomain(input: {
     input.token,
   );
 }
-
-export async function deleteVercelProject(input: {
-  token: string;
-  teamId: string | undefined;
-  projectId: string;
-}): Promise<TVercelDeleteResult> {
-  return vercelDelete(
-    withTeamId(`/v9/projects/${input.projectId}`, input.teamId),
-    input.token,
-  );
-}

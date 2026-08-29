@@ -1,9 +1,9 @@
 /**
- * Deprovisioning workflow entrypoint — reverses `provision-tenant`'s five
+ * Deprovisioning workflow entrypoint — reverses `provision-tenant`'s four
  * steps for one tenant: removes its domain from the shared web project,
- * deletes its Studio Vercel project, archives (never deletes) its Sanity
- * project, clears the provisioning-artifact columns, then archives (never
- * hard-deletes) the `tenants` row.
+ * archives (never deletes) its Sanity project, clears the
+ * provisioning-artifact columns, then archives (never hard-deletes) the
+ * `tenants` row.
  *
  * Invoked only by `.github/workflows/deprovision-tenant.yml` via
  * `pnpm --filter @blog/db db:deprovision-tenant -- --tenant-id=<uuid>
@@ -27,7 +27,6 @@ import { getTenantRow } from './lib/get-tenant-row';
 import { archiveTenantSanityProject } from './steps/archive-sanity-project';
 import { archiveTenantRow } from './steps/archive-tenant';
 import { clearTenantArtifacts } from './steps/clear-artifacts';
-import { deleteTenantStudioProject } from './steps/delete-studio-project';
 import { removeTenantDomain } from './steps/remove-domain';
 
 const TENANT_ID_FLAG = '--tenant-id=';
@@ -73,7 +72,6 @@ type TStep = {
 
 const STEPS: TStep[] = [
   { name: 'remove-domain', run: removeTenantDomain },
-  { name: 'delete-studio-project', run: deleteTenantStudioProject },
   { name: 'archive-sanity-project', run: archiveTenantSanityProject },
   { name: 'clear-artifacts', run: clearTenantArtifacts },
   { name: 'archive-tenant', run: archiveTenantRow },

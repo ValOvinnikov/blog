@@ -4,14 +4,12 @@ const REQUIRED_ENV: Record<string, string> = {
   SANITY_MANAGEMENT_TOKEN: 'sanity-token',
   SANITY_ORGANIZATION_ID: 'org-abc',
   VERCEL_TOKEN: 'vercel-token',
-  VERCEL_ORG_ID: 'org-1',
   VERCEL_PROJECT_ID: 'proj-1',
   ADMIN_APP_BASE_URL: 'https://admin.example.com',
   PLATFORM_DOMAIN: 'example.com',
   TENANT_SANITY_DATASET: 'test-dataset',
   WEB_APP_URL: 'https://example.com',
   SANITY_REVALIDATE_SECRET: 'revalidate-shh',
-  GITHUB_REPOSITORY: 'acme/blog',
 };
 
 const originalEnv: Record<string, string | undefined> = {};
@@ -22,9 +20,7 @@ beforeEach(() => {
     process.env[key] = REQUIRED_ENV[key];
   }
   originalEnv['VERCEL_TEAM_ID'] = process.env['VERCEL_TEAM_ID'];
-  originalEnv['VERCEL_CLI_VERSION'] = process.env['VERCEL_CLI_VERSION'];
   delete process.env['VERCEL_TEAM_ID'];
-  delete process.env['VERCEL_CLI_VERSION'];
 });
 
 afterEach(() => {
@@ -45,27 +41,22 @@ describe(loadProvisionEnv, () => {
       sanityManagementToken: 'sanity-token',
       sanityOrganizationId: 'org-abc',
       vercelToken: 'vercel-token',
-      vercelOrgId: 'org-1',
       vercelTeamId: undefined,
       vercelWebProjectId: 'proj-1',
-      vercelCliVersion: '48.0.0',
       adminAppBaseUrl: 'https://admin.example.com',
       platformDomain: 'example.com',
       tenantSanityDataset: 'test-dataset',
       webAppBaseUrl: 'https://example.com',
       revalidateSecret: 'revalidate-shh',
-      githubRepository: 'acme/blog',
     });
   });
 
   it('carries through optional vars when set', () => {
     process.env['VERCEL_TEAM_ID'] = 'team-1';
-    process.env['VERCEL_CLI_VERSION'] = '50.0.0';
 
     const env = loadProvisionEnv();
 
     expect(env.vercelTeamId).toBe('team-1');
-    expect(env.vercelCliVersion).toBe('50.0.0');
   });
 
   it.each(Object.keys(REQUIRED_ENV))(

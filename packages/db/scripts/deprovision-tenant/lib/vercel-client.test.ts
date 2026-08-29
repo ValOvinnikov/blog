@@ -1,4 +1,4 @@
-import { deleteVercelProject, deleteVercelProjectDomain } from './vercel-client';
+import { deleteVercelProjectDomain } from './vercel-client';
 
 const fetchMock = vi.fn();
 
@@ -70,34 +70,5 @@ describe(deleteVercelProjectDomain, () => {
         domain: 'acme.example.com',
       }),
     ).rejects.toThrow(/400/);
-  });
-});
-
-describe(deleteVercelProject, () => {
-  it('DELETEs the project', async () => {
-    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
-
-    const result = await deleteVercelProject({
-      token: 'tok',
-      teamId: undefined,
-      projectId: 'prj_1',
-    });
-
-    expect(result).toEqual({ alreadyGone: false });
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe('https://api.vercel.com/v9/projects/prj_1');
-    expect(init.method).toBe('DELETE');
-  });
-
-  it('treats a 404 as already gone rather than an error', async () => {
-    fetchMock.mockResolvedValue(new Response('not found', { status: 404 }));
-
-    const result = await deleteVercelProject({
-      token: 'tok',
-      teamId: undefined,
-      projectId: 'prj_1',
-    });
-
-    expect(result).toEqual({ alreadyGone: true });
   });
 });

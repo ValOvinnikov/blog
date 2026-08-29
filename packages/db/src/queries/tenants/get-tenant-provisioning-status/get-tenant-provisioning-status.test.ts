@@ -29,7 +29,6 @@ describe(getTenantProvisioningStatus, () => {
     const provisioningSteps: TTenantProvisioningSteps = {
       SANITY_PROJECT: { status: 'DONE' },
       SEED_CONTENT: { status: 'RUNNING' },
-      DEPLOY_STUDIO: { status: 'IDLE' },
       PERSIST_TOKEN: { status: 'IDLE' },
       MAP_DOMAIN: { status: 'IDLE' },
       CREATE_WEBHOOK: { status: 'IDLE' },
