@@ -51,18 +51,11 @@ export type TCtaModuleProps = IWithClassName &
   };
 
 /**
- * CtaModule — page-builder organism rendering a call-to-action in one of three
- * layouts: Banner (full-bleed background image with a tinted scrim), Split
- * (side-by-side image and content), and Callout (centered, with an optional
- * image above the content). Paints its own contained card for Split/Callout
- * and breaks out to full viewport width for Banner; `content`/`image`/
- * `actions` are all pre-rendered nodes the web layer builds — this component
- * never constructs a link or an image itself.
- *
- * DOM order is always heading/text/actions before the image, for every
- * variant — `imageSide`/`mobileMediaOrder` only change the *visual* position
- * via CSS `order`, so reading and keyboard order never puts a decorative
- * image ahead of the content that explains it.
+ * CtaModule — page-builder organism rendering a call-to-action in one of
+ * three layouts. `content`/`image`/`actions` are pre-rendered nodes the web
+ * layer builds; this component never constructs a link or image itself. DOM
+ * order is always heading/text/actions before the image — `imageSide`/
+ * `mobileMediaOrder` only change the visual position via CSS.
  */
 export const CtaModule = ({
   variant,
