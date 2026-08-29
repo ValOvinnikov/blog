@@ -1,9 +1,10 @@
-import { BRAND_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, CTA_VARIANT } from '@blog/config';
 import { getSanityImageBaseUrl } from '@blog/service';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { ContentModuleView } from '@web/modules/content/content-module-view';
 import { CtaModuleView } from '@web/modules/cta/cta-module-view';
 import { HeroModuleView } from '@web/modules/hero/hero-module-view';
+import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { richTextDemo } from '@web/testing/shared/portable-text-renderer/fixtures';
 
@@ -45,21 +46,23 @@ const meta = {
         />
         <CtaModuleView
           id="cta-1"
+          variant={CTA_VARIANT.CALLOUT}
           brandVariant={BRAND_VARIANT.SECONDARY}
+          eyebrow={undefined}
           sectionHeader={{
             heading: 'Never miss a post',
             supportingText:
               'Subscribe to get new articles on design systems and engineering delivered straight to your inbox.',
             align: undefined,
           }}
-          action={{
-            label: 'Subscribe now',
-            href: '/blog',
-            target: undefined,
-            platform: undefined,
-            ariaLabel: undefined,
-          }}
+          content={undefined}
+          image={undefined}
+          imageSide={undefined}
+          mobileMediaOrder={undefined}
+          actions={ctaActionsDemo}
+          footnote={undefined}
           layout={undefined}
+          baseUrl={getSanityImageBaseUrl()}
         />
       </>
     ),

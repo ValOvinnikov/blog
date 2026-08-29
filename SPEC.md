@@ -201,9 +201,11 @@ incrementally (#251).
 
 Every `module_*` document also carries a **required** `brandVariant` field
 (stored values from `@blog/config`'s `BRAND_VARIANT` const —
-`PRIMARY`/`SECONDARY` for `module_content`/`module_cta`/`module_newsletter`/
-`module_postList`/`module_postLatest`/`module_taxonomyList`; `module_hero`'s
-schema additionally allows `BRAND_PRIMARY`), plus an optional, all-remaining-fields-optional `layout`
+`PRIMARY`/`SECONDARY` for `module_content`/`module_newsletter`/
+`module_postList`/`module_postLatest`/`module_taxonomyList`; `module_hero`
+and `module_cta` additionally allow `BRAND_PRIMARY` — on `module_cta` this
+field means the card's own fill tone (Banner/Split/Callout below), not the
+full-bleed band tone every other module uses it for), plus an optional, all-remaining-fields-optional `layout`
 object (`spacingTop`/`spacingBottom`, `containerWidth` (not on
 `module_hero`, which uses the leaner `heroLayout` type), `dividerTop`,
 `dividerBottom` — stored values from `SPACING_SCALE`/`CONTAINER_WIDTH`
@@ -219,6 +221,21 @@ its rich-text `body` supplies any in-content headings, so a separate
 structured heading field would just be a second way to do the same thing.
 `module_hero` has no `sectionHeader` either — its heading fields are its
 own dedicated schema, unrelated to this shared shape.
+
+`module_cta` additionally carries a required `variant` (`BANNER`/`SPLIT`/
+`CALLOUT`, from `CTA_VARIANT`, default `CALLOUT`), an optional `eyebrow`,
+an optional `content` (`basicText` — a constrained Portable Text block:
+paragraphs, bullet/numbered lists, bold/italic, and `link` annotations
+only, no headings/images/code/asides — distinct from the fuller `richText`
+used elsewhere), an optional `image` (`imageWithAlt`, required for
+`BANNER`/`SPLIT` via a custom validator, since Sanity can't make
+`.required()` conditional on a sibling field), `imageSide`/
+`mobileMediaOrder` (Split only), an optional `actions` (`actionGroup` — a
+reusable object under `objects/blocks/`, not CTA-specific: an `actions`
+array of `ctaAction` items, each with its own `variant` (`PRIMARY`/
+`SECONDARY`) and `appearance` (`CONTAINED`/`INLINE`, available on either
+variant), validated so a `PRIMARY` item is required and comes first,
+`SECONDARY` is optional, max two), and an optional `footnote`.
 
 `module_taxonomyList` is excluded from `MODULE_MAP`, so it never reaches
 `ModuleRenderer`; it still carries a `REVALIDATE_TAGS` entry, which every
@@ -260,6 +277,19 @@ every module). `titleId` is optional — `aria-labelledby` is only rendered
 when supplied, so a module with no unique heading (`module_content`) gets a
 landmark with no accessible-name fallback rather than pointing at an element
 that never renders.
+
+`module_cta` is the one deliberate exception to "passing `brandVariant`
+straight through": `cta-module-view.tsx` pins `Section` to `PRIMARY`
+regardless of the authored value, and passes the authored `brandVariant` to
+`CtaModule` as its own `tone` instead — the card's fill (Split/Callout) or
+overlay-scrim tint (Banner), painted by `CtaModule` itself rather than by
+`Section`. For `BANNER`, `CtaModule` additionally breaks out of `Section`'s
+always-constrained inner `<div>` (no `containerWidth` option removes its
+max-width) via a CSS technique independent of `Section`'s own padding
+values, rendering genuinely full-bleed; `SPLIT`/`CALLOUT` stay bounded,
+rounded cards inside `Section`'s inner container like every other module's
+organism. `Section` itself is unmodified either way — the exception lives
+entirely in how `CtaModule` uses the space `Section` gives it.
 
 **Theme-as-content** (Phase 2 of the configurability epic, #1285/#1287,
 storage cut over to Postgres by the config-to-Postgres transition's E5): a
