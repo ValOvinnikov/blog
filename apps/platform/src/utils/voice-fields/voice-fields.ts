@@ -1,6 +1,6 @@
 /**
  * The 19 curated voice-override fields, grouped exactly as
- * `apps/cms/src/schema-types/documents/settings/voice.ts` defines them
+ * `packages/studio/src/schema-types/documents/settings/voice.ts` defines them
  * (fieldset `title`s for groups, field `title`s for labels) — this is the
  * Postgres-backed port of that schema's field set, not a redesign of it.
  * Display text for `groupKey`/`key` lives in `i18n/messages/en.json` under
