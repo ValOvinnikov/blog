@@ -453,7 +453,7 @@ const toButtonVariant = (
   return variant === CTA_ACTION_VARIANT.PRIMARY ? 'primary' : 'ghost';
 };
 
-export const ActionGroup = ({ actions, onDark }: TActionGroupProps) => (
+export const ActionGroup = ({ actions, isOnDark }: TActionGroupProps) => (
   <>
     {actions.map((action) => (
       <LinkButton
@@ -464,7 +464,7 @@ export const ActionGroup = ({ actions, onDark }: TActionGroupProps) => (
         aria-label={action.link.ariaLabel}
         variant={toButtonVariant(action.variant, action.appearance)}
         className={
-          onDark ? 'border-white/55 text-white hover:border-white' : undefined
+          isOnDark ? 'border-white/55 text-white hover:border-white' : undefined
         }
       >
         {action.link.label}
@@ -476,7 +476,7 @@ export const ActionGroup = ({ actions, onDark }: TActionGroupProps) => (
 
 `cta-module-view.tsx` imports it, passes `actions` (the projected array) straight through, and passes the result as `CtaModule`'s `actions` prop — the same shape `HeroModuleView` already passes into `Hero.Cta`, just factored into a named, reusable component instead of repeated inline JSX, since CTA's mapping (variant + appearance → button variant) is one step more than Hero's.
 
-**`onDark` (D15 ✔, added 2026-08-29).** Discovered during #2304's own visual verification against the mock: Banner reverses its `ghost`/`link`-appearance button colors to white (mock's `.cta--banner .btn--ghost` override), but `CtaModule`'s `actions` prop is an opaque pre-rendered `ReactNode` — it structurally cannot reach in and recolor what web already built, and per D1/D8 it must not gain that ability (that would mean `CtaModule` constructing or mutating links, which is explicitly rejected). So the fix lives entirely on the web side: `cta-module-view.tsx` passes `onDark={variant === CTA_VARIANT.BANNER}` into `ActionGroup`, which applies the reversed border/text color only to its `ghost`/`link`-variant buttons (the `primary` variant is already a solid fill and needs no override — confirmed against the mock, its filled button is identical on Banner). `primary` action's own color is unaffected either way.
+**`isOnDark` (D15 ✔, added 2026-08-29).** Discovered during #2304's own visual verification against the mock: Banner reverses its `ghost`/`link`-appearance button colors to white (mock's `.cta--banner .btn--ghost` override), but `CtaModule`'s `actions` prop is an opaque pre-rendered `ReactNode` — it structurally cannot reach in and recolor what web already built, and per D1/D8 it must not gain that ability (that would mean `CtaModule` constructing or mutating links, which is explicitly rejected). So the fix lives entirely on the web side: `cta-module-view.tsx` passes `isOnDark={variant === CTA_VARIANT.BANNER}` into `ActionGroup`, which applies the reversed border/text color only to its `ghost`/`link`-variant buttons (the `primary` variant is already a solid fill and needs no override — confirmed against the mock, its filled button is identical on Banner). `primary` action's own color is unaffected either way.
 
 **Scope note:** this ticket does not migrate `HeroModuleView` onto `ActionGroup` — that inline JSX keeps working as-is. Adopting it there is a natural follow-up, not part of this epic; call it out separately if wanted rather than expanding this PR's diff.
 
@@ -569,7 +569,7 @@ Three of these (max-2, variant-uniqueness, Primary-first) are the cost of the ar
 - **D13 ✔, revised 2026-08-29** — **Banner is full-bleed, not a contained card.** It breaks out of `Section`'s always-constrained `inner` div itself (`left-1/2 w-screen -translate-x-1/2`, plus dropping the card's border/radius/shadow), rather than modifying `Section` to support an image background — same "the module owns its presentation" principle D1 already applies to Split/Callout, extended consistently to a full-bleed case instead of only a contained one. `Section` itself needs zero changes. Split and Callout are unaffected — still contained cards. §2, §3.2a.
 - **D14 ✔, 2026-08-29** — **`actionGroup` holds an array of `ctaAction` items, not named `primary`/`secondary` slots.** Reverts D8's shape half. Each item carries its own `variant` (`PRIMARY`/`SECONDARY`) and its own `appearance` — **appearance is available on both**, not hidden for `PRIMARY`. Max 2 items; a `PRIMARY` item is required and must be first; `SECONDARY` is optional; a validator enforces this (max-2 / unique variants / Primary-first) — this is the confirmed shape, and the earlier "named slots avoid a validator" reasoning (D8) was never actually confirmed against an unresolved `AskUserQuestion` answer. Requires a new config-layer constant, `CTA_ACTION_VARIANT`, not shipped in #2301. §5. **#2309/PR #2312 shipped the named-slots version before this correction — that work is being reverted and rebuilt.**
 - **D5a ✔, resolved 2026-08-29** — Centered Callout lists left-align inside the centered block. The mock already implements this (its `.cta--stack .cta__text ul` rule), and #2304's ui-layer build matched it during visual verification against the mock rather than leaving the recommended-but-technically-open option unimplemented. §6.
-- **D15 ✔, 2026-08-29** — **`ActionGroup` gains an `onDark` prop**, discovered during #2304's own visual verification against the mock: Banner reverses its `ghost`/`link`-appearance button colors to white, but `CtaModule`'s `actions` prop is an opaque `ReactNode` and structurally cannot recolor what web already built (and must not gain that ability — D1/D8 keep link/button construction out of `packages/ui`). `cta-module-view.tsx` passes `onDark={variant === CTA_VARIANT.BANNER}`; `ActionGroup` applies the reversed treatment only to non-`primary` buttons. §7.2.
+- **D15 ✔, 2026-08-29** — **`ActionGroup` gains an `isOnDark` prop**, discovered during #2304's own visual verification against the mock: Banner reverses its `ghost`/`link`-appearance button colors to white, but `CtaModule`'s `actions` prop is an opaque `ReactNode` and structurally cannot recolor what web already built (and must not gain that ability — D1/D8 keep link/button construction out of `packages/ui`). `cta-module-view.tsx` passes `isOnDark={variant === CTA_VARIANT.BANNER}`; `ActionGroup` applies the reversed treatment only to non-`primary` buttons. §7.2.
 
 **Still open:** none currently.
 
