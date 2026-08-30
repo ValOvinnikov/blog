@@ -4,9 +4,9 @@ import { HomePageTemplate } from '@web/components/page-templates/home-page-templ
 import { toMetadata } from '@web/metadata/to-metadata';
 import { HeroModule } from '@web/modules/hero/hero-module';
 import { ModuleRenderer } from '@web/modules/module-renderer';
+import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 
 type TProps = {
@@ -37,17 +37,10 @@ export default async function HomePage({ params }: TProps) {
   setRequestLocale(locale);
 
   const result = await service.pages.home.v1.getHomePage();
-
-  if (!result.ok) {
-    logger.error('home_page.fetch_failed', { error: result.error });
-    notFound();
-  }
-
-  if (!result.data) {
-    notFound();
-  }
-
-  const { hero, modules } = result.data;
+  const { hero, modules } = guardPageLoaderResult(
+    result,
+    'home_page.fetch_failed',
+  );
 
   return (
     <HomePageTemplate

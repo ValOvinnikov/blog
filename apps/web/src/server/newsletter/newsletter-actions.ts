@@ -53,13 +53,15 @@ export const subscribeToNewsletterAction = async (
       return { outcome: 'server-error' };
     }
 
-    if (result.data.outcome === 'already-active') {
+    const { outcome, subscriber } = result.data;
+
+    if (outcome === 'already-active') {
       await markNewsletterSubscribedSafely();
       return { outcome: 'already-subscribed' };
     }
 
     const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
-    const confirmationUrl = `${siteUrl}/api/newsletter/confirm?token=${result.data.subscriber.confirmationToken}`;
+    const confirmationUrl = `${siteUrl}/api/newsletter/confirm?token=${subscriber.confirmationToken}`;
     const { subject, html } = buildNewsletterConfirmationEmail({
       confirmationUrl,
     });
@@ -74,7 +76,7 @@ export const subscribeToNewsletterAction = async (
     );
 
     await sendEmail({
-      to: result.data.subscriber.email,
+      to: subscriber.email,
       from: fromAddress,
       subject,
       html,

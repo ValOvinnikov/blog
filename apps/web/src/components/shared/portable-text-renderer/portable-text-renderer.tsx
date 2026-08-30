@@ -139,14 +139,8 @@ export const PortableTextRenderer = ({
   const components: PortableTextComponents = {
     block: {
       normal: ({ children }) => <p>{children}</p>,
-      // Defensive: Studio's block-toolbar no longer offers 'h1' as a style,
-      // but the schema doesn't reject a document written with one via
-      // another path (API, import script, legacy content) — omitting this
-      // key entirely would let `@portabletext/react` fall back to its own
-      // bare, unstyled `<h1>` default, producing a second competing
-      // top-level heading on the page. Downgrade to the same treatment as
-      // h2 so it can never outrank the real page title (never part of the
-      // rail's outline — `extractPostHeadings` only looks at h2/h3).
+      // Defensive downgrade to h2 treatment: a document can still carry a
+      // legacy 'h1' block even though Studio no longer offers it.
       h1: ({ children }) => (
         <Heading level={2} visual="prose-h2">
           {children}
@@ -188,7 +182,7 @@ export const PortableTextRenderer = ({
       bodyImage: ({ value: imageValue }: { value: BodyImage }) =>
         renderBodyImage(imageValue),
       // Unknown/missing `kind` renders as CONTEXT — forward-compat with a
-      // future `ASIDE_KIND` value the renderer doesn't know about yet.
+      // future `ASIDE_KIND` value this renderer doesn't know about.
       aside: ({ value: asideValue }: { value: TAsideBlock }) => {
         const kind = asideValue.kind ?? ASIDE_KIND.CONTEXT;
         const label = asideKindLabels?.[kind] ?? kind;
@@ -208,11 +202,7 @@ export const PortableTextRenderer = ({
   const segments = segmentPortableTextBody(value);
   const hasBreakout = segments.some((segment) => segment.kind === 'BREAKOUT');
 
-  // The common case (no `FULL_BLEED` image in the body): render exactly as
-  // before, a single `Prose` wrapping every block directly, in one call —
-  // `segmentPortableTextBody` collapses to one `PROSE` segment here too, but
-  // going through the original single-call shape (rather than the segment
-  // loop below) keeps this path's DOM identical, unconditionally.
+  // Common case: skip the segment loop so the DOM stays identical to before FULL_BLEED support was added.
   if (!hasBreakout) {
     return (
       <Prose className={s.root()}>

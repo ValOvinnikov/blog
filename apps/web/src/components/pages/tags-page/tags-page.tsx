@@ -4,8 +4,7 @@ import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
-import { logger } from '@web/utils/logger/logger';
-import { notFound } from 'next/navigation';
+import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { getTranslations } from 'next-intl/server';
 
 import { TagsPageView } from './tags-page-view';
@@ -22,16 +21,10 @@ export const TagsPage = async () => {
     getTranslations('tagsPage'),
   ]);
 
-  if (!result.ok) {
-    logger.error('tags_page.fetch_failed', { error: result.error });
-    notFound();
-  }
-
-  if (!result.data) {
-    notFound();
-  }
-
-  const { heading, supportingText, taxonomyListId } = result.data;
+  const { heading, supportingText, taxonomyListId } = guardPageLoaderResult(
+    result,
+    'tags_page.fetch_failed',
+  );
 
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
   const breadcrumbTrail: IBreadcrumbItem[] = [

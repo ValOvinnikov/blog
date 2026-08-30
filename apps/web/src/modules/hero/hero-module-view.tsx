@@ -78,16 +78,7 @@ export const HeroModuleView = ({
 
         {sanityImage && (
           <Hero.Media key="media">
-            {/*
-              SanityImage bakes a hotspot-aware crop into the source URL at
-              this exact width/height — not just a CSS `object-fit` concern,
-              the source is pre-cropped before any responsive CSS runs.
-              Hero.Media is responsive (16:9 below `lg`, 4:3 at `lg` and up)
-              but this component only accepts one non-responsive ratio;
-              1200x675 (16:9) degrades gracefully at both breakpoints
-              (verified visually), while 1200x900 (4:3) visibly crops the
-              image on tablet/below-`lg` viewports.
-            */}
+            {/* 1200x675 (16:9) is pre-cropped into the source URL and degrades gracefully at Hero.Media's `lg` 4:3 breakpoint too (verified visually); 1200x900 would crop below `lg`. */}
             <SanityImage
               image={sanityImage}
               baseUrl={baseUrl}
