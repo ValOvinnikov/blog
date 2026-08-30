@@ -11,17 +11,17 @@ Rotation order (top to bottom) is the order a layer gets its first sweep when
 multiple rows tie on "never swept." After that, whichever row has the oldest
 `Last swept` date goes next.
 
-| Layer        | Last swept | Commit swept | Findings | Issues filed |
-| ------------ | ---------- | ------------ | -------- | ------------ |
-| config       | never      | —            | —        | —            |
-| studio       | never      | —            | —        | —            |
-| service      | never      | —            | —        | —            |
-| ui           | never      | —            | —        | —            |
-| web          | never      | —            | —        | —            |
-| db           | 2026-08-30 | fbdfda22     | 1        | #2326        |
-| auth         | never      | —            | —        | —            |
-| platform-app | never      | —            | —        | —            |
-| insight      | never      | —            | —        | —            |
+| Layer        | Last swept | Commit swept | Findings | Issues filed        |
+| ------------ | ---------- | ------------ | -------- | ------------------- |
+| config       | never      | —            | —        | —                   |
+| studio       | never      | —            | —        | —                   |
+| service      | never      | —            | —        | —                   |
+| ui           | never      | —            | —        | —                   |
+| web          | never      | —            | —        | —                   |
+| db           | 2026-08-30 | fbdfda22     | 3        | #2326, #2328, #2329 |
+| auth         | never      | —            | —        | —                   |
+| platform-app | never      | —            | —        | —                   |
+| insight      | never      | —            | —        | —                   |
 
 **Commit swept** is the `main` SHA the audit read at (short form), so a
 future sweep can diff from there if useful context for what's new since.

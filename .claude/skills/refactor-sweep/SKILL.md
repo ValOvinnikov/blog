@@ -2,11 +2,11 @@
 name: refactor-sweep
 description: >-
   Use when running an on-demand refactor audit over one workspace in this
-  blog monorepo — surfacing duplication, dead code, and drifted conventions
-  as tracked issues rather than fixing them inline. Triggers on "run a
-  refactor sweep", "audit <layer> for cleanup", or when
-  docs/context/refactor-sweep-log.md needs consulting to decide which layer
-  is overdue.
+  blog monorepo — surfacing duplication, over-complex code worth
+  simplifying, dead code, and drifted conventions as tracked issues rather
+  than fixing them inline. Triggers on "run a refactor sweep", "audit
+  <layer> for cleanup", or when docs/context/refactor-sweep-log.md needs
+  consulting to decide which layer is overdue.
 ---
 
 # Refactor sweep
@@ -35,10 +35,28 @@ run — it doesn't consume the overdue layer's turn, which stays next up.
 2. **Dispatch the `explore` subagent**, read-only, scoped strictly to that
    layer's directory (`packages/<x>/src`, `apps/<x>/src`, or equivalent —
    never touching another layer's files even to compare). Ask it to report,
-   with `file:line` evidence, not prose summaries:
-   - Duplication past this repo's own "extract at second repetition" bar
-     (three or more near-identical blocks, not two — two is normal, three is
-     a pattern).
+   with `file:line` evidence, not prose summaries, against all five of:
+   - **Duplication, worth extracting.** The bar is whatever the layer's own
+     agent file states — several (`config`, `service`, `ui`, `web`,
+     `platform-app`) document "extract at the second repetition" explicitly,
+     meaning **two** occurrences of the same logical operation already
+     qualify, not three. For a layer whose file states no explicit
+     threshold, default to that same two-occurrence bar rather than
+     inventing a stricter one — this repo has no layer where three is the
+     real bar. "Same logical operation" includes a repeated multi-step
+     expression (e.g. the same `.trim().toLowerCase()` normalization
+     inlined at every call site) even when the surrounding code differs —
+     literal copy-paste is not the only kind of duplication that qualifies.
+     For each hit, name where the extraction should live (a shared helper
+     within the layer, or flag up to `config`/`utils` if the logic is
+     genuinely cross-layer).
+   - **Code worth simplifying**, independent of duplication: deep
+     conditional/loop nesting, a function doing several unrelated things
+     that could be split, hand-rolled logic that duplicates what an
+     existing project utility (`@blog/utils`, `@blog/config`) already does,
+     or a shape that's harder to follow than the problem requires. This is
+     a distinct axis from duplication — flag it even when the code in
+     question appears only once.
    - Dead exports, orphaned files, or code no longer reachable from any
      entry point (cross-check against `pnpm knip` output for that workspace
      if available).
@@ -46,9 +64,11 @@ run — it doesn't consume the overdue layer's turn, which stays next up.
      using a pattern a later convention change superseded elsewhere in the
      same layer.
    - Stale `TODO:`/`FIXME:` comments whose linked issue is already closed.
-     Explicitly exclude pure style/taste opinions the workspace's own
-     ESLint/Prettier config doesn't already flag — this hunts for duplication
-     and drift, not a second opinion on formatting.
+
+   Explicitly exclude pure style/taste opinions the workspace's own
+   ESLint/Prettier config doesn't already flag — this hunts for duplication,
+   simplification, and drift, not a second opinion on formatting.
+
 3. **Dedup and sanity-check** the raw findings yourself before filing
    anything — merge near-duplicates, drop anything too subjective to act on
    without a judgment call only a human should make.
