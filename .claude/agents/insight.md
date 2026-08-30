@@ -92,11 +92,19 @@ Record<string, unknown>) => void`. Emits one JSON object per call
 
 ## Comments
 
-Default to none. A doc comment, when warranted, is one or two sentences of
-genuine non-obvious _why_ — never a listing of options (the types already say
-that), never a walkthrough of every issue/PR that touched the file. If it
-reads like a changelog or a design-doc summary, it's too long — that history
-belongs in the PR description, not the source file.
+**Inline comments are forbidden by default.** No comment inside a function
+body narrating what a line does — if that feels necessary, restructure the
+code or rename something instead. The single narrow exception: one line for
+a genuine non-obvious constraint the code can't express on its own — a
+hidden constraint, a real gotcha, a workaround for a specific bug.
+
+**A doc comment is the only other kind allowed — at most one per function,
+and only when the name doesn't already make the purpose obvious.** State what
+it's **for**, in one short sentence — never how it works internally: never a
+listing of options (the types already say that), never a walkthrough of
+every issue/PR that touched the file. If it reads like a changelog or a
+design-doc summary, it's too long — that history belongs in the PR
+description, not the source file.
 
 **Never reference project-management state in a comment.** No
 `docs/superpowers/**` path, no roadmap phase, no issue number as narrative, no

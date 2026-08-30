@@ -180,19 +180,29 @@ CI-enforced guard was deliberately not added.
   before this review is dispatched — reviewer trusts that result rather than
   re-running the suite. `build` is CI-only (`ci.yml`'s `build` job gates every
   PR); it is not part of the local/review loop.
-- **Comment length and content (blocking).** Read every doc comment the diff
-  adds or touches, not just grep for keywords. Flag as blocking: more than
-  ~2 sentences of prose: an issue/PR number cited as narrative (anything
-  outside a `TODO:`/`FIXME:` block); a `docs/superpowers/**` path, a roadmap
-  phase name, or a "not wired up yet" note; a step-by-step walkthrough of
-  internal implementation (what each hook/branch does) instead of one
-  sentence of non-obvious _why_; a listing of props/behavior the type
-  signature already states. A comment that reads like a changelog or a
-  design-doc summary is too long — that content belongs in the PR
-  description (dated, reachable via `git blame`), not the source file. This
-  applies per layer agent's own `## Comments` section (see e.g.
-  `.claude/agents/web.md`) — the reviewer is the independent check that
-  catches it even when the authoring agent doesn't self-police.
+- **Inline comments (blocking).** Read every comment the diff adds or
+  touches, not just grep for keywords. Any comment sitting inside a
+  function/component body — narrating what a line, branch, or step does —
+  is blocking unless it is the single narrow exception: one line explaining
+  a genuine non-obvious constraint the code truly cannot express on its own
+  (a hidden gotcha, a workaround for a specific bug). Everything else inside
+  a function body, including `TODO:`/`FIXME:` markers used to explain rather
+  than to flag open work, gets flagged.
+- **Doc comment content (blocking).** A doc comment is allowed only above a
+  function/component/export, at most one per, and only when the name doesn't
+  already make the purpose obvious. It must state what the thing is **for**
+  in one short sentence — flag as blocking anything that instead describes
+  **how** it works: a step-by-step walkthrough of internal implementation
+  (what each hook/branch does), a listing of props/behavior the type
+  signature already states, more than ~2 sentences of prose, an issue/PR
+  number cited as narrative (anything outside a `TODO:`/`FIXME:` block), a
+  `docs/superpowers/**` path, a roadmap phase name, or a "not wired up yet"
+  note. A comment that reads like a changelog or a design-doc summary is too
+  long — that content belongs in the PR description (dated, reachable via
+  `git blame`), not the source file. This applies per layer agent's own
+  `## Comments` section (see e.g. `.claude/agents/web.md`) — the reviewer is
+  the independent check that catches it even when the authoring agent
+  doesn't self-police.
 
 ## How to run a review here
 

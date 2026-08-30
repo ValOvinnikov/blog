@@ -353,18 +353,27 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
 
 ## Conventions
 
-- **Comments — short, or not at all.** Default to no comment. An inline
-  comment is only for something genuinely non-obvious on the next line — a
-  hidden constraint, a real gotcha, a workaround for a specific bug — never
-  to restate what the code already says (a competent developer can read the
-  code). A function/component doc comment, when one is warranted, is a
-  **short** statement of the non-obvious _why_ — never an exhaustive listing
-  of props/functionality (the type signature already documents that), and
-  never a decision-history narrative walking through every issue number that
-  touched the file (that belongs in the PR description and rots as the code
-  evolves further). If a doc comment is starting to read like a changelog or
-  a design-doc summary, it's too long — cut it down to the one or two
-  sentences a future reader actually needs.
+- **Inline comments are forbidden by default.** No comment inside a
+  function/component body narrating what a line, branch, or step does — if
+  that feels necessary, restructure the code or rename something instead of
+  explaining it (a competent developer can read the code). The single narrow
+  exception: one line for something genuinely non-obvious the code truly
+  cannot express on its own — a hidden constraint, a real gotcha, a
+  workaround for a specific bug. That exception is rare; reach for it only
+  when the alternative is a future reader silently re-breaking the same
+  thing — never to restate what the code already says.
+- **A doc comment is the only other kind allowed — at most one per
+  function/component, and only when the name doesn't already make the
+  purpose obvious.** It states what the function/component is **for**, in
+  one short sentence — never **how** it works internally. That means: never
+  a step-by-step walkthrough of its branches/hooks/implementation, never an
+  exhaustive listing of props/functionality (the type signature already
+  documents that), and never a decision-history narrative walking through
+  every issue number that touched the file (that belongs in the PR
+  description and rots as the code evolves further). If a doc comment is
+  starting to read like a changelog, a design-doc summary, or an
+  implementation walkthrough, it's too long — cut it down to the one
+  sentence a future reader actually needs to know before calling it.
 
   **REQUIRED — a source comment must never reference project-management
   state.** This is a hard prohibition, not a length guideline. Specifically,
