@@ -21,11 +21,10 @@ export type TDeprovisionTenantResult =
   { ok: true } | { ok: false; error: string };
 
 /**
- * The tenant status page's "Deprovision tenant" control. Re-checks `confirm`
- * against the tenant's live slug before dispatching — a fast-fail UX
- * convenience, not the actual security boundary: `deprovision-tenant.yml`
- * re-validates the same check independently before doing anything
- * destructive.
+ * The tenant status page's "Deprovision tenant" control. `confirm` is
+ * checked against the tenant's live slug here as a fast-fail UX convenience
+ * only — `deprovision-tenant.yml` re-validates it independently before doing
+ * anything destructive.
  */
 export const deprovisionTenantAction = async (
   tenantId: string,

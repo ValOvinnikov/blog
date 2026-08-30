@@ -38,10 +38,8 @@ const TOAST_ROLE: Record<TToastType, 'status' | 'alert'> = {
 };
 
 /**
- * A single dark, fixed-position notification — controlled and purely
- * presentational, matching the design mock's compact icon + message +
- * dismiss shape. The queue, timers, and phase transitions live in
- * `ToastProvider`, which re-renders this with updated props.
+ * A single controlled, presentational toast notification — `ToastProvider`
+ * owns the queue, timers, and phase transitions.
  */
 export const Toast = ({
   type,

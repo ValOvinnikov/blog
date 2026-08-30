@@ -32,9 +32,8 @@ const createTenantInputSchema = z.object({
     .regex(DOMAIN_PATTERN, 'Enter a valid domain.'),
   plan: z.enum(Object.values(TENANT_PLAN) as [TTenantPlan, ...TTenantPlan[]]),
   ownerEmail: z.string().trim().toLowerCase().email('Enter a valid email.'),
-  // Echoed back from the `ownerInviteConfirmation` the Details form was
-  // previously shown — verified server-side (HMAC over the exact
-  // `ownerEmail`) before the not-found-owner branch is allowed to proceed.
+  // Echoed back from the previously-shown ownerInviteConfirmation; verified
+  // server-side via HMAC before the not-found-owner branch may proceed.
   confirmOwnerInviteToken: z.string().optional(),
 });
 
@@ -118,9 +117,8 @@ export const createTenantAction = async (
     };
   }
 
-  // Advisory only — 'NOT_CONFIGURED' and 'ERROR' both mean "can't tell",
-  // and creation proceeds unchecked exactly as it did before this check
-  // existed.
+  // Advisory only: 'NOT_CONFIGURED'/'ERROR' both mean "can't tell" and fall
+  // through unchecked.
   if (domainAvailability === 'IN_USE') {
     return {
       ok: false,
@@ -173,11 +171,9 @@ export const createTenantAction = async (
     details: { name, slug, domain, plan, ownerEmail },
   });
 
-  // The invited owner shouldn't have to find the sign-in page and type
-  // their own email first — trigger the magic-link email immediately.
   // `redirect: false` returns a result instead of throwing, since this
-  // action still has its own `redirect()` below; a failed send never blocks
-  // provisioning (the tenant and its pending invite row already exist).
+  // action has its own `redirect()` below; a failed send never blocks
+  // provisioning.
   if (!owner) {
     try {
       const inviteEmailResult = await signIn('email', {
@@ -200,13 +196,9 @@ export const createTenantAction = async (
     }
   }
 
-  // `beginTenantProvisioning`'s atomic guard is the same one
-  // `retryProvisioningStepAction` uses — a hit here would be unexpected this
-  // soon after `createTenantDraft`, but it's still a legitimate no-op rather
-  // than an error, and the operator lands on the status page either way. If
-  // the guard succeeds but the GitHub dispatch itself fails, the
-  // `PROVISIONING` transition is reverted so the status page reflects reality
-  // instead of showing a workflow that never actually started.
+  // A hit on beginTenantProvisioning's already-provisioning guard here is a
+  // legitimate no-op, not an error; a failed dispatch reverts the status
+  // transition below instead of leaving it stuck.
   const began = await queries.tenants.beginTenantProvisioning(tenantId);
 
   if (!began.ok && began.error !== ERROR_CODE.DB_ALREADY_PROVISIONING) {
