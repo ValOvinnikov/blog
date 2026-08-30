@@ -14,7 +14,7 @@
 
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
-// Source: ../../packages/config/src/sanity/generated/schema.json
+// Source: ../config/src/sanity/generated/schema.json
 export type Module_newsletter = {
   _id: string;
   _type: 'module_newsletter';
@@ -41,64 +41,62 @@ export type Module_cta = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  variant?: 'BANNER' | 'SPLIT' | 'CALLOUT';
+  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  eyebrow?: string;
   sectionHeader?: RequiredHeadingSectionHeader;
-  action?: Link;
+  content?: BasicText;
+  image?: ImageWithAlt;
+  imageSide?: 'LEFT' | 'RIGHT';
+  mobileMediaOrder?: 'LAST' | 'FIRST';
+  actions?: ActionGroup;
+  footnote?: string;
   layout?: Layout;
 };
 
-export type Blog_postReference = {
+export type ActionGroup = {
+  _type: 'actionGroup';
+  actions?: Array<
+    {
+      _key: string;
+    } & CtaAction
+  >;
+};
+
+export type SanityImageAssetReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'blog_post';
+  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
 };
 
-export type Blog_topicReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'blog_topic';
+export type ImageWithAlt = {
+  _type: 'imageWithAlt';
+  asset?: SanityImageAssetReference;
+  media?: unknown;
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  alt?: string;
 };
 
-export type Page_genericReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_generic';
-};
-
-export type Page_blogReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_blog';
-};
-
-export type Link = {
-  _type: 'link';
-  label?: string;
-  accessibleLabel?: string;
-  linkType?: 'INTERNAL' | 'EXTERNAL';
-  internalReference?:
-    | Blog_postReference
-    | Blog_topicReference
-    | Page_genericReference
-    | Page_blogReference;
-  url?: string;
-  openInNewTab?: boolean;
-  platform?:
-    | 'X'
-    | 'GITHUB'
-    | 'LINKEDIN'
-    | 'YOUTUBE'
-    | 'INSTAGRAM'
-    | 'MASTODON'
-    | 'BLUESKY'
-    | 'FACEBOOK'
-    | 'THREADS'
-    | 'RSS';
-};
+export type BasicText = Array<{
+  children?: Array<{
+    marks?: Array<string>;
+    text?: string;
+    _type: 'span';
+    _key: string;
+  }>;
+  style?: 'normal';
+  listItem?: 'bullet' | 'number';
+  markDefs?: Array<
+    {
+      _key: string;
+    } & Link
+  >;
+  level?: number;
+  _type: 'block';
+  _key: string;
+}>;
 
 export type Module_content = {
   _id: string;
@@ -197,6 +195,66 @@ export type OpenGraph = {
   ogImage?: ImageWithAlt;
 };
 
+export type CtaAction = {
+  _type: 'ctaAction';
+  variant?: 'PRIMARY' | 'SECONDARY';
+  appearance?: 'CONTAINED' | 'INLINE';
+  link?: Link;
+};
+
+export type Blog_postReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'blog_post';
+};
+
+export type Blog_topicReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'blog_topic';
+};
+
+export type Page_genericReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_generic';
+};
+
+export type Page_blogReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_blog';
+};
+
+export type Link = {
+  _type: 'link';
+  label?: string;
+  accessibleLabel?: string;
+  linkType?: 'INTERNAL' | 'EXTERNAL';
+  internalReference?:
+    | Blog_postReference
+    | Blog_topicReference
+    | Page_genericReference
+    | Page_blogReference;
+  url?: string;
+  openInNewTab?: boolean;
+  platform?:
+    | 'X'
+    | 'GITHUB'
+    | 'LINKEDIN'
+    | 'YOUTUBE'
+    | 'INSTAGRAM'
+    | 'MASTODON'
+    | 'BLUESKY'
+    | 'FACEBOOK'
+    | 'THREADS'
+    | 'RSS';
+};
+
 export type SocialLink = {
   _type: 'socialLink';
   platform?: string;
@@ -228,13 +286,6 @@ export type Aside = {
   body?: BlockText;
 };
 
-export type SanityImageAssetReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
-};
-
 export type BodyImage = {
   _type: 'bodyImage';
   asset?: SanityImageAssetReference;
@@ -243,15 +294,6 @@ export type BodyImage = {
   crop?: SanityImageCrop;
   alt?: string;
   layout?: 'INLINE' | 'FULL_BLEED' | 'FLOAT_LEFT' | 'FLOAT_RIGHT';
-};
-
-export type ImageWithAlt = {
-  _type: 'imageWithAlt';
-  asset?: SanityImageAssetReference;
-  media?: unknown;
-  hotspot?: SanityImageHotspot;
-  crop?: SanityImageCrop;
-  alt?: string;
 };
 
 export type HeroLayout = {
@@ -849,11 +891,10 @@ export type AllSanitySchemaTypes =
   | Module_newsletter
   | RequiredHeadingSectionHeader
   | Module_cta
-  | Blog_postReference
-  | Blog_topicReference
-  | Page_genericReference
-  | Page_blogReference
-  | Link
+  | ActionGroup
+  | SanityImageAssetReference
+  | ImageWithAlt
+  | BasicText
   | Module_content
   | RichText
   | Module_postLatest
@@ -863,12 +904,16 @@ export type AllSanitySchemaTypes =
   | SpecLine
   | Seo
   | OpenGraph
+  | CtaAction
+  | Blog_postReference
+  | Blog_topicReference
+  | Page_genericReference
+  | Page_blogReference
+  | Link
   | SocialLink
   | BlockText
   | Aside
-  | SanityImageAssetReference
   | BodyImage
-  | ImageWithAlt
   | HeroLayout
   | Layout
   | MigrationState

@@ -21,38 +21,12 @@ describe(computeTenantFieldLocks, () => {
     expect(computeTenantFieldLocks(null, null)).toEqual({});
   });
 
-  it('locks slug once DEPLOY_STUDIO is DONE, leaving primaryDomain editable, when a later step failed', () => {
-    const steps = {
-      ...idleProvisioningSteps(),
-      [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-        status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-      },
-      [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
-        status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-      },
-      [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: {
-        status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-      },
-      [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
-        status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-        error: 'boom',
-      },
-    };
-
-    expect(
-      computeTenantFieldLocks(steps, TENANT_PROVISIONING_STATUS.FAILED),
-    ).toEqual({
-      slug: { kind: 'step', step: TENANT_PROVISIONING_STEP.DEPLOY_STUDIO },
-    });
-  });
-
-  it('locks primaryDomain once MAP_DOMAIN is DONE — but MAP_DOMAIN itself failing leaves it editable (the real 409 case)', () => {
+  it('locks nothing once MAP_DOMAIN is DONE — MAP_DOMAIN itself failing leaves primaryDomain editable (the real 409 case)', () => {
     const done = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
     const failedAtMapDomain = {
       ...idleProvisioningSteps(),
       [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: done,
       [TENANT_PROVISIONING_STEP.SEED_CONTENT]: done,
-      [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: done,
       [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: done,
       [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
         status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
@@ -60,16 +34,14 @@ describe(computeTenantFieldLocks, () => {
       },
     };
 
-    // slug is locked (DEPLOY_STUDIO is DONE) but primaryDomain — the field
-    // that actually caused the failure — stays editable.
+    // primaryDomain — the field that actually caused the failure — stays
+    // editable, since MAP_DOMAIN itself never reached DONE.
     expect(
       computeTenantFieldLocks(
         failedAtMapDomain,
         TENANT_PROVISIONING_STATUS.FAILED,
       ),
-    ).toEqual({
-      slug: { kind: 'step', step: TENANT_PROVISIONING_STEP.DEPLOY_STUDIO },
-    });
+    ).toEqual({});
   });
 
   it('locks primaryDomain once MAP_DOMAIN completed and a later step failed', () => {
@@ -79,9 +51,6 @@ describe(computeTenantFieldLocks, () => {
         status: TENANT_PROVISIONING_STEP_STATUS.DONE,
       },
       [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
-        status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-      },
-      [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: {
         status: TENANT_PROVISIONING_STEP_STATUS.DONE,
       },
       [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
@@ -99,7 +68,6 @@ describe(computeTenantFieldLocks, () => {
     expect(
       computeTenantFieldLocks(steps, TENANT_PROVISIONING_STATUS.FAILED),
     ).toEqual({
-      slug: { kind: 'step', step: TENANT_PROVISIONING_STEP.DEPLOY_STUDIO },
       primaryDomain: {
         kind: 'step',
         step: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
@@ -132,7 +100,6 @@ describe(computeTenantFieldLocks, () => {
     const steps = {
       [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: done,
       [TENANT_PROVISIONING_STEP.SEED_CONTENT]: done,
-      [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: done,
       [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: done,
       [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: done,
       [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: done,
@@ -153,12 +120,11 @@ describe(computeTenantFieldLocks, () => {
     });
   });
 
-  it('excludes OWNER_ELEVATION from the fold entirely — a 7th key never changes the result, even with a status the core sequence never produces', () => {
+  it('excludes OWNER_ELEVATION from the fold entirely — a 6th key never changes the result, even with a status the core sequence never produces', () => {
     const done = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
     const coreStepsDone = {
       [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: done,
       [TENANT_PROVISIONING_STEP.SEED_CONTENT]: done,
-      [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: done,
       [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: done,
       [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: done,
       [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: done,

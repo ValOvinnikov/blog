@@ -16,7 +16,7 @@ The repository root (`prettier.config.mjs`, used by the root `format` script
 and the `lint-staged` pre-commit hook) and every package/app workspace's own
 `prettier.config.mjs`: `packages/config`, `packages/utils`,
 `packages/service`, `packages/db`, `packages/auth`, `packages/ui`,
-`apps/web`, `apps/cms`, `apps/platform`.
+`packages/studio`, `apps/web`, `apps/platform`.
 
 ## Further reading
 

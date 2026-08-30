@@ -300,9 +300,9 @@ Variants: wrapped: (boolean)
 
 ### CtaModule — `organisms/cta-module/cta-module.tsx`
 
-page-builder organism rendering an optional heading, optional supporting text, and an optional action slot.
-Props: heading?: string · headingId?: string · supportingText?: string · action?: ReactNode · align?: TCtaModuleVariants['align'] · isWrapped?: TCtaModuleVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
-Variants: wrapped: (boolean) · align: HEADING_ALIGN.LEFT|HEADING_ALIGN.CENTER|HEADING_ALIGN.RIGHT
+page-builder organism rendering a call-to-action in one of three layouts.
+Props: variant: TCtaVariant · tone: TBrandVariant · eyebrow?: string · heading: string · headingId?: string · supportingText?: string · content?: ReactNode · image?: ReactNode · actions?: ReactNode · footnote?: string · align?: THeadingAlign · imageSide?: TCtaImageSide · mobileMediaOrder?: TCtaMobileMediaOrder · isWrapped?: TCtaModuleVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
+Variants: variant: CTA_VARIANT.BANNER|CTA_VARIANT.SPLIT|CTA_VARIANT.CALLOUT · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY · align: HEADING_ALIGN.LEFT|HEADING_ALIGN.CENTER|HEADING_ALIGN.RIGHT · imageSide: CTA_IMAGE_SIDE.LEFT|CTA_IMAGE_SIDE.RIGHT · mobileMediaOrder: CTA_MOBILE_MEDIA_ORDER.FIRST|CTA_MOBILE_MEDIA_ORDER.LAST · wrapped: (boolean)
 
 ### Footer — `organisms/footer/footer.tsx`
 

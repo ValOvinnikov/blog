@@ -13,7 +13,7 @@ and adds only its own `paths`.
 
 Every package and app workspace: `packages/config`, `packages/utils`,
 `packages/service`, `packages/db`, `packages/auth`, `packages/ui`,
-`apps/web`, `apps/cms`, `apps/platform`.
+`packages/studio`, `apps/web`, `apps/platform`.
 
 ## Further reading
 

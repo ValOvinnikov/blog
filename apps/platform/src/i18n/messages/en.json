@@ -11,7 +11,8 @@
     "tenantProvisioning": "Provisioning · Admin",
     "tenantDanger": "Danger zone · Admin",
     "tenantDomain": "Domain · Admin",
-    "features": "Features · Admin"
+    "features": "Features · Admin",
+    "studio": "Studio · Admin"
   },
   "workspacePendingPage": {
     "heading": "Your workspace isn't ready yet",
@@ -19,7 +20,9 @@
   },
   "sidebar": {
     "brandName": "Valstack",
-    "brandTagline": "admin"
+    "brandTagline": "admin",
+    "collapseToggle": "Collapse sidebar",
+    "expandToggle": "Expand sidebar"
   },
   "toastProvider": {
     "viewportAriaLabel": "Notifications",
@@ -35,14 +38,16 @@
   "navSections": {
     "platformLabel": "Platform",
     "platformSectionLabel": "Platform actions",
+    "contentSectionLabel": "Content",
+    "configurationSectionLabel": "Configuration",
     "tenants": "Tenants",
     "addTenant": "Add tenant",
     "tenantLabel": "Tenant · {tenantName}",
-    "dashboardLabel": "Workspace",
     "overview": "Overview",
     "look": "Look",
     "voice": "Voice",
     "domain": "Domain",
+    "studio": "Studio",
     "email": "Email",
     "subscribers": "Subscribers",
     "comments": "Comments",
@@ -130,7 +135,6 @@
   },
   "tenantOverviewPage": {
     "openSiteAction": "Open site ↗",
-    "openStudioAction": "Open Studio ↗",
     "domainCardTitle": "Domain",
     "dnsLinkButton": "DNS →",
     "publicDomainLabel": "Public domain",
@@ -153,7 +157,6 @@
     "platformBadge": "platform",
     "sanityProjectLabel": "Sanity project",
     "datasetLabel": "Dataset",
-    "studioLabel": "Studio",
     "readTokenLabel": "Read token",
     "readTokenStored": "Stored",
     "readTokenNotSet": "Not set",
@@ -342,10 +345,6 @@
         "title": "Seed content",
         "description": "Starter documents"
       },
-      "deployStudio": {
-        "title": "Deploy Studio",
-        "description": "Vercel deploy"
-      },
       "registryRows": {
         "title": "Registry rows",
         "description": "tenants + memberships"
@@ -361,7 +360,7 @@
     "description": "The fast part. Everything after this runs automatically, each step resumable on failure.",
     "nameLabel": "Tenant name",
     "slugLabel": "Slug",
-    "slugHint": "Becomes the Studio's own hostname, e.g. studio-yourslug.valstack.dev — never the public site address.",
+    "slugHint": "A unique identifier for this tenant — you'll type it to confirm destructive actions. Never part of a web address.",
     "domainLabel": "Domain",
     "domainHint": "The public domain this tenant's site will answer to.",
     "planLabel": "Plan",
@@ -382,7 +381,6 @@
     "stepLabel": {
       "SANITY_PROJECT": "Create the content workspace",
       "SEED_CONTENT": "Add starter content",
-      "DEPLOY_STUDIO": "Deploy the content editor",
       "PERSIST_TOKEN": "Connect the site to its content",
       "MAP_DOMAIN": "Connect the custom domain",
       "CREATE_WEBHOOK": "Wire up the CMS to the site"
@@ -430,6 +428,10 @@
   "tenantDangerPage": {
     "title": "Danger zone",
     "description": "Irreversible actions for this tenant. Restricted to superadmins."
+  },
+  "studioPage": {
+    "notProvisionedTitle": "Studio isn't ready yet",
+    "notProvisionedDescription": "This tenant's Sanity project hasn't finished provisioning. Try again once provisioning completes."
   },
   "tenantDetailsPanel": {
     "heading": "Tenant details",

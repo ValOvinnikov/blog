@@ -52,7 +52,10 @@ vi.mock('next-intl/server', () => ({
 // .mockReturnValue(...)`. `useRouter`'s default stub returns a brand-new
 // `refresh: vi.fn()` on every render, matching apps/web's own setup — a test
 // that asserts a call to `refresh` overrides it with `vi.mocked(useRouter)
-// .mockReturnValue(...)`.
+// .mockReturnValue(...)`. `useSelectedLayoutSegment`
+// defaults to `null` (no active child segment) the same way — a test
+// asserting full-bleed behavior overrides it with
+// `vi.mocked(useSelectedLayoutSegment).mockReturnValue('studio')`.
 // `unstable_rethrow` is a no-op stub: real Next.js only re-throws an error
 // shaped like its own internal redirect/notFound digest, and returns
 // normally for anything else — a plain caught `Error` in a test (e.g. a
@@ -75,6 +78,7 @@ vi.mock('next/navigation', () => ({
   }),
   unstable_rethrow: vi.fn(),
   usePathname: vi.fn(() => '/'),
+  useSelectedLayoutSegment: vi.fn(() => null),
   useRouter: vi.fn(() => ({
     push: vi.fn(),
     replace: vi.fn(),

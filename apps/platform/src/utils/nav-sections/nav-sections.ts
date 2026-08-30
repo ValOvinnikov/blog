@@ -33,10 +33,11 @@ type TTenantNavHrefs = {
   voice: string;
   features: string;
   domain: string;
+  studio: string;
 };
 
-/** The four tenant-facing destinations that route somewhere today, shared by the `/tenants/{id}` and slug-free `/dashboard` sidebars — only the hrefs (and, via the caller, the section label) differ between them. Danger zone is deliberately excluded: it's platform-only and never appears in the owner-facing `/dashboard` tree. */
-const shippingTenantNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
+/** The four site-configuration destinations that route somewhere today, shared by the `/tenants/{id}` and slug-free `/dashboard` sidebars — only the hrefs (and, via the caller, the section label) differ between them. */
+const configurationNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
   const shipping = { label: t('badgeThisMilestone'), tone: 'neutral' } as const;
 
   return [
@@ -67,6 +68,13 @@ const shippingTenantNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
   ];
 };
 
+/** Studio edits the tenant's content rather than configuring the site, so it lives in its own Content section rather than alongside Look/Voice/Features/Domain. Shared by the `/tenants/{id}` and slug-free `/dashboard` sidebars, same as `configurationNavItems`. Carries no badge — it's live and routable today, unlike the "this milestone"/"later" items around it. */
+const studioNavItem = (t: TNavTranslator, href: string) => ({
+  label: t('studio'),
+  icon: ICONS.STUDIO,
+  href,
+});
+
 /** Tenant-facing destinations with no owner-actionable route yet — platform-only, and dropped from the owner-facing `/dashboard` tree entirely rather than shown as a permanently inert "later" badge. */
 const laterPlatformNavItems = (t: TNavTranslator) => {
   const later = { label: t('badgeLater'), tone: 'warn' } as const;
@@ -89,6 +97,13 @@ export const tenantNavSections = (
     tone: 'neutral',
     hasDot: false,
   } as const;
+  const hrefs: TTenantNavHrefs = {
+    look: adminRoutes.look(tenantId),
+    voice: adminRoutes.voice(tenantId),
+    features: adminRoutes.features(tenantId),
+    domain: adminRoutes.tenantDomain(tenantId),
+    studio: adminRoutes.tenantStudio(tenantId),
+  };
 
   return [
     {
@@ -99,14 +114,15 @@ export const tenantNavSections = (
           icon: ICONS.HOUSE,
           href: adminRoutes.tenantOverview(tenantId),
         },
-        ...shippingTenantNavItems(t, {
-          look: adminRoutes.look(tenantId),
-          voice: adminRoutes.voice(tenantId),
-          features: adminRoutes.features(tenantId),
-          domain: adminRoutes.tenantDomain(tenantId),
-        }),
-        ...laterPlatformNavItems(t),
       ],
+    },
+    {
+      label: t('contentSectionLabel'),
+      items: [studioNavItem(t, hrefs.studio)],
+    },
+    {
+      label: t('configurationSectionLabel'),
+      items: [...configurationNavItems(t, hrefs), ...laterPlatformNavItems(t)],
     },
     {
       label: t('platformSectionLabel'),
@@ -128,17 +144,26 @@ export const tenantNavSections = (
   ];
 };
 
-/** The slug-free counterpart to `tenantNavSections`'s tenant-facing section — same four shipping destinations, routed under `/dashboard` instead of `/tenants/{id}`, labeled generically since the whole point of this tree is not naming the tenant in anything the URL-shy owner sees. Owners never get the Overview item (there's nothing at slug-free `/dashboard` distinct from the section itself), the platform-only Provisioning/Danger zone section, or the four not-yet-owner-actionable items (Email, Subscribers, Comments, Team) — those are dropped entirely rather than shown as a permanently inert "later" badge. */
+/** The slug-free counterpart to `tenantNavSections`'s Content/Configuration sections — same shipping destinations, routed under `/dashboard` instead of `/tenants/{id}`. Owners never get the Overview item (there's nothing at slug-free `/dashboard` distinct from the sections themselves), the platform-only Provisioning/Danger zone section, or the four not-yet-owner-actionable items (Email, Subscribers, Comments, Team) — those are dropped entirely rather than shown as a permanently inert "later" badge. */
 export const dashboardNavSections = (
   t: TNavTranslator,
-): TSidebarNavSection[] => [
-  {
-    label: t('dashboardLabel'),
-    items: shippingTenantNavItems(t, {
-      look: adminRoutes.dashboardLook(),
-      voice: adminRoutes.dashboardVoice(),
-      features: adminRoutes.dashboardFeatures(),
-      domain: adminRoutes.dashboardDomain(),
-    }),
-  },
-];
+): TSidebarNavSection[] => {
+  const hrefs: TTenantNavHrefs = {
+    look: adminRoutes.dashboardLook(),
+    voice: adminRoutes.dashboardVoice(),
+    features: adminRoutes.dashboardFeatures(),
+    domain: adminRoutes.dashboardDomain(),
+    studio: adminRoutes.dashboardStudio(),
+  };
+
+  return [
+    {
+      label: t('contentSectionLabel'),
+      items: [studioNavItem(t, hrefs.studio)],
+    },
+    {
+      label: t('configurationSectionLabel'),
+      items: configurationNavItems(t, hrefs),
+    },
+  ];
+};

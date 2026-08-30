@@ -5,6 +5,7 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import userEvent from '@testing-library/user-event';
+import { useSelectedLayoutSegment } from 'next/navigation';
 import type { ComponentPropsWithoutRef } from 'react';
 
 import { AdminShell } from './admin-shell';
@@ -30,6 +31,10 @@ const render = renderWithIntl;
 const roleChip = { name: 'Val Ovinnikov', role: 'ADMIN', scope: 'Platform' };
 
 describe(AdminShell, () => {
+  afterEach(() => {
+    vi.mocked(useSelectedLayoutSegment).mockReturnValue(null);
+  });
+
   it('renders the sidebar, topbar and page content together', () => {
     render(
       <AdminShell
@@ -80,5 +85,51 @@ describe(AdminShell, () => {
       within(menu).getByRole('menuitem', { name: 'Tenants' }),
     ).toBeVisible();
     expect(within(menu).getByText('Tenant switcher')).toBeVisible();
+  });
+
+  it('still renders the sidebar, topbar and page content on the studio route, in full-bleed mode', () => {
+    vi.mocked(useSelectedLayoutSegment).mockReturnValue('studio');
+
+    render(
+      <AdminShell
+        sections={[
+          {
+            label: 'Platform section',
+            items: [{ label: 'Tenants', icon: ICONS.GRID, href: '/tenants' }],
+          },
+        ]}
+        crumb={<p>Platform</p>}
+        roleChip={roleChip}
+      >
+        <p>Studio content</p>
+      </AdminShell>,
+    );
+
+    expect(screen.getByRole('link', { name: 'Tenants' })).toBeVisible();
+    expect(screen.getByText('Studio content')).toBeVisible();
+  });
+
+  it('seeds the sidebar as collapsed when isSidebarInitiallyCollapsed is true', () => {
+    render(
+      <AdminShell
+        sections={[
+          {
+            label: 'Platform section',
+            items: [{ label: 'Tenants', icon: ICONS.GRID, href: '/tenants' }],
+          },
+        ]}
+        isSidebarInitiallyCollapsed={true}
+        crumb={<p>Platform</p>}
+        roleChip={roleChip}
+      >
+        <p>Tenants page</p>
+      </AdminShell>,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Expand sidebar' }),
+    ).toHaveAttribute('aria-expanded', 'false');
+    // The nav link's accessible name survives the collapse.
+    expect(screen.getByRole('link', { name: 'Tenants' })).toBeVisible();
   });
 });

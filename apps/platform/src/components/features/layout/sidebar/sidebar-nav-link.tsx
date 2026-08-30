@@ -11,9 +11,9 @@ export type TSidebarNavLinkProps = {
 };
 
 /**
- * The sidebar's only client boundary: matches `href` against the current
- * route to decide the active state. `Sidebar` itself, and every inert row it
- * renders, stay server components.
+ * A client boundary: matches `href` against the current route to decide the
+ * active state. `Sidebar` itself, and every inert row it renders, stay
+ * server components.
  */
 export const SidebarNavLink = ({ href, children }: TSidebarNavLinkProps) => {
   const pathname = usePathname();

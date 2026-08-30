@@ -20,6 +20,7 @@
     "@blog/config": "workspace:*",
     "@blog/db": "workspace:*",
     "@blog/insight": "workspace:*",
+    "@blog/studio": "workspace:*",
     "@blog/tailwind-config": "workspace:*",
     "@blog/ui": "workspace:*",
     "@t3-oss/env-nextjs": "^0.13.11",

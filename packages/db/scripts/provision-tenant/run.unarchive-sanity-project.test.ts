@@ -23,9 +23,6 @@ const { createTenantSanityProjectMock } = vi.hoisted(() => ({
 const { seedTenantContentMock } = vi.hoisted(() => ({
   seedTenantContentMock: vi.fn(),
 }));
-const { createTenantStudioMock } = vi.hoisted(() => ({
-  createTenantStudioMock: vi.fn(),
-}));
 const { persistTenantSanityTokenMock } = vi.hoisted(() => ({
   persistTenantSanityTokenMock: vi.fn(),
 }));
@@ -50,9 +47,6 @@ vi.mock('./steps/create-sanity-project', () => ({
 }));
 vi.mock('./steps/seed-content', () => ({
   seedTenantContent: seedTenantContentMock,
-}));
-vi.mock('./steps/create-studio-vercel-project', () => ({
-  createTenantStudio: createTenantStudioMock,
 }));
 vi.mock('./steps/persist-sanity-token', () => ({
   persistTenantSanityToken: persistTenantSanityTokenMock,
@@ -81,16 +75,12 @@ const env = {
   sanityManagementToken: 'sanity-token',
   sanityOrganizationId: 'org-abc',
   vercelToken: 'vercel-token',
-  vercelOrgId: 'org-1',
   vercelTeamId: undefined,
   vercelWebProjectId: 'proj-1',
-  vercelCliVersion: '48.0.0',
   adminAppBaseUrl: 'https://admin.example.com',
-  platformDomain: 'example.com',
   tenantSanityDataset: 'test-dataset',
   webAppBaseUrl: 'https://example.com',
   revalidateSecret: 'revalidate-shh',
-  githubRepository: 'acme/blog',
 };
 
 beforeEach(() => {
@@ -118,7 +108,6 @@ beforeEach(() => {
   reportStepStatusMock.mockReset().mockResolvedValue(undefined);
   createTenantSanityProjectMock.mockReset().mockResolvedValue({});
   seedTenantContentMock.mockReset().mockResolvedValue(undefined);
-  createTenantStudioMock.mockReset().mockResolvedValue({});
   persistTenantSanityTokenMock.mockReset().mockResolvedValue(undefined);
   mapTenantDomainMock.mockReset().mockResolvedValue(undefined);
   createTenantRevalidateWebhookMock.mockReset().mockResolvedValue(undefined);

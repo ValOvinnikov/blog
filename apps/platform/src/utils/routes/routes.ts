@@ -1,4 +1,11 @@
 /**
+ * The final path segment both Studio routes share — also matched against
+ * `useSelectedLayoutSegment()` by `ShellFrame` to switch `AdminShell`'s
+ * content column into full-bleed mode.
+ */
+export const STUDIO_SEGMENT = 'studio';
+
+/**
  * Single source of truth for apps/platform's own URL construction — never build
  * these paths inline elsewhere.
  */
@@ -15,11 +22,13 @@ export const adminRoutes = {
   look: (tenantId: string) => `/tenants/${tenantId}/look`,
   voice: (tenantId: string) => `/tenants/${tenantId}/voice`,
   features: (tenantId: string) => `/tenants/${tenantId}/features`,
+  tenantStudio: (tenantId: string) => `/tenants/${tenantId}/${STUDIO_SEGMENT}`,
   dashboard: () => '/dashboard',
   dashboardDomain: () => '/dashboard/domain',
   dashboardLook: () => '/dashboard/look',
   dashboardVoice: () => '/dashboard/voice',
   dashboardFeatures: () => '/dashboard/features',
+  dashboardStudio: () => `/dashboard/${STUDIO_SEGMENT}`,
   dashboardSelectTenant: () => '/dashboard/select-tenant',
   /** The picker's link target — verifies `tenantId` against the session's own `memberships` (or, for a SUPERADMIN, that the tenant exists) before setting the "active tenant" cookie. */
   dashboardSelectTenantHref: (tenantId: string) =>

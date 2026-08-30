@@ -63,6 +63,8 @@ import ShieldCheckComponent from '@blog/ui/assets/icons/shield-check.svg';
 import ShieldCheckUrl from '@blog/ui/assets/icons/shield-check.svg?url';
 import SpinnerComponent from '@blog/ui/assets/icons/spinner.svg';
 import SpinnerUrl from '@blog/ui/assets/icons/spinner.svg?url';
+import StudioComponent from '@blog/ui/assets/icons/studio.svg';
+import StudioUrl from '@blog/ui/assets/icons/studio.svg?url';
 import SunComponent from '@blog/ui/assets/icons/sun.svg';
 import SunUrl from '@blog/ui/assets/icons/sun.svg?url';
 import UsersComponent from '@blog/ui/assets/icons/users.svg';
@@ -126,6 +128,7 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
   [ICONS.PALETTE]: { component: PaletteComponent, url: PaletteUrl },
   [ICONS.QUOTE]: { component: QuoteComponent, url: QuoteUrl },
   [ICONS.GLOBE]: { component: GlobeComponent, url: GlobeUrl },
+  [ICONS.STUDIO]: { component: StudioComponent, url: StudioUrl },
   [ICONS.COMMENT]: { component: CommentComponent, url: CommentUrl },
   [ICONS.USERS]: { component: UsersComponent, url: UsersUrl },
 };

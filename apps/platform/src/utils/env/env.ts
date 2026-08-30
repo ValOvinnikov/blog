@@ -38,12 +38,12 @@ export const env = createEnv({
     // retry once this is configured.
     TENANT_PROVISIONING_GITHUB_TOKEN: z.string().min(1).optional(),
     // The `owner/repo` this app's own Server Actions dispatch
-    // `provision-tenant.yml`/`deprovision-tenant.yml` against — unlike
-    // `PLATFORM_DOMAIN` (a CI-side GitHub Environment Variable), this call
+    // `provision-tenant.yml`/`deprovision-tenant.yml` against — this call
     // originates from `apps/platform` itself, not a CI job, so there's no
-    // `GITHUB_REPOSITORY`-style var to read the target repo from. Optional,
-    // paired with `TENANT_PROVISIONING_GITHUB_TOKEN` above — absent, the
-    // dispatch is skipped and logged the same way a missing token is.
+    // Actions-provided variable to read the target repo from; it must be
+    // configured explicitly. Optional, paired with
+    // `TENANT_PROVISIONING_GITHUB_TOKEN` above — absent, the dispatch is
+    // skipped and logged the same way a missing token is.
     TENANT_PROVISIONING_GITHUB_REPO: z
       .string()
       .regex(/^[^/\s]+\/[^/\s]+$/, 'Expected "owner/repo".')

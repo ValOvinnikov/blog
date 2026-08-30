@@ -5,6 +5,7 @@ import type { TMembership } from '@blog/db/schema/memberships';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
+import { cache } from 'react';
 
 import { auth } from './auth';
 import { buildVirtualAdminMembership } from './build-virtual-admin-membership';
@@ -28,9 +29,11 @@ export type TSessionTenants = {
  * their own real `memberships` row count. `resolveDashboardTenant` narrows
  * this further to exactly one tenant; the `/dashboard/select-tenant` picker
  * page calls this directly since it needs to render on the membership count
- * itself, before any tenant is chosen.
+ * itself, before any tenant is chosen — `cache()`-wrapped so
+ * `dashboard/layout.tsx`'s own direct call and `resolveDashboardTenant`'s
+ * internal one share a single fetch per request.
  */
-export const listSessionTenants = async (): Promise<TSessionTenants> => {
+export const listSessionTenants = cache(async (): Promise<TSessionTenants> => {
   const session = await auth();
   const userId = session?.user?.id;
 
@@ -61,4 +64,4 @@ export const listSessionTenants = async (): Promise<TSessionTenants> => {
   );
 
   return { userId, memberships, tenants };
-};
+});

@@ -5,9 +5,6 @@ import { runDeprovisioning, runSteps } from './run';
 const { removeTenantDomainMock } = vi.hoisted(() => ({
   removeTenantDomainMock: vi.fn(),
 }));
-const { deleteTenantStudioProjectMock } = vi.hoisted(() => ({
-  deleteTenantStudioProjectMock: vi.fn(),
-}));
 const { archiveTenantSanityProjectMock } = vi.hoisted(() => ({
   archiveTenantSanityProjectMock: vi.fn(),
 }));
@@ -20,9 +17,6 @@ const { archiveTenantRowMock } = vi.hoisted(() => ({
 
 vi.mock('./steps/remove-domain', () => ({
   removeTenantDomain: removeTenantDomainMock,
-}));
-vi.mock('./steps/delete-studio-project', () => ({
-  deleteTenantStudioProject: deleteTenantStudioProjectMock,
 }));
 vi.mock('./steps/archive-sanity-project', () => ({
   archiveTenantSanityProject: archiveTenantSanityProjectMock,
@@ -47,7 +41,6 @@ const env = {
 
 beforeEach(() => {
   removeTenantDomainMock.mockReset().mockResolvedValue(undefined);
-  deleteTenantStudioProjectMock.mockReset().mockResolvedValue(undefined);
   archiveTenantSanityProjectMock.mockReset().mockResolvedValue(undefined);
   clearTenantArtifactsMock.mockReset().mockResolvedValue(undefined);
   archiveTenantRowMock.mockReset().mockResolvedValue(undefined);
@@ -59,7 +52,6 @@ describe(runSteps, () => {
 
     expect(result).toEqual({ ok: true });
     expect(removeTenantDomainMock).toHaveBeenCalledTimes(1);
-    expect(deleteTenantStudioProjectMock).toHaveBeenCalledTimes(1);
     expect(archiveTenantSanityProjectMock).toHaveBeenCalledTimes(1);
     expect(clearTenantArtifactsMock).toHaveBeenCalledTimes(1);
     expect(archiveTenantRowMock).toHaveBeenCalledTimes(1);
@@ -72,7 +64,6 @@ describe(runSteps, () => {
 
     expect(result).toEqual({ ok: false });
     expect(removeTenantDomainMock).toHaveBeenCalledTimes(1);
-    expect(deleteTenantStudioProjectMock).toHaveBeenCalledTimes(1);
     expect(archiveTenantSanityProjectMock).toHaveBeenCalledTimes(1);
     expect(clearTenantArtifactsMock).not.toHaveBeenCalled();
     expect(archiveTenantRowMock).not.toHaveBeenCalled();
@@ -83,7 +74,6 @@ describe(runSteps, () => {
 
     for (const mock of [
       removeTenantDomainMock,
-      deleteTenantStudioProjectMock,
       archiveTenantSanityProjectMock,
       clearTenantArtifactsMock,
       archiveTenantRowMock,
@@ -102,7 +92,6 @@ describe(runDeprovisioning, () => {
     );
 
     expect(removeTenantDomainMock).not.toHaveBeenCalled();
-    expect(deleteTenantStudioProjectMock).not.toHaveBeenCalled();
     expect(archiveTenantSanityProjectMock).not.toHaveBeenCalled();
     expect(clearTenantArtifactsMock).not.toHaveBeenCalled();
     expect(archiveTenantRowMock).not.toHaveBeenCalled();

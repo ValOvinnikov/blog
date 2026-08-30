@@ -103,7 +103,6 @@ function stepsWith(
   return {
     SANITY_PROJECT: idle,
     SEED_CONTENT: idle,
-    DEPLOY_STUDIO: idle,
     PERSIST_TOKEN: idle,
     MAP_DOMAIN: idle,
     CREATE_WEBHOOK: idle,
@@ -304,7 +303,6 @@ describe(updateTenantDetails, () => {
       provisioningSteps: {
         SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.RUNNING },
         SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
@@ -366,7 +364,6 @@ describe(updateTenantDetails, () => {
       provisioningSteps: {
         SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.RUNNING },
         SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
@@ -393,7 +390,6 @@ describe(updateTenantDetails, () => {
       provisioningSteps: {
         SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
@@ -431,7 +427,6 @@ describe(updateTenantDetails, () => {
       provisioningSteps: {
         SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
@@ -469,7 +464,6 @@ describe(updateTenantDetails, () => {
       provisioningSteps: stepsWith({
         SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
@@ -490,12 +484,13 @@ describe(updateTenantDetails, () => {
     expect(row?.name).toBe('Acme');
   });
 
-  it('updates a changed slug when provisioning failed before DEPLOY_STUDIO completed', async () => {
+  it('updates a changed slug regardless of how far provisioning has progressed', async () => {
     const tenantId = await insertTenantWithDomain({
       slug: 'acme',
       provisioningSteps: stepsWith({
         SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
+        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
       }),
     });
 
@@ -511,66 +506,12 @@ describe(updateTenantDetails, () => {
     });
   });
 
-  it('refuses a changed slug with slug-locked once DEPLOY_STUDIO has completed, and leaves the row unchanged', async () => {
-    const tenantId = await insertTenantWithDomain({
-      slug: 'acme',
-      provisioningSteps: stepsWith({
-        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
-      }),
-    });
-
-    const result = await updateTenantDetails(tenantId, {
-      ...validInput,
-      slug: 'acme-new',
-      primaryDomain: 'acme.example.com',
-    });
-
-    expect(result).toEqual({
-      outcome: 'slug-locked',
-      blockingStep: 'DEPLOY_STUDIO',
-    });
-
-    const [row] = await db
-      .select()
-      .from(tenants)
-      .where(eq(tenants.id, tenantId));
-    expect(row?.slug).toBe('acme');
-  });
-
-  it('applies the rest of the update instead of slug-locked when the resubmitted slug is unchanged, even though DEPLOY_STUDIO has completed', async () => {
-    const tenantId = await insertTenantWithDomain({
-      slug: 'acme',
-      provisioningSteps: stepsWith({
-        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
-      }),
-    });
-
-    const result = await updateTenantDetails(tenantId, {
-      ...validInput,
-      slug: 'acme',
-      primaryDomain: 'acme.example.com',
-      name: 'New Name',
-    });
-
-    expect(result).toMatchObject({
-      outcome: 'updated',
-      tenant: { name: 'New Name', slug: 'acme' },
-    });
-  });
-
   it('updates a changed primaryDomain when provisioning failed before MAP_DOMAIN completed', async () => {
     const tenantId = await insertTenantWithDomain({
       domain: 'acme.example.com',
       provisioningSteps: stepsWith({
         SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
       }),
@@ -593,7 +534,6 @@ describe(updateTenantDetails, () => {
       provisioningSteps: stepsWith({
         SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
@@ -623,7 +563,6 @@ describe(updateTenantDetails, () => {
       provisioningSteps: stepsWith({
         SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
@@ -649,7 +588,6 @@ describe(updateTenantDetails, () => {
       provisioningSteps: stepsWith({
         SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
@@ -676,7 +614,7 @@ describe(updateTenantDetails, () => {
       provisioningSteps: stepsWith({
         SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
+        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
       }),
     });
 
@@ -716,7 +654,6 @@ describe(updateTenantDetails, () => {
       provisioningSteps: stepsWith({
         SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
         CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
@@ -740,7 +677,6 @@ describe(updateTenantDetails, () => {
       provisioningSteps: stepsWith({
         SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
         MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
@@ -807,7 +743,6 @@ describe(updateTenantDetails, () => {
       provisioningSteps: {
         SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.RUNNING },
         SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },

@@ -28,7 +28,7 @@ const ALL_FIELD_KEYS: TTenantFieldKey[] = [
   'ownerEmail',
 ];
 
-// The six core provisioning steps `run.ts`'s workflow actually sequences —
+// The five core provisioning steps `run.ts`'s workflow actually sequences —
 // hardcoded rather than derived from `TENANT_PROVISIONING_STEP` (which also
 // carries `OWNER_ELEVATION`, a recurring post-provisioning check with no
 // bearing on this state machine) so this fold can't silently pick up a
@@ -36,7 +36,6 @@ const ALL_FIELD_KEYS: TTenantFieldKey[] = [
 const CORE_PROVISIONING_STEPS: TTenantProvisioningStep[] = [
   TENANT_PROVISIONING_STEP.SANITY_PROJECT,
   TENANT_PROVISIONING_STEP.SEED_CONTENT,
-  TENANT_PROVISIONING_STEP.DEPLOY_STUDIO,
   TENANT_PROVISIONING_STEP.PERSIST_TOKEN,
   TENANT_PROVISIONING_STEP.MAP_DOMAIN,
   TENANT_PROVISIONING_STEP.CREATE_WEBHOOK,
@@ -93,10 +92,10 @@ const deriveProvisioningState = (
 /**
  * The client-side mirror of `packages/db`'s `updateTenantDetails` per-field
  * lock rules: while provisioning is FAILED, only a field an already-completed
- * step baked into an external resource locks (`slug` once `DEPLOY_STUDIO` is
- * DONE, `primaryDomain` once `MAP_DOMAIN` is DONE) — the field that actually
- * caused the failure stays editable. RUNNING/SUCCEEDED lock every field,
- * matching that function's blanket `provisioning-started` rejection.
+ * step baked into an external resource locks (`primaryDomain` once
+ * `MAP_DOMAIN` is DONE) — the field that actually caused the failure stays
+ * editable. RUNNING/SUCCEEDED lock every field, matching that function's
+ * blanket `provisioning-started` rejection.
  */
 export const computeTenantFieldLocks = (
   steps: TTenantProvisioningSteps | null,
@@ -110,16 +109,6 @@ export const computeTenantFieldLocks = (
 
   if (state === 'FAILED') {
     const locks: TTenantFieldLocks = {};
-
-    if (
-      steps?.[TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]?.status ===
-      TENANT_PROVISIONING_STEP_STATUS.DONE
-    ) {
-      locks.slug = {
-        kind: 'step',
-        step: TENANT_PROVISIONING_STEP.DEPLOY_STUDIO,
-      };
-    }
 
     if (
       steps?.[TENANT_PROVISIONING_STEP.MAP_DOMAIN]?.status ===

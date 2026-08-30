@@ -59,7 +59,7 @@ When invoked, before writing any code:
 - Depend only on `@blog/db`, `@blog/config`, `@blog/utils`, and the
   `next-auth`/`@auth/*` packages. The graph stays acyclic:
   `auth → db, config, utils`.
-- **Only `apps/web` and `apps/platform` consume this package.** `cms`, `service`,
+- **Only `apps/web` and `apps/platform` consume this package.** `studio`, `service`,
   `ui`, and `db` never do.
 - **Export configuration, not instances.** Each app calls `NextAuth()` itself
   with the config you export, so each keeps its own `auth`/`handlers` bound to

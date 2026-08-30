@@ -27,7 +27,6 @@ export type TUpdateTenantDetailsResult =
   | { outcome: 'updated'; tenant: TTenant }
   | { outcome: 'slug-taken' }
   | { outcome: 'domain-taken' }
-  | { outcome: 'slug-locked'; blockingStep: TTenantProvisioningStep }
   | { outcome: 'domain-locked'; blockingStep: TTenantProvisioningStep }
   | { outcome: 'provisioning-started' }
   | { outcome: 'owner-already-joined' }
@@ -40,7 +39,7 @@ export type TUpdateTenantDetailsResult =
 // never by position in the sequence.
 type TProvisioningState = 'IDLE' | 'RUNNING' | 'FAILED' | 'SUCCEEDED';
 
-// The six core provisioning steps `run.ts`'s workflow actually sequences —
+// The five core provisioning steps `run.ts`'s workflow actually sequences —
 // hardcoded rather than derived from `TENANT_PROVISIONING_STEP` (which also
 // carries `OWNER_ELEVATION`, a recurring post-provisioning check with no
 // bearing on this state machine) so this fold can't silently pick up a
@@ -48,7 +47,6 @@ type TProvisioningState = 'IDLE' | 'RUNNING' | 'FAILED' | 'SUCCEEDED';
 const CORE_PROVISIONING_STEPS: TTenantProvisioningStep[] = [
   TENANT_PROVISIONING_STEP.SANITY_PROJECT,
   TENANT_PROVISIONING_STEP.SEED_CONTENT,
-  TENANT_PROVISIONING_STEP.DEPLOY_STUDIO,
   TENANT_PROVISIONING_STEP.PERSIST_TOKEN,
   TENANT_PROVISIONING_STEP.MAP_DOMAIN,
   TENANT_PROVISIONING_STEP.CREATE_WEBHOOK,
@@ -99,29 +97,15 @@ function deriveProvisioningState(
   return 'RUNNING';
 }
 
-// Only slug (`DEPLOY_STUDIO`) and primaryDomain (`MAP_DOMAIN`) get baked
-// into an external resource by a completed step; name/plan/locale never lock.
+// Only primaryDomain (`MAP_DOMAIN`) gets baked into an external resource by
+// a completed step; name/slug/plan/locale never lock.
 function lockedFieldOutcome(
   input: TUpdateTenantDetailsInput,
   existing: TTenant,
 ):
-  | Extract<
-      TUpdateTenantDetailsResult,
-      { outcome: 'slug-locked' | 'domain-locked' }
-    >
+  | Extract<TUpdateTenantDetailsResult, { outcome: 'domain-locked' }>
   | undefined {
   const steps = existing.provisioningSteps;
-
-  if (
-    input.slug !== existing.slug &&
-    steps?.[TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]?.status ===
-      TENANT_PROVISIONING_STEP_STATUS.DONE
-  ) {
-    return {
-      outcome: 'slug-locked',
-      blockingStep: TENANT_PROVISIONING_STEP.DEPLOY_STUDIO,
-    };
-  }
 
   if (
     input.primaryDomain !== existing.primaryDomain &&
@@ -140,10 +124,10 @@ function lockedFieldOutcome(
 // Pre-checked rather than caught off the `slug_unique`/`tenant_domains.domain`
 // unique constraints: a typed outcome the caller can map straight onto a
 // field error, instead of an unhandled Postgres throw. First match wins:
-// provisioning-started (RUNNING/SUCCEEDED), then slug-locked/domain-locked
-// (FAILED, only for a field a completed step already consumed), then
-// slug-taken, then domain-taken, then (when `ownerEmail` is supplied)
-// owner-already-joined / owner-email-taken.
+// provisioning-started (RUNNING/SUCCEEDED), then domain-locked (FAILED, only
+// when a completed MAP_DOMAIN already consumed it), then slug-taken, then
+// domain-taken, then (when `ownerEmail` is supplied) owner-already-joined /
+// owner-email-taken.
 export async function updateTenantDetails(
   tenantId: string,
   input: TUpdateTenantDetailsInput,

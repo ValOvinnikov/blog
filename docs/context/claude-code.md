@@ -13,7 +13,7 @@ contracts:
   - `config` — `packages/config`, `packages/utils`, `configs/*`: UPPERCASE
     constants, the `routes` URL builder, shared config packages, cross-workspace
     alias wiring, guards `src/sanity/generated/` (typegen-only).
-  - `cms` — Sanity schemas, content modelling, typegen.
+  - `studio` — Sanity schemas, content modelling, typegen, and the `StudioMount` component `apps/platform` renders.
   - `service` — Sanity client, GROQ, typed fetchers (no React).
   - `db` — `packages/db` (`@blog/db`): Neon Postgres + Drizzle, the
     relational sibling to `service` for the engagement layer (Auth.js,
@@ -32,7 +32,7 @@ contracts:
   - `platform-app` — `apps/platform`, the operator/tenant admin panel: a second Next.js
     app with its own deployment and domain, gated by the session `apps/web`
     already issues. A sibling to `web`, not a step after it — its upstreams are
-    `config`, `db`, and `ui` only, so it never waits on `cms`/`service`, which
+    `config`, `db`, and `ui` only, so it never waits on `studio`/`service`, which
     it must not import. Interactive primitives come from Base UI installed in
     that app and styled with the shared Tailwind tokens; nothing is added to
     `@blog/ui` for it (a component with one consumer isn't shared — the same
@@ -49,7 +49,7 @@ contracts:
     via `recordAuditEvent`, gated on the mutation actually having succeeded —
     auditing is a separate concern from logging, and a false record is worse
     than a missing one.
-  - Those nine layer agents (`config`, `cms`, `service`, `ui`, `web`, `db`,
+  - Those nine layer agents (`config`, `studio`, `service`, `ui`, `web`, `db`,
     `platform-app`, `auth`, `insight`) additionally carry the two context7 MCP tools
     (`resolve-library-id`, `query-docs`) in their `tools:` frontmatter, so the
     `use-context7` skill is actually executable by the agent that hits an
@@ -272,7 +272,7 @@ file` are all denied alike) — an earlier version only handled the
   - `pre-agent-gate0-guard.sh` — `PreToolUse` hook on the **`Agent` tool**
     (wired in `settings.json`, not in agent frontmatter, since it must see
     dispatches before any agent starts). Denies dispatching a **layer agent**
-    (`config`/`cms`/`service`/`ui`/`web`/`db`/`platform-app`/`auth`/`insight`) to implement an issue that
+    (`config`/`studio`/`service`/`ui`/`web`/`db`/`platform-app`/`auth`/`insight`) to implement an issue that
     isn't `In Progress` on the board — i.e. Gate 0 was skipped. The deny
     message names the fix (dispatch `board-keeper` with
     `"starting work on #<n>"`).
@@ -469,7 +469,7 @@ file` are all denied alike) — an earlier version only handled the
 - **Skills** (`.claude/skills/`):
   - `develop-feature` — the lifecycle playbook (investigate → delegate per layer → test → review → commit → remove the subagent worktrees); start here for non-trivial work.
   - `add-content-type` — end-to-end recipe spanning all layers (schema → types → service → ui → web).
-  - `cms-schema-practices` — Sanity schema quality bar + content-migration workflow.
+  - `studio-schema-practices` — Sanity schema quality bar + content-migration workflow.
   - `ui-library-practices` — building pure, prop-driven design-system components.
   - `web-component-practices` — building interactive `apps/web` components (compose `@blog/ui` via slots, client behaviour in ref-based hooks).
   - `ui-storybook` / `web-storybook` — Storybook conventions per workspace.

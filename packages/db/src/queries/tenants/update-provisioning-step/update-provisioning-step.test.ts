@@ -26,7 +26,6 @@ async function insertDraftTenant(): Promise<string> {
       provisioningSteps: {
         SANITY_PROJECT: { status: 'IDLE' },
         SEED_CONTENT: { status: 'IDLE' },
-        DEPLOY_STUDIO: { status: 'IDLE' },
         PERSIST_TOKEN: { status: 'IDLE' },
         MAP_DOMAIN: { status: 'IDLE' },
         CREATE_WEBHOOK: { status: 'IDLE' },
@@ -66,7 +65,6 @@ describe(updateProvisioningStep, () => {
     expect(result.data.provisioningSteps).toEqual({
       SANITY_PROJECT: { status: 'RUNNING' },
       SEED_CONTENT: { status: 'IDLE' },
-      DEPLOY_STUDIO: { status: 'IDLE' },
       PERSIST_TOKEN: { status: 'IDLE' },
       MAP_DOMAIN: { status: 'IDLE' },
       CREATE_WEBHOOK: { status: 'IDLE' },
@@ -92,7 +90,6 @@ describe(updateProvisioningStep, () => {
     expect(result.data.provisioningSteps).toEqual({
       SANITY_PROJECT: { status: 'DONE' },
       SEED_CONTENT: { status: 'RUNNING' },
-      DEPLOY_STUDIO: { status: 'IDLE' },
       PERSIST_TOKEN: { status: 'IDLE' },
       MAP_DOMAIN: { status: 'IDLE' },
       CREATE_WEBHOOK: { status: 'IDLE' },

@@ -1,5 +1,5 @@
 /**
- * Provisioning workflow entrypoint — runs the six independently-idempotent
+ * Provisioning workflow entrypoint — runs the five independently-idempotent
  * steps in order for one tenant, writing each step's status directly to
  * Postgres (via `reportStepStatus`) both on success and failure, then
  * attempts to elevate the owner to Sanity `administrator` (see
@@ -33,7 +33,6 @@ import { reportOwnerElevationOutcome } from './lib/report-owner-elevation-outcom
 import { reportStepStatus } from './lib/report-step-status';
 import { createTenantRevalidateWebhook } from './steps/create-revalidate-webhook';
 import { createTenantSanityProject } from './steps/create-sanity-project';
-import { createTenantStudio } from './steps/create-studio-vercel-project';
 import { elevateTenantOwner } from './steps/elevate-tenant-owner';
 import { mapTenantDomain } from './steps/map-domain';
 import { persistTenantSanityToken } from './steps/persist-sanity-token';
@@ -66,7 +65,6 @@ const STEPS: TStep[] = [
     run: createTenantSanityProject,
   },
   { key: TENANT_PROVISIONING_STEP.SEED_CONTENT, run: seedTenantContent },
-  { key: TENANT_PROVISIONING_STEP.DEPLOY_STUDIO, run: createTenantStudio },
   {
     key: TENANT_PROVISIONING_STEP.PERSIST_TOKEN,
     run: persistTenantSanityToken,

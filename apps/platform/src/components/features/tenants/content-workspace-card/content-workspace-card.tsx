@@ -12,7 +12,6 @@ export const ContentWorkspaceCard = ({
   tenant,
 }: TContentWorkspaceCardProps) => {
   const t = useTranslations('tenantOverviewPage');
-  const studioHost = `studio-${tenant.slug}.valstack.dev`;
 
   return (
     <Card>
@@ -32,9 +31,6 @@ export const ContentWorkspaceCard = ({
           </DetailList.Row>
           <DetailList.Row label={t('datasetLabel')} isMono={true}>
             {tenant.sanityDataset ?? t('notSetValue')}
-          </DetailList.Row>
-          <DetailList.Row label={t('studioLabel')} isMono={true}>
-            {studioHost}
           </DetailList.Row>
           <DetailList.Row label={t('readTokenLabel')}>
             <StatusBadge

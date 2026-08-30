@@ -37,7 +37,7 @@ This README covers what the project is and where things live. Everything else
 ## Stack
 
 - **Next.js 16** (App Router, React Server Components, TS strict) + **React 19** — `apps/web`
-- **Sanity Studio v6** (headless CMS, typegen source) — `apps/cms`
+- **Sanity Studio v6** (headless CMS, typegen source) — `packages/studio`
 - **Tailwind CSS v4** with shared design tokens + `tailwind-variants`
 - **next-intl** i18n (locale-prefix-free URLs)
 - **Atomic Design** component library — `packages/ui`
@@ -48,9 +48,9 @@ This README covers what the project is and where things live. Everything else
 
 ```
 apps/
-  cms        Sanity Studio: schemas, editorial UI, typegen source   (cms)
   web        Next.js frontend: routes, SEO, composition             (web)
 packages/
+  studio     Sanity Studio: schemas, editorial UI, typegen source   (@blog/studio)
   service    Data access: Sanity client, groqd queries, transformers (@blog/service)
   ui         Atomic Design component library (pure, prop-driven)     (@blog/ui)
   config     Constants, generated Sanity types, shared TS types      (@blog/config)

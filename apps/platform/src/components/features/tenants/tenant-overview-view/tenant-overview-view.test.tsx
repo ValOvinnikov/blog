@@ -94,7 +94,6 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
-        isSuperAdmin={false}
       />,
     );
 
@@ -120,7 +119,6 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
-        isSuperAdmin={false}
       />,
     );
 
@@ -160,7 +158,6 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
-        isSuperAdmin={false}
       />,
     );
 
@@ -177,7 +174,6 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
-        isSuperAdmin={false}
       />,
     );
 
@@ -202,7 +198,6 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
-        isSuperAdmin={false}
       />,
     );
 
@@ -214,12 +209,8 @@ describe(TenantOverviewView, () => {
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
   });
 
-  it('locks only the field a completed step already consumed once provisioning has FAILED, leaving the field that caused the failure editable', () => {
-    // Mirrors the real 409 case: DEPLOY_STUDIO completed (locking slug), but
-    // MAP_DOMAIN itself failed — so primaryDomain, the field that actually
-    // caused the failure, stays editable.
+  it('locks primaryDomain once MAP_DOMAIN has completed and a later step failed, leaving the field that caused the failure editable', () => {
     const tenant = makeTenant({
-      primaryDomain: 'taken-domain.example.com',
       provisioningSteps: {
         ...idleProvisioningSteps(),
         [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
@@ -228,15 +219,15 @@ describe(TenantOverviewView, () => {
         [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
           status: TENANT_PROVISIONING_STEP_STATUS.DONE,
         },
-        [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
         [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
           status: TENANT_PROVISIONING_STEP_STATUS.DONE,
         },
         [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
+        [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
           status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error: 'Vercel deploy failed: 409 domain_already_in_use',
+          error: 'boom',
         },
       },
     });
@@ -248,20 +239,18 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
-        isSuperAdmin={false}
       />,
-    );
-
-    const slugInput = screen.getByRole('textbox', { name: 'Slug' });
-    expect(slugInput).toBeDisabled();
-    expect(slugInput).toHaveAccessibleDescription(
-      'Locked — the "Deploy the content editor" step has already completed and used this value.',
     );
 
     const domainInput = screen.getByRole('textbox', {
       name: 'Primary domain',
     });
-    expect(domainInput).not.toBeDisabled();
+    expect(domainInput).toBeDisabled();
+    expect(domainInput).toHaveAccessibleDescription(
+      'Locked — the "Connect the custom domain" step has already completed and used this value.',
+    );
+
+    expect(screen.getByRole('textbox', { name: 'Slug' })).not.toBeDisabled();
     expect(screen.getByRole('textbox', { name: 'Name' })).not.toBeDisabled();
   });
 
@@ -281,7 +270,6 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
-        isSuperAdmin={false}
       />,
     );
 
@@ -323,11 +311,10 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
-        isSuperAdmin={false}
       />,
     );
 
-    expect(screen.getByText('Provisioning — step 2 of 6')).toBeVisible();
+    expect(screen.getByText('Provisioning — step 2 of 5')).toBeVisible();
     expect(
       screen.getByRole('textbox', { name: 'Slug' }),
     ).toHaveAccessibleDescription('Locked while provisioning is running.');
@@ -363,7 +350,6 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[makeEvent()]}
-        isSuperAdmin={false}
       />,
     );
 
@@ -383,7 +369,6 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
-        isSuperAdmin={false}
       />,
     );
 
@@ -392,7 +377,7 @@ describe(TenantOverviewView, () => {
     expect(link).toHaveAttribute('target', '_blank');
   });
 
-  it('renders "Open Studio", linking to the tenant\'s Studio host, only for a super admin', () => {
+  it('never renders an "Open Studio" action — the sidebar is the only entry point to Studio', () => {
     const tenant = makeTenant({ slug: 'acme' });
     render(
       <TenantOverviewView
@@ -402,32 +387,11 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
-        isSuperAdmin={true}
-      />,
-    );
-
-    expect(screen.getByRole('link', { name: 'Open Studio ↗' })).toHaveAttribute(
-      'href',
-      'https://studio-acme.valstack.dev',
-    );
-  });
-
-  it('omits "Open Studio" for a non-super-admin viewer', () => {
-    const tenant = makeTenant({ slug: 'acme' });
-    render(
-      <TenantOverviewView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-        ownerJoinedAt="Aug 12, 2026"
-        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[]}
-        isSuperAdmin={false}
       />,
     );
 
     expect(
-      screen.queryByRole('link', { name: 'Open Studio ↗' }),
+      screen.queryByRole('link', { name: 'Open Studio →' }),
     ).not.toBeInTheDocument();
   });
 });

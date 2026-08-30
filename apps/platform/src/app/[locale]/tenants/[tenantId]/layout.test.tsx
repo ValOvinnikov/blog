@@ -44,17 +44,29 @@ describe(`<${TenantByIdLayout.name}/>`, () => {
     expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 
-  it('404s when the signed-in user has no admins row', async () => {
+  it('404s when the signed-in user has no admins row — this is what keeps the operator-only Studio route ungated by URL alone', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
-    expect(redirect).not.toHaveBeenCalled();
     expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 
-  it('renders the gated content for a platform operator', async () => {
+  it('404s for an unknown tenant id', async () => {
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    getAdminByUserIdMock.mockResolvedValue({
+      id: 'admin-1',
+      userId: 'user-1',
+      role: 'ADMIN',
+      createdAt: new Date(),
+    });
+    getTenantByIdMock.mockResolvedValue(undefined);
+
+    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+  });
+
+  it('renders the gated content bare, with no AdminShell chrome, for a platform operator', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue({
       id: 'admin-1',
@@ -72,27 +84,9 @@ describe(`<${TenantByIdLayout.name}/>`, () => {
     await setup();
 
     expect(screen.getByText('tenant content')).toBeVisible();
+    expect(
+      screen.queryByText('Platform', { selector: 'p' }),
+    ).not.toBeInTheDocument();
     expect(redirect).not.toHaveBeenCalled();
-  });
-
-  it('renders both the Platform and Tenant sections in the sidebar', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      userId: 'user-1',
-      role: 'ADMIN',
-      createdAt: new Date(),
-    });
-    getTenantByIdMock.mockResolvedValue({
-      id: 'tenant-1',
-      slug: 'acme',
-      name: 'Acme Inc.',
-      primaryDomain: 'acme.example.com',
-    });
-
-    await setup();
-
-    expect(screen.getByText('Platform', { selector: 'p' })).toBeVisible();
-    expect(screen.getByText('Tenant · Acme Inc.')).toBeVisible();
   });
 });

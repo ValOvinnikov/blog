@@ -1,6 +1,6 @@
 // Checks that the "voice" override vocabulary stays in sync across the four
 // places that hand-duplicate it:
-//   - apps/cms/src/schema-types/documents/settings/voice.ts
+//   - packages/studio/src/schema-types/documents/settings/voice.ts
 //     (the Sanity `settings_voice` schema's `defineField({ name: '...' })` calls)
 //   - apps/platform/src/utils/voice-fields/voice-fields.ts
 //     (`VOICE_FIELD_GROUPS`' field `key`s)
@@ -24,7 +24,7 @@ const repoRoot = join(scriptDir, '..');
 
 const CMS_FILE = join(
   repoRoot,
-  'apps/cms/src/schema-types/documents/settings/voice.ts',
+  'packages/studio/src/schema-types/documents/settings/voice.ts',
 );
 const ADMIN_FILE = join(
   repoRoot,

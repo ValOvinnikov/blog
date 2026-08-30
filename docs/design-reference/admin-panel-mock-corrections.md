@@ -120,7 +120,7 @@ The mock invents **"Publish confirmation"** (`:555`) and **"No search
 results"** (`:569`). Remove both — the second is especially misleading because
 **there is no search feature on the site**.
 
-The real set is 19 fields in 4 groups (source: `apps/cms/src/schema-types/
+The real set is 19 fields in 4 groups (source: `packages/studio/src/schema-types/
 documents/settings/voice.ts`, being ported to Postgres — the field set carries
 over unchanged). Use these groupings and names:
 

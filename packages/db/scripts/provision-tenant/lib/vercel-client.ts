@@ -32,30 +32,6 @@ async function vercelRequest<T>(
   return (text ? JSON.parse(text) : undefined) as T;
 }
 
-export type TVercelProject = { id: string; name: string };
-
-export async function createVercelProject(input: {
-  token: string;
-  teamId: string | undefined;
-  name: string;
-  rootDirectory: string;
-  gitRepository: string;
-}): Promise<TVercelProject> {
-  return vercelRequest<TVercelProject>(
-    withTeamId('/v11/projects', input.teamId),
-    input.token,
-    {
-      method: 'POST',
-      body: JSON.stringify({
-        name: input.name,
-        rootDirectory: input.rootDirectory,
-        framework: 'sanity',
-        gitRepository: { repo: input.gitRepository, type: 'github' },
-      }),
-    },
-  );
-}
-
 export type TVercelDomain = { name: string };
 
 export async function listVercelProjectDomains(input: {

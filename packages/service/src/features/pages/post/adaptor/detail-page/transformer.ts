@@ -77,9 +77,6 @@ export function toPostDetail(
     newsletterEnabled: raw.newsletterEnabled ?? true,
     body: raw.body,
     skim: toPostSkim(raw.skim),
-    // `_type: 'aside'` is the schema's own registered block name (`apps/cms/src/schema-types/objects/aside.ts`),
-    // matching how `.filterByType('blog_post')`/module queries elsewhere in
-    // this package match against a document's own `_type` literal.
     hasAsides: raw.body.some((block) => block._type === 'aside'),
     // `page_post.seo` is the override — mirrors `page_topic`/`page_blog`,
     // whose own `.seo` overrides a content-derived fallback, not the wrapped

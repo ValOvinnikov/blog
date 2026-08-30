@@ -1,10 +1,12 @@
 import { ICONS } from '@blog/config';
+import { SidebarCollapseProvider } from '@platform/components/features/layout/sidebar-collapse-provider';
 import {
   renderWithIntl,
   screen,
   within,
 } from '@platform/testing/custom-render';
-import type { ComponentPropsWithoutRef } from 'react';
+import userEvent from '@testing-library/user-event';
+import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 
 import { Sidebar } from './sidebar';
 
@@ -29,7 +31,15 @@ vi.mock('@platform/i18n/navigation', () => ({
   ),
 }));
 
-const render = renderWithIntl;
+// `Sidebar` renders `SidebarCollapseToggle`, which reads `useSidebarCollapse`
+// — every render needs the ambient `SidebarCollapseProvider` `ShellFrame`
+// supplies in production.
+const render = (ui: ReactNode) =>
+  renderWithIntl(
+    <SidebarCollapseProvider isInitiallyCollapsed={false}>
+      {ui}
+    </SidebarCollapseProvider>,
+  );
 
 const setPathname = (pathname: string) => {
   usePathnameMock.mockReturnValue(pathname);
@@ -146,6 +156,40 @@ describe(Sidebar, () => {
     );
   });
 
+  it('marks Studio active when its own route is open, same as any other nav item', () => {
+    setPathname('/tenants/tenant-1/studio');
+
+    render(
+      <Sidebar
+        sections={[
+          {
+            label: 'Tenant · acme',
+            items: [
+              {
+                label: 'Studio',
+                icon: ICONS.STUDIO,
+                href: '/tenants/tenant-1/studio',
+              },
+              {
+                label: 'Look',
+                icon: ICONS.PALETTE,
+                href: '/tenants/tenant-1/look',
+              },
+            ],
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByRole('link', { name: 'Studio' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(screen.getByRole('link', { name: 'Look' })).not.toHaveAttribute(
+      'aria-current',
+    );
+  });
+
   it('switches which item is active when the route changes — the case a shared href could not express', () => {
     setPathname('/tenants/tenant-1/voice');
 
@@ -229,5 +273,39 @@ describe(Sidebar, () => {
 
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
     expect(screen.getByText("Provisioning isn't available yet.")).toBeVisible();
+  });
+
+  it('names its collapse toggle for the action it performs, and flips both the name and aria-expanded on click', async () => {
+    const user = userEvent.setup();
+    render(<Sidebar sections={[]} />);
+
+    const toggle = screen.getByRole('button', { name: 'Collapse sidebar' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+
+    await user.click(toggle);
+
+    expect(
+      screen.getByRole('button', { name: 'Expand sidebar' }),
+    ).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('keeps a nav link reachable by its accessible name once the sidebar starts collapsed', () => {
+    renderWithIntl(
+      <SidebarCollapseProvider isInitiallyCollapsed={true}>
+        <Sidebar
+          sections={[
+            {
+              label: 'Platform',
+              items: [{ label: 'Tenants', icon: ICONS.GRID, href: '/tenants' }],
+            },
+          ]}
+        />
+      </SidebarCollapseProvider>,
+    );
+
+    expect(screen.getByRole('link', { name: 'Tenants' })).toHaveAttribute(
+      'href',
+      '/tenants',
+    );
   });
 });

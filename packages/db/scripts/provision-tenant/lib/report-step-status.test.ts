@@ -26,7 +26,6 @@ async function insertDraftTenant(): Promise<string> {
       provisioningSteps: {
         SANITY_PROJECT: { status: 'IDLE' },
         SEED_CONTENT: { status: 'IDLE' },
-        DEPLOY_STUDIO: { status: 'IDLE' },
         PERSIST_TOKEN: { status: 'IDLE' },
         MAP_DOMAIN: { status: 'IDLE' },
         CREATE_WEBHOOK: { status: 'IDLE' },
@@ -129,7 +128,7 @@ describe(reportStepStatus, () => {
 
     await reportStepStatus({
       tenantId,
-      step: 'DEPLOY_STUDIO',
+      step: 'PERSIST_TOKEN',
       status: 'FAILED',
     });
 

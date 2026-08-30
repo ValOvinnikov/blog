@@ -53,6 +53,10 @@ export default mergeConfig(
           replacement: `${fileURLToPath(new URL('../../packages/ui/src', import.meta.url))}/`,
         },
         {
+          find: /^@blog\/studio\//,
+          replacement: `${fileURLToPath(new URL('../../packages/studio/src', import.meta.url))}/`,
+        },
+        {
           find: /^@blog\/utils\//,
           replacement: `${fileURLToPath(new URL('../../packages/utils/src', import.meta.url))}/`,
         },

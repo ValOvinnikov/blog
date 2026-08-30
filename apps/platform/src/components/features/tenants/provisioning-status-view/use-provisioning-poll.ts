@@ -26,7 +26,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState, useEffect, useRef, useTransition } from 'react';
 
-// The six core provisioning steps `run.ts`'s workflow actually sequences —
+// The five core provisioning steps `run.ts`'s workflow actually sequences —
 // hardcoded rather than derived from `TENANT_PROVISIONING_STEP` (which also
 // carries `OWNER_ELEVATION`, a recurring post-provisioning check with no
 // step-count or ordering role in this UI) so this list can't silently pick
@@ -35,7 +35,6 @@ import { useState, useEffect, useRef, useTransition } from 'react';
 export const STEP_ORDER: TTenantProvisioningStep[] = [
   TENANT_PROVISIONING_STEP.SANITY_PROJECT,
   TENANT_PROVISIONING_STEP.SEED_CONTENT,
-  TENANT_PROVISIONING_STEP.DEPLOY_STUDIO,
   TENANT_PROVISIONING_STEP.PERSIST_TOKEN,
   TENANT_PROVISIONING_STEP.MAP_DOMAIN,
   TENANT_PROVISIONING_STEP.CREATE_WEBHOOK,
@@ -140,7 +139,7 @@ export type TUseProvisioningPollResult = {
   failedStepError: string | undefined;
   errorKind: TProvisioningErrorKind | undefined;
   domainStatus: TDomainVerificationStatus;
-  /** The most recent `elevateTenantOwner` check's outcome, independent of the six-step sequence above. `undefined` before any check has run. */
+  /** The most recent `elevateTenantOwner` check's outcome, independent of the five-step sequence above. `undefined` before any check has run. */
   ownerElevationOutcome: TElevateTenantOwnerOutcome | undefined;
 };
 

@@ -27,7 +27,6 @@ export type TTenantOverviewViewProps = {
   ownerJoinedAt: string | undefined;
   ownerJoinedAtIso: string | undefined;
   auditEvents: TAuditEvent[];
-  isSuperAdmin: boolean;
 };
 
 /**
@@ -45,7 +44,6 @@ export const TenantOverviewView = ({
   ownerJoinedAt,
   ownerJoinedAtIso,
   auditEvents,
-  isSuperAdmin,
 }: TTenantOverviewViewProps) => {
   const tTenantsTable = useTranslations('tenantsTable');
   const t = useTranslations('tenantOverviewPage');
@@ -76,18 +74,9 @@ export const TenantOverviewView = ({
           </>
         }
         actions={
-          <>
-            <ExternalLinkButton href={`https://${tenant.primaryDomain}`}>
-              {t('openSiteAction')}
-            </ExternalLinkButton>
-            {isSuperAdmin && (
-              <ExternalLinkButton
-                href={`https://studio-${tenant.slug}.valstack.dev`}
-              >
-                {t('openStudioAction')}
-              </ExternalLinkButton>
-            )}
-          </>
+          <ExternalLinkButton href={`https://${tenant.primaryDomain}`}>
+            {t('openSiteAction')}
+          </ExternalLinkButton>
         }
       />
 
