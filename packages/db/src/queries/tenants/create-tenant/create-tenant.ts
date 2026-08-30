@@ -39,9 +39,7 @@ export async function createTenant(
     .where(eq(tenants.slug, input.slug));
 
   if (!existing) {
-    // A real, if narrow, race: the insert only no-ops on a `slug`
-    // conflict, but `updateTenantDetails` can rename an existing tenant's
-    // slug away between this call's failed insert and this read.
+    // A real, if narrow, race: the insert no-ops on a `slug` conflict, but `updateTenantDetails` can rename the slug away before this read.
     return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
   }
 

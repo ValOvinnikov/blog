@@ -18,6 +18,7 @@ import {
   type TTenant,
   type TTenantProvisioningSteps,
 } from '@blog/db/schema/tenants';
+import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import type { TResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
 
@@ -124,7 +125,7 @@ export async function createTenantDraft(
           .insert(membershipInvites)
           .values({
             tenantId: tenant.data.id,
-            email: input.owner.email.trim().toLowerCase(),
+            email: normalizeEmail(input.owner.email),
             role: MEMBERSHIP_ROLE.OWNER,
           })
           .returning();
@@ -170,9 +171,7 @@ async function resolveSlugConflict(
     .where(eq(tenants.slug, slug));
 
   if (!existing) {
-    // A real, if narrow, race: the insert only no-ops on a `slug`
-    // conflict, but `updateTenantDetails` can rename an existing tenant's
-    // slug away between this call's failed insert and this read.
+    // A real, if narrow, race: the insert no-ops on a `slug` conflict, but `updateTenantDetails` can rename the slug away before this read.
     return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
   }
 

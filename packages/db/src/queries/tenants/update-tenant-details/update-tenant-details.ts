@@ -12,6 +12,7 @@ import { membershipInvites } from '@blog/db/schema/membership-invites';
 import { memberships } from '@blog/db/schema/memberships';
 import { tenantDomains } from '@blog/db/schema/tenant-domains';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
+import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import { and, eq, isNull, ne } from 'drizzle-orm';
 
 export type TUpdateTenantDetailsInput = {
@@ -194,11 +195,15 @@ export async function updateTenantDetails(
   let ownerInviteId: string | undefined;
 
   if (input.ownerEmail !== undefined) {
-    normalizedOwnerEmail = input.ownerEmail.trim().toLowerCase();
+    normalizedOwnerEmail = normalizeEmail(input.ownerEmail);
 
     const currentOwnerEmail = await getTenantOwnerEmail(tenantId);
+    const normalizedCurrentOwnerEmail =
+      currentOwnerEmail === undefined
+        ? undefined
+        : normalizeEmail(currentOwnerEmail);
     const ownerEmailChanged =
-      currentOwnerEmail?.trim().toLowerCase() !== normalizedOwnerEmail;
+      normalizedCurrentOwnerEmail !== normalizedOwnerEmail;
 
     if (ownerEmailChanged) {
       const [joinedOwner] = await db

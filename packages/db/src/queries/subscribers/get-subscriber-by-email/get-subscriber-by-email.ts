@@ -1,5 +1,6 @@
 import { getDb } from '@blog/db/client';
 import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
+import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import { and, eq } from 'drizzle-orm';
 
 // Reads a subscriber's current row (and therefore `status`) by tenant and
@@ -16,7 +17,7 @@ export async function getSubscriberByEmail(
   email: string,
 ): Promise<TSubscriber | undefined> {
   const db = getDb();
-  const normalizedEmail = email.trim().toLowerCase();
+  const normalizedEmail = normalizeEmail(email);
 
   const [existing] = await db
     .select()

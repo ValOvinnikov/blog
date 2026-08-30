@@ -1,6 +1,7 @@
 import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
+import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import type { TResult } from '@blog/utils';
 import { and, eq } from 'drizzle-orm';
 
@@ -46,7 +47,7 @@ export async function createPendingSubscriber(
   email: string,
 ): Promise<TResult<TCreatePendingSubscriberResult, TErrorCode>> {
   const db = getDb();
-  const normalizedEmail = email.trim().toLowerCase();
+  const normalizedEmail = normalizeEmail(email);
 
   const [inserted] = await db
     .insert(subscribers)
@@ -69,10 +70,7 @@ export async function createPendingSubscriber(
     );
 
   if (!existing) {
-    // A real, if narrow, race: the insert only no-ops on a (tenantId,
-    // email) conflict, but `unsubscribe` can delete that exact row between
-    // the failed insert and this read (a rapid subscribe/unsubscribe
-    // double-click, or two tabs).
+    // A real, if narrow, race: the insert no-ops on a (tenantId, email) conflict, but `unsubscribe` can delete that row before this read.
     return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
   }
 
