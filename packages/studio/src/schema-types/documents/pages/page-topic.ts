@@ -3,6 +3,7 @@ import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic';
 import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/page-topic-type';
 import { defineModulesField } from '@blog/studio/schema-types/helpers/define-modules-field';
 import { getDraftsClient } from '@blog/studio/schema-types/helpers/get-drafts-client';
+import { slugField } from '@blog/studio/schema-types/helpers/slug-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
 import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
@@ -54,17 +55,9 @@ export const pageTopicSchema = defineType({
     // — is exactly the scope this field needs: /topics/{slug} collisions
     // only matter within page_topic itself, never against page_generic's
     // /{slug}. No custom `isUnique` override is needed on top of it.
-    defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
+    slugField({
       description: 'URL path segment — auto-generated from title.',
-      options: {
-        source: 'title',
-        maxLength: 96,
-      },
-      components: { input: topicSlugUrlPreviewInput },
-      validation: (rule) => rule.required(),
+      previewInput: topicSlugUrlPreviewInput,
     }),
     defineField({
       name: 'topic',

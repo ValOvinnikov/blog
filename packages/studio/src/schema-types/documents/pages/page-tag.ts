@@ -3,6 +3,7 @@ import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag';
 import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/page-tag-type';
 import { defineModulesField } from '@blog/studio/schema-types/helpers/define-modules-field';
 import { getDraftsClient } from '@blog/studio/schema-types/helpers/get-drafts-client';
+import { slugField } from '@blog/studio/schema-types/helpers/slug-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
 import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
@@ -82,17 +83,9 @@ export const pageTagSchema = defineType({
     // — is exactly the scope this field needs: /tags/{slug} collisions only
     // matter within page_tag itself, never against page_generic's /{slug}.
     // No custom `isUnique` override is needed on top of it.
-    defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
+    slugField({
       description: 'URL path segment — auto-generated from title.',
-      options: {
-        source: 'title',
-        maxLength: 96,
-      },
-      components: { input: tagSlugUrlPreviewInput },
-      validation: (rule) => rule.required(),
+      previewInput: tagSlugUrlPreviewInput,
     }),
     defineField({
       name: 'tag',

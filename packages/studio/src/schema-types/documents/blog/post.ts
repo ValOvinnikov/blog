@@ -1,5 +1,6 @@
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
 import { getDraftsClient } from '@blog/studio/schema-types/helpers/get-drafts-client';
+import { slugField } from '@blog/studio/schema-types/helpers/slug-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt';
 import { richTextSchema } from '@blog/studio/schema-types/objects/rich-text';
 import { seoSchema } from '@blog/studio/schema-types/objects/seo';
@@ -56,16 +57,8 @@ export const postSchema = defineType({
       description: 'The headline displayed on the post page and in cards.',
       validation: (rule) => rule.required().max(120),
     }),
-    defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
+    slugField({
       description: 'URL path segment — auto-generated from the title.',
-      options: {
-        source: 'title',
-        maxLength: 96,
-      },
-      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'excerpt',
