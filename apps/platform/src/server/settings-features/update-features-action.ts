@@ -21,11 +21,9 @@ export type TUpdateFeaturesInput = z.input<typeof updateFeaturesInputSchema>;
 export type TUpdateFeaturesResult = { ok: true } | { ok: false };
 
 /**
- * The Features tab's save action. A disabled toggle on the client is a
- * courtesy, never the real gate — every capability the payload attempts to
- * turn on is re-checked against `PLAN_REGISTRY[tenant.plan]` here, and the
- * whole save is rejected (nothing is written) if any of them exceeds the
- * tenant's plan, rather than silently dropping just that one field.
+ * The Features tab's save action. Rejects the whole save (writes nothing)
+ * if any toggle in the payload exceeds `PLAN_REGISTRY[tenant.plan]`, rather
+ * than silently dropping just that field.
  */
 export const updateFeaturesAction = async (
   tenantSlug: string,

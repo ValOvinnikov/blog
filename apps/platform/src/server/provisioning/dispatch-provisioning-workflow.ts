@@ -1,10 +1,7 @@
+import { dispatchGitHubWorkflow } from '@platform/utils/dispatch-github-workflow/dispatch-github-workflow';
 import { env } from '@platform/utils/env/env';
-import { logger } from '@platform/utils/logger/logger';
-import { parseTenantProvisioningRepo } from '@platform/utils/tenant-provisioning-repo/tenant-provisioning-repo';
 
 const WORKFLOW_FILE = 'provision-tenant.yml';
-const WORKFLOW_REF = 'main';
-const DISPATCH_TIMEOUT_MS = 5000;
 
 /**
  * `workflow_dispatch` trigger for `.github/workflows/provision-tenant.yml` —
@@ -20,66 +17,29 @@ const DISPATCH_TIMEOUT_MS = 5000;
 export const dispatchProvisioningWorkflow = async (
   tenantId: string,
 ): Promise<boolean> => {
-  const token = env.TENANT_PROVISIONING_GITHUB_TOKEN;
-  const repo = parseTenantProvisioningRepo(env.TENANT_PROVISIONING_GITHUB_REPO);
-
-  if (!token || !repo) {
-    logger.error('provisioning.dispatch_skipped', { tenantId });
-    return false;
-  }
-
-  // Local-dev-only: forwarded as the workflow's `adminAppBaseUrl` input only
-  // when set, so a real (production) dispatch never sends this key and CI's
-  // `inputs.adminAppBaseUrl || vars.ADMIN_APP_BASE_URL` fallback is untouched.
   const adminAppBaseUrlOverride =
     env.TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE;
 
-  // The base-url override always implies a local test run, so it forces
-  // `development` regardless of TENANT_PROVISIONING_DATASET — a safety net
-  // against ever creating a `production`-dataset Sanity project by accident.
-  // Also forwarded as the workflow's `environment` input so the tenant
-  // registry it dispatches against always matches this Sanity dataset.
+  // Local-dev-only: forces the `development` dataset regardless of
+  // TENANT_PROVISIONING_DATASET, as a safety net against ever creating a
+  // `production`-dataset Sanity project by accident.
   const tenantSanityDataset = adminAppBaseUrlOverride
     ? 'development'
     : env.TENANT_PROVISIONING_DATASET;
 
-  try {
-    const response = await fetch(
-      `https://api.github.com/repos/${repo.owner}/${repo.repo}/actions/workflows/${WORKFLOW_FILE}/dispatches`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: 'application/vnd.github+json',
-          'X-GitHub-Api-Version': '2022-11-28',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ref: WORKFLOW_REF,
-          inputs: {
-            tenantId,
-            ...(adminAppBaseUrlOverride && {
-              adminAppBaseUrl: adminAppBaseUrlOverride,
-            }),
-            ...(tenantSanityDataset && { tenantSanityDataset }),
-            ...(tenantSanityDataset && { environment: tenantSanityDataset }),
-          },
-        }),
-        signal: AbortSignal.timeout(DISPATCH_TIMEOUT_MS),
-      },
-    );
-
-    if (!response.ok) {
-      logger.error('provisioning.dispatch_failed', {
-        tenantId,
-        responseStatus: response.status,
-      });
-      return false;
-    }
-
-    return true;
-  } catch (error) {
-    logger.error('provisioning.dispatch_error', { tenantId, error });
-    return false;
-  }
+  return dispatchGitHubWorkflow({
+    workflowFile: WORKFLOW_FILE,
+    inputs: {
+      tenantId,
+      adminAppBaseUrl: adminAppBaseUrlOverride,
+      tenantSanityDataset,
+      environment: tenantSanityDataset,
+    },
+    logEvents: {
+      skipped: 'provisioning.dispatch_skipped',
+      failed: 'provisioning.dispatch_failed',
+      error: 'provisioning.dispatch_error',
+    },
+    logContext: { tenantId },
+  });
 };

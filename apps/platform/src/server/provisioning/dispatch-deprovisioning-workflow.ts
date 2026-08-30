@@ -1,10 +1,7 @@
+import { dispatchGitHubWorkflow } from '@platform/utils/dispatch-github-workflow/dispatch-github-workflow';
 import { env } from '@platform/utils/env/env';
-import { logger } from '@platform/utils/logger/logger';
-import { parseTenantProvisioningRepo } from '@platform/utils/tenant-provisioning-repo/tenant-provisioning-repo';
 
 const WORKFLOW_FILE = 'deprovision-tenant.yml';
-const WORKFLOW_REF = 'main';
-const DISPATCH_TIMEOUT_MS = 5000;
 
 export type TDispatchDeprovisioningWorkflowInput = {
   tenantId: string;
@@ -26,55 +23,19 @@ export const dispatchDeprovisioningWorkflow = async ({
   tenantId,
   confirm,
   dryRun,
-}: TDispatchDeprovisioningWorkflowInput): Promise<boolean> => {
-  const token = env.TENANT_PROVISIONING_GITHUB_TOKEN;
-  const repo = parseTenantProvisioningRepo(env.TENANT_PROVISIONING_GITHUB_REPO);
-
-  if (!token || !repo) {
-    logger.error('provisioning.deprovision_dispatch_skipped', { tenantId });
-    return false;
-  }
-
-  const environment = env.TENANT_PROVISIONING_DATASET;
-
-  try {
-    const response = await fetch(
-      `https://api.github.com/repos/${repo.owner}/${repo.repo}/actions/workflows/${WORKFLOW_FILE}/dispatches`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: 'application/vnd.github+json',
-          'X-GitHub-Api-Version': '2022-11-28',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ref: WORKFLOW_REF,
-          inputs: {
-            tenantId,
-            confirm,
-            dryRun: String(dryRun),
-            ...(environment && { environment }),
-          },
-        }),
-        signal: AbortSignal.timeout(DISPATCH_TIMEOUT_MS),
-      },
-    );
-
-    if (!response.ok) {
-      logger.error('provisioning.deprovision_dispatch_failed', {
-        tenantId,
-        responseStatus: response.status,
-      });
-      return false;
-    }
-
-    return true;
-  } catch (error) {
-    logger.error('provisioning.deprovision_dispatch_error', {
+}: TDispatchDeprovisioningWorkflowInput): Promise<boolean> =>
+  dispatchGitHubWorkflow({
+    workflowFile: WORKFLOW_FILE,
+    inputs: {
       tenantId,
-      error,
-    });
-    return false;
-  }
-};
+      confirm,
+      dryRun: String(dryRun),
+      environment: env.TENANT_PROVISIONING_DATASET,
+    },
+    logEvents: {
+      skipped: 'provisioning.deprovision_dispatch_skipped',
+      failed: 'provisioning.deprovision_dispatch_failed',
+      error: 'provisioning.deprovision_dispatch_error',
+    },
+    logContext: { tenantId },
+  });

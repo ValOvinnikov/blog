@@ -8,21 +8,9 @@ interface IRowActivity {
 }
 
 /**
- * useToastRowPause — the per-row hover/focus-within pause-resume sub-flow
- * behind `ToastProvider`'s toast rows: tracks hover and keyboard focus as two
- * independent flags per toast id and calls `onActivate`/`onDeactivate` only
- * on the 0↔1 transition of "either is active", not on every individual
- * enter/leave/focus/blur event. This matters because the two can overlap —
- * e.g. the mouse hovers a toast, focus then tabs into its action button, and
- * the mouse leaves without focus moving: the toast must stay paused (focus
- * is still inside) until focus *also* leaves, not resume the instant the
- * mouse does.
- *
- * Also owns the row DOM node registry used to find which toast (if any)
- * currently holds focus (`getFocusedRowId`, for the `Esc` shortcut) —
- * registration and activity tracking are cleaned up together the moment a
- * row unmounts (`registerRow`'s ref callback fires with `null`), so neither
- * map grows unbounded over a long session.
+ * Tracks per-toast hover/focus activity so `ToastProvider` can pause a
+ * toast's dismiss timer while it's being interacted with, and exposes a row
+ * registry for the `Esc` shortcut to find the currently focused toast.
  */
 export const useToastRowPause = (
   onActivate: (id: string) => void,
@@ -56,14 +44,8 @@ export const useToastRowPause = (
     [onActivate, onDeactivate],
   );
 
-  // A per-id ref callback is cached and reused across renders — a plain
-  // inline `(node) => registerRow(id)(node)` would return a *new* function
-  // identity on every render, and React detaches (`null`) + reattaches a
-  // callback ref whenever its identity changes, not just on real
-  // mount/unmount. That churn would silently wipe `activity`'s entry for a
-  // still-mounted toast the instant any re-render happened between a
-  // `mouseenter` and the matching `mouseleave` (exactly what a `pause()`-
-  // triggered re-render does), losing track of the hover flag entirely.
+  // Cached per id: a fresh callback identity each render would make React
+  // detach/reattach the ref, wiping mid-hover activity for a still-mounted toast.
   const registerRow = useCallback((id: string) => {
     const cached = rowRefCallbacks.current.get(id);
     if (cached) return cached;
