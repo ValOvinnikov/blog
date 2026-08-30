@@ -99,4 +99,40 @@ describe('env', () => {
 
     expect(env.SANITY_API_WRITE_TOKEN).toBeUndefined();
   });
+
+  it('reads NEXT_PUBLIC_SANITY_PROJECT_ID/DATASET as if window is defined', async () => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
+    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'staging';
+    process.env['SANITY_API_READ_TOKEN'] = 'secret-token';
+    process.env['SANITY_API_WRITE_TOKEN'] = 'secret-write-token';
+
+    vi.stubGlobal('window', {});
+    try {
+      const { env } = await importEnv();
+
+      expect(env.NEXT_PUBLIC_SANITY_PROJECT_ID).toBe('abc123');
+      expect(env.NEXT_PUBLIC_SANITY_DATASET).toBe('staging');
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('throws when SANITY_API_READ_TOKEN is accessed as if window is defined', async () => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
+    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'staging';
+    process.env['SANITY_API_READ_TOKEN'] = 'secret-token';
+
+    vi.stubGlobal('window', {});
+    try {
+      const { env } = await importEnv();
+
+      expect(() => env.SANITY_API_READ_TOKEN).toThrow(
+        /server-side environment variable/,
+      );
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
 });
