@@ -2,45 +2,25 @@ import { authorSchema } from '@blog/studio/schema-types/documents/blog/author';
 import { postSchema } from '@blog/studio/schema-types/documents/blog/post';
 import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag';
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic';
-import { blogPageSchema } from '@blog/studio/schema-types/documents/pages/blog-page';
-import { homePageSchema } from '@blog/studio/schema-types/documents/pages/home-page';
-import { genericSchema } from '@blog/studio/schema-types/documents/pages/page';
-import { pagePostSchema } from '@blog/studio/schema-types/documents/pages/page-post';
-import { pageTagSchema } from '@blog/studio/schema-types/documents/pages/page-tag';
-import { pageTopicSchema } from '@blog/studio/schema-types/documents/pages/page-topic';
-import { tagIndexPageSchema } from '@blog/studio/schema-types/documents/pages/tag-index-page';
-import { topicIndexPageSchema } from '@blog/studio/schema-types/documents/pages/topic-index-page';
 import { footerSchema } from '@blog/studio/schema-types/documents/settings/footer';
 import { navigationSchema } from '@blog/studio/schema-types/documents/settings/navigation';
 import { newsletterSettingsSchema } from '@blog/studio/schema-types/documents/settings/newsletter';
 import { siteSchema } from '@blog/studio/schema-types/documents/settings/site-settings';
 import { themeSchema } from '@blog/studio/schema-types/documents/settings/theme';
 import { voiceSchema } from '@blog/studio/schema-types/documents/settings/voice';
-import { contentSchema } from '@blog/studio/schema-types/modules/module-content';
-import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
-import { heroSchema } from '@blog/studio/schema-types/modules/module-hero';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
-import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
-import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
-import { taxonomyListSchema } from '@blog/studio/schema-types/modules/module-taxonomy-list';
+import { buildGroupedListItems } from '@blog/studio/structure/build-grouped-list';
+import { modulesGroups } from '@blog/studio/structure/modules-groups';
+import { pagesGroups } from '@blog/studio/structure/pages-groups';
 import {
   Blocks,
-  Clock,
   Files,
-  FileText,
-  House,
-  Layers,
-  LayoutGrid,
-  List,
   Mail,
-  Megaphone,
   Menu,
   MessageSquareText,
   Newspaper,
   Palette,
   PanelBottom,
   Settings,
-  Sparkles,
   Tag,
   Tags,
   UserRound,
@@ -57,88 +37,7 @@ export const studioStructure: StructureResolver = (S) =>
         .id('pages')
         .icon(Files)
         .child(
-          S.list()
-            .title('Pages')
-            .items([
-              S.listItem()
-                .title('Home Page')
-                .id('home-page')
-                .icon(House)
-                .child(
-                  S.list()
-                    .title('Home Page')
-                    .items([
-                      S.listItem()
-                        .title('Home Page')
-                        .id(homePageSchema.name)
-                        .icon(House)
-                        .child(
-                          S.document()
-                            .schemaType(homePageSchema.name)
-                            .documentId(homePageSchema.name),
-                        ),
-                    ]),
-                ),
-              S.listItem()
-                .title('Blog')
-                .id('pages-blog')
-                .icon(Newspaper)
-                .child(
-                  S.list()
-                    .title('Blog')
-                    .items([
-                      S.listItem()
-                        .title('Post Index Page')
-                        .id(blogPageSchema.name)
-                        .icon(Newspaper)
-                        .child(
-                          S.document()
-                            .schemaType(blogPageSchema.name)
-                            .documentId(blogPageSchema.name),
-                        ),
-                      S.documentTypeListItem(pagePostSchema.name)
-                        .title('Post Pages')
-                        .icon(FileText),
-                      S.listItem()
-                        .title('Topic Index Page')
-                        .id(topicIndexPageSchema.name)
-                        .icon(LayoutGrid)
-                        .child(
-                          S.document()
-                            .schemaType(topicIndexPageSchema.name)
-                            .documentId(topicIndexPageSchema.name),
-                        ),
-                      S.documentTypeListItem(pageTopicSchema.name)
-                        .title('Topic Pages')
-                        .icon(Layers),
-                      S.listItem()
-                        .title('Tag Index Page')
-                        .id(tagIndexPageSchema.name)
-                        .icon(Tags)
-                        .child(
-                          S.document()
-                            .schemaType(tagIndexPageSchema.name)
-                            .documentId(tagIndexPageSchema.name),
-                        ),
-                      S.documentTypeListItem(pageTagSchema.name)
-                        .title('Tag Pages')
-                        .icon(Tag),
-                    ]),
-                ),
-              S.listItem()
-                .title('General')
-                .id('pages-general')
-                .icon(FileText)
-                .child(
-                  S.list()
-                    .title('General')
-                    .items([
-                      S.documentTypeListItem(genericSchema.name)
-                        .title('Landing Page')
-                        .icon(FileText),
-                    ]),
-                ),
-            ]),
+          S.list().title('Pages').items(buildGroupedListItems(S, pagesGroups)),
         ),
       S.listItem()
         .title('Modules')
@@ -147,49 +46,7 @@ export const studioStructure: StructureResolver = (S) =>
         .child(
           S.list()
             .title('Modules')
-            .items([
-              S.listItem()
-                .title('Post modules')
-                .id('post-modules')
-                .icon(List)
-                .child(
-                  S.list()
-                    .title('Post modules')
-                    .items([
-                      S.documentTypeListItem(postListSchema.name)
-                        .title('Post Lists')
-                        .icon(List),
-                      S.documentTypeListItem(postLatestSchema.name)
-                        .title('Post Latest')
-                        .icon(Clock),
-                      S.documentTypeListItem(taxonomyListSchema.name)
-                        .title('Taxonomy Lists')
-                        .icon(LayoutGrid),
-                    ]),
-                ),
-              S.listItem()
-                .title('Content modules')
-                .id('content-modules')
-                .icon(FileText)
-                .child(
-                  S.list()
-                    .title('Content modules')
-                    .items([
-                      S.documentTypeListItem(heroSchema.name)
-                        .title('Heroes')
-                        .icon(Sparkles),
-                      S.documentTypeListItem(contentSchema.name)
-                        .title('Content')
-                        .icon(FileText),
-                      S.documentTypeListItem(ctaSchema.name)
-                        .title('CTAs')
-                        .icon(Megaphone),
-                      S.documentTypeListItem(newsletterSchema.name)
-                        .title('Newsletter Signups')
-                        .icon(Mail),
-                    ]),
-                ),
-            ]),
+            .items(buildGroupedListItems(S, modulesGroups)),
         ),
       S.listItem()
         .title('Blog')
