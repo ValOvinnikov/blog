@@ -476,6 +476,10 @@ file` are all denied alike) — an earlier version only handled the
   - `testing-practices` — Vitest + Testing Library conventions.
   - `seo-and-metadata` — per-route metadata, JSON-LD, sitemap/robots/RSS.
   - `code-review-practices` — boundary/type/SEO/test checklist before a PR.
+  - `refactor-sweep` — on-demand, layer-scoped cleanup audit (duplication,
+    dead code, convention drift); files findings as tracked issues, never
+    edits directly. No fixed cadence — run whenever asked; staleness per
+    layer is tracked in `docs/context/refactor-sweep-log.md`.
   - `open-pull-request` — branch → work → PR with human-gated push/PR steps.
   - `use-context7` — fetch live, version-matched library docs before guessing.
   - Plugin skills (provisioned via `.claude/settings.json`, see below):

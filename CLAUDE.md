@@ -327,6 +327,10 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
 - `seo-and-metadata` when changing routes, metadata, or feeds.
 - `code-review-practices` before every commit — applied by the `reviewer`
   subagent at gate step 4 (see the delivery gate sequence below).
+- `refactor-sweep` for an on-demand, layer-scoped cleanup audit (duplication,
+  dead code, convention drift) — no fixed cadence, run whenever asked;
+  surfaces findings as tracked issues rather than editing directly. Staleness
+  per layer tracked in `docs/context/refactor-sweep-log.md`.
 - `open-pull-request` when shipping an issue: branch → work → PR → assign (push is human-gated).
 - `use-context7` before implementing against any library API you are not certain
   of — resolves live, version-matched docs via the context7 MCP server. Use
