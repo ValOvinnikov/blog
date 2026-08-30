@@ -93,18 +93,21 @@ vi.mock('next/navigation', () => ({
 // `ResizeObserver`, both of which Base UI's floating-positioned components
 // (e.g. `Menu`) call unconditionally — without these no-op stand-ins every
 // such test throws `TypeError: … is not a function` before it can assert
-// anything.
-if (!Element.prototype.hasPointerCapture) {
-  Element.prototype.hasPointerCapture = () => false;
-}
-if (!Element.prototype.setPointerCapture) {
-  Element.prototype.setPointerCapture = () => {};
-}
-if (!Element.prototype.releasePointerCapture) {
-  Element.prototype.releasePointerCapture = () => {};
-}
-if (!Element.prototype.scrollIntoView) {
-  Element.prototype.scrollIntoView = () => {};
+// anything. Guarded by `typeof Element` since this setup file also runs
+// under the `node` project (`.ts` tests), where no DOM globals exist at all.
+if (typeof Element !== 'undefined') {
+  if (!Element.prototype.hasPointerCapture) {
+    Element.prototype.hasPointerCapture = () => false;
+  }
+  if (!Element.prototype.setPointerCapture) {
+    Element.prototype.setPointerCapture = () => {};
+  }
+  if (!Element.prototype.releasePointerCapture) {
+    Element.prototype.releasePointerCapture = () => {};
+  }
+  if (!Element.prototype.scrollIntoView) {
+    Element.prototype.scrollIntoView = () => {};
+  }
 }
 if (typeof globalThis.ResizeObserver === 'undefined') {
   class NoopResizeObserver implements ResizeObserver {

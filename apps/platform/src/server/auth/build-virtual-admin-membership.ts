@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { MEMBERSHIP_ROLE } from '@blog/db';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import type { TMembership } from '@blog/db/schema/memberships';
 
 /**
