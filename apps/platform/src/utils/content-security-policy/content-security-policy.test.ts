@@ -20,8 +20,9 @@ describe(buildContentSecurityPolicy, () => {
         "'self' https://*.blob.vercel-storage.com https://authjs.dev https://cdn.sanity.io",
       'script-src': "'self' 'unsafe-inline'",
       'style-src': "'self' 'unsafe-inline'",
-      'font-src': "'self'",
-      'connect-src': "'self' https://*.api.sanity.io https://sanity-cdn.com",
+      'font-src': "'self' https://design-system-static.sanity.io",
+      'connect-src':
+        "'self' https://*.api.sanity.io https://api.sanity.io https://sanity-cdn.com",
       'frame-ancestors': "'none'",
       'base-uri': "'self'",
       'form-action': "'self' https://github.com https://accounts.google.com",
@@ -65,5 +66,22 @@ describe(buildContentSecurityPolicy, () => {
     );
 
     expect(connectSrc).toContain('https://sanity-cdn.com');
+  });
+
+  it('allows the embedded Studio to load its Inter webfont from design-system-static.sanity.io', () => {
+    const { 'font-src': fontSrc } = parseDirectives(
+      buildContentSecurityPolicy({ isDev: false }),
+    );
+
+    expect(fontSrc).toContain('https://design-system-static.sanity.io');
+  });
+
+  it('allows the embedded Studio to reach the bare api.sanity.io host, which the *.api.sanity.io wildcard does not match', () => {
+    const { 'connect-src': connectSrc } = parseDirectives(
+      buildContentSecurityPolicy({ isDev: false }),
+    );
+
+    expect(connectSrc).toContain('https://api.sanity.io');
+    expect(connectSrc).toContain('https://*.api.sanity.io');
   });
 });

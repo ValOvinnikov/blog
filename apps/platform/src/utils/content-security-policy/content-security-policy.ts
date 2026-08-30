@@ -32,13 +32,19 @@ export const buildContentSecurityPolicy = ({
     // <style> tags at runtime; there is no static, hashable set of style
     // content to allow-list instead.
     "style-src 'self' 'unsafe-inline'",
-    "font-src 'self'",
+    // The embedded Studio's injected @font-face rule loads Inter from a
+    // fixed host for every tenant project (never removed on unmount, so it
+    // keeps requesting on every route after one Studio visit).
+    "font-src 'self' https://design-system-static.sanity.io",
     // The embedded Studio talks directly to its tenant's own Sanity project
     // host (`<projectId>.api.sanity.io`) for data, assets, and realtime
     // listeners — `projectId` is resolved per request, so this can't be a
     // fixed hostname the way `img-src`'s CDN entry is. `sanity-cdn.com` is
     // the fixed host Studio checks for its own available-version updates.
-    "connect-src 'self' https://*.api.sanity.io https://sanity-cdn.com",
+    // The wildcard above only matches a subdomain of api.sanity.io, not
+    // the bare host itself, which the Studio also calls directly for
+    // non-project-scoped endpoints (e.g. its feedback intake).
+    "connect-src 'self' https://*.api.sanity.io https://api.sanity.io https://sanity-cdn.com",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     // Auth.js's built-in sign-in page (no custom `pages.signIn` is
