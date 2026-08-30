@@ -16,7 +16,7 @@ const meta = {
           <NavLink href="/about">About</NavLink>
           <NavLink href="/contact">Contact</NavLink>
         </Footer.Nav>
-        <Footer.Copyright title="My Blog" />
+        <Footer.Copyright title="My Blog" year={2027} />
       </>
     ),
   },
@@ -29,6 +29,6 @@ export const Default: TStory = {};
 
 export const Minimal: TStory = {
   args: {
-    children: <Footer.Copyright title="My Blog" />,
+    children: <Footer.Copyright title="My Blog" year={2027} />,
   },
 };

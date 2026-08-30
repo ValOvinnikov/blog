@@ -5,14 +5,13 @@ import { NavLink } from '../../atoms/nav-link';
 import { Footer } from './footer';
 
 describe(`<${Footer.name}/>`, () => {
-  it('renders Footer.Copyright with the current year and title', () => {
+  it('renders Footer.Copyright with the given year and title', () => {
     renderElement(
       <Footer>
-        <Footer.Copyright title="My Blog" />
+        <Footer.Copyright title="My Blog" year={2027} />
       </Footer>,
     );
-    const year = new Date().getFullYear();
-    expect(screen.getByText(`© ${year} My Blog`)).toBeVisible();
+    expect(screen.getByText('© 2027 My Blog')).toBeVisible();
   });
 
   it('renders Footer.Nav content', () => {
@@ -45,7 +44,7 @@ describe(`<${Footer.name}/>`, () => {
   it('does not render a nav element when Footer.Nav is omitted', () => {
     renderElement(
       <Footer>
-        <Footer.Copyright title="My Blog" />
+        <Footer.Copyright title="My Blog" year={2027} />
       </Footer>,
     );
     expect(
@@ -56,7 +55,7 @@ describe(`<${Footer.name}/>`, () => {
   it('renders unmatched children without dropping them', () => {
     renderElement(
       <Footer>
-        <Footer.Copyright title="My Blog" />
+        <Footer.Copyright title="My Blog" year={2027} />
         <span>stray content</span>
       </Footer>,
     );

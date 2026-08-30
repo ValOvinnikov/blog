@@ -24,16 +24,10 @@ const defaultSizes: Record<THeadingLevel, TSize> = {
 };
 
 /**
- * Semantic heading (`level` picks the rendered `h1`–`h4` tag) with an
- * independent `visual` treatment. `visual` always wins over `size` — pass it
- * whenever the heading's rendered size should be driven by *where* it sits
- * on the page rather than its outline depth.
- *
- * For in-article/body content (e.g. a `PortableTextRenderer` in `apps/web`
- * mapping Portable Text `h2`/`h3`/`h4` blocks), pair `level` with the
- * matching `prose-h2`/`prose-h3`/`prose-h4` visual so body subheadings read
- * as clearly subordinate to the page's own `post`-visual title, however deep
- * the block sits in the document outline:
+ * Semantic heading — `level` picks the rendered `h1`–`h4` tag for the page
+ * outline, independently of `visual`, which drives the rendered size instead
+ * (e.g. a deep Portable Text heading can still read as subordinate to the
+ * page's title).
  *
  * @example
  * <Heading level={2} visual="prose-h2">{block.text}</Heading>

@@ -1,5 +1,6 @@
 import type { IWithDataTestId } from '@blog/config';
 import type { TPolymorphicProps } from '@blog/config/react';
+import { resolveComponent } from '@blog/ui/lib/react';
 import type { ElementType, ReactNode } from 'react';
 
 import {
@@ -30,10 +31,11 @@ export const PopoverMenuItem = <C extends ElementType = 'button'>({
   dataTestId,
   ...rest
 }: TPopoverMenuItemProps<C>) => {
-  const Component = (as ?? 'button') as ElementType;
+  const Component = resolveComponent(as, 'button');
   const isButton = Component === 'button';
 
   return (
+    // eslint-disable-next-line react-hooks/static-components -- resolveComponent returns `as`/fallback verbatim, so the reference stays stable across renders
     <Component
       role="menuitem"
       type={isButton ? 'button' : undefined}

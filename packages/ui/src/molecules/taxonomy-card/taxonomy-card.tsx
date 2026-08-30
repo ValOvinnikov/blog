@@ -1,8 +1,7 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { Heading } from '@blog/ui/atoms/heading';
-import type { THeadingLevel } from '@blog/ui/lib/react';
-import type { ElementType } from 'react';
+import { resolveComponent, type THeadingLevel } from '@blog/ui/lib/react';
 
 import { taxonomyCardVariants } from './taxonomy-card-variants';
 
@@ -38,11 +37,12 @@ export const TaxonomyCard = ({
   className,
   dataTestId,
 }: TTaxonomyCardProps) => {
-  const LinkComponent = (linkAs ?? 'a') as ElementType;
+  const LinkComponent = resolveComponent(linkAs, 'a');
 
   return (
     <article className={s.root({ class: className })} data-testid={dataTestId}>
       <Heading level={headingLevel} visual="card">
+        {/* eslint-disable-next-line react-hooks/static-components -- resolveComponent returns `linkAs`/fallback verbatim, so the reference stays stable across renders */}
         <LinkComponent href={href} className={s.link()}>
           <span aria-hidden="true">{title}</span>
           <span className={s.accessibleName()}>

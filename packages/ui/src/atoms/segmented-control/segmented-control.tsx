@@ -25,14 +25,8 @@ const s = segmentedControlVariants();
 /**
  * SegmentedControl — a fully controlled switch between a small, mutually
  * exclusive set of views (e.g. a reader's chosen depth for an article). The
- * selected value, its options, and the change handler all live in the
- * caller; this component holds no state of its own. Uses the radiogroup
- * pattern — one exclusive choice among peers — rather than tabs, since the
- * component itself shows or hides no panel. Arrow keys move both focus and
- * the selection between options, wrapping at the ends, matching the ARIA
- * authoring practices for a radiogroup.
- * The root is a `div[role="radiogroup"]`, not a labelable element, so it
- * must never be paired with `<label htmlFor>` — the accessible name comes
+ * root is a `div[role="radiogroup"]`, not a labelable element, so it must
+ * never be paired with `<label htmlFor>` — the accessible name comes
  * entirely from the required `ariaLabel` prop.
  *
  * @example

@@ -122,6 +122,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
   const navItems = navResult.ok ? navResult.data.items : [];
   const social = footerResult.ok ? footerResult.data.social : [];
   const plain = !chromeOn;
+  const currentYear = new Date().getFullYear();
   const s = localeLayoutVariants();
 
   return (
@@ -172,7 +173,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
             </Header>
             <div className={s.content()}>{children}</div>
             <Footer dataTestId="site-footer">
-              <Footer.Copyright title={brand.name} />
+              <Footer.Copyright title={brand.name} year={currentYear} />
               <Footer.Nav>
                 {social.map((link) => {
                   // `link.platform` is optional and free-form beyond the
