@@ -11,17 +11,17 @@ Rotation order (top to bottom) is the order a layer gets its first sweep when
 multiple rows tie on "never swept." After that, whichever row has the oldest
 `Last swept` date goes next.
 
-| Layer        | Last swept | Commit swept | Findings | Issues filed        |
-| ------------ | ---------- | ------------ | -------- | ------------------- |
-| config       | never      | —            | —        | —                   |
-| studio       | never      | —            | —        | —                   |
-| service      | never      | —            | —        | —                   |
-| ui           | never      | —            | —        | —                   |
-| web          | never      | —            | —        | —                   |
-| db           | 2026-08-30 | fbdfda22     | 3        | #2326, #2328, #2329 |
-| auth         | never      | —            | —        | —                   |
-| platform-app | never      | —            | —        | —                   |
-| insight      | never      | —            | —        | —                   |
+| Layer        | Last swept | Commit swept | Findings | Issues filed                      |
+| ------------ | ---------- | ------------ | -------- | --------------------------------- |
+| config       | never      | —            | —        | —                                 |
+| studio       | 2026-08-30 | 9e2a5c76     | 1        | #2332                             |
+| service      | never      | —            | —        | —                                 |
+| ui           | never      | —            | —        | —                                 |
+| web          | never      | —            | —        | —                                 |
+| db           | 2026-08-30 | 9e2a5c76     | 5        | #2326, #2328, #2329, #2333, #2334 |
+| auth         | never      | —            | —        | —                                 |
+| platform-app | 2026-08-30 | 9e2a5c76     | 2        | #2330, #2331                      |
+| insight      | never      | —            | —        | —                                 |
 
 **Commit swept** is the `main` SHA the audit read at (short form), so a
 future sweep can diff from there if useful context for what's new since.

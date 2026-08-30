@@ -3,10 +3,11 @@ name: refactor-sweep
 description: >-
   Use when running an on-demand refactor audit over one workspace in this
   blog monorepo — surfacing duplication, over-complex code worth
-  simplifying, dead code, and drifted conventions as tracked issues rather
-  than fixing them inline. Triggers on "run a refactor sweep", "audit
-  <layer> for cleanup", or when docs/context/refactor-sweep-log.md needs
-  consulting to decide which layer is overdue.
+  simplifying, comment-policy violations, dead code, and drifted
+  conventions as tracked issues rather than fixing them inline. Triggers on
+  "run a refactor sweep", "audit <layer> for cleanup", or when
+  docs/context/refactor-sweep-log.md needs consulting to decide which layer
+  is overdue.
 ---
 
 # Refactor sweep
@@ -35,7 +36,7 @@ run — it doesn't consume the overdue layer's turn, which stays next up.
 2. **Dispatch the `explore` subagent**, read-only, scoped strictly to that
    layer's directory (`packages/<x>/src`, `apps/<x>/src`, or equivalent —
    never touching another layer's files even to compare). Ask it to report,
-   with `file:line` evidence, not prose summaries, against all five of:
+   with `file:line` evidence, not prose summaries, against all six of:
    - **Duplication, worth extracting.** The bar is whatever the layer's own
      agent file states — several (`config`, `service`, `ui`, `web`,
      `platform-app`) document "extract at the second repetition" explicitly,
@@ -57,6 +58,19 @@ run — it doesn't consume the overdue layer's turn, which stays next up.
      or a shape that's harder to follow than the problem requires. This is
      a distinct axis from duplication — flag it even when the code in
      question appears only once.
+   - **Comment-policy violations**, per CLAUDE.md's Conventions section:
+     any comment inside a function/component body that narrates a line or
+     step rather than the one narrow non-obvious-gotcha exception; a doc
+     comment that describes **how** something works instead of one short
+     sentence on what it's **for**; the same comment copy-pasted verbatim
+     across two or more files (a duplication finding in its own right — the
+     copies can drift from each other, not just from the length limit); or
+     a comment referencing project-management state (an issue/PR number as
+     narrative outside a `TODO:`/`FIXME:` block, a `docs/superpowers/**`
+     path, a roadmap phase, a "not wired up yet" note). This policy shipped
+     across the whole repo at once, so expect it to be the single richest
+     source of findings in code written before that — don't undercount it
+     relative to the other five categories.
    - Dead exports, orphaned files, or code no longer reachable from any
      entry point (cross-check against `pnpm knip` output for that workspace
      if available).
@@ -67,7 +81,8 @@ run — it doesn't consume the overdue layer's turn, which stays next up.
 
    Explicitly exclude pure style/taste opinions the workspace's own
    ESLint/Prettier config doesn't already flag — this hunts for duplication,
-   simplification, and drift, not a second opinion on formatting.
+   simplification, comment-policy compliance, and drift, not a second
+   opinion on formatting.
 
 3. **Dedup and sanity-check** the raw findings yourself before filing
    anything — merge near-duplicates, drop anything too subjective to act on
