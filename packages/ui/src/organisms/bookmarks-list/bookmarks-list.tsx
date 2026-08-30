@@ -1,6 +1,7 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
-import type { ElementType, ReactNode } from 'react';
+import { resolveComponent } from '@blog/ui/lib/react';
+import type { ReactNode } from 'react';
 
 import { bookmarksListVariants } from './bookmarks-list-variants';
 
@@ -42,7 +43,7 @@ export const BookmarksList = ({
   className,
   dataTestId,
 }: TBookmarksListProps) => {
-  const Component = (linkAs ?? 'a') as ElementType;
+  const Component = resolveComponent(linkAs, 'a');
   const {
     root,
     list,

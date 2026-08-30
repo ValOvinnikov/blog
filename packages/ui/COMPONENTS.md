@@ -55,7 +55,7 @@ Variants: hasHref: (boolean)
 
 ### Heading — `atoms/heading/heading.tsx`
 
-Semantic heading (`level` picks the rendered `h1`–`h4` tag) with an independent `visual` treatment.
+Semantic heading — `level` picks the rendered `h1`–`h4` tag for the page outline, independently of `visual`, which drives the rendered size instead (e.g. a deep Portable Text heading can still read as subordinate to the page's title).
 Props: level: THeadingLevel · visual?: THeadingVariants['visual'] · size?: THeadingVariants['size'] · id?: string · style?: CSSProperties · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 Variants: visual: hero|post|card|section|prose-h2|prose-h3|prose-h4|preview|copy · size: Size.XS|Size.SM|Size.MD|Size.LG|Size.XL|Size.XXL
 
@@ -164,7 +164,7 @@ Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Aside — `molecules/aside/aside.tsx`
 
-Aside molecule — an inline deep-dive digression rendered alongside a post's body copy, set visually apart from the surrounding prose so a reader in the deep-dive depth can tell at a glance that it's supplementary rather than part of the main argument.
+Aside molecule — an inline deep-dive digression rendered alongside a post's body copy, visually set apart from the surrounding prose.
 Props: kind: TAsideKind · label: string · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### BrandLockup — `molecules/brand-lockup/brand-lockup.tsx`
@@ -312,7 +312,7 @@ Props: children?: TCompoundChildren<typeof FooterParts> _(extends IWithClassName
 Slots:
 
 - **Footer.Nav** — the navigation region of the site `Footer`; a labelled `<nav>` wrapping the footer links. Props: ariaLabel?: string · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **Footer.Copyright** — the copyright line in the site `Footer`; renders "© {year} {title}" with the current year filled in automatically. Props: title: string _(extends IWithClassName, IWithDataTestId)_
+- **Footer.Copyright** — the copyright line in the site `Footer`, rendering "© {year} {title}". Props: title: string · year: number _(extends IWithClassName, IWithDataTestId)_
 
 ### Header — `organisms/header/header.tsx`
 
@@ -347,7 +347,7 @@ Compound component:
 
 ### Pagination — `organisms/pagination/pagination.tsx`
 
-prev/next + numbered links for paginated listings.
+prev/next + numbered links for paginated listings, route-agnostic (`createHref`) and polymorphic (`linkAs`); renders nothing when there is a single page.
 Props: currentPage: number · totalPages: number · createHref: (page: number) => string · ariaLabel: string · previousLabel: string · nextLabel: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 Variants: current: (boolean)
 

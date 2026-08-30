@@ -1,6 +1,7 @@
 import type { IWithDataTestId } from '@blog/config';
 import type { TPolymorphicProps } from '@blog/config/react';
 import { buttonVariants } from '@blog/ui/atoms/button/button-variants';
+import { resolveComponent } from '@blog/ui/lib/react';
 import type { ElementType } from 'react';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -27,9 +28,10 @@ export const LinkButton = <C extends ElementType = 'a'>({
   variant,
   ...rest
 }: TLinkButtonProps<C>) => {
-  const Component = (as ?? 'a') as ElementType;
+  const Component = resolveComponent(as, 'a');
 
   return (
+    // eslint-disable-next-line react-hooks/static-components -- resolveComponent returns `as`/fallback verbatim, so the reference stays stable across renders
     <Component
       className={buttonVariants({ variant, size, class: className })}
       data-testid={dataTestId}

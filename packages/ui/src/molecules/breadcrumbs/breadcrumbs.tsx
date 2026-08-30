@@ -6,7 +6,7 @@ import {
 } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { Icon } from '@blog/ui/atoms/icon';
-import { type ElementType } from 'react';
+import { resolveComponent } from '@blog/ui/lib/react';
 
 import { breadcrumbsVariants } from './breadcrumbs-variants';
 
@@ -54,7 +54,7 @@ export const Breadcrumbs = ({
   className,
   dataTestId,
 }: TBreadcrumbsProps) => {
-  const LinkComponent = (linkAs ?? 'a') as ElementType;
+  const LinkComponent = resolveComponent(linkAs, 'a');
   const lastIndex = items.length - 1;
 
   return (

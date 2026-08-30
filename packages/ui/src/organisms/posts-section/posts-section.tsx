@@ -7,9 +7,8 @@ import {
 import type { TAnchorElementType } from '@blog/config/react';
 import { Heading } from '@blog/ui/atoms/heading';
 import { Icon } from '@blog/ui/atoms/icon';
-import type { THeadingLevel } from '@blog/ui/lib/react';
+import { resolveComponent, type THeadingLevel } from '@blog/ui/lib/react';
 import { PostCard } from '@blog/ui/molecules/post-card';
-import type { ElementType } from 'react';
 
 import {
   postsSectionVariants,
@@ -90,7 +89,7 @@ export const PostsSection = ({
 }: TPostsSectionProps) => {
   const isEmpty = posts.length === 0;
   if (isEmpty && !emptyMessage) return null;
-  const Component = (linkAs ?? 'a') as ElementType;
+  const Component = resolveComponent(linkAs, 'a');
   const s = postsSectionVariants({
     tinted: isTinted,
     wrapped: isWrapped,

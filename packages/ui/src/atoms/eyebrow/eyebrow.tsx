@@ -1,6 +1,7 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
-import { type ElementType, type ReactNode } from 'react';
+import { resolveComponent } from '@blog/ui/lib/react';
+import { type ReactNode } from 'react';
 
 import { eyebrowVariants } from './eyebrow-variants';
 
@@ -24,9 +25,10 @@ export const Eyebrow = ({
   dataTestId,
   children,
 }: TEyebrowProps) => {
-  const Component = (href ? (linkAs ?? 'a') : 'p') as ElementType;
+  const Component = href ? resolveComponent(linkAs, 'a') : 'p';
 
   return (
+    // eslint-disable-next-line react-hooks/static-components -- resolveComponent returns `linkAs`/`fallback` verbatim, so the reference stays stable across renders
     <Component
       className={eyebrowVariants({ hasHref: Boolean(href), class: className })}
       data-testid={dataTestId}
