@@ -1,6 +1,6 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { eq } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
@@ -14,23 +14,6 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 let db: PgliteDatabase<typeof schema>;
-
-async function insertTenant(slug: string): Promise<string> {
-  const [tenant] = await db
-    .insert(schema.tenants)
-    .values({
-      slug,
-      name: slug,
-      primaryDomain: `${slug}.example.com`,
-      sanityProjectId: 'abc123',
-      sanityDataset: 'production',
-      locale: 'en',
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
-  return tenant!.id;
-}
 
 // One in-memory Postgres instance for the whole file (spinning up pglite's
 // WASM engine is the slow part — seconds, not milliseconds) — `afterEach`
@@ -64,7 +47,7 @@ async function insertPendingSubscriber(
 
 describe(confirmSubscriber, () => {
   it('flips a pending subscriber to active and stamps confirmedAt', async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     const pending = await insertPendingSubscriber(tenantId);
 
     const result = await confirmSubscriber(tenantId, pending.confirmationToken);
@@ -82,7 +65,7 @@ describe(confirmSubscriber, () => {
   });
 
   it('is idempotent-safe: confirming an already-active row again does not error or restamp confirmedAt', async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     const pending = await insertPendingSubscriber(tenantId);
     const first = await confirmSubscriber(tenantId, pending.confirmationToken);
     if (first.outcome !== 'confirmed') throw new Error('expected confirmed');
@@ -96,7 +79,7 @@ describe(confirmSubscriber, () => {
   });
 
   it('returns not-found for an unrecognized token', async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
 
     const result = await confirmSubscriber(tenantId, 'does-not-exist');
 
@@ -104,8 +87,8 @@ describe(confirmSubscriber, () => {
   });
 
   it("returns not-found for another tenant's token", async () => {
-    const tenantOneId = await insertTenant('acme');
-    const tenantTwoId = await insertTenant('other');
+    const { id: tenantOneId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantTwoId } = await insertTestTenant(db, { slug: 'other' });
     const pending = await insertPendingSubscriber(tenantOneId);
 
     const result = await confirmSubscriber(
@@ -127,7 +110,7 @@ describe(confirmSubscriber, () => {
   // two racing calls can ever match that `WHERE`, not from this test — see
   // the docstring on `confirmSubscriber`.
   it('resolves two concurrent confirms of the same token into exactly one confirmed outcome', async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     const pending = await insertPendingSubscriber(tenantId);
 
     const [first, second] = await Promise.all([

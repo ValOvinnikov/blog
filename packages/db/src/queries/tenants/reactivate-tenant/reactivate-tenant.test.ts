@@ -1,12 +1,9 @@
 import { ERROR_CODE } from '@blog/config/constants';
-import {
-  TENANT_PLAN,
-  TENANT_PROVISIONING_STATUS,
-  TENANT_STATUS,
-} from '@blog/db/constants';
+import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { eq } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
@@ -26,22 +23,14 @@ type TInsertTenantOptions = {
 };
 
 async function insertTenant(options: TInsertTenantOptions): Promise<string> {
-  const [tenant] = await db
-    .insert(schema.tenants)
-    .values({
-      slug: 'acme',
-      name: 'Acme',
-      primaryDomain: 'acme.example.com',
-      locale: 'en',
-      plan: TENANT_PLAN.FREE,
-      status: options.status,
-      deprovisionedAt: options.deprovisionedAt,
-      sanityProjectId: options.sanityProjectId,
-      provisioningStatus: options.provisioningStatus,
-    })
-    .returning();
-
-  if (!tenant) throw new Error('setup: tenant insert returned no row.');
+  const tenant = await insertTestTenant(db, {
+    slug: 'acme',
+    name: 'Acme',
+    status: options.status,
+    deprovisionedAt: options.deprovisionedAt,
+    sanityProjectId: options.sanityProjectId,
+    provisioningStatus: options.provisioningStatus,
+  });
 
   return tenant.id;
 }

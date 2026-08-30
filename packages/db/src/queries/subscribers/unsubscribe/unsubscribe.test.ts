@@ -1,6 +1,6 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
 import { and, eq } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
@@ -14,23 +14,6 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 let db: PgliteDatabase<typeof schema>;
-
-async function insertTenant(slug: string): Promise<string> {
-  const [tenant] = await db
-    .insert(schema.tenants)
-    .values({
-      slug,
-      name: slug,
-      primaryDomain: `${slug}.example.com`,
-      sanityProjectId: 'abc123',
-      sanityDataset: 'production',
-      locale: 'en',
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
-  return tenant!.id;
-}
 
 // One in-memory Postgres instance for the whole file (spinning up pglite's
 // WASM engine is the slow part — seconds, not milliseconds) — `afterEach`
@@ -52,20 +35,13 @@ afterEach(async () => {
 async function insertUser(
   overrides: Partial<typeof schema.users.$inferInsert> = {},
 ): Promise<schema.TUser> {
-  const [inserted] = await db
-    .insert(schema.users)
-    .values({ email: 'reader@example.com', ...overrides })
-    .returning();
-
-  if (!inserted) throw new Error('failed to seed a user row');
-
-  return inserted;
+  return insertTestUser(db, { email: 'reader@example.com', ...overrides });
 }
 
 describe(unsubscribe, () => {
   it('deletes the subscriber row matching the account email', async () => {
     const user = await insertUser();
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     await db
       .insert(schema.subscribers)
       .values({ tenantId, email: 'reader@example.com' });
@@ -86,13 +62,13 @@ describe(unsubscribe, () => {
 
   it('is a no-op when no subscriber row matches the account email', async () => {
     const user = await insertUser();
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
 
     await expect(unsubscribe(tenantId, user.id)).resolves.toBeUndefined();
   });
 
   it('is a no-op for an unrecognized userId', async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     await db
       .insert(schema.subscribers)
       .values({ tenantId, email: 'reader@example.com' });
@@ -108,7 +84,7 @@ describe(unsubscribe, () => {
 
   it('is a no-op when the user has no email on file', async () => {
     const user = await insertUser({ email: null });
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     await db
       .insert(schema.subscribers)
       .values({ tenantId, email: 'reader@example.com' });
@@ -123,7 +99,7 @@ describe(unsubscribe, () => {
   });
 
   it("does not remove another user's subscriber row", async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     const user = await insertUser({ email: 'reader@example.com' });
     await db
       .insert(schema.subscribers)
@@ -143,8 +119,8 @@ describe(unsubscribe, () => {
 
   it("does not remove another tenant's subscriber row for the same email", async () => {
     const user = await insertUser();
-    const tenantOneId = await insertTenant('acme');
-    const tenantTwoId = await insertTenant('other');
+    const { id: tenantOneId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantTwoId } = await insertTestTenant(db, { slug: 'other' });
     await db
       .insert(schema.subscribers)
       .values({ tenantId: tenantOneId, email: 'reader@example.com' });

@@ -1,10 +1,7 @@
-import {
-  MEMBERSHIP_ROLE,
-  TENANT_PLAN,
-  TENANT_STATUS,
-} from '@blog/db/constants';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
 import { eq } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
@@ -15,25 +12,6 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 let db: PgliteDatabase<typeof schema>;
-
-async function insertUser(id: string): Promise<void> {
-  await db.insert(schema.users).values({ id });
-}
-
-async function insertTenant(slug: string): Promise<string> {
-  const [tenant] = await db
-    .insert(schema.tenants)
-    .values({
-      slug,
-      name: slug,
-      primaryDomain: `${slug}.example.com`,
-      locale: 'en',
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
-  return tenant!.id;
-}
 
 async function insertInvite(
   tenantId: string,
@@ -64,8 +42,8 @@ afterEach(async () => {
 
 describe(consumeMembershipInvite, () => {
   it('inserts the real membership row and stamps consumedAt', async () => {
-    await insertUser('user-1');
-    const tenantId = await insertTenant('acme');
+    await insertTestUser(db, { id: 'user-1' });
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     const inviteId = await insertInvite(
       tenantId,
       'owner@example.com',
@@ -88,8 +66,8 @@ describe(consumeMembershipInvite, () => {
   });
 
   it('is idempotent for an already-consumed invite: no-op, returns undefined', async () => {
-    await insertUser('user-1');
-    const tenantId = await insertTenant('acme');
+    await insertTestUser(db, { id: 'user-1' });
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     const inviteId = await insertInvite(tenantId, 'owner@example.com');
     await consumeMembershipInvite(inviteId, 'user-1');
 
@@ -101,7 +79,7 @@ describe(consumeMembershipInvite, () => {
   });
 
   it('returns undefined for an invite id that does not exist', async () => {
-    await insertUser('user-1');
+    await insertTestUser(db, { id: 'user-1' });
 
     const result = await consumeMembershipInvite(
       '00000000-0000-0000-0000-000000000000',
@@ -112,7 +90,7 @@ describe(consumeMembershipInvite, () => {
   });
 
   it('rolls back the claim when the dependent membership insert fails, leaving the invite pending and retryable', async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     const inviteId = await insertInvite(tenantId, 'owner@example.com');
 
     await expect(
@@ -126,14 +104,14 @@ describe(consumeMembershipInvite, () => {
     expect(invite!.consumedAt).toBeNull();
 
     // Retryable once a real user exists for that id.
-    await insertUser('missing-user');
+    await insertTestUser(db, { id: 'missing-user' });
     const membership = await consumeMembershipInvite(inviteId, 'missing-user');
     expect(membership).toMatchObject({ userId: 'missing-user', tenantId });
   });
 
   it('returns the existing membership without erroring when one already exists for the (userId, tenantId) pair', async () => {
-    await insertUser('user-1');
-    const tenantId = await insertTenant('acme');
+    await insertTestUser(db, { id: 'user-1' });
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     const [existingMembership] = await db
       .insert(schema.memberships)
       .values({ userId: 'user-1', tenantId, role: MEMBERSHIP_ROLE.READER })

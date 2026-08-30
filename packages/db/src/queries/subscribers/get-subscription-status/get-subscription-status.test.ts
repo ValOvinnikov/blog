@@ -1,6 +1,6 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { getSubscriptionStatus } from './get-subscription-status';
@@ -13,23 +13,6 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 let db: PgliteDatabase<typeof schema>;
-
-async function insertTenant(slug: string): Promise<string> {
-  const [tenant] = await db
-    .insert(schema.tenants)
-    .values({
-      slug,
-      name: slug,
-      primaryDomain: `${slug}.example.com`,
-      sanityProjectId: 'abc123',
-      sanityDataset: 'production',
-      locale: 'en',
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
-  return tenant!.id;
-}
 
 // One in-memory Postgres instance for the whole file (spinning up pglite's
 // WASM engine is the slow part — seconds, not milliseconds) — `afterEach`
@@ -51,20 +34,13 @@ afterEach(async () => {
 async function insertUser(
   overrides: Partial<typeof schema.users.$inferInsert> = {},
 ): Promise<schema.TUser> {
-  const [inserted] = await db
-    .insert(schema.users)
-    .values({ email: 'reader@example.com', ...overrides })
-    .returning();
-
-  if (!inserted) throw new Error('failed to seed a user row');
-
-  return inserted;
+  return insertTestUser(db, { email: 'reader@example.com', ...overrides });
 }
 
 describe(getSubscriptionStatus, () => {
   it('returns active for a user whose account email has an active subscriber row', async () => {
     const user = await insertUser();
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     await db
       .insert(schema.subscribers)
       .values({ tenantId, email: 'reader@example.com', status: 'active' });
@@ -78,7 +54,7 @@ describe(getSubscriptionStatus, () => {
 
   it('returns pending for a user whose account email has a pending subscriber row', async () => {
     const user = await insertUser();
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     await db
       .insert(schema.subscribers)
       .values({ tenantId, email: 'reader@example.com' });
@@ -92,7 +68,7 @@ describe(getSubscriptionStatus, () => {
 
   it('returns not-subscribed when no subscriber row matches the account email', async () => {
     const user = await insertUser();
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
 
     const result = await getSubscriptionStatus(tenantId, user.id);
 
@@ -101,7 +77,7 @@ describe(getSubscriptionStatus, () => {
 
   it('returns not-subscribed when the user has no email on file', async () => {
     const user = await insertUser({ email: null });
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
 
     const result = await getSubscriptionStatus(tenantId, user.id);
 
@@ -109,7 +85,7 @@ describe(getSubscriptionStatus, () => {
   });
 
   it('returns not-subscribed for an unrecognized userId', async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
 
     const result = await getSubscriptionStatus(tenantId, 'does-not-exist');
 
@@ -118,7 +94,7 @@ describe(getSubscriptionStatus, () => {
 
   it('matches case-insensitively/trimmed against the stored subscriber email', async () => {
     const user = await insertUser({ email: '  Reader@Example.com  ' });
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     await db
       .insert(schema.subscribers)
       .values({ tenantId, email: 'reader@example.com' });
@@ -130,8 +106,8 @@ describe(getSubscriptionStatus, () => {
 
   it('returns not-subscribed when the subscriber row belongs to a different tenant', async () => {
     const user = await insertUser();
-    const tenantOneId = await insertTenant('acme');
-    const tenantTwoId = await insertTenant('other');
+    const { id: tenantOneId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantTwoId } = await insertTestTenant(db, { slug: 'other' });
     await db
       .insert(schema.subscribers)
       .values({ tenantId: tenantOneId, email: 'reader@example.com' });

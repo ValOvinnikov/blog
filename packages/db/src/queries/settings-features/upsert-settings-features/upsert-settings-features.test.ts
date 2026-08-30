@@ -1,6 +1,6 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { upsertSettingsFeatures } from './upsert-settings-features';
@@ -10,23 +10,6 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 let db: PgliteDatabase<typeof schema>;
-
-async function insertTenant(slug: string): Promise<string> {
-  const [tenant] = await db
-    .insert(schema.tenants)
-    .values({
-      slug,
-      name: slug,
-      primaryDomain: `${slug}.example.com`,
-      sanityProjectId: 'abc123',
-      sanityDataset: 'production',
-      locale: 'en',
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
-  return tenant!.id;
-}
 
 beforeAll(async () => {
   db = await createTestDb();
@@ -43,7 +26,7 @@ afterEach(async () => {
 
 describe(upsertSettingsFeatures, () => {
   it('inserts a new row falling back to column defaults for omitted toggles', async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
 
     const result = await upsertSettingsFeatures(tenantId, {
       newsletterEnabled: true,
@@ -60,7 +43,7 @@ describe(upsertSettingsFeatures, () => {
   });
 
   it('updates the existing row in place rather than inserting a second one', async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     await upsertSettingsFeatures(tenantId, {});
 
     const result = await upsertSettingsFeatures(tenantId, {
@@ -73,7 +56,7 @@ describe(upsertSettingsFeatures, () => {
   });
 
   it('leaves an omitted toggle untouched on a later update', async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     await upsertSettingsFeatures(tenantId, { newsletterEnabled: true });
 
     const result = await upsertSettingsFeatures(tenantId, {

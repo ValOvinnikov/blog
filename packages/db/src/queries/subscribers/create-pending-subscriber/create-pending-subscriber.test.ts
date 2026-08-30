@@ -1,7 +1,7 @@
 import { ERROR_CODE } from '@blog/config/constants';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { createPendingSubscriber } from './create-pending-subscriber';
@@ -16,23 +16,6 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 let db: PgliteDatabase<typeof schema>;
-
-async function insertTenant(slug: string): Promise<string> {
-  const [tenant] = await db
-    .insert(schema.tenants)
-    .values({
-      slug,
-      name: slug,
-      primaryDomain: `${slug}.example.com`,
-      sanityProjectId: 'abc123',
-      sanityDataset: 'production',
-      locale: 'en',
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
-  return tenant!.id;
-}
 
 // One in-memory Postgres instance for the whole file (spinning up pglite's
 // WASM engine is the slow part — seconds, not milliseconds) — `afterEach`
@@ -62,7 +45,7 @@ function unwrapOk<T>(result: { ok: boolean; data?: T; error?: unknown }): T {
 
 describe(createPendingSubscriber, () => {
   it('inserts a new pending row for a fresh email', async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
 
     const result = unwrapOk(
       await createPendingSubscriber(tenantId, 'reader@example.com'),
@@ -82,7 +65,7 @@ describe(createPendingSubscriber, () => {
   });
 
   it('normalizes email casing/whitespace so it collides with an existing row', async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     const first = unwrapOk(
       await createPendingSubscriber(tenantId, 'Reader@Example.com'),
     );
@@ -98,7 +81,7 @@ describe(createPendingSubscriber, () => {
   });
 
   it('is idempotent-safe for a duplicate submission while still pending', async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     const first = unwrapOk(
       await createPendingSubscriber(tenantId, 'reader@example.com'),
     );
@@ -122,7 +105,7 @@ describe(createPendingSubscriber, () => {
   });
 
   it('reports already-active for an email that already confirmed, without inserting or erroring', async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     await db.insert(schema.subscribers).values({
       tenantId,
       email: 'reader@example.com',
@@ -141,8 +124,8 @@ describe(createPendingSubscriber, () => {
   });
 
   it('allows the same email to subscribe on two different tenants', async () => {
-    const tenantOneId = await insertTenant('acme');
-    const tenantTwoId = await insertTenant('other');
+    const { id: tenantOneId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantTwoId } = await insertTestTenant(db, { slug: 'other' });
 
     const first = unwrapOk(
       await createPendingSubscriber(tenantOneId, 'reader@example.com'),
@@ -169,7 +152,7 @@ describe(createPendingSubscriber, () => {
   // check Postgres's job rather than a racy read-then-decide — see the
   // docstring on `createPendingSubscriber`.
   it('resolves two concurrent calls for the same brand-new email without an uncaught constraint error', async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
 
     const [first, second] = await Promise.all([
       createPendingSubscriber(tenantId, 'reader@example.com'),
@@ -188,7 +171,7 @@ describe(createPendingSubscriber, () => {
   // forced here — `unsubscribe` deleting the same row is the real-world
   // trigger. The follow-up read is spied to simulate that exact window.
   it('returns DB_NOT_FOUND when the conflicting row vanishes before the follow-up read', async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     await createPendingSubscriber(tenantId, 'reader@example.com');
 
     const selectSpy = vi.spyOn(db, 'select').mockReturnValueOnce({

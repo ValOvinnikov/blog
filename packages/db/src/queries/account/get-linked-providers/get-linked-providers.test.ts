@@ -1,5 +1,6 @@
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestAccount, insertTestUser } from '@blog/db/testing/fixtures';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { getLinkedProviders } from './get-linked-providers';
@@ -29,33 +30,11 @@ afterEach(async () => {
   await db.delete(schema.users);
 });
 
-async function insertUser(
-  overrides: Partial<typeof schema.users.$inferInsert> = {},
-): Promise<schema.TUser> {
-  const [inserted] = await db
-    .insert(schema.users)
-    .values(overrides)
-    .returning();
-
-  if (!inserted) throw new Error('failed to seed a user row');
-
-  return inserted;
-}
-
-async function insertAccount(userId: string, provider: string): Promise<void> {
-  await db.insert(schema.accounts).values({
-    userId,
-    type: 'oauth',
-    provider,
-    providerAccountId: `${userId}-${provider}`,
-  });
-}
-
 describe(getLinkedProviders, () => {
   it('reports github and google linked from accounts rows', async () => {
-    const user = await insertUser();
-    await insertAccount(user.id, 'github');
-    await insertAccount(user.id, 'google');
+    const user = await insertTestUser(db);
+    await insertTestAccount(db, user.id, 'github');
+    await insertTestAccount(db, user.id, 'google');
 
     const result = await getLinkedProviders(user.id);
 
@@ -63,8 +42,8 @@ describe(getLinkedProviders, () => {
   });
 
   it('reports only the linked provider when just one accounts row exists', async () => {
-    const user = await insertUser();
-    await insertAccount(user.id, 'github');
+    const user = await insertTestUser(db);
+    await insertTestAccount(db, user.id, 'github');
 
     const result = await getLinkedProviders(user.id);
 
@@ -72,7 +51,9 @@ describe(getLinkedProviders, () => {
   });
 
   it('reports emailLink linked from emailVerified with zero accounts rows', async () => {
-    const user = await insertUser({ emailVerified: new Date(2026, 0, 1) });
+    const user = await insertTestUser(db, {
+      emailVerified: new Date(2026, 0, 1),
+    });
 
     const result = await getLinkedProviders(user.id);
 
@@ -80,7 +61,7 @@ describe(getLinkedProviders, () => {
   });
 
   it('reports every method as false when nothing is linked', async () => {
-    const user = await insertUser();
+    const user = await insertTestUser(db);
 
     const result = await getLinkedProviders(user.id);
 
@@ -94,9 +75,9 @@ describe(getLinkedProviders, () => {
   });
 
   it("does not report another user's linked accounts", async () => {
-    const user = await insertUser();
-    const otherUser = await insertUser();
-    await insertAccount(otherUser.id, 'github');
+    const user = await insertTestUser(db);
+    const otherUser = await insertTestUser(db);
+    await insertTestAccount(db, otherUser.id, 'github');
 
     const result = await getLinkedProviders(user.id);
 

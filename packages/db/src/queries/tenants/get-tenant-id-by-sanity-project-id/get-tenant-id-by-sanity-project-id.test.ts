@@ -1,6 +1,6 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { getTenantIdBySanityProjectId } from './get-tenant-id-by-sanity-project-id';
@@ -16,21 +16,13 @@ async function insertTenant(
   sanityProjectId: string | null,
   createdAt?: Date,
 ): Promise<string> {
-  const [tenant] = await db
-    .insert(schema.tenants)
-    .values({
-      slug,
-      name: slug,
-      primaryDomain: `${slug}.example.com`,
-      sanityProjectId,
-      sanityDataset: sanityProjectId ? 'production' : null,
-      locale: 'en',
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-      ...(createdAt ? { createdAt } : {}),
-    })
-    .returning();
-  return tenant!.id;
+  const tenant = await insertTestTenant(db, {
+    slug,
+    sanityProjectId,
+    sanityDataset: sanityProjectId ? 'production' : null,
+    ...(createdAt ? { createdAt } : {}),
+  });
+  return tenant.id;
 }
 
 beforeAll(async () => {

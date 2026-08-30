@@ -1,7 +1,7 @@
 import { ERROR_CODE } from '@blog/config/constants';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { eq } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
@@ -12,26 +12,6 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 let db: PgliteDatabase<typeof schema>;
-
-async function insertTenant(
-  slug: string,
-  primaryDomain: string,
-): Promise<string> {
-  const [tenant] = await db
-    .insert(schema.tenants)
-    .values({
-      slug,
-      name: slug,
-      primaryDomain,
-      sanityProjectId: 'abc123',
-      sanityDataset: 'production',
-      locale: 'en',
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
-  return tenant!.id;
-}
 
 beforeAll(async () => {
   db = await createTestDb();
@@ -48,7 +28,10 @@ afterEach(async () => {
 
 describe(addTenantDomain, () => {
   it('inserts a new domain row for the given tenant', async () => {
-    const tenantId = await insertTenant('acme', 'acme.example.com');
+    const { id: tenantId } = await insertTestTenant(db, {
+      slug: 'acme',
+      primaryDomain: 'acme.example.com',
+    });
 
     const result = await addTenantDomain(tenantId, 'acme.example.com');
 
@@ -62,7 +45,10 @@ describe(addTenantDomain, () => {
   });
 
   it('is idempotent when the same (tenantId, domain) pair is added again', async () => {
-    const tenantId = await insertTenant('acme', 'acme.example.com');
+    const { id: tenantId } = await insertTestTenant(db, {
+      slug: 'acme',
+      primaryDomain: 'acme.example.com',
+    });
     const first = await addTenantDomain(tenantId, 'acme.example.com');
 
     const second = await addTenantDomain(tenantId, 'acme.example.com');
@@ -73,8 +59,14 @@ describe(addTenantDomain, () => {
   });
 
   it('returns DB_DUPLICATE_DOMAIN for a domain already assigned to a different tenant', async () => {
-    const tenantId = await insertTenant('acme', 'acme.example.com');
-    const otherTenantId = await insertTenant('other', 'other.example.com');
+    const { id: tenantId } = await insertTestTenant(db, {
+      slug: 'acme',
+      primaryDomain: 'acme.example.com',
+    });
+    const { id: otherTenantId } = await insertTestTenant(db, {
+      slug: 'other',
+      primaryDomain: 'other.example.com',
+    });
     await addTenantDomain(tenantId, 'shared.example.com');
 
     const result = await addTenantDomain(otherTenantId, 'shared.example.com');
@@ -91,7 +83,10 @@ describe(addTenantDomain, () => {
   // real-world trigger. The follow-up read is spied to simulate that exact
   // window instead.
   it('returns DB_NOT_FOUND when the conflicting row vanishes before the follow-up read', async () => {
-    const tenantId = await insertTenant('acme', 'acme.example.com');
+    const { id: tenantId } = await insertTestTenant(db, {
+      slug: 'acme',
+      primaryDomain: 'acme.example.com',
+    });
     await addTenantDomain(tenantId, 'shared.example.com');
 
     const selectSpy = vi.spyOn(db, 'select').mockReturnValueOnce({
@@ -107,7 +102,10 @@ describe(addTenantDomain, () => {
 
 describe('foreign-key cascade', () => {
   it('removes a tenant_domains row when its owning tenant is deleted', async () => {
-    const tenantId = await insertTenant('acme', 'acme.example.com');
+    const { id: tenantId } = await insertTestTenant(db, {
+      slug: 'acme',
+      primaryDomain: 'acme.example.com',
+    });
     await addTenantDomain(tenantId, 'acme.example.com');
 
     await db.delete(schema.tenants).where(eq(schema.tenants.id, tenantId));

@@ -1,12 +1,9 @@
 import { ERROR_CODE } from '@blog/config/constants';
-import {
-  TENANT_PLAN,
-  TENANT_PROVISIONING_STATUS,
-  TENANT_STATUS,
-} from '@blog/db/constants';
+import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { eq } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
@@ -21,20 +18,10 @@ let db: PgliteDatabase<typeof schema>;
 async function insertTenant(overrides?: {
   provisioningStatus?: (typeof TENANT_PROVISIONING_STATUS)[keyof typeof TENANT_PROVISIONING_STATUS];
 }): Promise<string> {
-  const [tenant] = await db
-    .insert(schema.tenants)
-    .values({
-      slug: 'acme',
-      name: 'Acme',
-      primaryDomain: 'acme.example.com',
-      locale: 'en',
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-      provisioningStatus: overrides?.provisioningStatus,
-    })
-    .returning();
-
-  if (!tenant) throw new Error('setup: tenant insert returned no row.');
+  const tenant = await insertTestTenant(db, {
+    slug: 'acme',
+    provisioningStatus: overrides?.provisioningStatus,
+  });
 
   return tenant.id;
 }

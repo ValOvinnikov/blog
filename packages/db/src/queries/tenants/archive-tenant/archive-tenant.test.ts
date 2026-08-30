@@ -1,8 +1,9 @@
 import { ERROR_CODE } from '@blog/config/constants';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import { TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { eq } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
@@ -13,24 +14,6 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 let db: PgliteDatabase<typeof schema>;
-
-async function insertTenant(): Promise<string> {
-  const [tenant] = await db
-    .insert(schema.tenants)
-    .values({
-      slug: 'acme',
-      name: 'Acme',
-      primaryDomain: 'acme.example.com',
-      locale: 'en',
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
-
-  if (!tenant) throw new Error('setup: tenant insert returned no row.');
-
-  return tenant.id;
-}
 
 beforeAll(async () => {
   db = await createTestDb();
@@ -46,7 +29,7 @@ afterEach(async () => {
 
 describe(archiveTenant, () => {
   it('stamps deprovisionedAt, sets status to ARCHIVED, and returns the updated row', async () => {
-    const tenantId = await insertTenant();
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
 
     const result = await archiveTenant(tenantId);
 
@@ -63,7 +46,7 @@ describe(archiveTenant, () => {
   });
 
   it('leaves the slug intact so it stays reserved', async () => {
-    const tenantId = await insertTenant();
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
 
     const result = await archiveTenant(tenantId);
 

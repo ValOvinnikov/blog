@@ -1,6 +1,6 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { addBookmark } from '../add-bookmark';
@@ -16,27 +16,6 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 let db: PgliteDatabase<typeof schema>;
-
-async function insertUser(id: string): Promise<void> {
-  await db.insert(schema.users).values({ id });
-}
-
-async function insertTenant(slug: string): Promise<string> {
-  const [tenant] = await db
-    .insert(schema.tenants)
-    .values({
-      slug,
-      name: slug,
-      primaryDomain: `${slug}.example.com`,
-      sanityProjectId: 'abc123',
-      sanityDataset: 'production',
-      locale: 'en',
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
-  return tenant!.id;
-}
 
 // One in-memory Postgres instance for the whole file (spinning up pglite's
 // WASM engine is the slow part — seconds, not milliseconds) — `afterEach`
@@ -57,10 +36,10 @@ afterEach(async () => {
 
 describe(listBookmarks, () => {
   it("returns only the given tenant and user's bookmarks", async () => {
-    await insertUser('user-1');
-    await insertUser('user-2');
-    const tenantOneId = await insertTenant('acme');
-    const tenantTwoId = await insertTenant('other');
+    await insertTestUser(db, { id: 'user-1' });
+    await insertTestUser(db, { id: 'user-2' });
+    const { id: tenantOneId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantTwoId } = await insertTestTenant(db, { slug: 'other' });
     await addBookmark(tenantOneId, 'user-1', 'post-1');
     await addBookmark(tenantOneId, 'user-1', 'post-2');
     await addBookmark(tenantOneId, 'user-2', 'post-3');
@@ -75,8 +54,8 @@ describe(listBookmarks, () => {
   });
 
   it('orders results by most recently bookmarked first', async () => {
-    await insertUser('user-1');
-    const tenantId = await insertTenant('acme');
+    await insertTestUser(db, { id: 'user-1' });
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     // Insert directly with explicit timestamps rather than relying on two
     // calls to addBookmark() landing in different clock ticks (defaultNow()
     // could otherwise collide within the same statement/transaction).
@@ -104,8 +83,8 @@ describe(listBookmarks, () => {
   });
 
   it('returns an empty array when the user has no bookmarks', async () => {
-    await insertUser('user-1');
-    const tenantId = await insertTenant('acme');
+    await insertTestUser(db, { id: 'user-1' });
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
 
     expect(await listBookmarks(tenantId, 'user-1')).toEqual([]);
   });

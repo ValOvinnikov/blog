@@ -2,6 +2,7 @@ import { ERROR_CODE } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestUser } from '@blog/db/testing/fixtures';
 import { eq } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
@@ -25,10 +26,6 @@ const draftInput: TCreateTenantDraftInput = {
   owner: { type: 'user', userId: 'user-1' },
 };
 
-async function insertUser(id: string): Promise<void> {
-  await db.insert(schema.users).values({ id });
-}
-
 beforeAll(async () => {
   db = await createTestDb();
 }, 30_000);
@@ -47,7 +44,7 @@ afterEach(async () => {
 
 describe(createTenantDraft, () => {
   it('inserts a tenant row left in PENDING with an idle per-step map and no Sanity project yet', async () => {
-    await insertUser('user-1');
+    await insertTestUser(db, { id: 'user-1' });
 
     const result = await createTenantDraft(draftInput);
 
@@ -74,7 +71,7 @@ describe(createTenantDraft, () => {
   });
 
   it('inserts the primary domain into tenant_domains', async () => {
-    await insertUser('user-1');
+    await insertTestUser(db, { id: 'user-1' });
 
     const result = await createTenantDraft(draftInput);
 
@@ -91,7 +88,7 @@ describe(createTenantDraft, () => {
   });
 
   it('inserts an OWNER membership row for the given owner user id', async () => {
-    await insertUser('user-1');
+    await insertTestUser(db, { id: 'user-1' });
 
     const result = await createTenantDraft(draftInput);
 
@@ -152,8 +149,8 @@ describe(createTenantDraft, () => {
   });
 
   it('rejects on a colliding domain and leaves the second tenant and its dependents cleaned up', async () => {
-    await insertUser('user-1');
-    await insertUser('user-2');
+    await insertTestUser(db, { id: 'user-1' });
+    await insertTestUser(db, { id: 'user-2' });
     await createTenantDraft(draftInput);
 
     await expect(
@@ -213,8 +210,8 @@ describe(createTenantDraft, () => {
   });
 
   it('returns DB_DUPLICATE_SLUG for a second draft with an already-used slug, without touching dependent rows', async () => {
-    await insertUser('user-1');
-    await insertUser('user-2');
+    await insertTestUser(db, { id: 'user-1' });
+    await insertTestUser(db, { id: 'user-2' });
     await createTenantDraft(draftInput);
 
     const result = await createTenantDraft({
@@ -238,7 +235,7 @@ describe(createTenantDraft, () => {
   // real-world trigger. The follow-up read is spied to simulate that exact
   // window.
   it('returns DB_NOT_FOUND when the conflicting row vanishes before the follow-up read', async () => {
-    await insertUser('user-1');
+    await insertTestUser(db, { id: 'user-1' });
     await createTenantDraft(draftInput);
 
     const selectSpy = vi.spyOn(db, 'select').mockReturnValueOnce({

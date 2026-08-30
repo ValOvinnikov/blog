@@ -1,6 +1,7 @@
 import { ADMIN_ROLE, GRANTED_VIA } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestUser } from '@blog/db/testing/fixtures';
 import { eq } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
@@ -17,10 +18,6 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 let db: PgliteDatabase<typeof schema>;
 
-async function insertUser(id: string): Promise<void> {
-  await db.insert(schema.users).values({ id });
-}
-
 beforeAll(async () => {
   db = await createTestDb();
 }, 30_000);
@@ -36,7 +33,7 @@ afterEach(async () => {
 
 describe(createAdmin, () => {
   it('inserts a new admin row', async () => {
-    await insertUser('user-1');
+    await insertTestUser(db, { id: 'user-1' });
 
     const admin = await createAdmin(
       'user-1',
@@ -51,7 +48,7 @@ describe(createAdmin, () => {
   });
 
   it('is idempotent when the user already has an admin row', async () => {
-    await insertUser('user-1');
+    await insertTestUser(db, { id: 'user-1' });
     const first = await createAdmin(
       'user-1',
       ADMIN_ROLE.SUPERADMIN,
@@ -70,7 +67,7 @@ describe(createAdmin, () => {
   });
 
   it('does not change the stored role when re-run with a different role', async () => {
-    await insertUser('user-1');
+    await insertTestUser(db, { id: 'user-1' });
     const first = await createAdmin(
       'user-1',
       ADMIN_ROLE.SUPERADMIN,
@@ -101,7 +98,7 @@ describe(createAdmin, () => {
   });
 
   it('leaves grantedBy NULL and still sets grantedAt for a break-glass grant', async () => {
-    await insertUser('user-1');
+    await insertTestUser(db, { id: 'user-1' });
 
     const admin = await createAdmin(
       'user-1',
@@ -115,8 +112,8 @@ describe(createAdmin, () => {
   });
 
   it('records the granting user id, grantedVia, and grantedAt for an in-app promotion', async () => {
-    await insertUser('user-1');
-    await insertUser('granter-1');
+    await insertTestUser(db, { id: 'user-1' });
+    await insertTestUser(db, { id: 'granter-1' });
 
     const admin = await createAdmin(
       'user-1',
@@ -131,8 +128,8 @@ describe(createAdmin, () => {
   });
 
   it('keeps grantedVia as PROMOTION even after the granting user is deleted', async () => {
-    await insertUser('user-1');
-    await insertUser('granter-1');
+    await insertTestUser(db, { id: 'user-1' });
+    await insertTestUser(db, { id: 'granter-1' });
     const admin = await createAdmin(
       'user-1',
       ADMIN_ROLE.SUPERADMIN,
@@ -157,7 +154,7 @@ describe(createAdmin, () => {
 
 describe('foreign-key cascade', () => {
   it('removes an admin row when its owning user is deleted', async () => {
-    await insertUser('user-1');
+    await insertTestUser(db, { id: 'user-1' });
     await createAdmin('user-1', ADMIN_ROLE.SUPERADMIN, GRANTED_VIA.BREAK_GLASS);
 
     await db.delete(schema.users).where(eq(schema.users.id, 'user-1'));
