@@ -69,17 +69,9 @@ export default async function RootLayout({ children }: TProps) {
       </head>
       <body>
         {children}
-        {/* Client components (use hooks internally) mounted at the leaf —
-            collect real-user Core Web Vitals and pageview analytics. Both
-            unconditionally request a same-origin script
-            (`/_vercel/speed-insights/script.js` / `/_vercel/insights/script.js`)
-            that Vercel's edge only proxies when the matching dashboard
-            feature is enabled for the deploying project — gated behind
-            `isWebAnalyticsEnabled()` (env var, not `VERCEL_ENV`; see its
-            own comment) so a project without Speed Insights/Web Analytics
-            turned on doesn't 404 on that path, AND the tenant's `ANALYTICS`
-            capability (`isCapabilityEnabled`) — plan entitlement and the
-            tenant's own toggle, on top of the env gate. */}
+        {/* Both scripts 404 on a project without Speed Insights/Web
+            Analytics enabled in the Vercel dashboard, so `isWebAnalyticsEnabled()`
+            must gate them alongside the tenant's `ANALYTICS` capability. */}
         {analyticsEnabled && <SpeedInsights />}
         {analyticsEnabled && <Analytics />}
       </body>

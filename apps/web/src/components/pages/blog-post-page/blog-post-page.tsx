@@ -18,10 +18,10 @@ import {
   extractPostHeadings,
   MIN_H2_HEADINGS_FOR_RAIL,
 } from '@web/utils/extract-post-headings/extract-post-headings';
+import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { logger } from '@web/utils/logger/logger';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { toSocialIconName } from '@web/utils/to-social-icon-name';
-import { notFound } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
 
 import { BlogPostPageView } from './blog-post-page-view';
@@ -37,17 +37,9 @@ type TBlogPostPageProps = { slug: string };
  */
 export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
   const result = await service.pages.post.v1.getPost(slug);
-
-  if (!result.ok) {
-    logger.error('blog_post_page.fetch_failed', { slug, error: result.error });
-    notFound();
-  }
-
-  if (!result.data) {
-    notFound();
-  }
-
-  const post = result.data;
+  const post = guardPageLoaderResult(result, 'blog_post_page.fetch_failed', {
+    slug,
+  });
   const {
     id,
     title,

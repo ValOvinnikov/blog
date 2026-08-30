@@ -13,7 +13,7 @@ const SITE_CONFIG_REVALIDATE_SECONDS = 3600;
  * it out of static rendering.
  *
  * TODO: fold this into `resolveTenantId()`/`getRequestTenantId()` once
- * `site_config` reads have a tenant-scoped caching story (#1527).
+ * `site_config` reads have a tenant-scoped caching story.
  */
 const resolveSiteConfigTenantId = async (): Promise<string | undefined> => {
   const [tenant] = await queries.tenants.listTenants();

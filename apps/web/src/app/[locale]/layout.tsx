@@ -140,21 +140,10 @@ export default async function LocaleLayout({ children, params }: TProps) {
       now={now}
       timeZone={timeZone}
     >
-      {/* Session isn't server-fetched here (no `session` prop) — `AuthMenu`
-          resolves it client-side, mirroring `ThemeToggleButton`'s own
-          mounted-gated flash-avoidance pattern rather than duplicating an
-          `auth()` call at every layout render. */}
+      {/* No `session` prop: `AuthMenu` resolves the session client-side rather than duplicating an `auth()` call at every layout render. */}
       <SessionProvider>
-        {/* `ToastProvider` is mounted once here, above the routed `children`,
-            so a toast fired by an engagement island survives a client-side
-            route change instead of being tied to the page that fired it —
-            it owns no visual layout of its own, it just renders its fixed
-            `ToastViewport` alongside whatever `children` mounts. */}
+        {/* Mounted above `children` so a toast survives a client-side route change instead of being tied to the page that fired it. */}
         <ToastProvider isPlain={plain}>
-          {/* `root` is the sticky-footer shell: `min-h-dvh flex-col` so short
-              pages still fill the viewport, `content` is `flex-1` so it grows to
-              push `Footer` to the bottom on short pages and yields naturally
-              (no overlap) once page content exceeds the viewport. */}
           <div className={s.root()}>
             <Header>
               <Header.Brand>

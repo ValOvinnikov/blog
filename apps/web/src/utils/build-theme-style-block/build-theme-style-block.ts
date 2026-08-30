@@ -2,10 +2,10 @@ import type { TThemeTokens } from '@blog/config';
 
 /**
  * Fixed light/dark L·C recipe for the accent and logo token families
- * (`configs/tailwind/theme.css`'s `:root`/`.dark` — only hue rotates per
- * `accentHue`/`logoHue`, see the Phase 2 plan's "Accent OKLCH derivation
- * contract"). `--brand-primary-contrast` is achromatic by design and never
- * varies with hue.
+ * (`configs/tailwind/theme.css`'s `:root`/`.dark`) — lightness and chroma
+ * stay constant across tenants so contrast ratios hold, and only hue rotates
+ * per `accentHue`/`logoHue`. `--brand-primary-contrast` is achromatic by
+ * design and never varies with hue.
  */
 const buildAccentTokens = (hue: number, isDark: boolean): string => {
   if (isDark) {
@@ -51,8 +51,8 @@ const buildLogoTokens = (hue: number, isDark: boolean): string => {
  * counterpart to `configs/tailwind/theme.css`'s static defaults, which stay
  * byte-identical to the Console preset's own resolved values (the "no
  * `settings_theme` document" safety net). `accentHue` and `logoHue` are
- * applied independently since they no longer always share one hue (see the
- * Phase 2 plan's "retiring the Console/Indigo brand-variant axis").
+ * applied independently since a tenant's brand accent and logo mark don't
+ * always share one hue.
  *
  * Emits raw `oklch()` CSS rather than pre-converting to hex: every modern
  * browser resolves it natively, and this token only exists to become a CSS

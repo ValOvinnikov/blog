@@ -4,8 +4,7 @@ import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
-import { logger } from '@web/utils/logger/logger';
-import { notFound } from 'next/navigation';
+import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { getTranslations } from 'next-intl/server';
 
 import { GenericPageView } from './generic-page-view';
@@ -24,16 +23,11 @@ export const GenericPage = async ({ slug, locale }: TGenericPageProps) => {
     getTranslations('breadcrumbs'),
   ]);
 
-  if (!result.ok) {
-    logger.error('generic_page.fetch_failed', { slug, error: result.error });
-    notFound();
-  }
-
-  if (!result.data) {
-    notFound();
-  }
-
-  const { title, modules } = result.data;
+  const { title, modules } = guardPageLoaderResult(
+    result,
+    'generic_page.fetch_failed',
+    { slug },
+  );
 
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
   const breadcrumbTrail: IBreadcrumbItem[] = [

@@ -5,8 +5,7 @@ import { ModuleRenderer } from '@web/modules/module-renderer';
 import { PostListModule } from '@web/modules/post-list/post-list-module';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
-import { logger } from '@web/utils/logger/logger';
-import { notFound } from 'next/navigation';
+import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { getTranslations } from 'next-intl/server';
 
 import { TagPageView } from './tag-page-view';
@@ -27,16 +26,11 @@ export const TagPage = async ({ slug, page, locale }: TTagPageProps) => {
     getTranslations('tagPage'),
   ]);
 
-  if (!result.ok) {
-    logger.error('tag_page.fetch_failed', { slug, error: result.error });
-    notFound();
-  }
-
-  if (!result.data) {
-    notFound();
-  }
-
-  const { tag, modules, postListId } = result.data;
+  const { tag, modules, postListId } = guardPageLoaderResult(
+    result,
+    'tag_page.fetch_failed',
+    { slug },
+  );
 
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
   const breadcrumbTrail: IBreadcrumbItem[] = [

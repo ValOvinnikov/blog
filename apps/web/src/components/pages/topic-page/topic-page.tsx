@@ -6,8 +6,7 @@ import { PostListModule } from '@web/modules/post-list/post-list-module';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
 import { getTopicsSafely } from '@web/utils/get-topics-safely';
-import { logger } from '@web/utils/logger/logger';
-import { notFound } from 'next/navigation';
+import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { getTranslations } from 'next-intl/server';
 
 import { TopicPageView } from './topic-page-view';
@@ -31,16 +30,11 @@ export const TopicPage = async ({ slug, page, locale }: TTopicPageProps) => {
     getTranslations('topicPage'),
   ]);
 
-  if (!result.ok) {
-    logger.error('topic_page.fetch_failed', { slug, error: result.error });
-    notFound();
-  }
-
-  if (!result.data) {
-    notFound();
-  }
-
-  const { topic, modules, postListId } = result.data;
+  const { topic, modules, postListId } = guardPageLoaderResult(
+    result,
+    'topic_page.fetch_failed',
+    { slug },
+  );
 
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
   const breadcrumbTrail: IBreadcrumbItem[] = [
