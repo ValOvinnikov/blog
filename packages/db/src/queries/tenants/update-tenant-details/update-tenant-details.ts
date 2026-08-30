@@ -24,6 +24,28 @@ export type TUpdateTenantDetailsInput = {
   ownerEmail?: string;
 };
 
+type TTenantDetailsFields = {
+  name: string;
+  slug: string;
+  primaryDomain: string;
+  plan: TTenantPlan;
+  locale: string;
+};
+
+// The tenant columns this mutation writes, shared by the main update and
+// `restoreTenantRow`'s compensating write so the two can't drift apart.
+function tenantDetailsFields(
+  source: TTenantDetailsFields,
+): TTenantDetailsFields {
+  return {
+    name: source.name,
+    slug: source.slug,
+    primaryDomain: source.primaryDomain,
+    plan: source.plan,
+    locale: source.locale,
+  };
+}
+
 export type TUpdateTenantDetailsResult =
   | { outcome: 'updated'; tenant: TTenant }
   | { outcome: 'slug-taken' }
@@ -258,13 +280,7 @@ export async function updateTenantDetails(
 
   const [tenant] = await db
     .update(tenants)
-    .set({
-      name: input.name,
-      slug: input.slug,
-      primaryDomain: input.primaryDomain,
-      plan: input.plan,
-      locale: input.locale,
-    })
+    .set(tenantDetailsFields(input))
     .where(eq(tenants.id, tenantId))
     .returning();
 
@@ -277,13 +293,7 @@ export async function updateTenantDetails(
   async function restoreTenantRow(original: TTenant): Promise<void> {
     await db
       .update(tenants)
-      .set({
-        name: original.name,
-        slug: original.slug,
-        primaryDomain: original.primaryDomain,
-        plan: original.plan,
-        locale: original.locale,
-      })
+      .set(tenantDetailsFields(original))
       .where(eq(tenants.id, tenantId));
   }
 

@@ -1,5 +1,6 @@
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestUser } from '@blog/db/testing/fixtures';
 import { eq } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
@@ -29,22 +30,9 @@ afterEach(async () => {
   await db.delete(schema.users);
 });
 
-async function insertUser(
-  overrides: Partial<typeof schema.users.$inferInsert> = {},
-): Promise<schema.TUser> {
-  const [inserted] = await db
-    .insert(schema.users)
-    .values(overrides)
-    .returning();
-
-  if (!inserted) throw new Error('failed to seed a user row');
-
-  return inserted;
-}
-
 describe(updateDisplayName, () => {
   it('persists the new name', async () => {
-    const user = await insertUser({ name: 'Old Name' });
+    const user = await insertTestUser(db, { name: 'Old Name' });
 
     await updateDisplayName(user.id, 'New Name');
 
@@ -56,8 +44,8 @@ describe(updateDisplayName, () => {
   });
 
   it("does not change another user's name", async () => {
-    const user = await insertUser({ name: 'User One' });
-    const otherUser = await insertUser({ name: 'User Two' });
+    const user = await insertTestUser(db, { name: 'User One' });
+    const otherUser = await insertTestUser(db, { name: 'User Two' });
 
     await updateDisplayName(user.id, 'Renamed');
 

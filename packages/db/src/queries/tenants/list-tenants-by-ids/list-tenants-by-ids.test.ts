@@ -1,6 +1,6 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { listTenantsByIds } from './list-tenants-by-ids';
@@ -10,23 +10,6 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 let db: PgliteDatabase<typeof schema>;
-
-async function insertTenant(slug: string): Promise<string> {
-  const [tenant] = await db
-    .insert(schema.tenants)
-    .values({
-      slug,
-      name: slug,
-      primaryDomain: `${slug}.example.com`,
-      sanityProjectId: 'abc123',
-      sanityDataset: 'production',
-      locale: 'en',
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
-  return tenant!.id;
-}
 
 beforeAll(async () => {
   db = await createTestDb();
@@ -49,7 +32,7 @@ describe(listTenantsByIds, () => {
   });
 
   it('silently omits ids with no matching row', async () => {
-    const acmeId = await insertTenant('acme');
+    const { id: acmeId } = await insertTestTenant(db, { slug: 'acme' });
 
     const result = await listTenantsByIds([
       acmeId,
@@ -61,8 +44,8 @@ describe(listTenantsByIds, () => {
   });
 
   it('resolves multiple ids to their tenants', async () => {
-    const acmeId = await insertTenant('acme');
-    const zetaId = await insertTenant('zeta');
+    const { id: acmeId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: zetaId } = await insertTestTenant(db, { slug: 'zeta' });
 
     const result = await listTenantsByIds([acmeId, zetaId]);
 

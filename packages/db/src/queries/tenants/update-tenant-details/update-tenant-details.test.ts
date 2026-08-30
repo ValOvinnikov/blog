@@ -15,6 +15,7 @@ import {
   type TTenantProvisioningSteps,
 } from '@blog/db/schema/tenants';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { and, eq } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
@@ -47,22 +48,14 @@ async function insertTenantWithDomain(overrides?: {
   const slug = overrides?.slug ?? 'acme';
   const domain = overrides?.domain ?? 'acme.example.com';
 
-  const [tenant] = await db
-    .insert(tenants)
-    .values({
-      slug,
-      name: 'Acme',
-      primaryDomain: domain,
-      locale: 'en',
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-      sanityProjectId: overrides?.sanityProjectId,
-      provisioningStatus: overrides?.provisioningStatus,
-      provisioningSteps: overrides?.provisioningSteps,
-    })
-    .returning();
-
-  if (!tenant) throw new Error('setup: tenant insert returned no row.');
+  const tenant = await insertTestTenant(db, {
+    slug,
+    name: 'Acme',
+    primaryDomain: domain,
+    sanityProjectId: overrides?.sanityProjectId,
+    provisioningStatus: overrides?.provisioningStatus,
+    provisioningSteps: overrides?.provisioningSteps,
+  });
 
   await db.insert(tenantDomains).values({ tenantId: tenant.id, domain });
 

@@ -1,10 +1,7 @@
-import {
-  MEMBERSHIP_ROLE,
-  TENANT_PLAN,
-  TENANT_STATUS,
-} from '@blog/db/constants';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
 import { eq } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
@@ -20,27 +17,6 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 let db: PgliteDatabase<typeof schema>;
-
-async function insertUser(id: string): Promise<void> {
-  await db.insert(schema.users).values({ id });
-}
-
-async function insertTenant(slug: string): Promise<string> {
-  const [tenant] = await db
-    .insert(schema.tenants)
-    .values({
-      slug,
-      name: slug,
-      primaryDomain: `${slug}.example.com`,
-      sanityProjectId: 'abc123',
-      sanityDataset: 'production',
-      locale: 'en',
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
-  return tenant!.id;
-}
 
 beforeAll(async () => {
   db = await createTestDb();
@@ -58,8 +34,8 @@ afterEach(async () => {
 
 describe(createMembership, () => {
   it('inserts a new membership row', async () => {
-    await insertUser('user-1');
-    const tenantId = await insertTenant('acme');
+    await insertTestUser(db, { id: 'user-1' });
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
 
     const membership = await createMembership(
       'user-1',
@@ -75,8 +51,8 @@ describe(createMembership, () => {
   });
 
   it('is idempotent when the (userId, tenantId) pair already has a membership', async () => {
-    await insertUser('user-1');
-    const tenantId = await insertTenant('acme');
+    await insertTestUser(db, { id: 'user-1' });
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     const first = await createMembership(
       'user-1',
       tenantId,
@@ -96,9 +72,9 @@ describe(createMembership, () => {
   });
 
   it('allows the same user to hold memberships on different tenants', async () => {
-    await insertUser('user-1');
-    const tenantOneId = await insertTenant('acme');
-    const tenantTwoId = await insertTenant('other');
+    await insertTestUser(db, { id: 'user-1' });
+    const { id: tenantOneId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantTwoId } = await insertTestTenant(db, { slug: 'other' });
 
     await createMembership('user-1', tenantOneId, MEMBERSHIP_ROLE.OWNER);
     await createMembership('user-1', tenantTwoId, MEMBERSHIP_ROLE.READER);
@@ -108,7 +84,7 @@ describe(createMembership, () => {
   });
 
   it('rejects a membership for a user that does not exist', async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
 
     await expect(
       createMembership('missing-user', tenantId, MEMBERSHIP_ROLE.OWNER),
@@ -118,8 +94,8 @@ describe(createMembership, () => {
 
 describe('foreign-key cascade', () => {
   it('removes a membership when its owning user is deleted', async () => {
-    await insertUser('user-1');
-    const tenantId = await insertTenant('acme');
+    await insertTestUser(db, { id: 'user-1' });
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     await createMembership('user-1', tenantId, MEMBERSHIP_ROLE.OWNER);
 
     await db.delete(schema.users).where(eq(schema.users.id, 'user-1'));
@@ -129,8 +105,8 @@ describe('foreign-key cascade', () => {
   });
 
   it('removes a membership when its owning tenant is deleted', async () => {
-    await insertUser('user-1');
-    const tenantId = await insertTenant('acme');
+    await insertTestUser(db, { id: 'user-1' });
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     await createMembership('user-1', tenantId, MEMBERSHIP_ROLE.OWNER);
 
     await db.delete(schema.tenants).where(eq(schema.tenants.id, tenantId));

@@ -7,6 +7,7 @@ import {
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { eq } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
@@ -27,21 +28,13 @@ async function insertTenant(
 ): Promise<string> {
   const { archived = true, slug = 'acme', sanityProjectId } = options;
 
-  const [tenant] = await db
-    .insert(schema.tenants)
-    .values({
-      slug,
-      name: 'Acme',
-      primaryDomain: 'acme.example.com',
-      locale: 'en',
-      plan: TENANT_PLAN.FREE,
-      status: archived ? TENANT_STATUS.ARCHIVED : TENANT_STATUS.ACTIVE,
-      deprovisionedAt: archived ? new Date() : undefined,
-      sanityProjectId,
-    })
-    .returning();
-
-  if (!tenant) throw new Error('setup: tenant insert returned no row.');
+  const tenant = await insertTestTenant(db, {
+    slug,
+    name: 'Acme',
+    status: archived ? TENANT_STATUS.ARCHIVED : TENANT_STATUS.ACTIVE,
+    deprovisionedAt: archived ? new Date() : undefined,
+    sanityProjectId,
+  });
 
   return tenant.id;
 }

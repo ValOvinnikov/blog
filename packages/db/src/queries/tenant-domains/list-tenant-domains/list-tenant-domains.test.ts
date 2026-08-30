@@ -1,6 +1,6 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { listTenantDomains } from './list-tenant-domains';
@@ -10,26 +10,6 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 let db: PgliteDatabase<typeof schema>;
-
-async function insertTenant(
-  slug: string,
-  primaryDomain: string,
-): Promise<string> {
-  const [tenant] = await db
-    .insert(schema.tenants)
-    .values({
-      slug,
-      name: slug,
-      primaryDomain,
-      sanityProjectId: 'abc123',
-      sanityDataset: 'production',
-      locale: 'en',
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
-  return tenant!.id;
-}
 
 beforeAll(async () => {
   db = await createTestDb();
@@ -46,8 +26,14 @@ afterEach(async () => {
 
 describe(listTenantDomains, () => {
   it('returns every domain for the given tenant', async () => {
-    const tenantId = await insertTenant('acme', 'acme.example.com');
-    const otherTenantId = await insertTenant('other', 'other.example.com');
+    const { id: tenantId } = await insertTestTenant(db, {
+      slug: 'acme',
+      primaryDomain: 'acme.example.com',
+    });
+    const { id: otherTenantId } = await insertTestTenant(db, {
+      slug: 'other',
+      primaryDomain: 'other.example.com',
+    });
     await db.insert(schema.tenantDomains).values([
       { tenantId, domain: 'acme.example.com' },
       { tenantId, domain: 'www.acme.example.com' },
@@ -63,7 +49,10 @@ describe(listTenantDomains, () => {
   });
 
   it('returns an empty array for a tenant with no domains', async () => {
-    const tenantId = await insertTenant('acme', 'acme.example.com');
+    const { id: tenantId } = await insertTestTenant(db, {
+      slug: 'acme',
+      primaryDomain: 'acme.example.com',
+    });
 
     const result = await listTenantDomains(tenantId);
 

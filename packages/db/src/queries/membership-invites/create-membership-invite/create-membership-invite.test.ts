@@ -1,10 +1,7 @@
-import {
-  MEMBERSHIP_ROLE,
-  TENANT_PLAN,
-  TENANT_STATUS,
-} from '@blog/db/constants';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { eq } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
@@ -15,21 +12,6 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 let db: PgliteDatabase<typeof schema>;
-
-async function insertTenant(slug: string): Promise<string> {
-  const [tenant] = await db
-    .insert(schema.tenants)
-    .values({
-      slug,
-      name: slug,
-      primaryDomain: `${slug}.example.com`,
-      locale: 'en',
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
-  return tenant!.id;
-}
 
 beforeAll(async () => {
   db = await createTestDb();
@@ -46,7 +28,7 @@ afterEach(async () => {
 
 describe(createMembershipInvite, () => {
   it('inserts a new pending invite, normalizing the email', async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
 
     const result = await createMembershipInvite(
       tenantId,
@@ -64,7 +46,7 @@ describe(createMembershipInvite, () => {
   });
 
   it('is idempotent for a duplicate pending invite to the same tenant + email', async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     const first = await createMembershipInvite(
       tenantId,
       'owner@example.com',
@@ -86,7 +68,7 @@ describe(createMembershipInvite, () => {
   });
 
   it('is idempotent (case-insensitively) for a duplicate invite with different casing', async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     await createMembershipInvite(
       tenantId,
       'owner@example.com',
@@ -105,7 +87,7 @@ describe(createMembershipInvite, () => {
   });
 
   it('is idempotent (trimming whitespace) for a duplicate invite padded with leading/trailing spaces', async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     await createMembershipInvite(
       tenantId,
       'owner@example.com',
@@ -124,7 +106,7 @@ describe(createMembershipInvite, () => {
   });
 
   it('reports already-consumed for a duplicate invite whose original was already consumed', async () => {
-    const tenantId = await insertTenant('acme');
+    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
     const first = await createMembershipInvite(
       tenantId,
       'owner@example.com',
@@ -145,8 +127,8 @@ describe(createMembershipInvite, () => {
   });
 
   it('allows the same email to hold a distinct pending invite on a different tenant', async () => {
-    const tenantOneId = await insertTenant('acme');
-    const tenantTwoId = await insertTenant('other');
+    const { id: tenantOneId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantTwoId } = await insertTestTenant(db, { slug: 'other' });
 
     await createMembershipInvite(
       tenantOneId,

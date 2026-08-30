@@ -1,6 +1,7 @@
 import { ADMIN_ROLE, GRANTED_VIA } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestUser } from '@blog/db/testing/fixtures';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { getFirstAdminEmail } from './get-first-admin-email';
@@ -10,10 +11,6 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 let db: PgliteDatabase<typeof schema>;
-
-async function insertUser(id: string, email: string | null): Promise<void> {
-  await db.insert(schema.users).values({ id, email });
-}
 
 async function insertAdmin(
   userId: string,
@@ -43,8 +40,8 @@ afterEach(async () => {
 
 describe(getFirstAdminEmail, () => {
   it('returns the email of the earliest-created admin row', async () => {
-    await insertUser('user-1', 'first@example.com');
-    await insertUser('user-2', 'second@example.com');
+    await insertTestUser(db, { id: 'user-1', email: 'first@example.com' });
+    await insertTestUser(db, { id: 'user-2', email: 'second@example.com' });
     await insertAdmin('user-1', new Date('2026-01-01T00:00:00Z'));
     await insertAdmin('user-2', new Date('2026-02-01T00:00:00Z'));
 
@@ -54,8 +51,8 @@ describe(getFirstAdminEmail, () => {
   });
 
   it('ignores insertion order and only orders by createdAt', async () => {
-    await insertUser('user-1', 'later@example.com');
-    await insertUser('user-2', 'earlier@example.com');
+    await insertTestUser(db, { id: 'user-1', email: 'later@example.com' });
+    await insertTestUser(db, { id: 'user-2', email: 'earlier@example.com' });
     await insertAdmin('user-1', new Date('2026-03-01T00:00:00Z'));
     await insertAdmin('user-2', new Date('2026-01-15T00:00:00Z'));
 
@@ -71,7 +68,7 @@ describe(getFirstAdminEmail, () => {
   });
 
   it('returns undefined when the earliest admin has no email on file', async () => {
-    await insertUser('user-1', null);
+    await insertTestUser(db, { id: 'user-1', email: null });
     await insertAdmin('user-1', new Date('2026-01-01T00:00:00Z'));
 
     const result = await getFirstAdminEmail();
@@ -80,8 +77,8 @@ describe(getFirstAdminEmail, () => {
   });
 
   it('is not filtered by role — the earliest row wins regardless of its role value', async () => {
-    await insertUser('user-1', 'moderator@example.com');
-    await insertUser('user-2', 'superadmin@example.com');
+    await insertTestUser(db, { id: 'user-1', email: 'moderator@example.com' });
+    await insertTestUser(db, { id: 'user-2', email: 'superadmin@example.com' });
     await insertAdmin(
       'user-1',
       new Date('2026-01-01T00:00:00Z'),

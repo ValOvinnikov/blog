@@ -1,6 +1,7 @@
 import { ADMIN_ROLE, GRANTED_VIA } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestUser } from '@blog/db/testing/fixtures';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { getAdminByUserId } from './get-admin-by-user-id';
@@ -10,10 +11,6 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 let db: PgliteDatabase<typeof schema>;
-
-async function insertUser(id: string): Promise<void> {
-  await db.insert(schema.users).values({ id });
-}
 
 beforeAll(async () => {
   db = await createTestDb();
@@ -30,7 +27,7 @@ afterEach(async () => {
 
 describe(getAdminByUserId, () => {
   it('returns the row for an existing admin user', async () => {
-    await insertUser('user-1');
+    await insertTestUser(db, { id: 'user-1' });
     await db.insert(schema.admins).values({
       userId: 'user-1',
       role: ADMIN_ROLE.SUPERADMIN,
@@ -46,7 +43,7 @@ describe(getAdminByUserId, () => {
   });
 
   it('returns undefined when the user is not an admin', async () => {
-    await insertUser('user-1');
+    await insertTestUser(db, { id: 'user-1' });
 
     const result = await getAdminByUserId('user-1');
 

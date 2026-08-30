@@ -1,6 +1,6 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { exportAccountData } from './export-account-data';
@@ -25,20 +25,7 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   getDbMock.mockReturnValue(db);
-  const [tenant] = await db
-    .insert(schema.tenants)
-    .values({
-      slug: 'acme',
-      name: 'Acme',
-      primaryDomain: 'acme.example.com',
-      sanityProjectId: 'abc123',
-      sanityDataset: 'production',
-      locale: 'en',
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
-  if (!tenant) throw new Error('failed to seed a tenant row');
+  const tenant = await insertTestTenant(db, { slug: 'acme' });
   tenantId = tenant.id;
 });
 
@@ -47,24 +34,6 @@ afterEach(async () => {
   await db.delete(schema.users);
   await db.delete(schema.tenants);
 });
-
-async function insertTenant(slug: string): Promise<string> {
-  const [tenant] = await db
-    .insert(schema.tenants)
-    .values({
-      slug,
-      name: slug,
-      primaryDomain: `${slug}.example.com`,
-      sanityProjectId: 'abc123',
-      sanityDataset: 'production',
-      locale: 'en',
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
-  if (!tenant) throw new Error('failed to seed a tenant row');
-  return tenant.id;
-}
 
 describe(exportAccountData, () => {
   it('returns undefined for a userId with no matching users row', async () => {
@@ -148,7 +117,9 @@ describe(exportAccountData, () => {
 
   it("does not include the user's bookmarks from another tenant", async () => {
     await db.insert(schema.users).values({ id: 'user-1' });
-    const otherTenantId = await insertTenant('other');
+    const { id: otherTenantId } = await insertTestTenant(db, {
+      slug: 'other',
+    });
     await db.insert(schema.bookmarks).values([
       { tenantId, userId: 'user-1', postId: 'post-1' },
       { tenantId: otherTenantId, userId: 'user-1', postId: 'post-2' },
