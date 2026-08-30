@@ -411,6 +411,36 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
   own comment block, because it is a pointer to open work rather than a
   narrative about closed work.
 
+  **Two more failure shapes, beyond the four above — state the current fact,
+  not the fix's history.** Seen repeatedly across the CTA epic (#2300)
+  despite dispatch prompts already carrying the general comment-discipline
+  instruction:
+
+  - **Narrating the mechanism or history of a change instead of the current
+    invariant.** `basic-text-renderer.tsx`'s link handler once read: "Both
+    `EXTERNAL` and `INTERNAL` links carry a resolved `url` here — the service
+    derefs `content`'s markDefs before this component ever sees them, same as
+    CTA `actions`." That's how a bug got fixed, not what the code does today.
+    The fact a reader needs: `url` is already resolved for both link types;
+    the fallback below handles one that failed to resolve. If a comment reads
+    like it belongs in a commit message or PR description — explaining _why a
+    change was made_ rather than _what holds true now_ — cut it down to the
+    fact.
+  - **Tying a shared/reusable component's own doc comment to its first
+    specific consumer.** `ActionGroup` (`apps/web/src/components/shared/`) is
+    general-purpose — CTA is its first caller, not its scope — but its doc
+    comment read "renders a **CTA module's** authored actions," and a prop
+    comment cited "Banner's dark scrim (D15)," a design-decision id from a doc
+    that's since been deleted. Describe the component's actual, general
+    contract; name the specific case that prompted it only if the doc comment
+    would be meaningless without that context (rare for a component meant to
+    be reused).
+
+  **A `§4.2`-style section reference is the same dead-link problem as a
+  `docs/superpowers/specs/*` path, just spelled differently — a design-doc
+  section number is worthless once that doc is deleted per the retention
+  rule below, which happens routinely within the same epic. Never cite one.**
+
 - All workspace source files live under `src/` within each package/app.
   Exceptions: root-level config files required by their tool (`sanity.config.ts`,
   `sanity.cli.ts`, `next.config.ts`, `vitest.config.ts`, etc.) stay at the
