@@ -5,7 +5,7 @@ import { parseTenantProvisioningRepo } from '@platform/utils/tenant-provisioning
 const WORKFLOW_REF = 'main';
 const DISPATCH_TIMEOUT_MS = 5000;
 
-export type TDispatchGitHubWorkflowLogEvents = {
+type TDispatchGitHubWorkflowLogEvents = {
   skipped: string;
   failed: string;
   error: string;
