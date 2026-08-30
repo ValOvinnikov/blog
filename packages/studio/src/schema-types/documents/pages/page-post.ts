@@ -2,6 +2,7 @@ import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/components/
 import { postSchema } from '@blog/studio/schema-types/documents/blog/post';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
 import { getDraftsClient } from '@blog/studio/schema-types/helpers/get-drafts-client';
+import { slugField } from '@blog/studio/schema-types/helpers/slug-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
 import { seoSchema } from '@blog/studio/schema-types/objects/seo';
 import { Newspaper } from 'lucide-react';
@@ -49,17 +50,9 @@ export const pagePostSchema = defineType({
     // — is exactly the scope this field needs: /blog/{slug} collisions only
     // matter within page_post itself, never against page_generic's /{slug}.
     // No custom `isUnique` override is needed on top of it.
-    defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
+    slugField({
       description: 'URL path segment — auto-generated from title.',
-      options: {
-        source: 'title',
-        maxLength: 96,
-      },
-      components: { input: postSlugUrlPreviewInput },
-      validation: (rule) => rule.required(),
+      previewInput: postSlugUrlPreviewInput,
     }),
     defineField({
       name: 'post',

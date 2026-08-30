@@ -1,5 +1,6 @@
 import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/page-topic-type';
 import { getDraftsClient } from '@blog/studio/schema-types/helpers/get-drafts-client';
+import { slugField } from '@blog/studio/schema-types/helpers/slug-field';
 import { Tags } from 'lucide-react';
 import {
   defineField,
@@ -47,17 +48,9 @@ export const topicSchema = defineType({
       description: 'Topic name shown in filters and navigation.',
       validation: (rule) => rule.required().max(60),
     }),
-    defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
+    slugField({
       description:
         'URL path segment for the topic page — auto-generated from title.',
-      options: {
-        source: 'title',
-        maxLength: 96,
-      },
-      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'description',
