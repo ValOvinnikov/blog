@@ -4,6 +4,7 @@ import {
   membershipInvites,
   type TMembershipInvite,
 } from '@blog/db/schema/membership-invites';
+import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import { and, eq } from 'drizzle-orm';
 
 export type TCreateMembershipInviteResult =
@@ -23,7 +24,7 @@ export async function createMembershipInvite(
   role: TMembershipRole,
 ): Promise<TCreateMembershipInviteResult> {
   const db = getDb();
-  const normalizedEmail = email.trim().toLowerCase();
+  const normalizedEmail = normalizeEmail(email);
 
   const [inserted] = await db
     .insert(membershipInvites)

@@ -3,6 +3,7 @@ import {
   membershipInvites,
   type TMembershipInvite,
 } from '@blog/db/schema/membership-invites';
+import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import { and, eq, isNull } from 'drizzle-orm';
 
 // Returns every still-pending invite for `email`, across every tenant it
@@ -15,7 +16,7 @@ export async function findPendingInviteByEmail(
   email: string,
 ): Promise<TMembershipInvite[]> {
   const db = getDb();
-  const normalizedEmail = email.trim().toLowerCase();
+  const normalizedEmail = normalizeEmail(email);
 
   return db
     .select()

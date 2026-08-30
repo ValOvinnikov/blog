@@ -1,6 +1,7 @@
 import { getDb } from '@blog/db/client';
 import { users } from '@blog/db/schema/auth';
 import { subscribers } from '@blog/db/schema/subscribers';
+import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import { and, eq } from 'drizzle-orm';
 
 // `subscribers.status` only has `pending`/`active` — there is no
@@ -32,7 +33,7 @@ export async function unsubscribe(
     .where(
       and(
         eq(subscribers.tenantId, tenantId),
-        eq(subscribers.email, user.email.trim().toLowerCase()),
+        eq(subscribers.email, normalizeEmail(user.email)),
       ),
     );
 }
