@@ -11,17 +11,17 @@ Rotation order (top to bottom) is the order a layer gets its first sweep when
 multiple rows tie on "never swept." After that, whichever row has the oldest
 `Last swept` date goes next.
 
-| Layer        | Last swept | Commit swept | Findings | Issues filed                      |
-| ------------ | ---------- | ------------ | -------- | --------------------------------- |
-| config       | never      | —            | —        | —                                 |
-| studio       | 2026-08-30 | 9e2a5c76     | 1        | #2332                             |
-| service      | never      | —            | —        | —                                 |
-| ui           | 2026-08-30 | 8e49f9a8     | 3        | #2340, #2341, #2342               |
-| web          | 2026-08-30 | 8e49f9a8     | 3        | #2337, #2338, #2339               |
-| db           | 2026-08-30 | 9e2a5c76     | 5        | #2326, #2328, #2329, #2333, #2334 |
-| auth         | never      | —            | —        | —                                 |
-| platform-app | 2026-08-30 | 9e2a5c76     | 2        | #2330, #2331                      |
-| insight      | never      | —            | —        | —                                 |
+| Layer        | Last swept | Commit swept | Findings | Issues filed                             |
+| ------------ | ---------- | ------------ | -------- | ---------------------------------------- |
+| config       | 2026-08-30 | 9434fa47     | 6        | #2352, #2353, #2354, #2355, #2356, #2357 |
+| studio       | 2026-08-30 | 9e2a5c76     | 1        | #2332                                    |
+| service      | never      | —            | —        | —                                        |
+| ui           | 2026-08-30 | 8e49f9a8     | 3        | #2340, #2341, #2342                      |
+| web          | 2026-08-30 | 8e49f9a8     | 3        | #2337, #2338, #2339                      |
+| db           | 2026-08-30 | 9e2a5c76     | 5        | #2326, #2328, #2329, #2333, #2334        |
+| auth         | never      | —            | —        | —                                        |
+| platform-app | 2026-08-30 | 9e2a5c76     | 2        | #2330, #2331                             |
+| insight      | never      | —            | —        | —                                        |
 
 **Commit swept** is the `main` SHA the audit read at (short form), so a
 future sweep can diff from there if useful context for what's new since.
