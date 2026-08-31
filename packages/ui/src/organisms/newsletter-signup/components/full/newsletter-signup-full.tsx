@@ -1,7 +1,7 @@
 import {
   ALERT_TYPE,
   ICONS,
-  Size,
+  SIZE,
   type IWithClassName,
   type IWithDataTestId,
   type TFormStatus,
@@ -116,7 +116,7 @@ export const NewsletterSignupFull = ({
               inputPrompt={
                 <Icon
                   name={ICONS.CHEVRON_RIGHT}
-                  size={Size.SM}
+                  size={SIZE.SM}
                   dataTestId="newsletter-signup-input-prompt"
                 />
               }

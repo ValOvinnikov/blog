@@ -1,4 +1,4 @@
-import { Size } from '@blog/config';
+import { SIZE } from '@blog/config';
 import { Button } from '@blog/ui/atoms/button';
 import type { INewsletterSectionViewProps } from '@web/components/pages/account-page/sections/newsletter-section';
 
@@ -20,7 +20,7 @@ export const makeNewsletterSectionView = (
     pendingDescription:
       "The double-opt-in link hasn't been clicked yet. Resend it if it never arrived.",
     control: (
-      <Button size={Size.SM} variant="ghost">
+      <Button size={SIZE.SM} variant="ghost">
         Unsubscribe
       </Button>
     ),

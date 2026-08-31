@@ -1,6 +1,6 @@
 import {
   ICONS,
-  Size,
+  SIZE,
   TOAST_TYPE,
   type IWithClassName,
   type IWithDataTestId,
@@ -106,7 +106,7 @@ export const Toast = ({
   const statusGlyph = isLoading ? (
     <Spinner
       label={state ?? type}
-      size={Size.SM}
+      size={SIZE.SM}
       className={s.spinner()}
       aria-hidden="true"
       dataTestId="toast-spinner"
@@ -124,7 +124,7 @@ export const Toast = ({
       onClick={onDismiss}
       className={s.dismiss()}
     >
-      <Icon name={ICONS.CLOSE} size={Size.SM} dataTestId="toast-dismiss-icon" />
+      <Icon name={ICONS.CLOSE} size={SIZE.SM} dataTestId="toast-dismiss-icon" />
     </IconButton>
   );
 

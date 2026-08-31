@@ -1,6 +1,6 @@
 'use client';
 
-import { ICONS, routes, Size } from '@blog/config';
+import { ICONS, routes, SIZE } from '@blog/config';
 import { Avatar } from '@blog/ui/atoms/avatar';
 import { Icon } from '@blog/ui/atoms/icon';
 import { PopoverMenu } from '@blog/ui/molecules/popover-menu';
@@ -83,7 +83,7 @@ export const AccountMenu = ({
           src={avatarSrc}
           name={displayName}
           alt=""
-          size={Size.SM}
+          size={SIZE.SM}
           onImageError={() => setImageFailed(true)}
         />
         <div>
@@ -94,21 +94,21 @@ export const AccountMenu = ({
       <PopoverMenu.Item
         as={SmartLink}
         href={routes.bookmarks()}
-        icon={<Icon name={ICONS.BOOKMARK} size={Size.SM} />}
+        icon={<Icon name={ICONS.BOOKMARK} size={SIZE.SM} />}
       >
         {t('myBookmarks')}
       </PopoverMenu.Item>
       <PopoverMenu.Item
         as={SmartLink}
         href={routes.account()}
-        icon={<Icon name={ICONS.SETTINGS} size={Size.SM} />}
+        icon={<Icon name={ICONS.SETTINGS} size={SIZE.SM} />}
       >
         {t('accountSettings')}
       </PopoverMenu.Item>
       <PopoverMenu.Item
         onClick={() => signOut()}
         className={signOutItem()}
-        icon={<Icon name={ICONS.POWER} size={Size.SM} />}
+        icon={<Icon name={ICONS.POWER} size={SIZE.SM} />}
       >
         {t('signOut')}
       </PopoverMenu.Item>
@@ -130,7 +130,7 @@ export const AccountMenu = ({
           src={avatarSrc}
           name={displayName}
           alt=""
-          size={Size.SM}
+          size={SIZE.SM}
           onImageError={() => setImageFailed(true)}
         />
       </PopoverMenu.Trigger>

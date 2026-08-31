@@ -1,6 +1,6 @@
 'use client';
 
-import { Size } from '@blog/config';
+import { SIZE } from '@blog/config';
 import {
   ELEVATE_TENANT_OWNER_OUTCOME,
   TENANT_PROVISIONING_STATUS,
@@ -63,7 +63,7 @@ export const ProvisioningBanner = ({
     <LinkButton
       href={adminRoutes.tenantProvisioning(tenantId)}
       variant="secondary"
-      size={Size.SM}
+      size={SIZE.SM}
     >
       {t('viewStepsButton')}
     </LinkButton>

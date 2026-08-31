@@ -1,4 +1,4 @@
-import { type IWithDataTestId, Size } from '@blog/config';
+import { type IWithDataTestId, SIZE } from '@blog/config';
 import { Heading } from '@blog/ui/atoms/heading';
 import type { THeadingLevel } from '@blog/ui/lib/react';
 import type { ReactNode } from 'react';
@@ -29,7 +29,7 @@ export const PlainSection = ({
 
   return (
     <section className={s.root({ class: className })} data-testid={dataTestId}>
-      <Heading level={headingLevel} size={Size.SM} className={s.heading()}>
+      <Heading level={headingLevel} size={SIZE.SM} className={s.heading()}>
         {heading}
       </Heading>
       <div className={s.body()}>{children}</div>

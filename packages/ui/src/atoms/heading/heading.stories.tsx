@@ -1,4 +1,4 @@
-import { Size } from '@blog/config';
+import { SIZE } from '@blog/config';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -41,7 +41,7 @@ export const H4: TStory = {
 };
 
 export const WithSizeOverride: TStory = {
-  args: { level: 2, size: Size.XS, children: 'H2 with xs size override' },
+  args: { level: 2, size: SIZE.XS, children: 'H2 with xs size override' },
 };
 
 export const VisualHero: TStory = {

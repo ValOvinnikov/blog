@@ -1,4 +1,4 @@
-import { Size } from '@blog/config';
+import { SIZE } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -11,13 +11,13 @@ export const avatarVariants = tv({
   ],
   variants: {
     size: {
-      [Size.SM]: 'h-8 w-8 text-xs',
-      [Size.MD]: 'h-10 w-10 text-sm',
-      [Size.LG]: 'h-14 w-14 text-base',
+      [SIZE.SM]: 'h-8 w-8 text-xs',
+      [SIZE.MD]: 'h-10 w-10 text-sm',
+      [SIZE.LG]: 'h-14 w-14 text-base',
     },
   },
   defaultVariants: {
-    size: Size.MD,
+    size: SIZE.MD,
   },
 });
 

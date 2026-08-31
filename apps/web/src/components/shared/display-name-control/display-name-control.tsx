@@ -1,6 +1,6 @@
 'use client';
 
-import { ICONS, Size } from '@blog/config';
+import { ICONS, SIZE } from '@blog/config';
 import { Avatar } from '@blog/ui/atoms/avatar';
 import { Button } from '@blog/ui/atoms/button';
 import { Icon } from '@blog/ui/atoms/icon';
@@ -94,7 +94,7 @@ export const DisplayNameControl = ({
           src={avatarSrc}
           name={avatarName}
           alt=""
-          size={Size.SM}
+          size={SIZE.SM}
           onImageError={() => setImageFailed(true)}
         />
         <TextInput
@@ -104,7 +104,7 @@ export const DisplayNameControl = ({
           leadingIcon={
             <Icon
               name={ICONS.CHEVRON_RIGHT}
-              size={Size.SM}
+              size={SIZE.SM}
               dataTestId="display-name-prompt-icon"
             />
           }

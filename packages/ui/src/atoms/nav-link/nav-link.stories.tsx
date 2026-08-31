@@ -1,4 +1,4 @@
-import { ICONS, Size } from '@blog/config';
+import { ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -32,14 +32,14 @@ export const Inactive: TStory = {
 export const WithIcon: TStory = {
   args: {
     children: 'RSS feed',
-    icon: <Icon name={ICONS.RSS} size={Size.SM} />,
+    icon: <Icon name={ICONS.RSS} size={SIZE.SM} />,
   },
 };
 
 export const IconOnly: TStory = {
   args: {
     children: 'RSS feed',
-    icon: <Icon name={ICONS.RSS} size={Size.SM} />,
+    icon: <Icon name={ICONS.RSS} size={SIZE.SM} />,
     hasLabel: false,
   },
 };

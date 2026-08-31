@@ -1,6 +1,6 @@
 'use client';
 
-import { ICONS, Size } from '@blog/config';
+import { ICONS, SIZE } from '@blog/config';
 import { Button } from '@blog/ui/atoms/button';
 import { Icon } from '@blog/ui/atoms/icon';
 import { Text } from '@blog/ui/atoms/text';
@@ -106,7 +106,7 @@ export const SignInMenu = ({
           key={providerId}
           variant="bordered"
           className={providerButton()}
-          icon={<Icon name={icon} size={Size.SM} />}
+          icon={<Icon name={icon} size={SIZE.SM} />}
           onClick={() => signIn(providerId)}
         >
           {label}
@@ -142,7 +142,7 @@ export const SignInMenu = ({
             leadingIcon={
               <Icon
                 name={ICONS.CHEVRON_RIGHT}
-                size={Size.SM}
+                size={SIZE.SM}
                 dataTestId="sign-in-prompt-icon"
               />
             }
@@ -156,7 +156,7 @@ export const SignInMenu = ({
           )}
           <div className={emailFormActions()}>
             <Button
-              size={Size.SM}
+              size={SIZE.SM}
               isDisabled={emailStep === 'submitting'}
               onClick={handleEmailSubmit}
             >

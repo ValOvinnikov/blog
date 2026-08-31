@@ -1,4 +1,4 @@
-import { ICONS, Size } from '@blog/config';
+import { ICONS, SIZE } from '@blog/config';
 import { Button } from '@blog/ui/atoms/button';
 import { Icon } from '@blog/ui/atoms/icon';
 import type {
@@ -14,14 +14,14 @@ const makeIdentityProviderRow = (
 ): IIdentityProviderRow => {
   return {
     id: 'github',
-    icon: <Icon name={ICONS.GITHUB} size={Size.MD} />,
+    icon: <Icon name={ICONS.GITHUB} size={SIZE.MD} />,
     label: 'GitHub',
     isLinked: true,
     isLastMethod: false,
     linkedStatusLabel: 'Linked',
     lastMethodNoticeLabel: "Last remaining method — can't unlink",
     control: (
-      <Button size={Size.SM} variant="ghost">
+      <Button size={SIZE.SM} variant="ghost">
         Unlink
       </Button>
     ),
@@ -41,11 +41,11 @@ export const makeIdentitySectionView = (
       makeIdentityProviderRow(),
       makeIdentityProviderRow({
         id: 'google',
-        icon: <Icon name={ICONS.GOOGLE} size={Size.SM} />,
+        icon: <Icon name={ICONS.GOOGLE} size={SIZE.SM} />,
         label: 'Google',
         isLinked: false,
         control: (
-          <Button size={Size.SM} variant="ghost">
+          <Button size={SIZE.SM} variant="ghost">
             Link
           </Button>
         ),
@@ -67,7 +67,7 @@ export const makeIdentitySectionView = (
     displayNameDescription:
       'Overrides your provider handle wherever your comments appear.',
     displayNameControl: (
-      <Button size={Size.SM} variant="ghost">
+      <Button size={SIZE.SM} variant="ghost">
         Save
       </Button>
     ),

@@ -1,4 +1,4 @@
-import { ICONS, Size } from '@blog/config';
+import { ICONS, SIZE } from '@blog/config';
 import { Card } from '@platform/components/shared/card';
 import { Heading } from '@platform/components/shared/heading';
 import { Icon } from '@platform/components/shared/icon';
@@ -21,7 +21,7 @@ export const WorkspacePendingView = () => {
       <Card className={card()}>
         <Card.Body>
           <span className={iconWrap()}>
-            <Icon name={ICONS.SPINNER} size={Size.MD} />
+            <Icon name={ICONS.SPINNER} size={SIZE.MD} />
           </span>
           <Heading level={1} size="pageTitle">
             {t('heading')}

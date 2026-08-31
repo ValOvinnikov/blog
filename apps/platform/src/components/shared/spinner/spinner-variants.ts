@@ -1,4 +1,4 @@
-import { Size } from '@blog/config';
+import { SIZE } from '@blog/config';
 import { tv } from '@platform/utils/tv/tv';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -14,13 +14,13 @@ export const spinnerVariants = tv({
   },
   variants: {
     size: {
-      [Size.SM]: { glyph: ['size-3.5'] },
-      [Size.MD]: { glyph: ['size-4.5'] },
-      [Size.LG]: { glyph: ['size-6'] },
+      [SIZE.SM]: { glyph: ['size-3.5'] },
+      [SIZE.MD]: { glyph: ['size-4.5'] },
+      [SIZE.LG]: { glyph: ['size-6'] },
     },
   },
   defaultVariants: {
-    size: Size.MD,
+    size: SIZE.MD,
   },
 });
 

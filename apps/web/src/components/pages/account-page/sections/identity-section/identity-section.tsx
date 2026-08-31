@@ -1,4 +1,4 @@
-import { ICONS, Size } from '@blog/config';
+import { ICONS, SIZE } from '@blog/config';
 import { queries } from '@blog/db';
 import { Icon } from '@blog/ui/atoms/icon';
 import { DisplayNameControl } from '@web/components/shared/display-name-control';
@@ -22,7 +22,7 @@ const s = identitySectionVariants();
  * IdentitySection — the `/account` "connected accounts / identity" wrapper.
  * Provider rows render as plain flex-row markup rather than `SettingRow`
  * (its label+description+control model doesn't fit a single-line
- * icon+name+status+action row). GitHub's `Icon` renders one `Size` step
+ * icon+name+status+action row). GitHub's `Icon` renders one `SIZE` step
  * larger than Google's/email's glyphs since the octocat SVG carries more
  * internal padding than the others.
  */
@@ -53,14 +53,14 @@ export const IdentitySection = async () => {
     {
       id: 'github',
       provider: 'github',
-      icon: <Icon name={ICONS.GITHUB} size={Size.MD} />,
+      icon: <Icon name={ICONS.GITHUB} size={SIZE.MD} />,
       label: t('githubLabel'),
       isLinked: linked.github,
     },
     {
       id: 'google',
       provider: 'google',
-      icon: <Icon name={ICONS.GOOGLE} size={Size.SM} />,
+      icon: <Icon name={ICONS.GOOGLE} size={SIZE.SM} />,
       label: t('googleLabel'),
       isLinked: linked.google,
     },

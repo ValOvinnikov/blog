@@ -1,6 +1,6 @@
 'use client';
 
-import { ALERT_TYPE, Size } from '@blog/config';
+import { ALERT_TYPE, SIZE } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { clearBrandAssetAction } from '@platform/server/site-config/clear-brand-asset-action';
@@ -151,7 +151,7 @@ export const BrandAssetField = ({
         />
         <Button
           type="button"
-          size={Size.SM}
+          size={SIZE.SM}
           variant="ghost"
           onClick={() => inputRef.current?.click()}
           isDisabled={isPending}
@@ -165,7 +165,7 @@ export const BrandAssetField = ({
         {currentUrl && (
           <Button
             type="button"
-            size={Size.SM}
+            size={SIZE.SM}
             variant="ghost"
             onClick={handleRemove}
             isDisabled={isPending}

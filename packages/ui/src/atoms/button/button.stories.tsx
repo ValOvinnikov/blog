@@ -1,4 +1,4 @@
-import { Size } from '@blog/config';
+import { SIZE } from '@blog/config';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -25,7 +25,7 @@ export default meta;
 type TStory = StoryObj<typeof Button>;
 
 export const Primary: TStory = {
-  args: { children: 'Publish', variant: 'primary', size: Size.MD },
+  args: { children: 'Publish', variant: 'primary', size: SIZE.MD },
 };
 
 export const Ghost: TStory = {
@@ -45,11 +45,11 @@ export const DangerDisabled: TStory = {
 };
 
 export const Small: TStory = {
-  args: { children: 'Tag', size: Size.SM },
+  args: { children: 'Tag', size: SIZE.SM },
 };
 
 export const Large: TStory = {
-  args: { children: 'Get started', size: Size.LG },
+  args: { children: 'Get started', size: SIZE.LG },
 };
 
 export const Disabled: TStory = {

@@ -1,4 +1,4 @@
-import { Size } from '@blog/config';
+import { SIZE } from '@blog/config';
 import { tv } from '@platform/utils/tv/tv';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -19,13 +19,13 @@ export const buttonVariants = tv({
       danger: 'border-[#f2c9c5] bg-admin-bad-weak text-admin-bad shadow-admin',
     },
     size: {
-      [Size.SM]: 'px-[9px] py-[5px] text-[12px]',
-      [Size.MD]: 'px-[13px] py-[8px] text-[13px]',
+      [SIZE.SM]: 'px-[9px] py-[5px] text-[12px]',
+      [SIZE.MD]: 'px-[13px] py-[8px] text-[13px]',
     },
   },
   defaultVariants: {
     variant: 'secondary',
-    size: Size.MD,
+    size: SIZE.MD,
   },
 });
 

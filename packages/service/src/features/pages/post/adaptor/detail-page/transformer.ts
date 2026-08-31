@@ -16,7 +16,7 @@ import type { TPostDetail, TPostDetailAuthor, TPostSkim } from './types';
 export type TRawPostPage = NonNullable<InferResultType<typeof postPageQuery>>;
 export type TRawPostDetail = TRawPostPage['post'];
 
-// PostMeta renders the author avatar at Size.SM (32px, `avatar-variants.ts`)
+// PostMeta renders the author avatar at SIZE.SM (32px, `avatar-variants.ts`)
 // — 64px covers a 2x DPR display without serving the source asset's full
 // natural resolution.
 const AUTHOR_AVATAR_SIZE_PX = 64;

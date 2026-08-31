@@ -14,7 +14,7 @@ export const authMenuVariants = tv({
     window: ['w-80 max-w-[calc(100vw-2rem)]'],
     // The session-resolving placeholder — wraps `Spinner` (the live region),
     // not a button, so it's just sized/centered to match `Avatar`'s
-    // `Size.LG` footprint (32px) exactly, matching `AccountMenu`'s actual
+    // `SIZE.LG` footprint (32px) exactly, matching `AccountMenu`'s actual
     // `Avatar` usage. `rounded-full bg-primary-subtle` mirror `Avatar`'s own
     // base classes so this reads as "the avatar slot, mid-load" rather than a
     // disconnected spinner (no border/hover, those are `IconButton`'s
