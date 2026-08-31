@@ -1,5 +1,6 @@
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { schema } from '@blog/db';
+import type { NextAuthConfig } from 'next-auth';
 
 import { buildAuthConfig } from './config';
 
@@ -30,6 +31,10 @@ describe(buildAuthConfig, () => {
   afterEach(() => {
     delete process.env['AUTH_SECRET'];
     delete process.env['AUTH_COOKIE_DOMAIN'];
+    delete process.env['AUTH_GITHUB_ID'];
+    delete process.env['AUTH_GITHUB_SECRET'];
+    delete process.env['AUTH_GOOGLE_ID'];
+    delete process.env['AUTH_GOOGLE_SECRET'];
   });
 
   it('uses the database session strategy', () => {
@@ -83,17 +88,51 @@ describe(buildAuthConfig, () => {
     expect(config.secret).toBe('test-secret');
   });
 
-  it('includes GitHub, Google, and the magic-link email provider', () => {
-    const config = buildAuthConfig({ sendEmail: vi.fn() });
-    const providerIds = config.providers.map((provider) => {
+  function providerIdsOf(config: NextAuthConfig): unknown[] {
+    return config.providers.map((provider) => {
       // A provider entry is either a config object or a factory returning
       // one — `id` sits on the object form every provider here resolves to.
       const resolved = typeof provider === 'function' ? provider() : provider;
       return resolved.id;
     });
+  }
 
-    expect(providerIds).toEqual(
-      expect.arrayContaining(['github', 'google', 'email']),
+  it('always includes the magic-link email provider', () => {
+    const config = buildAuthConfig({ sendEmail: vi.fn() });
+
+    expect(providerIdsOf(config)).toEqual(expect.arrayContaining(['email']));
+  });
+
+  it('includes GitHub and Google when their credentials are set', async () => {
+    process.env['AUTH_SECRET'] = 'test-secret';
+    process.env['AUTH_GITHUB_ID'] = 'github-id';
+    process.env['AUTH_GITHUB_SECRET'] = 'github-secret';
+    process.env['AUTH_GOOGLE_ID'] = 'google-id';
+    process.env['AUTH_GOOGLE_SECRET'] = 'google-secret';
+    const freshBuildAuthConfig = await importBuildAuthConfig();
+
+    const config = freshBuildAuthConfig({ sendEmail: vi.fn() });
+
+    expect(providerIdsOf(config)).toEqual(
+      expect.arrayContaining(['github', 'google']),
+    );
+  });
+
+  it('omits GitHub when only one of its credential pair is set', async () => {
+    process.env['AUTH_SECRET'] = 'test-secret';
+    process.env['AUTH_GITHUB_ID'] = 'github-id';
+    const freshBuildAuthConfig = await importBuildAuthConfig();
+
+    const config = freshBuildAuthConfig({ sendEmail: vi.fn() });
+
+    expect(providerIdsOf(config)).not.toContain('github');
+  });
+
+  it('omits GitHub and Google when neither credential pair is set', () => {
+    const config = buildAuthConfig({ sendEmail: vi.fn() });
+
+    expect(providerIdsOf(config)).not.toEqual(
+      expect.arrayContaining(['github', 'google']),
     );
   });
 
