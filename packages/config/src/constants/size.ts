@@ -1,6 +1,6 @@
 import type { TValueOf } from '@blog/config/utils';
 
-export const Size = {
+export const SIZE = {
   XS: 'XS',
   SM: 'SM',
   MD: 'MD',
@@ -9,4 +9,4 @@ export const Size = {
   XXL: 'XXL',
 } as const;
 
-export type TSize = TValueOf<typeof Size>;
+export type TSize = TValueOf<typeof SIZE>;
