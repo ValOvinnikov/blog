@@ -1,6 +1,13 @@
 import base from './base.js';
 import { noVitestGlobalsImportPath } from './no-vitest-globals-import.js';
 
+const noJsxMessage =
+  '@blog/db must not use JSX — it is the relational data layer and never imports React.';
+const noReactImportMessage =
+  '@blog/db must not import React — it has no React at all, client or server.';
+const noUiImportMessage =
+  '@blog/db must not import @blog/ui — db has no presentation concerns.';
+
 /** @type {import("eslint").Linter.Config[]} */
 export default [
   ...base,
@@ -14,13 +21,11 @@ export default [
         'error',
         {
           selector: 'JSXElement',
-          message:
-            '@blog/db must not use JSX — it is the relational data layer and never imports React.',
+          message: noJsxMessage,
         },
         {
           selector: 'JSXFragment',
-          message:
-            '@blog/db must not use JSX — it is the relational data layer and never imports React.',
+          message: noJsxMessage,
         },
       ],
       'no-restricted-imports': [
@@ -30,13 +35,11 @@ export default [
           patterns: [
             {
               group: ['react', 'react/*', 'react-dom', 'react-dom/*'],
-              message:
-                '@blog/db must not import React — it has no React at all, client or server.',
+              message: noReactImportMessage,
             },
             {
               group: ['@blog/ui', '@blog/ui/*'],
-              message:
-                '@blog/db must not import @blog/ui — db has no presentation concerns.',
+              message: noUiImportMessage,
             },
             {
               group: [
@@ -83,13 +86,11 @@ export default [
           patterns: [
             {
               group: ['react', 'react/*', 'react-dom', 'react-dom/*'],
-              message:
-                '@blog/db must not import React — it has no React at all, client or server.',
+              message: noReactImportMessage,
             },
             {
               group: ['@blog/ui', '@blog/ui/*'],
-              message:
-                '@blog/db must not import @blog/ui — db has no presentation concerns.',
+              message: noUiImportMessage,
             },
             {
               group: [
@@ -130,13 +131,11 @@ export default [
           patterns: [
             {
               group: ['react', 'react/*', 'react-dom', 'react-dom/*'],
-              message:
-                '@blog/db must not import React — it has no React at all, client or server.',
+              message: noReactImportMessage,
             },
             {
               group: ['@blog/ui', '@blog/ui/*'],
-              message:
-                '@blog/db must not import @blog/ui — db has no presentation concerns.',
+              message: noUiImportMessage,
             },
             {
               group: [
@@ -177,13 +176,11 @@ export default [
           patterns: [
             {
               group: ['react', 'react/*', 'react-dom', 'react-dom/*'],
-              message:
-                '@blog/db must not import React — it has no React at all, client or server.',
+              message: noReactImportMessage,
             },
             {
               group: ['@blog/ui', '@blog/ui/*'],
-              message:
-                '@blog/db must not import @blog/ui — db has no presentation concerns.',
+              message: noUiImportMessage,
             },
             {
               group: [
