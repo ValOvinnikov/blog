@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { ADMIN_ROLE } from '@blog/db';
+import { ADMIN_ROLE } from '@blog/db/constants';
 import type { TAdmin } from '@blog/db/schema/admins';
 import { notFound } from 'next/navigation';
 
