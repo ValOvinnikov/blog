@@ -6,14 +6,7 @@ export type TSignInEventUser = {
 };
 
 /**
- * Auth.js `events.signIn` handler (wired in `config.ts`): attaches every
- * still-pending `membershipInvites` row for the signed-in user's email to
- * a real `memberships` row. Fires after every successful sign-in —
- * magic-link, GitHub, or Google, new or already-existing user — which is
- * what lets an already-registered user invited to a second tenant pick up
- * the membership on their next sign-in anywhere, with no separate
- * acceptance flow. Consumption keys on `user.email` matching, trusting
- * each provider's own verification rather than a locally-verified email.
+ * Auth.js `events.signIn` handler that attaches a signed-in user's pending membership invites to real `memberships` rows.
  */
 export async function consumePendingInvitesOnSignIn({
   user,

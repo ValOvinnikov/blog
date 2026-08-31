@@ -8,11 +8,7 @@ export type TMagicLinkInviteEmailInput = {
 };
 
 /**
- * buildInviteMagicLinkEmail — sign-in copy for an address with one or more
- * pending tenant invites, swapped in by `magic-link-provider.ts`'s
- * `sendVerificationRequest` instead of `buildMagicLinkEmail`'s generic
- * copy. Pure for the same reason as `buildMagicLinkEmail` — testable
- * without mocking Auth.js or the email transport.
+ * Builds sign-in email copy for an address with one or more pending tenant invites.
  */
 export function buildInviteMagicLinkEmail({
   url,
