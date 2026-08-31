@@ -4,10 +4,9 @@ import type { TTenantSanityContext } from './client';
 
 /**
  * The `sanity-image` package's own `baseUrl` prop format, as an alternative
- * to passing it separate `projectId`/`dataset` props. Pure string
- * construction — no client, no network call — so it stays importable from
- * environments (e.g. Storybook) that never evaluate `./client`'s
- * `server-only` guard.
+ * to passing it separate `projectId`/`dataset` props. Reads only
+ * `client`-declared env vars, so it's safe to call from any environment
+ * (e.g. Storybook running in a real browser).
  */
 export function getSanityImageBaseUrl(tenant?: TTenantSanityContext): string {
   const projectId = tenant?.projectId ?? env.NEXT_PUBLIC_SANITY_PROJECT_ID;
