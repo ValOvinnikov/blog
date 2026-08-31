@@ -1,4 +1,4 @@
-import { SOCIAL_PLATFORMS, TLINK_TYPE } from '@blog/config/constants';
+import { SOCIAL_PLATFORMS, LINK_TYPE } from '@blog/config/constants';
 import { postSchema } from '@blog/studio/schema-types/documents/blog/post';
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic';
 import { toTitleCase } from '@blog/utils/primitives';
@@ -18,7 +18,7 @@ export const linkSchema = defineType({
   type: 'object',
   icon: Link2,
   initialValue: {
-    linkType: TLINK_TYPE.INTERNAL,
+    linkType: LINK_TYPE.INTERNAL,
     openInNewTab: false,
   },
   fields: [
@@ -43,8 +43,8 @@ export const linkSchema = defineType({
       options: {
         layout: 'radio',
         list: [
-          { title: 'Internal document', value: TLINK_TYPE.INTERNAL },
-          { title: 'URL or path', value: TLINK_TYPE.EXTERNAL },
+          { title: 'Internal document', value: LINK_TYPE.INTERNAL },
+          { title: 'URL or path', value: LINK_TYPE.EXTERNAL },
         ],
       },
       validation: (rule) => rule.required(),
@@ -62,10 +62,10 @@ export const linkSchema = defineType({
         { type: 'page_generic' },
         { type: 'page_blog' },
       ],
-      hidden: ({ parent }) => !isLinkType(parent, TLINK_TYPE.INTERNAL),
+      hidden: ({ parent }) => !isLinkType(parent, LINK_TYPE.INTERNAL),
       validation: (rule) =>
         rule.custom((value, context) => {
-          if (isLinkType(context.parent, TLINK_TYPE.INTERNAL) && !value) {
+          if (isLinkType(context.parent, LINK_TYPE.INTERNAL) && !value) {
             return 'Choose a document for an internal link.';
           }
 
@@ -78,10 +78,10 @@ export const linkSchema = defineType({
       type: 'string',
       description:
         'Use a relative path such as /blog or a full URL such as https://example.com.',
-      hidden: ({ parent }) => !isLinkType(parent, TLINK_TYPE.EXTERNAL),
+      hidden: ({ parent }) => !isLinkType(parent, LINK_TYPE.EXTERNAL),
       validation: (rule) =>
         rule.custom((value, context) => {
-          if (!isLinkType(context.parent, TLINK_TYPE.EXTERNAL)) {
+          if (!isLinkType(context.parent, LINK_TYPE.EXTERNAL)) {
             return true;
           }
 
@@ -102,7 +102,7 @@ export const linkSchema = defineType({
       type: 'boolean',
       description: 'Only applies to external URLs or paths.',
       initialValue: false,
-      hidden: ({ parent }) => !isLinkType(parent, TLINK_TYPE.EXTERNAL),
+      hidden: ({ parent }) => !isLinkType(parent, LINK_TYPE.EXTERNAL),
     }),
     defineField({
       name: 'platform',
@@ -128,7 +128,7 @@ export const linkSchema = defineType({
       return {
         title: title ?? 'Unknown',
         subtitle:
-          linkType === TLINK_TYPE.INTERNAL
+          linkType === LINK_TYPE.INTERNAL
             ? `Internal: ${String(internalTitle ?? 'not selected')}`
             : String(url ?? 'URL not set'),
       };

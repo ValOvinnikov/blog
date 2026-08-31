@@ -4,7 +4,7 @@ import {
   CTA_ACTION_VARIANT,
   CTA_VARIANT,
   HERO_FIELD_MODE,
-  TLINK_TYPE,
+  LINK_TYPE,
 } from '@blog/config';
 import type { TRawContentModule } from '@blog/service/features/modules/content/adaptor/transformer';
 import type {
@@ -113,7 +113,7 @@ export function makeRawCtaAction(
     appearance: CTA_ACTION_APPEARANCE.CONTAINED,
     link: {
       label: 'Subscribe',
-      linkType: TLINK_TYPE.EXTERNAL,
+      linkType: LINK_TYPE.EXTERNAL,
       url: '/newsletter',
       internalReference: null,
       openInNewTab: null,
@@ -131,7 +131,7 @@ export function makeRawContentMarkDef(
     _key: 'mark-1',
     _type: 'link',
     label: 'Learn more',
-    linkType: TLINK_TYPE.EXTERNAL,
+    linkType: LINK_TYPE.EXTERNAL,
     url: 'https://example.com',
     internalReference: null,
     openInNewTab: null,

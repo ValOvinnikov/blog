@@ -5,7 +5,7 @@ import {
   CTA_ACTION_VARIANT,
   CTA_VARIANT,
   HEADING_ALIGN,
-  TLINK_TYPE,
+  LINK_TYPE,
 } from '@blog/config';
 import {
   makeRawContentBlock,
@@ -131,7 +131,7 @@ describe('toCtaModule', () => {
         makeRawContentBlock({
           markDefs: [
             makeRawContentMarkDef({
-              linkType: TLINK_TYPE.INTERNAL,
+              linkType: LINK_TYPE.INTERNAL,
               internalReference: { _type: 'blog_post', slug: 'hello-world' },
             }),
           ],
@@ -154,7 +154,7 @@ describe('toCtaModule', () => {
         makeRawContentBlock({
           markDefs: [
             makeRawContentMarkDef({
-              linkType: TLINK_TYPE.INTERNAL,
+              linkType: LINK_TYPE.INTERNAL,
               internalReference: { _type: 'blog_topic', slug: 'engineering' },
             }),
           ],
@@ -166,7 +166,7 @@ describe('toCtaModule', () => {
         makeRawContentBlock({
           markDefs: [
             makeRawContentMarkDef({
-              linkType: TLINK_TYPE.INTERNAL,
+              linkType: LINK_TYPE.INTERNAL,
               internalReference: { _type: 'page_generic', slug: 'about' },
             }),
           ],
@@ -188,7 +188,7 @@ describe('toCtaModule', () => {
         makeRawContentBlock({
           markDefs: [
             makeRawContentMarkDef({
-              linkType: TLINK_TYPE.EXTERNAL,
+              linkType: LINK_TYPE.EXTERNAL,
               url: 'https://example.com',
             }),
           ],
@@ -207,7 +207,7 @@ describe('toCtaModule', () => {
         makeRawContentBlock({
           markDefs: [
             makeRawContentMarkDef({
-              linkType: TLINK_TYPE.INTERNAL,
+              linkType: LINK_TYPE.INTERNAL,
               internalReference: null,
               url: null,
             }),
@@ -293,7 +293,7 @@ describe('toCtaModule', () => {
             appearance: CTA_ACTION_APPEARANCE.INLINE,
             link: {
               label: 'Learn more',
-              linkType: TLINK_TYPE.EXTERNAL,
+              linkType: LINK_TYPE.EXTERNAL,
               url: '/learn-more',
               internalReference: null,
               openInNewTab: null,
@@ -339,7 +339,7 @@ describe('toCtaModule', () => {
           makeRawCtaAction({
             link: {
               label: 'Broken',
-              linkType: TLINK_TYPE.INTERNAL,
+              linkType: LINK_TYPE.INTERNAL,
               url: null,
               internalReference: null,
               openInNewTab: null,
@@ -363,7 +363,7 @@ describe('toCtaModule', () => {
           makeRawCtaAction({
             link: {
               label: 'Subscribe',
-              linkType: TLINK_TYPE.EXTERNAL,
+              linkType: LINK_TYPE.EXTERNAL,
               url: '/newsletter',
               internalReference: null,
               openInNewTab: null,
