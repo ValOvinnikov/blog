@@ -5,27 +5,18 @@ description: >-
   blog monorepo — surfacing duplication, over-complex code worth
   simplifying, comment-policy violations, dead code, and drifted
   conventions as tracked issues rather than fixing them inline. Triggers on
-  "run a refactor sweep", "audit <layer> for cleanup", or when
-  docs/context/refactor-sweep-log.md needs consulting to decide which layer
-  is overdue.
+  "run a refactor sweep" or "audit <layer> for cleanup".
 ---
 
 # Refactor sweep
 
 An on-demand, read-only audit of **one layer at a time** — never a repo-wide
-pass, never a diff-scoped cleanup. Run it whenever you decide it's time, not
-on any fixed cadence. It surfaces findings as tracked issues; it never edits
-code itself. Complements `code-review-practices` (reactive, per-diff, runs on
-every PR) with a pass over code nobody's touching right now, which is exactly
-the code a per-diff review never sees.
-
-## Which layer to sweep
-
-Read `docs/context/refactor-sweep-log.md`. Pick the row with the oldest
-`Last swept` date; rows still `never` swept go in the table's top-to-bottom
-order before any already-swept row gets a second turn. An on-demand request
-naming a layer explicitly ("sweep `ui`") overrides the rotation for that one
-run — it doesn't consume the overdue layer's turn, which stays next up.
+pass, never a diff-scoped cleanup. Run it whenever asked, naming the layer to
+sweep — there is no automatic rotation or staleness tracking; the human
+decides which layer and when. It surfaces findings as tracked issues; it
+never edits code itself. Complements `code-review-practices` (reactive,
+per-diff, runs on every PR) with a pass over code nobody's touching right
+now, which is exactly the code a per-diff review never sees.
 
 ## Running the sweep
 
@@ -96,19 +87,13 @@ run — it doesn't consume the overdue layer's turn, which stays next up.
    lifecycle later, as their own ticket, own PR, own gate sequence, whenever
    someone decides to act on it. This skill's job ends at "surfaced and
    ticketed."
-5. **Update `docs/context/refactor-sweep-log.md`**: set the swept layer's
-   `Last swept` date, the `main` commit SHA the audit read at, and the
-   findings/issues-filed counts.
-6. **Report a summary**: layer swept, finding count, issue numbers filed,
-   which layer is next in rotation.
+5. **Report a summary**: layer swept, finding count, issue numbers filed.
 
 ## Cadence
 
 No fixed schedule — this runs only when explicitly invoked ("run a refactor
-sweep", optionally naming a layer). `docs/context/refactor-sweep-log.md` is
-what makes staleness visible between runs: anyone can glance at it and see
-which layer has gone longest without a look, without needing to remember or
-track it separately.
+sweep", naming a layer). Which layer is overdue is a call the human makes;
+this skill doesn't track or infer it.
 
 ## Boundaries
 
@@ -116,6 +101,3 @@ track it separately.
 - **Never sweep more than one layer per run.** A big-bang audit across every
   layer at once produces a wall of findings nobody triages — the point of
   this skill is a steady, reviewable drip.
-- **Never let a sweep skip the log update.** An un-logged sweep is
-  indistinguishable from one that never happened, and the next run will
-  re-pick the same layer instead of rotating.
