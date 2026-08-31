@@ -15,13 +15,13 @@ multiple rows tie on "never swept." After that, whichever row has the oldest
 | ------------ | ---------- | ------------ | -------- | --------------------------------- |
 | config       | never      | —            | —        | —                                 |
 | studio       | 2026-08-30 | 9e2a5c76     | 1        | #2332                             |
-| service      | never      | —            | —        | —                                 |
+| service      | 2026-08-31 | ff2e94f7     | 3        | #2371, #2372, #2373               |
 | ui           | 2026-08-30 | 8e49f9a8     | 3        | #2340, #2341, #2342               |
 | web          | 2026-08-30 | 8e49f9a8     | 3        | #2337, #2338, #2339               |
 | db           | 2026-08-30 | 9e2a5c76     | 5        | #2326, #2328, #2329, #2333, #2334 |
-| auth         | never      | —            | —        | —                                 |
+| auth         | 2026-08-31 | ff2e94f7     | 2        | #2376, #2377                      |
 | platform-app | 2026-08-30 | 9e2a5c76     | 2        | #2330, #2331                      |
-| insight      | never      | —            | —        | —                                 |
+| insight      | 2026-08-31 | ff2e94f7     | 1        | #2378                             |
 
 **Commit swept** is the `main` SHA the audit read at (short form), so a
 future sweep can diff from there if useful context for what's new since.
