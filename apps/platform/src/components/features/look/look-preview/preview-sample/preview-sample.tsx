@@ -1,4 +1,4 @@
-import { Size } from '@blog/config';
+import { SIZE } from '@blog/config';
 import { BrandMark } from '@blog/ui/atoms/brand-mark';
 import { Button } from '@blog/ui/atoms/button';
 import { Heading } from '@blog/ui/atoms/heading';
@@ -40,7 +40,7 @@ export const PreviewSample = ({
   const sample = (
     <>
       <div className={brandRow()}>
-        <BrandMark size={Size.SM} title={tenantSlug} />
+        <BrandMark size={SIZE.SM} title={tenantSlug} />
         <span className={brandName()} style={{ fontFamily: headingFontFamily }}>
           {tenantSlug}
         </span>
@@ -56,10 +56,10 @@ export const PreviewSample = ({
         {t('samplePara')}
       </Text>
       <div className={actionsRow()}>
-        <Button type="button" size={Size.SM}>
+        <Button type="button" size={SIZE.SM}>
           {t('subscribeButton')}
         </Button>
-        <Button type="button" variant="ghost" size={Size.SM}>
+        <Button type="button" variant="ghost" size={SIZE.SM}>
           {t('readMoreButton')}
         </Button>
         <span className={chip()}>{t('readTimeChip')}</span>

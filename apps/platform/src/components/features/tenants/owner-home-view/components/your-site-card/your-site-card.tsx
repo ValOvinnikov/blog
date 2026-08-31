@@ -1,4 +1,4 @@
-import { Size } from '@blog/config';
+import { SIZE } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
@@ -47,7 +47,7 @@ export const YourSiteCard = ({ tenant }: TYourSiteCardProps) => {
               <ExternalLinkButton
                 href={`https://${tenant.primaryDomain}`}
                 variant="ghost"
-                size={Size.SM}
+                size={SIZE.SM}
                 ariaLabel={openDomainLabel}
                 title={openDomainLabel}
               >

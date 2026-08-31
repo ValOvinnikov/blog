@@ -1,4 +1,4 @@
-import { Size, type TIconName } from '@blog/config';
+import { SIZE, type TIconName } from '@blog/config';
 import { Icon } from '@platform/components/shared/icon';
 import { Link } from '@platform/i18n/navigation';
 
@@ -21,7 +21,7 @@ export const Tile = ({ href, icon, title, description }: TTileProps) => {
 
   return (
     <Link href={href} className={root()}>
-      <Icon name={icon} size={Size.LG} className={iconSlot()} />
+      <Icon name={icon} size={SIZE.LG} className={iconSlot()} />
       <span className={titleSlot()}>{title}</span>
       <span className={descriptionSlot()}>{description}</span>
     </Link>

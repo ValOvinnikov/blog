@@ -1,6 +1,6 @@
 'use client';
 
-import { ALERT_TYPE, Size } from '@blog/config';
+import { ALERT_TYPE, SIZE } from '@blog/config';
 import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
@@ -194,7 +194,7 @@ export const TenantDetailsForm = () => {
 
         {isPending && (
           <div className={overlay()}>
-            <Spinner label={pendingLabel} size={Size.LG} hasLabel={true} />
+            <Spinner label={pendingLabel} size={SIZE.LG} hasLabel={true} />
           </div>
         )}
       </div>

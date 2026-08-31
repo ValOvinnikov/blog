@@ -1,4 +1,4 @@
-import { Size, type TIconName } from '@blog/config';
+import { SIZE, type TIconName } from '@blog/config';
 import { BrandMark } from '@platform/components/shared/brand-mark';
 import { Icon } from '@platform/components/shared/icon';
 import {
@@ -116,7 +116,7 @@ export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
                         <SidebarNavLink href={item.href}>
                           <Icon
                             name={item.icon}
-                            size={Size.SM}
+                            size={SIZE.SM}
                             className={rowIcon()}
                           />
                           <span className={rowBody()}>
@@ -133,7 +133,7 @@ export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
                       <div className={row({ state: 'inert' })}>
                         <Icon
                           name={item.icon}
-                          size={Size.SM}
+                          size={SIZE.SM}
                           className={rowIcon()}
                         />
                         <span className={rowBody()}>

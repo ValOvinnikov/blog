@@ -1,4 +1,4 @@
-import { Size } from '@blog/config';
+import { SIZE } from '@blog/config';
 import { render, screen } from '@platform/testing/custom-render';
 
 import { Spinner } from './spinner';
@@ -30,7 +30,7 @@ describe(Spinner, () => {
   });
 
   it('renders every size without throwing', () => {
-    for (const size of [Size.SM, Size.MD, Size.LG] as const) {
+    for (const size of [SIZE.SM, SIZE.MD, SIZE.LG] as const) {
       expect(() =>
         render(<Spinner label="Loading" size={size} />),
       ).not.toThrow();
