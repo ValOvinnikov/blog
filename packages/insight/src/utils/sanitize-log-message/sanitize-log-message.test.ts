@@ -1,7 +1,9 @@
-import { sanitizeLogMessage } from './sanitize-log-message';
+import {
+  LINE_SEPARATOR,
+  PARAGRAPH_SEPARATOR,
+} from '@blog/insight/testing/fixtures';
 
-const LINE_SEPARATOR = String.fromCharCode(0x2028);
-const PARAGRAPH_SEPARATOR = String.fromCharCode(0x2029);
+import { sanitizeLogMessage } from './sanitize-log-message';
 
 describe(sanitizeLogMessage, () => {
   it('extracts the message from an Error', () => {
