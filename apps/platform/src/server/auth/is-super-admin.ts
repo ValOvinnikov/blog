@@ -1,6 +1,7 @@
 import 'server-only';
 
-import { ADMIN_ROLE, queries } from '@blog/db';
+import { queries } from '@blog/db';
+import { ADMIN_ROLE } from '@blog/db/constants';
 
 /**
  * A platform SUPERADMIN bypasses every per-tenant `memberships` check in
