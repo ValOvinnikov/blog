@@ -2,7 +2,7 @@
 
 import {
   ICONS,
-  Size,
+  SIZE,
   type THeadingAlign,
   type TFormStatus,
 } from '@blog/config';
@@ -119,11 +119,11 @@ export const NewsletterForm = ({
 
   const trustCues = [
     {
-      icon: <Icon name={ICONS.SHIELD_CHECK} size={Size.SM} />,
+      icon: <Icon name={ICONS.SHIELD_CHECK} size={SIZE.SM} />,
       label: t('trustCueNoSpam'),
     },
     {
-      icon: <Icon name={ICONS.CLOSE} size={Size.SM} />,
+      icon: <Icon name={ICONS.CLOSE} size={SIZE.SM} />,
       label: t('trustCueUnsubscribe'),
     },
   ];

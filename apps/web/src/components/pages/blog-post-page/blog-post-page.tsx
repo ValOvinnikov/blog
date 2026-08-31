@@ -2,7 +2,7 @@ import {
   ASIDE_KIND,
   CAPABILITY,
   ICONS,
-  Size,
+  SIZE,
   type TAsideKind,
   routes,
 } from '@blog/config';
@@ -69,7 +69,7 @@ export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
     icon: (
       <Icon
         name={toSocialIconName(link.platform) ?? ICONS.EXTERNAL_LINK}
-        size={Size.SM}
+        size={SIZE.SM}
       />
     ),
   }));

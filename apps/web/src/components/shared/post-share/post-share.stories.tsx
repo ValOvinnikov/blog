@@ -1,4 +1,4 @@
-import { ICONS, Size } from '@blog/config';
+import { ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { buildShareLinks } from '@web/utils/build-share-links';
@@ -15,7 +15,7 @@ const links = buildShareLinks({ url, title }).map((link) => ({
   icon: (
     <Icon
       name={toSocialIconName(link.platform) ?? ICONS.EXTERNAL_LINK}
-      size={Size.SM}
+      size={SIZE.SM}
     />
   ),
 }));

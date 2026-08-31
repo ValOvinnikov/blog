@@ -1,4 +1,4 @@
-import { ICONS, type ILocalizedParams, routes, Size } from '@blog/config';
+import { ICONS, type ILocalizedParams, routes, SIZE } from '@blog/config';
 import { service } from '@blog/service';
 import { Icon } from '@blog/ui/atoms/icon';
 import { NavLink } from '@blog/ui/atoms/nav-link';
@@ -183,7 +183,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
                         iconName ? (
                           <Icon
                             name={iconName}
-                            size={Size.SM}
+                            size={SIZE.SM}
                             dataTestId={`social-icon-${link.platform}`}
                           />
                         ) : undefined
@@ -200,7 +200,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
                   icon={
                     <Icon
                       name={ICONS.RSS}
-                      size={Size.SM}
+                      size={SIZE.SM}
                       dataTestId="rss-icon"
                     />
                   }

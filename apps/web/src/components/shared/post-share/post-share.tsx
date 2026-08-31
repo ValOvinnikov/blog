@@ -1,6 +1,6 @@
 'use client';
 
-import { ICONS, Size } from '@blog/config';
+import { ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import { PopoverMenu } from '@blog/ui/molecules/popover-menu';
 import { type IShareLinkItem } from '@blog/ui/molecules/share-link';
@@ -51,7 +51,7 @@ export const PostShare = ({
         panelId={panelId}
         onClick={toggle}
       >
-        <Icon name={ICONS.SHARE} size={Size.SM} />
+        <Icon name={ICONS.SHARE} size={SIZE.SM} />
       </PopoverMenu.Trigger>
       <PopoverMenu.Panel
         ref={panelRef}
@@ -62,9 +62,9 @@ export const PostShare = ({
         <PopoverMenu.Item
           icon={
             isCopied ? (
-              <Icon name={ICONS.CHECK} size={Size.SM} />
+              <Icon name={ICONS.CHECK} size={SIZE.SM} />
             ) : (
-              <Icon name={ICONS.COPY} size={Size.SM} />
+              <Icon name={ICONS.COPY} size={SIZE.SM} />
             )
           }
           onClick={() => copy(url)}
