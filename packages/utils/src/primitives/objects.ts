@@ -6,7 +6,7 @@
 export const objectKeys = <T extends object>(obj: T): Array<keyof T> =>
   Object.keys(obj) as Array<keyof T>;
 
-// Assumes SCREAMING_SNAKE_CASE input (this repo's UPPERCASE const-value convention).
+/** Assumes SCREAMING_SNAKE_CASE input (this repo's UPPERCASE const-value convention). */
 export const toTitleCase = (value: string): string =>
   value
     .split('_')

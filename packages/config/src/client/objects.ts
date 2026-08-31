@@ -37,8 +37,6 @@ export interface ILink {
   target: TMaybeUndefined<'_blank'>;
   /** Social platform key (set on footer social links). */
   platform: TMaybeUndefined<TSocialPlatform>;
-  /** Accessible name override when `label` alone isn't descriptive enough
-   *  (e.g. a generic "Read more" CTA) — passed through to the rendered
-   *  link's `aria-label`. Omit when `label` is already descriptive. */
+  /** Accessible name override, passed through to the rendered link's `aria-label` when `label` alone isn't descriptive enough. */
   ariaLabel: TMaybeUndefined<string>;
 }
