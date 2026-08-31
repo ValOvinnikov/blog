@@ -1,4 +1,4 @@
-import { Size } from '@blog/config';
+import { SIZE } from '@blog/config';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -10,7 +10,7 @@ const meta = {
   component: BrandMark,
   tags: ['autodocs'],
   args: {
-    size: Size.MD,
+    size: SIZE.MD,
   },
   argTypes: {
     size: {
@@ -26,11 +26,11 @@ type TStory = StoryObj<typeof meta>;
 export const Default: TStory = {};
 
 export const Small: TStory = {
-  args: { size: Size.SM },
+  args: { size: SIZE.SM },
 };
 
 export const Large: TStory = {
-  args: { size: Size.LG },
+  args: { size: SIZE.LG },
 };
 
 export const Standalone: TStory = {

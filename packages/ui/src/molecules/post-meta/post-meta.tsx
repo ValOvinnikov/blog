@@ -1,4 +1,4 @@
-import { type IWithClassName, type IWithDataTestId, Size } from '@blog/config';
+import { type IWithClassName, type IWithDataTestId, SIZE } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { Avatar } from '@blog/ui/atoms/avatar';
 import { MetaSeparator } from '@blog/ui/atoms/meta-separator';
@@ -51,7 +51,7 @@ export const PostMeta = ({
           name={author.name}
           alt={author.name}
           src={author.imageUrl}
-          size={Size.SM}
+          size={SIZE.SM}
         />
         {author.href ? (
           // eslint-disable-next-line react-hooks/static-components -- resolveComponent returns `linkAs`/fallback verbatim, so the reference stays stable across renders

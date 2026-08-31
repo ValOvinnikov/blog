@@ -16,7 +16,7 @@ Variants: type: ALERT_TYPE.SUCCESS|ALERT_TYPE.WARNING|ALERT_TYPE.ERROR|ALERT_TYP
 
 Avatar atom — renders a provided image, or an initials badge derived from `name` when no image is supplied.
 Props: src?: string · alt: string · name: string · size?: TAvatarVariants['size'] · className?: string · onImageError?: () => void _(extends IWithDataTestId)_
-Variants: size: Size.SM|Size.MD|Size.LG
+Variants: size: SIZE.SM|SIZE.MD|SIZE.LG
 
 ### BackToTop — `atoms/back-to-top/back-to-top.tsx`
 
@@ -34,13 +34,13 @@ Variants: isBookmarked: (boolean)
 
 BrandMark atom — the brand mark, rendered from an uploaded image when `src` is supplied, or as three stacked polygon layers coloured from the `--logo-1/2/3` design tokens via inline `style` otherwise (these tokens aren't mirrored into `@theme inline` as Tailwind utilities).
 Props: size?: TBrandMarkVariants['size'] · title?: string · src?: string · isStacked?: boolean _(extends IWithClassName, IWithDataTestId)_
-Variants: size: Size.SM|Size.MD|Size.LG
+Variants: size: SIZE.SM|SIZE.MD|SIZE.LG
 
 ### Button — `atoms/button/button.tsx`
 
 the styled `<button>` for in-page actions (submit, toggle, dismiss).
 Props: type?: 'button' | 'submit' | 'reset' · title?: string · children?: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · isDisabled?: boolean · 'aria-busy'?: AriaAttributes['aria-busy'] _(extends IWithClassName, IWithDataTestId, TButtonVariants)_
-Variants: variant: primary|ghost|link|danger · size: Size.SM|Size.MD|Size.LG
+Variants: variant: primary|ghost|link|danger · size: SIZE.SM|SIZE.MD|SIZE.LG
 
 ### Caption — `atoms/caption/caption.tsx`
 
@@ -57,13 +57,13 @@ Variants: hasHref: (boolean)
 
 Semantic heading — `level` picks the rendered `h1`–`h4` tag for the page outline, independently of `visual`, which drives the rendered size instead (e.g. a deep Portable Text heading can still read as subordinate to the page's title).
 Props: level: THeadingLevel · visual?: THeadingVariants['visual'] · size?: THeadingVariants['size'] · id?: string · style?: CSSProperties · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-Variants: visual: hero|post|card|section|prose-h2|prose-h3|prose-h4|preview|copy · size: Size.XS|Size.SM|Size.MD|Size.LG|Size.XL|Size.XXL
+Variants: visual: hero|post|card|section|prose-h2|prose-h3|prose-h4|preview|copy · size: SIZE.XS|SIZE.SM|SIZE.MD|SIZE.LG|SIZE.XL|SIZE.XXL
 
 ### Icon — `atoms/icon/icon.tsx`
 
 renders any icon from the bespoke icon set by name.
 Props: name: TIconName · size?: TIconVariants['size'] · 'aria-label'?: AriaAttributes['aria-label'] · 'aria-hidden'?: AriaAttributes['aria-hidden'] _(extends IWithClassName, IWithDataTestId)_
-Variants: size: Size.SM|Size.MD|Size.LG
+Variants: size: SIZE.SM|SIZE.MD|SIZE.LG
 
 ### IconButton — `atoms/icon-button/icon-button.tsx`
 
@@ -97,7 +97,7 @@ Variants: isActive: (boolean)
 
 Typography wrapper for long-form body text.
 Props: size?: TProseVariants['size'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-Variants: size: Size.SM|Size.MD|Size.LG
+Variants: size: SIZE.SM|SIZE.MD|SIZE.LG
 
 ### ProseLink — `atoms/prose-link/prose-link.tsx`
 
@@ -119,7 +119,7 @@ Variants: selected: (boolean)
 
 the shared indeterminate loading indicator for every async state (a submitting button, a session resolving, a region fetching on demand).
 Props: label: string · hasLabel?: boolean · size?: TSpinnerVariants['size'] · 'aria-hidden'?: AriaAttributes['aria-hidden'] _(extends IWithClassName, IWithDataTestId)_
-Variants: size: Size.SM|Size.MD|Size.LG
+Variants: size: SIZE.SM|SIZE.MD|SIZE.LG
 
 ### StatusBadge — `atoms/status-badge/status-badge.tsx`
 

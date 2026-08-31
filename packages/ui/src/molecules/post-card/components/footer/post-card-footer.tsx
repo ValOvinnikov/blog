@@ -1,4 +1,4 @@
-import { Size, type IWithClassName, type IWithDataTestId } from '@blog/config';
+import { SIZE, type IWithClassName, type IWithDataTestId } from '@blog/config';
 import { Avatar } from '@blog/ui/atoms/avatar';
 import type { ReactNode } from 'react';
 
@@ -41,7 +41,7 @@ export const PostCardFooter = ({
         name={authorName}
         alt={authorName}
         src={authorAvatarSrc}
-        size={Size.SM}
+        size={SIZE.SM}
       />
     )}
     {authorName && <span>{authorName}</span>}

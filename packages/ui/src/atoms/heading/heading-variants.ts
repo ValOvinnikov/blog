@@ -1,4 +1,4 @@
-import { Size } from '@blog/config';
+import { SIZE } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -20,12 +20,12 @@ export const headingVariants = tv({
       copy: ['text-copy'],
     },
     size: {
-      [Size.XS]: ['text-lg leading-tight tracking-tight'],
-      [Size.SM]: ['text-xl leading-tight tracking-tight'],
-      [Size.MD]: ['text-2xl leading-tight tracking-tight'],
-      [Size.LG]: ['text-3xl leading-tight tracking-tight'],
-      [Size.XL]: ['text-4xl leading-tight tracking-tight'],
-      [Size.XXL]: ['text-display leading-[1.05] tracking-tight'],
+      [SIZE.XS]: ['text-lg leading-tight tracking-tight'],
+      [SIZE.SM]: ['text-xl leading-tight tracking-tight'],
+      [SIZE.MD]: ['text-2xl leading-tight tracking-tight'],
+      [SIZE.LG]: ['text-3xl leading-tight tracking-tight'],
+      [SIZE.XL]: ['text-4xl leading-tight tracking-tight'],
+      [SIZE.XXL]: ['text-display leading-[1.05] tracking-tight'],
     },
   },
 });

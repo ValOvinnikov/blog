@@ -1,6 +1,6 @@
 import {
   ICONS,
-  Size,
+  SIZE,
   type IWithClassName,
   type IWithDataTestId,
 } from '@blog/config';
@@ -131,7 +131,7 @@ export const PostsSection = ({
                 trailingIcon={
                   <Icon
                     name={ICONS.ARROW}
-                    size={Size.SM}
+                    size={SIZE.SM}
                     dataTestId="post-card-footer-arrow"
                   />
                 }

@@ -2,7 +2,7 @@ import {
   ICONS,
   type IWithClassName,
   type IWithDataTestId,
-  Size,
+  SIZE,
 } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 
@@ -49,7 +49,7 @@ export const BookmarkToggle = ({
       data-testid={dataTestId}
       className={root({ class: className })}
     >
-      <Icon name={ICONS.BOOKMARK} size={Size.MD} className={icon()} />
+      <Icon name={ICONS.BOOKMARK} size={SIZE.MD} className={icon()} />
       <span>{label}</span>
     </button>
   );

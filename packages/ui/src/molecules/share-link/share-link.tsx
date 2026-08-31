@@ -1,4 +1,4 @@
-import { type IWithClassName, type IWithDataTestId, Size } from '@blog/config';
+import { type IWithClassName, type IWithDataTestId, SIZE } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import type { IWithIcon } from '@blog/ui/lib/react';
 import { LinkButton } from '@blog/ui/molecules/link-button';
@@ -46,7 +46,7 @@ export const ShareLink = ({
       target="_blank"
       rel="noopener noreferrer"
       variant="ghost"
-      size={Size.SM}
+      size={SIZE.SM}
       className={className}
       dataTestId={dataTestId}
     >

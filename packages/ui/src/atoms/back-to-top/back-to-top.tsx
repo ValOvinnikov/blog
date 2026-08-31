@@ -1,6 +1,6 @@
 import {
   ICONS,
-  Size,
+  SIZE,
   type IWithClassName,
   type IWithDataTestId,
 } from '@blog/config';
@@ -37,6 +37,6 @@ export const BackToTop = ({
     dataTestId={dataTestId}
     className={backToTopVariants({ visible: isVisible, class: className })}
   >
-    <Icon name={ICONS.ARROW_UP} size={Size.MD} />
+    <Icon name={ICONS.ARROW_UP} size={SIZE.MD} />
   </IconButton>
 );

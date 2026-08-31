@@ -1,4 +1,4 @@
-import { ICONS, Size } from '@blog/config';
+import { ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -33,7 +33,7 @@ const meta = {
         </PostCard.Title>
         <PostCard.Footer
           topic="design-system"
-          trailingIcon={<Icon name={ICONS.ARROW} size={Size.SM} />}
+          trailingIcon={<Icon name={ICONS.ARROW} size={SIZE.SM} />}
         />
       </>
     ),
@@ -88,7 +88,7 @@ export const WithTags: TStory = {
         </PostCard.Title>
         <PostCard.Footer
           topic="typescript"
-          trailingIcon={<Icon name={ICONS.ARROW} size={Size.SM} />}
+          trailingIcon={<Icon name={ICONS.ARROW} size={SIZE.SM} />}
         />
       </>
     ),
@@ -107,8 +107,8 @@ export const WithFooterLeadingIcon: TStory = {
         </PostCard.Title>
         <PostCard.Footer
           topic="typescript"
-          leadingIcon={<Icon name={ICONS.BOOKMARK} size={Size.SM} />}
-          trailingIcon={<Icon name={ICONS.ARROW} size={Size.SM} />}
+          leadingIcon={<Icon name={ICONS.BOOKMARK} size={SIZE.SM} />}
+          trailingIcon={<Icon name={ICONS.ARROW} size={SIZE.SM} />}
         />
       </>
     ),
@@ -126,7 +126,7 @@ export const AsSecondLevelHeading: TStory = {
         </PostCard.Title>
         <PostCard.Footer
           topic="design-system"
-          trailingIcon={<Icon name={ICONS.ARROW} size={Size.SM} />}
+          trailingIcon={<Icon name={ICONS.ARROW} size={SIZE.SM} />}
         />
       </>
     ),

@@ -1,4 +1,4 @@
-import { ICONS, Size } from '@blog/config';
+import { ICONS, SIZE } from '@blog/config';
 import { Avatar } from '@blog/ui/atoms/avatar';
 import { Icon } from '@blog/ui/atoms/icon';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -11,7 +11,7 @@ const meta = {
   tags: ['autodocs'],
   args: {
     ariaLabel: 'Action',
-    children: <Icon name={ICONS.SUN} size={Size.SM} />,
+    children: <Icon name={ICONS.SUN} size={SIZE.SM} />,
   },
 } satisfies Meta<typeof IconButton>;
 
@@ -27,7 +27,7 @@ export const Default: TStory = {};
 export const WithMoonIcon: TStory = {
   args: {
     ariaLabel: 'Switch to dark theme',
-    children: <Icon name={ICONS.MOON} size={Size.SM} />,
+    children: <Icon name={ICONS.MOON} size={SIZE.SM} />,
   },
 };
 
@@ -48,6 +48,6 @@ export const AvatarVariant: TStory = {
   args: {
     variant: 'avatar',
     ariaLabel: 'Open account menu',
-    children: <Avatar name="Ada Lovelace" alt="" size={Size.SM} />,
+    children: <Avatar name="Ada Lovelace" alt="" size={SIZE.SM} />,
   },
 };

@@ -1,4 +1,4 @@
-import { Size } from '@blog/config';
+import { SIZE } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -24,12 +24,12 @@ export const buttonVariants = tv({
         'border-error/55 bg-transparent text-error hover:border-error hover:bg-error hover:text-primary',
     },
     size: {
-      [Size.SM]: 'px-3 py-1.5 text-sm',
-      [Size.MD]: 'px-4 py-2 text-copy',
-      [Size.LG]: 'px-5 py-2.5 text-base',
+      [SIZE.SM]: 'px-3 py-1.5 text-sm',
+      [SIZE.MD]: 'px-4 py-2 text-copy',
+      [SIZE.LG]: 'px-5 py-2.5 text-base',
     },
   },
-  defaultVariants: { variant: 'primary', size: Size.MD },
+  defaultVariants: { variant: 'primary', size: SIZE.MD },
 });
 
 export type TButtonVariants = VariantProps<typeof buttonVariants>;

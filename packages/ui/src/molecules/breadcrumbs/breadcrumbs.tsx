@@ -1,6 +1,6 @@
 import {
   ICONS,
-  Size,
+  SIZE,
   type IWithClassName,
   type IWithDataTestId,
 } from '@blog/config';
@@ -65,7 +65,7 @@ export const Breadcrumbs = ({
           const isFirst = index === 0;
           const content = isFirst ? (
             <>
-              <Icon name={ICONS.HOUSE} size={Size.SM} />
+              <Icon name={ICONS.HOUSE} size={SIZE.SM} />
               <span className={s.homeLabel()}>{label}</span>
             </>
           ) : (

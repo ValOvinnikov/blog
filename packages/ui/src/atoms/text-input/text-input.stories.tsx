@@ -1,4 +1,4 @@
-import { ICONS, Size } from '@blog/config';
+import { ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
@@ -28,17 +28,17 @@ export const WithLeadingIcon: TStory = {
 
 /** `leadingIcon` accepts any `ReactNode`, not just a glyph — e.g. an `Icon`. */
 export const WithLeadingIconAsIcon: TStory = {
-  args: { leadingIcon: <Icon name={ICONS.CHEVRON_RIGHT} size={Size.SM} /> },
+  args: { leadingIcon: <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} /> },
 };
 
 export const WithTrailingIcon: TStory = {
-  args: { trailingIcon: <Icon name={ICONS.CHEVRON_RIGHT} size={Size.SM} /> },
+  args: { trailingIcon: <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} /> },
 };
 
 export const WithLeadingAndTrailingIcon: TStory = {
   args: {
     leadingIcon: '›',
-    trailingIcon: <Icon name={ICONS.CHEVRON_RIGHT} size={Size.SM} />,
+    trailingIcon: <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />,
   },
 };
 

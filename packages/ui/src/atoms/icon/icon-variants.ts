@@ -1,4 +1,4 @@
-import { Size } from '@blog/config';
+import { SIZE } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -6,13 +6,13 @@ export const iconVariants = tv({
   base: ['shrink-0'],
   variants: {
     size: {
-      [Size.SM]: ['size-4'],
-      [Size.MD]: ['size-4.5'],
-      [Size.LG]: ['size-6'],
+      [SIZE.SM]: ['size-4'],
+      [SIZE.MD]: ['size-4.5'],
+      [SIZE.LG]: ['size-6'],
     },
   },
   defaultVariants: {
-    size: Size.MD,
+    size: SIZE.MD,
   },
 });
 

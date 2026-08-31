@@ -1,4 +1,4 @@
-import { Size } from '@blog/config';
+import { SIZE } from '@blog/config';
 import { Button } from '@blog/ui/atoms/button';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -32,14 +32,14 @@ export const WithVisibleLabel: TStory = {
   args: { label: 'Posting comment', hasLabel: true },
 };
 
-/** Fits inside a compact footprint, such as beside an `Avatar` at `Size.SM`. */
+/** Fits inside a compact footprint, such as beside an `Avatar` at `SIZE.SM`. */
 export const Small: TStory = {
-  args: { size: Size.SM, hasLabel: true },
+  args: { size: SIZE.SM, hasLabel: true },
 };
 
 /** The larger size for a more prominent standalone loading state. */
 export const Large: TStory = {
-  args: { size: Size.LG, hasLabel: true },
+  args: { size: SIZE.LG, hasLabel: true },
 };
 
 /** On a solid `Button` fill, the glyph swaps to `text-brand-primary-contrast` via `className` so it reads against the fill. */

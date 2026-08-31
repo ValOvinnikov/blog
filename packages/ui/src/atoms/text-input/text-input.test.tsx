@@ -1,4 +1,4 @@
-import { ICONS, Size } from '@blog/config';
+import { ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
@@ -53,7 +53,7 @@ describe(`<${TextInput.name}/>`, () => {
       leadingIcon: (
         <Icon
           name={ICONS.CHEVRON_RIGHT}
-          size={Size.SM}
+          size={SIZE.SM}
           dataTestId="leading-icon"
         />
       ),
@@ -83,7 +83,7 @@ describe(`<${TextInput.name}/>`, () => {
       trailingIcon: (
         <Icon
           name={ICONS.CHEVRON_RIGHT}
-          size={Size.SM}
+          size={SIZE.SM}
           dataTestId="trailing-icon"
         />
       ),

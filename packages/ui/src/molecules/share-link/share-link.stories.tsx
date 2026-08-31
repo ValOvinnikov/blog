@@ -1,4 +1,4 @@
-import { ICONS, Size } from '@blog/config';
+import { ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -13,7 +13,7 @@ const meta = {
   args: {
     href: faker.internet.url(),
     label: 'Share on X',
-    icon: <Icon name={ICONS.EXTERNAL_LINK} size={Size.SM} />,
+    icon: <Icon name={ICONS.EXTERNAL_LINK} size={SIZE.SM} />,
   },
 } satisfies Meta<typeof ShareLink>;
 

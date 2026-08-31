@@ -1,4 +1,4 @@
-import { ICONS, Size } from '@blog/config';
+import { ICONS, SIZE } from '@blog/config';
 import { Avatar } from '@blog/ui/atoms/avatar';
 import { Icon } from '@blog/ui/atoms/icon';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -34,7 +34,7 @@ const InteractiveDemo = () => {
         panelId="popover-menu-panel"
         onClick={() => setIsOpen((current) => !current)}
       >
-        <Icon name={ICONS.SHARE} size={Size.SM} />
+        <Icon name={ICONS.SHARE} size={SIZE.SM} />
       </PopoverMenu.Trigger>
       <PopoverMenu.Panel
         id="popover-menu-panel"
@@ -42,7 +42,7 @@ const InteractiveDemo = () => {
         ariaLabel="Menu"
       >
         <PopoverMenu.Item
-          icon={<Icon name={ICONS.EXTERNAL_LINK} size={Size.SM} />}
+          icon={<Icon name={ICONS.EXTERNAL_LINK} size={SIZE.SM} />}
         >
           Copy link
         </PopoverMenu.Item>
@@ -71,14 +71,14 @@ export const Copied: TStory = {
           isOpen={true}
           panelId="popover-menu-panel"
         >
-          <Icon name={ICONS.SHARE} size={Size.SM} />
+          <Icon name={ICONS.SHARE} size={SIZE.SM} />
         </PopoverMenu.Trigger>
         <PopoverMenu.Panel
           id="popover-menu-panel"
           isOpen={true}
           ariaLabel="Menu"
         >
-          <PopoverMenu.Item icon={<Icon name={ICONS.CHECK} size={Size.SM} />}>
+          <PopoverMenu.Item icon={<Icon name={ICONS.CHECK} size={SIZE.SM} />}>
             Copied
           </PopoverMenu.Item>
           <PopoverMenu.Separator />
@@ -103,7 +103,7 @@ export const Closed: TStory = {
           isOpen={false}
           panelId="popover-menu-panel"
         >
-          <Icon name={ICONS.SHARE} size={Size.SM} />
+          <Icon name={ICONS.SHARE} size={SIZE.SM} />
         </PopoverMenu.Trigger>
         <PopoverMenu.Panel
           id="popover-menu-panel"
@@ -111,7 +111,7 @@ export const Closed: TStory = {
           ariaLabel="Menu"
         >
           <PopoverMenu.Item
-            icon={<Icon name={ICONS.EXTERNAL_LINK} size={Size.SM} />}
+            icon={<Icon name={ICONS.EXTERNAL_LINK} size={SIZE.SM} />}
           >
             Copy link
           </PopoverMenu.Item>
@@ -130,7 +130,7 @@ export const BorderedItems: TStory = {
           isOpen={true}
           panelId="popover-menu-panel-bordered"
         >
-          <Icon name={ICONS.SHARE} size={Size.SM} />
+          <Icon name={ICONS.SHARE} size={SIZE.SM} />
         </PopoverMenu.Trigger>
         <PopoverMenu.Panel
           id="popover-menu-panel-bordered"
@@ -139,13 +139,13 @@ export const BorderedItems: TStory = {
         >
           <PopoverMenu.Item
             variant="bordered"
-            icon={<Icon name={ICONS.GITHUB} size={Size.SM} />}
+            icon={<Icon name={ICONS.GITHUB} size={SIZE.SM} />}
           >
             Continue with GitHub
           </PopoverMenu.Item>
           <PopoverMenu.Item
             variant="bordered"
-            icon={<Icon name={ICONS.GOOGLE} size={Size.SM} />}
+            icon={<Icon name={ICONS.GOOGLE} size={SIZE.SM} />}
           >
             Continue with Google
           </PopoverMenu.Item>
@@ -165,7 +165,7 @@ export const AvatarTrigger: TStory = {
           panelId="popover-menu-panel-avatar"
           variant="avatar"
         >
-          <Avatar name="Ada Lovelace" alt="" size={Size.SM} />
+          <Avatar name="Ada Lovelace" alt="" size={SIZE.SM} />
         </PopoverMenu.Trigger>
         <PopoverMenu.Panel
           id="popover-menu-panel-avatar"
