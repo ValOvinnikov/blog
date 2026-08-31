@@ -1,4 +1,4 @@
-import type { TRawFeedPost } from '@blog/service/features/entities/posts/adaptor/all-published.transformer';
+import type { TRawFeedPost } from '@blog/service/features/entities/posts/adaptor/all-published/transformer';
 import type { TRawTagWithPostCount } from '@blog/service/features/entities/tags/adaptor/transformer';
 import type { TRawTopicWithPostCount } from '@blog/service/features/entities/topics/adaptor/transformer';
 import type { TRawTag } from '@blog/service/shared/transformers/to-tag';
