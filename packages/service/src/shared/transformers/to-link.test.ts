@@ -1,11 +1,11 @@
-import { TLINK_TYPE } from '@blog/config';
+import { LINK_TYPE } from '@blog/config';
 
 import { toLink, type TRawLink } from './to-link';
 
 function makeRawLink(overrides: Partial<TRawLink> = {}): TRawLink {
   return {
     label: 'Learn more',
-    linkType: TLINK_TYPE.EXTERNAL,
+    linkType: LINK_TYPE.EXTERNAL,
     url: '/newsletter',
     internalReference: null,
     openInNewTab: null,
@@ -58,7 +58,7 @@ describe('toLink', () => {
   it('resolves an internal blog_post reference to its post route', () => {
     const result = toLink(
       makeRawLink({
-        linkType: TLINK_TYPE.INTERNAL,
+        linkType: LINK_TYPE.INTERNAL,
         internalReference: { _type: 'blog_post', slug: 'hello-world' },
       }),
     );
@@ -69,7 +69,7 @@ describe('toLink', () => {
   it('resolves an internal blog_topic reference to its topic route', () => {
     const result = toLink(
       makeRawLink({
-        linkType: TLINK_TYPE.INTERNAL,
+        linkType: LINK_TYPE.INTERNAL,
         internalReference: { _type: 'blog_topic', slug: 'engineering' },
       }),
     );
@@ -80,7 +80,7 @@ describe('toLink', () => {
   it('resolves an internal page_generic reference to its generic-page route', () => {
     const result = toLink(
       makeRawLink({
-        linkType: TLINK_TYPE.INTERNAL,
+        linkType: LINK_TYPE.INTERNAL,
         internalReference: { _type: 'page_generic', slug: 'about' },
       }),
     );
@@ -91,7 +91,7 @@ describe('toLink', () => {
   it('resolves an internal page_blog reference to the blog index — no slug required', () => {
     const result = toLink(
       makeRawLink({
-        linkType: TLINK_TYPE.INTERNAL,
+        linkType: LINK_TYPE.INTERNAL,
         internalReference: { _type: 'page_blog', slug: null },
       }),
     );
@@ -102,7 +102,7 @@ describe('toLink', () => {
   it('returns undefined when a slug-having internal reference is genuinely missing its slug', () => {
     const result = toLink(
       makeRawLink({
-        linkType: TLINK_TYPE.INTERNAL,
+        linkType: LINK_TYPE.INTERNAL,
         internalReference: { _type: 'blog_post', slug: null },
       }),
     );
@@ -113,7 +113,7 @@ describe('toLink', () => {
   it('returns undefined when an internal link has no reference and no url', () => {
     const result = toLink(
       makeRawLink({
-        linkType: TLINK_TYPE.INTERNAL,
+        linkType: LINK_TYPE.INTERNAL,
         internalReference: null,
         url: null,
       }),

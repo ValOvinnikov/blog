@@ -473,7 +473,7 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
   live in `.claude/agents/web.md` § "Function style".
 - **Key/value-pair consts are always both UPPERCASE** (key === uppercase value),
   `as const`, and live in `@blog/config` (`constants/`). e.g.
-  `export const TLINK_TYPE = { INTERNAL: 'INTERNAL', EXTERNAL: 'EXTERNAL' } as const;`
+  `export const LINK_TYPE = { INTERNAL: 'INTERNAL', EXTERNAL: 'EXTERNAL' } as const;`
   The uppercase value is the stored/serialized value, so schema `options.list`
   and migrations use it too; derive unions with `(typeof C)[keyof typeof C]`.
 

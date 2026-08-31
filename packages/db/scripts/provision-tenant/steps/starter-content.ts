@@ -1,4 +1,4 @@
-import { BRAND_VARIANTS, PRESET_ID, TLINK_TYPE } from '@blog/config/constants';
+import { BRAND_VARIANTS, PRESET_ID, LINK_TYPE } from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 // Fixed document ids (published, not `drafts.`-prefixed) — every field a
@@ -92,7 +92,7 @@ export function buildStarterDocuments(
         _type: 'link',
         _key: 'starter-nav-blog',
         label: 'Blog',
-        linkType: TLINK_TYPE.EXTERNAL,
+        linkType: LINK_TYPE.EXTERNAL,
         url: '/blog',
         openInNewTab: false,
       },
