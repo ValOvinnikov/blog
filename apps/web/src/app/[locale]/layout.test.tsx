@@ -18,6 +18,7 @@ const {
   setRequestLocaleMock,
   isProductionEnvironmentMock,
   useSessionMock,
+  getEnabledOAuthProviderIdsMock,
 } = vi.hoisted(() => ({
   getSiteSettingsMock: vi.fn(),
   getNavigationMock: vi.fn(),
@@ -30,6 +31,11 @@ const {
   setRequestLocaleMock: vi.fn(),
   isProductionEnvironmentMock: vi.fn(),
   useSessionMock: vi.fn(),
+  getEnabledOAuthProviderIdsMock: vi.fn(),
+}));
+
+vi.mock('@blog/auth/utils/oauth-providers/oauth-providers', () => ({
+  getEnabledOAuthProviderIds: getEnabledOAuthProviderIdsMock,
 }));
 
 vi.mock('@web/utils/is-production-environment', () => ({
@@ -107,6 +113,7 @@ describe('LocaleLayout', () => {
     );
     isProductionEnvironmentMock.mockReturnValue(true);
     useSessionMock.mockReturnValue({ data: null, status: 'unauthenticated' });
+    getEnabledOAuthProviderIdsMock.mockReturnValue(['github', 'google']);
   });
 
   describe('generateStaticParams', () => {
@@ -270,5 +277,22 @@ describe('LocaleLayout', () => {
 
     expect(within(panel).queryByText('Guest')).not.toBeInTheDocument();
     expect(within(panel).getByText('Choose a sign-in method')).toBeVisible();
+  });
+
+  it('wires the enabled OAuth provider ids from getEnabledOAuthProviderIds into AuthMenu', async () => {
+    getEnabledOAuthProviderIdsMock.mockReturnValue(['github']);
+
+    await setup();
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Sign in' }));
+    const panel = screen.getByRole('menu');
+
+    expect(
+      within(panel).getByRole('menuitem', { name: 'Continue with GitHub' }),
+    ).toBeVisible();
+    expect(
+      within(panel).queryByRole('menuitem', { name: 'Continue with Google' }),
+    ).not.toBeInTheDocument();
   });
 });

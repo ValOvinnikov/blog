@@ -2,6 +2,7 @@ import { ALERT_TYPE } from '@blog/config';
 import { queries } from '@blog/db';
 import { StudioMount } from '@blog/studio';
 import { Alert } from '@platform/components/shared/alert';
+import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { resolveDashboardTenant } from '@platform/server/auth/resolve-dashboard-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
@@ -21,10 +22,20 @@ export async function generateMetadata(): Promise<Metadata> {
  */
 export default async function DashboardStudioPage() {
   const { tenant } = await resolveDashboardTenant();
+  const t = await getTranslations('studioPage');
+
+  if (tenant.deprovisionedAt) {
+    return (
+      <>
+        <PageHeader title={t('title')} />
+        <ArchivedTenantNotice archivedAt={tenant.deprovisionedAt} />
+      </>
+    );
+  }
+
   const credentials = await queries.tenants.getTenantSanityCredentials(
     tenant.id,
   );
-  const t = await getTranslations('studioPage');
 
   if (!credentials) {
     return (

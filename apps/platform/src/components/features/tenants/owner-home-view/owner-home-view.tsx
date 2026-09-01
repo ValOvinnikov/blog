@@ -1,6 +1,7 @@
 import type { TTenant } from '@blog/db/schema/tenants';
 import { DomainCard } from '@platform/components/features/tenants/domain-card';
 import { OwnerCard } from '@platform/components/features/tenants/owner-card';
+import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
@@ -63,6 +64,10 @@ export const OwnerHomeView = ({
           </ExternalLinkButton>
         }
       />
+
+      {tenant.deprovisionedAt && (
+        <ArchivedTenantNotice archivedAt={tenant.deprovisionedAt} />
+      )}
 
       <YourSiteCard tenant={tenant} />
 

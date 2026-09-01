@@ -20,8 +20,13 @@ vi.mock('next-auth/react', () => ({
   signOut: signOutMock,
 }));
 
-const setup = customRender(AuthMenu, {});
-const setupPlain = customRender(AuthMenu, { isPlain: true });
+const setup = customRender(AuthMenu, {
+  oauthProviderIds: ['github', 'google'],
+});
+const setupPlain = customRender(AuthMenu, {
+  oauthProviderIds: ['github', 'google'],
+  isPlain: true,
+});
 
 const setLocationSearch = (search: string) => {
   window.history.replaceState(null, '', `/${search}`);
@@ -143,6 +148,61 @@ describe(`<${AuthMenu.name}/>`, () => {
       );
 
       expect(signInMock).toHaveBeenCalledWith('google');
+    });
+
+    it('renders only the GitHub button when only GitHub is enabled', async () => {
+      setup({ oauthProviderIds: ['github'] });
+      const user = userEvent.setup();
+
+      await user.click(screen.getByRole('button', { name: 'Sign in' }));
+
+      expect(
+        screen.getByRole('menuitem', { name: 'Continue with GitHub' }),
+      ).toBeVisible();
+      expect(
+        screen.queryByRole('menuitem', { name: 'Continue with Google' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('menuitem', { name: 'Continue with email' }),
+      ).toBeVisible();
+    });
+
+    it('renders only the Google button when only Google is enabled', async () => {
+      setup({ oauthProviderIds: ['google'] });
+      const user = userEvent.setup();
+
+      await user.click(screen.getByRole('button', { name: 'Sign in' }));
+
+      expect(
+        screen.queryByRole('menuitem', { name: 'Continue with GitHub' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('menuitem', { name: 'Continue with Google' }),
+      ).toBeVisible();
+      expect(
+        screen.getByRole('menuitem', { name: 'Continue with email' }),
+      ).toBeVisible();
+    });
+
+    it('renders no OAuth buttons when neither provider is enabled, but email sign-in still works', async () => {
+      setup({ oauthProviderIds: [] });
+      const user = userEvent.setup();
+
+      await user.click(screen.getByRole('button', { name: 'Sign in' }));
+
+      expect(
+        screen.queryByRole('menuitem', { name: 'Continue with GitHub' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('menuitem', { name: 'Continue with Google' }),
+      ).not.toBeInTheDocument();
+      await user.click(
+        screen.getByRole('menuitem', { name: 'Continue with email' }),
+      );
+
+      expect(
+        screen.getByRole('textbox', { name: 'Email address' }),
+      ).toBeVisible();
     });
 
     it('expands the email item in place into a field and submit button', async () => {

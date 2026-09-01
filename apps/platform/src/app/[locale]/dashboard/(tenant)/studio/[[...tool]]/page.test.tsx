@@ -82,6 +82,24 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
     expect(screen.queryByTestId('studio-mount')).not.toBeInTheDocument();
   });
 
+  it('shows the archived notice instead of mounting Studio for an archived tenant, without checking credentials', async () => {
+    listTenantsByIdsMock.mockResolvedValue([
+      makeTenant({
+        id: 'tenant-1',
+        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      }),
+    ]);
+
+    await setup();
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Studio' }),
+    ).toBeVisible();
+    expect(screen.getByText('This tenant is archived')).toBeVisible();
+    expect(getTenantSanityCredentialsMock).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('studio-mount')).not.toBeInTheDocument();
+  });
+
   it("mounts Studio with the session tenant's own coordinates and a locale-free basePath — never a tenant id from the URL, since this route carries none", async () => {
     listTenantsByIdsMock.mockResolvedValue([
       makeTenant({ id: 'tenant-1', name: 'Acme Inc.' }),

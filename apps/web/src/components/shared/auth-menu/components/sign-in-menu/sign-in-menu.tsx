@@ -1,6 +1,7 @@
 'use client';
 
-import { ICONS, SIZE } from '@blog/config';
+import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
+import { ICONS, SIZE, type TIconName } from '@blog/config';
 import { Button } from '@blog/ui/atoms/button';
 import { Icon } from '@blog/ui/atoms/icon';
 import { Text } from '@blog/ui/atoms/text';
@@ -22,6 +23,8 @@ export type TSignInMenuProps = {
   triggerRef: RefObject<HTMLButtonElement | null>;
   panelRef: RefObject<HTMLDivElement | null>;
   oauthError: string | null;
+  /** Auth.js provider ids to render a button for, server-derived from credential presence. */
+  oauthProviderIds: readonly TOAuthProviderId[];
   /** Renders the panel without the `WindowChrome` terminal shell. */
   isPlain?: boolean;
 };
@@ -41,6 +44,7 @@ export const SignInMenu = ({
   triggerRef,
   panelRef,
   oauthError,
+  oauthProviderIds,
   isPlain = false,
 }: TSignInMenuProps) => {
   const t = useTranslations('authMenu');
@@ -69,11 +73,13 @@ export const SignInMenu = ({
     emailSent,
   } = signInMenuVariants();
 
-  // `providerId` is the Auth.js provider id (`auth.ts`'s `GitHub`/`Google`
-  // configs use next-auth's default lowercase ids, no `id` override) —
-  // deliberately kept separate from `icon`, the unrelated `ICONS` key used
-  // only to pick which `<Icon />` glyph renders.
-  const providers = [
+  // `providerId` is the Auth.js provider id (next-auth's default lowercase
+  // ids) — kept separate from `icon`, the unrelated `ICONS` key.
+  const allProviders: {
+    providerId: TOAuthProviderId;
+    icon: TIconName;
+    label: string;
+  }[] = [
     {
       providerId: 'github',
       icon: ICONS.GITHUB,
@@ -85,6 +91,9 @@ export const SignInMenu = ({
       label: t('continueWithGoogle'),
     },
   ];
+  const providers = allProviders.filter(({ providerId }) =>
+    oauthProviderIds.includes(providerId),
+  );
 
   const menuContent = (
     <>
