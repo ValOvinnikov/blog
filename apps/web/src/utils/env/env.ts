@@ -33,9 +33,9 @@ export const env = createEnv({
     // opt-in set only on the Vercel project(s) where those dashboard
     // features are actually enabled — same human-gated console posture as
     // this repo's other one-time Vercel/Sanity setup (`docs/DEPLOY.md`).
-    // Named `WEB_` rather than `VERCEL_` because Vercel reserves the entire
-    // `VERCEL_` prefix for its own system-injected variables — a custom var
-    // with that prefix can never actually be created in the dashboard.
+    // Named `WEB_` because this is a repo-owned feature flag, not a
+    // Vercel-owned value — this repo's convention keeps values we define
+    // under our own namespace rather than a vendor's.
     // Server-only: whether `<Analytics />`/`<SpeedInsights />` render at all
     // is decided in the root layout (a Server Component) before the RSC
     // payload is built, so the flag never needs to reach the client bundle.

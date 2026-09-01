@@ -74,8 +74,8 @@ deploy via the Vercel CLI in CI): `<VERCEL_TOKEN>` (account token) and
 `<VERCEL_ORG_ID>` are shared across all four projects; `<VERCEL_PROJECT_ID>` is
 **per project** (`blog-dev` / `blog-prod` and `admin-dev` / `admin-prod`, each
 read from `vercel link`) — the web and admin project ids are stored as two
-distinct GitHub Environment variables (`VERCEL_PROJECT_ID` /
-`VERCEL_PROJECT_ID_ADMIN`).
+distinct GitHub Environment variables (`VERCEL_PROJECT_ID_WEB` /
+`VERCEL_PROJECT_ID_PLATFORM`).
 
 ---
 
@@ -162,23 +162,23 @@ linking + domains remain:
 
 - [ ] **`blog-dev`**
   - [ ] From repo root: `npx vercel link` → select `blog-dev`. Read the ids from
-        `.vercel/project.json` → `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
+        `.vercel/project.json` → `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID_WEB`.
         (Then delete the local `.vercel/` dir — it's gitignored scratch.)
 - [ ] **`blog-prod`**
   - [ ] From repo root: `npx vercel link` → select `blog-prod`. Read the ids
-        from `.vercel/project.json` → `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
+        from `.vercel/project.json` → `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID_WEB`.
         (Then delete the local `.vercel/` dir — it's gitignored scratch.)
 - [ ] **`admin-dev`**
   - [ ] From repo root: `npx vercel link` → select `admin-dev`. Read
         `VERCEL_PROJECT_ID` from `.vercel/project.json` → this is
-        `VERCEL_PROJECT_ID_ADMIN` for the `development` GitHub Environment.
+        `VERCEL_PROJECT_ID_PLATFORM` for the `development` GitHub Environment.
         (Then delete the local `.vercel/` dir.)
   - [ ] Settings → Domains → add `admin-dev.{your-hosting}`; add the DNS record
         it shows you, same as above.
 - [ ] **`admin-prod`**
   - [ ] From repo root: `npx vercel link` → select `admin-prod`. Read
         `VERCEL_PROJECT_ID` from `.vercel/project.json` → this is
-        `VERCEL_PROJECT_ID_ADMIN` for the `production` GitHub Environment.
+        `VERCEL_PROJECT_ID_PLATFORM` for the `production` GitHub Environment.
         (Then delete the local `.vercel/` dir.)
   - [ ] Settings → Domains → add `admin.{your-hosting}`; add the DNS record it
         shows you, same as above. This must match the `ADMIN_APP_BASE_URL`
@@ -446,8 +446,8 @@ job resolves its own project's id + token:
       Postgres section above and #2057.
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
-- [ ] Variable `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (**blog-dev**)
-- [ ] Variable `VERCEL_PROJECT_ID_ADMIN` = `<VERCEL_PROJECT_ID>` (**admin-dev**)
+- [ ] Variable `VERCEL_PROJECT_ID_WEB` = `<VERCEL_PROJECT_ID>` (**blog-dev**)
+- [ ] Variable `VERCEL_PROJECT_ID_PLATFORM` = `<VERCEL_PROJECT_ID>` (**admin-dev**)
       — the `deploy-admin` job's target; until it's set that job no-ops green.
 
 **`production` environment**
@@ -464,8 +464,8 @@ job resolves its own project's id + token:
       the Neon Postgres section above for the incident that motivated it).
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
-- [ ] Variable `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (**blog-prod**)
-- [ ] Variable `VERCEL_PROJECT_ID_ADMIN` = `<VERCEL_PROJECT_ID>` (**admin-prod**)
+- [ ] Variable `VERCEL_PROJECT_ID_WEB` = `<VERCEL_PROJECT_ID>` (**blog-prod**)
+- [ ] Variable `VERCEL_PROJECT_ID_PLATFORM` = `<VERCEL_PROJECT_ID>` (**admin-prod**)
       — the `deploy-admin` job's target; until it's set that job no-ops green.
 - [ ] (Optional) require a reviewer on `production` for a manual gate before prod
       deploys run.
@@ -542,8 +542,8 @@ environment` rather than silently falling through to the wrong branch.
       to `development` now points its provisioning/deprovisioning dispatches
       at the `development` tenant registry too, not just the Sanity dataset.
       See `docs/context/environment-variables.md`.
-- [ ] `VERCEL_TOKEN` / `VERCEL_PROJECT_ID` above are reused as-is.
-      `VERCEL_PROJECT_ID` here means the **shared web** project (`blog-prod`)
+- [ ] `VERCEL_TOKEN` / `VERCEL_PROJECT_ID_WEB` above are reused as-is.
+      `VERCEL_PROJECT_ID_WEB` here means the **shared web** project (`blog-prod`)
       — the one the "Map domain" step adds every tenant's custom domain to,
       never a per-tenant project.
 - [ ] Variable `WEB_APP_URL` — the deployed `apps/web` origin (no trailing

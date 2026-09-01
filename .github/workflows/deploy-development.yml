@@ -279,7 +279,7 @@ jobs:
       # Org/project ids are not sensitive — they live as environment-scoped
       # Variables (not Secrets) so they stay inspectable in run logs.
       VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_WEB }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -303,7 +303,7 @@ jobs:
           # Without both ids the CLI silently auto-links to whatever project
           # matches the directory name — fail loudly instead.
           : "${VERCEL_ORG_ID:?empty — set the VERCEL_ORG_ID Variable on the development environment}"
-          : "${VERCEL_PROJECT_ID:?empty — set the VERCEL_PROJECT_ID Variable on the development environment}"
+          : "${VERCEL_PROJECT_ID:?empty — set the VERCEL_PROJECT_ID_WEB Variable on the development environment}"
           # npx (not `npm install -g`) keeps zizmor's ad-hoc-install audit
           # green; the package is cached after the first resolution.
           npx --yes "vercel@${VERCEL_CLI_VERSION}" pull --yes --environment=production --token="$VERCEL_TOKEN"
@@ -327,10 +327,10 @@ jobs:
       # Org/project ids are not sensitive — they live as environment-scoped
       # Variables (not Secrets) so they stay inspectable in run logs.
       VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
-      # Distinct GitHub Environment variable from deploy-web's VERCEL_PROJECT_ID
+      # Distinct GitHub Environment variable from deploy-web's VERCEL_PROJECT_ID_WEB
       # (platform-dev is its own Vercel project, rooted at apps/platform) — mapped to
       # the local name the Vercel CLI actually reads.
-      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_ADMIN }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_PLATFORM }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -348,7 +348,7 @@ jobs:
       # --prod targets its main URL. Guarded on VERCEL_PROJECT_ID (not
       # VERCEL_TOKEN, which deploy-web already has configured) so this stays a
       # true no-op until the platform-dev Vercel project exists and
-      # VERCEL_PROJECT_ID_ADMIN is set.
+      # VERCEL_PROJECT_ID_PLATFORM is set.
       - name: Deploy to Vercel (platform-dev)
         if: ${{ env.VERCEL_PROJECT_ID != '' }}
         run: |
