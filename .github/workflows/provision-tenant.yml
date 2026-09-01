@@ -74,7 +74,7 @@ jobs:
       VERCEL_TEAM_ID: ${{ vars.VERCEL_TEAM_ID }}
       # The *shared* apps/web Vercel project — step 4 adds every tenant's
       # custom domain to this one project, never a per-tenant project.
-      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+      VERCEL_PROJECT_ID_WEB: ${{ vars.VERCEL_PROJECT_ID_WEB }}
       # Overridable per-dispatch via the adminAppBaseUrl input (e.g. a local
       # tunnel URL) for manual testing — real dispatches from apps/platform's
       # dispatch-provisioning-workflow.ts never set this input, so they

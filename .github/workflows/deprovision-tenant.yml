@@ -78,7 +78,7 @@ jobs:
       VERCEL_TEAM_ID: ${{ vars.VERCEL_TEAM_ID }}
       # The *shared* apps/web Vercel project — step 1 removes the tenant's
       # domain from this one project, never a per-tenant project.
-      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+      VERCEL_PROJECT_ID_WEB: ${{ vars.VERCEL_PROJECT_ID_WEB }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
