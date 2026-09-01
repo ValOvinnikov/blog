@@ -23,7 +23,7 @@ Architecture rationale lives in `SPEC.md` §13 and
 > `<PRD_PROJECT_ID>` below). Because Sanity **tokens are project-scoped**, dev and
 > prod each need their own read + deploy tokens, wired as **environment-scoped**
 > GitHub secrets/variables (the `development` / `production` GitHub Environments),
-> not repo-level. `blog-dev` and `blog-prod` likewise point
+> not repo-level. `blog-web-dev` and `blog-web-prod` likewise point
 > `NEXT_PUBLIC_SANITY_PROJECT_ID` at different project ids.
 
 ---
@@ -34,8 +34,8 @@ Architecture rationale lives in `SPEC.md` §13 and
 | ---------------------- | --------------------------------- | ---------------------------------- |
 | Sanity project         | separate dev project (id via env) | separate prod project (id via env) |
 | Sanity dataset         | `development`                     | `production`                       |
-| Vercel project (web)   | `blog-dev`                        | `blog-prod`                        |
-| Vercel project (admin) | `admin-dev`                       | `admin-prod`                       |
+| Vercel project (web)   | `blog-web-dev`                    | `blog-web-prod`                    |
+| Vercel project (admin) | `platform-dev`                    | `platform-prod`                    |
 | Web URL (initial)      | `<DEV_WEB_URL>`                   | `<PRD_WEB_URL>`                    |
 | Admin URL (initial)    | `<DEV_ADMIN_URL>`                 | `<PRD_ADMIN_URL>`                  |
 | Deploy trigger         | push/merge to `main`              | push git tag `v*`                  |
@@ -43,6 +43,8 @@ Architecture rationale lives in `SPEC.md` §13 and
 | Admin deploy           | Vercel CLI (GitHub Actions)       | Vercel CLI (GitHub Actions)        |
 | CI gate before deploy  | `verify` job on `main`            | `verify` job on the `v*` tag       |
 | Revalidation webhook   | dev → dev site                    | prod → prod site                   |
+
+> **Project name vs. hostname.** The Vercel _projects_ are named `blog-web-dev`/`blog-web-prod` and `platform-dev`/`platform-prod`; the _hostnames_ they serve are `blog-dev.{your-hosting}` and `admin-dev.{your-hosting}` (and the apex plus `admin.{your-hosting}` in production). The two do not match, and both appear in this file on purpose — `vercel link` and the project settings use the project name, while anything you visit in a browser uses the hostname.
 
 > `<DEV_ADMIN_URL>` / `<PRD_ADMIN_URL>` are the admin panel's equivalents, on
 > its own two projects.
@@ -73,7 +75,7 @@ within this doc; the real values live in GitHub / Vercel / local `.env` and are
 Vercel (needed for **both** environments — the web app and the admin panel each
 deploy via the Vercel CLI in CI): `<VERCEL_TOKEN>` (account token) and
 `<VERCEL_ORG_ID>` are shared across all four projects; `<VERCEL_PROJECT_ID>` is
-**per project** (`blog-dev` / `blog-prod` and `admin-dev` / `admin-prod`, each
+**per project** (`blog-web-dev` / `blog-web-prod` and `platform-dev` / `platform-prod`, each
 read from `vercel link`) — the web and admin project ids are stored as two
 distinct GitHub Environment variables (`VERCEL_PROJECT_ID_WEB` /
 `VERCEL_PROJECT_ID_PLATFORM`).
@@ -135,23 +137,23 @@ Studio is no longer a deploy target of its own: it ships as the `@blog/studio`
 package and is mounted by the admin panel, so it has no project, no hostname
 and no deploy job.
 
-- **Web:** `blog-dev`, `blog-prod` — Add New → Project → import
+- **Web:** `blog-web-dev`, `blog-web-prod` — Add New → Project → import
   `{github_account}/blog`; **Root Directory `apps/web`** + tick _"Include files
   outside of the root directory"_; **Node.js 22.x**.
-- **Admin:** `admin-dev`, `admin-prod` — same import flow; **Root Directory
+- **Admin:** `platform-dev`, `platform-prod` — same import flow; **Root Directory
   `apps/platform`** + tick _"Include files outside of the root directory"_;
   **Node.js 22.x**. A separate project rather than a second domain on
-  `blog-dev`/`blog-prod`: a Vercel project has exactly one Root Directory,
+  `blog-web-dev`/`blog-web-prod`: a Vercel project has exactly one Root Directory,
   and the panel is a second Next.js app under `apps/platform`.
 
-`blog-*` and `admin-*` have Vercel's Git auto-deploy **disabled** — every deploy
+`blog-web-*` and `platform-*` have Vercel's Git auto-deploy **disabled** — every deploy
 goes through a CI-gated GitHub Actions job (no pre-merge/preview deploys,
 nothing deploys before checks pass). This is set **once, in code**, via each
 app's own `vercel.json`'s `git.deploymentEnabled: false` (`apps/web`,
 `apps/platform`) — since the two projects sharing a Root Directory
 get the same committed file, it can't silently drift the way a per-project
 console toggle (the old "Ignored Build Step" setting) could — a missed
-one-time click on `blog-prod` once meant it deployed on every branch push,
+one-time click on `blog-web-prod` once meant it deployed on every branch push,
 uncontrolled, until #445 replaced it with this file.
 
 `apps/platform` was considered for branch previews (a panel whose purpose is
@@ -164,7 +166,8 @@ real admin domain either, since `AUTH_COOKIE_DOMAIN` (below) cannot be scoped
 to `vercel.app`, which is on the Public Suffix List. A preview you can't sign
 in to can't be reviewed, so previews would cost a standing OAuth chore and a
 new grant of preview database access while delivering nothing. Admin changes
-are reviewed on `admin-dev`, which deploys automatically on merge.
+are reviewed on `admin-dev.{your-hosting}`, which deploys automatically on
+merge.
 
 > **Legacy projects still in the console.** `cms-dev`, `cms-prod`,
 > `studio-demo` and `studio-demo-1` predate the Studio becoming a package.
@@ -178,23 +181,23 @@ are reviewed on `admin-dev`, which deploys automatically on merge.
 Nothing to set per project in the dashboard for this anymore; only project
 linking + domains remain:
 
-- [ ] **`blog-dev`**
-  - [ ] From repo root: `npx vercel link` → select `blog-dev`. Read the ids from
+- [ ] **`blog-web-dev`**
+  - [ ] From repo root: `npx vercel link` → select `blog-web-dev`. Read the ids from
         `.vercel/project.json` → `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID_WEB`.
         (Then delete the local `.vercel/` dir — it's gitignored scratch.)
-- [ ] **`blog-prod`**
-  - [ ] From repo root: `npx vercel link` → select `blog-prod`. Read the ids
+- [ ] **`blog-web-prod`**
+  - [ ] From repo root: `npx vercel link` → select `blog-web-prod`. Read the ids
         from `.vercel/project.json` → `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID_WEB`.
         (Then delete the local `.vercel/` dir — it's gitignored scratch.)
-- [ ] **`admin-dev`**
-  - [ ] From repo root: `npx vercel link` → select `admin-dev`. Read
+- [ ] **`platform-dev`**
+  - [ ] From repo root: `npx vercel link` → select `platform-dev`. Read
         `VERCEL_PROJECT_ID` from `.vercel/project.json` → this is
         `VERCEL_PROJECT_ID_PLATFORM` for the `development` GitHub Environment.
         (Then delete the local `.vercel/` dir.)
   - [ ] Settings → Domains → add `admin-dev.{your-hosting}`; add the DNS record
         it shows you, same as above.
-- [ ] **`admin-prod`**
-  - [ ] From repo root: `npx vercel link` → select `admin-prod`. Read
+- [ ] **`platform-prod`**
+  - [ ] From repo root: `npx vercel link` → select `platform-prod`. Read
         `VERCEL_PROJECT_ID` from `.vercel/project.json` → this is
         `VERCEL_PROJECT_ID_PLATFORM` for the `production` GitHub Environment.
         (Then delete the local `.vercel/` dir.)
@@ -204,7 +207,7 @@ linking + domains remain:
 
 #### Vercel env vars
 
-**Web** (`blog-dev` / `blog-prod`, Production scope — `deploy-development.yml`
+**Web** (`blog-web-dev` / `blog-web-prod`, Production scope — `deploy-development.yml`
 and `deploy-production.yml` both run `vercel pull --environment=production`
 before `vercel build`, so a var scoped only to Preview/Development is never
 pulled, and — for a required key like `DATABASE_URL` — the app fails at its
@@ -213,7 +216,7 @@ the Preview-scope note below) — same five keys per project; each project
 points at its **own** Sanity project, so the id / dataset / URL / tokens all
 differ:
 
-| Key                             | `blog-dev` value          | `blog-prod` value         |
+| Key                             | `blog-web-dev` value      | `blog-web-prod` value     |
 | ------------------------------- | ------------------------- | ------------------------- |
 | `NEXT_PUBLIC_SANITY_PROJECT_ID` | `<DEV_PROJECT_ID>`        | `<PRD_PROJECT_ID>`        |
 | `NEXT_PUBLIC_SANITY_DATASET`    | `development`             | `production`              |
@@ -237,7 +240,7 @@ differ:
 subscribers, `SPEC.md` §4/§8) needs two connection strings, same Production
 scope as the five keys above:
 
-| Key                           | `blog-dev` value              | `blog-prod` value             |
+| Key                           | `blog-web-dev` value          | `blog-web-prod` value         |
 | ----------------------------- | ----------------------------- | ----------------------------- |
 | `DATABASE_URL`                | `<DEV_DATABASE_URL>` (pooled) | `<PRD_DATABASE_URL>` (pooled) |
 | `DATABASE_URL_UNPOOLED`       | `<DEV_DATABASE_URL_UNPOOLED>` | `<PRD_DATABASE_URL_UNPOOLED>` |
@@ -269,7 +272,7 @@ scope as the five keys above:
 Unlike Sanity (a separate **project** per environment), Neon uses one project
 with **branches**. This repo's Neon project has two today: `main` (the
 project's original/default branch, backing production) and `development`
-(branched off `main` on 2026-08-25, backing `blog-dev`). Before that date only
+(branched off `main` on 2026-08-25, backing `blog-web-dev`). Before that date only
 `main` existed and both environments read it — `development`'s data started as
 whatever `main` held at branch time, not a synced or continuously-refreshed
 copy (that's a separate, Sanity-only workflow — see "Refreshing development
@@ -300,16 +303,17 @@ two-branch split is recent and the secret wiring has not fully caught up:
   tenant-registry dispatch can no longer silently repoint a production
   migration. That split (#2056, merged 2026-08-25) fixed a real incident: the
   two purposes used to share one secret, and pointing it at `development` to
-  unblock tenant provisioning from `admin-dev` had silently repointed a
+  unblock tenant provisioning from `admin-dev.{your-hosting}` had silently
+  repointed a
   production tag's `migrate-db` step at `development` too, leaving `main`
   unmigrated while reporting success — the same silent-wrong-branch failure
   mode #2264's guard now catches structurally, not just for this one
   incident's specific cause.
-- `blog-dev`'s Vercel `DATABASE_URL` may be scoped to Preview+Development
+- `blog-web-dev`'s Vercel `DATABASE_URL` may be scoped to Preview+Development
   rather than Production; `deploy-development.yml` builds via
   `vercel pull --environment=production`, which would not read a
   Preview+Development-scoped value. Unconfirmed whether this breaks any live
-  route on `blog-dev` — tracked in #2058.
+  route on `blog-dev.{your-hosting}` — tracked in #2058.
 
 **Pooled vs. unpooled — the distinction that caused confusion during setup.**
 Neon gives each branch two connection strings from **Connection details**: a
@@ -368,7 +372,7 @@ Provisioning notes for recreating this from scratch:
       mis-set `production` secret fails it loudly instead of silently
       migrating the wrong branch (or nothing at all) while reporting success.
 
-**Admin** (`admin-dev` / `admin-prod`, Production scope). The panel runs its
+**Admin** (`platform-dev` / `platform-prod`, Production scope). The panel runs its
 **own** Node process, so it needs
 its own copy of every variable it reads: `@blog/auth` declares the auth set
 with `runtimeEnv: process.env` and neither app declares them itself any more
@@ -378,10 +382,10 @@ not where they are _needed_. It never touches Sanity, so none of the
 
 Required — the app cannot serve without these:
 
-| Key            | `admin-dev` value             | `admin-prod` value            |
-| -------------- | ----------------------------- | ----------------------------- |
-| `AUTH_SECRET`  | same value as `blog-dev`'s    | same value as `blog-prod`'s   |
-| `DATABASE_URL` | `<DEV_DATABASE_URL>` (pooled) | `<PRD_DATABASE_URL>` (pooled) |
+| Key            | `platform-dev` value           | `platform-prod` value           |
+| -------------- | ------------------------------ | ------------------------------- |
+| `AUTH_SECRET`  | same value as `blog-web-dev`'s | same value as `blog-web-prod`'s |
+| `DATABASE_URL` | `<DEV_DATABASE_URL>` (pooled)  | `<PRD_DATABASE_URL>` (pooled)   |
 
 > **Keep `AUTH_SECRET` byte-identical to the paired web project's** — but
 > know why, because the reason is not the one this file used to give. Under
@@ -457,7 +461,7 @@ so browsers reject a cookie scoped to it. If it is ever set, it must carry the
 
 > `NEWSLETTER_FROM_ADDRESS` is `apps/web`-only — do **not** set it here.
 > `TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE` is a local-dev escape hatch and
-> must **never** be set on `admin-prod`.
+> must **never** be set on `platform-prod`.
 
 > Every key above is **Production scope only**, same as the web projects — see
 > the Preview-scope note under the web keys above.
@@ -494,8 +498,8 @@ job resolves its own project's id + token:
       Postgres section above and #2057.
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
-- [ ] Variable `VERCEL_PROJECT_ID_WEB` = `<VERCEL_PROJECT_ID>` (**blog-dev**)
-- [ ] Variable `VERCEL_PROJECT_ID_PLATFORM` = `<VERCEL_PROJECT_ID>` (**admin-dev**)
+- [ ] Variable `VERCEL_PROJECT_ID_WEB` = `<VERCEL_PROJECT_ID>` (**blog-web-dev**)
+- [ ] Variable `VERCEL_PROJECT_ID_PLATFORM` = `<VERCEL_PROJECT_ID>` (**platform-dev**)
       — the `deploy-admin` job's target; until it's set that job no-ops green.
 
 **`production` environment**
@@ -512,8 +516,8 @@ job resolves its own project's id + token:
       the Neon Postgres section above for the incident that motivated it).
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
-- [ ] Variable `VERCEL_PROJECT_ID_WEB` = `<VERCEL_PROJECT_ID>` (**blog-prod**)
-- [ ] Variable `VERCEL_PROJECT_ID_PLATFORM` = `<VERCEL_PROJECT_ID>` (**admin-prod**)
+- [ ] Variable `VERCEL_PROJECT_ID_WEB` = `<VERCEL_PROJECT_ID>` (**blog-web-prod**)
+- [ ] Variable `VERCEL_PROJECT_ID_PLATFORM` = `<VERCEL_PROJECT_ID>` (**platform-prod**)
       — the `deploy-admin` job's target; until it's set that job no-ops green.
 - [ ] (Optional) require a reviewer on `production` for a manual gate before prod
       deploys run.
@@ -560,13 +564,13 @@ environment` rather than silently falling through to the wrong branch.
       without it the project is silently created in whichever org the
       token's owner defaults to, not necessarily this one.
 - [ ] Secret `TENANT_TOKEN_ENCRYPTION_KEY` — the **same** value already set
-      as the `blog-prod`-adjacent Vercel env var of the same name
+      as the `blog-web-prod`-adjacent Vercel env var of the same name
       (see the `@blog/db` env vars table above). `setTenantSanityToken`
       throws without it.
 - [ ] Variable `ADMIN_APP_BASE_URL` — the deployed `apps/platform` origin (no
       trailing slash/path), e.g. `https://admin.{your-hosting}`. Used as the
       CORS origin step 1 adds to each new tenant's Sanity project. Must match
-      the domain on the `admin-prod` Vercel project exactly (§3 above).
+      the domain on the `platform-prod` Vercel project exactly (§3 above).
 - [ ] Variable `VERCEL_TEAM_ID` — only needed if the Vercel account is
       team-owned; omit otherwise.
 - [ ] `apps/platform`'s own Vercel project (not this GitHub Actions
@@ -586,12 +590,12 @@ environment` rather than silently falling through to the wrong branch.
       deployment apart from real production. Left unset, provisioning falls
       back to this GitHub Environment's `TENANT_SANITY_DATASET`, unchanged
       from today. The same value is also forwarded as both workflows'
-      `environment` input (§ above) — an `admin-dev` deployment setting this
+      `environment` input (§ above) — a `platform-dev` deployment setting this
       to `development` now points its provisioning/deprovisioning dispatches
       at the `development` tenant registry too, not just the Sanity dataset.
       See `docs/context/environment-variables.md`.
 - [ ] `VERCEL_TOKEN` / `VERCEL_PROJECT_ID_WEB` above are reused as-is.
-      `VERCEL_PROJECT_ID_WEB` here means the **shared web** project (`blog-prod`)
+      `VERCEL_PROJECT_ID_WEB` here means the **shared web** project (`blog-web-prod`)
       — the one the "Map domain" step adds every tenant's custom domain to,
       never a per-tenant project.
 - [ ] Variable `WEB_APP_URL` — the deployed `apps/web` origin (no trailing
@@ -807,9 +811,9 @@ migrate, migrate-db]` (see step 4 below for `migrate-db`). No
    skips) if that Variable is unset or malformed. **No approval gate on
    dev.** See
    `.claude/agents/db.md`'s "Migrations" section.
-5. **`deploy-web`** → `blog-dev` via the Vercel CLI
+5. **`deploy-web`** → `blog-web-dev` via the Vercel CLI
    (`vercel pull → build --prod → deploy --prebuilt --prod`).
-6. **`deploy-admin`** → `admin-dev` via the Vercel CLI, same mechanism.
+6. **`deploy-admin`** → `platform-dev` via the Vercel CLI, same mechanism.
    `needs: [changes, verify, migrate-db]` — it depends on `@blog/db` (it
    writes `site_config`), so it is at least as exposed to schema drift as the
    public site is, but not on `migrate`, since it never reads Sanity.
@@ -862,9 +866,9 @@ There are **no PR preview deployments** — deploys happen only on merge to `mai
    the job is a **no-op until that secret is configured** — safe to ship
    ahead of setup. `deploy-web` and `deploy-admin` `need` it (the Studio never
    touches Postgres). See `.claude/agents/db.md`'s "Migrations" section.
-4. **`deploy-web`** → `blog-prod` via the Vercel CLI
+4. **`deploy-web`** → `blog-web-prod` via the Vercel CLI
    (`vercel pull → build --prod → deploy --prebuilt --prod`).
-5. **`deploy-admin`** → `admin-prod` via the Vercel CLI, same mechanism. A tag
+5. **`deploy-admin`** → `platform-prod` via the Vercel CLI, same mechanism. A tag
    is a deliberate full release, so both apps deploy — there is no change
    detection on the production side.
 
@@ -941,7 +945,7 @@ Unlike everything above, this is **not** part of the dev/prod pipeline — no
 Sanity project, no dataset, no CI-gated migration. It's a single Vercel
 project hosting `@blog/ui`'s Storybook build for visual PR review, and it
 deliberately uses Vercel's Git integration with PR previews **enabled** —
-the opposite of `blog-dev`/`blog-prod`/`admin-dev`/`admin-prod`, whose Git
+the opposite of `blog-web-dev`/`blog-web-prod`/`platform-dev`/`platform-prod`, whose Git
 integration is disabled in favor of a CI-gated deploy. That's intentional:
 `@blog/ui` is pure and prop-driven (no `service`/Sanity import), so there's
 no content or credentials a pre-merge preview could leak — and the entire
