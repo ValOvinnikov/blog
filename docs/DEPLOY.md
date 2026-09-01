@@ -486,7 +486,10 @@ detect or report it.
 
 The deploy jobs run in the `development` / `production` **GitHub Environments**,
 so set these per environment (Settings → Environments → `<env>`) — that's how each
-job resolves its own project's id + token:
+job resolves its own project's id + token. The three tenant lifecycle workflows
+resolve their credentials the same way, from whichever Environment a dispatch
+names, so their block below applies to **both** environments rather than only to
+`production`.
 
 **`development` environment**
 
@@ -497,28 +500,15 @@ job resolves its own project's id + token:
       `drizzle-kit migrate`; same value as the Vercel env var above). **Confirm
       it actually points at the `development` branch** — see the Neon
       Postgres section above and #2057. **Not** read by any of the three
-      tenant lifecycle workflows — see this environment's own
-      `TENANT_REGISTRY_DATABASE_URL` below.
-- [ ] Secret `TENANT_REGISTRY_DATABASE_URL` = `<DEV_DATABASE_URL_UNPOOLED>`
-      (the same value as this environment's own `DATABASE_URL_UNPOOLED`
-      above, under a separate secret name) — read by all three tenant
-      lifecycle workflows when dispatched with `environment: development`.
-      See the `production` environment's own `TENANT_REGISTRY_DATABASE_URL`
-      bullet below for why this stays a separate secret from
-      `DATABASE_URL_UNPOOLED` rather than reusing it.
-- [ ] Secret `SANITY_MANAGEMENT_TOKEN` — the same organization-level token
-      described in the `production` checklist below. Required here too: every
-      tenant lifecycle workflow resolves it from whichever Environment its
-      dispatch targets, so a `development` dispatch reads this copy and fails
-      loudly without it.
-- [ ] (Optional) Secret `RESEND_API_KEY` — only
-      `recheck-tenant-owners.yml`'s operator notification reads it. Unset
-      skips that email; the sweep itself still runs.
+      tenant lifecycle workflows, which read `TENANT_REGISTRY_DATABASE_URL`
+      from the tenant-provisioning block below.
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
 - [ ] Variable `VERCEL_PROJECT_ID_WEB` = `<VERCEL_PROJECT_ID>` (**web-dev**)
 - [ ] Variable `VERCEL_PROJECT_ID_PLATFORM` = `<VERCEL_PROJECT_ID>` (**platform-dev**)
       — the `deploy-admin` job's target; until it's set that job no-ops green.
+- [ ] Every entry in **"Tenant lifecycle — both environments"** below, with this
+      environment's own values.
 
 **`production` environment**
 
@@ -527,19 +517,23 @@ job resolves its own project's id + token:
 - [ ] Secret `DATABASE_URL_UNPOOLED` = `<PRD_DATABASE_URL_UNPOOLED>` (the `main`
       Neon branch's direct connection string — the `migrate-db` job's
       `pg_dump` backup + `drizzle-kit migrate`; same value as the Vercel env
-      var above). **Not** read by any of the three tenant lifecycle
-      workflows (see this environment's own `TENANT_REGISTRY_DATABASE_URL`
-      below), deliberately, so repointing the tenant registry at a
-      different Neon branch can never silently repoint this deploy job too
-      (#2056 — see the Neon Postgres section above for the incident that
-      motivated it).
+      var above). **Not** read by any of the three tenant lifecycle workflows,
+      which read `TENANT_REGISTRY_DATABASE_URL` from the block below,
+      deliberately, so repointing the tenant registry at a different Neon
+      branch can never silently repoint this deploy job too (#2056 — see the
+      Neon Postgres section above for the incident that motivated it).
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
 - [ ] Variable `VERCEL_PROJECT_ID_WEB` = `<VERCEL_PROJECT_ID>` (**web-prod**)
 - [ ] Variable `VERCEL_PROJECT_ID_PLATFORM` = `<VERCEL_PROJECT_ID>` (**platform-prod**)
       — the `deploy-admin` job's target; until it's set that job no-ops green.
+- [ ] Every entry in **"Tenant lifecycle — both environments"** below, with this
+      environment's own values. Every scheduled `recheck-tenant-owners.yml`
+      sweep resolves them from here.
 - [ ] (Optional) require a reviewer on `production` for a manual gate before prod
       deploys run.
+
+**Tenant lifecycle — both environments**
 
 `.github/workflows/provision-tenant.yml`/`deprovision-tenant.yml`
 (`workflow_dispatch` only, the former triggered from `apps/platform`'s "Add
@@ -549,6 +543,19 @@ whichever Environment their dispatch's `environment` input names
 need, including the tenant registry connection string, resolves from that
 same Environment, never a mix of the two.
 
+So every entry below belongs on **both** the `development` and the
+`production` Environment, each holding that environment's own values. A
+fully-configured `production` does nothing for a `development` dispatch: it
+fails on whatever `development` is missing. The three workflows read
+overlapping subsets, so configuring an environment for provisioning covers the
+other two:
+
+| Workflow                    | Reads                                                                                                                |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `provision-tenant.yml`      | all of them except `RESEND_API_KEY`                                                                                  |
+| `deprovision-tenant.yml`    | `SANITY_MANAGEMENT_TOKEN`, `VERCEL_TOKEN`, `VERCEL_TEAM_ID`, `VERCEL_PROJECT_ID_WEB`, `TENANT_REGISTRY_DATABASE_URL` |
+| `recheck-tenant-owners.yml` | `SANITY_MANAGEMENT_TOKEN`, `TENANT_REGISTRY_DATABASE_URL`, and optionally `RESEND_API_KEY`                           |
+
 `recheck-tenant-owners.yml` also runs on a `schedule:`, and a scheduled run
 carries no `inputs` context at all, so its binding is
 `${{ inputs.environment || 'production' }}` rather than the bare input its
@@ -556,93 +563,104 @@ two siblings use: every cron sweep targets `production`, and only a manual
 dispatch can point it at `development`.
 
 > **`TENANT_REGISTRY_DATABASE_URL` must be created as a Secret, not a
-> Variable, in both the `development` and `production` environments** (see
-> this environment's bullet below and the `development` environment's own
-> above). GitHub Environments keep Secrets and Variables in separate
-> namespaces — `secrets.NAME` and `vars.NAME` never see each other's values.
-> All three tenant lifecycle workflows read
+> Variable, in both environments.** GitHub Environments keep Secrets and
+> Variables in separate namespaces — `secrets.NAME` and `vars.NAME` never see
+> each other's values. All three tenant lifecycle workflows read
 > `secrets.TENANT_REGISTRY_DATABASE_URL` specifically; creating it as a
 > Variable by mistake leaves the secret unset, and the job fails every
 > dispatch with an empty `DATABASE_URL` rather than silently falling through
 > to the wrong branch.
 
-- [ ] Secret `TENANT_REGISTRY_DATABASE_URL` = `<PRD_DATABASE_URL_UNPOOLED>`
-      (the same value as this environment's own `DATABASE_URL_UNPOOLED`
-      above, under a separate secret name) — read by all three tenant
-      lifecycle workflows when dispatched with `environment: production`
-      (the default), and by every scheduled `recheck-tenant-owners.yml`
-      sweep. Deliberately a **different
-      secret name** from `DATABASE_URL_UNPOOLED`, even though the value is
-      identical here, so retargeting the tenant registry can never silently
-      retarget this deploy job's own migration too. The `development`
-      environment carries its own copy of this same secret — see that
-      environment's checklist above.
+- [ ] Secret `TENANT_REGISTRY_DATABASE_URL` = that environment's own
+      `DATABASE_URL_UNPOOLED` value (`<DEV_DATABASE_URL_UNPOOLED>` on
+      `development`, `<PRD_DATABASE_URL_UNPOOLED>` on `production`), under a
+      separate secret name — the workflows read it as `DATABASE_URL`.
+      Deliberately a **different secret name** from `DATABASE_URL_UNPOOLED`,
+      even though the value is identical within each environment, so
+      retargeting the tenant registry can never silently retarget that
+      environment's own deploy migration too.
 - [ ] **Delete** the retired Secrets `TENANT_REGISTRY_DATABASE_URL_DEV` and
-      `TENANT_REGISTRY_DATABASE_URL_PROD`. `recheck-tenant-owners.yml` was
-      their only reader and now resolves this environment's own
-      `TENANT_REGISTRY_DATABASE_URL` above, like its two siblings. Leaving
-      them in place is harmless to any workflow but re-creates exactly the
-      drift the split caused: several secrets holding the same connection
-      string, only one of which anyone remembers to rotate.
+      `TENANT_REGISTRY_DATABASE_URL_PROD` from `production`.
+      `recheck-tenant-owners.yml` was their only reader and now resolves each
+      environment's own `TENANT_REGISTRY_DATABASE_URL` above, like its two
+      siblings. Leaving them in place is harmless to any workflow but
+      re-creates exactly the drift the split caused: several secrets holding
+      the same connection string, only one of which anyone remembers to
+      rotate.
 - [ ] Secret `SANITY_MANAGEMENT_TOKEN` — an **organization-level** Sanity
       token with "create project" permission (broader than `SANITY_MIGRATE_TOKEN`,
       which is scoped to one already-existing project). Mint it at
       https://manage.sanity.io → your organization → API → Tokens. Used to
-      create each new tenant's Sanity project/dataset/CORS entry and to mint
-      its transient seed-content token and its persisted read-only token.
+      create each new tenant's Sanity project/dataset/CORS entry, to mint its
+      transient seed-content token and its persisted read-only token, and by
+      the owner-elevation sweep to read and grant tenant project ACLs.
 - [ ] Variable `SANITY_ORGANIZATION_ID` — the Sanity organization id every
       tenant project must be created under (find it at
       https://manage.sanity.io → your organization → Settings). Sent as
       `organizationId` in the Management API's `POST /projects` body;
       without it the project is silently created in whichever org the
-      token's owner defaults to, not necessarily this one.
-- [ ] Secret `TENANT_TOKEN_ENCRYPTION_KEY` — the **same** value already set
-      as the `web-prod`-adjacent Vercel env var of the same name (see
-      the `@blog/db` env vars table above). `provision-tenant.yml`/
-      `deprovision-tenant.yml` resolve this secret from whichever
-      Environment their dispatch targets, so the `development` environment
-      carries its own copy too, matching `web-dev`'s.
-      `setTenantSanityToken` throws without it.
-- [ ] Variable `ADMIN_APP_BASE_URL` — the deployed `apps/platform` origin (no
-      trailing slash/path), e.g. `https://admin.{your-hosting}`. Used as the
-      CORS origin step 1 adds to each new tenant's Sanity project. Must match
-      the domain on the `platform-prod` Vercel project exactly (§3 above).
+      token's owner defaults to, not necessarily this one. Read by
+      `provision-tenant.yml` only.
+- [ ] Secret `TENANT_TOKEN_ENCRYPTION_KEY` — the **same** value already set as
+      the Vercel env var of the same name on that environment's `apps/web`
+      project (see the `@blog/db` env vars table above): `web-dev`'s on
+      `development`, `web-prod`'s on `production`. `setTenantSanityToken`
+      throws without it.
+- [ ] Variable `ADMIN_APP_BASE_URL` — the deployed `apps/platform` origin for
+      that environment (no trailing slash/path), e.g.
+      `https://admin.{your-hosting}`. Used as the CORS origin step 1 adds to
+      each new tenant's Sanity project, so it must match the domain on that
+      environment's Vercel platform project exactly — `platform-dev` on
+      `development`, `platform-prod` on `production` (§3 above).
+- [ ] Variable `TENANT_SANITY_DATASET` — the name of the single dataset created
+      inside each new tenant's Sanity project, set to match the Environment it
+      lives on. Externalized as a variable rather than hardcoded in TS;
+      `provision-tenant.yml` also accepts a per-dispatch `tenantSanityDataset`
+      input that overrides it for manual testing, which the wizard's real
+      dispatches never set.
+- [ ] Variable `WEB_APP_URL` — the deployed `apps/web` origin for that
+      environment (no trailing slash), e.g. `https://{your-web-domain}`. Used
+      to build the target URL for the revalidation webhook
+      `provision-tenant.yml` creates on each new tenant's Sanity project.
+- [ ] Secret `SANITY_REVALIDATE_SECRET` — the **same** value already set as
+      that environment's `apps/web` `SANITY_REVALIDATE_SECRET` Vercel env var.
+      Every tenant's webhook is created with this shared secret; a mismatch
+      makes that tenant's webhook calls fail `apps/web`'s signature check, so
+      content publishes in that tenant's Studio never trigger revalidation.
+- [ ] (Optional) Secret `RESEND_API_KEY` — the same shared secret name
+      `apps/web`/`apps/platform` already use for their own Resend sends. Only
+      `recheck-tenant-owners.yml`'s operator notification reads it; unset
+      skips that email, and the sweep itself still runs.
 - [ ] Variable `VERCEL_TEAM_ID` — only needed if the Vercel account is
       team-owned; omit otherwise.
-- [ ] `apps/platform`'s own Vercel project (not this GitHub Actions
-      environment) needs env var `TENANT_PROVISIONING_GITHUB_REPO` = `<owner>/<repo>`
-      (e.g. `ValOvinnikov/blog`), paired with its own
-      `TENANT_PROVISIONING_GITHUB_TOKEN` — the "Add tenant" wizard's and the
-      tenant status page's "Deprovision tenant" control's Server Actions
-      dispatch `provision-tenant.yml`/`deprovision-tenant.yml` directly
-      against the GitHub API from `apps/platform` itself, not from a CI job, so
-      there's no `GITHUB_REPOSITORY`-style var to infer this from. See
-      `docs/context/environment-variables.md`.
-- [ ] Optional: `apps/platform`'s own Vercel project can also set env var
-      `TENANT_PROVISIONING_DATASET` (`development` or `production`) to pick
-      which dataset that deployment's provisioning runs create in — a
-      manually-set, per-deployment opt-in, same posture as `apps/web`'s
-      `WEB_ANALYTICS_ENABLED`, since `VERCEL_ENV` can't reliably tell a dev
-      deployment apart from real production. Left unset, provisioning falls
-      back to this GitHub Environment's `TENANT_SANITY_DATASET`, unchanged
-      from today. The same value is also forwarded as both workflows'
-      `environment` input (§ above) — a `platform-dev` deployment setting this
-      to `development` now points its provisioning/deprovisioning dispatches
+- [ ] `VERCEL_TOKEN` / `VERCEL_PROJECT_ID_WEB` from that environment's
+      checklist above are reused as-is — no separate copies to create.
+      `VERCEL_PROJECT_ID_WEB` here means the **shared web** project
+      (`web-dev` / `web-prod`) — the one the "Map domain" step adds every
+      tenant's custom domain to, never a per-tenant project.
+
+**`apps/platform`'s own Vercel project (not a GitHub Environment)**
+
+The "Add tenant" wizard's and the tenant status page's "Deprovision tenant"
+control's Server Actions dispatch `provision-tenant.yml`/`deprovision-tenant.yml`
+directly against the GitHub API from `apps/platform` itself, not from a CI job
+— so these are Vercel env vars on that app's project, not entries on a GitHub
+Environment. See `docs/context/environment-variables.md`.
+
+- [ ] Env var `TENANT_PROVISIONING_GITHUB_REPO` = `<owner>/<repo>` (e.g.
+      `ValOvinnikov/blog`), paired with its own
+      `TENANT_PROVISIONING_GITHUB_TOKEN` — there's no `GITHUB_REPOSITORY`-style
+      var to infer the repo from outside Actions.
+- [ ] Optional env var `TENANT_PROVISIONING_DATASET` (`development` or
+      `production`) picks which dataset that deployment's provisioning runs
+      create in — a manually-set, per-deployment opt-in, same posture as
+      `apps/web`'s `WEB_ANALYTICS_ENABLED`, since `VERCEL_ENV` can't reliably
+      tell a dev deployment apart from real production. Left unset,
+      provisioning falls back to the dispatched GitHub Environment's
+      `TENANT_SANITY_DATASET`. The same value is also forwarded as both
+      workflows' `environment` input — a `platform-dev` deployment setting
+      this to `development` points its provisioning/deprovisioning dispatches
       at the `development` tenant registry too, not just the Sanity dataset.
-      See `docs/context/environment-variables.md`.
-- [ ] `VERCEL_TOKEN` / `VERCEL_PROJECT_ID_WEB` above are reused as-is.
-      `VERCEL_PROJECT_ID_WEB` here means the **shared web** project (`web-prod`)
-      — the one the "Map domain" step adds every tenant's custom domain to,
-      never a per-tenant project.
-- [ ] Variable `WEB_APP_URL` — the deployed `apps/web` origin (no trailing
-      slash), e.g. `https://{your-web-domain}`. Used to build the target URL
-      for the revalidation webhook this workflow creates on each new tenant's
-      Sanity project.
-- [ ] Secret `SANITY_REVALIDATE_SECRET` — the **same** value already set as
-      `apps/web`'s own `SANITY_REVALIDATE_SECRET` Vercel env var. Every
-      tenant's webhook is created with this shared secret; a mismatch makes
-      that tenant's webhook calls fail `apps/web`'s signature check, so
-      content publishes in that tenant's Studio never trigger revalidation.
 
 > Repo-level `SANITY_STUDIO_PROJECT_ID` / `SANITY_STUDIO_DATASET` remain the
 > fallback for `ci.yml` (which sets no environment) — point them at whichever
