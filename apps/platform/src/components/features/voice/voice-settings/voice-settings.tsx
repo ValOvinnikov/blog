@@ -4,6 +4,7 @@ import { ALERT_TYPE } from '@blog/config';
 import type { TVoicePack } from '@blog/config/constants';
 import { VoiceFieldGroup } from '@platform/components/features/voice/voice-field-group';
 import { Alert } from '@platform/components/shared/alert';
+import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { Disclosure } from '@platform/components/shared/disclosure';
@@ -19,7 +20,7 @@ import {
 } from '@platform/utils/voice-fields/voice-fields';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useMemo } from 'react';
+import { useId, useMemo } from 'react';
 
 import { voiceSettingsVariants } from './voice-settings-variants';
 
@@ -32,6 +33,8 @@ export type TVoiceSettingsProps = {
     tenantSlug: string,
     overrides: TVoiceOverrides,
   ) => Promise<{ ok: boolean }>;
+  /** When set, the tenant is archived: Save is disabled and a notice explains why. */
+  archivedAt?: Date;
 };
 
 const buildInitialValues = (
@@ -57,7 +60,10 @@ export const VoiceSettings = ({
   voicePack,
   initialOverrides,
   saveAction,
+  archivedAt,
 }: TVoiceSettingsProps) => {
+  const isArchived = Boolean(archivedAt);
+  const archivedNoticeId = useId();
   const t = useTranslations('voiceSettings');
   const tGroups = useTranslations('voiceFieldGroups');
   const tLabels = useTranslations('voiceFieldLabels');
@@ -100,12 +106,17 @@ export const VoiceSettings = ({
           <Button
             variant="primary"
             onClick={handleSubmit}
-            isDisabled={isPending}
+            isDisabled={isPending || isArchived}
+            aria-describedby={isArchived ? archivedNoticeId : undefined}
           >
             {t('saveButton')}
           </Button>
         }
       />
+
+      {archivedAt && (
+        <ArchivedTenantNotice id={archivedNoticeId} archivedAt={archivedAt} />
+      )}
 
       {status === 'error' && (
         <Alert

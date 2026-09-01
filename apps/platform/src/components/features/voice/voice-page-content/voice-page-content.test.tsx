@@ -120,4 +120,18 @@ describe(`<${VoicePageContent.name}/>`, () => {
       screen.getByRole('textbox', { name: 'Terminal Prompt Host' }),
     ).toHaveValue('guest@acme');
   });
+
+  it('passes the archived date through for a deprovisioned tenant', async () => {
+    getSiteConfigMock.mockResolvedValue(undefined);
+
+    await setup({
+      tenant: {
+        ...tenant,
+        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      },
+    });
+
+    expect(screen.getByText('This tenant is archived')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+  });
 });

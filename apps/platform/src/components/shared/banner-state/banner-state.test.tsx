@@ -33,4 +33,19 @@ describe(BannerState, () => {
 
     expect(screen.getByRole('alert')).toBeVisible();
   });
+
+  it('carries an id onto its root, so a disabled control elsewhere can point aria-describedby at it', () => {
+    render(
+      <BannerState
+        id="archived-notice"
+        tone="warn"
+        role="status"
+        title="This tenant is archived"
+        description="Everything here is read-only."
+        action={null}
+      />,
+    );
+
+    expect(screen.getByRole('status')).toHaveAttribute('id', 'archived-notice');
+  });
 });

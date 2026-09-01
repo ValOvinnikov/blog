@@ -54,4 +54,19 @@ describe(Button, () => {
     await user.click(screen.getByRole('button', { name: 'Save' }));
     expect(handleClick).toHaveBeenCalledOnce();
   });
+
+  it('associates a description via aria-describedby, so a disabled control can be explained by an element elsewhere on the page', () => {
+    render(
+      <>
+        <Button isDisabled={true} aria-describedby="save-reason">
+          Save
+        </Button>
+        <p id="save-reason">This tenant is archived.</p>
+      </>,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Save' }),
+    ).toHaveAccessibleDescription('This tenant is archived.');
+  });
 });

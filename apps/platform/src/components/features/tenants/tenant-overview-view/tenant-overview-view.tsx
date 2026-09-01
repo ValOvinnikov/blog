@@ -9,6 +9,7 @@ import { ProvisioningBanner } from '@platform/components/features/tenants/provis
 import { useProvisioningPoll } from '@platform/components/features/tenants/provisioning-status-view/use-provisioning-poll';
 import { RecentActivityCard } from '@platform/components/features/tenants/recent-activity-card';
 import { TenantDetailsPanel } from '@platform/components/features/tenants/tenant-details-panel';
+import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
@@ -17,6 +18,7 @@ import { adminRoutes } from '@platform/utils/routes/routes';
 import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
 import { computeTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';
 import { useTranslations } from 'next-intl';
+import { useId } from 'react';
 
 import { tenantOverviewViewVariants } from './tenant-overview-view-variants';
 
@@ -47,6 +49,7 @@ export const TenantOverviewView = ({
 }: TTenantOverviewViewProps) => {
   const tTenantsTable = useTranslations('tenantsTable');
   const t = useTranslations('tenantOverviewPage');
+  const archivedNoticeId = useId();
   const { root, cardsGrid, cardsColumn } = tenantOverviewViewVariants();
   const {
     provisioningStatus,
@@ -80,6 +83,13 @@ export const TenantOverviewView = ({
         }
       />
 
+      {tenant.deprovisionedAt && (
+        <ArchivedTenantNotice
+          id={archivedNoticeId}
+          archivedAt={tenant.deprovisionedAt}
+        />
+      )}
+
       <ProvisioningBanner
         tenantId={tenant.id}
         provisioningStatus={provisioningStatus}
@@ -97,6 +107,7 @@ export const TenantOverviewView = ({
           effectiveProvisioningStatus,
         )}
         ownerEmail={ownerEmail}
+        archivedNoticeId={archivedNoticeId}
       />
 
       <div className={cardsGrid()}>

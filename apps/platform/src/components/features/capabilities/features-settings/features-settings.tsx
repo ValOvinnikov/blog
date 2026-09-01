@@ -3,6 +3,7 @@
 import { Switch } from '@base-ui/react/switch';
 import { ALERT_TYPE, type TCapability } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
+import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { PageHeader } from '@platform/components/shared/page-header';
@@ -15,6 +16,7 @@ import {
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { useId } from 'react';
 
 import { featuresSettingsVariants } from './features-settings-variants';
 
@@ -27,6 +29,8 @@ export type TFeaturesSettingsProps = {
     tenantSlug: string,
     values: TSettingsFeaturesValues,
   ) => Promise<{ ok: boolean }>;
+  /** When set, the tenant is archived: Save is disabled and a notice explains why. */
+  archivedAt?: Date;
 };
 
 /**
@@ -41,7 +45,10 @@ export const FeaturesSettings = ({
   entitledCapabilities,
   initialValues,
   saveAction,
+  archivedAt,
 }: TFeaturesSettingsProps) => {
+  const isArchived = Boolean(archivedAt);
+  const archivedNoticeId = useId();
   const t = useTranslations('featuresSettings');
   const toast = useToast();
   const router = useRouter();
@@ -78,12 +85,17 @@ export const FeaturesSettings = ({
           <Button
             variant="primary"
             onClick={handleSubmit}
-            isDisabled={isPending}
+            isDisabled={isPending || isArchived}
+            aria-describedby={isArchived ? archivedNoticeId : undefined}
           >
             {isPending ? t('savingButton') : t('saveButton')}
           </Button>
         }
       />
+
+      {archivedAt && (
+        <ArchivedTenantNotice id={archivedNoticeId} archivedAt={archivedAt} />
+      )}
 
       {status === 'error' && (
         <Alert

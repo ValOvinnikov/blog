@@ -13,13 +13,17 @@ export type TTenantFieldKey =
 export type TTenantFieldLockReason =
   | { kind: 'step'; step: TTenantProvisioningStep }
   | { kind: 'running' }
-  | { kind: 'succeeded' };
+  | { kind: 'succeeded' }
+  // Never produced by `computeTenantFieldLocks` itself — the tenant's
+  // archived state is a separate, stronger lock `TenantDetailsPanel`
+  // overlays on top, reusing this same reason vocabulary.
+  | { kind: 'archived' };
 
 export type TTenantFieldLocks = Partial<
   Record<TTenantFieldKey, TTenantFieldLockReason>
 >;
 
-const ALL_FIELD_KEYS: TTenantFieldKey[] = [
+export const ALL_FIELD_KEYS: TTenantFieldKey[] = [
   'name',
   'slug',
   'primaryDomain',

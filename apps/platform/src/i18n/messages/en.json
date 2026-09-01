@@ -397,6 +397,7 @@
     "startingButton": "Starting…",
     "startError": "Couldn't start provisioning — try again.",
     "startErrorNotFound": "Couldn't find this tenant — refresh the page and try again.",
+    "startErrorArchived": "This tenant is archived; provisioning can't be started.",
     "pollErrorWarning": "Couldn't refresh the latest status — retrying automatically.",
     "errorKind": {
       "permission": {
@@ -449,13 +450,20 @@
     "savingButton": "Saving…",
     "alertSuccess": "Tenant details saved.",
     "provisioningStartedError": "This tenant's provisioning has already started; its details can no longer be edited.",
+    "archivedError": "This tenant is archived; its details can no longer be edited.",
+    "notFoundError": "Tenant not found.",
     "ownerAlreadyJoinedError": "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
     "ownerEmailTakenError": "This email already has a pending invite on this tenant.",
     "lockedAnnouncement": "Some tenant detail fields are now locked.",
     "unlockedAnnouncement": "More tenant detail fields are now editable.",
     "fieldLockedReasonStep": "Locked — the \"{step}\" step has already completed and used this value.",
     "fieldLockedReasonRunning": "Locked while provisioning is running.",
-    "fieldLockedReasonSucceeded": "Locked — provisioning has already finished."
+    "fieldLockedReasonSucceeded": "Locked — provisioning has already finished.",
+    "fieldLockedReasonArchived": "Locked — this tenant is archived."
+  },
+  "archivedTenantNotice": {
+    "title": "This tenant is archived",
+    "description": "Deprovisioned {date}. Everything on these pages is read-only."
   },
   "archivedTenantsToggle": {
     "ariaLabel": "Tenant visibility",

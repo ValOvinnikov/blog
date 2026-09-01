@@ -55,7 +55,9 @@ export type TUpdateTenantDetailsActionResult =
  * The client only ever submits a locked field's unchanged value, but that's
  * a UX affordance, not an authorization boundary — the `domain-locked`
  * outcome below is the real enforcement, re-checked here against the
- * current db row regardless of what the client sends.
+ * current db row regardless of what the client sends. Likewise the disabled
+ * panel an archived tenant renders is a UX affordance too — the
+ * `deprovisionedAt` check below is what actually stops the write.
  */
 export const updateTenantDetailsAction = async (
   tenantId: string,
@@ -74,6 +76,18 @@ export const updateTenantDetailsAction = async (
       }
     }
     return { ok: false, fieldErrors };
+  }
+
+  const tenant = await queries.tenants.getTenantById(tenantId, {
+    includeArchived: true,
+  });
+  if (!tenant) {
+    const t = await getTranslations('tenantDetailsPanel');
+    return { ok: false, error: t('notFoundError') };
+  }
+  if (tenant.deprovisionedAt) {
+    const t = await getTranslations('tenantDetailsPanel');
+    return { ok: false, error: t('archivedError') };
   }
 
   try {

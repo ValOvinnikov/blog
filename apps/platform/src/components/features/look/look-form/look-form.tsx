@@ -3,6 +3,7 @@
 import { ALERT_TYPE, PRESET_REGISTRY, type TPresetId } from '@blog/config';
 import { LookPreview } from '@platform/components/features/look/look-preview';
 import { Alert } from '@platform/components/shared/alert';
+import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { Disclosure } from '@platform/components/shared/disclosure';
@@ -12,7 +13,7 @@ import { updateLookAction } from '@platform/server/site-config/update-look-actio
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 
 import { LookFormAdvancedSection } from './look-form-advanced-section';
 import { LookFormBasicSection } from './look-form-basic-section';
@@ -22,6 +23,8 @@ import { lookFormVariants } from './look-form-variants';
 export type TLookFormProps = {
   tenantSlug: string;
   initialValues: TLookFormValues;
+  /** When set, the tenant is archived: Save is disabled and a notice explains why. */
+  archivedAt?: Date;
 };
 
 export type TLookFormFieldSetter = <K extends keyof TLookFormValues>(
@@ -71,7 +74,13 @@ const valuesEqual = (a: TLookFormValues, b: TLookFormValues): boolean => {
   );
 };
 
-export const LookForm = ({ tenantSlug, initialValues }: TLookFormProps) => {
+export const LookForm = ({
+  tenantSlug,
+  initialValues,
+  archivedAt,
+}: TLookFormProps) => {
+  const isArchived = Boolean(archivedAt);
+  const archivedNoticeId = useId();
   const toast = useToast();
   const t = useTranslations('lookForm');
   // The last known-persisted state: the submitted fields on a successful
@@ -133,7 +142,8 @@ export const LookForm = ({ tenantSlug, initialValues }: TLookFormProps) => {
               type="button"
               variant="ghost"
               onClick={handleReset}
-              isDisabled={!isDirty}
+              isDisabled={!isDirty || isArchived}
+              aria-describedby={isArchived ? archivedNoticeId : undefined}
             >
               {t('resetButton')}
             </Button>
@@ -141,13 +151,18 @@ export const LookForm = ({ tenantSlug, initialValues }: TLookFormProps) => {
               type="button"
               variant="primary"
               onClick={handleSubmit}
-              isDisabled={isPending || !isDirty}
+              isDisabled={isPending || !isDirty || isArchived}
+              aria-describedby={isArchived ? archivedNoticeId : undefined}
             >
               {isPending ? t('savingButton') : t('saveButton')}
             </Button>
           </>
         }
       />
+
+      {archivedAt && (
+        <ArchivedTenantNotice id={archivedNoticeId} archivedAt={archivedAt} />
+      )}
 
       {status === 'error' && (
         <Alert type={ALERT_TYPE.ERROR} title={t('alertError')} />

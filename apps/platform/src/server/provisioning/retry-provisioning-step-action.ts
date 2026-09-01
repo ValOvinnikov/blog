@@ -11,25 +11,31 @@ export type TRetryProvisioningStepResult =
   | { outcome: 'dispatched' }
   | { outcome: 'already-in-progress' }
   | { outcome: 'not-found' }
+  | { outcome: 'archived' }
   | { outcome: 'dispatch-error' };
 
 /**
  * Backs both the status page's per-step Retry button and its all-idle Start
- * provisioning action — re-dispatches the whole provisioning workflow for
- * `tenantId` rather than a single step, since every step is independently
- * idempotent: only the failed-or-later steps actually do work, everything
- * already `done` is skipped via its own persisted-state check.
- *
- * `beginTenantProvisioning`'s atomic guard is the real backstop against a
- * concurrent double-dispatch (the client-side disabled button only helps);
- * a guard hit is reported back as a legitimate no-op, not an error. If the
- * subsequent GitHub dispatch itself fails, the `PROVISIONING` transition is
- * reverted so the tenant never sits showing a workflow that isn't running.
+ * action — re-dispatches the whole workflow rather than a single step, since
+ * every step is independently idempotent. The archived check below is the
+ * same disabled-button-is-UX, server-check-is-enforcement split as the
+ * tenant details save action; `beginTenantProvisioning`'s atomic guard is
+ * likewise the real backstop against a concurrent double-dispatch.
  */
 export const retryProvisioningStepAction = async (
   tenantId: string,
 ): Promise<TRetryProvisioningStepResult> => {
   await requireSuperAdmin();
+
+  const tenant = await queries.tenants.getTenantById(tenantId, {
+    includeArchived: true,
+  });
+  if (!tenant) {
+    return { outcome: 'not-found' };
+  }
+  if (tenant.deprovisionedAt) {
+    return { outcome: 'archived' };
+  }
 
   const began = await queries.tenants.beginTenantProvisioning(tenantId);
 

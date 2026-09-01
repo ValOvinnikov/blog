@@ -211,4 +211,40 @@ describe(LookForm, () => {
 
     expect(screen.getByText('250°')).toBeVisible();
   });
+
+  it('shows an archived notice and disables Save even once dirty, for an archived tenant', async () => {
+    const user = userEvent.setup();
+    render(
+      <LookForm
+        tenantSlug="acme"
+        initialValues={defaultLookFormValues()}
+        archivedAt={new Date('2026-08-26T00:00:00.000Z')}
+      />,
+    );
+
+    expect(screen.getByText('This tenant is archived')).toBeVisible();
+
+    screen.getByRole('slider', { name: 'Accent hue' }).focus();
+    await user.keyboard('{ArrowRight}');
+
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+    expect(updateLookActionMock).not.toHaveBeenCalled();
+  });
+
+  it('describes the disabled Save and Reset buttons with the archived notice text, for a screen-reader user', () => {
+    render(
+      <LookForm
+        tenantSlug="acme"
+        initialValues={defaultLookFormValues()}
+        archivedAt={new Date('2026-08-26T00:00:00.000Z')}
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Save changes' }),
+    ).toHaveAccessibleDescription(/This tenant is archived/);
+    expect(
+      screen.getByRole('button', { name: 'Reset to preset' }),
+    ).toHaveAccessibleDescription(/This tenant is archived/);
+  });
 });

@@ -14,16 +14,18 @@ export type TTenantByIdContext = {
 };
 
 /**
- * The platform-operator counterpart to `requireTenantMembership`: the
- * `/tenants/{id}/*` tree is for operators acting on any tenant, unlike the
- * tenant's own `memberships`-gated section. `cache()`-wrapped because a
- * layout can't pass this down to its page, so the ancestor gate and the
- * `(detail)`/Studio pages below it would otherwise each resolve it separately.
+ * The platform-operator counterpart to `requireTenantMembership`, gating
+ * `/tenants/{id}/*` for any admin regardless of tenant membership. Resolves
+ * archived tenants too (`includeArchived: true`) — only a genuinely unknown
+ * id 404s — and is `cache()`-wrapped so the layout and its descendant pages
+ * share one fetch.
  */
 export const requireTenantById = cache(
   async (tenantId: string): Promise<TTenantByIdContext> => {
     const admin = await requireAdmin();
-    const tenant = await queries.tenants.getTenantById(tenantId);
+    const tenant = await queries.tenants.getTenantById(tenantId, {
+      includeArchived: true,
+    });
 
     if (!tenant) {
       notFound();
