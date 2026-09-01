@@ -1,3 +1,4 @@
+import { getEnabledOAuthProviderIds } from '@blog/auth';
 import { ICONS, type ILocalizedParams, routes, SIZE } from '@blog/config';
 import { service } from '@blog/service';
 import { Icon } from '@blog/ui/atoms/icon';
@@ -124,6 +125,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
   const plain = !chromeOn;
   const currentYear = new Date().getFullYear();
   const s = localeLayoutVariants();
+  const oauthProviderIds = getEnabledOAuthProviderIds();
 
   return (
     // `locale`, `now`, and `timeZone` are passed explicitly (not inherited)
@@ -155,7 +157,10 @@ export default async function LocaleLayout({ children, params }: TProps) {
                 actions={
                   <>
                     <ThemeToggleButton />
-                    <AuthMenu isPlain={plain} />
+                    <AuthMenu
+                      oauthProviderIds={oauthProviderIds}
+                      isPlain={plain}
+                    />
                   </>
                 }
               />

@@ -18,6 +18,7 @@ const {
   setRequestLocaleMock,
   isProductionEnvironmentMock,
   useSessionMock,
+  getEnabledOAuthProviderIdsMock,
 } = vi.hoisted(() => ({
   getSiteSettingsMock: vi.fn(),
   getNavigationMock: vi.fn(),
@@ -30,6 +31,11 @@ const {
   setRequestLocaleMock: vi.fn(),
   isProductionEnvironmentMock: vi.fn(),
   useSessionMock: vi.fn(),
+  getEnabledOAuthProviderIdsMock: vi.fn(),
+}));
+
+vi.mock('@blog/auth', () => ({
+  getEnabledOAuthProviderIds: getEnabledOAuthProviderIdsMock,
 }));
 
 vi.mock('@web/utils/is-production-environment', () => ({
@@ -107,6 +113,7 @@ describe('LocaleLayout', () => {
     );
     isProductionEnvironmentMock.mockReturnValue(true);
     useSessionMock.mockReturnValue({ data: null, status: 'unauthenticated' });
+    getEnabledOAuthProviderIdsMock.mockReturnValue(['github', 'google']);
   });
 
   describe('generateStaticParams', () => {

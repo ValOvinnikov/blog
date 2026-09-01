@@ -1,5 +1,6 @@
 'use client';
 
+import type { TOAuthProviderId } from '@blog/auth';
 import { Spinner } from '@blog/ui/atoms/spinner';
 import { useOAuthErrorParam } from '@web/hooks/use-oauth-error-param';
 import { usePopover } from '@web/hooks/use-popover';
@@ -21,11 +22,16 @@ import { SignInMenu } from './components/sign-in-menu/sign-in-menu';
  * *other* state's shape first.
  */
 export interface IAuthMenuProps {
+  /** Auth.js provider ids to offer for sign-in, server-derived from credential presence. */
+  oauthProviderIds: readonly TOAuthProviderId[];
   /** Renders both branches' panel without the `WindowChrome` shell. */
   isPlain?: boolean;
 }
 
-export const AuthMenu = ({ isPlain = false }: IAuthMenuProps) => {
+export const AuthMenu = ({
+  oauthProviderIds,
+  isPlain = false,
+}: IAuthMenuProps) => {
   const sessionResult = useSession();
   const oauthError = useOAuthErrorParam();
   const t = useTranslations('authMenu');
@@ -70,6 +76,7 @@ export const AuthMenu = ({ isPlain = false }: IAuthMenuProps) => {
       triggerRef={triggerRef}
       panelRef={panelRef}
       oauthError={oauthError}
+      oauthProviderIds={oauthProviderIds}
       isPlain={isPlain}
     />
   );
