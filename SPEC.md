@@ -365,8 +365,10 @@ fallback window as its safety net, but `apps/platform`'s Look/Voice save actions
 `apps/web`'s `POST /api/revalidate-site-config` after a successful
 `site_config` write, so a tenant admin's save reflects on the live site
 within seconds rather than waiting out that window. This is a plain
-shared-secret (`SITE_CONFIG_REVALIDATE_SECRET`, byte-identical between the
-two apps, same posture as `AUTH_SECRET`) service-to-service call between the
+shared-secret (`SITE_CONFIG_REVALIDATE_SECRET`, which must be byte-identical
+between the two apps because `apps/web` compares the bearer token it receives
+against its own copy — unlike `AUTH_SECRET`, where matching is an operational
+stance rather than a verified dependency) service-to-service call between the
 two apps' own deployments — not a Sanity webhook, so it doesn't reuse
 `@sanity/webhook`'s HMAC verification. Calling it is best-effort from the
 platform side: a failure (missing config, network error, non-2xx) is logged and
