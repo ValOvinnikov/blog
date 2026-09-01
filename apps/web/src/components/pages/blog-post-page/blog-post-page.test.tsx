@@ -22,12 +22,14 @@ const {
   getBookmarkStatusMock,
   getNewsletterSettingsMock,
   isCapabilityEnabledMock,
+  getTenantSanityContextMock,
 } = vi.hoisted(() => ({
   getPostMock: vi.fn(),
   useSessionMock: vi.fn(),
   getBookmarkStatusMock: vi.fn(),
   getNewsletterSettingsMock: vi.fn(),
   isCapabilityEnabledMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -67,6 +69,10 @@ vi.mock('@web/server/bookmarks/bookmark-actions', () => ({
 
 vi.mock('@web/server/settings-features/is-capability-enabled', () => ({
   isCapabilityEnabled: isCapabilityEnabledMock,
+}));
+
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
 }));
 
 // `BookmarkButton` calls `useToast()` unconditionally (it's a hook), so any
@@ -116,6 +122,8 @@ describe(`<${BlogPostPage.name}/>`, () => {
     });
     isCapabilityEnabledMock.mockReset();
     isCapabilityEnabledMock.mockResolvedValue(true);
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -426,5 +434,20 @@ describe(`<${BlogPostPage.name}/>`, () => {
       expect(errorSpy).toHaveBeenCalled();
       errorSpy.mockRestore();
     });
+  });
+
+  it('forwards the resolved tenant Sanity context to getPost and getNewsletterSettings', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
+
+    await setup();
+
+    expect(getPostMock).toHaveBeenCalledWith('hello-world', tenant);
+    expect(getNewsletterSettingsMock).toHaveBeenCalledWith(tenant);
   });
 });

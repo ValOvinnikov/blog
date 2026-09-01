@@ -3,9 +3,14 @@
  */
 import type { TFeedPost } from '@blog/service';
 
-const { getAllPublishedPostsMock, getSiteSettingsMock } = vi.hoisted(() => ({
+const {
+  getAllPublishedPostsMock,
+  getSiteSettingsMock,
+  getHostTenantSanityContextMock,
+} = vi.hoisted(() => ({
   getAllPublishedPostsMock: vi.fn(),
   getSiteSettingsMock: vi.fn(),
+  getHostTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -17,6 +22,10 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
+vi.mock('@web/server/tenant/get-host-tenant-sanity-context', () => ({
+  getHostTenantSanityContext: getHostTenantSanityContextMock,
+}));
+
 const post: TFeedPost = {
   title: 'Hello & Welcome',
   slug: 'hello-welcome',
@@ -25,10 +34,18 @@ const post: TFeedPost = {
 };
 
 describe('GET /rss.xml', () => {
+  beforeEach(() => {
+    getHostTenantSanityContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant: undefined,
+    });
+  });
+
   afterEach(() => {
     vi.resetModules();
     getAllPublishedPostsMock.mockReset();
     getSiteSettingsMock.mockReset();
+    getHostTenantSanityContextMock.mockReset();
   });
 
   it('returns a valid RSS 2.0 feed with the correct content type', async () => {
@@ -103,5 +120,38 @@ describe('GET /rss.xml', () => {
     const doc = new DOMParser().parseFromString(xml, 'application/xml');
 
     expect(doc.querySelectorAll('item')).toHaveLength(0);
+  });
+
+  it('forwards the resolved tenant Sanity context to every loader', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getHostTenantSanityContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant,
+    });
+    getAllPublishedPostsMock.mockResolvedValue({ ok: true, data: [] });
+    getSiteSettingsMock.mockResolvedValue({
+      ok: true,
+      data: { brand: { name: 'My Blog' }, description: 'desc' },
+    });
+    const { GET } = await import('./route');
+
+    await GET();
+
+    expect(getAllPublishedPostsMock).toHaveBeenCalledWith(tenant);
+    expect(getSiteSettingsMock).toHaveBeenCalledWith(tenant);
+  });
+
+  it('returns a 404 without querying any content when the host is unresolvable', async () => {
+    getHostTenantSanityContextMock.mockResolvedValue({ isResolvable: false });
+    const { GET } = await import('./route');
+
+    const response = await GET();
+
+    expect(response.status).toBe(404);
+    expect(getAllPublishedPostsMock).not.toHaveBeenCalled();
   });
 });

@@ -3,8 +3,9 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { PostLatestModule } from './post-latest-module';
 
-const { getPostLatestMock } = vi.hoisted(() => ({
+const { getPostLatestMock, getTenantSanityContextMock } = vi.hoisted(() => ({
   getPostLatestMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -13,6 +14,10 @@ vi.mock('@blog/service', () => ({
       postLatest: { v1: { getPostLatest: getPostLatestMock } },
     },
   },
+}));
+
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
 }));
 
 vi.mock('@web/components/shared/smart-link', () => ({
@@ -38,9 +43,11 @@ const setup = customRenderAsync(PostLatestModule, {
 describe(PostLatestModule, () => {
   beforeEach(() => {
     getPostLatestMock.mockReset();
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(undefined);
   });
 
-  it('calls getPostLatest with only the module id', async () => {
+  it('calls getPostLatest with the module id and resolved tenant Sanity context', async () => {
     getPostLatestMock.mockResolvedValue({
       ok: true,
       data: {
@@ -57,7 +64,33 @@ describe(PostLatestModule, () => {
 
     await setup();
 
-    expect(getPostLatestMock).toHaveBeenCalledWith('post-latest-1');
+    expect(getPostLatestMock).toHaveBeenCalledWith('post-latest-1', undefined);
+  });
+
+  it('forwards the resolved tenant Sanity context to getPostLatest', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getPostLatestMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        sectionHeader: {
+          heading: 'Latest posts',
+          supportingText: undefined,
+          align: undefined,
+        },
+        posts: [],
+        layout: undefined,
+      },
+    });
+
+    await setup();
+
+    expect(getPostLatestMock).toHaveBeenCalledWith('post-latest-1', tenant);
   });
 
   it('renders nothing when the fetch fails', async () => {

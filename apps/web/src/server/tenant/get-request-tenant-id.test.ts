@@ -21,3 +21,41 @@ describe(getRequestTenantId, () => {
     await expect(getRequestTenantId()).resolves.toBeUndefined();
   });
 });
+
+describe('getRequestTenantId memoization', () => {
+  afterEach(() => {
+    vi.doUnmock('react');
+    vi.resetModules();
+  });
+
+  it('dedupes the header read when called more than once in the same render pass', async () => {
+    headersMock.mockClear();
+    vi.doMock('react', async (importOriginal) => {
+      const actual = await importOriginal<typeof import('react')>();
+      return {
+        ...actual,
+        cache: (fn: () => unknown) => {
+          let called = false;
+          let result: unknown;
+          return () => {
+            if (!called) {
+              result = fn();
+              called = true;
+            }
+            return result;
+          };
+        },
+      };
+    });
+    vi.resetModules();
+    headersMock.mockResolvedValue(new Headers({ 'x-tenant-id': 'tenant-1' }));
+
+    const { getRequestTenantId: freshGetRequestTenantId } =
+      await import('./get-request-tenant-id');
+
+    await freshGetRequestTenantId();
+    await freshGetRequestTenantId();
+
+    expect(headersMock).toHaveBeenCalledTimes(1);
+  });
+});

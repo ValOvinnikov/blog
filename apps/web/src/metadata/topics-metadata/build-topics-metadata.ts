@@ -1,6 +1,7 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 
@@ -10,7 +11,8 @@ import type { Metadata } from 'next';
  * called by `TopicsPage`), so this adds no extra round-trip.
  */
 export const buildTopicsMetadata = async (): Promise<Metadata> => {
-  const result = await service.pages.topicIndex.v1.getIndexPage();
+  const tenant = await getTenantSanityContext();
+  const result = await service.pages.topicIndex.v1.getIndexPage(tenant);
 
   if (!result.ok) {
     logger.error('topics_metadata.fetch_failed', { error: result.error });

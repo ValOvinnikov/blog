@@ -1,6 +1,7 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 
@@ -16,7 +17,8 @@ import type { Metadata } from 'next';
 export const buildGenericPageMetadata = async (
   slug: string,
 ): Promise<Metadata> => {
-  const result = await service.pages.generic.v1.getPage(slug);
+  const tenant = await getTenantSanityContext();
+  const result = await service.pages.generic.v1.getPage(slug, tenant);
 
   if (!result.ok) {
     logger.error('generic_page_metadata.fetch_failed', {

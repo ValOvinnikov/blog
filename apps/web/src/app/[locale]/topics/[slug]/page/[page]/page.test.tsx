@@ -12,9 +12,14 @@ const { permanentRedirectMock } = vi.hoisted(() => ({
   }),
 }));
 
-const { getTopicPageMock, getTopicPaginationParamsMock } = vi.hoisted(() => ({
+const {
+  getTopicPageMock,
+  getTopicPaginationParamsMock,
+  getTenantSanityContextMock,
+} = vi.hoisted(() => ({
   getTopicPageMock: vi.fn(),
   getTopicPaginationParamsMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
 }));
 
 // Isolates the redirect/404/static-params branches — none of the tested
@@ -32,6 +37,10 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
+}));
+
 vi.mock('@web/i18n/navigation', () => ({
   permanentRedirect: permanentRedirectMock,
 }));
@@ -47,6 +56,8 @@ const setup = customRenderAsync(TopicNumberedPage, {
 describe('TopicNumberedPage', () => {
   beforeEach(() => {
     permanentRedirectMock.mockClear();
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(undefined);
   });
 
   describe('generateStaticParams', () => {
@@ -139,7 +150,7 @@ describe('TopicNumberedPage', () => {
       });
 
       expect(metadata.title).toBe('Engineering – Page 2');
-      expect(getTopicPageMock).toHaveBeenCalledWith('engineering');
+      expect(getTopicPageMock).toHaveBeenCalledWith('engineering', undefined);
     });
   });
 

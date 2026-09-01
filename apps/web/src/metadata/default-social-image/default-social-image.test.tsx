@@ -3,9 +3,12 @@ import {
   resolveDefaultSocialImageProps,
 } from './default-social-image';
 
-const { getSiteSettingsMock } = vi.hoisted(() => ({
-  getSiteSettingsMock: vi.fn(),
-}));
+const { getSiteSettingsMock, getHostTenantSanityContextMock } = vi.hoisted(
+  () => ({
+    getSiteSettingsMock: vi.fn(),
+    getHostTenantSanityContextMock: vi.fn(),
+  }),
+);
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -13,6 +16,10 @@ vi.mock('@blog/service', () => ({
       siteSettings: { v1: { getSiteSettings: getSiteSettingsMock } },
     },
   },
+}));
+
+vi.mock('@web/server/tenant/get-host-tenant-sanity-context', () => ({
+  getHostTenantSanityContext: getHostTenantSanityContextMock,
 }));
 
 // `ImageResponse` (Satori/`@vercel/og`) loads its own WASM renderer via a
@@ -137,6 +144,11 @@ describe(buildDefaultSocialImage, () => {
 describe(resolveDefaultSocialImageProps, () => {
   beforeEach(() => {
     getSiteSettingsMock.mockReset();
+    getHostTenantSanityContextMock.mockReset();
+    getHostTenantSanityContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant: undefined,
+    });
   });
 
   it('resolves brandName and tagline from site settings', async () => {
@@ -169,5 +181,34 @@ describe(resolveDefaultSocialImageProps, () => {
       expect.stringContaining('opengraph-image'),
     );
     consoleErrorSpy.mockRestore();
+  });
+
+  it('forwards the resolved tenant Sanity context to getSiteSettings', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getHostTenantSanityContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant,
+    });
+    getSiteSettingsMock.mockResolvedValue({
+      ok: true,
+      data: { brand: { name: 'Test Brand' }, tagline: undefined },
+    });
+
+    await resolveDefaultSocialImageProps('opengraph-image');
+
+    expect(getSiteSettingsMock).toHaveBeenCalledWith(tenant);
+  });
+
+  it('returns empty props without calling site settings when the host is unresolvable', async () => {
+    getHostTenantSanityContextMock.mockResolvedValue({ isResolvable: false });
+
+    const props = await resolveDefaultSocialImageProps('opengraph-image');
+
+    expect(props).toEqual({});
+    expect(getSiteSettingsMock).not.toHaveBeenCalled();
   });
 });

@@ -1,6 +1,7 @@
 import { CAPABILITY } from '@blog/config';
 import { service } from '@blog/service';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 
 import { NewsletterModuleView } from './newsletter-module-view';
 
@@ -25,7 +26,8 @@ export const NewsletterModule = async ({ id }: INewsletterModuleProps) => {
   const isEnabled = await isCapabilityEnabled(CAPABILITY.NEWSLETTER);
   if (!isEnabled) return null;
 
-  const result = await service.modules.newsletter.v1.getNewsletter(id);
+  const tenant = await getTenantSanityContext();
+  const result = await service.modules.newsletter.v1.getNewsletter(id, tenant);
 
   if (!result.ok) return null;
 

@@ -2,8 +2,9 @@ import { makeSeo } from '@web/testing/shared/seo/fixtures';
 
 import { buildGenericPageMetadata } from './build-generic-page-metadata';
 
-const { getPageMock } = vi.hoisted(() => ({
+const { getPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
   getPageMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -12,6 +13,10 @@ vi.mock('@blog/service', () => ({
       generic: { v1: { getPage: getPageMock } },
     },
   },
+}));
+
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
 }));
 
 const seo = makeSeo({
@@ -23,6 +28,28 @@ const seo = makeSeo({
 });
 
 describe('buildGenericPageMetadata', () => {
+  beforeEach(() => {
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(undefined);
+  });
+
+  it('forwards the resolved tenant Sanity context to getPage', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getPageMock.mockResolvedValue({
+      ok: true,
+      data: { title: 'About Us', slug: 'about-us', modules: [], seo },
+    });
+
+    await buildGenericPageMetadata('about-us');
+
+    expect(getPageMock).toHaveBeenCalledWith('about-us', tenant);
+  });
+
   it('maps the resolved seo straight through toMetadata, self-canonical to /[slug]', async () => {
     getPageMock.mockResolvedValue({
       ok: true,

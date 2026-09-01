@@ -19,6 +19,7 @@ const {
   isProductionEnvironmentMock,
   useSessionMock,
   getEnabledOAuthProviderIdsMock,
+  getTenantSanityContextMock,
 } = vi.hoisted(() => ({
   getSiteSettingsMock: vi.fn(),
   getNavigationMock: vi.fn(),
@@ -32,6 +33,11 @@ const {
   isProductionEnvironmentMock: vi.fn(),
   useSessionMock: vi.fn(),
   getEnabledOAuthProviderIdsMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
+}));
+
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
 }));
 
 vi.mock('@blog/auth/utils/oauth-providers/oauth-providers', () => ({
@@ -114,6 +120,7 @@ describe('LocaleLayout', () => {
     isProductionEnvironmentMock.mockReturnValue(true);
     useSessionMock.mockReturnValue({ data: null, status: 'unauthenticated' });
     getEnabledOAuthProviderIdsMock.mockReturnValue(['github', 'google']);
+    getTenantSanityContextMock.mockResolvedValue(undefined);
   });
 
   describe('generateStaticParams', () => {
@@ -294,5 +301,20 @@ describe('LocaleLayout', () => {
     expect(
       within(panel).queryByRole('menuitem', { name: 'Continue with Google' }),
     ).not.toBeInTheDocument();
+  });
+
+  it('forwards the resolved tenant Sanity context to getSiteSettings, getNavigation, and getFooter', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getTenantSanityContextMock.mockResolvedValue(tenant);
+
+    await setup();
+
+    expect(getSiteSettingsMock).toHaveBeenCalledWith(tenant);
+    expect(getNavigationMock).toHaveBeenCalledWith(tenant);
+    expect(getFooterMock).toHaveBeenCalledWith(tenant);
   });
 });

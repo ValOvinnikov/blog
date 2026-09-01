@@ -1,5 +1,6 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
@@ -45,8 +46,9 @@ export const PostListModule = async ({
   emptyMessageFallback,
   titleId = 'blog-posts-title',
 }: IPostListModuleProps) => {
+  const tenant = await getTenantSanityContext();
   const [result, blogListT, paginationT] = await Promise.all([
-    service.modules.postList.v1.getPostList(id, page),
+    service.modules.postList.v1.getPostList(id, page, tenant),
     getTranslations('blogListPage'),
     getTranslations('pagination'),
   ]);

@@ -1,11 +1,16 @@
 export {};
 
-const { getPublishedPostBodyMock, saveSkimDraftMock, generateTakeawaysMock } =
-  vi.hoisted(() => ({
-    getPublishedPostBodyMock: vi.fn(),
-    saveSkimDraftMock: vi.fn(),
-    generateTakeawaysMock: vi.fn(),
-  }));
+const {
+  getPublishedPostBodyMock,
+  saveSkimDraftMock,
+  generateTakeawaysMock,
+  getHostTenantSanityContextMock,
+} = vi.hoisted(() => ({
+  getPublishedPostBodyMock: vi.fn(),
+  saveSkimDraftMock: vi.fn(),
+  generateTakeawaysMock: vi.fn(),
+  getHostTenantSanityContextMock: vi.fn(),
+}));
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -23,6 +28,10 @@ vi.mock('@blog/service', () => ({
 vi.mock('@web/server/skim/generate-takeaways', () => ({
   generateTakeaways: generateTakeawaysMock,
   SKIM_GENERATION_MODEL: 'claude-haiku-4-5',
+}));
+
+vi.mock('@web/server/tenant/get-host-tenant-sanity-context', () => ({
+  getHostTenantSanityContext: getHostTenantSanityContextMock,
 }));
 
 vi.mock('@web/utils/env/env', () => ({
@@ -46,6 +55,11 @@ describe('POST /api/generate-skim', () => {
     getPublishedPostBodyMock.mockReset();
     saveSkimDraftMock.mockReset();
     generateTakeawaysMock.mockReset();
+    getHostTenantSanityContextMock.mockReset();
+    getHostTenantSanityContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant: undefined,
+    });
   });
 
   afterEach(() => {
@@ -155,7 +169,7 @@ describe('POST /api/generate-skim', () => {
 
     expect(response.status).toBe(200);
     expect(json).toEqual({ ok: true, count: 3 });
-    expect(getPublishedPostBodyMock).toHaveBeenCalledWith('post-1');
+    expect(getPublishedPostBodyMock).toHaveBeenCalledWith('post-1', undefined);
     expect(saveSkimDraftMock).toHaveBeenCalledWith({
       postId: 'post-1',
       takeaways: ['a', 'b', 'c'],
@@ -183,6 +197,36 @@ describe('POST /api/generate-skim', () => {
       takeaways: ['a', 'b', 'c'],
       model: 'claude-haiku-4-5',
     });
+  });
+
+  it('forwards the resolved tenant Sanity context to getPublishedPostBody', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getHostTenantSanityContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant,
+    });
+    getPublishedPostBodyMock.mockResolvedValue({ ok: true, data: [] });
+    generateTakeawaysMock.mockResolvedValue(['a', 'b', 'c']);
+    saveSkimDraftMock.mockResolvedValue({ ok: true, data: undefined });
+    const { POST } = await import('./route');
+
+    await POST(makeRequest({ _id: 'post-1' }));
+
+    expect(getPublishedPostBodyMock).toHaveBeenCalledWith('post-1', tenant);
+  });
+
+  it('returns 404 without reading the post when the requesting host is unresolvable', async () => {
+    getHostTenantSanityContextMock.mockResolvedValue({ isResolvable: false });
+    const { POST } = await import('./route');
+
+    const response = await POST(makeRequest({ _id: 'post-1' }));
+
+    expect(response.status).toBe(404);
+    expect(getPublishedPostBodyMock).not.toHaveBeenCalled();
   });
 
   // `vi.doMock` overrides the module registry's mock factory for

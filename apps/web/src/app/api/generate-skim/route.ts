@@ -3,6 +3,7 @@ import {
   generateTakeaways,
   SKIM_GENERATION_MODEL,
 } from '@web/server/skim/generate-takeaways';
+import { getHostTenantSanityContext } from '@web/server/tenant/get-host-tenant-sanity-context';
 import { env } from '@web/utils/env/env';
 import { isSecretMatch } from '@web/utils/is-secret-match';
 import { logger } from '@web/utils/logger/logger';
@@ -79,8 +80,19 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
   const { _id: postId } = parsedBody.data;
 
-  const bodyResult =
-    await service.editorial.skim.v1.getPublishedPostBody(postId);
+  const hostTenant = await getHostTenantSanityContext();
+  if (!hostTenant.isResolvable) {
+    logger.error('generate_skim.host_unresolvable', { postId });
+    return NextResponse.json(
+      { message: 'Failed to resolve the requesting tenant.' },
+      { status: 404 },
+    );
+  }
+
+  const bodyResult = await service.editorial.skim.v1.getPublishedPostBody(
+    postId,
+    hostTenant.tenant,
+  );
   if (!bodyResult.ok) {
     logger.error('generate_skim.post_body_fetch_failed', {
       postId,

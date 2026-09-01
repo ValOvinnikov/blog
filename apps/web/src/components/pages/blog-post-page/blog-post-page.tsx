@@ -10,6 +10,7 @@ import { getSanityImageBaseUrl, service } from '@blog/service';
 import { Icon } from '@blog/ui/atoms/icon';
 import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { buildBlogPostingSchema } from '@web/utils/build-blog-posting-schema';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { buildShareLinks } from '@web/utils/build-share-links';
@@ -36,7 +37,8 @@ type TBlogPostPageProps = { slug: string };
  * `BlogPostPageView`.
  */
 export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
-  const result = await service.pages.post.v1.getPost(slug);
+  const tenant = await getTenantSanityContext();
+  const result = await service.pages.post.v1.getPost(slug, tenant);
   const post = guardPageLoaderResult(result, 'blog_post_page.fetch_failed', {
     slug,
   });
@@ -85,7 +87,7 @@ export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
     getTranslations('breadcrumbs'),
     getTranslations('blogPostPage'),
     toPostListItems(relatedPosts),
-    service.global.newsletterSettings.v1.getNewsletterSettings(),
+    service.global.newsletterSettings.v1.getNewsletterSettings(tenant),
     isCapabilityEnabled(CAPABILITY.BOOKMARKS),
   ]);
 
