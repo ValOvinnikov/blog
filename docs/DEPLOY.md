@@ -425,7 +425,7 @@ not fully functional until they are set:
 | `TENANT_PROVISIONING_GITHUB_REPO`  | `owner/repo` those dispatches target                                 |
 | `TENANT_PROVISIONING_DATASET`      | which dataset new tenants' Sanity projects are created in            |
 | `VERCEL_API_TOKEN`                 | read-scoped token for the tenant status page's live domain check     |
-| `VERCEL_WEB_PROJECT_ID`            | the shared `apps/web` project id that check runs against             |
+| `VERCEL_PROJECT_ID_WEB`            | the shared `apps/web` project id that check runs against             |
 | `VERCEL_TEAM_ID`                   | only when the Vercel account is team-owned                           |
 
 **`AUTH_COOKIE_DOMAIN` is deliberately left unset on the development pair** —

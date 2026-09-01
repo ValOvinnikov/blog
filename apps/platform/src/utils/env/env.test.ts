@@ -9,7 +9,7 @@ const ENV_KEYS = [
   'TENANT_PROVISIONING_GITHUB_REPO',
   'TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE',
   'VERCEL_API_TOKEN',
-  'VERCEL_WEB_PROJECT_ID',
+  'VERCEL_PROJECT_ID_WEB',
   'VERCEL_TEAM_ID',
   'SKIP_ENV_VALIDATION',
   'AUTH_SECRET',
@@ -218,26 +218,26 @@ describe('env', () => {
   it('parses valid Vercel domain-check vars and exposes them typed', async () => {
     delete process.env['SKIP_ENV_VALIDATION'];
     process.env['VERCEL_API_TOKEN'] = 'vercel-token';
-    process.env['VERCEL_WEB_PROJECT_ID'] = 'prj_123';
+    process.env['VERCEL_PROJECT_ID_WEB'] = 'prj_123';
     process.env['VERCEL_TEAM_ID'] = 'team_123';
 
     const { env } = await importEnvOnServer();
 
     expect(env.VERCEL_API_TOKEN).toBe('vercel-token');
-    expect(env.VERCEL_WEB_PROJECT_ID).toBe('prj_123');
+    expect(env.VERCEL_PROJECT_ID_WEB).toBe('prj_123');
     expect(env.VERCEL_TEAM_ID).toBe('team_123');
   });
 
   it('leaves Vercel domain-check vars undefined when absent (the status page skips the live check)', async () => {
     delete process.env['SKIP_ENV_VALIDATION'];
     delete process.env['VERCEL_API_TOKEN'];
-    delete process.env['VERCEL_WEB_PROJECT_ID'];
+    delete process.env['VERCEL_PROJECT_ID_WEB'];
     delete process.env['VERCEL_TEAM_ID'];
 
     const { env } = await importEnvOnServer();
 
     expect(env.VERCEL_API_TOKEN).toBeUndefined();
-    expect(env.VERCEL_WEB_PROJECT_ID).toBeUndefined();
+    expect(env.VERCEL_PROJECT_ID_WEB).toBeUndefined();
     expect(env.VERCEL_TEAM_ID).toBeUndefined();
   });
 });
