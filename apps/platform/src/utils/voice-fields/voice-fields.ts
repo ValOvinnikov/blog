@@ -87,3 +87,7 @@ export const VOICE_FIELD_GROUPS: TVoiceFieldGroup[] = [
 
 export const VOICE_OVERRIDE_KEYS: TVoiceOverrideKey[] =
   VOICE_FIELD_GROUPS.flatMap((group) => group.fields.map((field) => field.key));
+
+/** The DOM id shared by a voice field's control and its associated `<label htmlFor>`. */
+export const voiceFieldInputId = (key: TVoiceOverrideKey): string =>
+  `voice-field-${key}`;
