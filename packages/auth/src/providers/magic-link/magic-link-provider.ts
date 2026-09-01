@@ -16,18 +16,7 @@ export type TSendEmailInput = {
 export type TSendEmail = (input: TSendEmailInput) => Promise<void>;
 
 /**
- * buildMagicLinkProvider — the Auth.js Email (magic-link) provider, shared
- * unchanged by both apps. Delivery is injected via `sendEmail` rather than
- * owned here: this package's dependency contract has no room for an email
- * SDK, so each app supplies its own already-configured sender.
- * `sendVerificationRequest` swaps in invite-flavored copy when the
- * identifier being emailed has a pending `membershipInvites` row.
- *
- * Hand-rolled `EmailConfig`, not `next-auth/providers/nodemailer`'s
- * `Nodemailer` factory — that factory's runtime module unconditionally
- * imports `nodemailer`, so a bundler resolves it at build time regardless of
- * whether it's ever used, requiring a dependency this package otherwise has
- * no reason to carry.
+ * Builds the Auth.js Email (magic-link) provider shared by both apps.
  */
 export function buildMagicLinkProvider(sendEmail: TSendEmail): EmailConfig {
   const from = resolveMagicLinkFromAddress(env.MAGIC_LINK_FROM_ADDRESS);

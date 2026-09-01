@@ -23,15 +23,7 @@ export type TBuildAuthConfigOptions = {
 };
 
 /**
- * buildAuthConfig — the Auth.js configuration both apps pass to their own
- * `NextAuth()` call: the Drizzle adapter over `@blog/db`'s tables, the
- * `database` session strategy (and the `session.user.id` it exposes), and
- * the GitHub/Google/magic-link providers, identically for both. Returned
- * from a function — not a plain object — so each app can keep using Auth.js
- * v5's lazy-initialization form (`NextAuth(() => buildAuthConfig(...))`),
- * deferring `getDb()`'s Neon connection until the first real request instead
- * of constructing it at module-import time (which would otherwise crash a
- * build environment with no `DATABASE_URL` set).
+ * Builds the Auth.js configuration both apps pass to their own `NextAuth()` call.
  */
 export function buildAuthConfig({
   sendEmail,
