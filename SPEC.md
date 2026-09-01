@@ -571,10 +571,11 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   `main` on 2026-08-25) backs development. Before that date only `main`
   existed and both environments read it. `deploy-production.yml`'s
   `migrate-db` job reads the `production` Environment's own
-  `DATABASE_URL_UNPOOLED` (`main`); the tenant-provisioning workflows
-  (`provision-tenant.yml`/`deprovision-tenant.yml`) read their own
-  `TENANT_REGISTRY_DATABASE_URL_DEV`/`_PROD` secrets instead (#2056, merged
-  2026-08-25) — before that split, both purposes shared one secret, and
+  `DATABASE_URL_UNPOOLED` (`main`); the three tenant lifecycle workflows
+  (`provision-tenant.yml`/`deprovision-tenant.yml`/`recheck-tenant-owners.yml`)
+  read their own Environment's `TENANT_REGISTRY_DATABASE_URL` secret instead
+  (#2056, merged 2026-08-25) — before that split, both purposes shared one
+  secret, and
   pointing it at `development` for tenant provisioning had silently
   repointed production migrations at `development` too. The dev `migrate-db`
   job now guards against the same class of mistake for its own secret: it

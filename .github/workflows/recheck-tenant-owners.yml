@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Which Neon branch the tenant registry lives in — leave default for the normal scheduled-sweep target'
+        description: 'Which GitHub Environment this run resolves its credentials from — leave default for the normal scheduled-sweep target'
         required: false
         type: choice
         options: [development, production]
@@ -46,20 +46,38 @@ jobs:
     # most, one role grant, no Sanity project creation or Vercel work) — 10
     # minutes is ample even for a large tenant count.
     timeout-minutes: 10
-    # Reuses the same production GitHub Environment every other prod-affecting
-    # job in this repo uses — see provision-tenant.yml's own comment on this.
-    # Unlike those, this job's trigger is `schedule:`, with no human present
-    # to satisfy a required-reviewer rule — if one is ever added to this
-    # shared environment, this workflow would silently stall forever rather
-    # than run unattended. Give this job its own environment first if that
-    # protection is ever configured.
-    environment: production
+    # Bound to the dispatch input rather than hardcoded: a run dispatched for
+    # `development` must resolve every credential (including the tenant
+    # registry connection string below) from the `development` GitHub
+    # Environment, and a `production` dispatch from `production` — never a
+    # mix of the two, same as provision-tenant.yml/deprovision-tenant.yml.
+    #
+    # The `|| 'production'` fallback is load-bearing, and is why this line
+    # cannot be spelled exactly like those two: they are `workflow_dispatch`
+    # only, whereas a `schedule`-triggered run here has a null `inputs`
+    # context. A bare `inputs.environment` would resolve to an empty
+    # environment name on every cron run, leaving the sweep with none of the
+    # secrets below.
+    #
+    # A cron run also has no human present to satisfy a required-reviewer
+    # rule — if one is ever added to either Environment, this workflow would
+    # silently stall forever rather than run unattended. Give this job its
+    # own environment first if that protection is ever configured.
+    environment: ${{ inputs.environment || 'production' }}
     env:
       SANITY_MANAGEMENT_TOKEN: ${{ secrets.SANITY_MANAGEMENT_TOKEN }}
       # Optional — same shared secret name `apps/web`/`apps/platform` already
       # use for their own Resend sends. Unset means the sweep still runs;
       # only the operator-notification email is skipped, not the sweep.
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      # `getDb()` (via `packages/db/src/utils/env/env.ts`) reads `DATABASE_URL`
+      # specifically — deliberately its own secret, distinct from
+      # `DATABASE_URL_UNPOOLED` (which `deploy-production.yml`'s `migrate-db`
+      # job reads): the tenant registry and the application database are two
+      # different connection strings, resolved from the same Environment.
+      # Empty or unset fails the sweep loudly in `createEnv`, so the shell
+      # `:?` guard the removed selector step carried is not needed here.
+      DATABASE_URL: ${{ secrets.TENANT_REGISTRY_DATABASE_URL }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -68,28 +86,5 @@ jobs:
         with:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
-      # `schedule`-triggered runs have a null `inputs` context, so every
-      # reference here falls back to 'production' rather than reading
-      # `inputs.environment` bare. Same `:?` hard-fail idiom as
-      # provision-tenant.yml's own "Select tenant registry database URL"
-      # step — a shell `if`, not the `${{ A && B || C }}` expression idiom,
-      # since that returns the FALSE branch whenever a not-yet-configured
-      # secret evaluates to `''` (falsy).
-      - name: Select tenant registry database URL
-        env:
-          TARGET_ENVIRONMENT: ${{ inputs.environment || 'production' }}
-          DEV_URL: ${{ secrets.TENANT_REGISTRY_DATABASE_URL_DEV }}
-          PROD_URL: ${{ secrets.TENANT_REGISTRY_DATABASE_URL_PROD }}
-        run: |
-          set -euo pipefail
-          if [ "$TARGET_ENVIRONMENT" = development ]; then
-            SELECTED="$DEV_URL"
-            SELECTED_NAME=TENANT_REGISTRY_DATABASE_URL_DEV
-          else
-            SELECTED="$PROD_URL"
-            SELECTED_NAME=TENANT_REGISTRY_DATABASE_URL_PROD
-          fi
-          : "${SELECTED:?empty — set the $SELECTED_NAME secret on the production environment}"
-          echo "DATABASE_URL=$SELECTED" >> "$GITHUB_ENV"
       - name: Run owner-elevation sweep
         run: pnpm --filter @blog/db db:recheck-tenant-owners
