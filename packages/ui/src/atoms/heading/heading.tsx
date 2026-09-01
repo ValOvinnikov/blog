@@ -1,4 +1,4 @@
-import { type IWithClassName, type IWithDataTestId, Size } from '@blog/config';
+import { type IWithClassName, type IWithDataTestId, SIZE } from '@blog/config';
 import { headingTags, type THeadingLevel } from '@blog/ui/lib/react';
 import type { CSSProperties, ReactNode } from 'react';
 
@@ -17,10 +17,10 @@ export type THeadingProps = IWithClassName &
 type TSize = NonNullable<THeadingVariants['size']>;
 
 const defaultSizes: Record<THeadingLevel, TSize> = {
-  1: Size.XXL,
-  2: Size.XL,
-  3: Size.LG,
-  4: Size.MD,
+  1: SIZE.XXL,
+  2: SIZE.XL,
+  3: SIZE.LG,
+  4: SIZE.MD,
 };
 
 /**

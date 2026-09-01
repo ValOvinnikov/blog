@@ -1,4 +1,4 @@
-import { Size } from '@blog/config';
+import { SIZE } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -19,13 +19,13 @@ export const spinnerVariants = tv({
   },
   variants: {
     size: {
-      [Size.SM]: { root: ['text-xs'] },
-      [Size.MD]: { root: ['text-sm'] },
-      [Size.LG]: { root: ['text-base'] },
+      [SIZE.SM]: { root: ['text-xs'] },
+      [SIZE.MD]: { root: ['text-sm'] },
+      [SIZE.LG]: { root: ['text-base'] },
     },
   },
   defaultVariants: {
-    size: Size.MD,
+    size: SIZE.MD,
   },
 });
 

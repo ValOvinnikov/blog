@@ -1,6 +1,6 @@
 import {
   ICONS,
-  Size,
+  SIZE,
   type IWithClassName,
   type IWithDataTestId,
 } from '@blog/config';
@@ -35,7 +35,7 @@ export const CardMeta = ({
   <div className={s.root({ class: className })} data-testid={dataTestId}>
     <Icon
       name={ICONS.CHEVRON_RIGHT}
-      size={Size.SM}
+      size={SIZE.SM}
       className={s.chevron()}
       dataTestId="card-meta-chevron"
     />

@@ -1,4 +1,4 @@
-import { Size } from '@blog/config';
+import { SIZE } from '@blog/config';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -12,7 +12,7 @@ const meta = {
   args: {
     name: 'Jane Doe',
     alt: 'Jane Doe',
-    size: Size.MD,
+    size: SIZE.MD,
   },
   argTypes: {
     size: {
@@ -32,9 +32,9 @@ export const WithImage: TStory = {
 export const Initials: TStory = {};
 
 export const Small: TStory = {
-  args: { size: Size.SM },
+  args: { size: SIZE.SM },
 };
 
 export const Large: TStory = {
-  args: { size: Size.LG },
+  args: { size: SIZE.LG },
 };

@@ -1,21 +1,21 @@
 import { makeRawFeedPost } from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 
-import { getAllPublishedPosts } from './all-published.loader';
+import { getPublishedPostsByTag } from './loader';
 
 vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
   runQuery: vi.fn(),
 }));
 
-describe(getAllPublishedPosts, () => {
-  it('fetches every published post with no pagination parameters', async () => {
+describe(getPublishedPostsByTag, () => {
+  it('fetches every published post tagged with the given tag id', async () => {
     mockRun.mockResolvedValue([
       makeRawFeedPost({ title: 'First', slug: 'first' }),
       makeRawFeedPost({ title: 'Second', slug: 'second' }),
     ]);
 
-    const result = await getAllPublishedPosts();
+    const result = await getPublishedPostsByTag('tag-1');
 
     expect(result).toEqual([
       {
@@ -31,16 +31,23 @@ describe(getAllPublishedPosts, () => {
         publishedAt: '2026-01-15T00:00:00Z',
       },
     ]);
+  });
+
+  it('passes the tag id as a query parameter', async () => {
+    mockRun.mockResolvedValue([]);
+
+    await getPublishedPostsByTag('tag-1');
+
     expect(mockRun).toHaveBeenCalledWith(
       expect.anything(),
-      expect.not.objectContaining({ parameters: expect.anything() }),
+      expect.objectContaining({ parameters: { tagId: 'tag-1' } }),
     );
   });
 
   it('tags the ISR call with posts only', async () => {
     mockRun.mockResolvedValue([]);
 
-    await getAllPublishedPosts();
+    await getPublishedPostsByTag('tag-1');
 
     expect(mockRun).toHaveBeenCalledWith(
       expect.anything(),
@@ -50,10 +57,10 @@ describe(getAllPublishedPosts, () => {
     );
   });
 
-  it('returns an empty array when there are no published posts', async () => {
+  it('returns an empty array when no posts are tagged', async () => {
     mockRun.mockResolvedValue([]);
 
-    const result = await getAllPublishedPosts();
+    const result = await getPublishedPostsByTag('tag-1');
 
     expect(result).toEqual([]);
   });

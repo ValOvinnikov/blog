@@ -42,7 +42,7 @@ When invoked, before writing any code:
 ## Scope & boundaries
 
 - **`packages/config`** (`@blog/config`) — all source under `src/`:
-  - `constants/` — UPPERCASE key/value const pairs (`export const TLINK_TYPE = { INTERNAL: 'INTERNAL', ... } as const`),
+  - `constants/` — UPPERCASE key/value const pairs (`export const LINK_TYPE = { INTERNAL: 'INTERNAL', ... } as const`),
     one file per domain (`link.ts`, `module.ts`, `size.ts`, `language.ts`),
     re-exported from `constants/index.ts`. Derive the union type with
     `(typeof C)[keyof typeof C]`.
@@ -208,7 +208,7 @@ Run these checks **once, after all work is complete**:
 **Report back to the orchestrator** with:
 
 - New/changed constant, type, or route-builder names and their exact export
-  path (e.g. `TLINK_TYPE` from `@blog/config`, `routes.category(slug)`)
+  path (e.g. `LINK_TYPE` from `@blog/config`, `routes.category(slug)`)
 - New/changed `@blog/utils` helper names and signatures
 - Any `configs/*` preset changed, and which workspaces must re-run their
   checks as a result (since presets have no isolated test of their own)

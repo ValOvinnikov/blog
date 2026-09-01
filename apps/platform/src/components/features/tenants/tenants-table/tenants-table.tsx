@@ -1,4 +1,4 @@
-import { Size } from '@blog/config';
+import { SIZE } from '@blog/config';
 import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { Avatar } from '@platform/components/shared/avatar';
@@ -90,7 +90,7 @@ export const TenantsTable = ({ tenants }: TTenantsTableProps) => {
                 <LinkButton
                   href={manageHrefFor(tenant)}
                   variant="ghost"
-                  size={Size.SM}
+                  size={SIZE.SM}
                   ariaLabel={t('manageAriaLabel', { tenantName: tenant.name })}
                 >
                   {t('manage')}

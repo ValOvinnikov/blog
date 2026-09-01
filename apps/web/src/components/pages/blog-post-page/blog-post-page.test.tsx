@@ -1,4 +1,4 @@
-import { ICONS, type ISanityImage, type RichText, Size } from '@blog/config';
+import { ICONS, type ISanityImage, type RichText, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import userEvent from '@testing-library/user-event';
 import {
@@ -229,7 +229,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
       .getByRole('menuitem', { name: /Share on LinkedIn/ })
       .querySelector('svg');
     const { container: fallbackContainer } = renderElement(
-      <Icon name={ICONS.EXTERNAL_LINK} size={Size.SM} />,
+      <Icon name={ICONS.EXTERNAL_LINK} size={SIZE.SM} />,
     );
     const fallbackSvg = fallbackContainer.querySelector('svg');
 

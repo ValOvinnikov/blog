@@ -1,7 +1,7 @@
 'use client';
 
 import { Menu } from '@base-ui/react/menu';
-import { ICONS, Size } from '@blog/config';
+import { ICONS, SIZE } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { Avatar } from '@platform/components/shared/avatar';
 import { Icon } from '@platform/components/shared/icon';
@@ -62,7 +62,7 @@ export const TenantSwitcher = ({
           <span className={name()}>{active.name}</span>
           <span className={domain()}>{active.primaryDomain}</span>
         </span>
-        <Icon name={ICONS.CHEVRON_RIGHT} size={Size.SM} className={chev()} />
+        <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} className={chev()} />
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner sideOffset={6} align="start">

@@ -1,4 +1,4 @@
-import { ASIDE_KIND, Size, type TAsideKind, ICONS } from '@blog/config';
+import { ASIDE_KIND, SIZE, type TAsideKind, ICONS } from '@blog/config';
 import type { TPostDetail } from '@blog/service';
 import { Icon } from '@blog/ui/atoms/icon';
 import type { IBlogPostPageViewProps } from '@web/components/pages/blog-post-page';
@@ -88,7 +88,7 @@ export const makeBlogPostPageView = (
       icon: (
         <Icon
           name={toSocialIconName(link.platform) ?? ICONS.EXTERNAL_LINK}
-          size={Size.SM}
+          size={SIZE.SM}
         />
       ),
     }),

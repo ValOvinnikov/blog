@@ -1,6 +1,6 @@
 import { makeRawFeedPost } from '@blog/service/testing/entities/fixtures';
 
-import { toAllPublishedPosts } from './all-published.transformer';
+import { toAllPublishedPosts } from './transformer';
 
 describe(toAllPublishedPosts, () => {
   it('maps every raw feed post into a domain feed post', () => {

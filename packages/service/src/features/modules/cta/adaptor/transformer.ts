@@ -1,4 +1,4 @@
-import { TLINK_TYPE, type BasicText, type TMaybeUndefined } from '@blog/config';
+import { LINK_TYPE, type BasicText, type TMaybeUndefined } from '@blog/config';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import {
   toInternalHref,
@@ -29,7 +29,7 @@ function toContentLinkAnnotation(
   raw: TRawCtaContentMarkDef,
 ): TCtaContentMarkDef {
   const url =
-    raw.linkType === TLINK_TYPE.INTERNAL && raw.internalReference
+    raw.linkType === LINK_TYPE.INTERNAL && raw.internalReference
       ? toInternalHref(raw.internalReference)
       : (raw.url ?? undefined);
 

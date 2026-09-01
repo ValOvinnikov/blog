@@ -1,9 +1,9 @@
-export const TLINK_TYPE = {
+export const LINK_TYPE = {
   INTERNAL: 'INTERNAL',
   EXTERNAL: 'EXTERNAL',
 } as const;
 
-export type TLinkType = (typeof TLINK_TYPE)[keyof typeof TLINK_TYPE];
+export type TLinkType = (typeof LINK_TYPE)[keyof typeof LINK_TYPE];
 
 export const SOCIAL_PLATFORMS = {
   X: 'X',

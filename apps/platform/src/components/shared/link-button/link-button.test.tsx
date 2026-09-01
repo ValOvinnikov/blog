@@ -1,4 +1,4 @@
-import { Size } from '@blog/config';
+import { SIZE } from '@blog/config';
 import { render, screen } from '@platform/testing/custom-render';
 import type { ComponentPropsWithoutRef } from 'react';
 
@@ -31,7 +31,7 @@ describe(LinkButton, () => {
 
   it('renders every variant and size without throwing', () => {
     const variants = ['primary', 'secondary', 'ghost', 'danger'] as const;
-    const sizes = [Size.SM, Size.MD] as const;
+    const sizes = [SIZE.SM, SIZE.MD] as const;
 
     variants.forEach((variant) => {
       sizes.forEach((size) => {

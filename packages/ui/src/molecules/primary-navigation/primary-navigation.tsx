@@ -2,7 +2,7 @@ import {
   ICONS,
   type IWithClassName,
   type IWithDataTestId,
-  Size,
+  SIZE,
 } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { Icon } from '@blog/ui/atoms/icon';
@@ -103,7 +103,7 @@ export const PrimaryNavigation = ({
           >
             <Icon
               name={mobileToggle.isOpen ? ICONS.CLOSE : ICONS.MENU}
-              size={Size.MD}
+              size={SIZE.MD}
             />
           </IconButton>
           <div

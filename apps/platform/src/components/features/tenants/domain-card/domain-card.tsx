@@ -1,4 +1,4 @@
-import { Size } from '@blog/config';
+import { SIZE } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
@@ -34,7 +34,7 @@ export const DomainCard = ({
             >
               {t(`dnsStatus.${domainVerificationStatus}`)}
             </StatusBadge>
-            <LinkButton href={dnsHref} variant="ghost" size={Size.SM}>
+            <LinkButton href={dnsHref} variant="ghost" size={SIZE.SM}>
               {t('dnsLinkButton')}
             </LinkButton>
           </>

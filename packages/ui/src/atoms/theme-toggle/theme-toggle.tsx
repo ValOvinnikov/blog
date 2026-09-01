@@ -1,6 +1,6 @@
 import {
   ICONS,
-  Size,
+  SIZE,
   type IWithClassName,
   type IWithDataTestId,
 } from '@blog/config';
@@ -46,9 +46,9 @@ export const ThemeToggle = ({
     >
       {isMounted ? (
         isDark ? (
-          <Icon name={ICONS.SUN} size={Size.MD} />
+          <Icon name={ICONS.SUN} size={SIZE.MD} />
         ) : (
-          <Icon name={ICONS.MOON} size={Size.MD} />
+          <Icon name={ICONS.MOON} size={SIZE.MD} />
         )
       ) : (
         <span className={themeTogglePlaceholderVariants()} aria-hidden="true" />

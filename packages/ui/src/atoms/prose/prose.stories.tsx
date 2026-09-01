@@ -1,4 +1,4 @@
-import { Size } from '@blog/config';
+import { SIZE } from '@blog/config';
 import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -32,9 +32,9 @@ type TStory = StoryObj<typeof Prose>;
 export const Medium: TStory = {};
 
 export const Small: TStory = {
-  args: { size: Size.SM },
+  args: { size: SIZE.SM },
 };
 
 export const Large: TStory = {
-  args: { size: Size.LG },
+  args: { size: SIZE.LG },
 };

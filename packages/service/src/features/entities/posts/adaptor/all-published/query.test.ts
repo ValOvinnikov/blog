@@ -1,6 +1,6 @@
 import { makeRawFeedPost } from '@blog/service/testing/entities/fixtures';
 
-import { allPublishedPostsQuery } from './all-published.query';
+import { allPublishedPostsQuery } from './query';
 
 describe('allPublishedPostsQuery', () => {
   it('parses a feed post', () => {

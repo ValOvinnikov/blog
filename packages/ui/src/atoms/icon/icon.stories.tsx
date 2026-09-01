@@ -1,4 +1,4 @@
-import { ICONS, Size } from '@blog/config';
+import { ICONS, SIZE } from '@blog/config';
 import { objectKeys, toTitleCase } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -14,7 +14,7 @@ const IconGallery = () => (
         key={name}
         className="flex flex-col items-center gap-2 rounded-md border border-border p-4 text-center"
       >
-        <Icon name={name} size={Size.LG} />
+        <Icon name={name} size={SIZE.LG} />
         <span className="font-mono text-label text-text-muted">
           {toTitleCase(name)}
         </span>
@@ -44,11 +44,11 @@ type TStory = StoryObj<typeof meta>;
 export const Default: TStory = {};
 
 export const Small: TStory = {
-  args: { size: Size.SM },
+  args: { size: SIZE.SM },
 };
 
 export const Large: TStory = {
-  args: { size: Size.LG },
+  args: { size: SIZE.LG },
 };
 
 export const CustomColor: TStory = {

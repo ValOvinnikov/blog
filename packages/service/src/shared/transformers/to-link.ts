@@ -1,6 +1,6 @@
 import {
   routes,
-  TLINK_TYPE,
+  LINK_TYPE,
   type ILink,
   type TMaybeUndefined,
 } from '@blog/config';
@@ -46,7 +46,7 @@ export function toLink(
   if (!raw) return undefined;
 
   const href =
-    raw.linkType === TLINK_TYPE.INTERNAL && raw.internalReference
+    raw.linkType === LINK_TYPE.INTERNAL && raw.internalReference
       ? toInternalHref(raw.internalReference)
       : raw.url;
 
@@ -56,7 +56,7 @@ export function toLink(
     label: raw.label,
     href,
     target:
-      raw.linkType === TLINK_TYPE.EXTERNAL && raw.openInNewTab
+      raw.linkType === LINK_TYPE.EXTERNAL && raw.openInNewTab
         ? '_blank'
         : undefined,
     platform: raw.platform ?? undefined,
