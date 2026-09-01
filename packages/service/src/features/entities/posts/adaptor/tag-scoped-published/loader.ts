@@ -1,10 +1,10 @@
-import { isr, runQuery } from '@blog/service/sanity/query';
-
 import {
   toAllPublishedPosts,
   type TFeedPost,
-} from './all-published.transformer';
-import { tagScopedPublishedPostsQuery } from './tag-scoped-published.query';
+} from '@blog/service/features/entities/posts/adaptor/all-published/transformer';
+import { isr, runQuery } from '@blog/service/sanity/query';
+
+import { tagScopedPublishedPostsQuery } from './query';
 
 export async function getPublishedPostsByTag(
   tagId: string,

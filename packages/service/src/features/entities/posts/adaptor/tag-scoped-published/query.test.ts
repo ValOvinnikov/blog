@@ -1,6 +1,6 @@
 import { makeRawFeedPost } from '@blog/service/testing/entities/fixtures';
 
-import { tagScopedPublishedPostsQuery } from './tag-scoped-published.query';
+import { tagScopedPublishedPostsQuery } from './query';
 
 describe('tagScopedPublishedPostsQuery', () => {
   it('parses a feed post', () => {

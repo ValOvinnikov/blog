@@ -1,22 +1,25 @@
-import { getAllPublishedPosts } from '@blog/service/features/entities/posts/adaptor/all-published.loader';
-import { getPostsByIds } from '@blog/service/features/entities/posts/adaptor/loader';
-import { getPublishedPostsByTag } from '@blog/service/features/entities/posts/adaptor/tag-scoped-published.loader';
+import { getAllPublishedPosts } from '@blog/service/features/entities/posts/adaptor/all-published/loader';
+import { getPostsByIds } from '@blog/service/features/entities/posts/adaptor/get-by-ids/loader';
+import { getPublishedPostsByTag } from '@blog/service/features/entities/posts/adaptor/tag-scoped-published/loader';
 
 import { createPostsService } from './service';
 
-vi.mock('@blog/service/features/entities/posts/adaptor/loader', () => ({
-  getPostsByIds: vi.fn(),
-}));
+vi.mock(
+  '@blog/service/features/entities/posts/adaptor/get-by-ids/loader',
+  () => ({
+    getPostsByIds: vi.fn(),
+  }),
+);
 
 vi.mock(
-  '@blog/service/features/entities/posts/adaptor/all-published.loader',
+  '@blog/service/features/entities/posts/adaptor/all-published/loader',
   () => ({
     getAllPublishedPosts: vi.fn(),
   }),
 );
 
 vi.mock(
-  '@blog/service/features/entities/posts/adaptor/tag-scoped-published.loader',
+  '@blog/service/features/entities/posts/adaptor/tag-scoped-published/loader',
   () => ({
     getPublishedPostsByTag: vi.fn(),
   }),
