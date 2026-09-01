@@ -45,4 +45,31 @@ describe(getPublishedPostBody, () => {
 
     await expect(getPublishedPostBody('missing')).rejects.toThrow();
   });
+
+  it('threads tenant context into runQuery', async () => {
+    mockRun.mockResolvedValueOnce({ body: [] });
+    const tenant = {
+      projectId: 'tenant-a',
+      dataset: 'production',
+      token: 'tok',
+    };
+
+    await getPublishedPostBody('post-abc', tenant);
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ tenant }),
+    );
+  });
+
+  it('omits tenant when no tenant is given (legacy behavior unchanged)', async () => {
+    mockRun.mockResolvedValueOnce({ body: [] });
+
+    await getPublishedPostBody('post-abc');
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ tenant: undefined }),
+    );
+  });
 });

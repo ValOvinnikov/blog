@@ -1,4 +1,8 @@
-import { isr, runQuery } from '@blog/service/sanity/query';
+import {
+  isr,
+  runQuery,
+  type TTenantSanityContext,
+} from '@blog/service/sanity/query';
 
 import { heroFallbackFeaturedPostQuery } from './featured-post.query';
 import { heroModuleQuery } from './query';
@@ -11,22 +15,32 @@ import type { THeroModule } from './types';
 // `blog_topic`/`page_generic`/`page_blog`) — every one of those types'
 // tags must be included alongside the module's own tags (tag-scope
 // contract, `sanity/query.ts`).
-export async function getHero(id: string): Promise<THeroModule> {
+export async function getHero(
+  id: string,
+  tenant?: TTenantSanityContext,
+): Promise<THeroModule> {
   const [raw, rawFallbackPost] = await Promise.all([
     runQuery(heroModuleQuery, {
       parameters: { id },
-      ...isr([
-        'modules:hero',
-        `module:${id}`,
-        'posts',
-        'author',
-        'topic',
-        'post',
-        'page_generic',
-        'page_blog',
-      ]),
+      tenant,
+      ...isr(
+        [
+          'modules:hero',
+          `module:${id}`,
+          'posts',
+          'author',
+          'topic',
+          'post',
+          'page_generic',
+          'page_blog',
+        ],
+        tenant?.projectId,
+      ),
     }),
-    runQuery(heroFallbackFeaturedPostQuery, isr(['posts', 'author', 'topic'])),
+    runQuery(heroFallbackFeaturedPostQuery, {
+      tenant,
+      ...isr(['posts', 'author', 'topic'], tenant?.projectId),
+    }),
   ]);
 
   return toHeroModule(raw, rawFallbackPost);

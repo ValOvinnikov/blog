@@ -1,7 +1,11 @@
 import { TAXONOMY_KIND, type TTaxonomyKind } from '@blog/config';
 import { getTags } from '@blog/service/features/entities/tags/adaptor/loader';
 import { getTopics } from '@blog/service/features/entities/topics/adaptor/loader';
-import { isr, runQuery } from '@blog/service/sanity/query';
+import {
+  isr,
+  runQuery,
+  type TTenantSanityContext,
+} from '@blog/service/sanity/query';
 
 import { taxonomyListModuleQuery } from './query';
 import { toTaxonomyListModule } from './transformer';
@@ -15,13 +19,15 @@ import type { TTaxonomyListModule } from './types';
 export async function getTaxonomyList(
   id: string,
   taxonomy: TTaxonomyKind,
+  tenant?: TTenantSanityContext,
 ): Promise<TTaxonomyListModule> {
   const [raw, entries] = await Promise.all([
     runQuery(taxonomyListModuleQuery, {
       parameters: { id },
-      ...isr(['modules:taxonomyList', `module:${id}`]),
+      tenant,
+      ...isr(['modules:taxonomyList', `module:${id}`], tenant?.projectId),
     }),
-    taxonomy === TAXONOMY_KIND.TOPICS ? getTopics() : getTags(),
+    taxonomy === TAXONOMY_KIND.TOPICS ? getTopics(tenant) : getTags(tenant),
   ]);
 
   return toTaxonomyListModule(raw, entries);

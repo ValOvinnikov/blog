@@ -67,4 +67,42 @@ describe('getFooter', () => {
       }),
     );
   });
+
+  it('threads tenant context into runQuery and scopes the tags to it', async () => {
+    mockRun.mockResolvedValue(makeRawFooter());
+    const tenant = {
+      projectId: 'tenant-a',
+      dataset: 'production',
+      token: 'tok',
+    };
+
+    await getFooter(tenant);
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        tenant,
+        next: expect.objectContaining({
+          tags: [
+            't:tenant-a:footer',
+            't:tenant-a:post',
+            't:tenant-a:topic',
+            't:tenant-a:page_generic',
+            't:tenant-a:page_blog',
+          ],
+        }),
+      }),
+    );
+  });
+
+  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
+    mockRun.mockResolvedValue(makeRawFooter());
+
+    await getFooter();
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ tenant: undefined }),
+    );
+  });
 });

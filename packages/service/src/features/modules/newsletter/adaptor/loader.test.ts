@@ -40,4 +40,39 @@ describe('getNewsletter', () => {
       }),
     );
   });
+
+  it('threads tenant context into runQuery and scopes the tags to it', async () => {
+    mockRun.mockResolvedValue(makeRawNewsletterModule());
+    const tenant = {
+      projectId: 'tenant-a',
+      dataset: 'production',
+      token: 'tok',
+    };
+
+    await getNewsletter('newsletter-1', tenant);
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        tenant,
+        next: expect.objectContaining({
+          tags: [
+            't:tenant-a:modules:newsletter',
+            't:tenant-a:module:newsletter-1',
+          ],
+        }),
+      }),
+    );
+  });
+
+  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
+    mockRun.mockResolvedValue(makeRawNewsletterModule());
+
+    await getNewsletter('newsletter-1');
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ tenant: undefined }),
+    );
+  });
 });

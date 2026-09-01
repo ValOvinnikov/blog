@@ -154,4 +154,59 @@ describe('getTopicPage', () => {
 
     expect(mockRun).toHaveBeenCalledTimes(1);
   });
+
+  it('threads tenant context into both queries and scopes their tags to it', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawTopicPage())
+      .mockResolvedValueOnce(makeRawSiteSettings());
+    const tenant = {
+      projectId: 'tenant-a',
+      dataset: 'production',
+      token: 'tok',
+    };
+
+    await getTopicPage('engineering', tenant);
+
+    expect(mockRun).toHaveBeenNthCalledWith(
+      1,
+      expect.anything(),
+      expect.objectContaining({
+        tenant,
+        next: expect.objectContaining({
+          tags: [
+            't:tenant-a:page_topic',
+            't:tenant-a:topic',
+            't:tenant-a:modules:postList',
+          ],
+        }),
+      }),
+    );
+    expect(mockRun).toHaveBeenNthCalledWith(
+      2,
+      expect.anything(),
+      expect.objectContaining({
+        tenant,
+        next: expect.objectContaining({ tags: ['t:tenant-a:site-settings'] }),
+      }),
+    );
+  });
+
+  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawTopicPage())
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    await getTopicPage('engineering');
+
+    expect(mockRun).toHaveBeenNthCalledWith(
+      1,
+      expect.anything(),
+      expect.objectContaining({ tenant: undefined }),
+    );
+    expect(mockRun).toHaveBeenNthCalledWith(
+      2,
+      expect.anything(),
+      expect.objectContaining({ tenant: undefined }),
+    );
+  });
 });

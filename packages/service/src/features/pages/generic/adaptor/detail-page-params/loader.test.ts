@@ -23,4 +23,37 @@ describe('getPageSlugs', () => {
 
     expect(params).toEqual([]);
   });
+
+  it('threads tenant context into runQuery and scopes the tags to it', async () => {
+    mockRun.mockResolvedValue([]);
+    const tenant = {
+      projectId: 'tenant-a',
+      dataset: 'production',
+      token: 'tok',
+    };
+
+    await getPageSlugs(tenant);
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        tenant,
+        next: expect.objectContaining({ tags: ['t:tenant-a:page_generic'] }),
+      }),
+    );
+  });
+
+  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
+    mockRun.mockResolvedValue([]);
+
+    await getPageSlugs();
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        tenant: undefined,
+        next: expect.objectContaining({ tags: ['page_generic'] }),
+      }),
+    );
+  });
 });

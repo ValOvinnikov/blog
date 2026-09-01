@@ -111,4 +111,73 @@ describe('getPostList', () => {
     expect(postList.currentPage).toBe(2);
     expect(postList.totalPages).toBe(3); // ceil(25 / 9)
   });
+
+  it('threads tenant context into both queries and scopes their tags to it', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawPostListModule({ pageSize: 3 }))
+      .mockResolvedValueOnce({
+        posts: [makeRawPostCard({ _id: 'a' })],
+        total: 1,
+      });
+    const tenant = {
+      projectId: 'tenant-a',
+      dataset: 'production',
+      token: 'tok',
+    };
+
+    await getPostList('post-list-1', 1, tenant);
+
+    expect(mockRun).toHaveBeenNthCalledWith(
+      1,
+      expect.anything(),
+      expect.objectContaining({
+        tenant,
+        next: expect.objectContaining({
+          tags: [
+            't:tenant-a:modules:postList',
+            't:tenant-a:module:post-list-1',
+          ],
+        }),
+      }),
+    );
+    expect(mockRun).toHaveBeenNthCalledWith(
+      2,
+      expect.anything(),
+      expect.objectContaining({
+        tenant,
+        next: expect.objectContaining({
+          tags: [
+            't:tenant-a:posts',
+            't:tenant-a:author',
+            't:tenant-a:topic',
+            't:tenant-a:page_tag',
+            't:tenant-a:tag',
+            't:tenant-a:page_topic',
+          ],
+        }),
+      }),
+    );
+  });
+
+  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawPostListModule({ pageSize: 3 }))
+      .mockResolvedValueOnce({
+        posts: [makeRawPostCard({ _id: 'a' })],
+        total: 1,
+      });
+
+    await getPostList('post-list-1');
+
+    expect(mockRun).toHaveBeenNthCalledWith(
+      1,
+      expect.anything(),
+      expect.objectContaining({ tenant: undefined }),
+    );
+    expect(mockRun).toHaveBeenNthCalledWith(
+      2,
+      expect.anything(),
+      expect.objectContaining({ tenant: undefined }),
+    );
+  });
 });

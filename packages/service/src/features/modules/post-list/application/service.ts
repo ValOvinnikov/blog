@@ -1,11 +1,13 @@
 import { getPostList } from '@blog/service/features/modules/post-list/adaptor/loader';
+import type { TTenantSanityContext } from '@blog/service/sanity/query';
 import { safeAsync } from '@blog/utils';
 
 export function createPostListModuleService() {
   return {
     v1: {
-      getPostList: safeAsync((id: string, page?: number) =>
-        getPostList(id, page),
+      getPostList: safeAsync(
+        (id: string, page?: number, tenant?: TTenantSanityContext) =>
+          getPostList(id, page, tenant),
       ),
     },
   };

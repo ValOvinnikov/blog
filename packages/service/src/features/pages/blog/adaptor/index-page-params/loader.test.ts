@@ -39,4 +39,46 @@ describe('getIndexPageParams', () => {
       }),
     );
   });
+
+  it('threads tenant context into runQuery and scopes the tags to it', async () => {
+    mockRun.mockResolvedValueOnce({
+      blogPosts: { total: 0 },
+      postList: { pageSize: 9 },
+    });
+    const tenant = {
+      projectId: 'tenant-a',
+      dataset: 'production',
+      token: 'tok',
+    };
+
+    await getIndexPageParams(tenant);
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        tenant,
+        next: expect.objectContaining({
+          tags: [
+            't:tenant-a:posts',
+            't:tenant-a:page_blog',
+            't:tenant-a:modules:postList',
+          ],
+        }),
+      }),
+    );
+  });
+
+  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
+    mockRun.mockResolvedValueOnce({
+      blogPosts: { total: 0 },
+      postList: { pageSize: 9 },
+    });
+
+    await getIndexPageParams();
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ tenant: undefined }),
+    );
+  });
 });

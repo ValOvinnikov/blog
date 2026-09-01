@@ -1,4 +1,8 @@
-import { isr, runQuery } from '@blog/service/sanity/query';
+import {
+  isr,
+  runQuery,
+  type TTenantSanityContext,
+} from '@blog/service/sanity/query';
 
 import { topicPaginationParamsQuery } from './query';
 import { toTopicPaginationParams } from './transformer';
@@ -9,12 +13,15 @@ import { toTopicPaginationParams } from './transformer';
  * archive page size in one round-trip (see `./query.ts`) — no per-slug
  * fan-out.
  */
-export async function getTopicPaginationParams(): Promise<
-  { slug: string; page: string }[]
-> {
-  const topicPages = await runQuery(
-    topicPaginationParamsQuery,
-    isr(['page_topic', 'modules:postList', 'posts', 'topic']),
-  );
+export async function getTopicPaginationParams(
+  tenant?: TTenantSanityContext,
+): Promise<{ slug: string; page: string }[]> {
+  const topicPages = await runQuery(topicPaginationParamsQuery, {
+    tenant,
+    ...isr(
+      ['page_topic', 'modules:postList', 'posts', 'topic'],
+      tenant?.projectId,
+    ),
+  });
   return toTopicPaginationParams(topicPages);
 }
