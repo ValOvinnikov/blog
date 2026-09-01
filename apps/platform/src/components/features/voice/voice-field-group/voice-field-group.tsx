@@ -40,11 +40,12 @@ export const VoiceFieldGroup = ({
       <Card.Header
         title={title}
         supportingText={t('fieldCount', { count: fields.length })}
+        headingLevel={2}
       />
       <Card.Body className={body()}>
         {fields.map((field) => (
           <div key={field.key} className={vfield()}>
-            <Heading level={4} size="fieldLabel" className={vfieldLabel()}>
+            <Heading level={3} size="fieldLabel" className={vfieldLabel()}>
               {field.label} <code className={vfieldKey()}>{field.key}</code>
             </Heading>
             <VoiceField

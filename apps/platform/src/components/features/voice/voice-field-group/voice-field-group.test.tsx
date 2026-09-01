@@ -51,14 +51,14 @@ describe(VoiceFieldGroup, () => {
     );
 
     expect(
-      screen.getByRole('heading', { level: 3, name: 'Terminal prompts' }),
+      screen.getByRole('heading', { level: 2, name: 'Terminal prompts' }),
     ).toBeVisible();
     expect(
-      screen.getByRole('heading', { level: 4, name: /Terminal Prompt Host/ }),
+      screen.getByRole('heading', { level: 3, name: /Terminal Prompt Host/ }),
     ).toBeVisible();
     expect(
       screen.getByRole('heading', {
-        level: 4,
+        level: 3,
         name: /Auth Prompt Command — Sign In/,
       }),
     ).toBeVisible();
