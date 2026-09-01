@@ -4,7 +4,7 @@ const REQUIRED_ENV: Record<string, string> = {
   SANITY_MANAGEMENT_TOKEN: 'sanity-token',
   SANITY_ORGANIZATION_ID: 'org-abc',
   VERCEL_TOKEN: 'vercel-token',
-  VERCEL_PROJECT_ID: 'proj-1',
+  VERCEL_PROJECT_ID_WEB: 'proj-1',
   ADMIN_APP_BASE_URL: 'https://admin.example.com',
   TENANT_SANITY_DATASET: 'test-dataset',
   WEB_APP_URL: 'https://example.com',

@@ -30,7 +30,7 @@ export function loadDeprovisionEnv(dryRun: boolean): TDeprovisionEnv {
     sanityManagementToken: requireEnv('SANITY_MANAGEMENT_TOKEN'),
     vercelToken: requireEnv('VERCEL_TOKEN'),
     vercelTeamId: process.env['VERCEL_TEAM_ID'],
-    vercelWebProjectId: requireEnv('VERCEL_PROJECT_ID'),
+    vercelWebProjectId: requireEnv('VERCEL_PROJECT_ID_WEB'),
     dryRun,
     githubActor: process.env['GITHUB_ACTOR'],
     githubRunId: process.env['GITHUB_RUN_ID'],

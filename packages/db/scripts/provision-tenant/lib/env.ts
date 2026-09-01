@@ -42,7 +42,7 @@ export function loadProvisionEnv(): TProvisionEnv {
     sanityOrganizationId: requireEnv('SANITY_ORGANIZATION_ID'),
     vercelToken: requireEnv('VERCEL_TOKEN'),
     vercelTeamId: process.env['VERCEL_TEAM_ID'],
-    vercelWebProjectId: requireEnv('VERCEL_PROJECT_ID'),
+    vercelWebProjectId: requireEnv('VERCEL_PROJECT_ID_WEB'),
     adminAppBaseUrl: requireEnv('ADMIN_APP_BASE_URL'),
     tenantSanityDataset: requireEnv('TENANT_SANITY_DATASET'),
     webAppBaseUrl: requireEnv('WEB_APP_URL'),

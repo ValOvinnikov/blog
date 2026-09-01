@@ -3,7 +3,7 @@ import { loadDeprovisionEnv } from './env';
 const REQUIRED_ENV: Record<string, string> = {
   SANITY_MANAGEMENT_TOKEN: 'sanity-token',
   VERCEL_TOKEN: 'vercel-token',
-  VERCEL_PROJECT_ID: 'proj-1',
+  VERCEL_PROJECT_ID_WEB: 'proj-1',
 };
 
 const originalEnv: Record<string, string | undefined> = {};
