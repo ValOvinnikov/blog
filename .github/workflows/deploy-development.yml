@@ -292,11 +292,11 @@ jobs:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
 
-      # Deploys `blog-dev` via the Vercel CLI (its Git auto-deploy is disabled).
-      # For `blog-dev`, Vercel "production" = main, so --prod targets its main
+      # Deploys `blog-web-dev` via the Vercel CLI (its Git auto-deploy is disabled).
+      # For `blog-web-dev`, Vercel "production" = main, so --prod targets its main
       # URL. No-op (green) until the development environment's VERCEL_* secrets
       # exist.
-      - name: Deploy to Vercel (blog-dev)
+      - name: Deploy to Vercel (blog-web-dev)
         if: ${{ env.VERCEL_TOKEN != '' }}
         run: |
           set -euo pipefail

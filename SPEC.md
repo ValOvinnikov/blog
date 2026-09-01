@@ -315,7 +315,7 @@ its `Host` header against `@blog/db`'s `tenant_domains`
 (`resolveTenantId()`, `apps/web/src/server/tenant/`), falling back to the
 sole `tenants` row outside production (`isProductionEnvironment()` — never
 `NODE_ENV`, which is `production` on every Vercel build including the live
-`blog-dev` deployment) and 404ing on an unmatched host in production; the
+`blog-web-dev` deployment) and 404ing on an unmatched host in production; the
 resolved `tenantId` is threaded to Server Components/Actions via the
 `x-tenant-id` request header (unconditionally cleared before the conditional
 set, so a client-supplied value can never survive an unresolved lookup),
@@ -549,8 +549,8 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
 | Sanity project           | separate dev project (id via env) | separate prod project (id via env) |
 | Sanity dataset           | `development`                     | `production`                       |
 | Neon branch (`@blog/db`) | `development`                     | `production`                       |
-| Vercel project (web)     | `blog-dev`                        | `blog-prod`                        |
-| Vercel project (admin)   | `admin-dev`                       | `admin-prod`                       |
+| Vercel project (web)     | `blog-web-dev`                    | `blog-web-prod`                    |
+| Vercel project (admin)   | `platform-dev`                    | `platform-prod`                    |
 | Admin hostname           | `admin-dev.{your-hosting}`        | `admin.{your-hosting}`             |
 | Deploy trigger           | push/merge to `main`              | push git tag `v*`                  |
 | Web deploy mechanism     | Vercel CLI in GitHub Actions      | Vercel CLI in GitHub Actions       |
@@ -585,7 +585,7 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   (#2264): it fails if its own resolved host does **not** match the same
   repo Variable, so a mis-set production secret can no longer migrate the
   wrong Neon branch — or nothing at all — while reporting success. Whether
-  `blog-dev`'s Vercel `DATABASE_URL` scope is correct is still open (#2058).
+  `blog-web-dev`'s Vercel `DATABASE_URL` scope is correct is still open (#2058).
   See `docs/DEPLOY.md`'s Neon Postgres section for the full state and open
   items.
 - **Each environment is a separate Sanity project** with its own env-driven,
