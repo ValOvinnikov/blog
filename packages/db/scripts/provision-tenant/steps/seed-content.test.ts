@@ -2,7 +2,11 @@ import type { TTenant } from '@blog/db/schema/tenants';
 
 import type { TProvisionEnv } from '../lib/env';
 
-import { seedTenantContent, type TSeedContentDeps } from './seed-content';
+import {
+  seedTenantContent,
+  SEED_TRANSACTION_MAX_ATTEMPTS,
+  type TSeedContentDeps,
+} from './seed-content';
 
 const { setTenantSeededAtMock } = vi.hoisted(() => ({
   setTenantSeededAtMock: vi.fn(),
@@ -57,6 +61,7 @@ describe(seedTenantContent, () => {
       createClient: vi.fn(),
       mintWriteToken: vi.fn(),
       revokeWriteToken: vi.fn(),
+      sleep: vi.fn().mockResolvedValue(undefined),
     };
 
     await seedTenantContent(tenant, env, deps);
@@ -71,6 +76,7 @@ describe(seedTenantContent, () => {
       createClient: vi.fn(),
       mintWriteToken: vi.fn(),
       revokeWriteToken: vi.fn(),
+      sleep: vi.fn().mockResolvedValue(undefined),
     };
 
     await expect(seedTenantContent(tenant, env, deps)).rejects.toThrow(
@@ -93,11 +99,13 @@ describe(seedTenantContent, () => {
       .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
     const revokeWriteToken = vi.fn().mockResolvedValue(undefined);
     const createClient = vi.fn().mockReturnValue(client);
+    const sleep = vi.fn().mockResolvedValue(undefined);
 
     await seedTenantContent(tenant, env, {
       createClient: createClient as unknown as TSeedContentDeps['createClient'],
       mintWriteToken,
       revokeWriteToken,
+      sleep,
     });
 
     expect(mintWriteToken).toHaveBeenCalledWith({
@@ -117,6 +125,7 @@ describe(seedTenantContent, () => {
     expect(upload).toHaveBeenCalledTimes(2);
     expect(createOrReplace).toHaveBeenCalledTimes(9);
     expect(commit).toHaveBeenCalledTimes(1);
+    expect(sleep).not.toHaveBeenCalled();
     expect(revokeWriteToken).toHaveBeenCalledWith({
       token: 'mgmt-token',
       projectId: 'proj123',
@@ -140,6 +149,7 @@ describe(seedTenantContent, () => {
       .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
     const revokeWriteToken = vi.fn().mockResolvedValue(undefined);
     const createClient = vi.fn().mockReturnValue(client);
+    const sleep = vi.fn().mockResolvedValue(undefined);
 
     await expect(
       seedTenantContent(tenant, env, {
@@ -147,6 +157,7 @@ describe(seedTenantContent, () => {
           createClient as unknown as TSeedContentDeps['createClient'],
         mintWriteToken,
         revokeWriteToken,
+        sleep,
       }),
     ).rejects.toThrow('upload failed');
 
@@ -156,5 +167,126 @@ describe(seedTenantContent, () => {
       robotId: 'robot-1',
     });
     expect(setTenantSeededAtMock).not.toHaveBeenCalled();
+  });
+
+  it('retries a grant-propagation failure once and succeeds without re-uploading assets', async () => {
+    const tenant = baseTenant();
+    const grantError = new Error(
+      'transaction failed: Insufficient permissions; permission "create" required',
+    );
+    const commit = vi
+      .fn()
+      .mockRejectedValueOnce(grantError)
+      .mockResolvedValueOnce(undefined);
+    const createOrReplace = vi.fn();
+    const transaction = { createOrReplace, commit };
+    const upload = vi
+      .fn()
+      .mockResolvedValueOnce({ _id: 'image-author' })
+      .mockResolvedValueOnce({ _id: 'image-og' });
+    const client = { assets: { upload }, transaction: () => transaction };
+    const mintWriteToken = vi
+      .fn()
+      .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
+    const revokeWriteToken = vi.fn().mockResolvedValue(undefined);
+    const createClient = vi.fn().mockReturnValue(client);
+    const sleep = vi.fn().mockResolvedValue(undefined);
+
+    await seedTenantContent(tenant, env, {
+      createClient: createClient as unknown as TSeedContentDeps['createClient'],
+      mintWriteToken,
+      revokeWriteToken,
+      sleep,
+    });
+
+    expect(upload).toHaveBeenCalledTimes(2);
+    expect(commit).toHaveBeenCalledTimes(2);
+    expect(sleep).toHaveBeenCalledTimes(1);
+    expect(revokeWriteToken).toHaveBeenCalledWith({
+      token: 'mgmt-token',
+      projectId: 'proj123',
+      robotId: 'robot-1',
+    });
+    expect(setTenantSeededAtMock).toHaveBeenCalledWith(
+      'tenant-1',
+      expect.any(Date),
+    );
+  });
+
+  it('exhausts retries on a persistent grant-propagation failure, still revokes the token, and never persists seededAt', async () => {
+    const tenant = baseTenant();
+    const grantError = new Error(
+      'transaction failed: Insufficient permissions; permission "create" required',
+    );
+    const commit = vi.fn().mockRejectedValue(grantError);
+    const createOrReplace = vi.fn();
+    const transaction = { createOrReplace, commit };
+    const upload = vi
+      .fn()
+      .mockResolvedValueOnce({ _id: 'image-author' })
+      .mockResolvedValueOnce({ _id: 'image-og' });
+    const client = { assets: { upload }, transaction: () => transaction };
+    const mintWriteToken = vi
+      .fn()
+      .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
+    const revokeWriteToken = vi.fn().mockResolvedValue(undefined);
+    const createClient = vi.fn().mockReturnValue(client);
+    const sleep = vi.fn().mockResolvedValue(undefined);
+
+    await expect(
+      seedTenantContent(tenant, env, {
+        createClient:
+          createClient as unknown as TSeedContentDeps['createClient'],
+        mintWriteToken,
+        revokeWriteToken,
+        sleep,
+      }),
+    ).rejects.toThrow(grantError);
+
+    expect(upload).toHaveBeenCalledTimes(2);
+    expect(commit).toHaveBeenCalledTimes(SEED_TRANSACTION_MAX_ATTEMPTS);
+    expect(revokeWriteToken).toHaveBeenCalledWith({
+      token: 'mgmt-token',
+      projectId: 'proj123',
+      robotId: 'robot-1',
+    });
+    expect(setTenantSeededAtMock).not.toHaveBeenCalled();
+  });
+
+  it('does not retry a non-grant-propagation commit failure', async () => {
+    const tenant = baseTenant();
+    const otherError = new Error('malformed document');
+    const commit = vi.fn().mockRejectedValue(otherError);
+    const createOrReplace = vi.fn();
+    const transaction = { createOrReplace, commit };
+    const upload = vi
+      .fn()
+      .mockResolvedValueOnce({ _id: 'image-author' })
+      .mockResolvedValueOnce({ _id: 'image-og' });
+    const client = { assets: { upload }, transaction: () => transaction };
+    const mintWriteToken = vi
+      .fn()
+      .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
+    const revokeWriteToken = vi.fn().mockResolvedValue(undefined);
+    const createClient = vi.fn().mockReturnValue(client);
+    const sleep = vi.fn().mockResolvedValue(undefined);
+
+    await expect(
+      seedTenantContent(tenant, env, {
+        createClient:
+          createClient as unknown as TSeedContentDeps['createClient'],
+        mintWriteToken,
+        revokeWriteToken,
+        sleep,
+      }),
+    ).rejects.toThrow(otherError);
+
+    expect(commit).toHaveBeenCalledTimes(1);
+    expect(sleep).not.toHaveBeenCalled();
+    expect(revokeWriteToken).toHaveBeenCalledWith({
+      token: 'mgmt-token',
+      projectId: 'proj123',
+      robotId: 'robot-1',
+    });
   });
 });
