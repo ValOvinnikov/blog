@@ -3,6 +3,10 @@ import { safeAsync } from '@blog/utils';
 
 export function createPostListModuleService() {
   return {
-    v1: { getPostList: safeAsync(getPostList) },
+    v1: {
+      getPostList: safeAsync((id: string, page?: number) =>
+        getPostList(id, page),
+      ),
+    },
   };
 }

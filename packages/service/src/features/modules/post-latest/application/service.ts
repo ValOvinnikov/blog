@@ -3,6 +3,6 @@ import { safeAsync } from '@blog/utils';
 
 export function createPostLatestModuleService() {
   return {
-    v1: { getPostLatest: safeAsync(getPostLatest) },
+    v1: { getPostLatest: safeAsync((id: string) => getPostLatest(id)) },
   };
 }
