@@ -1,4 +1,4 @@
-import { getEnabledOAuthProviderIds } from '@blog/auth';
+import { getEnabledOAuthProviderIds } from '@blog/auth/utils/oauth-providers/oauth-providers';
 import { ICONS, type ILocalizedParams, routes, SIZE } from '@blog/config';
 import { service } from '@blog/service';
 import { Icon } from '@blog/ui/atoms/icon';

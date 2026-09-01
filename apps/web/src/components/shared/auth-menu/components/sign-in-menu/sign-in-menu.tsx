@@ -1,6 +1,6 @@
 'use client';
 
-import type { TOAuthProviderId } from '@blog/auth';
+import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
 import { ICONS, SIZE, type TIconName } from '@blog/config';
 import { Button } from '@blog/ui/atoms/button';
 import { Icon } from '@blog/ui/atoms/icon';

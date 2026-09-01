@@ -34,7 +34,7 @@ const {
   getEnabledOAuthProviderIdsMock: vi.fn(),
 }));
 
-vi.mock('@blog/auth', () => ({
+vi.mock('@blog/auth/utils/oauth-providers/oauth-providers', () => ({
   getEnabledOAuthProviderIds: getEnabledOAuthProviderIdsMock,
 }));
 

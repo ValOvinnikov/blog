@@ -26,10 +26,9 @@ const OAUTH_CREDENTIAL_GETTERS: Record<
 };
 
 /**
- * getOAuthProviderCredentials — the single source of truth for whether an
- * OAuth provider's full credential pair is present; `config.ts`'s provider
- * gating and `getEnabledOAuthProviderIds` both resolve through this so the
- * registered set and the advertised set can never drift apart.
+ * The single predicate both `config.ts`'s provider gating and
+ * `getEnabledOAuthProviderIds` resolve through, so the registered and
+ * advertised provider sets can never drift apart.
  */
 export function getOAuthProviderCredentials(
   id: TOAuthProviderId,
