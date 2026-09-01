@@ -7,6 +7,7 @@ import {
   type TSendEmail,
 } from '@blog/auth/providers/magic-link/magic-link-provider';
 import { env } from '@blog/auth/utils/env/env';
+import { getOAuthProviderCredentials } from '@blog/auth/utils/oauth-providers/oauth-providers';
 import { getDb, schema } from '@blog/db';
 import type { NextAuthConfig } from 'next-auth';
 import GitHub from 'next-auth/providers/github';
@@ -36,6 +37,9 @@ export type TBuildAuthConfigOptions = {
 export function buildAuthConfig({
   sendEmail,
 }: TBuildAuthConfigOptions): NextAuthConfig {
+  const githubCredentials = getOAuthProviderCredentials('github');
+  const googleCredentials = getOAuthProviderCredentials('google');
+
   return {
     adapter: DrizzleAdapter(getDb(), {
       usersTable: schema.users,
@@ -86,22 +90,8 @@ export function buildAuthConfig({
       signIn: ({ user }) => consumePendingInvitesOnSignIn({ user }),
     },
     providers: [
-      ...(env.AUTH_GITHUB_ID && env.AUTH_GITHUB_SECRET
-        ? [
-            GitHub({
-              clientId: env.AUTH_GITHUB_ID,
-              clientSecret: env.AUTH_GITHUB_SECRET,
-            }),
-          ]
-        : []),
-      ...(env.AUTH_GOOGLE_ID && env.AUTH_GOOGLE_SECRET
-        ? [
-            Google({
-              clientId: env.AUTH_GOOGLE_ID,
-              clientSecret: env.AUTH_GOOGLE_SECRET,
-            }),
-          ]
-        : []),
+      ...(githubCredentials ? [GitHub(githubCredentials)] : []),
+      ...(googleCredentials ? [Google(googleCredentials)] : []),
       buildMagicLinkProvider(sendEmail),
     ],
   };

@@ -7,3 +7,7 @@ export type {
   TSendEmailInput,
 } from '@blog/auth/providers/magic-link/magic-link-provider';
 export { buildAuthConfig, type TBuildAuthConfigOptions } from './config';
+export {
+  getEnabledOAuthProviderIds,
+  type TOAuthProviderId,
+} from './utils/oauth-providers/oauth-providers';
