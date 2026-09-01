@@ -223,13 +223,19 @@ The split is by message kind, not by convenience:
 
 `getDomainVerificationStatus` returns `NOT_ADDED` only on a literal 404 from
 Vercel's Domains API, so for a tenant whose `MAP_DOMAIN` step reports `DONE`
-the domain is genuinely absent from the project being queried. Two candidates:
-`VERCEL_WEB_PROJECT_ID` in admin's runtime env does not match the project the
-provisioning workflow mapped onto, or `MAP_DOMAIN` writes to a different
-project than the one it reports.
+the domain is genuinely absent from the project being queried.
 
-**No fix is specified here** — the cause is unknown, and §0 must land before
-the behaviour can be reproduced. This ships as an investigation ticket.
+**Cause identified 2026-09-01: the first candidate.** All three tenant
+workflows take an `environment` input but pin the job to
+`environment: production`, so a run dispatched from `platform-dev` maps the
+domain onto the _production_ web project while the dev panel queries the
+development one. The domain is added to one project and looked for in
+another. The fix — binding `environment:` to the dispatch input across all
+three workflows — is specified on #2261.
+
+(The runtime variable named here has since been renamed to
+`VERCEL_PROJECT_ID_WEB`, matching the GitHub Environment side; one value
+carrying two names across two systems was what let the mismatch hide.)
 
 ## §7 — Shell chrome: breadcrumbs and the role chip
 
