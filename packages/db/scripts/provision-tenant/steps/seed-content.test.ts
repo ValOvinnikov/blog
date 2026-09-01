@@ -8,12 +8,16 @@ import {
   type TSeedContentDeps,
 } from './seed-content';
 
-const { setTenantSeededAtMock } = vi.hoisted(() => ({
-  setTenantSeededAtMock: vi.fn(),
-}));
+const { setTenantSeededAtMock, setTenantSanityWriteTokenMock } = vi.hoisted(
+  () => ({
+    setTenantSeededAtMock: vi.fn(),
+    setTenantSanityWriteTokenMock: vi.fn(),
+  }),
+);
 
 vi.mock('@blog/db/queries/tenants', () => ({
   setTenantSeededAt: setTenantSeededAtMock,
+  setTenantSanityWriteToken: setTenantSanityWriteTokenMock,
 }));
 
 const env: TProvisionEnv = {
@@ -52,6 +56,7 @@ function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
 
 beforeEach(() => {
   setTenantSeededAtMock.mockReset();
+  setTenantSanityWriteTokenMock.mockReset();
 });
 
 describe(seedTenantContent, () => {
@@ -84,7 +89,7 @@ describe(seedTenantContent, () => {
     );
   });
 
-  it('mints a transient editor token, uploads two images, commits a transaction, revokes the token, and persists seededAt', async () => {
+  it('mints an editor token, uploads two images, commits a transaction, persists the token instead of revoking it, and persists seededAt', async () => {
     const tenant = baseTenant();
     const commit = vi.fn().mockResolvedValue(undefined);
     const createOrReplace = vi.fn();
@@ -126,11 +131,11 @@ describe(seedTenantContent, () => {
     expect(createOrReplace).toHaveBeenCalledTimes(9);
     expect(commit).toHaveBeenCalledTimes(1);
     expect(sleep).not.toHaveBeenCalled();
-    expect(revokeWriteToken).toHaveBeenCalledWith({
-      token: 'mgmt-token',
-      projectId: 'proj123',
-      robotId: 'robot-1',
-    });
+    expect(setTenantSanityWriteTokenMock).toHaveBeenCalledWith(
+      'tenant-1',
+      'sk-write',
+    );
+    expect(revokeWriteToken).not.toHaveBeenCalled();
     expect(setTenantSeededAtMock).toHaveBeenCalledWith(
       'tenant-1',
       expect.any(Date),
@@ -160,6 +165,45 @@ describe(seedTenantContent, () => {
         sleep,
       }),
     ).rejects.toThrow('upload failed');
+
+    expect(revokeWriteToken).toHaveBeenCalledWith({
+      token: 'mgmt-token',
+      projectId: 'proj123',
+      robotId: 'robot-1',
+    });
+    expect(setTenantSanityWriteTokenMock).not.toHaveBeenCalled();
+    expect(setTenantSeededAtMock).not.toHaveBeenCalled();
+  });
+
+  it('revokes the token when persisting it fails', async () => {
+    const tenant = baseTenant();
+    const commit = vi.fn().mockResolvedValue(undefined);
+    const createOrReplace = vi.fn();
+    const transaction = { createOrReplace, commit };
+    const upload = vi
+      .fn()
+      .mockResolvedValueOnce({ _id: 'image-author' })
+      .mockResolvedValueOnce({ _id: 'image-og' });
+    const client = { assets: { upload }, transaction: () => transaction };
+    const mintWriteToken = vi
+      .fn()
+      .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
+    const revokeWriteToken = vi.fn().mockResolvedValue(undefined);
+    const createClient = vi.fn().mockReturnValue(client);
+    const sleep = vi.fn().mockResolvedValue(undefined);
+    setTenantSanityWriteTokenMock.mockRejectedValue(
+      new Error('persist failed'),
+    );
+
+    await expect(
+      seedTenantContent(tenant, env, {
+        createClient:
+          createClient as unknown as TSeedContentDeps['createClient'],
+        mintWriteToken,
+        revokeWriteToken,
+        sleep,
+      }),
+    ).rejects.toThrow('persist failed');
 
     expect(revokeWriteToken).toHaveBeenCalledWith({
       token: 'mgmt-token',
@@ -202,11 +246,11 @@ describe(seedTenantContent, () => {
     expect(upload).toHaveBeenCalledTimes(2);
     expect(commit).toHaveBeenCalledTimes(2);
     expect(sleep).toHaveBeenCalledTimes(1);
-    expect(revokeWriteToken).toHaveBeenCalledWith({
-      token: 'mgmt-token',
-      projectId: 'proj123',
-      robotId: 'robot-1',
-    });
+    expect(setTenantSanityWriteTokenMock).toHaveBeenCalledWith(
+      'tenant-1',
+      'sk-write',
+    );
+    expect(revokeWriteToken).not.toHaveBeenCalled();
     expect(setTenantSeededAtMock).toHaveBeenCalledWith(
       'tenant-1',
       expect.any(Date),
@@ -250,6 +294,7 @@ describe(seedTenantContent, () => {
       projectId: 'proj123',
       robotId: 'robot-1',
     });
+    expect(setTenantSanityWriteTokenMock).not.toHaveBeenCalled();
     expect(setTenantSeededAtMock).not.toHaveBeenCalled();
   });
 
@@ -288,5 +333,6 @@ describe(seedTenantContent, () => {
       projectId: 'proj123',
       robotId: 'robot-1',
     });
+    expect(setTenantSanityWriteTokenMock).not.toHaveBeenCalled();
   });
 });
