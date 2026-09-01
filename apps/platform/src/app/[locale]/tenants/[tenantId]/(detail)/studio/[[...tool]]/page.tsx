@@ -2,6 +2,7 @@ import { ALERT_TYPE } from '@blog/config';
 import { queries } from '@blog/db';
 import { StudioMount } from '@blog/studio';
 import { Alert } from '@platform/components/shared/alert';
+import { PageHeader } from '@platform/components/shared/page-header';
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { Metadata } from 'next';
@@ -32,11 +33,14 @@ export default async function TenantStudioPage({ params }: TProps) {
 
   if (!credentials) {
     return (
-      <Alert
-        type={ALERT_TYPE.WARNING}
-        title={t('notProvisionedTitle')}
-        description={t('notProvisionedDescription')}
-      />
+      <>
+        <PageHeader title={t('title')} />
+        <Alert
+          type={ALERT_TYPE.WARNING}
+          title={t('notProvisionedTitle')}
+          description={t('notProvisionedDescription')}
+        />
+      </>
     );
   }
 

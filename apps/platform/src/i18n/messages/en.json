@@ -430,6 +430,7 @@
     "description": "Irreversible actions for this tenant. Restricted to superadmins."
   },
   "studioPage": {
+    "title": "Studio",
     "notProvisionedTitle": "Studio isn't ready yet",
     "notProvisionedDescription": "This tenant's Sanity project hasn't finished provisioning. Try again once provisioning completes."
   },
