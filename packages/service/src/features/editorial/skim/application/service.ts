@@ -7,12 +7,12 @@ import { safeAsync } from '@blog/utils';
 export function createSkimService() {
   return {
     v1: {
-      getPublishedPostBody: safeAsync(
-        (postId: string, tenant?: TTenantSanityContext) =>
-          getPublishedPostBody(postId, tenant),
+      getPublishedPostBody: safeAsync((postId: string) =>
+        getPublishedPostBody(postId),
       ),
-      saveSkimDraft: safeAsync((input: TSaveSkimDraftInput) =>
-        saveSkimDraft(input),
+      saveSkimDraft: safeAsync(
+        (input: TSaveSkimDraftInput, tenant?: TTenantSanityContext) =>
+          saveSkimDraft(input, tenant),
       ),
     },
   };
