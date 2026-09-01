@@ -365,13 +365,25 @@ Required — the app cannot serve without these:
 | `AUTH_SECRET`  | same value as `blog-dev`'s    | same value as `blog-prod`'s   |
 | `DATABASE_URL` | `<DEV_DATABASE_URL>` (pooled) | `<PRD_DATABASE_URL>` (pooled) |
 
-> **`AUTH_SECRET` must be byte-identical to the paired web project's.** It
-> signs and encrypts the session cookie, so different values mean each app
-> rejects the other's session — shared sign-in simply doesn't work, with no
-> error, no type failure and no failing test; you are bounced to sign-in on
-> the admin side and left guessing why. This is the same silent drift
-> `@blog/auth` exists to prevent, except this half lives in configuration
-> rather than code, so nothing in the repo can catch it.
+> **Keep `AUTH_SECRET` byte-identical to the paired web project's** — but
+> know why, because the reason is not the one this file used to give. Under
+> `session.strategy: 'database'` the secret does _not_ validate the session
+> cookie: that is an opaque token resolved by a `sessions` table lookup. What
+> it does salt — the magic-link verification-token hash and the CSRF token
+> hash — is in every case created and verified inside a single app's own
+> process, so **no mechanism in this repo is currently known to require the
+> two apps' values to match.** Holding them on one value is a deliberate
+> operational stance, not a functional dependency: one secret to rotate, and
+> no hidden coupling if the session or cookie arrangement ever changes.
+>
+> What a mismatch _does_ break is same-app: a secret that changes between
+> issuing a token and verifying it — a rotation mid-flight — invalidates
+> in-flight magic links and CSRF checks with no error, no type failure and no
+> failing test.
+>
+> It is **not** what makes a sign-in span both origins — that is cookie
+> scope, and `AUTH_COOKIE_DOMAIN` is deliberately unset (see below), so each
+> origin is signed into separately even with matching secrets.
 
 Optional — each is feature-flag-by-absence (the surface it powers degrades
 with a logged, readable error rather than crashing the app), but the panel is
@@ -382,7 +394,7 @@ not fully functional until they are set:
 | `AUTH_GITHUB_ID` / `_SECRET`       | GitHub sign-in (`@blog/auth`)                                        |
 | `AUTH_GOOGLE_ID` / `_SECRET`       | Google sign-in (`@blog/auth`)                                        |
 | `MAGIC_LINK_FROM_ADDRESS`          | magic-link sender address (`@blog/auth`)                             |
-| `AUTH_COOKIE_DOMAIN`               | shares one session with `apps/web` — see below                       |
+| `AUTH_COOKIE_DOMAIN`               | deliberately unset — see below                                       |
 | `RESEND_API_KEY`                   | delivers the magic-link email (`apps/platform`'s own `sendEmail`)    |
 | `BLOB_READ_WRITE_TOKEN`            | Look tab's logo/favicon uploads (`@vercel/blob`)                     |
 | `WEB_APP_URL`                      | `apps/web` origin the Look/Voice saves call to revalidate its cache  |
@@ -394,18 +406,36 @@ not fully functional until they are set:
 | `VERCEL_WEB_PROJECT_ID`            | the shared `apps/web` project id that check runs against             |
 | `VERCEL_TEAM_ID`                   | only when the Vercel account is team-owned                           |
 
-**`AUTH_COOKIE_DOMAIN` is what makes one sign-in cover both origins**, and it
-must be set to the **same value on the paired web project**, not just here.
-It scopes the session cookie to a shared parent domain, so give it the parent
-of both origins with a leading dot — e.g. `.{your-hosting}` when the site is
-`{your-hosting}` and the panel is `admin.{your-hosting}`. Both origins must be
-subdomains of it or the cookie is simply not sent.
+**`AUTH_COOKIE_DOMAIN` is deliberately left unset on the development pair** —
+decided 2026-09-01 (#2399). Unset, `@blog/auth` sets no cookie options at all
+and each origin keeps its own session: you sign in once on the site and again
+on the panel. That is the intended behaviour, not an oversight, and the
+verification checklists below reflect it. The production pair is assessed
+separately, but the hazard below applies there identically.
 
-Leave it **unset** anywhere that isn't a real custom domain — local dev, and
-any `*.vercel.app` origin. `vercel.app` is on the Public Suffix List, so
-browsers reject a cookie scoped to it. Unset, `@blog/auth` sets no cookie
-options at all and each origin keeps its own session, which is the current
-behaviour and is safe; you just sign in twice.
+Setting it would scope the session cookie to a shared parent domain so one
+sign-in covered both origins — but **that parent cannot be the apex domain
+this deployment already uses.** Every surface hangs off a single apex: the
+production site is the apex itself, and the dev pair, every tenant site and
+the hosted Storybook are subdomains of it (the production admin panel has no
+custom domain assigned yet, but the plan puts it on that apex too).
+
+`@blog/auth` hardcodes one cookie name across all deployments, so a cookie
+scoped to the apex would be a **single browser cookie** shared by
+development, production and every tenant. Under `session.strategy:
+'database'` that cookie is an opaque token resolved by a `sessions` table
+lookup, and dev and production run separate Neon branches — so signing in on
+dev overwrites the cookie production is using, production's lookup then finds
+no matching row, and you are silently signed out there. The same cookie would
+also be transmitted to every tenant site. Enabling cross-app sessions
+therefore requires first giving each environment its own parent domain
+(`.{env}.{your-hosting}`, so dev and prod cookies cannot collide) or making the
+cookie name environment-specific — setting this variable alone is not enough.
+
+It also must stay **unset** anywhere that isn't a real custom domain — local
+dev, and any `*.vercel.app` origin. `vercel.app` is on the Public Suffix List,
+so browsers reject a cookie scoped to it. If it is ever set, it must carry the
+**same value on both paired projects**, and the two must never diverge.
 
 > `NEWSLETTER_FROM_ADDRESS` is `apps/web`-only — do **not** set it here.
 > `TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE` is a local-dev escape hatch and
@@ -877,13 +907,13 @@ commit or redeploy a prior Vercel build.
       is green, and no PR deploys either of them).
 - [ ] Publishing in the Studio updates the corresponding site within seconds
       (webhook). Dev publishes hit the dev site; prod publishes hit prod.
-- [ ] **Sign in on the admin domain.** A green deploy proves none of the auth
-      wiring — `AUTH_SECRET`, the provider credentials, and the OAuth callback
-      registrations all fail only at runtime, and the first of those fails
-      silently. Then, separately, sign in on the main site and confirm the
-      session carries across to admin without a second sign-in. That second
-      check is the only thing that proves `AUTH_SECRET` matches **and**
-      `AUTH_COOKIE_DOMAIN` is right on both projects.
+- [ ] **Sign in on the admin domain, then again on the main site.** A green
+      deploy proves none of the auth wiring — `AUTH_SECRET`, the provider
+      credentials, and the OAuth callback registrations all fail only at
+      runtime, and the first of those fails silently. Each origin must be
+      signed into on its own: with `AUTH_COOKIE_DOMAIN` deliberately unset
+      (see above), a session does **not** carry from one to the other, so a
+      second sign-in being required is the expected result, not a fault.
 
 ---
 
