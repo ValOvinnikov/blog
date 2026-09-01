@@ -1,4 +1,4 @@
-export {};
+import type { TTenantSanityContext } from './client';
 
 describe('Sanity write client module loading', () => {
   const originalProjectId = process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'];
@@ -138,6 +138,15 @@ describe('Sanity write client module loading', () => {
     { projectId: '', dataset: 'production', token: 'tok-a' },
     { projectId: 'tenant-a', dataset: '', token: 'tok-a' },
     { projectId: 'tenant-a', dataset: 'production', token: '' },
+    { projectId: '   ', dataset: 'production', token: 'tok-a' },
+    { projectId: 'tenant-a', dataset: '   ', token: 'tok-a' },
+    { projectId: 'tenant-a', dataset: 'production', token: '   ' },
+    { projectId: undefined, dataset: 'production', token: 'tok-a' },
+    { projectId: 'tenant-a', dataset: undefined, token: 'tok-a' },
+    { projectId: 'tenant-a', dataset: 'production', token: undefined },
+    { projectId: null, dataset: 'production', token: 'tok-a' },
+    { projectId: 'tenant-a', dataset: null, token: 'tok-a' },
+    { projectId: 'tenant-a', dataset: 'production', token: null },
   ])(
     'throws InvalidTenantSanityContextError for a partial tenant context %j instead of falling back to the platform client',
     async (tenant) => {
@@ -152,9 +161,9 @@ describe('Sanity write client module loading', () => {
       const { InvalidTenantSanityContextError } =
         await import('./invalid-tenant-sanity-context-error');
 
-      expect(() => getWriteClient(tenant)).toThrow(
-        InvalidTenantSanityContextError,
-      );
+      expect(() =>
+        getWriteClient(tenant as unknown as TTenantSanityContext),
+      ).toThrow(InvalidTenantSanityContextError);
       expect(createClientMock).not.toHaveBeenCalled();
 
       vi.doUnmock('next-sanity');

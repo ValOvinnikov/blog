@@ -27,9 +27,9 @@ function tenantWriteClientKey(tenant: TTenantSanityContext): string {
 
 function assertValidTenantContext(tenant: TTenantSanityContext): void {
   if (
-    !tenant.projectId.trim() ||
-    !tenant.dataset.trim() ||
-    !tenant.token.trim()
+    !tenant.projectId?.trim() ||
+    !tenant.dataset?.trim() ||
+    !tenant.token?.trim()
   ) {
     throw new InvalidTenantSanityContextError();
   }
@@ -39,9 +39,7 @@ function assertValidTenantContext(tenant: TTenantSanityContext): void {
  * Separate from `getClient()` (the public read client): this one carries a
  * scoped write token and is used only by the publish-time skim pipeline
  * (`features/editorial/skim`) to patch a post's *draft*. Never imported by
- * page-rendering code. No-arg call returns the legacy platform write client
- * (env-configured, unchanged). Called with a `TTenantSanityContext`, returns
- * (and LRU-caches) a client scoped to that tenant's own project/dataset/token.
+ * page-rendering code.
  */
 export function getWriteClient(
   tenant?: TTenantSanityContext,
