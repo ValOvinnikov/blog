@@ -3,7 +3,7 @@ import { checkDomainAvailability } from './check-domain-availability';
 const { envMock, loggerErrorMock } = vi.hoisted(() => ({
   envMock: {
     VERCEL_API_TOKEN: undefined as string | undefined,
-    VERCEL_WEB_PROJECT_ID: undefined as string | undefined,
+    VERCEL_PROJECT_ID_WEB: undefined as string | undefined,
     VERCEL_TEAM_ID: undefined as string | undefined,
   },
   loggerErrorMock: vi.fn(),
@@ -23,13 +23,13 @@ describe(checkDomainAvailability, () => {
     loggerErrorMock.mockReset();
     vi.stubGlobal('fetch', fetchMock);
     envMock.VERCEL_API_TOKEN = 'vercel-token';
-    envMock.VERCEL_WEB_PROJECT_ID = 'prj_web';
+    envMock.VERCEL_PROJECT_ID_WEB = 'prj_web';
     envMock.VERCEL_TEAM_ID = undefined;
   });
 
   it('returns NOT_CONFIGURED when the Vercel token or project id is missing, and makes no request', async () => {
     envMock.VERCEL_API_TOKEN = undefined;
-    envMock.VERCEL_WEB_PROJECT_ID = undefined;
+    envMock.VERCEL_PROJECT_ID_WEB = undefined;
 
     const result = await checkDomainAvailability('example.com');
 

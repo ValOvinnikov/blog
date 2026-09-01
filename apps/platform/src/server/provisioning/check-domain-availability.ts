@@ -69,7 +69,7 @@ export const checkDomainAvailability = async (
 ): Promise<TDomainAvailability> => {
   const {
     VERCEL_API_TOKEN: token,
-    VERCEL_WEB_PROJECT_ID: webProjectId,
+    VERCEL_PROJECT_ID_WEB: webProjectId,
     VERCEL_TEAM_ID: teamId,
   } = env;
 

@@ -79,7 +79,7 @@ export const env = createEnv({
     // The *shared* `apps/web` Vercel project id — every tenant's custom
     // domain is added to this one project (frontend topology is shared app,
     // not per-tenant), so domain verification is checked against it.
-    VERCEL_WEB_PROJECT_ID: z.string().min(1).optional(),
+    VERCEL_PROJECT_ID_WEB: z.string().min(1).optional(),
     // Vercel team id, only needed when the account is team-owned (Vercel's
     // API requires it as a query param in that case). Optional even when
     // VERCEL_API_TOKEN is set — a personal-account token needs no team id.
@@ -104,7 +104,7 @@ export const env = createEnv({
       process.env.TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE,
     TENANT_PROVISIONING_DATASET: process.env.TENANT_PROVISIONING_DATASET,
     VERCEL_API_TOKEN: process.env.VERCEL_API_TOKEN,
-    VERCEL_WEB_PROJECT_ID: process.env.VERCEL_WEB_PROJECT_ID,
+    VERCEL_PROJECT_ID_WEB: process.env.VERCEL_PROJECT_ID_WEB,
     VERCEL_TEAM_ID: process.env.VERCEL_TEAM_ID,
     AUTH_SECRET: process.env.AUTH_SECRET,
   },

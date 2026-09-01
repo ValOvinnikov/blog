@@ -3,7 +3,7 @@ import { getDomainDnsRecords } from './get-domain-dns-records';
 const { envMock } = vi.hoisted(() => ({
   envMock: {
     VERCEL_API_TOKEN: undefined as string | undefined,
-    VERCEL_WEB_PROJECT_ID: undefined as string | undefined,
+    VERCEL_PROJECT_ID_WEB: undefined as string | undefined,
     VERCEL_TEAM_ID: undefined as string | undefined,
   },
 }));
@@ -17,13 +17,13 @@ describe(getDomainDnsRecords, () => {
     fetchMock.mockReset();
     vi.stubGlobal('fetch', fetchMock);
     envMock.VERCEL_API_TOKEN = 'vercel-token';
-    envMock.VERCEL_WEB_PROJECT_ID = 'prj_123';
+    envMock.VERCEL_PROJECT_ID_WEB = 'prj_123';
     envMock.VERCEL_TEAM_ID = undefined;
   });
 
   it('returns undefined when the Vercel token or project id is missing', async () => {
     envMock.VERCEL_API_TOKEN = undefined;
-    envMock.VERCEL_WEB_PROJECT_ID = undefined;
+    envMock.VERCEL_PROJECT_ID_WEB = undefined;
 
     const result = await getDomainDnsRecords('example.com');
 

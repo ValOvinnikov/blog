@@ -29,7 +29,7 @@ export const getDomainDnsRecords = async (
 ): Promise<TDomainDnsRecord[] | undefined> => {
   const {
     VERCEL_API_TOKEN: token,
-    VERCEL_WEB_PROJECT_ID: projectId,
+    VERCEL_PROJECT_ID_WEB: projectId,
     VERCEL_TEAM_ID: teamId,
   } = env;
 
