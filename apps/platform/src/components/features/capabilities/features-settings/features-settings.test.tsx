@@ -118,7 +118,7 @@ describe(FeaturesSettings, () => {
       screen.getByRole('heading', { level: 1, name: 'Features' }),
     ).toBeVisible();
     expect(
-      screen.getByRole('heading', { level: 3, name: 'Capabilities' }),
+      screen.getByRole('heading', { level: 2, name: 'Capabilities' }),
     ).toBeVisible();
     expect(screen.getByText('Comments')).toBeVisible();
   });

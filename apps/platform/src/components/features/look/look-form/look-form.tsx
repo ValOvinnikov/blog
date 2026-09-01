@@ -174,6 +174,7 @@ export const LookForm = ({
             <Card.Header
               title={t('basicHeading')}
               supportingText={t('basicDescription')}
+              headingLevel={2}
             />
             <Card.Body>
               <LookFormBasicSection

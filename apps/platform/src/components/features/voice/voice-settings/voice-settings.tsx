@@ -127,7 +127,7 @@ export const VoiceSettings = ({
       )}
 
       <Card>
-        <Card.Header title={t('basicHeading')} />
+        <Card.Header title={t('basicHeading')} headingLevel={2} />
         <Card.Body>
           <Alert type={ALERT_TYPE.INFO} title={t('basicAlert')} />
         </Card.Body>
