@@ -77,7 +77,7 @@ describe(`<${TenantStudioPage.name}/>`, () => {
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
   });
 
-  it('shows the archived notice instead of mounting Studio for an archived tenant, without checking credentials', async () => {
+  it('shows the "Studio" heading and the archived notice instead of mounting Studio for an archived tenant, without checking credentials', async () => {
     getTenantByIdMock.mockResolvedValue(
       makeTenant({
         id: 'tenant-2',
@@ -87,6 +87,9 @@ describe(`<${TenantStudioPage.name}/>`, () => {
 
     await setup();
 
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Studio' }),
+    ).toBeVisible();
     expect(screen.getByText('This tenant is archived')).toBeVisible();
     expect(getTenantSanityCredentialsMock).not.toHaveBeenCalled();
     expect(screen.queryByTestId('studio-mount')).not.toBeInTheDocument();
