@@ -22,5 +22,11 @@ export const LookPageContent = async ({ tenant }: TLookPageContentProps) => {
     ? toLookFormValues(siteConfig)
     : defaultLookFormValues();
 
-  return <LookForm tenantSlug={tenant.slug} initialValues={initialValues} />;
+  return (
+    <LookForm
+      tenantSlug={tenant.slug}
+      initialValues={initialValues}
+      archivedAt={tenant.deprovisionedAt ?? undefined}
+    />
+  );
 };

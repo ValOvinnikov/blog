@@ -118,7 +118,7 @@ const isTerminalDomainVerificationStatus = (
   return status === 'VERIFIED' || status === 'NOT_CONFIGURED';
 };
 
-type TDispatchErrorKind = 'not-found' | 'other';
+type TDispatchErrorKind = 'not-found' | 'archived' | 'other';
 
 export type TUseProvisioningPollResult = {
   dispatchError: TDispatchErrorKind | undefined;
@@ -396,7 +396,9 @@ export const useProvisioningPoll = (
         // took effect, and let the operator see and act on the failure.
         setPendingRetryBaseline(null);
         setDispatchError(
-          result.outcome === 'not-found' ? 'not-found' : 'other',
+          result.outcome === 'not-found' || result.outcome === 'archived'
+            ? result.outcome
+            : 'other',
         );
       }
 

@@ -61,7 +61,9 @@ describe(requireTenantById, () => {
 
     await expect(requireTenantById('ghost')).rejects.toThrow('NEXT_NOT_FOUND');
 
-    expect(getTenantByIdMock).toHaveBeenCalledWith('ghost');
+    expect(getTenantByIdMock).toHaveBeenCalledWith('ghost', {
+      includeArchived: true,
+    });
   });
 
   it('returns the tenant and admin for a signed-in admins row, without checking membership', async () => {
@@ -83,5 +85,32 @@ describe(requireTenantById, () => {
 
     expect(result).toEqual({ tenant, admin });
     expect(redirect).not.toHaveBeenCalled();
+  });
+
+  it('resolves an archived tenant, requesting it with includeArchived so the query does not filter it out', async () => {
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    const admin = {
+      id: 'admin-1',
+      userId: 'user-1',
+      role: 'ADMIN',
+      grantedBy: null,
+      grantedVia: 'MANUAL',
+      grantedAt: new Date(),
+      createdAt: new Date(),
+    };
+    getAdminByUserIdMock.mockResolvedValue(admin);
+    const archivedTenant = {
+      id: 'tenant-1',
+      slug: 'acme',
+      deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+    };
+    getTenantByIdMock.mockResolvedValue(archivedTenant);
+
+    const result = await requireTenantById('tenant-1');
+
+    expect(result).toEqual({ tenant: archivedTenant, admin });
+    expect(getTenantByIdMock).toHaveBeenCalledWith('tenant-1', {
+      includeArchived: true,
+    });
   });
 });

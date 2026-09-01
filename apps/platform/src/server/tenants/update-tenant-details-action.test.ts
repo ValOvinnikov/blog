@@ -5,12 +5,14 @@ import { makeTenant } from '@platform/testing/tenants/fixtures';
 const {
   requireAdminMock,
   authMock,
+  getTenantByIdMock,
   updateTenantDetailsMock,
   insertAuditEventMock,
   loggerErrorMock,
 } = vi.hoisted(() => ({
   requireAdminMock: vi.fn(),
   authMock: vi.fn(),
+  getTenantByIdMock: vi.fn(),
   updateTenantDetailsMock: vi.fn(),
   insertAuditEventMock: vi.fn(),
   loggerErrorMock: vi.fn(),
@@ -29,7 +31,10 @@ vi.mock('@platform/utils/logger/logger', () => ({
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
-    tenants: { updateTenantDetails: updateTenantDetailsMock },
+    tenants: {
+      getTenantById: getTenantByIdMock,
+      updateTenantDetails: updateTenantDetailsMock,
+    },
     auditEvents: { insertAuditEvent: insertAuditEventMock },
   },
 }));
@@ -50,6 +55,8 @@ describe('updateTenantDetailsAction', () => {
     authMock.mockResolvedValue({
       user: { id: 'operator-1', email: 'operator@example.com' },
     });
+    getTenantByIdMock.mockReset();
+    getTenantByIdMock.mockResolvedValue(makeTenant());
     updateTenantDetailsMock.mockReset();
     insertAuditEventMock.mockReset();
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
@@ -67,6 +74,34 @@ describe('updateTenantDetailsAction', () => {
       updateTenantDetailsAction('tenant-1', validInput),
     ).rejects.toThrow('NEXT_REDIRECT');
     expect(updateTenantDetailsMock).not.toHaveBeenCalled();
+  });
+
+  it('returns an error and never writes when the tenant no longer exists', async () => {
+    getTenantByIdMock.mockResolvedValue(undefined);
+    const { updateTenantDetailsAction } =
+      await import('./update-tenant-details-action');
+
+    const result = await updateTenantDetailsAction('tenant-1', validInput);
+
+    expect(result).toEqual({ ok: false, error: 'Tenant not found.' });
+    expect(updateTenantDetailsMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects a write against an archived tenant server-side, without touching updateTenantDetails or recording an audit event', async () => {
+    getTenantByIdMock.mockResolvedValue(
+      makeTenant({ deprovisionedAt: new Date('2026-08-26T00:00:00.000Z') }),
+    );
+    const { updateTenantDetailsAction } =
+      await import('./update-tenant-details-action');
+
+    const result = await updateTenantDetailsAction('tenant-1', validInput);
+
+    expect(result).toEqual({
+      ok: false,
+      error: 'This tenant is archived; its details can no longer be edited.',
+    });
+    expect(updateTenantDetailsMock).not.toHaveBeenCalled();
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
   it('returns field errors for an invalid slug without touching the database', async () => {

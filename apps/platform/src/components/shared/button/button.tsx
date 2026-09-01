@@ -1,4 +1,4 @@
-import type { MouseEventHandler, ReactNode } from 'react';
+import type { AriaAttributes, MouseEventHandler, ReactNode } from 'react';
 
 import { buttonVariants, type TButtonVariants } from './button-variants';
 
@@ -10,6 +10,7 @@ export type TButtonProps = {
   onClick?: MouseEventHandler<HTMLButtonElement>;
   children?: ReactNode;
   className?: string;
+  'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
 
 export const Button = ({
@@ -20,6 +21,7 @@ export const Button = ({
   onClick,
   children,
   className,
+  'aria-describedby': ariaDescribedBy,
 }: TButtonProps) => {
   return (
     <button
@@ -27,6 +29,7 @@ export const Button = ({
       disabled={isDisabled}
       onClick={onClick}
       className={buttonVariants({ variant, size, class: className })}
+      aria-describedby={ariaDescribedBy}
     >
       {children}
     </button>

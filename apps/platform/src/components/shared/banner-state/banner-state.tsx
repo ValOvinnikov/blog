@@ -17,6 +17,8 @@ export type TBannerStateProps = {
   title: ReactNode;
   description: ReactNode;
   action: ReactNode;
+  /** Lets a caller point a disabled control's `aria-describedby` at this banner. */
+  id?: string;
 };
 
 export const BannerState = ({
@@ -25,6 +27,7 @@ export const BannerState = ({
   title,
   description,
   action,
+  id,
 }: TBannerStateProps) => {
   const {
     root,
@@ -35,7 +38,7 @@ export const BannerState = ({
   } = bannerStateVariants();
 
   return (
-    <div className={root({ tone })} role={role}>
+    <div id={id} className={root({ tone })} role={role}>
       <span className={icon()} aria-hidden="true">
         {GLYPH[tone]}
       </span>

@@ -111,4 +111,18 @@ describe(`<${LookPageContent.name}/>`, () => {
     );
     expect(screen.getByText('28°')).toBeVisible();
   });
+
+  it('passes the archived date through for a deprovisioned tenant', async () => {
+    getSiteConfigMock.mockResolvedValue(undefined);
+
+    await setup({
+      tenant: {
+        ...tenant,
+        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      },
+    });
+
+    expect(screen.getByText('This tenant is archived')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+  });
 });

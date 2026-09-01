@@ -1,4 +1,5 @@
 import type { TTenant } from '@blog/db/schema/tenants';
+import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { Card } from '@platform/components/shared/card';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
@@ -37,6 +38,10 @@ export const DomainPageContent = ({
           </StatusBadge>
         }
       />
+
+      {tenant.deprovisionedAt && (
+        <ArchivedTenantNotice archivedAt={tenant.deprovisionedAt} />
+      )}
 
       <Card>
         <Card.Header

@@ -15,10 +15,11 @@ import {
   type TUpdateTenantDetailsActionInput,
   type TUpdateTenantDetailsFieldErrors,
 } from '@platform/server/tenants/update-tenant-details-action';
-import type {
-  TTenantFieldKey,
-  TTenantFieldLockReason,
-  TTenantFieldLocks,
+import {
+  ALL_FIELD_KEYS,
+  type TTenantFieldKey,
+  type TTenantFieldLockReason,
+  type TTenantFieldLocks,
 } from '@platform/utils/tenant-field-locks/tenant-field-locks';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -31,6 +32,8 @@ export type TTenantDetailsPanelProps = {
   tenant: TTenant;
   fieldLocks: TTenantFieldLocks;
   ownerEmail: string | undefined;
+  /** The page's `ArchivedTenantNotice` id, so the Save button can point its `aria-describedby` at it when archived. */
+  archivedNoticeId?: string;
 };
 
 type TFormValues = {
@@ -94,6 +97,7 @@ export const TenantDetailsPanel = ({
   tenant,
   fieldLocks,
   ownerEmail,
+  archivedNoticeId,
 }: TTenantDetailsPanelProps) => {
   const t = useTranslations('tenantDetailsPanel');
   const tSteps = useTranslations('provisioningStatusView');
@@ -109,6 +113,7 @@ export const TenantDetailsPanel = ({
     useState<TUpdateTenantDetailsFieldErrors>({});
   const [formError, setFormError] = useState<string | undefined>(undefined);
   const [isPending, startTransition] = useTransition();
+  const isArchived = Boolean(tenant.deprovisionedAt);
 
   // A fresh `tenant`/`ownerEmail` prop (a successful save's own
   // `router.refresh()`) should replace whatever the form last held —
@@ -120,9 +125,18 @@ export const TenantDetailsPanel = ({
     setValues(valuesFromProps(tenant, ownerEmail));
   }
 
+  // An archived tenant overrides every provisioning-derived lock with a
+  // single, stronger reason — reusing the same lock machinery (hint,
+  // `aria-describedby`, lock/unlock announcement) rather than a parallel one.
+  const effectiveFieldLocks: TTenantFieldLocks = isArchived
+    ? Object.fromEntries(
+        ALL_FIELD_KEYS.map((key) => [key, { kind: 'archived' } as const]),
+      )
+    : fieldLocks;
+
   const { lockAnnouncement, fieldsContainerRef } = useLockStateChange({
     panelId,
-    fieldLocks,
+    fieldLocks: effectiveFieldLocks,
     lockedAnnouncement: t('lockedAnnouncement'),
     unlockedAnnouncement: t('unlockedAnnouncement'),
     // A field that just locked (e.g. a background poll catching up to a
@@ -201,15 +215,24 @@ export const TenantDetailsPanel = ({
   };
 
   const lockReasonText = (reason: TTenantFieldLockReason): string => {
-    if (reason.kind === 'step') {
-      return t('fieldLockedReasonStep', {
-        step: tSteps(`stepLabel.${reason.step}`),
-      });
+    switch (reason.kind) {
+      case 'step':
+        return t('fieldLockedReasonStep', {
+          step: tSteps(`stepLabel.${reason.step}`),
+        });
+      case 'succeeded':
+        return t('fieldLockedReasonSucceeded');
+      case 'archived':
+        return t('fieldLockedReasonArchived');
+      case 'running':
+        return t('fieldLockedReasonRunning');
+      default: {
+        const unhandledReason: never = reason;
+        throw new Error(
+          `lockReasonText: unhandled reason ${JSON.stringify(unhandledReason)}`,
+        );
+      }
     }
-    if (reason.kind === 'succeeded') {
-      return t('fieldLockedReasonSucceeded');
-    }
-    return t('fieldLockedReasonRunning');
   };
 
   const planOptions = [
@@ -225,7 +248,7 @@ export const TenantDetailsPanel = ({
     { key: 'ownerEmail', label: t('ownerEmailLabel') },
   ];
 
-  const planLock = fieldLocks.plan;
+  const planLock = effectiveFieldLocks.plan;
 
   return (
     <div data-tenant-details-panel={panelId}>
@@ -251,7 +274,7 @@ export const TenantDetailsPanel = ({
                 const errorId = `${id}-error`;
                 const reasonId = `${id}-lock-reason`;
                 const errorMessage = fieldErrors[key];
-                const lock = fieldLocks[key];
+                const lock = effectiveFieldLocks[key];
                 const describedBy =
                   [lock ? reasonId : null, errorMessage ? errorId : null]
                     .filter(Boolean)
@@ -315,7 +338,8 @@ export const TenantDetailsPanel = ({
               type="button"
               variant="primary"
               onClick={handleSave}
-              isDisabled={isPending || !isDirty}
+              isDisabled={isPending || !isDirty || isArchived}
+              aria-describedby={isArchived ? archivedNoticeId : undefined}
             >
               {isPending ? t('savingButton') : t('saveButton')}
             </Button>

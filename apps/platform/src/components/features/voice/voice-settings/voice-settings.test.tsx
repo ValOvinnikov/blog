@@ -259,4 +259,42 @@ describe(VoiceSettings, () => {
     expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't save");
     expect(refresh).not.toHaveBeenCalled();
   });
+
+  it('shows an archived notice and disables Save for an archived tenant', async () => {
+    const user = userEvent.setup();
+    const saveAction = vi.fn().mockResolvedValue({ ok: true });
+    render(
+      <VoiceSettings
+        tenantSlug="acme"
+        voicePack={CONSOLE_VOICE_PACK}
+        initialOverrides={{}}
+        saveAction={saveAction}
+        archivedAt={new Date('2026-08-26T00:00:00.000Z')}
+      />,
+    );
+
+    expect(screen.getByText('This tenant is archived')).toBeVisible();
+
+    const saveButton = screen.getByRole('button', { name: 'Save changes' });
+    expect(saveButton).toBeDisabled();
+
+    await user.click(saveButton);
+    expect(saveAction).not.toHaveBeenCalled();
+  });
+
+  it('describes the disabled Save button with the archived notice text, for a screen-reader user', () => {
+    render(
+      <VoiceSettings
+        tenantSlug="acme"
+        voicePack={CONSOLE_VOICE_PACK}
+        initialOverrides={{}}
+        saveAction={vi.fn()}
+        archivedAt={new Date('2026-08-26T00:00:00.000Z')}
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Save changes' }),
+    ).toHaveAccessibleDescription(/This tenant is archived/);
+  });
 });

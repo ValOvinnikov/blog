@@ -81,4 +81,38 @@ describe(DomainPageContent, () => {
     ).toBeVisible();
     expect(screen.queryByRole('table')).toBeNull();
   });
+
+  it('shows the archived notice for a deprovisioned tenant, and nothing for a live one', () => {
+    const archivedTenant = makeTenant({
+      primaryDomain: 'northwind.dev',
+      deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+    });
+    render(
+      <DomainPageContent
+        tenant={archivedTenant}
+        domainVerificationStatus="PENDING"
+        dnsRecords={undefined}
+      />,
+    );
+
+    expect(screen.getByText('This tenant is archived')).toBeVisible();
+  });
+
+  it('does not show the archived notice for a live tenant', () => {
+    const liveTenant = makeTenant({
+      primaryDomain: 'northwind.dev',
+      deprovisionedAt: null,
+    });
+    render(
+      <DomainPageContent
+        tenant={liveTenant}
+        domainVerificationStatus="PENDING"
+        dnsRecords={undefined}
+      />,
+    );
+
+    expect(
+      screen.queryByText('This tenant is archived'),
+    ).not.toBeInTheDocument();
+  });
 });

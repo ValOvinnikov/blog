@@ -662,6 +662,24 @@ describe(useProvisioningPoll, () => {
       });
     });
 
+    it('reports an archived dispatch error distinctly from a generic one', async () => {
+      const tenant = makeTenant();
+      retryProvisioningStepActionMock.mockResolvedValue({
+        outcome: 'archived',
+      });
+      const { result } = renderHook(() =>
+        useProvisioningPoll(tenant, 'NOT_CONFIGURED'),
+      );
+
+      act(() => {
+        result.current.handleStart();
+      });
+
+      await waitFor(() => {
+        expect(result.current.dispatchError).toBe('archived');
+      });
+    });
+
     it('reports a generic dispatch error for a dispatch failure', async () => {
       const tenant = makeTenant();
       retryProvisioningStepActionMock.mockResolvedValue({

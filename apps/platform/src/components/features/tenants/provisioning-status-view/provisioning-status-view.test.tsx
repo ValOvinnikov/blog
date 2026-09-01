@@ -104,6 +104,28 @@ describe(ProvisioningStatusView, () => {
     ).toBeVisible();
   });
 
+  it('shows the archived notice for a deprovisioned tenant', () => {
+    const tenant = makeTenant({
+      deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+    });
+    render(
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+    );
+
+    expect(screen.getByText('This tenant is archived')).toBeVisible();
+  });
+
+  it('does not show the archived notice for a live tenant', () => {
+    const tenant = makeTenant({ deprovisionedAt: null });
+    render(
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+    );
+
+    expect(
+      screen.queryByText('This tenant is archived'),
+    ).not.toBeInTheDocument();
+  });
+
   it("keeps an overall status badge in the page header even before the body's own status row appears", () => {
     const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
     render(
@@ -613,6 +635,105 @@ describe(ProvisioningStatusView, () => {
       expect(retryProvisioningStepActionMock).toHaveBeenCalledWith('tenant-1');
     });
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('disables Start provisioning for an archived tenant, and never dispatches on click', async () => {
+    const tenant = makeTenant({
+      provisioningSteps: idleProvisioningSteps(),
+      deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+    });
+    const user = userEvent.setup();
+    render(
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+    );
+
+    const startButton = screen.getByRole('button', {
+      name: 'Start provisioning',
+    });
+    expect(startButton).toBeDisabled();
+
+    await user.click(startButton);
+    expect(retryProvisioningStepActionMock).not.toHaveBeenCalled();
+  });
+
+  it('disables Retry provisioning for an archived tenant, and never dispatches on click', async () => {
+    const tenant = makeTenant({
+      deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      provisioningSteps: {
+        ...idleProvisioningSteps(),
+        [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+          error: 'Vercel Domains API returned 500',
+        },
+      },
+    });
+    const user = userEvent.setup();
+    render(
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+    );
+
+    const retryButton = screen.getByRole('button', {
+      name: 'Retry provisioning',
+    });
+    expect(retryButton).toBeDisabled();
+
+    await user.click(retryButton);
+    expect(retryProvisioningStepActionMock).not.toHaveBeenCalled();
+  });
+
+  it('describes the disabled Start button with the archived notice, for a screen-reader user', () => {
+    const tenant = makeTenant({
+      provisioningSteps: idleProvisioningSteps(),
+      deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+    });
+    render(
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Start provisioning' }),
+    ).toHaveAccessibleDescription(/This tenant is archived/);
+  });
+
+  it('describes the disabled Retry button with the archived notice, for a screen-reader user', () => {
+    const tenant = makeTenant({
+      deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      provisioningSteps: {
+        ...idleProvisioningSteps(),
+        [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+          error: 'Vercel Domains API returned 500',
+        },
+      },
+    });
+    render(
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Retry provisioning' }),
+    ).toHaveAccessibleDescription(/This tenant is archived/);
+  });
+
+  it('shows an archived-specific error if a dispatch is somehow still attempted against an archived tenant', async () => {
+    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    retryProvisioningStepActionMock.mockResolvedValue({
+      outcome: 'archived',
+    });
+    const user = userEvent.setup();
+    render(
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+    );
+
+    await user.click(
+      screen.getByRole('button', { name: 'Start provisioning' }),
+    );
+
+    expect(
+      await screen.findByText(
+        "This tenant is archived; provisioning can't be started.",
+      ),
+    ).toBeVisible();
   });
 
   describe('live polling', () => {

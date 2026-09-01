@@ -2,6 +2,7 @@ import { ALERT_TYPE } from '@blog/config';
 import { queries } from '@blog/db';
 import { StudioMount } from '@blog/studio';
 import { Alert } from '@platform/components/shared/alert';
+import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { Metadata } from 'next';
@@ -25,6 +26,11 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function TenantStudioPage({ params }: TProps) {
   const { tenantId } = await params;
   const { tenant } = await requireTenantById(tenantId);
+
+  if (tenant.deprovisionedAt) {
+    return <ArchivedTenantNotice archivedAt={tenant.deprovisionedAt} />;
+  }
+
   const credentials = await queries.tenants.getTenantSanityCredentials(
     tenant.id,
   );

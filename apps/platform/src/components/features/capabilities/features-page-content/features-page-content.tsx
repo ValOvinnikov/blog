@@ -32,6 +32,7 @@ export const FeaturesPageContent = async ({
       entitledCapabilities={entitledCapabilities}
       initialValues={initialValues}
       saveAction={updateFeaturesAction}
+      archivedAt={tenant.deprovisionedAt ?? undefined}
     />
   );
 };

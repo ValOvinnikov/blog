@@ -197,4 +197,20 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
       screen.getByRole('switch', { name: 'Analytics' }),
     ).not.toHaveAttribute('data-disabled');
   });
+
+  it('passes the archived date through for a deprovisioned tenant', async () => {
+    getSettingsFeaturesMock.mockResolvedValue(undefined);
+    getSiteConfigMock.mockResolvedValue(undefined);
+
+    const tenant = buildTenant('FREE');
+    await setup({
+      tenant: {
+        ...tenant,
+        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      },
+    });
+
+    expect(screen.getByText('This tenant is archived')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+  });
 });

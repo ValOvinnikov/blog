@@ -394,4 +394,60 @@ describe(TenantOverviewView, () => {
       screen.queryByRole('link', { name: 'Open Studio →' }),
     ).not.toBeInTheDocument();
   });
+
+  it('shows the archived notice for a deprovisioned tenant', () => {
+    const archivedTenant = makeTenant({
+      deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+    });
+    render(
+      <TenantOverviewView
+        tenant={archivedTenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+        ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
+        auditEvents={[]}
+      />,
+    );
+
+    expect(screen.getByText('This tenant is archived')).toBeVisible();
+  });
+
+  it("describes the details panel's disabled Save button with the archived notice, end to end", () => {
+    const archivedTenant = makeTenant({
+      deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+    });
+    render(
+      <TenantOverviewView
+        tenant={archivedTenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+        ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
+        auditEvents={[]}
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Save changes' }),
+    ).toHaveAccessibleDescription(/This tenant is archived/);
+  });
+
+  it('does not show the archived notice for a live tenant', () => {
+    const liveTenant = makeTenant({ deprovisionedAt: null });
+    render(
+      <TenantOverviewView
+        tenant={liveTenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+        ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
+        auditEvents={[]}
+      />,
+    );
+
+    expect(
+      screen.queryByText('This tenant is archived'),
+    ).not.toBeInTheDocument();
+  });
 });

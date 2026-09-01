@@ -969,6 +969,101 @@ describe(TenantDetailsPanel, () => {
     });
   });
 
+  describe('archived tenant', () => {
+    it('disables every field and the Save button, regardless of edits or field locks', async () => {
+      const user = userEvent.setup();
+      const tenant = makeTenant({
+        name: 'Acme Inc.',
+        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      });
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={NO_LOCKS}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      expect(screen.getByRole('textbox', { name: 'Name' })).toBeDisabled();
+      expect(screen.getByRole('textbox', { name: 'Slug' })).toBeDisabled();
+      expect(
+        screen.getByRole('textbox', { name: 'Primary domain' }),
+      ).toBeDisabled();
+      expect(screen.getByRole('textbox', { name: 'Locale' })).toBeDisabled();
+      expect(
+        screen.getByRole('textbox', { name: 'Owner email' }),
+      ).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Free' })).toBeDisabled();
+
+      const saveButton = screen.getByRole('button', { name: 'Save changes' });
+      expect(saveButton).toBeDisabled();
+
+      await user.click(saveButton);
+      expect(updateTenantDetailsActionMock).not.toHaveBeenCalled();
+    });
+
+    it('exposes an accessible hint for an archived field, reusing the same lock convention as a step/succeeded/running lock', () => {
+      const tenant = makeTenant({
+        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      });
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={NO_LOCKS}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      expect(nameInput).toHaveAccessibleDescription(
+        'Locked — this tenant is archived.',
+      );
+
+      const planGroup = screen.getByRole('group', { name: 'Plan' });
+      expect(planGroup).toHaveAccessibleDescription(
+        'Locked — this tenant is archived.',
+      );
+    });
+
+    it('describes the disabled Save button with the page-level archived notice when an archivedNoticeId is supplied', () => {
+      const tenant = makeTenant({
+        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      });
+      render(
+        <>
+          <TenantDetailsPanel
+            tenant={tenant}
+            fieldLocks={NO_LOCKS}
+            ownerEmail="owner@example.com"
+            archivedNoticeId="archived-notice"
+          />
+          <p id="archived-notice">This tenant is archived.</p>
+        </>,
+      );
+
+      expect(
+        screen.getByRole('button', { name: 'Save changes' }),
+      ).toHaveAccessibleDescription('This tenant is archived.');
+    });
+
+    it('leaves the Save button without a description when no archivedNoticeId is supplied', () => {
+      const tenant = makeTenant({
+        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      });
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={NO_LOCKS}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      expect(
+        screen.getByRole('button', { name: 'Save changes' }),
+      ).not.toHaveAttribute('aria-describedby');
+    });
+  });
+
   describe('focus management on a locking transition', () => {
     it('does not move focus away from document.body on mount', () => {
       const tenant = makeTenant();

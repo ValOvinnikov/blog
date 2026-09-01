@@ -24,6 +24,7 @@ export const VoicePageContent = async ({ tenant }: TVoicePageContentProps) => {
       voicePack={PRESET_REGISTRY[presetId].voicePack}
       initialOverrides={config?.voiceOverrides ?? {}}
       saveAction={saveVoiceOverridesAction}
+      archivedAt={tenant.deprovisionedAt ?? undefined}
     />
   );
 };

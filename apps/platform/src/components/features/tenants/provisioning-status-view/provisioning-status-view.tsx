@@ -4,6 +4,7 @@ import { ALERT_TYPE, ICONS } from '@blog/config';
 import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { Alert } from '@platform/components/shared/alert';
+import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { Heading } from '@platform/components/shared/heading';
@@ -16,6 +17,7 @@ import { Link } from '@platform/i18n/navigation';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { provisioningStepTone } from '@platform/utils/status-tone/status-tone';
 import { useTranslations } from 'next-intl';
+import { useId } from 'react';
 
 import { provisioningStatusViewVariants } from './provisioning-status-view-variants';
 import { STEP_ORDER, useProvisioningPoll } from './use-provisioning-poll';
@@ -61,6 +63,8 @@ export const ProvisioningStatusView = ({
   const doneStepCount = stepStatuses.filter(
     (status) => status === TENANT_PROVISIONING_STEP_STATUS.DONE,
   ).length;
+  const isArchived = Boolean(tenant.deprovisionedAt);
+  const archivedNoticeId = useId();
 
   const {
     root,
@@ -118,6 +122,13 @@ export const ProvisioningStatusView = ({
         }
       />
 
+      {tenant.deprovisionedAt && (
+        <ArchivedTenantNotice
+          id={archivedNoticeId}
+          archivedAt={tenant.deprovisionedAt}
+        />
+      )}
+
       {!ownerEmail && (
         <div className={ownerRow()}>
           <Text variant="hint">{t('ownerLabel')}</Text>
@@ -131,7 +142,9 @@ export const ProvisioningStatusView = ({
           title={
             dispatchError === 'not-found'
               ? t('startErrorNotFound')
-              : t('startError')
+              : dispatchError === 'archived'
+                ? t('startErrorArchived')
+                : t('startError')
           }
         />
       )}
@@ -142,7 +155,8 @@ export const ProvisioningStatusView = ({
             type="button"
             variant="primary"
             onClick={handleStart}
-            isDisabled={isStarting}
+            isDisabled={isStarting || isArchived}
+            aria-describedby={isArchived ? archivedNoticeId : undefined}
           >
             {isStarting ? t('startingButton') : t('startButton')}
           </Button>
@@ -222,7 +236,8 @@ export const ProvisioningStatusView = ({
                   type="button"
                   variant="ghost"
                   onClick={handleRetry}
-                  isDisabled={isRetrying}
+                  isDisabled={isRetrying || isArchived}
+                  aria-describedby={isArchived ? archivedNoticeId : undefined}
                 >
                   {isRetrying ? t('retryingButton') : t('retryButton')}
                 </Button>
