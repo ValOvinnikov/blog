@@ -1,7 +1,9 @@
-import { createLogger, LOG_LEVEL } from './logger';
+import {
+  LINE_SEPARATOR,
+  PARAGRAPH_SEPARATOR,
+} from '@blog/insight/testing/fixtures';
 
-const LINE_SEPARATOR = String.fromCharCode(0x2028);
-const PARAGRAPH_SEPARATOR = String.fromCharCode(0x2029);
+import { createLogger, LOG_LEVEL } from './logger';
 
 function captureCall(spy: ReturnType<typeof vi.spyOn>): string {
   const call = spy.mock.calls.at(-1);
