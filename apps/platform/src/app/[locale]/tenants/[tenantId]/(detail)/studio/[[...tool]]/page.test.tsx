@@ -83,6 +83,9 @@ describe(`<${TenantStudioPage.name}/>`, () => {
 
     await setup();
 
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Studio' }),
+    ).toBeVisible();
     expect(screen.getByText("Studio isn't ready yet")).toBeVisible();
     expect(screen.queryByTestId('studio-mount')).not.toBeInTheDocument();
   });
