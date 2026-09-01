@@ -61,13 +61,14 @@ the project id and all tokens differ. The `<PLACEHOLDER>` names are used only
 within this doc; the real values live in GitHub / Vercel / local `.env` and are
 **never committed** (project ids included).
 
-| What                                       | Development               | Production                |
-| ------------------------------------------ | ------------------------- | ------------------------- |
-| Sanity project id (public)                 | `<DEV_PROJECT_ID>`        | `<PRD_PROJECT_ID>`        |
-| Sanity dataset                             | `development`             | `production`              |
-| Sanity **Viewer** token                    | `<DEV_READ_TOKEN>`        | `<PRD_READ_TOKEN>`        |
-| Sanity **Migrate** token (Editor)          | `<DEV_MIGRATE_TOKEN>`     | `<PRD_MIGRATE_TOKEN>`     |
-| Revalidate secret (`openssl rand -hex 32`) | `<DEV_REVALIDATE_SECRET>` | `<PRD_REVALIDATE_SECRET>` |
+| What                                                   | Development                | Production                 |
+| ------------------------------------------------------ | -------------------------- | -------------------------- |
+| Sanity project id (public)                             | `<DEV_PROJECT_ID>`         | `<PRD_PROJECT_ID>`         |
+| Sanity dataset                                         | `development`              | `production`               |
+| Sanity **Viewer** token                                | `<DEV_READ_TOKEN>`         | `<PRD_READ_TOKEN>`         |
+| Sanity **Migrate** token (Editor)                      | `<DEV_MIGRATE_TOKEN>`      | `<PRD_MIGRATE_TOKEN>`      |
+| Revalidate secret (`openssl rand -hex 32`)             | `<DEV_REVALIDATE_SECRET>`  | `<PRD_REVALIDATE_SECRET>`  |
+| Site-config revalidate secret (`openssl rand -hex 32`) | `<DEV_SITE_CONFIG_SECRET>` | `<PRD_SITE_CONFIG_SECRET>` |
 
 Vercel (needed for **both** environments — the web app and the admin panel each
 deploy via the Vercel CLI in CI): `<VERCEL_TOKEN>` (account token) and
@@ -108,7 +109,24 @@ project-scoped, so mint them **inside** the matching project):
 ```sh
 openssl rand -hex 32   # → DEV_REVALIDATE_SECRET
 openssl rand -hex 32   # → PRD_REVALIDATE_SECRET
+openssl rand -hex 32   # → DEV_SITE_CONFIG_SECRET
+openssl rand -hex 32   # → PRD_SITE_CONFIG_SECRET
 ```
+
+`SITE_CONFIG_REVALIDATE_SECRET` is a shared bearer token between this repo's
+own two apps — `apps/platform` sends it, `apps/web` compares it. Nothing
+external issues or validates it, so rotating it means generating a new value
+and replacing it in both places; there is nothing to recover if the old value
+is lost.
+
+**Each value goes on both projects of its pair** (`blog-web-dev` **and**
+`platform-dev`; `blog-web-prod` **and** `platform-prod`). Setting it on only
+one side is worse than setting it on neither: `apps/platform` skips the call
+only when its own copy is absent, so a panel that has the secret POSTs to a
+site that does not. The save itself has already committed by then — the
+operator sees success while the background revalidation POST takes a 500 and
+the site quietly goes stale until the fallback window expires. Dev and prod
+take different values.
 
 ### 3. Vercel — four projects · https://vercel.com
 
