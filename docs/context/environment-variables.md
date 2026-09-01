@@ -5,6 +5,41 @@
 > and whether it's required. For the minimal subset needed to run `pnpm dev`
 > locally, see [`docs/context/getting-started.md`](./getting-started.md).
 
+## Vercel scopes every variable to a target — only **Production** is live here
+
+Vercel stores each variable against one or more of three targets —
+**Production**, **Preview**, **Development** — independently, so the same name
+can exist more than once with different values and different scopes. This
+table names variables; it does not name targets. On the four pipeline
+projects (`blog-web-dev`, `blog-web-prod`, `platform-dev`, `platform-prod`)
+the only target that is ever read is **Production**:
+
+- `apps/web/vercel.json` and `apps/platform/vercel.json` both set
+  `git.deploymentEnabled: false`, so none of the four ever produces a preview
+  deployment. A Preview-scoped value has nothing to run in.
+- Both deploy workflows run `vercel pull --environment=production` before
+  `vercel build`, so a value scoped only to Preview or Development is never
+  pulled even when a deployment does happen.
+- Nothing in this repo runs `vercel env pull`, so the Development target is
+  not feeding local work either — local development reads `.env.local`.
+
+**Set every value on the Production target.** A value placed only on Preview
+or Development is not a safety measure or a staging step; it is inert, and it
+reads to the next audit as configuration that exists. The two Storybook
+projects are the exception — they deliberately preview-deploy, and hold no
+credentials.
+
+**Integration-injected variables are not part of this table.** Connecting a
+Vercel integration (Neon, Blob) injects its own variables — `POSTGRES_*`,
+`PG*`, `NEON_*`, `VITE_NEON_AUTH_URL`, `BLOB_STORE_ID`,
+`BLOB_WEBHOOK_PUBLIC_KEY` — which nothing in this repo reads. For database
+**connection strings** specifically, `@blog/db` reads only `DATABASE_URL`
+(runtime) and `DATABASE_URL_UNPOOLED` (`drizzle.config.ts`), never a
+`POSTGRES_*`/`PG*`/`NEON_*` alternative for the same connection. They reappear when the
+integration re-syncs, so treat them as noise to skip rather than drift to
+re-flag, and narrow what the integration injects if they need to stop coming
+back.
+
 | Variable                                                                                                    | Consumer                                                                                                                                                                                       | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `NEXT_PUBLIC_SANITY_PROJECT_ID`                                                                             | web + service                                                                                                                                                                                  | required; validated by Zod at import                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
