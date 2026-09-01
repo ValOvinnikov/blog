@@ -25,6 +25,12 @@ const meta = {
   component: TaxonomyListModuleView,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
+  argTypes: {
+    brandVariant: {
+      control: 'select',
+      options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
+    },
+  },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
     sectionHeader: {
