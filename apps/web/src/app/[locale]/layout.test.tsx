@@ -278,4 +278,21 @@ describe('LocaleLayout', () => {
     expect(within(panel).queryByText('Guest')).not.toBeInTheDocument();
     expect(within(panel).getByText('Choose a sign-in method')).toBeVisible();
   });
+
+  it('wires the enabled OAuth provider ids from getEnabledOAuthProviderIds into AuthMenu', async () => {
+    getEnabledOAuthProviderIdsMock.mockReturnValue(['github']);
+
+    await setup();
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Sign in' }));
+    const panel = screen.getByRole('menu');
+
+    expect(
+      within(panel).getByRole('menuitem', { name: 'Continue with GitHub' }),
+    ).toBeVisible();
+    expect(
+      within(panel).queryByRole('menuitem', { name: 'Continue with Google' }),
+    ).not.toBeInTheDocument();
+  });
 });

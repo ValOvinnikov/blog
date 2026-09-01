@@ -74,4 +74,28 @@ describe('oauth-providers', () => {
       expect(getOAuthProviderCredentials('google')).toBeUndefined();
     });
   });
+
+  describe('module import', () => {
+    it('does not require AUTH_SECRET, so a route rendering just the OAuth buttons never needs it', async () => {
+      const previousAuthSecret = process.env['AUTH_SECRET'];
+      const previousSkipValidation = process.env['SKIP_ENV_VALIDATION'];
+      delete process.env['AUTH_SECRET'];
+      delete process.env['SKIP_ENV_VALIDATION'];
+
+      try {
+        await expect(importOAuthProviders()).resolves.toBeDefined();
+      } finally {
+        if (previousAuthSecret === undefined) {
+          delete process.env['AUTH_SECRET'];
+        } else {
+          process.env['AUTH_SECRET'] = previousAuthSecret;
+        }
+        if (previousSkipValidation === undefined) {
+          delete process.env['SKIP_ENV_VALIDATION'];
+        } else {
+          process.env['SKIP_ENV_VALIDATION'] = previousSkipValidation;
+        }
+      }
+    });
+  });
 });

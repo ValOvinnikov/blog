@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { env } from '@blog/auth/utils/env/env';
+import { oauthEnv } from '@blog/auth/utils/oauth-env/oauth-env';
 
 export type TOAuthProviderId = 'github' | 'google';
 
@@ -16,12 +16,18 @@ const OAUTH_CREDENTIAL_GETTERS: Record<
   () => TOAuthCredentials | undefined
 > = {
   github: () =>
-    env.AUTH_GITHUB_ID && env.AUTH_GITHUB_SECRET
-      ? { clientId: env.AUTH_GITHUB_ID, clientSecret: env.AUTH_GITHUB_SECRET }
+    oauthEnv.AUTH_GITHUB_ID && oauthEnv.AUTH_GITHUB_SECRET
+      ? {
+          clientId: oauthEnv.AUTH_GITHUB_ID,
+          clientSecret: oauthEnv.AUTH_GITHUB_SECRET,
+        }
       : undefined,
   google: () =>
-    env.AUTH_GOOGLE_ID && env.AUTH_GOOGLE_SECRET
-      ? { clientId: env.AUTH_GOOGLE_ID, clientSecret: env.AUTH_GOOGLE_SECRET }
+    oauthEnv.AUTH_GOOGLE_ID && oauthEnv.AUTH_GOOGLE_SECRET
+      ? {
+          clientId: oauthEnv.AUTH_GOOGLE_ID,
+          clientSecret: oauthEnv.AUTH_GOOGLE_SECRET,
+        }
       : undefined,
 };
 
