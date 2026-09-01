@@ -11,6 +11,8 @@ export type TButtonProps = {
   children?: ReactNode;
   className?: string;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
+  /** Appends a decorative arrow, hidden from the accessible name. */
+  hasArrow?: boolean;
 };
 
 export const Button = ({
@@ -22,6 +24,7 @@ export const Button = ({
   children,
   className,
   'aria-describedby': ariaDescribedBy,
+  hasArrow,
 }: TButtonProps) => {
   return (
     <button
@@ -32,6 +35,7 @@ export const Button = ({
       aria-describedby={ariaDescribedBy}
     >
       {children}
+      {hasArrow && <span aria-hidden="true"> →</span>}
     </button>
   );
 };

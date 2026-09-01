@@ -77,7 +77,10 @@ export const TenantOverviewView = ({
           </>
         }
         actions={
-          <ExternalLinkButton href={`https://${tenant.primaryDomain}`}>
+          <ExternalLinkButton
+            href={`https://${tenant.primaryDomain}`}
+            hasArrow={true}
+          >
             {t('openSiteAction')}
           </ExternalLinkButton>
         }

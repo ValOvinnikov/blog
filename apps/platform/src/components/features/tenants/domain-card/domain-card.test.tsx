@@ -17,7 +17,7 @@ describe(DomainCard, () => {
     );
 
     expect(screen.getByText('acme.example.com')).toBeVisible();
-    expect(screen.getByRole('link', { name: 'DNS →' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'DNS' })).toHaveAttribute(
       'href',
       `/tenants/${tenant.id}/domain`,
     );
@@ -33,7 +33,7 @@ describe(DomainCard, () => {
       />,
     );
 
-    expect(screen.getByRole('link', { name: 'DNS →' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'DNS' })).toHaveAttribute(
       'href',
       '/dashboard/domain',
     );

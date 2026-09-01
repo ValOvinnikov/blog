@@ -5,6 +5,8 @@ import {
   type TButtonVariants,
 } from '../button/button-variants';
 
+import { newTabHintVariants } from './external-link-button-variants';
+
 export type TExternalLinkButtonProps = {
   href: string;
   variant?: TButtonVariants['variant'];
@@ -14,6 +16,8 @@ export type TExternalLinkButtonProps = {
   ariaLabel?: string;
   /** Only needed alongside `ariaLabel` when `children` is a bare glyph rather than descriptive text — an icon-only control needs both. */
   title?: string;
+  /** Appends a decorative arrow plus a visually-hidden "opens in new tab" hint. */
+  hasArrow?: boolean;
 };
 
 /**
@@ -31,6 +35,7 @@ export const ExternalLinkButton = ({
   className,
   ariaLabel,
   title,
+  hasArrow,
 }: TExternalLinkButtonProps) => {
   return (
     <a
@@ -42,6 +47,12 @@ export const ExternalLinkButton = ({
       title={title}
     >
       {children}
+      {hasArrow && (
+        <>
+          <span aria-hidden="true"> ↗</span>{' '}
+          <span className={newTabHintVariants()}>(opens in new tab)</span>
+        </>
+      )}
     </a>
   );
 };

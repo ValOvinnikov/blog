@@ -59,7 +59,10 @@ export const OwnerHomeView = ({
           </>
         }
         actions={
-          <ExternalLinkButton href={`https://${tenant.primaryDomain}`}>
+          <ExternalLinkButton
+            href={`https://${tenant.primaryDomain}`}
+            hasArrow={true}
+          >
             {t('openSiteAction')}
           </ExternalLinkButton>
         }

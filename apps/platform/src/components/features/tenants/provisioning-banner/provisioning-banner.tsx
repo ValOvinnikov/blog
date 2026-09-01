@@ -64,6 +64,7 @@ export const ProvisioningBanner = ({
       href={adminRoutes.tenantProvisioning(tenantId)}
       variant="secondary"
       size={SIZE.SM}
+      hasArrow={true}
     >
       {t('viewStepsButton')}
     </LinkButton>

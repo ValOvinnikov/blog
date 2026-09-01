@@ -49,13 +49,25 @@ describe(LinkButton, () => {
   it('applies the given ariaLabel as the accessible name', () => {
     render(
       <LinkButton href="/tenants" ariaLabel="Manage Acme Inc.">
-        Manage →
+        Manage
       </LinkButton>,
     );
 
     expect(
       screen.getByRole('link', { name: 'Manage Acme Inc.' }),
     ).toHaveAttribute('href', '/tenants');
+  });
+
+  it('keeps a decorative arrow out of the accessible name', () => {
+    render(
+      <LinkButton href="/tenants" hasArrow={true}>
+        View steps
+      </LinkButton>,
+    );
+
+    expect(
+      screen.getByRole('link', { name: 'View steps' }),
+    ).toBeInTheDocument();
   });
 
   it('renders through a custom `as` component', () => {

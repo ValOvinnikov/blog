@@ -21,6 +21,8 @@ export type TLinkButtonProps = {
   children?: ReactNode;
   className?: string;
   ariaLabel?: string;
+  /** Appends a decorative arrow, hidden from the accessible name. */
+  hasArrow?: boolean;
 };
 
 export const LinkButton = ({
@@ -31,6 +33,7 @@ export const LinkButton = ({
   children,
   className,
   ariaLabel,
+  hasArrow,
 }: TLinkButtonProps) => {
   return (
     <Component
@@ -39,6 +42,7 @@ export const LinkButton = ({
       aria-label={ariaLabel}
     >
       {children}
+      {hasArrow && <span aria-hidden="true"> →</span>}
     </Component>
   );
 };

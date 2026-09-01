@@ -11,7 +11,7 @@ import { useTranslations } from 'next-intl';
 export type TDomainCardProps = {
   tenant: TTenant;
   domainVerificationStatus: TDomainVerificationStatus;
-  /** Where the "DNS →" link goes — `/tenants/{id}/domain` on the platform tree, `/dashboard/domain` on the owner tree. */
+  /** Where the "DNS" link goes — `/tenants/{id}/domain` on the platform tree, `/dashboard/domain` on the owner tree. */
   dnsHref: string;
 };
 
@@ -34,7 +34,12 @@ export const DomainCard = ({
             >
               {t(`dnsStatus.${domainVerificationStatus}`)}
             </StatusBadge>
-            <LinkButton href={dnsHref} variant="ghost" size={SIZE.SM}>
+            <LinkButton
+              href={dnsHref}
+              variant="ghost"
+              size={SIZE.SM}
+              hasArrow={true}
+            >
               {t('dnsLinkButton')}
             </LinkButton>
           </>

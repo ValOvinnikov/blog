@@ -28,10 +28,9 @@ describe(OwnerHomeView, () => {
     ).toBeVisible();
     expect(screen.getByText('Active')).toBeVisible();
     expect(screen.getAllByText('Growth').length).toBeGreaterThan(0);
-    expect(screen.getByRole('link', { name: 'Open site ↗' })).toHaveAttribute(
-      'href',
-      'https://northwind.dev',
-    );
+    expect(
+      screen.getByRole('link', { name: 'Open site (opens in new tab)' }),
+    ).toHaveAttribute('href', 'https://northwind.dev');
   });
 
   it('renders the archived notice when the tenant has been deprovisioned', () => {
@@ -108,7 +107,7 @@ describe(OwnerHomeView, () => {
     expect(
       screen.getByRole('heading', { level: 2, name: 'Owner' }),
     ).toBeVisible();
-    expect(screen.getByRole('link', { name: 'DNS →' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'DNS' })).toHaveAttribute(
       'href',
       '/dashboard/domain',
     );
