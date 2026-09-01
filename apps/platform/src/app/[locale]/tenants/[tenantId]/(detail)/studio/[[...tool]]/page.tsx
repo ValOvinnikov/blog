@@ -27,15 +27,20 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function TenantStudioPage({ params }: TProps) {
   const { tenantId } = await params;
   const { tenant } = await requireTenantById(tenantId);
+  const t = await getTranslations('studioPage');
 
   if (tenant.deprovisionedAt) {
-    return <ArchivedTenantNotice archivedAt={tenant.deprovisionedAt} />;
+    return (
+      <>
+        <PageHeader title={t('title')} />
+        <ArchivedTenantNotice archivedAt={tenant.deprovisionedAt} />
+      </>
+    );
   }
 
   const credentials = await queries.tenants.getTenantSanityCredentials(
     tenant.id,
   );
-  const t = await getTranslations('studioPage');
 
   if (!credentials) {
     return (
