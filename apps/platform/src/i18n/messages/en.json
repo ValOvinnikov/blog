@@ -93,7 +93,7 @@
       "FREE": "Free",
       "GROWTH": "Growth"
     },
-    "manage": "Manage →",
+    "manage": "Manage",
     "manageAriaLabel": "Manage {tenantName}"
   },
   "ownerHomePage": {
@@ -118,7 +118,7 @@
   "provisioningBanner": {
     "readyTitle": "Provisioned",
     "readyDescription": "All steps completed.",
-    "viewStepsButton": "View steps →",
+    "viewStepsButton": "View steps",
     "runningTitle": "Provisioning — step {step} of {total}",
     "runningDescription": "This page updates on its own.",
     "failedTitle": "Provisioning failed at step {step} of {total}",
@@ -134,9 +134,9 @@
     }
   },
   "tenantOverviewPage": {
-    "openSiteAction": "Open site ↗",
+    "openSiteAction": "Open site",
     "domainCardTitle": "Domain",
-    "dnsLinkButton": "DNS →",
+    "dnsLinkButton": "DNS",
     "publicDomainLabel": "Public domain",
     "lastCheckedLabel": "Last checked",
     "lastCheckedJustNow": "Just now",
@@ -368,8 +368,8 @@
     "planOptionGrowth": "Growth",
     "ownerEmailLabel": "Owner email",
     "ownerEmailHint": "The person who'll manage this tenant. An existing account gets access immediately; a new address gets an email invite to sign in.",
-    "submitButton": "Begin provisioning →",
-    "confirmOwnerInviteButton": "Confirm & invite owner →",
+    "submitButton": "Begin provisioning",
+    "confirmOwnerInviteButton": "Confirm & invite owner",
     "submittingBeginButton": "Beginning provisioning…",
     "submittingInviteButton": "Inviting owner…"
   },

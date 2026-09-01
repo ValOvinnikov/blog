@@ -22,14 +22,14 @@ describe(DetailList, () => {
       <DetailList>
         <DetailList.Row
           label="Public domain"
-          action={<button type="button">DNS →</button>}
+          action={<button type="button">DNS</button>}
         >
           northwind.dev
         </DetailList.Row>
       </DetailList>,
     );
 
-    expect(screen.getByRole('button', { name: 'DNS →' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'DNS' })).toBeVisible();
   });
 
   it('renders as a real definition list', () => {

@@ -77,7 +77,7 @@ describe(ProvisioningBanner, () => {
     );
 
     expect(screen.getByText('Provisioning — step 3 of 5')).toBeVisible();
-    expect(screen.getByRole('link', { name: 'View steps →' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'View steps' })).toHaveAttribute(
       'href',
       '/tenants/tenant-1/provisioning',
     );
@@ -128,7 +128,7 @@ describe(ProvisioningBanner, () => {
     );
 
     expect(screen.getByText('Provisioned')).toBeVisible();
-    expect(screen.getByRole('link', { name: 'View steps →' })).toBeVisible();
+    expect(screen.getByRole('link', { name: 'View steps' })).toBeVisible();
   });
 
   it('shows a status-role owner-elevation row for a STALLED outcome when ready', () => {

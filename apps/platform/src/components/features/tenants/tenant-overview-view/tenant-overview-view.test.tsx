@@ -372,7 +372,9 @@ describe(TenantOverviewView, () => {
       />,
     );
 
-    const link = screen.getByRole('link', { name: 'Open site ↗' });
+    const link = screen.getByRole('link', {
+      name: 'Open site (opens in new tab)',
+    });
     expect(link).toHaveAttribute('href', 'https://acme.example.com');
     expect(link).toHaveAttribute('target', '_blank');
   });

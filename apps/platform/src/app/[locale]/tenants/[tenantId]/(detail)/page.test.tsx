@@ -135,10 +135,9 @@ describe(TenantOverviewPage, () => {
 
     await setup();
 
-    expect(screen.getByRole('link', { name: 'Open site ↗' })).toHaveAttribute(
-      'href',
-      'https://acme.example.com',
-    );
+    expect(
+      screen.getByRole('link', { name: 'Open site (opens in new tab)' }),
+    ).toHaveAttribute('href', 'https://acme.example.com');
   });
 
   it('never shows an "Open Studio" action — the sidebar is the only entry point to Studio', async () => {

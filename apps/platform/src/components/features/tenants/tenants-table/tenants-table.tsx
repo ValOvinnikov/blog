@@ -92,6 +92,7 @@ export const TenantsTable = ({ tenants }: TTenantsTableProps) => {
                   variant="ghost"
                   size={SIZE.SM}
                   ariaLabel={t('manageAriaLabel', { tenantName: tenant.name })}
+                  hasArrow={true}
                 >
                   {t('manage')}
                 </LinkButton>

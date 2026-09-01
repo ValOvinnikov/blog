@@ -181,6 +181,7 @@ export const TenantDetailsForm = () => {
                 variant="primary"
                 onClick={handleSubmit}
                 isDisabled={isPending}
+                hasArrow={!isPending}
               >
                 {isPending
                   ? pendingLabel
