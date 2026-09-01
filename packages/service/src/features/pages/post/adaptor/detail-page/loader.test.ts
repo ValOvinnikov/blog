@@ -375,6 +375,7 @@ describe('getPost', () => {
       'post-abc',
       ['tag-1'],
       'topic-1',
+      undefined,
     );
   });
 
@@ -496,5 +497,68 @@ describe('getPost', () => {
       _type: 'bodyImage',
       layout: 'FLOAT_RIGHT',
     });
+  });
+
+  it('threads tenant context into both queries, the related-posts lookup, and scopes their tags to it', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawPostPage())
+      .mockResolvedValueOnce(makeRawSiteSettings());
+    const tenant = {
+      projectId: 'tenant-a',
+      dataset: 'production',
+      token: 'tok',
+    };
+
+    await getPost('my-slug', tenant);
+
+    expect(mockRun).toHaveBeenNthCalledWith(
+      1,
+      expect.anything(),
+      expect.objectContaining({
+        tenant,
+        next: expect.objectContaining({
+          tags: [
+            't:tenant-a:page_post',
+            't:tenant-a:post',
+            't:tenant-a:author',
+            't:tenant-a:topic',
+            't:tenant-a:tag',
+          ],
+        }),
+      }),
+    );
+    expect(mockRun).toHaveBeenNthCalledWith(
+      2,
+      expect.anything(),
+      expect.objectContaining({
+        tenant,
+        next: expect.objectContaining({ tags: ['t:tenant-a:site-settings'] }),
+      }),
+    );
+    expect(mockGetRelatedPosts).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+      tenant,
+    );
+  });
+
+  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawPostPage())
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    await getPost('my-slug');
+
+    expect(mockRun).toHaveBeenNthCalledWith(
+      1,
+      expect.anything(),
+      expect.objectContaining({ tenant: undefined }),
+    );
+    expect(mockRun).toHaveBeenNthCalledWith(
+      2,
+      expect.anything(),
+      expect.objectContaining({ tenant: undefined }),
+    );
   });
 });

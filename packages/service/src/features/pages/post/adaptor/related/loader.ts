@@ -1,4 +1,8 @@
-import { isr, runQuery } from '@blog/service/sanity/query';
+import {
+  isr,
+  runQuery,
+  type TTenantSanityContext,
+} from '@blog/service/sanity/query';
 import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
 
 import { relatedByTagsQuery, relatedByTopicQuery } from './query';
@@ -13,6 +17,7 @@ export async function getRelatedPosts(
   currentId: string,
   tagIds: string[],
   topicId: string | undefined,
+  tenant?: TTenantSanityContext,
 ): Promise<TPostCard[]> {
   // Both queries project `postCardFragment`, which derefs `author`/`topic`
   // — both tags must ride alongside `posts` (tag-scope contract,
@@ -23,13 +28,15 @@ export async function getRelatedPosts(
     tagIds.length > 0
       ? runQuery(relatedByTagsQuery, {
           parameters: { currentId, tagIds },
-          ...isr(['posts', 'author', 'topic', 'tag']),
+          tenant,
+          ...isr(['posts', 'author', 'topic', 'tag'], tenant?.projectId),
         })
       : Promise.resolve([]),
     topicId
       ? runQuery(relatedByTopicQuery, {
           parameters: { currentId, topicId },
-          ...isr(['posts', 'author', 'topic']),
+          tenant,
+          ...isr(['posts', 'author', 'topic'], tenant?.projectId),
         })
       : Promise.resolve([]),
   ]);

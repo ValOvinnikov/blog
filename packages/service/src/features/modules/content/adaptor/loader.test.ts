@@ -22,4 +22,41 @@ describe('getContent', () => {
 
     await expect(getContent('missing')).rejects.toThrow();
   });
+
+  it('threads tenant context into runQuery and scopes the tags to it', async () => {
+    mockRun.mockResolvedValue(makeRawContentModule());
+    const tenant = {
+      projectId: 'tenant-a',
+      dataset: 'production',
+      token: 'tok',
+    };
+
+    await getContent('content-1', tenant);
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        tenant,
+        next: expect.objectContaining({
+          tags: ['t:tenant-a:modules:content', 't:tenant-a:module:content-1'],
+        }),
+      }),
+    );
+  });
+
+  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
+    mockRun.mockResolvedValue(makeRawContentModule());
+
+    await getContent('content-1');
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        tenant: undefined,
+        next: expect.objectContaining({
+          tags: ['modules:content', 'module:content-1'],
+        }),
+      }),
+    );
+  });
 });

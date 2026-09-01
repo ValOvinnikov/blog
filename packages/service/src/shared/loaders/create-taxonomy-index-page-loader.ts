@@ -1,7 +1,11 @@
 import type { TMaybeUndefined } from '@blog/config';
 import { getSiteSettings } from '@blog/service/features/global/site-settings/adaptor/loader';
 import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
-import { isr, runQuery } from '@blog/service/sanity/query';
+import {
+  isr,
+  runQuery,
+  type TTenantSanityContext,
+} from '@blog/service/sanity/query';
 import type { IGroqBuilder, QueryConfig } from 'groqd';
 
 type TRawTaxonomyIndexPage = {
@@ -38,18 +42,24 @@ export function createTaxonomyIndexPageLoader<
   tags,
   MissingTaxonomyListError,
 }: TCreateTaxonomyIndexPageLoaderOptions<TRaw, TPage, TQueryConfig>) {
-  return async function getIndexPage(): Promise<TMaybeUndefined<TPage>> {
+  return async function getIndexPage(
+    tenant?: TTenantSanityContext,
+  ): Promise<TMaybeUndefined<TPage>> {
     // `parameters: {}` is a no-op at runtime (`runQuery` defaults it the
     // same way) — needed only because a generic `TQueryConfig` can't narrow
     // away `runQuery`'s optional-parameters overload the way a concrete
     // query type does.
-    const rawPage = await runQuery(query, { parameters: {}, ...isr(tags) });
+    const rawPage = await runQuery(query, {
+      parameters: {},
+      tenant,
+      ...isr(tags, tenant?.projectId),
+    });
     if (!rawPage) return undefined;
     if (!rawPage.taxonomyList) {
       throw new MissingTaxonomyListError();
     }
 
-    const settings = await getSiteSettings();
+    const settings = await getSiteSettings(tenant);
     return transformer(rawPage, settings, rawPage.taxonomyList._id);
   };
 }

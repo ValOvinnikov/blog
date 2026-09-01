@@ -83,4 +83,60 @@ describe('getPostLatest', () => {
       }),
     );
   });
+
+  it('threads tenant context into both queries and scopes their tags to it', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawPostLatestModule({ limit: 3 }))
+      .mockResolvedValueOnce([makeRawPostCard({ _id: 'a' })]);
+    const tenant = {
+      projectId: 'tenant-a',
+      dataset: 'production',
+      token: 'tok',
+    };
+
+    await getPostLatest('post-latest-1', tenant);
+
+    expect(mockRun).toHaveBeenNthCalledWith(
+      1,
+      expect.anything(),
+      expect.objectContaining({
+        tenant,
+        next: expect.objectContaining({
+          tags: [
+            't:tenant-a:modules:postLatest',
+            't:tenant-a:module:post-latest-1',
+          ],
+        }),
+      }),
+    );
+    expect(mockRun).toHaveBeenNthCalledWith(
+      2,
+      expect.anything(),
+      expect.objectContaining({
+        tenant,
+        next: expect.objectContaining({
+          tags: ['t:tenant-a:posts', 't:tenant-a:author', 't:tenant-a:topic'],
+        }),
+      }),
+    );
+  });
+
+  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawPostLatestModule({ limit: 3 }))
+      .mockResolvedValueOnce([makeRawPostCard({ _id: 'a' })]);
+
+    await getPostLatest('post-latest-1');
+
+    expect(mockRun).toHaveBeenNthCalledWith(
+      1,
+      expect.anything(),
+      expect.objectContaining({ tenant: undefined }),
+    );
+    expect(mockRun).toHaveBeenNthCalledWith(
+      2,
+      expect.anything(),
+      expect.objectContaining({ tenant: undefined }),
+    );
+  });
 });

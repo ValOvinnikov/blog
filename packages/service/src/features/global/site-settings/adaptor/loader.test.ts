@@ -247,4 +247,37 @@ describe('getSiteSettings', () => {
 
     expect(result.brand.logoAsset).toBeUndefined();
   });
+
+  it('threads tenant context into runQuery and scopes the tags to it', async () => {
+    mockRun.mockResolvedValue(makeRawSiteSettings());
+    const tenant = {
+      projectId: 'tenant-a',
+      dataset: 'production',
+      token: 'tok',
+    };
+
+    await getSiteSettings(tenant);
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        tenant,
+        next: expect.objectContaining({ tags: ['t:tenant-a:site-settings'] }),
+      }),
+    );
+  });
+
+  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
+    mockRun.mockResolvedValue(makeRawSiteSettings());
+
+    await getSiteSettings();
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        tenant: undefined,
+        next: expect.objectContaining({ tags: ['site-settings'] }),
+      }),
+    );
+  });
 });

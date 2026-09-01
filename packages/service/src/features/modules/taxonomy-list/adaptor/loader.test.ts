@@ -93,4 +93,60 @@ describe('getTaxonomyList', () => {
       getTaxonomyList('missing', TAXONOMY_KIND.TOPICS),
     ).rejects.toThrow();
   });
+
+  it('threads tenant context into both queries and scopes their tags to it', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawTaxonomyListModule())
+      .mockResolvedValueOnce([]);
+    const tenant = {
+      projectId: 'tenant-a',
+      dataset: 'production',
+      token: 'tok',
+    };
+
+    await getTaxonomyList('taxonomy-list-1', TAXONOMY_KIND.TOPICS, tenant);
+
+    expect(mockRun).toHaveBeenNthCalledWith(
+      1,
+      expect.anything(),
+      expect.objectContaining({
+        tenant,
+        next: expect.objectContaining({
+          tags: [
+            't:tenant-a:modules:taxonomyList',
+            't:tenant-a:module:taxonomy-list-1',
+          ],
+        }),
+      }),
+    );
+    expect(mockRun).toHaveBeenNthCalledWith(
+      2,
+      expect.anything(),
+      expect.objectContaining({
+        tenant,
+        next: expect.objectContaining({
+          tags: ['t:tenant-a:topics', 't:tenant-a:posts'],
+        }),
+      }),
+    );
+  });
+
+  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawTaxonomyListModule())
+      .mockResolvedValueOnce([]);
+
+    await getTaxonomyList('taxonomy-list-1', TAXONOMY_KIND.TOPICS);
+
+    expect(mockRun).toHaveBeenNthCalledWith(
+      1,
+      expect.anything(),
+      expect.objectContaining({ tenant: undefined }),
+    );
+    expect(mockRun).toHaveBeenNthCalledWith(
+      2,
+      expect.anything(),
+      expect.objectContaining({ tenant: undefined }),
+    );
+  });
 });

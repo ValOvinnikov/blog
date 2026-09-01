@@ -41,12 +41,12 @@ describe(createPostsService, () => {
     expect(typeof svc.v1.getPublishedPostsByTag).toBe('function');
   });
 
-  it('calls the loader with no arguments', async () => {
+  it('calls the loader with no tenant context', async () => {
     vi.mocked(getAllPublishedPosts).mockResolvedValue([]);
 
     await createPostsService().v1.getAllPublishedPosts();
 
-    expect(getAllPublishedPosts).toHaveBeenCalledWith();
+    expect(getAllPublishedPosts).toHaveBeenCalledWith(undefined);
   });
 
   it('threads an optional tenant context through to the loader', async () => {
@@ -67,6 +67,32 @@ describe(createPostsService, () => {
 
     await createPostsService().v1.getPublishedPostsByTag('tag-1');
 
-    expect(getPublishedPostsByTag).toHaveBeenCalledWith('tag-1');
+    expect(getPublishedPostsByTag).toHaveBeenCalledWith('tag-1', undefined);
+  });
+
+  it('threads an optional tenant context through to the tag-scoped loader', async () => {
+    const tenant = {
+      projectId: 'tenant-a',
+      dataset: 'production',
+      token: 'tok',
+    };
+    vi.mocked(getPublishedPostsByTag).mockResolvedValue([]);
+
+    await createPostsService().v1.getPublishedPostsByTag('tag-1', tenant);
+
+    expect(getPublishedPostsByTag).toHaveBeenCalledWith('tag-1', tenant);
+  });
+
+  it('threads an optional tenant context through to getAllPublishedPosts', async () => {
+    const tenant = {
+      projectId: 'tenant-a',
+      dataset: 'production',
+      token: 'tok',
+    };
+    vi.mocked(getAllPublishedPosts).mockResolvedValue([]);
+
+    await createPostsService().v1.getAllPublishedPosts(tenant);
+
+    expect(getAllPublishedPosts).toHaveBeenCalledWith(tenant);
   });
 });

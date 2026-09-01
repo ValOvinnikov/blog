@@ -10,9 +10,12 @@ export function createPostsService() {
       getPostsByIds: safeAsync((ids: string[], tenant?: TTenantSanityContext) =>
         getPostsByIds(ids, tenant),
       ),
-      getAllPublishedPosts: safeAsync(() => getAllPublishedPosts()),
-      getPublishedPostsByTag: safeAsync((tagId: string) =>
-        getPublishedPostsByTag(tagId),
+      getAllPublishedPosts: safeAsync((tenant?: TTenantSanityContext) =>
+        getAllPublishedPosts(tenant),
+      ),
+      getPublishedPostsByTag: safeAsync(
+        (tagId: string, tenant?: TTenantSanityContext) =>
+          getPublishedPostsByTag(tagId, tenant),
       ),
     },
   };
