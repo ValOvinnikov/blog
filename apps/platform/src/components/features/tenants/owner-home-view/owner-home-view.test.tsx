@@ -34,6 +34,44 @@ describe(OwnerHomeView, () => {
     );
   });
 
+  it('renders the archived notice when the tenant has been deprovisioned', () => {
+    const tenant = makeTenant({
+      name: 'Northwind Field Notes',
+      deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+    });
+    render(
+      <OwnerHomeView
+        tenant={tenant}
+        domainVerificationStatus="VERIFIED"
+        ownerEmail="sam@northwind.dev"
+        ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
+      />,
+    );
+
+    expect(screen.getByText('This tenant is archived')).toBeVisible();
+  });
+
+  it('does not render the archived notice for a non-archived tenant', () => {
+    const tenant = makeTenant({
+      name: 'Northwind Field Notes',
+      deprovisionedAt: null,
+    });
+    render(
+      <OwnerHomeView
+        tenant={tenant}
+        domainVerificationStatus="VERIFIED"
+        ownerEmail="sam@northwind.dev"
+        ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
+      />,
+    );
+
+    expect(
+      screen.queryByText('This tenant is archived'),
+    ).not.toBeInTheDocument();
+  });
+
   it('renders the read-only "Your site" card instead of an editable form', () => {
     const tenant = makeTenant({ name: 'Northwind Field Notes' });
     render(
