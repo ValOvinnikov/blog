@@ -23,9 +23,10 @@ export const env = createEnv({
     // `SITE_CONFIG_REVALIDATE_SECRET` below): absent, the call is skipped
     // and logged — the save itself still succeeds.
     WEB_APP_URL: z.string().url().optional(),
-    // MUST be byte-identical to `apps/web`'s own `SITE_CONFIG_REVALIDATE_SECRET`
-    // — same posture as `AUTH_SECRET` — sent as a bearer token to
-    // `apps/web`'s `/api/revalidate-site-config` route.
+    // MUST be byte-identical to `apps/web`'s own `SITE_CONFIG_REVALIDATE_SECRET`:
+    // sent as a bearer token to `apps/web`'s `/api/revalidate-site-config`
+    // route, which compares it against its own copy and rejects a mismatch
+    // with 401.
     SITE_CONFIG_REVALIDATE_SECRET: z.string().min(1).optional(),
     // A narrowly-scoped (`actions: write` only) GitHub PAT used to trigger
     // both `provision-tenant.yml` (the "Add tenant" wizard) and

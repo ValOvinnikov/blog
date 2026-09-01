@@ -315,7 +315,7 @@ its `Host` header against `@blog/db`'s `tenant_domains`
 (`resolveTenantId()`, `apps/web/src/server/tenant/`), falling back to the
 sole `tenants` row outside production (`isProductionEnvironment()` — never
 `NODE_ENV`, which is `production` on every Vercel build including the live
-`blog-dev` deployment) and 404ing on an unmatched host in production; the
+`blog-web-dev` deployment) and 404ing on an unmatched host in production; the
 resolved `tenantId` is threaded to Server Components/Actions via the
 `x-tenant-id` request header (unconditionally cleared before the conditional
 set, so a client-supplied value can never survive an unresolved lookup),
@@ -365,8 +365,10 @@ fallback window as its safety net, but `apps/platform`'s Look/Voice save actions
 `apps/web`'s `POST /api/revalidate-site-config` after a successful
 `site_config` write, so a tenant admin's save reflects on the live site
 within seconds rather than waiting out that window. This is a plain
-shared-secret (`SITE_CONFIG_REVALIDATE_SECRET`, byte-identical between the
-two apps, same posture as `AUTH_SECRET`) service-to-service call between the
+shared-secret (`SITE_CONFIG_REVALIDATE_SECRET`, which must be byte-identical
+between the two apps because `apps/web` compares the bearer token it receives
+against its own copy — unlike `AUTH_SECRET`, where matching is an operational
+stance rather than a verified dependency) service-to-service call between the
 two apps' own deployments — not a Sanity webhook, so it doesn't reuse
 `@sanity/webhook`'s HMAC verification. Calling it is best-effort from the
 platform side: a failure (missing config, network error, non-2xx) is logged and
@@ -547,8 +549,8 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
 | Sanity project           | separate dev project (id via env) | separate prod project (id via env) |
 | Sanity dataset           | `development`                     | `production`                       |
 | Neon branch (`@blog/db`) | `development`                     | `production`                       |
-| Vercel project (web)     | `blog-dev`                        | `blog-prod`                        |
-| Vercel project (admin)   | `admin-dev`                       | `admin-prod`                       |
+| Vercel project (web)     | `blog-web-dev`                    | `blog-web-prod`                    |
+| Vercel project (admin)   | `platform-dev`                    | `platform-prod`                    |
 | Admin hostname           | `admin-dev.{your-hosting}`        | `admin.{your-hosting}`             |
 | Deploy trigger           | push/merge to `main`              | push git tag `v*`                  |
 | Web deploy mechanism     | Vercel CLI in GitHub Actions      | Vercel CLI in GitHub Actions       |
@@ -583,7 +585,7 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   (#2264): it fails if its own resolved host does **not** match the same
   repo Variable, so a mis-set production secret can no longer migrate the
   wrong Neon branch — or nothing at all — while reporting success. Whether
-  `blog-dev`'s Vercel `DATABASE_URL` scope is correct is still open (#2058).
+  `blog-web-dev`'s Vercel `DATABASE_URL` scope is correct is still open (#2058).
   See `docs/DEPLOY.md`'s Neon Postgres section for the full state and open
   items.
 - **Each environment is a separate Sanity project** with its own env-driven,
