@@ -23,8 +23,6 @@ What lives where, and which docs are live vs. historical. See `CLAUDE.md`'s
   - `rendering-caching-i18n.md` — ISR, the skim pipeline, i18n mechanics.
   - `seo-accessibility.md` — metadata, JSON-LD, breadcrumbs, a11y checklist.
   - `surfaces-and-routing.md` — routing conventions + per-surface layout history.
-  - `refactor-sweep-log.md` — last-swept tracking for the `refactor-sweep`
-    skill, one row per layer agent.
 - **`docs/BACKLOG.md`** — ticket-ready roadmap.
 - **`docs/DEPLOY.md`** — deploy & release runbook, one-time environment setup.
 - **`docs/design-reference/`** — design-system reference (HTML mockup +
