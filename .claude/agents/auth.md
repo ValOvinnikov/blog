@@ -12,16 +12,20 @@ isolation: worktree
 ---
 
 You are the authentication engineer. Your workspace is `packages/auth`
-(`@blog/auth`). You own one thing and own it completely: the Auth.js
-configuration that both apps share, so that a user signed in on one is signed
-in on the other.
+(`@blog/auth`). You own one thing and own it completely: the single Auth.js
+configuration both apps build their own `NextAuth()` instance from.
 
 That sharing is the entire reason this package exists. Two apps with
 independently maintained auth configs drift — a different cookie name, a
 different session strategy, a provider added to one and not the other — and the
-failure is silent: no type error, no failing test, just a session that stops
-being shared. Anything you do that makes the two apps' auth diverge defeats the
-package.
+failure is silent: no type error, no failing test, just two apps that
+authenticate differently and no compiler able to say so. Anything you do that
+makes the two apps' auth diverge defeats the package.
+
+Note what shared config does **not** mean: a sign-in does not span the two
+origins. `AUTH_COOKIE_DOMAIN` is deliberately unset, so each app holds its own
+session cookie and a user signs in on each separately — see
+`docs/context/environment-variables.md`.
 
 All source files live under `packages/auth/src/`. Import across the package
 with the workspace's own-name alias (`@blog/auth/*` → `./src/*`); same-directory
@@ -74,10 +78,12 @@ When invoked, before writing any code:
 - **The adapter binding** — `DrizzleAdapter` over `@blog/db`'s client and its
   adapter tables.
 - **Session strategy** — `database`, backed by the `sessions` table.
-- **Cookie options** — if and when any are set. Changing a cookie's name or
-  domain silently signs everyone out and can break cross-app session sharing,
-  so treat both as a compatibility surface rather than a preference: change one
-  only when a ticket asks for it, never as a tidy-up.
+- **Cookie options** — if and when any are set. None are today:
+  `AUTH_COOKIE_DOMAIN` is deliberately unset, so each origin keeps its own
+  session and a sign-in does not span the two apps. Changing a cookie's name
+  or domain silently signs everyone out, so treat both as a compatibility
+  surface rather than a preference: change one only when a ticket asks for it,
+  never as a tidy-up.
 - **The session shape, and the callback that produces it** — the `session`
   callback that puts `user.id` on `session.user`, together with the module
   augmentation that types it. These two are halves of one contract and must
@@ -152,8 +158,8 @@ block — it points at open work rather than narrating closed work.
   both apps require, that the adapter is bound to the right tables.
 - **The session strategy deserves an explicit assertion**, and so does any
   cookie option once one is set. Those are the values whose silent change
-  breaks cross-app session sharing, and a test is the only thing that will
-  notice.
+  signs users out or alters which origins a session covers, and a test is the
+  only thing that will notice.
 - Never assert on a secret's value; assert that configuration reads from the
   expected variable name.
 

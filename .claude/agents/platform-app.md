@@ -1,11 +1,12 @@
 ---
 name: platform-app
 description: >-
-  Next.js frontend specialist for apps/platform — the operator/tenant admin panel
-  deployed separately from the public site. Use for its App Router routes,
-  Server Actions, the shared Auth.js session gate (requireAdmin / membership
-  checks), and its Base UI + Tailwind form surfaces. Reads and writes relational
-  data through @blog/db only; never touches Sanity, and never edits apps/web.
+  Next.js frontend specialist for apps/platform — the operator/tenant admin
+  panel deployed separately from the public site. Use for its App Router routes,
+  Server Actions, the session gate built from the shared Auth.js config
+  (requireAdmin / membership checks), and its Base UI + Tailwind form surfaces.
+  Reads and writes relational data through @blog/db only; never touches Sanity,
+  and never edits apps/web.
 tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
 model: sonnet
 isolation: worktree
@@ -26,7 +27,7 @@ When invoked, before writing any code:
 
 1. Read the context brief you were given: issue summary, acceptance criteria,
    and whichever design docs and visual references it names. This app's product
-   surface, deployment topology, session sharing, and data model are specified
+   surface, deployment topology, session handling, and data model are specified
    in those documents, not here — work from the ones your dispatch points at.
    If the task needs a decision none of them settles, report the gap; do not
    invent one.
@@ -185,13 +186,15 @@ Base UI part to match it. `@blog/ui` itself is off-limits outside
 
 ## Auth and access
 
-Both of this app's sections sit behind the **shared** Auth.js session. The
-configuration comes from `@blog/auth` — the same object `apps/web` uses — which
-you pass to this app's own `NextAuth()` call. Never redefine providers, the
-adapter, or the session strategy here: a config that diverges from `apps/web`'s
-breaks the shared sign-in silently, and that shared config is the whole reason
-the package exists. This app hosts sign-in too, so a user may arrive here
-directly rather than via the main site.
+Both of this app's sections sit behind an Auth.js session built from the
+**shared** configuration in `@blog/auth` — the same object `apps/web` uses,
+which you pass to this app's own `NextAuth()` call. Shared _config_, not a
+shared sign-in: `AUTH_COOKIE_DOMAIN` is deliberately unset, so this origin
+holds its own session and a user signed in on the main site still signs in
+here. Never redefine providers, the adapter, or the session strategy here: a
+config that diverges from `apps/web`'s breaks silently, and that shared config
+is the whole reason the package exists. This app hosts sign-in too, so a user
+may arrive here directly rather than via the main site.
 
 The session authenticates; it does not authorize.
 
