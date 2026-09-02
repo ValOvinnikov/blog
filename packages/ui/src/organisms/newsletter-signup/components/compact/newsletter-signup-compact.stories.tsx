@@ -1,3 +1,4 @@
+import { FORM_STATUSES } from '@blog/config';
 import { NewsletterSignup } from '@blog/ui/organisms/newsletter-signup/newsletter-signup';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -6,6 +7,12 @@ const meta = {
   component: NewsletterSignup.Compact,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
+  argTypes: {
+    status: {
+      control: 'select',
+      options: FORM_STATUSES,
+    },
+  },
   args: {
     email: '',
     onChange: () => {},

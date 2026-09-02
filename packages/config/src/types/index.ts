@@ -32,8 +32,15 @@ export interface ILocalizedParams {
   locale: TLocaleIsoCode;
 }
 
+export const FORM_STATUSES = [
+  'idle',
+  'submitting',
+  'success',
+  'error',
+] as const;
+
 /**
  * Lifecycle status for a controlled form submission — the caller owns the
  * state, the component only reads it to drive its UI.
  */
-export type TFormStatus = 'idle' | 'submitting' | 'success' | 'error';
+export type TFormStatus = (typeof FORM_STATUSES)[number];

@@ -1,4 +1,5 @@
 import { BRAND_VARIANT } from '@blog/config';
+import { HEADING_LEVELS } from '@blog/ui/lib/react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { TaxonomyListModuleView } from './taxonomy-list-module-view';
@@ -29,6 +30,10 @@ const meta = {
     brandVariant: {
       control: 'select',
       options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
+    },
+    headingLevel: {
+      control: 'select',
+      options: HEADING_LEVELS,
     },
   },
   args: {

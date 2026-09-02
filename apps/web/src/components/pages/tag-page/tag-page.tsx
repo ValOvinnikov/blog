@@ -3,9 +3,9 @@ import { service } from '@blog/service';
 import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import { PostListModule } from '@web/modules/post-list/post-list-module';
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
-import { env } from '@web/utils/env/env';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { getTranslations } from 'next-intl/server';
 
@@ -34,7 +34,7 @@ export const TagPage = async ({ slug, page, locale }: TTagPageProps) => {
     { slug },
   );
 
-  const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
+  const siteUrl = (await getTenantBaseUrl()) ?? '';
   const breadcrumbTrail: IBreadcrumbItem[] = [
     { label: breadcrumbsT('home'), href: routes.home() },
     { label: tagPageT('label', { name: tag.title }), href: routes.tag(slug) },

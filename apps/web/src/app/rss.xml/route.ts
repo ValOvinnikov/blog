@@ -1,8 +1,8 @@
 import { routes } from '@blog/config';
 import { service, type TFeedPost } from '@blog/service';
 import { getHostTenantSanityContext } from '@web/server/tenant/get-host-tenant-sanity-context';
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { buildRssFeed, type TRssItem } from '@web/utils/build-rss-feed';
-import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import { NextResponse } from 'next/server';
 import { getTranslations } from 'next-intl/server';
@@ -23,7 +23,7 @@ const toRssItem = (post: TFeedPost, siteUrl: string): TRssItem => {
  * failure.
  */
 export async function GET(): Promise<Response> {
-  const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
+  const siteUrl = (await getTenantBaseUrl()) ?? '';
 
   const hostTenant = await getHostTenantSanityContext();
   if (!hostTenant.isResolvable) {

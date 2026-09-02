@@ -7,10 +7,12 @@ const {
   getAllPublishedPostsMock,
   getSiteSettingsMock,
   getHostTenantSanityContextMock,
+  getTenantBaseUrlMock,
 } = vi.hoisted(() => ({
   getAllPublishedPostsMock: vi.fn(),
   getSiteSettingsMock: vi.fn(),
   getHostTenantSanityContextMock: vi.fn(),
+  getTenantBaseUrlMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -26,6 +28,10 @@ vi.mock('@web/server/tenant/get-host-tenant-sanity-context', () => ({
   getHostTenantSanityContext: getHostTenantSanityContextMock,
 }));
 
+vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
+  getTenantBaseUrl: getTenantBaseUrlMock,
+}));
+
 const post: TFeedPost = {
   title: 'Hello & Welcome',
   slug: 'hello-welcome',
@@ -39,6 +45,7 @@ describe('GET /rss.xml', () => {
       isResolvable: true,
       tenant: undefined,
     });
+    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
   });
 
   afterEach(() => {
@@ -46,6 +53,7 @@ describe('GET /rss.xml', () => {
     getAllPublishedPostsMock.mockReset();
     getSiteSettingsMock.mockReset();
     getHostTenantSanityContextMock.mockReset();
+    getTenantBaseUrlMock.mockReset();
   });
 
   it('returns a valid RSS 2.0 feed with the correct content type', async () => {
