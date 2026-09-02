@@ -67,11 +67,12 @@
   verifies a plain shared secret (`SITE_CONFIG_REVALIDATE_SECRET`, sent as a
   bearer token) rather than `@sanity/webhook`'s HMAC signature. Accepts an
   optional JSON body `{ tenantId }` to scope the purge to just that tenant;
-  an omitted `tenantId` (the current, not-yet-updated `apps/platform` caller)
-  falls back to revalidating every tenant, so revalidation never silently
-  stops working. `apps/platform`
-  calls it best-effort (`@platform/server/site-config/revalidate-site-config`)
-  — a failed call is logged, never thrown, and the site-config cache's own
+  an omitted `tenantId` falls back to revalidating every tenant, so
+  revalidation never silently stops working; `apps/platform` always sends one,
+  leaving that fallback as a safety net for a future caller rather than a path
+  the panel takes. It calls the endpoint best-effort
+  (`@platform/server/site-config/revalidate-site-config`) — a failed call is
+  logged, never thrown, and the site-config cache's own
   3600s (`SITE_CONFIG_REVALIDATE_SECONDS`) window remains the fallback
   either way. `deprovision-tenant.yml`'s `invalidate-tenant-cache`
   step is a second caller, POSTing the same `{ tenantId }` once a tenant has

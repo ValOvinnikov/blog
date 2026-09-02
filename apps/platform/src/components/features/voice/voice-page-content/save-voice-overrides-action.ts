@@ -48,7 +48,7 @@ export const saveVoiceOverridesAction = async (
       faviconAssetUrl: existing?.faviconAssetUrl,
       voiceOverrides: overrides,
     });
-    await revalidateSiteConfig();
+    await revalidateSiteConfig(tenant.id);
 
     return { ok: true };
   } catch (error) {
