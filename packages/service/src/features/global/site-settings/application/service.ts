@@ -5,7 +5,7 @@ import { safeAsync } from '@blog/utils';
 export function createSiteSettingsService() {
   return {
     v1: {
-      getSiteSettings: safeAsync((tenant?: TTenantSanityContext) =>
+      getSiteSettings: safeAsync((tenant: TTenantSanityContext) =>
         getSiteSettings(tenant),
       ),
     },

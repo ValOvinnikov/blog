@@ -1,5 +1,6 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getPostsByIds } from './loader';
 
@@ -8,6 +9,8 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   runQuery: vi.fn(),
 }));
 
+const tenant = makeTenant();
+
 describe(getPostsByIds, () => {
   it('resolves an id list to post-card data', async () => {
     mockRun.mockResolvedValue([
@@ -15,7 +18,7 @@ describe(getPostsByIds, () => {
       makeRawPostCard({ _id: 'b' }),
     ]);
 
-    const result = await getPostsByIds(['a', 'b']);
+    const result = await getPostsByIds(['a', 'b'], tenant);
 
     expect(result.map((post) => post.id)).toEqual(['a', 'b']);
     expect(mockRun).toHaveBeenCalledWith(
@@ -30,13 +33,13 @@ describe(getPostsByIds, () => {
     // for the loader/transformer to check.
     mockRun.mockResolvedValue([makeRawPostCard({ _id: 'a' })]);
 
-    const result = await getPostsByIds(['a', 'deleted-id']);
+    const result = await getPostsByIds(['a', 'deleted-id'], tenant);
 
     expect(result.map((post) => post.id)).toEqual(['a']);
   });
 
   it('returns an empty array without querying when given no ids', async () => {
-    const result = await getPostsByIds([]);
+    const result = await getPostsByIds([], tenant);
 
     expect(result).toEqual([]);
     expect(mockRun).not.toHaveBeenCalled();
@@ -44,11 +47,6 @@ describe(getPostsByIds, () => {
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     mockRun.mockResolvedValue([]);
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getPostsByIds(['a'], tenant);
 
@@ -58,22 +56,6 @@ describe(getPostsByIds, () => {
         tenant,
         next: expect.objectContaining({
           tags: ['t:tenant-a:posts', 't:tenant-a:author', 't:tenant-a:topic'],
-        }),
-      }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun.mockResolvedValue([]);
-
-    await getPostsByIds(['a']);
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant: undefined,
-        next: expect.objectContaining({
-          tags: ['posts', 'author', 'topic'],
         }),
       }),
     );

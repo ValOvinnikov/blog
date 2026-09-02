@@ -7,10 +7,10 @@ import {
 import { tagParamsQuery } from './query';
 
 export async function getTagParams(
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<{ slug: string }[]> {
   return runQuery(tagParamsQuery, {
     tenant,
-    ...isr('page_tag', tenant?.projectId),
+    ...isr('page_tag', tenant.projectId),
   });
 }

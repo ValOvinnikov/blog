@@ -2,6 +2,7 @@ import { MissingPostListError } from '@blog/service/features/pages/blog/adaptor/
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawBlogPage } from '@blog/service/testing/pages/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getIndexPage } from './loader';
 
@@ -16,6 +17,8 @@ vi.mock('@blog/service/sanity/image', () => ({
   ),
 }));
 
+const tenant = makeTenant();
+
 describe('getIndexPage', () => {
   it('exposes the postList module id from page_blog.postList', async () => {
     mockRun
@@ -24,7 +27,7 @@ describe('getIndexPage', () => {
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
-    const result = await getIndexPage();
+    const result = await getIndexPage(tenant);
     if (!result) throw new Error('expected a blog index page');
 
     expect(result.postListId).toBe('post-list-1');
@@ -45,7 +48,7 @@ describe('getIndexPage', () => {
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
-    const result = await getIndexPage();
+    const result = await getIndexPage(tenant);
     if (!result) throw new Error('expected a blog index page');
 
     expect(result.heading).toBe('Latest posts');
@@ -68,7 +71,7 @@ describe('getIndexPage', () => {
         makeRawSiteSettings({ description: 'Notes on building things.' }),
       );
 
-    const result = await getIndexPage();
+    const result = await getIndexPage(tenant);
     if (!result) throw new Error('expected a blog index page');
 
     expect(result.seo).toEqual({
@@ -89,7 +92,7 @@ describe('getIndexPage', () => {
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
-    const result = await getIndexPage();
+    const result = await getIndexPage(tenant);
     if (!result) throw new Error('expected a blog index page');
 
     expect(result.modules).toEqual([
@@ -102,28 +105,10 @@ describe('getIndexPage', () => {
       .mockResolvedValueOnce(makeRawBlogPage({ modules: null }))
       .mockResolvedValueOnce(makeRawSiteSettings());
 
-    const result = await getIndexPage();
+    const result = await getIndexPage(tenant);
     if (!result) throw new Error('expected a blog index page');
 
     expect(result.modules).toEqual([]);
-  });
-
-  it('tags the page_blog query with modules:postList alongside page_blog', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawBlogPage())
-      .mockResolvedValueOnce(makeRawSiteSettings());
-
-    await getIndexPage();
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({
-        next: expect.objectContaining({
-          tags: ['page_blog', 'modules:postList'],
-        }),
-      }),
-    );
   });
 
   // Regression guard for the decision that a missing slot is a loud failure,
@@ -132,14 +117,14 @@ describe('getIndexPage', () => {
   it('rejects with MissingPostListError when page_blog.postList is unset, without fetching site settings', async () => {
     mockRun.mockResolvedValueOnce(makeRawBlogPage({ postList: null }));
 
-    await expect(getIndexPage()).rejects.toThrow(MissingPostListError);
+    await expect(getIndexPage(tenant)).rejects.toThrow(MissingPostListError);
     expect(mockRun).toHaveBeenCalledTimes(1);
   });
 
   it('resolves undefined, rather than rejecting, when no page_blog document exists', async () => {
     mockRun.mockResolvedValueOnce(null);
 
-    const result = await getIndexPage();
+    const result = await getIndexPage(tenant);
 
     expect(result).toBeUndefined();
   });
@@ -147,7 +132,7 @@ describe('getIndexPage', () => {
   it('does not fetch site settings when no page_blog document exists', async () => {
     mockRun.mockResolvedValueOnce(null);
 
-    await getIndexPage();
+    await getIndexPage(tenant);
 
     expect(mockRun).toHaveBeenCalledTimes(1);
   });
@@ -156,11 +141,6 @@ describe('getIndexPage', () => {
     mockRun
       .mockResolvedValueOnce(makeRawBlogPage())
       .mockResolvedValueOnce(makeRawSiteSettings());
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getIndexPage(tenant);
 
@@ -183,25 +163,6 @@ describe('getIndexPage', () => {
           tags: ['t:tenant-a:site-settings'],
         }),
       }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawBlogPage())
-      .mockResolvedValueOnce(makeRawSiteSettings());
-
-    await getIndexPage();
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
-    );
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
     );
   });
 });

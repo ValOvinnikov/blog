@@ -1,4 +1,5 @@
 import { getWriteClient } from '@blog/service/sanity/write-client';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { saveSkimDraft } from './loader';
 
@@ -7,6 +8,7 @@ vi.mock('@blog/service/sanity/write-client', () => ({
 }));
 
 const mockGetWriteClient = vi.mocked(getWriteClient);
+const tenant = makeTenant();
 
 function makeMockClient(
   overrides: { getDocument?: ReturnType<typeof vi.fn> } = {},
@@ -30,11 +32,10 @@ describe(saveSkimDraft, () => {
     mockGetWriteClient.mockReturnValue(client as never);
 
     await expect(
-      saveSkimDraft({
-        postId: 'post-1',
-        takeaways: ['a', 'b', 'c'],
-        model: 'x',
-      }),
+      saveSkimDraft(
+        { postId: 'post-1', takeaways: ['a', 'b', 'c'], model: 'x' },
+        tenant,
+      ),
     ).rejects.toThrow(/no published post/);
   });
 
@@ -44,11 +45,10 @@ describe(saveSkimDraft, () => {
     });
 
     await expect(
-      saveSkimDraft({
-        postId: 'post-1',
-        takeaways: ['a', 'b', 'c'],
-        model: 'x',
-      }),
+      saveSkimDraft(
+        { postId: 'post-1', takeaways: ['a', 'b', 'c'], model: 'x' },
+        tenant,
+      ),
     ).rejects.toThrow(/SANITY_API_WRITE_TOKEN/);
   });
 
@@ -62,11 +62,14 @@ describe(saveSkimDraft, () => {
     });
     mockGetWriteClient.mockReturnValue(client as never);
 
-    await saveSkimDraft({
-      postId: 'post-1',
-      takeaways: ['One', 'Two', 'Three'],
-      model: 'claude-haiku-4-5',
-    });
+    await saveSkimDraft(
+      {
+        postId: 'post-1',
+        takeaways: ['One', 'Two', 'Three'],
+        model: 'claude-haiku-4-5',
+      },
+      tenant,
+    );
 
     expect(client.getDocument).toHaveBeenCalledWith('post-1');
     expect(client.createIfNotExists).toHaveBeenCalledWith(
@@ -91,11 +94,10 @@ describe(saveSkimDraft, () => {
     const client = makeMockClient();
     mockGetWriteClient.mockReturnValue(client as never);
 
-    await saveSkimDraft({
-      postId: 'post-1',
-      takeaways: ['a', 'b', 'c'],
-      model: 'x',
-    });
+    await saveSkimDraft(
+      { postId: 'post-1', takeaways: ['a', 'b', 'c'], model: 'x' },
+      tenant,
+    );
 
     expect(client.patch).not.toHaveBeenCalledWith('post-1', expect.anything());
   });
@@ -104,11 +106,10 @@ describe(saveSkimDraft, () => {
     const client = makeMockClient();
     mockGetWriteClient.mockReturnValue(client as never);
 
-    await saveSkimDraft({
-      postId: 'drafts.post-1',
-      takeaways: ['a', 'b', 'c'],
-      model: 'x',
-    });
+    await saveSkimDraft(
+      { postId: 'drafts.post-1', takeaways: ['a', 'b', 'c'], model: 'x' },
+      tenant,
+    );
 
     expect(client.getDocument).toHaveBeenCalledWith('post-1');
     expect(client.createIfNotExists).toHaveBeenCalledWith(
@@ -123,11 +124,6 @@ describe(saveSkimDraft, () => {
   it('passes the tenant context through to getWriteClient', async () => {
     const client = makeMockClient();
     mockGetWriteClient.mockReturnValue(client as never);
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok-a',
-    };
 
     await saveSkimDraft(
       { postId: 'post-1', takeaways: ['a', 'b', 'c'], model: 'x' },
@@ -135,18 +131,5 @@ describe(saveSkimDraft, () => {
     );
 
     expect(mockGetWriteClient).toHaveBeenCalledWith(tenant);
-  });
-
-  it('calls getWriteClient with undefined when no tenant is given, preserving the legacy client', async () => {
-    const client = makeMockClient();
-    mockGetWriteClient.mockReturnValue(client as never);
-
-    await saveSkimDraft({
-      postId: 'post-1',
-      takeaways: ['a', 'b', 'c'],
-      model: 'x',
-    });
-
-    expect(mockGetWriteClient).toHaveBeenCalledWith(undefined);
   });
 });

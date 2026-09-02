@@ -1,4 +1,5 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getPublishedPostBody } from './loader';
 
@@ -7,12 +8,14 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   runQuery: vi.fn(),
 }));
 
+const tenant = makeTenant();
+
 describe(getPublishedPostBody, () => {
   it('returns the post body from the raw query result', async () => {
     const body = [{ _type: 'block', _key: 'b1', children: [] }];
     mockRun.mockResolvedValueOnce({ body });
 
-    const result = await getPublishedPostBody('post-1');
+    const result = await getPublishedPostBody('post-1', tenant);
 
     expect(result).toEqual(body);
   });
@@ -20,7 +23,7 @@ describe(getPublishedPostBody, () => {
   it('queries by the given post id', async () => {
     mockRun.mockResolvedValueOnce({ body: [] });
 
-    await getPublishedPostBody('post-abc');
+    await getPublishedPostBody('post-abc', tenant);
 
     expect(mockRun).toHaveBeenCalledWith(
       expect.anything(),
@@ -31,7 +34,7 @@ describe(getPublishedPostBody, () => {
   it('does not tag the fetch for Next ISR caching (always reads fresh)', async () => {
     mockRun.mockResolvedValueOnce({ body: [] });
 
-    await getPublishedPostBody('post-abc');
+    await getPublishedPostBody('post-abc', tenant);
 
     const [, options] = mockRun.mock.calls[0] as [
       unknown,
@@ -43,33 +46,17 @@ describe(getPublishedPostBody, () => {
   it('propagates when no published post matches the id', async () => {
     mockRun.mockRejectedValueOnce(new Error('ValidationError'));
 
-    await expect(getPublishedPostBody('missing')).rejects.toThrow();
+    await expect(getPublishedPostBody('missing', tenant)).rejects.toThrow();
   });
 
   it('threads tenant context into runQuery', async () => {
     mockRun.mockResolvedValueOnce({ body: [] });
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getPublishedPostBody('post-abc', tenant);
 
     expect(mockRun).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ tenant }),
-    );
-  });
-
-  it('omits tenant when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun.mockResolvedValueOnce({ body: [] });
-
-    await getPublishedPostBody('post-abc');
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
     );
   });
 });

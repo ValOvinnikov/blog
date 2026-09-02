@@ -1,5 +1,6 @@
 import { makeRawNavigation } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getNavigation } from './loader';
 
@@ -8,17 +9,19 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   runQuery: vi.fn(),
 }));
 
+const tenant = makeTenant();
+
 describe('getNavigation', () => {
   it('throws when the navigation document does not exist', async () => {
     mockRun.mockResolvedValue(null);
 
-    await expect(getNavigation()).rejects.toThrow();
+    await expect(getNavigation(tenant)).rejects.toThrow();
   });
 
   it('defaults items to an empty array when none are set', async () => {
     mockRun.mockResolvedValue(makeRawNavigation({ items: null }));
 
-    const result = await getNavigation();
+    const result = await getNavigation(tenant);
 
     expect(result.items).toEqual([]);
   });
@@ -40,7 +43,7 @@ describe('getNavigation', () => {
       }),
     );
 
-    const result = await getNavigation();
+    const result = await getNavigation(tenant);
 
     expect(result.items).toEqual([
       {
@@ -53,28 +56,8 @@ describe('getNavigation', () => {
     ]);
   });
 
-  it('tags the query with every type its items can reference internally', async () => {
-    mockRun.mockResolvedValue(makeRawNavigation());
-
-    await getNavigation();
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        next: expect.objectContaining({
-          tags: ['navigation', 'post', 'topic', 'page_generic', 'page_blog'],
-        }),
-      }),
-    );
-  });
-
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     mockRun.mockResolvedValue(makeRawNavigation());
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getNavigation(tenant);
 
@@ -92,17 +75,6 @@ describe('getNavigation', () => {
           ],
         }),
       }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun.mockResolvedValue(makeRawNavigation());
-
-    await getNavigation();
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
     );
   });
 });

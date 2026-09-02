@@ -1,6 +1,7 @@
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawGenericPage } from '@blog/service/testing/pages/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getPage } from './loader';
 
@@ -15,13 +16,15 @@ vi.mock('@blog/service/sanity/image', () => ({
   ),
 }));
 
+const tenant = makeTenant();
+
 describe('getPage', () => {
   it('maps the thin page_generic document to module refs', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawGenericPage())
       .mockResolvedValueOnce(makeRawSiteSettings());
 
-    const page = await getPage('about');
+    const page = await getPage('about', tenant);
     if (!page) throw new Error('expected a generic page');
 
     expect(page.title).toBe('About');
@@ -41,7 +44,7 @@ describe('getPage', () => {
         }),
       );
 
-    const page = await getPage('about');
+    const page = await getPage('about', tenant);
     if (!page) throw new Error('expected a generic page');
 
     expect(page.seo.title).toBe('About');
@@ -62,7 +65,7 @@ describe('getPage', () => {
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
-    const page = await getPage('about');
+    const page = await getPage('about', tenant);
     if (!page) throw new Error('expected a generic page');
 
     expect(page.seo.title).toBe('About Us');
@@ -72,7 +75,7 @@ describe('getPage', () => {
   it('resolves undefined, rather than rejecting, when no page_generic matches the slug', async () => {
     mockRun.mockResolvedValueOnce(null);
 
-    const page = await getPage('missing');
+    const page = await getPage('missing', tenant);
 
     expect(page).toBeUndefined();
   });
@@ -80,7 +83,7 @@ describe('getPage', () => {
   it('does not fetch site settings when no page_generic matches the slug', async () => {
     mockRun.mockResolvedValueOnce(null);
 
-    await getPage('missing');
+    await getPage('missing', tenant);
 
     expect(mockRun).toHaveBeenCalledTimes(1);
   });
@@ -89,11 +92,6 @@ describe('getPage', () => {
     mockRun
       .mockResolvedValueOnce(makeRawGenericPage())
       .mockResolvedValueOnce(makeRawSiteSettings());
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getPage('about', tenant);
 
@@ -112,25 +110,6 @@ describe('getPage', () => {
         tenant,
         next: expect.objectContaining({ tags: ['t:tenant-a:site-settings'] }),
       }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawGenericPage())
-      .mockResolvedValueOnce(makeRawSiteSettings());
-
-    await getPage('about');
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
-    );
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
     );
   });
 });

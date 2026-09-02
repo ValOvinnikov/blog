@@ -99,6 +99,8 @@ export type { TTopicIndexPage } from './features/pages/topic-index';
 export { getSanityImageBaseUrl } from './sanity/image-base-url';
 export { urlForImage } from './sanity/image';
 export type { TTenantSanityContext } from './sanity/query';
+export { getPlatformSanityContext } from './sanity/client';
+export { getPlatformSanityWriteContext } from './sanity/write-client';
 export { buildImageUrl } from './shared/transformers/build-image-url';
 export type { TRawImage } from './shared/transformers/build-image-url';
 export type { TArchivePostCard } from './shared/transformers/to-archive-post-card';

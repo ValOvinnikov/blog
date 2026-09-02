@@ -6,10 +6,10 @@ import { safeAsync } from '@blog/utils';
 export function createBlogService() {
   return {
     v1: {
-      getIndexPage: safeAsync((tenant?: TTenantSanityContext) =>
+      getIndexPage: safeAsync((tenant: TTenantSanityContext) =>
         getIndexPage(tenant),
       ),
-      getIndexPageParams: safeAsync((tenant?: TTenantSanityContext) =>
+      getIndexPageParams: safeAsync((tenant: TTenantSanityContext) =>
         getIndexPageParams(tenant),
       ),
     },

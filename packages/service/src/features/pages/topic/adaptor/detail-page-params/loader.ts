@@ -7,10 +7,10 @@ import {
 import { topicParamsQuery } from './query';
 
 export async function getTopicParams(
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<{ slug: string }[]> {
   return runQuery(topicParamsQuery, {
     tenant,
-    ...isr('page_topic', tenant?.projectId),
+    ...isr('page_topic', tenant.projectId),
   });
 }

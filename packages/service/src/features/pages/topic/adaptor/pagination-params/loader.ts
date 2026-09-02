@@ -14,13 +14,13 @@ import { toTopicPaginationParams } from './transformer';
  * fan-out.
  */
 export async function getTopicPaginationParams(
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<{ slug: string; page: string }[]> {
   const topicPages = await runQuery(topicPaginationParamsQuery, {
     tenant,
     ...isr(
       ['page_topic', 'modules:postList', 'posts', 'topic'],
-      tenant?.projectId,
+      tenant.projectId,
     ),
   });
   return toTopicPaginationParams(topicPages);

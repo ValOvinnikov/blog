@@ -7,13 +7,13 @@ import { safeAsync } from '@blog/utils';
 export function createTopicService() {
   return {
     v1: {
-      getTopicPage: safeAsync((slug: string, tenant?: TTenantSanityContext) =>
+      getTopicPage: safeAsync((slug: string, tenant: TTenantSanityContext) =>
         getTopicPage(slug, tenant),
       ),
-      getTopicParams: safeAsync((tenant?: TTenantSanityContext) =>
+      getTopicParams: safeAsync((tenant: TTenantSanityContext) =>
         getTopicParams(tenant),
       ),
-      getTopicPaginationParams: safeAsync((tenant?: TTenantSanityContext) =>
+      getTopicPaginationParams: safeAsync((tenant: TTenantSanityContext) =>
         getTopicPaginationParams(tenant),
       ),
     },

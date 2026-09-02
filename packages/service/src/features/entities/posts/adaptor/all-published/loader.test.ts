@@ -1,5 +1,6 @@
 import { makeRawFeedPost } from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getAllPublishedPosts } from './loader';
 
@@ -8,6 +9,8 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   runQuery: vi.fn(),
 }));
 
+const tenant = makeTenant();
+
 describe(getAllPublishedPosts, () => {
   it('fetches every published post with no pagination parameters', async () => {
     mockRun.mockResolvedValue([
@@ -15,7 +18,7 @@ describe(getAllPublishedPosts, () => {
       makeRawFeedPost({ title: 'Second', slug: 'second' }),
     ]);
 
-    const result = await getAllPublishedPosts();
+    const result = await getAllPublishedPosts(tenant);
 
     expect(result).toEqual([
       {
@@ -37,34 +40,16 @@ describe(getAllPublishedPosts, () => {
     );
   });
 
-  it('tags the ISR call with posts only', async () => {
-    mockRun.mockResolvedValue([]);
-
-    await getAllPublishedPosts();
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        next: expect.objectContaining({ tags: ['posts'] }),
-      }),
-    );
-  });
-
   it('returns an empty array when there are no published posts', async () => {
     mockRun.mockResolvedValue([]);
 
-    const result = await getAllPublishedPosts();
+    const result = await getAllPublishedPosts(tenant);
 
     expect(result).toEqual([]);
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     mockRun.mockResolvedValue([]);
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getAllPublishedPosts(tenant);
 
@@ -73,20 +58,6 @@ describe(getAllPublishedPosts, () => {
       expect.objectContaining({
         tenant,
         next: expect.objectContaining({ tags: ['t:tenant-a:posts'] }),
-      }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun.mockResolvedValue([]);
-
-    await getAllPublishedPosts();
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant: undefined,
-        next: expect.objectContaining({ tags: ['posts'] }),
       }),
     );
   });

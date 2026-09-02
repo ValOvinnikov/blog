@@ -1,6 +1,7 @@
 import { getAllPublishedPosts } from '@blog/service/features/entities/posts/adaptor/all-published/loader';
 import { getPostsByIds } from '@blog/service/features/entities/posts/adaptor/get-by-ids/loader';
 import { getPublishedPostsByTag } from '@blog/service/features/entities/posts/adaptor/tag-scoped-published/loader';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { createPostsService } from './service';
 
@@ -25,6 +26,8 @@ vi.mock(
   }),
 );
 
+const tenant = makeTenant();
+
 describe(createPostsService, () => {
   it('exposes v1.getPostsByIds as a function', () => {
     const svc = createPostsService();
@@ -41,20 +44,7 @@ describe(createPostsService, () => {
     expect(typeof svc.v1.getPublishedPostsByTag).toBe('function');
   });
 
-  it('calls the loader with no tenant context', async () => {
-    vi.mocked(getAllPublishedPosts).mockResolvedValue([]);
-
-    await createPostsService().v1.getAllPublishedPosts();
-
-    expect(getAllPublishedPosts).toHaveBeenCalledWith(undefined);
-  });
-
-  it('threads an optional tenant context through to the loader', async () => {
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
+  it('threads tenant context through to the id-list loader', async () => {
     vi.mocked(getPostsByIds).mockResolvedValue([]);
 
     await createPostsService().v1.getPostsByIds(['a'], tenant);
@@ -62,20 +52,7 @@ describe(createPostsService, () => {
     expect(getPostsByIds).toHaveBeenCalledWith(['a'], tenant);
   });
 
-  it('threads the tag id through to the tag-scoped loader', async () => {
-    vi.mocked(getPublishedPostsByTag).mockResolvedValue([]);
-
-    await createPostsService().v1.getPublishedPostsByTag('tag-1');
-
-    expect(getPublishedPostsByTag).toHaveBeenCalledWith('tag-1', undefined);
-  });
-
-  it('threads an optional tenant context through to the tag-scoped loader', async () => {
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
+  it('threads tenant context through to the tag-scoped loader', async () => {
     vi.mocked(getPublishedPostsByTag).mockResolvedValue([]);
 
     await createPostsService().v1.getPublishedPostsByTag('tag-1', tenant);
@@ -83,12 +60,7 @@ describe(createPostsService, () => {
     expect(getPublishedPostsByTag).toHaveBeenCalledWith('tag-1', tenant);
   });
 
-  it('threads an optional tenant context through to getAllPublishedPosts', async () => {
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
+  it('threads tenant context through to getAllPublishedPosts', async () => {
     vi.mocked(getAllPublishedPosts).mockResolvedValue([]);
 
     await createPostsService().v1.getAllPublishedPosts(tenant);

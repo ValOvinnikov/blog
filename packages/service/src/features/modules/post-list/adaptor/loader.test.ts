@@ -1,6 +1,7 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawPostListModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getPostList } from './loader';
 
@@ -8,6 +9,8 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
   runQuery: vi.fn(),
 }));
+
+const tenant = makeTenant();
 
 describe('getPostList', () => {
   it('bounds the posts query by the module pageSize and maps the result', async () => {
@@ -27,7 +30,7 @@ describe('getPostList', () => {
         total: 1,
       });
 
-    const postList = await getPostList('post-list-1');
+    const postList = await getPostList('post-list-1', 1, tenant);
 
     // The module's `pageSize` is threaded into the GROQ posts query's slice bound.
     expect(mockRun.mock.calls[1]?.[0]?.query).toContain('[0...3]');
@@ -38,28 +41,7 @@ describe('getPostList', () => {
   it('propagates when the module document is missing', async () => {
     mockRun.mockRejectedValueOnce(new Error('ValidationError'));
 
-    await expect(getPostList('missing')).rejects.toThrow();
-  });
-
-  it('tags the posts query with author/topic/page_tag/tag/page_topic alongside posts', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawPostListModule({ pageSize: 3 }))
-      .mockResolvedValueOnce({
-        posts: [makeRawPostCard({ _id: 'a' })],
-        total: 1,
-      });
-
-    await getPostList('post-list-1');
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({
-        next: expect.objectContaining({
-          tags: ['posts', 'author', 'topic', 'page_tag', 'tag', 'page_topic'],
-        }),
-      }),
-    );
+    await expect(getPostList('missing', 1, tenant)).rejects.toThrow();
   });
 
   it('passes the module id as a posts-query parameter', async () => {
@@ -70,7 +52,7 @@ describe('getPostList', () => {
         total: 1,
       });
 
-    await getPostList('post-list-1');
+    await getPostList('post-list-1', 1, tenant);
 
     expect(mockRun).toHaveBeenNthCalledWith(
       2,
@@ -89,7 +71,7 @@ describe('getPostList', () => {
         total: 20,
       });
 
-    const postList = await getPostList('post-list-1');
+    const postList = await getPostList('post-list-1', undefined, tenant);
 
     expect(mockRun.mock.calls[1]?.[0]?.query).toContain('[0...9]');
     expect(postList.currentPage).toBe(1);
@@ -104,7 +86,7 @@ describe('getPostList', () => {
         total: 25,
       });
 
-    const postList = await getPostList('post-list-1', 2);
+    const postList = await getPostList('post-list-1', 2, tenant);
 
     expect(mockRun.mock.calls[1]?.[0]?.query).toContain('[9...18]');
     expect(postList.posts.map((p) => p.id)).toEqual(['a']);
@@ -119,11 +101,6 @@ describe('getPostList', () => {
         posts: [makeRawPostCard({ _id: 'a' })],
         total: 1,
       });
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getPostList('post-list-1', 1, tenant);
 
@@ -156,28 +133,6 @@ describe('getPostList', () => {
           ],
         }),
       }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawPostListModule({ pageSize: 3 }))
-      .mockResolvedValueOnce({
-        posts: [makeRawPostCard({ _id: 'a' })],
-        total: 1,
-      });
-
-    await getPostList('post-list-1');
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
-    );
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
     );
   });
 });

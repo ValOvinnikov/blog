@@ -1,4 +1,5 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getTagPaginationParams } from './loader';
 
@@ -6,6 +7,8 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
   runQuery: vi.fn(),
 }));
+
+const tenant = makeTenant();
 
 describe('getTagPaginationParams', () => {
   // Branch coverage (zero posts, single-page corpus, multi-page corpus,
@@ -17,7 +20,7 @@ describe('getTagPaginationParams', () => {
       { slug: 'react', postList: { pageSize: 9 }, postCount: 9 },
     ]);
 
-    const params = await getTagPaginationParams();
+    const params = await getTagPaginationParams(tenant);
 
     expect(params).toEqual([
       { slug: 'typescript', page: '2' },
@@ -25,28 +28,8 @@ describe('getTagPaginationParams', () => {
     ]);
   });
 
-  it('tags the query with modules:postList, posts, and tag alongside page_tag', async () => {
-    mockRun.mockResolvedValueOnce([]);
-
-    await getTagPaginationParams();
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        next: expect.objectContaining({
-          tags: ['page_tag', 'modules:postList', 'posts', 'tag'],
-        }),
-      }),
-    );
-  });
-
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     mockRun.mockResolvedValueOnce([]);
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getTagPaginationParams(tenant);
 
@@ -63,17 +46,6 @@ describe('getTagPaginationParams', () => {
           ],
         }),
       }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun.mockResolvedValueOnce([]);
-
-    await getTagPaginationParams();
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
     );
   });
 });

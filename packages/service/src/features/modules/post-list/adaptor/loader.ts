@@ -13,14 +13,14 @@ import type { TPostListModule } from './types';
 export async function getPostList(
   id: string,
   page = 1,
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<TPostListModule> {
   // Read the module document first so its `pageSize` can bound the posts
   // query in GROQ (avoids fetching the entire post collection to slice it in JS).
   const raw = await runQuery(postListModuleQuery, {
     parameters: { id },
     tenant,
-    ...isr(['modules:postList', `module:${id}`], tenant?.projectId),
+    ...isr(['modules:postList', `module:${id}`], tenant.projectId),
   });
 
   // `postCardFragment` derefs `author`/`topic` — both tags must ride
@@ -37,7 +37,7 @@ export async function getPostList(
       tenant,
       ...isr(
         ['posts', 'author', 'topic', 'page_tag', 'tag', 'page_topic'],
-        tenant?.projectId,
+        tenant.projectId,
       ),
     },
   );

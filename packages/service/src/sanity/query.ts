@@ -23,7 +23,12 @@ export type TSlugParams = { slug: string };
 
 type TNextFetchOptions = {
   next?: { revalidate?: number | false; tags?: string[] };
-  tenant?: TTenantSanityContext;
+  tenant: TTenantSanityContext;
+};
+
+/** `isr(...)`'s return shape — only the cache-tag half of `TNextFetchOptions`, spread alongside a caller's own `tenant`. */
+type TIsrOptions = {
+  next: { revalidate: number; tags: string[] };
 };
 
 export const runQuery = makeSafeQueryRunner<TNextFetchOptions>(
@@ -47,23 +52,22 @@ export const runQuery = makeSafeQueryRunner<TNextFetchOptions>(
  * replace or depend on the webhook's blanket `revalidatePath('/', 'layout')`
  * backstop, which stays regardless.
  *
- * No-arg `scopeProjectId` keeps producing the legacy unprefixed tags (every
- * loader not yet migrated to per-tenant context). Passed a `projectId`,
- * every tag is prefixed `t:<projectId>:<tag>` — the revalidation webhook
- * (`apps/web/src/app/api/revalidate/route.ts`) purges both forms on every
- * publish, so this is forward-compatible with loaders migrating one at a
- * time, no webhook change required per loader.
+ * `scopeProjectId` is required — every tag is prefixed `t:<projectId>:<tag>`,
+ * the platform's own project id included (`getPlatformSanityContext().
+ * projectId`). The revalidation webhook (`apps/web/src/app/api/revalidate/
+ * route.ts`) always purges the unprefixed and prefixed form together, so
+ * this stays correct regardless of which project published.
  */
 export function isr(
   tag: string | string[],
-  scopeProjectId?: string,
-): TNextFetchOptions {
+  scopeProjectId: string,
+): TIsrOptions {
   const tags = Array.isArray(tag) ? tag : [tag];
 
   return {
     next: {
       revalidate: 3600,
-      tags: scopeProjectId ? tags.map((t) => `t:${scopeProjectId}:${t}`) : tags,
+      tags: tags.map((t) => `t:${scopeProjectId}:${t}`),
     },
   };
 }

@@ -5,7 +5,7 @@ import { safeAsync } from '@blog/utils';
 export function createNewsletterSettingsService() {
   return {
     v1: {
-      getNewsletterSettings: safeAsync((tenant?: TTenantSanityContext) =>
+      getNewsletterSettings: safeAsync((tenant: TTenantSanityContext) =>
         getNewsletterSettings(tenant),
       ),
     },

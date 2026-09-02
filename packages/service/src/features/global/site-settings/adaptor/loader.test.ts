@@ -6,6 +6,7 @@ import {
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawImage } from '@blog/service/testing/shared/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getSiteSettings } from './loader';
 
@@ -20,11 +21,13 @@ vi.mock('@blog/service/sanity/image', () => ({
   ),
 }));
 
+const tenant = makeTenant();
+
 describe('getSiteSettings', () => {
   it('throws when site settings document does not exist', async () => {
     mockRun.mockResolvedValue(null);
 
-    await expect(getSiteSettings()).rejects.toThrow();
+    await expect(getSiteSettings(tenant)).rejects.toThrow();
   });
 
   it('maps raw site settings into a domain object', async () => {
@@ -43,7 +46,7 @@ describe('getSiteSettings', () => {
       }),
     );
 
-    const result = await getSiteSettings();
+    const result = await getSiteSettings(tenant);
 
     expect(result.description).toBe('Great content');
     expect(result.brand.name).toBe('Awesome Blog');
@@ -65,7 +68,7 @@ describe('getSiteSettings', () => {
       }),
     );
 
-    const result = await getSiteSettings();
+    const result = await getSiteSettings(tenant);
 
     expect(result.brand.variant).toBe(BRAND_VARIANTS.INDIGO);
   });
@@ -82,7 +85,7 @@ describe('getSiteSettings', () => {
       }),
     );
 
-    const result = await getSiteSettings();
+    const result = await getSiteSettings(tenant);
 
     expect(result.brand.specLine).toBeUndefined();
   });
@@ -102,7 +105,7 @@ describe('getSiteSettings', () => {
       }),
     );
 
-    const result = await getSiteSettings();
+    const result = await getSiteSettings(tenant);
 
     expect(result.brand.specLine).toBe(
       `build 2026.07 ${SPEC_LINE_SEPARATOR_CHARS.PIPE} online`,
@@ -124,7 +127,7 @@ describe('getSiteSettings', () => {
       }),
     );
 
-    const result = await getSiteSettings();
+    const result = await getSiteSettings(tenant);
 
     expect(result.brand.specLine).toBe(
       `build 2026.07 ${SPEC_LINE_SEPARATOR_CHARS.BULLET} online`,
@@ -146,7 +149,7 @@ describe('getSiteSettings', () => {
       }),
     );
 
-    const result = await getSiteSettings();
+    const result = await getSiteSettings(tenant);
 
     expect(result.brand.specLine).toBe(
       `build 2026.07 ${SPEC_LINE_SEPARATOR_CHARS.SLASH} online`,
@@ -165,7 +168,7 @@ describe('getSiteSettings', () => {
       }),
     );
 
-    const result = await getSiteSettings();
+    const result = await getSiteSettings(tenant);
 
     expect(result.brand.specLine).toBe('online');
   });
@@ -182,7 +185,7 @@ describe('getSiteSettings', () => {
       }),
     );
 
-    const result = await getSiteSettings();
+    const result = await getSiteSettings(tenant);
 
     expect(result.brand.specLine).toBeUndefined();
   });
@@ -190,7 +193,7 @@ describe('getSiteSettings', () => {
   it('maps the default OG image to a URL', async () => {
     mockRun.mockResolvedValue(makeRawSiteSettings());
 
-    const result = await getSiteSettings();
+    const result = await getSiteSettings(tenant);
 
     expect(result.defaultOgImageUrl).toContain('sanity.io');
   });
@@ -207,7 +210,7 @@ describe('getSiteSettings', () => {
       }),
     );
 
-    const result = await getSiteSettings();
+    const result = await getSiteSettings(tenant);
 
     expect(result.brand.logoUrl).toBeUndefined();
   });
@@ -225,7 +228,7 @@ describe('getSiteSettings', () => {
       }),
     );
 
-    const result = await getSiteSettings();
+    const result = await getSiteSettings(tenant);
 
     expect(result.brand.logoAsset).toEqual(logo);
     expect(result.brand.logoUrl).toBeDefined();
@@ -243,18 +246,13 @@ describe('getSiteSettings', () => {
       }),
     );
 
-    const result = await getSiteSettings();
+    const result = await getSiteSettings(tenant);
 
     expect(result.brand.logoAsset).toBeUndefined();
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     mockRun.mockResolvedValue(makeRawSiteSettings());
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getSiteSettings(tenant);
 
@@ -263,20 +261,6 @@ describe('getSiteSettings', () => {
       expect.objectContaining({
         tenant,
         next: expect.objectContaining({ tags: ['t:tenant-a:site-settings'] }),
-      }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun.mockResolvedValue(makeRawSiteSettings());
-
-    await getSiteSettings();
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant: undefined,
-        next: expect.objectContaining({ tags: ['site-settings'] }),
       }),
     );
   });

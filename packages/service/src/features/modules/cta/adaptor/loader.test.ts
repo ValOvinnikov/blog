@@ -3,6 +3,7 @@ import {
   makeRawCtaAction,
   makeRawCtaModule,
 } from '@blog/service/testing/modules/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getCta } from './loader';
 
@@ -11,13 +12,15 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   runQuery: vi.fn(),
 }));
 
+const tenant = makeTenant();
+
 describe('getCta', () => {
   it('maps the cta module document', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawCtaModule({ actions: { actions: [makeRawCtaAction()] } }),
     );
 
-    const cta = await getCta('cta-1');
+    const cta = await getCta('cta-1', tenant);
 
     expect(cta.sectionHeader.heading).toBe('Subscribe to the newsletter');
     expect(cta.actions?.[0]?.link.href).toBe('/newsletter');
@@ -26,38 +29,11 @@ describe('getCta', () => {
   it('propagates when the module document is missing', async () => {
     mockRun.mockRejectedValueOnce(new Error('ValidationError'));
 
-    await expect(getCta('missing')).rejects.toThrow();
-  });
-
-  it('tags the query with every type its actions can reference internally', async () => {
-    mockRun.mockResolvedValueOnce(makeRawCtaModule());
-
-    await getCta('cta-1');
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        next: expect.objectContaining({
-          tags: [
-            'modules:cta',
-            'module:cta-1',
-            'post',
-            'topic',
-            'page_generic',
-            'page_blog',
-          ],
-        }),
-      }),
-    );
+    await expect(getCta('missing', tenant)).rejects.toThrow();
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     mockRun.mockResolvedValue(makeRawCtaModule());
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getCta('cta-1', tenant);
 
@@ -76,17 +52,6 @@ describe('getCta', () => {
           ],
         }),
       }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun.mockResolvedValue(makeRawCtaModule());
-
-    await getCta('cta-1');
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
     );
   });
 });
