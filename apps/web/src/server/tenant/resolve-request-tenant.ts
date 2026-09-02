@@ -5,16 +5,12 @@ import { cache } from 'react';
 import { resolveTenant } from './resolve-tenant';
 
 /**
- * resolveRequestTenant — the single per-request tenant lookup every helper
- * that needs the full tenant row (base URL, Sanity read/write credentials)
- * is built on, so a request resolves "which tenant is this" once no matter
- * how many of those helpers ask. Always resolves fresh from the request
- * `Host` header rather than the `x-tenant-id` header `proxy.ts` sets — this
- * function backs helpers serving routes `proxy.ts`'s matcher excludes
- * (`/api/*`, any path containing a dot), which never pass through
- * `proxy.ts` and so never have that header sanitised; trusting a
- * client-supplied value there would let a request claim any tenant's
- * credentials.
+ * resolveRequestTenant — the single per-request tenant lookup, deduped via
+ * `cache()`, that every tenant helper builds on. Resolves from the request
+ * `Host` header only, never the `x-tenant-id` header `proxy.ts` sets — some
+ * callers serve routes `proxy.ts`'s matcher excludes (`/api/*`, any dotted
+ * path) and never have that header sanitised, so trusting it here would let
+ * a request claim another tenant's credentials.
  */
 export const resolveRequestTenant = cache(
   async (): Promise<TTenant | undefined> => {

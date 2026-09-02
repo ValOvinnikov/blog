@@ -56,6 +56,7 @@ describe(resolveRequestTenant, () => {
       id: 'victim-tenant',
       primaryDomain: 'victim.example.com',
     } as never);
+    // Unreached while the fix holds; makes a header-preferring regression fail on identity, not a crash.
     vi.mocked(queries.tenants.getTenantById).mockResolvedValue({
       id: 'attacker-tenant',
       primaryDomain: 'attacker.example.com',
