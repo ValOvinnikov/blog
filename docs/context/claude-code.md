@@ -114,7 +114,11 @@ contracts:
     project board against repo reality (open PR → issue in Code Review,
     in-flight branch → In Progress, merged PR → issue Done, a completed
     parent issue whose sub-issues all trace to merged PRs → Done, every
-    open issue/PR carries at least one label). Also propagates parent/epic
+    open issue/PR carries at least one label, every open issue carries
+    exactly one `prio:*` label per `CLAUDE.md`'s "Ticket priority & triage"
+    section — a creation dispatch without one is rejected as incomplete,
+    and a sweep flags open issues carrying zero or two-plus `prio:*`
+    labels). Also propagates parent/epic
     status both ways: a parent still `Todo` moves to In Progress the moment
     any of its sub-issues does, and a parent whose sub-issues are all
     complete but is still open gets flagged (not auto-closed — closing an
@@ -478,7 +482,11 @@ file` are all denied alike) — an earlier version only handled the
   - `code-review-practices` — boundary/type/SEO/test checklist before a PR.
   - `refactor-sweep` — on-demand, layer-scoped cleanup audit (duplication,
     dead code, convention drift); files findings as tracked issues, never
-    edits directly. No fixed cadence — run whenever asked, naming the layer.
+    edits directly. Micro-findings batch into one per-layer umbrella issue
+    per sweep instead of one issue each; every filed issue defaults to
+    `prio:later` (`prio:someday` if speculative) and gets `cloud-ok` when it
+    meets the solo-cloud-session criteria. No fixed cadence — run whenever
+    asked, naming the layer.
   - `open-pull-request` — branch → work → PR with human-gated push/PR steps.
   - `use-context7` — fetch live, version-matched library docs before guessing.
   - Plugin skills (provisioned via `.claude/settings.json`, see below):

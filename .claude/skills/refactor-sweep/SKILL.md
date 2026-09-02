@@ -78,15 +78,34 @@ now, which is exactly the code a per-diff review never sees.
 3. **Dedup and sanity-check** the raw findings yourself before filing
    anything — merge near-duplicates, drop anything too subjective to act on
    without a judgment call only a human should make.
-4. **File each surviving finding as a tracked issue via `board-keeper`**, one
+4. **File the surviving findings as tracked issues via `board-keeper`**, one
    batched dispatch for the whole set (`board-keeper.md`'s batch-dispatch
-   support — never one dispatch per finding). Each issue: `refactor` +
-   `layer:<x>` labels, a title naming the concrete problem, and a body with
-   the `file:line` evidence and a proposed direction. **Do not implement any
+   support — never one dispatch per finding). Two shapes, chosen per
+   finding:
+   - **Micro-findings** — mechanical fixes a competent agent lands in
+     minutes (a comment deletion, a rename, a dead export, a two-line
+     dedup) — do **not** each get their own issue. Batch every
+     micro-finding from the sweep into **one** umbrella issue per layer
+     (`chore(<layer>): cleanup batch — <date>`), its body a checklist of
+     `file:line` items, harvested later in a single batch PR. One sweep
+     never mints more than one umbrella.
+   - **Substantial findings** — an extraction with design decisions, a
+     restructuring, anything needing its own review — get their own issue
+     as before.
+
+   Each issue: `refactor` + `layer:<x>` labels **plus exactly one `prio:*`
+   label — `prio:later` by default, `prio:someday` if speculative; a sweep
+   finding never earns `prio:now`/`prio:next` unless it is a user-facing
+   bug, in which case it's labeled `bug`, not `refactor`** (CLAUDE.md's
+   "Ticket priority & triage" section). Add `cloud-ok` when the issue meets
+   that section's solo-cloud-session criteria — most single-layer sweep
+   findings do. Title names the concrete problem; body carries the
+   `file:line` evidence and a proposed direction. **Do not implement any
    of them here** — actual fixes go through the normal `develop-feature`
    lifecycle later, as their own ticket, own PR, own gate sequence, whenever
    someone decides to act on it. This skill's job ends at "surfaced and
    ticketed."
+
 5. **Report a summary**: layer swept, finding count, issue numbers filed.
 
 ## Cadence
