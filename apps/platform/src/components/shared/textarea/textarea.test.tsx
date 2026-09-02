@@ -71,4 +71,10 @@ describe(Textarea, () => {
     await user.type(textarea, 'x');
     expect(handleChange).not.toHaveBeenCalled();
   });
+
+  it('does not forward hasExternalLabel to the rendered textarea', () => {
+    render(<Textarea value="" onChange={vi.fn()} hasExternalLabel={true} />);
+
+    expect(screen.getByRole('textbox')).not.toHaveAttribute('hasexternallabel');
+  });
 });

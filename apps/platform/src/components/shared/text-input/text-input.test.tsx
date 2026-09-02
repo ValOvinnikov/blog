@@ -58,4 +58,10 @@ describe(TextInput, () => {
     await user.type(input, 'x');
     expect(handleChange).not.toHaveBeenCalled();
   });
+
+  it('does not forward hasExternalLabel to the rendered input', () => {
+    render(<TextInput value="" onChange={vi.fn()} hasExternalLabel={true} />);
+
+    expect(screen.getByRole('textbox')).not.toHaveAttribute('hasexternallabel');
+  });
 });

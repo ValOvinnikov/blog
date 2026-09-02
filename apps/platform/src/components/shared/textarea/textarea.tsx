@@ -6,6 +6,8 @@ export type TTextareaProps = {
   value: string;
   onChange: (value: string) => void;
   ariaLabel?: string;
+  /** Declares that a different component renders this control's `<label htmlFor>` — an accessibility contract only, with no effect on the rendered element. */
+  hasExternalLabel?: boolean;
   id?: string;
   placeholder?: string;
   rows?: number;
