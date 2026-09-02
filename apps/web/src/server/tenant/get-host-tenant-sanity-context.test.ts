@@ -91,7 +91,7 @@ describe(getHostTenantSanityContext, () => {
     });
   });
 
-  it('falls back to the platform Sanity context when the matched tenant has no credentials set', async () => {
+  it('falls back to the platform Sanity context outside production when the matched tenant has no credentials set', async () => {
     vi.mocked(resolveRequestTenant).mockResolvedValue({
       id: 'tenant-1',
     } as never);
@@ -103,6 +103,21 @@ describe(getHostTenantSanityContext, () => {
       isResolvable: true,
       tenant: platformTenant,
     });
+  });
+
+  it('resolves as unresolvable in production when the matched tenant has no credentials set, never falling back to the platform context', async () => {
+    isProductionEnvironmentMock.mockReturnValue(true);
+    vi.mocked(resolveRequestTenant).mockResolvedValue({
+      id: 'tenant-1',
+    } as never);
+    vi.mocked(queries.tenants.getTenantSanityCredentials).mockResolvedValue(
+      undefined,
+    );
+
+    await expect(getHostTenantSanityContext()).resolves.toEqual({
+      isResolvable: false,
+    });
+    expect(getPlatformSanityContextMock).not.toHaveBeenCalled();
   });
 });
 

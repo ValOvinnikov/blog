@@ -3,6 +3,8 @@ import {
   getPlatformSanityContext,
   type TTenantSanityContext,
 } from '@blog/service';
+import { isProductionEnvironment } from '@web/utils/is-production-environment';
+import { notFound } from 'next/navigation';
 import { cache } from 'react';
 
 import { getRequestTenantId } from './get-request-tenant-id';
@@ -10,9 +12,12 @@ import { getRequestTenantId } from './get-request-tenant-id';
 /**
  * Resolves the current request's tenant Sanity credentials. An unmatched
  * host falls back to `getPlatformSanityContext()` only outside production —
- * `proxy.ts` 404s an unmatched host in production before any route reaches
- * this. A matched tenant with no Sanity credentials set yet falls back to
- * `getPlatformSanityContext()` unconditionally, including in production.
+ * `proxy.ts` 404s an unmatched host (or one refused by `resolveTenant()`'s
+ * own servability check) in production before any route reaches this. A
+ * matched tenant whose credentials query still comes back empty — a race
+ * against `proxy.ts`'s own check, in practice — refuses with `notFound()` in
+ * production rather than ever substituting the platform's content; outside
+ * production it keeps the same platform fallback.
  *
  * Wrapped in React's `cache()`, not `unstable_cache` — this reads a
  * decrypted Sanity token, which must stay request-scoped, and the `cache()`
@@ -25,6 +30,11 @@ export const getTenantSanityContext = cache(
     if (!tenantId) return getPlatformSanityContext();
 
     const tenant = await queries.tenants.getTenantSanityCredentials(tenantId);
-    return tenant ?? getPlatformSanityContext();
+    if (tenant) return tenant;
+
+    if (isProductionEnvironment()) {
+      notFound();
+    }
+    return getPlatformSanityContext();
   },
 );

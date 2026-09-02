@@ -1,5 +1,6 @@
 import { routes } from '@blog/config';
 import { queries } from '@blog/db';
+import { isTenantActive } from '@web/server/tenant/is-tenant-active';
 import { resolveTenantId } from '@web/server/tenant/resolve-tenant-id';
 import { escapeXml } from '@web/utils/escape-xml';
 import { logger } from '@web/utils/logger/logger';
@@ -85,6 +86,21 @@ export async function GET(request: Request): Promise<NextResponse> {
         }),
         {
           status: 500,
+          headers: { 'Content-Type': 'text/html; charset=utf-8' },
+        },
+      );
+    }
+
+    if (!(await isTenantActive(tenantId))) {
+      logger.warn('newsletter.confirm_tenant_not_active', { tenantId });
+      return new NextResponse(
+        renderConfirmationPage({
+          title: t('errorTitle'),
+          message: t('errorMessage'),
+          returnHomeLabel,
+        }),
+        {
+          status: 403,
           headers: { 'Content-Type': 'text/html; charset=utf-8' },
         },
       );
