@@ -392,16 +392,17 @@ no `site_config` row, falls back to the `CONSOLE` preset with no overrides
 as theme, above.
 
 `get-site-config.ts`'s cache carries a 3600s (`SITE_CONFIG_REVALIDATE_SECONDS`)
-fallback window as its safety net, but `apps/platform`'s Look/Voice save actions
-(`update-look-action.ts`/`save-voice-overrides-action.ts`) also POST to
+fallback window as its safety net, but `apps/platform`'s Look/Voice/Features save
+actions (`update-look-action.ts`/`save-voice-overrides-action.ts`/
+`update-features-action.ts`) also POST to
 `apps/web`'s `POST /api/revalidate-site-config` after a successful
 `site_config` write, so a tenant admin's save reflects on the live site
 within seconds rather than waiting out that window. The route accepts an
 optional JSON body `{ tenantId }` to scope the purge to the tenant that
 actually saved (matching `revalidateTag`'s tenant-scoped tags); a request
-with no body — the current `apps/platform` behavior, not yet updated to send
-one — falls back to revalidating every tenant rather than silently doing
-nothing. This is a plain
+with no body falls back to revalidating every tenant rather than silently
+doing nothing. `apps/platform` always sends one, so that fallback is a safety
+net for any future caller that omits it, not a path the panel takes. This is a plain
 shared-secret (`SITE_CONFIG_REVALIDATE_SECRET`, which must be byte-identical
 between the two apps because `apps/web` compares the bearer token it receives
 against its own copy — unlike `AUTH_SECRET`, where matching is an operational
