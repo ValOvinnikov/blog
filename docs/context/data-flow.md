@@ -24,6 +24,31 @@ apps/web
   `pnpm --filter @blog/studio typegen`. **Commit the generated files.**
 - Typegen output can be non-deterministic across runs — if the diff churns,
   re-run until minimal before committing.
+- **Typegen is tenant-agnostic** — one schema (`packages/studio`), one
+  generated `types.ts`, shared by every tenant. What's tenant-scoped is which
+  Sanity _project/dataset_ a request's `service.*` calls actually hit, per the
+  read and write paths below.
+- **The read path is tenant-aware.** Every `service.*.v1.*` loader accepts an
+  optional `tenant?: TTenantSanityContext` argument
+  (`packages/service/src/sanity/client.ts`); `getClient(tenant)` builds — and
+  LRU-caches, keyed by `projectId:dataset` — a Sanity client scoped to that
+  tenant's own project, dataset, and read token, falling back to the legacy
+  env-configured client (`SANITY_API_READ_TOKEN`) when `tenant` is omitted.
+  `apps/web` resolves the current request's tenant once per render:
+  `getTenantSanityContext()` (`apps/web/src/server/tenant/`, wrapped in
+  React's `cache()`) reads the tenant id `apps/web/src/proxy.ts` already
+  resolved from the request's `Host` header and threaded via the
+  `x-tenant-id` header, decrypts that tenant's read credentials fresh from
+  `@blog/db` on every request (never cached across requests), and the result
+  is passed into each page's and module's loader call — so a single request
+  only ever touches one tenant's content. Outside production, or before a
+  tenant has credentials provisioned, this resolves to `undefined` and
+  loaders fall back to the legacy single-tenant client. A parallel
+  `getHostTenantSanityContext()` resolves the same way but reads the `Host`
+  header directly, for the handful of routes `proxy.ts`'s matcher excludes
+  (`/api/*`, `sitemap.xml`, `rss.xml`, the favicon, the default OG/Twitter
+  images) and which therefore never receive `x-tenant-id` in the first
+  place — used by `/api/generate-skim`'s own read step, below.
 - Generated types mark **every** field optional (validation is runtime-only).
   The service layer restores the contract at the query boundary: explicit
   `sub.field()` projections, `.notNull()` (always last in the chain) for
@@ -61,12 +86,36 @@ apps/web
 - **Service also has a scoped write path, `service.editorial.*`** (e.g.
   `service.editorial.skim.v1`, added for the choose-your-depth reading
   pipeline, #957) — separate from the read-only flow described above.
-  `packages/service/src/sanity/write-client.ts` is a distinct client from the
-  page-render read client, authenticated with `SANITY_API_WRITE_TOKEN`
-  (server-only, never bundled to the client). Writes are always scoped to a
-  document's **draft** (`drafts.<id>`), never the published document, and are
-  triggered by an explicit pipeline action — concretely, `apps/web`'s
-  `POST /api/generate-skim` route (webhook-driven, secret-verified — see
+  `packages/service/src/sanity/write-client.ts`'s `getWriteClient()` is a
+  distinct client from the page-render read client, and is itself
+  tenant-aware the same way `getClient()` is: called with no argument it
+  falls back to `SANITY_API_WRITE_TOKEN` (server-only, never bundled to the
+  client) — the platform's own content. Called with a tenant's
+  `TTenantSanityContext` it authenticates with that tenant's own persisted,
+  encrypted write token instead, scoping the write to that tenant's own
+  project/dataset. It is **not** true unconditionally that the write client
+  authenticates with `SANITY_API_WRITE_TOKEN`. `apps/web`'s
+  `POST /api/generate-skim` route, the only caller, resolves this tenant
+  context straight from the request's `Host` header via
+  `getHostTenantSanityWriteContext()`
+  (`apps/web/src/server/tenant/get-host-tenant-sanity-write-context.ts`, the
+  write-side counterpart to `getHostTenantSanityContext()` above, not to
+  `getTenantSanityContext()` — `/api/*` is one of the routes `proxy.ts`'s
+  matcher excludes, so `x-tenant-id` is never set here) rather than through
+  the header-threading page renders use. Unlike the read side, the write
+  route distinguishes "no tenant resolved at all" (dev/local only — a
+  production request with no matching host never reaches this far) from "a
+  tenant resolved but has no usable write credentials": only the former
+  falls back to the platform token above; the latter fails the request with
+  a `503` instead of ever writing to the platform's own project. The
+  tenant's two durable Sanity credentials (a `viewer`-scoped read token
+  and this `editor`-scoped write token) — how they're minted, persisted
+  encrypted, and read back — are documented once, in `SPEC.md`'s two-token
+  credential footnote under the `@blog/db` layer contract; this doc doesn't
+  duplicate that. Writes are always scoped to a document's **draft**
+  (`drafts.<id>`), never the published document, and are triggered by an
+  explicit pipeline action — concretely, that same route (webhook-driven,
+  secret-verified — see
   [`rendering-caching-i18n.md`](./rendering-caching-i18n.md)) — never by a page
   render. A human still reviews and publishes the draft in Studio before it
   goes live — the write path only stages content, it never publishes.
