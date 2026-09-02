@@ -24,23 +24,10 @@ describe(resolveRequestTenant, () => {
     vi.mocked(queries.tenants.getTenantById).mockReset();
   });
 
-  it('prefers the proxy-resolved header tenant, fetching that row by id and never touching Host-based resolution', async () => {
-    headersMock.mockResolvedValue(new Headers({ 'x-tenant-id': 'tenant-1' }));
-    vi.mocked(queries.tenants.getTenantById).mockResolvedValue({
-      id: 'tenant-1',
-      primaryDomain: 'acme.example.com',
-    } as never);
-
-    await expect(resolveRequestTenant()).resolves.toEqual({
-      id: 'tenant-1',
-      primaryDomain: 'acme.example.com',
-    });
-    expect(queries.tenants.getTenantById).toHaveBeenCalledWith('tenant-1');
-    expect(resolveTenant).not.toHaveBeenCalled();
-  });
-
-  it('falls back to Host-based resolution when the header is absent', async () => {
-    headersMock.mockResolvedValue(new Headers({ host: 'acme.example.com' }));
+  it('resolves from the Host header, ignoring any x-tenant-id header on the request', async () => {
+    headersMock.mockResolvedValue(
+      new Headers({ host: 'acme.example.com', 'x-tenant-id': 'tenant-1' }),
+    );
     vi.mocked(resolveTenant).mockResolvedValue({
       id: 'tenant-1',
       primaryDomain: 'acme.example.com',
@@ -51,10 +38,35 @@ describe(resolveRequestTenant, () => {
       primaryDomain: 'acme.example.com',
     });
     expect(resolveTenant).toHaveBeenCalledWith('acme.example.com');
-    expect(queries.tenants.getTenantById).not.toHaveBeenCalled();
   });
 
-  it('resolves undefined when neither the header nor Host-based resolution finds a tenant', async () => {
+  it('does not let a spoofed x-tenant-id naming a different tenant than Host change which tenant is resolved', async () => {
+    headersMock.mockResolvedValue(
+      new Headers({
+        host: 'victim.example.com',
+        'x-tenant-id': 'attacker-tenant',
+      }),
+    );
+    vi.mocked(resolveTenant).mockResolvedValue({
+      id: 'victim-tenant',
+      primaryDomain: 'victim.example.com',
+    } as never);
+    vi.mocked(queries.tenants.getTenantById).mockResolvedValue({
+      id: 'attacker-tenant',
+      primaryDomain: 'attacker.example.com',
+    } as never);
+
+    await expect(resolveRequestTenant()).resolves.toEqual({
+      id: 'victim-tenant',
+      primaryDomain: 'victim.example.com',
+    });
+    expect(resolveTenant).toHaveBeenCalledWith('victim.example.com');
+    expect(resolveTenant).not.toHaveBeenCalledWith(
+      expect.stringContaining('attacker'),
+    );
+  });
+
+  it('resolves undefined when Host-based resolution finds no tenant', async () => {
     headersMock.mockResolvedValue(new Headers());
     vi.mocked(resolveTenant).mockResolvedValue(undefined);
 
@@ -66,7 +78,6 @@ describe('resolveRequestTenant memoization', () => {
   beforeEach(() => {
     headersMock.mockReset();
     vi.mocked(resolveTenant).mockReset();
-    vi.mocked(queries.tenants.getTenantById).mockReset();
     vi.mocked(queries.tenants.getTenantSanityCredentials).mockReset();
     vi.mocked(queries.tenants.getTenantSanityWriteCredentials).mockReset();
   });
