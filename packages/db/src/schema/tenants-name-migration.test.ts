@@ -63,12 +63,7 @@ describe('0009_quick_jazinda (tenants name backfill)', () => {
         await applyMigrationFile(db, file);
       }
 
-      // Keyed by `primaryDomain`, not `slug`: `slug` is only guaranteed to
-      // exist in the raw historical insert above (what this migration reads
-      // to derive `name`), not on the typed `tenants` object this select
-      // uses, so ordering/asserting through a column the current schema
-      // still carries is what keeps this replay test resilient to a future
-      // schema change dropping `slug` outright.
+      // Keyed by `primaryDomain`: this select must not depend on `slug`.
       const rows = await db
         .select()
         .from(tenants)
