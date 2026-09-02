@@ -1,15 +1,55 @@
+import { queries } from '@blog/db';
 import { env } from '@web/utils/env/env';
 import { isSecretMatch } from '@web/utils/is-secret-match';
 import { logger } from '@web/utils/logger/logger';
+import {
+  buildSettingsFeaturesCacheTag,
+  buildSiteConfigCacheTag,
+  buildTenantPlanCacheTag,
+} from '@web/utils/tenant-cache-tags';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
 
 // `revalidateTag` requires the Node.js runtime (it isn't supported on Edge).
 export const runtime = 'nodejs';
 
-const SITE_CONFIG_CACHE_TAG = 'site-config';
-const SETTINGS_FEATURES_CACHE_TAG = 'settings-features';
-const TENANT_PLAN_CACHE_TAG = 'tenant-plan';
+const buildTagsForTenant = (tenantId: string): string[] => [
+  buildSiteConfigCacheTag(tenantId),
+  buildSettingsFeaturesCacheTag(tenantId),
+  buildTenantPlanCacheTag(tenantId),
+];
+
+const parseTenantId = async (request: Request): Promise<string | undefined> => {
+  try {
+    const body: unknown = await request.json();
+    if (
+      typeof body === 'object' &&
+      body !== null &&
+      'tenantId' in body &&
+      typeof (body as { tenantId: unknown }).tenantId === 'string' &&
+      (body as { tenantId: string }).tenantId.length > 0
+    ) {
+      return (body as { tenantId: string }).tenantId;
+    }
+  } catch {
+    return undefined;
+  }
+  return undefined;
+};
+
+/**
+ * Resolves the tenant ids to revalidate: just the given one, or — for a
+ * caller that hasn't been updated to send one yet — every tenant, so an
+ * omitted `tenantId` still revalidates rather than silently doing nothing.
+ */
+const resolveTenantIdsToRevalidate = async (
+  requestedTenantId: string | undefined,
+): Promise<string[]> => {
+  if (requestedTenantId) return [requestedTenantId];
+
+  const tenants = await queries.tenants.listTenants();
+  return tenants.map((tenant) => tenant.id);
+};
 
 /**
  * On-demand revalidation endpoint for `apps/platform`'s Look/Voice/Features
@@ -20,7 +60,9 @@ const TENANT_PLAN_CACHE_TAG = 'tenant-plan';
  * `@web/server/tenant/get-tenant-plan`). Verified with a plain shared secret
  * (`Authorization: Bearer <SITE_CONFIG_REVALIDATE_SECRET>`), not a signed
  * payload — this is a trusted internal service-to-service call between the
- * two apps, not a public webhook.
+ * two apps, not a public webhook. Accepts an optional JSON body
+ * `{ tenantId }` to scope revalidation to the tenant that actually saved;
+ * an empty/missing body revalidates every tenant.
  */
 export async function POST(request: Request): Promise<NextResponse> {
   const secret = env.SITE_CONFIG_REVALIDATE_SECRET;
@@ -44,11 +86,10 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  const revalidatedTags = [
-    SITE_CONFIG_CACHE_TAG,
-    SETTINGS_FEATURES_CACHE_TAG,
-    TENANT_PLAN_CACHE_TAG,
-  ];
+  const requestedTenantId = await parseTenantId(request);
+  const tenantIds = await resolveTenantIdsToRevalidate(requestedTenantId);
+  const revalidatedTags = tenantIds.flatMap(buildTagsForTenant);
+
   for (const tag of revalidatedTags) {
     revalidateTag(tag, { expire: 0 });
   }

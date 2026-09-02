@@ -1,32 +1,34 @@
 import { queries, type TTenantPlan } from '@blog/db';
 import { safeAsync } from '@blog/utils';
+import { buildTenantPlanCacheTag } from '@web/utils/tenant-cache-tags';
 import { unstable_cache } from 'next/cache';
 
-import { resolveCachedTenantId } from './resolve-cached-tenant-id';
+import { getRequestTenantId } from './get-request-tenant-id';
 
-const TENANT_PLAN_CACHE_TAG = 'tenant-plan';
 const TENANT_PLAN_REVALIDATE_SECONDS = 3600;
 
-const getCachedTenantPlan = unstable_cache(
-  async (): Promise<TTenantPlan | undefined> => {
-    const tenantId = await resolveCachedTenantId();
-    if (!tenantId) return undefined;
+const getCachedTenantPlanForTenant = (tenantId: string) =>
+  unstable_cache(
+    async (id: string): Promise<TTenantPlan | undefined> => {
+      const [tenant] = await queries.tenants.listTenantsByIds([id]);
+      return tenant?.plan;
+    },
+    ['tenant-plan', tenantId],
+    {
+      tags: [buildTenantPlanCacheTag(tenantId)],
+      revalidate: TENANT_PLAN_REVALIDATE_SECONDS,
+    },
+  )(tenantId);
 
-    const [tenant] = await queries.tenants.listTenantsByIds([tenantId]);
-    return tenant?.plan;
-  },
-  ['tenant-plan'],
-  {
-    tags: [TENANT_PLAN_CACHE_TAG],
-    revalidate: TENANT_PLAN_REVALIDATE_SECONDS,
-  },
-);
+const getUncachedTenantPlan = async (): Promise<TTenantPlan | undefined> => {
+  const tenantId = await getRequestTenantId();
+  if (!tenantId) return undefined;
+  return getCachedTenantPlanForTenant(tenantId);
+};
 
 /**
  * getTenantPlan — the `TENANT_PLAN` half of capability entitlement
- * (`isCapabilityEnabled`), cached the same way `site_config`/
- * `settings_features` are: a tenant's plan changes about as rarely as its
- * preset, so there's no reason to force every render site checking it into
- * dynamic rendering.
+ * (`isCapabilityEnabled`), cached per tenant the same way `site_config`/
+ * `settings_features` are.
  */
-export const getTenantPlan = safeAsync(getCachedTenantPlan);
+export const getTenantPlan = safeAsync(getUncachedTenantPlan);

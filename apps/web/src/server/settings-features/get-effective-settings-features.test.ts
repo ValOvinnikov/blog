@@ -1,15 +1,18 @@
 import { getEffectiveSettingsFeatures } from './get-effective-settings-features';
 
-const { listTenantsMock, getSettingsFeaturesMock, getSiteConfigMock } =
+const { getRequestTenantIdMock, getSettingsFeaturesMock, getSiteConfigMock } =
   vi.hoisted(() => ({
-    listTenantsMock: vi.fn(),
+    getRequestTenantIdMock: vi.fn(),
     getSettingsFeaturesMock: vi.fn(),
     getSiteConfigMock: vi.fn(),
   }));
 
+vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
+  getRequestTenantId: getRequestTenantIdMock,
+}));
+
 vi.mock('@blog/db', () => ({
   queries: {
-    tenants: { listTenants: listTenantsMock },
     settingsFeatures: { getSettingsFeatures: getSettingsFeaturesMock },
     siteConfig: { getSiteConfig: getSiteConfigMock },
   },
@@ -21,17 +24,18 @@ vi.mock('next/cache', () => ({
   unstable_cache: (fn: (...args: unknown[]) => unknown) => fn,
 }));
 
-const TENANT = { id: 'tenant-1' };
+const TENANT_A_ID = 'tenant-a';
+const TENANT_B_ID = 'tenant-b';
 
 describe(getEffectiveSettingsFeatures, () => {
   beforeEach(() => {
-    listTenantsMock.mockReset();
+    getRequestTenantIdMock.mockReset();
     getSettingsFeaturesMock.mockReset();
     getSiteConfigMock.mockReset();
   });
 
   it('maps the settings_features row to capabilities when one exists', async () => {
-    listTenantsMock.mockResolvedValue([TENANT]);
+    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
     getSettingsFeaturesMock.mockResolvedValue({
       commentsEnabled: false,
       ratingsEnabled: true,
@@ -53,11 +57,11 @@ describe(getEffectiveSettingsFeatures, () => {
         ANALYTICS: false,
       },
     });
-    expect(getSettingsFeaturesMock).toHaveBeenCalledWith(TENANT.id);
+    expect(getSettingsFeaturesMock).toHaveBeenCalledWith(TENANT_A_ID);
   });
 
   it("falls back to the tenant's current preset defaults when no settings_features row exists", async () => {
-    listTenantsMock.mockResolvedValue([TENANT]);
+    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
     getSettingsFeaturesMock.mockResolvedValue(undefined);
     getSiteConfigMock.mockResolvedValue({ preset: 'EDITORIAL' });
 
@@ -76,7 +80,7 @@ describe(getEffectiveSettingsFeatures, () => {
   });
 
   it('falls back to the console preset when there is no site_config row either', async () => {
-    listTenantsMock.mockResolvedValue([TENANT]);
+    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
     getSettingsFeaturesMock.mockResolvedValue(undefined);
     getSiteConfigMock.mockResolvedValue(undefined);
 
@@ -94,8 +98,8 @@ describe(getEffectiveSettingsFeatures, () => {
     });
   });
 
-  it('returns ok:true with undefined data when no tenant row exists', async () => {
-    listTenantsMock.mockResolvedValue([]);
+  it('returns ok:true with undefined data when the request has no resolvable tenant', async () => {
+    getRequestTenantIdMock.mockResolvedValue(undefined);
 
     const result = await getEffectiveSettingsFeatures();
 
@@ -104,10 +108,33 @@ describe(getEffectiveSettingsFeatures, () => {
   });
 
   it('returns ok:false when a query rejects', async () => {
-    listTenantsMock.mockRejectedValue(new Error('boom'));
+    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
+    getSettingsFeaturesMock.mockRejectedValue(new Error('boom'));
 
     const result = await getEffectiveSettingsFeatures();
 
     expect(result.ok).toBe(false);
+  });
+
+  it("resolves each request's own tenant's features rather than a shared one", async () => {
+    getSettingsFeaturesMock.mockImplementation((tenantId: string) => ({
+      commentsEnabled: tenantId === TENANT_A_ID,
+      ratingsEnabled: true,
+      bookmarksEnabled: true,
+      newsletterEnabled: false,
+      analyticsEnabled: false,
+    }));
+    getSiteConfigMock.mockResolvedValue({ preset: 'CONSOLE' });
+
+    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
+    const resultA = await getEffectiveSettingsFeatures();
+
+    getRequestTenantIdMock.mockResolvedValue(TENANT_B_ID);
+    const resultB = await getEffectiveSettingsFeatures();
+
+    expect(resultA.ok && resultA.data?.COMMENTS).toBe(true);
+    expect(resultB.ok && resultB.data?.COMMENTS).toBe(false);
+    expect(getSettingsFeaturesMock).toHaveBeenCalledWith(TENANT_A_ID);
+    expect(getSettingsFeaturesMock).toHaveBeenCalledWith(TENANT_B_ID);
   });
 });
