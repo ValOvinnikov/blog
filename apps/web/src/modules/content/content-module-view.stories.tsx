@@ -2,6 +2,7 @@ import { BRAND_VARIANT, SPACING_SCALE } from '@blog/config';
 import { getSanityImageBaseUrl } from '@blog/service';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { richTextDemo } from '@web/testing/shared/portable-text-renderer/fixtures';
+import { STUB_IMAGE_TENANT } from '@web/testing/shared/tenant/fixtures';
 
 import { ContentModuleView } from './content-module-view';
 
@@ -21,7 +22,7 @@ const meta = {
     brandVariant: BRAND_VARIANT.PRIMARY,
     body: richTextDemo,
     layout: undefined,
-    baseUrl: getSanityImageBaseUrl(),
+    baseUrl: getSanityImageBaseUrl(STUB_IMAGE_TENANT),
   },
   decorators: [
     (Story) => (

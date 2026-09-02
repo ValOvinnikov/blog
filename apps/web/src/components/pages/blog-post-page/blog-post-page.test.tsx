@@ -35,8 +35,8 @@ const {
 }));
 
 vi.mock('@blog/service', () => ({
-  getSanityImageBaseUrl: () =>
-    'https://cdn.sanity.io/images/test-project/test-dataset/',
+  getSanityImageBaseUrl: (tenant: { projectId: string; dataset: string }) =>
+    `https://cdn.sanity.io/images/${tenant.projectId}/${tenant.dataset}/`,
   service: {
     pages: {
       post: { v1: { getPost: getPostMock } },
@@ -129,7 +129,11 @@ describe(`<${BlogPostPage.name}/>`, () => {
     isCapabilityEnabledMock.mockReset();
     isCapabilityEnabledMock.mockResolvedValue(true);
     getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue({
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    });
     getTenantBaseUrlMock.mockReset();
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');
   });
@@ -263,6 +267,11 @@ describe(`<${BlogPostPage.name}/>`, () => {
   });
 
   it('resolves baseUrl via getSanityImageBaseUrl and forwards it into the rendered hero image src', async () => {
+    getTenantSanityContextMock.mockResolvedValue({
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    });
     const heroImageSanity: ISanityImage = {
       assetId: 'image-abc123-1600x1200-jpg',
       alt: 'A scenic mountain range',
@@ -279,7 +288,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
     await setup();
 
     const img = screen.getByRole('img', { name: mockPostDetail.heroImageAlt });
-    expect(img.getAttribute('src')).toContain('test-project/test-dataset');
+    expect(img.getAttribute('src')).toContain('tenant-project/production');
   });
 
   it('renders no PostContentsRail (and stays single-column) when the body has fewer than 3 H2 headings', async () => {

@@ -1,6 +1,7 @@
 import { getSanityImageBaseUrl } from '@blog/service';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { richTextDemo } from '@web/testing/shared/portable-text-renderer/fixtures';
+import { STUB_IMAGE_TENANT } from '@web/testing/shared/tenant/fixtures';
 
 import { PortableTextRenderer } from './portable-text-renderer';
 
@@ -11,7 +12,7 @@ const meta = {
   parameters: { layout: 'padded' },
   args: {
     value: richTextDemo,
-    baseUrl: getSanityImageBaseUrl(),
+    baseUrl: getSanityImageBaseUrl(STUB_IMAGE_TENANT),
   },
 } satisfies Meta<typeof PortableTextRenderer>;
 

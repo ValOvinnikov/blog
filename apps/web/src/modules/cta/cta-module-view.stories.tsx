@@ -11,6 +11,7 @@ import {
   ctaContentDemo,
 } from '@web/testing/modules/cta/fixtures';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { STUB_IMAGE_TENANT } from '@web/testing/shared/tenant/fixtures';
 
 import { CtaModuleView } from './cta-module-view';
 
@@ -55,7 +56,7 @@ const meta = {
     actions: ctaActionsDemo,
     footnote: undefined,
     layout: undefined,
-    baseUrl: getSanityImageBaseUrl(),
+    baseUrl: getSanityImageBaseUrl(STUB_IMAGE_TENANT),
   },
 } satisfies Meta<typeof CtaModuleView>;
 

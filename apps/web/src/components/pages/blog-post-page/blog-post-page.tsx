@@ -63,7 +63,7 @@ export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
   const headings = extractPostHeadings(body);
   const hasContentsRail = headings.length >= MIN_H2_HEADINGS_FOR_RAIL;
   const siteUrl = (await getTenantBaseUrl()) ?? '';
-  const imageBaseUrl = getSanityImageBaseUrl();
+  const imageBaseUrl = getSanityImageBaseUrl(tenant);
   const url = `${siteUrl}${routes.post(slug)}`;
   const blogPostingSchema = buildBlogPostingSchema(post, siteUrl);
   const shareLinks = buildShareLinks({ url, title }).map((link) => ({

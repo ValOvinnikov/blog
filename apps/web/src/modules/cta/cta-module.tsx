@@ -18,6 +18,10 @@ export const CtaModule = async ({ id }: ICtaModuleProps) => {
   if (!result.ok) return null;
 
   return (
-    <CtaModuleView id={id} {...result.data} baseUrl={getSanityImageBaseUrl()} />
+    <CtaModuleView
+      id={id}
+      {...result.data}
+      baseUrl={getSanityImageBaseUrl(tenant)}
+    />
   );
 };

@@ -22,7 +22,7 @@ export const ContentModule = async ({ id }: IContentModuleProps) => {
     <ContentModuleView
       id={id}
       {...result.data}
-      baseUrl={getSanityImageBaseUrl()}
+      baseUrl={getSanityImageBaseUrl(tenant)}
     />
   );
 };
