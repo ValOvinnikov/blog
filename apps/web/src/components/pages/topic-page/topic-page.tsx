@@ -3,6 +3,7 @@ import { service } from '@blog/service';
 import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import { PostListModule } from '@web/modules/post-list/post-list-module';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
 import { getTopicsSafely } from '@web/utils/get-topics-safely';
@@ -23,9 +24,10 @@ type TTopicPageProps = { slug: string; page?: number; locale: string };
  * heading and supporting text.
  */
 export const TopicPage = async ({ slug, page, locale }: TTopicPageProps) => {
+  const tenant = await getTenantSanityContext();
   const [result, topics, breadcrumbsT, topicPageT] = await Promise.all([
-    service.pages.topic.v1.getTopicPage(slug),
-    getTopicsSafely(),
+    service.pages.topic.v1.getTopicPage(slug, tenant),
+    getTopicsSafely(tenant),
     getTranslations('breadcrumbs'),
     getTranslations('topicPage'),
   ]);

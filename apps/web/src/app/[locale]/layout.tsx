@@ -12,6 +12,7 @@ import { SmartLink } from '@web/components/shared/smart-link';
 import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
 import { ToastProvider } from '@web/context/toast-provider';
 import { routing } from '@web/i18n/routing';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { env } from '@web/utils/env/env';
 import { getChromeOn } from '@web/utils/get-chrome-on';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
@@ -32,7 +33,8 @@ import {
 import { localeLayoutVariants } from './layout-variants';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const result = await service.global.siteSettings.v1.getSiteSettings();
+  const tenant = await getTenantSanityContext();
+  const result = await service.global.siteSettings.v1.getSiteSettings(tenant);
 
   // Every route's own `openGraph`/`twitter` replaces (not merges with) this
   // root segment's — `metadataBase` is the one field that still inherits
@@ -92,6 +94,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
 
   setRequestLocale(locale);
 
+  const tenant = await getTenantSanityContext();
   const [
     settingsResult,
     navResult,
@@ -102,9 +105,9 @@ export default async function LocaleLayout({ children, params }: TProps) {
     timeZone,
     t,
   ] = await Promise.all([
-    service.global.siteSettings.v1.getSiteSettings(),
-    service.global.navigation.v1.getNavigation(),
-    service.global.footer.v1.getFooter(),
+    service.global.siteSettings.v1.getSiteSettings(tenant),
+    service.global.navigation.v1.getNavigation(tenant),
+    service.global.footer.v1.getFooter(tenant),
     getChromeOn(),
     getMessages(),
     getNow(),

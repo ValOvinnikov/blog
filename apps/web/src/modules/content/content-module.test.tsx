@@ -3,8 +3,9 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { ContentModule } from './content-module';
 
-const { getContentMock } = vi.hoisted(() => ({
+const { getContentMock, getTenantSanityContextMock } = vi.hoisted(() => ({
   getContentMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -17,6 +18,10 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
+}));
+
 const setup = customRenderAsync(ContentModule, {
   id: 'content-1',
   locale: 'en',
@@ -25,6 +30,29 @@ const setup = customRenderAsync(ContentModule, {
 describe(ContentModule, () => {
   beforeEach(() => {
     getContentMock.mockReset();
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(undefined);
+  });
+
+  it('forwards the resolved tenant Sanity context to getContent', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getContentMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        body: [],
+        layout: undefined,
+      },
+    });
+
+    await setup();
+
+    expect(getContentMock).toHaveBeenCalledWith('content-1', tenant);
   });
 
   it('renders nothing when the fetch fails', async () => {

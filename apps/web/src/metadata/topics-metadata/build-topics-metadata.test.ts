@@ -2,8 +2,9 @@ import { makeSeo } from '@web/testing/shared/seo/fixtures';
 
 import { buildTopicsMetadata } from './build-topics-metadata';
 
-const { getIndexPageMock } = vi.hoisted(() => ({
+const { getIndexPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
   getIndexPageMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -12,6 +13,10 @@ vi.mock('@blog/service', () => ({
       topicIndex: { v1: { getIndexPage: getIndexPageMock } },
     },
   },
+}));
+
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
 }));
 
 const seo = makeSeo({
@@ -23,6 +28,28 @@ const seo = makeSeo({
 });
 
 describe('buildTopicsMetadata', () => {
+  beforeEach(() => {
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(undefined);
+  });
+
+  it('forwards the resolved tenant Sanity context to getIndexPage', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: { heading: 'Topics', seo, taxonomyListId: 'topic-list-1' },
+    });
+
+    await buildTopicsMetadata();
+
+    expect(getIndexPageMock).toHaveBeenCalledWith(tenant);
+  });
+
   it('builds metadata from the resolved seo, self-canonical to /topics', async () => {
     getIndexPageMock.mockResolvedValue({
       ok: true,

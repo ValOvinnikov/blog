@@ -12,9 +12,14 @@ const { permanentRedirectMock } = vi.hoisted(() => ({
   }),
 }));
 
-const { getTagPageMock, getTagPaginationParamsMock } = vi.hoisted(() => ({
+const {
+  getTagPageMock,
+  getTagPaginationParamsMock,
+  getTenantSanityContextMock,
+} = vi.hoisted(() => ({
   getTagPageMock: vi.fn(),
   getTagPaginationParamsMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
 }));
 
 // Isolates the redirect/404/static-params branches — none of the tested
@@ -32,6 +37,10 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
+}));
+
 vi.mock('@web/i18n/navigation', () => ({
   permanentRedirect: permanentRedirectMock,
 }));
@@ -47,6 +56,8 @@ const setup = customRenderAsync(TagNumberedPage, {
 describe('TagNumberedPage', () => {
   beforeEach(() => {
     permanentRedirectMock.mockClear();
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(undefined);
   });
 
   describe('generateStaticParams', () => {
@@ -139,7 +150,7 @@ describe('TagNumberedPage', () => {
       });
 
       expect(metadata.title).toBe('TypeScript – Page 2');
-      expect(getTagPageMock).toHaveBeenCalledWith('typescript');
+      expect(getTagPageMock).toHaveBeenCalledWith('typescript', undefined);
     });
   });
 

@@ -3,6 +3,7 @@ import { service } from '@blog/service';
 import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import { PostListModule } from '@web/modules/post-list/post-list-module';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
 import { getTopicsSafely } from '@web/utils/get-topics-safely';
@@ -20,9 +21,10 @@ type TBlogListPageProps = { page: number; locale: string };
  * `BlogListPageView`.
  */
 export const BlogListPage = async ({ page, locale }: TBlogListPageProps) => {
+  const tenant = await getTenantSanityContext();
   const [result, topics, breadcrumbsT] = await Promise.all([
-    service.pages.blog.v1.getIndexPage(),
-    getTopicsSafely(),
+    service.pages.blog.v1.getIndexPage(tenant),
+    getTopicsSafely(tenant),
     getTranslations('breadcrumbs'),
   ]);
 

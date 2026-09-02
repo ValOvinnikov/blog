@@ -4,42 +4,46 @@ import { notFound } from 'next/navigation';
 
 import { TagPage } from './tag-page';
 
-const { getTagPageMock, moduleRendererMock, postListModuleMock } = vi.hoisted(
-  () => ({
-    getTagPageMock: vi.fn(),
-    // `ModuleRenderer`/`PostListModule` are async Server Components — real
-    // RSC async-component nesting isn't renderable through
-    // `@testing-library/react`'s client renderer. Stubbed as plain sync
-    // components so this suite can assert `TagPage` passes the right props
-    // through without needing a real async render; their own dispatch logic
-    // is covered by `module-renderer.test.tsx` and
-    // `post-list-module.test.tsx`. `TagPageView`'s own rendering (h1,
-    // breadcrumbs, JSON-LD, composed posts markup) is covered by
-    // `tag-page-view.test.tsx`.
-    moduleRendererMock: vi.fn(
-      ({ modules }: { modules: { id: string; type: string }[] }) => (
-        <div data-testid="module-renderer-stub">
-          {modules.map((module) => module.type).join(',')}
-        </div>
-      ),
+const {
+  getTagPageMock,
+  moduleRendererMock,
+  postListModuleMock,
+  getTenantSanityContextMock,
+} = vi.hoisted(() => ({
+  getTagPageMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
+  // `ModuleRenderer`/`PostListModule` are async Server Components — real
+  // RSC async-component nesting isn't renderable through
+  // `@testing-library/react`'s client renderer. Stubbed as plain sync
+  // components so this suite can assert `TagPage` passes the right props
+  // through without needing a real async render; their own dispatch logic
+  // is covered by `module-renderer.test.tsx` and
+  // `post-list-module.test.tsx`. `TagPageView`'s own rendering (h1,
+  // breadcrumbs, JSON-LD, composed posts markup) is covered by
+  // `tag-page-view.test.tsx`.
+  moduleRendererMock: vi.fn(
+    ({ modules }: { modules: { id: string; type: string }[] }) => (
+      <div data-testid="module-renderer-stub">
+        {modules.map((module) => module.type).join(',')}
+      </div>
     ),
-    postListModuleMock: vi.fn(
-      ({
-        id,
-        page,
-      }: {
-        id: string;
-        locale: string;
-        page: number;
-        createHref: (page: number) => string;
-      }) => (
-        <div data-testid="post-list-module-stub">
-          {id}:{page}
-        </div>
-      ),
+  ),
+  postListModuleMock: vi.fn(
+    ({
+      id,
+      page,
+    }: {
+      id: string;
+      locale: string;
+      page: number;
+      createHref: (page: number) => string;
+    }) => (
+      <div data-testid="post-list-module-stub">
+        {id}:{page}
+      </div>
     ),
-  }),
-);
+  ),
+}));
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -55,6 +59,10 @@ vi.mock('@web/modules/module-renderer', () => ({
 
 vi.mock('@web/modules/post-list/post-list-module', () => ({
   PostListModule: postListModuleMock,
+}));
+
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
 }));
 
 vi.mock('@web/components/shared/smart-link', () => ({
@@ -85,6 +93,8 @@ describe(`<${TagPage.name}/>`, () => {
     getTagPageMock.mockReset();
     moduleRendererMock.mockClear();
     postListModuleMock.mockClear();
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(undefined);
   });
 
   it('calls notFound() and logs when the fetch fails', async () => {
@@ -228,5 +238,22 @@ describe(`<${TagPage.name}/>`, () => {
     expect(breadcrumbScript?.textContent).toContain(
       '"item":"https://example.com/tags/typescript"',
     );
+  });
+
+  it('forwards the resolved tenant Sanity context to getTagPage', async () => {
+    const tenantContext = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getTenantSanityContextMock.mockResolvedValue(tenantContext);
+    getTagPageMock.mockResolvedValue({
+      ok: true,
+      data: { tag, modules: [], seo: {}, postListId: 'post-list-1' },
+    });
+
+    await setup();
+
+    expect(getTagPageMock).toHaveBeenCalledWith('typescript', tenantContext);
   });
 });
