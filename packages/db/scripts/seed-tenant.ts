@@ -29,7 +29,6 @@
  * build (the condition Next.js itself sets), so this plain-Node script can
  * reuse the real query functions instead of duplicating their SQL.
  */
-import { DOMAIN_PATTERN } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import {
   MEMBERSHIP_ROLE,
@@ -46,6 +45,7 @@ import {
   setTenantSanityToken,
 } from '@blog/db/queries/tenants';
 import { users } from '@blog/db/schema/auth';
+import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import { eq } from 'drizzle-orm';
 
 type TParsedArgs = {
@@ -104,7 +104,7 @@ function parseArgs(argv: string[]): TParsedArgs {
   }
 
   const primaryDomain = requireOne('primary-domain');
-  if (!DOMAIN_PATTERN.test(primaryDomain)) {
+  if (!isValidDomain(primaryDomain)) {
     throw new Error(
       `seed-tenant: --primary-domain "${primaryDomain}" is not a valid domain.`,
     );
@@ -112,7 +112,7 @@ function parseArgs(argv: string[]): TParsedArgs {
 
   const extraDomains = flags.get('domain') ?? [];
   for (const domain of extraDomains) {
-    if (!DOMAIN_PATTERN.test(domain)) {
+    if (!isValidDomain(domain)) {
       throw new Error(
         `seed-tenant: --domain "${domain}" is not a valid domain.`,
       );
