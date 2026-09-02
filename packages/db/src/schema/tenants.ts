@@ -34,12 +34,27 @@ export type TProvisioningStepState = {
   // `elevateTenantOwner`'s outcome. Typed as the outcome union (not `string`)
   // so an exhaustive downstream switch/map over it stays checked by `tsc`.
   detail?: TElevateTenantOwnerOutcome;
+  // ISO-8601 timestamp of this step's last status change.
+  updatedAt?: string;
 };
 
-export type TTenantProvisioningSteps = Record<
+export type TProvisioningRun = {
+  startedAt: string;
+  finishedAt?: string;
+  // The dispatched GitHub Environment name, verbatim (e.g. `development`,
+  // `production`) — an external identifier, not this codebase's own
+  // vocabulary.
+  registry?: string;
+  workflowRunUrl?: string;
+};
+
+// Keyed by every `TENANT_PROVISIONING_STEP` UPPERCASE constant, plus the
+// reserved lowercase `run` key for the overall run this set of steps
+// belongs to — the casing convention keeps the two from ever colliding.
+export type TTenantProvisioningState = Record<
   TTenantProvisioningStep,
   TProvisioningStepState
->;
+> & { run?: TProvisioningRun };
 
 // `primaryDomain` is the canonical domain; `tenant_domains` holds every
 // domain (including this one) a tenant answers to.
@@ -74,10 +89,11 @@ export const tenants = pgTable('tenants', {
   provisioningStatus: text(
     'provisioning_status',
   ).$type<TTenantProvisioningStatus>(),
-  // Map of every `TENANT_PROVISIONING_STEP` key to its own progress — see
-  // `TTenantProvisioningSteps` above.
+  // Map of every `TENANT_PROVISIONING_STEP` key to its own progress, plus
+  // the current provisioning run's own metadata under `run` — see
+  // `TTenantProvisioningState` above.
   provisioningSteps:
-    jsonb('provisioning_steps').$type<TTenantProvisioningSteps>(),
+    jsonb('provisioning_steps').$type<TTenantProvisioningState>(),
   studioVercelProjectId: text('studio_vercel_project_id'),
   seededAt: timestamp('seeded_at', { mode: 'date' }),
   // Set once provisioning creates the Sanity webhook pointing at apps/web's

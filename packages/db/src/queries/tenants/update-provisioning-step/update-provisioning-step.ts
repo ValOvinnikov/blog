@@ -37,8 +37,9 @@ export type TUpdateProvisioningStepInput = {
 // object — so two steps reporting status back around the same time can
 // never race each other into clobbering one another's entry. `error`/`detail`
 // are written only when supplied, matching `TProvisioningStepState`'s
-// optional fields; the overall `provisioningStatus` column is left untouched
-// unless this call explicitly supplies one.
+// optional fields; `updatedAt` is stamped with the current time on every
+// call; the overall `provisioningStatus` column is left untouched unless
+// this call explicitly supplies one.
 //
 // `tenantId` not matching any row is a real, reachable outcome — the CI
 // provisioning script (`packages/db/scripts/provision-tenant/`) passes a
@@ -52,6 +53,7 @@ export async function updateProvisioningStep(
     status: input.status,
     ...(input.error === undefined ? {} : { error: input.error }),
     ...(input.detail === undefined ? {} : { detail: input.detail }),
+    updatedAt: new Date().toISOString(),
   };
 
   const [tenant] = await db

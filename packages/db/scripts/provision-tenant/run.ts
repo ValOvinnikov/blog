@@ -30,7 +30,12 @@ import { sanitizeLogMessage } from '@blog/insight';
 
 import { loadProvisionEnv, type TProvisionEnv } from './lib/env';
 import { reportOwnerElevationOutcome } from './lib/report-owner-elevation-outcome';
+import {
+  reportProvisioningRunFinish,
+  reportProvisioningRunStart,
+} from './lib/report-provisioning-run';
 import { reportStepStatus } from './lib/report-step-status';
+import { workflowRunUrl } from './lib/workflow-run-url/workflow-run-url';
 import { createTenantRevalidateWebhook } from './steps/create-revalidate-webhook';
 import { createTenantSanityProject } from './steps/create-sanity-project';
 import { elevateTenantOwner } from './steps/elevate-tenant-owner';
@@ -114,6 +119,20 @@ export async function runSteps(
     }
   }
 
+  const runUrl = workflowRunUrl({
+    serverUrl: env.githubServerUrl,
+    repository: env.githubRepository,
+    runId: env.githubRunId,
+  });
+
+  await reportProvisioningRunStart({
+    tenantId,
+    ...(env.tenantRegistryEnvironment === undefined
+      ? {}
+      : { registry: env.tenantRegistryEnvironment }),
+    ...(runUrl === undefined ? {} : { workflowRunUrl: runUrl }),
+  });
+
   for (const step of STEPS) {
     await reportStepStatus({
       tenantId,
@@ -143,6 +162,8 @@ export async function runSteps(
         error: message,
       });
 
+      await reportProvisioningRunFinish(tenantId);
+
       // Stop here — later steps stay at whatever status they were already
       // in (idle, on a first run). The admin UI's per-step Retry button
       // re-dispatches this whole workflow, which resumes at this step via
@@ -150,6 +171,8 @@ export async function runSteps(
       return { ok: false };
     }
   }
+
+  await reportProvisioningRunFinish(tenantId);
 
   // Runs only once the tenant is fully provisioned and never affects this
   // run's own result — the owner accepting their invite is outside this

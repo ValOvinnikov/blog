@@ -14,11 +14,13 @@ import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
 import { Link } from '@platform/i18n/navigation';
+import { formatDateTime } from '@platform/utils/format-date-time/format-date-time';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { provisioningStepTone } from '@platform/utils/status-tone/status-tone';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
+import { RunCard } from './components/run-card/run-card';
 import { provisioningStatusViewVariants } from './provisioning-status-view-variants';
 import { STEP_ORDER, useProvisioningPoll } from './use-provisioning-poll';
 
@@ -51,6 +53,8 @@ export const ProvisioningStatusView = ({
     handleStart,
     handleRetry,
     stepStatuses,
+    stepUpdatedAt,
+    provisioningRun,
     allIdle,
     isProvisioningRunning,
     overallStepStatus,
@@ -82,6 +86,7 @@ export const ProvisioningStatusView = ({
     stepBody,
     stepTitle,
     stepStatusLive,
+    stepWhen,
     visuallyHidden,
     detailsColumn,
     detailsHeader,
@@ -187,8 +192,15 @@ export const ProvisioningStatusView = ({
                     status === TENANT_PROVISIONING_STEP_STATUS.FAILED;
                   const isDone =
                     status === TENANT_PROVISIONING_STEP_STATUS.DONE;
+                  const isRunning =
+                    status === TENANT_PROVISIONING_STEP_STATUS.RUNNING;
                   const isLast = index === STEP_ORDER.length - 1;
                   const title = t(`stepLabel.${stepKey}`);
+                  const updatedAt = stepUpdatedAt[index];
+                  const formattedUpdatedAt =
+                    (isDone || isFailed) && updatedAt
+                      ? formatDateTime(updatedAt)
+                      : undefined;
 
                   return (
                     <div className={step()} key={stepKey}>
@@ -217,6 +229,16 @@ export const ProvisioningStatusView = ({
                           </span>
                         </span>
                       </div>
+                      {isRunning && (
+                        <span className={stepWhen()}>
+                          {t('stepRunningNow')}
+                        </span>
+                      )}
+                      {formattedUpdatedAt && (
+                        <time dateTime={updatedAt} className={stepWhen()}>
+                          {formattedUpdatedAt}
+                        </time>
+                      )}
                     </div>
                   );
                 })}
@@ -244,6 +266,8 @@ export const ProvisioningStatusView = ({
               )}
             </div>
           )}
+
+          {provisioningRun && <RunCard run={provisioningRun} />}
 
           {isOverallFailed && errorKind && (
             <div className={errorCard()} role="alert">
