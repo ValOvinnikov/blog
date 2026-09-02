@@ -3,6 +3,11 @@
    fed unsaved form state, so it needs the site's real token vocabulary. It
    is the one directory under apps/platform allowed to import `@blog/ui`; do
    not drop this import to "clean up" the dependency. */
+
+/* Pre-registers Sanity's `sui` layer so it sorts below Tailwind's
+   theme/base/components/utilities layers instead of above them — a
+   later-registered layer otherwise wins regardless of specificity. */
+@layer sui;
 @import '@blog/tailwind-config/theme.css';
 @import './src/styles/admin-theme.css';
 
