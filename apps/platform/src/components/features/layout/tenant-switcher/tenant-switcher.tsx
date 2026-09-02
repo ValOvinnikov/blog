@@ -5,8 +5,10 @@ import { ICONS, SIZE } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { Avatar } from '@platform/components/shared/avatar';
 import { Icon } from '@platform/components/shared/icon';
+import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Link } from '@platform/i18n/navigation';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { useTranslations } from 'next-intl';
 
 import { tenantSwitcherVariants } from './tenant-switcher-variants';
 
@@ -38,16 +40,22 @@ export const TenantSwitcher = ({
   const active =
     tenants.find((tenant) => tenant.id === activeTenantId) ?? tenants[0];
 
+  const t = useTranslations('tenantSwitcher');
+
   const {
     trigger,
     meta,
+    nameRow,
     name,
     domain,
     chev,
+    badge,
     popup,
     item,
+    itemNameRow,
     itemName,
     itemDomain,
+    itemBadge,
   } = tenantSwitcherVariants();
 
   if (!active) {
@@ -59,7 +67,14 @@ export const TenantSwitcher = ({
       <Menu.Trigger className={trigger()}>
         <Avatar name={active.name} variant="switcher" />
         <span className={meta()}>
-          <span className={name()}>{active.name}</span>
+          <span className={nameRow()}>
+            <span className={name()}>{active.name}</span>
+            {Boolean(active.deprovisionedAt) && (
+              <StatusBadge tone="neutral" hasDot={false} className={badge()}>
+                {t('archived')}
+              </StatusBadge>
+            )}
+          </span>
           <span className={domain()}>{active.primaryDomain}</span>
         </span>
         <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} className={chev()} />
@@ -76,7 +91,18 @@ export const TenantSwitcher = ({
                 className={item()}
                 render={<Link href={hrefFor(tenant)} />}
               >
-                <span className={itemName()}>{tenant.name}</span>
+                <span className={itemNameRow()}>
+                  <span className={itemName()}>{tenant.name}</span>
+                  {Boolean(tenant.deprovisionedAt) && (
+                    <StatusBadge
+                      tone="neutral"
+                      hasDot={false}
+                      className={itemBadge()}
+                    >
+                      {t('archived')}
+                    </StatusBadge>
+                  )}
+                </span>
                 <span className={itemDomain()}>{tenant.primaryDomain}</span>
               </Menu.LinkItem>
             ))}

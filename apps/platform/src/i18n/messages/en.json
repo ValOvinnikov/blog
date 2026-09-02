@@ -24,6 +24,9 @@
     "collapseToggle": "Collapse sidebar",
     "expandToggle": "Expand sidebar"
   },
+  "tenantSwitcher": {
+    "archived": "Archived"
+  },
   "toastProvider": {
     "viewportAriaLabel": "Notifications",
     "dismissLabel": "Dismiss notification",
