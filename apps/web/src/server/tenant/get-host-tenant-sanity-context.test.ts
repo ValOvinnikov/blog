@@ -1,15 +1,15 @@
 import { queries, TENANT_STATUS } from '@blog/db';
 
 import { getHostTenantSanityContext } from './get-host-tenant-sanity-context';
-import { resolveTenantId } from './resolve-tenant-id';
+import { resolveRequestTenant } from './resolve-request-tenant';
 
-const { headersMock, isProductionEnvironmentMock } = vi.hoisted(() => ({
-  headersMock: vi.fn(),
+const { isProductionEnvironmentMock } = vi.hoisted(() => ({
   isProductionEnvironmentMock: vi.fn(),
 }));
 
-vi.mock('next/headers', () => ({ headers: headersMock }));
-vi.mock('./resolve-tenant-id', () => ({ resolveTenantId: vi.fn() }));
+vi.mock('./resolve-request-tenant', () => ({
+  resolveRequestTenant: vi.fn(),
+}));
 vi.mock('@blog/db', () => ({
   queries: { tenants: { getTenantSanityCredentials: vi.fn() } },
   TENANT_STATUS: {
@@ -22,22 +22,18 @@ vi.mock('@web/utils/is-production-environment', () => ({
   isProductionEnvironment: isProductionEnvironmentMock,
 }));
 
-const setHost = (host: string | null) => {
-  headersMock.mockResolvedValue({ get: () => host });
-};
-
 describe(getHostTenantSanityContext, () => {
   beforeEach(() => {
-    headersMock.mockReset();
+    vi.mocked(resolveRequestTenant).mockReset();
+    vi.mocked(queries.tenants.getTenantSanityCredentials).mockReset();
     isProductionEnvironmentMock.mockReset();
     isProductionEnvironmentMock.mockReturnValue(false);
-    vi.mocked(resolveTenantId).mockReset();
-    vi.mocked(queries.tenants.getTenantSanityCredentials).mockReset();
   });
 
-  it('resolves the tenant Sanity credentials for a matched host', async () => {
-    setHost('acme.example.com');
-    vi.mocked(resolveTenantId).mockResolvedValue('tenant-1');
+  it('resolves the tenant Sanity credentials for a resolved tenant', async () => {
+    vi.mocked(resolveRequestTenant).mockResolvedValue({
+      id: 'tenant-1',
+    } as never);
     vi.mocked(queries.tenants.getTenantSanityCredentials).mockResolvedValue({
       projectId: 'proj',
       dataset: 'production',
@@ -58,13 +54,14 @@ describe(getHostTenantSanityContext, () => {
         provisioningStatus: null,
       },
     });
-    expect(resolveTenantId).toHaveBeenCalledWith('acme.example.com');
+    expect(queries.tenants.getTenantSanityCredentials).toHaveBeenCalledWith(
+      'tenant-1',
+    );
   });
 
-  it('resolves as unresolvable in production when the host matches no tenant', async () => {
-    setHost('unknown.example.com');
+  it('resolves as unresolvable in production when no tenant resolves', async () => {
     isProductionEnvironmentMock.mockReturnValue(true);
-    vi.mocked(resolveTenantId).mockResolvedValue(undefined);
+    vi.mocked(resolveRequestTenant).mockResolvedValue(undefined);
 
     await expect(getHostTenantSanityContext()).resolves.toEqual({
       isResolvable: false,
@@ -72,10 +69,8 @@ describe(getHostTenantSanityContext, () => {
     expect(queries.tenants.getTenantSanityCredentials).not.toHaveBeenCalled();
   });
 
-  it('resolves with an undefined tenant outside production when no host matches (sole-tenant fallback already applied by resolveTenantId)', async () => {
-    setHost('unknown.example.com');
-    isProductionEnvironmentMock.mockReturnValue(false);
-    vi.mocked(resolveTenantId).mockResolvedValue(undefined);
+  it('resolves with an undefined tenant outside production when no tenant resolves', async () => {
+    vi.mocked(resolveRequestTenant).mockResolvedValue(undefined);
 
     await expect(getHostTenantSanityContext()).resolves.toEqual({
       isResolvable: true,
@@ -91,15 +86,11 @@ describe('getHostTenantSanityContext memoization', () => {
   });
 
   it('dedupes the host lookup and credentials query when called more than once in the same render pass', async () => {
-    // `resolveTenantId`/`queries`/`headers`/`isProductionEnvironment` are all
-    // replaced module-wide by the `vi.mock()` calls above — pinned for the
-    // whole file and unaffected by `resetModules()`, so only
-    // `get-host-tenant-sanity-context.ts` itself (a plain, non-mocked
-    // module) needs re-importing to pick up the mocked `react.cache`.
-    setHost('acme.example.com');
-    vi.mocked(resolveTenantId).mockReset();
+    vi.mocked(resolveRequestTenant).mockReset();
     vi.mocked(queries.tenants.getTenantSanityCredentials).mockReset();
-    vi.mocked(resolveTenantId).mockResolvedValue('tenant-1');
+    vi.mocked(resolveRequestTenant).mockResolvedValue({
+      id: 'tenant-1',
+    } as never);
     vi.mocked(queries.tenants.getTenantSanityCredentials).mockResolvedValue({
       projectId: 'proj',
       dataset: 'production',
@@ -134,7 +125,7 @@ describe('getHostTenantSanityContext memoization', () => {
     await freshGetHostTenantSanityContext();
     await freshGetHostTenantSanityContext();
 
-    expect(resolveTenantId).toHaveBeenCalledTimes(1);
+    expect(resolveRequestTenant).toHaveBeenCalledTimes(1);
     expect(queries.tenants.getTenantSanityCredentials).toHaveBeenCalledTimes(1);
   });
 });

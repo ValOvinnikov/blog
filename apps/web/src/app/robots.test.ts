@@ -7,44 +7,63 @@ describe('robots', () => {
 
   describe('production', () => {
     it('allows all crawlers and points sitemap at the absolute site URL', async () => {
-      vi.doMock('@web/utils/env/env', () => ({
-        env: { NEXT_PUBLIC_SITE_URL: 'https://example.com' },
+      vi.doMock('@web/server/tenant/get-tenant-base-url', () => ({
+        getTenantBaseUrl: async () => 'https://example.com',
       }));
       vi.doMock('@web/utils/is-production-environment', () => ({
         isProductionEnvironment: () => true,
       }));
       const robots = (await import('./robots')).default;
 
-      expect(robots()).toEqual({
+      await expect(robots()).resolves.toEqual({
         rules: { userAgent: '*', allow: '/' },
         sitemap: 'https://example.com/sitemap.xml',
       });
     });
 
-    it('falls back to a relative sitemap path when the site URL is unset', async () => {
-      vi.doMock('@web/utils/env/env', () => ({ env: {} }));
+    it('falls back to a relative sitemap path when no base URL resolves', async () => {
+      vi.doMock('@web/server/tenant/get-tenant-base-url', () => ({
+        getTenantBaseUrl: async () => undefined,
+      }));
       vi.doMock('@web/utils/is-production-environment', () => ({
         isProductionEnvironment: () => true,
       }));
       const robots = (await import('./robots')).default;
 
-      expect(robots().sitemap).toBe('/sitemap.xml');
+      await expect(robots()).resolves.toMatchObject({
+        sitemap: '/sitemap.xml',
+      });
     });
   });
 
   describe('non-production', () => {
     it('allows crawling (so the page-level noindex meta is seen) but omits the sitemap', async () => {
-      vi.doMock('@web/utils/env/env', () => ({
-        env: { NEXT_PUBLIC_SITE_URL: 'https://dev.example.com' },
+      vi.doMock('@web/server/tenant/get-tenant-base-url', () => ({
+        getTenantBaseUrl: async () => 'https://dev.example.com',
       }));
       vi.doMock('@web/utils/is-production-environment', () => ({
         isProductionEnvironment: () => false,
       }));
       const robots = (await import('./robots')).default;
 
-      expect(robots()).toEqual({
+      await expect(robots()).resolves.toEqual({
         rules: { userAgent: '*', allow: '/' },
       });
+    });
+
+    it('never resolves the tenant base URL, since its value goes unused', async () => {
+      const getTenantBaseUrlMock = vi.fn(async () => 'https://dev.example.com');
+      vi.doMock('@web/server/tenant/get-tenant-base-url', () => ({
+        getTenantBaseUrl: getTenantBaseUrlMock,
+      }));
+      vi.doMock('@web/utils/is-production-environment', () => ({
+        isProductionEnvironment: () => false,
+      }));
+      const robots = (await import('./robots')).default;
+
+      await robots();
+
+      expect(getTenantBaseUrlMock).not.toHaveBeenCalled();
     });
   });
 });

@@ -6,6 +6,7 @@ import { buildNewsletterConfirmationEmail } from '@web/server/newsletter/newslet
 import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address';
 import { markNewsletterSubscribed } from '@web/server/newsletter/newsletter-subscribed-cookie';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { env } from '@web/utils/env/env';
 import { isValidEmail } from '@web/utils/is-valid-email';
 import { logger } from '@web/utils/logger/logger';
@@ -60,7 +61,7 @@ export const subscribeToNewsletterAction = async (
       return { outcome: 'already-subscribed' };
     }
 
-    const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
+    const siteUrl = (await getTenantBaseUrl()) ?? '';
     const confirmationUrl = `${siteUrl}/api/newsletter/confirm?token=${subscriber.confirmationToken}`;
     const { subject, html } = buildNewsletterConfirmationEmail({
       confirmationUrl,

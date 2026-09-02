@@ -11,6 +11,7 @@ const {
   getTopicIndexPageMock,
   getTagIndexPageMock,
   getHostTenantSanityContextMock,
+  getTenantBaseUrlMock,
 } = vi.hoisted(() => ({
   getPostParamsMock: vi.fn(),
   getTopicParamsMock: vi.fn(),
@@ -22,10 +23,15 @@ const {
   getTopicIndexPageMock: vi.fn(),
   getTagIndexPageMock: vi.fn(),
   getHostTenantSanityContextMock: vi.fn(),
+  getTenantBaseUrlMock: vi.fn(),
 }));
 
 vi.mock('@web/server/tenant/get-host-tenant-sanity-context', () => ({
   getHostTenantSanityContext: getHostTenantSanityContextMock,
+}));
+
+vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
+  getTenantBaseUrl: getTenantBaseUrlMock,
 }));
 
 vi.mock('@blog/service', () => ({
@@ -52,10 +58,6 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/utils/env/env', () => ({
-  env: { NEXT_PUBLIC_SITE_URL: 'https://example.com' },
-}));
-
 /** Resolves every params mock to an empty result; tests override as needed. */
 const mockAllEmpty = () => {
   getPostParamsMock.mockResolvedValue({ ok: true, data: [] });
@@ -75,6 +77,7 @@ describe('sitemap', () => {
       isResolvable: true,
       tenant: undefined,
     });
+    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
   });
 
   afterEach(() => {
@@ -89,6 +92,7 @@ describe('sitemap', () => {
     getTopicIndexPageMock.mockReset();
     getTagIndexPageMock.mockReset();
     getHostTenantSanityContextMock.mockReset();
+    getTenantBaseUrlMock.mockReset();
   });
 
   it('includes home, blog index, topics hub, post, topic, tag, blog page and generic page entries', async () => {
@@ -383,12 +387,8 @@ describe('sitemap', () => {
     expect(getPostParamsMock).not.toHaveBeenCalled();
   });
 
-  // `vi.doMock` overrides the module registry's mock factory for
-  // `@web/utils/env/env` for every subsequent dynamic `import('./sitemap')`
-  // in this file (`vi.resetModules()` clears cached instances, not the
-  // registered factory) — this case stays last.
-  it('returns an empty sitemap when NEXT_PUBLIC_SITE_URL is unset', async () => {
-    vi.doMock('@web/utils/env/env', () => ({ env: {} }));
+  it('returns an empty sitemap when no tenant base URL resolves', async () => {
+    getTenantBaseUrlMock.mockResolvedValue(undefined);
     const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();

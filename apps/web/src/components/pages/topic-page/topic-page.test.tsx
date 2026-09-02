@@ -13,10 +13,12 @@ const {
   moduleRendererMock,
   postListModuleMock,
   getTenantSanityContextMock,
+  getTenantBaseUrlMock,
 } = vi.hoisted(() => ({
   getTopicPageMock: vi.fn(),
   getTopicsMock: vi.fn(),
   getTenantSanityContextMock: vi.fn(),
+  getTenantBaseUrlMock: vi.fn(),
   // `ModuleRenderer`/`PostListModule` are async Server Components — real
   // RSC async-component nesting isn't renderable through
   // `@testing-library/react`'s client renderer. Stubbed as plain sync
@@ -73,6 +75,10 @@ vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
   getTenantSanityContext: getTenantSanityContextMock,
 }));
 
+vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
+  getTenantBaseUrl: getTenantBaseUrlMock,
+}));
+
 vi.mock('@web/components/shared/smart-link', () => ({
   SmartLink: ({
     href,
@@ -104,6 +110,8 @@ describe(`<${TopicPage.name}/>`, () => {
     postListModuleMock.mockClear();
     getTenantSanityContextMock.mockReset();
     getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantBaseUrlMock.mockReset();
+    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
     getTopicsMock.mockResolvedValue({
       ok: true,
       data: [
