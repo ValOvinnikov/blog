@@ -158,6 +158,12 @@ raises it by hand in Sanity's Manage UI once the owner accepts. Invite
 failures are logged and do not fail the step — a membership problem must not
 cost the project, dataset, seeded content and webhook alongside it.
 
+Enforced by a dedicated `configs/eslint/db.js` override scoped to that
+directory; every other path in
+`@blog/db` keeps the blanket prohibition.
+Dependency-graph enforcement details and SVG/type-flow wiring:
+[`docs/context/frontend-conventions.md`](./docs/context/frontend-conventions.md).
+
 Provisioning also mints the tenant's two durable Sanity credentials, both
 stored encrypted on the `tenants` row under `TENANT_TOKEN_ENCRYPTION_KEY`
 and both read back only through `@blog/db` query helpers, never returned to
@@ -172,12 +178,6 @@ and minting one per request would require an admin-scoped management token
 inside `apps/web`. It is revoked on any seeding failure, so a failed run
 leaves nothing live. This is deliberately a higher-privilege, longer-lived
 secret than the read token.
-
-Enforced by a dedicated `configs/eslint/db.js` override scoped to that
-directory; every other path in
-`@blog/db` keeps the blanket prohibition.
-Dependency-graph enforcement details and SVG/type-flow wiring:
-[`docs/context/frontend-conventions.md`](./docs/context/frontend-conventions.md).
 
 ² `@blog/db`'s "never log" rule has one scoped exception, decided on
 #2120: `packages/db/scripts/provision-tenant/`,
