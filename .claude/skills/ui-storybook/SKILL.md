@@ -198,9 +198,60 @@ compositions are storied in `apps/web` (`web-storybook`).
   type alias back to its definition looking for
   `TValueOf<typeof SOME_UPPERCASE_CONST>`.
 
-  For a prop typed as a bare literal union with neither a `tv()` config nor a
-  dictionary const behind it (`variant: 'full' | 'compact'`), Storybook's
-  inferred control is fine — only override with `argTypes` when it's wrong.
+- **For a prop typed as a literal union with neither a `tv()` config nor a
+  dictionary const behind it, whether inference suffices depends on how the
+  prop is declared — inline or behind a named type alias.** Both Storybooks
+  run the default `react-docgen` (neither `.storybook/main.ts` sets
+  `typescript.reactDocgen`), which resolves the two differently.
+
+  Declared **inline**, docgen emits the whole option list, so Storybook infers
+  a working select and no `argTypes` entry is needed:
+
+  ```tsx
+  type?: 'button' | 'submit' | 'reset';
+  // → { name: 'union', raw: "'button' | 'submit' | 'reset'",
+  //     elements: [{ name: 'literal', value: "'button'" }, …] }
+  ```
+
+  Declared via a **named type alias**, docgen emits only the alias name and
+  never resolves it, so there is nothing to build a control from:
+
+  ```tsx
+  status: TFormStatus; // → { name: 'TFormStatus' }  — no values at all
+  ```
+
+  An alias-typed prop therefore **always needs an explicit `argTypes` entry**.
+  Rather than repeat the union's members in every story that controls it,
+  **give the union a runtime array and derive the type from that array**, so
+  there is one source both the type and the control read from:
+
+  ```ts
+  export const HEADING_LEVELS = [1, 2, 3, 4] as const;
+  export type THeadingLevel = (typeof HEADING_LEVELS)[number];
+  ```
+
+  ```tsx
+  argTypes: {
+    level: {
+      control: 'select',
+      options: HEADING_LEVELS,
+    },
+  },
+  ```
+
+  A control sourced this way cannot drift from the type — adding a member to
+  the array widens both at once. Name these consts in the **plural**
+  (`HEADING_LEVELS`, `FORM_STATUSES`) to mark them as lists you pass straight
+  to `options`, as against the singular dictionary consts whose values you
+  reach through `Object.values`.
+
+  If a prop's union genuinely has no such const to point at, a literal array
+  is the fallback — but match the declared type exactly: `THeadingLevel` takes
+  **numbers**, not `['1','2','3','4']`. And don't reach for
+  `objectKeys(headingTags)` to derive them: that record is keyed by the
+  numeric levels, and `objectKeys` types as `Array<1 | 2 | 3 | 4>`, so it
+  compiles clean while handing the control stringified keys at runtime.
+  Type-check won't catch it; the select just sets the wrong value.
 
 - Never pass live data or async functions as args — all props must be static
   and serialisable.
@@ -377,6 +428,11 @@ Stories in `@blog/ui` must obey the same boundary rules as the components:
       accepts — checked against the component's prop types, not the story's
       imports. If the prop also drives a `tv()` config, source the options
       from the variant map instead.
+- [ ] Any prop whose type is a literal union behind a **named alias** has an
+      explicit `argTypes` `select` control — docgen never resolves an alias,
+      so inference cannot supply one. Source its `options` from the plural
+      array const the type is derived from, not a repeated literal list.
+      Inline unions need nothing.
 - [ ] No `service`/`sanity`/`next` imports in the story file.
 - [ ] Story compiles clean — `.storybook` and `.stories.tsx` are covered by
       `packages/ui/tsconfig.json`'s `include`, so

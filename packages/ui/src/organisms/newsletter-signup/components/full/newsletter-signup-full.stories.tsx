@@ -1,4 +1,4 @@
-import { HEADING_ALIGN, ICONS, SIZE } from '@blog/config';
+import { FORM_STATUSES, HEADING_ALIGN, ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import { NewsletterSignup } from '@blog/ui/organisms/newsletter-signup/newsletter-signup';
 import { newsletterSignupVariants } from '@blog/ui/organisms/newsletter-signup/newsletter-signup-variants';
@@ -25,6 +25,10 @@ const meta = {
     align: {
       control: 'select',
       options: objectKeys(newsletterSignupVariants.variants.align),
+    },
+    status: {
+      control: 'select',
+      options: FORM_STATUSES,
     },
   },
   args: {
