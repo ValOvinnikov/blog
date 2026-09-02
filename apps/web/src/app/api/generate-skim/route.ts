@@ -4,6 +4,7 @@ import {
   SKIM_GENERATION_MODEL,
 } from '@web/server/skim/generate-takeaways';
 import { getHostTenantSanityContext } from '@web/server/tenant/get-host-tenant-sanity-context';
+import { getHostTenantSanityWriteContext } from '@web/server/tenant/get-host-tenant-sanity-write-context';
 import { env } from '@web/utils/env/env';
 import { isSecretMatch } from '@web/utils/is-secret-match';
 import { logger } from '@web/utils/logger/logger';
@@ -89,6 +90,28 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
+  const writeTenant = await getHostTenantSanityWriteContext();
+  if (!writeTenant.isResolvable) {
+    logger.error('generate_skim.write_tenant_unresolvable', { postId });
+    return NextResponse.json(
+      { message: 'Failed to resolve the requesting tenant.' },
+      { status: 404 },
+    );
+  }
+  if (writeTenant.tenantId && !writeTenant.tenant) {
+    logger.error('generate_skim.tenant_write_credentials_missing', {
+      postId,
+      tenantId: writeTenant.tenantId,
+    });
+    return NextResponse.json(
+      {
+        message:
+          'The requesting tenant has no usable Sanity write credentials.',
+      },
+      { status: 503 },
+    );
+  }
+
   const bodyResult = await service.editorial.skim.v1.getPublishedPostBody(
     postId,
     hostTenant.tenant,
@@ -115,11 +138,14 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  const saveResult = await service.editorial.skim.v1.saveSkimDraft({
-    postId,
-    takeaways,
-    model: SKIM_GENERATION_MODEL,
-  });
+  const saveResult = await service.editorial.skim.v1.saveSkimDraft(
+    {
+      postId,
+      takeaways,
+      model: SKIM_GENERATION_MODEL,
+    },
+    writeTenant.tenant,
+  );
   if (!saveResult.ok) {
     logger.error('generate_skim.draft_save_failed', {
       postId,

@@ -5,11 +5,15 @@ const {
   saveSkimDraftMock,
   generateTakeawaysMock,
   getHostTenantSanityContextMock,
+  getHostTenantSanityWriteContextMock,
+  loggerErrorMock,
 } = vi.hoisted(() => ({
   getPublishedPostBodyMock: vi.fn(),
   saveSkimDraftMock: vi.fn(),
   generateTakeawaysMock: vi.fn(),
   getHostTenantSanityContextMock: vi.fn(),
+  getHostTenantSanityWriteContextMock: vi.fn(),
+  loggerErrorMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -32,6 +36,14 @@ vi.mock('@web/server/skim/generate-takeaways', () => ({
 
 vi.mock('@web/server/tenant/get-host-tenant-sanity-context', () => ({
   getHostTenantSanityContext: getHostTenantSanityContextMock,
+}));
+
+vi.mock('@web/server/tenant/get-host-tenant-sanity-write-context', () => ({
+  getHostTenantSanityWriteContext: getHostTenantSanityWriteContextMock,
+}));
+
+vi.mock('@web/utils/logger/logger', () => ({
+  logger: { error: loggerErrorMock },
 }));
 
 vi.mock('@web/utils/env/env', () => ({
@@ -60,6 +72,13 @@ describe('POST /api/generate-skim', () => {
       isResolvable: true,
       tenant: undefined,
     });
+    getHostTenantSanityWriteContextMock.mockReset();
+    getHostTenantSanityWriteContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant: undefined,
+      tenantId: undefined,
+    });
+    loggerErrorMock.mockReset();
   });
 
   afterEach(() => {
@@ -142,6 +161,10 @@ describe('POST /api/generate-skim', () => {
     const response = await POST(makeRequest({ _id: 'post-1' }));
 
     expect(response.status).toBe(503);
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      'generate_skim.draft_save_failed',
+      expect.anything(),
+    );
   });
 
   it('returns 500 when saving the draft fails for another reason', async () => {
@@ -170,11 +193,14 @@ describe('POST /api/generate-skim', () => {
     expect(response.status).toBe(200);
     expect(json).toEqual({ ok: true, count: 3 });
     expect(getPublishedPostBodyMock).toHaveBeenCalledWith('post-1', undefined);
-    expect(saveSkimDraftMock).toHaveBeenCalledWith({
-      postId: 'post-1',
-      takeaways: ['a', 'b', 'c'],
-      model: 'claude-haiku-4-5',
-    });
+    expect(saveSkimDraftMock).toHaveBeenCalledWith(
+      {
+        postId: 'post-1',
+        takeaways: ['a', 'b', 'c'],
+        model: 'claude-haiku-4-5',
+      },
+      undefined,
+    );
   });
 
   it('re-running with the same post is idempotent (always patches the draft, never appends)', async () => {
@@ -187,16 +213,24 @@ describe('POST /api/generate-skim', () => {
     await POST(makeRequest({ _id: 'post-1' }));
 
     expect(saveSkimDraftMock).toHaveBeenCalledTimes(2);
-    expect(saveSkimDraftMock).toHaveBeenNthCalledWith(1, {
-      postId: 'post-1',
-      takeaways: ['a', 'b', 'c'],
-      model: 'claude-haiku-4-5',
-    });
-    expect(saveSkimDraftMock).toHaveBeenNthCalledWith(2, {
-      postId: 'post-1',
-      takeaways: ['a', 'b', 'c'],
-      model: 'claude-haiku-4-5',
-    });
+    expect(saveSkimDraftMock).toHaveBeenNthCalledWith(
+      1,
+      {
+        postId: 'post-1',
+        takeaways: ['a', 'b', 'c'],
+        model: 'claude-haiku-4-5',
+      },
+      undefined,
+    );
+    expect(saveSkimDraftMock).toHaveBeenNthCalledWith(
+      2,
+      {
+        postId: 'post-1',
+        takeaways: ['a', 'b', 'c'],
+        model: 'claude-haiku-4-5',
+      },
+      undefined,
+    );
   });
 
   it('forwards the resolved tenant Sanity context to getPublishedPostBody', async () => {
@@ -221,6 +255,71 @@ describe('POST /api/generate-skim', () => {
 
   it('returns 404 without reading the post when the requesting host is unresolvable', async () => {
     getHostTenantSanityContextMock.mockResolvedValue({ isResolvable: false });
+    const { POST } = await import('./route');
+
+    const response = await POST(makeRequest({ _id: 'post-1' }));
+
+    expect(response.status).toBe(404);
+    expect(getPublishedPostBodyMock).not.toHaveBeenCalled();
+  });
+
+  it('saves the skim draft with the resolved tenant Sanity write credentials', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-write-token',
+    };
+    getHostTenantSanityWriteContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant,
+      tenantId: 'tenant-1',
+    });
+    getPublishedPostBodyMock.mockResolvedValue({ ok: true, data: [] });
+    generateTakeawaysMock.mockResolvedValue(['a', 'b', 'c']);
+    saveSkimDraftMock.mockResolvedValue({ ok: true, data: undefined });
+    const { POST } = await import('./route');
+
+    const response = await POST(makeRequest({ _id: 'post-1' }));
+
+    expect(response.status).toBe(200);
+    expect(saveSkimDraftMock).toHaveBeenCalledWith(
+      {
+        postId: 'post-1',
+        takeaways: ['a', 'b', 'c'],
+        model: 'claude-haiku-4-5',
+      },
+      tenant,
+    );
+  });
+
+  it('returns 503 without generating takeaways when the resolved tenant has no usable write credentials', async () => {
+    getHostTenantSanityWriteContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant: undefined,
+      tenantId: 'tenant-1',
+    });
+    const { POST } = await import('./route');
+
+    const response = await POST(makeRequest({ _id: 'post-1' }));
+    const json = await response.json();
+
+    expect(response.status).toBe(503);
+    expect(json).toEqual({
+      message: 'The requesting tenant has no usable Sanity write credentials.',
+    });
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      'generate_skim.tenant_write_credentials_missing',
+      { postId: 'post-1', tenantId: 'tenant-1' },
+    );
+    expect(generateTakeawaysMock).not.toHaveBeenCalled();
+    expect(getPublishedPostBodyMock).not.toHaveBeenCalled();
+    expect(saveSkimDraftMock).not.toHaveBeenCalled();
+  });
+
+  it('returns 404 without reading the post when the write-side tenant context is unresolvable', async () => {
+    getHostTenantSanityWriteContextMock.mockResolvedValue({
+      isResolvable: false,
+    });
     const { POST } = await import('./route');
 
     const response = await POST(makeRequest({ _id: 'post-1' }));
