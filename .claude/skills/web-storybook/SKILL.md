@@ -152,16 +152,23 @@ export const LongBody: Story = {
   an **alias-typed** one (`headingLevel: THeadingLevel` yields just
   `{ name: 'THeadingLevel' }`), with no values to build a control from. An
   alias-typed
-  prop needs an explicit `argTypes` entry, and since the union is erased at
-  runtime there is nothing to enumerate — hand-write the array, matching the
-  declared type (`THeadingLevel = 1 | 2 | 3 | 4` takes numbers, not strings):
+  prop needs an explicit `argTypes` entry. Rather than repeat the union's
+  members in every story, give the union a runtime array and derive the type
+  from it (`export const HEADING_LEVELS = [1, 2, 3, 4] as const;` then
+  `type THeadingLevel = (typeof HEADING_LEVELS)[number]`), and point the
+  control at that const so the two cannot drift:
 
   ```tsx
   headingLevel: {
     control: 'select',
-    options: [1, 2, 3, 4],
+    options: HEADING_LEVELS,
   },
   ```
+
+  These list consts are named in the **plural**, as against the singular
+  dictionary consts whose values you reach through `Object.values`. Where no
+  such const exists, a literal array is the fallback — match the declared type
+  exactly (`THeadingLevel` takes numbers, not strings).
 
   `Record<TEnum, string>` label maps are keyed by an enum rather than valued
   by one, so there is nothing to select.
@@ -307,8 +314,9 @@ Use page-level paths: `"Pages/PostPage"`, `"Pages/HomePage"`,
       accepts — checked against the component's prop types, not the story's
       imports.
 - [ ] Any prop whose type is a literal union behind a **named alias** has an
-      explicit `argTypes` `select` control with a hand-written `options`
-      array — docgen never resolves an alias, so inference cannot supply one.
+      explicit `argTypes` `select` control — docgen never resolves an alias,
+      so inference cannot supply one. Source its `options` from the plural
+      array const the type is derived from, not a repeated literal list.
       Inline unions need nothing.
 - [ ] `nextjs.navigation.pathname` set if component checks active route.
 - [ ] Fixtures live in `src/storybook/fixtures/`; not imported outside Storybook.
