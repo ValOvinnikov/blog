@@ -29,4 +29,27 @@ describe(PresetPicker, () => {
 
     expect(handleChange).toHaveBeenCalledWith(PRESET_ID.EDITORIAL);
   });
+
+  it('disables every option and stops reporting clicks when isDisabled is true', async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+    render(
+      <PresetPicker
+        value={PRESET_ID.CONSOLE}
+        onChange={handleChange}
+        isDisabled={true}
+        aria-describedby="archived-notice"
+      />,
+    );
+
+    const editorial = screen.getByRole('radio', { name: 'Editorial' });
+    expect(editorial).toHaveAttribute('aria-disabled', 'true');
+    expect(editorial.closest('[role="radiogroup"]')).toHaveAttribute(
+      'aria-describedby',
+      'archived-notice',
+    );
+
+    await user.click(editorial);
+    expect(handleChange).not.toHaveBeenCalled();
+  });
 });

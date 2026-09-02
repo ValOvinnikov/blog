@@ -123,8 +123,9 @@ export const FeaturesSettings = ({
                 <Switch.Root
                   checked={values[field]}
                   onCheckedChange={(checked) => handleToggle(field, checked)}
-                  disabled={isLocked || isPending}
+                  disabled={isLocked || isPending || isArchived}
                   aria-label={label}
+                  aria-describedby={isArchived ? archivedNoticeId : undefined}
                   className={switchTrack()}
                 >
                   <Switch.Thumb className={switchThumb()} />

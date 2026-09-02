@@ -148,6 +148,7 @@ export const VoiceSettings = ({
               placeholders={placeholders}
               onFieldChange={handleFieldChange}
               isDisabled={isPending}
+              isReadOnly={isArchived}
             />
           ))}
         </div>

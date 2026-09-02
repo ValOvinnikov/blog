@@ -76,4 +76,24 @@ describe(LogoHueField, () => {
 
     await waitFor(() => expect(handleChange).toHaveBeenCalledWith(undefined));
   });
+
+  it('disables the follow switch and the hue slider when isDisabled is true, even with an explicit hue set', () => {
+    render(
+      <LogoHueField
+        accentHue={200}
+        logoHue={90}
+        onChange={vi.fn()}
+        isDark={false}
+        isDisabled={true}
+        aria-describedby="archived-notice"
+      />,
+    );
+
+    const followSwitch = screen.getByRole('switch', {
+      name: 'Follow accent hue',
+    });
+    expect(followSwitch).toHaveAttribute('aria-disabled', 'true');
+    expect(followSwitch).toHaveAttribute('aria-describedby', 'archived-notice');
+    expect(screen.getByRole('slider', { name: 'Logo hue' })).toBeDisabled();
+  });
 });

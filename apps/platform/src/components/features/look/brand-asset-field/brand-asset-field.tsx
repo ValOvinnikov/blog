@@ -13,7 +13,13 @@ import {
 import Image from 'next/image';
 import { unstable_rethrow } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { type ChangeEvent, useRef, useState, useTransition } from 'react';
+import {
+  type AriaAttributes,
+  type ChangeEvent,
+  useRef,
+  useState,
+  useTransition,
+} from 'react';
 
 import { brandAssetFieldVariants } from './brand-asset-field-variants';
 
@@ -24,6 +30,8 @@ export type TBrandAssetFieldProps = {
   hint: string;
   currentUrl: string | undefined;
   onChange: (url: string | undefined) => void;
+  isDisabled?: boolean;
+  'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
 
 /**
@@ -40,6 +48,8 @@ export const BrandAssetField = ({
   hint,
   currentUrl,
   onChange,
+  isDisabled = false,
+  'aria-describedby': ariaDescribedBy,
 }: TBrandAssetFieldProps) => {
   const t = useTranslations('brandAssetField');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -154,7 +164,8 @@ export const BrandAssetField = ({
           size={SIZE.SM}
           variant="ghost"
           onClick={() => inputRef.current?.click()}
-          isDisabled={isPending}
+          isDisabled={isPending || isDisabled}
+          aria-describedby={ariaDescribedBy}
         >
           {isPending
             ? t('uploading')
@@ -168,7 +179,8 @@ export const BrandAssetField = ({
             size={SIZE.SM}
             variant="ghost"
             onClick={handleRemove}
-            isDisabled={isPending}
+            isDisabled={isPending || isDisabled}
+            aria-describedby={ariaDescribedBy}
           >
             {t('remove')}
           </Button>

@@ -254,4 +254,41 @@ describe(FeaturesSettings, () => {
       screen.getByRole('button', { name: 'Save changes' }),
     ).toHaveAccessibleDescription(/This tenant is archived/);
   });
+
+  it('disables every capability toggle, including entitled ones, for an archived tenant', async () => {
+    const user = userEvent.setup();
+    render(
+      <FeaturesSettings
+        tenantSlug="acme"
+        entitledCapabilities={ALL_ENTITLED}
+        initialValues={INITIAL_VALUES}
+        saveAction={vi.fn()}
+        archivedAt={new Date('2026-08-26T00:00:00.000Z')}
+      />,
+    );
+
+    const commentsSwitch = screen.getByRole('switch', { name: 'Comments' });
+    expect(commentsSwitch).toHaveAttribute('data-disabled', '');
+    expect(commentsSwitch).toHaveAccessibleDescription(
+      /This tenant is archived/,
+    );
+
+    await user.click(commentsSwitch);
+    expect(commentsSwitch).toHaveAttribute('data-checked', '');
+  });
+
+  it('leaves entitled capability toggles enabled for a non-archived tenant', () => {
+    render(
+      <FeaturesSettings
+        tenantSlug="acme"
+        entitledCapabilities={ALL_ENTITLED}
+        initialValues={INITIAL_VALUES}
+        saveAction={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole('switch', { name: 'Comments' }),
+    ).not.toHaveAttribute('data-disabled');
+  });
 });

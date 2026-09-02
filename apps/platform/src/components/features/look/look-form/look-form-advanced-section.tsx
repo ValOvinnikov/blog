@@ -22,6 +22,8 @@ export type TLookFormAdvancedSectionProps = {
   radiusScale: TRadiusScale;
   density: TDensity;
   onFieldChange: TLookFormFieldSetter;
+  isArchived: boolean;
+  archivedNoticeId: string;
 };
 
 /** Fonts, radius, density, and terminal chrome — the controls collapsed under "Advanced" by default. */
@@ -32,7 +34,10 @@ export const LookFormAdvancedSection = ({
   radiusScale,
   density,
   onFieldChange,
+  isArchived,
+  archivedNoticeId,
 }: TLookFormAdvancedSectionProps) => {
+  const archivedDescribedBy = isArchived ? archivedNoticeId : undefined;
   const t = useTranslations('lookForm');
   const { field, fieldLabel, fieldHint, switchRow, switchTrack, switchThumb } =
     lookFormVariants();
@@ -62,7 +67,9 @@ export const LookFormAdvancedSection = ({
           <Switch.Root
             checked={isChromeOn}
             onCheckedChange={(checked) => onFieldChange('chromeOn', checked)}
+            disabled={isArchived}
             aria-label={terminalChromeLabel}
+            aria-describedby={archivedDescribedBy}
             className={switchTrack()}
           >
             <Switch.Thumb className={switchThumb()} />
@@ -78,6 +85,8 @@ export const LookFormAdvancedSection = ({
           ariaLabel={headingFontLabel}
           value={headingFont}
           onChange={(font) => onFieldChange('headingFont', font)}
+          isDisabled={isArchived}
+          aria-describedby={archivedDescribedBy}
         />
       </div>
 
@@ -87,6 +96,8 @@ export const LookFormAdvancedSection = ({
           ariaLabel={bodyFontLabel}
           value={bodyFont}
           onChange={(font) => onFieldChange('bodyFont', font)}
+          isDisabled={isArchived}
+          aria-describedby={archivedDescribedBy}
         />
       </div>
 
@@ -98,6 +109,8 @@ export const LookFormAdvancedSection = ({
           options={radiusOptions}
           value={radiusScale}
           onChange={(scale) => onFieldChange('radiusScale', scale)}
+          isDisabled={isArchived}
+          aria-describedby={archivedDescribedBy}
         />
       </div>
 
@@ -109,6 +122,8 @@ export const LookFormAdvancedSection = ({
           options={densityOptions}
           value={density}
           onChange={(option) => onFieldChange('density', option)}
+          isDisabled={isArchived}
+          aria-describedby={archivedDescribedBy}
         />
       </div>
     </>

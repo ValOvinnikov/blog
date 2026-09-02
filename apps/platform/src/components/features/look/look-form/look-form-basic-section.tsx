@@ -19,6 +19,8 @@ export type TLookFormBasicSectionProps = {
   accentHue: number;
   logoHue: number | undefined;
   onFieldChange: TLookFormFieldSetter;
+  isArchived: boolean;
+  archivedNoticeId: string;
 };
 
 /** The preset picker, accent hue, and logo hue controls — the settings a preset choice seeds directly. */
@@ -28,7 +30,10 @@ export const LookFormBasicSection = ({
   accentHue,
   logoHue,
   onFieldChange,
+  isArchived,
+  archivedNoticeId,
 }: TLookFormBasicSectionProps) => {
+  const archivedDescribedBy = isArchived ? archivedNoticeId : undefined;
   const t = useTranslations('lookForm');
   const {
     field,
@@ -50,7 +55,12 @@ export const LookFormBasicSection = ({
       <div className={field()}>
         <span className={fieldLabel()}>{t('presetLabel')}</span>
         <p className={fieldHint()}>{t('presetDescription')}</p>
-        <PresetPicker value={preset} onChange={onPresetChange} />
+        <PresetPicker
+          value={preset}
+          onChange={onPresetChange}
+          isDisabled={isArchived}
+          aria-describedby={archivedDescribedBy}
+        />
       </div>
 
       <div className={field()}>
@@ -66,6 +76,8 @@ export const LookFormBasicSection = ({
             ariaLabel={accentHueLabel}
             value={accentHue}
             onChange={(value) => onFieldChange('accentHue', value)}
+            isDisabled={isArchived}
+            aria-describedby={archivedDescribedBy}
             trackStyle={{ background: accentHueGradient() }}
           />
           <span className={hueValue()}>{accentHue}°</span>
@@ -83,6 +95,8 @@ export const LookFormBasicSection = ({
           logoHue={logoHue}
           onChange={(hue) => onFieldChange('logoHue', hue)}
           isDark={false}
+          isDisabled={isArchived}
+          aria-describedby={archivedDescribedBy}
         />
       </div>
     </>

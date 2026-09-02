@@ -58,4 +58,21 @@ describe(HueSlider, () => {
 
     expect(screen.getByRole('slider', { name: 'Logo hue' })).toBeDisabled();
   });
+
+  it('forwards aria-describedby to the slider', () => {
+    render(
+      <HueSlider
+        ariaLabel="Logo hue"
+        value={50}
+        onChange={vi.fn()}
+        isDisabled={true}
+        aria-describedby="archived-notice"
+      />,
+    );
+
+    expect(screen.getByRole('slider', { name: 'Logo hue' })).toHaveAttribute(
+      'aria-describedby',
+      'archived-notice',
+    );
+  });
 });
