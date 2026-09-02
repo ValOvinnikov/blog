@@ -1,4 +1,5 @@
 import { customRenderAsync } from '@web/testing/custom-render';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
 import TopicNumberedPage, {
@@ -66,7 +67,7 @@ describe('TopicNumberedPage', () => {
   beforeEach(() => {
     permanentRedirectMock.mockClear();
     getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
     getPlatformSanityContextMock.mockReset();
     getPlatformSanityContextMock.mockReturnValue(platformTenant);
   });
@@ -161,7 +162,10 @@ describe('TopicNumberedPage', () => {
       });
 
       expect(metadata.title).toBe('Engineering – Page 2');
-      expect(getTopicPageMock).toHaveBeenCalledWith('engineering', undefined);
+      expect(getTopicPageMock).toHaveBeenCalledWith(
+        'engineering',
+        DEFAULT_TENANT_SANITY_CONTEXT,
+      );
     });
   });
 

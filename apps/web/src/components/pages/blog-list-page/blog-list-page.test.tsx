@@ -1,4 +1,5 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { makeTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
 import { notFound } from 'next/navigation';
 
@@ -92,7 +93,7 @@ describe(`<${BlogListPage.name}/>`, () => {
     moduleRendererMock.mockClear();
     postListModuleMock.mockClear();
     getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
     getTenantBaseUrlMock.mockReset();
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');
     getTopicsMock.mockResolvedValue({

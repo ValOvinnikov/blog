@@ -1,4 +1,5 @@
 import { customRenderAsync } from '@web/testing/custom-render';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
 import TagNumberedPage, {
@@ -66,7 +67,7 @@ describe('TagNumberedPage', () => {
   beforeEach(() => {
     permanentRedirectMock.mockClear();
     getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
     getPlatformSanityContextMock.mockReset();
     getPlatformSanityContextMock.mockReturnValue(platformTenant);
   });
@@ -161,7 +162,10 @@ describe('TagNumberedPage', () => {
       });
 
       expect(metadata.title).toBe('TypeScript – Page 2');
-      expect(getTagPageMock).toHaveBeenCalledWith('typescript', undefined);
+      expect(getTagPageMock).toHaveBeenCalledWith(
+        'typescript',
+        DEFAULT_TENANT_SANITY_CONTEXT,
+      );
     });
   });
 

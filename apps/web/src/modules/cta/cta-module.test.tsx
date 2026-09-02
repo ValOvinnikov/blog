@@ -1,4 +1,5 @@
 import { customRenderAsync } from '@web/testing/custom-render';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { CtaModule } from './cta-module';
 
@@ -25,7 +26,7 @@ describe(CtaModule, () => {
   beforeEach(() => {
     getCtaMock.mockReset();
     getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('renders nothing when the fetch fails', async () => {

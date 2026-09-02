@@ -2,6 +2,7 @@ import { LOCALE_ISO_CODES, routes, SOCIAL_PLATFORMS } from '@blog/config';
 import userEvent from '@testing-library/user-event';
 import realMessages from '@web/i18n/messages/en.json';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import type { ReactNode } from 'react';
 
 import LocaleLayout, { generateMetadata, generateStaticParams } from './layout';
@@ -126,7 +127,7 @@ describe('LocaleLayout', () => {
     isProductionEnvironmentMock.mockReturnValue(true);
     useSessionMock.mockReturnValue({ data: null, status: 'unauthenticated' });
     getEnabledOAuthProviderIdsMock.mockReturnValue(['github', 'google']);
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
     getTenantBaseUrlMock.mockResolvedValue(undefined);
   });
 

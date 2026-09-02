@@ -1,4 +1,5 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import {
   makeTopic,
   makeTopicWithPostCount,
@@ -109,7 +110,7 @@ describe(`<${TopicPage.name}/>`, () => {
     moduleRendererMock.mockClear();
     postListModuleMock.mockClear();
     getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
     getTenantBaseUrlMock.mockReset();
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');
     getTopicsMock.mockResolvedValue({

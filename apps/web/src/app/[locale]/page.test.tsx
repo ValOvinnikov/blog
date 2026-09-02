@@ -1,5 +1,6 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
 import HomePage, { generateMetadata } from './page';
@@ -41,7 +42,7 @@ describe('HomePage', () => {
   beforeEach(() => {
     getHomePageMock.mockReset();
     getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('calls notFound() and logs when the fetch fails', async () => {
@@ -110,7 +111,7 @@ describe('generateMetadata', () => {
   beforeEach(() => {
     getHomePageMock.mockReset();
     getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('returns empty metadata and logs when the fetch fails', async () => {
