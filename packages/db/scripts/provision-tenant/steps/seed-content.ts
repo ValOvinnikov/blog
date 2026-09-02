@@ -1,7 +1,4 @@
-import {
-  setTenantSanityWriteToken,
-  setTenantSeededAt,
-} from '@blog/db/queries/tenants';
+import { setTenantSanityWriteTokenAndSeededAt } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { createClient } from '@sanity/client';
 
@@ -46,10 +43,7 @@ function isGrantPropagationError(error: unknown): boolean {
  * Step 2 — seeds the fixed starter content template (singletons + one
  * starter post + navigation, see `starter-content.ts`) into the tenant's
  * brand-new, empty dataset, using an Editor-scoped Sanity token minted for
- * this run. On success the token is persisted (encrypted) as this tenant's
- * write credential rather than revoked, so later writes can target this
- * tenant's own project; on failure it's revoked, leaving nothing live and
- * unrecorded.
+ * this run.
  *
  * Idempotent: skips entirely once `tenants.seededAt` is set.
  * `createOrReplace` (rather than `create`) also makes a single run safe
@@ -114,7 +108,11 @@ export async function seedTenantContent(
       sleep: deps.sleep,
     });
 
-    await setTenantSanityWriteToken(tenant.id, writeToken.token);
+    await setTenantSanityWriteTokenAndSeededAt(
+      tenant.id,
+      writeToken.token,
+      new Date(),
+    );
     persisted = true;
   } finally {
     if (!persisted) {
@@ -125,6 +123,4 @@ export async function seedTenantContent(
       });
     }
   }
-
-  await setTenantSeededAt(tenant.id, new Date());
 }
