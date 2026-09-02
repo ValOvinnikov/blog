@@ -1,13 +1,13 @@
-import { env } from '@web/utils/env/env';
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
 import type { MetadataRoute } from 'next';
 
 /**
- * Production: allows every crawler and points at the sitemap.
- * `NEXT_PUBLIC_SITE_URL` unset falls back to a relative `/sitemap.xml`
- * rather than an empty sitemap field — unlike `sitemap.ts`'s entries, a
- * relative sitemap reference here is still valid (resolved relative to
- * `robots.txt`'s own origin) so there is no need to omit it.
+ * Production: allows every crawler and points at the sitemap. No resolvable
+ * base URL falls back to a relative `/sitemap.xml` rather than an empty
+ * sitemap field — unlike `sitemap.ts`'s entries, a relative sitemap
+ * reference here is still valid (resolved relative to `robots.txt`'s own
+ * origin) so there is no need to omit it.
  *
  * Non-production (e.g. `development` after a prod→dev dataset refresh):
  * the root layout's `generateMetadata` already emits a page-level
@@ -21,8 +21,8 @@ import type { MetadataRoute } from 'next';
  * instead, since there's no reason to actively invite crawling of a
  * non-production environment even though it isn't blocked outright.
  */
-export default function robots(): MetadataRoute.Robots {
-  const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
+export default async function robots(): Promise<MetadataRoute.Robots> {
+  const siteUrl = (await getTenantBaseUrl()) ?? '';
 
   if (!isProductionEnvironment()) {
     return {

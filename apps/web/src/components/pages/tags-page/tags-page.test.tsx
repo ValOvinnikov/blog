@@ -3,39 +3,44 @@ import { notFound } from 'next/navigation';
 
 import { TagsPage } from './tags-page';
 
-const { getIndexPageMock, taxonomyListModuleMock, getTenantSanityContextMock } =
-  vi.hoisted(() => ({
-    getIndexPageMock: vi.fn(),
-    getTenantSanityContextMock: vi.fn(),
-    // `TaxonomyListModule` is an async Server Component — real RSC async-
-    // component nesting isn't renderable through `@testing-library/react`'s
-    // client renderer. Stubbed as a plain sync component so this suite can
-    // assert `TagsPage` passes the right props through without needing a
-    // real async render; its own fetch/render logic is covered by
-    // `taxonomy-list-module.test.tsx`. `TagsPageView`'s own rendering (h1,
-    // breadcrumbs, JSON-LD, composed content) is covered by
-    // `tags-page-view.test.tsx`.
-    taxonomyListModuleMock: vi.fn(
-      ({
-        id,
-        accessibleTitle,
-        emptyMessage,
-        buildHref,
-        formatPostCount,
-      }: {
-        id: string;
-        accessibleTitle: string;
-        emptyMessage: string;
-        buildHref: (slug: string) => string;
-        formatPostCount: (count: number) => string;
-      }) => (
-        <div data-testid="taxonomy-list-module-stub">
-          {id}:{accessibleTitle}:{emptyMessage}:{buildHref('typescript')}:
-          {formatPostCount(5)}
-        </div>
-      ),
+const {
+  getIndexPageMock,
+  taxonomyListModuleMock,
+  getTenantSanityContextMock,
+  getTenantBaseUrlMock,
+} = vi.hoisted(() => ({
+  getIndexPageMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
+  getTenantBaseUrlMock: vi.fn(),
+  // `TaxonomyListModule` is an async Server Component — real RSC async-
+  // component nesting isn't renderable through `@testing-library/react`'s
+  // client renderer. Stubbed as a plain sync component so this suite can
+  // assert `TagsPage` passes the right props through without needing a
+  // real async render; its own fetch/render logic is covered by
+  // `taxonomy-list-module.test.tsx`. `TagsPageView`'s own rendering (h1,
+  // breadcrumbs, JSON-LD, composed content) is covered by
+  // `tags-page-view.test.tsx`.
+  taxonomyListModuleMock: vi.fn(
+    ({
+      id,
+      accessibleTitle,
+      emptyMessage,
+      buildHref,
+      formatPostCount,
+    }: {
+      id: string;
+      accessibleTitle: string;
+      emptyMessage: string;
+      buildHref: (slug: string) => string;
+      formatPostCount: (count: number) => string;
+    }) => (
+      <div data-testid="taxonomy-list-module-stub">
+        {id}:{accessibleTitle}:{emptyMessage}:{buildHref('typescript')}:
+        {formatPostCount(5)}
+      </div>
     ),
-  }));
+  ),
+}));
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -51,6 +56,10 @@ vi.mock('@web/modules/taxonomy-list/taxonomy-list-module', () => ({
 
 vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
   getTenantSanityContext: getTenantSanityContextMock,
+}));
+
+vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
+  getTenantBaseUrl: getTenantBaseUrlMock,
 }));
 
 vi.mock('@web/components/shared/smart-link', () => ({
@@ -76,6 +85,8 @@ describe(`<${TagsPage.name}/>`, () => {
     taxonomyListModuleMock.mockClear();
     getTenantSanityContextMock.mockReset();
     getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantBaseUrlMock.mockReset();
+    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
   });
 
   it('calls notFound() when the fetch fails', async () => {

@@ -7,6 +7,7 @@ const {
   sendEmailMock,
   clearNewsletterSubscribedCookieMock,
   getRequestTenantIdMock,
+  getTenantBaseUrlMock,
 } = vi.hoisted(() => ({
   authMock: vi.fn(),
   unsubscribeMock: vi.fn(),
@@ -14,6 +15,7 @@ const {
   sendEmailMock: vi.fn(),
   clearNewsletterSubscribedCookieMock: vi.fn(),
   getRequestTenantIdMock: vi.fn(),
+  getTenantBaseUrlMock: vi.fn(),
 }));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
@@ -39,15 +41,16 @@ vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
   getRequestTenantId: getRequestTenantIdMock,
 }));
 
+vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
+  getTenantBaseUrl: getTenantBaseUrlMock,
+}));
+
 const TENANT_ID = 'tenant-1';
 
 // The real `@t3-oss/env-nextjs` module throws when a server var is read
 // under jsdom — mock it the same way `newsletter-actions.test.ts` does.
 vi.mock('@web/utils/env/env', () => ({
-  env: {
-    NEWSLETTER_FROM_ADDRESS: undefined,
-    NEXT_PUBLIC_SITE_URL: 'https://example.com',
-  },
+  env: { NEWSLETTER_FROM_ADDRESS: undefined },
 }));
 
 const session = {
@@ -134,6 +137,8 @@ describe('resendConfirmationAction', () => {
     sendEmailMock.mockReset();
     getRequestTenantIdMock.mockReset();
     getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
+    getTenantBaseUrlMock.mockReset();
+    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
   });
 
   it('returns { ok: false } without resending when there is no session', async () => {

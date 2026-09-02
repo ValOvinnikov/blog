@@ -23,6 +23,7 @@ const {
   getNewsletterSettingsMock,
   isCapabilityEnabledMock,
   getTenantSanityContextMock,
+  getTenantBaseUrlMock,
 } = vi.hoisted(() => ({
   getPostMock: vi.fn(),
   useSessionMock: vi.fn(),
@@ -30,6 +31,7 @@ const {
   getNewsletterSettingsMock: vi.fn(),
   isCapabilityEnabledMock: vi.fn(),
   getTenantSanityContextMock: vi.fn(),
+  getTenantBaseUrlMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -73,6 +75,10 @@ vi.mock('@web/server/settings-features/is-capability-enabled', () => ({
 
 vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
   getTenantSanityContext: getTenantSanityContextMock,
+}));
+
+vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
+  getTenantBaseUrl: getTenantBaseUrlMock,
 }));
 
 // `BookmarkButton` calls `useToast()` unconditionally (it's a hook), so any
@@ -124,6 +130,8 @@ describe(`<${BlogPostPage.name}/>`, () => {
     isCapabilityEnabledMock.mockResolvedValue(true);
     getTenantSanityContextMock.mockReset();
     getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantBaseUrlMock.mockReset();
+    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
   });
 
   afterEach(() => {

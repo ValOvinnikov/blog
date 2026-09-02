@@ -26,7 +26,7 @@ export type TBlogPostingSchema = {
  * when the post has none — schema.org's `keywords` accepts free-form `Text`.
  *
  * Returns `undefined` when `siteUrl` is empty, mirroring how
- * `[locale]/layout.tsx` treats a missing `NEXT_PUBLIC_SITE_URL` as "no
+ * `[locale]/layout.tsx` treats an unresolved base URL as "no
  * `metadataBase`" rather than defaulting to `''` — schema.org's `url` must
  * be absolute, so silently concatenating an empty `siteUrl` with a relative
  * `routes.post()` path would produce an invalid (relative) `url` and fail
@@ -34,7 +34,7 @@ export type TBlogPostingSchema = {
  * when this returns `undefined`.
  *
  * @example
- * const schema = buildBlogPostingSchema(post, env.NEXT_PUBLIC_SITE_URL ?? '');
+ * const schema = buildBlogPostingSchema(post, (await getTenantBaseUrl()) ?? '');
  * return schema ? <JsonLd schema={schema} /> : null;
  */
 export const buildBlogPostingSchema = (

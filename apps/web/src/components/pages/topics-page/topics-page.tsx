@@ -2,9 +2,9 @@ import { routes, TAXONOMY_KIND } from '@blog/config';
 import { service } from '@blog/service';
 import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
-import { env } from '@web/utils/env/env';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { getTranslations } from 'next-intl/server';
 
@@ -29,7 +29,7 @@ export const TopicsPage = async () => {
     'topics_page.fetch_failed',
   );
 
-  const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
+  const siteUrl = (await getTenantBaseUrl()) ?? '';
   const breadcrumbTrail: IBreadcrumbItem[] = [
     { label: breadcrumbsT('home'), href: routes.home() },
     { label: breadcrumbsT('topics'), href: routes.topics() },

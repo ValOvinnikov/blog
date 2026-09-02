@@ -20,6 +20,7 @@ const {
   useSessionMock,
   getEnabledOAuthProviderIdsMock,
   getTenantSanityContextMock,
+  getTenantBaseUrlMock,
 } = vi.hoisted(() => ({
   getSiteSettingsMock: vi.fn(),
   getNavigationMock: vi.fn(),
@@ -34,10 +35,15 @@ const {
   useSessionMock: vi.fn(),
   getEnabledOAuthProviderIdsMock: vi.fn(),
   getTenantSanityContextMock: vi.fn(),
+  getTenantBaseUrlMock: vi.fn(),
 }));
 
 vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
   getTenantSanityContext: getTenantSanityContextMock,
+}));
+
+vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
+  getTenantBaseUrl: getTenantBaseUrlMock,
 }));
 
 vi.mock('@blog/auth/utils/oauth-providers/oauth-providers', () => ({
@@ -121,6 +127,7 @@ describe('LocaleLayout', () => {
     useSessionMock.mockReturnValue({ data: null, status: 'unauthenticated' });
     getEnabledOAuthProviderIdsMock.mockReturnValue(['github', 'google']);
     getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantBaseUrlMock.mockResolvedValue(undefined);
   });
 
   describe('generateStaticParams', () => {
