@@ -1,0 +1,1 @@
+ALTER TABLE "tenants" ADD COLUMN "sanity_write_token_encrypted" text;

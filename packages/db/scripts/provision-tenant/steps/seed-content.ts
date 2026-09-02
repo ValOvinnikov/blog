@@ -1,4 +1,4 @@
-import { setTenantSeededAt } from '@blog/db/queries/tenants';
+import { setTenantSanityWriteTokenAndSeededAt } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { createClient } from '@sanity/client';
 
@@ -13,7 +13,7 @@ import {
 import { buildStarterDocuments } from './starter-content';
 
 const SANITY_API_VERSION = '2024-01-01';
-const SEED_TOKEN_LABEL = 'provisioning-seed (temporary)';
+const SEED_TOKEN_LABEL = 'web-write (provisioned)';
 
 // Bounded to ride out a freshly-minted token's grant-propagation delay, not to mask a genuine misconfiguration.
 export const SEED_TRANSACTION_MAX_ATTEMPTS = 5;
@@ -42,10 +42,8 @@ function isGrantPropagationError(error: unknown): boolean {
 /**
  * Step 2 — seeds the fixed starter content template (singletons + one
  * starter post + navigation, see `starter-content.ts`) into the tenant's
- * brand-new, empty dataset. Uses a transient Editor-scoped Sanity token
- * minted for this run only and revoked immediately after: this dataset has
- * no content yet, so there's no existing write token to reuse, and no
- * reason to leave one lying around once seeding is done.
+ * brand-new, empty dataset, using an Editor-scoped Sanity token minted for
+ * this run.
  *
  * Idempotent: skips entirely once `tenants.seededAt` is set.
  * `createOrReplace` (rather than `create`) also makes a single run safe
@@ -72,6 +70,8 @@ export async function seedTenantContent(
     label: SEED_TOKEN_LABEL,
     role: 'editor',
   });
+
+  let persisted = false;
 
   try {
     const client = deps.createClient({
@@ -107,13 +107,20 @@ export async function seedTenantContent(
       isRetryable: isGrantPropagationError,
       sleep: deps.sleep,
     });
-  } finally {
-    await deps.revokeWriteToken({
-      token: env.sanityManagementToken,
-      projectId: tenant.sanityProjectId,
-      robotId: writeToken.id,
-    });
-  }
 
-  await setTenantSeededAt(tenant.id, new Date());
+    await setTenantSanityWriteTokenAndSeededAt(
+      tenant.id,
+      writeToken.token,
+      new Date(),
+    );
+    persisted = true;
+  } finally {
+    if (!persisted) {
+      await deps.revokeWriteToken({
+        token: env.sanityManagementToken,
+        projectId: tenant.sanityProjectId,
+        robotId: writeToken.id,
+      });
+    }
+  }
 }

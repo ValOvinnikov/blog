@@ -34,6 +34,7 @@ const tenant: TTenant = {
   sanityProjectId: 'proj-1',
   sanityDataset: 'production',
   sanityReadTokenEncrypted: null,
+  sanityWriteTokenEncrypted: null,
   locale: 'en',
   plan: 'FREE',
   status: 'ACTIVE',
