@@ -1259,4 +1259,125 @@ describe(ProvisioningStatusView, () => {
       expect(within(sidebar).getByText('Complete')).toBeVisible();
     });
   });
+
+  describe('step and run timestamps', () => {
+    it("shows a done step's updatedAt as its timestamp", () => {
+      const tenant = makeTenant({
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+            updatedAt: '2026-08-12T14:19:00.000Z',
+          },
+        },
+      });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      expect(screen.getByText('Aug 12, 2026, 2:19 PM')).toBeVisible();
+    });
+
+    it("shows a failed step's updatedAt as its timestamp", () => {
+      const tenant = makeTenant({
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+            error: 'boom',
+            updatedAt: '2026-08-12T14:20:00.000Z',
+          },
+        },
+      });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      expect(screen.getByText('Aug 12, 2026, 2:20 PM')).toBeVisible();
+    });
+
+    it('shows "now" for a running step instead of a timestamp', () => {
+      const tenant = makeTenant({
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+          },
+        },
+      });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      expect(screen.getByText('now')).toBeVisible();
+    });
+
+    it('shows no timestamp for a done step with no recorded updatedAt', () => {
+      const tenant = makeTenant({
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+          },
+        },
+      });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      expect(screen.queryByText(/\d{4}/)).not.toBeInTheDocument();
+    });
+
+    it('renders no Run card for a tenant with no run', () => {
+      const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      expect(
+        screen.queryByRole('heading', { level: 2, name: 'Run' }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('renders a Run card with Started/Finished/Registry when the run exists', () => {
+      const tenant = makeTenant({
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          run: {
+            startedAt: '2026-08-12T14:18:00.000Z',
+            finishedAt: '2026-08-12T14:22:00.000Z',
+            registry: 'production',
+          },
+        },
+      });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      expect(
+        screen.getByRole('heading', { level: 2, name: 'Run' }),
+      ).toBeVisible();
+      expect(screen.getByText('Aug 12, 2026, 2:18 PM')).toBeVisible();
+      expect(screen.getByText('Aug 12, 2026, 2:22 PM')).toBeVisible();
+      expect(screen.getByText('production')).toBeVisible();
+    });
+  });
 });

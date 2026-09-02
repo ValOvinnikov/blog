@@ -8,10 +8,10 @@ import {
 import type {
   TProvisioningStepState,
   TTenant,
-  TTenantProvisioningSteps,
+  TTenantProvisioningState,
 } from '@blog/db/schema/tenants';
 
-export const idleProvisioningSteps = (): TTenantProvisioningSteps => {
+export const idleProvisioningSteps = (): TTenantProvisioningState => {
   const idle: TProvisioningStepState = {
     status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
   };

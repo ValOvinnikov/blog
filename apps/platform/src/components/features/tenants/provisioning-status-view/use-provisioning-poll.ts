@@ -10,8 +10,9 @@ import {
   type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
 import type {
+  TProvisioningRun,
   TTenant,
-  TTenantProvisioningSteps,
+  TTenantProvisioningState,
 } from '@blog/db/schema/tenants';
 import { useToast } from '@platform/context/toast-provider';
 import type { TDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
@@ -77,7 +78,7 @@ const isTerminalProvisioningStatus = (
 
 const shouldContinuePolling = (
   status: TTenantProvisioningStatus | null,
-  steps: TTenantProvisioningSteps | null,
+  steps: TTenantProvisioningState | null,
 ): boolean => {
   if (isTerminalProvisioningStatus(status)) {
     return false;
@@ -100,12 +101,17 @@ const shouldContinuePolling = (
 };
 
 const stepStatusesFor = (
-  steps: TTenantProvisioningSteps | null,
+  steps: TTenantProvisioningState | null,
 ): TTenantProvisioningStepStatus[] =>
   STEP_ORDER.map(
     (stepKey) =>
       steps?.[stepKey]?.status ?? TENANT_PROVISIONING_STEP_STATUS.IDLE,
   );
+
+const stepUpdatedAtFor = (
+  steps: TTenantProvisioningState | null,
+): (string | undefined)[] =>
+  STEP_ORDER.map((stepKey) => steps?.[stepKey]?.updatedAt);
 
 const stepStatusesEqual = (
   a: TTenantProvisioningStepStatus[],
@@ -127,10 +133,14 @@ export type TUseProvisioningPollResult = {
   handleStart: () => void;
   handleRetry: () => void;
   provisioningStatus: TTenantProvisioningStatus | null;
-  provisioningSteps: TTenantProvisioningSteps | null;
+  provisioningSteps: TTenantProvisioningState | null;
   /** `PROVISIONING` while a Start/Retry dispatch is in flight, whatever the last-polled status was. */
   effectiveProvisioningStatus: TTenantProvisioningStatus | null;
   stepStatuses: TTenantProvisioningStepStatus[];
+  /** Each step's last status-change timestamp, parallel to `stepStatuses` and `STEP_ORDER` — `undefined` for a step with none recorded. */
+  stepUpdatedAt: (string | undefined)[];
+  /** The overall run this set of steps belongs to — `undefined` for a tenant that has never been provisioned, or one provisioned before this field existed. */
+  provisioningRun: TProvisioningRun | undefined;
   allIdle: boolean;
   isProvisioningRunning: boolean;
   overallStepStatus: TTenantProvisioningStepStatus;
@@ -175,7 +185,7 @@ export const useProvisioningPoll = (
   const [provisioningStatus, setProvisioningStatus] =
     useState<TTenantProvisioningStatus | null>(tenant.provisioningStatus);
   const [provisioningSteps, setProvisioningSteps] =
-    useState<TTenantProvisioningSteps | null>(tenant.provisioningSteps);
+    useState<TTenantProvisioningState | null>(tenant.provisioningSteps);
   // The poll loop's own on/off switch — only a poll tick may turn it off.
   const [isPollingActive, setIsPollingActive] = useState(() =>
     shouldContinuePolling(tenant.provisioningStatus, tenant.provisioningSteps),
@@ -327,6 +337,8 @@ export const useProvisioningPoll = (
   }, [tenant.id, domainStatus]);
 
   const stepStatuses = stepStatusesFor(provisioningSteps);
+  const stepUpdatedAt = stepUpdatedAtFor(provisioningSteps);
+  const provisioningRun = provisioningSteps?.run;
   const allIdle = stepStatuses.every(
     (status) => status === TENANT_PROVISIONING_STEP_STATUS.IDLE,
   );
@@ -419,6 +431,8 @@ export const useProvisioningPoll = (
     provisioningSteps,
     effectiveProvisioningStatus,
     stepStatuses,
+    stepUpdatedAt,
+    provisioningRun,
     allIdle,
     isProvisioningRunning,
     overallStepStatus,
