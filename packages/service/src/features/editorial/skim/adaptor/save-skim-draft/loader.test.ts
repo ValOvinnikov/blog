@@ -119,4 +119,34 @@ describe(saveSkimDraft, () => {
       expect.anything(),
     );
   });
+
+  it('passes the tenant context through to getWriteClient', async () => {
+    const client = makeMockClient();
+    mockGetWriteClient.mockReturnValue(client as never);
+    const tenant = {
+      projectId: 'tenant-a',
+      dataset: 'production',
+      token: 'tok-a',
+    };
+
+    await saveSkimDraft(
+      { postId: 'post-1', takeaways: ['a', 'b', 'c'], model: 'x' },
+      tenant,
+    );
+
+    expect(mockGetWriteClient).toHaveBeenCalledWith(tenant);
+  });
+
+  it('calls getWriteClient with undefined when no tenant is given, preserving the legacy client', async () => {
+    const client = makeMockClient();
+    mockGetWriteClient.mockReturnValue(client as never);
+
+    await saveSkimDraft({
+      postId: 'post-1',
+      takeaways: ['a', 'b', 'c'],
+      model: 'x',
+    });
+
+    expect(mockGetWriteClient).toHaveBeenCalledWith(undefined);
+  });
 });

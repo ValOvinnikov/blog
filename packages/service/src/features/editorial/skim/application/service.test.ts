@@ -39,6 +39,19 @@ describe('createSkimService', () => {
 
       expect(result).toEqual({ ok: false, error });
     });
+
+    it('passes an optional tenant context through to the loader', async () => {
+      mockGetPublishedPostBody.mockResolvedValue([]);
+      const tenant = {
+        projectId: 'tenant-a',
+        dataset: 'production',
+        token: 'tok-a',
+      };
+
+      await createSkimService().v1.getPublishedPostBody('post-1', tenant);
+
+      expect(mockGetPublishedPostBody).toHaveBeenCalledWith('post-1', tenant);
+    });
   });
 
   describe('v1.saveSkimDraft', () => {
@@ -65,6 +78,24 @@ describe('createSkimService', () => {
       });
 
       expect(result).toEqual({ ok: false, error });
+    });
+
+    it('passes an optional tenant context through to the loader', async () => {
+      mockSaveSkimDraft.mockResolvedValue(undefined);
+      const tenant = {
+        projectId: 'tenant-a',
+        dataset: 'production',
+        token: 'tok-a',
+      };
+      const input = {
+        postId: 'post-1',
+        takeaways: ['a', 'b', 'c'],
+        model: 'x',
+      };
+
+      await createSkimService().v1.saveSkimDraft(input, tenant);
+
+      expect(mockSaveSkimDraft).toHaveBeenCalledWith(input, tenant);
     });
   });
 });

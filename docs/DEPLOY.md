@@ -298,13 +298,12 @@ two-branch split is recent and the secret wiring has not fully caught up:
   asymmetry, where a mis-set production secret would migrate the wrong branch
   with no backup and no failure, no longer exists. The tenant lifecycle
   workflows never read this secret at all, deliberately, so a tenant-registry
-  dispatch can never repoint a deploy job's migration: `provision-tenant.yml`
-  and `deprovision-tenant.yml` bind to whichever Environment their dispatch's
+  dispatch can never repoint a deploy job's migration: all three tenant
+  lifecycle workflows bind to whichever Environment their dispatch's
   `environment` input names and read that Environment's own
-  `TENANT_REGISTRY_DATABASE_URL` secret instead; `recheck-tenant-owners.yml`
-  stays pinned to `production` and selects between that Environment's own
-  `TENANT_REGISTRY_DATABASE_URL_DEV`/`_PROD` secrets by the same input (§4
-  below). The two purposes — tenant registry and deploy migration — used to
+  `TENANT_REGISTRY_DATABASE_URL` secret instead (§4 below).
+  `recheck-tenant-owners.yml` additionally falls back to `production` when
+  that input is absent, which is every `schedule`-triggered sweep. The two purposes — tenant registry and deploy migration — used to
   share one secret until #2056 split them apart, after pointing it at
   `development` to unblock tenant provisioning from `admin-dev.{your-hosting}`
   had silently repointed a production tag's `migrate-db` step at
@@ -497,16 +496,24 @@ job resolves its own project's id + token:
       Neon branch's direct connection string — the `migrate-db` job's
       `drizzle-kit migrate`; same value as the Vercel env var above). **Confirm
       it actually points at the `development` branch** — see the Neon
-      Postgres section above and #2057. **Not** read by
-      `provision-tenant.yml`/`deprovision-tenant.yml` — see this
-      environment's own `TENANT_REGISTRY_DATABASE_URL` below.
+      Postgres section above and #2057. **Not** read by any of the three
+      tenant lifecycle workflows — see this environment's own
+      `TENANT_REGISTRY_DATABASE_URL` below.
 - [ ] Secret `TENANT_REGISTRY_DATABASE_URL` = `<DEV_DATABASE_URL_UNPOOLED>`
       (the same value as this environment's own `DATABASE_URL_UNPOOLED`
-      above, under a separate secret name) — read by
-      `provision-tenant.yml`/`deprovision-tenant.yml` when dispatched with
-      `environment: development`. See the `production` environment's own
-      `TENANT_REGISTRY_DATABASE_URL` bullet below for why this stays a
-      separate secret from `DATABASE_URL_UNPOOLED` rather than reusing it.
+      above, under a separate secret name) — read by all three tenant
+      lifecycle workflows when dispatched with `environment: development`.
+      See the `production` environment's own `TENANT_REGISTRY_DATABASE_URL`
+      bullet below for why this stays a separate secret from
+      `DATABASE_URL_UNPOOLED` rather than reusing it.
+- [ ] Secret `SANITY_MANAGEMENT_TOKEN` — the same organization-level token
+      described in the `production` checklist below. Required here too: every
+      tenant lifecycle workflow resolves it from whichever Environment its
+      dispatch targets, so a `development` dispatch reads this copy and fails
+      loudly without it.
+- [ ] (Optional) Secret `RESEND_API_KEY` — only
+      `recheck-tenant-owners.yml`'s operator notification reads it. Unset
+      skips that email; the sweep itself still runs.
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
 - [ ] Variable `VERCEL_PROJECT_ID_WEB` = `<VERCEL_PROJECT_ID>` (**blog-web-dev**)
@@ -520,10 +527,9 @@ job resolves its own project's id + token:
 - [ ] Secret `DATABASE_URL_UNPOOLED` = `<PRD_DATABASE_URL_UNPOOLED>` (the `main`
       Neon branch's direct connection string — the `migrate-db` job's
       `pg_dump` backup + `drizzle-kit migrate`; same value as the Vercel env
-      var above). **Not** read by `provision-tenant.yml`/`deprovision-tenant.yml`
-      (see this environment's own `TENANT_REGISTRY_DATABASE_URL` below) or by
-      `recheck-tenant-owners.yml` (see `TENANT_REGISTRY_DATABASE_URL_DEV`/
-      `_PROD` below), deliberately, so repointing the tenant registry at a
+      var above). **Not** read by any of the three tenant lifecycle
+      workflows (see this environment's own `TENANT_REGISTRY_DATABASE_URL`
+      below), deliberately, so repointing the tenant registry at a
       different Neon branch can never silently repoint this deploy job too
       (#2056 — see the Neon Postgres section above for the incident that
       motivated it).
@@ -537,50 +543,47 @@ job resolves its own project's id + token:
 
 `.github/workflows/provision-tenant.yml`/`deprovision-tenant.yml`
 (`workflow_dispatch` only, the former triggered from `apps/platform`'s "Add
-tenant" wizard) bind to whichever Environment their dispatch's `environment`
-input names (`development`/`production`, default `production`) — every
-credential they need, including the tenant registry connection string,
-resolves from that same Environment, never a mix of the two.
-`.github/workflows/recheck-tenant-owners.yml` is different: it stays pinned
-to this `production` environment regardless of its own `environment` input
-(a `schedule`-triggered run has no `inputs` context to bind against), and
-that input instead only picks which of two `production`-scoped secrets a
-dispatch reads — see the `TENANT_REGISTRY_DATABASE_URL_DEV`/`_PROD` bullets
-below.
+tenant" wizard) and `.github/workflows/recheck-tenant-owners.yml` all bind to
+whichever Environment their dispatch's `environment` input names
+(`development`/`production`, default `production`) — every credential they
+need, including the tenant registry connection string, resolves from that
+same Environment, never a mix of the two.
+
+`recheck-tenant-owners.yml` also runs on a `schedule:`, and a scheduled run
+carries no `inputs` context at all, so its binding is
+`${{ inputs.environment || 'production' }}` rather than the bare input its
+two siblings use: every cron sweep targets `production`, and only a manual
+dispatch can point it at `development`.
 
 > **`TENANT_REGISTRY_DATABASE_URL` must be created as a Secret, not a
 > Variable, in both the `development` and `production` environments** (see
 > this environment's bullet below and the `development` environment's own
 > above). GitHub Environments keep Secrets and Variables in separate
 > namespaces — `secrets.NAME` and `vars.NAME` never see each other's values.
-> `provision-tenant.yml`/`deprovision-tenant.yml` read
+> All three tenant lifecycle workflows read
 > `secrets.TENANT_REGISTRY_DATABASE_URL` specifically; creating it as a
 > Variable by mistake leaves the secret unset, and the job fails every
 > dispatch with an empty `DATABASE_URL` rather than silently falling through
-> to the wrong branch. The same applies to `TENANT_REGISTRY_DATABASE_URL_DEV`/
-> `_PROD` below, which only `recheck-tenant-owners.yml` reads.
+> to the wrong branch.
 
 - [ ] Secret `TENANT_REGISTRY_DATABASE_URL` = `<PRD_DATABASE_URL_UNPOOLED>`
       (the same value as this environment's own `DATABASE_URL_UNPOOLED`
-      above, under a separate secret name) — read by
-      `provision-tenant.yml`/`deprovision-tenant.yml` when dispatched with
-      `environment: production` (the default). Deliberately a **different
+      above, under a separate secret name) — read by all three tenant
+      lifecycle workflows when dispatched with `environment: production`
+      (the default), and by every scheduled `recheck-tenant-owners.yml`
+      sweep. Deliberately a **different
       secret name** from `DATABASE_URL_UNPOOLED`, even though the value is
       identical here, so retargeting the tenant registry can never silently
       retarget this deploy job's own migration too. The `development`
       environment carries its own copy of this same secret — see that
       environment's checklist above.
-- [ ] Secret `TENANT_REGISTRY_DATABASE_URL_DEV` = `<DEV_DATABASE_URL_UNPOOLED>`
-      (the same value as the `development` environment's own
-      `DATABASE_URL_UNPOOLED`) — read only by `recheck-tenant-owners.yml`,
-      which selects between this secret and the one below by its own
-      `environment` input while the job itself stays pinned to this
-      `production` environment.
-- [ ] Secret `TENANT_REGISTRY_DATABASE_URL_PROD` = `<PRD_DATABASE_URL_UNPOOLED>`
-      (the same value as this environment's own `DATABASE_URL_UNPOOLED`
-      above) — the other half of that same pair, used when
-      `recheck-tenant-owners.yml`'s own `environment` input is `production`
-      (the default).
+- [ ] **Delete** the retired Secrets `TENANT_REGISTRY_DATABASE_URL_DEV` and
+      `TENANT_REGISTRY_DATABASE_URL_PROD`. `recheck-tenant-owners.yml` was
+      their only reader and now resolves this environment's own
+      `TENANT_REGISTRY_DATABASE_URL` above, like its two siblings. Leaving
+      them in place is harmless to any workflow but re-creates exactly the
+      drift the split caused: several secrets holding the same connection
+      string, only one of which anyone remembers to rotate.
 - [ ] Secret `SANITY_MANAGEMENT_TOKEN` — an **organization-level** Sanity
       token with "create project" permission (broader than `SANITY_MIGRATE_TOKEN`,
       which is scoped to one already-existing project). Mint it at

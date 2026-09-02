@@ -8,6 +8,12 @@ const meta = {
   component: DeepAside,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
+  argTypes: {
+    kind: {
+      control: 'select',
+      options: Object.values(ASIDE_KIND),
+    },
+  },
   args: {
     kind: ASIDE_KIND.DIGRESSION,
     label: 'Digression',

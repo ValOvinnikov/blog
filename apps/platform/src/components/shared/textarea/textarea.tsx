@@ -5,7 +5,7 @@ import { textareaVariants, type TTextareaVariants } from './textarea-variants';
 export type TTextareaProps = {
   value: string;
   onChange: (value: string) => void;
-  ariaLabel: string;
+  ariaLabel?: string;
   id?: string;
   placeholder?: string;
   rows?: number;
