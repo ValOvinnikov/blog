@@ -1,8 +1,16 @@
 import type { TTenant } from '@blog/db/schema/tenants';
 
-import type { TDeprovisionEnv } from '../lib/env';
-
 const REVALIDATE_PATH = '/api/revalidate-site-config';
+
+// Deliberately narrower than `TDeprovisionEnv` — this is the only field
+// subset the request below reads, so any caller's env satisfies it
+// structurally, including `scripts/invalidate-tenant-cache/`'s own,
+// unrelated env shape.
+export type TInvalidateTenantCacheEnv = {
+  dryRun: boolean;
+  webAppUrl: string | undefined;
+  siteConfigRevalidateSecret: string | undefined;
+};
 
 /**
  * Step 6 — purges the now-archived tenant's cached pages by POSTing to
@@ -13,7 +21,7 @@ const REVALIDATE_PATH = '/api/revalidate-site-config';
  */
 export async function invalidateTenantCache(
   tenant: TTenant,
-  env: TDeprovisionEnv,
+  env: TInvalidateTenantCacheEnv,
 ): Promise<void> {
   if (env.dryRun) {
     console.warn(

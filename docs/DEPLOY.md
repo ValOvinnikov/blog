@@ -299,7 +299,7 @@ two-branch split is recent and the secret wiring has not fully caught up:
   asymmetry, where a mis-set production secret would migrate the wrong branch
   with no backup and no failure, no longer exists. The tenant lifecycle
   workflows never read this secret at all, deliberately, so a tenant-registry
-  dispatch can never repoint a deploy job's migration: all three tenant
+  dispatch can never repoint a deploy job's migration: all tenant
   lifecycle workflows bind to whichever Environment their dispatch's
   `environment` input names and read that Environment's own
   `TENANT_REGISTRY_DATABASE_URL` secret instead (§4 below).
@@ -487,7 +487,7 @@ detect or report it.
 
 The deploy jobs run in the `development` / `production` **GitHub Environments**,
 so set these per environment (Settings → Environments → `<env>`) — that's how each
-job resolves its own project's id + token. The three tenant lifecycle workflows
+job resolves its own project's id + token. The tenant lifecycle workflows
 resolve their credentials the same way, from whichever Environment a dispatch
 names, so their block below applies to **both** environments rather than only to
 `production`.
@@ -500,7 +500,7 @@ names, so their block below applies to **both** environments rather than only to
       Neon branch's direct connection string — the `migrate-db` job's
       `drizzle-kit migrate`; same value as the Vercel env var above). **Confirm
       it actually points at the `development` branch** — see the Neon
-      Postgres section above and #2057. **Not** read by any of the three
+      Postgres section above and #2057. **Not** read by any of the
       tenant lifecycle workflows, which read `TENANT_REGISTRY_DATABASE_URL`
       from the tenant-provisioning block below.
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
@@ -518,7 +518,7 @@ names, so their block below applies to **both** environments rather than only to
 - [ ] Secret `DATABASE_URL_UNPOOLED` = `<PRD_DATABASE_URL_UNPOOLED>` (the `main`
       Neon branch's direct connection string — the `migrate-db` job's
       `pg_dump` backup + `drizzle-kit migrate`; same value as the Vercel env
-      var above). **Not** read by any of the three tenant lifecycle workflows,
+      var above). **Not** read by any of the tenant lifecycle workflows,
       which read `TENANT_REGISTRY_DATABASE_URL` from the block below,
       deliberately, so repointing the tenant registry at a different Neon
       branch can never silently repoint this deploy job too (#2056 — see the
@@ -536,37 +536,39 @@ names, so their block below applies to **both** environments rather than only to
 
 **Tenant lifecycle — both environments**
 
-`.github/workflows/provision-tenant.yml`/`deprovision-tenant.yml`
-(`workflow_dispatch` only, the former triggered from `apps/platform`'s "Add
-tenant" wizard) and `.github/workflows/recheck-tenant-owners.yml` all bind to
-whichever Environment their dispatch's `environment` input names
-(`development`/`production`, default `production`) — every credential they
-need, including the tenant registry connection string, resolves from that
-same Environment, never a mix of the two.
+`.github/workflows/provision-tenant.yml`/`deprovision-tenant.yml`/
+`invalidate-tenant-cache.yml` (`workflow_dispatch` only, the first triggered
+from `apps/platform`'s "Add tenant" wizard) and
+`.github/workflows/recheck-tenant-owners.yml` all bind to whichever
+Environment their dispatch's `environment` input names (`development`/
+`production`, default `production`) — every credential they need, including
+the tenant registry connection string, resolves from that same Environment,
+never a mix of the two.
 
 So every entry below belongs on **both** the `development` and the
 `production` Environment, each holding that environment's own values. A
 fully-configured `production` does nothing for a `development` dispatch: it
-fails on whatever `development` is missing. The three workflows read
+fails on whatever `development` is missing. These workflows read
 overlapping subsets, so configuring an environment for provisioning covers the
-other two:
+rest:
 
-| Workflow                    | Reads                                                                                                                                                                |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `provision-tenant.yml`      | all of them except `RESEND_API_KEY`                                                                                                                                  |
-| `deprovision-tenant.yml`    | `SANITY_MANAGEMENT_TOKEN`, `VERCEL_TOKEN`, `VERCEL_TEAM_ID`, `VERCEL_PROJECT_ID_WEB`, `TENANT_REGISTRY_DATABASE_URL`, `WEB_APP_URL`, `SITE_CONFIG_REVALIDATE_SECRET` |
-| `recheck-tenant-owners.yml` | `SANITY_MANAGEMENT_TOKEN`, `TENANT_REGISTRY_DATABASE_URL`, and optionally `RESEND_API_KEY`                                                                           |
+| Workflow                      | Reads                                                                                                                                                                |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `provision-tenant.yml`        | all of them except `RESEND_API_KEY`                                                                                                                                  |
+| `deprovision-tenant.yml`      | `SANITY_MANAGEMENT_TOKEN`, `VERCEL_TOKEN`, `VERCEL_TEAM_ID`, `VERCEL_PROJECT_ID_WEB`, `TENANT_REGISTRY_DATABASE_URL`, `WEB_APP_URL`, `SITE_CONFIG_REVALIDATE_SECRET` |
+| `invalidate-tenant-cache.yml` | `TENANT_REGISTRY_DATABASE_URL`, `WEB_APP_URL`, `SITE_CONFIG_REVALIDATE_SECRET` — the recovery path for `deprovision-tenant.yml`'s final step                         |
+| `recheck-tenant-owners.yml`   | `SANITY_MANAGEMENT_TOKEN`, `TENANT_REGISTRY_DATABASE_URL`, and optionally `RESEND_API_KEY`                                                                           |
 
 `recheck-tenant-owners.yml` also runs on a `schedule:`, and a scheduled run
 carries no `inputs` context at all, so its binding is
 `${{ inputs.environment || 'production' }}` rather than the bare input its
-two siblings use: every cron sweep targets `production`, and only a manual
+siblings use: every cron sweep targets `production`, and only a manual
 dispatch can point it at `development`.
 
 > **`TENANT_REGISTRY_DATABASE_URL` must be created as a Secret, not a
 > Variable, in both environments.** GitHub Environments keep Secrets and
 > Variables in separate namespaces — `secrets.NAME` and `vars.NAME` never see
-> each other's values. All three tenant lifecycle workflows read
+> each other's values. All tenant lifecycle workflows read
 > `secrets.TENANT_REGISTRY_DATABASE_URL` specifically; creating it as a
 > Variable by mistake leaves the secret unset, and the job fails every
 > dispatch with an empty `DATABASE_URL` rather than silently falling through
@@ -623,8 +625,9 @@ dispatch can point it at `development`.
       environment (no trailing slash), e.g. `https://{your-web-domain}`. Used
       to build the target URL for the revalidation webhook
       `provision-tenant.yml` creates on each new tenant's Sanity project. Also
-      read by `deprovision-tenant.yml`, as the origin it POSTs to when purging
-      an archived tenant's cached pages.
+      read by `deprovision-tenant.yml`/`invalidate-tenant-cache.yml`, as the
+      origin either of them POSTs to when purging an archived (or still-active)
+      tenant's cached pages.
 - [ ] Secret `SANITY_REVALIDATE_SECRET` — the **same** value already set as
       that environment's `apps/web` `SANITY_REVALIDATE_SECRET` Vercel env var.
       Every tenant's webhook is created with this shared secret; a mismatch
@@ -635,10 +638,11 @@ dispatch can point it at `development`.
       above, in both projects' tables). A GitHub Environment Secret is a **separate store** from those
       Vercel project vars, so setting it there does not cover this; all three
       copies must be byte-identical. `deprovision-tenant.yml`'s final step
-      sends it as a bearer token to purge an archived tenant's cached pages,
-      and — unlike every other credential in this list — throws rather than
-      skipping when it is absent, so a deprovisioning run fails loudly instead
-      of leaving the archived site serving from cache.
+      (and `invalidate-tenant-cache.yml`, its retry path) sends it as a
+      bearer token to purge a tenant's cached pages, and — unlike every
+      other credential in this list — throws rather than skipping when it is
+      absent, so a run fails loudly instead of leaving the site serving from
+      cache.
 - [ ] (Optional) Secret `RESEND_API_KEY` — the same shared secret name
       `apps/web`/`apps/platform` already use for their own Resend sends. Only
       `recheck-tenant-owners.yml`'s operator notification reads it; unset
