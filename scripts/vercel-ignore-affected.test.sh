@@ -3,7 +3,7 @@
 #
 # The script decides whether a Vercel build runs at all (exit 0 skips, exit 1
 # builds), so a wrong answer is invisible until someone notices a project has
-# silently stopped deploying — which is exactly how blog-web-ui ended up with
+# silently stopped deploying — which is exactly how web-ui-library ended up with
 # no production deployment at all. This suite pins the base-resolution rules:
 # which commit the diff is taken against in each situation, and the two
 # outcomes that follow from it.

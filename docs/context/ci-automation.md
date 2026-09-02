@@ -63,7 +63,7 @@ PR-push trigger only paid the run cost without adding signal a post-merge
 run doesn't already give.
 
 **`apps/web`'s Storybook coverage is a hosted Vercel deployment, not a CI
-workflow** — mirroring `packages/ui`'s existing `blog-storybook` project
+workflow** — mirroring `packages/ui`'s existing `ui-library` project
 (neither appears in the table above; a hosted Vercel deployment isn't a
 GitHub Actions workflow). A second Vercel project, rooted at the repo root
 (`vercel.json`, scoped via turbo to `storybook:build --filter=web`), builds
@@ -92,7 +92,7 @@ depends on the situation:
   and a commit diffed against itself shows nothing affected. Before this rule
   existed, a project that had never deployed successfully skipped every single
   `main` build — which never produced a deployment, so `VERCEL_GIT_PREVIOUS_SHA`
-  stayed empty and the next merge repeated it. `blog-web-ui` sat in exactly that
+  stayed empty and the next merge repeated it. `web-ui-library` sat in exactly that
   deadlock, showing "No Production Deployment", until it was broken.
 
 A change touching **only** `packages/config/src/types/**` or
