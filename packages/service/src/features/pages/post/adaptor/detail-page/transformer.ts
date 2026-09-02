@@ -73,7 +73,7 @@ export function toPostDetail(
     publishedAt: rawPage.publishedAt,
     heroImageUrl,
     heroImageAlt: raw.heroImage?.alt,
-    heroImageSanity: toSanityImage(raw.heroImageAsset),
+    heroImageSanity: toSanityImage(raw.heroImageAsset, tenant),
     featured: raw.featured ?? false,
     // Schema default is `initialValue: true` (studio-only, not a stored
     // fallback) — the migration backfilled every existing post's stored

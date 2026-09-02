@@ -43,7 +43,6 @@ const setup = customRender(CtaModuleView, {
   actions: [],
   footnote: undefined,
   layout: undefined,
-  baseUrl: 'https://cdn.sanity.io/images/test-project/test-dataset/',
 });
 
 describe(CtaModuleView, () => {

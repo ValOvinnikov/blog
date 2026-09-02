@@ -1,4 +1,5 @@
 import { LINK_TYPE, type BasicText, type TMaybeUndefined } from '@blog/config';
+import type { TImageTenant } from '@blog/service/sanity/image';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import {
   toInternalHref,
@@ -77,14 +78,17 @@ function toCtaActions(raw: TRawCtaModule['actions']): TCtaAction[] {
     .filter((action): action is TCtaAction => action !== undefined);
 }
 
-export function toCtaModule(raw: TRawCtaModule): TCtaModule {
+export function toCtaModule(
+  raw: TRawCtaModule,
+  tenant: TImageTenant,
+): TCtaModule {
   return {
     variant: raw.variant,
     brandVariant: raw.brandVariant,
     eyebrow: raw.eyebrow ?? undefined,
     sectionHeader: toRequiredSectionHeader(raw.sectionHeader),
     content: toContent(raw.content),
-    image: toSanityImage(raw.image),
+    image: toSanityImage(raw.image, tenant),
     imageSide: raw.imageSide ?? undefined,
     mobileMediaOrder: raw.mobileMediaOrder ?? undefined,
     actions: toCtaActions(raw.actions),

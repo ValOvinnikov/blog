@@ -10,11 +10,11 @@ const image: ISanityImage = {
   crop: undefined,
   lqip: undefined,
   dimensions: { width: 800, height: 600, aspectRatio: 800 / 600 },
+  cdnBaseUrl: 'https://cdn.sanity.io/images/test-project/test-dataset/',
 };
 
 const setup = customRender(SanityImage, {
   image,
-  baseUrl: 'https://cdn.sanity.io/images/test-project/test-dataset/',
   width: 960,
   height: 720,
 });
@@ -31,9 +31,12 @@ describe('SanityImage', () => {
     expect(img.getAttribute('srcset')).toContain('cdn.sanity.io');
   });
 
-  it('forwards the given baseUrl to the rendered src/srcset, not a hardcoded origin', () => {
+  it("forwards the image's own cdnBaseUrl to the rendered src/srcset, not a hardcoded origin", () => {
     setup({
-      baseUrl: 'https://cdn.sanity.io/images/other-project/other-dataset/',
+      image: {
+        ...image,
+        cdnBaseUrl: 'https://cdn.sanity.io/images/other-project/other-dataset/',
+      },
     });
 
     const img = screen.getByRole('img', { name: image.alt });

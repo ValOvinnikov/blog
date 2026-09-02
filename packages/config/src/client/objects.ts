@@ -24,6 +24,8 @@ export interface ISanityImageDimensions {
 export interface ISanityImage {
   assetId: string;
   alt: string;
+  /** CDN origin the asset resolves against, e.g. `https://cdn.sanity.io/images/{projectId}/{dataset}/`. */
+  cdnBaseUrl: string;
   hotspot: TMaybeUndefined<ISanityImageHotspot>;
   crop: TMaybeUndefined<ISanityImageCrop>;
   lqip: TMaybeUndefined<string>;
