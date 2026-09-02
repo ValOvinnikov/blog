@@ -28,5 +28,5 @@ export async function getTagPage(
   }
 
   const settings = await getSiteSettings(tenant);
-  return toTagDetailPage(rawPage, settings, rawPage.postList._id);
+  return toTagDetailPage(rawPage, settings, rawPage.postList._id, tenant);
 }

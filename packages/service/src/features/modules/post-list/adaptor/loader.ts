@@ -42,8 +42,13 @@ export async function getPostList(
     },
   );
 
-  return toPostListModule(raw, rawPosts.posts, {
-    currentPage: page,
-    totalPages: toTotalPages(rawPosts.total, raw.pageSize),
-  });
+  return toPostListModule(
+    raw,
+    rawPosts.posts,
+    {
+      currentPage: page,
+      totalPages: toTotalPages(rawPosts.total, raw.pageSize),
+    },
+    tenant,
+  );
 }

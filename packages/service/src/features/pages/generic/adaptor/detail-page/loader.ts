@@ -22,5 +22,5 @@ export async function getPage(
   if (!raw) return undefined;
 
   const settings = await getSiteSettings(tenant);
-  return toGenericPage(raw, settings);
+  return toGenericPage(raw, settings, tenant);
 }

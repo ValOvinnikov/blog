@@ -132,7 +132,7 @@ describe('getPost', () => {
 
     await getPost('hello-world', tenant);
 
-    expect(urlForImage).toHaveBeenCalledWith(authorImage, {
+    expect(urlForImage).toHaveBeenCalledWith(authorImage, tenant, {
       width: 64,
       height: 64,
       fit: 'crop',
@@ -327,7 +327,7 @@ describe('getPost', () => {
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
     mockGetRelatedPosts.mockResolvedValueOnce([
-      toPostCard(makeRawPostCard({ _id: 'related-1' })),
+      toPostCard(makeRawPostCard({ _id: 'related-1' }), tenant),
     ]);
 
     const result = await getPost('hello-world', tenant);

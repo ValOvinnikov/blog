@@ -1,4 +1,5 @@
 import { HERO_FIELD_MODE, routes } from '@blog/config';
+import type { TImageTenant } from '@blog/service/sanity/image';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import { toLink } from '@blog/service/shared/transformers/to-link';
 import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
@@ -31,12 +32,13 @@ function getCustomOrFallback(
 export function toHeroModule(
   raw: TRawHeroModule,
   rawFallbackPost: TRawHeroFallbackPost,
+  tenant: TImageTenant,
 ): THeroModule {
   const configuredFeaturedPost = raw.featuredPost
-    ? toPostCard(raw.featuredPost)
+    ? toPostCard(raw.featuredPost, tenant)
     : undefined;
   const fallbackPost = rawFallbackPost
-    ? toPostCard(rawFallbackPost)
+    ? toPostCard(rawFallbackPost, tenant)
     : undefined;
   const heroPost = configuredFeaturedPost ?? fallbackPost;
 

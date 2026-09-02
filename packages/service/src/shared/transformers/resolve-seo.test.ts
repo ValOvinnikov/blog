@@ -1,4 +1,5 @@
 import { makeRawImage } from '@blog/service/testing/shared/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { type TRawSeo, resolveSeo } from './resolve-seo';
 
@@ -7,6 +8,8 @@ vi.mock('@blog/service/sanity/image', () => ({
     () => 'https://cdn.sanity.io/images/proj/dataset/og-800x600.jpg',
   ),
 }));
+
+const tenant = makeTenant();
 
 const content = {
   title: 'Content title',
@@ -33,7 +36,7 @@ function makeAuthoredSeo(overrides: Partial<TRawSeo> = {}): TRawSeo {
 
 describe(resolveSeo, () => {
   it('uses authored values when present', () => {
-    const result = resolveSeo(makeAuthoredSeo(), content, settings);
+    const result = resolveSeo(makeAuthoredSeo(), content, settings, tenant);
 
     expect(result.title).toBe('Authored title');
     expect(result.description).toBe('Authored description');
@@ -43,7 +46,7 @@ describe(resolveSeo, () => {
   });
 
   it('falls back to content-derived defaults when unauthored', () => {
-    const result = resolveSeo(undefined, content, settings);
+    const result = resolveSeo(undefined, content, settings, tenant);
 
     expect(result.title).toBe('Content title');
     expect(result.description).toBe('Content description');
@@ -51,7 +54,12 @@ describe(resolveSeo, () => {
   });
 
   it('bottoms out at site settings when neither authored nor content-derived', () => {
-    const result = resolveSeo(undefined, { title: 'Content title' }, settings);
+    const result = resolveSeo(
+      undefined,
+      { title: 'Content title' },
+      settings,
+      tenant,
+    );
 
     expect(result.description).toBe(settings.description);
     expect(result.ogImageUrl).toBe(settings.defaultOgImageUrl);
@@ -62,6 +70,7 @@ describe(resolveSeo, () => {
       makeAuthoredSeo({ openGraph: null }),
       { title: 'Content title' },
       { description: 'Settings description', defaultOgImageUrl: undefined },
+      tenant,
     );
 
     expect(result.ogImageUrl).toBeUndefined();
@@ -74,6 +83,7 @@ describe(resolveSeo, () => {
       }),
       content,
       settings,
+      tenant,
     );
 
     expect(result.ogTitle).toBe(result.title);
@@ -85,6 +95,7 @@ describe(resolveSeo, () => {
       makeAuthoredSeo({ openGraph: null }),
       content,
       settings,
+      tenant,
     );
 
     expect(result.ogTitle).toBe(result.title);
@@ -97,13 +108,14 @@ describe(resolveSeo, () => {
       makeAuthoredSeo({ metaTitle: 'Authored title' }),
       { title: 'Content title' },
       settings,
+      tenant,
     );
 
     expect(result.title).toBe('Authored title');
   });
 
   it('resolves the ogImageUrl ladder: authored wins over content and settings', () => {
-    const result = resolveSeo(makeAuthoredSeo(), content, settings);
+    const result = resolveSeo(makeAuthoredSeo(), content, settings, tenant);
 
     expect(result.ogImageUrl).not.toBe(content.imageUrl);
     expect(result.ogImageUrl).not.toBe(settings.defaultOgImageUrl);
@@ -114,6 +126,7 @@ describe(resolveSeo, () => {
       makeAuthoredSeo({ openGraph: null }),
       content,
       settings,
+      tenant,
     );
 
     expect(result.ogImageUrl).toBe(content.imageUrl);

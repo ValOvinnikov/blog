@@ -1,4 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config';
+import type { TImageTenant } from '@blog/service/sanity/image';
 import type { seoFragment } from '@blog/service/shared/fragments/seo';
 import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
 import type { InferFragmentType } from 'groqd';
@@ -36,6 +37,7 @@ export function resolveSeo(
   authored: TRawSeo | undefined,
   content: TSeoContentDefaults,
   settings: TSeoSettingsDefaults,
+  tenant: TImageTenant,
 ): TSeoResolved {
   const title = authored?.metaTitle ?? content.title;
   const description =
@@ -47,7 +49,7 @@ export function resolveSeo(
     ogTitle: authored?.openGraph?.ogTitle ?? title,
     ogDescription: authored?.openGraph?.ogDescription ?? description,
     ogImageUrl:
-      buildImageUrl(authored?.openGraph?.ogImage) ??
+      buildImageUrl(authored?.openGraph?.ogImage, tenant) ??
       content.imageUrl ??
       settings.defaultOgImageUrl,
   };

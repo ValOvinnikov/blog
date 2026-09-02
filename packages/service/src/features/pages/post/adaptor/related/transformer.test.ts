@@ -1,4 +1,5 @@
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import {
   toRelatedPosts,
@@ -24,6 +25,8 @@ function byTopicPost(
   return makeRawPostCard(overrides);
 }
 
+const tenant = makeTenant();
+
 describe(toRelatedPosts, () => {
   it('ranks candidates by shared-tag count desc, then publishedAt desc', () => {
     const oneShared = byTagsPost({
@@ -46,6 +49,7 @@ describe(toRelatedPosts, () => {
       [oneShared, newerOneShared, twoShared],
       [],
       ['tag-a', 'tag-b'],
+      tenant,
     );
 
     expect(result.map((post) => post.id)).toEqual([
@@ -60,7 +64,7 @@ describe(toRelatedPosts, () => {
       byTagsPost({ _id: `post-${i}`, tagIds: [{ _id: 'tag-a' }] }),
     );
 
-    const result = toRelatedPosts(byTags, [], ['tag-a']);
+    const result = toRelatedPosts(byTags, [], ['tag-a'], tenant);
 
     expect(result).toHaveLength(3);
   });
@@ -68,7 +72,7 @@ describe(toRelatedPosts, () => {
   it('excludes the current post (the query already filters it, this asserts no re-inclusion by the transformer)', () => {
     const other = byTagsPost({ _id: 'other', tagIds: [{ _id: 'tag-a' }] });
 
-    const result = toRelatedPosts([other], [], ['tag-a']);
+    const result = toRelatedPosts([other], [], ['tag-a'], tenant);
 
     expect(result.map((post) => post.id)).not.toContain('current');
   });
@@ -82,6 +86,7 @@ describe(toRelatedPosts, () => {
       [shared],
       [topicOnlyA, topicOnlyB],
       ['tag-a'],
+      tenant,
     );
 
     expect(result.map((post) => post.id)).toEqual([
@@ -96,7 +101,12 @@ describe(toRelatedPosts, () => {
     const duplicate = byTopicPost({ _id: 'shared' });
     const topicOnly = byTopicPost({ _id: 'topic-only' });
 
-    const result = toRelatedPosts([shared], [duplicate, topicOnly], ['tag-a']);
+    const result = toRelatedPosts(
+      [shared],
+      [duplicate, topicOnly],
+      ['tag-a'],
+      tenant,
+    );
 
     expect(result.map((post) => post.id)).toEqual(['shared', 'topic-only']);
   });
@@ -105,7 +115,7 @@ describe(toRelatedPosts, () => {
     const topicOnlyA = byTopicPost({ _id: 'topic-a' });
     const topicOnlyB = byTopicPost({ _id: 'topic-b' });
 
-    const result = toRelatedPosts([], [topicOnlyA, topicOnlyB], []);
+    const result = toRelatedPosts([], [topicOnlyA, topicOnlyB], [], tenant);
 
     expect(result.map((post) => post.id)).toEqual(['topic-a', 'topic-b']);
   });

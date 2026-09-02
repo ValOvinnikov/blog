@@ -15,5 +15,5 @@ export async function getSiteSettings(
     tenant,
     ...isr('site-settings', tenant.projectId),
   });
-  return toSiteSettings(raw);
+  return toSiteSettings(raw, tenant);
 }

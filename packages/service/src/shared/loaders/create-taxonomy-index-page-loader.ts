@@ -1,6 +1,7 @@
 import type { TMaybeUndefined } from '@blog/config';
 import { getSiteSettings } from '@blog/service/features/global/site-settings/adaptor/loader';
 import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
+import type { TImageTenant } from '@blog/service/sanity/image';
 import {
   isr,
   runQuery,
@@ -22,6 +23,7 @@ type TCreateTaxonomyIndexPageLoaderOptions<
     rawPage: TRaw,
     settings: TSiteSettings,
     taxonomyListId: string,
+    tenant: TImageTenant,
   ) => TPage;
   tags: string[];
   MissingTaxonomyListError: new () => Error;
@@ -60,6 +62,6 @@ export function createTaxonomyIndexPageLoader<
     }
 
     const settings = await getSiteSettings(tenant);
-    return transformer(rawPage, settings, rawPage.taxonomyList._id);
+    return transformer(rawPage, settings, rawPage.taxonomyList._id, tenant);
   };
 }

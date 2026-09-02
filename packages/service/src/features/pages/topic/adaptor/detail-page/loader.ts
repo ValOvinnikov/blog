@@ -28,5 +28,5 @@ export async function getTopicPage(
   }
 
   const settings = await getSiteSettings(tenant);
-  return toTopicDetailPage(rawPage, settings, rawPage.postList._id);
+  return toTopicDetailPage(rawPage, settings, rawPage.postList._id, tenant);
 }

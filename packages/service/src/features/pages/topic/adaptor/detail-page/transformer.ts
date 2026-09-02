@@ -1,4 +1,5 @@
 import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
+import type { TImageTenant } from '@blog/service/sanity/image';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
 import { toModule } from '@blog/service/shared/transformers/to-module';
 import { toTopic } from '@blog/service/shared/transformers/to-topic';
@@ -13,6 +14,7 @@ export function toTopicDetailPage(
   rawPage: TRawTopicPage,
   settings: TSiteSettings,
   postListId: string,
+  tenant: TImageTenant,
 ): TTopicDetailPage {
   const topic = toTopic(rawPage.topic);
 
@@ -26,6 +28,7 @@ export function toTopicDetailPage(
         description: settings.description,
         defaultOgImageUrl: settings.defaultOgImageUrl,
       },
+      tenant,
     ),
     postListId,
   };
