@@ -3,7 +3,8 @@
  * for one tenant: removes its domain from the shared web project, archives
  * (never deletes) its Sanity project, revokes the provisioned Sanity robot
  * tokens still live in that project, clears the provisioning-artifact
- * columns, then archives (never hard-deletes) the `tenants` row.
+ * columns, archives (never hard-deletes) the `tenants` row, then
+ * invalidates its cached pages so the archived site stops serving.
  *
  * Invoked only by `.github/workflows/deprovision-tenant.yml` via
  * `pnpm --filter @blog/db db:deprovision-tenant -- --tenant-id=<uuid>
@@ -27,6 +28,7 @@ import { getTenantRow } from './lib/get-tenant-row';
 import { archiveTenantSanityProject } from './steps/archive-sanity-project';
 import { archiveTenantRow } from './steps/archive-tenant';
 import { clearTenantArtifacts } from './steps/clear-artifacts';
+import { invalidateTenantCache } from './steps/invalidate-tenant-cache';
 import { removeTenantDomain } from './steps/remove-domain';
 import { revokeTenantSanityTokens } from './steps/revoke-sanity-tokens';
 
@@ -77,6 +79,7 @@ const STEPS: TStep[] = [
   { name: 'revoke-sanity-tokens', run: revokeTenantSanityTokens },
   { name: 'clear-artifacts', run: clearTenantArtifacts },
   { name: 'archive-tenant', run: archiveTenantRow },
+  { name: 'invalidate-tenant-cache', run: invalidateTenantCache },
 ];
 
 // Exported for direct testing of the step sequencing without also exercising

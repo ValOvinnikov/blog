@@ -12,7 +12,7 @@ const SITE_CONFIG_REVALIDATE_TIMEOUT_MS = 5000;
  * swallowed, since the calling save has already succeeded and that fallback
  * window remains the safety net either way.
  */
-export const revalidateSiteConfig = async (): Promise<void> => {
+export const revalidateSiteConfig = async (tenantId: string): Promise<void> => {
   const { WEB_APP_URL: webAppUrl, SITE_CONFIG_REVALIDATE_SECRET: secret } = env;
 
   if (!webAppUrl || !secret) {
@@ -23,7 +23,11 @@ export const revalidateSiteConfig = async (): Promise<void> => {
   try {
     const response = await fetch(new URL(REVALIDATE_PATH, webAppUrl), {
       method: 'POST',
-      headers: { Authorization: `Bearer ${secret}` },
+      headers: {
+        Authorization: `Bearer ${secret}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ tenantId }),
       signal: AbortSignal.timeout(SITE_CONFIG_REVALIDATE_TIMEOUT_MS),
     });
 

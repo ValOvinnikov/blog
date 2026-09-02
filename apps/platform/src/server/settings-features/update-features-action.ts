@@ -54,7 +54,7 @@ export const updateFeaturesAction = async (
       tenant.id,
       parsed.data,
     );
-    await revalidateSiteConfig();
+    await revalidateSiteConfig(tenant.id);
     await recordAuditEvent({
       logEvent: 'settings_features.update_audit_failed',
       action: AUDIT_ACTION.SETTINGS_UPDATED,

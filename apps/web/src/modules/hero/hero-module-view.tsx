@@ -10,7 +10,6 @@ import { heroHiddenLabelVariants } from './hero-module-variants';
 export interface IHeroModuleViewProps extends Omit<THeroModule, 'title'> {
   id: string;
   title: string;
-  baseUrl: string;
 }
 
 /**
@@ -29,7 +28,6 @@ export const HeroModuleView = ({
   primaryAction,
   secondaryAction,
   layout,
-  baseUrl,
 }: IHeroModuleViewProps) => {
   const titleId = `hero-${id}`;
 
@@ -81,7 +79,6 @@ export const HeroModuleView = ({
             {/* 1200x675 (16:9) is pre-cropped into the source URL and degrades gracefully at Hero.Media's `lg` 4:3 breakpoint too (verified visually); 1200x900 would crop below `lg`. */}
             <SanityImage
               image={sanityImage}
-              baseUrl={baseUrl}
               width={1200}
               height={675}
               sizes="(min-width: 1024px) 50vw, 100vw"

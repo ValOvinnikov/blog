@@ -7,6 +7,7 @@ import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-
 import { markNewsletterSubscribed } from '@web/server/newsletter/newsletter-subscribed-cookie';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
+import { isTenantActive } from '@web/server/tenant/is-tenant-active';
 import { env } from '@web/utils/env/env';
 import { isValidEmail } from '@web/utils/is-valid-email';
 import { logger } from '@web/utils/logger/logger';
@@ -40,6 +41,11 @@ export const subscribeToNewsletterAction = async (
 
   const tenantId = await getRequestTenantId();
   if (!tenantId) {
+    return { outcome: 'server-error' };
+  }
+
+  if (!(await isTenantActive(tenantId))) {
+    logger.warn('newsletter.subscribe_tenant_not_active', { tenantId });
     return { outcome: 'server-error' };
   }
 

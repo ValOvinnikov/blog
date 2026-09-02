@@ -44,7 +44,7 @@ export function toHeroModule(
 
   const sanityImage =
     raw.heroImageMode === HERO_FIELD_MODE.CUSTOM
-      ? toSanityImage(raw.heroImageAsset)
+      ? toSanityImage(raw.heroImageAsset, tenant)
       : raw.heroImageMode === HERO_FIELD_MODE.NONE
         ? undefined
         : heroPost?.heroImageSanity;

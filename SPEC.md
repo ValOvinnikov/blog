@@ -335,7 +335,22 @@ sole `tenants` row outside production (`isProductionEnvironment()` — never
 resolved `tenantId` is threaded to Server Components/Actions via the
 `x-tenant-id` request header (unconditionally cleared before the conditional
 set, so a client-supplied value can never survive an unresolved lookup),
-read back with `getRequestTenantId()`. `get-site-config.ts` (and its
+read back with `getRequestTenantId()`.
+
+A resolved tenant is not automatically a usable one, and the two directions
+have deliberately different thresholds. **Reads** are refused for a tenant
+that is ARCHIVED or has no Sanity credentials yet (`isTenantServable()`), so a
+domain that goes live at draft creation cannot serve another tenant's content
+while provisioning is still pending. **Writes** are refused for any tenant
+that is not ACTIVE (`isTenantActive()`), so a SUSPENDED tenant's site stays
+readable while nothing new lands against it. Both live in
+`apps/web/src/server/tenant/`, and every tenant-scoped mutation checks the
+latter — one shared predicate rather than a per-call-site status check, since
+independent predicates drift apart. The asymmetry is the point: a suspended
+tenant should still be visible, and a frozen or torn-down one should not
+accumulate rows that a later restore would have to reconcile.
+
+`get-site-config.ts` (and its
 `settings_features`/tenant-plan counterparts below) reads that same
 per-request `getRequestTenantId()` and caches per tenant — both the
 `unstable_cache` key and the revalidation tag carry the tenant id
@@ -392,16 +407,17 @@ no `site_config` row, falls back to the `CONSOLE` preset with no overrides
 as theme, above.
 
 `get-site-config.ts`'s cache carries a 3600s (`SITE_CONFIG_REVALIDATE_SECONDS`)
-fallback window as its safety net, but `apps/platform`'s Look/Voice save actions
-(`update-look-action.ts`/`save-voice-overrides-action.ts`) also POST to
+fallback window as its safety net, but `apps/platform`'s Look/Voice/Features save
+actions (`update-look-action.ts`/`save-voice-overrides-action.ts`/
+`update-features-action.ts`) also POST to
 `apps/web`'s `POST /api/revalidate-site-config` after a successful
 `site_config` write, so a tenant admin's save reflects on the live site
 within seconds rather than waiting out that window. The route accepts an
 optional JSON body `{ tenantId }` to scope the purge to the tenant that
 actually saved (matching `revalidateTag`'s tenant-scoped tags); a request
-with no body — the current `apps/platform` behavior, not yet updated to send
-one — falls back to revalidating every tenant rather than silently doing
-nothing. This is a plain
+with no body falls back to revalidating every tenant rather than silently
+doing nothing. `apps/platform` always sends one, so that fallback is a safety
+net for any future caller that omits it, not a path the panel takes. This is a plain
 shared-secret (`SITE_CONFIG_REVALIDATE_SECRET`, which must be byte-identical
 between the two apps because `apps/web` compares the bearer token it receives
 against its own copy — unlike `AUTH_SECRET`, where matching is an operational
@@ -410,7 +426,12 @@ two apps' own deployments — not a Sanity webhook, so it doesn't reuse
 `@sanity/webhook`'s HMAC verification. Calling it is best-effort from the
 platform side: a failure (missing config, network error, non-2xx) is logged and
 swallowed, never thrown, since the save itself has already succeeded and the
-3600s window still covers it. See
+3600s window still covers it. That best-effort stance belongs to the platform
+caller, not to the route: `deprovision-tenant.yml`'s final step is a second
+caller, POSTing the same `{ tenantId }` body to purge an archived tenant's
+pages, and it deliberately throws on missing config or a non-2xx instead of
+swallowing — a silently skipped purge there would tell an operator a tenant
+was taken down while its site kept serving from cache. See
 [`docs/context/environment-variables.md`](./docs/context/environment-variables.md)
 and [`docs/context/rendering-caching-i18n.md`](./docs/context/rendering-caching-i18n.md).
 

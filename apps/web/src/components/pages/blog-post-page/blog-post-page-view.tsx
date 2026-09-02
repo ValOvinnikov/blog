@@ -197,7 +197,6 @@ export const BlogPostPageView = ({
                 heroImageSanity ? (
                   <SanityImage
                     image={heroImageSanity}
-                    baseUrl={imageBaseUrl}
                     width={1200}
                     height={675}
                     sizes="(min-width: 1024px) 800px, 100vw"

@@ -22,6 +22,9 @@ const { clearTenantArtifactsMock } = vi.hoisted(() => ({
 const { archiveTenantRowMock } = vi.hoisted(() => ({
   archiveTenantRowMock: vi.fn(),
 }));
+const { invalidateTenantCacheMock } = vi.hoisted(() => ({
+  invalidateTenantCacheMock: vi.fn(),
+}));
 
 vi.mock('./steps/remove-domain', () => ({
   removeTenantDomain: removeTenantDomainMock,
@@ -34,6 +37,9 @@ vi.mock('./steps/clear-artifacts', () => ({
 }));
 vi.mock('./steps/archive-tenant', () => ({
   archiveTenantRow: archiveTenantRowMock,
+}));
+vi.mock('./steps/invalidate-tenant-cache', () => ({
+  invalidateTenantCache: invalidateTenantCacheMock,
 }));
 
 const fetchMock = vi.fn();
@@ -53,6 +59,8 @@ const env = {
   dryRun: false,
   githubActor: 'octocat',
   githubRunId: 'run-42',
+  webAppUrl: 'https://web.example.com',
+  siteConfigRevalidateSecret: 'shared-secret',
 };
 
 beforeEach(() => {
@@ -76,6 +84,7 @@ beforeEach(() => {
   revokeTenantSanityTokensMock.mockReset().mockResolvedValue(undefined);
   clearTenantArtifactsMock.mockReset().mockResolvedValue(undefined);
   archiveTenantRowMock.mockReset().mockResolvedValue(undefined);
+  invalidateTenantCacheMock.mockReset().mockResolvedValue(undefined);
 });
 
 afterEach(() => {
@@ -97,6 +106,7 @@ describe(runSteps, () => {
     expect(patchInit.body).toBe(JSON.stringify({ isDisabledByUser: true }));
     expect(clearTenantArtifactsMock).toHaveBeenCalledTimes(1);
     expect(archiveTenantRowMock).toHaveBeenCalledTimes(1);
+    expect(invalidateTenantCacheMock).toHaveBeenCalledTimes(1);
   });
 
   it('does not call PATCH again when the project is already archived', async () => {

@@ -49,7 +49,6 @@ export const makeGenericPageView = (
           actions={ctaActionsDemo}
           footnote={undefined}
           layout={undefined}
-          baseUrl="https://cdn.sanity.io/images/test-project/test-dataset/"
         />
       </Fragment>
     ),

@@ -62,7 +62,7 @@ export const updateLookAction = async (
 
   try {
     await queries.siteConfig.upsertSiteConfig(tenant.id, parsed.data);
-    await revalidateSiteConfig();
+    await revalidateSiteConfig(tenant.id);
     await recordAuditEvent({
       logEvent: 'site_config.look_audit_failed',
       action: AUDIT_ACTION.SETTINGS_UPDATED,

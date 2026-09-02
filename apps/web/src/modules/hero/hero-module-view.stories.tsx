@@ -1,8 +1,6 @@
 import { BRAND_VARIANT } from '@blog/config';
-import { getSanityImageBaseUrl } from '@blog/service';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import { STUB_IMAGE_TENANT } from '@web/testing/shared/tenant/fixtures';
 
 import { HeroModuleView } from './hero-module-view';
 
@@ -35,7 +33,6 @@ const meta = {
     },
     secondaryAction: undefined,
     layout: undefined,
-    baseUrl: getSanityImageBaseUrl(STUB_IMAGE_TENANT),
   },
 } satisfies Meta<typeof HeroModuleView>;
 

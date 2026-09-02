@@ -266,12 +266,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(screen.getByText('January 15, 2026')).toBeVisible();
   });
 
-  it('resolves baseUrl via getSanityImageBaseUrl and forwards it into the rendered hero image src', async () => {
-    getTenantSanityContextMock.mockResolvedValue({
-      projectId: 'tenant-project',
-      dataset: 'production',
-      token: 'tenant-token',
-    });
+  it('renders the hero image using its own cdnBaseUrl, not a hardcoded origin', async () => {
     const heroImageSanity: ISanityImage = {
       assetId: 'image-abc123-1600x1200-jpg',
       alt: 'A scenic mountain range',
@@ -279,6 +274,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
       crop: undefined,
       lqip: undefined,
       dimensions: { width: 1600, height: 1200, aspectRatio: 1600 / 1200 },
+      cdnBaseUrl: 'https://cdn.sanity.io/images/tenant-project/production/',
     };
     getPostMock.mockResolvedValue({
       ok: true,
