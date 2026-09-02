@@ -30,5 +30,5 @@ export async function getCta(
     ),
   });
 
-  return toCtaModule(raw);
+  return toCtaModule(raw, tenant);
 }

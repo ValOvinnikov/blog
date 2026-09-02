@@ -85,6 +85,7 @@ describe('toHeroModule', () => {
     expect(hero.sanityImage).toEqual({
       assetId: 'image-abc123-800x600-jpg',
       alt: 'Alt text',
+      cdnBaseUrl: 'https://cdn.sanity.io/images/tenant-a/production/',
       hotspot: undefined,
       crop: undefined,
       lqip: 'data:image/png;base64,abc123',

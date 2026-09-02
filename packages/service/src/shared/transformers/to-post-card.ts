@@ -65,7 +65,7 @@ export function toPostCard(raw: TRawPostCard, tenant: TImageTenant): TPostCard {
     publishedAt: raw.publishedAt,
     heroImageUrl: buildImageUrl(raw.heroImage, tenant),
     heroImageAlt: raw.heroImage?.alt,
-    heroImageSanity: toSanityImage(raw.heroImageAsset),
+    heroImageSanity: toSanityImage(raw.heroImageAsset, tenant),
     featured: raw.featured ?? false,
     author: toPostCardAuthor(raw.author, tenant),
     topic: toPostCardTopic(raw.topic),
