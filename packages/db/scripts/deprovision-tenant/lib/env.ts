@@ -23,6 +23,11 @@ export type TDeprovisionEnv = {
   // whole script before it does anything.
   githubActor: string | undefined;
   githubRunId: string | undefined;
+  // Not `requireEnv`'d here so a missing value doesn't block the earlier,
+  // higher-priority teardown steps — `invalidate-tenant-cache` validates
+  // both itself and fails loudly there instead.
+  webAppUrl: string | undefined;
+  siteConfigRevalidateSecret: string | undefined;
 };
 
 export function loadDeprovisionEnv(dryRun: boolean): TDeprovisionEnv {
@@ -34,5 +39,7 @@ export function loadDeprovisionEnv(dryRun: boolean): TDeprovisionEnv {
     dryRun,
     githubActor: process.env['GITHUB_ACTOR'],
     githubRunId: process.env['GITHUB_RUN_ID'],
+    webAppUrl: process.env['WEB_APP_URL'],
+    siteConfigRevalidateSecret: process.env['SITE_CONFIG_REVALIDATE_SECRET'],
   };
 }

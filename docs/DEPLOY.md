@@ -212,17 +212,18 @@ and `deploy-production.yml` both run `vercel pull --environment=production`
 before `vercel build`, so a var scoped only to Preview/Development is never
 pulled, and — for a required key like `DATABASE_URL` — the app fails at its
 eager `@blog/db` validation rather than silently degrading; same reasoning as
-the Preview-scope note below) — same five keys per project; each project
+the Preview-scope note below) — same six keys per project; each project
 points at its **own** Sanity project, so the id / dataset / URL / tokens all
 differ:
 
-| Key                             | `web-dev` value           | `web-prod` value          |
-| ------------------------------- | ------------------------- | ------------------------- |
-| `NEXT_PUBLIC_SANITY_PROJECT_ID` | `<DEV_PROJECT_ID>`        | `<PRD_PROJECT_ID>`        |
-| `NEXT_PUBLIC_SANITY_DATASET`    | `development`             | `production`              |
-| `NEXT_PUBLIC_SITE_URL`          | `https://<DEV_WEB_URL>`   | `https://<PRD_WEB_URL>`   |
-| `SANITY_API_READ_TOKEN`         | `<DEV_READ_TOKEN>`        | `<PRD_READ_TOKEN>`        |
-| `SANITY_REVALIDATE_SECRET`      | `<DEV_REVALIDATE_SECRET>` | `<PRD_REVALIDATE_SECRET>` |
+| Key                             | `web-dev` value            | `web-prod` value           |
+| ------------------------------- | -------------------------- | -------------------------- |
+| `NEXT_PUBLIC_SANITY_PROJECT_ID` | `<DEV_PROJECT_ID>`         | `<PRD_PROJECT_ID>`         |
+| `NEXT_PUBLIC_SANITY_DATASET`    | `development`              | `production`               |
+| `NEXT_PUBLIC_SITE_URL`          | `https://<DEV_WEB_URL>`    | `https://<PRD_WEB_URL>`    |
+| `SANITY_API_READ_TOKEN`         | `<DEV_READ_TOKEN>`         | `<PRD_READ_TOKEN>`         |
+| `SANITY_REVALIDATE_SECRET`      | `<DEV_REVALIDATE_SECRET>`  | `<PRD_REVALIDATE_SECRET>`  |
+| `SITE_CONFIG_REVALIDATE_SECRET` | `<DEV_SITE_CONFIG_SECRET>` | `<PRD_SITE_CONFIG_SECRET>` |
 
 > `SANITY_API_READ_TOKEN` is server-only (never exposed to the browser). Each
 > project uses the Viewer token minted in its own Sanity project.
@@ -550,11 +551,11 @@ fails on whatever `development` is missing. The three workflows read
 overlapping subsets, so configuring an environment for provisioning covers the
 other two:
 
-| Workflow                    | Reads                                                                                                                |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `provision-tenant.yml`      | all of them except `RESEND_API_KEY`                                                                                  |
-| `deprovision-tenant.yml`    | `SANITY_MANAGEMENT_TOKEN`, `VERCEL_TOKEN`, `VERCEL_TEAM_ID`, `VERCEL_PROJECT_ID_WEB`, `TENANT_REGISTRY_DATABASE_URL` |
-| `recheck-tenant-owners.yml` | `SANITY_MANAGEMENT_TOKEN`, `TENANT_REGISTRY_DATABASE_URL`, and optionally `RESEND_API_KEY`                           |
+| Workflow                    | Reads                                                                                                                                                                |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `provision-tenant.yml`      | all of them except `RESEND_API_KEY`                                                                                                                                  |
+| `deprovision-tenant.yml`    | `SANITY_MANAGEMENT_TOKEN`, `VERCEL_TOKEN`, `VERCEL_TEAM_ID`, `VERCEL_PROJECT_ID_WEB`, `TENANT_REGISTRY_DATABASE_URL`, `WEB_APP_URL`, `SITE_CONFIG_REVALIDATE_SECRET` |
+| `recheck-tenant-owners.yml` | `SANITY_MANAGEMENT_TOKEN`, `TENANT_REGISTRY_DATABASE_URL`, and optionally `RESEND_API_KEY`                                                                           |
 
 `recheck-tenant-owners.yml` also runs on a `schedule:`, and a scheduled run
 carries no `inputs` context at all, so its binding is
@@ -621,12 +622,23 @@ dispatch can point it at `development`.
 - [ ] Variable `WEB_APP_URL` — the deployed `apps/web` origin for that
       environment (no trailing slash), e.g. `https://{your-web-domain}`. Used
       to build the target URL for the revalidation webhook
-      `provision-tenant.yml` creates on each new tenant's Sanity project.
+      `provision-tenant.yml` creates on each new tenant's Sanity project. Also
+      read by `deprovision-tenant.yml`, as the origin it POSTs to when purging
+      an archived tenant's cached pages.
 - [ ] Secret `SANITY_REVALIDATE_SECRET` — the **same** value already set as
       that environment's `apps/web` `SANITY_REVALIDATE_SECRET` Vercel env var.
       Every tenant's webhook is created with this shared secret; a mismatch
       makes that tenant's webhook calls fail `apps/web`'s signature check, so
       content publishes in that tenant's Studio never trigger revalidation.
+- [ ] Secret `SITE_CONFIG_REVALIDATE_SECRET` — the **same** value already set as
+      that environment's `apps/web` and `apps/platform` Vercel env vars (§3
+      above, in both projects' tables). A GitHub Environment Secret is a **separate store** from those
+      Vercel project vars, so setting it there does not cover this; all three
+      copies must be byte-identical. `deprovision-tenant.yml`'s final step
+      sends it as a bearer token to purge an archived tenant's cached pages,
+      and — unlike every other credential in this list — throws rather than
+      skipping when it is absent, so a deprovisioning run fails loudly instead
+      of leaving the archived site serving from cache.
 - [ ] (Optional) Secret `RESEND_API_KEY` — the same shared secret name
       `apps/web`/`apps/platform` already use for their own Resend sends. Only
       `recheck-tenant-owners.yml`'s operator notification reads it; unset
