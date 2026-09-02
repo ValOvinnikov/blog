@@ -18,6 +18,7 @@ import {
   type TTenant,
   type TTenantProvisioningState,
 } from '@blog/db/schema/tenants';
+import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import type { TResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
@@ -86,6 +87,10 @@ function buildIdleProvisioningSteps(): TTenantProvisioningState {
 export async function createTenantDraft(
   input: TCreateTenantDraftInput,
 ): Promise<TResult<TTenant, TErrorCode>> {
+  if (!isValidDomain(input.domain)) {
+    return { ok: false, error: ERROR_CODE.DB_INVALID_DOMAIN };
+  }
+
   const db = getDb();
 
   const [inserted] = await db

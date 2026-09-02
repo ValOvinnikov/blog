@@ -1,6 +1,6 @@
+import { DOMAIN_PATTERN } from '@blog/config';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
-import { DOMAIN_PATTERN } from '@platform/utils/path/path';
 
 export type TDomainDnsRecord = {
   type: string;

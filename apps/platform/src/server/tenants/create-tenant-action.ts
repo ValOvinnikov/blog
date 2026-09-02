@@ -1,6 +1,12 @@
 'use server';
 
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE, ERROR_CODE } from '@blog/config';
+import {
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  DOMAIN_PATTERN,
+  ERROR_CODE,
+  SLUG_PATTERN,
+} from '@blog/config';
 import { queries, TENANT_PLAN, type TTenantPlan } from '@blog/db';
 import { routing } from '@platform/i18n/routing';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
@@ -13,7 +19,6 @@ import {
   verifyOwnerInviteToken,
 } from '@platform/server/tenants/owner-invite-token';
 import { logger } from '@platform/utils/logger/logger';
-import { DOMAIN_PATTERN, SLUG_PATTERN } from '@platform/utils/path/path';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';

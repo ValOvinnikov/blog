@@ -45,6 +45,7 @@ import {
   setTenantSanityToken,
 } from '@blog/db/queries/tenants';
 import { users } from '@blog/db/schema/auth';
+import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import { eq } from 'drizzle-orm';
 
 type TParsedArgs = {
@@ -102,17 +103,33 @@ function parseArgs(argv: string[]): TParsedArgs {
     );
   }
 
+  const primaryDomain = requireOne('primary-domain');
+  if (!isValidDomain(primaryDomain)) {
+    throw new Error(
+      `seed-tenant: --primary-domain "${primaryDomain}" is not a valid domain.`,
+    );
+  }
+
+  const extraDomains = flags.get('domain') ?? [];
+  for (const domain of extraDomains) {
+    if (!isValidDomain(domain)) {
+      throw new Error(
+        `seed-tenant: --domain "${domain}" is not a valid domain.`,
+      );
+    }
+  }
+
   return {
     slug: requireOne('slug'),
     name: requireOne('name'),
-    primaryDomain: requireOne('primary-domain'),
+    primaryDomain,
     sanityProjectId: requireOne('sanity-project-id'),
     sanityDataset: requireOne('sanity-dataset'),
     locale: requireOne('locale'),
     ownerEmail: requireOne('owner-email'),
     plan,
     status,
-    extraDomains: flags.get('domain') ?? [],
+    extraDomains,
     sanityReadToken: flags.get('sanity-read-token')?.[0],
   };
 }

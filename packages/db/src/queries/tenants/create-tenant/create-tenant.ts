@@ -2,6 +2,7 @@ import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { type TTenantPlan, type TTenantStatus } from '@blog/db/constants';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
+import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import type { TResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
 
@@ -23,6 +24,10 @@ export type TCreateTenantInput = {
 export async function createTenant(
   input: TCreateTenantInput,
 ): Promise<TResult<TTenant, TErrorCode>> {
+  if (!isValidDomain(input.primaryDomain)) {
+    return { ok: false, error: ERROR_CODE.DB_INVALID_DOMAIN };
+  }
+
   const db = getDb();
 
   const [inserted] = await db

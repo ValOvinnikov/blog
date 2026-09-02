@@ -78,4 +78,23 @@ describe(createTenant, () => {
     expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
     selectSpy.mockRestore();
   });
+
+  it.each([
+    ['a scheme-prefixed value', 'https://acme.com'],
+    ['a trailing-slash value', 'acme.com/'],
+    ['a whitespace-padded value', ' acme.com '],
+  ])(
+    'rejects %s for primaryDomain without writing a row',
+    async (_description, primaryDomain) => {
+      const result = await createTenant({ ...tenantInput, primaryDomain });
+
+      expect(result).toEqual({
+        ok: false,
+        error: ERROR_CODE.DB_INVALID_DOMAIN,
+      });
+
+      const rows = await db.select().from(schema.tenants);
+      expect(rows).toHaveLength(0);
+    },
+  );
 });
