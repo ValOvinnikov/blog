@@ -45,14 +45,13 @@ describe(VoiceField, () => {
     render(
       <VoiceField
         fieldKey="terminalPromptHost"
-        label="Terminal Prompt Host"
         value="custom"
         onChange={vi.fn()}
         isReadOnly={true}
       />,
     );
 
-    const input = screen.getByRole('textbox', { name: 'Terminal Prompt Host' });
+    const input = screen.getByRole('textbox');
     expect(input).toHaveAttribute('readonly');
     expect(input).toBeEnabled();
   });
