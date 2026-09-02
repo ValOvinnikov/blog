@@ -1,5 +1,5 @@
 import { routes, type ILocalizedParams } from '@blog/config';
-import { service } from '@blog/service';
+import { getPlatformSanityContext, service } from '@blog/service';
 import { BlogListPage } from '@web/components/pages/blog-list-page';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { buildBlogListMetadata } from '@web/metadata/blog-list-metadata';
@@ -17,7 +17,9 @@ type TProps = {
 // (dynamicParams defaults to true); correctness rides on the explicit
 // range check in BlogListPage, not on this list.
 export async function generateStaticParams() {
-  const result = await service.pages.blog.v1.getIndexPageParams();
+  const result = await service.pages.blog.v1.getIndexPageParams(
+    getPlatformSanityContext(),
+  );
   if (!result.ok) {
     logger.error('blog_pagination.params_fetch_failed', {
       error: result.error,

@@ -83,7 +83,7 @@ describe(PostListModule, () => {
 
     await setup({ page: 2 });
 
-    expect(getPostListMock).toHaveBeenCalledWith('post-list-1', 2, undefined);
+    expect(getPostListMock).toHaveBeenCalledWith('post-list-1', undefined, 2);
   });
 
   it('forwards the resolved tenant Sanity context to getPostList', async () => {
@@ -111,7 +111,7 @@ describe(PostListModule, () => {
 
     await setup();
 
-    expect(getPostListMock).toHaveBeenCalledWith('post-list-1', 1, tenant);
+    expect(getPostListMock).toHaveBeenCalledWith('post-list-1', tenant, 1);
   });
 
   it('renders an archive-appropriate accessible heading (never "Latest posts")', async () => {

@@ -6,6 +6,7 @@ const {
   generateTakeawaysMock,
   getHostTenantSanityContextMock,
   getHostTenantSanityWriteContextMock,
+  getPlatformSanityWriteContextMock,
   loggerErrorMock,
 } = vi.hoisted(() => ({
   getPublishedPostBodyMock: vi.fn(),
@@ -13,6 +14,7 @@ const {
   generateTakeawaysMock: vi.fn(),
   getHostTenantSanityContextMock: vi.fn(),
   getHostTenantSanityWriteContextMock: vi.fn(),
+  getPlatformSanityWriteContextMock: vi.fn(),
   loggerErrorMock: vi.fn(),
 }));
 
@@ -27,6 +29,7 @@ vi.mock('@blog/service', () => ({
       },
     },
   },
+  getPlatformSanityWriteContext: getPlatformSanityWriteContextMock,
 }));
 
 vi.mock('@web/server/skim/generate-takeaways', () => ({
@@ -53,6 +56,12 @@ vi.mock('@web/utils/env/env', () => ({
   },
 }));
 
+const platformTenant = {
+  projectId: 'platform-project',
+  dataset: 'production',
+  token: 'platform-token',
+};
+
 const makeRequest = (body: unknown, secret = 'test-secret'): Request => {
   const url = new URL('https://example.com/api/generate-skim');
   if (secret !== undefined) url.searchParams.set('secret', secret);
@@ -78,6 +87,8 @@ describe('POST /api/generate-skim', () => {
       tenant: undefined,
       tenantId: undefined,
     });
+    getPlatformSanityWriteContextMock.mockReset();
+    getPlatformSanityWriteContextMock.mockReturnValue(platformTenant);
     loggerErrorMock.mockReset();
   });
 
@@ -149,20 +160,20 @@ describe('POST /api/generate-skim', () => {
     expect(saveSkimDraftMock).not.toHaveBeenCalled();
   });
 
-  it('returns 503 when the write path is unconfigured (SANITY_API_WRITE_TOKEN absent)', async () => {
+  it('returns 503 without saving when the platform write context is unconfigured (SANITY_API_WRITE_TOKEN absent)', async () => {
     getPublishedPostBodyMock.mockResolvedValue({ ok: true, data: [] });
     generateTakeawaysMock.mockResolvedValue(['a', 'b', 'c']);
-    saveSkimDraftMock.mockResolvedValue({
-      ok: false,
-      error: new Error('getWriteClient: SANITY_API_WRITE_TOKEN is not set'),
+    getPlatformSanityWriteContextMock.mockImplementation(() => {
+      throw new Error('SANITY_API_WRITE_TOKEN is not set');
     });
     const { POST } = await import('./route');
 
     const response = await POST(makeRequest({ _id: 'post-1' }));
 
     expect(response.status).toBe(503);
+    expect(saveSkimDraftMock).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      'generate_skim.draft_save_failed',
+      'generate_skim.write_client_unconfigured',
       expect.anything(),
     );
   });
@@ -199,7 +210,7 @@ describe('POST /api/generate-skim', () => {
         takeaways: ['a', 'b', 'c'],
         model: 'claude-haiku-4-5',
       },
-      undefined,
+      platformTenant,
     );
   });
 
@@ -220,7 +231,7 @@ describe('POST /api/generate-skim', () => {
         takeaways: ['a', 'b', 'c'],
         model: 'claude-haiku-4-5',
       },
-      undefined,
+      platformTenant,
     );
     expect(saveSkimDraftMock).toHaveBeenNthCalledWith(
       2,
@@ -229,7 +240,7 @@ describe('POST /api/generate-skim', () => {
         takeaways: ['a', 'b', 'c'],
         model: 'claude-haiku-4-5',
       },
-      undefined,
+      platformTenant,
     );
   });
 
@@ -290,6 +301,7 @@ describe('POST /api/generate-skim', () => {
       },
       tenant,
     );
+    expect(getPlatformSanityWriteContextMock).not.toHaveBeenCalled();
   });
 
   it('returns 503 without generating takeaways when the resolved tenant has no usable write credentials', async () => {

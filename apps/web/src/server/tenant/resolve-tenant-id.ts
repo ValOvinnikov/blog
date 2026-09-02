@@ -7,8 +7,12 @@ import { isProductionEnvironment } from '@web/utils/is-production-environment';
  * custom domain pointed at `tenant_domains`), an unmatched host falls back to
  * the sole `tenants` row when exactly one exists, preserving the single-
  * tenant dev experience with no extra config. In production an unmatched
- * host resolves to `undefined` — callers must never substitute another
- * tenant's data for it.
+ * host resolves to `undefined` — and every caller of this function refuses
+ * to serve (`proxy.ts` 404s, `getHostTenantSanityContext`/
+ * `getHostTenantSanityWriteContext` report `isResolvable: false`) rather than
+ * ever substituting another tenant's data for it; `getClient`/`getWriteClient`
+ * requiring a `TTenantSanityContext` argument makes it impossible to reach a
+ * `service.*` call without one.
  *
  * Gated by `isProductionEnvironment()`, not `NODE_ENV` — `NODE_ENV` is
  * `production` on every Vercel build, dev deployment included, so it can't

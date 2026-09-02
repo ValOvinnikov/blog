@@ -1,5 +1,5 @@
 import type { ILocalizedParams } from '@blog/config';
-import { service } from '@blog/service';
+import { getPlatformSanityContext, service } from '@blog/service';
 import { TagPage } from '@web/components/pages/tag-page';
 import { buildTagMetadata } from '@web/metadata/tag-metadata';
 import { logger } from '@web/utils/logger/logger';
@@ -14,7 +14,9 @@ type TProps = {
 // uncaught throw here would crash the entire `next build`. `dynamicParams`
 // stays default `true`, so a missed build-time slug still renders on demand.
 export async function generateStaticParams() {
-  const result = await service.pages.tag.v1.getTagParams();
+  const result = await service.pages.tag.v1.getTagParams(
+    getPlatformSanityContext(),
+  );
 
   if (!result.ok) {
     logger.error('tag_page.params_fetch_failed', { error: result.error });

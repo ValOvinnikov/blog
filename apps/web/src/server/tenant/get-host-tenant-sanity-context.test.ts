@@ -3,9 +3,14 @@ import { queries, TENANT_STATUS } from '@blog/db';
 import { getHostTenantSanityContext } from './get-host-tenant-sanity-context';
 import { resolveTenantId } from './resolve-tenant-id';
 
-const { headersMock, isProductionEnvironmentMock } = vi.hoisted(() => ({
+const {
+  headersMock,
+  isProductionEnvironmentMock,
+  getPlatformSanityContextMock,
+} = vi.hoisted(() => ({
   headersMock: vi.fn(),
   isProductionEnvironmentMock: vi.fn(),
+  getPlatformSanityContextMock: vi.fn(),
 }));
 
 vi.mock('next/headers', () => ({ headers: headersMock }));
@@ -18,12 +23,21 @@ vi.mock('@blog/db', () => ({
     ARCHIVED: 'ARCHIVED',
   },
 }));
+vi.mock('@blog/service', () => ({
+  getPlatformSanityContext: getPlatformSanityContextMock,
+}));
 vi.mock('@web/utils/is-production-environment', () => ({
   isProductionEnvironment: isProductionEnvironmentMock,
 }));
 
 const setHost = (host: string | null) => {
   headersMock.mockResolvedValue({ get: () => host });
+};
+
+const platformTenant = {
+  projectId: 'platform-project',
+  dataset: 'production',
+  token: 'platform-token',
 };
 
 describe(getHostTenantSanityContext, () => {
@@ -33,6 +47,8 @@ describe(getHostTenantSanityContext, () => {
     isProductionEnvironmentMock.mockReturnValue(false);
     vi.mocked(resolveTenantId).mockReset();
     vi.mocked(queries.tenants.getTenantSanityCredentials).mockReset();
+    getPlatformSanityContextMock.mockReset();
+    getPlatformSanityContextMock.mockReturnValue(platformTenant);
   });
 
   it('resolves the tenant Sanity credentials for a matched host', async () => {
@@ -72,14 +88,27 @@ describe(getHostTenantSanityContext, () => {
     expect(queries.tenants.getTenantSanityCredentials).not.toHaveBeenCalled();
   });
 
-  it('resolves with an undefined tenant outside production when no host matches (sole-tenant fallback already applied by resolveTenantId)', async () => {
+  it('falls back to the platform Sanity context outside production when no host matches (sole-tenant fallback already applied by resolveTenantId)', async () => {
     setHost('unknown.example.com');
     isProductionEnvironmentMock.mockReturnValue(false);
     vi.mocked(resolveTenantId).mockResolvedValue(undefined);
 
     await expect(getHostTenantSanityContext()).resolves.toEqual({
       isResolvable: true,
-      tenant: undefined,
+      tenant: platformTenant,
+    });
+  });
+
+  it('falls back to the platform Sanity context when the matched tenant has no credentials set', async () => {
+    setHost('acme.example.com');
+    vi.mocked(resolveTenantId).mockResolvedValue('tenant-1');
+    vi.mocked(queries.tenants.getTenantSanityCredentials).mockResolvedValue(
+      undefined,
+    );
+
+    await expect(getHostTenantSanityContext()).resolves.toEqual({
+      isResolvable: true,
+      tenant: platformTenant,
     });
   });
 });

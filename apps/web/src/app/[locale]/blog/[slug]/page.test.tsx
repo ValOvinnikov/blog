@@ -3,9 +3,16 @@ import BlogPostSlugPage, {
   generateStaticParams,
 } from './page';
 
-const { getPostParamsMock } = vi.hoisted(() => ({
-  getPostParamsMock: vi.fn(),
-}));
+const { getPostParamsMock, getPlatformSanityContextMock, platformTenant } =
+  vi.hoisted(() => ({
+    getPostParamsMock: vi.fn(),
+    getPlatformSanityContextMock: vi.fn(),
+    platformTenant: {
+      projectId: 'platform-project',
+      dataset: 'production',
+      token: 'platform-token',
+    },
+  }));
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -13,6 +20,7 @@ vi.mock('@blog/service', () => ({
       post: { v1: { getPostParams: getPostParamsMock } },
     },
   },
+  getPlatformSanityContext: getPlatformSanityContextMock,
 }));
 
 vi.mock('@web/metadata/post-metadata', () => ({
@@ -28,6 +36,11 @@ vi.mock('@web/components/pages/blog-post-page', () => ({
 describe('BlogPostSlugPage', () => {
   describe('generateStaticParams', () => {
     const originalSkipEnvValidation = process.env.SKIP_ENV_VALIDATION;
+
+    beforeEach(() => {
+      getPlatformSanityContextMock.mockReset();
+      getPlatformSanityContextMock.mockReturnValue(platformTenant);
+    });
 
     afterEach(() => {
       process.env.SKIP_ENV_VALIDATION = originalSkipEnvValidation;
@@ -45,6 +58,7 @@ describe('BlogPostSlugPage', () => {
       const params = await generateStaticParams();
 
       expect(params).toEqual([{ slug: 'a' }, { slug: 'b' }]);
+      expect(getPostParamsMock).toHaveBeenCalledWith(platformTenant);
     });
 
     it('returns an empty array when getPostParams resolves to a failure result, regardless of SKIP_ENV_VALIDATION', async () => {

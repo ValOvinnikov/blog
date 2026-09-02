@@ -1,5 +1,8 @@
 import { queries } from '@blog/db';
-import type { TTenantSanityContext } from '@blog/service';
+import {
+  getPlatformSanityContext,
+  type TTenantSanityContext,
+} from '@blog/service';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
 import { headers } from 'next/headers';
 import { cache } from 'react';
@@ -7,7 +10,7 @@ import { cache } from 'react';
 import { resolveTenantId } from './resolve-tenant-id';
 
 export type THostTenantSanityContext =
-  | { isResolvable: true; tenant: TTenantSanityContext | undefined }
+  | { isResolvable: true; tenant: TTenantSanityContext }
   | { isResolvable: false };
 
 /**
@@ -18,6 +21,9 @@ export type THostTenantSanityContext =
  * header `getTenantSanityContext` reads. `isResolvable: false` means
  * production saw a host matching no tenant — the caller must render as
  * though it has no content, never fall back to the platform's own project.
+ * Outside production, an unmatched host (or a matched tenant with no token
+ * set yet) resolves `tenant` to `getPlatformSanityContext()` — the
+ * deliberate single-tenant dev/preview fallback.
  *
  * Wrapped in React's `cache()`, not `unstable_cache` — same reasoning as
  * `getTenantSanityContext`: the resolved token is request-scoped-only, and
@@ -33,10 +39,13 @@ export const getHostTenantSanityContext = cache(
       if (isProductionEnvironment()) {
         return { isResolvable: false };
       }
-      return { isResolvable: true, tenant: undefined };
+      return { isResolvable: true, tenant: getPlatformSanityContext() };
     }
 
     const tenant = await queries.tenants.getTenantSanityCredentials(tenantId);
-    return { isResolvable: true, tenant };
+    return {
+      isResolvable: true,
+      tenant: tenant ?? getPlatformSanityContext(),
+    };
   },
 );

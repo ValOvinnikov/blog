@@ -11,7 +11,7 @@ import { logger } from '@web/utils/logger/logger';
  * content, so a failure here must never 404 `/blog` or `/topics/[slug]`.
  */
 export const getTopicsSafely = async (
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<TTopicsList> => {
   const result = await service.entities.topics.v1.getTopics(tenant);
 

@@ -1,8 +1,15 @@
 import TagDetailPage, { generateMetadata, generateStaticParams } from './page';
 
-const { getTagParamsMock } = vi.hoisted(() => ({
-  getTagParamsMock: vi.fn(),
-}));
+const { getTagParamsMock, getPlatformSanityContextMock, platformTenant } =
+  vi.hoisted(() => ({
+    getTagParamsMock: vi.fn(),
+    getPlatformSanityContextMock: vi.fn(),
+    platformTenant: {
+      projectId: 'platform-project',
+      dataset: 'production',
+      token: 'platform-token',
+    },
+  }));
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -10,6 +17,7 @@ vi.mock('@blog/service', () => ({
       tag: { v1: { getTagParams: getTagParamsMock } },
     },
   },
+  getPlatformSanityContext: getPlatformSanityContextMock,
 }));
 
 vi.mock('@web/components/pages/tag-page', () => ({
@@ -24,6 +32,11 @@ vi.mock('@web/metadata/tag-metadata', () => ({
 
 describe('TagDetailPage', () => {
   describe('generateStaticParams', () => {
+    beforeEach(() => {
+      getPlatformSanityContextMock.mockReset();
+      getPlatformSanityContextMock.mockReturnValue(platformTenant);
+    });
+
     it('returns the tag slugs on success', async () => {
       getTagParamsMock.mockResolvedValue({
         ok: true,
@@ -33,6 +46,7 @@ describe('TagDetailPage', () => {
       const params = await generateStaticParams();
 
       expect(params).toEqual([{ slug: 'typescript' }, { slug: 'react' }]);
+      expect(getTagParamsMock).toHaveBeenCalledWith(platformTenant);
     });
 
     it('returns an empty array when the fetch resolves to a failure result', async () => {

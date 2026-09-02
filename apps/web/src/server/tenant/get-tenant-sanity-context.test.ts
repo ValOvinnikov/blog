@@ -3,6 +3,13 @@ import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 
 import { getTenantSanityContext } from './get-tenant-sanity-context';
 
+const { getPlatformSanityContextMock } = vi.hoisted(() => ({
+  getPlatformSanityContextMock: vi.fn(),
+}));
+
+vi.mock('@blog/service', () => ({
+  getPlatformSanityContext: getPlatformSanityContextMock,
+}));
 vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
   getRequestTenantId: vi.fn(),
 }));
@@ -15,12 +22,32 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
+const platformTenant = {
+  projectId: 'platform-project',
+  dataset: 'production',
+  token: 'platform-token',
+};
+
 describe(getTenantSanityContext, () => {
-  it('resolves undefined when no tenant is resolved for the request', async () => {
+  beforeEach(() => {
+    getPlatformSanityContextMock.mockReset();
+    getPlatformSanityContextMock.mockReturnValue(platformTenant);
+  });
+
+  it('falls back to the platform Sanity context when no tenant is resolved for the request', async () => {
     vi.mocked(getRequestTenantId).mockResolvedValue(undefined);
 
-    await expect(getTenantSanityContext()).resolves.toBeUndefined();
+    await expect(getTenantSanityContext()).resolves.toBe(platformTenant);
     expect(queries.tenants.getTenantSanityCredentials).not.toHaveBeenCalled();
+  });
+
+  it('falls back to the platform Sanity context when the resolved tenant has no credentials set', async () => {
+    vi.mocked(getRequestTenantId).mockResolvedValue('tenant-uuid');
+    vi.mocked(queries.tenants.getTenantSanityCredentials).mockResolvedValue(
+      undefined,
+    );
+
+    await expect(getTenantSanityContext()).resolves.toBe(platformTenant);
   });
 
   it('resolves the tenant Sanity credentials for the request-scoped tenant id', async () => {
