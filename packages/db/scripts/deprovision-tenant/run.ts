@@ -100,7 +100,11 @@ export async function runSteps(
         `deprovision-tenant: step "${step.name}" failed: ${sanitizeLogMessage(error)}`,
       );
       // Stop here — later steps stay untouched. Re-running the workflow for
-      // the same tenant resumes at this step via its own idempotency check.
+      // the same tenant resumes at this step via its own idempotency check
+      // — except invalidate-tenant-cache: once archive-tenant has run, the
+      // top-level deprovisionedAt guard blocks any resumed run from ever
+      // reaching it again, so retrying that one step alone goes through
+      // `scripts/invalidate-tenant-cache/` instead.
       return { ok: false };
     }
   }

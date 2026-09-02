@@ -1,0 +1,79 @@
+name: Invalidate Tenant Cache
+
+# Retries the cache-purge step of `deprovision-tenant.yml` (POSTing the
+# tenant id to `apps/web`'s `/api/revalidate-site-config`) for one tenant,
+# without any of that workflow's other, destructive steps. Deprovisioning's
+# `deprovisionedAt` guard blocks a normal re-dispatch of that workflow from
+# ever reaching this step once the tenant is already archived, so a failed
+# purge (network blip, 500, missing secret) needs this dedicated recovery
+# path instead. See `packages/db/scripts/invalidate-tenant-cache/`.
+#
+# Dispatched by hand from the Actions UI by an operator; there is no wizard
+# triggering this automatically.
+#
+# Non-destructive and safely repeatable — the endpoint it calls only purges
+# cache tags, so this workflow needs no `confirm`/`dryRun` gate. It should
+# NOT no-op green when a secret is missing, same posture as
+# `deprovision-tenant.yml`: the script fails loudly, before any network
+# call, if a required env var is absent.
+on:
+  workflow_dispatch:
+    inputs:
+      tenantId:
+        description: 'tenants.id of the row whose cached pages to purge'
+        required: true
+        type: string
+      environment:
+        description: 'Which Neon branch the tenant registry (the tenants row this run reads) lives in'
+        required: true
+        type: choice
+        options: [development, production]
+        default: production
+
+permissions:
+  contents: read
+
+concurrency:
+  group: invalidate-tenant-cache-${{ inputs.tenantId }}
+  cancel-in-progress: false
+
+env:
+  PNPM_VERSION: 11.21.0
+  NODE_VERSION: '22'
+
+jobs:
+  invalidate:
+    name: Invalidate tenant cache
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Bound to the dispatch input rather than hardcoded — same reasoning as
+    # provision-tenant.yml/deprovision-tenant.yml: a run dispatched for
+    # `development` must resolve the tenant registry connection string, and
+    # every other credential, from the `development` GitHub Environment, and
+    # a `production` dispatch from `production`, never a mix of the two.
+    environment: ${{ inputs.environment }}
+    env:
+      # `getDb()` (via `packages/db/src/utils/env/env.ts`) reads `DATABASE_URL`
+      # specifically — the tenant registry connection string, distinct from
+      # `DATABASE_URL_UNPOOLED` (which `deploy-production.yml`'s `migrate-db`
+      # job reads).
+      DATABASE_URL: ${{ secrets.TENANT_REGISTRY_DATABASE_URL }}
+      WEB_APP_URL: ${{ vars.WEB_APP_URL }}
+      SITE_CONFIG_REVALIDATE_SECRET: ${{ secrets.SITE_CONFIG_REVALIDATE_SECRET }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Invalidate cached pages
+        # `inputs.tenantId` is attacker-influenceable (any repo collaborator
+        # who can trigger workflow_dispatch controls it) — never interpolate
+        # a `${{ }}` expression directly into a `run:` shell script (template
+        # injection); pass it through `env` and reference the shell variable
+        # instead.
+        env:
+          TENANT_ID: ${{ inputs.tenantId }}
+        run: pnpm --filter @blog/db db:invalidate-tenant-cache -- --tenant-id="$TENANT_ID" --dry-run=false

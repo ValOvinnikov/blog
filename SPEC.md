@@ -630,9 +630,10 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   `main` on 2026-08-25) backs development. Before that date only `main`
   existed and both environments read it. `deploy-production.yml`'s
   `migrate-db` job reads the `production` Environment's own
-  `DATABASE_URL_UNPOOLED` (`main`); the three tenant lifecycle workflows
-  (`provision-tenant.yml`/`deprovision-tenant.yml`/`recheck-tenant-owners.yml`)
-  read their own Environment's `TENANT_REGISTRY_DATABASE_URL` secret instead
+  `DATABASE_URL_UNPOOLED` (`main`); the tenant lifecycle workflows
+  (`provision-tenant.yml`/`deprovision-tenant.yml`/`recheck-tenant-owners.yml`/
+  `invalidate-tenant-cache.yml`) read their own Environment's
+  `TENANT_REGISTRY_DATABASE_URL` secret instead
   (#2056, merged 2026-08-25) — before that split, both purposes shared one
   secret, and
   pointing it at `development` for tenant provisioning had silently
