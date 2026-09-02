@@ -7,7 +7,6 @@ import { SanityImage as SanityImageBase } from 'sanity-image';
 
 export interface ISanityImageProps {
   image: ISanityImage;
-  baseUrl: string;
   width: number;
   height?: number;
   mode?: 'cover' | 'contain';
@@ -25,10 +24,8 @@ export interface ISanityImageProps {
 
 /**
  * Framework-coupled bridge between the service layer's `ISanityImage`
- * view-model and the `sanity-image` package. `baseUrl` is a plain prop
- * resolved by the caller via `@blog/service`'s `getSanityImageBaseUrl` —
- * this component stays free of any env/service import so it doesn't pull
- * that cost into the client bundle.
+ * view-model and the `sanity-image` package. `image.cdnBaseUrl` already
+ * carries the CDN origin, so this component needs no separate origin prop.
  *
  * `preview` (the LQIP blur-up placeholder) is withheld when `priority` is
  * set. When a `preview` is passed, the underlying package renders the real
@@ -40,11 +37,10 @@ export interface ISanityImageProps {
  * its final `<img>` with no hydration-gated placeholder swap.
  *
  * @example
- * <SanityImage image={hero.sanityImage} baseUrl={baseUrl} width={960} height={720} mode="cover" />
+ * <SanityImage image={hero.sanityImage} width={960} height={720} mode="cover" />
  */
 export const SanityImage = ({
   image,
-  baseUrl,
   width,
   height,
   mode = 'cover',
@@ -56,7 +52,7 @@ export const SanityImage = ({
 }: ISanityImageProps) => (
   <SanityImageBase
     id={image.assetId}
-    baseUrl={baseUrl}
+    baseUrl={image.cdnBaseUrl}
     hotspot={image.hotspot}
     crop={image.crop}
     preview={priority ? undefined : image.lqip}

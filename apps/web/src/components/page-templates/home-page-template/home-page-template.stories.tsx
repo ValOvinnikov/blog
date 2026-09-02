@@ -1,5 +1,4 @@
 import { BRAND_VARIANT, CTA_VARIANT } from '@blog/config';
-import { getSanityImageBaseUrl } from '@blog/service';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { ContentModuleView } from '@web/modules/content/content-module-view';
 import { CtaModuleView } from '@web/modules/cta/cta-module-view';
@@ -7,9 +6,11 @@ import { HeroModuleView } from '@web/modules/hero/hero-module-view';
 import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { richTextDemo } from '@web/testing/shared/portable-text-renderer/fixtures';
-import { STUB_IMAGE_TENANT } from '@web/testing/shared/tenant/fixtures';
 
 import { HomePageTemplate } from './home-page-template';
+
+const STORYBOOK_CDN_BASE_URL =
+  'https://cdn.sanity.io/images/storybook-project/storybook-dataset/';
 
 const meta = {
   title: 'Page Templates/HomePageTemplate',
@@ -33,7 +34,6 @@ const meta = {
         }}
         secondaryAction={undefined}
         layout={undefined}
-        baseUrl={getSanityImageBaseUrl(STUB_IMAGE_TENANT)}
       />
     ),
     modules: (
@@ -43,7 +43,7 @@ const meta = {
           brandVariant={BRAND_VARIANT.PRIMARY}
           body={richTextDemo}
           layout={undefined}
-          baseUrl={getSanityImageBaseUrl(STUB_IMAGE_TENANT)}
+          baseUrl={STORYBOOK_CDN_BASE_URL}
         />
         <CtaModuleView
           id="cta-1"
@@ -63,7 +63,6 @@ const meta = {
           actions={ctaActionsDemo}
           footnote={undefined}
           layout={undefined}
-          baseUrl={getSanityImageBaseUrl(STUB_IMAGE_TENANT)}
         />
       </>
     ),
@@ -88,7 +87,6 @@ export const MinimalSlots: TStory = {
         primaryAction={undefined}
         secondaryAction={undefined}
         layout={undefined}
-        baseUrl={getSanityImageBaseUrl(STUB_IMAGE_TENANT)}
       />
     ),
     modules: (

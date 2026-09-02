@@ -49,9 +49,14 @@ const toCrop = (raw: BodyImage['crop']): ISanityImageCrop | undefined => {
  * `dimensions` only come from the asset document's `metadata`, so they stay
  * `undefined` here: `SanityImage` renders fine without them (no blur-up
  * placeholder; explicit `width`/`height` props still apply).
+ *
+ * Unlike `toSanityImage`, this stays a web-owned transformer rather than a
+ * service one, so it takes `cdnBaseUrl` as a plain argument instead of
+ * deriving it from a tenant itself.
  */
 export const toPortableTextImage = (
   block: BodyImage,
+  cdnBaseUrl: string,
 ): ISanityImage | undefined => {
   const assetId = block.asset?._ref;
   if (!assetId) return undefined;
@@ -63,5 +68,6 @@ export const toPortableTextImage = (
     crop: toCrop(block.crop),
     lqip: undefined,
     dimensions: undefined,
+    cdnBaseUrl,
   };
 };

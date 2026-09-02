@@ -163,6 +163,7 @@ describe(BlogPostPageView, () => {
       crop: undefined,
       lqip: undefined,
       dimensions: { width: 1600, height: 1200, aspectRatio: 1600 / 1200 },
+      cdnBaseUrl: 'https://cdn.sanity.io/images/test-project/test-dataset/',
     };
 
     setup({ heroImageSanity, heroImageAlt: 'A scenic mountain range' });

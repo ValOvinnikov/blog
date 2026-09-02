@@ -63,6 +63,8 @@ export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
   const headings = extractPostHeadings(body);
   const hasContentsRail = headings.length >= MIN_H2_HEADINGS_FOR_RAIL;
   const siteUrl = (await getTenantBaseUrl()) ?? '';
+  // Only for images embedded in `body` — `heroImageSanity` already carries
+  // its own `cdnBaseUrl` from the service layer.
   const imageBaseUrl = getSanityImageBaseUrl(tenant);
   const url = `${siteUrl}${routes.post(slug)}`;
   const blogPostingSchema = buildBlogPostingSchema(post, siteUrl);

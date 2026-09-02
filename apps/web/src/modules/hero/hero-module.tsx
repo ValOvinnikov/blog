@@ -1,4 +1,4 @@
-import { getSanityImageBaseUrl, service } from '@blog/service';
+import { service } from '@blog/service';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 
 import { HeroModuleView } from './hero-module-view';
@@ -23,12 +23,5 @@ export const HeroModule = async ({ id }: IHeroModuleProps) => {
   // render a Hero with an empty top-level <h1>.
   if (!title) return null;
 
-  return (
-    <HeroModuleView
-      id={id}
-      {...result.data}
-      title={title}
-      baseUrl={getSanityImageBaseUrl(tenant)}
-    />
-  );
+  return <HeroModuleView id={id} {...result.data} title={title} />;
 };

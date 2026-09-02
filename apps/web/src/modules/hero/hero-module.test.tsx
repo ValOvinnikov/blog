@@ -10,8 +10,6 @@ const { getHeroMock, getTenantSanityContextMock } = vi.hoisted(() => ({
 }));
 
 vi.mock('@blog/service', () => ({
-  getSanityImageBaseUrl: (tenant: { projectId: string; dataset: string }) =>
-    `https://cdn.sanity.io/images/${tenant.projectId}/${tenant.dataset}/`,
   service: {
     modules: {
       hero: { v1: { getHero: getHeroMock } },
@@ -87,13 +85,10 @@ describe(HeroModule, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("resolves baseUrl via getSanityImageBaseUrl and forwards it into the rendered hero image's src", async () => {
-    getTenantSanityContextMock.mockResolvedValue({
-      projectId: 'tenant-project',
-      dataset: 'production',
-      token: 'tenant-token',
+  it('renders the hero image using its own cdnBaseUrl, not a hardcoded origin', async () => {
+    const sanityImage = makeSanityImage({
+      cdnBaseUrl: 'https://cdn.sanity.io/images/tenant-project/production/',
     });
-    const sanityImage = makeSanityImage();
     getHeroMock.mockResolvedValue({
       ok: true,
       data: {
