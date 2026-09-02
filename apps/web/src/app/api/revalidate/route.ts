@@ -83,11 +83,9 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const { _type: type, _id: id } = parsedBody;
   const baseTags = getRevalidateTagsForType(type, id);
-  // Identifies which tenant's project published. Emitting both the legacy
-  // and tenant-scoped form keeps this webhook correct regardless of how many
-  // service.* loaders have migrated to tenant-scoped tags yet (an unmigrated
-  // loader's cache only ever holds the legacy tag; a migrated one only the
-  // prefixed tag — purging both is a no-op for whichever one wasn't set).
+  // Identifies which tenant's project published. `isr()` always emits the
+  // tenant-prefixed tag now, but the legacy unprefixed form can still be
+  // live in the cache from before, so both are purged.
   const tenantProjectId = request.headers.get(SANITY_PROJECT_ID_HEADER);
   const revalidated = tenantProjectId
     ? [...baseTags, ...baseTags.map((tag) => `t:${tenantProjectId}:${tag}`)]
