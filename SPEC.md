@@ -335,7 +335,22 @@ sole `tenants` row outside production (`isProductionEnvironment()` — never
 resolved `tenantId` is threaded to Server Components/Actions via the
 `x-tenant-id` request header (unconditionally cleared before the conditional
 set, so a client-supplied value can never survive an unresolved lookup),
-read back with `getRequestTenantId()`. `get-site-config.ts` (and its
+read back with `getRequestTenantId()`.
+
+A resolved tenant is not automatically a usable one, and the two directions
+have deliberately different thresholds. **Reads** are refused for a tenant
+that is ARCHIVED or has no Sanity credentials yet (`isTenantServable()`), so a
+domain that goes live at draft creation cannot serve another tenant's content
+while provisioning is still pending. **Writes** are refused for any tenant
+that is not ACTIVE (`isTenantActive()`), so a SUSPENDED tenant's site stays
+readable while nothing new lands against it. Both live in
+`apps/web/src/server/tenant/`, and every tenant-scoped mutation checks the
+latter — one shared predicate rather than a per-call-site status check, since
+independent predicates drift apart. The asymmetry is the point: a suspended
+tenant should still be visible, and a frozen or torn-down one should not
+accumulate rows that a later restore would have to reconcile.
+
+`get-site-config.ts` (and its
 `settings_features`/tenant-plan counterparts below) reads that same
 per-request `getRequestTenantId()` and caches per tenant — both the
 `unstable_cache` key and the revalidation tag carry the tenant id
