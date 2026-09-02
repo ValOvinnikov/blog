@@ -1,4 +1,4 @@
-import { queries } from '@blog/db';
+import { queries, TENANT_STATUS } from '@blog/db';
 
 import { getHostTenantSanityContext } from './get-host-tenant-sanity-context';
 import { resolveTenantId } from './resolve-tenant-id';
@@ -12,6 +12,11 @@ vi.mock('next/headers', () => ({ headers: headersMock }));
 vi.mock('./resolve-tenant-id', () => ({ resolveTenantId: vi.fn() }));
 vi.mock('@blog/db', () => ({
   queries: { tenants: { getTenantSanityCredentials: vi.fn() } },
+  TENANT_STATUS: {
+    ACTIVE: 'ACTIVE',
+    SUSPENDED: 'SUSPENDED',
+    ARCHIVED: 'ARCHIVED',
+  },
 }));
 vi.mock('@web/utils/is-production-environment', () => ({
   isProductionEnvironment: isProductionEnvironmentMock,
@@ -37,11 +42,21 @@ describe(getHostTenantSanityContext, () => {
       projectId: 'proj',
       dataset: 'production',
       token: 'tok',
+      status: TENANT_STATUS.ACTIVE,
+      deprovisionedAt: null,
+      provisioningStatus: null,
     });
 
     await expect(getHostTenantSanityContext()).resolves.toEqual({
       isResolvable: true,
-      tenant: { projectId: 'proj', dataset: 'production', token: 'tok' },
+      tenant: {
+        projectId: 'proj',
+        dataset: 'production',
+        token: 'tok',
+        status: TENANT_STATUS.ACTIVE,
+        deprovisionedAt: null,
+        provisioningStatus: null,
+      },
     });
     expect(resolveTenantId).toHaveBeenCalledWith('acme.example.com');
   });
@@ -89,6 +104,9 @@ describe('getHostTenantSanityContext memoization', () => {
       projectId: 'proj',
       dataset: 'production',
       token: 'tok',
+      status: TENANT_STATUS.ACTIVE,
+      deprovisionedAt: null,
+      provisioningStatus: null,
     });
 
     vi.doMock('react', async (importOriginal) => {

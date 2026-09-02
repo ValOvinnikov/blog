@@ -1,4 +1,4 @@
-import { queries } from '@blog/db';
+import { queries, TENANT_STATUS } from '@blog/db';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 
 import { getTenantSanityContext } from './get-tenant-sanity-context';
@@ -8,6 +8,11 @@ vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
 }));
 vi.mock('@blog/db', () => ({
   queries: { tenants: { getTenantSanityCredentials: vi.fn() } },
+  TENANT_STATUS: {
+    ACTIVE: 'ACTIVE',
+    SUSPENDED: 'SUSPENDED',
+    ARCHIVED: 'ARCHIVED',
+  },
 }));
 
 describe(getTenantSanityContext, () => {
@@ -24,12 +29,18 @@ describe(getTenantSanityContext, () => {
       projectId: 'proj',
       dataset: 'production',
       token: 'tok',
+      status: TENANT_STATUS.ACTIVE,
+      deprovisionedAt: null,
+      provisioningStatus: null,
     });
 
     await expect(getTenantSanityContext()).resolves.toEqual({
       projectId: 'proj',
       dataset: 'production',
       token: 'tok',
+      status: TENANT_STATUS.ACTIVE,
+      deprovisionedAt: null,
+      provisioningStatus: null,
     });
     expect(queries.tenants.getTenantSanityCredentials).toHaveBeenCalledWith(
       'tenant-uuid',
@@ -57,6 +68,9 @@ describe('getTenantSanityContext memoization', () => {
       projectId: 'proj',
       dataset: 'production',
       token: 'tok',
+      status: TENANT_STATUS.ACTIVE,
+      deprovisionedAt: null,
+      provisioningStatus: null,
     });
 
     vi.doMock('react', async (importOriginal) => {
