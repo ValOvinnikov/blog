@@ -1,5 +1,6 @@
 import type { TPostDetail } from '@blog/service';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { buildPostMetadata } from './build-post-metadata';
 
@@ -64,7 +65,7 @@ const basePost: TPostDetail = {
 describe('buildPostMetadata', () => {
   beforeEach(() => {
     getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('forwards the resolved tenant Sanity context to getPost', async () => {

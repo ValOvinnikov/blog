@@ -1,5 +1,6 @@
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { buildTagMetadata } from './build-tag-metadata';
 
@@ -31,7 +32,7 @@ const seo = makeSeo({
 describe('buildTagMetadata', () => {
   beforeEach(() => {
     getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('forwards the resolved tenant Sanity context to getTagPage', async () => {
@@ -67,7 +68,10 @@ describe('buildTagMetadata', () => {
     });
     expect(metadata.openGraph?.title).toBe('TypeScript');
     expect(metadata.openGraph?.description).toBe('Posts about TypeScript.');
-    expect(getTagPageMock).toHaveBeenCalledWith('typescript', undefined);
+    expect(getTagPageMock).toHaveBeenCalledWith(
+      'typescript',
+      DEFAULT_TENANT_SANITY_CONTEXT,
+    );
   });
 
   it('returns empty metadata when the tag fetch fails', async () => {
@@ -96,7 +100,10 @@ describe('buildTagMetadata', () => {
     expect(metadata.alternates?.types).toEqual({
       'application/rss+xml': '/tags/typescript/rss.xml',
     });
-    expect(getTagPageMock).toHaveBeenCalledWith('typescript', undefined);
+    expect(getTagPageMock).toHaveBeenCalledWith(
+      'typescript',
+      DEFAULT_TENANT_SANITY_CONTEXT,
+    );
   });
 
   it('returns empty metadata for page N when the tag fetch fails', async () => {

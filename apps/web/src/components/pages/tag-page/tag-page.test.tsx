@@ -1,5 +1,6 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeTag } from '@web/testing/shared/tag/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
 import { TagPage } from './tag-page';
@@ -100,7 +101,7 @@ describe(`<${TagPage.name}/>`, () => {
     moduleRendererMock.mockClear();
     postListModuleMock.mockClear();
     getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
     getTenantBaseUrlMock.mockReset();
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');
   });

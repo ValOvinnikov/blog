@@ -1,5 +1,6 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { PostLatestModule } from './post-latest-module';
 
@@ -44,7 +45,7 @@ describe(PostLatestModule, () => {
   beforeEach(() => {
     getPostLatestMock.mockReset();
     getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('calls getPostLatest with the module id and resolved tenant Sanity context', async () => {
@@ -64,7 +65,10 @@ describe(PostLatestModule, () => {
 
     await setup();
 
-    expect(getPostLatestMock).toHaveBeenCalledWith('post-latest-1', undefined);
+    expect(getPostLatestMock).toHaveBeenCalledWith(
+      'post-latest-1',
+      DEFAULT_TENANT_SANITY_CONTEXT,
+    );
   });
 
   it('forwards the resolved tenant Sanity context to getPostLatest', async () => {
