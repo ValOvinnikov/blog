@@ -149,6 +149,38 @@ expect_base() {
 build() { expect 1 "$@"; }
 skip() { expect 0 "$@"; }
 
+# expect_paths <want-exit> <label> <repo> <trigger-path>...
+# Allowlist mode takes no package argument and must never reach turbo — falling
+# through to affectedness would silently restore the behaviour it replaces, so
+# every case asserts the stub stayed untouched.
+expect_paths() {
+	want=$1
+	label=$2
+	repo=$3
+	shift 3
+	PNPM_STUB_LOG="$workdir/pnpm-args"
+	export PNPM_STUB_LOG
+	: >"$PNPM_STUB_LOG"
+	(
+		cd "$repo" && \
+			VERCEL_GIT_REPO_OWNER=test-owner \
+			VERCEL_GIT_REPO_SLUG=test-repo \
+			sh "$script" --paths "$@" >/dev/null 2>&1
+	)
+	got=$?
+	if [ "$got" != "$want" ]; then
+		printf 'FAIL want=%s got=%s  %s\n' "$want" "$got" "$label"
+		fails=$((fails + 1))
+	fi
+	if [ -s "$PNPM_STUB_LOG" ]; then
+		printf 'FAIL turbo was invoked in --paths mode  %s\n' "$label"
+		fails=$((fails + 1))
+	fi
+}
+
+build_paths() { expect_paths 1 "$@"; }
+skip_paths() { expect_paths 0 "$@"; }
+
 # --- the #1712 deadlock: a main build with no prior successful deployment ---
 # VERCEL_GIT_PREVIOUS_SHA is empty until a project has deployed successfully
 # once, so a brand-new project's every main build lands here. The fallback
@@ -298,6 +330,64 @@ parent=$(git -C "$seed" rev-parse HEAD^1)
 VERCEL_GIT_PREVIOUS_SHA="$(git -C "$repo" rev-parse HEAD)" \
 	build 'shallow clone deepens to reach HEAD^1' "$repo"
 expect_base "$parent" 'shallow clone resolves HEAD^1 after deepening'
+
+# --- allowlist mode: an explicit trigger list instead of turbo affectedness -
+# web's Storybook is scoped to the `web` turbo package, which nearly every
+# commit touches, so affected mode rebuilt it on pushes that could not move a
+# single story. These cases pin the narrower contract: the trigger list is the
+# complete input set, and anything outside it skips.
+stories=':(glob)apps/web/**/*.stories.tsx'
+
+repo=$(new_repo paths-story)
+prev=$(git -C "$repo" rev-parse HEAD)
+commit_file "$repo" apps/web/src/components/thing/thing.stories.tsx
+VERCEL_GIT_PREVIOUS_SHA="$prev" \
+	build_paths 'a story file matches the glob and builds' "$repo" \
+	vercel.json "$stories"
+
+# The case affected mode got wrong, and the whole reason the mode exists.
+repo=$(new_repo paths-component)
+prev=$(git -C "$repo" rev-parse HEAD)
+commit_file "$repo" apps/web/src/components/thing/thing.tsx
+VERCEL_GIT_PREVIOUS_SHA="$prev" \
+	skip_paths 'a web component with no story change skips' "$repo" \
+	vercel.json "$stories"
+
+# A bare `*` in a git pathspec spans slashes, so without :(glob) magic this
+# case would match apps/platform and build.
+repo=$(new_repo paths-glob-scope)
+prev=$(git -C "$repo" rev-parse HEAD)
+commit_file "$repo" apps/platform/src/thing.stories.tsx
+VERCEL_GIT_PREVIOUS_SHA="$prev" \
+	skip_paths 'a story outside apps/web does not match the glob' "$repo" \
+	vercel.json "$stories"
+
+# Directory triggers work alongside the glob.
+repo=$(new_repo paths-dir)
+prev=$(git -C "$repo" rev-parse HEAD)
+commit_file "$repo" packages/ui/src/index.ts
+VERCEL_GIT_PREVIOUS_SHA="$prev" \
+	build_paths 'a directory trigger builds' "$repo" \
+	vercel.json "$stories" packages/ui
+
+# Deploy-config changes keep forcing a build, same as in affected mode.
+repo=$(new_repo paths-config)
+prev=$(git -C "$repo" rev-parse HEAD)
+commit_file "$repo" vercel.json
+VERCEL_GIT_PREVIOUS_SHA="$prev" \
+	build_paths 'a deploy-config change still forces a build' "$repo" \
+	vercel.json "$stories"
+
+# Fail safe, same stance as affected mode: an unresolvable base builds.
+repo="$workdir/paths-rootonly"
+mkdir -p "$repo"
+git -C "$repo" init --quiet --initial-branch=main
+echo 'x' >"$repo/file.txt"
+git -C "$repo" add -A
+git -C "$repo" commit --quiet -m 'root commit'
+VERCEL_GIT_PREVIOUS_SHA='' \
+	build_paths 'unresolvable base builds rather than skips' "$repo" \
+	vercel.json "$stories"
 
 if [ "$fails" -eq 0 ]; then
 	echo "vercel-ignore-affected: all cases pass"

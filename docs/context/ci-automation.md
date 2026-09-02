@@ -70,15 +70,37 @@ GitHub Actions workflow). A second Vercel project, rooted at the repo root
 and previews `apps/web`'s own stories — see
 [`docs/DEPLOY.md`](../DEPLOY.md)'s Storybook section for the setup.
 
-Both Storybook projects share one `ignoreCommand`
-(`scripts/vercel-ignore-affected.sh <package> <watched-paths…>`): a PR push
-builds a project only when turbo sees its package as **affected**, _or_ when
-one of its watched deploy-config paths changed — its own `vercel.json` and
-the shared ignore script itself. Watching the config files means a
-deploy-config change (which turbo can't see as "affecting" the package) still
-gets validated by a real build instead of being silently skipped; watching
-the script means a change to the skip logic self-verifies. Everything else
-skips, so an unrelated PR triggers neither Storybook deployment.
+Both Storybook projects share one `ignoreCommand` script,
+`scripts/vercel-ignore-affected.sh`, in **two modes**.
+
+`ui-library` uses **affected mode**
+(`vercel-ignore-affected.sh <package> <watched-paths…>`): a push builds it
+only when turbo sees `@blog/ui` as **affected**, _or_ when one of its watched
+deploy-config paths changed — its own `vercel.json` and the shared ignore
+script itself. Watching the config files means a deploy-config change (which
+turbo can't see as "affecting" the package) still gets validated by a real
+build instead of being silently skipped; watching the script means a change
+to the skip logic self-verifies.
+
+`web-ui-library` uses **allowlist mode**
+(`vercel-ignore-affected.sh --paths <trigger-paths…>`), which drops turbo and
+builds only when one of the named paths changed: the two deploy-config paths
+above, plus `apps/web/.storybook`, `apps/web/**/*.stories.tsx`, `packages/ui`
+and `configs/tailwind`. Affected mode was a poor fit here because the project
+is scoped to the `web` package, which nearly every commit touches — it
+rebuilt on ~41% of all pushes (252 of 609 over twelve days) while the stories
+themselves had not moved, and Storybook builds were the single largest
+consumer of the account's Vercel build-CPU allowance. Naming the real inputs
+confines rebuilds to commits that can actually change the output. The trade
+is a deployed Storybook that lags a plain component edit until a story,
+`@blog/ui`, or the Tailwind preset moves — acceptable for a browsable
+reference that is run locally (`pnpm storybook`) during development. Note
+that a dependency bump alone (`pnpm-lock.yaml`) is deliberately **not** a
+trigger; bump Storybook or Vite and the deployed build stays stale until one
+of the listed paths moves.
+
+Everything outside a project's triggers skips, so an unrelated PR builds
+neither Storybook.
 
 **Which commit the diff is taken against** decides all of the above, and it
 depends on the situation:
@@ -95,12 +117,14 @@ depends on the situation:
   stayed empty and the next merge repeated it. `web-ui-library` sat in exactly that
   deadlock, showing "No Production Deployment", until it was broken.
 
-A change touching **only** `packages/config/src/types/**` or
-`packages/config/src/sanity/generated/**` skips regardless of affectedness.
-Turbo marks every dependent affected by any `packages/config` change, but both
-`storybook:build` scripts are a bare `storybook build`, which transpiles
-without type-checking — so type-only files can neither reach the output nor
-break the build. A type-only file alongside any other change still builds.
+In **affected mode**, a change touching **only**
+`packages/config/src/types/**` or `packages/config/src/sanity/generated/**`
+skips regardless of affectedness. Turbo marks every dependent affected by any
+`packages/config` change, but both `storybook:build` scripts are a bare
+`storybook build`, which transpiles without type-checking — so type-only files
+can neither reach the output nor break the build. A type-only file alongside
+any other change still builds. Allowlist mode needs no such carve-out:
+`packages/config` is not a trigger path, so it skips by construction.
 
 `scripts/vercel-ignore-affected.test.sh` pins all of this (see the Hooks row
 above); the script has no failing signal of its own, so a regression here is

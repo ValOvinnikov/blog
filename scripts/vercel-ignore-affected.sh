@@ -1,15 +1,37 @@
 #!/bin/sh
-# Vercel ignoreCommand for a turbo-scoped package: skip the build (exit 0)
-# unless $1 is affected since $VERCEL_GIT_PREVIOUS_SHA — or one of the extra
-# watch paths ($2..$N) changed since the same base, in which case the build
-# is forced. The watch paths carry the deploy config that governs this build
-# (the project's own vercel.json, plus this shared script): a change there is
-# exactly what turbo can't see as "affecting" the package, yet it's the change
-# that most needs a live build to validate. Falls back to a real git-computed
-# base when Vercel doesn't supply one (e.g. a branch's first push). Vercel's
-# build clone has no 'origin' remote configured, so this fetches by explicit
-# URL and diffs against FETCH_HEAD instead of origin/main.
-PACKAGE="$1"
+# Vercel ignoreCommand, in two modes.
+#
+#   <package> <watch-path>...   affected mode
+#   --paths <trigger-path>...   allowlist mode
+#
+# Affected mode skips the build (exit 0) unless $1 is affected since
+# $VERCEL_GIT_PREVIOUS_SHA — or one of the extra watch paths ($2..$N) changed
+# since the same base, in which case the build is forced. The watch paths carry
+# the deploy config that governs this build (the project's own vercel.json, plus
+# this shared script): a change there is exactly what turbo can't see as
+# "affecting" the package, yet it's the change that most needs a live build to
+# validate.
+#
+# Allowlist mode drops turbo entirely and builds only when one of the trigger
+# paths changed. It exists for a project whose turbo package is a poor proxy for
+# its output: web's Storybook is scoped to the `web` package, which nearly every
+# commit touches, so affected mode rebuilt it on ~41% of all pushes while the
+# stories themselves had not moved. Naming the real inputs cuts that to the
+# commits that can actually change the output. The trade is a Storybook that
+# lags a component edit until a story, @blog/ui, or the Tailwind preset moves —
+# acceptable for a browsable reference that is run locally during development.
+#
+# Both modes fall back to a real git-computed base when Vercel doesn't supply
+# one (e.g. a branch's first push). Vercel's build clone has no 'origin' remote
+# configured, so this fetches by explicit URL and diffs against FETCH_HEAD
+# instead of origin/main.
+if [ "$1" = "--paths" ]; then
+  MODE=paths
+  PACKAGE=''
+else
+  MODE=affected
+  PACKAGE="$1"
+fi
 shift
 ROOT="$(git rev-parse --show-toplevel)"
 REPO_URL="https://github.com/${VERCEL_GIT_REPO_OWNER}/${VERCEL_GIT_REPO_SLUG}.git"
@@ -37,9 +59,14 @@ if [ -z "$BASE" ]; then
 fi
 
 # A change to any watched deploy-config path forces the build (exit 1) so the
-# config change is validated by a real deployment.
+# config change is validated by a real deployment. In allowlist mode the same
+# diff is the whole decision, since the arguments are the complete input set.
 if [ "$#" -gt 0 ] && ! git -C "$ROOT" diff --quiet "$BASE" HEAD -- "$@" 2>/dev/null; then
   exit 1
+fi
+
+if [ "$MODE" = paths ]; then
+  exit 0
 fi
 
 # Turbo marks every dependent affected by any packages/config change, but these
