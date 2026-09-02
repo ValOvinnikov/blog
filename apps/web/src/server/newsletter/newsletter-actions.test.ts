@@ -4,12 +4,14 @@ const {
   markNewsletterSubscribedMock,
   getRequestTenantIdMock,
   getTenantBaseUrlMock,
+  isTenantActiveMock,
 } = vi.hoisted(() => ({
   createPendingSubscriberMock: vi.fn(),
   sendEmailMock: vi.fn(),
   markNewsletterSubscribedMock: vi.fn(),
   getRequestTenantIdMock: vi.fn(),
   getTenantBaseUrlMock: vi.fn(),
+  isTenantActiveMock: vi.fn(),
 }));
 
 vi.mock('@blog/db', () => ({
@@ -32,6 +34,10 @@ vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
 
 vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
   getTenantBaseUrl: getTenantBaseUrlMock,
+}));
+
+vi.mock('@web/server/tenant/is-tenant-active', () => ({
+  isTenantActive: isTenantActiveMock,
 }));
 
 const TENANT_ID = 'tenant-1';
@@ -60,6 +66,8 @@ describe('subscribeToNewsletterAction', () => {
     getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
     getTenantBaseUrlMock.mockReset();
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');
+    isTenantActiveMock.mockReset();
+    isTenantActiveMock.mockResolvedValue(true);
   });
 
   it('returns "invalid" without touching the db for a malformed email', async () => {
@@ -138,6 +146,19 @@ describe('subscribeToNewsletterAction', () => {
 
   it('returns "server-error" without touching the db when no tenant resolves', async () => {
     getRequestTenantIdMock.mockResolvedValue(undefined);
+    const { subscribeToNewsletterAction } =
+      await import('./newsletter-actions');
+
+    await expect(
+      subscribeToNewsletterAction('reader@example.com'),
+    ).resolves.toEqual({ outcome: 'server-error' });
+    expect(createPendingSubscriberMock).not.toHaveBeenCalled();
+    expect(sendEmailMock).not.toHaveBeenCalled();
+    expect(markNewsletterSubscribedMock).not.toHaveBeenCalled();
+  });
+
+  it('returns "server-error" without touching the db when the tenant is not ACTIVE', async () => {
+    isTenantActiveMock.mockResolvedValue(false);
     const { subscribeToNewsletterAction } =
       await import('./newsletter-actions');
 
