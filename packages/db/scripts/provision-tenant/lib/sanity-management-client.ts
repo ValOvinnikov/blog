@@ -1,15 +1,14 @@
+import {
+  SANITY_MANAGEMENT_API_BASE,
+  sanityAccessRequest,
+} from '@blog/db/utils/sanity-management-client/sanity-management-client';
+
 // Sanity Management (HTTP) API — https://www.sanity.io/docs/http-reference/access-api.
 // Distinct from `@sanity/client` (the data API used for content reads/writes,
 // see `steps/seed-content.ts`) — project/dataset/CORS/token management lives
-// on this separate, versioned management surface.
-const SANITY_MANAGEMENT_API_BASE = 'https://api.sanity.io/v2021-06-07';
-
-// The invite endpoints below share this Access API surface — see
-// https://www.sanity.io/docs/content-lake/http-auth — distinct from the
-// `v2021-06-07` base every other endpoint in this file still uses. Robot-token
-// minting/listing/revoking on the same surface lives in
-// `@blog/db/utils/sanity-management-client`, shared with `deprovision-tenant`.
-const SANITY_ACCESS_API_BASE = 'https://api.sanity.io/v2026-07-10';
+// on this separate, versioned management surface. The invite endpoints below
+// instead target the Access API surface `sanityAccessRequest` (imported
+// above) speaks — see its home in `@blog/db/utils/sanity-management-client`.
 
 async function sanityManagementRequest<T>(
   path: string,
@@ -34,31 +33,6 @@ async function sanityManagementRequest<T>(
 
   // DELETE (and some POSTs) return an empty 2xx body — `.json()` on that
   // throws, so only parse when there's actually a body to parse.
-  const text = await response.text();
-  return (text ? JSON.parse(text) : undefined) as T;
-}
-
-async function sanityAccessRequest<T>(
-  path: string,
-  token: string,
-  init: RequestInit = {},
-): Promise<T> {
-  const response = await fetch(`${SANITY_ACCESS_API_BASE}${path}`, {
-    ...init,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      ...init.headers,
-    },
-  });
-
-  if (!response.ok) {
-    const body = await response.text().catch(() => '');
-    throw new Error(
-      `Sanity Access API ${init.method ?? 'GET'} ${path} failed: ${response.status} ${body}`,
-    );
-  }
-
   const text = await response.text();
   return (text ? JSON.parse(text) : undefined) as T;
 }
