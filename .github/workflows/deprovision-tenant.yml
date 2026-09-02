@@ -83,6 +83,12 @@ jobs:
       # job reads): the tenant registry and the application database are two
       # different connection strings, resolved from the same Environment.
       DATABASE_URL: ${{ secrets.TENANT_REGISTRY_DATABASE_URL }}
+      # Step 6 (`invalidate-tenant-cache`) POSTs to the web app's on-demand
+      # revalidation endpoint. Both are required only by that final step, so
+      # they are absent from `loadDeprovisionEnv`'s `requireEnv` set — the
+      # step itself fails loudly when either is missing.
+      WEB_APP_URL: ${{ vars.WEB_APP_URL }}
+      SITE_CONFIG_REVALIDATE_SECRET: ${{ secrets.SITE_CONFIG_REVALIDATE_SECRET }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

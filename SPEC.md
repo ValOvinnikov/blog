@@ -410,7 +410,12 @@ two apps' own deployments — not a Sanity webhook, so it doesn't reuse
 `@sanity/webhook`'s HMAC verification. Calling it is best-effort from the
 platform side: a failure (missing config, network error, non-2xx) is logged and
 swallowed, never thrown, since the save itself has already succeeded and the
-3600s window still covers it. See
+3600s window still covers it. That best-effort stance belongs to the platform
+caller, not to the route: `deprovision-tenant.yml`'s final step is a second
+caller, POSTing the same `{ tenantId }` body to purge an archived tenant's
+pages, and it deliberately throws on missing config or a non-2xx instead of
+swallowing — a silently skipped purge there would tell an operator a tenant
+was taken down while its site kept serving from cache. See
 [`docs/context/environment-variables.md`](./docs/context/environment-variables.md)
 and [`docs/context/rendering-caching-i18n.md`](./docs/context/rendering-caching-i18n.md).
 
