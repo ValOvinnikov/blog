@@ -3,7 +3,7 @@ import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { makeTenant } from '@platform/testing/tenants/fixtures';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentPropsWithoutRef } from 'react';
@@ -26,18 +26,10 @@ vi.mock('@platform/i18n/navigation', () => ({
   ),
 }));
 
-const tenant: TTenant = {
-  id: 'tenant-1',
-  slug: 'acme',
-  name: 'Acme Inc.',
-  primaryDomain: 'acme.example.com',
+const tenant = makeTenant({
   sanityProjectId: 'proj-1',
   sanityDataset: 'production',
-  sanityReadTokenEncrypted: null,
-  sanityWriteTokenEncrypted: null,
   locale: 'en',
-  plan: 'FREE',
-  status: 'ACTIVE',
   provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
   provisioningSteps: {
     [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
@@ -59,13 +51,9 @@ const tenant: TTenant = {
       status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
     },
   },
-  studioVercelProjectId: null,
   seededAt: new Date('2026-01-01T00:00:00.000Z'),
   webhookCreatedAt: new Date('2026-01-01T00:00:00.000Z'),
-  deprovisionedAt: null,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
+});
 
 describe(TenantSwitcher, () => {
   it('shows the active tenant on the trigger', () => {

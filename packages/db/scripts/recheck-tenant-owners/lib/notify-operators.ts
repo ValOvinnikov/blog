@@ -55,11 +55,10 @@ type TNotifyOperatorsParams = {
 };
 
 /**
- * Emails every SUPERADMIN admin the first time a tenant's owner-elevation
- * outcome newly transitions into STALLED or AMBIGUOUS_MEMBERSHIP — the
- * caller (`recheckOne`) is responsible for the de-dup check against the
- * previously persisted outcome. Never throws: a notification failure must
- * never fail the sweep it's reporting on.
+ * Emails every SUPERADMIN admin about a notifiable owner-elevation outcome —
+ * `notifyOwnerElevationOutcome` is the sole caller and is responsible for the
+ * de-dup check against the previously persisted outcome. Never throws: a
+ * notification failure must never fail the sweep it's reporting on.
  */
 export async function notifyOperatorsOfOwnerElevationOutcome({
   tenant,

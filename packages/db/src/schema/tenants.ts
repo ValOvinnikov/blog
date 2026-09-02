@@ -94,6 +94,17 @@ export const tenants = pgTable('tenants', {
   // `TTenantProvisioningState` above.
   provisioningSteps:
     jsonb('provisioning_steps').$type<TTenantProvisioningState>(),
+  // Outcome last actually communicated to operators, written by
+  // `notifyOwnerElevationOutcome` — distinct from `provisioningSteps`'
+  // `OWNER_ELEVATION` `detail` above, which only
+  // records the most recently *observed* outcome. Dedup for both
+  // provisioning's own first check and the recurring recheck sweep keys off
+  // this column, so a notifiable outcome first observed during provisioning
+  // is communicated once and the same-state sweep that follows stays
+  // silent. Nullable: never notified yet.
+  lastNotifiedOwnerElevationOutcome: text(
+    'last_notified_owner_elevation_outcome',
+  ).$type<TElevateTenantOwnerOutcome>(),
   studioVercelProjectId: text('studio_vercel_project_id'),
   seededAt: timestamp('seeded_at', { mode: 'date' }),
   // Set once provisioning creates the Sanity webhook pointing at apps/web's
