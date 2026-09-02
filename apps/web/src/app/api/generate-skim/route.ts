@@ -108,7 +108,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         message:
           'The requesting tenant has no usable Sanity write credentials.',
       },
-      { status: 409 },
+      { status: 503 },
     );
   }
 

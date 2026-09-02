@@ -6,12 +6,14 @@ const {
   generateTakeawaysMock,
   getHostTenantSanityContextMock,
   getHostTenantSanityWriteContextMock,
+  loggerErrorMock,
 } = vi.hoisted(() => ({
   getPublishedPostBodyMock: vi.fn(),
   saveSkimDraftMock: vi.fn(),
   generateTakeawaysMock: vi.fn(),
   getHostTenantSanityContextMock: vi.fn(),
   getHostTenantSanityWriteContextMock: vi.fn(),
+  loggerErrorMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -38,6 +40,10 @@ vi.mock('@web/server/tenant/get-host-tenant-sanity-context', () => ({
 
 vi.mock('@web/server/tenant/get-host-tenant-sanity-write-context', () => ({
   getHostTenantSanityWriteContext: getHostTenantSanityWriteContextMock,
+}));
+
+vi.mock('@web/utils/logger/logger', () => ({
+  logger: { error: loggerErrorMock },
 }));
 
 vi.mock('@web/utils/env/env', () => ({
@@ -72,6 +78,7 @@ describe('POST /api/generate-skim', () => {
       tenant: undefined,
       tenantId: undefined,
     });
+    loggerErrorMock.mockReset();
   });
 
   afterEach(() => {
@@ -154,6 +161,10 @@ describe('POST /api/generate-skim', () => {
     const response = await POST(makeRequest({ _id: 'post-1' }));
 
     expect(response.status).toBe(503);
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      'generate_skim.draft_save_failed',
+      expect.anything(),
+    );
   });
 
   it('returns 500 when saving the draft fails for another reason', async () => {
@@ -281,7 +292,7 @@ describe('POST /api/generate-skim', () => {
     );
   });
 
-  it('returns 409 without generating takeaways when the resolved tenant has no usable write credentials', async () => {
+  it('returns 503 without generating takeaways when the resolved tenant has no usable write credentials', async () => {
     getHostTenantSanityWriteContextMock.mockResolvedValue({
       isResolvable: true,
       tenant: undefined,
@@ -290,8 +301,16 @@ describe('POST /api/generate-skim', () => {
     const { POST } = await import('./route');
 
     const response = await POST(makeRequest({ _id: 'post-1' }));
+    const json = await response.json();
 
-    expect(response.status).toBe(409);
+    expect(response.status).toBe(503);
+    expect(json).toEqual({
+      message: 'The requesting tenant has no usable Sanity write credentials.',
+    });
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      'generate_skim.tenant_write_credentials_missing',
+      { postId: 'post-1', tenantId: 'tenant-1' },
+    );
     expect(generateTakeawaysMock).not.toHaveBeenCalled();
     expect(getPublishedPostBodyMock).not.toHaveBeenCalled();
     expect(saveSkimDraftMock).not.toHaveBeenCalled();
