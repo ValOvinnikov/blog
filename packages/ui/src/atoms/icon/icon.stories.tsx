@@ -31,6 +31,10 @@ const meta = {
     name: ICONS.SUN,
   },
   argTypes: {
+    name: {
+      control: 'select',
+      options: Object.values(ICONS),
+    },
     size: {
       control: 'select',
       options: objectKeys(iconVariants.variants.size),

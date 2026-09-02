@@ -57,6 +57,14 @@ const meta = {
       control: 'select',
       options: objectKeys(ctaModuleVariants.variants.align),
     },
+    imageSide: {
+      control: 'select',
+      options: objectKeys(ctaModuleVariants.variants.imageSide),
+    },
+    mobileMediaOrder: {
+      control: 'select',
+      options: objectKeys(ctaModuleVariants.variants.mobileMediaOrder),
+    },
   },
   args: {
     variant: CTA_VARIANT.CALLOUT,
