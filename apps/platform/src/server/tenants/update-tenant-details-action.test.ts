@@ -41,7 +41,6 @@ vi.mock('@blog/db', async () => ({
 
 const validInput = {
   name: 'Acme',
-  slug: 'acme',
   primaryDomain: 'acme.example.com',
   plan: 'FREE' as const,
   locale: 'EN',
@@ -102,22 +101,6 @@ describe('updateTenantDetailsAction', () => {
     });
     expect(updateTenantDetailsMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
-  });
-
-  it('returns field errors for an invalid slug without touching the database', async () => {
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
-
-    const result = await updateTenantDetailsAction('tenant-1', {
-      ...validInput,
-      slug: 'Not A Slug!',
-    });
-
-    expect(result).toEqual({
-      ok: false,
-      fieldErrors: { slug: expect.any(String) },
-    });
-    expect(updateTenantDetailsMock).not.toHaveBeenCalled();
   });
 
   it('returns field errors for an invalid domain', async () => {
@@ -182,19 +165,6 @@ describe('updateTenantDetailsAction', () => {
       'tenant-1',
       expect.not.objectContaining({ ownerEmail: expect.anything() }),
     );
-  });
-
-  it('maps a slug-taken outcome onto a slug field error', async () => {
-    updateTenantDetailsMock.mockResolvedValue({ outcome: 'slug-taken' });
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
-
-    const result = await updateTenantDetailsAction('tenant-1', validInput);
-
-    expect(result).toEqual({
-      ok: false,
-      fieldErrors: { slug: expect.any(String) },
-    });
   });
 
   it('maps a domain-taken outcome onto a primaryDomain field error', async () => {
@@ -403,16 +373,6 @@ describe('updateTenantDetailsAction', () => {
         error: expect.any(Error),
       }),
     );
-  });
-
-  it('does not record an audit event for a non-updated outcome', async () => {
-    updateTenantDetailsMock.mockResolvedValue({ outcome: 'slug-taken' });
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
-
-    await updateTenantDetailsAction('tenant-1', validInput);
-
-    expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
   it('does not record an audit event for a domain-taken outcome', async () => {

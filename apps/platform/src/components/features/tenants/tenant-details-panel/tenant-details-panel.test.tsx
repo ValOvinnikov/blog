@@ -25,14 +25,13 @@ const render = renderWithIntl;
 const NO_LOCKS: TTenantFieldLocks = {};
 const ALL_LOCKED_RUNNING: TTenantFieldLocks = {
   name: { kind: 'running' },
-  slug: { kind: 'running' },
   primaryDomain: { kind: 'running' },
   plan: { kind: 'running' },
   locale: { kind: 'running' },
   ownerEmail: { kind: 'running' },
 };
-const SLUG_LOCKED: TTenantFieldLocks = {
-  slug: { kind: 'step', step: TENANT_PROVISIONING_STEP.MAP_DOMAIN },
+const DOMAIN_LOCKED: TTenantFieldLocks = {
+  primaryDomain: { kind: 'step', step: TENANT_PROVISIONING_STEP.MAP_DOMAIN },
 };
 
 // Applies the same wrapper on mount and on every `rerender()` call, so the
@@ -85,7 +84,6 @@ describe(TenantDetailsPanel, () => {
     it('renders every field, including owner email, as an editable, enabled control, pre-filled from props — and starts with Save disabled', () => {
       const tenant = makeTenant({
         name: 'Acme Inc.',
-        slug: 'acme',
         primaryDomain: 'acme.example.com',
         plan: TENANT_PLAN.FREE,
         locale: 'EN',
@@ -102,8 +100,6 @@ describe(TenantDetailsPanel, () => {
       expect(nameInput).toHaveValue('Acme Inc.');
       expect(nameInput).not.toBeDisabled();
 
-      expect(screen.getByRole('textbox', { name: 'Slug' })).toHaveValue('acme');
-      expect(screen.getByRole('textbox', { name: 'Slug' })).not.toBeDisabled();
       expect(
         screen.getByRole('textbox', { name: 'Primary domain' }),
       ).toHaveValue('acme.example.com');
@@ -241,7 +237,7 @@ describe(TenantDetailsPanel, () => {
     it('shows a field error and does not refresh when saving fails', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: false,
-        fieldErrors: { slug: 'This slug is already in use.' },
+        fieldErrors: { primaryDomain: 'This domain is already in use.' },
       });
       const user = userEvent.setup();
       const tenant = makeTenant();
@@ -253,12 +249,15 @@ describe(TenantDetailsPanel, () => {
         />,
       );
 
-      await user.clear(screen.getByRole('textbox', { name: 'Slug' }));
-      await user.type(screen.getByRole('textbox', { name: 'Slug' }), 'acme-2');
+      await user.clear(screen.getByRole('textbox', { name: 'Primary domain' }));
+      await user.type(
+        screen.getByRole('textbox', { name: 'Primary domain' }),
+        'taken.example.com',
+      );
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
       expect(
-        await screen.findByText('This slug is already in use.'),
+        await screen.findByText('This domain is already in use.'),
       ).toBeVisible();
       expect(refreshMock).not.toHaveBeenCalled();
     });
@@ -296,9 +295,9 @@ describe(TenantDetailsPanel, () => {
       expect(domainInput).toHaveAccessibleDescription('Enter a valid domain.');
 
       // Fields with no error of their own stay valid and undescribed.
-      const slugInput = screen.getByRole('textbox', { name: 'Slug' });
-      expect(slugInput).not.toBeInvalid();
-      expect(slugInput).toHaveAccessibleDescription('');
+      const localeInput = screen.getByRole('textbox', { name: 'Locale' });
+      expect(localeInput).not.toBeInvalid();
+      expect(localeInput).toHaveAccessibleDescription('');
     });
 
     it('shows a save-confirmation toast after a successful save, independent of further edits', async () => {
@@ -339,7 +338,7 @@ describe(TenantDetailsPanel, () => {
     it('does not show a success alert when saving fails', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: false,
-        fieldErrors: { slug: 'This slug is already in use.' },
+        fieldErrors: { primaryDomain: 'This domain is already in use.' },
       });
       const user = userEvent.setup();
       const tenant = makeTenant();
@@ -355,7 +354,7 @@ describe(TenantDetailsPanel, () => {
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
       expect(
-        await screen.findByText('This slug is already in use.'),
+        await screen.findByText('This domain is already in use.'),
       ).toBeVisible();
       expect(screen.queryByRole('status')).not.toBeInTheDocument();
     });
@@ -457,19 +456,21 @@ describe(TenantDetailsPanel, () => {
 
   describe('per-field locking', () => {
     it('renders a field whose consuming step already completed as disabled, stating why', () => {
-      const tenant = makeTenant({ slug: 'acme' });
+      const tenant = makeTenant({ primaryDomain: 'acme.example.com' });
       render(
         <TenantDetailsPanel
           tenant={tenant}
-          fieldLocks={SLUG_LOCKED}
+          fieldLocks={DOMAIN_LOCKED}
           ownerEmail="owner@example.com"
         />,
       );
 
-      const slugInput = screen.getByRole('textbox', { name: 'Slug' });
-      expect(slugInput).toHaveValue('acme');
-      expect(slugInput).toBeDisabled();
-      expect(slugInput).toHaveAccessibleDescription(
+      const domainInput = screen.getByRole('textbox', {
+        name: 'Primary domain',
+      });
+      expect(domainInput).toHaveValue('acme.example.com');
+      expect(domainInput).toBeDisabled();
+      expect(domainInput).toHaveAccessibleDescription(
         'Locked — the "Connect the custom domain" step has already completed and used this value.',
       );
     });
@@ -484,15 +485,12 @@ describe(TenantDetailsPanel, () => {
       render(
         <TenantDetailsPanel
           tenant={tenant}
-          fieldLocks={SLUG_LOCKED}
+          fieldLocks={DOMAIN_LOCKED}
           ownerEmail="owner@example.com"
         />,
       );
 
       expect(screen.getByRole('textbox', { name: 'Name' })).not.toBeDisabled();
-      expect(
-        screen.getByRole('textbox', { name: 'Primary domain' }),
-      ).not.toBeDisabled();
       expect(screen.getByRole('button', { name: 'Free' })).not.toBeDisabled();
       expect(
         screen.getByRole('textbox', { name: 'Locale' }),
@@ -513,12 +511,16 @@ describe(TenantDetailsPanel, () => {
       const user = userEvent.setup();
       const tenant = makeTenant({
         id: 'tenant-1',
+        name: 'Acme Inc.',
         primaryDomain: 'taken-domain.example.com',
       });
+      const nameLocked: TTenantFieldLocks = {
+        name: { kind: 'step', step: TENANT_PROVISIONING_STEP.MAP_DOMAIN },
+      };
       render(
         <TenantDetailsPanel
           tenant={tenant}
-          fieldLocks={SLUG_LOCKED}
+          fieldLocks={nameLocked}
           ownerEmail="owner@example.com"
         />,
       );
@@ -536,7 +538,7 @@ describe(TenantDetailsPanel, () => {
           expect.objectContaining({
             primaryDomain: 'new-domain.example.com',
             // The locked field's original value is submitted unchanged.
-            slug: tenant.slug,
+            name: tenant.name,
           }),
         );
       });
@@ -604,7 +606,6 @@ describe(TenantDetailsPanel, () => {
     it('disables every control and disables Save, since nothing can become dirty', () => {
       const tenant = makeTenant({
         name: 'Acme Inc.',
-        slug: 'acme',
         primaryDomain: 'acme.example.com',
         plan: TENANT_PLAN.GROWTH,
         locale: 'EN',
@@ -618,7 +619,6 @@ describe(TenantDetailsPanel, () => {
       );
 
       expect(screen.getByRole('textbox', { name: 'Name' })).toBeDisabled();
-      expect(screen.getByRole('textbox', { name: 'Slug' })).toBeDisabled();
       expect(
         screen.getByRole('textbox', { name: 'Primary domain' }),
       ).toBeDisabled();
@@ -653,7 +653,7 @@ describe(TenantDetailsPanel, () => {
   describe('mid-edit lock transition', () => {
     it('discards an unsaved edit and reverts to the server value when the field being edited newly locks', async () => {
       const user = userEvent.setup();
-      const tenant = makeTenant({ slug: 'acme' });
+      const tenant = makeTenant({ primaryDomain: 'acme.example.com' });
       const { rerender } = rtlRender(
         withIntl(
           <TenantDetailsPanel
@@ -664,27 +664,33 @@ describe(TenantDetailsPanel, () => {
         ),
       );
 
-      const slugInput = screen.getByRole('textbox', { name: 'Slug' });
-      await user.clear(slugInput);
-      await user.type(slugInput, 'acme-unsaved-edit');
-      expect(screen.getByRole('textbox', { name: 'Slug' })).toHaveValue(
-        'acme-unsaved-edit',
-      );
+      const domainInput = screen.getByRole('textbox', {
+        name: 'Primary domain',
+      });
+      await user.clear(domainInput);
+      await user.type(domainInput, 'unsaved-domain.example.com');
+      expect(
+        screen.getByRole('textbox', { name: 'Primary domain' }),
+      ).toHaveValue('unsaved-domain.example.com');
 
-      // A background poll discovers a step has completed, locking slug —
-      // while the operator's unsaved edit above is still showing.
+      // A background poll discovers a step has completed, locking the
+      // domain — while the operator's unsaved edit above is still showing.
       rerender(
         withIntl(
           <TenantDetailsPanel
             tenant={tenant}
-            fieldLocks={SLUG_LOCKED}
+            fieldLocks={DOMAIN_LOCKED}
             ownerEmail="owner@example.com"
           />,
         ),
       );
 
-      expect(screen.getByRole('textbox', { name: 'Slug' })).toHaveValue('acme');
-      expect(screen.getByRole('textbox', { name: 'Slug' })).toBeDisabled();
+      expect(
+        screen.getByRole('textbox', { name: 'Primary domain' }),
+      ).toHaveValue('acme.example.com');
+      expect(
+        screen.getByRole('textbox', { name: 'Primary domain' }),
+      ).toBeDisabled();
     });
 
     it('leaves an unrelated field’s unsaved edit alone when a different field newly locks', async () => {
@@ -708,7 +714,7 @@ describe(TenantDetailsPanel, () => {
         withIntl(
           <TenantDetailsPanel
             tenant={tenant}
-            fieldLocks={SLUG_LOCKED}
+            fieldLocks={DOMAIN_LOCKED}
             ownerEmail="owner@example.com"
           />,
         ),
@@ -880,7 +886,7 @@ describe(TenantDetailsPanel, () => {
         withIntl(
           <TenantDetailsPanel
             tenant={tenant}
-            fieldLocks={SLUG_LOCKED}
+            fieldLocks={DOMAIN_LOCKED}
             ownerEmail="owner@example.com"
           />,
         ),
@@ -894,7 +900,7 @@ describe(TenantDetailsPanel, () => {
         withIntl(
           <TenantDetailsPanel
             tenant={makeTenant({ name: 'Acme Again' })}
-            fieldLocks={SLUG_LOCKED}
+            fieldLocks={DOMAIN_LOCKED}
             ownerEmail="owner@example.com"
           />,
         ),
@@ -910,7 +916,7 @@ describe(TenantDetailsPanel, () => {
         withIntl(
           <TenantDetailsPanel
             tenant={tenant}
-            fieldLocks={SLUG_LOCKED}
+            fieldLocks={DOMAIN_LOCKED}
             ownerEmail="owner@example.com"
           />,
         ),
@@ -942,7 +948,7 @@ describe(TenantDetailsPanel, () => {
         withIntl(
           <TenantDetailsPanel
             tenant={tenant}
-            fieldLocks={SLUG_LOCKED}
+            fieldLocks={DOMAIN_LOCKED}
             ownerEmail="owner@example.com"
           />,
         ),
@@ -951,8 +957,8 @@ describe(TenantDetailsPanel, () => {
       const liveRegion = container.querySelector('[aria-live="assertive"]');
       expect(liveRegion).toHaveTextContent('');
 
-      // slug unlocks as name locks, in the same render — the locked-field
-      // count stays 1, but the set genuinely changed.
+      // The domain unlocks as name locks, in the same render — the
+      // locked-field count stays 1, but the set genuinely changed.
       rerender(
         withIntl(
           <TenantDetailsPanel
@@ -985,7 +991,6 @@ describe(TenantDetailsPanel, () => {
       );
 
       expect(screen.getByRole('textbox', { name: 'Name' })).toBeDisabled();
-      expect(screen.getByRole('textbox', { name: 'Slug' })).toBeDisabled();
       expect(
         screen.getByRole('textbox', { name: 'Primary domain' }),
       ).toBeDisabled();

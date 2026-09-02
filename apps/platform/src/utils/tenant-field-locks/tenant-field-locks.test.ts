@@ -87,7 +87,6 @@ describe(computeTenantFieldLocks, () => {
       computeTenantFieldLocks(steps, TENANT_PROVISIONING_STATUS.PROVISIONING),
     ).toEqual({
       name: { kind: 'running' },
-      slug: { kind: 'running' },
       primaryDomain: { kind: 'running' },
       plan: { kind: 'running' },
       locale: { kind: 'running' },
@@ -112,7 +111,6 @@ describe(computeTenantFieldLocks, () => {
       computeTenantFieldLocks(steps, TENANT_PROVISIONING_STATUS.READY),
     ).toEqual({
       name: { kind: 'succeeded' },
-      slug: { kind: 'succeeded' },
       primaryDomain: { kind: 'succeeded' },
       plan: { kind: 'succeeded' },
       locale: { kind: 'succeeded' },
@@ -155,7 +153,6 @@ describe(computeTenantFieldLocks, () => {
 
     expect(withoutOwnerElevation).toEqual({
       name: { kind: 'succeeded' },
-      slug: { kind: 'succeeded' },
       primaryDomain: { kind: 'succeeded' },
       plan: { kind: 'succeeded' },
       locale: { kind: 'succeeded' },
@@ -176,7 +173,6 @@ describe(computeTenantFieldLocks, () => {
       ),
     ).toEqual({
       name: { kind: 'running' },
-      slug: { kind: 'running' },
       primaryDomain: { kind: 'running' },
       plan: { kind: 'running' },
       locale: { kind: 'running' },

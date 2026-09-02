@@ -165,7 +165,7 @@ describe(TenantOverviewView, () => {
   });
 
   it('relocates the tenant details panel here as the Identity card', () => {
-    const tenant = makeTenant({ slug: 'acme' });
+    const tenant = makeTenant({ name: 'Acme Inc.' });
     render(
       <TenantOverviewView
         tenant={tenant}
@@ -178,7 +178,9 @@ describe(TenantOverviewView, () => {
     );
 
     expect(screen.getByText('Tenant details')).toBeVisible();
-    expect(screen.getByRole('textbox', { name: 'Slug' })).toHaveValue('acme');
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue(
+      'Acme Inc.',
+    );
   });
 
   it('locks every tenant details field while a step is running, stating why', () => {
@@ -201,9 +203,9 @@ describe(TenantOverviewView, () => {
       />,
     );
 
-    const slugInput = screen.getByRole('textbox', { name: 'Slug' });
-    expect(slugInput).toBeDisabled();
-    expect(slugInput).toHaveAccessibleDescription(
+    const nameInput = screen.getByRole('textbox', { name: 'Name' });
+    expect(nameInput).toBeDisabled();
+    expect(nameInput).toHaveAccessibleDescription(
       'Locked while provisioning is running.',
     );
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
@@ -250,7 +252,6 @@ describe(TenantOverviewView, () => {
       'Locked — the "Connect the custom domain" step has already completed and used this value.',
     );
 
-    expect(screen.getByRole('textbox', { name: 'Slug' })).not.toBeDisabled();
     expect(screen.getByRole('textbox', { name: 'Name' })).not.toBeDisabled();
   });
 
@@ -273,7 +274,6 @@ describe(TenantOverviewView, () => {
       />,
     );
 
-    expect(screen.getByRole('textbox', { name: 'Slug' })).toBeDisabled();
     expect(screen.getByRole('textbox', { name: 'Name' })).toBeDisabled();
     expect(
       screen.getByRole('textbox', { name: 'Primary domain' }),
@@ -316,7 +316,7 @@ describe(TenantOverviewView, () => {
 
     expect(screen.getByText('Provisioning — step 2 of 5')).toBeVisible();
     expect(
-      screen.getByRole('textbox', { name: 'Slug' }),
+      screen.getByRole('textbox', { name: 'Name' }),
     ).toHaveAccessibleDescription('Locked while provisioning is running.');
 
     await act(async () => {
@@ -328,7 +328,7 @@ describe(TenantOverviewView, () => {
     // other has already caught up to READY/SUCCEEDED.
     expect(screen.getByText('Provisioned')).toBeVisible();
     expect(
-      screen.getByRole('textbox', { name: 'Slug' }),
+      screen.getByRole('textbox', { name: 'Name' }),
     ).toHaveAccessibleDescription(
       'Locked — provisioning has already finished.',
     );
@@ -380,7 +380,7 @@ describe(TenantOverviewView, () => {
   });
 
   it('never renders an "Open Studio" action — the sidebar is the only entry point to Studio', () => {
-    const tenant = makeTenant({ slug: 'acme' });
+    const tenant = makeTenant();
     render(
       <TenantOverviewView
         tenant={tenant}

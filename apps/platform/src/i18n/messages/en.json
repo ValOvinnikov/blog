@@ -335,7 +335,7 @@
     "steps": {
       "details": {
         "title": "Details",
-        "description": "Name, slug, plan"
+        "description": "Name, domain, plan"
       },
       "sanityProject": {
         "title": "Sanity project",
@@ -444,7 +444,6 @@
     "heading": "Tenant details",
     "fieldsGroupLabel": "Tenant detail fields",
     "nameLabel": "Name",
-    "slugLabel": "Slug",
     "domainLabel": "Primary domain",
     "ownerEmailLabel": "Owner email",
     "planLabel": "Plan",

@@ -5,14 +5,14 @@ import { useLockStateChange } from './use-lock-state-change';
 
 const NO_LOCKS = {};
 const NAME_LOCKED = { name: { kind: 'running' as const } };
-const SLUG_LOCKED = { slug: { kind: 'running' as const } };
+const DOMAIN_LOCKED = { primaryDomain: { kind: 'running' as const } };
 const BOTH_LOCKED = {
   name: { kind: 'running' as const },
-  slug: { kind: 'running' as const },
+  primaryDomain: { kind: 'running' as const },
 };
 
 type THarnessProps = {
-  fieldLocks: typeof NO_LOCKS | typeof NAME_LOCKED | typeof SLUG_LOCKED;
+  fieldLocks: typeof NO_LOCKS | typeof NAME_LOCKED | typeof DOMAIN_LOCKED;
   onFieldsLocked?: (keys: TTenantFieldKey[]) => void;
 };
 
@@ -83,7 +83,7 @@ describe(useLockStateChange, () => {
     const { rerender } = render(<Harness fieldLocks={NAME_LOCKED} />);
     const liveRegion = screen.getByTestId('live-region');
 
-    rerender(<Harness fieldLocks={SLUG_LOCKED} />);
+    rerender(<Harness fieldLocks={DOMAIN_LOCKED} />);
     expect(liveRegion).toHaveTextContent('locked!');
   });
 
@@ -97,7 +97,7 @@ describe(useLockStateChange, () => {
     rerender(
       <Harness fieldLocks={BOTH_LOCKED} onFieldsLocked={onFieldsLocked} />,
     );
-    expect(onFieldsLocked).toHaveBeenCalledWith(['slug']);
+    expect(onFieldsLocked).toHaveBeenCalledWith(['primaryDomain']);
   });
 
   it('does not call onFieldsLocked when a lock transition only unlocks fields', () => {

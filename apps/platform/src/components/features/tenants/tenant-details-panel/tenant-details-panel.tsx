@@ -38,19 +38,16 @@ export type TTenantDetailsPanelProps = {
 
 type TFormValues = {
   name: string;
-  slug: string;
   primaryDomain: string;
   plan: TTenantPlan;
   locale: string;
   ownerEmail: string;
 };
 
-type TTextFieldKey =
-  'name' | 'slug' | 'primaryDomain' | 'locale' | 'ownerEmail';
+type TTextFieldKey = 'name' | 'primaryDomain' | 'locale' | 'ownerEmail';
 
 const TEXT_FIELD_ID: Record<TTextFieldKey, string> = {
   name: 'tenant-detail-name',
-  slug: 'tenant-detail-slug',
   primaryDomain: 'tenant-detail-domain',
   locale: 'tenant-detail-locale',
   ownerEmail: 'tenant-detail-owner-email',
@@ -68,7 +65,6 @@ const valuesFromProps = (
 ): TFormValues => {
   return {
     name: tenant.name,
-    slug: tenant.slug,
     primaryDomain: tenant.primaryDomain,
     plan: tenant.plan,
     locale: tenant.locale,
@@ -172,7 +168,6 @@ export const TenantDetailsPanel = ({
   const baselineValues = valuesFromProps(tenant, ownerEmail);
   const isDirty =
     values.name !== baselineValues.name ||
-    values.slug !== baselineValues.slug ||
     values.primaryDomain !== baselineValues.primaryDomain ||
     values.plan !== baselineValues.plan ||
     values.locale !== baselineValues.locale ||
@@ -191,7 +186,6 @@ export const TenantDetailsPanel = ({
 
     const payload: TUpdateTenantDetailsActionInput = {
       name: values.name,
-      slug: values.slug,
       primaryDomain: values.primaryDomain,
       plan: values.plan,
       locale: values.locale,
@@ -242,7 +236,6 @@ export const TenantDetailsPanel = ({
 
   const textFields: { key: TTextFieldKey; label: string }[] = [
     { key: 'name', label: t('nameLabel') },
-    { key: 'slug', label: t('slugLabel') },
     { key: 'primaryDomain', label: t('domainLabel') },
     { key: 'locale', label: t('localeLabel') },
     { key: 'ownerEmail', label: t('ownerEmailLabel') },
