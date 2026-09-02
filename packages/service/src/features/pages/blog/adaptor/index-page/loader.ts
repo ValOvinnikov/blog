@@ -26,5 +26,5 @@ export async function getIndexPage(
   }
 
   const settings = await getSiteSettings(tenant);
-  return toIndexPage(rawPage, settings, rawPage.postList._id);
+  return toIndexPage(rawPage, settings, rawPage.postList._id, tenant);
 }

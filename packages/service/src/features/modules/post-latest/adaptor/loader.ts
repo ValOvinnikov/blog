@@ -28,5 +28,5 @@ export async function getPostLatest(
     ...isr(['posts', 'author', 'topic'], tenant.projectId),
   });
 
-  return toPostLatestModule(raw, rawPosts);
+  return toPostLatestModule(raw, rawPosts, tenant);
 }

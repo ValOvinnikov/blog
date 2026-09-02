@@ -1,5 +1,6 @@
 import type { TMaybeUndefined } from '@blog/config';
 import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
+import type { TImageTenant } from '@blog/service/sanity/image';
 import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
 import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
@@ -21,12 +22,15 @@ export type TRawPostDetail = TRawPostPage['post'];
 // natural resolution.
 const AUTHOR_AVATAR_SIZE_PX = 64;
 
-function toPostDetailAuthor(raw: TRawPostDetail['author']): TPostDetailAuthor {
+function toPostDetailAuthor(
+  raw: TRawPostDetail['author'],
+  tenant: TImageTenant,
+): TPostDetailAuthor {
   return {
     id: raw._id,
     name: raw.name,
     profilePageSlug: raw.profilePage?.slug ?? undefined,
-    imageUrl: buildImageUrl(raw.image, {
+    imageUrl: buildImageUrl(raw.image, tenant, {
       width: AUTHOR_AVATAR_SIZE_PX,
       height: AUTHOR_AVATAR_SIZE_PX,
       fit: 'crop',
@@ -54,9 +58,10 @@ export function toPostDetail(
   rawPage: TRawPostPage,
   settings: TSiteSettings,
   relatedPosts: TPostCard[],
+  tenant: TImageTenant,
 ): TPostDetail {
   const raw = rawPage.post;
-  const heroImageUrl = buildImageUrl(raw.heroImage);
+  const heroImageUrl = buildImageUrl(raw.heroImage, tenant);
 
   return {
     id: raw._id,
@@ -88,8 +93,9 @@ export function toPostDetail(
         description: settings.description,
         defaultOgImageUrl: settings.defaultOgImageUrl,
       },
+      tenant,
     ),
-    author: toPostDetailAuthor(raw.author),
+    author: toPostDetailAuthor(raw.author, tenant),
     topic: toTopic(raw.topic),
     tags: (raw.tags ?? []).map(toTag),
     relatedPosts,

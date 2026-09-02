@@ -20,5 +20,5 @@ export async function getHomePage(
   if (!raw) return undefined;
 
   const settings = await getSiteSettings(tenant);
-  return toHomePage(raw, settings);
+  return toHomePage(raw, settings, tenant);
 }

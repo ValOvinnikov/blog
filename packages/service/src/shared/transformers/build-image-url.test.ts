@@ -1,4 +1,5 @@
 import { makeRawImage } from '@blog/service/testing/shared/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { buildImageUrl } from './build-image-url';
 
@@ -8,29 +9,34 @@ vi.mock('@blog/service/sanity/image', () => ({
   ),
 }));
 
+const tenant = makeTenant();
+
 describe('buildImageUrl', () => {
   it('returns undefined for null', () => {
-    expect(buildImageUrl(null)).toBeUndefined();
+    expect(buildImageUrl(null, tenant)).toBeUndefined();
   });
 
   it('returns undefined for undefined', () => {
-    expect(buildImageUrl(undefined)).toBeUndefined();
+    expect(buildImageUrl(undefined, tenant)).toBeUndefined();
   });
 
   it('returns undefined when image has no asset', () => {
     expect(
-      buildImageUrl({
-        _type: 'imageWithAlt',
-        asset: null,
-        alt: 'x',
-        hotspot: null,
-        crop: null,
-      }),
+      buildImageUrl(
+        {
+          _type: 'imageWithAlt',
+          asset: null,
+          alt: 'x',
+          hotspot: null,
+          crop: null,
+        },
+        tenant,
+      ),
     ).toBeUndefined();
   });
 
   it('returns a URL string for a valid image', () => {
-    const result = buildImageUrl(makeRawImage());
+    const result = buildImageUrl(makeRawImage(), tenant);
     expect(typeof result).toBe('string');
     expect(result).toContain('sanity.io');
   });
@@ -40,16 +46,16 @@ describe('buildImageUrl', () => {
     vi.mocked(urlForImage).mockImplementationOnce(() => {
       throw new Error('builder error');
     });
-    expect(buildImageUrl(makeRawImage())).toBeUndefined();
+    expect(buildImageUrl(makeRawImage(), tenant)).toBeUndefined();
   });
 
-  it('forwards transform options to urlForImage', async () => {
+  it('forwards the tenant and transform options to urlForImage', async () => {
     const { urlForImage } = await import('@blog/service/sanity/image');
     const image = makeRawImage();
 
-    buildImageUrl(image, { width: 64, height: 64, fit: 'crop' });
+    buildImageUrl(image, tenant, { width: 64, height: 64, fit: 'crop' });
 
-    expect(urlForImage).toHaveBeenCalledWith(image, {
+    expect(urlForImage).toHaveBeenCalledWith(image, tenant, {
       width: 64,
       height: 64,
       fit: 'crop',

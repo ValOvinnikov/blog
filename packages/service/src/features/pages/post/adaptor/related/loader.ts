@@ -41,5 +41,5 @@ export async function getRelatedPosts(
       : Promise.resolve([]),
   ]);
 
-  return toRelatedPosts(byTags, byTopic, tagIds);
+  return toRelatedPosts(byTags, byTopic, tagIds, tenant);
 }

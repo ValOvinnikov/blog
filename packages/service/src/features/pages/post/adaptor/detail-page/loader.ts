@@ -31,5 +31,5 @@ export async function getPost(
     getRelatedPosts(rawPage.post._id, tagIds, rawPage.post.topic._id, tenant),
   ]);
 
-  return toPostDetail(rawPage, settings, relatedPosts);
+  return toPostDetail(rawPage, settings, relatedPosts, tenant);
 }

@@ -1,5 +1,6 @@
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
 import { makeRawImage } from '@blog/service/testing/shared/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { toPostCard } from './to-post-card';
 
@@ -9,9 +10,11 @@ vi.mock('@blog/service/sanity/image', () => ({
   ),
 }));
 
+const tenant = makeTenant();
+
 describe('toPostCard', () => {
   it('maps all fields from raw input', () => {
-    const result = toPostCard(makeRawPostCard());
+    const result = toPostCard(makeRawPostCard(), tenant);
 
     expect(result.id).toBe('post-1');
     expect(result.title).toBe('Hello World');
@@ -25,7 +28,7 @@ describe('toPostCard', () => {
   });
 
   it('computes reading time from the word count', () => {
-    const result = toPostCard(makeRawPostCard({ wordCount: 600 }));
+    const result = toPostCard(makeRawPostCard({ wordCount: 600 }), tenant);
     expect(result.readingTimeMinutes).toBe(3);
   });
 
@@ -39,6 +42,7 @@ describe('toPostCard', () => {
           profilePage: { slug: 'jane-doe' },
         },
       }),
+      tenant,
     );
 
     expect(result.author).toEqual({
@@ -50,13 +54,13 @@ describe('toPostCard', () => {
   });
 
   it('maps a missing profilePage reference to an undefined profilePageSlug', () => {
-    const result = toPostCard(makeRawPostCard());
+    const result = toPostCard(makeRawPostCard(), tenant);
 
     expect(result.author.profilePageSlug).toBeUndefined();
   });
 
   it('maps the topic', () => {
-    const result = toPostCard(makeRawPostCard());
+    const result = toPostCard(makeRawPostCard(), tenant);
 
     expect(result.topic).toEqual({
       id: 'topic-1',
@@ -66,13 +70,14 @@ describe('toPostCard', () => {
   });
 
   it('defaults featured to false when null', () => {
-    const result = toPostCard(makeRawPostCard({ featured: null }));
+    const result = toPostCard(makeRawPostCard({ featured: null }), tenant);
     expect(result.featured).toBe(false);
   });
 
   it('returns undefined image fields when heroImage is absent', () => {
     const result = toPostCard(
       makeRawPostCard({ heroImage: null, heroImageAsset: null }),
+      tenant,
     );
 
     expect(result.heroImageUrl).toBeUndefined();

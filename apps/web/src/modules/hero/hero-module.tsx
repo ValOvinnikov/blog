@@ -28,7 +28,7 @@ export const HeroModule = async ({ id }: IHeroModuleProps) => {
       id={id}
       {...result.data}
       title={title}
-      baseUrl={getSanityImageBaseUrl()}
+      baseUrl={getSanityImageBaseUrl(tenant)}
     />
   );
 };

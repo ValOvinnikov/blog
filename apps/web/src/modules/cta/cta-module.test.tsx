@@ -8,8 +8,8 @@ const { getCtaMock, getTenantSanityContextMock } = vi.hoisted(() => ({
 }));
 
 vi.mock('@blog/service', () => ({
-  getSanityImageBaseUrl: () =>
-    'https://cdn.sanity.io/images/test-project/test-dataset/',
+  getSanityImageBaseUrl: (tenant: { projectId: string; dataset: string }) =>
+    `https://cdn.sanity.io/images/${tenant.projectId}/${tenant.dataset}/`,
   service: {
     modules: {
       cta: { v1: { getCta: getCtaMock } },

@@ -1,4 +1,5 @@
 import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
+import type { TImageTenant } from '@blog/service/sanity/image';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
 import { toModule } from '@blog/service/shared/transformers/to-module';
 import type { InferResultType } from 'groqd';
@@ -13,6 +14,7 @@ export type TRawGenericPage = NonNullable<
 export function toGenericPage(
   raw: TRawGenericPage,
   settings: TSiteSettings,
+  tenant: TImageTenant,
 ): TGenericPage {
   return {
     title: raw.title,
@@ -28,6 +30,7 @@ export function toGenericPage(
         description: settings.description,
         defaultOgImageUrl: settings.defaultOgImageUrl,
       },
+      tenant,
     ),
   };
 }

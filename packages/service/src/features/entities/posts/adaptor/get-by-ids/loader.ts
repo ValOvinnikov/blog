@@ -25,5 +25,5 @@ export async function getPostsByIds(
     ...isr(['posts', 'author', 'topic'], tenant.projectId),
   });
 
-  return toPostsByIds(raw);
+  return toPostsByIds(raw, tenant);
 }
