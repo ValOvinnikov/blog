@@ -19,6 +19,11 @@ const { unarchiveSanityProjectMock } = vi.hoisted(() => ({
 const { reportStepStatusMock } = vi.hoisted(() => ({
   reportStepStatusMock: vi.fn(),
 }));
+const { reportProvisioningRunStartMock, reportProvisioningRunFinishMock } =
+  vi.hoisted(() => ({
+    reportProvisioningRunStartMock: vi.fn(),
+    reportProvisioningRunFinishMock: vi.fn(),
+  }));
 const { createTenantSanityProjectMock } = vi.hoisted(() => ({
   createTenantSanityProjectMock: vi.fn(),
 }));
@@ -49,6 +54,10 @@ vi.mock(
 );
 vi.mock('./lib/report-step-status', () => ({
   reportStepStatus: reportStepStatusMock,
+}));
+vi.mock('./lib/report-provisioning-run', () => ({
+  reportProvisioningRunStart: reportProvisioningRunStartMock,
+  reportProvisioningRunFinish: reportProvisioningRunFinishMock,
 }));
 vi.mock('./steps/create-sanity-project', () => ({
   createTenantSanityProject: createTenantSanityProjectMock,
@@ -85,6 +94,10 @@ const env = {
   tenantSanityDataset: 'test-dataset',
   webAppBaseUrl: 'https://example.com',
   revalidateSecret: 'revalidate-shh',
+  githubRunId: undefined,
+  githubRepository: undefined,
+  githubServerUrl: undefined,
+  tenantRegistryEnvironment: undefined,
 };
 
 beforeEach(() => {
@@ -95,6 +108,8 @@ beforeEach(() => {
     .mockReset()
     .mockResolvedValue({ outcome: 'unarchived' });
   reportStepStatusMock.mockReset().mockResolvedValue(undefined);
+  reportProvisioningRunStartMock.mockReset().mockResolvedValue(undefined);
+  reportProvisioningRunFinishMock.mockReset().mockResolvedValue(undefined);
   createTenantSanityProjectMock.mockReset();
   seedTenantContentMock.mockReset().mockResolvedValue(undefined);
   persistTenantSanityTokenMock.mockReset().mockResolvedValue(undefined);
@@ -373,5 +388,80 @@ describe(runSteps, () => {
         step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
       }),
     );
+  });
+
+  it('starts the run with the registry and workflow run URL before the first step', async () => {
+    createTenantSanityProjectMock.mockResolvedValue({});
+
+    await runSteps('tenant-1', {
+      ...env,
+      tenantRegistryEnvironment: 'production',
+      githubServerUrl: 'https://github.com',
+      githubRepository: 'acme/blog',
+      githubRunId: '123',
+    });
+
+    expect(reportProvisioningRunStartMock).toHaveBeenCalledWith({
+      tenantId: 'tenant-1',
+      registry: 'production',
+      workflowRunUrl: 'https://github.com/acme/blog/actions/runs/123',
+    });
+    const [startCallOrder] =
+      reportProvisioningRunStartMock.mock.invocationCallOrder;
+    const [firstStepReportCallOrder] =
+      reportStepStatusMock.mock.invocationCallOrder;
+    expect(startCallOrder).toBeLessThan(firstStepReportCallOrder as number);
+  });
+
+  it('omits registry and workflowRunUrl entirely when the underlying env vars are unset', async () => {
+    createTenantSanityProjectMock.mockResolvedValue({});
+
+    await runSteps('tenant-1', env);
+
+    expect(reportProvisioningRunStartMock).toHaveBeenCalledWith({
+      tenantId: 'tenant-1',
+    });
+  });
+
+  it('finishes the run once every step succeeds', async () => {
+    createTenantSanityProjectMock.mockResolvedValue({});
+
+    await runSteps('tenant-1', env);
+
+    expect(reportProvisioningRunFinishMock).toHaveBeenCalledWith('tenant-1');
+  });
+
+  it('finishes the run when a step fails', async () => {
+    createTenantSanityProjectMock.mockResolvedValue({});
+    seedTenantContentMock.mockRejectedValue(new Error('seed failed'));
+
+    await runSteps('tenant-1', env);
+
+    expect(reportProvisioningRunFinishMock).toHaveBeenCalledWith('tenant-1');
+  });
+
+  it('never starts or finishes a run when reactivateTenant fails', async () => {
+    reactivateTenantMock.mockResolvedValue({
+      ok: false,
+      error: ERROR_CODE.DB_NOT_FOUND,
+    });
+
+    await runSteps('tenant-1', env);
+
+    expect(reportProvisioningRunStartMock).not.toHaveBeenCalled();
+    expect(reportProvisioningRunFinishMock).not.toHaveBeenCalled();
+  });
+
+  it('never starts or finishes a run when un-archiving the Sanity project fails', async () => {
+    reactivateTenantMock.mockResolvedValue({
+      ok: true,
+      data: { ...baseTenant, sanityProjectId: 'proj-abc' },
+    });
+    unarchiveSanityProjectMock.mockRejectedValue(new Error('network error'));
+
+    await runSteps('tenant-1', env);
+
+    expect(reportProvisioningRunStartMock).not.toHaveBeenCalled();
+    expect(reportProvisioningRunFinishMock).not.toHaveBeenCalled();
   });
 });

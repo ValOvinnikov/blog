@@ -17,6 +17,11 @@ const { reactivateTenantMock } = vi.hoisted(() => ({
 const { reportStepStatusMock } = vi.hoisted(() => ({
   reportStepStatusMock: vi.fn(),
 }));
+const { reportProvisioningRunStartMock, reportProvisioningRunFinishMock } =
+  vi.hoisted(() => ({
+    reportProvisioningRunStartMock: vi.fn(),
+    reportProvisioningRunFinishMock: vi.fn(),
+  }));
 const { createTenantSanityProjectMock } = vi.hoisted(() => ({
   createTenantSanityProjectMock: vi.fn(),
 }));
@@ -41,6 +46,10 @@ vi.mock('@blog/db/queries/tenants', () => ({
 }));
 vi.mock('./lib/report-step-status', () => ({
   reportStepStatus: reportStepStatusMock,
+}));
+vi.mock('./lib/report-provisioning-run', () => ({
+  reportProvisioningRunStart: reportProvisioningRunStartMock,
+  reportProvisioningRunFinish: reportProvisioningRunFinishMock,
 }));
 vi.mock('./steps/create-sanity-project', () => ({
   createTenantSanityProject: createTenantSanityProjectMock,
@@ -76,6 +85,10 @@ const env = {
   sanityOrganizationId: 'org-abc',
   vercelToken: 'vercel-token',
   vercelTeamId: undefined,
+  githubRunId: undefined,
+  githubRepository: undefined,
+  githubServerUrl: undefined,
+  tenantRegistryEnvironment: undefined,
   vercelWebProjectId: 'proj-1',
   adminAppBaseUrl: 'https://admin.example.com',
   tenantSanityDataset: 'test-dataset',
@@ -106,6 +119,8 @@ beforeEach(() => {
     .mockReset()
     .mockResolvedValue({ ok: true, data: reprovisionedTenant });
   reportStepStatusMock.mockReset().mockResolvedValue(undefined);
+  reportProvisioningRunStartMock.mockReset().mockResolvedValue(undefined);
+  reportProvisioningRunFinishMock.mockReset().mockResolvedValue(undefined);
   createTenantSanityProjectMock.mockReset().mockResolvedValue({});
   seedTenantContentMock.mockReset().mockResolvedValue(undefined);
   persistTenantSanityTokenMock.mockReset().mockResolvedValue(undefined);

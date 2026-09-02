@@ -92,6 +92,11 @@ jobs:
       WEB_APP_URL: ${{ vars.WEB_APP_URL }}
       SANITY_REVALIDATE_SECRET: ${{ secrets.SANITY_REVALIDATE_SECRET }}
       TENANT_TOKEN_ENCRYPTION_KEY: ${{ secrets.TENANT_TOKEN_ENCRYPTION_KEY }}
+      # The dispatched environment (`development`/`production`), surfaced on
+      # apps/platform's provisioning page as the run's "Registry" — the one
+      # of these four run-metadata values Actions doesn't already set as a
+      # default env var.
+      TENANT_REGISTRY_ENVIRONMENT: ${{ inputs.environment }}
       # `getDb()` (via `packages/db/src/utils/env/env.ts`) reads `DATABASE_URL`
       # specifically — deliberately its own secret, distinct from
       # `DATABASE_URL_UNPOOLED` (which `deploy-production.yml`'s `migrate-db`

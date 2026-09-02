@@ -1,6 +1,6 @@
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import type { TTenantProvisioningSteps } from '@blog/db/schema/tenants';
+import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
 import { createTestDb } from '@blog/db/testing/create-test-db';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
@@ -26,7 +26,7 @@ afterEach(async () => {
 
 describe(getTenantProvisioningStatus, () => {
   it('returns the overall status and per-step map for an existing tenant', async () => {
-    const provisioningSteps: TTenantProvisioningSteps = {
+    const provisioningSteps: TTenantProvisioningState = {
       SANITY_PROJECT: { status: 'DONE' },
       SEED_CONTENT: { status: 'RUNNING' },
       PERSIST_TOKEN: { status: 'IDLE' },

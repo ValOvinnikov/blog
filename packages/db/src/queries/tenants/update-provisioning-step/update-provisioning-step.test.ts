@@ -39,16 +39,21 @@ async function insertDraftTenant(): Promise<string> {
   return tenant.id;
 }
 
+const NOW = '2026-09-02T12:00:00.000Z';
+
 beforeAll(async () => {
   db = await createTestDb();
 }, 30_000);
 
 beforeEach(() => {
   getDbMock.mockReturnValue(db);
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date(NOW));
 });
 
 afterEach(async () => {
   await db.delete(schema.tenants);
+  vi.useRealTimers();
 });
 
 describe(updateProvisioningStep, () => {
@@ -63,7 +68,7 @@ describe(updateProvisioningStep, () => {
 
     if (!result.ok) throw new Error('expected ok:true');
     expect(result.data.provisioningSteps).toEqual({
-      SANITY_PROJECT: { status: 'RUNNING' },
+      SANITY_PROJECT: { status: 'RUNNING', updatedAt: NOW },
       SEED_CONTENT: { status: 'IDLE' },
       PERSIST_TOKEN: { status: 'IDLE' },
       MAP_DOMAIN: { status: 'IDLE' },
@@ -88,8 +93,8 @@ describe(updateProvisioningStep, () => {
 
     if (!result.ok) throw new Error('expected ok:true');
     expect(result.data.provisioningSteps).toEqual({
-      SANITY_PROJECT: { status: 'DONE' },
-      SEED_CONTENT: { status: 'RUNNING' },
+      SANITY_PROJECT: { status: 'DONE', updatedAt: NOW },
+      SEED_CONTENT: { status: 'RUNNING', updatedAt: NOW },
       PERSIST_TOKEN: { status: 'IDLE' },
       MAP_DOMAIN: { status: 'IDLE' },
       CREATE_WEBHOOK: { status: 'IDLE' },
@@ -111,6 +116,7 @@ describe(updateProvisioningStep, () => {
     expect(result.data.provisioningSteps?.['SANITY_PROJECT']).toEqual({
       status: 'FAILED',
       error: 'Sanity Projects API returned 429',
+      updatedAt: NOW,
     });
   });
 
@@ -128,6 +134,7 @@ describe(updateProvisioningStep, () => {
     expect(result.data.provisioningSteps?.['OWNER_ELEVATION']).toEqual({
       status: 'DONE',
       detail: 'STALLED',
+      updatedAt: NOW,
     });
   });
 
@@ -143,6 +150,7 @@ describe(updateProvisioningStep, () => {
     if (!result.ok) throw new Error('expected ok:true');
     expect(result.data.provisioningSteps?.['SANITY_PROJECT']).toEqual({
       status: 'DONE',
+      updatedAt: NOW,
     });
   });
 
@@ -173,6 +181,7 @@ describe(updateProvisioningStep, () => {
     expect(result.data.provisioningStatus).toBe('READY');
     expect(result.data.provisioningSteps?.['MAP_DOMAIN']).toEqual({
       status: 'DONE',
+      updatedAt: NOW,
     });
   });
 
