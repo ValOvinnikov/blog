@@ -94,9 +94,9 @@ export const tenants = pgTable('tenants', {
   // `TTenantProvisioningState` above.
   provisioningSteps:
     jsonb('provisioning_steps').$type<TTenantProvisioningState>(),
-  // Outcome last actually communicated to operators via
-  // `notifyOperatorsOfOwnerElevationOutcome` — distinct from
-  // `provisioningSteps`' `OWNER_ELEVATION` `detail` above, which only
+  // Outcome last actually communicated to operators, written by
+  // `notifyOwnerElevationOutcome` — distinct from `provisioningSteps`'
+  // `OWNER_ELEVATION` `detail` above, which only
   // records the most recently *observed* outcome. Dedup for both
   // provisioning's own first check and the recurring recheck sweep keys off
   // this column, so a notifiable outcome first observed during provisioning
