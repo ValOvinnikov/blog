@@ -38,7 +38,8 @@ function assertValidTenantContext(tenant: TTenantSanityContext): void {
  * scoped write token and is used only by the publish-time skim pipeline
  * (`features/editorial/skim`) to patch a post's *draft*. Never imported by
  * page-rendering code. There is no no-arg form — a caller that means the
- * platform's own project uses `getPlatformWriteClient()` explicitly.
+ * platform's own project passes `getPlatformSanityWriteContext()`'s result
+ * explicitly.
  */
 export function getWriteClient(
   tenant: TTenantSanityContext,
