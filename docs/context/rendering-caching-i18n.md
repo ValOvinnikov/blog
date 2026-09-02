@@ -4,7 +4,27 @@
 > Referenced from `SPEC.md` §9.
 
 - **Default:** static generation; `generateStaticParams` for dynamic routes
-  (service exposes `params` slices returning `{ slug }[]`).
+  (service exposes `params` slices returning `{ slug }[]`). In practice this
+  no longer holds for content routes since #2408 (every `service` loader
+  reads the per-request tenant via `getRequestTenantId()` → `headers()`) —
+  #2440 measured the resulting `next build` output: every content route
+  (`/[locale]`, `/[locale]/blog`, `/[locale]/blog/[slug]`,
+  `/[locale]/tags/**`, `/[locale]/topics/**`, `/rss.xml`, `/sitemap.xml`,
+  `/icon`, `/opengraph-image`, `/twitter-image`) is `ƒ` (Dynamic); only
+  `/_not-found` and `/robots.txt` remained static at that baseline. #2477's
+  root layout (`getThemeTokens()`/`isCapabilityEnabled()`, both now
+  tenant-scoped) reads `headers()` too. For the ten content routes above this
+  adds no new cost — a descendant layout or page already forced dynamic
+  rendering. `/_not-found` is different: it renders outside
+  `[locale]/layout.tsx` (see "Root layout" below) and had no `headers()`
+  dependency before #2477, so it was one of the two routes #2440 measured as
+  static. A `pnpm --filter web build` on the #2477 branch confirms
+  `/_not-found` is now `ƒ` (Dynamic) too — only `/robots.txt` remains `○`
+  (Static), and the prerender manifest bakes 2 routes (`/_global-error`,
+  `/robots.txt`) instead of #2440's baseline of 3. #2440 is the open,
+  unresolved question of whether/how to claw any of this back (e.g. Cache
+  Components/PPR); it also notes `generateStaticParams` is now vestigial on
+  the ten content routes (still runs at build, output never baked).
 - **Build-time zero-results guard (`SKIP_ENV_VALIDATION`, #889):**
   `blog/[slug]`'s `generateStaticParams` throws — failing the build — if its
   params query resolves successfully but to zero posts, unless
@@ -38,12 +58,17 @@
   retry the whole revalidation.
 - **`site_config` on-demand revalidation:** `POST /api/revalidate-site-config`
   (`apps/web`) mirrors `/api/revalidate`'s cache-purge shape
-  (`revalidateTag('site-config', { expire: 0 })` +
+  (per-tenant `revalidateTag('site-config:<tenantId>', { expire: 0 })` +
+  same for `settings-features`/`tenant-plan` +
   `revalidatePath('/', 'layout')` fallback) but not its verification
   mechanism or its caller — it's called by `apps/platform`'s Look/Voice save
   actions after a `site_config` write, not by a Sanity webhook, so it
   verifies a plain shared secret (`SITE_CONFIG_REVALIDATE_SECRET`, sent as a
-  bearer token) rather than `@sanity/webhook`'s HMAC signature. `apps/platform`
+  bearer token) rather than `@sanity/webhook`'s HMAC signature. Accepts an
+  optional JSON body `{ tenantId }` to scope the purge to just that tenant;
+  an omitted `tenantId` (the current, not-yet-updated `apps/platform` caller)
+  falls back to revalidating every tenant, so revalidation never silently
+  stops working. `apps/platform`
   calls it best-effort (`@platform/server/site-config/revalidate-site-config`)
   — a failed call is logged, never thrown, and the site-config cache's own
   3600s (`SITE_CONFIG_REVALIDATE_SECONDS`) window remains the fallback

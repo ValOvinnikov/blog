@@ -321,7 +321,7 @@ tenant's row in `@blog/db`'s `site_config` table (`preset` —
 `PRESET_REGISTRY` into a fully-populated `TThemeTokens` (never partial —
 every gap, and the case of no row existing at all, is filled by the preset's
 own default). `apps/web`'s root layout fetches this once per request
-(`unstable_cache`-wrapped, tagged `site-config`) and injects the resolved
+(`unstable_cache`-wrapped, tenant-scoped tag) and injects the resolved
 tokens as a server-rendered `<style>` block declaring CSS custom properties
 under both `:root` and `.dark`, and selects the matching `next/font/google`
 pair (`headingFont`/`bodyFont`) via a per-font dynamically imported loader
@@ -335,14 +335,31 @@ sole `tenants` row outside production (`isProductionEnvironment()` — never
 resolved `tenantId` is threaded to Server Components/Actions via the
 `x-tenant-id` request header (unconditionally cleared before the conditional
 set, so a client-supplied value can never survive an unresolved lookup),
-read back with `getRequestTenantId()`. `get-site-config.ts` is a deliberate
-exception: it backs the theme/voice reads below via a fixed-cache-key
-`unstable_cache` read on nearly every route (including statically rendered
-ones), so wiring it to the per-request header would force those routes out
-of static rendering — a larger, sitewide tradeoff with no settled design yet
-(unresolved, not scoped into any existing epic). It keeps its own private
-sole-tenant resolution (`resolveSiteConfigTenantId`) until that tradeoff is
-decided. The Sanity `settings_theme` schema this superseded is
+read back with `getRequestTenantId()`. `get-site-config.ts` (and its
+`settings_features`/tenant-plan counterparts below) reads that same
+per-request `getRequestTenantId()` and caches per tenant — both the
+`unstable_cache` key and the revalidation tag carry the tenant id
+(`buildSiteConfigCacheTag`/`buildSettingsFeaturesCacheTag`/
+`buildTenantPlanCacheTag`, `apps/web/src/utils/tenant-cache-tags/`) — closing
+the leak where every tenant was served the first `tenants` row's config
+(#2477). The root layout (`app/layout.tsx`) now also calls `headers()`
+directly via `getThemeTokens()`/`isCapabilityEnabled()`. For the ten content
+routes #2408 already forced dynamic (a descendant — `[locale]/layout.tsx` or
+the page itself — already reads `getRequestTenantId()` for its own
+tenant-scoped Sanity reads), this adds no new rendering-mode cost — they were
+already re-rendered per request regardless. `/_not-found` is different: it
+renders outside `[locale]/layout.tsx` and had no `headers()` dependency
+before #2477 (`getSiteConfig()` previously resolved via a plain `listTenants()`
+DB call, not a Next.js Dynamic API), which is why #2440 measured it as one of
+only two static routes. A `pnpm --filter web build` on this branch confirms
+`/_not-found` is now `ƒ` (Dynamic) — the route table shows only `/robots.txt`
+as `○` (Static), and the prerender manifest bakes 2 routes
+(`/_global-error`, `/robots.txt`) instead of #2440's baseline of 3
+(`/_global-error`, `/_not-found`, `/robots.txt`). #2440 holds the measured
+baseline and the open decision of whether/how to claw any of this back (e.g.
+Cache Components/PPR) — #2477 does not revisit or change that decision, but
+does move the needle on it: one fewer static route. The
+Sanity `settings_theme` schema this superseded is
 retained only as a rollback path (unused by any read path) until the
 transition's retirement epic deletes it. The favicon route
 (`apps/web/src/app/icon.tsx`) fetches through the tenant's uploaded
@@ -362,7 +379,7 @@ request's `next-intl` messages as a three-layer merge — the neutral base
 `voicePack` (`@blog/config`'s `PRESET_REGISTRY[preset].voicePack`, via
 `deepMergePartial`) ← the tenant's `site_config.voiceOverrides`. The
 `preset` and `voiceOverrides` come from the same `site_config` row and the
-same cached read as theme (`get-site-config.ts`, tag `site-config`) — one
+same cached read as theme (`get-site-config.ts`, tenant-scoped tag) — one
 row backs both. `voiceOverrides` stores its 19 curated fields as flat
 camelCase keys (e.g. `notFoundCommandNotFound`), matching `apps/platform`'s
 Voice tab (`apps/platform/src/utils/voice-fields/voice-fields.ts`);
@@ -371,16 +388,20 @@ nested message path and applies it last, cloning only the objects along
 that path so untouched namespaces keep referencing the cached messages
 module instead of being mutated in place. A fetch failure, or a tenant with
 no `site_config` row, falls back to the `CONSOLE` preset with no overrides
-— never a thrown error or an empty page. Same `get-site-config.ts` caveat as
-theme, above: this reads the sole `tenants` row rather than the real
-`proxy.ts` resolution, pending the tenant-scoped caching design.
+— never a thrown error or an empty page. Same per-request tenant resolution
+as theme, above.
 
 `get-site-config.ts`'s cache carries a 3600s (`SITE_CONFIG_REVALIDATE_SECONDS`)
 fallback window as its safety net, but `apps/platform`'s Look/Voice save actions
 (`update-look-action.ts`/`save-voice-overrides-action.ts`) also POST to
 `apps/web`'s `POST /api/revalidate-site-config` after a successful
 `site_config` write, so a tenant admin's save reflects on the live site
-within seconds rather than waiting out that window. This is a plain
+within seconds rather than waiting out that window. The route accepts an
+optional JSON body `{ tenantId }` to scope the purge to the tenant that
+actually saved (matching `revalidateTag`'s tenant-scoped tags); a request
+with no body — the current `apps/platform` behavior, not yet updated to send
+one — falls back to revalidating every tenant rather than silently doing
+nothing. This is a plain
 shared-secret (`SITE_CONFIG_REVALIDATE_SECRET`, which must be byte-identical
 between the two apps because `apps/web` compares the bearer token it receives
 against its own copy — unlike `AUTH_SECRET`, where matching is an operational

@@ -2,14 +2,17 @@ import { PRESET_ID } from '@blog/config';
 
 import requestConfig from './request';
 
-const { listTenantsMock, getSiteConfigMock } = vi.hoisted(() => ({
-  listTenantsMock: vi.fn(),
+const { getRequestTenantIdMock, getSiteConfigMock } = vi.hoisted(() => ({
+  getRequestTenantIdMock: vi.fn(),
   getSiteConfigMock: vi.fn(),
+}));
+
+vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
+  getRequestTenantId: getRequestTenantIdMock,
 }));
 
 vi.mock('@blog/db', () => ({
   queries: {
-    tenants: { listTenants: listTenantsMock },
     siteConfig: { getSiteConfig: getSiteConfigMock },
   },
 }));
@@ -233,9 +236,9 @@ const CLASSIFICATION_TABLE: Array<[string[], string, string]> = [
 
 describe('i18n request config — voice ladder', () => {
   beforeEach(() => {
-    listTenantsMock.mockReset();
+    getRequestTenantIdMock.mockReset();
     getSiteConfigMock.mockReset();
-    listTenantsMock.mockResolvedValue([TENANT]);
+    getRequestTenantIdMock.mockResolvedValue(TENANT.id);
   });
 
   it('CONSOLE preset with no voice overrides reproduces the original pre-neutralization wording at all 64 classification-table paths', async () => {

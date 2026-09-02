@@ -4,12 +4,12 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import RootLayout from './layout';
 
 const {
-  listTenantsMock,
+  getRequestTenantIdMock,
   listTenantsByIdsMock,
   getSiteConfigMock,
   getSettingsFeaturesMock,
 } = vi.hoisted(() => ({
-  listTenantsMock: vi.fn(),
+  getRequestTenantIdMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
   getSiteConfigMock: vi.fn(),
   getSettingsFeaturesMock: vi.fn(),
@@ -19,10 +19,13 @@ const { envMock } = vi.hoisted(() => ({
   envMock: { WEB_ANALYTICS_ENABLED: undefined as string | undefined },
 }));
 
+vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
+  getRequestTenantId: getRequestTenantIdMock,
+}));
+
 vi.mock('@blog/db', () => ({
   queries: {
     tenants: {
-      listTenants: listTenantsMock,
       listTenantsByIds: listTenantsByIdsMock,
     },
     siteConfig: { getSiteConfig: getSiteConfigMock },
@@ -64,7 +67,7 @@ describe(`<${RootLayout.name}/>`, () => {
   beforeEach(() => {
     vi.clearAllMocks();
     envMock.WEB_ANALYTICS_ENABLED = undefined;
-    listTenantsMock.mockResolvedValue([TENANT]);
+    getRequestTenantIdMock.mockResolvedValue(TENANT.id);
     getSiteConfigMock.mockResolvedValue(CONSOLE_SITE_CONFIG_ROW);
     listTenantsByIdsMock.mockResolvedValue([{ ...TENANT, plan: 'GROWTH' }]);
     getSettingsFeaturesMock.mockResolvedValue({
@@ -115,7 +118,7 @@ describe(`<${RootLayout.name}/>`, () => {
   });
 
   it('falls back to the Console preset tokens when the site config fetch fails', async () => {
-    listTenantsMock.mockRejectedValue(new Error('boom'));
+    getSiteConfigMock.mockRejectedValue(new Error('boom'));
     const consoleErrorSpy = vi
       .spyOn(console, 'error')
       .mockImplementation(() => {});
