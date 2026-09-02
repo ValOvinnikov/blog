@@ -7,6 +7,7 @@ import {
   buildLogoPreviewTokens,
 } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { useTranslations } from 'next-intl';
+import type { AriaAttributes } from 'react';
 
 import { logoHueFieldVariants } from './logo-hue-field-variants';
 
@@ -16,6 +17,8 @@ export type TLogoHueFieldProps = {
   logoHue: number | undefined;
   onChange: (logoHue: number | undefined) => void;
   isDark: boolean;
+  isDisabled?: boolean;
+  'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
 
 /**
@@ -28,6 +31,8 @@ export const LogoHueField = ({
   logoHue,
   onChange,
   isDark,
+  isDisabled = false,
+  'aria-describedby': ariaDescribedBy,
 }: TLogoHueFieldProps) => {
   const t = useTranslations('logoHueField');
   const follows = logoHue === undefined;
@@ -53,7 +58,9 @@ export const LogoHueField = ({
           onCheckedChange={(checked) =>
             onChange(checked ? undefined : accentHue)
           }
+          disabled={isDisabled}
           aria-label={t('followAccentHue')}
+          aria-describedby={ariaDescribedBy}
           className={switchTrack()}
         >
           <Switch.Thumb className={switchThumb()} />
@@ -71,7 +78,8 @@ export const LogoHueField = ({
           ariaLabel={t('logoHueAriaLabel')}
           value={resolvedHue}
           onChange={onChange}
-          isDisabled={follows}
+          isDisabled={follows || isDisabled}
+          aria-describedby={ariaDescribedBy}
           trackStyle={{ background: accentHueGradient() }}
         />
         <span className={hueValue()}>

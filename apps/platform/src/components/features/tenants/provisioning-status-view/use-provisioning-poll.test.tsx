@@ -188,6 +188,51 @@ describe(useProvisioningPoll, () => {
   });
 
   describe('status derivation', () => {
+    it('exposes provisioningRun read off provisioningSteps.run, and undefined when absent', () => {
+      const withoutRun = makeTenant({
+        provisioningSteps: idleProvisioningSteps(),
+      });
+      const { result: withoutResult } = renderHook(() =>
+        useProvisioningPoll(withoutRun, 'NOT_CONFIGURED'),
+      );
+      expect(withoutResult.current.provisioningRun).toBeUndefined();
+
+      const withRun = makeTenant({
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          run: {
+            startedAt: '2026-08-12T14:18:00.000Z',
+            registry: 'production',
+          },
+        },
+      });
+      const { result: withResult } = renderHook(() =>
+        useProvisioningPoll(withRun, 'NOT_CONFIGURED'),
+      );
+      expect(withResult.current.provisioningRun).toEqual({
+        startedAt: '2026-08-12T14:18:00.000Z',
+        registry: 'production',
+      });
+    });
+
+    it('exposes stepUpdatedAt parallel to STEP_ORDER, undefined for a step with none recorded', () => {
+      const tenant = makeTenant({
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+            updatedAt: '2026-08-12T14:19:00.000Z',
+          },
+        },
+      });
+      const { result } = renderHook(() =>
+        useProvisioningPoll(tenant, 'NOT_CONFIGURED'),
+      );
+
+      expect(result.current.stepUpdatedAt[0]).toBe('2026-08-12T14:19:00.000Z');
+      expect(result.current.stepUpdatedAt[1]).toBeUndefined();
+    });
+
     it('reports allIdle and IDLE overall status when every step is idle', () => {
       const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
       const { result } = renderHook(() =>

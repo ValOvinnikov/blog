@@ -38,4 +38,24 @@ describe(TextInput, () => {
     const input = screen.getByLabelText('Slug');
     expect(input).toBeDisabled();
   });
+
+  it('makes the input read-only, not disabled, when isReadOnly is true', async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+    render(
+      <TextInput
+        ariaLabel="Archived field"
+        value="authored value"
+        onChange={handleChange}
+        isReadOnly={true}
+      />,
+    );
+
+    const input = screen.getByLabelText('Archived field');
+    expect(input).toHaveAttribute('readonly');
+    expect(input).toBeEnabled();
+
+    await user.type(input, 'x');
+    expect(handleChange).not.toHaveBeenCalled();
+  });
 });

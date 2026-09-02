@@ -14,6 +14,9 @@ export const textInputVariants = tv({
     isDisabled: {
       true: 'bg-admin-line-2 text-admin-faint border-admin-line-2 cursor-not-allowed',
     },
+    isReadOnly: {
+      true: 'bg-admin-line-2 text-admin-muted border-admin-line-2',
+    },
   },
 });
 

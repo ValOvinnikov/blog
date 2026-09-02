@@ -50,4 +50,28 @@ describe(FontPicker, () => {
 
     expect(handleChange).toHaveBeenCalledWith(FONT_CHOICE.INTER);
   });
+
+  it('disables every option and stops reporting clicks when isDisabled is true', async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+    render(
+      <FontPicker
+        ariaLabel="Body font"
+        value={FONT_CHOICE.NEWSREADER}
+        onChange={handleChange}
+        isDisabled={true}
+        aria-describedby="archived-notice"
+      />,
+    );
+
+    const inter = screen.getByRole('radio', { name: 'Inter' });
+    expect(inter).toHaveAttribute('aria-disabled', 'true');
+    expect(inter.closest('[role="radiogroup"]')).toHaveAttribute(
+      'aria-describedby',
+      'archived-notice',
+    );
+
+    await user.click(screen.getByText('Inter'));
+    expect(handleChange).not.toHaveBeenCalled();
+  });
 });

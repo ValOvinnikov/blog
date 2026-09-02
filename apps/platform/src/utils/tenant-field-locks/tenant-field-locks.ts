@@ -5,7 +5,7 @@ import {
   type TTenantProvisioningStatus,
   type TTenantProvisioningStep,
 } from '@blog/db/constants';
-import type { TTenantProvisioningSteps } from '@blog/db/schema/tenants';
+import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
 
 export type TTenantFieldKey =
   'name' | 'slug' | 'primaryDomain' | 'plan' | 'locale' | 'ownerEmail';
@@ -55,7 +55,7 @@ const CORE_PROVISIONING_STEPS: TTenantProvisioningStep[] = [
 // wins, same as the db-side function.
 const deriveProvisioningState = (
   provisioningStatus: TTenantProvisioningStatus | null,
-  steps: TTenantProvisioningSteps | null,
+  steps: TTenantProvisioningState | null,
 ): 'IDLE' | 'RUNNING' | 'FAILED' | 'SUCCEEDED' => {
   if (provisioningStatus === TENANT_PROVISIONING_STATUS.PROVISIONING) {
     return 'RUNNING';
@@ -102,7 +102,7 @@ const deriveProvisioningState = (
  * blanket `provisioning-started` rejection.
  */
 export const computeTenantFieldLocks = (
-  steps: TTenantProvisioningSteps | null,
+  steps: TTenantProvisioningState | null,
   provisioningStatus: TTenantProvisioningStatus | null,
 ): TTenantFieldLocks => {
   const state = deriveProvisioningState(provisioningStatus, steps);

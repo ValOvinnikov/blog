@@ -11,6 +11,14 @@ const REQUIRED_ENV: Record<string, string> = {
   SANITY_REVALIDATE_SECRET: 'revalidate-shh',
 };
 
+const OPTIONAL_ENV_KEYS = [
+  'VERCEL_TEAM_ID',
+  'GITHUB_RUN_ID',
+  'GITHUB_REPOSITORY',
+  'GITHUB_SERVER_URL',
+  'TENANT_REGISTRY_ENVIRONMENT',
+];
+
 const originalEnv: Record<string, string | undefined> = {};
 
 beforeEach(() => {
@@ -18,8 +26,10 @@ beforeEach(() => {
     originalEnv[key] = process.env[key];
     process.env[key] = REQUIRED_ENV[key];
   }
-  originalEnv['VERCEL_TEAM_ID'] = process.env['VERCEL_TEAM_ID'];
-  delete process.env['VERCEL_TEAM_ID'];
+  for (const key of OPTIONAL_ENV_KEYS) {
+    originalEnv[key] = process.env[key];
+    delete process.env[key];
+  }
 });
 
 afterEach(() => {
@@ -46,15 +56,27 @@ describe(loadProvisionEnv, () => {
       tenantSanityDataset: 'test-dataset',
       webAppBaseUrl: 'https://example.com',
       revalidateSecret: 'revalidate-shh',
+      githubRunId: undefined,
+      githubRepository: undefined,
+      githubServerUrl: undefined,
+      tenantRegistryEnvironment: undefined,
     });
   });
 
   it('carries through optional vars when set', () => {
     process.env['VERCEL_TEAM_ID'] = 'team-1';
+    process.env['GITHUB_RUN_ID'] = '123';
+    process.env['GITHUB_REPOSITORY'] = 'acme/blog';
+    process.env['GITHUB_SERVER_URL'] = 'https://github.com';
+    process.env['TENANT_REGISTRY_ENVIRONMENT'] = 'production';
 
     const env = loadProvisionEnv();
 
     expect(env.vercelTeamId).toBe('team-1');
+    expect(env.githubRunId).toBe('123');
+    expect(env.githubRepository).toBe('acme/blog');
+    expect(env.githubServerUrl).toBe('https://github.com');
+    expect(env.tenantRegistryEnvironment).toBe('production');
   });
 
   it.each(Object.keys(REQUIRED_ENV))(

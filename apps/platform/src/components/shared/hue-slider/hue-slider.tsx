@@ -1,7 +1,7 @@
 'use client';
 
 import { Slider } from '@base-ui/react/slider';
-import type { CSSProperties } from 'react';
+import type { AriaAttributes, CSSProperties } from 'react';
 
 import { hueSliderVariants } from './hue-slider-variants';
 
@@ -13,6 +13,7 @@ export type THueSliderProps = {
   value: number;
   onChange: (value: number) => void;
   isDisabled?: boolean;
+  'aria-describedby'?: AriaAttributes['aria-describedby'];
   /** The gradient track — callers own the color formula (`accentHueGradient`). */
   trackStyle?: CSSProperties;
   className?: string;
@@ -28,6 +29,7 @@ export const HueSlider = ({
   value,
   onChange,
   isDisabled,
+  'aria-describedby': ariaDescribedBy,
   trackStyle,
   className,
 }: THueSliderProps) => {
@@ -47,7 +49,11 @@ export const HueSlider = ({
     >
       <Slider.Control className={control()}>
         <Slider.Track className={track()} style={trackStyle}>
-          <Slider.Thumb aria-label={ariaLabel} className={thumb()} />
+          <Slider.Thumb
+            aria-label={ariaLabel}
+            aria-describedby={ariaDescribedBy}
+            className={thumb()}
+          />
         </Slider.Track>
       </Slider.Control>
     </Slider.Root>

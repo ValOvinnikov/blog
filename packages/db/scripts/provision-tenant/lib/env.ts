@@ -34,6 +34,17 @@ export type TProvisionEnv = {
   // the value each tenant's webhook is created with, and the value that
   // route verifies incoming requests against.
   revalidateSecret: string;
+  // Set automatically by Actions for every workflow run; absent for a local
+  // run outside Actions. Together these three build the run's
+  // `workflowRunUrl` — deliberately not `requireEnv`'d, since a local run
+  // legitimately has none of them.
+  githubRunId: string | undefined;
+  githubRepository: string | undefined;
+  githubServerUrl: string | undefined;
+  // The dispatched GitHub Environment name (`development`/`production`) —
+  // surfaced verbatim as the run's registry, not this codebase's own
+  // vocabulary. Absent for a local run outside Actions.
+  tenantRegistryEnvironment: string | undefined;
 };
 
 export function loadProvisionEnv(): TProvisionEnv {
@@ -47,5 +58,9 @@ export function loadProvisionEnv(): TProvisionEnv {
     tenantSanityDataset: requireEnv('TENANT_SANITY_DATASET'),
     webAppBaseUrl: requireEnv('WEB_APP_URL'),
     revalidateSecret: requireEnv('SANITY_REVALIDATE_SECRET'),
+    githubRunId: process.env['GITHUB_RUN_ID'],
+    githubRepository: process.env['GITHUB_REPOSITORY'],
+    githubServerUrl: process.env['GITHUB_SERVER_URL'],
+    tenantRegistryEnvironment: process.env['TENANT_REGISTRY_ENVIRONMENT'],
   };
 }

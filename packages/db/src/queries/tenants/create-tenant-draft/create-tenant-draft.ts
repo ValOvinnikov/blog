@@ -16,7 +16,7 @@ import {
   tenants,
   type TProvisioningStepState,
   type TTenant,
-  type TTenantProvisioningSteps,
+  type TTenantProvisioningState,
 } from '@blog/db/schema/tenants';
 import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import type { TResult } from '@blog/utils';
@@ -42,7 +42,7 @@ export type TCreateTenantDraftInput = {
 // Every step starts idle — the admin UI's per-step wizard view has
 // something to render for all five steps from the moment the tenant row
 // exists, before the provisioning workflow has run at all.
-function buildIdleProvisioningSteps(): TTenantProvisioningSteps {
+function buildIdleProvisioningSteps(): TTenantProvisioningState {
   const steps = Object.values(
     TENANT_PROVISIONING_STEP,
   ) as TTenantProvisioningStep[];
@@ -50,9 +50,10 @@ function buildIdleProvisioningSteps(): TTenantProvisioningSteps {
     status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
   };
 
-  return Object.fromEntries(
-    steps.map((step) => [step, idleState]),
-  ) as TTenantProvisioningSteps;
+  return Object.fromEntries(steps.map((step) => [step, idleState])) as Record<
+    TTenantProvisioningStep,
+    TProvisioningStepState
+  >;
 }
 
 // Inserts the three rows a brand-new tenant needs before the provisioning

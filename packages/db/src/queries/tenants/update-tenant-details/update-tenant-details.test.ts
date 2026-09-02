@@ -12,7 +12,7 @@ import { memberships } from '@blog/db/schema/memberships';
 import { tenantDomains } from '@blog/db/schema/tenant-domains';
 import {
   tenants,
-  type TTenantProvisioningSteps,
+  type TTenantProvisioningState,
 } from '@blog/db/schema/tenants';
 import { createTestDb } from '@blog/db/testing/create-test-db';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
@@ -43,7 +43,7 @@ async function insertTenantWithDomain(overrides?: {
   domain?: string;
   sanityProjectId?: string;
   provisioningStatus?: (typeof TENANT_PROVISIONING_STATUS)[keyof typeof TENANT_PROVISIONING_STATUS];
-  provisioningSteps?: TTenantProvisioningSteps;
+  provisioningSteps?: TTenantProvisioningState;
 }): Promise<string> {
   const slug = overrides?.slug ?? 'acme';
   const domain = overrides?.domain ?? 'acme.example.com';
@@ -90,8 +90,8 @@ async function insertJoinedOwner(
 }
 
 function stepsWith(
-  overrides: Partial<TTenantProvisioningSteps>,
-): TTenantProvisioningSteps {
+  overrides: Partial<TTenantProvisioningState>,
+): TTenantProvisioningState {
   const idle = { status: TENANT_PROVISIONING_STEP_STATUS.IDLE };
   return {
     SANITY_PROJECT: idle,

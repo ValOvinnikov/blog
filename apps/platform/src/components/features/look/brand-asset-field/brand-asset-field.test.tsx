@@ -189,6 +189,29 @@ describe(BrandAssetField, () => {
     expect(screen.getByAltText('Current logo')).toBeInTheDocument();
   });
 
+  it('disables the upload and remove controls when isDisabled is true', () => {
+    render(
+      <BrandAssetField
+        tenantSlug="acme"
+        kind="logo"
+        label="Logo"
+        hint="PNG, JPEG, or WebP."
+        currentUrl="https://example.blob.vercel-storage.com/logo.png"
+        onChange={vi.fn()}
+        isDisabled={true}
+        aria-describedby="archived-notice"
+      />,
+    );
+
+    const replaceButton = screen.getByRole('button', { name: 'Replace logo' });
+    expect(replaceButton).toBeDisabled();
+    expect(replaceButton).toHaveAttribute(
+      'aria-describedby',
+      'archived-notice',
+    );
+    expect(screen.getByRole('button', { name: 'Remove' })).toBeDisabled();
+  });
+
   it('clears the saved value through the clear action when Remove is clicked', async () => {
     clearBrandAssetActionMock.mockResolvedValue({ ok: true });
     const onChange = vi.fn();

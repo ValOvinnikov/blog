@@ -424,7 +424,14 @@
     "technicalDetailsToggle": "Technical details",
     "backToTenantAction": "← Back to tenant",
     "ownerLabel": "Owner",
-    "ownerInvitedPendingBadge": "Invited, pending"
+    "ownerInvitedPendingBadge": "Invited, pending",
+    "stepRunningNow": "now",
+    "runCardTitle": "Run",
+    "runStartedLabel": "Started",
+    "runFinishedLabel": "Finished",
+    "runRegistryLabel": "Registry",
+    "runFinishedPending": "—",
+    "runWorkflowLogLink": "Workflow log"
   },
   "tenantDangerPage": {
     "title": "Danger zone",

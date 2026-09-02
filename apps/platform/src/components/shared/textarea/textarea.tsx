@@ -12,6 +12,7 @@ export type TTextareaProps = {
   maxLength?: number;
   isRequired?: boolean;
   isDisabled?: TTextareaVariants['isDisabled'];
+  isReadOnly?: TTextareaVariants['isReadOnly'];
   'aria-describedby'?: AriaAttributes['aria-describedby'];
   className?: string;
 };
@@ -26,6 +27,7 @@ export const Textarea = ({
   maxLength,
   isRequired,
   isDisabled,
+  isReadOnly,
   'aria-describedby': ariaDescribedBy,
   className,
 }: TTextareaProps) => {
@@ -41,11 +43,12 @@ export const Textarea = ({
       maxLength={maxLength}
       required={isRequired}
       disabled={Boolean(isDisabled)}
+      readOnly={Boolean(isReadOnly)}
       value={value}
       onChange={handleChange}
       aria-label={ariaLabel}
       aria-describedby={ariaDescribedBy}
-      className={textareaVariants({ isDisabled, class: className })}
+      className={textareaVariants({ isDisabled, isReadOnly, class: className })}
     />
   );
 };

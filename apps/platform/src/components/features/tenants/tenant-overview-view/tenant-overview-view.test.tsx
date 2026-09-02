@@ -5,7 +5,7 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db';
 import type { TAuditEvent } from '@blog/db/schema/audit-events';
-import type { TTenantProvisioningSteps } from '@blog/db/schema/tenants';
+import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
 import {
   act,
   renderWithIntl,
@@ -148,7 +148,7 @@ describe(TenantOverviewView, () => {
           step,
           { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         ]),
-      ) as TTenantProvisioningSteps,
+      ) as unknown as TTenantProvisioningState,
     });
     render(
       <TenantOverviewView
@@ -300,7 +300,7 @@ describe(TenantOverviewView, () => {
           step,
           { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         ]),
-      ) as TTenantProvisioningSteps,
+      ) as unknown as TTenantProvisioningState,
     });
 
     render(
