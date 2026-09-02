@@ -1278,7 +1278,33 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      expect(screen.getByText('Aug 12, 2026, 2:19 PM')).toBeVisible();
+      const timestamp = screen.getByText('Aug 12, 2026, 2:19 PM UTC');
+      expect(timestamp.tagName).toBe('TIME');
+      expect(timestamp).toHaveAttribute('dateTime', '2026-08-12T14:19:00.000Z');
+    });
+
+    it("keeps a step's timestamp outside the aria-live status region", () => {
+      const tenant = makeTenant({
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+            updatedAt: '2026-08-12T14:19:00.000Z',
+          },
+        },
+      });
+      const { container } = render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      const liveRegions = container.querySelectorAll('[aria-live="polite"]');
+      expect(liveRegions.length).toBeGreaterThan(0);
+      for (const region of liveRegions) {
+        expect(region).not.toHaveTextContent('Aug 12, 2026, 2:19 PM UTC');
+      }
     });
 
     it("shows a failed step's updatedAt as its timestamp", () => {
@@ -1299,7 +1325,9 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      expect(screen.getByText('Aug 12, 2026, 2:20 PM')).toBeVisible();
+      const timestamp = screen.getByText('Aug 12, 2026, 2:20 PM UTC');
+      expect(timestamp.tagName).toBe('TIME');
+      expect(timestamp).toHaveAttribute('dateTime', '2026-08-12T14:20:00.000Z');
     });
 
     it('shows "now" for a running step instead of a timestamp', () => {
@@ -1318,7 +1346,9 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      expect(screen.getByText('now')).toBeVisible();
+      const nowText = screen.getByText('now');
+      expect(nowText).toBeVisible();
+      expect(nowText.tagName).not.toBe('TIME');
     });
 
     it('shows no timestamp for a done step with no recorded updatedAt', () => {
@@ -1375,8 +1405,8 @@ describe(ProvisioningStatusView, () => {
       expect(
         screen.getByRole('heading', { level: 2, name: 'Run' }),
       ).toBeVisible();
-      expect(screen.getByText('Aug 12, 2026, 2:18 PM')).toBeVisible();
-      expect(screen.getByText('Aug 12, 2026, 2:22 PM')).toBeVisible();
+      expect(screen.getByText('Aug 12, 2026, 2:18 PM UTC')).toBeVisible();
+      expect(screen.getByText('Aug 12, 2026, 2:22 PM UTC')).toBeVisible();
       expect(screen.getByText('production')).toBeVisible();
     });
   });

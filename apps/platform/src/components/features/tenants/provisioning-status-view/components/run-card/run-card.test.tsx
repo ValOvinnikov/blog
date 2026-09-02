@@ -17,12 +17,16 @@ describe(RunCard, () => {
       />,
     );
 
-    expect(screen.getByText('Aug 12, 2026, 2:18 PM')).toBeVisible();
-    expect(screen.getByText('Aug 12, 2026, 2:22 PM')).toBeVisible();
+    const started = screen.getByText('Aug 12, 2026, 2:18 PM UTC');
+    const finished = screen.getByText('Aug 12, 2026, 2:22 PM UTC');
+    expect(started.tagName).toBe('TIME');
+    expect(started).toHaveAttribute('dateTime', '2026-08-12T14:18:00.000Z');
+    expect(finished.tagName).toBe('TIME');
+    expect(finished).toHaveAttribute('dateTime', '2026-08-12T14:22:00.000Z');
     expect(screen.getByText('production')).toBeVisible();
   });
 
-  it('shows an em-dash placeholder for Finished while the run is still in flight', () => {
+  it('shows an em-dash placeholder for Finished while the run is still in flight, with no <time> element', () => {
     render(
       <RunCard
         run={{
@@ -31,7 +35,9 @@ describe(RunCard, () => {
       />,
     );
 
-    expect(screen.getByText('—')).toBeVisible();
+    const placeholder = screen.getByText('—');
+    expect(placeholder).toBeVisible();
+    expect(placeholder.tagName).not.toBe('TIME');
   });
 
   it('renders no workflow log link when the run has no workflowRunUrl', () => {

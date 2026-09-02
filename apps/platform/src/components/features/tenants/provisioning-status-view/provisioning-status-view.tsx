@@ -197,9 +197,8 @@ export const ProvisioningStatusView = ({
                   const isLast = index === STEP_ORDER.length - 1;
                   const title = t(`stepLabel.${stepKey}`);
                   const updatedAt = stepUpdatedAt[index];
-                  const whenText = isRunning
-                    ? t('stepRunningNow')
-                    : (isDone || isFailed) && updatedAt
+                  const formattedUpdatedAt =
+                    (isDone || isFailed) && updatedAt
                       ? formatDateTime(updatedAt)
                       : undefined;
 
@@ -230,8 +229,15 @@ export const ProvisioningStatusView = ({
                           </span>
                         </span>
                       </div>
-                      {whenText && (
-                        <span className={stepWhen()}>{whenText}</span>
+                      {isRunning && (
+                        <span className={stepWhen()}>
+                          {t('stepRunningNow')}
+                        </span>
+                      )}
+                      {formattedUpdatedAt && (
+                        <time dateTime={updatedAt} className={stepWhen()}>
+                          {formattedUpdatedAt}
+                        </time>
                       )}
                     </div>
                   );

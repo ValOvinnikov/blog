@@ -18,20 +18,24 @@ export const RunCard = ({ run }: TRunCardProps) => {
   const t = useTranslations('provisioningStatusView');
   const { workflowLogLink } = runCardVariants();
 
-  const finishedDisplay =
-    (run.finishedAt && formatDateTime(run.finishedAt)) ||
-    t('runFinishedPending');
-
   return (
     <Card>
       <Card.Header title={t('runCardTitle')} headingLevel={2} />
       <Card.Body>
         <DetailList>
           <DetailList.Row label={t('runStartedLabel')}>
-            {formatDateTime(run.startedAt)}
+            <time dateTime={run.startedAt}>
+              {formatDateTime(run.startedAt)}
+            </time>
           </DetailList.Row>
           <DetailList.Row label={t('runFinishedLabel')}>
-            {finishedDisplay}
+            {run.finishedAt ? (
+              <time dateTime={run.finishedAt}>
+                {formatDateTime(run.finishedAt) ?? t('runFinishedPending')}
+              </time>
+            ) : (
+              t('runFinishedPending')
+            )}
           </DetailList.Row>
           {run.registry && (
             <DetailList.Row label={t('runRegistryLabel')}>
