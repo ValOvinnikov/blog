@@ -210,7 +210,9 @@ initial implementation, every review-remediation, every follow-up tweak, every
 or hand-patch a layer's files because doing it itself feels faster. Handing a
 sub-agent pre-written stubs, or editing its files after it hands them back, both
 bypass the layer's skill conventions and break the delegation model. Describe
-structure in the prompt; never write it to disk first.
+structure in the prompt; never write it to disk first. (The one exception is
+a solo cloud session with no subagent tooling — see "Solo-session mode"
+under "Ticket priority & triage".)
 
 **What the orchestrator does with its own hands is exactly the work that falls
 OUTSIDE every sub-agent's scope:**
@@ -646,6 +648,10 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
 ## Delivery gate sequence (mandatory — never skip or bundle)
 
 Every issue follows this exact order. **Committing is free (no approval needed); stop and wait for explicit user approval at the push and PR gates.**
+(In a solo cloud session, steps 1 and 7's board writes and step 4's
+`reviewer` dispatch are replaced as "Solo-session mode" under "Ticket
+priority & triage" describes — every other step, including both approval
+gates, is unchanged.)
 
 1. Set issue → In Progress on the board
 2. Checkout branch from `main`
@@ -721,10 +727,15 @@ reports the issue number back — creation and placement happen as one
 verified operation instead of two steps where the second could be skipped.
 Before dispatching, gather every required field — **title** (conventional-
 commit style), **body** (context + acceptance criteria), **at least one
-label**, and a **parent issue number** if this is a sub-issue of an existing
-tracking issue — asking the human for anything missing rather than guessing;
-`board-keeper` has no interactive-prompt tool, so this gathering only happens
-here, before dispatch, never inside it.
+label including exactly one `prio:*` label** (the taxonomy and defaults in
+"Ticket priority & triage" below — `board-keeper` rejects a creation
+dispatch without one), and a **parent issue number** if this is a sub-issue
+of an existing tracking issue — asking the human for anything missing
+rather than guessing; `board-keeper` has no interactive-prompt tool, so
+this gathering only happens here, before dispatch, never inside it. In the
+same pass, check the ticket against the `cloud-ok` criteria (same section)
+and include that label when it qualifies — cloud-eligibility is assessed
+at creation, not discovered later.
 
 **A feature spanning 2+ layers always gets an epic (parent) issue plus one
 sub-issue per layer — never a single flat issue covering multiple layers.**
@@ -734,6 +745,92 @@ title/body/labels up front, same as any other creation, then dispatch
 `board-keeper` once with the whole set — it creates the epic first, then
 each sub-issue with `parent=<epic-number>`, using its existing batch-dispatch
 support (one Step 1 pull covers the whole batch, not one per issue).
+
+## Ticket priority & triage
+
+**Every open issue carries exactly one `prio:*` label**, set at creation
+(board-keeper rejects a creation dispatch without one):
+
+- `prio:now` — blocks users (a live bug) or blocks the active epic. Work
+  this first, always.
+- `prio:next` — on the active feature path: the current epic's sub-issues,
+  or the next epic queued behind it.
+- `prio:later` — real, agreed work with no schedule. Pulled deliberately
+  (e.g. a cleanup-batch PR, a cloud-agent session), never by default.
+- `prio:someday` — an idea or speculative cleanup; no commitment implied.
+  Supersedes the old `deferred` label for new issues. The 2026-09-02
+  backfill already applied `prio:someday` to every then-open `deferred`
+  issue, which keeps its old label alongside — don't churn them further.
+
+**The pull rule:** work comes from `prio:now`, then the active epic's
+`prio:next` — never from `later`/`someday` unless the human explicitly asks
+for a cleanup pass. A growing `prio:later` pile is healthy (it's a backlog,
+not a queue); a growing `prio:now` pile is the signal to stop and re-triage.
+
+**Findings found mid-work get fixed in the current work, not ticketed.**
+When a reviewer finding, lint nit, or small cleanup surfaces during feature
+work and it touches the current branch's layers, route it to the owning
+layer agent and land it in the same branch/PR — the existing
+review-remediation loop. Filing a ticket is the fallback, not the default,
+and is reserved for findings that are genuinely out of scope: a different
+layer, a design decision, or a change big enough to need its own review.
+Ticketed findings default to `prio:later` (`prio:someday` if speculative);
+an agent-discovered finding earns `prio:now`/`prio:next` only when it's a
+user-facing bug or blocks a planned feature, and the dispatch creating it
+must say which. This is the guard against backlog inflation — every unit of
+work was minting 2-3 new tickets and the queue crowded out feature work.
+
+**`cloud-ok` marks a ticket safe to hand to a solo cloud agent session**
+(single context, no local multi-agent tooling). A ticket qualifies only
+when it is all of:
+
+- **single-layer** — one workspace, one owning agent's domain;
+- **self-contained** — the body alone carries exact files, acceptance
+  criteria, and the verification commands (`pnpm type-check && pnpm lint &&
+pnpm test`), assuming the reader has only the ticket;
+- **free of human gates** — no Sanity or Drizzle migration, no console
+  config, no production-dataset touch;
+- **small** — roughly ≤5 files touched.
+
+**Solo-session mode.** When running as a single cloud session — a Claude
+Code web/remote session, the same environment `board-keeper.md`'s
+preflight calls "web/remote" — with no parallel local jobs and no
+worktree/scratchpad tooling, two parts of the standard process are
+replaced, and nothing else:
+
+- The mandatory subagent-delegation protocol ("Use the scoped agents") is
+  relaxed: implement directly, reading the owning layer's
+  `.claude/agents/<layer>.md` for its conventions first. This also
+  replaces the delivery gate sequence's step 4 (`reviewer` dispatch) with
+  applying the `code-review-practices` checklist as a self-review before
+  committing.
+- The delivery gate sequence's board writes (step 1's In Progress, step
+  7's Code Review) are replaced by the evidence protocol below — cloud
+  sessions cannot write the board at all.
+
+Everything else still applies — quality gates
+(`type-check`/`lint`/`test`), conventional commits, and the push/PR
+approval gates.
+
+**Cloud sessions never write the project board — they leave evidence it can
+be inferred from instead.** Board status lives in Projects v2, which is
+GraphQL-only, and cloud sessions ship without `gh` and with that API
+blocked (`board-keeper.md`'s preflight documents both) — so a cloud agent
+must not attempt `gh project item-edit` or equivalent. Instead it signals
+status the way the board tooling already knows how to read
+(`board-keeper.md` Step 3's evidence table):
+
+- **Starting:** comment on the issue ("starting work in a cloud session"),
+  and name the branch `<type>/<n>-<slug>` — a pushed branch with that name
+  is the In Progress signal.
+- **In review:** open the PR with the issue reference (`Closes #n` on the
+  completing PR only, per the per-layer-PR rule) — an open PR is the Code
+  Review signal.
+- **Done:** the merged `Closes #n` PR is the Done signal; nothing extra.
+
+The board catches up when any local session dispatches `board-keeper`
+(targeted trigger or sweep) — its existing branch/PR inference turns that
+evidence into status writes.
 
 ## Deployment
 
