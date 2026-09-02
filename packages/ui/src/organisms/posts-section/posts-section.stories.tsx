@@ -1,4 +1,5 @@
 import { HEADING_ALIGN } from '@blog/config';
+import { HEADING_LEVELS } from '@blog/ui/lib/react';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -52,7 +53,7 @@ const meta = {
     },
     cardHeadingLevel: {
       control: 'select',
-      options: [1, 2, 3, 4],
+      options: HEADING_LEVELS,
     },
   },
   args: {

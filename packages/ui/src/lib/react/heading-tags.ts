@@ -1,4 +1,5 @@
-export type THeadingLevel = 1 | 2 | 3 | 4;
+export const HEADING_LEVELS = [1, 2, 3, 4] as const;
+export type THeadingLevel = (typeof HEADING_LEVELS)[number];
 export type THeadingTag = 'h1' | 'h2' | 'h3' | 'h4';
 
 /**

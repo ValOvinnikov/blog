@@ -1,3 +1,4 @@
+import { HEADING_LEVELS } from '@blog/ui/lib/react';
 import { PostGrid } from '@blog/ui/organisms/post-grid';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -11,7 +12,7 @@ const meta = {
   argTypes: {
     headingLevel: {
       control: 'select',
-      options: [1, 2, 3, 4],
+      options: HEADING_LEVELS,
     },
   },
   args: {

@@ -1,3 +1,4 @@
+import { FORM_STATUSES } from '@blog/config';
 import { NewsletterSignup } from '@blog/ui/organisms/newsletter-signup/newsletter-signup';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -9,7 +10,7 @@ const meta = {
   argTypes: {
     status: {
       control: 'select',
-      options: ['idle', 'submitting', 'success', 'error'],
+      options: FORM_STATUSES,
     },
   },
   args: {
