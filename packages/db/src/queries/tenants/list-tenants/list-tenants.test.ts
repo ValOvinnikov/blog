@@ -24,10 +24,9 @@ afterEach(async () => {
 });
 
 describe(listTenants, () => {
-  it('returns every tenant ordered by slug', async () => {
+  it('returns every tenant ordered by name', async () => {
     await db.insert(schema.tenants).values([
       {
-        slug: 'zeta',
         name: 'Zeta',
         primaryDomain: 'zeta.example.com',
         sanityProjectId: 'p1',
@@ -37,7 +36,6 @@ describe(listTenants, () => {
         status: TENANT_STATUS.ACTIVE,
       },
       {
-        slug: 'acme',
         name: 'Acme',
         primaryDomain: 'acme.example.com',
         sanityProjectId: 'p2',
@@ -50,7 +48,7 @@ describe(listTenants, () => {
 
     const result = await listTenants();
 
-    expect(result.map((tenant) => tenant.slug)).toEqual(['acme', 'zeta']);
+    expect(result.map((tenant) => tenant.name)).toEqual(['Acme', 'Zeta']);
   });
 
   it('returns an empty array when no tenants exist', async () => {
@@ -62,7 +60,6 @@ describe(listTenants, () => {
   it('excludes deprovisioned tenants by default', async () => {
     await db.insert(schema.tenants).values([
       {
-        slug: 'acme',
         name: 'Acme',
         primaryDomain: 'acme.example.com',
         sanityProjectId: 'p1',
@@ -72,7 +69,6 @@ describe(listTenants, () => {
         status: TENANT_STATUS.ACTIVE,
       },
       {
-        slug: 'zeta',
         name: 'Zeta',
         primaryDomain: 'zeta.example.com',
         sanityProjectId: 'p2',
@@ -86,13 +82,12 @@ describe(listTenants, () => {
 
     const result = await listTenants();
 
-    expect(result.map((tenant) => tenant.slug)).toEqual(['acme']);
+    expect(result.map((tenant) => tenant.name)).toEqual(['Acme']);
   });
 
   it('includes deprovisioned tenants when includeArchived is true', async () => {
     await db.insert(schema.tenants).values([
       {
-        slug: 'acme',
         name: 'Acme',
         primaryDomain: 'acme.example.com',
         sanityProjectId: 'p1',
@@ -102,7 +97,6 @@ describe(listTenants, () => {
         status: TENANT_STATUS.ACTIVE,
       },
       {
-        slug: 'zeta',
         name: 'Zeta',
         primaryDomain: 'zeta.example.com',
         sanityProjectId: 'p2',
@@ -116,6 +110,6 @@ describe(listTenants, () => {
 
     const result = await listTenants({ includeArchived: true });
 
-    expect(result.map((tenant) => tenant.slug)).toEqual(['acme', 'zeta']);
+    expect(result.map((tenant) => tenant.name)).toEqual(['Acme', 'Zeta']);
   });
 });

@@ -16,7 +16,6 @@ import { getTenantSanityCredentials } from './get-tenant-sanity-credentials';
 
 async function insertTenant(): Promise<TTenant> {
   const result = await createTenant({
-    slug: 'acme',
     name: 'Acme',
     primaryDomain: 'acme.example.com',
     sanityProjectId: 'abc123',

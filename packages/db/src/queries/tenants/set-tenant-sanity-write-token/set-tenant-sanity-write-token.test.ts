@@ -10,7 +10,6 @@ import { setTenantSanityWriteToken } from './set-tenant-sanity-write-token';
 
 async function insertTenant(): Promise<TTenant> {
   const result = await createTenant({
-    slug: 'acme',
     name: 'Acme',
     primaryDomain: 'acme.example.com',
     sanityProjectId: 'abc123',

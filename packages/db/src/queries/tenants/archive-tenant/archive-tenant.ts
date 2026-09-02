@@ -6,10 +6,9 @@ import type { TResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
 
 // Marks a tenant deprovisioned by stamping `deprovisionedAt` and setting
-// `status` to ARCHIVED — the row is archived, never hard-deleted, so
-// `slug`'s unique constraint keeps holding the name even after teardown.
-// `tenantId` not matching any row (a stale id, or a second concurrent
-// deprovision attempt) is a real, reachable outcome, not a bug.
+// `status` to ARCHIVED — the row is archived, never hard-deleted. `tenantId`
+// not matching any row (a stale id, or a second concurrent deprovision
+// attempt) is a real, reachable outcome, not a bug.
 export async function archiveTenant(
   tenantId: string,
 ): Promise<TResult<TTenant, TErrorCode>> {

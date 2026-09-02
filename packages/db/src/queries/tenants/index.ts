@@ -8,7 +8,6 @@ export * from './create-tenant-draft';
 export * from './delete-tenant';
 export * from './finish-provisioning-run';
 export * from './get-tenant-by-id';
-export * from './get-tenant-by-slug';
 export * from './get-tenant-id-by-sanity-project-id';
 export * from './get-tenant-provisioning-status';
 export * from './get-tenant-sanity-credentials';

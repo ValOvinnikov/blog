@@ -39,7 +39,6 @@ afterEach(async () => {
 describe(runInvalidateTenantCache, () => {
   it('invalidates the cache for an already-archived tenant', async () => {
     const created = await createTenant({
-      slug: 'acme',
       name: 'Acme',
       primaryDomain: 'acme.example.com',
       sanityProjectId: 'abc123',
@@ -70,7 +69,6 @@ describe(runInvalidateTenantCache, () => {
 
   it('invalidates the cache for a still-active tenant too', async () => {
     const created = await createTenant({
-      slug: 'still-active',
       name: 'Still Active',
       primaryDomain: 'still-active.example.com',
       sanityProjectId: 'def456',
@@ -89,7 +87,6 @@ describe(runInvalidateTenantCache, () => {
 
   it('reports failure without throwing when the revalidation request fails', async () => {
     const created = await createTenant({
-      slug: 'flaky',
       name: 'Flaky',
       primaryDomain: 'flaky.example.com',
       sanityProjectId: 'ghi789',

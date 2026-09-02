@@ -60,7 +60,13 @@ export type TTenantProvisioningState = Record<
 // domain (including this one) a tenant answers to.
 export const tenants = pgTable('tenants', {
   id: uuid('id').primaryKey().defaultRandom(),
-  slug: text('slug').notNull().unique(),
+  // Unused by every caller — kept `.notNull().unique()` only until the
+  // column itself is dropped. `$defaultFn` fills it so an insert never has
+  // to supply one.
+  slug: text('slug')
+    .notNull()
+    .unique()
+    .$defaultFn(() => crypto.randomUUID()),
   name: text('name').notNull(),
   primaryDomain: text('primary_domain').notNull(),
   // Nullable: null until provisioning step 1 (Create Sanity project) creates

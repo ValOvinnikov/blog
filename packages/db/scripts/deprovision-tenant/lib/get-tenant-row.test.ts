@@ -27,7 +27,6 @@ afterEach(async () => {
 describe(getTenantRow, () => {
   it('returns the row for an existing tenant id', async () => {
     const created = await createTenant({
-      slug: 'acme',
       name: 'Acme',
       primaryDomain: 'acme.example.com',
       sanityProjectId: 'abc123',
@@ -40,7 +39,7 @@ describe(getTenantRow, () => {
 
     const result = await getTenantRow(created.data.id);
 
-    expect(result).toMatchObject({ id: created.data.id, slug: 'acme' });
+    expect(result).toMatchObject({ id: created.data.id, name: 'Acme' });
   });
 
   it('throws for an unknown tenant id', async () => {
