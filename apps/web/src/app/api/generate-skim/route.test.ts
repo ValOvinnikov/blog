@@ -7,7 +7,9 @@ const {
   getHostTenantSanityContextMock,
   getHostTenantSanityWriteContextMock,
   getPlatformSanityWriteContextMock,
+  isTenantActiveMock,
   loggerErrorMock,
+  loggerWarnMock,
 } = vi.hoisted(() => ({
   getPublishedPostBodyMock: vi.fn(),
   saveSkimDraftMock: vi.fn(),
@@ -15,7 +17,9 @@ const {
   getHostTenantSanityContextMock: vi.fn(),
   getHostTenantSanityWriteContextMock: vi.fn(),
   getPlatformSanityWriteContextMock: vi.fn(),
+  isTenantActiveMock: vi.fn(),
   loggerErrorMock: vi.fn(),
+  loggerWarnMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -45,8 +49,12 @@ vi.mock('@web/server/tenant/get-host-tenant-sanity-write-context', () => ({
   getHostTenantSanityWriteContext: getHostTenantSanityWriteContextMock,
 }));
 
+vi.mock('@web/server/tenant/is-tenant-active', () => ({
+  isTenantActive: isTenantActiveMock,
+}));
+
 vi.mock('@web/utils/logger/logger', () => ({
-  logger: { error: loggerErrorMock },
+  logger: { error: loggerErrorMock, warn: loggerWarnMock },
 }));
 
 vi.mock('@web/utils/env/env', () => ({
@@ -89,7 +97,10 @@ describe('POST /api/generate-skim', () => {
     });
     getPlatformSanityWriteContextMock.mockReset();
     getPlatformSanityWriteContextMock.mockReturnValue(platformTenant);
+    isTenantActiveMock.mockReset();
+    isTenantActiveMock.mockResolvedValue(true);
     loggerErrorMock.mockReset();
+    loggerWarnMock.mockReset();
   });
 
   afterEach(() => {
@@ -326,6 +337,84 @@ describe('POST /api/generate-skim', () => {
     expect(generateTakeawaysMock).not.toHaveBeenCalled();
     expect(getPublishedPostBodyMock).not.toHaveBeenCalled();
     expect(saveSkimDraftMock).not.toHaveBeenCalled();
+  });
+
+  it('returns 403 without writing when the resolved tenant is not active', async () => {
+    getHostTenantSanityWriteContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant: {
+        projectId: 'tenant-project',
+        dataset: 'production',
+        token: 'tenant-write-token',
+      },
+      tenantId: 'tenant-1',
+    });
+    isTenantActiveMock.mockResolvedValue(false);
+    const { POST } = await import('./route');
+
+    const response = await POST(makeRequest({ _id: 'post-1' }));
+    const json = await response.json();
+
+    expect(response.status).toBe(403);
+    expect(json).toEqual({
+      message: 'The requesting tenant is not permitted to write.',
+    });
+    expect(isTenantActiveMock).toHaveBeenCalledWith('tenant-1');
+    expect(loggerWarnMock).toHaveBeenCalledWith(
+      'generate_skim.tenant_not_active',
+      { postId: 'post-1', tenantId: 'tenant-1' },
+    );
+    expect(getPublishedPostBodyMock).not.toHaveBeenCalled();
+    expect(generateTakeawaysMock).not.toHaveBeenCalled();
+    expect(saveSkimDraftMock).not.toHaveBeenCalled();
+  });
+
+  it('saves the skim draft when the resolved tenant is active', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-write-token',
+    };
+    getHostTenantSanityWriteContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant,
+      tenantId: 'tenant-1',
+    });
+    isTenantActiveMock.mockResolvedValue(true);
+    getPublishedPostBodyMock.mockResolvedValue({ ok: true, data: [] });
+    generateTakeawaysMock.mockResolvedValue(['a', 'b', 'c']);
+    saveSkimDraftMock.mockResolvedValue({ ok: true, data: undefined });
+    const { POST } = await import('./route');
+
+    const response = await POST(makeRequest({ _id: 'post-1' }));
+
+    expect(response.status).toBe(200);
+    expect(isTenantActiveMock).toHaveBeenCalledWith('tenant-1');
+    expect(saveSkimDraftMock).toHaveBeenCalledWith(
+      {
+        postId: 'post-1',
+        takeaways: ['a', 'b', 'c'],
+        model: 'claude-haiku-4-5',
+      },
+      tenant,
+    );
+  });
+
+  it('does not check tenant status in platform mode (no tenantId resolved)', async () => {
+    getHostTenantSanityWriteContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant: undefined,
+      tenantId: undefined,
+    });
+    getPublishedPostBodyMock.mockResolvedValue({ ok: true, data: [] });
+    generateTakeawaysMock.mockResolvedValue(['a', 'b', 'c']);
+    saveSkimDraftMock.mockResolvedValue({ ok: true, data: undefined });
+    const { POST } = await import('./route');
+
+    const response = await POST(makeRequest({ _id: 'post-1' }));
+
+    expect(response.status).toBe(200);
+    expect(isTenantActiveMock).not.toHaveBeenCalled();
   });
 
   it('returns 404 without reading the post when the write-side tenant context is unresolvable', async () => {

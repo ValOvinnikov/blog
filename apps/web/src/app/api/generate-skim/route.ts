@@ -9,6 +9,7 @@ import {
 } from '@web/server/skim/generate-takeaways';
 import { getHostTenantSanityContext } from '@web/server/tenant/get-host-tenant-sanity-context';
 import { getHostTenantSanityWriteContext } from '@web/server/tenant/get-host-tenant-sanity-write-context';
+import { isTenantActive } from '@web/server/tenant/is-tenant-active';
 import { env } from '@web/utils/env/env';
 import { isSecretMatch } from '@web/utils/is-secret-match';
 import { logger } from '@web/utils/logger/logger';
@@ -103,6 +104,16 @@ export async function POST(request: Request): Promise<NextResponse> {
           'The requesting tenant has no usable Sanity write credentials.',
       },
       { status: 503 },
+    );
+  }
+  if (writeTenant.tenantId && !(await isTenantActive(writeTenant.tenantId))) {
+    logger.warn('generate_skim.tenant_not_active', {
+      postId,
+      tenantId: writeTenant.tenantId,
+    });
+    return NextResponse.json(
+      { message: 'The requesting tenant is not permitted to write.' },
+      { status: 403 },
     );
   }
 
