@@ -1,4 +1,4 @@
-import { queries } from '@blog/db';
+import { queries, TENANT_STATUS } from '@blog/db';
 
 import { resolveRequestTenant } from './resolve-request-tenant';
 import { resolveTenant } from './resolve-tenant';
@@ -14,6 +14,11 @@ vi.mock('@blog/db', () => ({
       getTenantSanityCredentials: vi.fn(),
       getTenantSanityWriteCredentials: vi.fn(),
     },
+  },
+  TENANT_STATUS: {
+    ACTIVE: 'ACTIVE',
+    SUSPENDED: 'SUSPENDED',
+    ARCHIVED: 'ARCHIVED',
   },
 }));
 
@@ -132,6 +137,9 @@ describe('resolveRequestTenant memoization', () => {
       projectId: 'proj',
       dataset: 'production',
       token: 'tok',
+      status: TENANT_STATUS.ACTIVE,
+      deprovisionedAt: null,
+      provisioningStatus: null,
     });
 
     vi.doMock('react', async (importOriginal) => {
@@ -176,6 +184,9 @@ describe('resolveRequestTenant memoization', () => {
       projectId: 'proj',
       dataset: 'production',
       token: 'tok',
+      status: TENANT_STATUS.ACTIVE,
+      deprovisionedAt: null,
+      provisioningStatus: null,
     });
     vi.mocked(
       queries.tenants.getTenantSanityWriteCredentials,
@@ -183,6 +194,9 @@ describe('resolveRequestTenant memoization', () => {
       projectId: 'proj',
       dataset: 'production',
       token: 'write-tok',
+      status: TENANT_STATUS.ACTIVE,
+      deprovisionedAt: null,
+      provisioningStatus: null,
     });
 
     vi.doMock('react', async (importOriginal) => {

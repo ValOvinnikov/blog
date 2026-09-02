@@ -99,3 +99,59 @@ describe(getHostTenantSanityWriteContext, () => {
     });
   });
 });
+
+describe('getHostTenantSanityWriteContext memoization', () => {
+  afterEach(() => {
+    vi.doUnmock('react');
+    vi.resetModules();
+  });
+
+  it('dedupes the host lookup and credentials query when called more than once in the same render pass', async () => {
+    vi.mocked(resolveRequestTenant).mockReset();
+    vi.mocked(queries.tenants.getTenantSanityWriteCredentials).mockReset();
+    vi.mocked(resolveRequestTenant).mockResolvedValue({
+      id: 'tenant-1',
+    } as never);
+    vi.mocked(
+      queries.tenants.getTenantSanityWriteCredentials,
+    ).mockResolvedValue({
+      projectId: 'proj',
+      dataset: 'production',
+      token: 'tok',
+      status: TENANT_STATUS.ACTIVE,
+      deprovisionedAt: null,
+      provisioningStatus: null,
+    });
+
+    vi.doMock('react', async (importOriginal) => {
+      const actual = await importOriginal<typeof import('react')>();
+      return {
+        ...actual,
+        cache: (fn: () => unknown) => {
+          let called = false;
+          let result: unknown;
+          return () => {
+            if (!called) {
+              result = fn();
+              called = true;
+            }
+            return result;
+          };
+        },
+      };
+    });
+    vi.resetModules();
+
+    const {
+      getHostTenantSanityWriteContext: freshGetHostTenantSanityWriteContext,
+    } = await import('./get-host-tenant-sanity-write-context');
+
+    await freshGetHostTenantSanityWriteContext();
+    await freshGetHostTenantSanityWriteContext();
+
+    expect(resolveRequestTenant).toHaveBeenCalledTimes(1);
+    expect(
+      queries.tenants.getTenantSanityWriteCredentials,
+    ).toHaveBeenCalledTimes(1);
+  });
+});
