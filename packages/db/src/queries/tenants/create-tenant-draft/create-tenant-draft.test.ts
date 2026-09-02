@@ -247,4 +247,31 @@ describe(createTenantDraft, () => {
     expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
     selectSpy.mockRestore();
   });
+
+  it.each([
+    ['a scheme-prefixed value', 'https://acme.com'],
+    ['a trailing-slash value', 'acme.com/'],
+    ['a whitespace-padded value', ' acme.com '],
+  ])(
+    'rejects %s for domain without writing any row',
+    async (_description, domain) => {
+      await insertTestUser(db, { id: 'user-1' });
+
+      const result = await createTenantDraft({ ...draftInput, domain });
+
+      expect(result).toEqual({
+        ok: false,
+        error: ERROR_CODE.DB_INVALID_DOMAIN,
+      });
+
+      const tenantRows = await db.select().from(schema.tenants);
+      expect(tenantRows).toHaveLength(0);
+
+      const domainRows = await db.select().from(schema.tenantDomains);
+      expect(domainRows).toHaveLength(0);
+
+      const membershipRows = await db.select().from(schema.memberships);
+      expect(membershipRows).toHaveLength(0);
+    },
+  );
 });

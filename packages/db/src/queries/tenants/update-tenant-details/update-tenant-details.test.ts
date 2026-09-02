@@ -883,4 +883,39 @@ describe(updateTenantDetails, () => {
       .where(eq(tenants.id, tenantId));
     expect(row?.name).toBe('Acme');
   });
+
+  it.each([
+    ['a scheme-prefixed value', 'https://acme-new.com'],
+    ['a trailing-slash value', 'acme-new.com/'],
+    ['a whitespace-padded value', ' acme-new.com '],
+  ])(
+    'returns domain-invalid for %s primaryDomain and applies no changes',
+    async (_description, primaryDomain) => {
+      const tenantId = await insertTenantWithDomain();
+
+      const result = await updateTenantDetails(tenantId, {
+        ...validInput,
+        name: 'New Name',
+        primaryDomain,
+      });
+
+      expect(result).toEqual({ outcome: 'domain-invalid' });
+
+      const [row] = await db
+        .select()
+        .from(tenants)
+        .where(eq(tenants.id, tenantId));
+      expect(row).toMatchObject({
+        name: 'Acme',
+        primaryDomain: 'acme.example.com',
+      });
+
+      const domainRows = await db
+        .select()
+        .from(tenantDomains)
+        .where(eq(tenantDomains.tenantId, tenantId));
+      expect(domainRows).toHaveLength(1);
+      expect(domainRows[0]).toMatchObject({ domain: 'acme.example.com' });
+    },
+  );
 });

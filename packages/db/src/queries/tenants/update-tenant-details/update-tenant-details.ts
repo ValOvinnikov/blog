@@ -12,6 +12,7 @@ import { membershipInvites } from '@blog/db/schema/membership-invites';
 import { memberships } from '@blog/db/schema/memberships';
 import { tenantDomains } from '@blog/db/schema/tenant-domains';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
+import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import { and, eq, isNull, ne } from 'drizzle-orm';
 
@@ -51,6 +52,7 @@ export type TUpdateTenantDetailsResult =
   | { outcome: 'slug-taken' }
   | { outcome: 'domain-taken' }
   | { outcome: 'domain-locked'; blockingStep: TTenantProvisioningStep }
+  | { outcome: 'domain-invalid' }
   | { outcome: 'provisioning-started' }
   | { outcome: 'owner-already-joined' }
   | { outcome: 'owner-email-taken' };
@@ -147,14 +149,19 @@ function lockedFieldOutcome(
 // Pre-checked rather than caught off the `slug_unique`/`tenant_domains.domain`
 // unique constraints: a typed outcome the caller can map straight onto a
 // field error, instead of an unhandled Postgres throw. First match wins:
-// provisioning-started (RUNNING/SUCCEEDED), then domain-locked (FAILED, only
-// when a completed MAP_DOMAIN already consumed it), then slug-taken, then
-// domain-taken, then (when `ownerEmail` is supplied) owner-already-joined /
-// owner-email-taken.
+// domain-invalid (a malformed `primaryDomain`, checked before any read),
+// then provisioning-started (RUNNING/SUCCEEDED), then domain-locked (FAILED,
+// only when a completed MAP_DOMAIN already consumed it), then slug-taken,
+// then domain-taken, then (when `ownerEmail` is supplied)
+// owner-already-joined / owner-email-taken.
 export async function updateTenantDetails(
   tenantId: string,
   input: TUpdateTenantDetailsInput,
 ): Promise<TUpdateTenantDetailsResult> {
+  if (!isValidDomain(input.primaryDomain)) {
+    return { outcome: 'domain-invalid' };
+  }
+
   const db = getDb();
 
   const [existing] = await db

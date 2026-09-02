@@ -29,6 +29,7 @@
  * build (the condition Next.js itself sets), so this plain-Node script can
  * reuse the real query functions instead of duplicating their SQL.
  */
+import { DOMAIN_PATTERN } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import {
   MEMBERSHIP_ROLE,
@@ -102,17 +103,33 @@ function parseArgs(argv: string[]): TParsedArgs {
     );
   }
 
+  const primaryDomain = requireOne('primary-domain');
+  if (!DOMAIN_PATTERN.test(primaryDomain)) {
+    throw new Error(
+      `seed-tenant: --primary-domain "${primaryDomain}" is not a valid domain.`,
+    );
+  }
+
+  const extraDomains = flags.get('domain') ?? [];
+  for (const domain of extraDomains) {
+    if (!DOMAIN_PATTERN.test(domain)) {
+      throw new Error(
+        `seed-tenant: --domain "${domain}" is not a valid domain.`,
+      );
+    }
+  }
+
   return {
     slug: requireOne('slug'),
     name: requireOne('name'),
-    primaryDomain: requireOne('primary-domain'),
+    primaryDomain,
     sanityProjectId: requireOne('sanity-project-id'),
     sanityDataset: requireOne('sanity-dataset'),
     locale: requireOne('locale'),
     ownerEmail: requireOne('owner-email'),
     plan,
     status,
-    extraDomains: flags.get('domain') ?? [],
+    extraDomains,
     sanityReadToken: flags.get('sanity-read-token')?.[0],
   };
 }

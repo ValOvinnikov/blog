@@ -4,6 +4,7 @@ import {
   tenantDomains,
   type TTenantDomain,
 } from '@blog/db/schema/tenant-domains';
+import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import type { TResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
 
@@ -18,6 +19,10 @@ export async function addTenantDomain(
   tenantId: string,
   domain: string,
 ): Promise<TResult<TTenantDomain, TErrorCode>> {
+  if (!isValidDomain(domain)) {
+    return { ok: false, error: ERROR_CODE.DB_INVALID_DOMAIN };
+  }
+
   const db = getDb();
 
   const [inserted] = await db
