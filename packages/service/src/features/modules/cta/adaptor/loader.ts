@@ -12,7 +12,7 @@ import type { TCtaModule } from './types';
 // post/topic/page document types, so one ISR tag list covers both.
 export async function getCta(
   id: string,
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<TCtaModule> {
   const raw = await runQuery(ctaModuleQuery, {
     parameters: { id },
@@ -26,7 +26,7 @@ export async function getCta(
         'page_generic',
         'page_blog',
       ],
-      tenant?.projectId,
+      tenant.projectId,
     ),
   });
 

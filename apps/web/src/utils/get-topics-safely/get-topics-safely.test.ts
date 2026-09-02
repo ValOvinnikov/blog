@@ -1,4 +1,4 @@
-import { service } from '@blog/service';
+import { service, type TTenantSanityContext } from '@blog/service';
 
 import { getTopicsSafely } from './get-topics-safely';
 
@@ -9,6 +9,12 @@ vi.mock('@blog/service', () => ({
     },
   },
 }));
+
+const tenant: TTenantSanityContext = {
+  projectId: 'proj',
+  dataset: 'production',
+  token: 'tok',
+};
 
 describe('getTopicsSafely', () => {
   it('returns the topics from the service on success', async () => {
@@ -26,7 +32,7 @@ describe('getTopicsSafely', () => {
       data: topics,
     });
 
-    await expect(getTopicsSafely()).resolves.toEqual(topics);
+    await expect(getTopicsSafely(tenant)).resolves.toEqual(topics);
   });
 
   it('falls back to an empty list and logs when the fetch resolves to a failure result', async () => {
@@ -36,7 +42,7 @@ describe('getTopicsSafely', () => {
       error: new Error('boom'),
     });
 
-    await expect(getTopicsSafely()).resolves.toEqual([]);
+    await expect(getTopicsSafely(tenant)).resolves.toEqual([]);
     expect(errorSpy).toHaveBeenCalledWith(
       expect.stringContaining('topics.fetch_failed'),
     );

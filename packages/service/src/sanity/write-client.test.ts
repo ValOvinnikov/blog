@@ -18,54 +18,17 @@ describe('Sanity write client module loading', () => {
     vi.resetModules();
   });
 
-  it('throws when SANITY_API_WRITE_TOKEN is not set', async () => {
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'test-project';
-    delete process.env['SANITY_API_WRITE_TOKEN'];
-    vi.resetModules();
-
+  it('rejects a call site that omits tenant context at compile time', async () => {
     const { getWriteClient } = await import('./write-client');
 
-    expect(() => getWriteClient()).toThrow(/SANITY_API_WRITE_TOKEN/);
-  });
-
-  it('creates a client scoped with the write token and the CDN disabled', async () => {
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'test-project';
-    process.env['SANITY_API_WRITE_TOKEN'] = 'write-secret';
-    vi.resetModules();
-
-    const createClientMock = vi.fn().mockReturnValue({});
-    vi.doMock('next-sanity', () => ({ createClient: createClientMock }));
-
-    const { getWriteClient } = await import('./write-client');
-    getWriteClient();
-
-    expect(createClientMock).toHaveBeenCalledWith(
-      expect.objectContaining({ useCdn: false, token: 'write-secret' }),
-    );
-
-    vi.doUnmock('next-sanity');
-  });
-
-  it('memoizes the client across calls', async () => {
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'test-project';
-    process.env['SANITY_API_WRITE_TOKEN'] = 'write-secret';
-    vi.resetModules();
-
-    const createClientMock = vi.fn().mockReturnValue({});
-    vi.doMock('next-sanity', () => ({ createClient: createClientMock }));
-
-    const { getWriteClient } = await import('./write-client');
-    getWriteClient();
-    getWriteClient();
-
-    expect(createClientMock).toHaveBeenCalledTimes(1);
-
-    vi.doUnmock('next-sanity');
+    expect(() =>
+      // @ts-expect-error -- `getWriteClient` takes a required `TTenantSanityContext`; there is no no-arg form that silently falls back to the platform's project.
+      getWriteClient(),
+    ).toThrow();
   });
 
   it('creates a per-tenant write client scoped to the tenant project/dataset/token', async () => {
     process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'test-project';
-    process.env['SANITY_API_WRITE_TOKEN'] = 'write-secret';
     vi.resetModules();
 
     const createClientMock = vi.fn().mockReturnValue({});
@@ -92,7 +55,6 @@ describe('Sanity write client module loading', () => {
 
   it('reuses a cached write client for the same tenant instead of recreating it', async () => {
     process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'test-project';
-    process.env['SANITY_API_WRITE_TOKEN'] = 'write-secret';
     vi.resetModules();
 
     const createClientMock = vi.fn().mockReturnValue({});
@@ -109,27 +71,6 @@ describe('Sanity write client module loading', () => {
 
     expect(first).toBe(second);
     expect(createClientMock).toHaveBeenCalledTimes(1);
-
-    vi.doUnmock('next-sanity');
-  });
-
-  it('does not share the legacy no-arg write client with a per-tenant write client', async () => {
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'test-project';
-    process.env['SANITY_API_WRITE_TOKEN'] = 'write-secret';
-    vi.resetModules();
-
-    const createClientMock = vi.fn().mockReturnValue({});
-    vi.doMock('next-sanity', () => ({ createClient: createClientMock }));
-
-    const { getWriteClient } = await import('./write-client');
-    getWriteClient();
-    getWriteClient({
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok-a',
-    });
-
-    expect(createClientMock).toHaveBeenCalledTimes(2);
 
     vi.doUnmock('next-sanity');
   });
@@ -151,7 +92,6 @@ describe('Sanity write client module loading', () => {
     'throws InvalidTenantSanityContextError for a partial tenant context %j instead of falling back to the platform client',
     async (tenant) => {
       process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'test-project';
-      process.env['SANITY_API_WRITE_TOKEN'] = 'write-secret';
       vi.resetModules();
 
       const createClientMock = vi.fn().mockReturnValue({});
@@ -169,4 +109,29 @@ describe('Sanity write client module loading', () => {
       vi.doUnmock('next-sanity');
     },
   );
+
+  it('builds the platform write tenant context from env vars', async () => {
+    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'platform-project';
+    process.env['SANITY_API_WRITE_TOKEN'] = 'write-secret';
+    vi.resetModules();
+
+    const { getPlatformSanityWriteContext } = await import('./write-client');
+
+    expect(getPlatformSanityWriteContext()).toMatchObject({
+      projectId: 'platform-project',
+      token: 'write-secret',
+    });
+  });
+
+  it('throws when SANITY_API_WRITE_TOKEN is not set', async () => {
+    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'test-project';
+    delete process.env['SANITY_API_WRITE_TOKEN'];
+    vi.resetModules();
+
+    const { getPlatformSanityWriteContext } = await import('./write-client');
+
+    expect(() => getPlatformSanityWriteContext()).toThrow(
+      /SANITY_API_WRITE_TOKEN/,
+    );
+  });
 });

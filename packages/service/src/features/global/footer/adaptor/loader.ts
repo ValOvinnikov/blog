@@ -13,13 +13,13 @@ import type { TFooter } from './types';
 // `page_generic`/`page_blog` — every one of those types' tags must be
 // included (tag-scope contract, `sanity/query.ts`).
 export async function getFooter(
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<TFooter> {
   const raw = await runQuery(footerQuery, {
     tenant,
     ...isr(
       ['footer', 'post', 'topic', 'page_generic', 'page_blog'],
-      tenant?.projectId,
+      tenant.projectId,
     ),
   });
   return toFooter(raw);

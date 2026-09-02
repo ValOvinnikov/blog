@@ -15,14 +15,14 @@ import { toPostsByIds } from './transformer';
  */
 export async function getPostsByIds(
   ids: string[],
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<TPostCard[]> {
   if (ids.length === 0) return [];
 
   const raw = await runQuery(postsByIdsQuery, {
     parameters: { ids },
     tenant,
-    ...isr(['posts', 'author', 'topic'], tenant?.projectId),
+    ...isr(['posts', 'author', 'topic'], tenant.projectId),
   });
 
   return toPostsByIds(raw);

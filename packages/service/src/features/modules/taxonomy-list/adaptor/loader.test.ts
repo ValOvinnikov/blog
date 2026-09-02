@@ -2,6 +2,7 @@ import { TAXONOMY_KIND } from '@blog/config';
 import { makeRawTopicWithPostCount } from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawTaxonomyListModule } from '@blog/service/testing/modules/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getTaxonomyList } from './loader';
 
@@ -9,6 +10,8 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
   runQuery: vi.fn(),
 }));
+
+const tenant = makeTenant();
 
 describe('getTaxonomyList', () => {
   it('composes topic entries when asked for TAXONOMY_KIND.TOPICS', async () => {
@@ -21,6 +24,7 @@ describe('getTaxonomyList', () => {
     const module = await getTaxonomyList(
       'taxonomy-list-1',
       TAXONOMY_KIND.TOPICS,
+      tenant,
     );
 
     // The entries query itself must run against blog_topic, not blog_tag —
@@ -52,7 +56,11 @@ describe('getTaxonomyList', () => {
         },
       ]);
 
-    const module = await getTaxonomyList('taxonomy-list-1', TAXONOMY_KIND.TAGS);
+    const module = await getTaxonomyList(
+      'taxonomy-list-1',
+      TAXONOMY_KIND.TAGS,
+      tenant,
+    );
 
     expect(mockRun.mock.calls[1]?.[0]?.query).toContain('_type == "blog_tag"');
     expect(module.entries).toEqual([
@@ -66,31 +74,13 @@ describe('getTaxonomyList', () => {
     ]);
   });
 
-  it('tags the module query with modules:taxonomyList and the per-document tag', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawTaxonomyListModule())
-      .mockResolvedValueOnce([]);
-
-    await getTaxonomyList('taxonomy-list-1', TAXONOMY_KIND.TOPICS);
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({
-        next: expect.objectContaining({
-          tags: ['modules:taxonomyList', 'module:taxonomy-list-1'],
-        }),
-      }),
-    );
-  });
-
   it('propagates when the module document is missing', async () => {
     mockRun
       .mockRejectedValueOnce(new Error('ValidationError'))
       .mockResolvedValueOnce([]);
 
     await expect(
-      getTaxonomyList('missing', TAXONOMY_KIND.TOPICS),
+      getTaxonomyList('missing', TAXONOMY_KIND.TOPICS, tenant),
     ).rejects.toThrow();
   });
 
@@ -98,11 +88,6 @@ describe('getTaxonomyList', () => {
     mockRun
       .mockResolvedValueOnce(makeRawTaxonomyListModule())
       .mockResolvedValueOnce([]);
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getTaxonomyList('taxonomy-list-1', TAXONOMY_KIND.TOPICS, tenant);
 
@@ -128,25 +113,6 @@ describe('getTaxonomyList', () => {
           tags: ['t:tenant-a:topics', 't:tenant-a:posts'],
         }),
       }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawTaxonomyListModule())
-      .mockResolvedValueOnce([]);
-
-    await getTaxonomyList('taxonomy-list-1', TAXONOMY_KIND.TOPICS);
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
-    );
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
     );
   });
 });

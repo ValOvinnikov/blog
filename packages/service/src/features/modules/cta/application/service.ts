@@ -5,7 +5,7 @@ import { safeAsync } from '@blog/utils';
 export function createCtaModuleService() {
   return {
     v1: {
-      getCta: safeAsync((id: string, tenant?: TTenantSanityContext) =>
+      getCta: safeAsync((id: string, tenant: TTenantSanityContext) =>
         getCta(id, tenant),
       ),
     },

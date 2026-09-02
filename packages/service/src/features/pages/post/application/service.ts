@@ -6,10 +6,10 @@ import { safeAsync } from '@blog/utils';
 export function createPostService() {
   return {
     v1: {
-      getPost: safeAsync((slug: string, tenant?: TTenantSanityContext) =>
+      getPost: safeAsync((slug: string, tenant: TTenantSanityContext) =>
         getPost(slug, tenant),
       ),
-      getPostParams: safeAsync((tenant?: TTenantSanityContext) =>
+      getPostParams: safeAsync((tenant: TTenantSanityContext) =>
         getPostParams(tenant),
       ),
     },

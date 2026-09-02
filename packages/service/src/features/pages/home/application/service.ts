@@ -5,7 +5,7 @@ import { safeAsync } from '@blog/utils';
 export function createHomeService() {
   return {
     v1: {
-      getHomePage: safeAsync((tenant?: TTenantSanityContext) =>
+      getHomePage: safeAsync((tenant: TTenantSanityContext) =>
         getHomePage(tenant),
       ),
     },

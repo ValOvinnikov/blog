@@ -5,7 +5,7 @@ import { safeAsync } from '@blog/utils';
 export function createPostLatestModuleService() {
   return {
     v1: {
-      getPostLatest: safeAsync((id: string, tenant?: TTenantSanityContext) =>
+      getPostLatest: safeAsync((id: string, tenant: TTenantSanityContext) =>
         getPostLatest(id, tenant),
       ),
     },

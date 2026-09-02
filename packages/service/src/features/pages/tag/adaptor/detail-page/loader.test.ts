@@ -2,6 +2,7 @@ import { MissingPostListError } from '@blog/service/features/pages/tag/adaptor/m
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawTagPage } from '@blog/service/testing/pages/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getTagPage } from './loader';
 
@@ -16,6 +17,8 @@ vi.mock('@blog/service/sanity/image', () => ({
   ),
 }));
 
+const tenant = makeTenant();
+
 describe('getTagPage', () => {
   it('exposes the postList module id from page_tag.postList', async () => {
     mockRun
@@ -24,7 +27,7 @@ describe('getTagPage', () => {
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
-    const result = await getTagPage('typescript');
+    const result = await getTagPage('typescript', tenant);
     if (!result) throw new Error('expected a tag page');
 
     expect(result.postListId).toBe('post-list-1');
@@ -44,7 +47,7 @@ describe('getTagPage', () => {
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
-    const result = await getTagPage('typescript');
+    const result = await getTagPage('typescript', tenant);
     if (!result) throw new Error('expected a tag page');
 
     expect(result.tag).toEqual({
@@ -73,7 +76,7 @@ describe('getTagPage', () => {
         makeRawSiteSettings({ description: 'Notes on building things.' }),
       );
 
-    const result = await getTagPage('typescript');
+    const result = await getTagPage('typescript', tenant);
     if (!result) throw new Error('expected a tag page');
 
     expect(result.seo).toEqual({
@@ -102,28 +105,23 @@ describe('getTagPage', () => {
         makeRawSiteSettings({ description: 'Site default description' }),
       );
 
-    const result = await getTagPage('typescript');
+    const result = await getTagPage('typescript', tenant);
     if (!result) throw new Error('expected a tag page');
 
     expect(result.seo.description).toBe('Posts about TypeScript.');
   });
 
-  it('tags the page_tag query with tag and modules:postList alongside page_tag', async () => {
+  it('passes the slug as a query parameter', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawTagPage())
       .mockResolvedValueOnce(makeRawSiteSettings());
 
-    await getTagPage('typescript');
+    await getTagPage('typescript', tenant);
 
     expect(mockRun).toHaveBeenNthCalledWith(
       1,
       expect.anything(),
-      expect.objectContaining({
-        parameters: { slug: 'typescript' },
-        next: expect.objectContaining({
-          tags: ['page_tag', 'tag', 'modules:postList'],
-        }),
-      }),
+      expect.objectContaining({ parameters: { slug: 'typescript' } }),
     );
   });
 
@@ -133,7 +131,7 @@ describe('getTagPage', () => {
   it('rejects with MissingPostListError when page_tag.postList is unset, without fetching site settings', async () => {
     mockRun.mockResolvedValueOnce(makeRawTagPage({ postList: null }));
 
-    await expect(getTagPage('typescript')).rejects.toThrow(
+    await expect(getTagPage('typescript', tenant)).rejects.toThrow(
       MissingPostListError,
     );
     expect(mockRun).toHaveBeenCalledTimes(1);
@@ -142,7 +140,7 @@ describe('getTagPage', () => {
   it('resolves undefined, rather than rejecting, when no page_tag matches the slug', async () => {
     mockRun.mockResolvedValueOnce(null);
 
-    const result = await getTagPage('nonexistent');
+    const result = await getTagPage('nonexistent', tenant);
 
     expect(result).toBeUndefined();
   });
@@ -150,7 +148,7 @@ describe('getTagPage', () => {
   it('does not fetch site settings when no page_tag matches the slug', async () => {
     mockRun.mockResolvedValueOnce(null);
 
-    await getTagPage('nonexistent');
+    await getTagPage('nonexistent', tenant);
 
     expect(mockRun).toHaveBeenCalledTimes(1);
   });
@@ -159,11 +157,6 @@ describe('getTagPage', () => {
     mockRun
       .mockResolvedValueOnce(makeRawTagPage())
       .mockResolvedValueOnce(makeRawSiteSettings());
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getTagPage('typescript', tenant);
 
@@ -188,25 +181,6 @@ describe('getTagPage', () => {
         tenant,
         next: expect.objectContaining({ tags: ['t:tenant-a:site-settings'] }),
       }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawTagPage())
-      .mockResolvedValueOnce(makeRawSiteSettings());
-
-    await getTagPage('typescript');
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
-    );
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
     );
   });
 });

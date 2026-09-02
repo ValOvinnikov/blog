@@ -6,7 +6,7 @@ export function createPostListModuleService() {
   return {
     v1: {
       getPostList: safeAsync(
-        (id: string, page?: number, tenant?: TTenantSanityContext) =>
+        (id: string, tenant: TTenantSanityContext, page: number = 1) =>
           getPostList(id, page, tenant),
       ),
     },

@@ -5,7 +5,7 @@ import { safeAsync } from '@blog/utils';
 export function createTagIndexService() {
   return {
     v1: {
-      getIndexPage: safeAsync((tenant?: TTenantSanityContext) =>
+      getIndexPage: safeAsync((tenant: TTenantSanityContext) =>
         getIndexPage(tenant),
       ),
     },

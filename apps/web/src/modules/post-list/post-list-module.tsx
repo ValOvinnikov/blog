@@ -48,7 +48,7 @@ export const PostListModule = async ({
 }: IPostListModuleProps) => {
   const tenant = await getTenantSanityContext();
   const [result, blogListT, paginationT] = await Promise.all([
-    service.modules.postList.v1.getPostList(id, page, tenant),
+    service.modules.postList.v1.getPostList(id, tenant, page),
     getTranslations('blogListPage'),
     getTranslations('pagination'),
   ]);

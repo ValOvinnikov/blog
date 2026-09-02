@@ -12,12 +12,12 @@ import type { TGenericPage } from './types';
 
 export async function getPage(
   slug: string,
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<TMaybeUndefined<TGenericPage>> {
   const raw = await runQuery(genericPageQuery, {
     parameters: { slug },
     tenant,
-    ...isr('page_generic', tenant?.projectId),
+    ...isr('page_generic', tenant.projectId),
   });
   if (!raw) return undefined;
 

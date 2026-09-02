@@ -38,7 +38,8 @@
   [`environment-variables.md`](./environment-variables.md)) — it doubles
   as the intentional escape hatch for a build that genuinely has no Sanity
   access.
-- **Revalidation:** time-based via `isr('tag')` in service queries; on-demand
+- **Revalidation:** time-based via `isr('tag', projectId)` in service queries
+  (the tenant's project id is required, and scopes the emitted tag); on-demand
   via `app/api/revalidate` (#93, secret-verified,
   `revalidateTag(tag, { expire: 0 })` — immediate expiry, not a stale-while-
   revalidate profile) from a Sanity publish webhook. Tag expiry alone does not

@@ -13,14 +13,14 @@ import type { TTagDetailPage } from './types';
 
 export async function getTagPage(
   slug: string,
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<TMaybeUndefined<TTagDetailPage>> {
   // `tagPageQuery` derefs `tag` and `postList` — both tags must ride
   // alongside `page_tag` (tag-scope contract, `sanity/query.ts`).
   const rawPage = await runQuery(tagPageQuery, {
     parameters: { slug },
     tenant,
-    ...isr(['page_tag', 'tag', 'modules:postList'], tenant?.projectId),
+    ...isr(['page_tag', 'tag', 'modules:postList'], tenant.projectId),
   });
   if (!rawPage) return undefined;
   if (!rawPage.postList) {

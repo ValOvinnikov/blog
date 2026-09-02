@@ -7,10 +7,10 @@ import {
 import { postParamsQuery } from './query';
 
 export async function getPostParams(
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<{ slug: string; publishedAt: string }[]> {
   return runQuery(postParamsQuery, {
     tenant,
-    ...isr('page_post', tenant?.projectId),
+    ...isr('page_post', tenant.projectId),
   });
 }

@@ -20,8 +20,6 @@ const API_VERSION = '2024-01-01';
 // for up to an hour — origin reads stay rare because ISR absorbs them.
 const USE_CDN = false;
 
-let legacyClient: TSanityClient | undefined;
-
 // Small LRU (insertion-order Map: re-set moves an entry to the end) —
 // sized for "tens of tenants" per the multi-tenant design's target scale,
 // not meant to hold every tenant that has ever existed.
@@ -33,28 +31,13 @@ function tenantClientKey(tenant: TTenantSanityContext): string {
 }
 
 /**
- * No-arg call returns the legacy single-tenant client (env-configured) —
- * unchanged behavior for every `service.*` loader not yet migrated to
- * per-tenant context. Called with a `TTenantSanityContext`, returns (and
- * LRU-caches) a client scoped to that tenant's own project/dataset/token.
+ * Returns (and LRU-caches) a client scoped to the given tenant's own
+ * project/dataset/token. There is no no-arg form — every caller states
+ * which project it means to read, the platform's own included (via
+ * `getPlatformSanityContext()`), so omitting one is a compile error rather
+ * than a silent fallback.
  */
-export function getClient(tenant?: TTenantSanityContext): TSanityClient {
-  if (!tenant) {
-    if (legacyClient) return legacyClient;
-
-    legacyClient = createClient({
-      projectId: env.NEXT_PUBLIC_SANITY_PROJECT_ID,
-      dataset: env.NEXT_PUBLIC_SANITY_DATASET,
-      apiVersion: API_VERSION,
-      useCdn: USE_CDN,
-      token: env.SANITY_API_READ_TOKEN,
-      // Explicit (already the default): never serve draft content to the public.
-      perspective: 'published',
-    });
-
-    return legacyClient;
-  }
-
+export function getClient(tenant: TTenantSanityContext): TSanityClient {
   const key = tenantClientKey(tenant);
   const cached = tenantClients.get(key);
   if (cached) {
@@ -81,4 +64,23 @@ export function getClient(tenant?: TTenantSanityContext): TSanityClient {
   }
 
   return client;
+}
+
+/**
+ * The platform's own project, expressed as a `TTenantSanityContext` — the
+ * explicit, greppable way to opt into the platform's project instead of a
+ * tenant's, for the handful of callers that genuinely mean that (single-
+ * tenant local/preview development, the image URL builder).
+ */
+export function getPlatformSanityContext(): TTenantSanityContext {
+  return {
+    projectId: env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+    dataset: env.NEXT_PUBLIC_SANITY_DATASET,
+    token: env.SANITY_API_READ_TOKEN ?? '',
+  };
+}
+
+/** `getClient(getPlatformSanityContext())` — reuses the same tenant-keyed cache, never a client per call. */
+export function getPlatformClient(): TSanityClient {
+  return getClient(getPlatformSanityContext());
 }

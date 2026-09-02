@@ -19,13 +19,13 @@ import type { TTaxonomyListModule } from './types';
 export async function getTaxonomyList(
   id: string,
   taxonomy: TTaxonomyKind,
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<TTaxonomyListModule> {
   const [raw, entries] = await Promise.all([
     runQuery(taxonomyListModuleQuery, {
       parameters: { id },
       tenant,
-      ...isr(['modules:taxonomyList', `module:${id}`], tenant?.projectId),
+      ...isr(['modules:taxonomyList', `module:${id}`], tenant.projectId),
     }),
     taxonomy === TAXONOMY_KIND.TOPICS ? getTopics(tenant) : getTags(tenant),
   ]);

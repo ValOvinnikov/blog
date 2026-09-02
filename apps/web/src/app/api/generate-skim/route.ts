@@ -1,4 +1,8 @@
-import { service } from '@blog/service';
+import {
+  getPlatformSanityWriteContext,
+  service,
+  type TTenantSanityContext,
+} from '@blog/service';
 import {
   generateTakeaways,
   SKIM_GENERATION_MODEL,
@@ -16,16 +20,6 @@ import { z } from 'zod';
 export const runtime = 'nodejs';
 
 const requestBodySchema = z.object({ _id: z.string().min(1) });
-
-const WRITE_CLIENT_UNCONFIGURED_MARKER = 'SANITY_API_WRITE_TOKEN is not set';
-
-/** `saveSkimDraft`'s write client throws this exact substring when `SANITY_API_WRITE_TOKEN` is absent — the one signal this route has for "unconfigured" vs. a genuine write failure. */
-const isWriteClientUnconfiguredError = (error: unknown): boolean => {
-  return (
-    error instanceof Error &&
-    error.message.includes(WRITE_CLIENT_UNCONFIGURED_MARKER)
-  );
-};
 
 /**
  * POST /api/generate-skim?secret=… — the publish-time skim-generation
@@ -138,23 +132,36 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
+  let resolvedWriteTenant: TTenantSanityContext;
+  try {
+    resolvedWriteTenant = writeTenant.tenant ?? getPlatformSanityWriteContext();
+  } catch (error) {
+    logger.error('generate_skim.write_client_unconfigured', {
+      postId,
+      error,
+    });
+    return NextResponse.json(
+      { message: 'Failed to save the skim draft.' },
+      { status: 503 },
+    );
+  }
+
   const saveResult = await service.editorial.skim.v1.saveSkimDraft(
     {
       postId,
       takeaways,
       model: SKIM_GENERATION_MODEL,
     },
-    writeTenant.tenant,
+    resolvedWriteTenant,
   );
   if (!saveResult.ok) {
     logger.error('generate_skim.draft_save_failed', {
       postId,
       error: saveResult.error,
     });
-    const status = isWriteClientUnconfiguredError(saveResult.error) ? 503 : 500;
     return NextResponse.json(
       { message: 'Failed to save the skim draft.' },
-      { status },
+      { status: 500 },
     );
   }
 

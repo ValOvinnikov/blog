@@ -3,9 +3,16 @@ import TopicDetailPage, {
   generateStaticParams,
 } from './page';
 
-const { getTopicParamsMock } = vi.hoisted(() => ({
-  getTopicParamsMock: vi.fn(),
-}));
+const { getTopicParamsMock, getPlatformSanityContextMock, platformTenant } =
+  vi.hoisted(() => ({
+    getTopicParamsMock: vi.fn(),
+    getPlatformSanityContextMock: vi.fn(),
+    platformTenant: {
+      projectId: 'platform-project',
+      dataset: 'production',
+      token: 'platform-token',
+    },
+  }));
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -13,6 +20,7 @@ vi.mock('@blog/service', () => ({
       topic: { v1: { getTopicParams: getTopicParamsMock } },
     },
   },
+  getPlatformSanityContext: getPlatformSanityContextMock,
 }));
 
 vi.mock('@web/components/pages/topic-page', () => ({
@@ -27,6 +35,11 @@ vi.mock('@web/metadata/topic-metadata', () => ({
 
 describe('TopicDetailPage', () => {
   describe('generateStaticParams', () => {
+    beforeEach(() => {
+      getPlatformSanityContextMock.mockReset();
+      getPlatformSanityContextMock.mockReturnValue(platformTenant);
+    });
+
     it('returns the topic slugs on success', async () => {
       getTopicParamsMock.mockResolvedValue({
         ok: true,
@@ -36,6 +49,7 @@ describe('TopicDetailPage', () => {
       const params = await generateStaticParams();
 
       expect(params).toEqual([{ slug: 'engineering' }, { slug: 'design' }]);
+      expect(getTopicParamsMock).toHaveBeenCalledWith(platformTenant);
     });
 
     it('returns an empty array when the fetch resolves to a failure result', async () => {

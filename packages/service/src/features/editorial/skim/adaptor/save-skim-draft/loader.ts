@@ -21,13 +21,11 @@ function toPublishedId(postId: string): string {
  * so a generated skim always needs human approval (a Studio publish) before
  * readers see it. Idempotent: re-running always targets the same draft id
  * and `.set()`s the whole `skim` object, so it only ever overwrites that one
- * field, never other draft content and never the published document. An
- * optional `tenant` targets that tenant's own Sanity project instead of the
- * platform's.
+ * field, never other draft content and never the published document.
  */
 export async function saveSkimDraft(
   { postId, takeaways, model }: TSaveSkimDraftInput,
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<void> {
   const client = getWriteClient(tenant);
   const draftId = toDraftId(postId);

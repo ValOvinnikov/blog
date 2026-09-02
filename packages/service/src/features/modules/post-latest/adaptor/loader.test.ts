@@ -1,6 +1,7 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawPostLatestModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getPostLatest } from './loader';
 
@@ -8,6 +9,8 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
   runQuery: vi.fn(),
 }));
+
+const tenant = makeTenant();
 
 describe('getPostLatest', () => {
   it('bounds the posts query by the module limit and maps the result', async () => {
@@ -24,7 +27,7 @@ describe('getPostLatest', () => {
       )
       .mockResolvedValueOnce([makeRawPostCard({ _id: 'a' })]);
 
-    const postLatest = await getPostLatest('post-latest-1');
+    const postLatest = await getPostLatest('post-latest-1', tenant);
 
     // The module's `limit` is threaded into the GROQ posts query's slice bound.
     expect(mockRun.mock.calls[1]?.[0]?.query).toContain('[0...3]');
@@ -37,7 +40,7 @@ describe('getPostLatest', () => {
       .mockResolvedValueOnce(makeRawPostLatestModule({ limit: 3 }))
       .mockResolvedValueOnce([]);
 
-    const postLatest = await getPostLatest('post-latest-1');
+    const postLatest = await getPostLatest('post-latest-1', tenant);
 
     expect(postLatest.posts).toEqual([]);
   });
@@ -45,54 +48,13 @@ describe('getPostLatest', () => {
   it('propagates when the module document is missing', async () => {
     mockRun.mockRejectedValueOnce(new Error('ValidationError'));
 
-    await expect(getPostLatest('missing')).rejects.toThrow();
-  });
-
-  it('tags the module query with the module id', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawPostLatestModule({ limit: 3 }))
-      .mockResolvedValueOnce([makeRawPostCard({ _id: 'a' })]);
-
-    await getPostLatest('post-latest-1');
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({
-        next: expect.objectContaining({
-          tags: ['modules:postLatest', 'module:post-latest-1'],
-        }),
-      }),
-    );
-  });
-
-  it('tags the posts query with author/topic alongside posts', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawPostLatestModule({ limit: 3 }))
-      .mockResolvedValueOnce([makeRawPostCard({ _id: 'a' })]);
-
-    await getPostLatest('post-latest-1');
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({
-        next: expect.objectContaining({
-          tags: ['posts', 'author', 'topic'],
-        }),
-      }),
-    );
+    await expect(getPostLatest('missing', tenant)).rejects.toThrow();
   });
 
   it('threads tenant context into both queries and scopes their tags to it', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawPostLatestModule({ limit: 3 }))
       .mockResolvedValueOnce([makeRawPostCard({ _id: 'a' })]);
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getPostLatest('post-latest-1', tenant);
 
@@ -118,25 +80,6 @@ describe('getPostLatest', () => {
           tags: ['t:tenant-a:posts', 't:tenant-a:author', 't:tenant-a:topic'],
         }),
       }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawPostLatestModule({ limit: 3 }))
-      .mockResolvedValueOnce([makeRawPostCard({ _id: 'a' })]);
-
-    await getPostLatest('post-latest-1');
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
-    );
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
     );
   });
 });

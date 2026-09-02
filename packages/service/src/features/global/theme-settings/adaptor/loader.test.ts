@@ -1,6 +1,7 @@
 import { PRESET_ID, PRESET_REGISTRY } from '@blog/config';
 import { makeRawThemeSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeTenant } from '@blog/service/testing/tenant';
 import { wcagContrastRatio } from '@blog/utils';
 
 import { getTheme } from './loader';
@@ -20,6 +21,7 @@ vi.mock('@blog/utils', async (importOriginal) => ({
 }));
 
 const mockedWcagContrastRatio = vi.mocked(wcagContrastRatio);
+const tenant = makeTenant();
 
 beforeEach(async () => {
   const actual =
@@ -31,7 +33,7 @@ describe('getTheme', () => {
   it('falls back to the console preset when no settings_theme document exists', async () => {
     mockRun.mockResolvedValue(null);
 
-    const result = await getTheme();
+    const result = await getTheme(tenant);
 
     const consoleTokens = PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens;
     expect(result).toEqual({
@@ -45,7 +47,7 @@ describe('getTheme', () => {
       makeRawThemeSettings({ preset: PRESET_ID.EDITORIAL }),
     );
 
-    const result = await getTheme();
+    const result = await getTheme(tenant);
 
     const editorial = PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens;
     expect(result).toEqual({ ...editorial, logoHue: editorial.accentHue });
@@ -56,7 +58,7 @@ describe('getTheme', () => {
       makeRawThemeSettings({ preset: PRESET_ID.EDITORIAL, accentHue: 200 }),
     );
 
-    const result = await getTheme();
+    const result = await getTheme(tenant);
 
     const editorial = PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens;
     expect(result).toEqual({
@@ -75,7 +77,7 @@ describe('getTheme', () => {
       }),
     );
 
-    const result = await getTheme();
+    const result = await getTheme(tenant);
 
     expect(result.accentHue).toBe(65);
     expect(result.logoHue).toBe(274);
@@ -87,7 +89,7 @@ describe('getTheme', () => {
       makeRawThemeSettings({ preset: PRESET_ID.EDITORIAL, accentHue: 310 }),
     );
 
-    const result = await getTheme();
+    const result = await getTheme(tenant);
 
     const editorial = PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens;
     expect(result.accentHue).toBe(editorial.accentHue);
@@ -96,11 +98,6 @@ describe('getTheme', () => {
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     mockRun.mockResolvedValue(makeRawThemeSettings());
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getTheme(tenant);
 
@@ -111,20 +108,6 @@ describe('getTheme', () => {
         next: expect.objectContaining({
           tags: ['t:tenant-a:theme-settings'],
         }),
-      }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun.mockResolvedValue(makeRawThemeSettings());
-
-    await getTheme();
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant: undefined,
-        next: expect.objectContaining({ tags: ['theme-settings'] }),
       }),
     );
   });

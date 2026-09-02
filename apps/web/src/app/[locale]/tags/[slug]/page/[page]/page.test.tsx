@@ -16,10 +16,18 @@ const {
   getTagPageMock,
   getTagPaginationParamsMock,
   getTenantSanityContextMock,
+  getPlatformSanityContextMock,
+  platformTenant,
 } = vi.hoisted(() => ({
   getTagPageMock: vi.fn(),
   getTagPaginationParamsMock: vi.fn(),
   getTenantSanityContextMock: vi.fn(),
+  getPlatformSanityContextMock: vi.fn(),
+  platformTenant: {
+    projectId: 'platform-project',
+    dataset: 'production',
+    token: 'platform-token',
+  },
 }));
 
 // Isolates the redirect/404/static-params branches — none of the tested
@@ -35,6 +43,7 @@ vi.mock('@blog/service', () => ({
       },
     },
   },
+  getPlatformSanityContext: getPlatformSanityContextMock,
 }));
 
 vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
@@ -58,6 +67,8 @@ describe('TagNumberedPage', () => {
     permanentRedirectMock.mockClear();
     getTenantSanityContextMock.mockReset();
     getTenantSanityContextMock.mockResolvedValue(undefined);
+    getPlatformSanityContextMock.mockReset();
+    getPlatformSanityContextMock.mockReturnValue(platformTenant);
   });
 
   describe('generateStaticParams', () => {
@@ -76,7 +87,7 @@ describe('TagNumberedPage', () => {
         { slug: 'typescript', page: '2' },
         { slug: 'react', page: '2' },
       ]);
-      expect(getTagPaginationParamsMock).toHaveBeenCalledWith();
+      expect(getTagPaginationParamsMock).toHaveBeenCalledWith(platformTenant);
     });
 
     it('returns an empty array when the fetch resolves to a failure result', async () => {

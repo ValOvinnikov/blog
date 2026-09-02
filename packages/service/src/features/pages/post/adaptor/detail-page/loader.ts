@@ -13,7 +13,7 @@ import type { TPostDetail } from './types';
 
 export async function getPost(
   slug: string,
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<TMaybeUndefined<TPostDetail>> {
   // `postPageQuery` derefs `post`, which itself derefs `author`/`topic`/
   // `tags[]` — all four tags must ride alongside `page_post` (tag-scope
@@ -21,7 +21,7 @@ export async function getPost(
   const rawPage = await runQuery(postPageQuery, {
     parameters: { slug },
     tenant,
-    ...isr(['page_post', 'post', 'author', 'topic', 'tag'], tenant?.projectId),
+    ...isr(['page_post', 'post', 'author', 'topic', 'tag'], tenant.projectId),
   });
   if (!rawPage) return undefined;
 

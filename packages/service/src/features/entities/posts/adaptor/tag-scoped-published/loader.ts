@@ -12,12 +12,12 @@ import { tagScopedPublishedPostsQuery } from './query';
 
 export async function getPublishedPostsByTag(
   tagId: string,
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<TFeedPost[]> {
   const raw = await runQuery(tagScopedPublishedPostsQuery, {
     parameters: { tagId },
     tenant,
-    ...isr(['posts'], tenant?.projectId),
+    ...isr(['posts'], tenant.projectId),
   });
   return toAllPublishedPosts(raw);
 }

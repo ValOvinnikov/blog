@@ -2,6 +2,7 @@ import { MissingTaxonomyListError } from '@blog/service/features/pages/tag-index
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawTagIndexPage } from '@blog/service/testing/pages/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getIndexPage } from './loader';
 
@@ -16,6 +17,8 @@ vi.mock('@blog/service/sanity/image', () => ({
   ),
 }));
 
+const tenant = makeTenant();
+
 describe('getIndexPage', () => {
   it('exposes the taxonomyList module id from page_tagIndex.taxonomyList', async () => {
     mockRun
@@ -24,7 +27,7 @@ describe('getIndexPage', () => {
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
-    const result = await getIndexPage();
+    const result = await getIndexPage(tenant);
     if (!result) throw new Error('expected a tag index page');
 
     expect(result.taxonomyListId).toBe('taxonomy-list-1');
@@ -45,7 +48,7 @@ describe('getIndexPage', () => {
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
-    const result = await getIndexPage();
+    const result = await getIndexPage(tenant);
     if (!result) throw new Error('expected a tag index page');
 
     expect(result.heading).toBe('Browse by tag');
@@ -68,7 +71,7 @@ describe('getIndexPage', () => {
         makeRawSiteSettings({ description: 'Notes on building things.' }),
       );
 
-    const result = await getIndexPage();
+    const result = await getIndexPage(tenant);
     if (!result) throw new Error('expected a tag index page');
 
     expect(result.seo).toEqual({
@@ -80,38 +83,22 @@ describe('getIndexPage', () => {
     });
   });
 
-  it('tags the page_tagIndex query with modules:taxonomyList alongside page_tagIndex', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawTagIndexPage())
-      .mockResolvedValueOnce(makeRawSiteSettings());
-
-    await getIndexPage();
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({
-        next: expect.objectContaining({
-          tags: ['page_tagIndex', 'modules:taxonomyList'],
-        }),
-      }),
-    );
-  });
-
   // Regression guard for the decision that a missing slot is a loud failure,
   // never a substituted default: this must reject rather than resolve with
   // an invented module id.
   it('rejects with MissingTaxonomyListError when page_tagIndex.taxonomyList is unset, without fetching site settings', async () => {
     mockRun.mockResolvedValueOnce(makeRawTagIndexPage({ taxonomyList: null }));
 
-    await expect(getIndexPage()).rejects.toThrow(MissingTaxonomyListError);
+    await expect(getIndexPage(tenant)).rejects.toThrow(
+      MissingTaxonomyListError,
+    );
     expect(mockRun).toHaveBeenCalledTimes(1);
   });
 
   it('resolves undefined, rather than rejecting, when no page_tagIndex document exists', async () => {
     mockRun.mockResolvedValueOnce(null);
 
-    const result = await getIndexPage();
+    const result = await getIndexPage(tenant);
 
     expect(result).toBeUndefined();
   });
@@ -119,7 +106,7 @@ describe('getIndexPage', () => {
   it('does not fetch site settings when no page_tagIndex document exists', async () => {
     mockRun.mockResolvedValueOnce(null);
 
-    await getIndexPage();
+    await getIndexPage(tenant);
 
     expect(mockRun).toHaveBeenCalledTimes(1);
   });
@@ -128,11 +115,6 @@ describe('getIndexPage', () => {
     mockRun
       .mockResolvedValueOnce(makeRawTagIndexPage())
       .mockResolvedValueOnce(makeRawSiteSettings());
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getIndexPage(tenant);
 
@@ -153,25 +135,6 @@ describe('getIndexPage', () => {
         tenant,
         next: expect.objectContaining({ tags: ['t:tenant-a:site-settings'] }),
       }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawTagIndexPage())
-      .mockResolvedValueOnce(makeRawSiteSettings());
-
-    await getIndexPage();
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
-    );
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
     );
   });
 });

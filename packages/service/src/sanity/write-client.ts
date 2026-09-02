@@ -16,8 +16,6 @@ const API_VERSION = '2024-01-01';
 // also exist — `raw` (unlike `published`) makes both visible.
 const PERSPECTIVE = 'raw';
 
-let writeClient: TSanityWriteClient | undefined;
-
 const MAX_CACHED_TENANT_WRITE_CLIENTS = 20;
 const tenantWriteClients = new Map<string, TSanityWriteClient>();
 
@@ -39,32 +37,13 @@ function assertValidTenantContext(tenant: TTenantSanityContext): void {
  * Separate from `getClient()` (the public read client): this one carries a
  * scoped write token and is used only by the publish-time skim pipeline
  * (`features/editorial/skim`) to patch a post's *draft*. Never imported by
- * page-rendering code.
+ * page-rendering code. There is no no-arg form — a caller that means the
+ * platform's own project passes `getPlatformSanityWriteContext()`'s result
+ * explicitly.
  */
 export function getWriteClient(
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): TSanityWriteClient {
-  if (!tenant) {
-    if (!env.SANITY_API_WRITE_TOKEN) {
-      throw new Error(
-        'getWriteClient: SANITY_API_WRITE_TOKEN is not set — the publish-time skim pipeline is disabled without a scoped write token.',
-      );
-    }
-
-    if (writeClient) return writeClient;
-
-    writeClient = createClient({
-      projectId: env.NEXT_PUBLIC_SANITY_PROJECT_ID,
-      dataset: env.NEXT_PUBLIC_SANITY_DATASET,
-      apiVersion: API_VERSION,
-      useCdn: false,
-      token: env.SANITY_API_WRITE_TOKEN,
-      perspective: PERSPECTIVE,
-    });
-
-    return writeClient;
-  }
-
   assertValidTenantContext(tenant);
 
   const key = tenantWriteClientKey(tenant);
@@ -91,4 +70,23 @@ export function getWriteClient(
   }
 
   return client;
+}
+
+/**
+ * The platform's own project, expressed as a `TTenantSanityContext` for
+ * `getWriteClient()` — the explicit, greppable way to opt into writing to
+ * the platform's project instead of a tenant's.
+ */
+export function getPlatformSanityWriteContext(): TTenantSanityContext {
+  if (!env.SANITY_API_WRITE_TOKEN) {
+    throw new Error(
+      'getPlatformSanityWriteContext: SANITY_API_WRITE_TOKEN is not set — the publish-time skim pipeline is disabled without a scoped write token.',
+    );
+  }
+
+  return {
+    projectId: env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+    dataset: env.NEXT_PUBLIC_SANITY_DATASET,
+    token: env.SANITY_API_WRITE_TOKEN,
+  };
 }

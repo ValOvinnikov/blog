@@ -508,18 +508,19 @@ URL scheme and a single `SmartLink` for all in-app navigation.
 Full mechanics:
 [`docs/context/rendering-caching-i18n.md`](./docs/context/rendering-caching-i18n.md).
 
-Cache tags can be tenant-scoped (`t:<projectId>:<tag>`, alongside the legacy
-unprefixed form); the revalidation webhook purges both per publish, keyed off
-Sanity's own `sanity-project-id` webhook header. The same webhook also cleans
+Cache tags are always tenant-scoped (`t:<projectId>:<tag>`); the revalidation
+webhook purges both that form and the legacy unprefixed one per publish, keyed
+off Sanity's own `sanity-project-id` webhook header. The same webhook also cleans
 up orphaned `@blog/db` `bookmarks` rows when it receives a `blog_post` delete
 (Sanity's `sanity-operation` header — unpublish fires the same trigger as
 true deletion), scoped to the tenant resolved from that project-id header.
 `@blog/service`'s
-`getClient()`/`runQuery()`/`isr()` all take an optional tenant context —
-called with none, they behave exactly as before (legacy single-tenant client,
-unprefixed tags), which is what keeps every not-yet-migrated `service.*`
-loader compiling and working unchanged while the migration proceeds
-loader-by-loader.
+`getClient()`/`getWriteClient()`/`runQuery()`/`isr()` all **require** a tenant
+context: omitting one is a compile error, not a silent fall back to the
+platform's own project. Code that legitimately wants the platform's project
+says so explicitly through `getPlatformSanityContext()`,
+`getPlatformSanityWriteContext()` or `getPlatformClient()` — which is what
+build-time `generateStaticParams` and the single-tenant dev/preview path use.
 
 Client-side error capture is a self-hosted route, not a third-party SDK
 (`web`'s Lighthouse performance budget rules out shipping an SDK on every

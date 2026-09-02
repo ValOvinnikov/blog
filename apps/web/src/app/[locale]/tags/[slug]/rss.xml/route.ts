@@ -37,7 +37,7 @@ const toRssItem = (post: TFeedPost, siteUrl: string): TRssItem => {
  */
 const getAllTagPosts = async (
   slug: string,
-  tenant: TTenantSanityContext | undefined,
+  tenant: TTenantSanityContext,
 ): Promise<TTagFeed | null> => {
   const tagResult = await service.pages.tag.v1.getTagPage(slug, tenant);
   if (!tagResult.ok) {

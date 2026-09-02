@@ -1,4 +1,5 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getTopicPaginationParams } from './loader';
 
@@ -6,6 +7,8 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
   runQuery: vi.fn(),
 }));
+
+const tenant = makeTenant();
 
 describe('getTopicPaginationParams', () => {
   // Branch coverage (zero posts, single-page corpus, multi-page corpus,
@@ -17,7 +20,7 @@ describe('getTopicPaginationParams', () => {
       { slug: 'design', postList: { pageSize: 9 }, postCount: 9 },
     ]);
 
-    const params = await getTopicPaginationParams();
+    const params = await getTopicPaginationParams(tenant);
 
     expect(params).toEqual([
       { slug: 'engineering', page: '2' },
@@ -25,28 +28,8 @@ describe('getTopicPaginationParams', () => {
     ]);
   });
 
-  it('tags the query with modules:postList, posts, and topic alongside page_topic', async () => {
-    mockRun.mockResolvedValueOnce([]);
-
-    await getTopicPaginationParams();
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        next: expect.objectContaining({
-          tags: ['page_topic', 'modules:postList', 'posts', 'topic'],
-        }),
-      }),
-    );
-  });
-
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     mockRun.mockResolvedValueOnce([]);
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getTopicPaginationParams(tenant);
 
@@ -63,17 +46,6 @@ describe('getTopicPaginationParams', () => {
           ],
         }),
       }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun.mockResolvedValueOnce([]);
-
-    await getTopicPaginationParams();
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
     );
   });
 });

@@ -2,6 +2,7 @@ import { MissingPostListError } from '@blog/service/features/pages/topic/adaptor
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawTopicPage } from '@blog/service/testing/pages/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getTopicPage } from './loader';
 
@@ -16,6 +17,8 @@ vi.mock('@blog/service/sanity/image', () => ({
   ),
 }));
 
+const tenant = makeTenant();
+
 describe('getTopicPage', () => {
   it('exposes the postList module id from page_topic.postList', async () => {
     mockRun
@@ -24,7 +27,7 @@ describe('getTopicPage', () => {
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
-    const result = await getTopicPage('engineering');
+    const result = await getTopicPage('engineering', tenant);
     if (!result) throw new Error('expected a topic page');
 
     expect(result.postListId).toBe('post-list-1');
@@ -44,7 +47,7 @@ describe('getTopicPage', () => {
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
-    const result = await getTopicPage('engineering');
+    const result = await getTopicPage('engineering', tenant);
     if (!result) throw new Error('expected a topic page');
 
     expect(result.topic).toEqual({
@@ -73,7 +76,7 @@ describe('getTopicPage', () => {
         makeRawSiteSettings({ description: 'Notes on building things.' }),
       );
 
-    const result = await getTopicPage('engineering');
+    const result = await getTopicPage('engineering', tenant);
     if (!result) throw new Error('expected a topic page');
 
     expect(result.seo).toEqual({
@@ -102,28 +105,23 @@ describe('getTopicPage', () => {
         makeRawSiteSettings({ description: 'Site default description' }),
       );
 
-    const result = await getTopicPage('engineering');
+    const result = await getTopicPage('engineering', tenant);
     if (!result) throw new Error('expected a topic page');
 
     expect(result.seo.description).toBe('Notes on building things.');
   });
 
-  it('tags the page_topic query with topic and modules:postList alongside page_topic', async () => {
+  it('passes the slug as a query parameter', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawTopicPage())
       .mockResolvedValueOnce(makeRawSiteSettings());
 
-    await getTopicPage('engineering');
+    await getTopicPage('engineering', tenant);
 
     expect(mockRun).toHaveBeenNthCalledWith(
       1,
       expect.anything(),
-      expect.objectContaining({
-        parameters: { slug: 'engineering' },
-        next: expect.objectContaining({
-          tags: ['page_topic', 'topic', 'modules:postList'],
-        }),
-      }),
+      expect.objectContaining({ parameters: { slug: 'engineering' } }),
     );
   });
 
@@ -133,7 +131,7 @@ describe('getTopicPage', () => {
   it('rejects with MissingPostListError when page_topic.postList is unset, without fetching site settings', async () => {
     mockRun.mockResolvedValueOnce(makeRawTopicPage({ postList: null }));
 
-    await expect(getTopicPage('engineering')).rejects.toThrow(
+    await expect(getTopicPage('engineering', tenant)).rejects.toThrow(
       MissingPostListError,
     );
     expect(mockRun).toHaveBeenCalledTimes(1);
@@ -142,7 +140,7 @@ describe('getTopicPage', () => {
   it('resolves undefined, rather than rejecting, when no page_topic matches the slug', async () => {
     mockRun.mockResolvedValueOnce(null);
 
-    const result = await getTopicPage('nonexistent');
+    const result = await getTopicPage('nonexistent', tenant);
 
     expect(result).toBeUndefined();
   });
@@ -150,7 +148,7 @@ describe('getTopicPage', () => {
   it('does not fetch site settings when no page_topic matches the slug', async () => {
     mockRun.mockResolvedValueOnce(null);
 
-    await getTopicPage('nonexistent');
+    await getTopicPage('nonexistent', tenant);
 
     expect(mockRun).toHaveBeenCalledTimes(1);
   });
@@ -159,11 +157,6 @@ describe('getTopicPage', () => {
     mockRun
       .mockResolvedValueOnce(makeRawTopicPage())
       .mockResolvedValueOnce(makeRawSiteSettings());
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getTopicPage('engineering', tenant);
 
@@ -188,25 +181,6 @@ describe('getTopicPage', () => {
         tenant,
         next: expect.objectContaining({ tags: ['t:tenant-a:site-settings'] }),
       }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawTopicPage())
-      .mockResolvedValueOnce(makeRawSiteSettings());
-
-    await getTopicPage('engineering');
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
-    );
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
     );
   });
 });

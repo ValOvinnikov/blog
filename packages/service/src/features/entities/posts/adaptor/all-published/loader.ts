@@ -8,11 +8,11 @@ import { allPublishedPostsQuery } from './query';
 import { toAllPublishedPosts, type TFeedPost } from './transformer';
 
 export async function getAllPublishedPosts(
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<TFeedPost[]> {
   const raw = await runQuery(allPublishedPostsQuery, {
     tenant,
-    ...isr(['posts'], tenant?.projectId),
+    ...isr(['posts'], tenant.projectId),
   });
   return toAllPublishedPosts(raw);
 }
