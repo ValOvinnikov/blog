@@ -1,5 +1,11 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import {
+  TENANT_PLAN,
+  TENANT_PROVISIONING_STATUS,
+  TENANT_STATUS,
+} from '@blog/db/constants';
+import { archiveTenant } from '@blog/db/queries/tenants/archive-tenant';
 import { createTenant } from '@blog/db/queries/tenants/create-tenant';
+import { setTenantProvisioningStatus } from '@blog/db/queries/tenants/set-tenant-provisioning-status';
 import { setTenantSanityToken } from '@blog/db/queries/tenants/set-tenant-sanity-token';
 import { setTenantSanityWriteToken } from '@blog/db/queries/tenants/set-tenant-sanity-write-token';
 import * as schema from '@blog/db/schema';
@@ -51,7 +57,7 @@ afterEach(async () => {
 });
 
 describe(getTenantSanityWriteCredentials, () => {
-  it('resolves the decrypted token alongside project/dataset', async () => {
+  it('resolves the decrypted token alongside project/dataset and servable state for an active tenant', async () => {
     const tenant = await insertTenant();
     await setTenantSanityWriteToken(tenant.id, 'sk-real-write-token-value');
 
@@ -61,7 +67,60 @@ describe(getTenantSanityWriteCredentials, () => {
       projectId: 'abc123',
       dataset: 'production',
       token: 'sk-real-write-token-value',
+      status: TENANT_STATUS.ACTIVE,
+      deprovisionedAt: null,
+      provisioningStatus: null,
     });
+  });
+
+  it('still resolves working write credentials for an archived tenant, tagged with its ARCHIVED status', async () => {
+    const tenant = await insertTenant();
+    await setTenantSanityWriteToken(tenant.id, 'sk-real-write-token-value');
+    const archived = await archiveTenant(tenant.id);
+    if (!archived.ok) throw new Error('setup: archiveTenant failed.');
+
+    const credentials = await getTenantSanityWriteCredentials(tenant.id);
+
+    expect(credentials).toMatchObject({
+      projectId: 'abc123',
+      dataset: 'production',
+      token: 'sk-real-write-token-value',
+      status: TENANT_STATUS.ARCHIVED,
+    });
+  });
+
+  it('surfaces deprovisionedAt for a deprovisioned tenant instead of collapsing to undefined', async () => {
+    const tenant = await insertTenant();
+    await setTenantSanityWriteToken(tenant.id, 'sk-real-write-token-value');
+    await archiveTenant(tenant.id);
+
+    const credentials = await getTenantSanityWriteCredentials(tenant.id);
+
+    expect(credentials?.deprovisionedAt).toBeInstanceOf(Date);
+  });
+
+  it('resolves undefined for a mid-provisioning tenant with no write token set yet', async () => {
+    const tenant = await insertTenant();
+    await setTenantProvisioningStatus(
+      tenant.id,
+      TENANT_PROVISIONING_STATUS.PROVISIONING,
+    );
+
+    await expect(
+      getTenantSanityWriteCredentials(tenant.id),
+    ).resolves.toBeUndefined();
+  });
+
+  it('resolves undefined for a tenant whose provisioning failed and never set a write token', async () => {
+    const tenant = await insertTenant();
+    await setTenantProvisioningStatus(
+      tenant.id,
+      TENANT_PROVISIONING_STATUS.FAILED,
+    );
+
+    await expect(
+      getTenantSanityWriteCredentials(tenant.id),
+    ).resolves.toBeUndefined();
   });
 
   it('resolves undefined when the tenant has no write token set yet', async () => {

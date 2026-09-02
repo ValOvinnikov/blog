@@ -1,4 +1,8 @@
 import { getDb } from '@blog/db/client';
+import type {
+  TTenantProvisioningStatus,
+  TTenantStatus,
+} from '@blog/db/constants';
 import { tenants } from '@blog/db/schema/tenants';
 import { env } from '@blog/db/utils/env/env';
 import { decryptSecret } from '@blog/utils';
@@ -8,8 +12,16 @@ export type TTenantSanityWriteCredentials = {
   projectId: string;
   dataset: string;
   token: string;
+  status: TTenantStatus;
+  deprovisionedAt: Date | null;
+  provisioningStatus: TTenantProvisioningStatus | null;
 };
 
+/**
+ * Resolves a tenant's Sanity write credentials alongside its servable
+ * state (`status`, `deprovisionedAt`, `provisioningStatus`) — this does not
+ * itself gate on that state, so callers must check it before writing.
+ */
 export async function getTenantSanityWriteCredentials(
   tenantId: string,
 ): Promise<TTenantSanityWriteCredentials | undefined> {
@@ -39,5 +51,8 @@ export async function getTenantSanityWriteCredentials(
       tenant.sanityWriteTokenEncrypted,
       env.TENANT_TOKEN_ENCRYPTION_KEY,
     ),
+    status: tenant.status,
+    deprovisionedAt: tenant.deprovisionedAt,
+    provisioningStatus: tenant.provisioningStatus,
   };
 }
