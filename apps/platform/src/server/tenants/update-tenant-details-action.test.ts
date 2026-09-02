@@ -210,6 +210,19 @@ describe('updateTenantDetailsAction', () => {
     });
   });
 
+  it('maps a domain-invalid outcome onto a primaryDomain field error', async () => {
+    updateTenantDetailsMock.mockResolvedValue({ outcome: 'domain-invalid' });
+    const { updateTenantDetailsAction } =
+      await import('./update-tenant-details-action');
+
+    const result = await updateTenantDetailsAction('tenant-1', validInput);
+
+    expect(result).toEqual({
+      ok: false,
+      fieldErrors: { primaryDomain: expect.any(String) },
+    });
+  });
+
   it('maps a domain-locked outcome onto a primaryDomain field error naming the blocking step', async () => {
     updateTenantDetailsMock.mockResolvedValue({
       outcome: 'domain-locked',
@@ -404,6 +417,16 @@ describe('updateTenantDetailsAction', () => {
 
   it('does not record an audit event for a domain-taken outcome', async () => {
     updateTenantDetailsMock.mockResolvedValue({ outcome: 'domain-taken' });
+    const { updateTenantDetailsAction } =
+      await import('./update-tenant-details-action');
+
+    await updateTenantDetailsAction('tenant-1', validInput);
+
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
+  });
+
+  it('does not record an audit event for a domain-invalid outcome', async () => {
+    updateTenantDetailsMock.mockResolvedValue({ outcome: 'domain-invalid' });
     const { updateTenantDetailsAction } =
       await import('./update-tenant-details-action');
 
