@@ -1,9 +1,9 @@
 /**
- * Deprovisioning workflow entrypoint — reverses `provision-tenant`'s four
- * steps for one tenant: removes its domain from the shared web project,
- * archives (never deletes) its Sanity project, clears the
- * provisioning-artifact columns, then archives (never hard-deletes) the
- * `tenants` row.
+ * Deprovisioning workflow entrypoint — reverses `provision-tenant`'s steps
+ * for one tenant: removes its domain from the shared web project, archives
+ * (never deletes) its Sanity project, revokes the provisioned Sanity robot
+ * tokens still live in that project, clears the provisioning-artifact
+ * columns, then archives (never hard-deletes) the `tenants` row.
  *
  * Invoked only by `.github/workflows/deprovision-tenant.yml` via
  * `pnpm --filter @blog/db db:deprovision-tenant -- --tenant-id=<uuid>
@@ -28,6 +28,7 @@ import { archiveTenantSanityProject } from './steps/archive-sanity-project';
 import { archiveTenantRow } from './steps/archive-tenant';
 import { clearTenantArtifacts } from './steps/clear-artifacts';
 import { removeTenantDomain } from './steps/remove-domain';
+import { revokeTenantSanityTokens } from './steps/revoke-sanity-tokens';
 
 const TENANT_ID_FLAG = '--tenant-id=';
 const CONFIRM_FLAG = '--confirm=';
@@ -73,6 +74,7 @@ type TStep = {
 const STEPS: TStep[] = [
   { name: 'remove-domain', run: removeTenantDomain },
   { name: 'archive-sanity-project', run: archiveTenantSanityProject },
+  { name: 'revoke-sanity-tokens', run: revokeTenantSanityTokens },
   { name: 'clear-artifacts', run: clearTenantArtifacts },
   { name: 'archive-tenant', run: archiveTenantRow },
 ];

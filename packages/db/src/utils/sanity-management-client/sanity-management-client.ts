@@ -3,6 +3,11 @@
 // robot tokens minted under it — nothing further to clean up separately.
 const SANITY_MANAGEMENT_API_BASE = 'https://api.sanity.io/v2021-06-07';
 
+// Robot-token management lives on a separate, newer Access API surface —
+// see https://www.sanity.io/docs/content-lake/http-auth — distinct from the
+// `v2021-06-07` base every other endpoint in this file uses.
+const SANITY_ACCESS_API_BASE = 'https://api.sanity.io/v2026-07-10';
+
 export type TSanityDeleteResult = {
   outcome:
     | 'deleted'
@@ -142,4 +147,113 @@ export async function unarchiveSanityProject(input: {
   if (result === 'already-gone') return { outcome: 'already-gone' };
   if (result === 'already-in-state') return { outcome: 'already-active' };
   return { outcome: 'unarchived' };
+}
+
+async function sanityAccessRequest<T>(
+  path: string,
+  token: string,
+  init: RequestInit = {},
+): Promise<T> {
+  const response = await fetch(`${SANITY_ACCESS_API_BASE}${path}`, {
+    ...init,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      ...init.headers,
+    },
+  });
+
+  if (!response.ok) {
+    const body = await response.text().catch(() => '');
+    throw new Error(
+      `Sanity Access API ${init.method ?? 'GET'} ${path} failed: ${response.status} ${body}`,
+    );
+  }
+
+  const text = await response.text();
+  return (text ? JSON.parse(text) : undefined) as T;
+}
+
+export type TSanityRobotRole = 'viewer' | 'editor';
+
+export type TSanityRobotToken = { id: string; token: string };
+
+// Mints a project-scoped "robot" token via Sanity's Access API
+// (`POST /access/project/:projectId/robots`) — the same mechanism
+// `sanity tokens create` uses under the hood. `viewer` (read-only) and
+// `editor` (write) are the two roles ever minted, passed as a
+// single-element `roleNames` membership rather than the old flat `role`
+// field.
+export async function createSanityRobotToken(input: {
+  token: string;
+  projectId: string;
+  label: string;
+  role: TSanityRobotRole;
+}): Promise<TSanityRobotToken> {
+  const result = await sanityAccessRequest<{
+    id?: string;
+    tokenId?: string;
+    token?: string;
+    key?: string;
+  }>(`/access/project/${input.projectId}/robots`, input.token, {
+    method: 'POST',
+    body: JSON.stringify({
+      label: input.label,
+      memberships: [
+        {
+          resourceType: 'project',
+          resourceId: input.projectId,
+          roleNames: [input.role],
+        },
+      ],
+    }),
+  });
+
+  // The Access API docs don't fully spell out the response shape — falling
+  // back from `id` to `tokenId`, and from `token` to `key`, guards against
+  // either field name until a real provisioning run confirms which one the
+  // API actually sends.
+  const robotId = result.id ?? result.tokenId;
+  const mintedToken = result.token ?? result.key;
+  if (!robotId || !mintedToken) {
+    throw new Error(
+      `Sanity Access API: robot token creation for project "${input.projectId}" returned no id/token.`,
+    );
+  }
+
+  return { id: robotId, token: mintedToken };
+}
+
+export type TSanityRobotTokenSummary = {
+  id: string;
+  label: string | undefined;
+};
+
+// Accepts either a bare array or a `{ data: [...] }` envelope, and drops
+// any entry with no resolvable id.
+export async function listSanityRobotTokens(input: {
+  token: string;
+  projectId: string;
+}): Promise<TSanityRobotTokenSummary[]> {
+  const result = await sanityAccessRequest<
+    | { data?: Array<{ id?: string; tokenId?: string; label?: string }> }
+    | Array<{ id?: string; tokenId?: string; label?: string }>
+  >(`/access/project/${input.projectId}/robots`, input.token);
+
+  const items = Array.isArray(result) ? result : (result.data ?? []);
+  return items
+    .map((item) => ({ id: item.id ?? item.tokenId, label: item.label }))
+    .filter((item): item is TSanityRobotTokenSummary => item.id !== undefined);
+}
+
+export async function deleteSanityRobotToken(input: {
+  token: string;
+  projectId: string;
+  robotId: string;
+}): Promise<void> {
+  await sanityAccessRequest(
+    `/access/project/${input.projectId}/robots/${input.robotId}`,
+    input.token,
+    { method: 'DELETE' },
+  );
 }

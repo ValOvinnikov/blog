@@ -4,12 +4,12 @@
 // on this separate, versioned management surface.
 const SANITY_MANAGEMENT_API_BASE = 'https://api.sanity.io/v2021-06-07';
 
-// Robot-token management moved to a separate, newer Access API surface — see
+// The invite endpoints below share this Access API surface — see
 // https://www.sanity.io/docs/content-lake/http-auth — distinct from the
-// `v2021-06-07` base every other endpoint in this file still uses.
+// `v2021-06-07` base every other endpoint in this file still uses. Robot-token
+// minting/listing/revoking on the same surface lives in
+// `@blog/db/utils/sanity-management-client`, shared with `deprovision-tenant`.
 const SANITY_ACCESS_API_BASE = 'https://api.sanity.io/v2026-07-10';
-
-export type TSanityRobotRole = 'viewer' | 'editor';
 
 async function sanityManagementRequest<T>(
   path: string,
@@ -131,66 +131,6 @@ export async function listSanityCorsOrigins(input: {
   return sanityManagementRequest<TSanityCorsOrigin[]>(
     `/projects/${input.projectId}/cors`,
     input.token,
-  );
-}
-
-export type TSanityRobotToken = { id: string; token: string };
-
-// Mints a project-scoped "robot" token via Sanity's Access API
-// (`POST /access/project/:projectId/robots`) — the same mechanism
-// `sanity tokens create` uses under the hood. `viewer` (read-only, step 3's
-// persisted token) and `editor` (write, step 2's transient seed token) are
-// the two roles this workflow ever mints, passed as a single-element
-// `roleNames` membership rather than the old flat `role` field.
-export async function createSanityRobotToken(input: {
-  token: string;
-  projectId: string;
-  label: string;
-  role: TSanityRobotRole;
-}): Promise<TSanityRobotToken> {
-  const result = await sanityAccessRequest<{
-    id?: string;
-    tokenId?: string;
-    token?: string;
-    key?: string;
-  }>(`/access/project/${input.projectId}/robots`, input.token, {
-    method: 'POST',
-    body: JSON.stringify({
-      label: input.label,
-      memberships: [
-        {
-          resourceType: 'project',
-          resourceId: input.projectId,
-          roleNames: [input.role],
-        },
-      ],
-    }),
-  });
-
-  // The Access API docs don't fully spell out the response shape — falling
-  // back from `id` to `tokenId`, and from `token` to `key`, guards against
-  // either field name until a real provisioning run confirms which one the
-  // API actually sends.
-  const robotId = result.id ?? result.tokenId;
-  const mintedToken = result.token ?? result.key;
-  if (!robotId || !mintedToken) {
-    throw new Error(
-      `Sanity Access API: robot token creation for project "${input.projectId}" returned no id/token.`,
-    );
-  }
-
-  return { id: robotId, token: mintedToken };
-}
-
-export async function deleteSanityRobotToken(input: {
-  token: string;
-  projectId: string;
-  robotId: string;
-}): Promise<void> {
-  await sanityAccessRequest(
-    `/access/project/${input.projectId}/robots/${input.robotId}`,
-    input.token,
-    { method: 'DELETE' },
   );
 }
 

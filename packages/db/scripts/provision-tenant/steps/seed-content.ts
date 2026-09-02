@@ -1,19 +1,19 @@
 import { setTenantSanityWriteTokenAndSeededAt } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import {
+  createSanityRobotToken,
+  deleteSanityRobotToken,
+} from '@blog/db/utils/sanity-management-client/sanity-management-client';
+import { SANITY_WRITE_TOKEN_LABEL } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
 import { createClient } from '@sanity/client';
 
 import type { TProvisionEnv } from '../lib/env';
 import { placeholderPngBuffer } from '../lib/placeholder-image';
 import { retryWithBackoff } from '../lib/retry-with-backoff';
-import {
-  createSanityRobotToken,
-  deleteSanityRobotToken,
-} from '../lib/sanity-management-client';
 
 import { buildStarterDocuments } from './starter-content';
 
 const SANITY_API_VERSION = '2024-01-01';
-const SEED_TOKEN_LABEL = 'web-write (provisioned)';
 
 // Bounded to ride out a freshly-minted token's grant-propagation delay, not to mask a genuine misconfiguration.
 export const SEED_TRANSACTION_MAX_ATTEMPTS = 5;
@@ -67,7 +67,7 @@ export async function seedTenantContent(
   const writeToken = await deps.mintWriteToken({
     token: env.sanityManagementToken,
     projectId: tenant.sanityProjectId,
-    label: SEED_TOKEN_LABEL,
+    label: SANITY_WRITE_TOKEN_LABEL,
     role: 'editor',
   });
 
