@@ -13,6 +13,9 @@ import { runSteps } from './run';
 const { removeTenantDomainMock } = vi.hoisted(() => ({
   removeTenantDomainMock: vi.fn(),
 }));
+const { revokeTenantSanityTokensMock } = vi.hoisted(() => ({
+  revokeTenantSanityTokensMock: vi.fn(),
+}));
 const { clearTenantArtifactsMock } = vi.hoisted(() => ({
   clearTenantArtifactsMock: vi.fn(),
 }));
@@ -22,6 +25,9 @@ const { archiveTenantRowMock } = vi.hoisted(() => ({
 
 vi.mock('./steps/remove-domain', () => ({
   removeTenantDomain: removeTenantDomainMock,
+}));
+vi.mock('./steps/revoke-sanity-tokens', () => ({
+  revokeTenantSanityTokens: revokeTenantSanityTokensMock,
 }));
 vi.mock('./steps/clear-artifacts', () => ({
   clearTenantArtifacts: clearTenantArtifactsMock,
@@ -67,6 +73,7 @@ beforeEach(() => {
       new Response(JSON.stringify({ isDisabledByUser: true }), { status: 200 }),
     );
   removeTenantDomainMock.mockReset().mockResolvedValue(undefined);
+  revokeTenantSanityTokensMock.mockReset().mockResolvedValue(undefined);
   clearTenantArtifactsMock.mockReset().mockResolvedValue(undefined);
   archiveTenantRowMock.mockReset().mockResolvedValue(undefined);
 });

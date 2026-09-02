@@ -1,10 +1,9 @@
 import { setTenantSanityToken } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { createSanityRobotToken } from '@blog/db/utils/sanity-management-client/sanity-management-client';
+import { SANITY_READ_TOKEN_LABEL } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
 
 import type { TProvisionEnv } from '../lib/env';
-import { createSanityRobotToken } from '../lib/sanity-management-client';
-
-const READ_TOKEN_LABEL = 'web-read (provisioned)';
 
 export type TPersistSanityTokenDeps = {
   mintReadToken: typeof createSanityRobotToken;
@@ -44,7 +43,7 @@ export async function persistTenantSanityToken(
   const readToken = await deps.mintReadToken({
     token: env.sanityManagementToken,
     projectId: tenant.sanityProjectId,
-    label: READ_TOKEN_LABEL,
+    label: SANITY_READ_TOKEN_LABEL,
     role: 'viewer',
   });
 

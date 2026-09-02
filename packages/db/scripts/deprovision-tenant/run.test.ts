@@ -8,6 +8,9 @@ const { removeTenantDomainMock } = vi.hoisted(() => ({
 const { archiveTenantSanityProjectMock } = vi.hoisted(() => ({
   archiveTenantSanityProjectMock: vi.fn(),
 }));
+const { revokeTenantSanityTokensMock } = vi.hoisted(() => ({
+  revokeTenantSanityTokensMock: vi.fn(),
+}));
 const { clearTenantArtifactsMock } = vi.hoisted(() => ({
   clearTenantArtifactsMock: vi.fn(),
 }));
@@ -20,6 +23,9 @@ vi.mock('./steps/remove-domain', () => ({
 }));
 vi.mock('./steps/archive-sanity-project', () => ({
   archiveTenantSanityProject: archiveTenantSanityProjectMock,
+}));
+vi.mock('./steps/revoke-sanity-tokens', () => ({
+  revokeTenantSanityTokens: revokeTenantSanityTokensMock,
 }));
 vi.mock('./steps/clear-artifacts', () => ({
   clearTenantArtifacts: clearTenantArtifactsMock,
@@ -42,6 +48,7 @@ const env = {
 beforeEach(() => {
   removeTenantDomainMock.mockReset().mockResolvedValue(undefined);
   archiveTenantSanityProjectMock.mockReset().mockResolvedValue(undefined);
+  revokeTenantSanityTokensMock.mockReset().mockResolvedValue(undefined);
   clearTenantArtifactsMock.mockReset().mockResolvedValue(undefined);
   archiveTenantRowMock.mockReset().mockResolvedValue(undefined);
 });
@@ -53,8 +60,23 @@ describe(runSteps, () => {
     expect(result).toEqual({ ok: true });
     expect(removeTenantDomainMock).toHaveBeenCalledTimes(1);
     expect(archiveTenantSanityProjectMock).toHaveBeenCalledTimes(1);
+    expect(revokeTenantSanityTokensMock).toHaveBeenCalledTimes(1);
     expect(clearTenantArtifactsMock).toHaveBeenCalledTimes(1);
     expect(archiveTenantRowMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('runs revoke-sanity-tokens before clear-artifacts', async () => {
+    const callOrder: string[] = [];
+    revokeTenantSanityTokensMock.mockImplementation(async () => {
+      callOrder.push('revoke-sanity-tokens');
+    });
+    clearTenantArtifactsMock.mockImplementation(async () => {
+      callOrder.push('clear-artifacts');
+    });
+
+    await runSteps(baseTenant, env);
+
+    expect(callOrder).toEqual(['revoke-sanity-tokens', 'clear-artifacts']);
   });
 
   it('stops at the first failing step and never runs later steps', async () => {
@@ -65,6 +87,7 @@ describe(runSteps, () => {
     expect(result).toEqual({ ok: false });
     expect(removeTenantDomainMock).toHaveBeenCalledTimes(1);
     expect(archiveTenantSanityProjectMock).toHaveBeenCalledTimes(1);
+    expect(revokeTenantSanityTokensMock).not.toHaveBeenCalled();
     expect(clearTenantArtifactsMock).not.toHaveBeenCalled();
     expect(archiveTenantRowMock).not.toHaveBeenCalled();
   });
@@ -75,6 +98,7 @@ describe(runSteps, () => {
     for (const mock of [
       removeTenantDomainMock,
       archiveTenantSanityProjectMock,
+      revokeTenantSanityTokensMock,
       clearTenantArtifactsMock,
       archiveTenantRowMock,
     ]) {
@@ -93,6 +117,7 @@ describe(runDeprovisioning, () => {
 
     expect(removeTenantDomainMock).not.toHaveBeenCalled();
     expect(archiveTenantSanityProjectMock).not.toHaveBeenCalled();
+    expect(revokeTenantSanityTokensMock).not.toHaveBeenCalled();
     expect(clearTenantArtifactsMock).not.toHaveBeenCalled();
     expect(archiveTenantRowMock).not.toHaveBeenCalled();
   });
