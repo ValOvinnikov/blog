@@ -6,6 +6,7 @@ export * from './capability';
 export * from './cta';
 export * from './depth';
 export * from './error';
+export * from './finding';
 export * from './icon';
 export * from './image-layout';
 export * from './language';
