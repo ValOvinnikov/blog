@@ -84,7 +84,6 @@ export const ConfirmDialog = ({
           >
             <TextInput
               id={confirmFieldId}
-              ariaLabel={confirmLabel}
               value={confirmValue}
               onChange={onConfirmValueChange}
             />

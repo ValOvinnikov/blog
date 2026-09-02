@@ -68,6 +68,17 @@ describe(ConfirmDialog, () => {
     expect(screen.getByRole('button', { name: 'Confirm' })).toBeEnabled();
   });
 
+  it('names the confirm field from the FormField label, with no redundant aria-label', async () => {
+    const user = userEvent.setup();
+    render(<ControlledConfirmDialog />);
+    await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+
+    const input = screen.getByRole('textbox', {
+      name: 'Type "acme" to confirm',
+    });
+    expect(input).not.toHaveAttribute('aria-label');
+  });
+
   it('calls onConfirm when the confirm button is clicked', async () => {
     const onConfirm = vi.fn();
     const user = userEvent.setup();
