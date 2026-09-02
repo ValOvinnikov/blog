@@ -123,6 +123,16 @@ describe('proxy tenant resolution', () => {
     expect(intlMiddlewareMock).not.toHaveBeenCalled();
   });
 
+  it('404s an archived or unprovisioned tenant domain in production the same as an unmatched host — resolveTenantId refuses both identically', async () => {
+    isProductionEnvironmentMock.mockReturnValue(true);
+    resolveTenantIdMock.mockResolvedValue(undefined);
+
+    const response = await proxy(buildRequest('archived-tenant.example.com'));
+
+    expect(response.status).toBe(404);
+    expect(intlMiddlewareMock).not.toHaveBeenCalled();
+  });
+
   it('strips a client-supplied x-tenant-id header before forwarding when resolution succeeds', async () => {
     resolveTenantIdMock.mockResolvedValue('tenant-1');
 
