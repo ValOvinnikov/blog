@@ -8,12 +8,11 @@ import { cache } from 'react';
 import { getRequestTenantId } from './get-request-tenant-id';
 
 /**
- * Resolves the current request's tenant Sanity credentials, falling back to
- * `getPlatformSanityContext()` when no request-scoped tenant is resolved (or
- * the resolved tenant has no token set yet) — the deliberate single-tenant
- * dev/preview fallback. `proxy.ts` 404s an unmatched host in production
- * before any route reaches this, so that fallback only ever engages outside
- * production.
+ * Resolves the current request's tenant Sanity credentials. An unmatched
+ * host falls back to `getPlatformSanityContext()` only outside production —
+ * `proxy.ts` 404s an unmatched host in production before any route reaches
+ * this. A matched tenant with no Sanity credentials set yet falls back to
+ * `getPlatformSanityContext()` unconditionally, including in production.
  *
  * Wrapped in React's `cache()`, not `unstable_cache` — this reads a
  * decrypted Sanity token, which must stay request-scoped, and the `cache()`

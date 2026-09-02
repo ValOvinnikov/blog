@@ -21,9 +21,10 @@ export type THostTenantSanityContext =
  * header `getTenantSanityContext` reads. `isResolvable: false` means
  * production saw a host matching no tenant — the caller must render as
  * though it has no content, never fall back to the platform's own project.
- * Outside production, an unmatched host (or a matched tenant with no token
- * set yet) resolves `tenant` to `getPlatformSanityContext()` — the
- * deliberate single-tenant dev/preview fallback.
+ * Outside production, an unmatched host resolves `tenant` to
+ * `getPlatformSanityContext()` — the deliberate single-tenant dev/preview
+ * fallback. A matched tenant with no Sanity credentials set yet falls back
+ * to `getPlatformSanityContext()` unconditionally, including in production.
  *
  * Wrapped in React's `cache()`, not `unstable_cache` — same reasoning as
  * `getTenantSanityContext`: the resolved token is request-scoped-only, and
