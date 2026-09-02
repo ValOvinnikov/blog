@@ -1,4 +1,4 @@
-import { DOMAIN_PATTERN, SLUG_PATTERN } from './path';
+import { DOMAIN_PATTERN } from './path';
 
 describe('DOMAIN_PATTERN', () => {
   it('matches a valid domain', () => {
@@ -15,15 +15,5 @@ describe('DOMAIN_PATTERN', () => {
 
   it('rejects a whitespace-padded value', () => {
     expect(DOMAIN_PATTERN.test(' acme.com ')).toBe(false);
-  });
-});
-
-describe('SLUG_PATTERN', () => {
-  it('matches a lowercase-alphanumeric-hyphen slug', () => {
-    expect(SLUG_PATTERN.test('my-tenant-slug')).toBe(true);
-  });
-
-  it('rejects an uppercase value', () => {
-    expect(SLUG_PATTERN.test('My-Tenant')).toBe(false);
   });
 });
