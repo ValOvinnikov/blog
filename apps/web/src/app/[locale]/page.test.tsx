@@ -4,8 +4,9 @@ import { notFound } from 'next/navigation';
 
 import HomePage, { generateMetadata } from './page';
 
-const { getHomePageMock } = vi.hoisted(() => ({
+const { getHomePageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
   getHomePageMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -14,6 +15,10 @@ vi.mock('@blog/service', () => ({
       home: { v1: { getHomePage: getHomePageMock } },
     },
   },
+}));
+
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
 }));
 
 vi.mock('@web/modules/hero/hero-module', () => ({
@@ -35,6 +40,8 @@ const setup = customRenderAsync(HomePage, {
 describe('HomePage', () => {
   beforeEach(() => {
     getHomePageMock.mockReset();
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(undefined);
   });
 
   it('calls notFound() and logs when the fetch fails', async () => {
@@ -80,11 +87,30 @@ describe('HomePage', () => {
       '1 modules',
     );
   });
+
+  it('forwards the resolved tenant Sanity context to getHomePage', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getHomePageMock.mockResolvedValue({
+      ok: true,
+      data: { hero: { id: 'hero-1' }, modules: [], seo: makeSeo() },
+    });
+
+    await setup();
+
+    expect(getHomePageMock).toHaveBeenCalledWith(tenant);
+  });
 });
 
 describe('generateMetadata', () => {
   beforeEach(() => {
     getHomePageMock.mockReset();
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(undefined);
   });
 
   it('returns empty metadata and logs when the fetch fails', async () => {

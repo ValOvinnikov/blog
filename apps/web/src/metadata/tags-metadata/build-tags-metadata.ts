@@ -1,11 +1,13 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 
 export const buildTagsMetadata = async (): Promise<Metadata> => {
-  const result = await service.pages.tagIndex.v1.getIndexPage();
+  const tenant = await getTenantSanityContext();
+  const result = await service.pages.tagIndex.v1.getIndexPage(tenant);
 
   if (!result.ok) {
     logger.error('tags_metadata.fetch_failed', { error: result.error });

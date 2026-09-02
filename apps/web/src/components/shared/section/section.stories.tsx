@@ -8,6 +8,12 @@ const meta = {
   component: Section,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
+  argTypes: {
+    brandVariant: {
+      control: 'select',
+      options: Object.values(BRAND_VARIANT),
+    },
+  },
   args: {
     titleId: 'section-story-title',
     layout: {

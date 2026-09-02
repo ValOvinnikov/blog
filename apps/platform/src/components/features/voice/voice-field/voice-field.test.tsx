@@ -1,23 +1,25 @@
+import { voiceFieldInputId } from '@platform/utils/voice-fields/voice-fields';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { VoiceField } from './voice-field';
 
 describe(VoiceField, () => {
-  it('shows the inherited value as a placeholder, not as the field value', () => {
+  it('shows the inherited value as a placeholder, not as the field value, and exposes the shared input id', () => {
     render(
       <VoiceField
         fieldKey="terminalPromptHost"
-        label="Terminal Prompt Host"
         value=""
         onChange={vi.fn()}
         placeholder="~$"
       />,
     );
 
-    const input = screen.getByRole('textbox', {
-      name: 'Terminal Prompt Host',
-    });
+    const input = screen.getByRole('textbox');
+    expect(input).toHaveAttribute(
+      'id',
+      voiceFieldInputId('terminalPromptHost'),
+    );
     expect(input).toHaveAttribute('placeholder', '~$');
     expect(input).toHaveValue('');
   });
@@ -26,27 +28,17 @@ describe(VoiceField, () => {
     const { rerender } = render(
       <VoiceField
         fieldKey="notFoundDescription"
-        label="Not Found Description"
         value=""
         onChange={vi.fn()}
         isMultiline={true}
       />,
     );
-    expect(
-      screen.getByRole('textbox', { name: 'Not Found Description' }).tagName,
-    ).toBe('TEXTAREA');
+    expect(screen.getByRole('textbox').tagName).toBe('TEXTAREA');
 
     rerender(
-      <VoiceField
-        fieldKey="terminalPromptHost"
-        label="Terminal Prompt Host"
-        value=""
-        onChange={vi.fn()}
-      />,
+      <VoiceField fieldKey="terminalPromptHost" value="" onChange={vi.fn()} />,
     );
-    expect(
-      screen.getByRole('textbox', { name: 'Terminal Prompt Host' }).tagName,
-    ).toBe('INPUT');
+    expect(screen.getByRole('textbox').tagName).toBe('INPUT');
   });
 
   it('makes the field read-only, not disabled, when isReadOnly is true', () => {
@@ -71,16 +63,13 @@ describe(VoiceField, () => {
     render(
       <VoiceField
         fieldKey="terminalPromptHost"
-        label="Terminal Prompt Host"
         value="custom"
         onChange={onChange}
         placeholder="~$"
       />,
     );
 
-    const input = screen.getByRole('textbox', {
-      name: 'Terminal Prompt Host',
-    });
+    const input = screen.getByRole('textbox');
     await user.clear(input);
 
     expect(onChange).toHaveBeenLastCalledWith('');

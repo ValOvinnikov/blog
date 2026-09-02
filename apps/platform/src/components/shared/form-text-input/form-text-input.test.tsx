@@ -14,7 +14,9 @@ describe(FormTextInput, () => {
       />,
     );
 
-    expect(screen.getByLabelText('Tenant name')).toBeVisible();
+    const input = screen.getByRole('textbox', { name: 'Tenant name' });
+    expect(input).toBeVisible();
+    expect(input).not.toHaveAttribute('aria-label');
   });
 
   it('renders the hint node and the error message', () => {

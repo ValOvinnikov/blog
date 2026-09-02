@@ -3,8 +3,9 @@ import { customRenderAsync } from '@web/testing/custom-render';
 
 import { NewsletterModule } from './newsletter-module';
 
-const { getNewsletterMock } = vi.hoisted(() => ({
+const { getNewsletterMock, getTenantSanityContextMock } = vi.hoisted(() => ({
   getNewsletterMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -13,6 +14,10 @@ vi.mock('@blog/service', () => ({
       newsletter: { v1: { getNewsletter: getNewsletterMock } },
     },
   },
+}));
+
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
 }));
 
 vi.mock('@web/server/settings-features/is-capability-enabled', () => ({
@@ -39,6 +44,8 @@ describe(NewsletterModule, () => {
     getNewsletterMock.mockReset();
     vi.mocked(isCapabilityEnabled).mockReset();
     vi.mocked(isCapabilityEnabled).mockResolvedValue(true);
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(undefined);
   });
 
   it('renders nothing when the fetch fails', async () => {
@@ -50,6 +57,23 @@ describe(NewsletterModule, () => {
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it('forwards the resolved tenant Sanity context to getNewsletter', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getNewsletterMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
+
+    await setup();
+
+    expect(getNewsletterMock).toHaveBeenCalledWith('newsletter-1', tenant);
   });
 
   it('renders nothing, without fetching the module, when the NEWSLETTER capability is not entitled/enabled', async () => {

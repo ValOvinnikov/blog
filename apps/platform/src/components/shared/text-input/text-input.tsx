@@ -8,7 +8,7 @@ import {
 export type TTextInputProps = {
   value: string;
   onChange: (value: string) => void;
-  ariaLabel: string;
+  ariaLabel?: string;
   id?: string;
   type?: string;
   placeholder?: string;

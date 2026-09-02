@@ -9,6 +9,12 @@ const meta = {
   title: 'Modules/HeroModule',
   component: HeroModuleView,
   tags: ['autodocs'],
+  argTypes: {
+    brandVariant: {
+      control: 'select',
+      options: Object.values(BRAND_VARIANT),
+    },
+  },
   args: {
     id: 'hero-1',
     brandVariant: BRAND_VARIANT.BRAND_PRIMARY,

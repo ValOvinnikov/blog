@@ -1,6 +1,7 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
@@ -22,8 +23,9 @@ export const buildTagMetadata = async (
   slug: string,
   pageNumber?: number,
 ): Promise<Metadata> => {
+  const tenant = await getTenantSanityContext();
   const [result, t] = await Promise.all([
-    service.pages.tag.v1.getTagPage(slug),
+    service.pages.tag.v1.getTagPage(slug, tenant),
     getTranslations('pagination'),
   ]);
 

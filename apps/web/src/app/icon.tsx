@@ -1,4 +1,5 @@
 import { buildImageUrl, service, type TRawImage } from '@blog/service';
+import { getHostTenantSanityContext } from '@web/server/tenant/get-host-tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 
 export const contentType = 'image/svg+xml';
@@ -60,7 +61,14 @@ const buildFallbackResponse = (): Response => {
  * break the page it's attached to.
  */
 export default async function Icon() {
-  const result = await service.global.siteSettings.v1.getSiteSettings();
+  const hostTenant = await getHostTenantSanityContext();
+  if (!hostTenant.isResolvable) {
+    return buildFallbackResponse();
+  }
+
+  const result = await service.global.siteSettings.v1.getSiteSettings(
+    hostTenant.tenant,
+  );
 
   if (!result.ok) {
     logger.error('icon.site_settings_fetch_failed', { error: result.error });

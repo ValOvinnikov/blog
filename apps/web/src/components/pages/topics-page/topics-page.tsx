@@ -2,6 +2,7 @@ import { routes, TAXONOMY_KIND } from '@blog/config';
 import { service } from '@blog/service';
 import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
@@ -16,8 +17,9 @@ import { TopicsPageView } from './topics-page-view';
  * `TopicsPageView`.
  */
 export const TopicsPage = async () => {
+  const tenant = await getTenantSanityContext();
   const [result, breadcrumbsT, t] = await Promise.all([
-    service.pages.topicIndex.v1.getIndexPage(),
+    service.pages.topicIndex.v1.getIndexPage(tenant),
     getTranslations('breadcrumbs'),
     getTranslations('topicsPage'),
   ]);

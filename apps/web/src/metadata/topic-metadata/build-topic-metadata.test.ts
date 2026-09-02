@@ -2,8 +2,9 @@ import { makeSeo } from '@web/testing/shared/seo/fixtures';
 
 import { buildTopicMetadata } from './build-topic-metadata';
 
-const { getTopicPageMock } = vi.hoisted(() => ({
+const { getTopicPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
   getTopicPageMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -12,6 +13,10 @@ vi.mock('@blog/service', () => ({
       topic: { v1: { getTopicPage: getTopicPageMock } },
     },
   },
+}));
+
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
 }));
 
 const seo = makeSeo({
@@ -23,6 +28,28 @@ const seo = makeSeo({
 });
 
 describe('buildTopicMetadata', () => {
+  beforeEach(() => {
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(undefined);
+  });
+
+  it('forwards the resolved tenant Sanity context to getTopicPage', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: { topic: {}, modules: [], seo, postListId: 'post-list-1' },
+    });
+
+    await buildTopicMetadata('engineering');
+
+    expect(getTopicPageMock).toHaveBeenCalledWith('engineering', tenant);
+  });
+
   it('builds page-1 metadata from the resolved seo, self-canonical to /topics/[slug]', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
@@ -38,7 +65,7 @@ describe('buildTopicMetadata', () => {
     expect(metadata.openGraph?.description).toBe(
       'Posts about building things OG.',
     );
-    expect(getTopicPageMock).toHaveBeenCalledWith('engineering');
+    expect(getTopicPageMock).toHaveBeenCalledWith('engineering', undefined);
   });
 
   it('returns empty metadata when the topic fetch fails', async () => {
@@ -64,7 +91,7 @@ describe('buildTopicMetadata', () => {
     expect(metadata.openGraph?.title).toBe('Engineering OG – Page 2');
     expect(metadata.alternates?.canonical).toBe('/topics/engineering/page/2');
     expect(metadata.alternates?.canonical).not.toBe('/topics/engineering');
-    expect(getTopicPageMock).toHaveBeenCalledWith('engineering');
+    expect(getTopicPageMock).toHaveBeenCalledWith('engineering', undefined);
   });
 
   it('returns empty metadata for page N when the topic fetch fails', async () => {

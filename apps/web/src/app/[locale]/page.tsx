@@ -4,6 +4,7 @@ import { HomePageTemplate } from '@web/components/page-templates/home-page-templ
 import { toMetadata } from '@web/metadata/to-metadata';
 import { HeroModule } from '@web/modules/hero/hero-module';
 import { ModuleRenderer } from '@web/modules/module-renderer';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
@@ -14,7 +15,8 @@ type TProps = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const result = await service.pages.home.v1.getHomePage();
+  const tenant = await getTenantSanityContext();
+  const result = await service.pages.home.v1.getHomePage(tenant);
 
   if (!result.ok) {
     logger.error('home_page.metadata_fetch_failed', { error: result.error });
@@ -36,7 +38,8 @@ export default async function HomePage({ params }: TProps) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const result = await service.pages.home.v1.getHomePage();
+  const tenant = await getTenantSanityContext();
+  const result = await service.pages.home.v1.getHomePage(tenant);
   const { hero, modules } = guardPageLoaderResult(
     result,
     'home_page.fetch_failed',

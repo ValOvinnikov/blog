@@ -58,6 +58,7 @@ const buildTenant = (plan: 'FREE' | 'GROWTH'): TTenant => ({
   sanityProjectId: 'proj-1',
   sanityDataset: 'production',
   sanityReadTokenEncrypted: null,
+  sanityWriteTokenEncrypted: null,
   locale: 'en',
   plan,
   status: 'ACTIVE',

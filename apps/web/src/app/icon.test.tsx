@@ -7,9 +7,12 @@
 // this file overrides to `node` to let that real transform run unmocked.
 import { buildImageUrl, type TRawImage } from '@blog/service';
 
-const { getSiteSettingsMock } = vi.hoisted(() => ({
-  getSiteSettingsMock: vi.fn(),
-}));
+const { getSiteSettingsMock, getHostTenantSanityContextMock } = vi.hoisted(
+  () => ({
+    getSiteSettingsMock: vi.fn(),
+    getHostTenantSanityContextMock: vi.fn(),
+  }),
+);
 
 vi.mock('@blog/service', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@blog/service')>();
@@ -22,6 +25,10 @@ vi.mock('@blog/service', async (importOriginal) => {
     },
   };
 });
+
+vi.mock('@web/server/tenant/get-host-tenant-sanity-context', () => ({
+  getHostTenantSanityContext: getHostTenantSanityContextMock,
+}));
 
 const logoAsset: TRawImage = {
   _type: 'imageWithAlt',
@@ -46,6 +53,11 @@ const EXPECTED_ICON_URL = buildImageUrl(logoAsset, {
 describe('icon', () => {
   beforeEach(() => {
     getSiteSettingsMock.mockReset();
+    getHostTenantSanityContextMock.mockReset();
+    getHostTenantSanityContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant: undefined,
+    });
   });
 
   afterEach(() => {
@@ -145,5 +157,36 @@ describe('icon', () => {
       expect.stringContaining('icon'),
     );
     consoleErrorSpy.mockRestore();
+  });
+
+  it('forwards the resolved tenant Sanity context to getSiteSettings', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getHostTenantSanityContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant,
+    });
+    getSiteSettingsMock.mockResolvedValue({
+      ok: true,
+      data: { brand: { logoAsset: undefined } },
+    });
+
+    const { default: Icon } = await import('./icon');
+    await Icon();
+
+    expect(getSiteSettingsMock).toHaveBeenCalledWith(tenant);
+  });
+
+  it('falls back to the static mark without calling site settings when the host is unresolvable', async () => {
+    getHostTenantSanityContextMock.mockResolvedValue({ isResolvable: false });
+
+    const { default: Icon } = await import('./icon');
+    const response = await Icon();
+
+    expect(await response.text()).toContain(FALLBACK_CONTENT);
+    expect(getSiteSettingsMock).not.toHaveBeenCalled();
   });
 });

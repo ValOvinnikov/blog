@@ -1,10 +1,10 @@
 import { VoiceField } from '@platform/components/features/voice/voice-field';
 import { Card } from '@platform/components/shared/card';
-import { Heading } from '@platform/components/shared/heading';
-import type {
-  TVoiceField,
-  TVoiceOverrideKey,
-  TVoiceOverrides,
+import {
+  voiceFieldInputId,
+  type TVoiceField,
+  type TVoiceOverrideKey,
+  type TVoiceOverrides,
 } from '@platform/utils/voice-fields/voice-fields';
 import { useTranslations } from 'next-intl';
 
@@ -47,12 +47,17 @@ export const VoiceFieldGroup = ({
       <Card.Body className={body()}>
         {fields.map((field) => (
           <div key={field.key} className={vfield()}>
-            <Heading level={3} size="fieldLabel" className={vfieldLabel()}>
-              {field.label} <code className={vfieldKey()}>{field.key}</code>
-            </Heading>
+            <label
+              htmlFor={voiceFieldInputId(field.key)}
+              className={vfieldLabel()}
+            >
+              {field.label}{' '}
+              <code aria-hidden="true" className={vfieldKey()}>
+                {field.key}
+              </code>
+            </label>
             <VoiceField
               fieldKey={field.key}
-              label={field.label}
               value={values[field.key]}
               onChange={(value) => onFieldChange(field.key, value)}
               placeholder={placeholders[field.key]}

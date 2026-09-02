@@ -1,4 +1,5 @@
 import { service } from '@blog/service';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { getTranslations } from 'next-intl/server';
 
@@ -14,8 +15,9 @@ export interface IPostLatestModuleProps {
  * never paginated) and hands it to the shared `PostListModuleView`.
  */
 export const PostLatestModule = async ({ id }: IPostLatestModuleProps) => {
+  const tenant = await getTenantSanityContext();
   const [result, t] = await Promise.all([
-    service.modules.postLatest.v1.getPostLatest(id),
+    service.modules.postLatest.v1.getPostLatest(id, tenant),
     getTranslations('postLatestModule'),
   ]);
 

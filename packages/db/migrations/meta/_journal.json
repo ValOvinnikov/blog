@@ -134,6 +134,13 @@
       "when": 1787644451519,
       "tag": "0018_rename_category_empty_to_topic_empty_voice_override",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1788305375561,
+      "tag": "0019_quiet_paibok",
+      "breakpoints": true
     }
   ]
 }

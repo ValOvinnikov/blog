@@ -157,11 +157,27 @@ is `viewer` because `SANITY_MANAGEMENT_TOKEN` lacks permission to grant
 raises it by hand in Sanity's Manage UI once the owner accepts. Invite
 failures are logged and do not fail the step — a membership problem must not
 cost the project, dataset, seeded content and webhook alongside it.
+
 Enforced by a dedicated `configs/eslint/db.js` override scoped to that
 directory; every other path in
 `@blog/db` keeps the blanket prohibition.
 Dependency-graph enforcement details and SVG/type-flow wiring:
 [`docs/context/frontend-conventions.md`](./docs/context/frontend-conventions.md).
+
+Provisioning also mints the tenant's two durable Sanity credentials, both
+stored encrypted on the `tenants` row under `TENANT_TOKEN_ENCRYPTION_KEY`
+and both read back only through `@blog/db` query helpers, never returned to
+a client component: a `viewer`-scoped **read** token
+(`sanityReadTokenEncrypted`), which the tenant-aware read path resolves via
+`getTenantSanityCredentials`; and an `editor`-scoped **write** token
+(`sanityWriteTokenEncrypted`), resolved via
+`getTenantSanityWriteCredentials`. The write token is the same one minted to
+seed the dataset — it is persisted on a successful seed rather than revoked,
+because a tenant's own project is otherwise unwritable from the app tier,
+and minting one per request would require an admin-scoped management token
+inside `apps/web`. It is revoked on any seeding failure, so a failed run
+leaves nothing live. This is deliberately a higher-privilege, longer-lived
+secret than the read token.
 
 ² `@blog/db`'s "never log" rule has one scoped exception, decided on
 #2120: `packages/db/scripts/provision-tenant/`,
@@ -315,7 +331,7 @@ its `Host` header against `@blog/db`'s `tenant_domains`
 (`resolveTenantId()`, `apps/web/src/server/tenant/`), falling back to the
 sole `tenants` row outside production (`isProductionEnvironment()` — never
 `NODE_ENV`, which is `production` on every Vercel build including the live
-`blog-web-dev` deployment) and 404ing on an unmatched host in production; the
+`web-dev` deployment) and 404ing on an unmatched host in production; the
 resolved `tenantId` is threaded to Server Components/Actions via the
 `x-tenant-id` request header (unconditionally cleared before the conditional
 set, so a client-supplied value can never survive an unresolved lookup),
@@ -549,7 +565,7 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
 | Sanity project           | separate dev project (id via env) | separate prod project (id via env) |
 | Sanity dataset           | `development`                     | `production`                       |
 | Neon branch (`@blog/db`) | `development`                     | `production`                       |
-| Vercel project (web)     | `blog-web-dev`                    | `blog-web-prod`                    |
+| Vercel project (web)     | `web-dev`                         | `web-prod`                         |
 | Vercel project (admin)   | `platform-dev`                    | `platform-prod`                    |
 | Admin hostname           | `admin-dev.{your-hosting}`        | `admin.{your-hosting}`             |
 | Deploy trigger           | push/merge to `main`              | push git tag `v*`                  |
@@ -571,10 +587,11 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   `main` on 2026-08-25) backs development. Before that date only `main`
   existed and both environments read it. `deploy-production.yml`'s
   `migrate-db` job reads the `production` Environment's own
-  `DATABASE_URL_UNPOOLED` (`main`); the tenant-provisioning workflows
-  (`provision-tenant.yml`/`deprovision-tenant.yml`) read their own
-  `TENANT_REGISTRY_DATABASE_URL_DEV`/`_PROD` secrets instead (#2056, merged
-  2026-08-25) — before that split, both purposes shared one secret, and
+  `DATABASE_URL_UNPOOLED` (`main`); the three tenant lifecycle workflows
+  (`provision-tenant.yml`/`deprovision-tenant.yml`/`recheck-tenant-owners.yml`)
+  read their own Environment's `TENANT_REGISTRY_DATABASE_URL` secret instead
+  (#2056, merged 2026-08-25) — before that split, both purposes shared one
+  secret, and
   pointing it at `development` for tenant provisioning had silently
   repointed production migrations at `development` too. The dev `migrate-db`
   job now guards against the same class of mistake for its own secret: it
@@ -585,7 +602,7 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   (#2264): it fails if its own resolved host does **not** match the same
   repo Variable, so a mis-set production secret can no longer migrate the
   wrong Neon branch — or nothing at all — while reporting success. Whether
-  `blog-web-dev`'s Vercel `DATABASE_URL` scope is correct is still open (#2058).
+  `web-dev`'s Vercel `DATABASE_URL` scope is correct is still open (#2058).
   See `docs/DEPLOY.md`'s Neon Postgres section for the full state and open
   items.
 - **Each environment is a separate Sanity project** with its own env-driven,
@@ -598,7 +615,7 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   deploy job of its own: it ships as the `@blog/studio` package and is
   mounted by the admin panel, which is what lets one Studio serve every
   tenant. Neither `*.sanity.studio` hosting nor `sanity deploy` is used.
-- `@blog/ui`'s Storybook is hosted separately (`blog-storybook` Vercel
+- `@blog/ui`'s Storybook is hosted separately (`ui-library` Vercel
   project, `ui-library.{your-hosting}`) via Vercel's Git integration with PR
   previews — a deliberate exception to the CI-gated, no-preview pattern
   above, since it carries no Sanity data or credentials. `apps/web`'s own

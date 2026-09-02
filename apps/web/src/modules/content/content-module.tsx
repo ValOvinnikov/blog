@@ -1,4 +1,5 @@
 import { getSanityImageBaseUrl, service } from '@blog/service';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 
 import { ContentModuleView } from './content-module-view';
 
@@ -12,7 +13,8 @@ export interface IContentModuleProps {
  * `ContentModuleView`.
  */
 export const ContentModule = async ({ id }: IContentModuleProps) => {
-  const result = await service.modules.content.v1.getContent(id);
+  const tenant = await getTenantSanityContext();
+  const result = await service.modules.content.v1.getContent(id, tenant);
 
   if (!result.ok) return null;
 

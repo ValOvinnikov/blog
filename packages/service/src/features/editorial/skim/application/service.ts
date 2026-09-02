@@ -11,8 +11,9 @@ export function createSkimService() {
         (postId: string, tenant?: TTenantSanityContext) =>
           getPublishedPostBody(postId, tenant),
       ),
-      saveSkimDraft: safeAsync((input: TSaveSkimDraftInput) =>
-        saveSkimDraft(input),
+      saveSkimDraft: safeAsync(
+        (input: TSaveSkimDraftInput, tenant?: TTenantSanityContext) =>
+          saveSkimDraft(input, tenant),
       ),
     },
   };

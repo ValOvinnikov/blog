@@ -3,8 +3,9 @@ import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
 
 import { buildTagMetadata } from './build-tag-metadata';
 
-const { getTagPageMock } = vi.hoisted(() => ({
+const { getTagPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
   getTagPageMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -13,6 +14,10 @@ vi.mock('@blog/service', () => ({
       tag: { v1: { getTagPage: getTagPageMock } },
     },
   },
+}));
+
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
 }));
 
 const seo = makeSeo({
@@ -24,6 +29,28 @@ const seo = makeSeo({
 });
 
 describe('buildTagMetadata', () => {
+  beforeEach(() => {
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(undefined);
+  });
+
+  it('forwards the resolved tenant Sanity context to getTagPage', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getTagPageMock.mockResolvedValue({
+      ok: true,
+      data: makeTagDetailPage({ seo }),
+    });
+
+    await buildTagMetadata('typescript');
+
+    expect(getTagPageMock).toHaveBeenCalledWith('typescript', tenant);
+  });
+
   it('builds page-1 metadata from the resolved seo, self-canonical to /tags/[slug]', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
@@ -40,7 +67,7 @@ describe('buildTagMetadata', () => {
     });
     expect(metadata.openGraph?.title).toBe('TypeScript');
     expect(metadata.openGraph?.description).toBe('Posts about TypeScript.');
-    expect(getTagPageMock).toHaveBeenCalledWith('typescript');
+    expect(getTagPageMock).toHaveBeenCalledWith('typescript', undefined);
   });
 
   it('returns empty metadata when the tag fetch fails', async () => {
@@ -69,7 +96,7 @@ describe('buildTagMetadata', () => {
     expect(metadata.alternates?.types).toEqual({
       'application/rss+xml': '/tags/typescript/rss.xml',
     });
-    expect(getTagPageMock).toHaveBeenCalledWith('typescript');
+    expect(getTagPageMock).toHaveBeenCalledWith('typescript', undefined);
   });
 
   it('returns empty metadata for page N when the tag fetch fails', async () => {

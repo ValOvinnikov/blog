@@ -3,6 +3,7 @@ import { service } from '@blog/service';
 import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import { PostListModule } from '@web/modules/post-list/post-list-module';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
@@ -20,8 +21,9 @@ type TTagPageProps = { slug: string; page?: number; locale: string };
  * `TagPageView`.
  */
 export const TagPage = async ({ slug, page, locale }: TTagPageProps) => {
+  const tenant = await getTenantSanityContext();
   const [result, breadcrumbsT, tagPageT] = await Promise.all([
-    service.pages.tag.v1.getTagPage(slug),
+    service.pages.tag.v1.getTagPage(slug, tenant),
     getTranslations('breadcrumbs'),
     getTranslations('tagPage'),
   ]);

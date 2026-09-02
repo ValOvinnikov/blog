@@ -37,7 +37,7 @@ describe(VoiceFieldGroup, () => {
     ).toBeVisible();
   });
 
-  it('nests field labels one heading level below the group title', () => {
+  it('keeps the group title as the only heading, associating each field label with its control instead', () => {
     render(
       <VoiceFieldGroup
         title="Terminal prompts"
@@ -53,15 +53,50 @@ describe(VoiceFieldGroup, () => {
     expect(
       screen.getByRole('heading', { level: 2, name: 'Terminal prompts' }),
     ).toBeVisible();
+    expect(screen.queryAllByRole('heading', { level: 3 })).toHaveLength(0);
+
+    const hostInput = screen.getByRole('textbox', {
+      name: 'Terminal Prompt Host',
+    });
+    const hostLabel = screen.getByText('Terminal Prompt Host', {
+      selector: 'label',
+      exact: false,
+    });
+    expect(hostLabel).toHaveAttribute('for', hostInput.id);
+
+    const signInInput = screen.getByRole('textbox', {
+      name: 'Auth Prompt Command — Sign In',
+    });
+    const signInLabel = screen.getByText('Auth Prompt Command — Sign In', {
+      selector: 'label',
+      exact: false,
+    });
+    expect(signInLabel).toHaveAttribute('for', signInInput.id);
+  });
+
+  it('focuses a field input when its visible label is clicked', async () => {
+    const user = userEvent.setup();
+    render(
+      <VoiceFieldGroup
+        title="Terminal prompts"
+        fields={fields}
+        values={
+          { terminalPromptHost: '', authPromptCommandSignIn: '' } as never
+        }
+        placeholders={{}}
+        onFieldChange={vi.fn()}
+      />,
+    );
+
+    const label = screen.getByText('Terminal Prompt Host', {
+      selector: 'label',
+      exact: false,
+    });
+    await user.click(label);
+
     expect(
-      screen.getByRole('heading', { level: 3, name: /Terminal Prompt Host/ }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('heading', {
-        level: 3,
-        name: /Auth Prompt Command — Sign In/,
-      }),
-    ).toBeVisible();
+      screen.getByRole('textbox', { name: 'Terminal Prompt Host' }),
+    ).toHaveFocus();
   });
 
   it('shows each field storage key next to its label', () => {

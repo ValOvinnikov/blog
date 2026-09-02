@@ -10,6 +10,7 @@ const {
   getPageSlugsMock,
   getTopicIndexPageMock,
   getTagIndexPageMock,
+  getHostTenantSanityContextMock,
 } = vi.hoisted(() => ({
   getPostParamsMock: vi.fn(),
   getTopicParamsMock: vi.fn(),
@@ -20,6 +21,11 @@ const {
   getPageSlugsMock: vi.fn(),
   getTopicIndexPageMock: vi.fn(),
   getTagIndexPageMock: vi.fn(),
+  getHostTenantSanityContextMock: vi.fn(),
+}));
+
+vi.mock('@web/server/tenant/get-host-tenant-sanity-context', () => ({
+  getHostTenantSanityContext: getHostTenantSanityContextMock,
 }));
 
 vi.mock('@blog/service', () => ({
@@ -64,6 +70,13 @@ const mockAllEmpty = () => {
 };
 
 describe('sitemap', () => {
+  beforeEach(() => {
+    getHostTenantSanityContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant: undefined,
+    });
+  });
+
   afterEach(() => {
     vi.resetModules();
     getPostParamsMock.mockReset();
@@ -75,6 +88,7 @@ describe('sitemap', () => {
     getPageSlugsMock.mockReset();
     getTopicIndexPageMock.mockReset();
     getTagIndexPageMock.mockReset();
+    getHostTenantSanityContextMock.mockReset();
   });
 
   it('includes home, blog index, topics hub, post, topic, tag, blog page and generic page entries', async () => {
@@ -339,6 +353,40 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/');
   });
 
+  it('forwards the resolved tenant Sanity context to every loader', async () => {
+    mockAllEmpty();
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getHostTenantSanityContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant,
+    });
+    const sitemap = (await import('./sitemap')).default;
+
+    await sitemap();
+
+    expect(getPostParamsMock).toHaveBeenCalledWith(tenant);
+    expect(getTopicIndexPageMock).toHaveBeenCalledWith(tenant);
+    expect(getTagIndexPageMock).toHaveBeenCalledWith(tenant);
+  });
+
+  it('returns an empty sitemap without querying any content when the host is unresolvable', async () => {
+    getHostTenantSanityContextMock.mockResolvedValue({ isResolvable: false });
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+
+    expect(entries).toEqual([]);
+    expect(getPostParamsMock).not.toHaveBeenCalled();
+  });
+
+  // `vi.doMock` overrides the module registry's mock factory for
+  // `@web/utils/env/env` for every subsequent dynamic `import('./sitemap')`
+  // in this file (`vi.resetModules()` clears cached instances, not the
+  // registered factory) — this case stays last.
   it('returns an empty sitemap when NEXT_PUBLIC_SITE_URL is unset', async () => {
     vi.doMock('@web/utils/env/env', () => ({ env: {} }));
     const sitemap = (await import('./sitemap')).default;

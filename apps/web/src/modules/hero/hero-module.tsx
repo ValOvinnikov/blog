@@ -1,4 +1,5 @@
 import { getSanityImageBaseUrl, service } from '@blog/service';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 
 import { HeroModuleView } from './hero-module-view';
 
@@ -11,7 +12,8 @@ export interface IHeroModuleProps {
  * HeroModule — fetches `module_hero` data and hands it to `HeroModuleView`.
  */
 export const HeroModule = async ({ id }: IHeroModuleProps) => {
-  const result = await service.modules.hero.v1.getHero(id);
+  const tenant = await getTenantSanityContext();
+  const result = await service.modules.hero.v1.getHero(id, tenant);
 
   if (!result.ok) return null;
 
