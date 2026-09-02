@@ -81,6 +81,26 @@ describe(VoiceFieldGroup, () => {
     expect(screen.getByText('authPromptCommandSignIn')).toBeVisible();
   });
 
+  it('makes every field read-only, not disabled, when isReadOnly is true', () => {
+    render(
+      <VoiceFieldGroup
+        title="Terminal prompts"
+        fields={fields}
+        values={
+          { terminalPromptHost: '', authPromptCommandSignIn: '' } as never
+        }
+        placeholders={{}}
+        onFieldChange={vi.fn()}
+        isReadOnly={true}
+      />,
+    );
+
+    for (const field of screen.getAllByRole('textbox')) {
+      expect(field).toHaveAttribute('readonly');
+      expect(field).toBeEnabled();
+    }
+  });
+
   it('forwards a field change with its own key', async () => {
     const user = userEvent.setup();
     const onFieldChange = vi.fn();

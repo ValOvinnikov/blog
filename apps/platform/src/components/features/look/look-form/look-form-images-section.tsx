@@ -11,6 +11,8 @@ export type TLookFormImagesSectionProps = {
   logoAssetUrl: string | undefined;
   faviconAssetUrl: string | undefined;
   onFieldChange: TLookFormFieldSetter;
+  isArchived: boolean;
+  archivedNoticeId: string;
 };
 
 /** The logo and favicon upload fields — independent of preset, so they persist immediately through their own actions rather than staging behind Save. */
@@ -19,7 +21,10 @@ export const LookFormImagesSection = ({
   logoAssetUrl,
   faviconAssetUrl,
   onFieldChange,
+  isArchived,
+  archivedNoticeId,
 }: TLookFormImagesSectionProps) => {
+  const archivedDescribedBy = isArchived ? archivedNoticeId : undefined;
   const t = useTranslations('lookForm');
   const { field, fieldLabel, fieldHint, uploads } = lookFormVariants();
 
@@ -35,6 +40,8 @@ export const LookFormImagesSection = ({
           hint={t('logoFieldHint')}
           currentUrl={logoAssetUrl}
           onChange={(url) => onFieldChange('logoAssetUrl', url)}
+          isDisabled={isArchived}
+          aria-describedby={archivedDescribedBy}
         />
         <BrandAssetField
           tenantSlug={tenantSlug}
@@ -43,6 +50,8 @@ export const LookFormImagesSection = ({
           hint={t('faviconFieldHint')}
           currentUrl={faviconAssetUrl}
           onChange={(url) => onFieldChange('faviconAssetUrl', url)}
+          isDisabled={isArchived}
+          aria-describedby={archivedDescribedBy}
         />
       </div>
     </div>

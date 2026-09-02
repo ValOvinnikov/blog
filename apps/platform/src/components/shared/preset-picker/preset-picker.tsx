@@ -5,12 +5,15 @@ import { RadioGroup } from '@base-ui/react/radio-group';
 import { FONT_CHOICE, PRESET_ID, type TPresetId } from '@blog/config';
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import { useTranslations } from 'next-intl';
+import type { AriaAttributes } from 'react';
 
 import { presetPickerVariants } from './preset-picker-variants';
 
 export type TPresetPickerProps = {
   value: TPresetId;
   onChange: (value: TPresetId) => void;
+  isDisabled?: boolean;
+  'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
 
 type TPresetOption = {
@@ -28,7 +31,12 @@ type TPresetOption = {
  * mini preview inside each card is illustrative only, not a live render of
  * the preset's actual tokens.
  */
-export const PresetPicker = ({ value, onChange }: TPresetPickerProps) => {
+export const PresetPicker = ({
+  value,
+  onChange,
+  isDisabled,
+  'aria-describedby': ariaDescribedBy,
+}: TPresetPickerProps) => {
   const t = useTranslations('presetPicker');
 
   const presetOptions: TPresetOption[] = [
@@ -54,8 +62,10 @@ export const PresetPicker = ({ value, onChange }: TPresetPickerProps) => {
   return (
     <RadioGroup
       aria-label={t('ariaLabel')}
+      aria-describedby={ariaDescribedBy}
       value={value}
       onValueChange={(next) => onChange(next as TPresetId)}
+      disabled={isDisabled}
       className={presetPickerVariants().root()}
     >
       {presetOptions.map((preset) => {

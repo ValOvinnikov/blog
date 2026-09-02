@@ -49,6 +49,22 @@ describe(VoiceField, () => {
     ).toBe('INPUT');
   });
 
+  it('makes the field read-only, not disabled, when isReadOnly is true', () => {
+    render(
+      <VoiceField
+        fieldKey="terminalPromptHost"
+        label="Terminal Prompt Host"
+        value="custom"
+        onChange={vi.fn()}
+        isReadOnly={true}
+      />,
+    );
+
+    const input = screen.getByRole('textbox', { name: 'Terminal Prompt Host' });
+    expect(input).toHaveAttribute('readonly');
+    expect(input).toBeEnabled();
+  });
+
   it('reports every keystroke, including clearing back to empty, via onChange', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();

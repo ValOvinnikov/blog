@@ -17,6 +17,7 @@ export type TVoiceFieldGroupProps = {
   placeholders: Partial<Record<TVoiceOverrideKey, string>>;
   onFieldChange: (key: TVoiceOverrideKey, value: string) => void;
   isDisabled?: boolean;
+  isReadOnly?: boolean;
 };
 
 /**
@@ -31,6 +32,7 @@ export const VoiceFieldGroup = ({
   placeholders,
   onFieldChange,
   isDisabled = false,
+  isReadOnly = false,
 }: TVoiceFieldGroupProps) => {
   const t = useTranslations('voiceFieldGroup');
   const { body, vfield, vfieldLabel, vfieldKey } = voiceFieldGroupVariants();
@@ -56,6 +58,7 @@ export const VoiceFieldGroup = ({
               placeholder={placeholders[field.key]}
               isMultiline={field.multiline}
               isDisabled={isDisabled}
+              isReadOnly={isReadOnly}
             />
           </div>
         ))}

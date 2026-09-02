@@ -7,6 +7,7 @@ export const presetPickerVariants = tv({
       'relative cursor-pointer rounded-xl border-[1.5px] border-admin-line bg-admin-surface p-[14px]',
       'outline-hidden',
       'focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
+      'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-[.55]',
     ],
     checkmark: [
       'absolute right-[11px] top-[11px] flex size-[18px] items-center justify-center',

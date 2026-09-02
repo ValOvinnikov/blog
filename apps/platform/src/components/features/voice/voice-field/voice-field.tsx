@@ -11,6 +11,7 @@ export type TVoiceFieldProps = {
   placeholder?: string;
   isMultiline?: boolean;
   isDisabled?: boolean;
+  isReadOnly?: boolean;
 };
 
 /**
@@ -30,6 +31,7 @@ export const VoiceField = ({
   placeholder,
   isMultiline = false,
   isDisabled = false,
+  isReadOnly = false,
 }: TVoiceFieldProps) => {
   const inputId = `voice-field-${fieldKey}`;
 
@@ -42,6 +44,7 @@ export const VoiceField = ({
         onChange={onChange}
         placeholder={placeholder}
         isDisabled={isDisabled}
+        isReadOnly={isReadOnly}
         rows={3}
       />
     );
@@ -55,6 +58,7 @@ export const VoiceField = ({
       onChange={onChange}
       placeholder={placeholder}
       isDisabled={isDisabled}
+      isReadOnly={isReadOnly}
     />
   );
 };

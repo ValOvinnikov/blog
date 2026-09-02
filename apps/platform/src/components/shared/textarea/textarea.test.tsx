@@ -51,4 +51,24 @@ describe(Textarea, () => {
 
     expect(screen.getByLabelText('Locked field')).toBeDisabled();
   });
+
+  it('makes the textarea read-only, not disabled, when isReadOnly is true', async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+    render(
+      <Textarea
+        ariaLabel="Archived field"
+        value="authored value"
+        onChange={handleChange}
+        isReadOnly={true}
+      />,
+    );
+
+    const textarea = screen.getByLabelText('Archived field');
+    expect(textarea).toHaveAttribute('readonly');
+    expect(textarea).toBeEnabled();
+
+    await user.type(textarea, 'x');
+    expect(handleChange).not.toHaveBeenCalled();
+  });
 });

@@ -25,6 +25,7 @@ export const lookFormVariants = tv({
       'relative h-5 w-9 shrink-0 cursor-pointer rounded-full bg-admin-line',
       'transition-colors',
       'data-[checked]:bg-admin-brand',
+      'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-[.55]',
       'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
     ],
     switchThumb: [

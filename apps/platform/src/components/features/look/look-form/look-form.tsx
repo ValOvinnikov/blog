@@ -183,12 +183,16 @@ export const LookForm = ({
                 accentHue={values.accentHue}
                 logoHue={values.logoHue}
                 onFieldChange={updateField}
+                isArchived={isArchived}
+                archivedNoticeId={archivedNoticeId}
               />
               <LookFormImagesSection
                 tenantSlug={tenantSlug}
                 logoAssetUrl={values.logoAssetUrl}
                 faviconAssetUrl={values.faviconAssetUrl}
                 onFieldChange={updateField}
+                isArchived={isArchived}
+                archivedNoticeId={archivedNoticeId}
               />
             </Card.Body>
           </Card>
@@ -208,6 +212,8 @@ export const LookForm = ({
               radiusScale={values.radiusScale}
               density={values.density}
               onFieldChange={updateField}
+              isArchived={isArchived}
+              archivedNoticeId={archivedNoticeId}
             />
           </Disclosure>
 

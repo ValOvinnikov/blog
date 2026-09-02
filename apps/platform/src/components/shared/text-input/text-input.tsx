@@ -15,6 +15,7 @@ export type TTextInputProps = {
   isRequired?: boolean;
   isInvalid?: TTextInputVariants['isInvalid'];
   isDisabled?: TTextInputVariants['isDisabled'];
+  isReadOnly?: TTextInputVariants['isReadOnly'];
   'aria-describedby'?: AriaAttributes['aria-describedby'];
   className?: string;
 };
@@ -29,6 +30,7 @@ export const TextInput = ({
   isRequired,
   isInvalid,
   isDisabled,
+  isReadOnly,
   'aria-describedby': ariaDescribedBy,
   className,
 }: TTextInputProps) => {
@@ -43,12 +45,18 @@ export const TextInput = ({
       placeholder={placeholder}
       required={isRequired}
       disabled={Boolean(isDisabled)}
+      readOnly={Boolean(isReadOnly)}
       value={value}
       onChange={handleChange}
       aria-label={ariaLabel}
       aria-invalid={Boolean(isInvalid)}
       aria-describedby={ariaDescribedBy}
-      className={textInputVariants({ isInvalid, isDisabled, class: className })}
+      className={textInputVariants({
+        isInvalid,
+        isDisabled,
+        isReadOnly,
+        class: className,
+      })}
     />
   );
 };

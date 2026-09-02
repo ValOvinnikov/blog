@@ -297,4 +297,44 @@ describe(VoiceSettings, () => {
       screen.getByRole('button', { name: 'Save changes' }),
     ).toHaveAccessibleDescription(/This tenant is archived/);
   });
+
+  it('makes every curated voice field read-only, not disabled, for an archived tenant', async () => {
+    const user = userEvent.setup();
+    render(
+      <VoiceSettings
+        tenantSlug="acme"
+        voicePack={CONSOLE_VOICE_PACK}
+        initialOverrides={{}}
+        saveAction={vi.fn()}
+        archivedAt={new Date('2026-08-26T00:00:00.000Z')}
+      />,
+    );
+
+    await openAdvanced(user);
+
+    const fields = screen.getAllByRole('textbox');
+    expect(fields).toHaveLength(19);
+    for (const field of fields) {
+      expect(field).toHaveAttribute('readonly');
+      expect(field).toBeEnabled();
+    }
+  });
+
+  it('leaves every curated voice field editable for a non-archived tenant', async () => {
+    const user = userEvent.setup();
+    render(
+      <VoiceSettings
+        tenantSlug="acme"
+        voicePack={CONSOLE_VOICE_PACK}
+        initialOverrides={{}}
+        saveAction={vi.fn()}
+      />,
+    );
+
+    await openAdvanced(user);
+
+    for (const field of screen.getAllByRole('textbox')) {
+      expect(field).not.toHaveAttribute('readonly');
+    }
+  });
 });

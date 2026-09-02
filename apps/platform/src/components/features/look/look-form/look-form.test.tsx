@@ -231,6 +231,79 @@ describe(LookForm, () => {
     expect(updateLookActionMock).not.toHaveBeenCalled();
   });
 
+  it('disables every Look control for an archived tenant', () => {
+    render(
+      <LookForm
+        tenantSlug="acme"
+        initialValues={defaultLookFormValues()}
+        archivedAt={new Date('2026-08-26T00:00:00.000Z')}
+      />,
+    );
+
+    expect(screen.getByRole('radio', { name: 'Console' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    expect(screen.getByRole('radio', { name: 'Editorial' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    expect(screen.getByRole('slider', { name: 'Accent hue' })).toBeDisabled();
+    expect(
+      screen.getByRole('switch', { name: 'Follow accent hue' }),
+    ).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByRole('button', { name: 'Upload logo' })).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: 'Upload favicon' }),
+    ).toBeDisabled();
+  });
+
+  it('disables the Advanced section controls for an archived tenant', async () => {
+    const user = userEvent.setup();
+    render(
+      <LookForm
+        tenantSlug="acme"
+        initialValues={defaultLookFormValues()}
+        archivedAt={new Date('2026-08-26T00:00:00.000Z')}
+      />,
+    );
+
+    await user.click(screen.getByText('Advanced'));
+
+    expect(
+      screen.getByRole('switch', { name: 'Terminal chrome' }),
+    ).toHaveAttribute('aria-disabled', 'true');
+    expect(
+      screen.getAllByRole('radio', { name: 'Space Grotesk' })[0],
+    ).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByRole('button', { name: 'Small' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Extra Large' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Compact' })).toBeDisabled();
+  });
+
+  it('leaves every Look control enabled for a non-archived tenant', async () => {
+    const user = userEvent.setup();
+    render(
+      <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+    );
+
+    await user.click(screen.getByText('Advanced'));
+
+    expect(screen.getByRole('radio', { name: 'Console' })).not.toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    expect(screen.getByRole('slider', { name: 'Accent hue' })).toBeEnabled();
+    expect(
+      screen.getByRole('switch', { name: 'Follow accent hue' }),
+    ).not.toHaveAttribute('aria-disabled', 'true');
+    expect(
+      screen.getByRole('switch', { name: 'Terminal chrome' }),
+    ).not.toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByRole('button', { name: 'Upload logo' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Small' })).toBeEnabled();
+  });
+
   it('describes the disabled Save and Reset buttons with the archived notice text, for a screen-reader user', () => {
     render(
       <LookForm
