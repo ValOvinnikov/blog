@@ -70,7 +70,7 @@ export function getClient(tenant: TTenantSanityContext): TSanityClient {
  * The platform's own project, expressed as a `TTenantSanityContext` — the
  * explicit, greppable way to opt into the platform's project instead of a
  * tenant's, for the handful of callers that genuinely mean that (single-
- * tenant local/preview development, the image URL builder).
+ * tenant local/preview development, the static-params slices).
  */
 export function getPlatformSanityContext(): TTenantSanityContext {
   return {
