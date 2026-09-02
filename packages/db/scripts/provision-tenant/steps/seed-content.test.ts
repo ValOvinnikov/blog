@@ -8,11 +8,20 @@ import {
   type TSeedContentDeps,
 } from './seed-content';
 
-const { setTenantSeededAtMock } = vi.hoisted(() => ({
+const {
+  setTenantSanityWriteTokenAndSeededAtMock,
+  setTenantSanityWriteTokenMock,
+  setTenantSeededAtMock,
+} = vi.hoisted(() => ({
+  setTenantSanityWriteTokenAndSeededAtMock: vi.fn(),
+  setTenantSanityWriteTokenMock: vi.fn(),
   setTenantSeededAtMock: vi.fn(),
 }));
 
 vi.mock('@blog/db/queries/tenants', () => ({
+  setTenantSanityWriteTokenAndSeededAt:
+    setTenantSanityWriteTokenAndSeededAtMock,
+  setTenantSanityWriteToken: setTenantSanityWriteTokenMock,
   setTenantSeededAt: setTenantSeededAtMock,
 }));
 
@@ -55,6 +64,8 @@ function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
 }
 
 beforeEach(() => {
+  setTenantSanityWriteTokenAndSeededAtMock.mockReset();
+  setTenantSanityWriteTokenMock.mockReset();
   setTenantSeededAtMock.mockReset();
 });
 
@@ -88,7 +99,7 @@ describe(seedTenantContent, () => {
     );
   });
 
-  it('mints a transient editor token, uploads two images, commits a transaction, revokes the token, and persists seededAt', async () => {
+  it('mints an editor token, uploads two images, commits a transaction, and persists the token and seededAt together instead of revoking', async () => {
     const tenant = baseTenant();
     const commit = vi.fn().mockResolvedValue(undefined);
     const createOrReplace = vi.fn();
@@ -130,15 +141,12 @@ describe(seedTenantContent, () => {
     expect(createOrReplace).toHaveBeenCalledTimes(9);
     expect(commit).toHaveBeenCalledTimes(1);
     expect(sleep).not.toHaveBeenCalled();
-    expect(revokeWriteToken).toHaveBeenCalledWith({
-      token: 'mgmt-token',
-      projectId: 'proj123',
-      robotId: 'robot-1',
-    });
-    expect(setTenantSeededAtMock).toHaveBeenCalledWith(
+    expect(setTenantSanityWriteTokenAndSeededAtMock).toHaveBeenCalledWith(
       'tenant-1',
+      'sk-write',
       expect.any(Date),
     );
+    expect(revokeWriteToken).not.toHaveBeenCalled();
   });
 
   it('still revokes the transient token when seeding fails', async () => {
@@ -170,7 +178,86 @@ describe(seedTenantContent, () => {
       projectId: 'proj123',
       robotId: 'robot-1',
     });
-    expect(setTenantSeededAtMock).not.toHaveBeenCalled();
+    expect(setTenantSanityWriteTokenAndSeededAtMock).not.toHaveBeenCalled();
+  });
+
+  it('revokes the token when persisting the token+seededAt fails', async () => {
+    const tenant = baseTenant();
+    const commit = vi.fn().mockResolvedValue(undefined);
+    const createOrReplace = vi.fn();
+    const transaction = { createOrReplace, commit };
+    const upload = vi
+      .fn()
+      .mockResolvedValueOnce({ _id: 'image-author' })
+      .mockResolvedValueOnce({ _id: 'image-og' });
+    const client = { assets: { upload }, transaction: () => transaction };
+    const mintWriteToken = vi
+      .fn()
+      .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
+    const revokeWriteToken = vi.fn().mockResolvedValue(undefined);
+    const createClient = vi.fn().mockReturnValue(client);
+    const sleep = vi.fn().mockResolvedValue(undefined);
+    setTenantSanityWriteTokenAndSeededAtMock.mockRejectedValue(
+      new Error('persist failed'),
+    );
+
+    await expect(
+      seedTenantContent(tenant, env, {
+        createClient:
+          createClient as unknown as TSeedContentDeps['createClient'],
+        mintWriteToken,
+        revokeWriteToken,
+        sleep,
+      }),
+    ).rejects.toThrow('persist failed');
+
+    expect(revokeWriteToken).toHaveBeenCalledWith({
+      token: 'mgmt-token',
+      projectId: 'proj123',
+      robotId: 'robot-1',
+    });
+  });
+
+  it('regression: never leaves a live, unrevoked token when persisting the write token succeeds but marking the tenant seeded does not — a crash/retry window that would otherwise orphan a live Editor-scoped token and mint a second one on retry', async () => {
+    const tenant = baseTenant();
+    const commit = vi.fn().mockResolvedValue(undefined);
+    const createOrReplace = vi.fn();
+    const transaction = { createOrReplace, commit };
+    const upload = vi
+      .fn()
+      .mockResolvedValueOnce({ _id: 'image-author' })
+      .mockResolvedValueOnce({ _id: 'image-og' });
+    const client = { assets: { upload }, transaction: () => transaction };
+    const mintWriteToken = vi
+      .fn()
+      .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
+    const revokeWriteToken = vi.fn().mockResolvedValue(undefined);
+    const createClient = vi.fn().mockReturnValue(client);
+    const sleep = vi.fn().mockResolvedValue(undefined);
+
+    setTenantSanityWriteTokenMock.mockResolvedValue(undefined);
+    setTenantSeededAtMock.mockRejectedValue(
+      new Error('crashed before marking seeded'),
+    );
+    setTenantSanityWriteTokenAndSeededAtMock.mockRejectedValue(
+      new Error('crashed before marking seeded'),
+    );
+
+    await expect(
+      seedTenantContent(tenant, env, {
+        createClient:
+          createClient as unknown as TSeedContentDeps['createClient'],
+        mintWriteToken,
+        revokeWriteToken,
+        sleep,
+      }),
+    ).rejects.toThrow('crashed before marking seeded');
+
+    expect(revokeWriteToken).toHaveBeenCalledWith({
+      token: 'mgmt-token',
+      projectId: 'proj123',
+      robotId: 'robot-1',
+    });
   });
 
   it('retries a grant-propagation failure once and succeeds without re-uploading assets', async () => {
@@ -206,18 +293,15 @@ describe(seedTenantContent, () => {
     expect(upload).toHaveBeenCalledTimes(2);
     expect(commit).toHaveBeenCalledTimes(2);
     expect(sleep).toHaveBeenCalledTimes(1);
-    expect(revokeWriteToken).toHaveBeenCalledWith({
-      token: 'mgmt-token',
-      projectId: 'proj123',
-      robotId: 'robot-1',
-    });
-    expect(setTenantSeededAtMock).toHaveBeenCalledWith(
+    expect(setTenantSanityWriteTokenAndSeededAtMock).toHaveBeenCalledWith(
       'tenant-1',
+      'sk-write',
       expect.any(Date),
     );
+    expect(revokeWriteToken).not.toHaveBeenCalled();
   });
 
-  it('exhausts retries on a persistent grant-propagation failure, still revokes the token, and never persists seededAt', async () => {
+  it('exhausts retries on a persistent grant-propagation failure, still revokes the token, and never persists it or seededAt', async () => {
     const tenant = baseTenant();
     const grantError = new Error(
       'transaction failed: Insufficient permissions; permission "create" required',
@@ -254,7 +338,7 @@ describe(seedTenantContent, () => {
       projectId: 'proj123',
       robotId: 'robot-1',
     });
-    expect(setTenantSeededAtMock).not.toHaveBeenCalled();
+    expect(setTenantSanityWriteTokenAndSeededAtMock).not.toHaveBeenCalled();
   });
 
   it('does not retry a non-grant-propagation commit failure', async () => {
@@ -292,5 +376,6 @@ describe(seedTenantContent, () => {
       projectId: 'proj123',
       robotId: 'robot-1',
     });
+    expect(setTenantSanityWriteTokenAndSeededAtMock).not.toHaveBeenCalled();
   });
 });

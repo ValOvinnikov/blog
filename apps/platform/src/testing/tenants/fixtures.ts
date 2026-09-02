@@ -36,6 +36,7 @@ export const makeTenant = (overrides: Partial<TTenant> = {}): TTenant => {
     sanityProjectId: null,
     sanityDataset: null,
     sanityReadTokenEncrypted: null,
+    sanityWriteTokenEncrypted: null,
     locale: 'EN',
     plan: TENANT_PLAN.FREE,
     status: TENANT_STATUS.ACTIVE,

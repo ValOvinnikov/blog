@@ -3,8 +3,9 @@ import { makeSeo } from '@web/testing/shared/seo/fixtures';
 
 import { buildPostMetadata } from './build-post-metadata';
 
-const { getPostMock } = vi.hoisted(() => ({
+const { getPostMock, getTenantSanityContextMock } = vi.hoisted(() => ({
   getPostMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -13,6 +14,10 @@ vi.mock('@blog/service', () => ({
       post: { v1: { getPost: getPostMock } },
     },
   },
+}));
+
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
 }));
 
 const basePost: TPostDetail = {
@@ -57,6 +62,25 @@ const basePost: TPostDetail = {
 };
 
 describe('buildPostMetadata', () => {
+  beforeEach(() => {
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(undefined);
+  });
+
+  it('forwards the resolved tenant Sanity context to getPost', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getPostMock.mockResolvedValue({ ok: true, data: basePost });
+
+    await buildPostMetadata('hello-world');
+
+    expect(getPostMock).toHaveBeenCalledWith('hello-world', tenant);
+  });
+
   it('returns empty metadata without logging when no page_post matches the slug', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getPostMock.mockResolvedValue({ ok: true, data: undefined });

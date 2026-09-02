@@ -26,15 +26,15 @@ async function setUpDbWithSiteConfigRow(
   const client = new PGlite();
   const db = drizzle(client, { schema });
 
-  const migrationFiles = listMigrationFiles();
-  const priorMigrations = migrationFiles.filter(
-    (file) => file < RENAME_MIGRATION,
-  );
-  const laterMigrations = migrationFiles.filter(
-    (file) => file > RENAME_MIGRATION,
+  // Every migration except the one under test runs up front, so the seed
+  // inserts below (built from the current Drizzle schema) always match the
+  // physical table — RENAME_MIGRATION is a data-only UPDATE with no DDL of
+  // its own, so applying it last doesn't change what it's testing.
+  const otherMigrations = listMigrationFiles().filter(
+    (file) => file !== RENAME_MIGRATION,
   );
 
-  for (const file of priorMigrations) {
+  for (const file of otherMigrations) {
     await applyMigrationFile(db, file);
   }
 
@@ -62,17 +62,13 @@ async function setUpDbWithSiteConfigRow(
     voiceOverrides,
   });
 
-  return { db, laterMigrations };
+  return { db };
 }
 
 async function applyRenameMigration(
   db: Awaited<ReturnType<typeof setUpDbWithSiteConfigRow>>['db'],
-  laterMigrations: string[],
 ) {
   await applyMigrationFile(db, RENAME_MIGRATION);
-  for (const file of laterMigrations) {
-    await applyMigrationFile(db, file);
-  }
 }
 
 async function readVoiceOverrides(
@@ -89,12 +85,12 @@ describe(`${RENAME_MIGRATION} (voiceOverrides categoryEmpty -> topicEmpty rename
   it(
     'renames categoryEmpty to topicEmpty and preserves its value alongside other keys',
     async () => {
-      const { db, laterMigrations } = await setUpDbWithSiteConfigRow({
+      const { db } = await setUpDbWithSiteConfigRow({
         categoryEmpty: 'No posts in this topic yet.',
         tagEmpty: 'No posts with this tag yet.',
       });
 
-      await applyRenameMigration(db, laterMigrations);
+      await applyRenameMigration(db);
 
       expect(await readVoiceOverrides(db)).toEqual({
         topicEmpty: 'No posts in this topic yet.',
@@ -107,11 +103,11 @@ describe(`${RENAME_MIGRATION} (voiceOverrides categoryEmpty -> topicEmpty rename
   it(
     'leaves a row with no categoryEmpty key untouched',
     async () => {
-      const { db, laterMigrations } = await setUpDbWithSiteConfigRow({
+      const { db } = await setUpDbWithSiteConfigRow({
         tagEmpty: 'No posts with this tag yet.',
       });
 
-      await applyRenameMigration(db, laterMigrations);
+      await applyRenameMigration(db);
 
       expect(await readVoiceOverrides(db)).toEqual({
         tagEmpty: 'No posts with this tag yet.',
@@ -123,9 +119,9 @@ describe(`${RENAME_MIGRATION} (voiceOverrides categoryEmpty -> topicEmpty rename
   it(
     'leaves an empty voice_overrides object untouched',
     async () => {
-      const { db, laterMigrations } = await setUpDbWithSiteConfigRow({});
+      const { db } = await setUpDbWithSiteConfigRow({});
 
-      await applyRenameMigration(db, laterMigrations);
+      await applyRenameMigration(db);
 
       expect(await readVoiceOverrides(db)).toEqual({});
     },
@@ -135,11 +131,11 @@ describe(`${RENAME_MIGRATION} (voiceOverrides categoryEmpty -> topicEmpty rename
   it(
     'leaves an already-migrated row (topicEmpty present, no categoryEmpty) untouched',
     async () => {
-      const { db, laterMigrations } = await setUpDbWithSiteConfigRow({
+      const { db } = await setUpDbWithSiteConfigRow({
         topicEmpty: 'No posts in this topic yet.',
       });
 
-      await applyRenameMigration(db, laterMigrations);
+      await applyRenameMigration(db);
 
       expect(await readVoiceOverrides(db)).toEqual({
         topicEmpty: 'No posts in this topic yet.',
@@ -151,12 +147,12 @@ describe(`${RENAME_MIGRATION} (voiceOverrides categoryEmpty -> topicEmpty rename
   it(
     'is idempotent: applying it a second time changes nothing',
     async () => {
-      const { db, laterMigrations } = await setUpDbWithSiteConfigRow({
+      const { db } = await setUpDbWithSiteConfigRow({
         categoryEmpty: 'No posts in this topic yet.',
         tagEmpty: 'No posts with this tag yet.',
       });
 
-      await applyRenameMigration(db, laterMigrations);
+      await applyRenameMigration(db);
       const afterFirstRun = await readVoiceOverrides(db);
 
       // The migration's own WHERE clause guards re-application; running its
@@ -177,12 +173,12 @@ describe(`${RENAME_MIGRATION} (voiceOverrides categoryEmpty -> topicEmpty rename
   it(
     'when both categoryEmpty and topicEmpty are present, topicEmpty ends up holding the old categoryEmpty value (jsonb || favours its right operand — accepted, not a bug)',
     async () => {
-      const { db, laterMigrations } = await setUpDbWithSiteConfigRow({
+      const { db } = await setUpDbWithSiteConfigRow({
         categoryEmpty: 'Old copy from categoryEmpty.',
         topicEmpty: 'Newer copy already under topicEmpty.',
       });
 
-      await applyRenameMigration(db, laterMigrations);
+      await applyRenameMigration(db);
 
       expect(await readVoiceOverrides(db)).toEqual({
         topicEmpty: 'Old copy from categoryEmpty.',

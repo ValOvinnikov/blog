@@ -4,8 +4,9 @@ import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 
 import { HeroModule } from './hero-module';
 
-const { getHeroMock } = vi.hoisted(() => ({
+const { getHeroMock, getTenantSanityContextMock } = vi.hoisted(() => ({
   getHeroMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -18,11 +19,43 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
+}));
+
 const setup = customRenderAsync(HeroModule, { id: 'hero-1', locale: 'en' });
 
 describe(HeroModule, () => {
   beforeEach(() => {
     getHeroMock.mockReset();
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(undefined);
+  });
+
+  it('forwards the resolved tenant Sanity context to getHero', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getHeroMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        eyebrow: undefined,
+        title: 'Welcome',
+        subtitle: undefined,
+        sanityImage: undefined,
+        primaryAction: undefined,
+        secondaryAction: undefined,
+        layout: undefined,
+      },
+    });
+
+    await setup();
+
+    expect(getHeroMock).toHaveBeenCalledWith('hero-1', tenant);
   });
 
   it('renders nothing when the fetch fails', async () => {

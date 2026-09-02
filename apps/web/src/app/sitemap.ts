@@ -1,6 +1,7 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { routing } from '@web/i18n/routing';
+import { getHostTenantSanityContext } from '@web/server/tenant/get-host-tenant-sanity-context';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import type { MetadataRoute } from 'next';
@@ -43,6 +44,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return [];
   }
 
+  const hostTenant = await getHostTenantSanityContext();
+  if (!hostTenant.isResolvable) {
+    return [];
+  }
+  const { tenant } = hostTenant;
+
   const [
     postParamsResult,
     topicParamsResult,
@@ -54,15 +61,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     topicIndexPageResult,
     tagIndexPageResult,
   ] = await Promise.all([
-    service.pages.post.v1.getPostParams(),
-    service.pages.topic.v1.getTopicParams(),
-    service.pages.tag.v1.getTagParams(),
-    service.pages.topic.v1.getTopicPaginationParams(),
-    service.pages.tag.v1.getTagPaginationParams(),
-    service.pages.blog.v1.getIndexPageParams(),
-    service.pages.generic.v1.getPageSlugs(),
-    service.pages.topicIndex.v1.getIndexPage(),
-    service.pages.tagIndex.v1.getIndexPage(),
+    service.pages.post.v1.getPostParams(tenant),
+    service.pages.topic.v1.getTopicParams(tenant),
+    service.pages.tag.v1.getTagParams(tenant),
+    service.pages.topic.v1.getTopicPaginationParams(tenant),
+    service.pages.tag.v1.getTagPaginationParams(tenant),
+    service.pages.blog.v1.getIndexPageParams(tenant),
+    service.pages.generic.v1.getPageSlugs(tenant),
+    service.pages.topicIndex.v1.getIndexPage(tenant),
+    service.pages.tagIndex.v1.getIndexPage(tenant),
   ]);
 
   if (!postParamsResult.ok) {

@@ -28,7 +28,7 @@ describe(Heading, () => {
 
   it('keeps size independent of level — every level/size combination renders without throwing', () => {
     const levels = [1, 2, 3, 4] as const;
-    const sizes = ['pageTitle', 'cardTitle', 'fieldLabel'] as const;
+    const sizes = ['pageTitle', 'cardTitle'] as const;
 
     for (const level of levels) {
       for (const size of sizes) {

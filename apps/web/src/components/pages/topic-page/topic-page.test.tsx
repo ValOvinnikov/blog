@@ -12,9 +12,11 @@ const {
   getTopicsMock,
   moduleRendererMock,
   postListModuleMock,
+  getTenantSanityContextMock,
 } = vi.hoisted(() => ({
   getTopicPageMock: vi.fn(),
   getTopicsMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
   // `ModuleRenderer`/`PostListModule` are async Server Components — real
   // RSC async-component nesting isn't renderable through
   // `@testing-library/react`'s client renderer. Stubbed as plain sync
@@ -67,6 +69,10 @@ vi.mock('@web/modules/post-list/post-list-module', () => ({
   PostListModule: postListModuleMock,
 }));
 
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
+}));
+
 vi.mock('@web/components/shared/smart-link', () => ({
   SmartLink: ({
     href,
@@ -96,6 +102,8 @@ describe(`<${TopicPage.name}/>`, () => {
     getTopicsMock.mockReset();
     moduleRendererMock.mockClear();
     postListModuleMock.mockClear();
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(undefined);
     getTopicsMock.mockResolvedValue({
       ok: true,
       data: [
@@ -239,5 +247,23 @@ describe(`<${TopicPage.name}/>`, () => {
     expect(breadcrumbScript?.textContent).toContain(
       '"item":"https://example.com/topics/news"',
     );
+  });
+
+  it('forwards the resolved tenant Sanity context to getTopicPage and getTopics', async () => {
+    const tenantContext = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getTenantSanityContextMock.mockResolvedValue(tenantContext);
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: { topic, modules: [], seo: {}, postListId: 'post-list-1' },
+    });
+
+    await setup();
+
+    expect(getTopicPageMock).toHaveBeenCalledWith('news', tenantContext);
+    expect(getTopicsMock).toHaveBeenCalledWith(tenantContext);
   });
 });

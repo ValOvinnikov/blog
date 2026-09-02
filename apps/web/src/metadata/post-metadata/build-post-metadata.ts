@@ -1,6 +1,7 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 
@@ -10,7 +11,8 @@ import type { Metadata } from 'next';
  * doesn't exist; the route itself calls `notFound()` for the actual 404.
  */
 export const buildPostMetadata = async (slug: string): Promise<Metadata> => {
-  const result = await service.pages.post.v1.getPost(slug);
+  const tenant = await getTenantSanityContext();
+  const result = await service.pages.post.v1.getPost(slug, tenant);
 
   if (!result.ok) {
     logger.error('post_metadata.fetch_failed', { slug, error: result.error });

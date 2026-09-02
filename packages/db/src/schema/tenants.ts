@@ -74,6 +74,12 @@ export const tenants = pgTable('tenants', {
   // being set up, has no token yet — @blog/service's client factory falls
   // back to the legacy single-tenant client until it's set.
   sanityReadTokenEncrypted: text('sanity_read_token_encrypted'),
+  // Sanity write token for this tenant's project, same encryption envelope
+  // as `sanityReadTokenEncrypted` above. Higher-privilege than the read
+  // token — minted `editor`-scoped during provisioning's seed step and kept
+  // (rather than revoked) so later writes can target this tenant's own
+  // project instead of the platform's.
+  sanityWriteTokenEncrypted: text('sanity_write_token_encrypted'),
   locale: text('locale').notNull(),
   plan: tenantPlanEnum('plan').notNull(),
   status: tenantStatusEnum('status').notNull(),

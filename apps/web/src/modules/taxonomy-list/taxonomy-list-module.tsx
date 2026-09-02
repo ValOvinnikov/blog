@@ -1,6 +1,7 @@
 import type { TTaxonomyKind } from '@blog/config';
 import { service } from '@blog/service';
 import type { THeadingLevel } from '@blog/ui/lib/react';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
@@ -40,9 +41,11 @@ export const TaxonomyListModule = async ({
   buildHref,
   formatPostCount,
 }: ITaxonomyListModuleProps) => {
+  const tenant = await getTenantSanityContext();
   const result = await service.modules.taxonomyList.v1.getTaxonomyList(
     id,
     taxonomy,
+    tenant,
   );
 
   if (!result.ok) {

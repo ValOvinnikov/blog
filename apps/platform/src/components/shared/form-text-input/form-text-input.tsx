@@ -45,7 +45,6 @@ export const FormTextInput = ({
       <TextInput
         id={htmlFor}
         type={type}
-        ariaLabel={label}
         value={value}
         onChange={onChange}
         isInvalid={isInvalid}

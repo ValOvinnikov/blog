@@ -1,4 +1,9 @@
-import { BRAND_VARIANT, CTA_IMAGE_SIDE, CTA_VARIANT } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CTA_IMAGE_SIDE,
+  CTA_MOBILE_MEDIA_ORDER,
+  CTA_VARIANT,
+} from '@blog/config';
 import { getSanityImageBaseUrl } from '@blog/service';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import {
@@ -14,6 +19,24 @@ const meta = {
   component: CtaModuleView,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
+  argTypes: {
+    variant: {
+      control: 'select',
+      options: Object.values(CTA_VARIANT),
+    },
+    brandVariant: {
+      control: 'select',
+      options: Object.values(BRAND_VARIANT),
+    },
+    imageSide: {
+      control: 'select',
+      options: Object.values(CTA_IMAGE_SIDE),
+    },
+    mobileMediaOrder: {
+      control: 'select',
+      options: Object.values(CTA_MOBILE_MEDIA_ORDER),
+    },
+  },
   args: {
     id: 'cta-1',
     variant: CTA_VARIANT.CALLOUT,

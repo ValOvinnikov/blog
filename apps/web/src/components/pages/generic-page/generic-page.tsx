@@ -2,6 +2,7 @@ import { routes, type ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
 import { ModuleRenderer } from '@web/modules/module-renderer';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
@@ -18,8 +19,9 @@ type TGenericPageProps = ILocalizedParams & { slug: string };
  * `GenericPageView`.
  */
 export const GenericPage = async ({ slug, locale }: TGenericPageProps) => {
+  const tenant = await getTenantSanityContext();
   const [result, breadcrumbsT] = await Promise.all([
-    service.pages.generic.v1.getPage(slug),
+    service.pages.generic.v1.getPage(slug, tenant),
     getTranslations('breadcrumbs'),
   ]);
 

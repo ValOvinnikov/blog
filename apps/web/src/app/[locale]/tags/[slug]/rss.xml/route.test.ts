@@ -5,9 +5,14 @@ import type { TFeedPost } from '@blog/service';
 import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
 import { notFound } from 'next/navigation';
 
-const { getTagPageMock, getPublishedPostsByTagMock } = vi.hoisted(() => ({
+const {
+  getTagPageMock,
+  getPublishedPostsByTagMock,
+  getHostTenantSanityContextMock,
+} = vi.hoisted(() => ({
   getTagPageMock: vi.fn(),
   getPublishedPostsByTagMock: vi.fn(),
+  getHostTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -21,6 +26,10 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
+vi.mock('@web/server/tenant/get-host-tenant-sanity-context', () => ({
+  getHostTenantSanityContext: getHostTenantSanityContextMock,
+}));
+
 const post: TFeedPost = {
   title: 'Hello & Welcome',
   slug: 'hello-welcome',
@@ -31,10 +40,18 @@ const post: TFeedPost = {
 const params = Promise.resolve({ slug: 'typescript' });
 
 describe('GET /tags/[slug]/rss.xml', () => {
+  beforeEach(() => {
+    getHostTenantSanityContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant: undefined,
+    });
+  });
+
   afterEach(() => {
     vi.resetModules();
     getTagPageMock.mockReset();
     getPublishedPostsByTagMock.mockReset();
+    getHostTenantSanityContextMock.mockReset();
   });
 
   it('returns a valid RSS 2.0 feed scoped to the tag with the correct content type', async () => {
@@ -73,8 +90,8 @@ describe('GET /tags/[slug]/rss.xml', () => {
     expect(doc.querySelector('item > link')?.textContent).toBe(
       'https://example.com/blog/hello-welcome',
     );
-    expect(getTagPageMock).toHaveBeenCalledWith('typescript');
-    expect(getPublishedPostsByTagMock).toHaveBeenCalledWith('tag-1');
+    expect(getTagPageMock).toHaveBeenCalledWith('typescript', undefined);
+    expect(getPublishedPostsByTagMock).toHaveBeenCalledWith('tag-1', undefined);
   });
 
   it('falls back to the tag title as the channel description when none is authored', async () => {
@@ -151,5 +168,47 @@ describe('GET /tags/[slug]/rss.xml', () => {
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
 
     errorSpy.mockRestore();
+  });
+
+  it('forwards the resolved tenant Sanity context to every loader', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getHostTenantSanityContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant,
+    });
+    getTagPageMock.mockResolvedValue({
+      ok: true,
+      data: makeTagDetailPage({
+        tag: {
+          id: 'tag-1',
+          title: 'TypeScript',
+          slug: 'typescript',
+          description: undefined,
+        },
+      }),
+    });
+    getPublishedPostsByTagMock.mockResolvedValue({ ok: true, data: [] });
+    const { GET } = await import('./route');
+
+    await GET(new Request('https://example.com'), { params });
+
+    expect(getTagPageMock).toHaveBeenCalledWith('typescript', tenant);
+    expect(getPublishedPostsByTagMock).toHaveBeenCalledWith('tag-1', tenant);
+  });
+
+  it('returns a 404 without querying any content when the host is unresolvable', async () => {
+    getHostTenantSanityContextMock.mockResolvedValue({ isResolvable: false });
+    const { GET } = await import('./route');
+
+    const response = await GET(new Request('https://example.com'), {
+      params,
+    });
+
+    expect(response.status).toBe(404);
+    expect(getTagPageMock).not.toHaveBeenCalled();
   });
 });

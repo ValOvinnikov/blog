@@ -1,5 +1,6 @@
 import { service } from '@blog/service';
 import { oklchToHex } from '@blog/utils';
+import { getHostTenantSanityContext } from '@web/server/tenant/get-host-tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import { ImageResponse } from 'next/og';
 
@@ -196,7 +197,14 @@ export const buildDefaultSocialImage = async ({
 export const resolveDefaultSocialImageProps = async (
   routeName: string,
 ): Promise<TBuildDefaultSocialImageOptions> => {
-  const result = await service.global.siteSettings.v1.getSiteSettings();
+  const hostTenant = await getHostTenantSanityContext();
+  if (!hostTenant.isResolvable) {
+    return {};
+  }
+
+  const result = await service.global.siteSettings.v1.getSiteSettings(
+    hostTenant.tenant,
+  );
 
   if (!result.ok) {
     logger.error('default_social_image.site_settings_fetch_failed', {

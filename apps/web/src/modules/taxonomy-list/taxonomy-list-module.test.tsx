@@ -4,8 +4,9 @@ import { notFound } from 'next/navigation';
 
 import { TaxonomyListModule } from './taxonomy-list-module';
 
-const { getTaxonomyListMock } = vi.hoisted(() => ({
+const { getTaxonomyListMock, getTenantSanityContextMock } = vi.hoisted(() => ({
   getTaxonomyListMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -14,6 +15,10 @@ vi.mock('@blog/service', () => ({
       taxonomyList: { v1: { getTaxonomyList: getTaxonomyListMock } },
     },
   },
+}));
+
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
 }));
 
 vi.mock('@web/components/shared/smart-link', () => ({
@@ -47,6 +52,8 @@ const setup = customRenderAsync(TaxonomyListModule, {
 describe(TaxonomyListModule, () => {
   beforeEach(() => {
     getTaxonomyListMock.mockReset();
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(undefined);
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
@@ -84,6 +91,37 @@ describe(TaxonomyListModule, () => {
     expect(getTaxonomyListMock).toHaveBeenCalledWith(
       'topic-list-1',
       TAXONOMY_KIND.TOPICS,
+      undefined,
+    );
+  });
+
+  it('forwards the resolved tenant Sanity context to getTaxonomyList', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getTaxonomyListMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        sectionHeader: {
+          heading: 'Browse by topic',
+          supportingText: undefined,
+          align: undefined,
+        },
+        layout: undefined,
+        entries: [],
+      },
+    });
+
+    await setup();
+
+    expect(getTaxonomyListMock).toHaveBeenCalledWith(
+      'topic-list-1',
+      TAXONOMY_KIND.TOPICS,
+      tenant,
     );
   });
 

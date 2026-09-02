@@ -3,19 +3,21 @@ import { notFound } from 'next/navigation';
 
 import { GenericPage } from './generic-page';
 
-const { getPageMock, moduleRendererMock } = vi.hoisted(() => ({
-  getPageMock: vi.fn(),
-  // `ModuleRenderer` is an async Server Component — real RSC async-component
-  // nesting isn't renderable through `@testing-library/react`'s client
-  // renderer. Stubbed as a plain sync component so this suite can assert
-  // `GenericPage` passes the right props through without needing a real
-  // async render; its own dispatch logic is covered by
-  // `module-renderer.test.tsx`. `GenericPageView`'s own rendering (h1,
-  // breadcrumbs, JSON-LD) is covered by `generic-page-view.test.tsx`.
-  moduleRendererMock: vi.fn(({ modules }: { modules: { id: string }[] }) => (
-    <div data-testid="module-renderer">{modules.length} modules</div>
-  )),
-}));
+const { getPageMock, moduleRendererMock, getTenantSanityContextMock } =
+  vi.hoisted(() => ({
+    getPageMock: vi.fn(),
+    getTenantSanityContextMock: vi.fn(),
+    // `ModuleRenderer` is an async Server Component — real RSC async-component
+    // nesting isn't renderable through `@testing-library/react`'s client
+    // renderer. Stubbed as a plain sync component so this suite can assert
+    // `GenericPage` passes the right props through without needing a real
+    // async render; its own dispatch logic is covered by
+    // `module-renderer.test.tsx`. `GenericPageView`'s own rendering (h1,
+    // breadcrumbs, JSON-LD) is covered by `generic-page-view.test.tsx`.
+    moduleRendererMock: vi.fn(({ modules }: { modules: { id: string }[] }) => (
+      <div data-testid="module-renderer">{modules.length} modules</div>
+    )),
+  }));
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -27,6 +29,10 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/modules/module-renderer', () => ({
   ModuleRenderer: moduleRendererMock,
+}));
+
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
 }));
 
 vi.mock('@web/components/shared/smart-link', () => ({
@@ -53,6 +59,8 @@ describe(`<${GenericPage.name}/>`, () => {
   beforeEach(() => {
     getPageMock.mockReset();
     moduleRendererMock.mockClear();
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(undefined);
   });
 
   it('calls notFound() and logs when the fetch fails', async () => {
@@ -148,5 +156,22 @@ describe(`<${GenericPage.name}/>`, () => {
     const moduleRenderer = screen.getByTestId('module-renderer');
 
     expect(moduleRenderer.parentElement).toBe(main);
+  });
+
+  it('forwards the resolved tenant Sanity context to getPage', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getPageMock.mockResolvedValue({
+      ok: true,
+      data: { title: 'About Us', slug: 'about-us', modules: [] },
+    });
+
+    await setup();
+
+    expect(getPageMock).toHaveBeenCalledWith('about-us', tenant);
   });
 });

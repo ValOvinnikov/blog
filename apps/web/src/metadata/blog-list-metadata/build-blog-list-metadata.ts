@@ -1,6 +1,7 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
@@ -19,8 +20,9 @@ import { getTranslations } from 'next-intl/server';
 export const buildBlogListMetadata = async (
   page: number,
 ): Promise<Metadata> => {
+  const tenant = await getTenantSanityContext();
   const [result, t] = await Promise.all([
-    service.pages.blog.v1.getIndexPage(),
+    service.pages.blog.v1.getIndexPage(tenant),
     getTranslations('pagination'),
   ]);
 

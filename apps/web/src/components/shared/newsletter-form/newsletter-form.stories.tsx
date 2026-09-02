@@ -1,3 +1,4 @@
+import { HEADING_ALIGN } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { userEvent, within } from 'storybook/test';
 
@@ -8,6 +9,12 @@ const meta = {
   component: NewsletterForm,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
+  argTypes: {
+    align: {
+      control: 'select',
+      options: Object.values(HEADING_ALIGN),
+    },
+  },
   args: {
     variant: 'full',
     heading: 'Get new posts in your inbox',

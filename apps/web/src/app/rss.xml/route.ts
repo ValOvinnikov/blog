@@ -1,8 +1,10 @@
 import { routes } from '@blog/config';
 import { service, type TFeedPost } from '@blog/service';
+import { getHostTenantSanityContext } from '@web/server/tenant/get-host-tenant-sanity-context';
 import { buildRssFeed, type TRssItem } from '@web/utils/build-rss-feed';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
+import { NextResponse } from 'next/server';
 import { getTranslations } from 'next-intl/server';
 
 const toRssItem = (post: TFeedPost, siteUrl: string): TRssItem => {
@@ -23,9 +25,15 @@ const toRssItem = (post: TFeedPost, siteUrl: string): TRssItem => {
 export async function GET(): Promise<Response> {
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
 
+  const hostTenant = await getHostTenantSanityContext();
+  if (!hostTenant.isResolvable) {
+    return new NextResponse(null, { status: 404 });
+  }
+  const { tenant } = hostTenant;
+
   const [postsResult, siteSettingsResult, t] = await Promise.all([
-    service.entities.posts.v1.getAllPublishedPosts(),
-    service.global.siteSettings.v1.getSiteSettings(),
+    service.entities.posts.v1.getAllPublishedPosts(tenant),
+    service.global.siteSettings.v1.getSiteSettings(tenant),
     getTranslations('rss'),
   ]);
 
