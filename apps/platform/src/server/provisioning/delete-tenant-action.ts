@@ -18,10 +18,10 @@ export type TDeleteTenantResult = { ok: true } | { ok: false; error: string };
 /**
  * The tenant status page's hard-delete control. Fetches the tenant to
  * validate `confirm` against its live name (not trusting the client) and to
- * carry `name`/`slug` into the audit record; the archived precondition
- * itself is left to `queries.tenants.deleteTenant`'s own typed refusal
- * rather than re-checked here, since re-fetching just to duplicate a check
- * the mutation already makes atomically would only widen the race window.
+ * carry `name` into the audit record; the archived precondition itself is
+ * left to `queries.tenants.deleteTenant`'s own typed refusal rather than
+ * re-checked here, since re-fetching just to duplicate a check the mutation
+ * already makes atomically would only widen the race window.
  */
 export const deleteTenantAction = async (
   tenantId: string,
@@ -71,7 +71,7 @@ export const deleteTenantAction = async (
     action: AUDIT_ACTION.DELETED,
     targetType: AUDIT_TARGET_TYPE.TENANT,
     targetId: tenantId,
-    details: { name: tenant.name, slug: tenant.slug },
+    details: { name: tenant.name },
   });
 
   return { ok: true };

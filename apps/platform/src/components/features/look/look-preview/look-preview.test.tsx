@@ -7,7 +7,8 @@ import { LookPreview } from './look-preview';
 const render = renderWithIntl;
 
 const BASE_PROPS = {
-  tenantSlug: 'acme',
+  tenantName: 'Acme Inc.',
+  primaryDomain: 'acme.example.com',
   accentHue: 250,
   logoHue: undefined,
   headingFont: FONT_CHOICE.SPACE_GROTESK,
@@ -16,10 +17,10 @@ const BASE_PROPS = {
 };
 
 describe(LookPreview, () => {
-  it('renders the tenant slug and a real site Button primitive from the preview sample', () => {
+  it('renders the tenant name and a real site Button primitive from the preview sample', () => {
     render(<LookPreview {...BASE_PROPS} />);
 
-    expect(screen.getAllByText('acme').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Acme Inc.').length).toBeGreaterThan(0);
     expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
   });
 
@@ -51,7 +52,7 @@ describe(LookPreview, () => {
     render(<LookPreview {...BASE_PROPS} />);
 
     expect(screen.getByText('Full-page preview')).toBeVisible();
-    expect(screen.getByText('preview.acme.dev')).toBeVisible();
+    expect(screen.getByText('acme.example.com')).toBeVisible();
   });
 
   it('re-derives the swatch color when the preview mode toggles to dark, independent of preset', async () => {

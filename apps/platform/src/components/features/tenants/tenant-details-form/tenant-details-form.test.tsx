@@ -19,7 +19,6 @@ vi.mock('@platform/server/tenants/create-tenant-action', () => ({
 
 const fillValidForm = async (user: ReturnType<typeof userEvent.setup>) => {
   await user.type(screen.getByRole('textbox', { name: 'Tenant name' }), 'Acme');
-  await user.type(screen.getByRole('textbox', { name: 'Slug' }), 'acme');
   await user.type(
     screen.getByRole('textbox', { name: 'Domain' }),
     'acme.example.com',
@@ -40,7 +39,6 @@ describe(TenantDetailsForm, () => {
     render(<TenantDetailsForm />);
 
     expect(screen.getByRole('textbox', { name: 'Tenant name' })).toBeVisible();
-    expect(screen.getByRole('textbox', { name: 'Slug' })).toBeVisible();
     expect(screen.getByRole('textbox', { name: 'Domain' })).toBeVisible();
     expect(screen.getByRole('group', { name: 'Plan' })).toBeVisible();
     expect(screen.getByRole('textbox', { name: 'Owner email' })).toBeVisible();
@@ -67,7 +65,6 @@ describe(TenantDetailsForm, () => {
 
     expect(createTenantActionMock).toHaveBeenCalledWith({
       name: 'Acme',
-      slug: 'acme',
       domain: 'acme.example.com',
       plan: 'GROWTH',
       ownerEmail: 'owner@example.com',
@@ -239,7 +236,6 @@ describe(TenantDetailsForm, () => {
       screen.getByRole('textbox', { name: 'Tenant name' }),
       'Acme',
     );
-    await user.type(screen.getByRole('textbox', { name: 'Slug' }), 'acme');
     await user.type(
       screen.getByRole('textbox', { name: 'Domain' }),
       'acme.example.com',

@@ -23,10 +23,10 @@ export type TClearBrandAssetResult =
  * not an error, so a stale "Remove" click can't fail.
  */
 export const clearBrandAssetAction = async (
-  tenantSlug: string,
+  tenantId: string,
   kind: TBrandAssetKind,
 ): Promise<TClearBrandAssetResult> => {
-  const { tenant } = await requireTenantMembership(tenantSlug);
+  const { tenant } = await requireTenantMembership(tenantId);
 
   const parsedKind = brandAssetKindSchema.safeParse(kind);
   if (!parsedKind.success) {

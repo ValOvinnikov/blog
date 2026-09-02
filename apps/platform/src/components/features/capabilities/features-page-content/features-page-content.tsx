@@ -28,7 +28,7 @@ export const FeaturesPageContent = async ({
 
   return (
     <FeaturesSettings
-      tenantSlug={tenant.slug}
+      tenantId={tenant.id}
       entitledCapabilities={entitledCapabilities}
       initialValues={initialValues}
       saveAction={updateFeaturesAction}

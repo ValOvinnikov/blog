@@ -48,7 +48,12 @@ describe(LookForm, () => {
     { timeout: 15000 },
     () => {
       render(
-        <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+        <LookForm
+          tenantId="tenant-1"
+          tenantName="Acme Inc."
+          primaryDomain="acme.example.com"
+          initialValues={defaultLookFormValues()}
+        />,
       );
 
       expect(screen.getByRole('radio', { name: 'Console' })).toHaveAttribute(
@@ -61,7 +66,12 @@ describe(LookForm, () => {
 
   it('renders Basic and Advanced as visually distinct sections, Advanced collapsed by default', () => {
     render(
-      <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+      <LookForm
+        tenantId="tenant-1"
+        tenantName="Acme Inc."
+        primaryDomain="acme.example.com"
+        initialValues={defaultLookFormValues()}
+      />,
     );
 
     expect(screen.getByRole('heading', { name: 'Basic' })).toBeVisible();
@@ -72,7 +82,12 @@ describe(LookForm, () => {
 
   it('shows the favicon square requirement before any file is chosen', () => {
     render(
-      <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+      <LookForm
+        tenantId="tenant-1"
+        tenantName="Acme Inc."
+        primaryDomain="acme.example.com"
+        initialValues={defaultLookFormValues()}
+      />,
     );
 
     expect(
@@ -88,7 +103,9 @@ describe(LookForm, () => {
     const user = userEvent.setup();
     render(
       <LookForm
-        tenantSlug="acme"
+        tenantId="tenant-1"
+        tenantName="Acme Inc."
+        primaryDomain="acme.example.com"
         initialValues={{
           ...defaultLookFormValues(),
           logoAssetUrl: 'https://example.blob.vercel-storage.com/logo.png',
@@ -103,7 +120,12 @@ describe(LookForm, () => {
 
   it('notes that terminal chrome is not yet persisted', () => {
     render(
-      <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+      <LookForm
+        tenantId="tenant-1"
+        tenantName="Acme Inc."
+        primaryDomain="acme.example.com"
+        initialValues={defaultLookFormValues()}
+      />,
     );
 
     expect(
@@ -114,7 +136,12 @@ describe(LookForm, () => {
   it("choosing a preset resets every one of that preset's defaults", async () => {
     const user = userEvent.setup();
     render(
-      <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+      <LookForm
+        tenantId="tenant-1"
+        tenantName="Acme Inc."
+        primaryDomain="acme.example.com"
+        initialValues={defaultLookFormValues()}
+      />,
     );
 
     await user.click(screen.getByRole('radio', { name: 'Editorial' }));
@@ -125,7 +152,12 @@ describe(LookForm, () => {
   it('saves the current form state, excluding chromeOn, through updateLookAction', async () => {
     const user = userEvent.setup();
     render(
-      <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+      <LookForm
+        tenantId="tenant-1"
+        tenantName="Acme Inc."
+        primaryDomain="acme.example.com"
+        initialValues={defaultLookFormValues()}
+      />,
     );
 
     screen.getByRole('slider', { name: 'Accent hue' }).focus();
@@ -133,7 +165,7 @@ describe(LookForm, () => {
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     await waitFor(() => {
-      expect(updateLookActionMock).toHaveBeenCalledWith('acme', {
+      expect(updateLookActionMock).toHaveBeenCalledWith('tenant-1', {
         preset: PRESET_ID.CONSOLE,
         accentHue: 251,
         logoHue: null,
@@ -148,7 +180,12 @@ describe(LookForm, () => {
   it('shows a save-confirmation toast once the save resolves', async () => {
     const user = userEvent.setup();
     render(
-      <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+      <LookForm
+        tenantId="tenant-1"
+        tenantName="Acme Inc."
+        primaryDomain="acme.example.com"
+        initialValues={defaultLookFormValues()}
+      />,
     );
 
     screen.getByRole('slider', { name: 'Accent hue' }).focus();
@@ -164,7 +201,12 @@ describe(LookForm, () => {
     updateLookActionMock.mockResolvedValue({ ok: false });
     const user = userEvent.setup();
     render(
-      <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+      <LookForm
+        tenantId="tenant-1"
+        tenantName="Acme Inc."
+        primaryDomain="acme.example.com"
+        initialValues={defaultLookFormValues()}
+      />,
     );
 
     screen.getByRole('slider', { name: 'Accent hue' }).focus();
@@ -179,7 +221,12 @@ describe(LookForm, () => {
   it('disables Reset to preset and Save changes until the form is dirty', async () => {
     const user = userEvent.setup();
     render(
-      <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+      <LookForm
+        tenantId="tenant-1"
+        tenantName="Acme Inc."
+        primaryDomain="acme.example.com"
+        initialValues={defaultLookFormValues()}
+      />,
     );
 
     expect(
@@ -199,7 +246,12 @@ describe(LookForm, () => {
   it('resets a diverged control back to the current preset on "Reset to preset"', async () => {
     const user = userEvent.setup();
     render(
-      <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+      <LookForm
+        tenantId="tenant-1"
+        tenantName="Acme Inc."
+        primaryDomain="acme.example.com"
+        initialValues={defaultLookFormValues()}
+      />,
     );
 
     const slider = screen.getByRole('slider', { name: 'Accent hue' });
@@ -216,7 +268,9 @@ describe(LookForm, () => {
     const user = userEvent.setup();
     render(
       <LookForm
-        tenantSlug="acme"
+        tenantId="tenant-1"
+        tenantName="Acme Inc."
+        primaryDomain="acme.example.com"
         initialValues={defaultLookFormValues()}
         archivedAt={new Date('2026-08-26T00:00:00.000Z')}
       />,
@@ -234,7 +288,9 @@ describe(LookForm, () => {
   it('disables every Look control for an archived tenant', () => {
     render(
       <LookForm
-        tenantSlug="acme"
+        tenantId="tenant-1"
+        tenantName="Acme Inc."
+        primaryDomain="acme.example.com"
         initialValues={defaultLookFormValues()}
         archivedAt={new Date('2026-08-26T00:00:00.000Z')}
       />,
@@ -262,7 +318,9 @@ describe(LookForm, () => {
     const user = userEvent.setup();
     render(
       <LookForm
-        tenantSlug="acme"
+        tenantId="tenant-1"
+        tenantName="Acme Inc."
+        primaryDomain="acme.example.com"
         initialValues={defaultLookFormValues()}
         archivedAt={new Date('2026-08-26T00:00:00.000Z')}
       />,
@@ -284,7 +342,12 @@ describe(LookForm, () => {
   it('leaves every Look control enabled for a non-archived tenant', async () => {
     const user = userEvent.setup();
     render(
-      <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+      <LookForm
+        tenantId="tenant-1"
+        tenantName="Acme Inc."
+        primaryDomain="acme.example.com"
+        initialValues={defaultLookFormValues()}
+      />,
     );
 
     await user.click(screen.getByText('Advanced'));
@@ -307,7 +370,9 @@ describe(LookForm, () => {
   it('describes the disabled Save and Reset buttons with the archived notice text, for a screen-reader user', () => {
     render(
       <LookForm
-        tenantSlug="acme"
+        tenantId="tenant-1"
+        tenantName="Acme Inc."
+        primaryDomain="acme.example.com"
         initialValues={defaultLookFormValues()}
         archivedAt={new Date('2026-08-26T00:00:00.000Z')}
       />,

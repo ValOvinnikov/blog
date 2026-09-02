@@ -47,18 +47,18 @@ export type TUpdateLookResult = { ok: true } | { ok: false };
 /**
  * The Look tab's save action, called directly from `LookForm` (not a native
  * form submission, since it gathers several controls' state at once).
- * `requireTenantMembership` re-checks the session against `tenantSlug` here
+ * `requireTenantMembership` re-checks the session against `tenantId` here
  * too — the page's own gate proves nothing about who actually invoked this
  * endpoint.
  */
 export const updateLookAction = async (
-  tenantSlug: string,
+  tenantId: string,
   input: TUpdateLookInput,
 ): Promise<TUpdateLookResult> => {
   const parsed = updateLookInputSchema.safeParse(input);
   if (!parsed.success) return { ok: false };
 
-  const { tenant } = await requireTenantMembership(tenantSlug);
+  const { tenant } = await requireTenantMembership(tenantId);
 
   try {
     await queries.siteConfig.upsertSiteConfig(tenant.id, parsed.data);

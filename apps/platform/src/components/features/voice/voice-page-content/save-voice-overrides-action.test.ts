@@ -31,7 +31,7 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-const tenant = { id: 'tenant-1', slug: 'acme' };
+const tenant = { id: 'tenant-1' };
 
 const overrides = {
   notFoundMetaTitle: '',
@@ -68,13 +68,13 @@ describe(saveVoiceOverridesAction, () => {
     });
   });
 
-  it('resolves the tenant from the session-checked slug, not a client-supplied id', async () => {
+  it('resolves the tenant from the session-checked membership, never trusting a client-supplied id on its own', async () => {
     getSiteConfigMock.mockResolvedValue(undefined);
     upsertSiteConfigMock.mockResolvedValue({});
 
-    await saveVoiceOverridesAction('acme', overrides);
+    await saveVoiceOverridesAction('tenant-1', overrides);
 
-    expect(requireTenantMembershipMock).toHaveBeenCalledWith('acme');
+    expect(requireTenantMembershipMock).toHaveBeenCalledWith('tenant-1');
     expect(getSiteConfigMock).toHaveBeenCalledWith('tenant-1');
     expect(upsertSiteConfigMock).toHaveBeenCalledWith(
       'tenant-1',
@@ -86,7 +86,7 @@ describe(saveVoiceOverridesAction, () => {
     getSiteConfigMock.mockResolvedValue(undefined);
     upsertSiteConfigMock.mockResolvedValue({});
 
-    await saveVoiceOverridesAction('acme', overrides);
+    await saveVoiceOverridesAction('tenant-1', overrides);
 
     const consoleTokens = PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens;
     expect(upsertSiteConfigMock).toHaveBeenCalledWith('tenant-1', {
@@ -118,7 +118,7 @@ describe(saveVoiceOverridesAction, () => {
     });
     upsertSiteConfigMock.mockResolvedValue({});
 
-    await saveVoiceOverridesAction('acme', overrides);
+    await saveVoiceOverridesAction('tenant-1', overrides);
 
     expect(upsertSiteConfigMock).toHaveBeenCalledWith('tenant-1', {
       preset: PRESET_ID.EDITORIAL,
@@ -138,7 +138,7 @@ describe(saveVoiceOverridesAction, () => {
     getSiteConfigMock.mockResolvedValue(undefined);
     upsertSiteConfigMock.mockRejectedValue(new Error('db down'));
 
-    const result = await saveVoiceOverridesAction('acme', overrides);
+    const result = await saveVoiceOverridesAction('tenant-1', overrides);
 
     expect(result).toEqual({ ok: false });
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
@@ -148,7 +148,7 @@ describe(saveVoiceOverridesAction, () => {
     getSiteConfigMock.mockResolvedValue(undefined);
     upsertSiteConfigMock.mockResolvedValue({});
 
-    const result = await saveVoiceOverridesAction('acme', overrides);
+    const result = await saveVoiceOverridesAction('tenant-1', overrides);
 
     expect(result).toEqual({ ok: true });
   });
@@ -157,7 +157,7 @@ describe(saveVoiceOverridesAction, () => {
     getSiteConfigMock.mockResolvedValue(undefined);
     upsertSiteConfigMock.mockResolvedValue({});
 
-    await saveVoiceOverridesAction('acme', overrides);
+    await saveVoiceOverridesAction('tenant-1', overrides);
 
     expect(revalidateSiteConfigMock).toHaveBeenCalledTimes(1);
   });

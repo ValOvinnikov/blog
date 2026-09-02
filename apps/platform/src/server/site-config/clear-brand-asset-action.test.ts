@@ -69,7 +69,7 @@ describe(clearBrandAssetAction, () => {
     delMock.mockReset();
 
     requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: 'tenant-1', slug: 'acme' },
+      tenant: { id: 'tenant-1' },
       membership: { role: 'OWNER' },
     });
     authMock.mockResolvedValue({
@@ -78,16 +78,16 @@ describe(clearBrandAssetAction, () => {
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
   });
 
-  it('re-resolves the tenant from the session against the routed slug before writing anything', async () => {
+  it('re-resolves the tenant from the session against the routed tenant id before writing anything', async () => {
     getSiteConfigOrDefaultsMock.mockResolvedValue({
       ...THEME_FIELDS,
       logoAssetUrl: undefined,
       faviconAssetUrl: undefined,
     });
 
-    await clearBrandAssetAction('acme', 'favicon');
+    await clearBrandAssetAction('tenant-1', 'favicon');
 
-    expect(requireTenantMembershipMock).toHaveBeenCalledWith('acme');
+    expect(requireTenantMembershipMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('nulls the logo column and deletes the stored blob', async () => {
@@ -98,7 +98,7 @@ describe(clearBrandAssetAction, () => {
     });
     upsertSiteConfigMock.mockResolvedValue({});
 
-    const result = await clearBrandAssetAction('acme', 'logo');
+    const result = await clearBrandAssetAction('tenant-1', 'logo');
 
     expect(result).toEqual({ ok: true });
     expect(upsertSiteConfigMock).toHaveBeenCalledWith('tenant-1', {
@@ -119,7 +119,7 @@ describe(clearBrandAssetAction, () => {
     });
     upsertSiteConfigMock.mockResolvedValue({});
 
-    await clearBrandAssetAction('acme', 'favicon');
+    await clearBrandAssetAction('tenant-1', 'favicon');
 
     expect(insertAuditEventMock).toHaveBeenCalledTimes(1);
     expect(insertAuditEventMock).toHaveBeenCalledWith({
@@ -139,7 +139,7 @@ describe(clearBrandAssetAction, () => {
       faviconAssetUrl: undefined,
     });
 
-    const result = await clearBrandAssetAction('acme', 'favicon');
+    const result = await clearBrandAssetAction('tenant-1', 'favicon');
 
     expect(result).toEqual({ ok: true });
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();
@@ -155,7 +155,7 @@ describe(clearBrandAssetAction, () => {
     });
     upsertSiteConfigMock.mockRejectedValue(new Error('db unavailable'));
 
-    const result = await clearBrandAssetAction('acme', 'favicon');
+    const result = await clearBrandAssetAction('tenant-1', 'favicon');
 
     expect(result).toEqual({
       ok: false,
@@ -169,7 +169,7 @@ describe(clearBrandAssetAction, () => {
       throw new Error('NEXT_REDIRECT');
     });
 
-    await expect(clearBrandAssetAction('acme', 'logo')).rejects.toThrow(
+    await expect(clearBrandAssetAction('tenant-1', 'logo')).rejects.toThrow(
       'NEXT_REDIRECT',
     );
 
@@ -181,7 +181,7 @@ describe(clearBrandAssetAction, () => {
       throw new Error('NEXT_NOT_FOUND');
     });
 
-    await expect(clearBrandAssetAction('acme', 'logo')).rejects.toThrow(
+    await expect(clearBrandAssetAction('tenant-1', 'logo')).rejects.toThrow(
       'NEXT_NOT_FOUND',
     );
 

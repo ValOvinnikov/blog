@@ -21,17 +21,17 @@ export type TUploadBrandAssetResult =
  * Called directly from `BrandAssetField` on file selection — persists to
  * `site_config` immediately, not gated behind the Look tab's "Save changes"
  * (the same way any native file-upload control takes effect right away).
- * `requireTenantMembership` re-checks the session against `tenantSlug` here
+ * `requireTenantMembership` re-checks the session against `tenantId` here
  * too, same as every other Look-tab action; `kind` is re-validated even
  * though the client only ever sends one of two literals, since a Server
  * Action is a public HTTP endpoint regardless of what its caller's types say.
  */
 export const uploadBrandAssetAction = async (
-  tenantSlug: string,
+  tenantId: string,
   kind: TBrandAssetKind,
   formData: FormData,
 ): Promise<TUploadBrandAssetResult> => {
-  const { tenant } = await requireTenantMembership(tenantSlug);
+  const { tenant } = await requireTenantMembership(tenantId);
 
   const parsedKind = brandAssetKindSchema.safeParse(kind);
   if (!parsedKind.success) {

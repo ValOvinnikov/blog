@@ -9,7 +9,7 @@ import { z } from 'zod';
 import { dispatchDeprovisioningWorkflow } from './dispatch-deprovisioning-workflow';
 
 const deprovisionTenantInputSchema = z.object({
-  confirm: z.string().trim().min(1, 'Type the tenant slug to confirm.'),
+  confirm: z.string().trim().min(1, 'Type the tenant name to confirm.'),
   dryRun: z.boolean(),
 });
 
@@ -22,7 +22,7 @@ export type TDeprovisionTenantResult =
 
 /**
  * The tenant status page's "Deprovision tenant" control. `confirm` is
- * checked against the tenant's live slug here as a fast-fail UX convenience
+ * checked against the tenant's live name here as a fast-fail UX convenience
  * only — `deprovision-tenant.yml` re-validates it independently before doing
  * anything destructive.
  */
@@ -50,8 +50,8 @@ export const deprovisionTenantAction = async (
   }
 
   const { confirm, dryRun } = parsed.data;
-  if (confirm !== tenant.slug) {
-    return { ok: false, error: "Doesn't match the tenant's slug." };
+  if (confirm !== tenant.name) {
+    return { ok: false, error: "Doesn't match the tenant's name." };
   }
 
   const dispatched = await dispatchDeprovisioningWorkflow({
@@ -72,7 +72,7 @@ export const deprovisionTenantAction = async (
       action: AUDIT_ACTION.DEPROVISIONED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: tenantId,
-      details: { slug: tenant.slug },
+      details: { name: tenant.name },
     });
   }
 
