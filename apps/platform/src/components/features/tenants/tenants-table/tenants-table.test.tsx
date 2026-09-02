@@ -1,56 +1,17 @@
-import {
-  TENANT_PROVISIONING_STATUS,
-  TENANT_PROVISIONING_STEP,
-  TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db';
+import { TENANT_PROVISIONING_STATUS } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { makeTenant } from '@platform/testing/tenants/fixtures';
 
 import { TenantsTable } from './tenants-table';
 
 const render = renderWithIntl;
 
-const buildTenant = (overrides: Partial<TTenant> = {}): TTenant => ({
-  id: 'tenant-1',
-  slug: 'acme',
-  name: 'Acme Inc.',
-  primaryDomain: 'acme.example.com',
-  sanityProjectId: 'proj-1',
-  sanityDataset: 'production',
-  sanityReadTokenEncrypted: null,
-  sanityWriteTokenEncrypted: null,
-  locale: 'en',
-  plan: 'FREE',
-  status: 'ACTIVE',
-  provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-  provisioningSteps: {
-    [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-    },
-    [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
-      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-    },
-    [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
-      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-    },
-    [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-    },
-    [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
-      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-    },
-    [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
-      status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
-    },
-  },
-  studioVercelProjectId: null,
-  seededAt: new Date('2026-04-02T00:00:00.000Z'),
-  webhookCreatedAt: new Date('2026-04-02T00:00:00.000Z'),
-  deprovisionedAt: null,
-  createdAt: new Date('2026-04-02T00:00:00.000Z'),
-  updatedAt: new Date('2026-04-02T00:00:00.000Z'),
-  ...overrides,
-});
+const buildTenant = (overrides: Partial<TTenant> = {}): TTenant =>
+  makeTenant({
+    provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+    ...overrides,
+  });
 
 describe(TenantsTable, () => {
   it('renders one row per tenant with its name, domain, plan and status', () => {

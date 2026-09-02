@@ -7,6 +7,7 @@ import {
 import type { TTenant } from '@blog/db/schema/tenants';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { makeTenant } from '@platform/testing/tenants/fixtures';
 
 import { FeaturesPageContent } from './features-page-content';
 
@@ -50,27 +51,17 @@ const provisioningSteps = {
   },
 };
 
-const buildTenant = (plan: 'FREE' | 'GROWTH'): TTenant => ({
-  id: 'tenant-1',
-  slug: 'acme',
-  name: 'Acme Inc.',
-  primaryDomain: 'acme.example.com',
-  sanityProjectId: 'proj-1',
-  sanityDataset: 'production',
-  sanityReadTokenEncrypted: null,
-  sanityWriteTokenEncrypted: null,
-  locale: 'en',
-  plan,
-  status: 'ACTIVE',
-  provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-  provisioningSteps,
-  studioVercelProjectId: null,
-  seededAt: new Date('2026-01-01T00:00:00.000Z'),
-  webhookCreatedAt: new Date('2026-01-01T00:00:00.000Z'),
-  deprovisionedAt: null,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-});
+const buildTenant = (plan: 'FREE' | 'GROWTH'): TTenant =>
+  makeTenant({
+    sanityProjectId: 'proj-1',
+    sanityDataset: 'production',
+    locale: 'en',
+    plan,
+    provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+    provisioningSteps,
+    seededAt: new Date('2026-01-01T00:00:00.000Z'),
+    webhookCreatedAt: new Date('2026-01-01T00:00:00.000Z'),
+  });
 
 const setup = customRenderAsync(FeaturesPageContent, {
   tenant: buildTenant('FREE'),
