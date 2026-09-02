@@ -9,6 +9,12 @@ const meta = {
   component: Aside,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
+  argTypes: {
+    kind: {
+      control: 'select',
+      options: Object.values(ASIDE_KIND),
+    },
+  },
   args: {
     children: <p>{faker.lorem.paragraphs(2, '\n\n')}</p>,
   },

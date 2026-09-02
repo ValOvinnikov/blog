@@ -1,3 +1,5 @@
+import { buttonVariants } from '@blog/ui/atoms/button/button-variants';
+import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { LinkButton } from './link-button';
@@ -6,6 +8,12 @@ const meta: Meta<typeof LinkButton> = {
   title: 'Molecules/LinkButton',
   component: LinkButton,
   tags: ['autodocs'],
+  argTypes: {
+    size: {
+      control: 'select',
+      options: objectKeys(buttonVariants.variants.size),
+    },
+  },
   args: {
     href: '/blog',
     children: 'Read more',
