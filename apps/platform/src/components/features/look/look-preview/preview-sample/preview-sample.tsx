@@ -10,7 +10,7 @@ import type { CSSProperties } from 'react';
 import { previewSampleVariants } from './preview-sample-variants';
 
 export type TPreviewSampleProps = {
-  tenantSlug: string;
+  tenantName: string;
   tokenStyle: CSSProperties;
   isDark: boolean;
   headingFontFamily: string;
@@ -25,7 +25,7 @@ export type TPreviewSampleProps = {
  * admin-styled approximation of it.
  */
 export const PreviewSample = ({
-  tenantSlug,
+  tenantName,
   tokenStyle,
   isDark,
   headingFontFamily,
@@ -40,9 +40,9 @@ export const PreviewSample = ({
   const sample = (
     <>
       <div className={brandRow()}>
-        <BrandMark size={SIZE.SM} title={tenantSlug} />
+        <BrandMark size={SIZE.SM} title={tenantName} />
         <span className={brandName()} style={{ fontFamily: headingFontFamily }}>
-          {tenantSlug}
+          {tenantName}
         </span>
       </div>
       <Heading

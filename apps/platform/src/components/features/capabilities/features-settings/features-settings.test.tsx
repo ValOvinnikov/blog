@@ -43,7 +43,7 @@ describe(FeaturesSettings, () => {
   it('renders one toggle per v1 capability, reflecting the initial values', () => {
     render(
       <FeaturesSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         entitledCapabilities={ALL_ENTITLED}
         initialValues={INITIAL_VALUES}
         saveAction={vi.fn()}
@@ -64,7 +64,7 @@ describe(FeaturesSettings, () => {
   it('disables an out-of-plan toggle and shows a plan-locked badge, without hiding it', () => {
     render(
       <FeaturesSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         entitledCapabilities={FREE_ENTITLED}
         initialValues={INITIAL_VALUES}
         saveAction={vi.fn()}
@@ -88,7 +88,7 @@ describe(FeaturesSettings, () => {
   it('makes a locked toggle inert (unreachable and unclickable) while leaving an entitled toggle interactive, same as a provisioning-locked field', () => {
     render(
       <FeaturesSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         entitledCapabilities={FREE_ENTITLED}
         initialValues={INITIAL_VALUES}
         saveAction={vi.fn()}
@@ -107,7 +107,7 @@ describe(FeaturesSettings, () => {
   it('renders the page heading and a section heading without skipping a level; toggle rows are labelled rows, not further headings', () => {
     render(
       <FeaturesSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         entitledCapabilities={ALL_ENTITLED}
         initialValues={INITIAL_VALUES}
         saveAction={vi.fn()}
@@ -127,7 +127,7 @@ describe(FeaturesSettings, () => {
     const user = userEvent.setup();
     render(
       <FeaturesSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         entitledCapabilities={ALL_ENTITLED}
         initialValues={INITIAL_VALUES}
         saveAction={vi.fn()}
@@ -147,7 +147,7 @@ describe(FeaturesSettings, () => {
     const saveAction = vi.fn().mockResolvedValue({ ok: true });
     render(
       <FeaturesSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         entitledCapabilities={ALL_ENTITLED}
         initialValues={INITIAL_VALUES}
         saveAction={saveAction}
@@ -157,7 +157,7 @@ describe(FeaturesSettings, () => {
     await user.click(screen.getByRole('switch', { name: 'Ratings' }));
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-    expect(saveAction).toHaveBeenCalledWith('acme', {
+    expect(saveAction).toHaveBeenCalledWith('tenant-1', {
       ...INITIAL_VALUES,
       ratingsEnabled: false,
     });
@@ -177,7 +177,7 @@ describe(FeaturesSettings, () => {
     const saveAction = vi.fn().mockResolvedValue({ ok: true });
     render(
       <FeaturesSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         entitledCapabilities={ALL_ENTITLED}
         initialValues={INITIAL_VALUES}
         saveAction={saveAction}
@@ -204,7 +204,7 @@ describe(FeaturesSettings, () => {
     const saveAction = vi.fn().mockResolvedValue({ ok: false });
     render(
       <FeaturesSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         entitledCapabilities={ALL_ENTITLED}
         initialValues={INITIAL_VALUES}
         saveAction={saveAction}
@@ -222,7 +222,7 @@ describe(FeaturesSettings, () => {
     const saveAction = vi.fn().mockResolvedValue({ ok: true });
     render(
       <FeaturesSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         entitledCapabilities={ALL_ENTITLED}
         initialValues={INITIAL_VALUES}
         saveAction={saveAction}
@@ -242,7 +242,7 @@ describe(FeaturesSettings, () => {
   it('describes the disabled Save button with the archived notice text, for a screen-reader user', () => {
     render(
       <FeaturesSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         entitledCapabilities={ALL_ENTITLED}
         initialValues={INITIAL_VALUES}
         saveAction={vi.fn()}
@@ -259,7 +259,7 @@ describe(FeaturesSettings, () => {
     const user = userEvent.setup();
     render(
       <FeaturesSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         entitledCapabilities={ALL_ENTITLED}
         initialValues={INITIAL_VALUES}
         saveAction={vi.fn()}
@@ -280,7 +280,7 @@ describe(FeaturesSettings, () => {
   it('leaves entitled capability toggles enabled for a non-archived tenant', () => {
     render(
       <FeaturesSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         entitledCapabilities={ALL_ENTITLED}
         initialValues={INITIAL_VALUES}
         saveAction={vi.fn()}

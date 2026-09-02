@@ -5,7 +5,6 @@ import {
   AUDIT_TARGET_TYPE,
   DOMAIN_PATTERN,
   ERROR_CODE,
-  SLUG_PATTERN,
 } from '@blog/config';
 import { queries, TENANT_PLAN, type TTenantPlan } from '@blog/db';
 import { routing } from '@platform/i18n/routing';
@@ -25,11 +24,6 @@ import { z } from 'zod';
 
 const createTenantInputSchema = z.object({
   name: z.string().trim().min(1, 'Enter a tenant name.'),
-  slug: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .regex(SLUG_PATTERN, 'Lowercase letters, numbers, and hyphens only.'),
   domain: z
     .string()
     .trim()
@@ -41,6 +35,13 @@ const createTenantInputSchema = z.object({
   // server-side via HMAC before the not-found-owner branch may proceed.
   confirmOwnerInviteToken: z.string().optional(),
 });
+
+/**
+ * `tenants.slug` is still `.notNull().unique()`, but the operator no longer
+ * types one — it's derived from the (already-validated, already
+ * uniqueness-checked) domain rather than surfaced as its own field.
+ */
+const deriveTenantSlug = (domain: string): string => domain.replace(/\./g, '-');
 
 export type TCreateTenantInput = z.input<typeof createTenantInputSchema>;
 
@@ -87,8 +88,9 @@ export const createTenantAction = async (
     return { ok: false, fieldErrors };
   }
 
-  const { name, slug, domain, plan, ownerEmail, confirmOwnerInviteToken } =
+  const { name, domain, plan, ownerEmail, confirmOwnerInviteToken } =
     parsed.data;
+  const slug = deriveTenantSlug(domain);
 
   const owner = await queries.users.getUserByEmail(ownerEmail);
   if (!owner && !verifyOwnerInviteToken(ownerEmail, confirmOwnerInviteToken)) {
@@ -102,18 +104,10 @@ export const createTenantAction = async (
     };
   }
 
-  const [existingSlug, existingDomain, domainAvailability] = await Promise.all([
-    queries.tenants.getTenantBySlug(slug, { includeArchived: true }),
+  const [existingDomain, domainAvailability] = await Promise.all([
     queries.tenantDomains.getTenantByDomain(domain),
     checkDomainAvailability(domain),
   ]);
-
-  if (existingSlug) {
-    return {
-      ok: false,
-      fieldErrors: { slug: 'This slug is already in use.' },
-    };
-  }
 
   if (existingDomain) {
     return {
@@ -151,7 +145,10 @@ export const createTenantAction = async (
       if (result.error === ERROR_CODE.DB_DUPLICATE_SLUG) {
         return {
           ok: false,
-          fieldErrors: { slug: 'This slug is already in use.' },
+          fieldErrors: {
+            domain:
+              'This domain conflicts with an existing tenant — try a different one.',
+          },
         };
       }
       logger.error('tenants.create_draft_failed', {

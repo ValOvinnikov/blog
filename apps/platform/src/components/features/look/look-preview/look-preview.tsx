@@ -17,7 +17,8 @@ import { PreviewSample } from './preview-sample';
 type TPreviewMode = 'light' | 'dark';
 
 export type TLookPreviewProps = {
-  tenantSlug: string;
+  tenantName: string;
+  primaryDomain: string;
   accentHue: number;
   logoHue: number | undefined;
   headingFont: TFontChoice;
@@ -38,7 +39,8 @@ export type TLookPreviewProps = {
  * regardless of preset.
  */
 export const LookPreview = ({
-  tenantSlug,
+  tenantName,
+  primaryDomain,
   accentHue,
   logoHue,
   headingFont,
@@ -92,7 +94,7 @@ export const LookPreview = ({
         />
         <Card.Body>
           <PreviewSample
-            tenantSlug={tenantSlug}
+            tenantName={tenantName}
             tokenStyle={tokenStyle}
             isDark={isDark}
             headingFontFamily={heading.fontFamily}
@@ -117,7 +119,7 @@ export const LookPreview = ({
               <span className={deviceDot()} />
             </span>
             <span className={deviceUrl()}>
-              {t('deviceUrl', { tenantSlug })}
+              {t('deviceUrl', { primaryDomain })}
             </span>
           </div>
           <div className={frame()}>

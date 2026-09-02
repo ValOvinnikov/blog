@@ -16,7 +16,7 @@ export type TTenantMembershipContext = {
 
 /**
  * The Tenant-section gate: no session redirects to sign-in; an unknown
- * tenant slug and a session with no `memberships` row for a real tenant both
+ * tenant id and a session with no `memberships` row for a real tenant both
  * 404, indistinguishably — unless the session has any `admins` row, which
  * gets a virtual OWNER-level membership on any existing tenant instead,
  * regardless of any real `memberships` row or admin role. This matches
@@ -26,7 +26,7 @@ export type TTenantMembershipContext = {
  * check someone could forget to add.
  */
 export const requireTenantMembership = async (
-  tenantSlug: string,
+  tenantId: string,
 ): Promise<TTenantMembershipContext> => {
   const session = await auth();
   const userId = session?.user?.id;
@@ -35,7 +35,7 @@ export const requireTenantMembership = async (
     redirect(adminRoutes.signIn());
   }
 
-  const tenant = await queries.tenants.getTenantBySlug(tenantSlug);
+  const tenant = await queries.tenants.getTenantById(tenantId);
 
   if (!tenant) {
     notFound();

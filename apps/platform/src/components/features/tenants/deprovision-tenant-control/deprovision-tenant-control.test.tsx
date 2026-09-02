@@ -98,9 +98,9 @@ describe(DeprovisionTenantControl, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('opens a confirm dialog requiring the tenant slug, disabled until it matches', async () => {
+  it('opens a confirm dialog requiring the tenant name, disabled until it matches', async () => {
     const user = userEvent.setup();
-    const tenant = makeTenant({ slug: 'acme' });
+    const tenant = makeTenant();
     render(<DeprovisionTenantControl tenant={tenant} />);
 
     await user.click(
@@ -115,17 +115,17 @@ describe(DeprovisionTenantControl, () => {
     expect(screen.getByRole('button', { name: 'Deprovision' })).toBeDisabled();
   });
 
-  it('enables the confirm button only once the typed slug matches, and calls the action on confirm', async () => {
+  it('enables the confirm button only once the typed name matches, and calls the action on confirm', async () => {
     const user = userEvent.setup();
-    const tenant = makeTenant({ slug: 'acme' });
+    const tenant = makeTenant();
     render(<DeprovisionTenantControl tenant={tenant} />);
 
     await user.click(
       screen.getByRole('button', { name: 'Deprovision tenant' }),
     );
     await user.type(
-      screen.getByRole('textbox', { name: /type "acme"/i }),
-      'acme',
+      screen.getByRole('textbox', { name: /type "acme inc\."/i }),
+      'Acme Inc.',
     );
 
     const confirmButton = screen.getByRole('button', { name: 'Deprovision' });
@@ -134,7 +134,7 @@ describe(DeprovisionTenantControl, () => {
     await user.click(confirmButton);
 
     expect(deprovisionTenantActionMock).toHaveBeenCalledWith(tenant.id, {
-      confirm: 'acme',
+      confirm: 'Acme Inc.',
       dryRun: true,
     });
   });
@@ -142,23 +142,23 @@ describe(DeprovisionTenantControl, () => {
   it('shows the error message inline and never refreshes when the action fails', async () => {
     deprovisionTenantActionMock.mockResolvedValue({
       ok: false,
-      error: "Doesn't match the tenant's slug.",
+      error: "Doesn't match the tenant's name.",
     });
     const user = userEvent.setup();
-    const tenant = makeTenant({ slug: 'acme' });
+    const tenant = makeTenant();
     render(<DeprovisionTenantControl tenant={tenant} />);
 
     await user.click(
       screen.getByRole('button', { name: 'Deprovision tenant' }),
     );
     await user.type(
-      screen.getByRole('textbox', { name: /type "acme"/i }),
-      'acme',
+      screen.getByRole('textbox', { name: /type "acme inc\."/i }),
+      'Acme Inc.',
     );
     await user.click(screen.getByRole('button', { name: 'Deprovision' }));
 
     expect(
-      await screen.findByText("Doesn't match the tenant's slug."),
+      await screen.findByText("Doesn't match the tenant's name."),
     ).toBeVisible();
     expect(refreshMock).not.toHaveBeenCalled();
   });

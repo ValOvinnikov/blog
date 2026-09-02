@@ -87,7 +87,7 @@ describe(uploadBrandAssetAction, () => {
     delMock.mockReset();
 
     requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: 'tenant-1', slug: 'acme' },
+      tenant: { id: 'tenant-1' },
       membership: { role: 'OWNER' },
     });
     authMock.mockResolvedValue({
@@ -108,17 +108,17 @@ describe(uploadBrandAssetAction, () => {
     });
 
     await uploadBrandAssetAction(
-      'acme',
+      'tenant-1',
       'logo',
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
 
-    expect(requireTenantMembershipMock).toHaveBeenCalledWith('acme');
+    expect(requireTenantMembershipMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('rejects when no file is present in the form data', async () => {
     const result = await uploadBrandAssetAction(
-      'acme',
+      'tenant-1',
       'logo',
       makeFormData(null),
     );
@@ -135,7 +135,7 @@ describe(uploadBrandAssetAction, () => {
     });
 
     const result = await uploadBrandAssetAction(
-      'acme',
+      'tenant-1',
       'favicon',
       makeFormData(new File(['x'], 'favicon.png', { type: 'image/png' })),
     );
@@ -164,7 +164,7 @@ describe(uploadBrandAssetAction, () => {
     upsertSiteConfigMock.mockResolvedValue({});
 
     const result = await uploadBrandAssetAction(
-      'acme',
+      'tenant-1',
       'logo',
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
@@ -194,7 +194,7 @@ describe(uploadBrandAssetAction, () => {
     upsertSiteConfigMock.mockResolvedValue({});
 
     await uploadBrandAssetAction(
-      'acme',
+      'tenant-1',
       'logo',
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
@@ -235,7 +235,7 @@ describe(uploadBrandAssetAction, () => {
     delMock.mockRejectedValue(new Error('blob unavailable'));
 
     const result = await uploadBrandAssetAction(
-      'acme',
+      'tenant-1',
       'logo',
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
@@ -259,7 +259,7 @@ describe(uploadBrandAssetAction, () => {
     putMock.mockRejectedValue(new Error('blob store unavailable'));
 
     const result = await uploadBrandAssetAction(
-      'acme',
+      'tenant-1',
       'logo',
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
@@ -287,7 +287,7 @@ describe(uploadBrandAssetAction, () => {
     upsertSiteConfigMock.mockRejectedValue(new Error('db unavailable'));
 
     const result = await uploadBrandAssetAction(
-      'acme',
+      'tenant-1',
       'logo',
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
@@ -305,7 +305,7 @@ describe(uploadBrandAssetAction, () => {
 
     try {
       const result = await uploadBrandAssetAction(
-        'acme',
+        'tenant-1',
         'logo',
         makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
       );
@@ -330,7 +330,7 @@ describe(uploadBrandAssetAction, () => {
 
     await expect(
       uploadBrandAssetAction(
-        'acme',
+        'tenant-1',
         'logo',
         makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
       ),
@@ -346,7 +346,7 @@ describe(uploadBrandAssetAction, () => {
 
     await expect(
       uploadBrandAssetAction(
-        'acme',
+        'tenant-1',
         'logo',
         makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
       ),

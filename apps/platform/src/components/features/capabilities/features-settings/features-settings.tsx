@@ -21,12 +21,12 @@ import { useId } from 'react';
 import { featuresSettingsVariants } from './features-settings-variants';
 
 export type TFeaturesSettingsProps = {
-  tenantSlug: string;
+  tenantId: string;
   /** Which capabilities the tenant's plan entitles — everything else renders locked, visible but disabled. */
   entitledCapabilities: TCapability[];
   initialValues: TSettingsFeaturesValues;
   saveAction: (
-    tenantSlug: string,
+    tenantId: string,
     values: TSettingsFeaturesValues,
   ) => Promise<{ ok: boolean }>;
   /** When set, the tenant is archived: Save is disabled and a notice explains why. */
@@ -41,7 +41,7 @@ export type TFeaturesSettingsProps = {
  * entitlement itself.
  */
 export const FeaturesSettings = ({
-  tenantSlug,
+  tenantId,
   entitledCapabilities,
   initialValues,
   saveAction,
@@ -55,7 +55,7 @@ export const FeaturesSettings = ({
   const { values, setValues, status, isPending, handleSubmit } =
     useFormSubmission<TSettingsFeaturesValues, { ok: boolean }>({
       initialValues,
-      onSubmit: (vals) => saveAction(tenantSlug, vals),
+      onSubmit: (vals) => saveAction(tenantId, vals),
       onSuccess: () => {
         toast.success({
           command: 'features',

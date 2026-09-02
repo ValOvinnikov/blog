@@ -36,7 +36,7 @@ describe(VoiceSettings, () => {
   it('renders Basic empty, with a stated reason', () => {
     render(
       <VoiceSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={vi.fn()}
@@ -56,7 +56,7 @@ describe(VoiceSettings, () => {
   it('starts the Advanced section collapsed', () => {
     render(
       <VoiceSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={vi.fn()}
@@ -72,7 +72,7 @@ describe(VoiceSettings, () => {
   it('shows a chevron affordance on the Advanced disclosure toggle', () => {
     render(
       <VoiceSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={vi.fn()}
@@ -87,7 +87,7 @@ describe(VoiceSettings, () => {
     const user = userEvent.setup();
     render(
       <VoiceSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={vi.fn()}
@@ -106,7 +106,7 @@ describe(VoiceSettings, () => {
     const user = userEvent.setup();
     render(
       <VoiceSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={vi.fn()}
@@ -128,7 +128,7 @@ describe(VoiceSettings, () => {
     const user = userEvent.setup();
     render(
       <VoiceSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={vi.fn()}
@@ -145,7 +145,7 @@ describe(VoiceSettings, () => {
     const user = userEvent.setup();
     render(
       <VoiceSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         voicePack={EDITORIAL_VOICE_PACK}
         initialOverrides={{}}
         saveAction={vi.fn()}
@@ -161,7 +161,7 @@ describe(VoiceSettings, () => {
     const user = userEvent.setup();
     render(
       <VoiceSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{ terminalPromptHost: 'guest@acme' }}
         saveAction={vi.fn()}
@@ -179,7 +179,7 @@ describe(VoiceSettings, () => {
     const saveAction = vi.fn().mockResolvedValue({ ok: true });
     render(
       <VoiceSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{ terminalPromptHost: 'guest@acme' }}
         saveAction={saveAction}
@@ -197,7 +197,7 @@ describe(VoiceSettings, () => {
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     expect(saveAction).toHaveBeenCalledWith(
-      'acme',
+      'tenant-1',
       expect.objectContaining({
         terminalPromptHost: '',
         bookmarkToastSavedMessage: 'saved!',
@@ -220,7 +220,7 @@ describe(VoiceSettings, () => {
     const saveAction = vi.fn().mockResolvedValue({ ok: true });
     render(
       <VoiceSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={saveAction}
@@ -247,7 +247,7 @@ describe(VoiceSettings, () => {
     const saveAction = vi.fn().mockResolvedValue({ ok: false });
     render(
       <VoiceSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={saveAction}
@@ -265,7 +265,7 @@ describe(VoiceSettings, () => {
     const saveAction = vi.fn().mockResolvedValue({ ok: true });
     render(
       <VoiceSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={saveAction}
@@ -285,7 +285,7 @@ describe(VoiceSettings, () => {
   it('describes the disabled Save button with the archived notice text, for a screen-reader user', () => {
     render(
       <VoiceSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={vi.fn()}
@@ -302,7 +302,7 @@ describe(VoiceSettings, () => {
     const user = userEvent.setup();
     render(
       <VoiceSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={vi.fn()}
@@ -324,7 +324,7 @@ describe(VoiceSettings, () => {
     const user = userEvent.setup();
     render(
       <VoiceSettings
-        tenantSlug="acme"
+        tenantId="tenant-1"
         voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={vi.fn()}

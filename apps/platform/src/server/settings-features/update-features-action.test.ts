@@ -46,8 +46,8 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-const FREE_TENANT = { id: 'tenant-1', slug: 'acme', plan: 'FREE' };
-const GROWTH_TENANT = { id: 'tenant-2', slug: 'northwind', plan: 'GROWTH' };
+const FREE_TENANT = { id: 'tenant-1', plan: 'FREE' };
+const GROWTH_TENANT = { id: 'tenant-2', plan: 'GROWTH' };
 
 const VALID_INPUT: TUpdateFeaturesInput = {
   commentsEnabled: true,
@@ -73,16 +73,16 @@ describe(updateFeaturesAction, () => {
     loggerWarnMock.mockReset();
   });
 
-  it('re-resolves the tenant from the session against the routed slug before writing anything', async () => {
+  it('re-resolves the tenant from the session against the routed tenant id before writing anything', async () => {
     requireTenantMembershipMock.mockResolvedValue({
       tenant: FREE_TENANT,
       membership: { role: 'OWNER' },
     });
     upsertSettingsFeaturesMock.mockResolvedValue({});
 
-    const result = await updateFeaturesAction('acme', VALID_INPUT);
+    const result = await updateFeaturesAction('tenant-1', VALID_INPUT);
 
-    expect(requireTenantMembershipMock).toHaveBeenCalledWith('acme');
+    expect(requireTenantMembershipMock).toHaveBeenCalledWith('tenant-1');
     expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
       'tenant-1',
       VALID_INPUT,
@@ -97,13 +97,13 @@ describe(updateFeaturesAction, () => {
     });
     upsertSettingsFeaturesMock.mockResolvedValue({});
 
-    await updateFeaturesAction('acme', VALID_INPUT);
+    await updateFeaturesAction('tenant-1', VALID_INPUT);
 
     expect(revalidateSiteConfigMock).toHaveBeenCalledTimes(1);
   });
 
   it('rejects a payload with a non-boolean field without ever calling the tenant gate', async () => {
-    const result = await updateFeaturesAction('acme', {
+    const result = await updateFeaturesAction('tenant-1', {
       ...VALID_INPUT,
       commentsEnabled: 'yes' as unknown as boolean,
     });
@@ -118,7 +118,7 @@ describe(updateFeaturesAction, () => {
       membership: { role: 'OWNER' },
     });
 
-    const result = await updateFeaturesAction('acme', {
+    const result = await updateFeaturesAction('tenant-1', {
       ...VALID_INPUT,
       newsletterEnabled: true,
     });
@@ -140,7 +140,7 @@ describe(updateFeaturesAction, () => {
     // stale `true` from when the tenant was GROWTH, but the client clamps
     // it to `false` before this action ever sees it (see
     // `clampToEntitlement`) — only `commentsEnabled` was actually changed.
-    const result = await updateFeaturesAction('acme', {
+    const result = await updateFeaturesAction('tenant-1', {
       ...VALID_INPUT,
       commentsEnabled: false,
       newsletterEnabled: false,
@@ -161,7 +161,7 @@ describe(updateFeaturesAction, () => {
     });
     upsertSettingsFeaturesMock.mockResolvedValue({});
 
-    const result = await updateFeaturesAction('northwind', {
+    const result = await updateFeaturesAction('tenant-2', {
       ...VALID_INPUT,
       newsletterEnabled: true,
       analyticsEnabled: true,
@@ -182,7 +182,7 @@ describe(updateFeaturesAction, () => {
     });
     upsertSettingsFeaturesMock.mockRejectedValue(new Error('db unavailable'));
 
-    const result = await updateFeaturesAction('acme', VALID_INPUT);
+    const result = await updateFeaturesAction('tenant-1', VALID_INPUT);
 
     expect(result).toEqual({ ok: false });
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
@@ -196,7 +196,7 @@ describe(updateFeaturesAction, () => {
     });
     upsertSettingsFeaturesMock.mockResolvedValue({});
 
-    await updateFeaturesAction('acme', VALID_INPUT);
+    await updateFeaturesAction('tenant-1', VALID_INPUT);
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
       actorId: 'operator-1',
@@ -216,7 +216,7 @@ describe(updateFeaturesAction, () => {
     upsertSettingsFeaturesMock.mockResolvedValue({});
     insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
 
-    const result = await updateFeaturesAction('acme', VALID_INPUT);
+    const result = await updateFeaturesAction('tenant-1', VALID_INPUT);
 
     expect(result).toEqual({ ok: true });
     expect(loggerErrorMock).toHaveBeenCalledWith(
@@ -233,7 +233,7 @@ describe(updateFeaturesAction, () => {
       throw new Error('NEXT_REDIRECT');
     });
 
-    await expect(updateFeaturesAction('acme', VALID_INPUT)).rejects.toThrow(
+    await expect(updateFeaturesAction('tenant-1', VALID_INPUT)).rejects.toThrow(
       'NEXT_REDIRECT',
     );
 
@@ -245,7 +245,7 @@ describe(updateFeaturesAction, () => {
       throw new Error('NEXT_NOT_FOUND');
     });
 
-    await expect(updateFeaturesAction('acme', VALID_INPUT)).rejects.toThrow(
+    await expect(updateFeaturesAction('tenant-1', VALID_INPUT)).rejects.toThrow(
       'NEXT_NOT_FOUND',
     );
 

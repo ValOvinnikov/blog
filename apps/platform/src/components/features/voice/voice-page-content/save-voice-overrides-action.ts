@@ -12,12 +12,12 @@ export type TSaveVoiceOverridesResult = { ok: true } | { ok: false };
 /**
  * Persists the Voice tab's 19 curated overrides for the routed tenant.
  * Re-derives the tenant and re-checks membership from the session itself
- * via `requireTenantMembership` — never trusts a client-supplied tenant id.
- * Shared by both `/tenants/[tenantId]/voice` and the slug-free `/dashboard/voice`
- * (via `VoicePageContent`): `requireTenantMembership` takes a slug either
- * way, and the dashboard route already resolved its tenant's real slug from
- * the session's own `memberships`, so re-checking it here is a no-op
- * re-verification rather than a second code path.
+ * via `requireTenantMembership` — the id only selects which tenant is in
+ * scope, never an authorization decision on its own. Shared by both
+ * `/tenants/[tenantId]/voice` and the membership-scoped `/dashboard/voice`
+ * (via `VoicePageContent`): both resolve the same tenant id and hand it to
+ * this action, so re-checking membership here is a no-op re-verification
+ * rather than a second code path.
  *
  * `upsertSiteConfig` writes its typed theme columns on every call (they're
  * required, not optional), so a Voice-only save must round-trip the
@@ -27,10 +27,10 @@ export type TSaveVoiceOverridesResult = { ok: true } | { ok: false };
  * preset's own registry defaults.
  */
 export const saveVoiceOverridesAction = async (
-  tenantSlug: string,
+  tenantId: string,
   overrides: TVoiceOverrides,
 ): Promise<TSaveVoiceOverridesResult> => {
-  const { tenant } = await requireTenantMembership(tenantSlug);
+  const { tenant } = await requireTenantMembership(tenantId);
 
   const existing = await queries.siteConfig.getSiteConfig(tenant.id);
   const theme = existing ?? PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens;

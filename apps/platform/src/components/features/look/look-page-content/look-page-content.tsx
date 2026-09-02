@@ -24,7 +24,9 @@ export const LookPageContent = async ({ tenant }: TLookPageContentProps) => {
 
   return (
     <LookForm
-      tenantSlug={tenant.slug}
+      tenantId={tenant.id}
+      tenantName={tenant.name}
+      primaryDomain={tenant.primaryDomain}
       initialValues={initialValues}
       archivedAt={tenant.deprovisionedAt ?? undefined}
     />
