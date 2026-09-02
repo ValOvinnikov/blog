@@ -1,10 +1,9 @@
 import { queries } from '@blog/db';
 import type { TTenantSanityContext } from '@blog/service';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
-import { headers } from 'next/headers';
 import { cache } from 'react';
 
-import { resolveTenantId } from './resolve-tenant-id';
+import { resolveRequestTenant } from './resolve-request-tenant';
 
 export type THostTenantSanityWriteContext =
   | {
@@ -15,12 +14,12 @@ export type THostTenantSanityWriteContext =
   | { isResolvable: false };
 
 /**
- * Write-credential counterpart to `getHostTenantSanityContext` — same host
- * resolution and `cache()` scoping, but resolving the tenant's Sanity
- * *write* credentials for routes (like `/api/generate-skim`) that must read
- * and write within one tenant project. `isResolvable: false` means
- * production saw a host matching no tenant — the caller must refuse the
- * write, never fall back to the platform's project.
+ * Write-credential counterpart to `getHostTenantSanityContext` — same
+ * request-tenant resolution and `cache()` scoping, but resolving the
+ * tenant's Sanity *write* credentials for routes (like `/api/generate-skim`)
+ * that must read and write within one tenant project. `isResolvable: false`
+ * means production saw a host matching no tenant — the caller must refuse
+ * the write, never fall back to the platform's project.
  *
  * Unlike the read counterpart, this also returns `tenantId` alongside
  * `tenant`: the write side must distinguish "no tenant resolved" (platform
@@ -31,18 +30,18 @@ export type THostTenantSanityWriteContext =
  */
 export const getHostTenantSanityWriteContext = cache(
   async (): Promise<THostTenantSanityWriteContext> => {
-    const host = (await headers()).get('host');
-    const tenantId = await resolveTenantId(host);
+    const resolvedTenant = await resolveRequestTenant();
 
-    if (!tenantId) {
+    if (!resolvedTenant) {
       if (isProductionEnvironment()) {
         return { isResolvable: false };
       }
       return { isResolvable: true, tenant: undefined, tenantId: undefined };
     }
 
-    const tenant =
-      await queries.tenants.getTenantSanityWriteCredentials(tenantId);
-    return { isResolvable: true, tenant, tenantId };
+    const tenant = await queries.tenants.getTenantSanityWriteCredentials(
+      resolvedTenant.id,
+    );
+    return { isResolvable: true, tenant, tenantId: resolvedTenant.id };
   },
 );

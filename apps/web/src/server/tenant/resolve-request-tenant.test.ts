@@ -12,6 +12,7 @@ vi.mock('@blog/db', () => ({
     tenants: {
       getTenantById: vi.fn(),
       getTenantSanityCredentials: vi.fn(),
+      getTenantSanityWriteCredentials: vi.fn(),
     },
   },
 }));
@@ -67,6 +68,7 @@ describe('resolveRequestTenant memoization', () => {
     vi.mocked(resolveTenant).mockReset();
     vi.mocked(queries.tenants.getTenantById).mockReset();
     vi.mocked(queries.tenants.getTenantSanityCredentials).mockReset();
+    vi.mocked(queries.tenants.getTenantSanityWriteCredentials).mockReset();
   });
 
   afterEach(() => {
@@ -149,6 +151,58 @@ describe('resolveRequestTenant memoization', () => {
 
     await getTenantBaseUrl();
     await getHostTenantSanityContext();
+
+    expect(resolveTenant).toHaveBeenCalledTimes(1);
+  });
+
+  it('resolves the tenant exactly once when getHostTenantSanityContext and getHostTenantSanityWriteContext both ask for it in the same render pass', async () => {
+    headersMock.mockResolvedValue(new Headers({ host: 'acme.example.com' }));
+    vi.mocked(resolveTenant).mockResolvedValue({
+      id: 'tenant-1',
+      primaryDomain: 'acme.example.com',
+    } as never);
+    vi.mocked(queries.tenants.getTenantSanityCredentials).mockResolvedValue({
+      projectId: 'proj',
+      dataset: 'production',
+      token: 'tok',
+    });
+    vi.mocked(
+      queries.tenants.getTenantSanityWriteCredentials,
+    ).mockResolvedValue({
+      projectId: 'proj',
+      dataset: 'production',
+      token: 'write-tok',
+    });
+
+    vi.doMock('react', async (importOriginal) => {
+      const actual = await importOriginal<typeof import('react')>();
+      return {
+        ...actual,
+        cache: (fn: () => unknown) => {
+          let called = false;
+          let result: unknown;
+          return () => {
+            if (!called) {
+              result = fn();
+              called = true;
+            }
+            return result;
+          };
+        },
+      };
+    });
+    vi.doMock('@web/utils/is-production-environment', () => ({
+      isProductionEnvironment: () => false,
+    }));
+    vi.resetModules();
+
+    const { getHostTenantSanityContext } =
+      await import('./get-host-tenant-sanity-context');
+    const { getHostTenantSanityWriteContext } =
+      await import('./get-host-tenant-sanity-write-context');
+
+    await getHostTenantSanityContext();
+    await getHostTenantSanityWriteContext();
 
     expect(resolveTenant).toHaveBeenCalledTimes(1);
   });
