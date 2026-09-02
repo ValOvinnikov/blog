@@ -117,7 +117,68 @@ compositions are storied in `apps/web` (`web-storybook`).
   } satisfies Meta<typeof Button>;
   ```
 
-  For other union-typed props with no `tv()` variant behind them, Storybook's
+- **For a prop backed by an UPPERCASE key/value dictionary const (the
+  `@blog/config` constant convention — `ASIDE_KIND`, `BRAND_VARIANT`, …),
+  always wire an explicit `select` control with
+  `options: Object.values(THE_CONST)`.** A free-text input for such a prop is
+  not acceptable: it invites an arbitrary invalid string where the valid set
+  is already known and enumerable.
+
+  ```tsx
+  // ❌ before — no argTypes entry, so `kind` renders as a free-text box
+  import { ASIDE_KIND } from '@blog/config';
+
+  import { Aside } from './aside';
+
+  const meta = {
+    title: 'Molecules/Aside',
+    component: Aside,
+    tags: ['autodocs'],
+    args: { children: <p>…</p> },
+  } satisfies Meta<typeof Aside>;
+
+  // ✅ after — a select bound to the real dictionary
+  const meta = {
+    title: 'Molecules/Aside',
+    component: Aside,
+    tags: ['autodocs'],
+    argTypes: {
+      kind: {
+        control: 'select',
+        options: Object.values(ASIDE_KIND),
+      },
+    },
+    args: { children: <p>…</p> },
+  } satisfies Meta<typeof Aside>;
+  ```
+
+  `Object.values` here, not the `objectKeys` of the `tv()` rule above — the
+  two look alike but aren't the same case. A dictionary const's _values_ are
+  the stored vocabulary the prop accepts; a `tv()` variant map's _keys_ are,
+  and its values are class strings.
+
+  **Scope the options to the subset the prop actually accepts.** Where a prop
+  narrows a wider dictionary (`TBrandVariantOf<'PRIMARY' | 'SECONDARY'>`), a
+  blanket `Object.values()` offers a value the type rejects — trading a
+  permissive text box for a dropdown of invalid options. List the narrowed
+  subset instead:
+
+  ```tsx
+  brandVariant: {
+    control: 'select',
+    options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
+  },
+  ```
+
+  **Audit from the component's prop types, not from the story's imports.** A
+  story file often doesn't import the const its component's prop is typed
+  against, so an import-driven sweep silently misses those props. For each
+  story, open the component, read its full prop type, and follow every prop's
+  type alias back to its definition looking for
+  `TValueOf<typeof SOME_UPPERCASE_CONST>`.
+
+  For a prop typed as a bare literal union with neither a `tv()` config nor a
+  dictionary const behind it (`variant: 'full' | 'compact'`), Storybook's
   inferred control is fine — only override with `argTypes` when it's wrong.
 
 - Never pass live data or async functions as args — all props must be static
@@ -290,6 +351,10 @@ Stories in `@blog/ui` must obey the same boundary rules as the components:
 - [ ] Any `tv()`-backed prop (`variant`, `size`, …) has an `argTypes` `select`
       control sourced via `objectKeys(<x>Variants.variants.<group>)`, not
       left to TypeScript inference.
+- [ ] Any dictionary-const-backed prop has an `argTypes` `select` control with
+      `options: Object.values(THE_CONST)`, narrowed to the subset the prop
+      accepts — checked against the component's prop types, not the story's
+      imports.
 - [ ] No `service`/`sanity`/`next` imports in the story file.
 - [ ] Story compiles clean — `.storybook` and `.stories.tsx` are covered by
       `packages/ui/tsconfig.json`'s `include`, so

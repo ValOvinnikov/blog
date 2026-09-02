@@ -89,6 +89,66 @@ export const LongBody: Story = {
 };
 ```
 
+## Args and controls
+
+- **A prop backed by an UPPERCASE key/value dictionary const (the
+  `@blog/config` constant convention — `BRAND_VARIANT`, `ASIDE_KIND`,
+  `CTA_VARIANT`, …) always gets an explicit `select` control with
+  `options: Object.values(THE_CONST)`.** Free-text input is not acceptable for
+  such a prop: it invites an arbitrary invalid string where the valid set is
+  already known and enumerable.
+
+  ```tsx
+  // ❌ before — no argTypes entry, so `kind` renders as a free-text box
+  const meta = {
+    title: 'Components/DeepAside',
+    component: DeepAside,
+    tags: ['autodocs'],
+    args: { kind: ASIDE_KIND.DIGRESSION, label: 'Digression' },
+  } satisfies Meta<typeof DeepAside>;
+
+  // ✅ after — a select bound to the real dictionary
+  const meta = {
+    title: 'Components/DeepAside',
+    component: DeepAside,
+    tags: ['autodocs'],
+    argTypes: {
+      kind: {
+        control: 'select',
+        options: Object.values(ASIDE_KIND),
+      },
+    },
+    args: { kind: ASIDE_KIND.DIGRESSION, label: 'Digression' },
+  } satisfies Meta<typeof DeepAside>;
+  ```
+
+  **Scope the options to the subset the prop actually accepts.** Several
+  modules narrow a wider dictionary (`TBrandVariantOf<'PRIMARY' | 'SECONDARY'>`
+  on content/newsletter/post-list/taxonomy-list, where cta/hero/section take
+  all three). A blanket `Object.values()` there offers a value the type
+  rejects — trading a permissive text box for a dropdown of invalid options.
+  List the narrowed subset instead:
+
+  ```tsx
+  brandVariant: {
+    control: 'select',
+    options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
+  },
+  ```
+
+  **Audit from the component's prop types, not from the story's imports.** A
+  story file often doesn't import the const its component's prop is typed
+  against — `NewsletterForm.align` is typed `THeadingAlign`, and nothing in
+  `newsletter-form.tsx` imports the `HEADING_ALIGN` value at all — so an
+  import-driven sweep silently misses those props. For each story, open the component, read its full prop type, and
+  follow every prop's type alias back to its definition looking for
+  `TValueOf<typeof SOME_UPPERCASE_CONST>`.
+
+  A prop typed as a bare literal union with no dictionary const behind it
+  (`variant: 'full' | 'compact'`) is a different case — Storybook's inferred
+  control is fine there, and `Record<TEnum, string>` label maps are keyed by
+  an enum rather than valued by one, so there is nothing to select.
+
 ## Mocking `@blog/service`
 
 Server Components in `apps/web` call service functions (`getPosts`,
@@ -225,6 +285,10 @@ Use page-level paths: `"Pages/PostPage"`, `"Pages/HomePage"`,
 - [ ] Component accepts data as props (Approach A) rather than fetching
       internally, where possible.
 - [ ] All required props provided via `args`; no live Sanity calls.
+- [ ] Any dictionary-const-backed prop has an `argTypes` `select` control with
+      `options: Object.values(THE_CONST)`, narrowed to the subset the prop
+      accepts — checked against the component's prop types, not the story's
+      imports.
 - [ ] `nextjs.navigation.pathname` set if component checks active route.
 - [ ] Fixtures live in `src/storybook/fixtures/`; not imported outside Storybook.
 - [ ] Story compiles clean — `.storybook` and `src/**/*.tsx` (including

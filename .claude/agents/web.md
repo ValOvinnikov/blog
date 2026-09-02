@@ -423,8 +423,9 @@ block — it points at open work rather than narrating closed work.
 - Storybook is configured in `apps/web` (`.storybook/main.ts` scans
   `src/app/**` and `src/components/**`). When adding or changing a client
   component or page composition, follow the `web-storybook` skill
-  (`.claude/skills/web-storybook/SKILL.md`) — it covers RSC caveats and
-  service-layer mocking.
+  (`.claude/skills/web-storybook/SKILL.md`) — it covers RSC caveats,
+  service-layer mocking, and the `select`-control rule for props backed by an
+  UPPERCASE dictionary const.
 - Run `pnpm --filter web type-check` after each major group of files — it's
   fast and catches structural errors early without burning tokens on test output.
 - Run the full test suite **once, after all implementation is complete**:

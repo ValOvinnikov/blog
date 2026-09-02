@@ -146,7 +146,9 @@ block — it points at open work rather than narrating closed work.
   Stories may use faker unseeded (they are not diffed in CI).
 - Add a Storybook story for every new or changed component — follow the
   `ui-storybook` skill (`.claude/skills/ui-storybook/SKILL.md`). Stories are
-  part of done, not optional.
+  part of done, not optional. Any prop backed by a `tv()` variant map or an
+  UPPERCASE dictionary const needs an explicit `argTypes` `select` control —
+  never a free-text box; the skill has the exact form for each.
 - Run `pnpm --filter @blog/ui type-check` after each major group of files —
   fast, catches structural errors early without verbose test output.
 - Run the full test suite **once, after all implementation is complete**:
