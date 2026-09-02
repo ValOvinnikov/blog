@@ -157,6 +157,27 @@ compositions are storied in `apps/web` (`web-storybook`).
   the stored vocabulary the prop accepts; a `tv()` variant map's _keys_ are,
   and its values are class strings.
 
+  **When a prop is both — typed from a dictionary const _and_ passed into a
+  `tv()` config — the `tv()` rule wins:** source the options from the variant
+  map. The variant map is usually keyed off the const already
+  (`[CTA_IMAGE_SIDE.LEFT]: { … }`), so both forms yield the same list, but the
+  variant map is what actually renders, and keying off it keeps the control
+  honest if the two ever diverge. The discriminator is _does this prop drive
+  `tv()`_, not _is this prop dictionary-typed_. `Icon` carries one of each:
+
+  ```tsx
+  argTypes: {
+    name: {
+      control: 'select',
+      options: Object.values(ICONS),
+    },
+    size: {
+      control: 'select',
+      options: objectKeys(iconVariants.variants.size),
+    },
+  },
+  ```
+
   **Scope the options to the subset the prop actually accepts.** Where a prop
   narrows a wider dictionary (`TBrandVariantOf<'PRIMARY' | 'SECONDARY'>`), a
   blanket `Object.values()` offers a value the type rejects — trading a
@@ -354,7 +375,8 @@ Stories in `@blog/ui` must obey the same boundary rules as the components:
 - [ ] Any dictionary-const-backed prop has an `argTypes` `select` control with
       `options: Object.values(THE_CONST)`, narrowed to the subset the prop
       accepts — checked against the component's prop types, not the story's
-      imports.
+      imports. If the prop also drives a `tv()` config, source the options
+      from the variant map instead.
 - [ ] No `service`/`sanity`/`next` imports in the story file.
 - [ ] Story compiles clean — `.storybook` and `.stories.tsx` are covered by
       `packages/ui/tsconfig.json`'s `include`, so
