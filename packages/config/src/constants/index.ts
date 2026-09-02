@@ -12,6 +12,7 @@ export * from './language';
 export * from './layout';
 export * from './link';
 export * from './module';
+export * from './path';
 export * from './preset';
 export * from './reserved-slug';
 export * from './size';
