@@ -22,8 +22,6 @@ import type { MetadataRoute } from 'next';
  * non-production environment even though it isn't blocked outright.
  */
 export default async function robots(): Promise<MetadataRoute.Robots> {
-  const siteUrl = (await getTenantBaseUrl()) ?? '';
-
   if (!isProductionEnvironment()) {
     return {
       rules: {
@@ -32,6 +30,8 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
       },
     };
   }
+
+  const siteUrl = (await getTenantBaseUrl()) ?? '';
 
   return {
     rules: {

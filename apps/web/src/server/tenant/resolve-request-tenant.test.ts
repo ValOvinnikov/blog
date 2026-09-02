@@ -1,0 +1,155 @@
+import { queries } from '@blog/db';
+
+import { resolveRequestTenant } from './resolve-request-tenant';
+import { resolveTenant } from './resolve-tenant';
+
+const { headersMock } = vi.hoisted(() => ({ headersMock: vi.fn() }));
+
+vi.mock('next/headers', () => ({ headers: headersMock }));
+vi.mock('./resolve-tenant', () => ({ resolveTenant: vi.fn() }));
+vi.mock('@blog/db', () => ({
+  queries: {
+    tenants: {
+      getTenantById: vi.fn(),
+      getTenantSanityCredentials: vi.fn(),
+    },
+  },
+}));
+
+describe(resolveRequestTenant, () => {
+  beforeEach(() => {
+    headersMock.mockReset();
+    vi.mocked(resolveTenant).mockReset();
+    vi.mocked(queries.tenants.getTenantById).mockReset();
+  });
+
+  it('prefers the proxy-resolved header tenant, fetching that row by id and never touching Host-based resolution', async () => {
+    headersMock.mockResolvedValue(new Headers({ 'x-tenant-id': 'tenant-1' }));
+    vi.mocked(queries.tenants.getTenantById).mockResolvedValue({
+      id: 'tenant-1',
+      primaryDomain: 'acme.example.com',
+    } as never);
+
+    await expect(resolveRequestTenant()).resolves.toEqual({
+      id: 'tenant-1',
+      primaryDomain: 'acme.example.com',
+    });
+    expect(queries.tenants.getTenantById).toHaveBeenCalledWith('tenant-1');
+    expect(resolveTenant).not.toHaveBeenCalled();
+  });
+
+  it('falls back to Host-based resolution when the header is absent', async () => {
+    headersMock.mockResolvedValue(new Headers({ host: 'acme.example.com' }));
+    vi.mocked(resolveTenant).mockResolvedValue({
+      id: 'tenant-1',
+      primaryDomain: 'acme.example.com',
+    } as never);
+
+    await expect(resolveRequestTenant()).resolves.toEqual({
+      id: 'tenant-1',
+      primaryDomain: 'acme.example.com',
+    });
+    expect(resolveTenant).toHaveBeenCalledWith('acme.example.com');
+    expect(queries.tenants.getTenantById).not.toHaveBeenCalled();
+  });
+
+  it('resolves undefined when neither the header nor Host-based resolution finds a tenant', async () => {
+    headersMock.mockResolvedValue(new Headers());
+    vi.mocked(resolveTenant).mockResolvedValue(undefined);
+
+    await expect(resolveRequestTenant()).resolves.toBeUndefined();
+  });
+});
+
+describe('resolveRequestTenant memoization', () => {
+  beforeEach(() => {
+    headersMock.mockReset();
+    vi.mocked(resolveTenant).mockReset();
+    vi.mocked(queries.tenants.getTenantById).mockReset();
+    vi.mocked(queries.tenants.getTenantSanityCredentials).mockReset();
+  });
+
+  afterEach(() => {
+    vi.doUnmock('react');
+    vi.resetModules();
+  });
+
+  it('dedupes the underlying lookup when called more than once in the same render pass', async () => {
+    headersMock.mockResolvedValue(new Headers({ host: 'acme.example.com' }));
+    vi.mocked(resolveTenant).mockResolvedValue({
+      id: 'tenant-1',
+      primaryDomain: 'acme.example.com',
+    } as never);
+
+    vi.doMock('react', async (importOriginal) => {
+      const actual = await importOriginal<typeof import('react')>();
+      return {
+        ...actual,
+        cache: (fn: () => unknown) => {
+          let called = false;
+          let result: unknown;
+          return () => {
+            if (!called) {
+              result = fn();
+              called = true;
+            }
+            return result;
+          };
+        },
+      };
+    });
+    vi.resetModules();
+
+    const { resolveRequestTenant: freshResolveRequestTenant } =
+      await import('./resolve-request-tenant');
+
+    await freshResolveRequestTenant();
+    await freshResolveRequestTenant();
+
+    expect(resolveTenant).toHaveBeenCalledTimes(1);
+  });
+
+  it('resolves the tenant exactly once when getTenantBaseUrl and getHostTenantSanityContext both ask for it in the same render pass', async () => {
+    headersMock.mockResolvedValue(new Headers({ host: 'acme.example.com' }));
+    vi.mocked(resolveTenant).mockResolvedValue({
+      id: 'tenant-1',
+      primaryDomain: 'acme.example.com',
+    } as never);
+    vi.mocked(queries.tenants.getTenantSanityCredentials).mockResolvedValue({
+      projectId: 'proj',
+      dataset: 'production',
+      token: 'tok',
+    });
+
+    vi.doMock('react', async (importOriginal) => {
+      const actual = await importOriginal<typeof import('react')>();
+      return {
+        ...actual,
+        cache: (fn: () => unknown) => {
+          let called = false;
+          let result: unknown;
+          return () => {
+            if (!called) {
+              result = fn();
+              called = true;
+            }
+            return result;
+          };
+        },
+      };
+    });
+    vi.doMock('@web/utils/is-production-environment', () => ({
+      isProductionEnvironment: () => false,
+    }));
+    vi.resetModules();
+
+    const { getTenantBaseUrl } = await import('./get-tenant-base-url');
+    const { getHostTenantSanityContext } =
+      await import('./get-host-tenant-sanity-context');
+
+    await getTenantBaseUrl();
+    await getHostTenantSanityContext();
+
+    expect(resolveTenant).toHaveBeenCalledTimes(1);
+  });
+});

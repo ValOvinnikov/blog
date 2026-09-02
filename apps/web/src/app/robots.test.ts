@@ -50,5 +50,20 @@ describe('robots', () => {
         rules: { userAgent: '*', allow: '/' },
       });
     });
+
+    it('never resolves the tenant base URL, since its value goes unused', async () => {
+      const getTenantBaseUrlMock = vi.fn(async () => 'https://dev.example.com');
+      vi.doMock('@web/server/tenant/get-tenant-base-url', () => ({
+        getTenantBaseUrl: getTenantBaseUrlMock,
+      }));
+      vi.doMock('@web/utils/is-production-environment', () => ({
+        isProductionEnvironment: () => false,
+      }));
+      const robots = (await import('./robots')).default;
+
+      await robots();
+
+      expect(getTenantBaseUrlMock).not.toHaveBeenCalled();
+    });
   });
 });
