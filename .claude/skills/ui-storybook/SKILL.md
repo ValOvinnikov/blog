@@ -198,9 +198,48 @@ compositions are storied in `apps/web` (`web-storybook`).
   type alias back to its definition looking for
   `TValueOf<typeof SOME_UPPERCASE_CONST>`.
 
-  For a prop typed as a bare literal union with neither a `tv()` config nor a
-  dictionary const behind it (`variant: 'full' | 'compact'`), Storybook's
-  inferred control is fine — only override with `argTypes` when it's wrong.
+- **For a prop typed as a literal union with neither a `tv()` config nor a
+  dictionary const behind it, whether inference suffices depends on how the
+  prop is declared — inline or behind a named type alias.** Both Storybooks
+  run the default `react-docgen` (neither `.storybook/main.ts` sets
+  `typescript.reactDocgen`), which resolves the two differently.
+
+  Declared **inline**, docgen emits the whole option list, so Storybook infers
+  a working select and no `argTypes` entry is needed:
+
+  ```tsx
+  type?: 'button' | 'submit' | 'reset';
+  // → { name: 'union', raw: "'button' | 'submit' | 'reset'",
+  //     elements: [{ name: 'literal', value: "'button'" }, …] }
+  ```
+
+  Declared via a **named type alias**, docgen emits only the alias name and
+  never resolves it, so there is nothing to build a control from:
+
+  ```tsx
+  status: TFormStatus; // → { name: 'TFormStatus' }  — no values at all
+  ```
+
+  An alias-typed prop therefore **always needs an explicit `argTypes` entry**.
+  Since the union is a pure type and erased at runtime, there is no const or
+  variant map to enumerate — hand-write the array, and keep it in step with
+  the alias:
+
+  ```tsx
+  argTypes: {
+    level: {
+      control: 'select',
+      options: [1, 2, 3, 4],
+    },
+  },
+  ```
+
+  Match the declared type: `THeadingLevel = 1 | 2 | 3 | 4` takes **numbers**,
+  not `['1','2','3','4']`. Don't reach for `objectKeys(headingTags)` to derive
+  them either — that record is keyed by the numeric levels, and `objectKeys`
+  types as `Array<1 | 2 | 3 | 4>`, so this compiles clean while handing the
+  control stringified keys at runtime. Type-check won't catch it; the select
+  just sets the wrong value.
 
 - Never pass live data or async functions as args — all props must be static
   and serialisable.
@@ -377,6 +416,10 @@ Stories in `@blog/ui` must obey the same boundary rules as the components:
       accepts — checked against the component's prop types, not the story's
       imports. If the prop also drives a `tv()` config, source the options
       from the variant map instead.
+- [ ] Any prop whose type is a literal union behind a **named alias** has an
+      explicit `argTypes` `select` control with a hand-written `options`
+      array — docgen never resolves an alias, so inference cannot supply one.
+      Inline unions need nothing.
 - [ ] No `service`/`sanity`/`next` imports in the story file.
 - [ ] Story compiles clean — `.storybook` and `.stories.tsx` are covered by
       `packages/ui/tsconfig.json`'s `include`, so

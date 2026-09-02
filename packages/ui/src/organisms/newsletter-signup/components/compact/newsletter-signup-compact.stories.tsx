@@ -6,6 +6,12 @@ const meta = {
   component: NewsletterSignup.Compact,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
+  argTypes: {
+    status: {
+      control: 'select',
+      options: ['idle', 'submitting', 'success', 'error'],
+    },
+  },
   args: {
     email: '',
     onChange: () => {},

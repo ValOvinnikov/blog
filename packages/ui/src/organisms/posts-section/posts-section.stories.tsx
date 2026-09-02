@@ -50,6 +50,10 @@ const meta = {
       control: 'select',
       options: objectKeys(postsSectionVariants.variants.align),
     },
+    cardHeadingLevel: {
+      control: 'select',
+      options: [1, 2, 3, 4],
+    },
   },
   args: {
     title: 'Latest',

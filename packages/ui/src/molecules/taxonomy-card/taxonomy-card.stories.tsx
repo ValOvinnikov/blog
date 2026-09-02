@@ -8,6 +8,12 @@ const meta = {
   component: TaxonomyCard,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
+  argTypes: {
+    headingLevel: {
+      control: 'select',
+      options: [1, 2, 3, 4],
+    },
+  },
   args: {
     title: 'Engineering',
     href: '/topics/engineering',

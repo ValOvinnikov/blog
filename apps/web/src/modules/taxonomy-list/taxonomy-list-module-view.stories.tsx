@@ -30,6 +30,10 @@ const meta = {
       control: 'select',
       options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
     },
+    headingLevel: {
+      control: 'select',
+      options: [1, 2, 3, 4],
+    },
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,

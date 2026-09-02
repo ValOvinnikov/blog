@@ -18,6 +18,10 @@ const meta: Meta<typeof Heading> = {
       control: 'select',
       options: objectKeys(headingVariants.variants.size),
     },
+    level: {
+      control: 'select',
+      options: [1, 2, 3, 4],
+    },
   },
 };
 export default meta;

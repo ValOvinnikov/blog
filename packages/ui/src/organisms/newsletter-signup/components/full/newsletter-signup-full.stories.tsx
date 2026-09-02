@@ -26,6 +26,10 @@ const meta = {
       control: 'select',
       options: objectKeys(newsletterSignupVariants.variants.align),
     },
+    status: {
+      control: 'select',
+      options: ['idle', 'submitting', 'success', 'error'],
+    },
   },
   args: {
     email: '',
