@@ -136,6 +136,21 @@ describe(reportStepStatus, () => {
     expect(tenant?.provisioningStatus).toBe('PENDING');
   });
 
+  it('writes lastNotifiedOwnerElevationOutcome only when supplied', async () => {
+    const tenantId = await insertDraftTenant();
+
+    await reportStepStatus({
+      tenantId,
+      step: 'OWNER_ELEVATION',
+      status: 'DONE',
+      detail: 'STALLED',
+      notifiedOwnerElevationOutcome: 'STALLED',
+    });
+
+    const tenant = await loadTenant(tenantId);
+    expect(tenant?.lastNotifiedOwnerElevationOutcome).toBe('STALLED');
+  });
+
   it('never throws when the tenant id does not exist — logs instead', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 

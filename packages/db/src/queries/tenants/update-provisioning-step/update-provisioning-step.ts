@@ -30,6 +30,13 @@ export type TUpdateProvisioningStepInput = {
   // earlier step's call omits this and leaves the tenant's overall
   // `provisioningStatus` untouched.
   provisioningStatus?: TTenantProvisioningStatus;
+  // Only meaningful (and only ever set) alongside the `OWNER_ELEVATION`
+  // step, when this same call is also recording that `detail`'s outcome has
+  // just been communicated to operators. Written straight to the
+  // `lastNotifiedOwnerElevationOutcome` column, not into the `detail` JSONB
+  // path above. Omitted entirely, never a sentinel, when this call isn't
+  // also marking a notification sent.
+  notifiedOwnerElevationOutcome?: TElevateTenantOwnerOutcome;
 };
 
 // Updates exactly one key of the `provisioningSteps` jsonb map via
@@ -68,6 +75,12 @@ export async function updateProvisioningStep(
       ...(input.provisioningStatus === undefined
         ? {}
         : { provisioningStatus: input.provisioningStatus }),
+      ...(input.notifiedOwnerElevationOutcome === undefined
+        ? {}
+        : {
+            lastNotifiedOwnerElevationOutcome:
+              input.notifiedOwnerElevationOutcome,
+          }),
     })
     .where(eq(tenants.id, input.tenantId))
     .returning();

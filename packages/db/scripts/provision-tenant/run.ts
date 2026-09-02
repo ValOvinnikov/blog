@@ -29,6 +29,7 @@ import { unarchiveSanityProject } from '@blog/db/utils/sanity-management-client/
 import { sanitizeLogMessage } from '@blog/insight';
 
 import { loadProvisionEnv, type TProvisionEnv } from './lib/env';
+import { notifyOwnerElevationOutcome } from './lib/notify-owner-elevation-outcome';
 import { reportOwnerElevationOutcome } from './lib/report-owner-elevation-outcome';
 import {
   reportProvisioningRunFinish,
@@ -181,6 +182,11 @@ export async function runSteps(
   try {
     const outcome = await elevateTenantOwner(tenant, env);
     await reportOwnerElevationOutcome(tenantId, outcome);
+    await notifyOwnerElevationOutcome({
+      tenant,
+      outcome,
+      resendApiKey: env.resendApiKey,
+    });
 
     if (outcome === ELEVATE_TENANT_OWNER_OUTCOME.STALLED) {
       console.error(

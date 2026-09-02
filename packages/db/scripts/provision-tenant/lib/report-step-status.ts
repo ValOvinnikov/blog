@@ -13,6 +13,7 @@ export type TReportStepStatusInput = {
   status: TTenantProvisioningStepStatus;
   error?: string;
   detail?: TElevateTenantOwnerOutcome;
+  notifiedOwnerElevationOutcome?: TElevateTenantOwnerOutcome;
 };
 
 /**
@@ -26,7 +27,14 @@ export type TReportStepStatusInput = {
 export async function reportStepStatus(
   input: TReportStepStatusInput,
 ): Promise<void> {
-  const { tenantId, step, status, error, detail } = input;
+  const {
+    tenantId,
+    step,
+    status,
+    error,
+    detail,
+    notifiedOwnerElevationOutcome,
+  } = input;
   const provisioningStatus = overallStatusFor(step, status);
 
   const result = await updateProvisioningStep({
@@ -36,6 +44,9 @@ export async function reportStepStatus(
     ...(error === undefined ? {} : { error }),
     ...(detail === undefined ? {} : { detail }),
     ...(provisioningStatus === undefined ? {} : { provisioningStatus }),
+    ...(notifiedOwnerElevationOutcome === undefined
+      ? {}
+      : { notifiedOwnerElevationOutcome }),
   });
 
   if (!result.ok) {

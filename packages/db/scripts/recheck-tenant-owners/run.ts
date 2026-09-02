@@ -17,22 +17,16 @@
  */
 import { pathToFileURL } from 'node:url';
 
-import {
-  ELEVATE_TENANT_OWNER_OUTCOME,
-  TENANT_PROVISIONING_STEP,
-} from '@blog/db/constants';
+import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
 import { listTenantsPendingOwnerElevation } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
 
+import { notifyOwnerElevationOutcome } from '../provision-tenant/lib/notify-owner-elevation-outcome';
 import { reportOwnerElevationOutcome } from '../provision-tenant/lib/report-owner-elevation-outcome';
 import { elevateTenantOwner } from '../provision-tenant/steps/elevate-tenant-owner';
 
 import { loadRecheckEnv, type TRecheckEnv } from './lib/env';
-import {
-  isNotifiableOutcome,
-  notifyOperatorsOfOwnerElevationOutcome,
-} from './lib/notify-operators';
 
 export type TRecheckSummary = {
   checked: number;
@@ -70,22 +64,16 @@ async function recheckOne(
   summary: TRecheckSummary,
 ): Promise<void> {
   try {
-    const previousOutcome =
-      tenant.provisioningSteps?.[TENANT_PROVISIONING_STEP.OWNER_ELEVATION]
-        ?.detail;
     const outcome = await elevateTenantOwner(
       tenant,
       env as TElevateTenantOwnerEnv,
     );
     await reportOwnerElevationOutcome(tenant.id, outcome);
-
-    if (isNotifiableOutcome(outcome) && outcome !== previousOutcome) {
-      await notifyOperatorsOfOwnerElevationOutcome({
-        tenant,
-        outcome,
-        resendApiKey: env.resendApiKey,
-      });
-    }
+    await notifyOwnerElevationOutcome({
+      tenant,
+      outcome,
+      resendApiKey: env.resendApiKey,
+    });
 
     switch (outcome) {
       case ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED:
