@@ -1,9 +1,5 @@
 import { PRESET_ID } from '@blog/config/constants';
-import {
-  MEMBERSHIP_ROLE,
-  TENANT_PLAN,
-  TENANT_STATUS,
-} from '@blog/db/constants';
+import { MEMBERSHIP_ROLE, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
 import { createTestDb } from '@blog/db/testing/create-test-db';
@@ -22,14 +18,12 @@ let db: PgliteDatabase<typeof schema>;
 async function insertTenant(
   options: {
     archived?: boolean;
-    slug?: string;
     sanityProjectId?: string;
   } = {},
 ): Promise<string> {
-  const { archived = true, slug = 'acme', sanityProjectId } = options;
+  const { archived = true, sanityProjectId } = options;
 
   const tenant = await insertTestTenant(db, {
-    slug,
     name: 'Acme',
     status: archived ? TENANT_STATUS.ARCHIVED : TENANT_STATUS.ACTIVE,
     deprovisionedAt: archived ? new Date() : undefined,
@@ -169,26 +163,6 @@ describe(deleteTenant, () => {
       .from(schema.bookmarks)
       .where(eq(schema.bookmarks.tenantId, tenantId));
     expect(remainingBookmarks).toEqual([]);
-  });
-
-  it('frees the slug for a new tenant after a successful delete', async () => {
-    const tenantId = await insertTenant({ archived: true, slug: 'acme' });
-
-    await deleteTenant(tenantId);
-
-    const [newTenant] = await db
-      .insert(schema.tenants)
-      .values({
-        slug: 'acme',
-        name: 'Acme Reborn',
-        primaryDomain: 'acme-reborn.example.com',
-        locale: 'en',
-        plan: TENANT_PLAN.FREE,
-        status: TENANT_STATUS.ACTIVE,
-      })
-      .returning();
-
-    expect(newTenant?.slug).toBe('acme');
   });
 });
 

@@ -63,15 +63,24 @@ describe('0009_quick_jazinda (tenants name backfill)', () => {
         await applyMigrationFile(db, file);
       }
 
-      const rows = await db.select().from(tenants).orderBy(tenants.slug);
-      const namesBySlug = Object.fromEntries(
-        rows.map((row) => [row.slug, row.name]),
+      // Keyed by `primaryDomain`, not `slug`: `slug` is only guaranteed to
+      // exist in the raw historical insert above (what this migration reads
+      // to derive `name`), not on the typed `tenants` object this select
+      // uses, so ordering/asserting through a column the current schema
+      // still carries is what keeps this replay test resilient to a future
+      // schema change dropping `slug` outright.
+      const rows = await db
+        .select()
+        .from(tenants)
+        .orderBy(tenants.primaryDomain);
+      const namesByDomain = Object.fromEntries(
+        rows.map((row) => [row.primaryDomain, row.name]),
       );
 
-      expect(namesBySlug).toEqual({
-        acme: 'Acme',
-        'acme-corp': 'Acme Corp',
-        foo_bar: 'Foo Bar',
+      expect(namesByDomain).toEqual({
+        'acme.example.com': 'Acme',
+        'acme-corp.example.com': 'Acme Corp',
+        'foo-bar.example.com': 'Foo Bar',
       });
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
