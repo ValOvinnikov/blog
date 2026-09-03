@@ -94,6 +94,17 @@ graph is acyclic
   import `sanitizeLogMessage` (not
   the logger) directly — see the `@blog/db` bullet above and `SPEC.md` §4. See
   `.claude/agents/insight.md`.
+- `@blog/email` (`packages/email`) is the single home for every email the
+  product sends — the shared branded HTML shell, the canonical `escapeHtml`,
+  and the typed `sendEmail` Resend transport. Upstream is `utils` only, which
+  is what lets both apps, `@blog/auth` **and** `@blog/db`'s CLI scripts consume
+  it without a cycle (`auth` sits above `db`, so a dependency on either would
+  close one). It is side-effecting — it owns the send call — but **never
+  logs**, and never resolves tenants or fetches content: callers pass it
+  resolved copy and URLs, the way `@blog/ui` takes props. That is what keeps it
+  usable from an Auth.js callback with no request context. Operator-alert copy
+  stays hardcoded and must never become tenant-editable. See
+  `.claude/agents/email.md`.
 - Content shapes come from the generated Sanity types in `@blog/config`
   (`packages/config/src/sanity/generated/types.ts`, produced by typegen) —
   never hand-redeclared.
@@ -253,7 +264,7 @@ When a review turns up a blocking finding in a layer file, or a rename / knip /
 lint nit needs a two-line change, patching it inline _feels_ faster than
 re-dispatching the owning agent. That feeling is the rationalization this rule
 exists to stop: a two-line orchestrator edit to a `config`/`studio`/`service`/`ui`/
-`web`/`db`/`platform-app`/`auth` file is still the orchestrator doing a sub-agent's job. Route the fix to
+`web`/`db`/`platform-app`/`auth`/`insight`/`email` file is still the orchestrator doing a sub-agent's job. Route the fix to
 the owning agent (dispatch, or `SendMessage` it), let it re-export, then
 re-verify and re-review. "Small", "mechanical", "the agent already did the hard
 part", and "it's a fix, not new code" are **not** exemptions — the only
