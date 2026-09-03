@@ -1,3 +1,4 @@
+import type { TProvisioningRun } from '@blog/db/schema/tenants';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 
 import { RunCard } from './run-card';
@@ -34,6 +35,22 @@ describe(RunCard, () => {
     expect(finished.tagName).toBe('TIME');
     expect(finished).toHaveAttribute('dateTime', '2026-08-12T14:22:00.000Z');
     expect(screen.getByText('production')).toBeVisible();
+  });
+
+  it('shows a waiting-to-start placeholder for Started when the run has been admitted but has not yet begun, with no <time> element', () => {
+    render(
+      <RunCard
+        run={
+          {
+            admittedAt: '2026-08-12T14:18:00.000Z',
+          } as unknown as TProvisioningRun
+        }
+      />,
+    );
+
+    const placeholder = screen.getByText('Waiting for the run to start…');
+    expect(placeholder).toBeVisible();
+    expect(placeholder.tagName).not.toBe('TIME');
   });
 
   it('shows an em-dash placeholder for Finished while the run is still in flight, with no <time> element', () => {
