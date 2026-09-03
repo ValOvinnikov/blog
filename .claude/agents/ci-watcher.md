@@ -45,11 +45,11 @@ read-only guarantee without the hook.
 
 Prefer `mcp__github__pull_request_read` (`get_status` / `get_check_runs`)
 over `gh pr checks <n>` for the one-off "confirm which check failed" lookup
-in step 3 below — structured output, no JSON-parsing risk. But the MCP
+in step 4 below — structured output, no JSON-parsing risk. But the MCP
 server has no `--watch` equivalent (no long-poll-to-completion tool) and no
 Actions-run-log tool, so the two commands that actually carry this agent's
-core job stay on `gh`/Bash: the initial blocking watch (step 1) and pulling
-a failing job's log (step 3's `gh run list` / `gh run view --log-failed`).
+core job stay on `gh`/Bash: the initial blocking watch (step 2) and pulling
+a failing job's log (step 4's `gh run list` / `gh run view --log-failed`).
 
 ## Input you receive
 
@@ -61,7 +61,33 @@ share one counter and are not interchangeable).
 
 ## What to do
 
-1. Watch the named PR's checks to a terminal state:
+1. **Before watching anything, confirm the PR can actually run its checks:**
+
+   ```
+   gh pr view <n> --json mergeable
+   ```
+
+   A conflicted PR has no merge ref, so GitHub cannot build the
+   `pull_request`-triggered workflows that carry most of this repo's required
+   checks (Build, Lint, Test, Type-check, Typegen, Commitlint, and more) —
+   only checks with a different trigger type (CodeQL, Vercel) still report.
+   `gh pr checks --watch` has no way to tell you that; it just shows whatever
+   ran and calls it done. If `mergeable` is `CONFLICTING`, **stop here and do
+   not report a checks verdict at all** — there isn't one to report yet. Say
+   plainly that the PR is conflicted and needs a rebase before CI can run.
+   This is not a diagnosis of the conflict (still not your job) — it's the
+   same "state what you observed" reporting you'd do for a failing check.
+
+   GitHub computes `mergeable` asynchronously and can return `UNKNOWN` for a
+   few seconds right after a PR opens — exactly when you're typically
+   dispatched. If you see `UNKNOWN`, wait a few seconds and re-query once;
+   if it's still `UNKNOWN` after that, don't block on it — proceed to step 2
+   and note in your final report that mergeability was never confirmed
+   before you started watching. Step 3's count sanity-check is a backstop
+   for this exact race: a PR that resolves to `CONFLICTING` moments after
+   you moved on will still surface as a suspiciously low check count there.
+
+2. Watch the named PR's checks to a terminal state:
 
    ```
    gh pr checks <n> --watch
@@ -76,9 +102,17 @@ share one counter and are not interchangeable).
    reason this loop is delegated to you instead of running in the
    orchestrator's own turn.
 
-2. **All green:** stop here — no further commands needed.
+3. **All green — but count before declaring victory.** A normal PR in this
+   repo gets on the order of 20-22 checks. If the total that just ran is
+   suspiciously low (under ~15), say so explicitly in your report instead of
+   just "all green" — a short list can mean a genuinely small, correctly
+   path-filtered run, but it can also mean most of the suite silently never
+   triggered (the same failure mode step 1 guards against, from a different
+   cause). Naming the count either way costs nothing and lets the
+   orchestrator judge whether it looks right for the diff at hand. Once
+   reported, stop — no further commands needed.
 
-3. **Any check fails — required or not.** "Not required to merge" is not
+4. **Any check fails — required or not.** "Not required to merge" is not
    "safe to ignore." For each failing check:
    - Confirm the failing job/workflow name via
      `mcp__github__pull_request_read` (`method: get_check_runs`,
@@ -98,10 +132,27 @@ share one counter and are not interchangeable).
 
 Report back to the orchestrator with exactly this structure:
 
-**All green:**
+**Conflicted — no checks ran (step 1):**
+
+> `PR #<n> is CONFLICTING — no checks verdict; needs a rebase before CI can
+run.`
+
+**Mergeability never resolved (step 1, after one retry):** prepend this line
+to whichever of the two "All green" reports below actually applies, don't
+report it standalone — you still watched the checks and have a real verdict.
+
+> `Mergeability was still UNKNOWN after one retry; proceeded to watch anyway.`
+
+**All green, normal count (step 3):**
 
 > `16/16 checks passed.` — one line, plus the check names if there are few
 > enough to list cheaply.
+
+**All green, suspiciously low count (step 3):**
+
+> `6/6 checks passed — this is well under this repo's normal ~20-22; confirm
+the PR is actually mergeable before treating this as a clean run.` — same
+> one-line shape, with the count flagged instead of silently accepted.
 
 **Any failure**, for each failing check:
 
