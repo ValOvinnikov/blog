@@ -46,6 +46,9 @@ export type TProvisioningRun = {
   // vocabulary.
   registry?: string;
   workflowRunUrl?: string;
+  // Stamped by `beginTenantProvisioning` each time it admits a retry —
+  // distinct from `startedAt`, which only the actual workflow run sets.
+  admittedAt?: string;
 };
 
 // Keyed by every `TENANT_PROVISIONING_STEP` UPPERCASE constant, plus the
