@@ -88,8 +88,8 @@ relative paths only within a single slice (`./schema`, `./queries/comments`).
   scoped to `scripts/provision-tenant/`, and `@blog/insight`'s
   `sanitizeLogMessage`, scoped to `scripts/provision-tenant/`,
   `scripts/deprovision-tenant/`, `scripts/recheck-tenant-owners/`, and
-  `scripts/validate-tenant-documents/`, per the exceptions above. The dependency graph stays acyclic:
-  `db → config, utils`, nothing more.
+  `scripts/validate-tenant-documents/`, per the exceptions above. The
+  dependency graph stays acyclic: `db → config, utils`, nothing more.
 - **Three things import `@blog/db`** — `apps/web`, `apps/platform` (the
   operator/tenant admin panel, owned by the `platform-app` agent), and
   `@blog/auth`, which binds the Auth.js adapter to your tables. **`@blog/db`
