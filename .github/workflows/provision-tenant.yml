@@ -139,4 +139,7 @@ jobs:
     with:
       tenantId: ${{ inputs.tenantId }}
       environment: ${{ inputs.environment }}
-    secrets: inherit
+    secrets:
+      TENANT_REGISTRY_DATABASE_URL: ${{ secrets.TENANT_REGISTRY_DATABASE_URL }}
+      TENANT_TOKEN_ENCRYPTION_KEY: ${{ secrets.TENANT_TOKEN_ENCRYPTION_KEY }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}

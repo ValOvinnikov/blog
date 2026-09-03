@@ -46,6 +46,13 @@ on:
         description: 'Which GitHub Environment this run resolves its credentials from'
         required: true
         type: string
+    secrets:
+      TENANT_REGISTRY_DATABASE_URL:
+        required: true
+      TENANT_TOKEN_ENCRYPTION_KEY:
+        required: true
+      RESEND_API_KEY:
+        required: false
 
 permissions:
   contents: read

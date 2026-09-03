@@ -11,9 +11,9 @@ const studioDir = resolve(
   '../../../../studio',
 );
 
-export type TSanityValidationMarkerLevel = 'error' | 'warning' | 'info';
+type TSanityValidationMarkerLevel = 'error' | 'warning' | 'info';
 
-export type TSanityValidationMarker = {
+type TSanityValidationMarker = {
   level: TSanityValidationMarkerLevel;
   message: string;
   path?: unknown[];
