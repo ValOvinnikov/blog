@@ -97,6 +97,7 @@ jobs:
         with:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
+          install-filter: '@blog/db...'
       - name: Run deprovisioning steps
         # `inputs.*` are attacker-influenceable (any repo collaborator who
         # can trigger workflow_dispatch controls them) — never interpolate a
