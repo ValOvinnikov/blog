@@ -118,8 +118,7 @@ export const tenants = pgTable('tenants', {
   webhookCreatedAt: timestamp('webhook_created_at', { mode: 'date' }),
   // Set once `scripts/deprovision-tenant` finishes tearing a tenant's infra
   // down (alongside `status` moving to ARCHIVED). The row is archived, never
-  // hard-deleted, so `slug`'s unique constraint keeps a deprovisioned
-  // tenant's slug from being silently re-registered.
+  // hard-deleted.
   deprovisionedAt: timestamp('deprovisioned_at', { mode: 'date' }),
   createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' })
