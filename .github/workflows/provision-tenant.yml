@@ -116,6 +116,7 @@ jobs:
         with:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
+          install-filter: '@blog/db...'
       - name: Run provisioning steps
         # `inputs.tenantId` is attacker-influenceable (any repo collaborator
         # who can trigger workflow_dispatch controls it) — never interpolate

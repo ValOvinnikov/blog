@@ -4,6 +4,13 @@
 
 All automation lives in `.github/workflows/` (shared pnpm/Node setup in
 `.github/actions/setup`; Dependabot bumps npm + GitHub Actions weekly).
+`.github/actions/setup` takes an optional `install-filter` input (default
+empty, meaning an unscoped `pnpm install --frozen-lockfile` across every
+workspace) that, when set, installs with `pnpm install --filter "<value>"
+--frozen-lockfile` instead — Provision Tenant and Deprovision Tenant are the
+only two callers that set it (`@blog/db...`), since each dispatches a single
+`@blog/db` script and has no use for `apps/web`/`apps/platform`/Storybook/
+Playwright's dependency trees.
 
 **This table is a Prettier-driven merge-conflict hotspot.** Prettier repads
 every column to its widest cell whenever any row's content changes width, so

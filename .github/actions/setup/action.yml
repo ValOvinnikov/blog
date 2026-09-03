@@ -8,6 +8,10 @@ inputs:
   node-version:
     description: Node.js version to install
     required: true
+  install-filter:
+    description: 'Optional pnpm --filter expression to scope the install (e.g. "@blog/db..."). Leave blank to install every workspace.'
+    required: false
+    default: ''
 
 runs:
   using: composite
@@ -31,5 +35,12 @@ runs:
           turbo-${{ runner.os }}-
 
     - name: Install dependencies
-      run: pnpm install --frozen-lockfile
+      env:
+        INSTALL_FILTER: ${{ inputs.install-filter }}
+      run: |
+        if [ -n "$INSTALL_FILTER" ]; then
+          pnpm install --filter "$INSTALL_FILTER" --frozen-lockfile
+        else
+          pnpm install --frozen-lockfile
+        fi
       shell: bash
