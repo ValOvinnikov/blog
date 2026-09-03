@@ -13,6 +13,20 @@ describe('buildDocumentValidationAlertEmail', () => {
     expect(html).toContain('&lt;script&gt;');
   });
 
+  it('escapes the tenant id', () => {
+    const { html } = buildDocumentValidationAlertEmail({
+      tenantName: 'Acme',
+      tenantId: '<script>alert(1)</script>',
+      invalidDocumentCount: 2,
+      isCritical: false,
+    });
+
+    expect(html).not.toContain('<code><script>');
+    expect(html).toContain(
+      '<code>&lt;script&gt;alert(1)&lt;/script&gt;</code>',
+    );
+  });
+
   it('names the tenant in the subject', () => {
     const { subject } = buildDocumentValidationAlertEmail({
       tenantName: 'Acme',
