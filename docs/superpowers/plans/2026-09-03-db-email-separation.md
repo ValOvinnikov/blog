@@ -41,7 +41,7 @@ Each has its own test file. `@blog/utils` is framework-free and already consumed
 - Modify: all three importers listed above
 - Modify: `apps/platform/package.json` — **add `"@blog/utils": "workspace:*"`**, then run `pnpm install`
 
-**`apps/platform` does not currently depend on `@blog/utils`, and the alias alone will not save you.** Its `tsconfig.json` and `vitest.config.ts` already declare the `@blog/utils/*` wildcard, so the alias looks present — but `isSecretMatch` is consumed as a **bare** root import (`import { isSecretMatch } from '@blog/utils'`, matching every other consumer in the repo, since `packages/utils/package.json`'s `exports` map has no per-module subpath). A bare specifier does not match a wildcard-only `paths` entry, so it resolves through `node_modules` — which requires the `package.json` dependency. `@blog/insight` in this same app is the working precedent: wildcard-only alias, bare import, and it works precisely _because_ it is declared in `package.json`.
+**`apps/platform` does not currently depend on `@blog/utils`, and the alias alone will not save you.** Its `tsconfig.json` and `vitest.config.ts` already declare the `@blog/utils/*` wildcard, so the alias looks present — but `isSecretMatch` is consumed as a **bare** root import (`import { isSecretMatch } from '@blog/utils'`, matching every other consumer in the repo — `packages/utils/package.json`'s `exports` map does declare several subpaths such as `./async` and `./color`, but none for `is-secret-match`, and this task adds none). A bare specifier does not match a wildcard-only `paths` entry, so it resolves through `node_modules` — which requires the `package.json` dependency. `@blog/insight` in this same app is the working precedent: wildcard-only alias, bare import, and it works precisely _because_ it is declared in `package.json`.
 
 Skip this and `apps/platform` fails with "Cannot find module '@blog/utils'" at type-check, test and build.
 
@@ -144,8 +144,8 @@ Expected: all PASS.
 - [ ] **Step 7: Commit**
 
 ```bash
-git add packages/utils apps/web
-git commit -m "refactor(utils): hoist isSecretMatch out of apps/web"
+git add packages/utils apps/web apps/platform pnpm-lock.yaml
+git commit -m "refactor(utils): hoist isSecretMatch out of both apps"
 ```
 
 ---
