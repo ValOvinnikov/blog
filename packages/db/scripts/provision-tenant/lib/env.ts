@@ -41,6 +41,8 @@ export type TProvisionEnv = {
   githubRunId: string | undefined;
   githubRepository: string | undefined;
   githubServerUrl: string | undefined;
+  // Set automatically by Actions; absent for a local run. Attributes the
+  // provisioning audit event to the actor who dispatched the workflow.
   githubActor: string | undefined;
   // The dispatched GitHub Environment name (`development`/`production`) —
   // surfaced verbatim as the run's registry, not this codebase's own
