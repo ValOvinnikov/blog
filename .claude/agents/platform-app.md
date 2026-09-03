@@ -98,7 +98,7 @@ When invoked, before writing any code:
   logger.error('provisioning.dispatch_failed', { tenantId, step, error });
   ```
   **Never interpolate a dynamic value into the event name** — no template
-  literals, no concatenation. Tenant ids, slugs, domains, and status codes
+  literals, no concatenation. Tenant ids, names, domains, and status codes
   belong in the context object. Keeping the event name static is what makes
   failures groupable downstream and what preserves the log-injection barrier
   CodeQL checks. Pass the raw `error` through; the logger normalizes it to
