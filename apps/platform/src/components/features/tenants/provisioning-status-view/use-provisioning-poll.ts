@@ -139,6 +139,8 @@ export type TUseProvisioningPollResult = {
   /** `PROVISIONING` while a Start/Retry dispatch is in flight, whatever the last-polled status was. */
   effectiveProvisioningStatus: TTenantProvisioningStatus | null;
   stepStatuses: TTenantProvisioningStepStatus[];
+  /** `stepStatuses`, but with any stale FAILED entry masked to IDLE while `isProvisioningRunning` — what the step list should actually render. */
+  displayStepStatuses: TTenantProvisioningStepStatus[];
   /** Each step's last status-change timestamp, parallel to `stepStatuses` and `STEP_ORDER` — `undefined` for a step with none recorded. */
   stepUpdatedAt: (string | undefined)[];
   /** The overall run this set of steps belongs to — `undefined` for a tenant that has never been provisioned, or one provisioned before this field existed. */
@@ -146,6 +148,7 @@ export type TUseProvisioningPollResult = {
   allIdle: boolean;
   isProvisioningRunning: boolean;
   overallStepStatus: TTenantProvisioningStepStatus;
+  /** True only when the tenant's own `effectiveProvisioningStatus` is also FAILED — a step still showing FAILED from a prior run while a retry is genuinely in progress does not count. */
   isOverallFailed: boolean;
   displayOverallStatus: Exclude<TTenantProvisioningStepStatus, 'FAILED'>;
   failedStepError: string | undefined;
@@ -349,20 +352,6 @@ export const useProvisioningPoll = (
   const overallStepStatus = OVERALL_STATUS_PRIORITY.find((candidate) =>
     stepStatuses.includes(candidate),
   ) as TTenantProvisioningStepStatus;
-  const isOverallFailed =
-    overallStepStatus === TENANT_PROVISIONING_STEP_STATUS.FAILED;
-  const failedStepError = isOverallFailed
-    ? STEP_ORDER.map((stepKey) => provisioningSteps?.[stepKey]).find(
-        (stepState) =>
-          stepState?.status === TENANT_PROVISIONING_STEP_STATUS.FAILED,
-      )?.error
-    : undefined;
-  const errorKind = isOverallFailed
-    ? classifyProvisioningError(failedStepError)
-    : undefined;
-
-  const ownerElevationOutcome =
-    provisioningSteps?.[TENANT_PROVISIONING_STEP.OWNER_ELEVATION]?.detail;
 
   // A dispatch has been requested but the runner hasn't reported a step yet
   // — `provisioningStatus` itself won't reflect this until the Server
@@ -377,11 +366,44 @@ export const useProvisioningPoll = (
     : provisioningStatus;
   const isProvisioningRunning =
     effectiveProvisioningStatus === TENANT_PROVISIONING_STATUS.PROVISIONING;
-  // The real per-step statuses drive `overallStepStatus`/`isOverallFailed`
-  // above unchanged; this is only what the header badge displays while
-  // every step is still IDLE but a dispatch is nonetheless in flight.
+
+  // `beginTenantProvisioning` deliberately never clears a step's FAILED entry
+  // when it admits a retry — it isn't overwritten until `run.ts`'s loop
+  // reaches that step again. While a run is genuinely live, that leftover
+  // FAILED entry must not read as a current failure, so it's masked back to
+  // IDLE rather than re-deriving per-step recency client-side.
+  const displayStepStatuses = isProvisioningRunning
+    ? stepStatuses.map((status) =>
+        status === TENANT_PROVISIONING_STEP_STATUS.FAILED
+          ? TENANT_PROVISIONING_STEP_STATUS.IDLE
+          : status,
+      )
+    : stepStatuses;
+
+  // `effectiveProvisioningStatus` is the authoritative "is this failure
+  // current" signal (it settles to FAILED the moment any step actually
+  // fails) — a stale per-step FAILED entry alone must not count.
+  const isOverallFailed =
+    overallStepStatus === TENANT_PROVISIONING_STEP_STATUS.FAILED &&
+    effectiveProvisioningStatus === TENANT_PROVISIONING_STATUS.FAILED;
+  const failedStepError = isOverallFailed
+    ? STEP_ORDER.map((stepKey) => provisioningSteps?.[stepKey]).find(
+        (stepState) =>
+          stepState?.status === TENANT_PROVISIONING_STEP_STATUS.FAILED,
+      )?.error
+    : undefined;
+  const errorKind = isOverallFailed
+    ? classifyProvisioningError(failedStepError)
+    : undefined;
+
+  const ownerElevationOutcome =
+    provisioningSteps?.[TENANT_PROVISIONING_STEP.OWNER_ELEVATION]?.detail;
+
+  // A run in progress always displays as RUNNING, regardless of `allIdle` —
+  // a stale FAILED step can coexist with a genuinely live run (this is the
+  // retry-in-progress case), and must not keep the badge stuck on it.
   const displayOverallStatus = (
-    allIdle && isProvisioningRunning
+    isProvisioningRunning
       ? TENANT_PROVISIONING_STEP_STATUS.RUNNING
       : overallStepStatus
   ) as Exclude<TTenantProvisioningStepStatus, 'FAILED'>;
@@ -437,6 +459,7 @@ export const useProvisioningPoll = (
     provisioningSteps,
     effectiveProvisioningStatus,
     stepStatuses,
+    displayStepStatuses,
     stepUpdatedAt,
     provisioningRun,
     allIdle,
