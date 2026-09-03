@@ -1,4 +1,4 @@
-# admin
+# platform
 
 > The operator/tenant admin panel: a Next.js app for managing tenants and their site configuration.
 
@@ -32,14 +32,18 @@ supplies authentication only — it has no opinion on either.
   (`next-intl` with `localePrefix: 'never'`), used to route UI copy through
   message catalogs rather than to serve multiple languages.
   - `(operator)/` — `admins`-gated routes (tenant list, add-tenant wizard).
-  - `dashboard/(tenant)/` and `t/[tenantSlug]/` — `memberships`-gated tenant
-    routes (Look/Voice settings), reached with and without an explicit tenant
-    slug in the URL.
+  - `tenants/[tenantId]/` — `admins`-gated routes for a single tenant's
+    detail view (Look/Voice/Features/Domain settings, provisioning status,
+    the danger zone), gated per-tenant rather than globally.
+  - `dashboard/(tenant)/` — `memberships`-gated tenant routes (the same
+    Look/Voice/Features/Domain settings), resolved from the signed-in
+    user's own membership and the active-tenant cookie rather than from a
+    URL segment.
   - `workspace-pending/` — session-gated page for a signed-in user with no
     `admins` row and no `memberships` rows: a workspace still provisioning,
     or one whose provisioning failed.
-- `src/app/api/` — Route Handlers: the Auth.js catch-all, the dashboard
-  tenant-select endpoint, and the tenant-provisioning status callback.
+- `src/app/api/` — Route Handlers: the Auth.js catch-all and the dashboard
+  tenant-select endpoint.
 - `src/components/` — one folder per component (component file,
   `*-variants.ts`, co-located test, `index.ts` barrel), covering the admin
   shell, sidebar/topbar, tenant management, and the Look/Voice settings forms.
@@ -53,21 +57,23 @@ supplies authentication only — it has no opinion on either.
   message catalog.
 - `src/testing/` — shared test fixtures and a custom render helper.
 
-Shared UI primitives come from `@blog/ui`; see
-[`packages/ui/COMPONENTS.md`](../../packages/ui/COMPONENTS.md) for the full
-component index rather than duplicating it here.
+This app owns its own presentational primitives under `src/components/shared/`
+(`Text`, `Card`, `Button`, `SegmentedControl`, …) rather than drawing them from
+`@blog/ui` — the one exception is `look-preview/preview-sample/`, which
+renders the tenant's real site and is allowed to import `@blog/ui` directly
+for that reason.
 
 ## Scripts
 
-| Script       | Command                          |
-| ------------ | -------------------------------- |
-| `dev`        | `pnpm --filter admin dev`        |
-| `build`      | `pnpm --filter admin build`      |
-| `start`      | `pnpm --filter admin start`      |
-| `lint`       | `pnpm --filter admin lint`       |
-| `type-check` | `pnpm --filter admin type-check` |
-| `format`     | `pnpm --filter admin format`     |
-| `test`       | `pnpm --filter admin test`       |
+| Script       | Command                             |
+| ------------ | ----------------------------------- |
+| `dev`        | `pnpm --filter platform dev`        |
+| `build`      | `pnpm --filter platform build`      |
+| `start`      | `pnpm --filter platform start`      |
+| `lint`       | `pnpm --filter platform lint`       |
+| `type-check` | `pnpm --filter platform type-check` |
+| `format`     | `pnpm --filter platform format`     |
+| `test`       | `pnpm --filter platform test`       |
 
 The root-level `pnpm type-check`, `pnpm lint`, and `pnpm test` run every
 workspace's equivalent script through Turborepo, this one included.
