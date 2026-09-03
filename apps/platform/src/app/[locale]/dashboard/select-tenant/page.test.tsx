@@ -61,7 +61,7 @@ describe(`<${SelectTenantPage.name}/>`, () => {
     listMembershipsForUserMock.mockResolvedValue([
       { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1', role: 'OWNER' },
     ]);
-    listTenantsByIdsMock.mockResolvedValue([{ id: 'tenant-1', slug: 'acme' }]);
+    listTenantsByIdsMock.mockResolvedValue([{ id: 'tenant-1' }]);
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
@@ -75,8 +75,8 @@ describe(`<${SelectTenantPage.name}/>`, () => {
       { id: 'm-2', userId: 'user-1', tenantId: 'tenant-2', role: 'OWNER' },
     ]);
     listTenantsByIdsMock.mockResolvedValue([
-      { id: 'tenant-1', slug: 'acme', name: 'Acme Inc.' },
-      { id: 'tenant-2', slug: 'globex', name: 'Globex Corp.' },
+      { id: 'tenant-1', name: 'Acme Inc.' },
+      { id: 'tenant-2', name: 'Globex Corp.' },
     ]);
 
     await setup();

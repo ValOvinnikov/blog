@@ -32,7 +32,7 @@ afterEach(async () => {
 
 describe(getSubscriberByEmail, () => {
   it('returns the row for an existing email', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await db
       .insert(schema.subscribers)
       .values({ tenantId, email: 'reader@example.com' });
@@ -46,7 +46,7 @@ describe(getSubscriberByEmail, () => {
   });
 
   it('normalizes casing/whitespace before looking the row up', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await db
       .insert(schema.subscribers)
       .values({ tenantId, email: 'reader@example.com' });
@@ -60,7 +60,7 @@ describe(getSubscriberByEmail, () => {
   });
 
   it('returns undefined for an email with no row', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     const result = await getSubscriberByEmail(tenantId, 'nobody@example.com');
 
@@ -68,8 +68,8 @@ describe(getSubscriberByEmail, () => {
   });
 
   it("returns undefined for another tenant's row with the same email", async () => {
-    const { id: tenantOneId } = await insertTestTenant(db, { slug: 'acme' });
-    const { id: tenantTwoId } = await insertTestTenant(db, { slug: 'other' });
+    const { id: tenantOneId } = await insertTestTenant(db);
+    const { id: tenantTwoId } = await insertTestTenant(db);
     await db
       .insert(schema.subscribers)
       .values({ tenantId: tenantOneId, email: 'reader@example.com' });

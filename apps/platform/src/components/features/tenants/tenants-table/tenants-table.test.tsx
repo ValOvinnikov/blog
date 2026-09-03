@@ -21,7 +21,6 @@ describe(TenantsTable, () => {
           buildTenant(),
           buildTenant({
             id: 'tenant-2',
-            slug: 'harbor',
             name: 'Harbor Co.',
             primaryDomain: 'harbor.example.com',
             plan: 'GROWTH',
@@ -48,7 +47,6 @@ describe(TenantsTable, () => {
           buildTenant(),
           buildTenant({
             id: 'tenant-2',
-            slug: 'harbor',
             name: 'Harbor Co.',
             primaryDomain: 'harbor.example.com',
           }),
@@ -73,7 +71,6 @@ describe(TenantsTable, () => {
           }),
           buildTenant({
             id: 'tenant-2',
-            slug: 'harbor',
             name: 'Harbor Co.',
             primaryDomain: 'harbor.example.com',
             provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,

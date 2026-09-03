@@ -24,7 +24,6 @@ type TInsertTenantOptions = {
 
 async function insertTenant(options: TInsertTenantOptions): Promise<string> {
   const tenant = await insertTestTenant(db, {
-    slug: 'acme',
     name: 'Acme',
     status: options.status,
     deprovisionedAt: options.deprovisionedAt,

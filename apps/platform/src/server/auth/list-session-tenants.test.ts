@@ -83,10 +83,7 @@ describe(listSessionTenants, () => {
       { id: 'm-2', userId: 'user-1', tenantId: 'tenant-2', role: 'OWNER' },
     ];
     listMembershipsForUserMock.mockResolvedValue(memberships);
-    const tenants = [
-      { id: 'tenant-1', slug: 'acme' },
-      { id: 'tenant-2', slug: 'globex' },
-    ];
+    const tenants = [{ id: 'tenant-1' }, { id: 'tenant-2' }];
     listTenantsByIdsMock.mockResolvedValue(tenants);
 
     const result = await listSessionTenants();
@@ -104,9 +101,9 @@ describe(listSessionTenants, () => {
       role: 'SUPERADMIN',
     });
     const tenants = [
-      { id: 'tenant-1', slug: 'acme' },
-      { id: 'tenant-2', slug: 'globex' },
-      { id: 'tenant-3', slug: 'initech' },
+      { id: 'tenant-1' },
+      { id: 'tenant-2' },
+      { id: 'tenant-3' },
     ];
     listTenantsMock.mockResolvedValue(tenants);
 

@@ -37,7 +37,7 @@ afterEach(async () => {
 describe(addBookmark, () => {
   it('inserts a new bookmark row for the given tenant, user and post', async () => {
     await insertTestUser(db, { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     const result = await addBookmark(tenantId, 'user-1', 'post-1');
 
@@ -53,7 +53,7 @@ describe(addBookmark, () => {
 
   it('is idempotent when the tuple is already bookmarked', async () => {
     await insertTestUser(db, { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     const first = await addBookmark(tenantId, 'user-1', 'post-1');
 
     const second = await addBookmark(tenantId, 'user-1', 'post-1');
@@ -65,8 +65,8 @@ describe(addBookmark, () => {
 
   it('allows the same user to bookmark the same postId on different tenants', async () => {
     await insertTestUser(db, { id: 'user-1' });
-    const { id: tenantOneId } = await insertTestTenant(db, { slug: 'acme' });
-    const { id: tenantTwoId } = await insertTestTenant(db, { slug: 'other' });
+    const { id: tenantOneId } = await insertTestTenant(db);
+    const { id: tenantTwoId } = await insertTestTenant(db);
 
     await addBookmark(tenantOneId, 'user-1', 'post-1');
     await addBookmark(tenantTwoId, 'user-1', 'post-1');
@@ -76,7 +76,7 @@ describe(addBookmark, () => {
   });
 
   it('rejects a bookmark for a user that does not exist', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     await expect(
       addBookmark(tenantId, 'missing-user', 'post-1'),
@@ -97,7 +97,7 @@ describe(addBookmark, () => {
   // trigger. The follow-up read is spied to simulate that exact window.
   it('returns DB_NOT_FOUND when the conflicting row vanishes before the follow-up read', async () => {
     await insertTestUser(db, { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await addBookmark(tenantId, 'user-1', 'post-1');
 
     const selectSpy = vi.spyOn(db, 'select').mockReturnValueOnce({
@@ -114,7 +114,7 @@ describe(addBookmark, () => {
 describe('foreign-key cascade', () => {
   it('removes a bookmark when its owning user is deleted', async () => {
     await insertTestUser(db, { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await addBookmark(tenantId, 'user-1', 'post-1');
 
     await db.delete(schema.users).where(eq(schema.users.id, 'user-1'));
@@ -125,7 +125,7 @@ describe('foreign-key cascade', () => {
 
   it('removes a bookmark when its owning tenant is deleted', async () => {
     await insertTestUser(db, { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await addBookmark(tenantId, 'user-1', 'post-1');
 
     await db.delete(schema.tenants).where(eq(schema.tenants.id, tenantId));

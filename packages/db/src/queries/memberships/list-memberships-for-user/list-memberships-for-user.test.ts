@@ -30,8 +30,8 @@ describe(listMembershipsForUser, () => {
   it('returns every membership for the given user', async () => {
     await insertTestUser(db, { id: 'user-1' });
     await insertTestUser(db, { id: 'user-2' });
-    const { id: tenantOneId } = await insertTestTenant(db, { slug: 'acme' });
-    const { id: tenantTwoId } = await insertTestTenant(db, { slug: 'other' });
+    const { id: tenantOneId } = await insertTestTenant(db);
+    const { id: tenantTwoId } = await insertTestTenant(db);
     await db.insert(schema.memberships).values([
       { userId: 'user-1', tenantId: tenantOneId, role: MEMBERSHIP_ROLE.OWNER },
       { userId: 'user-1', tenantId: tenantTwoId, role: MEMBERSHIP_ROLE.READER },

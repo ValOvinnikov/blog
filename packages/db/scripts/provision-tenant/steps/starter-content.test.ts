@@ -62,6 +62,14 @@ describe(buildStarterDocuments, () => {
     expect(site.defaultOgImage.asset._ref).toBe('image-og');
   });
 
+  it('the author document has no slug field (not a blog_author schema field)', () => {
+    const author = buildStarterDocuments(tenant, assets).find(
+      (doc) => doc._id === STARTER_DOCUMENT_IDS.AUTHOR,
+    );
+
+    expect(author).not.toHaveProperty('slug');
+  });
+
   it('the external nav link satisfies the link schema union (label + linkType + url)', () => {
     const navigation = buildStarterDocuments(tenant, assets).find(
       (doc) => doc._id === STARTER_DOCUMENT_IDS.NAVIGATION,

@@ -78,7 +78,7 @@ describe(requireTenantById, () => {
       createdAt: new Date(),
     };
     getAdminByUserIdMock.mockResolvedValue(admin);
-    const tenant = { id: 'tenant-1', slug: 'acme' };
+    const tenant = { id: 'tenant-1' };
     getTenantByIdMock.mockResolvedValue(tenant);
 
     const result = await requireTenantById('tenant-1');
@@ -101,7 +101,6 @@ describe(requireTenantById, () => {
     getAdminByUserIdMock.mockResolvedValue(admin);
     const archivedTenant = {
       id: 'tenant-1',
-      slug: 'acme',
       deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
     };
     getTenantByIdMock.mockResolvedValue(archivedTenant);

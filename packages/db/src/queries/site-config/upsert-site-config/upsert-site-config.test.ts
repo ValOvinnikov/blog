@@ -44,7 +44,7 @@ afterEach(async () => {
 
 describe(upsertSiteConfig, () => {
   it('inserts a new row when the tenant has no config yet', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     const result = await upsertSiteConfig(tenantId, baseInput);
 
@@ -58,7 +58,7 @@ describe(upsertSiteConfig, () => {
   });
 
   it('updates the existing row in place rather than inserting a second one', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await upsertSiteConfig(tenantId, baseInput);
 
     const result = await upsertSiteConfig(tenantId, {
@@ -74,7 +74,7 @@ describe(upsertSiteConfig, () => {
   });
 
   it('stores curated voice overrides', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     const result = await upsertSiteConfig(tenantId, {
       ...baseInput,
@@ -95,7 +95,7 @@ describe(upsertSiteConfig, () => {
   // storing `''` would silently break the "blank falls through to the
   // preset default" ladder for anyone who clears a field.
   it('clears a previously-set voice override when resubmitted blank', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await upsertSiteConfig(tenantId, {
       ...baseInput,
       voiceOverrides: { notFoundDescription: 'Custom description.' },
@@ -116,7 +116,7 @@ describe(upsertSiteConfig, () => {
   });
 
   it('trims a whitespace-only override to the same cleared state as blank', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     const result = await upsertSiteConfig(tenantId, {
       ...baseInput,
@@ -127,7 +127,7 @@ describe(upsertSiteConfig, () => {
   });
 
   it('rejects an accentHue outside the 0–360 range', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     await expect(
       upsertSiteConfig(tenantId, { ...baseInput, accentHue: 400 }),
@@ -135,7 +135,7 @@ describe(upsertSiteConfig, () => {
   });
 
   it('rejects a voice override longer than its field-specific cap', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     await expect(
       upsertSiteConfig(tenantId, {
@@ -158,7 +158,7 @@ describe(upsertSiteConfig, () => {
 // changes anything.
 describe('partial updates — omission leaves a field untouched, explicit null clears it', () => {
   it('preserves voice overrides when a later update omits the field entirely', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await upsertSiteConfig(tenantId, {
       ...baseInput,
       voiceOverrides: { notFoundDescription: 'Custom description.' },
@@ -175,7 +175,7 @@ describe('partial updates — omission leaves a field untouched, explicit null c
   });
 
   it('clears every voice override when explicitly updated with {}', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await upsertSiteConfig(tenantId, {
       ...baseInput,
       voiceOverrides: { notFoundDescription: 'Custom description.' },
@@ -190,7 +190,7 @@ describe('partial updates — omission leaves a field untouched, explicit null c
   });
 
   it('preserves logoHue when a later update omits the field', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await upsertSiteConfig(tenantId, { ...baseInput, logoHue: 200 });
 
     const result = await upsertSiteConfig(tenantId, {
@@ -202,7 +202,7 @@ describe('partial updates — omission leaves a field untouched, explicit null c
   });
 
   it('clears logoHue back to "follow accentHue" when explicitly set to null', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await upsertSiteConfig(tenantId, { ...baseInput, logoHue: 200 });
 
     const result = await upsertSiteConfig(tenantId, {
@@ -214,7 +214,7 @@ describe('partial updates — omission leaves a field untouched, explicit null c
   });
 
   it('preserves logoAssetUrl on omission and clears it on explicit null', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await upsertSiteConfig(tenantId, {
       ...baseInput,
       logoAssetUrl: 'https://blob.example.com/logo.png',

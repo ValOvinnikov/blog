@@ -32,7 +32,7 @@ describe(removeBookmarksForPost, () => {
   it('deletes every user’s bookmark for the given tenant and post', async () => {
     await insertTestUser(db, { id: 'user-1' });
     await insertTestUser(db, { id: 'user-2' });
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await addBookmark(tenantId, 'user-1', 'post-1');
     await addBookmark(tenantId, 'user-2', 'post-1');
 
@@ -45,7 +45,7 @@ describe(removeBookmarksForPost, () => {
 
   it('leaves bookmarks for a different post untouched', async () => {
     await insertTestUser(db, { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await addBookmark(tenantId, 'user-1', 'post-1');
     await addBookmark(tenantId, 'user-1', 'post-2');
 
@@ -56,8 +56,8 @@ describe(removeBookmarksForPost, () => {
 
   it("leaves a different tenant's bookmarks for the same postId untouched", async () => {
     await insertTestUser(db, { id: 'user-1' });
-    const { id: tenantOneId } = await insertTestTenant(db, { slug: 'acme' });
-    const { id: tenantTwoId } = await insertTestTenant(db, { slug: 'other' });
+    const { id: tenantOneId } = await insertTestTenant(db);
+    const { id: tenantTwoId } = await insertTestTenant(db);
     await addBookmark(tenantOneId, 'user-1', 'post-1');
     await addBookmark(tenantTwoId, 'user-1', 'post-1');
 
@@ -67,7 +67,7 @@ describe(removeBookmarksForPost, () => {
   });
 
   it('returns 0 when nothing matches', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     const count = await removeBookmarksForPost(tenantId, 'post-1');
 

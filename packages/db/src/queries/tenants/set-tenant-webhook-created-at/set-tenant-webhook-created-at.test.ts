@@ -17,7 +17,6 @@ async function insertDraftTenant(): Promise<string> {
   const [tenant] = await db
     .insert(schema.tenants)
     .values({
-      slug: 'acme',
       name: 'Acme',
       primaryDomain: 'acme.example.com',
       sanityProjectId: 'abc123',
@@ -74,7 +73,6 @@ describe(setTenantWebhookCreatedAt, () => {
       .where(eq(tenants.id, tenantId));
 
     expect(row).toMatchObject({
-      slug: 'acme',
       name: 'Acme',
       sanityProjectId: 'abc123',
       sanityDataset: 'production',
