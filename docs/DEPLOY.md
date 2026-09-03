@@ -849,7 +849,12 @@ nothing deploys before checks pass):
    target's turbo graph (a no-op merge skips everything, including `verify`;
    a manual `workflow_dispatch` bypasses the gate on every job, so all of them
    run). `@blog/studio` gates the Sanity `migrate` job rather than a deploy —
-   the Studio ships as a package and is not deployed on its own.
+   the Studio ships as a package and is not deployed on its own. "Affects" is
+   measured from the last commit this workflow **completed successfully
+   against**, not from `HEAD^1`, so a merge whose run was cancelled by the next
+   merge is still covered by that next run — see "A cancelled dev deploy is not
+   a lost deploy" in
+   [`docs/context/ci-automation.md`](context/ci-automation.md).
 2. **`verify` gate** re-runs `type-check` / `lint` / `test` / `build` on the
    merged commit.
 3. **`migrate`** (`environment: development`) applies any un-applied migrations

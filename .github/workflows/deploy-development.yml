@@ -32,6 +32,16 @@ permissions:
 #     pending run per group (newer supersedes older pending), so rapid merges
 #     collapse to "finish the current migration, then run the latest".
 # Production keeps a workflow-level `cancel-in-progress: false` (never cancels).
+#
+# "Latest merge wins" is only lossless because change detection is anchored to
+# the last commit this workflow COMPLETED SUCCESSFULLY against rather than to
+# HEAD^1 (#2570) — see the `changes` job. A cancelled run leaves it where it
+# stood, so the run
+# that superseded it widens its own window to cover the cancelled commit too;
+# cancellation costs deploy latency, never a lost deploy. Queueing the deploy
+# jobs (`cancel-in-progress: false`) would NOT have fixed this on its own:
+# GitHub cancels an older PENDING run when a newer one queues, so a middle merge
+# can still be dropped while every deploy runs to completion.
 
 env:
   PNPM_VERSION: 11.21.0
@@ -52,14 +62,33 @@ env:
 
 jobs:
   # Graph-aware change detection: turbo-ignore exits 0 when the package and its
-  # workspace dependencies are untouched between HEAD^1 (main before this merge)
-  # and HEAD, 1 when a redeploy is needed. A `packages/config` change therefore
-  # redeploys both apps; a docs-only merge deploys neither. workflow_dispatch
-  # bypasses the gates below, so a manual run always deploys everything.
+  # workspace dependencies are untouched between the comparison ref and HEAD, 1
+  # when a redeploy is needed. A `packages/config` change therefore redeploys
+  # both apps; a docs-only merge deploys neither. workflow_dispatch bypasses the
+  # gates below, so a manual run always deploys everything.
+  #
+  # That comparison ref is the head commit of the last SUCCESSFUL run of this
+  # workflow on `main`, not HEAD^1 (#2570). HEAD^1 makes the window exactly one
+  # merge wide, so a merge whose run is cancelled by the next one falls outside
+  # every window that follows and is silently never deployed. Anchoring to the
+  # last success needs no state of our own — GitHub's run history already is
+  # that state — and it self-heals: a run that is cancelled or fails never
+  # becomes the anchor, so the next merge re-evaluates every commit back to the
+  # one this workflow last got all the way through.
+  #
+  # The anchor is a diff boundary, not an assertion that something shipped: a
+  # docs-only merge and a run whose deploy step is a guarded no-op (its Vercel
+  # token not configured yet) both conclude `success` and both advance it. That
+  # is still correct — once a token is configured, the next real run inherits
+  # the whole accumulated window rather than one merge of it.
   changes:
     name: Detect changes
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: read
+      # Reading this workflow's own run history is what resolves the anchor.
+      actions: read
     concurrency:
       group: deploy-dev-changes
       cancel-in-progress: true
@@ -71,13 +100,61 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-          fetch-depth: 2
+          # Full history: the anchor can be many merges back after a run of
+          # cancellations or failures, and both the ancestry check below and
+          # turbo-ignore need that commit present locally.
+          fetch-depth: 0
+
+      # Runs come back newest-first; the first one that is an ancestor of HEAD
+      # wins. A head_sha that no longer exists (rewritten history) or that isn't
+      # an ancestor is skipped rather than trusted. An unreachable API — or a
+      # rename of this file, which the query names literally — degrades to HEAD^1
+      # with a warning: the pre-#2570 behaviour, which under-detects rather than
+      # deploying everything, so a blip can't stampede both Vercel projects.
+      - name: Resolve comparison ref
+        id: baseline
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          set -uo pipefail
+          # --verify, or rev-parse echoes its own argument back on failure and
+          # the fallback below silently becomes the literal string "<sha>^1".
+          parent=$(git rev-parse --verify "${HEAD_SHA}^1")
+          if [ -z "$parent" ]; then
+            echo "::error::Could not resolve ${HEAD_SHA}^1 — refusing to guess a comparison ref. The anchor stays where it is, so the next merge covers this commit too." >&2
+            exit 1
+          fi
+          ref=""
+          candidates=$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/deploy-development.yml/runs?branch=main&status=success&exclude_pull_requests=true&per_page=50" --jq '.workflow_runs[].head_sha') || candidates=""
+          for sha in $candidates; do
+            if [ "$sha" = "$HEAD_SHA" ]; then
+              continue
+            fi
+            if ! git cat-file -e "${sha}^{commit}" 2>/dev/null; then
+              continue
+            fi
+            if ! git merge-base --is-ancestor "$sha" "$HEAD_SHA"; then
+              continue
+            fi
+            ref="$sha"
+            break
+          done
+          if [ -z "$ref" ]; then
+            echo "::warning::No successful Deploy Development run found to compare against — falling back to HEAD^1, which cannot cover an earlier cancelled deploy."
+            ref="$parent"
+          elif [ "$ref" != "$parent" ]; then
+            echo "::notice::Comparing against ${ref} (last commit this workflow completed successfully against), $(git rev-list --count "${ref}..${HEAD_SHA}") commits back — an earlier run was cancelled or failed, so this run covers its changes too."
+          fi
+          echo "ref=${ref}" >> "$GITHUB_OUTPUT"
 
       - name: Is studio affected?
         id: studio
+        env:
+          BASE_REF: ${{ steps.baseline.outputs.ref }}
         run: |
           set -uo pipefail
-          if npx --yes "turbo-ignore@${TURBO_IGNORE_VERSION}" @blog/studio --fallback=HEAD^1; then
+          if npx --yes "turbo-ignore@${TURBO_IGNORE_VERSION}" @blog/studio --fallback="$BASE_REF"; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -85,9 +162,11 @@ jobs:
 
       - name: Is web affected?
         id: web
+        env:
+          BASE_REF: ${{ steps.baseline.outputs.ref }}
         run: |
           set -uo pipefail
-          if npx --yes "turbo-ignore@${TURBO_IGNORE_VERSION}" web --fallback=HEAD^1; then
+          if npx --yes "turbo-ignore@${TURBO_IGNORE_VERSION}" web --fallback="$BASE_REF"; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -95,9 +174,11 @@ jobs:
 
       - name: Is admin affected?
         id: admin
+        env:
+          BASE_REF: ${{ steps.baseline.outputs.ref }}
         run: |
           set -uo pipefail
-          if npx --yes "turbo-ignore@${TURBO_IGNORE_VERSION}" platform --fallback=HEAD^1; then
+          if npx --yes "turbo-ignore@${TURBO_IGNORE_VERSION}" platform --fallback="$BASE_REF"; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
