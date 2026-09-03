@@ -26,7 +26,6 @@ const env: TDeprovisionEnv = {
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
   return {
     id: 'tenant-1',
-    slug: 'acme',
     name: 'Acme',
     primaryDomain: 'acme.example.com',
     sanityProjectId: 'proj123',

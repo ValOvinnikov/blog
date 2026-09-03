@@ -46,7 +46,6 @@ const fetchMock = vi.fn();
 
 const tenant = {
   id: 'tenant-1',
-  slug: 'acme',
   sanityProjectId: 'proj123',
   sanityDataset: 'production',
 } as TTenant;

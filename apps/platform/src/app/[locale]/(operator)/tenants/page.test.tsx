@@ -33,7 +33,6 @@ describe(TenantsPage, () => {
     listTenantsMock.mockResolvedValue([
       {
         id: 'tenant-1',
-        slug: 'acme',
         name: 'Acme Inc.',
         primaryDomain: 'acme.example.com',
         sanityProjectId: 'proj-1',

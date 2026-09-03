@@ -26,7 +26,7 @@ afterEach(async () => {
 
 describe(getSettingsFeatures, () => {
   it('returns undefined when the tenant has no settings_features row', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     const result = await getSettingsFeatures(tenantId);
 
@@ -34,7 +34,7 @@ describe(getSettingsFeatures, () => {
   });
 
   it('returns the stored toggles when a row exists', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await db.insert(schema.settingsFeatures).values({
       tenantId,
       newsletterEnabled: true,

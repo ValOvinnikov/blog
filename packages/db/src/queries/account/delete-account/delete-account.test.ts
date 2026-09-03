@@ -29,7 +29,6 @@ beforeEach(async () => {
   const [tenant] = await db
     .insert(schema.tenants)
     .values({
-      slug: 'acme',
       name: 'Acme',
       primaryDomain: 'acme.example.com',
       sanityProjectId: 'abc123',

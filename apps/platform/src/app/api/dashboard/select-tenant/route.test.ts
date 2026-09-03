@@ -134,7 +134,7 @@ describe('GET /api/dashboard/select-tenant', () => {
       id: 'admin-1',
       role: 'SUPERADMIN',
     });
-    listTenantsByIdsMock.mockResolvedValue([{ id: 'tenant-1', slug: 'acme' }]);
+    listTenantsByIdsMock.mockResolvedValue([{ id: 'tenant-1' }]);
     const { GET } = await import('./route');
 
     const response = await GET(

@@ -41,7 +41,6 @@ const env: TProvisionEnv = {
 function tenantAt(createdAt: Date, overrides: Partial<TTenant> = {}): TTenant {
   return {
     id: 'tenant-1',
-    slug: 'acme',
     name: 'Acme',
     primaryDomain: 'acme.example.com',
     sanityProjectId: 'proj-abc',

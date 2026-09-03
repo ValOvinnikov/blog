@@ -38,7 +38,7 @@ afterEach(async () => {
 
 describe(openFinding, () => {
   it('inserts a fresh OPEN finding when none exists for the condition', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     const result = await openFinding({
       tenantId,
@@ -64,7 +64,7 @@ describe(openFinding, () => {
   });
 
   it('detecting the same condition twice yields one open row, not two', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     const input = {
       tenantId,
       source: FINDING_SOURCE.RECHECK_TENANT_OWNERS,
@@ -101,7 +101,7 @@ describe(openFinding, () => {
   });
 
   it('bumps lastSeenAt without changing firstSeenAt on a repeat sighting', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     const input = {
       tenantId,
       source: FINDING_SOURCE.DOCUMENT_VALIDATION,
@@ -126,7 +126,7 @@ describe(openFinding, () => {
   });
 
   it('reopens as a new row once the prior finding for the same condition was resolved', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     const input = {
       tenantId,
       source: FINDING_SOURCE.SITE_CONFIG_REVALIDATION,
@@ -174,7 +174,7 @@ describe(openFinding, () => {
   });
 
   it('returns DB_NOT_FOUND when the open row vanishes before the follow-up update', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     const input = {
       tenantId,
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,
@@ -203,7 +203,7 @@ describe(openFinding, () => {
 
 describe('foreign-key cascade', () => {
   it('removes a finding when its owning tenant is deleted', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await openFinding({
       tenantId,
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,

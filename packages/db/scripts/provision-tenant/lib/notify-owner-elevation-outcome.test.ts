@@ -28,7 +28,6 @@ vi.mock(
 function tenant(overrides: Partial<TTenant> = {}): TTenant {
   return {
     id: 't1',
-    slug: 'acme',
     name: 'Acme',
     primaryDomain: 'acme.example.com',
     sanityProjectId: 'proj-acme',

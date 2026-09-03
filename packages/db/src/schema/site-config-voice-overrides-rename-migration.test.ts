@@ -41,7 +41,6 @@ async function setUpDbWithSiteConfigRow(
   const [tenant] = await db
     .insert(tenants)
     .values({
-      slug: 'acme',
       name: 'Acme',
       primaryDomain: 'acme.example.com',
       locale: 'en',

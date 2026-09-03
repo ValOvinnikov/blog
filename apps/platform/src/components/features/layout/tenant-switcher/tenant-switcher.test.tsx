@@ -107,7 +107,6 @@ describe(TenantSwitcher, () => {
     const user = userEvent.setup();
     const archivedTenant = makeTenant({
       id: 'tenant-2',
-      slug: 'globex',
       name: 'Globex Corp',
       primaryDomain: 'globex.example.com',
       deprovisionedAt: new Date('2026-02-01T00:00:00.000Z'),
@@ -133,7 +132,6 @@ describe(TenantSwitcher, () => {
   it('shows the archived marker on the trigger when the active tenant is archived', () => {
     const archivedTenant = makeTenant({
       id: 'tenant-2',
-      slug: 'globex',
       name: 'Globex Corp',
       primaryDomain: 'globex.example.com',
       deprovisionedAt: new Date('2026-02-01T00:00:00.000Z'),
