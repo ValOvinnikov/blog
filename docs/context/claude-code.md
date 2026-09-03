@@ -521,7 +521,10 @@ file` are all denied alike) — an earlier version only handled the
   GitHub's auth server doesn't support the dynamic client registration
   Claude Code's automatic MCP login needs. Each contributor exports their own
   `GITHUB_PAT` (a GitHub personal access token) in their shell profile; never
-  put the token value in this repo.
+  put the token value in this repo. Cloud runs have no shell profile to read,
+  so `claude.yml` supplies the same variable from the `GH_PAT` Actions secret
+  (see `ci-automation.md`) — without it every `mcp__github__*` tool is
+  silently absent from the run.
 - **Scheduled cloud routines** — a Claude Code "routine" (`/schedule`, backed
   by the `RemoteTrigger` API — cloud infrastructure, not a local cron job)
   runs daily and posts a summary of what merged in the last 24 hours, plus a
