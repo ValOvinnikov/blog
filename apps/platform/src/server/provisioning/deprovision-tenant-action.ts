@@ -65,11 +65,12 @@ export const deprovisionTenantAction = async (
   }
 
   // A dry run never actually deprovisions anything — only a real dispatch
-  // is a lifecycle fact worth recording.
+  // is a lifecycle fact worth recording. The workflow records the outcome
+  // itself; this row attests only that it was asked to run.
   if (!dryRun) {
     await recordAuditEvent({
       logEvent: 'provisioning.deprovision_audit_failed',
-      action: AUDIT_ACTION.DEPROVISIONED,
+      action: AUDIT_ACTION.DEPROVISION_REQUESTED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: tenantId,
       details: { name: tenant.name },

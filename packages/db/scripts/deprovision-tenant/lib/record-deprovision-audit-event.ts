@@ -5,18 +5,20 @@ import { sanitizeLogMessage } from '@blog/insight';
 import type { TDeprovisionEnv } from './env';
 
 /**
- * Records exactly one `ARCHIVED`/`TENANT` audit event after a real archive.
- * Never throws — the archive itself already succeeded by the time this
- * runs, so a lost audit write is logged and swallowed rather than failing
- * a step whose destructive work is already done.
+ * Records exactly one `DEPROVISIONED`/`TENANT` audit event after a real
+ * archive — the outcome half of the pair the platform app opens with
+ * `DEPROVISION_REQUESTED`. Never throws: the archive itself already
+ * succeeded by the time this runs, so a lost audit write is logged and
+ * swallowed rather than failing a step whose destructive work is already
+ * done.
  */
-export async function recordArchiveAuditEvent(
+export async function recordDeprovisionAuditEvent(
   tenantId: string,
   env: TDeprovisionEnv,
 ): Promise<void> {
   if (!env.githubActor) {
     console.error(
-      'deprovision-tenant: GITHUB_ACTOR is not set — skipping the archive audit event.',
+      'deprovision-tenant: GITHUB_ACTOR is not set — skipping the deprovision audit event.',
     );
     return;
   }
@@ -25,14 +27,14 @@ export async function recordArchiveAuditEvent(
     await insertAuditEvent({
       actorId: `github:${env.githubActor}`,
       actorEmail: `${env.githubActor}@users.noreply.github.com`,
-      action: AUDIT_ACTION.ARCHIVED,
+      action: AUDIT_ACTION.DEPROVISIONED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: tenantId,
       details: { via: 'deprovision-tenant-workflow', runId: env.githubRunId },
     });
   } catch (error) {
     console.error(
-      `deprovision-tenant: failed to record the archive audit event for tenant "${tenantId}" (${sanitizeLogMessage(error)}).`,
+      `deprovision-tenant: failed to record the deprovision audit event for tenant "${tenantId}" (${sanitizeLogMessage(error)}).`,
     );
   }
 }

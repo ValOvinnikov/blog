@@ -216,8 +216,8 @@
     "relativeDaysAgo": "{days}d ago",
     "activityAction": {
       "CREATED": "Tenant created",
-      "ARCHIVED": "Tenant archived",
-      "DEPROVISIONED": "Provisioning removed",
+      "DEPROVISION_REQUESTED": "Deprovisioning requested",
+      "DEPROVISIONED": "Tenant deprovisioned",
       "PROVISIONED": "Tenant provisioned",
       "PROVISIONING_FAILED": "Provisioning failed",
       "SETTINGS_UPDATED": "Settings updated",
