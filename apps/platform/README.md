@@ -34,11 +34,13 @@ supplies authentication only — it has no opinion on either.
   - `(operator)/` — `admins`-gated routes (tenant list, add-tenant wizard).
   - `tenants/[tenantId]/` — `admins`-gated routes for a single tenant's
     detail view (Look/Voice/Features/Domain settings, provisioning status,
-    the danger zone), gated per-tenant rather than globally.
+    the danger zone): the operator side, gated globally by any `admins` row
+    like `(operator)/` — the `[tenantId]` segment only selects which
+    tenant's data loads, not who may load it.
   - `dashboard/(tenant)/` — `memberships`-gated tenant routes (the same
-    Look/Voice/Features/Domain settings), resolved from the signed-in
-    user's own membership and the active-tenant cookie rather than from a
-    URL segment.
+    Look/Voice/Features/Domain settings), genuinely scoped per-tenant:
+    resolved from the signed-in user's own `memberships` rows and the
+    active-tenant cookie rather than from a URL segment.
   - `workspace-pending/` — session-gated page for a signed-in user with no
     `admins` row and no `memberships` rows: a workspace still provisioning,
     or one whose provisioning failed.
