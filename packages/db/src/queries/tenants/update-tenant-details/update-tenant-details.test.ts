@@ -413,6 +413,32 @@ describe(updateTenantDetails, () => {
     expect(row?.name).toBe('Acme');
   });
 
+  it('refuses with provisioning-started when every core step has succeeded, even though OWNER_ELEVATION is FAILED', async () => {
+    const tenantId = await insertTenantWithDomain({
+      provisioningSteps: stepsWith({
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        OWNER_ELEVATION: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
+      }),
+    });
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      name: 'New Name',
+    });
+
+    expect(result).toEqual({ outcome: 'provisioning-started' });
+
+    const [row] = await db
+      .select()
+      .from(tenants)
+      .where(eq(tenants.id, tenantId));
+    expect(row?.name).toBe('Acme');
+  });
+
   it('updates a changed primaryDomain when provisioning failed before MAP_DOMAIN completed', async () => {
     const tenantId = await insertTenantWithDomain({
       domain: 'acme.example.com',
