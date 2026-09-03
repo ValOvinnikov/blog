@@ -248,6 +248,7 @@ describe(useProvisioningPoll, () => {
 
     it('surfaces a FAILED step as the overall status even with other steps still idle, and classifies its error', () => {
       const tenant = makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
         provisioningSteps: {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
@@ -263,6 +264,80 @@ describe(useProvisioningPoll, () => {
       expect(result.current.isOverallFailed).toBe(true);
       expect(result.current.failedStepError).toBe('fetch failed');
       expect(result.current.errorKind).toBe('network');
+    });
+
+    it('does not treat a stale FAILED step as a current failure while provisioningStatus is still non-terminal', () => {
+      const tenant = makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+            error: 'fetch failed',
+          },
+        },
+      });
+      const { result } = renderHook(() =>
+        useProvisioningPoll(tenant, 'NOT_CONFIGURED'),
+      );
+
+      expect(result.current.overallStepStatus).toBe(
+        TENANT_PROVISIONING_STEP_STATUS.FAILED,
+      );
+      expect(result.current.isOverallFailed).toBe(false);
+      expect(result.current.failedStepError).toBeUndefined();
+      expect(result.current.errorKind).toBeUndefined();
+    });
+
+    it('masks a stale FAILED step to IDLE and reports RUNNING, not FAILED, once a retried run is genuinely PROVISIONING', () => {
+      const tenant = makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+            error: 'Vercel Domains API returned 500',
+          },
+        },
+      });
+      const { result } = renderHook(() =>
+        useProvisioningPoll(tenant, 'NOT_CONFIGURED'),
+      );
+
+      expect(result.current.isProvisioningRunning).toBe(true);
+      expect(result.current.isOverallFailed).toBe(false);
+      expect(result.current.displayOverallStatus).toBe(
+        TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+      );
+      // The raw array still carries the real FAILED entry — only the
+      // display-facing one is masked.
+      expect(result.current.stepStatuses[3]).toBe(
+        TENANT_PROVISIONING_STEP_STATUS.FAILED,
+      );
+      expect(result.current.displayStepStatuses[3]).toBe(
+        TENANT_PROVISIONING_STEP_STATUS.IDLE,
+      );
+    });
+
+    it('still reports a step as FAILED in displayStepStatuses once the tenant is genuinely, currently FAILED', () => {
+      const tenant = makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+            error: 'Vercel Domains API returned 500',
+          },
+        },
+      });
+      const { result } = renderHook(() =>
+        useProvisioningPoll(tenant, 'NOT_CONFIGURED'),
+      );
+
+      expect(result.current.isOverallFailed).toBe(true);
+      expect(result.current.displayStepStatuses[3]).toBe(
+        TENANT_PROVISIONING_STEP_STATUS.FAILED,
+      );
     });
 
     it('prioritises FAILED over RUNNING across steps for the overall status', () => {

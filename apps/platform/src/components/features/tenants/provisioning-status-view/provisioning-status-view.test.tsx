@@ -338,6 +338,7 @@ describe(ProvisioningStatusView, () => {
 
   it('shows a single Retry button in the tenant details header for a failed step, with no per-step Retry buttons in the sidebar', () => {
     const tenant = makeTenant({
+      provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
       provisioningSteps: {
         ...idleProvisioningSteps(),
         [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
@@ -399,6 +400,7 @@ describe(ProvisioningStatusView, () => {
   describe('parsed provisioning error card', () => {
     const renderFailed = (error: string) => {
       const tenant = makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
         provisioningSteps: {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
@@ -474,8 +476,65 @@ describe(ProvisioningStatusView, () => {
     });
   });
 
+  describe('a stale FAILED step while a retried run is genuinely in progress', () => {
+    const staleFailedTenant = () =>
+      makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+            error: 'Vercel Domains API returned 500',
+          },
+        },
+      });
+
+    it('shows a running indicator, not the stale Failed state, in both status badges', () => {
+      render(
+        <ProvisioningStatusView
+          tenant={staleFailedTenant()}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      expect(screen.getAllByText('Running…').length).toBeGreaterThan(0);
+      expect(screen.queryByText('Failed')).not.toBeInTheDocument();
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+
+    it('renders the stale step with its pending number instead of the failed glyph', () => {
+      render(
+        <ProvisioningStatusView
+          tenant={staleFailedTenant()}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      expect(
+        screen.queryByText('!', { selector: 'span[aria-hidden="true"]' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByText('4', { selector: 'span[aria-hidden="true"]' }),
+      ).toBeVisible();
+    });
+
+    it('shows no Retry button while the run is genuinely in progress', () => {
+      render(
+        <ProvisioningStatusView
+          tenant={staleFailedTenant()}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      expect(
+        screen.queryByRole('button', { name: 'Retry provisioning' }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
   it('re-dispatches the workflow for this tenant when Retry is clicked', async () => {
     const tenant = makeTenant({
+      provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
       provisioningSteps: {
         ...idleProvisioningSteps(),
         [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
@@ -662,6 +721,7 @@ describe(ProvisioningStatusView, () => {
 
   it('disables Retry provisioning for an archived tenant, and never dispatches on click', async () => {
     const tenant = makeTenant({
+      provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
       deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
       provisioningSteps: {
         ...idleProvisioningSteps(),
@@ -701,6 +761,7 @@ describe(ProvisioningStatusView, () => {
 
   it('describes the disabled Retry button with the archived notice, for a screen-reader user', () => {
     const tenant = makeTenant({
+      provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
       deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
       provisioningSteps: {
         ...idleProvisioningSteps(),
@@ -965,7 +1026,7 @@ describe(ProvisioningStatusView, () => {
         },
       };
       const tenant = makeTenant({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
+        provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
         provisioningSteps: failedSteps,
       });
       render(
@@ -1034,7 +1095,7 @@ describe(ProvisioningStatusView, () => {
         },
       };
       const tenant = makeTenant({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
+        provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
         provisioningSteps: failedSteps,
       });
       // Models a retry whose dispatched workflow never actually starts —
@@ -1122,7 +1183,7 @@ describe(ProvisioningStatusView, () => {
         },
       };
       const tenant = makeTenant({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
+        provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
         provisioningSteps: failedSteps,
       });
       render(
