@@ -12,7 +12,7 @@ name: Deprovision Tenant
 # triggering this automatically.
 #
 # Destructive, so `workflow_dispatch` alone is not enough: `confirm` must
-# match the tenant's live slug (checked before any deletion) and `dryRun`
+# match the tenant's live name (checked before any deletion) and `dryRun`
 # defaults to `true` — an operator must explicitly set it to `false` to
 # delete anything. See `packages/db/scripts/deprovision-tenant/run.ts`.
 #
