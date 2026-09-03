@@ -18,6 +18,7 @@ platform → db, auth, config, utils, studio   studio → config, utils (typegen
 ui → config (no Sanity/fetch)               configs/* → consumed by all
 db → config, utils (no React/Sanity)        auth → db, config, utils
 insight → nothing (base of graph, like config/utils)
+email → utils (sits low; both apps, auth and db's scripts consume it)
 graph is acyclic
 ```
 
@@ -205,9 +206,20 @@ dispatch `insight` only for changes to the logger core itself — a change to
 how an app _uses_ the logger belongs to `web`/`platform-app`. See
 `.claude/agents/insight.md`.
 
+`email` (`packages/email`, the single home for every email the product sends —
+the shared branded HTML shell, the canonical `escapeHtml`, and the typed
+`sendEmail` Resend transport) sits **low in the graph, upstream of `utils`
+only**, so both apps, `@blog/auth` and `@blog/db`'s CLI scripts can all consume
+it without a cycle. It is side-effecting (it owns the send call) but never
+logs, and never resolves tenants or fetches content — callers pass it resolved
+copy and URLs, the way `@blog/ui` takes props, which is what keeps it usable
+from an Auth.js callback that has no request context. Dispatch it for the email
+templates and transport themselves; a change to _which_ copy a caller passes
+belongs to that caller's layer. See `.claude/agents/email.md`.
+
 **Delegating in-scope work to its sub-agent is REQUIRED, not optional — for the
 whole lifecycle, not just the first draft.** Every file that lives in a
-sub-agent's domain (`config`/`studio`/`service`/`ui`/`web`/`db`/`platform-app`/`auth`/`insight` per the map above) is
+sub-agent's domain (`config`/`studio`/`service`/`ui`/`web`/`db`/`platform-app`/`auth`/`insight`/`email` per the map above) is
 written, changed, fixed, renamed, and reworked **by that sub-agent** — the
 initial implementation, every review-remediation, every follow-up tweak, every
 "it's one line" edit. The orchestrator _orchestrates_; it does not hand-author
