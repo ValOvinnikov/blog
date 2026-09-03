@@ -96,7 +96,7 @@ async function resolveOpenFindingIfAny(tenant: TTenant): Promise<void> {
   const result = await resolveFinding(finding.id);
   if (!result.ok) {
     console.error(
-      `validate-tenant-documents: resolveFinding failed for tenant "${tenant.id}" (slug "${tenant.slug}"): ${result.error}`,
+      `validate-tenant-documents: resolveFinding failed for tenant "${tenant.id}": ${result.error}`,
     );
   }
 }
@@ -118,7 +118,7 @@ async function validateOne(
   ) {
     summary.skipped += 1;
     console.log(
-      `validate-tenant-documents: skipping tenant "${tenant.id}" (slug "${tenant.slug}") — status="${credentials.status}" deprovisionedAt=${credentials.deprovisionedAt ? credentials.deprovisionedAt.toISOString() : 'null'}`,
+      `validate-tenant-documents: skipping tenant "${tenant.id}" — status="${credentials.status}" deprovisionedAt=${credentials.deprovisionedAt ? credentials.deprovisionedAt.toISOString() : 'null'}`,
     );
     return;
   }
@@ -133,7 +133,7 @@ async function validateOne(
   } catch (error) {
     summary.errors += 1;
     console.error(
-      `validate-tenant-documents: sanity documents validate failed for tenant "${tenant.id}" (slug "${tenant.slug}"): ${sanitizeLogMessage(error)}`,
+      `validate-tenant-documents: sanity documents validate failed for tenant "${tenant.id}": ${sanitizeLogMessage(error)}`,
     );
     return;
   }
@@ -168,7 +168,7 @@ async function validateOne(
   if (!openResult.ok) {
     summary.errors += 1;
     console.error(
-      `validate-tenant-documents: openFinding failed for tenant "${tenant.id}" (slug "${tenant.slug}"): ${openResult.error}`,
+      `validate-tenant-documents: openFinding failed for tenant "${tenant.id}": ${openResult.error}`,
     );
     return;
   }
