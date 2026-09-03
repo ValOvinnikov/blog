@@ -50,9 +50,7 @@ describe(`<${DashboardFeaturesPage.name}/>`, () => {
     listMembershipsForUserMock.mockResolvedValue([
       { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1', role: 'OWNER' },
     ]);
-    listTenantsByIdsMock.mockResolvedValue([
-      { id: 'tenant-1', slug: 'acme', plan: 'FREE' },
-    ]);
+    listTenantsByIdsMock.mockResolvedValue([{ id: 'tenant-1', plan: 'FREE' }]);
   });
 
   it('redirects to sign-in without a session', async () => {

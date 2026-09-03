@@ -68,7 +68,6 @@ describe(`<${FeaturesPage.name}/>`, () => {
     getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
     getTenantByIdMock.mockResolvedValue({
       id: 'tenant-1',
-      slug: 'acme',
       plan: 'FREE',
     });
     getSettingsFeaturesMock.mockResolvedValue(undefined);
@@ -89,7 +88,6 @@ describe(`<${FeaturesPage.name}/>`, () => {
     getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
     getTenantByIdMock.mockResolvedValue({
       id: 'tenant-1',
-      slug: 'acme',
       plan: 'FREE',
     });
     getSettingsFeaturesMock.mockResolvedValue(undefined);

@@ -58,7 +58,7 @@ describe(`<${LookPage.name}/>`, () => {
   it('renders Console defaults for a platform operator with no saved site_config row yet', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
-    getTenantByIdMock.mockResolvedValue({ id: 'tenant-1', slug: 'acme' });
+    getTenantByIdMock.mockResolvedValue({ id: 'tenant-1' });
     getSiteConfigMock.mockResolvedValue(undefined);
 
     await setup();

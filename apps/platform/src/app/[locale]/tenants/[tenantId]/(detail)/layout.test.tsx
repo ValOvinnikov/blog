@@ -74,7 +74,6 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
     });
     getTenantByIdMock.mockResolvedValue({
       id: 'tenant-1',
-      slug: 'acme',
       name: 'Acme Inc.',
       primaryDomain: 'acme.example.com',
     });
@@ -95,7 +94,6 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
     });
     getTenantByIdMock.mockResolvedValue({
       id: 'tenant-1',
-      slug: 'acme',
       name: 'Acme Inc.',
       primaryDomain: 'acme.example.com',
     });

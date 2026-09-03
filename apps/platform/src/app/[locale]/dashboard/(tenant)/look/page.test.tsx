@@ -46,7 +46,7 @@ describe(`<${DashboardLookPage.name}/>`, () => {
     listMembershipsForUserMock.mockResolvedValue([
       { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1', role: 'OWNER' },
     ]);
-    listTenantsByIdsMock.mockResolvedValue([{ id: 'tenant-1', slug: 'acme' }]);
+    listTenantsByIdsMock.mockResolvedValue([{ id: 'tenant-1' }]);
   });
 
   it('redirects to sign-in without a session', async () => {
