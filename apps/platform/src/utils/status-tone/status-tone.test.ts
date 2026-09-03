@@ -1,7 +1,11 @@
 import { FINDING_SEVERITY } from '@blog/config/constants';
 import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
 
-import { findingSeverityTone, ownerElevationTone } from './status-tone';
+import {
+  findingSeverityTone,
+  ownerElevationTone,
+  sanityValidationMarkerTone,
+} from './status-tone';
 
 // Only `ownerElevationTone` is covered here — the other exported tone
 // functions in this file (`tenantStatusTone`, `provisioningStepTone`,
@@ -50,5 +54,19 @@ describe(findingSeverityTone, () => {
 
   it('is "bad" for CRITICAL', () => {
     expect(findingSeverityTone(FINDING_SEVERITY.CRITICAL)).toBe('bad');
+  });
+});
+
+describe(sanityValidationMarkerTone, () => {
+  it('is "bad" for error', () => {
+    expect(sanityValidationMarkerTone('error')).toBe('bad');
+  });
+
+  it('is "warn" for warning', () => {
+    expect(sanityValidationMarkerTone('warning')).toBe('warn');
+  });
+
+  it('is "neutral" for info', () => {
+    expect(sanityValidationMarkerTone('info')).toBe('neutral');
   });
 });

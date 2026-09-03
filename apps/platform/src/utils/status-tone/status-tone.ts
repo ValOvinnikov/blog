@@ -58,6 +58,19 @@ const FINDING_SEVERITY_TONE: Record<TFindingSeverity, TBadgeTone> = {
   [FINDING_SEVERITY.CRITICAL]: 'bad',
 };
 
+// The `sanity documents validate` CLI's own marker levels — distinct from
+// `TFindingSeverity` (which is uppercase and has no 'error' member).
+export type TSanityValidationMarkerLevel = 'error' | 'warning' | 'info';
+
+const SANITY_VALIDATION_MARKER_TONE: Record<
+  TSanityValidationMarkerLevel,
+  TBadgeTone
+> = {
+  error: 'bad',
+  warning: 'warn',
+  info: 'neutral',
+};
+
 export const tenantStatusTone = (status: TTenantStatus) =>
   TENANT_STATUS_TONE[status];
 
@@ -73,3 +86,7 @@ export const domainVerificationTone = (status: TDomainVerificationStatus) =>
 
 export const ownerElevationTone = (outcome: TElevateTenantOwnerOutcome) =>
   OWNER_ELEVATION_TONE[outcome];
+
+export const sanityValidationMarkerTone = (
+  level: TSanityValidationMarkerLevel,
+) => SANITY_VALIDATION_MARKER_TONE[level];

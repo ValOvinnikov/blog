@@ -117,12 +117,20 @@
   "findingsCard": {
     "title": "Open findings",
     "empty": "No open findings for this tenant — everything's healthy.",
-    "detailsToggle": "Details"
+    "detailsToggle": "Details",
+    "columnLevel": "Level",
+    "columnDocument": "Document",
+    "columnMessage": "Message"
   },
   "findingSeverityLabel": {
     "INFO": "Info",
     "WARNING": "Warning",
     "CRITICAL": "Critical"
+  },
+  "sanityValidationMarkerLabel": {
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Info"
   },
   "findingSourceLabel": {
     "DOCUMENT_VALIDATION": "Document validation",
