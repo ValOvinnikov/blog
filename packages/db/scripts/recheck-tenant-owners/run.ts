@@ -68,12 +68,16 @@ async function recheckOne(
       tenant,
       env as TElevateTenantOwnerEnv,
     );
-    await reportOwnerElevationOutcome(tenant.id, outcome);
-    await notifyOwnerElevationOutcome({
+    const notifiedOutcome = await notifyOwnerElevationOutcome({
       tenant,
       outcome,
       resendApiKey: env.resendApiKey,
     });
+    await reportOwnerElevationOutcome(
+      tenant.id,
+      outcome,
+      ...(notifiedOutcome === undefined ? [] : [notifiedOutcome]),
+    );
 
     switch (outcome) {
       case ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED:
