@@ -1,9 +1,7 @@
 import { routes, type ILocalizedParams } from '@blog/config';
-import { getPlatformSanityContext, service } from '@blog/service';
 import { BlogListPage } from '@web/components/pages/blog-list-page';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { buildBlogListMetadata } from '@web/metadata/blog-list-metadata';
-import { logger } from '@web/utils/logger/logger';
 import { parsePageParam } from '@web/utils/parse-page-param/parse-page-param';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -12,23 +10,6 @@ import { setRequestLocale } from 'next-intl/server';
 type TProps = {
   params: Promise<ILocalizedParams & { page: string }>;
 };
-
-// Pages beyond the build-time list still render on demand via ISR
-// (dynamicParams defaults to true); correctness rides on the explicit
-// range check in BlogListPage, not on this list.
-export async function generateStaticParams() {
-  const result = await service.pages.blog.v1.getIndexPageParams(
-    getPlatformSanityContext(),
-  );
-  if (!result.ok) {
-    logger.error('blog_pagination.params_fetch_failed', {
-      error: result.error,
-    });
-    return [];
-  }
-
-  return result.data;
-}
 
 export async function generateMetadata({ params }: TProps): Promise<Metadata> {
   const { page: rawPage } = await params;

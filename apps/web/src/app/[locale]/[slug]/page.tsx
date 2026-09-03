@@ -1,30 +1,12 @@
 import type { ILocalizedParams } from '@blog/config';
-import { getPlatformSanityContext, service } from '@blog/service';
 import { GenericPage } from '@web/components/pages/generic-page';
 import { buildGenericPageMetadata } from '@web/metadata/generic-page-metadata';
-import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 
 type TProps = {
   params: Promise<ILocalizedParams & { slug: string }>;
 };
-
-// CI's build environment can't always construct the Sanity client; an
-// uncaught throw here would crash the entire `next build`. `dynamicParams`
-// stays default `true`, so a missed build-time slug still renders on demand.
-export async function generateStaticParams() {
-  const result = await service.pages.generic.v1.getPageSlugs(
-    getPlatformSanityContext(),
-  );
-
-  if (!result.ok) {
-    logger.error('generic_page.slugs_fetch_failed', { error: result.error });
-    return [];
-  }
-
-  return result.data.map(({ slug }) => ({ slug }));
-}
 
 export async function generateMetadata({ params }: TProps): Promise<Metadata> {
   const { slug } = await params;

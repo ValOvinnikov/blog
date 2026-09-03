@@ -140,10 +140,11 @@ relative paths only within a single slice (`./query`, `./types`).
     as a function.
   - **`index.ts`** — `export { createXService } from './application/service'` +
     the public view-model type(s) from the slice's `adaptor/**/types.ts`.
-- **Params slices** produce the `generateStaticParams` source directly, so the
-  web route only spreads `result.data`: slug routes
+- **Params slices** enumerate a content type's routable paths: slug routes
   (`detail-page-params/` — post, category, author) return `{ slug: string }[]`;
   the paginated index (`index-page-params/` — blog) returns `{ page: string }[]`.
+  Their consumer is `apps/web`'s `sitemap.ts`; content routes render on demand
+  and no longer define `generateStaticParams`.
 - **`shared/`** holds cross-feature building blocks:
   `fragments/` (groqd projections — **multiple fragments per file is fine when
   they belong to one domain**, e.g. `post.ts` holds the post-card + post-detail

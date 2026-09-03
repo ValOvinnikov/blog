@@ -565,8 +565,12 @@ true deletion), scoped to the tenant resolved from that project-id header.
 context: omitting one is a compile error, not a silent fall back to the
 platform's own project. Code that legitimately wants the platform's project
 says so explicitly through `getPlatformSanityContext()`,
-`getPlatformSanityWriteContext()` or `getPlatformClient()` — which is what
-build-time `generateStaticParams` and the single-tenant dev/preview path use.
+`getPlatformSanityWriteContext()` or `getPlatformClient()` — which is what the
+single-tenant dev/preview fallback path uses. No build-time caller remains:
+#2493 deleted the seven content routes' `generateStaticParams`, having measured
+that they queried the platform's project at build and had their output
+discarded, since `[locale]/layout.tsx` reads `headers()` and forces every
+content route dynamic. Every content path is served on demand.
 
 Client-side error capture is a self-hosted route, not a third-party SDK
 (`web`'s Lighthouse performance budget rules out shipping an SDK on every

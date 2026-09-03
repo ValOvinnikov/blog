@@ -1,27 +1,4 @@
-import BlogPostSlugPage, {
-  generateMetadata,
-  generateStaticParams,
-} from './page';
-
-const { getPostParamsMock, getPlatformSanityContextMock, platformTenant } =
-  vi.hoisted(() => ({
-    getPostParamsMock: vi.fn(),
-    getPlatformSanityContextMock: vi.fn(),
-    platformTenant: {
-      projectId: 'platform-project',
-      dataset: 'production',
-      token: 'platform-token',
-    },
-  }));
-
-vi.mock('@blog/service', () => ({
-  service: {
-    pages: {
-      post: { v1: { getPostParams: getPostParamsMock } },
-    },
-  },
-  getPlatformSanityContext: getPlatformSanityContextMock,
-}));
+import BlogPostSlugPage, { generateMetadata } from './page';
 
 vi.mock('@web/metadata/post-metadata', () => ({
   buildPostMetadata: vi.fn().mockResolvedValue({ title: 'Hello World' }),
@@ -34,66 +11,6 @@ vi.mock('@web/components/pages/blog-post-page', () => ({
 }));
 
 describe('BlogPostSlugPage', () => {
-  describe('generateStaticParams', () => {
-    const originalSkipEnvValidation = process.env.SKIP_ENV_VALIDATION;
-
-    beforeEach(() => {
-      getPlatformSanityContextMock.mockReset();
-      getPlatformSanityContextMock.mockReturnValue(platformTenant);
-    });
-
-    afterEach(() => {
-      process.env.SKIP_ENV_VALIDATION = originalSkipEnvValidation;
-    });
-
-    it('returns the bare slug for each post, letting Next combine it with the locale segment', async () => {
-      getPostParamsMock.mockResolvedValue({
-        ok: true,
-        data: [
-          { slug: 'a', publishedAt: '2026-01-01' },
-          { slug: 'b', publishedAt: '2026-01-02' },
-        ],
-      });
-
-      const params = await generateStaticParams();
-
-      expect(params).toEqual([{ slug: 'a' }, { slug: 'b' }]);
-      expect(getPostParamsMock).toHaveBeenCalledWith(platformTenant);
-    });
-
-    it('returns an empty array when getPostParams resolves to a failure result, regardless of SKIP_ENV_VALIDATION', async () => {
-      delete process.env.SKIP_ENV_VALIDATION;
-      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      getPostParamsMock.mockResolvedValue({
-        ok: false,
-        error: new Error('projectId missing'),
-      });
-
-      const params = await generateStaticParams();
-
-      expect(params).toEqual([]);
-      errorSpy.mockRestore();
-    });
-
-    it('throws when getPostParams resolves to zero posts and SKIP_ENV_VALIDATION is unset', async () => {
-      delete process.env.SKIP_ENV_VALIDATION;
-      getPostParamsMock.mockResolvedValue({ ok: true, data: [] });
-
-      await expect(generateStaticParams()).rejects.toThrow(
-        /generateStaticParams for blog\/\[slug\] returned zero posts/,
-      );
-    });
-
-    it('returns an empty array when getPostParams resolves to zero posts and SKIP_ENV_VALIDATION is set', async () => {
-      process.env.SKIP_ENV_VALIDATION = 'true';
-      getPostParamsMock.mockResolvedValue({ ok: true, data: [] });
-
-      const params = await generateStaticParams();
-
-      expect(params).toEqual([]);
-    });
-  });
-
   describe('generateMetadata', () => {
     it('delegates to buildPostMetadata with the resolved slug', async () => {
       const metadata = await generateMetadata({

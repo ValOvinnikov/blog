@@ -30,8 +30,9 @@ const toEntry = (
 /**
  * Site-wide sitemap covering every static and archive route, including
  * numbered pagination pages for consistency with the numbered `/blog/page/N`
- * entries — `itemsPerPage` here must match each route's own
- * `generateStaticParams` or the two disagree on how many pages exist.
+ * entries — `itemsPerPage` here must match the page count each archive
+ * route computes for its own range check (e.g. `BlogListPage`, `TagPage`,
+ * `TopicPage`) or the two disagree on how many pages exist.
  *
  * Returns an empty sitemap (logged) when no base URL resolves — every URL
  * in a sitemap must be absolute, so there is no meaningful relative

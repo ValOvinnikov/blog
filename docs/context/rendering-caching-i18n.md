@@ -3,10 +3,19 @@
 > Part of the docs split described in [`docs/README.md`](../README.md).
 > Referenced from `SPEC.md` §9.
 
-- **Default:** static generation; `generateStaticParams` for dynamic routes
-  (service exposes `params` slices returning `{ slug }[]`). In practice this
-  no longer holds for content routes since #2408 (every `service` loader
-  reads the per-request tenant via `getRequestTenantId()` → `headers()`) —
+- **Default for content routes: dynamic, rendered on demand.** Static
+  generation stopped applying to them at #2408 (every `service` loader reads the
+  per-request tenant via `getRequestTenantId()` → `headers()`), and #2493
+  removed the now-pointless `generateStaticParams` from all seven of them
+  (`[locale]/[slug]`, `blog/[slug]`, `blog/page/[page]`, `tags/[slug]`,
+  `tags/[slug]/page/[page]`, `topics/[slug]`, `topics/[slug]/page/[page]`).
+  A build on `main` before that removal enumerated 51 pages from those
+  functions and emitted zero HTML — 153 `Dynamic server usage: … used headers`
+  bailouts — so they queried the **platform's** Sanity project at build and had
+  every result discarded. `dynamicParams` stays at its default `true`, which is
+  what already served every path. #2625 tracks resolving the tenant from the
+  route path, the prerequisite for any real per-tenant ISR. History behind the
+  measurement:
   #2440 measured the resulting `next build` output: every content route
   (`/[locale]`, `/[locale]/blog`, `/[locale]/blog/[slug]`,
   `/[locale]/tags/**`, `/[locale]/topics/**`, `/rss.xml`, `/sitemap.xml`,
@@ -21,23 +30,22 @@
   static. A `pnpm --filter web build` on the #2477 branch confirms
   `/_not-found` is now `ƒ` (Dynamic) too — only `/robots.txt` remains `○`
   (Static), and the prerender manifest bakes 2 routes (`/_global-error`,
-  `/robots.txt`) instead of #2440's baseline of 3. #2440 is the open,
-  unresolved question of whether/how to claw any of this back (e.g. Cache
-  Components/PPR); it also notes `generateStaticParams` is now vestigial on
-  the ten content routes (still runs at build, output never baked).
-- **Build-time zero-results guard (`SKIP_ENV_VALIDATION`, #889):**
-  `blog/[slug]`'s `generateStaticParams` throws — failing the build — if its
-  params query resolves successfully but to zero posts, unless
-  `SKIP_ENV_VALIDATION` is set. A real build with valid Sanity access
-  resolving to zero posts is not a legitimate "no content yet" state for this
-  app (posts exist in production); it previously meant a build-scoped Sanity
-  token wasn't actually reaching the build step (e.g. a Vercel "Sensitive"
-  env var, redacted during `vercel build` but injected at runtime), silently
-  shipping a route with zero prebuilt paths. `SKIP_ENV_VALIDATION` is the same
-  flag CI's credential-less builds already set (see
-  [`environment-variables.md`](./environment-variables.md)) — it doubles
-  as the intentional escape hatch for a build that genuinely has no Sanity
-  access.
+  `/robots.txt`) instead of #2440's baseline of 3. #2440 remains the open
+  question of whether/how to claw any of this back, with #2625 as its leading
+  candidate.
+- **Build-time zero-results guard — removed (#2493, was #889):**
+  `blog/[slug]`'s `generateStaticParams` used to throw, failing the build, when
+  its params query resolved successfully but to zero posts — a tripwire for a
+  build-scoped Sanity token not reaching the build step (e.g. a Vercel
+  "Sensitive" env var, redacted during `vercel build` but injected at runtime),
+  which would otherwise silently ship a route with zero prebuilt paths. #2493
+  deleted it together with the `generateStaticParams` that hosted it: with no
+  build-time Sanity query left on any content route there is nothing for it to
+  observe, and it asserted against the **platform's** project while every
+  tenant's content is read with credentials fetched per request from Neon.
+  There is deliberately no replacement — if a missing-token alarm is wanted
+  again, the right shape is an explicit env assertion, not one inferred from an
+  empty result set.
 - **Revalidation:** time-based via `isr('tag', projectId)` in service queries
   (the tenant's project id is required, and scopes the emitted tag); on-demand
   via `app/api/revalidate` (#93, secret-verified,
