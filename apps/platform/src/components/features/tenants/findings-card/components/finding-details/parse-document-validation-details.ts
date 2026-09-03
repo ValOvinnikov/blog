@@ -1,6 +1,6 @@
 import type { TSanityValidationMarkerLevel } from '@platform/utils/status-tone/status-tone';
 
-export type TSanityValidationMarker = {
+type TSanityValidationMarker = {
   level: TSanityValidationMarkerLevel;
   message: string;
 };
