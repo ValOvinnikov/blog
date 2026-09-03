@@ -573,11 +573,17 @@ file` are all denied alike) — an earlier version only handled the
   `main`.
 
   **The one thing to know before using it:** a PR that targets anything other
-  than `main` receives **no CI**. `ci.yml` is scoped to
-  `pull_request: branches: [main]`, so Type-check, Lint, Test, Build, Knip and
-  CodeQL never run — only `pr-opened` and the Vercel checks, which is just
-  enough output to look normal. Those jobs are required status checks, so the
-  PR blocks indefinitely. When the base merges, GitHub retargets the PR to
+  than `main` receives **no CI**. Every required workflow declares
+  `pull_request: branches: [main]` independently — `ci.yml` plus `knip.yml`,
+  `dependency-review.yml`, `zizmor.yml`, `actionlint.yml`, `commitlint.yml`
+  and `hooks.yml` — so none of Type-check, Lint, Test, Build, Typegen,
+  Migrations, Knip, Dependency Review, Zizmor, Actionlint, Commitlint or
+  Shellcheck + guard tests ever runs. Only `pr-opened` and the Vercel checks
+  report, which is just enough output to look normal. Those jobs are required
+  status checks, so the PR blocks indefinitely. (CodeQL is not among them —
+  it runs from GitHub's default code-scanning setup on a schedule, not from a
+  workflow file, and is enforced by a separate `code_scanning` ruleset rule
+  rather than as a required status check.) When the base merges, GitHub retargets the PR to
   `main` but that fires a `pull_request` `edited` event, which the workflow
   does not listen for, so still nothing runs. Closing and reopening the PR
   fires `reopened` and produces a real run; confirm by counting checks

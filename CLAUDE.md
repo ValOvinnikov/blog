@@ -661,11 +661,14 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   merge green alone" constraint above** and lets a rename-plus-consumers
   change split per layer after all.
 
-  **But a stacked PR gets zero CI in this repo.** `ci.yml` is scoped to
-  `pull_request: branches: [main]`, so a PR aimed anywhere else runs no
-  Type-check, Lint, Test, Build or Knip — only `pr-opened` and the Vercel
-  checks, which look plausible enough to miss. Those jobs are _required_
-  status checks, so the PR sits on `BLOCKED` forever. Retargeting when the
+  **But a stacked PR gets zero CI in this repo.** All seven workflows carrying
+  required checks — `ci.yml`, `knip.yml`, `dependency-review.yml`,
+  `zizmor.yml`, `actionlint.yml`, `commitlint.yml`, `hooks.yml` — each declare
+  `pull_request: branches: [main]` independently, so a PR aimed anywhere else
+  runs none of them. Only `pr-opened` and the Vercel checks report, which
+  looks plausible enough to miss, and since those jobs are _required_ status
+  checks the PR sits on `BLOCKED` forever. (CodeQL is not among them — it runs
+  from GitHub's default code-scanning setup on a schedule, not per PR.) Retargeting when the
   base merges does **not** fix it (that fires `edited`; the workflow listens
   for `opened`/`synchronize`/`reopened`) — close and reopen the PR to force a
   real run, then confirm by count: ~5 checks means the stale run, ~20 means a

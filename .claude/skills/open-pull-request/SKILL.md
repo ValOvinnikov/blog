@@ -49,12 +49,21 @@ rename-plus-consumers change _can_ be split per layer as long as the whole
 stack merges in order.
 
 **THE TRAP — a stacked PR gets ZERO CI in this repo, and it is not obvious.**
-`.github/workflows/ci.yml` is scoped to `pull_request: branches: [main]`. A PR
-opened against any other branch therefore runs **no** Type-check, Lint, Test,
-Build, Knip or CodeQL — only `pr-opened` and the Vercel checks, which look
-plausible enough at a glance to miss. Because those jobs are _required_ status
-checks in the branch ruleset, the PR sits on `BLOCKED` waiting for checks that
-will never arrive.
+**Every** required workflow — `ci.yml`, and separately `knip.yml`,
+`dependency-review.yml`, `zizmor.yml`, `actionlint.yml`, `commitlint.yml` and
+`hooks.yml` — independently declares `pull_request: branches: [main]`. A PR
+opened against any other branch therefore runs **none** of Type-check, Lint,
+Test, Build, Typegen, Migrations, Knip, Dependency Review, Zizmor, Actionlint,
+Commitlint or Shellcheck + guard tests. Only `pr-opened` and the Vercel checks
+report, which looks plausible enough at a glance to miss. Because those jobs
+are _required_ status checks in the branch ruleset, the PR sits on `BLOCKED`
+waiting for checks that will never arrive.
+
+Note this is spread across seven workflow files, not one — widening only
+`ci.yml`'s trigger would fix six of the twelve and leave the PR just as
+blocked. CodeQL is **not** in this set: it runs from GitHub's default
+code-scanning setup on a schedule, with no workflow file in
+`.github/workflows/` and no per-PR run to miss.
 
 Retargeting does **not** fix it. When the base merges, GitHub retargets the PR
 to `main`, but that fires a `pull_request` `edited` event, and the workflow
