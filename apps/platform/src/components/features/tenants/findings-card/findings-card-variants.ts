@@ -10,10 +10,6 @@ export const findingsCardVariants = tv({
     body: ['flex min-w-0 flex-1 flex-col gap-1'],
     kindText: ['block text-[13px] text-admin-text'],
     sourceText: ['block text-[12px] text-admin-faint'],
-    detailsPre: [
-      'overflow-x-auto rounded-lg bg-admin-surface-2 p-2.5',
-      'text-[12px] text-admin-muted',
-    ],
     time: ['flex-none pt-0.5 text-[12px] text-admin-muted'],
     empty: ['text-[13px] text-admin-muted'],
   },
