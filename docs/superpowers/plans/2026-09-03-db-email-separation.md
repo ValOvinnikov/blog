@@ -39,7 +39,11 @@ Each has its own test file. `@blog/utils` is framework-free and already consumed
 - Delete: `apps/web/src/utils/is-secret-match/` (whole directory, including its test)
 - Delete: `apps/platform/src/utils/is-secret-match/` (whole directory, including its test)
 - Modify: all three importers listed above
-- Modify: `apps/platform/tsconfig.json` and `apps/platform/vitest.config.ts` if `@blog/utils` is not already aliased there — a workspace that starts consuming a new package needs the alias in **both** or type-check and test break
+- Modify: `apps/platform/package.json` — **add `"@blog/utils": "workspace:*"`**, then run `pnpm install`
+
+**`apps/platform` does not currently depend on `@blog/utils`, and the alias alone will not save you.** Its `tsconfig.json` and `vitest.config.ts` already declare the `@blog/utils/*` wildcard, so the alias looks present — but `isSecretMatch` is consumed as a **bare** root import (`import { isSecretMatch } from '@blog/utils'`, matching every other consumer in the repo, since `packages/utils/package.json`'s `exports` map has no per-module subpath). A bare specifier does not match a wildcard-only `paths` entry, so it resolves through `node_modules` — which requires the `package.json` dependency. `@blog/insight` in this same app is the working precedent: wildcard-only alias, bare import, and it works precisely _because_ it is declared in `package.json`.
+
+Skip this and `apps/platform` fails with "Cannot find module '@blog/utils'" at type-check, test and build.
 
 **Interfaces:**
 
@@ -112,15 +116,30 @@ Expected: PASS.
 
 - [ ] **Step 5: Update consumers and delete the old copy**
 
-Point every importer from Step 1 at `@blog/utils`, then `rm -rf apps/web/src/utils/is-secret-match`.
+Add the `apps/platform` dependency and install:
+
+```bash
+pnpm --filter platform add @blog/utils@workspace:*
+```
+
+Point all three importers at `@blog/utils`, then delete **both** copies:
+
+```bash
+rm -rf apps/web/src/utils/is-secret-match
+rm -rf apps/platform/src/utils/is-secret-match
+```
 
 - [ ] **Step 6: Verify nothing still points at the old path**
 
 Run: `grep -rn "utils/is-secret-match" apps packages --include="*.ts" --exclude-dir=node_modules`
 Expected: no output.
 
-Run: `pnpm --filter @blog/utils type-check && pnpm --filter web type-check && pnpm --filter web test`
-Expected: PASS.
+Run: `pnpm --filter @blog/utils type-check && pnpm --filter @blog/utils test`
+Run: `pnpm --filter web type-check && pnpm --filter web test`
+Run: `pnpm --filter platform type-check && pnpm --filter platform test`
+Expected: all PASS.
+
+**`platform` is not optional here.** This task deletes a directory inside `apps/platform` and rewrites one of its importers, so a gate that only checks `web` would pass while leaving that app broken.
 
 - [ ] **Step 7: Commit**
 
