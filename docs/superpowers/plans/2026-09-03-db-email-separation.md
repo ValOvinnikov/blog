@@ -23,7 +23,12 @@
 
 ### Task 1: Move `isSecretMatch` into `@blog/utils`
 
-`apps/platform` needs the same constant-time comparison `apps/web` already has. Duplicating it would put two copies of a security primitive in the repo; `@blog/utils` is framework-free and already consumed by both apps.
+**This primitive is already duplicated — that is the reason for the task, not a risk it avoids.** Both apps carry their own byte-for-byte copy:
+
+- `apps/web/src/utils/is-secret-match/` (with an `index.ts` barrel), consumed by `apps/web/src/app/api/revalidate-site-config/route.ts` and `apps/web/src/app/api/generate-skim/route.ts`
+- `apps/platform/src/utils/is-secret-match/` (no barrel), consumed by `apps/platform/src/server/tenants/owner-invite-token.ts`
+
+Each has its own test file. `@blog/utils` is framework-free and already consumed by both apps, so one copy there replaces both. Deleting only the web copy would leave the duplication standing.
 
 **Files:**
 
@@ -32,7 +37,9 @@
 - Create: `packages/utils/src/is-secret-match/is-secret-match.test.ts`
 - Modify: `packages/utils/src/index.ts` (add the barrel re-export)
 - Delete: `apps/web/src/utils/is-secret-match/` (whole directory, including its test)
-- Modify: every `apps/web` importer found in Step 1
+- Delete: `apps/platform/src/utils/is-secret-match/` (whole directory, including its test)
+- Modify: all three importers listed above
+- Modify: `apps/platform/tsconfig.json` and `apps/platform/vitest.config.ts` if `@blog/utils` is not already aliased there — a workspace that starts consuming a new package needs the alias in **both** or type-check and test break
 
 **Interfaces:**
 
@@ -44,20 +51,20 @@
 grep -rn "is-secret-match\|isSecretMatch" apps packages --include="*.ts" --include="*.tsx" --exclude-dir=node_modules
 ```
 
-Write the list down — every hit outside the directory being deleted must be updated in Step 5.
+Expect at least the three importers and two implementation directories named above. If the grep turns up anything else, it goes in the same sweep — a fourth copy is exactly what this task exists to prevent.
 
 - [ ] **Step 2: Move the implementation verbatim**
 
-The body is copied unchanged from `apps/web/src/utils/is-secret-match/is-secret-match.ts`. Note `@blog/utils` exports operations, so this stays an arrow const only if the surrounding file style is arrow — check a sibling in `packages/utils/src/` and match it.
+The body is copied unchanged from `apps/web/src/utils/is-secret-match/is-secret-match.ts`, which is an **arrow const** — match the file style of its new neighbours in `packages/utils/src/` and convert only if they are declarations.
 
 ```ts
 import { timingSafeEqual } from 'node:crypto';
 
 /** Constant-time secret comparison — a plain `===` leaks timing information proportional to how many leading characters match. */
-export function isSecretMatch(
+export const isSecretMatch = (
   provided: string | null,
   expected: string,
-): boolean {
+): boolean => {
   if (!provided) return false;
 
   const providedBuffer = Buffer.from(provided);
@@ -65,8 +72,10 @@ export function isSecretMatch(
   if (providedBuffer.length !== expectedBuffer.length) return false;
 
   return timingSafeEqual(providedBuffer, expectedBuffer);
-}
+};
 ```
+
+Diff the two app copies against each other before deleting either. They are believed identical; if they have drifted, the differences must be understood rather than silently resolved by picking one.
 
 - [ ] **Step 3: Move the existing test and add the length case**
 
@@ -226,8 +235,8 @@ Expected: FAIL — modules not found.
 Lift the copy strings verbatim from `packages/db/scripts/recheck-tenant-owners/lib/notify-operators.ts` (its `OUTCOME_COPY` map) and `packages/db/scripts/validate-tenant-documents/lib/notify-operators.ts` (its `severityCopy` ternary). Wrap the body in `buildEmailShell` with `brandName` set to the platform's own name and a `previewText` summarising the alert.
 
 ```ts
-import { buildEmailShell } from '@blog/email/html';
-import { escapeHtml } from '@blog/email/html';
+import { buildEmailShell } from '@blog/email/html/email-shell';
+import { escapeHtml } from '@blog/email/html/escape-html';
 
 const OUTCOME_COPY = {
   STALLED:
@@ -261,7 +270,7 @@ export function buildOwnerElevationAlertEmail({
 }
 ```
 
-Resolve the exact import specifier for `buildEmailShell`/`escapeHtml` against `packages/email/src/index.ts` as it stands — use the package's own-name alias, not a relative parent path.
+Note the specifiers point at the **modules**, not at `@blog/email/html`. There is no `src/html/index.ts` barrel, and `packages/email/package.json`'s `exports` map declares only `"."` — so `@blog/email/html` does not resolve. Intra-package imports go through the own-name alias `@blog/email/*` → `./src/*`, never a relative parent path.
 
 - [ ] **Step 4: Run tests**
 
@@ -512,7 +521,7 @@ Expected: FAIL.
 
 `notifyOperatorsOfOwnerElevationOutcome` keeps its exported name and its never-throws contract, but its `TNotifyOperatorsParams` loses `resendApiKey` and its body becomes a `postOperatorAlert` call. Delete this file's local `escapeHtml`, its `Resend` import, its `DEFAULT_FROM_ADDRESS`, its `OUTCOME_COPY` (now in `@blog/email`), and its `listSuperadminEmails` call — recipient resolution is the platform's job now. Keep `isNotifiableOutcome` and `TNotifiableOutcome` exactly as they are; the caller depends on them.
 
-Update the caller in `packages/db/scripts/provision-tenant/lib/notify-owner-elevation-outcome.ts` and `recheck-tenant-owners`'s own call site to stop passing `resendApiKey`.
+Then follow `resendApiKey` all the way up and delete it at every level, not just at this boundary: `notify-owner-elevation-outcome.ts`'s own `resendApiKey` param field goes too, and so does the threading in **both** of its callers (`provision-tenant/run.ts` and `recheck-tenant-owners/run.ts`). Type errors will surface most of this, but the env-reading that supplies the value will not error on its own — remove that as well.
 
 - [ ] **Step 4: Run tests**
 

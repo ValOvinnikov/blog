@@ -45,9 +45,10 @@ not a fit for this: it is a voice ladder for site copy, not a per-template
 subject and body.
 
 **`@blog/db` sends email.** `packages/db/package.json:37` depends on `resend`,
-and `scripts/validate-tenant-documents/lib/notify-operators.ts:41-84` plus
-`scripts/recheck-tenant-owners/lib/notify-operators.ts:63-100` each construct a
-`Resend` client and carry their own private `escapeHtml`. A relational
+and `scripts/validate-tenant-documents/lib/notify-operators.ts` plus
+`scripts/recheck-tenant-owners/lib/notify-operators.ts` each construct a
+`Resend` client (at `:68` and `:84` respectively) and carry their own private
+`escapeHtml` (at `:18` and `:19`). A relational
 data-access layer should not own an outbound email transport, and #2619 was
 about to formalise that by adding `@blog/email` to `db`'s dependencies rather
 than removing the capability.
@@ -91,7 +92,7 @@ comment. This extends the same rule to styling and makes both mechanical.
 Theming in this repo is **hue-based**, which makes this far cheaper than it
 would otherwise be. `packages/db/src/schema/site-config.ts:50-74` stores
 `accentHue` and `logoHue` as integers (0–360); `PRESET_REGISTRY` in
-`packages/config/src/constants/preset.ts:10-103` holds recipes whose lightness
+`packages/config/src/constants/preset.ts:66-103` holds recipes whose lightness
 and chroma are fixed, with hue substituted per tenant —
 `oklch(0.53 0.17 <hue>)` for `brand-primary` in light mode. `apps/web` applies
 this at render time by injecting a `<style>` block
