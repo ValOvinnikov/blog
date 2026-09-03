@@ -16,8 +16,9 @@ import { buildStarterDocuments } from './starter-content';
 const SANITY_API_VERSION = '2024-01-01';
 
 // Bounded to ride out a freshly-minted token's grant-propagation delay, not to mask a genuine misconfiguration.
-export const SEED_TRANSACTION_MAX_ATTEMPTS = 5;
-const SEED_TRANSACTION_BASE_DELAY_MS = 1000;
+// Shared by the asset uploads and the transaction commit — every write the freshly-minted token makes.
+export const SEED_GRANT_RETRY_MAX_ATTEMPTS = 5;
+const SEED_GRANT_RETRY_BASE_DELAY_MS = 1000;
 
 export type TSeedContentDeps = {
   createClient: typeof createClient;
@@ -91,13 +92,28 @@ export async function seedTenantContent(
       useCdn: false,
     });
 
+    const grantPropagationRetryOptions = {
+      maxAttempts: SEED_GRANT_RETRY_MAX_ATTEMPTS,
+      baseDelayMs: SEED_GRANT_RETRY_BASE_DELAY_MS,
+      isRetryable: isGrantPropagationError,
+      sleep: deps.sleep,
+    };
+
     const [authorImage, ogImage] = await Promise.all([
-      client.assets.upload('image', placeholderPngBuffer(), {
-        filename: 'starter-avatar.png',
-      }),
-      client.assets.upload('image', placeholderPngBuffer(), {
-        filename: 'starter-og-image.png',
-      }),
+      retryWithBackoff(
+        () =>
+          client.assets.upload('image', placeholderPngBuffer(), {
+            filename: 'starter-avatar.png',
+          }),
+        grantPropagationRetryOptions,
+      ),
+      retryWithBackoff(
+        () =>
+          client.assets.upload('image', placeholderPngBuffer(), {
+            filename: 'starter-og-image.png',
+          }),
+        grantPropagationRetryOptions,
+      ),
     ]);
 
     const documents = buildStarterDocuments(tenant, {
@@ -110,12 +126,10 @@ export async function seedTenantContent(
       transaction.createOrReplace(document);
     }
 
-    await retryWithBackoff(() => transaction.commit(), {
-      maxAttempts: SEED_TRANSACTION_MAX_ATTEMPTS,
-      baseDelayMs: SEED_TRANSACTION_BASE_DELAY_MS,
-      isRetryable: isGrantPropagationError,
-      sleep: deps.sleep,
-    });
+    await retryWithBackoff(
+      () => transaction.commit(),
+      grantPropagationRetryOptions,
+    );
 
     await setTenantSanityWriteTokenAndSeededAt(
       tenant.id,
