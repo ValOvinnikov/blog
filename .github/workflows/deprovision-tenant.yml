@@ -28,7 +28,7 @@ on:
         required: true
         type: string
       confirm:
-        description: "Tenant's slug, typed to confirm — must match exactly or the run aborts before any destructive step"
+        description: "Tenant's name, typed to confirm — must match exactly or the run aborts before any destructive step"
         required: true
         type: string
       dryRun:
