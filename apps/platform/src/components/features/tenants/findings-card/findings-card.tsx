@@ -1,11 +1,11 @@
 import type { TFinding } from '@blog/db/schema/findings';
 import { Card } from '@platform/components/shared/card';
-import { Disclosure } from '@platform/components/shared/disclosure';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { findingSeverityTone } from '@platform/utils/status-tone/status-tone';
 import { useTranslations } from 'next-intl';
 
+import { FindingDetails } from './components/finding-details/finding-details';
 import { findingsCardVariants } from './findings-card-variants';
 
 export type TFindingsCardProps = {
@@ -22,7 +22,7 @@ export const FindingsCard = ({ findings }: TFindingsCardProps) => {
   const tSeverity = useTranslations('findingSeverityLabel');
   const tSource = useTranslations('findingSourceLabel');
   const tKind = useTranslations('findingKindLabel');
-  const { list, row, body, kindText, sourceText, detailsPre, time, empty } =
+  const { list, row, body, kindText, sourceText, time, empty } =
     findingsCardVariants();
 
   return (
@@ -44,11 +44,7 @@ export const FindingsCard = ({ findings }: TFindingsCardProps) => {
                     {tSource(finding.source)}
                   </span>
                   {finding.details && (
-                    <Disclosure summary={t('detailsToggle')}>
-                      <pre className={detailsPre()}>
-                        {JSON.stringify(finding.details, null, 2)}
-                      </pre>
-                    </Disclosure>
+                    <FindingDetails details={finding.details} />
                   )}
                 </div>
                 <time

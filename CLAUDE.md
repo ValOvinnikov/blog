@@ -790,7 +790,27 @@ when it is all of:
 - **single-layer** — one workspace, one owning agent's domain;
 - **self-contained** — the body alone carries exact files, acceptance
   criteria, and the verification commands (`pnpm type-check && pnpm lint &&
-pnpm test`), assuming the reader has only the ticket;
+pnpm test && pnpm knip`), assuming the reader has only the ticket. Add
+  `pnpm gen:ui-index:check` when the ticket touches `packages/ui`,
+  `pnpm check:turbo-env-sync` when it touches env vars or `turbo.json`, and
+  `pnpm check:voice-sync` when it touches voice keys.
+
+  **Why these and not just the first three.** A cloud session has no `gh`
+  (see "Solo-session mode" below), so it cannot read a red check after it
+  pushes — a CI failure is invisible to it both before the push, if the
+  command isn't in the ticket, and after. Every command above runs locally,
+  is deterministic, and gates a check that a single-layer change can
+  plausibly break; `knip` is unconditional because any new exported symbol
+  in any workspace can trip it. The rest of CI stays out of reach on
+  purpose: `build` is CI-only by the rule above, typegen drift needs
+  `pnpm typegen` (orchestrator-only, it mutates generated files),
+  commitlint is already enforced by the `commit-msg` hook, actionlint /
+  zizmor / shellcheck only fire on workflow or shell changes a `cloud-ok`
+  ticket shouldn't contain, and CodeQL / Dependency Review / Document
+  validation / Migrations / Vercel cannot run locally at all. That
+  irreducible tail is why a local session still owns the CI tail after a
+  cloud agent opens a PR;
+
 - **free of human gates** — no Sanity or Drizzle migration, no console
   config, no production-dataset touch;
 - **small** — roughly ≤5 files touched.
@@ -823,9 +843,12 @@ must not attempt `gh project item-edit` or equivalent. Instead it signals
 status the way the board tooling already knows how to read
 (`board-keeper.md` Step 3's evidence table):
 
-- **Starting:** comment on the issue ("starting work in a cloud session"),
-  and name the branch `<type>/<n>-<slug>` — a pushed branch with that name
-  is the In Progress signal.
+- **Starting:** comment on the issue ("starting work in a cloud session"). A
+  web/remote session names its own branch `<type>/<n>-<slug>` — a pushed
+  branch with that name is the In Progress signal. The GitHub Actions
+  `@claude` path can't control this: `claude-code-action` generates its own
+  branch as `claude/issue-<n>-<timestamp>`, which `board-keeper.md`'s Step 2
+  also recognizes as an In Progress signal.
 - **In review:** open the PR with the issue reference (`Closes #n` on the
   completing PR only, per the per-layer-PR rule) — an open PR is the Code
   Review signal. For the GitHub Actions `@claude` path, this is a

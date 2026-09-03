@@ -1,5 +1,6 @@
 import { queries } from '@blog/db';
 import { DeprovisionTenantControl } from '@platform/components/features/tenants/deprovision-tenant-control';
+import { ReactivateTenantControl } from '@platform/components/features/tenants/reactivate-tenant-control';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import type { Metadata } from 'next';
@@ -35,6 +36,7 @@ export default async function TenantDangerPage({ params }: TProps) {
   return (
     <>
       <PageHeader title={t('title')} description={t('description')} />
+      {tenant.deprovisionedAt && <ReactivateTenantControl tenant={tenant} />}
       <DeprovisionTenantControl tenant={tenant} />
     </>
   );
