@@ -42,11 +42,29 @@ describe(overallStatusFor, () => {
     ).toBeUndefined();
   });
 
-  it('returns undefined for an earlier step failing (resumable, not terminal)', () => {
+  it('returns FAILED when an earlier step fails, not just the last one', () => {
     expect(
       overallStatusFor(
         TENANT_PROVISIONING_STEP.PERSIST_TOKEN,
         TENANT_PROVISIONING_STEP_STATUS.FAILED,
+      ),
+    ).toBe('FAILED');
+  });
+
+  it('returns FAILED when the very first step fails', () => {
+    expect(
+      overallStatusFor(
+        TENANT_PROVISIONING_STEP.SANITY_PROJECT,
+        TENANT_PROVISIONING_STEP_STATUS.FAILED,
+      ),
+    ).toBe('FAILED');
+  });
+
+  it('returns undefined for an earlier step only RUNNING', () => {
+    expect(
+      overallStatusFor(
+        TENANT_PROVISIONING_STEP.SEED_CONTENT,
+        TENANT_PROVISIONING_STEP_STATUS.RUNNING,
       ),
     ).toBeUndefined();
   });
