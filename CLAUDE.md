@@ -823,9 +823,12 @@ must not attempt `gh project item-edit` or equivalent. Instead it signals
 status the way the board tooling already knows how to read
 (`board-keeper.md` Step 3's evidence table):
 
-- **Starting:** comment on the issue ("starting work in a cloud session"),
-  and name the branch `<type>/<n>-<slug>` — a pushed branch with that name
-  is the In Progress signal.
+- **Starting:** comment on the issue ("starting work in a cloud session"). A
+  web/remote session names its own branch `<type>/<n>-<slug>` — a pushed
+  branch with that name is the In Progress signal. The GitHub Actions
+  `@claude` path can't control this: `claude-code-action` generates its own
+  branch as `claude/issue-<n>-<timestamp>`, which `board-keeper.md`'s Step 2
+  also recognizes as an In Progress signal.
 - **In review:** open the PR with the issue reference (`Closes #n` on the
   completing PR only, per the per-layer-PR rule) — an open PR is the Code
   Review signal. For the GitHub Actions `@claude` path, this is a
