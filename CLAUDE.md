@@ -34,8 +34,9 @@ graph is acyclic
   other log call. The one exception is scoped to
   `packages/db/scripts/provision-tenant/`,
   `packages/db/scripts/deprovision-tenant/`,
-  `packages/db/scripts/recheck-tenant-owners/`, and
-  `packages/db/scripts/validate-tenant-documents/`, standalone CLI tools
+  `packages/db/scripts/recheck-tenant-owners/`,
+  `packages/db/scripts/validate-tenant-documents/`, and
+  `packages/db/scripts/migrate-tenant-content/`, standalone CLI tools
   outside the request-handling path: they import `@blog/insight`'s
   `sanitizeLogMessage` directly rather than keeping their own drifted copy.
   Full rationale: `SPEC.md` §4.

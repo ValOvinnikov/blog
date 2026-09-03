@@ -1,0 +1,174 @@
+name: Migrate Tenant Content
+
+# Fans `migrate.mjs deploy` (write) out across every ACTIVE, non-deprovisioned
+# tenant's own Sanity project/dataset, authenticated with that tenant's own
+# persisted write token — the console project keeps migrating separately via
+# deploy-development.yml's `migrate` job (dev, on merge) and
+# deploy-production.yml's own migrate step (prod, on tag). See
+# `packages/db/scripts/migrate-tenant-content/`.
+#
+# A tenant whose `migrationState` ledger has never recorded an applied
+# migration (provisioned before this fan-out existed, seeded already at the
+# current schema) is backfilled — recorded as applied without being run —
+# rather than replayed, since replaying migrations written for older
+# document shapes against an already-current tenant ranges from no-op to
+# destructive. See `lib/read-tenant-migration-ledger.ts`.
+#
+# Three triggers:
+#   - `push` to `main`, mirroring deploy-development.yml's `migrate` job:
+#     gated on the same studio||web change detection, targets `development`
+#     unconditionally, never scoped to one tenant.
+#   - `workflow_dispatch`, deliberately NOT a release tag — a release tag is
+#     too low-ceremony a trigger for a run that mutates customer content
+#     across every tenant project at once. Defaults to `production` and can
+#     optionally scope to one tenant via `tenantId`.
+#   - `workflow_call`, for another workflow migrating a single tenant (e.g.
+#     right after it finishes provisioning), the same shape
+#     validate-tenant-documents.yml already exposes.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      tenantId:
+        description: "Limit this run to one tenant's id — leave blank to migrate every in-scope tenant"
+        required: false
+        type: string
+      environment:
+        description: 'Which GitHub Environment this run resolves its credentials from'
+        required: false
+        type: choice
+        options: [development, production]
+        default: production
+  workflow_call:
+    inputs:
+      tenantId:
+        description: "The tenant's id to migrate"
+        required: true
+        type: string
+      environment:
+        description: 'Which GitHub Environment this run resolves its credentials from'
+        required: true
+        type: string
+    secrets:
+      TENANT_REGISTRY_DATABASE_URL:
+        required: true
+      TENANT_TOKEN_ENCRYPTION_KEY:
+        required: true
+
+permissions:
+  contents: read
+
+# A dev push, a full production sweep, and a single-tenant production check
+# all queue independently of each other (distinct groups), but two runs for
+# the exact same scope queue behind one another rather than overlap — a
+# migration deploy mutates a dataset mid-transaction, so a newer run must
+# never cancel one already in flight (`cancel-in-progress: false`, same
+# reasoning as deploy-development.yml's `migrate`/`migrate-db` jobs).
+concurrency:
+  group: migrate-tenant-content-${{ (github.event_name == 'push' && 'development') || (inputs.environment || 'production') }}-${{ inputs.tenantId || 'all' }}
+  cancel-in-progress: false
+
+env:
+  PNPM_VERSION: 11.21.0
+  NODE_VERSION: '22'
+  TURBO_IGNORE_VERSION: 2.10.4
+
+jobs:
+  # Mirrors deploy-development.yml's own `changes` job — runs on every
+  # trigger (never conditioned on `github.event_name`) so a `needs: changes`
+  # downstream job is never itself skipped by an upstream skip. Only its
+  # outputs are consulted, and only on the `push` path below.
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency:
+      group: migrate-tenant-content-changes
+      cancel-in-progress: true
+    outputs:
+      studio: ${{ steps.studio.outputs.changed }}
+      web: ${{ steps.web.outputs.changed }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+
+      - name: Is studio affected?
+        id: studio
+        run: |
+          set -uo pipefail
+          if npx --yes "turbo-ignore@${TURBO_IGNORE_VERSION}" @blog/studio --fallback=HEAD^1; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Is web affected?
+        id: web
+        run: |
+          set -uo pipefail
+          if npx --yes "turbo-ignore@${TURBO_IGNORE_VERSION}" web --fallback=HEAD^1; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  migrate:
+    name: Migrate tenant content
+    needs: changes
+    # A push only runs the fan-out when the merge actually touched something
+    # a content migration could depend on (same studio||web gate
+    # deploy-development.yml's `migrate` job uses) — every other trigger
+    # (a deliberate workflow_dispatch, or a workflow_call for one freshly
+    # provisioned tenant) always runs.
+    if: >-
+      github.event_name != 'push' ||
+      needs.changes.outputs.studio == 'true' ||
+      needs.changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    # A full sweep runs `migrate.mjs deploy` against every in-scope tenant in
+    # sequence — generous relative to validate-tenant-documents.yml's 30
+    # minutes, since a real migration (not just a read-only validate) can be
+    # slower per tenant.
+    timeout-minutes: 45
+    # Bound to the resolved trigger rather than hardcoded: a dev push must
+    # resolve every credential (including the tenant registry connection
+    # string below) from the `development` GitHub Environment, and a
+    # production dispatch/call from `production` — never a mix of the two,
+    # same as provision-tenant.yml/validate-tenant-documents.yml. See the
+    # concurrency group above for why this can't be spelled as a plain
+    # `inputs.environment` fallback: `inputs` is null on the `push` trigger.
+    environment: ${{ (github.event_name == 'push' && 'development') || (inputs.environment || 'production') }}
+    env:
+      # `getDb()` (via `packages/db/src/utils/env/env.ts`) reads `DATABASE_URL`
+      # specifically — the tenant registry connection string, resolved from
+      # the same Environment as everything else this run touches.
+      DATABASE_URL: ${{ secrets.TENANT_REGISTRY_DATABASE_URL }}
+      # Decrypts each tenant's persisted Sanity WRITE token — see
+      # `getTenantSanityWriteCredentials`. This run mutates content, unlike
+      # validate-tenant-documents.yml's read-only sweep.
+      TENANT_TOKEN_ENCRYPTION_KEY: ${{ secrets.TENANT_TOKEN_ENCRYPTION_KEY }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Run tenant content-migration fan-out
+        # `inputs.tenantId` is attacker-influenceable on the
+        # workflow_dispatch path (any repo collaborator who can trigger it
+        # controls it) — never interpolate a `${{ }}` expression directly
+        # into a `run:` shell script (template injection); pass it through
+        # `env` and reference the shell variable instead.
+        env:
+          TENANT_ID: ${{ inputs.tenantId }}
+        run: |
+          if [ -n "$TENANT_ID" ]; then
+            pnpm --filter @blog/db db:migrate-tenant-content -- --tenant-id="$TENANT_ID"
+          else
+            pnpm --filter @blog/db db:migrate-tenant-content
+          fi
