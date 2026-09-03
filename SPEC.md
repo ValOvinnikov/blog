@@ -181,9 +181,10 @@ secret than the read token.
 
 ² `@blog/db`'s "never log" rule has one scoped exception, decided on
 #2120: `packages/db/scripts/provision-tenant/`,
-`packages/db/scripts/deprovision-tenant/`, and
-`packages/db/scripts/recheck-tenant-owners/` — standalone CLI tools run via
-`tsx`, outside the request-handling path the rule targets — import
+`packages/db/scripts/deprovision-tenant/`,
+`packages/db/scripts/recheck-tenant-owners/`, and
+`packages/db/scripts/validate-tenant-documents/` — standalone CLI tools run
+via `tsx`, outside the request-handling path the rule targets — import
 `@blog/insight`'s `sanitizeLogMessage` (the sanitizer only, not
 `createLogger`) directly, rather than keeping their own copy of it. The rest
 of `@blog/db` (its `src/` library code, consumed by `apps/web`/`apps/platform`
@@ -632,7 +633,8 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   `migrate-db` job reads the `production` Environment's own
   `DATABASE_URL_UNPOOLED` (`main`); the tenant lifecycle workflows
   (`provision-tenant.yml`/`deprovision-tenant.yml`/`recheck-tenant-owners.yml`/
-  `invalidate-tenant-cache.yml`) read their own Environment's
+  `invalidate-tenant-cache.yml`/`validate-tenant-documents.yml`) read their own
+  Environment's
   `TENANT_REGISTRY_DATABASE_URL` secret instead
   (#2056, merged 2026-08-25) — before that split, both purposes shared one
   secret, and

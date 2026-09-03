@@ -73,8 +73,9 @@ relative paths only within a single slice (`./schema`, `./queries/comments`).
   well would put the same failure into the pipeline twice, and this layer's
   copy would be the one lacking the route/request context that makes it
   actionable. **A second scoped exception (#2120):** the standalone
-  `scripts/provision-tenant/`, `scripts/deprovision-tenant/`, and
-  `scripts/recheck-tenant-owners/` CLI tools —
+  `scripts/provision-tenant/`, `scripts/deprovision-tenant/`,
+  `scripts/recheck-tenant-owners/`, and `scripts/validate-tenant-documents/`
+  CLI tools —
   outside the request-handling path this rule targets, with no app layer
   above them to log through — import `@blog/insight`'s `sanitizeLogMessage`
   (the sanitizer only, never `createLogger`) directly, rather than keeping
@@ -86,8 +87,8 @@ relative paths only within a single slice (`./schema`, `./queries/comments`).
   `@neondatabase/serverless`, the Auth.js Drizzle adapter) — plus `@sanity/client`,
   scoped to `scripts/provision-tenant/`, and `@blog/insight`'s
   `sanitizeLogMessage`, scoped to `scripts/provision-tenant/`,
-  `scripts/deprovision-tenant/`, and `scripts/recheck-tenant-owners/`, per
-  the exceptions above. The dependency graph stays acyclic:
+  `scripts/deprovision-tenant/`, `scripts/recheck-tenant-owners/`, and
+  `scripts/validate-tenant-documents/`, per the exceptions above. The dependency graph stays acyclic:
   `db → config, utils`, nothing more.
 - **Three things import `@blog/db`** — `apps/web`, `apps/platform` (the
   operator/tenant admin panel, owned by the `platform-app` agent), and
