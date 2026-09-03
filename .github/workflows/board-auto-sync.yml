@@ -1,0 +1,104 @@
+name: Board Auto-Sync
+
+# Turns cloud-session branch/PR evidence into board status writes, so status
+# doesn't wait on a local session dispatching board-keeper (CLAUDE.md's
+# "Ticket priority & triage" cloud-session protocol). Forward-only, mirroring
+# the safe-transition rule board-keeper.md's Step 4 applies by hand.
+#
+# The branch-name regex below is the same two-shape alternation
+# board-keeper.md's Step 2 grep uses (`<type>/<n>-<slug>` and the GitHub
+# Actions cloud shape `claude/issue-<n>-<timestamp>`) — diff the two if this
+# workflow's detection is ever suspected of drifting from board-keeper's.
+#
+# Gated to the repo owner only, same posture as claude.yml: a PR body's
+# "Closes #n" is otherwise attacker-controllable input, and without this gate
+# any contributor opening any PR against this public repo could move an
+# arbitrary issue to Code Review on the board.
+
+on:
+  create:
+  pull_request:
+    types: [opened, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  branch-created:
+    if: github.event_name == 'create' && github.event.ref_type == 'branch' && github.actor == 'ValOvinnikov'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Require GH_PAT
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          if [ -z "$GH_PAT" ]; then
+            echo "::error::GH_PAT secret is not set — this workflow needs a classic PAT scoped public_repo + project (the default GITHUB_TOKEN cannot write Projects v2). See docs/context/ci-automation.md."
+            exit 1
+          fi
+
+      - name: Extract issue number from branch name
+        id: extract
+        env:
+          REF_NAME: ${{ github.event.ref }}
+        run: |
+          set -euo pipefail
+          if [[ "$REF_NAME" =~ ^claude/issue-([0-9]+)-[^[:space:]]+$ ]] || [[ "$REF_NAME" =~ ^[a-zA-Z]+/([0-9]+)-[^[:space:]]+$ ]]; then
+            echo "issue=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+          else
+            echo "Branch '$REF_NAME' doesn't match a ticket branch convention — skipping."
+            echo "issue=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Move issue to In Progress
+        if: steps.extract.outputs.issue != ''
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+          ISSUE_NUMBER: ${{ steps.extract.outputs.issue }}
+        run: .github/scripts/sync-board-status.sh "$ISSUE_NUMBER" "In Progress"
+
+  pr-opened:
+    if: github.event_name == 'pull_request' && github.actor == 'ValOvinnikov'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Require GH_PAT
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          if [ -z "$GH_PAT" ]; then
+            echo "::error::GH_PAT secret is not set — this workflow needs a classic PAT scoped public_repo + project (the default GITHUB_TOKEN cannot write Projects v2). See docs/context/ci-automation.md."
+            exit 1
+          fi
+
+      - name: Extract issue number from PR body or branch
+        id: extract
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+          issue=$(printf '%s' "$PR_BODY" | grep -ioE '(closes|fixes|resolves) #[0-9]+' | head -1 | grep -oE '[0-9]+' || true)
+          if [[ -z "$issue" ]]; then
+            if [[ "$HEAD_REF" =~ ^claude/issue-([0-9]+)-[^[:space:]]+$ ]] || [[ "$HEAD_REF" =~ ^[a-zA-Z]+/([0-9]+)-[^[:space:]]+$ ]]; then
+              issue="${BASH_REMATCH[1]}"
+            fi
+          fi
+          echo "issue=$issue" >> "$GITHUB_OUTPUT"
+
+      - name: Move issue to Code Review
+        if: steps.extract.outputs.issue != ''
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+          ISSUE_NUMBER: ${{ steps.extract.outputs.issue }}
+        run: .github/scripts/sync-board-status.sh "$ISSUE_NUMBER" "Code Review"
