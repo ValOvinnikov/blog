@@ -8,7 +8,7 @@ import { NextResponse } from 'next/server';
 const ACTIVE_TENANT_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 
 /**
- * `GET /api/dashboard/select-tenant?tenantId=…` — the slug-free dashboard's
+ * `GET /api/dashboard/select-tenant?tenantId=…` — `/dashboard`'s
  * tenant-picker link target (`DashboardTenantPicker`, reused from the
  * sidebar's `TenantSwitcher`). Re-verifies `tenantId` against the signed-in
  * user's own `memberships` before trusting it — never a client-supplied

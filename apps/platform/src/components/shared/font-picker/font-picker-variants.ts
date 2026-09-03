@@ -1,3 +1,4 @@
+import { HAS_DISABLED_DESCENDANT_AFFORDANCE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const fontPickerVariants = tv({
@@ -7,7 +8,7 @@ export const fontPickerVariants = tv({
       'flex cursor-pointer items-center gap-3 rounded-[10px] border-[1.5px] border-admin-line bg-admin-surface px-[13px] py-[11px]',
       'transition-colors',
       'has-[[data-checked]]:border-admin-brand has-[[data-checked]]:shadow-[0_0_0_3px_var(--admin-brand-weak)]',
-      'has-[[data-disabled]]:cursor-not-allowed has-[[data-disabled]]:opacity-[.55]',
+      ...HAS_DISABLED_DESCENDANT_AFFORDANCE_CLASSES,
     ],
     radioRoot: [
       'flex size-4 shrink-0 items-center justify-center rounded-full border-[1.5px] border-admin-line',

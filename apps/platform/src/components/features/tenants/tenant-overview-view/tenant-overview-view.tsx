@@ -1,9 +1,11 @@
 'use client';
 
 import type { TAuditEvent } from '@blog/db/schema/audit-events';
+import type { TFinding } from '@blog/db/schema/findings';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { ContentWorkspaceCard } from '@platform/components/features/tenants/content-workspace-card';
 import { DomainCard } from '@platform/components/features/tenants/domain-card';
+import { FindingsCard } from '@platform/components/features/tenants/findings-card';
 import { OwnerCard } from '@platform/components/features/tenants/owner-card';
 import { ProvisioningBanner } from '@platform/components/features/tenants/provisioning-banner';
 import { useProvisioningPoll } from '@platform/components/features/tenants/provisioning-status-view/use-provisioning-poll';
@@ -29,6 +31,7 @@ export type TTenantOverviewViewProps = {
   ownerJoinedAt: string | undefined;
   ownerJoinedAtIso: string | undefined;
   auditEvents: TAuditEvent[];
+  findings: TFinding[];
 };
 
 /**
@@ -46,6 +49,7 @@ export const TenantOverviewView = ({
   ownerJoinedAt,
   ownerJoinedAtIso,
   auditEvents,
+  findings,
 }: TTenantOverviewViewProps) => {
   const tTenantsTable = useTranslations('tenantsTable');
   const t = useTranslations('tenantOverviewPage');
@@ -112,6 +116,8 @@ export const TenantOverviewView = ({
         ownerEmail={ownerEmail}
         archivedNoticeId={archivedNoticeId}
       />
+
+      <FindingsCard findings={findings} />
 
       <div className={cardsGrid()}>
         <div className={cardsColumn()}>

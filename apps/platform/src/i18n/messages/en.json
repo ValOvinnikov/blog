@@ -12,7 +12,8 @@
     "tenantDanger": "Danger zone · Admin",
     "tenantDomain": "Domain · Admin",
     "features": "Features · Admin",
-    "studio": "Studio · Admin"
+    "studio": "Studio · Admin",
+    "findings": "Findings · Admin"
   },
   "workspacePendingPage": {
     "heading": "Your workspace isn't ready yet",
@@ -45,6 +46,7 @@
     "configurationSectionLabel": "Configuration",
     "tenants": "Tenants",
     "addTenant": "Add tenant",
+    "findings": "Findings",
     "tenantLabel": "Tenant · {tenantName}",
     "overview": "Overview",
     "look": "Look",
@@ -98,6 +100,44 @@
     },
     "manage": "Manage",
     "manageAriaLabel": "Manage {tenantName}"
+  },
+  "findingsView": {
+    "title": "Findings",
+    "description": "Operational conditions detected by scheduled sweeps, across every tenant."
+  },
+  "findingsTable": {
+    "columnTenant": "Tenant",
+    "columnSource": "Source",
+    "columnKind": "Kind",
+    "columnSeverity": "Severity",
+    "columnLastSeen": "Last seen",
+    "noTenant": "— platform-wide",
+    "empty": "No open findings. Everything's healthy."
+  },
+  "findingsCard": {
+    "title": "Open findings",
+    "empty": "No open findings for this tenant — everything's healthy.",
+    "detailsToggle": "Details"
+  },
+  "findingSeverityLabel": {
+    "INFO": "Info",
+    "WARNING": "Warning",
+    "CRITICAL": "Critical"
+  },
+  "findingSourceLabel": {
+    "DOCUMENT_VALIDATION": "Document validation",
+    "TENANT_PROVISIONING": "Tenant provisioning",
+    "RECHECK_TENANT_OWNERS": "Owner recheck",
+    "DOMAIN_VERIFICATION": "Domain verification",
+    "SITE_CONFIG_REVALIDATION": "Site config revalidation"
+  },
+  "findingKindLabel": {
+    "SCHEMA_VALIDATION_ERROR": "Schema validation error",
+    "PROVISIONING_STEP_FAILED": "Provisioning step failed",
+    "OWNER_CHECK_STALLED": "Owner check stalled",
+    "OWNER_CHECK_AMBIGUOUS": "Owner check ambiguous",
+    "DOMAIN_NOT_ADDED": "Domain not added",
+    "REVALIDATION_FAILED": "Revalidation failed"
   },
   "ownerHomePage": {
     "description": "Your site at a glance. Everything here is live.",

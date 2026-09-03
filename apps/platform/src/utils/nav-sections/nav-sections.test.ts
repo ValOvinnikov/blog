@@ -26,6 +26,14 @@ describe('operatorNavSections', () => {
     expect(addTenant).toMatchObject({ href: '/tenants/new' });
     expect(addTenant?.badge).toBeUndefined();
   });
+
+  it('gives Findings a real href, unbadged', () => {
+    const [platform] = operatorNavSections(t);
+    const findings = platform!.items.find((item) => item.label === 'Findings');
+
+    expect(findings).toMatchObject({ href: '/findings' });
+    expect(findings?.badge).toBeUndefined();
+  });
 });
 
 describe('tenantNavSections', () => {
@@ -161,7 +169,7 @@ describe('dashboardNavSections', () => {
     ]);
   });
 
-  it('gives Look, Voice, Features, Domain and Studio their slug-free /dashboard hrefs', () => {
+  it('gives Look, Voice, Features, Domain and Studio their /dashboard hrefs', () => {
     const [content, configuration] = dashboardNavSections(t);
     const look = configuration!.items.find((item) => item.label === 'Look');
     const voice = configuration!.items.find((item) => item.label === 'Voice');

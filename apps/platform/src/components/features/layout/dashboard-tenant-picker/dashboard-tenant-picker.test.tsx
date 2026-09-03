@@ -24,7 +24,7 @@ const tenants = [
 ] as TTenant[];
 
 describe(DashboardTenantPicker, () => {
-  it('renders a heading and every tenant, linked through the select-tenant endpoint (not /t/{slug})', async () => {
+  it('renders a heading and every tenant, linked through the select-tenant endpoint', async () => {
     const user = userEvent.setup();
     render(<DashboardTenantPicker tenants={tenants} />);
 

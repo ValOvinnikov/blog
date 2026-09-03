@@ -1,4 +1,8 @@
 import {
+  FINDING_SEVERITY,
+  type TFindingSeverity,
+} from '@blog/config/constants';
+import {
   TENANT_STATUS,
   TENANT_PROVISIONING_STEP_STATUS,
   ELEVATE_TENANT_OWNER_OUTCOME,
@@ -8,7 +12,7 @@ import {
 } from '@blog/db/constants';
 import type { TDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
 
-type TBadgeTone = 'ok' | 'warn' | 'neutral';
+type TBadgeTone = 'ok' | 'warn' | 'bad' | 'neutral';
 
 // Tone is a design-system concern, not display text — the visible label for
 // each status/plan lives in `i18n/messages/en.json` under `tenantsTable`,
@@ -48,8 +52,17 @@ const OWNER_ELEVATION_TONE: Record<TElevateTenantOwnerOutcome, TBadgeTone> = {
   [ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP]: 'warn',
 };
 
+const FINDING_SEVERITY_TONE: Record<TFindingSeverity, TBadgeTone> = {
+  [FINDING_SEVERITY.INFO]: 'neutral',
+  [FINDING_SEVERITY.WARNING]: 'warn',
+  [FINDING_SEVERITY.CRITICAL]: 'bad',
+};
+
 export const tenantStatusTone = (status: TTenantStatus) =>
   TENANT_STATUS_TONE[status];
+
+export const findingSeverityTone = (severity: TFindingSeverity) =>
+  FINDING_SEVERITY_TONE[severity];
 
 export const provisioningStepTone = (
   status: Exclude<TTenantProvisioningStepStatus, 'FAILED'>,

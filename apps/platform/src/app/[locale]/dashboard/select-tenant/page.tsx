@@ -11,12 +11,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /**
- * The slug-free dashboard's tenant picker — reached when
- * `resolveDashboardTenant` finds more than one membership and no (or a
- * stale) active-tenant cookie. A single-membership session redirects
- * straight past this to `/dashboard`: it's only ever reachable when there's
- * genuinely a choice to make. Deliberately outside the `(tenant)` route
- * group's gated layout, since that layout would redirect right back here.
+ * `/dashboard`'s tenant picker — reached when `resolveDashboardTenant` finds
+ * more than one membership and no (or a stale) active-tenant cookie. A
+ * single-membership session redirects straight past this to `/dashboard`:
+ * it's only ever reachable when there's genuinely a choice to make.
+ * Deliberately outside the `(tenant)` route group's gated layout, since that
+ * layout would redirect right back here.
  */
 export default async function SelectTenantPage() {
   const { memberships, tenants } = await listSessionTenants();

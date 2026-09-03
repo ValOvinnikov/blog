@@ -44,4 +44,14 @@ describe(OperatorBreadcrumb, () => {
     );
     expect(screen.getByText('Add tenant')).toBeVisible();
   });
+
+  it('renders the 2-segment trail on the findings list, with Findings as the current item', () => {
+    vi.mocked(usePathname).mockReturnValue('/findings');
+
+    render(<OperatorBreadcrumb />);
+
+    expect(screen.getByText('Platform')).toBeVisible();
+    expect(screen.getByText('Findings')).toBeVisible();
+    expect(screen.queryByRole('link', { name: 'Findings' })).toBeNull();
+  });
 });
