@@ -420,11 +420,11 @@
     "stepsCardTitle": "Steps",
     "stepsCompletionBadge": "{done} of {total} done",
     "stepLabel": {
-      "SANITY_PROJECT": "Create the content workspace",
-      "SEED_CONTENT": "Add starter content",
-      "PERSIST_TOKEN": "Connect the site to its content",
-      "MAP_DOMAIN": "Connect the custom domain",
-      "CREATE_WEBHOOK": "Wire up the CMS to the site"
+      "SANITY_PROJECT": "Create workspace",
+      "SEED_CONTENT": "Seed content",
+      "PERSIST_TOKEN": "Issue read credentials",
+      "MAP_DOMAIN": "Connect domain",
+      "CREATE_WEBHOOK": "Wire up CMS to website"
     },
     "statusLabel": {
       "IDLE": "Not started",
@@ -468,6 +468,10 @@
     "ownerLabel": "Owner",
     "ownerInvitedPendingBadge": "Invited, pending",
     "stepRunningNow": "now",
+    "relativeJustNow": "Just now",
+    "relativeMinutesAgo": "{minutes}m ago",
+    "relativeHoursAgo": "{hours}h ago",
+    "relativeDaysAgo": "{days}d ago",
     "runCardTitle": "Run",
     "runStartedLabel": "Started",
     "runFinishedLabel": "Finished",

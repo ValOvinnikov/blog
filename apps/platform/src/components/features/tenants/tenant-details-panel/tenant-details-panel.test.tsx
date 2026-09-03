@@ -471,7 +471,7 @@ describe(TenantDetailsPanel, () => {
       expect(domainInput).toHaveValue('acme.example.com');
       expect(domainInput).toBeDisabled();
       expect(domainInput).toHaveAccessibleDescription(
-        'Locked — the "Connect the custom domain" step has already completed and used this value.',
+        'Locked — the "Connect domain" step has already completed and used this value.',
       );
     });
 
@@ -571,7 +571,7 @@ describe(TenantDetailsPanel, () => {
         ok: false,
         fieldErrors: {
           primaryDomain:
-            'Locked — the "Connect the custom domain" step has already completed and used this value.',
+            'Locked — the "Connect domain" step has already completed and used this value.',
         },
       });
       const user = userEvent.setup();
@@ -596,7 +596,7 @@ describe(TenantDetailsPanel, () => {
       });
       expect(domainInput).toBeInvalid();
       expect(domainInput).toHaveAccessibleDescription(
-        'Locked — the "Connect the custom domain" step has already completed and used this value.',
+        'Locked — the "Connect domain" step has already completed and used this value.',
       );
       expect(refreshMock).not.toHaveBeenCalled();
     });

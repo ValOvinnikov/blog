@@ -207,7 +207,7 @@ describe('updateTenantDetailsAction', () => {
       ok: false,
       fieldErrors: {
         primaryDomain:
-          'Locked — the "Connect the custom domain" step has already completed and used this value.',
+          'Locked — the "Connect domain" step has already completed and used this value.',
       },
     });
     expect(insertAuditEventMock).not.toHaveBeenCalled();

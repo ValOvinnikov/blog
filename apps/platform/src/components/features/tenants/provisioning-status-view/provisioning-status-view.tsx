@@ -14,7 +14,7 @@ import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
 import { Link } from '@platform/i18n/navigation';
-import { formatDateTime } from '@platform/utils/format-date-time/format-date-time';
+import { formatRelativeTime } from '@platform/utils/format-relative-time/format-relative-time';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { provisioningStepTone } from '@platform/utils/status-tone/status-tone';
 import { useTranslations } from 'next-intl';
@@ -23,6 +23,7 @@ import { useId } from 'react';
 import { RunCard } from './components/run-card/run-card';
 import { provisioningStatusViewVariants } from './provisioning-status-view-variants';
 import { STEP_ORDER, useProvisioningPoll } from './use-provisioning-poll';
+import { useRelativeTimeTick } from './use-relative-time-tick';
 
 type TProvisioningStatusViewProps = {
   tenant: TTenant;
@@ -63,6 +64,7 @@ export const ProvisioningStatusView = ({
     failedStepError,
     errorKind,
   } = useProvisioningPoll(tenant);
+  useRelativeTimeTick();
 
   const doneStepCount = stepStatuses.filter(
     (status) => status === TENANT_PROVISIONING_STEP_STATUS.DONE,
@@ -203,9 +205,9 @@ export const ProvisioningStatusView = ({
                   const isLast = index === STEP_ORDER.length - 1;
                   const title = t(`stepLabel.${stepKey}`);
                   const updatedAt = stepUpdatedAt[index];
-                  const formattedUpdatedAt =
+                  const relativeUpdatedAt =
                     (isDone || isFailed) && updatedAt
-                      ? formatDateTime(updatedAt)
+                      ? formatRelativeTime(new Date(updatedAt), t)
                       : undefined;
 
                   return (
@@ -240,9 +242,9 @@ export const ProvisioningStatusView = ({
                           {t('stepRunningNow')}
                         </span>
                       )}
-                      {formattedUpdatedAt && (
+                      {relativeUpdatedAt && (
                         <time dateTime={updatedAt} className={stepWhen()}>
-                          {formattedUpdatedAt}
+                          {relativeUpdatedAt}
                         </time>
                       )}
                     </div>

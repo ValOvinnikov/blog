@@ -108,9 +108,7 @@ describe(ProvisioningBanner, () => {
       screen.getByText('Provisioning failed at step 4 of 5'),
     ).toBeVisible();
     expect(
-      screen.getByText(
-        'Connect the custom domain — Already in use by another tenant',
-      ),
+      screen.getByText('Connect domain — Already in use by another tenant'),
     ).toBeVisible();
   });
 
