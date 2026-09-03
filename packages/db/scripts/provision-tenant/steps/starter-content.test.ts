@@ -83,4 +83,42 @@ describe(buildStarterDocuments, () => {
       url: '/blog',
     });
   });
+
+  it('builds a module_hero document with the required mode fields, referencing the starter post', () => {
+    const hero = buildStarterDocuments(tenant, assets).find(
+      (doc) => doc._id === STARTER_DOCUMENT_IDS.HERO,
+    ) as unknown as {
+      _type: string;
+      title: string;
+      brandVariant: string;
+      featuredPost: { _ref: string };
+      heroEyebrowMode: string;
+      heroTitleMode: string;
+      heroSubtitleMode: string;
+      heroImageMode: string;
+    };
+
+    expect(hero._type).toBe('module_hero');
+    expect(hero.title).toBeTruthy();
+    expect(hero.brandVariant).toBeTruthy();
+    expect(hero.featuredPost._ref).toBe(STARTER_DOCUMENT_IDS.POST);
+    expect(hero.heroEyebrowMode).toBe('POST_TOPIC');
+    expect(hero.heroTitleMode).toBe('POST_TITLE');
+    expect(hero.heroSubtitleMode).toBe('POST_EXCERPT');
+    expect(hero.heroImageMode).toBe('POST_IMAGE');
+  });
+
+  it('builds a page_home document whose hero reference resolves to the starter hero', () => {
+    const home = buildStarterDocuments(tenant, assets).find(
+      (doc) => doc._id === STARTER_DOCUMENT_IDS.HOME,
+    ) as unknown as {
+      _type: string;
+      title: string;
+      hero: { _ref: string };
+    };
+
+    expect(home._type).toBe('page_home');
+    expect(home.title).toBeTruthy();
+    expect(home.hero._ref).toBe(STARTER_DOCUMENT_IDS.HERO);
+  });
 });
