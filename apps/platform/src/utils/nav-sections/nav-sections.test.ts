@@ -26,6 +26,14 @@ describe('operatorNavSections', () => {
     expect(addTenant).toMatchObject({ href: '/tenants/new' });
     expect(addTenant?.badge).toBeUndefined();
   });
+
+  it('gives Findings a real href, unbadged', () => {
+    const [platform] = operatorNavSections(t);
+    const findings = platform!.items.find((item) => item.label === 'Findings');
+
+    expect(findings).toMatchObject({ href: '/findings' });
+    expect(findings?.badge).toBeUndefined();
+  });
 });
 
 describe('tenantNavSections', () => {

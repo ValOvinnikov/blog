@@ -796,6 +796,28 @@ expire, cannot be queried by business key, and carry no integrity guarantee.
 Answering audit questions with log retention turns the pipeline into an
 expensive, lossy database, and couples noise-reduction work to compliance.
 
+### Findings are not an error tracker
+
+The `findings` table (`@blog/db`) is a third category alongside logs and
+`audit_events`: detected operational conditions — provisioning failures,
+stalled owner checks, unverified domains, schema-validation drift — each
+optionally tenant-referenced, each open or resolved.
+
+It borrows `audit_events`' shape (`source`/`kind` as plain `text`, a `details`
+jsonb) but not its table, because `audit_events` answers _who did what_ —
+`actorId`/`actorEmail` are `notNull` — and most findings have no actor: a
+weekly cron, a failed webhook, a domain that never verified. Open/resolved
+state, not an append-only log, is what lets a consumer ask "did this tenant
+just transition into a bad state" instead of re-deriving it from history on
+every read.
+
+It is deliberately **not** a general error tracker. Runtime exceptions stay in
+the log stream (`@blog/insight` → the platform's logs, per above); mirroring
+every caught error into Postgres brings volume, retention and PII questions
+that are a build-vs-buy decision, not one to arrive at by accident. `findings`
+is scoped to conditions detected by sweeps, workflows and checks — the kind a
+human is expected to act on, not exception noise.
+
 ### Where logs land
 
 Server logs go to Vercel Runtime Logs, per project, with a build-time vs

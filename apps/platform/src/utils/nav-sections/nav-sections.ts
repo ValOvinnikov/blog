@@ -24,6 +24,11 @@ export const operatorNavSections = (
         icon: ICONS.PLUS,
         href: adminRoutes.newTenant(),
       },
+      {
+        label: t('findings'),
+        icon: ICONS.WARNING,
+        href: adminRoutes.findings(),
+      },
     ],
   },
 ];

@@ -1,6 +1,7 @@
+import { FINDING_SEVERITY } from '@blog/config/constants';
 import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
 
-import { ownerElevationTone } from './status-tone';
+import { findingSeverityTone, ownerElevationTone } from './status-tone';
 
 // Only `ownerElevationTone` is covered here — the other exported tone
 // functions in this file (`tenantStatusTone`, `provisioningStepTone`,
@@ -35,5 +36,19 @@ describe(ownerElevationTone, () => {
     expect(
       ownerElevationTone(ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP),
     ).toBe('warn');
+  });
+});
+
+describe(findingSeverityTone, () => {
+  it('is "neutral" for INFO', () => {
+    expect(findingSeverityTone(FINDING_SEVERITY.INFO)).toBe('neutral');
+  });
+
+  it('is "warn" for WARNING', () => {
+    expect(findingSeverityTone(FINDING_SEVERITY.WARNING)).toBe('warn');
+  });
+
+  it('is "bad" for CRITICAL', () => {
+    expect(findingSeverityTone(FINDING_SEVERITY.CRITICAL)).toBe('bad');
   });
 });
