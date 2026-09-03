@@ -19,7 +19,6 @@ async function insertTenant(overrides?: {
   provisioningStatus?: (typeof TENANT_PROVISIONING_STATUS)[keyof typeof TENANT_PROVISIONING_STATUS];
 }): Promise<string> {
   const tenant = await insertTestTenant(db, {
-    slug: 'acme',
     provisioningStatus: overrides?.provisioningStatus,
   });
 

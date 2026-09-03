@@ -17,7 +17,6 @@ async function insertDraftTenant(): Promise<string> {
   const [tenant] = await db
     .insert(schema.tenants)
     .values({
-      slug: 'acme',
       name: 'Acme',
       primaryDomain: 'acme.example.com',
       locale: 'en',
@@ -77,7 +76,6 @@ describe(setTenantSanityProject, () => {
       .where(eq(tenants.id, tenantId));
 
     expect(row).toMatchObject({
-      slug: 'acme',
       name: 'Acme',
       primaryDomain: 'acme.example.com',
       studioVercelProjectId: null,

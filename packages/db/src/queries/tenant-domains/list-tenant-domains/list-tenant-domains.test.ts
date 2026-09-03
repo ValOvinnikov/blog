@@ -27,11 +27,9 @@ afterEach(async () => {
 describe(listTenantDomains, () => {
   it('returns every domain for the given tenant', async () => {
     const { id: tenantId } = await insertTestTenant(db, {
-      slug: 'acme',
       primaryDomain: 'acme.example.com',
     });
     const { id: otherTenantId } = await insertTestTenant(db, {
-      slug: 'other',
       primaryDomain: 'other.example.com',
     });
     await db.insert(schema.tenantDomains).values([
@@ -50,7 +48,6 @@ describe(listTenantDomains, () => {
 
   it('returns an empty array for a tenant with no domains', async () => {
     const { id: tenantId } = await insertTestTenant(db, {
-      slug: 'acme',
       primaryDomain: 'acme.example.com',
     });
 

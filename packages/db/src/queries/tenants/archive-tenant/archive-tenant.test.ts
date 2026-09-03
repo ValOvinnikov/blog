@@ -29,7 +29,7 @@ afterEach(async () => {
 
 describe(archiveTenant, () => {
   it('stamps deprovisionedAt, sets status to ARCHIVED, and returns the updated row', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     const result = await archiveTenant(tenantId);
 

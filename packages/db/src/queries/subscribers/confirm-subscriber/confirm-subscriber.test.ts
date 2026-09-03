@@ -47,7 +47,7 @@ async function insertPendingSubscriber(
 
 describe(confirmSubscriber, () => {
   it('flips a pending subscriber to active and stamps confirmedAt', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     const pending = await insertPendingSubscriber(tenantId);
 
     const result = await confirmSubscriber(tenantId, pending.confirmationToken);
@@ -65,7 +65,7 @@ describe(confirmSubscriber, () => {
   });
 
   it('is idempotent-safe: confirming an already-active row again does not error or restamp confirmedAt', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     const pending = await insertPendingSubscriber(tenantId);
     const first = await confirmSubscriber(tenantId, pending.confirmationToken);
     if (first.outcome !== 'confirmed') throw new Error('expected confirmed');
@@ -79,7 +79,7 @@ describe(confirmSubscriber, () => {
   });
 
   it('returns not-found for an unrecognized token', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     const result = await confirmSubscriber(tenantId, 'does-not-exist');
 
@@ -87,8 +87,8 @@ describe(confirmSubscriber, () => {
   });
 
   it("returns not-found for another tenant's token", async () => {
-    const { id: tenantOneId } = await insertTestTenant(db, { slug: 'acme' });
-    const { id: tenantTwoId } = await insertTestTenant(db, { slug: 'other' });
+    const { id: tenantOneId } = await insertTestTenant(db);
+    const { id: tenantTwoId } = await insertTestTenant(db);
     const pending = await insertPendingSubscriber(tenantOneId);
 
     const result = await confirmSubscriber(
@@ -110,7 +110,7 @@ describe(confirmSubscriber, () => {
   // two racing calls can ever match that `WHERE`, not from this test — see
   // the docstring on `confirmSubscriber`.
   it('resolves two concurrent confirms of the same token into exactly one confirmed outcome', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     const pending = await insertPendingSubscriber(tenantId);
 
     const [first, second] = await Promise.all([

@@ -38,8 +38,8 @@ describe(listBookmarks, () => {
   it("returns only the given tenant and user's bookmarks", async () => {
     await insertTestUser(db, { id: 'user-1' });
     await insertTestUser(db, { id: 'user-2' });
-    const { id: tenantOneId } = await insertTestTenant(db, { slug: 'acme' });
-    const { id: tenantTwoId } = await insertTestTenant(db, { slug: 'other' });
+    const { id: tenantOneId } = await insertTestTenant(db);
+    const { id: tenantTwoId } = await insertTestTenant(db);
     await addBookmark(tenantOneId, 'user-1', 'post-1');
     await addBookmark(tenantOneId, 'user-1', 'post-2');
     await addBookmark(tenantOneId, 'user-2', 'post-3');
@@ -55,7 +55,7 @@ describe(listBookmarks, () => {
 
   it('orders results by most recently bookmarked first', async () => {
     await insertTestUser(db, { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     // Insert directly with explicit timestamps rather than relying on two
     // calls to addBookmark() landing in different clock ticks (defaultNow()
     // could otherwise collide within the same statement/transaction).
@@ -84,7 +84,7 @@ describe(listBookmarks, () => {
 
   it('returns an empty array when the user has no bookmarks', async () => {
     await insertTestUser(db, { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     expect(await listBookmarks(tenantId, 'user-1')).toEqual([]);
   });
