@@ -237,11 +237,11 @@ describe(ProvisioningStatusView, () => {
     );
 
     const headings = [
-      'Create the content workspace',
-      'Add starter content',
-      'Connect the site to its content',
-      'Connect the custom domain',
-      'Wire up the CMS to the site',
+      'Create workspace',
+      'Seed content',
+      'Issue read credentials',
+      'Connect domain',
+      'Wire up CMS to website',
     ];
     for (const heading of headings) {
       expect(screen.getByText(heading)).toBeVisible();
@@ -1261,7 +1261,16 @@ describe(ProvisioningStatusView, () => {
   });
 
   describe('step and run timestamps', () => {
-    it("shows a done step's updatedAt as its timestamp", () => {
+    beforeEach(() => {
+      vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'Date'] });
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("shows a done step's updatedAt as relative time, keeping the full ISO in dateTime", () => {
+      vi.setSystemTime(new Date('2026-08-12T14:25:00.000Z'));
       const tenant = makeTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
@@ -1278,12 +1287,13 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      const timestamp = screen.getByText('Aug 12, 2026, 2:19 PM UTC');
+      const timestamp = screen.getByText('6m ago');
       expect(timestamp.tagName).toBe('TIME');
       expect(timestamp).toHaveAttribute('dateTime', '2026-08-12T14:19:00.000Z');
     });
 
     it("keeps a step's timestamp outside the aria-live status region", () => {
+      vi.setSystemTime(new Date('2026-08-12T14:25:00.000Z'));
       const tenant = makeTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
@@ -1303,11 +1313,12 @@ describe(ProvisioningStatusView, () => {
       const liveRegions = container.querySelectorAll('[aria-live="polite"]');
       expect(liveRegions.length).toBeGreaterThan(0);
       for (const region of liveRegions) {
-        expect(region).not.toHaveTextContent('Aug 12, 2026, 2:19 PM UTC');
+        expect(region).not.toHaveTextContent('6m ago');
       }
     });
 
-    it("shows a failed step's updatedAt as its timestamp", () => {
+    it("shows a failed step's updatedAt as relative time, keeping the full ISO in dateTime", () => {
+      vi.setSystemTime(new Date('2026-08-12T14:25:00.000Z'));
       const tenant = makeTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
@@ -1325,7 +1336,7 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      const timestamp = screen.getByText('Aug 12, 2026, 2:20 PM UTC');
+      const timestamp = screen.getByText('5m ago');
       expect(timestamp.tagName).toBe('TIME');
       expect(timestamp).toHaveAttribute('dateTime', '2026-08-12T14:20:00.000Z');
     });
@@ -1384,7 +1395,8 @@ describe(ProvisioningStatusView, () => {
       ).not.toBeInTheDocument();
     });
 
-    it('renders a Run card with Started/Finished/Registry when the run exists', () => {
+    it('renders a Run card with Started/Finished/Registry when the run exists, each showing relative and absolute UTC time together', () => {
+      vi.setSystemTime(new Date('2026-08-12T14:24:00.000Z'));
       const tenant = makeTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
@@ -1405,8 +1417,12 @@ describe(ProvisioningStatusView, () => {
       expect(
         screen.getByRole('heading', { level: 2, name: 'Run' }),
       ).toBeVisible();
-      expect(screen.getByText('Aug 12, 2026, 2:18 PM UTC')).toBeVisible();
-      expect(screen.getByText('Aug 12, 2026, 2:22 PM UTC')).toBeVisible();
+      expect(
+        screen.getByText('6m ago · Aug 12, 2026, 2:18 PM UTC'),
+      ).toBeVisible();
+      expect(
+        screen.getByText('2m ago · Aug 12, 2026, 2:22 PM UTC'),
+      ).toBeVisible();
       expect(screen.getByText('production')).toBeVisible();
     });
   });

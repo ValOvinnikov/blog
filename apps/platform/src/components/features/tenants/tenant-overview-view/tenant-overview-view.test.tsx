@@ -280,7 +280,7 @@ describe(TenantOverviewView, () => {
     });
     expect(domainInput).toBeDisabled();
     expect(domainInput).toHaveAccessibleDescription(
-      'Locked — the "Connect the custom domain" step has already completed and used this value.',
+      'Locked — the "Connect domain" step has already completed and used this value.',
     );
 
     expect(screen.getByRole('textbox', { name: 'Name' })).not.toBeDisabled();
