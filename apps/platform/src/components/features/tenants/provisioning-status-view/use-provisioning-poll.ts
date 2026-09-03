@@ -1,12 +1,12 @@
 'use client';
 
 import {
+  CORE_PROVISIONING_STEPS,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TElevateTenantOwnerOutcome,
   type TTenantProvisioningStatus,
-  type TTenantProvisioningStep,
   type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
 import type {
@@ -27,19 +27,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState, useEffect, useRef, useTransition } from 'react';
 
-// The five core provisioning steps `run.ts`'s workflow actually sequences —
-// hardcoded rather than derived from `TENANT_PROVISIONING_STEP` (which also
-// carries `OWNER_ELEVATION`, a recurring post-provisioning check with no
-// step-count or ordering role in this UI) so this list can't silently pick
-// up a future unrelated step key. Mirrors `tenant-field-locks.ts`'s own
-// `CORE_PROVISIONING_STEPS` allowlist.
-export const STEP_ORDER: TTenantProvisioningStep[] = [
-  TENANT_PROVISIONING_STEP.SANITY_PROJECT,
-  TENANT_PROVISIONING_STEP.SEED_CONTENT,
-  TENANT_PROVISIONING_STEP.PERSIST_TOKEN,
-  TENANT_PROVISIONING_STEP.MAP_DOMAIN,
-  TENANT_PROVISIONING_STEP.CREATE_WEBHOOK,
-];
+export const STEP_ORDER = CORE_PROVISIONING_STEPS;
 
 // Highest-priority status wins: any FAILED step outranks a RUNNING one, which
 // outranks a still-IDLE one, so the overall status always reflects the most
