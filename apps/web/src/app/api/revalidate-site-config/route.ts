@@ -1,6 +1,6 @@
 import { queries } from '@blog/db';
+import { isSecretMatch } from '@blog/utils';
 import { env } from '@web/utils/env/env';
-import { isSecretMatch } from '@web/utils/is-secret-match';
 import { logger } from '@web/utils/logger/logger';
 import {
   buildSettingsFeaturesCacheTag,

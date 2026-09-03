@@ -3,6 +3,7 @@ import {
   service,
   type TTenantSanityContext,
 } from '@blog/service';
+import { isSecretMatch } from '@blog/utils';
 import {
   generateTakeaways,
   SKIM_GENERATION_MODEL,
@@ -11,7 +12,6 @@ import { getHostTenantSanityContext } from '@web/server/tenant/get-host-tenant-s
 import { getHostTenantSanityWriteContext } from '@web/server/tenant/get-host-tenant-sanity-write-context';
 import { isTenantActive } from '@web/server/tenant/is-tenant-active';
 import { env } from '@web/utils/env/env';
-import { isSecretMatch } from '@web/utils/is-secret-match';
 import { logger } from '@web/utils/logger/logger';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
