@@ -27,7 +27,9 @@ export const OperatorBreadcrumb = () => {
   const items: TBreadcrumbItem[] =
     pathname === adminRoutes.newTenant()
       ? [platform, tenants, { label: t('addTenant') }]
-      : [platform, { label: t('tenants') }];
+      : pathname === adminRoutes.findings()
+        ? [platform, { label: t('findings') }]
+        : [platform, { label: t('tenants') }];
 
   return (
     <Breadcrumbs items={items} ariaLabel={tTopbar('breadcrumbAriaLabel')} />

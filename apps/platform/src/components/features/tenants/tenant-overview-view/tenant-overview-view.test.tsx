@@ -1,10 +1,17 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import {
+  FINDING_KIND,
+  FINDING_SEVERITY,
+  FINDING_SOURCE,
+  FINDING_STATUS,
+} from '@blog/config/constants';
+import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db';
 import type { TAuditEvent } from '@blog/db/schema/audit-events';
+import type { TFinding } from '@blog/db/schema/findings';
 import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
 import {
   act,
@@ -65,6 +72,21 @@ const makeEvent = (overrides: Partial<TAuditEvent> = {}): TAuditEvent => ({
   ...overrides,
 });
 
+const makeFinding = (overrides: Partial<TFinding> = {}): TFinding => ({
+  id: 'finding-1',
+  tenantId: 'tenant-1',
+  source: FINDING_SOURCE.TENANT_PROVISIONING,
+  kind: FINDING_KIND.PROVISIONING_STEP_FAILED,
+  severity: FINDING_SEVERITY.CRITICAL,
+  status: FINDING_STATUS.OPEN,
+  dedupeKey: 'dedupe-1',
+  details: null,
+  firstSeenAt: new Date('2026-04-01T00:00:00.000Z'),
+  lastSeenAt: new Date('2026-04-02T00:00:00.000Z'),
+  resolvedAt: null,
+  ...overrides,
+});
+
 describe(TenantOverviewView, () => {
   // Rendering a non-terminal `provisioningStatus` starts a real
   // `setInterval` poll loop that can outlive a test's own cleanup under
@@ -94,6 +116,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
@@ -119,6 +142,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
@@ -136,6 +160,9 @@ describe(TenantOverviewView, () => {
     ).toBeVisible();
     expect(
       screen.getByRole('heading', { level: 2, name: 'Recent activity' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Open findings' }),
     ).toBeVisible();
     expect(screen.queryByRole('heading', { level: 3 })).not.toBeInTheDocument();
   });
@@ -158,6 +185,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
@@ -174,6 +202,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
@@ -200,6 +229,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
@@ -241,6 +271,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
@@ -271,6 +302,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
@@ -311,6 +343,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
@@ -350,6 +383,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[makeEvent()]}
+        findings={[makeFinding()]}
       />,
     );
 
@@ -357,6 +391,7 @@ describe(TenantOverviewView, () => {
     expect(screen.getByText('Aug 12, 2026')).toBeVisible();
     expect(screen.getByText('proj-1')).toBeVisible();
     expect(screen.getByText('vo@valstack.dev')).toBeVisible();
+    expect(screen.getByText('Provisioning step failed')).toBeVisible();
   });
 
   it('always renders "Open site", linking to the tenant\'s live domain', () => {
@@ -369,6 +404,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
@@ -389,6 +425,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
@@ -409,6 +446,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
@@ -427,6 +465,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
@@ -445,6 +484,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
