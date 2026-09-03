@@ -46,7 +46,7 @@ export async function notifyOperatorsOfDocumentValidationFailure({
 }: TNotifyOperatorsParams): Promise<void> {
   if (!resendApiKey) {
     console.log(
-      `validate-tenant-documents: RESEND_API_KEY is unset — skipping operator notification for tenant "${tenant.id}" (slug "${tenant.slug}").`,
+      `validate-tenant-documents: RESEND_API_KEY is unset — skipping operator notification for tenant "${tenant.id}" ("${tenant.name}").`,
     );
     return;
   }
@@ -55,7 +55,7 @@ export async function notifyOperatorsOfDocumentValidationFailure({
     const recipients = await listSuperadminEmails();
     if (recipients.length === 0) {
       console.log(
-        `validate-tenant-documents: no SUPERADMIN admins on file — skipping operator notification for tenant "${tenant.id}" (slug "${tenant.slug}").`,
+        `validate-tenant-documents: no SUPERADMIN admins on file — skipping operator notification for tenant "${tenant.id}" ("${tenant.name}").`,
       );
       return;
     }
@@ -69,8 +69,8 @@ export async function notifyOperatorsOfDocumentValidationFailure({
     const { error } = await resend.emails.send({
       from: DEFAULT_FROM_ADDRESS,
       to: recipients,
-      subject: `Tenant "${tenant.name}" (${tenant.slug}) has invalid Sanity documents`,
-      html: `<p>Tenant <strong>${escapeHtml(tenant.name)}</strong> (slug <code>${escapeHtml(tenant.slug)}</code>, id <code>${escapeHtml(tenant.id)}</code>) — ${severityCopy}. ${invalidDocumentCount} document(s) failed validation.</p><p>See the tenant's detail page in the platform admin panel for the full list.</p>`,
+      subject: `Tenant "${tenant.name}" (${tenant.id}) has invalid Sanity documents`,
+      html: `<p>Tenant <strong>${escapeHtml(tenant.name)}</strong> (id <code>${escapeHtml(tenant.id)}</code>) — ${severityCopy}. ${invalidDocumentCount} document(s) failed validation.</p><p>See the tenant's detail page in the platform admin panel for the full list.</p>`,
     });
 
     if (error) {
@@ -78,7 +78,7 @@ export async function notifyOperatorsOfDocumentValidationFailure({
     }
   } catch (error) {
     console.error(
-      `validate-tenant-documents: failed to notify operators for tenant "${tenant.id}" (slug "${tenant.slug}"): ${sanitizeLogMessage(error)}`,
+      `validate-tenant-documents: failed to notify operators for tenant "${tenant.id}" ("${tenant.name}"): ${sanitizeLogMessage(error)}`,
     );
   }
 }

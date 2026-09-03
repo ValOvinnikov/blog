@@ -48,20 +48,21 @@ vi.mock('./lib/notify-operators', () => ({
 
 const env = { resendApiKey: 'resend-key' };
 
-function tenant(id: string, slug: string): TTenant {
+function tenant(id: string, name: string): TTenant {
   return {
     id,
-    slug,
-    name: slug,
-    primaryDomain: `${slug}.example.com`,
-    sanityProjectId: `proj-${slug}`,
+    name,
+    primaryDomain: `${name}.example.com`,
+    sanityProjectId: `proj-${name}`,
     sanityDataset: 'production',
     sanityReadTokenEncrypted: 'encrypted',
+    sanityWriteTokenEncrypted: null,
     locale: 'en',
     plan: 'FREE',
     status: TENANT_STATUS.ACTIVE,
     provisioningStatus: 'READY',
     provisioningSteps: null,
+    lastNotifiedOwnerElevationOutcome: null,
     studioVercelProjectId: null,
     seededAt: null,
     webhookCreatedAt: null,
