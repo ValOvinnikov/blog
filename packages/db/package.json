@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@blog/config": "workspace:*",
+    "@blog/email": "workspace:*",
     "@blog/insight": "workspace:*",
     "@blog/utils": "workspace:*",
     "@neondatabase/serverless": "^1.1.0",

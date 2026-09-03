@@ -11,7 +11,12 @@
     "paths": {
       "@blog/db/*": ["./src/*"],
       "@blog/config/*": ["../../packages/config/src/*"],
-      "@blog/insight/*": ["../../packages/insight/src/*"]
+      "@blog/insight/*": ["../../packages/insight/src/*"],
+      "@blog/email/*": ["../../packages/email/src/*"],
+      // Not imported directly by this package's own source — needed only
+      // because @blog/email/* resolves to source, and its brand-tokens
+      // module imports @blog/utils/color.
+      "@blog/utils/*": ["../../packages/utils/src/*"]
     }
   },
   "include": ["src", "scripts", "drizzle.config.ts"]

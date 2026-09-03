@@ -6,6 +6,8 @@ import { defineConfig, mergeConfig } from 'vitest/config';
 const src = fileURLToPath(new URL('./src', import.meta.url));
 const configSrc = fileURLToPath(new URL('../config/src', import.meta.url));
 const insightSrc = fileURLToPath(new URL('../insight/src', import.meta.url));
+const emailSrc = fileURLToPath(new URL('../email/src', import.meta.url));
+const utilsSrc = fileURLToPath(new URL('../utils/src', import.meta.url));
 
 export default mergeConfig(
   preset,
@@ -32,6 +34,11 @@ export default mergeConfig(
         { find: /^@blog\/db\//, replacement: `${src}/` },
         { find: /^@blog\/config\//, replacement: `${configSrc}/` },
         { find: /^@blog\/insight\//, replacement: `${insightSrc}/` },
+        { find: /^@blog\/email\//, replacement: `${emailSrc}/` },
+        // Not imported directly by this package's own source — needed only
+        // because @blog/email resolves to source, and its brand-tokens
+        // module imports @blog/utils/color.
+        { find: /^@blog\/utils\//, replacement: `${utilsSrc}/` },
         // `import 'server-only'` throws outside a react-server bundle; stub it
         // to a no-op for the node test env (the real guard still runs in build).
         {
