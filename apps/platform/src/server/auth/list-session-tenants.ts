@@ -42,7 +42,9 @@ export const listSessionTenants = cache(async (): Promise<TSessionTenants> => {
   }
 
   if (await isSuperAdmin(userId)) {
-    const tenants = await queries.tenants.listTenants();
+    const tenants = await queries.tenants.listTenants({
+      includeArchived: true,
+    });
 
     return {
       userId,

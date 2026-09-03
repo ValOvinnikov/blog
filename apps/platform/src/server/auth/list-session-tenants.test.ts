@@ -112,7 +112,7 @@ describe(listSessionTenants, () => {
 
     const result = await listSessionTenants();
 
-    expect(listTenantsMock).toHaveBeenCalledWith();
+    expect(listTenantsMock).toHaveBeenCalledWith({ includeArchived: true });
     expect(listMembershipsForUserMock).not.toHaveBeenCalled();
     expect(result.userId).toBe('super-1');
     expect(result.tenants).toEqual(tenants);
