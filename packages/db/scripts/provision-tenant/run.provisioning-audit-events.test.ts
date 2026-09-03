@@ -113,6 +113,7 @@ const env = {
   githubServerUrl: undefined,
   githubActor: 'octocat',
   tenantRegistryEnvironment: undefined,
+  resendApiKey: undefined,
 };
 
 beforeEach(() => {

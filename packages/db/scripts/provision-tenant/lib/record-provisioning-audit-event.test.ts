@@ -27,6 +27,7 @@ const env: TProvisionEnv = {
   githubServerUrl: 'https://github.com',
   githubActor: 'octocat',
   tenantRegistryEnvironment: undefined,
+  resendApiKey: undefined,
 };
 
 beforeEach(() => {
