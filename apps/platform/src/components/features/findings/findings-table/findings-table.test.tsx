@@ -38,7 +38,10 @@ describe(FindingsTable, () => {
     expect(screen.getByText('Document validation')).toBeVisible();
     expect(screen.getByText('Schema validation error')).toBeVisible();
     expect(screen.getByText('Warning')).toBeVisible();
-    expect(screen.getByText('Apr 2, 2026')).toBeVisible();
+    expect(screen.getByText('Apr 2, 2026')).toHaveAttribute(
+      'dateTime',
+      '2026-04-02T00:00:00.000Z',
+    );
   });
 
   it("links a finding's tenant name to that tenant's overview page", () => {

@@ -87,7 +87,11 @@ export const FindingsTable = ({
                   {tSeverity(finding.severity)}
                 </StatusBadge>
               </td>
-              <td className={cell()}>{formatDate(finding.lastSeenAt)}</td>
+              <td className={cell()}>
+                <time dateTime={finding.lastSeenAt.toISOString()}>
+                  {formatDate(finding.lastSeenAt)}
+                </time>
+              </td>
             </tr>
           ))}
         </tbody>
