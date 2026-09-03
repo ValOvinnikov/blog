@@ -175,6 +175,8 @@
       "CREATED": "Tenant created",
       "ARCHIVED": "Tenant archived",
       "DEPROVISIONED": "Provisioning removed",
+      "PROVISIONED": "Tenant provisioned",
+      "PROVISIONING_FAILED": "Provisioning failed",
       "SETTINGS_UPDATED": "Settings updated",
       "DELETED": "Tenant deleted"
     }
