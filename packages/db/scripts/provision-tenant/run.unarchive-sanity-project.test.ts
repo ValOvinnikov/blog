@@ -88,6 +88,7 @@ const env = {
   githubRunId: undefined,
   githubRepository: undefined,
   githubServerUrl: undefined,
+  githubActor: undefined,
   tenantRegistryEnvironment: undefined,
   vercelWebProjectId: 'proj-1',
   adminAppBaseUrl: 'https://admin.example.com',

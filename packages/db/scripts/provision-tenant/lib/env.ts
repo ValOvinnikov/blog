@@ -41,6 +41,7 @@ export type TProvisionEnv = {
   githubRunId: string | undefined;
   githubRepository: string | undefined;
   githubServerUrl: string | undefined;
+  githubActor: string | undefined;
   // The dispatched GitHub Environment name (`development`/`production`) —
   // surfaced verbatim as the run's registry, not this codebase's own
   // vocabulary. Absent for a local run outside Actions.
@@ -61,6 +62,7 @@ export function loadProvisionEnv(): TProvisionEnv {
     githubRunId: process.env['GITHUB_RUN_ID'],
     githubRepository: process.env['GITHUB_REPOSITORY'],
     githubServerUrl: process.env['GITHUB_SERVER_URL'],
+    githubActor: process.env['GITHUB_ACTOR'],
     tenantRegistryEnvironment: process.env['TENANT_REGISTRY_ENVIRONMENT'],
   };
 }

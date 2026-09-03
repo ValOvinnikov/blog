@@ -17,6 +17,7 @@
  */
 import { pathToFileURL } from 'node:url';
 
+import { AUDIT_ACTION } from '@blog/config/constants';
 import {
   ELEVATE_TENANT_OWNER_OUTCOME,
   TENANT_PROVISIONING_STEP,
@@ -29,6 +30,7 @@ import { unarchiveSanityProject } from '@blog/db/utils/sanity-management-client/
 import { sanitizeLogMessage } from '@blog/insight';
 
 import { loadProvisionEnv, type TProvisionEnv } from './lib/env';
+import { recordProvisioningAuditEvent } from './lib/record-provisioning-audit-event';
 import { reportOwnerElevationOutcome } from './lib/report-owner-elevation-outcome';
 import {
   reportProvisioningRunFinish,
@@ -95,6 +97,11 @@ export async function runSteps(
     console.error(
       `provision-tenant: reactivateTenant failed for "${tenantId}" (${reactivateResult.error}).`,
     );
+    await recordProvisioningAuditEvent(
+      tenantId,
+      env,
+      AUDIT_ACTION.PROVISIONING_FAILED,
+    );
     return { ok: false };
   }
 
@@ -114,6 +121,11 @@ export async function runSteps(
     } catch (error) {
       console.error(
         `provision-tenant: failed to un-archive Sanity project "${tenant.sanityProjectId}" for tenant "${tenantId}": ${sanitizeLogMessage(error)}`,
+      );
+      await recordProvisioningAuditEvent(
+        tenantId,
+        env,
+        AUDIT_ACTION.PROVISIONING_FAILED,
       );
       return { ok: false };
     }
@@ -163,6 +175,12 @@ export async function runSteps(
       });
 
       await reportProvisioningRunFinish(tenantId);
+      await recordProvisioningAuditEvent(
+        tenantId,
+        env,
+        AUDIT_ACTION.PROVISIONING_FAILED,
+        step.key,
+      );
 
       // Stop here — later steps stay at whatever status they were already
       // in (idle, on a first run). The admin UI's per-step Retry button
@@ -173,6 +191,7 @@ export async function runSteps(
   }
 
   await reportProvisioningRunFinish(tenantId);
+  await recordProvisioningAuditEvent(tenantId, env, AUDIT_ACTION.PROVISIONED);
 
   // Runs only once the tenant is fully provisioned and never affects this
   // run's own result — the owner accepting their invite is outside this
