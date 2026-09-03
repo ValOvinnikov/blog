@@ -226,6 +226,7 @@
       "CREATED": "Tenant created",
       "ARCHIVED": "Tenant archived",
       "DEPROVISIONED": "Provisioning removed",
+      "REACTIVATED": "Tenant reactivated",
       "PROVISIONED": "Tenant provisioned",
       "PROVISIONING_FAILED": "Provisioning failed",
       "SETTINGS_UPDATED": "Settings updated",
@@ -555,6 +556,18 @@
     "deleteConfirmHint": "Must match the tenant's name exactly.",
     "deleteConfirmButton": "Delete",
     "deleteConfirmingButton": "Deleting…"
+  },
+  "reactivateTenantControl": {
+    "cardTitle": "Reactivate this tenant",
+    "description": "Brings an archived tenant back online by re-running provisioning: it un-archives the tenant row and its Sanity project, re-maps the custom domain, and recreates the revalidation webhook. Use this instead of deleting a tenant that was deprovisioned by mistake.",
+    "triggerButton": "Reactivate tenant",
+    "dialogTitle": "Reactivate {name}",
+    "dialogDescription": "This dispatches provision-tenant.yml, which restores every provisioned resource for this tenant. Type the tenant's name to confirm.",
+    "confirmLabel": "Type \"{name}\" to confirm",
+    "confirmHint": "Must match the tenant's name exactly.",
+    "cancelButton": "Cancel",
+    "confirmButton": "Reactivate",
+    "confirmingButton": "Dispatching…"
   },
   "featuresSettings": {
     "heading": "Features",
