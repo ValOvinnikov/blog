@@ -71,7 +71,7 @@ export const FindingsTable = ({
                 {finding.tenantId ? (
                   <LinkButton
                     href={adminRoutes.tenantOverview(finding.tenantId)}
-                    variant="ghost"
+                    variant="secondary"
                     size={SIZE.SM}
                   >
                     {tenantNamesById[finding.tenantId] ?? finding.tenantId}
