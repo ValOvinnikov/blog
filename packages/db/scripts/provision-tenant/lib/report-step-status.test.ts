@@ -1,4 +1,5 @@
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import { beginTenantProvisioning } from '@blog/db/queries/tenants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
 import { eq } from 'drizzle-orm';
@@ -123,7 +124,7 @@ describe(reportStepStatus, () => {
     expect(tenant?.provisioningStatus).toBe('FAILED');
   });
 
-  it('leaves the overall provisioningStatus untouched for an earlier step', async () => {
+  it('sets the overall provisioningStatus to FAILED when an earlier step fails', async () => {
     const tenantId = await insertDraftTenant();
 
     await reportStepStatus({
@@ -133,7 +134,55 @@ describe(reportStepStatus, () => {
     });
 
     const tenant = await loadTenant(tenantId);
+    expect(tenant?.provisioningStatus).toBe('FAILED');
+  });
+
+  it('leaves a mid-sequence failure retryable via beginTenantProvisioning', async () => {
+    const tenantId = await insertDraftTenant();
+    await db
+      .update(schema.tenants)
+      .set({ provisioningStatus: 'PROVISIONING' })
+      .where(eq(schema.tenants.id, tenantId));
+
+    await reportStepStatus({
+      tenantId,
+      step: 'SEED_CONTENT',
+      status: 'FAILED',
+      error: 'Sanity content API returned 500',
+    });
+
+    const result = await beginTenantProvisioning(tenantId);
+
+    if (!result.ok) throw new Error('expected ok:true');
+    expect(result.data.previousProvisioningStatus).toBe('FAILED');
+  });
+
+  it('leaves the overall provisioningStatus untouched for an earlier step only RUNNING', async () => {
+    const tenantId = await insertDraftTenant();
+
+    await reportStepStatus({
+      tenantId,
+      step: 'PERSIST_TOKEN',
+      status: 'RUNNING',
+    });
+
+    const tenant = await loadTenant(tenantId);
     expect(tenant?.provisioningStatus).toBe('PENDING');
+  });
+
+  it('writes lastNotifiedOwnerElevationOutcome only when supplied', async () => {
+    const tenantId = await insertDraftTenant();
+
+    await reportStepStatus({
+      tenantId,
+      step: 'OWNER_ELEVATION',
+      status: 'DONE',
+      detail: 'STALLED',
+      notifiedOwnerElevationOutcome: 'STALLED',
+    });
+
+    const tenant = await loadTenant(tenantId);
+    expect(tenant?.lastNotifiedOwnerElevationOutcome).toBe('STALLED');
   });
 
   it('never throws when the tenant id does not exist — logs instead', async () => {

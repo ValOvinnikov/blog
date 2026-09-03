@@ -9,10 +9,12 @@ const {
   getTagPageMock,
   getPublishedPostsByTagMock,
   getHostTenantSanityContextMock,
+  getTenantBaseUrlMock,
 } = vi.hoisted(() => ({
   getTagPageMock: vi.fn(),
   getPublishedPostsByTagMock: vi.fn(),
   getHostTenantSanityContextMock: vi.fn(),
+  getTenantBaseUrlMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -30,6 +32,10 @@ vi.mock('@web/server/tenant/get-host-tenant-sanity-context', () => ({
   getHostTenantSanityContext: getHostTenantSanityContextMock,
 }));
 
+vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
+  getTenantBaseUrl: getTenantBaseUrlMock,
+}));
+
 const post: TFeedPost = {
   title: 'Hello & Welcome',
   slug: 'hello-welcome',
@@ -45,6 +51,7 @@ describe('GET /tags/[slug]/rss.xml', () => {
       isResolvable: true,
       tenant: undefined,
     });
+    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
   });
 
   afterEach(() => {
@@ -52,6 +59,7 @@ describe('GET /tags/[slug]/rss.xml', () => {
     getTagPageMock.mockReset();
     getPublishedPostsByTagMock.mockReset();
     getHostTenantSanityContextMock.mockReset();
+    getTenantBaseUrlMock.mockReset();
   });
 
   it('returns a valid RSS 2.0 feed scoped to the tag with the correct content type', async () => {

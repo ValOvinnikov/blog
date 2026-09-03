@@ -1,6 +1,7 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { HeroModule } from './hero-module';
 
@@ -10,8 +11,6 @@ const { getHeroMock, getTenantSanityContextMock } = vi.hoisted(() => ({
 }));
 
 vi.mock('@blog/service', () => ({
-  getSanityImageBaseUrl: () =>
-    'https://cdn.sanity.io/images/test-project/test-dataset/',
   service: {
     modules: {
       hero: { v1: { getHero: getHeroMock } },
@@ -29,7 +28,7 @@ describe(HeroModule, () => {
   beforeEach(() => {
     getHeroMock.mockReset();
     getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('forwards the resolved tenant Sanity context to getHero', async () => {
@@ -87,8 +86,10 @@ describe(HeroModule, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("resolves baseUrl via getSanityImageBaseUrl and forwards it into the rendered hero image's src", async () => {
-    const sanityImage = makeSanityImage();
+  it('renders the hero image using its own cdnBaseUrl, not a hardcoded origin', async () => {
+    const sanityImage = makeSanityImage({
+      cdnBaseUrl: 'https://cdn.sanity.io/images/tenant-project/production/',
+    });
     getHeroMock.mockResolvedValue({
       ok: true,
       data: {
@@ -106,6 +107,6 @@ describe(HeroModule, () => {
     await setup();
 
     const img = screen.getByRole('img', { name: sanityImage.alt });
-    expect(img.getAttribute('src')).toContain('test-project/test-dataset');
+    expect(img.getAttribute('src')).toContain('tenant-project/production');
   });
 });

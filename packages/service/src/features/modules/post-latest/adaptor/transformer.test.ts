@@ -1,6 +1,7 @@
 import { BRAND_VARIANT, CONTAINER_WIDTH, HEADING_ALIGN } from '@blog/config';
 import { makeRawPostLatestModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import {
   toPostLatestModule,
@@ -8,12 +9,13 @@ import {
 } from './transformer';
 
 const rawPosts: TRawPostLatestModulePosts = [];
+const tenant = makeTenant();
 
 describe('toPostLatestModule', () => {
   it('maps sectionHeader straight through', () => {
     const raw = makeRawPostLatestModule();
 
-    const module = toPostLatestModule(raw, rawPosts);
+    const module = toPostLatestModule(raw, rawPosts, tenant);
 
     expect(module.sectionHeader).toEqual({
       heading: 'Latest',
@@ -27,7 +29,7 @@ describe('toPostLatestModule', () => {
       brandVariant: BRAND_VARIANT.SECONDARY,
     });
 
-    const module = toPostLatestModule(raw, rawPosts);
+    const module = toPostLatestModule(raw, rawPosts, tenant);
 
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
@@ -35,7 +37,7 @@ describe('toPostLatestModule', () => {
   it('leaves every sectionHeader field undefined when the field itself is unset (no faked default)', () => {
     const raw = makeRawPostLatestModule({ sectionHeader: null });
 
-    const module = toPostLatestModule(raw, rawPosts);
+    const module = toPostLatestModule(raw, rawPosts, tenant);
 
     expect(module.sectionHeader).toEqual({
       heading: undefined,
@@ -53,7 +55,7 @@ describe('toPostLatestModule', () => {
       },
     });
 
-    const module = toPostLatestModule(raw, rawPosts);
+    const module = toPostLatestModule(raw, rawPosts, tenant);
 
     expect(module.sectionHeader.align).toBe(HEADING_ALIGN.RIGHT);
   });
@@ -69,7 +71,7 @@ describe('toPostLatestModule', () => {
       },
     });
 
-    const module = toPostLatestModule(raw, rawPosts);
+    const module = toPostLatestModule(raw, rawPosts, tenant);
 
     expect(module.layout).toEqual({
       spacingTop: 'MD',
@@ -83,7 +85,7 @@ describe('toPostLatestModule', () => {
   it('leaves layout undefined when the field is unset (no faked default)', () => {
     const raw = makeRawPostLatestModule({ layout: null });
 
-    const module = toPostLatestModule(raw, rawPosts);
+    const module = toPostLatestModule(raw, rawPosts, tenant);
 
     expect(module.layout).toBeUndefined();
   });
@@ -91,7 +93,11 @@ describe('toPostLatestModule', () => {
   it('maps posts through toPostCard', () => {
     const raw = makeRawPostLatestModule();
 
-    const module = toPostLatestModule(raw, [makeRawPostCard({ _id: 'a' })]);
+    const module = toPostLatestModule(
+      raw,
+      [makeRawPostCard({ _id: 'a' })],
+      tenant,
+    );
 
     expect(module.posts.map((p) => p.id)).toEqual(['a']);
   });
@@ -99,7 +105,7 @@ describe('toPostLatestModule', () => {
   it('returns an empty posts array when nothing resolves', () => {
     const raw = makeRawPostLatestModule();
 
-    const module = toPostLatestModule(raw, rawPosts);
+    const module = toPostLatestModule(raw, rawPosts, tenant);
 
     expect(module.posts).toEqual([]);
   });

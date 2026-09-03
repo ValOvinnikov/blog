@@ -11,7 +11,6 @@ const {
   signInMock,
   dispatchProvisioningWorkflowMock,
   getUserByEmailMock,
-  getTenantBySlugMock,
   getTenantByDomainMock,
   createTenantDraftMock,
   beginTenantProvisioningMock,
@@ -26,7 +25,6 @@ const {
   signInMock: vi.fn(),
   dispatchProvisioningWorkflowMock: vi.fn(),
   getUserByEmailMock: vi.fn(),
-  getTenantBySlugMock: vi.fn(),
   getTenantByDomainMock: vi.fn(),
   createTenantDraftMock: vi.fn(),
   beginTenantProvisioningMock: vi.fn(),
@@ -67,7 +65,6 @@ vi.mock('@blog/db', async () => ({
   queries: {
     users: { getUserByEmail: getUserByEmailMock },
     tenants: {
-      getTenantBySlug: getTenantBySlugMock,
       createTenantDraft: createTenantDraftMock,
       beginTenantProvisioning: beginTenantProvisioningMock,
       setTenantProvisioningStatus: setTenantProvisioningStatusMock,
@@ -79,7 +76,6 @@ vi.mock('@blog/db', async () => ({
 
 const validInput = {
   name: 'Acme',
-  slug: 'acme',
   domain: 'acme.example.com',
   plan: 'FREE' as const,
   ownerEmail: 'owner@example.com',
@@ -112,8 +108,6 @@ describe('createTenantAction', () => {
       id: 'user-1',
       email: 'owner@example.com',
     });
-    getTenantBySlugMock.mockReset();
-    getTenantBySlugMock.mockResolvedValue(undefined);
     getTenantByDomainMock.mockReset();
     getTenantByDomainMock.mockResolvedValue(undefined);
     checkDomainAvailabilityMock.mockReset();
@@ -130,17 +124,17 @@ describe('createTenantAction', () => {
     vi.mocked(redirect).mockClear();
   });
 
-  it('returns field errors for an invalid slug without touching the database', async () => {
+  it('returns field errors for an invalid domain without touching the database', async () => {
     const { createTenantAction } = await import('./create-tenant-action');
 
     const result = await createTenantAction({
       ...validInput,
-      slug: 'Not A Slug!',
+      domain: 'not a domain',
     });
 
     expect(result).toEqual({
       ok: false,
-      fieldErrors: { slug: expect.any(String) },
+      fieldErrors: { domain: expect.any(String) },
     });
     expect(getUserByEmailMock).not.toHaveBeenCalled();
     expect(createTenantDraftMock).not.toHaveBeenCalled();
@@ -221,7 +215,6 @@ describe('createTenantAction', () => {
 
     expect(createTenantDraftMock).toHaveBeenCalledWith({
       name: 'Acme',
-      slug: 'acme',
       domain: 'acme.example.com',
       locale: 'EN',
       plan: 'FREE',
@@ -290,31 +283,6 @@ describe('createTenantAction', () => {
     );
 
     expect(signInMock).not.toHaveBeenCalled();
-  });
-
-  it('returns a field error when the slug is already taken', async () => {
-    getTenantBySlugMock.mockResolvedValue({ id: 'existing-tenant' });
-    const { createTenantAction } = await import('./create-tenant-action');
-
-    const result = await createTenantAction(validInput);
-
-    expect(result).toEqual({
-      ok: false,
-      fieldErrors: { slug: expect.any(String) },
-    });
-    expect(createTenantDraftMock).not.toHaveBeenCalled();
-  });
-
-  it('checks slug availability including archived tenants, so a deprovisioned slug stays reserved', async () => {
-    const { createTenantAction } = await import('./create-tenant-action');
-
-    // Succeeds and redirects (NEXT_REDIRECT) — only the pre-redirect call
-    // args to getTenantBySlug matter here.
-    await createTenantAction(validInput).catch(() => undefined);
-
-    expect(getTenantBySlugMock).toHaveBeenCalledWith('acme', {
-      includeArchived: true,
-    });
   });
 
   it('returns a field error when the domain is already taken', async () => {
@@ -387,27 +355,8 @@ describe('createTenantAction', () => {
     expect(redirect).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'tenants.create_draft_failed',
-      expect.objectContaining({ slug: 'acme' }),
+      expect.objectContaining({ domain: 'acme.example.com' }),
     );
-  });
-
-  it('returns a slug field error and logs nothing when createTenantDraft reports DB_DUPLICATE_SLUG', async () => {
-    createTenantDraftMock.mockResolvedValue({
-      ok: false,
-      error: 'DB_DUPLICATE_SLUG',
-    });
-    const { createTenantAction } = await import('./create-tenant-action');
-
-    const result = await createTenantAction(validInput);
-
-    expect(result).toEqual({
-      ok: false,
-      fieldErrors: { slug: expect.any(String) },
-    });
-    expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
-    expect(redirect).not.toHaveBeenCalled();
-    expect(loggerWarnMock).not.toHaveBeenCalled();
-    expect(loggerErrorMock).not.toHaveBeenCalled();
   });
 
   it('returns a generic error and logs at error level when createTenantDraft reports any other typed failure', async () => {
@@ -424,12 +373,15 @@ describe('createTenantAction', () => {
     expect(redirect).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'tenants.create_draft_failed',
-      expect.objectContaining({ slug: 'acme', error: 'DB_NOT_FOUND' }),
+      expect.objectContaining({
+        domain: 'acme.example.com',
+        error: 'DB_NOT_FOUND',
+      }),
     );
     expect(loggerWarnMock).not.toHaveBeenCalled();
   });
 
-  it('creates the tenant draft with the resolved owner id and platform default locale', async () => {
+  it('creates the tenant draft with the resolved owner id and the platform default locale', async () => {
     const { createTenantAction } = await import('./create-tenant-action');
 
     await expect(createTenantAction(validInput)).rejects.toThrow(
@@ -438,7 +390,6 @@ describe('createTenantAction', () => {
 
     expect(createTenantDraftMock).toHaveBeenCalledWith({
       name: 'Acme',
-      slug: 'acme',
       domain: 'acme.example.com',
       locale: 'EN',
       plan: 'FREE',
@@ -513,7 +464,6 @@ describe('createTenantAction', () => {
       targetId: 'tenant-1',
       details: {
         name: 'Acme',
-        slug: 'acme',
         domain: 'acme.example.com',
         plan: 'FREE',
         ownerEmail: 'owner@example.com',

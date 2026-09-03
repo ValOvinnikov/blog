@@ -1,5 +1,5 @@
 import type { ILocalizedParams } from '@blog/config';
-import { service } from '@blog/service';
+import { getPlatformSanityContext, service } from '@blog/service';
 import { GenericPage } from '@web/components/pages/generic-page';
 import { buildGenericPageMetadata } from '@web/metadata/generic-page-metadata';
 import { logger } from '@web/utils/logger/logger';
@@ -14,7 +14,9 @@ type TProps = {
 // uncaught throw here would crash the entire `next build`. `dynamicParams`
 // stays default `true`, so a missed build-time slug still renders on demand.
 export async function generateStaticParams() {
-  const result = await service.pages.generic.v1.getPageSlugs();
+  const result = await service.pages.generic.v1.getPageSlugs(
+    getPlatformSanityContext(),
+  );
 
   if (!result.ok) {
     logger.error('generic_page.slugs_fetch_failed', { error: result.error });

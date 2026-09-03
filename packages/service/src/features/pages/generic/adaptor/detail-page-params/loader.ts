@@ -7,10 +7,10 @@ import {
 import { genericPageParamsQuery } from './query';
 
 export async function getPageSlugs(
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<{ slug: string }[]> {
   return runQuery(genericPageParamsQuery, {
     tenant,
-    ...isr('page_generic', tenant?.projectId),
+    ...isr('page_generic', tenant.projectId),
   });
 }

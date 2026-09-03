@@ -5,7 +5,7 @@ import { safeAsync } from '@blog/utils';
 export function createNavigationService() {
   return {
     v1: {
-      getNavigation: safeAsync((tenant?: TTenantSanityContext) =>
+      getNavigation: safeAsync((tenant: TTenantSanityContext) =>
         getNavigation(tenant),
       ),
     },

@@ -11,9 +11,9 @@ export type TLookPageContentProps = {
 };
 
 /**
- * The Look tab's data-fetch + render, shared by `/tenants/[tenantId]/look` and
- * the slug-free `/dashboard/look` — both resolve a `TTenant` however fits
- * their own routing (URL param vs. session membership) and hand it here.
+ * The Look tab's data-fetch + render, shared by `/tenants/[tenantId]/look`
+ * and `/dashboard/look` — both resolve a `TTenant` however fits their own
+ * routing (URL param vs. session membership) and hand it here.
  */
 export const LookPageContent = async ({ tenant }: TLookPageContentProps) => {
   const siteConfig = await queries.siteConfig.getSiteConfig(tenant.id);
@@ -24,7 +24,9 @@ export const LookPageContent = async ({ tenant }: TLookPageContentProps) => {
 
   return (
     <LookForm
-      tenantSlug={tenant.slug}
+      tenantId={tenant.id}
+      tenantName={tenant.name}
+      primaryDomain={tenant.primaryDomain}
       initialValues={initialValues}
       archivedAt={tenant.deprovisionedAt ?? undefined}
     />

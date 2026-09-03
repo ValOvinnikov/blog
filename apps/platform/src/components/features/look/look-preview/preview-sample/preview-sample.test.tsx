@@ -6,7 +6,7 @@ import { PreviewSample } from './preview-sample';
 const render = renderWithIntl;
 
 const BASE_PROPS = {
-  tenantSlug: 'acme',
+  tenantName: 'Acme Inc.',
   tokenStyle: {
     '--brand-primary': 'oklch(0.53 0.17 250)',
   } as CSSProperties,
@@ -17,10 +17,10 @@ const BASE_PROPS = {
 };
 
 describe(PreviewSample, () => {
-  it('renders the tenant slug and a @blog/ui Button primitive', () => {
+  it('renders the tenant name and a @blog/ui Button primitive', () => {
     render(<PreviewSample {...BASE_PROPS} />);
 
-    expect(screen.getAllByText('acme').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Acme Inc.').length).toBeGreaterThan(0);
     expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
   });
 

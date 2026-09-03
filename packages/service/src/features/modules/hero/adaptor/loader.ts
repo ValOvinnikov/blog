@@ -17,7 +17,7 @@ import type { THeroModule } from './types';
 // contract, `sanity/query.ts`).
 export async function getHero(
   id: string,
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<THeroModule> {
   const [raw, rawFallbackPost] = await Promise.all([
     runQuery(heroModuleQuery, {
@@ -34,14 +34,14 @@ export async function getHero(
           'page_generic',
           'page_blog',
         ],
-        tenant?.projectId,
+        tenant.projectId,
       ),
     }),
     runQuery(heroFallbackFeaturedPostQuery, {
       tenant,
-      ...isr(['posts', 'author', 'topic'], tenant?.projectId),
+      ...isr(['posts', 'author', 'topic'], tenant.projectId),
     }),
   ]);
 
-  return toHeroModule(raw, rawFallbackPost);
+  return toHeroModule(raw, rawFallbackPost, tenant);
 }

@@ -17,7 +17,7 @@ export async function getRelatedPosts(
   currentId: string,
   tagIds: string[],
   topicId: string | undefined,
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<TPostCard[]> {
   // Both queries project `postCardFragment`, which derefs `author`/`topic`
   // — both tags must ride alongside `posts` (tag-scope contract,
@@ -29,17 +29,17 @@ export async function getRelatedPosts(
       ? runQuery(relatedByTagsQuery, {
           parameters: { currentId, tagIds },
           tenant,
-          ...isr(['posts', 'author', 'topic', 'tag'], tenant?.projectId),
+          ...isr(['posts', 'author', 'topic', 'tag'], tenant.projectId),
         })
       : Promise.resolve([]),
     topicId
       ? runQuery(relatedByTopicQuery, {
           parameters: { currentId, topicId },
           tenant,
-          ...isr(['posts', 'author', 'topic'], tenant?.projectId),
+          ...isr(['posts', 'author', 'topic'], tenant.projectId),
         })
       : Promise.resolve([]),
   ]);
 
-  return toRelatedPosts(byTags, byTopic, tagIds);
+  return toRelatedPosts(byTags, byTopic, tagIds, tenant);
 }

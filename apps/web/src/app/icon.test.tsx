@@ -5,7 +5,11 @@
 // server-var access when `typeof window !== 'undefined'` (`@t3-oss/env-core`'s
 // client/server guard) — the default jsdom environment defines `window`, so
 // this file overrides to `node` to let that real transform run unmocked.
-import { buildImageUrl, type TRawImage } from '@blog/service';
+import {
+  buildImageUrl,
+  type TRawImage,
+  type TTenantSanityContext,
+} from '@blog/service';
 
 const { getSiteSettingsMock, getHostTenantSanityContextMock } = vi.hoisted(
   () => ({
@@ -40,11 +44,17 @@ const logoAsset: TRawImage = {
 const brand = { logoAsset };
 const FALLBACK_CONTENT = '.l1{fill:#2E6BD6}';
 
+const DEFAULT_TENANT: TTenantSanityContext = {
+  projectId: 'tenant-project',
+  dataset: 'tenant-dataset',
+  token: 'tenant-token',
+};
+
 // Computed via the real (unmocked) `buildImageUrl`/`urlForImage` transform,
 // the same one `icon.tsx` must call — asserting against this, rather than a
-// hand-typed string, is what would catch a regression back to
-// double-transforming an already-built URL (the bug this test exists for).
-const EXPECTED_ICON_URL = buildImageUrl(logoAsset, {
+// hand-typed string, is what would catch a regression back to building the
+// URL against the wrong (e.g. platform) tenant project/dataset.
+const EXPECTED_ICON_URL = buildImageUrl(logoAsset, DEFAULT_TENANT, {
   width: 64,
   height: 64,
   fit: 'crop',
@@ -56,7 +66,7 @@ describe('icon', () => {
     getHostTenantSanityContextMock.mockReset();
     getHostTenantSanityContextMock.mockResolvedValue({
       isResolvable: true,
-      tenant: undefined,
+      tenant: DEFAULT_TENANT,
     });
   });
 
@@ -66,7 +76,7 @@ describe('icon', () => {
 
   it('builds a real crop URL directly from the raw asset reference and fetches it', async () => {
     expect(EXPECTED_ICON_URL).toMatch(
-      /^https:\/\/cdn\.sanity\.io\/images\/test-project\/test-dataset\/.+\?.*w=64.*h=64.*fit=crop/,
+      /^https:\/\/cdn\.sanity\.io\/images\/tenant-project\/tenant-dataset\/.+\?.*w=64.*h=64.*fit=crop/,
     );
 
     getSiteSettingsMock.mockResolvedValue({ ok: true, data: { brand } });

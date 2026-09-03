@@ -12,6 +12,12 @@ const { mockFetch, getClientMock } = vi.hoisted(() => {
 
 vi.mock('./client', () => ({ getClient: getClientMock }));
 
+const testTenant = {
+  projectId: 'tenant-a',
+  dataset: 'production',
+  token: 'tok',
+};
+
 /**
  * `.notNull()` fragment fields on a `slice(0)` query make groqd's
  * `builder.parse()` throw — not resolve `null` — when Sanity genuinely
@@ -32,19 +38,21 @@ describe(runQuery, () => {
       .project((sub) => ({ title: sub.field('title').notNull() }));
 
     await expect(
-      runQuery(query, { parameters: { slug: 'nonexistent' } }),
+      runQuery(query, {
+        parameters: { slug: 'nonexistent' },
+        tenant: testTenant,
+      }),
     ).rejects.toThrow();
   });
 });
 
 describe(isr, () => {
-  it('leaves tags unprefixed with no project id', () => {
-    expect(isr(['posts', 'author'])).toEqual({
-      next: { revalidate: 3600, tags: ['posts', 'author'] },
-    });
+  it('rejects a call site that omits the project id at compile time', () => {
+    // @ts-expect-error -- `scopeProjectId` is required; there is no unscoped form that silently shares a cache tag across tenants.
+    isr(['posts', 'author']);
   });
 
-  it('prefixes every tag with t:<projectId>: when a project id is given', () => {
+  it('prefixes every tag with t:<projectId>:', () => {
     expect(isr(['posts', 'author'], 'tenant-a')).toEqual({
       next: {
         revalidate: 3600,
@@ -61,16 +69,18 @@ describe(isr, () => {
 });
 
 describe('runQuery tenant threading', () => {
+  it('rejects a call site that omits tenant context at compile time', async () => {
+    const query = q.star.filterByType('blog_post').slice(0);
+
+    // @ts-expect-error -- `tenant` is required on `runQuery`'s options; there is no form that silently reads the platform's project.
+    await runQuery(query, {}).catch(() => {});
+  });
+
   it('passes the tenant context through to getClient', async () => {
     mockFetch.mockResolvedValue(null);
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     const query = q.star.filterByType('blog_post').slice(0);
-    await runQuery(query, { tenant }).catch(() => {
+    await runQuery(query, { tenant: testTenant }).catch(() => {
       // The slice(0)+notNull edge case from the test above doesn't apply
       // here (no .notNull() fragment); a null fetch resolves to null, not a
       // throw, for this unprojected query — this test only cares that
@@ -78,6 +88,6 @@ describe('runQuery tenant threading', () => {
       // with the tenant argument, not with the query's result shape.
     });
 
-    expect(getClientMock).toHaveBeenCalledWith(tenant);
+    expect(getClientMock).toHaveBeenCalledWith(testTenant);
   });
 });

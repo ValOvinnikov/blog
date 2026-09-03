@@ -1,4 +1,5 @@
 import { SIZE } from '@blog/config';
+import { HEADING_LEVELS } from '@blog/ui/lib/react';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -17,6 +18,10 @@ const meta: Meta<typeof Heading> = {
     size: {
       control: 'select',
       options: objectKeys(headingVariants.variants.size),
+    },
+    level: {
+      control: 'select',
+      options: HEADING_LEVELS,
     },
   },
 };

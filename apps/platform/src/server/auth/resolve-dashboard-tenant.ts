@@ -18,11 +18,10 @@ export type TDashboardTenantContext = {
 };
 
 /**
- * The slug-free `/dashboard` tree's tenant gate — resolves "which tenant"
- * from the session's own `memberships` instead of a URL param. Several
- * memberships require the "active tenant" cookie rather than guessing one.
- * `cache()`-wrapped: a layout can't pass this down to its page, so a
- * route's layout and page would otherwise each resolve it separately.
+ * `/dashboard`'s tenant gate — resolves "which tenant" from the session's
+ * own `memberships` and the "active tenant" cookie instead of a URL
+ * segment. `cache()`-wrapped: a layout can't pass this down to its page, so
+ * a route's layout and page would otherwise each resolve it separately.
  */
 export const resolveDashboardTenant = cache(
   async (): Promise<TDashboardTenantContext> => {

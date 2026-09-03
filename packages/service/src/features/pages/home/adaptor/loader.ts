@@ -11,14 +11,14 @@ import { toHomePage } from './transformer';
 import type { THomePage } from './types';
 
 export async function getHomePage(
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<TMaybeUndefined<THomePage>> {
   const raw = await runQuery(homePageQuery, {
     tenant,
-    ...isr('homePage', tenant?.projectId),
+    ...isr('homePage', tenant.projectId),
   });
   if (!raw) return undefined;
 
   const settings = await getSiteSettings(tenant);
-  return toHomePage(raw, settings);
+  return toHomePage(raw, settings, tenant);
 }

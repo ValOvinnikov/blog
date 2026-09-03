@@ -1,5 +1,5 @@
 import { routes, type ILocalizedParams } from '@blog/config';
-import { service } from '@blog/service';
+import { getPlatformSanityContext, service } from '@blog/service';
 import { TagPage } from '@web/components/pages/tag-page';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { buildTagMetadata } from '@web/metadata/tag-metadata';
@@ -19,7 +19,9 @@ type TProps = {
 // on demand via ISR — correctness rides on the explicit range check in
 // `TagPage`, not on this list.
 export async function generateStaticParams() {
-  const result = await service.pages.tag.v1.getTagPaginationParams();
+  const result = await service.pages.tag.v1.getTagPaginationParams(
+    getPlatformSanityContext(),
+  );
 
   if (!result.ok) {
     logger.error('tag_pagination.params_fetch_failed', {

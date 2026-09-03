@@ -98,6 +98,30 @@ describe(addTenantDomain, () => {
     expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
     selectSpy.mockRestore();
   });
+
+  it.each([
+    ['a scheme-prefixed value', 'https://acme.com'],
+    ['a trailing-slash value', 'acme.com/'],
+    ['a whitespace-padded value', ' acme.com '],
+  ])(
+    'rejects %s for domain without writing a row',
+    async (_description, domain) => {
+      const { id: tenantId } = await insertTestTenant(db, {
+        slug: 'acme',
+        primaryDomain: 'acme.example.com',
+      });
+
+      const result = await addTenantDomain(tenantId, domain);
+
+      expect(result).toEqual({
+        ok: false,
+        error: ERROR_CODE.DB_INVALID_DOMAIN,
+      });
+
+      const rows = await db.select().from(schema.tenantDomains);
+      expect(rows).toHaveLength(0);
+    },
+  );
 });
 
 describe('foreign-key cascade', () => {

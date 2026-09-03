@@ -1,11 +1,12 @@
 // Sanity Management (HTTP) API — https://www.sanity.io/docs/http-reference/access-api.
 // Deleting a project also deletes its dataset(s), CORS entries, and any
 // robot tokens minted under it — nothing further to clean up separately.
-const SANITY_MANAGEMENT_API_BASE = 'https://api.sanity.io/v2021-06-07';
+export const SANITY_MANAGEMENT_API_BASE = 'https://api.sanity.io/v2021-06-07';
 
-// Robot-token management lives on a separate, newer Access API surface —
-// see https://www.sanity.io/docs/content-lake/http-auth — distinct from the
-// `v2021-06-07` base every other endpoint in this file uses.
+// This Access API surface (https://www.sanity.io/docs/content-lake/http-auth)
+// backs robot-token management below and the invite endpoints in
+// provision-tenant's scripts-side client — distinct from the `v2021-06-07`
+// base every other endpoint in this file uses.
 const SANITY_ACCESS_API_BASE = 'https://api.sanity.io/v2026-07-10';
 
 export type TSanityDeleteResult = {
@@ -149,7 +150,7 @@ export async function unarchiveSanityProject(input: {
   return { outcome: 'unarchived' };
 }
 
-async function sanityAccessRequest<T>(
+export async function sanityAccessRequest<T>(
   path: string,
   token: string,
   init: RequestInit = {},

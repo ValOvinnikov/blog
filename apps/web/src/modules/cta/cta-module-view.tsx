@@ -8,7 +8,6 @@ import { Section } from '@web/components/shared/section';
 
 export interface ICtaModuleViewProps extends TCtaModule {
   id: string;
-  baseUrl: string;
 }
 
 /**
@@ -30,7 +29,6 @@ export const CtaModuleView = ({
   actions,
   footnote,
   layout,
-  baseUrl,
 }: ICtaModuleViewProps) => {
   const titleId = `cta-${id}`;
   const { heading, supportingText, align } = sectionHeader;
@@ -54,7 +52,6 @@ export const CtaModuleView = ({
           image ? (
             <SanityImage
               image={image}
-              baseUrl={baseUrl}
               width={1200}
               sizes="(min-width: 1024px) 50vw, 100vw"
               loading="lazy"

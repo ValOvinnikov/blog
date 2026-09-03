@@ -4,6 +4,7 @@ import checkFile from 'eslint-plugin-check-file';
 import { booleanPropPrefixRule } from './boolean-prop-prefix.js';
 import { noVitestGlobalsImportPath } from './no-vitest-globals-import.js';
 import react from './react.js';
+import { textInputTextareaAccessibleNameRule } from './text-input-textarea-accessible-name.js';
 
 const contentLayerRestrictedGroup = {
   group: [
@@ -44,10 +45,17 @@ export default [
   {
     files: ['**/*.{ts,tsx}'],
     plugins: {
-      blog: { rules: { 'boolean-prop-prefix': booleanPropPrefixRule } },
+      blog: {
+        rules: {
+          'boolean-prop-prefix': booleanPropPrefixRule,
+          'text-input-textarea-accessible-name':
+            textInputTextareaAccessibleNameRule,
+        },
+      },
     },
     rules: {
       'blog/boolean-prop-prefix': 'error',
+      'blog/text-input-textarea-accessible-name': 'error',
       'func-style': ['error', 'expression', { allowArrowFunctions: true }],
       'no-restricted-imports': [
         'error',

@@ -9,11 +9,15 @@ const { revalidateTagMock, revalidatePathMock } = vi.hoisted(() => ({
   revalidatePathMock: vi.fn(),
 }));
 
-const { getTenantIdBySanityProjectIdMock, removeBookmarksForPostMock } =
-  vi.hoisted(() => ({
-    getTenantIdBySanityProjectIdMock: vi.fn(),
-    removeBookmarksForPostMock: vi.fn(),
-  }));
+const {
+  getTenantIdBySanityProjectIdMock,
+  getTenantByIdMock,
+  removeBookmarksForPostMock,
+} = vi.hoisted(() => ({
+  getTenantIdBySanityProjectIdMock: vi.fn(),
+  getTenantByIdMock: vi.fn(),
+  removeBookmarksForPostMock: vi.fn(),
+}));
 
 vi.mock('@sanity/webhook', () => ({
   isValidSignature: isValidSignatureMock,
@@ -33,6 +37,7 @@ vi.mock('@blog/db', () => ({
   queries: {
     tenants: {
       getTenantIdBySanityProjectId: getTenantIdBySanityProjectIdMock,
+      getTenantById: getTenantByIdMock,
     },
     bookmarks: {
       removeBookmarksForPost: removeBookmarksForPostMock,
@@ -75,6 +80,8 @@ describe('POST /api/revalidate', () => {
     revalidateTagMock.mockReset();
     revalidatePathMock.mockReset();
     getTenantIdBySanityProjectIdMock.mockReset();
+    getTenantByIdMock.mockReset();
+    getTenantByIdMock.mockResolvedValue({ id: 'tenant-uuid-1' });
     removeBookmarksForPostMock.mockReset();
     loggerErrorMock.mockReset();
   });
@@ -153,6 +160,43 @@ describe('POST /api/revalidate', () => {
       expect.stringMatching(/^t:/),
       expect.anything(),
     );
+  });
+
+  describe('archived tenant', () => {
+    it('ignores the event and revalidates nothing when the resolved tenant is archived', async () => {
+      isValidSignatureMock.mockResolvedValue(true);
+      getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-uuid-1');
+      getTenantByIdMock.mockResolvedValue(undefined);
+      const { POST } = await import('./route');
+
+      const request = makeRequest(
+        { _type: 'blog_post', _id: 'post-1' },
+        't=1,v=valid-signature',
+        { [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project' },
+      );
+      const response = await POST(request);
+      const json = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(json).toEqual({ message: 'Tenant is archived; event ignored.' });
+      expect(revalidateTagMock).not.toHaveBeenCalled();
+      expect(revalidatePathMock).not.toHaveBeenCalled();
+    });
+
+    it('still revalidates when no sanity-project-id is present at all', async () => {
+      isValidSignatureMock.mockResolvedValue(true);
+      const { POST } = await import('./route');
+
+      const request = makeRequest(
+        { _type: 'blog_post', _id: 'post-1' },
+        't=1,v=valid-signature',
+      );
+      const response = await POST(request);
+
+      expect(response.status).toBe(200);
+      expect(getTenantByIdMock).not.toHaveBeenCalled();
+      expect(revalidateTagMock).toHaveBeenCalledTimes(3);
+    });
   });
 
   it('returns 401 and revalidates nothing for an invalid signature', async () => {

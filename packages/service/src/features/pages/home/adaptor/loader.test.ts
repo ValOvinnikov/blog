@@ -1,6 +1,7 @@
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawHomePage } from '@blog/service/testing/pages/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getHomePage } from './loader';
 
@@ -15,13 +16,15 @@ vi.mock('@blog/service/sanity/image', () => ({
   ),
 }));
 
+const tenant = makeTenant();
+
 describe('getHomePage', () => {
   it('maps the thin page_home document to module refs', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawHomePage())
       .mockResolvedValueOnce(makeRawSiteSettings());
 
-    const page = await getHomePage();
+    const page = await getHomePage(tenant);
     if (!page) throw new Error('expected a home page');
 
     expect(page.title).toBe('Home Page');
@@ -44,7 +47,7 @@ describe('getHomePage', () => {
         }),
       );
 
-    const page = await getHomePage();
+    const page = await getHomePage(tenant);
     if (!page) throw new Error('expected a home page');
 
     expect(page.seo.title).toBe('My Blog');
@@ -61,7 +64,7 @@ describe('getHomePage', () => {
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
-    const page = await getHomePage();
+    const page = await getHomePage(tenant);
     if (!page) throw new Error('expected a home page');
 
     expect(page.seo.title).toBe('Home');
@@ -71,7 +74,7 @@ describe('getHomePage', () => {
   it('resolves undefined, rather than rejecting, when no page_home document exists', async () => {
     mockRun.mockResolvedValueOnce(null);
 
-    const page = await getHomePage();
+    const page = await getHomePage(tenant);
 
     expect(page).toBeUndefined();
   });
@@ -79,7 +82,7 @@ describe('getHomePage', () => {
   it('does not fetch site settings when no page_home document exists', async () => {
     mockRun.mockResolvedValueOnce(null);
 
-    await getHomePage();
+    await getHomePage(tenant);
 
     expect(mockRun).toHaveBeenCalledTimes(1);
   });
@@ -88,11 +91,6 @@ describe('getHomePage', () => {
     mockRun
       .mockResolvedValueOnce(makeRawHomePage())
       .mockResolvedValueOnce(makeRawSiteSettings());
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getHomePage(tenant);
 
@@ -111,25 +109,6 @@ describe('getHomePage', () => {
         tenant,
         next: expect.objectContaining({ tags: ['t:tenant-a:site-settings'] }),
       }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawHomePage())
-      .mockResolvedValueOnce(makeRawSiteSettings());
-
-    await getHomePage();
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
-    );
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
     );
   });
 });

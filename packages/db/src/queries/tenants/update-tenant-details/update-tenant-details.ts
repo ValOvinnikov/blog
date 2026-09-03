@@ -12,12 +12,12 @@ import { membershipInvites } from '@blog/db/schema/membership-invites';
 import { memberships } from '@blog/db/schema/memberships';
 import { tenantDomains } from '@blog/db/schema/tenant-domains';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
+import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import { and, eq, isNull, ne } from 'drizzle-orm';
 
 export type TUpdateTenantDetailsInput = {
   name: string;
-  slug: string;
   primaryDomain: string;
   plan: TTenantPlan;
   locale: string;
@@ -26,7 +26,6 @@ export type TUpdateTenantDetailsInput = {
 
 type TTenantDetailsFields = {
   name: string;
-  slug: string;
   primaryDomain: string;
   plan: TTenantPlan;
   locale: string;
@@ -39,7 +38,6 @@ function tenantDetailsFields(
 ): TTenantDetailsFields {
   return {
     name: source.name,
-    slug: source.slug,
     primaryDomain: source.primaryDomain,
     plan: source.plan,
     locale: source.locale,
@@ -48,9 +46,9 @@ function tenantDetailsFields(
 
 export type TUpdateTenantDetailsResult =
   | { outcome: 'updated'; tenant: TTenant }
-  | { outcome: 'slug-taken' }
   | { outcome: 'domain-taken' }
   | { outcome: 'domain-locked'; blockingStep: TTenantProvisioningStep }
+  | { outcome: 'domain-invalid' }
   | { outcome: 'provisioning-started' }
   | { outcome: 'owner-already-joined' }
   | { outcome: 'owner-email-taken' };
@@ -121,7 +119,7 @@ function deriveProvisioningState(
 }
 
 // Only primaryDomain (`MAP_DOMAIN`) gets baked into an external resource by
-// a completed step; name/slug/plan/locale never lock.
+// a completed step; name/plan/locale never lock.
 function lockedFieldOutcome(
   input: TUpdateTenantDetailsInput,
   existing: TTenant,
@@ -144,17 +142,22 @@ function lockedFieldOutcome(
   return undefined;
 }
 
-// Pre-checked rather than caught off the `slug_unique`/`tenant_domains.domain`
-// unique constraints: a typed outcome the caller can map straight onto a
-// field error, instead of an unhandled Postgres throw. First match wins:
-// provisioning-started (RUNNING/SUCCEEDED), then domain-locked (FAILED, only
-// when a completed MAP_DOMAIN already consumed it), then slug-taken, then
-// domain-taken, then (when `ownerEmail` is supplied) owner-already-joined /
+// Pre-checked rather than caught off the `tenant_domains.domain` unique
+// constraint: a typed outcome the caller can map straight onto a field
+// error, instead of an unhandled Postgres throw. First match wins:
+// domain-invalid (a malformed `primaryDomain`, checked before any read),
+// then provisioning-started (RUNNING/SUCCEEDED), then domain-locked (FAILED,
+// only when a completed MAP_DOMAIN already consumed it), then domain-taken,
+// then (when `ownerEmail` is supplied) owner-already-joined /
 // owner-email-taken.
 export async function updateTenantDetails(
   tenantId: string,
   input: TUpdateTenantDetailsInput,
 ): Promise<TUpdateTenantDetailsResult> {
+  if (!isValidDomain(input.primaryDomain)) {
+    return { outcome: 'domain-invalid' };
+  }
+
   const db = getDb();
 
   const [existing] = await db
@@ -184,15 +187,6 @@ export async function updateTenantDetails(
     }
   }
 
-  const [slugConflict] = await db
-    .select({ id: tenants.id })
-    .from(tenants)
-    .where(and(eq(tenants.slug, input.slug), ne(tenants.id, tenantId)));
-
-  if (slugConflict) {
-    return { outcome: 'slug-taken' };
-  }
-
   if (input.primaryDomain !== existing.primaryDomain) {
     const [domainConflict] = await db
       .select({ id: tenantDomains.id })
@@ -209,7 +203,7 @@ export async function updateTenantDetails(
   // provisioning state, an invited owner can already have signed in and
   // been consumed into a real `memberships` row (see
   // `consumeMembershipInvite`/`getTenantOwnerEmail`). A submitted email that
-  // matches the current owner (e.g. an unrelated name/slug edit resubmitting
+  // matches the current owner (e.g. an unrelated name edit resubmitting
   // the same value) is a no-op for this concern; only a genuine change is
   // treated as an ownership-transfer attempt and, once a real owner has
   // joined, refused as a distinct outcome instead of silently reassigning it.

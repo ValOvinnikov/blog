@@ -1,5 +1,6 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getRelatedPosts } from './loader';
 
@@ -7,6 +8,8 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
   runQuery: vi.fn(),
 }));
+
+const tenant = makeTenant();
 
 describe(getRelatedPosts, () => {
   it('queries by shared tags and the primary topic, then ranks the results', async () => {
@@ -19,7 +22,12 @@ describe(getRelatedPosts, () => {
       ])
       .mockResolvedValueOnce([makeRawPostCard({ _id: 'topic-match' })]);
 
-    const result = await getRelatedPosts('current-id', ['tag-a'], 'topic-1');
+    const result = await getRelatedPosts(
+      'current-id',
+      ['tag-a'],
+      'topic-1',
+      tenant,
+    );
 
     expect(result.map((post) => post.id)).toEqual(['tag-match', 'topic-match']);
     expect(mockRun).toHaveBeenNthCalledWith(
@@ -41,7 +49,7 @@ describe(getRelatedPosts, () => {
   it('skips the shared-tags query entirely when the post has no tags', async () => {
     mockRun.mockResolvedValueOnce([makeRawPostCard({ _id: 'topic-match' })]);
 
-    const result = await getRelatedPosts('current-id', [], 'topic-1');
+    const result = await getRelatedPosts('current-id', [], 'topic-1', tenant);
 
     expect(result.map((post) => post.id)).toEqual(['topic-match']);
     expect(mockRun).toHaveBeenCalledTimes(1);
@@ -52,7 +60,12 @@ describe(getRelatedPosts, () => {
       { ...makeRawPostCard({ _id: 'tag-match' }), tagIds: [{ _id: 'tag-a' }] },
     ]);
 
-    const result = await getRelatedPosts('current-id', ['tag-a'], undefined);
+    const result = await getRelatedPosts(
+      'current-id',
+      ['tag-a'],
+      undefined,
+      tenant,
+    );
 
     expect(result.map((post) => post.id)).toEqual(['tag-match']);
     expect(mockRun).toHaveBeenCalledTimes(1);
@@ -61,43 +74,18 @@ describe(getRelatedPosts, () => {
   it('returns an empty array when nothing qualifies', async () => {
     mockRun.mockResolvedValueOnce([]).mockResolvedValueOnce([]);
 
-    const result = await getRelatedPosts('current-id', ['tag-a'], 'topic-1');
+    const result = await getRelatedPosts(
+      'current-id',
+      ['tag-a'],
+      'topic-1',
+      tenant,
+    );
 
     expect(result).toEqual([]);
   });
 
-  it('tags both queries with author/topic alongside posts, plus tag on the byTags query only', async () => {
-    mockRun.mockResolvedValueOnce([]).mockResolvedValueOnce([]);
-
-    await getRelatedPosts('current-id', ['tag-a'], 'topic-1');
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({
-        next: expect.objectContaining({
-          tags: ['posts', 'author', 'topic', 'tag'],
-        }),
-      }),
-    );
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({
-        next: expect.objectContaining({
-          tags: ['posts', 'author', 'topic'],
-        }),
-      }),
-    );
-  });
-
   it('threads tenant context into both queries and scopes their tags to it', async () => {
     mockRun.mockResolvedValueOnce([]).mockResolvedValueOnce([]);
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getRelatedPosts('current-id', ['tag-a'], 'topic-1', tenant);
 
@@ -125,23 +113,6 @@ describe(getRelatedPosts, () => {
           tags: ['t:tenant-a:posts', 't:tenant-a:author', 't:tenant-a:topic'],
         }),
       }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun.mockResolvedValueOnce([]).mockResolvedValueOnce([]);
-
-    await getRelatedPosts('current-id', ['tag-a'], 'topic-1');
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
-    );
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
     );
   });
 });

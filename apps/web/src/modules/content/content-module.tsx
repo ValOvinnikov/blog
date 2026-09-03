@@ -18,11 +18,14 @@ export const ContentModule = async ({ id }: IContentModuleProps) => {
 
   if (!result.ok) return null;
 
+  // `body` is fetched unprojected, so its embedded `bodyImage` blocks arrive
+  // as raw asset references rather than already-resolved `ISanityImage`
+  // values — `PortableTextRenderer` still needs a separate origin for them.
   return (
     <ContentModuleView
       id={id}
       {...result.data}
-      baseUrl={getSanityImageBaseUrl()}
+      baseUrl={getSanityImageBaseUrl(tenant)}
     />
   );
 };

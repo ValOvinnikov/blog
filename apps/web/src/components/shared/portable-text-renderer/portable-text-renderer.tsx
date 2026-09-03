@@ -31,7 +31,13 @@ import { portableTextRendererVariants } from './portable-text-renderer-variants'
 
 export interface IPortableTextRendererProps {
   value: TPortableText;
-  /** Sanity CDN origin for the `sanity-image` package, sourced from `@blog/service`'s `getSanityImageBaseUrl`. */
+  /**
+   * CDN origin for images embedded in the body. Body content is fetched
+   * unprojected, so a `bodyImage` block carries only a bare asset
+   * reference rather than an already-resolved `ISanityImage` — unlike a
+   * view-model image, it can't carry its own origin, so the caller
+   * supplies one.
+   */
   baseUrl: string;
   /**
    * The precomputed `extractPostHeadings(value)` outline; when passed, each
@@ -119,14 +125,13 @@ export const PortableTextRenderer = ({
   asideKindLabels,
 }: IPortableTextRendererProps) => {
   const renderBodyImage = (imageValue: BodyImage) => {
-    const image = toPortableTextImage(imageValue);
+    const image = toPortableTextImage(imageValue, baseUrl);
     if (!image) return null;
 
     return (
       <ImageWithCaption layout={imageValue.layout}>
         <SanityImage
           image={image}
-          baseUrl={baseUrl}
           width={1200}
           sizes="(min-width: 1024px) 800px, 100vw"
           loading="lazy"

@@ -5,8 +5,8 @@ import {
   type TTenantSanityContext,
 } from '@blog/service';
 import { getHostTenantSanityContext } from '@web/server/tenant/get-host-tenant-sanity-context';
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { buildRssFeed, type TRssItem } from '@web/utils/build-rss-feed';
-import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 import { NextResponse } from 'next/server';
@@ -37,7 +37,7 @@ const toRssItem = (post: TFeedPost, siteUrl: string): TRssItem => {
  */
 const getAllTagPosts = async (
   slug: string,
-  tenant: TTenantSanityContext | undefined,
+  tenant: TTenantSanityContext,
 ): Promise<TTagFeed | null> => {
   const tagResult = await service.pages.tag.v1.getTagPage(slug, tenant);
   if (!tagResult.ok) {
@@ -81,7 +81,7 @@ export async function GET(
   { params }: TProps,
 ): Promise<Response> {
   const { slug } = await params;
-  const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
+  const siteUrl = (await getTenantBaseUrl()) ?? '';
 
   const hostTenant = await getHostTenantSanityContext();
   if (!hostTenant.isResolvable) {

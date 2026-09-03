@@ -92,6 +92,11 @@ jobs:
       WEB_APP_URL: ${{ vars.WEB_APP_URL }}
       SANITY_REVALIDATE_SECRET: ${{ secrets.SANITY_REVALIDATE_SECRET }}
       TENANT_TOKEN_ENCRYPTION_KEY: ${{ secrets.TENANT_TOKEN_ENCRYPTION_KEY }}
+      # Optional — same shared secret name apps/web/apps/platform and
+      # recheck-tenant-owners.yml already use for their own Resend sends.
+      # Unset means this run still completes; only the post-provisioning
+      # operator-notification email is skipped.
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       # The dispatched environment (`development`/`production`), surfaced on
       # apps/platform's provisioning page as the run's "Registry" — the one
       # of these four run-metadata values Actions doesn't already set as a

@@ -24,7 +24,7 @@ import {
 import { brandAssetFieldVariants } from './brand-asset-field-variants';
 
 export type TBrandAssetFieldProps = {
-  tenantSlug: string;
+  tenantId: string;
   kind: TBrandAssetKind;
   label: string;
   hint: string;
@@ -42,7 +42,7 @@ export type TBrandAssetFieldProps = {
  * value (and its thumbnail) stays displayed.
  */
 export const BrandAssetField = ({
-  tenantSlug,
+  tenantId,
   kind,
   label,
   hint,
@@ -85,7 +85,7 @@ export const BrandAssetField = ({
 
     startTransition(async () => {
       try {
-        const result = await uploadBrandAssetAction(tenantSlug, kind, formData);
+        const result = await uploadBrandAssetAction(tenantId, kind, formData);
         if (result.ok) {
           onChange(result.url);
         } else {
@@ -108,7 +108,7 @@ export const BrandAssetField = ({
     setError(undefined);
     startTransition(async () => {
       try {
-        const result = await clearBrandAssetAction(tenantSlug, kind);
+        const result = await clearBrandAssetAction(tenantId, kind);
         if (result.ok) {
           onChange(undefined);
         } else {

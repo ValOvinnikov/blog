@@ -3,12 +3,14 @@ import { getBookmarkStatus, setBookmarkStatus } from './bookmark-actions';
 const {
   authMock,
   getRequestTenantIdMock,
+  isTenantActiveMock,
   isBookmarkedMock,
   addBookmarkMock,
   removeBookmarkMock,
 } = vi.hoisted(() => ({
   authMock: vi.fn(),
   getRequestTenantIdMock: vi.fn(),
+  isTenantActiveMock: vi.fn(),
   isBookmarkedMock: vi.fn(),
   addBookmarkMock: vi.fn(),
   removeBookmarkMock: vi.fn(),
@@ -18,6 +20,10 @@ vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
 vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
   getRequestTenantId: getRequestTenantIdMock,
+}));
+
+vi.mock('@web/server/tenant/is-tenant-active', () => ({
+  isTenantActive: isTenantActiveMock,
 }));
 
 vi.mock('@blog/db', () => ({
@@ -73,6 +79,8 @@ describe('setBookmarkStatus', () => {
     authMock.mockReset();
     getRequestTenantIdMock.mockReset();
     getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
+    isTenantActiveMock.mockReset();
+    isTenantActiveMock.mockResolvedValue(true);
     addBookmarkMock.mockReset();
     removeBookmarkMock.mockReset();
   });
@@ -90,6 +98,17 @@ describe('setBookmarkStatus', () => {
   it('returns { ok: false } without writing when no tenant resolves', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getRequestTenantIdMock.mockResolvedValue(undefined);
+
+    await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
+      ok: false,
+    });
+    expect(addBookmarkMock).not.toHaveBeenCalled();
+    expect(removeBookmarkMock).not.toHaveBeenCalled();
+  });
+
+  it('returns { ok: false } without writing when the tenant is not ACTIVE', async () => {
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    isTenantActiveMock.mockResolvedValue(false);
 
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
       ok: false,

@@ -1,9 +1,11 @@
 export {};
 
-const { confirmSubscriberMock, resolveTenantIdMock } = vi.hoisted(() => ({
-  confirmSubscriberMock: vi.fn(),
-  resolveTenantIdMock: vi.fn(),
-}));
+const { confirmSubscriberMock, resolveTenantIdMock, isTenantActiveMock } =
+  vi.hoisted(() => ({
+    confirmSubscriberMock: vi.fn(),
+    resolveTenantIdMock: vi.fn(),
+    isTenantActiveMock: vi.fn(),
+  }));
 
 vi.mock('@blog/db', () => ({
   queries: { subscribers: { confirmSubscriber: confirmSubscriberMock } },
@@ -11,6 +13,10 @@ vi.mock('@blog/db', () => ({
 
 vi.mock('@web/server/tenant/resolve-tenant-id', () => ({
   resolveTenantId: resolveTenantIdMock,
+}));
+
+vi.mock('@web/server/tenant/is-tenant-active', () => ({
+  isTenantActive: isTenantActiveMock,
 }));
 
 const TENANT_ID = 'tenant-1';
@@ -29,6 +35,8 @@ describe('GET /api/newsletter/confirm', () => {
     confirmSubscriberMock.mockReset();
     resolveTenantIdMock.mockReset();
     resolveTenantIdMock.mockResolvedValue(TENANT_ID);
+    isTenantActiveMock.mockReset();
+    isTenantActiveMock.mockResolvedValue(true);
   });
 
   it('returns 400 without querying the db when no token is given', async () => {
@@ -104,6 +112,18 @@ describe('GET /api/newsletter/confirm', () => {
 
     expect(response.status).toBe(404);
     expect(html).toContain('Invalid confirmation link');
+  });
+
+  it('returns 403 without confirming when the resolved tenant is not ACTIVE', async () => {
+    isTenantActiveMock.mockResolvedValue(false);
+    const { GET } = await import('./route');
+
+    const response = await GET(
+      new Request('https://example.com/api/newsletter/confirm?token=token-abc'),
+    );
+
+    expect(response.status).toBe(403);
+    expect(confirmSubscriberMock).not.toHaveBeenCalled();
   });
 
   it('returns 500 without querying the db when no tenant resolves', async () => {

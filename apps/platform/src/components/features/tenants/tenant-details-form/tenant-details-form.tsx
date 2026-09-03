@@ -20,7 +20,6 @@ import { tenantDetailsFormVariants } from './tenant-details-form-variants';
 
 type TFormValues = {
   name: string;
-  slug: string;
   domain: string;
   plan: TTenantPlan;
   ownerEmail: string;
@@ -28,7 +27,6 @@ type TFormValues = {
 
 const INITIAL_VALUES: TFormValues = {
   name: '',
-  slug: '',
   domain: '',
   plan: TENANT_PLAN.FREE,
   ownerEmail: '',
@@ -126,15 +124,6 @@ export const TenantDetailsForm = () => {
                   error={fieldErrors.name}
                   value={values.name}
                   onChange={(value) => updateField('name', value)}
-                />
-
-                <FormTextInput
-                  label={t('slugLabel')}
-                  htmlFor="tenant-slug"
-                  hint={<span className={hint()}>{t('slugHint')}</span>}
-                  error={fieldErrors.slug}
-                  value={values.slug}
-                  onChange={(value) => updateField('slug', value)}
                 />
 
                 <FormTextInput

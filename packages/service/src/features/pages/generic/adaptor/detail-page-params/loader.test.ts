@@ -1,4 +1,5 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getPageSlugs } from './loader';
 
@@ -7,11 +8,13 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   runQuery: vi.fn(),
 }));
 
+const tenant = makeTenant();
+
 describe('getPageSlugs', () => {
   it('returns all page_generic slug entries', async () => {
     mockRun.mockResolvedValue([{ slug: 'about' }, { slug: 'contact' }]);
 
-    const params = await getPageSlugs();
+    const params = await getPageSlugs(tenant);
 
     expect(params).toEqual([{ slug: 'about' }, { slug: 'contact' }]);
   });
@@ -19,18 +22,13 @@ describe('getPageSlugs', () => {
   it('returns an empty array when no generic pages exist', async () => {
     mockRun.mockResolvedValue([]);
 
-    const params = await getPageSlugs();
+    const params = await getPageSlugs(tenant);
 
     expect(params).toEqual([]);
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     mockRun.mockResolvedValue([]);
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getPageSlugs(tenant);
 
@@ -39,20 +37,6 @@ describe('getPageSlugs', () => {
       expect.objectContaining({
         tenant,
         next: expect.objectContaining({ tags: ['t:tenant-a:page_generic'] }),
-      }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun.mockResolvedValue([]);
-
-    await getPageSlugs();
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant: undefined,
-        next: expect.objectContaining({ tags: ['page_generic'] }),
       }),
     );
   });

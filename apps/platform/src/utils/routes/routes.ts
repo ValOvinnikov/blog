@@ -15,6 +15,7 @@ export const adminRoutes = {
   tenants: (options?: { archived?: boolean }) =>
     options?.archived ? '/tenants?archived=1' : '/tenants',
   newTenant: () => '/tenants/new',
+  findings: () => '/findings',
   tenantOverview: (tenantId: string) => `/tenants/${tenantId}`,
   tenantProvisioning: (tenantId: string) => `/tenants/${tenantId}/provisioning`,
   tenantDanger: (tenantId: string) => `/tenants/${tenantId}/danger`,

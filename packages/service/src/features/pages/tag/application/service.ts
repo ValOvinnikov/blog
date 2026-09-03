@@ -7,13 +7,13 @@ import { safeAsync } from '@blog/utils';
 export function createTagService() {
   return {
     v1: {
-      getTagPage: safeAsync((slug: string, tenant?: TTenantSanityContext) =>
+      getTagPage: safeAsync((slug: string, tenant: TTenantSanityContext) =>
         getTagPage(slug, tenant),
       ),
-      getTagParams: safeAsync((tenant?: TTenantSanityContext) =>
+      getTagParams: safeAsync((tenant: TTenantSanityContext) =>
         getTagParams(tenant),
       ),
-      getTagPaginationParams: safeAsync((tenant?: TTenantSanityContext) =>
+      getTagPaginationParams: safeAsync((tenant: TTenantSanityContext) =>
         getTagPaginationParams(tenant),
       ),
     },

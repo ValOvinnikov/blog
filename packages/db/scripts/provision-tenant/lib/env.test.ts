@@ -18,6 +18,7 @@ const OPTIONAL_ENV_KEYS = [
   'GITHUB_SERVER_URL',
   'GITHUB_ACTOR',
   'TENANT_REGISTRY_ENVIRONMENT',
+  'RESEND_API_KEY',
 ];
 
 const originalEnv: Record<string, string | undefined> = {};
@@ -62,6 +63,7 @@ describe(loadProvisionEnv, () => {
       githubServerUrl: undefined,
       githubActor: undefined,
       tenantRegistryEnvironment: undefined,
+      resendApiKey: undefined,
     });
   });
 
@@ -72,6 +74,7 @@ describe(loadProvisionEnv, () => {
     process.env['GITHUB_SERVER_URL'] = 'https://github.com';
     process.env['GITHUB_ACTOR'] = 'octocat';
     process.env['TENANT_REGISTRY_ENVIRONMENT'] = 'production';
+    process.env['RESEND_API_KEY'] = 'resend-key';
 
     const env = loadProvisionEnv();
 
@@ -81,6 +84,7 @@ describe(loadProvisionEnv, () => {
     expect(env.githubServerUrl).toBe('https://github.com');
     expect(env.githubActor).toBe('octocat');
     expect(env.tenantRegistryEnvironment).toBe('production');
+    expect(env.resendApiKey).toBe('resend-key');
   });
 
   it.each(Object.keys(REQUIRED_ENV))(

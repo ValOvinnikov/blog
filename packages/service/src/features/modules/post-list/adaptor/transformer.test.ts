@@ -1,16 +1,18 @@
 import { BRAND_VARIANT, CONTAINER_WIDTH, HEADING_ALIGN } from '@blog/config';
 import { makeRawPostListModule } from '@blog/service/testing/modules/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { toPostListModule, type TRawPostListModulePosts } from './transformer';
 
 const rawPosts: TRawPostListModulePosts = [];
 const pagination = { currentPage: 1, totalPages: 1 };
+const tenant = makeTenant();
 
 describe('toPostListModule', () => {
   it('maps sectionHeader straight through', () => {
     const raw = makeRawPostListModule();
 
-    const module = toPostListModule(raw, rawPosts, pagination);
+    const module = toPostListModule(raw, rawPosts, pagination, tenant);
 
     expect(module.sectionHeader).toEqual({
       heading: 'Latest',
@@ -24,7 +26,7 @@ describe('toPostListModule', () => {
       brandVariant: BRAND_VARIANT.SECONDARY,
     });
 
-    const module = toPostListModule(raw, rawPosts, pagination);
+    const module = toPostListModule(raw, rawPosts, pagination, tenant);
 
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
@@ -32,7 +34,7 @@ describe('toPostListModule', () => {
   it('leaves every sectionHeader field undefined when the field itself is unset (no faked default)', () => {
     const raw = makeRawPostListModule({ sectionHeader: null });
 
-    const module = toPostListModule(raw, rawPosts, pagination);
+    const module = toPostListModule(raw, rawPosts, pagination, tenant);
 
     expect(module.sectionHeader).toEqual({
       heading: undefined,
@@ -50,7 +52,7 @@ describe('toPostListModule', () => {
       },
     });
 
-    const module = toPostListModule(raw, rawPosts, pagination);
+    const module = toPostListModule(raw, rawPosts, pagination, tenant);
 
     expect(module.sectionHeader.align).toBe(HEADING_ALIGN.RIGHT);
   });
@@ -66,7 +68,7 @@ describe('toPostListModule', () => {
       },
     });
 
-    const module = toPostListModule(raw, rawPosts, pagination);
+    const module = toPostListModule(raw, rawPosts, pagination, tenant);
 
     expect(module.layout).toEqual({
       spacingTop: 'MD',
@@ -80,7 +82,7 @@ describe('toPostListModule', () => {
   it('leaves layout undefined when the field is unset (no faked default)', () => {
     const raw = makeRawPostListModule({ layout: null });
 
-    const module = toPostListModule(raw, rawPosts, pagination);
+    const module = toPostListModule(raw, rawPosts, pagination, tenant);
 
     expect(module.layout).toBeUndefined();
   });
@@ -88,7 +90,7 @@ describe('toPostListModule', () => {
   it('maps posts through toPostCard', () => {
     const raw = makeRawPostListModule();
 
-    const module = toPostListModule(raw, rawPosts, pagination);
+    const module = toPostListModule(raw, rawPosts, pagination, tenant);
 
     expect(module.posts).toEqual([]);
   });
@@ -96,10 +98,15 @@ describe('toPostListModule', () => {
   it('maps currentPage/totalPages straight through', () => {
     const raw = makeRawPostListModule();
 
-    const module = toPostListModule(raw, rawPosts, {
-      currentPage: 2,
-      totalPages: 5,
-    });
+    const module = toPostListModule(
+      raw,
+      rawPosts,
+      {
+        currentPage: 2,
+        totalPages: 5,
+      },
+      tenant,
+    );
 
     expect(module.currentPage).toBe(2);
     expect(module.totalPages).toBe(5);

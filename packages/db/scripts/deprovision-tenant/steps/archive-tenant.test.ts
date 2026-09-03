@@ -25,6 +25,8 @@ const env: TDeprovisionEnv = {
   dryRun: false,
   githubActor: 'octocat',
   githubRunId: 'run-42',
+  webAppUrl: 'https://web.example.com',
+  siteConfigRevalidateSecret: 'shared-secret',
 };
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {

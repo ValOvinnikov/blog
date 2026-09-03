@@ -23,13 +23,13 @@ authoritative list — this is the subset you need to get `pnpm dev` running;
 the complete reference, including deploy/CI-only vars, is
 [`docs/context/environment-variables.md`](./environment-variables.md)):
 
-| Variable                        | Purpose                                  |
-| ------------------------------- | ---------------------------------------- |
-| `NEXT_PUBLIC_SANITY_PROJECT_ID` | Sanity project id                        |
-| `NEXT_PUBLIC_SANITY_DATASET`    | usually `production`                     |
-| `NEXT_PUBLIC_SITE_URL`          | canonical origin for SEO / sitemap / RSS |
-| `SANITY_API_READ_TOKEN`         | drafts / preview only                    |
-| `SANITY_REVALIDATE_SECRET`      | on-demand ISR webhook secret             |
+| Variable                        | Purpose                                                                                 |
+| ------------------------------- | --------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SANITY_PROJECT_ID` | Sanity project id                                                                       |
+| `NEXT_PUBLIC_SANITY_DATASET`    | usually `production`                                                                    |
+| `NEXT_PUBLIC_SITE_URL`          | fallback canonical origin for SEO / sitemap / RSS (a tenant's own `primaryDomain` wins) |
+| `SANITY_API_READ_TOKEN`         | drafts / preview only                                                                   |
+| `SANITY_REVALIDATE_SECRET`      | on-demand ISR webhook secret                                                            |
 
 Add `http://localhost:3000` (and your deployed origin) to the project's CORS
 origins at [manage.sanity.io](https://manage.sanity.io).

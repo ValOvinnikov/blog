@@ -146,7 +146,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     expect(screen.getByRole('button', { name: /globex/i })).toBeVisible();
   });
 
-  it('shows the Tenant nav destinations under slug-free /dashboard hrefs, without a Platform section', async () => {
+  it('shows the Tenant nav destinations under /dashboard hrefs, without a Platform section', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listMembershipsForUserMock.mockResolvedValue([membership1]);
     listTenantsByIdsMock.mockResolvedValue([tenant1]);

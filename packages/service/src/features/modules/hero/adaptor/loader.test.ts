@@ -1,6 +1,7 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawHeroModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getHero } from './loader';
 
@@ -8,6 +9,8 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
   runQuery: vi.fn(),
 }));
+
+const tenant = makeTenant();
 
 describe('getHero', () => {
   it('resolves the hero using the configured featured post', async () => {
@@ -19,7 +22,7 @@ describe('getHero', () => {
       )
       .mockResolvedValueOnce(null);
 
-    const hero = await getHero('hero-1');
+    const hero = await getHero('hero-1', tenant);
 
     expect(hero.title).toBe('Hello World');
     expect(hero.primaryAction?.href).toBe('/blog/hello-world');
@@ -28,54 +31,13 @@ describe('getHero', () => {
   it('propagates when the hero document is missing', async () => {
     mockRun.mockRejectedValueOnce(new Error('ValidationError'));
 
-    await expect(getHero('missing')).rejects.toThrow();
-  });
-
-  it('tags both queries with every document type their fragments dereference', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawHeroModule())
-      .mockResolvedValueOnce(null);
-
-    await getHero('hero-1');
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({
-        next: expect.objectContaining({
-          tags: [
-            'modules:hero',
-            'module:hero-1',
-            'posts',
-            'author',
-            'topic',
-            'post',
-            'page_generic',
-            'page_blog',
-          ],
-        }),
-      }),
-    );
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({
-        next: expect.objectContaining({
-          tags: ['posts', 'author', 'topic'],
-        }),
-      }),
-    );
+    await expect(getHero('missing', tenant)).rejects.toThrow();
   });
 
   it('threads tenant context into both queries and scopes their tags to it', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawHeroModule())
       .mockResolvedValueOnce(null);
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getHero('hero-1', tenant);
 
@@ -107,25 +69,6 @@ describe('getHero', () => {
           tags: ['t:tenant-a:posts', 't:tenant-a:author', 't:tenant-a:topic'],
         }),
       }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawHeroModule())
-      .mockResolvedValueOnce(null);
-
-    await getHero('hero-1');
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
-    );
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
     );
   });
 });

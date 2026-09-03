@@ -1,5 +1,6 @@
 import { BRAND_VARIANT, type RichText } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { ContentModule } from './content-module';
 
@@ -9,8 +10,8 @@ const { getContentMock, getTenantSanityContextMock } = vi.hoisted(() => ({
 }));
 
 vi.mock('@blog/service', () => ({
-  getSanityImageBaseUrl: () =>
-    'https://cdn.sanity.io/images/test-project/test-dataset/',
+  getSanityImageBaseUrl: (tenant: { projectId: string; dataset: string }) =>
+    `https://cdn.sanity.io/images/${tenant.projectId}/${tenant.dataset}/`,
   service: {
     modules: {
       content: { v1: { getContent: getContentMock } },
@@ -31,7 +32,7 @@ describe(ContentModule, () => {
   beforeEach(() => {
     getContentMock.mockReset();
     getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('forwards the resolved tenant Sanity context to getContent', async () => {
@@ -64,6 +65,11 @@ describe(ContentModule, () => {
   });
 
   it("resolves baseUrl via getSanityImageBaseUrl and forwards it into a rendered body image's src", async () => {
+    getTenantSanityContextMock.mockResolvedValue({
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    });
     const body: RichText = [
       {
         _type: 'bodyImage',
@@ -87,6 +93,6 @@ describe(ContentModule, () => {
     await setup();
 
     const img = screen.getByRole('img', { name: 'A scenic mountain range' });
-    expect(img.getAttribute('src')).toContain('test-project/test-dataset');
+    expect(img.getAttribute('src')).toContain('tenant-project/production');
   });
 });

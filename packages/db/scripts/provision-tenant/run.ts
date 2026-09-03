@@ -30,6 +30,7 @@ import { unarchiveSanityProject } from '@blog/db/utils/sanity-management-client/
 import { sanitizeLogMessage } from '@blog/insight';
 
 import { loadProvisionEnv, type TProvisionEnv } from './lib/env';
+import { notifyOwnerElevationOutcome } from './lib/notify-owner-elevation-outcome';
 import { recordProvisioningAuditEvent } from './lib/record-provisioning-audit-event';
 import { reportOwnerElevationOutcome } from './lib/report-owner-elevation-outcome';
 import {
@@ -90,8 +91,8 @@ export async function runSteps(
   env: TProvisionEnv,
 ): Promise<{ ok: boolean }> {
   // Reactivates a re-provisioned tenant's row before any step runs, so it
-  // stays deprovisionable and slug-resolvable once this run succeeds — see
-  // `reactivateTenant` for why a SUSPENDED tenant is left untouched.
+  // stays deprovisionable once this run succeeds — see `reactivateTenant`
+  // for why a SUSPENDED tenant is left untouched.
   const reactivateResult = await reactivateTenant(tenantId);
   if (!reactivateResult.ok) {
     console.error(
@@ -199,7 +200,16 @@ export async function runSteps(
   // outcomes, not failures.
   try {
     const outcome = await elevateTenantOwner(tenant, env);
-    await reportOwnerElevationOutcome(tenantId, outcome);
+    const notifiedOutcome = await notifyOwnerElevationOutcome({
+      tenant,
+      outcome,
+      resendApiKey: env.resendApiKey,
+    });
+    await reportOwnerElevationOutcome(
+      tenantId,
+      outcome,
+      ...(notifiedOutcome === undefined ? [] : [notifiedOutcome]),
+    );
 
     if (outcome === ELEVATE_TENANT_OWNER_OUTCOME.STALLED) {
       console.error(

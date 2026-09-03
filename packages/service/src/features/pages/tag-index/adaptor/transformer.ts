@@ -1,4 +1,5 @@
 import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
+import type { TImageTenant } from '@blog/service/sanity/image';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
 import type { InferResultType } from 'groqd';
 
@@ -13,6 +14,7 @@ export function toTagIndexPage(
   rawPage: TRawTagIndexPage,
   settings: TSiteSettings,
   taxonomyListId: string,
+  tenant: TImageTenant,
 ): TTagIndexPage {
   return {
     heading: rawPage.heading,
@@ -24,6 +26,7 @@ export function toTagIndexPage(
         description: settings.description,
         defaultOgImageUrl: settings.defaultOgImageUrl,
       },
+      tenant,
     ),
     taxonomyListId,
   };

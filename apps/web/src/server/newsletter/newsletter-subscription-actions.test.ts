@@ -7,6 +7,8 @@ const {
   sendEmailMock,
   clearNewsletterSubscribedCookieMock,
   getRequestTenantIdMock,
+  getTenantBaseUrlMock,
+  isTenantActiveMock,
 } = vi.hoisted(() => ({
   authMock: vi.fn(),
   unsubscribeMock: vi.fn(),
@@ -14,6 +16,8 @@ const {
   sendEmailMock: vi.fn(),
   clearNewsletterSubscribedCookieMock: vi.fn(),
   getRequestTenantIdMock: vi.fn(),
+  getTenantBaseUrlMock: vi.fn(),
+  isTenantActiveMock: vi.fn(),
 }));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
@@ -39,15 +43,20 @@ vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
   getRequestTenantId: getRequestTenantIdMock,
 }));
 
+vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
+  getTenantBaseUrl: getTenantBaseUrlMock,
+}));
+
+vi.mock('@web/server/tenant/is-tenant-active', () => ({
+  isTenantActive: isTenantActiveMock,
+}));
+
 const TENANT_ID = 'tenant-1';
 
 // The real `@t3-oss/env-nextjs` module throws when a server var is read
 // under jsdom — mock it the same way `newsletter-actions.test.ts` does.
 vi.mock('@web/utils/env/env', () => ({
-  env: {
-    NEWSLETTER_FROM_ADDRESS: undefined,
-    NEXT_PUBLIC_SITE_URL: 'https://example.com',
-  },
+  env: { NEWSLETTER_FROM_ADDRESS: undefined },
 }));
 
 const session = {
@@ -61,6 +70,8 @@ describe('unsubscribeAction', () => {
     clearNewsletterSubscribedCookieMock.mockReset();
     getRequestTenantIdMock.mockReset();
     getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
+    isTenantActiveMock.mockReset();
+    isTenantActiveMock.mockResolvedValue(true);
   });
 
   it('returns { ok: false } without unsubscribing when there is no session', async () => {
@@ -76,6 +87,17 @@ describe('unsubscribeAction', () => {
   it('returns { ok: false } without unsubscribing when no tenant resolves', async () => {
     authMock.mockResolvedValue(session);
     getRequestTenantIdMock.mockResolvedValue(undefined);
+    const { unsubscribeAction } =
+      await import('./newsletter-subscription-actions');
+
+    await expect(unsubscribeAction()).resolves.toEqual({ ok: false });
+    expect(unsubscribeMock).not.toHaveBeenCalled();
+    expect(clearNewsletterSubscribedCookieMock).not.toHaveBeenCalled();
+  });
+
+  it('returns { ok: false } without unsubscribing when the tenant is not ACTIVE', async () => {
+    authMock.mockResolvedValue(session);
+    isTenantActiveMock.mockResolvedValue(false);
     const { unsubscribeAction } =
       await import('./newsletter-subscription-actions');
 
@@ -134,6 +156,10 @@ describe('resendConfirmationAction', () => {
     sendEmailMock.mockReset();
     getRequestTenantIdMock.mockReset();
     getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
+    getTenantBaseUrlMock.mockReset();
+    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
+    isTenantActiveMock.mockReset();
+    isTenantActiveMock.mockResolvedValue(true);
   });
 
   it('returns { ok: false } without resending when there is no session', async () => {
@@ -158,6 +184,17 @@ describe('resendConfirmationAction', () => {
   it('returns { ok: false } without resending when no tenant resolves', async () => {
     authMock.mockResolvedValue(session);
     getRequestTenantIdMock.mockResolvedValue(undefined);
+    const { resendConfirmationAction } =
+      await import('./newsletter-subscription-actions');
+
+    await expect(resendConfirmationAction()).resolves.toEqual({ ok: false });
+    expect(resendConfirmationMock).not.toHaveBeenCalled();
+    expect(sendEmailMock).not.toHaveBeenCalled();
+  });
+
+  it('returns { ok: false } without resending when the tenant is not ACTIVE', async () => {
+    authMock.mockResolvedValue(session);
+    isTenantActiveMock.mockResolvedValue(false);
     const { resendConfirmationAction } =
       await import('./newsletter-subscription-actions');
 

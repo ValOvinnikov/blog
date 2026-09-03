@@ -1,5 +1,5 @@
 import { routes, type ILocalizedParams } from '@blog/config';
-import { service } from '@blog/service';
+import { getPlatformSanityContext, service } from '@blog/service';
 import { TopicPage } from '@web/components/pages/topic-page';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { buildTopicMetadata } from '@web/metadata/topic-metadata';
@@ -19,7 +19,9 @@ type TProps = {
 // on demand via ISR — correctness rides on the explicit range check in
 // `TopicPage`, not on this list.
 export async function generateStaticParams() {
-  const result = await service.pages.topic.v1.getTopicPaginationParams();
+  const result = await service.pages.topic.v1.getTopicPaginationParams(
+    getPlatformSanityContext(),
+  );
 
   if (!result.ok) {
     logger.error('topic_pagination.params_fetch_failed', {

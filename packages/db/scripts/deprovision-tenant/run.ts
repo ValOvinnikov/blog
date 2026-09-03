@@ -3,15 +3,16 @@
  * for one tenant: removes its domain from the shared web project, archives
  * (never deletes) its Sanity project, revokes the provisioned Sanity robot
  * tokens still live in that project, clears the provisioning-artifact
- * columns, then archives (never hard-deletes) the `tenants` row.
+ * columns, archives (never hard-deletes) the `tenants` row, then
+ * invalidates its cached pages so the archived site stops serving.
  *
  * Invoked only by `.github/workflows/deprovision-tenant.yml` via
  * `pnpm --filter @blog/db db:deprovision-tenant -- --tenant-id=<uuid>
- * --confirm=<slug>` — never run by hand against a shared/production tenant
+ * --confirm=<name>` — never run by hand against a shared/production tenant
  * outside that workflow. Defaults to a dry run (`--dry-run` unset or
  * anything other than `"false"`); an operator must pass `--dry-run=false`
  * to actually delete anything, on top of `--confirm` matching the tenant's
- * live slug.
+ * name.
  *
  * `--conditions=react-server` makes `getDb()`'s `import 'server-only'`
  * resolve to a no-op outside Next.js's own build, same trick
@@ -27,6 +28,7 @@ import { getTenantRow } from './lib/get-tenant-row';
 import { archiveTenantSanityProject } from './steps/archive-sanity-project';
 import { archiveTenantRow } from './steps/archive-tenant';
 import { clearTenantArtifacts } from './steps/clear-artifacts';
+import { invalidateTenantCache } from './steps/invalidate-tenant-cache';
 import { removeTenantDomain } from './steps/remove-domain';
 import { revokeTenantSanityTokens } from './steps/revoke-sanity-tokens';
 
@@ -53,7 +55,7 @@ function parseConfirm(argv: string[]): string {
   const value = parseFlagValue(argv, CONFIRM_FLAG) ?? process.env['CONFIRM'];
   if (!value) {
     throw new Error(
-      'deprovision-tenant: missing required --confirm=<tenant-slug> (or CONFIRM env var).',
+      'deprovision-tenant: missing required --confirm=<tenant-name> (or CONFIRM env var).',
     );
   }
   return value;
@@ -77,6 +79,7 @@ const STEPS: TStep[] = [
   { name: 'revoke-sanity-tokens', run: revokeTenantSanityTokens },
   { name: 'clear-artifacts', run: clearTenantArtifacts },
   { name: 'archive-tenant', run: archiveTenantRow },
+  { name: 'invalidate-tenant-cache', run: invalidateTenantCache },
 ];
 
 // Exported for direct testing of the step sequencing without also exercising
@@ -97,7 +100,11 @@ export async function runSteps(
         `deprovision-tenant: step "${step.name}" failed: ${sanitizeLogMessage(error)}`,
       );
       // Stop here — later steps stay untouched. Re-running the workflow for
-      // the same tenant resumes at this step via its own idempotency check.
+      // the same tenant resumes at this step via its own idempotency check
+      // — except invalidate-tenant-cache: once archive-tenant has run, the
+      // top-level deprovisionedAt guard blocks any resumed run from ever
+      // reaching it again, so retrying that one step alone goes through
+      // `scripts/invalidate-tenant-cache/` instead.
       return { ok: false };
     }
   }
@@ -123,15 +130,15 @@ export async function runDeprovisioning(
     return { ok: true, skipped: true };
   }
 
-  if (confirm !== tenant.slug) {
+  if (confirm !== tenant.name) {
     throw new Error(
-      `deprovision-tenant: --confirm="${confirm}" does not match tenant slug "${tenant.slug}" — aborting before any destructive action.`,
+      `deprovision-tenant: --confirm="${confirm}" does not match tenant name "${tenant.name}" — aborting before any destructive action.`,
     );
   }
 
   if (env.dryRun) {
     console.warn(
-      `deprovision-tenant: DRY RUN for tenant "${tenant.id}" (slug "${tenant.slug}") — no changes will be made.`,
+      `deprovision-tenant: DRY RUN for tenant "${tenant.id}" ("${tenant.name}") — no changes will be made.`,
     );
   }
 

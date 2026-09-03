@@ -1,4 +1,5 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getTagParams } from './loader';
 
@@ -7,11 +8,13 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   runQuery: vi.fn(),
 }));
 
+const tenant = makeTenant();
+
 describe('getTagParams', () => {
   it('returns all slug entries', async () => {
     mockRun.mockResolvedValue([{ slug: 'typescript' }, { slug: 'react' }]);
 
-    const params = await getTagParams();
+    const params = await getTagParams(tenant);
 
     expect(params).toEqual([{ slug: 'typescript' }, { slug: 'react' }]);
   });
@@ -19,31 +22,13 @@ describe('getTagParams', () => {
   it('returns an empty array when there are no tag pages', async () => {
     mockRun.mockResolvedValue([]);
 
-    const params = await getTagParams();
+    const params = await getTagParams(tenant);
 
     expect(params).toEqual([]);
   });
 
-  it('tags the query with page_tag', async () => {
-    mockRun.mockResolvedValue([]);
-
-    await getTagParams();
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        next: expect.objectContaining({ tags: ['page_tag'] }),
-      }),
-    );
-  });
-
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     mockRun.mockResolvedValue([]);
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getTagParams(tenant);
 
@@ -53,17 +38,6 @@ describe('getTagParams', () => {
         tenant,
         next: expect.objectContaining({ tags: ['t:tenant-a:page_tag'] }),
       }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun.mockResolvedValue([]);
-
-    await getTagParams();
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
     );
   });
 });

@@ -1,4 +1,4 @@
-import { getSanityImageBaseUrl, service } from '@blog/service';
+import { service } from '@blog/service';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 
 import { CtaModuleView } from './cta-module-view';
@@ -17,7 +17,5 @@ export const CtaModule = async ({ id }: ICtaModuleProps) => {
 
   if (!result.ok) return null;
 
-  return (
-    <CtaModuleView id={id} {...result.data} baseUrl={getSanityImageBaseUrl()} />
-  );
+  return <CtaModuleView id={id} {...result.data} />;
 };

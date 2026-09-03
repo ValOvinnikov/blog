@@ -10,11 +10,11 @@ import type { TTagsList } from './types';
 
 /** Every tag with its title/slug and published-post count, alphabetical by title. */
 export async function getTags(
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<TTagsList> {
   const raw = await runQuery(tagsQuery, {
     tenant,
-    ...isr(['tags', 'posts'], tenant?.projectId),
+    ...isr(['tags', 'posts'], tenant.projectId),
   });
   return toTags(raw);
 }

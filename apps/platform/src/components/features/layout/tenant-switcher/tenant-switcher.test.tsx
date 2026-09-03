@@ -3,8 +3,12 @@ import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { render, screen, within } from '@testing-library/react';
+import {
+  renderWithIntl,
+  screen,
+  within,
+} from '@platform/testing/custom-render';
+import { makeTenant } from '@platform/testing/tenants/fixtures';
 import userEvent from '@testing-library/user-event';
 import type { ComponentPropsWithoutRef } from 'react';
 
@@ -26,18 +30,10 @@ vi.mock('@platform/i18n/navigation', () => ({
   ),
 }));
 
-const tenant: TTenant = {
-  id: 'tenant-1',
-  slug: 'acme',
-  name: 'Acme Inc.',
-  primaryDomain: 'acme.example.com',
+const tenant = makeTenant({
   sanityProjectId: 'proj-1',
   sanityDataset: 'production',
-  sanityReadTokenEncrypted: null,
-  sanityWriteTokenEncrypted: null,
   locale: 'en',
-  plan: 'FREE',
-  status: 'ACTIVE',
   provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
   provisioningSteps: {
     [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
@@ -59,17 +55,15 @@ const tenant: TTenant = {
       status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
     },
   },
-  studioVercelProjectId: null,
   seededAt: new Date('2026-01-01T00:00:00.000Z'),
   webhookCreatedAt: new Date('2026-01-01T00:00:00.000Z'),
-  deprovisionedAt: null,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
+});
 
 describe(TenantSwitcher, () => {
   it('shows the active tenant on the trigger', () => {
-    render(<TenantSwitcher tenants={[tenant]} activeTenantId="tenant-1" />);
+    renderWithIntl(
+      <TenantSwitcher tenants={[tenant]} activeTenantId="tenant-1" />,
+    );
 
     expect(
       screen.getByRole('button', { name: /acme inc\./i }),
@@ -78,7 +72,9 @@ describe(TenantSwitcher, () => {
 
   it('opens a menu whose accessible name is the active tenant (from the trigger), listing every tenant the user can switch into and linking to its route', async () => {
     const user = userEvent.setup();
-    render(<TenantSwitcher tenants={[tenant]} activeTenantId="tenant-1" />);
+    renderWithIntl(
+      <TenantSwitcher tenants={[tenant]} activeTenantId="tenant-1" />,
+    );
 
     await user.click(screen.getByRole('button', { name: /acme inc\./i }));
 
@@ -89,7 +85,7 @@ describe(TenantSwitcher, () => {
 
   it('links each tenant through a caller-supplied hrefFor instead of the default /tenants/{id} route', async () => {
     const user = userEvent.setup();
-    render(
+    renderWithIntl(
       <TenantSwitcher
         tenants={[tenant]}
         activeTenantId="tenant-1"
@@ -105,5 +101,52 @@ describe(TenantSwitcher, () => {
       'href',
       '/dashboard/select-tenant?tenantId=tenant-1',
     );
+  });
+
+  it('marks an archived tenant in the menu, as part of its accessible name, and leaves a non-archived one unmarked', async () => {
+    const user = userEvent.setup();
+    const archivedTenant = makeTenant({
+      id: 'tenant-2',
+      slug: 'globex',
+      name: 'Globex Corp',
+      primaryDomain: 'globex.example.com',
+      deprovisionedAt: new Date('2026-02-01T00:00:00.000Z'),
+    });
+    renderWithIntl(
+      <TenantSwitcher
+        tenants={[tenant, archivedTenant]}
+        activeTenantId="tenant-1"
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: /acme inc\./i }));
+
+    const menu = await screen.findByRole('menu', { name: /acme inc\./i });
+    expect(
+      within(menu).getByRole('menuitem', { name: /acme inc\./i }),
+    ).not.toHaveAccessibleName(/archived/i);
+    expect(
+      within(menu).getByRole('menuitem', { name: /globex corp.*archived/i }),
+    ).toBeVisible();
+  });
+
+  it('shows the archived marker on the trigger when the active tenant is archived', () => {
+    const archivedTenant = makeTenant({
+      id: 'tenant-2',
+      slug: 'globex',
+      name: 'Globex Corp',
+      primaryDomain: 'globex.example.com',
+      deprovisionedAt: new Date('2026-02-01T00:00:00.000Z'),
+    });
+    renderWithIntl(
+      <TenantSwitcher
+        tenants={[tenant, archivedTenant]}
+        activeTenantId="tenant-2"
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: /globex corp.*archived/i }),
+    ).toBeVisible();
   });
 });

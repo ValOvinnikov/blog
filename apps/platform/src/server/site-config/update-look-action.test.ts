@@ -71,34 +71,34 @@ describe(updateLookAction, () => {
     loggerErrorMock.mockReset();
   });
 
-  it('re-resolves the tenant from the session against the routed slug before writing anything', async () => {
+  it('re-resolves the tenant from the session against the routed tenant id before writing anything', async () => {
     requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: 'tenant-1', slug: 'acme' },
+      tenant: { id: 'tenant-1' },
       membership: { role: 'OWNER' },
     });
     upsertSiteConfigMock.mockResolvedValue({});
 
-    const result = await updateLookAction('acme', VALID_INPUT);
+    const result = await updateLookAction('tenant-1', VALID_INPUT);
 
-    expect(requireTenantMembershipMock).toHaveBeenCalledWith('acme');
+    expect(requireTenantMembershipMock).toHaveBeenCalledWith('tenant-1');
     expect(upsertSiteConfigMock).toHaveBeenCalledWith('tenant-1', VALID_INPUT);
     expect(result).toEqual({ ok: true });
   });
 
   it('calls the site-config revalidation webhook after a successful save', async () => {
     requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: 'tenant-1', slug: 'acme' },
+      tenant: { id: 'tenant-1' },
       membership: { role: 'OWNER' },
     });
     upsertSiteConfigMock.mockResolvedValue({});
 
-    await updateLookAction('acme', VALID_INPUT);
+    await updateLookAction('tenant-1', VALID_INPUT);
 
     expect(revalidateSiteConfigMock).toHaveBeenCalledTimes(1);
   });
 
   it('rejects a payload with an out-of-range hue without ever calling the tenant gate', async () => {
-    const result = await updateLookAction('acme', {
+    const result = await updateLookAction('tenant-1', {
       ...VALID_INPUT,
       accentHue: 999,
     });
@@ -109,12 +109,12 @@ describe(updateLookAction, () => {
 
   it('reports failure instead of throwing when the write itself fails', async () => {
     requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: 'tenant-1', slug: 'acme' },
+      tenant: { id: 'tenant-1' },
       membership: { role: 'OWNER' },
     });
     upsertSiteConfigMock.mockRejectedValue(new Error('db unavailable'));
 
-    const result = await updateLookAction('acme', VALID_INPUT);
+    const result = await updateLookAction('tenant-1', VALID_INPUT);
 
     expect(result).toEqual({ ok: false });
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
@@ -123,12 +123,12 @@ describe(updateLookAction, () => {
 
   it('records a SETTINGS_UPDATED audit event against the site config, with the operator as actor', async () => {
     requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: 'tenant-1', slug: 'acme' },
+      tenant: { id: 'tenant-1' },
       membership: { role: 'OWNER' },
     });
     upsertSiteConfigMock.mockResolvedValue({});
 
-    await updateLookAction('acme', VALID_INPUT);
+    await updateLookAction('tenant-1', VALID_INPUT);
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
       actorId: 'operator-1',
@@ -142,13 +142,13 @@ describe(updateLookAction, () => {
 
   it('still returns ok when the audit write fails, and logs the failure', async () => {
     requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: 'tenant-1', slug: 'acme' },
+      tenant: { id: 'tenant-1' },
       membership: { role: 'OWNER' },
     });
     upsertSiteConfigMock.mockResolvedValue({});
     insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
 
-    const result = await updateLookAction('acme', VALID_INPUT);
+    const result = await updateLookAction('tenant-1', VALID_INPUT);
 
     expect(result).toEqual({ ok: true });
     expect(loggerErrorMock).toHaveBeenCalledWith(
@@ -165,7 +165,7 @@ describe(updateLookAction, () => {
       throw new Error('NEXT_REDIRECT');
     });
 
-    await expect(updateLookAction('acme', VALID_INPUT)).rejects.toThrow(
+    await expect(updateLookAction('tenant-1', VALID_INPUT)).rejects.toThrow(
       'NEXT_REDIRECT',
     );
 
@@ -177,7 +177,7 @@ describe(updateLookAction, () => {
       throw new Error('NEXT_NOT_FOUND');
     });
 
-    await expect(updateLookAction('acme', VALID_INPUT)).rejects.toThrow(
+    await expect(updateLookAction('tenant-1', VALID_INPUT)).rejects.toThrow(
       'NEXT_NOT_FOUND',
     );
 

@@ -2,7 +2,7 @@ import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { routing } from '@web/i18n/routing';
 import { getHostTenantSanityContext } from '@web/server/tenant/get-host-tenant-sanity-context';
-import { env } from '@web/utils/env/env';
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { logger } from '@web/utils/logger/logger';
 import type { MetadataRoute } from 'next';
 
@@ -33,12 +33,12 @@ const toEntry = (
  * entries — `itemsPerPage` here must match each route's own
  * `generateStaticParams` or the two disagree on how many pages exist.
  *
- * Returns an empty sitemap (logged) when `NEXT_PUBLIC_SITE_URL` is unset —
- * every URL in a sitemap must be absolute, so there is no meaningful
- * relative fallback.
+ * Returns an empty sitemap (logged) when no base URL resolves — every URL
+ * in a sitemap must be absolute, so there is no meaningful relative
+ * fallback.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = env.NEXT_PUBLIC_SITE_URL;
+  const siteUrl = await getTenantBaseUrl();
   if (!siteUrl) {
     logger.error('sitemap.site_url_missing');
     return [];

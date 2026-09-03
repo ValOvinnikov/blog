@@ -4,7 +4,6 @@ import {
   CTA_MOBILE_MEDIA_ORDER,
   CTA_VARIANT,
 } from '@blog/config';
-import { getSanityImageBaseUrl } from '@blog/service';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import {
   ctaActionsDemo,
@@ -55,7 +54,6 @@ const meta = {
     actions: ctaActionsDemo,
     footnote: undefined,
     layout: undefined,
-    baseUrl: getSanityImageBaseUrl(),
   },
 } satisfies Meta<typeof CtaModuleView>;
 

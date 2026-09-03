@@ -7,6 +7,8 @@ import { buildNewsletterConfirmationEmail } from '@web/server/newsletter/newslet
 import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address';
 import { clearNewsletterSubscribedCookie } from '@web/server/newsletter/newsletter-subscribed-cookie';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
+import { isTenantActive } from '@web/server/tenant/is-tenant-active';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 
@@ -30,6 +32,11 @@ export const unsubscribeAction = async (): Promise<TUnsubscribeResult> => {
 
   const tenantId = await getRequestTenantId();
   if (!tenantId) return { ok: false };
+
+  if (!(await isTenantActive(tenantId))) {
+    logger.warn('newsletter.unsubscribe_tenant_not_active', { tenantId });
+    return { ok: false };
+  }
 
   try {
     await queries.subscribers.unsubscribe(tenantId, userId);
@@ -76,6 +83,13 @@ export const resendConfirmationAction =
     const tenantId = await getRequestTenantId();
     if (!tenantId) return { ok: false };
 
+    if (!(await isTenantActive(tenantId))) {
+      logger.warn('newsletter.resend_confirmation_tenant_not_active', {
+        tenantId,
+      });
+      return { ok: false };
+    }
+
     try {
       const result = await queries.subscribers.resendConfirmation(
         tenantId,
@@ -83,7 +97,7 @@ export const resendConfirmationAction =
       );
       if (result.outcome === 'not-pending') return { ok: false };
 
-      const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
+      const siteUrl = (await getTenantBaseUrl()) ?? '';
       const confirmationUrl = `${siteUrl}/api/newsletter/confirm?token=${result.confirmationToken}`;
       const { subject, html } = buildNewsletterConfirmationEmail({
         confirmationUrl,

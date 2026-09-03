@@ -13,14 +13,14 @@ import type { TTopicDetailPage } from './types';
 
 export async function getTopicPage(
   slug: string,
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<TMaybeUndefined<TTopicDetailPage>> {
   // `topicPageQuery` derefs `topic` and `postList` — both tags must ride
   // alongside `page_topic` (tag-scope contract, `sanity/query.ts`).
   const rawPage = await runQuery(topicPageQuery, {
     parameters: { slug },
     tenant,
-    ...isr(['page_topic', 'topic', 'modules:postList'], tenant?.projectId),
+    ...isr(['page_topic', 'topic', 'modules:postList'], tenant.projectId),
   });
   if (!rawPage) return undefined;
   if (!rawPage.postList) {
@@ -28,5 +28,5 @@ export async function getTopicPage(
   }
 
   const settings = await getSiteSettings(tenant);
-  return toTopicDetailPage(rawPage, settings, rawPage.postList._id);
+  return toTopicDetailPage(rawPage, settings, rawPage.postList._id, tenant);
 }

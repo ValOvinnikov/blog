@@ -23,6 +23,7 @@ const {
   getNewsletterSettingsMock,
   isCapabilityEnabledMock,
   getTenantSanityContextMock,
+  getTenantBaseUrlMock,
 } = vi.hoisted(() => ({
   getPostMock: vi.fn(),
   useSessionMock: vi.fn(),
@@ -30,11 +31,12 @@ const {
   getNewsletterSettingsMock: vi.fn(),
   isCapabilityEnabledMock: vi.fn(),
   getTenantSanityContextMock: vi.fn(),
+  getTenantBaseUrlMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
-  getSanityImageBaseUrl: () =>
-    'https://cdn.sanity.io/images/test-project/test-dataset/',
+  getSanityImageBaseUrl: (tenant: { projectId: string; dataset: string }) =>
+    `https://cdn.sanity.io/images/${tenant.projectId}/${tenant.dataset}/`,
   service: {
     pages: {
       post: { v1: { getPost: getPostMock } },
@@ -73,6 +75,10 @@ vi.mock('@web/server/settings-features/is-capability-enabled', () => ({
 
 vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
   getTenantSanityContext: getTenantSanityContextMock,
+}));
+
+vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
+  getTenantBaseUrl: getTenantBaseUrlMock,
 }));
 
 // `BookmarkButton` calls `useToast()` unconditionally (it's a hook), so any
@@ -123,7 +129,13 @@ describe(`<${BlogPostPage.name}/>`, () => {
     isCapabilityEnabledMock.mockReset();
     isCapabilityEnabledMock.mockResolvedValue(true);
     getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue({
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    });
+    getTenantBaseUrlMock.mockReset();
+    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
   });
 
   afterEach(() => {
@@ -254,7 +266,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(screen.getByText('January 15, 2026')).toBeVisible();
   });
 
-  it('resolves baseUrl via getSanityImageBaseUrl and forwards it into the rendered hero image src', async () => {
+  it('renders the hero image using its own cdnBaseUrl, not a hardcoded origin', async () => {
     const heroImageSanity: ISanityImage = {
       assetId: 'image-abc123-1600x1200-jpg',
       alt: 'A scenic mountain range',
@@ -262,6 +274,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
       crop: undefined,
       lqip: undefined,
       dimensions: { width: 1600, height: 1200, aspectRatio: 1600 / 1200 },
+      cdnBaseUrl: 'https://cdn.sanity.io/images/tenant-project/production/',
     };
     getPostMock.mockResolvedValue({
       ok: true,
@@ -271,7 +284,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
     await setup();
 
     const img = screen.getByRole('img', { name: mockPostDetail.heroImageAlt });
-    expect(img.getAttribute('src')).toContain('test-project/test-dataset');
+    expect(img.getAttribute('src')).toContain('tenant-project/production');
   });
 
   it('renders no PostContentsRail (and stays single-column) when the body has fewer than 3 H2 headings', async () => {

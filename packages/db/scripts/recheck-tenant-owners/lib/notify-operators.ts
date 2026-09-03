@@ -55,11 +55,10 @@ type TNotifyOperatorsParams = {
 };
 
 /**
- * Emails every SUPERADMIN admin the first time a tenant's owner-elevation
- * outcome newly transitions into STALLED or AMBIGUOUS_MEMBERSHIP — the
- * caller (`recheckOne`) is responsible for the de-dup check against the
- * previously persisted outcome. Never throws: a notification failure must
- * never fail the sweep it's reporting on.
+ * Emails every SUPERADMIN admin about a notifiable owner-elevation outcome —
+ * `notifyOwnerElevationOutcome` is the sole caller and is responsible for the
+ * de-dup check against the previously persisted outcome. Never throws: a
+ * notification failure must never fail the sweep it's reporting on.
  */
 export async function notifyOperatorsOfOwnerElevationOutcome({
   tenant,
@@ -68,7 +67,7 @@ export async function notifyOperatorsOfOwnerElevationOutcome({
 }: TNotifyOperatorsParams): Promise<void> {
   if (!resendApiKey) {
     console.log(
-      `recheck-tenant-owners: RESEND_API_KEY is unset — skipping operator notification for tenant "${tenant.id}" (slug "${tenant.slug}").`,
+      `recheck-tenant-owners: RESEND_API_KEY is unset — skipping operator notification for tenant "${tenant.id}" ("${tenant.name}").`,
     );
     return;
   }
@@ -77,7 +76,7 @@ export async function notifyOperatorsOfOwnerElevationOutcome({
     const recipients = await listSuperadminEmails();
     if (recipients.length === 0) {
       console.log(
-        `recheck-tenant-owners: no SUPERADMIN admins on file — skipping operator notification for tenant "${tenant.id}" (slug "${tenant.slug}").`,
+        `recheck-tenant-owners: no SUPERADMIN admins on file — skipping operator notification for tenant "${tenant.id}" ("${tenant.name}").`,
       );
       return;
     }
@@ -86,8 +85,8 @@ export async function notifyOperatorsOfOwnerElevationOutcome({
     const { error } = await resend.emails.send({
       from: DEFAULT_FROM_ADDRESS,
       to: recipients,
-      subject: `Tenant "${tenant.name}" (${tenant.slug}) needs owner-elevation attention`,
-      html: `<p>Tenant <strong>${escapeHtml(tenant.name)}</strong> (slug <code>${escapeHtml(tenant.slug)}</code>, id <code>${escapeHtml(tenant.id)}</code>) — ${OUTCOME_COPY[outcome]}</p><p>See the tenant's provisioning page in the platform admin panel for detail.</p>`,
+      subject: `Tenant "${tenant.name}" (${tenant.id}) needs owner-elevation attention`,
+      html: `<p>Tenant <strong>${escapeHtml(tenant.name)}</strong> (id <code>${escapeHtml(tenant.id)}</code>) — ${OUTCOME_COPY[outcome]}</p><p>See the tenant's provisioning page in the platform admin panel for detail.</p>`,
     });
 
     if (error) {
@@ -95,7 +94,7 @@ export async function notifyOperatorsOfOwnerElevationOutcome({
     }
   } catch (error) {
     console.error(
-      `recheck-tenant-owners: failed to notify operators for tenant "${tenant.id}" (slug "${tenant.slug}"): ${sanitizeLogMessage(error)}`,
+      `recheck-tenant-owners: failed to notify operators for tenant "${tenant.id}" ("${tenant.name}"): ${sanitizeLogMessage(error)}`,
     );
   }
 }

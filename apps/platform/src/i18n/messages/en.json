@@ -12,7 +12,8 @@
     "tenantDanger": "Danger zone · Admin",
     "tenantDomain": "Domain · Admin",
     "features": "Features · Admin",
-    "studio": "Studio · Admin"
+    "studio": "Studio · Admin",
+    "findings": "Findings · Admin"
   },
   "workspacePendingPage": {
     "heading": "Your workspace isn't ready yet",
@@ -23,6 +24,9 @@
     "brandTagline": "admin",
     "collapseToggle": "Collapse sidebar",
     "expandToggle": "Expand sidebar"
+  },
+  "tenantSwitcher": {
+    "archived": "Archived"
   },
   "toastProvider": {
     "viewportAriaLabel": "Notifications",
@@ -42,6 +46,7 @@
     "configurationSectionLabel": "Configuration",
     "tenants": "Tenants",
     "addTenant": "Add tenant",
+    "findings": "Findings",
     "tenantLabel": "Tenant · {tenantName}",
     "overview": "Overview",
     "look": "Look",
@@ -95,6 +100,44 @@
     },
     "manage": "Manage",
     "manageAriaLabel": "Manage {tenantName}"
+  },
+  "findingsView": {
+    "title": "Findings",
+    "description": "Operational conditions detected by scheduled sweeps, across every tenant."
+  },
+  "findingsTable": {
+    "columnTenant": "Tenant",
+    "columnSource": "Source",
+    "columnKind": "Kind",
+    "columnSeverity": "Severity",
+    "columnLastSeen": "Last seen",
+    "noTenant": "— platform-wide",
+    "empty": "No open findings. Everything's healthy."
+  },
+  "findingsCard": {
+    "title": "Open findings",
+    "empty": "No open findings for this tenant — everything's healthy.",
+    "detailsToggle": "Details"
+  },
+  "findingSeverityLabel": {
+    "INFO": "Info",
+    "WARNING": "Warning",
+    "CRITICAL": "Critical"
+  },
+  "findingSourceLabel": {
+    "DOCUMENT_VALIDATION": "Document validation",
+    "TENANT_PROVISIONING": "Tenant provisioning",
+    "RECHECK_TENANT_OWNERS": "Owner recheck",
+    "DOMAIN_VERIFICATION": "Domain verification",
+    "SITE_CONFIG_REVALIDATION": "Site config revalidation"
+  },
+  "findingKindLabel": {
+    "SCHEMA_VALIDATION_ERROR": "Schema validation error",
+    "PROVISIONING_STEP_FAILED": "Provisioning step failed",
+    "OWNER_CHECK_STALLED": "Owner check stalled",
+    "OWNER_CHECK_AMBIGUOUS": "Owner check ambiguous",
+    "DOMAIN_NOT_ADDED": "Domain not added",
+    "REVALIDATION_FAILED": "Revalidation failed"
   },
   "ownerHomePage": {
     "description": "Your site at a glance. Everything here is live.",
@@ -279,7 +322,7 @@
     "previewNote": "Unsaved form state → CSS custom properties, matching production's OKLCH ramp. Nothing here is live until you save.",
     "fullPagePreviewHeading": "Full-page preview",
     "fullPagePreviewDescription": "Reserved — needs a save to reflect",
-    "deviceUrl": "preview.{tenantSlug}.dev",
+    "deviceUrl": "{primaryDomain}",
     "framePlaceholder": "Iframe of the real site in preview mode. Needs a save (or a preview-mode URL) to reflect — space and routing reserved now."
   },
   "brandAssetField": {
@@ -337,7 +380,7 @@
     "steps": {
       "details": {
         "title": "Details",
-        "description": "Name, slug, plan"
+        "description": "Name, domain, plan"
       },
       "sanityProject": {
         "title": "Sanity project",
@@ -361,8 +404,6 @@
     "heading": "Tenant details",
     "description": "The fast part. Everything after this runs automatically, each step resumable on failure.",
     "nameLabel": "Tenant name",
-    "slugLabel": "Slug",
-    "slugHint": "A unique identifier for this tenant — you'll type it to confirm destructive actions. Never part of a web address.",
     "domainLabel": "Domain",
     "domainHint": "The public domain this tenant's site will answer to.",
     "planLabel": "Plan",
@@ -400,6 +441,7 @@
     "startError": "Couldn't start provisioning — try again.",
     "startErrorNotFound": "Couldn't find this tenant — refresh the page and try again.",
     "startErrorArchived": "This tenant is archived; provisioning can't be started.",
+    "startNoticeAlreadyInProgress": "A provisioning run is already in progress for this tenant — this page will update automatically once it finishes.",
     "pollErrorWarning": "Couldn't refresh the latest status — retrying automatically.",
     "errorKind": {
       "permission": {
@@ -424,7 +466,7 @@
       }
     },
     "technicalDetailsToggle": "Technical details",
-    "backToTenantAction": "← Back to tenant",
+    "backToTenantAction": "Back to tenant",
     "ownerLabel": "Owner",
     "ownerInvitedPendingBadge": "Invited, pending",
     "stepRunningNow": "now",
@@ -448,7 +490,6 @@
     "heading": "Tenant details",
     "fieldsGroupLabel": "Tenant detail fields",
     "nameLabel": "Name",
-    "slugLabel": "Slug",
     "domainLabel": "Primary domain",
     "ownerEmailLabel": "Owner email",
     "planLabel": "Plan",
@@ -481,19 +522,19 @@
   },
   "deprovisionTenantControl": {
     "cardTitle": "Deprovision this tenant",
-    "description": "Removes the tenant's custom domain, deletes its Studio project, and archives its Sanity project so it stops billing rather than deleting it. The tenant row itself is archived, not deleted — its slug stays reserved. This cannot be undone.",
+    "description": "Removes the tenant's custom domain, deletes its Studio project, and archives its Sanity project so it stops billing rather than deleting it. The tenant row itself is archived, not deleted. This cannot be undone.",
     "triggerButton": "Deprovision tenant",
     "dialogTitle": "Deprovision {name}",
-    "dialogDescription": "This dispatches deprovision-tenant.yml, which tears down every provisioned resource for this tenant. Type the tenant's slug to confirm.",
-    "confirmLabel": "Type \"{slug}\" to confirm",
-    "confirmHint": "Must match the tenant's slug exactly.",
+    "dialogDescription": "This dispatches deprovision-tenant.yml, which tears down every provisioned resource for this tenant. Type the tenant's name to confirm.",
+    "confirmLabel": "Type \"{name}\" to confirm",
+    "confirmHint": "Must match the tenant's name exactly.",
     "dryRunLabel": "Dry run (preview only, nothing is deleted)",
     "cancelButton": "Cancel",
     "confirmButton": "Deprovision",
     "confirmingButton": "Dispatching…",
     "archivedBadge": "Deprovisioned",
     "archivedAt": "Deprovisioned {date}",
-    "deleteDescription": "Permanently removes this tenant and every dependent row (memberships, subscribers, bookmarks, domains, site config) from the database. This cannot be undone, and releases the slug for reuse.",
+    "deleteDescription": "Permanently removes this tenant and every dependent row (memberships, subscribers, bookmarks, domains, site config) from the database. This cannot be undone, and releases its domain for reuse.",
     "deleteTriggerButton": "Delete tenant permanently",
     "deleteDialogTitle": "Delete {name}",
     "deleteDialogDescription": "This permanently deletes the tenant row and everything that depends on it. Type the tenant's name to confirm.",

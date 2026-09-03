@@ -3,7 +3,7 @@ import { render, screen } from '@platform/testing/custom-render';
 import { WizardRail } from './wizard-rail';
 
 const steps = [
-  { title: 'Details', description: 'Name, slug, plan' },
+  { title: 'Details', description: 'Name, domain, plan' },
   { title: 'Sanity project', description: 'Create + configure' },
   { title: 'Seed content', description: 'Starter documents' },
 ];
@@ -13,7 +13,7 @@ describe(WizardRail, () => {
     render(<WizardRail steps={steps} activeIndex={0} ariaLabel="Steps" />);
 
     expect(screen.getByText('Details')).toBeVisible();
-    expect(screen.getByText('Name, slug, plan')).toBeVisible();
+    expect(screen.getByText('Name, domain, plan')).toBeVisible();
     expect(screen.getByText('Sanity project')).toBeVisible();
     expect(screen.getByText('Seed content')).toBeVisible();
   });

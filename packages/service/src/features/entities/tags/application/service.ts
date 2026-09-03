@@ -5,7 +5,7 @@ import { safeAsync } from '@blog/utils';
 export function createTagsService() {
   return {
     v1: {
-      getTags: safeAsync((tenant?: TTenantSanityContext) => getTags(tenant)),
+      getTags: safeAsync((tenant: TTenantSanityContext) => getTags(tenant)),
     },
   };
 }

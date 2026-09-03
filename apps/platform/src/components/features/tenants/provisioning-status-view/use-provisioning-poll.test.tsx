@@ -686,7 +686,7 @@ describe(useProvisioningPoll, () => {
       await waitFor(() => {
         expect(result.current.isRetrying).toBe(false);
       });
-      expect(result.current.dispatchError).toBeUndefined();
+      expect(result.current.dispatchNotice).toBeUndefined();
     });
 
     it('reports a not-found dispatch error distinctly from a generic one', async () => {
@@ -703,7 +703,7 @@ describe(useProvisioningPoll, () => {
       });
 
       await waitFor(() => {
-        expect(result.current.dispatchError).toBe('not-found');
+        expect(result.current.dispatchNotice).toBe('not-found');
       });
     });
 
@@ -721,7 +721,7 @@ describe(useProvisioningPoll, () => {
       });
 
       await waitFor(() => {
-        expect(result.current.dispatchError).toBe('archived');
+        expect(result.current.dispatchNotice).toBe('archived');
       });
     });
 
@@ -739,11 +739,11 @@ describe(useProvisioningPoll, () => {
       });
 
       await waitFor(() => {
-        expect(result.current.dispatchError).toBe('other');
+        expect(result.current.dispatchNotice).toBe('other');
       });
     });
 
-    it('treats already-in-progress as a no-op — no dispatch error reported', async () => {
+    it('reports already-in-progress distinctly from a real failure, and still refreshes', async () => {
       const tenant = makeTenant();
       retryProvisioningStepActionMock.mockResolvedValue({
         outcome: 'already-in-progress',
@@ -757,9 +757,9 @@ describe(useProvisioningPoll, () => {
       });
 
       await waitFor(() => {
-        expect(result.current.isStarting).toBe(false);
+        expect(result.current.dispatchNotice).toBe('already-in-progress');
       });
-      expect(result.current.dispatchError).toBeUndefined();
+      expect(result.current.isStarting).toBe(false);
     });
   });
 });

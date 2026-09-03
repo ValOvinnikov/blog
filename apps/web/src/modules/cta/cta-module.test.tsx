@@ -1,4 +1,5 @@
 import { customRenderAsync } from '@web/testing/custom-render';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { CtaModule } from './cta-module';
 
@@ -8,8 +9,6 @@ const { getCtaMock, getTenantSanityContextMock } = vi.hoisted(() => ({
 }));
 
 vi.mock('@blog/service', () => ({
-  getSanityImageBaseUrl: () =>
-    'https://cdn.sanity.io/images/test-project/test-dataset/',
   service: {
     modules: {
       cta: { v1: { getCta: getCtaMock } },
@@ -27,7 +26,7 @@ describe(CtaModule, () => {
   beforeEach(() => {
     getCtaMock.mockReset();
     getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('renders nothing when the fetch fails', async () => {

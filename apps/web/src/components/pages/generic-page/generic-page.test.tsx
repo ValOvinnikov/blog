@@ -1,23 +1,29 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
 import { GenericPage } from './generic-page';
 
-const { getPageMock, moduleRendererMock, getTenantSanityContextMock } =
-  vi.hoisted(() => ({
-    getPageMock: vi.fn(),
-    getTenantSanityContextMock: vi.fn(),
-    // `ModuleRenderer` is an async Server Component — real RSC async-component
-    // nesting isn't renderable through `@testing-library/react`'s client
-    // renderer. Stubbed as a plain sync component so this suite can assert
-    // `GenericPage` passes the right props through without needing a real
-    // async render; its own dispatch logic is covered by
-    // `module-renderer.test.tsx`. `GenericPageView`'s own rendering (h1,
-    // breadcrumbs, JSON-LD) is covered by `generic-page-view.test.tsx`.
-    moduleRendererMock: vi.fn(({ modules }: { modules: { id: string }[] }) => (
-      <div data-testid="module-renderer">{modules.length} modules</div>
-    )),
-  }));
+const {
+  getPageMock,
+  moduleRendererMock,
+  getTenantSanityContextMock,
+  getTenantBaseUrlMock,
+} = vi.hoisted(() => ({
+  getPageMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
+  getTenantBaseUrlMock: vi.fn(),
+  // `ModuleRenderer` is an async Server Component — real RSC async-component
+  // nesting isn't renderable through `@testing-library/react`'s client
+  // renderer. Stubbed as a plain sync component so this suite can assert
+  // `GenericPage` passes the right props through without needing a real
+  // async render; its own dispatch logic is covered by
+  // `module-renderer.test.tsx`. `GenericPageView`'s own rendering (h1,
+  // breadcrumbs, JSON-LD) is covered by `generic-page-view.test.tsx`.
+  moduleRendererMock: vi.fn(({ modules }: { modules: { id: string }[] }) => (
+    <div data-testid="module-renderer">{modules.length} modules</div>
+  )),
+}));
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -33,6 +39,10 @@ vi.mock('@web/modules/module-renderer', () => ({
 
 vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
   getTenantSanityContext: getTenantSanityContextMock,
+}));
+
+vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
+  getTenantBaseUrl: getTenantBaseUrlMock,
 }));
 
 vi.mock('@web/components/shared/smart-link', () => ({
@@ -60,7 +70,9 @@ describe(`<${GenericPage.name}/>`, () => {
     getPageMock.mockReset();
     moduleRendererMock.mockClear();
     getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getTenantBaseUrlMock.mockReset();
+    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
   });
 
   it('calls notFound() and logs when the fetch fails', async () => {

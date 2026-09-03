@@ -114,10 +114,10 @@ in GH_TOKEN is invalid" even where `gh api user` succeeds — so treat
 
 ### What each outcome means
 
-| Outcome | Report | Fix |
-| --- | --- | --- |
+| Outcome                | Report                                                                                              | Fix                                                                                                                        |
+| ---------------------- | --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | `NO_GH` / `NO_GRAPHQL` | Board writes are **not possible in this session**. List the issue numbers still needing board work. | Run the board work from a local session with the human's own credentials. There is no in-session fix — do not suggest one. |
-| `MISSING` | The token lacks `project` scope. | `gh auth refresh -h github.com -s project` — interactive device-code flow, needs a human in a browser. |
+| `MISSING`              | The token lacks `project` scope.                                                                    | `gh auth refresh -h github.com -s project` — interactive device-code flow, needs a human in a browser.                     |
 
 **Stop before any board write in all three cases — but do not stop the whole
 dispatch.** Everything here that does not touch Projects v2 — creating
@@ -219,8 +219,13 @@ Skip this step entirely for any other trigger.
 The orchestrator never calls `gh issue create` directly — creating an issue
 always goes through you, so placement/labels/status can never be forgotten
 as a separate step. That means every field must already be fully specified
-in the dispatch: title, body, at least one label, and (if this is a
-sub-issue of an existing tracking issue) the parent's issue number. You have
+in the dispatch: title, body, at least one label **including exactly one
+`prio:*` label** (`prio:now`/`prio:next`/`prio:later`/`prio:someday` — the
+priority taxonomy in `CLAUDE.md`'s "Ticket priority & triage" section), and
+(if this is a sub-issue of an existing tracking issue) the parent's issue
+number. A dispatch whose labels carry zero or two-plus `prio:*` entries is
+incomplete the same way a missing title is — the orchestrator picks the
+priority before dispatching, you never do. You have
 no interactive-prompt tool — gathering missing fields from a human is the
 orchestrator's job, before it ever dispatches you. **If anything required is
 missing from the dispatch, don't invent it** — stop and report the dispatch
@@ -517,6 +522,12 @@ prettier, tsconfig, vitest, CI, editor, husky/lint-staged, ignore files,
 etc.) gets `tooling`, combined with a `layer:*` label where one applies
 (usually `layer:config`); product/feature work gets the relevant `layer:*`;
 bug reports get `bug` alongside their layer.
+
+Additionally flag every **open issue** (not PRs) that carries zero or
+two-plus `prio:*` labels — the convention is exactly one
+(`CLAUDE.md`'s "Ticket priority & triage" section). Report-only, same as
+the zero-label check: which priority an issue deserves is the
+orchestrator's judgment call, never yours.
 
 This is a report-only check, not a safe-fix — picking the correct label
 requires reading the issue/PR title and body for its actual concern, which is

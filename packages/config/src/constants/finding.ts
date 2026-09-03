@@ -1,0 +1,40 @@
+import type { TValueOf } from '@blog/config/utils';
+
+export const FINDING_SOURCE = {
+  DOCUMENT_VALIDATION: 'DOCUMENT_VALIDATION',
+  TENANT_PROVISIONING: 'TENANT_PROVISIONING',
+  RECHECK_TENANT_OWNERS: 'RECHECK_TENANT_OWNERS',
+  DOMAIN_VERIFICATION: 'DOMAIN_VERIFICATION',
+  SITE_CONFIG_REVALIDATION: 'SITE_CONFIG_REVALIDATION',
+} as const;
+
+export type TFindingSource = TValueOf<typeof FINDING_SOURCE>;
+
+// One source can report more than one kind (e.g. RECHECK_TENANT_OWNERS
+// reports both OWNER_CHECK_STALLED and OWNER_CHECK_AMBIGUOUS) — kind and
+// source are independent vocabularies, not a 1:1 pair.
+export const FINDING_KIND = {
+  SCHEMA_VALIDATION_ERROR: 'SCHEMA_VALIDATION_ERROR',
+  PROVISIONING_STEP_FAILED: 'PROVISIONING_STEP_FAILED',
+  OWNER_CHECK_STALLED: 'OWNER_CHECK_STALLED',
+  OWNER_CHECK_AMBIGUOUS: 'OWNER_CHECK_AMBIGUOUS',
+  DOMAIN_NOT_ADDED: 'DOMAIN_NOT_ADDED',
+  REVALIDATION_FAILED: 'REVALIDATION_FAILED',
+} as const;
+
+export type TFindingKind = TValueOf<typeof FINDING_KIND>;
+
+export const FINDING_SEVERITY = {
+  INFO: 'INFO',
+  WARNING: 'WARNING',
+  CRITICAL: 'CRITICAL',
+} as const;
+
+export type TFindingSeverity = TValueOf<typeof FINDING_SEVERITY>;
+
+export const FINDING_STATUS = {
+  OPEN: 'OPEN',
+  RESOLVED: 'RESOLVED',
+} as const;
+
+export type TFindingStatus = TValueOf<typeof FINDING_STATUS>;

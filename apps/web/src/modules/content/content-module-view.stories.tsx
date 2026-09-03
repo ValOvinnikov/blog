@@ -1,5 +1,4 @@
 import { BRAND_VARIANT, SPACING_SCALE } from '@blog/config';
-import { getSanityImageBaseUrl } from '@blog/service';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { richTextDemo } from '@web/testing/shared/portable-text-renderer/fixtures';
 
@@ -21,7 +20,8 @@ const meta = {
     brandVariant: BRAND_VARIANT.PRIMARY,
     body: richTextDemo,
     layout: undefined,
-    baseUrl: getSanityImageBaseUrl(),
+    baseUrl:
+      'https://cdn.sanity.io/images/storybook-project/storybook-dataset/',
   },
   decorators: [
     (Story) => (

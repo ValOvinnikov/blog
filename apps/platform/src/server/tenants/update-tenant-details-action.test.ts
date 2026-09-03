@@ -41,7 +41,6 @@ vi.mock('@blog/db', async () => ({
 
 const validInput = {
   name: 'Acme',
-  slug: 'acme',
   primaryDomain: 'acme.example.com',
   plan: 'FREE' as const,
   locale: 'EN',
@@ -102,22 +101,6 @@ describe('updateTenantDetailsAction', () => {
     });
     expect(updateTenantDetailsMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
-  });
-
-  it('returns field errors for an invalid slug without touching the database', async () => {
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
-
-    const result = await updateTenantDetailsAction('tenant-1', {
-      ...validInput,
-      slug: 'Not A Slug!',
-    });
-
-    expect(result).toEqual({
-      ok: false,
-      fieldErrors: { slug: expect.any(String) },
-    });
-    expect(updateTenantDetailsMock).not.toHaveBeenCalled();
   });
 
   it('returns field errors for an invalid domain', async () => {
@@ -184,8 +167,8 @@ describe('updateTenantDetailsAction', () => {
     );
   });
 
-  it('maps a slug-taken outcome onto a slug field error', async () => {
-    updateTenantDetailsMock.mockResolvedValue({ outcome: 'slug-taken' });
+  it('maps a domain-taken outcome onto a primaryDomain field error', async () => {
+    updateTenantDetailsMock.mockResolvedValue({ outcome: 'domain-taken' });
     const { updateTenantDetailsAction } =
       await import('./update-tenant-details-action');
 
@@ -193,12 +176,12 @@ describe('updateTenantDetailsAction', () => {
 
     expect(result).toEqual({
       ok: false,
-      fieldErrors: { slug: expect.any(String) },
+      fieldErrors: { primaryDomain: expect.any(String) },
     });
   });
 
-  it('maps a domain-taken outcome onto a primaryDomain field error', async () => {
-    updateTenantDetailsMock.mockResolvedValue({ outcome: 'domain-taken' });
+  it('maps a domain-invalid outcome onto a primaryDomain field error', async () => {
+    updateTenantDetailsMock.mockResolvedValue({ outcome: 'domain-invalid' });
     const { updateTenantDetailsAction } =
       await import('./update-tenant-details-action');
 
@@ -392,8 +375,8 @@ describe('updateTenantDetailsAction', () => {
     );
   });
 
-  it('does not record an audit event for a non-updated outcome', async () => {
-    updateTenantDetailsMock.mockResolvedValue({ outcome: 'slug-taken' });
+  it('does not record an audit event for a domain-taken outcome', async () => {
+    updateTenantDetailsMock.mockResolvedValue({ outcome: 'domain-taken' });
     const { updateTenantDetailsAction } =
       await import('./update-tenant-details-action');
 
@@ -402,8 +385,8 @@ describe('updateTenantDetailsAction', () => {
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
-  it('does not record an audit event for a domain-taken outcome', async () => {
-    updateTenantDetailsMock.mockResolvedValue({ outcome: 'domain-taken' });
+  it('does not record an audit event for a domain-invalid outcome', async () => {
+    updateTenantDetailsMock.mockResolvedValue({ outcome: 'domain-invalid' });
     const { updateTenantDetailsAction } =
       await import('./update-tenant-details-action');
 

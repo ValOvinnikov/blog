@@ -1,4 +1,5 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getTopicParams } from './loader';
 
@@ -7,11 +8,13 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   runQuery: vi.fn(),
 }));
 
+const tenant = makeTenant();
+
 describe('getTopicParams', () => {
   it('returns all slug entries', async () => {
     mockRun.mockResolvedValue([{ slug: 'engineering' }, { slug: 'design' }]);
 
-    const params = await getTopicParams();
+    const params = await getTopicParams(tenant);
 
     expect(params).toEqual([{ slug: 'engineering' }, { slug: 'design' }]);
   });
@@ -19,31 +22,13 @@ describe('getTopicParams', () => {
   it('returns an empty array when there are no topic pages', async () => {
     mockRun.mockResolvedValue([]);
 
-    const params = await getTopicParams();
+    const params = await getTopicParams(tenant);
 
     expect(params).toEqual([]);
   });
 
-  it('tags the query with page_topic', async () => {
-    mockRun.mockResolvedValue([]);
-
-    await getTopicParams();
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        next: expect.objectContaining({ tags: ['page_topic'] }),
-      }),
-    );
-  });
-
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     mockRun.mockResolvedValue([]);
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getTopicParams(tenant);
 
@@ -53,17 +38,6 @@ describe('getTopicParams', () => {
         tenant,
         next: expect.objectContaining({ tags: ['t:tenant-a:page_topic'] }),
       }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun.mockResolvedValue([]);
-
-    await getTopicParams();
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ tenant: undefined }),
     );
   });
 });

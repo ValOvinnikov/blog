@@ -12,7 +12,7 @@ name: Deprovision Tenant
 # triggering this automatically.
 #
 # Destructive, so `workflow_dispatch` alone is not enough: `confirm` must
-# match the tenant's live slug (checked before any deletion) and `dryRun`
+# match the tenant's live name (checked before any deletion) and `dryRun`
 # defaults to `true` — an operator must explicitly set it to `false` to
 # delete anything. See `packages/db/scripts/deprovision-tenant/run.ts`.
 #
@@ -28,7 +28,7 @@ on:
         required: true
         type: string
       confirm:
-        description: "Tenant's slug, typed to confirm — must match exactly or the run aborts before any destructive step"
+        description: "Tenant's name, typed to confirm — must match exactly or the run aborts before any destructive step"
         required: true
         type: string
       dryRun:
@@ -83,6 +83,12 @@ jobs:
       # job reads): the tenant registry and the application database are two
       # different connection strings, resolved from the same Environment.
       DATABASE_URL: ${{ secrets.TENANT_REGISTRY_DATABASE_URL }}
+      # Step 6 (`invalidate-tenant-cache`) POSTs to the web app's on-demand
+      # revalidation endpoint. Both are required only by that final step, so
+      # they are absent from `loadDeprovisionEnv`'s `requireEnv` set — the
+      # step itself fails loudly when either is missing.
+      WEB_APP_URL: ${{ vars.WEB_APP_URL }}
+      SITE_CONFIG_REVALIDATE_SECRET: ${{ secrets.SITE_CONFIG_REVALIDATE_SECRET }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

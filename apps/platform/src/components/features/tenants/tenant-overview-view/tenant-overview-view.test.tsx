@@ -1,10 +1,17 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import {
+  FINDING_KIND,
+  FINDING_SEVERITY,
+  FINDING_SOURCE,
+  FINDING_STATUS,
+} from '@blog/config/constants';
+import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db';
 import type { TAuditEvent } from '@blog/db/schema/audit-events';
+import type { TFinding } from '@blog/db/schema/findings';
 import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
 import {
   act,
@@ -65,6 +72,21 @@ const makeEvent = (overrides: Partial<TAuditEvent> = {}): TAuditEvent => ({
   ...overrides,
 });
 
+const makeFinding = (overrides: Partial<TFinding> = {}): TFinding => ({
+  id: 'finding-1',
+  tenantId: 'tenant-1',
+  source: FINDING_SOURCE.TENANT_PROVISIONING,
+  kind: FINDING_KIND.PROVISIONING_STEP_FAILED,
+  severity: FINDING_SEVERITY.CRITICAL,
+  status: FINDING_STATUS.OPEN,
+  dedupeKey: 'dedupe-1',
+  details: null,
+  firstSeenAt: new Date('2026-04-01T00:00:00.000Z'),
+  lastSeenAt: new Date('2026-04-02T00:00:00.000Z'),
+  resolvedAt: null,
+  ...overrides,
+});
+
 describe(TenantOverviewView, () => {
   // Rendering a non-terminal `provisioningStatus` starts a real
   // `setInterval` poll loop that can outlive a test's own cleanup under
@@ -94,6 +116,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
@@ -119,6 +142,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
@@ -136,6 +160,9 @@ describe(TenantOverviewView, () => {
     ).toBeVisible();
     expect(
       screen.getByRole('heading', { level: 2, name: 'Recent activity' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Open findings' }),
     ).toBeVisible();
     expect(screen.queryByRole('heading', { level: 3 })).not.toBeInTheDocument();
   });
@@ -158,6 +185,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
@@ -165,7 +193,7 @@ describe(TenantOverviewView, () => {
   });
 
   it('relocates the tenant details panel here as the Identity card', () => {
-    const tenant = makeTenant({ slug: 'acme' });
+    const tenant = makeTenant({ name: 'Acme Inc.' });
     render(
       <TenantOverviewView
         tenant={tenant}
@@ -174,11 +202,14 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
     expect(screen.getByText('Tenant details')).toBeVisible();
-    expect(screen.getByRole('textbox', { name: 'Slug' })).toHaveValue('acme');
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue(
+      'Acme Inc.',
+    );
   });
 
   it('locks every tenant details field while a step is running, stating why', () => {
@@ -198,12 +229,13 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
-    const slugInput = screen.getByRole('textbox', { name: 'Slug' });
-    expect(slugInput).toBeDisabled();
-    expect(slugInput).toHaveAccessibleDescription(
+    const nameInput = screen.getByRole('textbox', { name: 'Name' });
+    expect(nameInput).toBeDisabled();
+    expect(nameInput).toHaveAccessibleDescription(
       'Locked while provisioning is running.',
     );
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
@@ -239,6 +271,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
@@ -250,7 +283,6 @@ describe(TenantOverviewView, () => {
       'Locked — the "Connect the custom domain" step has already completed and used this value.',
     );
 
-    expect(screen.getByRole('textbox', { name: 'Slug' })).not.toBeDisabled();
     expect(screen.getByRole('textbox', { name: 'Name' })).not.toBeDisabled();
   });
 
@@ -270,10 +302,10 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
-    expect(screen.getByRole('textbox', { name: 'Slug' })).toBeDisabled();
     expect(screen.getByRole('textbox', { name: 'Name' })).toBeDisabled();
     expect(
       screen.getByRole('textbox', { name: 'Primary domain' }),
@@ -311,12 +343,13 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
     expect(screen.getByText('Provisioning — step 2 of 5')).toBeVisible();
     expect(
-      screen.getByRole('textbox', { name: 'Slug' }),
+      screen.getByRole('textbox', { name: 'Name' }),
     ).toHaveAccessibleDescription('Locked while provisioning is running.');
 
     await act(async () => {
@@ -328,7 +361,7 @@ describe(TenantOverviewView, () => {
     // other has already caught up to READY/SUCCEEDED.
     expect(screen.getByText('Provisioned')).toBeVisible();
     expect(
-      screen.getByRole('textbox', { name: 'Slug' }),
+      screen.getByRole('textbox', { name: 'Name' }),
     ).toHaveAccessibleDescription(
       'Locked — provisioning has already finished.',
     );
@@ -350,6 +383,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[makeEvent()]}
+        findings={[makeFinding()]}
       />,
     );
 
@@ -357,6 +391,7 @@ describe(TenantOverviewView, () => {
     expect(screen.getByText('Aug 12, 2026')).toBeVisible();
     expect(screen.getByText('proj-1')).toBeVisible();
     expect(screen.getByText('vo@valstack.dev')).toBeVisible();
+    expect(screen.getByText('Provisioning step failed')).toBeVisible();
   });
 
   it('always renders "Open site", linking to the tenant\'s live domain', () => {
@@ -369,6 +404,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
@@ -380,7 +416,7 @@ describe(TenantOverviewView, () => {
   });
 
   it('never renders an "Open Studio" action — the sidebar is the only entry point to Studio', () => {
-    const tenant = makeTenant({ slug: 'acme' });
+    const tenant = makeTenant();
     render(
       <TenantOverviewView
         tenant={tenant}
@@ -389,6 +425,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
@@ -409,6 +446,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
@@ -427,6 +465,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 
@@ -445,6 +484,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        findings={[]}
       />,
     );
 

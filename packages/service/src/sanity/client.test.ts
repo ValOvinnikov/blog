@@ -2,12 +2,18 @@ export {};
 
 describe('Sanity client module loading', () => {
   const originalProjectId = process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'];
+  const originalReadToken = process.env['SANITY_API_READ_TOKEN'];
 
   afterEach(() => {
     if (originalProjectId === undefined) {
       delete process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'];
     } else {
       process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = originalProjectId;
+    }
+    if (originalReadToken === undefined) {
+      delete process.env['SANITY_API_READ_TOKEN'];
+    } else {
+      process.env['SANITY_API_READ_TOKEN'] = originalReadToken;
     }
     vi.resetModules();
   });
@@ -26,26 +32,16 @@ describe('Sanity client module loading', () => {
     await expect(import('./image')).resolves.toHaveProperty('urlForImage');
   });
 
-  it('creates the client with the Sanity CDN disabled', async () => {
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'test-project';
-    vi.resetModules();
-
-    const createClientMock = vi.fn().mockReturnValue({});
-    vi.doMock('next-sanity', () => ({ createClient: createClientMock }));
-
+  it('rejects a call site that omits tenant context at compile time', async () => {
     const { getClient } = await import('./client');
-    getClient();
 
-    // Next's tagged data cache is the sole caching layer — a CDN read after a
-    // tag purge can re-cache stale content.
-    expect(createClientMock).toHaveBeenCalledWith(
-      expect.objectContaining({ useCdn: false }),
-    );
-
-    vi.doUnmock('next-sanity');
+    expect(() =>
+      // @ts-expect-error -- `getClient` takes a required `TTenantSanityContext`; there is no no-arg form that silently falls back to the platform's project.
+      getClient(),
+    ).toThrow();
   });
 
-  it('creates a per-tenant client when a tenant context is passed', async () => {
+  it('creates a per-tenant client with the Sanity CDN disabled', async () => {
     process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'test-project';
     vi.resetModules();
 
@@ -60,6 +56,8 @@ describe('Sanity client module loading', () => {
         projectId: 'tenant-a',
         dataset: 'production',
         token: 'tok-a',
+        // Next's tagged data cache is the sole caching layer — a CDN read
+        // after a tag purge can re-cache stale content.
         useCdn: false,
       }),
     );
@@ -89,18 +87,33 @@ describe('Sanity client module loading', () => {
     vi.doUnmock('next-sanity');
   });
 
-  it('does not share the legacy no-arg client with a per-tenant client', async () => {
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'test-project';
+  it('builds the platform tenant context from env vars', async () => {
+    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'platform-project';
+    process.env['SANITY_API_READ_TOKEN'] = 'platform-read-token';
+    vi.resetModules();
+
+    const { getPlatformSanityContext } = await import('./client');
+
+    expect(getPlatformSanityContext()).toMatchObject({
+      projectId: 'platform-project',
+      token: 'platform-read-token',
+    });
+  });
+
+  it('getPlatformClient reuses the same cache as getClient — never a client per call', async () => {
+    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'platform-project';
+    process.env['SANITY_API_READ_TOKEN'] = 'platform-read-token';
     vi.resetModules();
 
     const createClientMock = vi.fn().mockReturnValue({});
     vi.doMock('next-sanity', () => ({ createClient: createClientMock }));
 
-    const { getClient } = await import('./client');
-    getClient();
-    getClient({ projectId: 'tenant-a', dataset: 'production', token: 'tok-a' });
+    const { getPlatformClient } = await import('./client');
+    const first = getPlatformClient();
+    const second = getPlatformClient();
 
-    expect(createClientMock).toHaveBeenCalledTimes(2);
+    expect(first).toBe(second);
+    expect(createClientMock).toHaveBeenCalledTimes(1);
 
     vi.doUnmock('next-sanity');
   });

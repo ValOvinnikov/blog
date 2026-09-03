@@ -39,7 +39,6 @@ vi.mock('@blog/db', () => ({
 
 const tenant = {
   id: 'tenant-1',
-  slug: 'acme',
   name: 'Acme Inc.',
   deprovisionedAt: new Date('2026-01-01T00:00:00.000Z') as Date | null,
 };
@@ -154,7 +153,7 @@ describe('deleteTenantAction', () => {
       action: AUDIT_ACTION.DELETED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: 'tenant-1',
-      details: { name: 'Acme Inc.', slug: 'acme' },
+      details: { name: 'Acme Inc.' },
     });
   });
 

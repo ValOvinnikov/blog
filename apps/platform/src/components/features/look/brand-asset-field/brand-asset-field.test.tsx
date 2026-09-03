@@ -47,7 +47,7 @@ describe(BrandAssetField, () => {
   it('shows the pre-selection square requirement in its hint before any file is chosen', () => {
     render(
       <BrandAssetField
-        tenantSlug="acme"
+        tenantId="tenant-1"
         kind="favicon"
         label="Favicon"
         hint="Pre-cropped square, please — non-square uploads are rejected."
@@ -65,7 +65,7 @@ describe(BrandAssetField, () => {
   it('renders a thumbnail and a Remove control once a value is set', () => {
     render(
       <BrandAssetField
-        tenantSlug="acme"
+        tenantId="tenant-1"
         kind="logo"
         label="Logo"
         hint="PNG, JPEG, or WebP."
@@ -89,7 +89,7 @@ describe(BrandAssetField, () => {
     const onChange = vi.fn();
     const { container } = render(
       <BrandAssetField
-        tenantSlug="acme"
+        tenantId="tenant-1"
         kind="logo"
         label="Logo"
         hint="PNG, JPEG, or WebP."
@@ -103,7 +103,7 @@ describe(BrandAssetField, () => {
 
     await waitFor(() => {
       expect(uploadBrandAssetActionMock).toHaveBeenCalledWith(
-        'acme',
+        'tenant-1',
         'logo',
         expect.any(FormData),
       );
@@ -117,7 +117,7 @@ describe(BrandAssetField, () => {
     const onChange = vi.fn();
     const { container } = render(
       <BrandAssetField
-        tenantSlug="acme"
+        tenantId="tenant-1"
         kind="logo"
         label="Logo"
         hint="PNG, JPEG, or WebP."
@@ -144,7 +144,7 @@ describe(BrandAssetField, () => {
     const onChange = vi.fn();
     const { container } = render(
       <BrandAssetField
-        tenantSlug="acme"
+        tenantId="tenant-1"
         kind="favicon"
         label="Favicon"
         hint="Pre-cropped square, please."
@@ -170,7 +170,7 @@ describe(BrandAssetField, () => {
     const onChange = vi.fn();
     const { container } = render(
       <BrandAssetField
-        tenantSlug="acme"
+        tenantId="tenant-1"
         kind="logo"
         label="Logo"
         hint="PNG, JPEG, or WebP."
@@ -192,7 +192,7 @@ describe(BrandAssetField, () => {
   it('disables the upload and remove controls when isDisabled is true', () => {
     render(
       <BrandAssetField
-        tenantSlug="acme"
+        tenantId="tenant-1"
         kind="logo"
         label="Logo"
         hint="PNG, JPEG, or WebP."
@@ -218,7 +218,7 @@ describe(BrandAssetField, () => {
     const user = userEvent.setup();
     render(
       <BrandAssetField
-        tenantSlug="acme"
+        tenantId="tenant-1"
         kind="logo"
         label="Logo"
         hint="PNG, JPEG, or WebP."
@@ -230,7 +230,10 @@ describe(BrandAssetField, () => {
     await user.click(screen.getByRole('button', { name: 'Remove' }));
 
     await waitFor(() => {
-      expect(clearBrandAssetActionMock).toHaveBeenCalledWith('acme', 'logo');
+      expect(clearBrandAssetActionMock).toHaveBeenCalledWith(
+        'tenant-1',
+        'logo',
+      );
     });
     expect(onChange).toHaveBeenCalledWith(undefined);
   });

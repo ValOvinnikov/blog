@@ -63,15 +63,19 @@ describe('0009_quick_jazinda (tenants name backfill)', () => {
         await applyMigrationFile(db, file);
       }
 
-      const rows = await db.select().from(tenants).orderBy(tenants.slug);
-      const namesBySlug = Object.fromEntries(
-        rows.map((row) => [row.slug, row.name]),
+      // Keyed by `primaryDomain`: this select must not depend on `slug`.
+      const rows = await db
+        .select()
+        .from(tenants)
+        .orderBy(tenants.primaryDomain);
+      const namesByDomain = Object.fromEntries(
+        rows.map((row) => [row.primaryDomain, row.name]),
       );
 
-      expect(namesBySlug).toEqual({
-        acme: 'Acme',
-        'acme-corp': 'Acme Corp',
-        foo_bar: 'Foo Bar',
+      expect(namesByDomain).toEqual({
+        'acme.example.com': 'Acme',
+        'acme-corp.example.com': 'Acme Corp',
+        'foo-bar.example.com': 'Foo Bar',
       });
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,

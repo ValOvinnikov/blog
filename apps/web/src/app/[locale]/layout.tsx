@@ -12,8 +12,8 @@ import { SmartLink } from '@web/components/shared/smart-link';
 import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
 import { ToastProvider } from '@web/context/toast-provider';
 import { routing } from '@web/i18n/routing';
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
-import { env } from '@web/utils/env/env';
 import { getChromeOn } from '@web/utils/get-chrome-on';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
 import { logger } from '@web/utils/logger/logger';
@@ -40,9 +40,8 @@ export async function generateMetadata(): Promise<Metadata> {
   // root segment's — `metadataBase` is the one field that still inherits
   // down (see `toMetadata`), which is what lets a leaf's relative fallback
   // image path resolve to an absolute URL.
-  const metadataBase = env.NEXT_PUBLIC_SITE_URL
-    ? new URL(env.NEXT_PUBLIC_SITE_URL)
-    : undefined;
+  const tenantBaseUrl = await getTenantBaseUrl();
+  const metadataBase = tenantBaseUrl ? new URL(tenantBaseUrl) : undefined;
 
   // Only the real production environment is indexable — see
   // `isProductionEnvironment` and `robots.ts` for the full reasoning. This

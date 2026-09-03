@@ -5,7 +5,7 @@ import { safeAsync } from '@blog/utils';
 export function createNewsletterModuleService() {
   return {
     v1: {
-      getNewsletter: safeAsync((id: string, tenant?: TTenantSanityContext) =>
+      getNewsletter: safeAsync((id: string, tenant: TTenantSanityContext) =>
         getNewsletter(id, tenant),
       ),
     },

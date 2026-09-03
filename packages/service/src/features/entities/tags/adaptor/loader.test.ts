@@ -1,5 +1,6 @@
 import { makeRawTagWithPostCount } from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getTags } from './loader';
 
@@ -7,6 +8,8 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
   runQuery: vi.fn(),
 }));
+
+const tenant = makeTenant();
 
 describe(getTags, () => {
   it('maps every raw tag into a domain tag with its post count', async () => {
@@ -25,7 +28,7 @@ describe(getTags, () => {
       }),
     ]);
 
-    const result = await getTags();
+    const result = await getTags(tenant);
 
     expect(result.map((t) => t.id)).toEqual(['a', 'b']);
     expect(result[0]?.title).toBe('Design');
@@ -38,7 +41,7 @@ describe(getTags, () => {
       makeRawTagWithPostCount({ description: 'All things TypeScript' }),
     ]);
 
-    const result = await getTags();
+    const result = await getTags(tenant);
 
     expect(result[0]?.description).toBe('All things TypeScript');
   });
@@ -46,7 +49,7 @@ describe(getTags, () => {
   it('normalises a missing description to undefined', async () => {
     mockRun.mockResolvedValue([makeRawTagWithPostCount({ description: null })]);
 
-    const result = await getTags();
+    const result = await getTags(tenant);
 
     expect(result[0]?.description).toBeUndefined();
   });
@@ -54,18 +57,13 @@ describe(getTags, () => {
   it('returns an empty list when there are no tags', async () => {
     mockRun.mockResolvedValue([]);
 
-    const result = await getTags();
+    const result = await getTags(tenant);
 
     expect(result).toEqual([]);
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     mockRun.mockResolvedValue([]);
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getTags(tenant);
 
@@ -76,20 +74,6 @@ describe(getTags, () => {
         next: expect.objectContaining({
           tags: ['t:tenant-a:tags', 't:tenant-a:posts'],
         }),
-      }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun.mockResolvedValue([]);
-
-    await getTags();
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant: undefined,
-        next: expect.objectContaining({ tags: ['tags', 'posts'] }),
       }),
     );
   });

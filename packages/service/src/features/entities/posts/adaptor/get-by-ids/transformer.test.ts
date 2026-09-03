@@ -1,6 +1,9 @@
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { toPostsByIds } from './transformer';
+
+const tenant = makeTenant();
 
 describe(toPostsByIds, () => {
   it('maps every raw post card into a domain post card', () => {
@@ -9,7 +12,7 @@ describe(toPostsByIds, () => {
       makeRawPostCard({ _id: 'b', title: 'Second' }),
     ];
 
-    const result = toPostsByIds(raw);
+    const result = toPostsByIds(raw, tenant);
 
     expect(result.map((post) => post.id)).toEqual(['a', 'b']);
     expect(result[0]?.title).toBe('First');
@@ -17,6 +20,6 @@ describe(toPostsByIds, () => {
   });
 
   it('returns an empty array when there are no matches', () => {
-    expect(toPostsByIds([])).toEqual([]);
+    expect(toPostsByIds([], tenant)).toEqual([]);
   });
 });

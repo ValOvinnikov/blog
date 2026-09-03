@@ -185,6 +185,40 @@ describe(updateProvisioningStep, () => {
     });
   });
 
+  it('leaves lastNotifiedOwnerElevationOutcome untouched when not supplied', async () => {
+    const tenantId = await insertDraftTenant();
+
+    const result = await updateProvisioningStep({
+      tenantId,
+      step: 'OWNER_ELEVATION',
+      status: 'DONE',
+      detail: 'STALLED',
+    });
+
+    if (!result.ok) throw new Error('expected ok:true');
+    expect(result.data.lastNotifiedOwnerElevationOutcome).toBeNull();
+  });
+
+  it('writes lastNotifiedOwnerElevationOutcome alongside the step detail when supplied', async () => {
+    const tenantId = await insertDraftTenant();
+
+    const result = await updateProvisioningStep({
+      tenantId,
+      step: 'OWNER_ELEVATION',
+      status: 'DONE',
+      detail: 'STALLED',
+      notifiedOwnerElevationOutcome: 'STALLED',
+    });
+
+    if (!result.ok) throw new Error('expected ok:true');
+    expect(result.data.lastNotifiedOwnerElevationOutcome).toBe('STALLED');
+    expect(result.data.provisioningSteps?.['OWNER_ELEVATION']).toEqual({
+      status: 'DONE',
+      detail: 'STALLED',
+      updatedAt: NOW,
+    });
+  });
+
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {
     const result = await updateProvisioningStep({
       tenantId: '00000000-0000-0000-0000-000000000000',

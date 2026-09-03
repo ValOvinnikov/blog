@@ -1,3 +1,4 @@
+import type { TImageTenant } from '@blog/service/sanity/image';
 import {
   toPostCard,
   type TPostCard,
@@ -20,6 +21,7 @@ export function toRelatedPosts(
   byTags: TRawRelatedByTags,
   byTopic: TRawRelatedByTopic,
   currentTagIds: string[],
+  tenant: TImageTenant,
 ): TPostCard[] {
   const ranked = byTags
     .map((raw) => ({
@@ -35,7 +37,7 @@ export function toRelatedPosts(
       return b.raw.publishedAt.localeCompare(a.raw.publishedAt);
     })
     .slice(0, RELATED_POSTS_LIMIT)
-    .map(({ raw }) => toPostCard(raw));
+    .map(({ raw }) => toPostCard(raw, tenant));
 
   if (ranked.length >= RELATED_POSTS_LIMIT) return ranked;
 
@@ -43,7 +45,7 @@ export function toRelatedPosts(
   const backfill = byTopic
     .filter((raw) => !rankedIds.has(raw._id))
     .slice(0, RELATED_POSTS_LIMIT - ranked.length)
-    .map(toPostCard);
+    .map((raw) => toPostCard(raw, tenant));
 
   return [...ranked, ...backfill];
 }

@@ -5,7 +5,7 @@ import { safeAsync } from '@blog/utils';
 export function createThemeSettingsService() {
   return {
     v1: {
-      getTheme: safeAsync((tenant?: TTenantSanityContext) => getTheme(tenant)),
+      getTheme: safeAsync((tenant: TTenantSanityContext) => getTheme(tenant)),
     },
   };
 }

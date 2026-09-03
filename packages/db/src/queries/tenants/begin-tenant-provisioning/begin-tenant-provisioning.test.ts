@@ -104,6 +104,34 @@ describe(beginTenantProvisioning, () => {
     );
   });
 
+  it('resolves exactly one of two concurrent calls with ok:true', async () => {
+    const tenantId = await insertTenant();
+
+    const [first, second] = await Promise.all([
+      beginTenantProvisioning(tenantId),
+      beginTenantProvisioning(tenantId),
+    ]);
+
+    const outcomes = [first, second];
+    const succeeded = outcomes.filter((result) => result.ok);
+    const refused = outcomes.filter((result) => !result.ok);
+
+    expect(succeeded).toHaveLength(1);
+    expect(refused).toHaveLength(1);
+    expect(refused[0]).toEqual({
+      ok: false,
+      error: ERROR_CODE.DB_ALREADY_PROVISIONING,
+    });
+
+    const [row] = await db
+      .select()
+      .from(tenants)
+      .where(eq(tenants.id, tenantId));
+    expect(row?.provisioningStatus).toBe(
+      TENANT_PROVISIONING_STATUS.PROVISIONING,
+    );
+  });
+
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {
     const result = await beginTenantProvisioning(
       '00000000-0000-0000-0000-000000000000',

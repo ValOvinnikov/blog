@@ -1,5 +1,6 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
 import { PostListModule } from './post-list-module';
@@ -46,7 +47,7 @@ describe(PostListModule, () => {
   beforeEach(() => {
     getPostListMock.mockReset();
     getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
@@ -83,7 +84,11 @@ describe(PostListModule, () => {
 
     await setup({ page: 2 });
 
-    expect(getPostListMock).toHaveBeenCalledWith('post-list-1', 2, undefined);
+    expect(getPostListMock).toHaveBeenCalledWith(
+      'post-list-1',
+      DEFAULT_TENANT_SANITY_CONTEXT,
+      2,
+    );
   });
 
   it('forwards the resolved tenant Sanity context to getPostList', async () => {
@@ -111,7 +116,7 @@ describe(PostListModule, () => {
 
     await setup();
 
-    expect(getPostListMock).toHaveBeenCalledWith('post-list-1', 1, tenant);
+    expect(getPostListMock).toHaveBeenCalledWith('post-list-1', tenant, 1);
   });
 
   it('renders an archive-appropriate accessible heading (never "Latest posts")', async () => {

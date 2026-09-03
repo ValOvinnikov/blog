@@ -25,12 +25,12 @@ import { useId, useMemo } from 'react';
 import { voiceSettingsVariants } from './voice-settings-variants';
 
 export type TVoiceSettingsProps = {
-  tenantSlug: string;
+  tenantId: string;
   voicePack: TVoicePack;
   /** The tenant's saved `site_config.voiceOverrides` — matches its `Record<string, string>` JSONB shape directly rather than a narrower curated-key type, so the server component can pass it straight through. */
   initialOverrides: Record<string, string>;
   saveAction: (
-    tenantSlug: string,
+    tenantId: string,
     overrides: TVoiceOverrides,
   ) => Promise<{ ok: boolean }>;
   /** When set, the tenant is archived: Save is disabled and a notice explains why. */
@@ -56,7 +56,7 @@ const buildInitialValues = (
  * absent JSONB key rather than a stored empty string.
  */
 export const VoiceSettings = ({
-  tenantSlug,
+  tenantId,
   voicePack,
   initialOverrides,
   saveAction,
@@ -72,7 +72,7 @@ export const VoiceSettings = ({
   const { values, setValues, status, isPending, handleSubmit } =
     useFormSubmission<TVoiceOverrides, { ok: boolean }>({
       initialValues: () => buildInitialValues(initialOverrides),
-      onSubmit: (vals) => saveAction(tenantSlug, vals),
+      onSubmit: (vals) => saveAction(tenantId, vals),
       onSuccess: () => {
         toast.success({
           command: 'voice',

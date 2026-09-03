@@ -6,6 +6,7 @@ export * as account from './account';
 export * as admins from './admins';
 export * as auditEvents from './audit-events';
 export * as bookmarks from './bookmarks';
+export * as findings from './findings';
 export * as membershipInvites from './membership-invites';
 export * as memberships from './memberships';
 export * as settingsFeatures from './settings-features';

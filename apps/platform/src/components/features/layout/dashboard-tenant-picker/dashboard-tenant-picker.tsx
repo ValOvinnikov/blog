@@ -13,11 +13,11 @@ export type TDashboardTenantPickerProps = {
 };
 
 /**
- * Shown at `/dashboard/select-tenant` before a slug-free dashboard session
- * has an "active tenant" cookie. Reuses `TenantSwitcher`'s own tenant-list
- * rendering rather than a second list UI — only its link target differs,
- * pointing at the cookie-setting `/api/dashboard/select-tenant` endpoint
- * instead of the id-routed `/tenants/{id}`.
+ * Shown at `/dashboard/select-tenant` before the session has an "active
+ * tenant" cookie. Reuses `TenantSwitcher`'s own tenant-list rendering rather
+ * than a second list UI — only its link target differs, pointing at the
+ * cookie-setting `/api/dashboard/select-tenant` endpoint instead of the
+ * id-routed `/tenants/{id}`.
  */
 export const DashboardTenantPicker = ({
   tenants,

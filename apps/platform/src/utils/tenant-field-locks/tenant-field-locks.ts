@@ -8,7 +8,7 @@ import {
 import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
 
 export type TTenantFieldKey =
-  'name' | 'slug' | 'primaryDomain' | 'plan' | 'locale' | 'ownerEmail';
+  'name' | 'primaryDomain' | 'plan' | 'locale' | 'ownerEmail';
 
 export type TTenantFieldLockReason =
   | { kind: 'step'; step: TTenantProvisioningStep }
@@ -25,7 +25,6 @@ export type TTenantFieldLocks = Partial<
 
 export const ALL_FIELD_KEYS: TTenantFieldKey[] = [
   'name',
-  'slug',
   'primaryDomain',
   'plan',
   'locale',

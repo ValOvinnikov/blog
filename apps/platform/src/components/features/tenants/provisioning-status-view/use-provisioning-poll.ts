@@ -124,10 +124,12 @@ const isTerminalDomainVerificationStatus = (
   return status === 'VERIFIED' || status === 'NOT_CONFIGURED';
 };
 
-type TDispatchErrorKind = 'not-found' | 'archived' | 'other';
+type TDispatchNoticeKind =
+  'not-found' | 'archived' | 'already-in-progress' | 'other';
 
 export type TUseProvisioningPollResult = {
-  dispatchError: TDispatchErrorKind | undefined;
+  /** Non-undefined when the last Start/Retry dispatch didn't result in a fresh run — `already-in-progress` means one is genuinely in flight, the rest are real failures. */
+  dispatchNotice: TDispatchNoticeKind | undefined;
   isStarting: boolean;
   isRetrying: boolean;
   handleStart: () => void;
@@ -177,8 +179,8 @@ export const useProvisioningPoll = (
   const pollErrorToastIdRef = useRef<string | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
-  const [dispatchError, setDispatchError] = useState<
-    TDispatchErrorKind | undefined
+  const [dispatchNotice, setDispatchNotice] = useState<
+    TDispatchNoticeKind | undefined
   >(undefined);
   const [, startTransition] = useTransition();
   const [renderedTenant, setRenderedTenant] = useState(tenant);
@@ -385,7 +387,7 @@ export const useProvisioningPoll = (
   ) as Exclude<TTenantProvisioningStepStatus, 'FAILED'>;
 
   const runProvisioningDispatch = (setPending: (pending: boolean) => void) => {
-    setDispatchError(undefined);
+    setDispatchNotice(undefined);
     setPending(true);
     // Force polling back on immediately, and record what the steps look
     // like right now — the re-dispatched workflow hasn't actually started
@@ -397,17 +399,21 @@ export const useProvisioningPoll = (
     startTransition(async () => {
       const result = await retryProvisioningStepAction(tenant.id);
 
-      if (
-        result.outcome === 'dispatched' ||
-        result.outcome === 'already-in-progress'
-      ) {
+      if (result.outcome === 'dispatched') {
         router.refresh();
+      } else if (result.outcome === 'already-in-progress') {
+        // A run is genuinely in flight server-side — keep watching the
+        // pending-retry baseline (unlike the real failures below) and still
+        // refresh, but tell the operator why this click didn't start a new
+        // one instead of leaving the button looking broken.
+        router.refresh();
+        setDispatchNotice('already-in-progress');
       } else {
         // Nothing was actually dispatched (or it was reverted server-side)
         // — stop waiting for a change that predates a retry that never
         // took effect, and let the operator see and act on the failure.
         setPendingRetryBaseline(null);
-        setDispatchError(
+        setDispatchNotice(
           result.outcome === 'not-found' || result.outcome === 'archived'
             ? result.outcome
             : 'other',
@@ -422,7 +428,7 @@ export const useProvisioningPoll = (
   const handleStart = () => runProvisioningDispatch(setIsStarting);
 
   return {
-    dispatchError,
+    dispatchNotice,
     isStarting,
     isRetrying,
     handleStart,

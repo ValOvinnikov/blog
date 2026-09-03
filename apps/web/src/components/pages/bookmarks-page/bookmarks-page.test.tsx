@@ -1,5 +1,6 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makePostCard } from '@web/testing/shared/post/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { redirect } from 'next/navigation';
 
 import { BookmarksPage } from './bookmarks-page';
@@ -75,7 +76,7 @@ describe(`<${BookmarksPage.name}/>`, () => {
     getRequestTenantIdMock.mockReset();
     getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
     getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('redirects home without querying bookmarks when there is no session', async () => {
@@ -107,7 +108,10 @@ describe(`<${BookmarksPage.name}/>`, () => {
     await setup();
 
     expect(listBookmarksMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
-    expect(getPostsByIdsMock).toHaveBeenCalledWith([], undefined);
+    expect(getPostsByIdsMock).toHaveBeenCalledWith(
+      [],
+      DEFAULT_TENANT_SANITY_CONTEXT,
+    );
   });
 
   it('forwards the resolved tenant Sanity context to getPostsByIds', async () => {
@@ -144,7 +148,7 @@ describe(`<${BookmarksPage.name}/>`, () => {
 
     expect(getPostsByIdsMock).toHaveBeenCalledWith(
       ['post-2', 'post-1'],
-      undefined,
+      DEFAULT_TENANT_SANITY_CONTEXT,
     );
 
     const links = screen.getAllByRole('link');

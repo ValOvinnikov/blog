@@ -5,7 +5,7 @@ import { safeAsync } from '@blog/utils';
 export function createHeroModuleService() {
   return {
     v1: {
-      getHero: safeAsync((id: string, tenant?: TTenantSanityContext) =>
+      getHero: safeAsync((id: string, tenant: TTenantSanityContext) =>
         getHero(id, tenant),
       ),
     },

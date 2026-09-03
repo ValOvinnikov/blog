@@ -60,7 +60,13 @@ export type TTenantProvisioningState = Record<
 // domain (including this one) a tenant answers to.
 export const tenants = pgTable('tenants', {
   id: uuid('id').primaryKey().defaultRandom(),
-  slug: text('slug').notNull().unique(),
+  // Unused by every caller — kept `.notNull().unique()` only until the
+  // column itself is dropped. `$defaultFn` fills it so an insert never has
+  // to supply one.
+  slug: text('slug')
+    .notNull()
+    .unique()
+    .$defaultFn(() => crypto.randomUUID()),
   name: text('name').notNull(),
   primaryDomain: text('primary_domain').notNull(),
   // Nullable: null until provisioning step 1 (Create Sanity project) creates
@@ -94,6 +100,17 @@ export const tenants = pgTable('tenants', {
   // `TTenantProvisioningState` above.
   provisioningSteps:
     jsonb('provisioning_steps').$type<TTenantProvisioningState>(),
+  // Outcome last actually communicated to operators, written by
+  // `notifyOwnerElevationOutcome` — distinct from `provisioningSteps`'
+  // `OWNER_ELEVATION` `detail` above, which only
+  // records the most recently *observed* outcome. Dedup for both
+  // provisioning's own first check and the recurring recheck sweep keys off
+  // this column, so a notifiable outcome first observed during provisioning
+  // is communicated once and the same-state sweep that follows stays
+  // silent. Nullable: never notified yet.
+  lastNotifiedOwnerElevationOutcome: text(
+    'last_notified_owner_elevation_outcome',
+  ).$type<TElevateTenantOwnerOutcome>(),
   studioVercelProjectId: text('studio_vercel_project_id'),
   seededAt: timestamp('seeded_at', { mode: 'date' }),
   // Set once provisioning creates the Sanity webhook pointing at apps/web's
@@ -101,8 +118,7 @@ export const tenants = pgTable('tenants', {
   webhookCreatedAt: timestamp('webhook_created_at', { mode: 'date' }),
   // Set once `scripts/deprovision-tenant` finishes tearing a tenant's infra
   // down (alongside `status` moving to ARCHIVED). The row is archived, never
-  // hard-deleted, so `slug`'s unique constraint keeps a deprovisioned
-  // tenant's slug from being silently re-registered.
+  // hard-deleted.
   deprovisionedAt: timestamp('deprovisioned_at', { mode: 'date' }),
   createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' })

@@ -5,7 +5,10 @@
 > applies this as an audit checklist.
 
 - Per-route `generateMetadata` (title, description, canonical, Open Graph,
-  Twitter card) using `NEXT_PUBLIC_SITE_URL`.
+  Twitter card). Absolute URLs are derived from the resolved tenant's own
+  `primaryDomain`, falling back to `NEXT_PUBLIC_SITE_URL` when no tenant
+  resolves — a single deployment-wide origin would otherwise emit the
+  deployment's host for every tenant.
 - **SEO fallback resolution lives in `service`**, not the routes: a single
   `resolveSeo` transformer applies the ladder **authored `seo` →
   content-derived → site defaults** once per field, returning a fully-resolved

@@ -2,6 +2,7 @@ import { LOCALE_ISO_CODES, routes, SOCIAL_PLATFORMS } from '@blog/config';
 import userEvent from '@testing-library/user-event';
 import realMessages from '@web/i18n/messages/en.json';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import type { ReactNode } from 'react';
 
 import LocaleLayout, { generateMetadata, generateStaticParams } from './layout';
@@ -20,6 +21,7 @@ const {
   useSessionMock,
   getEnabledOAuthProviderIdsMock,
   getTenantSanityContextMock,
+  getTenantBaseUrlMock,
 } = vi.hoisted(() => ({
   getSiteSettingsMock: vi.fn(),
   getNavigationMock: vi.fn(),
@@ -34,10 +36,15 @@ const {
   useSessionMock: vi.fn(),
   getEnabledOAuthProviderIdsMock: vi.fn(),
   getTenantSanityContextMock: vi.fn(),
+  getTenantBaseUrlMock: vi.fn(),
 }));
 
 vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
   getTenantSanityContext: getTenantSanityContextMock,
+}));
+
+vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
+  getTenantBaseUrl: getTenantBaseUrlMock,
 }));
 
 vi.mock('@blog/auth/utils/oauth-providers/oauth-providers', () => ({
@@ -120,7 +127,8 @@ describe('LocaleLayout', () => {
     isProductionEnvironmentMock.mockReturnValue(true);
     useSessionMock.mockReturnValue({ data: null, status: 'unauthenticated' });
     getEnabledOAuthProviderIdsMock.mockReturnValue(['github', 'google']);
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getTenantBaseUrlMock.mockResolvedValue(undefined);
   });
 
   describe('generateStaticParams', () => {

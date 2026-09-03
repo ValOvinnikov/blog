@@ -18,8 +18,8 @@ export async function listTenants(
       .select()
       .from(tenants)
       .where(isNull(tenants.deprovisionedAt))
-      .orderBy(asc(tenants.slug));
+      .orderBy(asc(tenants.name));
   }
 
-  return db.select().from(tenants).orderBy(asc(tenants.slug));
+  return db.select().from(tenants).orderBy(asc(tenants.name));
 }

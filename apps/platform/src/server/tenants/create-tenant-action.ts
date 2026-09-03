@@ -1,6 +1,11 @@
 'use server';
 
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE, ERROR_CODE } from '@blog/config';
+import {
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  DOMAIN_PATTERN,
+  ERROR_CODE,
+} from '@blog/config';
 import { queries, TENANT_PLAN, type TTenantPlan } from '@blog/db';
 import { routing } from '@platform/i18n/routing';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
@@ -13,18 +18,12 @@ import {
   verifyOwnerInviteToken,
 } from '@platform/server/tenants/owner-invite-token';
 import { logger } from '@platform/utils/logger/logger';
-import { DOMAIN_PATTERN, SLUG_PATTERN } from '@platform/utils/path/path';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 const createTenantInputSchema = z.object({
   name: z.string().trim().min(1, 'Enter a tenant name.'),
-  slug: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .regex(SLUG_PATTERN, 'Lowercase letters, numbers, and hyphens only.'),
   domain: z
     .string()
     .trim()
@@ -82,7 +81,7 @@ export const createTenantAction = async (
     return { ok: false, fieldErrors };
   }
 
-  const { name, slug, domain, plan, ownerEmail, confirmOwnerInviteToken } =
+  const { name, domain, plan, ownerEmail, confirmOwnerInviteToken } =
     parsed.data;
 
   const owner = await queries.users.getUserByEmail(ownerEmail);
@@ -97,18 +96,10 @@ export const createTenantAction = async (
     };
   }
 
-  const [existingSlug, existingDomain, domainAvailability] = await Promise.all([
-    queries.tenants.getTenantBySlug(slug, { includeArchived: true }),
+  const [existingDomain, domainAvailability] = await Promise.all([
     queries.tenantDomains.getTenantByDomain(domain),
     checkDomainAvailability(domain),
   ]);
-
-  if (existingSlug) {
-    return {
-      ok: false,
-      fieldErrors: { slug: 'This slug is already in use.' },
-    };
-  }
 
   if (existingDomain) {
     return {
@@ -133,7 +124,6 @@ export const createTenantAction = async (
   try {
     const result = await queries.tenants.createTenantDraft({
       name,
-      slug,
       domain,
       locale: routing.defaultLocale,
       plan,
@@ -143,14 +133,7 @@ export const createTenantAction = async (
     });
 
     if (!result.ok) {
-      if (result.error === ERROR_CODE.DB_DUPLICATE_SLUG) {
-        return {
-          ok: false,
-          fieldErrors: { slug: 'This slug is already in use.' },
-        };
-      }
       logger.error('tenants.create_draft_failed', {
-        slug,
         domain,
         error: result.error,
       });
@@ -159,7 +142,7 @@ export const createTenantAction = async (
 
     tenantId = result.data.id;
   } catch (error) {
-    logger.error('tenants.create_draft_failed', { slug, domain, error });
+    logger.error('tenants.create_draft_failed', { domain, error });
     return { ok: false, error: "Couldn't create the tenant — try again." };
   }
 
@@ -168,7 +151,7 @@ export const createTenantAction = async (
     action: AUDIT_ACTION.CREATED,
     targetType: AUDIT_TARGET_TYPE.TENANT,
     targetId: tenantId,
-    details: { name, slug, domain, plan, ownerEmail },
+    details: { name, domain, plan, ownerEmail },
   });
 
   // `redirect: false` returns a result instead of throwing, since this

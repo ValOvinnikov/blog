@@ -152,7 +152,7 @@ describe(ProvisioningStatusView, () => {
       />,
     );
     expect(
-      screen.getByRole('link', { name: '← Back to tenant' }),
+      screen.getByRole('link', { name: 'Back to tenant' }),
     ).toHaveAttribute('href', '/tenants/tenant-1');
     unmount();
 
@@ -166,7 +166,7 @@ describe(ProvisioningStatusView, () => {
       />,
     );
     expect(
-      screen.getByRole('link', { name: '← Back to tenant' }),
+      screen.getByRole('link', { name: 'Back to tenant' }),
     ).toHaveAttribute('href', '/tenants/tenant-1');
   });
 
@@ -617,7 +617,7 @@ describe(ProvisioningStatusView, () => {
     ).toBeVisible();
   });
 
-  it('treats "already-in-progress" as a no-op — no error shown, dispatch still reported', async () => {
+  it('shows a distinct, non-error notice when a run is already in progress', async () => {
     const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
     retryProvisioningStepActionMock.mockResolvedValue({
       outcome: 'already-in-progress',
@@ -631,9 +631,13 @@ describe(ProvisioningStatusView, () => {
       screen.getByRole('button', { name: 'Start provisioning' }),
     );
 
-    await waitFor(() => {
-      expect(retryProvisioningStepActionMock).toHaveBeenCalledWith('tenant-1');
-    });
+    expect(
+      await screen.findByText(
+        'A provisioning run is already in progress for this tenant — this page will update automatically once it finishes.',
+      ),
+    ).toBeVisible();
+    // A non-error notice uses the `status` live region, not `alert` — it
+    // must not read to assistive tech as a failure.
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 

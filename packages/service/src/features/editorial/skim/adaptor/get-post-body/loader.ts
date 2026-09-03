@@ -11,7 +11,7 @@ import type { TPostBody } from './types';
 // never serve a stale cached response.
 export async function getPublishedPostBody(
   postId: string,
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<TPostBody> {
   const raw = await runQuery(publishedPostBodyQuery, {
     parameters: { id: postId },

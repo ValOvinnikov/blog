@@ -1,5 +1,5 @@
 import type { ILocalizedParams } from '@blog/config';
-import { service } from '@blog/service';
+import { getPlatformSanityContext, service } from '@blog/service';
 import { BlogPostPage } from '@web/components/pages/blog-post-page';
 import { buildPostMetadata } from '@web/metadata/post-metadata';
 import { logger } from '@web/utils/logger/logger';
@@ -11,7 +11,9 @@ type TProps = {
 };
 
 export async function generateStaticParams() {
-  const result = await service.pages.post.v1.getPostParams();
+  const result = await service.pages.post.v1.getPostParams(
+    getPlatformSanityContext(),
+  );
 
   if (!result.ok) {
     logger.error('blog_post.params_fetch_failed', { error: result.error });

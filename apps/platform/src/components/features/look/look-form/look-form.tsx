@@ -21,7 +21,9 @@ import { LookFormImagesSection } from './look-form-images-section';
 import { lookFormVariants } from './look-form-variants';
 
 export type TLookFormProps = {
-  tenantSlug: string;
+  tenantId: string;
+  tenantName: string;
+  primaryDomain: string;
   initialValues: TLookFormValues;
   /** When set, the tenant is archived: Save is disabled and a notice explains why. */
   archivedAt?: Date;
@@ -75,7 +77,9 @@ const valuesEqual = (a: TLookFormValues, b: TLookFormValues): boolean => {
 };
 
 export const LookForm = ({
-  tenantSlug,
+  tenantId,
+  tenantName,
+  primaryDomain,
   initialValues,
   archivedAt,
 }: TLookFormProps) => {
@@ -93,7 +97,7 @@ export const LookForm = ({
     useFormSubmission<TLookFormValues, { ok: boolean }>({
       initialValues,
       onSubmit: (vals) =>
-        updateLookAction(tenantSlug, {
+        updateLookAction(tenantId, {
           preset: vals.preset,
           accentHue: vals.accentHue,
           logoHue: vals.logoHue ?? null,
@@ -187,7 +191,7 @@ export const LookForm = ({
                 archivedNoticeId={archivedNoticeId}
               />
               <LookFormImagesSection
-                tenantSlug={tenantSlug}
+                tenantId={tenantId}
                 logoAssetUrl={values.logoAssetUrl}
                 faviconAssetUrl={values.faviconAssetUrl}
                 onFieldChange={updateField}
@@ -222,7 +226,8 @@ export const LookForm = ({
 
         <div className={stack()}>
           <LookPreview
-            tenantSlug={tenantSlug}
+            tenantName={tenantName}
+            primaryDomain={primaryDomain}
             accentHue={values.accentHue}
             logoHue={values.logoHue}
             headingFont={values.headingFont}

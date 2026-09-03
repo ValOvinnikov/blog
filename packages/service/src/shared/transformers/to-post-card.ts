@@ -1,4 +1,5 @@
 import type { ISanityImage, TMaybeUndefined } from '@blog/config';
+import type { TImageTenant } from '@blog/service/sanity/image';
 import type { postCardFragment } from '@blog/service/shared/fragments/post';
 import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
@@ -35,12 +36,15 @@ export type TPostCard = {
   readingTimeMinutes: number;
 };
 
-function toPostCardAuthor(raw: TRawPostCard['author']): TPostCardAuthor {
+function toPostCardAuthor(
+  raw: TRawPostCard['author'],
+  tenant: TImageTenant,
+): TPostCardAuthor {
   return {
     id: raw._id,
     name: raw.name,
     profilePageSlug: raw.profilePage?.slug ?? undefined,
-    imageUrl: buildImageUrl(raw.image),
+    imageUrl: buildImageUrl(raw.image, tenant),
   };
 }
 
@@ -52,18 +56,18 @@ export function toPostCardTopic(raw: TRawPostCard['topic']): TPostCardTopic {
   };
 }
 
-export function toPostCard(raw: TRawPostCard): TPostCard {
+export function toPostCard(raw: TRawPostCard, tenant: TImageTenant): TPostCard {
   return {
     id: raw._id,
     title: raw.title,
     slug: raw.slug,
     excerpt: raw.excerpt,
     publishedAt: raw.publishedAt,
-    heroImageUrl: buildImageUrl(raw.heroImage),
+    heroImageUrl: buildImageUrl(raw.heroImage, tenant),
     heroImageAlt: raw.heroImage?.alt,
-    heroImageSanity: toSanityImage(raw.heroImageAsset),
+    heroImageSanity: toSanityImage(raw.heroImageAsset, tenant),
     featured: raw.featured ?? false,
-    author: toPostCardAuthor(raw.author),
+    author: toPostCardAuthor(raw.author, tenant),
     topic: toPostCardTopic(raw.topic),
     readingTimeMinutes: toReadingTimeMinutes(raw.wordCount),
   };

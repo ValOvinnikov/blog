@@ -1,5 +1,6 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeTag } from '@web/testing/shared/tag/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
 import { TagPage } from './tag-page';
@@ -9,9 +10,11 @@ const {
   moduleRendererMock,
   postListModuleMock,
   getTenantSanityContextMock,
+  getTenantBaseUrlMock,
 } = vi.hoisted(() => ({
   getTagPageMock: vi.fn(),
   getTenantSanityContextMock: vi.fn(),
+  getTenantBaseUrlMock: vi.fn(),
   // `ModuleRenderer`/`PostListModule` are async Server Components — real
   // RSC async-component nesting isn't renderable through
   // `@testing-library/react`'s client renderer. Stubbed as plain sync
@@ -65,6 +68,10 @@ vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
   getTenantSanityContext: getTenantSanityContextMock,
 }));
 
+vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
+  getTenantBaseUrl: getTenantBaseUrlMock,
+}));
+
 vi.mock('@web/components/shared/smart-link', () => ({
   SmartLink: ({
     href,
@@ -94,7 +101,9 @@ describe(`<${TagPage.name}/>`, () => {
     moduleRendererMock.mockClear();
     postListModuleMock.mockClear();
     getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getTenantBaseUrlMock.mockReset();
+    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
   });
 
   it('calls notFound() and logs when the fetch fails', async () => {

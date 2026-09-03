@@ -17,22 +17,16 @@
  */
 import { pathToFileURL } from 'node:url';
 
-import {
-  ELEVATE_TENANT_OWNER_OUTCOME,
-  TENANT_PROVISIONING_STEP,
-} from '@blog/db/constants';
+import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
 import { listTenantsPendingOwnerElevation } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
 
+import { notifyOwnerElevationOutcome } from '../provision-tenant/lib/notify-owner-elevation-outcome';
 import { reportOwnerElevationOutcome } from '../provision-tenant/lib/report-owner-elevation-outcome';
 import { elevateTenantOwner } from '../provision-tenant/steps/elevate-tenant-owner';
 
 import { loadRecheckEnv, type TRecheckEnv } from './lib/env';
-import {
-  isNotifiableOutcome,
-  notifyOperatorsOfOwnerElevationOutcome,
-} from './lib/notify-operators';
 
 export type TRecheckSummary = {
   checked: number;
@@ -70,22 +64,20 @@ async function recheckOne(
   summary: TRecheckSummary,
 ): Promise<void> {
   try {
-    const previousOutcome =
-      tenant.provisioningSteps?.[TENANT_PROVISIONING_STEP.OWNER_ELEVATION]
-        ?.detail;
     const outcome = await elevateTenantOwner(
       tenant,
       env as TElevateTenantOwnerEnv,
     );
-    await reportOwnerElevationOutcome(tenant.id, outcome);
-
-    if (isNotifiableOutcome(outcome) && outcome !== previousOutcome) {
-      await notifyOperatorsOfOwnerElevationOutcome({
-        tenant,
-        outcome,
-        resendApiKey: env.resendApiKey,
-      });
-    }
+    const notifiedOutcome = await notifyOwnerElevationOutcome({
+      tenant,
+      outcome,
+      resendApiKey: env.resendApiKey,
+    });
+    await reportOwnerElevationOutcome(
+      tenant.id,
+      outcome,
+      ...(notifiedOutcome === undefined ? [] : [notifiedOutcome]),
+    );
 
     switch (outcome) {
       case ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED:
@@ -100,20 +92,20 @@ async function recheckOne(
       case ELEVATE_TENANT_OWNER_OUTCOME.STALLED:
         summary.stalled += 1;
         console.error(
-          `recheck-tenant-owners: tenant "${tenant.id}" (slug "${tenant.slug}")'s owner still hasn't accepted their Sanity invite — administrator grant is stalled, not failed.`,
+          `recheck-tenant-owners: tenant "${tenant.id}" ("${tenant.name}")'s owner still hasn't accepted their Sanity invite — administrator grant is stalled, not failed.`,
         );
         break;
       case ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP:
         summary.ambiguous += 1;
         console.error(
-          `recheck-tenant-owners: tenant "${tenant.id}" (slug "${tenant.slug}")'s Sanity project has more than one human member — cannot tell which is the owner, so no role was granted. Needs manual review.`,
+          `recheck-tenant-owners: tenant "${tenant.id}" ("${tenant.name}")'s Sanity project has more than one human member — cannot tell which is the owner, so no role was granted. Needs manual review.`,
         );
         break;
     }
   } catch (error) {
     summary.errors += 1;
     console.error(
-      `recheck-tenant-owners: elevate-tenant-owner failed for tenant "${tenant.id}" (slug "${tenant.slug}"): ${sanitizeLogMessage(error)}`,
+      `recheck-tenant-owners: elevate-tenant-owner failed for tenant "${tenant.id}" ("${tenant.name}"): ${sanitizeLogMessage(error)}`,
     );
   }
 }

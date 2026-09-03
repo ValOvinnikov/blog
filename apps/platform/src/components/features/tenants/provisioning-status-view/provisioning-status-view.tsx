@@ -47,7 +47,7 @@ export const ProvisioningStatusView = ({
 }: TProvisioningStatusViewProps) => {
   const t = useTranslations('provisioningStatusView');
   const {
-    dispatchError,
+    dispatchNotice,
     isStarting,
     isRetrying,
     handleStart,
@@ -120,7 +120,7 @@ export const ProvisioningStatusView = ({
           <LinkButton
             as={Link}
             href={adminRoutes.tenantOverview(tenant.id)}
-            variant="ghost"
+            variant="secondary"
           >
             {t('backToTenantAction')}
           </LinkButton>
@@ -141,15 +141,21 @@ export const ProvisioningStatusView = ({
         </div>
       )}
 
-      {dispatchError && (
+      {dispatchNotice && (
         <Alert
-          type={ALERT_TYPE.ERROR}
+          type={
+            dispatchNotice === 'already-in-progress'
+              ? ALERT_TYPE.INFO
+              : ALERT_TYPE.ERROR
+          }
           title={
-            dispatchError === 'not-found'
+            dispatchNotice === 'not-found'
               ? t('startErrorNotFound')
-              : dispatchError === 'archived'
+              : dispatchNotice === 'archived'
                 ? t('startErrorArchived')
-                : t('startError')
+                : dispatchNotice === 'already-in-progress'
+                  ? t('startNoticeAlreadyInProgress')
+                  : t('startError')
           }
         />
       )}
@@ -256,7 +262,7 @@ export const ProvisioningStatusView = ({
               {isOverallFailed && (
                 <Button
                   type="button"
-                  variant="ghost"
+                  variant="secondary"
                   onClick={handleRetry}
                   isDisabled={isRetrying || isArchived}
                   aria-describedby={isArchived ? archivedNoticeId : undefined}

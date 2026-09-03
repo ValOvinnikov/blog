@@ -40,7 +40,7 @@ vi.mock('./dispatch-deprovisioning-workflow', () => ({
 
 const tenant = {
   id: 'tenant-1',
-  slug: 'acme',
+  name: 'Acme Inc.',
   deprovisionedAt: null as Date | null,
 };
 
@@ -73,7 +73,10 @@ describe('deprovisionTenantAction', () => {
       await import('./deprovision-tenant-action');
 
     await expect(
-      deprovisionTenantAction('tenant-1', { confirm: 'acme', dryRun: true }),
+      deprovisionTenantAction('tenant-1', {
+        confirm: 'Acme Inc.',
+        dryRun: true,
+      }),
     ).rejects.toThrow('NEXT_REDIRECT');
     expect(dispatchDeprovisioningWorkflowMock).not.toHaveBeenCalled();
   });
@@ -86,7 +89,10 @@ describe('deprovisionTenantAction', () => {
       await import('./deprovision-tenant-action');
 
     await expect(
-      deprovisionTenantAction('tenant-1', { confirm: 'acme', dryRun: true }),
+      deprovisionTenantAction('tenant-1', {
+        confirm: 'Acme Inc.',
+        dryRun: true,
+      }),
     ).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(redirect).not.toHaveBeenCalled();
@@ -94,12 +100,12 @@ describe('deprovisionTenantAction', () => {
     expect(dispatchDeprovisioningWorkflowMock).not.toHaveBeenCalled();
   });
 
-  it('returns a field error when confirm does not match the tenant slug', async () => {
+  it('returns a field error when confirm does not match the tenant name', async () => {
     const { deprovisionTenantAction } =
       await import('./deprovision-tenant-action');
 
     const result = await deprovisionTenantAction('tenant-1', {
-      confirm: 'wrong-slug',
+      confirm: 'wrong-name',
       dryRun: true,
     });
 
@@ -113,7 +119,7 @@ describe('deprovisionTenantAction', () => {
       await import('./deprovision-tenant-action');
 
     const result = await deprovisionTenantAction('tenant-1', {
-      confirm: 'acme',
+      confirm: 'Acme Inc.',
       dryRun: true,
     });
 
@@ -129,7 +135,7 @@ describe('deprovisionTenantAction', () => {
       await import('./deprovision-tenant-action');
 
     const result = await deprovisionTenantAction('tenant-1', {
-      confirm: 'acme',
+      confirm: 'Acme Inc.',
       dryRun: true,
     });
 
@@ -137,19 +143,19 @@ describe('deprovisionTenantAction', () => {
     expect(dispatchDeprovisioningWorkflowMock).not.toHaveBeenCalled();
   });
 
-  it('dispatches the deprovisioning workflow when confirm matches the live slug', async () => {
+  it('dispatches the deprovisioning workflow when confirm matches the live name', async () => {
     const { deprovisionTenantAction } =
       await import('./deprovision-tenant-action');
 
     const result = await deprovisionTenantAction('tenant-1', {
-      confirm: 'acme',
+      confirm: 'Acme Inc.',
       dryRun: false,
     });
 
     expect(result).toEqual({ ok: true });
     expect(dispatchDeprovisioningWorkflowMock).toHaveBeenCalledWith({
       tenantId: 'tenant-1',
-      confirm: 'acme',
+      confirm: 'Acme Inc.',
       dryRun: false,
     });
   });
@@ -159,7 +165,7 @@ describe('deprovisionTenantAction', () => {
       await import('./deprovision-tenant-action');
 
     await deprovisionTenantAction('tenant-1', {
-      confirm: 'acme',
+      confirm: 'Acme Inc.',
       dryRun: false,
     });
 
@@ -169,7 +175,7 @@ describe('deprovisionTenantAction', () => {
       action: AUDIT_ACTION.DEPROVISIONED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: 'tenant-1',
-      details: { slug: 'acme' },
+      details: { name: 'Acme Inc.' },
     });
   });
 
@@ -179,7 +185,7 @@ describe('deprovisionTenantAction', () => {
       await import('./deprovision-tenant-action');
 
     const result = await deprovisionTenantAction('tenant-1', {
-      confirm: 'acme',
+      confirm: 'Acme Inc.',
       dryRun: false,
     });
 
@@ -192,7 +198,7 @@ describe('deprovisionTenantAction', () => {
       await import('./deprovision-tenant-action');
 
     const result = await deprovisionTenantAction('tenant-1', {
-      confirm: 'acme',
+      confirm: 'Acme Inc.',
       dryRun: true,
     });
 
@@ -206,7 +212,7 @@ describe('deprovisionTenantAction', () => {
       await import('./deprovision-tenant-action');
 
     const result = await deprovisionTenantAction('tenant-1', {
-      confirm: 'acme',
+      confirm: 'Acme Inc.',
       dryRun: false,
     });
 

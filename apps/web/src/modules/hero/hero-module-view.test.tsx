@@ -16,7 +16,6 @@ const setup = customRender(HeroModuleView, {
   primaryAction: undefined,
   secondaryAction: undefined,
   layout: undefined,
-  baseUrl: 'https://cdn.sanity.io/images/test-project/test-dataset/',
 });
 
 describe(HeroModuleView, () => {

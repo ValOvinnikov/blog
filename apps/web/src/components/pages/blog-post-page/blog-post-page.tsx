@@ -10,11 +10,11 @@ import { getSanityImageBaseUrl, service } from '@blog/service';
 import { Icon } from '@blog/ui/atoms/icon';
 import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { buildBlogPostingSchema } from '@web/utils/build-blog-posting-schema';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { buildShareLinks } from '@web/utils/build-share-links';
-import { env } from '@web/utils/env/env';
 import {
   extractPostHeadings,
   MIN_H2_HEADINGS_FOR_RAIL,
@@ -62,8 +62,10 @@ export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
 
   const headings = extractPostHeadings(body);
   const hasContentsRail = headings.length >= MIN_H2_HEADINGS_FOR_RAIL;
-  const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
-  const imageBaseUrl = getSanityImageBaseUrl();
+  const siteUrl = (await getTenantBaseUrl()) ?? '';
+  // Only for images embedded in `body` — `heroImageSanity` already carries
+  // its own `cdnBaseUrl` from the service layer.
+  const imageBaseUrl = getSanityImageBaseUrl(tenant);
   const url = `${siteUrl}${routes.post(slug)}`;
   const blogPostingSchema = buildBlogPostingSchema(post, siteUrl);
   const shareLinks = buildShareLinks({ url, title }).map((link) => ({

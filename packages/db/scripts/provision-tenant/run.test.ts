@@ -42,6 +42,9 @@ const { createTenantRevalidateWebhookMock } = vi.hoisted(() => ({
 const { elevateTenantOwnerMock } = vi.hoisted(() => ({
   elevateTenantOwnerMock: vi.fn(),
 }));
+const { notifyOwnerElevationOutcomeMock } = vi.hoisted(() => ({
+  notifyOwnerElevationOutcomeMock: vi.fn(),
+}));
 
 vi.mock('@blog/db/queries/tenants', () => ({
   reactivateTenant: reactivateTenantMock,
@@ -77,6 +80,9 @@ vi.mock('./steps/create-revalidate-webhook', () => ({
 vi.mock('./steps/elevate-tenant-owner', () => ({
   elevateTenantOwner: elevateTenantOwnerMock,
 }));
+vi.mock('./lib/notify-owner-elevation-outcome', () => ({
+  notifyOwnerElevationOutcome: notifyOwnerElevationOutcomeMock,
+}));
 
 const baseTenant = {
   id: 'tenant-1',
@@ -99,6 +105,7 @@ const env = {
   githubServerUrl: undefined,
   githubActor: undefined,
   tenantRegistryEnvironment: undefined,
+  resendApiKey: 'resend-key',
 };
 
 beforeEach(() => {
@@ -117,6 +124,7 @@ beforeEach(() => {
   mapTenantDomainMock.mockReset().mockResolvedValue(undefined);
   createTenantRevalidateWebhookMock.mockReset().mockResolvedValue(undefined);
   elevateTenantOwnerMock.mockReset().mockResolvedValue('PENDING_ACCEPTANCE');
+  notifyOwnerElevationOutcomeMock.mockReset().mockResolvedValue(undefined);
 });
 
 describe(runSteps, () => {
@@ -345,6 +353,29 @@ describe(runSteps, () => {
     const result = await runSteps('tenant-1', env);
 
     expect(result).toEqual({ ok: true });
+  });
+
+  it('notifies operators of a notifiable owner-elevation outcome once core provisioning finishes', async () => {
+    createTenantSanityProjectMock.mockResolvedValue({});
+    elevateTenantOwnerMock.mockResolvedValue('STALLED');
+
+    await runSteps('tenant-1', env);
+
+    expect(notifyOwnerElevationOutcomeMock).toHaveBeenCalledTimes(1);
+    expect(notifyOwnerElevationOutcomeMock).toHaveBeenCalledWith({
+      tenant: expect.objectContaining({ id: 'tenant-1' }),
+      outcome: 'STALLED',
+      resendApiKey: 'resend-key',
+    });
+  });
+
+  it('never notifies when an earlier step fails', async () => {
+    createTenantSanityProjectMock.mockResolvedValue({});
+    seedTenantContentMock.mockRejectedValue(new Error('seed failed'));
+
+    await runSteps('tenant-1', env);
+
+    expect(notifyOwnerElevationOutcomeMock).not.toHaveBeenCalled();
   });
 
   it('never elevates the owner when an earlier step fails', async () => {

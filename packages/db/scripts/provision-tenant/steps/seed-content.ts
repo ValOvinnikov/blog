@@ -5,7 +5,7 @@ import {
   deleteSanityRobotToken,
 } from '@blog/db/utils/sanity-management-client/sanity-management-client';
 import { SANITY_WRITE_TOKEN_LABEL } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
-import { createClient } from '@sanity/client';
+import { ClientError, createClient } from '@sanity/client';
 
 import type { TProvisionEnv } from '../lib/env';
 import { placeholderPngBuffer } from '../lib/placeholder-image';
@@ -16,8 +16,9 @@ import { buildStarterDocuments } from './starter-content';
 const SANITY_API_VERSION = '2024-01-01';
 
 // Bounded to ride out a freshly-minted token's grant-propagation delay, not to mask a genuine misconfiguration.
-export const SEED_TRANSACTION_MAX_ATTEMPTS = 5;
-const SEED_TRANSACTION_BASE_DELAY_MS = 1000;
+// Shared by the asset uploads and the transaction commit — every write the freshly-minted token makes.
+export const SEED_GRANT_RETRY_MAX_ATTEMPTS = 5;
+const SEED_GRANT_RETRY_BASE_DELAY_MS = 1000;
 
 export type TSeedContentDeps = {
   createClient: typeof createClient;
@@ -33,7 +34,16 @@ const defaultDeps: TSeedContentDeps = {
   sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
 };
 
+const INSUFFICIENT_PERMISSIONS_STATUS_CODE = 403;
+
 function isGrantPropagationError(error: unknown): boolean {
+  if (
+    error instanceof ClientError &&
+    error.statusCode === INSUFFICIENT_PERMISSIONS_STATUS_CODE
+  ) {
+    return true;
+  }
+
   return (
     error instanceof Error && /insufficient permissions/i.test(error.message)
   );
@@ -82,13 +92,28 @@ export async function seedTenantContent(
       useCdn: false,
     });
 
+    const grantPropagationRetryOptions = {
+      maxAttempts: SEED_GRANT_RETRY_MAX_ATTEMPTS,
+      baseDelayMs: SEED_GRANT_RETRY_BASE_DELAY_MS,
+      isRetryable: isGrantPropagationError,
+      sleep: deps.sleep,
+    };
+
     const [authorImage, ogImage] = await Promise.all([
-      client.assets.upload('image', placeholderPngBuffer(), {
-        filename: 'starter-avatar.png',
-      }),
-      client.assets.upload('image', placeholderPngBuffer(), {
-        filename: 'starter-og-image.png',
-      }),
+      retryWithBackoff(
+        () =>
+          client.assets.upload('image', placeholderPngBuffer(), {
+            filename: 'starter-avatar.png',
+          }),
+        grantPropagationRetryOptions,
+      ),
+      retryWithBackoff(
+        () =>
+          client.assets.upload('image', placeholderPngBuffer(), {
+            filename: 'starter-og-image.png',
+          }),
+        grantPropagationRetryOptions,
+      ),
     ]);
 
     const documents = buildStarterDocuments(tenant, {
@@ -101,12 +126,10 @@ export async function seedTenantContent(
       transaction.createOrReplace(document);
     }
 
-    await retryWithBackoff(() => transaction.commit(), {
-      maxAttempts: SEED_TRANSACTION_MAX_ATTEMPTS,
-      baseDelayMs: SEED_TRANSACTION_BASE_DELAY_MS,
-      isRetryable: isGrantPropagationError,
-      sleep: deps.sleep,
-    });
+    await retryWithBackoff(
+      () => transaction.commit(),
+      grantPropagationRetryOptions,
+    );
 
     await setTenantSanityWriteTokenAndSeededAt(
       tenant.id,

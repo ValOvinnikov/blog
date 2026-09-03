@@ -2,8 +2,11 @@ import { BRAND_VARIANT, HERO_FIELD_MODE } from '@blog/config';
 import { makeRawHeroModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
 import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { toHeroModule } from './transformer';
+
+const tenant = makeTenant();
 
 describe('toHeroModule', () => {
   it('maps brandVariant straight through', () => {
@@ -11,7 +14,7 @@ describe('toHeroModule', () => {
       brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
     });
 
-    const hero = toHeroModule(raw, null);
+    const hero = toHeroModule(raw, null, tenant);
 
     expect(hero.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
   });
@@ -21,7 +24,7 @@ describe('toHeroModule', () => {
       featuredPost: makeRawPostCard({ _id: 'featured-ref' }),
     });
 
-    const hero = toHeroModule(raw, null);
+    const hero = toHeroModule(raw, null, tenant);
 
     expect(hero.title).toBe('Hello World');
     expect(hero.primaryAction).toEqual({
@@ -39,7 +42,7 @@ describe('toHeroModule', () => {
       primaryActionLabel: 'Discover the story',
     });
 
-    const hero = toHeroModule(raw, null);
+    const hero = toHeroModule(raw, null, tenant);
 
     expect(hero.primaryAction).toEqual({
       label: 'Discover the story',
@@ -54,7 +57,7 @@ describe('toHeroModule', () => {
     const raw = makeRawHeroModule({ featuredPost: null });
     const fallbackPost = makeRawPostCard({ _id: 'fallback' });
 
-    const hero = toHeroModule(raw, fallbackPost);
+    const hero = toHeroModule(raw, fallbackPost, tenant);
 
     expect(hero.title).toBe('Hello World');
     expect(hero.primaryAction?.href).toBe('/blog/hello-world');
@@ -74,7 +77,7 @@ describe('toHeroModule', () => {
       heroImageAsset: makeRawSanityImage(),
     });
 
-    const hero = toHeroModule(raw, null);
+    const hero = toHeroModule(raw, null, tenant);
 
     expect(hero.eyebrow).toBe('Field notes');
     expect(hero.title).toBe('Custom home title');
@@ -82,6 +85,7 @@ describe('toHeroModule', () => {
     expect(hero.sanityImage).toEqual({
       assetId: 'image-abc123-800x600-jpg',
       alt: 'Alt text',
+      cdnBaseUrl: 'https://cdn.sanity.io/images/tenant-a/production/',
       hotspot: undefined,
       crop: undefined,
       lqip: 'data:image/png;base64,abc123',
@@ -95,7 +99,7 @@ describe('toHeroModule', () => {
       heroEyebrowMode: HERO_FIELD_MODE.POST_TOPIC,
     });
 
-    const hero = toHeroModule(raw, null);
+    const hero = toHeroModule(raw, null, tenant);
 
     expect(hero.eyebrow).toBe('Engineering');
   });
@@ -107,7 +111,7 @@ describe('toHeroModule', () => {
     });
     const fallbackPost = makeRawPostCard({ _id: 'fallback' });
 
-    const hero = toHeroModule(raw, fallbackPost);
+    const hero = toHeroModule(raw, fallbackPost, tenant);
 
     expect(hero.sanityImage).toBeUndefined();
   });
@@ -120,7 +124,7 @@ describe('toHeroModule', () => {
       }),
     });
 
-    const hero = toHeroModule(raw, null);
+    const hero = toHeroModule(raw, null, tenant);
 
     expect(hero.title).toBe('Hello World');
     expect(hero.sanityImage).toBeUndefined();
@@ -129,7 +133,7 @@ describe('toHeroModule', () => {
   it('has no primary action and undefined title/subtitle when there is no post at all', () => {
     const raw = makeRawHeroModule({ featuredPost: null });
 
-    const hero = toHeroModule(raw, null);
+    const hero = toHeroModule(raw, null, tenant);
 
     expect(hero.primaryAction).toBeUndefined();
     expect(hero.title).toBeUndefined();

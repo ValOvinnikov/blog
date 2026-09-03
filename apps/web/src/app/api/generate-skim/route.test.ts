@@ -6,14 +6,20 @@ const {
   generateTakeawaysMock,
   getHostTenantSanityContextMock,
   getHostTenantSanityWriteContextMock,
+  getPlatformSanityWriteContextMock,
+  isTenantActiveMock,
   loggerErrorMock,
+  loggerWarnMock,
 } = vi.hoisted(() => ({
   getPublishedPostBodyMock: vi.fn(),
   saveSkimDraftMock: vi.fn(),
   generateTakeawaysMock: vi.fn(),
   getHostTenantSanityContextMock: vi.fn(),
   getHostTenantSanityWriteContextMock: vi.fn(),
+  getPlatformSanityWriteContextMock: vi.fn(),
+  isTenantActiveMock: vi.fn(),
   loggerErrorMock: vi.fn(),
+  loggerWarnMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -27,6 +33,7 @@ vi.mock('@blog/service', () => ({
       },
     },
   },
+  getPlatformSanityWriteContext: getPlatformSanityWriteContextMock,
 }));
 
 vi.mock('@web/server/skim/generate-takeaways', () => ({
@@ -42,8 +49,12 @@ vi.mock('@web/server/tenant/get-host-tenant-sanity-write-context', () => ({
   getHostTenantSanityWriteContext: getHostTenantSanityWriteContextMock,
 }));
 
+vi.mock('@web/server/tenant/is-tenant-active', () => ({
+  isTenantActive: isTenantActiveMock,
+}));
+
 vi.mock('@web/utils/logger/logger', () => ({
-  logger: { error: loggerErrorMock },
+  logger: { error: loggerErrorMock, warn: loggerWarnMock },
 }));
 
 vi.mock('@web/utils/env/env', () => ({
@@ -52,6 +63,12 @@ vi.mock('@web/utils/env/env', () => ({
     ANTHROPIC_API_KEY: 'test-api-key',
   },
 }));
+
+const platformTenant = {
+  projectId: 'platform-project',
+  dataset: 'production',
+  token: 'platform-token',
+};
 
 const makeRequest = (body: unknown, secret = 'test-secret'): Request => {
   const url = new URL('https://example.com/api/generate-skim');
@@ -78,7 +95,12 @@ describe('POST /api/generate-skim', () => {
       tenant: undefined,
       tenantId: undefined,
     });
+    getPlatformSanityWriteContextMock.mockReset();
+    getPlatformSanityWriteContextMock.mockReturnValue(platformTenant);
+    isTenantActiveMock.mockReset();
+    isTenantActiveMock.mockResolvedValue(true);
     loggerErrorMock.mockReset();
+    loggerWarnMock.mockReset();
   });
 
   afterEach(() => {
@@ -149,20 +171,20 @@ describe('POST /api/generate-skim', () => {
     expect(saveSkimDraftMock).not.toHaveBeenCalled();
   });
 
-  it('returns 503 when the write path is unconfigured (SANITY_API_WRITE_TOKEN absent)', async () => {
+  it('returns 503 without saving when the platform write context is unconfigured (SANITY_API_WRITE_TOKEN absent)', async () => {
     getPublishedPostBodyMock.mockResolvedValue({ ok: true, data: [] });
     generateTakeawaysMock.mockResolvedValue(['a', 'b', 'c']);
-    saveSkimDraftMock.mockResolvedValue({
-      ok: false,
-      error: new Error('getWriteClient: SANITY_API_WRITE_TOKEN is not set'),
+    getPlatformSanityWriteContextMock.mockImplementation(() => {
+      throw new Error('SANITY_API_WRITE_TOKEN is not set');
     });
     const { POST } = await import('./route');
 
     const response = await POST(makeRequest({ _id: 'post-1' }));
 
     expect(response.status).toBe(503);
+    expect(saveSkimDraftMock).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      'generate_skim.draft_save_failed',
+      'generate_skim.write_client_unconfigured',
       expect.anything(),
     );
   });
@@ -199,7 +221,7 @@ describe('POST /api/generate-skim', () => {
         takeaways: ['a', 'b', 'c'],
         model: 'claude-haiku-4-5',
       },
-      undefined,
+      platformTenant,
     );
   });
 
@@ -220,7 +242,7 @@ describe('POST /api/generate-skim', () => {
         takeaways: ['a', 'b', 'c'],
         model: 'claude-haiku-4-5',
       },
-      undefined,
+      platformTenant,
     );
     expect(saveSkimDraftMock).toHaveBeenNthCalledWith(
       2,
@@ -229,7 +251,7 @@ describe('POST /api/generate-skim', () => {
         takeaways: ['a', 'b', 'c'],
         model: 'claude-haiku-4-5',
       },
-      undefined,
+      platformTenant,
     );
   });
 
@@ -290,6 +312,7 @@ describe('POST /api/generate-skim', () => {
       },
       tenant,
     );
+    expect(getPlatformSanityWriteContextMock).not.toHaveBeenCalled();
   });
 
   it('returns 503 without generating takeaways when the resolved tenant has no usable write credentials', async () => {
@@ -314,6 +337,84 @@ describe('POST /api/generate-skim', () => {
     expect(generateTakeawaysMock).not.toHaveBeenCalled();
     expect(getPublishedPostBodyMock).not.toHaveBeenCalled();
     expect(saveSkimDraftMock).not.toHaveBeenCalled();
+  });
+
+  it('returns 403 without writing when the resolved tenant is not active', async () => {
+    getHostTenantSanityWriteContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant: {
+        projectId: 'tenant-project',
+        dataset: 'production',
+        token: 'tenant-write-token',
+      },
+      tenantId: 'tenant-1',
+    });
+    isTenantActiveMock.mockResolvedValue(false);
+    const { POST } = await import('./route');
+
+    const response = await POST(makeRequest({ _id: 'post-1' }));
+    const json = await response.json();
+
+    expect(response.status).toBe(403);
+    expect(json).toEqual({
+      message: 'The requesting tenant is not permitted to write.',
+    });
+    expect(isTenantActiveMock).toHaveBeenCalledWith('tenant-1');
+    expect(loggerWarnMock).toHaveBeenCalledWith(
+      'generate_skim.tenant_not_active',
+      { postId: 'post-1', tenantId: 'tenant-1' },
+    );
+    expect(getPublishedPostBodyMock).not.toHaveBeenCalled();
+    expect(generateTakeawaysMock).not.toHaveBeenCalled();
+    expect(saveSkimDraftMock).not.toHaveBeenCalled();
+  });
+
+  it('saves the skim draft when the resolved tenant is active', async () => {
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-write-token',
+    };
+    getHostTenantSanityWriteContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant,
+      tenantId: 'tenant-1',
+    });
+    isTenantActiveMock.mockResolvedValue(true);
+    getPublishedPostBodyMock.mockResolvedValue({ ok: true, data: [] });
+    generateTakeawaysMock.mockResolvedValue(['a', 'b', 'c']);
+    saveSkimDraftMock.mockResolvedValue({ ok: true, data: undefined });
+    const { POST } = await import('./route');
+
+    const response = await POST(makeRequest({ _id: 'post-1' }));
+
+    expect(response.status).toBe(200);
+    expect(isTenantActiveMock).toHaveBeenCalledWith('tenant-1');
+    expect(saveSkimDraftMock).toHaveBeenCalledWith(
+      {
+        postId: 'post-1',
+        takeaways: ['a', 'b', 'c'],
+        model: 'claude-haiku-4-5',
+      },
+      tenant,
+    );
+  });
+
+  it('does not check tenant status in platform mode (no tenantId resolved)', async () => {
+    getHostTenantSanityWriteContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant: undefined,
+      tenantId: undefined,
+    });
+    getPublishedPostBodyMock.mockResolvedValue({ ok: true, data: [] });
+    generateTakeawaysMock.mockResolvedValue(['a', 'b', 'c']);
+    saveSkimDraftMock.mockResolvedValue({ ok: true, data: undefined });
+    const { POST } = await import('./route');
+
+    const response = await POST(makeRequest({ _id: 'post-1' }));
+
+    expect(response.status).toBe(200);
+    expect(isTenantActiveMock).not.toHaveBeenCalled();
   });
 
   it('returns 404 without reading the post when the write-side tenant context is unresolvable', async () => {

@@ -7,7 +7,7 @@ import type { TLookFormFieldSetter } from './look-form';
 import { lookFormVariants } from './look-form-variants';
 
 export type TLookFormImagesSectionProps = {
-  tenantSlug: string;
+  tenantId: string;
   logoAssetUrl: string | undefined;
   faviconAssetUrl: string | undefined;
   onFieldChange: TLookFormFieldSetter;
@@ -17,7 +17,7 @@ export type TLookFormImagesSectionProps = {
 
 /** The logo and favicon upload fields — independent of preset, so they persist immediately through their own actions rather than staging behind Save. */
 export const LookFormImagesSection = ({
-  tenantSlug,
+  tenantId,
   logoAssetUrl,
   faviconAssetUrl,
   onFieldChange,
@@ -34,7 +34,7 @@ export const LookFormImagesSection = ({
       <p className={fieldHint()}>{t('brandImagesDescription')}</p>
       <div className={uploads()}>
         <BrandAssetField
-          tenantSlug={tenantSlug}
+          tenantId={tenantId}
           kind="logo"
           label={t('logoFieldLabel')}
           hint={t('logoFieldHint')}
@@ -44,7 +44,7 @@ export const LookFormImagesSection = ({
           aria-describedby={archivedDescribedBy}
         />
         <BrandAssetField
-          tenantSlug={tenantSlug}
+          tenantId={tenantId}
           kind="favicon"
           label={t('faviconFieldLabel')}
           hint={t('faviconFieldHint')}

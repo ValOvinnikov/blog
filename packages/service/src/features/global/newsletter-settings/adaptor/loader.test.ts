@@ -1,5 +1,6 @@
 import { makeRawNewsletterSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getNewsletterSettings } from './loader';
 
@@ -8,11 +9,13 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   runQuery: vi.fn(),
 }));
 
+const tenant = makeTenant();
+
 describe('getNewsletterSettings', () => {
   it('throws when the newsletter settings document does not exist', async () => {
     mockRun.mockResolvedValue(null);
 
-    await expect(getNewsletterSettings()).rejects.toThrow();
+    await expect(getNewsletterSettings(tenant)).rejects.toThrow();
   });
 
   it('maps raw newsletter settings into a domain object', async () => {
@@ -23,7 +26,7 @@ describe('getNewsletterSettings', () => {
       }),
     );
 
-    const result = await getNewsletterSettings();
+    const result = await getNewsletterSettings(tenant);
 
     expect(result.heading).toBe('Join the newsletter');
     expect(result.description).toBe('Weekly updates, no spam.');
@@ -32,18 +35,13 @@ describe('getNewsletterSettings', () => {
   it('leaves description undefined when not set (no faked default)', async () => {
     mockRun.mockResolvedValue(makeRawNewsletterSettings({ description: null }));
 
-    const result = await getNewsletterSettings();
+    const result = await getNewsletterSettings(tenant);
 
     expect(result.description).toBeUndefined();
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     mockRun.mockResolvedValue(makeRawNewsletterSettings());
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok',
-    };
 
     await getNewsletterSettings(tenant);
 
@@ -54,20 +52,6 @@ describe('getNewsletterSettings', () => {
         next: expect.objectContaining({
           tags: ['t:tenant-a:newsletter-settings'],
         }),
-      }),
-    );
-  });
-
-  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
-    mockRun.mockResolvedValue(makeRawNewsletterSettings());
-
-    await getNewsletterSettings();
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant: undefined,
-        next: expect.objectContaining({ tags: ['newsletter-settings'] }),
       }),
     );
   });

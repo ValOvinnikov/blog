@@ -1,5 +1,5 @@
 import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
-import { getDb, type TDb } from '@blog/db/client';
+import { getDb } from '@blog/db/client';
 import {
   MEMBERSHIP_ROLE,
   TENANT_PROVISIONING_STATUS,
@@ -18,6 +18,7 @@ import {
   type TTenant,
   type TTenantProvisioningState,
 } from '@blog/db/schema/tenants';
+import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import type { TResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
@@ -32,7 +33,6 @@ export type TDraftOwner =
 
 export type TCreateTenantDraftInput = {
   name: string;
-  slug: string;
   domain: string;
   locale: string;
   plan: TTenantPlan;
@@ -68,12 +68,6 @@ function buildIdleProvisioningSteps(): TTenantProvisioningState {
 // explicit required input rather than a hardcoded default: this layer never
 // guesses a value the caller hasn't actually supplied.
 //
-// The initial insert uses the same atomic `onConflictDoNothing()` +
-// follow-up read pattern as `createTenant`/`addTenantDomain` — a duplicate
-// `slug` is a typed `DB_DUPLICATE_SLUG` outcome rather than a raw Postgres
-// constraint error, and (since nothing was written yet) needs no
-// compensating cleanup.
-//
 // Not wrapped in a `db.transaction()` — the runtime `neon-http` driver has
 // no multi-statement transaction support (see `unlinkProvider` for the same
 // constraint elsewhere in this package). The two dependent inserts run
@@ -81,17 +75,19 @@ function buildIdleProvisioningSteps(): TTenantProvisioningState {
 // depends on the other; if either fails, the tenant row (and any
 // partially-succeeded dependent row, via its own `onDelete: 'cascade'` FK)
 // is deleted before rethrowing — otherwise a failed call would leave an
-// orphaned draft stuck at `provisioningStatus: PENDING` forever, and (since
-// `tenants.slug` is unique) permanently block retrying with the same slug.
+// orphaned draft stuck at `provisioningStatus: PENDING` forever.
 export async function createTenantDraft(
   input: TCreateTenantDraftInput,
 ): Promise<TResult<TTenant, TErrorCode>> {
+  if (!isValidDomain(input.domain)) {
+    return { ok: false, error: ERROR_CODE.DB_INVALID_DOMAIN };
+  }
+
   const db = getDb();
 
-  const [inserted] = await db
+  const [tenant] = await db
     .insert(tenants)
     .values({
-      slug: input.slug,
       name: input.name,
       primaryDomain: input.domain,
       locale: input.locale,
@@ -100,32 +96,30 @@ export async function createTenantDraft(
       provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
       provisioningSteps: buildIdleProvisioningSteps(),
     })
-    .onConflictDoNothing({ target: tenants.slug })
     .returning();
 
-  const tenant = inserted
-    ? { ok: true as const, data: inserted }
-    : await resolveSlugConflict(db, input.slug);
-  if (!tenant.ok) return tenant;
+  if (!tenant) {
+    throw new Error('createTenantDraft: tenant insert returned no row.');
+  }
 
   const ownerInsert =
     input.owner.type === 'user'
       ? db
           .insert(memberships)
           .values({
-            tenantId: tenant.data.id,
+            tenantId: tenant.id,
             userId: input.owner.userId,
             role: MEMBERSHIP_ROLE.OWNER,
           })
           .returning()
       : // A plain insert, not `createMembershipInvite`'s idempotent
-        // conflict-handling: `tenant.data.id` is brand new, so the
+        // conflict-handling: `tenant.id` is brand new, so the
         // (tenantId, email) unique constraint can't already have a row to
         // collide with.
         db
           .insert(membershipInvites)
           .values({
-            tenantId: tenant.data.id,
+            tenantId: tenant.id,
             email: normalizeEmail(input.owner.email),
             role: MEMBERSHIP_ROLE.OWNER,
           })
@@ -135,14 +129,14 @@ export async function createTenantDraft(
     const [domainRow, ownerRow] = await Promise.all([
       db
         .insert(tenantDomains)
-        .values({ tenantId: tenant.data.id, domain: input.domain })
+        .values({ tenantId: tenant.id, domain: input.domain })
         .returning(),
       ownerInsert,
     ]);
 
     if (!domainRow[0]) {
       throw new Error(
-        `createTenantDraft: tenant_domains insert for tenant "${tenant.data.id}" returned no row.`,
+        `createTenantDraft: tenant_domains insert for tenant "${tenant.id}" returned no row.`,
       );
     }
 
@@ -150,31 +144,13 @@ export async function createTenantDraft(
       const table =
         input.owner.type === 'user' ? 'memberships' : 'membership_invites';
       throw new Error(
-        `createTenantDraft: ${table} insert for tenant "${tenant.data.id}" returned no row.`,
+        `createTenantDraft: ${table} insert for tenant "${tenant.id}" returned no row.`,
       );
     }
   } catch (error) {
-    await db.delete(tenants).where(eq(tenants.id, tenant.data.id));
+    await db.delete(tenants).where(eq(tenants.id, tenant.id));
     throw error;
   }
 
-  return tenant;
-}
-
-// Only reached once the insert itself has no-opped on a `slug` conflict.
-async function resolveSlugConflict(
-  db: TDb,
-  slug: string,
-): Promise<TResult<TTenant, TErrorCode>> {
-  const [existing] = await db
-    .select()
-    .from(tenants)
-    .where(eq(tenants.slug, slug));
-
-  if (!existing) {
-    // A real, if narrow, race: the insert no-ops on a `slug` conflict, but `updateTenantDetails` can rename the slug away before this read.
-    return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
-  }
-
-  return { ok: false, error: ERROR_CODE.DB_DUPLICATE_SLUG };
+  return { ok: true, data: tenant };
 }

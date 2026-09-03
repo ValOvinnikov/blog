@@ -1,22 +1,16 @@
 'use server';
 
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE, DOMAIN_PATTERN } from '@blog/config';
 import { queries, TENANT_PLAN, type TTenantPlan } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { logger } from '@platform/utils/logger/logger';
-import { DOMAIN_PATTERN, SLUG_PATTERN } from '@platform/utils/path/path';
 import { getTranslations } from 'next-intl/server';
 import { z } from 'zod';
 
 const updateTenantDetailsInputSchema = z.object({
   name: z.string().trim().min(1, 'Enter a tenant name.'),
-  slug: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .regex(SLUG_PATTERN, 'Lowercase letters, numbers, and hyphens only.'),
   primaryDomain: z
     .string()
     .trim()
@@ -106,15 +100,15 @@ export const updateTenantDetailsAction = async (
           details: parsed.data,
         });
         return { ok: true, tenant: result.tenant };
-      case 'slug-taken':
-        return {
-          ok: false,
-          fieldErrors: { slug: 'This slug is already in use.' },
-        };
       case 'domain-taken':
         return {
           ok: false,
           fieldErrors: { primaryDomain: 'This domain is already in use.' },
+        };
+      case 'domain-invalid':
+        return {
+          ok: false,
+          fieldErrors: { primaryDomain: 'Enter a valid domain.' },
         };
       case 'domain-locked': {
         const t = await getTranslations('tenantDetailsPanel');

@@ -45,6 +45,7 @@ export const VoiceField = ({
         placeholder={placeholder}
         isDisabled={isDisabled}
         isReadOnly={isReadOnly}
+        hasExternalLabel={true}
         rows={3}
       />
     );
@@ -58,6 +59,7 @@ export const VoiceField = ({
       placeholder={placeholder}
       isDisabled={isDisabled}
       isReadOnly={isReadOnly}
+      hasExternalLabel={true}
     />
   );
 };

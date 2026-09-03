@@ -26,13 +26,13 @@ export type TUpdateFeaturesResult = { ok: true } | { ok: false };
  * than silently dropping just that field.
  */
 export const updateFeaturesAction = async (
-  tenantSlug: string,
+  tenantId: string,
   input: TUpdateFeaturesInput,
 ): Promise<TUpdateFeaturesResult> => {
   const parsed = updateFeaturesInputSchema.safeParse(input);
   if (!parsed.success) return { ok: false };
 
-  const { tenant } = await requireTenantMembership(tenantSlug);
+  const { tenant } = await requireTenantMembership(tenantId);
 
   const entitled = PLAN_REGISTRY[tenant.plan];
   const outOfPlan = CAPABILITY_TOGGLES.filter(
@@ -54,7 +54,7 @@ export const updateFeaturesAction = async (
       tenant.id,
       parsed.data,
     );
-    await revalidateSiteConfig();
+    await revalidateSiteConfig(tenant.id);
     await recordAuditEvent({
       logEvent: 'settings_features.update_audit_failed',
       action: AUDIT_ACTION.SETTINGS_UPDATED,

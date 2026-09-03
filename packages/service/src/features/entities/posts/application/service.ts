@@ -7,14 +7,14 @@ import { safeAsync } from '@blog/utils';
 export function createPostsService() {
   return {
     v1: {
-      getPostsByIds: safeAsync((ids: string[], tenant?: TTenantSanityContext) =>
+      getPostsByIds: safeAsync((ids: string[], tenant: TTenantSanityContext) =>
         getPostsByIds(ids, tenant),
       ),
-      getAllPublishedPosts: safeAsync((tenant?: TTenantSanityContext) =>
+      getAllPublishedPosts: safeAsync((tenant: TTenantSanityContext) =>
         getAllPublishedPosts(tenant),
       ),
       getPublishedPostsByTag: safeAsync(
-        (tagId: string, tenant?: TTenantSanityContext) =>
+        (tagId: string, tenant: TTenantSanityContext) =>
           getPublishedPostsByTag(tagId, tenant),
       ),
     },

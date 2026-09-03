@@ -13,7 +13,6 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 let db: PgliteDatabase<typeof schema>;
 
 const tenantInput: TCreateTenantInput = {
-  slug: 'acme',
   name: 'Acme',
   primaryDomain: 'acme.example.com',
   sanityProjectId: 'abc123',
@@ -44,38 +43,22 @@ describe(createTenant, () => {
     expect(result.data.id).toEqual(expect.any(String));
   });
 
-  it('returns DB_DUPLICATE_SLUG for a second tenant with an already-used slug', async () => {
-    await createTenant(tenantInput);
+  it.each([
+    ['a scheme-prefixed value', 'https://acme.com'],
+    ['a trailing-slash value', 'acme.com/'],
+    ['a whitespace-padded value', ' acme.com '],
+  ])(
+    'rejects %s for primaryDomain without writing a row',
+    async (_description, primaryDomain) => {
+      const result = await createTenant({ ...tenantInput, primaryDomain });
 
-    const result = await createTenant({
-      ...tenantInput,
-      primaryDomain: 'other.example.com',
-    });
+      expect(result).toEqual({
+        ok: false,
+        error: ERROR_CODE.DB_INVALID_DOMAIN,
+      });
 
-    expect(result).toEqual({
-      ok: false,
-      error: ERROR_CODE.DB_DUPLICATE_SLUG,
-    });
-
-    const rows = await db.select().from(schema.tenants);
-    expect(rows).toHaveLength(1);
-  });
-
-  // pglite serves a single connection, so a real concurrent UPDATE landing
-  // between this call's no-op insert and its follow-up read can't be
-  // forced here — `updateTenantDetails` renaming the slug away is the
-  // real-world trigger. The follow-up read is spied to simulate that exact
-  // window.
-  it('returns DB_NOT_FOUND when the conflicting row vanishes before the follow-up read', async () => {
-    await createTenant(tenantInput);
-
-    const selectSpy = vi.spyOn(db, 'select').mockReturnValueOnce({
-      from: () => ({ where: () => Promise.resolve([]) }),
-    } as unknown as ReturnType<typeof db.select>);
-
-    const result = await createTenant(tenantInput);
-
-    expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
-    selectSpy.mockRestore();
-  });
+      const rows = await db.select().from(schema.tenants);
+      expect(rows).toHaveLength(0);
+    },
+  );
 });

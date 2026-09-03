@@ -40,14 +40,13 @@ describe(listTenantsPendingOwnerElevation, () => {
   it('includes an ACTIVE, READY tenant', async () => {
     await db.insert(schema.tenants).values({
       ...baseTenant,
-      slug: 'acme',
       status: TENANT_STATUS.ACTIVE,
       provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
     });
 
     const result = await listTenantsPendingOwnerElevation();
 
-    expect(result.map((tenant) => tenant.slug)).toEqual(['acme']);
+    expect(result.map((tenant) => tenant.name)).toEqual(['Acme']);
   });
 
   it.each([
@@ -57,7 +56,6 @@ describe(listTenantsPendingOwnerElevation, () => {
   ])('excludes a tenant with provisioningStatus %s', async (status) => {
     await db.insert(schema.tenants).values({
       ...baseTenant,
-      slug: 'acme',
       status: TENANT_STATUS.ACTIVE,
       provisioningStatus: status,
     });
@@ -72,7 +70,6 @@ describe(listTenantsPendingOwnerElevation, () => {
     async (status) => {
       await db.insert(schema.tenants).values({
         ...baseTenant,
-        slug: 'acme',
         status,
         provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
         ...(status === TENANT_STATUS.ARCHIVED
@@ -89,7 +86,6 @@ describe(listTenantsPendingOwnerElevation, () => {
   it('excludes a deprovisioned tenant', async () => {
     await db.insert(schema.tenants).values({
       ...baseTenant,
-      slug: 'acme',
       status: TENANT_STATUS.ARCHIVED,
       provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
       deprovisionedAt: new Date(),

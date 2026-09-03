@@ -1,3 +1,4 @@
+import { HEADING_LEVELS } from '@blog/ui/lib/react';
 import { PostGrid } from '@blog/ui/organisms/post-grid';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -8,6 +9,12 @@ const meta = {
   component: TaxonomyCard,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
+  argTypes: {
+    headingLevel: {
+      control: 'select',
+      options: HEADING_LEVELS,
+    },
+  },
   args: {
     title: 'Engineering',
     href: '/topics/engineering',

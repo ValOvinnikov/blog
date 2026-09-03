@@ -82,13 +82,26 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   const { _type: type, _id: id } = parsedBody;
-  const baseTags = getRevalidateTagsForType(type, id);
-  // Identifies which tenant's project published. Emitting both the legacy
-  // and tenant-scoped form keeps this webhook correct regardless of how many
-  // service.* loaders have migrated to tenant-scoped tags yet (an unmigrated
-  // loader's cache only ever holds the legacy tag; a migrated one only the
-  // prefixed tag — purging both is a no-op for whichever one wasn't set).
+
+  // Identifies which tenant's project published. `isr()` always emits the
+  // tenant-prefixed tag now, but the legacy unprefixed form can still be
+  // live in the cache from before, so both are purged below. Resolved once,
+  // up front, so both the archived-tenant check and the delete-cleanup
+  // branch further down share the same lookup.
   const tenantProjectId = request.headers.get(SANITY_PROJECT_ID_HEADER);
+  const tenantId = tenantProjectId
+    ? await queries.tenants.getTenantIdBySanityProjectId(tenantProjectId)
+    : undefined;
+
+  if (tenantId && !(await queries.tenants.getTenantById(tenantId))) {
+    logger.warn('revalidate.tenant_archived', { tenantProjectId, tenantId });
+    return NextResponse.json(
+      { message: 'Tenant is archived; event ignored.' },
+      { status: 200 },
+    );
+  }
+
+  const baseTags = getRevalidateTagsForType(type, id);
   const revalidated = tenantProjectId
     ? [...baseTags, ...baseTags.map((tag) => `t:${tenantProjectId}:${tag}`)]
     : baseTags;
@@ -115,20 +128,12 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   let bookmarksRemoved = 0;
   const operation = request.headers.get(SANITY_OPERATION_HEADER);
-  if (operation === DELETE_OPERATION && type === BLOG_POST_TYPE) {
+  if (operation === DELETE_OPERATION && type === BLOG_POST_TYPE && tenantId) {
     try {
-      // No sole-tenant fallback here (unlike resolve-tenant-id.ts) — this is
-      // a destructive delete, so an unresolvable tenant must skip cleanup
-      // rather than guess.
-      const tenantId = tenantProjectId
-        ? await queries.tenants.getTenantIdBySanityProjectId(tenantProjectId)
-        : undefined;
-      if (tenantId) {
-        bookmarksRemoved = await queries.bookmarks.removeBookmarksForPost(
-          tenantId,
-          id,
-        );
-      }
+      bookmarksRemoved = await queries.bookmarks.removeBookmarksForPost(
+        tenantId,
+        id,
+      );
     } catch (error) {
       logger.error('revalidate.bookmark_cleanup_failed', {
         type,

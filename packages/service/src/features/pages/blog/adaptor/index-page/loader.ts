@@ -12,13 +12,13 @@ import { toIndexPage } from './transformer';
 import type { TBlogIndexPage } from './types';
 
 export async function getIndexPage(
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<TMaybeUndefined<TBlogIndexPage>> {
   // `blogPageQuery` derefs `postList` — that tag must ride alongside
   // `page_blog` (tag-scope contract, `sanity/query.ts`).
   const rawPage = await runQuery(blogPageQuery, {
     tenant,
-    ...isr(['page_blog', 'modules:postList'], tenant?.projectId),
+    ...isr(['page_blog', 'modules:postList'], tenant.projectId),
   });
   if (!rawPage) return undefined;
   if (!rawPage.postList) {
@@ -26,5 +26,5 @@ export async function getIndexPage(
   }
 
   const settings = await getSiteSettings(tenant);
-  return toIndexPage(rawPage, settings, rawPage.postList._id);
+  return toIndexPage(rawPage, settings, rawPage.postList._id, tenant);
 }

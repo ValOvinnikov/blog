@@ -6,10 +6,10 @@ import { safeAsync } from '@blog/utils';
 export function createGenericPageService() {
   return {
     v1: {
-      getPage: safeAsync((slug: string, tenant?: TTenantSanityContext) =>
+      getPage: safeAsync((slug: string, tenant: TTenantSanityContext) =>
         getPage(slug, tenant),
       ),
-      getPageSlugs: safeAsync((tenant?: TTenantSanityContext) =>
+      getPageSlugs: safeAsync((tenant: TTenantSanityContext) =>
         getPageSlugs(tenant),
       ),
     },

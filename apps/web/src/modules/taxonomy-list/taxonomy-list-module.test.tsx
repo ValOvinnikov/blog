@@ -1,5 +1,6 @@
 import { BRAND_VARIANT, TAXONOMY_KIND } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
 import { TaxonomyListModule } from './taxonomy-list-module';
@@ -53,7 +54,7 @@ describe(TaxonomyListModule, () => {
   beforeEach(() => {
     getTaxonomyListMock.mockReset();
     getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(undefined);
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
@@ -91,7 +92,7 @@ describe(TaxonomyListModule, () => {
     expect(getTaxonomyListMock).toHaveBeenCalledWith(
       'topic-list-1',
       TAXONOMY_KIND.TOPICS,
-      undefined,
+      DEFAULT_TENANT_SANITY_CONTEXT,
     );
   });
 

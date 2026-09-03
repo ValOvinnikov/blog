@@ -13,13 +13,13 @@ import type { TNavigation } from './types';
 // `page_generic`/`page_blog` — every one of those types' tags must be
 // included (tag-scope contract, `sanity/query.ts`).
 export async function getNavigation(
-  tenant?: TTenantSanityContext,
+  tenant: TTenantSanityContext,
 ): Promise<TNavigation> {
   const raw = await runQuery(navigationQuery, {
     tenant,
     ...isr(
       ['navigation', 'post', 'topic', 'page_generic', 'page_blog'],
-      tenant?.projectId,
+      tenant.projectId,
     ),
   });
   return toNavigation(raw);
