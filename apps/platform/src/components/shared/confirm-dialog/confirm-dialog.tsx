@@ -31,6 +31,8 @@ export type TConfirmDialogProps = {
   cancelLabel: ReactNode;
   /** Extra content between the confirmation field and the action buttons, e.g. a dry-run toggle. */
   children?: ReactNode;
+  /** Button styling for the trigger and confirm actions. */
+  tone?: 'danger' | 'primary';
 };
 
 export const ConfirmDialog = ({
@@ -52,6 +54,7 @@ export const ConfirmDialog = ({
   confirmingButtonLabel,
   cancelLabel,
   children,
+  tone = 'danger',
 }: TConfirmDialogProps) => {
   const {
     backdrop,
@@ -64,7 +67,7 @@ export const ConfirmDialog = ({
 
   return (
     <AlertDialog.Root open={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialog.Trigger render={<Button type="button" variant="danger" />}>
+      <AlertDialog.Trigger render={<Button type="button" variant={tone} />}>
         {triggerLabel}
       </AlertDialog.Trigger>
       <AlertDialog.Portal>
@@ -99,7 +102,7 @@ export const ConfirmDialog = ({
             </AlertDialog.Close>
             <Button
               type="button"
-              variant="danger"
+              variant={tone}
               onClick={onConfirm}
               isDisabled={isPending || confirmValue !== expectedValue}
             >

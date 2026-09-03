@@ -28,6 +28,10 @@ vi.mock('@platform/server/provisioning/delete-tenant-action', () => ({
   deleteTenantAction: vi.fn(),
 }));
 
+vi.mock('@platform/server/provisioning/reactivate-tenant-action', () => ({
+  reactivateTenantAction: vi.fn(),
+}));
+
 const setup = customRenderAsync(TenantDangerPage, {
   params: Promise.resolve({ tenantId: 'tenant-1' }),
 });
@@ -63,6 +67,30 @@ describe(TenantDangerPage, () => {
     ).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Deprovision tenant' }),
+    ).toBeVisible();
+  });
+
+  it('never offers reactivation for a live tenant', async () => {
+    listTenantsByIdsMock.mockResolvedValue([
+      makeTenant({ deprovisionedAt: null }),
+    ]);
+
+    await setup();
+
+    expect(
+      screen.queryByRole('button', { name: 'Reactivate tenant' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('offers reactivation for an already-deprovisioned tenant', async () => {
+    listTenantsByIdsMock.mockResolvedValue([
+      makeTenant({ deprovisionedAt: new Date('2026-04-10T00:00:00.000Z') }),
+    ]);
+
+    await setup();
+
+    expect(
+      screen.getByRole('button', { name: 'Reactivate tenant' }),
     ).toBeVisible();
   });
 
