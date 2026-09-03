@@ -175,6 +175,50 @@ describe(runValidation, () => {
     expect(validateTenantDocumentsMock).not.toHaveBeenCalled();
   });
 
+  it('skips a tenant whose credentials resolve to a non-ACTIVE status', async () => {
+    listTenantsForDocumentValidationMock.mockResolvedValue([
+      tenant('t1', 'acme'),
+    ]);
+    getTenantSanityCredentialsMock.mockResolvedValue({
+      ...credentials('t1'),
+      status: TENANT_STATUS.SUSPENDED,
+    });
+
+    const summary = await runValidation(env);
+
+    expect(summary).toEqual({
+      checked: 1,
+      clean: 0,
+      warning: 0,
+      critical: 0,
+      skipped: 1,
+      errors: 0,
+    });
+    expect(validateTenantDocumentsMock).not.toHaveBeenCalled();
+  });
+
+  it('skips a tenant whose credentials resolve to a deprovisioned timestamp', async () => {
+    listTenantsForDocumentValidationMock.mockResolvedValue([
+      tenant('t1', 'acme'),
+    ]);
+    getTenantSanityCredentialsMock.mockResolvedValue({
+      ...credentials('t1'),
+      deprovisionedAt: new Date('2026-01-02T00:00:00.000Z'),
+    });
+
+    const summary = await runValidation(env);
+
+    expect(summary).toEqual({
+      checked: 1,
+      clean: 0,
+      warning: 0,
+      critical: 0,
+      skipped: 1,
+      errors: 0,
+    });
+    expect(validateTenantDocumentsMock).not.toHaveBeenCalled();
+  });
+
   it("one tenant's failure does not abort the sweep for the rest", async () => {
     const tenants = [
       tenant('t1', 'acme'),

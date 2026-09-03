@@ -26,6 +26,7 @@ import {
   FINDING_STATUS,
   type TFindingSeverity,
 } from '@blog/config/constants';
+import { TENANT_STATUS } from '@blog/db/constants';
 import {
   listFindingsForTenant,
   openFinding,
@@ -108,6 +109,17 @@ async function validateOne(
   const credentials = await getTenantSanityCredentials(tenant.id);
   if (!credentials) {
     summary.skipped += 1;
+    return;
+  }
+
+  if (
+    credentials.status !== TENANT_STATUS.ACTIVE ||
+    credentials.deprovisionedAt
+  ) {
+    summary.skipped += 1;
+    console.log(
+      `validate-tenant-documents: skipping tenant "${tenant.id}" (slug "${tenant.slug}") — status="${credentials.status}" deprovisionedAt=${credentials.deprovisionedAt ? credentials.deprovisionedAt.toISOString() : 'null'}`,
+    );
     return;
   }
 
