@@ -4,7 +4,7 @@ description: >-
   Email specialist for packages/email (@blog/email) — the single home for every
   email this repo sends: the shared branded HTML shell, the canonical
   escapeHtml, and the typed sendEmail transport wrapping Resend. Sits low in the
-  dependency graph (config and utils only), so both apps, @blog/auth and
+  dependency graph (utils only), so both apps, @blog/auth and
   @blog/db's CLI scripts can all consume it without a cycle. Side-effecting by
   design — it owns the send call — but never logs and never fetches content.
 tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
@@ -25,7 +25,7 @@ stays relative, parent-traversal `../` never.
 
 ## Layer contract — the part that constrains everything else
 
-Your only upstreams are `@blog/config` and `@blog/utils`. That is not a
+Your only workspace upstream is `@blog/utils`. That is not a
 stylistic preference: `apps/web`, `apps/platform`, `@blog/auth` **and**
 `@blog/db`'s standalone CLI scripts all consume you, and `@blog/auth` sits above
 `@blog/db`. Taking a dependency on either app, on `@blog/db`, on `@blog/auth`,
@@ -88,12 +88,12 @@ override-driven: it responds to a tenant's chosen voice.
 **Operator-alert mail is not, and must never become so.** Those are the messages
 that tell a human that provisioning broke or a tenant's documents are invalid.
 They stay English-only and hardcoded. Enforce that structurally — a tenant-facing
-copy surface must not be *able* to reach operator copy — not with a comment
+copy surface must not be _able_ to reach operator copy — not with a comment
 asking nicely.
 
 ## Conventions
 
-- TypeScript strict, no `any`. This package exports *operations*, so
+- TypeScript strict, no `any`. This package exports _operations_, so
   `export function`, not arrow consts.
 - Folder-per-concern under `src/`, each with its own `index.ts` barrel
   re-exported from the top-level `src/index.ts` — same shape as
@@ -102,7 +102,10 @@ asking nicely.
   that passes against a stub.
 - Key/value-pair consts are UPPERCASE key === UPPERCASE value, `as const`, and
   live in `@blog/config` — email copy is not this layer's persisted vocabulary,
-  so it does not earn the storage-layer exception.
+  so it does not earn the storage-layer exception. Note you do **not** depend on
+  `@blog/config` today, so such a const belongs to whichever layer reads it, not
+  to you; if you find yourself needing one internally, that is a signal to
+  reconsider the shape rather than to add the dependency.
 - **Inline comments are forbidden by default** (except the HTML-email carve-out
   above). At most one doc comment per exported symbol, saying what it is FOR,
   never how it works. Never an issue/PR number, roadmap phase, or spec-doc path
