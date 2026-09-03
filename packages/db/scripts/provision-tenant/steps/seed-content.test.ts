@@ -9,21 +9,13 @@ import {
   type TSeedContentDeps,
 } from './seed-content';
 
-const {
-  setTenantSanityWriteTokenAndSeededAtMock,
-  setTenantSanityWriteTokenMock,
-  setTenantSeededAtMock,
-} = vi.hoisted(() => ({
+const { setTenantSanityWriteTokenAndSeededAtMock } = vi.hoisted(() => ({
   setTenantSanityWriteTokenAndSeededAtMock: vi.fn(),
-  setTenantSanityWriteTokenMock: vi.fn(),
-  setTenantSeededAtMock: vi.fn(),
 }));
 
 vi.mock('@blog/db/queries/tenants', () => ({
   setTenantSanityWriteTokenAndSeededAt:
     setTenantSanityWriteTokenAndSeededAtMock,
-  setTenantSanityWriteToken: setTenantSanityWriteTokenMock,
-  setTenantSeededAt: setTenantSeededAtMock,
 }));
 
 const env: TProvisionEnv = {
@@ -67,8 +59,6 @@ function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
 
 beforeEach(() => {
   setTenantSanityWriteTokenAndSeededAtMock.mockReset();
-  setTenantSanityWriteTokenMock.mockReset();
-  setTenantSeededAtMock.mockReset();
 });
 
 describe(seedTenantContent, () => {
@@ -183,7 +173,7 @@ describe(seedTenantContent, () => {
     expect(setTenantSanityWriteTokenAndSeededAtMock).not.toHaveBeenCalled();
   });
 
-  it('revokes the token when persisting the token+seededAt fails', async () => {
+  it('regression: revokes the token when persisting the token+seededAt fails, so a crash/retry window never orphans a live Editor-scoped token or mints a second one on retry', async () => {
     const tenant = baseTenant();
     const commit = vi.fn().mockResolvedValue(undefined);
     const createOrReplace = vi.fn();
@@ -212,48 +202,6 @@ describe(seedTenantContent, () => {
         sleep,
       }),
     ).rejects.toThrow('persist failed');
-
-    expect(revokeWriteToken).toHaveBeenCalledWith({
-      token: 'mgmt-token',
-      projectId: 'proj123',
-      robotId: 'robot-1',
-    });
-  });
-
-  it('regression: never leaves a live, unrevoked token when persisting the write token succeeds but marking the tenant seeded does not — a crash/retry window that would otherwise orphan a live Editor-scoped token and mint a second one on retry', async () => {
-    const tenant = baseTenant();
-    const commit = vi.fn().mockResolvedValue(undefined);
-    const createOrReplace = vi.fn();
-    const transaction = { createOrReplace, commit };
-    const upload = vi
-      .fn()
-      .mockResolvedValueOnce({ _id: 'image-author' })
-      .mockResolvedValueOnce({ _id: 'image-og' });
-    const client = { assets: { upload }, transaction: () => transaction };
-    const mintWriteToken = vi
-      .fn()
-      .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
-    const revokeWriteToken = vi.fn().mockResolvedValue(undefined);
-    const createClient = vi.fn().mockReturnValue(client);
-    const sleep = vi.fn().mockResolvedValue(undefined);
-
-    setTenantSanityWriteTokenMock.mockResolvedValue(undefined);
-    setTenantSeededAtMock.mockRejectedValue(
-      new Error('crashed before marking seeded'),
-    );
-    setTenantSanityWriteTokenAndSeededAtMock.mockRejectedValue(
-      new Error('crashed before marking seeded'),
-    );
-
-    await expect(
-      seedTenantContent(tenant, env, {
-        createClient:
-          createClient as unknown as TSeedContentDeps['createClient'],
-        mintWriteToken,
-        revokeWriteToken,
-        sleep,
-      }),
-    ).rejects.toThrow('crashed before marking seeded');
 
     expect(revokeWriteToken).toHaveBeenCalledWith({
       token: 'mgmt-token',
