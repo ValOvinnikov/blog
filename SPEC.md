@@ -182,8 +182,9 @@ secret than the read token.
 ² `@blog/db`'s "never log" rule has one scoped exception, decided on
 #2120: `packages/db/scripts/provision-tenant/`,
 `packages/db/scripts/deprovision-tenant/`,
-`packages/db/scripts/recheck-tenant-owners/`, and
-`packages/db/scripts/validate-tenant-documents/` — standalone CLI tools run
+`packages/db/scripts/recheck-tenant-owners/`,
+`packages/db/scripts/validate-tenant-documents/`, and
+`packages/db/scripts/migrate-tenant-content/` — standalone CLI tools run
 via `tsx`, outside the request-handling path the rule targets — import
 `@blog/insight`'s `sanitizeLogMessage` (the sanitizer only, not
 `createLogger`) directly, rather than keeping their own copy of it. The rest
@@ -509,6 +510,27 @@ changes need none (say so explicitly). Workflow: **dry-run → dataset export
 Full migration tooling (`packages/studio/migrations/`, the `migrationState` ledger,
 `migrate:deploy`/`migrate:backfill`) is documented alongside the content model
 in [`docs/context/content-model.md`](./docs/context/content-model.md).
+
+**Content migrations are multi-tenant.** One shared schema serves N Sanity
+projects, so a content migration must reach every tenant's project, not just
+the console one. `migrate:deploy` targets a single project (and stays that way,
+so `migrate:dry`/`migrate:run` remain usable by hand); the fan-out across
+tenants is `packages/db/scripts/migrate-tenant-content/`, which enumerates
+`status = ACTIVE`, non-deprovisioned tenants and drives the single-project path
+once per tenant using **that tenant's own persisted write token** — never an
+organisation-scoped credential, so a leaked token reaches exactly one tenant.
+The `migrationState` ledger is per dataset, which makes the fan-out idempotent,
+resumable, and self-catching-up for tenants added later; one tenant's failure
+never aborts the rest.
+
+Two rules govern it. **A tenant whose ledger is empty is backfilled, not
+replayed** — such a tenant was seeded from starter content at the then-current
+schema, so executing migrations written for older shapes against it ranges from
+no-op to destructive; the empty-ledger check runs before every deploy and is
+structural, not an opt-in flag. And **production fan-out requires an explicit
+dispatch, not a `vX.Y.Z` tag** — a deliberate divergence from `migrate:deploy`'s
+stance, because one run mutates customer content across every tenant project at
+once and cutting a release should not implicitly do that.
 
 **`@blog/db` (Neon/Drizzle) has a separate, parallel migration mechanism** —
 schema migrations, not content migrations: a `packages/db/src/schema/*.ts`
