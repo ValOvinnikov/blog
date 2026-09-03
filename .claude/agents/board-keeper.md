@@ -434,7 +434,7 @@ avoid.
 ```
 gh pr list --state open   --json number,title,headRefName,body,url,labels
 gh issue list --state open --limit 200 --json number,title,url,labels
-git ls-remote --heads origin | grep -oE '[a-zA-Z]+/[0-9]+-[^[:space:]]+$'
+git ls-remote --heads origin | grep -oE '(claude/issue-[0-9]+-[^[:space:]]+|[a-zA-Z]+/[0-9]+-[^[:space:]]+)$'
 ```
 
 The `labels` field on the two open-item queries feeds Step 3a's hygiene
@@ -479,6 +479,18 @@ open PR yet is mid-work. The same grep also still matches the legacy
 `issue/<n>-*` form used by old branches (issues #3–122), so nothing
 previously covered is lost.
 
+**A third shape, `claude/issue-<n>-<timestamp>`, comes from GitHub Actions
+`@claude` cloud runs** — `claude-code-action`'s own `setupBranch` generates
+this suffix internally; it is not the `<type>/<n>-<slug>` form and cannot be
+made to match it (the action exposes a `branch_prefix` input, default
+`claude/`, which this repo's `claude.yml` leaves unconfigured, but the
+`issue-<n>-<timestamp>` suffix past that prefix is generated internally with
+no exposed way to shape it into a real slug). A real example:
+`claude/issue-2571-20260903-1251`. Extract the issue number after `issue-`,
+not after the slash, for this shape (`claude/issue-2571-20260903-1251` →
+`2571`) — the two extraction rules are different because the two branch
+shapes put the number in different positions.
+
 **A remote branch is a positive signal only, never a negative one.** Work in
 progress in another session's local checkout, or in a subagent worktree that
 hasn't pushed yet, is invisible to `git ls-remote` — its absence proves
@@ -495,7 +507,7 @@ X" is not evidence of "not X":
 | -------------------------------------------------------------------------------------------------------------------------- | --------------------- |
 | Merged PR with `Closes #n` for this issue, issue is closed                                                                 | Done                  |
 | Open PR with `Closes #n` for this issue (issue still open)                                                                 | Code Review           |
-| Remote branch `<type>/<n>-*` (or legacy `issue/<n>-*`) exists, no open PR yet, issue open                                  | In Progress           |
+| Remote branch `<type>/<n>-*` (legacy `issue/<n>-*`, or cloud `claude/issue-<n>-*`) exists, no open PR yet, issue open      | In Progress           |
 | Issue closed with **no** merged `Closes #n` PR (manually closed, or closed as a side effect of a partial/stacked PR merge) | **flag, don't infer** |
 
 If none of these signals apply to an issue (no branch, no PR either way),
