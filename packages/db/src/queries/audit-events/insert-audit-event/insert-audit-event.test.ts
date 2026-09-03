@@ -33,7 +33,7 @@ describe(insertAuditEvent, () => {
     const event = await insertAuditEvent({
       actorId: 'admin-1',
       actorEmail: 'admin-1@example.com',
-      action: AUDIT_ACTION.ARCHIVED,
+      action: AUDIT_ACTION.DEPROVISIONED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: 'tenant-123',
       details: { previousStatus: 'active', reason: 'customer offboarding' },
@@ -41,7 +41,7 @@ describe(insertAuditEvent, () => {
 
     expect(event.actorId).toBe('admin-1');
     expect(event.actorEmail).toBe('admin-1@example.com');
-    expect(event.action).toBe(AUDIT_ACTION.ARCHIVED);
+    expect(event.action).toBe(AUDIT_ACTION.DEPROVISIONED);
     expect(event.targetType).toBe(AUDIT_TARGET_TYPE.TENANT);
     expect(event.targetId).toBe('tenant-123');
     expect(event.details).toEqual({
@@ -54,7 +54,7 @@ describe(insertAuditEvent, () => {
       .select()
       .from(schema.auditEvents)
       .where(eq(schema.auditEvents.id, event.id));
-    expect(row?.action).toBe(AUDIT_ACTION.ARCHIVED);
+    expect(row?.action).toBe(AUDIT_ACTION.DEPROVISIONED);
     expect(row?.targetId).toBe('tenant-123');
     expect(row?.details).toEqual({
       previousStatus: 'active',

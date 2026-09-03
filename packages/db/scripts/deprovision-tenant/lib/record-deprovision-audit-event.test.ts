@@ -1,5 +1,5 @@
 import type { TDeprovisionEnv } from './env';
-import { recordArchiveAuditEvent } from './record-archive-audit-event';
+import { recordDeprovisionAuditEvent } from './record-deprovision-audit-event';
 
 const { insertAuditEventMock } = vi.hoisted(() => ({
   insertAuditEventMock: vi.fn(),
@@ -30,14 +30,14 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe(recordArchiveAuditEvent, () => {
-  it('inserts an ARCHIVED/TENANT audit event attributed to the GitHub actor', async () => {
-    await recordArchiveAuditEvent('tenant-1', env);
+describe(recordDeprovisionAuditEvent, () => {
+  it('inserts a DEPROVISIONED/TENANT audit event attributed to the GitHub actor', async () => {
+    await recordDeprovisionAuditEvent('tenant-1', env);
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
       actorId: 'github:octocat',
       actorEmail: 'octocat@users.noreply.github.com',
-      action: 'ARCHIVED',
+      action: 'DEPROVISIONED',
       targetType: 'TENANT',
       targetId: 'tenant-1',
       details: { via: 'deprovision-tenant-workflow', runId: 'run-42' },
@@ -48,14 +48,14 @@ describe(recordArchiveAuditEvent, () => {
     insertAuditEventMock.mockRejectedValueOnce(new Error('db down'));
 
     await expect(
-      recordArchiveAuditEvent('tenant-1', env),
+      recordDeprovisionAuditEvent('tenant-1', env),
     ).resolves.toBeUndefined();
 
     expect(console.error).toHaveBeenCalled();
   });
 
   it('logs and skips the insert when GITHUB_ACTOR is unset', async () => {
-    await recordArchiveAuditEvent('tenant-1', {
+    await recordDeprovisionAuditEvent('tenant-1', {
       ...env,
       githubActor: undefined,
     });

@@ -26,7 +26,7 @@ async function insertEvent(overrides: {
   await db.insert(schema.auditEvents).values({
     actorId: 'admin-1',
     actorEmail: overrides.actorEmail ?? 'admin-1@example.com',
-    action: overrides.action ?? AUDIT_ACTION.ARCHIVED,
+    action: overrides.action ?? AUDIT_ACTION.DEPROVISIONED,
     targetType: overrides.targetType,
     targetId: overrides.targetId,
     createdAt: overrides.createdAt,
@@ -57,7 +57,7 @@ describe(listAuditEventsForTarget, () => {
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: 'tenant-1',
       createdAt: new Date(2026, 0, 3),
-      action: AUDIT_ACTION.ARCHIVED,
+      action: AUDIT_ACTION.DEPROVISIONED,
     });
     await insertEvent({
       targetType: AUDIT_TARGET_TYPE.TENANT,
@@ -72,7 +72,7 @@ describe(listAuditEventsForTarget, () => {
     );
 
     expect(result.map((event) => event.action)).toEqual([
-      AUDIT_ACTION.ARCHIVED,
+      AUDIT_ACTION.DEPROVISIONED,
       AUDIT_ACTION.SETTINGS_UPDATED,
       AUDIT_ACTION.CREATED,
     ]);
