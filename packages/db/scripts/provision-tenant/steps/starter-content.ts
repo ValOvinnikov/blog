@@ -1,4 +1,10 @@
-import { BRAND_VARIANTS, PRESET_ID, LINK_TYPE } from '@blog/config/constants';
+import {
+  BRAND_VARIANT,
+  BRAND_VARIANTS,
+  HERO_FIELD_MODE,
+  PRESET_ID,
+  LINK_TYPE,
+} from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 // Fixed document ids (published, not `drafts.`-prefixed) — every field a
@@ -17,6 +23,8 @@ export const STARTER_DOCUMENT_IDS = {
   VOICE: 'provisioning.settings.voice',
   NEWSLETTER: 'provisioning.settings.newsletter',
   SITE: 'provisioning.settings.site',
+  HERO: 'provisioning.module.hero',
+  HOME: 'provisioning.settings.home',
 } as const;
 
 export type TStarterAssetRefs = {
@@ -144,6 +152,25 @@ export function buildStarterDocuments(
     },
   };
 
+  const hero: TSanityDocument = {
+    _id: STARTER_DOCUMENT_IDS.HERO,
+    _type: 'module_hero',
+    title: 'Welcome Hero',
+    brandVariant: BRAND_VARIANT.PRIMARY,
+    featuredPost: { _type: 'reference', _ref: STARTER_DOCUMENT_IDS.POST },
+    heroEyebrowMode: HERO_FIELD_MODE.POST_TOPIC,
+    heroTitleMode: HERO_FIELD_MODE.POST_TITLE,
+    heroSubtitleMode: HERO_FIELD_MODE.POST_EXCERPT,
+    heroImageMode: HERO_FIELD_MODE.POST_IMAGE,
+  };
+
+  const home: TSanityDocument = {
+    _id: STARTER_DOCUMENT_IDS.HOME,
+    _type: 'page_home',
+    title: 'Home',
+    hero: { _type: 'reference', _ref: STARTER_DOCUMENT_IDS.HERO },
+  };
+
   return [
     author,
     topic,
@@ -154,5 +181,7 @@ export function buildStarterDocuments(
     voice,
     newsletter,
     site,
+    hero,
+    home,
   ];
 }
