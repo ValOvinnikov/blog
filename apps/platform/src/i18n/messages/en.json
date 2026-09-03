@@ -338,7 +338,7 @@
     "steps": {
       "details": {
         "title": "Details",
-        "description": "Name, slug, plan"
+        "description": "Name, domain, plan"
       },
       "sanityProject": {
         "title": "Sanity project",
@@ -447,7 +447,6 @@
     "heading": "Tenant details",
     "fieldsGroupLabel": "Tenant detail fields",
     "nameLabel": "Name",
-    "slugLabel": "Slug",
     "domainLabel": "Primary domain",
     "ownerEmailLabel": "Owner email",
     "planLabel": "Plan",
@@ -480,7 +479,7 @@
   },
   "deprovisionTenantControl": {
     "cardTitle": "Deprovision this tenant",
-    "description": "Removes the tenant's custom domain, deletes its Studio project, and archives its Sanity project so it stops billing rather than deleting it. The tenant row itself is archived, not deleted — its slug stays reserved. This cannot be undone.",
+    "description": "Removes the tenant's custom domain, deletes its Studio project, and archives its Sanity project so it stops billing rather than deleting it. The tenant row itself is archived, not deleted. This cannot be undone.",
     "triggerButton": "Deprovision tenant",
     "dialogTitle": "Deprovision {name}",
     "dialogDescription": "This dispatches deprovision-tenant.yml, which tears down every provisioned resource for this tenant. Type the tenant's name to confirm.",
@@ -492,7 +491,7 @@
     "confirmingButton": "Dispatching…",
     "archivedBadge": "Deprovisioned",
     "archivedAt": "Deprovisioned {date}",
-    "deleteDescription": "Permanently removes this tenant and every dependent row (memberships, subscribers, bookmarks, domains, site config) from the database. This cannot be undone, and releases the slug for reuse.",
+    "deleteDescription": "Permanently removes this tenant and every dependent row (memberships, subscribers, bookmarks, domains, site config) from the database. This cannot be undone, and releases its domain for reuse.",
     "deleteTriggerButton": "Delete tenant permanently",
     "deleteDialogTitle": "Delete {name}",
     "deleteDialogDescription": "This permanently deletes the tenant row and everything that depends on it. Type the tenant's name to confirm.",

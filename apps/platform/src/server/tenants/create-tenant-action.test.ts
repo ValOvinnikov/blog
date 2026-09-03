@@ -81,9 +81,6 @@ const validInput = {
   ownerEmail: 'owner@example.com',
 };
 
-// `deriveTenantSlug` collapses the domain's dots to hyphens.
-const derivedSlug = 'acme-example-com';
-
 describe('createTenantAction', () => {
   beforeEach(() => {
     requireAdminMock.mockReset();
@@ -218,7 +215,6 @@ describe('createTenantAction', () => {
 
     expect(createTenantDraftMock).toHaveBeenCalledWith({
       name: 'Acme',
-      slug: derivedSlug,
       domain: 'acme.example.com',
       locale: 'EN',
       plan: 'FREE',
@@ -359,27 +355,8 @@ describe('createTenantAction', () => {
     expect(redirect).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'tenants.create_draft_failed',
-      expect.objectContaining({ slug: derivedSlug }),
+      expect.objectContaining({ domain: 'acme.example.com' }),
     );
-  });
-
-  it('returns a domain field error and logs nothing when createTenantDraft reports DB_DUPLICATE_SLUG', async () => {
-    createTenantDraftMock.mockResolvedValue({
-      ok: false,
-      error: 'DB_DUPLICATE_SLUG',
-    });
-    const { createTenantAction } = await import('./create-tenant-action');
-
-    const result = await createTenantAction(validInput);
-
-    expect(result).toEqual({
-      ok: false,
-      fieldErrors: { domain: expect.any(String) },
-    });
-    expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
-    expect(redirect).not.toHaveBeenCalled();
-    expect(loggerWarnMock).not.toHaveBeenCalled();
-    expect(loggerErrorMock).not.toHaveBeenCalled();
   });
 
   it('returns a generic error and logs at error level when createTenantDraft reports any other typed failure', async () => {
@@ -396,12 +373,15 @@ describe('createTenantAction', () => {
     expect(redirect).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'tenants.create_draft_failed',
-      expect.objectContaining({ slug: derivedSlug, error: 'DB_NOT_FOUND' }),
+      expect.objectContaining({
+        domain: 'acme.example.com',
+        error: 'DB_NOT_FOUND',
+      }),
     );
     expect(loggerWarnMock).not.toHaveBeenCalled();
   });
 
-  it('creates the tenant draft with a domain-derived slug, the resolved owner id, and the platform default locale', async () => {
+  it('creates the tenant draft with the resolved owner id and the platform default locale', async () => {
     const { createTenantAction } = await import('./create-tenant-action');
 
     await expect(createTenantAction(validInput)).rejects.toThrow(
@@ -410,7 +390,6 @@ describe('createTenantAction', () => {
 
     expect(createTenantDraftMock).toHaveBeenCalledWith({
       name: 'Acme',
-      slug: derivedSlug,
       domain: 'acme.example.com',
       locale: 'EN',
       plan: 'FREE',
@@ -485,7 +464,6 @@ describe('createTenantAction', () => {
       targetId: 'tenant-1',
       details: {
         name: 'Acme',
-        slug: derivedSlug,
         domain: 'acme.example.com',
         plan: 'FREE',
         ownerEmail: 'owner@example.com',

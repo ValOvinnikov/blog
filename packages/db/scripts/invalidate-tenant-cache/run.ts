@@ -72,7 +72,7 @@ export async function runInvalidateTenantCache(
   }
 
   console.warn(
-    `invalidate-tenant-cache: done for tenant "${tenant.id}" (slug "${tenant.slug}").`,
+    `invalidate-tenant-cache: done for tenant "${tenant.id}" ("${tenant.name}").`,
   );
   return { ok: true };
 }

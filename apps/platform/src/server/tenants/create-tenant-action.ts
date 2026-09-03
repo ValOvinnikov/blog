@@ -36,13 +36,6 @@ const createTenantInputSchema = z.object({
   confirmOwnerInviteToken: z.string().optional(),
 });
 
-/**
- * `tenants.slug` is still `.notNull().unique()`, but the operator no longer
- * types one — it's derived from the (already-validated, already
- * uniqueness-checked) domain rather than surfaced as its own field.
- */
-const deriveTenantSlug = (domain: string): string => domain.replace(/\./g, '-');
-
 export type TCreateTenantInput = z.input<typeof createTenantInputSchema>;
 
 export type TCreateTenantFieldErrors = Partial<
@@ -90,7 +83,6 @@ export const createTenantAction = async (
 
   const { name, domain, plan, ownerEmail, confirmOwnerInviteToken } =
     parsed.data;
-  const slug = deriveTenantSlug(domain);
 
   const owner = await queries.users.getUserByEmail(ownerEmail);
   if (!owner && !verifyOwnerInviteToken(ownerEmail, confirmOwnerInviteToken)) {
@@ -132,7 +124,6 @@ export const createTenantAction = async (
   try {
     const result = await queries.tenants.createTenantDraft({
       name,
-      slug,
       domain,
       locale: routing.defaultLocale,
       plan,
@@ -142,17 +133,7 @@ export const createTenantAction = async (
     });
 
     if (!result.ok) {
-      if (result.error === ERROR_CODE.DB_DUPLICATE_SLUG) {
-        return {
-          ok: false,
-          fieldErrors: {
-            domain:
-              'This domain conflicts with an existing tenant — try a different one.',
-          },
-        };
-      }
       logger.error('tenants.create_draft_failed', {
-        slug,
         domain,
         error: result.error,
       });
@@ -161,7 +142,7 @@ export const createTenantAction = async (
 
     tenantId = result.data.id;
   } catch (error) {
-    logger.error('tenants.create_draft_failed', { slug, domain, error });
+    logger.error('tenants.create_draft_failed', { domain, error });
     return { ok: false, error: "Couldn't create the tenant — try again." };
   }
 
@@ -170,7 +151,7 @@ export const createTenantAction = async (
     action: AUDIT_ACTION.CREATED,
     targetType: AUDIT_TARGET_TYPE.TENANT,
     targetId: tenantId,
-    details: { name, slug, domain, plan, ownerEmail },
+    details: { name, domain, plan, ownerEmail },
   });
 
   // `redirect: false` returns a result instead of throwing, since this

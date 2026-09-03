@@ -40,7 +40,7 @@ vi.mock('./steps/invalidate-tenant-cache', () => ({
   invalidateTenantCache: invalidateTenantCacheMock,
 }));
 
-const baseTenant = { id: 'tenant-1', slug: 'acme' } as TTenant;
+const baseTenant = { id: 'tenant-1', name: 'Acme' } as TTenant;
 const env = {
   sanityManagementToken: 'sanity-token',
   vercelToken: 'vercel-token',
@@ -144,11 +144,11 @@ describe(runSteps, () => {
 });
 
 describe(runDeprovisioning, () => {
-  it('throws before any step runs when confirm does not match the slug', async () => {
+  it('throws before any step runs when confirm does not match the name', async () => {
     await expect(
-      runDeprovisioning(baseTenant, 'wrong-slug', env),
+      runDeprovisioning(baseTenant, 'Wrong Name', env),
     ).rejects.toThrow(
-      'deprovision-tenant: --confirm="wrong-slug" does not match tenant slug "acme" — aborting before any destructive action.',
+      'deprovision-tenant: --confirm="Wrong Name" does not match tenant name "Acme" — aborting before any destructive action.',
     );
 
     expect(removeTenantDomainMock).not.toHaveBeenCalled();
@@ -159,8 +159,8 @@ describe(runDeprovisioning, () => {
     expect(invalidateTenantCacheMock).not.toHaveBeenCalled();
   });
 
-  it('runs every step when confirm matches the slug', async () => {
-    const result = await runDeprovisioning(baseTenant, 'acme', env);
+  it('runs every step when confirm matches the name', async () => {
+    const result = await runDeprovisioning(baseTenant, 'Acme', env);
 
     expect(result).toEqual({ ok: true });
     expect(removeTenantDomainMock).toHaveBeenCalledTimes(1);
@@ -171,7 +171,7 @@ describe(runDeprovisioning, () => {
   it('skips every step without checking confirm when already deprovisioned', async () => {
     const tenant = { ...baseTenant, deprovisionedAt: new Date() } as TTenant;
 
-    const result = await runDeprovisioning(tenant, 'wrong-slug', env);
+    const result = await runDeprovisioning(tenant, 'Wrong Name', env);
 
     expect(result).toEqual({ ok: true, skipped: true });
     expect(removeTenantDomainMock).not.toHaveBeenCalled();

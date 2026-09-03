@@ -45,15 +45,6 @@ describe(archiveTenant, () => {
     expect(row?.status).toBe(TENANT_STATUS.ARCHIVED);
   });
 
-  it('leaves the slug intact so it stays reserved', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
-
-    const result = await archiveTenant(tenantId);
-
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.slug).toBe('acme');
-  });
-
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {
     const missingId = '00000000-0000-0000-0000-000000000000';
 

@@ -88,20 +88,20 @@ async function recheckOne(
       case ELEVATE_TENANT_OWNER_OUTCOME.STALLED:
         summary.stalled += 1;
         console.error(
-          `recheck-tenant-owners: tenant "${tenant.id}" (slug "${tenant.slug}")'s owner still hasn't accepted their Sanity invite — administrator grant is stalled, not failed.`,
+          `recheck-tenant-owners: tenant "${tenant.id}" ("${tenant.name}")'s owner still hasn't accepted their Sanity invite — administrator grant is stalled, not failed.`,
         );
         break;
       case ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP:
         summary.ambiguous += 1;
         console.error(
-          `recheck-tenant-owners: tenant "${tenant.id}" (slug "${tenant.slug}")'s Sanity project has more than one human member — cannot tell which is the owner, so no role was granted. Needs manual review.`,
+          `recheck-tenant-owners: tenant "${tenant.id}" ("${tenant.name}")'s Sanity project has more than one human member — cannot tell which is the owner, so no role was granted. Needs manual review.`,
         );
         break;
     }
   } catch (error) {
     summary.errors += 1;
     console.error(
-      `recheck-tenant-owners: elevate-tenant-owner failed for tenant "${tenant.id}" (slug "${tenant.slug}"): ${sanitizeLogMessage(error)}`,
+      `recheck-tenant-owners: elevate-tenant-owner failed for tenant "${tenant.id}" ("${tenant.name}"): ${sanitizeLogMessage(error)}`,
     );
   }
 }

@@ -7,7 +7,6 @@
  *
  *   set -a && source apps/web/.env.local && set +a
  *   pnpm --filter @blog/db db:seed-tenant -- \
- *     --slug=acme \
  *     --name="Acme" \
  *     --primary-domain=acme.example.com \
  *     --sanity-project-id=<project id> \
@@ -17,18 +16,20 @@
  *     [--plan=FREE|GROWTH] [--status=ACTIVE|SUSPENDED] \
  *     [--domain=extra.example.com ...] [--sanity-read-token=<token>]
  *
- * Idempotent: re-running with the same `--slug` reuses the existing tenant
- * row instead of failing, and every write below (domain, membership) is
- * itself a no-op-safe upsert. `--owner-email` must already have a `users`
- * row — this script does not create one; the owner signs in once first (via
- * the site's normal Auth.js flow) so a real, correctly-linked account exists
- * before it is granted a membership.
+ * Idempotent: re-running with the same `--primary-domain` reuses the
+ * existing tenant row instead of creating a duplicate, and every write below
+ * (domain, membership) is itself a no-op-safe upsert. `--owner-email` must
+ * already have a `users` row — this script does not create one; the owner
+ * signs in once first (via the site's normal Auth.js flow) so a real,
+ * correctly-linked account exists before it is granted a membership.
  *
  * `db:seed-tenant`'s `--conditions=react-server` node flag makes `getDb()`'s
  * `import 'server-only'` resolve to its no-op export outside Next.js's own
  * build (the condition Next.js itself sets), so this plain-Node script can
  * reuse the real query functions instead of duplicating their SQL.
  */
+import { pathToFileURL } from 'node:url';
+
 import { getDb } from '@blog/db/client';
 import {
   MEMBERSHIP_ROLE,
@@ -38,18 +39,17 @@ import {
   type TTenantStatus,
 } from '@blog/db/constants';
 import { createMembership } from '@blog/db/queries/memberships';
-import { addTenantDomain } from '@blog/db/queries/tenant-domains';
 import {
-  createTenant,
-  getTenantBySlug,
-  setTenantSanityToken,
-} from '@blog/db/queries/tenants';
+  addTenantDomain,
+  getTenantByDomain,
+} from '@blog/db/queries/tenant-domains';
+import { createTenant, setTenantSanityToken } from '@blog/db/queries/tenants';
 import { users } from '@blog/db/schema/auth';
+import type { TTenant } from '@blog/db/schema/tenants';
 import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import { eq } from 'drizzle-orm';
 
 type TParsedArgs = {
-  slug: string;
   name: string;
   primaryDomain: string;
   sanityProjectId: string;
@@ -120,7 +120,6 @@ function parseArgs(argv: string[]): TParsedArgs {
   }
 
   return {
-    slug: requireOne('slug'),
     name: requireOne('name'),
     primaryDomain,
     sanityProjectId: requireOne('sanity-project-id'),
@@ -134,36 +133,45 @@ function parseArgs(argv: string[]): TParsedArgs {
   };
 }
 
+// Exported for direct testing of the idempotency check without also
+// exercising argv parsing or the domain/membership writes `main()` wraps it
+// in.
+export async function resolveOrCreateTenant(
+  args: TParsedArgs,
+): Promise<TTenant> {
+  const existing = await getTenantByDomain(args.primaryDomain);
+  if (existing) {
+    console.warn(
+      `Tenant "${existing.name}" already exists (${existing.id}) — reusing it.`,
+    );
+    return existing;
+  }
+
+  const created = await createTenant({
+    name: args.name,
+    primaryDomain: args.primaryDomain,
+    sanityProjectId: args.sanityProjectId,
+    sanityDataset: args.sanityDataset,
+    locale: args.locale,
+    plan: args.plan,
+    status: args.status,
+  });
+  if (!created.ok) {
+    throw new Error(`seed-tenant: createTenant failed (${created.error}).`);
+  }
+  console.warn(`Created tenant "${created.data.name}" (${created.data.id}).`);
+  return created.data;
+}
+
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
   const db = getDb();
 
-  let tenant = await getTenantBySlug(args.slug, { includeArchived: true });
-  if (tenant) {
-    console.warn(
-      `Tenant "${args.slug}" already exists (${tenant.id}) — reusing it.`,
-    );
-  } else {
-    const created = await createTenant({
-      slug: args.slug,
-      name: args.name,
-      primaryDomain: args.primaryDomain,
-      sanityProjectId: args.sanityProjectId,
-      sanityDataset: args.sanityDataset,
-      locale: args.locale,
-      plan: args.plan,
-      status: args.status,
-    });
-    if (!created.ok) {
-      throw new Error(`seed-tenant: createTenant failed (${created.error}).`);
-    }
-    tenant = created.data;
-    console.warn(`Created tenant "${args.slug}" (${tenant.id}).`);
-  }
+  const tenant = await resolveOrCreateTenant(args);
 
   if (args.sanityReadToken) {
     await setTenantSanityToken(tenant.id, args.sanityReadToken);
-    console.warn(`Sanity read token set for tenant "${args.slug}".`);
+    console.warn(`Sanity read token set for tenant "${tenant.name}".`);
   }
 
   for (const domain of [args.primaryDomain, ...args.extraDomains]) {
@@ -173,7 +181,7 @@ async function main(): Promise<void> {
         `seed-tenant: addTenantDomain failed for "${domain}" (${domainResult.error}).`,
       );
     }
-    console.warn(`Domain "${domain}" -> tenant "${args.slug}".`);
+    console.warn(`Domain "${domain}" -> tenant "${tenant.name}".`);
   }
 
   const [owner] = await db
@@ -187,12 +195,20 @@ async function main(): Promise<void> {
   }
 
   await createMembership(owner.id, tenant.id, MEMBERSHIP_ROLE.OWNER);
-  console.warn(`Granted OWNER on "${args.slug}" to "${args.ownerEmail}".`);
+  console.warn(`Granted OWNER on "${tenant.name}" to "${args.ownerEmail}".`);
 }
 
-main()
-  .then(() => process.exit(0))
-  .catch((error: unknown) => {
-    console.error(error);
-    process.exit(1);
-  });
+// Only auto-run when this file is the CLI entrypoint (`tsx seed-tenant.ts`)
+// — guards against `main()` firing as an import side effect when a test
+// imports `resolveOrCreateTenant` from this same module.
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
+  main()
+    .then(() => process.exit(0))
+    .catch((error: unknown) => {
+      console.error(error);
+      process.exit(1);
+    });
+}

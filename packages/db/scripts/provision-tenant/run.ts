@@ -89,8 +89,8 @@ export async function runSteps(
   env: TProvisionEnv,
 ): Promise<{ ok: boolean }> {
   // Reactivates a re-provisioned tenant's row before any step runs, so it
-  // stays deprovisionable and slug-resolvable once this run succeeds — see
-  // `reactivateTenant` for why a SUSPENDED tenant is left untouched.
+  // stays deprovisionable once this run succeeds — see `reactivateTenant`
+  // for why a SUSPENDED tenant is left untouched.
   const reactivateResult = await reactivateTenant(tenantId);
   if (!reactivateResult.ok) {
     console.error(

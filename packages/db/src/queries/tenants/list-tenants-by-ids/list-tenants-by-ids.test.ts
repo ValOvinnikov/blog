@@ -32,7 +32,7 @@ describe(listTenantsByIds, () => {
   });
 
   it('silently omits ids with no matching row', async () => {
-    const { id: acmeId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: acmeId } = await insertTestTenant(db, { name: 'Acme' });
 
     const result = await listTenantsByIds([
       acmeId,
@@ -40,18 +40,18 @@ describe(listTenantsByIds, () => {
     ]);
 
     expect(result).toHaveLength(1);
-    expect(result[0]).toMatchObject({ slug: 'acme' });
+    expect(result[0]).toMatchObject({ name: 'Acme' });
   });
 
   it('resolves multiple ids to their tenants', async () => {
-    const { id: acmeId } = await insertTestTenant(db, { slug: 'acme' });
-    const { id: zetaId } = await insertTestTenant(db, { slug: 'zeta' });
+    const { id: acmeId } = await insertTestTenant(db, { name: 'Acme' });
+    const { id: zetaId } = await insertTestTenant(db, { name: 'Zeta' });
 
     const result = await listTenantsByIds([acmeId, zetaId]);
 
-    expect(result.map((tenant) => tenant.slug).sort()).toEqual([
-      'acme',
-      'zeta',
+    expect(result.map((tenant) => tenant.name).sort()).toEqual([
+      'Acme',
+      'Zeta',
     ]);
   });
 });

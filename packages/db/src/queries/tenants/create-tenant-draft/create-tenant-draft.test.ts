@@ -19,7 +19,6 @@ let db: PgliteDatabase<typeof schema>;
 
 const draftInput: TCreateTenantDraftInput = {
   name: 'Acme',
-  slug: 'acme',
   domain: 'acme.example.com',
   locale: 'en',
   plan: TENANT_PLAN.FREE,
@@ -50,7 +49,6 @@ describe(createTenantDraft, () => {
 
     if (!result.ok) throw new Error('expected ok:true');
     expect(result.data).toMatchObject({
-      slug: 'acme',
       name: 'Acme',
       primaryDomain: 'acme.example.com',
       locale: 'en',
@@ -135,10 +133,7 @@ describe(createTenantDraft, () => {
   it('rejects when the owner user id does not exist, and leaves no orphaned tenant or domain row behind', async () => {
     await expect(createTenantDraft(draftInput)).rejects.toThrow();
 
-    const tenantRows = await db
-      .select()
-      .from(schema.tenants)
-      .where(eq(schema.tenants.slug, draftInput.slug));
+    const tenantRows = await db.select().from(schema.tenants);
     expect(tenantRows).toHaveLength(0);
 
     const domainRows = await db
@@ -156,16 +151,12 @@ describe(createTenantDraft, () => {
     await expect(
       createTenantDraft({
         ...draftInput,
-        slug: 'acme-2',
         owner: { type: 'user', userId: 'user-2' },
       }),
     ).rejects.toThrow();
 
-    const secondTenantRows = await db
-      .select()
-      .from(schema.tenants)
-      .where(eq(schema.tenants.slug, 'acme-2'));
-    expect(secondTenantRows).toHaveLength(0);
+    const tenantRows = await db.select().from(schema.tenants);
+    expect(tenantRows).toHaveLength(1);
 
     const secondMembershipRows = await db
       .select()
@@ -191,61 +182,18 @@ describe(createTenantDraft, () => {
     await expect(
       createTenantDraft({
         ...draftInput,
-        slug: 'acme-2',
         owner: { type: 'invite', email: 'owner-2@example.com' },
       }),
     ).rejects.toThrow();
 
-    const secondTenantRows = await db
-      .select()
-      .from(schema.tenants)
-      .where(eq(schema.tenants.slug, 'acme-2'));
-    expect(secondTenantRows).toHaveLength(0);
+    const tenantRows = await db.select().from(schema.tenants);
+    expect(tenantRows).toHaveLength(1);
 
     const secondInviteRows = await db
       .select()
       .from(schema.membershipInvites)
       .where(eq(schema.membershipInvites.email, 'owner-2@example.com'));
     expect(secondInviteRows).toHaveLength(0);
-  });
-
-  it('returns DB_DUPLICATE_SLUG for a second draft with an already-used slug, without touching dependent rows', async () => {
-    await insertTestUser(db, { id: 'user-1' });
-    await insertTestUser(db, { id: 'user-2' });
-    await createTenantDraft(draftInput);
-
-    const result = await createTenantDraft({
-      ...draftInput,
-      domain: 'other.example.com',
-      owner: { type: 'user', userId: 'user-2' },
-    });
-
-    expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_DUPLICATE_SLUG });
-
-    const secondMembershipRows = await db
-      .select()
-      .from(schema.memberships)
-      .where(eq(schema.memberships.userId, 'user-2'));
-    expect(secondMembershipRows).toHaveLength(0);
-  });
-
-  // pglite serves a single connection, so a real concurrent UPDATE landing
-  // between this call's no-op insert and its follow-up read can't be
-  // forced here — `updateTenantDetails` renaming the slug away is the
-  // real-world trigger. The follow-up read is spied to simulate that exact
-  // window.
-  it('returns DB_NOT_FOUND when the conflicting row vanishes before the follow-up read', async () => {
-    await insertTestUser(db, { id: 'user-1' });
-    await createTenantDraft(draftInput);
-
-    const selectSpy = vi.spyOn(db, 'select').mockReturnValueOnce({
-      from: () => ({ where: () => Promise.resolve([]) }),
-    } as unknown as ReturnType<typeof db.select>);
-
-    const result = await createTenantDraft(draftInput);
-
-    expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
-    selectSpy.mockRestore();
   });
 
   it.each([

@@ -98,7 +98,7 @@ When invoked, before writing any code:
   logger.error('provisioning.dispatch_failed', { tenantId, step, error });
   ```
   **Never interpolate a dynamic value into the event name** — no template
-  literals, no concatenation. Tenant ids, slugs, domains, and status codes
+  literals, no concatenation. Tenant ids, names, domains, and status codes
   belong in the context object. Keeping the event name static is what makes
   failures groupable downstream and what preserves the log-injection barrier
   CodeQL checks. Pass the raw `error` through; the logger normalizes it to
@@ -110,7 +110,7 @@ When invoked, before writing any code:
   `ERROR_CODE` you did not anticipate. `warn` — handled, but worth seeing: a
   fallback engaged, a retry, a rare race that actually fired. **Never log an
   expected, user-correctable outcome at `error`.** A validation failure, a
-  duplicate slug or domain, a not-found on user-supplied input is a return
+  duplicate domain, a not-found on user-supplied input is a return
   value, not a failure — logging it at `error` buries the real breakages in
   routine noise and fires alerts nobody can act on.
   **A `TResult` failure is not automatically an `error`:** branch on the
@@ -122,13 +122,16 @@ When invoked, before writing any code:
   the log is the only place that cause exists.
   ```ts
   if (!result.ok) {
-    if (result.error === ERROR_CODE.DB_DUPLICATE_SLUG) {
+    if (result.error === ERROR_CODE.DB_DUPLICATE_DOMAIN) {
       return {
         ok: false,
-        fieldErrors: { slug: 'This slug is already in use.' },
+        fieldErrors: { domain: 'This domain is already in use.' },
       };
     }
-    logger.error('tenants.create_draft_failed', { slug, error: result.error });
+    logger.error('tenants.create_draft_failed', {
+      domain,
+      error: result.error,
+    });
     return { ok: false, error: "Couldn't create the tenant — try again." };
   }
   ```
