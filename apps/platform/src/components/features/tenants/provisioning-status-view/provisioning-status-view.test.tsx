@@ -152,7 +152,7 @@ describe(ProvisioningStatusView, () => {
       />,
     );
     expect(
-      screen.getByRole('link', { name: '← Back to tenant' }),
+      screen.getByRole('link', { name: 'Back to tenant' }),
     ).toHaveAttribute('href', '/tenants/tenant-1');
     unmount();
 
@@ -166,7 +166,7 @@ describe(ProvisioningStatusView, () => {
       />,
     );
     expect(
-      screen.getByRole('link', { name: '← Back to tenant' }),
+      screen.getByRole('link', { name: 'Back to tenant' }),
     ).toHaveAttribute('href', '/tenants/tenant-1');
   });
 

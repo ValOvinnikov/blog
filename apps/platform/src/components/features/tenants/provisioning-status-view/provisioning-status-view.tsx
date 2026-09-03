@@ -120,7 +120,7 @@ export const ProvisioningStatusView = ({
           <LinkButton
             as={Link}
             href={adminRoutes.tenantOverview(tenant.id)}
-            variant="ghost"
+            variant="secondary"
           >
             {t('backToTenantAction')}
           </LinkButton>
@@ -256,7 +256,7 @@ export const ProvisioningStatusView = ({
               {isOverallFailed && (
                 <Button
                   type="button"
-                  variant="ghost"
+                  variant="secondary"
                   onClick={handleRetry}
                   isDisabled={isRetrying || isArchived}
                   aria-describedby={isArchived ? archivedNoticeId : undefined}

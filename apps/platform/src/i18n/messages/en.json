@@ -463,7 +463,7 @@
       }
     },
     "technicalDetailsToggle": "Technical details",
-    "backToTenantAction": "← Back to tenant",
+    "backToTenantAction": "Back to tenant",
     "ownerLabel": "Owner",
     "ownerInvitedPendingBadge": "Invited, pending",
     "stepRunningNow": "now",
