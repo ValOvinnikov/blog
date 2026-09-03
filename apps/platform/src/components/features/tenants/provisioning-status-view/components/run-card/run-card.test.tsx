@@ -5,8 +5,15 @@ import { RunCard } from './run-card';
 const render = renderWithIntl;
 
 describe(RunCard, () => {
-  it('renders the started and finished times as relative and absolute UTC together when the run has finished', () => {
+  beforeEach(() => {
     vi.useFakeTimers({ toFake: ['Date'] });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('renders the started and finished times as relative and absolute UTC together when the run has finished', () => {
     vi.setSystemTime(new Date('2026-08-12T14:24:00.000Z'));
 
     render(
@@ -27,8 +34,6 @@ describe(RunCard, () => {
     expect(finished.tagName).toBe('TIME');
     expect(finished).toHaveAttribute('dateTime', '2026-08-12T14:22:00.000Z');
     expect(screen.getByText('production')).toBeVisible();
-
-    vi.useRealTimers();
   });
 
   it('shows an em-dash placeholder for Finished while the run is still in flight, with no <time> element', () => {
