@@ -86,7 +86,15 @@
       "Bash(vercel deploy --prod:*)",
       "Bash(vercel promote:*)",
       "Bash(vercel rollback:*)",
-      "mcp__plugin_vercel_vercel__deploy_to_vercel"
+      "mcp__plugin_vercel_vercel__deploy_to_vercel",
+      "mcp__github__create_pull_request",
+      "mcp__github__merge_pull_request",
+      "mcp__github__pull_request_review_write",
+      "mcp__github__create_or_update_file",
+      "mcp__github__push_files",
+      "mcp__github__delete_file",
+      "mcp__github__create_repository",
+      "mcp__github__delete_repository"
     ]
   },
   "extraKnownMarketplaces": {
