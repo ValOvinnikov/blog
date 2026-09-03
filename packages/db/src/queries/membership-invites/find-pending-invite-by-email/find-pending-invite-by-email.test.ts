@@ -40,7 +40,7 @@ afterEach(async () => {
 
 describe(findPendingInviteByEmail, () => {
   it('returns a pending invite matching the normalized email', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await insertInvite(tenantId, 'owner@example.com');
 
     const results = await findPendingInviteByEmail('Owner@Example.com');
@@ -50,7 +50,7 @@ describe(findPendingInviteByEmail, () => {
   });
 
   it('matches an email padded with leading/trailing whitespace', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await insertInvite(tenantId, 'owner@example.com');
 
     const results = await findPendingInviteByEmail('  owner@example.com  ');
@@ -60,7 +60,7 @@ describe(findPendingInviteByEmail, () => {
   });
 
   it('excludes already-consumed invites', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await insertInvite(tenantId, 'owner@example.com', true);
 
     const results = await findPendingInviteByEmail('owner@example.com');
@@ -69,8 +69,8 @@ describe(findPendingInviteByEmail, () => {
   });
 
   it('returns every pending invite across multiple tenants for the same email', async () => {
-    const { id: tenantOneId } = await insertTestTenant(db, { slug: 'acme' });
-    const { id: tenantTwoId } = await insertTestTenant(db, { slug: 'other' });
+    const { id: tenantOneId } = await insertTestTenant(db);
+    const { id: tenantTwoId } = await insertTestTenant(db);
     await insertInvite(tenantOneId, 'owner@example.com');
     await insertInvite(tenantTwoId, 'owner@example.com');
 

@@ -23,7 +23,6 @@ async function insertProvisionedTenant(): Promise<string> {
   const [tenant] = await db
     .insert(schema.tenants)
     .values({
-      slug: 'acme',
       name: 'Acme',
       primaryDomain: 'acme.example.com',
       sanityProjectId: 'proj123',
@@ -108,7 +107,6 @@ describe(clearTenantProvisioningArtifacts, () => {
       .where(eq(tenants.id, tenantId));
 
     expect(row).toMatchObject({
-      slug: 'acme',
       name: 'Acme',
       primaryDomain: 'acme.example.com',
     });

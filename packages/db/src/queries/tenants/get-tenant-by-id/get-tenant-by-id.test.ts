@@ -28,7 +28,6 @@ describe(getTenantById, () => {
     const [inserted] = await db
       .insert(schema.tenants)
       .values({
-        slug: 'acme',
         name: 'Acme',
         primaryDomain: 'acme.example.com',
         sanityProjectId: 'abc123',
@@ -42,7 +41,7 @@ describe(getTenantById, () => {
 
     const result = await getTenantById(inserted.id);
 
-    expect(result).toMatchObject({ id: inserted.id, slug: 'acme' });
+    expect(result).toMatchObject({ id: inserted.id, name: 'Acme' });
   });
 
   it('returns undefined for an id with no row', async () => {
@@ -55,7 +54,6 @@ describe(getTenantById, () => {
     const [inserted] = await db
       .insert(schema.tenants)
       .values({
-        slug: 'acme',
         name: 'Acme',
         primaryDomain: 'acme.example.com',
         sanityProjectId: 'abc123',
@@ -77,7 +75,6 @@ describe(getTenantById, () => {
     const [inserted] = await db
       .insert(schema.tenants)
       .values({
-        slug: 'acme',
         name: 'Acme',
         primaryDomain: 'acme.example.com',
         sanityProjectId: 'abc123',
@@ -92,6 +89,6 @@ describe(getTenantById, () => {
 
     const result = await getTenantById(inserted.id, { includeArchived: true });
 
-    expect(result).toMatchObject({ id: inserted.id, slug: 'acme' });
+    expect(result).toMatchObject({ id: inserted.id, name: 'Acme' });
   });
 });

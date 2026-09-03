@@ -37,7 +37,6 @@ describe(getTenantProvisioningStatus, () => {
     const [tenant] = await db
       .insert(schema.tenants)
       .values({
-        slug: 'acme',
         name: 'Acme',
         primaryDomain: 'acme.example.com',
         locale: 'en',
@@ -70,7 +69,6 @@ describe(getTenantProvisioningStatus, () => {
     const [tenant] = await db
       .insert(schema.tenants)
       .values({
-        slug: 'legacy',
         name: 'Legacy',
         primaryDomain: 'legacy.example.com',
         locale: 'en',

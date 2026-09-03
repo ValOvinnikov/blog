@@ -19,7 +19,6 @@ async function insertTenant(overrides?: {
   provisioningStatus?: (typeof TENANT_PROVISIONING_STATUS)[keyof typeof TENANT_PROVISIONING_STATUS];
 }): Promise<string> {
   const tenant = await insertTestTenant(db, {
-    slug: 'acme',
     name: 'Acme',
     provisioningStatus: overrides?.provisioningStatus,
   });
@@ -82,7 +81,7 @@ describe(setTenantProvisioningStatus, () => {
       .from(tenants)
       .where(eq(tenants.id, tenantId));
 
-    expect(row).toMatchObject({ slug: 'acme', name: 'Acme' });
+    expect(row).toMatchObject({ name: 'Acme' });
   });
 
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {

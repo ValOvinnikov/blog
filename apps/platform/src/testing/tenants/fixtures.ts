@@ -30,7 +30,6 @@ export const idleProvisioningSteps = (): TTenantProvisioningState => {
 export const makeTenant = (overrides: Partial<TTenant> = {}): TTenant => {
   return {
     id: 'tenant-1',
-    slug: 'acme',
     name: 'Acme Inc.',
     primaryDomain: 'acme.example.com',
     sanityProjectId: null,

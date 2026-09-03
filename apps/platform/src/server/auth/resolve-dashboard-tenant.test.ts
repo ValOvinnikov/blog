@@ -13,8 +13,8 @@ vi.mock('./list-session-tenants', () => ({
 
 vi.mock('next/headers', () => ({ cookies: cookiesMock }));
 
-const tenant1 = { id: 'tenant-1', slug: 'acme' };
-const tenant2 = { id: 'tenant-2', slug: 'globex' };
+const tenant1 = { id: 'tenant-1' };
+const tenant2 = { id: 'tenant-2' };
 const membership1 = {
   id: 'm-1',
   userId: 'user-1',

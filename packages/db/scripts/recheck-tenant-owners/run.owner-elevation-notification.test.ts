@@ -88,7 +88,6 @@ async function insertActiveTenant(): Promise<string> {
   const [tenant] = await db
     .insert(schema.tenants)
     .values({
-      slug: 'acme',
       name: 'Acme',
       primaryDomain: 'acme.example.com',
       locale: 'en',
