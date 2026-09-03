@@ -135,7 +135,8 @@ When invoked, before writing any code:
     return { ok: false, error: "Couldn't create the tenant — try again." };
   }
   ```
-- Depend on `@blog/db`, `@blog/auth`, `@blog/config`, and `@blog/insight`
+- Depend on `@blog/db`, `@blog/auth`, `@blog/config`, `@blog/insight`, and
+  `@blog/email`
   only — `@blog/ui` is **not** an ordinary dependency here; it's confined by
   an ESLint guard to `look-preview/preview-sample/` (the one directory that
   renders the tenant's real site for live-preview fidelity). Reach for this
