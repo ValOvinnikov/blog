@@ -54,7 +54,22 @@ validation, Lighthouse CI, Playwright smoke) stays advisory: a red result
 there does not currently block a merge.
 Required workflows run on every PR without path filters on purpose — a
 path-skipped workflow leaves its required checks pending forever (see the
-comment in `ci.yml`). Document validation is a separate job inside `ci.yml`
+comment in `ci.yml`).
+
+**The same deadlock still reaches stacked PRs, through the base filter rather
+than a path filter.** `ci.yml` is scoped to `pull_request: branches: [main]`,
+so a PR opened against any other branch — the normal shape of a stacked PR —
+runs none of the required jobs. Only `pr-opened` and the Vercel checks report,
+which is just enough to look like a normal run at a glance, while the PR sits
+blocked on required checks that will never arrive. Retargeting does not help:
+when the base merges, GitHub retargets the PR to `main`, but that fires a
+`pull_request` `edited` event and the workflow listens only for
+`opened`/`synchronize`/`reopened`. Closing and reopening the PR forces a real
+run; count the checks to confirm (roughly 5 means the stale run, roughly 20
+means a real one). Widening the trigger would fix it at the cost of running
+the full suite against arbitrary base branches, so it has been left as a known
+manual step rather than changed — see `open-pull-request`'s "Stacked PRs"
+section. Document validation is a separate job inside `ci.yml`
 from the required Migrations job precisely so a routine drift in an existing
 live document (independent of any given PR's diff) can't fail a required
 check — same reasoning as Lighthouse CI / Playwright smoke below.

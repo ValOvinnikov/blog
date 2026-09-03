@@ -563,4 +563,27 @@ file` are all denied alike) — an earlier version only handled the
   enabled/disabled status, and incident history; that file is a
   version-controlled reference copy, so editing it has no effect on the live
   routine — update both places if the prompt changes.
+- **`gh` CLI extensions** — `github/gh-stack` (`gh stack`) is installed for
+  stacked pull requests, and is the supported way to create them: `init`,
+  `add`, `submit`, `sync`, `view`. Prefer it over hand-rolling bases with
+  `gh pr create --base <branch>`, mainly for `sync`, which restacks the
+  branches above a PR once it merges. Stacking is what makes a per-layer
+  split viable for a change whose layers cannot each merge to `main` green
+  alone, since the intermediate states target their predecessor rather than
+  `main`.
+
+  **The one thing to know before using it:** a PR that targets anything other
+  than `main` receives **no CI**. `ci.yml` is scoped to
+  `pull_request: branches: [main]`, so Type-check, Lint, Test, Build, Knip and
+  CodeQL never run — only `pr-opened` and the Vercel checks, which is just
+  enough output to look normal. Those jobs are required status checks, so the
+  PR blocks indefinitely. When the base merges, GitHub retargets the PR to
+  `main` but that fires a `pull_request` `edited` event, which the workflow
+  does not listen for, so still nothing runs. Closing and reopening the PR
+  fires `reopened` and produces a real run; confirm by counting checks
+  (roughly 5 means the stale run, roughly 20 means a real one). Note this is
+  the same deadlock `ci.yml`'s header comment says it deliberately avoids by
+  refusing to use `paths-ignore` — the base-branch filter reintroduces it
+  through a different door.
+
 - **`CLAUDE.md`** — repo-wide guidance loaded into every session.

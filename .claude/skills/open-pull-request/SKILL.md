@@ -22,6 +22,62 @@ Keep it a single PR when a partial merge breaks the build — e.g. renaming a
 shared `_type`/generated type that downstream references reds `type-check` until
 all layers land. One concern per PR still holds either way.
 
+### Stacked PRs — use `gh stack`, and read the CI trap first
+
+The `github/gh-stack` extension is installed (`gh extension list` →
+`gh stack`). Use it rather than hand-rolling bases with
+`gh pr create --base <branch>`:
+
+```bash
+gh stack init                 # start a stack targeting main
+gh stack init b1 b2 b3        # or adopt existing branches as a stack
+gh stack add <branch>         # add a branch on top of the current stack
+gh stack submit               # push every branch, create/update all PRs
+gh stack sync                 # restack after a base merges upstream
+gh stack view                 # see the current stack
+```
+
+`submit` and `sync` are the reason to use it: `sync` restacks automatically
+when a lower PR merges, which is the step most likely to be forgotten
+by hand.
+
+**Stacking dissolves the "split only when each layer merges green alone"
+constraint above.** That rule exists because a partial merge to `main` can
+red the build. A stacked PR targets its predecessor's branch, not `main`, so
+the intermediate states never land on `main` at all — which means a
+rename-plus-consumers change _can_ be split per layer as long as the whole
+stack merges in order.
+
+**THE TRAP — a stacked PR gets ZERO CI in this repo, and it is not obvious.**
+`.github/workflows/ci.yml` is scoped to `pull_request: branches: [main]`. A PR
+opened against any other branch therefore runs **no** Type-check, Lint, Test,
+Build, Knip or CodeQL — only `pr-opened` and the Vercel checks, which look
+plausible enough at a glance to miss. Because those jobs are _required_ status
+checks in the branch ruleset, the PR sits on `BLOCKED` waiting for checks that
+will never arrive.
+
+Retargeting does **not** fix it. When the base merges, GitHub retargets the PR
+to `main`, but that fires a `pull_request` `edited` event, and the workflow
+listens for `opened`/`synchronize`/`reopened`. So the PR is now aimed at `main`
+with still no CI.
+
+**The fix is to close and reopen the PR** (`gh pr close <n> && gh pr reopen <n>`),
+which fires `reopened` and triggers a full run. Verify it worked by counting
+checks — `gh pr checks <n>` showing ~5 entries means the stale run; a real run
+is ~20. Pushing any new commit also works, but do not invent an empty commit
+just for this.
+
+Note the irony worth remembering: `ci.yml`'s own header comment explains it
+deliberately has **no** `paths-ignore`, precisely so a docs-only PR cannot
+deadlock on required checks that never run. The `branches: [main]` filter
+recreates that exact deadlock through a different door.
+
+**When NOT to stack.** If the pieces are genuinely independent — no compile-time
+dependency between them — give each its own branch off `main` and skip the
+stack entirely. Independent PRs merge in any order, get CI for free, and cost
+no restacking. Stack only when a later PR genuinely will not compile without an
+earlier one.
+
 **Only the completing PR includes `Closes #<n>`.** In a per-layer split, every
 earlier layer's PR body must reference the tracked issue without an adjacent
 closing keyword — see the "PR body template" section below for the exact
