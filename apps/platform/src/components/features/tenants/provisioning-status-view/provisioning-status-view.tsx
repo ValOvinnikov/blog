@@ -23,6 +23,7 @@ import { useId } from 'react';
 import { RunCard } from './components/run-card/run-card';
 import { provisioningStatusViewVariants } from './provisioning-status-view-variants';
 import { STEP_ORDER, useProvisioningPoll } from './use-provisioning-poll';
+import { useRelativeTimeTick } from './use-relative-time-tick';
 
 type TProvisioningStatusViewProps = {
   tenant: TTenant;
@@ -63,6 +64,7 @@ export const ProvisioningStatusView = ({
     failedStepError,
     errorKind,
   } = useProvisioningPoll(tenant);
+  useRelativeTimeTick();
 
   const doneStepCount = stepStatuses.filter(
     (status) => status === TENANT_PROVISIONING_STEP_STATUS.DONE,
