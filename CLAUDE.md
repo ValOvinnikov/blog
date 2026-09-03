@@ -828,7 +828,14 @@ status the way the board tooling already knows how to read
   is the In Progress signal.
 - **In review:** open the PR with the issue reference (`Closes #n` on the
   completing PR only, per the per-layer-PR rule) — an open PR is the Code
-  Review signal.
+  Review signal. For the GitHub Actions `@claude` path, this is a
+  workflow-level default, not something each ticket has to ask for:
+  `claude.yml`'s `--append-system-prompt` tells every run to push and open
+  its own PR via `gh pr create` in the same pass. Before that instruction
+  existed, a run's default was to push a branch and leave only a "Create
+  PR" link in its comment, requiring a human to click it — if a link
+  appears instead of an opened PR, `gh pr create --head <branch>` opens one
+  from the already-pushed branch without needing a checkout.
 - **Done:** the merged `Closes #n` PR is the Done signal; nothing extra.
 
 The board catches up when any local session dispatches `board-keeper`
