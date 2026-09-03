@@ -27,6 +27,20 @@ export const TENANT_PROVISIONING_STEP = {
 
 export type TTenantProvisioningStep = TValueOf<typeof TENANT_PROVISIONING_STEP>;
 
+// The core provisioning steps `run.ts`'s workflow actually sequences, in
+// order — excludes `OWNER_ELEVATION`, a recurring post-provisioning check
+// with no bearing on the sequenced-provisioning state machine, so a fold
+// over this list can't silently pick up a future unrelated step key.
+export const CORE_PROVISIONING_STEPS = [
+  TENANT_PROVISIONING_STEP.SANITY_PROJECT,
+  TENANT_PROVISIONING_STEP.SEED_CONTENT,
+  TENANT_PROVISIONING_STEP.PERSIST_TOKEN,
+  TENANT_PROVISIONING_STEP.MAP_DOMAIN,
+  TENANT_PROVISIONING_STEP.CREATE_WEBHOOK,
+] as const satisfies readonly TTenantProvisioningStep[];
+
+export type TCoreProvisioningStep = (typeof CORE_PROVISIONING_STEPS)[number];
+
 export const TENANT_PROVISIONING_STEP_STATUS = {
   IDLE: 'IDLE',
   RUNNING: 'RUNNING',

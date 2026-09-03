@@ -1,5 +1,6 @@
 import { getDb } from '@blog/db/client';
 import {
+  CORE_PROVISIONING_STEPS,
   MEMBERSHIP_ROLE,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
@@ -59,19 +60,6 @@ export type TUpdateTenantDetailsResult =
 // which field is actually locked is decided per-step in `lockedFieldOutcome`,
 // never by position in the sequence.
 type TProvisioningState = 'IDLE' | 'RUNNING' | 'FAILED' | 'SUCCEEDED';
-
-// The five core provisioning steps `run.ts`'s workflow actually sequences —
-// hardcoded rather than derived from `TENANT_PROVISIONING_STEP` (which also
-// carries `OWNER_ELEVATION`, a recurring post-provisioning check with no
-// bearing on this state machine) so this fold can't silently pick up a
-// future unrelated step key the same way.
-const CORE_PROVISIONING_STEPS: TTenantProvisioningStep[] = [
-  TENANT_PROVISIONING_STEP.SANITY_PROJECT,
-  TENANT_PROVISIONING_STEP.SEED_CONTENT,
-  TENANT_PROVISIONING_STEP.PERSIST_TOKEN,
-  TENANT_PROVISIONING_STEP.MAP_DOMAIN,
-  TENANT_PROVISIONING_STEP.CREATE_WEBHOOK,
-];
 
 function deriveProvisioningState(
   provisioningStatus: TTenant['provisioningStatus'],
