@@ -1,3 +1,4 @@
+import { DISABLED_READONLY_SURFACE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
 import { tv } from '@platform/utils/tv/tv';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -9,10 +10,10 @@ export const textareaVariants = tv({
   ],
   variants: {
     isDisabled: {
-      true: 'bg-admin-line-2 text-admin-faint border-admin-line-2 cursor-not-allowed',
+      true: `${DISABLED_READONLY_SURFACE_CLASSES} text-admin-faint cursor-not-allowed`,
     },
     isReadOnly: {
-      true: 'bg-admin-line-2 text-admin-muted border-admin-line-2',
+      true: `${DISABLED_READONLY_SURFACE_CLASSES} text-admin-muted`,
     },
   },
 });
