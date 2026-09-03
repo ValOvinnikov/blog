@@ -439,6 +439,7 @@
     "startError": "Couldn't start provisioning — try again.",
     "startErrorNotFound": "Couldn't find this tenant — refresh the page and try again.",
     "startErrorArchived": "This tenant is archived; provisioning can't be started.",
+    "startNoticeAlreadyInProgress": "A provisioning run is already in progress for this tenant — this page will update automatically once it finishes.",
     "pollErrorWarning": "Couldn't refresh the latest status — retrying automatically.",
     "errorKind": {
       "permission": {
