@@ -16,6 +16,7 @@ const OPTIONAL_ENV_KEYS = [
   'GITHUB_RUN_ID',
   'GITHUB_REPOSITORY',
   'GITHUB_SERVER_URL',
+  'GITHUB_ACTOR',
   'TENANT_REGISTRY_ENVIRONMENT',
   'RESEND_API_KEY',
 ];
@@ -60,6 +61,7 @@ describe(loadProvisionEnv, () => {
       githubRunId: undefined,
       githubRepository: undefined,
       githubServerUrl: undefined,
+      githubActor: undefined,
       tenantRegistryEnvironment: undefined,
       resendApiKey: undefined,
     });
@@ -70,6 +72,7 @@ describe(loadProvisionEnv, () => {
     process.env['GITHUB_RUN_ID'] = '123';
     process.env['GITHUB_REPOSITORY'] = 'acme/blog';
     process.env['GITHUB_SERVER_URL'] = 'https://github.com';
+    process.env['GITHUB_ACTOR'] = 'octocat';
     process.env['TENANT_REGISTRY_ENVIRONMENT'] = 'production';
     process.env['RESEND_API_KEY'] = 'resend-key';
 
@@ -79,6 +82,7 @@ describe(loadProvisionEnv, () => {
     expect(env.githubRunId).toBe('123');
     expect(env.githubRepository).toBe('acme/blog');
     expect(env.githubServerUrl).toBe('https://github.com');
+    expect(env.githubActor).toBe('octocat');
     expect(env.tenantRegistryEnvironment).toBe('production');
     expect(env.resendApiKey).toBe('resend-key');
   });

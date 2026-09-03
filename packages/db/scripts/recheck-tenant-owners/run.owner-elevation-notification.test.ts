@@ -135,6 +135,7 @@ const provisionEnv = {
   githubRunId: undefined,
   githubRepository: undefined,
   githubServerUrl: undefined,
+  githubActor: undefined,
   tenantRegistryEnvironment: undefined,
   resendApiKey: 'resend-key',
 };

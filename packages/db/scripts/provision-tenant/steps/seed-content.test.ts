@@ -26,6 +26,7 @@ const env: TProvisionEnv = {
   githubRunId: undefined,
   githubRepository: undefined,
   githubServerUrl: undefined,
+  githubActor: undefined,
   tenantRegistryEnvironment: undefined,
   vercelWebProjectId: 'prj_web',
   adminAppBaseUrl: 'https://admin.example.com',
