@@ -83,4 +83,22 @@ describe(buildStarterDocuments, () => {
       url: '/blog',
     });
   });
+
+  it('seeds a module_hero document whose featuredPost references the starter post', () => {
+    const hero = buildStarterDocuments(tenant, assets).find(
+      (doc) => doc._id === STARTER_DOCUMENT_IDS.HERO,
+    ) as unknown as { _type: string; featuredPost: { _ref: string } };
+
+    expect(hero._type).toBe('module_hero');
+    expect(hero.featuredPost._ref).toBe(STARTER_DOCUMENT_IDS.POST);
+  });
+
+  it('seeds a page_home document whose hero references the starter hero', () => {
+    const home = buildStarterDocuments(tenant, assets).find(
+      (doc) => doc._id === STARTER_DOCUMENT_IDS.HOME,
+    ) as unknown as { _type: string; hero: { _ref: string } };
+
+    expect(home._type).toBe('page_home');
+    expect(home.hero._ref).toBe(STARTER_DOCUMENT_IDS.HERO);
+  });
 });
