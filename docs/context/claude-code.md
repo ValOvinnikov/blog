@@ -523,7 +523,7 @@ file` are all denied alike) — an earlier version only handled the
   `GITHUB_PAT` (a GitHub personal access token) in their shell profile; never
   put the token value in this repo. Cloud runs have no shell profile to read,
   so `claude.yml` supplies the same variable from the `GH_PAT` Actions secret
-  (see `ci-automation.md`) — without it every `mcp__github__*` tool is
+  (see [`docs/context/ci-automation.md`](./ci-automation.md)) — without it every `mcp__github__*` tool is
   silently absent from the run. That server also exposes write tools this
   repo's gates reserve for a human or for local git, so the deny list blocks
   eight of them: `create_pull_request`, `merge_pull_request` and
