@@ -13,13 +13,11 @@ const render = renderWithIntl;
 const tenants = [
   {
     id: 'tenant-1',
-    slug: 'acme',
     name: 'Acme Inc.',
     primaryDomain: 'acme.example.com',
   },
   {
     id: 'tenant-2',
-    slug: 'globex',
     name: 'Globex Corp.',
     primaryDomain: 'globex.example.com',
   },
