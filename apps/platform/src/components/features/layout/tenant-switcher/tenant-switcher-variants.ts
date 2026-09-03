@@ -24,6 +24,8 @@ export const tenantSwitcherVariants = tv({
     item: [
       'flex cursor-pointer flex-col rounded-admin-sm px-2 py-1.5 outline-none',
       'data-[highlighted]:bg-admin-side-raised',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-side-accent',
+      'focus-visible:ring-offset-2 focus-visible:ring-offset-admin-side',
     ],
     itemNameRow: ['flex min-w-0 items-center gap-1.5'],
     itemName: ['min-w-0 flex-1 truncate text-sm text-admin-side-text'],
