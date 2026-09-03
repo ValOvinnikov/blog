@@ -18,6 +18,7 @@
     "db:recheck-tenant-owners": "tsx --conditions=react-server scripts/recheck-tenant-owners/run.ts",
     "db:recover-wedged-provisioning": "tsx --conditions=react-server scripts/recover-wedged-provisioning.ts",
     "db:validate-tenant-documents": "tsx --conditions=react-server scripts/validate-tenant-documents/run.ts",
+    "db:migrate-tenant-content": "tsx --conditions=react-server scripts/migrate-tenant-content/run.ts",
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",

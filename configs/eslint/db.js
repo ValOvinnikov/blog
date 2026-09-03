@@ -59,7 +59,7 @@ export default [
             {
               group: ['@blog/insight', '@blog/insight/*'],
               message:
-                '@blog/db must not import @blog/insight — db never logs; failures return to the caller and the app layer logs them. The one exception is the standalone provision-tenant/deprovision-tenant/recheck-tenant-owners/validate-tenant-documents CLI scripts, which carve this out in their own override.',
+                '@blog/db must not import @blog/insight — db never logs; failures return to the caller and the app layer logs them. The one exception is the standalone provision-tenant/deprovision-tenant/recheck-tenant-owners/validate-tenant-documents/migrate-tenant-content CLI scripts, which carve this out in their own override.',
             },
             {
               group: ['@blog/auth', '@blog/auth/*'],
@@ -251,11 +251,56 @@ export default [
       ],
     },
   },
+  // migrate-tenant-content is the content-migration fan-out counterpart —
+  // same logging exception as the other tenant-aware scripts, no
+  // `@sanity/client` use (it shells out to `sanity`/`migrate.mjs`, same
+  // mechanism as validate-tenant-documents).
+  {
+    files: ['scripts/migrate-tenant-content/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [noVitestGlobalsImportPath],
+          patterns: [
+            {
+              group: ['react', 'react/*', 'react-dom', 'react-dom/*'],
+              message: noReactImportMessage,
+            },
+            {
+              group: ['@blog/ui', '@blog/ui/*'],
+              message: noUiImportMessage,
+            },
+            {
+              group: [
+                '@blog/service',
+                '@blog/service/*',
+                'sanity',
+                'sanity/*',
+                'next-sanity',
+                'next-sanity/*',
+                '@sanity/*',
+                'groqd',
+                'groqd/*',
+              ],
+              message:
+                '@blog/db must not import @blog/service or any Sanity SDK — db and service are sibling data layers that never reference each other; a feature needing both joins them in apps/web.',
+            },
+            {
+              group: ['@blog/auth', '@blog/auth/*'],
+              message:
+                "@blog/db must not import @blog/auth — auth sits above db and binds the Drizzle adapter to db's own tables; the dependency only flows one way.",
+            },
+          ],
+        },
+      ],
+    },
+  },
   {
     // provision-tenant/deprovision-tenant/recheck-tenant-owners/
-    // validate-tenant-documents are standalone CLI tools — stdout IS their
-    // interface. drizzle.config.ts is loaded only by the drizzle-kit CLI
-    // (db:generate/db:migrate/db:studio) — same category.
+    // validate-tenant-documents/migrate-tenant-content are standalone CLI
+    // tools — stdout IS their interface. drizzle.config.ts is loaded only by
+    // the drizzle-kit CLI (db:generate/db:migrate/db:studio) — same category.
     files: ['scripts/**/*.{ts,tsx}', 'drizzle.config.ts'],
     rules: {
       'no-console': 'off',
