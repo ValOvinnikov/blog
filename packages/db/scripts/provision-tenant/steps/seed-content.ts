@@ -5,7 +5,7 @@ import {
   deleteSanityRobotToken,
 } from '@blog/db/utils/sanity-management-client/sanity-management-client';
 import { SANITY_WRITE_TOKEN_LABEL } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
-import { createClient } from '@sanity/client';
+import { ClientError, createClient } from '@sanity/client';
 
 import type { TProvisionEnv } from '../lib/env';
 import { placeholderPngBuffer } from '../lib/placeholder-image';
@@ -33,7 +33,16 @@ const defaultDeps: TSeedContentDeps = {
   sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
 };
 
+const INSUFFICIENT_PERMISSIONS_STATUS_CODE = 403;
+
 function isGrantPropagationError(error: unknown): boolean {
+  if (
+    error instanceof ClientError &&
+    error.statusCode === INSUFFICIENT_PERMISSIONS_STATUS_CODE
+  ) {
+    return true;
+  }
+
   return (
     error instanceof Error && /insufficient permissions/i.test(error.message)
   );
