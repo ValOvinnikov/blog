@@ -17,6 +17,7 @@
     "db:invalidate-tenant-cache": "tsx --conditions=react-server scripts/invalidate-tenant-cache/run.ts",
     "db:recheck-tenant-owners": "tsx --conditions=react-server scripts/recheck-tenant-owners/run.ts",
     "db:recover-wedged-provisioning": "tsx --conditions=react-server scripts/recover-wedged-provisioning.ts",
+    "db:validate-tenant-documents": "tsx --conditions=react-server scripts/validate-tenant-documents/run.ts",
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
