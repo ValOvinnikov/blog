@@ -1,7 +1,7 @@
 import { createHmac } from 'node:crypto';
 
+import { isSecretMatch } from '@blog/utils';
 import { env } from '@platform/utils/env/env';
-import { isSecretMatch } from '@platform/utils/is-secret-match/is-secret-match';
 
 const OWNER_INVITE_TOKEN_MESSAGE_PREFIX = 'owner-invite:';
 
