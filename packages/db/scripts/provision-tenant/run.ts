@@ -181,12 +181,16 @@ export async function runSteps(
   // outcomes, not failures.
   try {
     const outcome = await elevateTenantOwner(tenant, env);
-    await reportOwnerElevationOutcome(tenantId, outcome);
-    await notifyOwnerElevationOutcome({
+    const notifiedOutcome = await notifyOwnerElevationOutcome({
       tenant,
       outcome,
       resendApiKey: env.resendApiKey,
     });
+    await reportOwnerElevationOutcome(
+      tenantId,
+      outcome,
+      ...(notifiedOutcome === undefined ? [] : [notifiedOutcome]),
+    );
 
     if (outcome === ELEVATE_TENANT_OWNER_OUTCOME.STALLED) {
       console.error(

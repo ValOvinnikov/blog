@@ -1,13 +1,10 @@
-import { TENANT_PROVISIONING_STEP, TENANT_STATUS } from '@blog/db/constants';
+import { TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 import { notifyOwnerElevationOutcome } from './notify-owner-elevation-outcome';
 
 const { notifyOperatorsOfOwnerElevationOutcomeMock } = vi.hoisted(() => ({
   notifyOperatorsOfOwnerElevationOutcomeMock: vi.fn(),
-}));
-const { reportStepStatusMock } = vi.hoisted(() => ({
-  reportStepStatusMock: vi.fn(),
 }));
 
 // `isNotifiableOutcome` is left as the real implementation — only the send
@@ -27,9 +24,6 @@ vi.mock(
     };
   },
 );
-vi.mock('./report-step-status', () => ({
-  reportStepStatus: reportStepStatusMock,
-}));
 
 function tenant(overrides: Partial<TTenant> = {}): TTenant {
   return {
@@ -60,12 +54,11 @@ beforeEach(() => {
   notifyOperatorsOfOwnerElevationOutcomeMock
     .mockReset()
     .mockResolvedValue(undefined);
-  reportStepStatusMock.mockReset().mockResolvedValue(undefined);
 });
 
 describe(notifyOwnerElevationOutcome, () => {
-  it('notifies and records the outcome as notified when never notified before', async () => {
-    await notifyOwnerElevationOutcome({
+  it('notifies and returns the outcome sent when never notified before', async () => {
+    const result = await notifyOwnerElevationOutcome({
       tenant: tenant({ lastNotifiedOwnerElevationOutcome: null }),
       outcome: 'STALLED',
       resendApiKey: 'resend-key',
@@ -77,54 +70,42 @@ describe(notifyOwnerElevationOutcome, () => {
       outcome: 'STALLED',
       resendApiKey: 'resend-key',
     });
-    expect(reportStepStatusMock).toHaveBeenCalledWith({
-      tenantId: 't1',
-      step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
-      status: 'DONE',
-      detail: 'STALLED',
-      notifiedOwnerElevationOutcome: 'STALLED',
-    });
+    expect(result).toBe('STALLED');
   });
 
-  it('does not re-notify when the outcome matches what was already notified', async () => {
-    await notifyOwnerElevationOutcome({
+  it('does not re-notify, and returns undefined, when the outcome matches what was already notified', async () => {
+    const result = await notifyOwnerElevationOutcome({
       tenant: tenant({ lastNotifiedOwnerElevationOutcome: 'STALLED' }),
       outcome: 'STALLED',
       resendApiKey: 'resend-key',
     });
 
     expect(notifyOperatorsOfOwnerElevationOutcomeMock).not.toHaveBeenCalled();
-    expect(reportStepStatusMock).not.toHaveBeenCalled();
+    expect(result).toBeUndefined();
   });
 
   it('notifies again when the outcome transitions to a different notifiable one', async () => {
-    await notifyOwnerElevationOutcome({
+    const result = await notifyOwnerElevationOutcome({
       tenant: tenant({ lastNotifiedOwnerElevationOutcome: 'STALLED' }),
       outcome: 'AMBIGUOUS_MEMBERSHIP',
       resendApiKey: 'resend-key',
     });
 
     expect(notifyOperatorsOfOwnerElevationOutcomeMock).toHaveBeenCalledTimes(1);
-    expect(reportStepStatusMock).toHaveBeenCalledWith({
-      tenantId: 't1',
-      step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
-      status: 'DONE',
-      detail: 'AMBIGUOUS_MEMBERSHIP',
-      notifiedOwnerElevationOutcome: 'AMBIGUOUS_MEMBERSHIP',
-    });
+    expect(result).toBe('AMBIGUOUS_MEMBERSHIP');
   });
 
   it.each(['ELEVATED', 'ALREADY_ADMINISTRATOR', 'PENDING_ACCEPTANCE'] as const)(
-    'never notifies for a non-notifiable outcome %s',
+    'never notifies, and returns undefined, for a non-notifiable outcome %s',
     async (outcome) => {
-      await notifyOwnerElevationOutcome({
+      const result = await notifyOwnerElevationOutcome({
         tenant: tenant(),
         outcome,
         resendApiKey: 'resend-key',
       });
 
       expect(notifyOperatorsOfOwnerElevationOutcomeMock).not.toHaveBeenCalled();
-      expect(reportStepStatusMock).not.toHaveBeenCalled();
+      expect(result).toBeUndefined();
     },
   );
 });

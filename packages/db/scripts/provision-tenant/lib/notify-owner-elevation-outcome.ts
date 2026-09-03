@@ -1,16 +1,10 @@
-import {
-  TENANT_PROVISIONING_STEP,
-  TENANT_PROVISIONING_STEP_STATUS,
-  type TElevateTenantOwnerOutcome,
-} from '@blog/db/constants';
+import type { TElevateTenantOwnerOutcome } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 import {
   isNotifiableOutcome,
   notifyOperatorsOfOwnerElevationOutcome,
 } from '../../recheck-tenant-owners/lib/notify-operators';
-
-import { reportStepStatus } from './report-step-status';
 
 export type TNotifyOwnerElevationOutcomeParams = {
   tenant: TTenant;
@@ -24,18 +18,24 @@ export type TNotifyOwnerElevationOutcomeParams = {
  * actually communicated last time, not the most recently observed one, so a
  * provisioning-time notification and a later recheck sweep never both fire
  * for the same outcome. Called by both `provision-tenant/run.ts` and
- * `recheck-tenant-owners/run.ts`.
+ * `recheck-tenant-owners/run.ts`. Returns the outcome once it has actually
+ * been sent, so the caller can persist `detail` and
+ * `notifiedOwnerElevationOutcome` together in a single
+ * `reportOwnerElevationOutcome` write; returns `undefined` when nothing was
+ * sent, leaving that write to record `detail` alone.
  */
 export async function notifyOwnerElevationOutcome({
   tenant,
   outcome,
   resendApiKey,
-}: TNotifyOwnerElevationOutcomeParams): Promise<void> {
+}: TNotifyOwnerElevationOutcomeParams): Promise<
+  TElevateTenantOwnerOutcome | undefined
+> {
   if (
     !isNotifiableOutcome(outcome) ||
     outcome === tenant.lastNotifiedOwnerElevationOutcome
   ) {
-    return;
+    return undefined;
   }
 
   await notifyOperatorsOfOwnerElevationOutcome({
@@ -44,11 +44,5 @@ export async function notifyOwnerElevationOutcome({
     resendApiKey,
   });
 
-  await reportStepStatus({
-    tenantId: tenant.id,
-    step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
-    status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-    detail: outcome,
-    notifiedOwnerElevationOutcome: outcome,
-  });
+  return outcome;
 }
