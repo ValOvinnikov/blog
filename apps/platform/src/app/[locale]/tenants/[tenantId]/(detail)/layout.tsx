@@ -1,6 +1,5 @@
 import { AdminShell } from '@platform/components/features/layout/admin-shell';
 import { TenantBreadcrumb } from '@platform/components/features/layout/tenant-breadcrumb';
-import { TenantSwitcher } from '@platform/components/features/layout/tenant-switcher';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
 import { resolveIsSidebarCollapsed } from '@platform/server/layout/resolve-is-sidebar-collapsed';
@@ -39,9 +38,6 @@ export default async function TenantDetailLayout({ children, params }: TProps) {
         ...operatorNavSections(tNavSections),
         ...tenantNavSections(tNavSections, tenant.id, tenant.name),
       ]}
-      switcher={
-        <TenantSwitcher tenants={[tenant]} activeTenantId={tenant.id} />
-      }
       crumb={<TenantBreadcrumb tenantId={tenant.id} tenantName={tenant.name} />}
       roleChip={{
         name: session?.user?.name ?? session?.user?.email ?? admin.role,

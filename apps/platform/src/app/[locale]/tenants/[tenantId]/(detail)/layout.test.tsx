@@ -105,4 +105,24 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
     expect(screen.getByText('Platform', { selector: 'p' })).toBeVisible();
     expect(screen.getByText('Tenant · Acme Inc.')).toBeVisible();
   });
+
+  it('renders no tenant switcher in the sidebar', async () => {
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    getAdminByUserIdMock.mockResolvedValue({
+      id: 'admin-1',
+      userId: 'user-1',
+      role: 'ADMIN',
+      createdAt: new Date(),
+    });
+    getTenantByIdMock.mockResolvedValue({
+      id: 'tenant-1',
+      slug: 'acme',
+      name: 'Acme Inc.',
+      primaryDomain: 'acme.example.com',
+    });
+
+    await setup();
+
+    expect(screen.queryByText('acme.example.com')).not.toBeInTheDocument();
+  });
 });
