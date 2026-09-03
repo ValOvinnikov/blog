@@ -14,6 +14,11 @@
   // config that imports it); nothing in source imports it directly, so
   // knip's root-level import graph can't see the usage.
   "ignoreDependencies": ["prettier-plugin-tailwindcss"],
+  // `sanity` is invoked via `pnpm exec sanity` in
+  // `validate-tenant-documents`'s CLI wrapper, resolved from
+  // `packages/studio`'s devDependency, not `packages/db`'s own — same
+  // cross-workspace resolution gap as `prettier-plugin-tailwindcss` above.
+  "ignoreBinaries": ["sanity"],
   "workspaces": {
     "packages/studio": {
       // Each migration's default export is loaded by the Sanity CLI

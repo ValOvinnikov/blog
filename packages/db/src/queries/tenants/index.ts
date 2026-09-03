@@ -14,6 +14,7 @@ export * from './get-tenant-sanity-credentials';
 export * from './get-tenant-sanity-write-credentials';
 export * from './list-tenants';
 export * from './list-tenants-by-ids';
+export * from './list-tenants-for-document-validation';
 export * from './list-tenants-pending-owner-elevation';
 export * from './list-tenants-wedged-in-provisioning';
 export * from './reactivate-tenant';

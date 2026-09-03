@@ -33,10 +33,12 @@ graph is acyclic
   imports `@blog/insight` either — that stays the two apps' job, same as any
   other log call. The one exception is scoped to
   `packages/db/scripts/provision-tenant/`,
-  `packages/db/scripts/deprovision-tenant/`, and
-  `packages/db/scripts/recheck-tenant-owners/`, standalone CLI tools outside the
-  request-handling path: they import `@blog/insight`'s `sanitizeLogMessage`
-  directly rather than keeping their own drifted copy. Full rationale: `SPEC.md` §4.
+  `packages/db/scripts/deprovision-tenant/`,
+  `packages/db/scripts/recheck-tenant-owners/`, and
+  `packages/db/scripts/validate-tenant-documents/`, standalone CLI tools
+  outside the request-handling path: they import `@blog/insight`'s
+  `sanitizeLogMessage` directly rather than keeping their own drifted copy.
+  Full rationale: `SPEC.md` §4.
 - `apps/web` is the only place `ui` and `service` (and `db`) meet (Server
   Components fetch, pass typed props to `ui`).
 - `@blog/auth` holds the Auth.js configuration both apps pass to their own
@@ -86,7 +88,8 @@ graph is acyclic
   `service`, `db` and `auth` never log at all — failures reach the caller and
   the app layer logs them once, with request context. The one exception is
   `@blog/db`'s standalone `provision-tenant`/`deprovision-tenant`/
-  `recheck-tenant-owners` CLI scripts, which import `sanitizeLogMessage` (not
+  `recheck-tenant-owners`/`validate-tenant-documents` CLI scripts, which
+  import `sanitizeLogMessage` (not
   the logger) directly — see the `@blog/db` bullet above and `SPEC.md` §4. See
   `.claude/agents/insight.md`.
 - Content shapes come from the generated Sanity types in `@blog/config`

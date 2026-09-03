@@ -125,3 +125,21 @@ jobs:
         env:
           TENANT_ID: ${{ inputs.tenantId }}
         run: pnpm --filter @blog/db db:provision-tenant -- --tenant-id="$TENANT_ID"
+
+  # Catches a tenant seeded already-invalid by `starter-content.ts`
+  # immediately, rather than waiting for validate-tenant-documents.yml's next
+  # scheduled sweep — see that workflow for what this checks and how drift is
+  # reported. Only runs once provisioning itself succeeded (the default
+  # `needs` gate): a tenant whose Sanity project was never created has
+  # nothing to validate yet.
+  validate-documents:
+    name: Validate freshly provisioned tenant documents
+    needs: provision
+    uses: ./.github/workflows/validate-tenant-documents.yml
+    with:
+      tenantId: ${{ inputs.tenantId }}
+      environment: ${{ inputs.environment }}
+    secrets:
+      TENANT_REGISTRY_DATABASE_URL: ${{ secrets.TENANT_REGISTRY_DATABASE_URL }}
+      TENANT_TOKEN_ENCRYPTION_KEY: ${{ secrets.TENANT_TOKEN_ENCRYPTION_KEY }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}

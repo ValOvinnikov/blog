@@ -1,0 +1,127 @@
+name: Validate Tenant Documents
+
+# Fans `sanity documents validate` (read-only) out across every ACTIVE,
+# non-deprovisioned tenant's own Sanity project/dataset — the console
+# project is validated separately by ci.yml's `document-validation` job.
+# Drift is persisted as `findings` rows (see
+# `packages/db/scripts/validate-tenant-documents/`) via
+# `db.queries.findings.openFinding`/`resolveFinding`, surfaced on the
+# tenant detail page and the platform-wide findings list in `apps/platform`
+# — never as a failed check here. Always advisory: a tenant seeded already
+# invalid by `starter-content.ts` is reported, not blocked, and this
+# workflow's own exit code only reflects a systemic failure (the CLI or the
+# findings store itself failing), never an expected invalid-document
+# outcome.
+#
+# Three triggers:
+#   - Weekly cron, sweeping every in-scope tenant.
+#   - `workflow_dispatch`, optionally scoped to one tenant via `tenantId`
+#     (blank sweeps every in-scope tenant, same as the cron).
+#   - `workflow_call`, invoked by `provision-tenant.yml` right after a
+#     tenant finishes provisioning — catches a tenant seeded already-invalid
+#     by `starter-content.ts` immediately, rather than waiting for the next
+#     scheduled sweep.
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      tenantId:
+        description: "Limit this run to one tenant's id — leave blank to validate every in-scope tenant"
+        required: false
+        type: string
+      environment:
+        description: 'Which GitHub Environment this run resolves its credentials from — leave default for the normal scheduled-sweep target'
+        required: false
+        type: choice
+        options: [development, production]
+        default: production
+  workflow_call:
+    inputs:
+      tenantId:
+        description: "The freshly provisioned tenant's id"
+        required: true
+        type: string
+      environment:
+        description: 'Which GitHub Environment this run resolves its credentials from'
+        required: true
+        type: string
+    secrets:
+      TENANT_REGISTRY_DATABASE_URL:
+        required: true
+      TENANT_TOKEN_ENCRYPTION_KEY:
+        required: true
+      RESEND_API_KEY:
+        required: false
+
+permissions:
+  contents: read
+
+# A full sweep and a single-tenant check queue independently of each other
+# (different group per tenantId), but two runs for the SAME scope queue
+# rather than overlap — a Sanity read is cheap to repeat, but there is no
+# reason to run it twice at once.
+concurrency:
+  group: validate-tenant-documents-${{ inputs.tenantId || 'all' }}
+  cancel-in-progress: false
+
+env:
+  PNPM_VERSION: 11.21.0
+  NODE_VERSION: '22'
+
+jobs:
+  validate:
+    name: Validate tenant documents
+    runs-on: ubuntu-latest
+    # A full sweep downloads and validates every document in every in-scope
+    # tenant's dataset — generous relative to recheck-tenant-owners.yml's 10
+    # minutes, since this does real per-document work, not just an ACL read.
+    timeout-minutes: 30
+    # Bound to the dispatch input rather than hardcoded: a run dispatched for
+    # `development` must resolve every credential (including the tenant
+    # registry connection string below) from the `development` GitHub
+    # Environment, and a `production` dispatch from `production` — never a
+    # mix of the two, same as provision-tenant.yml/recheck-tenant-owners.yml.
+    #
+    # The `|| 'production'` fallback is load-bearing for the cron trigger,
+    # whose `inputs` context is null — see recheck-tenant-owners.yml's own
+    # comment on this exact line for why it can't be spelled like
+    # provision-tenant.yml/deprovision-tenant.yml's unconditional
+    # `${{ inputs.environment }}`.
+    environment: ${{ inputs.environment || 'production' }}
+    env:
+      # `getDb()` (via `packages/db/src/utils/env/env.ts`) reads `DATABASE_URL`
+      # specifically — the tenant registry connection string, resolved from
+      # the same Environment as everything else this run touches.
+      DATABASE_URL: ${{ secrets.TENANT_REGISTRY_DATABASE_URL }}
+      # Decrypts each tenant's persisted Sanity read token — see
+      # `getTenantSanityCredentials`. No Sanity management/write token is
+      # needed: this workflow only ever reads.
+      TENANT_TOKEN_ENCRYPTION_KEY: ${{ secrets.TENANT_TOKEN_ENCRYPTION_KEY }}
+      # Optional — same shared secret name apps/web/apps/platform and
+      # recheck-tenant-owners.yml already use for their own Resend sends.
+      # Unset means the sweep still runs; only the operator-notification
+      # email on a tenant's first newly-failing transition is skipped.
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Run document-validation sweep
+        # `inputs.tenantId` is attacker-influenceable on the workflow_dispatch
+        # path (any repo collaborator who can trigger it controls it) — never
+        # interpolate a `${{ }}` expression directly into a `run:` shell
+        # script (template injection); pass it through `env` and reference
+        # the shell variable instead.
+        env:
+          TENANT_ID: ${{ inputs.tenantId }}
+        run: |
+          if [ -n "$TENANT_ID" ]; then
+            pnpm --filter @blog/db db:validate-tenant-documents -- --tenant-id="$TENANT_ID"
+          else
+            pnpm --filter @blog/db db:validate-tenant-documents
+          fi
