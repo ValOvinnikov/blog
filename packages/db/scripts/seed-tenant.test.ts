@@ -34,7 +34,6 @@ const args = {
 function tenant(overrides: Partial<TTenant> = {}): TTenant {
   return {
     id: 'tenant-1',
-    slug: 'acme',
     name: 'Acme',
     primaryDomain: 'acme.example.com',
     sanityProjectId: 'proj-acme',

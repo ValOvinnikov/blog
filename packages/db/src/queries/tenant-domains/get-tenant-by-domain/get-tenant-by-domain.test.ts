@@ -27,7 +27,6 @@ afterEach(async () => {
 describe(getTenantByDomain, () => {
   it('resolves the owning tenant via a tenant_domains row', async () => {
     const { id: tenantId } = await insertTestTenant(db, {
-      slug: 'acme',
       primaryDomain: 'acme.example.com',
     });
     await db
@@ -47,11 +46,9 @@ describe(getTenantByDomain, () => {
 
   it('does not cross-match a domain belonging to a different tenant', async () => {
     const { id: tenantId } = await insertTestTenant(db, {
-      slug: 'acme',
       primaryDomain: 'acme.example.com',
     });
     const { id: otherTenantId } = await insertTestTenant(db, {
-      slug: 'other',
       primaryDomain: 'other.example.com',
     });
     await db.insert(schema.tenantDomains).values([

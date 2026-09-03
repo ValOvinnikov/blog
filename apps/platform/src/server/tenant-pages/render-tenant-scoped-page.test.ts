@@ -7,7 +7,7 @@ import {
 
 describe('renderTenantScopedPage', () => {
   it('resolves the tenant and hands it to the page content renderer', async () => {
-    const tenant = { id: 'tenant-1', slug: 'acme' } as TTenant;
+    const tenant = { id: 'tenant-1' } as TTenant;
     const resolveTenant = vi.fn().mockResolvedValue({ tenant });
     const PageContent = vi.fn().mockResolvedValue('rendered content');
 

@@ -29,7 +29,6 @@ afterEach(async () => {
 describe(addTenantDomain, () => {
   it('inserts a new domain row for the given tenant', async () => {
     const { id: tenantId } = await insertTestTenant(db, {
-      slug: 'acme',
       primaryDomain: 'acme.example.com',
     });
 
@@ -46,7 +45,6 @@ describe(addTenantDomain, () => {
 
   it('is idempotent when the same (tenantId, domain) pair is added again', async () => {
     const { id: tenantId } = await insertTestTenant(db, {
-      slug: 'acme',
       primaryDomain: 'acme.example.com',
     });
     const first = await addTenantDomain(tenantId, 'acme.example.com');
@@ -60,11 +58,9 @@ describe(addTenantDomain, () => {
 
   it('returns DB_DUPLICATE_DOMAIN for a domain already assigned to a different tenant', async () => {
     const { id: tenantId } = await insertTestTenant(db, {
-      slug: 'acme',
       primaryDomain: 'acme.example.com',
     });
     const { id: otherTenantId } = await insertTestTenant(db, {
-      slug: 'other',
       primaryDomain: 'other.example.com',
     });
     await addTenantDomain(tenantId, 'shared.example.com');
@@ -84,7 +80,6 @@ describe(addTenantDomain, () => {
   // window instead.
   it('returns DB_NOT_FOUND when the conflicting row vanishes before the follow-up read', async () => {
     const { id: tenantId } = await insertTestTenant(db, {
-      slug: 'acme',
       primaryDomain: 'acme.example.com',
     });
     await addTenantDomain(tenantId, 'shared.example.com');
@@ -107,7 +102,6 @@ describe(addTenantDomain, () => {
     'rejects %s for domain without writing a row',
     async (_description, domain) => {
       const { id: tenantId } = await insertTestTenant(db, {
-        slug: 'acme',
         primaryDomain: 'acme.example.com',
       });
 
@@ -127,7 +121,6 @@ describe(addTenantDomain, () => {
 describe('foreign-key cascade', () => {
   it('removes a tenant_domains row when its owning tenant is deleted', async () => {
     const { id: tenantId } = await insertTestTenant(db, {
-      slug: 'acme',
       primaryDomain: 'acme.example.com',
     });
     await addTenantDomain(tenantId, 'acme.example.com');

@@ -40,7 +40,7 @@ async function insertUser(
 describe(getSubscriptionStatus, () => {
   it('returns active for a user whose account email has an active subscriber row', async () => {
     const user = await insertUser();
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await db
       .insert(schema.subscribers)
       .values({ tenantId, email: 'reader@example.com', status: 'active' });
@@ -54,7 +54,7 @@ describe(getSubscriptionStatus, () => {
 
   it('returns pending for a user whose account email has a pending subscriber row', async () => {
     const user = await insertUser();
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await db
       .insert(schema.subscribers)
       .values({ tenantId, email: 'reader@example.com' });
@@ -68,7 +68,7 @@ describe(getSubscriptionStatus, () => {
 
   it('returns not-subscribed when no subscriber row matches the account email', async () => {
     const user = await insertUser();
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     const result = await getSubscriptionStatus(tenantId, user.id);
 
@@ -77,7 +77,7 @@ describe(getSubscriptionStatus, () => {
 
   it('returns not-subscribed when the user has no email on file', async () => {
     const user = await insertUser({ email: null });
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     const result = await getSubscriptionStatus(tenantId, user.id);
 
@@ -85,7 +85,7 @@ describe(getSubscriptionStatus, () => {
   });
 
   it('returns not-subscribed for an unrecognized userId', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     const result = await getSubscriptionStatus(tenantId, 'does-not-exist');
 
@@ -94,7 +94,7 @@ describe(getSubscriptionStatus, () => {
 
   it('matches case-insensitively/trimmed against the stored subscriber email', async () => {
     const user = await insertUser({ email: '  Reader@Example.com  ' });
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await db
       .insert(schema.subscribers)
       .values({ tenantId, email: 'reader@example.com' });
@@ -106,8 +106,8 @@ describe(getSubscriptionStatus, () => {
 
   it('returns not-subscribed when the subscriber row belongs to a different tenant', async () => {
     const user = await insertUser();
-    const { id: tenantOneId } = await insertTestTenant(db, { slug: 'acme' });
-    const { id: tenantTwoId } = await insertTestTenant(db, { slug: 'other' });
+    const { id: tenantOneId } = await insertTestTenant(db);
+    const { id: tenantTwoId } = await insertTestTenant(db);
     await db
       .insert(schema.subscribers)
       .values({ tenantId: tenantOneId, email: 'reader@example.com' });

@@ -59,8 +59,8 @@ describe(`<${DashboardLayout.name}/>`, () => {
       { id: 'm-2', userId: 'user-1', tenantId: 'tenant-2', role: 'OWNER' },
     ]);
     listTenantsByIdsMock.mockResolvedValue([
-      { id: 'tenant-1', slug: 'acme' },
-      { id: 'tenant-2', slug: 'globex' },
+      { id: 'tenant-1' },
+      { id: 'tenant-2' },
     ]);
 
     await setup();

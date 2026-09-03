@@ -34,8 +34,8 @@ afterEach(async () => {
 
 describe(listOpenFindings, () => {
   it('returns open findings across every tenant, excluding resolved ones', async () => {
-    const { id: tenantOneId } = await insertTestTenant(db, { slug: 'acme' });
-    const { id: tenantTwoId } = await insertTestTenant(db, { slug: 'globex' });
+    const { id: tenantOneId } = await insertTestTenant(db);
+    const { id: tenantTwoId } = await insertTestTenant(db);
     const resolved = await openFinding({
       tenantId: tenantOneId,
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,

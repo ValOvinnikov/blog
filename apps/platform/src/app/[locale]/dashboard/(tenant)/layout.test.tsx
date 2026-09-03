@@ -44,13 +44,11 @@ vi.mock('next/headers', () => ({ cookies: cookiesMock }));
 
 const tenant1 = {
   id: 'tenant-1',
-  slug: 'acme',
   name: 'Acme Inc.',
   primaryDomain: 'acme.com',
 };
 const tenant2 = {
   id: 'tenant-2',
-  slug: 'globex',
   name: 'Globex Corp.',
   primaryDomain: 'globex.com',
 };

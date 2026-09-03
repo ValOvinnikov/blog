@@ -35,8 +35,8 @@ afterEach(async () => {
 
 describe(listFindingsForTenant, () => {
   it('returns only the given tenant’s findings, most recently seen first', async () => {
-    const { id: tenantOneId } = await insertTestTenant(db, { slug: 'acme' });
-    const { id: tenantTwoId } = await insertTestTenant(db, { slug: 'globex' });
+    const { id: tenantOneId } = await insertTestTenant(db);
+    const { id: tenantTwoId } = await insertTestTenant(db);
     const olderInput = {
       tenantId: tenantOneId,
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,
@@ -62,7 +62,7 @@ describe(listFindingsForTenant, () => {
   });
 
   it('filters by status when given', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     const opened = await openFinding({
       tenantId,
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,
@@ -93,7 +93,7 @@ describe(listFindingsForTenant, () => {
   });
 
   it('returns an empty array for a tenant with no findings', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     const result = await listFindingsForTenant(tenantId);
 

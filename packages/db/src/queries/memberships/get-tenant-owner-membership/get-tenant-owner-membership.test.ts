@@ -30,7 +30,7 @@ afterEach(async () => {
 describe(getTenantOwnerMembership, () => {
   it('returns the OWNER membership email and joinedAt for the tenant', async () => {
     await insertTestUser(db, { id: 'user-1', email: 'owner@example.com' });
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     const [membership] = await db
       .insert(schema.memberships)
       .values({
@@ -50,7 +50,7 @@ describe(getTenantOwnerMembership, () => {
 
   it('ignores a non-OWNER membership on the same tenant', async () => {
     await insertTestUser(db, { id: 'user-1', email: 'editor@example.com' });
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await db.insert(schema.memberships).values({
       userId: 'user-1',
       tenantId,
@@ -63,7 +63,7 @@ describe(getTenantOwnerMembership, () => {
   });
 
   it('returns undefined when only a pending OWNER invite exists (no real membership row)', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await db.insert(schema.membershipInvites).values({
       tenantId,
       email: 'owner@example.com',
@@ -76,7 +76,7 @@ describe(getTenantOwnerMembership, () => {
   });
 
   it('returns undefined when the tenant has no OWNER membership or invite', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     const result = await getTenantOwnerMembership(tenantId);
 
@@ -85,7 +85,7 @@ describe(getTenantOwnerMembership, () => {
 
   it('returns undefined when the owner user has no email on file', async () => {
     await insertTestUser(db, { id: 'user-1', email: null });
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await db.insert(schema.memberships).values({
       userId: 'user-1',
       tenantId,

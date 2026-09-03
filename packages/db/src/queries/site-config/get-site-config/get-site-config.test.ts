@@ -27,7 +27,7 @@ afterEach(async () => {
 
 describe(getSiteConfig, () => {
   it('returns undefined when the tenant has no config row', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     const result = await getSiteConfig(tenantId);
 
@@ -35,7 +35,7 @@ describe(getSiteConfig, () => {
   });
 
   it('maps null theme columns to undefined', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await db.insert(schema.siteConfig).values({
       tenantId,
       preset: PRESET_ID.CONSOLE,

@@ -39,7 +39,6 @@ export function buildStarterDocuments(
     _id: STARTER_DOCUMENT_IDS.AUTHOR,
     _type: 'blog_author',
     name: `${tenant.name} Team`,
-    slug: { _type: 'slug', current: 'editorial-team' },
     image: {
       _type: 'imageWithAlt',
       asset: { _type: 'reference', _ref: assets.authorImageAssetId },

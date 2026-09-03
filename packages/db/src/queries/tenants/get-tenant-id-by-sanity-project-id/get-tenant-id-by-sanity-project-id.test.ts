@@ -12,12 +12,10 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 let db: PgliteDatabase<typeof schema>;
 
 async function insertTenant(
-  slug: string,
   sanityProjectId: string | null,
   createdAt?: Date,
 ): Promise<string> {
   const tenant = await insertTestTenant(db, {
-    slug,
     sanityProjectId,
     sanityDataset: sanityProjectId ? 'production' : null,
     ...(createdAt ? { createdAt } : {}),
@@ -39,7 +37,7 @@ afterEach(async () => {
 
 describe(getTenantIdBySanityProjectId, () => {
   it('returns the tenant id for a matching sanityProjectId', async () => {
-    const tenantId = await insertTenant('acme', 'abc123');
+    const tenantId = await insertTenant('abc123');
 
     const result = await getTenantIdBySanityProjectId('abc123');
 
@@ -47,7 +45,7 @@ describe(getTenantIdBySanityProjectId, () => {
   });
 
   it('returns undefined when no tenant matches', async () => {
-    await insertTenant('acme', 'abc123');
+    await insertTenant('abc123');
 
     const result = await getTenantIdBySanityProjectId('missing');
 
@@ -55,7 +53,7 @@ describe(getTenantIdBySanityProjectId, () => {
   });
 
   it('returns undefined when sanityProjectId is null on every row', async () => {
-    await insertTenant('acme', null);
+    await insertTenant(null);
 
     const result = await getTenantIdBySanityProjectId('abc123');
 
@@ -63,12 +61,8 @@ describe(getTenantIdBySanityProjectId, () => {
   });
 
   it('deterministically resolves to the earliest-created match when more than one tenant shares a sanityProjectId', async () => {
-    const olderTenantId = await insertTenant(
-      'acme',
-      'abc123',
-      new Date('2026-01-01'),
-    );
-    await insertTenant('acme-duplicate', 'abc123', new Date('2026-02-01'));
+    const olderTenantId = await insertTenant('abc123', new Date('2026-01-01'));
+    await insertTenant('abc123', new Date('2026-02-01'));
 
     const result = await getTenantIdBySanityProjectId('abc123');
 

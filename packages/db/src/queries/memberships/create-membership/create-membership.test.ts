@@ -35,7 +35,7 @@ afterEach(async () => {
 describe(createMembership, () => {
   it('inserts a new membership row', async () => {
     await insertTestUser(db, { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     const membership = await createMembership(
       'user-1',
@@ -52,7 +52,7 @@ describe(createMembership, () => {
 
   it('is idempotent when the (userId, tenantId) pair already has a membership', async () => {
     await insertTestUser(db, { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     const first = await createMembership(
       'user-1',
       tenantId,
@@ -73,8 +73,8 @@ describe(createMembership, () => {
 
   it('allows the same user to hold memberships on different tenants', async () => {
     await insertTestUser(db, { id: 'user-1' });
-    const { id: tenantOneId } = await insertTestTenant(db, { slug: 'acme' });
-    const { id: tenantTwoId } = await insertTestTenant(db, { slug: 'other' });
+    const { id: tenantOneId } = await insertTestTenant(db);
+    const { id: tenantTwoId } = await insertTestTenant(db);
 
     await createMembership('user-1', tenantOneId, MEMBERSHIP_ROLE.OWNER);
     await createMembership('user-1', tenantTwoId, MEMBERSHIP_ROLE.READER);
@@ -84,7 +84,7 @@ describe(createMembership, () => {
   });
 
   it('rejects a membership for a user that does not exist', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     await expect(
       createMembership('missing-user', tenantId, MEMBERSHIP_ROLE.OWNER),
@@ -95,7 +95,7 @@ describe(createMembership, () => {
 describe('foreign-key cascade', () => {
   it('removes a membership when its owning user is deleted', async () => {
     await insertTestUser(db, { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await createMembership('user-1', tenantId, MEMBERSHIP_ROLE.OWNER);
 
     await db.delete(schema.users).where(eq(schema.users.id, 'user-1'));
@@ -106,7 +106,7 @@ describe('foreign-key cascade', () => {
 
   it('removes a membership when its owning tenant is deleted', async () => {
     await insertTestUser(db, { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await createMembership('user-1', tenantId, MEMBERSHIP_ROLE.OWNER);
 
     await db.delete(schema.tenants).where(eq(schema.tenants.id, tenantId));

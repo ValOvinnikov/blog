@@ -27,17 +27,18 @@ vi.mock('resend', () => ({
 function tenant(overrides: Partial<TTenant> = {}): TTenant {
   return {
     id: 't1',
-    slug: 'acme',
     name: 'Acme',
     primaryDomain: 'acme.example.com',
     sanityProjectId: 'proj-acme',
     sanityDataset: 'production',
     sanityReadTokenEncrypted: null,
+    sanityWriteTokenEncrypted: null,
     locale: 'en',
     plan: 'FREE',
     status: TENANT_STATUS.ACTIVE,
     provisioningStatus: 'READY',
     provisioningSteps: null,
+    lastNotifiedOwnerElevationOutcome: null,
     studioVercelProjectId: null,
     seededAt: null,
     webhookCreatedAt: null,
@@ -45,7 +46,7 @@ function tenant(overrides: Partial<TTenant> = {}): TTenant {
     createdAt: new Date('2026-01-01T00:00:00.000Z'),
     updatedAt: new Date('2026-01-01T00:00:00.000Z'),
     ...overrides,
-  } as TTenant;
+  };
 }
 
 beforeEach(() => {

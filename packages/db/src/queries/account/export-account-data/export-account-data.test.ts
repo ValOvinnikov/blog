@@ -25,7 +25,7 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   getDbMock.mockReturnValue(db);
-  const tenant = await insertTestTenant(db, { slug: 'acme' });
+  const tenant = await insertTestTenant(db);
   tenantId = tenant.id;
 });
 
@@ -117,9 +117,7 @@ describe(exportAccountData, () => {
 
   it("does not include the user's bookmarks from another tenant", async () => {
     await db.insert(schema.users).values({ id: 'user-1' });
-    const { id: otherTenantId } = await insertTestTenant(db, {
-      slug: 'other',
-    });
+    const { id: otherTenantId } = await insertTestTenant(db);
     await db.insert(schema.bookmarks).values([
       { tenantId, userId: 'user-1', postId: 'post-1' },
       { tenantId: otherTenantId, userId: 'user-1', postId: 'post-2' },

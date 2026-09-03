@@ -28,7 +28,7 @@ afterEach(async () => {
 
 describe(createMembershipInvite, () => {
   it('inserts a new pending invite, normalizing the email', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     const result = await createMembershipInvite(
       tenantId,
@@ -46,7 +46,7 @@ describe(createMembershipInvite, () => {
   });
 
   it('is idempotent for a duplicate pending invite to the same tenant + email', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     const first = await createMembershipInvite(
       tenantId,
       'owner@example.com',
@@ -68,7 +68,7 @@ describe(createMembershipInvite, () => {
   });
 
   it('is idempotent (case-insensitively) for a duplicate invite with different casing', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await createMembershipInvite(
       tenantId,
       'owner@example.com',
@@ -87,7 +87,7 @@ describe(createMembershipInvite, () => {
   });
 
   it('is idempotent (trimming whitespace) for a duplicate invite padded with leading/trailing spaces', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await createMembershipInvite(
       tenantId,
       'owner@example.com',
@@ -106,7 +106,7 @@ describe(createMembershipInvite, () => {
   });
 
   it('reports already-consumed for a duplicate invite whose original was already consumed', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     const first = await createMembershipInvite(
       tenantId,
       'owner@example.com',
@@ -127,8 +127,8 @@ describe(createMembershipInvite, () => {
   });
 
   it('allows the same email to hold a distinct pending invite on a different tenant', async () => {
-    const { id: tenantOneId } = await insertTestTenant(db, { slug: 'acme' });
-    const { id: tenantTwoId } = await insertTestTenant(db, { slug: 'other' });
+    const { id: tenantOneId } = await insertTestTenant(db);
+    const { id: tenantTwoId } = await insertTestTenant(db);
 
     await createMembershipInvite(
       tenantOneId,

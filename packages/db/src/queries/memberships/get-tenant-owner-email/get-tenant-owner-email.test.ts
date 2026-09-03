@@ -30,7 +30,7 @@ afterEach(async () => {
 describe(getTenantOwnerEmail, () => {
   it('returns the OWNER membership user email for the tenant', async () => {
     await insertTestUser(db, { id: 'user-1', email: 'owner@example.com' });
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await db.insert(schema.memberships).values({
       userId: 'user-1',
       tenantId,
@@ -44,7 +44,7 @@ describe(getTenantOwnerEmail, () => {
 
   it('ignores a non-OWNER membership on the same tenant', async () => {
     await insertTestUser(db, { id: 'user-1', email: 'editor@example.com' });
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await db.insert(schema.memberships).values({
       userId: 'user-1',
       tenantId,
@@ -57,7 +57,7 @@ describe(getTenantOwnerEmail, () => {
   });
 
   it('returns undefined when the tenant has no OWNER membership or invite', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
 
     const result = await getTenantOwnerEmail(tenantId);
 
@@ -65,7 +65,7 @@ describe(getTenantOwnerEmail, () => {
   });
 
   it('falls back to a still-pending OWNER membershipInvite when no memberships row exists yet', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await db.insert(schema.membershipInvites).values({
       tenantId,
       email: 'owner@example.com',
@@ -82,7 +82,7 @@ describe(getTenantOwnerEmail, () => {
       id: 'user-1',
       email: 'signed-in-owner@example.com',
     });
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await db.insert(schema.memberships).values({
       userId: 'user-1',
       tenantId,
@@ -100,7 +100,7 @@ describe(getTenantOwnerEmail, () => {
   });
 
   it('ignores an already-consumed OWNER invite', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await db.insert(schema.membershipInvites).values({
       tenantId,
       email: 'owner@example.com',
@@ -114,7 +114,7 @@ describe(getTenantOwnerEmail, () => {
   });
 
   it('ignores a non-OWNER invite on the same tenant', async () => {
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await db.insert(schema.membershipInvites).values({
       tenantId,
       email: 'editor@example.com',
@@ -128,7 +128,7 @@ describe(getTenantOwnerEmail, () => {
 
   it('returns undefined when the owner user has no email on file', async () => {
     await insertTestUser(db, { id: 'user-1', email: null });
-    const { id: tenantId } = await insertTestTenant(db, { slug: 'acme' });
+    const { id: tenantId } = await insertTestTenant(db);
     await db.insert(schema.memberships).values({
       userId: 'user-1',
       tenantId,

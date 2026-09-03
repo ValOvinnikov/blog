@@ -45,7 +45,7 @@ describe(`<${VoicePage.name}/>`, () => {
 
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
-    getTenantByIdMock.mockResolvedValue({ id: 'tenant-1', slug: 'acme' });
+    getTenantByIdMock.mockResolvedValue({ id: 'tenant-1' });
   });
 
   it('404s when the signed-in user has no admins row', async () => {
