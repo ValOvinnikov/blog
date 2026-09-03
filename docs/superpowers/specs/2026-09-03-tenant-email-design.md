@@ -136,10 +136,64 @@ Whether these become columns on `site_config` or a separate `email_config`
 table is an implementation call for the `db` layer, made when the migration is
 written. Either needs a generated Drizzle migration and the human-gated apply.
 
+### §3.1 — Logos resolve per template, not per tenant
+
+Each template additionally carries **its own optional logo**, uploaded against
+that template. The resolution ladder mirrors the voice ladder already used for
+copy:
+
+```
+product default  ←  tenant email logo (above)  ←  per-template logo
+```
+
+A template with no logo of its own falls back rather than rendering nothing, so
+introducing a template type later cannot produce a logoless email.
+
+**The upload transport is reused; the validation is not.** `apps/platform`
+already has a complete brand-asset pipeline —
+`src/server/site-config/upload-brand-asset-action.ts:29-120` takes `FormData`
+with a `File`, validates it, `put()`s it to Vercel Blob at
+`tenants/{tenant.id}/{kind}.{extension}` with `access: 'public'`, and persists
+the returned URL; `src/components/features/look/brand-asset-field/brand-asset-field.tsx:153-161`
+is the file input, uploading immediately on selection rather than staging behind
+a save. That transport is exactly right here, and `access: 'public'` already
+satisfies email's hardest constraint (below).
+
+What cannot be reused is
+`src/server/site-config/validate-brand-asset.ts:98-163` and its limits in
+`src/utils/brand-asset-limits/brand-asset-limits.ts:6-37`. Those are correct for
+a website logo and wrong for email on every axis:
+
+| Check      | Site logo today          | Email logo needs | Why                                                                                          |
+| ---------- | ------------------------ | ---------------- | -------------------------------------------------------------------------------------------- |
+| Formats    | PNG, JPEG, WebP, **SVG** | PNG, JPEG, GIF   | **SVG does not render in email** — Gmail, Outlook and Yahoo strip it. WebP support is patchy |
+| Max bytes  | 4 MB                     | tens of KB       | Recipients pay for the bytes on mobile; Gmail clips long messages                            |
+| Dimensions | 32–4000 px               | ~400 px ceiling  | Email logos display at 120–200 px; 2× covers retina, beyond that is waste                    |
+
+The SVG exclusion is the one that will look wrong to whoever implements it. SVG
+is the obvious logo format on the web, the existing validator already accepts and
+sanitises it (`src/utils/sanitize-svg-markup/`), and rejecting it feels like a
+regression. It is not: an SVG logo renders as nothing in the major clients, and a
+tenant testing in a client that happens to support it would ship broken mail to
+everyone else. Reject at upload with a message that says why.
+
+**The hard constraint on wherever these land:** the URL must be public, stable
+and unauthenticated. Email clients fetch images from the recipient's machine
+with no session, and Gmail proxies every image through its own cache. Any
+session-guarded asset route yields broken images for every recipient. Vercel
+Blob's `access: 'public'` already meets this; nothing here may be moved behind
+the platform's auth.
+
+Two mechanical consequences for the implementing layers: the blob path must not
+collide with the site logo's `tenants/{id}/{kind}.{ext}`, and the per-template
+logo URL is persisted on the template row (§4), not on the tenant settings the
+existing action writes — so this is a sibling Server Action, not a new `kind`
+passed to the existing one.
+
 ## §4 — Copy: Portable Text bodies in `jsonb`, with a locked action
 
-Per tenant, per template type: a `subject` string and a `body` in Portable
-Text, stored as `jsonb`.
+Per tenant, per template type: a `subject` string, a `body` in Portable Text
+stored as `jsonb`, and the optional logo URL from §3.1.
 
 **Portable Text is the content model; Sanity is not the store.** The tenant
 edits in the platform admin panel, not in Studio — `@portabletext/editor` runs
@@ -274,9 +328,11 @@ In dependency order:
    form per type, and `db` keys rows by them. Three layers is the same shape as
    `AUDIT_ACTION`, which stays in `config` for exactly this reason.
 
-2. `db` — settings + copy schema, migration, seeding, dropping `resend`
+2. `db` — settings + copy schema (including the per-template logo URL),
+   migration, seeding, dropping `resend`
 3. `email` — split shells, brand resolver, PT serializer, templates
-4. `platform-app` — settings form, PT editor, operator-alert endpoint
+4. `platform-app` — settings form, PT editor, per-template logo upload
+   (§3.1) and its email-specific validator, operator-alert endpoint
 5. `auth`, `web` — resolution at the two remaining send sites
 
 `auth` and `web` are siblings at the end and may run in parallel. `email`
@@ -299,6 +355,12 @@ together — relocating an export reds `type-check` until the consumer follows.
   authored body is empty, and there is no authored input that removes it.
 - Merge-with-defaults — a tenant row missing a template type renders defaults,
   not blanks.
+- Logo validation — SVG and WebP are rejected with a reason, oversized
+  dimensions and byte counts are rejected, and PNG/JPEG/GIF within bounds pass.
+  The SVG case gets an explicit test: the site-logo validator accepts SVG, so a
+  future refactor that "unifies" the two validators must fail loudly here.
+- Logo fallback — a template with no logo renders the tenant email logo, and a
+  tenant with neither renders the product default.
 - Operator endpoint — rejects a missing, wrong, and wrong-length token;
   comparison is constant-time.
 - Type-level separation — a compile-time assertion that a tenant brand cannot
