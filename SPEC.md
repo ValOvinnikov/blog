@@ -798,6 +798,17 @@ expire, cannot be queried by business key, and carry no integrity guarantee.
 Answering audit questions with log retention turns the pipeline into an
 expensive, lossy database, and couples noise-reduction work to compliance.
 
+**`AUDIT_ACTION` names events, and never reuses a status value.** A tenant
+lifecycle run that spans the platform app and a CLI workflow records one event
+per system, reading request-then-outcome: `CREATED` (platform) precedes
+`PROVISIONED`/`PROVISIONING_FAILED` (`provision-tenant`), and
+`DEPROVISION_REQUESTED` (platform, written when the workflow is dispatched —
+it attests to the request, not the outcome) precedes `DEPROVISIONED`
+(`deprovision-tenant`, written once the `tenants` row is actually archived).
+No action may share a word with a `TENANT_STATUS` value: the tenant's resting
+state is `ARCHIVED`, so an `ARCHIVED` action too would leave "when was this
+tenant archived?" ambiguous between the state and the event that produced it.
+
 ### Findings are not an error tracker
 
 The `findings` table (`@blog/db`) is a third category alongside logs and

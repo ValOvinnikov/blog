@@ -2,7 +2,7 @@ import { archiveTenant } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 import type { TDeprovisionEnv } from '../lib/env';
-import { recordArchiveAuditEvent } from '../lib/record-archive-audit-event';
+import { recordDeprovisionAuditEvent } from '../lib/record-deprovision-audit-event';
 
 /**
  * Step 5 — soft-deletes the `tenants` row by stamping `deprovisionedAt`,
@@ -30,5 +30,5 @@ export async function archiveTenantRow(
     );
   }
 
-  await recordArchiveAuditEvent(tenant.id, env);
+  await recordDeprovisionAuditEvent(tenant.id, env);
 }

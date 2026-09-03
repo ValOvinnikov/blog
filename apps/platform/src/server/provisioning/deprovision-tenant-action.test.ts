@@ -160,7 +160,7 @@ describe('deprovisionTenantAction', () => {
     });
   });
 
-  it('records a DEPROVISIONED audit event for a real (non-dry-run) dispatch', async () => {
+  it('records a DEPROVISION_REQUESTED audit event for a real (non-dry-run) dispatch', async () => {
     const { deprovisionTenantAction } =
       await import('./deprovision-tenant-action');
 
@@ -172,7 +172,7 @@ describe('deprovisionTenantAction', () => {
     expect(insertAuditEventMock).toHaveBeenCalledWith({
       actorId: 'operator-1',
       actorEmail: 'operator@example.com',
-      action: AUDIT_ACTION.DEPROVISIONED,
+      action: AUDIT_ACTION.DEPROVISION_REQUESTED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: 'tenant-1',
       details: { name: 'Acme Inc.' },

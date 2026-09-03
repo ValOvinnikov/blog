@@ -70,14 +70,14 @@ describe(archiveTenantRow, () => {
     expect(archiveTenantMock).toHaveBeenCalledWith('tenant-1');
   });
 
-  it('records exactly one ARCHIVED/TENANT audit event after a successful archive', async () => {
+  it('records exactly one DEPROVISIONED/TENANT audit event after a successful archive', async () => {
     await archiveTenantRow(baseTenant(), env);
 
     expect(insertAuditEventMock).toHaveBeenCalledTimes(1);
     expect(insertAuditEventMock).toHaveBeenCalledWith({
       actorId: 'github:octocat',
       actorEmail: 'octocat@users.noreply.github.com',
-      action: 'ARCHIVED',
+      action: 'DEPROVISIONED',
       targetType: 'TENANT',
       targetId: 'tenant-1',
       details: { via: 'deprovision-tenant-workflow', runId: 'run-42' },

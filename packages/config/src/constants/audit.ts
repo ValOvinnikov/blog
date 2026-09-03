@@ -12,9 +12,16 @@ export type TAuditTargetType = TValueOf<typeof AUDIT_TARGET_TYPE>;
 // — the `targetType` column already carries which entity a row is about, so
 // the action stays reusable across target types instead of being repeated
 // once per entity it could ever apply to.
+//
+// A lifecycle run spanning two systems gets one action per system, reading
+// request-then-outcome: `DEPROVISION_REQUESTED` is the platform app
+// dispatching the workflow, `DEPROVISIONED` is the CLI reporting the archive
+// happened — as `CREATED` precedes the CLI's `PROVISIONED`/
+// `PROVISIONING_FAILED`. No action may reuse a `TENANT_STATUS` value, or a
+// row's resting state and the event that produced it share a word.
 export const AUDIT_ACTION = {
   CREATED: 'CREATED',
-  ARCHIVED: 'ARCHIVED',
+  DEPROVISION_REQUESTED: 'DEPROVISION_REQUESTED',
   DEPROVISIONED: 'DEPROVISIONED',
   REACTIVATED: 'REACTIVATED',
   PROVISIONED: 'PROVISIONED',
