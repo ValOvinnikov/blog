@@ -13,7 +13,8 @@
     "./web": "./web.js",
     "./studio": "./studio.js",
     "./auth": "./auth.js",
-    "./platform": "./platform.js"
+    "./platform": "./platform.js",
+    "./email": "./email.js"
   },
   "scripts": {
     "test": "node --test"

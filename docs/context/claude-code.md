@@ -49,8 +49,19 @@ contracts:
     via `recordAuditEvent`, gated on the mutation actually having succeeded —
     auditing is a separate concern from logging, and a false record is worse
     than a missing one.
-  - Those nine layer agents (`config`, `studio`, `service`, `ui`, `web`, `db`,
-    `platform-app`, `auth`, `insight`) additionally carry the two context7 MCP tools
+  - `email` owns `packages/email` (`@blog/email`) — the single home for every
+    email the product sends: the shared branded HTML shell, the canonical
+    `escapeHtml`, and the typed `sendEmail` Resend transport. It sits low in
+    the graph (`@blog/utils` only) so both apps, `@blog/auth` and `@blog/db`'s
+    CLI scripts can all consume it without a cycle, and it is side-effecting by
+    design — it owns the send call — while never logging and never resolving
+    tenants or fetching content itself. Its own agent exists because HTML email
+    inverts normal front-end instincts (inlined styles only, table layout, no
+    JSX, escape every interpolated value) and because operator-alert copy must
+    never become tenant-editable — a trust boundary, since those alerts are how
+    a broken provisioning run gets noticed.
+  - Those ten layer agents (`config`, `studio`, `service`, `ui`, `web`, `db`,
+    `platform-app`, `auth`, `insight`, `email`) additionally carry the two context7 MCP tools
     (`resolve-library-id`, `query-docs`) in their `tools:` frontmatter, so the
     `use-context7` skill is actually executable by the agent that hits an
     unfamiliar library API mid-implementation. Without them the instruction to
@@ -282,7 +293,7 @@ file` are all denied alike) — an earlier version only handled the
   - `pre-agent-gate0-guard.sh` — `PreToolUse` hook on the **`Agent` tool**
     (wired in `settings.json`, not in agent frontmatter, since it must see
     dispatches before any agent starts). Denies dispatching a **layer agent**
-    (`config`/`studio`/`service`/`ui`/`web`/`db`/`platform-app`/`auth`/`insight`) to implement an issue that
+    (`config`/`studio`/`service`/`ui`/`web`/`db`/`platform-app`/`auth`/`insight`/`email`) to implement an issue that
     isn't `In Progress` on the board — i.e. Gate 0 was skipped. The deny
     message names the fix (dispatch `board-keeper` with
     `"starting work on #<n>"`).

@@ -1,11 +1,8 @@
 {
-  "name": "@blog/auth",
+  "name": "@blog/email",
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "engines": {
-    "node": "22.x"
-  },
   "exports": {
     ".": "./src/index.ts"
   },
@@ -17,11 +14,9 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@auth/drizzle-adapter": "^1.11.3",
-    "@blog/db": "workspace:*",
-    "@blog/email": "workspace:*",
+    "@blog/utils": "workspace:*",
     "@t3-oss/env-core": "^0.13.11",
-    "next-auth": "5.0.0-beta.32",
+    "resend": "^6.18.1",
     "server-only": "^0.0.1",
     "zod": "catalog:"
   },

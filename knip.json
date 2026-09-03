@@ -37,11 +37,26 @@
     "packages/db": {
       // Same reason as packages/service above: reachable only through a
       // string in vitest.config.ts's `resolve.alias`.
-      "entry": ["src/testing/server-only-stub.ts"]
+      "entry": ["src/testing/server-only-stub.ts"],
+      // @blog/email is scaffolded ahead of its first consumer here —
+      // packages/db/scripts/*/lib/notify-operators.ts migrates onto it
+      // separately. Same "real dependency, no import yet" shape as
+      // prettier-plugin-tailwindcss above.
+      "ignoreDependencies": ["@blog/email"]
     },
     "packages/auth": {
       // Same reason as packages/service/packages/db above: reachable only
       // through a string in vitest.config.ts's `resolve.alias`.
+      "entry": ["src/testing/server-only-stub.ts"],
+      // @blog/email is scaffolded ahead of its first consumer here —
+      // the magic-link email builders migrate onto it separately. Same
+      // "real dependency, no import yet" shape as
+      // prettier-plugin-tailwindcss above.
+      "ignoreDependencies": ["@blog/email"]
+    },
+    "packages/email": {
+      // Same reason as packages/service/packages/db/packages/auth above:
+      // reachable only through a string in vitest.config.ts's `resolve.alias`.
       "entry": ["src/testing/server-only-stub.ts"]
     },
     "apps/web": {
@@ -68,7 +83,12 @@
       // @blog/db dropped from this list (#1107): the Auth.js config
       // (`src/server/auth/auth.ts`) is now the first real
       // `import ... from '@blog/db'` in apps/web.
-      "ignoreDependencies": ["@svgr/webpack"]
+      //
+      // @blog/email is scaffolded ahead of its first consumer here — the
+      // newsletter confirmation and Resend transport migrate onto it
+      // separately. Same "real dependency, no import yet" shape as
+      // prettier-plugin-tailwindcss above.
+      "ignoreDependencies": ["@svgr/webpack", "@blog/email"]
     },
     "apps/platform": {
       // Referenced only as a Turbopack loader string (next.config.ts
@@ -76,7 +96,12 @@
       // import graph can't see a bare string naming a package. Strict pnpm
       // (no hoisting) still requires it as a real apps/platform devDependency so
       // Turbopack can resolve it.
-      "ignoreDependencies": ["@svgr/webpack"],
+      //
+      // @blog/email is scaffolded ahead of its first consumer here — the
+      // Resend transport migrates onto it separately. Same "real
+      // dependency, no import yet" shape as prettier-plugin-tailwindcss
+      // above.
+      "ignoreDependencies": ["@svgr/webpack", "@blog/email"],
       // next-intl navigation helpers (Link/usePathname), scaffolded to
       // mirror apps/web's i18n/navigation.ts but not yet consumed by any
       // component. Mark it an entry so its exports aren't reported unused;
