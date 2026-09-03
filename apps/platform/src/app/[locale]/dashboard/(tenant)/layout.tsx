@@ -20,12 +20,12 @@ type TProps = {
 /**
  * Gates page rendering for everything nested under this segment behind the
  * signed-in user's own `memberships` rows (`resolveDashboardTenant`), with
- * the same platform SUPERADMIN bypass — `/dashboard`'s slug-free
- * counterpart to `/tenants/[tenantId]/layout.tsx`, which instead gates on
- * any `admins` row via `requireTenantById` regardless of role. Deliberately
- * omits the Platform nav section shown alongside Tenant on `/tenants/{id}`:
- * this tree exists specifically so a tenant owner never sees that the
- * platform is multi-tenant.
+ * the same platform SUPERADMIN bypass — `/dashboard`'s counterpart to
+ * `/tenants/[tenantId]/layout.tsx`, which instead gates on any `admins` row
+ * via `requireTenantById` regardless of role. Deliberately omits the
+ * Platform nav section shown alongside Tenant on `/tenants/{id}`: this tree
+ * exists specifically so a tenant owner never sees that the platform is
+ * multi-tenant.
  */
 export default async function DashboardTenantLayout({ children }: TProps) {
   const { tenant, membership, tenants } = await resolveDashboardTenant();

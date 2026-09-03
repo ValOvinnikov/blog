@@ -10,9 +10,9 @@ export type TVoicePageContentProps = {
 };
 
 /**
- * The Voice tab's data-fetch + render, shared by `/tenants/[tenantId]/voice` and
- * the slug-free `/dashboard/voice` — both resolve a `TTenant` however fits
- * their own routing (URL param vs. session membership) and hand it here.
+ * The Voice tab's data-fetch + render, shared by `/tenants/[tenantId]/voice`
+ * and `/dashboard/voice` — both resolve a `TTenant` however fits their own
+ * routing (URL param vs. session membership) and hand it here.
  */
 export const VoicePageContent = async ({ tenant }: TVoicePageContentProps) => {
   const config = await queries.siteConfig.getSiteConfig(tenant.id);

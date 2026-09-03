@@ -113,7 +113,7 @@ describe(OwnerHomeView, () => {
     );
   });
 
-  it('renders "Make it yours" tiles routing to the slug-free Look/Voice/Features pages', () => {
+  it('renders "Make it yours" tiles routing to the Look/Voice/Features dashboard pages', () => {
     render(
       <OwnerHomeView
         tenant={makeTenant()}

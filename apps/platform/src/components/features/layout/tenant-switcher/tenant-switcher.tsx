@@ -18,10 +18,9 @@ export type TTenantSwitcherProps = {
   activeTenantId: string;
   /**
    * Builds each list item's link target. Defaults to the id-routed
-   * `/tenants/{id}` tenant overview page the sidebar's own switcher uses; the
-   * slug-free `/dashboard` tree passes its own tenant-select endpoint
-   * instead, reusing this same list-rendering rather than a second tenant
-   * picker.
+   * `/tenants/{id}` tenant overview page the sidebar's own switcher uses;
+   * the `/dashboard` tree passes its own tenant-select endpoint instead,
+   * reusing this same list-rendering rather than a second tenant picker.
    */
   hrefFor?: (tenant: TTenant) => string;
 };

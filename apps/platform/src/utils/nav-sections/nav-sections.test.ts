@@ -169,7 +169,7 @@ describe('dashboardNavSections', () => {
     ]);
   });
 
-  it('gives Look, Voice, Features, Domain and Studio their slug-free /dashboard hrefs', () => {
+  it('gives Look, Voice, Features, Domain and Studio their /dashboard hrefs', () => {
     const [content, configuration] = dashboardNavSections(t);
     const look = configuration!.items.find((item) => item.label === 'Look');
     const voice = configuration!.items.find((item) => item.label === 'Voice');

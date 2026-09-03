@@ -9,7 +9,7 @@ import { adminRoutes } from '@platform/utils/routes/routes';
 import { useTranslations } from 'next-intl';
 
 /**
- * `dashboard/(tenant)/layout.tsx`'s breadcrumb — the slug-free owner tree's
+ * `dashboard/(tenant)/layout.tsx`'s breadcrumb — the owner tree's
  * counterpart to `TenantBreadcrumb`. Deliberately never names the tenant:
  * this tree exists so an owner never sees that the platform is multi-tenant.
  */
