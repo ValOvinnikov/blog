@@ -25,10 +25,14 @@ export const RunCard = ({ run }: TRunCardProps) => {
       <Card.Body>
         <DetailList>
           <DetailList.Row label={t('runStartedLabel')}>
-            <time dateTime={run.startedAt}>
-              {formatRelativeTime(new Date(run.startedAt), t)} ·{' '}
-              {formatDateTime(run.startedAt)}
-            </time>
+            {run.startedAt ? (
+              <time dateTime={run.startedAt}>
+                {formatRelativeTime(new Date(run.startedAt), t)} ·{' '}
+                {formatDateTime(run.startedAt)}
+              </time>
+            ) : (
+              t('runStartedPending')
+            )}
           </DetailList.Row>
           <DetailList.Row label={t('runFinishedLabel')}>
             {run.finishedAt ? (

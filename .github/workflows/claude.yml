@@ -94,7 +94,21 @@ jobs:
           # git push / gh pr create are allowed here (cloud-only), not in the
           # shared .claude/settings.json — that file also governs interactive
           # local sessions, which should keep asking before every push/PR.
+          #
+          # --append-system-prompt COMBINES with the SDK's default system prompt (the
+          # claude_code preset) rather than replacing it — see the action's
+          # parseSdkOptions. The `prompt:` input above is a different mechanism: it
+          # replaces the dynamically-derived task content tag mode builds from the
+          # triggering comment with a static template (the risk the comment above
+          # already names), not something that touches this job's own `if:` gate,
+          # which is independent and unaffected either way. Without this
+          # append-system-prompt line, a run's default is to push a branch and leave
+          # a "Create PR" link in its comment rather than opening the PR itself,
+          # requiring a human click every time (confirmed empirically: runs on #2571
+          # with an explicit per-ticket instruction opened their own PR; runs on
+          # #2579/#2582 without one did not).
           claude_args: |
             --model ${{ (contains(github.event.comment.body, '@claude-opus') || contains(github.event.review.body, '@claude-opus') || contains(github.event.issue.body, '@claude-opus') || contains(github.event.issue.title, '@claude-opus')) && 'claude-opus-4-8' || 'claude-sonnet-5' }}
             --allowedTools "Bash(git push:*),Bash(gh pr create:*),Bash(gh pr edit:*)"
+            --append-system-prompt "When your implementation is ready, commit, push your branch, and open the pull request yourself via gh pr create in this same run instead of leaving only a Create PR link for a human to click — this runner is ephemeral, so unpushed or un-opened work is lost once the job ends. Only the completing PR in a multi-PR sequence should carry a Closes #<n> keyword. Before starting: if you were tagged on an issue that already has an open PR referencing it, continue on that PR's existing branch — the one matching the layer you're already working in, if more than one is open — rather than opening a new, disconnected one."
 

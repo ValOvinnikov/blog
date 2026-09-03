@@ -54,6 +54,7 @@ export const ProvisioningStatusView = ({
     handleStart,
     handleRetry,
     stepStatuses,
+    displayStepStatuses,
     stepUpdatedAt,
     provisioningRun,
     allIdle,
@@ -168,7 +169,7 @@ export const ProvisioningStatusView = ({
             type="button"
             variant="primary"
             onClick={handleStart}
-            isDisabled={isStarting || isArchived}
+            isDisabled={isStarting || isArchived || isProvisioningRunning}
             aria-describedby={isArchived ? archivedNoticeId : undefined}
           >
             {isStarting ? t('startingButton') : t('startButton')}
@@ -195,7 +196,8 @@ export const ProvisioningStatusView = ({
               <div className={list()}>
                 {STEP_ORDER.map((stepKey, index) => {
                   const status =
-                    stepStatuses[index] ?? TENANT_PROVISIONING_STEP_STATUS.IDLE;
+                    displayStepStatuses[index] ??
+                    TENANT_PROVISIONING_STEP_STATUS.IDLE;
                   const isFailed =
                     status === TENANT_PROVISIONING_STEP_STATUS.FAILED;
                   const isDone =
@@ -266,7 +268,7 @@ export const ProvisioningStatusView = ({
                   type="button"
                   variant="secondary"
                   onClick={handleRetry}
-                  isDisabled={isRetrying || isArchived}
+                  isDisabled={isRetrying || isArchived || isProvisioningRunning}
                   aria-describedby={isArchived ? archivedNoticeId : undefined}
                 >
                   {isRetrying ? t('retryingButton') : t('retryButton')}

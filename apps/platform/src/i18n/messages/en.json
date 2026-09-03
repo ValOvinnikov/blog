@@ -486,6 +486,7 @@
     "runStartedLabel": "Started",
     "runFinishedLabel": "Finished",
     "runRegistryLabel": "Registry",
+    "runStartedPending": "Waiting for the run to start…",
     "runFinishedPending": "—",
     "runWorkflowLogLink": "Workflow log"
   },

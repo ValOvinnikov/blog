@@ -8,6 +8,7 @@ import {
   SEED_GRANT_RETRY_MAX_ATTEMPTS,
   type TSeedContentDeps,
 } from './seed-content';
+import { STARTER_DOCUMENT_IDS } from './starter-content';
 
 const { setTenantSanityWriteTokenAndSeededAtMock } = vi.hoisted(() => ({
   setTenantSanityWriteTokenAndSeededAtMock: vi.fn(),
@@ -130,7 +131,9 @@ describe(seedTenantContent, () => {
       }),
     );
     expect(upload).toHaveBeenCalledTimes(2);
-    expect(createOrReplace).toHaveBeenCalledTimes(9);
+    expect(createOrReplace).toHaveBeenCalledTimes(
+      Object.keys(STARTER_DOCUMENT_IDS).length,
+    );
     expect(commit).toHaveBeenCalledTimes(1);
     expect(sleep).not.toHaveBeenCalled();
     expect(setTenantSanityWriteTokenAndSeededAtMock).toHaveBeenCalledWith(

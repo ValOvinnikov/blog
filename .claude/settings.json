@@ -12,6 +12,7 @@
       "Bash(pnpm type-check:*)",
       "Bash(pnpm typegen:*)",
       "Bash(pnpm format:*)",
+      "Bash(pnpm exec prettier --check:*)",
       "Bash(turbo run:*)",
       "Bash(npx sanity:*)",
       "Bash(pnpm create:*)",
