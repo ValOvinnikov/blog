@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const { resolveTenantIdMock, isProductionEnvironmentMock } = vi.hoisted(() => ({
+const {
+  resolveTenantIdMock,
+  isProductionEnvironmentMock,
+  loggerErrorMock,
+} = vi.hoisted(() => ({
   resolveTenantIdMock: vi.fn(),
   isProductionEnvironmentMock: vi.fn(),
+  loggerErrorMock: vi.fn(),
 }));
 
 const intlMiddlewareMock = vi.fn<(request: NextRequest) => NextResponse>(() =>
@@ -19,6 +24,15 @@ vi.mock('./server/tenant/resolve-tenant-id', () => ({
 
 vi.mock('./utils/is-production-environment', () => ({
   isProductionEnvironment: isProductionEnvironmentMock,
+}));
+
+vi.mock('@web/utils/logger/logger', () => ({
+  logger: {
+    error: loggerErrorMock,
+    warn: vi.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
+  },
 }));
 
 const { config, default: proxy } = await import('./proxy');
@@ -82,6 +96,7 @@ describe('proxy tenant resolution', () => {
     intlMiddlewareMock.mockClear();
     isProductionEnvironmentMock.mockReset();
     isProductionEnvironmentMock.mockReturnValue(false);
+    loggerErrorMock.mockReset();
   });
 
   it('sets x-tenant-id on the request handed to next-intl when a tenant resolves', async () => {
@@ -155,5 +170,72 @@ describe('proxy tenant resolution', () => {
 
     const [forwardedRequest] = intlMiddlewareMock.mock.calls[0]!;
     expect(forwardedRequest.headers.has('x-tenant-id')).toBe(false);
+  });
+});
+
+describe('proxy tenant lookup failure', () => {
+  beforeEach(() => {
+    resolveTenantIdMock.mockReset();
+    intlMiddlewareMock.mockClear();
+    isProductionEnvironmentMock.mockReset();
+    isProductionEnvironmentMock.mockReturnValue(false);
+    loggerErrorMock.mockReset();
+  });
+
+  it('returns a controlled 503 instead of throwing when resolveTenantId rejects', async () => {
+    resolveTenantIdMock.mockRejectedValue(new Error('connection refused'));
+
+    const response = await proxy(buildRequest('acme.example.com'));
+
+    expect(response.status).toBe(503);
+  });
+
+  it('never calls next-intl when the tenant lookup fails', async () => {
+    resolveTenantIdMock.mockRejectedValue(new Error('connection refused'));
+
+    await proxy(buildRequest('acme.example.com'));
+
+    expect(intlMiddlewareMock).not.toHaveBeenCalled();
+  });
+
+  it('logs the lookup failure exactly once with host and error context', async () => {
+    const error = new Error('connection refused');
+    resolveTenantIdMock.mockRejectedValue(error);
+
+    await proxy(buildRequest('acme.example.com'));
+
+    expect(loggerErrorMock).toHaveBeenCalledTimes(1);
+    expect(loggerErrorMock).toHaveBeenCalledWith('proxy.tenant_lookup_failed', {
+      host: 'acme.example.com',
+      error,
+    });
+  });
+
+  it('fails closed in production the same way a lookup failure fails in dev, distinct from the plain 404 for an unmatched host', async () => {
+    isProductionEnvironmentMock.mockReturnValue(true);
+    resolveTenantIdMock.mockRejectedValue(new Error('connection refused'));
+
+    const response = await proxy(buildRequest('acme.example.com'));
+
+    expect(response.status).toBe(503);
+    expect(response.status).not.toBe(404);
+  });
+
+  it('does not set x-tenant-id, and does not fall back to a previously-resolved or default tenant, when the lookup fails', async () => {
+    resolveTenantIdMock.mockRejectedValue(new Error('connection refused'));
+
+    await proxy(
+      buildRequest('acme.example.com', { 'x-tenant-id': 'spoofed-tenant' }),
+    );
+
+    expect(intlMiddlewareMock).not.toHaveBeenCalled();
+  });
+
+  it('does not log when a host simply resolves to no tenant, distinguishing that from an actual lookup failure', async () => {
+    resolveTenantIdMock.mockResolvedValue(undefined);
+
+    await proxy(buildRequest('unknown.example.com'));
+
+    expect(loggerErrorMock).not.toHaveBeenCalled();
   });
 });

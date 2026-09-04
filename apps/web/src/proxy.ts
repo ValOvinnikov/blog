@@ -1,3 +1,4 @@
+import { logger } from '@web/utils/logger/logger';
 import { NextResponse, type NextRequest } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 
@@ -21,12 +22,24 @@ const handleI18nRouting = createMiddleware(routing);
  * survive resolution failing (0 or 2+ tenant rows outside production, or an
  * unmatched host that already 404'd in production), or it would be forwarded
  * verbatim to every downstream reader of this header as a spoofed tenant.
+ *
+ * A thrown lookup (Neon unreachable, credentials rotated, …) is distinct
+ * from an ordinary unmatched host: it is caught, logged once, and fails
+ * closed with a 503 before next-intl or any route handler runs, rather than
+ * falling through to any default or previously-resolved tenant.
  */
 export default async function proxy(
   request: NextRequest,
 ): Promise<NextResponse> {
   const host = request.headers.get('host');
-  const tenantId = await resolveTenantId(host);
+
+  let tenantId: string | undefined;
+  try {
+    tenantId = await resolveTenantId(host);
+  } catch (error) {
+    logger.error('proxy.tenant_lookup_failed', { host, error });
+    return new NextResponse(null, { status: 503 });
+  }
 
   if (!tenantId && isProductionEnvironment()) {
     return new NextResponse(null, { status: 404 });
