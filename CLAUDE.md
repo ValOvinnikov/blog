@@ -19,7 +19,7 @@ ui → config (no Sanity/fetch)               configs/* → consumed by all
 db → config, utils (no React/Sanity)        auth → db, config, utils
 config → utils (OKLCH maths behind the shared contrast guard)
 insight → nothing (base of graph, like utils)
-email → utils (sits low; both apps, auth and db's scripts consume it)
+email → utils (sits low; both apps and auth consume it)
 graph is acyclic
 ```
 
