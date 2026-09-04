@@ -117,7 +117,7 @@ describe(`<${AuthMenu.name}/>`, () => {
 
       // Plain mode never introduces a new heading — the popover panel
       // already has an accessible name via its own `ariaLabel`, and this
-      // panel renders before the page's own `<h1>` in `[locale]/layout.tsx`.
+      // panel renders before the page's own `<h1>` in `[tenant]/[locale]/layout.tsx`.
       expect(within(panel).queryByRole('heading')).not.toBeInTheDocument();
       expect(within(panel).getByText('Sign in')).toBeVisible();
       expect(within(panel).queryByText('Guest')).not.toBeInTheDocument();

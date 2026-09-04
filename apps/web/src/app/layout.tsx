@@ -14,9 +14,10 @@ type TProps = {
 const SANITY_IMAGE_CDN_ORIGIN = 'https://cdn.sanity.io';
 
 /**
- * The real root layout — `[locale]/layout.tsx` is the de facto root for
- * every localized route (this app has one locale, hidden from the URL by
- * `localePrefix: 'never'`), but Next.js still requires a genuine
+ * The real root layout — `[tenant]/[locale]/layout.tsx` is the de facto root
+ * for every localized route (this app has one locale, hidden from the URL
+ * by `localePrefix: 'never'`, and the tenant segment is hidden the same way
+ * by `proxy.ts`'s rewrite), but Next.js still requires a genuine
  * `app/layout.tsx` to own the document shell so that root-level files like
  * `not-found.tsx` have a layout to render into. `lang` is fixed rather than
  * threaded from `params` — this app has exactly one locale today
@@ -24,8 +25,8 @@ const SANITY_IMAGE_CDN_ORIGIN = 'https://cdn.sanity.io';
  *
  * Tenant-independent by design: it sits above where the tenant is resolved,
  * so it owns only the static document shell. Theme tokens, font variables,
- * and analytics gating live in `[locale]/layout.tsx`; `not-found.tsx` — the
- * one route that renders outside that layout — resolves its own.
+ * and analytics gating live in `[tenant]/[locale]/layout.tsx`; `not-found.tsx`
+ * — the one route that renders outside that layout — resolves its own.
  */
 export default function RootLayout({ children }: TProps) {
   return (

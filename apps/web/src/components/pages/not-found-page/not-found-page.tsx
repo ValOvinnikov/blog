@@ -26,8 +26,9 @@ const {
 
 /**
  * NotFoundPage — the 404 body content. Rendered from the root
- * `not-found.tsx`, which sits outside the `[locale]` route tree (this app's
- * `Header`/`Footer` chrome lives in `[locale]/layout.tsx`), so this stays a
+ * `not-found.tsx`, which sits outside the `[tenant]/[locale]` route tree
+ * (this app's `Header`/`Footer` chrome lives in `[tenant]/[locale]/layout.tsx`),
+ * so this stays a
  * self-contained, centered composition: no site chrome, just a short
  * explanation and a link home. Renders the terminal-styled `TerminalChip`/
  * prompt-line treatment when `isPlain` is unset, or a plain equivalent when

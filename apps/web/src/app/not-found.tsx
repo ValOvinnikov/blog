@@ -12,13 +12,14 @@ import {
 } from 'next-intl/server';
 
 /**
- * This root boundary sits outside `[locale]/layout.tsx` (see `app/layout.tsx`'s
- * doc comment), so it gets no request locale, no `NextIntlClientProvider`,
- * and none of that layout's theme rendering for free — all three are
- * resolved here directly instead. `setRequestLocale` must run before any
- * other next-intl API, or that API falls back to reading `headers()` —
- * fatal ("Page changed from static to dynamic at runtime") on an on-demand
- * render of the otherwise-static `[locale]/[slug]` route. The provider
+ * This root boundary sits outside `[tenant]/[locale]/layout.tsx` (see
+ * `app/layout.tsx`'s doc comment), so it gets no request locale, no
+ * `NextIntlClientProvider`, and none of that layout's theme rendering for
+ * free — all three are resolved here directly instead. `setRequestLocale`
+ * must run before any other next-intl API, or that API falls back to
+ * reading `headers()` — fatal ("Page changed from static to dynamic at
+ * runtime") on an on-demand render of the otherwise-static
+ * `[tenant]/[locale]/[slug]` route. The provider
  * wraps `NotFoundPage` because its `SmartLink` renders next-intl's client
  * `Link`, which throws without one.
  */

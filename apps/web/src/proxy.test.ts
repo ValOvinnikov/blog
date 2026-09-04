@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const {
-  resolveTenantIdMock,
-  isProductionEnvironmentMock,
-  loggerErrorMock,
-} = vi.hoisted(() => ({
-  resolveTenantIdMock: vi.fn(),
-  isProductionEnvironmentMock: vi.fn(),
-  loggerErrorMock: vi.fn(),
-}));
+const { resolveTenantIdMock, isProductionEnvironmentMock, loggerErrorMock } =
+  vi.hoisted(() => ({
+    resolveTenantIdMock: vi.fn(),
+    isProductionEnvironmentMock: vi.fn(),
+    loggerErrorMock: vi.fn(),
+  }));
 
 const intlMiddlewareMock = vi.fn<(request: NextRequest) => NextResponse>(() =>
   NextResponse.next(),
@@ -37,13 +34,16 @@ vi.mock('@web/utils/logger/logger', () => ({
 
 const { config, default: proxy } = await import('./proxy');
 
+const FOREIGN_TENANT_ID = 'a1b2c3d4-e5f6-4789-a012-3456789abcde';
+
 const buildRequest = (
   host: string | null,
   extraHeaders?: Record<string, string>,
+  pathname = '/blog',
 ): NextRequest => {
   const headers = new Headers(extraHeaders);
   if (host) headers.set('host', host);
-  return new NextRequest('https://example.com/blog', { headers });
+  return new NextRequest(`https://example.com${pathname}`, { headers });
 };
 
 const buildMatcherRegExp = () => {
@@ -67,14 +67,22 @@ describe('proxy matcher', () => {
     expect(matcher.test('/blog/some-post-slug')).toBe(true);
   });
 
-  it('still excludes the pre-existing api/_next/_vercel and dotted-extension paths', () => {
+  it('still excludes the pre-existing api/_next/_vercel paths', () => {
     const matcher = buildMatcherRegExp();
 
     expect(matcher.test('/api/whatever')).toBe(false);
     expect(matcher.test('/_next/static/chunk.js')).toBe(false);
     expect(matcher.test('/_vercel/insights')).toBe(false);
-    expect(matcher.test('/robots.txt')).toBe(false);
-    expect(matcher.test('/favicon.ico')).toBe(false);
+  });
+
+  it('now matches dotted-extension paths, so the proxy function itself can guard them instead of skipping them entirely', () => {
+    const matcher = buildMatcherRegExp();
+
+    expect(matcher.test('/robots.txt')).toBe(true);
+    expect(matcher.test('/favicon.ico')).toBe(true);
+    expect(matcher.test('/sitemap.xml')).toBe(true);
+    expect(matcher.test('/rss.xml')).toBe(true);
+    expect(matcher.test('/tags/typescript/rss.xml')).toBe(true);
   });
 
   it('documents the prefix-match caveat: sibling paths sharing an excluded prefix also bypass locale middleware', () => {
@@ -87,6 +95,162 @@ describe('proxy matcher', () => {
     // exclusions, just extended to the three new names.
     expect(matcher.test('/icons')).toBe(false);
     expect(matcher.test('/icon-something')).toBe(false);
+  });
+});
+
+describe('proxy security guard', () => {
+  beforeEach(() => {
+    resolveTenantIdMock.mockReset();
+    intlMiddlewareMock.mockClear();
+    isProductionEnvironmentMock.mockReset();
+    isProductionEnvironmentMock.mockReturnValue(false);
+    loggerErrorMock.mockReset();
+  });
+
+  it('refuses a request whose first path segment is already tenant-shaped', async () => {
+    const response = await proxy(
+      buildRequest('acme.example.com', undefined, `/${FOREIGN_TENANT_ID}/blog`),
+    );
+
+    expect(response.status).toBe(404);
+    expect(resolveTenantIdMock).not.toHaveBeenCalled();
+    expect(intlMiddlewareMock).not.toHaveBeenCalled();
+  });
+
+  it('refuses a tenant-shaped first segment even when the path also carries a dotted extension, closing the bypass a dot-anywhere matcher exclusion would otherwise leave open', async () => {
+    const response = await proxy(
+      buildRequest(
+        'acme.example.com',
+        undefined,
+        `/${FOREIGN_TENANT_ID}/EN/blog/x.html`,
+      ),
+    );
+
+    expect(response.status).toBe(404);
+    expect(resolveTenantIdMock).not.toHaveBeenCalled();
+    expect(intlMiddlewareMock).not.toHaveBeenCalled();
+  });
+
+  it('refuses an uppercase tenant-shaped first segment too', async () => {
+    const response = await proxy(
+      buildRequest(
+        'acme.example.com',
+        undefined,
+        `/${FOREIGN_TENANT_ID.toUpperCase()}/blog`,
+      ),
+    );
+
+    expect(response.status).toBe(404);
+  });
+
+  it("refuses a percent-encoded tenant-shaped first segment, which Next's own route matcher would decode back to the raw UUID after this proxy waved it through as harmless", async () => {
+    const percentEncodedForeignTenantId =
+      '%61%31%62%32%63%33%64%34%2d%65%35%66%36%2d%34%37%38%39%2d%61%30%31%32%2d%33%34%35%36%37%38%39%61%62%63%64%65';
+
+    const response = await proxy(
+      buildRequest(
+        'acme.example.com',
+        undefined,
+        `/${percentEncodedForeignTenantId}/EN/blog/x.html`,
+      ),
+    );
+
+    expect(response.status).toBe(404);
+    expect(resolveTenantIdMock).not.toHaveBeenCalled();
+    expect(intlMiddlewareMock).not.toHaveBeenCalled();
+  });
+
+  it('refuses a tenant-shaped first segment with trailing garbage appended, rather than requiring an exact-length match', async () => {
+    const response = await proxy(
+      buildRequest(
+        'acme.example.com',
+        undefined,
+        `/${FOREIGN_TENANT_ID}./EN/blog`,
+      ),
+    );
+
+    expect(response.status).toBe(404);
+    expect(resolveTenantIdMock).not.toHaveBeenCalled();
+    expect(intlMiddlewareMock).not.toHaveBeenCalled();
+  });
+
+  it("refuses a first segment that cannot be percent-decoded at all, the same way Next's own route matcher would refuse to pass it through", async () => {
+    const response = await proxy(
+      buildRequest('acme.example.com', undefined, '/%E0%A4%A'),
+    );
+
+    expect(response.status).toBe(404);
+    expect(resolveTenantIdMock).not.toHaveBeenCalled();
+    expect(intlMiddlewareMock).not.toHaveBeenCalled();
+  });
+
+  it('does not refuse an ordinary content path', async () => {
+    resolveTenantIdMock.mockResolvedValue('tenant-1');
+
+    const response = await proxy(
+      buildRequest('acme.example.com', undefined, '/blog/hello-world'),
+    );
+
+    expect(response.status).not.toBe(404);
+  });
+});
+
+describe('proxy dotted-path pass-through', () => {
+  beforeEach(() => {
+    resolveTenantIdMock.mockReset();
+    intlMiddlewareMock.mockClear();
+    isProductionEnvironmentMock.mockReset();
+    isProductionEnvironmentMock.mockReturnValue(false);
+    loggerErrorMock.mockReset();
+  });
+
+  it.each([
+    '/robots.txt',
+    '/sitemap.xml',
+    '/rss.xml',
+    '/tags/typescript/rss.xml',
+  ])(
+    'passes %s through unrewritten, without resolving a tenant or invoking next-intl',
+    async (pathname) => {
+      const response = await proxy(
+        buildRequest('acme.example.com', undefined, pathname),
+      );
+
+      expect(resolveTenantIdMock).not.toHaveBeenCalled();
+      expect(intlMiddlewareMock).not.toHaveBeenCalled();
+      expect(response.headers.get('x-middleware-rewrite')).toBeNull();
+      expect(response.status).not.toBe(404);
+    },
+  );
+
+  it('strips a client-supplied x-tenant-id header even on the pass-through branch, so it never reaches the downstream request Next forwards', async () => {
+    const request = buildRequest(
+      'acme.example.com',
+      { 'x-tenant-id': 'spoofed-tenant' },
+      '/robots.txt',
+    );
+
+    const response = await proxy(request);
+
+    // Asserting on `request.headers` here would prove nothing — `.delete()`
+    // always mutates that local object regardless of whether the mutation
+    // reaches the response. What Next actually forwards downstream is read
+    // from the RESPONSE's own `x-middleware-override-headers` instruction
+    // (next/dist/server/web/adapter.js), so that is what must be asserted.
+    const overriddenHeaderNames = response.headers.get(
+      'x-middleware-override-headers',
+    );
+    expect(overriddenHeaderNames).not.toBeNull();
+    expect(overriddenHeaderNames?.split(',')).not.toContain('x-tenant-id');
+    expect(response.headers.get('x-middleware-request-x-tenant-id')).toBeNull();
+
+    // Proves the override list is the real, non-empty header set (not an
+    // empty `Headers()` that would vacuously satisfy the assertions above)
+    // by checking a legitimate header actually survived alongside it.
+    expect(overriddenHeaderNames?.split(',')).toContain('host');
+    expect(response.headers.get('x-middleware-request-host')).toBe(
+      'acme.example.com',
+    );
   });
 });
 
@@ -170,6 +334,77 @@ describe('proxy tenant resolution', () => {
 
     const [forwardedRequest] = intlMiddlewareMock.mock.calls[0]!;
     expect(forwardedRequest.headers.has('x-tenant-id')).toBe(false);
+  });
+});
+
+describe('proxy tenant segment rewrite', () => {
+  beforeEach(() => {
+    resolveTenantIdMock.mockReset();
+    intlMiddlewareMock.mockClear();
+    isProductionEnvironmentMock.mockReset();
+    isProductionEnvironmentMock.mockReturnValue(false);
+    loggerErrorMock.mockReset();
+  });
+
+  it('prepends the resolved tenant id to the locale-rewritten pathname next-intl already produced', async () => {
+    resolveTenantIdMock.mockResolvedValue('tenant-1');
+    intlMiddlewareMock.mockImplementationOnce((request) =>
+      NextResponse.rewrite(
+        new URL(`/EN${request.nextUrl.pathname}`, request.url),
+      ),
+    );
+
+    const response = await proxy(
+      buildRequest('acme.example.com', undefined, '/blog/hello-world'),
+    );
+
+    expect(response.headers.get('x-middleware-rewrite')).toBe(
+      'https://example.com/tenant-1/EN/blog/hello-world',
+    );
+  });
+
+  it('falls back to the original request URL when next-intl did not need to rewrite', async () => {
+    resolveTenantIdMock.mockResolvedValue('tenant-1');
+    intlMiddlewareMock.mockImplementationOnce(() => NextResponse.next());
+
+    const response = await proxy(
+      buildRequest('acme.example.com', undefined, '/blog'),
+    );
+
+    expect(response.headers.get('x-middleware-rewrite')).toBe(
+      'https://example.com/tenant-1/blog',
+    );
+  });
+
+  it('uses a stable placeholder tenant segment when no tenant resolves outside production, so the route tree still matches', async () => {
+    resolveTenantIdMock.mockResolvedValue(undefined);
+    intlMiddlewareMock.mockImplementationOnce((request) =>
+      NextResponse.rewrite(
+        new URL(`/EN${request.nextUrl.pathname}`, request.url),
+      ),
+    );
+
+    const response = await proxy(
+      buildRequest('unknown.example.com', undefined, '/blog'),
+    );
+
+    expect(response.headers.get('x-middleware-rewrite')).toBe(
+      'https://example.com/unresolved-tenant/EN/blog',
+    );
+  });
+
+  it('never rewrites the tenant-shaped segment onto a redirect response', async () => {
+    resolveTenantIdMock.mockResolvedValue('tenant-1');
+    intlMiddlewareMock.mockImplementationOnce(() =>
+      NextResponse.redirect(new URL('https://example.com/blog')),
+    );
+
+    const response = await proxy(
+      buildRequest('acme.example.com', undefined, '/blog'),
+    );
+
+    expect(response.headers.get('x-middleware-rewrite')).toBeNull();
+    expect(response.headers.get('location')).toBe('https://example.com/blog');
   });
 });
 

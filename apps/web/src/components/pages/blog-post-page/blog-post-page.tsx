@@ -31,7 +31,7 @@ type TBlogPostPageProps = { slug: string };
 
 /**
  * `/blog/{slug}` composition. Site chrome (`Header`/`Footer`) stays owned by
- * `[locale]/layout.tsx`, not this component. Resolves every async concern
+ * `[tenant]/[locale]/layout.tsx`, not this component. Resolves every async concern
  * (the post fetch, next-intl translations/formatting, the newsletter
  * settings + bookmarks-capability checks) and hands the result to the pure
  * `BlogPostPageView`.

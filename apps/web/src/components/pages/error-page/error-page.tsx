@@ -19,7 +19,7 @@ const s = errorPageLayoutVariants();
 
 /**
  * Rendered by `app/error.tsx` — the error boundary for everything below the
- * root layout, including `[locale]/layout.tsx` itself. It can't assume
+ * root layout, including `[tenant]/[locale]/layout.tsx` itself. It can't assume
  * `NextIntlClientProvider` is available, so this stays hardcoded English and
  * "Go home" is a plain anchor rather than `SmartLink`.
  */
