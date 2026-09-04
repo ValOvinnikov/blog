@@ -139,10 +139,10 @@ and no deploy job.
 
 - **Web:** `web-dev`, `web-prod` — Add New → Project → import
   `{github_account}/blog`; **Root Directory `apps/web`** + tick _"Include files
-  outside of the root directory"_; **Node.js 22.x**.
+  outside of the root directory"_; **Node.js 24.x**.
 - **Admin:** `platform-dev`, `platform-prod` — same import flow; **Root Directory
   `apps/platform`** + tick _"Include files outside of the root directory"_;
-  **Node.js 22.x**. A separate project rather than a second domain on
+  **Node.js 24.x**. A separate project rather than a second domain on
   `web-dev`/`web-prod`: a Vercel project has exactly one Root Directory,
   and the panel is a second Next.js app under `apps/platform`.
 
@@ -1036,7 +1036,7 @@ integration stays **on** are human-gated console steps:
 
 - [ ] Vercel → Add New → Project → import `{github_account}/blog`; **Root
       Directory `packages/ui`** + tick _"Include files outside of the root
-      directory"_; **Node.js 22.x**; Framework Preset **Other** (build/output
+      directory"_; **Node.js 24.x**; Framework Preset **Other** (build/output
       commands come from `packages/ui/vercel.json`).
 - [ ] Confirm Git integration is **enabled**, with PR previews **on** — this
       is the default for a newly imported project; the point is to leave it
@@ -1087,7 +1087,7 @@ main web app — a second reason not to root it there.)
 
 - [ ] Vercel → Add New → Project → import `{github_account}/blog`; **Root
       Directory** left at the repo root (`.`) — do **not** set it to
-      `apps/web`; **Node.js 22.x**; Framework Preset **Other** (build/output
+      `apps/web`; **Node.js 24.x**; Framework Preset **Other** (build/output
       commands come from the root `vercel.json`).
 - [ ] Confirm Git integration is **enabled**, with PR previews **on** — same
       as the `packages/ui` project above.
