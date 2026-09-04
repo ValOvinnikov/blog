@@ -85,6 +85,7 @@ export function toCtaModule(
   return {
     variant: raw.variant,
     brandVariant: raw.brandVariant,
+    bandTone: raw.bandTone,
     eyebrow: raw.eyebrow ?? undefined,
     sectionHeader: toRequiredSectionHeader(raw.sectionHeader),
     content: toContent(raw.content),

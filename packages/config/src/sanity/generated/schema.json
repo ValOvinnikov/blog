@@ -211,6 +211,27 @@
         },
         "optional": true
       },
+      "bandTone": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "SECONDARY"
+            }
+          ]
+        },
+        "optional": true
+      },
       "eyebrow": {
         "type": "objectAttribute",
         "value": {
@@ -3697,6 +3718,10 @@
         "value": {
           "type": "union",
           "of": [
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
+            },
             {
               "type": "string",
               "value": "PRIMARY"

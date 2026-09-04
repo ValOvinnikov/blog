@@ -43,6 +43,7 @@ export type Module_cta = {
   title?: string;
   variant?: 'BANNER' | 'SPLIT' | 'CALLOUT';
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  bandTone?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   eyebrow?: string;
   sectionHeader?: RequiredHeadingSectionHeader;
   content?: BasicText;
@@ -601,7 +602,7 @@ export type Module_postList = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   sectionHeader?: SectionHeader;
   pageSize?: number;
   layout?: Layout;

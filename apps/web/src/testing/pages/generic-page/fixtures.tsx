@@ -36,6 +36,7 @@ export const makeGenericPageView = (
           id="cta-1"
           variant={CTA_VARIANT.CALLOUT}
           brandVariant={BRAND_VARIANT.SECONDARY}
+          bandTone={BRAND_VARIANT.PRIMARY}
           eyebrow={undefined}
           sectionHeader={{
             heading: 'Get in touch',

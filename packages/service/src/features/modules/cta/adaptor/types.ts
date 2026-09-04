@@ -22,6 +22,7 @@ export type TCtaAction = {
 export type TCtaModule = {
   variant: TCtaVariant;
   brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY'>;
+  bandTone: TBrandVariantOf<'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY'>;
   eyebrow: TMaybeUndefined<string>;
   sectionHeader: {
     heading: string;
