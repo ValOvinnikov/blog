@@ -558,8 +558,8 @@ rest:
 | `provision-tenant.yml`          | all of them                                                                                                                                                          |
 | `deprovision-tenant.yml`        | `SANITY_MANAGEMENT_TOKEN`, `VERCEL_TOKEN`, `VERCEL_TEAM_ID`, `VERCEL_PROJECT_ID_WEB`, `TENANT_REGISTRY_DATABASE_URL`, `WEB_APP_URL`, `SITE_CONFIG_REVALIDATE_SECRET` |
 | `invalidate-tenant-cache.yml`   | `TENANT_REGISTRY_DATABASE_URL`, `WEB_APP_URL`, `SITE_CONFIG_REVALIDATE_SECRET` — the recovery path for `deprovision-tenant.yml`'s final step                         |
-| `recheck-tenant-owners.yml`     | `SANITY_MANAGEMENT_TOKEN`, `TENANT_REGISTRY_DATABASE_URL`, and optionally `PLATFORM_APP_URL` + `OPERATOR_ALERT_SECRET`                                               |
-| `validate-tenant-documents.yml` | `TENANT_REGISTRY_DATABASE_URL`, `TENANT_TOKEN_ENCRYPTION_KEY`, and optionally `PLATFORM_APP_URL` + `OPERATOR_ALERT_SECRET`                                           |
+| `recheck-tenant-owners.yml`     | `SANITY_MANAGEMENT_TOKEN`, `TENANT_REGISTRY_DATABASE_URL`, and optionally `ADMIN_APP_BASE_URL` + `OPERATOR_ALERT_SECRET`                                             |
+| `validate-tenant-documents.yml` | `TENANT_REGISTRY_DATABASE_URL`, `TENANT_TOKEN_ENCRYPTION_KEY`, and optionally `ADMIN_APP_BASE_URL` + `OPERATOR_ALERT_SECRET`                                         |
 
 `recheck-tenant-owners.yml` also runs on a `schedule:`, and a scheduled run
 carries no `inputs` context at all, so its binding is
@@ -616,7 +616,10 @@ dispatch can point it at `development`.
       `https://admin.{your-hosting}`. Used as the CORS origin step 1 adds to
       each new tenant's Sanity project, so it must match the domain on that
       environment's Vercel platform project exactly — `platform-dev` on
-      `development`, `platform-prod` on `production` (§3 above).
+      `development`, `platform-prod` on `production` (§3 above). The two
+      sweeps below (`recheck-tenant-owners.yml`,
+      `validate-tenant-documents.yml`) reuse it as the base they POST
+      operator alerts to; there is no second URL variable to set.
 - [ ] Variable `TENANT_SANITY_DATASET` — the name of the single dataset created
       inside each new tenant's Sanity project, set to match the Environment it
       lives on. Externalized as a variable rather than hardcoded in TS;
@@ -645,13 +648,13 @@ dispatch can point it at `development`.
       other credential in this list — throws rather than skipping when it is
       absent, so a run fails loudly instead of leaving the site serving from
       cache.
-- [ ] (Optional) Variable `PLATFORM_APP_URL` and secret
-      `OPERATOR_ALERT_SECRET` — the pair `recheck-tenant-owners.yml` and
-      `validate-tenant-documents.yml` use to report an operator alert.
-      Neither workflow sends email itself: it POSTs the bare facts (tenant
-      id, outcome or invalid-document count) to `apps/platform`'s
-      `/api/internal/operator-alert`, and that app resolves the superadmin
-      recipients and sends. `OPERATOR_ALERT_SECRET` is the bearer token that
+- [ ] (Optional) Secret `OPERATOR_ALERT_SECRET` — paired with
+      `ADMIN_APP_BASE_URL` above, this is what lets
+      `recheck-tenant-owners.yml` and `validate-tenant-documents.yml` report
+      an operator alert. Neither workflow sends email itself: it POSTs the
+      bare facts (tenant id, outcome or invalid-document count) to
+      `apps/platform`'s `/api/internal/operator-alert`, and that app resolves
+      the superadmin recipients and sends. It is the bearer token that
       route authenticates against, so **this copy and the one in the
       `platform-dev`/`platform-prod` Vercel projects must be byte-identical**
       — set both, or the route answers 401 and no alert is delivered. Leave
