@@ -31,6 +31,16 @@ describe('toPostListModule', () => {
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
 
+  it('maps brandVariant straight through, including BRAND_PRIMARY', () => {
+    const raw = makeRawPostListModule({
+      brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
+    });
+
+    const module = toPostListModule(raw, rawPosts, pagination, tenant);
+
+    expect(module.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
+  });
+
   it('leaves every sectionHeader field undefined when the field itself is unset (no faked default)', () => {
     const raw = makeRawPostListModule({ sectionHeader: null });
 

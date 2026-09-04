@@ -40,6 +40,22 @@ describe('toCtaModule', () => {
     expect(cta.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
   });
 
+  it('maps bandTone straight through', () => {
+    const raw = makeRawCtaModule({ bandTone: BRAND_VARIANT.SECONDARY });
+
+    const cta = toCtaModule(raw, makeTenant());
+
+    expect(cta.bandTone).toBe(BRAND_VARIANT.SECONDARY);
+  });
+
+  it('maps bandTone straight through, including BRAND_PRIMARY', () => {
+    const raw = makeRawCtaModule({ bandTone: BRAND_VARIANT.BRAND_PRIMARY });
+
+    const cta = toCtaModule(raw, makeTenant());
+
+    expect(cta.bandTone).toBe(BRAND_VARIANT.BRAND_PRIMARY);
+  });
+
   it.each([CTA_VARIANT.BANNER, CTA_VARIANT.SPLIT, CTA_VARIANT.CALLOUT])(
     'maps variant %s straight through',
     (variant) => {

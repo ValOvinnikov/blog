@@ -7,7 +7,7 @@ import type {
 import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
 
 export type TPostListModule = {
-  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY'>;
   sectionHeader: TSectionHeader;
   posts: TPostCard[];
   layout: TMaybeUndefined<TLayout>;

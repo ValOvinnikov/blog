@@ -13,6 +13,7 @@ export const ctaModuleQuery = q
   .project((sub) => ({
     variant: sub.field('variant').notNull(),
     brandVariant: sub.field('brandVariant').notNull(),
+    bandTone: sub.field('bandTone').notNull(),
     eyebrow: sub.field('eyebrow').nullable(true),
     sectionHeader: sub
       .field('sectionHeader')

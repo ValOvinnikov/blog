@@ -88,6 +88,7 @@ export function makeRawCtaModule(
   return {
     variant: CTA_VARIANT.CALLOUT,
     brandVariant: BRAND_VARIANT.PRIMARY,
+    bandTone: BRAND_VARIANT.PRIMARY,
     eyebrow: null,
     sectionHeader: {
       heading: 'Subscribe to the newsletter',
