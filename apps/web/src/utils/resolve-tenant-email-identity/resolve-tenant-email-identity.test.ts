@@ -1,4 +1,8 @@
-import { PRESET_ID, PRESET_REGISTRY, resolveTenantEmailBrand } from '@blog/config';
+import {
+  PRESET_ID,
+  PRESET_REGISTRY,
+  resolveTenantEmailBrand,
+} from '@blog/config';
 import { queries } from '@blog/db';
 import { getSiteConfig } from '@web/server/site-config/get-site-config';
 
@@ -56,12 +60,17 @@ describe(resolveTenantEmailIdentity, () => {
     errorSpy.mockRestore();
   });
 
-  it('falls back to the default name when the tenant row cannot be found', async () => {
+  it('falls back to the default name and logs when the tenant row cannot be found', async () => {
+    const errorSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     vi.mocked(getSiteConfig).mockResolvedValue({ ok: true, data: undefined });
     vi.mocked(queries.tenants.getTenantById).mockResolvedValue(undefined);
 
     const identity = await resolveTenantEmailIdentity(TENANT_ID);
 
     expect(identity.brandName).toBe('Newsletter');
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('tenant_email_identity.tenant_row_not_found'),
+    );
+    errorSpy.mockRestore();
   });
 });

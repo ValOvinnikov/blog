@@ -35,6 +35,10 @@ export const resolveTenantEmailIdentity = async (
     });
   }
 
+  if (!tenant) {
+    logger.warn('tenant_email_identity.tenant_row_not_found', { tenantId });
+  }
+
   return {
     brand: toTenantEmailBrand(
       siteConfigResult.ok ? siteConfigResult.data : undefined,

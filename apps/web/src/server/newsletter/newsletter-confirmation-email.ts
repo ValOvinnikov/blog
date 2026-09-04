@@ -12,12 +12,8 @@ export type TNewsletterConfirmationEmailContent = {
 };
 
 /**
- * buildNewsletterConfirmationEmail — the double opt-in confirmation email's
- * content, sent via `@blog/email`'s `sendEmail` from
- * `subscribeToNewsletterAction`. Pure and framework-free so it's testable
- * without mocking Resend, mirroring `buildMagicLinkEmail`'s shape. Rendered
- * with the subscribing tenant's own resolved brand via `buildTenantShell` —
- * the subject and body copy stay hardcoded until tenant-authored copy ships.
+ * Builds the double opt-in newsletter confirmation email's content, rendered
+ * with the subscribing tenant's own resolved brand via `buildTenantShell`.
  */
 export const buildNewsletterConfirmationEmail = ({
   confirmationUrl,

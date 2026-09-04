@@ -20,7 +20,7 @@ describe(buildNewsletterConfirmationEmail, () => {
     expect(subject).toBe('Confirm your subscription');
   });
 
-  it('links the confirmation url in the html body — the only actionable, legally-required link this email carries', () => {
+  it('links the confirmation url in the html body', () => {
     const { html } = buildNewsletterConfirmationEmail({
       confirmationUrl: CONFIRMATION_URL,
       brand: BRAND,
@@ -30,7 +30,7 @@ describe(buildNewsletterConfirmationEmail, () => {
     expect(html).toContain(`href="${CONFIRMATION_URL}"`);
   });
 
-  it('renders the subscribing tenant\'s resolved hue, not a fixed palette', () => {
+  it("renders the subscribing tenant's resolved hue, not a fixed palette", () => {
     const otherTenantBrand = resolveTenantEmailBrand({
       preset: PRESET_ID.CONSOLE,
       accentHue: 40,
