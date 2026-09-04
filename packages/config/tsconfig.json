@@ -3,12 +3,13 @@
   "extends": "@blog/tsconfig/base.json",
   "compilerOptions": {
     "paths": {
-      "@blog/config/*": ["./src/*"]
+      "@blog/config/*": ["./src/*"],
+      "@blog/utils/*": ["../utils/src/*"]
     },
     "noEmit": true,
-    // Declare vitest's ambient test globals explicitly (vitest config sets
-    // `globals: true`) so type resolution does not depend on pnpm's hoisting
-    // layout — matches @blog/ui, @blog/service, and web.
+    // "vitest/globals" declares vitest's ambient test globals (vitest config
+    // sets `globals: true`) so type resolution does not depend on pnpm's
+    // hoisting layout — matches @blog/ui, @blog/service, and web.
     "types": ["vitest/globals"]
   },
   "include": ["src"]

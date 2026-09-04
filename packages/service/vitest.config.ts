@@ -5,6 +5,7 @@ import { defineConfig, mergeConfig } from 'vitest/config';
 
 const src = fileURLToPath(new URL('./src', import.meta.url));
 const configSrc = fileURLToPath(new URL('../config/src', import.meta.url));
+const utilsSrc = fileURLToPath(new URL('../utils/src', import.meta.url));
 
 export default mergeConfig(
   preset,
@@ -25,6 +26,7 @@ export default mergeConfig(
       alias: [
         { find: /^@blog\/service\//, replacement: `${src}/` },
         { find: /^@blog\/config\//, replacement: `${configSrc}/` },
+        { find: /^@blog\/utils\//, replacement: `${utilsSrc}/` },
         // `import 'server-only'` throws outside a react-server bundle; stub it
         // to a no-op for the node test env (the real guard still runs in build).
         {

@@ -1,18 +1,23 @@
 # @blog/config
 
-> Shared constants, URL builders, and generated Sanity types — the base of the dependency graph.
+> Shared constants, URL builders, and generated Sanity types — near the base of the dependency graph.
 
-Every other workspace in this monorepo depends on `@blog/config`, and it
-depends on nothing. It centralizes the values and shapes that must stay
-identical across layers: UPPERCASE key/value constants (also referenced by
-CMS schema `options.list` and migrations), the single URL-construction
-source of truth (`routes`), shared TS types, and the Sanity typegen output
-that gives every consumer end-to-end content types without hand-redeclaring
-them.
+Every other workspace in this monorepo depends on `@blog/config`. Its only
+workspace upstream is `@blog/utils`, for the OKLCH maths behind the shared
+contrast guard — imported by the `@blog/utils/color` subpath, never the root
+barrel, which re-exports `node:crypto`-importing modules into every
+consumer's graph, `@blog/ui` among them. It centralizes the values and
+shapes that must stay identical across layers: UPPERCASE key/value constants
+(also referenced by CMS schema `options.list` and migrations), the single
+URL-construction source of truth (`routes`), shared TS types, and the Sanity
+typegen output that gives every consumer end-to-end content types without
+hand-redeclaring them.
 
 ## Layer contract
 
-- **Depends on:** nothing (no workspace dependencies).
+- **Depends on:** `@blog/utils`, via the `@blog/utils/color` subpath only
+  (never the root barrel, which re-exports `node:crypto`-importing modules) —
+  used for the OKLCH maths behind the shared contrast guard.
 - **Consumed by:** `@blog/service`, `@blog/db`, `@blog/ui`, `@blog/studio`, `apps/web`, `apps/platform`.
 - **Never imports:** `@blog/service`, `@blog/ui`, or any app — enforced by
   `configs/eslint/no-upstream-imports.js` in this package's own
@@ -33,7 +38,7 @@ them.
   exposed only via the `@blog/config/react` subpath so non-React consumers
   (like `@blog/service`) stay React-free.
 - `sanity/generated/` — `schema.json` and `types.ts`, produced by
-  `pnpm --filter cms typegen`. Never hand-edited — the next typegen run
+  `pnpm --filter @blog/studio typegen`. Never hand-edited — the next typegen run
   reverts a manual edit, and CI's typegen drift guard catches it.
 
 Three `package.json` `exports` subpaths: `.` (the `src/index.ts` barrel —

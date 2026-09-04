@@ -5,7 +5,8 @@
     "types": ["vitest/globals"],
     "paths": {
       "@blog/ui/*": ["./src/*"],
-      "@blog/config/*": ["../../packages/config/src/*"]
+      "@blog/config/*": ["../../packages/config/src/*"],
+      "@blog/utils/*": ["../../packages/utils/src/*"]
     }
   },
   "include": ["src", ".storybook"]

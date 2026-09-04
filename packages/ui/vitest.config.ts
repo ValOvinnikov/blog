@@ -44,6 +44,10 @@ export default mergeConfig(
           find: /^@blog\/config\/(.+)/,
           replacement: `${path.resolve(__dirname, '../config/src')}/$1`,
         },
+        {
+          find: /^@blog\/utils\/(.+)/,
+          replacement: `${path.resolve(__dirname, '../utils/src')}/$1`,
+        },
       ],
     },
     test: {

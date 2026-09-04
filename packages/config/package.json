@@ -15,6 +15,9 @@
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest"
   },
+  "dependencies": {
+    "@blog/utils": "workspace:*"
+  },
   "devDependencies": {
     "@blog/eslint-config": "workspace:*",
     "@blog/prettier-config": "workspace:*",
