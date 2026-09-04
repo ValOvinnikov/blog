@@ -54,7 +54,27 @@ validation, Lighthouse CI, Playwright smoke) stays advisory: a red result
 there does not currently block a merge.
 Required workflows run on every PR without path filters on purpose — a
 path-skipped workflow leaves its required checks pending forever (see the
-comment in `ci.yml`). Document validation is a separate job inside `ci.yml`
+comment in `ci.yml`).
+
+**The same deadlock still reaches stacked PRs, through the base filter rather
+than a path filter.** Every workflow above that carries a required check —
+`ci.yml`, `knip.yml`, `dependency-review.yml`, `zizmor.yml`, `actionlint.yml`,
+`commitlint.yml` and `hooks.yml` — declares `pull_request: branches: [main]`
+independently, so a PR opened against any other branch (the normal shape of a
+stacked PR) runs none of the required jobs. Only `pr-opened` and the Vercel checks report,
+which is just enough to look like a normal run at a glance, while the PR sits
+blocked on required checks that will never arrive. Retargeting does not help:
+when the base merges, GitHub retargets the PR to `main`, but that fires a
+`pull_request` `edited` event and the workflow listens only for
+`opened`/`synchronize`/`reopened`. Closing and reopening the PR forces a real
+run; count the checks to confirm (roughly 5 means the stale run, roughly 20
+means a real one). Widening the triggers would fix it, but note the scope: the scoping is
+declared independently in each of the seven workflow files, so changing only
+`ci.yml` would restore six of the twelve required checks and leave the PR just
+as blocked. That, plus the cost and security implications of running the full
+suite against arbitrary base branches, is why it has been left as a known
+manual step rather than changed — see `open-pull-request`'s "Stacked PRs"
+section. Document validation is a separate job inside `ci.yml`
 from the required Migrations job precisely so a routine drift in an existing
 live document (independent of any given PR's diff) can't fail a required
 check — same reasoning as Lighthouse CI / Playwright smoke below.

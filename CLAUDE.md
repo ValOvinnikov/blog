@@ -651,6 +651,31 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   "Scope: prefer per-layer PRs" and "PR body template" sections for the exact
   wording rule and the board-Status gotcha if an issue is auto-closed
   prematurely.
+
+- **Stacked PRs — `gh stack`, and know the CI trap.** The `github/gh-stack`
+  extension is installed; use it (`init` / `add` / `submit` / `sync`) rather
+  than hand-rolling bases with `gh pr create --base`. `sync` restacks
+  automatically when a lower PR merges, which is the step most easily
+  forgotten by hand. A stacked PR targets its predecessor rather than `main`,
+  so intermediate states never land on `main` — which **dissolves the "must
+  merge green alone" constraint above** and lets a rename-plus-consumers
+  change split per layer after all.
+
+  **But a stacked PR gets zero CI in this repo.** All seven workflows carrying
+  required checks — `ci.yml`, `knip.yml`, `dependency-review.yml`,
+  `zizmor.yml`, `actionlint.yml`, `commitlint.yml`, `hooks.yml` — each declare
+  `pull_request: branches: [main]` independently, so a PR aimed anywhere else
+  runs none of them. Only `pr-opened` and the Vercel checks report, which
+  looks plausible enough to miss, and since those jobs are _required_ status
+  checks the PR sits on `BLOCKED` forever. (CodeQL is not among them — it runs
+  from GitHub's default code-scanning setup on a schedule, not per PR.) Retargeting when the
+  base merges does **not** fix it (that fires `edited`; the workflow listens
+  for `opened`/`synchronize`/`reopened`) — close and reopen the PR to force a
+  real run, then confirm by count: ~5 checks means the stale run, ~20 means a
+  real one. Stack only when a later PR genuinely cannot compile without an
+  earlier one; independent work gets its own branch off `main` and avoids all
+  of this. Full mechanics in `open-pull-request`'s "Stacked PRs" section.
+
 - **Spec sync:** any PR that changes architecture, layer contracts, env vars,
   or the content model updates `SPEC.md` in the same PR.
 - **Design-doc retention:** a `docs/superpowers/specs/*`/`plans/*` doc is
