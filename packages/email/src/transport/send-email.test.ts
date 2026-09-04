@@ -43,6 +43,47 @@ describe('sendEmail', () => {
     });
   });
 
+  it('forwards custom headers to the Resend client when supplied', async () => {
+    sendMock.mockResolvedValue({ data: { id: 'email_1' }, error: null });
+
+    const { sendEmail } = await importSendEmail();
+    await sendEmail({
+      to: 'reader@example.com',
+      from: 'Newsletter <newsletter@resend.dev>',
+      subject: 'Latest issue',
+      html: '<p>Read the latest issue</p>',
+      headers: {
+        'List-Unsubscribe': '<https://example.com/unsubscribe>',
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+      },
+    });
+
+    expect(sendMock).toHaveBeenCalledWith({
+      to: 'reader@example.com',
+      from: 'Newsletter <newsletter@resend.dev>',
+      subject: 'Latest issue',
+      html: '<p>Read the latest issue</p>',
+      headers: {
+        'List-Unsubscribe': '<https://example.com/unsubscribe>',
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+      },
+    });
+  });
+
+  it('sends no headers when none are supplied', async () => {
+    sendMock.mockResolvedValue({ data: { id: 'email_1' }, error: null });
+
+    const { sendEmail } = await importSendEmail();
+    await sendEmail({
+      to: 'reader@example.com',
+      from: 'Sign in <onboarding@resend.dev>',
+      subject: 'Sign in to example.com',
+      html: '<p>Click to sign in</p>',
+    });
+
+    expect(sendMock.mock.calls[0]?.[0].headers).toBeUndefined();
+  });
+
   it('constructs the Resend client with the configured API key', async () => {
     sendMock.mockResolvedValue({ data: { id: 'email_1' }, error: null });
 
