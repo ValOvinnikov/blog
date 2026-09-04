@@ -38,13 +38,13 @@ describe(buildAuthConfig, () => {
   });
 
   it('uses the database session strategy', () => {
-    const config = buildAuthConfig({ sendEmail: vi.fn() });
+    const config = buildAuthConfig();
 
     expect(config.session).toEqual({ strategy: 'database' });
   });
 
   it("binds the Drizzle adapter to @blog/db's Auth.js tables", () => {
-    buildAuthConfig({ sendEmail: vi.fn() });
+    buildAuthConfig();
 
     expect(DrizzleAdapter).toHaveBeenCalledWith(expect.anything(), {
       usersTable: schema.users,
@@ -55,7 +55,7 @@ describe(buildAuthConfig, () => {
   });
 
   it('sets no cookie options', () => {
-    const config = buildAuthConfig({ sendEmail: vi.fn() });
+    const config = buildAuthConfig();
 
     expect(config.cookies).toBeUndefined();
   });
@@ -65,7 +65,7 @@ describe(buildAuthConfig, () => {
     process.env['AUTH_COOKIE_DOMAIN'] = '.example.com';
     const freshBuildAuthConfig = await importBuildAuthConfig();
 
-    const config = freshBuildAuthConfig({ sendEmail: vi.fn() });
+    const config = freshBuildAuthConfig();
 
     expect(config.cookies?.sessionToken).toEqual({
       name: '__Secure-authjs.session-token',
@@ -83,7 +83,7 @@ describe(buildAuthConfig, () => {
     process.env['AUTH_SECRET'] = 'test-secret';
     const freshBuildAuthConfig = await importBuildAuthConfig();
 
-    const config = freshBuildAuthConfig({ sendEmail: vi.fn() });
+    const config = freshBuildAuthConfig();
 
     expect(config.secret).toBe('test-secret');
   });
@@ -98,7 +98,7 @@ describe(buildAuthConfig, () => {
   }
 
   it('always includes the magic-link email provider', () => {
-    const config = buildAuthConfig({ sendEmail: vi.fn() });
+    const config = buildAuthConfig();
 
     expect(providerIdsOf(config)).toEqual(expect.arrayContaining(['email']));
   });
@@ -111,7 +111,7 @@ describe(buildAuthConfig, () => {
     process.env['AUTH_GOOGLE_SECRET'] = 'google-secret';
     const freshBuildAuthConfig = await importBuildAuthConfig();
 
-    const config = freshBuildAuthConfig({ sendEmail: vi.fn() });
+    const config = freshBuildAuthConfig();
 
     expect(providerIdsOf(config)).toEqual(
       expect.arrayContaining(['github', 'google']),
@@ -123,13 +123,13 @@ describe(buildAuthConfig, () => {
     process.env['AUTH_GITHUB_ID'] = 'github-id';
     const freshBuildAuthConfig = await importBuildAuthConfig();
 
-    const config = freshBuildAuthConfig({ sendEmail: vi.fn() });
+    const config = freshBuildAuthConfig();
 
     expect(providerIdsOf(config)).not.toContain('github');
   });
 
   it('omits GitHub and Google when neither credential pair is set', () => {
-    const config = buildAuthConfig({ sendEmail: vi.fn() });
+    const config = buildAuthConfig();
 
     expect(providerIdsOf(config)).not.toEqual(
       expect.arrayContaining(['github', 'google']),
@@ -137,13 +137,13 @@ describe(buildAuthConfig, () => {
   });
 
   it("exposes a session callback that adds the adapter user's id", () => {
-    const config = buildAuthConfig({ sendEmail: vi.fn() });
+    const config = buildAuthConfig();
 
     expect(config.callbacks?.session).toEqual(expect.any(Function));
   });
 
   it('exposes a signIn event that consumes pending membership invites', async () => {
-    const config = buildAuthConfig({ sendEmail: vi.fn() });
+    const config = buildAuthConfig();
     const user = { id: 'user-1', email: 'owner@example.com' };
 
     await config.events?.signIn?.({ user });
