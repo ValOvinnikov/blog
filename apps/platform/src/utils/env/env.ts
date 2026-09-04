@@ -84,10 +84,9 @@ export const env = createEnv({
     // API requires it as a query param in that case). Optional even when
     // VERCEL_API_TOKEN is set — a personal-account token needs no team id.
     VERCEL_TEAM_ID: z.string().min(1).optional(),
-    // MUST be byte-identical to the value `@blog/db`'s CLI scripts send as a
-    // bearer token to this app's `POST /api/internal/operator-alert` route,
-    // which compares it against its own copy and rejects a mismatch with
-    // 401. Optional: absent, the route returns 500 rather than accepting an
+    // Bearer token this app's `POST /api/internal/operator-alert` route
+    // compares an incoming request against, rejecting a mismatch with 401.
+    // Optional: absent, the route returns 500 rather than accepting an
     // unauthenticated request.
     OPERATOR_ALERT_SECRET: z.string().min(1).optional(),
     // Shared Auth.js signing secret — required for this app's session to
