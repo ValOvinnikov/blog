@@ -1,6 +1,7 @@
 import { getAllPublishedPosts } from '@blog/service/features/entities/posts/adaptor/all-published/loader';
 import { getPostsByIds } from '@blog/service/features/entities/posts/adaptor/get-by-ids/loader';
 import { getPublishedPostsByTag } from '@blog/service/features/entities/posts/adaptor/tag-scoped-published/loader';
+import { getPostTaxonomySlugs } from '@blog/service/features/entities/posts/adaptor/taxonomy-by-id/loader';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { createPostsService } from './service';
@@ -26,6 +27,13 @@ vi.mock(
   }),
 );
 
+vi.mock(
+  '@blog/service/features/entities/posts/adaptor/taxonomy-by-id/loader',
+  () => ({
+    getPostTaxonomySlugs: vi.fn(),
+  }),
+);
+
 const tenant = makeTenant();
 
 describe(createPostsService, () => {
@@ -42,6 +50,11 @@ describe(createPostsService, () => {
   it('exposes v1.getPublishedPostsByTag as a function', () => {
     const svc = createPostsService();
     expect(typeof svc.v1.getPublishedPostsByTag).toBe('function');
+  });
+
+  it('exposes v1.getPostTaxonomySlugs as a function', () => {
+    const svc = createPostsService();
+    expect(typeof svc.v1.getPostTaxonomySlugs).toBe('function');
   });
 
   it('threads tenant context through to the id-list loader', async () => {
@@ -66,5 +79,16 @@ describe(createPostsService, () => {
     await createPostsService().v1.getAllPublishedPosts(tenant);
 
     expect(getAllPublishedPosts).toHaveBeenCalledWith(tenant);
+  });
+
+  it('threads tenant context through to getPostTaxonomySlugs', async () => {
+    vi.mocked(getPostTaxonomySlugs).mockResolvedValue({
+      tagSlugs: [],
+      topicSlug: undefined,
+    });
+
+    await createPostsService().v1.getPostTaxonomySlugs('post-1', tenant);
+
+    expect(getPostTaxonomySlugs).toHaveBeenCalledWith('post-1', tenant);
   });
 });
