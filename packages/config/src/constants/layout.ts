@@ -11,6 +11,14 @@ export type TBrandVariant = TValueOf<typeof BRAND_VARIANT>;
 export type TBrandVariantOf<TKeys extends keyof typeof BRAND_VARIANT> =
   (typeof BRAND_VARIANT)[TKeys];
 
+export const FULL_BRAND_VARIANT_LIST = [
+  BRAND_VARIANT.BRAND_PRIMARY,
+  BRAND_VARIANT.PRIMARY,
+  BRAND_VARIANT.SECONDARY,
+] as const satisfies readonly TBrandVariant[];
+
+export type TFullBrandVariant = (typeof FULL_BRAND_VARIANT_LIST)[number];
+
 export const SPACING_SCALE = {
   NONE: 'NONE',
   SM: 'SM',
