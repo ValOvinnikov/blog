@@ -78,12 +78,7 @@
       // @blog/db dropped from this list (#1107): the Auth.js config
       // (`src/server/auth/auth.ts`) is now the first real
       // `import ... from '@blog/db'` in apps/web.
-      //
-      // @blog/email is scaffolded ahead of its first consumer here — the
-      // newsletter confirmation and Resend transport migrate onto it
-      // separately. Same "real dependency, no import yet" shape as
-      // prettier-plugin-tailwindcss above.
-      "ignoreDependencies": ["@svgr/webpack", "@blog/email"]
+      "ignoreDependencies": ["@svgr/webpack"]
     },
     "apps/platform": {
       // Referenced only as a Turbopack loader string (next.config.ts
