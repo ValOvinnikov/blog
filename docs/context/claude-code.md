@@ -172,7 +172,7 @@ contracts:
     would otherwise report a false green on whatever partial set did run
     (#2578); it stops and reports the conflict instead of a checks verdict.
     Once mergeable, runs `gh pr checks <n> --watch` to a terminal state,
-    sanity-checks the total count against this repo's normal ~20-22 (flagging
+    sanity-checks the total count against this repo's normal ~19-21 (flagging
     a suspiciously low one rather than silently accepting it), and reports
     pass/fail — on failure, the check name, run/job URL, and a raw
     `--log-failed` excerpt, handed back as data with no root-cause diagnosis
@@ -598,17 +598,17 @@ file` are all denied alike) — an earlier version only handled the
   alone, since the intermediate states target their predecessor rather than
   `main`.
 
-  A PR receives the full required suite whatever branch it targets. The seven
-  workflows behind the twelve required checks — `ci.yml` (Type-check, Lint,
+  A PR receives the full required suite whatever branch it targets. The six
+  workflows behind the eleven required checks — `ci.yml` (Type-check, Lint,
   Test, Build, Typegen, Migrations) plus `knip.yml`, `dependency-review.yml`,
-  `zizmor.yml`, `actionlint.yml`, `commitlint.yml` and `hooks.yml` (one each)
-  — each declare a bare `pull_request:` trigger with no `branches:` filter,
+  `zizmor.yml`, `actionlint.yml` and `hooks.yml` (one each) — each declare a
+  bare `pull_request:` trigger with no `branches:` filter,
   which is what makes stacking usable. Keep it that way: each file scopes its
   own trigger, so re-adding `branches: [main]` to any one of them drops that
   workflow's checks from every stacked PR, and because these are _required_
   checks the PR then hangs on `BLOCKED` rather than failing. That is the same
   deadlock `ci.yml`'s header comment describes when explaining why it carries
-  no `paths-ignore`. (CodeQL is not among the twelve — it runs from GitHub's
+  no `paths-ignore`. (CodeQL is not among the eleven — it runs from GitHub's
   default code-scanning setup on a schedule, not from a workflow file, and is
   enforced by a separate `code_scanning` ruleset rule rather than as a
   required status check.)

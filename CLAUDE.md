@@ -641,11 +641,13 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   lint stays report-only (never `--fix`); commit-time gates stay authoritative.
 - **Conventional commits, one concern per PR — mechanically enforced.**
   `.husky/commit-msg` runs commitlint (`commitlint.config.mjs`) on every
-  local commit; the **Commitlint** CI workflow (`commitlint.yml`) re-checks
-  the full PR commit range as a backstop. Allowed types: config-conventional's
-  defaults (`build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`,
-  `revert`, `style`, `test`) plus this repo's own `tooling`; scope is
-  free-form (component/area name) but must be lower-case. Merge commits
+  local commit — the only place this is enforced, so a commit that bypasses
+  the hook (`--no-verify`, the GitHub web UI, a clone where `pnpm install`
+  has not yet run) is not caught anywhere else. Allowed types:
+  config-conventional's defaults (`build`, `chore`, `ci`, `docs`, `feat`,
+  `fix`, `perf`, `refactor`, `revert`, `style`, `test`) plus this repo's own
+  `tooling`; scope is free-form (component/area name) but must be
+  lower-case. Merge commits
   (local or `Merge pull request #…`) are explicitly skipped; Dependabot's
   `chore(deps): …` messages are not separately exempted — they pass because
   they're already conventional.
@@ -673,9 +675,9 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   change split per layer after all.
 
   **A stacked PR runs the full required suite, and that is load-bearing.**
-  All seven workflows carrying required checks — `ci.yml`, `knip.yml`,
-  `dependency-review.yml`, `zizmor.yml`, `actionlint.yml`, `commitlint.yml`,
-  `hooks.yml` — declare their `pull_request:` trigger with no `branches:`
+  All six workflows carrying required checks — `ci.yml`, `knip.yml`,
+  `dependency-review.yml`, `zizmor.yml`, `actionlint.yml`, `hooks.yml` —
+  declare their `pull_request:` trigger with no `branches:`
   filter, so a PR reports its checks whatever it is based on. Keep it that
   way: each file scopes its own trigger, so re-adding `branches: [main]` to
   any one of them silently removes that workflow's checks from every stacked
@@ -874,9 +876,8 @@ pnpm test && pnpm knip`), assuming the reader has only the ticket. Add
   plausibly break; `knip` is unconditional because any new exported symbol
   in any workspace can trip it. The rest of CI stays out of reach on
   purpose: `build` is CI-only by the rule above, typegen drift needs
-  `pnpm typegen` (orchestrator-only, it mutates generated files),
-  commitlint is already enforced by the `commit-msg` hook, actionlint /
-  zizmor / shellcheck only fire on workflow or shell changes a `cloud-ok`
+  `pnpm typegen` (orchestrator-only, it mutates generated files), actionlint
+  / zizmor / shellcheck only fire on workflow or shell changes a `cloud-ok`
   ticket shouldn't contain, and CodeQL / Dependency Review / Document
   validation / Migrations / Vercel cannot run locally at all. That
   irreducible tail is why a local session still owns the CI tail after a
