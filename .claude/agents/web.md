@@ -307,10 +307,12 @@ for the live surface). Route inventory (built + planned; see SPEC.md §1):
   rendered through `src/modules/` (`HeroModule` + `ModuleRenderer`).
 - `/blog` — built; post list via `service.pages.blog.v1`, pagination at
   `/blog/page/[page]`.
-- `/blog/[slug]` — `service.pages.post.v1.getPost`; `generateStaticParams`
-  from the params slice; body rendered through the **web-owned**
-  `PortableTextRenderer` (maps Portable Text blocks to `@blog/ui` components,
-  incl. code blocks). Add JSON-LD `BlogPosting` and `generateMetadata`.
+- `/blog/[slug]` — `service.pages.post.v1.getPost`; rendered on demand, with no
+  `generateStaticParams` (content routes read the per-request tenant via
+  `headers()`, so they cannot prerender); body rendered through the
+  **web-owned** `PortableTextRenderer` (maps Portable Text blocks to
+  `@blog/ui` components, incl. code blocks). Add JSON-LD `BlogPosting` and
+  `generateMetadata`.
 - `/category/[slug]` — `service.pages.category.v1`.
 - `/[slug]` — standalone `page_generic` documents; the modules[] page-builder
   data layer is live (`service.pages.generic.v1`, `service.modules.*`).
