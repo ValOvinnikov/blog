@@ -231,10 +231,11 @@ incrementally (#251).
 Every `module_*` document also carries a **required** `brandVariant` field
 (stored values from `@blog/config`'s `BRAND_VARIANT` const —
 `PRIMARY`/`SECONDARY` for `module_content`/`module_newsletter`/
-`module_postList`/`module_postLatest`/`module_taxonomyList`; `module_hero`
-and `module_cta` additionally allow `BRAND_PRIMARY` — on `module_cta` this
-field means the card's own fill tone (Banner/Split/Callout below), not the
-full-bleed band tone every other module uses it for), plus an optional, all-remaining-fields-optional `layout`
+`module_postLatest`/`module_taxonomyList`; `module_hero`, `module_cta` and
+`module_postList` additionally allow `BRAND_PRIMARY` — on `module_cta` this
+field means the card's own fill tone (Banner/Split/Callout below) rather
+than the full-bleed band tone every other module uses it for, which that
+module carries as a separate `bandTone` field), plus an optional, all-remaining-fields-optional `layout`
 object (`spacingTop`/`spacingBottom`, `containerWidth` (not on
 `module_hero`, which uses the leaner `heroLayout` type), `dividerTop`,
 `dividerBottom` — stored values from `SPACING_SCALE`/`CONTAINER_WIDTH`
@@ -252,7 +253,13 @@ structured heading field would just be a second way to do the same thing.
 own dedicated schema, unrelated to this shared shape.
 
 `module_cta` additionally carries a required `variant` (`BANNER`/`SPLIT`/
-`CALLOUT`, from `CTA_VARIANT`, default `CALLOUT`), an optional `eyebrow`,
+`CALLOUT`, from `CTA_VARIANT`, default `CALLOUT`), a required `bandTone`
+(the section band behind the card — same three `BRAND_VARIANT` values its
+`brandVariant` offers, defaulting to `PRIMARY` against `brandVariant`'s
+`SECONDARY` so the two contrast out of the box; hidden for `BANNER`, whose
+full-bleed image covers the section entirely, and carrying a non-blocking
+warning when it equals `brandVariant`, since a matching band and card is
+occasionally deliberate), an optional `eyebrow`,
 an optional `content` (`basicText` — a constrained Portable Text block:
 paragraphs, bullet/numbered lists, bold/italic, and `link` annotations
 only, no headings/images/code/asides — distinct from the fuller `richText`
@@ -308,17 +315,19 @@ landmark with no accessible-name fallback rather than pointing at an element
 that never renders.
 
 `module_cta` is the one deliberate exception to "passing `brandVariant`
-straight through": `cta-module-view.tsx` pins `Section` to `PRIMARY`
-regardless of the authored value, and passes the authored `brandVariant` to
-`CtaModule` as its own `tone` instead — the card's fill (Split/Callout) or
-overlay-scrim tint (Banner), painted by `CtaModule` itself rather than by
-`Section`. For `BANNER`, `CtaModule` additionally breaks out of `Section`'s
+straight through", because it authors the two tones separately:
+`cta-module-view.tsx` gives `Section` the authored `bandTone` as the
+full-bleed band, and passes `brandVariant` to `CtaModule` as its own `tone`
+— the card's fill (Split/Callout) or overlay-scrim tint (Banner), painted
+by `CtaModule` itself rather than by `Section`. For `BANNER`, `CtaModule`
+additionally breaks out of `Section`'s
 always-constrained inner `<div>` (no `containerWidth` option removes its
 max-width) via a CSS technique independent of `Section`'s own padding
-values, rendering genuinely full-bleed; `SPLIT`/`CALLOUT` stay bounded,
+values, rendering genuinely full-bleed — which is why `bandTone` is hidden
+for that variant; `SPLIT`/`CALLOUT` stay bounded,
 rounded cards inside `Section`'s inner container like every other module's
-organism. `Section` itself is unmodified either way — the exception lives
-entirely in how `CtaModule` uses the space `Section` gives it.
+organism. `Section` itself is unmodified either way — what differs is only
+how `CtaModule` uses the space `Section` gives it.
 
 **Theme-as-content** (Phase 2 of the configurability epic, #1285/#1287,
 storage cut over to Postgres by the config-to-Postgres transition's E5): a
