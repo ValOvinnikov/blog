@@ -8,15 +8,17 @@ export const buttonVariants = tv({
     'rounded-[9px] border font-medium no-underline',
     'cursor-pointer',
     'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-[.45]',
+    'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
   ],
   variants: {
     variant: {
       primary: 'border-admin-brand bg-admin-brand text-white shadow-admin',
       secondary:
-        'border-admin-line bg-admin-surface text-admin-text shadow-admin hover:bg-admin-surface-2',
+        'border-admin-control-line bg-admin-surface text-admin-text shadow-admin hover:bg-admin-surface-2',
       ghost:
         'border-transparent bg-transparent text-admin-text hover:bg-admin-line-2',
-      danger: 'border-[#f2c9c5] bg-admin-bad-weak text-admin-bad shadow-admin',
+      danger:
+        'border-admin-bad-line bg-admin-bad-weak text-admin-bad shadow-admin',
     },
     size: {
       [SIZE.SM]: 'px-[9px] py-[5px] text-[12px]',
