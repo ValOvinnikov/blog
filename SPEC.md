@@ -758,7 +758,7 @@ epics #1039–#1044), built on the new `@blog/db` layer (§3, §4, §8).
 ## 17. Observability & logging
 
 The logger core is `@blog/insight` (`createLogger`, `LOG_LEVEL`) — a
-zero-dependency package at the base of the graph alongside `config`/`utils`.
+zero-dependency package at the base of the graph alongside `utils`.
 Each app owns **one** shared logger at `src/utils/logger/logger.ts`
 (`createLogger({ service: 'web' | 'admin' })`) and imports it; modules never
 call `createLogger` themselves, because the `service` field is what separates

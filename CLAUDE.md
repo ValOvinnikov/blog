@@ -82,7 +82,7 @@ graph is acyclic
   `.claude/agents/studio.md`.
 - `@blog/insight` (`packages/insight`) holds the structured logger core —
   `createLogger`, `LOG_LEVEL`, and `sanitizeLogMessage`. Sits at the base of
-  the dependency graph alongside `config`/`utils` — depends on nothing.
+  the dependency graph alongside `utils` — depends on nothing.
   `sanitizeLogMessage` is `@blog/insight`'s sole canonical implementation —
   `@blog/utils`'s former copy was removed once every call site migrated onto
   this package instead. Both apps consume it: `apps/web` and `apps/platform` each expose one
@@ -212,7 +212,7 @@ real components. See `.claude/agents/platform-app.md`.
 
 `insight` (`packages/insight`, the structured logger core — `createLogger`,
 `LOG_LEVEL`, and `sanitizeLogMessage`, its sole canonical implementation) is
-**independent, like `config`/`utils`** — depends on nothing, not a step in
+**independent, like `utils`** — depends on nothing, not a step in
 any chain. Both apps consume it through their own shared logger module, so
 dispatch `insight` only for changes to the logger core itself — a change to
 how an app _uses_ the logger belongs to `web`/`platform-app`. See
