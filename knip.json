@@ -96,12 +96,7 @@
       // import graph can't see a bare string naming a package. Strict pnpm
       // (no hoisting) still requires it as a real apps/platform devDependency so
       // Turbopack can resolve it.
-      //
-      // @blog/email is scaffolded ahead of its first consumer here — the
-      // Resend transport migrates onto it separately. Same "real
-      // dependency, no import yet" shape as prettier-plugin-tailwindcss
-      // above.
-      "ignoreDependencies": ["@svgr/webpack", "@blog/email"],
+      "ignoreDependencies": ["@svgr/webpack"],
       // next-intl navigation helpers (Link/usePathname), scaffolded to
       // mirror apps/web's i18n/navigation.ts but not yet consumed by any
       // component. Mark it an entry so its exports aren't reported unused;
