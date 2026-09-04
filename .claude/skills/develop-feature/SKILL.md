@@ -373,6 +373,50 @@ issue #410 share the main checkout's `node_modules` (~80 MB each instead of
 `git worktree list` and hold branches. A subagent cannot do this itself — it
 cannot remove the worktree it is standing in.
 
+### First: is this session itself inside a worktree?
+
+If you ran `EnterWorktree` — every background job does, before its first edit
+— **you cannot perform any of this step from where you are standing**, and
+finding that out one refused command at a time wastes a lot of context. The
+isolation guard refuses anything whose working directory resolves back to the
+shared checkout, which is every command below:
+
+```
+git -C <other worktree> status --porcelain
+> ...this command redirects git to the shared checkout via -C. Refusing to run it.
+git worktree remove <path>
+> This session is isolated in the worktree `...`, but this command's working
+> directory resolved to the shared checkout. Refusing to run it.
+```
+
+This is a **different** protection from the lock-file check further down —
+that one refuses `git worktree remove` on a path another job still owns
+(#669); this one refuses the command before it gets that far, on the basis of
+where its working directory resolves. Both are doing their job here. There is
+no in-place workaround, and inventing one — a wrapper script, a `cd` that
+hides the target, disabling the sandbox — is out of bounds. On top of it, you
+cannot remove your **own** feature worktree while standing in it whatever the
+permissions say.
+
+**The sequence is exit-then-clean:**
+
+1. Finish the work: commit, push (Gate 6), and let CI settle. Until the branch
+   is on the remote, nothing here is safe to delete anyway — that is the same
+   safety condition the rest of this step is built on.
+2. Call `ExitWorktree` with `action: "keep"`. The session's working directory
+   returns to the shared checkout. Use `keep`, not `remove` — `remove` would
+   also delete the branch, and the removal below is the checked path.
+3. Run this step exactly as written. Every command now resolves normally,
+   including `git worktree remove` on your own feature worktree, which is
+   only possible from outside it.
+
+**If the job has to end before the push** — work still in flight, a Gate 5a
+fix outstanding, the session interrupted — then do not clean up at all.
+Report the exact worktree and scratchpad paths this session created in the
+final message instead. A later non-isolated session sweeps them under the same
+three ownership checks; an uncleaned worktree is a nuisance, a wrongly-deleted
+one is lost work.
+
 ### Only your own worktrees — never enumerate `git worktree list`
 
 **This machine runs several Claude sessions at once, each with its own

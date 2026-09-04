@@ -69,7 +69,7 @@ share one counter and are not interchangeable).
 
    A conflicted PR has no merge ref, so GitHub cannot build the
    `pull_request`-triggered workflows that carry most of this repo's required
-   checks (Build, Lint, Test, Type-check, Typegen, Commitlint, and more) —
+   checks (Build, Lint, Test, Type-check, Typegen, Knip, and more) —
    only checks with a different trigger type (CodeQL, Vercel) still report.
    `gh pr checks --watch` has no way to tell you that; it just shows whatever
    ran and calls it done. If `mergeable` is `CONFLICTING`, **stop here and do
@@ -103,7 +103,7 @@ share one counter and are not interchangeable).
    orchestrator's own turn.
 
 3. **All green — but count before declaring victory.** A normal PR in this
-   repo gets on the order of 20-22 checks. If the total that just ran is
+   repo gets on the order of 19-21 checks. If the total that just ran is
    suspiciously low (under ~15), say so explicitly in your report instead of
    just "all green" — a short list can mean a genuinely small, correctly
    path-filtered run, but it can also mean most of the suite silently never
@@ -150,7 +150,7 @@ report it standalone — you still watched the checks and have a real verdict.
 
 **All green, suspiciously low count (step 3):**
 
-> `6/6 checks passed — this is well under this repo's normal ~20-22; confirm
+> `6/6 checks passed — this is well under this repo's normal ~19-21; confirm
 the PR is actually mergeable before treating this as a clean run.` — same
 > one-line shape, with the count flagged instead of silently accepted.
 

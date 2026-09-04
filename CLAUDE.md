@@ -297,6 +297,17 @@ orchestrator resumes on its completion notification and dispatches `reviewer`
 then, same ordering as a synchronous wait would have given, without blocking
 the ability to respond to the user in the meantime.
 
+**`board-keeper` needs no `isolation` argument on the dispatch** — it carries
+`isolation: worktree` in its own frontmatter, and that line is load-bearing
+rather than decoration for an agent that never edits a file. A
+worktree-isolated session (any background job that ran `EnterWorktree`)
+refuses every command whose working directory resolves back to the shared
+checkout, which is exactly where a non-isolated subagent's Bash lands — so
+without it the dispatch returns having made zero board writes, and Gate 0 has
+to be done by hand. Full rationale in `.claude/agents/board-keeper.md`'s "Why
+this agent carries `isolation: worktree`" section; don't "simplify" the
+frontmatter by dropping it.
+
 **How completion is detected — no polling, no synchronous wait.** The
 orchestrator never needs to block on a background dispatch to learn its
 result, and must never invent one (sleeping, re-dispatching the same check
@@ -630,11 +641,13 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   lint stays report-only (never `--fix`); commit-time gates stay authoritative.
 - **Conventional commits, one concern per PR — mechanically enforced.**
   `.husky/commit-msg` runs commitlint (`commitlint.config.mjs`) on every
-  local commit; the **Commitlint** CI workflow (`commitlint.yml`) re-checks
-  the full PR commit range as a backstop. Allowed types: config-conventional's
-  defaults (`build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`,
-  `revert`, `style`, `test`) plus this repo's own `tooling`; scope is
-  free-form (component/area name) but must be lower-case. Merge commits
+  local commit — the only place this is enforced, so a commit that bypasses
+  the hook (`--no-verify`, the GitHub web UI, a clone where `pnpm install`
+  has not yet run) is not caught anywhere else. Allowed types:
+  config-conventional's defaults (`build`, `chore`, `ci`, `docs`, `feat`,
+  `fix`, `perf`, `refactor`, `revert`, `style`, `test`) plus this repo's own
+  `tooling`; scope is free-form (component/area name) but must be
+  lower-case. Merge commits
   (local or `Merge pull request #…`) are explicitly skipped; Dependabot's
   `chore(deps): …` messages are not separately exempted — they pass because
   they're already conventional.
@@ -652,7 +665,7 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   wording rule and the board-Status gotcha if an issue is auto-closed
   prematurely.
 
-- **Stacked PRs — `gh stack`, and know the CI trap.** The `github/gh-stack`
+- **Stacked PRs — use `gh stack`.** The `github/gh-stack`
   extension is installed; use it (`init` / `add` / `submit` / `sync`) rather
   than hand-rolling bases with `gh pr create --base`. `sync` restacks
   automatically when a lower PR merges, which is the step most easily
@@ -661,20 +674,18 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   merge green alone" constraint above** and lets a rename-plus-consumers
   change split per layer after all.
 
-  **But a stacked PR gets zero CI in this repo.** All seven workflows carrying
-  required checks — `ci.yml`, `knip.yml`, `dependency-review.yml`,
-  `zizmor.yml`, `actionlint.yml`, `commitlint.yml`, `hooks.yml` — each declare
-  `pull_request: branches: [main]` independently, so a PR aimed anywhere else
-  runs none of them. Only `pr-opened` and the Vercel checks report, which
-  looks plausible enough to miss, and since those jobs are _required_ status
-  checks the PR sits on `BLOCKED` forever. (CodeQL is not among them — it runs
-  from GitHub's default code-scanning setup on a schedule, not per PR.) Retargeting when the
-  base merges does **not** fix it (that fires `edited`; the workflow listens
-  for `opened`/`synchronize`/`reopened`) — close and reopen the PR to force a
-  real run, then confirm by count: ~5 checks means the stale run, ~20 means a
-  real one. Stack only when a later PR genuinely cannot compile without an
-  earlier one; independent work gets its own branch off `main` and avoids all
-  of this. Full mechanics in `open-pull-request`'s "Stacked PRs" section.
+  **A stacked PR runs the full required suite, and that is load-bearing.**
+  All six workflows carrying required checks — `ci.yml`, `knip.yml`,
+  `dependency-review.yml`, `zizmor.yml`, `actionlint.yml`, `hooks.yml` —
+  declare their `pull_request:` trigger with no `branches:`
+  filter, so a PR reports its checks whatever it is based on. Keep it that
+  way: each file scopes its own trigger, so re-adding `branches: [main]` to
+  any one of them silently removes that workflow's checks from every stacked
+  PR, and a _required_ check that never starts leaves the PR `BLOCKED`
+  forever instead of failing it. Stack only when a later PR genuinely cannot
+  compile without an earlier one; independent work gets its own branch off
+  `main` and avoids the restacking entirely. Full mechanics in
+  `open-pull-request`'s "Stacked PRs" section.
 
 - **Spec sync:** any PR that changes architecture, layer contracts, env vars,
   or the content model updates `SPEC.md` in the same PR.
@@ -752,6 +763,19 @@ tree` is that guard working, so never answer it with `-f -f` or
    created. Parallel jobs share that tree too, and unlike a worktree a
    scratchpad has **no lock file**: a wildcard `rm -rf` destroys another
    running job's in-flight buffer with no error and no warning.
+
+   **If this session is itself worktree-isolated, exit the worktree first —
+   none of the above can run from inside it.** A session that ran
+   `EnterWorktree` has every `git -C <other worktree>` and
+   `git worktree remove` refused, because both resolve to the shared
+   checkout; it also cannot remove its _own_ feature worktree while standing
+   in it. Once the branch is pushed and CI has settled, call `ExitWorktree`
+   with `action: "keep"` — the working directory returns to the shared
+   checkout and this whole step then runs unchanged, own worktree included.
+   If the job has to end before the push, do **not** clean up: report the
+   exact worktree and scratchpad paths it created, and the next non-isolated
+   session sweeps them under the same ownership checks. The refusal is the
+   guard working — never route around it.
 
 **Broad instructions ("go ahead", "keep going", "pick the next issue") authorize the work and commits — never the push or PR.** Those two gates always require fresh, explicit confirmation.
 
@@ -852,9 +876,8 @@ pnpm test && pnpm knip`), assuming the reader has only the ticket. Add
   plausibly break; `knip` is unconditional because any new exported symbol
   in any workspace can trip it. The rest of CI stays out of reach on
   purpose: `build` is CI-only by the rule above, typegen drift needs
-  `pnpm typegen` (orchestrator-only, it mutates generated files),
-  commitlint is already enforced by the `commit-msg` hook, actionlint /
-  zizmor / shellcheck only fire on workflow or shell changes a `cloud-ok`
+  `pnpm typegen` (orchestrator-only, it mutates generated files), actionlint
+  / zizmor / shellcheck only fire on workflow or shell changes a `cloud-ok`
   ticket shouldn't contain, and CodeQL / Dependency Review / Document
   validation / Migrations / Vercel cannot run locally at all. That
   irreducible tail is why a local session still owns the CI tail after a

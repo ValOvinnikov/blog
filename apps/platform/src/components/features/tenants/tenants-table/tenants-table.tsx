@@ -89,7 +89,7 @@ export const TenantsTable = ({ tenants }: TTenantsTableProps) => {
               <td className={cell()}>
                 <LinkButton
                   href={manageHrefFor(tenant)}
-                  variant="ghost"
+                  variant="secondary"
                   size={SIZE.SM}
                   ariaLabel={t('manageAriaLabel', { tenantName: tenant.name })}
                   hasArrow={true}

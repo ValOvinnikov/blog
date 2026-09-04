@@ -36,16 +36,17 @@ concurrency:
 
 env:
   PNPM_VERSION: 11.21.0
-  NODE_VERSION: '22'
+  NODE_VERSION: '24'
 
 jobs:
   recheck:
     name: Recheck tenant owners
     runs-on: ubuntu-latest
     # Lighter work per tenant than Provision Tenant (one ACL read plus, at
-    # most, one role grant, no Sanity project creation or Vercel work) — 10
-    # minutes is ample even for a large tenant count.
-    timeout-minutes: 10
+    # most, one role grant, no Sanity project creation or Vercel work), so this
+    # sits at the floor every dependency-installing job gets rather than the
+    # larger budget the provisioning jobs need.
+    timeout-minutes: 15
     # Bound to the dispatch input rather than hardcoded: a run dispatched for
     # `development` must resolve every credential (including the tenant
     # registry connection string below) from the `development` GitHub
