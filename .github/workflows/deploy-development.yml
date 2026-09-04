@@ -1,5 +1,10 @@
 name: Deploy Development
 
+# TEMPORARY (2026-09-04) — READ FIRST: the `push` trigger is commented out, so
+# NOTHING below runs on merge. The paragraph that follows describes the normal,
+# currently-suspended behaviour. See the block above `on:` for why and how to
+# restore it (#2648).
+#
 # The dev web app and dev admin panel deploy from here on merge to `main` — but
 # only the app(s) whose turbo graph the merge actually touched (see the `changes`
 # job), and ONLY after the `verify` gate (type-check/lint/test/build on the
@@ -11,9 +16,24 @@ name: Deploy Development
 # deploys pre-merge or ungated — every dev deploy goes through this workflow.
 # Mirrors deploy-production.yml, which deploys both apps unconditionally (a tag
 # is a deliberate full release).
+#
+# TEMPORARY (2026-09-04): automatic deploy-on-merge is disabled to stay inside
+# the Vercel metered-usage allowance during a low-development stretch. Dev
+# deploys are manual — run this workflow from the Actions tab, or
+# `gh workflow run deploy-development.yml`.
+#
+# Re-enable by uncommenting the `push:` trigger below. Do NOT instead leave the
+# trigger active and skip the deploy jobs with an `if:` guard: the `changes` job
+# anchors to the head_sha of the last SUCCESSFUL run of this workflow, so a run
+# that succeeds with its deploys skipped advances the anchor past commits that
+# were never deployed, and the next real run silently skips them. Not running at
+# all leaves the anchor parked, which is what makes a later manual run cover
+# every commit since.
+#
+# TODO(#2648): restore automatic deploy-on-merge.
 on:
-  push:
-    branches: [main]
+  # push:
+  #   branches: [main]
   workflow_dispatch:
 
 permissions:
