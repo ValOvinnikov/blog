@@ -49,10 +49,10 @@ rename-plus-consumers change _can_ be split per layer as long as the whole
 stack merges in order.
 
 **A stacked PR gets the full required suite, and the triggers must stay that
-way.** The seven workflows behind the twelve required checks — `ci.yml`
+way.** The six workflows behind the eleven required checks — `ci.yml`
 (Type-check, Lint, Test, Build, Typegen, Migrations) plus `knip.yml`,
-`dependency-review.yml`, `zizmor.yml`, `actionlint.yml`, `commitlint.yml` and
-`hooks.yml` (one each) — declare a bare `pull_request:` trigger with no
+`dependency-review.yml`, `zizmor.yml`, `actionlint.yml` and `hooks.yml`
+(one each) — declare a bare `pull_request:` trigger with no
 `branches:` filter, so they run whatever branch the PR targets.
 
 **Do not re-add a `branches:` filter to any of them.** Each file scopes its
@@ -64,7 +64,7 @@ deadlock `ci.yml`'s header comment describes when it explains why the workflow
 carries no `paths-ignore`; a base-branch filter reaches it through a different
 door. Both filters are absent on purpose, and each file's header says so.
 
-(CodeQL is not among the twelve: it runs from GitHub's default code-scanning
+(CodeQL is not among the eleven: it runs from GitHub's default code-scanning
 setup on a schedule, with no workflow file in `.github/workflows/`, and is
 enforced by a separate `code_scanning` ruleset rule rather than as a required
 status check.)
