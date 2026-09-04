@@ -1,21 +1,25 @@
-import { PRESET_ID, PRESET_REGISTRY } from '@blog/config';
-import { wcagContrastRatio } from '@blog/utils';
+import {
+  isAccentHueAccessible,
+  PRESET_ID,
+  PRESET_REGISTRY,
+} from '@blog/config';
 
 import { toThemeTokens } from './to-theme-tokens';
 
-// The real contrast math is covered by @blog/utils's own oklch.test.ts;
-// mocked here so one test below can force the AA-fallback branch.
-vi.mock('@blog/utils', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/utils')>()),
-  wcagContrastRatio: vi.fn(),
+// The guard itself is covered by @blog/config's own accent-hue-guard.test.ts;
+// mocked here so one test below can force the AA-fallback branch without
+// depending on which hues happen to pass or fail the real contrast math.
+vi.mock('@blog/config', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@blog/config')>()),
+  isAccentHueAccessible: vi.fn(),
 }));
 
-const mockedWcagContrastRatio = vi.mocked(wcagContrastRatio);
+const mockedIsAccentHueAccessible = vi.mocked(isAccentHueAccessible);
 
 beforeEach(async () => {
   const actual =
-    await vi.importActual<typeof import('@blog/utils')>('@blog/utils');
-  mockedWcagContrastRatio.mockImplementation(actual.wcagContrastRatio);
+    await vi.importActual<typeof import('@blog/config')>('@blog/config');
+  mockedIsAccentHueAccessible.mockImplementation(actual.isAccentHueAccessible);
 });
 
 describe(toThemeTokens, () => {
@@ -59,7 +63,7 @@ describe(toThemeTokens, () => {
   });
 
   it('falls back to the preset accentHue when the row accentHue fails the AA guard', () => {
-    mockedWcagContrastRatio.mockReturnValue(1);
+    mockedIsAccentHueAccessible.mockReturnValue(false);
 
     const result = toThemeTokens({
       preset: PRESET_ID.EDITORIAL,
