@@ -48,7 +48,9 @@ export type Module_cta = {
   sectionHeader?: RequiredHeadingSectionHeader;
   content?: BasicText;
   image?: ImageWithAlt;
-  imageSide?: 'LEFT' | 'RIGHT';
+  contentPositionSplit?: 'LEFT' | 'RIGHT';
+  contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   mobileMediaOrder?: 'LAST' | 'FIRST';
   actions?: ActionGroup;
   footnote?: string;

@@ -1,9 +1,8 @@
 import {
   BRAND_VARIANT,
-  CTA_IMAGE_SIDE,
+  CTA_ALIGNMENT,
   CTA_MOBILE_MEDIA_ORDER,
   CTA_VARIANT,
-  HEADING_ALIGN,
 } from '@blog/config';
 import { Button } from '@blog/ui/atoms/button';
 import { objectKeys } from '@blog/utils/primitives';
@@ -53,13 +52,13 @@ const meta = {
       control: 'select',
       options: objectKeys(ctaModuleVariants.variants.tone),
     },
-    align: {
+    contentPosition: {
       control: 'select',
-      options: objectKeys(ctaModuleVariants.variants.align),
+      options: objectKeys(ctaModuleVariants.variants.position),
     },
-    imageSide: {
+    contentAlignment: {
       control: 'select',
-      options: objectKeys(ctaModuleVariants.variants.imageSide),
+      options: objectKeys(ctaModuleVariants.variants.alignment),
     },
     mobileMediaOrder: {
       control: 'select',
@@ -139,7 +138,7 @@ export const SplitImageLeft: TStory = {
   args: {
     ...SplitDefault.args,
     tone: BRAND_VARIANT.SECONDARY,
-    imageSide: CTA_IMAGE_SIDE.LEFT,
+    contentPosition: CTA_ALIGNMENT.RIGHT,
     eyebrow: 'Membership',
     heading: 'Support independent writing',
     content: undefined,
@@ -162,7 +161,8 @@ export const BannerDefault: TStory = {
   args: {
     variant: CTA_VARIANT.BANNER,
     tone: BRAND_VARIANT.BRAND_PRIMARY,
-    align: HEADING_ALIGN.LEFT,
+    contentPosition: CTA_ALIGNMENT.LEFT,
+    contentAlignment: CTA_ALIGNMENT.LEFT,
     eyebrow: 'Get the book',
     heading: 'The whole system, on paper',
     supportingText:
@@ -177,7 +177,8 @@ export const BannerNeutralTint: TStory = {
   args: {
     ...BannerDefault.args,
     tone: BRAND_VARIANT.PRIMARY,
-    align: HEADING_ALIGN.CENTER,
+    contentPosition: CTA_ALIGNMENT.CENTER,
+    contentAlignment: CTA_ALIGNMENT.CENTER,
     eyebrow: undefined,
     heading: 'Join 12,000 readers',
     supportingText:
@@ -191,7 +192,8 @@ export const BannerAlignRight: TStory = {
   args: {
     ...BannerDefault.args,
     tone: BRAND_VARIANT.SECONDARY,
-    align: HEADING_ALIGN.RIGHT,
+    contentPosition: CTA_ALIGNMENT.RIGHT,
+    contentAlignment: CTA_ALIGNMENT.RIGHT,
     eyebrow: 'Workshop',
     heading: 'Two days, one craft',
     supportingText:

@@ -1,15 +1,13 @@
 import {
-  CTA_IMAGE_SIDE,
+  CTA_ALIGNMENT,
   CTA_MOBILE_MEDIA_ORDER,
   CTA_VARIANT,
-  HEADING_ALIGN,
   type IWithClassName,
   type IWithDataTestId,
   type TBrandVariant,
-  type TCtaImageSide,
+  type TCtaAlignment,
   type TCtaMobileMediaOrder,
   type TCtaVariant,
-  type THeadingAlign,
 } from '@blog/config';
 import { Eyebrow } from '@blog/ui/atoms/eyebrow';
 import { Heading } from '@blog/ui/atoms/heading';
@@ -37,10 +35,10 @@ export type TCtaModuleProps = IWithClassName &
     /** Pre-rendered action buttons/links, built by the web layer — a plain slot. */
     actions?: ReactNode;
     footnote?: string;
-    /** Banner and Callout only; Split ignores this and lays content out in its own grid cell. */
-    align?: THeadingAlign;
-    /** Split only. Defaults to `RIGHT`. */
-    imageSide?: TCtaImageSide;
+    /** Where the content block sits relative to the image — not applicable on Callout. */
+    contentPosition?: TCtaAlignment;
+    /** How text and actions align within the content block, on all three variants. */
+    contentAlignment?: TCtaAlignment;
     /** Split only. Defaults to `LAST` (image collapses below content on mobile). */
     mobileMediaOrder?: TCtaMobileMediaOrder;
     /**
@@ -54,7 +52,7 @@ export type TCtaModuleProps = IWithClassName &
  * CtaModule — page-builder organism rendering a call-to-action in one of
  * three layouts. `content`/`image`/`actions` are pre-rendered nodes the web
  * layer builds; this component never constructs a link or image itself. DOM
- * order is always heading/text/actions before the image — `imageSide`/
+ * order is always heading/text/actions before the image — `contentPosition`/
  * `mobileMediaOrder` only change the visual position via CSS.
  */
 export const CtaModule = ({
@@ -68,8 +66,8 @@ export const CtaModule = ({
   image,
   actions,
   footnote,
-  align,
-  imageSide,
+  contentPosition,
+  contentAlignment,
   mobileMediaOrder,
   isWrapped,
   className,
@@ -77,15 +75,20 @@ export const CtaModule = ({
 }: TCtaModuleProps) => {
   const isSplit = variant === CTA_VARIANT.SPLIT;
   const isBanner = variant === CTA_VARIANT.BANNER;
-  const resolvedAlign = isSplit
+  const isCallout = variant === CTA_VARIANT.CALLOUT;
+  const resolvedPosition = isCallout
     ? undefined
-    : (align ?? (isBanner ? HEADING_ALIGN.LEFT : HEADING_ALIGN.CENTER));
+    : (contentPosition ?? CTA_ALIGNMENT.LEFT);
+  const resolvedAlignment = isSplit
+    ? contentAlignment
+    : (contentAlignment ??
+      (isBanner ? CTA_ALIGNMENT.LEFT : CTA_ALIGNMENT.CENTER));
 
   const s = ctaModuleVariants({
     variant,
     tone,
-    align: resolvedAlign,
-    imageSide: isSplit ? (imageSide ?? CTA_IMAGE_SIDE.RIGHT) : undefined,
+    position: resolvedPosition,
+    alignment: resolvedAlignment,
     mobileMediaOrder: isSplit
       ? (mobileMediaOrder ?? CTA_MOBILE_MEDIA_ORDER.LAST)
       : undefined,

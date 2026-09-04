@@ -1,4 +1,10 @@
-import { LINK_TYPE, type BasicText, type TMaybeUndefined } from '@blog/config';
+import {
+  CTA_VARIANT,
+  LINK_TYPE,
+  type BasicText,
+  type TCtaAlignment,
+  type TMaybeUndefined,
+} from '@blog/config';
 import type { TImageTenant } from '@blog/service/sanity/image';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import {
@@ -58,6 +64,17 @@ function toContent(raw: TRawCtaModule['content']): TMaybeUndefined<BasicText> {
   return raw.map(toContentBlock);
 }
 
+function toContentPosition(raw: TRawCtaModule): TMaybeUndefined<TCtaAlignment> {
+  switch (raw.variant) {
+    case CTA_VARIANT.SPLIT:
+      return raw.contentPositionSplit ?? undefined;
+    case CTA_VARIANT.BANNER:
+      return raw.contentPositionBanner ?? undefined;
+    case CTA_VARIANT.CALLOUT:
+      return undefined;
+  }
+}
+
 function toCtaAction(raw: TRawCtaAction): TCtaAction | undefined {
   const link = toLink(raw.link);
   if (!link) return undefined;
@@ -90,7 +107,8 @@ export function toCtaModule(
     sectionHeader: toRequiredSectionHeader(raw.sectionHeader),
     content: toContent(raw.content),
     image: toSanityImage(raw.image, tenant),
-    imageSide: raw.imageSide ?? undefined,
+    contentPosition: toContentPosition(raw),
+    contentAlignment: raw.contentAlignment ?? undefined,
     mobileMediaOrder: raw.mobileMediaOrder ?? undefined,
     actions: toCtaActions(raw.actions),
     footnote: raw.footnote ?? undefined,

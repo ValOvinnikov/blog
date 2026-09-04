@@ -266,13 +266,38 @@ paragraphs, bullet/numbered lists, bold/italic, and `link` annotations
 only, no headings/images/code/asides — distinct from the fuller `richText`
 used elsewhere), an optional `image` (`imageWithAlt`, required for
 `BANNER`/`SPLIT` via a custom validator, since Sanity can't make
-`.required()` conditional on a sibling field), `imageSide`/
-`mobileMediaOrder` (Split only), an optional `actions` (`actionGroup` — a
+`.required()` conditional on a sibling field), two independent alignment
+axes (below), `mobileMediaOrder` (Split only), an optional `actions` (`actionGroup` — a
 reusable object under `objects/blocks/`, not CTA-specific: an `actions`
 array of `ctaAction` items, each with its own `variant` (`PRIMARY`/
 `SECONDARY`) and `appearance` (`CONTAINED`/`INLINE`, available on either
 variant), validated so a `PRIMARY` item is required and comes first,
 `SECONDARY` is optional, max two), and an optional `footnote`.
+
+`module_cta`'s two alignment axes are deliberately separate. **Content
+position** is where the content block sits relative to the image — which grid
+column it takes on Split, where it sits over the full-bleed image on Banner,
+and nothing at all on Callout, whose image sits above the content. **Content
+alignment** is how text and actions align inside that block, and applies on
+every variant. Both draw their values from `CTA_ALIGNMENT`. They replaced a
+single `imageSide` field that claimed to move the image while actually moving
+the content column, plus a reuse of `sectionHeader.align` that CTA applied to
+the whole card rather than the heading.
+
+Position is stored as **two** variant-scoped fields —
+`contentPositionSplit` (`LEFT`/`RIGHT`) and `contentPositionBanner`
+(adding `CENTER`) — because Sanity's `options.list` is static: only `hidden`
+and `readOnly` accept callbacks, so one field cannot vary its own option set
+by variant. `hidden` keeps exactly one visible. `@blog/service` collapses the
+pair into a single `contentPosition` on the view model, so no layer below the
+service knows the split exists. Both are emitted by the
+`defineAlignmentFields()` helper, which also appends the `contentAlignment`
+field every caller is guaranteed to have.
+
+CTA no longer reads `sectionHeader.align`, which consequently renders as an
+inert control on its form; removing it needs `align` hoisted out of the
+shared `sectionHeader` object, since a Sanity named type's field list is
+fixed at registration.
 
 `module_taxonomyList` is excluded from `MODULE_MAP`, so it never reaches
 `ModuleRenderer`; it still carries a `REVALIDATE_TAGS` entry, which every
