@@ -1,11 +1,12 @@
 name: Dependency Review
 
 on:
-  # No path filter on purpose — same reasoning as ci.yml: a workflow skipped
-  # by path filtering leaves any required status check "Pending" forever.
+  # No path filter and no base-branch filter, on purpose — same reasoning as
+  # ci.yml: a workflow skipped by either leaves any required status check
+  # "Pending" forever, whether the PR was skipped for touching only ignored
+  # paths or for being based on a branch other than `main`.
   # The action no-ops cheaply on PRs that don't touch the dependency graph.
   pull_request:
-    branches: [main]
 
 permissions:
   contents: read

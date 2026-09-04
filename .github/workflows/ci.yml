@@ -1,13 +1,23 @@
 name: CI
 
 on:
-  # No `paths-ignore` here on purpose. Build/Lint/Test/Type-check/Typegen are
-  # *required* status checks in the branch ruleset. A workflow skipped by path
-  # filtering leaves its required checks "Pending" forever, which blocks any PR
-  # that only touches the ignored paths (e.g. a `.claude/**` or docs-only PR)
-  # from ever merging. Running CI on every PR is cheap and avoids that deadlock.
+  # Neither a `paths-ignore` nor a `branches:` filter here, on purpose.
+  # Build/Lint/Test/Type-check/Typegen are *required* status checks in the
+  # branch ruleset, and a required check that never starts sits "Pending"
+  # forever rather than failing — so anything that skips this workflow blocks
+  # the PR permanently instead of reporting on it.
+  #
+  # A path filter would do that to a PR touching only the ignored paths (e.g.
+  # a `.claude/**` or docs-only PR). A base-branch filter would do it to a PR
+  # based on anything but `main` — the normal shape of a stacked PR — and
+  # retargeting when the base merges does not rescue it, because that fires
+  # `edited` while this listens for `opened`/`synchronize`/`reopened`.
+  #
+  # Running CI on every PR is cheap and avoids both deadlocks. The other six
+  # workflows carrying required checks (knip, dependency-review, zizmor,
+  # actionlint, commitlint, hooks) declare their triggers independently and
+  # must stay unfiltered for the same reason.
   pull_request:
-    branches: [main]
 
 permissions:
   contents: read
