@@ -45,9 +45,10 @@ export function makeRawPostListModule(
 ): TRawPostListModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: { heading: 'Latest', supportingText: null, align: null },
+    sectionHeader: { heading: 'Latest', supportingText: null },
     pageSize: 6,
     layout: null,
+    contentAlignment: null,
     ...overrides,
   };
 }
@@ -57,9 +58,10 @@ export function makeRawPostLatestModule(
 ): TRawPostLatestModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: { heading: 'Latest', supportingText: null, align: null },
+    sectionHeader: { heading: 'Latest', supportingText: null },
     limit: 6,
     layout: null,
+    contentAlignment: null,
     ...overrides,
   };
 }
@@ -93,7 +95,6 @@ export function makeRawCtaModule(
     sectionHeader: {
       heading: 'Subscribe to the newsletter',
       supportingText: 'Get new posts in your inbox.',
-      align: null,
     },
     content: null,
     image: null,
@@ -162,8 +163,9 @@ export function makeRawTaxonomyListModule(
 ): TRawTaxonomyListModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: { heading: 'Topics', supportingText: null, align: null },
+    sectionHeader: { heading: 'Topics', supportingText: null },
     layout: null,
+    contentAlignment: null,
     ...overrides,
   };
 }
@@ -176,9 +178,9 @@ export function makeRawNewsletterModule(
     sectionHeader: {
       heading: 'Stay in the loop',
       supportingText: 'Get new posts in your inbox.',
-      align: null,
     },
     layout: null,
+    contentAlignment: null,
     ...overrides,
   };
 }

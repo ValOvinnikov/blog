@@ -8,7 +8,6 @@ import type {
   TCtaMobileMediaOrder,
   TCtaVariant,
   TFullBrandVariant,
-  THeadingAlign,
   TLayout,
   TMaybeUndefined,
 } from '@blog/config';
@@ -27,7 +26,6 @@ export type TCtaModule = {
   sectionHeader: {
     heading: string;
     supportingText: TMaybeUndefined<string>;
-    align: TMaybeUndefined<THeadingAlign>;
   };
   content: TMaybeUndefined<BasicText>;
   image: TMaybeUndefined<ISanityImage>;

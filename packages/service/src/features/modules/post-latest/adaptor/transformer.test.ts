@@ -20,7 +20,6 @@ describe('toPostLatestModule', () => {
     expect(module.sectionHeader).toEqual({
       heading: 'Latest',
       supportingText: undefined,
-      align: undefined,
     });
   });
 
@@ -42,22 +41,25 @@ describe('toPostLatestModule', () => {
     expect(module.sectionHeader).toEqual({
       heading: undefined,
       supportingText: undefined,
-      align: undefined,
     });
   });
 
-  it('maps sectionHeader.align when authored', () => {
+  it('leaves contentAlignment undefined when unset (no faked default)', () => {
+    const raw = makeRawPostLatestModule({ contentAlignment: null });
+
+    const module = toPostLatestModule(raw, rawPosts, tenant);
+
+    expect(module.contentAlignment).toBeUndefined();
+  });
+
+  it('maps contentAlignment when authored', () => {
     const raw = makeRawPostLatestModule({
-      sectionHeader: {
-        heading: 'Latest',
-        supportingText: null,
-        align: HEADING_ALIGN.RIGHT,
-      },
+      contentAlignment: HEADING_ALIGN.RIGHT,
     });
 
     const module = toPostLatestModule(raw, rawPosts, tenant);
 
-    expect(module.sectionHeader.align).toBe(HEADING_ALIGN.RIGHT);
+    expect(module.contentAlignment).toBe(HEADING_ALIGN.RIGHT);
   });
 
   it('maps a fully-authored layout object 1:1', () => {

@@ -5,7 +5,6 @@ export const sectionHeaderFragment = q
   .project((sub) => ({
     heading: sub.field('heading').nullable(true),
     supportingText: sub.field('supportingText').nullable(true),
-    align: sub.field('align').nullable(true),
   }));
 
 export const requiredSectionHeaderFragment = q
@@ -13,5 +12,4 @@ export const requiredSectionHeaderFragment = q
   .project((sub) => ({
     heading: sub.field('heading').notNull(),
     supportingText: sub.field('supportingText').nullable(true),
-    align: sub.field('align').nullable(true),
   }));

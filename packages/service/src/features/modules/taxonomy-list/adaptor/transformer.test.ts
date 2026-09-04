@@ -19,7 +19,6 @@ describe('toTaxonomyListModule', () => {
       sectionHeader: {
         heading: 'Browse by topic',
         supportingText: 'Pick a subject.',
-        align: HEADING_ALIGN.CENTER,
       },
     });
 
@@ -28,7 +27,6 @@ describe('toTaxonomyListModule', () => {
     expect(module.sectionHeader).toEqual({
       heading: 'Browse by topic',
       supportingText: 'Pick a subject.',
-      align: HEADING_ALIGN.CENTER,
     });
   });
 
@@ -40,8 +38,25 @@ describe('toTaxonomyListModule', () => {
     expect(module.sectionHeader).toEqual({
       heading: undefined,
       supportingText: undefined,
-      align: undefined,
     });
+  });
+
+  it('leaves contentAlignment undefined when unset (no faked default)', () => {
+    const raw = makeRawTaxonomyListModule({ contentAlignment: null });
+
+    const module = toTaxonomyListModule(raw, []);
+
+    expect(module.contentAlignment).toBeUndefined();
+  });
+
+  it('maps contentAlignment when authored', () => {
+    const raw = makeRawTaxonomyListModule({
+      contentAlignment: HEADING_ALIGN.CENTER,
+    });
+
+    const module = toTaxonomyListModule(raw, []);
+
+    expect(module.contentAlignment).toBe(HEADING_ALIGN.CENTER);
   });
 
   it('maps a fully-authored layout object 1:1', () => {

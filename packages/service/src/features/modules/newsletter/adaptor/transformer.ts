@@ -16,5 +16,6 @@ export function toNewsletterModule(
     brandVariant: raw.brandVariant,
     sectionHeader: toRequiredSectionHeader(raw.sectionHeader),
     layout: toLayout(raw.layout),
+    contentAlignment: raw.contentAlignment ?? undefined,
   };
 }
