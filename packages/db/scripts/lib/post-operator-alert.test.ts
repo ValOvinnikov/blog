@@ -120,4 +120,19 @@ describe(postOperatorAlert, () => {
     ).resolves.toBeUndefined();
     expect(fetchMock).not.toHaveBeenCalled();
   });
+
+  it('does not throw when ADMIN_APP_BASE_URL is not a valid URL', async () => {
+    process.env['ADMIN_APP_BASE_URL'] = 'not a url';
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(
+      postOperatorAlert({
+        kind: 'OWNER_ELEVATION',
+        tenantId: 't1',
+        outcome: 'STALLED',
+      }),
+    ).resolves.toBeUndefined();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
 });
