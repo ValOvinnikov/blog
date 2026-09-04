@@ -1,8 +1,11 @@
-import { PRESET_ID, PRESET_REGISTRY } from '@blog/config';
+import {
+  isAccentHueAccessible,
+  PRESET_ID,
+  PRESET_REGISTRY,
+} from '@blog/config';
 import { makeRawThemeSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeTenant } from '@blog/service/testing/tenant';
-import { wcagContrastRatio } from '@blog/utils';
 
 import { getTheme } from './loader';
 
@@ -11,22 +14,21 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   runQuery: vi.fn(),
 }));
 
-// The real contrast math is covered by @blog/utils's own oklch.test.ts;
-// mocked here so one test below can force the resolver's AA-fallback branch
-// (a full 0–360 scan at 0.05° resolution found no real accentHue that fails
-// this fixed-L/C pairing — see that test for why it's simulated, not real).
-vi.mock('@blog/utils', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/utils')>()),
-  wcagContrastRatio: vi.fn(),
+// The guard itself is covered by @blog/config's own accent-hue-guard.test.ts;
+// mocked here so one test below can force the AA-fallback branch without
+// depending on which hues happen to pass or fail the real contrast math.
+vi.mock('@blog/config', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@blog/config')>()),
+  isAccentHueAccessible: vi.fn(),
 }));
 
-const mockedWcagContrastRatio = vi.mocked(wcagContrastRatio);
+const mockedIsAccentHueAccessible = vi.mocked(isAccentHueAccessible);
 const tenant = makeTenant();
 
 beforeEach(async () => {
   const actual =
-    await vi.importActual<typeof import('@blog/utils')>('@blog/utils');
-  mockedWcagContrastRatio.mockImplementation(actual.wcagContrastRatio);
+    await vi.importActual<typeof import('@blog/config')>('@blog/config');
+  mockedIsAccentHueAccessible.mockImplementation(actual.isAccentHueAccessible);
 });
 
 describe('getTheme', () => {
@@ -84,7 +86,7 @@ describe('getTheme', () => {
   });
 
   it('falls back to the preset accentHue when a tenant override fails the AA guard', async () => {
-    mockedWcagContrastRatio.mockReturnValue(1);
+    mockedIsAccentHueAccessible.mockReturnValue(false);
     mockRun.mockResolvedValue(
       makeRawThemeSettings({ preset: PRESET_ID.EDITORIAL, accentHue: 310 }),
     );
