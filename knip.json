@@ -42,12 +42,7 @@
     "packages/auth": {
       // Same reason as packages/service/packages/db above: reachable only
       // through a string in vitest.config.ts's `resolve.alias`.
-      "entry": ["src/testing/server-only-stub.ts"],
-      // @blog/email is scaffolded ahead of its first consumer here —
-      // the magic-link email builders migrate onto it separately. Same
-      // "real dependency, no import yet" shape as
-      // prettier-plugin-tailwindcss above.
-      "ignoreDependencies": ["@blog/email"]
+      "entry": ["src/testing/server-only-stub.ts"]
     },
     "packages/email": {
       // Same reason as packages/service/packages/db/packages/auth above:
