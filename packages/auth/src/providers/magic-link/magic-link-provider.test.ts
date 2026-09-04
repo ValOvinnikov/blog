@@ -8,11 +8,13 @@ const {
   listTenantsByIdsMock,
   getTenantByDomainMock,
   getSiteConfigMock,
+  sendEmailMock,
 } = vi.hoisted(() => ({
   findPendingInviteByEmailMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
   getTenantByDomainMock: vi.fn(),
   getSiteConfigMock: vi.fn(),
+  sendEmailMock: vi.fn(),
 }));
 
 vi.mock('@blog/db', () => ({
@@ -26,16 +28,22 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
+vi.mock('@blog/email', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@blog/email')>()),
+  sendEmail: sendEmailMock,
+}));
+
 describe(buildMagicLinkProvider, () => {
   beforeEach(() => {
     findPendingInviteByEmailMock.mockReset().mockResolvedValue([]);
     listTenantsByIdsMock.mockReset();
     getTenantByDomainMock.mockReset().mockResolvedValue(undefined);
     getSiteConfigMock.mockReset();
+    sendEmailMock.mockReset().mockResolvedValue(undefined);
   });
 
   it('identifies itself as the email provider', () => {
-    const provider = buildMagicLinkProvider(vi.fn());
+    const provider = buildMagicLinkProvider();
 
     expect(provider.id).toBe('email');
     expect(provider.type).toBe('email');
@@ -46,14 +54,13 @@ describe(buildMagicLinkProvider, () => {
   // module state already exercises the fallback branch;
   // `resolve-magic-link-from-address.test.ts` covers the configured case.
   it('resolves the from address via resolveMagicLinkFromAddress', () => {
-    const provider = buildMagicLinkProvider(vi.fn());
+    const provider = buildMagicLinkProvider();
 
     expect(provider.from).toBe('Sign in <onboarding@resend.dev>');
   });
 
-  it('delivers the sign-in link through the injected sendEmail', async () => {
-    const sendEmail = vi.fn().mockResolvedValue(undefined);
-    const provider = buildMagicLinkProvider(sendEmail);
+  it("delivers the sign-in link through @blog/email's sendEmail", async () => {
+    const provider = buildMagicLinkProvider();
 
     // `sendVerificationRequest` only reads `identifier`/`url`; the rest are
     // filled with placeholders that satisfy the full param type.
@@ -67,7 +74,7 @@ describe(buildMagicLinkProvider, () => {
       request: new Request('https://example.com'),
     });
 
-    expect(sendEmail).toHaveBeenCalledWith({
+    expect(sendEmailMock).toHaveBeenCalledWith({
       to: 'jane@example.com',
       from: 'Sign in <onboarding@resend.dev>',
       subject: 'Sign in to example.com',
@@ -84,8 +91,7 @@ describe(buildMagicLinkProvider, () => {
     listTenantsByIdsMock.mockResolvedValue([
       { id: 'tenant-1', name: 'Acme Blog' },
     ]);
-    const sendEmail = vi.fn().mockResolvedValue(undefined);
-    const provider = buildMagicLinkProvider(sendEmail);
+    const provider = buildMagicLinkProvider();
 
     await provider.sendVerificationRequest({
       identifier: 'invited@example.com',
@@ -100,7 +106,7 @@ describe(buildMagicLinkProvider, () => {
     expect(findPendingInviteByEmailMock).toHaveBeenCalledWith(
       'invited@example.com',
     );
-    expect(sendEmail).toHaveBeenCalledWith({
+    expect(sendEmailMock).toHaveBeenCalledWith({
       to: 'invited@example.com',
       from: 'Sign in <onboarding@resend.dev>',
       subject: "You've been invited to manage Acme Blog",
@@ -110,8 +116,7 @@ describe(buildMagicLinkProvider, () => {
 
   it('falls back to the generic copy and still delivers when the invite lookup throws', async () => {
     findPendingInviteByEmailMock.mockRejectedValue(new Error('db error'));
-    const sendEmail = vi.fn().mockResolvedValue(undefined);
-    const provider = buildMagicLinkProvider(sendEmail);
+    const provider = buildMagicLinkProvider();
 
     await provider.sendVerificationRequest({
       identifier: 'jane@example.com',
@@ -123,7 +128,7 @@ describe(buildMagicLinkProvider, () => {
       request: new Request('https://example.com'),
     });
 
-    expect(sendEmail).toHaveBeenCalledWith({
+    expect(sendEmailMock).toHaveBeenCalledWith({
       to: 'jane@example.com',
       from: 'Sign in <onboarding@resend.dev>',
       subject: 'Sign in to example.com',
@@ -135,8 +140,7 @@ describe(buildMagicLinkProvider, () => {
 
   it('still delivers, unbranded, when the host resolves to no tenant', async () => {
     getTenantByDomainMock.mockResolvedValue(undefined);
-    const sendEmail = vi.fn().mockResolvedValue(undefined);
-    const provider = buildMagicLinkProvider(sendEmail);
+    const provider = buildMagicLinkProvider();
 
     await provider.sendVerificationRequest({
       identifier: 'jane@example.com',
@@ -148,7 +152,7 @@ describe(buildMagicLinkProvider, () => {
       request: new Request('https://example.com'),
     });
 
-    expect(sendEmail).toHaveBeenCalledWith({
+    expect(sendEmailMock).toHaveBeenCalledWith({
       to: 'jane@example.com',
       from: 'Sign in <onboarding@resend.dev>',
       subject: 'Sign in to example.com',
@@ -158,8 +162,7 @@ describe(buildMagicLinkProvider, () => {
 
   it('still delivers, unbranded, when the tenant domain lookup throws', async () => {
     getTenantByDomainMock.mockRejectedValue(new Error('db error'));
-    const sendEmail = vi.fn().mockResolvedValue(undefined);
-    const provider = buildMagicLinkProvider(sendEmail);
+    const provider = buildMagicLinkProvider();
 
     await provider.sendVerificationRequest({
       identifier: 'jane@example.com',
@@ -171,7 +174,7 @@ describe(buildMagicLinkProvider, () => {
       request: new Request('https://example.com'),
     });
 
-    expect(sendEmail).toHaveBeenCalledWith({
+    expect(sendEmailMock).toHaveBeenCalledWith({
       to: 'jane@example.com',
       from: 'Sign in <onboarding@resend.dev>',
       subject: 'Sign in to example.com',
@@ -189,8 +192,7 @@ describe(buildMagicLinkProvider, () => {
       accentHue: 140,
       logoHue: undefined,
     });
-    const sendEmail = vi.fn().mockResolvedValue(undefined);
-    const provider = buildMagicLinkProvider(sendEmail);
+    const provider = buildMagicLinkProvider();
 
     await provider.sendVerificationRequest({
       identifier: 'jane@example.com',
@@ -206,7 +208,7 @@ describe(buildMagicLinkProvider, () => {
       preset: PRESET_ID.CONSOLE,
       accentHue: 140,
     });
-    expect(sendEmail).toHaveBeenCalledWith(
+    expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
         html: expect.stringContaining(expectedBrand.logo1),
       }),

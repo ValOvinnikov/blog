@@ -2,10 +2,7 @@ import 'server-only';
 
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { consumePendingInvitesOnSignIn } from '@blog/auth/events/consume-pending-invites-on-sign-in';
-import {
-  buildMagicLinkProvider,
-  type TSendEmail,
-} from '@blog/auth/providers/magic-link/magic-link-provider';
+import { buildMagicLinkProvider } from '@blog/auth/providers/magic-link/magic-link-provider';
 import { env } from '@blog/auth/utils/env/env';
 import { getOAuthProviderCredentials } from '@blog/auth/utils/oauth-providers/oauth-providers';
 import { getDb, schema } from '@blog/db';
@@ -13,22 +10,10 @@ import type { NextAuthConfig } from 'next-auth';
 import GitHub from 'next-auth/providers/github';
 import Google from 'next-auth/providers/google';
 
-export type TBuildAuthConfigOptions = {
-  /**
-   * Delivers the magic-link sign-in email. Injected rather than owned here:
-   * this package's dependency contract has no room for an email-sending SDK,
-   * so each app supplies its own already-configured sender (e.g. a Resend
-   * client) with the same `{ to, from, subject, html }` shape.
-   */
-  sendEmail: TSendEmail;
-};
-
 /**
  * Builds the Auth.js configuration both apps pass to their own `NextAuth()` call.
  */
-export function buildAuthConfig({
-  sendEmail,
-}: TBuildAuthConfigOptions): NextAuthConfig {
+export function buildAuthConfig(): NextAuthConfig {
   const githubCredentials = getOAuthProviderCredentials('github');
   const googleCredentials = getOAuthProviderCredentials('google');
 
@@ -84,7 +69,7 @@ export function buildAuthConfig({
     providers: [
       ...(githubCredentials ? [GitHub(githubCredentials)] : []),
       ...(googleCredentials ? [Google(googleCredentials)] : []),
-      buildMagicLinkProvider(sendEmail),
+      buildMagicLinkProvider(),
     ],
   };
 }

@@ -4,10 +4,12 @@ import { z } from 'zod';
 // Single validated entry point for the admin app's environment.
 export const env = createEnv({
   server: {
-    // Shared Resend "send email" helper (`@platform/server/email/send-email`) —
-    // powers the Auth.js Email provider's magic-link, via the `sendEmail`
-    // this app injects into `@blog/auth`. Optional: absent, magic-link
-    // sign-in fails at send time, every other sign-in method is unaffected.
+    // `@blog/email`'s `sendEmail` reads its own byte-identical copy of this
+    // var to actually send (magic-link via `@blog/auth`, and this app's own
+    // operator-alert route) — this app's copy exists so the tenants list can
+    // read it directly to show the "email alerts not configured" banner.
+    // Optional: absent, magic-link and operator-alert sends fail at send
+    // time; every other sign-in method is unaffected.
     RESEND_API_KEY: z.string().min(1).optional(),
     // Vercel's standard read-write token for the Blob store the Look tab's
     // logo/favicon uploads write to (`@vercel/blob`'s `put`/`del`).
