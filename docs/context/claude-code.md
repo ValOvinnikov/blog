@@ -462,6 +462,32 @@ file` are all denied alike) — an earlier version only handled the
   `git worktree unlock` on another job's worktree destroys its uncommitted
   work. `develop-feature` §8 is the teardown procedure — remove only the
   worktrees the current session created, checked against the lock file first.
+- **A worktree-isolated session cannot reach the shared checkout at all**
+  (issue #2618) — a second, earlier-firing protection, distinct from the
+  lock-file check above: that one refuses removal of a path another job owns,
+  this one refuses the command outright based on where its working directory
+  resolves, before ownership is ever consulted. A session
+  that ran `EnterWorktree` (every background job does, before its first
+  edit) has the harness refuse any Bash command whose working directory
+  resolves back to the shared checkout, including one redirected there with
+  `git -C`. Two documented steps collide with that, and both are now
+  reconciled rather than worked around:
+  - **Subagents that only read the repo still need their own worktree.** A
+    subagent dispatched without isolation inherits the shared checkout as
+    its cwd, so every command it runs is refused and it returns having done
+    nothing — the refusal names a working directory, not the work, so it
+    reads as a permissions problem. `board-keeper` hit this and now carries
+    `isolation: worktree` in its frontmatter for that reason alone; because
+    it never writes a file its worktree is always unchanged and the harness
+    auto-removes it, so it never reaches §8's cleanup list. Its own file
+    documents this so the line isn't dropped as pointless.
+  - **§8 teardown is exit-then-clean.** `git worktree remove` and
+    `git -C <other worktree> …` are both refused from inside, and a session
+    cannot remove its own worktree while standing in it. Once the branch is
+    pushed and CI has settled, `ExitWorktree` with `action: "keep"` returns
+    the session to the shared checkout and §8 then runs unchanged. A job
+    that must end before the push reports the paths it created instead, for
+    a later session to sweep.
 
 - **Env files in agent worktrees** (issue #404) — the same
   `.husky/post-checkout` hook copies `.env.local`/`.env.*.local` from the
