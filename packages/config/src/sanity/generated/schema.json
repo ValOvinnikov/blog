@@ -263,7 +263,7 @@
         },
         "optional": true
       },
-      "imageSide": {
+      "contentPositionSplit": {
         "type": "objectAttribute",
         "value": {
           "type": "union",
@@ -271,6 +271,48 @@
             {
               "type": "string",
               "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "RIGHT"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "contentPositionBanner": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
+            },
+            {
+              "type": "string",
+              "value": "RIGHT"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "contentAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
             },
             {
               "type": "string",
