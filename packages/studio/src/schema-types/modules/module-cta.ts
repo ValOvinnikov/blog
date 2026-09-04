@@ -1,6 +1,6 @@
 import {
   BRAND_VARIANT,
-  CTA_IMAGE_SIDE,
+  CTA_ALIGNMENT,
   CTA_MOBILE_MEDIA_ORDER,
   CTA_VARIANT,
   FULL_BRAND_VARIANT_LIST,
@@ -22,11 +22,14 @@ type TCtaParent = { variant?: string; brandVariant?: string };
 const isVariant = (parent: unknown, variant: TCtaVariant) =>
   (parent as TCtaParent | undefined)?.variant === variant;
 
-const isSplitVariant = ({ parent }: { parent?: unknown }) =>
+const isNotSplitVariant = ({ parent }: { parent?: unknown }) =>
   !isVariant(parent, CTA_VARIANT.SPLIT);
 
 const isBannerVariant = ({ parent }: { parent?: unknown }) =>
   isVariant(parent, CTA_VARIANT.BANNER);
+
+const isNotBannerVariant = ({ parent }: { parent?: unknown }) =>
+  !isVariant(parent, CTA_VARIANT.BANNER);
 
 export const ctaSchema = defineType({
   name: 'module_cta',
@@ -121,18 +124,53 @@ export const ctaSchema = defineType({
         }),
     }),
     defineField({
-      name: 'imageSide',
-      title: 'Image Side',
+      name: 'contentPositionSplit',
+      title: 'Content Position',
       type: 'string',
+      description:
+        'Where the content sits relative to the image, on this variant’s grid.',
       options: {
         layout: 'radio',
-        list: Object.values(CTA_IMAGE_SIDE).map((value) => ({
+        list: [CTA_ALIGNMENT.LEFT, CTA_ALIGNMENT.RIGHT].map((value) => ({
           title: toTitleCase(value),
           value,
         })),
       },
-      initialValue: CTA_IMAGE_SIDE.RIGHT,
-      hidden: isSplitVariant,
+      initialValue: CTA_ALIGNMENT.LEFT,
+      hidden: isNotSplitVariant,
+    }),
+    defineField({
+      name: 'contentPositionBanner',
+      title: 'Content Position',
+      type: 'string',
+      description:
+        'Where the content sits relative to the image, over the full-bleed background.',
+      options: {
+        layout: 'radio',
+        list: [
+          CTA_ALIGNMENT.LEFT,
+          CTA_ALIGNMENT.CENTER,
+          CTA_ALIGNMENT.RIGHT,
+        ].map((value) => ({
+          title: toTitleCase(value),
+          value,
+        })),
+      },
+      initialValue: CTA_ALIGNMENT.LEFT,
+      hidden: isNotBannerVariant,
+    }),
+    defineField({
+      name: 'contentAlignment',
+      title: 'Content Alignment',
+      type: 'string',
+      description: 'How text and actions align inside the content block.',
+      options: {
+        layout: 'radio',
+        list: Object.values(CTA_ALIGNMENT).map((value) => ({
+          title: toTitleCase(value),
+          value,
+        })),
+      },
     }),
     defineField({
       name: 'mobileMediaOrder',
@@ -146,7 +184,7 @@ export const ctaSchema = defineType({
         })),
       },
       initialValue: CTA_MOBILE_MEDIA_ORDER.LAST,
-      hidden: isSplitVariant,
+      hidden: isNotSplitVariant,
     }),
     actionGroupField(),
     defineField({
