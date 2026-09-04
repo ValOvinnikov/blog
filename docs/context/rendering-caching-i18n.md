@@ -97,10 +97,9 @@ blog/my-post')` matches the resolved-pathname tag exactly — and is how the
   own pagination) in the tenant. Purging the whole taxonomy rather than just
   the post's current tags/topic is deliberate: a re-categorisation or tag
   removal leaves stale HTML on the page the post was removed from, and the
-  derivation would otherwise report success while missing it. This makes
-  `getPostTaxonomySlugs` (`@blog/service`) unnecessary for path derivation —
-  it's no longer called from `apps/web`, though the function itself stays for
-  a possible future consumer.
+  derivation would otherwise report success while missing it. It also removes
+  any need to know a post's _previous_ taxonomy, which the webhook payload
+  does not carry.
 
   **Known limitation, accepted rather than solved:** a renamed post slug is
   not recoverable from the webhook payload, so the page at the _old_ slug
