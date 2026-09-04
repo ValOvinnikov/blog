@@ -221,6 +221,60 @@ describe('POST /api/revalidate', () => {
     });
   });
 
+  describe('tenant lookup failures', () => {
+    it('returns a non-2xx and revalidates nothing when getTenantIdBySanityProjectId throws', async () => {
+      isValidSignatureMock.mockResolvedValue(true);
+      getTenantIdBySanityProjectIdMock.mockRejectedValue(
+        new Error('connection terminated'),
+      );
+      const { POST } = await import('./route');
+
+      const request = makeRequest(
+        { _type: 'blog_post', _id: 'post-1' },
+        't=1,v=valid-signature',
+        { [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project' },
+      );
+      const response = await POST(request);
+      const json = await response.json();
+
+      expect(response.status).toBe(502);
+      expect(response.status).not.toBe(200);
+      expect(json).toEqual({ message: 'Tenant lookup failed.' });
+      expect(getTenantByIdMock).not.toHaveBeenCalled();
+      expect(revalidateTagMock).not.toHaveBeenCalled();
+      expect(revalidatePathMock).not.toHaveBeenCalled();
+      expect(loggerErrorMock).toHaveBeenCalledWith(
+        'revalidate.tenant_id_lookup_failed',
+        expect.objectContaining({ tenantProjectId: 'tenant-a-project' }),
+      );
+    });
+
+    it('returns a non-2xx and revalidates nothing when getTenantById throws', async () => {
+      isValidSignatureMock.mockResolvedValue(true);
+      getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-uuid-1');
+      getTenantByIdMock.mockRejectedValue(new Error('connection terminated'));
+      const { POST } = await import('./route');
+
+      const request = makeRequest(
+        { _type: 'blog_post', _id: 'post-1' },
+        't=1,v=valid-signature',
+        { [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project' },
+      );
+      const response = await POST(request);
+      const json = await response.json();
+
+      expect(response.status).toBe(502);
+      expect(response.status).not.toBe(200);
+      expect(json).toEqual({ message: 'Tenant lookup failed.' });
+      expect(revalidateTagMock).not.toHaveBeenCalled();
+      expect(revalidatePathMock).not.toHaveBeenCalled();
+      expect(loggerErrorMock).toHaveBeenCalledWith(
+        'revalidate.tenant_by_id_lookup_failed',
+        expect.objectContaining({ tenantId: 'tenant-uuid-1' }),
+      );
+    });
+  });
+
   it('returns 401 and revalidates nothing for an invalid signature', async () => {
     isValidSignatureMock.mockResolvedValue(false);
     const { POST } = await import('./route');

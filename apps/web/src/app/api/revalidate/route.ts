@@ -140,16 +140,45 @@ export async function POST(request: Request): Promise<NextResponse> {
   // up front, so both the archived-tenant check and the delete-cleanup
   // branch further down share the same lookup.
   const tenantProjectId = request.headers.get(SANITY_PROJECT_ID_HEADER);
-  const tenantId = tenantProjectId
-    ? await queries.tenants.getTenantIdBySanityProjectId(tenantProjectId)
-    : undefined;
 
-  if (tenantId && !(await queries.tenants.getTenantById(tenantId))) {
-    logger.warn('revalidate.tenant_archived', { tenantProjectId, tenantId });
-    return NextResponse.json(
-      { message: 'Tenant is archived; event ignored.' },
-      { status: 200 },
-    );
+  let tenantId: string | undefined;
+  if (tenantProjectId) {
+    try {
+      tenantId =
+        await queries.tenants.getTenantIdBySanityProjectId(tenantProjectId);
+    } catch (error) {
+      logger.error('revalidate.tenant_id_lookup_failed', {
+        tenantProjectId,
+        error,
+      });
+      return NextResponse.json(
+        { message: 'Tenant lookup failed.' },
+        { status: 502 },
+      );
+    }
+  }
+
+  if (tenantId) {
+    let tenant;
+    try {
+      tenant = await queries.tenants.getTenantById(tenantId);
+    } catch (error) {
+      logger.error('revalidate.tenant_by_id_lookup_failed', {
+        tenantId,
+        error,
+      });
+      return NextResponse.json(
+        { message: 'Tenant lookup failed.' },
+        { status: 502 },
+      );
+    }
+    if (!tenant) {
+      logger.warn('revalidate.tenant_archived', { tenantProjectId, tenantId });
+      return NextResponse.json(
+        { message: 'Tenant is archived; event ignored.' },
+        { status: 200 },
+      );
+    }
   }
 
   const baseTags = getRevalidateTagsForType(type, id);
