@@ -75,7 +75,7 @@ describe(CtaModuleView, () => {
   });
 
   it('renders the authored bandTone on the Section landmark', () => {
-    setup({ bandTone: BRAND_VARIANT.SECONDARY });
+    setup();
 
     const section = screen
       .getByRole('heading', { level: 2 })

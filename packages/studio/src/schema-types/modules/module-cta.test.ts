@@ -205,6 +205,24 @@ describe('ctaSchema bandTone validation', () => {
     return customFn;
   };
 
+  it('registers a required rule alongside the warning rule', () => {
+    const field = getField('bandTone');
+
+    if (!('validation' in field) || !field.validation) {
+      throw new Error('Expected bandTone field to define validation.');
+    }
+
+    const rule = {
+      required: () => 'required-rule',
+      custom: () => ({ warning: () => 'warning-rule' }),
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    const result = (field.validation as any)(rule);
+
+    expect(result).toEqual(['required-rule', 'warning-rule']);
+  });
+
   it('warns when Band Tone matches Brand Variant on a non-Banner variant', () => {
     const validate = getBandToneWarningValidator();
 
