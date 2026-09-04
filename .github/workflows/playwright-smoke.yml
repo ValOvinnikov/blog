@@ -43,7 +43,7 @@ jobs:
     timeout-minutes: 10
     env:
       PNPM_VERSION: 11.21.0
-      NODE_VERSION: '22'
+      NODE_VERSION: '24'
       # One full origin — the preview/smoke URL to run `e2e/*.spec.ts`
       # against. A repo Variable (not a Secret): a smoke-test origin isn't
       # sensitive, and this keeps the value inspectable in run logs, same as

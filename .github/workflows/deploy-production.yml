@@ -14,7 +14,7 @@ concurrency:
 
 env:
   PNPM_VERSION: 11.21.0
-  NODE_VERSION: '22'
+  NODE_VERSION: '24'
   VERCEL_CLI_VERSION: 48.0.0
   # Sanity project/dataset defaults, sourced from repo Variables like ci.yml.
   # The content `migrate` job overrides both explicitly, and nothing builds

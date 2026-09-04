@@ -20,7 +20,7 @@ concurrency:
 
 env:
   PNPM_VERSION: 11.21.0
-  NODE_VERSION: '22'
+  NODE_VERSION: '24'
   # The Sanity project/dataset are not hardcoded in the repo — the Studio/CLI
   # config reads them from SANITY_STUDIO_*. Jobs that load that config (typegen,
   # build, migrations) need them present, so source them from repo-level
