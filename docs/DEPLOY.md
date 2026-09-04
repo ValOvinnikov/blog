@@ -539,7 +539,8 @@ names, so their block below applies to **both** environments rather than only to
 `.github/workflows/provision-tenant.yml`/`deprovision-tenant.yml`/
 `invalidate-tenant-cache.yml` (`workflow_dispatch` only, the first triggered
 from `apps/platform`'s "Add tenant" wizard) and
-`.github/workflows/recheck-tenant-owners.yml` all bind to whichever
+`.github/workflows/recheck-tenant-owners.yml`/`validate-tenant-documents.yml`
+all bind to whichever
 Environment their dispatch's `environment` input names (`development`/
 `production`, default `production`) — every credential they need, including
 the tenant registry connection string, resolves from that same Environment,
@@ -552,12 +553,13 @@ fails on whatever `development` is missing. These workflows read
 overlapping subsets, so configuring an environment for provisioning covers the
 rest:
 
-| Workflow                      | Reads                                                                                                                                                                |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `provision-tenant.yml`        | all of them except `RESEND_API_KEY`                                                                                                                                  |
-| `deprovision-tenant.yml`      | `SANITY_MANAGEMENT_TOKEN`, `VERCEL_TOKEN`, `VERCEL_TEAM_ID`, `VERCEL_PROJECT_ID_WEB`, `TENANT_REGISTRY_DATABASE_URL`, `WEB_APP_URL`, `SITE_CONFIG_REVALIDATE_SECRET` |
-| `invalidate-tenant-cache.yml` | `TENANT_REGISTRY_DATABASE_URL`, `WEB_APP_URL`, `SITE_CONFIG_REVALIDATE_SECRET` — the recovery path for `deprovision-tenant.yml`'s final step                         |
-| `recheck-tenant-owners.yml`   | `SANITY_MANAGEMENT_TOKEN`, `TENANT_REGISTRY_DATABASE_URL`, and optionally `RESEND_API_KEY`                                                                           |
+| Workflow                        | Reads                                                                                                                                                                |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `provision-tenant.yml`          | all of them                                                                                                                                                          |
+| `deprovision-tenant.yml`        | `SANITY_MANAGEMENT_TOKEN`, `VERCEL_TOKEN`, `VERCEL_TEAM_ID`, `VERCEL_PROJECT_ID_WEB`, `TENANT_REGISTRY_DATABASE_URL`, `WEB_APP_URL`, `SITE_CONFIG_REVALIDATE_SECRET` |
+| `invalidate-tenant-cache.yml`   | `TENANT_REGISTRY_DATABASE_URL`, `WEB_APP_URL`, `SITE_CONFIG_REVALIDATE_SECRET` — the recovery path for `deprovision-tenant.yml`'s final step                         |
+| `recheck-tenant-owners.yml`     | `SANITY_MANAGEMENT_TOKEN`, `TENANT_REGISTRY_DATABASE_URL`, and optionally `PLATFORM_APP_URL` + `OPERATOR_ALERT_SECRET`                                               |
+| `validate-tenant-documents.yml` | `TENANT_REGISTRY_DATABASE_URL`, `TENANT_TOKEN_ENCRYPTION_KEY`, and optionally `PLATFORM_APP_URL` + `OPERATOR_ALERT_SECRET`                                           |
 
 `recheck-tenant-owners.yml` also runs on a `schedule:`, and a scheduled run
 carries no `inputs` context at all, so its binding is
@@ -643,10 +645,19 @@ dispatch can point it at `development`.
       other credential in this list — throws rather than skipping when it is
       absent, so a run fails loudly instead of leaving the site serving from
       cache.
-- [ ] (Optional) Secret `RESEND_API_KEY` — the same shared secret name
-      `apps/web`/`apps/platform` already use for their own Resend sends. Only
-      `recheck-tenant-owners.yml`'s operator notification reads it; unset
-      skips that email, and the sweep itself still runs.
+- [ ] (Optional) Variable `PLATFORM_APP_URL` and secret
+      `OPERATOR_ALERT_SECRET` — the pair `recheck-tenant-owners.yml` and
+      `validate-tenant-documents.yml` use to report an operator alert.
+      Neither workflow sends email itself: it POSTs the bare facts (tenant
+      id, outcome or invalid-document count) to `apps/platform`'s
+      `/api/internal/operator-alert`, and that app resolves the superadmin
+      recipients and sends. `OPERATOR_ALERT_SECRET` is the bearer token that
+      route authenticates against, so **this copy and the one in the
+      `platform-dev`/`platform-prod` Vercel projects must be byte-identical**
+      — set both, or the route answers 401 and no alert is delivered. Leave
+      either unset and the sweep skips only the notification and still runs
+      to completion, so a half-configured pair looks healthy while alerting
+      silently does nothing.
 - [ ] Variable `VERCEL_TEAM_ID` — only needed if the Vercel account is
       team-owned; omit otherwise.
 - [ ] `VERCEL_TOKEN` / `VERCEL_PROJECT_ID_WEB` from that environment's

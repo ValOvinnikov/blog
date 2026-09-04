@@ -98,9 +98,10 @@ graph is acyclic
   product sends — the shared branded HTML shell, the canonical `escapeHtml`,
   and the typed `sendEmail` Resend transport. Upstream is `utils` only, which
   is what lets both apps **and** `@blog/auth` consume it without a cycle
-  (`auth` sits above `db`, so a dependency on either would close one). It is side-effecting — it owns the send call — but **never
-  logs**, and never resolves tenants or fetches content: callers pass it
-  resolved copy and URLs, the way `@blog/ui` takes props. That is what keeps it
+  (`auth` sits above `db`, so a dependency on either would close one). It is
+  side-effecting — it owns the send call — but **never logs**, and never
+  resolves tenants or fetches content: callers pass it resolved copy and URLs,
+  the way `@blog/ui` takes props. That is what keeps it
   usable from an Auth.js callback with no request context. Operator-alert copy
   stays hardcoded and must never become tenant-editable. See
   `.claude/agents/email.md`.
@@ -219,9 +220,10 @@ how an app _uses_ the logger belongs to `web`/`platform-app`. See
 `email` (`packages/email`, the single home for every email the product sends —
 the shared branded HTML shell, the canonical `escapeHtml`, and the typed
 `sendEmail` Resend transport) sits **low in the graph, upstream of `utils`
-only**, so both apps and `@blog/auth` can all consume it without a cycle. It is side-effecting (it owns the send call) but never
-logs, and never resolves tenants or fetches content — callers pass it resolved
-copy and URLs, the way `@blog/ui` takes props, which is what keeps it usable
+only**, so both apps and `@blog/auth` can all consume it without a cycle. It is
+side-effecting (it owns the send call) but never logs, and never resolves
+tenants or fetches content — callers pass it resolved copy and URLs, the way
+`@blog/ui` takes props, which is what keeps it usable
 from an Auth.js callback that has no request context. Dispatch it for the email
 templates and transport themselves; a change to _which_ copy a caller passes
 belongs to that caller's layer. See `.claude/agents/email.md`.
