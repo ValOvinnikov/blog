@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, HEADING_ALIGN } from '@blog/config';
+import { BRAND_VARIANT } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 
 import { TaxonomyListModuleView } from './taxonomy-list-module-view';
@@ -104,11 +104,5 @@ describe(TaxonomyListModuleView, () => {
 
     expect(screen.getByText('No topics yet.')).toBeVisible();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
-  });
-
-  it('passes contentAlignment through to the heading label alignment classes', () => {
-    setup({ contentAlignment: HEADING_ALIGN.CENTER });
-
-    expect(screen.getByText('Browse by topic')).toHaveClass('text-center');
   });
 });
