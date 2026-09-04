@@ -59,10 +59,10 @@ export async function generateMetadata(): Promise<Metadata> {
   // `isProductionEnvironment` and `robots.ts` for the full reasoning. This
   // page-level meta tag is the primary de-indexing lever (unlike a robots.txt
   // disallow, it survives a crawl and gets honored by the crawler), so it's
-  // applied here at the root layout, ahead of the `!result.ok` guard, so it
-  // still lands even when site settings fail to load. Spread conditionally
-  // rather than assigning `robots: undefined` on production, keeping the key
-  // absent (not just falsy) when indexing is allowed.
+  // applied here, ahead of the `!result.ok` guard, so it still lands even
+  // when site settings fail to load. Spread conditionally rather than
+  // assigning `robots: undefined` on production, keeping the key absent (not
+  // just falsy) when indexing is allowed.
   const robotsMetadata = isProductionEnvironment()
     ? {}
     : { robots: { index: false, follow: false } };

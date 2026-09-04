@@ -10,7 +10,7 @@ import type { MetadataRoute } from 'next';
  * origin) so there is no need to omit it.
  *
  * Non-production (e.g. `development` after a prod→dev dataset refresh):
- * the root layout's `generateMetadata` already emits a page-level
+ * `[locale]/layout.tsx`'s `generateMetadata` already emits a page-level
  * `<meta name="robots" content="noindex, nofollow">` on every route, and
  * that meta tag — not this file — is the authoritative de-indexing lever.
  * Crawling is deliberately left `allow: '/'` here rather than switched to
