@@ -5,6 +5,7 @@ import { defineField } from 'sanity';
 export const brandVariantField = (options?: {
   list?: TBrandVariant[];
   description?: string;
+  initialValue?: TBrandVariant;
 }) =>
   defineField({
     name: 'brandVariant',
@@ -17,5 +18,6 @@ export const brandVariantField = (options?: {
         options?.list ?? [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY]
       ).map((value) => ({ title: toTitleCase(value), value })),
     },
+    initialValue: options?.initialValue,
     validation: (rule) => rule.required(),
   });

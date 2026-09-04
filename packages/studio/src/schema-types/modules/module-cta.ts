@@ -15,13 +15,22 @@ import { toTitleCase } from '@blog/utils/primitives';
 import { Megaphone } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
-type TCtaParent = { variant?: string };
+type TCtaParent = { variant?: string; brandVariant?: string };
 
 const isVariant = (parent: unknown, variant: string) =>
   (parent as TCtaParent | undefined)?.variant === variant;
 
 const isSplitVariant = ({ parent }: { parent?: unknown }) =>
   !isVariant(parent, CTA_VARIANT.SPLIT);
+
+const isBannerVariant = ({ parent }: { parent?: unknown }) =>
+  isVariant(parent, CTA_VARIANT.BANNER);
+
+const CTA_BRAND_VARIANT_LIST = [
+  BRAND_VARIANT.BRAND_PRIMARY,
+  BRAND_VARIANT.PRIMARY,
+  BRAND_VARIANT.SECONDARY,
+];
 
 export const ctaSchema = defineType({
   name: 'module_cta',
@@ -45,13 +54,41 @@ export const ctaSchema = defineType({
       validation: (rule) => rule.required(),
     }),
     brandVariantField({
-      list: [
-        BRAND_VARIANT.BRAND_PRIMARY,
-        BRAND_VARIANT.PRIMARY,
-        BRAND_VARIANT.SECONDARY,
-      ],
+      list: CTA_BRAND_VARIANT_LIST,
       description:
         'On this module: the card fill for Split/Callout, or the overlay tint for Banner — not the full-bleed band tone every other module uses this field for.',
+      initialValue: BRAND_VARIANT.SECONDARY,
+    }),
+    defineField({
+      name: 'bandTone',
+      title: 'Band Tone',
+      type: 'string',
+      description:
+        'Background tone for the full-bleed section band behind the CTA card — distinct from Brand Variant, which is the card’s own fill or overlay.',
+      options: {
+        list: CTA_BRAND_VARIANT_LIST.map((value) => ({
+          title: toTitleCase(value),
+          value,
+        })),
+      },
+      initialValue: BRAND_VARIANT.PRIMARY,
+      hidden: isBannerVariant,
+      validation: (rule) => [
+        rule.required(),
+        rule
+          .custom((value, context) => {
+            const parent = context.parent as TCtaParent | undefined;
+
+            if (parent?.variant === CTA_VARIANT.BANNER) {
+              return true;
+            }
+
+            return value !== undefined && value === parent?.brandVariant
+              ? 'Band Tone matches Brand Variant — the band and card will blend together. Sometimes that’s intentional, but usually they should contrast.'
+              : true;
+          })
+          .warning(),
+      ],
     }),
     defineField({
       name: 'eyebrow',
