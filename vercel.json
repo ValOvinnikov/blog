@@ -2,5 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "pnpm exec turbo run storybook:build --filter=web && rm -rf storybook-static && cp -R apps/web/storybook-static storybook-static",
   "outputDirectory": "storybook-static",
-  "ignoreCommand": "sh \"$(git rev-parse --show-toplevel)/scripts/vercel-ignore-affected.sh\" --paths vercel.json scripts/vercel-ignore-affected.sh apps/web/.storybook ':(glob)apps/web/**/*.stories.tsx' packages/ui configs/tailwind"
+  "ignoreCommand": "sh \"$(git rev-parse --show-toplevel)/scripts/vercel-ignore-affected.sh\" --paths vercel.json scripts/vercel-ignore-affected.sh apps/web/.storybook ':(glob)apps/web/**/*.stories.tsx' packages/ui configs/tailwind",
+  "git": { "deploymentEnabled": false }
 }

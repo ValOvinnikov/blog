@@ -13,6 +13,7 @@
   --admin-surface-2: #fbfbfd;
   --admin-line: #e5e7eb;
   --admin-line-2: #eef0f3;
+  --admin-control-line: #818a99;
   --admin-text: #12141a;
   --admin-muted: #5b6472;
   --admin-faint: #8a93a3;
@@ -24,6 +25,7 @@
   --admin-warn-weak: #fbf3df;
   --admin-bad: #b42318;
   --admin-bad-weak: #fdeceb;
+  --admin-bad-line: #dd6152;
   --admin-warn-on-dark: #f5c451;
   --admin-side: #0f1115;
   --admin-side-line: #1c1f26;
@@ -38,6 +40,7 @@
   --color-admin-surface-2: var(--admin-surface-2);
   --color-admin-line: var(--admin-line);
   --color-admin-line-2: var(--admin-line-2);
+  --color-admin-control-line: var(--admin-control-line);
   --color-admin-text: var(--admin-text);
   --color-admin-muted: var(--admin-muted);
   --color-admin-faint: var(--admin-faint);
@@ -49,6 +52,7 @@
   --color-admin-warn-weak: var(--admin-warn-weak);
   --color-admin-bad: var(--admin-bad);
   --color-admin-bad-weak: var(--admin-bad-weak);
+  --color-admin-bad-line: var(--admin-bad-line);
   --color-admin-warn-on-dark: var(--admin-warn-on-dark);
   --color-admin-side: var(--admin-side);
   --color-admin-side-line: var(--admin-side-line);

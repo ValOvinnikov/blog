@@ -52,7 +52,7 @@
   `production` dataset is indexable. Every other environment (e.g.
   `development`, which can serve content byte-identical to production after a
   dataset refresh) gets a page-level `<meta name="robots" content="noindex,
-nofollow">` from the root layout on every route, while `robots.ts` keeps
+nofollow">` from `[locale]/layout.tsx` on every route, while `robots.ts` keeps
   crawling allowed (so that noindex is actually seen) but omits the sitemap.
   The blanket meta tag, not `robots.txt`, is the authoritative de-indexing
   lever — a `Disallow: /` would stop crawlers from ever fetching the page to

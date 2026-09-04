@@ -939,6 +939,37 @@ evidence into status writes.
 
 ## Deployment
 
+**TEMPORARY (2026-09-04) — automatic deployments are OFF.** Nothing deploys on
+merge right now: `deploy-development.yml`'s `push: branches: [main]` trigger is
+commented out, and both Storybook projects carry
+`git.deploymentEnabled: false` (root `vercel.json` and `packages/ui/vercel.json`).
+This is a cost freeze on the Vercel metered-usage allowance, not a permanent
+change — restoring it is tracked in #2648.
+
+What this means for an agent:
+
+- **Don't report a merged PR as deployed, and don't treat a stale dev site as a
+  bug.** The dev environment intentionally lags `main` until someone dispatches
+  a deploy.
+- **A merged Sanity or Drizzle migration is NOT live on dev** — the `migrate`
+  and `migrate-db` jobs ride in `deploy-development.yml`, so they wait for the
+  manual dispatch too. This inverts the usual rule that a merged migration is
+  already applied to dev.
+- **Deploying is still human-gated and still a push-class action.** The manual
+  trigger is `gh workflow run deploy-development.yml` (or the Actions tab) for
+  the apps, and the Vercel dashboard's **Redeploy** button for either Storybook.
+  Ask before running any of them; never run `vercel` deploy commands directly
+  (see "Don't" below, which is unchanged).
+
+Full rationale, the per-surface table, and the re-enabling procedure are in
+[`docs/context/ci-automation.md`](docs/context/ci-automation.md)'s
+"Deployments are temporarily manual" section. **When re-enabling, uncomment the
+trigger — never leave it active behind an `if:` guard**, which corrupts the
+workflow's change-detection anchor and silently drops commits.
+
+The rest of this section describes the pipeline as it behaves normally, and as
+it will behave again once the freeze is lifted.
+
 Deploys are automated by the pipeline (see `docs/DEPLOY.md`, `SPEC.md` §13):
 merge to `main` → **development**; push a `vX.Y.Z` git tag → **production**
 (gated by a CI `verify` job). Dev deploys only the app(s) whose turbo graph the
