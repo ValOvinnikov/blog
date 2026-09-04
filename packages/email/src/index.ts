@@ -1,6 +1,13 @@
-export { emailBrandTokens } from './html/brand-tokens';
 export { escapeHtml } from './html/escape-html';
-export { buildEmailShell, type TEmailShellInput } from './html/email-shell';
+export {
+  buildOperatorShell,
+  type TBuildOperatorShellInput,
+} from './html/operator-shell';
+export {
+  buildTenantShell,
+  type TBuildTenantShellInput,
+  type TTenantEmailBrand,
+} from './html/tenant-shell';
 export {
   buildOwnerElevationAlertEmail,
   type TOwnerElevationAlertInput,
