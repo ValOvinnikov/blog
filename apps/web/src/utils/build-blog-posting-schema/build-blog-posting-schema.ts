@@ -26,7 +26,7 @@ export type TBlogPostingSchema = {
  * when the post has none — schema.org's `keywords` accepts free-form `Text`.
  *
  * Returns `undefined` when `siteUrl` is empty, mirroring how
- * `[locale]/layout.tsx` treats an unresolved base URL as "no
+ * `[tenant]/[locale]/layout.tsx` treats an unresolved base URL as "no
  * `metadataBase`" rather than defaulting to `''` — schema.org's `url` must
  * be absolute, so silently concatenating an empty `siteUrl` with a relative
  * `routes.post()` path would produce an invalid (relative) `url` and fail

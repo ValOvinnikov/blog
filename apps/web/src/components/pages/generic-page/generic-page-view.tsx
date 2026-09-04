@@ -30,7 +30,7 @@ const s = genericPageVariants();
  * exist. `modulesContent` is pre-rendered by the wrapper (`ModuleRenderer`)
  * since it's an async Server Component. Each module owns its own full-bleed
  * background/width via `Section`, so `<main>` here is otherwise an
- * unconstrained root. `Header`/`Footer` stay owned by `[locale]/layout.tsx`.
+ * unconstrained root. `Header`/`Footer` stay owned by `[tenant]/[locale]/layout.tsx`.
  */
 export const GenericPageView = ({
   title,

@@ -2,7 +2,7 @@ import { env } from '@web/utils/env/env';
 
 /**
  * The one discriminator for "should `<Analytics />`/`<SpeedInsights />`
- * render at all?" (`apps/web/src/app/[locale]/layout.tsx`) — see
+ * render at all?" (`apps/web/src/app/[tenant]/[locale]/layout.tsx`) — see
  * `WEB_ANALYTICS_ENABLED`'s own comment in `@web/utils/env/env` for why
  * this has to be an explicit opt-in rather than a `VERCEL_ENV` check.
  *

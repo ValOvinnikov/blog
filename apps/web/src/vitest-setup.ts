@@ -86,7 +86,7 @@ vi.mock('next-intl/server', () => ({
 // Next.js build-time transform that doesn't exist under Vitest, so calling
 // them directly throws ("... is not a function"). Stubbed globally, not just
 // in a single layout's test, because `fonts.ts` is evaluated at module load
-// time by anything that imports `[locale]/layout.tsx` or the root
+// time by anything that imports `[tenant]/[locale]/layout.tsx` or the root
 // `not-found.tsx` (directly or transitively) — same reasoning as the
 // `next-intl/server`/`next/navigation` mocks above. The stub returns the
 // shape consumers read: a `className` string plus a `variable` string

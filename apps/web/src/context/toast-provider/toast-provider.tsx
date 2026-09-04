@@ -47,7 +47,7 @@ export interface IToastProviderProps {
 const s = toastProviderVariants();
 
 /**
- * ToastProvider — mounted once near the app root (`[locale]/layout.tsx`).
+ * ToastProvider — mounted once near the app root (`[tenant]/[locale]/layout.tsx`).
  * Owns the toast queue through a framework-free `createToastStore` instance
  * (subscribed via `useSyncExternalStore`, so it renders an always-empty
  * queue on the server and never ships a toast in the static HTML), the

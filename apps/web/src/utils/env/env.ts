@@ -23,7 +23,7 @@ export const env = createEnv({
     SANITY_GENERATE_SECRET: z.string().min(1).optional(),
     // Feature-flag-by-absence (same stance as the two vars above): Web
     // Analytics (`<Analytics />`) and Speed Insights (`<SpeedInsights />`,
-    // `apps/web/src/app/[locale]/layout.tsx`) each load a same-origin script
+    // `apps/web/src/app/[tenant]/[locale]/layout.tsx`) each load a same-origin script
     // (`/_vercel/insights/script.js` / `/_vercel/speed-insights/script.js`)
     // that Vercel's edge only proxies when the matching feature is turned on
     // for that project in the dashboard — off, the request falls through to
@@ -37,7 +37,7 @@ export const env = createEnv({
     // Vercel-owned value — this repo's convention keeps values we define
     // under our own namespace rather than a vendor's.
     // Server-only: whether `<Analytics />`/`<SpeedInsights />` render at all
-    // is decided in `[locale]/layout.tsx` (a Server Component) before the
+    // is decided in `[tenant]/[locale]/layout.tsx` (a Server Component) before the
     // RSC payload is built, so the flag never needs to reach the client
     // bundle.
     WEB_ANALYTICS_ENABLED: z.enum(['true', 'false']).optional(),

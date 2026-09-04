@@ -8,7 +8,7 @@ import { logger } from '@web/utils/logger/logger';
  * Applies the tenant's preset voice pack and any per-key voice overrides on
  * top of the base locale messages returned by `getMessages()`. Called from
  * every route that builds its own `NextIntlClientProvider` tree
- * (`[locale]/layout.tsx`, and the root `not-found.tsx`, which renders
+ * (`[tenant]/[locale]/layout.tsx`, and the root `not-found.tsx`, which renders
  * outside it) — `i18n/request.ts`'s `getRequestConfig` only resolves the
  * base, un-voiced messages since it has no tenant to read.
  */
