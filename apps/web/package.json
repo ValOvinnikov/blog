@@ -41,7 +41,6 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-syntax-highlighter": "^15.6.6",
-    "resend": "^6.18.1",
     "sanity-image": "^1.1.0",
     "server-only": "^0.0.1",
     "tailwind-variants": "^3.2.2",
