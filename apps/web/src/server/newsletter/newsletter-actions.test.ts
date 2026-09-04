@@ -1,6 +1,9 @@
+import { PRESET_ID, resolveTenantEmailBrand } from '@blog/config';
+
 const {
   createPendingSubscriberMock,
   sendEmailMock,
+  resolveTenantEmailIdentityMock,
   markNewsletterSubscribedMock,
   getRequestTenantIdMock,
   getTenantBaseUrlMock,
@@ -8,6 +11,7 @@ const {
 } = vi.hoisted(() => ({
   createPendingSubscriberMock: vi.fn(),
   sendEmailMock: vi.fn(),
+  resolveTenantEmailIdentityMock: vi.fn(),
   markNewsletterSubscribedMock: vi.fn(),
   getRequestTenantIdMock: vi.fn(),
   getTenantBaseUrlMock: vi.fn(),
@@ -20,8 +24,13 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-vi.mock('@web/server/email/send-email', () => ({
+vi.mock('@blog/email', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@blog/email')>()),
   sendEmail: sendEmailMock,
+}));
+
+vi.mock('@web/utils/resolve-tenant-email-identity', () => ({
+  resolveTenantEmailIdentity: resolveTenantEmailIdentityMock,
 }));
 
 vi.mock('@web/server/newsletter/newsletter-subscribed-cookie', () => ({
@@ -57,10 +66,20 @@ const subscriber = {
   confirmedAt: null,
 };
 
+const DEFAULT_BRAND = resolveTenantEmailBrand({
+  preset: PRESET_ID.CONSOLE,
+  accentHue: 250,
+});
+
 describe('subscribeToNewsletterAction', () => {
   beforeEach(() => {
     createPendingSubscriberMock.mockReset();
     sendEmailMock.mockReset();
+    resolveTenantEmailIdentityMock.mockReset();
+    resolveTenantEmailIdentityMock.mockResolvedValue({
+      brand: DEFAULT_BRAND,
+      brandName: 'Acme Blog',
+    });
     markNewsletterSubscribedMock.mockReset();
     getRequestTenantIdMock.mockReset();
     getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
@@ -240,6 +259,38 @@ describe('subscribeToNewsletterAction', () => {
       expect.stringContaining('newsletter.subscribed_cookie_set_failed'),
     );
     errorSpy.mockRestore();
+  });
+
+  it("renders the subscribing tenant's own resolved brand and name in the confirmation email", async () => {
+    createPendingSubscriberMock.mockResolvedValue({
+      ok: true,
+      data: { outcome: 'created', subscriber },
+    });
+    const tenantBrand = resolveTenantEmailBrand({
+      preset: PRESET_ID.CONSOLE,
+      accentHue: 40,
+    });
+    resolveTenantEmailIdentityMock.mockResolvedValue({
+      brand: tenantBrand,
+      brandName: 'Zeta Times',
+    });
+    sendEmailMock.mockResolvedValue(undefined);
+    const { subscribeToNewsletterAction } =
+      await import('./newsletter-actions');
+
+    await subscribeToNewsletterAction('reader@example.com');
+
+    expect(resolveTenantEmailIdentityMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        html: expect.stringContaining(tenantBrand.logo1),
+      }),
+    );
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        html: expect.stringContaining('Zeta Times'),
+      }),
+    );
   });
 
   it('still returns "already-subscribed" (logging, not failing) when marking the cookie throws', async () => {

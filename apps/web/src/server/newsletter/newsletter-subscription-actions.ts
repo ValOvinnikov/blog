@@ -1,8 +1,8 @@
 'use server';
 
 import { queries } from '@blog/db';
+import { sendEmail } from '@blog/email';
 import { auth } from '@web/server/auth/auth';
-import { sendEmail } from '@web/server/email/send-email';
 import { buildNewsletterConfirmationEmail } from '@web/server/newsletter/newsletter-confirmation-email';
 import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address';
 import { clearNewsletterSubscribedCookie } from '@web/server/newsletter/newsletter-subscribed-cookie';
@@ -11,6 +11,7 @@ import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { isTenantActive } from '@web/server/tenant/is-tenant-active';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
+import { resolveTenantEmailIdentity } from '@web/utils/resolve-tenant-email-identity';
 
 export type TUnsubscribeResult = { ok: true } | { ok: false };
 export type TResendConfirmationActionResult = { ok: true } | { ok: false };
@@ -99,8 +100,11 @@ export const resendConfirmationAction =
 
       const siteUrl = (await getTenantBaseUrl()) ?? '';
       const confirmationUrl = `${siteUrl}/api/newsletter/confirm?token=${result.confirmationToken}`;
+      const { brand, brandName } = await resolveTenantEmailIdentity(tenantId);
       const { subject, html } = buildNewsletterConfirmationEmail({
         confirmationUrl,
+        brand,
+        brandName,
       });
       const fromAddress = resolveNewsletterFromAddress(
         env.NEWSLETTER_FROM_ADDRESS,

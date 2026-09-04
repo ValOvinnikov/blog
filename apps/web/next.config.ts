@@ -153,7 +153,12 @@ const config: NextConfig = {
       ],
     },
   },
-  transpilePackages: ['@blog/ui', '@blog/service', '@blog/config'],
+  transpilePackages: [
+    '@blog/ui',
+    '@blog/service',
+    '@blog/config',
+    '@blog/email',
+  ],
   images: {
     // This app never uses Next's static-image-import feature (all imagery
     // is remote Sanity CDN URLs via SanityImage) — disabling it removes

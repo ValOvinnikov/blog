@@ -1,7 +1,7 @@
 'use server';
 
 import { queries } from '@blog/db';
-import { sendEmail } from '@web/server/email/send-email';
+import { sendEmail } from '@blog/email';
 import { buildNewsletterConfirmationEmail } from '@web/server/newsletter/newsletter-confirmation-email';
 import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address';
 import { markNewsletterSubscribed } from '@web/server/newsletter/newsletter-subscribed-cookie';
@@ -11,6 +11,7 @@ import { isTenantActive } from '@web/server/tenant/is-tenant-active';
 import { env } from '@web/utils/env/env';
 import { isValidEmail } from '@web/utils/is-valid-email';
 import { logger } from '@web/utils/logger/logger';
+import { resolveTenantEmailIdentity } from '@web/utils/resolve-tenant-email-identity';
 
 export type TSubscribeResult =
   | { outcome: 'success' }
@@ -69,8 +70,12 @@ export const subscribeToNewsletterAction = async (
 
     const siteUrl = (await getTenantBaseUrl()) ?? '';
     const confirmationUrl = `${siteUrl}/api/newsletter/confirm?token=${subscriber.confirmationToken}`;
+    const { brand, brandName } = await resolveTenantEmailIdentity(tenantId);
+
     const { subject, html } = buildNewsletterConfirmationEmail({
       confirmationUrl,
+      brand,
+      brandName,
     });
 
     // Resolved inside the action, not at module scope — the `'use client'`
