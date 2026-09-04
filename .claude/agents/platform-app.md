@@ -146,6 +146,20 @@ When invoked, before writing any code:
   added to `tsconfig.json` `paths` **and** `vitest.config.ts` `resolve.alias` —
   that wiring is the `config` agent's, so report it rather than editing shared
   presets yourself.
+- **Never hardcode user-facing copy in JSX.** This app runs on `next-intl`:
+  every visible string comes from the catalogue at
+  `apps/platform/src/i18n/messages/en.json`, read with `useTranslations` in a
+  component, or `getTranslations` from `next-intl/server` in an async context
+  where the hook cannot run (`generateMetadata`, a Server Action, a route
+  handler). The setup lives in `apps/platform/src/i18n/` (`routing.ts`,
+  `request.ts`, `navigation.ts`) and routes sit under `src/app/[locale]/`.
+  `ariaLabel`s and `title`s are copy too — they go through the same
+  catalogue, never a literal (see Accessibility).
+- **Link with `@platform/i18n/navigation`, not `next/link`.** That module
+  re-exports the locale-aware `Link`, `permanentRedirect`, `usePathname` and
+  `useRouter` from `createNavigation(routing)`. No lint rule enforces this yet,
+  so it holds by discipline — every navigation in the app currently uses it,
+  and a stray `next/link` import would pass CI.
 
 ## Base UI is this app's behavior layer
 
@@ -443,8 +457,12 @@ them to fix these.
 
 ## Not decided — do not invent
 
-- **No i18n.** `apps/platform` has no `next-intl` setup and no locale segment. Do
-  not add one; if a ticket needs localized admin copy, report it back.
+- **No second locale.** The `next-intl` plumbing is real and every string
+  already goes through it, but `routing.ts` declares exactly one locale (`EN`)
+  with `localePrefix: 'never'`, so no locale ever appears in a URL. Adding a
+  locale, a switcher, or prefixed routes is unsettled — report it back rather
+  than deciding. Adding a _key_ to the existing catalogue is ordinary work and
+  needs no permission.
 - **No SEO surface.** No `generateMetadata` beyond a plain title, no sitemap,
   no robots, no feeds. This app should not be indexed.
 - **Voice settings mirror a curated subset of `apps/web`'s i18n keys.**
