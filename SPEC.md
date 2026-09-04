@@ -47,7 +47,12 @@ topic cap was narrowed to a single required reference in #809 on
 is **not** redirected and simply 404s.
 
 Both environments are **live** (§13): merging to `main` deploys development;
-a `vX.Y.Z` tag promotes to production.
+a `vX.Y.Z` tag promotes to production. **Temporarily suspended (2026-09-04):**
+automatic deployments are off as a Vercel cost freeze — dev deploys run by
+manual `workflow_dispatch` and both Storybook projects deploy from the Vercel
+dashboard. See
+[`docs/context/ci-automation.md`](docs/context/ci-automation.md)'s
+"Deployments are temporarily manual"; restoring them is tracked in #2648.
 
 **Routing conventions, per-surface layout decisions, and their history**
 (pagination/canonical rules, the tag axis, post-detail layout, choose-your-depth

@@ -838,6 +838,15 @@ Local dev points at the **dev** project (`<DEV_PROJECT_ID>`):
 
 ## How a deploy happens (steady state)
 
+> **Temporarily suspended (2026-09-04).** Automatic deployments are off as a
+> Vercel cost freeze: `deploy-development.yml`'s `push` trigger is commented
+> out and both Storybook projects carry `git.deploymentEnabled: false`. Dev
+> deploys run via `gh workflow run deploy-development.yml`; Storybook deploys
+> from the Vercel dashboard's **Redeploy** button. The rest of this section
+> describes the steady state, which resumes when #2648 lands. Details in
+> [`docs/context/ci-automation.md`](context/ci-automation.md)'s "Deployments
+> are temporarily manual".
+
 ### Development — on merge to `main`
 
 `.github/workflows/deploy-development.yml` (Vercel's `main` auto-deploy is
@@ -907,7 +916,9 @@ running migration instead of interrupting a mutation mid-transaction. GitHub
 keeps at most one pending run per group, so a burst of merges collapses to
 "finish the current migration, then run the latest".
 
-There are **no PR preview deployments** — deploys happen only on merge to `main`.
+There are **no PR preview deployments** — deploys happen only on merge to
+`main`, and while the cost freeze above is in force, only on a manual
+`workflow_dispatch`.
 
 ### Production — on a `vX.Y.Z` tag
 
