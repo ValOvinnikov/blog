@@ -5,6 +5,7 @@ import { findPendingInviteTenantNames } from './find-pending-invite-tenant-names
 import { buildMagicLinkEmail } from './magic-link-email';
 import { buildInviteMagicLinkEmail } from './magic-link-invite-email';
 import { resolveMagicLinkFromAddress } from './resolve-magic-link-from-address';
+import { resolveTenantEmailIdentity } from './resolve-tenant-email-identity';
 
 export type TSendEmailInput = {
   to: string;
@@ -37,10 +38,17 @@ export function buildMagicLinkProvider(sendEmail: TSendEmail): EmailConfig {
         // magic-link email itself. Never console.*, this package never logs
         // (see CLAUDE.md).
       }
+      const tenantIdentity = await resolveTenantEmailIdentity(host);
+
       const { subject, html } =
         tenantNames.length > 0
-          ? buildInviteMagicLinkEmail({ url, host, tenantNames })
-          : buildMagicLinkEmail({ url, host });
+          ? buildInviteMagicLinkEmail({
+              url,
+              host,
+              tenantNames,
+              tenantIdentity,
+            })
+          : buildMagicLinkEmail({ url, host, tenantIdentity });
 
       await sendEmail({ to: identifier, from, subject, html });
     },

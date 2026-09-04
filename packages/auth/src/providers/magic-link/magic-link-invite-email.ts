@@ -1,10 +1,15 @@
+import { buildTenantShell } from '@blog/email';
+
 import { escapeHtml } from './escape-html';
 import type { TMagicLinkEmailContent } from './magic-link-email';
+import type { TResolvedTenantEmailIdentity } from './resolve-tenant-email-identity';
 
 export type TMagicLinkInviteEmailInput = {
   url: string;
   host: string;
   tenantNames: string[];
+  /** The sending host's resolved tenant, if any — see `resolveTenantEmailIdentity`. */
+  tenantIdentity?: TResolvedTenantEmailIdentity;
 };
 
 /**
@@ -14,17 +19,26 @@ export function buildInviteMagicLinkEmail({
   url,
   host,
   tenantNames,
+  tenantIdentity,
 }: TMagicLinkInviteEmailInput): TMagicLinkEmailContent {
   const tenantList = formatTenantNames(tenantNames);
   const tenantListHtml = formatTenantNames(tenantNames.map(escapeHtml));
 
+  const bodyHtml = [
+    `<p>You've been invited to manage <strong>${tenantListHtml}</strong> on ${escapeHtml(host)}.</p>`,
+    `<p><a href="${escapeHtml(url)}">Sign in to get started</a></p>`,
+    `<p>If you did not expect this invite, you can safely ignore it.</p>`,
+  ].join('');
+
   return {
     subject: `You've been invited to manage ${tenantList}`,
-    html: [
-      `<p>You've been invited to manage <strong>${tenantListHtml}</strong> on ${escapeHtml(host)}.</p>`,
-      `<p><a href="${escapeHtml(url)}">Sign in to get started</a></p>`,
-      `<p>If you did not expect this invite, you can safely ignore it.</p>`,
-    ].join(''),
+    html: tenantIdentity
+      ? buildTenantShell({
+          brand: tenantIdentity.brand,
+          brandName: tenantIdentity.brandName,
+          bodyHtml,
+        })
+      : bodyHtml,
   };
 }
 

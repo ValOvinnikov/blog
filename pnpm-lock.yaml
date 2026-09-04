@@ -458,6 +458,9 @@ importers:
       '@auth/drizzle-adapter':
         specifier: ^1.11.3
         version: 1.11.3
+      '@blog/config':
+        specifier: workspace:*
+        version: link:../config
       '@blog/db':
         specifier: workspace:*
         version: link:../db
