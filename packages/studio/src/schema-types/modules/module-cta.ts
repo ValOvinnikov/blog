@@ -3,12 +3,11 @@ import {
   CTA_IMAGE_SIDE,
   CTA_MOBILE_MEDIA_ORDER,
   CTA_VARIANT,
+  FULL_BRAND_VARIANT_LIST,
+  type TCtaVariant,
 } from '@blog/config/constants';
 import { actionGroupField } from '@blog/studio/schema-types/helpers/action-group-field';
-import {
-  brandVariantField,
-  FULL_BRAND_VARIANT_LIST,
-} from '@blog/studio/schema-types/helpers/brand-variant-field';
+import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
 import { layoutField } from '@blog/studio/schema-types/helpers/layout-field';
 import { sectionHeaderField } from '@blog/studio/schema-types/helpers/section-header-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
@@ -20,7 +19,7 @@ import { defineField, defineType } from 'sanity';
 
 type TCtaParent = { variant?: string; brandVariant?: string };
 
-const isVariant = (parent: unknown, variant: string) =>
+const isVariant = (parent: unknown, variant: TCtaVariant) =>
   (parent as TCtaParent | undefined)?.variant === variant;
 
 const isSplitVariant = ({ parent }: { parent?: unknown }) =>

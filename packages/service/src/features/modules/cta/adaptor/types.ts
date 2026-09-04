@@ -2,12 +2,12 @@ import type {
   BasicText,
   ILink,
   ISanityImage,
-  TBrandVariantOf,
   TCtaActionAppearance,
   TCtaActionVariant,
   TCtaImageSide,
   TCtaMobileMediaOrder,
   TCtaVariant,
+  TFullBrandVariant,
   THeadingAlign,
   TLayout,
   TMaybeUndefined,
@@ -21,8 +21,8 @@ export type TCtaAction = {
 
 export type TCtaModule = {
   variant: TCtaVariant;
-  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY'>;
-  bandTone: TBrandVariantOf<'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY'>;
+  brandVariant: TFullBrandVariant;
+  bandTone: TFullBrandVariant;
   eyebrow: TMaybeUndefined<string>;
   sectionHeader: {
     heading: string;

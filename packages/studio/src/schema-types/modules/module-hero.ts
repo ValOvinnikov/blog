@@ -1,9 +1,9 @@
-import { HERO_FIELD_MODE } from '@blog/config/constants';
-import { postSchema } from '@blog/studio/schema-types/documents/blog/post';
 import {
-  brandVariantField,
   FULL_BRAND_VARIANT_LIST,
-} from '@blog/studio/schema-types/helpers/brand-variant-field';
+  HERO_FIELD_MODE,
+} from '@blog/config/constants';
+import { postSchema } from '@blog/studio/schema-types/documents/blog/post';
+import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
 import { defineModeFieldPair } from '@blog/studio/schema-types/helpers/define-mode-field-pair';
 import { heroLayoutField } from '@blog/studio/schema-types/helpers/layout-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
