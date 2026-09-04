@@ -20,7 +20,11 @@ vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
   getTenantSanityContext: getTenantSanityContextMock,
 }));
 
-const setup = customRenderAsync(CtaModule, { id: 'cta-1', locale: 'en' });
+const setup = customRenderAsync(CtaModule, {
+  id: 'cta-1',
+  locale: 'en',
+  tenant: 'tenant-1',
+});
 
 describe(CtaModule, () => {
   beforeEach(() => {
@@ -49,5 +53,6 @@ describe(CtaModule, () => {
     await setup();
 
     expect(getCtaMock).toHaveBeenCalledWith('cta-1', tenant);
+    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 });

@@ -581,11 +581,38 @@ context: omitting one is a compile error, not a silent fall back to the
 platform's own project. Code that legitimately wants the platform's project
 says so explicitly through `getPlatformSanityContext()`,
 `getPlatformSanityWriteContext()` or `getPlatformClient()` — which is what the
-single-tenant dev/preview fallback path uses. No build-time caller remains:
-#2493 deleted the seven content routes' `generateStaticParams`, having measured
-that they queried the platform's project at build and had their output
-discarded, since `[locale]/layout.tsx` reads `headers()` and forces every
-content route dynamic. Every content path is served on demand.
+single-tenant dev/preview fallback path uses. No build-time caller enumerates
+content: the content routes' `generateStaticParams` return an empty list, with
+`dynamicParams` at its default, so each `(tenant, locale, slug)` path is
+rendered and cached on first request rather than baked. Enumerating tenants at
+build time is deliberately avoided — it would require production credentials
+in the build and scales into a per-page `staticPageGenerationTimeout` cliff.
+
+**The tenant reaches a route through its `[tenant]` path segment, not a
+request header.** `proxy.ts` resolves it from `Host` and writes it into the
+path by rewrite (invisible in the URL, as `localePrefix: 'never'` already
+hides the locale), and routes pass `params.tenant` down explicitly —
+`ITenantLocalizedParams` in `@blog/config` types the pair. The two functions
+that read the request (`getRequestTenantId`, `resolveRequestTenant`, in
+`apps/web/src/server/tenant/`) take the tenant as an argument and only touch
+`headers()` when not given one. That fallback serves Server Actions,
+`app/not-found.tsx`, and the root-level `Host`-resolved routes
+(`robots.ts`/`sitemap.ts`/`rss.xml`) — none of which have route params to
+thread — and also the `account`/`bookmarks` compositions, which do sit under a
+route carrying `tenant` but deliberately leave it unthreaded: `force-dynamic`
+already excludes them from the cache, so resolving from the request costs them
+nothing.
+
+A route cannot validate its own tenant param — doing so means reading `Host`,
+which would force the dynamic rendering this arrangement removes. `proxy.ts`
+is therefore the sole writer of that segment and refuses any inbound request
+whose first path segment is already tenant-shaped, decoding it first so a
+percent-encoded id cannot slip past a raw-string test.
+
+`account` and `bookmarks` opt out with `force-dynamic`: both render the
+signed-in reader's own session, so they must never be cached across users, and
+stating that on the route is safer than relying on a session read several
+layers below it.
 
 Client-side error capture is a self-hosted route, not a third-party SDK
 (`web`'s Lighthouse performance budget rules out shipping an SDK on every

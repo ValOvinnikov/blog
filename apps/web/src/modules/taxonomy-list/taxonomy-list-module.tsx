@@ -12,6 +12,7 @@ import {
 
 export interface ITaxonomyListModuleProps {
   id: string;
+  tenant: string;
   taxonomy: TTaxonomyKind;
   titleId: string;
   dataTestId: string;
@@ -32,6 +33,7 @@ export interface ITaxonomyListModuleProps {
  */
 export const TaxonomyListModule = async ({
   id,
+  tenant,
   taxonomy,
   titleId,
   dataTestId,
@@ -41,11 +43,11 @@ export const TaxonomyListModule = async ({
   buildHref,
   formatPostCount,
 }: ITaxonomyListModuleProps) => {
-  const tenant = await getTenantSanityContext();
+  const tenantContext = await getTenantSanityContext(tenant);
   const result = await service.modules.taxonomyList.v1.getTaxonomyList(
     id,
     taxonomy,
-    tenant,
+    tenantContext,
   );
 
   if (!result.ok) {

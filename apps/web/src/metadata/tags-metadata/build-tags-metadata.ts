@@ -5,9 +5,9 @@ import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-con
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 
-export const buildTagsMetadata = async (): Promise<Metadata> => {
-  const tenant = await getTenantSanityContext();
-  const result = await service.pages.tagIndex.v1.getIndexPage(tenant);
+export const buildTagsMetadata = async (tenant: string): Promise<Metadata> => {
+  const tenantContext = await getTenantSanityContext(tenant);
+  const result = await service.pages.tagIndex.v1.getIndexPage(tenantContext);
 
   if (!result.ok) {
     logger.error('tags_metadata.fetch_failed', { error: result.error });

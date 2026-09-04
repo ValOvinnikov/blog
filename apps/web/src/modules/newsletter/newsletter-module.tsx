@@ -8,6 +8,7 @@ import { NewsletterModuleView } from './newsletter-module-view';
 export interface INewsletterModuleProps {
   id: string;
   locale: string;
+  tenant: string;
 }
 
 /**
@@ -22,12 +23,18 @@ export interface INewsletterModuleProps {
  * `NEWSLETTER` capability — same silent-omission fallback `ModuleRenderer`
  * uses for an unrecognized module type.
  */
-export const NewsletterModule = async ({ id }: INewsletterModuleProps) => {
-  const isEnabled = await isCapabilityEnabled(CAPABILITY.NEWSLETTER);
+export const NewsletterModule = async ({
+  id,
+  tenant,
+}: INewsletterModuleProps) => {
+  const isEnabled = await isCapabilityEnabled(CAPABILITY.NEWSLETTER, tenant);
   if (!isEnabled) return null;
 
-  const tenant = await getTenantSanityContext();
-  const result = await service.modules.newsletter.v1.getNewsletter(id, tenant);
+  const tenantContext = await getTenantSanityContext(tenant);
+  const result = await service.modules.newsletter.v1.getNewsletter(
+    id,
+    tenantContext,
+  );
 
   if (!result.ok) return null;
 

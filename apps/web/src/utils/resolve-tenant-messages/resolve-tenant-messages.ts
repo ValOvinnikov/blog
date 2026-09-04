@@ -10,12 +10,15 @@ import { logger } from '@web/utils/logger/logger';
  * every route that builds its own `NextIntlClientProvider` tree
  * (`[tenant]/[locale]/layout.tsx`, and the root `not-found.tsx`, which renders
  * outside it) — `i18n/request.ts`'s `getRequestConfig` only resolves the
- * base, un-voiced messages since it has no tenant to read.
+ * base, un-voiced messages since it has no tenant to read. Accepts the
+ * `[tenant]` route param and forwards it to `getSiteConfig`; the root
+ * `not-found.tsx` has no param to supply and falls through to the header.
  */
 export const resolveTenantMessages = async (
   base: Record<string, unknown>,
+  tenant?: string,
 ): Promise<Record<string, unknown>> => {
-  const result = await getSiteConfig();
+  const result = await getSiteConfig(tenant);
 
   let presetId: TPresetId = PRESET_ID.CONSOLE;
   let voiceOverrides: Record<string, string> = {};

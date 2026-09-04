@@ -22,7 +22,11 @@ vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
   getTenantSanityContext: getTenantSanityContextMock,
 }));
 
-const setup = customRenderAsync(HeroModule, { id: 'hero-1', locale: 'en' });
+const setup = customRenderAsync(HeroModule, {
+  id: 'hero-1',
+  locale: 'en',
+  tenant: 'tenant-1',
+});
 
 describe(HeroModule, () => {
   beforeEach(() => {
@@ -55,6 +59,7 @@ describe(HeroModule, () => {
     await setup();
 
     expect(getHeroMock).toHaveBeenCalledWith('hero-1', tenant);
+    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders nothing when the fetch fails', async () => {

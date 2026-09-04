@@ -32,6 +32,10 @@ export interface ILocalizedParams {
   locale: TLocaleIsoCode;
 }
 
+export interface ITenantLocalizedParams extends ILocalizedParams {
+  tenant: string;
+}
+
 export const FORM_STATUSES = [
   'idle',
   'submitting',

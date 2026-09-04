@@ -39,6 +39,7 @@ vi.mock('@web/components/shared/smart-link', () => ({
 const setup = customRenderAsync(PostLatestModule, {
   id: 'post-latest-1',
   locale: 'en',
+  tenant: 'tenant-1',
 });
 
 describe(PostLatestModule, () => {
@@ -95,6 +96,7 @@ describe(PostLatestModule, () => {
     await setup();
 
     expect(getPostLatestMock).toHaveBeenCalledWith('post-latest-1', tenant);
+    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders nothing when the fetch fails', async () => {

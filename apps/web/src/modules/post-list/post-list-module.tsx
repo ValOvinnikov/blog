@@ -14,6 +14,7 @@ import {
 export interface IPostListModuleProps {
   id: string;
   locale: string;
+  tenant: string;
   page: number;
   /** Pagination href builder. Defaults to `routes.blogIndex` for `/blog`; archive callers other than `/blog` must supply their own. */
   createHref?: (page: number) => string;
@@ -39,6 +40,7 @@ export interface IPostListModuleProps {
  */
 export const PostListModule = async ({
   id,
+  tenant,
   page,
   createHref = routes.blogIndex,
   ariaLabel,
@@ -46,9 +48,9 @@ export const PostListModule = async ({
   emptyMessageFallback,
   titleId = 'blog-posts-title',
 }: IPostListModuleProps) => {
-  const tenant = await getTenantSanityContext();
+  const tenantContext = await getTenantSanityContext(tenant);
   const [result, blogListT, paginationT] = await Promise.all([
-    service.modules.postList.v1.getPostList(id, tenant, page),
+    service.modules.postList.v1.getPostList(id, tenantContext, page),
     getTranslations('blogListPage'),
     getTranslations('pagination'),
   ]);

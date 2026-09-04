@@ -30,6 +30,24 @@ describe('getThemeTokens', () => {
     );
   });
 
+  it('forwards an explicitly supplied tenant to getSiteConfig', async () => {
+    vi.mocked(getSiteConfig).mockResolvedValue({
+      ok: true,
+      data: {
+        preset: PRESET_ID.CONSOLE,
+        accentHue: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue,
+        headingFont: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.headingFont,
+        bodyFont: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.bodyFont,
+        radiusScale: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.radiusScale,
+        density: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.density,
+      } as never,
+    });
+
+    await getThemeTokens('tenant-1');
+
+    expect(getSiteConfig).toHaveBeenCalledWith('tenant-1');
+  });
+
   it('falls back to the Console preset tokens and logs when the fetch fails', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.mocked(getSiteConfig).mockResolvedValue({

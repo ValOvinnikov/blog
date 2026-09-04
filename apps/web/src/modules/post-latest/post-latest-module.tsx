@@ -8,16 +8,20 @@ import { PostListModuleView } from '../post-list/post-list-module-view';
 export interface IPostLatestModuleProps {
   id: string;
   locale: string;
+  tenant: string;
 }
 
 /**
  * PostLatestModule — fetches `module_postLatest` data (a latest-N teaser,
  * never paginated) and hands it to the shared `PostListModuleView`.
  */
-export const PostLatestModule = async ({ id }: IPostLatestModuleProps) => {
-  const tenant = await getTenantSanityContext();
+export const PostLatestModule = async ({
+  id,
+  tenant,
+}: IPostLatestModuleProps) => {
+  const tenantContext = await getTenantSanityContext(tenant);
   const [result, t] = await Promise.all([
-    service.modules.postLatest.v1.getPostLatest(id, tenant),
+    service.modules.postLatest.v1.getPostLatest(id, tenantContext),
     getTranslations('postLatestModule'),
   ]);
 

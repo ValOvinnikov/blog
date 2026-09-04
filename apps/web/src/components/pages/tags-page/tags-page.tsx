@@ -10,15 +10,17 @@ import { getTranslations } from 'next-intl/server';
 
 import { TagsPageView } from './tags-page-view';
 
+type TTagsPageProps = { tenant: string };
+
 /**
  * TagsPage — `/tags` composition: fetches the `page_tagIndex` document via
  * `service.pages.tagIndex.v1.getIndexPage()`, then hands the resolved data —
  * plus the pre-rendered `taxonomyList` slot content — to `TagsPageView`.
  */
-export const TagsPage = async () => {
-  const tenant = await getTenantSanityContext();
+export const TagsPage = async ({ tenant }: TTagsPageProps) => {
+  const tenantContext = await getTenantSanityContext(tenant);
   const [result, breadcrumbsT, t] = await Promise.all([
-    service.pages.tagIndex.v1.getIndexPage(tenant),
+    service.pages.tagIndex.v1.getIndexPage(tenantContext),
     getTranslations('breadcrumbs'),
     getTranslations('tagsPage'),
   ]);
@@ -28,7 +30,7 @@ export const TagsPage = async () => {
     'tags_page.fetch_failed',
   );
 
-  const siteUrl = (await getTenantBaseUrl()) ?? '';
+  const siteUrl = (await getTenantBaseUrl(tenant)) ?? '';
   const breadcrumbTrail: IBreadcrumbItem[] = [
     { label: breadcrumbsT('home'), href: routes.home() },
     { label: breadcrumbsT('tags'), href: routes.tags() },
@@ -48,6 +50,7 @@ export const TagsPage = async () => {
       taxonomyListContent={
         <TaxonomyListModule
           id={taxonomyListId}
+          tenant={tenant}
           taxonomy={TAXONOMY_KIND.TAGS}
           titleId="tag-list-title"
           dataTestId={`taxonomy-list-module-${taxonomyListId}`}

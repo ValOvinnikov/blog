@@ -1,12 +1,15 @@
 import { queries, TENANT_STATUS } from '@blog/db';
 
 import { resolveRequestTenant } from './resolve-request-tenant';
-import { resolveTenant } from './resolve-tenant';
+import { resolveTenant, resolveTenantById } from './resolve-tenant';
 
 const { headersMock } = vi.hoisted(() => ({ headersMock: vi.fn() }));
 
 vi.mock('next/headers', () => ({ headers: headersMock }));
-vi.mock('./resolve-tenant', () => ({ resolveTenant: vi.fn() }));
+vi.mock('./resolve-tenant', () => ({
+  resolveTenant: vi.fn(),
+  resolveTenantById: vi.fn(),
+}));
 vi.mock('@blog/db', () => ({
   queries: {
     tenants: {
@@ -77,6 +80,21 @@ describe(resolveRequestTenant, () => {
     vi.mocked(resolveTenant).mockResolvedValue(undefined);
 
     await expect(resolveRequestTenant()).resolves.toBeUndefined();
+  });
+
+  it('prefers an explicitly supplied tenant id over Host, resolving by id without reading headers', async () => {
+    vi.mocked(resolveTenantById).mockResolvedValue({
+      id: 'tenant-1',
+      primaryDomain: 'acme.example.com',
+    } as never);
+
+    await expect(resolveRequestTenant('tenant-1')).resolves.toEqual(
+      expect.objectContaining({ id: 'tenant-1' }),
+    );
+
+    expect(headersMock).not.toHaveBeenCalled();
+    expect(resolveTenant).not.toHaveBeenCalled();
+    expect(resolveTenantById).toHaveBeenCalledWith('tenant-1');
   });
 });
 

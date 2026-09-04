@@ -21,8 +21,8 @@ const getCachedSiteConfigForTenant = (tenantId: string) =>
     },
   )(tenantId);
 
-const getUncachedSiteConfig = async () => {
-  const tenantId = await getRequestTenantId();
+const getUncachedSiteConfig = async (tenant?: string) => {
+  const tenantId = await getRequestTenantId(tenant);
   if (!tenantId) return undefined;
   return getCachedSiteConfigForTenant(tenantId);
 };
@@ -31,6 +31,7 @@ const getUncachedSiteConfig = async () => {
  * The single `@blog/db` read shared by `getThemeTokens` (the theme
  * `<style>`/font-variable injector) and `resolveTenantMessages` (the
  * next-intl voice ladder) — one cached row backs both, cached per tenant so
- * no tenant is ever served another's config.
+ * no tenant is ever served another's config. Accepts the `[tenant]` route
+ * param and forwards it to `getRequestTenantId`.
  */
 export const getSiteConfig = safeAsync(getUncachedSiteConfig);

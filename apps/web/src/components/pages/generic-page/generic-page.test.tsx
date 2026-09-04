@@ -63,6 +63,7 @@ vi.mock('@web/components/shared/smart-link', () => ({
 const setup = customRenderAsync(GenericPage, {
   slug: 'about-us',
   locale: 'EN',
+  tenant: 'tenant-1',
 });
 
 describe(`<${GenericPage.name}/>`, () => {
@@ -123,7 +124,7 @@ describe(`<${GenericPage.name}/>`, () => {
     await setup();
 
     expect(moduleRendererMock).toHaveBeenCalledWith(
-      { modules: [], locale: 'EN' },
+      { modules: [], locale: 'EN', tenant: 'tenant-1' },
       undefined,
     );
   });
@@ -144,6 +145,7 @@ describe(`<${GenericPage.name}/>`, () => {
       {
         modules: [{ id: 'module-1', type: 'module_content' }],
         locale: 'EN',
+        tenant: 'tenant-1',
       },
       undefined,
     );

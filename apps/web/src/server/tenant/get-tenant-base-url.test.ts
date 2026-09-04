@@ -54,6 +54,17 @@ describe(getTenantBaseUrl, () => {
     );
   });
 
+  it('forwards an explicitly supplied tenant to resolveRequestTenant', async () => {
+    vi.mocked(resolveRequestTenant).mockResolvedValue({
+      id: 'tenant-1',
+      primaryDomain: 'demo.valstack.dev',
+    } as never);
+
+    await getTenantBaseUrl('tenant-1');
+
+    expect(resolveRequestTenant).toHaveBeenCalledWith('tenant-1');
+  });
+
   it('returns undefined when no tenant resolves and NEXT_PUBLIC_SITE_URL is unset', async () => {
     vi.doMock('@web/utils/env/env', () => ({ env: {} }));
     vi.resetModules();

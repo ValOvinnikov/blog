@@ -18,6 +18,7 @@ vi.mock('./module-map', () => ({
 const setup = customRenderAsync(ModuleRenderer, {
   modules: [{ type: 'module_cta', id: 'cta-doc-id' }],
   locale: 'en',
+  tenant: 'tenant-1',
 });
 
 describe('ModuleRenderer', () => {
@@ -31,12 +32,13 @@ describe('ModuleRenderer', () => {
     expect(screen.getByTestId('stub-cta')).toHaveTextContent('cta-doc-id');
   });
 
-  it('forwards id and locale to every module component', async () => {
+  it('forwards id, locale, and tenant to every module component', async () => {
     await setup();
 
     expect(ctaModuleMock).toHaveBeenCalledWith({
       id: 'cta-doc-id',
       locale: 'en',
+      tenant: 'tenant-1',
     });
   });
 

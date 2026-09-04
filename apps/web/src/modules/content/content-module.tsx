@@ -6,15 +6,16 @@ import { ContentModuleView } from './content-module-view';
 export interface IContentModuleProps {
   id: string;
   locale: string;
+  tenant: string;
 }
 
 /**
  * ContentModule — fetches `module_content` data and hands it to
  * `ContentModuleView`.
  */
-export const ContentModule = async ({ id }: IContentModuleProps) => {
-  const tenant = await getTenantSanityContext();
-  const result = await service.modules.content.v1.getContent(id, tenant);
+export const ContentModule = async ({ id, tenant }: IContentModuleProps) => {
+  const tenantContext = await getTenantSanityContext(tenant);
+  const result = await service.modules.content.v1.getContent(id, tenantContext);
 
   if (!result.ok) return null;
 
@@ -25,7 +26,7 @@ export const ContentModule = async ({ id }: IContentModuleProps) => {
     <ContentModuleView
       id={id}
       {...result.data}
-      baseUrl={getSanityImageBaseUrl(tenant)}
+      baseUrl={getSanityImageBaseUrl(tenantContext)}
     />
   );
 };

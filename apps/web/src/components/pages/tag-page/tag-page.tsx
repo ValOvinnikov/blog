@@ -11,7 +11,12 @@ import { getTranslations } from 'next-intl/server';
 
 import { TagPageView } from './tag-page-view';
 
-type TTagPageProps = { slug: string; page?: number; locale: string };
+type TTagPageProps = {
+  slug: string;
+  page?: number;
+  locale: string;
+  tenant: string;
+};
 
 /**
  * TagPage — shared composition for `/tags/[slug]` (page 1, `page`
@@ -20,10 +25,15 @@ type TTagPageProps = { slug: string; page?: number; locale: string };
  * data — plus the pre-rendered archive/page-builder modules content — to
  * `TagPageView`.
  */
-export const TagPage = async ({ slug, page, locale }: TTagPageProps) => {
-  const tenant = await getTenantSanityContext();
+export const TagPage = async ({
+  slug,
+  page,
+  locale,
+  tenant,
+}: TTagPageProps) => {
+  const tenantContext = await getTenantSanityContext(tenant);
   const [result, breadcrumbsT, tagPageT] = await Promise.all([
-    service.pages.tag.v1.getTagPage(slug, tenant),
+    service.pages.tag.v1.getTagPage(slug, tenantContext),
     getTranslations('breadcrumbs'),
     getTranslations('tagPage'),
   ]);
@@ -34,7 +44,7 @@ export const TagPage = async ({ slug, page, locale }: TTagPageProps) => {
     { slug },
   );
 
-  const siteUrl = (await getTenantBaseUrl()) ?? '';
+  const siteUrl = (await getTenantBaseUrl(tenant)) ?? '';
   const breadcrumbTrail: IBreadcrumbItem[] = [
     { label: breadcrumbsT('home'), href: routes.home() },
     { label: tagPageT('label', { name: tag.title }), href: routes.tag(slug) },
@@ -56,6 +66,7 @@ export const TagPage = async ({ slug, page, locale }: TTagPageProps) => {
           <PostListModule
             id={postListId}
             locale={locale}
+            tenant={tenant}
             page={page ?? 1}
             createHref={(pageNumber) => routes.tag(slug, pageNumber)}
             ariaLabel={tagPageT('paginationAriaLabel', {
@@ -65,7 +76,7 @@ export const TagPage = async ({ slug, page, locale }: TTagPageProps) => {
             emptyMessageFallback={tagPageT('empty', { name: tag.title })}
             titleId="tag-posts-title"
           />
-          <ModuleRenderer modules={modules} locale={locale} />
+          <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />
         </>
       }
     />

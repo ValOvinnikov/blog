@@ -46,9 +46,10 @@ describe('buildBlogListMetadata', () => {
       data: { heading: 'Blog', seo, modules: [], postListId: 'post-list-1' },
     });
 
-    await buildBlogListMetadata(1);
+    await buildBlogListMetadata(1, 'tenant-1');
 
     expect(getIndexPageMock).toHaveBeenCalledWith(tenant);
+    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('builds page-1 metadata from the resolved seo, self-canonical to /blog', async () => {
@@ -62,7 +63,7 @@ describe('buildBlogListMetadata', () => {
       },
     });
 
-    const metadata = await buildBlogListMetadata(1);
+    const metadata = await buildBlogListMetadata(1, 'tenant-1');
 
     expect(metadata.title).toBe('The Blog');
     expect(metadata.description).toBe('All the posts.');
@@ -88,7 +89,7 @@ describe('buildBlogListMetadata', () => {
       },
     });
 
-    const metadata = await buildBlogListMetadata(2);
+    const metadata = await buildBlogListMetadata(2, 'tenant-1');
 
     expect(metadata.title).toBe('The Blog – Page 2');
     expect(metadata.openGraph?.title).toBe('The Blog OG – Page 2');
@@ -106,7 +107,7 @@ describe('buildBlogListMetadata', () => {
       error: new Error('boom'),
     });
 
-    const metadata = await buildBlogListMetadata(1);
+    const metadata = await buildBlogListMetadata(1, 'tenant-1');
 
     expect(metadata).toEqual({});
   });
@@ -115,7 +116,7 @@ describe('buildBlogListMetadata', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    const metadata = await buildBlogListMetadata(1);
+    const metadata = await buildBlogListMetadata(1, 'tenant-1');
 
     expect(metadata).toEqual({});
     expect(errorSpy).not.toHaveBeenCalled();

@@ -6,14 +6,15 @@ import { HeroModuleView } from './hero-module-view';
 export interface IHeroModuleProps {
   id: string;
   locale: string;
+  tenant: string;
 }
 
 /**
  * HeroModule — fetches `module_hero` data and hands it to `HeroModuleView`.
  */
-export const HeroModule = async ({ id }: IHeroModuleProps) => {
-  const tenant = await getTenantSanityContext();
-  const result = await service.modules.hero.v1.getHero(id, tenant);
+export const HeroModule = async ({ id, tenant }: IHeroModuleProps) => {
+  const tenantContext = await getTenantSanityContext(tenant);
+  const result = await service.modules.hero.v1.getHero(id, tenantContext);
 
   if (!result.ok) return null;
 

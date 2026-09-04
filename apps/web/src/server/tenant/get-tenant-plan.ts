@@ -20,8 +20,10 @@ const getCachedTenantPlanForTenant = (tenantId: string) =>
     },
   )(tenantId);
 
-const getUncachedTenantPlan = async (): Promise<TTenantPlan | undefined> => {
-  const tenantId = await getRequestTenantId();
+const getUncachedTenantPlan = async (
+  tenant?: string,
+): Promise<TTenantPlan | undefined> => {
+  const tenantId = await getRequestTenantId(tenant);
   if (!tenantId) return undefined;
   return getCachedTenantPlanForTenant(tenantId);
 };
@@ -29,6 +31,7 @@ const getUncachedTenantPlan = async (): Promise<TTenantPlan | undefined> => {
 /**
  * getTenantPlan — the `TENANT_PLAN` half of capability entitlement
  * (`isCapabilityEnabled`), cached per tenant the same way `site_config`/
- * `settings_features` are.
+ * `settings_features` are. Accepts the `[tenant]` route param and forwards
+ * it to `getRequestTenantId`.
  */
 export const getTenantPlan = safeAsync(getUncachedTenantPlan);

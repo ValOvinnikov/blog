@@ -26,6 +26,7 @@ vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
 const setup = customRenderAsync(ContentModule, {
   id: 'content-1',
   locale: 'en',
+  tenant: 'tenant-1',
 });
 
 describe(ContentModule, () => {
@@ -54,6 +55,7 @@ describe(ContentModule, () => {
     await setup();
 
     expect(getContentMock).toHaveBeenCalledWith('content-1', tenant);
+    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders nothing when the fetch fails', async () => {

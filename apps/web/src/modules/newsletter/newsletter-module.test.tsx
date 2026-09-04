@@ -38,6 +38,7 @@ vi.mock('@web/server/newsletter/newsletter-actions', () => ({
 const setup = customRenderAsync(NewsletterModule, {
   id: 'newsletter-1',
   locale: 'en',
+  tenant: 'tenant-1',
 });
 
 describe(NewsletterModule, () => {
@@ -75,6 +76,7 @@ describe(NewsletterModule, () => {
     await setup();
 
     expect(getNewsletterMock).toHaveBeenCalledWith('newsletter-1', tenant);
+    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders nothing, without fetching the module, when the NEWSLETTER capability is not entitled/enabled', async () => {
@@ -84,5 +86,16 @@ describe(NewsletterModule, () => {
 
     expect(container).toBeEmptyDOMElement();
     expect(getNewsletterMock).not.toHaveBeenCalled();
+  });
+
+  it('forwards the tenant route param to isCapabilityEnabled', async () => {
+    getNewsletterMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
+
+    await setup();
+
+    expect(isCapabilityEnabled).toHaveBeenCalledWith('NEWSLETTER', 'tenant-1');
   });
 });

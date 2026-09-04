@@ -16,9 +16,10 @@ import type { Metadata } from 'next';
  */
 export const buildGenericPageMetadata = async (
   slug: string,
+  tenant: string,
 ): Promise<Metadata> => {
-  const tenant = await getTenantSanityContext();
-  const result = await service.pages.generic.v1.getPage(slug, tenant);
+  const tenantContext = await getTenantSanityContext(tenant);
+  const result = await service.pages.generic.v1.getPage(slug, tenantContext);
 
   if (!result.ok) {
     logger.error('generic_page_metadata.fetch_failed', {

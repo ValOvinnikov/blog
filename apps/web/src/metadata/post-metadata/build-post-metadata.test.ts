@@ -77,16 +77,17 @@ describe('buildPostMetadata', () => {
     getTenantSanityContextMock.mockResolvedValue(tenant);
     getPostMock.mockResolvedValue({ ok: true, data: basePost });
 
-    await buildPostMetadata('hello-world');
+    await buildPostMetadata('hello-world', 'tenant-1');
 
     expect(getPostMock).toHaveBeenCalledWith('hello-world', tenant);
+    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('returns empty metadata without logging when no page_post matches the slug', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getPostMock.mockResolvedValue({ ok: true, data: undefined });
 
-    const metadata = await buildPostMetadata('missing');
+    const metadata = await buildPostMetadata('missing', 'tenant-1');
 
     expect(metadata).toEqual({});
     expect(errorSpy).not.toHaveBeenCalled();
@@ -97,7 +98,7 @@ describe('buildPostMetadata', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getPostMock.mockResolvedValue({ ok: false, error: new Error('boom') });
 
-    const metadata = await buildPostMetadata('hello-world');
+    const metadata = await buildPostMetadata('hello-world', 'tenant-1');
 
     expect(metadata).toEqual({});
     errorSpy.mockRestore();
@@ -106,7 +107,7 @@ describe('buildPostMetadata', () => {
   it('passes the already-resolved seo through to toMetadata', async () => {
     getPostMock.mockResolvedValue({ ok: true, data: basePost });
 
-    const metadata = await buildPostMetadata('hello-world');
+    const metadata = await buildPostMetadata('hello-world', 'tenant-1');
 
     expect(metadata.title).toBe('Hello World');
     expect(metadata.description).toBe(
@@ -125,7 +126,7 @@ describe('buildPostMetadata', () => {
   it('sets openGraph.publishedTime from post.publishedAt', async () => {
     getPostMock.mockResolvedValue({ ok: true, data: basePost });
 
-    const metadata = await buildPostMetadata('hello-world');
+    const metadata = await buildPostMetadata('hello-world', 'tenant-1');
 
     expect(
       (metadata.openGraph as { publishedTime?: string })?.publishedTime,
@@ -135,7 +136,7 @@ describe('buildPostMetadata', () => {
   it('sets openGraph.authors from post.author.name', async () => {
     getPostMock.mockResolvedValue({ ok: true, data: basePost });
 
-    const metadata = await buildPostMetadata('hello-world');
+    const metadata = await buildPostMetadata('hello-world', 'tenant-1');
 
     expect((metadata.openGraph as { authors?: string[] })?.authors).toEqual([
       'Jane Doe',

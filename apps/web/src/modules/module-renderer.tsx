@@ -7,6 +7,7 @@ import { MODULE_MAP } from './module-map';
 export interface IModuleRendererProps {
   modules: TModule[];
   locale: string;
+  tenant: string;
 }
 
 /**
@@ -24,6 +25,7 @@ export interface IModuleRendererProps {
 export const ModuleRenderer = async ({
   modules,
   locale,
+  tenant,
 }: IModuleRendererProps): Promise<ReactNode> => {
   const rendered = await Promise.all(
     modules.map(async (module) => {
@@ -38,7 +40,7 @@ export const ModuleRenderer = async ({
 
       return {
         key: module.id,
-        node: await Component({ id: module.id, locale }),
+        node: await Component({ id: module.id, locale, tenant }),
       };
     }),
   );

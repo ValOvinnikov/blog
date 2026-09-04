@@ -8,10 +8,13 @@ import { toThemeTokens } from '@web/utils/to-theme-tokens';
  * `site_config` row — the single read shared by every caller that needs
  * `chromeOn`/font/accent-hue tokens, so a config change (e.g. an operator
  * flipping the Look tab's preset) is visible everywhere the same way. Falls
- * back to the Console preset's own tokens on a fetch failure.
+ * back to the Console preset's own tokens on a fetch failure. Accepts the
+ * `[tenant]` route param and forwards it to `getSiteConfig`.
  */
-export const getThemeTokens = async (): Promise<TThemeTokens> => {
-  const result = await getSiteConfig();
+export const getThemeTokens = async (
+  tenant?: string,
+): Promise<TThemeTokens> => {
+  const result = await getSiteConfig(tenant);
 
   if (!result.ok) {
     logger.error('theme_tokens.site_config_fetch_failed', {

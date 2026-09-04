@@ -10,9 +10,11 @@ import type { Metadata } from 'next';
  * `seo` — mirrors `buildBlogListMetadata`. Reuses `getIndexPage` (also
  * called by `TopicsPage`), so this adds no extra round-trip.
  */
-export const buildTopicsMetadata = async (): Promise<Metadata> => {
-  const tenant = await getTenantSanityContext();
-  const result = await service.pages.topicIndex.v1.getIndexPage(tenant);
+export const buildTopicsMetadata = async (
+  tenant: string,
+): Promise<Metadata> => {
+  const tenantContext = await getTenantSanityContext(tenant);
+  const result = await service.pages.topicIndex.v1.getIndexPage(tenantContext);
 
   if (!result.ok) {
     logger.error('topics_metadata.fetch_failed', { error: result.error });

@@ -46,9 +46,10 @@ describe('buildTopicMetadata', () => {
       data: { topic: {}, modules: [], seo, postListId: 'post-list-1' },
     });
 
-    await buildTopicMetadata('engineering');
+    await buildTopicMetadata('engineering', 'tenant-1');
 
     expect(getTopicPageMock).toHaveBeenCalledWith('engineering', tenant);
+    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('builds page-1 metadata from the resolved seo, self-canonical to /topics/[slug]', async () => {
@@ -57,7 +58,7 @@ describe('buildTopicMetadata', () => {
       data: { topic: {}, modules: [], seo, postListId: 'post-list-1' },
     });
 
-    const metadata = await buildTopicMetadata('engineering');
+    const metadata = await buildTopicMetadata('engineering', 'tenant-1');
 
     expect(metadata.title).toBe('Engineering');
     expect(metadata.description).toBe('Posts about building things.');
@@ -78,7 +79,7 @@ describe('buildTopicMetadata', () => {
       error: new Error('boom'),
     });
 
-    const metadata = await buildTopicMetadata('engineering');
+    const metadata = await buildTopicMetadata('engineering', 'tenant-1');
 
     expect(metadata).toEqual({});
   });
@@ -89,7 +90,7 @@ describe('buildTopicMetadata', () => {
       data: { topic: {}, modules: [], seo, postListId: 'post-list-1' },
     });
 
-    const metadata = await buildTopicMetadata('engineering', 2);
+    const metadata = await buildTopicMetadata('engineering', 'tenant-1', 2);
 
     expect(metadata.title).toBe('Engineering – Page 2');
     expect(metadata.openGraph?.title).toBe('Engineering OG – Page 2');
@@ -107,7 +108,7 @@ describe('buildTopicMetadata', () => {
       error: new Error('boom'),
     });
 
-    const metadata = await buildTopicMetadata('missing', 2);
+    const metadata = await buildTopicMetadata('missing', 'tenant-1', 2);
 
     expect(metadata).toEqual({});
   });
@@ -116,7 +117,7 @@ describe('buildTopicMetadata', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getTopicPageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    const metadata = await buildTopicMetadata('missing');
+    const metadata = await buildTopicMetadata('missing', 'tenant-1');
 
     expect(metadata).toEqual({});
     expect(errorSpy).not.toHaveBeenCalled();

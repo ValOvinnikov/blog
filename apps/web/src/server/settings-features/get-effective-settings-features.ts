@@ -28,10 +28,10 @@ const getCachedEffectiveSettingsFeaturesForTenant = (tenantId: string) =>
     },
   )(tenantId);
 
-const getUncachedEffectiveSettingsFeatures = async (): Promise<
-  Record<TCapability, boolean> | undefined
-> => {
-  const tenantId = await getRequestTenantId();
+const getUncachedEffectiveSettingsFeatures = async (
+  tenant?: string,
+): Promise<Record<TCapability, boolean> | undefined> => {
+  const tenantId = await getRequestTenantId(tenant);
   if (!tenantId) return undefined;
   return getCachedEffectiveSettingsFeaturesForTenant(tenantId);
 };
@@ -44,7 +44,8 @@ const getUncachedEffectiveSettingsFeatures = async (): Promise<
  * request time rather than eagerly seeded at provisioning, so a later
  * preset change is always reflected — `settings_features` is never
  * eagerly inserted anywhere (mirrors `site_config`'s own lazy-default
- * precedent). Cached per tenant, same as `getSiteConfig`.
+ * precedent). Cached per tenant, same as `getSiteConfig`. Accepts the
+ * `[tenant]` route param and forwards it to `getRequestTenantId`.
  */
 export const getEffectiveSettingsFeatures = safeAsync(
   getUncachedEffectiveSettingsFeatures,

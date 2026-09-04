@@ -21,11 +21,12 @@ import { getTranslations } from 'next-intl/server';
  */
 export const buildTagMetadata = async (
   slug: string,
+  tenant: string,
   pageNumber?: number,
 ): Promise<Metadata> => {
-  const tenant = await getTenantSanityContext();
+  const tenantContext = await getTenantSanityContext(tenant);
   const [result, t] = await Promise.all([
-    service.pages.tag.v1.getTagPage(slug, tenant),
+    service.pages.tag.v1.getTagPage(slug, tenantContext),
     getTranslations('pagination'),
   ]);
 

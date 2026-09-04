@@ -46,9 +46,10 @@ describe('buildGenericPageMetadata', () => {
       data: { title: 'About Us', slug: 'about-us', modules: [], seo },
     });
 
-    await buildGenericPageMetadata('about-us');
+    await buildGenericPageMetadata('about-us', 'tenant-1');
 
     expect(getPageMock).toHaveBeenCalledWith('about-us', tenant);
+    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('maps the resolved seo straight through toMetadata, self-canonical to /[slug]', async () => {
@@ -57,7 +58,7 @@ describe('buildGenericPageMetadata', () => {
       data: { title: 'About Us', slug: 'about-us', modules: [], seo },
     });
 
-    const metadata = await buildGenericPageMetadata('about-us');
+    const metadata = await buildGenericPageMetadata('about-us', 'tenant-1');
 
     expect(metadata.title).toBe('About Us');
     expect(metadata.description).toBe('Who we are.');
@@ -73,7 +74,7 @@ describe('buildGenericPageMetadata', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getPageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
 
-    const metadata = await buildGenericPageMetadata('missing');
+    const metadata = await buildGenericPageMetadata('missing', 'tenant-1');
 
     expect(metadata).toEqual({});
     expect(errorSpy).toHaveBeenCalledWith(
@@ -86,7 +87,7 @@ describe('buildGenericPageMetadata', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getPageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    const metadata = await buildGenericPageMetadata('missing');
+    const metadata = await buildGenericPageMetadata('missing', 'tenant-1');
 
     expect(metadata).toEqual({});
     expect(errorSpy).not.toHaveBeenCalled();
