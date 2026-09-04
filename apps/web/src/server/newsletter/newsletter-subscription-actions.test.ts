@@ -1,10 +1,11 @@
-export {};
+import { PRESET_ID, resolveTenantEmailBrand } from '@blog/config';
 
 const {
   authMock,
   unsubscribeMock,
   resendConfirmationMock,
   sendEmailMock,
+  resolveTenantEmailIdentityMock,
   clearNewsletterSubscribedCookieMock,
   getRequestTenantIdMock,
   getTenantBaseUrlMock,
@@ -14,6 +15,7 @@ const {
   unsubscribeMock: vi.fn(),
   resendConfirmationMock: vi.fn(),
   sendEmailMock: vi.fn(),
+  resolveTenantEmailIdentityMock: vi.fn(),
   clearNewsletterSubscribedCookieMock: vi.fn(),
   getRequestTenantIdMock: vi.fn(),
   getTenantBaseUrlMock: vi.fn(),
@@ -31,8 +33,13 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-vi.mock('@web/server/email/send-email', () => ({
+vi.mock('@blog/email', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@blog/email')>()),
   sendEmail: sendEmailMock,
+}));
+
+vi.mock('@web/utils/resolve-tenant-email-identity', () => ({
+  resolveTenantEmailIdentity: resolveTenantEmailIdentityMock,
 }));
 
 vi.mock('@web/server/newsletter/newsletter-subscribed-cookie', () => ({
@@ -154,6 +161,14 @@ describe('resendConfirmationAction', () => {
     authMock.mockReset();
     resendConfirmationMock.mockReset();
     sendEmailMock.mockReset();
+    resolveTenantEmailIdentityMock.mockReset();
+    resolveTenantEmailIdentityMock.mockResolvedValue({
+      brand: resolveTenantEmailBrand({
+        preset: PRESET_ID.CONSOLE,
+        accentHue: 250,
+      }),
+      brandName: 'Acme Blog',
+    });
     getRequestTenantIdMock.mockReset();
     getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
     getTenantBaseUrlMock.mockReset();
@@ -221,6 +236,34 @@ describe('resendConfirmationAction', () => {
         html: expect.stringContaining(
           'https://example.com/api/newsletter/confirm?token=token-abc',
         ),
+      }),
+    );
+  });
+
+  it("renders the subscribing tenant's own resolved brand in the resent confirmation email", async () => {
+    authMock.mockResolvedValue(session);
+    resendConfirmationMock.mockResolvedValue({
+      outcome: 'pending',
+      confirmationToken: 'token-abc',
+    });
+    const tenantBrand = resolveTenantEmailBrand({
+      preset: PRESET_ID.CONSOLE,
+      accentHue: 40,
+    });
+    resolveTenantEmailIdentityMock.mockResolvedValue({
+      brand: tenantBrand,
+      brandName: 'Zeta Times',
+    });
+    sendEmailMock.mockResolvedValue(undefined);
+    const { resendConfirmationAction } =
+      await import('./newsletter-subscription-actions');
+
+    await resendConfirmationAction();
+
+    expect(resolveTenantEmailIdentityMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        html: expect.stringContaining(tenantBrand.logo1),
       }),
     );
   });

@@ -41,14 +41,15 @@ export const env = createEnv({
     // RSC payload is built, so the flag never needs to reach the client
     // bundle.
     WEB_ANALYTICS_ENABLED: z.enum(['true', 'false']).optional(),
-    // Shared Resend "send email" helper (`@web/server/email/send-email`) —
-    // powers the Auth.js Email provider's magic-link (via `@blog/auth`) and
-    // the newsletter confirmation email (reuses this same helper/var).
+    // Powers this app's own Resend transport (`@web/server/email/send-email`),
+    // which the Auth.js Email provider's magic-link (via `@blog/auth`) still
+    // sends through. `@blog/email`'s own `sendEmail` — used by the newsletter
+    // confirmation email — validates the same variable name independently.
     RESEND_API_KEY: z.string().min(1).optional(),
     // The newsletter confirmation email's `from` address
-    // (`@web/server/newsletter/newsletter-from-address.ts`), reusing the same
-    // `sendEmail` helper: optional, falls back to Resend's own shared
-    // testing sender until a verified sending domain is configured.
+    // (`@web/server/newsletter/newsletter-from-address.ts`): optional, falls
+    // back to Resend's own shared testing sender until a verified sending
+    // domain is configured.
     NEWSLETTER_FROM_ADDRESS: z.string().min(1).optional(),
   },
   client: {
