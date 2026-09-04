@@ -602,7 +602,15 @@ git commit -m "refactor(db): post document-validation alerts to the platform"
 
 - Modify: `packages/db/package.json` (remove `resend` and `@blog/email`)
 - Modify: `knip.json` (remove the now-obsolete `@blog/email` ignore for `packages/db`)
-- Modify: `turbo.json` (declare `ADMIN_APP_BASE_URL`, `OPERATOR_ALERT_SECRET`)
+- Do **not** modify `turbo.json`. Neither variable belongs in its build `env`
+  allowlist on account of this task: `packages/db`'s scripts are `tsx` entry
+  points invoked directly (`pnpm --filter @blog/db <script>`), never through
+  `turbo run`, and `@blog/db` has no `build` task at all, so turbo's strict-env
+  stripping never applies to them. `check-turbo-env-sync.mjs` only asserts that
+  vars declared via `createEnv()` in an app's own `env.ts` appear in the
+  allowlist, and neither variable is declared that way here.
+  `OPERATOR_ALERT_SECRET` does belong there — but because `apps/platform`
+  declares it, which is the endpoint task's change, not this one's.
 - Modify: `.github/workflows/recheck-tenant-owners.yml`
 - Modify: `.github/workflows/validate-tenant-documents.yml`
 - Modify: `.github/workflows/provision-tenant.yml` (it `workflow_call`s validate-tenant-documents)
