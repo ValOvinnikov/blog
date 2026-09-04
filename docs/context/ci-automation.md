@@ -12,6 +12,34 @@ only two callers that set it (`@blog/db...`), since each dispatches a single
 `@blog/db` script and has no use for `apps/web`/`apps/platform`/Storybook/
 Playwright's dependency trees.
 
+**The pinned pnpm binary is cached, and that is load-bearing.**
+`pnpm/action-setup`'s self-installer shells out to `npm install pnpm@<version>`,
+and that single-package install has been observed taking upwards of seven
+minutes on hosted runners — roughly thirty-five times longer than installing
+this entire monorepo. Every job that sets up pnpm pays it independently, so a
+slow npm registry surfaces as cancelled required checks on PRs whose diffs are
+fine. `.github/actions/setup` therefore restores `~/setup-pnpm` from an
+`actions/cache` entry keyed on `runner.os`/`runner.arch`/the pinned pnpm
+version, and only runs `pnpm/action-setup` when that cache does not yield a
+working binary of exactly the pinned version. One cold install is paid per pnpm
+bump; every other job restores in seconds. Two consequences worth knowing:
+a cache written on a feature branch is not visible to other branches, so the
+first run after a pnpm bump pays the cold cost until `main` writes the entry
+for everyone; and a restored-but-broken entry falls through to the installer
+rather than failing the job, which is what the explicit version check in the
+composite action is for.
+
+**Timeout policy.** A job that uses `.github/actions/setup` gets at least
+`timeout-minutes: 15`, because it pays a fixed dependency-setup cost on top of
+its own work; jobs whose work genuinely takes longer (the deploy, provisioning,
+dataset and content-migration jobs) keep their larger budgets. A job that
+installs nothing — Actionlint, Zizmor, Dependency Review, Hooks, Board auto-sync,
+and the `changes` path-filter jobs — gets `timeout-minutes: 5`. Every job
+carries an explicit budget except those that call a reusable workflow, where
+GitHub does not permit the key. Before this policy the budgets ranged from 5 to
+15 with no stated relationship to that fixed cost, which is how Commitlint came
+to be cancelled four consecutive times on a PR whose other checks were green.
+
 **This table is a Prettier-driven merge-conflict hotspot.** Prettier repads
 every column to its widest cell whenever any row's content changes width, so
 two PRs that each edit a different row — merged in either order — conflict on

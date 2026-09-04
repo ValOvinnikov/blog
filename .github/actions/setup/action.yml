@@ -17,9 +17,50 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+    # pnpm/action-setup's self-installer shells out to `npm install pnpm@<version>`,
+    # and that single-package install has been observed taking upwards of seven
+    # minutes on hosted runners — ~35x longer than installing this entire
+    # monorepo. Every job that sets up pnpm pays it, so a bad npm-registry day
+    # surfaces as cancelled required checks on unrelated PRs. Caching the
+    # installed binary keyed on the pinned version reduces that to one cold
+    # install per pnpm bump; every other job restores it in seconds.
+    - name: Restore the pinned pnpm binary
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ~/setup-pnpm
+        key: setup-pnpm-${{ runner.os }}-${{ runner.arch }}-${{ inputs.pnpm-version }}
+
+    # A restored-but-unusable cache entry would otherwise break every job in the
+    # repo at once with a bare "pnpm: command not found". Verifying it here
+    # turns that into a transparent fall-through to the install below.
+    - name: Verify the restored pnpm binary
+      id: pnpm-check
+      shell: bash
+      env:
+        EXPECTED_VERSION: ${{ inputs.pnpm-version }}
+      run: |
+        usable=false
+        actual=$("$HOME/setup-pnpm/node_modules/.bin/pnpm" --version 2>/dev/null || true)
+        if [ "$actual" = "$EXPECTED_VERSION" ]; then
+          usable=true
+        fi
+        echo "usable=$usable" >> "$GITHUB_OUTPUT"
+
+    - if: steps.pnpm-check.outputs.usable != 'true'
+      uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
       with:
         version: ${{ inputs.pnpm-version }}
+
+    # This is the one thing pnpm/action-setup does that the cache cannot: export
+    # the install location. Both writes are fixed literals with no `${{ }}`
+    # interpolation and no run-time input, so the injection the github-env audit
+    # guards against has nothing to enter through.
+    - name: Put the cached pnpm binary on PATH
+      if: steps.pnpm-check.outputs.usable == 'true'
+      shell: bash
+      run: | # zizmor: ignore[github-env]
+        echo "PNPM_HOME=$HOME/setup-pnpm/node_modules/.bin" >> "$GITHUB_ENV"
+        echo "$HOME/setup-pnpm/node_modules/.bin" >> "$GITHUB_PATH"
 
     - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
       with:
