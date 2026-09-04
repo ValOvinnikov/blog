@@ -1,11 +1,11 @@
-import { oklchToHex, wcagContrastRatio } from '@blog/utils';
+import { oklchToHex, wcagContrastRatio } from '@blog/utils/color';
 
 import { PRESET_ID, PRESET_REGISTRY } from '@blog/config/constants';
 
 import { resolveTenantEmailBrand } from './resolve-tenant-email-brand';
 
-vi.mock('@blog/utils', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/utils')>()),
+vi.mock('@blog/utils/color', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@blog/utils/color')>()),
   wcagContrastRatio: vi.fn(),
 }));
 
@@ -13,7 +13,9 @@ const mockedWcagContrastRatio = vi.mocked(wcagContrastRatio);
 
 beforeEach(async () => {
   const actual =
-    await vi.importActual<typeof import('@blog/utils')>('@blog/utils');
+    await vi.importActual<typeof import('@blog/utils/color')>(
+      '@blog/utils/color',
+    );
   mockedWcagContrastRatio.mockImplementation(actual.wcagContrastRatio);
 });
 

@@ -1,4 +1,4 @@
-import { oklchToHex } from '@blog/utils';
+import { oklchToHex } from '@blog/utils/color';
 
 import { PRESET_REGISTRY, type TPresetId } from '@blog/config/constants';
 

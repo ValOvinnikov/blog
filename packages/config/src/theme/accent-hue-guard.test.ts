@@ -1,9 +1,9 @@
-import { wcagContrastRatio } from '@blog/utils';
+import { wcagContrastRatio } from '@blog/utils/color';
 
 import { isAccentHueAccessible } from './accent-hue-guard';
 
-vi.mock('@blog/utils', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/utils')>()),
+vi.mock('@blog/utils/color', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@blog/utils/color')>()),
   wcagContrastRatio: vi.fn(),
 }));
 
@@ -11,7 +11,9 @@ const mockedWcagContrastRatio = vi.mocked(wcagContrastRatio);
 
 beforeEach(async () => {
   const actual =
-    await vi.importActual<typeof import('@blog/utils')>('@blog/utils');
+    await vi.importActual<typeof import('@blog/utils/color')>(
+      '@blog/utils/color',
+    );
   mockedWcagContrastRatio.mockImplementation(actual.wcagContrastRatio);
 });
 

@@ -1,4 +1,4 @@
-import { WCAG_AA_CONTRAST_MIN, wcagContrastRatio } from '@blog/utils';
+import { WCAG_AA_CONTRAST_MIN, wcagContrastRatio } from '@blog/utils/color';
 
 // Fixed L/C for --text and --brand-primary-muted (configs/tailwind/theme.css) —
 // only hue rotates per accentHue, so this is the pairing the WCAG guard below checks.
