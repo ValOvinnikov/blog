@@ -85,13 +85,14 @@ vi.mock('next-intl/server', () => ({
 // `JetBrains_Mono`, `Fraunces`, `Inter` — see `@web/config/fonts`) rely on a
 // Next.js build-time transform that doesn't exist under Vitest, so calling
 // them directly throws ("... is not a function"). Stubbed globally, not just
-// in the root layout's test, because `fonts.ts` is evaluated at module load
-// time by anything that imports the root `app/layout.tsx` (directly or
-// transitively) — same reasoning as the `next-intl/server`/`next/navigation`
-// mocks above. The stub returns the shape consumers read: a `className`
-// string plus a `variable` string derived from the `variable` option, since
-// `resolveFontVariableClassName` reads `.variable` off the selected font
-// exports to build the root `<html>` className.
+// in a single layout's test, because `fonts.ts` is evaluated at module load
+// time by anything that imports `[locale]/layout.tsx` or the root
+// `not-found.tsx` (directly or transitively) — same reasoning as the
+// `next-intl/server`/`next/navigation` mocks above. The stub returns the
+// shape consumers read: a `className` string plus a `variable` string
+// derived from the `variable` option, since `resolveFontVariableClassName`
+// reads `.variable` off the selected font exports to build the tenant
+// layout's font-variable wrapper className.
 vi.mock('next/font/google', () => {
   const createFontMock =
     (fontName: string) =>

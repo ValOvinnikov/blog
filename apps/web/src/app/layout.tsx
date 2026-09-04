@@ -1,14 +1,7 @@
 import '../../index.css';
 
-import { CAPABILITY, LOCALE_ISO_CODES } from '@blog/config';
-import { Analytics } from '@vercel/analytics/next';
-import { SpeedInsights } from '@vercel/speed-insights/next';
-import { resolveFontVariableClassName } from '@web/config/fonts';
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { themeBootstrapScript } from '@web/config/theme-script';
-import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
-import { buildThemeStyleBlock } from '@web/utils/build-theme-style-block';
-import { getThemeTokens } from '@web/utils/get-theme-tokens';
-import { isWebAnalyticsEnabled } from '@web/utils/is-web-analytics-enabled';
 
 type TProps = {
   children: React.ReactNode;
@@ -29,52 +22,26 @@ const SANITY_IMAGE_CDN_ORIGIN = 'https://cdn.sanity.io';
  * threaded from `params` — this app has exactly one locale today
  * (`routing.ts`) and a root layout has no route params to read one from.
  *
- * Resolves the tenant's theme tokens here to inject the `<style>` block and
- * pick the `next/font` variable classes at server-render time. A fetch
- * failure falls back to the Console preset's own tokens rather than
- * `notFound()`: this shell wraps the whole app, including the not-found page
- * itself, so it must always render.
+ * Tenant-independent by design: it sits above where the tenant is resolved,
+ * so it owns only the static document shell. Theme tokens, font variables,
+ * and analytics gating live in `[locale]/layout.tsx`; `not-found.tsx` — the
+ * one route that renders outside that layout — resolves its own.
  */
-export default async function RootLayout({ children }: TProps) {
-  const [themeTokens, isAnalyticsCapabilityEnabled] = await Promise.all([
-    getThemeTokens(),
-    isCapabilityEnabled(CAPABILITY.ANALYTICS),
-  ]);
-
-  const analyticsEnabled =
-    isWebAnalyticsEnabled() && isAnalyticsCapabilityEnabled;
-  const fontVariableClassName = resolveFontVariableClassName(
-    themeTokens.headingFont,
-    themeTokens.bodyFont,
-  );
-
+export default function RootLayout({ children }: TProps) {
   return (
     <html
       lang={LOCALE_ISO_CODES.EN.toLowerCase()}
-      className={fontVariableClassName}
       suppressHydrationWarning={true}
     >
       <head>
         <link rel="preconnect" href={SANITY_IMAGE_CDN_ORIGIN} />
-        <style
-          dangerouslySetInnerHTML={{
-            __html: buildThemeStyleBlock(themeTokens),
-          }}
-        />
         <script
           dangerouslySetInnerHTML={{
             __html: themeBootstrapScript,
           }}
         />
       </head>
-      <body>
-        {children}
-        {/* Both scripts 404 on a project without Speed Insights/Web
-            Analytics enabled in the Vercel dashboard, so `isWebAnalyticsEnabled()`
-            must gate them alongside the tenant's `ANALYTICS` capability. */}
-        {analyticsEnabled && <SpeedInsights />}
-        {analyticsEnabled && <Analytics />}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

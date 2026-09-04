@@ -20,14 +20,16 @@
   (`/[locale]`, `/[locale]/blog`, `/[locale]/blog/[slug]`,
   `/[locale]/tags/**`, `/[locale]/topics/**`, `/rss.xml`, `/sitemap.xml`,
   `/icon`, `/opengraph-image`, `/twitter-image`) is `ƒ` (Dynamic); only
-  `/_not-found` and `/robots.txt` remained static at that baseline. #2477's
-  root layout (`getThemeTokens()`/`isCapabilityEnabled()`, both now
-  tenant-scoped) reads `headers()` too. For the ten content routes above this
-  adds no new cost — a descendant layout or page already forced dynamic
-  rendering. `/_not-found` is different: it renders outside
-  `[locale]/layout.tsx` (see "Root layout" below) and had no `headers()`
-  dependency before #2477, so it was one of the two routes #2440 measured as
-  static. A `pnpm --filter web build` on the #2477 branch confirms
+  `/_not-found` and `/robots.txt` remained static at that baseline. #2477 gave
+  the root layout its own `headers()` dependency via
+  `getThemeTokens()`/`isCapabilityEnabled()`; #2625's first stage moved both
+  down into `[locale]/layout.tsx`, leaving the root layout
+  tenant-independent (see "Root layout" below). For the ten content routes
+  above neither change altered the rendering mode — a descendant layout or
+  page already forced dynamic rendering. `/_not-found` is different: it
+  renders outside `[locale]/layout.tsx` and had no `headers()` dependency
+  before #2477, so it was one of the two routes #2440 measured as static; it
+  now resolves its own theme tokens and so keeps one. A `pnpm --filter web build` on the #2477 branch confirms
   `/_not-found` is now `ƒ` (Dynamic) too — only `/robots.txt` remains `○`
   (Static), and the prerender manifest bakes 2 routes (`/_global-error`,
   `/robots.txt`) instead of #2440's baseline of 3. #2440 remains the open
@@ -121,12 +123,25 @@
   navigation helpers (`permanentRedirect`, `usePathname`) and of the `Link`
   that `SmartLink` wraps internally.
 - **Root layout:** `src/app/layout.tsx` is a real root layout — it owns the
-  document shell (`<html>`/`<head>`/`<body>`, global stylesheet, fonts, the
-  dark-mode bootstrap script) with a fixed `lang` (`LOCALE_ISO_CODES.EN`; this
-  app has exactly one locale today). `[locale]/layout.tsx` nests inside it and
-  owns everything locale-aware (`NextIntlClientProvider`, `Header`/`Footer`
-  chrome, the locale-validation `notFound()`). This exists so root-level files
+  document shell (`<html>`/`<head>`/`<body>`, global stylesheet, the
+  Sanity CDN preconnect, the dark-mode bootstrap script) with a fixed `lang`
+  (`LOCALE_ISO_CODES.EN`; this app has exactly one locale today). It is
+  **tenant-independent and reads no Dynamic API**: theme tokens, `next/font`
+  variables, analytics gating and the tenant's voice overrides all live in
+  `[locale]/layout.tsx`, which also owns everything locale-aware
+  (`NextIntlClientProvider`, `Header`/`Footer` chrome, the locale-validation
+  `notFound()`). The theme tokens reach the tree through `ThemeScope`
+  (`src/components/shared/theme-scope/`), whose `<style>` carries
+  `precedence`/`href` so React hoists it into `<head>` from wherever it
+  mounts — there is no ordering constraint on its siblings.
+  `src/i18n/request.ts` is tenant-independent for the same reason, returning
+  base locale messages only, with `resolveTenantMessages` applying the
+  tenant's preset voice pack and overrides in the layout instead. Both
+  moved in #2625's first stage, because the root layout and
+  `getRequestConfig` sit above any future `[tenant]` segment and can never
+  receive it as a param. The root layout exists so root-level files
   that need a layout to render into — chiefly `src/app/not-found.tsx` for
   genuinely unmatched URLs — have one; `not-found.tsx` renders outside the
   `[locale]` tree, so it has no `Header`/`Footer` chrome, just the terminal-
-  styled 404 body (#491).
+  styled 404 body (#491), and it mounts its own `ThemeScope` and resolves its
+  own messages rather than inheriting either.

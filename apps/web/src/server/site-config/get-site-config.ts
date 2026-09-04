@@ -28,9 +28,9 @@ const getUncachedSiteConfig = async () => {
 };
 
 /**
- * The single `@blog/db` read shared by the theme `<style>` injector
- * (`app/layout.tsx`) and the next-intl voice ladder (`i18n/request.ts`) —
- * one cached row backs both, cached per tenant so no tenant is ever served
- * another's config.
+ * The single `@blog/db` read shared by `getThemeTokens` (the theme
+ * `<style>`/font-variable injector) and `resolveTenantMessages` (the
+ * next-intl voice ladder) — one cached row backs both, cached per tenant so
+ * no tenant is ever served another's config.
  */
 export const getSiteConfig = safeAsync(getUncachedSiteConfig);
