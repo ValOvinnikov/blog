@@ -1,5 +1,10 @@
 import { queries } from '@blog/db';
 import { isValidSignature, SIGNATURE_HEADER_NAME } from '@sanity/webhook';
+import {
+  BLOG_POST_TYPE,
+  deriveRevalidatePaths,
+  isDerivableRevalidateType,
+} from '@web/server/revalidate/derive-revalidate-paths';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import { getRevalidateTagsForType } from '@web/utils/revalidate-tags';
@@ -19,7 +24,6 @@ export const SANITY_PROJECT_ID_HEADER = 'sanity-project-id';
 // true deletion and unpublish; 'create'/'update' can never reach cleanup.
 export const SANITY_OPERATION_HEADER = 'sanity-operation';
 
-const BLOG_POST_TYPE = 'blog_post';
 const DELETE_OPERATION = 'delete';
 
 interface IRevalidateWebhookBody {
@@ -37,6 +41,53 @@ const isRevalidateWebhookBody = (
     typeof (value as Record<string, unknown>)['_type'] === 'string' &&
     typeof (value as Record<string, unknown>)['_id'] === 'string'
   );
+};
+
+type TResolvedRevalidatePaths =
+  { ok: true; paths: string[] } | { ok: false; reason: string };
+
+/**
+ * Resolves the precise, tenant-scoped paths a published document affects.
+ * Anything that isn't derivable — no resolved tenant, a `_type` without a
+ * precise derivation yet, or a failed lookup — reports why so the caller can
+ * fall back to a whole-site purge instead of serving stale content.
+ */
+const resolveDerivedRevalidatePaths = async (
+  type: string,
+  id: string,
+  tenantId: string | undefined,
+): Promise<TResolvedRevalidatePaths> => {
+  if (!tenantId) {
+    return { ok: false, reason: 'tenant_unresolved' };
+  }
+  if (!isDerivableRevalidateType(type)) {
+    return { ok: false, reason: 'unsupported_type' };
+  }
+
+  let tenant;
+  try {
+    tenant = await queries.tenants.getTenantSanityCredentials(tenantId);
+  } catch (error) {
+    logger.error('revalidate.tenant_sanity_credentials_fetch_threw', {
+      type,
+      id,
+      tenantId,
+      error,
+    });
+    return { ok: false, reason: 'fetch_failed' };
+  }
+  if (!tenant) {
+    logger.error('revalidate.tenant_sanity_credentials_missing', {
+      type,
+      id,
+      tenantId,
+    });
+    return { ok: false, reason: 'fetch_failed' };
+  }
+
+  const derived = await deriveRevalidatePaths({ type, id, tenantId, tenant });
+  if (derived.ok) return derived;
+  return { ok: false, reason: derived.reason };
 };
 
 /**
@@ -115,16 +166,26 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   // Tag expiry alone does not invalidate prerendered route entries on
-  // Vercel, so every publish purges the whole site rather than just the
-  // publishing tenant's pages. Per-tenant scoping isn't expressible here:
-  // Next derives each route's implicit layout tags from the route
-  // *pattern* with dynamic segments unresolved (`_N_T_/[tenant]/layout`),
-  // never from a resolved value, so `revalidatePath('/<tenantId>', 'layout')`
-  // matches nothing. Purging each resolved tenant path individually would
-  // work and is tracked separately.
+  // Vercel, so a path purge is required alongside the tag purge above.
+  // `revalidatePath` only matches a fully resolved path (`/<tenantId>/EN/
+  // blog/x`) — the bracketed route pattern (`'/', 'layout'`) matches every
+  // tenant's request, never one tenant's alone.
   const pathPurged = revalidated.length > 0;
   if (pathPurged) {
-    revalidatePath('/', 'layout');
+    const derived = await resolveDerivedRevalidatePaths(type, id, tenantId);
+    if (derived.ok) {
+      for (const path of derived.paths) {
+        revalidatePath(path);
+      }
+    } else {
+      logger.warn('revalidate.path_purge_fallback', {
+        type,
+        id,
+        tenantId,
+        reason: derived.reason,
+      });
+      revalidatePath('/', 'layout');
+    }
   }
 
   let bookmarksRemoved = 0;
