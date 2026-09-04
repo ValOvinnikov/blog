@@ -38,7 +38,9 @@ export const ctaModuleQuery = q
     // Not `.notNull()` — required only for Banner/Split via a custom
     // validator, not `.required()`, so it's genuinely absent for Callout.
     image: sub.field('image').project(sanityImageFragment).nullable(true),
-    imageSide: sub.field('imageSide').nullable(true),
+    contentPositionSplit: sub.field('contentPositionSplit').nullable(true),
+    contentPositionBanner: sub.field('contentPositionBanner').nullable(true),
+    contentAlignment: sub.field('contentAlignment').nullable(true),
     mobileMediaOrder: sub.field('mobileMediaOrder').nullable(true),
     actions: sub.field('actions').project(actionGroupFragment).nullable(true),
     footnote: sub.field('footnote').nullable(true),

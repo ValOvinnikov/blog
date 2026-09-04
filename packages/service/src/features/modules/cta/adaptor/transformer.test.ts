@@ -3,6 +3,7 @@ import {
   CONTAINER_WIDTH,
   CTA_ACTION_APPEARANCE,
   CTA_ACTION_VARIANT,
+  CTA_ALIGNMENT,
   CTA_VARIANT,
   HEADING_ALIGN,
   LINK_TYPE,
@@ -66,6 +67,85 @@ describe('toCtaModule', () => {
       expect(cta.variant).toBe(variant);
     },
   );
+
+  it('takes contentPosition from contentPositionSplit on Split, ignoring contentPositionBanner', () => {
+    const raw = makeRawCtaModule({
+      variant: CTA_VARIANT.SPLIT,
+      contentPositionSplit: CTA_ALIGNMENT.RIGHT,
+      contentPositionBanner: CTA_ALIGNMENT.LEFT,
+    });
+
+    const cta = toCtaModule(raw, makeTenant());
+
+    expect(cta.contentPosition).toBe(CTA_ALIGNMENT.RIGHT);
+  });
+
+  it('takes contentPosition from contentPositionBanner on Banner, ignoring contentPositionSplit', () => {
+    const raw = makeRawCtaModule({
+      variant: CTA_VARIANT.BANNER,
+      contentPositionSplit: CTA_ALIGNMENT.RIGHT,
+      contentPositionBanner: CTA_ALIGNMENT.LEFT,
+    });
+
+    const cta = toCtaModule(raw, makeTenant());
+
+    expect(cta.contentPosition).toBe(CTA_ALIGNMENT.LEFT);
+  });
+
+  it('maps a Banner contentPositionBanner of CENTER through', () => {
+    const raw = makeRawCtaModule({
+      variant: CTA_VARIANT.BANNER,
+      contentPositionBanner: CTA_ALIGNMENT.CENTER,
+    });
+
+    const cta = toCtaModule(raw, makeTenant());
+
+    expect(cta.contentPosition).toBe(CTA_ALIGNMENT.CENTER);
+  });
+
+  it('leaves contentPosition undefined on Callout regardless of stored position keys', () => {
+    const raw = makeRawCtaModule({
+      variant: CTA_VARIANT.CALLOUT,
+      contentPositionSplit: CTA_ALIGNMENT.RIGHT,
+      contentPositionBanner: CTA_ALIGNMENT.CENTER,
+    });
+
+    const cta = toCtaModule(raw, makeTenant());
+
+    expect(cta.contentPosition).toBeUndefined();
+  });
+
+  it('leaves contentPosition undefined on Split/Banner when the matching key is unset', () => {
+    const splitRaw = makeRawCtaModule({
+      variant: CTA_VARIANT.SPLIT,
+      contentPositionSplit: null,
+    });
+    const bannerRaw = makeRawCtaModule({
+      variant: CTA_VARIANT.BANNER,
+      contentPositionBanner: null,
+    });
+
+    expect(toCtaModule(splitRaw, makeTenant()).contentPosition).toBeUndefined();
+    expect(
+      toCtaModule(bannerRaw, makeTenant()).contentPosition,
+    ).toBeUndefined();
+  });
+
+  it('leaves contentAlignment undefined when unset', () => {
+    const raw = makeRawCtaModule({ contentAlignment: null });
+
+    const cta = toCtaModule(raw, makeTenant());
+
+    expect(cta.contentAlignment).toBeUndefined();
+  });
+
+  it('maps contentAlignment when authored, independent of variant', () => {
+    const raw = makeRawCtaModule({ contentAlignment: CTA_ALIGNMENT.CENTER });
+
+    const cta = toCtaModule(raw, makeTenant());
+
+    expect(cta.contentAlignment).toBe(CTA_ALIGNMENT.CENTER);
+  });
 
   it('leaves supportingText and align undefined when not set (no faked default)', () => {
     const raw = makeRawCtaModule({

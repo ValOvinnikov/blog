@@ -4,7 +4,7 @@ import type {
   ISanityImage,
   TCtaActionAppearance,
   TCtaActionVariant,
-  TCtaImageSide,
+  TCtaAlignment,
   TCtaMobileMediaOrder,
   TCtaVariant,
   TFullBrandVariant,
@@ -31,7 +31,8 @@ export type TCtaModule = {
   };
   content: TMaybeUndefined<BasicText>;
   image: TMaybeUndefined<ISanityImage>;
-  imageSide: TMaybeUndefined<TCtaImageSide>;
+  contentPosition: TMaybeUndefined<TCtaAlignment>;
+  contentAlignment: TMaybeUndefined<TCtaAlignment>;
   mobileMediaOrder: TMaybeUndefined<TCtaMobileMediaOrder>;
   actions: TCtaAction[];
   footnote: TMaybeUndefined<string>;
