@@ -17,7 +17,8 @@ web → ui, service, db, auth, config, utils   service → config, utils (no Rea
 platform → db, auth, config, utils, studio   studio → config, utils (typegen source)
 ui → config (no Sanity/fetch)               configs/* → consumed by all
 db → config, utils (no React/Sanity)        auth → db, config, utils
-insight → nothing (base of graph, like config/utils)
+config → utils (OKLCH maths behind the shared contrast guard)
+insight → nothing (base of graph, like utils)
 email → utils (sits low; both apps, auth and db's scripts consume it)
 graph is acyclic
 ```
