@@ -1,5 +1,5 @@
-import { buildEmailShell } from '@blog/email/html/email-shell';
 import { escapeHtml } from '@blog/email/html/escape-html';
+import { buildOperatorShell } from '@blog/email/html/operator-shell';
 
 export type TDocumentValidationAlertInput = {
   tenantName: string;
@@ -22,8 +22,7 @@ export function buildDocumentValidationAlertEmail({
 
   return {
     subject: `Tenant "${tenantName}" (${tenantId}) has invalid Sanity documents`,
-    html: buildEmailShell({
-      brandName: 'Tenant Alerts',
+    html: buildOperatorShell({
       previewText: `${tenantName} has invalid Sanity documents`,
       bodyHtml,
     }),

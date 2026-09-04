@@ -1,5 +1,5 @@
-import { buildEmailShell } from '@blog/email/html/email-shell';
 import { escapeHtml } from '@blog/email/html/escape-html';
+import { buildOperatorShell } from '@blog/email/html/operator-shell';
 
 const OUTCOME_COPY = {
   STALLED:
@@ -24,8 +24,7 @@ export function buildOwnerElevationAlertEmail({
 
   return {
     subject: `Tenant "${tenantName}" (${tenantId}) needs owner-elevation attention`,
-    html: buildEmailShell({
-      brandName: 'Tenant Alerts',
+    html: buildOperatorShell({
       previewText: `${tenantName} needs owner-elevation attention`,
       bodyHtml,
     }),

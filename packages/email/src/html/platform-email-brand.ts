@@ -4,7 +4,7 @@ import { oklchToHex } from '@blog/utils/color';
 // `configs/tailwind/theme.css`'s light-mode `:root` OKLCH values as static
 // hex, computed once at module load rather than duplicated as hand-copied
 // hex literals that could drift from the source tokens unnoticed.
-export const emailBrandTokens = {
+export const PLATFORM_EMAIL_BRAND = {
   surface: oklchToHex(1, 0, 0),
   surface2: oklchToHex(0.975, 0.003, 250),
   border: oklchToHex(0.9, 0.004, 250),
