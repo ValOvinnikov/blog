@@ -162,7 +162,7 @@ export const BrandAssetField = ({
         <Button
           type="button"
           size={SIZE.SM}
-          variant="ghost"
+          variant="secondary"
           onClick={() => inputRef.current?.click()}
           isDisabled={isPending || isDisabled}
           aria-describedby={ariaDescribedBy}
