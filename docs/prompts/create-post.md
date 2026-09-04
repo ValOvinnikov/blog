@@ -209,7 +209,7 @@ UUID, not a slug-style ID. Before writing any `_ref` to an existing author/
 category/tag, resolve its real `_id` with:
 
 ```bash
-pnpm --filter cms exec sanity documents query \
+pnpm --filter @blog/studio exec sanity documents query \
   '*[_type in ["blog_author","blog_category","blog_tag"]]{_id,_type,title,name,"slug":slug.current}' \
   --dataset <dataset>
 ```
@@ -224,7 +224,7 @@ One JSON document **per line** (post + any NEW author/category/tag docs),
 importable with:
 
 ```bash
-pnpm --filter cms exec sanity dataset import posts.ndjson <dataset>
+pnpm --filter @blog/studio exec sanity dataset import posts.ndjson <dataset>
 ```
 
 Rules — these must be exact or the import fails or orphans data:
