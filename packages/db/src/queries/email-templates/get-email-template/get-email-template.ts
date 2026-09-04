@@ -23,8 +23,7 @@ type TAuthoredEmailTemplateFields = {
 
 // Merges one authored row over its template type's product defaults, field
 // by field — a row present but missing a field (or absent entirely) yields
-// that field's default rather than an empty value. Shared by every read of
-// template copy so the merge logic exists in exactly one place.
+// that field's default rather than an empty value.
 export function mergeEmailTemplateCopy(
   tenantId: string,
   templateType: TEmailTemplateType,

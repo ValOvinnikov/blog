@@ -340,6 +340,17 @@ describe(runSteps, () => {
     expect(seedEmailTemplateDefaultsMock).not.toHaveBeenCalled();
   });
 
+  it('still reports ok:true when seeding email-template defaults throws', async () => {
+    createTenantSanityProjectMock.mockResolvedValue({});
+    seedEmailTemplateDefaultsMock.mockRejectedValue(
+      new Error('seed defaults failed'),
+    );
+
+    const result = await runSteps('tenant-1', env);
+
+    expect(result).toEqual({ ok: true });
+  });
+
   it('elevates the tenant owner once every core step succeeds', async () => {
     createTenantSanityProjectMock.mockResolvedValue({});
     elevateTenantOwnerMock.mockResolvedValue('ELEVATED');
