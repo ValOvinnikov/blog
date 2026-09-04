@@ -240,14 +240,28 @@ module carries as a separate `bandTone` field), plus an optional, all-remaining-
 object (`spacingTop`/`spacingBottom`, `containerWidth` (not on
 `module_hero`, which uses the leaner `heroLayout` type), `dividerTop`,
 `dividerBottom` — stored values from `SPACING_SCALE`/`CONTAINER_WIDTH`
-consts; there is no `align` field on `layout` — see `SectionHeader` below
-for heading alignment).
+consts; there is no `align` field on `layout` — alignment is its own
+module-level field, below).
 `module_cta`/`module_postList`/`module_postLatest`/`module_taxonomyList`/`module_newsletter`
-additionally carry a `sectionHeader` object (`heading`, `supportingText`,
-`align` — stored values from `HEADING_ALIGN`; all optional on
+additionally carry a `sectionHeader` object (`heading` and `supportingText`
+only — all optional on
 `module_postList`/`module_postLatest`/`module_taxonomyList`, `heading` required on
 `module_cta`/`module_newsletter` via a per-module `requireHeading` override
-on the shared `sectionHeaderField()` helper). `module_content` has no `sectionHeader` —
+on the shared `sectionHeaderField()` helper).
+
+**Alignment is a module-level field, not part of `sectionHeader`.** All five
+of those modules carry their own `contentAlignment`, emitted by the
+`defineAlignmentFields()` helper, which every caller gets whether or not it
+asks for variant-scoped extras. `sectionHeader` deliberately does not bundle
+it: a Sanity named object type's field list is fixed at registration, so a
+bundled field cannot be omitted for the one module that doesn't want it —
+the same constraint that forces `sectionHeader` and
+`requiredHeadingSectionHeader` to exist as two registered types rather than
+one with conditional validation. Bundling it meant `module_cta`, which
+aligns its whole card rather than its heading, was forced to render an
+alignment control nothing read.
+
+`module_content` has no `sectionHeader` —
 its rich-text `body` supplies any in-content headings, so a separate
 structured heading field would just be a second way to do the same thing.
 `module_hero` has no `sectionHeader` either — its heading fields are its
@@ -294,10 +308,12 @@ service knows the split exists. Both are emitted by the
 `defineAlignmentFields()` helper, which also appends the `contentAlignment`
 field every caller is guaranteed to have.
 
-CTA no longer reads `sectionHeader.align`, which consequently renders as an
-inert control on its form; removing it needs `align` hoisted out of the
-shared `sectionHeader` object, since a Sanity named type's field list is
-fixed at registration.
+CTA's `contentAlignment` and the other four modules' are the same field from
+the same helper, but they mean different things: CTA aligns its whole card,
+while the others align a section heading and its supporting text. The
+`@blog/service` view models reflect that — CTA's is typed against
+`CTA_ALIGNMENT`, the others against `HEADING_ALIGN`. The two consts hold
+identical values, so the distinction is semantic rather than structural.
 
 `module_taxonomyList` is excluded from `MODULE_MAP`, so it never reaches
 `ModuleRenderer`; it still carries a `REVALIDATE_TAGS` entry, which every
