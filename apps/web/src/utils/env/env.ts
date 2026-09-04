@@ -41,11 +41,6 @@ export const env = createEnv({
     // RSC payload is built, so the flag never needs to reach the client
     // bundle.
     WEB_ANALYTICS_ENABLED: z.enum(['true', 'false']).optional(),
-    // Powers this app's own Resend transport (`@web/server/email/send-email`),
-    // which the Auth.js Email provider's magic-link (via `@blog/auth`) still
-    // sends through. `@blog/email`'s own `sendEmail` — used by the newsletter
-    // confirmation email — validates the same variable name independently.
-    RESEND_API_KEY: z.string().min(1).optional(),
     // The newsletter confirmation email's `from` address
     // (`@web/server/newsletter/newsletter-from-address.ts`): optional, falls
     // back to Resend's own shared testing sender until a verified sending
@@ -65,7 +60,6 @@ export const env = createEnv({
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     SANITY_GENERATE_SECRET: process.env.SANITY_GENERATE_SECRET,
     WEB_ANALYTICS_ENABLED: process.env.WEB_ANALYTICS_ENABLED,
-    RESEND_API_KEY: process.env.RESEND_API_KEY,
     NEWSLETTER_FROM_ADDRESS: process.env.NEWSLETTER_FROM_ADDRESS,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,

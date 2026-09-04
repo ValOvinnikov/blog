@@ -1,7 +1,6 @@
 import 'server-only';
 
 import { buildAuthConfig } from '@blog/auth';
-import { sendEmail } from '@web/server/email/send-email';
 import NextAuth from 'next-auth';
 
 // Config is a function — Auth.js v5's documented "lazy initialization" form
@@ -16,7 +15,7 @@ import NextAuth from 'next-auth';
 // CI's build environment (feature-flag-by-absence, same stance as the other
 // auth env vars).
 const { handlers, auth } = NextAuth(() => ({
-  ...buildAuthConfig({ sendEmail }),
+  ...buildAuthConfig(),
   // Design has no dedicated `/login` route (sign-in is a header popover,
   // `AuthMenu`), so a failed OAuth callback redirects to `/` with `?error=`
   // appended rather than Auth.js's default unstyled `/api/auth/error` page —
