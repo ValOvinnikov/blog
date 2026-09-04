@@ -3,19 +3,30 @@
 > Part of the docs split described in [`docs/README.md`](../README.md).
 > Referenced from `SPEC.md` §9.
 
-- **Default for content routes: dynamic, rendered on demand.** Static
-  generation stopped applying to them at #2408 (every `service` loader reads the
-  per-request tenant via `getRequestTenantId()` → `headers()`), and #2493
-  removed the now-pointless `generateStaticParams` from all seven of them
-  (`[locale]/[slug]`, `blog/[slug]`, `blog/page/[page]`, `tags/[slug]`,
-  `tags/[slug]/page/[page]`, `topics/[slug]`, `topics/[slug]/page/[page]`).
-  A build on `main` before that removal enumerated 51 pages from those
-  functions and emitted zero HTML — 153 `Dynamic server usage: … used headers`
-  bailouts — so they queried the **platform's** Sanity project at build and had
-  every result discarded. `dynamicParams` stays at its default `true`, which is
-  what already served every path. #2625 tracks resolving the tenant from the
-  route path, the prerequisite for any real per-tenant ISR. History behind the
-  measurement:
+- **Content routes cache per tenant, filled on demand.** Routes live under
+  `app/[tenant]/[locale]/`, take the tenant from `params.tenant`, and their
+  `generateStaticParams` return an empty list with `dynamicParams` at its
+  default `true` — so nothing is baked at build time and each
+  `(tenant, locale, slug)` path is rendered and cached on its first request.
+  Tenants are deliberately not enumerated at build: that needs production
+  credentials in the build, grows linearly with tenant count, and hits a
+  per-page `staticPageGenerationTimeout` cliff rather than degrading
+  gracefully.
+
+  Measured on the #2625 stage-3 branch: eleven tenant content routes appear in
+  `prerender-manifest.json` under `dynamicRoutes`; `routes` (real build-time
+  HTML) stays exactly `/_global-error` and `/robots.txt`; and the only
+  remaining `Dynamic server usage … used headers` bailout is `/_not-found`,
+  which has no params to read instead. `account` and `bookmarks` are excluded
+  from `dynamicRoutes` entirely by `force-dynamic` — both render the signed-in
+  reader's own session and must never be cached across users.
+
+  Note the `next build` summary marks these routes `●`, which means only that
+  a `generateStaticParams` exists somewhere in the ancestor chain — **not**
+  that HTML was emitted. The prerender manifest and `.next/server/app/**/*.html`
+  are the authoritative signals; the marker has misled twice during this work.
+
+  History behind the measurement:
   #2440 measured the resulting `next build` output: every content route
   (`/[locale]`, `/[locale]/blog`, `/[locale]/blog/[slug]`,
   `/[locale]/tags/**`, `/[locale]/topics/**`, `/rss.xml`, `/sitemap.xml`,
@@ -33,8 +44,10 @@
   `/_not-found` is now `ƒ` (Dynamic) too — only `/robots.txt` remains `○`
   (Static), and the prerender manifest bakes 2 routes (`/_global-error`,
   `/robots.txt`) instead of #2440's baseline of 3. #2440 remains the open
-  question of whether/how to claw any of this back, with #2625 as its leading
-  candidate.
+  question of whether/how to claw any of this back; #2625 answered it by
+  putting the tenant in the path, which is what the first bullet above now
+  describes.
+
 - **Build-time zero-results guard — removed (#2493, was #889):**
   `blog/[slug]`'s `generateStaticParams` used to throw, failing the build, when
   its params query resolved successfully but to zero posts — a tripwire for a

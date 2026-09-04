@@ -47,3 +47,17 @@ const resolveSoleTenant = async (): Promise<TTenant | undefined> => {
   const [tenant] = tenants;
   return tenant && isTenantServable(tenant) ? tenant : undefined;
 };
+
+/**
+ * resolveTenantById — the `[tenant]` route param's counterpart to
+ * `resolveTenant`'s `Host`-based lookup: given the tenant id `proxy.ts`
+ * already validated and wrote onto the path, returns the full tenant row.
+ * No sole-tenant dev fallback — an id that fails to resolve is a data
+ * integrity gap, not "no host matched".
+ */
+export const resolveTenantById = async (
+  tenantId: string,
+): Promise<TTenant | undefined> => {
+  const tenant = await queries.tenants.getTenantById(tenantId);
+  return tenant && isTenantServable(tenant) ? tenant : undefined;
+};

@@ -40,6 +40,7 @@ vi.mock('@web/components/shared/smart-link', () => ({
 const setup = customRenderAsync(PostListModule, {
   id: 'post-list-1',
   locale: 'en',
+  tenant: 'tenant-1',
   page: 1,
 });
 
@@ -117,6 +118,7 @@ describe(PostListModule, () => {
     await setup();
 
     expect(getPostListMock).toHaveBeenCalledWith('post-list-1', tenant, 1);
+    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders an archive-appropriate accessible heading (never "Latest posts")', async () => {

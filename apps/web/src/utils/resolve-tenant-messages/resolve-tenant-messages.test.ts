@@ -278,6 +278,14 @@ describe('resolveTenantMessages', () => {
     );
   });
 
+  it('forwards an explicitly supplied tenant to getSiteConfig, through to getRequestTenantId', async () => {
+    getSiteConfigMock.mockResolvedValue(siteConfigRow(PRESET_ID.CONSOLE));
+
+    await resolveTenantMessages(realMessages, 'tenant-2');
+
+    expect(getRequestTenantIdMock).toHaveBeenCalledWith('tenant-2');
+  });
+
   it('falls back to the CONSOLE preset with no overrides when the site config fetch fails', async () => {
     getSiteConfigMock.mockRejectedValue(new Error('boom'));
     const consoleErrorSpy = vi

@@ -10,9 +10,12 @@ import type { Metadata } from 'next';
  * via the shared `toMetadata` mapper. Returns empty metadata when the post
  * doesn't exist; the route itself calls `notFound()` for the actual 404.
  */
-export const buildPostMetadata = async (slug: string): Promise<Metadata> => {
-  const tenant = await getTenantSanityContext();
-  const result = await service.pages.post.v1.getPost(slug, tenant);
+export const buildPostMetadata = async (
+  slug: string,
+  tenant: string,
+): Promise<Metadata> => {
+  const tenantContext = await getTenantSanityContext(tenant);
+  const result = await service.pages.post.v1.getPost(slug, tenantContext);
 
   if (!result.ok) {
     logger.error('post_metadata.fetch_failed', { slug, error: result.error });

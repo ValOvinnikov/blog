@@ -118,7 +118,9 @@ describe('generateMetadata', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getHomePageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
 
-    const metadata = await generateMetadata();
+    const metadata = await generateMetadata({
+      params: Promise.resolve({ tenant: 'tenant-1', locale: 'en' }),
+    });
 
     expect(metadata).toEqual({});
     expect(errorSpy).toHaveBeenCalledWith(
@@ -132,7 +134,9 @@ describe('generateMetadata', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getHomePageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    const metadata = await generateMetadata();
+    const metadata = await generateMetadata({
+      params: Promise.resolve({ tenant: 'tenant-1', locale: 'en' }),
+    });
 
     expect(metadata).toEqual({});
     expect(errorSpy).not.toHaveBeenCalled();
@@ -150,7 +154,9 @@ describe('generateMetadata', () => {
       },
     });
 
-    const metadata = await generateMetadata();
+    const metadata = await generateMetadata({
+      params: Promise.resolve({ tenant: 'tenant-1', locale: 'en' }),
+    });
 
     expect(metadata.title).toEqual({ absolute: 'Home' });
     expect(metadata.alternates?.canonical).toBe('/');

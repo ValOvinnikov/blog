@@ -2,7 +2,7 @@ import { getEnabledOAuthProviderIds } from '@blog/auth/utils/oauth-providers/oau
 import {
   CAPABILITY,
   ICONS,
-  type ILocalizedParams,
+  type ITenantLocalizedParams,
   routes,
   SIZE,
 } from '@blog/config';
@@ -44,15 +44,23 @@ import {
 
 import { localeLayoutVariants } from './layout-variants';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const tenant = await getTenantSanityContext();
-  const result = await service.global.siteSettings.v1.getSiteSettings(tenant);
+type TGenerateMetadataProps = {
+  params: Promise<ITenantLocalizedParams>;
+};
+
+export async function generateMetadata({
+  params,
+}: TGenerateMetadataProps): Promise<Metadata> {
+  const { tenant } = await params;
+  const tenantContext = await getTenantSanityContext(tenant);
+  const result =
+    await service.global.siteSettings.v1.getSiteSettings(tenantContext);
 
   // Every route's own `openGraph`/`twitter` replaces (not merges with) this
   // root segment's — `metadataBase` is the one field that still inherits
   // down (see `toMetadata`), which is what lets a leaf's relative fallback
   // image path resolve to an absolute URL.
-  const tenantBaseUrl = await getTenantBaseUrl();
+  const tenantBaseUrl = await getTenantBaseUrl(tenant);
   const metadataBase = tenantBaseUrl ? new URL(tenantBaseUrl) : undefined;
 
   // Only the real production environment is indexable — see
@@ -93,11 +101,11 @@ export function generateStaticParams() {
 
 type TProps = {
   children: React.ReactNode;
-  params: Promise<ILocalizedParams & { tenant: string }>;
+  params: Promise<ITenantLocalizedParams>;
 };
 
 export default async function LocaleLayout({ children, params }: TProps) {
-  const { locale } = await params;
+  const { locale, tenant } = await params;
 
   if (!hasLocale(routing.locales, locale)) {
     notFound();
@@ -105,7 +113,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
 
   setRequestLocale(locale);
 
-  const tenant = await getTenantSanityContext();
+  const tenantContext = await getTenantSanityContext(tenant);
   const [
     settingsResult,
     navResult,
@@ -117,11 +125,11 @@ export default async function LocaleLayout({ children, params }: TProps) {
     timeZone,
     t,
   ] = await Promise.all([
-    service.global.siteSettings.v1.getSiteSettings(tenant),
-    service.global.navigation.v1.getNavigation(tenant),
-    service.global.footer.v1.getFooter(tenant),
-    getThemeTokens(),
-    isCapabilityEnabled(CAPABILITY.ANALYTICS),
+    service.global.siteSettings.v1.getSiteSettings(tenantContext),
+    service.global.navigation.v1.getNavigation(tenantContext),
+    service.global.footer.v1.getFooter(tenantContext),
+    getThemeTokens(tenant),
+    isCapabilityEnabled(CAPABILITY.ANALYTICS, tenant),
     getMessages(),
     getNow(),
     getTimeZone(),
@@ -135,7 +143,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
     notFound();
   }
 
-  const messages = await resolveTenantMessages(baseMessages);
+  const messages = await resolveTenantMessages(baseMessages, tenant);
   const { brand } = settingsResult.data;
   const navItems = navResult.ok ? navResult.data.items : [];
   const social = footerResult.ok ? footerResult.data.social : [];

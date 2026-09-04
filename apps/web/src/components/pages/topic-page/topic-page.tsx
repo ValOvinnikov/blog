@@ -12,7 +12,12 @@ import { getTranslations } from 'next-intl/server';
 
 import { TopicPageView } from './topic-page-view';
 
-type TTopicPageProps = { slug: string; page?: number; locale: string };
+type TTopicPageProps = {
+  slug: string;
+  page?: number;
+  locale: string;
+  tenant: string;
+};
 
 /**
  * TopicPage — shared composition for `/topics/[slug]` (page 1, `page`
@@ -23,11 +28,16 @@ type TTopicPageProps = { slug: string; page?: number; locale: string };
  * deref'd `blog_topic`, not `page_topic`'s own CMS-label `title`) drive the
  * heading and supporting text.
  */
-export const TopicPage = async ({ slug, page, locale }: TTopicPageProps) => {
-  const tenant = await getTenantSanityContext();
+export const TopicPage = async ({
+  slug,
+  page,
+  locale,
+  tenant,
+}: TTopicPageProps) => {
+  const tenantContext = await getTenantSanityContext(tenant);
   const [result, topics, breadcrumbsT, topicPageT] = await Promise.all([
-    service.pages.topic.v1.getTopicPage(slug, tenant),
-    getTopicsSafely(tenant),
+    service.pages.topic.v1.getTopicPage(slug, tenantContext),
+    getTopicsSafely(tenantContext),
     getTranslations('breadcrumbs'),
     getTranslations('topicPage'),
   ]);
@@ -38,7 +48,7 @@ export const TopicPage = async ({ slug, page, locale }: TTopicPageProps) => {
     { slug },
   );
 
-  const siteUrl = (await getTenantBaseUrl()) ?? '';
+  const siteUrl = (await getTenantBaseUrl(tenant)) ?? '';
   const breadcrumbTrail: IBreadcrumbItem[] = [
     { label: breadcrumbsT('home'), href: routes.home() },
     { label: topic.title, href: routes.topic(slug) },
@@ -62,6 +72,7 @@ export const TopicPage = async ({ slug, page, locale }: TTopicPageProps) => {
           <PostListModule
             id={postListId}
             locale={locale}
+            tenant={tenant}
             page={page ?? 1}
             createHref={(pageNumber) => routes.topic(slug, pageNumber)}
             ariaLabel={topicPageT('paginationAriaLabel', {
@@ -71,7 +82,7 @@ export const TopicPage = async ({ slug, page, locale }: TTopicPageProps) => {
             emptyMessageFallback={topicPageT('empty', { name: topic.title })}
             titleId="topic-posts-title"
           />
-          <ModuleRenderer modules={modules} locale={locale} />
+          <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />
         </>
       }
     />

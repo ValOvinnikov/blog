@@ -93,7 +93,11 @@ const tag = makeTag({
   description: 'Posts about TypeScript.',
 });
 
-const setup = customRenderAsync(TagPage, { slug: 'typescript', locale: 'en' });
+const setup = customRenderAsync(TagPage, {
+  slug: 'typescript',
+  locale: 'en',
+  tenant: 'tenant-1',
+});
 
 describe(`<${TagPage.name}/>`, () => {
   beforeEach(() => {

@@ -104,4 +104,17 @@ describe(isCapabilityEnabled, () => {
 
     await expect(isCapabilityEnabled(CAPABILITY.COMMENTS)).resolves.toBe(false);
   });
+
+  it('forwards an explicitly supplied tenant to both reads', async () => {
+    vi.mocked(getTenantPlan).mockResolvedValue({ ok: true, data: 'GROWTH' });
+    vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue({
+      ok: true,
+      data: ALL_ENABLED,
+    });
+
+    await isCapabilityEnabled(CAPABILITY.NEWSLETTER, 'tenant-1');
+
+    expect(getTenantPlan).toHaveBeenCalledWith('tenant-1');
+    expect(getEffectiveSettingsFeatures).toHaveBeenCalledWith('tenant-1');
+  });
 });

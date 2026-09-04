@@ -12,7 +12,7 @@ import { getTranslations } from 'next-intl/server';
 
 import { BlogListPageView } from './blog-list-page-view';
 
-type TBlogListPageProps = { page: number; locale: string };
+type TBlogListPageProps = { page: number; locale: string; tenant: string };
 
 /**
  * Shared composition for `/blog` (page 1) and `/blog/page/[page]` (pages ≥
@@ -20,18 +20,22 @@ type TBlogListPageProps = { page: number; locale: string };
  * data — plus the pre-rendered archive/page-builder modules content — to
  * `BlogListPageView`.
  */
-export const BlogListPage = async ({ page, locale }: TBlogListPageProps) => {
-  const tenant = await getTenantSanityContext();
+export const BlogListPage = async ({
+  page,
+  locale,
+  tenant,
+}: TBlogListPageProps) => {
+  const tenantContext = await getTenantSanityContext(tenant);
   const [result, topics, breadcrumbsT] = await Promise.all([
-    service.pages.blog.v1.getIndexPage(tenant),
-    getTopicsSafely(tenant),
+    service.pages.blog.v1.getIndexPage(tenantContext),
+    getTopicsSafely(tenantContext),
     getTranslations('breadcrumbs'),
   ]);
 
   const { heading, supportingText, modules, postListId } =
     guardPageLoaderResult(result, 'blog_list_page.fetch_failed');
 
-  const siteUrl = (await getTenantBaseUrl()) ?? '';
+  const siteUrl = (await getTenantBaseUrl(tenant)) ?? '';
   const breadcrumbTrail: IBreadcrumbItem[] = [
     { label: breadcrumbsT('home'), href: routes.home() },
     { label: breadcrumbsT('blog'), href: routes.blogIndex() },
@@ -51,8 +55,13 @@ export const BlogListPage = async ({ page, locale }: TBlogListPageProps) => {
       breadcrumbListSchema={breadcrumbListSchema}
       postsContent={
         <>
-          <PostListModule id={postListId} locale={locale} page={page} />
-          <ModuleRenderer modules={modules} locale={locale} />
+          <PostListModule
+            id={postListId}
+            locale={locale}
+            tenant={tenant}
+            page={page}
+          />
+          <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />
         </>
       }
     />

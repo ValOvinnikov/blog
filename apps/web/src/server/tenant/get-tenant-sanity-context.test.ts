@@ -99,6 +99,17 @@ describe(getTenantSanityContext, () => {
       'tenant-uuid',
     );
   });
+
+  it('forwards an explicitly supplied tenant to getRequestTenantId', async () => {
+    vi.mocked(getRequestTenantId).mockResolvedValue('tenant-uuid');
+    vi.mocked(queries.tenants.getTenantSanityCredentials).mockResolvedValue(
+      undefined,
+    );
+
+    await getTenantSanityContext('tenant-uuid');
+
+    expect(getRequestTenantId).toHaveBeenCalledWith('tenant-uuid');
+  });
 });
 
 describe('getTenantSanityContext memoization', () => {

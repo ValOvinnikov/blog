@@ -84,7 +84,11 @@ vi.mock('@web/components/shared/smart-link', () => ({
   ),
 }));
 
-const setup = customRenderAsync(BlogListPage, { page: 1, locale: 'en' });
+const setup = customRenderAsync(BlogListPage, {
+  page: 1,
+  locale: 'en',
+  tenant: 'tenant-1',
+});
 
 describe(`<${BlogListPage.name}/>`, () => {
   beforeEach(() => {
@@ -167,7 +171,7 @@ describe(`<${BlogListPage.name}/>`, () => {
     await setup({ page: 2 });
 
     expect(postListModuleMock).toHaveBeenCalledWith(
-      { id: 'post-list-1', locale: 'en', page: 2 },
+      { id: 'post-list-1', locale: 'en', tenant: 'tenant-1', page: 2 },
       undefined,
     );
   });

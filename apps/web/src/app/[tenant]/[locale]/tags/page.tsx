@@ -1,20 +1,21 @@
-import type { ILocalizedParams } from '@blog/config';
+import type { ITenantLocalizedParams } from '@blog/config';
 import { TagsPage } from '@web/components/pages/tags-page';
 import { buildTagsMetadata } from '@web/metadata/tags-metadata';
 import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 
 type TProps = {
-  params: Promise<ILocalizedParams & { tenant: string }>;
+  params: Promise<ITenantLocalizedParams>;
 };
 
-export function generateMetadata(): Promise<Metadata> {
-  return buildTagsMetadata();
+export async function generateMetadata({ params }: TProps): Promise<Metadata> {
+  const { tenant } = await params;
+  return buildTagsMetadata(tenant);
 }
 
 export default async function TagsIndexPage({ params }: TProps) {
-  const { locale } = await params;
+  const { locale, tenant } = await params;
   setRequestLocale(locale);
 
-  return <TagsPage />;
+  return <TagsPage tenant={tenant} />;
 }

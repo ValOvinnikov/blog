@@ -47,9 +47,10 @@ describe('buildTagMetadata', () => {
       data: makeTagDetailPage({ seo }),
     });
 
-    await buildTagMetadata('typescript');
+    await buildTagMetadata('typescript', 'tenant-1');
 
     expect(getTagPageMock).toHaveBeenCalledWith('typescript', tenant);
+    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('builds page-1 metadata from the resolved seo, self-canonical to /tags/[slug]', async () => {
@@ -58,7 +59,7 @@ describe('buildTagMetadata', () => {
       data: makeTagDetailPage({ seo }),
     });
 
-    const metadata = await buildTagMetadata('typescript');
+    const metadata = await buildTagMetadata('typescript', 'tenant-1');
 
     expect(metadata.title).toBe('TypeScript');
     expect(metadata.description).toBe('Posts about TypeScript.');
@@ -80,7 +81,7 @@ describe('buildTagMetadata', () => {
       error: new Error('boom'),
     });
 
-    const metadata = await buildTagMetadata('typescript');
+    const metadata = await buildTagMetadata('typescript', 'tenant-1');
 
     expect(metadata).toEqual({});
   });
@@ -91,7 +92,7 @@ describe('buildTagMetadata', () => {
       data: makeTagDetailPage({ seo }),
     });
 
-    const metadata = await buildTagMetadata('typescript', 2);
+    const metadata = await buildTagMetadata('typescript', 'tenant-1', 2);
 
     expect(metadata.title).toBe('TypeScript – Page 2');
     expect(metadata.openGraph?.title).toBe('TypeScript – Page 2');
@@ -112,7 +113,7 @@ describe('buildTagMetadata', () => {
       error: new Error('boom'),
     });
 
-    const metadata = await buildTagMetadata('missing', 2);
+    const metadata = await buildTagMetadata('missing', 'tenant-1', 2);
 
     expect(metadata).toEqual({});
   });
@@ -121,7 +122,7 @@ describe('buildTagMetadata', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getTagPageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    const metadata = await buildTagMetadata('missing');
+    const metadata = await buildTagMetadata('missing', 'tenant-1');
 
     expect(metadata).toEqual({});
     expect(errorSpy).not.toHaveBeenCalled();

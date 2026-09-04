@@ -19,10 +19,11 @@ import { getTranslations } from 'next-intl/server';
  */
 export const buildBlogListMetadata = async (
   page: number,
+  tenant: string,
 ): Promise<Metadata> => {
-  const tenant = await getTenantSanityContext();
+  const tenantContext = await getTenantSanityContext(tenant);
   const [result, t] = await Promise.all([
-    service.pages.blog.v1.getIndexPage(tenant),
+    service.pages.blog.v1.getIndexPage(tenantContext),
     getTranslations('pagination'),
   ]);
 

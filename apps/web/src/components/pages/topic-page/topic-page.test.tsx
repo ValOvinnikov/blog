@@ -101,7 +101,11 @@ const topic = makeTopic({
   description: 'The latest updates.',
 });
 
-const setup = customRenderAsync(TopicPage, { slug: 'news', locale: 'en' });
+const setup = customRenderAsync(TopicPage, {
+  slug: 'news',
+  locale: 'en',
+  tenant: 'tenant-1',
+});
 
 describe(`<${TopicPage.name}/>`, () => {
   beforeEach(() => {

@@ -19,11 +19,12 @@ import { getTranslations } from 'next-intl/server';
  */
 export const buildTopicMetadata = async (
   slug: string,
+  tenant: string,
   pageNumber?: number,
 ): Promise<Metadata> => {
-  const tenant = await getTenantSanityContext();
+  const tenantContext = await getTenantSanityContext(tenant);
   const [result, t] = await Promise.all([
-    service.pages.topic.v1.getTopicPage(slug, tenant),
+    service.pages.topic.v1.getTopicPage(slug, tenantContext),
     getTranslations('pagination'),
   ]);
 

@@ -107,6 +107,16 @@ describe(getEffectiveSettingsFeatures, () => {
     expect(getSettingsFeaturesMock).not.toHaveBeenCalled();
   });
 
+  it('forwards an explicitly supplied tenant to getRequestTenantId', async () => {
+    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
+    getSettingsFeaturesMock.mockResolvedValue(undefined);
+    getSiteConfigMock.mockResolvedValue(undefined);
+
+    await getEffectiveSettingsFeatures(TENANT_A_ID);
+
+    expect(getRequestTenantIdMock).toHaveBeenCalledWith(TENANT_A_ID);
+  });
+
   it('returns ok:false when a query rejects', async () => {
     getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
     getSettingsFeaturesMock.mockRejectedValue(new Error('boom'));

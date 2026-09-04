@@ -177,7 +177,12 @@ describe('LocaleLayout', () => {
 
   describe('generateMetadata', () => {
     it('builds title and description from site settings', async () => {
-      const metadata = await generateMetadata();
+      const metadata = await generateMetadata({
+        params: Promise.resolve({
+          tenant: 'tenant-1',
+          locale: LOCALE_ISO_CODES.EN,
+        }),
+      });
 
       expect(metadata).toEqual(
         expect.objectContaining({
@@ -191,7 +196,12 @@ describe('LocaleLayout', () => {
       const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       getSiteSettingsMock.mockResolvedValue({ ok: false, error: 'boom' });
 
-      const metadata = await generateMetadata();
+      const metadata = await generateMetadata({
+        params: Promise.resolve({
+          tenant: 'tenant-1',
+          locale: LOCALE_ISO_CODES.EN,
+        }),
+      });
 
       expect(metadata).not.toHaveProperty('title');
       errorSpy.mockRestore();
@@ -200,7 +210,12 @@ describe('LocaleLayout', () => {
     it('omits robots restrictions in production (indexable)', async () => {
       isProductionEnvironmentMock.mockReturnValue(true);
 
-      const metadata = await generateMetadata();
+      const metadata = await generateMetadata({
+        params: Promise.resolve({
+          tenant: 'tenant-1',
+          locale: LOCALE_ISO_CODES.EN,
+        }),
+      });
 
       expect(metadata).not.toHaveProperty('robots');
     });
@@ -208,7 +223,12 @@ describe('LocaleLayout', () => {
     it('adds noindex, nofollow robots metadata outside production', async () => {
       isProductionEnvironmentMock.mockReturnValue(false);
 
-      const metadata = await generateMetadata();
+      const metadata = await generateMetadata({
+        params: Promise.resolve({
+          tenant: 'tenant-1',
+          locale: LOCALE_ISO_CODES.EN,
+        }),
+      });
 
       expect(metadata.robots).toEqual({ index: false, follow: false });
     });
@@ -218,10 +238,27 @@ describe('LocaleLayout', () => {
       isProductionEnvironmentMock.mockReturnValue(false);
       getSiteSettingsMock.mockResolvedValue({ ok: false, error: 'boom' });
 
-      const metadata = await generateMetadata();
+      const metadata = await generateMetadata({
+        params: Promise.resolve({
+          tenant: 'tenant-1',
+          locale: LOCALE_ISO_CODES.EN,
+        }),
+      });
 
       expect(metadata.robots).toEqual({ index: false, follow: false });
       errorSpy.mockRestore();
+    });
+
+    it('forwards the tenant route param to getTenantSanityContext and getTenantBaseUrl', async () => {
+      await generateMetadata({
+        params: Promise.resolve({
+          tenant: 'tenant-1',
+          locale: LOCALE_ISO_CODES.EN,
+        }),
+      });
+
+      expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
+      expect(getTenantBaseUrlMock).toHaveBeenCalledWith('tenant-1');
     });
   });
 
@@ -256,7 +293,10 @@ describe('LocaleLayout', () => {
       }),
     });
 
-    expect(resolveTenantMessagesMock).toHaveBeenCalledWith(realMessages);
+    expect(resolveTenantMessagesMock).toHaveBeenCalledWith(
+      realMessages,
+      'tenant-1',
+    );
     const [provider] = html.props.children;
     expect(provider.props.messages).toBe(realMessages);
   });
@@ -462,5 +502,20 @@ describe('LocaleLayout', () => {
     expect(getSiteSettingsMock).toHaveBeenCalledWith(tenant);
     expect(getNavigationMock).toHaveBeenCalledWith(tenant);
     expect(getFooterMock).toHaveBeenCalledWith(tenant);
+  });
+
+  it('forwards the tenant route param to getTenantSanityContext, getThemeTokens, isCapabilityEnabled, and resolveTenantMessages', async () => {
+    await setup();
+
+    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
+    expect(getThemeTokensMock).toHaveBeenCalledWith('tenant-1');
+    expect(isCapabilityEnabledMock).toHaveBeenCalledWith(
+      'ANALYTICS',
+      'tenant-1',
+    );
+    expect(resolveTenantMessagesMock).toHaveBeenCalledWith(
+      realMessages,
+      'tenant-1',
+    );
   });
 });

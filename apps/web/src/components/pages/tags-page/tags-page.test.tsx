@@ -78,7 +78,7 @@ vi.mock('@web/components/shared/smart-link', () => ({
   ),
 }));
 
-const setup = customRenderAsync(TagsPage, {});
+const setup = customRenderAsync(TagsPage, { tenant: 'tenant-1' });
 
 describe(`<${TagsPage.name}/>`, () => {
   beforeEach(() => {

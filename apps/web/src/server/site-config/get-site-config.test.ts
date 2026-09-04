@@ -79,6 +79,15 @@ describe(getSiteConfig, () => {
     expect(getSiteConfigMock).not.toHaveBeenCalled();
   });
 
+  it('forwards an explicitly supplied tenant to getRequestTenantId', async () => {
+    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
+    getSiteConfigMock.mockResolvedValue(SITE_CONFIG_ROW_A);
+
+    await getSiteConfig(TENANT_A_ID);
+
+    expect(getRequestTenantIdMock).toHaveBeenCalledWith(TENANT_A_ID);
+  });
+
   it('returns ok:false when the query rejects', async () => {
     getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
     getSiteConfigMock.mockRejectedValue(new Error('boom'));

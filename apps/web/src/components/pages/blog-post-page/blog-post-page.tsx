@@ -27,7 +27,7 @@ import { getFormatter, getTranslations } from 'next-intl/server';
 
 import { BlogPostPageView } from './blog-post-page-view';
 
-type TBlogPostPageProps = { slug: string };
+type TBlogPostPageProps = { slug: string; tenant: string };
 
 /**
  * `/blog/{slug}` composition. Site chrome (`Header`/`Footer`) stays owned by
@@ -36,9 +36,9 @@ type TBlogPostPageProps = { slug: string };
  * settings + bookmarks-capability checks) and hands the result to the pure
  * `BlogPostPageView`.
  */
-export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
-  const tenant = await getTenantSanityContext();
-  const result = await service.pages.post.v1.getPost(slug, tenant);
+export const BlogPostPage = async ({ slug, tenant }: TBlogPostPageProps) => {
+  const tenantContext = await getTenantSanityContext(tenant);
+  const result = await service.pages.post.v1.getPost(slug, tenantContext);
   const post = guardPageLoaderResult(result, 'blog_post_page.fetch_failed', {
     slug,
   });
@@ -62,10 +62,10 @@ export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
 
   const headings = extractPostHeadings(body);
   const hasContentsRail = headings.length >= MIN_H2_HEADINGS_FOR_RAIL;
-  const siteUrl = (await getTenantBaseUrl()) ?? '';
+  const siteUrl = (await getTenantBaseUrl(tenant)) ?? '';
   // Only for images embedded in `body` — `heroImageSanity` already carries
   // its own `cdnBaseUrl` from the service layer.
-  const imageBaseUrl = getSanityImageBaseUrl(tenant);
+  const imageBaseUrl = getSanityImageBaseUrl(tenantContext);
   const url = `${siteUrl}${routes.post(slug)}`;
   const blogPostingSchema = buildBlogPostingSchema(post, siteUrl);
   const shareLinks = buildShareLinks({ url, title }).map((link) => ({
@@ -89,8 +89,8 @@ export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
     getTranslations('breadcrumbs'),
     getTranslations('blogPostPage'),
     toPostListItems(relatedPosts),
-    service.global.newsletterSettings.v1.getNewsletterSettings(tenant),
-    isCapabilityEnabled(CAPABILITY.BOOKMARKS),
+    service.global.newsletterSettings.v1.getNewsletterSettings(tenantContext),
+    isCapabilityEnabled(CAPABILITY.BOOKMARKS, tenant),
   ]);
 
   // Per-post opt-out (`newsletterEnabled`) gates the compact signup on this

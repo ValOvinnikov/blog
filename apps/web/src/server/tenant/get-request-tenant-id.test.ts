@@ -20,6 +20,14 @@ describe(getRequestTenantId, () => {
 
     await expect(getRequestTenantId()).resolves.toBeUndefined();
   });
+
+  it('prefers an explicitly supplied tenant over the header, without reading headers at all', async () => {
+    await expect(getRequestTenantId('tenant-from-param')).resolves.toBe(
+      'tenant-from-param',
+    );
+
+    expect(headersMock).not.toHaveBeenCalled();
+  });
 });
 
 describe('getRequestTenantId memoization', () => {

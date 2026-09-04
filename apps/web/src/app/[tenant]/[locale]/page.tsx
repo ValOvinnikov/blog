@@ -1,4 +1,4 @@
-import type { ILocalizedParams } from '@blog/config';
+import type { ITenantLocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { HomePageTemplate } from '@web/components/page-templates/home-page-template';
 import { toMetadata } from '@web/metadata/to-metadata';
@@ -11,12 +11,13 @@ import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 
 type TProps = {
-  params: Promise<ILocalizedParams & { tenant: string }>;
+  params: Promise<ITenantLocalizedParams>;
 };
 
-export async function generateMetadata(): Promise<Metadata> {
-  const tenant = await getTenantSanityContext();
-  const result = await service.pages.home.v1.getHomePage(tenant);
+export async function generateMetadata({ params }: TProps): Promise<Metadata> {
+  const { tenant } = await params;
+  const tenantContext = await getTenantSanityContext(tenant);
+  const result = await service.pages.home.v1.getHomePage(tenantContext);
 
   if (!result.ok) {
     logger.error('home_page.metadata_fetch_failed', { error: result.error });
@@ -35,11 +36,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage({ params }: TProps) {
-  const { locale } = await params;
+  const { locale, tenant } = await params;
   setRequestLocale(locale);
 
-  const tenant = await getTenantSanityContext();
-  const result = await service.pages.home.v1.getHomePage(tenant);
+  const tenantContext = await getTenantSanityContext(tenant);
+  const result = await service.pages.home.v1.getHomePage(tenantContext);
   const { hero, modules } = guardPageLoaderResult(
     result,
     'home_page.fetch_failed',
@@ -47,8 +48,10 @@ export default async function HomePage({ params }: TProps) {
 
   return (
     <HomePageTemplate
-      hero={<HeroModule id={hero.id} locale={locale} />}
-      modules={<ModuleRenderer modules={modules} locale={locale} />}
+      hero={<HeroModule id={hero.id} locale={locale} tenant={tenant} />}
+      modules={
+        <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />
+      }
     />
   );
 }

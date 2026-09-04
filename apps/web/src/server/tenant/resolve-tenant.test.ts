@@ -1,19 +1,24 @@
 import { TENANT_STATUS } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 
-import { resolveTenant } from './resolve-tenant';
+import { resolveTenant, resolveTenantById } from './resolve-tenant';
 
-const { getTenantByDomainMock, listTenantsMock, isProductionEnvironmentMock } =
-  vi.hoisted(() => ({
-    getTenantByDomainMock: vi.fn(),
-    listTenantsMock: vi.fn(),
-    isProductionEnvironmentMock: vi.fn(),
-  }));
+const {
+  getTenantByDomainMock,
+  listTenantsMock,
+  getTenantByIdMock,
+  isProductionEnvironmentMock,
+} = vi.hoisted(() => ({
+  getTenantByDomainMock: vi.fn(),
+  listTenantsMock: vi.fn(),
+  getTenantByIdMock: vi.fn(),
+  isProductionEnvironmentMock: vi.fn(),
+}));
 
 vi.mock('@blog/db', () => ({
   queries: {
     tenantDomains: { getTenantByDomain: getTenantByDomainMock },
-    tenants: { listTenants: listTenantsMock },
+    tenants: { listTenants: listTenantsMock, getTenantById: getTenantByIdMock },
   },
   TENANT_STATUS: {
     ACTIVE: 'ACTIVE',
@@ -152,5 +157,45 @@ describe(resolveTenant, () => {
     await expect(resolveTenant('suspended.example.com')).resolves.toEqual(
       tenant,
     );
+  });
+});
+
+describe(resolveTenantById, () => {
+  beforeEach(() => {
+    getTenantByIdMock.mockReset();
+  });
+
+  it('resolves the full tenant row by id', async () => {
+    const tenant = buildServableTenant();
+    getTenantByIdMock.mockResolvedValue(tenant);
+
+    await expect(resolveTenantById('tenant-1')).resolves.toEqual(tenant);
+    expect(getTenantByIdMock).toHaveBeenCalledWith('tenant-1');
+  });
+
+  it('resolves undefined when no tenant matches the id', async () => {
+    getTenantByIdMock.mockResolvedValue(undefined);
+
+    await expect(resolveTenantById('missing')).resolves.toBeUndefined();
+  });
+
+  it('refuses an archived matched tenant instead of resolving it', async () => {
+    getTenantByIdMock.mockResolvedValue(
+      buildServableTenant({ status: TENANT_STATUS.ARCHIVED }),
+    );
+
+    await expect(resolveTenantById('tenant-1')).resolves.toBeUndefined();
+  });
+
+  it('refuses a matched tenant with no Sanity project/dataset/token set yet', async () => {
+    getTenantByIdMock.mockResolvedValue(
+      buildServableTenant({
+        sanityProjectId: null,
+        sanityDataset: null,
+        sanityReadTokenEncrypted: null,
+      }),
+    );
+
+    await expect(resolveTenantById('tenant-1')).resolves.toBeUndefined();
   });
 });

@@ -39,6 +39,7 @@ vi.mock('@web/components/shared/smart-link', () => ({
 
 const setup = customRenderAsync(TaxonomyListModule, {
   id: 'topic-list-1',
+  tenant: 'tenant-1',
   taxonomy: TAXONOMY_KIND.TOPICS,
   titleId: 'topic-list-title',
   dataTestId: 'taxonomy-list-module-topic-list-1',
@@ -124,6 +125,7 @@ describe(TaxonomyListModule, () => {
       TAXONOMY_KIND.TOPICS,
       tenant,
     );
+    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('maps each entry through buildHref and formatPostCount, then renders it as a card', async () => {

@@ -11,14 +11,16 @@ import { getEffectiveSettingsFeatures } from './get-effective-settings-features'
  * its own effective `settings_features` toggle is on. Every failure path —
  * no tenant resolved, a fetch error — resolves `false` rather than
  * throwing, so a render site can gate on this with a plain `if` and a
- * capability simply omits rather than breaking the page.
+ * capability simply omits rather than breaking the page. Accepts the
+ * `[tenant]` route param and forwards it to both reads below.
  */
 export const isCapabilityEnabled = async (
   capability: TCapability,
+  tenant?: string,
 ): Promise<boolean> => {
   const [planResult, featuresResult] = await Promise.all([
-    getTenantPlan(),
-    getEffectiveSettingsFeatures(),
+    getTenantPlan(tenant),
+    getEffectiveSettingsFeatures(tenant),
   ]);
 
   if (!planResult.ok) {

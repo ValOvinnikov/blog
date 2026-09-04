@@ -6,14 +6,15 @@ import { CtaModuleView } from './cta-module-view';
 export interface ICtaModuleProps {
   id: string;
   locale: string;
+  tenant: string;
 }
 
 /**
  * CtaModule — fetches `module_cta` data and hands it to `CtaModuleView`.
  */
-export const CtaModule = async ({ id }: ICtaModuleProps) => {
-  const tenant = await getTenantSanityContext();
-  const result = await service.modules.cta.v1.getCta(id, tenant);
+export const CtaModule = async ({ id, tenant }: ICtaModuleProps) => {
+  const tenantContext = await getTenantSanityContext(tenant);
+  const result = await service.modules.cta.v1.getCta(id, tenantContext);
 
   if (!result.ok) return null;
 

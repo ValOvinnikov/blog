@@ -9,6 +9,7 @@ import { PostLatestModule } from './post-latest/post-latest-module';
 export type TModuleComponentProps = {
   id: string;
   locale: string;
+  tenant: string;
 };
 
 /**
