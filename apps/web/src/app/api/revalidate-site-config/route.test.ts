@@ -23,6 +23,17 @@ vi.mock('@web/utils/env/env', () => ({
   env: { SITE_CONFIG_REVALIDATE_SECRET: 'test-secret' },
 }));
 
+const { loggerWarnMock } = vi.hoisted(() => ({ loggerWarnMock: vi.fn() }));
+
+vi.mock('@web/utils/logger/logger', () => ({
+  logger: {
+    error: vi.fn(),
+    warn: loggerWarnMock,
+    info: vi.fn(),
+    debug: vi.fn(),
+  },
+}));
+
 const makeRequest = (
   authorization?: string,
   body?: Record<string, unknown>,
@@ -56,6 +67,7 @@ describe('POST /api/revalidate-site-config', () => {
     revalidateTagMock.mockReset();
     revalidatePathMock.mockReset();
     listTenantsMock.mockReset();
+    loggerWarnMock.mockReset();
   });
 
   afterEach(() => {
@@ -85,6 +97,13 @@ describe('POST /api/revalidate-site-config', () => {
     expect(revalidateTagMock).toHaveBeenCalledTimes(3);
     expect(listTenantsMock).not.toHaveBeenCalled();
     expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
+    expect(loggerWarnMock).toHaveBeenCalledWith(
+      'revalidate_site_config.whole_site_purge',
+      expect.objectContaining({
+        tenantIds: ['tenant-1'],
+        requestedTenantId: 'tenant-1',
+      }),
+    );
     expect(json).toEqual({
       revalidated: [
         'site-config:tenant-1',
@@ -112,6 +131,13 @@ describe('POST /api/revalidate-site-config', () => {
     });
     expect(revalidateTagMock).toHaveBeenCalledTimes(6);
     expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
+    expect(loggerWarnMock).toHaveBeenCalledWith(
+      'revalidate_site_config.whole_site_purge',
+      expect.objectContaining({
+        tenantIds: ['tenant-1', 'tenant-2'],
+        requestedTenantId: undefined,
+      }),
+    );
     expect(json.revalidated).toHaveLength(6);
   });
 

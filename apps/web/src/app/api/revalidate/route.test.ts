@@ -12,12 +12,21 @@ const { revalidateTagMock, revalidatePathMock } = vi.hoisted(() => ({
 const {
   getTenantIdBySanityProjectIdMock,
   getTenantByIdMock,
+  getTenantSanityCredentialsMock,
   removeBookmarksForPostMock,
 } = vi.hoisted(() => ({
   getTenantIdBySanityProjectIdMock: vi.fn(),
   getTenantByIdMock: vi.fn(),
+  getTenantSanityCredentialsMock: vi.fn(),
   removeBookmarksForPostMock: vi.fn(),
 }));
+
+const { isDerivableRevalidateTypeMock, deriveRevalidatePathsMock } = vi.hoisted(
+  () => ({
+    isDerivableRevalidateTypeMock: vi.fn(),
+    deriveRevalidatePathsMock: vi.fn(),
+  }),
+);
 
 vi.mock('@sanity/webhook', () => ({
   isValidSignature: isValidSignatureMock,
@@ -38,6 +47,7 @@ vi.mock('@blog/db', () => ({
     tenants: {
       getTenantIdBySanityProjectId: getTenantIdBySanityProjectIdMock,
       getTenantById: getTenantByIdMock,
+      getTenantSanityCredentials: getTenantSanityCredentialsMock,
     },
     bookmarks: {
       removeBookmarksForPost: removeBookmarksForPostMock,
@@ -45,14 +55,21 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-const { loggerErrorMock } = vi.hoisted(() => ({
+vi.mock('@web/server/revalidate/derive-revalidate-paths', () => ({
+  BLOG_POST_TYPE: 'blog_post',
+  isDerivableRevalidateType: isDerivableRevalidateTypeMock,
+  deriveRevalidatePaths: deriveRevalidatePathsMock,
+}));
+
+const { loggerErrorMock, loggerWarnMock } = vi.hoisted(() => ({
   loggerErrorMock: vi.fn(),
+  loggerWarnMock: vi.fn(),
 }));
 
 vi.mock('@web/utils/logger/logger', () => ({
   logger: {
     error: loggerErrorMock,
-    warn: vi.fn(),
+    warn: loggerWarnMock,
     info: vi.fn(),
     debug: vi.fn(),
   },
@@ -82,8 +99,13 @@ describe('POST /api/revalidate', () => {
     getTenantIdBySanityProjectIdMock.mockReset();
     getTenantByIdMock.mockReset();
     getTenantByIdMock.mockResolvedValue({ id: 'tenant-uuid-1' });
+    getTenantSanityCredentialsMock.mockReset();
     removeBookmarksForPostMock.mockReset();
+    isDerivableRevalidateTypeMock.mockReset();
+    isDerivableRevalidateTypeMock.mockReturnValue(false);
+    deriveRevalidatePathsMock.mockReset();
     loggerErrorMock.mockReset();
+    loggerWarnMock.mockReset();
   });
 
   afterEach(() => {
@@ -438,6 +460,134 @@ describe('POST /api/revalidate', () => {
         'revalidate.bookmark_cleanup_failed',
         expect.objectContaining({ type: 'blog_post', id: 'post-1' }),
       );
+    });
+  });
+
+  describe('resolved path purge', () => {
+    it('purges each derived path instead of the whole site when derivation succeeds', async () => {
+      isValidSignatureMock.mockResolvedValue(true);
+      getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-uuid-1');
+      isDerivableRevalidateTypeMock.mockReturnValue(true);
+      getTenantSanityCredentialsMock.mockResolvedValue({
+        projectId: 'tenant-a-project',
+        dataset: 'production',
+        token: 'read-token',
+      });
+      deriveRevalidatePathsMock.mockResolvedValue({
+        ok: true,
+        paths: ['/tenant-uuid-1/EN', '/tenant-uuid-1/EN/blog/my-post'],
+      });
+      const { POST } = await import('./route');
+
+      const request = makeRequest(
+        { _type: 'blog_post', _id: 'post-1' },
+        't=1,v=valid-signature',
+        { [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project' },
+      );
+      const response = await POST(request);
+      const json = await response.json();
+
+      expect(revalidatePathMock).toHaveBeenCalledWith('/tenant-uuid-1/EN');
+      expect(revalidatePathMock).toHaveBeenCalledWith(
+        '/tenant-uuid-1/EN/blog/my-post',
+      );
+      expect(revalidatePathMock).not.toHaveBeenCalledWith('/', 'layout');
+      expect(loggerWarnMock).not.toHaveBeenCalled();
+      expect(json.pathPurged).toBe(true);
+    });
+
+    it('falls back to the whole-site purge and logs when the tenant Sanity credentials cannot be resolved', async () => {
+      isValidSignatureMock.mockResolvedValue(true);
+      getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-uuid-1');
+      isDerivableRevalidateTypeMock.mockReturnValue(true);
+      getTenantSanityCredentialsMock.mockResolvedValue(undefined);
+      const { POST } = await import('./route');
+
+      const request = makeRequest(
+        { _type: 'blog_post', _id: 'post-1' },
+        't=1,v=valid-signature',
+        { [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project' },
+      );
+      await POST(request);
+
+      expect(deriveRevalidatePathsMock).not.toHaveBeenCalled();
+      expect(loggerErrorMock).toHaveBeenCalledWith(
+        'revalidate.tenant_sanity_credentials_missing',
+        expect.objectContaining({ type: 'blog_post', id: 'post-1' }),
+      );
+      expect(loggerWarnMock).toHaveBeenCalledWith(
+        'revalidate.path_purge_fallback',
+        expect.objectContaining({ reason: 'fetch_failed' }),
+      );
+      expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
+    });
+
+    it('falls back to the whole-site purge and logs when the derivation itself cannot resolve the paths', async () => {
+      isValidSignatureMock.mockResolvedValue(true);
+      getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-uuid-1');
+      isDerivableRevalidateTypeMock.mockReturnValue(true);
+      getTenantSanityCredentialsMock.mockResolvedValue({
+        projectId: 'tenant-a-project',
+        dataset: 'production',
+        token: 'read-token',
+      });
+      deriveRevalidatePathsMock.mockResolvedValue({
+        ok: false,
+        reason: 'document_not_found',
+      });
+      const { POST } = await import('./route');
+
+      const request = makeRequest(
+        { _type: 'blog_post', _id: 'post-1' },
+        't=1,v=valid-signature',
+        { [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project' },
+      );
+      await POST(request);
+
+      expect(loggerWarnMock).toHaveBeenCalledWith(
+        'revalidate.path_purge_fallback',
+        expect.objectContaining({ reason: 'document_not_found' }),
+      );
+      expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
+    });
+
+    it('falls back to the whole-site purge and logs with reason tenant_unresolved when no tenant resolves', async () => {
+      isValidSignatureMock.mockResolvedValue(true);
+      const { POST } = await import('./route');
+
+      const request = makeRequest(
+        { _type: 'blog_post', _id: 'post-1' },
+        't=1,v=valid-signature',
+      );
+      await POST(request);
+
+      expect(isDerivableRevalidateTypeMock).not.toHaveBeenCalled();
+      expect(loggerWarnMock).toHaveBeenCalledWith(
+        'revalidate.path_purge_fallback',
+        expect.objectContaining({ reason: 'tenant_unresolved' }),
+      );
+      expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
+    });
+
+    it('falls back to the whole-site purge and logs with reason unsupported_type for a type without a precise derivation', async () => {
+      isValidSignatureMock.mockResolvedValue(true);
+      getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-uuid-1');
+      isDerivableRevalidateTypeMock.mockReturnValue(false);
+      const { POST } = await import('./route');
+
+      const request = makeRequest(
+        { _type: 'blog_author', _id: 'author-1' },
+        't=1,v=valid-signature',
+        { [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project' },
+      );
+      await POST(request);
+
+      expect(getTenantSanityCredentialsMock).not.toHaveBeenCalled();
+      expect(loggerWarnMock).toHaveBeenCalledWith(
+        'revalidate.path_purge_fallback',
+        expect.objectContaining({ reason: 'unsupported_type' }),
+      );
+      expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
     });
   });
 

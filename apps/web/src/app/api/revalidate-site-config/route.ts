@@ -93,13 +93,19 @@ export async function POST(request: Request): Promise<NextResponse> {
   for (const tag of revalidatedTags) {
     revalidateTag(tag, { expire: 0 });
   }
-  // Tag expiry alone does not invalidate prerendered route entries on
-  // Vercel, so this purges the whole site regardless of `tenantId`, same as
-  // `/api/revalidate`. Per-tenant scoping isn't expressible here: Next
-  // derives each route's implicit layout tags from the route pattern with
-  // dynamic segments unresolved, never from a resolved value, so a path
-  // built from a specific tenant id matches nothing. Purging each resolved
-  // tenant path individually would work and is tracked separately.
+
+  // A Look/Voice/Features save changes every page a tenant renders (theme
+  // tokens, nav, feature flags), so there is no partial path set that would
+  // be correct to purge instead — the choice is a full per-path enumeration
+  // (home, every post, every tag/topic page and its pagination, every
+  // generic page) or this whole-site purge. Enumerating is unbounded in the
+  // number of `revalidatePath` calls for a large tenant, so this stays the
+  // deliberate placeholder: loudly logged, not silently incomplete, pending
+  // a decision on whether the enumeration cost is worth paying here too.
+  logger.warn('revalidate_site_config.whole_site_purge', {
+    tenantIds,
+    requestedTenantId,
+  });
   revalidatePath('/', 'layout');
 
   return NextResponse.json(
