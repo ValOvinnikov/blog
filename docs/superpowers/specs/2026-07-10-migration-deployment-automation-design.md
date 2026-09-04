@@ -98,7 +98,7 @@ A single Sanity document per dataset records what has run:
 New helper subcommand (extends `apps/cms/scripts/migrate.mjs`):
 
 ```
-pnpm --filter cms migrate:deploy [--yes]
+pnpm --filter @blog/studio migrate:deploy [--yes]
 ```
 
 Algorithm:
@@ -186,7 +186,7 @@ Mostly yes. Corrections captured above:
 1. **Timestamped `migrate:new`** (tiny helper change).
 2. **Ledger + `migrate:deploy`** in `migrate.mjs` (reads/writes `migrationState`,
    runs pending in order). Locally usable immediately:
-   `SANITY_STUDIO_DATASET=development pnpm --filter cms migrate:deploy`.
+   `SANITY_STUDIO_DATASET=development pnpm --filter @blog/studio migrate:deploy`.
 3. **Backfill** the ledger with already-applied migrations (one-time, per
    dataset) so they aren't re-run.
 4. **Deploy workflow** (post-merge, gated, write token, backup artifact).
