@@ -32,9 +32,9 @@ function tenant(overrides: Partial<TTenant> = {}): TTenant {
 const originalEnv: Record<string, string | undefined> = {};
 
 beforeEach(() => {
-  originalEnv['PLATFORM_APP_URL'] = process.env['PLATFORM_APP_URL'];
+  originalEnv['ADMIN_APP_BASE_URL'] = process.env['ADMIN_APP_BASE_URL'];
   originalEnv['OPERATOR_ALERT_SECRET'] = process.env['OPERATOR_ALERT_SECRET'];
-  process.env['PLATFORM_APP_URL'] = 'https://platform.example.com';
+  process.env['ADMIN_APP_BASE_URL'] = 'https://platform.example.com';
   process.env['OPERATOR_ALERT_SECRET'] = 'shared-secret';
 });
 

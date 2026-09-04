@@ -67,11 +67,11 @@ jobs:
     environment: ${{ inputs.environment || 'production' }}
     env:
       SANITY_MANAGEMENT_TOKEN: ${{ secrets.SANITY_MANAGEMENT_TOKEN }}
-      # Optional — the deployed `apps/platform` origin (no trailing
-      # slash/path) this sweep POSTs an operator-alert event to on a
-      # notifiable owner-elevation outcome. Unset means the sweep still
-      # runs; only the operator notification is skipped.
-      PLATFORM_APP_URL: ${{ vars.PLATFORM_APP_URL }}
+      # The deployed `apps/platform` origin (no trailing slash/path) this
+      # sweep POSTs an operator-alert event to on a notifiable
+      # owner-elevation outcome. Unset means the sweep still runs; only the
+      # operator notification is skipped.
+      ADMIN_APP_BASE_URL: ${{ vars.ADMIN_APP_BASE_URL }}
       # Shared secret `apps/platform`'s `/api/internal/operator-alert` route
       # verifies as a Bearer token — same value in both places.
       OPERATOR_ALERT_SECRET: ${{ secrets.OPERATOR_ALERT_SECRET }}

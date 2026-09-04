@@ -3,9 +3,9 @@ import { postOperatorAlert } from './post-operator-alert';
 const originalEnv: Record<string, string | undefined> = {};
 
 beforeEach(() => {
-  originalEnv['PLATFORM_APP_URL'] = process.env['PLATFORM_APP_URL'];
+  originalEnv['ADMIN_APP_BASE_URL'] = process.env['ADMIN_APP_BASE_URL'];
   originalEnv['OPERATOR_ALERT_SECRET'] = process.env['OPERATOR_ALERT_SECRET'];
-  process.env['PLATFORM_APP_URL'] = 'https://platform.example.com';
+  process.env['ADMIN_APP_BASE_URL'] = 'https://platform.example.com';
   process.env['OPERATOR_ALERT_SECRET'] = 'shared-secret';
 });
 
@@ -91,8 +91,8 @@ describe(postOperatorAlert, () => {
     );
   });
 
-  it('does not call fetch and resolves when PLATFORM_APP_URL is unset', async () => {
-    delete process.env['PLATFORM_APP_URL'];
+  it('does not call fetch and resolves when ADMIN_APP_BASE_URL is unset', async () => {
+    delete process.env['ADMIN_APP_BASE_URL'];
     const fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
 

@@ -12,25 +12,28 @@ const OPERATOR_ALERT_PATH = '/api/internal/operator-alert';
 export async function postOperatorAlert(
   body: TOperatorAlertBody,
 ): Promise<void> {
-  const platformAppUrl = process.env['PLATFORM_APP_URL'];
+  const adminAppBaseUrl = process.env['ADMIN_APP_BASE_URL'];
   const operatorAlertSecret = process.env['OPERATOR_ALERT_SECRET'];
 
-  if (!platformAppUrl || !operatorAlertSecret) {
+  if (!adminAppBaseUrl || !operatorAlertSecret) {
     console.log(
-      `post-operator-alert: PLATFORM_APP_URL or OPERATOR_ALERT_SECRET is unset — skipping operator alert for kind "${body.kind}".`,
+      `post-operator-alert: ADMIN_APP_BASE_URL or OPERATOR_ALERT_SECRET is unset — skipping operator alert for kind "${body.kind}".`,
     );
     return;
   }
 
   try {
-    const response = await fetch(new URL(OPERATOR_ALERT_PATH, platformAppUrl), {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${operatorAlertSecret}`,
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      new URL(OPERATOR_ALERT_PATH, adminAppBaseUrl),
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${operatorAlertSecret}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
       },
-      body: JSON.stringify(body),
-    });
+    );
 
     if (!response.ok) {
       console.error(

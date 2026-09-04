@@ -92,13 +92,10 @@ jobs:
       WEB_APP_URL: ${{ vars.WEB_APP_URL }}
       SANITY_REVALIDATE_SECRET: ${{ secrets.SANITY_REVALIDATE_SECRET }}
       TENANT_TOKEN_ENCRYPTION_KEY: ${{ secrets.TENANT_TOKEN_ENCRYPTION_KEY }}
-      # Optional — the deployed apps/platform origin this run POSTs an
-      # operator-alert event to on a notifiable post-provisioning
-      # owner-elevation outcome. Unset means this run still completes; only
-      # that notification is skipped.
-      PLATFORM_APP_URL: ${{ vars.PLATFORM_APP_URL }}
       # Shared secret apps/platform's `/api/internal/operator-alert` route
-      # verifies as a Bearer token — same value in both places.
+      # verifies as a Bearer token — same value in both places. The
+      # operator-alert POST itself targets ADMIN_APP_BASE_URL above; unset
+      # means this run still completes and only that notification is skipped.
       OPERATOR_ALERT_SECRET: ${{ secrets.OPERATOR_ALERT_SECRET }}
       # The dispatched environment (`development`/`production`), surfaced on
       # apps/platform's provisioning page as the run's "Registry" — the one
