@@ -37,8 +37,8 @@ export default mergeConfig(
         { find: /^@blog\/config\//, replacement: `${configSrc}/` },
         { find: /^@blog\/email\//, replacement: `${emailSrc}/` },
         // Not imported directly by this package's own source either —
-        // needed only because @blog/email resolves to source, and its
-        // brand-tokens module imports @blog/utils/color.
+        // needed only because @blog/email resolves to source, and one of
+        // its html-shell modules imports @blog/utils/color.
         { find: /^@blog\/utils\//, replacement: `${utilsSrc}/` },
         // `import 'server-only'` throws outside a react-server bundle; stub it
         // to a no-op for the node test env (the real guard still runs in build).
