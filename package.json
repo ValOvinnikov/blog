@@ -4,7 +4,7 @@
   "type": "module",
   "packageManager": "pnpm@11.21.0",
   "engines": {
-    "node": ">=20.19"
+    "node": ">=24"
   },
   "scripts": {
     "preinstall": "node scripts/guard-worktree-install.mjs",

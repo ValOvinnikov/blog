@@ -7,7 +7,8 @@ inputs:
     required: true
   node-version:
     description: Node.js version to install
-    required: true
+    required: false
+    default: '24'
   install-filter:
     description: 'Optional pnpm --filter expression to scope the install (e.g. "@blog/db..."). Leave blank to install every workspace.'
     required: false
