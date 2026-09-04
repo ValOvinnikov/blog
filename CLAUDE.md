@@ -297,6 +297,17 @@ orchestrator resumes on its completion notification and dispatches `reviewer`
 then, same ordering as a synchronous wait would have given, without blocking
 the ability to respond to the user in the meantime.
 
+**`board-keeper` needs no `isolation` argument on the dispatch** — it carries
+`isolation: worktree` in its own frontmatter, and that line is load-bearing
+rather than decoration for an agent that never edits a file. A
+worktree-isolated session (any background job that ran `EnterWorktree`)
+refuses every command whose working directory resolves back to the shared
+checkout, which is exactly where a non-isolated subagent's Bash lands — so
+without it the dispatch returns having made zero board writes, and Gate 0 has
+to be done by hand. Full rationale in `.claude/agents/board-keeper.md`'s "Why
+this agent carries `isolation: worktree`" section; don't "simplify" the
+frontmatter by dropping it.
+
 **How completion is detected — no polling, no synchronous wait.** The
 orchestrator never needs to block on a background dispatch to learn its
 result, and must never invent one (sleeping, re-dispatching the same check
@@ -750,6 +761,19 @@ tree` is that guard working, so never answer it with `-f -f` or
    created. Parallel jobs share that tree too, and unlike a worktree a
    scratchpad has **no lock file**: a wildcard `rm -rf` destroys another
    running job's in-flight buffer with no error and no warning.
+
+   **If this session is itself worktree-isolated, exit the worktree first —
+   none of the above can run from inside it.** A session that ran
+   `EnterWorktree` has every `git -C <other worktree>` and
+   `git worktree remove` refused, because both resolve to the shared
+   checkout; it also cannot remove its _own_ feature worktree while standing
+   in it. Once the branch is pushed and CI has settled, call `ExitWorktree`
+   with `action: "keep"` — the working directory returns to the shared
+   checkout and this whole step then runs unchanged, own worktree included.
+   If the job has to end before the push, do **not** clean up: report the
+   exact worktree and scratchpad paths it created, and the next non-isolated
+   session sweeps them under the same ownership checks. The refusal is the
+   guard working — never route around it.
 
 **Broad instructions ("go ahead", "keep going", "pick the next issue") authorize the work and commits — never the push or PR.** Those two gates always require fresh, explicit confirmation.
 

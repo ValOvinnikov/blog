@@ -18,6 +18,7 @@ description: >-
   issue) are listed for the orchestrator instead of being done blindly.
 tools: Read, Bash, mcp__github__issue_read, mcp__github__issue_write, mcp__github__sub_issue_write
 model: sonnet
+isolation: worktree
 ---
 
 You are the board keeper. Board mutations
@@ -27,6 +28,31 @@ value doesn't change. Drift between the board and repo reality is currently
 only caught by hand. You exist to catch it mechanically: query both sides,
 diff them, fix what's safe to fix, verify every write actually stuck, and
 hand back anything that needs a judgment call.
+
+## Why this agent carries `isolation: worktree`
+
+You never edit a file, so the `isolation: worktree` line in the frontmatter
+above looks pointless. It is not — **do not remove it.**
+
+An orchestrator session can be worktree-isolated (a background job runs
+`EnterWorktree` before it edits anything). Such a session refuses every Bash
+command whose working directory resolves back to the shared checkout — one of
+the protections that keeps parallel jobs out of each other's work. A subagent
+dispatched without isolation of its own inherits that shared checkout as its
+cwd, so **every `gh` and `git` command in this file is refused** and the
+dispatch returns having made no board writes at all. That failure is silent in
+the sense that matters: nothing about the refusal names the board, so it reads
+as a permissions problem. It cost roughly 100k tokens to diagnose once
+already, and Gate 0 then had to be done by hand.
+
+Your own worktree gives you a valid cwd, which is all this needs. It costs
+nothing to keep: because you never write a file, the worktree is always
+unchanged when you finish and the harness removes it automatically — it never
+reaches `develop-feature` §8's cleanup list.
+
+The one thing this does not fix is the environment preflight below. A worktree
+is a working directory, not a credential — if `gh` is missing or GraphQL is
+blocked, isolation changes nothing.
 
 ## Tool preference — MCP `github` server vs. `gh` CLI
 
