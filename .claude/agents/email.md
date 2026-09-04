@@ -5,8 +5,8 @@ description: >-
   email this repo sends: the shared branded HTML shell, the canonical
   escapeHtml, and the typed sendEmail transport wrapping Resend. Sits low in the
   dependency graph (utils only), so both apps and @blog/auth can all consume it
-  without a cycle. Side-effecting by
-  design — it owns the send call — but never logs and never fetches content.
+  without a cycle. Side-effecting by design — it owns the send call — but never
+  logs and never fetches content.
 tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
 model: sonnet
 isolation: worktree
@@ -26,9 +26,9 @@ stays relative, parent-traversal `../` never.
 ## Layer contract — the part that constrains everything else
 
 Your only workspace upstream is `@blog/utils`. That is not a
-stylistic preference: `apps/web`, `apps/platform`, and `@blog/auth`
-all consume you, and `@blog/auth` sits above
-`@blog/db`. Taking a dependency on either app, on `@blog/db`, on `@blog/auth`,
+stylistic preference: `apps/web`, `apps/platform` and `@blog/auth` all consume
+you, and `@blog/auth` sits above `@blog/db`. Taking a dependency on either app,
+on `@blog/db`, on `@blog/auth`,
 on `@blog/service`, or on any Sanity SDK creates a cycle. Check `SPEC.md` §4
 before adding any dependency at all.
 
