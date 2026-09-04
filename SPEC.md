@@ -93,9 +93,9 @@ reading, page canvas elevation) are documented in full in
   in `@blog/auth` and consumed by both apps — GitHub, Google, and
   email-magic-link sign-in against `@blog/db`'s adapter tables (database
   session strategy). The magic-link provider (`sendVerificationRequest` and
-  its email-copy builders) lives in `@blog/auth`; each app supplies only the
-  low-level Resend send transport (`apps/web/src/server/email/send-email.ts`,
-  #1107), injected as `buildAuthConfig({ sendEmail })`
+  its email-copy builders) lives in `@blog/auth`, which sends through
+  `@blog/email`'s transport directly — `buildAuthConfig()` takes no arguments,
+  and neither app carries a send transport of its own
 - **Vitest + Testing Library**; **Storybook** in `packages/ui` and `apps/web`
 - **Turborepo + pnpm** workspaces; Node ≥ 20.19 (CI runs 22), pnpm 11.21
 
