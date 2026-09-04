@@ -1,7 +1,6 @@
 // Mechanically enforces this repo's "Conventional commits" convention (see
 // CLAUDE.md § Conventions). Runs locally via `.husky/commit-msg` (per-commit,
-// instant) and as a CI backstop over each PR's commit range
-// (`.github/workflows/commitlint.yml`).
+// instant), which is the only place it is enforced — there is no CI backstop.
 export default {
   extends: ['@commitlint/config-conventional'],
   rules: {
@@ -39,8 +38,8 @@ export default {
   // branch ... into ...") already match commitlint's built-in defaultIgnores,
   // but this repo merges PRs with real merge commits (not squash) AND
   // developers routinely merge origin/main into feature branches locally —
-  // both the commit-msg hook and the CI range check hit these, so make the
-  // skip explicit rather than relying only on the implicit default (defaults
-  // still apply on top of this; `ignores` is additive, not a replacement).
+  // the commit-msg hook hits these, so make the skip explicit rather than
+  // relying only on the implicit default (defaults still apply on top of
+  // this; `ignores` is additive, not a replacement).
   ignores: [(commit) => commit.startsWith('Merge')],
 };
