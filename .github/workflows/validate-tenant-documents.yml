@@ -51,7 +51,7 @@ on:
         required: true
       TENANT_TOKEN_ENCRYPTION_KEY:
         required: true
-      RESEND_API_KEY:
+      OPERATOR_ALERT_SECRET:
         required: false
 
 permissions:
@@ -98,11 +98,14 @@ jobs:
       # `getTenantSanityCredentials`. No Sanity management/write token is
       # needed: this workflow only ever reads.
       TENANT_TOKEN_ENCRYPTION_KEY: ${{ secrets.TENANT_TOKEN_ENCRYPTION_KEY }}
-      # Optional — same shared secret name apps/web/apps/platform and
-      # recheck-tenant-owners.yml already use for their own Resend sends.
-      # Unset means the sweep still runs; only the operator-notification
-      # email on a tenant's first newly-failing transition is skipped.
-      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      # Optional — the deployed apps/platform origin this sweep POSTs an
+      # operator-alert event to on a tenant's first newly-failing
+      # transition. Unset means the sweep still runs; only that
+      # notification is skipped.
+      PLATFORM_APP_URL: ${{ vars.PLATFORM_APP_URL }}
+      # Shared secret apps/platform's `/api/internal/operator-alert` route
+      # verifies as a Bearer token — same value in both places.
+      OPERATOR_ALERT_SECRET: ${{ secrets.OPERATOR_ALERT_SECRET }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

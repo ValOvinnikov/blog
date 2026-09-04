@@ -48,9 +48,6 @@ export type TProvisionEnv = {
   // surfaced verbatim as the run's registry, not this codebase's own
   // vocabulary. Absent for a local run outside Actions.
   tenantRegistryEnvironment: string | undefined;
-  // Optional: unset means the post-provisioning operator notification is
-  // skipped, not that the run fails — see `notifyOperatorsOfOwnerElevationOutcome`.
-  resendApiKey: string | undefined;
 };
 
 export function loadProvisionEnv(): TProvisionEnv {
@@ -69,6 +66,5 @@ export function loadProvisionEnv(): TProvisionEnv {
     githubServerUrl: process.env['GITHUB_SERVER_URL'],
     githubActor: process.env['GITHUB_ACTOR'],
     tenantRegistryEnvironment: process.env['TENANT_REGISTRY_ENVIRONMENT'],
-    resendApiKey: process.env['RESEND_API_KEY'] || undefined,
   };
 }

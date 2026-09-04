@@ -35,6 +35,8 @@
         "AUTH_COOKIE_DOMAIN",
         "TENANT_TOKEN_ENCRYPTION_KEY",
         "WEB_APP_URL",
+        "PLATFORM_APP_URL",
+        "OPERATOR_ALERT_SECRET",
         "VERCEL_API_TOKEN",
         "VERCEL_PROJECT_ID_WEB",
         "VERCEL_TEAM_ID",

@@ -105,7 +105,6 @@ const env = {
   githubServerUrl: undefined,
   githubActor: undefined,
   tenantRegistryEnvironment: undefined,
-  resendApiKey: 'resend-key',
 };
 
 beforeEach(() => {
@@ -365,7 +364,6 @@ describe(runSteps, () => {
     expect(notifyOwnerElevationOutcomeMock).toHaveBeenCalledWith({
       tenant: expect.objectContaining({ id: 'tenant-1' }),
       outcome: 'STALLED',
-      resendApiKey: 'resend-key',
     });
   });
 

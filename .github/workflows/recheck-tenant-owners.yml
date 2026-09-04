@@ -67,10 +67,14 @@ jobs:
     environment: ${{ inputs.environment || 'production' }}
     env:
       SANITY_MANAGEMENT_TOKEN: ${{ secrets.SANITY_MANAGEMENT_TOKEN }}
-      # Optional — same shared secret name `apps/web`/`apps/platform` already
-      # use for their own Resend sends. Unset means the sweep still runs;
-      # only the operator-notification email is skipped, not the sweep.
-      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      # Optional — the deployed `apps/platform` origin (no trailing
+      # slash/path) this sweep POSTs an operator-alert event to on a
+      # notifiable owner-elevation outcome. Unset means the sweep still
+      # runs; only the operator notification is skipped.
+      PLATFORM_APP_URL: ${{ vars.PLATFORM_APP_URL }}
+      # Shared secret `apps/platform`'s `/api/internal/operator-alert` route
+      # verifies as a Bearer token — same value in both places.
+      OPERATOR_ALERT_SECRET: ${{ secrets.OPERATOR_ALERT_SECRET }}
       # `getDb()` (via `packages/db/src/utils/env/env.ts`) reads `DATABASE_URL`
       # specifically — deliberately its own secret, distinct from
       # `DATABASE_URL_UNPOOLED` (which `deploy-production.yml`'s `migrate-db`

@@ -3,8 +3,8 @@
  * against every in-scope tenant's own Sanity project/dataset (its existing
  * read token, env-overridden per invocation — see
  * `lib/run-sanity-documents-validate.ts`), persisting drift as `findings`
- * rows via `db.queries.findings` and emailing SUPERADMIN operators the first
- * time a tenant newly transitions into a failing state.
+ * rows via `db.queries.findings` and reporting an operator alert to the
+ * platform the first time a tenant newly transitions into a failing state.
  *
  * Invoked only by `.github/workflows/validate-tenant-documents.yml` — the
  * weekly scheduled sweep (every in-scope tenant), a `workflow_dispatch`
@@ -40,7 +40,6 @@ import {
 import type { TTenant } from '@blog/db/schema/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
 
-import { loadValidateEnv, type TValidateEnv } from './lib/env';
 import { notifyOperatorsOfDocumentValidationFailure } from './lib/notify-operators';
 import {
   validateTenantDocuments,
@@ -103,7 +102,6 @@ async function resolveOpenFindingIfAny(tenant: TTenant): Promise<void> {
 
 async function validateOne(
   tenant: TTenant,
-  env: TValidateEnv,
   summary: TValidateSummary,
 ): Promise<void> {
   const credentials = await getTenantSanityCredentials(tenant.id);
@@ -178,14 +176,12 @@ async function validateOne(
       tenant,
       invalidDocumentCount: results.length,
       severity,
-      resendApiKey: env.resendApiKey,
     });
   }
 }
 
 async function validateCandidates(
   candidates: TTenant[],
-  env: TValidateEnv,
 ): Promise<TValidateSummary> {
   const summary = emptySummary();
   summary.checked = candidates.length;
@@ -193,7 +189,7 @@ async function validateCandidates(
   for (const tenant of candidates) {
     // Each tenant is independent — one tenant's CLI/network failure must
     // never abort the sweep for the rest.
-    await validateOne(tenant, env, summary);
+    await validateOne(tenant, summary);
   }
 
   console.log(
@@ -205,23 +201,20 @@ async function validateCandidates(
   return summary;
 }
 
-// Exported for direct testing of the sweep logic without also exercising env
-// loading or tenant enumeration.
-export async function runValidation(
-  env: TValidateEnv,
-): Promise<TValidateSummary> {
+// Exported for direct testing of the sweep logic without also exercising
+// tenant enumeration.
+export async function runValidation(): Promise<TValidateSummary> {
   const candidates = await listTenantsForDocumentValidation();
-  return validateCandidates(candidates, env);
+  return validateCandidates(candidates);
 }
 
 // Exported for direct testing of the single-tenant path — used by an
 // operator's scoped `workflow_dispatch` and by the post-provisioning check.
 export async function runValidationForTenant(
   tenantId: string,
-  env: TValidateEnv,
 ): Promise<TValidateSummary> {
   const tenant = await getTenantById(tenantId);
-  return validateCandidates(tenant ? [tenant] : [], env);
+  return validateCandidates(tenant ? [tenant] : []);
 }
 
 // Exported for direct testing of the exit-code decision without also
@@ -235,11 +228,10 @@ export function hasSystemicFailures(summary: TValidateSummary): boolean {
 
 async function main(): Promise<void> {
   const tenantId = parseTenantId(process.argv.slice(2));
-  const env = loadValidateEnv();
 
   const summary = tenantId
-    ? await runValidationForTenant(tenantId, env)
-    : await runValidation(env);
+    ? await runValidationForTenant(tenantId)
+    : await runValidation();
 
   if (tenantId && summary.checked === 0) {
     console.error(

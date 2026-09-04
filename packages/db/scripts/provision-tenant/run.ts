@@ -203,7 +203,6 @@ export async function runSteps(
     const notifiedOutcome = await notifyOwnerElevationOutcome({
       tenant,
       outcome,
-      resendApiKey: env.resendApiKey,
     });
     await reportOwnerElevationOutcome(
       tenantId,

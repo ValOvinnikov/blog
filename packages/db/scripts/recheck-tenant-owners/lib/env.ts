@@ -13,14 +13,10 @@ function requireEnv(name: string): string {
 // without importing it.
 export type TRecheckEnv = {
   sanityManagementToken: string;
-  // Optional: unset means operator notification is skipped, not that the
-  // sweep fails — see `notifyOperatorsOfOwnerElevationOutcome`.
-  resendApiKey?: string;
 };
 
 export function loadRecheckEnv(): TRecheckEnv {
   return {
     sanityManagementToken: requireEnv('SANITY_MANAGEMENT_TOKEN'),
-    resendApiKey: process.env['RESEND_API_KEY'] || undefined,
   };
 }

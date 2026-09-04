@@ -71,7 +71,6 @@ async function recheckOne(
     const notifiedOutcome = await notifyOwnerElevationOutcome({
       tenant,
       outcome,
-      resendApiKey: env.resendApiKey,
     });
     await reportOwnerElevationOutcome(
       tenant.id,
