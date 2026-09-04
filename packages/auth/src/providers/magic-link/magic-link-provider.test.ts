@@ -1,11 +1,19 @@
+import { resolveTenantEmailBrand } from '@blog/config';
+import { PRESET_ID } from '@blog/config/constants';
+
 import { buildMagicLinkProvider } from './magic-link-provider';
 
-const { findPendingInviteByEmailMock, listTenantsByIdsMock } = vi.hoisted(
-  () => ({
-    findPendingInviteByEmailMock: vi.fn(),
-    listTenantsByIdsMock: vi.fn(),
-  }),
-);
+const {
+  findPendingInviteByEmailMock,
+  listTenantsByIdsMock,
+  getTenantByDomainMock,
+  getSiteConfigMock,
+} = vi.hoisted(() => ({
+  findPendingInviteByEmailMock: vi.fn(),
+  listTenantsByIdsMock: vi.fn(),
+  getTenantByDomainMock: vi.fn(),
+  getSiteConfigMock: vi.fn(),
+}));
 
 vi.mock('@blog/db', () => ({
   queries: {
@@ -13,6 +21,8 @@ vi.mock('@blog/db', () => ({
       findPendingInviteByEmail: findPendingInviteByEmailMock,
     },
     tenants: { listTenantsByIds: listTenantsByIdsMock },
+    tenantDomains: { getTenantByDomain: getTenantByDomainMock },
+    siteConfig: { getSiteConfig: getSiteConfigMock },
   },
 }));
 
@@ -20,6 +30,8 @@ describe(buildMagicLinkProvider, () => {
   beforeEach(() => {
     findPendingInviteByEmailMock.mockReset().mockResolvedValue([]);
     listTenantsByIdsMock.mockReset();
+    getTenantByDomainMock.mockReset().mockResolvedValue(undefined);
+    getSiteConfigMock.mockReset();
   });
 
   it('identifies itself as the email provider', () => {
@@ -119,5 +131,85 @@ describe(buildMagicLinkProvider, () => {
         'href="https://example.com/api/auth/callback/email?token=abc"',
       ),
     });
+  });
+
+  it('still delivers, unbranded, when the host resolves to no tenant', async () => {
+    getTenantByDomainMock.mockResolvedValue(undefined);
+    const sendEmail = vi.fn().mockResolvedValue(undefined);
+    const provider = buildMagicLinkProvider(sendEmail);
+
+    await provider.sendVerificationRequest({
+      identifier: 'jane@example.com',
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      expires: new Date('2026-01-01T00:00:00.000Z'),
+      provider,
+      token: 'abc',
+      theme: {},
+      request: new Request('https://example.com'),
+    });
+
+    expect(sendEmail).toHaveBeenCalledWith({
+      to: 'jane@example.com',
+      from: 'Sign in <onboarding@resend.dev>',
+      subject: 'Sign in to example.com',
+      html: expect.not.stringContaining('<!doctype html>'),
+    });
+  });
+
+  it('still delivers, unbranded, when the tenant domain lookup throws', async () => {
+    getTenantByDomainMock.mockRejectedValue(new Error('db error'));
+    const sendEmail = vi.fn().mockResolvedValue(undefined);
+    const provider = buildMagicLinkProvider(sendEmail);
+
+    await provider.sendVerificationRequest({
+      identifier: 'jane@example.com',
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      expires: new Date('2026-01-01T00:00:00.000Z'),
+      provider,
+      token: 'abc',
+      theme: {},
+      request: new Request('https://example.com'),
+    });
+
+    expect(sendEmail).toHaveBeenCalledWith({
+      to: 'jane@example.com',
+      from: 'Sign in <onboarding@resend.dev>',
+      subject: 'Sign in to example.com',
+      html: expect.not.stringContaining('<!doctype html>'),
+    });
+  });
+
+  it("brands the sign-in email with the resolved tenant's hue", async () => {
+    getTenantByDomainMock.mockResolvedValue({
+      id: 'tenant-1',
+      name: 'Acme Blog',
+    });
+    getSiteConfigMock.mockResolvedValue({
+      preset: PRESET_ID.CONSOLE,
+      accentHue: 140,
+      logoHue: undefined,
+    });
+    const sendEmail = vi.fn().mockResolvedValue(undefined);
+    const provider = buildMagicLinkProvider(sendEmail);
+
+    await provider.sendVerificationRequest({
+      identifier: 'jane@example.com',
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      expires: new Date('2026-01-01T00:00:00.000Z'),
+      provider,
+      token: 'abc',
+      theme: {},
+      request: new Request('https://example.com'),
+    });
+
+    const expectedBrand = resolveTenantEmailBrand({
+      preset: PRESET_ID.CONSOLE,
+      accentHue: 140,
+    });
+    expect(sendEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        html: expect.stringContaining(expectedBrand.logo1),
+      }),
+    );
   });
 });

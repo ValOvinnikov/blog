@@ -1,3 +1,6 @@
+import { resolveTenantEmailBrand } from '@blog/config';
+import { PRESET_ID } from '@blog/config/constants';
+
 import { buildMagicLinkEmail } from './magic-link-email';
 
 describe(buildMagicLinkEmail, () => {
@@ -31,5 +34,30 @@ describe(buildMagicLinkEmail, () => {
     expect(html).not.toContain('"><img src=x onerror=alert(1)>');
     expect(html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');
     expect(html).toContain('&quot;&gt;&lt;img src=x onerror=alert(1)&gt;');
+  });
+
+  it('renders plain, unstyled html when no tenant identity is given', () => {
+    const { html } = buildMagicLinkEmail({
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      host: 'example.com',
+    });
+
+    expect(html).not.toContain('<!doctype html>');
+  });
+
+  it("threads the resolved tenant's hue into the rendered html", () => {
+    const brand = resolveTenantEmailBrand({
+      preset: PRESET_ID.CONSOLE,
+      accentHue: 140,
+    });
+
+    const { html } = buildMagicLinkEmail({
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      host: 'acme.example.com',
+      tenantIdentity: { brand, brandName: 'Acme Blog' },
+    });
+
+    expect(html).toContain('<!doctype html>');
+    expect(html).toContain(brand.logo1);
   });
 });

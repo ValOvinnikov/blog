@@ -31,9 +31,6 @@ export default mergeConfig(
       alias: [
         { find: /^@blog\/auth\//, replacement: `${src}/` },
         { find: /^@blog\/db\//, replacement: `${dbSrc}/` },
-        // Not imported directly by this package's own source — needed only
-        // because @blog/db resolves to source, and its schema files import
-        // @blog/config constants (same reason as the tsconfig.json mapping).
         { find: /^@blog\/config\//, replacement: `${configSrc}/` },
         { find: /^@blog\/email\//, replacement: `${emailSrc}/` },
         // Not imported directly by this package's own source either —
