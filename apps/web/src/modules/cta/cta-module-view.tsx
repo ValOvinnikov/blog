@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, CTA_VARIANT } from '@blog/config';
+import { CTA_VARIANT } from '@blog/config';
 import type { TCtaModule } from '@blog/service';
 import { CtaModule as CtaModuleUi } from '@blog/ui/organisms/cta-module';
 import { ActionGroup } from '@web/components/shared/action-group';
@@ -12,14 +12,15 @@ export interface ICtaModuleViewProps extends TCtaModule {
 
 /**
  * Pure view for `CtaModule` — wraps the `CtaModule` organism in a `Section`
- * landmark pinned to `PRIMARY` (never the authored tone) so no full-bleed
- * band competes with the card `CtaModule` paints itself; the authored
- * `brandVariant` flows down as the card/overlay tone instead.
+ * landmark. `bandTone` and `brandVariant` are distinct concerns: `bandTone`
+ * colors the full-bleed section band, `brandVariant` colors the card/overlay
+ * the organism paints itself.
  */
 export const CtaModuleView = ({
   id,
   variant,
   brandVariant,
+  bandTone,
   eyebrow,
   sectionHeader,
   content,
@@ -35,7 +36,7 @@ export const CtaModuleView = ({
 
   return (
     <Section
-      brandVariant={BRAND_VARIANT.PRIMARY}
+      brandVariant={bandTone}
       layout={layout}
       titleId={titleId}
       dataTestId={`cta-module-${id}`}

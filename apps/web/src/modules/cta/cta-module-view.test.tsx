@@ -8,8 +8,8 @@ import type { ReactNode } from 'react';
 
 import { CtaModuleView } from './cta-module-view';
 
-// Fakes `Section` so the pinning assertion reads `brandVariant` from a
-// `data-*` attribute instead of the rendered `tv()` background class.
+// Fakes `Section` so tests can read `brandVariant` from a `data-*`
+// attribute instead of the rendered `tv()` background class.
 vi.mock('@web/components/shared/section', () => ({
   Section: ({
     brandVariant,
@@ -30,6 +30,7 @@ const setup = customRender(CtaModuleView, {
   id: 'cta-1',
   variant: CTA_VARIANT.CALLOUT,
   brandVariant: BRAND_VARIANT.PRIMARY,
+  bandTone: BRAND_VARIANT.SECONDARY,
   eyebrow: undefined,
   sectionHeader: {
     heading: 'Get started',
@@ -73,16 +74,32 @@ describe(CtaModuleView, () => {
     expect(heading).toHaveAttribute('id', 'cta-cta-2');
   });
 
-  it('pins the Section landmark to PRIMARY regardless of the authored brandVariant', () => {
-    setup({ brandVariant: BRAND_VARIANT.BRAND_PRIMARY });
+  it('renders the authored bandTone on the Section landmark', () => {
+    setup({ bandTone: BRAND_VARIANT.SECONDARY });
 
     const section = screen
       .getByRole('heading', { level: 2 })
       .closest('section');
     expect(section).toHaveAttribute(
       'data-brand-variant',
-      BRAND_VARIANT.PRIMARY,
+      BRAND_VARIANT.SECONDARY,
     );
+  });
+
+  it('wires bandTone (Section band) and brandVariant (card tone) independently', () => {
+    const { container } = setup({
+      bandTone: BRAND_VARIANT.SECONDARY,
+      brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
+    });
+
+    const section = screen
+      .getByRole('heading', { level: 2 })
+      .closest('section');
+    expect(section).toHaveAttribute(
+      'data-brand-variant',
+      BRAND_VARIANT.SECONDARY,
+    );
+    expect(container.querySelector('.bg-brand-primary-muted')).not.toBeNull();
   });
 
   it('renders authored actions through ActionGroup, in order', () => {

@@ -27,6 +27,10 @@ const meta = {
       control: 'select',
       options: Object.values(BRAND_VARIANT),
     },
+    bandTone: {
+      control: 'select',
+      options: Object.values(BRAND_VARIANT),
+    },
     imageSide: {
       control: 'select',
       options: Object.values(CTA_IMAGE_SIDE),
@@ -40,6 +44,7 @@ const meta = {
     id: 'cta-1',
     variant: CTA_VARIANT.CALLOUT,
     brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
+    bandTone: BRAND_VARIANT.PRIMARY,
     eyebrow: 'Newsletter',
     sectionHeader: {
       heading: 'Never miss a post',
