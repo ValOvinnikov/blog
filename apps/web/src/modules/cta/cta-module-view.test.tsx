@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, CTA_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, CTA_ALIGNMENT, CTA_VARIANT } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   ctaActionsDemo,
@@ -39,7 +39,8 @@ const setup = customRender(CtaModuleView, {
   },
   content: undefined,
   image: undefined,
-  imageSide: undefined,
+  contentPosition: undefined,
+  contentAlignment: undefined,
   mobileMediaOrder: undefined,
   actions: [],
   footnote: undefined,
@@ -122,5 +123,16 @@ describe(CtaModuleView, () => {
     setup();
 
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
+  });
+
+  it('passes contentPosition and contentAlignment through to CtaModule', () => {
+    const { container } = setup({
+      variant: CTA_VARIANT.SPLIT,
+      contentPosition: CTA_ALIGNMENT.RIGHT,
+      contentAlignment: CTA_ALIGNMENT.RIGHT,
+    });
+
+    expect(container.querySelector('.md\\:order-2')).not.toBeNull();
+    expect(container.querySelector('.text-right')).not.toBeNull();
   });
 });

@@ -59,7 +59,8 @@ const meta = {
           }}
           content={undefined}
           image={undefined}
-          imageSide={undefined}
+          contentPosition={undefined}
+          contentAlignment={undefined}
           mobileMediaOrder={undefined}
           actions={ctaActionsDemo}
           footnote={undefined}
