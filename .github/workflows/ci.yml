@@ -1,13 +1,23 @@
 name: CI
 
 on:
-  # No `paths-ignore` here on purpose. Build/Lint/Test/Type-check/Typegen are
-  # *required* status checks in the branch ruleset. A workflow skipped by path
-  # filtering leaves its required checks "Pending" forever, which blocks any PR
-  # that only touches the ignored paths (e.g. a `.claude/**` or docs-only PR)
-  # from ever merging. Running CI on every PR is cheap and avoids that deadlock.
+  # Neither a `paths-ignore` nor a `branches:` filter here, on purpose.
+  # Build/Lint/Test/Type-check/Typegen are *required* status checks in the
+  # branch ruleset, and a required check that never starts sits "Pending"
+  # forever rather than failing — so anything that skips this workflow blocks
+  # the PR permanently instead of reporting on it.
+  #
+  # A path filter would do that to a PR touching only the ignored paths (e.g.
+  # a `.claude/**` or docs-only PR). A base-branch filter would do it to a PR
+  # based on anything but `main` — the normal shape of a stacked PR — and
+  # retargeting when the base merges does not rescue it, because that fires
+  # `edited` while this listens for `opened`/`synchronize`/`reopened`.
+  #
+  # Running CI on every PR is cheap and avoids both deadlocks. The other five
+  # workflows carrying required checks (knip, dependency-review, zizmor,
+  # actionlint, hooks) declare their triggers independently and must stay
+  # unfiltered for the same reason.
   pull_request:
-    branches: [main]
 
 permissions:
   contents: read
@@ -20,7 +30,7 @@ concurrency:
 
 env:
   PNPM_VERSION: 11.21.0
-  NODE_VERSION: '22'
+  NODE_VERSION: '24'
   # The Sanity project/dataset are not hardcoded in the repo — the Studio/CLI
   # config reads them from SANITY_STUDIO_*. Jobs that load that config (typegen,
   # build, migrations) need them present, so source them from repo-level
@@ -40,7 +50,7 @@ jobs:
   type-check:
     name: Type-check
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -57,7 +67,7 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -130,7 +140,7 @@ jobs:
   ui-index:
     name: UI index
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -164,7 +174,7 @@ jobs:
   voice-key-sync:
     name: Voice key sync
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -192,7 +202,7 @@ jobs:
   turbo-env-sync:
     name: Turbo env sync
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -221,7 +231,7 @@ jobs:
   migrations:
     name: Migrations
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     # Read-only guard against broken content migrations. Content is live in
     # the `production` dataset, so a malformed or un-runnable migration must
     # not slip through. `sanity migrations list` loads + registers every
@@ -273,7 +283,7 @@ jobs:
   document-validation:
     name: Document validation
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     # ADVISORY — deliberately NOT a required status check in the branch
     # ruleset, unlike the Migrations job above. `sanity documents validate`
     # checks every existing document in the live dataset against the current

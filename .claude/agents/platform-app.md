@@ -402,6 +402,45 @@ Base UI handles the hard parts (focus trapping, roving tabindex, ARIA wiring)
 only if you use its parts as documented — a `Dialog.Root` re-implemented with a
 `div` and a `useState` gets none of it.
 
+### When `variant="ghost"` is allowed
+
+`ghost` is `border-transparent bg-transparent` with no shadow, so at rest it is
+indistinguishable from static text — the affordance only appears on `:hover`,
+which makes it undiscoverable for keyboard users and for anyone scanning the
+page. The same defect was fixed one call site at a time four times before the
+rule below was written down.
+
+**A control may use `ghost` only if a user scanning the surface at rest can
+already see something interactive that leads to what they came to do.** That
+holds when at least one of these is true:
+
+1. **It has a visibly interactive sibling in its control group** — a `primary`,
+   `secondary` or `danger` control beside it. The group reads as interactive,
+   so its low-emphasis member does too (a dialog's "Cancel" next to the
+   confirm; "Reset" next to "Save").
+2. **It is a shortcut, and the destination is reachable another way that is
+   visible on the same screen** — a sidebar entry, or a non-`ghost` control
+   elsewhere on the page. "Reachable somewhere in the app" is not enough: the
+   test is what a user looking at this screen can see, so a card's only action
+   never qualifies just because a deep link to it exists on another route.
+3. **It is a supplementary deep-dive attached to content that is itself the
+   point of the surface** — the surrounding content answers the user's
+   question and the link is an optional extra. This is the loosest clause and
+   the easiest to talk yourself into; if the surface exists _so that_ the user
+   can follow that link, it does not apply.
+
+**Otherwise use `secondary`.** The two failing shapes seen in practice: a
+control that is the sole click target for a row or card whose other content
+reads as static text, and an entire action group rendered `ghost` so nothing
+in it is visible at rest.
+
+`hasArrow` is not an affordance — a bare `→`/`↗` on a transparent background is
+still invisible against body text, and does not exempt a call site.
+
+Do not answer a wrongly-`ghost` call site by restyling the variant: the
+legitimate low-emphasis uses outnumber the wrong ones, and restyling breaks
+them to fix these.
+
 ## Not decided — do not invent
 
 - **No i18n.** `apps/platform` has no `next-intl` setup and no locale segment. Do

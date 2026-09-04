@@ -22,7 +22,7 @@ Keep it a single PR when a partial merge breaks the build — e.g. renaming a
 shared `_type`/generated type that downstream references reds `type-check` until
 all layers land. One concern per PR still holds either way.
 
-### Stacked PRs — use `gh stack`, and read the CI trap first
+### Stacked PRs — use `gh stack`
 
 The `github/gh-stack` extension is installed (`gh extension list` →
 `gh stack`). Use it rather than hand-rolling bases with
@@ -48,38 +48,26 @@ the intermediate states never land on `main` at all — which means a
 rename-plus-consumers change _can_ be split per layer as long as the whole
 stack merges in order.
 
-**THE TRAP — a stacked PR gets ZERO CI in this repo, and it is not obvious.**
-**Every** required workflow — `ci.yml`, and separately `knip.yml`,
-`dependency-review.yml`, `zizmor.yml`, `actionlint.yml`, `commitlint.yml` and
-`hooks.yml` — independently declares `pull_request: branches: [main]`. A PR
-opened against any other branch therefore runs **none** of Type-check, Lint,
-Test, Build, Typegen, Migrations, Knip, Dependency Review, Zizmor, Actionlint,
-Commitlint or Shellcheck + guard tests. Only `pr-opened` and the Vercel checks
-report, which looks plausible enough at a glance to miss. Because those jobs
-are _required_ status checks in the branch ruleset, the PR sits on `BLOCKED`
-waiting for checks that will never arrive.
+**A stacked PR gets the full required suite, and the triggers must stay that
+way.** The six workflows behind the eleven required checks — `ci.yml`
+(Type-check, Lint, Test, Build, Typegen, Migrations) plus `knip.yml`,
+`dependency-review.yml`, `zizmor.yml`, `actionlint.yml` and `hooks.yml`
+(one each) — declare a bare `pull_request:` trigger with no
+`branches:` filter, so they run whatever branch the PR targets.
 
-Note this is spread across seven workflow files, not one — widening only
-`ci.yml`'s trigger would fix six of the twelve and leave the PR just as
-blocked. CodeQL is **not** in this set: it runs from GitHub's default
-code-scanning setup on a schedule, with no workflow file in
-`.github/workflows/` and no per-PR run to miss.
+**Do not re-add a `branches:` filter to any of them.** Each file scopes its
+own trigger, so narrowing one silently drops that workflow's checks from every
+PR based on something other than `main`. Because these are _required_ status
+checks, a workflow that never starts leaves the PR on `BLOCKED` waiting for a
+check that will never arrive — it does not fail, it hangs. This is the same
+deadlock `ci.yml`'s header comment describes when it explains why the workflow
+carries no `paths-ignore`; a base-branch filter reaches it through a different
+door. Both filters are absent on purpose, and each file's header says so.
 
-Retargeting does **not** fix it. When the base merges, GitHub retargets the PR
-to `main`, but that fires a `pull_request` `edited` event, and the workflow
-listens for `opened`/`synchronize`/`reopened`. So the PR is now aimed at `main`
-with still no CI.
-
-**The fix is to close and reopen the PR** (`gh pr close <n> && gh pr reopen <n>`),
-which fires `reopened` and triggers a full run. Verify it worked by counting
-checks — `gh pr checks <n>` showing ~5 entries means the stale run; a real run
-is ~20. Pushing any new commit also works, but do not invent an empty commit
-just for this.
-
-Note the irony worth remembering: `ci.yml`'s own header comment explains it
-deliberately has **no** `paths-ignore`, precisely so a docs-only PR cannot
-deadlock on required checks that never run. The `branches: [main]` filter
-recreates that exact deadlock through a different door.
+(CodeQL is not among the eleven: it runs from GitHub's default code-scanning
+setup on a schedule, with no workflow file in `.github/workflows/`, and is
+enforced by a separate `code_scanning` ruleset rule rather than as a required
+status check.)
 
 **When NOT to stack.** If the pieces are genuinely independent — no compile-time
 dependency between them — give each its own branch off `main` and skip the

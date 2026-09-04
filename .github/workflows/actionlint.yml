@@ -1,13 +1,14 @@
 name: Actionlint
 
 on:
-  # No path filter on purpose — same reasoning as ci.yml / zizmor.yml: a
-  # workflow skipped by path filtering leaves any required status check
-  # "Pending" forever. Linting every PR is cheap (actionlint finishes in
-  # seconds), and catches workflow syntax/expression/`needs` errors that zizmor
-  # (security posture) does not.
+  # No path filter and no base-branch filter, on purpose — same reasoning as
+  # ci.yml / zizmor.yml: a workflow skipped by either leaves any required
+  # status check "Pending" forever, whether the PR was skipped for touching
+  # only ignored paths or for being based on a branch other than `main`.
+  # Linting every PR is cheap (actionlint finishes in seconds), and catches
+  # workflow syntax/expression/`needs` errors that zizmor (security posture)
+  # does not.
   pull_request:
-    branches: [main]
 
 permissions:
   contents: read
@@ -28,6 +29,7 @@ jobs:
   actionlint:
     name: Actionlint
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

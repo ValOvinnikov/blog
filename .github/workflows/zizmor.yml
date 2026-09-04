@@ -1,11 +1,12 @@
 name: Zizmor
 
 on:
-  # No path filter on purpose — same reasoning as ci.yml: a workflow skipped
-  # by path filtering leaves any required status check "Pending" forever.
+  # No path filter and no base-branch filter, on purpose — same reasoning as
+  # ci.yml: a workflow skipped by either leaves any required status check
+  # "Pending" forever, whether the PR was skipped for touching only ignored
+  # paths or for being based on a branch other than `main`.
   # Auditing every PR is cheap (zizmor finishes in seconds).
   pull_request:
-    branches: [main]
 
 env:
   ZIZMOR_VERSION: 1.26.1
@@ -23,6 +24,7 @@ jobs:
   zizmor:
     name: Zizmor
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

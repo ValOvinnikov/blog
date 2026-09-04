@@ -172,7 +172,7 @@ contracts:
     would otherwise report a false green on whatever partial set did run
     (#2578); it stops and reports the conflict instead of a checks verdict.
     Once mergeable, runs `gh pr checks <n> --watch` to a terminal state,
-    sanity-checks the total count against this repo's normal ~20-22 (flagging
+    sanity-checks the total count against this repo's normal ~19-21 (flagging
     a suspiciously low one rather than silently accepting it), and reports
     pass/fail — on failure, the check name, run/job URL, and a raw
     `--log-failed` excerpt, handed back as data with no root-cause diagnosis
@@ -462,6 +462,32 @@ file` are all denied alike) — an earlier version only handled the
   `git worktree unlock` on another job's worktree destroys its uncommitted
   work. `develop-feature` §8 is the teardown procedure — remove only the
   worktrees the current session created, checked against the lock file first.
+- **A worktree-isolated session cannot reach the shared checkout at all**
+  (issue #2618) — a second, earlier-firing protection, distinct from the
+  lock-file check above: that one refuses removal of a path another job owns,
+  this one refuses the command outright based on where its working directory
+  resolves, before ownership is ever consulted. A session
+  that ran `EnterWorktree` (every background job does, before its first
+  edit) has the harness refuse any Bash command whose working directory
+  resolves back to the shared checkout, including one redirected there with
+  `git -C`. Two documented steps collide with that, and both are now
+  reconciled rather than worked around:
+  - **Subagents that only read the repo still need their own worktree.** A
+    subagent dispatched without isolation inherits the shared checkout as
+    its cwd, so every command it runs is refused and it returns having done
+    nothing — the refusal names a working directory, not the work, so it
+    reads as a permissions problem. `board-keeper` hit this and now carries
+    `isolation: worktree` in its frontmatter for that reason alone; because
+    it never writes a file its worktree is always unchanged and the harness
+    auto-removes it, so it never reaches §8's cleanup list. Its own file
+    documents this so the line isn't dropped as pointless.
+  - **§8 teardown is exit-then-clean.** `git worktree remove` and
+    `git -C <other worktree> …` are both refused from inside, and a session
+    cannot remove its own worktree while standing in it. Once the branch is
+    pushed and CI has settled, `ExitWorktree` with `action: "keep"` returns
+    the session to the shared checkout and §8 then runs unchanged. A job
+    that must end before the push reports the paths it created instead, for
+    a later session to sweep.
 
 - **Env files in agent worktrees** (issue #404) — the same
   `.husky/post-checkout` hook copies `.env.local`/`.env.*.local` from the
@@ -572,24 +598,19 @@ file` are all denied alike) — an earlier version only handled the
   alone, since the intermediate states target their predecessor rather than
   `main`.
 
-  **The one thing to know before using it:** a PR that targets anything other
-  than `main` receives **no CI**. Every required workflow declares
-  `pull_request: branches: [main]` independently — `ci.yml` plus `knip.yml`,
-  `dependency-review.yml`, `zizmor.yml`, `actionlint.yml`, `commitlint.yml`
-  and `hooks.yml` — so none of Type-check, Lint, Test, Build, Typegen,
-  Migrations, Knip, Dependency Review, Zizmor, Actionlint, Commitlint or
-  Shellcheck + guard tests ever runs. Only `pr-opened` and the Vercel checks
-  report, which is just enough output to look normal. Those jobs are required
-  status checks, so the PR blocks indefinitely. (CodeQL is not among them —
-  it runs from GitHub's default code-scanning setup on a schedule, not from a
-  workflow file, and is enforced by a separate `code_scanning` ruleset rule
-  rather than as a required status check.) When the base merges, GitHub retargets the PR to
-  `main` but that fires a `pull_request` `edited` event, which the workflow
-  does not listen for, so still nothing runs. Closing and reopening the PR
-  fires `reopened` and produces a real run; confirm by counting checks
-  (roughly 5 means the stale run, roughly 20 means a real one). Note this is
-  the same deadlock `ci.yml`'s header comment says it deliberately avoids by
-  refusing to use `paths-ignore` — the base-branch filter reintroduces it
-  through a different door.
+  A PR receives the full required suite whatever branch it targets. The six
+  workflows behind the eleven required checks — `ci.yml` (Type-check, Lint,
+  Test, Build, Typegen, Migrations) plus `knip.yml`, `dependency-review.yml`,
+  `zizmor.yml`, `actionlint.yml` and `hooks.yml` (one each) — each declare a
+  bare `pull_request:` trigger with no `branches:` filter,
+  which is what makes stacking usable. Keep it that way: each file scopes its
+  own trigger, so re-adding `branches: [main]` to any one of them drops that
+  workflow's checks from every stacked PR, and because these are _required_
+  checks the PR then hangs on `BLOCKED` rather than failing. That is the same
+  deadlock `ci.yml`'s header comment describes when explaining why it carries
+  no `paths-ignore`. (CodeQL is not among the eleven — it runs from GitHub's
+  default code-scanning setup on a schedule, not from a workflow file, and is
+  enforced by a separate `code_scanning` ruleset rule rather than as a
+  required status check.)
 
 - **`CLAUDE.md`** — repo-wide guidance loaded into every session.
