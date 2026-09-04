@@ -89,6 +89,9 @@ export const env = createEnv({
     // Optional: absent, the route returns 500 rather than accepting an
     // unauthenticated request.
     OPERATOR_ALERT_SECRET: z.string().min(1).optional(),
+    // The `from` address for operator-alert email. Optional: absent, it
+    // falls back to Resend's shared testing sender.
+    OPERATOR_ALERT_FROM_ADDRESS: z.string().min(1).optional(),
     // Shared Auth.js signing secret — required for this app's session to
     // function at all, byte-identical with `apps/web`'s. Funneled through
     // this module because it's also reused to sign the owner-invite
@@ -112,6 +115,7 @@ export const env = createEnv({
     VERCEL_PROJECT_ID_WEB: process.env.VERCEL_PROJECT_ID_WEB,
     VERCEL_TEAM_ID: process.env.VERCEL_TEAM_ID,
     OPERATOR_ALERT_SECRET: process.env.OPERATOR_ALERT_SECRET,
+    OPERATOR_ALERT_FROM_ADDRESS: process.env.OPERATOR_ALERT_FROM_ADDRESS,
     AUTH_SECRET: process.env.AUTH_SECRET,
   },
   emptyStringAsUndefined: true,

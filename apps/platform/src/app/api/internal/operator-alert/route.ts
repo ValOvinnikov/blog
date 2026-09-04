@@ -6,12 +6,11 @@ import {
   sendEmail,
 } from '@blog/email';
 import { isSecretMatch } from '@blog/utils';
+import { resolveOperatorAlertFromAddress } from '@platform/server/email/resolve-operator-alert-from-address';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-
-const OPERATOR_ALERT_FROM_ADDRESS = 'Tenant Alerts <onboarding@resend.dev>';
 
 const OPERATOR_ALERT_SCHEMA = z.discriminatedUnion('kind', [
   z.object({
@@ -100,10 +99,12 @@ export async function POST(request: Request): Promise<NextResponse> {
           isCritical: parsed.data.isCritical,
         });
 
+  const fromAddress = resolveOperatorAlertFromAddress(
+    env.OPERATOR_ALERT_FROM_ADDRESS,
+  );
+
   const results = await Promise.allSettled(
-    recipients.map((to) =>
-      sendEmail({ to, from: OPERATOR_ALERT_FROM_ADDRESS, subject, html }),
-    ),
+    recipients.map((to) => sendEmail({ to, from: fromAddress, subject, html })),
   );
 
   const failures = results.filter(
