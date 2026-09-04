@@ -147,7 +147,7 @@ describe('toMetadata', () => {
 });
 
 describe('toMetadata output resolved by Next itself (regression for #490)', () => {
-  // Mirrors the root layout's `metadataBase` — the leaf route (this
+  // Mirrors `[locale]/layout.tsx`'s `metadataBase` — the leaf route (this
   // function's output) never sets its own, so Next's resolver falls back to
   // this parent-segment value even though the leaf's `openGraph`/`twitter`
   // objects themselves are NOT merged with the parent's.

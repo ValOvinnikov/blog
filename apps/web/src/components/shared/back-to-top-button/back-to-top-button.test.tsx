@@ -172,7 +172,7 @@ describe(`<${BackToTopButton.name}/>`, () => {
   it('observes the site footer by test id, not an earlier in-DOM article footer', () => {
     // Mirrors a tagged post's real DOM: `Article.Footer` renders an
     // untagged `<footer>` inside `<article>`, earlier in document order
-    // than the site chrome `Footer` rendered by the root layout.
+    // than the site chrome `Footer` rendered by `[locale]/layout.tsx`.
     document.body.innerHTML =
       '<footer></footer><footer data-testid="site-footer"></footer>';
 

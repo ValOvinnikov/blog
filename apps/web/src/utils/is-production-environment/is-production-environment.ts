@@ -6,8 +6,8 @@ import { env } from '@web/utils/env/env';
  * real production deployment; every other environment (`development` after
  * a prod→dev dataset refresh, previews, etc.) serves content that must stay
  * out of search indexes even though it can be byte-identical to production.
- * Shared by `robots.ts` and the root layout's `generateMetadata` so both
- * gates read the same signal.
+ * The indexing gates in `robots.ts` and `[locale]/layout.tsx`'s
+ * `generateMetadata` both read it, so they can never disagree.
  *
  * @example
  * isProductionEnvironment() // true only when NEXT_PUBLIC_SANITY_DATASET === 'production'

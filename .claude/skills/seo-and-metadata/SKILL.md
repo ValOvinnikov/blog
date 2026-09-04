@@ -9,8 +9,9 @@ description: >-
 
 # SEO & metadata (`apps/web`)
 
-Target Lighthouse SEO ≥ 95. Canonical origin comes from `NEXT_PUBLIC_SITE_URL`
-(`metadataBase` in the root layout).
+Target Lighthouse SEO ≥ 95. Canonical origin comes from the resolved tenant's
+`primaryDomain`, falling back to `NEXT_PUBLIC_SITE_URL` (`getTenantBaseUrl()`,
+feeding `metadataBase` in `[locale]/layout.tsx`).
 
 **The service layer owns SEO resolution.** Page view-models from
 `@blog/service` carry a fully-resolved `seo: TSeoResolved` — the fallback
