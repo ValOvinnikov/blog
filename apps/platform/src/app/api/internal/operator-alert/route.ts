@@ -1,6 +1,5 @@
 import { OPERATOR_ALERT_KIND } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { listSuperadminEmails } from '@blog/db/queries/admins';
 import {
   buildDocumentValidationAlertEmail,
   buildOwnerElevationAlertEmail,
@@ -31,8 +30,7 @@ const OPERATOR_ALERT_SCHEMA = z.discriminatedUnion('kind', [
 /**
  * Inbound, machine-callable alert endpoint — `@blog/db`'s CLI scripts report
  * facts here over a Bearer shared secret, and this app resolves recipients,
- * renders copy, and sends. Unlike every other route in this app, it carries
- * no Auth.js session.
+ * renders copy, and sends.
  */
 export async function POST(request: Request): Promise<NextResponse> {
   const secret = env.OPERATOR_ALERT_SECRET;
@@ -56,7 +54,17 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  const parsed = OPERATOR_ALERT_SCHEMA.safeParse(await request.json());
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { message: 'Malformed alert body.' },
+      { status: 400 },
+    );
+  }
+
+  const parsed = OPERATOR_ALERT_SCHEMA.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       { message: 'Malformed alert body.' },
@@ -72,7 +80,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({ message: 'Unknown tenant.' }, { status: 404 });
   }
 
-  const recipients = await listSuperadminEmails();
+  const recipients = await queries.admins.listSuperadminEmails();
   if (recipients.length === 0) {
     logger.warn('operator_alert.no_recipients', { tenantId: tenant.id });
     return NextResponse.json({ sent: 0 }, { status: 200 });
@@ -92,11 +100,39 @@ export async function POST(request: Request): Promise<NextResponse> {
           isCritical: parsed.data.isCritical,
         });
 
-  await Promise.all(
+  const results = await Promise.allSettled(
     recipients.map((to) =>
       sendEmail({ to, from: OPERATOR_ALERT_FROM_ADDRESS, subject, html }),
     ),
   );
 
-  return NextResponse.json({ sent: recipients.length }, { status: 200 });
+  const failures = results.filter(
+    (result): result is PromiseRejectedResult => result.status === 'rejected',
+  );
+
+  failures.forEach((failure) => {
+    logger.error('operator_alert.send_failed', {
+      tenantId: tenant.id,
+      kind: parsed.data.kind,
+      error: failure.reason,
+    });
+  });
+
+  const sent = recipients.length - failures.length;
+
+  if (failures.length === recipients.length) {
+    return NextResponse.json(
+      { message: 'Failed to send operator alert email.' },
+      { status: 502 },
+    );
+  }
+
+  if (failures.length > 0) {
+    return NextResponse.json(
+      { sent, failed: failures.length },
+      { status: 207 },
+    );
+  }
+
+  return NextResponse.json({ sent }, { status: 200 });
 }
