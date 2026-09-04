@@ -32,15 +32,17 @@ const deriveBlogPostPublishPaths = async ({
 }: TDeriveRevalidatePathsInput): Promise<TDeriveRevalidatePathsResult> => {
   const [
     postsResult,
-    taxonomyResult,
     blogParamsResult,
-    tagParamsResult,
-    topicParamsResult,
+    tagSlugsResult,
+    tagPaginationParamsResult,
+    topicSlugsResult,
+    topicPaginationParamsResult,
   ] = await Promise.all([
     service.entities.posts.v1.getPostsByIds([id], tenant),
-    service.entities.posts.v1.getPostTaxonomySlugs(id, tenant),
     service.pages.blog.v1.getIndexPageParams(tenant),
+    service.pages.tag.v1.getTagParams(tenant),
     service.pages.tag.v1.getTagPaginationParams(tenant),
+    service.pages.topic.v1.getTopicParams(tenant),
     service.pages.topic.v1.getTopicPaginationParams(tenant),
   ]);
 
@@ -56,17 +58,6 @@ const deriveBlogPostPublishPaths = async ({
     return { ok: false, reason: 'document_not_found' };
   }
 
-  if (!taxonomyResult.ok) {
-    logger.error('revalidate.post_taxonomy_lookup_failed', {
-      id,
-      error: taxonomyResult.error,
-    });
-    return { ok: false, reason: 'fetch_failed' };
-  }
-  if (!taxonomyResult.data) {
-    return { ok: false, reason: 'document_not_found' };
-  }
-
   if (!blogParamsResult.ok) {
     logger.error('revalidate.blog_pagination_lookup_failed', {
       id,
@@ -74,17 +65,31 @@ const deriveBlogPostPublishPaths = async ({
     });
     return { ok: false, reason: 'fetch_failed' };
   }
-  if (!tagParamsResult.ok) {
-    logger.error('revalidate.tag_pagination_lookup_failed', {
+  if (!tagSlugsResult.ok) {
+    logger.error('revalidate.tag_params_lookup_failed', {
       id,
-      error: tagParamsResult.error,
+      error: tagSlugsResult.error,
     });
     return { ok: false, reason: 'fetch_failed' };
   }
-  if (!topicParamsResult.ok) {
+  if (!tagPaginationParamsResult.ok) {
+    logger.error('revalidate.tag_pagination_lookup_failed', {
+      id,
+      error: tagPaginationParamsResult.error,
+    });
+    return { ok: false, reason: 'fetch_failed' };
+  }
+  if (!topicSlugsResult.ok) {
+    logger.error('revalidate.topic_params_lookup_failed', {
+      id,
+      error: topicSlugsResult.error,
+    });
+    return { ok: false, reason: 'fetch_failed' };
+  }
+  if (!topicPaginationParamsResult.ok) {
     logger.error('revalidate.topic_pagination_lookup_failed', {
       id,
-      error: topicParamsResult.error,
+      error: topicPaginationParamsResult.error,
     });
     return { ok: false, reason: 'fetch_failed' };
   }
@@ -93,11 +98,11 @@ const deriveBlogPostPublishPaths = async ({
     tenantId,
     locales: Object.values(LOCALE_ISO_CODES),
     postSlug: post.slug,
-    tagSlugs: taxonomyResult.data.tagSlugs,
-    topicSlug: taxonomyResult.data.topicSlug,
+    tagSlugs: tagSlugsResult.data.map(({ slug }) => slug),
+    topicSlugs: topicSlugsResult.data.map(({ slug }) => slug),
     blogIndexPageParams: blogParamsResult.data,
-    tagPaginationParams: tagParamsResult.data,
-    topicPaginationParams: topicParamsResult.data,
+    tagPaginationParams: tagPaginationParamsResult.data,
+    topicPaginationParams: topicPaginationParamsResult.data,
   });
 
   return { ok: true, paths };

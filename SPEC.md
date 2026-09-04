@@ -583,10 +583,15 @@ webhook purges both that form and the legacy unprefixed one per publish, keyed
 off Sanity's own `sanity-project-id` webhook header. Tag expiry alone does not
 invalidate a prerendered route on Vercel, so the webhook also purges resolved,
 tenant-scoped paths (`revalidatePath('/<tenantId>/<locale>/blog/my-post')`) —
-precisely derived for a published `blog_post` (its own page, the home and blog
-archive with pagination, and every tag/topic page it belongs to), falling
-back to a logged whole-site purge for any `_type` without a precise
-derivation yet. The same webhook also cleans
+precisely derived for a published `blog_post`: its own page, the home and blog
+archive with pagination, and **every** tag/topic page of the tenant with their
+own pagination, not only the ones the post currently belongs to (a
+re-categorisation or removal would otherwise leave stale HTML on the page the
+post no longer occupies, with no way to detect it). A renamed post slug is a
+known, unsolved gap — the old slug isn't recoverable from the webhook payload,
+so the page at the old URL stays cached until it next changes for another
+reason. Anything without a precise derivation yet falls back to a logged
+whole-site purge. The same webhook also cleans
 up orphaned `@blog/db` `bookmarks` rows when it receives a `blog_post` delete
 (Sanity's `sanity-operation` header — unpublish fires the same trigger as
 true deletion), scoped to the tenant resolved from that project-id header.

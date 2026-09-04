@@ -6,7 +6,7 @@ export type TBuildPostPublishPathsInput = {
   locales: readonly string[];
   postSlug: string;
   tagSlugs: string[];
-  topicSlug: string | undefined;
+  topicSlugs: string[];
   blogIndexPageParams: { page: string }[];
   tagPaginationParams: { slug: string; page: string }[];
   topicPaginationParams: { slug: string; page: string }[];
@@ -15,10 +15,9 @@ export type TBuildPostPublishPathsInput = {
 /**
  * Every tenant-scoped, resolved path a published `blog_post` can affect:
  * its own detail page, the home and blog archive (with pagination), and
- * every tag/topic detail page it belongs to (with their own pagination).
- * `tagPaginationParams`/`topicPaginationParams` cover every tag/topic page
- * in the tenant — filtered here down to the ones this post actually
- * belongs to.
+ * every tag/topic page of the tenant (with their own pagination) — not
+ * only the ones this post currently belongs to, since a tag/topic
+ * reassignment leaves stale HTML on the page the post was removed from.
  */
 export const buildPostPublishPaths = (
   input: TBuildPostPublishPathsInput,
@@ -28,18 +27,11 @@ export const buildPostPublishPaths = (
     locales,
     postSlug,
     tagSlugs,
-    topicSlug,
+    topicSlugs,
     blogIndexPageParams,
     tagPaginationParams,
     topicPaginationParams,
   } = input;
-
-  const affectedTagPages = tagPaginationParams.filter((tagPage) =>
-    tagSlugs.includes(tagPage.slug),
-  );
-  const affectedTopicPages = topicSlug
-    ? topicPaginationParams.filter((topicPage) => topicPage.slug === topicSlug)
-    : [];
 
   const unprefixedPaths = [
     routes.home(),
@@ -49,11 +41,11 @@ export const buildPostPublishPaths = (
     ),
     routes.post(postSlug),
     ...tagSlugs.map((slug) => routes.tag(slug)),
-    ...affectedTagPages.map((tagPage) =>
+    ...tagPaginationParams.map((tagPage) =>
       routes.tag(tagPage.slug, Number(tagPage.page)),
     ),
-    ...(topicSlug ? [routes.topic(topicSlug)] : []),
-    ...affectedTopicPages.map((topicPage) =>
+    ...topicSlugs.map((slug) => routes.topic(slug)),
+    ...topicPaginationParams.map((topicPage) =>
       routes.topic(topicPage.slug, Number(topicPage.page)),
     ),
   ];

@@ -87,20 +87,42 @@
 blog/my-post')` matches the resolved-pathname tag exactly — and is how the
   route now purges a published `blog_post` (#2666):
   `@web/server/revalidate/derive-revalidate-paths` queries `@blog/service` for
-  the post's own slug, the tag/topic pages it belongs to, and every archive's
-  current pagination extent (`getIndexPageParams`/`getTagPaginationParams`/
-  `getTopicPaginationParams`), then `@web/utils/build-post-publish-paths`
+  the post's own slug, every archive's current pagination extent
+  (`getIndexPageParams`), and **every** tag/topic page of the tenant
+  (`getTagParams`/`getTopicParams` for the page-1 slugs, `getTagPaginationParams`/
+  `getTopicPaginationParams` for pages 2…N) — not filtered down to the ones
+  this post currently belongs to. Then `@web/utils/build-post-publish-paths`
   assembles the full, tenant-and-locale-scoped path set — the post's own page,
-  home, the blog archive with pagination, and each tag/topic page (with its
-  own pagination) the post belongs to. Every other `_type` (including the
-  `posts`-tagged `blog_author`/`blog_topic`/`blog_tag`, whose edit can affect
-  every post-list-bearing page of a tenant) has no precise derivation yet —
-  full enumeration for those is unbounded in the number of `revalidatePath`
-  calls for a large tenant, a design tradeoff not yet resolved. Any
-  undeliverable derivation — an unresolved tenant, a `_type` with no
-  derivation, or a failed lookup — falls back to the whole-site
-  `revalidatePath('/', 'layout')` purge, always logged (`revalidate.
-path_purge_fallback`) rather than left silently incomplete.
+  home, the blog archive with pagination, and every tag/topic page (with its
+  own pagination) in the tenant. Purging the whole taxonomy rather than just
+  the post's current tags/topic is deliberate: a re-categorisation or tag
+  removal leaves stale HTML on the page the post was removed from, and the
+  derivation would otherwise report success while missing it. This makes
+  `getPostTaxonomySlugs` (`@blog/service`) unnecessary for path derivation —
+  it's no longer called from `apps/web`, though the function itself stays for
+  a possible future consumer.
+
+  **Known limitation, accepted rather than solved:** a renamed post slug is
+  not recoverable from the webhook payload, so the page at the _old_ slug
+  keeps its stale prerendered HTML (still listing the post) until something
+  else revalidates that path. Fixing this would require reconfiguring the
+  Sanity webhook to project the document's previous slug, which is
+  human-gated console work.
+
+  Every other `_type` (including the `posts`-tagged
+  `blog_author`/`blog_topic`/`blog_tag`, whose edit can affect every
+  post-list-bearing page of a tenant) has no precise derivation yet — full
+  enumeration for those is unbounded in the number of `revalidatePath` calls
+  for a large tenant, a design tradeoff not yet resolved. Any undeliverable
+  derivation — an unresolved tenant, a `_type` with no derivation, a thrown
+  Sanity-credentials lookup, or a failed lookup — falls back to the
+  whole-site `revalidatePath('/', 'layout')` purge, always logged
+  (`revalidate.path_purge_fallback`) rather than left silently incomplete.
+  The credentials lookup (`getTenantSanityCredentials`, which throws when
+  `TENANT_TOKEN_ENCRYPTION_KEY` is unconfigured, or on a transient DB error)
+  is wrapped in a try/catch for exactly this reason — an uncaught throw there
+  would abort the handler before the fallback purge ever ran, which is worse
+  than the partial purge the fallback exists to prevent.
 
   The same route also cleans up orphaned `bookmarks` rows (`@blog/db`) when the
   webhook's `sanity-operation` header reads `delete` for a `blog_post` —
@@ -129,14 +151,14 @@ path_purge_fallback`) rather than left silently incomplete.
   the panel takes.
 
   Unlike `/api/revalidate`, this route makes no attempt at a resolved-path
-  derivation (#2666) — a Look/Voice/Features save changes theme tokens, nav
-  or feature flags on _every_ page the tenant renders, so there is no partial
-  path set that would be correct to purge instead of the whole site. It
-  always falls back to `revalidatePath('/', 'layout')`, logged
+  derivation and is expected to stay that way permanently (#2666) — a
+  Look/Voice/Features save changes theme tokens, nav or feature flags on
+  _every_ page the tenant renders, so there is no smaller path set that would
+  be correct to purge instead of the whole site; a full per-tenant path
+  enumeration would be no more correct here, only more code. It always falls
+  back to `revalidatePath('/', 'layout')`, logged
   (`revalidate_site_config.whole_site_purge`, with the resolved `tenantIds`)
-  rather than silent, pending a decision on whether a full per-tenant path
-  enumeration (home, every post, every tag/topic page and its pagination,
-  every generic page) is worth its cost for a large tenant.
+  rather than silent.
 
   It calls the endpoint best-effort
   (`@platform/server/site-config/revalidate-site-config`) — a failed call is

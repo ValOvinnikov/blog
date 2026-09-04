@@ -5,15 +5,17 @@ import {
 
 const {
   getPostsByIdsMock,
-  getPostTaxonomySlugsMock,
   getIndexPageParamsMock,
+  getTagParamsMock,
   getTagPaginationParamsMock,
+  getTopicParamsMock,
   getTopicPaginationParamsMock,
 } = vi.hoisted(() => ({
   getPostsByIdsMock: vi.fn(),
-  getPostTaxonomySlugsMock: vi.fn(),
   getIndexPageParamsMock: vi.fn(),
+  getTagParamsMock: vi.fn(),
   getTagPaginationParamsMock: vi.fn(),
+  getTopicParamsMock: vi.fn(),
   getTopicPaginationParamsMock: vi.fn(),
 }));
 
@@ -23,14 +25,23 @@ vi.mock('@blog/service', () => ({
       posts: {
         v1: {
           getPostsByIds: getPostsByIdsMock,
-          getPostTaxonomySlugs: getPostTaxonomySlugsMock,
         },
       },
     },
     pages: {
       blog: { v1: { getIndexPageParams: getIndexPageParamsMock } },
-      tag: { v1: { getTagPaginationParams: getTagPaginationParamsMock } },
-      topic: { v1: { getTopicPaginationParams: getTopicPaginationParamsMock } },
+      tag: {
+        v1: {
+          getTagParams: getTagParamsMock,
+          getTagPaginationParams: getTagPaginationParamsMock,
+        },
+      },
+      topic: {
+        v1: {
+          getTopicParams: getTopicParamsMock,
+          getTopicPaginationParams: getTopicPaginationParamsMock,
+        },
+      },
     },
   },
 }));
@@ -53,7 +64,6 @@ const tenant = {
 };
 
 const okPost = { id: 'post-1', slug: 'my-post' };
-const okTaxonomy = { tagSlugs: ['typescript'], topicSlug: 'engineering' };
 
 describe('isDerivableRevalidateType', () => {
   it('is true only for blog_post', () => {
@@ -66,9 +76,10 @@ describe('isDerivableRevalidateType', () => {
 describe(deriveRevalidatePaths, () => {
   beforeEach(() => {
     getPostsByIdsMock.mockReset();
-    getPostTaxonomySlugsMock.mockReset();
     getIndexPageParamsMock.mockReset();
+    getTagParamsMock.mockReset();
     getTagPaginationParamsMock.mockReset();
+    getTopicParamsMock.mockReset();
     getTopicPaginationParamsMock.mockReset();
     loggerErrorMock.mockReset();
   });
@@ -85,11 +96,18 @@ describe(deriveRevalidatePaths, () => {
     expect(getPostsByIdsMock).not.toHaveBeenCalled();
   });
 
-  it('resolves the full path set for a published post', async () => {
+  it('resolves the full path set for a published post, including every tag/topic page of the tenant', async () => {
     getPostsByIdsMock.mockResolvedValue({ ok: true, data: [okPost] });
-    getPostTaxonomySlugsMock.mockResolvedValue({ ok: true, data: okTaxonomy });
     getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getTagParamsMock.mockResolvedValue({
+      ok: true,
+      data: [{ slug: 'typescript' }, { slug: 'unrelated-tag' }],
+    });
     getTagPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getTopicParamsMock.mockResolvedValue({
+      ok: true,
+      data: [{ slug: 'engineering' }],
+    });
     getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
 
     const result = await deriveRevalidatePaths({
@@ -106,6 +124,7 @@ describe(deriveRevalidatePaths, () => {
         '/tenant-1/EN/blog',
         '/tenant-1/EN/blog/my-post',
         '/tenant-1/EN/tags/typescript',
+        '/tenant-1/EN/tags/unrelated-tag',
         '/tenant-1/EN/topics/engineering',
       ]),
     });
@@ -113,9 +132,10 @@ describe(deriveRevalidatePaths, () => {
 
   it('falls back with document_not_found when the id matches no post (e.g. a delete)', async () => {
     getPostsByIdsMock.mockResolvedValue({ ok: true, data: [] });
-    getPostTaxonomySlugsMock.mockResolvedValue({ ok: true, data: undefined });
     getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getTagParamsMock.mockResolvedValue({ ok: true, data: [] });
     getTagPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getTopicParamsMock.mockResolvedValue({ ok: true, data: [] });
     getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
 
     const result = await deriveRevalidatePaths({
@@ -134,9 +154,10 @@ describe(deriveRevalidatePaths, () => {
       ok: false,
       error: new Error('boom'),
     });
-    getPostTaxonomySlugsMock.mockResolvedValue({ ok: true, data: okTaxonomy });
     getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getTagParamsMock.mockResolvedValue({ ok: true, data: [] });
     getTagPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getTopicParamsMock.mockResolvedValue({ ok: true, data: [] });
     getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
 
     const result = await deriveRevalidatePaths({
@@ -153,38 +174,15 @@ describe(deriveRevalidatePaths, () => {
     );
   });
 
-  it('falls back with fetch_failed and logs when the taxonomy lookup fails', async () => {
-    getPostsByIdsMock.mockResolvedValue({ ok: true, data: [okPost] });
-    getPostTaxonomySlugsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-    getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTagPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
-
-    const result = await deriveRevalidatePaths({
-      type: 'blog_post',
-      id: 'post-1',
-      tenantId: 'tenant-1',
-      tenant,
-    });
-
-    expect(result).toEqual({ ok: false, reason: 'fetch_failed' });
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      'revalidate.post_taxonomy_lookup_failed',
-      expect.objectContaining({ id: 'post-1' }),
-    );
-  });
-
   it('falls back with fetch_failed and logs when the blog index pagination lookup fails', async () => {
     getPostsByIdsMock.mockResolvedValue({ ok: true, data: [okPost] });
-    getPostTaxonomySlugsMock.mockResolvedValue({ ok: true, data: okTaxonomy });
     getIndexPageParamsMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
     });
+    getTagParamsMock.mockResolvedValue({ ok: true, data: [] });
     getTagPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getTopicParamsMock.mockResolvedValue({ ok: true, data: [] });
     getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
 
     const result = await deriveRevalidatePaths({
@@ -201,14 +199,40 @@ describe(deriveRevalidatePaths, () => {
     );
   });
 
+  it('falls back with fetch_failed and logs when the tag params lookup fails', async () => {
+    getPostsByIdsMock.mockResolvedValue({ ok: true, data: [okPost] });
+    getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getTagParamsMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
+    getTagPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getTopicParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
+
+    const result = await deriveRevalidatePaths({
+      type: 'blog_post',
+      id: 'post-1',
+      tenantId: 'tenant-1',
+      tenant,
+    });
+
+    expect(result).toEqual({ ok: false, reason: 'fetch_failed' });
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      'revalidate.tag_params_lookup_failed',
+      expect.objectContaining({ id: 'post-1' }),
+    );
+  });
+
   it('falls back with fetch_failed and logs when the tag pagination lookup fails', async () => {
     getPostsByIdsMock.mockResolvedValue({ ok: true, data: [okPost] });
-    getPostTaxonomySlugsMock.mockResolvedValue({ ok: true, data: okTaxonomy });
     getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getTagParamsMock.mockResolvedValue({ ok: true, data: [] });
     getTagPaginationParamsMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
     });
+    getTopicParamsMock.mockResolvedValue({ ok: true, data: [] });
     getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
 
     const result = await deriveRevalidatePaths({
@@ -225,11 +249,37 @@ describe(deriveRevalidatePaths, () => {
     );
   });
 
+  it('falls back with fetch_failed and logs when the topic params lookup fails', async () => {
+    getPostsByIdsMock.mockResolvedValue({ ok: true, data: [okPost] });
+    getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getTagParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getTagPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getTopicParamsMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
+    getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
+
+    const result = await deriveRevalidatePaths({
+      type: 'blog_post',
+      id: 'post-1',
+      tenantId: 'tenant-1',
+      tenant,
+    });
+
+    expect(result).toEqual({ ok: false, reason: 'fetch_failed' });
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      'revalidate.topic_params_lookup_failed',
+      expect.objectContaining({ id: 'post-1' }),
+    );
+  });
+
   it('falls back with fetch_failed and logs when the topic pagination lookup fails', async () => {
     getPostsByIdsMock.mockResolvedValue({ ok: true, data: [okPost] });
-    getPostTaxonomySlugsMock.mockResolvedValue({ ok: true, data: okTaxonomy });
     getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getTagParamsMock.mockResolvedValue({ ok: true, data: [] });
     getTagPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getTopicParamsMock.mockResolvedValue({ ok: true, data: [] });
     getTopicPaginationParamsMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),

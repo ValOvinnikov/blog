@@ -522,6 +522,35 @@ describe('POST /api/revalidate', () => {
       expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
     });
 
+    it('still runs the whole-site fallback purge when getTenantSanityCredentials throws (e.g. a missing encryption key or a transient DB error)', async () => {
+      isValidSignatureMock.mockResolvedValue(true);
+      getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-uuid-1');
+      isDerivableRevalidateTypeMock.mockReturnValue(true);
+      getTenantSanityCredentialsMock.mockRejectedValue(
+        new Error('TENANT_TOKEN_ENCRYPTION_KEY is not configured.'),
+      );
+      const { POST } = await import('./route');
+
+      const request = makeRequest(
+        { _type: 'blog_post', _id: 'post-1' },
+        't=1,v=valid-signature',
+        { [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project' },
+      );
+      const response = await POST(request);
+
+      expect(response.status).toBe(200);
+      expect(deriveRevalidatePathsMock).not.toHaveBeenCalled();
+      expect(loggerErrorMock).toHaveBeenCalledWith(
+        'revalidate.tenant_sanity_credentials_fetch_threw',
+        expect.objectContaining({ type: 'blog_post', id: 'post-1' }),
+      );
+      expect(loggerWarnMock).toHaveBeenCalledWith(
+        'revalidate.path_purge_fallback',
+        expect.objectContaining({ reason: 'fetch_failed' }),
+      );
+      expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
+    });
+
     it('falls back to the whole-site purge and logs when the derivation itself cannot resolve the paths', async () => {
       isValidSignatureMock.mockResolvedValue(true);
       getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-uuid-1');

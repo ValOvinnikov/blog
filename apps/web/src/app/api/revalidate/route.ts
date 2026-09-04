@@ -64,7 +64,18 @@ const resolveDerivedRevalidatePaths = async (
     return { ok: false, reason: 'unsupported_type' };
   }
 
-  const tenant = await queries.tenants.getTenantSanityCredentials(tenantId);
+  let tenant;
+  try {
+    tenant = await queries.tenants.getTenantSanityCredentials(tenantId);
+  } catch (error) {
+    logger.error('revalidate.tenant_sanity_credentials_fetch_threw', {
+      type,
+      id,
+      tenantId,
+      error,
+    });
+    return { ok: false, reason: 'fetch_failed' };
+  }
   if (!tenant) {
     logger.error('revalidate.tenant_sanity_credentials_missing', {
       type,
@@ -158,9 +169,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   // Vercel, so a path purge is required alongside the tag purge above.
   // `revalidatePath` only matches a fully resolved path (`/<tenantId>/EN/
   // blog/x`) — the bracketed route pattern (`'/', 'layout'`) matches every
-  // tenant's request, never one tenant's alone — so a precise derivation is
-  // purged path-by-path, and anything not (yet) derivable falls back to
-  // that whole-site purge, loudly logged rather than silently incomplete.
+  // tenant's request, never one tenant's alone.
   const pathPurged = revalidated.length > 0;
   if (pathPurged) {
     const derived = await resolveDerivedRevalidatePaths(type, id, tenantId);

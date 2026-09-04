@@ -95,13 +95,9 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   // A Look/Voice/Features save changes every page a tenant renders (theme
-  // tokens, nav, feature flags), so there is no partial path set that would
-  // be correct to purge instead — the choice is a full per-path enumeration
-  // (home, every post, every tag/topic page and its pagination, every
-  // generic page) or this whole-site purge. Enumerating is unbounded in the
-  // number of `revalidatePath` calls for a large tenant, so this stays the
-  // deliberate placeholder: loudly logged, not silently incomplete, pending
-  // a decision on whether the enumeration cost is worth paying here too.
+  // tokens, nav, feature flags), so there is no smaller path set that would
+  // be correct to purge instead — the whole-site purge here is deliberate,
+  // not an unfinished derivation, and is logged loudly rather than silent.
   logger.warn('revalidate_site_config.whole_site_purge', {
     tenantIds,
     requestedTenantId,

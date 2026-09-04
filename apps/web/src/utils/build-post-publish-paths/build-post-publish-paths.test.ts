@@ -7,7 +7,7 @@ describe(buildPostPublishPaths, () => {
       locales: ['EN'],
       postSlug: 'my-post',
       tagSlugs: [],
-      topicSlug: undefined,
+      topicSlugs: [],
       blogIndexPageParams: [],
       tagPaginationParams: [],
       topicPaginationParams: [],
@@ -26,7 +26,7 @@ describe(buildPostPublishPaths, () => {
       locales: ['EN'],
       postSlug: 'my-post',
       tagSlugs: [],
-      topicSlug: undefined,
+      topicSlugs: [],
       blogIndexPageParams: [{ page: '2' }, { page: '3' }],
       tagPaginationParams: [],
       topicPaginationParams: [],
@@ -40,13 +40,13 @@ describe(buildPostPublishPaths, () => {
     );
   });
 
-  it('includes the base and pagination paths for every tag the post belongs to', () => {
+  it('includes the base and pagination paths for every tag of the tenant, not only the post’s own', () => {
     const paths = buildPostPublishPaths({
       tenantId: 'tenant-1',
       locales: ['EN'],
       postSlug: 'my-post',
-      tagSlugs: ['typescript', 'react'],
-      topicSlug: undefined,
+      tagSlugs: ['typescript', 'react', 'unrelated-tag'],
+      topicSlugs: [],
       blogIndexPageParams: [],
       tagPaginationParams: [
         { slug: 'typescript', page: '2' },
@@ -59,21 +59,20 @@ describe(buildPostPublishPaths, () => {
       expect.arrayContaining([
         '/tenant-1/EN/tags/typescript',
         '/tenant-1/EN/tags/react',
+        '/tenant-1/EN/tags/unrelated-tag',
         '/tenant-1/EN/tags/typescript/page/2',
+        '/tenant-1/EN/tags/unrelated-tag/page/2',
       ]),
-    );
-    expect(paths).not.toEqual(
-      expect.arrayContaining(['/tenant-1/EN/tags/unrelated-tag/page/2']),
     );
   });
 
-  it('includes the base and pagination paths for the post topic only', () => {
+  it('includes the base and pagination paths for every topic of the tenant, not only the post’s own', () => {
     const paths = buildPostPublishPaths({
       tenantId: 'tenant-1',
       locales: ['EN'],
       postSlug: 'my-post',
       tagSlugs: [],
-      topicSlug: 'engineering',
+      topicSlugs: ['engineering', 'unrelated-topic'],
       blogIndexPageParams: [],
       tagPaginationParams: [],
       topicPaginationParams: [
@@ -86,23 +85,22 @@ describe(buildPostPublishPaths, () => {
       expect.arrayContaining([
         '/tenant-1/EN/topics/engineering',
         '/tenant-1/EN/topics/engineering/page/2',
+        '/tenant-1/EN/topics/unrelated-topic',
+        '/tenant-1/EN/topics/unrelated-topic/page/2',
       ]),
-    );
-    expect(paths).not.toEqual(
-      expect.arrayContaining(['/tenant-1/EN/topics/unrelated-topic/page/2']),
     );
   });
 
-  it('omits the topic paths entirely when the post has no topic', () => {
+  it('omits topic paths entirely when the tenant has no topic pages', () => {
     const paths = buildPostPublishPaths({
       tenantId: 'tenant-1',
       locales: ['EN'],
       postSlug: 'my-post',
       tagSlugs: [],
-      topicSlug: undefined,
+      topicSlugs: [],
       blogIndexPageParams: [],
       tagPaginationParams: [],
-      topicPaginationParams: [{ slug: 'engineering', page: '2' }],
+      topicPaginationParams: [],
     });
 
     expect(paths.some((path) => path.includes('/topics/'))).toBe(false);
@@ -114,7 +112,7 @@ describe(buildPostPublishPaths, () => {
       locales: ['EN', 'FR'],
       postSlug: 'my-post',
       tagSlugs: [],
-      topicSlug: undefined,
+      topicSlugs: [],
       blogIndexPageParams: [],
       tagPaginationParams: [],
       topicPaginationParams: [],
@@ -134,7 +132,7 @@ describe(buildPostPublishPaths, () => {
       locales: ['EN'],
       postSlug: 'my-post',
       tagSlugs: [],
-      topicSlug: undefined,
+      topicSlugs: [],
       blogIndexPageParams: [],
       tagPaginationParams: [],
       topicPaginationParams: [],
