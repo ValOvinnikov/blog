@@ -1,6 +1,6 @@
 import { escapeHtml } from './escape-html';
 
-export type TEmailPalette = {
+type TEmailPalette = {
   surface: string;
   surface2: string;
   border: string;
