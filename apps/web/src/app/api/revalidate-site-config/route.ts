@@ -94,8 +94,12 @@ export async function POST(request: Request): Promise<NextResponse> {
     revalidateTag(tag, { expire: 0 });
   }
   // Tag expiry alone does not invalidate prerendered route entries on
-  // Vercel — purge the root layout's path too, same fallback the Sanity
-  // publish webhook (`/api/revalidate`) already relies on.
+  // Vercel, so this purges the whole site regardless of `tenantId`, same as
+  // `/api/revalidate`. Per-tenant scoping isn't expressible here: Next
+  // derives each route's implicit layout tags from the route pattern with
+  // dynamic segments unresolved, never from a resolved value, so a path
+  // built from a specific tenant id matches nothing. Purging each resolved
+  // tenant path individually would work and is tracked separately.
   revalidatePath('/', 'layout');
 
   return NextResponse.json(

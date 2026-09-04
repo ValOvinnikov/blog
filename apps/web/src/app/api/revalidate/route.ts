@@ -115,12 +115,13 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   // Tag expiry alone does not invalidate prerendered route entries on
-  // Vercel — pages would otherwise keep serving stale content indefinitely.
-  // Purging the root layout's path invalidates every page; publishes are infrequent
-  // on a blog, so the whole-site blast radius is acceptable. Verified against
-  // next@16.2.10 internals: every rendered route carries the implicit
-  // `_N_T_/layout` tag, which `revalidatePath('/', 'layout')` expires — so
-  // this covers the locale-prefixed prerenders (`/EN`) too.
+  // Vercel, so every publish purges the whole site rather than just the
+  // publishing tenant's pages. Per-tenant scoping isn't expressible here:
+  // Next derives each route's implicit layout tags from the route
+  // *pattern* with dynamic segments unresolved (`_N_T_/[tenant]/layout`),
+  // never from a resolved value, so `revalidatePath('/<tenantId>', 'layout')`
+  // matches nothing. Purging each resolved tenant path individually would
+  // work and is tracked separately.
   const pathPurged = revalidated.length > 0;
   if (pathPurged) {
     revalidatePath('/', 'layout');

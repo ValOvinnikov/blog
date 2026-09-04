@@ -68,8 +68,22 @@
   revalidate profile) from a Sanity publish webhook. Tag expiry alone does not
   invalidate prerendered route entries on Vercel (#318), so the route also
   calls `revalidatePath('/', 'layout')` when a registered type matched —
-  purging every page per publish (acceptable blast radius for a blog). The
-  same route also cleans up orphaned `bookmarks` rows (`@blog/db`) when the
+  purging every page per publish, **including every other tenant's**.
+
+  That blast radius is not a choice, and the obvious narrowing does not work:
+  `revalidatePath('/<tenantId>', 'layout')` matches nothing. Next derives its
+  per-segment layout tags from the **route pattern with brackets unresolved**
+  (`getDerivedTags` in `next/dist/server/lib/implicit-tags.js`), so a page under
+  `[tenant]/[locale]` carries `_N_T_/[tenant]/layout`, never an interpolated
+  id; the resolved pathname contributes one exact tag with no `/layout`
+  suffix. A scoped layout purge therefore fails **silently** — no error, no
+  log, stale HTML served indefinitely — and a unit test cannot catch it,
+  since `revalidatePath` is mocked and only its arguments are observable.
+  Passing the bracket pattern instead matches every tenant, so it buys
+  nothing. Purging **resolved** paths does work and is the tracked follow-up
+  (#2666).
+
+  The same route also cleans up orphaned `bookmarks` rows (`@blog/db`) when the
   webhook's `sanity-operation` header reads `delete` for a `blog_post` —
   unpublish fires the same trigger as true deletion, so one check covers
   both. Detection is header-only, never a re-query against Sanity: a
@@ -80,6 +94,7 @@
   skipped rather than guessed if unresolvable) and best-effort — a failure
   is logged but never turns the response into a non-2xx, since Sanity would
   retry the whole revalidation.
+
 - **`site_config` on-demand revalidation:** `POST /api/revalidate-site-config`
   (`apps/web`) mirrors `/api/revalidate`'s cache-purge shape
   (per-tenant `revalidateTag('site-config:<tenantId>', { expire: 0 })` +
