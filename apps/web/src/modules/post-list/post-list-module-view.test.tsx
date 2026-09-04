@@ -1,4 +1,4 @@
-import { BRAND_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, HEADING_ALIGN } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
 
@@ -26,10 +26,10 @@ const setup = customRender(PostListModuleView, {
   sectionHeader: {
     heading: 'Latest posts',
     supportingText: undefined,
-    align: undefined,
   },
   items: [post],
   layout: undefined,
+  contentAlignment: undefined,
   titleId: 'posts-title',
   dataTestId: 'post-list-module-post-list-1',
   accessibleTitle: 'Posts',
@@ -61,7 +61,6 @@ describe(PostListModuleView, () => {
       sectionHeader: {
         heading: 'More posts',
         supportingText: undefined,
-        align: undefined,
       },
     });
 
@@ -76,7 +75,6 @@ describe(PostListModuleView, () => {
       sectionHeader: {
         heading: undefined,
         supportingText: undefined,
-        align: undefined,
       },
     });
 
@@ -126,5 +124,11 @@ describe(PostListModuleView, () => {
     setup({ items: [] });
 
     expect(screen.getByText('No posts yet.')).toBeInTheDocument();
+  });
+
+  it('passes contentAlignment through to PostsSection as align', () => {
+    setup({ contentAlignment: HEADING_ALIGN.CENTER });
+
+    expect(screen.getByText('Latest posts')).toHaveClass('text-center');
   });
 });

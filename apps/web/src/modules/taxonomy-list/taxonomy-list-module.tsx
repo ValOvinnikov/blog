@@ -59,7 +59,8 @@ export const TaxonomyListModule = async ({
     notFound();
   }
 
-  const { brandVariant, sectionHeader, layout, entries } = result.data;
+  const { brandVariant, sectionHeader, layout, entries, contentAlignment } =
+    result.data;
 
   const items: ITaxonomyListModuleItem[] = entries.map((entry) => ({
     id: entry.id,
@@ -75,6 +76,7 @@ export const TaxonomyListModule = async ({
       sectionHeader={sectionHeader}
       items={items}
       layout={layout}
+      contentAlignment={contentAlignment}
       titleId={titleId}
       dataTestId={dataTestId}
       headingLevel={headingLevel}

@@ -1,4 +1,4 @@
-import { BRAND_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, HEADING_ALIGN } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 
 import { TaxonomyListModuleView } from './taxonomy-list-module-view';
@@ -31,10 +31,10 @@ const setup = customRender(TaxonomyListModuleView, {
   sectionHeader: {
     heading: 'Browse by topic',
     supportingText: undefined,
-    align: undefined,
   },
   items: [item],
   layout: undefined,
+  contentAlignment: undefined,
   titleId: 'topic-list-title',
   dataTestId: 'taxonomy-list-module-topic-list-1',
   headingLevel: 2,
@@ -79,7 +79,6 @@ describe(TaxonomyListModuleView, () => {
       sectionHeader: {
         heading: undefined,
         supportingText: undefined,
-        align: undefined,
       },
     });
 
@@ -105,5 +104,11 @@ describe(TaxonomyListModuleView, () => {
 
     expect(screen.getByText('No topics yet.')).toBeVisible();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('passes contentAlignment through to the heading label alignment classes', () => {
+    setup({ contentAlignment: HEADING_ALIGN.CENTER });
+
+    expect(screen.getByText('Browse by topic')).toHaveClass('text-center');
   });
 });

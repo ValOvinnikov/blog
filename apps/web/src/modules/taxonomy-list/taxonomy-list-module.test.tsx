@@ -81,9 +81,9 @@ describe(TaxonomyListModule, () => {
         sectionHeader: {
           heading: 'Browse by topic',
           supportingText: undefined,
-          align: undefined,
         },
         layout: undefined,
+        contentAlignment: undefined,
         entries: [],
       },
     });
@@ -111,9 +111,9 @@ describe(TaxonomyListModule, () => {
         sectionHeader: {
           heading: 'Browse by topic',
           supportingText: undefined,
-          align: undefined,
         },
         layout: undefined,
+        contentAlignment: undefined,
         entries: [],
       },
     });
@@ -136,9 +136,9 @@ describe(TaxonomyListModule, () => {
         sectionHeader: {
           heading: 'Browse by topic',
           supportingText: undefined,
-          align: undefined,
         },
         layout: undefined,
+        contentAlignment: undefined,
         entries: [
           {
             id: 'topic-1',
@@ -166,9 +166,9 @@ describe(TaxonomyListModule, () => {
         sectionHeader: {
           heading: 'Browse by topic',
           supportingText: undefined,
-          align: undefined,
         },
         layout: undefined,
+        contentAlignment: undefined,
         entries: [],
       },
     });

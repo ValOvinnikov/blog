@@ -41,10 +41,10 @@ const meta = {
     sectionHeader: {
       heading: 'Browse by topic',
       supportingText: undefined,
-      align: undefined,
     },
     items,
     layout: undefined,
+    contentAlignment: undefined,
     titleId: 'topic-list-title',
     dataTestId: 'taxonomy-list-module-topic-list-1',
     headingLevel: 2,
@@ -63,7 +63,6 @@ export const WithoutCmsHeading: TStory = {
     sectionHeader: {
       heading: undefined,
       supportingText: undefined,
-      align: undefined,
     },
   },
 };

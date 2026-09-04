@@ -35,7 +35,6 @@ const setup = customRender(CtaModuleView, {
   sectionHeader: {
     heading: 'Get started',
     supportingText: undefined,
-    align: undefined,
   },
   content: undefined,
   image: undefined,
@@ -67,7 +66,6 @@ describe(CtaModuleView, () => {
       sectionHeader: {
         heading: 'Join us',
         supportingText: undefined,
-        align: undefined,
       },
     });
 
