@@ -15,7 +15,7 @@ type TToMetadataOptions = {
 
 // Route-relative fallbacks to the file-convention-derived default images
 // (`app/opengraph-image.tsx` / `app/twitter-image.tsx`). Next resolves a
-// relative image URL against `metadataBase` (set once, in the root layout's
+// relative image URL against `metadataBase` (set once, in `[locale]/layout.tsx`'s
 // `generateMetadata`) when building the final `<meta>` tags.
 //
 // This fallback is required, not optional: Next's per-segment metadata merge

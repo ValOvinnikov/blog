@@ -324,10 +324,12 @@ tenant's row in `@blog/db`'s `site_config` table (`preset` —
 `apps/web/src/utils/to-theme-tokens.ts` against `@blog/config`'s
 `PRESET_REGISTRY` into a fully-populated `TThemeTokens` (never partial —
 every gap, and the case of no row existing at all, is filled by the preset's
-own default). `apps/web`'s root layout fetches this once per request
-(`unstable_cache`-wrapped, tenant-scoped tag) and injects the resolved
-tokens as a server-rendered `<style>` block declaring CSS custom properties
-under both `:root` and `.dark`, and selects the matching `next/font/google`
+own default). `apps/web`'s `[locale]/layout.tsx` fetches this once per request
+(`unstable_cache`-wrapped, tenant-scoped tag) and passes it to `ThemeScope`,
+which injects the resolved tokens as a server-rendered `<style>` block
+declaring CSS custom properties under both `:root` and `.dark`
+(carrying `precedence`/`href` so React hoists it into `<head>` from wherever
+it mounts), and selects the matching `next/font/google`
 pair (`headingFont`/`bodyFont`) via a per-font dynamically imported loader
 module so only the two fonts actually resolved for that render are
 bundled/preloaded. `apps/web/src/proxy.ts` resolves the request's tenant from
@@ -361,16 +363,22 @@ per-request `getRequestTenantId()` and caches per tenant — both the
 (`buildSiteConfigCacheTag`/`buildSettingsFeaturesCacheTag`/
 `buildTenantPlanCacheTag`, `apps/web/src/utils/tenant-cache-tags/`) — closing
 the leak where every tenant was served the first `tenants` row's config
-(#2477). The root layout (`app/layout.tsx`) now also calls `headers()`
-directly via `getThemeTokens()`/`isCapabilityEnabled()`. For the ten content
-routes #2408 already forced dynamic (a descendant — `[locale]/layout.tsx` or
-the page itself — already reads `getRequestTenantId()` for its own
-tenant-scoped Sanity reads), this adds no new rendering-mode cost — they were
-already re-rendered per request regardless. `/_not-found` is different: it
-renders outside `[locale]/layout.tsx` and had no `headers()` dependency
-before #2477 (`getSiteConfig()` previously resolved via a plain `listTenants()`
-DB call, not a Next.js Dynamic API), which is why #2440 measured it as one of
-only two static routes. A `pnpm --filter web build` on this branch confirms
+(#2477). The **root layout (`app/layout.tsx`) is tenant-independent** — it
+owns only the static document shell (`<html lang>`, the Sanity CDN
+preconnect, the dark-mode bootstrap script, `<body>`) and reads no Dynamic
+API. Theme tokens, font variables, analytics gating and the tenant's voice
+overrides all resolve in `[locale]/layout.tsx`; `not-found.tsx`, the one
+route rendering outside that layout, resolves its own theme tokens and
+messages (it has no analytics gating and no `Header`/`Footer` chrome). `i18n/request.ts`
+is likewise tenant-independent, returning the base locale messages only.
+This split exists because the root layout and `getRequestConfig` both sit
+above any future `[tenant]` route segment and so can never receive it as a
+param — while either resolved tenant state, every route stayed dynamic
+regardless of its path. `/_not-found` renders outside `[locale]/layout.tsx`
+and had no `headers()` dependency before #2477 (`getSiteConfig()` previously
+resolved via a plain `listTenants()` DB call, not a Next.js Dynamic API),
+which is why #2440 measured it as one of only two static routes; it acquires
+one again through its own `getThemeTokens()` call. A `pnpm --filter web build` on this branch confirms
 `/_not-found` is now `ƒ` (Dynamic) — the route table shows only `/robots.txt`
 as `○` (Static), and the prerender manifest bakes 2 routes
 (`/_global-error`, `/robots.txt`) instead of #2440's baseline of 3
@@ -463,8 +471,9 @@ already depend on `db` directly. `apps/web`'s
 resolves the two-layer check per request and never throws; a disabled
 capability is omitted silently at its own render site (`module_newsletter`
 in `ModuleRenderer`; the bookmark button on the post-detail page; Vercel
-Analytics/Speed Insights in the root layout, ANDed with the pre-existing
-`WEB_ANALYTICS_ENABLED` env gate) — same pattern as an unknown module type,
+Analytics/Speed Insights in `[locale]/layout.tsx`, ANDed with the
+pre-existing `WEB_ANALYTICS_ENABLED` env gate) — same pattern as an unknown
+module type,
 never a thrown error or a visible placeholder. `comments`/`ratings` have no
 render site yet in `apps/web` (no comments/ratings feature exists anywhere
 in the codebase today); their toggles and plan entitlement are wired

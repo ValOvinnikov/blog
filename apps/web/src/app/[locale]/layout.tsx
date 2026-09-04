@@ -1,22 +1,34 @@
 import { getEnabledOAuthProviderIds } from '@blog/auth/utils/oauth-providers/oauth-providers';
-import { ICONS, type ILocalizedParams, routes, SIZE } from '@blog/config';
+import {
+  CAPABILITY,
+  ICONS,
+  type ILocalizedParams,
+  routes,
+  SIZE,
+} from '@blog/config';
 import { service } from '@blog/service';
 import { Icon } from '@blog/ui/atoms/icon';
 import { NavLink } from '@blog/ui/atoms/nav-link';
 import { Footer } from '@blog/ui/organisms/footer';
 import { Header } from '@blog/ui/organisms/header';
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { AuthMenu } from '@web/components/shared/auth-menu';
 import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
 import { SiteNavigation } from '@web/components/shared/site-navigation';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { ThemeScope } from '@web/components/shared/theme-scope';
 import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
 import { ToastProvider } from '@web/context/toast-provider';
 import { routing } from '@web/i18n/routing';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
 import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
-import { getChromeOn } from '@web/utils/get-chrome-on';
+import { getThemeTokens } from '@web/utils/get-theme-tokens';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
+import { isWebAnalyticsEnabled } from '@web/utils/is-web-analytics-enabled';
 import { logger } from '@web/utils/logger/logger';
+import { resolveTenantMessages } from '@web/utils/resolve-tenant-messages';
 import { toSocialIconName } from '@web/utils/to-social-icon-name';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -98,8 +110,9 @@ export default async function LocaleLayout({ children, params }: TProps) {
     settingsResult,
     navResult,
     footerResult,
-    chromeOn,
-    messages,
+    themeTokens,
+    isAnalyticsCapabilityEnabled,
+    baseMessages,
     now,
     timeZone,
     t,
@@ -107,7 +120,8 @@ export default async function LocaleLayout({ children, params }: TProps) {
     service.global.siteSettings.v1.getSiteSettings(tenant),
     service.global.navigation.v1.getNavigation(tenant),
     service.global.footer.v1.getFooter(tenant),
-    getChromeOn(),
+    getThemeTokens(),
+    isCapabilityEnabled(CAPABILITY.ANALYTICS),
     getMessages(),
     getNow(),
     getTimeZone(),
@@ -121,105 +135,118 @@ export default async function LocaleLayout({ children, params }: TProps) {
     notFound();
   }
 
+  const messages = await resolveTenantMessages(baseMessages);
   const { brand } = settingsResult.data;
   const navItems = navResult.ok ? navResult.data.items : [];
   const social = footerResult.ok ? footerResult.data.social : [];
-  const plain = !chromeOn;
+  const plain = !themeTokens.chromeOn;
   const currentYear = new Date().getFullYear();
   const s = localeLayoutVariants();
   const oauthProviderIds = getEnabledOAuthProviderIds();
+  const analyticsEnabled =
+    isWebAnalyticsEnabled() && isAnalyticsCapabilityEnabled;
 
   return (
-    // `locale`, `now`, and `timeZone` are passed explicitly (not inherited)
-    // so the page stays statically rendered — `setRequestLocale` above
-    // already resolves them from the static param rather than a dynamic
-    // API, but passing them here skips the provider's own implicit
-    // resolution. `messages` comes from `getMessages()`, which reads the
-    // per-locale `messages/*.json` file wired in `i18n/request.ts`. Client
-    // components that read the locale (next-intl navigation `Link` in the
-    // post-list module) need this provider or they throw "No intl context
-    // found".
-    <NextIntlClientProvider
-      locale={locale}
-      messages={messages}
-      now={now}
-      timeZone={timeZone}
-    >
-      {/* No `session` prop: `AuthMenu` resolves the session client-side rather than duplicating an `auth()` call at every layout render. */}
-      <SessionProvider>
-        {/* Mounted above `children` so a toast survives a client-side route change instead of being tied to the page that fired it. */}
-        <ToastProvider isPlain={plain}>
-          <div className={s.root()}>
-            <Header>
-              <Header.Brand>
-                <BrandLockupLink brand={brand} />
-              </Header.Brand>
-              <SiteNavigation
-                links={navItems}
-                actions={
-                  <>
-                    <ThemeToggleButton />
-                    <AuthMenu
-                      oauthProviderIds={oauthProviderIds}
-                      isPlain={plain}
-                    />
-                  </>
-                }
-              />
-            </Header>
-            <div className={s.content()}>{children}</div>
-            <Footer dataTestId="site-footer">
-              <Footer.Copyright title={brand.name} year={currentYear} />
-              <Footer.Nav>
-                {social.map((link) => {
-                  // `link.platform` is optional and free-form beyond the
-                  // `SOCIAL_PLATFORMS` enum's known icon set — an unmapped
-                  // platform falls back to the original label-only rendering
-                  // (no `icon`, `hasLabel` stays true) rather than hiding
-                  // the link.
-                  const iconName =
-                    link.platform && toSocialIconName(link.platform);
-
-                  return (
-                    <NavLink
-                      key={link.href}
-                      as={SmartLink}
-                      href={link.href}
-                      target={link.target}
-                      icon={
-                        iconName ? (
-                          <Icon
-                            name={iconName}
-                            size={SIZE.SM}
-                            dataTestId={`social-icon-${link.platform}`}
-                          />
-                        ) : undefined
-                      }
-                      hasLabel={!iconName}
-                    >
-                      {link.label}
-                    </NavLink>
-                  );
-                })}
-                <NavLink
-                  as={SmartLink}
-                  href={routes.rssFeed()}
-                  icon={
-                    <Icon
-                      name={ICONS.RSS}
-                      size={SIZE.SM}
-                      dataTestId="rss-icon"
-                    />
+    // `<html>` (owned by the tenant-independent root layout above) has no
+    // tenant to resolve theme tokens from, so `ThemeScope` establishes them
+    // here instead.
+    <ThemeScope themeTokens={themeTokens}>
+      {/* `locale`, `now`, and `timeZone` are passed explicitly (not
+          inherited) so the page stays statically rendered —
+          `setRequestLocale` above already resolves them from the static
+          param rather than a dynamic API, but passing them here skips the
+          provider's own implicit resolution. `messages` is the base locale
+          messages with the tenant's preset voice pack and voice overrides
+          applied. Client components that read the locale (next-intl
+          navigation `Link` in the post-list module) need this provider or
+          they throw "No intl context found". */}
+      <NextIntlClientProvider
+        locale={locale}
+        messages={messages}
+        now={now}
+        timeZone={timeZone}
+      >
+        {/* No `session` prop: `AuthMenu` resolves the session client-side rather than duplicating an `auth()` call at every layout render. */}
+        <SessionProvider>
+          {/* Mounted above `children` so a toast survives a client-side route change instead of being tied to the page that fired it. */}
+          <ToastProvider isPlain={plain}>
+            <div className={s.root()}>
+              <Header>
+                <Header.Brand>
+                  <BrandLockupLink brand={brand} />
+                </Header.Brand>
+                <SiteNavigation
+                  links={navItems}
+                  actions={
+                    <>
+                      <ThemeToggleButton />
+                      <AuthMenu
+                        oauthProviderIds={oauthProviderIds}
+                        isPlain={plain}
+                      />
+                    </>
                   }
-                  hasLabel={false}
-                >
-                  {t('feedLinkLabel')}
-                </NavLink>
-              </Footer.Nav>
-            </Footer>
-          </div>
-        </ToastProvider>
-      </SessionProvider>
-    </NextIntlClientProvider>
+                />
+              </Header>
+              <div className={s.content()}>{children}</div>
+              <Footer dataTestId="site-footer">
+                <Footer.Copyright title={brand.name} year={currentYear} />
+                <Footer.Nav>
+                  {social.map((link) => {
+                    // `link.platform` is optional and free-form beyond the
+                    // `SOCIAL_PLATFORMS` enum's known icon set — an unmapped
+                    // platform falls back to the original label-only rendering
+                    // (no `icon`, `hasLabel` stays true) rather than hiding
+                    // the link.
+                    const iconName =
+                      link.platform && toSocialIconName(link.platform);
+
+                    return (
+                      <NavLink
+                        key={link.href}
+                        as={SmartLink}
+                        href={link.href}
+                        target={link.target}
+                        icon={
+                          iconName ? (
+                            <Icon
+                              name={iconName}
+                              size={SIZE.SM}
+                              dataTestId={`social-icon-${link.platform}`}
+                            />
+                          ) : undefined
+                        }
+                        hasLabel={!iconName}
+                      >
+                        {link.label}
+                      </NavLink>
+                    );
+                  })}
+                  <NavLink
+                    as={SmartLink}
+                    href={routes.rssFeed()}
+                    icon={
+                      <Icon
+                        name={ICONS.RSS}
+                        size={SIZE.SM}
+                        dataTestId="rss-icon"
+                      />
+                    }
+                    hasLabel={false}
+                  >
+                    {t('feedLinkLabel')}
+                  </NavLink>
+                </Footer.Nav>
+              </Footer>
+            </div>
+          </ToastProvider>
+        </SessionProvider>
+      </NextIntlClientProvider>
+      {/* Both scripts 404 on a project without Speed Insights/Web Analytics
+          enabled in the Vercel dashboard, so `isWebAnalyticsEnabled()` must
+          gate them alongside the tenant's `ANALYTICS` capability. */}
+      {analyticsEnabled && <SpeedInsights />}
+      {analyticsEnabled && <Analytics />}
+    </ThemeScope>
   );
 }
