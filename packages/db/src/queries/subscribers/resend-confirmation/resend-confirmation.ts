@@ -7,13 +7,13 @@ import { and, eq } from 'drizzle-orm';
 // This never sends email itself — `apps/web` owns that (the shared
 // `sendEmail` helper) — its job is validating a `pending` row still exists
 // for the user's account email and handing back its **existing**
-// `confirmationToken` unchanged, so the caller can rebuild the same
-// confirmation URL and resend it. The token is deliberately never rotated
-// here — the same reasoning as `createPendingSubscriber`'s "already-pending"
-// branch: rotating it would silently break any confirmation link already in
-// flight.
+// `confirmationToken`/`unsubscribeToken` unchanged, so the caller can rebuild
+// the same confirmation and unsubscribe URLs and resend them. Neither token
+// is rotated here — the same reasoning as `createPendingSubscriber`'s
+// "already-pending" branch: rotating either would silently break a link
+// already in flight.
 export type TResendConfirmationResult =
-  | { outcome: 'pending'; confirmationToken: string }
+  | { outcome: 'pending'; confirmationToken: string; unsubscribeToken: string }
   | { outcome: 'not-pending' };
 
 // Returns `not-pending` for every case that isn't "a pending subscriber row
@@ -52,5 +52,6 @@ export async function resendConfirmation(
   return {
     outcome: 'pending',
     confirmationToken: subscriber.confirmationToken,
+    unsubscribeToken: subscriber.unsubscribeToken,
   };
 }
