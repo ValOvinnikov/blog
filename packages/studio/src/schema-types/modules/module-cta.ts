@@ -8,6 +8,7 @@ import {
 } from '@blog/config/constants';
 import { actionGroupField } from '@blog/studio/schema-types/helpers/action-group-field';
 import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
+import { defineAlignmentFields } from '@blog/studio/schema-types/helpers/define-alignment-fields';
 import { layoutField } from '@blog/studio/schema-types/helpers/layout-field';
 import { sectionHeaderField } from '@blog/studio/schema-types/helpers/section-header-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
@@ -123,55 +124,26 @@ export const ctaSchema = defineType({
           return true;
         }),
     }),
-    defineField({
-      name: 'contentPositionSplit',
-      title: 'Content Position',
-      type: 'string',
-      description:
-        'Where the content sits relative to the image, on this variant’s grid.',
-      options: {
-        layout: 'radio',
-        list: [CTA_ALIGNMENT.LEFT, CTA_ALIGNMENT.RIGHT].map((value) => ({
-          title: toTitleCase(value),
-          value,
-        })),
+    ...defineAlignmentFields([
+      {
+        name: 'contentPositionSplit',
+        title: 'Content Position',
+        description:
+          'Where the content sits relative to the image, on this variant’s grid.',
+        allow: [CTA_ALIGNMENT.LEFT, CTA_ALIGNMENT.RIGHT],
+        initialValue: CTA_ALIGNMENT.LEFT,
+        hidden: isNotSplitVariant,
       },
-      initialValue: CTA_ALIGNMENT.LEFT,
-      hidden: isNotSplitVariant,
-    }),
-    defineField({
-      name: 'contentPositionBanner',
-      title: 'Content Position',
-      type: 'string',
-      description:
-        'Where the content sits relative to the image, over the full-bleed background.',
-      options: {
-        layout: 'radio',
-        list: [
-          CTA_ALIGNMENT.LEFT,
-          CTA_ALIGNMENT.CENTER,
-          CTA_ALIGNMENT.RIGHT,
-        ].map((value) => ({
-          title: toTitleCase(value),
-          value,
-        })),
+      {
+        name: 'contentPositionBanner',
+        title: 'Content Position',
+        description:
+          'Where the content sits relative to the image, over the full-bleed background.',
+        allow: [CTA_ALIGNMENT.LEFT, CTA_ALIGNMENT.CENTER, CTA_ALIGNMENT.RIGHT],
+        initialValue: CTA_ALIGNMENT.LEFT,
+        hidden: isNotBannerVariant,
       },
-      initialValue: CTA_ALIGNMENT.LEFT,
-      hidden: isNotBannerVariant,
-    }),
-    defineField({
-      name: 'contentAlignment',
-      title: 'Content Alignment',
-      type: 'string',
-      description: 'How text and actions align inside the content block.',
-      options: {
-        layout: 'radio',
-        list: Object.values(CTA_ALIGNMENT).map((value) => ({
-          title: toTitleCase(value),
-          value,
-        })),
-      },
-    }),
+    ]),
     defineField({
       name: 'mobileMediaOrder',
       title: 'Mobile Media Order',
