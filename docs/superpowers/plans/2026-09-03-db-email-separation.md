@@ -639,6 +639,10 @@ In both workflows, remove `RESEND_API_KEY` from the step env and add `ADMIN_APP_
 
 `SPEC.md` §4's `@blog/email` row and `.claude/agents/email.md` both justify the package's "upstream is `utils` only" position by naming `@blog/db`'s CLI scripts as consumers. That is no longer true. Correct both to cite `@blog/auth` (which still consumes the package and sits above `db`) as the binding constraint. Also update `CLAUDE.md`'s carve-out list, which names these scripts as `@blog/insight` importers — that part stays true, so change only the email claim.
 
+**Four files carry this claim, not three.** `docs/context/claude-code.md`'s `email` agent description repeats it verbatim, and `CLAUDE.md`'s own docs-sync rule requires that file to be updated in the same PR as any `.claude/agents/*` change. It is easy to miss because the other three sit together in the layer-contract prose while this one sits in the agent roster.
+
+Leave `.claude/agents/email.md`'s opening paragraph alone: it says email _used to_ live in `packages/db`'s CLI scripts before the package existed, which is history and stays true.
+
 - [ ] **Step 5: Full verification**
 
 ```bash

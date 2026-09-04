@@ -651,7 +651,7 @@ dispatch can point it at `development`.
 - [ ] (Optional) Secret `OPERATOR_ALERT_SECRET` — paired with
       `ADMIN_APP_BASE_URL` above, this is what lets
       `recheck-tenant-owners.yml` and `validate-tenant-documents.yml` report
-      an operator alert. Neither workflow sends email itself: it POSTs the
+      an operator alert. Neither workflow sends email itself: each POSTs the
       bare facts (tenant id, outcome or invalid-document count) to
       `apps/platform`'s `/api/internal/operator-alert`, and that app resolves
       the superadmin recipients and sends. It is the bearer token that
