@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, CTA_IMAGE_SIDE, CTA_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, CTA_ALIGNMENT, CTA_VARIANT } from '@blog/config';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 
@@ -128,10 +128,10 @@ describe(`<${CtaModule.name}/>`, () => {
     ).toBeTruthy();
   });
 
-  it('places the image after the heading in the DOM for Split with imageSide LEFT', () => {
+  it('places the image after the heading in the DOM for Split with contentPosition RIGHT', () => {
     setup({
       variant: CTA_VARIANT.SPLIT,
-      imageSide: CTA_IMAGE_SIDE.LEFT,
+      contentPosition: CTA_ALIGNMENT.RIGHT,
       image: <img src="/cta.jpg" alt="" data-testid="cta-image" />,
     });
 
@@ -163,5 +163,70 @@ describe(`<${CtaModule.name}/>`, () => {
       expect(screen.getByRole('heading')).toBeVisible();
       unmount();
     }
+  });
+
+  it('applies contentPosition and contentAlignment independently on Split', () => {
+    setup({
+      variant: CTA_VARIANT.SPLIT,
+      contentPosition: CTA_ALIGNMENT.RIGHT,
+      contentAlignment: CTA_ALIGNMENT.LEFT,
+      dataTestId: 'cta-module',
+    });
+
+    const root = screen.getByTestId('cta-module');
+    const body = screen.getByRole('heading').parentElement;
+
+    expect(body).toHaveClass('md:order-2');
+    expect(root).toHaveClass('text-left');
+    expect(root).not.toHaveClass('text-right');
+  });
+
+  it('applies contentPosition and contentAlignment independently on Banner', () => {
+    setup({
+      variant: CTA_VARIANT.BANNER,
+      contentPosition: CTA_ALIGNMENT.LEFT,
+      contentAlignment: CTA_ALIGNMENT.RIGHT,
+      dataTestId: 'cta-module',
+    });
+
+    const root = screen.getByTestId('cta-module');
+
+    expect(root).toHaveClass('items-start');
+    expect(root).toHaveClass('text-right');
+    expect(root).not.toHaveClass('items-end');
+  });
+
+  it('keeps a centered Callout list left-aligned so markers stay attached to their text', () => {
+    setup({
+      variant: CTA_VARIANT.CALLOUT,
+      contentAlignment: CTA_ALIGNMENT.CENTER,
+      content: (
+        <ul>
+          <li>{faker.lorem.words(3)}</li>
+          <li>{faker.lorem.words(3)}</li>
+        </ul>
+      ),
+    });
+
+    const list = screen.getByRole('list');
+
+    expect(list.parentElement).toHaveClass('[&_ul]:inline-block');
+    expect(list.parentElement).toHaveClass('[&_ul]:text-left');
+  });
+
+  it('does not force inline-block lists on a left-aligned Callout', () => {
+    setup({
+      variant: CTA_VARIANT.CALLOUT,
+      contentAlignment: CTA_ALIGNMENT.LEFT,
+      content: (
+        <ul>
+          <li>{faker.lorem.words(3)}</li>
+        </ul>
+      ),
+    });
+
+    const list = screen.getByRole('list');
+
+    expect(list.parentElement).not.toHaveClass('[&_ul]:inline-block');
   });
 });
