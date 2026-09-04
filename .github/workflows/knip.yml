@@ -5,10 +5,11 @@ on:
   # almost never created by editing the file that dies: deleting the last
   # import of a module is what orphans it, so filtering on the orphan's own
   # path would miss exactly the change that caused it. Keeping every PR in
-  # scope also means no rework when this is promoted to a required check,
-  # where a path-skipped run would sit "Pending" forever.
+  # scope also matters because Knip is a required status check: a run skipped
+  # by a path filter would sit "Pending" forever. No base-branch filter
+  # either, for the reason ci.yml spells out: a PR based on anything but
+  # `main` would otherwise skip this check entirely.
   pull_request:
-    branches: [main]
 
 permissions:
   contents: read

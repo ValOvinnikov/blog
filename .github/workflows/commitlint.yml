@@ -1,12 +1,11 @@
 name: Commitlint
 
 on:
-  # No path filter on purpose — same reasoning as ci.yml / actionlint.yml: a
-  # workflow skipped by path filtering leaves any required status check
-  # "Pending" forever, and every PR carries commits that need checking
-  # regardless of what files changed.
+  # No path filter and no base-branch filter, on purpose — same reasoning as
+  # ci.yml / actionlint.yml: a workflow skipped by either leaves any required
+  # status check "Pending" forever, and every PR carries commits that need
+  # checking regardless of what files changed or what branch it is based on.
   pull_request:
-    branches: [main]
 
 permissions:
   contents: read

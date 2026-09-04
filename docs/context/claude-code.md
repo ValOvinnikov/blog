@@ -572,24 +572,19 @@ file` are all denied alike) — an earlier version only handled the
   alone, since the intermediate states target their predecessor rather than
   `main`.
 
-  **The one thing to know before using it:** a PR that targets anything other
-  than `main` receives **no CI**. Every required workflow declares
-  `pull_request: branches: [main]` independently — `ci.yml` plus `knip.yml`,
-  `dependency-review.yml`, `zizmor.yml`, `actionlint.yml`, `commitlint.yml`
-  and `hooks.yml` — so none of Type-check, Lint, Test, Build, Typegen,
-  Migrations, Knip, Dependency Review, Zizmor, Actionlint, Commitlint or
-  Shellcheck + guard tests ever runs. Only `pr-opened` and the Vercel checks
-  report, which is just enough output to look normal. Those jobs are required
-  status checks, so the PR blocks indefinitely. (CodeQL is not among them —
-  it runs from GitHub's default code-scanning setup on a schedule, not from a
-  workflow file, and is enforced by a separate `code_scanning` ruleset rule
-  rather than as a required status check.) When the base merges, GitHub retargets the PR to
-  `main` but that fires a `pull_request` `edited` event, which the workflow
-  does not listen for, so still nothing runs. Closing and reopening the PR
-  fires `reopened` and produces a real run; confirm by counting checks
-  (roughly 5 means the stale run, roughly 20 means a real one). Note this is
-  the same deadlock `ci.yml`'s header comment says it deliberately avoids by
-  refusing to use `paths-ignore` — the base-branch filter reintroduces it
-  through a different door.
+  A PR receives the full required suite whatever branch it targets. The seven
+  workflows behind the twelve required checks — `ci.yml` (Type-check, Lint,
+  Test, Build, Typegen, Migrations) plus `knip.yml`, `dependency-review.yml`,
+  `zizmor.yml`, `actionlint.yml`, `commitlint.yml` and `hooks.yml` (one each)
+  — each declare a bare `pull_request:` trigger with no `branches:` filter,
+  which is what makes stacking usable. Keep it that way: each file scopes its
+  own trigger, so re-adding `branches: [main]` to any one of them drops that
+  workflow's checks from every stacked PR, and because these are _required_
+  checks the PR then hangs on `BLOCKED` rather than failing. That is the same
+  deadlock `ci.yml`'s header comment describes when explaining why it carries
+  no `paths-ignore`. (CodeQL is not among the twelve — it runs from GitHub's
+  default code-scanning setup on a schedule, not from a workflow file, and is
+  enforced by a separate `code_scanning` ruleset rule rather than as a
+  required status check.)
 
 - **`CLAUDE.md`** — repo-wide guidance loaded into every session.
