@@ -136,12 +136,10 @@ const provisionEnv = {
   githubServerUrl: undefined,
   githubActor: undefined,
   tenantRegistryEnvironment: undefined,
-  resendApiKey: 'resend-key',
 };
 
 const recheckEnv = {
   sanityManagementToken: 'sanity-token',
-  resendApiKey: 'resend-key',
 };
 
 beforeAll(async () => {

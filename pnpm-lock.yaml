@@ -540,9 +540,6 @@ importers:
       '@blog/config':
         specifier: workspace:*
         version: link:../config
-      '@blog/email':
-        specifier: workspace:*
-        version: link:../email
       '@blog/insight':
         specifier: workspace:*
         version: link:../insight
@@ -561,9 +558,6 @@ importers:
       drizzle-orm:
         specifier: ^0.45.2
         version: 0.45.2(@electric-sql/pglite@0.5.4)(@neondatabase/serverless@1.1.0)
-      resend:
-        specifier: ^6.18.1
-        version: 6.18.1
       server-only:
         specifier: ^0.0.1
         version: 0.0.1

@@ -52,8 +52,8 @@ contracts:
   - `email` owns `packages/email` (`@blog/email`) — the single home for every
     email the product sends: the shared branded HTML shell, the canonical
     `escapeHtml`, and the typed `sendEmail` Resend transport. It sits low in
-    the graph (`@blog/utils` only) so both apps, `@blog/auth` and `@blog/db`'s
-    CLI scripts can all consume it without a cycle, and it is side-effecting by
+    the graph (`@blog/utils` only) so both apps and `@blog/auth` can all
+    consume it without a cycle, and it is side-effecting by
     design — it owns the send call — while never logging and never resolving
     tenants or fetching content itself. Its own agent exists because HTML email
     inverts normal front-end instincts (inlined styles only, table layout, no

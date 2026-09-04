@@ -46,8 +46,6 @@ vi.mock('./lib/notify-operators', () => ({
   notifyOperatorsOfDocumentValidationFailure: notifyMock,
 }));
 
-const env = { resendApiKey: 'resend-key' };
-
 function tenant(id: string, name: string): TTenant {
   return {
     id,
@@ -107,7 +105,7 @@ beforeEach(() => {
 
 describe(runValidation, () => {
   it('is a clean no-op when there are no in-scope tenants', async () => {
-    const summary = await runValidation(env);
+    const summary = await runValidation();
 
     expect(summary).toEqual({
       checked: 0,
@@ -145,7 +143,7 @@ describe(runValidation, () => {
         },
       ]);
 
-    const summary = await runValidation(env);
+    const summary = await runValidation();
 
     expect(summary).toEqual({
       checked: 3,
@@ -163,7 +161,7 @@ describe(runValidation, () => {
     ]);
     getTenantSanityCredentialsMock.mockResolvedValue(undefined);
 
-    const summary = await runValidation(env);
+    const summary = await runValidation();
 
     expect(summary).toEqual({
       checked: 1,
@@ -185,7 +183,7 @@ describe(runValidation, () => {
       status: TENANT_STATUS.SUSPENDED,
     });
 
-    const summary = await runValidation(env);
+    const summary = await runValidation();
 
     expect(summary).toEqual({
       checked: 1,
@@ -207,7 +205,7 @@ describe(runValidation, () => {
       deprovisionedAt: new Date('2026-01-02T00:00:00.000Z'),
     });
 
-    const summary = await runValidation(env);
+    const summary = await runValidation();
 
     expect(summary).toEqual({
       checked: 1,
@@ -234,7 +232,7 @@ describe(runValidation, () => {
       })
       .mockReturnValueOnce([]);
 
-    const summary = await runValidation(env);
+    const summary = await runValidation();
 
     expect(summary).toEqual({
       checked: 3,
@@ -261,7 +259,7 @@ describe(runValidation, () => {
       },
     ]);
 
-    await runValidation(env);
+    await runValidation();
 
     expect(openFindingMock).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -294,7 +292,7 @@ describe(runValidation, () => {
         data: { finding: { id: 'f2' }, isNewlyOpened: false },
       });
 
-    await runValidation(env);
+    await runValidation();
 
     expect(notifyMock).toHaveBeenCalledTimes(1);
   });
@@ -314,7 +312,7 @@ describe(runValidation, () => {
       },
     ]);
 
-    await runValidation(env);
+    await runValidation();
 
     expect(resolveFindingMock).toHaveBeenCalledWith('finding-1');
   });
@@ -334,7 +332,7 @@ describe(runValidation, () => {
       },
     ]);
 
-    await runValidation(env);
+    await runValidation();
 
     expect(resolveFindingMock).not.toHaveBeenCalled();
   });
@@ -345,7 +343,7 @@ describe(runValidationForTenant, () => {
     getTenantByIdMock.mockResolvedValue(tenant('t1', 'acme'));
     validateTenantDocumentsMock.mockReturnValue([]);
 
-    const summary = await runValidationForTenant('t1', env);
+    const summary = await runValidationForTenant('t1');
 
     expect(summary.checked).toBe(1);
     expect(getTenantByIdMock).toHaveBeenCalledWith('t1');
@@ -355,7 +353,7 @@ describe(runValidationForTenant, () => {
   it('returns an empty summary when the tenant id does not resolve', async () => {
     getTenantByIdMock.mockResolvedValue(undefined);
 
-    const summary = await runValidationForTenant('missing', env);
+    const summary = await runValidationForTenant('missing');
 
     expect(summary.checked).toBe(0);
     expect(validateTenantDocumentsMock).not.toHaveBeenCalled();

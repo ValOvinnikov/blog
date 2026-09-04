@@ -60,14 +60,12 @@ describe(notifyOwnerElevationOutcome, () => {
     const result = await notifyOwnerElevationOutcome({
       tenant: tenant({ lastNotifiedOwnerElevationOutcome: null }),
       outcome: 'STALLED',
-      resendApiKey: 'resend-key',
     });
 
     expect(notifyOperatorsOfOwnerElevationOutcomeMock).toHaveBeenCalledTimes(1);
     expect(notifyOperatorsOfOwnerElevationOutcomeMock).toHaveBeenCalledWith({
       tenant: expect.objectContaining({ id: 't1' }),
       outcome: 'STALLED',
-      resendApiKey: 'resend-key',
     });
     expect(result).toBe('STALLED');
   });
@@ -76,7 +74,6 @@ describe(notifyOwnerElevationOutcome, () => {
     const result = await notifyOwnerElevationOutcome({
       tenant: tenant({ lastNotifiedOwnerElevationOutcome: 'STALLED' }),
       outcome: 'STALLED',
-      resendApiKey: 'resend-key',
     });
 
     expect(notifyOperatorsOfOwnerElevationOutcomeMock).not.toHaveBeenCalled();
@@ -87,7 +84,6 @@ describe(notifyOwnerElevationOutcome, () => {
     const result = await notifyOwnerElevationOutcome({
       tenant: tenant({ lastNotifiedOwnerElevationOutcome: 'STALLED' }),
       outcome: 'AMBIGUOUS_MEMBERSHIP',
-      resendApiKey: 'resend-key',
     });
 
     expect(notifyOperatorsOfOwnerElevationOutcomeMock).toHaveBeenCalledTimes(1);
@@ -100,7 +96,6 @@ describe(notifyOwnerElevationOutcome, () => {
       const result = await notifyOwnerElevationOutcome({
         tenant: tenant(),
         outcome,
-        resendApiKey: 'resend-key',
       });
 
       expect(notifyOperatorsOfOwnerElevationOutcomeMock).not.toHaveBeenCalled();

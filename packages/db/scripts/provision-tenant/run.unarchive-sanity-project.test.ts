@@ -95,7 +95,6 @@ const env = {
   tenantSanityDataset: 'test-dataset',
   webAppBaseUrl: 'https://example.com',
   revalidateSecret: 'revalidate-shh',
-  resendApiKey: undefined,
 };
 
 beforeEach(() => {

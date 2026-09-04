@@ -9,7 +9,6 @@ import {
 export type TNotifyOwnerElevationOutcomeParams = {
   tenant: TTenant;
   outcome: TElevateTenantOwnerOutcome;
-  resendApiKey: string | undefined;
 };
 
 /**
@@ -27,7 +26,6 @@ export type TNotifyOwnerElevationOutcomeParams = {
 export async function notifyOwnerElevationOutcome({
   tenant,
   outcome,
-  resendApiKey,
 }: TNotifyOwnerElevationOutcomeParams): Promise<
   TElevateTenantOwnerOutcome | undefined
 > {
@@ -41,7 +39,6 @@ export async function notifyOwnerElevationOutcome({
   await notifyOperatorsOfOwnerElevationOutcome({
     tenant,
     outcome,
-    resendApiKey,
   });
 
   return outcome;

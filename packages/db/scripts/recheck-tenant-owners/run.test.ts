@@ -33,7 +33,6 @@ vi.mock('../provision-tenant/steps/elevate-tenant-owner', () => ({
 
 const env = {
   sanityManagementToken: 'sanity-token',
-  resendApiKey: 'resend-key',
 };
 
 function tenant(id: string, name: string): TTenant {
@@ -192,7 +191,6 @@ describe(runRecheck, () => {
     expect(notifyOwnerElevationOutcomeMock).toHaveBeenCalledWith({
       tenant: tenants[0],
       outcome: 'STALLED',
-      resendApiKey: 'resend-key',
     });
   });
 
@@ -207,7 +205,6 @@ describe(runRecheck, () => {
     expect(notifyOwnerElevationOutcomeMock).toHaveBeenCalledWith({
       tenant: tenants[0],
       outcome: 'ELEVATED',
-      resendApiKey: 'resend-key',
     });
   });
 });

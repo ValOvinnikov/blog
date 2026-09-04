@@ -478,7 +478,7 @@ git commit -m "feat(platform): add the internal operator-alert endpoint"
 **Interfaces:**
 
 - Consumes: `TOperatorAlertBody` and `OPERATOR_ALERT_KIND` from `@blog/config/constants` (Task 3). `@blog/db` already depends on `@blog/config`, so no dependency changes.
-- Produces: `postOperatorAlert(body: TOperatorAlertBody): Promise<void>` — reads `PLATFORM_APP_URL` and `OPERATOR_ALERT_SECRET`, POSTs, **never throws**.
+- Produces: `postOperatorAlert(body: TOperatorAlertBody): Promise<void>` — reads `ADMIN_APP_BASE_URL` and `OPERATOR_ALERT_SECRET`, POSTs, **never throws**.
 
 Note `packages/db/scripts/lib/` is a new directory — every existing script keeps its own private `lib/`, and this is the first module shared across two of them. Confirm `packages/db`'s tsconfig/vitest alias resolves it before writing the test.
 
@@ -602,7 +602,15 @@ git commit -m "refactor(db): post document-validation alerts to the platform"
 
 - Modify: `packages/db/package.json` (remove `resend` and `@blog/email`)
 - Modify: `knip.json` (remove the now-obsolete `@blog/email` ignore for `packages/db`)
-- Modify: `turbo.json` (declare `PLATFORM_APP_URL`, `OPERATOR_ALERT_SECRET`)
+- Do **not** modify `turbo.json`. Neither variable belongs in its build `env`
+  allowlist on account of this task: `packages/db`'s scripts are `tsx` entry
+  points invoked directly (`pnpm --filter @blog/db <script>`), never through
+  `turbo run`, and `@blog/db` has no `build` task at all, so turbo's strict-env
+  stripping never applies to them. `check-turbo-env-sync.mjs` only asserts that
+  vars declared via `createEnv()` in an app's own `env.ts` appear in the
+  allowlist, and neither variable is declared that way here.
+  `OPERATOR_ALERT_SECRET` does belong there — but because `apps/platform`
+  declares it, which is the endpoint task's change, not this one's.
 - Modify: `.github/workflows/recheck-tenant-owners.yml`
 - Modify: `.github/workflows/validate-tenant-documents.yml`
 - Modify: `.github/workflows/provision-tenant.yml` (it `workflow_call`s validate-tenant-documents)
@@ -625,11 +633,15 @@ Expected: no output. If `RESEND_API_KEY` still appears in a script's env reader,
 
 - [ ] **Step 3: Swap the workflow env**
 
-In both workflows, remove `RESEND_API_KEY` from the step env and add `PLATFORM_APP_URL` and `OPERATOR_ALERT_SECRET`. Pass secrets via `env:`, never interpolated into `run:` — the same rule `.github/actions/setup/action.yml` follows for `install-filter`.
+In both workflows, remove `RESEND_API_KEY` from the step env and add `ADMIN_APP_BASE_URL` and `OPERATOR_ALERT_SECRET`. Pass secrets via `env:`, never interpolated into `run:` — the same rule `.github/actions/setup/action.yml` follows for `install-filter`.
 
 - [ ] **Step 4: Update the prose that names `db` as an email sender**
 
 `SPEC.md` §4's `@blog/email` row and `.claude/agents/email.md` both justify the package's "upstream is `utils` only" position by naming `@blog/db`'s CLI scripts as consumers. That is no longer true. Correct both to cite `@blog/auth` (which still consumes the package and sits above `db`) as the binding constraint. Also update `CLAUDE.md`'s carve-out list, which names these scripts as `@blog/insight` importers — that part stays true, so change only the email claim.
+
+**Four files carry this claim, not three.** `docs/context/claude-code.md`'s `email` agent description repeats it verbatim, and `CLAUDE.md`'s own docs-sync rule requires that file to be updated in the same PR as any `.claude/agents/*` change. It is easy to miss because the other three sit together in the layer-contract prose while this one sits in the agent roster.
+
+Leave `.claude/agents/email.md`'s opening paragraph alone: it says email _used to_ live in `packages/db`'s CLI scripts before the package existed, which is history and stays true.
 
 - [ ] **Step 5: Full verification**
 
