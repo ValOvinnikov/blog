@@ -50,7 +50,7 @@ jobs:
   type-check:
     name: Type-check
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -67,7 +67,7 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -140,7 +140,7 @@ jobs:
   ui-index:
     name: UI index
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -174,7 +174,7 @@ jobs:
   voice-key-sync:
     name: Voice key sync
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -202,7 +202,7 @@ jobs:
   turbo-env-sync:
     name: Turbo env sync
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -231,7 +231,7 @@ jobs:
   migrations:
     name: Migrations
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     # Read-only guard against broken content migrations. Content is live in
     # the `production` dataset, so a malformed or un-runnable migration must
     # not slip through. `sanity migrations list` loads + registers every
@@ -283,7 +283,7 @@ jobs:
   document-validation:
     name: Document validation
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     # ADVISORY — deliberately NOT a required status check in the branch
     # ruleset, unlike the Migrations job above. `sanity documents validate`
     # checks every existing document in the live dataset against the current

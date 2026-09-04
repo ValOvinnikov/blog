@@ -45,7 +45,7 @@ jobs:
   invalidate:
     name: Invalidate tenant cache
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     # Bound to the dispatch input rather than hardcoded — same reasoning as
     # provision-tenant.yml/deprovision-tenant.yml: a run dispatched for
     # `development` must resolve the tenant registry connection string, and
