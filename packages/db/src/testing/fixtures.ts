@@ -7,9 +7,10 @@ import type { PgliteDatabase } from 'drizzle-orm/pglite';
 export type TTestDb = PgliteDatabase<typeof schema>;
 
 // Seeds one `tenants` row against the given `createTestDb()` instance for a
-// test's `beforeEach`/setup — `name`/`primaryDomain` default to a fresh
-// random value so unrelated tests never collide; pass any `tenants` column
-// to override a default.
+// test's `beforeEach`/setup — `name`/`primaryDomain`/`sanityProjectId`
+// (unique-indexed) each default to a fresh random value so unrelated tests
+// never collide; pass any `tenants` column to override a default, or
+// `sanityProjectId: null` for a still-provisioning tenant.
 export async function insertTestTenant(
   db: TTestDb,
   overrides: Partial<typeof schema.tenants.$inferInsert> = {},
@@ -21,7 +22,7 @@ export async function insertTestTenant(
     .values({
       name: key,
       primaryDomain: `${key}.example.com`,
-      sanityProjectId: 'abc123',
+      sanityProjectId: `sanity-${crypto.randomUUID()}`,
       sanityDataset: 'production',
       locale: 'en',
       plan: TENANT_PLAN.FREE,

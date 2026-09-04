@@ -67,8 +67,10 @@ export const tenants = pgTable('tenants', {
   primaryDomain: text('primary_domain').notNull(),
   // Nullable: null until provisioning step 1 (Create Sanity project) creates
   // the project and fills these in — a draft tenant genuinely has neither
-  // yet, not a value standing in for one.
-  sanityProjectId: text('sanity_project_id'),
+  // yet, not a value standing in for one. Unique so a Sanity project can
+  // only ever back one tenant row; nullable and unique coexist fine since
+  // Postgres allows multiple NULLs under a unique index.
+  sanityProjectId: text('sanity_project_id').unique(),
   sanityDataset: text('sanity_dataset'),
   // Sanity read token for this tenant's project, AES-256-GCM encrypted
   // (`@blog/utils`'s encryptSecret) with TENANT_TOKEN_ENCRYPTION_KEY.
