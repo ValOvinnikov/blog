@@ -1,6 +1,9 @@
-import { BRAND_VARIANT, HERO_FIELD_MODE } from '@blog/config/constants';
+import { HERO_FIELD_MODE } from '@blog/config/constants';
 import { postSchema } from '@blog/studio/schema-types/documents/blog/post';
-import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
+import {
+  brandVariantField,
+  FULL_BRAND_VARIANT_LIST,
+} from '@blog/studio/schema-types/helpers/brand-variant-field';
 import { defineModeFieldPair } from '@blog/studio/schema-types/helpers/define-mode-field-pair';
 import { heroLayoutField } from '@blog/studio/schema-types/helpers/layout-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
@@ -15,13 +18,7 @@ export const heroSchema = defineType({
   icon: Sparkles,
   fields: [
     titleField(),
-    brandVariantField({
-      list: [
-        BRAND_VARIANT.BRAND_PRIMARY,
-        BRAND_VARIANT.PRIMARY,
-        BRAND_VARIANT.SECONDARY,
-      ],
-    }),
+    brandVariantField({ list: FULL_BRAND_VARIANT_LIST }),
     defineField({
       name: 'featuredPost',
       title: 'Featured Post',

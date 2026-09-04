@@ -1,5 +1,7 @@
-import { BRAND_VARIANT } from '@blog/config/constants';
-import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
+import {
+  brandVariantField,
+  FULL_BRAND_VARIANT_LIST,
+} from '@blog/studio/schema-types/helpers/brand-variant-field';
 import { layoutField } from '@blog/studio/schema-types/helpers/layout-field';
 import { sectionHeaderField } from '@blog/studio/schema-types/helpers/section-header-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
@@ -13,13 +15,7 @@ export const postListSchema = defineType({
   icon: List,
   fields: [
     titleField(),
-    brandVariantField({
-      list: [
-        BRAND_VARIANT.BRAND_PRIMARY,
-        BRAND_VARIANT.PRIMARY,
-        BRAND_VARIANT.SECONDARY,
-      ],
-    }),
+    brandVariantField({ list: FULL_BRAND_VARIANT_LIST }),
     sectionHeaderField(),
     defineField({
       name: 'pageSize',

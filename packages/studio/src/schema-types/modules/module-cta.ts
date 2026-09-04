@@ -5,7 +5,10 @@ import {
   CTA_VARIANT,
 } from '@blog/config/constants';
 import { actionGroupField } from '@blog/studio/schema-types/helpers/action-group-field';
-import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
+import {
+  brandVariantField,
+  FULL_BRAND_VARIANT_LIST,
+} from '@blog/studio/schema-types/helpers/brand-variant-field';
 import { layoutField } from '@blog/studio/schema-types/helpers/layout-field';
 import { sectionHeaderField } from '@blog/studio/schema-types/helpers/section-header-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
@@ -25,12 +28,6 @@ const isSplitVariant = ({ parent }: { parent?: unknown }) =>
 
 const isBannerVariant = ({ parent }: { parent?: unknown }) =>
   isVariant(parent, CTA_VARIANT.BANNER);
-
-const CTA_BRAND_VARIANT_LIST = [
-  BRAND_VARIANT.BRAND_PRIMARY,
-  BRAND_VARIANT.PRIMARY,
-  BRAND_VARIANT.SECONDARY,
-];
 
 export const ctaSchema = defineType({
   name: 'module_cta',
@@ -54,7 +51,7 @@ export const ctaSchema = defineType({
       validation: (rule) => rule.required(),
     }),
     brandVariantField({
-      list: CTA_BRAND_VARIANT_LIST,
+      list: FULL_BRAND_VARIANT_LIST,
       description:
         'On this module: the card fill for Split/Callout, or the overlay tint for Banner — not the full-bleed band tone every other module uses this field for.',
       initialValue: BRAND_VARIANT.SECONDARY,
@@ -66,7 +63,7 @@ export const ctaSchema = defineType({
       description:
         'Background tone for the full-bleed section band behind the CTA card — distinct from Brand Variant, which is the card’s own fill or overlay.',
       options: {
-        list: CTA_BRAND_VARIANT_LIST.map((value) => ({
+        list: FULL_BRAND_VARIANT_LIST.map((value) => ({
           title: toTitleCase(value),
           value,
         })),
