@@ -40,9 +40,15 @@ const { createTenantRevalidateWebhookMock } = vi.hoisted(() => ({
 const { elevateTenantOwnerMock } = vi.hoisted(() => ({
   elevateTenantOwnerMock: vi.fn(),
 }));
+const { seedEmailTemplateDefaultsMock } = vi.hoisted(() => ({
+  seedEmailTemplateDefaultsMock: vi.fn(),
+}));
 
 vi.mock('@blog/db/queries/tenants', () => ({
   reactivateTenant: reactivateTenantMock,
+}));
+vi.mock('@blog/db/queries/email-templates', () => ({
+  seedEmailTemplateDefaults: seedEmailTemplateDefaultsMock,
 }));
 vi.mock('./lib/report-step-status', () => ({
   reportStepStatus: reportStepStatusMock,
@@ -128,6 +134,7 @@ beforeEach(() => {
   mapTenantDomainMock.mockReset().mockResolvedValue(undefined);
   createTenantRevalidateWebhookMock.mockReset().mockResolvedValue(undefined);
   elevateTenantOwnerMock.mockReset().mockResolvedValue('PENDING_ACCEPTANCE');
+  seedEmailTemplateDefaultsMock.mockReset().mockResolvedValue(undefined);
 });
 
 afterEach(() => {

@@ -17,6 +17,7 @@
     "db:invalidate-tenant-cache": "tsx --conditions=react-server scripts/invalidate-tenant-cache/run.ts",
     "db:recheck-tenant-owners": "tsx --conditions=react-server scripts/recheck-tenant-owners/run.ts",
     "db:recover-wedged-provisioning": "tsx --conditions=react-server scripts/recover-wedged-provisioning.ts",
+    "db:backfill-email-template-defaults": "tsx --conditions=react-server scripts/backfill-email-template-defaults.ts",
     "db:validate-tenant-documents": "tsx --conditions=react-server scripts/validate-tenant-documents/run.ts",
     "db:migrate-tenant-content": "tsx --conditions=react-server scripts/migrate-tenant-content/run.ts",
     "lint": "eslint .",

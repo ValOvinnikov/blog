@@ -45,9 +45,15 @@ const { elevateTenantOwnerMock } = vi.hoisted(() => ({
 const { notifyOwnerElevationOutcomeMock } = vi.hoisted(() => ({
   notifyOwnerElevationOutcomeMock: vi.fn(),
 }));
+const { seedEmailTemplateDefaultsMock } = vi.hoisted(() => ({
+  seedEmailTemplateDefaultsMock: vi.fn(),
+}));
 
 vi.mock('@blog/db/queries/tenants', () => ({
   reactivateTenant: reactivateTenantMock,
+}));
+vi.mock('@blog/db/queries/email-templates', () => ({
+  seedEmailTemplateDefaults: seedEmailTemplateDefaultsMock,
 }));
 vi.mock(
   '@blog/db/utils/sanity-management-client/sanity-management-client',
@@ -124,6 +130,7 @@ beforeEach(() => {
   createTenantRevalidateWebhookMock.mockReset().mockResolvedValue(undefined);
   elevateTenantOwnerMock.mockReset().mockResolvedValue('PENDING_ACCEPTANCE');
   notifyOwnerElevationOutcomeMock.mockReset().mockResolvedValue(undefined);
+  seedEmailTemplateDefaultsMock.mockReset().mockResolvedValue(undefined);
 });
 
 describe(runSteps, () => {
@@ -313,6 +320,24 @@ describe(runSteps, () => {
     expect(result).toEqual({ ok: false });
     expect(createTenantSanityProjectMock).not.toHaveBeenCalled();
     expect(reportStepStatusMock).not.toHaveBeenCalled();
+  });
+
+  it('seeds default email-template copy once every core step succeeds', async () => {
+    createTenantSanityProjectMock.mockResolvedValue({});
+
+    const result = await runSteps('tenant-1', env);
+
+    expect(result).toEqual({ ok: true });
+    expect(seedEmailTemplateDefaultsMock).toHaveBeenCalledWith('tenant-1');
+  });
+
+  it('never seeds email-template copy when an earlier step fails', async () => {
+    createTenantSanityProjectMock.mockResolvedValue({});
+    seedTenantContentMock.mockRejectedValue(new Error('seed failed'));
+
+    await runSteps('tenant-1', env);
+
+    expect(seedEmailTemplateDefaultsMock).not.toHaveBeenCalled();
   });
 
   it('elevates the tenant owner once every core step succeeds', async () => {
