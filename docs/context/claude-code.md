@@ -150,8 +150,15 @@ contracts:
     equivalent) is unreachable there whatever the token carries; that is
     reported as outstanding board work rather than misdiagnosed as a missing
     scope, and the MCP-backed half of the dispatch — issue creation, labels,
-    milestones, sub-issue links — still completes. It also reports
-    destructive-looking moves (e.g.
+    milestones, sub-issue links — still completes. On a targeted
+    after-merge trigger it also sweeps orphaned `agent:*` labels — the
+    `agent:<job-id>` chip `open-pull-request` Gate 5 puts on every PR so
+    that concurrently running background jobs stay tellable apart in the
+    GitHub PR list — deleting only those no open PR still carries, so the
+    set stays bounded to live work. The prefix is filtered in `jq` rather
+    than via `gh label list --search`, which also matches descriptions and
+    would sweep in unrelated labels whose text mentions an agent. It also
+    reports destructive-looking moves (e.g.
     reopening a wrongly-closed issue) for the orchestrator instead of
     applying them. Dispatched to create any new issue, when starting work on
     an issue (`open-pull-request` Gate 0 — sets the issue itself to In
@@ -531,6 +538,14 @@ file` are all denied alike) — an earlier version only handled the
     meets the solo-cloud-session criteria. No fixed cadence — run whenever
     asked, naming the layer.
   - `open-pull-request` — branch → work → PR with human-gated push/PR steps.
+    Gate 5 also tags the PR `agent:<job-id>`, using the job id from
+    `$CLAUDE_JOB_DIR` with the job's name as the label description, so
+    parallel background jobs are distinguishable at a glance in the GitHub
+    PR list; a foreground session has no job id and skips it silently. The
+    step is scoped to local orchestrator sessions only — a solo cloud
+    session opens no PR from here and ships without `gh`, so it is carved
+    out explicitly rather than left to fail, alongside the board writes it
+    already cannot make.
   - `use-context7` — fetch live, version-matched library docs before guessing.
   - Plugin skills (provisioned via `.claude/settings.json`, see below):
     `superpowers:systematic-debugging`, `superpowers:test-driven-development`,

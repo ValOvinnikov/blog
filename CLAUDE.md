@@ -729,7 +729,13 @@ gates, is unchanged.)
 6. **Ask to push** — explicit approval required; separate question; wait for answer
 7. **Ask to open PR** — separate question, after push; wait for answer.
    Once approved: run `gh pr create`, then **immediately** set the issue → Code Review
-   on the board — do not report the PR URL until the board update is done.
+   on the board, and tag the PR `agent:<job-id>` so concurrently running
+   background jobs stay tellable apart in the GitHub PR list
+   (`open-pull-request` Gate 5 — silently skipped in a foreground session,
+   which has no job id and no ambiguity to resolve, and not applicable to a
+   cloud session at all, which opens no PR from here; `board-keeper` deletes
+   the label once no open PR carries it) — do not report the PR URL until
+   the board update is done.
    Then dispatch `ci-watcher` (background) to watch CI to completion, and
    diagnose and fix any failure it reports (`open-pull-request` Gate 5a) — a
    fix push still needs its own fresh push-approval ask, same as any push.
@@ -903,6 +909,12 @@ replaced, and nothing else:
 - The delivery gate sequence's board writes (step 1's In Progress, step
   7's Code Review) are replaced by the evidence protocol below — cloud
   sessions cannot write the board at all.
+- Step 7's `agent:<job-id>` PR label does not apply either, and has no
+  substitute. It exists to tell **concurrent local background jobs** apart
+  in the PR list; a cloud session is not one of those, has no job id, and
+  ships without the `gh` binary the labelling uses. Do not reach for an MCP
+  or REST equivalent — an unlabelled PR is the correct outcome here, not a
+  gap to close.
 
 Everything else still applies — quality gates
 (`type-check`/`lint`/`test`), conventional commits, and the push/PR

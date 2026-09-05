@@ -11,14 +11,10 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 let db: PgliteDatabase<typeof schema>;
 
-async function insertTenant(
-  sanityProjectId: string | null,
-  createdAt?: Date,
-): Promise<string> {
+async function insertTenant(sanityProjectId: string | null): Promise<string> {
   const tenant = await insertTestTenant(db, {
     sanityProjectId,
     sanityDataset: sanityProjectId ? 'production' : null,
-    ...(createdAt ? { createdAt } : {}),
   });
   return tenant.id;
 }
@@ -60,12 +56,18 @@ describe(getTenantIdBySanityProjectId, () => {
     expect(result).toBeUndefined();
   });
 
-  it('deterministically resolves to the earliest-created match when more than one tenant shares a sanityProjectId', async () => {
-    const olderTenantId = await insertTenant('abc123', new Date('2026-01-01'));
-    await insertTenant('abc123', new Date('2026-02-01'));
+  it('rejects a second tenant sharing an already-used sanityProjectId', async () => {
+    await insertTenant('abc123');
+
+    await expect(insertTenant('abc123')).rejects.toThrow();
+  });
+
+  it('allows more than one tenant to have a null sanityProjectId', async () => {
+    await insertTenant(null);
+    await insertTenant(null);
 
     const result = await getTenantIdBySanityProjectId('abc123');
 
-    expect(result).toBe(olderTenantId);
+    expect(result).toBeUndefined();
   });
 });

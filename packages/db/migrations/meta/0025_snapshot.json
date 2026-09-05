@@ -1,5 +1,5 @@
 {
-  "id": "0675b85f-8c9d-4c5d-a77d-783b64c607e2",
+  "id": "d3d58730-9270-4987-81fd-dc80a050a55a",
   "prevId": "0e6e5dba-e273-4db1-ad8c-e82f85a32f65",
   "version": "7",
   "dialect": "postgresql",
@@ -449,158 +449,6 @@
         "bookmarks_tenant_id_user_id_post_id_pk": {
           "name": "bookmarks_tenant_id_user_id_post_id_pk",
           "columns": ["tenant_id", "user_id", "post_id"]
-        }
-      },
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.email_config": {
-      "name": "email_config",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "tenant_id": {
-          "name": "tenant_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "logo_asset_url": {
-          "name": "logo_asset_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "sender_name": {
-          "name": "sender_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "reply_to_address": {
-          "name": "reply_to_address",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "footer_postal_address": {
-          "name": "footer_postal_address",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "email_config_tenant_id_tenants_id_fk": {
-          "name": "email_config_tenant_id_tenants_id_fk",
-          "tableFrom": "email_config",
-          "tableTo": "tenants",
-          "columnsFrom": ["tenant_id"],
-          "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "email_config_tenant_id_unique": {
-          "name": "email_config_tenant_id_unique",
-          "nullsNotDistinct": false,
-          "columns": ["tenant_id"]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.email_templates": {
-      "name": "email_templates",
-      "schema": "",
-      "columns": {
-        "tenant_id": {
-          "name": "tenant_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "template_type": {
-          "name": "template_type",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "subject": {
-          "name": "subject",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "body": {
-          "name": "body",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "logo_asset_url": {
-          "name": "logo_asset_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "email_templates_tenant_id_tenants_id_fk": {
-          "name": "email_templates_tenant_id_tenants_id_fk",
-          "tableFrom": "email_templates",
-          "tableTo": "tenants",
-          "columnsFrom": ["tenant_id"],
-          "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "email_templates_tenant_id_template_type_pk": {
-          "name": "email_templates_tenant_id_template_type_pk",
-          "columns": ["tenant_id", "template_type"]
         }
       },
       "uniqueConstraints": {},
@@ -1370,7 +1218,13 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "tenants_sanity_project_id_unique": {
+          "name": "tenants_sanity_project_id_unique",
+          "nullsNotDistinct": false,
+          "columns": ["sanity_project_id"]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
