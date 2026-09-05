@@ -158,19 +158,20 @@ CI-enforced guard was deliberately not added.
   story (follow `ui-storybook` skill). Both are required, not optional.
 - New/changed `service` functions have a co-located `*.test.ts`.
 - Bug fixes include a regression test that failed before the fix.
-- **No presentation CSS-class assertions.** Flag any `toHaveClass` / `className`
-  `toContain` on a Tailwind/CSS utility whose job is only appearance (layout,
-  spacing, colour, border, background, typography, radius/shadow, icon size) —
-  **even when it toggles with a prop/variant**, since a purely-visual variant
-  belongs in Storybook + `no-tests-needed`, not a class assertion (see
-  `testing-practices` → "What not to test"). The only allowed class assertion
-  is one where the class is the sole observable of a genuine data/state-driven
-  behaviour (e.g. code-block line highlighting driven by input data), and even
-  then a semantic/ARIA/rendered-output assertion is preferred. **This applies
-  to any test file the diff touches — do not grandfather a pre-existing class
-  assertion in a file being modified; a touched test file is expected to come
-  into compliance.** Stale assertions (a class no longer present in the
-  component) are always a blocking finding.
+- **Class assertions — allowed when the class is prop-driven, flagged when it
+  is static.** A class that changes with a prop, variant, or state is part of
+  the component's contract: `align="CENTER"` producing `text-center` is
+  behaviour, and a test asserting it is correct. Do **not** flag those, and do
+  not ask for them to be replaced by a mocked-consumer prop assertion. What to
+  flag is an assertion on a class the component applies **unconditionally** —
+  it never varies with input, so the test only restates the implementation and
+  turns any restyle into a failure (layout, spacing, colour, border,
+  background, typography, radius/shadow, icon size). Where the component
+  exposes a semantic or ARIA equivalent (`aria-current` over an active-state
+  class), prefer it — it survives a restyle — but that is a preference, not a
+  blocking finding. Stale assertions (a class no longer present in the
+  component) are always blocking. Full rule: `testing-practices` → "What not
+  to test".
 - `pnpm test` green.
 
 ## 7. Hygiene
