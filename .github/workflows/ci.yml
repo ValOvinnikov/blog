@@ -228,6 +228,36 @@ jobs:
       - name: Turbo env sync (helper unit tests)
         run: pnpm check:turbo-env-sync:test
 
+  revalidate-tags-sync:
+    name: Revalidate tags sync
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+
+      # apps/web's REVALIDATE_TAGS map (the revalidation webhook's `_type` →
+      # ISR tag lookup) is hand-synced against the `isr(...)` tag literals in
+      # packages/service/src loaders — a new tag added there with no matching
+      # entry silently purges nothing on publish. Parses every loader as a
+      # TypeScript AST and compares the extracted tag literals against
+      # REVALIDATE_TAGS's value union. Read-only; nothing is committed.
+      - name: REVALIDATE_TAGS covers every isr(...) tag literal
+        run: pnpm check:revalidate-tags-sync
+
+      # Fixture-based unit tests for the extraction + comparison helpers, same
+      # rationale as the UI index/voice key sync/turbo env sync jobs above —
+      # they need the repo's typescript package, which only the pnpm-install
+      # jobs have.
+      - name: Revalidate tags sync (helper unit tests)
+        run: pnpm check:revalidate-tags-sync:test
+
   migrations:
     name: Migrations
     runs-on: ubuntu-latest

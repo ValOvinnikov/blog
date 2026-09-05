@@ -1,3 +1,4 @@
+import { isr } from '@blog/service/sanity/query';
 import { createTaxonomyIndexPageLoader } from '@blog/service/shared/loaders/create-taxonomy-index-page-loader';
 
 import { MissingTaxonomyListError } from './missing-taxonomy-list-error';
@@ -7,6 +8,7 @@ import { toTopicIndexPage } from './transformer';
 export const getIndexPage = createTaxonomyIndexPageLoader({
   query: topicIndexPageQuery,
   transformer: toTopicIndexPage,
-  tags: ['page_topicIndex', 'modules:taxonomyList'],
+  getCacheOptions: (tenant) =>
+    isr(['page_topicIndex', 'modules:taxonomyList'], tenant.projectId),
   MissingTaxonomyListError,
 });
