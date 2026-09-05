@@ -23,6 +23,8 @@ export type TBuildTenantShellInput = {
   previewText?: string;
   /** Already-assembled, already-escaped HTML for the message-specific content. */
   bodyHtml: string;
+  /** Already-assembled, already-escaped HTML rendered between the body and the footer. Omit for an email with no action. */
+  actionHtml?: string;
 };
 
 /**
@@ -34,6 +36,13 @@ export function buildTenantShell({
   brandName,
   previewText,
   bodyHtml,
+  actionHtml,
 }: TBuildTenantShellInput): string {
-  return renderEmailShell({ palette: brand, brandName, previewText, bodyHtml });
+  return renderEmailShell({
+    palette: brand,
+    brandName,
+    previewText,
+    bodyHtml,
+    actionHtml,
+  });
 }
