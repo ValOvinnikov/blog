@@ -647,8 +647,10 @@ exists so a purge that never happens self-heals within a bounded window rather
 than leaving a page wrong indefinitely — a correctness floor, not a freshness
 target. Next requires the value to be a literal and rejects it on a shared
 layout that has a `force-dynamic` child, both as hard build errors, so each
-route declares its own, kept in step with `CONTENT_ROUTE_REVALIDATE_SECONDS`
-by test rather than by import. The same webhook also cleans
+route declares its own, kept in step with `@blog/config`'s
+`CONTENT_ROUTE_REVALIDATE_SECONDS` by test rather than by import.
+
+The same webhook also cleans
 up orphaned `@blog/db` `bookmarks` rows when it receives a `blog_post` delete
 (Sanity's `sanity-operation` header — unpublish fires the same trigger as
 true deletion), scoped to the tenant resolved from that project-id header.

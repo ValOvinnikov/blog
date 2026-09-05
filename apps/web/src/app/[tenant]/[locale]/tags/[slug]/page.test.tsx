@@ -1,4 +1,4 @@
-import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@web/utils/content-route-revalidate-seconds';
+import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
 
 import TagDetailPage, { generateMetadata, revalidate } from './page';
 

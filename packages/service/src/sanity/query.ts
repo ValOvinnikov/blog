@@ -53,9 +53,8 @@ export const runQuery = makeSafeQueryRunner<TNextFetchOptions>(
  * specific affected path(s), falling back to a blanket
  * `revalidatePath('/', 'layout')` only when path derivation fails, and each
  * content route's own `export const revalidate`
- * (`CONTENT_ROUTE_REVALIDATE_SECONDS` in
- * `apps/web/src/utils/content-route-revalidate-seconds/`) bounds how long a
- * missed or failed purge can stay visible regardless.
+ * (`CONTENT_ROUTE_REVALIDATE_SECONDS` from `@blog/config`) bounds how long
+ * a missed or failed purge can stay visible regardless.
  *
  * `scopeProjectId` is required — every tag is prefixed `t:<projectId>:<tag>`,
  * the platform's own project id included (`getPlatformSanityContext().

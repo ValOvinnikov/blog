@@ -2,6 +2,7 @@ export * from './alert';
 export * from './audit';
 export * from './aside';
 export * from './brand';
+export * from './cache';
 export * from './capability';
 export * from './cta';
 export * from './depth';

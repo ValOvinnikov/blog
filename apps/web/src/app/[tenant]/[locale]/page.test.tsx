@@ -1,7 +1,7 @@
+import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
-import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@web/utils/content-route-revalidate-seconds';
 import { notFound } from 'next/navigation';
 
 import HomePage, { generateMetadata, revalidate } from './page';

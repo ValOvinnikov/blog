@@ -144,10 +144,9 @@ detected`, and a re-export with `it mustn't be reexported`, so a wrong form
   `[tenant]/[locale]/layout.tsx`, because a layout-level `revalidate` fails the
   build outright once a child route sets `dynamic = 'force-dynamic'`. Each
   route therefore declares the literal itself, kept equal to
-  `CONTENT_ROUTE_REVALIDATE_SECONDS`
-  (`apps/web/src/utils/content-route-revalidate-seconds/`) by a per-route test;
-  that constant is a drift detector for the eleven copies rather than something
-  the routes import.
+  `CONTENT_ROUTE_REVALIDATE_SECONDS` (`@blog/config`) by a per-route test; that
+  constant is a drift detector for the eleven copies rather than something the
+  routes import.
 
   The same route also cleans up orphaned `bookmarks` rows (`@blog/db`) when the
   webhook's `sanity-operation` header reads `delete` for a `blog_post` —

@@ -1,5 +1,5 @@
+import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
 import { customRenderAsync } from '@web/testing/custom-render';
-import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@web/utils/content-route-revalidate-seconds';
 import { notFound } from 'next/navigation';
 
 import BlogListNumberedPage, { revalidate } from './page';
