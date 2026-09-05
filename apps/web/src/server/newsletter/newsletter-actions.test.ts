@@ -62,6 +62,7 @@ const subscriber = {
   email: 'reader@example.com',
   status: 'pending' as const,
   confirmationToken: 'token-abc',
+  unsubscribeToken: 'unsub-token-abc',
   subscribedAt: new Date('2026-01-01'),
   confirmedAt: null,
 };
@@ -124,6 +125,11 @@ describe('subscribeToNewsletterAction', () => {
         html: expect.stringContaining(
           'https://example.com/api/newsletter/confirm?token=token-abc',
         ),
+        headers: {
+          'List-Unsubscribe':
+            '<https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc>',
+          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        },
       }),
     );
     expect(markNewsletterSubscribedMock).toHaveBeenCalledTimes(1);
