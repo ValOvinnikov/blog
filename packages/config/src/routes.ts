@@ -22,6 +22,12 @@ export const routes = {
   account: () => '/account',
   /** The `/account` "export my data" download — a Route Handler, not a page, so it's outside `[locale]` like `rssFeed` below. */
   accountExport: () => '/api/account/export',
+  /** The double-opt-in confirmation link — a Route Handler, not a page, so it's outside `[locale]` like `accountExport` above. */
+  newsletterConfirm: (token: string) =>
+    `/api/newsletter/confirm?token=${encodeURIComponent(token)}`,
+  /** The no-session unsubscribe link — a Route Handler, not a page, so it's outside `[locale]` like `accountExport` above. */
+  newsletterUnsubscribe: (token: string) =>
+    `/api/newsletter/unsubscribe?token=${encodeURIComponent(token)}`,
   genericPage: (slug: string) => `/${slug}`,
   rssFeed: () => '/rss.xml',
   /** No pagination variant — always the tag's base path + `/rss.xml`. */
