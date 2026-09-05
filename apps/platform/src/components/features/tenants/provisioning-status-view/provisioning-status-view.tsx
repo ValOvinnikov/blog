@@ -12,6 +12,7 @@ import { Icon } from '@platform/components/shared/icon';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
+import { StepList } from '@platform/components/shared/step-list';
 import { Text } from '@platform/components/shared/text';
 import { Link } from '@platform/i18n/navigation';
 import { formatRelativeTime } from '@platform/utils/format-relative-time/format-relative-time';
@@ -81,16 +82,6 @@ export const ProvisioningStatusView = ({
     steps,
     stepsCard,
     stepsCardBody,
-    list,
-    step,
-    indicatorCol,
-    circle,
-    connector,
-    stepBody,
-    stepTitle,
-    stepStatusLive,
-    stepWhen,
-    visuallyHidden,
     detailsColumn,
     detailsHeader,
     overallStatusLive,
@@ -102,6 +93,29 @@ export const ProvisioningStatusView = ({
     errorDetailsSummary,
     errorDetailsText,
   } = provisioningStatusViewVariants();
+
+  const stepListSteps = STEP_ORDER.map((stepKey, index) => {
+    const status =
+      displayStepStatuses[index] ?? TENANT_PROVISIONING_STEP_STATUS.IDLE;
+    const isFailed = status === TENANT_PROVISIONING_STEP_STATUS.FAILED;
+    const isDone = status === TENANT_PROVISIONING_STEP_STATUS.DONE;
+    const isRunning = status === TENANT_PROVISIONING_STEP_STATUS.RUNNING;
+    const updatedAt = stepUpdatedAt[index];
+    const relativeUpdatedAt =
+      (isDone || isFailed) && updatedAt
+        ? formatRelativeTime(new Date(updatedAt), t)
+        : undefined;
+
+    return {
+      key: stepKey,
+      title: t(`stepLabel.${stepKey}`),
+      status,
+      statusLabel: t(`statusLabel.${status}`),
+      trailingSlot: isRunning ? t('stepRunningNow') : undefined,
+      updatedAt,
+      updatedAtLabel: relativeUpdatedAt,
+    };
+  });
 
   const overallStatusBadge = isOverallFailed ? (
     <StatusBadge tone="bad">
@@ -193,66 +207,7 @@ export const ProvisioningStatusView = ({
               }
             />
             <Card.Body className={stepsCardBody()}>
-              <div className={list()}>
-                {STEP_ORDER.map((stepKey, index) => {
-                  const status =
-                    displayStepStatuses[index] ??
-                    TENANT_PROVISIONING_STEP_STATUS.IDLE;
-                  const isFailed =
-                    status === TENANT_PROVISIONING_STEP_STATUS.FAILED;
-                  const isDone =
-                    status === TENANT_PROVISIONING_STEP_STATUS.DONE;
-                  const isRunning =
-                    status === TENANT_PROVISIONING_STEP_STATUS.RUNNING;
-                  const isLast = index === STEP_ORDER.length - 1;
-                  const title = t(`stepLabel.${stepKey}`);
-                  const updatedAt = stepUpdatedAt[index];
-                  const relativeUpdatedAt =
-                    (isDone || isFailed) && updatedAt
-                      ? formatRelativeTime(new Date(updatedAt), t)
-                      : undefined;
-
-                  return (
-                    <div className={step()} key={stepKey}>
-                      <div className={indicatorCol()}>
-                        <span className={circle({ status })} aria-hidden="true">
-                          {isDone ? '✓' : isFailed ? '!' : index + 1}
-                        </span>
-                        {!isLast && (
-                          <span
-                            className={connector({ isDone })}
-                            aria-hidden="true"
-                          />
-                        )}
-                      </div>
-                      <div className={stepBody()}>
-                        <span className={stepTitle()}>{title}</span>
-                        {/* The circle glyph is decorative (`aria-hidden`), so
-                            this text — visually hidden, not removed — is what
-                            actually carries each step's status to assistive
-                            tech; the live region still announces it on change
-                            even though the sighted badge that used to sit here
-                            is gone. */}
-                        <span className={stepStatusLive()} aria-live="polite">
-                          <span className={visuallyHidden()}>
-                            {t(`statusLabel.${status}`)}
-                          </span>
-                        </span>
-                      </div>
-                      {isRunning && (
-                        <span className={stepWhen()}>
-                          {t('stepRunningNow')}
-                        </span>
-                      )}
-                      {relativeUpdatedAt && (
-                        <time dateTime={updatedAt} className={stepWhen()}>
-                          {relativeUpdatedAt}
-                        </time>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+              <StepList steps={stepListSteps} />
             </Card.Body>
           </Card>
         </aside>
