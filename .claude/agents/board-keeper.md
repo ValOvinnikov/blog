@@ -399,7 +399,37 @@ Skip this step entirely for any other trigger.
    - Otherwise (partial completion, parent still correctly `OPEN` and
      already In Progress/Code Review) — nothing to do, no need to report
      the numbers just to report them.
-3. **Stop here.** Do NOT continue into Step 2 onward — this is a targeted
+3. **On `"after merge of #<n>"` only — sweep orphaned `agent:*` labels.**
+   Skip this for `"after PR #<n>"`: the PR that just opened still needs its
+   chip. Every PR is tagged `agent:<job-id>` at `open-pull-request`'s Gate 5
+   so concurrent background jobs are tellable apart in the PR list; once no
+   open PR carries one, it is dead weight in the label picker.
+
+   ```
+   gh label list --limit 200 --json name --jq '.[].name | select(startswith("agent:"))'
+   ```
+
+   For each name returned, check whether any open PR still carries it, and
+   delete only those with none:
+
+   ```
+   gh pr list --state open --label "<name>" --json number --jq 'length'
+   gh label delete "<name>" --yes
+   ```
+
+   **Filter the prefix in `jq`, not with `gh label list --search`** — that
+   flag matches label _descriptions_ as well as names, and an `agent:*`
+   label's description holds a free-text job name, so a search would sweep
+   in unrelated labels whose description happens to mention an agent.
+
+   Deleting a label removes it from any closed PR that carried it, which is
+   the intended outcome: the chip answers "which running job owns this open
+   PR", a question that stops existing once the PR merges. Deleting a label
+   is not a status write, so Step 4's re-verify protocol does not apply —
+   but do report the count swept in Step 5, and never delete a label
+   outside the `agent:` prefix.
+
+4. **Stop here.** Do NOT continue into Step 2 onward — this is a targeted
    check, not a full sweep, unless the dispatch explicitly also asked for
    one (see "Input you receive" above).
 

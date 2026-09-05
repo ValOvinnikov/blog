@@ -237,7 +237,7 @@ gh pr create --base main \
   --body "<summary + test plan + Closes #<n>>"
 ```
 
-### Gate 5 — Set Code Review on the board
+### Gate 5 — Set Code Review on the board, then tag the session
 
 Immediately after the PR is created, set status → **Code Review** (`679cfd06`):
 
@@ -251,6 +251,48 @@ gh api graphql -f query='mutation {
   }) { projectV2Item { id } }
 }'
 ```
+
+#### Then tag the PR with this session's agent label
+
+Several background jobs run against this repo at once, and their PRs are
+otherwise indistinguishable in the GitHub PR list — same author, same branch
+convention, nothing naming the session that opened them. One label fixes that,
+because GitHub renders labels as chips directly in the list row:
+
+```
+JOB=$(basename "$CLAUDE_JOB_DIR")
+NAME=$(jq -r '.name // empty' "$CLAUDE_JOB_DIR/state.json")
+gh label create "agent:$JOB" --color D4D8DC --description "$NAME" --force
+gh pr edit <n> --add-label "agent:$JOB"
+```
+
+`$JOB` is the job id shown in the job list (`d6f122a6`), which is also the
+first segment of the session's resume UUID — so the chip leads straight back
+to `claude --resume <that job>`. `--force` makes the call create-or-update, so
+a job renamed mid-flight refreshes its description rather than failing. The
+muted grey keeps the chip reading as metadata beside the `prio:*` and
+`layer:*` chips rather than competing with them.
+
+**Skip this silently when `$CLAUDE_JOB_DIR` is unset.** A foreground session
+has no job id — and no ambiguity to resolve either, since the label exists
+only to tell concurrent background jobs apart. A missing chip is a valid
+state, never a failure to report or work around.
+
+**This step does not apply to a solo cloud session at all.** Those sessions
+ship without `gh` and do not open PRs from here — see `CLAUDE.md`'s
+"Solo-session mode", where PR creation itself is already replaced by the
+evidence protocol. There is nothing to label and no binary to label it with.
+Do not substitute an MCP or REST call to reach the same end: the mechanism is
+local-orchestrator-only, exactly like the Gate 5 board write it sits beside,
+and for the same reason.
+
+The label identifies the **job**, not an individual subagent: one job
+dispatches many layer agents into a single PR. That is the granularity that
+answers the question actually being asked of it — "which of my running
+sessions do I go back to in order to approve this push?"
+
+`board-keeper` deletes the label once no open PR carries it (its
+`"after merge of #<n>"` trigger), so the set stays bounded to live work.
 
 Report the PR URL — but hold off on any "done"/"shipped" framing until
 Gate 5a below reports CI status. If Gate 5a hasn't run yet, say so explicitly
