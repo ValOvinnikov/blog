@@ -1,4 +1,6 @@
-import TopicDetailPage, { generateMetadata } from './page';
+import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@web/utils/content-route-revalidate-seconds';
+
+import TopicDetailPage, { generateMetadata, revalidate } from './page';
 
 vi.mock('@web/components/pages/topic-page', () => ({
   TopicPage: ({ slug }: { slug: string }) => (
@@ -11,6 +13,10 @@ vi.mock('@web/metadata/topic-metadata', () => ({
 }));
 
 describe('TopicDetailPage', () => {
+  it('declares the shared content-route revalidate backstop', () => {
+    expect(revalidate).toBe(CONTENT_ROUTE_REVALIDATE_SECONDS);
+  });
+
   describe('generateMetadata', () => {
     it('delegates to buildTopicMetadata with the resolved slug', async () => {
       const metadata = await generateMetadata({

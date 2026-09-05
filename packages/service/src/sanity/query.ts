@@ -46,11 +46,16 @@ export const runQuery = makeSafeQueryRunner<TNextFetchOptions>(
  * If a query's fragment `.deref()`s another document (a post's `author`/
  * `topic`, a `link`'s `internalReference`, …), the loader's tags must
  * include that dereferenced type's tag too — resolve the exact tag string
- * from `REVALIDATE_TAGS` in `apps/web/src/utils/revalidate-tags.ts` (the
- * webhook's source of truth for `_type` → tag), never invent a new one. This
- * is a defensive completeness rule for the tag scheme itself — it does not
- * replace or depend on the webhook's blanket `revalidatePath('/', 'layout')`
- * backstop, which stays regardless.
+ * from `REVALIDATE_TAGS` in `apps/web/src/utils/revalidate-tags/
+ * revalidate-tags.ts` (the webhook's source of truth for `_type` → tag),
+ * never invent a new one. Getting this right keeps content fresh, but a
+ * missed tag is not the only safeguard: the webhook resolves and purges the
+ * specific affected path(s), falling back to a blanket
+ * `revalidatePath('/', 'layout')` only when path derivation fails, and each
+ * content route's own `export const revalidate`
+ * (`CONTENT_ROUTE_REVALIDATE_SECONDS` in
+ * `apps/web/src/utils/content-route-revalidate-seconds/`) bounds how long a
+ * missed or failed purge can stay visible regardless.
  *
  * `scopeProjectId` is required — every tag is prefixed `t:<projectId>:<tag>`,
  * the platform's own project id included (`getPlatformSanityContext().

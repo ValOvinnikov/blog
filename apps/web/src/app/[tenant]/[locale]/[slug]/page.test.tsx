@@ -1,4 +1,6 @@
-import GenericSlugPage, { generateMetadata } from './page';
+import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@web/utils/content-route-revalidate-seconds';
+
+import GenericSlugPage, { generateMetadata, revalidate } from './page';
 
 vi.mock('@web/metadata/generic-page-metadata', () => ({
   buildGenericPageMetadata: vi.fn().mockResolvedValue({ title: 'About Us' }),
@@ -13,6 +15,10 @@ vi.mock('@web/components/pages/generic-page', () => ({
 }));
 
 describe('GenericSlugPage', () => {
+  it('declares the shared content-route revalidate backstop', () => {
+    expect(revalidate).toBe(CONTENT_ROUTE_REVALIDATE_SECONDS);
+  });
+
   describe('generateMetadata', () => {
     it('delegates to buildGenericPageMetadata with the resolved slug', async () => {
       const metadata = await generateMetadata({

@@ -1,8 +1,9 @@
 import { customRenderAsync } from '@web/testing/custom-render';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@web/utils/content-route-revalidate-seconds';
 import { notFound } from 'next/navigation';
 
-import TopicNumberedPage, { generateMetadata } from './page';
+import TopicNumberedPage, { generateMetadata, revalidate } from './page';
 
 const { permanentRedirectMock } = vi.hoisted(() => ({
   permanentRedirectMock: vi.fn(() => {
@@ -47,6 +48,10 @@ const setup = customRenderAsync(TopicNumberedPage, {
 });
 
 describe('TopicNumberedPage', () => {
+  it('declares the shared content-route revalidate backstop', () => {
+    expect(revalidate).toBe(CONTENT_ROUTE_REVALIDATE_SECONDS);
+  });
+
   beforeEach(() => {
     permanentRedirectMock.mockClear();
     getTenantSanityContextMock.mockReset();
