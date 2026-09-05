@@ -186,9 +186,9 @@ detected`, and a re-export with `it mustn't be reexported`, so a wrong form
 
   It calls the endpoint best-effort
   (`@platform/server/site-config/revalidate-site-config`) — a failed call is
-  logged, never thrown, and the site-config cache's own
-  3600s (`SITE_CONFIG_REVALIDATE_SECONDS`) window remains the fallback
-  either way. `deprovision-tenant.yml`'s `invalidate-tenant-cache`
+  logged, never thrown, and the site-config cache's own 3600s
+  (`TENANT_CONFIG_REVALIDATE_SECONDS`, `@blog/config`) window remains the
+  fallback either way. `deprovision-tenant.yml`'s `invalidate-tenant-cache`
   step is a second caller, POSTing the same `{ tenantId }` once a tenant has
   been archived, and it takes the opposite stance deliberately — it throws on
   missing config or a non-2xx rather than logging and continuing, because a
