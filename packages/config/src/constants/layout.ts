@@ -56,5 +56,4 @@ export type THeadingAlign = TValueOf<typeof HEADING_ALIGN>;
 export type TSectionHeader = {
   heading?: string;
   supportingText?: string;
-  align?: THeadingAlign;
 };

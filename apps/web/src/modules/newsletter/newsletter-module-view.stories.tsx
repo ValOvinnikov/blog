@@ -20,9 +20,9 @@ const meta = {
     sectionHeader: {
       heading: 'Get new posts in your inbox',
       supportingText: 'One email a week, no spam, unsubscribe anytime.',
-      align: undefined,
     },
     layout: undefined,
+    contentAlignment: undefined,
   },
 } satisfies Meta<typeof NewsletterModuleView>;
 

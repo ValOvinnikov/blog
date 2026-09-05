@@ -8,6 +8,7 @@ export type TSendEmailInput = {
   from: string;
   subject: string;
   html: string;
+  headers?: Record<string, string>;
 };
 
 let resendClient: Resend | undefined;
@@ -21,21 +22,24 @@ function getResendClient(): Resend {
 
 /**
  * The single Resend-backed transport every email builder in this repo sends
- * through — deliberately generic (`to`/`from`/`subject`/`html` only) so
- * callers as different as the Auth.js magic-link provider and the newsletter
- * confirmation email can share it without reshaping it around either one.
+ * through — deliberately generic (`to`/`from`/`subject`/`html`, plus optional
+ * mail headers) so callers as different as the Auth.js magic-link provider
+ * and the newsletter confirmation email can share it without reshaping it
+ * around either one.
  */
 export async function sendEmail({
   to,
   from,
   subject,
   html,
+  headers,
 }: TSendEmailInput): Promise<void> {
   const { error } = await getResendClient().emails.send({
     to,
     from,
     subject,
     html,
+    headers,
   });
 
   if (error) {

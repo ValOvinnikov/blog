@@ -1,8 +1,21 @@
-import { BRAND_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, HEADING_ALIGN } from '@blog/config';
+import { PostsSection } from '@blog/ui/organisms/posts-section';
 import { customRender, screen } from '@web/testing/custom-render';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
 
 import { PostListModuleView } from './post-list-module-view';
+
+// Wraps the real implementation (so every other assertion in this file keeps
+// exercising actual render behaviour) purely to observe the props it is
+// called with — never its own rendered output.
+vi.mock('@blog/ui/organisms/posts-section', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('@blog/ui/organisms/posts-section')>();
+  return {
+    ...actual,
+    PostsSection: vi.fn(actual.PostsSection),
+  };
+});
 
 vi.mock('@web/components/shared/smart-link', () => ({
   SmartLink: ({
@@ -26,10 +39,10 @@ const setup = customRender(PostListModuleView, {
   sectionHeader: {
     heading: 'Latest posts',
     supportingText: undefined,
-    align: undefined,
   },
   items: [post],
   layout: undefined,
+  contentAlignment: undefined,
   titleId: 'posts-title',
   dataTestId: 'post-list-module-post-list-1',
   accessibleTitle: 'Posts',
@@ -61,7 +74,6 @@ describe(PostListModuleView, () => {
       sectionHeader: {
         heading: 'More posts',
         supportingText: undefined,
-        align: undefined,
       },
     });
 
@@ -76,7 +88,6 @@ describe(PostListModuleView, () => {
       sectionHeader: {
         heading: undefined,
         supportingText: undefined,
-        align: undefined,
       },
     });
 
@@ -126,5 +137,14 @@ describe(PostListModuleView, () => {
     setup({ items: [] });
 
     expect(screen.getByText('No posts yet.')).toBeInTheDocument();
+  });
+
+  it('passes contentAlignment through to PostsSection as align', () => {
+    setup({ contentAlignment: HEADING_ALIGN.CENTER });
+
+    expect(vi.mocked(PostsSection)).toHaveBeenLastCalledWith(
+      expect.objectContaining({ align: HEADING_ALIGN.CENTER }),
+      undefined,
+    );
   });
 });

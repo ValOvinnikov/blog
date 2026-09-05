@@ -10,7 +10,7 @@ export type TNewsletterModule = {
   sectionHeader: {
     heading: string;
     supportingText: TMaybeUndefined<string>;
-    align: TMaybeUndefined<THeadingAlign>;
   };
   layout: TMaybeUndefined<TLayout>;
+  contentAlignment: TMaybeUndefined<THeadingAlign>;
 };

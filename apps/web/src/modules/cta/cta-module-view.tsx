@@ -25,14 +25,15 @@ export const CtaModuleView = ({
   sectionHeader,
   content,
   image,
-  imageSide,
+  contentPosition,
+  contentAlignment,
   mobileMediaOrder,
   actions,
   footnote,
   layout,
 }: ICtaModuleViewProps) => {
   const titleId = `cta-${id}`;
-  const { heading, supportingText, align } = sectionHeader;
+  const { heading, supportingText } = sectionHeader;
 
   return (
     <Section
@@ -68,8 +69,8 @@ export const CtaModuleView = ({
           ) : undefined
         }
         footnote={footnote}
-        align={align}
-        imageSide={imageSide}
+        contentPosition={contentPosition}
+        contentAlignment={contentAlignment}
         mobileMediaOrder={mobileMediaOrder}
         isWrapped={true}
       />

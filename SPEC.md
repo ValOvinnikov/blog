@@ -240,14 +240,28 @@ module carries as a separate `bandTone` field), plus an optional, all-remaining-
 object (`spacingTop`/`spacingBottom`, `containerWidth` (not on
 `module_hero`, which uses the leaner `heroLayout` type), `dividerTop`,
 `dividerBottom` — stored values from `SPACING_SCALE`/`CONTAINER_WIDTH`
-consts; there is no `align` field on `layout` — see `SectionHeader` below
-for heading alignment).
+consts; there is no `align` field on `layout` — alignment is its own
+module-level field, below).
 `module_cta`/`module_postList`/`module_postLatest`/`module_taxonomyList`/`module_newsletter`
-additionally carry a `sectionHeader` object (`heading`, `supportingText`,
-`align` — stored values from `HEADING_ALIGN`; all optional on
+additionally carry a `sectionHeader` object (`heading` and `supportingText`
+only — all optional on
 `module_postList`/`module_postLatest`/`module_taxonomyList`, `heading` required on
 `module_cta`/`module_newsletter` via a per-module `requireHeading` override
-on the shared `sectionHeaderField()` helper). `module_content` has no `sectionHeader` —
+on the shared `sectionHeaderField()` helper).
+
+**Alignment is a module-level field, not part of `sectionHeader`.** All five
+of those modules carry their own `contentAlignment`, emitted by the
+`defineAlignmentFields()` helper, which every caller gets whether or not it
+asks for variant-scoped extras. `sectionHeader` deliberately does not bundle
+it: a Sanity named object type's field list is fixed at registration, so a
+bundled field cannot be omitted for the one module that doesn't want it —
+the same constraint that forces `sectionHeader` and
+`requiredHeadingSectionHeader` to exist as two registered types rather than
+one with conditional validation. Bundling it meant `module_cta`, which
+aligns its whole card rather than its heading, was forced to render an
+alignment control nothing read.
+
+`module_content` has no `sectionHeader` —
 its rich-text `body` supplies any in-content headings, so a separate
 structured heading field would just be a second way to do the same thing.
 `module_hero` has no `sectionHeader` either — its heading fields are its
@@ -266,13 +280,40 @@ paragraphs, bullet/numbered lists, bold/italic, and `link` annotations
 only, no headings/images/code/asides — distinct from the fuller `richText`
 used elsewhere), an optional `image` (`imageWithAlt`, required for
 `BANNER`/`SPLIT` via a custom validator, since Sanity can't make
-`.required()` conditional on a sibling field), `imageSide`/
-`mobileMediaOrder` (Split only), an optional `actions` (`actionGroup` — a
+`.required()` conditional on a sibling field), two independent alignment
+axes (below), `mobileMediaOrder` (Split only), an optional `actions` (`actionGroup` — a
 reusable object under `objects/blocks/`, not CTA-specific: an `actions`
 array of `ctaAction` items, each with its own `variant` (`PRIMARY`/
 `SECONDARY`) and `appearance` (`CONTAINED`/`INLINE`, available on either
 variant), validated so a `PRIMARY` item is required and comes first,
 `SECONDARY` is optional, max two), and an optional `footnote`.
+
+`module_cta`'s two alignment axes are deliberately separate. **Content
+position** is where the content block sits relative to the image — which grid
+column it takes on Split, where it sits over the full-bleed image on Banner,
+and nothing at all on Callout, whose image sits above the content. **Content
+alignment** is how text and actions align inside that block, and applies on
+every variant. Both draw their values from `CTA_ALIGNMENT`. They replaced a
+single `imageSide` field that claimed to move the image while actually moving
+the content column, plus a reuse of `sectionHeader.align` that CTA applied to
+the whole card rather than the heading.
+
+Position is stored as **two** variant-scoped fields —
+`contentPositionSplit` (`LEFT`/`RIGHT`) and `contentPositionBanner`
+(adding `CENTER`) — because Sanity's `options.list` is static: only `hidden`
+and `readOnly` accept callbacks, so one field cannot vary its own option set
+by variant. `hidden` keeps exactly one visible. `@blog/service` collapses the
+pair into a single `contentPosition` on the view model, so no layer below the
+service knows the split exists. Both are emitted by the
+`defineAlignmentFields()` helper, which also appends the `contentAlignment`
+field every caller is guaranteed to have.
+
+CTA's `contentAlignment` and the other four modules' are the same field from
+the same helper, but they mean different things: CTA aligns its whole card,
+while the others align a section heading and its supporting text. The
+`@blog/service` view models reflect that — CTA's is typed against
+`CTA_ALIGNMENT`, the others against `HEADING_ALIGN`. The two consts hold
+identical values, so the distinction is semantic rather than structural.
 
 `module_taxonomyList` is excluded from `MODULE_MAP`, so it never reaches
 `ModuleRenderer`; it still carries a `REVALIDATE_TAGS` entry, which every
@@ -580,7 +621,18 @@ Full mechanics:
 
 Cache tags are always tenant-scoped (`t:<projectId>:<tag>`); the revalidation
 webhook purges both that form and the legacy unprefixed one per publish, keyed
-off Sanity's own `sanity-project-id` webhook header. The same webhook also cleans
+off Sanity's own `sanity-project-id` webhook header. Tag expiry alone does not
+invalidate a prerendered route on Vercel, so the webhook also purges resolved,
+tenant-scoped paths (`revalidatePath('/<tenantId>/<locale>/blog/my-post')`) —
+precisely derived for a published `blog_post`: its own page, the home and blog
+archive with pagination, and **every** tag/topic page of the tenant with their
+own pagination, not only the ones the post currently belongs to (a
+re-categorisation or removal would otherwise leave stale HTML on the page the
+post no longer occupies, with no way to detect it). A renamed post slug is a
+known, unsolved gap — the old slug isn't recoverable from the webhook payload,
+so the page at the old URL stays cached until it next changes for another
+reason. Anything without a precise derivation yet falls back to a logged
+whole-site purge. The same webhook also cleans
 up orphaned `@blog/db` `bookmarks` rows when it receives a `blog_post` delete
 (Sanity's `sanity-operation` header — unpublish fires the same trigger as
 true deletion), scoped to the tenant resolved from that project-id header.

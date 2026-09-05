@@ -43,6 +43,15 @@ export const subscribers = pgTable(
       .notNull()
       .unique()
       .$defaultFn(() => crypto.randomUUID()),
+    // The token embedded in the per-recipient unsubscribe link, generated
+    // and stored separately from `confirmationToken` because the two links
+    // have different lifetimes — see `confirmationToken`'s comment above and
+    // this table's own comment for why unsubscribing deletes the row rather
+    // than flipping a status.
+    unsubscribeToken: text('unsubscribe_token')
+      .notNull()
+      .unique()
+      .$defaultFn(() => crypto.randomUUID()),
     subscribedAt: timestamp('subscribed_at', { mode: 'date' })
       .notNull()
       .defaultNow(),

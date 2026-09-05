@@ -52,6 +52,7 @@ describe(resendConfirmation, () => {
     expect(result).toEqual({
       outcome: 'pending',
       confirmationToken: subscriber.confirmationToken,
+      unsubscribeToken: subscriber.unsubscribeToken,
     });
   });
 

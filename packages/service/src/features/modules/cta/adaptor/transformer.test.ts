@@ -3,8 +3,8 @@ import {
   CONTAINER_WIDTH,
   CTA_ACTION_APPEARANCE,
   CTA_ACTION_VARIANT,
+  CTA_ALIGNMENT,
   CTA_VARIANT,
-  HEADING_ALIGN,
   LINK_TYPE,
 } from '@blog/config';
 import {
@@ -27,7 +27,6 @@ describe('toCtaModule', () => {
     expect(cta.sectionHeader).toEqual({
       heading: 'Subscribe to the newsletter',
       supportingText: 'Get new posts in your inbox.',
-      align: undefined,
     });
     expect(cta.brandVariant).toBe(BRAND_VARIANT.PRIMARY);
   });
@@ -67,33 +66,96 @@ describe('toCtaModule', () => {
     },
   );
 
-  it('leaves supportingText and align undefined when not set (no faked default)', () => {
+  it('takes contentPosition from contentPositionSplit on Split, ignoring contentPositionBanner', () => {
+    const raw = makeRawCtaModule({
+      variant: CTA_VARIANT.SPLIT,
+      contentPositionSplit: CTA_ALIGNMENT.RIGHT,
+      contentPositionBanner: CTA_ALIGNMENT.LEFT,
+    });
+
+    const cta = toCtaModule(raw, makeTenant());
+
+    expect(cta.contentPosition).toBe(CTA_ALIGNMENT.RIGHT);
+  });
+
+  it('takes contentPosition from contentPositionBanner on Banner, ignoring contentPositionSplit', () => {
+    const raw = makeRawCtaModule({
+      variant: CTA_VARIANT.BANNER,
+      contentPositionSplit: CTA_ALIGNMENT.RIGHT,
+      contentPositionBanner: CTA_ALIGNMENT.LEFT,
+    });
+
+    const cta = toCtaModule(raw, makeTenant());
+
+    expect(cta.contentPosition).toBe(CTA_ALIGNMENT.LEFT);
+  });
+
+  it('maps a Banner contentPositionBanner of CENTER through', () => {
+    const raw = makeRawCtaModule({
+      variant: CTA_VARIANT.BANNER,
+      contentPositionBanner: CTA_ALIGNMENT.CENTER,
+    });
+
+    const cta = toCtaModule(raw, makeTenant());
+
+    expect(cta.contentPosition).toBe(CTA_ALIGNMENT.CENTER);
+  });
+
+  it('leaves contentPosition undefined on Callout regardless of stored position keys', () => {
+    const raw = makeRawCtaModule({
+      variant: CTA_VARIANT.CALLOUT,
+      contentPositionSplit: CTA_ALIGNMENT.RIGHT,
+      contentPositionBanner: CTA_ALIGNMENT.CENTER,
+    });
+
+    const cta = toCtaModule(raw, makeTenant());
+
+    expect(cta.contentPosition).toBeUndefined();
+  });
+
+  it('leaves contentPosition undefined on Split/Banner when the matching key is unset', () => {
+    const splitRaw = makeRawCtaModule({
+      variant: CTA_VARIANT.SPLIT,
+      contentPositionSplit: null,
+    });
+    const bannerRaw = makeRawCtaModule({
+      variant: CTA_VARIANT.BANNER,
+      contentPositionBanner: null,
+    });
+
+    expect(toCtaModule(splitRaw, makeTenant()).contentPosition).toBeUndefined();
+    expect(
+      toCtaModule(bannerRaw, makeTenant()).contentPosition,
+    ).toBeUndefined();
+  });
+
+  it('leaves contentAlignment undefined when unset', () => {
+    const raw = makeRawCtaModule({ contentAlignment: null });
+
+    const cta = toCtaModule(raw, makeTenant());
+
+    expect(cta.contentAlignment).toBeUndefined();
+  });
+
+  it('maps contentAlignment when authored, independent of variant', () => {
+    const raw = makeRawCtaModule({ contentAlignment: CTA_ALIGNMENT.CENTER });
+
+    const cta = toCtaModule(raw, makeTenant());
+
+    expect(cta.contentAlignment).toBe(CTA_ALIGNMENT.CENTER);
+  });
+
+  it('leaves supportingText undefined when not set (no faked default)', () => {
     const raw = makeRawCtaModule({
       sectionHeader: {
         heading: 'Subscribe to the newsletter',
         supportingText: null,
-        align: null,
       },
     });
 
     const cta = toCtaModule(raw, makeTenant());
 
     expect(cta.sectionHeader.supportingText).toBeUndefined();
-    expect(cta.sectionHeader.align).toBeUndefined();
-  });
-
-  it('maps sectionHeader.align when authored', () => {
-    const raw = makeRawCtaModule({
-      sectionHeader: {
-        heading: 'Subscribe to the newsletter',
-        supportingText: null,
-        align: HEADING_ALIGN.CENTER,
-      },
-    });
-
-    const cta = toCtaModule(raw, makeTenant());
-
-    expect(cta.sectionHeader.align).toBe(HEADING_ALIGN.CENTER);
   });
 
   it('leaves eyebrow and footnote undefined when unset', () => {

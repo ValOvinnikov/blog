@@ -24,8 +24,9 @@ export function toPostLatestModule(
     brandVariant: raw.brandVariant,
     sectionHeader: raw.sectionHeader
       ? toSectionHeader(raw.sectionHeader)
-      : { heading: undefined, supportingText: undefined, align: undefined },
+      : { heading: undefined, supportingText: undefined },
     posts: rawPosts.map((rawPost) => toPostCard(rawPost, tenant)),
     layout: toLayout(raw.layout),
+    contentAlignment: raw.contentAlignment ?? undefined,
   };
 }

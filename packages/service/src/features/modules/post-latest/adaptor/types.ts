@@ -1,5 +1,6 @@
 import type {
   TBrandVariantOf,
+  THeadingAlign,
   TLayout,
   TMaybeUndefined,
   TSectionHeader,
@@ -11,4 +12,5 @@ export type TPostLatestModule = {
   sectionHeader: TSectionHeader;
   posts: TPostCard[];
   layout: TMaybeUndefined<TLayout>;
+  contentAlignment: TMaybeUndefined<THeadingAlign>;
 };

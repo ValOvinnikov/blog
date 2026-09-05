@@ -62,4 +62,22 @@ describe('routes', () => {
   it('builds a per-tag RSS feed path off the tag base path, regardless of page', () => {
     expect(routes.tagRssFeed('typescript')).toBe('/tags/typescript/rss.xml');
   });
+
+  it('builds the newsletter confirm and unsubscribe paths with an encoded token', () => {
+    expect(routes.newsletterConfirm('abc123')).toBe(
+      '/api/newsletter/confirm?token=abc123',
+    );
+    expect(routes.newsletterUnsubscribe('abc123')).toBe(
+      '/api/newsletter/unsubscribe?token=abc123',
+    );
+  });
+
+  it('URL-encodes tokens containing reserved query characters', () => {
+    expect(routes.newsletterConfirm('a b&c=d')).toBe(
+      '/api/newsletter/confirm?token=a%20b%26c%3Dd',
+    );
+    expect(routes.newsletterUnsubscribe('a b&c=d')).toBe(
+      '/api/newsletter/unsubscribe?token=a%20b%26c%3Dd',
+    );
+  });
 });

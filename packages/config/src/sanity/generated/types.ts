@@ -24,6 +24,7 @@ export type Module_newsletter = {
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
   sectionHeader?: RequiredHeadingSectionHeader;
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
 };
 
@@ -31,7 +32,6 @@ export type RequiredHeadingSectionHeader = {
   _type: 'requiredHeadingSectionHeader';
   heading?: string;
   supportingText?: string;
-  align?: 'LEFT' | 'CENTER' | 'RIGHT';
 };
 
 export type Module_cta = {
@@ -48,7 +48,9 @@ export type Module_cta = {
   sectionHeader?: RequiredHeadingSectionHeader;
   content?: BasicText;
   image?: ImageWithAlt;
-  imageSide?: 'LEFT' | 'RIGHT';
+  contentPositionSplit?: 'LEFT' | 'RIGHT';
+  contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   mobileMediaOrder?: 'LAST' | 'FIRST';
   actions?: ActionGroup;
   footnote?: string;
@@ -150,6 +152,7 @@ export type Module_postLatest = {
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
   sectionHeader?: SectionHeader;
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   limit?: number;
   layout?: Layout;
 };
@@ -158,7 +161,6 @@ export type SectionHeader = {
   _type: 'sectionHeader';
   heading?: string;
   supportingText?: string;
-  align?: 'LEFT' | 'CENTER' | 'RIGHT';
 };
 
 export type Skim = {
@@ -571,6 +573,7 @@ export type Module_taxonomyList = {
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
   sectionHeader?: SectionHeader;
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
 };
 
@@ -604,6 +607,7 @@ export type Module_postList = {
   title?: string;
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   sectionHeader?: SectionHeader;
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   pageSize?: number;
   layout?: Layout;
 };

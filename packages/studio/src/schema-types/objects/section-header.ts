@@ -1,11 +1,4 @@
-import { HEADING_ALIGN } from '@blog/config/constants';
-import { toTitleCase } from '@blog/utils/primitives';
 import { defineField, defineType } from 'sanity';
-
-const alignOptions = Object.values(HEADING_ALIGN).map((value) => ({
-  title: toTitleCase(value),
-  value,
-}));
 
 const sectionHeaderFields = (options: { requireHeading?: boolean } = {}) => [
   defineField({
@@ -20,14 +13,6 @@ const sectionHeaderFields = (options: { requireHeading?: boolean } = {}) => [
     title: 'Supporting Text',
     type: 'text',
     validation: (rule) => rule.max(300),
-  }),
-  defineField({
-    name: 'align',
-    title: 'Align',
-    type: 'string',
-    description:
-      'Horizontal alignment of the heading. Leave unset for the default (left-aligned).',
-    options: { list: alignOptions },
   }),
 ];
 

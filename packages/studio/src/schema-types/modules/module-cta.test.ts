@@ -1,4 +1,8 @@
-import { BRAND_VARIANT, CTA_VARIANT } from '@blog/config/constants';
+import {
+  BRAND_VARIANT,
+  CTA_ALIGNMENT,
+  CTA_VARIANT,
+} from '@blog/config/constants';
 import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
 
 type TCustomFn = (
@@ -122,6 +126,97 @@ describe('ctaSchema image validation', () => {
         { parent: { variant: CTA_VARIANT.CALLOUT } },
       ),
     ).toBe(true);
+  });
+});
+
+describe('ctaSchema contentPositionSplit field', () => {
+  it('offers only Left and Right', () => {
+    const field = getField('contentPositionSplit');
+
+    expect(getOptionValues(field)).toEqual([
+      CTA_ALIGNMENT.LEFT,
+      CTA_ALIGNMENT.RIGHT,
+    ]);
+  });
+
+  it('defaults to Left', () => {
+    const field = getField('contentPositionSplit');
+
+    expect(field.initialValue).toBe(CTA_ALIGNMENT.LEFT);
+  });
+
+  it('is visible only for Split', () => {
+    const field = getField('contentPositionSplit');
+
+    if (!('hidden' in field) || typeof field.hidden !== 'function') {
+      throw new Error(
+        'Expected contentPositionSplit field to define a hidden() fn.',
+      );
+    }
+
+    const hidden = field.hidden as THiddenFn;
+
+    expect(hidden({ parent: { variant: CTA_VARIANT.SPLIT } })).toBe(false);
+    expect(hidden({ parent: { variant: CTA_VARIANT.BANNER } })).toBe(true);
+    expect(hidden({ parent: { variant: CTA_VARIANT.CALLOUT } })).toBe(true);
+  });
+});
+
+describe('ctaSchema contentPositionBanner field', () => {
+  it('offers Left, Center and Right', () => {
+    const field = getField('contentPositionBanner');
+
+    expect(getOptionValues(field)).toEqual([
+      CTA_ALIGNMENT.LEFT,
+      CTA_ALIGNMENT.CENTER,
+      CTA_ALIGNMENT.RIGHT,
+    ]);
+  });
+
+  it('defaults to Left', () => {
+    const field = getField('contentPositionBanner');
+
+    expect(field.initialValue).toBe(CTA_ALIGNMENT.LEFT);
+  });
+
+  it('is visible only for Banner', () => {
+    const field = getField('contentPositionBanner');
+
+    if (!('hidden' in field) || typeof field.hidden !== 'function') {
+      throw new Error(
+        'Expected contentPositionBanner field to define a hidden() fn.',
+      );
+    }
+
+    const hidden = field.hidden as THiddenFn;
+
+    expect(hidden({ parent: { variant: CTA_VARIANT.BANNER } })).toBe(false);
+    expect(hidden({ parent: { variant: CTA_VARIANT.SPLIT } })).toBe(true);
+    expect(hidden({ parent: { variant: CTA_VARIANT.CALLOUT } })).toBe(true);
+  });
+});
+
+describe('ctaSchema contentAlignment field', () => {
+  it('offers Left, Center and Right', () => {
+    const field = getField('contentAlignment');
+
+    expect(getOptionValues(field)).toEqual([
+      CTA_ALIGNMENT.LEFT,
+      CTA_ALIGNMENT.CENTER,
+      CTA_ALIGNMENT.RIGHT,
+    ]);
+  });
+
+  it('has no initial value', () => {
+    const field = getField('contentAlignment');
+
+    expect(field.initialValue).toBeUndefined();
+  });
+
+  it('is visible on every variant', () => {
+    const field = getField('contentAlignment');
+
+    expect('hidden' in field ? field.hidden : undefined).toBeUndefined();
   });
 });
 

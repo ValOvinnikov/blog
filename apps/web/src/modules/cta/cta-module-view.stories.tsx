@@ -1,14 +1,11 @@
 import {
   BRAND_VARIANT,
-  CTA_IMAGE_SIDE,
+  CTA_ALIGNMENT,
   CTA_MOBILE_MEDIA_ORDER,
   CTA_VARIANT,
 } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import {
-  ctaActionsDemo,
-  ctaContentDemo,
-} from '@web/testing/modules/cta/fixtures';
+import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 
 import { CtaModuleView } from './cta-module-view';
@@ -31,9 +28,13 @@ const meta = {
       control: 'select',
       options: Object.values(BRAND_VARIANT),
     },
-    imageSide: {
+    contentPosition: {
       control: 'select',
-      options: Object.values(CTA_IMAGE_SIDE),
+      options: Object.values(CTA_ALIGNMENT),
+    },
+    contentAlignment: {
+      control: 'select',
+      options: Object.values(CTA_ALIGNMENT),
     },
     mobileMediaOrder: {
       control: 'select',
@@ -50,11 +51,11 @@ const meta = {
       heading: 'Never miss a post',
       supportingText:
         'Subscribe to get new articles on design systems and engineering delivered straight to your inbox.',
-      align: undefined,
     },
     content: undefined,
     image: undefined,
-    imageSide: undefined,
+    contentPosition: undefined,
+    contentAlignment: undefined,
     mobileMediaOrder: undefined,
     actions: ctaActionsDemo,
     footnote: undefined,
@@ -65,25 +66,18 @@ const meta = {
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
-export const Callout: TStory = {};
-
-export const WithoutActions: TStory = {
-  args: { actions: [] },
-};
-
-export const WithContent: TStory = {
-  args: { content: ctaContentDemo },
-};
-
-export const WithImage: TStory = {
-  args: { image: makeSanityImage() },
+export const Callout: TStory = {
+  args: {
+    contentAlignment: CTA_ALIGNMENT.RIGHT,
+  },
 };
 
 export const Split: TStory = {
   args: {
     variant: CTA_VARIANT.SPLIT,
     image: makeSanityImage(),
-    imageSide: CTA_IMAGE_SIDE.RIGHT,
+    contentPosition: CTA_ALIGNMENT.RIGHT,
+    contentAlignment: CTA_ALIGNMENT.RIGHT,
   },
 };
 
@@ -92,9 +86,7 @@ export const Banner: TStory = {
     variant: CTA_VARIANT.BANNER,
     brandVariant: BRAND_VARIANT.SECONDARY,
     image: makeSanityImage(),
+    contentPosition: CTA_ALIGNMENT.CENTER,
+    contentAlignment: CTA_ALIGNMENT.CENTER,
   },
-};
-
-export const Secondary: TStory = {
-  args: { brandVariant: BRAND_VARIANT.SECONDARY },
 };

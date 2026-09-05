@@ -16,8 +16,10 @@ export const NewsletterModuleView = ({
   brandVariant,
   sectionHeader,
   layout,
+  contentAlignment,
 }: INewsletterModuleViewProps) => {
   const titleId = `newsletter-${id}`;
+  const { heading, supportingText } = sectionHeader;
 
   return (
     <Section
@@ -28,10 +30,10 @@ export const NewsletterModuleView = ({
     >
       <NewsletterForm
         variant="full"
-        heading={sectionHeader.heading}
+        heading={heading}
         headingId={titleId}
-        supportingText={sectionHeader.supportingText}
-        align={sectionHeader.align}
+        supportingText={supportingText}
+        align={contentAlignment}
       />
     </Section>
   );

@@ -1,5 +1,3 @@
-import { HEADING_ALIGN } from '@blog/config';
-
 import {
   toRequiredSectionHeader,
   toSectionHeader,
@@ -10,13 +8,11 @@ import {
 const rawSectionHeader: TRawSectionHeader = {
   heading: 'Featured posts',
   supportingText: 'Hand-picked reads from the team',
-  align: HEADING_ALIGN.CENTER,
 };
 
 const rawRequiredSectionHeader: TRawRequiredSectionHeader = {
   heading: 'Featured posts',
   supportingText: 'Hand-picked reads from the team',
-  align: HEADING_ALIGN.CENTER,
 };
 
 describe('toSectionHeader', () => {
@@ -29,12 +25,10 @@ describe('toSectionHeader', () => {
       toSectionHeader({
         heading: null,
         supportingText: null,
-        align: null,
       }),
     ).toEqual({
       heading: undefined,
       supportingText: undefined,
-      align: undefined,
     });
   });
 });
@@ -51,12 +45,10 @@ describe('toRequiredSectionHeader', () => {
       toRequiredSectionHeader({
         heading: 'Latest from the blog',
         supportingText: null,
-        align: null,
       }),
     ).toEqual({
       heading: 'Latest from the blog',
       supportingText: undefined,
-      align: undefined,
     });
   });
 });

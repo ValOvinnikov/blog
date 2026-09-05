@@ -7,4 +7,8 @@ describe('postLatestModuleQuery', () => {
     );
     expect(postLatestModuleQuery.query).toContain('_id == $id');
   });
+
+  it('projects contentAlignment', () => {
+    expect(postLatestModuleQuery.query).toContain('contentAlignment');
+  });
 });

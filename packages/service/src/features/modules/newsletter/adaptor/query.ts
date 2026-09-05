@@ -14,5 +14,6 @@ export const newsletterModuleQuery = q
       .project(requiredSectionHeaderFragment)
       .notNull(),
     layout: sub.field('layout').project(layoutFragment).nullable(true),
+    contentAlignment: sub.field('contentAlignment').nullable(true),
   }))
   .notNull();

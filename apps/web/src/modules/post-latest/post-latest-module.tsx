@@ -27,7 +27,8 @@ export const PostLatestModule = async ({
 
   if (!result.ok) return null;
 
-  const { brandVariant, sectionHeader, posts, layout } = result.data;
+  const { brandVariant, sectionHeader, posts, layout, contentAlignment } =
+    result.data;
 
   const items = await toPostListItems(posts);
 
@@ -39,6 +40,7 @@ export const PostLatestModule = async ({
       sectionHeader={sectionHeader}
       items={items}
       layout={layout}
+      contentAlignment={contentAlignment}
       titleId={`latest-posts-${id}`}
       dataTestId={`post-latest-module-${id}`}
       accessibleTitle={t('fallbackHeading')}

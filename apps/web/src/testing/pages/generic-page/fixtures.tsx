@@ -41,11 +41,11 @@ export const makeGenericPageView = (
           sectionHeader={{
             heading: 'Get in touch',
             supportingText: 'Have a question? We would love to hear from you.',
-            align: undefined,
           }}
           content={undefined}
           image={undefined}
-          imageSide={undefined}
+          contentPosition={undefined}
+          contentAlignment={undefined}
           mobileMediaOrder={undefined}
           actions={ctaActionsDemo}
           footnote={undefined}

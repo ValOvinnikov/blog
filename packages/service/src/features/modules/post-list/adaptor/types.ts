@@ -1,5 +1,6 @@
 import type {
   TFullBrandVariant,
+  THeadingAlign,
   TLayout,
   TMaybeUndefined,
   TSectionHeader,
@@ -11,6 +12,7 @@ export type TPostListModule = {
   sectionHeader: TSectionHeader;
   posts: TPostCard[];
   layout: TMaybeUndefined<TLayout>;
+  contentAlignment: TMaybeUndefined<THeadingAlign>;
   currentPage: number;
   totalPages: number;
 };

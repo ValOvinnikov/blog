@@ -51,12 +51,13 @@ export const TaxonomyListModuleView = ({
   headingLevel,
   accessibleTitle,
   emptyMessage,
+  contentAlignment,
 }: ITaxonomyListModuleViewProps) => {
-  const { heading, supportingText, align } = sectionHeader;
+  const { heading, supportingText } = sectionHeader;
   const hasHeading = Boolean(heading?.trim());
   const resolvedTitle = hasHeading ? heading : accessibleTitle;
   const isEmpty = items.length === 0;
-  const s = taxonomyListModuleViewVariants({ align });
+  const s = taxonomyListModuleViewVariants({ align: contentAlignment });
 
   return (
     <Section

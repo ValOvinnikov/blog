@@ -4,11 +4,10 @@ import type {
   ISanityImage,
   TCtaActionAppearance,
   TCtaActionVariant,
-  TCtaImageSide,
+  TCtaAlignment,
   TCtaMobileMediaOrder,
   TCtaVariant,
   TFullBrandVariant,
-  THeadingAlign,
   TLayout,
   TMaybeUndefined,
 } from '@blog/config';
@@ -27,11 +26,11 @@ export type TCtaModule = {
   sectionHeader: {
     heading: string;
     supportingText: TMaybeUndefined<string>;
-    align: TMaybeUndefined<THeadingAlign>;
   };
   content: TMaybeUndefined<BasicText>;
   image: TMaybeUndefined<ISanityImage>;
-  imageSide: TMaybeUndefined<TCtaImageSide>;
+  contentPosition: TMaybeUndefined<TCtaAlignment>;
+  contentAlignment: TMaybeUndefined<TCtaAlignment>;
   mobileMediaOrder: TMaybeUndefined<TCtaMobileMediaOrder>;
   actions: TCtaAction[];
   footnote: TMaybeUndefined<string>;

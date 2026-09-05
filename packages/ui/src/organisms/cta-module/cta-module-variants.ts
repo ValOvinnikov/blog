@@ -1,9 +1,8 @@
 import {
   BRAND_VARIANT,
-  CTA_IMAGE_SIDE,
+  CTA_ALIGNMENT,
   CTA_MOBILE_MEDIA_ORDER,
   CTA_VARIANT,
-  HEADING_ALIGN,
 } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
@@ -71,23 +70,24 @@ export const ctaModuleVariants = tv({
       [BRAND_VARIANT.SECONDARY]: {},
       [BRAND_VARIANT.BRAND_PRIMARY]: {},
     },
-    align: {
-      [HEADING_ALIGN.LEFT]: {
-        root: ['items-start text-left'],
+    position: {
+      [CTA_ALIGNMENT.LEFT]: {},
+      [CTA_ALIGNMENT.CENTER]: {},
+      [CTA_ALIGNMENT.RIGHT]: {},
+    },
+    alignment: {
+      [CTA_ALIGNMENT.LEFT]: {
+        root: ['text-left'],
         actions: ['justify-start'],
       },
-      [HEADING_ALIGN.CENTER]: {
-        root: ['items-center text-center'],
+      [CTA_ALIGNMENT.CENTER]: {
+        root: ['text-center'],
         actions: ['justify-center'],
       },
-      [HEADING_ALIGN.RIGHT]: {
-        root: ['items-end text-right'],
+      [CTA_ALIGNMENT.RIGHT]: {
+        root: ['text-right'],
         actions: ['justify-end'],
       },
-    },
-    imageSide: {
-      [CTA_IMAGE_SIDE.LEFT]: { body: ['md:order-2'] },
-      [CTA_IMAGE_SIDE.RIGHT]: {},
     },
     mobileMediaOrder: {
       [CTA_MOBILE_MEDIA_ORDER.FIRST]: { media: ['order-first md:order-none'] },
@@ -123,11 +123,31 @@ export const ctaModuleVariants = tv({
       tone: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
       class: { overlay: [NEUTRAL_SCRIM] },
     },
+    {
+      variant: CTA_VARIANT.BANNER,
+      position: CTA_ALIGNMENT.LEFT,
+      class: { root: ['items-start'] },
+    },
+    {
+      variant: CTA_VARIANT.BANNER,
+      position: CTA_ALIGNMENT.CENTER,
+      class: { root: ['items-center'] },
+    },
+    {
+      variant: CTA_VARIANT.BANNER,
+      position: CTA_ALIGNMENT.RIGHT,
+      class: { root: ['items-end'] },
+    },
+    {
+      variant: CTA_VARIANT.SPLIT,
+      position: CTA_ALIGNMENT.RIGHT,
+      class: { body: ['md:order-2'] },
+    },
     // A centered Callout still reads lists left-aligned within the centered
     // block — a fully centered list separates markers from their text.
     {
       variant: CTA_VARIANT.CALLOUT,
-      align: HEADING_ALIGN.CENTER,
+      alignment: CTA_ALIGNMENT.CENTER,
       class: {
         text: [
           '[&_ul]:inline-block [&_ol]:inline-block [&_ul]:text-left [&_ol]:text-left',

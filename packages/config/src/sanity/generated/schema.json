@@ -66,6 +66,27 @@
         },
         "optional": true
       },
+      "contentAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
+            },
+            {
+              "type": "string",
+              "value": "RIGHT"
+            }
+          ]
+        },
+        "optional": true
+      },
       "layout": {
         "type": "objectAttribute",
         "value": {
@@ -100,27 +121,6 @@
           "type": "objectAttribute",
           "value": {
             "type": "string"
-          },
-          "optional": true
-        },
-        "align": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "union",
-            "of": [
-              {
-                "type": "string",
-                "value": "LEFT"
-              },
-              {
-                "type": "string",
-                "value": "CENTER"
-              },
-              {
-                "type": "string",
-                "value": "RIGHT"
-              }
-            ]
           },
           "optional": true
         }
@@ -263,7 +263,7 @@
         },
         "optional": true
       },
-      "imageSide": {
+      "contentPositionSplit": {
         "type": "objectAttribute",
         "value": {
           "type": "union",
@@ -271,6 +271,48 @@
             {
               "type": "string",
               "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "RIGHT"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "contentPositionBanner": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
+            },
+            {
+              "type": "string",
+              "value": "RIGHT"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "contentAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
             },
             {
               "type": "string",
@@ -941,6 +983,27 @@
         },
         "optional": true
       },
+      "contentAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
+            },
+            {
+              "type": "string",
+              "value": "RIGHT"
+            }
+          ]
+        },
+        "optional": true
+      },
       "limit": {
         "type": "objectAttribute",
         "value": {
@@ -982,27 +1045,6 @@
           "type": "objectAttribute",
           "value": {
             "type": "string"
-          },
-          "optional": true
-        },
-        "align": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "union",
-            "of": [
-              {
-                "type": "string",
-                "value": "LEFT"
-              },
-              {
-                "type": "string",
-                "value": "CENTER"
-              },
-              {
-                "type": "string",
-                "value": "RIGHT"
-              }
-            ]
           },
           "optional": true
         }
@@ -3545,6 +3587,27 @@
         },
         "optional": true
       },
+      "contentAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
+            },
+            {
+              "type": "string",
+              "value": "RIGHT"
+            }
+          ]
+        },
+        "optional": true
+      },
       "layout": {
         "type": "objectAttribute",
         "value": {
@@ -3739,6 +3802,27 @@
         "value": {
           "type": "inline",
           "name": "sectionHeader"
+        },
+        "optional": true
+      },
+      "contentAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
+            },
+            {
+              "type": "string",
+              "value": "RIGHT"
+            }
+          ]
         },
         "optional": true
       },
