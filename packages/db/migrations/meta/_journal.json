@@ -176,6 +176,13 @@
       "when": 1788563578249,
       "tag": "0024_faithful_kree",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1788595637099,
+      "tag": "0025_mysterious_union_jack",
+      "breakpoints": true
     }
   ]
 }
