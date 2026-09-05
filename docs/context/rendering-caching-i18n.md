@@ -67,21 +67,61 @@
   `revalidateTag(tag, { expire: 0 })` — immediate expiry, not a stale-while-
   revalidate profile) from a Sanity publish webhook. Tag expiry alone does not
   invalidate prerendered route entries on Vercel (#318), so the route also
-  calls `revalidatePath('/', 'layout')` when a registered type matched —
-  purging every page per publish, **including every other tenant's**.
+  purges paths, on top of the tag purge above. A published `blog_post` purges
+  only its own tenant's affected paths; every other type still purges every
+  page of every tenant, as described below.
 
-  That blast radius is not a choice, and the obvious narrowing does not work:
-  `revalidatePath('/<tenantId>', 'layout')` matches nothing. Next derives its
-  per-segment layout tags from the **route pattern with brackets unresolved**
-  (`getDerivedTags` in `next/dist/server/lib/implicit-tags.js`), so a page under
+  A per-tenant layout purge is not expressible: `revalidatePath('/<tenantId>',
+'layout')` matches nothing. Next derives its per-segment layout tags from
+  the **route pattern with brackets unresolved** (`getDerivedTags` in
+  `next/dist/server/lib/implicit-tags.js`), so a page under
   `[tenant]/[locale]` carries `_N_T_/[tenant]/layout`, never an interpolated
   id; the resolved pathname contributes one exact tag with no `/layout`
   suffix. A scoped layout purge therefore fails **silently** — no error, no
   log, stale HTML served indefinitely — and a unit test cannot catch it,
   since `revalidatePath` is mocked and only its arguments are observable.
   Passing the bracket pattern instead matches every tenant, so it buys
-  nothing. Purging **resolved** paths does work and is the tracked follow-up
-  (#2666).
+  nothing.
+
+  Purging **resolved** paths does work — `revalidatePath('/<tenantId>/<locale>/
+blog/my-post')` matches the resolved-pathname tag exactly — and is how the
+  route now purges a published `blog_post` (#2666):
+  `@web/server/revalidate/derive-revalidate-paths` queries `@blog/service` for
+  the post's own slug, every archive's current pagination extent
+  (`getIndexPageParams`), and **every** tag/topic page of the tenant
+  (`getTagParams`/`getTopicParams` for the page-1 slugs, `getTagPaginationParams`/
+  `getTopicPaginationParams` for pages 2…N) — not filtered down to the ones
+  this post currently belongs to. Then `@web/utils/build-post-publish-paths`
+  assembles the full, tenant-and-locale-scoped path set — the post's own page,
+  home, the blog archive with pagination, and every tag/topic page (with its
+  own pagination) in the tenant. Purging the whole taxonomy rather than just
+  the post's current tags/topic is deliberate: a re-categorisation or tag
+  removal leaves stale HTML on the page the post was removed from, and the
+  derivation would otherwise report success while missing it. It also removes
+  any need to know a post's _previous_ taxonomy, which the webhook payload
+  does not carry.
+
+  **Known limitation, accepted rather than solved:** a renamed post slug is
+  not recoverable from the webhook payload, so the page at the _old_ slug
+  keeps its stale prerendered HTML (still listing the post) until something
+  else revalidates that path. Fixing this would require reconfiguring the
+  Sanity webhook to project the document's previous slug, which is
+  human-gated console work.
+
+  Every other `_type` (including the `posts`-tagged
+  `blog_author`/`blog_topic`/`blog_tag`, whose edit can affect every
+  post-list-bearing page of a tenant) has no precise derivation yet — full
+  enumeration for those is unbounded in the number of `revalidatePath` calls
+  for a large tenant, a design tradeoff not yet resolved. Any undeliverable
+  derivation — an unresolved tenant, a `_type` with no derivation, a thrown
+  Sanity-credentials lookup, or a failed lookup — falls back to the
+  whole-site `revalidatePath('/', 'layout')` purge, always logged
+  (`revalidate.path_purge_fallback`) rather than left silently incomplete.
+  The credentials lookup (`getTenantSanityCredentials`, which throws when
+  `TENANT_TOKEN_ENCRYPTION_KEY` is unconfigured, or on a transient DB error)
+  is wrapped in a try/catch for exactly this reason — an uncaught throw there
+  would abort the handler before the fallback purge ever ran, which is worse
+  than the partial purge the fallback exists to prevent.
 
   The same route also cleans up orphaned `bookmarks` rows (`@blog/db`) when the
   webhook's `sanity-operation` header reads `delete` for a `blog_post` —
@@ -98,8 +138,7 @@
 - **`site_config` on-demand revalidation:** `POST /api/revalidate-site-config`
   (`apps/web`) mirrors `/api/revalidate`'s cache-purge shape
   (per-tenant `revalidateTag('site-config:<tenantId>', { expire: 0 })` +
-  same for `settings-features`/`tenant-plan` +
-  `revalidatePath('/', 'layout')` fallback) but not its verification
+  same for `settings-features`/`tenant-plan`) but not its verification
   mechanism or its caller — it's called by `apps/platform`'s Look/Voice save
   actions after a `site_config` write, not by a Sanity webhook, so it
   verifies a plain shared secret (`SITE_CONFIG_REVALIDATE_SECRET`, sent as a
@@ -108,7 +147,19 @@
   an omitted `tenantId` falls back to revalidating every tenant, so
   revalidation never silently stops working; `apps/platform` always sends one,
   leaving that fallback as a safety net for a future caller rather than a path
-  the panel takes. It calls the endpoint best-effort
+  the panel takes.
+
+  Unlike `/api/revalidate`, this route makes no attempt at a resolved-path
+  derivation and is expected to stay that way permanently (#2666) — a
+  Look/Voice/Features save changes theme tokens, nav or feature flags on
+  _every_ page the tenant renders, so there is no smaller path set that would
+  be correct to purge instead of the whole site; a full per-tenant path
+  enumeration would be no more correct here, only more code. It always falls
+  back to `revalidatePath('/', 'layout')`, logged
+  (`revalidate_site_config.whole_site_purge`, with the resolved `tenantIds`)
+  rather than silent.
+
+  It calls the endpoint best-effort
   (`@platform/server/site-config/revalidate-site-config`) — a failed call is
   logged, never thrown, and the site-config cache's own
   3600s (`SITE_CONFIG_REVALIDATE_SECONDS`) window remains the fallback
@@ -117,6 +168,7 @@
   been archived, and it takes the opposite stance deliberately — it throws on
   missing config or a non-2xx rather than logging and continuing, because a
   skipped purge would leave an archived site serving from the prerender cache.
+
 - **Skim generation pipeline (#957):** `POST /api/generate-skim?secret=…`
   (`apps/web`), triggered by a Sanity publish webhook on `post`. Verification
   matches `/api/revalidate`'s _stance_ (feature-flag-by-absence, same 401/503
