@@ -729,16 +729,39 @@ gates, is unchanged.)
 6. **Ask to push** — explicit approval required; separate question; wait for answer
 7. **Ask to open PR** — separate question, after push; wait for answer.
    Once approved: run `gh pr create`, then **immediately** set the issue → Code Review
-   on the board, and tag the PR `agent:<job-id>` so concurrently running
+   on the board, and tag the PR `job:<session-name>` so concurrently running
    background jobs stay tellable apart in the GitHub PR list
    (`open-pull-request` Gate 5 — silently skipped in a foreground session,
    which has no job id and no ambiguity to resolve, and not applicable to a
    cloud session at all, which opens no PR from here; `board-keeper` deletes
    the label once no open PR carries it) — do not report the PR URL until
    the board update is done.
+
+   **Use the session's name, not its id.** Read it from
+   `$CLAUDE_JOB_DIR/state.json`'s `name` field and slugify it —
+   `job:static-generation`, never `job:ab922b91`. That name is what the
+   human sees in their own job list, so it is the only form that lets them
+   match a PR back to the job that opened it; a daemon hash identifies the
+   session to the machine and to nobody else. A job with no name is the one
+   case where the id is the fallback.
+
+   The job id goes in the label's **description**, solely as the stable key
+   that survives a rename — it is machinery, not something a reader is meant
+   to use. A renamed session must find its existing label by that
+   description and `gh label edit --name` it, never create a second:
+   renaming propagates to every PR already carrying it, while a new label
+   leaves earlier PRs showing a name the session no longer has. Full
+   mechanics in `open-pull-request` Gate 5.
+
+   **The label identifies the background job that ran the work, not the
+   author: PRs are always opened by the orchestrator, never by a subagent.**
+   Every PR is authored by the repo owner's GitHub account, because `gh`
+   authenticates as them and there is no separate agent identity to
+   attribute one to.
    Then dispatch `ci-watcher` (background) to watch CI to completion, and
    diagnose and fix any failure it reports (`open-pull-request` Gate 5a) — a
    fix push still needs its own fresh push-approval ask, same as any push.
+
 8. **Remove the subagent worktrees you created** (no gate — just do it). Nothing
    else will: the harness never auto-sweeps them because `worktree-agent-*`
    branches are never pushed. Worktrees share the main checkout's
@@ -909,7 +932,7 @@ replaced, and nothing else:
 - The delivery gate sequence's board writes (step 1's In Progress, step
   7's Code Review) are replaced by the evidence protocol below — cloud
   sessions cannot write the board at all.
-- Step 7's `agent:<job-id>` PR label does not apply either, and has no
+- Step 7's `job:<session-name>` PR label does not apply either, and has no
   substitute. It exists to tell **concurrent local background jobs** apart
   in the PR list; a cloud session is not one of those, has no job id, and
   ships without the `gh` binary the labelling uses. Do not reach for an MCP

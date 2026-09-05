@@ -262,16 +262,51 @@ because GitHub renders labels as chips directly in the list row:
 ```
 JOB=$(basename "$CLAUDE_JOB_DIR")
 NAME=$(jq -r '.name // empty' "$CLAUDE_JOB_DIR/state.json")
-gh label create "agent:$JOB" --color D4D8DC --description "$NAME" --force
-gh pr edit <n> --add-label "agent:$JOB"
+SLUG=$(printf '%s' "${NAME:-$JOB}" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' \
+  | sed 's/^-*//; s/-*$//')
+
+# One label per job, keyed by the job id in its description — so a renamed
+# session renames its existing label instead of minting a second one.
+PREV=$(gh label list --limit 200 --json name,description \
+  --jq ".[] | select(.description == \"$JOB\") | .name")
+
+if [ -n "$PREV" ] && [ "$PREV" != "job:$SLUG" ]; then
+  gh label edit "$PREV" --name "job:$SLUG"
+elif [ -z "$PREV" ]; then
+  gh label create "job:$SLUG" --color D4D8DC --description "$JOB"
+fi
+gh pr edit <n> --add-label "job:$SLUG"
 ```
 
-`$JOB` is the job id shown in the job list (`d6f122a6`), which is also the
-first segment of the session's resume UUID — so the chip leads straight back
-to `claude --resume <that job>`. `--force` makes the call create-or-update, so
-a job renamed mid-flight refreshes its description rather than failing. The
-muted grey keeps the chip reading as metadata beside the `prio:*` and
-`layer:*` chips rather than competing with them.
+**The chip carries the session's name, and the job id goes in the
+description — not the other way round.** Only the label's name renders in the
+PR list row; a description is invisible there. So the visible half has to be
+the thing the human recognises — `job:static-generation`, the name they gave
+the session and see in their own job list. A daemon hash like `ab922b91`
+identifies the session to the machine and to nobody else, and putting it on
+the chip makes every PR look alike, which is the exact problem this label
+exists to solve.
+
+The id lives in the description purely as the **stable key** the label is
+looked up by — the one identifier that survives a rename. It is machinery,
+not something a reader is meant to use: a label has nowhere else to carry
+metadata, so that is where it goes, and a human hovering the chip to find a
+hash is not a workflow anyone has. Do not add it to the chip text on the
+theory that someone might want it there.
+
+**A session renamed mid-flight renames its label; it never creates a second
+one.** A GitHub label is an object, so `gh label edit --name` propagates to
+every PR already carrying it — the chip on a PR opened an hour ago updates
+too. Minting a fresh label instead would leave every earlier PR showing a
+name the session no longer has, which is worse than the hash this replaced:
+a stale name reads as current and misidentifies the job, where a hash merely
+says nothing. Do not reach for `--force` here — it creates-or-updates by
+_name_, which is precisely the wrong key.
+
+An unnamed job falls back to the id for the chip too, since a nameless chip
+is worse than an opaque one. The muted grey keeps the chip reading as
+metadata beside the `prio:*` and `layer:*` chips rather than competing with
+them.
 
 **Skip this silently when `$CLAUDE_JOB_DIR` is unset.** A foreground session
 has no job id — and no ambiguity to resolve either, since the label exists
@@ -290,6 +325,11 @@ The label identifies the **job**, not an individual subagent: one job
 dispatches many layer agents into a single PR. That is the granularity that
 answers the question actually being asked of it — "which of my running
 sessions do I go back to in order to approve this push?"
+
+It is also not a claim of authorship. Every PR is authored by the repo
+owner's GitHub account, because `gh` authenticates as them and there is no
+separate agent identity; and PR creation is the orchestrator's own step at
+this gate, never a subagent's.
 
 `board-keeper` deletes the label once no open PR carries it (its
 `"after merge of #<n>"` trigger), so the set stays bounded to live work.
