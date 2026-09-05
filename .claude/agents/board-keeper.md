@@ -399,14 +399,14 @@ Skip this step entirely for any other trigger.
    - Otherwise (partial completion, parent still correctly `OPEN` and
      already In Progress/Code Review) — nothing to do, no need to report
      the numbers just to report them.
-3. **On `"after merge of #<n>"` only — sweep orphaned `agent:*` labels.**
+3. **On `"after merge of #<n>"` only — sweep orphaned `job:*` labels.**
    Skip this for `"after PR #<n>"`: the PR that just opened still needs its
-   chip. Every PR is tagged `agent:<job-id>` at `open-pull-request`'s Gate 5
+   chip. Every PR is tagged `job:<session-name>` at `open-pull-request`'s Gate 5
    so concurrent background jobs are tellable apart in the PR list; once no
    open PR carries one, it is dead weight in the label picker.
 
    ```
-   gh label list --limit 200 --json name --jq '.[].name | select(startswith("agent:"))'
+   gh label list --limit 200 --json name --jq '.[].name | select(startswith("job:"))'
    ```
 
    For each name returned, check whether any open PR still carries it, and
