@@ -1,11 +1,20 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const SRC_ROOT = fileURLToPath(new URL('..', import.meta.url));
-const ENTRYPOINT = fileURLToPath(new URL('./index.ts', import.meta.url));
+const PACKAGE_ROOT = fileURLToPath(new URL('..', import.meta.url));
 
 const FORBIDDEN_SPECIFIERS = ['server-only', 'resend'];
+
+function readClientSafeEntrypoints(): string[] {
+  const manifest = JSON.parse(
+    readFileSync(resolve(PACKAGE_ROOT, 'package.json'), 'utf8'),
+  ) as { exports: Record<string, string> };
+
+  return Object.entries(manifest.exports)
+    .filter(([specifier]) => specifier !== '.')
+    .map(([, entryPath]) => resolve(PACKAGE_ROOT, entryPath));
+}
 
 function extractSpecifiers(source: string): string[] {
   const specifiers: string[] = [];
@@ -31,7 +40,7 @@ function toModulePath(specifier: string, fromFile: string): string | null {
     return resolve(dirname(fromFile), specifier);
   }
   if (specifier.startsWith('@blog/email/')) {
-    return resolve(SRC_ROOT, specifier.slice('@blog/email/'.length));
+    return resolve(PACKAGE_ROOT, 'src', specifier.slice('@blog/email/'.length));
   }
   return null;
 }
@@ -40,7 +49,11 @@ function toFilePath(modulePath: string): string {
   if (modulePath.endsWith('.ts')) {
     return modulePath;
   }
-  return `${modulePath}.ts`;
+  const asFile = `${modulePath}.ts`;
+  if (existsSync(asFile)) {
+    return asFile;
+  }
+  return resolve(modulePath, 'index.ts');
 }
 
 function collectModuleGraph(entryFile: string): {
@@ -72,17 +85,26 @@ function collectModuleGraph(entryFile: string): {
   return { internal, external };
 }
 
-describe('the @blog/email/html subpath', () => {
-  it('never transitively imports server-only, resend, or the env module', () => {
-    const { internal, external } = collectModuleGraph(ENTRYPOINT);
+describe('every client-safe entrypoint declared in package.json', () => {
+  const entrypoints = readClientSafeEntrypoints();
 
-    for (const forbidden of FORBIDDEN_SPECIFIERS) {
-      expect(external.has(forbidden)).toBe(false);
-    }
-
-    const importsEnvModule = [...internal].some((file) =>
-      file.includes(`${resolve(SRC_ROOT, 'utils/env')}`),
-    );
-    expect(importsEnvModule).toBe(false);
+  it('declares at least one client-safe entrypoint to check', () => {
+    expect(entrypoints.length).toBeGreaterThan(0);
   });
+
+  it.each(entrypoints)(
+    'never transitively imports server-only, resend, or the env module: %s',
+    (entryFile) => {
+      const { internal, external } = collectModuleGraph(entryFile);
+
+      for (const forbidden of FORBIDDEN_SPECIFIERS) {
+        expect(external.has(forbidden)).toBe(false);
+      }
+
+      const importsEnvModule = [...internal].some((file) =>
+        file.includes(resolve(PACKAGE_ROOT, 'src/utils/env')),
+      );
+      expect(importsEnvModule).toBe(false);
+    },
+  );
 });
