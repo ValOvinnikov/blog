@@ -5,9 +5,10 @@ import { resolveTenantId } from '@web/server/tenant/resolve-tenant-id';
 import { escapeXml } from '@web/utils/escape-xml';
 import { logger } from '@web/utils/logger/logger';
 import { NextResponse } from 'next/server';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 
 type TConfirmationPageCopy = {
+  lang: string;
   title: string;
   message: string;
   returnHomeLabel: string;
@@ -22,6 +23,7 @@ type TConfirmationPageCopy = {
  * translated copy before it's interpolated into markup.
  */
 const renderConfirmationPage = ({
+  lang,
   title,
   message,
   returnHomeLabel,
@@ -32,7 +34,7 @@ const renderConfirmationPage = ({
   const homeHref = routes.home();
 
   return `<!doctype html>
-<html lang="en">
+<html lang="${lang}">
   <head>
     <meta charset="utf-8" />
     <title>${safeTitle}</title>
@@ -60,12 +62,16 @@ const renderConfirmationPage = ({
  */
 export async function GET(request: Request): Promise<NextResponse> {
   const token = new URL(request.url).searchParams.get('token');
-  const t = await getTranslations('newsletterConfirm');
+  const [lang, t] = await Promise.all([
+    getLocale(),
+    getTranslations('newsletterConfirm'),
+  ]);
   const returnHomeLabel = t('returnHome');
 
   if (!token) {
     return new NextResponse(
       renderConfirmationPage({
+        lang,
         title: t('invalidTitle'),
         message: t('invalidMessage'),
         returnHomeLabel,
@@ -80,6 +86,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     if (!tenantId) {
       return new NextResponse(
         renderConfirmationPage({
+          lang,
           title: t('errorTitle'),
           message: t('errorMessage'),
           returnHomeLabel,
@@ -95,6 +102,7 @@ export async function GET(request: Request): Promise<NextResponse> {
       logger.warn('newsletter.confirm_tenant_not_active', { tenantId });
       return new NextResponse(
         renderConfirmationPage({
+          lang,
           title: t('errorTitle'),
           message: t('errorMessage'),
           returnHomeLabel,
@@ -111,6 +119,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     if (result.outcome === 'not-found') {
       return new NextResponse(
         renderConfirmationPage({
+          lang,
           title: t('invalidTitle'),
           message: t('invalidMessage'),
           returnHomeLabel,
@@ -124,6 +133,7 @@ export async function GET(request: Request): Promise<NextResponse> {
 
     return new NextResponse(
       renderConfirmationPage({
+        lang,
         title: t('confirmedTitle'),
         message: t('confirmedMessage'),
         returnHomeLabel,
@@ -134,6 +144,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     logger.error('newsletter.confirm_failed', { error });
     return new NextResponse(
       renderConfirmationPage({
+        lang,
         title: t('errorTitle'),
         message: t('errorMessage'),
         returnHomeLabel,
