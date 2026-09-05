@@ -55,7 +55,6 @@ const meta = {
             heading: 'Never miss a post',
             supportingText:
               'Subscribe to get new articles on design systems and engineering delivered straight to your inbox.',
-            align: undefined,
           }}
           content={undefined}
           image={undefined}

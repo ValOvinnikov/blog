@@ -5,7 +5,6 @@ import {
   CTA_ACTION_VARIANT,
   CTA_ALIGNMENT,
   CTA_VARIANT,
-  HEADING_ALIGN,
   LINK_TYPE,
 } from '@blog/config';
 import {
@@ -28,7 +27,6 @@ describe('toCtaModule', () => {
     expect(cta.sectionHeader).toEqual({
       heading: 'Subscribe to the newsletter',
       supportingText: 'Get new posts in your inbox.',
-      align: undefined,
     });
     expect(cta.brandVariant).toBe(BRAND_VARIANT.PRIMARY);
   });
@@ -147,33 +145,17 @@ describe('toCtaModule', () => {
     expect(cta.contentAlignment).toBe(CTA_ALIGNMENT.CENTER);
   });
 
-  it('leaves supportingText and align undefined when not set (no faked default)', () => {
+  it('leaves supportingText undefined when not set (no faked default)', () => {
     const raw = makeRawCtaModule({
       sectionHeader: {
         heading: 'Subscribe to the newsletter',
         supportingText: null,
-        align: null,
       },
     });
 
     const cta = toCtaModule(raw, makeTenant());
 
     expect(cta.sectionHeader.supportingText).toBeUndefined();
-    expect(cta.sectionHeader.align).toBeUndefined();
-  });
-
-  it('maps sectionHeader.align when authored', () => {
-    const raw = makeRawCtaModule({
-      sectionHeader: {
-        heading: 'Subscribe to the newsletter',
-        supportingText: null,
-        align: HEADING_ALIGN.CENTER,
-      },
-    });
-
-    const cta = toCtaModule(raw, makeTenant());
-
-    expect(cta.sectionHeader.align).toBe(HEADING_ALIGN.CENTER);
   });
 
   it('leaves eyebrow and footnote undefined when unset', () => {

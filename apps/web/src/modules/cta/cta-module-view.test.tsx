@@ -1,4 +1,5 @@
 import { BRAND_VARIANT, CTA_ALIGNMENT, CTA_VARIANT } from '@blog/config';
+import { CtaModule } from '@blog/ui/organisms/cta-module';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   ctaActionsDemo,
@@ -7,6 +8,18 @@ import {
 import type { ReactNode } from 'react';
 
 import { CtaModuleView } from './cta-module-view';
+
+// Wraps the real implementation (so every other assertion in this file keeps
+// exercising actual render behaviour) purely to observe the props it is
+// called with — never its own rendered output.
+vi.mock('@blog/ui/organisms/cta-module', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('@blog/ui/organisms/cta-module')>();
+  return {
+    ...actual,
+    CtaModule: vi.fn(actual.CtaModule),
+  };
+});
 
 // Fakes `Section` so tests can read `brandVariant` from a `data-*`
 // attribute instead of the rendered `tv()` background class.
@@ -35,7 +48,6 @@ const setup = customRender(CtaModuleView, {
   sectionHeader: {
     heading: 'Get started',
     supportingText: undefined,
-    align: undefined,
   },
   content: undefined,
   image: undefined,
@@ -67,7 +79,6 @@ describe(CtaModuleView, () => {
       sectionHeader: {
         heading: 'Join us',
         supportingText: undefined,
-        align: undefined,
       },
     });
 
@@ -126,13 +137,18 @@ describe(CtaModuleView, () => {
   });
 
   it('passes contentPosition and contentAlignment through to CtaModule', () => {
-    const { container } = setup({
+    setup({
       variant: CTA_VARIANT.SPLIT,
       contentPosition: CTA_ALIGNMENT.RIGHT,
       contentAlignment: CTA_ALIGNMENT.RIGHT,
     });
 
-    expect(container.querySelector('.md\\:order-2')).not.toBeNull();
-    expect(container.querySelector('.text-right')).not.toBeNull();
+    expect(vi.mocked(CtaModule)).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        contentPosition: CTA_ALIGNMENT.RIGHT,
+        contentAlignment: CTA_ALIGNMENT.RIGHT,
+      }),
+      undefined,
+    );
   });
 });

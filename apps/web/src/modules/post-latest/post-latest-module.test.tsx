@@ -57,10 +57,10 @@ describe(PostLatestModule, () => {
         sectionHeader: {
           heading: 'Latest posts',
           supportingText: undefined,
-          align: undefined,
         },
         posts: [],
         layout: undefined,
+        contentAlignment: undefined,
       },
     });
 
@@ -86,10 +86,10 @@ describe(PostLatestModule, () => {
         sectionHeader: {
           heading: 'Latest posts',
           supportingText: undefined,
-          align: undefined,
         },
         posts: [],
         layout: undefined,
+        contentAlignment: undefined,
       },
     });
 
@@ -118,10 +118,10 @@ describe(PostLatestModule, () => {
         sectionHeader: {
           heading: 'Latest posts',
           supportingText: undefined,
-          align: undefined,
         },
         posts: [],
         layout: undefined,
+        contentAlignment: undefined,
       },
     });
 
@@ -139,7 +139,6 @@ describe(PostLatestModule, () => {
         sectionHeader: {
           heading: undefined,
           supportingText: undefined,
-          align: undefined,
         },
         posts: [
           {
@@ -153,6 +152,7 @@ describe(PostLatestModule, () => {
           },
         ],
         layout: undefined,
+        contentAlignment: undefined,
       },
     });
 
@@ -176,7 +176,6 @@ describe(PostLatestModule, () => {
         sectionHeader: {
           heading: 'Latest posts',
           supportingText: undefined,
-          align: undefined,
         },
         posts: [
           {
@@ -190,6 +189,7 @@ describe(PostLatestModule, () => {
           },
         ],
         layout: undefined,
+        contentAlignment: undefined,
       },
     });
 

@@ -66,6 +66,6 @@ export const defineAlignmentFields = (
   alignmentField({
     name: 'contentAlignment',
     title: 'Content Alignment',
-    description: 'How text and actions align inside the content block.',
+    description: "Horizontal alignment of this module's content.",
   }),
 ];

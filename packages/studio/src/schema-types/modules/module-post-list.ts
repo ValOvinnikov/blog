@@ -1,5 +1,6 @@
 import { FULL_BRAND_VARIANT_LIST } from '@blog/config/constants';
 import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
+import { defineAlignmentFields } from '@blog/studio/schema-types/helpers/define-alignment-fields';
 import { layoutField } from '@blog/studio/schema-types/helpers/layout-field';
 import { sectionHeaderField } from '@blog/studio/schema-types/helpers/section-header-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
@@ -15,6 +16,7 @@ export const postListSchema = defineType({
     titleField(),
     brandVariantField({ list: FULL_BRAND_VARIANT_LIST }),
     sectionHeaderField(),
+    ...defineAlignmentFields([]),
     defineField({
       name: 'pageSize',
       title: 'Page Size',

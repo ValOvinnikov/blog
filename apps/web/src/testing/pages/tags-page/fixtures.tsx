@@ -26,7 +26,6 @@ export const makeTagsPageView = (
         sectionHeader={{
           heading: undefined,
           supportingText: undefined,
-          align: undefined,
         }}
         items={[
           {
@@ -45,6 +44,7 @@ export const makeTagsPageView = (
           },
         ]}
         layout={undefined}
+        contentAlignment={undefined}
         titleId="tag-list-title"
         dataTestId="taxonomy-list-module-tag-list-1"
         headingLevel={2}

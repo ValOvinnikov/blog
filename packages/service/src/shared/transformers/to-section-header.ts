@@ -1,8 +1,4 @@
-import type {
-  TMaybeUndefined,
-  THeadingAlign,
-  TSectionHeader,
-} from '@blog/config';
+import type { TMaybeUndefined, TSectionHeader } from '@blog/config';
 import type {
   requiredSectionHeaderFragment,
   sectionHeaderFragment,
@@ -17,14 +13,12 @@ export type TRawRequiredSectionHeader = InferFragmentType<
 export type TRequiredSectionHeader = {
   heading: string;
   supportingText: TMaybeUndefined<string>;
-  align: TMaybeUndefined<THeadingAlign>;
 };
 
 export function toSectionHeader(raw: TRawSectionHeader): TSectionHeader {
   return {
     heading: raw.heading ?? undefined,
     supportingText: raw.supportingText ?? undefined,
-    align: raw.align ?? undefined,
   };
 }
 
@@ -34,6 +28,5 @@ export function toRequiredSectionHeader(
   return {
     heading: raw.heading,
     supportingText: raw.supportingText ?? undefined,
-    align: raw.align ?? undefined,
   };
 }

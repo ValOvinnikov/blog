@@ -17,8 +17,9 @@ export function toTaxonomyListModule(
     brandVariant: raw.brandVariant,
     sectionHeader: raw.sectionHeader
       ? toSectionHeader(raw.sectionHeader)
-      : { heading: undefined, supportingText: undefined, align: undefined },
+      : { heading: undefined, supportingText: undefined },
     layout: toLayout(raw.layout),
+    contentAlignment: raw.contentAlignment ?? undefined,
     entries,
   };
 }

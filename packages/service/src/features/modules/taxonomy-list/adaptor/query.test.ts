@@ -22,4 +22,8 @@ describe('taxonomyListModuleQuery', () => {
 
     expect(() => taxonomyListModuleQuery.parse(raw)).not.toThrow();
   });
+
+  it('projects contentAlignment', () => {
+    expect(taxonomyListModuleQuery.query).toContain('contentAlignment');
+  });
 });

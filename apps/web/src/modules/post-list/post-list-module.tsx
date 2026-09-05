@@ -71,6 +71,7 @@ export const PostListModule = async ({
     layout,
     currentPage,
     totalPages,
+    contentAlignment,
   } = result.data;
 
   // Out-of-range page (corpus shrank or hand-typed URL) → hard 404, never a
@@ -97,6 +98,7 @@ export const PostListModule = async ({
       sectionHeader={sectionHeader}
       items={items}
       layout={layout}
+      contentAlignment={contentAlignment}
       titleId={titleId}
       dataTestId={`post-list-module-${id}`}
       accessibleTitle={accessibleTitle ?? blogListT('title')}

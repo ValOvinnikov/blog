@@ -15,5 +15,6 @@ export const postListModuleQuery = q
       .nullable(true),
     pageSize: sub.field('pageSize').notNull(),
     layout: sub.field('layout').project(layoutFragment).nullable(true),
+    contentAlignment: sub.field('contentAlignment').nullable(true),
   }))
   .notNull();

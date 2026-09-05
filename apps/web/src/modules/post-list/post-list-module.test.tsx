@@ -74,10 +74,10 @@ describe(PostListModule, () => {
         sectionHeader: {
           heading: 'Blog',
           supportingText: undefined,
-          align: undefined,
         },
         posts: [],
         layout: undefined,
+        contentAlignment: undefined,
         currentPage: 2,
         totalPages: 2,
       },
@@ -106,10 +106,10 @@ describe(PostListModule, () => {
         sectionHeader: {
           heading: 'Blog',
           supportingText: undefined,
-          align: undefined,
         },
         posts: [],
         layout: undefined,
+        contentAlignment: undefined,
         currentPage: 1,
         totalPages: 1,
       },
@@ -129,10 +129,10 @@ describe(PostListModule, () => {
         sectionHeader: {
           heading: undefined,
           supportingText: undefined,
-          align: undefined,
         },
         posts: [],
         layout: undefined,
+        contentAlignment: undefined,
         currentPage: 1,
         totalPages: 1,
       },
@@ -158,10 +158,10 @@ describe(PostListModule, () => {
         sectionHeader: {
           heading: 'Blog',
           supportingText: undefined,
-          align: undefined,
         },
         posts: [],
         layout: undefined,
+        contentAlignment: undefined,
         currentPage: 1,
         totalPages: 1,
       },
@@ -180,7 +180,6 @@ describe(PostListModule, () => {
         sectionHeader: {
           heading: 'Blog',
           supportingText: undefined,
-          align: undefined,
         },
         posts: [
           {
@@ -194,6 +193,7 @@ describe(PostListModule, () => {
           },
         ],
         layout: undefined,
+        contentAlignment: undefined,
         currentPage: 2,
         totalPages: 3,
       },
@@ -219,10 +219,10 @@ describe(PostListModule, () => {
         sectionHeader: {
           heading: 'Blog',
           supportingText: undefined,
-          align: undefined,
         },
         posts: [],
         layout: undefined,
+        contentAlignment: undefined,
         currentPage: 5,
         totalPages: 1,
       },
@@ -241,10 +241,10 @@ describe(PostListModule, () => {
         sectionHeader: {
           heading: 'Blog',
           supportingText: undefined,
-          align: undefined,
         },
         posts: [],
         layout: undefined,
+        contentAlignment: undefined,
         currentPage: 1,
         totalPages: 1,
       },
@@ -264,7 +264,6 @@ describe(PostListModule, () => {
         sectionHeader: {
           heading: 'News',
           supportingText: undefined,
-          align: undefined,
         },
         posts: [
           {
@@ -278,6 +277,7 @@ describe(PostListModule, () => {
           },
         ],
         layout: undefined,
+        contentAlignment: undefined,
         currentPage: 2,
         totalPages: 3,
       },
@@ -301,10 +301,10 @@ describe(PostListModule, () => {
         sectionHeader: {
           heading: undefined,
           supportingText: undefined,
-          align: undefined,
         },
         posts: [],
         layout: undefined,
+        contentAlignment: undefined,
         currentPage: 1,
         totalPages: 1,
       },
@@ -328,10 +328,10 @@ describe(PostListModule, () => {
         sectionHeader: {
           heading: 'News',
           supportingText: undefined,
-          align: undefined,
         },
         posts: [],
         layout: undefined,
+        contentAlignment: undefined,
         currentPage: 1,
         totalPages: 1,
       },
@@ -351,7 +351,6 @@ describe(PostListModule, () => {
         sectionHeader: {
           heading: 'News',
           supportingText: undefined,
-          align: undefined,
         },
         posts: [
           {
@@ -365,6 +364,7 @@ describe(PostListModule, () => {
           },
         ],
         layout: undefined,
+        contentAlignment: undefined,
         currentPage: 2,
         totalPages: 3,
       },
@@ -390,10 +390,10 @@ describe(PostListModule, () => {
         sectionHeader: {
           heading: 'News',
           supportingText: undefined,
-          align: undefined,
         },
         posts: [],
         layout: undefined,
+        contentAlignment: undefined,
         currentPage: 1,
         totalPages: 1,
       },

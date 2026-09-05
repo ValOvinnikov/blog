@@ -20,7 +20,6 @@ describe('getPostList', () => {
           sectionHeader: {
             heading: 'Recent writing',
             supportingText: null,
-            align: null,
           },
           pageSize: 3,
         }),
