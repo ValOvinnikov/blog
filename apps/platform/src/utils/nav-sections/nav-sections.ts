@@ -38,10 +38,11 @@ type TTenantNavHrefs = {
   voice: string;
   features: string;
   domain: string;
+  email: string;
   studio: string;
 };
 
-/** The four site-configuration destinations that route somewhere today, shared by the `/tenants/{id}` and `/dashboard` sidebars — only the hrefs (and, via the caller, the section label) differ between them. */
+/** The five site-configuration destinations that route somewhere today, shared by the `/tenants/{id}` and `/dashboard` sidebars — only the hrefs (and, via the caller, the section label) differ between them. */
 const configurationNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
   const shipping = { label: t('badgeThisMilestone'), tone: 'neutral' } as const;
 
@@ -70,6 +71,12 @@ const configurationNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
       href: hrefs.domain,
       badge: shipping,
     },
+    {
+      label: t('email'),
+      icon: ICONS.MAIL,
+      href: hrefs.email,
+      badge: shipping,
+    },
   ];
 };
 
@@ -85,7 +92,6 @@ const laterPlatformNavItems = (t: TNavTranslator) => {
   const later = { label: t('badgeLater'), tone: 'warn' } as const;
 
   return [
-    { label: t('email'), icon: ICONS.MAIL, badge: later },
     { label: t('subscribers'), icon: ICONS.MENU_ROWS, badge: later },
     { label: t('comments'), icon: ICONS.COMMENT, badge: later },
     { label: t('team'), icon: ICONS.USERS, badge: later },
@@ -107,6 +113,7 @@ export const tenantNavSections = (
     voice: adminRoutes.voice(tenantId),
     features: adminRoutes.features(tenantId),
     domain: adminRoutes.tenantDomain(tenantId),
+    email: adminRoutes.email(tenantId),
     studio: adminRoutes.tenantStudio(tenantId),
   };
 
@@ -149,7 +156,7 @@ export const tenantNavSections = (
   ];
 };
 
-/** The `/dashboard` counterpart to `tenantNavSections`'s Content/Configuration sections — same shipping destinations, routed under `/dashboard` instead of `/tenants/{id}`. Owners never get the Overview item (there's nothing at `/dashboard` distinct from the sections themselves), the platform-only Provisioning/Danger zone section, or the four not-yet-owner-actionable items (Email, Subscribers, Comments, Team) — those are dropped entirely rather than shown as a permanently inert "later" badge. */
+/** The `/dashboard` counterpart to `tenantNavSections`'s Content/Configuration sections — same shipping destinations, routed under `/dashboard` instead of `/tenants/{id}`. Owners never get the Overview item (there's nothing at `/dashboard` distinct from the sections themselves), the platform-only Provisioning/Danger zone section, or the three not-yet-owner-actionable items (Subscribers, Comments, Team) — those are dropped entirely rather than shown as a permanently inert "later" badge. */
 export const dashboardNavSections = (
   t: TNavTranslator,
 ): TSidebarNavSection[] => {
@@ -158,6 +165,7 @@ export const dashboardNavSections = (
     voice: adminRoutes.dashboardVoice(),
     features: adminRoutes.dashboardFeatures(),
     domain: adminRoutes.dashboardDomain(),
+    email: adminRoutes.dashboardEmail(),
     studio: adminRoutes.dashboardStudio(),
   };
 

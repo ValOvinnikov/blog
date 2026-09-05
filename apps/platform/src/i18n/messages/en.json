@@ -13,7 +13,8 @@
     "tenantDomain": "Domain · Admin",
     "features": "Features · Admin",
     "studio": "Studio · Admin",
-    "findings": "Findings · Admin"
+    "findings": "Findings · Admin",
+    "email": "Email · Admin"
   },
   "workspacePendingPage": {
     "heading": "Your workspace isn't ready yet",
@@ -341,6 +342,81 @@
     "replace": "Replace {label}",
     "upload": "Upload {label}",
     "remove": "Remove"
+  },
+  "emailForm": {
+    "pageHeading": "Email",
+    "pageSubtitle": "Sender identity and per-template copy for every email this tenant sends."
+  },
+  "emailSettingsForm": {
+    "heading": "Email settings",
+    "description": "Applies to every email this tenant sends. Blank fields fall back to the product default.",
+    "senderNameLabel": "Sender name",
+    "senderNameHint": "The display name on the From address — unrelated to the site title.",
+    "replyToLabel": "Reply-to address",
+    "replyToHint": "Where a reply to any tenant email is routed.",
+    "footerAddressLabel": "Footer postal address",
+    "footerAddressHint": "A legal requirement for bulk mail — shown in the footer of every tenant email.",
+    "logoLabel": "Email logo",
+    "logoHint": "Falls back to the product default. A template can override this with its own logo below.",
+    "saveButton": "Save changes",
+    "savingButton": "Saving…",
+    "alertSuccess": "Saved email settings.",
+    "alertError": "Couldn't save email settings — try again."
+  },
+  "emailLogoField": {
+    "unexpectedError": "Something went wrong — try again.",
+    "currentAlt": "Current {label}",
+    "uploading": "Uploading…",
+    "replace": "Replace {label}",
+    "upload": "Upload {label}",
+    "remove": "Remove"
+  },
+  "emailTemplatesSection": {
+    "heading": "Templates",
+    "description": "Subject, body and logo for each template type. Removing all authored copy renders the product default.",
+    "segmentedControlAriaLabel": "Choose an email template to edit"
+  },
+  "emailTemplateEditor": {
+    "subjectLabel": "Subject",
+    "subjectHint": "Blank reverts to the product default subject.",
+    "bodyLabel": "Body",
+    "bodyHint": "The sign-in button, invite link or unsubscribe link always renders below this — it can't be removed from here.",
+    "logoLabel": "Template logo",
+    "logoHint": "Overrides the tenant email logo for this template only.",
+    "saveButton": "Save changes",
+    "savingButton": "Saving…",
+    "alertSuccess": "Saved template.",
+    "alertError": "Couldn't save this template — try again.",
+    "previewHeading": "Preview",
+    "previewIframeTitle": "Email preview",
+    "actionLockedNote": "The button below always renders and can't be edited here.",
+    "templateTypeLabel": {
+      "MAGIC_LINK": "Sign-in link",
+      "TENANT_INVITE": "Team invite",
+      "NEWSLETTER_CONFIRMATION": "Newsletter confirmation"
+    },
+    "templateTypeDescription": {
+      "MAGIC_LINK": "Sent when someone signs in to this tenant's site.",
+      "TENANT_INVITE": "Sent when someone is invited to join this tenant's team.",
+      "NEWSLETTER_CONFIRMATION": "Sent to confirm a newsletter subscription."
+    },
+    "previewActionLabel": {
+      "MAGIC_LINK": "Sign in",
+      "TENANT_INVITE": "Accept invite",
+      "NEWSLETTER_CONFIRMATION": "Confirm subscription"
+    }
+  },
+  "portableTextEditorToolbar": {
+    "bold": "Bold",
+    "italic": "Italic",
+    "heading": "Heading",
+    "bulletList": "Bullet list",
+    "numberedList": "Numbered list",
+    "link": "Link",
+    "removeLink": "Remove link",
+    "linkUrlLabel": "Link URL",
+    "linkApply": "Apply",
+    "linkCancel": "Cancel"
   },
   "voiceSettings": {
     "heading": "Voice",
