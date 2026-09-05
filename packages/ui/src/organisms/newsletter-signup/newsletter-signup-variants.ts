@@ -1,4 +1,4 @@
-import { HEADING_ALIGN } from '@blog/config';
+import { CONTENT_ALIGNMENT } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -58,12 +58,12 @@ export const newsletterSignupVariants = tv({
       },
     },
     align: {
-      [HEADING_ALIGN.LEFT]: { pitchPane: ['items-start text-left'] },
-      [HEADING_ALIGN.CENTER]: { pitchPane: ['items-center text-center'] },
-      [HEADING_ALIGN.RIGHT]: { pitchPane: ['items-end text-right'] },
+      [CONTENT_ALIGNMENT.LEFT]: { pitchPane: ['items-start text-left'] },
+      [CONTENT_ALIGNMENT.CENTER]: { pitchPane: ['items-center text-center'] },
+      [CONTENT_ALIGNMENT.RIGHT]: { pitchPane: ['items-end text-right'] },
     },
   },
-  defaultVariants: { variant: 'full', align: HEADING_ALIGN.LEFT },
+  defaultVariants: { variant: 'full', align: CONTENT_ALIGNMENT.LEFT },
 });
 
 export type TNewsletterSignupVariants = VariantProps<

@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, HEADING_ALIGN, routes } from '@blog/config';
+import { BRAND_VARIANT, CONTENT_ALIGNMENT, routes } from '@blog/config';
 import { Pagination } from '@blog/ui/organisms/pagination';
 import { PostsSection } from '@blog/ui/organisms/posts-section';
 import type { IBlogListPageViewProps } from '@web/components/pages/blog-list-page';
@@ -54,7 +54,7 @@ export const makeBlogListPageView = (
           ]}
           titleId="blog-posts-title"
           accessibleTitle="Blog posts"
-          align={HEADING_ALIGN.LEFT}
+          align={CONTENT_ALIGNMENT.LEFT}
           linkAs={SmartLink}
           isWrapped={true}
           emptyMessage="No posts yet."

@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, CTA_ALIGNMENT, CTA_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, CONTENT_ALIGNMENT, CTA_VARIANT } from '@blog/config';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 
@@ -131,7 +131,7 @@ describe(`<${CtaModule.name}/>`, () => {
   it('places the image after the heading in the DOM for Split with contentPosition RIGHT', () => {
     setup({
       variant: CTA_VARIANT.SPLIT,
-      contentPosition: CTA_ALIGNMENT.RIGHT,
+      contentPosition: CONTENT_ALIGNMENT.RIGHT,
       image: <img src="/cta.jpg" alt="" data-testid="cta-image" />,
     });
 
@@ -168,8 +168,8 @@ describe(`<${CtaModule.name}/>`, () => {
   it('applies contentPosition and contentAlignment independently on Split', () => {
     setup({
       variant: CTA_VARIANT.SPLIT,
-      contentPosition: CTA_ALIGNMENT.RIGHT,
-      contentAlignment: CTA_ALIGNMENT.LEFT,
+      contentPosition: CONTENT_ALIGNMENT.RIGHT,
+      contentAlignment: CONTENT_ALIGNMENT.LEFT,
       dataTestId: 'cta-module',
     });
 
@@ -184,8 +184,8 @@ describe(`<${CtaModule.name}/>`, () => {
   it('applies contentPosition and contentAlignment independently on Banner', () => {
     setup({
       variant: CTA_VARIANT.BANNER,
-      contentPosition: CTA_ALIGNMENT.LEFT,
-      contentAlignment: CTA_ALIGNMENT.RIGHT,
+      contentPosition: CONTENT_ALIGNMENT.LEFT,
+      contentAlignment: CONTENT_ALIGNMENT.RIGHT,
       dataTestId: 'cta-module',
     });
 
@@ -199,7 +199,7 @@ describe(`<${CtaModule.name}/>`, () => {
   it('keeps a centered Callout list left-aligned so markers stay attached to their text', () => {
     setup({
       variant: CTA_VARIANT.CALLOUT,
-      contentAlignment: CTA_ALIGNMENT.CENTER,
+      contentAlignment: CONTENT_ALIGNMENT.CENTER,
       content: (
         <ul>
           <li>{faker.lorem.words(3)}</li>
@@ -217,7 +217,7 @@ describe(`<${CtaModule.name}/>`, () => {
   it('does not force inline-block lists on a left-aligned Callout', () => {
     setup({
       variant: CTA_VARIANT.CALLOUT,
-      contentAlignment: CTA_ALIGNMENT.LEFT,
+      contentAlignment: CONTENT_ALIGNMENT.LEFT,
       content: (
         <ul>
           <li>{faker.lorem.words(3)}</li>

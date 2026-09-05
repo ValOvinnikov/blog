@@ -210,7 +210,7 @@ unset-vs-set and rendering defaults), `sectionHeader`/
 `requiredHeadingSectionHeader` variant used by `module_cta`/
 `module_newsletter`, optional on `module_postList`'s plain
 `sectionHeader`), `supportingText` (text, max 300), `align`
-(`HEADING_ALIGN`) — same shared-fields/two-named-types pattern, via
+(`CONTENT_ALIGNMENT`) — same shared-fields/two-named-types pattern, via
 `sectionHeaderField({ requireHeading? })`; attached to `module_cta`/
 `module_postList`/`module_newsletter` only — `module_content` and
 `module_hero` don't get one). Every `module_*` document gets its own

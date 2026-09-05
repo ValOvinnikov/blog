@@ -1,4 +1,4 @@
-import { HEADING_ALIGN } from '@blog/config';
+import { CONTENT_ALIGNMENT } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -35,21 +35,21 @@ export const postsSectionVariants = tv({
       },
     },
     align: {
-      [HEADING_ALIGN.LEFT]: {
+      [CONTENT_ALIGNMENT.LEFT]: {
         label: ['text-left'],
         supportingText: ['text-left'],
       },
-      [HEADING_ALIGN.CENTER]: {
+      [CONTENT_ALIGNMENT.CENTER]: {
         label: ['text-center'],
         supportingText: ['text-center'],
       },
-      [HEADING_ALIGN.RIGHT]: {
+      [CONTENT_ALIGNMENT.RIGHT]: {
         label: ['text-right'],
         supportingText: ['text-right'],
       },
     },
   },
-  defaultVariants: { align: HEADING_ALIGN.LEFT },
+  defaultVariants: { align: CONTENT_ALIGNMENT.LEFT },
 });
 
 export type TPostsSectionVariants = VariantProps<typeof postsSectionVariants>;

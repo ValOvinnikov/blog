@@ -1,6 +1,6 @@
 import {
   BRAND_VARIANT,
-  CTA_ALIGNMENT,
+  CONTENT_ALIGNMENT,
   CTA_VARIANT,
 } from '@blog/config/constants';
 import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
@@ -134,15 +134,15 @@ describe('ctaSchema contentPositionSplit field', () => {
     const field = getField('contentPositionSplit');
 
     expect(getOptionValues(field)).toEqual([
-      CTA_ALIGNMENT.LEFT,
-      CTA_ALIGNMENT.RIGHT,
+      CONTENT_ALIGNMENT.LEFT,
+      CONTENT_ALIGNMENT.RIGHT,
     ]);
   });
 
   it('defaults to Left', () => {
     const field = getField('contentPositionSplit');
 
-    expect(field.initialValue).toBe(CTA_ALIGNMENT.LEFT);
+    expect(field.initialValue).toBe(CONTENT_ALIGNMENT.LEFT);
   });
 
   it('is visible only for Split', () => {
@@ -167,16 +167,16 @@ describe('ctaSchema contentPositionBanner field', () => {
     const field = getField('contentPositionBanner');
 
     expect(getOptionValues(field)).toEqual([
-      CTA_ALIGNMENT.LEFT,
-      CTA_ALIGNMENT.CENTER,
-      CTA_ALIGNMENT.RIGHT,
+      CONTENT_ALIGNMENT.LEFT,
+      CONTENT_ALIGNMENT.CENTER,
+      CONTENT_ALIGNMENT.RIGHT,
     ]);
   });
 
   it('defaults to Left', () => {
     const field = getField('contentPositionBanner');
 
-    expect(field.initialValue).toBe(CTA_ALIGNMENT.LEFT);
+    expect(field.initialValue).toBe(CONTENT_ALIGNMENT.LEFT);
   });
 
   it('is visible only for Banner', () => {
@@ -201,9 +201,9 @@ describe('ctaSchema contentAlignment field', () => {
     const field = getField('contentAlignment');
 
     expect(getOptionValues(field)).toEqual([
-      CTA_ALIGNMENT.LEFT,
-      CTA_ALIGNMENT.CENTER,
-      CTA_ALIGNMENT.RIGHT,
+      CONTENT_ALIGNMENT.LEFT,
+      CONTENT_ALIGNMENT.CENTER,
+      CONTENT_ALIGNMENT.RIGHT,
     ]);
   });
 

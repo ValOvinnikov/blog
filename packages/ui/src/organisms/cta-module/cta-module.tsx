@@ -1,11 +1,11 @@
 import {
-  CTA_ALIGNMENT,
+  CONTENT_ALIGNMENT,
   CTA_MOBILE_MEDIA_ORDER,
   CTA_VARIANT,
   type IWithClassName,
   type IWithDataTestId,
   type TBrandVariant,
-  type TCtaAlignment,
+  type TContentAlignment,
   type TCtaMobileMediaOrder,
   type TCtaVariant,
 } from '@blog/config';
@@ -36,9 +36,9 @@ export type TCtaModuleProps = IWithClassName &
     actions?: ReactNode;
     footnote?: string;
     /** Where the content block sits relative to the image — not applicable on Callout. */
-    contentPosition?: TCtaAlignment;
+    contentPosition?: TContentAlignment;
     /** How text and actions align within the content block, on all three variants. */
-    contentAlignment?: TCtaAlignment;
+    contentAlignment?: TContentAlignment;
     /** Split only. Defaults to `LAST` (image collapses below content on mobile). */
     mobileMediaOrder?: TCtaMobileMediaOrder;
     /**
@@ -78,11 +78,11 @@ export const CtaModule = ({
   const isCallout = variant === CTA_VARIANT.CALLOUT;
   const resolvedPosition = isCallout
     ? undefined
-    : (contentPosition ?? CTA_ALIGNMENT.LEFT);
+    : (contentPosition ?? CONTENT_ALIGNMENT.LEFT);
   const resolvedAlignment = isSplit
     ? contentAlignment
     : (contentAlignment ??
-      (isBanner ? CTA_ALIGNMENT.LEFT : CTA_ALIGNMENT.CENTER));
+      (isBanner ? CONTENT_ALIGNMENT.LEFT : CONTENT_ALIGNMENT.CENTER));
 
   const s = ctaModuleVariants({
     variant,

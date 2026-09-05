@@ -8,14 +8,6 @@ export const CTA_VARIANT = {
 
 export type TCtaVariant = TValueOf<typeof CTA_VARIANT>;
 
-export const CTA_ALIGNMENT = {
-  LEFT: 'LEFT',
-  CENTER: 'CENTER',
-  RIGHT: 'RIGHT',
-} as const;
-
-export type TCtaAlignment = TValueOf<typeof CTA_ALIGNMENT>;
-
 export const CTA_MOBILE_MEDIA_ORDER = {
   LAST: 'LAST',
   FIRST: 'FIRST',

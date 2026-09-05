@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, HEADING_ALIGN } from '@blog/config';
+import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
 import { Pagination } from '@blog/ui/organisms/pagination';
 import { PostsSection } from '@blog/ui/organisms/posts-section';
 import type { ITopicPageViewProps } from '@web/components/pages/topic-page';
@@ -52,7 +52,7 @@ export const makeTopicPageView = (
           ]}
           titleId="topic-posts-title"
           accessibleTitle="Posts in News"
-          align={HEADING_ALIGN.LEFT}
+          align={CONTENT_ALIGNMENT.LEFT}
           linkAs={SmartLink}
           isWrapped={true}
           emptyMessage="No posts in News yet."

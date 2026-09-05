@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, HEADING_ALIGN } from '@blog/config';
+import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
 import { PostsSection } from '@blog/ui/organisms/posts-section';
 import { customRender, screen } from '@web/testing/custom-render';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
@@ -140,10 +140,10 @@ describe(PostListModuleView, () => {
   });
 
   it('passes contentAlignment through to PostsSection as align', () => {
-    setup({ contentAlignment: HEADING_ALIGN.CENTER });
+    setup({ contentAlignment: CONTENT_ALIGNMENT.CENTER });
 
     expect(vi.mocked(PostsSection)).toHaveBeenLastCalledWith(
-      expect.objectContaining({ align: HEADING_ALIGN.CENTER }),
+      expect.objectContaining({ align: CONTENT_ALIGNMENT.CENTER }),
       undefined,
     );
   });

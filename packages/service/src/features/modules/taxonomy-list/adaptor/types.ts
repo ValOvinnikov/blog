@@ -1,6 +1,6 @@
 import type {
   TBrandVariantOf,
-  THeadingAlign,
+  TContentAlignment,
   TLayout,
   TMaybeUndefined,
   TSectionHeader,
@@ -19,6 +19,6 @@ export type TTaxonomyListModule = {
   brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
   sectionHeader: TSectionHeader;
   layout: TMaybeUndefined<TLayout>;
-  contentAlignment: TMaybeUndefined<THeadingAlign>;
+  contentAlignment: TMaybeUndefined<TContentAlignment>;
   entries: TTaxonomyEntry[];
 };

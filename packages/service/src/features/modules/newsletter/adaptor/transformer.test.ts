@@ -1,4 +1,8 @@
-import { BRAND_VARIANT, CONTAINER_WIDTH, HEADING_ALIGN } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CONTAINER_WIDTH,
+  CONTENT_ALIGNMENT,
+} from '@blog/config';
 import { makeRawNewsletterModule } from '@blog/service/testing/modules/fixtures';
 
 import { toNewsletterModule } from './transformer';
@@ -48,12 +52,12 @@ describe('toNewsletterModule', () => {
 
   it('maps contentAlignment when authored', () => {
     const raw = makeRawNewsletterModule({
-      contentAlignment: HEADING_ALIGN.CENTER,
+      contentAlignment: CONTENT_ALIGNMENT.CENTER,
     });
 
     const module = toNewsletterModule(raw);
 
-    expect(module.contentAlignment).toBe(HEADING_ALIGN.CENTER);
+    expect(module.contentAlignment).toBe(CONTENT_ALIGNMENT.CENTER);
   });
 
   it('maps a fully-authored layout object 1:1', () => {

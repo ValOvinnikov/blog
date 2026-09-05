@@ -1,6 +1,6 @@
 import {
   BRAND_VARIANT,
-  CTA_ALIGNMENT,
+  CONTENT_ALIGNMENT,
   CTA_MOBILE_MEDIA_ORDER,
   CTA_VARIANT,
   FULL_BRAND_VARIANT_LIST,
@@ -130,8 +130,8 @@ export const ctaSchema = defineType({
         title: 'Content Position',
         description:
           'Where the content sits relative to the image, on this variant’s grid.',
-        allow: [CTA_ALIGNMENT.LEFT, CTA_ALIGNMENT.RIGHT],
-        initialValue: CTA_ALIGNMENT.LEFT,
+        allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.RIGHT],
+        initialValue: CONTENT_ALIGNMENT.LEFT,
         hidden: isNotSplitVariant,
       },
       {
@@ -139,8 +139,12 @@ export const ctaSchema = defineType({
         title: 'Content Position',
         description:
           'Where the content sits relative to the image, over the full-bleed background.',
-        allow: [CTA_ALIGNMENT.LEFT, CTA_ALIGNMENT.CENTER, CTA_ALIGNMENT.RIGHT],
-        initialValue: CTA_ALIGNMENT.LEFT,
+        allow: [
+          CONTENT_ALIGNMENT.LEFT,
+          CONTENT_ALIGNMENT.CENTER,
+          CONTENT_ALIGNMENT.RIGHT,
+        ],
+        initialValue: CONTENT_ALIGNMENT.LEFT,
         hidden: isNotBannerVariant,
       },
     ]),

@@ -3,7 +3,7 @@ import {
   CONTAINER_WIDTH,
   CTA_ACTION_APPEARANCE,
   CTA_ACTION_VARIANT,
-  CTA_ALIGNMENT,
+  CONTENT_ALIGNMENT,
   CTA_VARIANT,
   LINK_TYPE,
 } from '@blog/config';
@@ -69,43 +69,43 @@ describe('toCtaModule', () => {
   it('takes contentPosition from contentPositionSplit on Split, ignoring contentPositionBanner', () => {
     const raw = makeRawCtaModule({
       variant: CTA_VARIANT.SPLIT,
-      contentPositionSplit: CTA_ALIGNMENT.RIGHT,
-      contentPositionBanner: CTA_ALIGNMENT.LEFT,
+      contentPositionSplit: CONTENT_ALIGNMENT.RIGHT,
+      contentPositionBanner: CONTENT_ALIGNMENT.LEFT,
     });
 
     const cta = toCtaModule(raw, makeTenant());
 
-    expect(cta.contentPosition).toBe(CTA_ALIGNMENT.RIGHT);
+    expect(cta.contentPosition).toBe(CONTENT_ALIGNMENT.RIGHT);
   });
 
   it('takes contentPosition from contentPositionBanner on Banner, ignoring contentPositionSplit', () => {
     const raw = makeRawCtaModule({
       variant: CTA_VARIANT.BANNER,
-      contentPositionSplit: CTA_ALIGNMENT.RIGHT,
-      contentPositionBanner: CTA_ALIGNMENT.LEFT,
+      contentPositionSplit: CONTENT_ALIGNMENT.RIGHT,
+      contentPositionBanner: CONTENT_ALIGNMENT.LEFT,
     });
 
     const cta = toCtaModule(raw, makeTenant());
 
-    expect(cta.contentPosition).toBe(CTA_ALIGNMENT.LEFT);
+    expect(cta.contentPosition).toBe(CONTENT_ALIGNMENT.LEFT);
   });
 
   it('maps a Banner contentPositionBanner of CENTER through', () => {
     const raw = makeRawCtaModule({
       variant: CTA_VARIANT.BANNER,
-      contentPositionBanner: CTA_ALIGNMENT.CENTER,
+      contentPositionBanner: CONTENT_ALIGNMENT.CENTER,
     });
 
     const cta = toCtaModule(raw, makeTenant());
 
-    expect(cta.contentPosition).toBe(CTA_ALIGNMENT.CENTER);
+    expect(cta.contentPosition).toBe(CONTENT_ALIGNMENT.CENTER);
   });
 
   it('leaves contentPosition undefined on Callout regardless of stored position keys', () => {
     const raw = makeRawCtaModule({
       variant: CTA_VARIANT.CALLOUT,
-      contentPositionSplit: CTA_ALIGNMENT.RIGHT,
-      contentPositionBanner: CTA_ALIGNMENT.CENTER,
+      contentPositionSplit: CONTENT_ALIGNMENT.RIGHT,
+      contentPositionBanner: CONTENT_ALIGNMENT.CENTER,
     });
 
     const cta = toCtaModule(raw, makeTenant());
@@ -138,11 +138,13 @@ describe('toCtaModule', () => {
   });
 
   it('maps contentAlignment when authored, independent of variant', () => {
-    const raw = makeRawCtaModule({ contentAlignment: CTA_ALIGNMENT.CENTER });
+    const raw = makeRawCtaModule({
+      contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    });
 
     const cta = toCtaModule(raw, makeTenant());
 
-    expect(cta.contentAlignment).toBe(CTA_ALIGNMENT.CENTER);
+    expect(cta.contentAlignment).toBe(CONTENT_ALIGNMENT.CENTER);
   });
 
   it('leaves supportingText undefined when not set (no faked default)', () => {

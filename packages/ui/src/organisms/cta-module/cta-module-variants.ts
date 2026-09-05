@@ -1,6 +1,6 @@
 import {
   BRAND_VARIANT,
-  CTA_ALIGNMENT,
+  CONTENT_ALIGNMENT,
   CTA_MOBILE_MEDIA_ORDER,
   CTA_VARIANT,
 } from '@blog/config';
@@ -71,20 +71,20 @@ export const ctaModuleVariants = tv({
       [BRAND_VARIANT.BRAND_PRIMARY]: {},
     },
     position: {
-      [CTA_ALIGNMENT.LEFT]: {},
-      [CTA_ALIGNMENT.CENTER]: {},
-      [CTA_ALIGNMENT.RIGHT]: {},
+      [CONTENT_ALIGNMENT.LEFT]: {},
+      [CONTENT_ALIGNMENT.CENTER]: {},
+      [CONTENT_ALIGNMENT.RIGHT]: {},
     },
     alignment: {
-      [CTA_ALIGNMENT.LEFT]: {
+      [CONTENT_ALIGNMENT.LEFT]: {
         root: ['text-left'],
         actions: ['justify-start'],
       },
-      [CTA_ALIGNMENT.CENTER]: {
+      [CONTENT_ALIGNMENT.CENTER]: {
         root: ['text-center'],
         actions: ['justify-center'],
       },
-      [CTA_ALIGNMENT.RIGHT]: {
+      [CONTENT_ALIGNMENT.RIGHT]: {
         root: ['text-right'],
         actions: ['justify-end'],
       },
@@ -125,29 +125,29 @@ export const ctaModuleVariants = tv({
     },
     {
       variant: CTA_VARIANT.BANNER,
-      position: CTA_ALIGNMENT.LEFT,
+      position: CONTENT_ALIGNMENT.LEFT,
       class: { root: ['items-start'] },
     },
     {
       variant: CTA_VARIANT.BANNER,
-      position: CTA_ALIGNMENT.CENTER,
+      position: CONTENT_ALIGNMENT.CENTER,
       class: { root: ['items-center'] },
     },
     {
       variant: CTA_VARIANT.BANNER,
-      position: CTA_ALIGNMENT.RIGHT,
+      position: CONTENT_ALIGNMENT.RIGHT,
       class: { root: ['items-end'] },
     },
     {
       variant: CTA_VARIANT.SPLIT,
-      position: CTA_ALIGNMENT.RIGHT,
+      position: CONTENT_ALIGNMENT.RIGHT,
       class: { body: ['md:order-2'] },
     },
     // A centered Callout still reads lists left-aligned within the centered
     // block — a fully centered list separates markers from their text.
     {
       variant: CTA_VARIANT.CALLOUT,
-      alignment: CTA_ALIGNMENT.CENTER,
+      alignment: CONTENT_ALIGNMENT.CENTER,
       class: {
         text: [
           '[&_ul]:inline-block [&_ol]:inline-block [&_ul]:text-left [&_ol]:text-left',

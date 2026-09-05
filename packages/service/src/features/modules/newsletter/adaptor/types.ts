@@ -1,6 +1,6 @@
 import type {
   TBrandVariantOf,
-  THeadingAlign,
+  TContentAlignment,
   TLayout,
   TMaybeUndefined,
 } from '@blog/config';
@@ -12,5 +12,5 @@ export type TNewsletterModule = {
     supportingText: TMaybeUndefined<string>;
   };
   layout: TMaybeUndefined<TLayout>;
-  contentAlignment: TMaybeUndefined<THeadingAlign>;
+  contentAlignment: TMaybeUndefined<TContentAlignment>;
 };

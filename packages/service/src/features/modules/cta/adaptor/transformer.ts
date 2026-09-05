@@ -2,7 +2,7 @@ import {
   CTA_VARIANT,
   LINK_TYPE,
   type BasicText,
-  type TCtaAlignment,
+  type TContentAlignment,
   type TMaybeUndefined,
 } from '@blog/config';
 import type { TImageTenant } from '@blog/service/sanity/image';
@@ -64,7 +64,9 @@ function toContent(raw: TRawCtaModule['content']): TMaybeUndefined<BasicText> {
   return raw.map(toContentBlock);
 }
 
-function toContentPosition(raw: TRawCtaModule): TMaybeUndefined<TCtaAlignment> {
+function toContentPosition(
+  raw: TRawCtaModule,
+): TMaybeUndefined<TContentAlignment> {
   switch (raw.variant) {
     case CTA_VARIANT.SPLIT:
       return raw.contentPositionSplit ?? undefined;

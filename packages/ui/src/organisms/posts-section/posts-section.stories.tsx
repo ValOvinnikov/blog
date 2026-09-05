@@ -1,4 +1,4 @@
-import { HEADING_ALIGN } from '@blog/config';
+import { CONTENT_ALIGNMENT } from '@blog/config';
 import { HEADING_LEVELS } from '@blog/ui/lib/react';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -111,7 +111,7 @@ export const WithSupportingText: TStory = {
 
 export const Centered: TStory = {
   args: {
-    align: HEADING_ALIGN.CENTER,
+    align: CONTENT_ALIGNMENT.CENTER,
     supportingText:
       'Hand-picked posts on design systems, TypeScript, and component architecture.',
   },

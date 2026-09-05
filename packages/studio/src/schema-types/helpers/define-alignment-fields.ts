@@ -1,4 +1,7 @@
-import { CTA_ALIGNMENT, type TCtaAlignment } from '@blog/config/constants';
+import {
+  CONTENT_ALIGNMENT,
+  type TContentAlignment,
+} from '@blog/config/constants';
 import { toTitleCase } from '@blog/utils/primitives';
 import { defineField, type StringDefinition } from 'sanity';
 
@@ -6,8 +9,8 @@ type TAlignmentField = {
   name: string;
   title: string;
   description: string;
-  list?: readonly TCtaAlignment[];
-  initialValue?: TCtaAlignment;
+  list?: readonly TContentAlignment[];
+  initialValue?: TContentAlignment;
   hidden?: StringDefinition['hidden'];
 };
 
@@ -26,7 +29,7 @@ const alignmentField = ({
     description,
     options: {
       layout: 'radio',
-      list: (list ?? Object.values(CTA_ALIGNMENT)).map((value) => ({
+      list: (list ?? Object.values(CONTENT_ALIGNMENT)).map((value) => ({
         title: toTitleCase(value),
         value,
       })),
@@ -39,8 +42,8 @@ type TAlignmentFieldExtra = {
   name: string;
   title: string;
   description: string;
-  allow: readonly TCtaAlignment[];
-  initialValue?: TCtaAlignment;
+  allow: readonly TContentAlignment[];
+  initialValue?: TContentAlignment;
   hidden: StringDefinition['hidden'];
 };
 
