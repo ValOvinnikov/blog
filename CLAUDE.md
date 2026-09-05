@@ -671,9 +671,25 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   than hand-rolling bases with `gh pr create --base`. `sync` restacks
   automatically when a lower PR merges, which is the step most easily
   forgotten by hand. A stacked PR targets its predecessor rather than `main`,
-  so intermediate states never land on `main` — which **dissolves the "must
-  merge green alone" constraint above** and lets a rename-plus-consumers
-  change split per layer after all.
+  so intermediate states never land on `main` — which relaxes the "must merge
+  green alone" constraint above **for every PR except the bottom one**.
+
+  **The bottom PR is the exception, and it is the one that decides whether
+  the stack is viable at all.** It targets `main`, so it inherits `main`'s
+  ruleset in full, required `Type-check` and `Build` included. A first layer
+  that cannot compile on its own therefore leaves the entire stack
+  permanently `BLOCKED` rather than merely red — nothing above it can merge,
+  because the bottom never can. That is what happened to the align-hoist
+  stack (#2689 → #2690 → #2691): the studio PR removed a field the service
+  layer still read, and had to be collapsed back into a single PR after the
+  fact.
+
+  So a rename-plus-consumers change is stackable only if its **bottom** PR is
+  green alone. Two ways to get there: keep it one PR (what the rule above
+  already prescribes), or restructure expand/contract so the bottom is purely
+  additive — add the new field, migrate the consumers in the PRs above it,
+  and delete the old field in a final PR. Absent one of those, the split buys
+  nothing and costs a rework.
 
   **A stacked PR runs the full required suite, and that is load-bearing.**
   All six workflows carrying required checks — `ci.yml`, `knip.yml`,
@@ -687,6 +703,17 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   compile without an earlier one; independent work gets its own branch off
   `main` and avoids the restacking entirely. Full mechanics in
   `open-pull-request`'s "Stacked PRs" section.
+
+  **Retargeting a PR's base does not re-run its checks — and CodeQL will be
+  missing entirely.** When a stack has to be collapsed, `gh pr edit --base
+main` fires no workflow. CodeQL runs here through GitHub's _default setup_
+  (there is no `codeql.yml`), which only analyzes PRs into the default
+  branch, so a PR that was previously based on a stack branch has none of its
+  three required contexts — `CodeQL`, `Analyze (actions)`,
+  `Analyze (javascript-typescript)` — and sits `BLOCKED` on checks that never
+  start. Closing and reopening does not trigger them either. Only a
+  `synchronize` does, i.e. a push to the head branch; `gh pr update-branch`
+  is the cleanest one, since it also clears any staleness against `main`.
 
 - **Spec sync:** any PR that changes architecture, layer contracts, env vars,
   or the content model updates `SPEC.md` in the same PR.
