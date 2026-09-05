@@ -10,6 +10,8 @@ const {
   getRequestTenantIdMock,
   getTenantBaseUrlMock,
   isTenantActiveMock,
+  getEmailConfigMock,
+  getEmailTemplateMock,
 } = vi.hoisted(() => ({
   authMock: vi.fn(),
   unsubscribeMock: vi.fn(),
@@ -20,6 +22,8 @@ const {
   getRequestTenantIdMock: vi.fn(),
   getTenantBaseUrlMock: vi.fn(),
   isTenantActiveMock: vi.fn(),
+  getEmailConfigMock: vi.fn(),
+  getEmailTemplateMock: vi.fn(),
 }));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
@@ -30,6 +34,8 @@ vi.mock('@blog/db', () => ({
       unsubscribe: unsubscribeMock,
       resendConfirmation: resendConfirmationMock,
     },
+    emailConfig: { getEmailConfig: getEmailConfigMock },
+    emailTemplates: { getEmailTemplate: getEmailTemplateMock },
   },
 }));
 
@@ -175,6 +181,16 @@ describe('resendConfirmationAction', () => {
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');
     isTenantActiveMock.mockReset();
     isTenantActiveMock.mockResolvedValue(true);
+    getEmailConfigMock.mockReset();
+    getEmailConfigMock.mockResolvedValue(undefined);
+    getEmailTemplateMock.mockReset();
+    getEmailTemplateMock.mockResolvedValue({
+      tenantId: TENANT_ID,
+      templateType: 'NEWSLETTER_CONFIRMATION',
+      subject: 'Confirm your subscription',
+      body: [],
+      logoAssetUrl: undefined,
+    });
   });
 
   it('returns { ok: false } without resending when there is no session', async () => {
@@ -300,5 +316,81 @@ describe('resendConfirmationAction', () => {
     await expect(resendConfirmationAction()).resolves.toEqual({ ok: false });
     expect(errorSpy).toHaveBeenCalled();
     errorSpy.mockRestore();
+  });
+
+  it('still sends the confirmation email when the email settings lookup rejects', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    authMock.mockResolvedValue(session);
+    getEmailConfigMock.mockRejectedValue(new Error('db down'));
+    resendConfirmationMock.mockResolvedValue({
+      outcome: 'pending',
+      confirmationToken: 'token-abc',
+      unsubscribeToken: 'unsub-token-abc',
+    });
+    sendEmailMock.mockResolvedValue(undefined);
+    const { resendConfirmationAction } =
+      await import('./newsletter-subscription-actions');
+
+    await expect(resendConfirmationAction()).resolves.toEqual({ ok: true });
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({ to: 'val@icloud.com' }),
+    );
+    warnSpy.mockRestore();
+  });
+
+  it('sends with a validated reply-to while preserving the List-Unsubscribe headers', async () => {
+    authMock.mockResolvedValue(session);
+    getEmailConfigMock.mockResolvedValue({
+      tenantId: TENANT_ID,
+      logoAssetUrl: undefined,
+      senderName: undefined,
+      replyToAddress: 'support@example.com',
+      footerPostalAddress: undefined,
+    });
+    resendConfirmationMock.mockResolvedValue({
+      outcome: 'pending',
+      confirmationToken: 'token-abc',
+      unsubscribeToken: 'unsub-token-abc',
+    });
+    sendEmailMock.mockResolvedValue(undefined);
+    const { resendConfirmationAction } =
+      await import('./newsletter-subscription-actions');
+
+    await resendConfirmationAction();
+
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        replyTo: 'support@example.com',
+        headers: {
+          'List-Unsubscribe':
+            '<https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc>',
+          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        },
+      }),
+    );
+  });
+
+  it('drops a malformed stored reply-to address rather than blocking the resend', async () => {
+    authMock.mockResolvedValue(session);
+    getEmailConfigMock.mockResolvedValue({
+      tenantId: TENANT_ID,
+      logoAssetUrl: undefined,
+      senderName: undefined,
+      replyToAddress: 'not-an-address',
+      footerPostalAddress: undefined,
+    });
+    resendConfirmationMock.mockResolvedValue({
+      outcome: 'pending',
+      confirmationToken: 'token-abc',
+      unsubscribeToken: 'unsub-token-abc',
+    });
+    sendEmailMock.mockResolvedValue(undefined);
+    const { resendConfirmationAction } =
+      await import('./newsletter-subscription-actions');
+
+    await expect(resendConfirmationAction()).resolves.toEqual({ ok: true });
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({ replyTo: undefined }),
+    );
   });
 });

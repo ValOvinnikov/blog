@@ -3,8 +3,8 @@
 import { routes } from '@blog/config';
 import { queries } from '@blog/db';
 import { buildNewsletterConfirmationEmail, sendEmail } from '@blog/email';
-import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address';
 import { markNewsletterSubscribed } from '@web/server/newsletter/newsletter-subscribed-cookie';
+import { resolveNewsletterEmailSettings } from '@web/server/newsletter/resolve-newsletter-email-settings';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { isTenantActive } from '@web/server/tenant/is-tenant-active';
@@ -73,21 +73,25 @@ export const subscribeToNewsletterAction = async (
     const unsubscribeUrl = `${siteUrl}${routes.newsletterUnsubscribe(subscriber.unsubscribeToken)}`;
     const { brand, brandName } = await resolveTenantEmailIdentity(tenantId);
 
-    const { subject, html, headers } = buildNewsletterConfirmationEmail({
-      confirmationUrl,
-      unsubscribeUrl,
-      brand,
-      brandName,
-    });
-
     // Resolved inside the action, not at module scope — the `'use client'`
     // `NewsletterForm` imports this module, so an eager read of
     // `env.NEWSLETTER_FROM_ADDRESS` (server-only) would throw under Vitest's
     // jsdom environment; reading it lazily here keeps importing this module
     // safe from a client boundary.
-    const fromAddress = resolveNewsletterFromAddress(
-      env.NEWSLETTER_FROM_ADDRESS,
-    );
+    const { logoImageUrl, footerPostalAddress, fromAddress, replyTo } =
+      await resolveNewsletterEmailSettings(
+        tenantId,
+        env.NEWSLETTER_FROM_ADDRESS,
+      );
+
+    const { subject, html, headers } = buildNewsletterConfirmationEmail({
+      confirmationUrl,
+      unsubscribeUrl,
+      brand,
+      brandName,
+      logoImageUrl,
+      footerPostalAddress,
+    });
 
     await sendEmail({
       to: subscriber.email,
@@ -95,6 +99,7 @@ export const subscribeToNewsletterAction = async (
       subject,
       html,
       headers,
+      replyTo,
     });
 
     await markNewsletterSubscribedSafely();

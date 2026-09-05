@@ -8,6 +8,8 @@ const {
   getRequestTenantIdMock,
   getTenantBaseUrlMock,
   isTenantActiveMock,
+  getEmailConfigMock,
+  getEmailTemplateMock,
 } = vi.hoisted(() => ({
   createPendingSubscriberMock: vi.fn(),
   sendEmailMock: vi.fn(),
@@ -16,11 +18,15 @@ const {
   getRequestTenantIdMock: vi.fn(),
   getTenantBaseUrlMock: vi.fn(),
   isTenantActiveMock: vi.fn(),
+  getEmailConfigMock: vi.fn(),
+  getEmailTemplateMock: vi.fn(),
 }));
 
 vi.mock('@blog/db', () => ({
   queries: {
     subscribers: { createPendingSubscriber: createPendingSubscriberMock },
+    emailConfig: { getEmailConfig: getEmailConfigMock },
+    emailTemplates: { getEmailTemplate: getEmailTemplateMock },
   },
 }));
 
@@ -88,6 +94,16 @@ describe('subscribeToNewsletterAction', () => {
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');
     isTenantActiveMock.mockReset();
     isTenantActiveMock.mockResolvedValue(true);
+    getEmailConfigMock.mockReset();
+    getEmailConfigMock.mockResolvedValue(undefined);
+    getEmailTemplateMock.mockReset();
+    getEmailTemplateMock.mockResolvedValue({
+      tenantId: TENANT_ID,
+      templateType: 'NEWSLETTER_CONFIRMATION',
+      subject: 'Confirm your subscription',
+      body: [],
+      logoAssetUrl: undefined,
+    });
   });
 
   it('returns "invalid" without touching the db for a malformed email', async () => {
@@ -296,6 +312,80 @@ describe('subscribeToNewsletterAction', () => {
       expect.objectContaining({
         html: expect.stringContaining('Zeta Times'),
       }),
+    );
+  });
+
+  it('still sends the confirmation email when the email settings lookup rejects', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    getEmailConfigMock.mockRejectedValue(new Error('db down'));
+    createPendingSubscriberMock.mockResolvedValue({
+      ok: true,
+      data: { outcome: 'created', subscriber },
+    });
+    sendEmailMock.mockResolvedValue(undefined);
+    const { subscribeToNewsletterAction } =
+      await import('./newsletter-actions');
+
+    await expect(
+      subscribeToNewsletterAction('reader@example.com'),
+    ).resolves.toEqual({ outcome: 'success' });
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({ to: 'reader@example.com' }),
+    );
+    warnSpy.mockRestore();
+  });
+
+  it('sends with a validated reply-to while preserving the List-Unsubscribe headers', async () => {
+    getEmailConfigMock.mockResolvedValue({
+      tenantId: TENANT_ID,
+      logoAssetUrl: undefined,
+      senderName: undefined,
+      replyToAddress: 'support@example.com',
+      footerPostalAddress: undefined,
+    });
+    createPendingSubscriberMock.mockResolvedValue({
+      ok: true,
+      data: { outcome: 'created', subscriber },
+    });
+    sendEmailMock.mockResolvedValue(undefined);
+    const { subscribeToNewsletterAction } =
+      await import('./newsletter-actions');
+
+    await subscribeToNewsletterAction('reader@example.com');
+
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        replyTo: 'support@example.com',
+        headers: {
+          'List-Unsubscribe':
+            '<https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc>',
+          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        },
+      }),
+    );
+  });
+
+  it('drops a malformed stored reply-to address rather than blocking the send', async () => {
+    getEmailConfigMock.mockResolvedValue({
+      tenantId: TENANT_ID,
+      logoAssetUrl: undefined,
+      senderName: undefined,
+      replyToAddress: 'not-an-address',
+      footerPostalAddress: undefined,
+    });
+    createPendingSubscriberMock.mockResolvedValue({
+      ok: true,
+      data: { outcome: 'created', subscriber },
+    });
+    sendEmailMock.mockResolvedValue(undefined);
+    const { subscribeToNewsletterAction } =
+      await import('./newsletter-actions');
+
+    await expect(
+      subscribeToNewsletterAction('reader@example.com'),
+    ).resolves.toEqual({ outcome: 'success' });
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({ replyTo: undefined }),
     );
   });
 
