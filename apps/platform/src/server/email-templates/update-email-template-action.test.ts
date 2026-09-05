@@ -202,6 +202,58 @@ describe(updateEmailTemplateAction, () => {
     },
   );
 
+  it('rejects a malicious href buried in a later markDef of a later block', async () => {
+    const input: TUpdateEmailTemplateInput = {
+      subject: 'Sign in',
+      body: [
+        {
+          _type: 'block',
+          _key: 'k1',
+          style: 'normal',
+          children: [
+            { _type: 'span', _key: 's1', text: 'safe link', marks: ['link1'] },
+          ],
+          markDefs: [
+            { _type: 'link', _key: 'link1', href: 'https://acme.example' },
+          ],
+        },
+        {
+          _type: 'block',
+          _key: 'k2',
+          style: 'normal',
+          children: [
+            {
+              _type: 'span',
+              _key: 's2',
+              text: 'also safe',
+              marks: ['link2'],
+            },
+            {
+              _type: 'span',
+              _key: 's3',
+              text: 'malicious',
+              marks: ['link3'],
+            },
+          ],
+          markDefs: [
+            { _type: 'link', _key: 'link2', href: 'https://safe.example' },
+            { _type: 'link', _key: 'link3', href: 'javascript:alert(1)' },
+          ],
+        },
+      ],
+    };
+
+    const result = await updateEmailTemplateAction(
+      'tenant-1',
+      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      input,
+    );
+
+    expect(result).toEqual({ ok: false });
+    expect(requireTenantMembershipMock).not.toHaveBeenCalled();
+    expect(upsertEmailTemplateMock).not.toHaveBeenCalled();
+  });
+
   it('accepts explicit nulls as "revert to product default"', async () => {
     requireTenantMembershipMock.mockResolvedValue({
       tenant: { id: 'tenant-1' },

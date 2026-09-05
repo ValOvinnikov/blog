@@ -26,21 +26,29 @@ export const maxEmailLogoKbLabel = (): string => {
   return `${Math.round(MAX_EMAIL_LOGO_BYTES / KB)} KB`;
 };
 
+export type TEmailLogoQuickCheckError =
+  { key: 'unsupportedType' } | { key: 'tooLarge'; limit: string };
+
 /**
  * Client-side convenience only — catches an obviously wrong file before a
  * round trip. `validateEmailLogoUpload` on the server is the actual gate.
+ * Returns a message key rather than translated text: a plain utility
+ * function has no `useTranslations` to call, so the caller (a client
+ * component) translates using the key and any interpolation values here.
  */
-export const quickClientEmailLogoCheck = (file: File): string | undefined => {
+export const quickClientEmailLogoCheck = (
+  file: File,
+): TEmailLogoQuickCheckError | undefined => {
   if (
     !ACCEPTED_EMAIL_LOGO_MIME_TYPES.includes(
       file.type as TAcceptedEmailLogoMimeType,
     )
   ) {
-    return 'Choose a PNG, JPEG, or GIF image — SVG and WebP are not supported by major email clients.';
+    return { key: 'unsupportedType' };
   }
 
   if (file.size > MAX_EMAIL_LOGO_BYTES) {
-    return `That file is too large — the limit is ${maxEmailLogoKbLabel()}.`;
+    return { key: 'tooLarge', limit: maxEmailLogoKbLabel() };
   }
 
   return undefined;

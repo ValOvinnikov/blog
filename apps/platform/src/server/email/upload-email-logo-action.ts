@@ -55,8 +55,8 @@ const persistLogoUrl = async (
 };
 
 /**
- * Uploads and persists per §3.1's logo ladder — the tenant's own email logo
- * or one template's logo, resolved by `target`. Reuses the site logo's
+ * Uploads and persists the tenant's own email logo, or one template's own
+ * logo, resolved by `target`. Reuses the site logo's
  * upload transport (`FormData` with a `File`, `put()` to Vercel Blob with
  * `access: 'public'` — recipients fetch this with no session) but never its
  * validator: `validateEmailLogoUpload` enforces email-specific limits.

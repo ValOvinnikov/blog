@@ -3,7 +3,7 @@
 import { useEditor, useEditorSelector } from '@portabletext/editor';
 import * as selectors from '@portabletext/editor/selectors';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 
 import { PortableTextEditorLinkControl } from './components/link-control/portable-text-editor-link-control';
 import { PortableTextEditorToggleButton } from './components/toggle-button/portable-text-editor-toggle-button';
@@ -25,6 +25,7 @@ const findActiveLinkHref = (
 export const PortableTextEditorToolbar = () => {
   const t = useTranslations('portableTextEditorToolbar');
   const editor = useEditor();
+  const linkControlId = useId();
   const [isLinkControlOpen, setIsLinkControlOpen] = useState(false);
 
   const isBoldActive = useEditorSelector(
@@ -132,11 +133,14 @@ export const PortableTextEditorToolbar = () => {
         <PortableTextEditorToggleButton
           label={t('link')}
           isActive={isLinkActive}
+          isExpanded={isLinkControlOpen}
+          ariaControls={linkControlId}
           onToggle={() => setIsLinkControlOpen((open) => !open)}
         />
       </div>
       {isLinkControlOpen && (
         <PortableTextEditorLinkControl
+          id={linkControlId}
           initialHref={findActiveLinkHref(activeAnnotations)}
           hasExistingLink={isLinkActive}
           onApply={handleLinkApply}

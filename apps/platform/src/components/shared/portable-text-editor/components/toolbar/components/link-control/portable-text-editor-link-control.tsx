@@ -8,6 +8,7 @@ import { useId, useState, type FormEvent } from 'react';
 import { portableTextEditorLinkControlVariants } from './portable-text-editor-link-control-variants';
 
 export type TPortableTextEditorLinkControlProps = {
+  id: string;
   initialHref: string;
   hasExistingLink: boolean;
   onApply: (href: string) => void;
@@ -21,6 +22,7 @@ export type TPortableTextEditorLinkControlProps = {
  * can't collect on its own.
  */
 export const PortableTextEditorLinkControl = ({
+  id,
   initialHref,
   hasExistingLink,
   onApply,
@@ -39,7 +41,7 @@ export const PortableTextEditorLinkControl = ({
   };
 
   return (
-    <form className={root()} onSubmit={handleSubmit}>
+    <form id={id} className={root()} onSubmit={handleSubmit}>
       <label className="sr-only" htmlFor={inputId}>
         {t('linkUrlLabel')}
       </label>

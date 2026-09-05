@@ -60,7 +60,11 @@ export const PortableTextEditor = ({
     const rawHref = typeof value.href === 'string' ? value.href : '';
     const safeHref = sanitizeHref(rawHref);
     return (
-      <a href={safeHref ?? undefined} className={link()}>
+      <a
+        href={safeHref ?? undefined}
+        rel="noopener noreferrer"
+        className={link()}
+      >
         {children}
       </a>
     );

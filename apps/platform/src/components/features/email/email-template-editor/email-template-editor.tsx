@@ -14,7 +14,7 @@ import { Heading } from '@platform/components/shared/heading';
 import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
 import { useToast } from '@platform/context/toast-provider';
 import { updateEmailTemplateAction } from '@platform/server/email-templates/update-email-template-action';
-import { buildEmailTemplatePreviewAction } from '@platform/utils/email-template-preview-action/email-template-preview-action';
+import { buildEmailTemplatePreviewAction } from '@platform/utils/email-template-preview-action-builder/email-template-preview-action-builder';
 import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { useTranslations } from 'next-intl';

@@ -76,7 +76,11 @@ export const EmailLogoField = ({
 
     const quickError = quickClientEmailLogoCheck(file);
     if (quickError) {
-      setError(quickError);
+      setError(
+        quickError.key === 'unsupportedType'
+          ? t('unsupportedType')
+          : t('tooLarge', { limit: quickError.limit }),
+      );
       return;
     }
 

@@ -369,7 +369,9 @@
     "uploading": "Uploading…",
     "replace": "Replace {label}",
     "upload": "Upload {label}",
-    "remove": "Remove"
+    "remove": "Remove",
+    "unsupportedType": "Choose a PNG, JPEG, or GIF image — SVG and WebP are not supported by major email clients.",
+    "tooLarge": "That file is too large — the limit is {limit}."
   },
   "emailTemplatesSection": {
     "heading": "Templates",

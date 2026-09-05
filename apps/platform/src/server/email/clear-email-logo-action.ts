@@ -31,10 +31,10 @@ const getCurrentLogoUrl = async (
 };
 
 /**
- * Returns a logo to its next rung on the §3.1 ladder — clearing a
- * per-template logo falls back to the tenant email logo, clearing the
- * tenant email logo falls back to the product default. Idempotent: clearing
- * an already-empty field is a no-op success.
+ * Returns a logo to its next fallback — clearing a per-template logo falls
+ * back to the tenant email logo, clearing the tenant email logo falls back
+ * to the product default. Idempotent: clearing an already-empty field is a
+ * no-op success.
  */
 export const clearEmailLogoAction = async (
   tenantId: string,
