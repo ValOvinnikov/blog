@@ -1,7 +1,7 @@
 import type { TTenantEmailBrand } from '@blog/email/html/tenant-shell';
 import type { TPortableTextContent } from '@blog/email/portable-text';
 
-import { buildTenantActionEmail } from './action-email';
+import { buildTenantEmail } from './tenant-email';
 
 const BRAND: TTenantEmailBrand = {
   surface: '#ffffff',
@@ -19,7 +19,7 @@ const BRAND: TTenantEmailBrand = {
 
 const ACTION = { label: 'Sign in', url: 'https://example.com/sign-in' };
 
-describe('buildTenantActionEmail', () => {
+describe('buildTenantEmail', () => {
   it('renders the authored body followed by the action element', () => {
     const body: TPortableTextContent = [
       {
@@ -29,7 +29,7 @@ describe('buildTenantActionEmail', () => {
       },
     ];
 
-    const html = buildTenantActionEmail({
+    const html = buildTenantEmail({
       brand: BRAND,
       brandName: 'Acme',
       body,
@@ -42,7 +42,7 @@ describe('buildTenantActionEmail', () => {
   });
 
   it('renders the action element even when the authored body is empty', () => {
-    const html = buildTenantActionEmail({
+    const html = buildTenantEmail({
       brand: BRAND,
       brandName: 'Acme',
       body: [],
@@ -54,13 +54,13 @@ describe('buildTenantActionEmail', () => {
   });
 
   it('renders the action element even when the authored body is null or undefined', () => {
-    const htmlWithNull = buildTenantActionEmail({
+    const htmlWithNull = buildTenantEmail({
       brand: BRAND,
       brandName: 'Acme',
       body: null,
       action: ACTION,
     });
-    const htmlWithUndefined = buildTenantActionEmail({
+    const htmlWithUndefined = buildTenantEmail({
       brand: BRAND,
       brandName: 'Acme',
       body: undefined,
@@ -90,7 +90,7 @@ describe('buildTenantActionEmail', () => {
       },
     ];
 
-    const html = buildTenantActionEmail({
+    const html = buildTenantEmail({
       brand: BRAND,
       brandName: 'Acme',
       body: impersonatingBody,
@@ -103,7 +103,7 @@ describe('buildTenantActionEmail', () => {
   });
 
   it('renders the action in the tenant brand colours', () => {
-    const html = buildTenantActionEmail({
+    const html = buildTenantEmail({
       brand: BRAND,
       brandName: 'Acme',
       body: [],
@@ -115,7 +115,7 @@ describe('buildTenantActionEmail', () => {
   });
 
   it('escapes an authored body that attempts to inject markup', () => {
-    const html = buildTenantActionEmail({
+    const html = buildTenantEmail({
       brand: BRAND,
       brandName: 'Acme',
       body: [
@@ -129,5 +129,22 @@ describe('buildTenantActionEmail', () => {
     });
 
     expect(html).not.toContain('<img src=x onerror=steal()>');
+  });
+
+  it('renders no action element at all when action is omitted', () => {
+    const html = buildTenantEmail({
+      brand: BRAND,
+      brandName: 'Acme',
+      body: [
+        {
+          _type: 'block',
+          style: 'normal',
+          children: [{ _type: 'span', text: 'Just an update.' }],
+        },
+      ],
+    });
+
+    expect(html).toContain('Just an update.');
+    expect(html).not.toContain('<a href=');
   });
 });

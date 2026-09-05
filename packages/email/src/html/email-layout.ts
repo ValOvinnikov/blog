@@ -16,6 +16,7 @@ export type TRenderEmailShellInput = {
   brandName: string;
   previewText?: string;
   bodyHtml: string;
+  actionHtml?: string;
 };
 
 export const FONT_STACK =
@@ -33,6 +34,7 @@ export function renderEmailShell({
   brandName,
   previewText,
   bodyHtml,
+  actionHtml,
 }: TRenderEmailShellInput): string {
   const escapedBrandName = escapeHtml(brandName);
   const preheader = previewText
@@ -61,6 +63,9 @@ export function renderEmailShell({
     `<tr><td style="padding:32px;color:${palette.text};font-family:${FONT_STACK};font-size:16px;line-height:1.5;">`,
     bodyHtml,
     '</td></tr>',
+    actionHtml
+      ? `<tr><td style="padding:0 32px 32px;">${actionHtml}</td></tr>`
+      : '',
     `<tr><td style="padding:24px 32px;border-top:1px solid ${palette.border};color:${palette.textMuted};font-family:${FONT_STACK};font-size:12px;line-height:1.5;">`,
     `&copy; ${new Date().getFullYear()} ${escapedBrandName}`,
     '</td></tr>',

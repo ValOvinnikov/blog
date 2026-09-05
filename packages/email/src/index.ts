@@ -28,7 +28,7 @@ export {
   type TDocumentValidationAlertInput,
 } from './templates/operator';
 export {
-  buildTenantActionEmail,
-  type TBuildTenantActionEmailInput,
+  buildTenantEmail,
+  type TBuildTenantEmailInput,
 } from './templates/tenant';
 export { sendEmail, type TSendEmailInput } from './transport/send-email';

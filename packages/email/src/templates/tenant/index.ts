@@ -1,4 +1,1 @@
-export {
-  buildTenantActionEmail,
-  type TBuildTenantActionEmailInput,
-} from './action-email';
+export { buildTenantEmail, type TBuildTenantEmailInput } from './tenant-email';
