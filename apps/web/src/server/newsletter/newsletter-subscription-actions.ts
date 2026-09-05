@@ -1,5 +1,6 @@
 'use server';
 
+import { routes } from '@blog/config';
 import { queries } from '@blog/db';
 import { sendEmail } from '@blog/email';
 import { auth } from '@web/server/auth/auth';
@@ -99,10 +100,12 @@ export const resendConfirmationAction =
       if (result.outcome === 'not-pending') return { ok: false };
 
       const siteUrl = (await getTenantBaseUrl()) ?? '';
-      const confirmationUrl = `${siteUrl}/api/newsletter/confirm?token=${result.confirmationToken}`;
+      const confirmationUrl = `${siteUrl}${routes.newsletterConfirm(result.confirmationToken)}`;
+      const unsubscribeUrl = `${siteUrl}${routes.newsletterUnsubscribe(result.unsubscribeToken)}`;
       const { brand, brandName } = await resolveTenantEmailIdentity(tenantId);
-      const { subject, html } = buildNewsletterConfirmationEmail({
+      const { subject, html, headers } = buildNewsletterConfirmationEmail({
         confirmationUrl,
+        unsubscribeUrl,
         brand,
         brandName,
       });
@@ -110,7 +113,13 @@ export const resendConfirmationAction =
         env.NEWSLETTER_FROM_ADDRESS,
       );
 
-      await sendEmail({ to: email, from: fromAddress, subject, html });
+      await sendEmail({
+        to: email,
+        from: fromAddress,
+        subject,
+        html,
+        headers,
+      });
       return { ok: true };
     } catch (error) {
       logger.error('newsletter.confirmation_resend_failed', { error });
