@@ -192,6 +192,17 @@ generate`) diffs the schema against the last migration and writes a new
    before applying anywhere; this is the dry-run step (drizzle-kit does not
    touch the database at generate time, so reading the diff here _is_ the
    dry-run, unlike Sanity's separate `migrate:dry` flag).
+
+   **Generate as the last step before pushing, not while iterating on the
+   schema.** The index drizzle-kit assigns is whichever one is next free on
+   `main` at generate time, and several sessions run against this repo
+   concurrently — so the longer a generated migration sits on a branch, the
+   better the odds another branch claims the same index and one of the two has
+   to be regenerated. Schema work can proceed with generation deferred until
+   the branch is otherwise ready. `pnpm check:migration-index` fails a PR whose
+   index is already taken on `main`; `packages/db/README.md`'s "Renumbering a
+   migration that collides with `main`" is the fix when it fires.
+
 3. **Apply to local/dev.** `pnpm --filter @blog/db db:migrate` against the
    **development** Neon branch — no backup required first, same stance
    `docs/DEPLOY.md` already takes for the Sanity `development` dataset (the

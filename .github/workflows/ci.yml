@@ -258,6 +258,54 @@ jobs:
       - name: Revalidate tags sync (helper unit tests)
         run: pnpm check:revalidate-tags-sync:test
 
+  migration-index:
+    name: Migration index
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      # The only job here that pins the PR's own head rather than taking the
+      # default merge ref. The question this check asks is whether the commits
+      # on this branch claim an index `main` has already given to a different
+      # migration — a property of the branch, not of a merge result. The merge
+      # ref is the wrong artefact to ask it of: a merge that succeeds has
+      # already reconciled the two journals, and one that fails produces no
+      # merge ref to check out at all.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+
+      # The checkout above fetches only this PR's merge ref, so `origin/main`
+      # does not exist yet and the check below would have nothing to compare
+      # against. The explicit refspec is what creates the remote-tracking ref;
+      # a bare `git fetch origin main` only moves FETCH_HEAD. This repo is
+      # public, so the anonymous remote works without the credentials the
+      # checkout deliberately drops.
+      - name: Fetch main to compare against
+        run: git fetch --no-tags --depth=1 origin +refs/heads/main:refs/remotes/origin/main
+
+      # drizzle-kit numbers each migration sequentially from whatever is on
+      # main at `db:generate` time, so two branches generating concurrently
+      # both claim the same index. Nothing surfaces that until the second one
+      # merges and hits an add/add conflict on meta/<idx>_snapshot.json — long
+      # after CI went green, and a conflicted PR produces no merge ref, so its
+      # checks stop reporting entirely. Failing here keeps the fix at one
+      # cheap regenerate. Read-only; nothing is committed.
+      - name: Migration indices (no collision with main)
+        run: pnpm check:migration-index
+
+      # Fixture-based unit tests for the journal parsing + comparison helpers.
+      # Unlike the four jobs above these need no repo dependencies, but they
+      # stay beside the check they cover rather than moving to the
+      # install-free Hooks workflow.
+      - name: Migration index (helper unit tests)
+        run: pnpm check:migration-index:test
+
   migrations:
     name: Migrations
     runs-on: ubuntu-latest
