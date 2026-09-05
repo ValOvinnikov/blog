@@ -72,9 +72,9 @@ reading, page canvas elevation) are documented in full in
 4. **Server-first.** React Server Components by default; client components only
    for genuine interactivity, added at the leaf boundary in `apps/web` (never
    in `@blog/ui`).
-5. **Static + ISR.** Pages are statically generated and revalidated on a timer
-   and (once #93 ships) on-demand via webhook — no server round-trip on the hot
-   path.
+5. **Static + ISR.** Pages are statically generated, revalidated on demand via
+   the Sanity publish webhook, and expired on a timer as a backstop behind it —
+   no server round-trip on the hot path.
 6. **Live data is sacred.** The `production` dataset holds real content. Any
    schema change that alters an existing shape requires a content migration
    (§8) — never orphan documents.
@@ -614,7 +614,8 @@ section (rollback strategy is an open decision, not yet settled).
 
 ## 9. Rendering, caching & i18n
 
-Static generation by default with time-based + on-demand ISR revalidation; the
+Static generation by default, revalidated on demand by the publish webhook
+with a time-based expiry as its backstop; the
 skim-generation pipeline (`/api/generate-skim`); the Sanity CDN is
 deliberately bypassed; i18n runs through `next-intl` with a locale-prefix-free
 URL scheme and a single `SmartLink` for all in-app navigation.
@@ -633,9 +634,23 @@ own pagination, not only the ones the post currently belongs to (a
 re-categorisation or removal would otherwise leave stale HTML on the page the
 post no longer occupies, with no way to detect it). A renamed post slug is a
 known, unsolved gap — the old slug isn't recoverable from the webhook payload,
-so the page at the old URL stays cached until it next changes for another
-reason. Anything without a precise derivation yet falls back to a logged
-whole-site purge. The same webhook also cleans
+so the page at the old URL stays stale until the route-level backstop below
+expires it. Anything without a precise derivation yet falls back to a logged
+whole-site purge.
+
+That purge is best-effort, and the backstop behind it is a time-based
+expiry declared per content route: `export const revalidate = 21600` (6 hours)
+on each of the eleven `[tenant]/[locale]` content routes, excluding
+`account`/`bookmarks`, which stay `force-dynamic`. It governs the Full Route
+Cache, distinct from the 3600s Data Cache TTL `isr()` sets on fetches, and
+exists so a purge that never happens self-heals within a bounded window rather
+than leaving a page wrong indefinitely — a correctness floor, not a freshness
+target. Next requires the value to be a literal and rejects it on a shared
+layout that has a `force-dynamic` child, both as hard build errors, so each
+route declares its own, kept in step with `@blog/config`'s
+`CONTENT_ROUTE_REVALIDATE_SECONDS` by test rather than by import.
+
+The same webhook also cleans
 up orphaned `@blog/db` `bookmarks` rows when it receives a `blog_post` delete
 (Sanity's `sanity-operation` header — unpublish fires the same trigger as
 true deletion), scoped to the tenant resolved from that project-id header.
