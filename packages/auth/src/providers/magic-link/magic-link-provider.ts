@@ -1,10 +1,13 @@
 import { env } from '@blog/auth/utils/env/env';
+import { EMAIL_TEMPLATE_TYPE } from '@blog/config/constants';
 import { sendEmail } from '@blog/email';
 import type { EmailConfig } from 'next-auth/providers/email';
 
+import { applyTenantSenderName } from './apply-tenant-sender-name';
 import { findPendingInviteTenantNames } from './find-pending-invite-tenant-names';
 import { buildMagicLinkEmail } from './magic-link-email';
 import { buildInviteMagicLinkEmail } from './magic-link-invite-email';
+import { resolveMagicLinkEmailSettings } from './resolve-magic-link-email-settings';
 import { resolveMagicLinkFromAddress } from './resolve-magic-link-from-address';
 import { resolveTenantEmailIdentity } from './resolve-tenant-email-identity';
 
@@ -31,18 +34,41 @@ export function buildMagicLinkProvider(): EmailConfig {
         // (see CLAUDE.md).
       }
       const tenantIdentity = await resolveTenantEmailIdentity(host);
+      const isInvite = tenantNames.length > 0;
 
-      const { subject, html } =
-        tenantNames.length > 0
-          ? buildInviteMagicLinkEmail({
-              url,
-              host,
-              tenantNames,
-              tenantIdentity,
-            })
-          : buildMagicLinkEmail({ url, host, tenantIdentity });
+      const emailSettings = tenantIdentity
+        ? await resolveMagicLinkEmailSettings(
+            tenantIdentity.tenantId,
+            isInvite
+              ? EMAIL_TEMPLATE_TYPE.TENANT_INVITE
+              : EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+          )
+        : undefined;
 
-      await sendEmail({ to: identifier, from, subject, html });
+      const { subject, html } = isInvite
+        ? buildInviteMagicLinkEmail({
+            url,
+            host,
+            tenantNames,
+            tenantIdentity,
+            logoImageUrl: emailSettings?.logoImageUrl,
+            footerPostalAddress: emailSettings?.footerPostalAddress,
+          })
+        : buildMagicLinkEmail({
+            url,
+            host,
+            tenantIdentity,
+            logoImageUrl: emailSettings?.logoImageUrl,
+            footerPostalAddress: emailSettings?.footerPostalAddress,
+          });
+
+      await sendEmail({
+        to: identifier,
+        from: applyTenantSenderName(from, emailSettings?.senderName),
+        subject,
+        html,
+        replyTo: emailSettings?.replyTo,
+      });
     },
   };
 }

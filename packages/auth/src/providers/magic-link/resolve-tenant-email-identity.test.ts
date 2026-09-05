@@ -41,6 +41,7 @@ describe(resolveTenantEmailIdentity, () => {
         logoHue: undefined,
       }),
       brandName: 'Acme Blog',
+      tenantId: 'tenant-1',
     });
   });
 
