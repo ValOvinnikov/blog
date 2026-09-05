@@ -86,14 +86,8 @@ describe('extractServiceCallSiteTags', () => {
     assert.equal(dynamic[0].text, '`module:${id}`');
   });
 
-  it('resolves a bare-identifier isr(...) argument via a tags: [...] property', () => {
+  it('leaves a bare-identifier isr(...) argument as pending, not resolved or dropped', () => {
     const source = `
-      export const getIndexPage = createTaxonomyIndexPageLoader({
-        query: q,
-        tags: ['page_tagIndex', 'modules:taxonomyList'],
-        MissingTaxonomyListError,
-      });
-
       function createTaxonomyIndexPageLoader({ tags }) {
         return async () => {
           const rawPage = await runQuery(query, {
@@ -103,15 +97,15 @@ describe('extractServiceCallSiteTags', () => {
       }
     `;
     const sf = parseSource('/virtual/loader.ts', source);
-    const { tags, unresolved } = extractServiceCallSiteTags(
+    const { tags, unresolved, pending } = extractServiceCallSiteTags(
       '/virtual/loader.ts',
       sf,
     );
-    assert.deepEqual(
-      [...tags].sort(),
-      ['modules:taxonomyList', 'page_tagIndex'].sort(),
-    );
+    assert.deepEqual([...tags], []);
     assert.deepEqual(unresolved, []);
+    assert.equal(pending.length, 1);
+    assert.equal(pending[0].factoryName, 'createTaxonomyIndexPageLoader');
+    assert.equal(pending[0].propName, 'tags');
   });
 
   it('flags a non-literal, non-identifier isr(...) argument as unresolved', () => {
@@ -141,6 +135,73 @@ describe('collectServiceTags', () => {
     );
     assert.deepEqual([...tags].sort(), ['author', 'post', 'topic'].sort());
     assert.deepEqual(dynamic, []);
+    assert.deepEqual(unresolved, []);
+  });
+
+  it('resolves a bare-identifier isr(...) argument via its factory function’s call site in another file', () => {
+    const fixtures = {
+      '/virtual/create-taxonomy-index-page-loader.ts': `
+        export function createTaxonomyIndexPageLoader({ tags }) {
+          return async () => {
+            const rawPage = await runQuery(query, {
+              ...isr(tags, tenant.projectId),
+            });
+          };
+        }
+      `,
+      '/virtual/tag-index-loader.ts': `
+        export const getIndexPage = createTaxonomyIndexPageLoader({
+          query: tagIndexPageQuery,
+          tags: ['page_tagIndex', 'modules:taxonomyList'],
+          MissingTaxonomyListError,
+        });
+      `,
+    };
+    const { tags, unresolved } = collectServiceTags(
+      Object.keys(fixtures),
+      (file) => parseSource(file, fixtures[file]),
+    );
+    assert.deepEqual(
+      [...tags].sort(),
+      ['modules:taxonomyList', 'page_tagIndex'].sort(),
+    );
+    assert.deepEqual(unresolved, []);
+  });
+
+  it('fails loudly instead of silently dropping a bare-identifier isr(...) argument whose factory call site passes a non-literal value', () => {
+    const source = `
+      function getSomething(tags) {
+        return async function inner() {
+          ...isr(tags, tenant.projectId);
+        };
+      }
+      export const getNewThing = getSomething(computeTagsAtRuntime());
+    `;
+    const { tags, unresolved } = collectServiceTags(
+      ['/virtual/loader.ts'],
+      (file) => parseSource(file, source),
+    );
+    assert.deepEqual([...tags], []);
+    assert.equal(unresolved.length, 1);
+    assert.equal(unresolved[0].text, 'computeTagsAtRuntime()');
+  });
+
+  it('never resolves a bare-identifier isr(...) argument from an unrelated object literal’s tags property', () => {
+    const source = `
+      const unrelatedConfig = { tags: ['totally-unrelated-tag'] };
+
+      function getSomething(tags) {
+        return async function inner() {
+          ...isr(tags, tenant.projectId);
+        };
+      }
+      export const getNewThing = getSomething(['real-tag']);
+    `;
+    const { tags, unresolved } = collectServiceTags(
+      ['/virtual/loader.ts'],
+      (file) => parseSource(file, source),
+    );
+    assert.deepEqual([...tags], ['real-tag']);
     assert.deepEqual(unresolved, []);
   });
 });

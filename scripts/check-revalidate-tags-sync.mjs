@@ -6,19 +6,21 @@
 // no per-tag Object.hasOwn miss to report, so this is the only guard against
 // that failure class.
 //
-// Extraction covers three tag shapes emitted by real call sites:
+// Extraction covers these tag shapes emitted by real call sites:
 //   - a string/array literal passed directly to `isr(...)`;
 //   - a `module:${id}` (or similarly substituted) template element inside
 //     that array — always skipped, since it is a per-document dynamic tag,
 //     not a registrable one (`getRevalidateTagsForType` appends it itself
 //     for any `module_*` type);
-//   - an `isr(tags, ...)` call where `tags` is a bare identifier — resolved
-//     by also collecting every `tags: [...]` string-literal-array property
-//     anywhere in the scanned files (the shape `createTaxonomyIndexPageLoader`
-//     callers use to hand a literal list to a shared loader factory).
-// Anything else passed as `isr(...)`'s first argument is not statically
-// analysable by this script and fails the run rather than being silently
-// skipped — a blind spot here would be worse than no guard at all.
+//   - an `isr(tags, ...)` call where `tags` is a bare identifier bound to a
+//     parameter of some enclosing function `F` (directly, or via an
+//     object-destructured parameter) — resolved by tracing `F` to a name and
+//     scanning every call site of `F` across the scanned files for the
+//     literal value passed for that parameter.
+// A bare identifier that cannot be traced this way, or whose traced call
+// site(s) don't yield a literal, is never silently dropped — it is reported
+// as unresolved, same as any other shape this script cannot statically
+// resolve. A blind spot here would be worse than no guard at all.
 //
 // Run with `pnpm check:revalidate-tags-sync`. Read-only; exits 1 on any
 // mismatch or unrecognised call shape.
@@ -106,78 +108,215 @@ export const extractRevalidateTagValues = (sf) => {
 const toRelative = (file) => relative(repoRoot, file);
 
 /**
+ * Every string-literal/template element of an array literal, sorted into
+ * `tags` (plain strings), `dynamic` (substituted templates — a per-document
+ * runtime tag) or `unresolved` (anything else) on the given collections.
+ */
+const collectArrayLiteralElements = (arrayLiteral, sf, fileRel, target) => {
+  for (const element of arrayLiteral.elements) {
+    if (isStringLike(element)) {
+      target.tags.add(element.text);
+    } else if (ts.isTemplateExpression(element)) {
+      target.dynamic.push({ file: fileRel, text: element.getText(sf) });
+    } else {
+      target.unresolved.push({ file: fileRel, text: element.getText(sf) });
+    }
+  }
+};
+
+/**
+ * Walks upward from `node` through enclosing function-like scopes to find
+ * the nearest one that binds a parameter named `name` — either directly
+ * (`function f(name)`) or via an object-destructured parameter
+ * (`function f({ name })` or `function f({ renamed: name })`). Returns the
+ * binding's function node, its parameter index, and (for the destructured
+ * case) the property name to look up at a call site — or `null` if no
+ * enclosing function declares such a binding.
+ */
+const findEnclosingParamBinding = (node, name) => {
+  let current = node.parent;
+  while (current) {
+    if (ts.isFunctionLike(current)) {
+      for (
+        let paramIndex = 0;
+        paramIndex < current.parameters.length;
+        paramIndex += 1
+      ) {
+        const param = current.parameters[paramIndex];
+        if (ts.isIdentifier(param.name) && param.name.text === name) {
+          return { fn: current, paramIndex, propName: null };
+        }
+        if (ts.isObjectBindingPattern(param.name)) {
+          for (const element of param.name.elements) {
+            if (element.dotDotDotToken || !ts.isIdentifier(element.name)) {
+              continue;
+            }
+            if (element.name.text !== name) continue;
+            const propName =
+              element.propertyName && ts.isIdentifier(element.propertyName)
+                ? element.propertyName.text
+                : name;
+            return { fn: current, paramIndex, propName };
+          }
+        }
+      }
+    }
+    current = current.parent;
+  }
+  return null;
+};
+
+/** The callable name of a function-like node, if it has one resolvable by name across files. */
+const resolveFunctionName = (fn) => {
+  if (ts.isFunctionDeclaration(fn)) return fn.name?.text ?? null;
+  if (
+    (ts.isFunctionExpression(fn) || ts.isArrowFunction(fn)) &&
+    fn.parent &&
+    ts.isVariableDeclaration(fn.parent) &&
+    ts.isIdentifier(fn.parent.name)
+  ) {
+    return fn.parent.name.text;
+  }
+  return null;
+};
+
+/**
  * Every ISR tag literal reachable in a source file: direct `isr(...)`
- * string/array-literal arguments, plus any `tags: [...]` string-literal-array
- * object property (the shape a caller uses to hand a literal list to a
- * shared loader factory that itself calls `isr(tags, ...)`).
+ * string/array-literal arguments, plus (unresolved at this stage) any
+ * `isr(...)` call whose argument is a bare identifier bound to an enclosing
+ * function's parameter — recorded in `pending` for `collectServiceTags` to
+ * resolve against every call site of that function across all scanned files.
  *
  * Also returns `dynamic` (template-literal elements with substitutions,
  * always a per-document id tag, correctly skipped) and `unresolved` (any
  * `isr(...)` first argument this script cannot classify) so the caller can
- * report both instead of extraction silently dropping them.
+ * report both instead of extraction silently dropping them. `callSites`
+ * records every call expression's arguments, keyed by callee name, for the
+ * cross-file resolution pass.
  */
 export const extractServiceCallSiteTags = (file, sf) => {
+  const fileRel = toRelative(file);
   const tags = new Set();
   const dynamic = [];
   const unresolved = [];
-
-  const collectFromArrayLiteral = (arrayLiteral) => {
-    for (const element of arrayLiteral.elements) {
-      if (isStringLike(element)) {
-        tags.add(element.text);
-      } else if (ts.isTemplateExpression(element)) {
-        dynamic.push({ file: toRelative(file), text: element.getText(sf) });
-      } else {
-        unresolved.push({ file: toRelative(file), text: element.getText(sf) });
-      }
-    }
-  };
+  const pending = [];
+  const callSites = new Map();
 
   const visit = (node) => {
-    if (
-      ts.isCallExpression(node) &&
-      ts.isIdentifier(node.expression) &&
-      node.expression.text === 'isr' &&
-      node.arguments[0]
-    ) {
-      const arg = node.arguments[0];
-      if (isStringLike(arg)) {
-        tags.add(arg.text);
-      } else if (ts.isArrayLiteralExpression(arg)) {
-        collectFromArrayLiteral(arg);
-      } else if (!ts.isIdentifier(arg)) {
-        unresolved.push({ file: toRelative(file), text: arg.getText(sf) });
-      }
-      // A bare identifier (e.g. `isr(tags, ...)`) is resolved via the
-      // `tags: [...]` property scan below, not here.
-    }
+    if (ts.isCallExpression(node) && ts.isIdentifier(node.expression)) {
+      const calleeName = node.expression.text;
+      if (!callSites.has(calleeName)) callSites.set(calleeName, []);
+      callSites.get(calleeName).push(node.arguments);
 
-    if (
-      ts.isPropertyAssignment(node) &&
-      ts.isIdentifier(node.name) &&
-      node.name.text === 'tags' &&
-      ts.isArrayLiteralExpression(node.initializer) &&
-      node.initializer.elements.every(isStringLike)
-    ) {
-      collectFromArrayLiteral(node.initializer);
+      if (calleeName === 'isr' && node.arguments[0]) {
+        const arg = node.arguments[0];
+        if (isStringLike(arg)) {
+          tags.add(arg.text);
+        } else if (ts.isArrayLiteralExpression(arg)) {
+          collectArrayLiteralElements(arg, sf, fileRel, {
+            tags,
+            dynamic,
+            unresolved,
+          });
+        } else if (ts.isIdentifier(arg)) {
+          const binding = findEnclosingParamBinding(arg, arg.text);
+          const factoryName = binding ? resolveFunctionName(binding.fn) : null;
+          if (binding && factoryName) {
+            pending.push({
+              factoryName,
+              paramIndex: binding.paramIndex,
+              propName: binding.propName,
+              file: fileRel,
+              text: arg.getText(sf),
+            });
+          } else {
+            unresolved.push({ file: fileRel, text: arg.getText(sf) });
+          }
+        } else {
+          unresolved.push({ file: fileRel, text: arg.getText(sf) });
+        }
+      }
     }
 
     ts.forEachChild(node, visit);
   };
   visit(sf);
-  return { tags, dynamic, unresolved };
+  return { tags, dynamic, unresolved, pending, callSites };
+};
+
+/**
+ * Resolves every `pending` bare-identifier `isr(...)` argument against the
+ * traced factory function's call sites collected across all scanned files.
+ * A pending entry with no matching call site, or whose resolved argument
+ * isn't itself a literal, is pushed to `unresolved` rather than dropped —
+ * this is the step that must never silently pass.
+ */
+const resolvePendingCallSiteTags = (pending, callSitesByName, target) => {
+  for (const entry of pending) {
+    const sites = callSitesByName.get(entry.factoryName) ?? [];
+    let resolvedAny = false;
+
+    for (const args of sites) {
+      const arg = args[entry.paramIndex];
+      if (!arg) continue;
+
+      let valueNode = arg;
+      if (entry.propName !== null) {
+        if (!ts.isObjectLiteralExpression(arg)) continue;
+        const prop = arg.properties.find(
+          (p) =>
+            ts.isPropertyAssignment(p) &&
+            ts.isIdentifier(p.name) &&
+            p.name.text === entry.propName,
+        );
+        if (!prop) continue;
+        valueNode = prop.initializer;
+      }
+
+      resolvedAny = true;
+      if (isStringLike(valueNode)) {
+        target.tags.add(valueNode.text);
+      } else if (ts.isArrayLiteralExpression(valueNode)) {
+        collectArrayLiteralElements(valueNode, undefined, entry.file, target);
+      } else {
+        target.unresolved.push({
+          file: entry.file,
+          text: valueNode.getText(),
+        });
+      }
+    }
+
+    if (!resolvedAny) {
+      target.unresolved.push({ file: entry.file, text: entry.text });
+    }
+  }
 };
 
 export const collectServiceTags = (files, parseFn = (f) => parse(f)) => {
   const tags = new Set();
   const dynamic = [];
   const unresolved = [];
+  const pending = [];
+  const callSitesByName = new Map();
+
   for (const file of files) {
     const result = extractServiceCallSiteTags(file, parseFn(file));
     for (const tag of result.tags) tags.add(tag);
     dynamic.push(...result.dynamic);
     unresolved.push(...result.unresolved);
+    pending.push(...result.pending);
+    for (const [calleeName, sites] of result.callSites) {
+      if (!callSitesByName.has(calleeName)) callSitesByName.set(calleeName, []);
+      callSitesByName.get(calleeName).push(...sites);
+    }
   }
+
+  resolvePendingCallSiteTags(pending, callSitesByName, {
+    tags,
+    dynamic,
+    unresolved,
+  });
+
   return { tags, dynamic, unresolved };
 };
 
