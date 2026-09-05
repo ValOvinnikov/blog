@@ -1,3 +1,4 @@
+import { CORE_DEPROVISIONING_STEPS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 import type { TDeprovisionEnv } from './lib/env';
@@ -94,6 +95,17 @@ describe(runSteps, () => {
     expect(clearTenantArtifactsMock).toHaveBeenCalledTimes(1);
     expect(archiveTenantRowMock).toHaveBeenCalledTimes(1);
     expect(invalidateTenantCacheMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('reports RUNNING for each step in exactly CORE_DEPROVISIONING_STEPS order', async () => {
+    await runSteps(baseTenant, env);
+
+    const reportedOrder = reportDeprovisioningStepStatusMock.mock.calls
+      .map(([call]) => call as { step: string; status: string })
+      .filter((call) => call.status === 'RUNNING')
+      .map((call) => call.step);
+
+    expect(reportedOrder).toEqual(CORE_DEPROVISIONING_STEPS);
   });
 
   it('runs revoke-sanity-tokens before clear-artifacts', async () => {
