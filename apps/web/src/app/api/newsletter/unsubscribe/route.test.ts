@@ -69,6 +69,7 @@ describe('GET /api/newsletter/unsubscribe', () => {
     expect(html).toContain('<form method="post"');
     expect(html).toContain('token=unsub-token-abc');
     expect(html).toContain('Confirm unsubscribe');
+    expect(html).toContain('<a href="/">Return home</a>');
     expect(unsubscribeByTokenMock).not.toHaveBeenCalled();
     expect(resolveTenantIdMock).not.toHaveBeenCalled();
     expect(isTenantActiveMock).not.toHaveBeenCalled();

@@ -12,6 +12,7 @@ export type TConfirmPageCopy = {
   title: string;
   message: string;
   confirmButtonLabel: string;
+  returnHomeLabel: string;
   actionUrl: string;
 };
 
@@ -63,12 +64,15 @@ const renderConfirmPage = ({
   title,
   message,
   confirmButtonLabel,
+  returnHomeLabel,
   actionUrl,
 }: TConfirmPageCopy): string => {
   const safeTitle = escapeXml(title);
   const safeMessage = escapeXml(message);
   const safeButtonLabel = escapeXml(confirmButtonLabel);
+  const safeReturnHomeLabel = escapeXml(returnHomeLabel);
   const safeActionUrl = escapeXml(actionUrl);
+  const homeHref = routes.home();
 
   return `<!doctype html>
 <html lang="en">
@@ -83,6 +87,7 @@ const renderConfirmPage = ({
     <form method="post" action="${safeActionUrl}">
       <button type="submit">${safeButtonLabel}</button>
     </form>
+    <p><a href="${homeHref}">${safeReturnHomeLabel}</a></p>
   </body>
 </html>`;
 };
