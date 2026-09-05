@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./html": "./src/html/index.ts",
+    "./templates/tenant": "./src/templates/tenant/index.ts"
   },
   "scripts": {
     "lint": "eslint .",

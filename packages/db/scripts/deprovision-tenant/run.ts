@@ -20,11 +20,24 @@
  */
 import { pathToFileURL } from 'node:url';
 
+import {
+  DEPROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+  type TDeprovisioningStep,
+  type TTenantProvisioningStepStatus,
+} from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
 
+import { workflowRunUrl } from '../lib/workflow-run-url/workflow-run-url';
+
 import { loadDeprovisionEnv, type TDeprovisionEnv } from './lib/env';
 import { getTenantRow } from './lib/get-tenant-row';
+import {
+  reportDeprovisioningRunFinish,
+  reportDeprovisioningRunStart,
+} from './lib/report-deprovisioning-run';
+import { reportDeprovisioningStepStatus } from './lib/report-deprovisioning-step-status';
 import { archiveTenantSanityProject } from './steps/archive-sanity-project';
 import { archiveTenantRow } from './steps/archive-tenant';
 import { clearTenantArtifacts } from './steps/clear-artifacts';
@@ -69,18 +82,98 @@ function parseDryRun(argv: string[]): boolean {
 }
 
 type TStep = {
+  key: TDeprovisioningStep;
   name: string;
   run: (tenant: TTenant, env: TDeprovisionEnv) => Promise<void>;
 };
 
 const STEPS: TStep[] = [
-  { name: 'remove-domain', run: removeTenantDomain },
-  { name: 'archive-sanity-project', run: archiveTenantSanityProject },
-  { name: 'revoke-sanity-tokens', run: revokeTenantSanityTokens },
-  { name: 'clear-artifacts', run: clearTenantArtifacts },
-  { name: 'archive-tenant', run: archiveTenantRow },
-  { name: 'invalidate-tenant-cache', run: invalidateTenantCache },
+  {
+    key: DEPROVISIONING_STEP.REMOVE_DOMAIN,
+    name: 'remove-domain',
+    run: removeTenantDomain,
+  },
+  {
+    key: DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT,
+    name: 'archive-sanity-project',
+    run: archiveTenantSanityProject,
+  },
+  {
+    key: DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS,
+    name: 'revoke-sanity-tokens',
+    run: revokeTenantSanityTokens,
+  },
+  {
+    key: DEPROVISIONING_STEP.CLEAR_ARTIFACTS,
+    name: 'clear-artifacts',
+    run: clearTenantArtifacts,
+  },
+  {
+    key: DEPROVISIONING_STEP.ARCHIVE_TENANT,
+    name: 'archive-tenant',
+    run: archiveTenantRow,
+  },
+  {
+    key: DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE,
+    name: 'invalidate-tenant-cache',
+    run: invalidateTenantCache,
+  },
 ];
+
+// recordStepStatus, recordRunStart and recordRunFinish each swallow their
+// own error: a failure recording step/run state must never abort the
+// teardown it is only trying to describe.
+async function recordStepStatus(
+  tenantId: string,
+  step: TDeprovisioningStep,
+  status: TTenantProvisioningStepStatus,
+  error?: string,
+): Promise<void> {
+  try {
+    await reportDeprovisioningStepStatus({
+      tenantId,
+      step,
+      status,
+      ...(error === undefined ? {} : { error }),
+    });
+  } catch (reportError) {
+    console.error(
+      `deprovision-tenant: failed to record step "${step}" status "${status}" for tenant "${tenantId}": ${sanitizeLogMessage(reportError)}`,
+    );
+  }
+}
+
+async function recordRunStart(
+  tenant: TTenant,
+  env: TDeprovisionEnv,
+): Promise<void> {
+  try {
+    const runUrl = workflowRunUrl({
+      serverUrl: env.githubServerUrl,
+      repository: env.githubRepository,
+      runId: env.githubRunId,
+    });
+
+    await reportDeprovisioningRunStart({
+      tenantId: tenant.id,
+      ...(runUrl === undefined ? {} : { workflowRunUrl: runUrl }),
+    });
+  } catch (error) {
+    console.error(
+      `deprovision-tenant: failed to record run start for tenant "${tenant.id}": ${sanitizeLogMessage(error)}`,
+    );
+  }
+}
+
+async function recordRunFinish(tenantId: string): Promise<void> {
+  try {
+    await reportDeprovisioningRunFinish(tenantId);
+  } catch (error) {
+    console.error(
+      `deprovision-tenant: failed to record run finish for tenant "${tenantId}": ${sanitizeLogMessage(error)}`,
+    );
+  }
+}
 
 // Exported for direct testing of the step sequencing without also exercising
 // the confirmation guard, argv parsing, env loading, or the tenant-row fetch
@@ -89,16 +182,48 @@ export async function runSteps(
   tenant: TTenant,
   env: TDeprovisionEnv,
 ): Promise<{ ok: boolean }> {
+  if (env.dryRun === false) {
+    await recordRunStart(tenant, env);
+  }
+
   for (const step of STEPS) {
     console.warn(`deprovision-tenant: running step "${step.name}"...`);
+
+    if (env.dryRun === false) {
+      await recordStepStatus(
+        tenant.id,
+        step.key,
+        TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+      );
+    }
 
     try {
       await step.run(tenant, env);
       console.warn(`deprovision-tenant: step "${step.name}" done.`);
+
+      if (env.dryRun === false) {
+        await recordStepStatus(
+          tenant.id,
+          step.key,
+          TENANT_PROVISIONING_STEP_STATUS.DONE,
+        );
+      }
     } catch (error) {
+      const message = sanitizeLogMessage(error);
       console.error(
-        `deprovision-tenant: step "${step.name}" failed: ${sanitizeLogMessage(error)}`,
+        `deprovision-tenant: step "${step.name}" failed: ${message}`,
       );
+
+      if (env.dryRun === false) {
+        await recordStepStatus(
+          tenant.id,
+          step.key,
+          TENANT_PROVISIONING_STEP_STATUS.FAILED,
+          message,
+        );
+        await recordRunFinish(tenant.id);
+      }
+
       // Stop here — later steps stay untouched. Re-running the workflow for
       // the same tenant resumes at this step via its own idempotency check
       // — except invalidate-tenant-cache: once archive-tenant has run, the
@@ -107,6 +232,10 @@ export async function runSteps(
       // `scripts/invalidate-tenant-cache/` instead.
       return { ok: false };
     }
+  }
+
+  if (env.dryRun === false) {
+    await recordRunFinish(tenant.id);
   }
 
   return { ok: true };

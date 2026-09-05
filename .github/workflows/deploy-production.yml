@@ -233,11 +233,13 @@ jobs:
       # vars pulled from Vercel (root directory apps/web is stored on the
       # project, so build resolves the monorepo workspaces correctly).
       - name: Deploy to Vercel (production)
-        if: ${{ env.VERCEL_TOKEN != '' }}
         run: |
           set -euo pipefail
-          # Without both ids the CLI silently auto-links to whatever project
-          # matches the directory name — fail loudly instead.
+          # Every value is checked here rather than in an `if:`, because a
+          # skipped step reports green and a release that shipped nothing would
+          # look successful. Without both ids the CLI also silently auto-links
+          # to whatever project matches the directory name.
+          : "${VERCEL_TOKEN:?empty — set the VERCEL_TOKEN secret on the production environment}"
           : "${VERCEL_ORG_ID:?empty — set the VERCEL_ORG_ID Variable on the production environment}"
           : "${VERCEL_PROJECT_ID:?empty — set the VERCEL_PROJECT_ID_WEB Variable on the production environment}"
           # npx (not `npm install -g`) keeps zizmor's ad-hoc-install audit
@@ -273,16 +275,16 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
       # Vercel CLI runs its own `next build` with the project's Production env
       # vars pulled from Vercel (root directory apps/platform is stored on the
-      # project, so build resolves the monorepo workspaces correctly). Guarded
-      # on VERCEL_PROJECT_ID (not VERCEL_TOKEN, which deploy-web already has
-      # configured) so this stays a true no-op until the platform-prod Vercel
-      # project exists and VERCEL_PROJECT_ID_PLATFORM is set.
+      # project, so build resolves the monorepo workspaces correctly).
       - name: Deploy to Vercel (platform-prod)
-        if: ${{ env.VERCEL_PROJECT_ID != '' }}
         run: |
           set -euo pipefail
+          # Every value is checked here rather than in an `if:`, because a
+          # skipped step reports green — a tag that shipped the web app but not
+          # the admin panel would otherwise look like a complete release.
           : "${VERCEL_TOKEN:?empty — set the VERCEL_TOKEN secret on the production environment}"
           : "${VERCEL_ORG_ID:?empty — set the VERCEL_ORG_ID Variable on the production environment}"
+          : "${VERCEL_PROJECT_ID:?empty — set the VERCEL_PROJECT_ID_PLATFORM Variable on the production environment}"
           # npx (not `npm install -g`) keeps zizmor's ad-hoc-install audit
           # green; the package is cached after the first resolution.
           npx --yes "vercel@${VERCEL_CLI_VERSION}" pull --yes --environment=production --token="$VERCEL_TOKEN"
