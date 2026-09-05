@@ -1,4 +1,8 @@
-import { BRAND_VARIANT, CONTAINER_WIDTH, HEADING_ALIGN } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CONTAINER_WIDTH,
+  CONTENT_ALIGNMENT,
+} from '@blog/config';
 import { makeRawTaxonomyListModule } from '@blog/service/testing/modules/fixtures';
 
 import { toTaxonomyListModule } from './transformer';
@@ -51,12 +55,12 @@ describe('toTaxonomyListModule', () => {
 
   it('maps contentAlignment when authored', () => {
     const raw = makeRawTaxonomyListModule({
-      contentAlignment: HEADING_ALIGN.CENTER,
+      contentAlignment: CONTENT_ALIGNMENT.CENTER,
     });
 
     const module = toTaxonomyListModule(raw, []);
 
-    expect(module.contentAlignment).toBe(HEADING_ALIGN.CENTER);
+    expect(module.contentAlignment).toBe(CONTENT_ALIGNMENT.CENTER);
   });
 
   it('maps a fully-authored layout object 1:1', () => {

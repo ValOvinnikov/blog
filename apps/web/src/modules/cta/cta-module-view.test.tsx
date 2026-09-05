@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, CTA_ALIGNMENT, CTA_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, CONTENT_ALIGNMENT, CTA_VARIANT } from '@blog/config';
 import { CtaModule } from '@blog/ui/organisms/cta-module';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
@@ -139,14 +139,14 @@ describe(CtaModuleView, () => {
   it('passes contentPosition and contentAlignment through to CtaModule', () => {
     setup({
       variant: CTA_VARIANT.SPLIT,
-      contentPosition: CTA_ALIGNMENT.RIGHT,
-      contentAlignment: CTA_ALIGNMENT.RIGHT,
+      contentPosition: CONTENT_ALIGNMENT.RIGHT,
+      contentAlignment: CONTENT_ALIGNMENT.RIGHT,
     });
 
     expect(vi.mocked(CtaModule)).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        contentPosition: CTA_ALIGNMENT.RIGHT,
-        contentAlignment: CTA_ALIGNMENT.RIGHT,
+        contentPosition: CONTENT_ALIGNMENT.RIGHT,
+        contentAlignment: CONTENT_ALIGNMENT.RIGHT,
       }),
       undefined,
     );

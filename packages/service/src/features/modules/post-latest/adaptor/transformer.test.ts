@@ -1,4 +1,8 @@
-import { BRAND_VARIANT, CONTAINER_WIDTH, HEADING_ALIGN } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CONTAINER_WIDTH,
+  CONTENT_ALIGNMENT,
+} from '@blog/config';
 import { makeRawPostLatestModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
@@ -54,12 +58,12 @@ describe('toPostLatestModule', () => {
 
   it('maps contentAlignment when authored', () => {
     const raw = makeRawPostLatestModule({
-      contentAlignment: HEADING_ALIGN.RIGHT,
+      contentAlignment: CONTENT_ALIGNMENT.RIGHT,
     });
 
     const module = toPostLatestModule(raw, rawPosts, tenant);
 
-    expect(module.contentAlignment).toBe(HEADING_ALIGN.RIGHT);
+    expect(module.contentAlignment).toBe(CONTENT_ALIGNMENT.RIGHT);
   });
 
   it('maps a fully-authored layout object 1:1', () => {

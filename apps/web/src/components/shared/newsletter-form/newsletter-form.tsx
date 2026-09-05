@@ -3,7 +3,7 @@
 import {
   ICONS,
   SIZE,
-  type THeadingAlign,
+  type TContentAlignment,
   type TFormStatus,
 } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
@@ -23,7 +23,7 @@ type TNewsletterFormProps = {
   /** Ignored for `variant="compact"` — that density has no room for supporting copy. */
   supportingText?: string;
   /** Horizontal alignment of the pitch pane. Ignored for `variant="compact"` — Compact has no alignment control. */
-  align?: THeadingAlign;
+  align?: TContentAlignment;
   className?: string;
 };
 

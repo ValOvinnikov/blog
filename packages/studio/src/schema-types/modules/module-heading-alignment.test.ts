@@ -1,4 +1,4 @@
-import { CTA_ALIGNMENT } from '@blog/config/constants';
+import { CONTENT_ALIGNMENT } from '@blog/config/constants';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
@@ -49,9 +49,9 @@ describe.each(modulesWithHeadingAlignment)(
       }
 
       expect(getOptionValues(field)).toEqual([
-        CTA_ALIGNMENT.LEFT,
-        CTA_ALIGNMENT.CENTER,
-        CTA_ALIGNMENT.RIGHT,
+        CONTENT_ALIGNMENT.LEFT,
+        CONTENT_ALIGNMENT.CENTER,
+        CONTENT_ALIGNMENT.RIGHT,
       ]);
     });
 

@@ -1,4 +1,4 @@
-import { FORM_STATUSES, HEADING_ALIGN, ICONS, SIZE } from '@blog/config';
+import { FORM_STATUSES, CONTENT_ALIGNMENT, ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import { NewsletterSignup } from '@blog/ui/organisms/newsletter-signup/newsletter-signup';
 import { newsletterSignupVariants } from '@blog/ui/organisms/newsletter-signup/newsletter-signup-variants';
@@ -79,7 +79,7 @@ export const WithTrustCues: TStory = {
 };
 
 export const Centered: TStory = {
-  args: { align: HEADING_ALIGN.CENTER, trustCues },
+  args: { align: CONTENT_ALIGNMENT.CENTER, trustCues },
 };
 
 // The pitch/form panes collapse from two columns to one at a real `md:`

@@ -1,4 +1,8 @@
-import { BRAND_VARIANT, CONTAINER_WIDTH, HEADING_ALIGN } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CONTAINER_WIDTH,
+  CONTENT_ALIGNMENT,
+} from '@blog/config';
 import { makeRawPostListModule } from '@blog/service/testing/modules/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
@@ -61,12 +65,12 @@ describe('toPostListModule', () => {
 
   it('maps contentAlignment when authored', () => {
     const raw = makeRawPostListModule({
-      contentAlignment: HEADING_ALIGN.RIGHT,
+      contentAlignment: CONTENT_ALIGNMENT.RIGHT,
     });
 
     const module = toPostListModule(raw, rawPosts, pagination, tenant);
 
-    expect(module.contentAlignment).toBe(HEADING_ALIGN.RIGHT);
+    expect(module.contentAlignment).toBe(CONTENT_ALIGNMENT.RIGHT);
   });
 
   it('maps a fully-authored layout object 1:1', () => {

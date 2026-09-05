@@ -1,6 +1,6 @@
 import {
   BRAND_VARIANT,
-  CTA_ALIGNMENT,
+  CONTENT_ALIGNMENT,
   CTA_MOBILE_MEDIA_ORDER,
   CTA_VARIANT,
 } from '@blog/config';
@@ -138,7 +138,7 @@ export const SplitImageLeft: TStory = {
   args: {
     ...SplitDefault.args,
     tone: BRAND_VARIANT.SECONDARY,
-    contentPosition: CTA_ALIGNMENT.RIGHT,
+    contentPosition: CONTENT_ALIGNMENT.RIGHT,
     eyebrow: 'Membership',
     heading: 'Support independent writing',
     content: undefined,
@@ -161,8 +161,8 @@ export const BannerDefault: TStory = {
   args: {
     variant: CTA_VARIANT.BANNER,
     tone: BRAND_VARIANT.BRAND_PRIMARY,
-    contentPosition: CTA_ALIGNMENT.LEFT,
-    contentAlignment: CTA_ALIGNMENT.LEFT,
+    contentPosition: CONTENT_ALIGNMENT.LEFT,
+    contentAlignment: CONTENT_ALIGNMENT.LEFT,
     eyebrow: 'Get the book',
     heading: 'The whole system, on paper',
     supportingText:
@@ -177,8 +177,8 @@ export const BannerNeutralTint: TStory = {
   args: {
     ...BannerDefault.args,
     tone: BRAND_VARIANT.PRIMARY,
-    contentPosition: CTA_ALIGNMENT.CENTER,
-    contentAlignment: CTA_ALIGNMENT.CENTER,
+    contentPosition: CONTENT_ALIGNMENT.CENTER,
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
     eyebrow: undefined,
     heading: 'Join 12,000 readers',
     supportingText:
@@ -192,8 +192,8 @@ export const BannerAlignRight: TStory = {
   args: {
     ...BannerDefault.args,
     tone: BRAND_VARIANT.SECONDARY,
-    contentPosition: CTA_ALIGNMENT.RIGHT,
-    contentAlignment: CTA_ALIGNMENT.RIGHT,
+    contentPosition: CONTENT_ALIGNMENT.RIGHT,
+    contentAlignment: CONTENT_ALIGNMENT.RIGHT,
     eyebrow: 'Workshop',
     heading: 'Two days, one craft',
     supportingText:

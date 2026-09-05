@@ -293,7 +293,7 @@ position** is where the content block sits relative to the image — which grid
 column it takes on Split, where it sits over the full-bleed image on Banner,
 and nothing at all on Callout, whose image sits above the content. **Content
 alignment** is how text and actions align inside that block, and applies on
-every variant. Both draw their values from `CTA_ALIGNMENT`. They replaced a
+every variant. Both draw their values from `CONTENT_ALIGNMENT`. They replaced a
 single `imageSide` field that claimed to move the image while actually moving
 the content column, plus a reuse of `sectionHeader.align` that CTA applied to
 the whole card rather than the heading.
@@ -309,11 +309,14 @@ service knows the split exists. Both are emitted by the
 field every caller is guaranteed to have.
 
 CTA's `contentAlignment` and the other four modules' are the same field from
-the same helper, but they mean different things: CTA aligns its whole card,
-while the others align a section heading and its supporting text. The
-`@blog/service` view models reflect that — CTA's is typed against
-`CTA_ALIGNMENT`, the others against `HEADING_ALIGN`. The two consts hold
-identical values, so the distinction is semantic rather than structural.
+the same helper, and are typed against the same `CONTENT_ALIGNMENT` const.
+What they align differs — CTA aligns its whole card, the others a section
+heading and its supporting text — but that is a difference in what the
+consuming component does with the value, not in the value itself, so it does
+not warrant separate types. It previously did have two: `CTA_ALIGNMENT` and
+`HEADING_ALIGN`, holding identical `LEFT`/`CENTER`/`RIGHT` values, which left
+one generated field described by two names and one of them named after what
+had become only one of its five callers.
 
 `module_taxonomyList` is excluded from `MODULE_MAP`, so it never reaches
 `ModuleRenderer`; it still carries a `REVALIDATE_TAGS` entry, which every

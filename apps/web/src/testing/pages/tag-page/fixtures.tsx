@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, HEADING_ALIGN } from '@blog/config';
+import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
 import { Pagination } from '@blog/ui/organisms/pagination';
 import { PostsSection } from '@blog/ui/organisms/posts-section';
 import type { ITagPageViewProps } from '@web/components/pages/tag-page';
@@ -41,7 +41,7 @@ export const makeTagPageView = (
           ]}
           titleId="tag-posts-title"
           accessibleTitle="Posts tagged TypeScript"
-          align={HEADING_ALIGN.LEFT}
+          align={CONTENT_ALIGNMENT.LEFT}
           linkAs={SmartLink}
           isWrapped={true}
           emptyMessage="No posts tagged TypeScript yet."

@@ -138,8 +138,8 @@ export const LongBody: Story = {
 
   **Audit from the component's prop types, not from the story's imports.** A
   story file often doesn't import the const its component's prop is typed
-  against — `NewsletterForm.align` is typed `THeadingAlign`, and nothing in
-  `newsletter-form.tsx` imports the `HEADING_ALIGN` value at all — so an
+  against — `NewsletterForm.align` is typed `TContentAlignment`, and nothing in
+  `newsletter-form.tsx` imports the `CONTENT_ALIGNMENT` value at all — so an
   import-driven sweep silently misses those props. For each story, open the component, read its full prop type, and
   follow every prop's type alias back to its definition looking for
   `TValueOf<typeof SOME_UPPERCASE_CONST>`.

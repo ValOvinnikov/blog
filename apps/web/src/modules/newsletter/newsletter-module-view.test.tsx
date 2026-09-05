@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, HEADING_ALIGN } from '@blog/config';
+import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
 import { NewsletterForm } from '@web/components/shared/newsletter-form';
 import { customRender, screen } from '@web/testing/custom-render';
 
@@ -69,10 +69,10 @@ describe(NewsletterModuleView, () => {
   });
 
   it('passes contentAlignment through to NewsletterForm as align', () => {
-    setup({ contentAlignment: HEADING_ALIGN.CENTER });
+    setup({ contentAlignment: CONTENT_ALIGNMENT.CENTER });
 
     expect(vi.mocked(NewsletterForm)).toHaveBeenLastCalledWith(
-      expect.objectContaining({ align: HEADING_ALIGN.CENTER }),
+      expect.objectContaining({ align: CONTENT_ALIGNMENT.CENTER }),
       undefined,
     );
   });

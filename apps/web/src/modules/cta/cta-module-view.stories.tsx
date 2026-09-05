@@ -1,6 +1,6 @@
 import {
   BRAND_VARIANT,
-  CTA_ALIGNMENT,
+  CONTENT_ALIGNMENT,
   CTA_MOBILE_MEDIA_ORDER,
   CTA_VARIANT,
 } from '@blog/config';
@@ -30,11 +30,11 @@ const meta = {
     },
     contentPosition: {
       control: 'select',
-      options: Object.values(CTA_ALIGNMENT),
+      options: Object.values(CONTENT_ALIGNMENT),
     },
     contentAlignment: {
       control: 'select',
-      options: Object.values(CTA_ALIGNMENT),
+      options: Object.values(CONTENT_ALIGNMENT),
     },
     mobileMediaOrder: {
       control: 'select',
@@ -68,7 +68,7 @@ type TStory = StoryObj<typeof meta>;
 
 export const Callout: TStory = {
   args: {
-    contentAlignment: CTA_ALIGNMENT.RIGHT,
+    contentAlignment: CONTENT_ALIGNMENT.RIGHT,
   },
 };
 
@@ -76,8 +76,8 @@ export const Split: TStory = {
   args: {
     variant: CTA_VARIANT.SPLIT,
     image: makeSanityImage(),
-    contentPosition: CTA_ALIGNMENT.RIGHT,
-    contentAlignment: CTA_ALIGNMENT.RIGHT,
+    contentPosition: CONTENT_ALIGNMENT.RIGHT,
+    contentAlignment: CONTENT_ALIGNMENT.RIGHT,
   },
 };
 
@@ -86,7 +86,7 @@ export const Banner: TStory = {
     variant: CTA_VARIANT.BANNER,
     brandVariant: BRAND_VARIANT.SECONDARY,
     image: makeSanityImage(),
-    contentPosition: CTA_ALIGNMENT.CENTER,
-    contentAlignment: CTA_ALIGNMENT.CENTER,
+    contentPosition: CONTENT_ALIGNMENT.CENTER,
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
   },
 };

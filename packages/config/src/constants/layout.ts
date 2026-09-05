@@ -45,13 +45,13 @@ export type TLayout = {
   dividerBottom?: boolean;
 };
 
-export const HEADING_ALIGN = {
+export const CONTENT_ALIGNMENT = {
   LEFT: 'LEFT',
   CENTER: 'CENTER',
   RIGHT: 'RIGHT',
 } as const;
 
-export type THeadingAlign = TValueOf<typeof HEADING_ALIGN>;
+export type TContentAlignment = TValueOf<typeof CONTENT_ALIGNMENT>;
 
 export type TSectionHeader = {
   heading?: string;

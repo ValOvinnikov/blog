@@ -160,7 +160,7 @@ compositions are storied in `apps/web` (`web-storybook`).
   **When a prop is both — typed from a dictionary const _and_ passed into a
   `tv()` config — the `tv()` rule wins:** source the options from the variant
   map. The variant map is usually keyed off the const already
-  (`[CTA_ALIGNMENT.LEFT]: { … }`), so both forms yield the same list, but the
+  (`[CONTENT_ALIGNMENT.LEFT]: { … }`), so both forms yield the same list, but the
   variant map is what actually renders, and keying off it keeps the control
   honest if the two ever diverge. The discriminator is _does this prop drive
   `tv()`_, not _is this prop dictionary-typed_. `Icon` carries one of each:

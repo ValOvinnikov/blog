@@ -301,8 +301,8 @@ Variants: wrapped: (boolean)
 ### CtaModule — `organisms/cta-module/cta-module.tsx`
 
 page-builder organism rendering a call-to-action in one of three layouts.
-Props: variant: TCtaVariant · tone: TBrandVariant · eyebrow?: string · heading: string · headingId?: string · supportingText?: string · content?: ReactNode · image?: ReactNode · actions?: ReactNode · footnote?: string · contentPosition?: TCtaAlignment · contentAlignment?: TCtaAlignment · mobileMediaOrder?: TCtaMobileMediaOrder · isWrapped?: TCtaModuleVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
-Variants: variant: CTA_VARIANT.BANNER|CTA_VARIANT.SPLIT|CTA_VARIANT.CALLOUT · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY · position: CTA_ALIGNMENT.LEFT|CTA_ALIGNMENT.CENTER|CTA_ALIGNMENT.RIGHT · alignment: CTA_ALIGNMENT.LEFT|CTA_ALIGNMENT.CENTER|CTA_ALIGNMENT.RIGHT · mobileMediaOrder: CTA_MOBILE_MEDIA_ORDER.FIRST|CTA_MOBILE_MEDIA_ORDER.LAST · wrapped: (boolean)
+Props: variant: TCtaVariant · tone: TBrandVariant · eyebrow?: string · heading: string · headingId?: string · supportingText?: string · content?: ReactNode · image?: ReactNode · actions?: ReactNode · footnote?: string · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mobileMediaOrder?: TCtaMobileMediaOrder · isWrapped?: TCtaModuleVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
+Variants: variant: CTA_VARIANT.BANNER|CTA_VARIANT.SPLIT|CTA_VARIANT.CALLOUT · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mobileMediaOrder: CTA_MOBILE_MEDIA_ORDER.FIRST|CTA_MOBILE_MEDIA_ORDER.LAST · wrapped: (boolean)
 
 ### Footer — `organisms/footer/footer.tsx`
 
@@ -360,7 +360,7 @@ Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 labeled section rendering a set of posts in a responsive grid, generic enough to reuse for other post listings (e.g. related posts, topic pages).
 Props: posts: IPostCardData[] · title?: string · titleId?: string · accessibleTitle?: string · linkAs?: TAnchorElementType · cardHeadingLevel?: THeadingLevel · supportingText?: string · align?: TPostsSectionVariants['align'] · emptyMessage?: string · isTinted?: TPostsSectionVariants['tinted'] · isWrapped?: TPostsSectionVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
-Variants: tinted: (boolean) · wrapped: (boolean) · align: HEADING_ALIGN.LEFT|HEADING_ALIGN.CENTER|HEADING_ALIGN.RIGHT
+Variants: tinted: (boolean) · wrapped: (boolean) · align: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
 
 ### ToastViewport — `organisms/toast-viewport/toast-viewport.tsx`
 

@@ -25,7 +25,7 @@ export type TLayoutValue = {
  * as `heroLayout` on `module_hero`, `layout` on `module_newsletter`) from a
  * doc's legacy `appearance`. `appearance.align` is confirmed dead and is
  * never copied — no downstream reader, and its START/END vocabulary doesn't
- * match the `HEADING_ALIGN` enum used elsewhere.
+ * match the `CONTENT_ALIGNMENT` enum used elsewhere.
  */
 export const appearanceToLayout = (
   doc: TLegacyAppearanceDoc,

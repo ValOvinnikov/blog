@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, HEADING_ALIGN } from '@blog/config';
+import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
 import { HEADING_LEVELS } from '@blog/ui/lib/react';
 import { objectKeys } from '@blog/utils';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
@@ -82,5 +82,5 @@ export const Secondary: TStory = {
 };
 
 export const CenterAligned: TStory = {
-  args: { contentAlignment: HEADING_ALIGN.CENTER },
+  args: { contentAlignment: CONTENT_ALIGNMENT.CENTER },
 };

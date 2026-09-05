@@ -1,4 +1,4 @@
-import { CTA_ALIGNMENT } from '@blog/config/constants';
+import { CONTENT_ALIGNMENT } from '@blog/config/constants';
 import { defineAlignmentFields } from '@blog/studio/schema-types/helpers/define-alignment-fields';
 
 const getOptionValues = (field: { options?: unknown }) => {
@@ -36,9 +36,9 @@ describe('defineAlignmentFields with no extras', () => {
 
   it('offers Left, Center and Right', () => {
     expect(getOptionValues(getBaselineField())).toEqual([
-      CTA_ALIGNMENT.LEFT,
-      CTA_ALIGNMENT.CENTER,
-      CTA_ALIGNMENT.RIGHT,
+      CONTENT_ALIGNMENT.LEFT,
+      CONTENT_ALIGNMENT.CENTER,
+      CONTENT_ALIGNMENT.RIGHT,
     ]);
   });
 

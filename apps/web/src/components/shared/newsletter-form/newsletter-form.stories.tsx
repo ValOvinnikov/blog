@@ -1,4 +1,4 @@
-import { HEADING_ALIGN } from '@blog/config';
+import { CONTENT_ALIGNMENT } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { userEvent, within } from 'storybook/test';
 
@@ -12,7 +12,7 @@ const meta = {
   argTypes: {
     align: {
       control: 'select',
-      options: Object.values(HEADING_ALIGN),
+      options: Object.values(CONTENT_ALIGNMENT),
     },
   },
   args: {
