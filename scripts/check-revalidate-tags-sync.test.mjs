@@ -141,6 +141,36 @@ describe('collectTagsFromSource', () => {
     assert.equal(unresolved.length, 1);
     assert.equal(unresolved[0].text, 'someTag');
   });
+
+  it('silently misses a call reached through an aliased import — callee matching is by name only', () => {
+    const { tags, unresolved } = collectTagsFromSource(
+      '/virtual/loader.ts',
+      `
+        import { isr as buildCacheOptions } from '@blog/service/sanity/query';
+        buildCacheOptions('post', tenant.projectId);
+      `,
+    );
+    assert.deepEqual([...tags], []);
+    assert.deepEqual(unresolved, []);
+  });
+
+  it('silently misses a property-access call — the callee must be the bare identifier isr', () => {
+    const { tags, unresolved } = collectTagsFromSource(
+      '/virtual/loader.ts',
+      `ns.isr('post', tenant.projectId);`,
+    );
+    assert.deepEqual([...tags], []);
+    assert.deepEqual(unresolved, []);
+  });
+
+  it('silently misses a zero-argument isr() call', () => {
+    const { tags, unresolved } = collectTagsFromSource(
+      '/virtual/loader.ts',
+      `isr();`,
+    );
+    assert.deepEqual([...tags], []);
+    assert.deepEqual(unresolved, []);
+  });
 });
 
 describe('findMissingTags', () => {

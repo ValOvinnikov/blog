@@ -6,10 +6,19 @@
 // no per-tag Object.hasOwn miss to report, so this is the only guard against
 // that failure class.
 //
-// This check trusts literals only. Each `isr(...)` call is read straight off
-// its own file's AST, per file, with no cross-file resolution of any kind —
-// no TypeScript program, no symbol lookup, no declaration tracing, no
-// call-site matching by name. Its first argument must be one of:
+// This check trusts argument literals only — it never resolves what a name
+// refers to. Each `isr(...)` call is read straight off its own file's AST,
+// per file, with no cross-file resolution: no TypeScript program, no symbol
+// lookup, no declaration tracing. It still has to find the call in the first
+// place, and does so by name: a call is recognized only when its callee is
+// the bare identifier `isr`. An aliased import (`isr as buildCacheOptions`)
+// or a property-access call (`ns.isr(...)`) is not matched at all, so such a
+// call lands in none of the buckets below — it is silently neither checked
+// nor reported. This holds today because nothing in packages/service/src
+// aliases or namespaces the import; it is a deliberate limit, not an
+// oversight, and re-checking it is the cost of adding either.
+//
+// Once a call is recognized, its first argument must be one of:
 //   - a string literal, or an array literal of string literals — collected
 //     as covered tags;
 //   - a template literal with a substitution (e.g. `` `module:${id}` ``) —
@@ -20,6 +29,8 @@
 //     the run fails. There is no attempt to resolve it. A loader that needs
 //     to pass a non-literal here must be rewritten so its tags appear as a
 //     literal directly at the `isr(...)` call site instead.
+// A zero-argument `isr()` call is likewise not matched — `isr`'s first
+// parameter is mandatory, so this shape does not occur in practice.
 //
 // Run with `pnpm check:revalidate-tags-sync`. Read-only; exits 1 on any
 // mismatch or unresolved call site.
