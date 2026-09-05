@@ -1,3 +1,5 @@
+import { getLocale } from 'next-intl/server';
+
 export {};
 
 const { confirmSubscriberMock, resolveTenantIdMock, isTenantActiveMock } =
@@ -68,6 +70,22 @@ describe('GET /api/newsletter/confirm', () => {
     );
     expect(html).toContain('Subscription confirmed');
     expect(confirmSubscriberMock).toHaveBeenCalledWith(TENANT_ID, 'token-abc');
+  });
+
+  it('declares <html lang> as the resolved request locale, not a hardcoded value', async () => {
+    confirmSubscriberMock.mockResolvedValue({
+      outcome: 'confirmed',
+      subscriber,
+    });
+    vi.mocked(getLocale).mockResolvedValueOnce('fr');
+    const { GET } = await import('./route');
+
+    const response = await GET(
+      new Request('https://example.com/api/newsletter/confirm?token=token-abc'),
+    );
+    const html = await response.text();
+
+    expect(html).toContain('<html lang="fr">');
   });
 
   it('resolves the tenant from the request Host header', async () => {
