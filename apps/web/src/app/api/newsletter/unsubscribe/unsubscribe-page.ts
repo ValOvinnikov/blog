@@ -57,8 +57,7 @@ export const renderResultResponse = (
 
 /**
  * The GET-rendered confirmation page: a plain, JavaScript-free `<form>`
- * whose submit `POST`s to the same URL — the only place this route mutates
- * anything.
+ * whose submit `POST`s to the same URL rather than acting on this `GET`.
  */
 const renderConfirmPage = ({
   title,

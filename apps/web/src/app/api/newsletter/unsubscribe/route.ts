@@ -46,12 +46,9 @@ export async function GET(request: Request): Promise<NextResponse> {
 /**
  * `POST /api/newsletter/unsubscribe?token=…` performs the unsubscribe via
  * `queries.subscribers.unsubscribeByToken` and is simultaneously the RFC
- * 8058 one-click endpoint mail clients `POST` to directly. Every outcome —
- * an unknown token, an already-used token, a missing token, or an inactive
- * tenant — renders the same calm "you're unsubscribed / no longer valid"
- * copy rather than an error page, since `unsubscribeByToken`'s own
- * `not-found` outcome is indistinguishable from "already unsubscribed" (the
- * row is deleted on success).
+ * 8058 one-click endpoint mail clients `POST` to directly.
+ * `unsubscribeByToken`'s `not-found` outcome means "already unsubscribed",
+ * not an error — the row is deleted on success.
  */
 export async function POST(request: Request): Promise<NextResponse> {
   const token = new URL(request.url).searchParams.get('token');
