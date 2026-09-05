@@ -58,6 +58,7 @@ describe(createPendingSubscriber, () => {
       status: 'pending',
     });
     expect(result.subscriber.confirmationToken).toEqual(expect.any(String));
+    expect(result.subscriber.unsubscribeToken).toEqual(expect.any(String));
     expect(result.subscriber.confirmedAt).toBeNull();
 
     const rows = await db.select().from(schema.subscribers);

@@ -65,11 +65,20 @@ describe('0008_silly_xorn (bookmarks/subscribers tenant_id backfill)', () => {
 
       await applyMigrationFile(db, BACKFILL_MIGRATION);
 
-      const [bookmark] = await db.select().from(bookmarks);
-      const [subscriber] = await db.select().from(subscribers);
+      // Raw SQL selecting only `tenant_id`, for the same reason the seed
+      // inserts above use it: the live `bookmarks`/`subscribers` schema
+      // objects carry columns added by migrations later than this one, which
+      // don't exist yet against a database only migrated up to
+      // `BACKFILL_MIGRATION`.
+      const bookmarkRow = await db.execute<{ tenant_id: string }>(
+        sql.raw(`select "tenant_id" from "bookmarks"`),
+      );
+      const subscriberRow = await db.execute<{ tenant_id: string }>(
+        sql.raw(`select "tenant_id" from "subscribers"`),
+      );
 
-      expect(bookmark?.tenantId).toBe(tenant.id);
-      expect(subscriber?.tenantId).toBe(tenant.id);
+      expect(bookmarkRow.rows[0]?.tenant_id).toBe(tenant.id);
+      expect(subscriberRow.rows[0]?.tenant_id).toBe(tenant.id);
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
   );
