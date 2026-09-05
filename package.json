@@ -24,6 +24,8 @@
     "check:voice-sync:test": "node --test scripts/check-voice-key-sync.test.mjs",
     "check:turbo-env-sync": "node scripts/check-turbo-env-sync.mjs",
     "check:turbo-env-sync:test": "node --test scripts/check-turbo-env-sync.test.mjs",
+    "check:migration-index": "node scripts/check-migration-index-collision.mjs",
+    "check:migration-index:test": "node --test scripts/check-migration-index-collision.test.mjs",
     "check:revalidate-tags-sync": "node scripts/check-revalidate-tags-sync.mjs",
     "check:revalidate-tags-sync:test": "node --test scripts/check-revalidate-tags-sync.test.mjs",
     "knip": "knip",
