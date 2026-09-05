@@ -63,4 +63,46 @@ describe('renderEmailAction', () => {
 
     expect(html).not.toContain('<script>alert(1)</script>');
   });
+
+  it('neutralises a javascript: url to a harmless href', () => {
+    const html = renderEmailAction(
+      { label: 'Sign in', url: 'javascript:alert(document.cookie)' },
+      BRAND,
+    );
+
+    expect(html).not.toContain('javascript:');
+    expect(html).toContain('href="#"');
+  });
+
+  it('neutralises a data: url', () => {
+    const html = renderEmailAction(
+      {
+        label: 'Sign in',
+        url: 'data:text/html,<script>alert(1)</script>',
+      },
+      BRAND,
+    );
+
+    expect(html).not.toContain('data:');
+    expect(html).toContain('href="#"');
+  });
+
+  it('neutralises a javascript: url disguised with a tab inside the scheme', () => {
+    const html = renderEmailAction(
+      { label: 'Sign in', url: 'java\tscript:alert(document.cookie)' },
+      BRAND,
+    );
+
+    expect(html).not.toContain('javascript:');
+    expect(html).toContain('href="#"');
+  });
+
+  it('allows an http/https/mailto url through unchanged', () => {
+    const html = renderEmailAction(
+      { label: 'Sign in', url: 'https://example.com/sign-in?token=abc' },
+      BRAND,
+    );
+
+    expect(html).toContain('href="https://example.com/sign-in?token=abc"');
+  });
 });

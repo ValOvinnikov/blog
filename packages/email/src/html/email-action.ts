@@ -1,5 +1,6 @@
 import { FONT_STACK } from './email-layout';
 import { escapeHtml } from './escape-html';
+import { sanitizeHref } from './sanitize-href';
 
 export type TEmailAction = {
   /** The visible action text — a tenant may relabel this, but this is the only part of the action they can change. */
@@ -26,7 +27,7 @@ export function renderEmailAction(
   brand: TEmailActionBrand,
 ): string {
   const escapedLabel = escapeHtml(action.label);
-  const escapedUrl = escapeHtml(action.url);
+  const escapedUrl = escapeHtml(sanitizeHref(action.url) ?? '#');
 
   if (action.variant === 'link') {
     return [
@@ -41,8 +42,8 @@ export function renderEmailAction(
   return [
     '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px auto 0;">',
     '<tr>',
-    `<td align="center" style="border-radius:6px;background-color:${brand.brandPrimarySolid};">`,
-    `<a href="${escapedUrl}" style="display:inline-block;padding:12px 28px;font-family:${FONT_STACK};font-size:16px;font-weight:600;color:${brand.brandPrimaryContrast};text-decoration:none;border-radius:6px;">${escapedLabel}</a>`,
+    `<td align="center" style="padding:12px 28px;border-radius:6px;background-color:${brand.brandPrimarySolid};">`,
+    `<a href="${escapedUrl}" style="display:inline-block;font-family:${FONT_STACK};font-size:16px;font-weight:600;color:${brand.brandPrimaryContrast};text-decoration:none;">${escapedLabel}</a>`,
     '</td>',
     '</tr>',
     '</table>',

@@ -1,4 +1,5 @@
 import { escapeHtml } from '@blog/email/html/escape-html';
+import { sanitizeHref } from '@blog/email/html/sanitize-href';
 
 import type {
   TPortableTextBlock,
@@ -112,8 +113,10 @@ function renderSpan(
     (def) => def._type === 'link' && marks.includes(def._key),
   );
   if (linkMarkDef) {
-    const href = escapeHtml(linkMarkDef.href ?? '');
-    html = `<a href="${href}" style="color:inherit;text-decoration:underline;">${html}</a>`;
+    const safeHref = sanitizeHref(linkMarkDef.href ?? '');
+    if (safeHref) {
+      html = `<a href="${escapeHtml(safeHref)}" style="color:inherit;text-decoration:underline;">${html}</a>`;
+    }
   }
 
   return html;
