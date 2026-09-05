@@ -3,7 +3,7 @@ import { getSiteSettings } from '@blog/service/features/global/site-settings/ada
 import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
 import type { TImageTenant } from '@blog/service/sanity/image';
 import {
-  isr,
+  type isr,
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query';
@@ -25,14 +25,16 @@ type TCreateTaxonomyIndexPageLoaderOptions<
     taxonomyListId: string,
     tenant: TImageTenant,
   ) => TPage;
-  tags: string[];
+  getCacheOptions: (tenant: TTenantSanityContext) => ReturnType<typeof isr>;
   MissingTaxonomyListError: new () => Error;
 };
 
 /**
  * Builds the shared `getIndexPage` loader for the taxonomy index pages
- * (tag-index, topic-index). `tags` must cover both the page's own document
- * type and `taxonomyList`'s, since the query derefs it.
+ * (tag-index, topic-index). `getCacheOptions` must call `isr(...)` with tags
+ * covering both the page's own document type and `taxonomyList`'s, since the
+ * query derefs it — kept as a caller-supplied call so each loader's tag
+ * literals stay directly at its own `isr(...)` call site.
  */
 export function createTaxonomyIndexPageLoader<
   TRaw extends TRawTaxonomyIndexPage,
@@ -41,7 +43,7 @@ export function createTaxonomyIndexPageLoader<
 >({
   query,
   transformer,
-  tags,
+  getCacheOptions,
   MissingTaxonomyListError,
 }: TCreateTaxonomyIndexPageLoaderOptions<TRaw, TPage, TQueryConfig>) {
   return async function getIndexPage(
@@ -54,7 +56,7 @@ export function createTaxonomyIndexPageLoader<
     const rawPage = await runQuery(query, {
       parameters: {},
       tenant,
-      ...isr(tags, tenant.projectId),
+      ...getCacheOptions(tenant),
     });
     if (!rawPage) return undefined;
     if (!rawPage.taxonomyList) {
