@@ -33,7 +33,6 @@ afterEach(async () => {
 
 const baseTenant = {
   primaryDomain: 'acme.example.com',
-  sanityProjectId: 'p1',
   sanityDataset: 'production',
   locale: 'en',
   plan: TENANT_PLAN.FREE,
@@ -42,8 +41,18 @@ const baseTenant = {
 describe(backfillEmailTemplateDefaults, () => {
   it('seeds every active, non-deprovisioned tenant when not a dry run', async () => {
     await db.insert(schema.tenants).values([
-      { ...baseTenant, name: 'Acme', status: TENANT_STATUS.ACTIVE },
-      { ...baseTenant, name: 'Beta', status: TENANT_STATUS.ACTIVE },
+      {
+        ...baseTenant,
+        name: 'Acme',
+        sanityProjectId: 'p1',
+        status: TENANT_STATUS.ACTIVE,
+      },
+      {
+        ...baseTenant,
+        name: 'Beta',
+        sanityProjectId: 'p2',
+        status: TENANT_STATUS.ACTIVE,
+      },
     ]);
 
     const count = await backfillEmailTemplateDefaults(false);
@@ -54,8 +63,18 @@ describe(backfillEmailTemplateDefaults, () => {
 
   it('never seeds a suspended tenant', async () => {
     await db.insert(schema.tenants).values([
-      { ...baseTenant, name: 'Acme', status: TENANT_STATUS.ACTIVE },
-      { ...baseTenant, name: 'Beta', status: TENANT_STATUS.SUSPENDED },
+      {
+        ...baseTenant,
+        name: 'Acme',
+        sanityProjectId: 'p1',
+        status: TENANT_STATUS.ACTIVE,
+      },
+      {
+        ...baseTenant,
+        name: 'Beta',
+        sanityProjectId: 'p2',
+        status: TENANT_STATUS.SUSPENDED,
+      },
     ]);
 
     const count = await backfillEmailTemplateDefaults(false);
@@ -68,6 +87,7 @@ describe(backfillEmailTemplateDefaults, () => {
     await db.insert(schema.tenants).values({
       ...baseTenant,
       name: 'Acme',
+      sanityProjectId: 'p1',
       status: TENANT_STATUS.ACTIVE,
       deprovisionedAt: new Date(),
     });
@@ -79,9 +99,12 @@ describe(backfillEmailTemplateDefaults, () => {
   });
 
   it('reports tenants without writing anything on a dry run', async () => {
-    await db
-      .insert(schema.tenants)
-      .values({ ...baseTenant, name: 'Acme', status: TENANT_STATUS.ACTIVE });
+    await db.insert(schema.tenants).values({
+      ...baseTenant,
+      name: 'Acme',
+      sanityProjectId: 'p1',
+      status: TENANT_STATUS.ACTIVE,
+    });
 
     const count = await backfillEmailTemplateDefaults(true);
 
