@@ -1,5 +1,5 @@
 import { EMAIL_TEMPLATE_TYPE, type TEmailTemplateType } from '@blog/config';
-import type { TEmailAction } from '@blog/email';
+import type { TEmailAction } from '@blog/email/html';
 
 const PREVIEW_ACTION_LABEL_KEY: Record<TEmailTemplateType, string> = {
   [EMAIL_TEMPLATE_TYPE.MAGIC_LINK]: 'previewActionLabel.MAGIC_LINK',

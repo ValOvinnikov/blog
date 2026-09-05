@@ -1,7 +1,7 @@
 'use client';
 
 import type { TPortableTextBlock } from '@blog/db/schema/email-templates';
-import { sanitizeHref } from '@blog/email';
+import { sanitizeHref } from '@blog/email/html';
 import { EMAIL_PORTABLE_TEXT_SCHEMA } from '@platform/utils/portable-text-schema/portable-text-schema';
 import {
   EditorProvider,

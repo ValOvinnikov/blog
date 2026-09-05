@@ -8,7 +8,7 @@ import {
 } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TEmailTemplateResult } from '@blog/db/queries/email-templates';
-import { sanitizeHref } from '@blog/email';
+import { sanitizeHref } from '@blog/email/html';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { logger } from '@platform/utils/logger/logger';

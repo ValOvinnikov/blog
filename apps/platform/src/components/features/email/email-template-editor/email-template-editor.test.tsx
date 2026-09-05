@@ -1,5 +1,5 @@
 import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
-import type { TTenantEmailBrand } from '@blog/email';
+import type { TTenantEmailBrand } from '@blog/email/html';
 import {
   renderWithIntl,
   screen,

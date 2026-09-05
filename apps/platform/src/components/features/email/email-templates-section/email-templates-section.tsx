@@ -1,7 +1,7 @@
 'use client';
 
 import { EMAIL_TEMPLATE_TYPE, type TEmailTemplateType } from '@blog/config';
-import type { TTenantEmailBrand } from '@blog/email';
+import type { TTenantEmailBrand } from '@blog/email/html';
 import {
   EmailTemplateEditor,
   type TEmailTemplateEditorValues,

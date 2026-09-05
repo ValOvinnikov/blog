@@ -2,7 +2,8 @@
 
 import { ALERT_TYPE, type TEmailTemplateType } from '@blog/config';
 import type { TPortableTextBlock } from '@blog/db/schema/email-templates';
-import { buildTenantEmail, type TTenantEmailBrand } from '@blog/email';
+import type { TTenantEmailBrand } from '@blog/email/html';
+import { buildTenantEmail } from '@blog/email/templates/tenant';
 import { EmailLogoField } from '@platform/components/features/email/email-logo-field';
 import { EmailTemplatePreview } from '@platform/components/features/email/email-template-preview';
 import { Alert } from '@platform/components/shared/alert';

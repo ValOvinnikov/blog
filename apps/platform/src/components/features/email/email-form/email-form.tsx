@@ -1,6 +1,6 @@
 'use client';
 
-import type { TTenantEmailBrand } from '@blog/email';
+import type { TTenantEmailBrand } from '@blog/email/html';
 import {
   EmailSettingsForm,
   type TEmailSettingsFormValues,
