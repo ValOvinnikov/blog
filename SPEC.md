@@ -822,8 +822,11 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   Git-integration/PR-preview setup. See
   [`docs/DEPLOY.md`](./docs/DEPLOY.md)'s Storybook section.
 - Deploys are CI-gated behind a `verify` job (type-check/lint/test/build) on
-  the exact commit being deployed; deploy steps no-op green until the
-  one-time console setup ([`docs/DEPLOY.md`](./docs/DEPLOY.md)) provides their secret.
+  the exact commit being deployed; the development deploy steps no-op green
+  until the one-time console setup ([`docs/DEPLOY.md`](./docs/DEPLOY.md)) provides their secret.
+  The production ones do not: they fail loudly on a missing Vercel token, org
+  id or project id, because a skipped step reports green and a tag that shipped
+  only one of the two apps would otherwise look like a complete release.
 - Historical phased rollout tickets (D0–D5) live in `docs/BACKLOG.md`.
 - Full topology detail (per-environment isolation rationale, dataset refresh
   workflow, tag-as-source-of-truth) is in [`docs/DEPLOY.md`](./docs/DEPLOY.md) —
