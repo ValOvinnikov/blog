@@ -41,12 +41,31 @@ gh stack view                 # see the current stack
 when a lower PR merges, which is the step most likely to be forgotten
 by hand.
 
-**Stacking dissolves the "split only when each layer merges green alone"
-constraint above.** That rule exists because a partial merge to `main` can
-red the build. A stacked PR targets its predecessor's branch, not `main`, so
-the intermediate states never land on `main` at all — which means a
-rename-plus-consumers change _can_ be split per layer as long as the whole
-stack merges in order.
+**Stacking relaxes the "split only when each layer merges green alone"
+constraint above — for every PR except the bottom one.** That rule exists
+because a partial merge to `main` can red the build. A stacked PR targets its
+predecessor's branch, not `main`, so intermediate states never land on `main`.
+
+**But the bottom PR targets `main`, and inherits `main`'s ruleset in full.**
+Required `Type-check` and `Build` apply to it exactly as they would to an
+unstacked PR. If the first layer cannot compile alone, that PR is
+permanently `BLOCKED` — not red, blocked — and because nothing above it can
+merge until it does, the whole stack is dead. The align-hoist stack
+(#2689 → #2690 → #2691) hit this: the studio PR removed `sectionHeader.align`
+while `packages/service` still selected it, so `Type-check` could never pass
+there, and the three PRs had to be collapsed into one after the fact.
+
+**Before stacking, ask whether the bottom PR is green on its own.** If it
+isn't, either keep the change as one PR, or restructure it expand/contract so
+that it is: the bottom PR adds the new field without removing the old one,
+the PRs above migrate each consumer, and a final PR deletes the old field.
+Each of those is green alone, so the stack is real rather than notional.
+
+**If a stack has to be collapsed after the fact,** retarget the _top_ PR
+(which already contains every commit) to `main`, close the others as
+superseded, and move the `Closes #<n>` keywords for every issue in the stack
+onto the survivor. Note that changing a base fires no workflow: see the
+CodeQL note below.
 
 **A stacked PR gets the full required suite, and the triggers must stay that
 way.** The six workflows behind the eleven required checks — `ci.yml`
@@ -63,6 +82,17 @@ check that will never arrive — it does not fail, it hangs. This is the same
 deadlock `ci.yml`'s header comment describes when it explains why the workflow
 carries no `paths-ignore`; a base-branch filter reaches it through a different
 door. Both filters are absent on purpose, and each file's header says so.
+
+**CodeQL is the exception to that, and it bites when collapsing a stack.**
+CodeQL runs through GitHub's _default setup_ — there is no `codeql.yml` in
+`.github/workflows/` — and default setup only analyzes PRs targeting the
+default branch. So a PR built on a stack branch has none of its three
+required contexts (`CodeQL`, `Analyze (actions)`,
+`Analyze (javascript-typescript)`), and retargeting it to `main` does not
+create them: a base change triggers no workflow run, and neither does closing
+and reopening the PR. Only a `synchronize` — a push to the head branch —
+does. `gh pr update-branch <n>` is the cleanest trigger, since it merges
+`main` in and clears staleness at the same time.
 
 (CodeQL is not among the eleven: it runs from GitHub's default code-scanning
 setup on a schedule, with no workflow file in `.github/workflows/`, and is

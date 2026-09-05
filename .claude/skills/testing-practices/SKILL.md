@@ -98,10 +98,9 @@ export default mergeConfig(
 
 - **`@blog/ui`** — behaviour and contract, not markup snapshots. Query by role/
   text (`getByRole("button", { name: ... })`), assert rendered props and
-  interactions via `@testing-library/user-event`. Never assert presentation
-  CSS classes — not even ones that toggle with a prop/variant; a purely-visual
-  variant is Storybook + `no-tests-needed`, not a class assertion (see "What
-  not to test" for the full rule and the narrow data/state-driven exception).
+  interactions via `@testing-library/user-event`. A class that toggles with a
+  prop, variant, or state **is** part of the contract and may be asserted; a
+  class the component always applies is not (see "What not to test").
 - **`@blog/service`** — pure logic: GROQ result → domain mapping, `urlForImage`
   output, error/empty handling. **Mock the Sanity client** (`vi.mock`); never
   hit the network. No `revalidate` timing tests.
@@ -261,32 +260,25 @@ export default mergeConfig(
 
 ## What not to test
 
-- **Never assert Tailwind/CSS utility classes for presentation — REQUIRED, not a preference.**
-  Do not use `toHaveClass` or match/contain on `className` for a class whose
-  only job is **appearance**: layout (`w-full`, `max-w-page`, `grid`,
-  `flex`, `hidden`, `sticky`), spacing (`mt-*`/`px-*`/`gap-*`/`pt-*`),
-  colour/background/border (`text-accent`, `bg-bg`, `bg-bg-subtle`,
-  `border-t`, `border-border-strong`), typography (`text-copy`, `text-lead`,
-  `font-mono`), radius/shadow, or an icon's `size`. This holds **even when
-  the class toggles with a prop/variant** — a _purely-visual_ variant
-  (`tinted`, a `size`/`variant`/`intent` that only restyles, a
-  `sm:`/`md:`/`lg:` responsive swap) is still not a class-assertion target:
-  its effect is presentation, which belongs in a **Storybook story**, and the
-  variant itself ships with **`no-tests-needed`**, not a `toContain('w-full')`.
-  "This class used to be X, now it's Y" (a restyle, a bug fix, a token swap,
-  an added/removed wrapper `<div>`) is likewise never a reason to assert it.
-- **The only class assertion allowed** is when a class is the **sole
-  observable of a genuine data- or state-driven behaviour** the test is
-  exercising — e.g. a code block highlighting the specific lines its input
-  data marks, an item reflecting active/current navigation state, a control
-  reflecting disabled/error state. Even then: prefer a **semantic/ARIA or
-  rendered-output** assertion if one exists (`aria-current`, `aria-disabled`,
-  `role`, visible text, element presence) over the raw class, and if you must
-  assert the class, add a one-line comment saying which behaviour makes it the
-  sole observable. A bare "does this variant apply its classes" test is **not**
-  this exception — that's presentation.
+- **Never assert a class the component applies unconditionally.** If a utility
+  never varies with the component's input — layout (`w-full`, `max-w-page`,
+  `grid`, `flex`), spacing (`mt-*`/`px-*`/`gap-*`), colour/background/border
+  (`text-accent`, `bg-bg`, `border-t`), typography (`text-copy`, `font-mono`),
+  radius/shadow, an icon's `size` — then asserting it only restates the source
+  and turns every restyle into a failing test. "This class used to be X, now
+  it's Y" (a restyle, a token swap, an added/removed wrapper `<div>`) is never
+  a reason to add an assertion.
+- **A class that varies with a prop, variant, or state may be asserted.** That
+  is the component's contract rather than its decoration: an `align` prop
+  producing `text-center`, a `variant` producing its tint, an item reflecting
+  active navigation state, a control reflecting disabled/error state. Assert
+  it directly — mocking a child component purely to inspect the prop you just
+  passed it is more indirection, not more rigour. Where the component exposes
+  a semantic or ARIA equivalent (`aria-current`, `aria-disabled`, `role`,
+  visible text), prefer that: it survives a restyle and the class does not.
 - Assert behaviour, semantics, and rendered output; never static styling. A
-  purely-visual change has no unit-test surface — Storybook + `no-tests-needed`.
+  restyle that changes no prop-driven behaviour has no unit-test surface —
+  Storybook + `no-tests-needed`.
 - **No snapshot tests** — they couple tests to markup and break on unrelated changes.
 - **No implementation details** — test what a component does, not how it does it.
 - **No network calls** — always mock the Sanity client and `service` functions.

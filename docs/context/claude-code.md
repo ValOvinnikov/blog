@@ -608,10 +608,12 @@ file` are all denied alike) — an earlier version only handled the
   stacked pull requests, and is the supported way to create them: `init`,
   `add`, `submit`, `sync`, `view`. Prefer it over hand-rolling bases with
   `gh pr create --base <branch>`, mainly for `sync`, which restacks the
-  branches above a PR once it merges. Stacking is what makes a per-layer
-  split viable for a change whose layers cannot each merge to `main` green
-  alone, since the intermediate states target their predecessor rather than
-  `main`.
+  branches above a PR once it merges. Stacking makes a per-layer split viable
+  for the PRs _above_ the bottom one, since those target their predecessor
+  rather than `main`. The bottom PR still targets `main` and still inherits
+  its ruleset, so it must be green alone; if the first layer cannot compile
+  by itself the whole stack is permanently `BLOCKED` and has to be collapsed
+  into one PR. See `open-pull-request`'s "Stacked PRs" section.
 
   A PR receives the full required suite whatever branch it targets. The six
   workflows behind the eleven required checks — `ci.yml` (Type-check, Lint,
@@ -623,9 +625,18 @@ file` are all denied alike) — an earlier version only handled the
   workflow's checks from every stacked PR, and because these are _required_
   checks the PR then hangs on `BLOCKED` rather than failing. That is the same
   deadlock `ci.yml`'s header comment describes when explaining why it carries
-  no `paths-ignore`. (CodeQL is not among the eleven — it runs from GitHub's
-  default code-scanning setup on a schedule, not from a workflow file, and is
-  enforced by a separate `code_scanning` ruleset rule rather than as a
-  required status check.)
+  no `paths-ignore`.
+
+  CodeQL is not among the eleven and behaves differently in a way that
+  matters for stacks. It has no workflow file: it runs from GitHub's default
+  code-scanning setup and is enforced by a separate `code_scanning` ruleset
+  rule rather than as a required status check. Default setup analyzes pushes
+  to the default branch **and PRs targeting it**, reporting three contexts —
+  `CodeQL`, `Analyze (actions)`, `Analyze (javascript-typescript)`. A PR
+  based on a stack branch gets none of them, and retargeting it to `main`
+  does not create them, because a base change fires no workflow run and
+  neither does closing/reopening the PR. Only a `synchronize` (a push to the
+  head branch, e.g. `gh pr update-branch <n>`) does. Until then the PR sits
+  `BLOCKED` on analyses that never start.
 
 - **`CLAUDE.md`** — repo-wide guidance loaded into every session.
