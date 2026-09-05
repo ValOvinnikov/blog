@@ -8,10 +8,7 @@ export type TUnsubscribeByTokenResult =
 
 // Deletes the subscriber row matching `unsubscribeToken` with no session at
 // all — the whole point of a per-recipient unsubscribe link that has to work
-// from an inbox. A single `DELETE ... RETURNING` distinguishes "a row was
-// deleted" from "no such token" so the caller can tell a fresh unsubscribe
-// apart from a link that's already been used or was never valid, rather than
-// treating both as the same silent no-op.
+// from an inbox.
 export async function unsubscribeByToken(
   tenantId: string,
   token: string,
