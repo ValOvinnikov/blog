@@ -56,4 +56,32 @@ describe('sanitizeHref', () => {
   it('rejects an entity-encoded scheme, since it never parses as one', () => {
     expect(sanitizeHref('&#106;avascript:alert(1)')).toBeNull();
   });
+
+  it('strips a mailto query string containing percent-encoded CR/LF header injection', () => {
+    const result = sanitizeHref(
+      'mailto:a@b.com?subject=x%0d%0aBcc:evil@example.com',
+    );
+    expect(result).toBe('mailto:a@b.com');
+    expect(result).not.toMatch(/%0d%0a/i);
+  });
+
+  it('strips a benign mailto query string too', () => {
+    expect(sanitizeHref('mailto:someone@example.com?subject=hello')).toBe(
+      'mailto:someone@example.com',
+    );
+  });
+
+  it('rejects an http url carrying userinfo', () => {
+    expect(sanitizeHref('http://user@evil.example/')).toBeNull();
+  });
+
+  it('rejects an https url carrying userinfo with a password', () => {
+    expect(sanitizeHref('https://user:pass@evil.example/')).toBeNull();
+  });
+
+  it('rejects an https url whose userinfo looks like a trusted domain', () => {
+    expect(
+      sanitizeHref('https://trusted-looking.example@evil.example/'),
+    ).toBeNull();
+  });
 });
