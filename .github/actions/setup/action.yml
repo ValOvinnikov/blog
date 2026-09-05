@@ -10,7 +10,7 @@ inputs:
     required: false
     default: '24'
   install-filter:
-    description: 'Optional pnpm --filter expression to scope the install (e.g. "@blog/db..."). Leave blank to install every workspace.'
+    description: 'Optional space-separated pnpm --filter expressions scoping the install (e.g. "@blog/db..." or "@blog/db... @blog/studio..."). Leave blank to install every workspace.'
     required: false
     default: ''
 
@@ -76,12 +76,18 @@ runs:
           turbo-${{ runner.os }}-${{ hashFiles('turbo.json') }}-
           turbo-${{ runner.os }}-
 
+    # The filter is split on whitespace into one `--filter=` argument each,
+    # because a caller can need more than one workspace root: a job running a
+    # `@blog/db` script that shells out to the Sanity CLI needs `@blog/studio`'s
+    # installed tree as well, and pnpm has no way to express that as a single
+    # filter expression.
     - name: Install dependencies
       env:
         INSTALL_FILTER: ${{ inputs.install-filter }}
       run: |
         if [ -n "$INSTALL_FILTER" ]; then
-          pnpm install --filter "$INSTALL_FILTER" --frozen-lockfile
+          read -ra filters <<< "$INSTALL_FILTER"
+          pnpm install "${filters[@]/#/--filter=}" --frozen-lockfile
         else
           pnpm install --frozen-lockfile
         fi

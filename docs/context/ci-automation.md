@@ -6,11 +6,34 @@ All automation lives in `.github/workflows/` (shared pnpm/Node setup in
 `.github/actions/setup`; Dependabot bumps npm + GitHub Actions weekly).
 `.github/actions/setup` takes an optional `install-filter` input (default
 empty, meaning an unscoped `pnpm install --frozen-lockfile` across every
-workspace) that, when set, installs with `pnpm install --filter "<value>"
---frozen-lockfile` instead — Provision Tenant and Deprovision Tenant are the
-only two callers that set it (`@blog/db...`), since each dispatches a single
-`@blog/db` script and has no use for `apps/web`/`apps/platform`/Storybook/
-Playwright's dependency trees.
+workspace). When set, its value is split on whitespace into one `--filter=`
+argument each, so a caller may name more than one workspace root. Six
+workflows set it, all of them jobs that dispatch a single `@blog/db` script
+and have no use for `apps/web`/`apps/platform`/Storybook/Playwright's
+dependency trees:
+
+| Workflow                  | Filter                        |
+| ------------------------- | ----------------------------- |
+| Provision Tenant          | `@blog/db...`                 |
+| Deprovision Tenant        | `@blog/db...`                 |
+| Recheck Tenant Owners     | `@blog/db...`                 |
+| Invalidate Tenant Cache   | `@blog/db...`                 |
+| Validate Tenant Documents | `@blog/db... @blog/studio...` |
+| Migrate Tenant Content    | `@blog/db... @blog/studio...` |
+
+The last two need the second filter because their `@blog/db` scripts shell out
+to the Sanity CLI (`pnpm exec sanity documents validate` / `documents query`)
+and to `node scripts/migrate.mjs` with `packages/studio` as the cwd. Scoping
+those two to `@blog/db...` alone installs no `packages/studio/node_modules`
+and the run dies on `Command "sanity" not found` — so check what a script
+actually executes before narrowing a workflow's filter.
+
+Measured on one machine against a warm pnpm store, this is worth roughly two
+thirds of the install for a db-only job and roughly a third for a db+studio
+one: 49.4s/1.3G unscoped, 16.0s/422M for `@blog/db...`, 31.1s/803M for
+`@blog/db... @blog/studio...`. A filtered install still processes the
+workspace root, so the root's `preinstall` (`guard-worktree-install.mjs`) and
+`prepare` (husky) lifecycle scripts run exactly as they do unscoped.
 
 **The pinned pnpm binary is cached, and that is load-bearing.**
 `pnpm/action-setup`'s self-installer shells out to `npm install pnpm@<version>`,
