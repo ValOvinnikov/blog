@@ -2,10 +2,12 @@
  * Provisioning workflow entrypoint — runs the five independently-idempotent
  * steps in order for one tenant, writing each step's status directly to
  * Postgres (via `reportStepStatus`) both on success and failure, then
- * attempts to elevate the owner to Sanity `administrator` (see
- * `elevateTenantOwner`) — an owner who hasn't yet accepted their invite
- * never fails this run, since that step polls a live external event with no
- * fixed timeline.
+ * best-effort seeds default email-template copy
+ * (`seedEmailTemplateDefaults`) and attempts to elevate the owner to Sanity
+ * `administrator` (see `elevateTenantOwner`) — neither affects this run's own
+ * result: an owner who hasn't yet accepted their invite never fails it, since
+ * that step polls a live external event with no fixed timeline, and a
+ * missing template row already falls back to product defaults on every read.
  *
  * Invoked only by `.github/workflows/provision-tenant.yml` via
  * `pnpm --filter @blog/db db:provision-tenant -- --tenant-id=<uuid>` — never
@@ -24,6 +26,7 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStep,
 } from '@blog/db/constants';
+import { seedEmailTemplateDefaults } from '@blog/db/queries/email-templates';
 import { reactivateTenant } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { unarchiveSanityProject } from '@blog/db/utils/sanity-management-client/sanity-management-client';
@@ -193,6 +196,17 @@ export async function runSteps(
 
   await reportProvisioningRunFinish(tenantId);
   await recordProvisioningAuditEvent(tenantId, env, AUDIT_ACTION.PROVISIONED);
+
+  // Best-effort — a missing row falls back to `EMAIL_TEMPLATE_DEFAULT_COPY`
+  // per field on every read, so a seeding failure never affects this run's
+  // own result.
+  try {
+    await seedEmailTemplateDefaults(tenantId);
+  } catch (error) {
+    console.error(
+      `provision-tenant: seedEmailTemplateDefaults failed for tenant "${tenantId}": ${sanitizeLogMessage(error)}`,
+    );
+  }
 
   // Runs only once the tenant is fully provisioned and never affects this
   // run's own result — the owner accepting their invite is outside this

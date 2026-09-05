@@ -49,9 +49,15 @@ const { createTenantRevalidateWebhookMock } = vi.hoisted(() => ({
 const { elevateTenantOwnerMock } = vi.hoisted(() => ({
   elevateTenantOwnerMock: vi.fn(),
 }));
+const { seedEmailTemplateDefaultsMock } = vi.hoisted(() => ({
+  seedEmailTemplateDefaultsMock: vi.fn(),
+}));
 
 vi.mock('@blog/db/queries/tenants', () => ({
   reactivateTenant: reactivateTenantMock,
+}));
+vi.mock('@blog/db/queries/email-templates', () => ({
+  seedEmailTemplateDefaults: seedEmailTemplateDefaultsMock,
 }));
 vi.mock(
   '@blog/db/utils/sanity-management-client/sanity-management-client',
@@ -133,6 +139,7 @@ beforeEach(() => {
   mapTenantDomainMock.mockReset().mockResolvedValue(undefined);
   createTenantRevalidateWebhookMock.mockReset().mockResolvedValue(undefined);
   elevateTenantOwnerMock.mockReset().mockResolvedValue('PENDING_ACCEPTANCE');
+  seedEmailTemplateDefaultsMock.mockReset().mockResolvedValue(undefined);
 });
 
 describe(runSteps, () => {

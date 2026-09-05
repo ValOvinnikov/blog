@@ -7,6 +7,8 @@ export * from './admins';
 export * from './audit-events';
 export * from './auth';
 export * from './bookmarks';
+export * from './email-config';
+export * from './email-templates';
 export * from './findings';
 export * from './membership-invites';
 export * from './memberships';
