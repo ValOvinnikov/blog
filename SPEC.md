@@ -477,8 +477,9 @@ no `site_config` row, falls back to the `CONSOLE` preset with no overrides
 — never a thrown error or an empty page. Same per-request tenant resolution
 as theme, above.
 
-`get-site-config.ts`'s cache carries a 3600s (`SITE_CONFIG_REVALIDATE_SECONDS`)
-fallback window as its safety net, but `apps/platform`'s Look/Voice/Features save
+`get-site-config.ts`'s cache carries a 3600s
+(`TENANT_CONFIG_REVALIDATE_SECONDS`, `@blog/config`) fallback window as its
+safety net, but `apps/platform`'s Look/Voice/Features save
 actions (`update-look-action.ts`/`save-voice-overrides-action.ts`/
 `update-features-action.ts`) also POST to
 `apps/web`'s `POST /api/revalidate-site-config` after a successful

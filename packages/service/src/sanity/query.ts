@@ -1,6 +1,7 @@
-import type {
-  AllSanitySchemaTypes,
-  internalGroqTypeReferenceTo,
+import {
+  SANITY_CONTENT_REVALIDATE_SECONDS,
+  type AllSanitySchemaTypes,
+  type internalGroqTypeReferenceTo,
 } from '@blog/config';
 import { createGroqBuilder, makeSafeQueryRunner } from 'groqd';
 
@@ -70,7 +71,7 @@ export function isr(
 
   return {
     next: {
-      revalidate: 3600,
+      revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
       tags: tags.map((t) => `t:${scopeProjectId}:${t}`),
     },
   };
