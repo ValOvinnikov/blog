@@ -3,12 +3,16 @@ import 'server-only';
 import { env } from '@blog/email/utils/env/env';
 import { Resend } from 'resend';
 
+const REPLY_TO_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export type TSendEmailInput = {
   to: string;
   from: string;
   subject: string;
   html: string;
   headers?: Record<string, string>;
+  /** A tenant-supplied reply-to address. Must be a syntactically well-formed email address; domain authorisation and deliverability policy are the caller's concern. */
+  replyTo?: string;
 };
 
 let resendClient: Resend | undefined;
@@ -33,13 +37,19 @@ export async function sendEmail({
   subject,
   html,
   headers,
+  replyTo,
 }: TSendEmailInput): Promise<void> {
+  if (replyTo !== undefined && !REPLY_TO_PATTERN.test(replyTo)) {
+    throw new Error('sendEmail received a malformed replyTo address');
+  }
+
   const { error } = await getResendClient().emails.send({
     to,
     from,
     subject,
     html,
     headers,
+    replyTo,
   });
 
   if (error) {

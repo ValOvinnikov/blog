@@ -9,6 +9,10 @@ export type TNewsletterConfirmationEmailInput = {
   unsubscribeUrl: string;
   brand: TTenantEmailBrand;
   brandName: string;
+  /** An uploaded tenant or per-template logo image; falls back to the generated mark when omitted. */
+  logoImageUrl?: string;
+  /** Rendered beneath the copyright line in the footer. Omit for a send with no bulk-mail postal-address obligation. */
+  footerPostalAddress?: string;
 };
 
 export type TNewsletterConfirmationEmailContent = {
@@ -29,6 +33,8 @@ export function buildNewsletterConfirmationEmail({
   unsubscribeUrl,
   brand,
   brandName,
+  logoImageUrl,
+  footerPostalAddress,
 }: TNewsletterConfirmationEmailInput): TNewsletterConfirmationEmailContent {
   const bodyHtml = [
     '<p>Click the button below to confirm your newsletter subscription.</p>',
@@ -52,7 +58,14 @@ export function buildNewsletterConfirmationEmail({
 
   return {
     subject: 'Confirm your subscription',
-    html: buildTenantShell({ brand, brandName, bodyHtml, actionHtml }),
+    html: buildTenantShell({
+      brand,
+      brandName,
+      bodyHtml,
+      actionHtml,
+      logoImageUrl,
+      footerPostalAddress,
+    }),
     headers: {
       'List-Unsubscribe': `<${unsubscribeUrl}>`,
       'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',

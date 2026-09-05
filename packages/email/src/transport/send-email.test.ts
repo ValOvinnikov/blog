@@ -118,6 +118,56 @@ describe('sendEmail', () => {
     expect(resendCtorMock).toHaveBeenCalledTimes(1);
   });
 
+  it('forwards a given replyTo address to the Resend client', async () => {
+    sendMock.mockResolvedValue({ data: { id: 'email_1' }, error: null });
+
+    const { sendEmail } = await importSendEmail();
+    await sendEmail({
+      to: 'reader@example.com',
+      from: 'Newsletter <newsletter@resend.dev>',
+      subject: 'Latest issue',
+      html: '<p>Read the latest issue</p>',
+      replyTo: 'editor@example.com',
+    });
+
+    expect(sendMock).toHaveBeenCalledWith({
+      to: 'reader@example.com',
+      from: 'Newsletter <newsletter@resend.dev>',
+      subject: 'Latest issue',
+      html: '<p>Read the latest issue</p>',
+      replyTo: 'editor@example.com',
+    });
+  });
+
+  it('sends no replyTo when none is supplied', async () => {
+    sendMock.mockResolvedValue({ data: { id: 'email_1' }, error: null });
+
+    const { sendEmail } = await importSendEmail();
+    await sendEmail({
+      to: 'reader@example.com',
+      from: 'Sign in <onboarding@resend.dev>',
+      subject: 'Sign in to example.com',
+      html: '<p>Click to sign in</p>',
+    });
+
+    expect(sendMock.mock.calls[0]?.[0].replyTo).toBeUndefined();
+  });
+
+  it('rejects a malformed replyTo address before calling the Resend client', async () => {
+    const { sendEmail } = await importSendEmail();
+
+    await expect(
+      sendEmail({
+        to: 'reader@example.com',
+        from: 'from@example.com',
+        subject: 'Subject',
+        html: '<p>Body</p>',
+        replyTo: 'not-an-email',
+      }),
+    ).rejects.toThrow('sendEmail received a malformed replyTo address');
+    expect(sendMock).not.toHaveBeenCalled();
+  });
+
   it('throws a clear error when Resend reports a send failure', async () => {
     sendMock.mockResolvedValue({
       data: null,

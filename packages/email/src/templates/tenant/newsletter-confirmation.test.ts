@@ -113,4 +113,37 @@ describe('buildNewsletterConfirmationEmail', () => {
 
     expect(html).toContain('Acme Blog');
   });
+
+  it('renders byte-identical html when logoImageUrl and footerPostalAddress are omitted vs explicitly undefined', () => {
+    const { html: withoutOptionals } = buildNewsletterConfirmationEmail({
+      confirmationUrl: CONFIRMATION_URL,
+      unsubscribeUrl: UNSUBSCRIBE_URL,
+      brand: BRAND,
+      brandName: 'Acme Blog',
+    });
+    const { html: withUndefinedOptionals } = buildNewsletterConfirmationEmail({
+      confirmationUrl: CONFIRMATION_URL,
+      unsubscribeUrl: UNSUBSCRIBE_URL,
+      brand: BRAND,
+      brandName: 'Acme Blog',
+      logoImageUrl: undefined,
+      footerPostalAddress: undefined,
+    });
+
+    expect(withUndefinedOptionals).toBe(withoutOptionals);
+  });
+
+  it('forwards a given logo URL and footer postal address to the shell', () => {
+    const { html } = buildNewsletterConfirmationEmail({
+      confirmationUrl: CONFIRMATION_URL,
+      unsubscribeUrl: UNSUBSCRIBE_URL,
+      brand: BRAND,
+      brandName: 'Acme Blog',
+      logoImageUrl: 'https://cdn.example.com/logo.png',
+      footerPostalAddress: '123 Main St, Springfield',
+    });
+
+    expect(html).toContain('<img src="https://cdn.example.com/logo.png"');
+    expect(html).toContain('123 Main St, Springfield');
+  });
 });

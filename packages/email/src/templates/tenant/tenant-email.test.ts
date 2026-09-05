@@ -131,6 +131,47 @@ describe('buildTenantEmail', () => {
     expect(html).not.toContain('<img src=x onerror=steal()>');
   });
 
+  it('renders byte-identical output when logoImageUrl and footerPostalAddress are omitted vs explicitly undefined', () => {
+    const body: TPortableTextContent = [
+      {
+        _type: 'block',
+        style: 'normal',
+        children: [{ _type: 'span', text: 'Welcome back.' }],
+      },
+    ];
+
+    const withoutOptionals = buildTenantEmail({
+      brand: BRAND,
+      brandName: 'Acme',
+      body,
+      action: ACTION,
+    });
+    const withUndefinedOptionals = buildTenantEmail({
+      brand: BRAND,
+      brandName: 'Acme',
+      body,
+      action: ACTION,
+      logoImageUrl: undefined,
+      footerPostalAddress: undefined,
+    });
+
+    expect(withUndefinedOptionals).toBe(withoutOptionals);
+  });
+
+  it('forwards a given logo URL and footer postal address to the shell', () => {
+    const html = buildTenantEmail({
+      brand: BRAND,
+      brandName: 'Acme',
+      body: [],
+      action: ACTION,
+      logoImageUrl: 'https://cdn.example.com/logo.png',
+      footerPostalAddress: '123 Main St, Springfield',
+    });
+
+    expect(html).toContain('<img src="https://cdn.example.com/logo.png"');
+    expect(html).toContain('123 Main St, Springfield');
+  });
+
   it('renders no action element at all when action is omitted', () => {
     const html = buildTenantEmail({
       brand: BRAND,

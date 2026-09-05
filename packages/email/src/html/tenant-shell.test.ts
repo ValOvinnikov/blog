@@ -152,6 +152,83 @@ describe('buildTenantShell', () => {
     expect(actionIndex).toBeLessThan(footerIndex);
   });
 
+  it('renders no logo image given for an email with no uploaded logo', () => {
+    const withoutLogo = buildTenantShell({
+      brand: BRAND,
+      brandName: 'Acme',
+      bodyHtml: '<p>Body</p>',
+    });
+    const withUndefinedLogo = buildTenantShell({
+      brand: BRAND,
+      brandName: 'Acme',
+      bodyHtml: '<p>Body</p>',
+      logoImageUrl: undefined,
+    });
+
+    expect(withUndefinedLogo).toBe(withoutLogo);
+    expect(withoutLogo).not.toContain('<img');
+    expect(withoutLogo).toContain('<svg');
+  });
+
+  it('renders an img tag with explicit dimensions and escaped alt text when a logo URL is given', () => {
+    const html = buildTenantShell({
+      brand: BRAND,
+      brandName: 'Acme <Blog>',
+      bodyHtml: '<p>Body</p>',
+      logoImageUrl: 'https://cdn.example.com/logo.png',
+    });
+
+    expect(html).toContain('<img src="https://cdn.example.com/logo.png"');
+    expect(html).toContain('width="32" height="32"');
+    expect(html).toContain('alt="Acme &lt;Blog&gt; logo"');
+    expect(html).not.toContain('<svg');
+  });
+
+  it('falls back to the generated mark when the logo URL fails sanitization', () => {
+    const html = buildTenantShell({
+      brand: BRAND,
+      brandName: 'Acme',
+      bodyHtml: '<p>Body</p>',
+      logoImageUrl: 'javascript:alert(1)',
+    });
+
+    expect(html).not.toContain('<img');
+    expect(html).toContain('<svg');
+  });
+
+  it('renders no footer postal address given for a send with no obligation to carry one', () => {
+    const withoutAddress = buildTenantShell({
+      brand: BRAND,
+      brandName: 'Acme',
+      bodyHtml: '<p>Body</p>',
+    });
+    const withUndefinedAddress = buildTenantShell({
+      brand: BRAND,
+      brandName: 'Acme',
+      bodyHtml: '<p>Body</p>',
+      footerPostalAddress: undefined,
+    });
+
+    expect(withUndefinedAddress).toBe(withoutAddress);
+  });
+
+  it('renders the escaped postal address beneath the copyright line in the footer', () => {
+    const html = buildTenantShell({
+      brand: BRAND,
+      brandName: 'Acme',
+      bodyHtml: '<p>Body</p>',
+      footerPostalAddress: '123 Main St <Suite 4>, Springfield',
+    });
+
+    const copyrightIndex = html.indexOf('&copy;');
+    const addressIndex = html.indexOf(
+      '123 Main St &lt;Suite 4&gt;, Springfield',
+    );
+
+    expect(copyrightIndex).toBeGreaterThan(-1);
+    expect(addressIndex).toBeGreaterThan(copyrightIndex);
+  });
+
   it('requires a brand at compile time', () => {
     function callWithoutBrand(): string {
       // @ts-expect-error -- buildTenantShell requires a resolved brand; a

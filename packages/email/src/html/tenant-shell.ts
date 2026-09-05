@@ -25,6 +25,10 @@ export type TBuildTenantShellInput = {
   bodyHtml: string;
   /** Already-assembled, already-escaped HTML rendered between the body and the footer. Omit for an email with no action. */
   actionHtml?: string;
+  /** An uploaded tenant or per-template logo image; falls back to the generated mark when omitted. */
+  logoImageUrl?: string;
+  /** Rendered beneath the copyright line in the footer. Omit for a send with no bulk-mail postal-address obligation. */
+  footerPostalAddress?: string;
 };
 
 /**
@@ -37,6 +41,8 @@ export function buildTenantShell({
   previewText,
   bodyHtml,
   actionHtml,
+  logoImageUrl,
+  footerPostalAddress,
 }: TBuildTenantShellInput): string {
   return renderEmailShell({
     palette: brand,
@@ -44,5 +50,7 @@ export function buildTenantShell({
     previewText,
     bodyHtml,
     actionHtml,
+    logoImageUrl,
+    footerPostalAddress,
   });
 }
