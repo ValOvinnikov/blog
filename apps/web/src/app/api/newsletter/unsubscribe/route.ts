@@ -39,6 +39,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     title: t('confirmTitle'),
     message: t('confirmMessage'),
     confirmButtonLabel: t('confirmButtonLabel'),
+    returnHomeLabel,
     actionUrl: routes.newsletterUnsubscribe(token),
   });
 }
