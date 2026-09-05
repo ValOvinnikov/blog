@@ -20,7 +20,6 @@ export async function clearTenantProvisioningArtifacts(
     .set({
       sanityReadTokenEncrypted: null,
       sanityWriteTokenEncrypted: null,
-      studioVercelProjectId: null,
       provisioningStatus: null,
       provisioningSteps: null,
     })

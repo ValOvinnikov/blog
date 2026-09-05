@@ -78,7 +78,6 @@ describe(setTenantSanityProject, () => {
     expect(row).toMatchObject({
       name: 'Acme',
       primaryDomain: 'acme.example.com',
-      studioVercelProjectId: null,
       seededAt: null,
     });
   });

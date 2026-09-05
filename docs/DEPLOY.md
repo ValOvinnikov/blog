@@ -169,15 +169,6 @@ new grant of preview database access while delivering nothing. Admin changes
 are reviewed on `admin-dev.{your-hosting}`, which deploys automatically on
 merge.
 
-> **Legacy projects still in the console.** `cms-dev`, `cms-prod`,
-> `studio-demo` and `studio-demo-1` predate the Studio becoming a package.
-> They have no Root Directory to build (`apps/cms` is gone) and, because the
-> `vercel.json` that carried `git.deploymentEnabled: false` went with it,
-> they attempt a build on every PR and fail. Nothing blocks a merge — no
-> Vercel check is required — but they show as four permanently-red checks
-> until their Git integration is disabled or the projects are deleted. That
-> console work is tracked separately in the decommissioning ticket, not here.
-
 Nothing to set per project in the dashboard for this anymore; only project
 linking + domains remain:
 
