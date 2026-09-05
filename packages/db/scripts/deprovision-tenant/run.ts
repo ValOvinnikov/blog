@@ -120,8 +120,9 @@ const STEPS: TStep[] = [
   },
 ];
 
-// A failure recording step/run state must never abort the teardown it is
-// only trying to describe, so every call below swallows its own error.
+// recordStepStatus, recordRunStart and recordRunFinish each swallow their
+// own error: a failure recording step/run state must never abort the
+// teardown it is only trying to describe.
 async function recordStepStatus(
   tenantId: string,
   step: TDeprovisioningStep,
