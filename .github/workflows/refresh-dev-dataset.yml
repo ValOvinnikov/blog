@@ -52,8 +52,8 @@ jobs:
         with:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
-      # This is a deliberate, manually-triggered action — unlike the
-      # auto-triggered deploy workflows, it should NOT no-op green when a
+      # This is a deliberate, manually-triggered action — unlike
+      # `deploy-development.yml`, it should NOT no-op green when a
       # secret is missing. The script's own guard fails loudly (and safely,
       # before any network call) if anything required is missing or the
       # source/target direction isn't exactly production -> development.
