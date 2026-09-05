@@ -9,9 +9,11 @@ type TSanityType = Extract<AllSanitySchemaTypes, { _type: string }>['_type'];
  * `packages/service/src` — required (like `TModuleType`) so a removed or
  * typo'd entry fails `type-check` instead of silently purging nothing.
  *
- * This does not catch the opposite mistake: adding a brand-new `isr(...)` tag
- * for a type not yet listed here still relies on a human adding it — the
- * union only guards against entries disappearing, not new ones being missed.
+ * The opposite mistake — a brand-new `isr(...)` tag with no matching value
+ * below — is caught separately by `pnpm check:revalidate-tags-sync`
+ * (`scripts/check-revalidate-tags-sync.mjs`), which extracts every tag
+ * literal passed to `isr(...)` across `packages/service/src` and fails if
+ * one is absent from this map's value union.
  *
  * `settings_voice` is deliberately excluded: audited via
  * `grep -rln "voice" packages/service/src` (excluding tests) with zero hits —

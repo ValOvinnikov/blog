@@ -82,6 +82,40 @@ been applied anywhere shared is never hand-edited — write a new corrective
 migration instead. Full mechanism: [`../../SPEC.md`](../../SPEC.md) §8 and
 [`../../.claude/agents/db.md`](../../.claude/agents/db.md).
 
+### Renumbering a migration that collides with `main`
+
+Migrations are numbered sequentially from whatever is on `main` at
+`db:generate` time. Several branches can generate a migration around the same
+time, and two of them can land on the same index — whichever merges second
+hits an `add/add` conflict on `migrations/meta/<idx>_snapshot.json` plus a
+content conflict on `migrations/meta/_journal.json`. `pnpm check:migration-index`
+catches this in CI by comparing the PR branch's migration indices against
+`origin/main`'s journal, so a collision fails the PR at review time rather
+than surfacing as a merge conflict later.
+
+This is safe to fix by regenerating, because a migration that has not been
+applied anywhere shared carries none of the "never hand-edit an applied
+migration" constraint above — that rule is about migrations already run
+against a shared database, not ones still sitting on a branch. The procedure
+is mechanical:
+
+1. Merge `origin/main`, taking **main's** version of
+   `migrations/meta/<idx>_snapshot.json` and `migrations/meta/_journal.json`
+   wholesale — main's migration keeps the number.
+2. Delete our colliding `.sql` file and its snapshot.
+3. `pnpm --filter @blog/db db:generate` — ours regenerates under the next
+   free index.
+4. Run `db:generate` again and confirm it reports no changes, which proves
+   the snapshot chain is consistent.
+5. Diff the new SQL against the old: it must be byte-identical apart from the
+   filename. Anything else means the merge changed the schema's meaning, not
+   just its number, and needs a closer look before continuing.
+
+The window for a collision shrinks if `db:generate` runs as the last step
+before pushing rather than during implementation — the longer a generated
+migration sits on a branch, the more chances it has to collide with another
+branch's.
+
 ## Further reading
 
 - [`../../SPEC.md`](../../SPEC.md) §4 (layer contracts) and §8 (migrations & live data)

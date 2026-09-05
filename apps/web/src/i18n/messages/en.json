@@ -174,6 +174,16 @@
     "errorMessage": "We couldn't confirm your subscription. Please try again later.",
     "returnHome": "Return home"
   },
+  "newsletterUnsubscribe": {
+    "confirmTitle": "Unsubscribe from our newsletter",
+    "confirmMessage": "Click the button below to confirm you no longer want to receive newsletter emails from us.",
+    "confirmButtonLabel": "Confirm unsubscribe",
+    "successTitle": "You're unsubscribed",
+    "successMessage": "You will no longer receive newsletter emails from us.",
+    "invalidTitle": "Link no longer valid",
+    "invalidMessage": "This unsubscribe link is no longer valid — you may already be unsubscribed.",
+    "returnHome": "Return home"
+  },
   "accountPage": {
     "title": "Account",
     "metaDescription": "Manage your privacy and data — export or delete your account.",

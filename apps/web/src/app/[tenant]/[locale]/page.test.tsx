@@ -1,9 +1,10 @@
+import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
-import HomePage, { generateMetadata } from './page';
+import HomePage, { generateMetadata, revalidate } from './page';
 
 const { getHomePageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
   getHomePageMock: vi.fn(),
@@ -39,6 +40,10 @@ const setup = customRenderAsync(HomePage, {
 });
 
 describe('HomePage', () => {
+  it('declares the shared content-route revalidate backstop', () => {
+    expect(revalidate).toBe(CONTENT_ROUTE_REVALIDATE_SECONDS);
+  });
+
   beforeEach(() => {
     getHomePageMock.mockReset();
     getTenantSanityContextMock.mockReset();

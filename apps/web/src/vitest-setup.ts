@@ -58,7 +58,10 @@ const createLooseTranslator = createTranslator as unknown as (config: {
 
 // `next-intl/server`'s `setRequestLocale` is called by every locale-aware
 // layout/page but never asserted on — stub it globally so individual test
-// files don't repeat the mock. `getTranslations` is stubbed as a minimal
+// files don't repeat the mock. `getLocale` resolves to the same `en` this
+// mock's other stubs render under; a test that needs a different resolved
+// locale overrides it locally (e.g. the newsletter confirm route's test).
+// `getTranslations` is stubbed as a minimal
 // stand-in that resolves real strings from `i18n/messages/en.json` via
 // next-intl's own `createTranslator` (full ICU — interpolation, plurals,
 // select) so component tests assert on the actual rendered copy instead of
@@ -68,6 +71,7 @@ const createLooseTranslator = createTranslator as unknown as (config: {
 // rendered date string instead of a fake.
 vi.mock('next-intl/server', () => ({
   setRequestLocale: vi.fn(),
+  getLocale: vi.fn(async () => 'en'),
   getTranslations: vi.fn(async (arg?: TGetTranslationsArg) =>
     createLooseTranslator({
       locale: 'en',

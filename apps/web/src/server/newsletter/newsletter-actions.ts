@@ -1,8 +1,8 @@
 'use server';
 
+import { routes } from '@blog/config';
 import { queries } from '@blog/db';
-import { sendEmail } from '@blog/email';
-import { buildNewsletterConfirmationEmail } from '@web/server/newsletter/newsletter-confirmation-email';
+import { buildNewsletterConfirmationEmail, sendEmail } from '@blog/email';
 import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address';
 import { markNewsletterSubscribed } from '@web/server/newsletter/newsletter-subscribed-cookie';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
@@ -69,11 +69,13 @@ export const subscribeToNewsletterAction = async (
     }
 
     const siteUrl = (await getTenantBaseUrl()) ?? '';
-    const confirmationUrl = `${siteUrl}/api/newsletter/confirm?token=${subscriber.confirmationToken}`;
+    const confirmationUrl = `${siteUrl}${routes.newsletterConfirm(subscriber.confirmationToken)}`;
+    const unsubscribeUrl = `${siteUrl}${routes.newsletterUnsubscribe(subscriber.unsubscribeToken)}`;
     const { brand, brandName } = await resolveTenantEmailIdentity(tenantId);
 
-    const { subject, html } = buildNewsletterConfirmationEmail({
+    const { subject, html, headers } = buildNewsletterConfirmationEmail({
       confirmationUrl,
+      unsubscribeUrl,
       brand,
       brandName,
     });
@@ -92,6 +94,7 @@ export const subscribeToNewsletterAction = async (
       from: fromAddress,
       subject,
       html,
+      headers,
     });
 
     await markNewsletterSubscribedSafely();

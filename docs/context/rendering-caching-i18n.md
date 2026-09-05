@@ -103,10 +103,10 @@ blog/my-post')` matches the resolved-pathname tag exactly — and is how the
 
   **Known limitation, accepted rather than solved:** a renamed post slug is
   not recoverable from the webhook payload, so the page at the _old_ slug
-  keeps its stale prerendered HTML (still listing the post) until something
-  else revalidates that path. Fixing this would require reconfiguring the
-  Sanity webhook to project the document's previous slug, which is
-  human-gated console work.
+  keeps its stale prerendered HTML (still listing the post) until the
+  route-level backstop below expires it. Fixing this properly would require
+  reconfiguring the Sanity webhook to project the document's previous slug,
+  which is human-gated console work.
 
   Every other `_type` (including the `posts`-tagged
   `blog_author`/`blog_topic`/`blog_tag`, whose edit can affect every
@@ -122,6 +122,31 @@ blog/my-post')` matches the resolved-pathname tag exactly — and is how the
   is wrapped in a try/catch for exactly this reason — an uncaught throw there
   would abort the handler before the fallback purge ever ran, which is worse
   than the partial purge the fallback exists to prevent.
+
+  **The purge is best-effort; the route-level `revalidate` is the correctness
+  backstop behind it.** Every content route under `[tenant]/[locale]` declares
+  `export const revalidate = 21600` (6 hours) — the eleven content routes, not
+  `account`/`bookmarks`, which stay `force-dynamic` and must never be cached
+  across users. This governs the **Full Route Cache** and is a different
+  mechanism from the 3600s **Data Cache** TTL that `isr()` sets on fetches;
+  same unit, different cache, and the two should not be conflated. Its purpose
+  is that a purge which never happens — a derivation bug, a renamed slug, a
+  failed request — self-heals within a bounded window instead of leaving a
+  page wrong indefinitely. It is a correctness floor for a rare failure, not a
+  freshness target: the webhook remains the mechanism that makes a publish
+  appear promptly.
+
+  Two mechanical constraints, both established against real builds rather than
+  inferred. Next requires `revalidate` to be a **literal** — an imported
+  constant fails the Turbopack build with `Invalid segment configuration export
+detected`, and a re-export with `it mustn't be reexported`, so a wrong form
+  cannot ship silently. And the value cannot be hoisted to the shared
+  `[tenant]/[locale]/layout.tsx`, because a layout-level `revalidate` fails the
+  build outright once a child route sets `dynamic = 'force-dynamic'`. Each
+  route therefore declares the literal itself, kept equal to
+  `CONTENT_ROUTE_REVALIDATE_SECONDS` (`@blog/config`) by a per-route test; that
+  constant is a drift detector for the eleven copies rather than something the
+  routes import.
 
   The same route also cleans up orphaned `bookmarks` rows (`@blog/db`) when the
   webhook's `sanity-operation` header reads `delete` for a `blog_post` —

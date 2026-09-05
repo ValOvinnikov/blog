@@ -223,6 +223,7 @@ describe('resendConfirmationAction', () => {
     resendConfirmationMock.mockResolvedValue({
       outcome: 'pending',
       confirmationToken: 'token-abc',
+      unsubscribeToken: 'unsub-token-abc',
     });
     sendEmailMock.mockResolvedValue(undefined);
     const { resendConfirmationAction } =
@@ -236,6 +237,11 @@ describe('resendConfirmationAction', () => {
         html: expect.stringContaining(
           'https://example.com/api/newsletter/confirm?token=token-abc',
         ),
+        headers: {
+          'List-Unsubscribe':
+            '<https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc>',
+          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        },
       }),
     );
   });
@@ -245,6 +251,7 @@ describe('resendConfirmationAction', () => {
     resendConfirmationMock.mockResolvedValue({
       outcome: 'pending',
       confirmationToken: 'token-abc',
+      unsubscribeToken: 'unsub-token-abc',
     });
     const tenantBrand = resolveTenantEmailBrand({
       preset: PRESET_ID.CONSOLE,
@@ -284,6 +291,7 @@ describe('resendConfirmationAction', () => {
     resendConfirmationMock.mockResolvedValue({
       outcome: 'pending',
       confirmationToken: 'token-abc',
+      unsubscribeToken: 'unsub-token-abc',
     });
     sendEmailMock.mockRejectedValue(new Error('resend down'));
     const { resendConfirmationAction } =
