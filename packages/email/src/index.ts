@@ -1,19 +1,15 @@
-export { escapeHtml } from './html/escape-html';
 export {
+  escapeHtml,
   renderEmailAction,
   type TEmailAction,
   type TEmailActionBrand,
-} from './html/email-action';
-export {
   buildOperatorShell,
   type TBuildOperatorShellInput,
-} from './html/operator-shell';
-export { sanitizeHref } from './html/sanitize-href';
-export {
+  sanitizeHref,
   buildTenantShell,
   type TBuildTenantShellInput,
   type TTenantEmailBrand,
-} from './html/tenant-shell';
+} from './html';
 export {
   serializePortableText,
   type TPortableTextBlock,
