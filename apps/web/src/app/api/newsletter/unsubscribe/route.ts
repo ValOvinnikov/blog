@@ -2,96 +2,15 @@ import { routes } from '@blog/config';
 import { queries } from '@blog/db';
 import { isTenantActive } from '@web/server/tenant/is-tenant-active';
 import { resolveTenantId } from '@web/server/tenant/resolve-tenant-id';
-import { escapeXml } from '@web/utils/escape-xml';
 import { logger } from '@web/utils/logger/logger';
-import { NextResponse } from 'next/server';
+import type { NextResponse } from 'next/server';
 import { getTranslations } from 'next-intl/server';
 
-type TResultPageCopy = {
-  title: string;
-  message: string;
-  returnHomeLabel: string;
-};
-
-type TConfirmPageCopy = {
-  title: string;
-  message: string;
-  confirmButtonLabel: string;
-  actionUrl: string;
-};
-
-/**
- * A minimal, self-contained HTML page — mirrors the confirm route's own
- * `renderConfirmationPage`, since a Route Handler returns a `Response`, not
- * JSX, and this result needs no interactivity.
- */
-const renderResultPage = ({
-  title,
-  message,
-  returnHomeLabel,
-}: TResultPageCopy): string => {
-  const safeTitle = escapeXml(title);
-  const safeMessage = escapeXml(message);
-  const safeReturnHomeLabel = escapeXml(returnHomeLabel);
-  const homeHref = routes.home();
-
-  return `<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>${safeTitle}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-  </head>
-  <body>
-    <h1>${safeTitle}</h1>
-    <p>${safeMessage}</p>
-    <p><a href="${homeHref}">${safeReturnHomeLabel}</a></p>
-  </body>
-</html>`;
-};
-
-const renderResultResponse = (
-  copy: TResultPageCopy,
-  status: number,
-): NextResponse => {
-  return new NextResponse(renderResultPage(copy), {
-    status,
-    headers: { 'Content-Type': 'text/html; charset=utf-8' },
-  });
-};
-
-/**
- * The GET-rendered confirmation page: a plain, JavaScript-free `<form>`
- * whose submit `POST`s to the same URL — the only place this route mutates
- * anything.
- */
-const renderConfirmPage = ({
-  title,
-  message,
-  confirmButtonLabel,
-  actionUrl,
-}: TConfirmPageCopy): string => {
-  const safeTitle = escapeXml(title);
-  const safeMessage = escapeXml(message);
-  const safeButtonLabel = escapeXml(confirmButtonLabel);
-  const safeActionUrl = escapeXml(actionUrl);
-
-  return `<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>${safeTitle}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-  </head>
-  <body>
-    <h1>${safeTitle}</h1>
-    <p>${safeMessage}</p>
-    <form method="post" action="${safeActionUrl}">
-      <button type="submit">${safeButtonLabel}</button>
-    </form>
-  </body>
-</html>`;
-};
+import {
+  renderConfirmResponse,
+  renderResultResponse,
+  type TResultPageCopy,
+} from './unsubscribe-page';
 
 /**
  * `GET /api/newsletter/unsubscribe?token=…` renders a confirmation page
@@ -116,15 +35,12 @@ export async function GET(request: Request): Promise<NextResponse> {
     );
   }
 
-  return new NextResponse(
-    renderConfirmPage({
-      title: t('confirmTitle'),
-      message: t('confirmMessage'),
-      confirmButtonLabel: t('confirmButtonLabel'),
-      actionUrl: routes.newsletterUnsubscribe(token),
-    }),
-    { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } },
-  );
+  return renderConfirmResponse({
+    title: t('confirmTitle'),
+    message: t('confirmMessage'),
+    confirmButtonLabel: t('confirmButtonLabel'),
+    actionUrl: routes.newsletterUnsubscribe(token),
+  });
 }
 
 /**

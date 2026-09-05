@@ -2,8 +2,7 @@
 
 import { routes } from '@blog/config';
 import { queries } from '@blog/db';
-import { sendEmail } from '@blog/email';
-import { buildNewsletterConfirmationEmail } from '@web/server/newsletter/newsletter-confirmation-email';
+import { buildNewsletterConfirmationEmail, sendEmail } from '@blog/email';
 import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address';
 import { markNewsletterSubscribed } from '@web/server/newsletter/newsletter-subscribed-cookie';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
