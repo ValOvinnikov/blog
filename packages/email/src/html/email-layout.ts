@@ -18,7 +18,7 @@ export type TRenderEmailShellInput = {
   bodyHtml: string;
 };
 
-const FONT_STACK =
+export const FONT_STACK =
   "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
 
 /**
