@@ -45,8 +45,9 @@ export const PostListModuleView = ({
   accessibleTitle,
   emptyMessage,
   pagination,
+  contentAlignment,
 }: IPostListModuleViewProps) => {
-  const { heading, supportingText, align } = sectionHeader;
+  const { heading, supportingText } = sectionHeader;
 
   return (
     <Section
@@ -61,7 +62,7 @@ export const PostListModuleView = ({
         titleId={titleId}
         accessibleTitle={accessibleTitle}
         supportingText={supportingText}
-        align={align}
+        align={contentAlignment}
         linkAs={SmartLink}
         isWrapped={true}
         emptyMessage={emptyMessage}

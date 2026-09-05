@@ -38,10 +38,10 @@ const meta = {
     sectionHeader: {
       heading: 'Latest posts',
       supportingText: undefined,
-      align: undefined,
     },
     items,
     layout: undefined,
+    contentAlignment: undefined,
     titleId: 'post-list-title',
     dataTestId: 'post-list-module-post-list-1',
     accessibleTitle: 'Latest posts',
@@ -58,7 +58,6 @@ export const WithoutCmsHeading: TStory = {
     sectionHeader: {
       heading: undefined,
       supportingText: undefined,
-      align: undefined,
     },
   },
 };

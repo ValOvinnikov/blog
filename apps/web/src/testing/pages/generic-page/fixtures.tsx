@@ -41,7 +41,6 @@ export const makeGenericPageView = (
           sectionHeader={{
             heading: 'Get in touch',
             supportingText: 'Have a question? We would love to hear from you.',
-            align: undefined,
           }}
           content={undefined}
           image={undefined}

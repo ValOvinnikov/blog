@@ -26,7 +26,6 @@ export const makeTopicsPageView = (
         sectionHeader={{
           heading: undefined,
           supportingText: undefined,
-          align: undefined,
         }}
         items={[
           {
@@ -45,6 +44,7 @@ export const makeTopicsPageView = (
           },
         ]}
         layout={undefined}
+        contentAlignment={undefined}
         titleId="topic-list-title"
         dataTestId="taxonomy-list-module-topic-list-1"
         headingLevel={2}
