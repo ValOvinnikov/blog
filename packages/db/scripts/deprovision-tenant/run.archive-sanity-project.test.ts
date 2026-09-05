@@ -58,6 +58,8 @@ const env = {
   dryRun: false,
   githubActor: 'octocat',
   githubRunId: 'run-42',
+  githubRepository: 'acme/blog',
+  githubServerUrl: 'https://github.com',
   webAppUrl: 'https://web.example.com',
   siteConfigRevalidateSecret: 'shared-secret',
 };

@@ -17,6 +17,8 @@ beforeEach(() => {
     'VERCEL_TEAM_ID',
     'GITHUB_ACTOR',
     'GITHUB_RUN_ID',
+    'GITHUB_REPOSITORY',
+    'GITHUB_SERVER_URL',
     'WEB_APP_URL',
     'SITE_CONFIG_REVALIDATE_SECRET',
   ]) {
@@ -47,6 +49,8 @@ describe(loadDeprovisionEnv, () => {
       dryRun: true,
       githubActor: undefined,
       githubRunId: undefined,
+      githubRepository: undefined,
+      githubServerUrl: undefined,
       webAppUrl: undefined,
       siteConfigRevalidateSecret: undefined,
     });
@@ -61,17 +65,21 @@ describe(loadDeprovisionEnv, () => {
     expect(env.dryRun).toBe(false);
   });
 
-  it('carries through GITHUB_ACTOR/GITHUB_RUN_ID when set, without requiring them', () => {
+  it('carries through GITHUB_ACTOR/GITHUB_RUN_ID/GITHUB_REPOSITORY/GITHUB_SERVER_URL when set, without requiring them', () => {
     process.env['GITHUB_ACTOR'] = 'octocat';
     process.env['GITHUB_RUN_ID'] = 'run-42';
+    process.env['GITHUB_REPOSITORY'] = 'acme/blog';
+    process.env['GITHUB_SERVER_URL'] = 'https://github.com';
 
     const env = loadDeprovisionEnv(true);
 
     expect(env.githubActor).toBe('octocat');
     expect(env.githubRunId).toBe('run-42');
+    expect(env.githubRepository).toBe('acme/blog');
+    expect(env.githubServerUrl).toBe('https://github.com');
   });
 
-  it('does not throw when GITHUB_ACTOR/GITHUB_RUN_ID are unset', () => {
+  it('does not throw when GITHUB_ACTOR/GITHUB_RUN_ID/GITHUB_REPOSITORY/GITHUB_SERVER_URL are unset', () => {
     expect(() => loadDeprovisionEnv(true)).not.toThrow();
   });
 

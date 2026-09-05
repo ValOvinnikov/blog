@@ -1,6 +1,7 @@
 import {
   TENANT_PLAN,
   TENANT_STATUS,
+  type TDeprovisioningStep,
   type TElevateTenantOwnerOutcome,
   type TTenantPlan,
   type TTenantProvisioningStatus,
@@ -58,6 +59,25 @@ export type TTenantProvisioningState = Record<
   TTenantProvisioningStep,
   TProvisioningStepState
 > & { run?: TProvisioningRun };
+
+export type TDeprovisioningStepState = {
+  status: TTenantProvisioningStepStatus;
+  error?: string;
+  updatedAt?: string;
+};
+
+export type TDeprovisioningRun = {
+  startedAt: string;
+  finishedAt?: string;
+  workflowRunUrl?: string;
+};
+
+// Keyed by every `DEPROVISIONING_STEP` UPPERCASE constant, plus the reserved
+// lowercase `run` key, mirroring `TTenantProvisioningState`.
+export type TTenantDeprovisioningState = Record<
+  TDeprovisioningStep,
+  TDeprovisioningStepState
+> & { run?: TDeprovisioningRun };
 
 // `primaryDomain` is the canonical domain; `tenant_domains` holds every
 // domain (including this one) a tenant answers to.
@@ -118,6 +138,15 @@ export const tenants = pgTable('tenants', {
   // down (alongside `status` moving to ARCHIVED). The row is archived, never
   // hard-deleted.
   deprovisionedAt: timestamp('deprovisioned_at', { mode: 'date' }),
+  // Map of every `DEPROVISIONING_STEP` key to its own progress, plus the
+  // current deprovisioning run's own metadata under `run` — see
+  // `TTenantDeprovisioningState` above. A separate column from
+  // `provisioningSteps`: `reactivateTenantAction` means a tenant can be
+  // re-provisioned after archival, so both histories need to coexist.
+  // Nullable: a tenant never deprovisioned has none.
+  deprovisioningSteps: jsonb(
+    'deprovisioning_steps',
+  ).$type<TTenantDeprovisioningState>(),
   createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' })
     .notNull()
