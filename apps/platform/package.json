@@ -25,6 +25,7 @@
     "@blog/tailwind-config": "workspace:*",
     "@blog/ui": "workspace:*",
     "@blog/utils": "workspace:*",
+    "@portabletext/editor": "^7.10.13",
     "@t3-oss/env-nextjs": "^0.13.11",
     "@vercel/blob": "^2.8.0",
     "dompurify": "^3.4.13",

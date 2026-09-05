@@ -477,8 +477,9 @@ no `site_config` row, falls back to the `CONSOLE` preset with no overrides
 — never a thrown error or an empty page. Same per-request tenant resolution
 as theme, above.
 
-`get-site-config.ts`'s cache carries a 3600s (`SITE_CONFIG_REVALIDATE_SECONDS`)
-fallback window as its safety net, but `apps/platform`'s Look/Voice/Features save
+`get-site-config.ts`'s cache carries a 3600s
+(`TENANT_CONFIG_REVALIDATE_SECONDS`, `@blog/config`) fallback window as its
+safety net, but `apps/platform`'s Look/Voice/Features save
 actions (`update-look-action.ts`/`save-voice-overrides-action.ts`/
 `update-features-action.ts`) also POST to
 `apps/web`'s `POST /api/revalidate-site-config` after a successful
@@ -821,8 +822,11 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   Git-integration/PR-preview setup. See
   [`docs/DEPLOY.md`](./docs/DEPLOY.md)'s Storybook section.
 - Deploys are CI-gated behind a `verify` job (type-check/lint/test/build) on
-  the exact commit being deployed; deploy steps no-op green until the
-  one-time console setup ([`docs/DEPLOY.md`](./docs/DEPLOY.md)) provides their secret.
+  the exact commit being deployed; the development deploy steps no-op green
+  until the one-time console setup ([`docs/DEPLOY.md`](./docs/DEPLOY.md)) provides their secret.
+  The production ones do not: they fail loudly on a missing Vercel token, org
+  id or project id, because a skipped step reports green and a tag that shipped
+  only one of the two apps would otherwise look like a complete release.
 - Historical phased rollout tickets (D0–D5) live in `docs/BACKLOG.md`.
 - Full topology detail (per-environment isolation rationale, dataset refresh
   workflow, tag-as-source-of-truth) is in [`docs/DEPLOY.md`](./docs/DEPLOY.md) —

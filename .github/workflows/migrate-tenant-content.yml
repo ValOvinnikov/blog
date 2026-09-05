@@ -158,6 +158,11 @@ jobs:
         with:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
+          # `@blog/studio...` is not optional padding: the fan-out reads each
+          # tenant's ledger with `pnpm exec sanity documents query` and then
+          # runs `node scripts/migrate.mjs` (which imports `@sanity/client`),
+          # both with `packages/studio` as their cwd.
+          install-filter: '@blog/db... @blog/studio...'
       - name: Run tenant content-migration fan-out
         # `inputs.tenantId` is attacker-influenceable on the
         # workflow_dispatch path (any repo collaborator who can trigger it

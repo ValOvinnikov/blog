@@ -116,6 +116,11 @@ jobs:
         with:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
+          # `@blog/studio...` is not optional padding: the sweep shells out to
+          # `pnpm exec sanity documents validate` with `packages/studio` as its
+          # cwd, so without the Studio's own installed tree the run dies on
+          # `Command "sanity" not found`.
+          install-filter: '@blog/db... @blog/studio...'
       - name: Run document-validation sweep
         # `inputs.tenantId` is attacker-influenceable on the workflow_dispatch
         # path (any repo collaborator who can trigger it controls it) — never

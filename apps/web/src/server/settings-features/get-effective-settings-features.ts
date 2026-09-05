@@ -1,12 +1,14 @@
-import { PRESET_ID, type TCapability } from '@blog/config';
+import {
+  PRESET_ID,
+  TENANT_CONFIG_REVALIDATE_SECONDS,
+  type TCapability,
+} from '@blog/config';
 import { queries } from '@blog/db';
 import { safeAsync } from '@blog/utils';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 import { buildSettingsFeaturesCacheTag } from '@web/utils/tenant-cache-tags';
 import { toEffectiveSettingsFeatures } from '@web/utils/to-effective-settings-features';
 import { unstable_cache } from 'next/cache';
-
-const SETTINGS_FEATURES_REVALIDATE_SECONDS = 3600;
 
 const getCachedEffectiveSettingsFeaturesForTenant = (tenantId: string) =>
   unstable_cache(
@@ -24,7 +26,7 @@ const getCachedEffectiveSettingsFeaturesForTenant = (tenantId: string) =>
     ['settings-features', tenantId],
     {
       tags: [buildSettingsFeaturesCacheTag(tenantId)],
-      revalidate: SETTINGS_FEATURES_REVALIDATE_SECONDS,
+      revalidate: TENANT_CONFIG_REVALIDATE_SECONDS,
     },
   )(tenantId);
 

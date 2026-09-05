@@ -41,6 +41,7 @@ export const makeTenant = (overrides: Partial<TTenant> = {}): TTenant => {
     status: TENANT_STATUS.ACTIVE,
     provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
     provisioningSteps: idleProvisioningSteps(),
+    deprovisioningSteps: null,
     lastNotifiedOwnerElevationOutcome: null,
     seededAt: null,
     webhookCreatedAt: null,

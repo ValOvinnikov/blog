@@ -32,6 +32,8 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import { unarchiveSanityProject } from '@blog/db/utils/sanity-management-client/sanity-management-client';
 import { sanitizeLogMessage } from '@blog/insight';
 
+import { workflowRunUrl } from '../lib/workflow-run-url/workflow-run-url';
+
 import { loadProvisionEnv, type TProvisionEnv } from './lib/env';
 import { notifyOwnerElevationOutcome } from './lib/notify-owner-elevation-outcome';
 import { recordProvisioningAuditEvent } from './lib/record-provisioning-audit-event';
@@ -41,7 +43,6 @@ import {
   reportProvisioningRunStart,
 } from './lib/report-provisioning-run';
 import { reportStepStatus } from './lib/report-step-status';
-import { workflowRunUrl } from './lib/workflow-run-url/workflow-run-url';
 import { createTenantRevalidateWebhook } from './steps/create-revalidate-webhook';
 import { createTenantSanityProject } from './steps/create-sanity-project';
 import { elevateTenantOwner } from './steps/elevate-tenant-owner';

@@ -84,8 +84,12 @@ distinct GitHub Environment variables (`VERCEL_PROJECT_ID_WEB` /
 
 ## One-time setup (human-gated console work)
 
-The workflows are written to **no-op green until their secrets exist**, so the
+Most workflows are written to **no-op green until their secrets exist**, so the
 code can merge first; the pipeline activates once the steps below are done.
+`deploy-production.yml` is the deliberate exception: its `deploy-web` and
+`deploy-admin` jobs fail loudly on a missing Vercel token, org id or project
+id, because a skipped step reports green and a tag that shipped only one of the
+two apps would otherwise look like a complete release.
 
 ### 1. Sanity — projects, datasets & tokens · https://manage.sanity.io
 

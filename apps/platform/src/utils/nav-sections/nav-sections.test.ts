@@ -82,7 +82,7 @@ describe('tenantNavSections', () => {
     expect(content!.items[0]?.badge).toBeUndefined();
   });
 
-  it('gives Look, Voice, Features and Domain distinct real hrefs in the Configuration section, badged "this milestone" in neutral tone', () => {
+  it('gives Look, Voice, Features, Domain and Email distinct real hrefs in the Configuration section, badged "this milestone" in neutral tone', () => {
     const [, , configuration] = tenantNavSections(t, 'tenant-1', 'Acme Co');
     const look = configuration!.items.find((item) => item.label === 'Look');
     const voice = configuration!.items.find((item) => item.label === 'Voice');
@@ -90,11 +90,13 @@ describe('tenantNavSections', () => {
       (item) => item.label === 'Features',
     );
     const domain = configuration!.items.find((item) => item.label === 'Domain');
+    const email = configuration!.items.find((item) => item.label === 'Email');
 
     expect(look?.href).toBe('/tenants/tenant-1/look');
     expect(voice?.href).toBe('/tenants/tenant-1/voice');
     expect(features?.href).toBe('/tenants/tenant-1/features');
     expect(domain?.href).toBe('/tenants/tenant-1/domain');
+    expect(email?.href).toBe('/tenants/tenant-1/email');
     expect(look?.href).not.toBe(voice?.href);
     expect(look?.badge).toEqual({ label: 'this milestone', tone: 'neutral' });
     expect(voice?.badge).toEqual({ label: 'this milestone', tone: 'neutral' });
@@ -106,15 +108,16 @@ describe('tenantNavSections', () => {
       label: 'this milestone',
       tone: 'neutral',
     });
+    expect(email?.badge).toEqual({ label: 'this milestone', tone: 'neutral' });
   });
 
-  it('badges the remaining four unbuilt destinations "later" in warn tone, with no href, inside the Configuration section', () => {
+  it('badges the remaining three unbuilt destinations "later" in warn tone, with no href, inside the Configuration section', () => {
     const [, , configuration] = tenantNavSections(t, 'tenant-1', 'Acme Co');
     const later = configuration!.items.filter(
       (item) => item.badge?.label === 'later',
     );
 
-    expect(later).toHaveLength(4);
+    expect(later).toHaveLength(3);
     for (const item of later) {
       expect(item.href).toBeUndefined();
       expect(item.badge?.tone).toBe('warn');
@@ -155,7 +158,7 @@ describe('tenantNavSections', () => {
 });
 
 describe('dashboardNavSections', () => {
-  it('lists exactly two sections: Content (Studio) and Configuration (Look, Voice, Features, Domain)', () => {
+  it('lists exactly two sections: Content (Studio) and Configuration (Look, Voice, Features, Domain, Email)', () => {
     const [content, configuration] = dashboardNavSections(t);
 
     expect(content!.label).toBe('Content');
@@ -166,10 +169,11 @@ describe('dashboardNavSections', () => {
       'Voice',
       'Features',
       'Domain',
+      'Email',
     ]);
   });
 
-  it('gives Look, Voice, Features, Domain and Studio their /dashboard hrefs', () => {
+  it('gives Look, Voice, Features, Domain, Email and Studio their /dashboard hrefs', () => {
     const [content, configuration] = dashboardNavSections(t);
     const look = configuration!.items.find((item) => item.label === 'Look');
     const voice = configuration!.items.find((item) => item.label === 'Voice');
@@ -177,12 +181,14 @@ describe('dashboardNavSections', () => {
       (item) => item.label === 'Features',
     );
     const domain = configuration!.items.find((item) => item.label === 'Domain');
+    const email = configuration!.items.find((item) => item.label === 'Email');
     const studio = content!.items.find((item) => item.label === 'Studio');
 
     expect(look?.href).toBe('/dashboard/look');
     expect(voice?.href).toBe('/dashboard/voice');
     expect(features?.href).toBe('/dashboard/features');
     expect(domain?.href).toBe('/dashboard/domain');
+    expect(email?.href).toBe('/dashboard/email');
     expect(studio?.href).toBe('/dashboard/studio');
     expect(studio?.badge).toBeUndefined();
   });
@@ -198,13 +204,12 @@ describe('dashboardNavSections', () => {
     expect(labels).not.toContain('Danger zone');
   });
 
-  it('drops Email, Subscribers, Comments and Team entirely — no owner-actionable route exists for them yet', () => {
+  it('drops Subscribers, Comments and Team entirely — no owner-actionable route exists for them yet', () => {
     const sections = dashboardNavSections(t);
     const labels = sections.flatMap((section) =>
       section.items.map((item) => item.label),
     );
 
-    expect(labels).not.toContain('Email');
     expect(labels).not.toContain('Subscribers');
     expect(labels).not.toContain('Comments');
     expect(labels).not.toContain('Team');

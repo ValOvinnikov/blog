@@ -9,8 +9,8 @@ name: Provision Tenant
 # — every step is independently idempotent, see `packages/db/scripts/provision-tenant/`).
 #
 # Deliberately manually-triggered only, same posture as `refresh-dev-dataset.yml`
-# — it should NOT no-op green when a secret is missing (unlike the
-# auto-triggered deploy workflows): `packages/db/scripts/provision-tenant/run.ts`
+# — it should NOT no-op green when a secret is missing (unlike
+# `deploy-development.yml`): `packages/db/scripts/provision-tenant/run.ts`
 # fails loudly, before any network call, if a required env var is absent.
 on:
   workflow_dispatch:

@@ -1,11 +1,10 @@
+import { TENANT_CONFIG_REVALIDATE_SECONDS } from '@blog/config';
 import { queries, type TTenantPlan } from '@blog/db';
 import { safeAsync } from '@blog/utils';
 import { buildTenantPlanCacheTag } from '@web/utils/tenant-cache-tags';
 import { unstable_cache } from 'next/cache';
 
 import { getRequestTenantId } from './get-request-tenant-id';
-
-const TENANT_PLAN_REVALIDATE_SECONDS = 3600;
 
 const getCachedTenantPlanForTenant = (tenantId: string) =>
   unstable_cache(
@@ -16,7 +15,7 @@ const getCachedTenantPlanForTenant = (tenantId: string) =>
     ['tenant-plan', tenantId],
     {
       tags: [buildTenantPlanCacheTag(tenantId)],
-      revalidate: TENANT_PLAN_REVALIDATE_SECONDS,
+      revalidate: TENANT_CONFIG_REVALIDATE_SECONDS,
     },
   )(tenantId);
 

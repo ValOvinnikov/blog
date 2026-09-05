@@ -1,5 +1,5 @@
 {
-  "id": "b406d035-e2e9-4e60-877c-428db0e53e4c",
+  "id": "f48f15b8-c687-47a0-b6b3-75735f78348d",
   "prevId": "db370907-5f72-45f9-a1b4-d30317ebbf84",
   "version": "7",
   "dialect": "postgresql",
@@ -1328,6 +1328,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "studio_vercel_project_id": {
+          "name": "studio_vercel_project_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "seeded_at": {
           "name": "seeded_at",
           "type": "timestamp",
@@ -1343,6 +1349,12 @@
         "deprovisioned_at": {
           "name": "deprovisioned_at",
           "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "deprovisioning_steps": {
+          "name": "deprovisioning_steps",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
