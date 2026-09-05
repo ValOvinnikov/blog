@@ -116,6 +116,92 @@ describe(updateEmailTemplateAction, () => {
     expect(requireTenantMembershipMock).not.toHaveBeenCalled();
   });
 
+  it('accepts a body whose link markDef has a safe href', async () => {
+    requireTenantMembershipMock.mockResolvedValue({
+      tenant: { id: 'tenant-1' },
+      membership: { role: 'OWNER' },
+    });
+    upsertEmailTemplateMock.mockResolvedValue({
+      tenantId: 'tenant-1',
+      templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      subject: VALID_INPUT.subject,
+      body: VALID_INPUT.body,
+      logoAssetUrl: undefined,
+    });
+
+    const input: TUpdateEmailTemplateInput = {
+      subject: 'Sign in',
+      body: [
+        {
+          _type: 'block',
+          _key: 'k1',
+          style: 'normal',
+          children: [
+            { _type: 'span', _key: 's1', text: 'click here', marks: ['link1'] },
+          ],
+          markDefs: [
+            { _type: 'link', _key: 'link1', href: 'https://acme.example' },
+          ],
+        },
+      ],
+    };
+
+    const result = await updateEmailTemplateAction(
+      'tenant-1',
+      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      input,
+    );
+
+    expect(result.ok).toBe(true);
+    expect(upsertEmailTemplateMock).toHaveBeenCalledWith(
+      'tenant-1',
+      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      input,
+    );
+  });
+
+  it.each([
+    ['a javascript: href', 'javascript:alert(1)'],
+    ['a data: href', 'data:text/html,<script>alert(1)</script>'],
+    [
+      'a case- and whitespace-obfuscated javascript: href',
+      '  JaVaScRiPt:alert(1)',
+    ],
+  ])(
+    'rejects the whole update — never reaching upsertEmailTemplate — for a body carrying %s',
+    async (_description, href) => {
+      const input: TUpdateEmailTemplateInput = {
+        subject: 'Sign in',
+        body: [
+          {
+            _type: 'block',
+            _key: 'k1',
+            style: 'normal',
+            children: [
+              {
+                _type: 'span',
+                _key: 's1',
+                text: 'click here',
+                marks: ['link1'],
+              },
+            ],
+            markDefs: [{ _type: 'link', _key: 'link1', href }],
+          },
+        ],
+      };
+
+      const result = await updateEmailTemplateAction(
+        'tenant-1',
+        EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+        input,
+      );
+
+      expect(result).toEqual({ ok: false });
+      expect(requireTenantMembershipMock).not.toHaveBeenCalled();
+      expect(upsertEmailTemplateMock).not.toHaveBeenCalled();
+    },
+  );
+
   it('accepts explicit nulls as "revert to product default"', async () => {
     requireTenantMembershipMock.mockResolvedValue({
       tenant: { id: 'tenant-1' },

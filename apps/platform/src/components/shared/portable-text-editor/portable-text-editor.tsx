@@ -1,6 +1,7 @@
 'use client';
 
 import type { TPortableTextBlock } from '@blog/db/schema/email-templates';
+import { sanitizeHref } from '@blog/email';
 import { EMAIL_PORTABLE_TEXT_SCHEMA } from '@platform/utils/portable-text-schema/portable-text-schema';
 import {
   EditorProvider,
@@ -56,9 +57,10 @@ export const PortableTextEditor = ({
     children,
   }: BlockAnnotationRenderProps) => {
     if (value._type !== 'link') return children;
-    const href = typeof value.href === 'string' ? value.href : undefined;
+    const rawHref = typeof value.href === 'string' ? value.href : '';
+    const safeHref = sanitizeHref(rawHref);
     return (
-      <a href={href} className={link()}>
+      <a href={safeHref ?? undefined} className={link()}>
         {children}
       </a>
     );
