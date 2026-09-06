@@ -1,12 +1,12 @@
 import type {
-  RichText,
   TBrandVariantOf,
   TLayout,
   TMaybeUndefined,
+  TPortableTextBody,
 } from '@blog/config';
 
 export type TContentModule = {
   brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
-  body: RichText;
+  body: TPortableTextBody;
   layout: TMaybeUndefined<TLayout>;
 };

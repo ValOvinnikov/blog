@@ -1,4 +1,8 @@
-import type { BlockText, RichText, TMaybeUndefined } from '@blog/config';
+import type {
+  BlockText,
+  TMaybeUndefined,
+  TPortableTextBody,
+} from '@blog/config';
 import type { TSeoResolved } from '@blog/service/shared/transformers/resolve-seo';
 import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
 import type { TSocialLink } from '@blog/service/shared/transformers/to-social-link';
@@ -22,7 +26,7 @@ export type TPostSkim = {
 };
 
 export type TPostDetail = Omit<TPostCard, 'author' | 'topic'> & {
-  body: RichText;
+  body: TPortableTextBody;
   skim: TMaybeUndefined<TPostSkim>;
   hasAsides: boolean;
   seo: TSeoResolved;

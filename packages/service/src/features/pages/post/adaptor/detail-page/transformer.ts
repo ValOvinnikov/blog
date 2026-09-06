@@ -3,6 +3,7 @@ import type { TSiteSettings } from '@blog/service/features/global/site-settings/
 import type { TImageTenant } from '@blog/service/sanity/image';
 import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
+import { toPortableTextBody } from '@blog/service/shared/transformers/to-portable-text-body';
 import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import { toSocialLink } from '@blog/service/shared/transformers/to-social-link';
@@ -80,7 +81,7 @@ export function toPostDetail(
     // value to `true`, so `?? true` here only covers a theoretical
     // unmigrated row, mirroring `featured`'s own `?? false` shape.
     newsletterEnabled: raw.newsletterEnabled ?? true,
-    body: raw.body,
+    body: toPortableTextBody(raw.body, tenant),
     skim: toPostSkim(raw.skim),
     hasAsides: raw.body.some((block) => block._type === 'aside'),
     // `page_post.seo` is the override — mirrors `page_topic`/`page_blog`,

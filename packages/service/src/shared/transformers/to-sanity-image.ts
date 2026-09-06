@@ -12,8 +12,15 @@ import type { InferFragmentType } from 'groqd';
 
 export type TRawSanityImage = InferFragmentType<typeof sanityImageFragment>;
 
+// Same shape as `TRawSanityImage`, but the asset is nullable — accepted so a
+// `bodyImage` block whose asset was never selected, or points at a deleted
+// document (`bodyImageFragment`'s shape), is a valid argument too.
+type TRawSanityImageInput = Omit<TRawSanityImage, 'asset'> & {
+  asset: TRawSanityImage['asset'] | null;
+};
+
 function toHotspot(
-  raw: TRawSanityImage['hotspot'],
+  raw: TRawSanityImageInput['hotspot'],
 ): TMaybeUndefined<ISanityImageHotspot> {
   if (
     !raw ||
@@ -29,7 +36,7 @@ function toHotspot(
 }
 
 function toCrop(
-  raw: TRawSanityImage['crop'],
+  raw: TRawSanityImageInput['crop'],
 ): TMaybeUndefined<ISanityImageCrop> {
   if (
     !raw ||
@@ -45,7 +52,7 @@ function toCrop(
 }
 
 function toDimensions(
-  raw: TRawSanityImage['asset']['metadata'],
+  raw: NonNullable<TRawSanityImageInput['asset']>['metadata'],
 ): TMaybeUndefined<ISanityImageDimensions> {
   const dimensions = raw?.dimensions;
   if (
@@ -65,7 +72,7 @@ function toDimensions(
 }
 
 export function toSanityImage(
-  raw: TRawSanityImage | null | undefined,
+  raw: TRawSanityImageInput | null | undefined,
   tenant: TImageTenant,
 ): TMaybeUndefined<ISanityImage> {
   if (!raw?.asset) return undefined;

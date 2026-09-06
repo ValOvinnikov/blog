@@ -71,14 +71,11 @@ export function makeRawContentModule(
 ): TRawContentModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    body: [
-      {
-        _type: 'block',
-        _key: 'block-1',
-        style: 'normal',
-        children: [{ _type: 'span', _key: 'span-1', text: 'Hello.' }],
-      },
-    ],
+    // Only `_key`/`_type` are typeable here for a non-`bodyImage` block —
+    // `portableTextBodyItemFragment`'s `'...'` spread on this heterogeneous
+    // array can't statically type a member's other fields, though the query
+    // does return them at runtime.
+    body: [{ _type: 'block', _key: 'block-1' }],
     layout: null,
     ...overrides,
   };
