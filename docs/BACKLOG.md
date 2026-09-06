@@ -68,7 +68,15 @@ flowchart LR
     ENG["#1040 comments · #1041 ratings<br/>#1043 bookmarks · #1044 newsletter"]
     FND --> AUTH --> ENG
   end
-  DONE --> M0 --> M1 --> P3 --> M2 --> M3 --> M5
+  subgraph M10["M10 Generic home page (GitHub: M10, new)"]
+    H0["Phase 0 hero family slot · HERO_MAP"]
+    H1["Phase 1 blog: heroBlog · grid images<br/>postFeatured · carousel · topic cards"]
+    H2["Phase 2 heroStatement · heroProfile"]
+    H3["Phase 3 marketing modules · contact form"]
+    H0 --> H1 --> H2 --> H3
+  end
+  DONE --> M0 --> M1 --> P3 --> M2 --> M3 --> M5 --> M10
+  H2 -.->|heroProject · projectList| M9["M9 Portfolio #1919"]
   M14 -.->|webhook plumbing| M33
   P3a -.->|post route 76/90| M33
   M31 -.->|shared #984 bootstrap| FND
@@ -702,3 +710,308 @@ newsletter **campaign composition/sending** UI (signup only); email
 **notifications** for any feature. The `packages/db` schema/migrations
 themselves are owned by #984 + each epic's own `db` sub-issue — the design docs
 consume those shapes, they don't design them.
+
+---
+
+## M10 — Generic home page & module catalogue (GitHub: `M10 — Home page variants`, to be created)
+
+> **Design source of truth:**
+> `docs/superpowers/specs/2026-08-23-module-and-page-type-portfolio-design.md`
+> (module catalogue, contact form, portfolio strand — resynced 2026-09-06)
+> plus the per-module design sub-issues this section files. Portfolio itself
+> (#1919 / #1290 / #1291 / #1292) stays in **M9 — Portfolio** and slots in
+> after Phase 2 below; nothing here duplicates it.
+
+**The problem this milestone solves.** `page_home` is a blog home page and
+nothing else: its required `hero` slot accepts only `module_hero`, which is a
+featured-post module (every field is a "use the post's value / custom" pair,
+the primary action always links to a post, and with no post there is no
+primary CTA at all), and its `modules[]` allow-list admits only latest posts,
+CTA and newsletter. A tenant wanting a marketing, portfolio or personal home
+page has no way to author one. The fix is a **hero family** (one module type
+per hero kind, admitted by a widened slot) and a **module catalogue** wide
+enough to compose the popular home-page archetypes — blog, portfolio, agency,
+product, consultant, local business, newsletter-first — with no code.
+
+**Decisions taken 2026-09-06 (in conversation; recorded here so they bind
+every sub-issue):**
+
+- **Separate hero types, not one generalised hero with a `source` switch.**
+  Sanity fixes a named type's field list and option lists at registration, so
+  a single switched type needs `hidden` callbacks and conditional validators
+  on every field — the same workaround CTA's two position fields already
+  document. Separate types get honest required fields, and the repo already
+  chose types over modes for `module_postList` / `module_postLatest`.
+- **The blog hero is rebuilt as `module_heroBlog`, no migration.** The
+  existing `module_hero` stays live untouched until the new type replaces it
+  on production; a retirement ticket then removes it (Phase 1.1 below).
+  Sanity `_type`s are immutable, so the retirement is a per-tenant content
+  migration in its own right (create → repoint → delete, two steps).
+- **Every new module ships design-first.** Each module gets one design
+  sub-issue whose output is a short design section (schema fields, view
+  model, organism API, page allow-lists), followed by **four implementation
+  sub-issues — `studio → service → ui → web`** — in the repo's dependency
+  order (`ui` consumes `service`'s view-model types, so `service` precedes
+  `ui`). Where a module also needs `config`, `db` or `email`, that layer gets
+  its own sub-issue too; where a layer has nothing to do, the epic says so
+  rather than filing an empty ticket.
+- **Platform style is mandatory and identical for every module.** Studio:
+  `titleField`, `brandVariantField`, `sectionHeaderField` (where the module
+  has a heading), `defineAlignmentFields`, `layoutField`, a named
+  `{name}Schema` export, a desk-group entry, page allow-list entries.
+  Service: `service.modules.<name>.v1`, explicit projections, `T | undefined`
+  view models with no faked defaults, tenant-scoped ISR tags. UI: one pure
+  organism, compound slots for anything the web layer builds, stories and
+  tests. Web: `MODULE_MAP`/`HERO_MAP` entry, `Section` wrapper,
+  `REVALIDATE_TAGS` entry, a client leaf only for genuine interactivity.
+  Copy: per-instance content on the module, feature copy on a `settings_*`
+  singleton, nothing in Voice. Write paths get a `CAPABILITY` key and the
+  `isTenantActive()` gate.
+- **Grid vs. carousel is a display option on listing modules, not two
+  modules.** Data scope (which posts, how many) is the one-module-per-mode
+  axis; presentation is a per-instance field, like CTA's `variant`. Carousel
+  uses **Embla** (`embla-carousel-react`) in an `apps/web` client leaf; the
+  `@blog/ui` organism stays pure and renders a scroll-snap track that works
+  before hydration. No autoplay, reduced motion honoured, previous/next
+  buttons for keyboard reach.
+- **Blog first.** Phase 0 (make the home page generic) and Phase 1 (the blog
+  modules) are `prio:next`; Phases 2–4 are `prio:later` until Phase 1 ships.
+
+### Sequencing
+
+```mermaid
+flowchart TD
+  P0["Phase 0 · Generic home page<br/>hero family slot · HERO_MAP · page allow-lists"]
+  P1a["1.1 module_heroBlog<br/>+ retire module_hero"]
+  P1b["1.2 post grid images + toggle"]
+  P1c["1.3 module_postFeatured"]
+  P1d["1.4 carousel display mode (Embla)"]
+  P1e["1.5 taxonomy list placeable"]
+  P2["Phase 2 · Hero family<br/>heroStatement · heroProfile"]
+  P3["Phase 3 · Marketing modules<br/>featureGrid · testimonial · logoWall · stats · faq · embed<br/>featureHighlights · team · location · contactForm"]
+  P4["Phase 4 · Onboarding templates<br/>site-kind at tenant creation"]
+  M9["M9 · Portfolio (#1919)<br/>project entity · page_work · heroProject · projectList/Latest"]
+  P0 --> P1a & P1b & P1e
+  P1b --> P1c --> P1d
+  P0 --> P2 --> P3
+  P2 --> M9
+  P1d -.->|carousel reused| M9
+  P3 --> P4
+  P2 --> P4
+```
+
+### Phase 0 · Generic home page — epic `feat: generic home page & hero family infrastructure`
+
+- **Milestone / labels:** `M10` · epic `enhancement`, `prio:next`; sub-issues
+  add their layer label.
+- **Depends on:** nothing — additive throughout.
+- **Design sub-issue** · `docs: design the hero family slot & home page
+generalisation` — output: a design section covering the derived hero type,
+  the widened slots, the `HERO_MAP` dispatcher and the `defineHeroFields()`
+  studio helper. Must answer: which pages get a hero slot (home required,
+  landing page optional, work page later), and what the shared hero field set
+  is (brand variant, hero layout, image, actions, content position, content
+  alignment, mobile media order).
+- **Sub-issues (dependency order):**
+  - **config** · `feat(config): derive THeroModuleType from the module_hero*
+naming convention` — `Extract<TModuleType, \`module_hero${string}\`>`, the
+same template-literal trick that derives `TModuleType`; a
+`TSlotModuleType`union covering the hero family plus`module_postList`/`module_taxonomyList`, so `MODULE_MAP`'s `Exclude` names one type instead
+    of listing each.
+  - **studio** · `feat(studio): hero family slot on page_home and
+page_generic` — `page_home.hero` `to:` accepts every hero type;
+    `page_generic` gains an optional `hero` slot with the same list;
+    `page_home.modules` allow-list widens to every `modules[]` module (today
+    only latest/CTA/newsletter); the duplicate-blank-heading validator
+    generalises past `module_postLatest`; `defineHeroFields()` helper emitting
+    the shared hero tail. `pnpm typegen`, commit generated types.
+  - **service** · `feat(service): project the hero slot's _type on home and
+generic page view models` — the page loaders return `{ id, type }` for the
+    slot so the web dispatcher can branch without a second fetch; landing
+    page loader gains the optional hero.
+  - **ui** · none — no organism changes in this phase.
+  - **web** · `feat(web): HERO_MAP dispatcher and hero slot on home and
+landing pages` — `Record<THeroModuleType, …>` so an unregistered hero kind
+    is a compile error, mirroring `MODULE_MAP`; `MODULE_MAP` excludes via
+    `TSlotModuleType`; `[slug]` page renders the optional hero above
+    `modules[]`; `REVALIDATE_TAGS` keyed on the derived type.
+- **Acceptance:** `page_home.hero` and `page_generic.hero` accept the hero
+  family; adding a `module_hero*` schema without a `HERO_MAP` entry fails
+  `type-check`; every existing page renders unchanged (`module_hero` still
+  the only member of the family at this point).
+
+### Phase 1 · Blog — `prio:next`
+
+#### 1.1 `module_heroBlog` — epic `feat: module_heroBlog (featured-post hero, rebuilt)`
+
+- **Depends on:** Phase 0.
+- **Design sub-issue** · rebuilds the featured-post hero against the current
+  hero's known faults: (a) four mode/value pairs collapse to **optional
+  override fields** (eyebrow, title, subtitle — unset means "use the
+  post's", per the no-faked-defaults rule) with only the image keeping a
+  three-state mode (post / custom / none), so `HERO_FIELD_MODE` shrinks to
+  the image's values; (b) actions use the `ctaAction` shape (label, variant,
+  appearance) with the primary href derived from the post, and a real
+  secondary action instead of a bare link; (c) content position, alignment
+  and mobile media order via `defineHeroFields()`; (d) the newest-featured
+  fallback becomes an explicit, visible choice with an error (not a warning)
+  when neither a pinned post nor a featured post exists at author time.
+- **Sub-issues:**
+  - **studio** · `feat(studio): module_heroBlog schema` — new type beside
+    `module_hero`; desk group "Heroes" lists both; `page_home`/`page_generic`
+    slots admit it. Typegen.
+  - **service** · `feat(service): heroBlog loader with one coalesced query` —
+    the pinned-or-newest-featured resolution in **one** GROQ round trip (the
+    current hero fires the fallback query on every request, pinned or not);
+    its own `THeroBlogAction` view model instead of an `ILink` padded with
+    `undefined`; no masking of an empty override.
+  - **ui** · `feat(ui): Hero organism gains content position, alignment and
+mobile media order` — the one `Hero` organism serves the whole family;
+    props follow CTA's names; stories per position.
+  - **web** · `feat(web): heroBlog view + HERO_MAP entry` — view, `Section`
+    wrapper, `REVALIDATE_TAGS`, an empty title unreachable rather than a
+    silent `null`.
+  - **db** · `feat(db): starter content seeds module_heroBlog` —
+    `packages/db/scripts/provision-tenant/steps/starter-content.ts` seeds
+    the new type for new tenants.
+- **Retirement ticket (filed now, blocked):** `chore: retire module_hero
+once module_heroBlog replaces it on production` — `prio:later`, blocked on
+  the epic above **and** on every production tenant's `page_home.hero`
+  pointing at a `module_heroBlog`. Two migration steps per tenant (create the
+  `heroBlog` document from the `hero` document and repoint the slot; then
+  delete the old document), run through `packages/db/scripts/migrate-tenant-content/`,
+  dry-run → backup → human-gated. Then delete the schema, service slice,
+  web view, `HERO_FIELD_MODE`'s post values, and the desk entry.
+- **Acceptance:** a tenant can author a blog hero with no pinned post and
+  still get a primary CTA; overrides render only when set; one Sanity round
+  trip per hero render; `module_hero` documents keep rendering until retired.
+
+#### 1.2 Post grid images + show/hide toggle — epic `feat: post grid images with a per-module toggle`
+
+- **Depends on:** nothing (parallel to 1.1). **Finding:** the grid renders
+  no images today — `PostsSection`'s `IPostCardData` has no image field even
+  though `PostCard` has a `Media` slot — so this threads images through
+  first, then adds the switch.
+- **Design sub-issue** · field name and default (`showImages`, default on),
+  image crop/aspect for cards, whether `module_postList` (paginated archive)
+  gets the same toggle (proposed: yes, same helper).
+- **Sub-issues:**
+  - **studio** · `feat(studio): showImages on module_postLatest and
+module_postList`.
+  - **service** · `feat(service): project the post card image into list and
+latest view models` — `postCardFragment` already carries `heroImageSanity`;
+    the modules project `showImages` and pass the image only when on.
+  - **ui** · `feat(ui): PostsSection renders PostCard.Media` — `hasImages`
+    boolean prop (repo boolean naming), image passed as a pre-rendered node
+    per card so the organism never builds an image itself.
+  - **web** · `feat(web): SanityImage bridge for post grid cards` — both
+    module views and the blog/topic/tag archive pages.
+- **Acceptance:** grids show the post image by default; the toggle hides it
+  per module instance; archive pages unchanged when the toggle is on.
+
+#### 1.3 `module_postFeatured` — epic `feat: module_postFeatured (editor-pinned spotlight)`
+
+- **Depends on:** 1.2 (card images).
+- **Design sub-issue** · one to three editor-chosen posts in a spotlight
+  layout (first post large, rest as cards), an `h2` section for `modules[]`
+  anywhere — distinct from `module_heroBlog` (owns the page `h1`) and from
+  `module_postLatest` (automatic). Validation: unique refs, published only.
+- **Sub-issues:** **studio** · `feat(studio): module_postFeatured schema`;
+  **service** · `feat(service): postFeatured loader`; **ui** ·
+  `feat(ui): FeaturedPosts organism (spotlight layout)`; **web** ·
+  `feat(web): postFeatured MODULE_MAP entry`.
+- **Acceptance:** placeable on home, blog and landing pages; renders nothing
+  when every pinned post is unpublished; images follow the 1.2 toggle.
+
+#### 1.4 Carousel display mode (Embla) — epic `feat: carousel display mode for listing modules`
+
+- **Depends on:** 1.2, 1.3.
+- **Design sub-issue** · `displayMode` (`GRID` / `CAROUSEL`) on
+  `module_postLatest` and `module_postFeatured` (not `module_postList`, which
+  paginates); the pure track markup vs. the Embla leaf boundary; Embla
+  options (align start, one slide per scroll, no autoplay, `dragFree` off);
+  reduced-motion and keyboard behaviour; verify the current Embla API via
+  context7 at implementation time.
+- **Sub-issues:**
+  - **config** · `feat(config): DISPLAY_MODE const`.
+  - **studio** · `feat(studio): displayMode on post listing modules`.
+  - **service** · `feat(service): project displayMode`.
+  - **ui** · `feat(ui): Carousel organism — pure scroll-snap track with
+prev/next slots` — works before hydration; buttons and disabled states are
+    props.
+  - **web** · `feat(web): Embla client leaf wrapping the Carousel organism` —
+    `embla-carousel-react` added to `apps/web` only; web Storybook story.
+- **Acceptance:** grid remains the default; carousel mode is swipeable
+  without JS and Embla-driven with it; no autoplay; buttons keyboard
+  reachable; reduced motion respected.
+
+#### 1.5 Taxonomy list placeable in `modules[]` — epic `feat: topic cards on the home page`
+
+- **Depends on:** Phase 0.
+- **Design sub-issue** · today `module_taxonomyList` is slot-only and infers
+  its taxonomy from the index page holding it. Placed in `modules[]` it needs
+  an authored `taxonomy` field (topics / tags) — decide whether that field is
+  hidden when the module sits in a slot, or whether a sibling
+  `module_taxonomyCards` is cleaner. Proposed: authored field, one type.
+- **Sub-issues:** **studio** · allow on `page_home`/`page_generic` + the
+  field; **service** · read the authored taxonomy when present; **ui** · none
+  expected; **web** · `MODULE_MAP` entry (currently excluded).
+- **Acceptance:** a blog home can show topic cards between latest posts and
+  the newsletter.
+
+### Phase 2 · Hero family — `prio:later` until Phase 1 ships
+
+Each is an epic with a design sub-issue and `studio → service → ui → web`
+implementation sub-issues. `service` returns a per-kind view model; the `ui`
+`Hero` organism grows compound slots rather than new organisms.
+
+- **2.1 `module_heroStatement`** — marketing headline: eyebrow, required
+  heading, supporting text, optional image, `actionGroup`, the shared hero
+  tail. Sub-issues: studio (schema + slots), service (loader), ui (none
+  beyond Phase 1.1's organism, unless the design adds a background-image
+  variant), web (`HERO_MAP` entry).
+- **2.2 `module_heroProfile`** — person or freelancer: name, role, avatar,
+  short bio, social links, `actionGroup`. Sub-issues: studio, service, ui
+  (`Hero.Avatar` and `Hero.Social` slots), web.
+- **`module_heroProject`** stays with #1291 in M9 — it needs the `project`
+  entity.
+
+### Phase 3 · Marketing modules — `prio:later`
+
+One epic per module, each: design sub-issue → `studio → service → ui → web`.
+Read-only modules are one issue per layer and nothing else; the contact form
+adds `config`, `db` and `email`. Order by archetypes unlocked:
+
+1. **`module_featureGrid`**, **`module_testimonial`**, **`module_logoWall`**,
+   **`module_stats`** — together they complete the agency and product pages;
+   file as one batch.
+2. **`module_contactForm`** — the first write path. Extra sub-issues:
+   **config** (`CAPABILITY` key), **db** (`leads` table + `settings_features`
+   column, two generated migrations), **email** (lead-notification template),
+   plus a **studio** `settings_contact` singleton for feature copy. Open
+   decisions to settle in its design: FREE vs. GROWTH entitlement; where a
+   tenant reads leads before any CRM UI.
+3. **`module_faq`** (disclosure in a web client leaf), **`module_embed`**
+   (video, booking, maps).
+4. **`module_featureHighlights`** (repeatable image + text rows),
+   **`module_team`** (reuse `blog_author` as the person),
+   **`module_location`** (address, hours, map embed; feeds `LocalBusiness`
+   JSON-LD), **`module_pricing`**, **`module_timeline`**.
+
+### Phase 4 · Onboarding templates — `prio:later`
+
+- **Epic** `feat(platform-app): choose a site kind at tenant creation` — a
+  step in the tenant-creation flow (blog / portfolio / business / personal)
+  that seeds a matching home page: the right hero type plus a module set.
+  Sub-issues: **db** (starter-content variants in the provisioning script),
+  **platform-app** (the step and its copy). Depends on Phases 1–3 having the
+  modules each template needs; the blog template can ship after Phase 1
+  alone.
+
+### Non-goals (recorded so M10 doesn't sprawl)
+
+Renaming `module_hero` in place (immutable `_type`; retirement is the path);
+a CRM for leads; per-module visuals beyond tokens and the shared styling
+helpers; carousel autoplay; a hero on `page_post` / taxonomy pages (their
+required slots already own the page top); site-wide announcement bar
+(belongs on `settings_site`, tracked separately if wanted).
