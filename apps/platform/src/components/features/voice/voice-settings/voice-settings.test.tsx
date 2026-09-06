@@ -1,7 +1,6 @@
 import {
   renderWithIntl,
   screen,
-  waitFor,
   within,
 } from '@platform/testing/custom-render';
 import userEvent from '@testing-library/user-event';
@@ -231,7 +230,7 @@ describe(VoiceSettings, () => {
     expect(refresh).not.toHaveBeenCalled();
   });
 
-  it('shows a spinner and marks Save busy while the save is in flight', async () => {
+  it('shows a spinner, marks Save busy, and announces the pending state to assistive tech while the save is in flight', async () => {
     let resolveAction: (value: { ok: boolean }) => void = () => {};
     const saveAction = vi.fn(
       () =>
@@ -250,11 +249,13 @@ describe(VoiceSettings, () => {
 
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-    const saveButton = screen.getByRole('button', { name: 'Save changes' });
-    await waitFor(() =>
-      expect(saveButton).toHaveAttribute('aria-busy', 'true'),
-    );
+    const saveButton = await screen.findByRole('button', { name: 'Saving…' });
+    expect(saveButton).toHaveAttribute('aria-busy', 'true');
     expect(saveButton).toBeDisabled();
+    // The button is force-blurred by becoming natively disabled, so the
+    // announcement a screen-reader user actually gets comes from this
+    // separate live region, not from the button's own aria-busy/label.
+    expect(screen.getByRole('status', { name: 'Saving…' })).toBeInTheDocument();
 
     resolveAction({ ok: true });
   });

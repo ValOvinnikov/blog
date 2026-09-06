@@ -85,9 +85,10 @@ export const FeaturesSettings = ({
             onClick={handleSubmit}
             isDisabled={isArchived}
             isPending={isPending}
+            pendingLabel={t('savingButton')}
             aria-describedby={isArchived ? archivedNoticeId : undefined}
           >
-            {isPending ? t('savingButton') : t('saveButton')}
+            {t('saveButton')}
           </Button>
         }
       />

@@ -157,9 +157,10 @@ export const EmailTemplateEditor = ({
             onClick={handleSubmit}
             isDisabled={isArchived}
             isPending={isPending}
+            pendingLabel={t('savingButton')}
             aria-describedby={archivedDescribedBy}
           >
-            {isPending ? t('savingButton') : t('saveButton')}
+            {t('saveButton')}
           </Button>
         </div>
       </Card.Footer>

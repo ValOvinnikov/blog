@@ -155,9 +155,10 @@ export const LookForm = ({
               onClick={handleSubmit}
               isDisabled={!isDirty || isArchived}
               isPending={isPending}
+              pendingLabel={t('savingButton')}
               aria-describedby={isArchived ? archivedNoticeId : undefined}
             >
-              {isPending ? t('savingButton') : t('saveButton')}
+              {t('saveButton')}
             </Button>
           </>
         }

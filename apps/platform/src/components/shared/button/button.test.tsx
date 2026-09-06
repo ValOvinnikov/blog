@@ -78,10 +78,10 @@ describe(Button, () => {
     ).toHaveAccessibleDescription('This tenant is archived.');
   });
 
-  it('disables the button, sets aria-busy, and keeps the label accessible while pending', () => {
-    render(<Button isPending={true}>Saving…</Button>);
+  it('disables the button and sets aria-busy while pending', () => {
+    render(<Button isPending={true}>Save</Button>);
 
-    const button = screen.getByRole('button', { name: 'Saving…' });
+    const button = screen.getByRole('button', { name: 'Save' });
     expect(button).toBeDisabled();
     expect(button).toHaveAttribute('aria-busy', 'true');
   });
@@ -92,11 +92,11 @@ describe(Button, () => {
 
     render(
       <Button isPending={true} onClick={handleClick}>
-        Saving…
+        Save
       </Button>,
     );
 
-    await user.click(screen.getByRole('button', { name: 'Saving…' }));
+    await user.click(screen.getByRole('button', { name: 'Save' }));
     expect(handleClick).not.toHaveBeenCalled();
   });
 
@@ -106,5 +106,44 @@ describe(Button, () => {
     const button = screen.getByRole('button', { name: 'Save' });
     expect(button).toBeEnabled();
     expect(button).toHaveAttribute('aria-busy', 'false');
+  });
+
+  it('shows pendingLabel as the button label in place of children while pending', () => {
+    render(
+      <Button isPending={true} pendingLabel="Saving…">
+        Save
+      </Button>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Saving…' })).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Save' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('announces pendingLabel through a screen-reader-only live region, which survives the button being force-blurred by becoming disabled', () => {
+    render(
+      <Button isPending={true} pendingLabel="Saving…">
+        Save
+      </Button>,
+    );
+
+    expect(screen.getByRole('status', { name: 'Saving…' })).toBeInTheDocument();
+  });
+
+  it('renders no status region when not pending', () => {
+    render(
+      <Button pendingLabel="Saving…" isPending={false}>
+        Save
+      </Button>,
+    );
+
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+
+  it('renders no status region while pending if no pendingLabel is given', () => {
+    render(<Button isPending={true}>Save</Button>);
+
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 });

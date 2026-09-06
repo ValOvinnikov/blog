@@ -42,7 +42,7 @@ export const ExternalLinkButton = ({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={buttonVariants({ variant, size, class: className })}
+      className={buttonVariants({ variant, size }).root({ class: className })}
       aria-label={ariaLabel}
       title={title}
     >

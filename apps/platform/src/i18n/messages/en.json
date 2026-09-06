@@ -419,6 +419,7 @@
     "heading": "Voice",
     "description": "The words the site puts in its own mouth. Your preset already sets sensible defaults.",
     "saveButton": "Save changes",
+    "savingButton": "Saving…",
     "alertSuccess": "Saved voiceOverrides.",
     "alertError": "Couldn't save — try again.",
     "basicHeading": "Basic",

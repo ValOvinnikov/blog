@@ -93,6 +93,7 @@ export const VoiceSettings = ({
             onClick={handleSubmit}
             isDisabled={isArchived}
             isPending={isPending}
+            pendingLabel={t('savingButton')}
             aria-describedby={isArchived ? archivedNoticeId : undefined}
           >
             {t('saveButton')}

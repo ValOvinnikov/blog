@@ -139,10 +139,12 @@ export const EmailSettingsForm = ({
             type="button"
             variant="primary"
             onClick={handleSubmit}
-            isDisabled={isPending || isArchived}
+            isDisabled={isArchived}
+            isPending={isPending}
+            pendingLabel={t('savingButton')}
             aria-describedby={archivedDescribedBy}
           >
-            {isPending ? t('savingButton') : t('saveButton')}
+            {t('saveButton')}
           </Button>
         </div>
       </Card.Footer>

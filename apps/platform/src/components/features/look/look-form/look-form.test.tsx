@@ -182,7 +182,7 @@ describe(LookForm, () => {
     );
   });
 
-  it('shows a spinner and marks Save busy while the save is in flight', async () => {
+  it('shows a spinner, marks Save busy, and announces the pending state to assistive tech while the save is in flight', async () => {
     let resolveAction: (value: { ok: boolean }) => void = () => {};
     updateLookActionMock.mockImplementation(
       () =>
@@ -207,6 +207,10 @@ describe(LookForm, () => {
     const saveButton = await screen.findByRole('button', { name: 'Saving…' });
     expect(saveButton).toHaveAttribute('aria-busy', 'true');
     expect(saveButton).toBeDisabled();
+    // The button is force-blurred by becoming natively disabled, so the
+    // announcement a screen-reader user actually gets comes from this
+    // separate live region, not from the button's own aria-busy/label.
+    expect(screen.getByRole('status', { name: 'Saving…' })).toBeInTheDocument();
 
     resolveAction({ ok: true });
   });

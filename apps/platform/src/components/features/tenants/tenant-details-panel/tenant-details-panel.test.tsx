@@ -768,7 +768,7 @@ describe(TenantDetailsPanel, () => {
       ).toBeDisabled();
     });
 
-    it('stays disabled while a save is in flight, even with dirty values', async () => {
+    it('stays disabled and announces the pending state to assistive tech while a save is in flight, even with dirty values', async () => {
       let resolveAction: (value: {
         ok: true;
         tenant: ReturnType<typeof makeTenant>;
@@ -801,6 +801,12 @@ describe(TenantDetailsPanel, () => {
       });
       expect(saveButton).toBeDisabled();
       expect(saveButton).toHaveAttribute('aria-busy', 'true');
+      // The button is force-blurred by becoming natively disabled, so the
+      // announcement a screen-reader user actually gets comes from this
+      // separate live region, not from the button's own aria-busy/label.
+      expect(
+        screen.getByRole('status', { name: 'Saving…' }),
+      ).toBeInTheDocument();
 
       resolveAction({
         ok: true,
