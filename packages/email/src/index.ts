@@ -32,3 +32,4 @@ export {
   type TNewsletterConfirmationEmailContent,
 } from './templates/tenant';
 export { sendEmail, type TSendEmailInput } from './transport/send-email';
+export { isValidEmailAddress } from './validation';

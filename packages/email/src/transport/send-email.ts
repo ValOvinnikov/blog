@@ -3,7 +3,7 @@ import 'server-only';
 import { env } from '@blog/email/utils/env/env';
 import { Resend } from 'resend';
 
-const REPLY_TO_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { isValidEmailAddress } from '@blog/email/validation';
 
 export type TSendEmailInput = {
   to: string;
@@ -39,7 +39,7 @@ export async function sendEmail({
   headers,
   replyTo,
 }: TSendEmailInput): Promise<void> {
-  if (replyTo !== undefined && !REPLY_TO_PATTERN.test(replyTo)) {
+  if (replyTo !== undefined && !isValidEmailAddress(replyTo)) {
     throw new Error('sendEmail received a malformed replyTo address');
   }
 

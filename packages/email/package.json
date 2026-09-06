@@ -6,7 +6,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./html": "./src/html/index.ts",
-    "./templates/tenant": "./src/templates/tenant/index.ts"
+    "./templates/tenant": "./src/templates/tenant/index.ts",
+    "./validation": "./src/validation/index.ts"
   },
   "scripts": {
     "lint": "eslint .",
