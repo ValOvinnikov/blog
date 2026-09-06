@@ -276,7 +276,7 @@ Slots:
 
 ### BookmarksList — `organisms/bookmarks-list/bookmarks-list.tsx`
 
-the `/bookmarks` page's terminal directory-listing body, styled as `ls -l` output: one row per saved post with an optional caller-supplied prefix glyph, a pre-formatted date, and the post rendered as a filename-styled link.
+renders a reader's saved posts as one row per bookmark, each with a date and a link to the post, or `emptyMessage` when there are none.
 Props: rows: IBookmarkRow[] · emptyMessage: string · hint?: string · prefix?: ReactNode · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 
 ### ContentModule — `organisms/content-module/content-module.tsx`

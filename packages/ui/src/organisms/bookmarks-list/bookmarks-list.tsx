@@ -27,12 +27,9 @@ export type TBookmarksListProps = IWithClassName &
   };
 
 /**
- * BookmarksList — the `/bookmarks` page's terminal directory-listing body,
- * styled as `ls -l` output: one row per saved post with an optional
- * caller-supplied prefix glyph, a pre-formatted date, and the post rendered
- * as a filename-styled link. Renders `emptyMessage` in place of the listing
- * when there are no saved posts. The surrounding window-chrome shell (title
- * bar, `$ ls ~/bookmarks -l` prompt) is composed by the caller.
+ * BookmarksList — renders a reader's saved posts as one row per bookmark,
+ * each with a date and a link to the post, or `emptyMessage` when there are
+ * none.
  */
 export const BookmarksList = ({
   rows,
