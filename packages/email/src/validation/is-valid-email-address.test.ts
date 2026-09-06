@@ -1,27 +1,37 @@
 import { isValidEmailAddress } from './is-valid-email-address';
 
 describe('isValidEmailAddress', () => {
-  it('accepts a well-formed address', () => {
-    expect(isValidEmailAddress('editor@example.com')).toBe(true);
+  const cases: Array<[string, boolean]> = [
+    ['editor@example.com', true],
+    ['reader+tag@mail.example.com', true],
+    ['a@b.c', true],
+    ['a.b@c.d', true],
+    ['user@a..b', true],
+    ['not-an-email', false],
+    ['someone@localhost', false],
+    ['some one@example.com', false],
+    ['', false],
+    ['@example.com', false],
+    ['user@', false],
+    ['user@example', false],
+    ['user@.com', false],
+    ['user@com.', false],
+    ['a@b@c.com', false],
+    ['user@examp le.com', false],
+  ];
+
+  it.each(cases)('evaluates %s as %s', (value, expected) => {
+    expect(isValidEmailAddress(value)).toBe(expected);
   });
 
-  it('accepts an address with a subdomain and a plus tag', () => {
-    expect(isValidEmailAddress('reader+tag@mail.example.com')).toBe(true);
-  });
+  it('does not backtrack polynomially on adversarial input', () => {
+    const adversarialInput = `!@${'!.'.repeat(50000)} `;
 
-  it('rejects a value with no @', () => {
-    expect(isValidEmailAddress('not-an-email')).toBe(false);
-  });
+    const start = performance.now();
+    const result = isValidEmailAddress(adversarialInput);
+    const elapsed = performance.now() - start;
 
-  it('rejects a value with no domain dot', () => {
-    expect(isValidEmailAddress('someone@localhost')).toBe(false);
-  });
-
-  it('rejects a value containing whitespace', () => {
-    expect(isValidEmailAddress('some one@example.com')).toBe(false);
-  });
-
-  it('rejects an empty string', () => {
-    expect(isValidEmailAddress('')).toBe(false);
+    expect(result).toBe(false);
+    expect(elapsed).toBeLessThan(1000);
   });
 });
