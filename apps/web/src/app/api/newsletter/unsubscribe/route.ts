@@ -4,7 +4,7 @@ import { isTenantActive } from '@web/server/tenant/is-tenant-active';
 import { resolveTenantId } from '@web/server/tenant/resolve-tenant-id';
 import { logger } from '@web/utils/logger/logger';
 import type { NextResponse } from 'next/server';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 
 import {
   renderConfirmResponse,
@@ -21,12 +21,16 @@ import {
  */
 export async function GET(request: Request): Promise<NextResponse> {
   const token = new URL(request.url).searchParams.get('token');
-  const t = await getTranslations('newsletterUnsubscribe');
+  const [lang, t] = await Promise.all([
+    getLocale(),
+    getTranslations('newsletterUnsubscribe'),
+  ]);
   const returnHomeLabel = t('returnHome');
 
   if (!token) {
     return renderResultResponse(
       {
+        lang,
         title: t('invalidTitle'),
         message: t('invalidMessage'),
         returnHomeLabel,
@@ -36,6 +40,7 @@ export async function GET(request: Request): Promise<NextResponse> {
   }
 
   return renderConfirmResponse({
+    lang,
     title: t('confirmTitle'),
     message: t('confirmMessage'),
     confirmButtonLabel: t('confirmButtonLabel'),
@@ -53,9 +58,13 @@ export async function GET(request: Request): Promise<NextResponse> {
  */
 export async function POST(request: Request): Promise<NextResponse> {
   const token = new URL(request.url).searchParams.get('token');
-  const t = await getTranslations('newsletterUnsubscribe');
+  const [lang, t] = await Promise.all([
+    getLocale(),
+    getTranslations('newsletterUnsubscribe'),
+  ]);
   const returnHomeLabel = t('returnHome');
   const invalidCopy: TResultPageCopy = {
+    lang,
     title: t('invalidTitle'),
     message: t('invalidMessage'),
     returnHomeLabel,
@@ -89,6 +98,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     return renderResultResponse(
       {
+        lang,
         title: t('successTitle'),
         message: t('successMessage'),
         returnHomeLabel,

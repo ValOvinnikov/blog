@@ -3,12 +3,14 @@ import { escapeXml } from '@web/utils/escape-xml';
 import { NextResponse } from 'next/server';
 
 export type TResultPageCopy = {
+  lang: string;
   title: string;
   message: string;
   returnHomeLabel: string;
 };
 
 export type TConfirmPageCopy = {
+  lang: string;
   title: string;
   message: string;
   confirmButtonLabel: string;
@@ -22,6 +24,7 @@ export type TConfirmPageCopy = {
  * JSX, and this result needs no interactivity.
  */
 const renderResultPage = ({
+  lang,
   title,
   message,
   returnHomeLabel,
@@ -32,7 +35,7 @@ const renderResultPage = ({
   const homeHref = routes.home();
 
   return `<!doctype html>
-<html lang="en">
+<html lang="${lang}">
   <head>
     <meta charset="utf-8" />
     <title>${safeTitle}</title>
@@ -61,6 +64,7 @@ export const renderResultResponse = (
  * whose submit `POST`s to the same URL rather than acting on this `GET`.
  */
 const renderConfirmPage = ({
+  lang,
   title,
   message,
   confirmButtonLabel,
@@ -75,7 +79,7 @@ const renderConfirmPage = ({
   const homeHref = routes.home();
 
   return `<!doctype html>
-<html lang="en">
+<html lang="${lang}">
   <head>
     <meta charset="utf-8" />
     <title>${safeTitle}</title>
