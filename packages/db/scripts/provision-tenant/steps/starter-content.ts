@@ -20,7 +20,6 @@ export const STARTER_DOCUMENT_IDS = {
   NAVIGATION: 'provisioning.settings.navigation',
   FOOTER: 'provisioning.settings.footer',
   THEME: 'provisioning.settings.theme',
-  VOICE: 'provisioning.settings.voice',
   NEWSLETTER: 'provisioning.settings.newsletter',
   SITE: 'provisioning.settings.site',
   HERO: 'provisioning.module.hero',
@@ -119,12 +118,6 @@ export function buildStarterDocuments(
     preset: PRESET_ID.CONSOLE,
   };
 
-  const voice: TSanityDocument = {
-    _id: STARTER_DOCUMENT_IDS.VOICE,
-    _type: 'settings_voice',
-    title: 'Voice',
-  };
-
   const newsletter: TSanityDocument = {
     _id: STARTER_DOCUMENT_IDS.NEWSLETTER,
     _type: 'settings_newsletter',
@@ -177,7 +170,6 @@ export function buildStarterDocuments(
     navigation,
     footer,
     theme,
-    voice,
     newsletter,
     site,
     hero,
