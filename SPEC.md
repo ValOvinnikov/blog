@@ -770,7 +770,11 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
 - `main` is a continuous **staging line** (auto-deploys to development, which is
   also the local-dev dataset); a **`vMAJOR.MINOR.PATCH` git tag** promotes that
   exact commit to production. Content migrations run inside the gated prod
-  deploy (`verify → migrate → deploy`), never ahead of the migrated data.
+  deploy (`verify → migrate → deploy`), never ahead of the migrated data. A
+  missing migrate token or database secret **fails** the migration job rather
+  than skipping its steps (#2734) — only steps can be conditional, not the
+  job, so an inert-but-green job would otherwise satisfy the deploy jobs'
+  `needs` and let code ship ahead of its data.
   `@blog/db`'s Drizzle/Neon schema migrations run the same way, alongside the
   Sanity ones, via their own `migrate-db` job in both deploy workflows (dev:
   automatic; prod: backed up via `pg_dump`, gated behind the same required-
