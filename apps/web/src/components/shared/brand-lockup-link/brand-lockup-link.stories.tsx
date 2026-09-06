@@ -1,4 +1,3 @@
-import { BRAND_VARIANTS } from '@blog/config';
 import type { TBrand } from '@blog/service';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
@@ -9,7 +8,6 @@ const brand: TBrand = {
   specLine: 'engineering journal',
   logoUrl: undefined,
   logoAsset: undefined,
-  variant: BRAND_VARIANTS.CONSOLE,
 };
 
 const meta = {
