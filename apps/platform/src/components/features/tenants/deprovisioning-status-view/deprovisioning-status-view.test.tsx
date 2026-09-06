@@ -35,6 +35,19 @@ describe(DeprovisioningStatusView, () => {
     vi.useRealTimers();
   });
 
+  it('shows a starting notice, not "Not started", when a teardown was requested but no run marker has appeared yet', () => {
+    const tenant = makeTenant({ deprovisioningSteps: null });
+    render(<DeprovisioningStatusView tenant={tenant} />);
+
+    expect(screen.getByText('Starting…')).toBeVisible();
+    expect(
+      screen.getByText(
+        'A teardown has been requested for this tenant — this card will update automatically once the workflow reports in.',
+      ),
+    ).toBeVisible();
+    expect(screen.queryByText('Not started')).not.toBeInTheDocument();
+  });
+
   it('titles the card "Deprovisioning progress" and renders every step in order', () => {
     const tenant = makeTenant({
       deprovisioningSteps: {

@@ -178,6 +178,8 @@ describe(TenantDangerPage, () => {
     expect(
       screen.getByRole('heading', { name: 'Deprovisioning progress' }),
     ).toBeVisible();
+    expect(screen.getByText('Starting…')).toBeVisible();
+    expect(screen.queryByText('Not started')).not.toBeInTheDocument();
     expect(
       screen.queryByRole('heading', { level: 2, name: 'Run' }),
     ).not.toBeInTheDocument();

@@ -1,8 +1,9 @@
 'use client';
 
-import { ICONS } from '@blog/config';
+import { ALERT_TYPE, ICONS } from '@blog/config';
 import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { Alert } from '@platform/components/shared/alert';
 import { Card } from '@platform/components/shared/card';
 import { Heading } from '@platform/components/shared/heading';
 import { Icon } from '@platform/components/shared/icon';
@@ -33,6 +34,7 @@ export const DeprovisioningStatusView = ({
 }: TDeprovisioningStatusViewProps) => {
   const t = useTranslations('deprovisioningStatusView');
   const {
+    deprovisioningSteps,
     stepStatuses,
     stepUpdatedAt,
     run,
@@ -43,6 +45,8 @@ export const DeprovisioningStatusView = ({
     errorKind,
   } = useDeprovisioningPoll(tenant);
   useRelativeTimeTick();
+
+  const isPreRun = deprovisioningSteps === null;
 
   const {
     root,
@@ -78,14 +82,15 @@ export const DeprovisioningStatusView = ({
     };
   });
 
-  const overallStatusBadge =
-    overallStatus === TENANT_PROVISIONING_STEP_STATUS.FAILED ? (
-      <StatusBadge tone="bad">{t(`statusLabel.${overallStatus}`)}</StatusBadge>
-    ) : (
-      <StatusBadge tone={provisioningStepTone(overallStatus)}>
-        {t(`statusLabel.${overallStatus}`)}
-      </StatusBadge>
-    );
+  const overallStatusBadge = isPreRun ? (
+    <StatusBadge tone="warn">{t('startingBadge')}</StatusBadge>
+  ) : overallStatus === TENANT_PROVISIONING_STEP_STATUS.FAILED ? (
+    <StatusBadge tone="bad">{t(`statusLabel.${overallStatus}`)}</StatusBadge>
+  ) : (
+    <StatusBadge tone={provisioningStepTone(overallStatus)}>
+      {t(`statusLabel.${overallStatus}`)}
+    </StatusBadge>
+  );
 
   return (
     <div className={root()}>
@@ -96,7 +101,11 @@ export const DeprovisioningStatusView = ({
           actions={overallStatusBadge}
         />
         <Card.Body className={cardBody()}>
-          <StepList steps={stepListSteps} />
+          {isPreRun ? (
+            <Alert type={ALERT_TYPE.INFO} title={t('startingNotice')} />
+          ) : (
+            <StepList steps={stepListSteps} />
+          )}
         </Card.Body>
       </Card>
 
