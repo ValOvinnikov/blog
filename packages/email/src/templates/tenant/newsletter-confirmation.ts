@@ -3,8 +3,16 @@ import {
   buildTenantShell,
   type TTenantEmailBrand,
 } from '@blog/email/html/tenant-shell';
+import {
+  serializePortableText,
+  type TPortableTextContent,
+} from '@blog/email/portable-text';
 
 export type TNewsletterConfirmationEmailInput = {
+  /** The subject to send, already merged by the caller over its own default. */
+  subject: string;
+  /** The body to render, already merged by the caller over its own default. */
+  body: TPortableTextContent;
   confirmationUrl: string;
   unsubscribeUrl: string;
   brand: TTenantEmailBrand;
@@ -24,11 +32,13 @@ export type TNewsletterConfirmationEmailContent = {
 /**
  * Builds the double opt-in newsletter confirmation email — subject, HTML and
  * `List-Unsubscribe` headers — rendered with the subscribing tenant's own
- * resolved brand. The confirm and unsubscribe links are rendered as two
- * locked actions outside the authored body, via `renderEmailAction`, so
- * neither can be displaced by future authored content.
+ * resolved brand and resolved copy. The confirm and unsubscribe links are
+ * rendered as two locked actions outside the authored body, via
+ * `renderEmailAction`, so neither can be displaced by authored content.
  */
 export function buildNewsletterConfirmationEmail({
+  subject,
+  body,
   confirmationUrl,
   unsubscribeUrl,
   brand,
@@ -36,10 +46,7 @@ export function buildNewsletterConfirmationEmail({
   logoImageUrl,
   footerPostalAddress,
 }: TNewsletterConfirmationEmailInput): TNewsletterConfirmationEmailContent {
-  const bodyHtml = [
-    '<p>Click the button below to confirm your newsletter subscription.</p>',
-    '<p>If you did not request this, you can safely ignore this email.</p>',
-  ].join('');
+  const bodyHtml = serializePortableText(body);
 
   const actionHtml = [
     renderEmailAction(
@@ -57,7 +64,7 @@ export function buildNewsletterConfirmationEmail({
   ].join('');
 
   return {
-    subject: 'Confirm your subscription',
+    subject,
     html: buildTenantShell({
       brand,
       brandName,

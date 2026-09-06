@@ -37,6 +37,12 @@ vi.mock('@blog/db', () => ({
     emailConfig: { getEmailConfig: getEmailConfigMock },
     emailTemplates: { getEmailTemplate: getEmailTemplateMock },
   },
+  EMAIL_TEMPLATE_DEFAULT_COPY: {
+    NEWSLETTER_CONFIRMATION: {
+      subject: 'Confirm your newsletter subscription',
+      body: [{ _type: 'block', _key: 'newsletter-confirmation-default-1' }],
+    },
+  },
 }));
 
 vi.mock('@blog/email', async (importOriginal) => ({
@@ -334,6 +340,34 @@ describe('resendConfirmationAction', () => {
     await expect(resendConfirmationAction()).resolves.toEqual({ ok: true });
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({ to: 'val@icloud.com' }),
+    );
+    warnSpy.mockRestore();
+  });
+
+  it('falls back to product-default subject and body and still sends when the authored-copy lookup rejects', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    authMock.mockResolvedValue(session);
+    getEmailTemplateMock.mockRejectedValue(new Error('db down'));
+    resendConfirmationMock.mockResolvedValue({
+      outcome: 'pending',
+      confirmationToken: 'token-abc',
+      unsubscribeToken: 'unsub-token-abc',
+    });
+    sendEmailMock.mockResolvedValue(undefined);
+    const { resendConfirmationAction } =
+      await import('./newsletter-subscription-actions');
+
+    await expect(resendConfirmationAction()).resolves.toEqual({ ok: true });
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: 'val@icloud.com',
+        subject: 'Confirm your newsletter subscription',
+        headers: {
+          'List-Unsubscribe':
+            '<https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc>',
+          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        },
+      }),
     );
     warnSpy.mockRestore();
   });

@@ -1,13 +1,20 @@
-import { buildTenantShell } from '@blog/email';
+import {
+  buildTenantShell,
+  renderEmailAction,
+  serializePortableText,
+  type TPortableTextContent,
+} from '@blog/email';
 
 import { escapeHtml } from './escape-html';
 import type { TResolvedTenantEmailIdentity } from './resolve-tenant-email-identity';
 
 export type TMagicLinkEmailInput = {
   url: string;
-  host: string;
   /** The sending host's resolved tenant, if any — see `resolveTenantEmailIdentity`. */
   tenantIdentity?: TResolvedTenantEmailIdentity;
+  /** The resolved (authored-over-default) subject and body — see `resolveMagicLinkEmailSettings`. */
+  subject: string;
+  body: TPortableTextContent;
   /** The resolved tenant or per-template logo — see `resolveMagicLinkEmailSettings`. */
   logoImageUrl?: string;
   /** The tenant's configured footer postal address — see `resolveMagicLinkEmailSettings`. */
@@ -19,35 +26,44 @@ export type TMagicLinkEmailContent = {
   html: string;
 };
 
+const SIGN_IN_ACTION_LABEL = 'Sign in';
+
 /**
- * Builds the sign-in email's subject and HTML body for the Auth.js Email provider.
+ * Builds the sign-in email's subject and HTML body for the Auth.js Email
+ * provider. The sign-in link is rendered as a locked action element outside
+ * the authored body, so no authored copy can remove or replace it.
  */
 export function buildMagicLinkEmail({
   url,
-  host,
   tenantIdentity,
+  subject,
+  body,
   logoImageUrl,
   footerPostalAddress,
 }: TMagicLinkEmailInput): TMagicLinkEmailContent {
-  const escapedHost = escapeHtml(host);
-  const escapedUrl = escapeHtml(url);
+  const bodyHtml = serializePortableText(body);
 
-  const bodyHtml = [
-    `<p>Click the link below to sign in to ${escapedHost}.</p>`,
-    `<p><a href="${escapedUrl}">Sign in to ${escapedHost}</a></p>`,
-    `<p>If you did not request this email, you can safely ignore it.</p>`,
-  ].join('');
+  if (!tenantIdentity) {
+    return {
+      subject,
+      html: `${bodyHtml}<p><a href="${escapeHtml(url)}">${SIGN_IN_ACTION_LABEL}</a></p>`,
+    };
+  }
+
+  const actionHtml = renderEmailAction(
+    { label: SIGN_IN_ACTION_LABEL, url, variant: 'button' },
+    tenantIdentity.brand,
+  );
 
   return {
-    subject: `Sign in to ${host}`,
-    html: tenantIdentity
-      ? buildTenantShell({
-          brand: tenantIdentity.brand,
-          brandName: tenantIdentity.brandName,
-          bodyHtml,
-          logoImageUrl,
-          footerPostalAddress,
-        })
-      : bodyHtml,
+    subject,
+    html: buildTenantShell({
+      brand: tenantIdentity.brand,
+      brandName: tenantIdentity.brandName,
+      bodyHtml,
+      actionHtml,
+      logoImageUrl,
+      footerPostalAddress,
+    }),
   };
 }

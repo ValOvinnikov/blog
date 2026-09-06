@@ -1,8 +1,12 @@
 import type { TEmailTemplateType } from '@blog/config/constants';
 import { queries } from '@blog/db';
+import { EMAIL_TEMPLATE_DEFAULT_COPY } from '@blog/db/constants';
+import type { TEmailTemplateResult } from '@blog/db/queries/email-templates';
 import { isValidEmailAddress } from '@blog/email/validation';
 
 export type TResolvedMagicLinkEmailSettings = {
+  subject: string;
+  body: TEmailTemplateResult['body'];
   logoImageUrl: string | undefined;
   senderName: string | undefined;
   replyTo: string | undefined;
@@ -10,12 +14,12 @@ export type TResolvedMagicLinkEmailSettings = {
 };
 
 /**
- * Resolves a tenant's `email_config` settings and its `templateType` logo,
- * best-effort — each underlying lookup degrades to product defaults on its
- * own rather than failing the other, so a settings-load error never blocks
- * delivery of the magic-link email itself. A malformed stored reply-to
- * address is dropped rather than passed through, since `sendEmail` throws
- * on one.
+ * Resolves a tenant's authored (or product-default) `templateType` copy and
+ * logo, plus its `email_config` settings, best-effort — each underlying
+ * lookup degrades to product defaults on its own rather than failing the
+ * other, so a settings-load error never blocks delivery of the magic-link
+ * email itself. A malformed stored reply-to address is dropped rather than
+ * passed through, since `sendEmail` throws on one.
  */
 export async function resolveMagicLinkEmailSettings(
   tenantId: string,
@@ -26,9 +30,12 @@ export async function resolveMagicLinkEmailSettings(
     getEmailTemplateSafely(tenantId, templateType),
   ]);
 
+  const defaultCopy = EMAIL_TEMPLATE_DEFAULT_COPY[templateType];
   const replyTo = config?.replyToAddress;
 
   return {
+    subject: template?.subject ?? defaultCopy.subject,
+    body: template?.body ?? defaultCopy.body,
     logoImageUrl: template?.logoAssetUrl ?? config?.logoAssetUrl,
     senderName: config?.senderName,
     replyTo: replyTo && isValidEmailAddress(replyTo) ? replyTo : undefined,
@@ -47,7 +54,7 @@ async function getEmailConfigSafely(tenantId: string) {
 async function getEmailTemplateSafely(
   tenantId: string,
   templateType: TEmailTemplateType,
-) {
+): Promise<TEmailTemplateResult | undefined> {
   try {
     return await queries.emailTemplates.getEmailTemplate(
       tenantId,

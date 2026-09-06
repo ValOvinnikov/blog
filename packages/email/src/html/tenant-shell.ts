@@ -23,7 +23,9 @@ export type TBuildTenantShellInput = {
   previewText?: string;
   /** Already-assembled, already-escaped HTML for the message-specific content. */
   bodyHtml: string;
-  /** Already-assembled, already-escaped HTML rendered between the body and the footer. Omit for an email with no action. */
+  /** Already-assembled, already-escaped HTML for a locked structural fact — content the authored body must not be able to omit, reorder, or displace — rendered between the body and the action. The caller is responsible for escaping any interpolated values. Omit for an email with no such content. */
+  structuralHtml?: string;
+  /** Already-assembled, already-escaped HTML for the one locked action element, rendered after any structural content and before the footer. Omit for an email with no action. */
   actionHtml?: string;
   /** An uploaded tenant or per-template logo image; falls back to the generated mark when omitted. */
   logoImageUrl?: string;
@@ -40,6 +42,7 @@ export function buildTenantShell({
   brandName,
   previewText,
   bodyHtml,
+  structuralHtml,
   actionHtml,
   logoImageUrl,
   footerPostalAddress,
@@ -49,6 +52,7 @@ export function buildTenantShell({
     brandName,
     previewText,
     bodyHtml,
+    structuralHtml,
     actionHtml,
     logoImageUrl,
     footerPostalAddress,

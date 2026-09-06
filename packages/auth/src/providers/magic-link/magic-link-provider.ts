@@ -1,5 +1,6 @@
 import { env } from '@blog/auth/utils/env/env';
 import { EMAIL_TEMPLATE_TYPE } from '@blog/config/constants';
+import { EMAIL_TEMPLATE_DEFAULT_COPY } from '@blog/db/constants';
 import { sendEmail } from '@blog/email';
 import type { EmailConfig } from 'next-auth/providers/email';
 
@@ -35,29 +36,35 @@ export function buildMagicLinkProvider(): EmailConfig {
       }
       const tenantIdentity = await resolveTenantEmailIdentity(host);
       const isInvite = tenantNames.length > 0;
+      const templateType = isInvite
+        ? EMAIL_TEMPLATE_TYPE.TENANT_INVITE
+        : EMAIL_TEMPLATE_TYPE.MAGIC_LINK;
 
       const emailSettings = tenantIdentity
         ? await resolveMagicLinkEmailSettings(
             tenantIdentity.tenantId,
-            isInvite
-              ? EMAIL_TEMPLATE_TYPE.TENANT_INVITE
-              : EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+            templateType,
           )
         : undefined;
+
+      const { subject: resolvedSubject, body: resolvedBody } =
+        emailSettings ?? EMAIL_TEMPLATE_DEFAULT_COPY[templateType];
 
       const { subject, html } = isInvite
         ? buildInviteMagicLinkEmail({
             url,
-            host,
-            tenantNames,
             tenantIdentity,
+            tenantNames,
+            subject: resolvedSubject,
+            body: resolvedBody,
             logoImageUrl: emailSettings?.logoImageUrl,
             footerPostalAddress: emailSettings?.footerPostalAddress,
           })
         : buildMagicLinkEmail({
             url,
-            host,
             tenantIdentity,
+            subject: resolvedSubject,
+            body: resolvedBody,
             logoImageUrl: emailSettings?.logoImageUrl,
             footerPostalAddress: emailSettings?.footerPostalAddress,
           });
