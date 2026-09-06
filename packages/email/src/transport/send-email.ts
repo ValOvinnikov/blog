@@ -15,6 +15,11 @@ export type TSendEmailInput = {
   replyTo?: string;
 };
 
+/** Strips line breaks from a subject so authored copy can never inject a mail header. */
+function sanitizeEmailSubject(subject: string): string {
+  return subject.replace(/[\r\n]+/g, ' ');
+}
+
 let resendClient: Resend | undefined;
 
 /** Lazy singleton — mirrors `@blog/db`'s `getDb()`, avoids constructing a client until the first send. */
@@ -46,7 +51,7 @@ export async function sendEmail({
   const { error } = await getResendClient().emails.send({
     to,
     from,
-    subject,
+    subject: sanitizeEmailSubject(subject),
     html,
     headers,
     replyTo,
