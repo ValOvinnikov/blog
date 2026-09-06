@@ -19,8 +19,8 @@
 //
 //   - `'use server'` files are a boundary, not a module the client bundle
 //     pulls in — Next replaces a Server Action import with a network
-//     reference. Walking through them reports ~164 false positives on a clean
-//     `main`, since almost every Server Action reaches the database.
+//     reference. Almost every Server Action reaches the database, so walking
+//     through them flags nearly all of them.
 //   - Type-only imports are erased before the bundler sees them, so
 //     `import type { TUser } from '@blog/db'` is not a client-graph edge.
 //
@@ -45,24 +45,21 @@ const SERVER_DIRECTIVE = 'use server';
 // package's client module can reach server-only code exactly as easily.
 const SOURCE_ROOT_PARENTS = ['apps', 'packages'];
 
-// Every workspace whose tsconfig `paths` contributes an alias. Listed rather
-// than globbed so an unexpected new workspace surfaces as a review question
-// instead of silently widening what this guard resolves.
-const ALIAS_SOURCES = [
-  'apps/web',
-  'apps/platform',
-  'packages/auth',
-  'packages/config',
-  'packages/db',
-  'packages/email',
-  'packages/insight',
-  'packages/service',
-  'packages/studio',
-  'packages/ui',
-  'packages/utils',
-];
-
 const RESOLVABLE_EXTENSIONS = ['.ts', '.tsx'];
+
+const parsedModules = new Map();
+
+// Widely-shared modules (`@blog/config`, `@blog/ui`) sit in most entrypoints'
+// graphs, so parsing per entrypoint re-reads the same files ~79 times.
+const readModule = (file) => {
+  const cached = parsedModules.get(file);
+  if (cached !== undefined) {
+    return cached;
+  }
+  const sf = parseSource(file, readFileSync(file, 'utf8'));
+  parsedModules.set(file, sf);
+  return sf;
+};
 
 export const parseSource = (file, text) =>
   ts.createSourceFile(
@@ -127,8 +124,9 @@ const isErasedExportClause = (declaration) => {
 
 // Every module specifier that survives to runtime: static imports and
 // re-exports that are not type-only, bare side-effect imports (which is how
-// `server-only` itself is written), and dynamic `import()` calls, whose target
-// still lands in the client bundle as a lazy chunk.
+// `server-only` itself is written), `import x = require()`, and dynamic
+// `import()` calls written with a literal specifier — a computed one cannot be
+// followed statically.
 export const extractRuntimeSpecifiers = (sf) => {
   const specifiers = [];
 
@@ -151,6 +149,14 @@ export const extractRuntimeSpecifiers = (sf) => {
     }
 
     if (
+      ts.isImportEqualsDeclaration(node) &&
+      ts.isExternalModuleReference(node.moduleReference) &&
+      ts.isStringLiteral(node.moduleReference.expression)
+    ) {
+      specifiers.push(node.moduleReference.expression.text);
+    }
+
+    if (
       ts.isCallExpression(node) &&
       node.expression.kind === ts.SyntaxKind.ImportKeyword &&
       node.arguments[0] !== undefined &&
@@ -170,7 +176,24 @@ export const extractRuntimeSpecifiers = (sf) => {
 // the tsconfig `paths` that actually drive resolution. Targets are resolved
 // against the declaring tsconfig's own directory, so a package's self-alias
 // (`"@blog/email/*": ["./src/*"]`) lands in the right place.
-export const buildAliasMap = (root = repoRoot, sources = ALIAS_SOURCES) => {
+export const listWorkspaces = (root = repoRoot) =>
+  SOURCE_ROOT_PARENTS.flatMap((parent) => {
+    const parentDir = join(root, parent);
+    if (!existsSync(parentDir)) {
+      return [];
+    }
+    return readdirSync(parentDir, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => join(parent, entry.name))
+      .filter((workspace) =>
+        existsSync(join(root, workspace, 'tsconfig.json')),
+      );
+  });
+
+export const buildAliasMap = (
+  root = repoRoot,
+  sources = listWorkspaces(root),
+) => {
   const aliases = new Map();
 
   for (const workspace of sources) {
@@ -204,9 +227,12 @@ export const buildAliasMap = (root = repoRoot, sources = ALIAS_SOURCES) => {
   return aliases;
 };
 
+const isParseable = (file) =>
+  RESOLVABLE_EXTENSIONS.some((extension) => file.endsWith(extension));
+
 const tryFile = (base) => {
   const candidates = [
-    base,
+    ...(isParseable(base) ? [base] : []),
     ...RESOLVABLE_EXTENSIONS.map((extension) => `${base}${extension}`),
     ...RESOLVABLE_EXTENSIONS.map((extension) =>
       join(base, `index${extension}`),
@@ -282,7 +308,7 @@ const listSourceFiles = (dir, acc = []) => {
       listSourceFiles(path, acc);
     } else if (
       /\.tsx?$/.test(entry.name) &&
-      !/\.test\.tsx?$/.test(entry.name)
+      !/\.(test|stories)\.tsx?$/.test(entry.name)
     ) {
       acc.push(path);
     }
@@ -309,8 +335,7 @@ export const collectClientEntrypoints = (
   const entrypoints = [];
   for (const sourceRoot of sourceRoots) {
     for (const file of listSourceFiles(join(root, sourceRoot))) {
-      const sf = parseSource(file, readFileSync(file, 'utf8'));
-      if (readDirectives(sf).has(CLIENT_DIRECTIVE)) {
+      if (readDirectives(readModule(file)).has(CLIENT_DIRECTIVE)) {
         entrypoints.push(file);
       }
     }
@@ -333,9 +358,7 @@ export const findLeaksFrom = (entryFile, { aliases, root = repoRoot } = {}) => {
     }
     visited.add(file);
 
-    const sf = parseSource(file, readFileSync(file, 'utf8'));
-
-    for (const specifier of extractRuntimeSpecifiers(sf)) {
+    for (const specifier of extractRuntimeSpecifiers(readModule(file))) {
       const resolved = resolveSpecifier(specifier, file, { aliases, root });
 
       if (resolved.kind === 'taint') {
@@ -346,11 +369,7 @@ export const findLeaksFrom = (entryFile, { aliases, root = repoRoot } = {}) => {
         continue;
       }
 
-      const target = parseSource(
-        resolved.file,
-        readFileSync(resolved.file, 'utf8'),
-      );
-      if (readDirectives(target).has(SERVER_DIRECTIVE)) {
+      if (readDirectives(readModule(resolved.file)).has(SERVER_DIRECTIVE)) {
         continue;
       }
 

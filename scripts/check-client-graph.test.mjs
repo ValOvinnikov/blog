@@ -19,6 +19,7 @@ import {
   extractRuntimeSpecifiers,
   findLeaksFrom,
   listSourceRoots,
+  listWorkspaces,
   parseSource,
   readDirectives,
   resolveSpecifier,
@@ -120,6 +121,22 @@ describe('extractRuntimeSpecifiers', () => {
     assert.deepEqual(
       extractRuntimeSpecifiers(parse("import a, { type B } from './a';")),
       ['./a'],
+    );
+  });
+
+  it('keeps an import-equals require, which is a runtime edge', () => {
+    assert.deepEqual(
+      extractRuntimeSpecifiers(parse("import a = require('./a');")),
+      ['./a'],
+    );
+  });
+
+  it('drops a dynamic import whose specifier is computed rather than literal', () => {
+    assert.deepEqual(
+      extractRuntimeSpecifiers(
+        parse('const a = await import(`./messages/${locale}.json`);'),
+      ),
+      [],
     );
   });
 
@@ -302,6 +319,15 @@ describe('findLeaksFrom', () => {
     assert.deepEqual(leaksFrom(entry), []);
   });
 
+  it('treats a non-TypeScript side-effect import as an opaque leaf', () => {
+    write('apps/app/src/styles.css', '.a { color: red }\n');
+    const entry = write(
+      'apps/app/src/styled.tsx',
+      "'use client';\nimport './styles.css';\nexport const C = () => null;\n",
+    );
+    assert.deepEqual(leaksFrom(entry), []);
+  });
+
   it('terminates on a circular import graph', () => {
     write('apps/app/src/ping.ts', "export * from './pong';\n");
     write(
@@ -313,6 +339,15 @@ describe('findLeaksFrom', () => {
       "'use client';\nimport { p } from '@app/ping';\nexport const C = () => p;\n",
     );
     assert.deepEqual(leaksFrom(entry), []);
+  });
+});
+
+describe('listWorkspaces', () => {
+  const { root } = createFixtureRepo();
+  after(() => rmSync(root, { recursive: true, force: true }));
+
+  it('discovers every workspace carrying a tsconfig, so a new one needs no list edit', () => {
+    assert.deepEqual(listWorkspaces(root), [join('apps', 'app')]);
   });
 });
 
