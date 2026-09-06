@@ -10,8 +10,6 @@ const meta = {
   parameters: { layout: 'padded' },
   args: {
     value: richTextDemo,
-    baseUrl:
-      'https://cdn.sanity.io/images/storybook-project/storybook-dataset/',
   },
 } satisfies Meta<typeof PortableTextRenderer>;
 

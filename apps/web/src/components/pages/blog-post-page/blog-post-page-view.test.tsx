@@ -1,4 +1,8 @@
-import { ASIDE_KIND, type ISanityImage, type RichText } from '@blog/config';
+import {
+  ASIDE_KIND,
+  type ISanityImage,
+  type TPortableTextBody,
+} from '@blog/config';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import {
   makeBlogPostPageView,
@@ -140,7 +144,7 @@ describe(BlogPostPageView, () => {
   });
 
   it('renders exactly one <h1> on the page (the post title), even when the body authors an h1-style block', () => {
-    const body: RichText = [
+    const body: TPortableTextBody = [
       // The generated `style` union no longer includes 'h1' (Studio can't
       // author one anymore), but the renderer still defends against a
       // legacy/malformed one reaching this component via another write path.
@@ -302,7 +306,7 @@ describe(BlogPostPageView, () => {
   });
 
   it('renders an aside block from the body as a deep-dive aside with its translated kind label', () => {
-    const body: RichText = [
+    const body: TPortableTextBody = [
       richTextBlock('normal', [richTextSpan('Body text.')]),
       {
         _type: 'aside',

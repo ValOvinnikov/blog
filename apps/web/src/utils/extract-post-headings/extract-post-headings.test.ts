@@ -1,4 +1,4 @@
-import type { RichText } from '@blog/config';
+import type { TPortableTextBody } from '@blog/config';
 import {
   richTextBlock,
   richTextSpan,
@@ -12,7 +12,7 @@ describe(extractPostHeadings, () => {
   });
 
   it('returns an empty array when the body has zero H2 headings', () => {
-    const body: RichText = [
+    const body: TPortableTextBody = [
       richTextBlock('normal', [richTextSpan('Just a paragraph.')]),
       richTextBlock('h3', [richTextSpan('A stray subsection')]),
     ];
@@ -21,7 +21,7 @@ describe(extractPostHeadings, () => {
   });
 
   it('returns an empty array when the body has fewer than 3 H2 headings', () => {
-    const body: RichText = [
+    const body: TPortableTextBody = [
       richTextBlock('h2', [richTextSpan('First section')]),
       richTextBlock('normal', [richTextSpan('Some text.')]),
       richTextBlock('h2', [richTextSpan('Second section')]),
@@ -31,7 +31,7 @@ describe(extractPostHeadings, () => {
   });
 
   it('returns the ordered heading list, including nested H3s, once the body has 3+ H2 headings', () => {
-    const body: RichText = [
+    const body: TPortableTextBody = [
       richTextBlock('h2', [richTextSpan('Getting started')]),
       richTextBlock('normal', [richTextSpan('Intro text.')]),
       richTextBlock('h3', [richTextSpan('Prerequisites')]),
@@ -68,7 +68,7 @@ describe(extractPostHeadings, () => {
   });
 
   it('produces stable, URL-safe slugs from heading text (lower-cased, punctuation stripped, spaces hyphenated)', () => {
-    const body: RichText = [
+    const body: TPortableTextBody = [
       richTextBlock('h2', [richTextSpan('One')]),
       richTextBlock('h2', [richTextSpan('Two')]),
       richTextBlock('h2', [richTextSpan("What's New? (v2.0!)")]),
@@ -87,7 +87,7 @@ describe(extractPostHeadings, () => {
   });
 
   it('dedupes identical heading text with a numeric suffix', () => {
-    const body: RichText = [
+    const body: TPortableTextBody = [
       richTextBlock('h2', [richTextSpan('Overview')]),
       richTextBlock('h2', [richTextSpan('Overview')]),
       richTextBlock('h2', [richTextSpan('Overview')]),
@@ -103,7 +103,7 @@ describe(extractPostHeadings, () => {
   });
 
   it('ignores non-block nodes (images, code) and non-heading block styles', () => {
-    const body: RichText = [
+    const body: TPortableTextBody = [
       richTextBlock('h2', [richTextSpan('Section one')]),
       richTextBlock('h2', [richTextSpan('Section two')]),
       richTextBlock('h2', [richTextSpan('Section three')]),

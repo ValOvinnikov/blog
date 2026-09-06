@@ -1,4 +1,9 @@
-import { IMAGE_LAYOUT, type RichText } from '@blog/config';
+import {
+  IMAGE_LAYOUT,
+  type IBodyImageBlock,
+  type TPortableTextBody,
+} from '@blog/config';
+import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
   richTextBlock,
   richTextSpan,
@@ -6,26 +11,24 @@ import {
 
 import { segmentPortableTextBody } from './segment-portable-text-body';
 
-const fullBleedImage = (key: string): RichText[number] => {
+const fullBleedImage = (key: string): IBodyImageBlock => {
   return {
     _type: 'bodyImage',
     _key: key,
-    asset: { _ref: 'image-abc123-800x600-jpg', _type: 'reference' },
-    alt: 'A scenic mountain range',
+    image: makeSanityImage({ alt: 'A scenic mountain range' }),
     layout: IMAGE_LAYOUT.FULL_BLEED,
   };
 };
 
 describe('segmentPortableTextBody', () => {
   it('collapses a body with no FULL_BLEED image into a single PROSE segment holding every block, in order', () => {
-    const value: RichText = [
+    const value: TPortableTextBody = [
       richTextBlock('h2', [richTextSpan('Heading')]),
       richTextBlock('normal', [richTextSpan('Paragraph')]),
       {
         _type: 'bodyImage',
         _key: 'inline-1',
-        asset: { _ref: 'image-abc123-800x600-jpg', _type: 'reference' },
-        alt: 'Inline',
+        image: makeSanityImage({ alt: 'Inline' }),
         layout: IMAGE_LAYOUT.INLINE,
       },
     ];
@@ -43,7 +46,7 @@ describe('segmentPortableTextBody', () => {
     const before = richTextBlock('normal', [richTextSpan('Before')]);
     const image = fullBleedImage('image-1');
     const after = richTextBlock('normal', [richTextSpan('After')]);
-    const value: RichText = [before, image, after];
+    const value: TPortableTextBody = [before, image, after];
 
     expect(segmentPortableTextBody(value)).toEqual([
       { kind: 'PROSE', blocks: [before] },
@@ -83,14 +86,13 @@ describe('segmentPortableTextBody', () => {
   });
 
   it('keeps a non-FULL_BLEED bodyImage (e.g. FLOAT_LEFT) inside its surrounding PROSE run, not split out', () => {
-    const floatImage: RichText[number] = {
+    const floatImage: IBodyImageBlock = {
       _type: 'bodyImage',
       _key: 'float-1',
-      asset: { _ref: 'image-abc123-800x600-jpg', _type: 'reference' },
-      alt: 'Floated',
+      image: makeSanityImage({ alt: 'Floated' }),
       layout: IMAGE_LAYOUT.FLOAT_LEFT,
     };
-    const value: RichText = [
+    const value: TPortableTextBody = [
       richTextBlock('normal', [richTextSpan('Text')]),
       floatImage,
     ];

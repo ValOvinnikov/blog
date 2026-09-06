@@ -1,6 +1,10 @@
-import { IMAGE_LAYOUT, type RichText } from '@blog/config';
+import { IMAGE_LAYOUT, type TPortableTextBody } from '@blog/config';
+import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 
-export type TRichTextBlock = Extract<RichText[number], { _type: 'block' }>;
+export type TRichTextBlock = Extract<
+  TPortableTextBody[number],
+  { _type: 'block' }
+>;
 export type TRichTextSpan = NonNullable<TRichTextBlock['children']>[number];
 
 let keySeq = 0;
@@ -34,7 +38,7 @@ export const richTextBlock = (
  * missing vertical spacing between sibling blocks, which renders as one
  * unbroken block of text.
  */
-export const richTextDemo: RichText = [
+export const richTextDemo: TPortableTextBody = [
   richTextBlock('normal', [
     richTextSpan(
       'This story renders several sibling blocks back to back, so any missing vertical rhythm between them is immediately visible.',
@@ -82,11 +86,7 @@ export const richTextDemo: RichText = [
   {
     _type: 'bodyImage',
     _key: nextKey('image'),
-    asset: {
-      _ref: 'image-6205dacc42424f7a83d8e20a7000d895f7cdc7dd-2400x1260-png',
-      _type: 'reference',
-    },
-    alt: 'A scenic mountain range at sunset',
+    image: makeSanityImage({ alt: 'A scenic mountain range at sunset' }),
     // A non-default layout (rather than the more common INLINE) so this
     // fixture also exercises the floated width/wrap treatment, not just the
     // full-width default.

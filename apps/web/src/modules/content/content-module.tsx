@@ -1,4 +1,4 @@
-import { getSanityImageBaseUrl, service } from '@blog/service';
+import { service } from '@blog/service';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 
 import { ContentModuleView } from './content-module-view';
@@ -19,14 +19,5 @@ export const ContentModule = async ({ id, tenant }: IContentModuleProps) => {
 
   if (!result.ok) return null;
 
-  // `body` is fetched unprojected, so its embedded `bodyImage` blocks arrive
-  // as raw asset references rather than already-resolved `ISanityImage`
-  // values — `PortableTextRenderer` still needs a separate origin for them.
-  return (
-    <ContentModuleView
-      id={id}
-      {...result.data}
-      baseUrl={getSanityImageBaseUrl(tenantContext)}
-    />
-  );
+  return <ContentModuleView id={id} {...result.data} />;
 };

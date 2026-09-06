@@ -6,7 +6,7 @@ import {
   type TAsideKind,
   routes,
 } from '@blog/config';
-import { getSanityImageBaseUrl, service } from '@blog/service';
+import { service } from '@blog/service';
 import { Icon } from '@blog/ui/atoms/icon';
 import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
@@ -63,9 +63,6 @@ export const BlogPostPage = async ({ slug, tenant }: TBlogPostPageProps) => {
   const headings = extractPostHeadings(body);
   const hasContentsRail = headings.length >= MIN_H2_HEADINGS_FOR_RAIL;
   const siteUrl = (await getTenantBaseUrl(tenant)) ?? '';
-  // Only for images embedded in `body` — `heroImageSanity` already carries
-  // its own `cdnBaseUrl` from the service layer.
-  const imageBaseUrl = getSanityImageBaseUrl(tenantContext);
   const url = `${siteUrl}${routes.post(slug)}`;
   const blogPostingSchema = buildBlogPostingSchema(post, siteUrl);
   const shareLinks = buildShareLinks({ url, title }).map((link) => ({
@@ -150,7 +147,6 @@ export const BlogPostPage = async ({ slug, tenant }: TBlogPostPageProps) => {
       readingTimeMinutes={readingTimeMinutes}
       heroImageSanity={heroImageSanity}
       heroImageAlt={heroImageAlt}
-      imageBaseUrl={imageBaseUrl}
       headings={headings}
       hasContentsRail={hasContentsRail}
       url={url}

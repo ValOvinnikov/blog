@@ -1,10 +1,10 @@
 import {
   ASIDE_KIND,
   type Aside as TAsideBlock,
-  type BodyImage,
   type Code,
-  type RichText as TPortableText,
+  type IBodyImageBlock,
   type TAsideKind,
+  type TPortableTextBody,
 } from '@blog/config';
 import { Heading } from '@blog/ui/atoms/heading';
 import { InlineCode } from '@blog/ui/atoms/inline-code';
@@ -23,22 +23,13 @@ import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 import type { TPostHeading } from '@web/utils/extract-post-headings/extract-post-headings';
 import { segmentPortableTextBody } from '@web/utils/segment-portable-text-body';
-import { toPortableTextImage } from '@web/utils/to-portable-text-image';
 import { Fragment } from 'react';
 
 import { CodeBlock } from './code-block';
 import { portableTextRendererVariants } from './portable-text-renderer-variants';
 
 export interface IPortableTextRendererProps {
-  value: TPortableText;
-  /**
-   * CDN origin for images embedded in the body. Body content is fetched
-   * unprojected, so a `bodyImage` block carries only a bare asset
-   * reference rather than an already-resolved `ISanityImage` — unlike a
-   * view-model image, it can't carry its own origin, so the caller
-   * supplies one.
-   */
-  baseUrl: string;
+  value: TPortableTextBody;
   /**
    * The precomputed `extractPostHeadings(value)` outline; when passed, each
    * matching h2/h3 renders with that heading's `id` so anchor links resolve.
@@ -112,26 +103,24 @@ const headingBlockComponents = (
  *
  * @example
  * <ContentModule title={title}>
- *   <PortableTextRenderer value={body} baseUrl={baseUrl} />
+ *   <PortableTextRenderer value={body} />
  * </ContentModule>
  *
  * @example
- * <PortableTextRenderer value={body} baseUrl={baseUrl} headings={extractPostHeadings(body)} />
+ * <PortableTextRenderer value={body} headings={extractPostHeadings(body)} />
  */
 export const PortableTextRenderer = ({
   value,
-  baseUrl,
   headings,
   asideKindLabels,
 }: IPortableTextRendererProps) => {
-  const renderBodyImage = (imageValue: BodyImage) => {
-    const image = toPortableTextImage(imageValue, baseUrl);
-    if (!image) return null;
+  const renderBodyImage = (block: IBodyImageBlock) => {
+    if (!block.image) return null;
 
     return (
-      <ImageWithCaption layout={imageValue.layout}>
+      <ImageWithCaption layout={block.layout}>
         <SanityImage
-          image={image}
+          image={block.image}
           width={1200}
           sizes="(min-width: 1024px) 800px, 100vw"
           loading="lazy"
@@ -184,8 +173,8 @@ export const PortableTextRenderer = ({
           highlightedLines={codeValue.highlightedLines}
         />
       ),
-      bodyImage: ({ value: imageValue }: { value: BodyImage }) =>
-        renderBodyImage(imageValue),
+      bodyImage: ({ value: block }: { value: IBodyImageBlock }) =>
+        renderBodyImage(block),
       // Unknown/missing `kind` renders as CONTEXT — forward-compat with a
       // future `ASIDE_KIND` value this renderer doesn't know about.
       aside: ({ value: asideValue }: { value: TAsideBlock }) => {
