@@ -81,10 +81,10 @@ a matching subfolder rather than leaving everything flat at the top level —
 a flat folder with a dispatcher, two render branches, a hook, and a helper
 side by side is exactly the "crowded" problem this rule exists to fix one
 level up, just recreated inside the folder instead of inside one file. Mirror
-`@blog/ui`'s own compound-component precedent (`WindowChrome`'s
-`components/bar/`, `components/body/`, `components/tag/`, …, each sub-part in
-its own folder under `components/`, no barrel export since they're never
-imported from outside the parent) and this repo's existing top-level
+`@blog/ui`'s own compound-component precedent (`Panel`'s
+`components/header/`, `components/body/`, each sub-part in its own folder
+under `components/`, no barrel export since they're never imported from
+outside the parent) and this repo's existing top-level
 `src/hooks/` vs. `src/utils/` distinction — a stateful hook is not a "util,"
 even when, as here, it's private to one component rather than promoted to
 the shared top-level folder:
@@ -127,8 +127,8 @@ recreates the same crowding this rule already fixes for components — once
 `AccountMenu`/`SignInMenu` own their own render trees, each also owns a
 co-located `account-menu-variants.ts` / `sign-in-menu-variants.ts` in its own
 folder for the slots _only it_ uses. A slot genuinely used by **two or more**
-sub-components (here, `panel` and `window` — both render inside the same
-`WindowChrome` shell) stays in the shared top-level `auth-menu-variants.ts`
+sub-components (here, `panel` and `label` — both menus render the popover
+surface and its title) stays in the shared top-level `auth-menu-variants.ts`
 instead of being duplicated into each — duplicating a shared slot risks the
 two copies drifting apart on the next edit, exactly the "second repetition"
 failure mode this document keeps coming back to. The dispatcher's own
