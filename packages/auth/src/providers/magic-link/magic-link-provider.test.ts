@@ -1,7 +1,13 @@
 import { resolveTenantEmailBrand } from '@blog/config';
-import { PRESET_ID } from '@blog/config/constants';
+import { EMAIL_TEMPLATE_TYPE, PRESET_ID } from '@blog/config/constants';
+import { EMAIL_TEMPLATE_DEFAULT_COPY } from '@blog/db/constants';
 
 import { buildMagicLinkProvider } from './magic-link-provider';
+
+const MAGIC_LINK_DEFAULTS =
+  EMAIL_TEMPLATE_DEFAULT_COPY[EMAIL_TEMPLATE_TYPE.MAGIC_LINK];
+const TENANT_INVITE_DEFAULTS =
+  EMAIL_TEMPLATE_DEFAULT_COPY[EMAIL_TEMPLATE_TYPE.TENANT_INVITE];
 
 const {
   findPendingInviteByEmailMock,
@@ -47,6 +53,8 @@ describe(buildMagicLinkProvider, () => {
     getSiteConfigMock.mockReset();
     getEmailConfigMock.mockReset().mockResolvedValue(undefined);
     getEmailTemplateMock.mockReset().mockResolvedValue({
+      subject: MAGIC_LINK_DEFAULTS.subject,
+      body: MAGIC_LINK_DEFAULTS.body,
       logoAssetUrl: undefined,
     });
     sendEmailMock.mockReset().mockResolvedValue(undefined);
@@ -87,7 +95,7 @@ describe(buildMagicLinkProvider, () => {
     expect(sendEmailMock).toHaveBeenCalledWith({
       to: 'jane@example.com',
       from: 'Sign in <onboarding@resend.dev>',
-      subject: 'Sign in to example.com',
+      subject: MAGIC_LINK_DEFAULTS.subject,
       html: expect.stringContaining(
         'href="https://example.com/api/auth/callback/email?token=abc"',
       ),
@@ -119,8 +127,8 @@ describe(buildMagicLinkProvider, () => {
     expect(sendEmailMock).toHaveBeenCalledWith({
       to: 'invited@example.com',
       from: 'Sign in <onboarding@resend.dev>',
-      subject: "You've been invited to manage Acme Blog",
-      html: expect.stringContaining('<strong>Acme Blog</strong>'),
+      subject: TENANT_INVITE_DEFAULTS.subject,
+      html: expect.stringContaining('Accept invite'),
     });
   });
 
@@ -141,7 +149,7 @@ describe(buildMagicLinkProvider, () => {
     expect(sendEmailMock).toHaveBeenCalledWith({
       to: 'jane@example.com',
       from: 'Sign in <onboarding@resend.dev>',
-      subject: 'Sign in to example.com',
+      subject: MAGIC_LINK_DEFAULTS.subject,
       html: expect.stringContaining(
         'href="https://example.com/api/auth/callback/email?token=abc"',
       ),
@@ -165,7 +173,7 @@ describe(buildMagicLinkProvider, () => {
     expect(sendEmailMock).toHaveBeenCalledWith({
       to: 'jane@example.com',
       from: 'Sign in <onboarding@resend.dev>',
-      subject: 'Sign in to example.com',
+      subject: MAGIC_LINK_DEFAULTS.subject,
       html: expect.not.stringContaining('<!doctype html>'),
     });
   });
@@ -187,7 +195,7 @@ describe(buildMagicLinkProvider, () => {
     expect(sendEmailMock).toHaveBeenCalledWith({
       to: 'jane@example.com',
       from: 'Sign in <onboarding@resend.dev>',
-      subject: 'Sign in to example.com',
+      subject: MAGIC_LINK_DEFAULTS.subject,
       html: expect.not.stringContaining('<!doctype html>'),
     });
   });
@@ -403,6 +411,113 @@ describe(buildMagicLinkProvider, () => {
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
         from: 'Acme Support <onboarding@resend.dev>',
+        subject: MAGIC_LINK_DEFAULTS.subject,
+      }),
+    );
+  });
+
+  it('sends the authored subject and body once a tenant has edited its magic-link copy', async () => {
+    getTenantByDomainMock.mockResolvedValue({
+      id: 'tenant-1',
+      name: 'Acme Blog',
+    });
+    getSiteConfigMock.mockResolvedValue({
+      preset: PRESET_ID.CONSOLE,
+      accentHue: 140,
+      logoHue: undefined,
+    });
+    getEmailTemplateMock.mockResolvedValue({
+      subject: 'Welcome back to Acme',
+      body: [
+        {
+          _type: 'block',
+          _key: 'authored-1',
+          style: 'normal',
+          children: [
+            {
+              _type: 'span',
+              _key: 'authored-1-span',
+              text: 'Use the button below to get back in.',
+              marks: [],
+            },
+          ],
+        },
+      ],
+      logoAssetUrl: undefined,
+    });
+    const provider = buildMagicLinkProvider();
+
+    await provider.sendVerificationRequest({
+      identifier: 'jane@example.com',
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      expires: new Date('2026-01-01T00:00:00.000Z'),
+      provider,
+      token: 'abc',
+      theme: {},
+      request: new Request('https://example.com'),
+    });
+
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subject: 'Welcome back to Acme',
+        html: expect.stringContaining('Use the button below to get back in.'),
+      }),
+    );
+  });
+
+  it('keeps the sign-in action outside an authored body that mimics its own url and label', async () => {
+    getTenantByDomainMock.mockResolvedValue({
+      id: 'tenant-1',
+      name: 'Acme Blog',
+    });
+    getSiteConfigMock.mockResolvedValue({
+      preset: PRESET_ID.CONSOLE,
+      accentHue: 140,
+      logoHue: undefined,
+    });
+    getEmailTemplateMock.mockResolvedValue({
+      subject: MAGIC_LINK_DEFAULTS.subject,
+      body: [
+        {
+          _type: 'block',
+          _key: 'adversarial-1',
+          style: 'normal',
+          markDefs: [
+            {
+              _type: 'link',
+              _key: 'adversarial-link',
+              href: 'https://attacker.example.com/phish',
+            },
+          ],
+          children: [
+            {
+              _type: 'span',
+              _key: 'adversarial-span',
+              text: 'Sign in',
+              marks: ['adversarial-link'],
+            },
+          ],
+        },
+      ],
+      logoAssetUrl: undefined,
+    });
+    const provider = buildMagicLinkProvider();
+
+    await provider.sendVerificationRequest({
+      identifier: 'jane@example.com',
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      expires: new Date('2026-01-01T00:00:00.000Z'),
+      provider,
+      token: 'abc',
+      theme: {},
+      request: new Request('https://example.com'),
+    });
+
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        html: expect.stringContaining(
+          'href="https://example.com/api/auth/callback/email?token=abc"',
+        ),
       }),
     );
   });
