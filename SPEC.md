@@ -454,8 +454,9 @@ to one static default mark with no per-tenant recoloring. The former
 `siteSettings.brand.variant`/`BRAND_VARIANTS` binary look toggle (and its
 `.indigo` CSS class) is retired in favor of this — its one prior look
 ("Indigo") is expressible as a theme override (`accentHue`/`logoHue`) rather
-than a separate axis. The Studio field, the generated type and the
-`BRAND_VARIANTS` const are all removed; the one `settings_site` document that
+than a separate axis. The Studio field and its generated type are removed; the
+`BRAND_VARIANTS` const itself goes once its last consumer — a historical
+content migration — stops importing it. The one `settings_site` document that
 still carried a value keeps it as an unread key, which needs no migration.
 (The unrelated `BRAND_VARIANT` const in `@blog/config`'s `layout.ts`, which
 every `module_*` document's `brandVariant` field uses, is a different axis and
@@ -550,10 +551,11 @@ cut with no concrete values ever specified; tracked separately (#1920).
 
 **Curated UI copy lives in Voice, not on modules.** Empty-state and other
 curated UI strings have exactly one authorable home: the tenant's
-`site_config.voice_overrides` in Postgres (`blogListEmpty`, `topicEmpty`,
+`site_config.voiceOverrides` in Postgres (`blogListEmpty`, `topicEmpty`,
 `tagEmpty`, …), edited in the platform's Voice page and applied via the merge
 above. The `settings_voice` Studio singleton that previously held them is
-deleted — it had had no read path since the Postgres cutover. A module-level field for the same copy (e.g. a
+deleted — it had no read path after the Postgres cutover.
+A module-level field for the same copy (e.g. a
 `module_postList.emptyMessage`, removed in #1899 for exactly this reason)
 creates a second, uncoordinated home that silently wins over the tenant's
 Voice override with no error or warning — the worst failure mode for a
