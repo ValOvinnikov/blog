@@ -1,7 +1,6 @@
 import type { TEmailTemplateType } from '@blog/config/constants';
 import { queries } from '@blog/db';
-
-const REPLY_TO_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { isValidEmailAddress } from '@blog/email/validation';
 
 export type TResolvedMagicLinkEmailSettings = {
   logoImageUrl: string | undefined;
@@ -32,7 +31,7 @@ export async function resolveMagicLinkEmailSettings(
   return {
     logoImageUrl: template?.logoAssetUrl ?? config?.logoAssetUrl,
     senderName: config?.senderName,
-    replyTo: replyTo && REPLY_TO_PATTERN.test(replyTo) ? replyTo : undefined,
+    replyTo: replyTo && isValidEmailAddress(replyTo) ? replyTo : undefined,
     footerPostalAddress: config?.footerPostalAddress,
   };
 }
