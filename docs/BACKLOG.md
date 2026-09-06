@@ -1009,6 +1009,63 @@ adds `config`, `db` and `email`. Order by archetypes unlocked:
   modules each template needs; the blog template can ship after Phase 1
   alone.
 
+### Parked ideas — home page (recorded 2026-09-06, filed on demand)
+
+Ideas raised while designing the catalogue that are not in any phase above.
+Each reuses something that already exists; none is committed. The first
+three are the ones worth pulling forward first — each is a few days and
+visible to a tenant on day one.
+
+**For editors**
+
+- **Module presets** — Sanity initial-value templates so "add a
+  Testimonials section" arrives pre-filled (copy, brand variant, layout)
+  instead of as an empty form. Studio-only; makes the catalogue feel
+  finished. _(pull forward)_
+- **Visibility windows** — optional `visibleFrom` / `visibleUntil` on the
+  shared `layout` object, for launches, promotions and seasonal sections.
+  One field pair, every module inherits it; the web renderer skips a module
+  outside its window.
+- **Visual editing** — M2.1 (draft preview + Sanity Presentation) matters far
+  more once tenants compose home pages: click a section on the live
+  preview, land on its module document. Already tracked; sequence it after
+  Phase 1.
+- **Shared modules across pages** — modules are standalone documents, so one
+  testimonial block can sit on the home page and a landing page. Surface it
+  in the Studio desk (a "used on" preview subtitle) rather than leaving it
+  an accident.
+
+**For readers**
+
+- **Continue reading** — a signed-in visitor sees their bookmarked posts at
+  the top of the home page. Auth and bookmarks exist; a small `@blog/db`
+  query plus a module that renders nothing when there is nothing to show.
+  _(pull forward)_
+- **Popular this week** — `module_postPopular` ranked by bookmark counts from
+  Neon. The first module sourced from `@blog/db` rather than Sanity; the
+  web layer is already where the two meet, so no layer contract changes.
+- **Start here** — a curated reading path for first-time visitors.
+  `module_postFeatured` covers it if pinned posts keep their authored order
+  (one more reason pinning stays explicit).
+- **Series** — a `series` content type grouping posts into a sequence, plus a
+  teaser module. Gives long-running topics a front door.
+- **Search in the hero** — once semantic search (M3.4) lands, a search field
+  as a hero action, with `WebSite` sitelinks-searchbox JSON-LD.
+
+**For growth**
+
+- **Live social proof numbers** — "Join 1,240 readers" in the newsletter
+  module or a statement hero, counted from active `subscribers`. Real
+  numbers convert better than copy; the count already exists. _(pull
+  forward)_
+- **Generative hero art** — the M4 "fingerprint headers" idea: deterministic
+  artwork from a post's embedding, so a hero without a photo still has a
+  distinctive image, and a fresh tenant's home page is never blank.
+- **Theme-aware images** — a light/dark image pair on hero and CTA modules;
+  product screenshots look wrong in the other scheme.
+- **Per-page OG images** — generated from the hero title and brand tokens so
+  a shared link looks designed with no editor effort.
+
 ### Non-goals (recorded so this milestone doesn't sprawl)
 
 Renaming `module_hero` in place (immutable `_type`; retirement is the path);
