@@ -18,13 +18,13 @@ import { Link } from '@platform/i18n/navigation';
 import { formatRelativeTime } from '@platform/utils/format-relative-time/format-relative-time';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { provisioningStepTone } from '@platform/utils/status-tone/status-tone';
+import { useRelativeTimeTick } from '@platform/utils/use-relative-time-tick/use-relative-time-tick';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
 import { RunCard } from './components/run-card/run-card';
 import { provisioningStatusViewVariants } from './provisioning-status-view-variants';
 import { STEP_ORDER, useProvisioningPoll } from './use-provisioning-poll';
-import { useRelativeTimeTick } from './use-relative-time-tick';
 
 type TProvisioningStatusViewProps = {
   tenant: TTenant;
