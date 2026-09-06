@@ -1,4 +1,5 @@
 import {
+  DEPROVISIONING_STEP,
   TENANT_PLAN,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
@@ -6,8 +7,10 @@ import {
   TENANT_STATUS,
 } from '@blog/db/constants';
 import type {
+  TDeprovisioningStepState,
   TProvisioningStepState,
   TTenant,
+  TTenantDeprovisioningState,
   TTenantProvisioningState,
 } from '@blog/db/schema/tenants';
 
@@ -23,6 +26,21 @@ export const idleProvisioningSteps = (): TTenantProvisioningState => {
     [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: idle,
     [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: idle,
     [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: idle,
+  };
+};
+
+export const idleDeprovisioningSteps = (): TTenantDeprovisioningState => {
+  const idle: TDeprovisioningStepState = {
+    status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
+  };
+
+  return {
+    [DEPROVISIONING_STEP.REMOVE_DOMAIN]: idle,
+    [DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT]: idle,
+    [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: idle,
+    [DEPROVISIONING_STEP.CLEAR_ARTIFACTS]: idle,
+    [DEPROVISIONING_STEP.ARCHIVE_TENANT]: idle,
+    [DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE]: idle,
   };
 };
 

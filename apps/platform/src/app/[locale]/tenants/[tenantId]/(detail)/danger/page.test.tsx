@@ -1,12 +1,20 @@
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import {
+  idleDeprovisioningSteps,
+  makeTenant,
+} from '@platform/testing/tenants/fixtures';
 
 import TenantDangerPage from './page';
 
-const { requireSuperAdminMock, listTenantsByIdsMock } = vi.hoisted(() => ({
+const {
+  requireSuperAdminMock,
+  listTenantsByIdsMock,
+  getTenantDeprovisioningStatusActionMock,
+} = vi.hoisted(() => ({
   requireSuperAdminMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
+  getTenantDeprovisioningStatusActionMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/auth/require-super-admin', () => ({
@@ -32,18 +40,33 @@ vi.mock('@platform/server/provisioning/reactivate-tenant-action', () => ({
   reactivateTenantAction: vi.fn(),
 }));
 
+vi.mock(
+  '@platform/server/provisioning/get-tenant-deprovisioning-status-action',
+  () => ({
+    getTenantDeprovisioningStatusAction:
+      getTenantDeprovisioningStatusActionMock,
+  }),
+);
+
 const setup = customRenderAsync(TenantDangerPage, {
   params: Promise.resolve({ tenantId: 'tenant-1' }),
 });
 
 describe(TenantDangerPage, () => {
   beforeEach(() => {
+    vi.useFakeTimers();
     requireSuperAdminMock.mockReset();
     requireSuperAdminMock.mockResolvedValue({
       id: 'admin-1',
       role: 'SUPERADMIN',
     });
     listTenantsByIdsMock.mockReset();
+    getTenantDeprovisioningStatusActionMock.mockReset();
+    getTenantDeprovisioningStatusActionMock.mockResolvedValue(undefined);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('never queries the tenant when the caller is not a superadmin', async () => {
@@ -98,5 +121,46 @@ describe(TenantDangerPage, () => {
     listTenantsByIdsMock.mockResolvedValue([]);
 
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+  });
+
+  it('renders unchanged, with no deprovisioning progress card, for a tenant that has never been deprovisioned', async () => {
+    listTenantsByIdsMock.mockResolvedValue([
+      makeTenant({ deprovisioningSteps: null }),
+    ]);
+
+    await setup();
+
+    expect(
+      screen.queryByRole('heading', { name: 'Deprovisioning progress' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders the deprovisioning progress card once a run exists', async () => {
+    listTenantsByIdsMock.mockResolvedValue([
+      makeTenant({
+        deprovisioningSteps: {
+          ...idleDeprovisioningSteps(),
+          run: { startedAt: '2026-08-12T14:18:00.000Z' },
+        },
+      }),
+    ]);
+
+    await setup();
+
+    expect(
+      screen.getByRole('heading', { name: 'Deprovisioning progress' }),
+    ).toBeVisible();
+  });
+
+  it('renders no deprovisioning progress card when deprovisioningSteps carries no run marker', async () => {
+    listTenantsByIdsMock.mockResolvedValue([
+      makeTenant({ deprovisioningSteps: idleDeprovisioningSteps() }),
+    ]);
+
+    await setup();
+
+    expect(
+      screen.queryByRole('heading', { name: 'Deprovisioning progress' }),
+    ).not.toBeInTheDocument();
   });
 });

@@ -1,5 +1,6 @@
 import { queries } from '@blog/db';
 import { DeprovisionTenantControl } from '@platform/components/features/tenants/deprovision-tenant-control';
+import { DeprovisioningStatusView } from '@platform/components/features/tenants/deprovisioning-status-view';
 import { ReactivateTenantControl } from '@platform/components/features/tenants/reactivate-tenant-control';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
@@ -38,6 +39,9 @@ export default async function TenantDangerPage({ params }: TProps) {
       <PageHeader title={t('title')} description={t('description')} />
       {tenant.deprovisionedAt && <ReactivateTenantControl tenant={tenant} />}
       <DeprovisionTenantControl tenant={tenant} />
+      {tenant.deprovisioningSteps?.run && (
+        <DeprovisioningStatusView tenant={tenant} />
+      )}
     </>
   );
 }
