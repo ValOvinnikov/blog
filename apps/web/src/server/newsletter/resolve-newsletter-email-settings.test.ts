@@ -226,4 +226,49 @@ describe('resolveNewsletterEmailSettings', () => {
     );
     warnSpy.mockRestore();
   });
+
+  it('still uses the successfully-resolved per-template logo when getEmailConfig rejects', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    getEmailConfigMock.mockRejectedValue(new Error('db down'));
+    getEmailTemplateMock.mockResolvedValue({
+      tenantId: TENANT_ID,
+      templateType: 'NEWSLETTER_CONFIRMATION',
+      subject: 'Confirm your subscription',
+      body: [],
+      logoAssetUrl: 'https://cdn.example.com/template-logo.png',
+    });
+    const { resolveNewsletterEmailSettings } =
+      await import('./resolve-newsletter-email-settings');
+
+    const settings = await resolveNewsletterEmailSettings(TENANT_ID, undefined);
+
+    expect(settings.logoImageUrl).toBe(
+      'https://cdn.example.com/template-logo.png',
+    );
+    warnSpy.mockRestore();
+  });
+
+  it('still uses the successfully-resolved email_config values when getEmailTemplate rejects', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    getEmailTemplateMock.mockRejectedValue(new Error('db down'));
+    getEmailConfigMock.mockResolvedValue({
+      tenantId: TENANT_ID,
+      logoAssetUrl: 'https://cdn.example.com/tenant-logo.png',
+      senderName: 'Zeta Times',
+      replyToAddress: 'support@example.com',
+      footerPostalAddress: '123 Main St, Springfield',
+    });
+    const { resolveNewsletterEmailSettings } =
+      await import('./resolve-newsletter-email-settings');
+
+    const settings = await resolveNewsletterEmailSettings(TENANT_ID, undefined);
+
+    expect(settings).toEqual({
+      logoImageUrl: 'https://cdn.example.com/tenant-logo.png',
+      footerPostalAddress: '123 Main St, Springfield',
+      fromAddress: 'Zeta Times <onboarding@resend.dev>',
+      replyTo: 'support@example.com',
+    });
+    warnSpy.mockRestore();
+  });
 });
