@@ -50,7 +50,10 @@ const RESOLVABLE_EXTENSIONS = ['.ts', '.tsx'];
 const parsedModules = new Map();
 
 // Widely-shared modules (`@blog/config`, `@blog/ui`) sit in most entrypoints'
-// graphs, so parsing per entrypoint re-reads the same files ~79 times.
+// graphs, so parsing per entrypoint re-reads the same files ~79 times. Keyed by
+// absolute path and never invalidated: rewriting a file at a path already read
+// in this process yields the stale AST, which tests must avoid by giving each
+// fixture repo its own root.
 const readModule = (file) => {
   const cached = parsedModules.get(file);
   if (cached !== undefined) {
