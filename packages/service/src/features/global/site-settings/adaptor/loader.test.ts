@@ -1,8 +1,4 @@
-import {
-  BRAND_VARIANTS,
-  SPEC_LINE_SEPARATOR_CHARS,
-  SPEC_LINE_SEPARATORS,
-} from '@blog/config';
+import { SPEC_LINE_SEPARATOR_CHARS, SPEC_LINE_SEPARATORS } from '@blog/config';
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawImage } from '@blog/service/testing/shared/fixtures';
@@ -41,7 +37,6 @@ describe('getSiteSettings', () => {
             separator: SPEC_LINE_SEPARATORS.DOT,
           },
           logo: makeRawImage('Logo'),
-          variant: BRAND_VARIANTS.CONSOLE,
         },
       }),
     );
@@ -53,24 +48,6 @@ describe('getSiteSettings', () => {
     expect(result.brand.specLine).toBe(
       `build 2026.07 ${SPEC_LINE_SEPARATOR_CHARS.DOT} online`,
     );
-    expect(result.brand.variant).toBe(BRAND_VARIANTS.CONSOLE);
-  });
-
-  it('maps a non-default brand variant', async () => {
-    mockRun.mockResolvedValue(
-      makeRawSiteSettings({
-        brand: {
-          name: 'Awesome Blog',
-          specLine: null,
-          logo: makeRawImage('Logo'),
-          variant: BRAND_VARIANTS.INDIGO,
-        },
-      }),
-    );
-
-    const result = await getSiteSettings(tenant);
-
-    expect(result.brand.variant).toBe(BRAND_VARIANTS.INDIGO);
   });
 
   it('maps a missing spec line to undefined', async () => {
@@ -80,7 +57,6 @@ describe('getSiteSettings', () => {
           name: 'Awesome Blog',
           specLine: null,
           logo: makeRawImage('Logo'),
-          variant: BRAND_VARIANTS.CONSOLE,
         },
       }),
     );
@@ -100,7 +76,6 @@ describe('getSiteSettings', () => {
             separator: SPEC_LINE_SEPARATORS.PIPE,
           },
           logo: makeRawImage('Logo'),
-          variant: BRAND_VARIANTS.CONSOLE,
         },
       }),
     );
@@ -122,7 +97,6 @@ describe('getSiteSettings', () => {
             separator: SPEC_LINE_SEPARATORS.BULLET,
           },
           logo: makeRawImage('Logo'),
-          variant: BRAND_VARIANTS.CONSOLE,
         },
       }),
     );
@@ -144,7 +118,6 @@ describe('getSiteSettings', () => {
             separator: SPEC_LINE_SEPARATORS.SLASH,
           },
           logo: makeRawImage('Logo'),
-          variant: BRAND_VARIANTS.CONSOLE,
         },
       }),
     );
@@ -163,7 +136,6 @@ describe('getSiteSettings', () => {
           name: 'Awesome Blog',
           specLine: { items: ['online'], separator: SPEC_LINE_SEPARATORS.DOT },
           logo: makeRawImage('Logo'),
-          variant: BRAND_VARIANTS.CONSOLE,
         },
       }),
     );
@@ -180,7 +152,6 @@ describe('getSiteSettings', () => {
           name: 'Awesome Blog',
           specLine: { items: [], separator: SPEC_LINE_SEPARATORS.DOT },
           logo: makeRawImage('Logo'),
-          variant: BRAND_VARIANTS.CONSOLE,
         },
       }),
     );
@@ -205,7 +176,6 @@ describe('getSiteSettings', () => {
           name: 'Awesome Blog',
           specLine: null,
           logo: null,
-          variant: BRAND_VARIANTS.CONSOLE,
         },
       }),
     );
@@ -223,7 +193,6 @@ describe('getSiteSettings', () => {
           name: 'Awesome Blog',
           specLine: null,
           logo,
-          variant: BRAND_VARIANTS.CONSOLE,
         },
       }),
     );
@@ -241,7 +210,6 @@ describe('getSiteSettings', () => {
           name: 'Awesome Blog',
           specLine: null,
           logo: null,
-          variant: BRAND_VARIANTS.CONSOLE,
         },
       }),
     );

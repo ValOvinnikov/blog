@@ -17,7 +17,6 @@ export const siteSettingsQuery = q.star
           }))
           .nullable(true),
         logo: b.field('logo').project(imageWithAltFragment).nullable(true),
-        variant: b.field('variant').notNull(),
       }))
       .notNull(),
     description: sub.field('description').notNull(),
