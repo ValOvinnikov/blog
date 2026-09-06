@@ -51,7 +51,7 @@ export default meta;
 type TStory = StoryObj<typeof meta>;
 
 /**
- * Access via `NewsletterSignup.Full` — the rich window-shell density used by
+ * Access via `NewsletterSignup.Full` — the rich panel density used by
  * the site footer and CMS page-builder module, split into a pitch pane and a
  * form pane side by side on desktop.
  */

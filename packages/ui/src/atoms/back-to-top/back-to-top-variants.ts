@@ -6,7 +6,7 @@ export const backToTopVariants = tv({
     'fixed right-6 bottom-6 z-20',
     'size-11 rounded-full',
     'border border-border bg-surface shadow-lg',
-    'transition-[opacity,translate] duration-base ease-console',
+    'transition-[opacity,translate] duration-base ease-smooth',
   ],
   variants: {
     visible: {

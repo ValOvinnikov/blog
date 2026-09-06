@@ -5,7 +5,7 @@ export const postCardVariants = tv({
     root: [
       'relative flex h-full flex-col overflow-hidden',
       'bg-surface border-l-2 border-brand-primary',
-      'transition-colors duration-base ease-console',
+      'transition-colors duration-base ease-smooth',
       'hover:bg-brand-primary-muted focus-within:bg-brand-primary-muted',
       'motion-reduce:transition-none',
     ],

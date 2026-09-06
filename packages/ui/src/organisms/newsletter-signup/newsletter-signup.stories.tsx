@@ -13,7 +13,7 @@ type TStory = StoryObj<typeof meta>;
 
 /**
  * `NewsletterSignup` exposes two mutually-exclusive densities — `Full` (the
- * rich window-shell form) and `Compact` (the slim single-row strip) — shown
+ * rich panel form) and `Compact` (the slim single-row strip) — shown
  * together here. See `Organisms/NewsletterSignup/Full` and
  * `Organisms/NewsletterSignup/Compact` for each density's own controls.
  */

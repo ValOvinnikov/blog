@@ -15,7 +15,7 @@ export const textInputVariants = tv({
     input: [
       'w-full rounded-sm border bg-surface px-3 py-2',
       'font-mono text-copy text-text placeholder:text-subtle',
-      'transition-colors duration-base ease-console',
+      'transition-colors duration-base ease-smooth',
       'border-border-strong',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',

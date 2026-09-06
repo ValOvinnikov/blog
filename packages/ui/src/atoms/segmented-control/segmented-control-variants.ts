@@ -10,7 +10,7 @@ export const segmentedControlVariants = tv({
       'inline-flex items-center justify-center',
       'rounded-sm px-3 py-1.5',
       'font-mono text-xs font-medium uppercase tracking-eyebrow',
-      'cursor-pointer transition-colors duration-base ease-console',
+      'cursor-pointer transition-colors duration-base ease-smooth',
       'text-muted hover:text-text',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',

@@ -6,7 +6,7 @@ export const bookmarkToggleVariants = tv({
     root: [
       'inline-flex min-h-11 items-center gap-[0.7ch] sm:min-h-0',
       'rounded-sm border border-border-strong bg-surface px-[0.8rem] py-2',
-      'font-mono text-card-copy text-muted transition-colors duration-base ease-console',
+      'font-mono text-card-copy text-muted transition-colors duration-base ease-smooth',
       'cursor-pointer',
       'hover:border-brand-primary hover:text-brand-primary',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',

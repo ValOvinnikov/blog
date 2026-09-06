@@ -6,7 +6,7 @@ export const popoverMenuItemVariants = tv({
     'flex w-full items-center gap-2',
     'rounded-md px-3 py-2',
     'font-display text-sm text-text',
-    'transition-colors duration-base ease-console',
+    'transition-colors duration-base ease-smooth',
     'hover:bg-surface-2 hover:text-brand-primary',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
     'focus-visible:ring-offset-2 focus-visible:ring-offset-surface',

@@ -101,6 +101,37 @@ export const Plain: TStory = {
   },
 };
 
+export const WithTitle: TStory = {
+  args: {
+    command: undefined,
+    state: undefined,
+    title: 'Saved',
+    message: 'Added to your bookmarks.',
+  },
+};
+
+export const TitleLoading: TStory = {
+  args: {
+    type: TOAST_TYPE.INFO,
+    isLoading: true,
+    command: undefined,
+    state: undefined,
+    title: 'Saving',
+    message: 'Hang on a moment…',
+    time: undefined,
+    durationMs: undefined,
+  },
+};
+
+export const MessageOnly: TStory = {
+  args: {
+    command: undefined,
+    state: undefined,
+    title: undefined,
+    message: 'Removed from bookmarks.',
+  },
+};
+
 const ReducedMotionDemo = () => (
   <>
     {/*

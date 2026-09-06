@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_56 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_57 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -194,6 +194,16 @@ Variants: layout: IMAGE_LAYOUT.INLINE|IMAGE_LAYOUT.FULL_BLEED|IMAGE_LAYOUT.FLOAT
 a navigation link that looks like a `Button`: applies the shared `buttonVariants` to an anchor (or any `as` element), so links can read as buttons.
 Props: className?: string _(extends IWithDataTestId, VariantProps<typeof buttonVariants>)_
 
+### Panel — `molecules/panel/panel.tsx`
+
+a bordered, rounded surface with a titled header bar above a padded body, framing a self-contained feature (auth, account settings, bookmarks, newsletter) as one distinct block on the page.
+Props: children?: TCompoundChildren<typeof PanelSlotParts> _(extends IWithClassName, IWithDataTestId)_
+
+Slots:
+
+- **Panel.Header** — Panel.Header — the panel's title bar, rendered as a real heading so the panel's name takes its place in the page's heading outline. Props: headingLevel: THeadingLevel · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Panel.Body** — Panel.Body — the padded content slot below a `Panel.Header`. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+
 ### PopoverMenu — `molecules/popover-menu/popover-menu.tsx`
 
 positioned trigger + non-modal menu panel primitive (`PopoverMenu.Trigger`, `PopoverMenu.Panel`, `PopoverMenu.Item`, `PopoverMenu.Separator`).
@@ -258,7 +268,7 @@ Props: prefix: string · suffix?: string · hasCursor?: boolean _(extends IWithC
 ### Toast — `molecules/toast/toast.tsx`
 
 a single compact terminal-window notification confirming or reporting the result of an engagement action (bookmark, rating, comment, subscription, auth).
-Props: type: TToastType · isLoading?: boolean · command?: string · state?: string · message: ReactNode · time?: string · action?: IToastAction · dismissLabel: string · isPaused?: boolean · durationMs?: number · onDismiss: () => void · phase: NonNullable<TToastVariants['phase']> · isPlain?: boolean _(extends IWithClassName, IWithDataTestId)_
+Props: type: TToastType · isLoading?: boolean · command?: string · state?: string · title?: ReactNode · message: ReactNode · time?: string · action?: IToastAction · dismissLabel: string · isPaused?: boolean · durationMs?: number · onDismiss: () => void · phase: NonNullable<TToastVariants['phase']> · isPlain?: boolean _(extends IWithClassName, IWithDataTestId)_
 Variants: type: TOAST_TYPE.SUCCESS|TOAST_TYPE.INFO|TOAST_TYPE.WARNING|TOAST_TYPE.ERROR · phase: entering|visible|leaving · hasTime: (boolean) · paused: (boolean)
 
 ### WindowChrome — `molecules/window-chrome/window-chrome.tsx`
@@ -338,11 +348,11 @@ Slots:
 
 ### NewsletterSignup — `organisms/newsletter-signup/newsletter-signup.tsx`
 
-a pure, controlled subscribe form built on the `TextInput` atom, exposed as two mutually-exclusive densities rather than a single component with a `variant` switch: `NewsletterSignup.Full` is the rich window-shell form used by the site footer and the CMS page-builder module; `NewsletterSignup.Compact` is the slim single-row strip for the end of every article.
+a pure, controlled subscribe form built on the `TextInput` atom, exposed as two mutually-exclusive densities rather than a single component with a `variant` switch: `NewsletterSignup.Full` is the rich panel form used by the site footer and the CMS page-builder module; `NewsletterSignup.Compact` is the slim single-row strip for the end of every article.
 
 Compound component:
 
-- **NewsletterSignup.Full** — `NewsletterSignup.Full` — the rich, tinted window-shell signup form used by the site footer and the CMS page-builder module. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · supportingText?: string · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · trustCues?: INewsletterSignupTrustCue[] · align?: TNewsletterSignupVariants['align'] _(extends IWithClassName, IWithDataTestId)_
+- **NewsletterSignup.Full** — `NewsletterSignup.Full` — the rich, tinted panel signup form used by the site footer and the CMS page-builder module. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · supportingText?: string · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · trustCues?: INewsletterSignupTrustCue[] · align?: TNewsletterSignupVariants['align'] _(extends IWithClassName, IWithDataTestId)_
 - **NewsletterSignup.Compact** — `NewsletterSignup.Compact` — a slim single-row subscribe strip for the end of every article. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · prefix?: ReactNode · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string _(extends IWithClassName, IWithDataTestId)_
 
 ### Pagination — `organisms/pagination/pagination.tsx`

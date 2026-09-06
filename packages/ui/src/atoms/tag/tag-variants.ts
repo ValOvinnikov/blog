@@ -17,7 +17,7 @@ export const tagVariants = tv({
       accent: 'bg-brand-primary-muted text-brand-primary',
     },
     interactive: {
-      true: 'transition-colors duration-base ease-console',
+      true: 'transition-colors duration-base ease-smooth',
     },
   },
   compoundVariants: [
