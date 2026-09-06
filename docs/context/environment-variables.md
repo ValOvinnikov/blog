@@ -2,8 +2,11 @@
 
 > Part of the docs split described in [`docs/README.md`](../README.md). The
 > canonical, complete list of every env var this repo uses, who consumes it,
-> and whether it's required. For the minimal subset needed to run `pnpm dev`
-> locally, see [`docs/context/getting-started.md`](./getting-started.md).
+> and whether it's required. For why "required" splits into two separate
+> questions — required to boot, and required in a given deployment environment
+> — see "Optional means two different things" below. For the minimal subset
+> needed to run `pnpm dev` locally, see
+> [`docs/context/getting-started.md`](./getting-started.md).
 
 ## Vercel scopes every variable to a target — only **Production** is live here
 
@@ -89,6 +92,71 @@ back.
 | `ADMIN_APP_BASE_URL`                                                                                        | CI (`provision-tenant.yml` step 1, `recheck-tenant-owners.yml`, `validate-tenant-documents.yml`)                                                                                               | required for `provision-tenant.yml`, optional for the two sweeps; the deployed `apps/platform` origin (no trailing slash/path), e.g. `https://admin.{your-hosting}`. Used as the Sanity CORS origin step 1 adds to each new tenant's project, and as the base the two sweeps POST operator alerts to (`packages/db/scripts/lib/post-operator-alert.ts` → `/api/internal/operator-alert`); unset, a sweep skips only the notification and still completes. A `production`-scoped GitHub Environment Variable; must match the domain on the `platform-prod` Vercel project exactly. Overridable per-dispatch via the workflow's optional `adminAppBaseUrl` input (e.g. a local tunnel URL, for manually testing the flow against a local `apps/platform`) — blank falls back to this value; the real dispatch from `apps/platform` never sets the input                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | `TENANT_SANITY_DATASET`                                                                                     | CI (`provision-tenant.yml`, step 1)                                                                                                                                                            | required; the single dataset name created inside each tenant's own, freshly-created Sanity project (`packages/db/scripts/provision-tenant/steps/create-sanity-project.ts`) — externalized rather than hardcoded so the name can track which environment provisioned the tenant, `production` today since this workflow only ever runs under the `production` GitHub Environment. A `production`-scoped GitHub Environment Variable, new with this workflow — not to be confused with `SANITY_STUDIO_DATASET` above, which configures the _platform's own_ single Sanity project's dataset, not a per-tenant one. Overridable per-dispatch via the workflow's optional `tenantSanityDataset` input (e.g. `development`, for manual local testing) — blank falls back to this value; the real dispatch from `apps/platform` sets this input per `TENANT_PROVISIONING_DATASET` above (or, when `TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE` is set, always sends `development`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `TENANT_REGISTRY_ENVIRONMENT`                                                                               | CI (`provision-tenant.yml`)                                                                                                                                                                    | not a secret/var read from a GitHub Environment — set directly in the workflow's `env:` block from `inputs.environment` (the dispatched `development`/`production` choice), so `loadProvisionEnv()` can persist it verbatim onto the tenant's `provisioningSteps.run.registry`, surfaced on `apps/platform`'s provisioning page as "Registry". Absent for a local run outside Actions (`loadProvisionEnv()` treats it as optional, not required) — see `packages/db/scripts/provision-tenant/lib/env.ts`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+
+## "Optional" means two different things, and the schema can only spell one
+
+A var declared `.optional()` in an `env.ts` module is optional **at boot**. That
+is deliberate and is not the thing to change: `createEnv` validates eagerly at
+import time and one env module is imported by every entry point, so marking a
+route-scoped secret required in the zod schema would turn one webhook's missing
+secret into a whole-app outage. Optional-at-boot with a loud guard at the point
+of use — throw at the use site, fail closed with a logged 500, or degrade to a
+visible `undefined` in the type — is the correct pattern and the one this repo
+follows.
+
+What it cannot express is whether a deployment environment is nonetheless
+expected to provide the var. `WEB_ANALYTICS_ENABLED` absent means a feature is
+off, which is a valid production state. `SITE_CONFIG_REVALIDATE_SECRET` absent
+means a shipped feature is silently dead. Both are spelled `.optional()`, and
+for a long time nothing separated them — which is why
+`SITE_CONFIG_REVALIDATE_SECRET` was missing from production without anything
+noticing.
+
+So the classification is declared beside each declaration, as a marker comment
+`scripts/check-required-env.mjs` parses:
+
+```ts
+// @env-required: development, production
+SITE_CONFIG_REVALIDATE_SECRET: z.string().min(1).optional(),
+
+// @env-optional
+WEB_ANALYTICS_ENABLED: z.enum(['true', 'false']).optional(),
+```
+
+An `.optional()` var with no marker fails the check, so a new one cannot merge
+unclassified. The per-var notes in the table above still describe boot
+behaviour — "optional; feature-flag-by-absence" stays true and stays there; the
+marker is the orthogonal statement about provisioning, and the two do not
+contradict each other.
+
+The vars currently marked required in both `development` and `production`:
+
+| Variable                        | Declared in                       | Absent means                                                                 |
+| ------------------------------- | --------------------------------- | ---------------------------------------------------------------------------- |
+| `SANITY_REVALIDATE_SECRET`      | `apps/web`                        | `/api/revalidate` 500s; published content never refreshes                    |
+| `SITE_CONFIG_REVALIDATE_SECRET` | `apps/web`, `apps/platform`       | Look/Voice saves never invalidate web's cache                                |
+| `WEB_APP_URL`                   | `apps/platform`                   | the pair to the secret above — the revalidation call is skipped              |
+| `OPERATOR_ALERT_SECRET`         | `apps/platform`                   | the operator-alert route 500s                                                |
+| `RESEND_API_KEY`                | `apps/platform`, `packages/email` | magic-link sign-in and operator alerts silently never send                   |
+| `VERCEL_TEAM_ID`                | `apps/platform`                   | the account is team-owned, so domain verification cannot call the Vercel API |
+| `VERCEL_PROJECT_ID_WEB`         | `apps/platform`                   | no project to verify tenant custom domains against                           |
+| `TENANT_TOKEN_ENCRYPTION_KEY`   | `packages/db`                     | all four tenant-token queries throw                                          |
+
+**The check only sees GitHub Environments, which is a real scope limit.** A
+GitHub Environment holds the vars CI workflows consume plus the ones mirrored
+for deploy. A var read only by the running app — `VERCEL_API_TOKEN`,
+`BLOB_READ_WRITE_TOKEN`, `ANTHROPIC_API_KEY` — is provisioned in the Vercel
+project and never appears in a GitHub Environment at all. Only vars provisioned
+in a GitHub Environment may be marked required today; the others stay
+`@env-optional` even where a shipped feature arguably depends on them, and
+extending the check to the Vercel side is what would let them be reclassified.
+Presence in a GitHub Environment is also not presence in Vercel: the two must
+hold byte-identical values for the shared secrets, and only the Vercel side is
+what the running app actually reads.
+
+`development` fails the check; `production` warns while its known gaps are open.
+Mechanics and the CI wiring are in
+[`ci-automation.md`](ci-automation.md)'s "Required env vars".
 
 ## Access conventions
 

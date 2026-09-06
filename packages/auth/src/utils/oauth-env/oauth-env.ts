@@ -8,9 +8,13 @@ import { z } from 'zod';
  */
 export const oauthEnv = createEnv({
   server: {
+    // @env-optional
     AUTH_GITHUB_ID: z.string().min(1).optional(),
+    // @env-optional
     AUTH_GITHUB_SECRET: z.string().min(1).optional(),
+    // @env-optional
     AUTH_GOOGLE_ID: z.string().min(1).optional(),
+    // @env-optional
     AUTH_GOOGLE_SECRET: z.string().min(1).optional(),
   },
   runtimeEnv: process.env,

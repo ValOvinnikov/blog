@@ -7,6 +7,7 @@ import { z } from 'zod';
 // copy of RESEND_API_KEY.
 export const env = createEnv({
   server: {
+    // @env-required: development, production
     RESEND_API_KEY: z.string().min(1).optional(),
   },
   runtimeEnv: process.env,

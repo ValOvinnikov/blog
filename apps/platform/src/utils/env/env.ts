@@ -10,6 +10,7 @@ export const env = createEnv({
     // read it directly to show the "email alerts not configured" banner.
     // Optional: absent, magic-link and operator-alert sends fail at send
     // time; every other sign-in method is unaffected.
+    // @env-required: development, production
     RESEND_API_KEY: z.string().min(1).optional(),
     // Vercel's standard read-write token for the Blob store the Look tab's
     // logo/favicon uploads write to (`@vercel/blob`'s `put`/`del`).
@@ -17,6 +18,7 @@ export const env = createEnv({
     // dev/CI environment necessarily has — optional here so its absence
     // surfaces as a readable "uploads aren't configured" error from the
     // upload action rather than an import-time crash.
+    // @env-optional
     BLOB_READ_WRITE_TOKEN: z.string().min(1).optional(),
     // Base URL of the `apps/web` deployment this app's Look/Voice saves call
     // after a successful `site_config` write, to revalidate `apps/web`'s
@@ -24,11 +26,13 @@ export const env = createEnv({
     // Optional (feature-flag-by-absence, paired with
     // `SITE_CONFIG_REVALIDATE_SECRET` below): absent, the call is skipped
     // and logged — the save itself still succeeds.
+    // @env-required: development, production
     WEB_APP_URL: z.string().url().optional(),
     // MUST be byte-identical to `apps/web`'s own `SITE_CONFIG_REVALIDATE_SECRET`:
     // sent as a bearer token to `apps/web`'s `/api/revalidate-site-config`
     // route, which compares it against its own copy and rejects a mismatch
     // with 401.
+    // @env-required: development, production
     SITE_CONFIG_REVALIDATE_SECRET: z.string().min(1).optional(),
     // A narrowly-scoped (`actions: write` only) GitHub PAT used to trigger
     // both `provision-tenant.yml` (the "Add tenant" wizard) and
@@ -39,6 +43,7 @@ export const env = createEnv({
     // work itself. Optional: absent, the dispatch call is skipped and
     // logged — the triggering action still succeeds, so an operator can
     // retry once this is configured.
+    // @env-optional
     TENANT_PROVISIONING_GITHUB_TOKEN: z.string().min(1).optional(),
     // The `owner/repo` this app's own Server Actions dispatch
     // `provision-tenant.yml`/`deprovision-tenant.yml` against — this call
@@ -47,6 +52,7 @@ export const env = createEnv({
     // configured explicitly. Optional, paired with
     // `TENANT_PROVISIONING_GITHUB_TOKEN` above — absent, the dispatch is
     // skipped and logged the same way a missing token is.
+    // @env-optional
     TENANT_PROVISIONING_GITHUB_REPO: z
       .string()
       .regex(/^[^/\s]+\/[^/\s]+$/, 'Expected "owner/repo".')
@@ -58,6 +64,7 @@ export const env = createEnv({
     // the production Vercel project. Optional: absent, the input is omitted
     // entirely and CI falls back to the production `ADMIN_APP_BASE_URL`
     // Environment variable, unchanged from today.
+    // @env-optional
     TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE: z.string().url().optional(),
     // Forwarded as `provision-tenant.yml`'s `tenantSanityDataset`
     // workflow_dispatch input, letting this deployment pick which dataset
@@ -70,6 +77,7 @@ export const env = createEnv({
     // absent, the input is omitted and CI falls back to the
     // `TENANT_SANITY_DATASET` GitHub Environment default. Always overridden
     // by `TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE` above when that is set.
+    // @env-optional
     TENANT_PROVISIONING_DATASET: z
       .enum(['development', 'production'])
       .optional(),
@@ -77,22 +85,27 @@ export const env = createEnv({
     // custom domain's live DNS verification state (Vercel's Domains API) on
     // each render — informational only, never blocks provisioning. Optional:
     // absent, the status page shows "not configured" instead of a live check.
+    // @env-optional
     VERCEL_API_TOKEN: z.string().min(1).optional(),
     // The *shared* `apps/web` Vercel project id — every tenant's custom
     // domain is added to this one project (frontend topology is shared app,
     // not per-tenant), so domain verification is checked against it.
+    // @env-required: development, production
     VERCEL_PROJECT_ID_WEB: z.string().min(1).optional(),
     // Vercel team id, only needed when the account is team-owned (Vercel's
     // API requires it as a query param in that case). Optional even when
     // VERCEL_API_TOKEN is set — a personal-account token needs no team id.
+    // @env-required: development, production
     VERCEL_TEAM_ID: z.string().min(1).optional(),
     // Bearer token this app's `POST /api/internal/operator-alert` route
     // compares an incoming request against, rejecting a mismatch with 401.
     // Optional: absent, the route returns 500 rather than accepting an
     // unauthenticated request.
+    // @env-required: development, production
     OPERATOR_ALERT_SECRET: z.string().min(1).optional(),
     // The `from` address for operator-alert email. Optional: absent, it
     // falls back to Resend's shared testing sender.
+    // @env-optional
     OPERATOR_ALERT_FROM_ADDRESS: z.string().min(1).optional(),
     // Shared Auth.js signing secret — required for this app's session to
     // function at all, byte-identical with `apps/web`'s. Funneled through

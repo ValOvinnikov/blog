@@ -11,6 +11,7 @@ import { z } from 'zod';
 export const env = createEnv({
   server: {
     DATABASE_URL: z.string().min(1),
+    // @env-required: development, production
     TENANT_TOKEN_ENCRYPTION_KEY: z.string().min(1).optional(),
   },
   runtimeEnv: process.env,
