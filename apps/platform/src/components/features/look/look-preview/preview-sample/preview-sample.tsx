@@ -3,7 +3,7 @@ import { BrandMark } from '@blog/ui/atoms/brand-mark';
 import { Button } from '@blog/ui/atoms/button';
 import { Heading } from '@blog/ui/atoms/heading';
 import { Text } from '@blog/ui/atoms/text';
-import { WindowChrome } from '@blog/ui/molecules/window-chrome';
+import { Panel } from '@blog/ui/molecules/panel';
 import { useTranslations } from 'next-intl';
 import type { CSSProperties } from 'react';
 
@@ -15,7 +15,6 @@ export type TPreviewSampleProps = {
   isDark: boolean;
   headingFontFamily: string;
   bodyFontFamily: string;
-  isChromeOn: boolean;
 };
 
 /**
@@ -30,55 +29,46 @@ export const PreviewSample = ({
   isDark,
   headingFontFamily,
   bodyFontFamily,
-  isChromeOn,
 }: TPreviewSampleProps) => {
   const t = useTranslations('lookPreview');
 
-  const { previewBox, previewSurface, brandRow, brandName, actionsRow, chip } =
+  const { surface, brandRow, brandName, actionsRow, chip } =
     previewSampleVariants({ isDark });
-
-  const sample = (
-    <>
-      <div className={brandRow()}>
-        <BrandMark size={SIZE.SM} title={tenantName} />
-        <span className={brandName()} style={{ fontFamily: headingFontFamily }}>
-          {tenantName}
-        </span>
-      </div>
-      <Heading
-        level={3}
-        visual="preview"
-        style={{ fontFamily: headingFontFamily }}
-      >
-        {t('sampleHeading')}
-      </Heading>
-      <Text variant="supporting" style={{ fontFamily: bodyFontFamily }}>
-        {t('samplePara')}
-      </Text>
-      <div className={actionsRow()}>
-        <Button type="button" size={SIZE.SM}>
-          {t('subscribeButton')}
-        </Button>
-        <Button type="button" variant="ghost" size={SIZE.SM}>
-          {t('readMoreButton')}
-        </Button>
-        <span className={chip()}>{t('readTimeChip')}</span>
-      </div>
-    </>
-  );
 
   return (
     <div style={tokenStyle}>
-      {isChromeOn ? (
-        <WindowChrome className={previewSurface()}>
-          <WindowChrome.Bar>
-            <WindowChrome.Prompt>{t('terminalPrompt')}</WindowChrome.Prompt>
-          </WindowChrome.Bar>
-          <WindowChrome.Body>{sample}</WindowChrome.Body>
-        </WindowChrome>
-      ) : (
-        <div className={previewBox()}>{sample}</div>
-      )}
+      <Panel className={surface()} dataTestId="preview-sample-panel">
+        <Panel.Body>
+          <div className={brandRow()}>
+            <BrandMark size={SIZE.SM} title={tenantName} />
+            <span
+              className={brandName()}
+              style={{ fontFamily: headingFontFamily }}
+            >
+              {tenantName}
+            </span>
+          </div>
+          <Heading
+            level={3}
+            visual="preview"
+            style={{ fontFamily: headingFontFamily }}
+          >
+            {t('sampleHeading')}
+          </Heading>
+          <Text variant="supporting" style={{ fontFamily: bodyFontFamily }}>
+            {t('samplePara')}
+          </Text>
+          <div className={actionsRow()}>
+            <Button type="button" size={SIZE.SM}>
+              {t('subscribeButton')}
+            </Button>
+            <Button type="button" variant="ghost" size={SIZE.SM}>
+              {t('readMoreButton')}
+            </Button>
+            <span className={chip()}>{t('readTimeChip')}</span>
+          </div>
+        </Panel.Body>
+      </Panel>
     </div>
   );
 };

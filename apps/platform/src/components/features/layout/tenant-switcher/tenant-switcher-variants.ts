@@ -5,7 +5,7 @@ export const tenantSwitcherVariants = tv({
     trigger: [
       'flex w-full items-center gap-[9px] rounded-[10px] border border-admin-side-line',
       'bg-admin-side-raised px-2.5 py-2 text-left',
-      'transition-colors duration-base ease-console',
+      'transition-colors duration-base ease-smooth',
       'hover:border-admin-side-accent/40',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-brand',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-admin-side',

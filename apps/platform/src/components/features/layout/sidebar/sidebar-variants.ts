@@ -41,7 +41,7 @@ export const sidebarVariants = tv({
     list: ['flex flex-col gap-0.5'],
     row: [
       'group flex items-center gap-2.5 rounded-admin-sm px-2.5 py-2 text-[13px]',
-      'transition-colors duration-base ease-console',
+      'transition-colors duration-base ease-smooth',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-brand',
       'group-data-[collapsed=true]/shell:justify-center group-data-[collapsed=true]/shell:px-0',
     ],
@@ -49,7 +49,7 @@ export const sidebarVariants = tv({
     // renders, or never, for the static inert row) — the icon reads it off
     // its own ancestor via `group-aria-*` rather than a separate state prop.
     rowIcon: [
-      'opacity-75 transition-opacity duration-base ease-console',
+      'opacity-75 transition-opacity duration-base ease-smooth',
       'group-aria-[current=page]:text-admin-side-accent group-aria-[current=page]:opacity-100',
     ],
     // `sr-only` (not `hidden`) when collapsed — the label is the row's only

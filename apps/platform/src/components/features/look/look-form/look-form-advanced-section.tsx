@@ -1,6 +1,5 @@
 'use client';
 
-import { Switch } from '@base-ui/react/switch';
 import {
   DENSITY,
   RADIUS_SCALE,
@@ -16,7 +15,6 @@ import type { TLookFormFieldSetter } from './look-form';
 import { lookFormVariants } from './look-form-variants';
 
 export type TLookFormAdvancedSectionProps = {
-  isChromeOn: boolean;
   headingFont: TFontChoice;
   bodyFont: TFontChoice;
   radiusScale: TRadiusScale;
@@ -26,9 +24,8 @@ export type TLookFormAdvancedSectionProps = {
   archivedNoticeId: string;
 };
 
-/** Fonts, radius, density, and terminal chrome — the controls collapsed under "Advanced" by default. */
+/** Fonts, radius, and density — the controls collapsed under "Advanced" by default. */
 export const LookFormAdvancedSection = ({
-  isChromeOn,
   headingFont,
   bodyFont,
   radiusScale,
@@ -39,8 +36,7 @@ export const LookFormAdvancedSection = ({
 }: TLookFormAdvancedSectionProps) => {
   const archivedDescribedBy = isArchived ? archivedNoticeId : undefined;
   const t = useTranslations('lookForm');
-  const { field, fieldLabel, fieldHint, switchRow, switchTrack, switchThumb } =
-    lookFormVariants();
+  const { field, fieldLabel, fieldHint } = lookFormVariants();
 
   const radiusOptions = Object.values(RADIUS_SCALE).map((scale) => ({
     value: scale,
@@ -52,7 +48,6 @@ export const LookFormAdvancedSection = ({
     label: t(`densityOptionLabel.${option}`),
   }));
 
-  const terminalChromeLabel = t('terminalChromeLabel');
   const headingFontLabel = t('headingFontLabel');
   const bodyFontLabel = t('bodyFontLabel');
   const radiusScaleLabel = t('radiusScaleLabel');
@@ -60,24 +55,6 @@ export const LookFormAdvancedSection = ({
 
   return (
     <>
-      <div className={field()}>
-        <span className={fieldLabel()}>{terminalChromeLabel}</span>
-        <p className={fieldHint()}>{t('terminalChromeDescription')}</p>
-        <div className={switchRow()}>
-          <Switch.Root
-            checked={isChromeOn}
-            onCheckedChange={(checked) => onFieldChange('chromeOn', checked)}
-            disabled={isArchived}
-            aria-label={terminalChromeLabel}
-            aria-describedby={archivedDescribedBy}
-            className={switchTrack()}
-          >
-            <Switch.Thumb className={switchThumb()} />
-          </Switch.Root>
-          <span>{isChromeOn ? t('switchOn') : t('switchOff')}</span>
-        </div>
-      </div>
-
       <div className={field()}>
         <span className={fieldLabel()}>{headingFontLabel}</span>
         <p className={fieldHint()}>{t('headingFontDescription')}</p>

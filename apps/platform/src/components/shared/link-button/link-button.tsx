@@ -38,7 +38,7 @@ export const LinkButton = ({
   return (
     <Component
       href={href}
-      className={buttonVariants({ variant, size, class: className })}
+      className={buttonVariants({ variant, size }).root({ class: className })}
       aria-label={ariaLabel}
     >
       {children}

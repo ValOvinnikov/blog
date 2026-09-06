@@ -18,6 +18,34 @@ describe(Toast, () => {
     expect(screen.getByText('Saved')).toBeVisible();
   });
 
+  it('renders a bolded title ahead of the message when given', () => {
+    render(
+      <Toast
+        type={TOAST_TYPE.SUCCESS}
+        title="Bookmark"
+        message="Saved to bookmarks"
+        dismissLabel="Dismiss"
+        onDismiss={vi.fn()}
+        phase="visible"
+      />,
+    );
+    expect(screen.getByText('Bookmark').tagName).toBe('STRONG');
+    expect(screen.getByText('Saved to bookmarks')).toBeVisible();
+  });
+
+  it('renders no title element when none is given', () => {
+    render(
+      <Toast
+        type={TOAST_TYPE.SUCCESS}
+        message="Saved"
+        dismissLabel="Dismiss"
+        onDismiss={vi.fn()}
+        phase="visible"
+      />,
+    );
+    expect(document.querySelector('strong')).not.toBeInTheDocument();
+  });
+
   it('renders an assertive alert role for the ERROR type', () => {
     render(
       <Toast

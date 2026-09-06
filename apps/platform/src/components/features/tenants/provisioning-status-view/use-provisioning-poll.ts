@@ -293,8 +293,6 @@ export const useProvisioningPoll = (
           }
           if (!pollErrorToastIdRef.current) {
             pollErrorToastIdRef.current = toast.warning({
-              command: 'tenant.provisioning_poll',
-              state: 'error',
               message: t('pollErrorWarning'),
             });
           }

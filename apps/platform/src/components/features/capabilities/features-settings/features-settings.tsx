@@ -58,8 +58,6 @@ export const FeaturesSettings = ({
       onSubmit: (vals) => saveAction(tenantId, vals),
       onSuccess: () => {
         toast.success({
-          command: 'features',
-          state: 'saved',
           message: t('alertSuccess'),
         });
         router.refresh();
@@ -85,10 +83,12 @@ export const FeaturesSettings = ({
           <Button
             variant="primary"
             onClick={handleSubmit}
-            isDisabled={isPending || isArchived}
+            isDisabled={isArchived}
+            isPending={isPending}
+            pendingLabel={t('savingButton')}
             aria-describedby={isArchived ? archivedNoticeId : undefined}
           >
-            {isPending ? t('savingButton') : t('saveButton')}
+            {t('saveButton')}
           </Button>
         }
       />

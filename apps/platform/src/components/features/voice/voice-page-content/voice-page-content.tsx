@@ -1,4 +1,3 @@
-import { PRESET_ID, PRESET_REGISTRY } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { VoiceSettings } from '@platform/components/features/voice/voice-settings';
@@ -16,12 +15,10 @@ export type TVoicePageContentProps = {
  */
 export const VoicePageContent = async ({ tenant }: TVoicePageContentProps) => {
   const config = await queries.siteConfig.getSiteConfig(tenant.id);
-  const presetId = config?.preset ?? PRESET_ID.CONSOLE;
 
   return (
     <VoiceSettings
       tenantId={tenant.id}
-      voicePack={PRESET_REGISTRY[presetId].voicePack}
       initialOverrides={config?.voiceOverrides ?? {}}
       saveAction={saveVoiceOverridesAction}
       archivedAt={tenant.deprovisionedAt ?? undefined}

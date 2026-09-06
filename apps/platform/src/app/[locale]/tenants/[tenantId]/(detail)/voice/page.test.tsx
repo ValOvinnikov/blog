@@ -57,7 +57,7 @@ describe(`<${VoicePage.name}/>`, () => {
     expect(getSiteConfigMock).not.toHaveBeenCalled();
   });
 
-  it('shows every field blank, with CONSOLE placeholders, when the tenant has no site_config row yet', async () => {
+  it('shows every field blank, with no placeholder, when the tenant has no site_config row yet', async () => {
     getSiteConfigMock.mockResolvedValue(undefined);
 
     await setup();
@@ -68,6 +68,6 @@ describe(`<${VoicePage.name}/>`, () => {
     ).toHaveValue('');
     expect(
       screen.getByRole('textbox', { name: 'Terminal Prompt Host' }),
-    ).toHaveAttribute('placeholder', '~$');
+    ).not.toHaveAttribute('placeholder');
   });
 });

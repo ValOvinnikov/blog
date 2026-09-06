@@ -8,12 +8,12 @@ import { tv } from '@platform/utils/tv/tv';
  */
 export const previewSampleVariants = tv({
   slots: {
-    previewBox: ['rounded-lg border border-border bg-primary p-5'],
-    // No base classes — carries only the conditional `dark` class below, for
-    // WindowChrome (an external component whose own surface/border/text
-    // classes already read `--surface`/`--border`/`--text`) so re-theming the
-    // sample content only needs toggling this class, not restyling it.
-    previewSurface: [],
+    // No base classes — `Panel` (an external component whose own
+    // surface/border/text classes already read `--surface`/`--border`/
+    // `--text`) supplies the visible surface; this slot carries only the
+    // conditional `dark` class below, needed because those tokens are
+    // scoped to a `.dark` ancestor rather than `prefers-color-scheme`.
+    surface: [],
     brandRow: ['flex items-center gap-2'],
     brandName: ['text-base font-semibold text-text'],
     actionsRow: ['flex flex-wrap items-center gap-2 pt-1'],
@@ -24,8 +24,7 @@ export const previewSampleVariants = tv({
   variants: {
     isDark: {
       true: {
-        previewBox: ['dark'],
-        previewSurface: ['dark'],
+        surface: ['dark'],
       },
       false: {},
     },

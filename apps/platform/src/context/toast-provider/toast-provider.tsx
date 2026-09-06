@@ -159,6 +159,7 @@ export const ToastProvider = ({ children }: TToastProviderProps) => {
             <Toast
               type={record.type}
               isLoading={record.isLoading}
+              title={record.title}
               message={
                 record.count &&
                 record.count > 1 &&

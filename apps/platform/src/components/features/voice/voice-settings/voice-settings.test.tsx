@@ -1,8 +1,4 @@
 import {
-  CONSOLE_VOICE_PACK,
-  EDITORIAL_VOICE_PACK,
-} from '@blog/config/constants';
-import {
   renderWithIntl,
   screen,
   within,
@@ -37,7 +33,6 @@ describe(VoiceSettings, () => {
     render(
       <VoiceSettings
         tenantId="tenant-1"
-        voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={vi.fn()}
       />,
@@ -57,7 +52,6 @@ describe(VoiceSettings, () => {
     render(
       <VoiceSettings
         tenantId="tenant-1"
-        voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={vi.fn()}
       />,
@@ -73,7 +67,6 @@ describe(VoiceSettings, () => {
     render(
       <VoiceSettings
         tenantId="tenant-1"
-        voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={vi.fn()}
       />,
@@ -88,7 +81,6 @@ describe(VoiceSettings, () => {
     render(
       <VoiceSettings
         tenantId="tenant-1"
-        voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={vi.fn()}
       />,
@@ -107,7 +99,6 @@ describe(VoiceSettings, () => {
     render(
       <VoiceSettings
         tenantId="tenant-1"
-        voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={vi.fn()}
       />,
@@ -124,12 +115,11 @@ describe(VoiceSettings, () => {
     expect(screen.queryByText(/No search results/i)).not.toBeInTheDocument();
   });
 
-  it("shows the console preset's voice-pack value as the placeholder for an untouched field", async () => {
+  it('leaves an untouched field blank with no placeholder', async () => {
     const user = userEvent.setup();
     render(
       <VoiceSettings
         tenantId="tenant-1"
-        voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={vi.fn()}
       />,
@@ -138,22 +128,6 @@ describe(VoiceSettings, () => {
 
     const input = screen.getByRole('textbox', { name: 'Terminal Prompt Host' });
     expect(input).toHaveValue('');
-    expect(input).toHaveAttribute('placeholder', '~$');
-  });
-
-  it('leaves the placeholder blank for a field with no path in the editorial voice pack', async () => {
-    const user = userEvent.setup();
-    render(
-      <VoiceSettings
-        tenantId="tenant-1"
-        voicePack={EDITORIAL_VOICE_PACK}
-        initialOverrides={{}}
-        saveAction={vi.fn()}
-      />,
-    );
-    await openAdvanced(user);
-
-    const input = screen.getByRole('textbox', { name: 'Terminal Prompt Host' });
     expect(input.getAttribute('placeholder')).toBeFalsy();
   });
 
@@ -162,7 +136,6 @@ describe(VoiceSettings, () => {
     render(
       <VoiceSettings
         tenantId="tenant-1"
-        voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{ terminalPromptHost: 'guest@acme' }}
         saveAction={vi.fn()}
       />,
@@ -180,7 +153,6 @@ describe(VoiceSettings, () => {
     render(
       <VoiceSettings
         tenantId="tenant-1"
-        voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{ terminalPromptHost: 'guest@acme' }}
         saveAction={saveAction}
       />,
@@ -221,7 +193,6 @@ describe(VoiceSettings, () => {
     render(
       <VoiceSettings
         tenantId="tenant-1"
-        voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={saveAction}
       />,
@@ -248,7 +219,6 @@ describe(VoiceSettings, () => {
     render(
       <VoiceSettings
         tenantId="tenant-1"
-        voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={saveAction}
       />,
@@ -260,13 +230,40 @@ describe(VoiceSettings, () => {
     expect(refresh).not.toHaveBeenCalled();
   });
 
+  it('shows a spinner, marks Save busy, and announces the pending state to assistive tech while the save is in flight', async () => {
+    let resolveAction: (value: { ok: boolean }) => void = () => {};
+    const saveAction = vi.fn(
+      () =>
+        new Promise<{ ok: boolean }>((resolve) => {
+          resolveAction = resolve;
+        }),
+    );
+    const user = userEvent.setup();
+    render(
+      <VoiceSettings
+        tenantId="tenant-1"
+        initialOverrides={{}}
+        saveAction={saveAction}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    const saveButton = await screen.findByRole('button', { name: 'Saving…' });
+    expect(saveButton).toHaveAttribute('aria-busy', 'true');
+    expect(saveButton).toBeDisabled();
+    // A disabled button is force-blurred; this live region carries the real announcement.
+    expect(saveButton.nextElementSibling).toHaveTextContent('Saving…');
+
+    resolveAction({ ok: true });
+  });
+
   it('shows an archived notice and disables Save for an archived tenant', async () => {
     const user = userEvent.setup();
     const saveAction = vi.fn().mockResolvedValue({ ok: true });
     render(
       <VoiceSettings
         tenantId="tenant-1"
-        voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={saveAction}
         archivedAt={new Date('2026-08-26T00:00:00.000Z')}
@@ -286,7 +283,6 @@ describe(VoiceSettings, () => {
     render(
       <VoiceSettings
         tenantId="tenant-1"
-        voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={vi.fn()}
         archivedAt={new Date('2026-08-26T00:00:00.000Z')}
@@ -303,7 +299,6 @@ describe(VoiceSettings, () => {
     render(
       <VoiceSettings
         tenantId="tenant-1"
-        voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={vi.fn()}
         archivedAt={new Date('2026-08-26T00:00:00.000Z')}
@@ -325,7 +320,6 @@ describe(VoiceSettings, () => {
     render(
       <VoiceSettings
         tenantId="tenant-1"
-        voicePack={CONSOLE_VOICE_PACK}
         initialOverrides={{}}
         saveAction={vi.fn()}
       />,

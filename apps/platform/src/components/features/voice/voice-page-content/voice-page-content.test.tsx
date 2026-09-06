@@ -1,4 +1,3 @@
-import { PRESET_ID } from '@blog/config/constants';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
@@ -68,7 +67,7 @@ describe(`<${VoicePageContent.name}/>`, () => {
     getSiteConfigMock.mockReset();
   });
 
-  it('shows every field blank, with CONSOLE placeholders, when the tenant has no site_config row yet', async () => {
+  it('shows every field blank, with no placeholder, when the tenant has no site_config row yet', async () => {
     getSiteConfigMock.mockResolvedValue(undefined);
 
     await setup();
@@ -79,26 +78,11 @@ describe(`<${VoicePageContent.name}/>`, () => {
     ).toHaveValue('');
     expect(
       screen.getByRole('textbox', { name: 'Terminal Prompt Host' }),
-    ).toHaveAttribute('placeholder', '~$');
-  });
-
-  it("resolves placeholders from the tenant's actual saved preset, not always CONSOLE", async () => {
-    getSiteConfigMock.mockResolvedValue({
-      preset: PRESET_ID.EDITORIAL,
-      voiceOverrides: {},
-    });
-
-    await setup();
-    await openAdvanced();
-
-    expect(
-      screen.getByRole('textbox', { name: 'Terminal Prompt Host' }),
     ).not.toHaveAttribute('placeholder');
   });
 
   it('renders a previously-saved override as the field value', async () => {
     getSiteConfigMock.mockResolvedValue({
-      preset: PRESET_ID.CONSOLE,
       voiceOverrides: { terminalPromptHost: 'guest@acme' },
     });
 

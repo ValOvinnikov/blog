@@ -1,5 +1,9 @@
 import { CAPABILITY } from '@blog/config';
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import {
+  renderWithIntl,
+  screen,
+  waitFor,
+} from '@platform/testing/custom-render';
 import type { TSettingsFeaturesValues } from '@platform/utils/settings-features-fields/settings-features-fields';
 import userEvent from '@testing-library/user-event';
 import { useRouter } from 'next/navigation';
@@ -188,6 +192,39 @@ describe(FeaturesSettings, () => {
 
     expect(await screen.findByText('Features saved.')).toBeVisible();
     expect(refresh).toHaveBeenCalled();
+  });
+
+  it('shows a spinner, marks Save busy, and announces the pending state to assistive tech while the save is in flight', async () => {
+    let resolveAction: (value: { ok: boolean }) => void = () => {};
+    const saveAction = vi.fn(
+      () =>
+        new Promise<{ ok: boolean }>((resolve) => {
+          resolveAction = resolve;
+        }),
+    );
+    const user = userEvent.setup();
+    render(
+      <FeaturesSettings
+        tenantId="tenant-1"
+        entitledCapabilities={ALL_ENTITLED}
+        initialValues={INITIAL_VALUES}
+        saveAction={saveAction}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    const saveButton = await screen.findByRole('button', {
+      name: 'Saving…',
+    });
+    await waitFor(() =>
+      expect(saveButton).toHaveAttribute('aria-busy', 'true'),
+    );
+    expect(saveButton).toBeDisabled();
+    // A disabled button is force-blurred; this live region carries the real announcement.
+    expect(saveButton.nextElementSibling).toHaveTextContent('Saving…');
+
+    resolveAction({ ok: true });
   });
 
   it('shows an error alert and does not refresh when the save fails', async () => {

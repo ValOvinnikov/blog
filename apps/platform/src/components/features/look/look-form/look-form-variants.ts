@@ -1,4 +1,3 @@
-import { DISABLED_AFFORDANCE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const lookFormVariants = tv({
@@ -20,19 +19,6 @@ export const lookFormVariants = tv({
     ],
     hueValue: [
       'min-w-[92px] shrink-0 text-right text-[12.5px] tabular-nums text-admin-muted',
-    ],
-    switchRow: ['inline-flex items-center gap-2.5 text-[13px] text-admin-text'],
-    switchTrack: [
-      'relative h-5 w-9 shrink-0 cursor-pointer rounded-full bg-admin-line',
-      'transition-colors',
-      'data-[checked]:bg-admin-brand',
-      ...DISABLED_AFFORDANCE_CLASSES,
-      'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
-    ],
-    switchThumb: [
-      'absolute left-0.5 top-0.5 size-4 rounded-full bg-white shadow-admin',
-      'transition-transform',
-      'data-[checked]:translate-x-4',
     ],
     note: ['text-[12px] text-admin-muted'],
     uploads: ['grid grid-cols-1 gap-3 sm:grid-cols-2'],

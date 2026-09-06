@@ -87,6 +87,30 @@ describe(EmailSettingsForm, () => {
     });
   });
 
+  it('shows a spinner, marks Save busy, and announces the pending state to assistive tech while the save is in flight', async () => {
+    let resolveAction: (value: { ok: boolean }) => void = () => {};
+    updateEmailConfigActionMock.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveAction = resolve;
+        }),
+    );
+    render(
+      <EmailSettingsForm tenantId="tenant-1" initialValues={INITIAL_VALUES} />,
+    );
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    const saveButton = await screen.findByRole('button', { name: 'Saving…' });
+    expect(saveButton).toBeDisabled();
+    expect(saveButton).toHaveAttribute('aria-busy', 'true');
+    // A disabled button is force-blurred; this live region carries the real announcement.
+    expect(saveButton.nextElementSibling).toHaveTextContent('Saving…');
+
+    resolveAction({ ok: true });
+  });
+
   it('shows an error alert when the save fails', async () => {
     updateEmailConfigActionMock.mockResolvedValue({ ok: false });
     render(

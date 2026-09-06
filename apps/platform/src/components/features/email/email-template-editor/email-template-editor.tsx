@@ -78,8 +78,6 @@ export const EmailTemplateEditor = ({
         }),
       onSuccess: () => {
         toast.success({
-          command: 'email-template',
-          state: 'saved',
           message: t('alertSuccess'),
         });
       },
@@ -159,10 +157,12 @@ export const EmailTemplateEditor = ({
             type="button"
             variant="primary"
             onClick={handleSubmit}
-            isDisabled={isPending || isArchived}
+            isDisabled={isArchived}
+            isPending={isPending}
+            pendingLabel={t('savingButton')}
             aria-describedby={archivedDescribedBy}
           >
-            {isPending ? t('savingButton') : t('saveButton')}
+            {t('saveButton')}
           </Button>
         </div>
       </Card.Footer>

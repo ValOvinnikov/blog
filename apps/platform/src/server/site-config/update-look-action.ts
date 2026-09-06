@@ -24,7 +24,7 @@ const HUE_MAX = 360;
 const hueSchema = z.number().int().min(HUE_MIN).max(HUE_MAX);
 
 // `chromeOn` is deliberately absent — `site_config` has no column for it, so
-// nothing here can persist it (the Look form says so to the user directly).
+// nothing here can persist it.
 const updateLookInputSchema = z.object({
   preset: z.enum(Object.values(PRESET_ID) as [TPresetId, ...TPresetId[]]),
   accentHue: hueSchema,

@@ -169,7 +169,7 @@ export const TenantDetailsForm = () => {
                 type="button"
                 variant="primary"
                 onClick={handleSubmit}
-                isDisabled={isPending}
+                isPending={isPending}
                 hasArrow={!isPending}
               >
                 {isPending

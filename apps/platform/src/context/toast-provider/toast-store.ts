@@ -22,8 +22,7 @@ export const TOAST_MERGE_WINDOW_MS = 1000;
 export const TOAST_EXIT_ANIMATION_MS = 360;
 
 export interface IToastPayload {
-  command: string;
-  state: string;
+  title?: string;
   message: ReactNode;
   time?: string;
   action?: IToastAction;
@@ -33,14 +32,10 @@ export interface IToastPayload {
   coalesceKey?: string;
 }
 
-type TToastPromiseState = Omit<IToastPayload, 'command'>;
-
-type TToastPromiseMessage<T> =
-  TToastPromiseState | ((value: T) => TToastPromiseState);
+type TToastPromiseMessage<T> = IToastPayload | ((value: T) => IToastPayload);
 
 export interface IToastPromiseMessages<T> {
-  command: string;
-  loading: Pick<IToastPayload, 'state' | 'message'>;
+  loading: Pick<IToastPayload, 'title' | 'message'>;
   success: TToastPromiseMessage<T>;
   error: TToastPromiseMessage<unknown>;
 }
@@ -52,8 +47,7 @@ export interface IToastRecord {
   type: TToastType;
   /** True while a `toast.promise` call is still in flight. */
   isLoading?: boolean;
-  command: string;
-  state: string;
+  title?: string;
   message: ReactNode;
   time?: string;
   action?: IToastAction;
@@ -83,13 +77,9 @@ let idCounter = 0;
 const generateId = () => `toast-${Date.now()}-${idCounter++}`;
 
 const resolvePayload = <T>(
-  command: string,
   message: TToastPromiseMessage<T>,
   value: T,
-): IToastPayload => ({
-  ...(typeof message === 'function' ? message(value) : message),
-  command,
-});
+): IToastPayload => (typeof message === 'function' ? message(value) : message);
 
 const isMergeableType = (type: TToastType) =>
   type === TOAST_TYPE.SUCCESS || type === TOAST_TYPE.INFO;
@@ -249,8 +239,7 @@ export const createToastStore = () => {
   ): IToastRecord => ({
     id: generateId(),
     type,
-    command: payload.command,
-    state: payload.state,
+    title: payload.title,
     message: payload.message,
     time: payload.time,
     action: payload.action,
@@ -274,8 +263,7 @@ export const createToastStore = () => {
 
     const matches = (t: IToastRecord) =>
       t.type === type &&
-      t.command === payload.command &&
-      t.state === payload.state &&
+      t.title === payload.title &&
       t.message === payload.message &&
       now - t.createdAt <= TOAST_MERGE_WINDOW_MS;
 
@@ -291,8 +279,7 @@ export const createToastStore = () => {
         patchRecord(existing.id, () => ({
           ...existing,
           type,
-          command: payload.command,
-          state: payload.state,
+          title: payload.title,
           message: payload.message,
           time: payload.time,
           action: payload.action,
@@ -400,8 +387,7 @@ export const createToastStore = () => {
         id,
         type: TOAST_TYPE.INFO,
         isLoading: true,
-        command: messages.command,
-        state: messages.loading.state,
+        title: messages.loading.title,
         message: messages.loading.message,
         durationMs: undefined,
         phase: 'entering',
@@ -428,8 +414,7 @@ export const createToastStore = () => {
         ...r,
         type,
         isLoading: false,
-        command: payload.command,
-        state: payload.state,
+        title: payload.title,
         message: payload.message,
         time: payload.time,
         action: payload.action,
@@ -443,15 +428,9 @@ export const createToastStore = () => {
 
     promiseInput.then(
       (value) =>
-        settle(
-          TOAST_TYPE.SUCCESS,
-          resolvePayload(messages.command, messages.success, value),
-        ),
+        settle(TOAST_TYPE.SUCCESS, resolvePayload(messages.success, value)),
       (error: unknown) =>
-        settle(
-          TOAST_TYPE.ERROR,
-          resolvePayload(messages.command, messages.error, error),
-        ),
+        settle(TOAST_TYPE.ERROR, resolvePayload(messages.error, error)),
     );
 
     return promiseInput;

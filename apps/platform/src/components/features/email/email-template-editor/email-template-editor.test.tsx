@@ -194,4 +194,40 @@ describe(EmailTemplateEditor, () => {
       );
     });
   });
+
+  it('shows a spinner, marks Save busy, and announces the pending state to assistive tech while the save is in flight', async () => {
+    let resolveAction: (value: { ok: boolean }) => void = () => {};
+    updateEmailTemplateActionMock.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveAction = resolve;
+        }),
+    );
+    render(
+      <EmailTemplateEditor
+        tenantId="tenant-1"
+        templateType={EMAIL_TEMPLATE_TYPE.MAGIC_LINK}
+        initialValues={{
+          subject: 'Sign in',
+          body: BODY_WITH_TEXT,
+          logoAssetUrl: undefined,
+        }}
+        brand={BRAND}
+        brandName="Acme Co"
+      />,
+    );
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    const saveButton = await screen.findByRole('button', {
+      name: 'Saving…',
+    });
+    expect(saveButton).toBeDisabled();
+    expect(saveButton).toHaveAttribute('aria-busy', 'true');
+    // A disabled button is force-blurred; this live region carries the real announcement.
+    expect(saveButton.nextElementSibling).toHaveTextContent('Saving…');
+
+    resolveAction({ ok: true });
+  });
 });

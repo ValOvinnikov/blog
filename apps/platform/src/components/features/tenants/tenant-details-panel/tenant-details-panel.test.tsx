@@ -322,17 +322,13 @@ describe(TenantDetailsPanel, () => {
       );
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-      expect(await screen.findByRole('status')).toHaveTextContent(
-        'Tenant details saved.',
-      );
+      expect(await screen.findByText('Tenant details saved.')).toBeVisible();
 
       // Unlike the old inline alert (tied to `showSaveSuccess`, cleared on
       // any edit), a toast's lifecycle is independent of the form — it must
       // not disappear just because editing resumed.
       await user.type(screen.getByRole('textbox', { name: 'Name' }), ' again');
-      expect(screen.getByRole('status')).toHaveTextContent(
-        'Tenant details saved.',
-      );
+      expect(screen.getByText('Tenant details saved.')).toBeVisible();
     });
 
     it('does not show a success alert when saving fails', async () => {
@@ -356,7 +352,9 @@ describe(TenantDetailsPanel, () => {
       expect(
         await screen.findByText('This domain is already in use.'),
       ).toBeVisible();
-      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Tenant details saved.'),
+      ).not.toBeInTheDocument();
     });
 
     it('shows the form-level provisioning-started error and does not refresh, without a successful save', async () => {
@@ -768,7 +766,7 @@ describe(TenantDetailsPanel, () => {
       ).toBeDisabled();
     });
 
-    it('stays disabled while a save is in flight, even with dirty values', async () => {
+    it('stays disabled and announces the pending state to assistive tech while a save is in flight, even with dirty values', async () => {
       let resolveAction: (value: {
         ok: true;
         tenant: ReturnType<typeof makeTenant>;
@@ -796,9 +794,13 @@ describe(TenantDetailsPanel, () => {
       );
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-      expect(
-        await screen.findByRole('button', { name: 'Saving…' }),
-      ).toBeDisabled();
+      const saveButton = await screen.findByRole('button', {
+        name: 'Saving…',
+      });
+      expect(saveButton).toBeDisabled();
+      expect(saveButton).toHaveAttribute('aria-busy', 'true');
+      // A disabled button is force-blurred; this live region carries the real announcement.
+      expect(saveButton.nextElementSibling).toHaveTextContent('Saving…');
 
       resolveAction({
         ok: true,

@@ -109,8 +109,6 @@ export const LookForm = ({
       onSuccess: (submittedValues) => {
         setSavedValues(submittedValues);
         toast.success({
-          command: 'look',
-          state: 'saved',
           message: t('alertSuccess'),
         });
       },
@@ -155,10 +153,12 @@ export const LookForm = ({
               type="button"
               variant="primary"
               onClick={handleSubmit}
-              isDisabled={isPending || !isDirty || isArchived}
+              isDisabled={!isDirty || isArchived}
+              isPending={isPending}
+              pendingLabel={t('savingButton')}
               aria-describedby={isArchived ? archivedNoticeId : undefined}
             >
-              {isPending ? t('savingButton') : t('saveButton')}
+              {t('saveButton')}
             </Button>
           </>
         }
@@ -210,7 +210,6 @@ export const LookForm = ({
             }
           >
             <LookFormAdvancedSection
-              isChromeOn={values.chromeOn}
               headingFont={values.headingFont}
               bodyFont={values.bodyFont}
               radiusScale={values.radiusScale}
@@ -232,7 +231,6 @@ export const LookForm = ({
             logoHue={values.logoHue}
             headingFont={values.headingFont}
             bodyFont={values.bodyFont}
-            isChromeOn={values.chromeOn}
           />
         </div>
       </div>

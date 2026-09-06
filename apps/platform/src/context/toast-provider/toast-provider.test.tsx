@@ -33,8 +33,7 @@ const ToastHarness = () => {
       <button
         onClick={() =>
           toast.success({
-            command: 'Bookmark',
-            state: 'Saved',
+            title: 'Bookmark',
             message: 'Saved to bookmarks',
             action: { label: 'Undo', onAct: successAction, keyHint: '⌘Z' },
           })
@@ -45,8 +44,7 @@ const ToastHarness = () => {
       <button
         onClick={() =>
           toast.error({
-            command: 'Bookmark',
-            state: 'Failed',
+            title: 'Bookmark',
             message: "couldn't save",
           })
         }
@@ -56,16 +54,15 @@ const ToastHarness = () => {
       <button
         onClick={() =>
           toast.promise(Promise.resolve('done'), {
-            command: 'Bookmark',
             loading: {
-              state: 'Saving',
+              title: 'Bookmark',
               message: 'saving…',
             },
             success: {
-              state: 'Saved',
+              title: 'Bookmark',
               message: 'Saved to bookmarks',
             },
-            error: { state: 'Failed', message: 'failed' },
+            error: { title: 'Bookmark', message: 'failed' },
           })
         }
       >
@@ -121,6 +118,18 @@ describe(ToastProvider, () => {
 
     expect(screen.getByRole('status')).toBeVisible();
     expect(screen.getByText('Saved to bookmarks')).toBeVisible();
+  });
+
+  it('renders a payload title, so a caller that sets one actually gets it shown', () => {
+    withIntl(
+      <ToastProvider>
+        <ToastHarness />
+      </ToastProvider>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
+
+    expect(screen.getByText('Bookmark').tagName).toBe('STRONG');
   });
 
   it('shows an error toast with assertive alert semantics when fired', () => {

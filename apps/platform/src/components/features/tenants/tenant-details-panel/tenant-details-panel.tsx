@@ -200,8 +200,6 @@ export const TenantDetailsPanel = ({
         return;
       }
       toast.success({
-        command: 'tenant.details',
-        state: 'saved',
         message: t('alertSuccess'),
       });
       router.refresh();
@@ -331,10 +329,12 @@ export const TenantDetailsPanel = ({
               type="button"
               variant="primary"
               onClick={handleSave}
-              isDisabled={isPending || !isDirty || isArchived}
+              isDisabled={!isDirty || isArchived}
+              isPending={isPending}
+              pendingLabel={t('savingButton')}
               aria-describedby={isArchived ? archivedNoticeId : undefined}
             >
-              {isPending ? t('savingButton') : t('saveButton')}
+              {t('saveButton')}
             </Button>
           </div>
         </Card.Footer>
