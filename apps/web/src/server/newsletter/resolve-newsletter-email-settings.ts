@@ -1,7 +1,7 @@
 import { EMAIL_TEMPLATE_TYPE } from '@blog/config/constants';
 import { queries } from '@blog/db';
+import { isValidEmailAddress } from '@blog/email';
 import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address';
-import { isValidEmail } from '@web/utils/is-valid-email';
 import { logger } from '@web/utils/logger/logger';
 
 export type TNewsletterEmailSettings = {
@@ -79,7 +79,9 @@ export const resolveNewsletterEmailSettings = async (
 
   const replyToAddress = emailConfig?.replyToAddress;
   const replyTo =
-    replyToAddress && isValidEmail(replyToAddress) ? replyToAddress : undefined;
+    replyToAddress && isValidEmailAddress(replyToAddress)
+      ? replyToAddress
+      : undefined;
 
   if (replyToAddress && !replyTo) {
     logger.warn('newsletter_email_settings.reply_to_invalid', { tenantId });
