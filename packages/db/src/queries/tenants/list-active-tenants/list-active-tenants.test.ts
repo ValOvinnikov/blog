@@ -3,7 +3,7 @@ import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
-import { listTenantsForDocumentValidation } from './list-tenants-for-document-validation';
+import { listActiveTenants } from './list-active-tenants';
 
 const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
@@ -32,14 +32,14 @@ const baseTenant = {
   plan: TENANT_PLAN.FREE,
 };
 
-describe(listTenantsForDocumentValidation, () => {
+describe(listActiveTenants, () => {
   it('includes an ACTIVE, non-deprovisioned tenant', async () => {
     await db.insert(schema.tenants).values({
       ...baseTenant,
       status: TENANT_STATUS.ACTIVE,
     });
 
-    const result = await listTenantsForDocumentValidation();
+    const result = await listActiveTenants();
 
     expect(result.map((tenant) => tenant.name)).toEqual(['Acme']);
   });
@@ -49,7 +49,7 @@ describe(listTenantsForDocumentValidation, () => {
     async (status) => {
       await db.insert(schema.tenants).values({ ...baseTenant, status });
 
-      const result = await listTenantsForDocumentValidation();
+      const result = await listActiveTenants();
 
       expect(result).toEqual([]);
     },
@@ -62,13 +62,13 @@ describe(listTenantsForDocumentValidation, () => {
       deprovisionedAt: new Date(),
     });
 
-    const result = await listTenantsForDocumentValidation();
+    const result = await listActiveTenants();
 
     expect(result).toEqual([]);
   });
 
   it('returns an empty array when no tenants exist', async () => {
-    const result = await listTenantsForDocumentValidation();
+    const result = await listActiveTenants();
 
     expect(result).toEqual([]);
   });

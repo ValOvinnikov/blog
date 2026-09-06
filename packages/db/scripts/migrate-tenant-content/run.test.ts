@@ -7,8 +7,8 @@ import {
   runMigrationForTenant,
 } from './run';
 
-const { listTenantsForDocumentValidationMock } = vi.hoisted(() => ({
-  listTenantsForDocumentValidationMock: vi.fn(),
+const { listActiveTenantsMock } = vi.hoisted(() => ({
+  listActiveTenantsMock: vi.fn(),
 }));
 const { getTenantByIdMock } = vi.hoisted(() => ({
   getTenantByIdMock: vi.fn(),
@@ -24,7 +24,7 @@ const { runTenantMigrationDeployMock } = vi.hoisted(() => ({
 }));
 
 vi.mock('@blog/db/queries/tenants', () => ({
-  listTenantsForDocumentValidation: listTenantsForDocumentValidationMock,
+  listActiveTenants: listActiveTenantsMock,
   getTenantById: getTenantByIdMock,
   getTenantSanityWriteCredentials: getTenantSanityWriteCredentialsMock,
 }));
@@ -71,7 +71,7 @@ function credentials(tenantId: string) {
 }
 
 beforeEach(() => {
-  listTenantsForDocumentValidationMock.mockReset().mockResolvedValue([]);
+  listActiveTenantsMock.mockReset().mockResolvedValue([]);
   getTenantByIdMock.mockReset();
   getTenantSanityWriteCredentialsMock
     .mockReset()
@@ -96,9 +96,7 @@ describe(runMigration, () => {
   });
 
   it('runs a normal deploy for a tenant with a non-empty ledger', async () => {
-    listTenantsForDocumentValidationMock.mockResolvedValue([
-      tenant('t1', 'acme'),
-    ]);
+    listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
     isTenantMigrationLedgerEmptyMock.mockReturnValue(false);
 
     const summary = await runMigration();
@@ -116,9 +114,7 @@ describe(runMigration, () => {
   });
 
   it('backfills instead of replaying for a tenant with an empty ledger', async () => {
-    listTenantsForDocumentValidationMock.mockResolvedValue([
-      tenant('t1', 'acme'),
-    ]);
+    listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
     isTenantMigrationLedgerEmptyMock.mockReturnValue(true);
 
     const summary = await runMigration();
@@ -136,9 +132,7 @@ describe(runMigration, () => {
   });
 
   it('tallies a tenant with no Sanity write credentials yet as skipped', async () => {
-    listTenantsForDocumentValidationMock.mockResolvedValue([
-      tenant('t1', 'acme'),
-    ]);
+    listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
     getTenantSanityWriteCredentialsMock.mockResolvedValue(undefined);
 
     const summary = await runMigration();
@@ -155,9 +149,7 @@ describe(runMigration, () => {
   });
 
   it('skips a tenant whose credentials resolve to a non-ACTIVE status', async () => {
-    listTenantsForDocumentValidationMock.mockResolvedValue([
-      tenant('t1', 'acme'),
-    ]);
+    listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
     getTenantSanityWriteCredentialsMock.mockResolvedValue({
       ...credentials('t1'),
       status: TENANT_STATUS.SUSPENDED,
@@ -176,9 +168,7 @@ describe(runMigration, () => {
   });
 
   it('skips a tenant whose credentials resolve to a deprovisioned timestamp', async () => {
-    listTenantsForDocumentValidationMock.mockResolvedValue([
-      tenant('t1', 'acme'),
-    ]);
+    listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
     getTenantSanityWriteCredentialsMock.mockResolvedValue({
       ...credentials('t1'),
       deprovisionedAt: new Date('2026-01-02T00:00:00.000Z'),
@@ -202,7 +192,7 @@ describe(runMigration, () => {
       tenant('t2', 'globex'),
       tenant('t3', 'initech'),
     ];
-    listTenantsForDocumentValidationMock.mockResolvedValue(tenants);
+    listActiveTenantsMock.mockResolvedValue(tenants);
     runTenantMigrationDeployMock
       .mockImplementationOnce(() => undefined)
       .mockImplementationOnce(() => {
@@ -224,7 +214,7 @@ describe(runMigration, () => {
   });
 
   it('counts a failed ledger read as an error for that tenant only', async () => {
-    listTenantsForDocumentValidationMock.mockResolvedValue([
+    listActiveTenantsMock.mockResolvedValue([
       tenant('t1', 'acme'),
       tenant('t2', 'globex'),
     ]);
@@ -256,7 +246,7 @@ describe(runMigrationForTenant, () => {
 
     expect(summary.checked).toBe(1);
     expect(getTenantByIdMock).toHaveBeenCalledWith('t1');
-    expect(listTenantsForDocumentValidationMock).not.toHaveBeenCalled();
+    expect(listActiveTenantsMock).not.toHaveBeenCalled();
   });
 
   it('returns an empty summary when the tenant id does not resolve', async () => {

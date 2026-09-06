@@ -18,14 +18,14 @@
 import { pathToFileURL } from 'node:url';
 
 import { seedEmailTemplateDefaults } from '@blog/db/queries/email-templates';
-import { listTenantsForDocumentValidation } from '@blog/db/queries/tenants';
+import { listActiveTenants } from '@blog/db/queries/tenants';
 
 // Exported for direct testing of the backfill logic without also exercising
 // argv parsing.
 export async function backfillEmailTemplateDefaults(
   dryRun: boolean,
 ): Promise<number> {
-  const tenants = await listTenantsForDocumentValidation();
+  const tenants = await listActiveTenants();
 
   for (const tenant of tenants) {
     console.warn(

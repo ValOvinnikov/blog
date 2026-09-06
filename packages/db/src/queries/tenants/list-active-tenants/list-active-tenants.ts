@@ -4,11 +4,9 @@ import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { and, eq, isNull } from 'drizzle-orm';
 
 /**
- * Scope predicate for the document-validation sweep: `status` ACTIVE and
- * never deprovisioned — kept identical to the tenant content-migration
- * fan-out's own predicate.
+ * Lists tenants with `status` ACTIVE that have never been deprovisioned.
  */
-export async function listTenantsForDocumentValidation(): Promise<TTenant[]> {
+export async function listActiveTenants(): Promise<TTenant[]> {
   const db = getDb();
 
   return db
