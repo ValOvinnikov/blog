@@ -10,6 +10,10 @@ export type TMagicLinkInviteEmailInput = {
   tenantNames: string[];
   /** The sending host's resolved tenant, if any — see `resolveTenantEmailIdentity`. */
   tenantIdentity?: TResolvedTenantEmailIdentity;
+  /** The resolved tenant or per-template logo — see `resolveMagicLinkEmailSettings`. */
+  logoImageUrl?: string;
+  /** The tenant's configured footer postal address — see `resolveMagicLinkEmailSettings`. */
+  footerPostalAddress?: string;
 };
 
 /**
@@ -20,6 +24,8 @@ export function buildInviteMagicLinkEmail({
   host,
   tenantNames,
   tenantIdentity,
+  logoImageUrl,
+  footerPostalAddress,
 }: TMagicLinkInviteEmailInput): TMagicLinkEmailContent {
   const tenantList = formatTenantNames(tenantNames);
   const tenantListHtml = formatTenantNames(tenantNames.map(escapeHtml));
@@ -37,6 +43,8 @@ export function buildInviteMagicLinkEmail({
           brand: tenantIdentity.brand,
           brandName: tenantIdentity.brandName,
           bodyHtml,
+          logoImageUrl,
+          footerPostalAddress,
         })
       : bodyHtml,
   };

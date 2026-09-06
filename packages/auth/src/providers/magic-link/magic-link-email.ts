@@ -8,6 +8,10 @@ export type TMagicLinkEmailInput = {
   host: string;
   /** The sending host's resolved tenant, if any — see `resolveTenantEmailIdentity`. */
   tenantIdentity?: TResolvedTenantEmailIdentity;
+  /** The resolved tenant or per-template logo — see `resolveMagicLinkEmailSettings`. */
+  logoImageUrl?: string;
+  /** The tenant's configured footer postal address — see `resolveMagicLinkEmailSettings`. */
+  footerPostalAddress?: string;
 };
 
 export type TMagicLinkEmailContent = {
@@ -22,6 +26,8 @@ export function buildMagicLinkEmail({
   url,
   host,
   tenantIdentity,
+  logoImageUrl,
+  footerPostalAddress,
 }: TMagicLinkEmailInput): TMagicLinkEmailContent {
   const escapedHost = escapeHtml(host);
   const escapedUrl = escapeHtml(url);
@@ -39,6 +45,8 @@ export function buildMagicLinkEmail({
           brand: tenantIdentity.brand,
           brandName: tenantIdentity.brandName,
           bodyHtml,
+          logoImageUrl,
+          footerPostalAddress,
         })
       : bodyHtml,
   };

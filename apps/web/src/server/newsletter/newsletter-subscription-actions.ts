@@ -4,8 +4,8 @@ import { routes } from '@blog/config';
 import { queries } from '@blog/db';
 import { buildNewsletterConfirmationEmail, sendEmail } from '@blog/email';
 import { auth } from '@web/server/auth/auth';
-import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address';
 import { clearNewsletterSubscribedCookie } from '@web/server/newsletter/newsletter-subscribed-cookie';
+import { resolveNewsletterEmailSettings } from '@web/server/newsletter/resolve-newsletter-email-settings';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { isTenantActive } from '@web/server/tenant/is-tenant-active';
@@ -102,15 +102,19 @@ export const resendConfirmationAction =
       const confirmationUrl = `${siteUrl}${routes.newsletterConfirm(result.confirmationToken)}`;
       const unsubscribeUrl = `${siteUrl}${routes.newsletterUnsubscribe(result.unsubscribeToken)}`;
       const { brand, brandName } = await resolveTenantEmailIdentity(tenantId);
+      const { logoImageUrl, footerPostalAddress, fromAddress, replyTo } =
+        await resolveNewsletterEmailSettings(
+          tenantId,
+          env.NEWSLETTER_FROM_ADDRESS,
+        );
       const { subject, html, headers } = buildNewsletterConfirmationEmail({
         confirmationUrl,
         unsubscribeUrl,
         brand,
         brandName,
+        logoImageUrl,
+        footerPostalAddress,
       });
-      const fromAddress = resolveNewsletterFromAddress(
-        env.NEWSLETTER_FROM_ADDRESS,
-      );
 
       await sendEmail({
         to: email,
@@ -118,6 +122,7 @@ export const resendConfirmationAction =
         subject,
         html,
         headers,
+        replyTo,
       });
       return { ok: true };
     } catch (error) {

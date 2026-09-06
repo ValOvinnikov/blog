@@ -4,6 +4,7 @@ import { queries } from '@blog/db';
 export type TResolvedTenantEmailIdentity = {
   brand: TTenantEmailBrand;
   brandName: string;
+  tenantId: string;
 };
 
 /**
@@ -29,6 +30,7 @@ export async function resolveTenantEmailIdentity(
         logoHue: siteConfig.logoHue,
       }),
       brandName: tenant.name,
+      tenantId: tenant.id,
     };
   } catch {
     return undefined;

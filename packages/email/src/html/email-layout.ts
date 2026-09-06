@@ -1,4 +1,5 @@
 import { escapeHtml } from './escape-html';
+import { sanitizeHref } from './sanitize-href';
 
 type TEmailPalette = {
   surface: string;
@@ -17,6 +18,10 @@ export type TRenderEmailShellInput = {
   previewText?: string;
   bodyHtml: string;
   actionHtml?: string;
+  /** An uploaded logo image; falls back to the generated triangle mark when omitted or when the URL fails validation. */
+  logoImageUrl?: string;
+  /** Rendered beneath the copyright line in the footer. Omit for a send with no bulk-mail postal-address obligation. */
+  footerPostalAddress?: string;
 };
 
 export const FONT_STACK =
@@ -35,6 +40,8 @@ export function renderEmailShell({
   previewText,
   bodyHtml,
   actionHtml,
+  logoImageUrl,
+  footerPostalAddress,
 }: TRenderEmailShellInput): string {
   const escapedBrandName = escapeHtml(brandName);
   const preheader = previewText
@@ -58,7 +65,7 @@ export function renderEmailShell({
     '<tr><td align="center" style="padding:32px 16px;">',
     `<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:${palette.surface};border:1px solid ${palette.border};border-radius:8px;">`,
     `<tr><td style="padding:24px 32px;border-bottom:1px solid ${palette.border};">`,
-    buildBrandMark(palette, escapedBrandName),
+    buildBrandMark(palette, escapedBrandName, logoImageUrl),
     '</td></tr>',
     `<tr><td style="padding:32px;color:${palette.text};font-family:${FONT_STACK};font-size:16px;line-height:1.5;">`,
     bodyHtml,
@@ -68,6 +75,7 @@ export function renderEmailShell({
       : '',
     `<tr><td style="padding:24px 32px;border-top:1px solid ${palette.border};color:${palette.textMuted};font-family:${FONT_STACK};font-size:12px;line-height:1.5;">`,
     `&copy; ${new Date().getFullYear()} ${escapedBrandName}`,
+    footerPostalAddress ? `<br />${escapeHtml(footerPostalAddress)}` : '',
     '</td></tr>',
     '</table>',
     '</td></tr>',
@@ -77,18 +85,34 @@ export function renderEmailShell({
   ].join('');
 }
 
+function sanitizeLogoImageUrl(logoImageUrl: string): string | null {
+  const sanitized = sanitizeHref(logoImageUrl);
+  return sanitized && !sanitized.startsWith('mailto:') ? sanitized : null;
+}
+
 function buildBrandMark(
   palette: TEmailPalette,
   escapedBrandName: string,
+  logoImageUrl?: string,
 ): string {
+  const sanitizedLogoUrl = logoImageUrl
+    ? sanitizeLogoImageUrl(logoImageUrl)
+    : null;
+
+  const mark = sanitizedLogoUrl
+    ? `<img src="${escapeHtml(sanitizedLogoUrl)}" width="32" height="32" alt="${escapedBrandName} logo" style="display:block;width:32px;height:32px;border:0;" />`
+    : [
+        '<svg width="24" height="24" viewBox="0 0 24 24" role="img" aria-hidden="true">',
+        `<polygon points="12,3 22,7 12,11 2,7" fill="${palette.logo1}" />`,
+        `<polygon points="12,8 22,12 12,16 2,12" fill="${palette.logo2}" />`,
+        `<polygon points="12,13 22,17 12,21 2,17" fill="${palette.logo3}" />`,
+        '</svg>',
+      ].join('');
+
   return [
     '<table role="presentation" cellpadding="0" cellspacing="0"><tr>',
     '<td style="padding-right:8px;">',
-    '<svg width="24" height="24" viewBox="0 0 24 24" role="img" aria-hidden="true">',
-    `<polygon points="12,3 22,7 12,11 2,7" fill="${palette.logo1}" />`,
-    `<polygon points="12,8 22,12 12,16 2,12" fill="${palette.logo2}" />`,
-    `<polygon points="12,13 22,17 12,21 2,17" fill="${palette.logo3}" />`,
-    '</svg>',
+    mark,
     '</td>',
     `<td style="font-family:${FONT_STACK};font-size:18px;font-weight:700;color:${palette.text};">${escapedBrandName}</td>`,
     '</tr></table>',

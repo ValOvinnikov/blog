@@ -18,6 +18,10 @@ export type TBuildTenantEmailInput = {
   body: TPortableTextContent;
   /** Positioned after the body and before the footer, independent of `body` — omit for an email with no action. */
   action?: TEmailAction;
+  /** An uploaded tenant or per-template logo image; falls back to the generated mark when omitted. */
+  logoImageUrl?: string;
+  /** Rendered beneath the copyright line in the footer. Omit for a send with no bulk-mail postal-address obligation. */
+  footerPostalAddress?: string;
 };
 
 /**
@@ -30,6 +34,8 @@ export function buildTenantEmail({
   previewText,
   body,
   action,
+  logoImageUrl,
+  footerPostalAddress,
 }: TBuildTenantEmailInput): string {
   const bodyHtml = serializePortableText(body);
   const actionHtml = action ? renderEmailAction(action, brand) : undefined;
@@ -40,5 +46,7 @@ export function buildTenantEmail({
     previewText,
     bodyHtml,
     actionHtml,
+    logoImageUrl,
+    footerPostalAddress,
   });
 }

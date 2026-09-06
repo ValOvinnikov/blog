@@ -84,10 +84,29 @@ describe(buildInviteMagicLinkEmail, () => {
       url: 'https://example.com/api/auth/callback/email?token=abc',
       host: 'acme.example.com',
       tenantNames: ['Acme Blog'],
-      tenantIdentity: { brand, brandName: 'Acme Blog' },
+      tenantIdentity: { brand, brandName: 'Acme Blog', tenantId: 'tenant-1' },
     });
 
     expect(html).toContain('<!doctype html>');
     expect(html).toContain(brand.logo1);
+  });
+
+  it('renders an uploaded logo and the footer postal address when given', () => {
+    const brand = resolveTenantEmailBrand({
+      preset: PRESET_ID.CONSOLE,
+      accentHue: 140,
+    });
+
+    const { html } = buildInviteMagicLinkEmail({
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      host: 'acme.example.com',
+      tenantNames: ['Acme Blog'],
+      tenantIdentity: { brand, brandName: 'Acme Blog', tenantId: 'tenant-1' },
+      logoImageUrl: 'https://cdn.example.com/logo.png',
+      footerPostalAddress: '123 Main St, Springfield',
+    });
+
+    expect(html).toContain('src="https://cdn.example.com/logo.png"');
+    expect(html).toContain('123 Main St, Springfield');
   });
 });

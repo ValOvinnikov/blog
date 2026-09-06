@@ -8,12 +8,16 @@ const {
   listTenantsByIdsMock,
   getTenantByDomainMock,
   getSiteConfigMock,
+  getEmailConfigMock,
+  getEmailTemplateMock,
   sendEmailMock,
 } = vi.hoisted(() => ({
   findPendingInviteByEmailMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
   getTenantByDomainMock: vi.fn(),
   getSiteConfigMock: vi.fn(),
+  getEmailConfigMock: vi.fn(),
+  getEmailTemplateMock: vi.fn(),
   sendEmailMock: vi.fn(),
 }));
 
@@ -25,6 +29,8 @@ vi.mock('@blog/db', () => ({
     tenants: { listTenantsByIds: listTenantsByIdsMock },
     tenantDomains: { getTenantByDomain: getTenantByDomainMock },
     siteConfig: { getSiteConfig: getSiteConfigMock },
+    emailConfig: { getEmailConfig: getEmailConfigMock },
+    emailTemplates: { getEmailTemplate: getEmailTemplateMock },
   },
 }));
 
@@ -39,6 +45,10 @@ describe(buildMagicLinkProvider, () => {
     listTenantsByIdsMock.mockReset();
     getTenantByDomainMock.mockReset().mockResolvedValue(undefined);
     getSiteConfigMock.mockReset();
+    getEmailConfigMock.mockReset().mockResolvedValue(undefined);
+    getEmailTemplateMock.mockReset().mockResolvedValue({
+      logoAssetUrl: undefined,
+    });
     sendEmailMock.mockReset().mockResolvedValue(undefined);
   });
 
@@ -211,6 +221,188 @@ describe(buildMagicLinkProvider, () => {
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
         html: expect.stringContaining(expectedBrand.logo1),
+      }),
+    );
+  });
+
+  it("applies the tenant's sender name and reply-to address", async () => {
+    getTenantByDomainMock.mockResolvedValue({
+      id: 'tenant-1',
+      name: 'Acme Blog',
+    });
+    getSiteConfigMock.mockResolvedValue({
+      preset: PRESET_ID.CONSOLE,
+      accentHue: 140,
+      logoHue: undefined,
+    });
+    getEmailConfigMock.mockResolvedValue({
+      logoAssetUrl: undefined,
+      senderName: 'Acme Support',
+      replyToAddress: 'support@acme.example.com',
+      footerPostalAddress: undefined,
+    });
+    const provider = buildMagicLinkProvider();
+
+    await provider.sendVerificationRequest({
+      identifier: 'jane@example.com',
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      expires: new Date('2026-01-01T00:00:00.000Z'),
+      provider,
+      token: 'abc',
+      theme: {},
+      request: new Request('https://example.com'),
+    });
+
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        from: 'Acme Support <onboarding@resend.dev>',
+        replyTo: 'support@acme.example.com',
+      }),
+    );
+  });
+
+  it('drops a malformed stored reply-to address rather than blocking the send', async () => {
+    getTenantByDomainMock.mockResolvedValue({
+      id: 'tenant-1',
+      name: 'Acme Blog',
+    });
+    getSiteConfigMock.mockResolvedValue({
+      preset: PRESET_ID.CONSOLE,
+      accentHue: 140,
+      logoHue: undefined,
+    });
+    getEmailConfigMock.mockResolvedValue({
+      logoAssetUrl: undefined,
+      senderName: undefined,
+      replyToAddress: 'not-an-email',
+      footerPostalAddress: undefined,
+    });
+    const provider = buildMagicLinkProvider();
+
+    await provider.sendVerificationRequest({
+      identifier: 'jane@example.com',
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      expires: new Date('2026-01-01T00:00:00.000Z'),
+      provider,
+      token: 'abc',
+      theme: {},
+      request: new Request('https://example.com'),
+    });
+
+    expect(sendEmailMock).toHaveBeenCalledTimes(1);
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({ replyTo: undefined }),
+    );
+  });
+
+  it('renders the resolved logo and footer postal address in the sent email', async () => {
+    getTenantByDomainMock.mockResolvedValue({
+      id: 'tenant-1',
+      name: 'Acme Blog',
+    });
+    getSiteConfigMock.mockResolvedValue({
+      preset: PRESET_ID.CONSOLE,
+      accentHue: 140,
+      logoHue: undefined,
+    });
+    getEmailConfigMock.mockResolvedValue({
+      logoAssetUrl: 'https://cdn.example.com/tenant-logo.png',
+      senderName: undefined,
+      replyToAddress: undefined,
+      footerPostalAddress: '123 Main St, Springfield',
+    });
+    getEmailTemplateMock.mockResolvedValue({
+      logoAssetUrl: 'https://cdn.example.com/template-logo.png',
+    });
+    const provider = buildMagicLinkProvider();
+
+    await provider.sendVerificationRequest({
+      identifier: 'jane@example.com',
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      expires: new Date('2026-01-01T00:00:00.000Z'),
+      provider,
+      token: 'abc',
+      theme: {},
+      request: new Request('https://example.com'),
+    });
+
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        html: expect.stringContaining(
+          'src="https://cdn.example.com/template-logo.png"',
+        ),
+      }),
+    );
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        html: expect.stringContaining('123 Main St, Springfield'),
+      }),
+    );
+  });
+
+  it('still delivers with product defaults when the email-config lookup fails', async () => {
+    getTenantByDomainMock.mockResolvedValue({
+      id: 'tenant-1',
+      name: 'Acme Blog',
+    });
+    getSiteConfigMock.mockResolvedValue({
+      preset: PRESET_ID.CONSOLE,
+      accentHue: 140,
+      logoHue: undefined,
+    });
+    getEmailConfigMock.mockRejectedValue(new Error('db error'));
+    const provider = buildMagicLinkProvider();
+
+    await provider.sendVerificationRequest({
+      identifier: 'jane@example.com',
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      expires: new Date('2026-01-01T00:00:00.000Z'),
+      provider,
+      token: 'abc',
+      theme: {},
+      request: new Request('https://example.com'),
+    });
+
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        from: 'Sign in <onboarding@resend.dev>',
+        replyTo: undefined,
+      }),
+    );
+  });
+
+  it('still delivers with product defaults when the email-template lookup fails', async () => {
+    getTenantByDomainMock.mockResolvedValue({
+      id: 'tenant-1',
+      name: 'Acme Blog',
+    });
+    getSiteConfigMock.mockResolvedValue({
+      preset: PRESET_ID.CONSOLE,
+      accentHue: 140,
+      logoHue: undefined,
+    });
+    getEmailConfigMock.mockResolvedValue({
+      logoAssetUrl: undefined,
+      senderName: 'Acme Support',
+      replyToAddress: undefined,
+      footerPostalAddress: undefined,
+    });
+    getEmailTemplateMock.mockRejectedValue(new Error('db error'));
+    const provider = buildMagicLinkProvider();
+
+    await provider.sendVerificationRequest({
+      identifier: 'jane@example.com',
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      expires: new Date('2026-01-01T00:00:00.000Z'),
+      provider,
+      token: 'abc',
+      theme: {},
+      request: new Request('https://example.com'),
+    });
+
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        from: 'Acme Support <onboarding@resend.dev>',
       }),
     );
   });
