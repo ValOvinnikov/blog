@@ -34,14 +34,21 @@ export default async function TenantDangerPage({ params }: TProps) {
 
   const t = await getTranslations('tenantDangerPage');
 
+  // A dispatched workflow takes a minute or more to write its first step —
+  // the audit event covers that window so the card doesn't sit blank.
+  const hasDeprovisioningRun = Boolean(tenant.deprovisioningSteps?.run);
+  const deprovisionRequestedAt = hasDeprovisioningRun
+    ? undefined
+    : await queries.auditEvents.getLatestDeprovisionRequestedAt(tenantId);
+  const showDeprovisioningStatus =
+    hasDeprovisioningRun || Boolean(deprovisionRequestedAt);
+
   return (
     <>
       <PageHeader title={t('title')} description={t('description')} />
       {tenant.deprovisionedAt && <ReactivateTenantControl tenant={tenant} />}
       <DeprovisionTenantControl tenant={tenant} />
-      {tenant.deprovisioningSteps?.run && (
-        <DeprovisioningStatusView tenant={tenant} />
-      )}
+      {showDeprovisioningStatus && <DeprovisioningStatusView tenant={tenant} />}
     </>
   );
 }

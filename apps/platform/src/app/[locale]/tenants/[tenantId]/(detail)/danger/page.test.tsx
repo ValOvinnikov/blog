@@ -1,4 +1,8 @@
-import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import {
+  act,
+  customRenderAsync,
+  screen,
+} from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   idleDeprovisioningSteps,
@@ -7,13 +11,18 @@ import {
 
 import TenantDangerPage from './page';
 
+const STEP_POLL_INTERVAL_MS = 4000;
+const STALE_RUN_MAX_TICKS = 75;
+
 const {
   requireSuperAdminMock,
   listTenantsByIdsMock,
+  getLatestDeprovisionRequestedAtMock,
   getTenantDeprovisioningStatusActionMock,
 } = vi.hoisted(() => ({
   requireSuperAdminMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
+  getLatestDeprovisionRequestedAtMock: vi.fn(),
   getTenantDeprovisioningStatusActionMock: vi.fn(),
 }));
 
@@ -25,6 +34,9 @@ vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     tenants: { listTenantsByIds: listTenantsByIdsMock },
+    auditEvents: {
+      getLatestDeprovisionRequestedAt: getLatestDeprovisionRequestedAtMock,
+    },
   },
 }));
 
@@ -61,6 +73,8 @@ describe(TenantDangerPage, () => {
       role: 'SUPERADMIN',
     });
     listTenantsByIdsMock.mockReset();
+    getLatestDeprovisionRequestedAtMock.mockReset();
+    getLatestDeprovisionRequestedAtMock.mockResolvedValue(undefined);
     getTenantDeprovisioningStatusActionMock.mockReset();
     getTenantDeprovisioningStatusActionMock.mockResolvedValue(undefined);
   });
@@ -130,9 +144,68 @@ describe(TenantDangerPage, () => {
 
     await setup();
 
+    expect(getLatestDeprovisionRequestedAtMock).toHaveBeenCalledWith(
+      'tenant-1',
+    );
     expect(
       screen.queryByRole('heading', { name: 'Deprovisioning progress' }),
     ).not.toBeInTheDocument();
+  });
+
+  it('does not render the deprovisioning progress card after a dry run, which writes no audit event', async () => {
+    listTenantsByIdsMock.mockResolvedValue([
+      makeTenant({ deprovisioningSteps: null }),
+    ]);
+    getLatestDeprovisionRequestedAtMock.mockResolvedValue(undefined);
+
+    await setup();
+
+    expect(
+      screen.queryByRole('heading', { name: 'Deprovisioning progress' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders the deprovisioning progress card in a starting state when a request was dispatched but no run marker has appeared yet', async () => {
+    listTenantsByIdsMock.mockResolvedValue([
+      makeTenant({ deprovisioningSteps: null }),
+    ]);
+    getLatestDeprovisionRequestedAtMock.mockResolvedValue(
+      new Date('2026-08-12T14:18:00.000Z'),
+    );
+
+    await setup();
+
+    expect(
+      screen.getByRole('heading', { name: 'Deprovisioning progress' }),
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('heading', { level: 2, name: 'Run' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('stops polling the starting state once it exceeds the same stale-run cap a live run is bound by', async () => {
+    listTenantsByIdsMock.mockResolvedValue([
+      makeTenant({ deprovisioningSteps: null }),
+    ]);
+    getLatestDeprovisionRequestedAtMock.mockResolvedValue(
+      new Date('2026-08-12T14:18:00.000Z'),
+    );
+    getTenantDeprovisioningStatusActionMock.mockResolvedValue({
+      deprovisioningSteps: null,
+      deprovisionedAt: null,
+    });
+
+    await setup();
+
+    for (let tick = 0; tick < STALE_RUN_MAX_TICKS + 5; tick += 1) {
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+      });
+    }
+
+    expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledTimes(
+      STALE_RUN_MAX_TICKS,
+    );
   });
 
   it('renders the deprovisioning progress card once a run exists', async () => {
