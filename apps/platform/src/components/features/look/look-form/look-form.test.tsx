@@ -177,9 +177,7 @@ describe(LookForm, () => {
     await user.keyboard('{ArrowRight}');
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-    expect(await screen.findByRole('status')).toHaveTextContent(
-      'Saved to site_config.',
-    );
+    expect(await screen.findByText('Saved to site_config.')).toBeVisible();
   });
 
   it('shows a spinner, marks Save busy, and announces the pending state to assistive tech while the save is in flight', async () => {
@@ -207,10 +205,8 @@ describe(LookForm, () => {
     const saveButton = await screen.findByRole('button', { name: 'Saving…' });
     expect(saveButton).toHaveAttribute('aria-busy', 'true');
     expect(saveButton).toBeDisabled();
-    // The button is force-blurred by becoming natively disabled, so the
-    // announcement a screen-reader user actually gets comes from this
-    // separate live region, not from the button's own aria-busy/label.
-    expect(screen.getByRole('status', { name: 'Saving…' })).toBeInTheDocument();
+    // A disabled button is force-blurred; this live region carries the real announcement.
+    expect(saveButton.nextElementSibling).toHaveTextContent('Saving…');
 
     resolveAction({ ok: true });
   });

@@ -120,6 +120,18 @@ describe(ToastProvider, () => {
     expect(screen.getByText('Saved to bookmarks')).toBeVisible();
   });
 
+  it('renders a payload title, so a caller that sets one actually gets it shown', () => {
+    withIntl(
+      <ToastProvider>
+        <ToastHarness />
+      </ToastProvider>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
+
+    expect(screen.getByText('Bookmark').tagName).toBe('STRONG');
+  });
+
   it('shows an error toast with assertive alert semantics when fired', () => {
     withIntl(
       <ToastProvider>

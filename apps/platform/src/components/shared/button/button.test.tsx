@@ -121,29 +121,39 @@ describe(Button, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('announces pendingLabel through a screen-reader-only live region, which survives the button being force-blurred by becoming disabled', () => {
-    render(
+  it('mounts a persistent, polite status region as soon as pendingLabel is given, even when not pending, with no announcement text yet', () => {
+    render(<Button pendingLabel="Saving…">Save</Button>);
+
+    const status = screen.getByRole('status');
+    expect(status).toHaveAttribute('aria-live', 'polite');
+    expect(status).toHaveTextContent('');
+  });
+
+  it('renders no status region at all, even while pending, when no pendingLabel is given', () => {
+    render(<Button isPending={true}>Save</Button>);
+
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+
+  it("announces pendingLabel by updating the persistent status region's own text in place, rather than inserting a new element already populated", () => {
+    const { rerender } = render(
+      <Button isPending={false} pendingLabel="Saving…">
+        Save
+      </Button>,
+    );
+
+    const status = screen.getByRole('status');
+    expect(status).toHaveTextContent('');
+
+    rerender(
       <Button isPending={true} pendingLabel="Saving…">
         Save
       </Button>,
     );
 
-    expect(screen.getByRole('status', { name: 'Saving…' })).toBeInTheDocument();
-  });
-
-  it('renders no status region when not pending', () => {
-    render(
-      <Button pendingLabel="Saving…" isPending={false}>
-        Save
-      </Button>,
-    );
-
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
-  });
-
-  it('renders no status region while pending if no pendingLabel is given', () => {
-    render(<Button isPending={true}>Save</Button>);
-
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    // A screen reader only announces a change within a region that already
+    // existed — the same node must update, not get replaced by a fresh one.
+    expect(screen.getByRole('status')).toBe(status);
+    expect(status).toHaveTextContent('Saving…');
   });
 });

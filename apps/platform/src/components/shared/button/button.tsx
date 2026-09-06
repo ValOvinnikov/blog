@@ -14,15 +14,17 @@ export type TButtonProps = {
    * button (native `disabled`, so a click/Enter/Space can never double-submit).
    * A native-`disabled` control is force-blurred and stops being tracked by
    * assistive tech, so the actual announcement comes from `pendingLabel`'s
-   * screen-reader-only live region, not from `aria-busy` or the visible label.
+   * persistent live region, not from `aria-busy` or the visible label.
    */
   isPending?: boolean;
   /**
    * The single source of the pending-state text: shown as the button's own
-   * label in place of `children`, and announced through a visually-hidden
-   * `Spinner` (its `role="status"` + `aria-label` is what a live region
-   * needs — that role has no "name from content") whenever `isPending` is
-   * true.
+   * label in place of `children` while pending, and announced through an
+   * `aria-live="polite"` region whose text content toggles between empty and
+   * this value. Passing `pendingLabel` at all (regardless of `isPending`)
+   * mounts that region for this button's whole lifetime — a region inserted
+   * only once already pending is commonly missed by screen readers, so it
+   * must already exist before the text changes, not be created alongside it.
    */
   pendingLabel?: string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
@@ -47,7 +49,8 @@ export const Button = ({
   hasArrow,
 }: TButtonProps) => {
   const { root, srOnlyStatus } = buttonVariants({ variant, size });
-  const isPendingWithLabel = isPending && pendingLabel !== undefined;
+  const hasPendingLabel = pendingLabel !== undefined;
+  const isPendingWithLabel = isPending && hasPendingLabel;
   const label = isPendingWithLabel ? pendingLabel : children;
 
   return (
@@ -68,12 +71,10 @@ export const Button = ({
         {label}
         {hasArrow && <span aria-hidden="true"> →</span>}
       </button>
-      {isPendingWithLabel && (
-        <Spinner
-          label={pendingLabel}
-          hasLabel={true}
-          className={srOnlyStatus()}
-        />
+      {hasPendingLabel && (
+        <span role="status" aria-live="polite" className={srOnlyStatus()}>
+          {isPendingWithLabel ? pendingLabel : ''}
+        </span>
       )}
     </>
   );

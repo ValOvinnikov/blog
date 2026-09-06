@@ -18,6 +18,7 @@ export const toastVariants = tv({
       'motion-reduce:animate-none',
     ],
     message: ['min-w-0 flex-1'],
+    titleText: ['mr-1 font-semibold'],
     time: ['shrink-0 text-white/60'],
     action: [
       'shrink-0 cursor-pointer font-semibold text-white underline-offset-2',

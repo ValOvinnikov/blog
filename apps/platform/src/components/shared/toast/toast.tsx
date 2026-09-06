@@ -13,6 +13,8 @@ export type TToastProps = {
   type: TToastType;
   /** Overlays the type glyph with a spinner for an in-flight `toast.promise` state. */
   isLoading?: boolean;
+  /** Short label shown, bolded, ahead of `message` — omit for a message-only toast. */
+  title?: ReactNode;
   message: ReactNode;
   time?: string;
   action?: IToastAction;
@@ -44,6 +46,7 @@ const TOAST_ROLE: Record<TToastType, 'status' | 'alert'> = {
 export const Toast = ({
   type,
   isLoading = false,
+  title,
   message,
   time,
   action,
@@ -68,7 +71,10 @@ export const Toast = ({
           {TOAST_GLYPH[type]}
         </span>
       )}
-      <span className={s.message()}>{message}</span>
+      <span className={s.message()}>
+        {title && <strong className={s.titleText()}>{title}</strong>}
+        {message}
+      </span>
       {time && <span className={s.time()}>{time}</span>}
       {action && (
         <button type="button" onClick={action.onAct} className={s.action()}>
