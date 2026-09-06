@@ -247,8 +247,9 @@ jobs:
   # `verify`'s wider condition, so an admin-only merge doesn't run a Sanity
   # migration for an app that never touches Sanity; migrate is still never
   # skipped out from under a deploy that depends on it. migrate:deploy is a
-  # no-op when nothing is pending, and every step is guarded on the token so
-  # the job is inert until it's configured.
+  # no-op when nothing is pending; a missing SANITY_MIGRATE_TOKEN fails the job
+  # rather than skipping the step, since only steps can be conditional and an
+  # inert-but-green job still satisfies `deploy-web`'s `needs`.
   migrate:
     name: Migrate dev content
     needs: [changes, verify]
@@ -281,9 +282,13 @@ jobs:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
       - name: Apply pending migrations
-        if: ${{ env.SANITY_AUTH_TOKEN != '' }}
         working-directory: packages/studio
-        run: pnpm migrate:deploy --yes
+        run: |
+          set -euo pipefail
+          # Checked here rather than in an `if:`, because a skipped step reports
+          # green and a deploy that migrated nothing would look successful.
+          : "${SANITY_AUTH_TOKEN:?empty — set the SANITY_MIGRATE_TOKEN secret on the development environment}"
+          pnpm migrate:deploy --yes
 
   # Apply Drizzle/db schema migrations to the dev Neon branch BEFORE dev
   # serves new code — the same "code never ships ahead of a pending
@@ -293,9 +298,9 @@ jobs:
   # `@blog/db` (the Studio never touches Postgres), so this is gated on
   # web||admin, not `studio`, and only those two need it below. No artifact backup here — dev is the disposable staging line, same
   # stance as the content migrate job. `drizzle-kit migrate` is a no-op when nothing is
-  # pending, and the apply step is guarded on DATABASE_URL_UNPOOLED so the
-  # job is inert until that secret is configured. No approval gate on dev,
-  # same as the content migrate job.
+  # pending; a missing DATABASE_URL_UNPOOLED fails the job rather than skipping
+  # the steps, for the same reason the content `migrate` job above does. No
+  # approval gate on dev, same as the content migrate job.
   migrate-db:
     name: Migrate dev database
     needs: [changes, verify]
@@ -334,9 +339,11 @@ jobs:
       # unparseable connection string fails the job instead of silently
       # skipping the check.
       - name: Guard against a mis-set production target
-        if: ${{ env.DATABASE_URL_UNPOOLED != '' }}
         run: |
           set -euo pipefail
+          # Checked here rather than in an `if:`, because a skipped step reports
+          # green and a deploy that migrated nothing would look successful.
+          : "${DATABASE_URL_UNPOOLED:?empty — set the DATABASE_URL_UNPOOLED secret on the development environment}"
           if [ -z "${PRODUCTION_DB_HOST:-}" ]; then
             echo "::error::PRODUCTION_DB_HOST is unset — refusing to migrate without the production-host guard in place. Set it as a repo-level Variable (see docs/DEPLOY.md)." >&2
             exit 1
@@ -360,8 +367,10 @@ jobs:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
       - name: Apply pending db migrations
-        if: ${{ env.DATABASE_URL_UNPOOLED != '' }}
-        run: pnpm --filter @blog/db db:migrate
+        run: |
+          set -euo pipefail
+          : "${DATABASE_URL_UNPOOLED:?empty — set the DATABASE_URL_UNPOOLED secret on the development environment}"
+          pnpm --filter @blog/db db:migrate
 
   deploy-web:
     name: Deploy dev web
@@ -395,14 +404,15 @@ jobs:
 
       # Deploys `web-dev` via the Vercel CLI (its Git auto-deploy is disabled).
       # For `web-dev`, Vercel "production" = main, so --prod targets its main
-      # URL. No-op (green) until the development environment's VERCEL_* secrets
-      # exist.
+      # URL.
       - name: Deploy to Vercel (web-dev)
-        if: ${{ env.VERCEL_TOKEN != '' }}
         run: |
           set -euo pipefail
-          # Without both ids the CLI silently auto-links to whatever project
-          # matches the directory name — fail loudly instead.
+          # Every value is checked here rather than in an `if:`, because a
+          # skipped step reports green and a deploy that shipped nothing would
+          # look successful. Without both ids the CLI also silently auto-links
+          # to whatever project matches the directory name.
+          : "${VERCEL_TOKEN:?empty — set the VERCEL_TOKEN secret on the development environment}"
           : "${VERCEL_ORG_ID:?empty — set the VERCEL_ORG_ID Variable on the development environment}"
           : "${VERCEL_PROJECT_ID:?empty — set the VERCEL_PROJECT_ID_WEB Variable on the development environment}"
           # npx (not `npm install -g`) keeps zizmor's ad-hoc-install audit
@@ -446,16 +456,16 @@ jobs:
 
       # Deploys `platform-dev` via the Vercel CLI (its Git auto-deploy is disabled,
       # same as web). For `platform-dev`, Vercel "production" = main, so
-      # --prod targets its main URL. Guarded on VERCEL_PROJECT_ID (not
-      # VERCEL_TOKEN, which deploy-web already has configured) so this stays a
-      # true no-op until the platform-dev Vercel project exists and
-      # VERCEL_PROJECT_ID_PLATFORM is set.
+      # --prod targets its main URL.
       - name: Deploy to Vercel (platform-dev)
-        if: ${{ env.VERCEL_PROJECT_ID != '' }}
         run: |
           set -euo pipefail
+          # Every value is checked here rather than in an `if:`, because a
+          # skipped step reports green — a merge that deployed the web app but
+          # not the admin panel would otherwise look like a complete deploy.
           : "${VERCEL_TOKEN:?empty — set the VERCEL_TOKEN secret on the development environment}"
           : "${VERCEL_ORG_ID:?empty — set the VERCEL_ORG_ID Variable on the development environment}"
+          : "${VERCEL_PROJECT_ID:?empty — set the VERCEL_PROJECT_ID_PLATFORM Variable on the development environment}"
           # npx (not `npm install -g`) keeps zizmor's ad-hoc-install audit
           # green; the package is cached after the first resolution.
           npx --yes "vercel@${VERCEL_CLI_VERSION}" pull --yes --environment=production --token="$VERCEL_TOKEN"

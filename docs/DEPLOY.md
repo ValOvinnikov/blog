@@ -885,9 +885,10 @@ nothing deploys before checks pass):
 migrate, migrate-db]` (see step 4 below for `migrate-db`). No
    artifact backup here — dev is the disposable staging line (see "Refreshing
    development from production"
-   below for the manual post-migration refresh); the job is guarded on
-   `SANITY_MIGRATE_TOKEN`, so it's inert until that secret exists. **No
-   approval gate on dev** (unlike prod) — dev auto-migrates.
+   below for the manual post-migration refresh); a missing
+   `SANITY_MIGRATE_TOKEN` fails the job with a message naming that secret,
+   rather than skipping the step (#2734). **No approval gate on dev** (unlike
+   prod) — dev auto-migrates.
 4. **`migrate-db`** (`environment: development`) — the same idea as `migrate`
    above, for the separate `@blog/db` (Drizzle/Neon) relational store: applies
    any un-applied schema migrations to the **development** Neon branch via
@@ -895,8 +896,9 @@ migrate, migrate-db]` (see step 4 below for `migrate-db`). No
    none are pending). Gated on `web`-or-`admin` (the Studio never touches
    Postgres, so a studio-only change doesn't trigger it); `deploy-web` and
    `deploy-admin` `need` it. No artifact backup here,
-   same disposable-staging-line stance as `migrate`; guarded on
-   `DATABASE_URL_UNPOOLED`, so it's inert until that secret exists. Before
+   same disposable-staging-line stance as `migrate`; a missing
+   `DATABASE_URL_UNPOOLED` fails the job with a message naming that secret,
+   rather than skipping the steps (#2734). Before
    applying, a guard step compares the resolved connection host against the
    repo Variable `PRODUCTION_DB_HOST` and fails the job loudly if they match
    — see "Repo level — production-target guard for `migrate-db` (both
@@ -941,8 +943,11 @@ There are **no PR preview deployments** — deploys happen only on merge to
    mutation, then runs `migrate:deploy --yes` to apply only the un-applied
    content migrations (dry → run → record in the `migrationState` ledger,
    idempotent). The `production` environment's required reviewer is the human
-   approval gate. Every step is guarded on `SANITY_MIGRATE_TOKEN`, so the job is a
-   **no-op until that secret is configured** — safe to ship ahead of setup.
+   approval gate. A missing `SANITY_MIGRATE_TOKEN` **fails the job**, naming
+   that secret, rather than skipping its steps (#2734): only steps can be
+   conditional, not the job, so a silently inert `migrate` still satisfies
+   `deploy-web`'s `needs` and the release would ship new code against
+   un-migrated content — with the dataset backup skipped too.
 3. **`migrate-db`** (`environment: production`, `needs: verify`) — the same
    idea as `migrate` above, for the separate `@blog/db` (Drizzle/Neon)
    relational store: `pg_dump`s the production Neon branch and uploads it as
@@ -957,9 +962,10 @@ There are **no PR preview deployments** — deploys happen only on merge to
    inverse of the dev guard, which fails on a match — see "Repo level —
    production-target guard for `migrate-db` (both directions)" above; the
    guard step itself fails the job (not silently skips) if that Variable is
-   unset or malformed. Every step is guarded on `DATABASE_URL_UNPOOLED`, so
-   the job is a **no-op until that secret is configured** — safe to ship
-   ahead of setup. `deploy-web` and `deploy-admin` `need` it (the Studio never
+   unset or malformed. A missing `DATABASE_URL_UNPOOLED` likewise **fails the
+   job**, naming that secret, rather than skipping its steps (#2734) — same
+   reasoning as `migrate` above, with the `pg_dump` backup skipped alongside
+   the migration. `deploy-web` and `deploy-admin` `need` it (the Studio never
    touches Postgres). See `.claude/agents/db.md`'s "Migrations" section.
 4. **`deploy-web`** → `web-prod` via the Vercel CLI
    (`vercel pull → build --prod → deploy --prebuilt --prod`).
