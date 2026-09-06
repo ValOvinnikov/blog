@@ -50,14 +50,9 @@ export const sanityImageFragment = q
       .notNull(),
   }));
 
-// Same asset resolution as `sanityImageFragment`, but tolerant of a
-// `bodyImage` block whose asset was never selected or points at a deleted
-// document — the asset stays nullable so `toSanityImage` can degrade to
-// `undefined` instead of throwing. `alt` is likewise nullable here: the
-// schema's `rule.required()` is Studio-only validation, not a Content Lake
-// guarantee, and a body can carry many of these blocks — one missing `alt`
-// must not fail the whole document the way it may for a single hero/avatar
-// image.
+// Same asset resolution as `sanityImageFragment`, but both `asset` and
+// `alt` stay nullable so a malformed body-image block degrades gracefully
+// instead of failing the whole document.
 export const bodyImageFragment = q
   .fragmentForType<'bodyImage'>()
   .project((sub) => ({

@@ -98,9 +98,7 @@ describe('postPageQuery', () => {
     });
   });
 
-  // `alt` is `.nullable(true)`, not `.notNull()` — Studio's `rule.required()`
-  // is UI-only validation, so a bodyImage block missing alt text (written via
-  // the API, a migration, or an import) must not 404 the whole post.
+  // `alt` is `.nullable(true)` — missing alt text must not 404 the post.
   it('allows a bodyImage body block with no alt text', () => {
     const raw = makeRawPostPage({
       post: makeRawPostDetail({
