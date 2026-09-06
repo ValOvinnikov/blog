@@ -13,7 +13,6 @@ const BASE_PROPS = {
   isDark: false,
   headingFontFamily: 'mock-space-grotesk-font-family',
   bodyFontFamily: 'mock-newsreader-font-family',
-  isChromeOn: false,
 };
 
 describe(PreviewSample, () => {
@@ -31,15 +30,13 @@ describe(PreviewSample, () => {
     expect(button.closest('[style*="--brand-primary"]')).not.toBeNull();
   });
 
-  it('shows no terminal chrome bar when isChromeOn is false', () => {
-    render(<PreviewSample {...BASE_PROPS} isChromeOn={false} />);
+  it('keeps the Panel surface visible — a regression guard against a caller class stripping its border/background', () => {
+    render(<PreviewSample {...BASE_PROPS} />);
 
-    expect(screen.queryByText('~$ ./publish')).not.toBeInTheDocument();
-  });
-
-  it('shows the terminal chrome bar when isChromeOn is true', () => {
-    render(<PreviewSample {...BASE_PROPS} isChromeOn={true} />);
-
-    expect(screen.getByText('~$ ./publish')).toBeVisible();
+    expect(screen.getByTestId('preview-sample-panel')).toHaveClass(
+      'rounded-md',
+      'border-border',
+      'bg-surface',
+    );
   });
 });

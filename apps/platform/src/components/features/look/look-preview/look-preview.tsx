@@ -23,7 +23,6 @@ export type TLookPreviewProps = {
   logoHue: number | undefined;
   headingFont: TFontChoice;
   bodyFont: TFontChoice;
-  isChromeOn: boolean;
 };
 
 /**
@@ -45,7 +44,6 @@ export const LookPreview = ({
   logoHue,
   headingFont,
   bodyFont,
-  isChromeOn,
 }: TLookPreviewProps) => {
   const t = useTranslations('lookPreview');
   const [mode, setMode] = useState<TPreviewMode>('light');
@@ -99,7 +97,6 @@ export const LookPreview = ({
             isDark={isDark}
             headingFontFamily={heading.fontFamily}
             bodyFontFamily={body.fontFamily}
-            isChromeOn={isChromeOn}
           />
           <p className={note()}>{t('previewNote')}</p>
         </Card.Body>

@@ -77,4 +77,34 @@ describe(Button, () => {
       screen.getByRole('button', { name: 'Save' }),
     ).toHaveAccessibleDescription('This tenant is archived.');
   });
+
+  it('disables the button, sets aria-busy, and keeps the label accessible while pending', () => {
+    render(<Button isPending={true}>Saving…</Button>);
+
+    const button = screen.getByRole('button', { name: 'Saving…' });
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute('aria-busy', 'true');
+  });
+
+  it('blocks the click handler while pending, even without isDisabled', async () => {
+    const user = userEvent.setup();
+    const handleClick = vi.fn();
+
+    render(
+      <Button isPending={true} onClick={handleClick}>
+        Saving…
+      </Button>,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Saving…' }));
+    expect(handleClick).not.toHaveBeenCalled();
+  });
+
+  it('does not set aria-busy or disable the button when not pending', () => {
+    render(<Button>Save</Button>);
+
+    const button = screen.getByRole('button', { name: 'Save' });
+    expect(button).toBeEnabled();
+    expect(button).toHaveAttribute('aria-busy', 'false');
+  });
 });

@@ -1,7 +1,6 @@
 'use client';
 
 import { ALERT_TYPE } from '@blog/config';
-import type { TVoicePack } from '@blog/config/constants';
 import { VoiceFieldGroup } from '@platform/components/features/voice/voice-field-group';
 import { Alert } from '@platform/components/shared/alert';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
@@ -10,7 +9,6 @@ import { Card } from '@platform/components/shared/card';
 import { Disclosure } from '@platform/components/shared/disclosure';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { useToast } from '@platform/context/toast-provider';
-import { inheritedVoiceValue } from '@platform/utils/inherited-voice-value/inherited-voice-value';
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import {
   VOICE_FIELD_GROUPS,
@@ -20,13 +18,12 @@ import {
 } from '@platform/utils/voice-fields/voice-fields';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useId, useMemo } from 'react';
+import { useId } from 'react';
 
 import { voiceSettingsVariants } from './voice-settings-variants';
 
 export type TVoiceSettingsProps = {
   tenantId: string;
-  voicePack: TVoicePack;
   /** The tenant's saved `site_config.voiceOverrides` — matches its `Record<string, string>` JSONB shape directly rather than a narrower curated-key type, so the server component can pass it straight through. */
   initialOverrides: Record<string, string>;
   saveAction: (
@@ -50,14 +47,12 @@ const buildInitialValues = (
 /**
  * The Voice tab: Basic is deliberately empty (the preset already decides the
  * default voice), Advanced holds all 19 curated overrides. Every field is
- * blank-means-inherit — its placeholder shows the active preset's voice-pack
- * value, and saving sends the raw (possibly blank) strings straight through;
- * `upsertSiteConfig`'s own Zod schema is what turns a blank entry into an
- * absent JSONB key rather than a stored empty string.
+ * blank-means-inherit, and saving sends the raw (possibly blank) strings
+ * straight through; `upsertSiteConfig`'s own Zod schema is what turns a
+ * blank entry into an absent JSONB key rather than a stored empty string.
  */
 export const VoiceSettings = ({
   tenantId,
-  voicePack,
   initialOverrides,
   saveAction,
   archivedAt,
@@ -75,21 +70,11 @@ export const VoiceSettings = ({
       onSubmit: (vals) => saveAction(tenantId, vals),
       onSuccess: () => {
         toast.success({
-          command: 'voice',
-          state: 'saved',
           message: t('alertSuccess'),
         });
         router.refresh();
       },
     });
-
-  const placeholders = useMemo(() => {
-    const result: Partial<Record<TVoiceOverrideKey, string>> = {};
-    for (const key of VOICE_OVERRIDE_KEYS) {
-      result[key] = inheritedVoiceValue(voicePack, key);
-    }
-    return result;
-  }, [voicePack]);
 
   const { root, alert, advancedBody } = voiceSettingsVariants();
 
@@ -106,7 +91,8 @@ export const VoiceSettings = ({
           <Button
             variant="primary"
             onClick={handleSubmit}
-            isDisabled={isPending || isArchived}
+            isDisabled={isArchived}
+            isPending={isPending}
             aria-describedby={isArchived ? archivedNoticeId : undefined}
           >
             {t('saveButton')}
@@ -145,7 +131,7 @@ export const VoiceSettings = ({
                 label: tLabels(field.key),
               }))}
               values={values}
-              placeholders={placeholders}
+              placeholders={{}}
               onFieldChange={handleFieldChange}
               isDisabled={isPending}
               isReadOnly={isArchived}

@@ -33,8 +33,7 @@ const ToastHarness = () => {
       <button
         onClick={() =>
           toast.success({
-            command: 'Bookmark',
-            state: 'Saved',
+            title: 'Bookmark',
             message: 'Saved to bookmarks',
             action: { label: 'Undo', onAct: successAction, keyHint: '⌘Z' },
           })
@@ -45,8 +44,7 @@ const ToastHarness = () => {
       <button
         onClick={() =>
           toast.error({
-            command: 'Bookmark',
-            state: 'Failed',
+            title: 'Bookmark',
             message: "couldn't save",
           })
         }
@@ -56,16 +54,15 @@ const ToastHarness = () => {
       <button
         onClick={() =>
           toast.promise(Promise.resolve('done'), {
-            command: 'Bookmark',
             loading: {
-              state: 'Saving',
+              title: 'Bookmark',
               message: 'saving…',
             },
             success: {
-              state: 'Saved',
+              title: 'Bookmark',
               message: 'Saved to bookmarks',
             },
-            error: { state: 'Failed', message: 'failed' },
+            error: { title: 'Bookmark', message: 'failed' },
           })
         }
       >

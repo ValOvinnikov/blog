@@ -796,9 +796,11 @@ describe(TenantDetailsPanel, () => {
       );
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-      expect(
-        await screen.findByRole('button', { name: 'Saving…' }),
-      ).toBeDisabled();
+      const saveButton = await screen.findByRole('button', {
+        name: 'Saving…',
+      });
+      expect(saveButton).toBeDisabled();
+      expect(saveButton).toHaveAttribute('aria-busy', 'true');
 
       resolveAction({
         ok: true,

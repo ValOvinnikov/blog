@@ -108,9 +108,11 @@ describe(TenantDetailsForm, () => {
     expect(
       screen.getByRole('status', { name: 'Beginning provisioning…' }),
     ).toBeVisible();
-    expect(
-      screen.getByRole('button', { name: 'Beginning provisioning…' }),
-    ).toBeDisabled();
+    const submitButton = screen.getByRole('button', {
+      name: 'Beginning provisioning…',
+    });
+    expect(submitButton).toBeDisabled();
+    expect(submitButton).toHaveAttribute('aria-busy', 'true');
     expect(
       screen.getByRole('textbox', { name: 'Tenant name' }).closest('[inert]'),
     ).not.toBeNull();

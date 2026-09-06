@@ -6,7 +6,7 @@ export const topbarNavMenuVariants = tv({
       'md:hidden',
       'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-admin-sm',
       'border border-admin-line bg-admin-surface text-admin-muted',
-      'transition-colors duration-base ease-console',
+      'transition-colors duration-base ease-smooth',
       'hover:border-admin-brand hover:text-admin-text',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-brand',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-admin-bg',

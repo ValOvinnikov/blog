@@ -13,7 +13,6 @@ const BASE_PROPS = {
   logoHue: undefined,
   headingFont: FONT_CHOICE.SPACE_GROTESK,
   bodyFont: FONT_CHOICE.NEWSREADER,
-  isChromeOn: false,
 };
 
 describe(LookPreview, () => {
@@ -34,18 +33,6 @@ describe(LookPreview, () => {
     expect(previewSurface).toHaveStyle({
       '--brand-primary-solid': 'oklch(0.55 0.17 28)',
     });
-  });
-
-  it('shows no terminal chrome bar when isChromeOn is false', () => {
-    render(<LookPreview {...BASE_PROPS} isChromeOn={false} />);
-
-    expect(screen.queryByText('~$ ./publish')).not.toBeInTheDocument();
-  });
-
-  it('shows the terminal chrome bar when isChromeOn is true', () => {
-    render(<LookPreview {...BASE_PROPS} isChromeOn={true} />);
-
-    expect(screen.getByText('~$ ./publish')).toBeVisible();
   });
 
   it('reserves a full-page preview panel naming the deferred iframe mechanism', () => {

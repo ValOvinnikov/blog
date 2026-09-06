@@ -9,7 +9,7 @@ export type TVoiceFieldProps = {
   fieldKey: TVoiceOverrideKey;
   value: string;
   onChange: (value: string) => void;
-  /** The preset voice pack's value for this key — shown as the placeholder, since a blank field means "inherit" rather than "blank". */
+  /** Shown as the placeholder, since a blank field means "inherit" rather than "blank". */
   placeholder?: string;
   isMultiline?: boolean;
   isDisabled?: boolean;
@@ -17,12 +17,11 @@ export type TVoiceFieldProps = {
 };
 
 /**
- * One curated voice-override control: a controlled text field whose
- * placeholder is the inherited preset value. Clearing the field back to
- * empty is handled entirely by the caller (it just means `value` becomes
- * `''`) — the save path is what turns an empty string into "no override
- * stored," not this component. Its accessible name comes from the
- * `<label htmlFor>` the enclosing `VoiceFieldGroup` row renders for the
+ * One curated voice-override control: a controlled text field. Clearing the
+ * field back to empty is handled entirely by the caller (it just means
+ * `value` becomes `''`) — the save path is what turns an empty string into
+ * "no override stored," not this component. Its accessible name comes from
+ * the `<label htmlFor>` the enclosing `VoiceFieldGroup` row renders for the
  * same id.
  */
 export const VoiceField = ({

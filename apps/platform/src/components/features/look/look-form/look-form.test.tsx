@@ -118,21 +118,6 @@ describe(LookForm, () => {
     expect(screen.getByAltText('Current logo')).toBeInTheDocument();
   });
 
-  it('notes that terminal chrome is not yet persisted', () => {
-    render(
-      <LookForm
-        tenantId="tenant-1"
-        tenantName="Acme Inc."
-        primaryDomain="acme.example.com"
-        initialValues={defaultLookFormValues()}
-      />,
-    );
-
-    expect(
-      screen.getByText(/Not saved yet — site_config has no column/),
-    ).toBeInTheDocument();
-  });
-
   it("choosing a preset resets every one of that preset's defaults", async () => {
     const user = userEvent.setup();
     render(
@@ -195,6 +180,35 @@ describe(LookForm, () => {
     expect(await screen.findByRole('status')).toHaveTextContent(
       'Saved to site_config.',
     );
+  });
+
+  it('shows a spinner and marks Save busy while the save is in flight', async () => {
+    let resolveAction: (value: { ok: boolean }) => void = () => {};
+    updateLookActionMock.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveAction = resolve;
+        }),
+    );
+    const user = userEvent.setup();
+    render(
+      <LookForm
+        tenantId="tenant-1"
+        tenantName="Acme Inc."
+        primaryDomain="acme.example.com"
+        initialValues={defaultLookFormValues()}
+      />,
+    );
+
+    screen.getByRole('slider', { name: 'Accent hue' }).focus();
+    await user.keyboard('{ArrowRight}');
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    const saveButton = await screen.findByRole('button', { name: 'Saving…' });
+    expect(saveButton).toHaveAttribute('aria-busy', 'true');
+    expect(saveButton).toBeDisabled();
+
+    resolveAction({ ok: true });
   });
 
   it('shows an error alert when the save fails', async () => {
@@ -329,9 +343,6 @@ describe(LookForm, () => {
     await user.click(screen.getByText('Advanced'));
 
     expect(
-      screen.getByRole('switch', { name: 'Terminal chrome' }),
-    ).toHaveAttribute('aria-disabled', 'true');
-    expect(
       screen.getAllByRole('radio', { name: 'Space Grotesk' })[0],
     ).toHaveAttribute('aria-disabled', 'true');
     expect(screen.getByRole('button', { name: 'Small' })).toBeDisabled();
@@ -359,9 +370,6 @@ describe(LookForm, () => {
     expect(screen.getByRole('slider', { name: 'Accent hue' })).toBeEnabled();
     expect(
       screen.getByRole('switch', { name: 'Follow accent hue' }),
-    ).not.toHaveAttribute('aria-disabled', 'true');
-    expect(
-      screen.getByRole('switch', { name: 'Terminal chrome' }),
     ).not.toHaveAttribute('aria-disabled', 'true');
     expect(screen.getByRole('button', { name: 'Upload logo' })).toBeEnabled();
     expect(screen.getByRole('button', { name: 'Small' })).toBeEnabled();

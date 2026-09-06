@@ -64,8 +64,6 @@ export const EmailSettingsForm = ({
         }),
       onSuccess: () => {
         toast.success({
-          command: 'email',
-          state: 'saved',
           message: t('alertSuccess'),
         });
       },
