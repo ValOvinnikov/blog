@@ -29,7 +29,6 @@ function tenant(overrides: Partial<TTenant> = {}): TTenant {
     provisioningStatus: 'PROVISIONING',
     provisioningSteps: null,
     lastNotifiedOwnerElevationOutcome: null,
-    studioVercelProjectId: null,
     seededAt: null,
     webhookCreatedAt: null,
     deprovisionedAt: null,

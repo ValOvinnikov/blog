@@ -129,7 +129,6 @@ export const tenants = pgTable('tenants', {
   lastNotifiedOwnerElevationOutcome: text(
     'last_notified_owner_elevation_outcome',
   ).$type<TElevateTenantOwnerOutcome>(),
-  studioVercelProjectId: text('studio_vercel_project_id'),
   seededAt: timestamp('seeded_at', { mode: 'date' }),
   // Set once provisioning creates the Sanity webhook pointing at apps/web's
   // shared revalidation endpoint. Nullable: unset until that step runs.

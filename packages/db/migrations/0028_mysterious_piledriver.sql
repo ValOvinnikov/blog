@@ -1,0 +1,1 @@
+ALTER TABLE "tenants" DROP COLUMN "studio_vercel_project_id";

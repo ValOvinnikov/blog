@@ -17,7 +17,7 @@ export async function clearTenantArtifacts(
 ): Promise<void> {
   if (env.dryRun) {
     console.warn(
-      `[dry-run] would clear Sanity/Studio provisioning columns for tenant "${tenant.id}".`,
+      `[dry-run] would clear Sanity provisioning columns for tenant "${tenant.id}".`,
     );
     return;
   }

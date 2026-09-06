@@ -50,7 +50,6 @@ function tenantAt(createdAt: Date, overrides: Partial<TTenant> = {}): TTenant {
     status: 'ACTIVE',
     provisioningStatus: 'PROVISIONING',
     provisioningSteps: null,
-    studioVercelProjectId: null,
     seededAt: null,
     webhookCreatedAt: null,
     deprovisionedAt: null,
