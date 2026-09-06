@@ -451,12 +451,15 @@ transition's retirement epic deletes it. The favicon route
 (`apps/web/src/app/icon.tsx`) fetches through the tenant's uploaded
 `settings_site.brand.logo` as a small square crop when present, falling back
 to one static default mark with no per-tenant recoloring. The former
-`siteSettings.brand.variant`/`BRAND_VARIANT` binary look toggle (and its
+`siteSettings.brand.variant`/`BRAND_VARIANTS` binary look toggle (and its
 `.indigo` CSS class) is retired in favor of this — its one prior look
-("Indigo") is now expressible as a theme override (`accentHue`/`logoHue`)
-rather than a separate axis; migrating existing `INDIGO`-variant content and
-removing the field itself is tracked separately (#1389) since it's a
-live-data migration, not a schema-only change.
+("Indigo") is expressible as a theme override (`accentHue`/`logoHue`) rather
+than a separate axis. The Studio field, the generated type and the
+`BRAND_VARIANTS` const are all removed; the one `settings_site` document that
+still carried a value keeps it as an unread key, which needs no migration.
+(The unrelated `BRAND_VARIANT` const in `@blog/config`'s `layout.ts`, which
+every `module_*` document's `brandVariant` field uses, is a different axis and
+is unaffected.)
 
 **Voice-as-content** (the config-to-Postgres transition's E4/E5, wired live
 for the first time by E5): `apps/web/src/i18n/request.ts` resolves each
@@ -546,9 +549,11 @@ limits and layout thresholds (mentioned in the original phase scope) were
 cut with no concrete values ever specified; tracked separately (#1920).
 
 **Curated UI copy lives in Voice, not on modules.** Empty-state and other
-curated UI strings have exactly one authorable home: `settings_voice`'s
-`emptyStates` group (`blogListEmpty`, `topicEmpty`, `tagEmpty`, …), applied
-via the merge above. A module-level field for the same copy (e.g. a
+curated UI strings have exactly one authorable home: the tenant's
+`site_config.voice_overrides` in Postgres (`blogListEmpty`, `topicEmpty`,
+`tagEmpty`, …), edited in the platform's Voice page and applied via the merge
+above. The `settings_voice` Studio singleton that previously held them is
+deleted — it had had no read path since the Postgres cutover. A module-level field for the same copy (e.g. a
 `module_postList.emptyMessage`, removed in #1899 for exactly this reason)
 creates a second, uncoordinated home that silently wins over the tenant's
 Voice override with no error or warning — the worst failure mode for a
