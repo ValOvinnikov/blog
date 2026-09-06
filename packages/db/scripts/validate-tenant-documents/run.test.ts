@@ -8,8 +8,8 @@ import {
   runValidationForTenant,
 } from './run';
 
-const { listTenantsForDocumentValidationMock } = vi.hoisted(() => ({
-  listTenantsForDocumentValidationMock: vi.fn(),
+const { listActiveTenantsMock } = vi.hoisted(() => ({
+  listActiveTenantsMock: vi.fn(),
 }));
 const { getTenantByIdMock } = vi.hoisted(() => ({
   getTenantByIdMock: vi.fn(),
@@ -30,7 +30,7 @@ const { resolveFindingMock } = vi.hoisted(() => ({
 const { notifyMock } = vi.hoisted(() => ({ notifyMock: vi.fn() }));
 
 vi.mock('@blog/db/queries/tenants', () => ({
-  listTenantsForDocumentValidation: listTenantsForDocumentValidationMock,
+  listActiveTenants: listActiveTenantsMock,
   getTenantById: getTenantByIdMock,
   getTenantSanityCredentials: getTenantSanityCredentialsMock,
 }));
@@ -82,7 +82,7 @@ function credentials(tenantId: string) {
 }
 
 beforeEach(() => {
-  listTenantsForDocumentValidationMock.mockReset().mockResolvedValue([]);
+  listActiveTenantsMock.mockReset().mockResolvedValue([]);
   getTenantByIdMock.mockReset();
   getTenantSanityCredentialsMock
     .mockReset()
@@ -123,7 +123,7 @@ describe(runValidation, () => {
       tenant('t2', 'globex'),
       tenant('t3', 'initech'),
     ];
-    listTenantsForDocumentValidationMock.mockResolvedValue(tenants);
+    listActiveTenantsMock.mockResolvedValue(tenants);
     validateTenantDocumentsMock
       .mockReturnValueOnce([])
       .mockReturnValueOnce([
@@ -156,9 +156,7 @@ describe(runValidation, () => {
   });
 
   it('tallies a tenant with no Sanity credentials yet as skipped', async () => {
-    listTenantsForDocumentValidationMock.mockResolvedValue([
-      tenant('t1', 'acme'),
-    ]);
+    listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
     getTenantSanityCredentialsMock.mockResolvedValue(undefined);
 
     const summary = await runValidation();
@@ -175,9 +173,7 @@ describe(runValidation, () => {
   });
 
   it('skips a tenant whose credentials resolve to a non-ACTIVE status', async () => {
-    listTenantsForDocumentValidationMock.mockResolvedValue([
-      tenant('t1', 'acme'),
-    ]);
+    listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
     getTenantSanityCredentialsMock.mockResolvedValue({
       ...credentials('t1'),
       status: TENANT_STATUS.SUSPENDED,
@@ -197,9 +193,7 @@ describe(runValidation, () => {
   });
 
   it('skips a tenant whose credentials resolve to a deprovisioned timestamp', async () => {
-    listTenantsForDocumentValidationMock.mockResolvedValue([
-      tenant('t1', 'acme'),
-    ]);
+    listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
     getTenantSanityCredentialsMock.mockResolvedValue({
       ...credentials('t1'),
       deprovisionedAt: new Date('2026-01-02T00:00:00.000Z'),
@@ -224,7 +218,7 @@ describe(runValidation, () => {
       tenant('t2', 'globex'),
       tenant('t3', 'initech'),
     ];
-    listTenantsForDocumentValidationMock.mockResolvedValue(tenants);
+    listActiveTenantsMock.mockResolvedValue(tenants);
     validateTenantDocumentsMock
       .mockReturnValueOnce([])
       .mockImplementationOnce(() => {
@@ -247,9 +241,7 @@ describe(runValidation, () => {
   });
 
   it('opens a finding for a tenant with invalid documents', async () => {
-    listTenantsForDocumentValidationMock.mockResolvedValue([
-      tenant('t1', 'acme'),
-    ]);
+    listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
     validateTenantDocumentsMock.mockReturnValue([
       {
         documentId: 'doc-1',
@@ -270,7 +262,7 @@ describe(runValidation, () => {
   });
 
   it('notifies operators only when the finding is newly opened, not on a repeat open', async () => {
-    listTenantsForDocumentValidationMock.mockResolvedValue([
+    listActiveTenantsMock.mockResolvedValue([
       tenant('t1', 'acme'),
       tenant('t2', 'globex'),
     ]);
@@ -298,9 +290,7 @@ describe(runValidation, () => {
   });
 
   it('resolves a previously open finding once the tenant validates clean again', async () => {
-    listTenantsForDocumentValidationMock.mockResolvedValue([
-      tenant('t1', 'acme'),
-    ]);
+    listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
     validateTenantDocumentsMock.mockReturnValue([]);
     listFindingsForTenantMock.mockResolvedValue([
       {
@@ -318,9 +308,7 @@ describe(runValidation, () => {
   });
 
   it('does not resolve an open finding from a different source/kind', async () => {
-    listTenantsForDocumentValidationMock.mockResolvedValue([
-      tenant('t1', 'acme'),
-    ]);
+    listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
     validateTenantDocumentsMock.mockReturnValue([]);
     listFindingsForTenantMock.mockResolvedValue([
       {
@@ -347,7 +335,7 @@ describe(runValidationForTenant, () => {
 
     expect(summary.checked).toBe(1);
     expect(getTenantByIdMock).toHaveBeenCalledWith('t1');
-    expect(listTenantsForDocumentValidationMock).not.toHaveBeenCalled();
+    expect(listActiveTenantsMock).not.toHaveBeenCalled();
   });
 
   it('returns an empty summary when the tenant id does not resolve', async () => {
