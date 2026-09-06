@@ -34,6 +34,7 @@ export const makeBookmarksPageView = (
 
   return {
     heading: 'My bookmarks',
+    listHeading: 'Saved posts',
     posts,
     emptyMessage: 'No bookmarks yet — save a post to find it here.',
     hint: posts.length > 0 ? `${posts.length} saved` : undefined,

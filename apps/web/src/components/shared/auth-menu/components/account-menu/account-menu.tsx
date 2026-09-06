@@ -3,7 +3,7 @@
 import { ICONS, routes, SIZE } from '@blog/config';
 import { Avatar } from '@blog/ui/atoms/avatar';
 import { Icon } from '@blog/ui/atoms/icon';
-import { Panel } from '@blog/ui/molecules/panel';
+import { Text } from '@blog/ui/atoms/text';
 import { PopoverMenu } from '@blog/ui/molecules/popover-menu';
 import { authMenuVariants } from '@web/components/shared/auth-menu/auth-menu-variants';
 import { SmartLink } from '@web/components/shared/smart-link';
@@ -26,9 +26,12 @@ export type TAccountMenuProps = {
 
 /**
  * `AuthMenu`'s logged-in render branch: an `Avatar`-triggered `PopoverMenu`
- * framed in a `Panel`, showing the session's name/email, "My bookmarks",
- * "Account settings", and "Sign out". Open/close state and refs come from
- * the parent's single `usePopover()` call — this component never calls
+ * showing the session's name/email, "My bookmarks", "Account settings", and
+ * "Sign out". The title is a plain styled label, not a heading —
+ * `role="menu"` doesn't own heading elements per the ARIA menu pattern, and
+ * this panel renders ahead of every page's own `<h1>` in
+ * `[tenant]/[locale]/layout.tsx`. Open/close state and refs come from the
+ * parent's single `usePopover()` call — this component never calls
  * `usePopover()` itself.
  */
 export const AccountMenu = ({
@@ -46,6 +49,7 @@ export const AccountMenu = ({
   const {
     menuRoot,
     avatarTrigger,
+    label,
     acctRow,
     accountName,
     accountEmail,
@@ -95,47 +99,45 @@ export const AccountMenu = ({
         id={panelId}
         isOpen={isOpen}
         ariaLabel={t('accountMenuAriaLabel')}
-        className={panel()}
+        className={`${panel()} ${windowSize()}`}
       >
-        <Panel className={windowSize()}>
-          <Panel.Header headingLevel={2}>{t('accountHeading')}</Panel.Header>
-          <Panel.Body>
-            <div className={acctRow()}>
-              <Avatar
-                src={avatarSrc}
-                name={displayName}
-                alt=""
-                size={SIZE.SM}
-                onImageError={() => setImageFailed(true)}
-              />
-              <div>
-                <p className={accountName()}>{displayName}</p>
-                {email && <p className={accountEmail()}>{email}</p>}
-              </div>
-            </div>
-            <PopoverMenu.Item
-              as={SmartLink}
-              href={routes.bookmarks()}
-              icon={<Icon name={ICONS.BOOKMARK} size={SIZE.SM} />}
-            >
-              {t('myBookmarks')}
-            </PopoverMenu.Item>
-            <PopoverMenu.Item
-              as={SmartLink}
-              href={routes.account()}
-              icon={<Icon name={ICONS.SETTINGS} size={SIZE.SM} />}
-            >
-              {t('accountSettings')}
-            </PopoverMenu.Item>
-            <PopoverMenu.Item
-              onClick={() => signOut()}
-              className={signOutItem()}
-              icon={<Icon name={ICONS.POWER} size={SIZE.SM} />}
-            >
-              {t('signOut')}
-            </PopoverMenu.Item>
-          </Panel.Body>
-        </Panel>
+        <Text variant="emphasis" className={label()}>
+          {t('accountHeading')}
+        </Text>
+        <div className={acctRow()}>
+          <Avatar
+            src={avatarSrc}
+            name={displayName}
+            alt=""
+            size={SIZE.SM}
+            onImageError={() => setImageFailed(true)}
+          />
+          <div>
+            <p className={accountName()}>{displayName}</p>
+            {email && <p className={accountEmail()}>{email}</p>}
+          </div>
+        </div>
+        <PopoverMenu.Item
+          as={SmartLink}
+          href={routes.bookmarks()}
+          icon={<Icon name={ICONS.BOOKMARK} size={SIZE.SM} />}
+        >
+          {t('myBookmarks')}
+        </PopoverMenu.Item>
+        <PopoverMenu.Item
+          as={SmartLink}
+          href={routes.account()}
+          icon={<Icon name={ICONS.SETTINGS} size={SIZE.SM} />}
+        >
+          {t('accountSettings')}
+        </PopoverMenu.Item>
+        <PopoverMenu.Item
+          onClick={() => signOut()}
+          className={signOutItem()}
+          icon={<Icon name={ICONS.POWER} size={SIZE.SM} />}
+        >
+          {t('signOut')}
+        </PopoverMenu.Item>
       </PopoverMenu.Panel>
     </PopoverMenu>
   );

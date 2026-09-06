@@ -2,6 +2,7 @@ import { tv } from 'tailwind-variants';
 
 export const signInMenuVariants = tv({
   slots: {
+    label: ['mb-3'],
     providerPrompt: ['mb-3'],
     providerButton: ['mt-2'],
     hint: ['mt-3 font-mono text-meta text-subtle'],

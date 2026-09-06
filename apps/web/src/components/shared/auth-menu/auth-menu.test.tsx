@@ -83,16 +83,18 @@ describe(`<${AuthMenu.name}/>`, () => {
       ).toBeVisible();
     });
 
-    it('renders the panel with a level-2 "Sign in" heading and the provider prompt', async () => {
+    it('renders a plain "Sign in" label — not a heading — plus the provider prompt', async () => {
       setup();
       const user = userEvent.setup();
 
       await user.click(screen.getByRole('button', { name: 'Sign in' }));
       const panel = screen.getByRole('menu');
 
-      expect(
-        within(panel).getByRole('heading', { level: 2, name: 'Sign in' }),
-      ).toBeVisible();
+      // `role="menu"` doesn't own heading elements per the ARIA menu
+      // pattern, and this panel renders ahead of every page's own `<h1>` —
+      // the title must stay a plain styled label, never a real heading.
+      expect(within(panel).queryByRole('heading')).not.toBeInTheDocument();
+      expect(within(panel).getByText('Sign in')).toBeVisible();
       expect(within(panel).getByText(/Choose a sign-in method/)).toBeVisible();
       expect(
         within(panel).getByText(
@@ -357,16 +359,18 @@ describe(`<${AuthMenu.name}/>`, () => {
       ).toHaveAttribute('href', '/account');
     });
 
-    it('renders the panel with a level-2 "Account" heading', async () => {
+    it('renders a plain "Account" label — not a heading', async () => {
       setup();
       const user = userEvent.setup();
 
       await user.click(screen.getByRole('button', { name: 'Account menu' }));
       const panel = screen.getByRole('menu');
 
-      expect(
-        within(panel).getByRole('heading', { level: 2, name: 'Account' }),
-      ).toBeVisible();
+      // `role="menu"` doesn't own heading elements per the ARIA menu
+      // pattern, and this panel renders ahead of every page's own `<h1>` —
+      // the title must stay a plain styled label, never a real heading.
+      expect(within(panel).queryByRole('heading')).not.toBeInTheDocument();
+      expect(within(panel).getByText('Account')).toBeVisible();
     });
 
     it('calls signOut when Sign out is clicked', async () => {

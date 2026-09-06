@@ -78,6 +78,7 @@ export const BookmarksPage = async () => {
   return (
     <BookmarksPageView
       heading={t('title')}
+      listHeading={t('listHeading')}
       posts={posts}
       emptyMessage={t('empty')}
       hint={posts.length > 0 ? t('hint', { count: posts.length }) : undefined}

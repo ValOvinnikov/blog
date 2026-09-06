@@ -14,11 +14,11 @@ describe(BookmarksPageView, () => {
     ).toBeVisible();
   });
 
-  it('renders the panel heading as a level-2 heading with the same title', () => {
+  it('renders a distinct level-2 panel heading, not a repeat of the page title', () => {
     setup();
 
     expect(
-      screen.getByRole('heading', { level: 2, name: 'My bookmarks' }),
+      screen.getByRole('heading', { level: 2, name: 'Saved posts' }),
     ).toBeVisible();
   });
 
@@ -32,7 +32,7 @@ describe(BookmarksPageView, () => {
     expect(screen.queryByText(/saved$/)).not.toBeInTheDocument();
   });
 
-  it('renders resolved posts as ls -l rows with a saved-count hint', () => {
+  it('renders resolved posts as rows with a saved-count hint, no decorative prefix', () => {
     setup();
 
     const links = screen.getAllByRole('link');
@@ -43,10 +43,8 @@ describe(BookmarksPageView, () => {
     expect(links[0]).toHaveAttribute('href', '/blog/static-first-rendering');
     expect(links[1]).toHaveAttribute('href', '/blog/a-tour-of-the-new-editor');
     expect(screen.getByText('2 saved')).toBeVisible();
-    expect(screen.getAllByTestId('bookmarks-list-row-prefix')).toHaveLength(2);
-    for (const prefix of screen.getAllByTestId('bookmarks-list-row-prefix')) {
-      expect(prefix).toHaveTextContent('drwx');
-      expect(prefix).toHaveAttribute('aria-hidden', 'true');
-    }
+    expect(
+      screen.queryByTestId('bookmarks-list-row-prefix'),
+    ).not.toBeInTheDocument();
   });
 });

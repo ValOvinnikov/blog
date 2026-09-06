@@ -21,6 +21,7 @@ export interface IBookmarkedPost {
 
 export interface IBookmarksPageViewProps {
   heading: string;
+  listHeading: string;
   posts: IBookmarkedPost[];
   emptyMessage: string;
   hint?: string;
@@ -34,6 +35,7 @@ export interface IBookmarksPageViewProps {
  */
 export const BookmarksPageView = ({
   heading,
+  listHeading,
   posts,
   emptyMessage,
   hint,
@@ -51,21 +53,12 @@ export const BookmarksPageView = ({
         {heading}
       </Heading>
       <Panel className={s.chrome()}>
-        <Panel.Header headingLevel={2}>{heading}</Panel.Header>
+        <Panel.Header headingLevel={2}>{listHeading}</Panel.Header>
         <Panel.Body>
           <BookmarksList
             rows={rows}
             emptyMessage={emptyMessage}
             hint={rows.length > 0 ? hint : undefined}
-            prefix={
-              <span
-                aria-hidden="true"
-                data-testid="bookmarks-list-row-prefix"
-                className={s.prefix()}
-              >
-                drwx
-              </span>
-            }
             linkAs={SmartLink}
           />
         </Panel.Body>

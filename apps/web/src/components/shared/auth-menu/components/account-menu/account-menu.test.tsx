@@ -97,16 +97,18 @@ describe(`<${AccountMenu.name}/>`, () => {
     expect(getTriggerImage()).toBeInTheDocument();
   });
 
-  it('renders the panel with a level-2 "Account" heading and the session name/email', async () => {
+  it('renders a plain "Account" label — not a heading — and the session name/email', async () => {
     setup();
     const user = userEvent.setup();
 
     await user.click(screen.getByRole('button', { name: 'Account menu' }));
     const panel = screen.getByRole('menu');
 
-    expect(
-      within(panel).getByRole('heading', { level: 2, name: 'Account' }),
-    ).toBeVisible();
+    // `role="menu"` doesn't own heading elements per the ARIA menu pattern,
+    // and this panel renders ahead of every page's own `<h1>` — the title
+    // must stay a plain styled label, never a real heading.
+    expect(within(panel).queryByRole('heading')).not.toBeInTheDocument();
+    expect(within(panel).getByText('Account')).toBeVisible();
     expect(within(panel).getAllByText('Jane Doe').length).toBeGreaterThan(0);
     expect(within(panel).getByText('jane@example.com')).toBeVisible();
     expect(
