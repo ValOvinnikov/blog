@@ -1,4 +1,3 @@
-import { BRAND_VARIANTS } from '@blog/config';
 import type { TBrand } from '@blog/service';
 import { customRender, screen } from '@web/testing/custom-render';
 
@@ -9,7 +8,6 @@ const brand: TBrand = {
   logoUrl: 'https://cdn.sanity.io/images/test/production/brand-mark.svg',
   logoAsset: undefined,
   specLine: undefined,
-  variant: BRAND_VARIANTS.CONSOLE,
 };
 
 const setup = customRender(BrandLockupLink, { brand });

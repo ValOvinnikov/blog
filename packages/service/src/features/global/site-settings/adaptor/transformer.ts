@@ -27,7 +27,6 @@ export function toSiteSettings(
       specLine,
       logoUrl: buildImageUrl(raw.brand.logo, tenant),
       logoAsset: raw.brand.logo ?? undefined,
-      variant: raw.brand.variant,
     },
     description: raw.description,
     tagline: raw.tagline ?? undefined,
