@@ -9,9 +9,9 @@ import {
 } from '@blog/email/portable-text';
 
 export type TNewsletterConfirmationEmailInput = {
-  /** The resolved (authored-over-default) subject — see `getEmailTemplate`. */
+  /** The subject to send, already merged by the caller over its own default. */
   subject: string;
-  /** The resolved (authored-over-default) body — see `getEmailTemplate`. */
+  /** The body to render, already merged by the caller over its own default. */
   body: TPortableTextContent;
   confirmationUrl: string;
   unsubscribeUrl: string;

@@ -17,6 +17,9 @@ export type TRenderEmailShellInput = {
   brandName: string;
   previewText?: string;
   bodyHtml: string;
+  /** Already-assembled, already-escaped HTML for a locked structural fact — content the authored body must not be able to omit, reorder, or displace — rendered between the body and the action. The caller is responsible for escaping any interpolated values. Omit for an email with no such content. */
+  structuralHtml?: string;
+  /** Already-assembled, already-escaped HTML for the one locked action element, rendered after any structural content and before the footer. Omit for an email with no action. */
   actionHtml?: string;
   /** An uploaded logo image; falls back to the generated triangle mark when omitted or when the URL fails validation. */
   logoImageUrl?: string;
@@ -39,11 +42,13 @@ export function renderEmailShell({
   brandName,
   previewText,
   bodyHtml,
+  structuralHtml,
   actionHtml,
   logoImageUrl,
   footerPostalAddress,
 }: TRenderEmailShellInput): string {
   const escapedBrandName = escapeHtml(brandName);
+  const lockedHtml = `${structuralHtml ?? ''}${actionHtml ?? ''}`;
   const preheader = previewText
     ? // Inbox preview text has no dedicated HTML tag — clients fall back to
       // the first visible text, so a hidden, zero-height span is the
@@ -70,8 +75,8 @@ export function renderEmailShell({
     `<tr><td style="padding:32px;color:${palette.text};font-family:${FONT_STACK};font-size:16px;line-height:1.5;">`,
     bodyHtml,
     '</td></tr>',
-    actionHtml
-      ? `<tr><td style="padding:0 32px 32px;">${actionHtml}</td></tr>`
+    lockedHtml
+      ? `<tr><td style="padding:0 32px 32px;">${lockedHtml}</td></tr>`
       : '',
     `<tr><td style="padding:24px 32px;border-top:1px solid ${palette.border};color:${palette.textMuted};font-family:${FONT_STACK};font-size:12px;line-height:1.5;">`,
     `&copy; ${new Date().getFullYear()} ${escapedBrandName}`,
