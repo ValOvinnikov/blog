@@ -65,12 +65,10 @@ export function buildInviteMagicLinkEmail({
     };
   }
 
-  const actionHtml =
-    tenantNamesHtml +
-    renderEmailAction(
-      { label: ACCEPT_INVITE_ACTION_LABEL, url, variant: 'button' },
-      tenantIdentity.brand,
-    );
+  const actionHtml = renderEmailAction(
+    { label: ACCEPT_INVITE_ACTION_LABEL, url, variant: 'button' },
+    tenantIdentity.brand,
+  );
 
   return {
     subject,
@@ -78,6 +76,7 @@ export function buildInviteMagicLinkEmail({
       brand: tenantIdentity.brand,
       brandName: tenantIdentity.brandName,
       bodyHtml,
+      structuralHtml: tenantNamesHtml,
       actionHtml,
       logoImageUrl,
       footerPostalAddress,
