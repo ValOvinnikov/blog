@@ -54,6 +54,7 @@ export function buildMagicLinkProvider(): EmailConfig {
         ? buildInviteMagicLinkEmail({
             url,
             tenantIdentity,
+            tenantNames,
             subject: resolvedSubject,
             body: resolvedBody,
             logoImageUrl: emailSettings?.logoImageUrl,

@@ -124,12 +124,19 @@ describe(buildMagicLinkProvider, () => {
     expect(findPendingInviteByEmailMock).toHaveBeenCalledWith(
       'invited@example.com',
     );
-    expect(sendEmailMock).toHaveBeenCalledWith({
-      to: 'invited@example.com',
-      from: 'Sign in <onboarding@resend.dev>',
-      subject: TENANT_INVITE_DEFAULTS.subject,
-      html: expect.stringContaining('Accept invite'),
-    });
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: 'invited@example.com',
+        from: 'Sign in <onboarding@resend.dev>',
+        subject: TENANT_INVITE_DEFAULTS.subject,
+        html: expect.stringContaining('Accept invite'),
+      }),
+    );
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        html: expect.stringContaining('<strong>Acme Blog</strong>'),
+      }),
+    );
   });
 
   it('falls back to the generic copy and still delivers when the invite lookup throws', async () => {

@@ -18,7 +18,8 @@ describe(buildInviteMagicLinkEmail, () => {
     const { subject } = buildInviteMagicLinkEmail({
       url: 'https://example.com/api/auth/callback/email?token=abc',
       subject: "You've been invited to join the team",
-      body: bodyOf("You've been invited to join as a team member."),
+      body: bodyOf('You have been invited to join as a team member.'),
+      tenantNames: ['Acme Blog'],
     });
 
     expect(subject).toBe("You've been invited to join the team");
@@ -29,16 +30,80 @@ describe(buildInviteMagicLinkEmail, () => {
       url: 'https://example.com/api/auth/callback/email?token=abc',
       subject: "You've been invited to join the team",
       body: bodyOf('You have been invited to join as a team member.'),
+      tenantNames: ['Acme Blog'],
     });
 
     expect(html).toContain('You have been invited to join as a team member.');
+  });
+
+  it('names a single invited tenant in the structural organisation element', () => {
+    const { html } = buildInviteMagicLinkEmail({
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      subject: "You've been invited to join the team",
+      body: bodyOf('You have been invited to join as a team member.'),
+      tenantNames: ['Acme Blog'],
+    });
+
+    expect(html).toContain('<strong>Acme Blog</strong>');
+  });
+
+  it('joins two invited tenant names with "and"', () => {
+    const { html } = buildInviteMagicLinkEmail({
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      subject: "You've been invited to join the team",
+      body: bodyOf('You have been invited to join as a team member.'),
+      tenantNames: ['Acme Blog', 'Other Corp'],
+    });
+
+    expect(html).toContain('<strong>Acme Blog and Other Corp</strong>');
+  });
+
+  it('joins three or more invited tenant names with an Oxford comma', () => {
+    const { html } = buildInviteMagicLinkEmail({
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      subject: "You've been invited to join the team",
+      body: bodyOf('You have been invited to join as a team member.'),
+      tenantNames: ['Acme Blog', 'Other Corp', 'Third Co'],
+    });
+
+    expect(html).toContain(
+      '<strong>Acme Blog, Other Corp, and Third Co</strong>',
+    );
+  });
+
+  it('escapes HTML-unsafe characters in an operator-entered tenant name', () => {
+    const { html } = buildInviteMagicLinkEmail({
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      subject: "You've been invited to join the team",
+      body: bodyOf('You have been invited to join as a team member.'),
+      tenantNames: [`<script>alert(1)</script> & "quoted" 'name'`],
+    });
+
+    expect(html).not.toContain('<script>alert(1)</script>');
+    expect(html).toContain(
+      '&lt;script&gt;alert(1)&lt;/script&gt; &amp; &quot;quoted&quot; &#39;name&#39;',
+    );
+  });
+
+  it('omits the organisation element and still sends when no tenant names are given', () => {
+    const { html } = buildInviteMagicLinkEmail({
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      subject: "You've been invited to join the team",
+      body: bodyOf('You have been invited to join as a team member.'),
+    });
+
+    expect(html).not.toContain("You've been invited to manage");
+    expect(html).toContain(
+      'href="https://example.com/api/auth/callback/email?token=abc"',
+    );
   });
 
   it('links the magic-link url in the accept-invite action', () => {
     const { html } = buildInviteMagicLinkEmail({
       url: 'https://example.com/api/auth/callback/email?token=abc',
       subject: "You've been invited to join the team",
-      body: bodyOf("You've been invited to join as a team member."),
+      body: bodyOf('You have been invited to join as a team member.'),
+      tenantNames: ['Acme Blog'],
     });
 
     expect(html).toContain(
@@ -51,7 +116,8 @@ describe(buildInviteMagicLinkEmail, () => {
     const { html } = buildInviteMagicLinkEmail({
       url: `https://example.com/callback?token="><img src=x onerror=alert(1)>`,
       subject: "You've been invited to join the team",
-      body: bodyOf("You've been invited to join as a team member."),
+      body: bodyOf('You have been invited to join as a team member.'),
+      tenantNames: ['Acme Blog'],
     });
 
     expect(html).not.toContain('"><img src=x onerror=alert(1)>');
@@ -62,7 +128,8 @@ describe(buildInviteMagicLinkEmail, () => {
     const { html } = buildInviteMagicLinkEmail({
       url: 'https://example.com/api/auth/callback/email?token=abc',
       subject: "You've been invited to join the team",
-      body: bodyOf("You've been invited to join as a team member."),
+      body: bodyOf('You have been invited to join as a team member.'),
+      tenantNames: ['Acme Blog'],
     });
 
     expect(html).not.toContain('<!doctype html>');
@@ -77,7 +144,8 @@ describe(buildInviteMagicLinkEmail, () => {
     const { html } = buildInviteMagicLinkEmail({
       url: 'https://example.com/api/auth/callback/email?token=abc',
       subject: "You've been invited to join the team",
-      body: bodyOf("You've been invited to join as a team member."),
+      body: bodyOf('You have been invited to join as a team member.'),
+      tenantNames: ['Acme Blog'],
       tenantIdentity: { brand, brandName: 'Acme Blog', tenantId: 'tenant-1' },
     });
 
@@ -94,7 +162,8 @@ describe(buildInviteMagicLinkEmail, () => {
     const { html } = buildInviteMagicLinkEmail({
       url: 'https://example.com/api/auth/callback/email?token=abc',
       subject: "You've been invited to join the team",
-      body: bodyOf("You've been invited to join as a team member."),
+      body: bodyOf('You have been invited to join as a team member.'),
+      tenantNames: ['Acme Blog'],
       tenantIdentity: { brand, brandName: 'Acme Blog', tenantId: 'tenant-1' },
       logoImageUrl: 'https://cdn.example.com/logo.png',
       footerPostalAddress: '123 Main St, Springfield',
@@ -132,6 +201,7 @@ describe(buildInviteMagicLinkEmail, () => {
           ],
         },
       ],
+      tenantNames: ['Acme Blog'],
       tenantIdentity: { brand, brandName: 'Acme Blog', tenantId: 'tenant-1' },
     });
 
@@ -139,5 +209,22 @@ describe(buildInviteMagicLinkEmail, () => {
       'href="https://example.com/api/auth/callback/email?token=abc"',
     );
     expect(html).toContain(`href="${adversarialUrl}"`);
+  });
+
+  it('keeps the real invited organisation name intact even when the authored body impersonates a different one', () => {
+    const brand = resolveTenantEmailBrand({
+      preset: PRESET_ID.CONSOLE,
+      accentHue: 140,
+    });
+
+    const { html } = buildInviteMagicLinkEmail({
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      subject: "You've been invited to join the team",
+      body: bodyOf("You've been invited to manage EvilCorp."),
+      tenantNames: ['Acme Blog'],
+      tenantIdentity: { brand, brandName: 'Acme Blog', tenantId: 'tenant-1' },
+    });
+
+    expect(html).toContain('<strong>Acme Blog</strong>');
   });
 });
