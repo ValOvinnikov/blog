@@ -126,8 +126,41 @@ describe('resolveNewsletterEmailSettings', () => {
     const settings = await resolveNewsletterEmailSettings(TENANT_ID, undefined);
 
     expect(settings.fromAddress).toBe(
-      'Zeta Bcc: attacker@example.com <onboarding@resend.dev>',
+      'ZetaBcc: attacker@example.com <onboarding@resend.dev>',
     );
+  });
+
+  it('strips angle brackets from a stored sender name so it cannot inject a second address', async () => {
+    getEmailConfigMock.mockResolvedValue({
+      tenantId: TENANT_ID,
+      logoAssetUrl: undefined,
+      senderName: 'Acme <evil@attacker.example>',
+      replyToAddress: undefined,
+      footerPostalAddress: undefined,
+    });
+    const { resolveNewsletterEmailSettings } =
+      await import('./resolve-newsletter-email-settings');
+
+    const settings = await resolveNewsletterEmailSettings(TENANT_ID, undefined);
+
+    expect(settings.fromAddress.match(/</g)).toHaveLength(1);
+    expect(settings.fromAddress).toContain('<onboarding@resend.dev>');
+  });
+
+  it('falls back to the unmodified from address when the sender name is whitespace-only after sanitizing', async () => {
+    getEmailConfigMock.mockResolvedValue({
+      tenantId: TENANT_ID,
+      logoAssetUrl: undefined,
+      senderName: '   ',
+      replyToAddress: undefined,
+      footerPostalAddress: undefined,
+    });
+    const { resolveNewsletterEmailSettings } =
+      await import('./resolve-newsletter-email-settings');
+
+    const settings = await resolveNewsletterEmailSettings(TENANT_ID, undefined);
+
+    expect(settings.fromAddress).toBe(DEFAULT_FROM_ADDRESS);
   });
 
   it('passes a well-formed reply-to address through', async () => {

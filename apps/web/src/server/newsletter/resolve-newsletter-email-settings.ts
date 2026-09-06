@@ -11,11 +11,12 @@ export type TNewsletterEmailSettings = {
   replyTo: string | undefined;
 };
 
-// Header-injection guard: a `from`/`replyTo` display name flows straight
-// into a mail header, so a stray CR/LF in a tenant-supplied sender name
-// must never reach it verbatim.
+// Header-injection guard: a `from` display name flows straight into a mail
+// header, so stray CR/LF and angle brackets in a tenant-supplied sender name
+// must never reach it verbatim — matches
+// packages/auth/src/providers/magic-link/apply-tenant-sender-name.ts.
 const sanitizeSenderName = (senderName: string): string =>
-  senderName.replace(/[\r\n]+/g, ' ').trim();
+  senderName.replace(/[\r\n<>]/g, '').trim();
 
 const FROM_ADDRESS_WITH_DISPLAY_NAME = /<([^<>]+)>\s*$/;
 
@@ -25,10 +26,13 @@ const applySenderNameOverride = (
 ): string => {
   if (!senderName) return fromAddress;
 
+  const sanitizedSenderName = sanitizeSenderName(senderName);
+  if (!sanitizedSenderName) return fromAddress;
+
   const match = fromAddress.match(FROM_ADDRESS_WITH_DISPLAY_NAME);
   const address = (match?.[1] ?? fromAddress).trim();
 
-  return `${sanitizeSenderName(senderName)} <${address}>`;
+  return `${sanitizedSenderName} <${address}>`;
 };
 
 const getEmailConfigSafely = async (tenantId: string) => {
