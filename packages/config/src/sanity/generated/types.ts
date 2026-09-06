@@ -175,7 +175,6 @@ export type Brand = {
   name?: string;
   logo?: ImageWithAlt;
   specLine?: SpecLine;
-  variant?: 'CONSOLE' | 'INDIGO';
 };
 
 export type SpecLine = {
@@ -329,34 +328,6 @@ export type MigrationState = {
     _type: 'appliedMigration';
     _key: string;
   }>;
-};
-
-export type Settings_voice = {
-  _id: string;
-  _type: 'settings_voice';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  notFoundMetaTitle?: string;
-  notFoundMetaDescription?: string;
-  notFoundCommandNotFound?: string;
-  notFoundDescription?: string;
-  notFoundReturnHome?: string;
-  terminalPromptHost?: string;
-  authPromptCommandSignIn?: string;
-  authPromptCommandAccount?: string;
-  bookmarksPromptCommand?: string;
-  accountPrivacyPromptCommand?: string;
-  accountNewsletterPromptCommand?: string;
-  accountIdentityPromptCommand?: string;
-  bookmarkToastSavedMessage?: string;
-  bookmarkToastRemovedMessage?: string;
-  blogListEmpty?: string;
-  topicEmpty?: string;
-  tagEmpty?: string;
-  topicsEmpty?: string;
-  bookmarksEmpty?: string;
 };
 
 export type Settings_theme = {
@@ -922,7 +893,6 @@ export type AllSanitySchemaTypes =
   | HeroLayout
   | Layout
   | MigrationState
-  | Settings_voice
   | Settings_theme
   | Settings_newsletter
   | Settings_footer
