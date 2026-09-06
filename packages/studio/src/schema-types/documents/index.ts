@@ -15,7 +15,6 @@ import { navigationSchema } from './settings/navigation';
 import { newsletterSettingsSchema } from './settings/newsletter';
 import { siteSchema } from './settings/site-settings';
 import { themeSchema } from './settings/theme';
-import { voiceSchema } from './settings/voice';
 import { migrationStateSchema } from './system/migration-state';
 
 export const documents = [
@@ -36,6 +35,5 @@ export const documents = [
   footerSchema,
   newsletterSettingsSchema,
   themeSchema,
-  voiceSchema,
   migrationStateSchema,
 ];

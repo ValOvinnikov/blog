@@ -1,7 +1,5 @@
-// Checks that the "voice" override vocabulary stays in sync across the four
+// Checks that the "voice" override vocabulary stays in sync across the three
 // places that hand-duplicate it:
-//   - packages/studio/src/schema-types/documents/settings/voice.ts
-//     (the Sanity `settings_voice` schema's `defineField({ name: '...' })` calls)
 //   - apps/platform/src/utils/voice-fields/voice-fields.ts
 //     (`VOICE_FIELD_GROUPS`' field `key`s)
 //   - apps/web/src/utils/apply-voice-overrides/apply-voice-overrides.ts
@@ -22,10 +20,6 @@ import ts from 'typescript';
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(scriptDir, '..');
 
-const CMS_FILE = join(
-  repoRoot,
-  'packages/studio/src/schema-types/documents/settings/voice.ts',
-);
 const ADMIN_FILE = join(
   repoRoot,
   'apps/platform/src/utils/voice-fields/voice-fields.ts',
@@ -63,30 +57,6 @@ const findLocalDeclaration = (sf, name) => {
     }
   }
   return null;
-};
-
-// Every `defineField({ name: '...' })` call's `name` string literal.
-export const extractCmsKeys = (sf) => {
-  const keys = [];
-  const visit = (node) => {
-    if (
-      ts.isCallExpression(node) &&
-      ts.isIdentifier(node.expression) &&
-      node.expression.text === 'defineField' &&
-      node.arguments[0] &&
-      ts.isObjectLiteralExpression(node.arguments[0])
-    ) {
-      for (const prop of node.arguments[0].properties) {
-        if (ts.isPropertyAssignment(prop) && prop.name.getText(sf) === 'name') {
-          const value = stringValue(prop.initializer);
-          if (value) keys.push(value);
-        }
-      }
-    }
-    ts.forEachChild(node, visit);
-  };
-  visit(sf);
-  return keys;
 };
 
 // Every `key: '...'` string literal inside VOICE_FIELD_GROUPS' nested
@@ -206,7 +176,6 @@ const formatReport = (missing, sources) => {
 };
 
 export const SOURCES = [
-  { label: 'cms', file: CMS_FILE, extract: extractCmsKeys },
   { label: 'admin', file: ADMIN_FILE, extract: extractAdminKeys },
   { label: 'web', file: WEB_FILE, extract: extractWebKeys },
   { label: 'db', file: DB_FILE, extract: extractDbKeys },
@@ -227,7 +196,7 @@ const main = () => {
   }
 
   console.log(
-    `Voice-override keys are in sync across cms/platform/web/db (${allKeys.size} keys).`,
+    `Voice-override keys are in sync across platform/web/db (${allKeys.size} keys).`,
   );
 };
 
