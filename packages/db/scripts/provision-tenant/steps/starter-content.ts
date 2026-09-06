@@ -1,6 +1,5 @@
 import {
   BRAND_VARIANT,
-  BRAND_VARIANTS,
   HERO_FIELD_MODE,
   PRESET_ID,
   LINK_TYPE,
@@ -132,7 +131,6 @@ export function buildStarterDocuments(
     brand: {
       _type: 'brand',
       name: tenant.name,
-      variant: BRAND_VARIANTS.CONSOLE,
     },
     description:
       `${tenant.name} was just provisioned on the platform. Edit this ` +
