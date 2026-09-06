@@ -6,9 +6,9 @@ const WHITESPACE_PATTERN = /\s/;
  * client-side check and `subscribeToNewsletterAction`'s server-side
  * re-check; real deliverability is Resend's problem, not this function's.
  *
- * Implemented with index/split logic rather than a single regex: a
- * `[^\s@]+\.[^\s@]+` pattern lets `.` satisfy either unbounded run, which
- * is polynomial-time backtracking on non-matching input.
+ * Implemented with index/split checks rather than a regex, since a
+ * pattern that captures this shape by construction backtracks
+ * polynomially on malformed input.
  *
  * @example
  * isValidEmail('reader@example.com') // true
@@ -32,5 +32,5 @@ export const isValidEmail = (email: string): boolean => {
     return false;
   }
 
-  return domainPart.length >= 3 && domainPart.slice(1, -1).includes('.');
+  return domainPart.slice(1, -1).includes('.');
 };
