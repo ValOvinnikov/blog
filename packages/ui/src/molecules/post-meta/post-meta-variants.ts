@@ -10,7 +10,7 @@ export const postMetaVariants = tv({
     author: ['flex items-center gap-2'],
     authorName: [
       'text-text font-medium no-underline',
-      'transition-colors duration-base ease-console',
+      'transition-colors duration-base ease-smooth',
       'hover:text-brand-primary',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',

@@ -4,6 +4,7 @@ import {
   TOAST_TYPE,
   type IWithClassName,
   type IWithDataTestId,
+  type TIconName,
   type TToastType,
 } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
@@ -33,9 +34,15 @@ export type TToastProps = IWithClassName &
     /**
      * Required unless `isPlain` is set — the terminal-style command/state chip
      * (e.g. "bookmark · saved") is only rendered when `isPlain` is falsy.
+     * Takes precedence over `title` when both are given.
      */
     command?: string;
     state?: string;
+    /**
+     * Short label shown beside the type icon. Ignored when `command` is set;
+     * omit both for an icon-and-message-only toast.
+     */
+    title?: ReactNode;
     message: ReactNode;
     time?: string;
     action?: IToastAction;
@@ -56,6 +63,13 @@ const TOAST_GLYPH: Record<TToastType, string> = {
   [TOAST_TYPE.INFO]: '›',
   [TOAST_TYPE.WARNING]: '●',
   [TOAST_TYPE.ERROR]: '✕',
+};
+
+const TOAST_TYPE_ICON: Record<TToastType, TIconName> = {
+  [TOAST_TYPE.SUCCESS]: ICONS.CHECK,
+  [TOAST_TYPE.INFO]: ICONS.INFO,
+  [TOAST_TYPE.WARNING]: ICONS.WARNING,
+  [TOAST_TYPE.ERROR]: ICONS.CLOSE,
 };
 
 const TOAST_ANNOUNCEMENT: Record<
@@ -83,6 +97,7 @@ export const Toast = ({
   isLoading = false,
   command,
   state,
+  title,
   message,
   time,
   action,
@@ -102,6 +117,7 @@ export const Toast = ({
     paused: isPaused,
   });
   const { role, live } = TOAST_ANNOUNCEMENT[type];
+  const hasCommand = command !== undefined;
 
   const statusGlyph = isLoading ? (
     <Spinner
@@ -115,6 +131,23 @@ export const Toast = ({
     <span className={s.glyph()} aria-hidden="true">
       {getToastGlyph(type, isLoading)}
     </span>
+  );
+
+  const typeIcon = isLoading ? (
+    <Spinner
+      label={state ?? type}
+      size={SIZE.SM}
+      className={s.spinner()}
+      aria-hidden="true"
+      dataTestId="toast-spinner"
+    />
+  ) : (
+    <Icon
+      name={TOAST_TYPE_ICON[type]}
+      size={SIZE.SM}
+      className={s.glyph()}
+      dataTestId="toast-icon"
+    />
   );
 
   const dismissButton = (
@@ -152,7 +185,7 @@ export const Toast = ({
           {time && <span className={s.time()}>{time}</span>}
           {dismissButton}
         </div>
-      ) : (
+      ) : hasCommand ? (
         <>
           <div className={s.bar()}>
             {statusGlyph}
@@ -167,6 +200,21 @@ export const Toast = ({
               <span className={s.prompt()} aria-hidden="true">
                 {getToastGlyph(type, isLoading)}
               </span>
+              <span>{message}</span>
+            </div>
+            {actionButton && <div className={s.actions()}>{actionButton}</div>}
+          </div>
+        </>
+      ) : (
+        <>
+          <div className={s.bar()}>
+            {typeIcon}
+            {title && <span className={s.titleText()}>{title}</span>}
+            {time && <span className={s.time()}>{time}</span>}
+            {dismissButton}
+          </div>
+          <div className={s.body()}>
+            <div className={s.message()}>
               <span>{message}</span>
             </div>
             {actionButton && <div className={s.actions()}>{actionButton}</div>}

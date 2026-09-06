@@ -8,7 +8,7 @@ import {
 } from '@blog/config';
 import { Alert } from '@blog/ui/atoms/alert';
 import { Icon } from '@blog/ui/atoms/icon';
-import { WindowChrome } from '@blog/ui/molecules/window-chrome';
+import { Panel } from '@blog/ui/molecules/panel';
 import { NewsletterSignupContent } from '@blog/ui/organisms/newsletter-signup/components/content/newsletter-signup-content';
 import {
   newsletterSignupVariants,
@@ -44,7 +44,7 @@ export type TNewsletterSignupFullProps = IWithClassName &
   };
 
 /**
- * `NewsletterSignup.Full` — the rich, tinted window-shell signup form used
+ * `NewsletterSignup.Full` — the rich, tinted panel signup form used
  * by the site footer and the CMS page-builder module. Pure and controlled:
  * it holds no state of its own and performs no email validation (the caller
  * supplies `errorMessage` for any invalid/duplicate/server failure), driven
@@ -74,11 +74,8 @@ export const NewsletterSignupFull = ({
   const s = newsletterSignupVariants({ variant: 'full', align });
 
   return (
-    <WindowChrome
-      className={s.root({ class: className })}
-      dataTestId={dataTestId}
-    >
-      <WindowChrome.Body className={s.body()}>
+    <Panel className={s.root({ class: className })} dataTestId={dataTestId}>
+      <Panel.Body className={s.body()}>
         <div className={s.pitchPane()}>
           <h3 id={headingId} className={s.heading()}>
             {heading}
@@ -124,7 +121,7 @@ export const NewsletterSignupFull = ({
             />
           )}
         </div>
-      </WindowChrome.Body>
-    </WindowChrome>
+      </Panel.Body>
+    </Panel>
   );
 };

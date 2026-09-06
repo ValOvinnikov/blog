@@ -6,7 +6,7 @@ export const taxonomyCardVariants = tv({
       'relative flex h-full flex-col gap-2',
       'bg-surface border-l-2 border-brand-primary',
       'px-card-x py-card-y',
-      'transition-colors duration-base ease-console',
+      'transition-colors duration-base ease-smooth',
       'hover:bg-brand-primary-muted focus-within:bg-brand-primary-muted',
       'motion-reduce:transition-none',
     ],

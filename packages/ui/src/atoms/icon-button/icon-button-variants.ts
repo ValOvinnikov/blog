@@ -5,7 +5,7 @@ export const iconButtonVariants = tv({
   base: [
     'inline-grid size-[22px] place-items-center',
     'rounded-sm border border-transparent bg-transparent p-0',
-    'text-muted transition-colors duration-base ease-console',
+    'text-muted transition-colors duration-base ease-smooth',
     // `bg-surface-2` alone reads as near-invisible here (page `--primary` vs
     // `--surface-2` is ~1.04:1 light / ~1.16:1 dark) — this button has no
     // resting border/bg, so the hover boundary is the only affordance a
@@ -25,12 +25,12 @@ export const iconButtonVariants = tv({
         'size-auto min-h-0 whitespace-nowrap',
         'rounded-sm border border-border-strong bg-surface px-3 py-1.5',
         'font-mono font-normal text-label text-text',
-        'transition-colors duration-base ease-console',
+        'transition-colors duration-base ease-smooth',
         'hover:border-brand-primary hover:text-brand-primary',
       ],
       avatar: [
         'size-8 rounded-full border-0',
-        'transition-shadow duration-base ease-console',
+        'transition-shadow duration-base ease-smooth',
         // `border-emphasis`, not `border-strong`, for the hover ring —
         // `border-strong` fails WCAG 1.4.11's 3:1 non-text contrast against
         // `--primary` (1.81:1 light / 2.26:1 dark); `border-emphasis`

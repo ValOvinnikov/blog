@@ -148,4 +148,69 @@ describe(`<${Toast.name}/>`, () => {
       expect(onAct).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('title/message mode (no command)', () => {
+    it('renders the title and message but not the command/state chip', () => {
+      const title = faker.word.noun();
+      setup({ command: undefined, state: undefined, title });
+      expect(screen.getByText(title)).toBeVisible();
+      expect(screen.getByText(message)).toBeVisible();
+      expect(
+        screen.queryByText(
+          (_, el) => el?.textContent === `${command} · ${state}`,
+        ),
+      ).not.toBeInTheDocument();
+    });
+
+    it('renders the type glyph using the Icon component, not a raw glyph span', () => {
+      setup({ command: undefined, state: undefined, title: 'Saved' });
+      expect(screen.getByTestId('toast-icon')).toBeInTheDocument();
+      expect(screen.queryByText('✓')).not.toBeInTheDocument();
+    });
+
+    it('renders the message alone when title is omitted', () => {
+      setup({ command: undefined, state: undefined, title: undefined });
+      expect(screen.getByText(message)).toBeVisible();
+    });
+
+    it('renders a decorative spinner instead of the icon when isLoading is true', () => {
+      setup({
+        command: undefined,
+        state: undefined,
+        title: 'Saving',
+        isLoading: true,
+      });
+      const spinner = screen.getByTestId('toast-spinner');
+      expect(spinner).toBeVisible();
+      expect(screen.queryByTestId('toast-icon')).not.toBeInTheDocument();
+    });
+
+    it('still calls onDismiss when the dismiss button is clicked', async () => {
+      const onDismiss = vi.fn();
+      setup({
+        command: undefined,
+        state: undefined,
+        title: 'Saved',
+        onDismiss,
+      });
+      await userEvent.click(screen.getByRole('button', { name: dismissLabel }));
+      expect(onDismiss).toHaveBeenCalledTimes(1);
+    });
+
+    it('still renders an action button and calls onAct when clicked', async () => {
+      const onAct = vi.fn();
+      const label = faker.word.verb();
+      setup({
+        command: undefined,
+        state: undefined,
+        title: 'Saved',
+        action: { label, onAct },
+      });
+
+      const actionButton = screen.getByRole('button', { name: label });
+      await userEvent.click(actionButton);
+
+      expect(onAct).toHaveBeenCalledTimes(1);
+    });
+  });
 });

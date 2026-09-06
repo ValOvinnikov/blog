@@ -6,7 +6,7 @@ export const navLinkVariants = tv({
     root: [
       'inline-flex items-center gap-x-1.5 no-underline',
       'font-mono text-meta',
-      'transition-colors duration-base ease-console',
+      'transition-colors duration-base ease-smooth',
       'hover:text-text',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
