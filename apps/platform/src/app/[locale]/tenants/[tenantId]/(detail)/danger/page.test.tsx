@@ -1,4 +1,8 @@
 import {
+  DEPROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+} from '@blog/db/constants';
+import {
   act,
   customRenderAsync,
   screen,
@@ -152,17 +156,75 @@ describe(TenantDangerPage, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('does not render the deprovisioning progress card after a dry run, which writes no audit event', async () => {
+  it('keeps showing a failed prior run, and does not poll, when a later dry run leaves no newer request behind', async () => {
     listTenantsByIdsMock.mockResolvedValue([
-      makeTenant({ deprovisioningSteps: null }),
+      makeTenant({
+        deprovisioningSteps: {
+          ...idleDeprovisioningSteps(),
+          [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+            error: 'boom',
+          },
+          run: {
+            startedAt: '2026-08-12T14:18:00.000Z',
+            finishedAt: '2026-08-12T14:19:00.000Z',
+          },
+        },
+      }),
     ]);
-    getLatestDeprovisionRequestedAtMock.mockResolvedValue(undefined);
+    getLatestDeprovisionRequestedAtMock.mockResolvedValue(
+      new Date('2026-08-12T14:18:00.000Z'),
+    );
 
     await setup();
 
     expect(
-      screen.queryByRole('heading', { name: 'Deprovisioning progress' }),
-    ).not.toBeInTheDocument();
+      screen.getByRole('heading', { name: 'Deprovisioning progress' }),
+    ).toBeVisible();
+    expect(screen.queryByText('Starting…')).not.toBeInTheDocument();
+    expect(screen.getAllByText('Failed').length).toBeGreaterThan(0);
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * 2);
+    });
+    expect(getTenantDeprovisioningStatusActionMock).not.toHaveBeenCalled();
+  });
+
+  it('shows a fresh starting state, not the old failure, when a newer request follows a failed prior run', async () => {
+    listTenantsByIdsMock.mockResolvedValue([
+      makeTenant({
+        deprovisioningSteps: {
+          ...idleDeprovisioningSteps(),
+          [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+            error: 'boom',
+          },
+          run: {
+            startedAt: '2026-08-12T14:18:00.000Z',
+            finishedAt: '2026-08-12T14:19:00.000Z',
+          },
+        },
+      }),
+    ]);
+    getLatestDeprovisionRequestedAtMock.mockResolvedValue(
+      new Date('2026-08-12T14:25:00.000Z'),
+    );
+
+    await setup();
+
+    expect(
+      screen.getByRole('heading', { name: 'Deprovisioning progress' }),
+    ).toBeVisible();
+    expect(screen.getByText('Starting…')).toBeVisible();
+    expect(screen.getAllByText('Queued').length).toBe(6);
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+    });
+    expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledWith(
+      'tenant-1',
+    );
   });
 
   it('renders the deprovisioning progress card in a starting state when a request was dispatched but no run marker has appeared yet', async () => {
@@ -199,6 +261,40 @@ describe(TenantDangerPage, () => {
       deprovisioningSteps: null,
       deprovisionedAt: null,
     });
+
+    await setup();
+
+    for (let tick = 0; tick < STALE_RUN_MAX_TICKS + 5; tick += 1) {
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+      });
+    }
+
+    expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledTimes(
+      STALE_RUN_MAX_TICKS,
+    );
+  });
+
+  it('stops polling a retry over a failed prior run once it exceeds the same stale-run cap', async () => {
+    listTenantsByIdsMock.mockResolvedValue([
+      makeTenant({
+        deprovisioningSteps: {
+          ...idleDeprovisioningSteps(),
+          [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+            error: 'boom',
+          },
+          run: {
+            startedAt: '2026-08-12T14:18:00.000Z',
+            finishedAt: '2026-08-12T14:19:00.000Z',
+          },
+        },
+      }),
+    ]);
+    getLatestDeprovisionRequestedAtMock.mockResolvedValue(
+      new Date('2026-08-12T14:25:00.000Z'),
+    );
+    getTenantDeprovisioningStatusActionMock.mockResolvedValue(undefined);
 
     await setup();
 

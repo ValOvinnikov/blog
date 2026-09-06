@@ -115,6 +115,61 @@ describe(useDeprovisioningPoll, () => {
       expect(result.current.errorKind).toBe('permission');
     });
 
+    it('treats a deprovision request newer than a stale FAILED run as a fresh start, not the old failure', () => {
+      const tenant = makeTenant({
+        deprovisioningSteps: {
+          ...idleDeprovisioningSteps(),
+          [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+            error: 'Sanity Access API returned 403',
+          },
+          run: {
+            startedAt: '2026-08-12T14:18:00.000Z',
+            finishedAt: '2026-08-12T14:19:00.000Z',
+          },
+        },
+      });
+      const { result } = renderHook(() =>
+        useDeprovisioningPoll(tenant, '2026-08-12T14:25:00.000Z'),
+      );
+
+      expect(result.current.deprovisioningSteps).toBeNull();
+      expect(result.current.overallStatus).toBe(
+        TENANT_PROVISIONING_STEP_STATUS.IDLE,
+      );
+      expect(result.current.isRunning).toBe(true);
+      expect(result.current.isFailed).toBe(false);
+      expect(result.current.run).toBeUndefined();
+    });
+
+    it('keeps showing a stale FAILED run when the deprovision request is not newer than it', () => {
+      const tenant = makeTenant({
+        deprovisioningSteps: {
+          ...idleDeprovisioningSteps(),
+          [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+            error: 'Sanity Access API returned 403',
+          },
+          run: {
+            startedAt: '2026-08-12T14:18:00.000Z',
+            finishedAt: '2026-08-12T14:19:00.000Z',
+          },
+        },
+      });
+      const { result } = renderHook(() =>
+        useDeprovisioningPoll(tenant, '2026-08-12T14:15:00.000Z'),
+      );
+
+      expect(result.current.overallStatus).toBe(
+        TENANT_PROVISIONING_STEP_STATUS.FAILED,
+      );
+      expect(result.current.isRunning).toBe(false);
+      expect(result.current.isFailed).toBe(true);
+      expect(result.current.failedStep).toBe(
+        DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS,
+      );
+    });
+
     it('reports DONE only once every step is done', () => {
       const done = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
       const tenant = makeTenant({
@@ -286,6 +341,53 @@ describe(useDeprovisioningPoll, () => {
       expect(getTenantDeprovisioningStatusActionMock).not.toHaveBeenCalled();
     });
 
+    it('resumes polling for a retry dispatched over a stale FAILED run, and adopts the new run once it reports in', async () => {
+      const tenant = makeTenant({
+        deprovisioningSteps: {
+          ...idleDeprovisioningSteps(),
+          [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+            error: 'boom',
+          },
+          run: {
+            startedAt: '2026-08-12T14:18:00.000Z',
+            finishedAt: '2026-08-12T14:19:00.000Z',
+          },
+        },
+      });
+      getTenantDeprovisioningStatusActionMock.mockResolvedValue({
+        deprovisioningSteps: {
+          ...idleDeprovisioningSteps(),
+          [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+          },
+          run: { startedAt: '2026-08-12T14:26:00.000Z' },
+        },
+        deprovisionedAt: null,
+      });
+      const { result } = renderHook(() =>
+        useDeprovisioningPoll(tenant, '2026-08-12T14:25:00.000Z'),
+      );
+
+      expect(result.current.isRunning).toBe(true);
+      expect(result.current.deprovisioningSteps).toBeNull();
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+      });
+
+      expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledWith(
+        'tenant-1',
+      );
+      expect(result.current.overallStatus).toBe(
+        TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+      );
+      expect(result.current.isFailed).toBe(false);
+      expect(result.current.run).toEqual({
+        startedAt: '2026-08-12T14:26:00.000Z',
+      });
+    });
+
     it('stops polling once the tenant reaches a failed terminal state', async () => {
       const tenant = makeTenant({
         deprovisioningSteps: {
@@ -344,6 +446,36 @@ describe(useDeprovisioningPoll, () => {
         deprovisionedAt: null,
       });
       renderHook(() => useDeprovisioningPoll(tenant));
+
+      for (let tick = 0; tick < STALE_RUN_MAX_TICKS + 5; tick += 1) {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+        });
+      }
+
+      expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledTimes(
+        STALE_RUN_MAX_TICKS,
+      );
+    });
+
+    it('bounds a pending retry starting state by the same stale-run cap when the workflow never reports in', async () => {
+      const tenant = makeTenant({
+        deprovisioningSteps: {
+          ...idleDeprovisioningSteps(),
+          [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+            error: 'boom',
+          },
+          run: {
+            startedAt: '2026-08-12T14:18:00.000Z',
+            finishedAt: '2026-08-12T14:19:00.000Z',
+          },
+        },
+      });
+      getTenantDeprovisioningStatusActionMock.mockResolvedValue(undefined);
+      renderHook(() =>
+        useDeprovisioningPoll(tenant, '2026-08-12T14:25:00.000Z'),
+      );
 
       for (let tick = 0; tick < STALE_RUN_MAX_TICKS + 5; tick += 1) {
         await act(async () => {

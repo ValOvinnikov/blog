@@ -50,6 +50,35 @@ describe(DeprovisioningStatusView, () => {
     expect(screen.queryByText('Not started')).not.toBeInTheDocument();
   });
 
+  it('shows the Starting badge and full step list, not the old failure, for a retry dispatched after a FAILED run', () => {
+    const tenant = makeTenant({
+      deprovisioningSteps: {
+        ...idleDeprovisioningSteps(),
+        [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+          error: 'Sanity Access API returned 403',
+        },
+        run: {
+          startedAt: '2026-08-12T14:18:00.000Z',
+          finishedAt: '2026-08-12T14:19:00.000Z',
+        },
+      },
+    });
+    render(
+      <DeprovisioningStatusView
+        tenant={tenant}
+        deprovisionRequestedAt="2026-08-12T14:25:00.000Z"
+      />,
+    );
+
+    expect(screen.getByText('Starting…')).toBeVisible();
+    expect(screen.getAllByText('Queued').length).toBe(6);
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { level: 2, name: 'Run' }),
+    ).not.toBeInTheDocument();
+  });
+
   it('titles the card "Deprovisioning progress" and renders every step in order', () => {
     const tenant = makeTenant({
       deprovisioningSteps: {

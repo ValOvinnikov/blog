@@ -34,12 +34,11 @@ export default async function TenantDangerPage({ params }: TProps) {
 
   const t = await getTranslations('tenantDangerPage');
 
-  // A dispatched workflow takes a minute or more to write its first step —
-  // the audit event covers that window so the card doesn't sit blank.
+  // Queried unconditionally: a request newer than the tenant's existing run
+  // (even a stale FAILED one) is how a retry re-enters the starting state.
+  const deprovisionRequestedAt =
+    await queries.auditEvents.getLatestDeprovisionRequestedAt(tenantId);
   const hasDeprovisioningRun = Boolean(tenant.deprovisioningSteps?.run);
-  const deprovisionRequestedAt = hasDeprovisioningRun
-    ? undefined
-    : await queries.auditEvents.getLatestDeprovisionRequestedAt(tenantId);
   const showDeprovisioningStatus =
     hasDeprovisioningRun || Boolean(deprovisionRequestedAt);
 
@@ -48,7 +47,12 @@ export default async function TenantDangerPage({ params }: TProps) {
       <PageHeader title={t('title')} description={t('description')} />
       {tenant.deprovisionedAt && <ReactivateTenantControl tenant={tenant} />}
       <DeprovisionTenantControl tenant={tenant} />
-      {showDeprovisioningStatus && <DeprovisioningStatusView tenant={tenant} />}
+      {showDeprovisioningStatus && (
+        <DeprovisioningStatusView
+          tenant={tenant}
+          deprovisionRequestedAt={deprovisionRequestedAt?.toISOString()}
+        />
+      )}
     </>
   );
 }

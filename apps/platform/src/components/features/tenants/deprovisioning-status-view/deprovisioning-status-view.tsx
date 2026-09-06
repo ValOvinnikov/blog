@@ -20,6 +20,7 @@ import { STEP_ORDER, useDeprovisioningPoll } from './use-deprovisioning-poll';
 
 type TDeprovisioningStatusViewProps = {
   tenant: TTenant;
+  deprovisionRequestedAt?: string;
 };
 
 /**
@@ -30,6 +31,7 @@ type TDeprovisioningStatusViewProps = {
  */
 export const DeprovisioningStatusView = ({
   tenant,
+  deprovisionRequestedAt,
 }: TDeprovisioningStatusViewProps) => {
   const t = useTranslations('deprovisioningStatusView');
   const {
@@ -42,7 +44,7 @@ export const DeprovisioningStatusView = ({
     failedStep,
     failedStepError,
     errorKind,
-  } = useDeprovisioningPoll(tenant);
+  } = useDeprovisioningPoll(tenant, deprovisionRequestedAt);
   useRelativeTimeTick();
 
   const isPreRun = deprovisioningSteps === null;

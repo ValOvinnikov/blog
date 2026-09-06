@@ -61,6 +61,23 @@ const isTerminalOverallStatus = (
   status === TENANT_PROVISIONING_STEP_STATUS.DONE ||
   status === TENANT_PROVISIONING_STEP_STATUS.FAILED;
 
+// A dispatch that postdates the tenant's own last run (its `finishedAt`, or
+// `startedAt` for one still in flight) is a retry the workflow hasn't
+// reported in on yet — including one dispatched over a stale FAILED run.
+const isRetryPending = (
+  deprovisionRequestedAt: string | undefined,
+  run: TDeprovisioningRun | undefined,
+): boolean => {
+  if (!deprovisionRequestedAt) {
+    return false;
+  }
+  const lastRunAt = run?.finishedAt ?? run?.startedAt;
+  return (
+    !lastRunAt ||
+    new Date(deprovisionRequestedAt).getTime() > new Date(lastRunAt).getTime()
+  );
+};
+
 export type TUseDeprovisioningPollResult = {
   deprovisioningSteps: TTenantDeprovisioningState | null;
   stepStatuses: TTenantProvisioningStepStatus[];
@@ -84,16 +101,26 @@ export type TUseDeprovisioningPollResult = {
  */
 export const useDeprovisioningPoll = (
   tenant: TTenant,
+  deprovisionRequestedAt?: string,
 ): TUseDeprovisioningPollResult => {
   const [renderedTenant, setRenderedTenant] = useState(tenant);
-  const [deprovisioningSteps, setDeprovisioningSteps] =
+  const [polledDeprovisioningSteps, setPolledDeprovisioningSteps] =
     useState<TTenantDeprovisioningState | null>(tenant.deprovisioningSteps);
   const staleTicksRef = useRef(0);
 
   if (tenant !== renderedTenant) {
     setRenderedTenant(tenant);
-    setDeprovisioningSteps(tenant.deprovisioningSteps);
+    setPolledDeprovisioningSteps(tenant.deprovisioningSteps);
   }
+
+  // A pending retry is presented exactly like a first-ever dispatch — the
+  // pre-run "Starting…" state, never the prior run's stale terminal steps.
+  const deprovisioningSteps = isRetryPending(
+    deprovisionRequestedAt,
+    polledDeprovisioningSteps?.run,
+  )
+    ? null
+    : polledDeprovisioningSteps;
 
   const stepStatuses = stepStatusesFor(deprovisioningSteps);
   const overallStatus = deriveOverallStatus(stepStatuses);
@@ -122,7 +149,7 @@ export const useDeprovisioningPoll = (
           if (cancelled || !result) {
             return;
           }
-          setDeprovisioningSteps(result.deprovisioningSteps);
+          setPolledDeprovisioningSteps(result.deprovisioningSteps);
         })
         .catch(() => {
           // A rejected tick (e.g. an expired-session redirect thrown by
