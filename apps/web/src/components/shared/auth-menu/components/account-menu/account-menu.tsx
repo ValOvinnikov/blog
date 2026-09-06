@@ -45,7 +45,7 @@ export const AccountMenu = ({
   image,
 }: TAccountMenuProps) => {
   const t = useTranslations('authMenu');
-  const { panel, window: windowSize } = authMenuVariants();
+  const { panel } = authMenuVariants();
   const {
     menuRoot,
     avatarTrigger,
@@ -99,7 +99,7 @@ export const AccountMenu = ({
         id={panelId}
         isOpen={isOpen}
         ariaLabel={t('accountMenuAriaLabel')}
-        className={`${panel()} ${windowSize()}`}
+        className={panel()}
       >
         <Text variant="emphasis" className={label()}>
           {t('accountHeading')}

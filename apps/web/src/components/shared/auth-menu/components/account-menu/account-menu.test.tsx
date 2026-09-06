@@ -116,4 +116,19 @@ describe(`<${AccountMenu.name}/>`, () => {
     ).toBeVisible();
     expect(screen.getByRole('menuitem', { name: 'Sign out' })).toBeVisible();
   });
+
+  it('renders the popover panel with its own visible surface (border/bg/shadow), not a transparent shell', async () => {
+    setup();
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Account menu' }));
+    const panel = screen.getByRole('menu');
+
+    expect(panel).toHaveClass('bg-surface');
+    expect(panel).not.toHaveClass('bg-transparent');
+    expect(panel).not.toHaveClass('border-0');
+    expect(panel).not.toHaveClass('shadow-none');
+    expect(panel).not.toHaveClass('rounded-none');
+    expect(panel).not.toHaveClass('p-0');
+  });
 });

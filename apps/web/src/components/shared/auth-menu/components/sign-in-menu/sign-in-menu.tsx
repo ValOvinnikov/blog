@@ -56,7 +56,7 @@ export const SignInMenu = ({
     emailFormRef,
     handleEmailSubmit,
   } = useEmailSignIn(isOpen);
-  const { panel, window: windowSize } = authMenuVariants();
+  const { panel } = authMenuVariants();
   const {
     label,
     providerPrompt,
@@ -108,7 +108,7 @@ export const SignInMenu = ({
         id={panelId}
         isOpen={isOpen}
         ariaLabel={t('panelAriaLabel')}
-        className={`${panel()} ${windowSize()}`}
+        className={panel()}
       >
         <Text variant="emphasis" className={label()}>
           {t('signInHeading')}
