@@ -288,6 +288,69 @@ jobs:
       - name: Client graph (helper unit tests)
         run: pnpm check:client-graph:test
 
+  required-env:
+    name: Required env (${{ matrix.environment }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Scoping the job to the environment is what lets it see which names that
+    # environment provides without any token: the `secrets`/`vars` contexts
+    # resolve to that environment's own entries merged over the repo-level
+    # ones. Listing environment secrets through the API would instead need
+    # repo-admin scope, which neither the default GITHUB_TOKEN nor the
+    # `public_repo + project` GH_PAT has.
+    environment: ${{ matrix.environment }}
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: [development, production]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Every `.optional()` env var declares whether it is genuinely optional
+      # or merely optional at boot but required in a deployment environment;
+      # this fails on an unmarked one, then checks the required ones are
+      # actually provisioned here.
+      #
+      # Each input below is a boolean, not a value: the `!= ''` comparison runs
+      # in GitHub's expression engine, so only `true`/`false` reaches the runner
+      # and no secret value is exposed to the job at all. Passing
+      # `toJSON(secrets)` would save maintaining this list, but injects every
+      # secret into the runner's environment for no benefit.
+      #
+      # The list must cover every var marked `@env-required` for this
+      # environment — the script fails and names the missing line if it does
+      # not, so it cannot drift out of sync silently.
+      #
+      # `development` fails the run; `production` only warns while its known
+      # gaps are open (BLOCKING_ENVIRONMENTS in the script decides, not this
+      # file). Read-only; nothing is committed.
+      - name: Env vars classified, and required ones present
+        env:
+          REQUIRED_ENV_ENVIRONMENT: ${{ matrix.environment }}
+          REQUIRED_ENV_PRESENT_SANITY_REVALIDATE_SECRET: ${{ secrets.SANITY_REVALIDATE_SECRET != '' }}
+          REQUIRED_ENV_PRESENT_SITE_CONFIG_REVALIDATE_SECRET: ${{ secrets.SITE_CONFIG_REVALIDATE_SECRET != '' }}
+          REQUIRED_ENV_PRESENT_OPERATOR_ALERT_SECRET: ${{ secrets.OPERATOR_ALERT_SECRET != '' }}
+          REQUIRED_ENV_PRESENT_RESEND_API_KEY: ${{ secrets.RESEND_API_KEY != '' }}
+          REQUIRED_ENV_PRESENT_TENANT_TOKEN_ENCRYPTION_KEY: ${{ secrets.TENANT_TOKEN_ENCRYPTION_KEY != '' }}
+          REQUIRED_ENV_PRESENT_WEB_APP_URL: ${{ vars.WEB_APP_URL != '' }}
+          REQUIRED_ENV_PRESENT_VERCEL_TEAM_ID: ${{ vars.VERCEL_TEAM_ID != '' }}
+          REQUIRED_ENV_PRESENT_VERCEL_PROJECT_ID_WEB: ${{ vars.VERCEL_PROJECT_ID_WEB != '' }}
+        run: pnpm check:required-env
+
+      # Fixture-based unit tests for the extraction + classification helpers,
+      # same rationale as the jobs above. Pinned to one matrix leg because they
+      # read no environment context and would otherwise run identically twice.
+      - name: Required env (helper unit tests)
+        if: matrix.environment == 'development'
+        run: pnpm check:required-env:test
+
   migration-index:
     name: Migration index
     runs-on: ubuntu-latest

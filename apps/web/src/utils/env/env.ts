@@ -9,17 +9,21 @@ export const env = createEnv({
   server: {
     // Feature-flag-by-absence: the on-demand revalidation route
     // (`/api/revalidate`) 500s without it instead of revalidating.
+    // @env-required: development, production
     SANITY_REVALIDATE_SECRET: z.string().min(1).optional(),
     // Verifies `apps/platform`'s Look/Voice-save revalidation call
     // (`/api/revalidate-site-config`), same feature-flag-by-absence stance
     // as `SANITY_REVALIDATE_SECRET`: absent, the route 500s instead of
     // revalidating.
+    // @env-required: development, production
     SITE_CONFIG_REVALIDATE_SECRET: z.string().min(1).optional(),
     // Both optional (feature-flag-by-absence, same stance as
     // SANITY_REVALIDATE_SECRET): the publish-time skim-generation pipeline
     // (`/api/generate-skim`) returns 503 without them; the reader path is
     // fully unaffected either way.
+    // @env-optional
     ANTHROPIC_API_KEY: z.string().min(1).optional(),
+    // @env-optional
     SANITY_GENERATE_SECRET: z.string().min(1).optional(),
     // Feature-flag-by-absence (same stance as the two vars above): Web
     // Analytics (`<Analytics />`) and Speed Insights (`<SpeedInsights />`,
@@ -40,14 +44,17 @@ export const env = createEnv({
     // is decided in `[tenant]/[locale]/layout.tsx` (a Server Component) before the
     // RSC payload is built, so the flag never needs to reach the client
     // bundle.
+    // @env-optional
     WEB_ANALYTICS_ENABLED: z.enum(['true', 'false']).optional(),
     // The newsletter confirmation email's `from` address
     // (`@web/server/newsletter/newsletter-from-address.ts`): optional, falls
     // back to Resend's own shared testing sender until a verified sending
     // domain is configured.
+    // @env-optional
     NEWSLETTER_FROM_ADDRESS: z.string().min(1).optional(),
   },
   client: {
+    // @env-optional
     NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
     NEXT_PUBLIC_SANITY_PROJECT_ID: z.string().min(1),
     NEXT_PUBLIC_SANITY_DATASET: z.string().min(1),

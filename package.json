@@ -30,6 +30,8 @@
     "check:revalidate-tags-sync:test": "node --test scripts/check-revalidate-tags-sync.test.mjs",
     "check:client-graph": "node scripts/check-client-graph.mjs",
     "check:client-graph:test": "node --test scripts/check-client-graph.test.mjs",
+    "check:required-env": "node scripts/check-required-env.mjs",
+    "check:required-env:test": "node --test scripts/check-required-env.test.mjs",
     "knip": "knip",
     "format": "turbo run format",
     "prepare": "husky"
