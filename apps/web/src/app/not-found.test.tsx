@@ -73,8 +73,8 @@ describe('NotFound (root not-found route)', () => {
       const metadata = await generateMetadata();
 
       expect(metadata).toEqual({
-        title: 'translated:metaTitle',
-        description: 'translated:metaDescription',
+        title: 'translated:heading',
+        description: 'translated:supportingText',
       });
     });
   });

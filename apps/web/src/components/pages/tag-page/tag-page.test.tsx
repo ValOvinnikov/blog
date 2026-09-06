@@ -1,4 +1,4 @@
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { makeTag } from '@web/testing/shared/tag/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
@@ -229,7 +229,8 @@ describe(`<${TagPage.name}/>`, () => {
 
     await setup();
 
-    const current = screen.getByText('Tag: TypeScript');
+    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    const current = within(nav).getByText('TypeScript');
     expect(current).toHaveAttribute('aria-current', 'page');
   });
 

@@ -63,19 +63,9 @@ export const DisplayNameControl = ({
             return result;
           })(),
           {
-            command: t('saveToastCommand'),
-            loading: {
-              state: t('saveToastLoadingState'),
-              message: t('saveToastLoadingMessage'),
-            },
-            success: {
-              state: t('saveToastSuccessState'),
-              message: t('saveToastSuccessMessage'),
-            },
-            error: {
-              state: t('saveToastErrorState'),
-              message: t('saveError'),
-            },
+            loading: { message: t('saveToastLoadingMessage') },
+            success: { message: t('saveToastSuccessMessage') },
+            error: { message: t('saveError') },
           },
         );
       } catch {

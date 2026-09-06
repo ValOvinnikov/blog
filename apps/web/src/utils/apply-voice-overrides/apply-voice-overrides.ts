@@ -5,8 +5,8 @@
 const VOICE_OVERRIDE_PATHS: Record<string, readonly string[]> = {
   notFoundMetaTitle: ['notFound', 'metaTitle'],
   notFoundMetaDescription: ['notFound', 'metaDescription'],
-  notFoundCommandNotFound: ['notFound', 'commandNotFound'],
-  notFoundDescription: ['notFound', 'description'],
+  notFoundCommandNotFound: ['notFound', 'heading'],
+  notFoundDescription: ['notFound', 'supportingText'],
   notFoundReturnHome: ['notFound', 'returnHome'],
   terminalPromptHost: ['authMenu', 'promptHost'],
   authPromptCommandSignIn: ['authMenu', 'promptCommandSignIn'],

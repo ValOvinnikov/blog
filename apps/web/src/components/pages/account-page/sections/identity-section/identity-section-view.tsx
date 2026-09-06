@@ -1,7 +1,6 @@
 import { Heading } from '@blog/ui/atoms/heading';
+import { Panel } from '@blog/ui/molecules/panel';
 import { SettingRow } from '@blog/ui/molecules/setting-row';
-import { WindowChrome } from '@blog/ui/molecules/window-chrome';
-import { PlainSection } from '@web/components/shared/plain-section';
 import type { ReactNode } from 'react';
 
 import { identitySectionVariants } from './identity-section-variants';
@@ -20,10 +19,7 @@ export interface IIdentityProviderRow {
 }
 
 export interface IIdentitySectionViewProps {
-  isChromeOn: boolean;
-  handle: string;
-  promptHost: string;
-  promptCommand: string;
+  heading: string;
   providerRows: IIdentityProviderRow[];
   displayNameLabel: string;
   displayNameDescription: string;
@@ -31,23 +27,21 @@ export interface IIdentitySectionViewProps {
 }
 
 /**
- * Pure view for `IdentitySection`: the connected-accounts window (provider
+ * Pure view for `IdentitySection`: the connected-accounts panel (provider
  * rows + display-name control). Each row and the display-name control
  * arrive already resolved by the wrapper — this component has no knowledge
  * of the session, `@blog/db`, or translations.
  */
 export const IdentitySectionView = ({
-  isChromeOn,
-  handle,
-  promptHost,
-  promptCommand,
+  heading,
   providerRows,
   displayNameLabel,
   displayNameDescription,
   displayNameControl,
-}: IIdentitySectionViewProps) => {
-  const bodyContent = (
-    <>
+}: IIdentitySectionViewProps) => (
+  <Panel>
+    <Panel.Header headingLevel={2}>{heading}</Panel.Header>
+    <Panel.Body>
       {providerRows.map(
         ({
           id,
@@ -81,24 +75,6 @@ export const IdentitySectionView = ({
       <SettingRow label={displayNameLabel} description={displayNameDescription}>
         {displayNameControl}
       </SettingRow>
-    </>
-  );
-
-  if (!isChromeOn) {
-    return (
-      <PlainSection heading={promptCommand} headingLevel={2}>
-        {bodyContent}
-      </PlainSection>
-    );
-  }
-
-  return (
-    <WindowChrome>
-      <WindowChrome.Bar headingLevel={2}>
-        <WindowChrome.User>{handle}</WindowChrome.User>{' '}
-        <WindowChrome.Prompt>{promptHost}</WindowChrome.Prompt> {promptCommand}
-      </WindowChrome.Bar>
-      <WindowChrome.Body>{bodyContent}</WindowChrome.Body>
-    </WindowChrome>
-  );
-};
+    </Panel.Body>
+  </Panel>
+);

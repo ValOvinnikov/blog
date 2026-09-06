@@ -22,8 +22,8 @@ export const TOAST_MERGE_WINDOW_MS = 1000;
 export const TOAST_EXIT_ANIMATION_MS = 360;
 
 export interface IToastPayload {
-  command: string;
-  state: string;
+  /** Short label shown beside the type icon — omit for a message-only toast. */
+  title?: ReactNode;
   message: ReactNode;
   time?: string;
   action?: IToastAction;
@@ -33,25 +33,10 @@ export interface IToastPayload {
   coalesceKey?: string;
 }
 
-type TToastPromiseState = Omit<IToastPayload, 'command'>;
+type TToastPromiseMessage<T> = IToastPayload | ((value: T) => IToastPayload);
 
-type TToastPromiseMessage<T> =
-  TToastPromiseState | ((value: T) => TToastPromiseState);
-
-/**
- * `command` is a single top-level field rather than repeated inside each of
- * `loading`/`success`/`error`: `success`/`error` can be a function of the
- * resolved value/error, so in principle each state's payload could vary
- * per-call — but across every real call site `command` is always identical
- * across all three states, so that flexibility was never used. This is a
- * simplification for the common case, not a hard API constraint — if a
- * genuine need for a per-state-varying `command` ever comes up, reintroduce
- * it as an optional per-state override that falls back to this top-level
- * value.
- */
 export interface IToastPromiseMessages<T> {
-  command: string;
-  loading: Pick<IToastPayload, 'state' | 'message'>;
+  loading: Pick<IToastPayload, 'title' | 'message'>;
   success: TToastPromiseMessage<T>;
   error: TToastPromiseMessage<unknown>;
 }
@@ -63,8 +48,7 @@ export interface IToastRecord {
   type: TToastType;
   /** True while a `toast.promise` call is still in flight (§4.6). */
   isLoading?: boolean;
-  command: string;
-  state: string;
+  title?: ReactNode;
   message: ReactNode;
   time?: string;
   action?: IToastAction;
@@ -94,13 +78,9 @@ let idCounter = 0;
 const generateId = () => `toast-${Date.now()}-${idCounter++}`;
 
 const resolvePayload = <T>(
-  command: string,
   message: TToastPromiseMessage<T>,
   value: T,
-): IToastPayload => ({
-  ...(typeof message === 'function' ? message(value) : message),
-  command,
-});
+): IToastPayload => (typeof message === 'function' ? message(value) : message);
 
 const isMergeableType = (type: TToastType) =>
   type === TOAST_TYPE.SUCCESS || type === TOAST_TYPE.INFO;
@@ -260,8 +240,7 @@ export const createToastStore = () => {
   ): IToastRecord => ({
     id: generateId(),
     type,
-    command: payload.command,
-    state: payload.state,
+    title: payload.title,
     message: payload.message,
     time: payload.time,
     action: payload.action,
@@ -285,8 +264,7 @@ export const createToastStore = () => {
 
     const matches = (t: IToastRecord) =>
       t.type === type &&
-      t.command === payload.command &&
-      t.state === payload.state &&
+      t.title === payload.title &&
       t.message === payload.message &&
       now - t.createdAt <= TOAST_MERGE_WINDOW_MS;
 
@@ -302,8 +280,7 @@ export const createToastStore = () => {
         patchRecord(existing.id, () => ({
           ...existing,
           type,
-          command: payload.command,
-          state: payload.state,
+          title: payload.title,
           message: payload.message,
           time: payload.time,
           action: payload.action,
@@ -411,8 +388,7 @@ export const createToastStore = () => {
         id,
         type: TOAST_TYPE.INFO,
         isLoading: true,
-        command: messages.command,
-        state: messages.loading.state,
+        title: messages.loading.title,
         message: messages.loading.message,
         durationMs: undefined,
         phase: 'entering',
@@ -439,8 +415,7 @@ export const createToastStore = () => {
         ...r,
         type,
         isLoading: false,
-        command: payload.command,
-        state: payload.state,
+        title: payload.title,
         message: payload.message,
         time: payload.time,
         action: payload.action,
@@ -454,15 +429,9 @@ export const createToastStore = () => {
 
     promiseInput.then(
       (value) =>
-        settle(
-          TOAST_TYPE.SUCCESS,
-          resolvePayload(messages.command, messages.success, value),
-        ),
+        settle(TOAST_TYPE.SUCCESS, resolvePayload(messages.success, value)),
       (error: unknown) =>
-        settle(
-          TOAST_TYPE.ERROR,
-          resolvePayload(messages.command, messages.error, error),
-        ),
+        settle(TOAST_TYPE.ERROR, resolvePayload(messages.error, error)),
     );
 
     return promiseInput;

@@ -1,7 +1,6 @@
 import { StatusBadge } from '@blog/ui/atoms/status-badge';
+import { Panel } from '@blog/ui/molecules/panel';
 import { SettingRow } from '@blog/ui/molecules/setting-row';
-import { WindowChrome } from '@blog/ui/molecules/window-chrome';
-import { PlainSection } from '@web/components/shared/plain-section';
 import type { ReactNode } from 'react';
 
 import { newsletterSectionVariants } from './newsletter-section-variants';
@@ -9,10 +8,7 @@ import { newsletterSectionVariants } from './newsletter-section-variants';
 const s = newsletterSectionVariants();
 
 export interface INewsletterSectionViewProps {
-  isChromeOn: boolean;
-  handle: string;
-  promptHost: string;
-  promptCommand: string;
+  heading: string;
   status: 'active' | 'pending';
   label: string;
   email: string;
@@ -31,10 +27,7 @@ export interface INewsletterSectionViewProps {
  * only ever receives an already-decided `active`/`pending` state.
  */
 export const NewsletterSectionView = ({
-  isChromeOn,
-  handle,
-  promptHost,
-  promptCommand,
+  heading,
   status,
   label,
   email,
@@ -75,21 +68,10 @@ export const NewsletterSectionView = ({
       </SettingRow>
     );
 
-  if (!isChromeOn) {
-    return (
-      <PlainSection heading={promptCommand} headingLevel={2}>
-        {settingRow}
-      </PlainSection>
-    );
-  }
-
   return (
-    <WindowChrome>
-      <WindowChrome.Bar headingLevel={2}>
-        <WindowChrome.User>{handle}</WindowChrome.User>{' '}
-        <WindowChrome.Prompt>{promptHost}</WindowChrome.Prompt> {promptCommand}
-      </WindowChrome.Bar>
-      <WindowChrome.Body>{settingRow}</WindowChrome.Body>
-    </WindowChrome>
+    <Panel>
+      <Panel.Header headingLevel={2}>{heading}</Panel.Header>
+      <Panel.Body>{settingRow}</Panel.Body>
+    </Panel>
   );
 };

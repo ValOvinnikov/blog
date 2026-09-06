@@ -3,11 +3,10 @@
 import { ICONS, routes, SIZE } from '@blog/config';
 import { Avatar } from '@blog/ui/atoms/avatar';
 import { Icon } from '@blog/ui/atoms/icon';
+import { Panel } from '@blog/ui/molecules/panel';
 import { PopoverMenu } from '@blog/ui/molecules/popover-menu';
-import { WindowChrome } from '@blog/ui/molecules/window-chrome';
 import { authMenuVariants } from '@web/components/shared/auth-menu/auth-menu-variants';
 import { SmartLink } from '@web/components/shared/smart-link';
-import { toSessionUsername } from '@web/utils/to-session-username';
 import { signOut } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useState, type RefObject } from 'react';
@@ -23,16 +22,14 @@ export type TAccountMenuProps = {
   name?: string | null;
   email?: string | null;
   image?: string | null;
-  /** Renders the panel without the `WindowChrome` terminal shell. */
-  isPlain?: boolean;
 };
 
 /**
  * `AuthMenu`'s logged-in render branch: an `Avatar`-triggered `PopoverMenu`
- * dressed in the `WindowChrome` terminal shell, showing the session's
- * name/email, "My bookmarks", "Account settings", and "Sign out". Open/close
- * state and refs come from the parent's single `usePopover()` call — this
- * component never calls `usePopover()` itself.
+ * framed in a `Panel`, showing the session's name/email, "My bookmarks",
+ * "Account settings", and "Sign out". Open/close state and refs come from
+ * the parent's single `usePopover()` call — this component never calls
+ * `usePopover()` itself.
  */
 export const AccountMenu = ({
   panelId,
@@ -43,7 +40,6 @@ export const AccountMenu = ({
   name,
   email,
   image,
-  isPlain = false,
 }: TAccountMenuProps) => {
   const t = useTranslations('authMenu');
   const { panel, window: windowSize } = authMenuVariants();
@@ -57,7 +53,6 @@ export const AccountMenu = ({
   } = accountMenuVariants();
 
   const displayName = name ?? email ?? '';
-  const username = toSessionUsername(name, email);
 
   // Tracks a runtime `<img>` load failure (e.g. a stale/broken OAuth avatar
   // URL) so both `Avatar` renders below fall back to initials together —
@@ -75,45 +70,6 @@ export const AccountMenu = ({
     setImageFailed(false);
   }
   const avatarSrc = imageFailed ? undefined : (image ?? undefined);
-
-  const menuContent = (
-    <>
-      <div className={acctRow()}>
-        <Avatar
-          src={avatarSrc}
-          name={displayName}
-          alt=""
-          size={SIZE.SM}
-          onImageError={() => setImageFailed(true)}
-        />
-        <div>
-          <p className={accountName()}>{displayName}</p>
-          {email && <p className={accountEmail()}>{email}</p>}
-        </div>
-      </div>
-      <PopoverMenu.Item
-        as={SmartLink}
-        href={routes.bookmarks()}
-        icon={<Icon name={ICONS.BOOKMARK} size={SIZE.SM} />}
-      >
-        {t('myBookmarks')}
-      </PopoverMenu.Item>
-      <PopoverMenu.Item
-        as={SmartLink}
-        href={routes.account()}
-        icon={<Icon name={ICONS.SETTINGS} size={SIZE.SM} />}
-      >
-        {t('accountSettings')}
-      </PopoverMenu.Item>
-      <PopoverMenu.Item
-        onClick={() => signOut()}
-        className={signOutItem()}
-        icon={<Icon name={ICONS.POWER} size={SIZE.SM} />}
-      >
-        {t('signOut')}
-      </PopoverMenu.Item>
-    </>
-  );
 
   return (
     <PopoverMenu className={menuRoot()}>
@@ -139,20 +95,47 @@ export const AccountMenu = ({
         id={panelId}
         isOpen={isOpen}
         ariaLabel={t('accountMenuAriaLabel')}
-        className={isPlain ? windowSize() : panel()}
+        className={panel()}
       >
-        {isPlain ? (
-          menuContent
-        ) : (
-          <WindowChrome className={windowSize()}>
-            <WindowChrome.Bar>
-              <WindowChrome.User>{username}</WindowChrome.User>{' '}
-              <WindowChrome.Prompt>{t('promptHost')}</WindowChrome.Prompt>{' '}
-              {t('promptCommandAccount')}
-            </WindowChrome.Bar>
-            <WindowChrome.Body>{menuContent}</WindowChrome.Body>
-          </WindowChrome>
-        )}
+        <Panel className={windowSize()}>
+          <Panel.Header headingLevel={2}>{t('accountHeading')}</Panel.Header>
+          <Panel.Body>
+            <div className={acctRow()}>
+              <Avatar
+                src={avatarSrc}
+                name={displayName}
+                alt=""
+                size={SIZE.SM}
+                onImageError={() => setImageFailed(true)}
+              />
+              <div>
+                <p className={accountName()}>{displayName}</p>
+                {email && <p className={accountEmail()}>{email}</p>}
+              </div>
+            </div>
+            <PopoverMenu.Item
+              as={SmartLink}
+              href={routes.bookmarks()}
+              icon={<Icon name={ICONS.BOOKMARK} size={SIZE.SM} />}
+            >
+              {t('myBookmarks')}
+            </PopoverMenu.Item>
+            <PopoverMenu.Item
+              as={SmartLink}
+              href={routes.account()}
+              icon={<Icon name={ICONS.SETTINGS} size={SIZE.SM} />}
+            >
+              {t('accountSettings')}
+            </PopoverMenu.Item>
+            <PopoverMenu.Item
+              onClick={() => signOut()}
+              className={signOutItem()}
+              icon={<Icon name={ICONS.POWER} size={SIZE.SM} />}
+            >
+              {t('signOut')}
+            </PopoverMenu.Item>
+          </Panel.Body>
+        </Panel>
       </PopoverMenu.Panel>
     </PopoverMenu>
   );

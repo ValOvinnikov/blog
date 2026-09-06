@@ -9,7 +9,7 @@ export const alt = 'Site preview image';
 export { contentType, size };
 
 /**
- * Site-wide default Twitter card image (Console brand variant) — same
+ * Site-wide default Twitter card image, rendered from a fixed dark palette — same
  * 1200×630 `summary_large_image` dimensions and renderer as
  * `opengraph-image.tsx`; see that file for the fallback-ladder rationale.
  */

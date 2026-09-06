@@ -2,8 +2,8 @@ import { tv } from 'tailwind-variants';
 
 export const authMenuVariants = tv({
   slots: {
-    // `PopoverMenu.Panel` only positions the window now (`WindowChrome` owns
-    // the visual surface — border/bg/radius/shadow) — its own chrome is
+    // `PopoverMenu.Panel` only positions the window now (`Panel` owns the
+    // visual surface — border/bg/radius/shadow) — its own chrome is
     // cancelled here rather than doubled up.
     panel: [
       'min-w-0 max-w-none rounded-none border-0 bg-transparent p-0 shadow-none',

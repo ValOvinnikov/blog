@@ -12,8 +12,3 @@ export default meta;
 type TStory = StoryObj<typeof meta>;
 
 export const Default: TStory = {};
-
-/** The `chromeOn: false` tenant treatment — no `TerminalChip`/prompt-line styling. */
-export const Plain: TStory = {
-  args: { isPlain: true },
-};

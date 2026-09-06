@@ -147,7 +147,6 @@ export default async function LocaleLayout({ children, params }: TProps) {
   const { brand } = settingsResult.data;
   const navItems = navResult.ok ? navResult.data.items : [];
   const social = footerResult.ok ? footerResult.data.social : [];
-  const plain = !themeTokens.chromeOn;
   const currentYear = new Date().getFullYear();
   const s = localeLayoutVariants();
   const oauthProviderIds = getEnabledOAuthProviderIds();
@@ -164,8 +163,8 @@ export default async function LocaleLayout({ children, params }: TProps) {
           `setRequestLocale` above already resolves them from the static
           param rather than a dynamic API, but passing them here skips the
           provider's own implicit resolution. `messages` is the base locale
-          messages with the tenant's preset voice pack and voice overrides
-          applied. Client components that read the locale (next-intl
+          messages with the tenant's voice overrides applied. Client
+          components that read the locale (next-intl
           navigation `Link` in the post-list module) need this provider or
           they throw "No intl context found". */}
       <NextIntlClientProvider
@@ -177,7 +176,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
         {/* No `session` prop: `AuthMenu` resolves the session client-side rather than duplicating an `auth()` call at every layout render. */}
         <SessionProvider>
           {/* Mounted above `children` so a toast survives a client-side route change instead of being tied to the page that fired it. */}
-          <ToastProvider isPlain={plain}>
+          <ToastProvider>
             <div className={s.root()}>
               <Header>
                 <Header.Brand>
@@ -188,10 +187,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
                   actions={
                     <>
                       <ThemeToggleButton />
-                      <AuthMenu
-                        oauthProviderIds={oauthProviderIds}
-                        isPlain={plain}
-                      />
+                      <AuthMenu oauthProviderIds={oauthProviderIds} />
                     </>
                   }
                 />

@@ -3,17 +3,14 @@ import { redirect } from 'next/navigation';
 
 import { AccountPage } from './account-page';
 
-const { authMock, getChromeOnMock, privacySectionMock } = vi.hoisted(() => ({
+const { authMock, privacySectionMock } = vi.hoisted(() => ({
   authMock: vi.fn(),
-  getChromeOnMock: vi.fn(),
   privacySectionMock: vi.fn(() => (
     <div data-testid="privacy-section">privacy section</div>
   )),
 }));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
-
-vi.mock('@web/utils/get-chrome-on', () => ({ getChromeOn: getChromeOnMock }));
 
 vi.mock('@web/components/pages/account-page/sections/identity-section', () => ({
   IdentitySection: () => (
@@ -43,8 +40,6 @@ const authedSession = {
 describe(`<${AccountPage.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
-    getChromeOnMock.mockReset();
-    getChromeOnMock.mockResolvedValue(true);
     privacySectionMock.mockClear();
   });
 
@@ -81,17 +76,15 @@ describe(`<${AccountPage.name}/>`, () => {
     ).toBeTruthy();
   });
 
-  it('resolves the session handle and chrome flag into PrivacySection props', async () => {
+  it('resolves the session handle into PrivacySection props', async () => {
     authMock.mockResolvedValue(authedSession);
-    getChromeOnMock.mockResolvedValue(false);
 
     await setup();
 
     expect(privacySectionMock).toHaveBeenCalledWith(
       expect.objectContaining({
         handle: 'jane',
-        isChromeOn: false,
-        promptCommand: 'Privacy',
+        heading: 'Privacy',
         exportLabel: 'Export my data',
         deleteLabel: 'Delete account',
       }),

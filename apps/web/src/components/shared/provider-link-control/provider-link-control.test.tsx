@@ -111,15 +111,8 @@ describe(`<${ProviderLinkControl.name}/>`, () => {
     expect(toastPromiseMock).toHaveBeenCalledWith(
       expect.any(Promise),
       expect.objectContaining({
-        command: 'Identity',
-        loading: {
-          state: 'Unlinking',
-          message: 'Unlinking your account…',
-        },
-        success: {
-          state: 'Unlinked',
-          message: 'Account unlinked.',
-        },
+        loading: { message: 'Unlinking your account…' },
+        success: { message: 'Account unlinked.' },
       }),
     );
   });

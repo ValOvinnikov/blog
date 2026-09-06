@@ -5,10 +5,7 @@ export const makePrivacySection = (
 ): IPrivacySectionProps => {
   return {
     handle: 'jane',
-    isChromeOn: true,
-    promptHost: '',
-    promptCommand: 'Privacy',
-    promptTag: '',
+    heading: 'Privacy',
     exportLabel: 'Export my data',
     exportDescription:
       'Download your profile and bookmarks as a single JSON archive.',

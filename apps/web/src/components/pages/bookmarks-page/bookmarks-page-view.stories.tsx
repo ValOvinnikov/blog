@@ -21,17 +21,3 @@ export const Empty: TStory = {
     hint: undefined,
   },
 };
-
-export const Plain: TStory = {
-  args: {
-    isPlain: true,
-  },
-};
-
-export const PlainEmpty: TStory = {
-  args: {
-    isPlain: true,
-    posts: [],
-    hint: undefined,
-  },
-};

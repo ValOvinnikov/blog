@@ -23,10 +23,6 @@ vi.mock('next-auth/react', () => ({
 const setup = customRender(AuthMenu, {
   oauthProviderIds: ['github', 'google'],
 });
-const setupPlain = customRender(AuthMenu, {
-  oauthProviderIds: ['github', 'google'],
-  isPlain: true,
-});
 
 const setLocationSearch = (search: string) => {
   window.history.replaceState(null, '', `/${search}`);
@@ -87,42 +83,21 @@ describe(`<${AuthMenu.name}/>`, () => {
       ).toBeVisible();
     });
 
-    it('dresses the panel in the WindowChrome terminal shell (mock §01) with a generic, non-personal bar', async () => {
+    it('renders the panel with a level-2 "Sign in" heading and the provider prompt', async () => {
       setup();
       const user = userEvent.setup();
 
       await user.click(screen.getByRole('button', { name: 'Sign in' }));
       const panel = screen.getByRole('menu');
 
-      expect(within(panel).getByText('Guest')).toBeVisible();
-      expect(within(panel).getByText(/Sign in/)).toBeVisible();
+      expect(
+        within(panel).getByRole('heading', { level: 2, name: 'Sign in' }),
+      ).toBeVisible();
       expect(within(panel).getByText(/Choose a sign-in method/)).toBeVisible();
       expect(
         within(panel).getByText(
           'Redirects back to this article — you never lose your place.',
         ),
-      ).toBeVisible();
-      // The bar's segments render as separate DOM nodes (User/Prompt/plain
-      // text) — assert the concatenated reading is properly space-separated
-      // ("Guest Sign in"), not touching ("GuestSign in").
-      expect(panel.textContent).toMatch(/Guest\s+Sign in/);
-    });
-
-    it('renders a plain, non-heading "Sign in" label with no terminal prompt line when plain', async () => {
-      setupPlain();
-      const user = userEvent.setup();
-
-      await user.click(screen.getByRole('button', { name: 'Sign in' }));
-      const panel = screen.getByRole('menu');
-
-      // Plain mode never introduces a new heading — the popover panel
-      // already has an accessible name via its own `ariaLabel`, and this
-      // panel renders before the page's own `<h1>` in `[tenant]/[locale]/layout.tsx`.
-      expect(within(panel).queryByRole('heading')).not.toBeInTheDocument();
-      expect(within(panel).getByText('Sign in')).toBeVisible();
-      expect(within(panel).queryByText('Guest')).not.toBeInTheDocument();
-      expect(
-        within(panel).getByRole('menuitem', { name: 'Continue with GitHub' }),
       ).toBeVisible();
     });
 
@@ -382,31 +357,16 @@ describe(`<${AuthMenu.name}/>`, () => {
       ).toHaveAttribute('href', '/account');
     });
 
-    it('dresses the panel in the WindowChrome terminal shell with the real session user, not a hardcoded name', async () => {
+    it('renders the panel with a level-2 "Account" heading', async () => {
       setup();
       const user = userEvent.setup();
 
       await user.click(screen.getByRole('button', { name: 'Account menu' }));
       const panel = screen.getByRole('menu');
 
-      // Asserts the bar shows this session's email-derived username, not a
-      // hardcoded placeholder.
-      expect(within(panel).getByText('jane')).toBeVisible();
-      expect(panel.textContent).toMatch(/jane\s+Account/);
-    });
-
-    it('renders a plain user-info row and link list with no terminal bar when plain', async () => {
-      setupPlain();
-      const user = userEvent.setup();
-
-      await user.click(screen.getByRole('button', { name: 'Account menu' }));
-      const panel = screen.getByRole('menu');
-
-      expect(within(panel).getAllByText('Jane Doe').length).toBeGreaterThan(0);
       expect(
-        screen.getByRole('menuitem', { name: 'My bookmarks' }),
+        within(panel).getByRole('heading', { level: 2, name: 'Account' }),
       ).toBeVisible();
-      expect(panel.textContent).not.toMatch(/jane\s+Account/);
     });
 
     it('calls signOut when Sign out is clicked', async () => {
@@ -417,28 +377,6 @@ describe(`<${AuthMenu.name}/>`, () => {
       await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
 
       expect(signOutMock).toHaveBeenCalled();
-    });
-
-    it('derives a different bar username for a different session (proves it is not hardcoded)', async () => {
-      useSessionMock.mockReturnValue({
-        data: {
-          user: {
-            name: 'Chester Reader',
-            email: 'chester@example.com',
-            image: null,
-          },
-          expires: '2099-01-01',
-        },
-        status: 'authenticated',
-      });
-      setup();
-      const user = userEvent.setup();
-
-      await user.click(screen.getByRole('button', { name: 'Account menu' }));
-      const panel = screen.getByRole('menu');
-
-      expect(within(panel).getByText('chester')).toBeVisible();
-      expect(within(panel).queryByText('jane')).not.toBeInTheDocument();
     });
   });
 });

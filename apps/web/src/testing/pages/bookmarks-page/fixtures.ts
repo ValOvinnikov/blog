@@ -35,12 +35,8 @@ export const makeBookmarksPageView = (
   return {
     heading: 'My bookmarks',
     posts,
-    isPlain: false,
     emptyMessage: 'No bookmarks yet — save a post to find it here.',
     hint: posts.length > 0 ? `${posts.length} saved` : undefined,
-    promptSymbol: '',
-    promptCommand: 'My bookmarks',
-    promptFlag: '',
     ...overrides,
   };
 };

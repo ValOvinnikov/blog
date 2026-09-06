@@ -9,7 +9,7 @@ import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-sche
 
 const DEFAULT_TRAIL = [
   { label: 'Home', href: '/' },
-  { label: 'Tag: TypeScript', href: '/tags/typescript' },
+  { label: 'TypeScript', href: '/tags/typescript' },
 ];
 
 export const makeTagPageView = (

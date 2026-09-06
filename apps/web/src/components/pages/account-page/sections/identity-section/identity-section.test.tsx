@@ -2,13 +2,10 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { IdentitySection } from './identity-section';
 
-const { authMock, getLinkedProvidersMock, getChromeOnMock } = vi.hoisted(
-  () => ({
-    authMock: vi.fn(),
-    getLinkedProvidersMock: vi.fn(),
-    getChromeOnMock: vi.fn(),
-  }),
-);
+const { authMock, getLinkedProvidersMock } = vi.hoisted(() => ({
+  authMock: vi.fn(),
+  getLinkedProvidersMock: vi.fn(),
+}));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
@@ -16,10 +13,6 @@ vi.mock('@blog/db', () => ({
   queries: {
     account: { getLinkedProviders: getLinkedProvidersMock },
   },
-}));
-
-vi.mock('@web/utils/get-chrome-on', () => ({
-  getChromeOn: getChromeOnMock,
 }));
 
 vi.mock('@web/components/shared/provider-link-control', () => ({
@@ -48,8 +41,6 @@ describe(`<${IdentitySection.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
     getLinkedProvidersMock.mockReset();
-    getChromeOnMock.mockReset();
-    getChromeOnMock.mockResolvedValue(true);
   });
 
   it('renders nothing when there is no session', async () => {
@@ -61,7 +52,7 @@ describe(`<${IdentitySection.name}/>`, () => {
     expect(getLinkedProvidersMock).not.toHaveBeenCalled();
   });
 
-  it('calls getLinkedProviders with the signed-in user id and renders the derived handle', async () => {
+  it('calls getLinkedProviders with the signed-in user id and renders the panel heading', async () => {
     authMock.mockResolvedValue(authedSession);
     getLinkedProvidersMock.mockResolvedValue({
       github: true,

@@ -24,14 +24,9 @@ import { SignInMenu } from './components/sign-in-menu/sign-in-menu';
 export interface IAuthMenuProps {
   /** Auth.js provider ids to offer for sign-in, server-derived from credential presence. */
   oauthProviderIds: readonly TOAuthProviderId[];
-  /** Renders both branches' panel without the `WindowChrome` shell. */
-  isPlain?: boolean;
 }
 
-export const AuthMenu = ({
-  oauthProviderIds,
-  isPlain = false,
-}: IAuthMenuProps) => {
+export const AuthMenu = ({ oauthProviderIds }: IAuthMenuProps) => {
   const sessionResult = useSession();
   const oauthError = useOAuthErrorParam();
   const t = useTranslations('authMenu');
@@ -63,7 +58,6 @@ export const AuthMenu = ({
         name={name}
         email={email}
         image={image}
-        isPlain={isPlain}
       />
     );
   }
@@ -77,7 +71,6 @@ export const AuthMenu = ({
       panelRef={panelRef}
       oauthError={oauthError}
       oauthProviderIds={oauthProviderIds}
-      isPlain={isPlain}
     />
   );
 };

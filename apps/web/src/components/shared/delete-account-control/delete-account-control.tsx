@@ -45,19 +45,9 @@ export const DeleteAccountControl = ({
             return result;
           })(),
           {
-            command: t('deleteToastCommand'),
-            loading: {
-              state: t('deleteToastLoadingState'),
-              message: t('deleteToastLoadingMessage'),
-            },
-            success: {
-              state: t('deleteToastSuccessState'),
-              message: t('deleteToastSuccessMessage'),
-            },
-            error: {
-              state: t('deleteToastErrorState'),
-              message: t('deleteError'),
-            },
+            loading: { message: t('deleteToastLoadingMessage') },
+            success: { message: t('deleteToastSuccessMessage') },
+            error: { message: t('deleteError') },
           },
         );
       } catch {

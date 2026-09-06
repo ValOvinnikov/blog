@@ -4,7 +4,6 @@ import { service } from '@blog/service';
 import { auth } from '@web/server/auth/auth';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
-import { getChromeOn } from '@web/utils/get-chrome-on';
 import { logger } from '@web/utils/logger/logger';
 import { redirect } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
@@ -37,14 +36,12 @@ export const BookmarksPage = async () => {
     redirect(routes.home());
   }
 
-  const [bookmarks, t, format, chromeOn, tenant] = await Promise.all([
+  const [bookmarks, t, format, tenant] = await Promise.all([
     queries.bookmarks.listBookmarks(tenantId, userId),
     getTranslations('bookmarksPage'),
     getFormatter(),
-    getChromeOn(),
     getTenantSanityContext(),
   ]);
-  const plain = !chromeOn;
 
   const bookmarkOrder = bookmarks.map((bookmark) => bookmark.postId);
 
@@ -82,12 +79,8 @@ export const BookmarksPage = async () => {
     <BookmarksPageView
       heading={t('title')}
       posts={posts}
-      isPlain={plain}
       emptyMessage={t('empty')}
       hint={posts.length > 0 ? t('hint', { count: posts.length }) : undefined}
-      promptSymbol={t('promptSymbol')}
-      promptCommand={t('promptCommand')}
-      promptFlag={t('promptFlag')}
     />
   );
 };

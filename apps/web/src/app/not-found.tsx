@@ -28,8 +28,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('notFound');
 
   return {
-    title: t('metaTitle'),
-    description: t('metaDescription'),
+    title: t('heading'),
+    description: t('supportingText'),
   };
 }
 
@@ -44,7 +44,7 @@ export default async function NotFound() {
   return (
     <ThemeScope themeTokens={themeTokens}>
       <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={messages}>
-        <NotFoundPage isPlain={!themeTokens.chromeOn} />
+        <NotFoundPage />
       </NextIntlClientProvider>
     </ThemeScope>
   );

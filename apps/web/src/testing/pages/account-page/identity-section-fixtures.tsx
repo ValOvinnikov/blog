@@ -33,10 +33,7 @@ export const makeIdentitySectionView = (
   overrides: Partial<IIdentitySectionViewProps> = {},
 ): IIdentitySectionViewProps => {
   return {
-    isChromeOn: true,
-    handle: 'jane',
-    promptHost: '',
-    promptCommand: 'Connected accounts',
+    heading: 'Connected accounts',
     providerRows: [
       makeIdentityProviderRow(),
       makeIdentityProviderRow({

@@ -9,14 +9,12 @@ const {
   authMock,
   listBookmarksMock,
   getPostsByIdsMock,
-  getChromeOnMock,
   getRequestTenantIdMock,
   getTenantSanityContextMock,
 } = vi.hoisted(() => ({
   authMock: vi.fn(),
   listBookmarksMock: vi.fn(),
   getPostsByIdsMock: vi.fn(),
-  getChromeOnMock: vi.fn(),
   getRequestTenantIdMock: vi.fn(),
   getTenantSanityContextMock: vi.fn(),
 }));
@@ -43,10 +41,6 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/utils/get-chrome-on', () => ({
-  getChromeOn: getChromeOnMock,
-}));
-
 vi.mock('@web/components/shared/smart-link', () => ({
   SmartLink: ({
     href,
@@ -71,8 +65,6 @@ describe(`<${BookmarksPage.name}/>`, () => {
     authMock.mockReset();
     listBookmarksMock.mockReset();
     getPostsByIdsMock.mockReset();
-    getChromeOnMock.mockReset();
-    getChromeOnMock.mockResolvedValue(true);
     getRequestTenantIdMock.mockReset();
     getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
     getTenantSanityContextMock.mockReset();
@@ -173,27 +165,5 @@ describe(`<${BookmarksPage.name}/>`, () => {
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
-  });
-
-  it('renders the plain list when getChromeOn resolves false', async () => {
-    getChromeOnMock.mockResolvedValue(false);
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    listBookmarksMock.mockResolvedValue([
-      { userId: 'user-1', postId: 'post-1', createdAt: new Date() },
-    ]);
-    getPostsByIdsMock.mockResolvedValue({
-      ok: true,
-      data: [makePostCard({ id: 'post-1', slug: 'first', title: 'First' })],
-    });
-
-    await setup();
-
-    expect(
-      screen.queryByTestId('bookmarks-list-row-prefix'),
-    ).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'First' })).toHaveAttribute(
-      'href',
-      '/blog/first',
-    );
   });
 });

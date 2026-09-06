@@ -12,10 +12,9 @@
     "blog": "Blog"
   },
   "notFound": {
-    "metaTitle": "Page not found",
-    "metaDescription": "The page you are looking for does not exist.",
-    "commandNotFound": "Not found",
-    "description": "The page you're looking for doesn't exist.",
+    "eyebrow": "404",
+    "heading": "Page not found",
+    "supportingText": "The page you're looking for doesn't exist.",
     "returnHome": "Return home"
   },
   "localeErrorPage": {
@@ -80,7 +79,6 @@
     "paginationAriaLabel": "{name} pages"
   },
   "tagPage": {
-    "label": "Tag: {name}",
     "title": "Posts tagged {name}",
     "empty": "No posts tagged {name} yet.",
     "paginationAriaLabel": "{name} pages"
@@ -101,10 +99,8 @@
   "authMenu": {
     "signIn": "Sign in",
     "panelAriaLabel": "Sign in options",
-    "guestLabel": "Guest",
-    "promptHost": "",
-    "promptCommandSignIn": "Sign in",
-    "promptCommandAccount": "Account",
+    "signInHeading": "Sign in",
+    "accountHeading": "Account",
     "chooseProviderPrompt": "Choose a sign-in method",
     "continueWithGithub": "Continue with GitHub",
     "continueWithGoogle": "Continue with Google",
@@ -134,13 +130,8 @@
     "saveAriaLabel": "Save post",
     "removeAriaLabel": "Remove bookmark",
     "error": "Couldn't save that. Try again.",
-    "toastCommand": "Bookmark",
-    "toastSavedState": "Saved",
     "toastSavedMessage": "Saved to bookmarks",
-    "toastRemovedState": "Removed",
     "toastRemovedMessage": "Removed from bookmarks",
-    "toastErrorState": "Failed",
-    "toastRevertedState": "Reverted",
     "toastRevertedMessage": "Reverted",
     "toastUndoLabel": "Undo",
     "toastRetryLabel": "Retry"
@@ -149,9 +140,6 @@
     "title": "My bookmarks",
     "metaDescription": "Posts you've saved to read later.",
     "empty": "No bookmarks yet — save a post to find it here.",
-    "promptSymbol": "",
-    "promptCommand": "My bookmarks",
-    "promptFlag": "",
     "hint": "{count, plural, one {1 saved} other {{count} saved}}"
   },
   "newsletterForm": {
@@ -188,9 +176,7 @@
     "title": "Account",
     "metaDescription": "Manage your privacy and data — export or delete your account.",
     "privacy": {
-      "promptHost": "",
-      "promptCommand": "Privacy",
-      "promptTag": "",
+      "heading": "Privacy",
       "exportLabel": "Export my data",
       "exportDescription": "Download your profile and bookmarks as a single JSON archive.",
       "exportButton": "Request export",
@@ -199,17 +185,12 @@
       "deleteConfirmAriaLabel": "Type your handle to confirm deletion",
       "deleteConfirmPlaceholder": "Type {handle} to confirm",
       "deleteButton": "Delete account",
-      "deleteToastCommand": "Account",
-      "deleteToastLoadingState": "Deleting",
       "deleteToastLoadingMessage": "Deleting your account…",
-      "deleteToastSuccessState": "Deleted",
       "deleteToastSuccessMessage": "Your account has been deleted.",
-      "deleteToastErrorState": "Failed",
       "deleteError": "Couldn't delete your account. Try again."
     },
     "newsletter": {
-      "promptHost": "",
-      "promptCommand": "Newsletter",
+      "heading": "Newsletter",
       "label": "Newsletter",
       "activeBadge": "Subscribed",
       "activeDescriptionPrefix": "Weekly posts delivered to",
@@ -218,24 +199,15 @@
       "pendingBadge": "Pending confirmation",
       "pendingDescription": "The double-opt-in link hasn't been clicked yet. Resend it if it never arrived.",
       "resendButton": "Resend confirmation",
-      "unsubscribeToastCommand": "Newsletter",
-      "unsubscribeToastLoadingState": "Unsubscribing",
       "unsubscribeToastLoadingMessage": "Unsubscribing…",
-      "unsubscribeToastSuccessState": "Unsubscribed",
       "unsubscribeToastSuccessMessage": "You've been unsubscribed.",
-      "unsubscribeToastErrorState": "Failed",
       "unsubscribeError": "Couldn't unsubscribe. Try again.",
-      "resendToastCommand": "Newsletter",
-      "resendToastLoadingState": "Resending",
       "resendToastLoadingMessage": "Resending the confirmation email…",
-      "resendToastSuccessState": "Resent",
       "resendToastSuccessMessage": "Confirmation email resent.",
-      "resendToastErrorState": "Failed",
       "resendError": "Couldn't resend the confirmation email. Try again."
     },
     "identity": {
-      "promptHost": "",
-      "promptCommand": "Connected accounts",
+      "heading": "Connected accounts",
       "githubLabel": "GitHub",
       "googleLabel": "Google",
       "emailLinkLabel": "Email link",
@@ -243,24 +215,16 @@
       "linkButton": "Link",
       "unlinkButton": "Unlink",
       "lastMethodNotice": "Last remaining method — can't unlink",
-      "unlinkToastCommand": "Identity",
-      "unlinkToastLoadingState": "Unlinking",
       "unlinkToastLoadingMessage": "Unlinking your account…",
-      "unlinkToastSuccessState": "Unlinked",
       "unlinkToastSuccessMessage": "Account unlinked.",
-      "unlinkToastErrorState": "Failed",
       "unlinkError": "Couldn't unlink. Try again.",
       "unlinkLastMethodError": "That's your only remaining sign-in method — link another before unlinking this one.",
       "displayNameLabel": "Display name",
       "displayNameDescription": "Overrides your provider handle wherever your comments appear.",
       "displayNameAriaLabel": "Display name",
       "saveButton": "Save",
-      "saveToastCommand": "Identity",
-      "saveToastLoadingState": "Saving",
       "saveToastLoadingMessage": "Saving your display name…",
-      "saveToastSuccessState": "Saved",
       "saveToastSuccessMessage": "Display name updated.",
-      "saveToastErrorState": "Failed",
       "saveError": "Couldn't update your display name. Try again."
     }
   }
