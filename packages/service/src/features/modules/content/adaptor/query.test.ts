@@ -65,6 +65,37 @@ describe('contentModuleQuery', () => {
     });
   });
 
+  // `alt` is `.nullable(true)`, not `.notNull()` — Studio's `rule.required()`
+  // is UI-only validation, so a bodyImage block missing alt text (written via
+  // the API, a migration, or an import) must not throw the whole query.
+  it('allows a bodyImage body block with no alt text', () => {
+    const raw = makeRawContentModule({
+      body: [
+        {
+          _type: 'bodyImage',
+          _key: 'image-1',
+          asset: {
+            _id: 'image-abc123-800x600-jpg',
+            metadata: {
+              lqip: null,
+              dimensions: { width: 800, height: 600, aspectRatio: 1.333 },
+            },
+          },
+          hotspot: null,
+          crop: null,
+          alt: null,
+          layout: 'FULL_BLEED',
+        },
+      ],
+    });
+
+    expect(() => contentModuleQuery.parse(raw)).not.toThrow();
+    expect(contentModuleQuery.parse(raw).body[0]).toMatchObject({
+      _type: 'bodyImage',
+      alt: null,
+    });
+  });
+
   it('keeps every field of a rich text block intact', () => {
     const richBlock = {
       _type: 'block',
