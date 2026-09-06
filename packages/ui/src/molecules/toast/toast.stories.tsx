@@ -21,9 +21,8 @@ const meta = {
   },
   args: {
     type: TOAST_TYPE.SUCCESS,
-    command: 'bookmark',
-    state: 'saved',
-    message: 'stashed to ~/bookmarks',
+    title: 'Saved',
+    message: 'Added to your bookmarks.',
     time: 'just now',
     dismissLabel: 'Dismiss notification',
     onDismiss: () => {},
@@ -40,18 +39,16 @@ export const Success: TStory = {};
 export const Info: TStory = {
   args: {
     type: TOAST_TYPE.INFO,
-    command: 'bookmark',
-    state: 'removed',
-    message: 'removed from ~/bookmarks',
+    title: 'Removed',
+    message: 'Removed from your bookmarks.',
   },
 };
 
 export const Warning: TStory = {
   args: {
     type: TOAST_TYPE.WARNING,
-    command: 'comment',
-    state: 'queued',
-    message: 'posted — awaiting review',
+    title: 'Queued',
+    message: 'Comment posted — awaiting review.',
     durationMs: 5000,
   },
 };
@@ -59,9 +56,8 @@ export const Warning: TStory = {
 export const Error: TStory = {
   args: {
     type: TOAST_TYPE.ERROR,
-    command: 'bookmark',
-    state: 'failed',
-    message: "couldn't save — retry?",
+    title: 'Failed',
+    message: "Couldn't save — retry?",
     durationMs: undefined,
     action: { label: 'retry', onAct: () => {}, keyHint: 'R' },
   },
@@ -71,9 +67,8 @@ export const Loading: TStory = {
   args: {
     type: TOAST_TYPE.INFO,
     isLoading: true,
-    command: 'bookmark',
-    state: 'saving',
-    message: 'saving…',
+    title: 'Saving',
+    message: 'Hang on a moment…',
     time: undefined,
     durationMs: undefined,
   },
@@ -92,41 +87,8 @@ export const Paused: TStory = {
   },
 };
 
-export const Plain: TStory = {
-  args: {
-    isPlain: true,
-    command: undefined,
-    state: undefined,
-    action: { label: 'undo', onAct: () => {}, keyHint: '⌘Z' },
-  },
-};
-
-export const WithTitle: TStory = {
-  args: {
-    command: undefined,
-    state: undefined,
-    title: 'Saved',
-    message: 'Added to your bookmarks.',
-  },
-};
-
-export const TitleLoading: TStory = {
-  args: {
-    type: TOAST_TYPE.INFO,
-    isLoading: true,
-    command: undefined,
-    state: undefined,
-    title: 'Saving',
-    message: 'Hang on a moment…',
-    time: undefined,
-    durationMs: undefined,
-  },
-};
-
 export const MessageOnly: TStory = {
   args: {
-    command: undefined,
-    state: undefined,
     title: undefined,
     message: 'Removed from bookmarks.',
   },
@@ -151,9 +113,8 @@ const ReducedMotionDemo = () => (
     `}</style>
     <Toast
       type={TOAST_TYPE.SUCCESS}
-      command="bookmark"
-      state="saved"
-      message="stashed to ~/bookmarks"
+      title="Saved"
+      message="Added to your bookmarks."
       time="just now"
       dismissLabel="Dismiss notification"
       onDismiss={() => {}}

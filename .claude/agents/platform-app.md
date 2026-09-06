@@ -318,8 +318,8 @@ banner-state/` for this app's own instance). Never inline a second component
 
 A component with more than one exported part (`Card.Header`/`Card.Body`/
 `Card.Footer`, a future `Tabs.Trigger`/`Tabs.Panel`, …) follows `@blog/ui`'s
-split, not one crowded file — see `packages/ui/src/molecules/window-chrome/`
-for the reference shape (read it with Read before building the next one):
+split, not one crowded file — see `packages/ui/src/molecules/panel/` for the
+reference shape (read it with Read before building the next one):
 
 - **Each part lives in its own file**, `components/<part>/<component>-<part>.tsx`
   (e.g. `components/header/card-header.tsx`). The root file (`card.tsx`) only
@@ -339,8 +339,8 @@ for the reference shape (read it with Read before building the next one):
   down.** A component whose ticket requires "one variants file is the single
   source of the treatment" (e.g. Card) keeps one shared
   `<component>-variants.ts` for every part, not one per part. Where the ticket
-  says nothing, follow `WindowChrome`'s default: a part with its own visual
-  identity (e.g. `window-chrome-body-variants.ts`) gets its own variants file.
+  says nothing, follow `Panel`'s default: a part with its own visual identity
+  (e.g. `panel-body-variants.ts`) gets its own variants file.
 
 ## Function style
 
