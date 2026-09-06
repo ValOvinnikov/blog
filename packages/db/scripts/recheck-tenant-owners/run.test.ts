@@ -49,7 +49,6 @@ function tenant(id: string, name: string): TTenant {
     provisioningStatus: 'READY',
     provisioningSteps: null,
     lastNotifiedOwnerElevationOutcome: null,
-    studioVercelProjectId: null,
     seededAt: null,
     webhookCreatedAt: null,
     deprovisionedAt: null,

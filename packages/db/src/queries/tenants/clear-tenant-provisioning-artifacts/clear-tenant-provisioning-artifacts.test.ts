@@ -53,7 +53,6 @@ async function insertProvisionedTenant(): Promise<string> {
           status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
         },
       },
-      studioVercelProjectId: 'prj_studio',
     })
     .returning();
 
@@ -90,7 +89,6 @@ describe(clearTenantProvisioningArtifacts, () => {
       sanityDataset: 'production',
       sanityReadTokenEncrypted: null,
       sanityWriteTokenEncrypted: null,
-      studioVercelProjectId: null,
       provisioningStatus: null,
       provisioningSteps: null,
     });

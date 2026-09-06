@@ -43,7 +43,6 @@ export const makeTenant = (overrides: Partial<TTenant> = {}): TTenant => {
     provisioningSteps: idleProvisioningSteps(),
     deprovisioningSteps: null,
     lastNotifiedOwnerElevationOutcome: null,
-    studioVercelProjectId: null,
     seededAt: null,
     webhookCreatedAt: null,
     deprovisionedAt: null,

@@ -76,7 +76,6 @@ describe(setTenantWebhookCreatedAt, () => {
       name: 'Acme',
       sanityProjectId: 'abc123',
       sanityDataset: 'production',
-      studioVercelProjectId: null,
     });
   });
 });

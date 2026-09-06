@@ -258,6 +258,36 @@ jobs:
       - name: Revalidate tags sync (helper unit tests)
         run: pnpm check:revalidate-tags-sync:test
 
+  client-graph:
+    name: Client graph
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+
+      # A `'use client'` module that can reach an `import 'server-only'` module
+      # fails `next build` under the `react-server` condition — and nothing
+      # else catches it, because every workspace aliases `@blog/<pkg>/*`
+      # straight to that package's `src/`, so a deep import resolves whether or
+      # not the package declares the subpath. Walks each client entrypoint's
+      # runtime import graph and fails on any chain reaching `server-only`.
+      # Read-only; nothing is committed.
+      - name: No server-only code reachable from the client graph
+        run: pnpm check:client-graph
+
+      # Fixture-based unit tests for the directive/specifier/resolution
+      # helpers, same rationale as the sync jobs above — they need the repo's
+      # typescript package, which only the pnpm-install jobs have.
+      - name: Client graph (helper unit tests)
+        run: pnpm check:client-graph:test
+
   required-env:
     name: Required env (${{ matrix.environment }})
     runs-on: ubuntu-latest

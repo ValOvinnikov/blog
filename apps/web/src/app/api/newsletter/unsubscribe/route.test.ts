@@ -1,3 +1,5 @@
+import { getLocale } from 'next-intl/server';
+
 export {};
 
 const { unsubscribeByTokenMock, resolveTenantIdMock, isTenantActiveMock } =
@@ -74,6 +76,20 @@ describe('GET /api/newsletter/unsubscribe', () => {
     expect(resolveTenantIdMock).not.toHaveBeenCalled();
     expect(isTenantActiveMock).not.toHaveBeenCalled();
   });
+
+  it('declares <html lang> as the resolved request locale, not a hardcoded value', async () => {
+    vi.mocked(getLocale).mockResolvedValueOnce('fr');
+    const { GET } = await import('./route');
+
+    const response = await GET(
+      new Request(
+        'https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc',
+      ),
+    );
+    const html = await response.text();
+
+    expect(html).toContain('<html lang="fr">');
+  });
 });
 
 describe('POST /api/newsletter/unsubscribe', () => {
@@ -121,6 +137,25 @@ describe('POST /api/newsletter/unsubscribe', () => {
       TENANT_ID,
       'unsub-token-abc',
     );
+  });
+
+  it('declares <html lang> as the resolved request locale, not a hardcoded value', async () => {
+    unsubscribeByTokenMock.mockResolvedValue({
+      outcome: 'unsubscribed',
+      subscriber,
+    });
+    vi.mocked(getLocale).mockResolvedValueOnce('fr');
+    const { POST } = await import('./route');
+
+    const response = await POST(
+      new Request(
+        'https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc',
+        { method: 'POST' },
+      ),
+    );
+    const html = await response.text();
+
+    expect(html).toContain('<html lang="fr">');
   });
 
   it('resolves the tenant from the request Host header', async () => {

@@ -55,9 +55,11 @@ jobs:
 
   # Apply any un-applied content migrations to production BEFORE new code is
   # served. `environment: production` gates this on the required reviewer (the
-  # human check), and every step is guarded on the migrate token so the whole job
-  # is a no-op until SANITY_MIGRATE_TOKEN is configured — safe to land ahead of
-  # the console setup.
+  # human check). A missing SANITY_MIGRATE_TOKEN fails this job rather than
+  # skipping its steps: only steps can be conditional, not the job, so a
+  # silently inert migrate job still satisfies `deploy-web`'s `needs` and the
+  # release ships new code against un-migrated content — with the dataset
+  # backup that would make it recoverable skipped too.
   migrate:
     name: Migrate prod content
     needs: verify
@@ -83,11 +85,14 @@ jobs:
       # upload it as an artifact BEFORE any mutation, so a bad migration is
       # recoverable.
       - name: Back up production dataset
-        if: ${{ env.SANITY_AUTH_TOKEN != '' }}
         working-directory: packages/studio
-        run: pnpm dataset:export "${RUNNER_TEMP}/prod-${GITHUB_REF_NAME}.tar.gz"
+        run: |
+          set -euo pipefail
+          # Checked here rather than in an `if:`, because a skipped step reports
+          # green and a release that migrated nothing would look successful.
+          : "${SANITY_AUTH_TOKEN:?empty — set the SANITY_MIGRATE_TOKEN secret on the production environment}"
+          pnpm dataset:export "${RUNNER_TEMP}/prod-${GITHUB_REF_NAME}.tar.gz"
       - name: Upload backup artifact
-        if: ${{ env.SANITY_AUTH_TOKEN != '' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: sanity-prod-backup-${{ github.ref_name }}
@@ -99,18 +104,22 @@ jobs:
       # CI=true which (with --yes) skips the interactive confirm; the approval
       # gate above is the real human check.
       - name: Apply pending migrations
-        if: ${{ env.SANITY_AUTH_TOKEN != '' }}
         working-directory: packages/studio
-        run: pnpm migrate:deploy --yes
+        run: |
+          set -euo pipefail
+          : "${SANITY_AUTH_TOKEN:?empty — set the SANITY_MIGRATE_TOKEN secret on the production environment}"
+          pnpm migrate:deploy --yes
 
   # Apply any un-applied Drizzle/db schema migrations to production BEFORE
   # new code is served — the same discipline as the content `migrate` job
   # above, for the separate relational store (`packages/db`, see
   # .claude/agents/db.md's "Migrations" section). `environment: production`
   # reuses the SAME required-reviewer gate as every other production job —
-  # no second approval mechanism. Every step is guarded on
-  # DATABASE_URL_UNPOOLED so the whole job is a no-op until that secret is
-  # configured — safe to land ahead of the console setup. `deploy-web` and
+  # no second approval mechanism. A missing DATABASE_URL_UNPOOLED fails this
+  # job rather than skipping its steps, for the same reason the content
+  # `migrate` job above does: an inert-but-green job satisfies the deploy
+  # jobs' `needs` and ships new code against an un-migrated schema, with the
+  # pg_dump backup skipped along with the migration. `deploy-web` and
   # `deploy-admin` both depend on `@blog/db` (the Studio never touches
   # Postgres), so only those two `need` this job below.
   migrate-db:
@@ -143,9 +152,11 @@ jobs:
       # connection string fails the job instead of silently skipping the
       # check.
       - name: Guard against a mis-set production target
-        if: ${{ env.DATABASE_URL_UNPOOLED != '' }}
         run: |
           set -euo pipefail
+          # Checked here rather than in an `if:`, because a skipped step reports
+          # green and a release that migrated nothing would look successful.
+          : "${DATABASE_URL_UNPOOLED:?empty — set the DATABASE_URL_UNPOOLED secret on the production environment}"
           if [ -z "${PRODUCTION_DB_HOST:-}" ]; then
             echo "::error::PRODUCTION_DB_HOST is unset — refusing to migrate without the production-host guard in place. Set it as a repo-level Variable (see docs/DEPLOY.md)." >&2
             exit 1
@@ -182,9 +193,9 @@ jobs:
       # doesn't repoint `pg_dump` — the versioned binary under
       # `/usr/lib/postgresql/17/bin/` has to be invoked explicitly.
       - name: Back up production database
-        if: ${{ env.DATABASE_URL_UNPOOLED != '' }}
         run: |
           set -euo pipefail
+          : "${DATABASE_URL_UNPOOLED:?empty — set the DATABASE_URL_UNPOOLED secret on the production environment}"
           PG_VERSION=17
           sudo apt-get install -y postgresql-common
           sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
@@ -192,7 +203,6 @@ jobs:
           sudo apt-get install -y "postgresql-client-${PG_VERSION}"
           "/usr/lib/postgresql/${PG_VERSION}/bin/pg_dump" "$DATABASE_URL_UNPOOLED" --format=custom --file="${RUNNER_TEMP}/prod-db-${GITHUB_REF_NAME}.dump"
       - name: Upload backup artifact
-        if: ${{ env.DATABASE_URL_UNPOOLED != '' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: db-prod-backup-${{ github.ref_name }}
@@ -204,8 +214,10 @@ jobs:
       # is a no-op. The `production` environment's required reviewer above
       # is the human approval gate (same one every other prod job uses).
       - name: Apply pending db migrations
-        if: ${{ env.DATABASE_URL_UNPOOLED != '' }}
-        run: pnpm --filter @blog/db db:migrate
+        run: |
+          set -euo pipefail
+          : "${DATABASE_URL_UNPOOLED:?empty — set the DATABASE_URL_UNPOOLED secret on the production environment}"
+          pnpm --filter @blog/db db:migrate
 
   deploy-web:
     name: Deploy prod web

@@ -54,7 +54,6 @@ function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
     status: 'ACTIVE',
     provisioningStatus: 'PROVISIONING',
     provisioningSteps: null,
-    studioVercelProjectId: 'prj_studio',
     seededAt: new Date(),
     webhookCreatedAt: null,
     createdAt: new Date(),
