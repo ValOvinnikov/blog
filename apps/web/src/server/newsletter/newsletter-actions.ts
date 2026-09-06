@@ -78,13 +78,21 @@ export const subscribeToNewsletterAction = async (
     // `env.NEWSLETTER_FROM_ADDRESS` (server-only) would throw under Vitest's
     // jsdom environment; reading it lazily here keeps importing this module
     // safe from a client boundary.
-    const { logoImageUrl, footerPostalAddress, fromAddress, replyTo } =
-      await resolveNewsletterEmailSettings(
-        tenantId,
-        env.NEWSLETTER_FROM_ADDRESS,
-      );
+    const {
+      subject,
+      body,
+      logoImageUrl,
+      footerPostalAddress,
+      fromAddress,
+      replyTo,
+    } = await resolveNewsletterEmailSettings(
+      tenantId,
+      env.NEWSLETTER_FROM_ADDRESS,
+    );
 
-    const { subject, html, headers } = buildNewsletterConfirmationEmail({
+    const { html, headers } = buildNewsletterConfirmationEmail({
+      subject,
+      body,
       confirmationUrl,
       unsubscribeUrl,
       brand,

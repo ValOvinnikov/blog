@@ -24,10 +24,10 @@ export type TDeprovisionTenantControlProps = {
  * The tenant status page's danger-zone control. A live tenant gets a
  * confirm-dialog trigger requiring its name to be typed exactly, same
  * confirm-before-destructive-action posture as `deprovision-tenant.yml`
- * itself; there is no live progress feed after dispatch — the workflow
- * writes the tenant row directly, so the operator sees the result on a
- * later refresh. An already-archived tenant instead gets a read-only status
- * row plus the hard-delete escape hatch, confirmed the same way.
+ * itself — `DeprovisioningStatusView`, rendered below this once a run
+ * exists, is what shows the dispatched workflow's live progress. An
+ * already-archived tenant instead gets a read-only status row plus the
+ * hard-delete escape hatch, confirmed the same way.
  */
 export const DeprovisionTenantControl = ({
   tenant,

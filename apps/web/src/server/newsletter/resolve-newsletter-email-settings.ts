@@ -1,10 +1,12 @@
 import { EMAIL_TEMPLATE_TYPE } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import { isValidEmailAddress } from '@blog/email';
+import { EMAIL_TEMPLATE_DEFAULT_COPY, queries } from '@blog/db';
+import { isValidEmailAddress, type TPortableTextContent } from '@blog/email';
 import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address';
 import { logger } from '@web/utils/logger/logger';
 
 export type TNewsletterEmailSettings = {
+  subject: string;
+  body: TPortableTextContent;
   logoImageUrl: string | undefined;
   footerPostalAddress: string | undefined;
   fromAddress: string;
@@ -47,15 +49,12 @@ const getEmailConfigSafely = async (tenantId: string) => {
   }
 };
 
-const getEmailTemplateLogoSafely = async (
-  tenantId: string,
-): Promise<string | undefined> => {
+const getEmailTemplateSafely = async (tenantId: string) => {
   try {
-    const template = await queries.emailTemplates.getEmailTemplate(
+    return await queries.emailTemplates.getEmailTemplate(
       tenantId,
       EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
     );
-    return template.logoAssetUrl;
   } catch (error) {
     logger.warn('newsletter_email_settings.email_template_fetch_failed', {
       tenantId,
@@ -67,19 +66,22 @@ const getEmailTemplateLogoSafely = async (
 
 /**
  * Resolves the tenant-configurable parts of a newsletter confirmation send —
- * logo, sender display name, reply-to and footer postal address — layering
- * `email_config` under the per-template logo and falling back to product
- * defaults on any settings-load failure so a broken query never blocks
- * delivery.
+ * authored subject/body, logo, sender display name, reply-to and footer
+ * postal address — layering `email_config` under the per-template row and
+ * falling back to product defaults on any settings-load failure so a broken
+ * query never blocks delivery.
  */
 export const resolveNewsletterEmailSettings = async (
   tenantId: string,
   configuredFromAddress: string | undefined,
 ): Promise<TNewsletterEmailSettings> => {
-  const [emailConfig, templateLogoImageUrl] = await Promise.all([
+  const [emailConfig, template] = await Promise.all([
     getEmailConfigSafely(tenantId),
-    getEmailTemplateLogoSafely(tenantId),
+    getEmailTemplateSafely(tenantId),
   ]);
+
+  const defaultCopy =
+    EMAIL_TEMPLATE_DEFAULT_COPY[EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION];
 
   const replyToAddress = emailConfig?.replyToAddress;
   const replyTo =
@@ -92,7 +94,9 @@ export const resolveNewsletterEmailSettings = async (
   }
 
   return {
-    logoImageUrl: templateLogoImageUrl ?? emailConfig?.logoAssetUrl,
+    subject: template?.subject ?? defaultCopy.subject,
+    body: template?.body ?? defaultCopy.body,
+    logoImageUrl: template?.logoAssetUrl ?? emailConfig?.logoAssetUrl,
     footerPostalAddress: emailConfig?.footerPostalAddress,
     fromAddress: applySenderNameOverride(
       resolveNewsletterFromAddress(configuredFromAddress),

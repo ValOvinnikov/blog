@@ -1,5 +1,5 @@
-// Shared by the magic-link email builders, whose `host`/`url` (and, for
-// invites, tenant names) are interpolated into HTML without prior sanitization.
+// Shared by the magic-link email builders, whose `url` and, for invites,
+// tenant names are interpolated into HTML without prior sanitization.
 export function escapeHtml(value: string): string {
   return value
     .replace(/&/g, '&amp;')

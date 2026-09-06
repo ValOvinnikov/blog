@@ -40,10 +40,12 @@ export type TEmailTemplateEditorProps = {
 };
 
 /**
- * One template type's subject, body and logo, plus a live preview built
- * from the same `buildTenantEmail` the real send path calls. Remounted
- * (via a `key={templateType}` from its caller) rather than kept in sync
- * across template switches — each template type is its own editing session.
+ * One template type's subject, body and logo, plus a live preview of the
+ * authored copy — the surrounding structure (actions, headers, brand
+ * fallback) doesn't reproduce what any one template type actually sends.
+ * Remounted (via a `key={templateType}` from its caller) rather than kept
+ * in sync across template switches — each template type is its own editing
+ * session.
  */
 export const EmailTemplateEditor = ({
   tenantId,

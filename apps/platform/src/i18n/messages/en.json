@@ -569,6 +569,59 @@
     "runFinishedPending": "—",
     "runWorkflowLogLink": "Workflow log"
   },
+  "deprovisioningStatusView": {
+    "cardTitle": "Deprovisioning progress",
+    "startingBadge": "Starting…",
+    "preRunStepStatusLabel": "Queued",
+    "stepLabel": {
+      "REMOVE_DOMAIN": "Remove domain",
+      "ARCHIVE_SANITY_PROJECT": "Archive Sanity project",
+      "REVOKE_SANITY_TOKENS": "Revoke Sanity tokens",
+      "CLEAR_ARTIFACTS": "Clear provisioning artifacts",
+      "ARCHIVE_TENANT": "Archive tenant",
+      "INVALIDATE_TENANT_CACHE": "Invalidate cached pages"
+    },
+    "statusLabel": {
+      "IDLE": "Not started",
+      "RUNNING": "Running…",
+      "DONE": "Complete",
+      "FAILED": "Failed"
+    },
+    "stepRunningNow": "now",
+    "failedStepLabel": "Failed while running \"{step}\".",
+    "errorKind": {
+      "permission": {
+        "headline": "Missing permission to complete this step",
+        "body": "The teardown credentials aren't allowed to do what this step needs — often revoking a token or removing a project member. It may need to be finished manually in the Sanity Manage or Vercel dashboard.",
+        "nextStep": "Grant the missing permission, then re-dispatch teardown."
+      },
+      "duplicate": {
+        "headline": "Already in use elsewhere",
+        "body": "Something this step is trying to remove or reassign — a domain mapping, a token — is already claimed or referenced elsewhere.",
+        "nextStep": "Resolve the conflict, then re-dispatch teardown."
+      },
+      "network": {
+        "headline": "Couldn't reach the teardown service",
+        "body": "The request to Sanity or Vercel timed out or the connection dropped before finishing. This is often temporary.",
+        "nextStep": "Wait a moment, then re-dispatch teardown."
+      },
+      "unknown": {
+        "headline": "This step failed",
+        "body": "Teardown hit an error that isn't recognized yet. The technical details below may help diagnose it.",
+        "nextStep": "Re-dispatch teardown, or check the technical details before asking for help."
+      }
+    },
+    "technicalDetailsToggle": "Technical details",
+    "relativeJustNow": "Just now",
+    "relativeMinutesAgo": "{minutes}m ago",
+    "relativeHoursAgo": "{hours}h ago",
+    "relativeDaysAgo": "{days}d ago",
+    "runCardTitle": "Run",
+    "runStartedLabel": "Started",
+    "runFinishedLabel": "Finished",
+    "runFinishedPending": "—",
+    "runWorkflowLogLink": "Workflow log"
+  },
   "tenantDangerPage": {
     "title": "Danger zone",
     "description": "Irreversible actions for this tenant. Restricted to superadmins."
