@@ -1,17 +1,36 @@
-// A deliberately loose format check — not RFC 5322 validation. This gates
-// two things: `NewsletterForm`'s client-side check (skip the round-trip for
-// an obviously malformed address) and `subscribeToNewsletterAction`'s
-// server-side re-check (never trust the client-only pass). Real
-// deliverability is Resend's problem, not this function's.
-const EMAIL_FORMAT_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const WHITESPACE_PATTERN = /\s/;
 
 /**
  * isValidEmail — shared email-format check for the newsletter signup flow.
+ * Deliberately loose — not RFC 5322 validation. Gates `NewsletterForm`'s
+ * client-side check and `subscribeToNewsletterAction`'s server-side
+ * re-check; real deliverability is Resend's problem, not this function's.
+ *
+ * Implemented with index/split logic rather than a single regex: a
+ * `[^\s@]+\.[^\s@]+` pattern lets `.` satisfy either unbounded run, which
+ * is polynomial-time backtracking on non-matching input.
  *
  * @example
  * isValidEmail('reader@example.com') // true
  * isValidEmail('not-an-email') // false
  */
 export const isValidEmail = (email: string): boolean => {
-  return EMAIL_FORMAT_PATTERN.test(email.trim());
+  const trimmed = email.trim();
+  const parts = trimmed.split('@');
+  if (parts.length !== 2) {
+    return false;
+  }
+
+  const [localPart, domainPart] = parts;
+  if (!localPart || !domainPart) {
+    return false;
+  }
+  if (
+    WHITESPACE_PATTERN.test(localPart) ||
+    WHITESPACE_PATTERN.test(domainPart)
+  ) {
+    return false;
+  }
+
+  return domainPart.length >= 3 && domainPart.slice(1, -1).includes('.');
 };
