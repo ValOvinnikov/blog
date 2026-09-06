@@ -9,51 +9,25 @@ describe(`<${NotFoundPage.name}/>`, () => {
     setup();
   });
 
+  it('renders the eyebrow', () => {
+    expect(screen.getByText('404')).toBeVisible();
+  });
+
   it('renders a single h1 landmark heading', () => {
     expect(
-      screen.getByRole('heading', { level: 1, name: '404' }),
+      screen.getByRole('heading', { level: 1, name: 'Page not found' }),
     ).toBeVisible();
   });
 
-  it('renders the terminal-styled "Not found" copy', () => {
-    expect(screen.getByText('404: Not found')).toBeVisible();
+  it('renders the supporting text', () => {
+    expect(
+      screen.getByText("The page you're looking for doesn't exist."),
+    ).toBeVisible();
   });
 
   it('renders a link back home', () => {
     const link = screen.getByRole('link', { name: 'Return home' });
     expect(link).toHaveAttribute('href', '/');
-  });
-
-  it('renders the decorative arrow icon inside the link', () => {
-    const link = screen.getByRole('link', { name: 'Return home' });
-    expect(
-      within(link).getByTestId('not-found-arrow-icon'),
-    ).toBeInTheDocument();
-  });
-});
-
-describe(`<${NotFoundPage.name}/> (plain)`, () => {
-  const setupPlain = customRender(NotFoundPage, { isPlain: true });
-
-  beforeEach(() => {
-    setupPlain();
-  });
-
-  it('renders a single h1 landmark heading', () => {
-    expect(
-      screen.getByRole('heading', { level: 1, name: '404' }),
-    ).toBeVisible();
-  });
-
-  it('renders the plain "Not found" copy with no TerminalChip prompt styling', () => {
-    expect(screen.getByText('Not found')).toBeVisible();
-    expect(screen.queryByText('404: Not found')).not.toBeInTheDocument();
-  });
-
-  it('renders a plain link back home with no "cd ~" prompt-line styling', () => {
-    const link = screen.getByRole('link', { name: 'Return home' });
-    expect(link).toHaveAttribute('href', '/');
-    expect(screen.queryByText('cd ~')).not.toBeInTheDocument();
   });
 
   it('renders the decorative arrow icon inside the link', () => {

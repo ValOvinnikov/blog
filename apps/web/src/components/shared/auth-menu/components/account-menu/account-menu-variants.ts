@@ -11,6 +11,7 @@ export const accountMenuVariants = tv({
     // Guards the flex-wrap header row — the trigger's `avatar` variant
     // already sizes/shapes it to match the 32px `Avatar` it wraps.
     avatarTrigger: ['shrink-0'],
+    label: ['mb-3'],
     acctRow: ['mb-2 flex items-center gap-2 border-b border-border pb-3'],
     accountName: ['font-mono text-copy text-text'],
     accountEmail: ['font-mono text-meta text-subtle'],

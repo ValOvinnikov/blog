@@ -9,12 +9,11 @@ export const contentType = 'image/png';
 
 // Satori (the `next/og` renderer) needs literal hex colours — it can't read
 // the site's OKLCH design tokens (`--logo-1/2/3`, `--bg`, `--text*` in
-// `configs/tailwind/theme.css`). These are derived via `oklchToHex` from that
-// dark-mode palette's OKLCH triples (Console brand variant only). The dark
-// palette is used regardless of the visitor's system theme: this is a
-// single static asset shared by every share surface, so it can't itself
-// respond to `prefers-color-scheme` the way the favicon route (`icon.tsx`)
-// does.
+// `configs/tailwind/theme.css`). These are derived via `oklchToHex` from a
+// fixed dark-mode OKLCH palette, not the tenant's own theme. That palette is
+// used regardless of the visitor's system theme: this is a single static
+// asset shared by every share surface, so it can't itself respond to
+// `prefers-color-scheme` the way the favicon route (`icon.tsx`) does.
 const COLORS = {
   bg: oklchToHex(0.17, 0.006, 250),
   logo1: oklchToHex(0.58, 0.17, 250),
@@ -103,8 +102,8 @@ export type TBuildDefaultSocialImageOptions = {
 };
 
 /**
- * Renders the site's default OG/Twitter share image (Console brand variant
- * only) — the fallback used whenever a route has no more specific
+ * Renders the site's default OG/Twitter share image from a fixed dark
+ * palette — the fallback used whenever a route has no more specific
  * `seo.ogImageUrl` (see `toMetadata`). Shared by `opengraph-image.tsx` and
  * `twitter-image.tsx`, which use identical 1200×630 `summary_large_image`
  * dimensions, so one implementation covers both file conventions.

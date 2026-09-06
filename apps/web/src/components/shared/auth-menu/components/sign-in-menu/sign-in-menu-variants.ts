@@ -2,17 +2,8 @@ import { tv } from 'tailwind-variants';
 
 export const signInMenuVariants = tv({
   slots: {
-    cmdLine: [
-      'mb-3 flex items-center gap-1.5',
-      'font-mono text-copy text-muted',
-    ],
-    cmdPrompt: ['text-brand-primary'],
-    cmdCursor: [
-      'inline-block h-[1em] w-[0.5ch] bg-brand-primary',
-      'animate-[blink_1s_steps(1)_infinite]',
-    ],
-    plainLabel: ['mb-3'],
-    plainPrompt: ['mb-3'],
+    label: ['mb-3'],
+    providerPrompt: ['mb-3'],
     providerButton: ['mt-2'],
     hint: ['mt-3 font-mono text-meta text-subtle'],
     // Deliberately a sibling of `PopoverMenu.Panel`, not a child of it — the

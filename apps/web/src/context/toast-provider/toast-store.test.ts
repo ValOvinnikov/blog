@@ -11,8 +11,7 @@ import {
 } from './toast-store';
 
 const buildPayload = (overrides?: Partial<IToastPayload>): IToastPayload => ({
-  command: 'Bookmark',
-  state: 'Saved',
+  title: 'Bookmark',
   message: 'Saved to bookmarks',
   ...overrides,
 });
@@ -36,8 +35,8 @@ describe(createToastStore, () => {
       expect(store.getState().visible[0]).toMatchObject({
         id,
         type: TOAST_TYPE.SUCCESS,
-        command: 'Bookmark',
-        state: 'Saved',
+        title: 'Bookmark',
+        message: 'Saved to bookmarks',
         phase: 'entering',
         paused: false,
         durationMs: TOAST_DEFAULT_LIFE_MS[TOAST_TYPE.SUCCESS],
@@ -154,18 +153,18 @@ describe(createToastStore, () => {
 
       const firstId = store.actions.show(
         TOAST_TYPE.SUCCESS,
-        buildPayload({ state: 'Saved', coalesceKey: key }),
+        buildPayload({ message: 'Saved', coalesceKey: key }),
       );
       const secondId = store.actions.show(
         TOAST_TYPE.INFO,
-        buildPayload({ state: 'Removed', coalesceKey: key }),
+        buildPayload({ message: 'Removed', coalesceKey: key }),
       );
 
       expect(secondId).toBe(firstId);
       expect(store.getState().visible).toHaveLength(1);
       expect(store.getState().visible[0]).toMatchObject({
         type: TOAST_TYPE.INFO,
-        state: 'Removed',
+        message: 'Removed',
       });
     });
 
@@ -320,10 +319,13 @@ describe(createToastStore, () => {
 
     it('dismisses the newest toast when no id is given', () => {
       const store = createToastStore();
-      store.actions.show(TOAST_TYPE.SUCCESS, buildPayload({ state: 'first' }));
+      store.actions.show(
+        TOAST_TYPE.SUCCESS,
+        buildPayload({ message: 'first' }),
+      );
       const secondId = store.actions.show(
         TOAST_TYPE.SUCCESS,
-        buildPayload({ state: 'second', coalesceKey: 'irrelevant' }),
+        buildPayload({ message: 'second', coalesceKey: 'irrelevant' }),
       );
 
       store.actions.dismiss();
@@ -372,13 +374,12 @@ describe(createToastStore, () => {
       const deferred = Promise.resolve('~/bookmarks');
 
       const returned = store.actions.promise(deferred, {
-        command: 'Bookmark',
-        loading: { state: 'Saving', message: 'saving…' },
+        loading: { title: 'Saving', message: 'saving…' },
         success: (value) => ({
-          state: 'Saved',
+          title: 'Saved',
           message: `stashed to ${value}`,
         }),
-        error: { state: 'Failed', message: '! failed' },
+        error: { title: 'Failed', message: '! failed' },
       });
 
       expect(returned).toBe(deferred);
@@ -401,10 +402,9 @@ describe(createToastStore, () => {
       });
 
       store.actions.promise(pending, {
-        command: 'Bookmark',
-        loading: { state: 'Saving', message: 'saving…' },
-        success: { state: 'Saved', message: 'saved' },
-        error: { state: 'Failed', message: 'failed' },
+        loading: { title: 'Saving', message: 'saving…' },
+        success: { title: 'Saved', message: 'saved' },
+        error: { title: 'Failed', message: 'failed' },
       });
 
       await vi.advanceTimersByTimeAsync(TOAST_PROMISE_GRACE_MS);
@@ -424,7 +424,7 @@ describe(createToastStore, () => {
         id: loadingId,
         type: TOAST_TYPE.SUCCESS,
         isLoading: false,
-        state: 'Saved',
+        title: 'Saved',
         durationMs: TOAST_DEFAULT_LIFE_MS[TOAST_TYPE.SUCCESS],
       });
     });
@@ -437,10 +437,9 @@ describe(createToastStore, () => {
       });
 
       const returned = store.actions.promise(pending, {
-        command: 'Bookmark',
-        loading: { state: 'Saving', message: 'saving…' },
-        success: { state: 'Saved', message: 'saved' },
-        error: { state: 'Failed', message: '! failed' },
+        loading: { title: 'Saving', message: 'saving…' },
+        success: { title: 'Saved', message: 'saved' },
+        error: { title: 'Failed', message: '! failed' },
       });
       // The store's own internal `.then` must not surface as an unhandled
       // rejection warning independently from this assertion's own handling.
@@ -453,7 +452,7 @@ describe(createToastStore, () => {
       expect(store.getState().visible[0]).toMatchObject({
         type: TOAST_TYPE.ERROR,
         isLoading: false,
-        state: 'Failed',
+        title: 'Failed',
         durationMs: undefined,
       });
     });
@@ -466,10 +465,9 @@ describe(createToastStore, () => {
       });
 
       store.actions.promise(pending, {
-        command: 'Bookmark',
-        loading: { state: 'Saving', message: 'saving…' },
-        success: { state: 'Saved', message: 'saved' },
-        error: { state: 'Failed', message: 'failed' },
+        loading: { title: 'Saving', message: 'saving…' },
+        success: { title: 'Saved', message: 'saved' },
+        error: { title: 'Failed', message: 'failed' },
       });
 
       await vi.advanceTimersByTimeAsync(TOAST_PROMISE_GRACE_MS);

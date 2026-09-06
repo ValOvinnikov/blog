@@ -47,7 +47,7 @@ export const TagPage = async ({
   const siteUrl = (await getTenantBaseUrl(tenant)) ?? '';
   const breadcrumbTrail: IBreadcrumbItem[] = [
     { label: breadcrumbsT('home'), href: routes.home() },
-    { label: tagPageT('label', { name: tag.title }), href: routes.tag(slug) },
+    { label: tag.title, href: routes.tag(slug) },
   ];
   const breadcrumbListSchema = buildBreadcrumbListSchema(
     breadcrumbTrail,

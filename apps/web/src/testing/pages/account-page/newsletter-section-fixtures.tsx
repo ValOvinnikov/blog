@@ -6,10 +6,7 @@ export const makeNewsletterSectionView = (
   overrides: Partial<INewsletterSectionViewProps> = {},
 ): INewsletterSectionViewProps => {
   return {
-    isChromeOn: true,
-    handle: 'jane',
-    promptHost: '',
-    promptCommand: 'Newsletter',
+    heading: 'Newsletter',
     status: 'active',
     label: 'Newsletter',
     email: 'jane@example.com',

@@ -20,7 +20,7 @@ export interface ITagPageViewProps {
 
 /**
  * Pure view for `TagPage` — shared by `/tags/[slug]` and
- * `/tags/[slug]/page/[page]`: the `Home › Tag: {name}` breadcrumb trail
+ * `/tags/[slug]/page/[page]`: the `Home › {name}` breadcrumb trail
  * (plus its `BreadcrumbList` JSON-LD) as a sibling before `<main>`, then the
  * archive shell itself via `BlogPageTemplate`. `postsContent` is
  * pre-rendered by the wrapper (`PostListModule` + `ModuleRenderer`) since

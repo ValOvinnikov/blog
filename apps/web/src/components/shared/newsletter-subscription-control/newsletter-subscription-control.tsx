@@ -36,24 +36,12 @@ export const NewsletterSubscriptionControl = ({
   const [isPending, startTransition] = useTransition();
 
   const isUnsubscribe = action === 'unsubscribe';
-  const commandKey = isUnsubscribe
-    ? 'unsubscribeToastCommand'
-    : 'resendToastCommand';
-  const loadingStateKey = isUnsubscribe
-    ? 'unsubscribeToastLoadingState'
-    : 'resendToastLoadingState';
   const loadingMessageKey = isUnsubscribe
     ? 'unsubscribeToastLoadingMessage'
     : 'resendToastLoadingMessage';
-  const successStateKey = isUnsubscribe
-    ? 'unsubscribeToastSuccessState'
-    : 'resendToastSuccessState';
   const successMessageKey = isUnsubscribe
     ? 'unsubscribeToastSuccessMessage'
     : 'resendToastSuccessMessage';
-  const errorStateKey = isUnsubscribe
-    ? 'unsubscribeToastErrorState'
-    : 'resendToastErrorState';
   const errorMessageKey = isUnsubscribe ? 'unsubscribeError' : 'resendError';
 
   const handleClick = () => {
@@ -68,19 +56,9 @@ export const NewsletterSubscriptionControl = ({
             return result;
           })(),
           {
-            command: t(commandKey),
-            loading: {
-              state: t(loadingStateKey),
-              message: t(loadingMessageKey),
-            },
-            success: {
-              state: t(successStateKey),
-              message: t(successMessageKey),
-            },
-            error: {
-              state: t(errorStateKey),
-              message: t(errorMessageKey),
-            },
+            loading: { message: t(loadingMessageKey) },
+            success: { message: t(successMessageKey) },
+            error: { message: t(errorMessageKey) },
           },
         );
       } catch {

@@ -1,13 +1,13 @@
 /**
- * Derives the `WindowChrome.User` segment for a signed-in reader from real
- * session data — never a hardcoded placeholder. Prefers the email's local
- * part (matches the mock's terminal-`whoami` voice: a username, not a full
- * display name); falls back to `name` lowercased with whitespace stripped
- * (not a true slugify — punctuation/diacritics pass through untouched), then
- * a generic noun if the session has neither. Each branch checks the
- * *transformed* result for actual non-emptiness before returning it — an
- * empty-local-part email (`@example.com`) or a whitespace-only `name`
- * transform to `''`, which must fall through rather than render blank.
+ * Derives a signed-in reader's display handle from real session data —
+ * never a hardcoded placeholder. Prefers the email's local part (a
+ * username, not a full display name); falls back to `name` lowercased with
+ * whitespace stripped (not a true slugify — punctuation/diacritics pass
+ * through untouched), then a generic noun if the session has neither. Each
+ * branch checks the *transformed* result for actual non-emptiness before
+ * returning it — an empty-local-part email (`@example.com`) or a
+ * whitespace-only `name` transform to `''`, which must fall through rather
+ * than render blank.
  */
 export const toSessionUsername = (
   name?: string | null,

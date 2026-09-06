@@ -100,19 +100,9 @@ describe(`<${DeleteAccountControl.name}/>`, () => {
     });
 
     expect(toastPromiseMock).toHaveBeenCalledWith(expect.any(Promise), {
-      command: 'Account',
-      loading: {
-        state: 'Deleting',
-        message: 'Deleting your account…',
-      },
-      success: {
-        state: 'Deleted',
-        message: 'Your account has been deleted.',
-      },
-      error: {
-        state: 'Failed',
-        message: "Couldn't delete your account. Try again.",
-      },
+      loading: { message: 'Deleting your account…' },
+      success: { message: 'Your account has been deleted.' },
+      error: { message: "Couldn't delete your account. Try again." },
     });
   });
 

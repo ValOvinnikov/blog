@@ -1,6 +1,5 @@
 import { routes } from '@blog/config';
 import { auth } from '@web/server/auth/auth';
-import { getChromeOn } from '@web/utils/get-chrome-on';
 import { toSessionUsername } from '@web/utils/to-session-username';
 import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
@@ -20,10 +19,9 @@ export const AccountPage = async () => {
   const { name, email } = session.user;
   const handle = toSessionUsername(name, email);
 
-  const [t, tPrivacy, chromeOn] = await Promise.all([
+  const [t, tPrivacy] = await Promise.all([
     getTranslations('accountPage'),
     getTranslations('accountPage.privacy'),
-    getChromeOn(),
   ]);
 
   return (
@@ -34,10 +32,7 @@ export const AccountPage = async () => {
       privacySection={
         <PrivacySection
           handle={handle}
-          isChromeOn={chromeOn}
-          promptHost={tPrivacy('promptHost')}
-          promptCommand={tPrivacy('promptCommand')}
-          promptTag={tPrivacy('promptTag')}
+          heading={tPrivacy('heading')}
           exportLabel={tPrivacy('exportLabel')}
           exportDescription={tPrivacy('exportDescription')}
           exportButton={tPrivacy('exportButton')}

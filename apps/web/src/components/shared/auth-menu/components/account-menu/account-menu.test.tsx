@@ -16,12 +16,9 @@ import { AccountMenu, type TAccountMenuProps } from './account-menu';
  * This wrapper stands in for that parent so the panel can actually open/close
  * under test the same way it does inside `AuthMenu`.
  */
-type TWrapperProps = Pick<
-  TAccountMenuProps,
-  'name' | 'email' | 'image' | 'isPlain'
->;
+type TWrapperProps = Pick<TAccountMenuProps, 'name' | 'email' | 'image'>;
 
-const Wrapper = ({ name, email, image, isPlain }: TWrapperProps) => {
+const Wrapper = ({ name, email, image }: TWrapperProps) => {
   const panelId = useId();
   const { open, toggle, triggerRef, panelRef } = usePopover();
 
@@ -35,7 +32,6 @@ const Wrapper = ({ name, email, image, isPlain }: TWrapperProps) => {
       name={name}
       email={email}
       image={image}
-      isPlain={isPlain}
     />
   );
 };
@@ -101,35 +97,38 @@ describe(`<${AccountMenu.name}/>`, () => {
     expect(getTriggerImage()).toBeInTheDocument();
   });
 
-  it('renders the WindowChrome terminal bar when chromeOn (plain unset)', async () => {
+  it('renders a plain "Account" label — not a heading — and the session name/email', async () => {
     setup();
     const user = userEvent.setup();
 
     await user.click(screen.getByRole('button', { name: 'Account menu' }));
     const panel = screen.getByRole('menu');
 
-    expect(panel.textContent).toMatch(/jane\s+Account/);
-  });
-
-  it('renders a plain user-info row and link list with no terminal bar when plain', async () => {
-    const setupPlain = customRender(Wrapper, {
-      name: 'Jane Doe',
-      email: 'jane@example.com',
-      image: 'https://example.com/broken-avatar.png',
-      isPlain: true,
-    });
-    setupPlain();
-    const user = userEvent.setup();
-
-    await user.click(screen.getByRole('button', { name: 'Account menu' }));
-    const panel = screen.getByRole('menu');
-
+    // `role="menu"` doesn't own heading elements per the ARIA menu pattern,
+    // and this panel renders ahead of every page's own `<h1>` — the title
+    // must stay a plain styled label, never a real heading.
+    expect(within(panel).queryByRole('heading')).not.toBeInTheDocument();
+    expect(within(panel).getByText('Account')).toBeVisible();
     expect(within(panel).getAllByText('Jane Doe').length).toBeGreaterThan(0);
     expect(within(panel).getByText('jane@example.com')).toBeVisible();
     expect(
       screen.getByRole('menuitem', { name: 'My bookmarks' }),
     ).toBeVisible();
     expect(screen.getByRole('menuitem', { name: 'Sign out' })).toBeVisible();
-    expect(panel.textContent).not.toMatch(/jane\s+Account/);
+  });
+
+  it('renders the popover panel with its own visible surface (border/bg/shadow), not a transparent shell', async () => {
+    setup();
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Account menu' }));
+    const panel = screen.getByRole('menu');
+
+    expect(panel).toHaveClass('bg-surface');
+    expect(panel).not.toHaveClass('bg-transparent');
+    expect(panel).not.toHaveClass('border-0');
+    expect(panel).not.toHaveClass('shadow-none');
+    expect(panel).not.toHaveClass('rounded-none');
+    expect(panel).not.toHaveClass('p-0');
   });
 });

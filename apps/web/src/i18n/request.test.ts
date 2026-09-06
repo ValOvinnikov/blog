@@ -19,9 +19,8 @@ describe('i18n request config', () => {
 
     expect(config.locale).toBe('EN');
     expect(
-      (config.messages as { notFound: { commandNotFound: string } }).notFound
-        .commandNotFound,
-    ).toBe('Not found');
+      (config.messages as { notFound: { heading: string } }).notFound.heading,
+    ).toBe('Page not found');
   });
 
   it('falls back to the default locale when requestLocale is unsupported', async () => {

@@ -6,11 +6,11 @@ import { NewsletterSectionView } from './newsletter-section-view';
 const setup = customRender(NewsletterSectionView, makeNewsletterSectionView());
 
 describe(NewsletterSectionView, () => {
-  it('renders the bar as a level-2 heading with the resolved prompt copy', () => {
+  it('renders the panel heading as a level-2 heading', () => {
     setup();
 
     expect(
-      screen.getByRole('heading', { level: 2, name: /Newsletter/ }),
+      screen.getByRole('heading', { level: 2, name: 'Newsletter' }),
     ).toBeVisible();
   });
 
@@ -36,17 +36,5 @@ describe(NewsletterSectionView, () => {
     ).toBeVisible();
     expect(screen.queryByText('jane@example.com')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Resend' })).toBeVisible();
-  });
-
-  describe('plain (isChromeOn: false)', () => {
-    it('renders a plain section heading + card with no terminal shell', () => {
-      setup({ isChromeOn: false });
-
-      expect(
-        screen.getByRole('heading', { level: 2, name: 'Newsletter' }),
-      ).toBeVisible();
-      expect(screen.getByText('Subscribed')).toBeVisible();
-      expect(screen.getByRole('button', { name: 'Unsubscribe' })).toBeVisible();
-    });
   });
 });

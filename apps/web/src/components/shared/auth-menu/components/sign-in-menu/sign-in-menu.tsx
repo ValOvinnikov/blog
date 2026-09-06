@@ -7,7 +7,6 @@ import { Icon } from '@blog/ui/atoms/icon';
 import { Text } from '@blog/ui/atoms/text';
 import { TextInput } from '@blog/ui/atoms/text-input';
 import { PopoverMenu } from '@blog/ui/molecules/popover-menu';
-import { WindowChrome } from '@blog/ui/molecules/window-chrome';
 import { authMenuVariants } from '@web/components/shared/auth-menu/auth-menu-variants';
 import { useEmailSignIn } from '@web/components/shared/auth-menu/hooks/use-email-sign-in';
 import { signIn } from 'next-auth/react';
@@ -25,17 +24,18 @@ export type TSignInMenuProps = {
   oauthError: string | null;
   /** Auth.js provider ids to render a button for, server-derived from credential presence. */
   oauthProviderIds: readonly TOAuthProviderId[];
-  /** Renders the panel without the `WindowChrome` terminal shell. */
-  isPlain?: boolean;
 };
 
 /**
- * `AuthMenu`'s logged-out render branch: a `PopoverMenu` dressed in the
- * `WindowChrome` terminal shell offering GitHub, Google, and an
- * inline-expanding email (magic-link) sign-in, plus the OAuth redirect-back
- * error notice. The email sub-flow's state machine lives in
- * `useEmailSignIn`; open/close state and refs come from the parent's single
- * `usePopover()` call — this component never calls `usePopover()` itself.
+ * `AuthMenu`'s logged-out render branch: a `PopoverMenu.Panel` offering
+ * GitHub, Google, and an inline-expanding email (magic-link) sign-in, plus
+ * the OAuth redirect-back error notice. The title is a plain styled label,
+ * not a heading — `role="menu"` doesn't own heading elements per the ARIA
+ * menu pattern, and this panel renders ahead of every page's own `<h1>` in
+ * `[tenant]/[locale]/layout.tsx`. The email sub-flow's state machine lives
+ * in `useEmailSignIn`; open/close state and refs come from the parent's
+ * single `usePopover()` call — this component never calls `usePopover()`
+ * itself.
  */
 export const SignInMenu = ({
   panelId,
@@ -45,7 +45,6 @@ export const SignInMenu = ({
   panelRef,
   oauthError,
   oauthProviderIds,
-  isPlain = false,
 }: TSignInMenuProps) => {
   const t = useTranslations('authMenu');
   const {
@@ -57,13 +56,10 @@ export const SignInMenu = ({
     emailFormRef,
     handleEmailSubmit,
   } = useEmailSignIn(isOpen);
-  const { panel, window: windowSize } = authMenuVariants();
+  const { panel } = authMenuVariants();
   const {
-    cmdLine,
-    cmdPrompt,
-    cmdCursor,
-    plainLabel,
-    plainPrompt,
+    label,
+    providerPrompt,
     providerButton,
     hint,
     errorNotice,
@@ -95,89 +91,6 @@ export const SignInMenu = ({
     oauthProviderIds.includes(providerId),
   );
 
-  const menuContent = (
-    <>
-      {isPlain ? (
-        <Text variant="card" className={plainPrompt()}>
-          {t('chooseProviderPrompt')}
-        </Text>
-      ) : (
-        <p className={cmdLine()}>
-          <span aria-hidden="true" className={cmdPrompt()}>
-            &gt;
-          </span>
-          {t('chooseProviderPrompt')}
-          <span aria-hidden="true" className={cmdCursor()} />
-        </p>
-      )}
-      {providers.map(({ providerId, icon, label }) => (
-        <PopoverMenu.Item
-          key={providerId}
-          variant="bordered"
-          className={providerButton()}
-          icon={<Icon name={icon} size={SIZE.SM} />}
-          onClick={() => signIn(providerId)}
-        >
-          {label}
-        </PopoverMenu.Item>
-      ))}
-      {emailStep === 'sent' && (
-        <p role="status" aria-live="polite" className={emailSent()}>
-          {t('checkYourInbox')}
-        </p>
-      )}
-      {emailStep === 'collapsed' && (
-        <PopoverMenu.Item
-          variant="bordered"
-          className={providerButton()}
-          onClick={() => setEmailStep('expanded')}
-        >
-          {t('continueWithEmail')}
-        </PopoverMenu.Item>
-      )}
-      {(emailStep === 'expanded' || emailStep === 'submitting') && (
-        <form
-          ref={emailFormRef}
-          className={emailForm()}
-          onSubmit={handleEmailSubmit}
-        >
-          <TextInput
-            type="email"
-            isRequired={true}
-            value={email}
-            onChange={setEmail}
-            ariaLabel={t('emailAriaLabel')}
-            placeholder={t('emailPlaceholder')}
-            leadingIcon={
-              <Icon
-                name={ICONS.CHEVRON_RIGHT}
-                size={SIZE.SM}
-                dataTestId="sign-in-prompt-icon"
-              />
-            }
-            isInvalid={emailError}
-            isDisabled={emailStep === 'submitting'}
-          />
-          {emailError && (
-            <p role="status" aria-live="polite" className={emailHint()}>
-              {t('emailError')}
-            </p>
-          )}
-          <div className={emailFormActions()}>
-            <Button
-              size={SIZE.SM}
-              isDisabled={emailStep === 'submitting'}
-              onClick={handleEmailSubmit}
-            >
-              {emailStep === 'submitting' ? t('sending') : t('sendLink')}
-            </Button>
-          </div>
-        </form>
-      )}
-      <p className={hint()}>{t('redirectHint')}</p>
-    </>
-  );
-
   return (
     <PopoverMenu>
       <PopoverMenu.Trigger
@@ -195,25 +108,79 @@ export const SignInMenu = ({
         id={panelId}
         isOpen={isOpen}
         ariaLabel={t('panelAriaLabel')}
-        className={isPlain ? windowSize() : panel()}
+        className={panel()}
       >
-        {isPlain ? (
-          <>
-            <Text variant="emphasis" className={plainLabel()}>
-              {t('signIn')}
-            </Text>
-            {menuContent}
-          </>
-        ) : (
-          <WindowChrome className={windowSize()}>
-            <WindowChrome.Bar>
-              <WindowChrome.User>{t('guestLabel')}</WindowChrome.User>{' '}
-              <WindowChrome.Prompt>{t('promptHost')}</WindowChrome.Prompt>{' '}
-              {t('promptCommandSignIn')}
-            </WindowChrome.Bar>
-            <WindowChrome.Body>{menuContent}</WindowChrome.Body>
-          </WindowChrome>
+        <Text variant="emphasis" className={label()}>
+          {t('signInHeading')}
+        </Text>
+        <Text variant="card" className={providerPrompt()}>
+          {t('chooseProviderPrompt')}
+        </Text>
+        {providers.map(({ providerId, icon, label: providerLabel }) => (
+          <PopoverMenu.Item
+            key={providerId}
+            variant="bordered"
+            className={providerButton()}
+            icon={<Icon name={icon} size={SIZE.SM} />}
+            onClick={() => signIn(providerId)}
+          >
+            {providerLabel}
+          </PopoverMenu.Item>
+        ))}
+        {emailStep === 'sent' && (
+          <p role="status" aria-live="polite" className={emailSent()}>
+            {t('checkYourInbox')}
+          </p>
         )}
+        {emailStep === 'collapsed' && (
+          <PopoverMenu.Item
+            variant="bordered"
+            className={providerButton()}
+            onClick={() => setEmailStep('expanded')}
+          >
+            {t('continueWithEmail')}
+          </PopoverMenu.Item>
+        )}
+        {(emailStep === 'expanded' || emailStep === 'submitting') && (
+          <form
+            ref={emailFormRef}
+            className={emailForm()}
+            onSubmit={handleEmailSubmit}
+          >
+            <TextInput
+              type="email"
+              isRequired={true}
+              value={email}
+              onChange={setEmail}
+              ariaLabel={t('emailAriaLabel')}
+              placeholder={t('emailPlaceholder')}
+              leadingIcon={
+                <Icon
+                  name={ICONS.CHEVRON_RIGHT}
+                  size={SIZE.SM}
+                  dataTestId="sign-in-prompt-icon"
+                />
+              }
+              isInvalid={emailError}
+              isDisabled={emailStep === 'submitting'}
+            />
+            {emailError && (
+              <p role="status" aria-live="polite" className={emailHint()}>
+                {t('emailError')}
+              </p>
+            )}
+            <div className={emailFormActions()}>
+              <Button
+                size={SIZE.SM}
+                isDisabled={emailStep === 'submitting'}
+                onClick={handleEmailSubmit}
+              >
+                {emailStep === 'submitting' ? t('sending') : t('sendLink')}
+              </Button>
+            </div>
+          </form>
+        )}
+        <p className={hint()}>{t('redirectHint')}</p>
       </PopoverMenu.Panel>
       {Boolean(oauthError) && !isOpen && (
         <p role="alert" className={errorNotice()}>

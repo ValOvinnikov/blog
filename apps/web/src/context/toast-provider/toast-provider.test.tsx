@@ -20,8 +20,7 @@ const ToastHarness = () => {
       <button
         onClick={() =>
           toast.success({
-            command: 'Bookmark',
-            state: 'Saved',
+            title: 'Bookmark',
             message: 'Saved to bookmarks',
             action: { label: 'Undo', onAct: successAction, keyHint: '⌘Z' },
           })
@@ -32,8 +31,7 @@ const ToastHarness = () => {
       <button
         onClick={() =>
           toast.error({
-            command: 'Bookmark',
-            state: 'Failed',
+            title: 'Bookmark',
             message: "couldn't save",
           })
         }
@@ -43,16 +41,9 @@ const ToastHarness = () => {
       <button
         onClick={() =>
           toast.promise(Promise.resolve('done'), {
-            command: 'Bookmark',
-            loading: {
-              state: 'Saving',
-              message: 'saving…',
-            },
-            success: {
-              state: 'Saved',
-              message: 'Saved to bookmarks',
-            },
-            error: { state: 'Failed', message: 'failed' },
+            loading: { message: 'saving…' },
+            success: { message: 'Saved to bookmarks' },
+            error: { message: 'failed' },
           })
         }
       >
@@ -107,6 +98,19 @@ describe(`<${ToastProvider.name}/>`, () => {
     fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
 
     expect(screen.getByRole('status')).toBeVisible();
+    expect(screen.getByText('Saved to bookmarks')).toBeVisible();
+  });
+
+  it('renders the given title alongside the message', () => {
+    renderElement(
+      <ToastProvider>
+        <ToastHarness />
+      </ToastProvider>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
+
+    expect(screen.getByText('Bookmark')).toBeVisible();
     expect(screen.getByText('Saved to bookmarks')).toBeVisible();
   });
 
@@ -248,7 +252,7 @@ describe(`<${ToastProvider.name}/>`, () => {
     fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
 
     expect(screen.getAllByRole('status')).toHaveLength(1);
-    expect(screen.getByText('Saved ×2')).toBeVisible();
+    expect(screen.getByText('Saved to bookmarks ×2')).toBeVisible();
   });
 
   it('Esc with no toast focused dismisses the newest toast', () => {
@@ -320,31 +324,5 @@ describe(`<${ToastProvider.name}/>`, () => {
     expect(() => renderHook(() => useToast())).toThrow(
       'useToast must be used within a ToastProvider',
     );
-  });
-
-  it('renders the command/state chip by default (chromeOn: true)', () => {
-    renderElement(
-      <ToastProvider>
-        <ToastHarness />
-      </ToastProvider>,
-    );
-
-    fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
-
-    expect(screen.getByText(/Bookmark/)).toBeVisible();
-    expect(screen.getByText('Saved to bookmarks')).toBeVisible();
-  });
-
-  it('renders plain mode with no command/state chip when isPlain is set', () => {
-    renderElement(
-      <ToastProvider isPlain={true}>
-        <ToastHarness />
-      </ToastProvider>,
-    );
-
-    fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
-
-    expect(screen.getByText('Saved to bookmarks')).toBeVisible();
-    expect(screen.queryByText('Bookmark')).not.toBeInTheDocument();
   });
 });

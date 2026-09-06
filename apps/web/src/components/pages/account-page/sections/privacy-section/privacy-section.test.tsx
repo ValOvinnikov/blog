@@ -27,11 +27,11 @@ vi.mock('@web/components/shared/delete-account-control', () => ({
 const setup = customRender(PrivacySection, makePrivacySection());
 
 describe(PrivacySection, () => {
-  it('renders the bar as a level-2 heading with the resolved prompt copy', () => {
+  it('renders the panel heading as a level-2 heading', () => {
     setup();
 
     expect(
-      screen.getByRole('heading', { level: 2, name: /Privacy/ }),
+      screen.getByRole('heading', { level: 2, name: 'Privacy' }),
     ).toBeVisible();
   });
 
@@ -50,18 +50,5 @@ describe(PrivacySection, () => {
     expect(screen.getByTestId('delete-account-control')).toHaveTextContent(
       'jane',
     );
-  });
-
-  describe('plain (isChromeOn: false)', () => {
-    it('renders a plain section heading + card, dropping the WindowChrome.Tag pill', () => {
-      setup({ isChromeOn: false });
-
-      expect(
-        screen.getByRole('heading', { level: 2, name: 'Privacy' }),
-      ).toBeVisible();
-      const exportLink = screen.getByRole('link', { name: 'Request export' });
-      expect(exportLink).toHaveAttribute('href', '/api/account/export');
-      expect(screen.getByText('Delete account')).toBeVisible();
-    });
   });
 });

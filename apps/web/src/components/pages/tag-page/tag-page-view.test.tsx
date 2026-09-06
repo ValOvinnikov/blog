@@ -31,7 +31,7 @@ describe(TagPageView, () => {
     const homeLink = within(nav).getByRole('link', { name: 'Home' });
     expect(homeLink).toHaveAttribute('href', '/');
 
-    const current = within(nav).getByText('Tag: TypeScript');
+    const current = within(nav).getByText('TypeScript');
     expect(current).toHaveAttribute('aria-current', 'page');
     expect(current.tagName).not.toBe('A');
   });

@@ -91,19 +91,11 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
       const result = await setBookmarkStatus(postId, reverted);
       if (!result.ok) {
         setIsBookmarked(committedValue);
-        toast.error({
-          command: t('toastCommand'),
-          state: t('toastErrorState'),
-          message: t('error'),
-        });
+        toast.error({ message: t('error') });
         return;
       }
 
-      toast.info({
-        command: t('toastCommand'),
-        state: t('toastRevertedState'),
-        message: t('toastRevertedMessage'),
-      });
+      toast.info({ message: t('toastRevertedMessage') });
     });
   };
 
@@ -117,8 +109,6 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
       if (!result.ok) {
         setIsBookmarked(!next);
         toast.error({
-          command: t('toastCommand'),
-          state: t('toastErrorState'),
           message: t('error'),
           action: {
             label: t('toastRetryLabel'),
@@ -135,19 +125,9 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
       };
 
       if (next) {
-        toast.success({
-          command: t('toastCommand'),
-          state: t('toastSavedState'),
-          message: t('toastSavedMessage'),
-          action: undoAction,
-        });
+        toast.success({ message: t('toastSavedMessage'), action: undoAction });
       } else {
-        toast.info({
-          command: t('toastCommand'),
-          state: t('toastRemovedState'),
-          message: t('toastRemovedMessage'),
-          action: undoAction,
-        });
+        toast.info({ message: t('toastRemovedMessage'), action: undoAction });
       }
     });
   };

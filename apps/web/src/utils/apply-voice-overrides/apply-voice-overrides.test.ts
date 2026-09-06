@@ -5,8 +5,8 @@ import { applyVoiceOverrides } from './apply-voice-overrides';
 const CURATED_KEY_PATHS: Record<string, readonly string[]> = {
   notFoundMetaTitle: ['notFound', 'metaTitle'],
   notFoundMetaDescription: ['notFound', 'metaDescription'],
-  notFoundCommandNotFound: ['notFound', 'commandNotFound'],
-  notFoundDescription: ['notFound', 'description'],
+  notFoundCommandNotFound: ['notFound', 'heading'],
+  notFoundDescription: ['notFound', 'supportingText'],
   notFoundReturnHome: ['notFound', 'returnHome'],
   terminalPromptHost: ['authMenu', 'promptHost'],
   authPromptCommandSignIn: ['authMenu', 'promptCommandSignIn'],
@@ -46,7 +46,7 @@ describe(applyVoiceOverrides, () => {
 
   it('sets a nested path without touching its siblings', () => {
     const messages = {
-      notFound: { commandNotFound: 'Not found', description: 'desc' },
+      notFound: { heading: 'Page not found', supportingText: 'desc' },
       unrelated: { value: 'untouched' },
     };
 
@@ -55,17 +55,17 @@ describe(applyVoiceOverrides, () => {
     });
 
     expect(result).toEqual({
-      notFound: { commandNotFound: 'nope', description: 'desc' },
+      notFound: { heading: 'nope', supportingText: 'desc' },
       unrelated: { value: 'untouched' },
     });
   });
 
   it('does not mutate the input object', () => {
-    const messages = { notFound: { commandNotFound: 'Not found' } };
+    const messages = { notFound: { heading: 'Page not found' } };
 
     applyVoiceOverrides(messages, { notFoundCommandNotFound: 'nope' });
 
-    expect(messages.notFound.commandNotFound).toBe('Not found');
+    expect(messages.notFound.heading).toBe('Page not found');
   });
 
   it('applies a deeply nested override without disturbing its siblings', () => {
@@ -87,7 +87,7 @@ describe(applyVoiceOverrides, () => {
   });
 
   it('ignores keys with no known path', () => {
-    const messages = { notFound: { commandNotFound: 'Not found' } };
+    const messages = { notFound: { heading: 'Page not found' } };
 
     const result = applyVoiceOverrides(messages, { unknownKey: 'ignored' });
 
@@ -96,7 +96,7 @@ describe(applyVoiceOverrides, () => {
 
   it('applies multiple overrides independently', () => {
     const messages = {
-      notFound: { commandNotFound: 'Not found', description: 'desc' },
+      notFound: { heading: 'Page not found', supportingText: 'desc' },
       bookmarksPage: { empty: 'No bookmarks yet' },
     };
 
@@ -106,7 +106,7 @@ describe(applyVoiceOverrides, () => {
     });
 
     expect(result).toEqual({
-      notFound: { commandNotFound: 'nope', description: 'desc' },
+      notFound: { heading: 'nope', supportingText: 'desc' },
       bookmarksPage: { empty: 'nothing saved' },
     });
   });

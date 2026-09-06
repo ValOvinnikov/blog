@@ -162,8 +162,6 @@ describe(`<${BookmarkButton.name}/>`, () => {
     expect(setBookmarkStatusMock).toHaveBeenCalledWith('post-1', true);
     await waitFor(() => {
       expect(toastSuccessMock).toHaveBeenCalledWith({
-        command: 'Bookmark',
-        state: 'Saved',
         message: 'Saved to bookmarks',
         action: expect.objectContaining({ label: 'Undo' }),
       });
@@ -193,8 +191,6 @@ describe(`<${BookmarkButton.name}/>`, () => {
     expect(setBookmarkStatusMock).toHaveBeenCalledWith('post-1', false);
     await waitFor(() => {
       expect(toastInfoMock).toHaveBeenCalledWith({
-        command: 'Bookmark',
-        state: 'Removed',
         message: 'Removed from bookmarks',
         action: expect.objectContaining({ label: 'Undo' }),
       });
@@ -226,8 +222,6 @@ describe(`<${BookmarkButton.name}/>`, () => {
       );
     });
     expect(toastErrorMock).toHaveBeenCalledWith({
-      command: 'Bookmark',
-      state: 'Failed',
       message: "Couldn't save that. Try again.",
       action: expect.objectContaining({ label: 'Retry', keyHint: 'R' }),
     });
@@ -267,8 +261,6 @@ describe(`<${BookmarkButton.name}/>`, () => {
     expect(setBookmarkStatusMock).toHaveBeenCalledTimes(2);
     expect(setBookmarkStatusMock).toHaveBeenNthCalledWith(2, 'post-1', false);
     expect(toastInfoMock).toHaveBeenCalledWith({
-      command: 'Bookmark',
-      state: 'Reverted',
       message: 'Reverted',
     });
   });
@@ -308,8 +300,6 @@ describe(`<${BookmarkButton.name}/>`, () => {
     // The undo's own success path is always `toast.info`, regardless of
     // which direction it reverted — this is the second `info` call.
     expect(toastInfoMock).toHaveBeenNthCalledWith(2, {
-      command: 'Bookmark',
-      state: 'Reverted',
       message: 'Reverted',
     });
   });
@@ -348,8 +338,6 @@ describe(`<${BookmarkButton.name}/>`, () => {
     // Deliberate: no `action` on the undo-failure toast, to avoid an
     // unbounded retry/undo chain.
     expect(toastErrorMock).toHaveBeenCalledWith({
-      command: 'Bookmark',
-      state: 'Failed',
       message: "Couldn't save that. Try again.",
     });
     expect(toastInfoMock).not.toHaveBeenCalled();
@@ -387,8 +375,6 @@ describe(`<${BookmarkButton.name}/>`, () => {
     expect(setBookmarkStatusMock).toHaveBeenCalledTimes(2);
     expect(setBookmarkStatusMock).toHaveBeenNthCalledWith(2, 'post-1', true);
     expect(toastSuccessMock).toHaveBeenCalledWith({
-      command: 'Bookmark',
-      state: 'Saved',
       message: 'Saved to bookmarks',
       action: expect.objectContaining({ label: 'Undo' }),
     });

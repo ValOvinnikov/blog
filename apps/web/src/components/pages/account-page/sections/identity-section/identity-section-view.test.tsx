@@ -6,7 +6,7 @@ import { IdentitySectionView } from './identity-section-view';
 const setup = customRender(IdentitySectionView, makeIdentitySectionView());
 
 describe(IdentitySectionView, () => {
-  it('renders the bar as a level-2 heading with the resolved prompt copy', () => {
+  it('renders the panel heading as a level-2 heading', () => {
     setup();
 
     expect(
@@ -71,22 +71,5 @@ describe(IdentitySectionView, () => {
 
     expect(screen.getByText('Display name')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Save' })).toBeVisible();
-  });
-
-  describe('plain (isChromeOn: false)', () => {
-    it('renders a plain section heading + card with no terminal shell, preserving heading levels', () => {
-      setup({ isChromeOn: false });
-
-      expect(
-        screen.getByRole('heading', {
-          level: 2,
-          name: 'Connected accounts',
-        }),
-      ).toBeVisible();
-      expect(
-        screen.getByRole('heading', { level: 3, name: 'GitHub' }),
-      ).toBeVisible();
-      expect(screen.getByRole('button', { name: 'Unlink' })).toBeVisible();
-    });
   });
 });

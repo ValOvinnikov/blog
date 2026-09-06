@@ -5,8 +5,6 @@ import { DisplayNameControl } from '@web/components/shared/display-name-control'
 import { ProviderLinkControl } from '@web/components/shared/provider-link-control';
 import type { TLinkableProvider } from '@web/server/account/identity-actions';
 import { auth } from '@web/server/auth/auth';
-import { getChromeOn } from '@web/utils/get-chrome-on';
-import { toSessionUsername } from '@web/utils/to-session-username';
 import { getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 
@@ -31,13 +29,9 @@ export const IdentitySection = async () => {
   if (!session?.user?.id) return null;
 
   const { id: userId, name, email, image } = session.user;
-  const handle = toSessionUsername(name, email);
   const t = await getTranslations('accountPage.identity');
 
-  const [linked, chromeOn] = await Promise.all([
-    queries.account.getLinkedProviders(userId),
-    getChromeOn(),
-  ]);
+  const linked = await queries.account.getLinkedProviders(userId);
   const linkedCount = [linked.github, linked.google, linked.emailLink].filter(
     Boolean,
   ).length;
@@ -97,10 +91,7 @@ export const IdentitySection = async () => {
 
   return (
     <IdentitySectionView
-      isChromeOn={chromeOn}
-      handle={handle}
-      promptHost={t('promptHost')}
-      promptCommand={t('promptCommand')}
+      heading={t('heading')}
       providerRows={providerRows}
       displayNameLabel={t('displayNameLabel')}
       displayNameDescription={t('displayNameDescription')}

@@ -2,17 +2,12 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { NewsletterSection } from './newsletter-section';
 
-const {
-  authMock,
-  getSubscriptionStatusMock,
-  getChromeOnMock,
-  getRequestTenantIdMock,
-} = vi.hoisted(() => ({
-  authMock: vi.fn(),
-  getSubscriptionStatusMock: vi.fn(),
-  getChromeOnMock: vi.fn(),
-  getRequestTenantIdMock: vi.fn(),
-}));
+const { authMock, getSubscriptionStatusMock, getRequestTenantIdMock } =
+  vi.hoisted(() => ({
+    authMock: vi.fn(),
+    getSubscriptionStatusMock: vi.fn(),
+    getRequestTenantIdMock: vi.fn(),
+  }));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
@@ -24,10 +19,6 @@ vi.mock('@blog/db', () => ({
   queries: {
     subscribers: { getSubscriptionStatus: getSubscriptionStatusMock },
   },
-}));
-
-vi.mock('@web/utils/get-chrome-on', () => ({
-  getChromeOn: getChromeOnMock,
 }));
 
 vi.mock('@web/components/shared/newsletter-subscription-control', () => ({
@@ -48,8 +39,6 @@ describe(`<${NewsletterSection.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
     getSubscriptionStatusMock.mockReset();
-    getChromeOnMock.mockReset();
-    getChromeOnMock.mockResolvedValue(true);
     getRequestTenantIdMock.mockReset();
     getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
   });

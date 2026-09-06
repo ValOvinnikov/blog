@@ -2,8 +2,6 @@ import { queries } from '@blog/db';
 import { NewsletterSubscriptionControl } from '@web/components/shared/newsletter-subscription-control';
 import { auth } from '@web/server/auth/auth';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
-import { getChromeOn } from '@web/utils/get-chrome-on';
-import { toSessionUsername } from '@web/utils/to-session-username';
 import { getTranslations } from 'next-intl/server';
 
 import { NewsletterSectionView } from './newsletter-section-view';
@@ -12,12 +10,9 @@ export const NewsletterSection = async () => {
   const session = await auth();
   if (!session?.user?.id) return null;
 
-  const { id: userId, name, email } = session.user;
+  const { id: userId, email } = session.user;
 
-  const [tenantId, chromeOn] = await Promise.all([
-    getRequestTenantId(),
-    getChromeOn(),
-  ]);
+  const tenantId = await getRequestTenantId();
   if (!tenantId) return null;
 
   const status = await queries.subscribers.getSubscriptionStatus(
@@ -29,15 +24,11 @@ export const NewsletterSection = async () => {
   // section only ever manages an existing subscription.
   if (status.outcome === 'not-subscribed') return null;
 
-  const handle = toSessionUsername(name, email);
   const t = await getTranslations('accountPage.newsletter');
 
   return (
     <NewsletterSectionView
-      isChromeOn={chromeOn}
-      handle={handle}
-      promptHost={t('promptHost')}
-      promptCommand={t('promptCommand')}
+      heading={t('heading')}
       status={status.outcome}
       label={t('label')}
       email={email ?? ''}

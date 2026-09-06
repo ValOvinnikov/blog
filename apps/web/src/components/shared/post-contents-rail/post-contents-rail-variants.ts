@@ -55,7 +55,7 @@ export const postContentsRailVariants = tv({
       'border border-border rounded-md bg-primary px-3 py-2.5',
       'font-mono text-copy text-text',
       'cursor-pointer text-left',
-      'transition-colors duration-base ease-console',
+      'transition-colors duration-base ease-smooth',
       'hover:bg-surface-2',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
@@ -63,7 +63,7 @@ export const postContentsRailVariants = tv({
     toggleLabel: ['flex-1 truncate'],
     chevron: [
       'size-1.5 shrink-0 rotate-45 border-r-2 border-b-2 border-current',
-      'transition-transform duration-base ease-console',
+      'transition-transform duration-base ease-smooth',
     ],
     // Absolute against `mobile`'s `relative` box so it overlays the article
     // body instead of pushing it down. `p-4` matches the nav-menu and
@@ -77,7 +77,7 @@ export const postContentsRailVariants = tv({
     item: [],
     link: [
       'block text-subtle no-underline',
-      'transition-colors duration-base ease-console',
+      'transition-colors duration-base ease-smooth',
       'hover:text-brand-primary',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
