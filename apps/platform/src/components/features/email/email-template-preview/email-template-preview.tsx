@@ -6,11 +6,12 @@ export type TEmailTemplatePreviewProps = {
 };
 
 /**
- * Renders exactly the HTML the tenant's email would send — built by
- * `buildTenantEmail`, the same function the real send path calls — so this
- * can never drift from what actually goes out. Sandboxed: the HTML is a
- * full document with its own inline styles, not something to compose with
- * the admin panel's own CSS.
+ * Renders the authored subject and body through the same read and
+ * serializer the real send path uses, so that copy matches what goes out —
+ * but the surrounding structure (actions, headers, brand fallback) is
+ * generic and doesn't reproduce what any one template type actually sends.
+ * Sandboxed: the HTML is a full document with its own inline styles, not
+ * something to compose with the admin panel's own CSS.
  */
 export const EmailTemplatePreview = ({
   html,
