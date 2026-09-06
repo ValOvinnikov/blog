@@ -2,6 +2,7 @@ import { q } from '@blog/service/sanity/query';
 
 import { authorCardFragment, authorDetailFragment } from './author';
 import { imageWithAltFragment, sanityImageFragment } from './image';
+import { portableTextBodyItemFragment } from './portable-text-body';
 import { seoFragment } from './seo';
 import { tagFragment } from './tag';
 import { topicFragment } from './topic';
@@ -53,7 +54,7 @@ export const postDetailFragment = q
       .nullable(true),
     featured: sub.field('featured').nullable(true),
     newsletterEnabled: sub.field('newsletterEnabled').nullable(true),
-    body: sub.field('body[]').notNull(),
+    body: sub.field('body[]').project(portableTextBodyItemFragment).notNull(),
     skim: sub.field('skim').project(skimFragment).nullable(true),
     seo: sub.field('seo').project(seoFragment).nullable(true),
     author: sub.field('author').deref().project(authorDetailFragment).notNull(),

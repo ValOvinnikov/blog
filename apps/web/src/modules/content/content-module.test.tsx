@@ -1,5 +1,6 @@
-import { BRAND_VARIANT, type RichText } from '@blog/config';
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { BRAND_VARIANT, type TPortableTextBody } from '@blog/config';
+import { customRenderAsync, within } from '@web/testing/custom-render';
+import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { ContentModule } from './content-module';
@@ -10,8 +11,6 @@ const { getContentMock, getTenantSanityContextMock } = vi.hoisted(() => ({
 }));
 
 vi.mock('@blog/service', () => ({
-  getSanityImageBaseUrl: (tenant: { projectId: string; dataset: string }) =>
-    `https://cdn.sanity.io/images/${tenant.projectId}/${tenant.dataset}/`,
   service: {
     modules: {
       content: { v1: { getContent: getContentMock } },
@@ -66,35 +65,58 @@ describe(ContentModule, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("resolves baseUrl via getSanityImageBaseUrl and forwards it into a rendered body image's src", async () => {
-    getTenantSanityContextMock.mockResolvedValue({
-      projectId: 'tenant-project',
-      dataset: 'production',
-      token: 'tenant-token',
-    });
-    const body: RichText = [
+  it("renders a body image against its own image's cdnBaseUrl, not another tenant's", async () => {
+    const bodyForTenantA: TPortableTextBody = [
       {
         _type: 'bodyImage',
         _key: 'image-1',
-        asset: {
-          _ref: 'image-abc123-800x600-jpg',
-          _type: 'reference',
-        },
-        alt: 'A scenic mountain range',
+        layout: undefined,
+        image: makeSanityImage({
+          alt: 'A scenic mountain range',
+          cdnBaseUrl: 'https://cdn.sanity.io/images/tenant-a/production/',
+        }),
       },
     ];
-    getContentMock.mockResolvedValue({
+    const bodyForTenantB: TPortableTextBody = [
+      {
+        _type: 'bodyImage',
+        _key: 'image-1',
+        layout: undefined,
+        image: makeSanityImage({
+          alt: 'A scenic mountain range',
+          cdnBaseUrl: 'https://cdn.sanity.io/images/tenant-b/staging/',
+        }),
+      },
+    ];
+
+    getContentMock.mockResolvedValueOnce({
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        body,
+        body: bodyForTenantA,
         layout: undefined,
       },
     });
+    const { container: containerA } = await setup();
+    const imgA = within(containerA).getByRole('img', {
+      name: 'A scenic mountain range',
+    });
+    expect(imgA.getAttribute('src')).toContain('tenant-a/production');
+    expect(imgA.getAttribute('src')).not.toContain('tenant-b/staging');
 
-    await setup();
-
-    const img = screen.getByRole('img', { name: 'A scenic mountain range' });
-    expect(img.getAttribute('src')).toContain('tenant-project/production');
+    getContentMock.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        body: bodyForTenantB,
+        layout: undefined,
+      },
+    });
+    const { container: containerB } = await setup();
+    const imgB = within(containerB).getByRole('img', {
+      name: 'A scenic mountain range',
+    });
+    expect(imgB.getAttribute('src')).toContain('tenant-b/staging');
+    expect(imgB.getAttribute('src')).not.toContain('tenant-a/production');
   });
 });

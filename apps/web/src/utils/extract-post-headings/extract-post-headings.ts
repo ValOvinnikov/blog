@@ -1,4 +1,4 @@
-import type { RichText } from '@blog/config';
+import type { TPortableTextBody } from '@blog/config';
 
 /** A post needs at least this many H2 headings before a table-of-contents rail earns its place. */
 export const MIN_H2_HEADINGS_FOR_RAIL = 3;
@@ -14,10 +14,10 @@ export type TPostHeading = {
   key: string;
 };
 
-type TRichTextBlock = Extract<RichText[number], { _type: 'block' }>;
+type TRichTextBlock = Extract<TPortableTextBody[number], { _type: 'block' }>;
 
 const isHeadingBlock = (
-  node: RichText[number],
+  node: TPortableTextBody[number],
 ): node is TRichTextBlock & { style: 'h2' | 'h3' } =>
   node._type === 'block' && (node.style === 'h2' || node.style === 'h3');
 
@@ -41,7 +41,7 @@ const slugify = (text: string): string =>
  * `BlogPostPage` uses, so a non-empty result is always render-worthy.
  */
 export const extractPostHeadings = (
-  body: RichText | undefined,
+  body: TPortableTextBody | undefined,
 ): TPostHeading[] => {
   if (!body) return [];
 

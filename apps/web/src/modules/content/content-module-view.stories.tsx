@@ -20,8 +20,6 @@ const meta = {
     brandVariant: BRAND_VARIANT.PRIMARY,
     body: richTextDemo,
     layout: undefined,
-    baseUrl:
-      'https://cdn.sanity.io/images/storybook-project/storybook-dataset/',
   },
   decorators: [
     (Story) => (

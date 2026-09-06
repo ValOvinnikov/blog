@@ -1,10 +1,12 @@
-import { IMAGE_LAYOUT, type RichText } from '@blog/config';
-
-type TBodyImageBlock = Extract<RichText[number], { _type: 'bodyImage' }>;
+import {
+  IMAGE_LAYOUT,
+  type IBodyImageBlock,
+  type TPortableTextBody,
+} from '@blog/config';
 
 export type TPortableTextSegment =
-  | { kind: 'PROSE'; blocks: RichText }
-  | { kind: 'BREAKOUT'; block: TBodyImageBlock };
+  | { kind: 'PROSE'; blocks: TPortableTextBody }
+  | { kind: 'BREAKOUT'; block: IBodyImageBlock };
 
 /**
  * segmentPortableTextBody — splits a Portable Text body into alternating
@@ -18,10 +20,10 @@ export type TPortableTextSegment =
  * single `PROSE` segment holding every block, in original order.
  */
 export const segmentPortableTextBody = (
-  value: RichText,
+  value: TPortableTextBody,
 ): TPortableTextSegment[] => {
   const segments: TPortableTextSegment[] = [];
-  let run: RichText = [];
+  let run: TPortableTextBody = [];
 
   const flushRun = () => {
     if (run.length > 0) {

@@ -9,9 +9,6 @@ import { richTextDemo } from '@web/testing/shared/portable-text-renderer/fixture
 
 import { HomePageTemplate } from './home-page-template';
 
-const STORYBOOK_CDN_BASE_URL =
-  'https://cdn.sanity.io/images/storybook-project/storybook-dataset/';
-
 const meta = {
   title: 'Page Templates/HomePageTemplate',
   component: HomePageTemplate,
@@ -43,7 +40,6 @@ const meta = {
           brandVariant={BRAND_VARIANT.PRIMARY}
           body={richTextDemo}
           layout={undefined}
-          baseUrl={STORYBOOK_CDN_BASE_URL}
         />
         <CtaModuleView
           id="cta-1"

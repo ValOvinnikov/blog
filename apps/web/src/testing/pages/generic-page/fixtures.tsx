@@ -30,7 +30,6 @@ export const makeGenericPageView = (
           brandVariant={BRAND_VARIANT.PRIMARY}
           body={richTextDemo}
           layout={undefined}
-          baseUrl="https://cdn.sanity.io/images/test-project/test-dataset/"
         />
         <CtaModuleView
           id="cta-1"

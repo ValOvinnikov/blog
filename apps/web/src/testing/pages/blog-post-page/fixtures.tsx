@@ -109,7 +109,6 @@ export const makeBlogPostPageView = (
     readingTimeMinutes: post.readingTimeMinutes,
     heroImageSanity: post.heroImageSanity,
     heroImageAlt: post.heroImageAlt,
-    imageBaseUrl: 'https://cdn.sanity.io/images/test-project/test-dataset/',
     headings: [],
     hasContentsRail: false,
     url,

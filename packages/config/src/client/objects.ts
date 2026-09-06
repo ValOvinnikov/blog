@@ -1,4 +1,6 @@
+import type { TImageLayout } from '@blog/config/constants/image-layout';
 import type { TSocialPlatform } from '@blog/config/constants/link';
+import type { RichText } from '@blog/config/sanity/generated/types';
 import type { TMaybeUndefined } from '@blog/config/types';
 
 export interface ISanityImageHotspot {
@@ -42,3 +44,15 @@ export interface ILink {
   /** Accessible name override, passed through to the rendered link's `aria-label` when `label` alone isn't descriptive enough. */
   ariaLabel: TMaybeUndefined<string>;
 }
+
+/** A `bodyImage` Portable Text block with its asset resolved to a view-model image. */
+export interface IBodyImageBlock {
+  _type: 'bodyImage';
+  _key: string;
+  layout: TMaybeUndefined<TImageLayout>;
+  image: TMaybeUndefined<ISanityImage>;
+}
+
+export type TPortableTextBody = Array<
+  Exclude<RichText[number], { _type: 'bodyImage' }> | IBodyImageBlock
+>;

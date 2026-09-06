@@ -18,5 +18,5 @@ export async function getContent(
     ...isr(['modules:content', `module:${id}`], tenant.projectId),
   });
 
-  return toContentModule(raw);
+  return toContentModule(raw, tenant);
 }

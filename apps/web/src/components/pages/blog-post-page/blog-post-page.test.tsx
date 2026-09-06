@@ -1,4 +1,9 @@
-import { ICONS, type ISanityImage, type RichText, SIZE } from '@blog/config';
+import {
+  ICONS,
+  SIZE,
+  type ISanityImage,
+  type TPortableTextBody,
+} from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import userEvent from '@testing-library/user-event';
 import {
@@ -35,8 +40,6 @@ const {
 }));
 
 vi.mock('@blog/service', () => ({
-  getSanityImageBaseUrl: (tenant: { projectId: string; dataset: string }) =>
-    `https://cdn.sanity.io/images/${tenant.projectId}/${tenant.dataset}/`,
   service: {
     pages: {
       post: { v1: { getPost: getPostMock } },
@@ -299,7 +302,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
   });
 
   it('renders PostContentsRail once the body has 3+ H2 headings', async () => {
-    const body: RichText = [
+    const body: TPortableTextBody = [
       richTextBlock('h2', [richTextSpan('Getting started')]),
       richTextBlock('normal', [richTextSpan('Intro.')]),
       richTextBlock('h2', [richTextSpan('Configuration')]),

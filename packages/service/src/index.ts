@@ -96,7 +96,6 @@ export type { TTagDetailPage } from './features/pages/tag';
 export type { TTagIndexPage } from './features/pages/tag-index';
 export type { TTopicDetailPage } from './features/pages/topic';
 export type { TTopicIndexPage } from './features/pages/topic-index';
-export { getSanityImageBaseUrl } from './sanity/image-base-url';
 export { urlForImage } from './sanity/image';
 export type { TTenantSanityContext } from './sanity/query';
 export { getPlatformSanityContext } from './sanity/client';

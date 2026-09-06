@@ -428,7 +428,7 @@ describe('getPost', () => {
       .mockResolvedValueOnce(
         makeRawPostPage({
           post: makeRawPostDetail({
-            body: [{ _type: 'aside', _key: 'a1', kind: 'WHY_NOT', body: [] }],
+            body: [{ _type: 'aside', _key: 'a1' }],
           }),
         }),
       )
@@ -453,7 +453,7 @@ describe('getPost', () => {
     expect(result.hasAsides).toBe(false);
   });
 
-  it('preserves the optional layout field on a bodyImage body block', async () => {
+  it('resolves a bodyImage block into an image view-model, keeping layout', async () => {
     mockRun
       .mockResolvedValueOnce(
         makeRawPostPage({
@@ -462,10 +462,15 @@ describe('getPost', () => {
               {
                 _type: 'bodyImage',
                 _key: 'image-1',
-                asset: undefined,
-                media: undefined,
-                hotspot: undefined,
-                crop: undefined,
+                asset: {
+                  _id: 'image-abc123-800x600-jpg',
+                  metadata: {
+                    lqip: null,
+                    dimensions: { width: 800, height: 600, aspectRatio: 1.333 },
+                  },
+                },
+                hotspot: null,
+                crop: null,
                 alt: 'A diagram',
                 layout: 'FLOAT_RIGHT',
               },
@@ -478,9 +483,42 @@ describe('getPost', () => {
     const result = await getPost('hello-world', tenant);
     if (!result) throw new Error('expected a post detail');
 
+    expect(result.body[0]).toEqual({
+      _type: 'bodyImage',
+      _key: 'image-1',
+      layout: 'FLOAT_RIGHT',
+      image: expect.objectContaining({ assetId: 'image-abc123-800x600-jpg' }),
+    });
+  });
+
+  it('keeps a bodyImage block whose asset never resolved, with image undefined', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawPostPage({
+          post: makeRawPostDetail({
+            body: [
+              {
+                _type: 'bodyImage',
+                _key: 'image-1',
+                asset: null,
+                hotspot: null,
+                crop: null,
+                alt: 'A diagram',
+                layout: null,
+              },
+            ],
+          }),
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getPost('hello-world', tenant);
+    if (!result) throw new Error('expected a post detail');
+
+    expect(result.body).toHaveLength(1);
     expect(result.body[0]).toMatchObject({
       _type: 'bodyImage',
-      layout: 'FLOAT_RIGHT',
+      image: undefined,
     });
   });
 

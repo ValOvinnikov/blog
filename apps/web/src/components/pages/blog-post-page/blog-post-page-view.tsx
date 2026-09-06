@@ -1,9 +1,9 @@
 import {
   routes,
   type ISanityImage,
-  type RichText,
   type TAsideKind,
   type TMaybeUndefined,
+  type TPortableTextBody,
 } from '@blog/config';
 import type { TPostDetailAuthor, TPostSkim, TTag, TTopic } from '@blog/service';
 import {
@@ -44,7 +44,7 @@ export interface IBlogPostPageViewProps {
   excerpt: string;
   topic: TTopic;
   tags: TTag[];
-  body: RichText;
+  body: TPortableTextBody;
   skim: TMaybeUndefined<TPostSkim>;
   hasAsides: boolean;
   author: TPostDetailAuthor;
@@ -53,7 +53,6 @@ export interface IBlogPostPageViewProps {
   readingTimeMinutes: number;
   heroImageSanity: TMaybeUndefined<ISanityImage>;
   heroImageAlt: TMaybeUndefined<string>;
-  imageBaseUrl: string;
   headings: TPostHeading[];
   hasContentsRail: boolean;
   url: string;
@@ -99,7 +98,6 @@ export const BlogPostPageView = ({
   readingTimeMinutes,
   heroImageSanity,
   heroImageAlt,
-  imageBaseUrl,
   headings,
   hasContentsRail,
   url,
@@ -215,7 +213,6 @@ export const BlogPostPageView = ({
                   <div className={s.content({ withRail: true })}>
                     <PortableTextRenderer
                       value={body}
-                      baseUrl={imageBaseUrl}
                       headings={headings}
                       asideKindLabels={asideKindLabels}
                     />
@@ -224,7 +221,6 @@ export const BlogPostPageView = ({
               ) : (
                 <PortableTextRenderer
                   value={body}
-                  baseUrl={imageBaseUrl}
                   headings={headings}
                   asideKindLabels={asideKindLabels}
                 />

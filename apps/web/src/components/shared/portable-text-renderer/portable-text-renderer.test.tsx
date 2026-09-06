@@ -1,9 +1,10 @@
-import { ASIDE_KIND, type RichText } from '@blog/config';
+import { ASIDE_KIND, type TPortableTextBody } from '@blog/config';
 import {
   customRender,
   renderElement,
   screen,
 } from '@web/testing/custom-render';
+import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
   richTextBlock,
   richTextSpan,
@@ -33,12 +34,11 @@ vi.mock('@blog/ui/molecules/image-with-caption', () => ({
 
 const setup = customRender(PortableTextRenderer, {
   value: [],
-  baseUrl: 'https://cdn.sanity.io/images/test-project/test-dataset/',
 });
 
 describe(`<${PortableTextRenderer.name}/>`, () => {
   it('renders a normal-style block as a paragraph', () => {
-    const value: RichText = [
+    const value: TPortableTextBody = [
       richTextBlock('normal', [richTextSpan('Hello world')]),
     ];
 
@@ -48,7 +48,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
   });
 
   it('renders an h1-style block downgraded to a level 2 heading, never a bare h1', () => {
-    const value: RichText = [
+    const value: TPortableTextBody = [
       // The generated `style` union no longer includes 'h1' (Studio can't
       // author one anymore), but the renderer still defends against a
       // legacy/malformed one reaching this component via another write path.
@@ -69,7 +69,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
 
   ([2, 3, 4] as const).forEach((level) => {
     it(`renders an h${level}-style block as a level ${level} heading`, () => {
-      const value: RichText = [
+      const value: TPortableTextBody = [
         richTextBlock(`h${level}` as TRichTextBlock['style'], [
           richTextSpan(`Heading ${level}`),
         ]),
@@ -86,7 +86,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
   });
 
   it('renders a blockquote-style block as a blockquote', () => {
-    const value: RichText = [
+    const value: TPortableTextBody = [
       richTextBlock('blockquote', [richTextSpan('A quote')]),
     ];
 
@@ -98,7 +98,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
   });
 
   it('renders the strong mark as bold text', () => {
-    const value: RichText = [
+    const value: TPortableTextBody = [
       richTextBlock('normal', [richTextSpan('bold text', ['strong'])]),
     ];
 
@@ -108,7 +108,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
   });
 
   it('renders the em mark as italic text', () => {
-    const value: RichText = [
+    const value: TPortableTextBody = [
       richTextBlock('normal', [richTextSpan('italic text', ['em'])]),
     ];
 
@@ -118,7 +118,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
   });
 
   it('renders the code mark as inline code', () => {
-    const value: RichText = [
+    const value: TPortableTextBody = [
       richTextBlock('normal', [richTextSpan('const x = 1', ['code'])]),
     ];
 
@@ -128,7 +128,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
   });
 
   it('renders a link annotation as a link', () => {
-    const value: RichText = [
+    const value: TPortableTextBody = [
       richTextBlock(
         'normal',
         [richTextSpan('a link', ['link-1'])],
@@ -143,7 +143,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
   });
 
   it('renders a link annotation without an href as plain text, not a dead link', () => {
-    const value: RichText = [
+    const value: TPortableTextBody = [
       richTextBlock(
         'normal',
         [richTextSpan('incomplete link', ['link-1'])],
@@ -158,7 +158,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
   });
 
   it('renders sibling blocks as direct children of the root, with no per-block wrapper', () => {
-    const value: RichText = [
+    const value: TPortableTextBody = [
       richTextBlock('h2', [richTextSpan('Section')]),
       richTextBlock('normal', [richTextSpan('First paragraph')]),
       richTextBlock('normal', [richTextSpan('Second paragraph')]),
@@ -175,7 +175,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
   });
 
   it('renders h2/h3 blocks with no id when the caller omits headings, even with 3+ H2 headings in the body (the page-builder-module default)', () => {
-    const value: RichText = [
+    const value: TPortableTextBody = [
       richTextBlock('h2', [richTextSpan('Getting started')]),
       richTextBlock('normal', [richTextSpan('Intro.')]),
       richTextBlock('h3', [richTextSpan('Prerequisites')]),
@@ -194,7 +194,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
   });
 
   it('gives h2/h3 blocks a stable, URL-safe id once the caller opts in with the pre-computed headings, so PostContentsRail links (and deep-links) resolve to the right heading', () => {
-    const value: RichText = [
+    const value: TPortableTextBody = [
       richTextBlock('h2', [richTextSpan('Getting started')]),
       richTextBlock('normal', [richTextSpan('Intro.')]),
       richTextBlock('h3', [richTextSpan('Prerequisites')]),
@@ -222,7 +222,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
   });
 
   it("renders h2/h3 blocks with no id when headings is passed but the body has fewer than 3 H2 headings, matching extractPostHeadings' own below-threshold []", () => {
-    const value: RichText = [
+    const value: TPortableTextBody = [
       richTextBlock('h2', [richTextSpan('Only section')]),
       richTextBlock('normal', [richTextSpan('Some text.')]),
     ];
@@ -237,12 +237,12 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
   });
 
   it('never lets two separate PortableTextRenderer instances on the same page collide on heading ids — neither passes headings, so neither stamps any (the module_content-rendered-twice scenario)', () => {
-    const firstModuleBody: RichText = [
+    const firstModuleBody: TPortableTextBody = [
       richTextBlock('h2', [richTextSpan('Overview')]),
       richTextBlock('h2', [richTextSpan('Details')]),
       richTextBlock('h2', [richTextSpan('Summary')]),
     ];
-    const secondModuleBody: RichText = [
+    const secondModuleBody: TPortableTextBody = [
       // Same heading text as the first module's outline — this is exactly
       // the scenario `module_content` can hit twice on one `page_generic`.
       richTextBlock('h2', [richTextSpan('Overview')]),
@@ -251,16 +251,10 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
     ];
 
     const { container: firstContainer } = renderElement(
-      <PortableTextRenderer
-        value={firstModuleBody}
-        baseUrl="https://cdn.sanity.io/images/test-project/test-dataset/"
-      />,
+      <PortableTextRenderer value={firstModuleBody} />,
     );
     const { container: secondContainer } = renderElement(
-      <PortableTextRenderer
-        value={secondModuleBody}
-        baseUrl="https://cdn.sanity.io/images/test-project/test-dataset/"
-      />,
+      <PortableTextRenderer value={secondModuleBody} />,
     );
 
     const firstIds = Array.from(firstContainer.querySelectorAll('h2')).map(
@@ -277,7 +271,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
   });
 
   it('renders a code block with syntax highlighting', () => {
-    const value: RichText = [
+    const value: TPortableTextBody = [
       {
         _type: 'code',
         _key: 'code-1',
@@ -298,15 +292,12 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
   it('renders a bodyImage block as an img with the CMS alt text, no unknown-block warning', () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-    const value: RichText = [
+    const value: TPortableTextBody = [
       {
         _type: 'bodyImage',
         _key: 'image-1',
-        asset: {
-          _ref: 'image-abc123-800x600-jpg',
-          _type: 'reference',
-        },
-        alt: 'A scenic mountain range',
+        layout: undefined,
+        image: makeSanityImage({ alt: 'A scenic mountain range' }),
       },
     ];
 
@@ -324,12 +315,13 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
     warnSpy.mockRestore();
   });
 
-  it('renders nothing for a bodyImage block with no asset reference', () => {
-    const value: RichText = [
+  it('renders nothing for a bodyImage block whose asset never resolved', () => {
+    const value: TPortableTextBody = [
       {
         _type: 'bodyImage',
         _key: 'image-1',
-        alt: 'Missing asset',
+        layout: undefined,
+        image: undefined,
       },
     ];
 
@@ -339,16 +331,12 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
   });
 
   it("passes the block's chosen layout through to ImageWithCaption", () => {
-    const value: RichText = [
+    const value: TPortableTextBody = [
       {
         _type: 'bodyImage',
         _key: 'image-1',
-        asset: {
-          _ref: 'image-abc123-800x600-jpg',
-          _type: 'reference',
-        },
-        alt: 'A scenic mountain range',
         layout: 'FLOAT_LEFT',
+        image: makeSanityImage({ alt: 'A scenic mountain range' }),
       },
     ];
 
@@ -361,15 +349,12 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
   });
 
   it('passes no layout through when the block has none set, leaving the INLINE default to ImageWithCaption', () => {
-    const value: RichText = [
+    const value: TPortableTextBody = [
       {
         _type: 'bodyImage',
         _key: 'image-1',
-        asset: {
-          _ref: 'image-abc123-800x600-jpg',
-          _type: 'reference',
-        },
-        alt: 'A scenic mountain range',
+        layout: undefined,
+        image: makeSanityImage({ alt: 'A scenic mountain range' }),
       },
     ];
 
@@ -381,14 +366,13 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
   });
 
   it('renders a FULL_BLEED bodyImage as a sibling of the surrounding text, not nested inside the same wrapper as the text before/after it (#1070 — a FULL_BLEED image must be free of the text measure cap)', () => {
-    const value: RichText = [
+    const value: TPortableTextBody = [
       richTextBlock('normal', [richTextSpan('Before the image.')]),
       {
         _type: 'bodyImage',
         _key: 'image-1',
-        asset: { _ref: 'image-abc123-800x600-jpg', _type: 'reference' },
-        alt: 'A scenic mountain range',
         layout: 'FULL_BLEED',
+        image: makeSanityImage({ alt: 'A scenic mountain range' }),
       },
       richTextBlock('normal', [richTextSpan('After the image.')]),
     ];
@@ -407,14 +391,13 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
   });
 
   it('keeps every block a direct child of a single wrapper when the body has a non-FULL_BLEED bodyImage (INLINE/FLOAT_LEFT/FLOAT_RIGHT stay nested with the surrounding text, unaffected by the FULL_BLEED breakout split)', () => {
-    const value: RichText = [
+    const value: TPortableTextBody = [
       richTextBlock('normal', [richTextSpan('Before the image.')]),
       {
         _type: 'bodyImage',
         _key: 'image-1',
-        asset: { _ref: 'image-abc123-800x600-jpg', _type: 'reference' },
-        alt: 'A scenic mountain range',
         layout: 'FLOAT_LEFT',
+        image: makeSanityImage({ alt: 'A scenic mountain range' }),
       },
       richTextBlock('normal', [richTextSpan('After the image.')]),
     ];
@@ -430,7 +413,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
   });
 
   it('renders an aside block as a DeepAside, with its body rendered through the same block components (visibility gating is pure CSS — no unit-test surface, see deep-aside.test.tsx)', () => {
-    const value: RichText = [
+    const value: TPortableTextBody = [
       {
         _type: 'aside',
         _key: 'aside-1',
@@ -447,7 +430,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
   });
 
   it('falls back to the raw kind value as the aside label when asideKindLabels is omitted', () => {
-    const value: RichText = [
+    const value: TPortableTextBody = [
       {
         _type: 'aside',
         _key: 'aside-1',
@@ -462,7 +445,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
   });
 
   it('treats a missing aside kind as CONTEXT (forward-compat)', () => {
-    const value: RichText = [
+    const value: TPortableTextBody = [
       {
         _type: 'aside',
         _key: 'aside-1',

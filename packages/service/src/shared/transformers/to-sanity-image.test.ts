@@ -97,6 +97,6 @@ describe('toSanityImage', () => {
 
   it('returns undefined when asset is absent', () => {
     const raw = { ...makeRawSanityImage(), asset: null };
-    expect(toSanityImage(raw as never, makeTenant())).toBeUndefined();
+    expect(toSanityImage(raw, makeTenant())).toBeUndefined();
   });
 });

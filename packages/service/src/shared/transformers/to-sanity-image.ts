@@ -12,8 +12,17 @@ import type { InferFragmentType } from 'groqd';
 
 export type TRawSanityImage = InferFragmentType<typeof sanityImageFragment>;
 
+// Same shape as `TRawSanityImage`, but the asset and alt are nullable —
+// accepted so a `bodyImage` block whose asset was never selected, points at
+// a deleted document, or is missing alt text (`bodyImageFragment`'s shape),
+// is a valid argument too.
+type TRawSanityImageInput = Omit<TRawSanityImage, 'asset' | 'alt'> & {
+  asset: TRawSanityImage['asset'] | null;
+  alt: TRawSanityImage['alt'] | null;
+};
+
 function toHotspot(
-  raw: TRawSanityImage['hotspot'],
+  raw: TRawSanityImageInput['hotspot'],
 ): TMaybeUndefined<ISanityImageHotspot> {
   if (
     !raw ||
@@ -29,7 +38,7 @@ function toHotspot(
 }
 
 function toCrop(
-  raw: TRawSanityImage['crop'],
+  raw: TRawSanityImageInput['crop'],
 ): TMaybeUndefined<ISanityImageCrop> {
   if (
     !raw ||
@@ -45,7 +54,7 @@ function toCrop(
 }
 
 function toDimensions(
-  raw: TRawSanityImage['asset']['metadata'],
+  raw: NonNullable<TRawSanityImageInput['asset']>['metadata'],
 ): TMaybeUndefined<ISanityImageDimensions> {
   const dimensions = raw?.dimensions;
   if (
@@ -65,14 +74,14 @@ function toDimensions(
 }
 
 export function toSanityImage(
-  raw: TRawSanityImage | null | undefined,
+  raw: TRawSanityImageInput | null | undefined,
   tenant: TImageTenant,
 ): TMaybeUndefined<ISanityImage> {
   if (!raw?.asset) return undefined;
 
   return {
     assetId: raw.asset._id,
-    alt: raw.alt,
+    alt: raw.alt ?? '',
     cdnBaseUrl: getSanityImageBaseUrl(tenant),
     hotspot: toHotspot(raw.hotspot),
     crop: toCrop(raw.crop),
