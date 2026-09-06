@@ -1,9 +1,8 @@
 'use client';
 
-import { ALERT_TYPE, ICONS } from '@blog/config';
+import { ICONS } from '@blog/config';
 import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { Alert } from '@platform/components/shared/alert';
 import { Card } from '@platform/components/shared/card';
 import { Heading } from '@platform/components/shared/heading';
 import { Icon } from '@platform/components/shared/icon';
@@ -75,7 +74,9 @@ export const DeprovisioningStatusView = ({
       key: stepKey,
       title: t(`stepLabel.${stepKey}`),
       status,
-      statusLabel: t(`statusLabel.${status}`),
+      statusLabel: isPreRun
+        ? t('preRunStepStatusLabel')
+        : t(`statusLabel.${status}`),
       trailingSlot: isStepRunning ? t('stepRunningNow') : undefined,
       updatedAt,
       updatedAtLabel: relativeUpdatedAt,
@@ -101,11 +102,7 @@ export const DeprovisioningStatusView = ({
           actions={overallStatusBadge}
         />
         <Card.Body className={cardBody()}>
-          {isPreRun ? (
-            <Alert type={ALERT_TYPE.INFO} title={t('startingNotice')} />
-          ) : (
-            <StepList steps={stepListSteps} />
-          )}
+          <StepList steps={stepListSteps} />
         </Card.Body>
       </Card>
 

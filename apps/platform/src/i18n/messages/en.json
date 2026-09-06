@@ -572,7 +572,7 @@
   "deprovisioningStatusView": {
     "cardTitle": "Deprovisioning progress",
     "startingBadge": "Starting…",
-    "startingNotice": "A teardown has been requested for this tenant — this card will update automatically once the workflow reports in.",
+    "preRunStepStatusLabel": "Queued",
     "stepLabel": {
       "REMOVE_DOMAIN": "Remove domain",
       "ARCHIVE_SANITY_PROJECT": "Archive Sanity project",

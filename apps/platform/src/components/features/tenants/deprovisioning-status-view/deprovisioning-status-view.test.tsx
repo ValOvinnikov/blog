@@ -35,16 +35,18 @@ describe(DeprovisioningStatusView, () => {
     vi.useRealTimers();
   });
 
-  it('shows a starting notice, not "Not started", when a teardown was requested but no run marker has appeared yet', () => {
+  it('shows the full step list under the Starting badge, not "Not started", when a teardown was requested but no run marker has appeared yet', () => {
     const tenant = makeTenant({ deprovisioningSteps: null });
     render(<DeprovisioningStatusView tenant={tenant} />);
 
     expect(screen.getByText('Starting…')).toBeVisible();
-    expect(
-      screen.getByText(
-        'A teardown has been requested for this tenant — this card will update automatically once the workflow reports in.',
-      ),
-    ).toBeVisible();
+    expect(screen.getByText('Remove domain')).toBeVisible();
+    expect(screen.getByText('Archive Sanity project')).toBeVisible();
+    expect(screen.getByText('Revoke Sanity tokens')).toBeVisible();
+    expect(screen.getByText('Clear provisioning artifacts')).toBeVisible();
+    expect(screen.getByText('Archive tenant')).toBeVisible();
+    expect(screen.getByText('Invalidate cached pages')).toBeVisible();
+    expect(screen.getAllByText('Queued').length).toBe(6);
     expect(screen.queryByText('Not started')).not.toBeInTheDocument();
   });
 
