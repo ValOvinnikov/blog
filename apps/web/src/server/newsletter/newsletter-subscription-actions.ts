@@ -102,12 +102,20 @@ export const resendConfirmationAction =
       const confirmationUrl = `${siteUrl}${routes.newsletterConfirm(result.confirmationToken)}`;
       const unsubscribeUrl = `${siteUrl}${routes.newsletterUnsubscribe(result.unsubscribeToken)}`;
       const { brand, brandName } = await resolveTenantEmailIdentity(tenantId);
-      const { logoImageUrl, footerPostalAddress, fromAddress, replyTo } =
-        await resolveNewsletterEmailSettings(
-          tenantId,
-          env.NEWSLETTER_FROM_ADDRESS,
-        );
-      const { subject, html, headers } = buildNewsletterConfirmationEmail({
+      const {
+        subject,
+        body,
+        logoImageUrl,
+        footerPostalAddress,
+        fromAddress,
+        replyTo,
+      } = await resolveNewsletterEmailSettings(
+        tenantId,
+        env.NEWSLETTER_FROM_ADDRESS,
+      );
+      const { html, headers } = buildNewsletterConfirmationEmail({
+        subject,
+        body,
         confirmationUrl,
         unsubscribeUrl,
         brand,

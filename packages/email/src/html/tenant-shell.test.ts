@@ -152,6 +152,63 @@ describe('buildTenantShell', () => {
     expect(actionIndex).toBeLessThan(footerIndex);
   });
 
+  it('renders no structuralHtml given for an email with no locked structural content', () => {
+    const withoutStructuralHtml = buildTenantShell({
+      brand: BRAND,
+      brandName: 'Acme',
+      bodyHtml: '<p>Body</p>',
+    });
+    const withUndefinedStructuralHtml = buildTenantShell({
+      brand: BRAND,
+      brandName: 'Acme',
+      bodyHtml: '<p>Body</p>',
+      structuralHtml: undefined,
+    });
+
+    expect(withUndefinedStructuralHtml).toBe(withoutStructuralHtml);
+  });
+
+  it('renders structuralHtml between the body and the action when both are given', () => {
+    const html = buildTenantShell({
+      brand: BRAND,
+      brandName: 'Acme',
+      bodyHtml: '<p>Body</p>',
+      structuralHtml: '<p>You have been invited to <strong>Acme</strong>.</p>',
+      actionHtml: '<a href="https://example.com">Confirm</a>',
+    });
+
+    const bodyIndex = html.indexOf('<p>Body</p>');
+    const structuralIndex = html.indexOf(
+      '<p>You have been invited to <strong>Acme</strong>.</p>',
+    );
+    const actionIndex = html.indexOf(
+      '<a href="https://example.com">Confirm</a>',
+    );
+    const footerIndex = html.indexOf('&copy;');
+
+    expect(bodyIndex).toBeLessThan(structuralIndex);
+    expect(structuralIndex).toBeLessThan(actionIndex);
+    expect(actionIndex).toBeLessThan(footerIndex);
+  });
+
+  it('renders structuralHtml between the body and the footer for an email with no action', () => {
+    const html = buildTenantShell({
+      brand: BRAND,
+      brandName: 'Acme',
+      bodyHtml: '<p>Body</p>',
+      structuralHtml: '<p>You have been invited to <strong>Acme</strong>.</p>',
+    });
+
+    const bodyIndex = html.indexOf('<p>Body</p>');
+    const structuralIndex = html.indexOf(
+      '<p>You have been invited to <strong>Acme</strong>.</p>',
+    );
+    const footerIndex = html.indexOf('&copy;');
+
+    expect(bodyIndex).toBeLessThan(structuralIndex);
+    expect(structuralIndex).toBeLessThan(footerIndex);
+  });
+
   it('renders no logo image given for an email with no uploaded logo', () => {
     const withoutLogo = buildTenantShell({
       brand: BRAND,

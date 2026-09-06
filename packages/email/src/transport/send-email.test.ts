@@ -168,6 +168,37 @@ describe('sendEmail', () => {
     expect(sendMock).not.toHaveBeenCalled();
   });
 
+  it('strips a newline from the subject so it cannot inject a header', async () => {
+    sendMock.mockResolvedValue({ data: { id: 'email_1' }, error: null });
+
+    const { sendEmail } = await importSendEmail();
+    await sendEmail({
+      to: 'reader@example.com',
+      from: 'from@example.com',
+      subject: 'Confirm subscription\r\nBcc: attacker@evil.example',
+      html: '<p>Body</p>',
+    });
+
+    const sentSubject = sendMock.mock.calls[0]?.[0].subject as string;
+    expect(sentSubject).not.toMatch(/[\r\n]/);
+    expect(sentSubject).toBe('Confirm subscription Bcc: attacker@evil.example');
+  });
+
+  it('strips a bare carriage return or line feed from the subject', async () => {
+    sendMock.mockResolvedValue({ data: { id: 'email_1' }, error: null });
+
+    const { sendEmail } = await importSendEmail();
+    await sendEmail({
+      to: 'reader@example.com',
+      from: 'from@example.com',
+      subject: 'Line one\nLine two\rLine three',
+      html: '<p>Body</p>',
+    });
+
+    const sentSubject = sendMock.mock.calls[0]?.[0].subject as string;
+    expect(sentSubject).not.toMatch(/[\r\n]/);
+  });
+
   it('throws a clear error when Resend reports a send failure', async () => {
     sendMock.mockResolvedValue({
       data: null,
