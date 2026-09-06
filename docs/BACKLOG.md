@@ -68,15 +68,15 @@ flowchart LR
     ENG["#1040 comments · #1041 ratings<br/>#1043 bookmarks · #1044 newsletter"]
     FND --> AUTH --> ENG
   end
-  subgraph M10["M10 Generic home page (GitHub: M10, new)"]
+  subgraph M9["M9 Generic home page + Portfolio (GitHub: M9)"]
     H0["Phase 0 hero family slot · HERO_MAP"]
     H1["Phase 1 blog: heroBlog · grid images<br/>postFeatured · carousel · topic cards"]
     H2["Phase 2 heroStatement · heroProfile"]
     H3["Phase 3 marketing modules · contact form"]
     H0 --> H1 --> H2 --> H3
+    H2 -.->|heroProject · projectList| PF["Portfolio #1919"]
   end
-  DONE --> M0 --> M1 --> P3 --> M2 --> M3 --> M5 --> M10
-  H2 -.->|heroProject · projectList| M9["M9 Portfolio #1919"]
+  DONE --> M0 --> M1 --> P3 --> M2 --> M3 --> M5 --> M9
   M14 -.->|webhook plumbing| M33
   P3a -.->|post route 76/90| M33
   M31 -.->|shared #984 bootstrap| FND
@@ -713,14 +713,15 @@ consume those shapes, they don't design them.
 
 ---
 
-## M10 — Generic home page & module catalogue (GitHub: `M10 — Home page variants`, to be created)
+## M9 — Generic home page & module catalogue (GitHub: `M9 — Portfolio`, existing)
 
 > **Design source of truth:**
 > `docs/superpowers/specs/2026-08-23-module-and-page-type-portfolio-design.md`
 > (module catalogue, contact form, portfolio strand — resynced 2026-09-06)
-> plus the per-module design sub-issues this section files. Portfolio itself
-> (#1919 / #1290 / #1291 / #1292) stays in **M9 — Portfolio** and slots in
-> after Phase 2 below; nothing here duplicates it.
+> plus the per-module design sub-issues this section files. Everything here
+> lands in the existing **M9 — Portfolio** GitHub milestone alongside the
+> portfolio strand (#1919 / #1290 / #1291 / #1292), which slots in after
+> Phase 2 below; nothing here duplicates it.
 
 **The problem this milestone solves.** `page_home` is a blog home page and
 nothing else: its required `hero` slot accepts only `module_hero`, which is a
@@ -790,7 +791,7 @@ flowchart TD
   P2["Phase 2 · Hero family<br/>heroStatement · heroProfile"]
   P3["Phase 3 · Marketing modules<br/>featureGrid · testimonial · logoWall · stats · faq · embed<br/>featureHighlights · team · location · contactForm"]
   P4["Phase 4 · Onboarding templates<br/>site-kind at tenant creation"]
-  M9["M9 · Portfolio (#1919)<br/>project entity · page_work · heroProject · projectList/Latest"]
+  M9["Portfolio strand (#1919, same milestone)<br/>project entity · page_work · heroProject · projectList/Latest"]
   P0 --> P1a & P1b & P1e
   P1b --> P1c --> P1d
   P0 --> P2 --> P3
@@ -802,7 +803,7 @@ flowchart TD
 
 ### Phase 0 · Generic home page — epic `feat: generic home page & hero family infrastructure`
 
-- **Milestone / labels:** `M10` · epic `enhancement`, `prio:next`; sub-issues
+- **Milestone / labels:** `M9 — Portfolio` · epic `enhancement`, `prio:next`; sub-issues
   add their layer label.
 - **Depends on:** nothing — additive throughout.
 - **Design sub-issue** · `docs: design the hero family slot & home page
@@ -1008,7 +1009,7 @@ adds `config`, `db` and `email`. Order by archetypes unlocked:
   modules each template needs; the blog template can ship after Phase 1
   alone.
 
-### Non-goals (recorded so M10 doesn't sprawl)
+### Non-goals (recorded so this milestone doesn't sprawl)
 
 Renaming `module_hero` in place (immutable `_type`; retirement is the path);
 a CRM for leads; per-module visuals beyond tokens and the shared styling
