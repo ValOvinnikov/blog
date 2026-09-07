@@ -28,6 +28,5 @@ export function toThemeTokens(raw: TRawThemeSettings): TThemeTokens {
     bodyFont: raw?.bodyFont ?? base.bodyFont,
     radiusScale: raw?.radiusScale ?? base.radiusScale,
     density: raw?.density ?? base.density,
-    chromeOn: base.chromeOn,
   };
 }
