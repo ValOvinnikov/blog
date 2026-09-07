@@ -60,6 +60,7 @@ describe(HeroModuleView, () => {
         target: undefined,
         platform: undefined,
         hiddenLabelSuffix: 'Welcome to the blog',
+        appearance: undefined,
       },
     });
 
@@ -78,6 +79,7 @@ describe(HeroModuleView, () => {
         target: undefined,
         platform: undefined,
         hiddenLabelSuffix: undefined,
+        appearance: undefined,
       },
     });
 

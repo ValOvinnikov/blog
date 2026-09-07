@@ -30,6 +30,7 @@ const meta = {
       target: undefined,
       platform: undefined,
       hiddenLabelSuffix: 'Building a Design System from Scratch',
+      appearance: undefined,
     },
     secondaryAction: undefined,
     layout: undefined,

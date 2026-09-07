@@ -1,1 +1,1 @@
-export { ActionGroup } from './action-group';
+export { ActionGroup, toButtonVariant } from './action-group';

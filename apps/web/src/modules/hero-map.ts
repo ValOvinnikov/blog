@@ -2,6 +2,7 @@ import type { THeroModuleType } from '@blog/config';
 import type { ReactNode } from 'react';
 
 import { HeroModule } from './hero/hero-module';
+import { HeroBlogModule } from './hero-blog/hero-blog-module';
 import type { TModuleComponentProps } from './module-map';
 
 /**
@@ -15,4 +16,5 @@ export const HERO_MAP: Record<
   (props: TModuleComponentProps) => Promise<ReactNode>
 > = {
   module_hero: HeroModule,
+  module_heroBlog: HeroBlogModule,
 };
