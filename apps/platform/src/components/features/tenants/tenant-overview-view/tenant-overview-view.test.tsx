@@ -347,7 +347,7 @@ describe(TenantOverviewView, () => {
       />,
     );
 
-    expect(screen.getByText('Provisioning — step 2 of 5')).toBeVisible();
+    expect(screen.getByText('Provisioning — step 2 of 6')).toBeVisible();
     expect(
       screen.getByRole('textbox', { name: 'Name' }),
     ).toHaveAccessibleDescription('Locked while provisioning is running.');

@@ -29,6 +29,7 @@ async function insertDraftTenant(): Promise<string> {
         PERSIST_TOKEN: { status: 'IDLE' },
         MAP_DOMAIN: { status: 'IDLE' },
         CREATE_WEBHOOK: { status: 'IDLE' },
+        VERIFY_CONTENT: { status: 'IDLE' },
         OWNER_ELEVATION: { status: 'IDLE' },
       },
     })
@@ -101,7 +102,7 @@ describe(reportStepStatus, () => {
 
     await reportStepStatus({
       tenantId,
-      step: 'CREATE_WEBHOOK',
+      step: 'VERIFY_CONTENT',
       status: 'DONE',
     });
 
@@ -109,14 +110,27 @@ describe(reportStepStatus, () => {
     expect(tenant?.provisioningStatus).toBe('READY');
   });
 
-  it('sets the overall provisioningStatus to FAILED when the last step fails', async () => {
+  it('leaves the overall provisioningStatus untouched when CREATE_WEBHOOK (not the last step) finishes', async () => {
     const tenantId = await insertDraftTenant();
 
     await reportStepStatus({
       tenantId,
       step: 'CREATE_WEBHOOK',
+      status: 'DONE',
+    });
+
+    const tenant = await loadTenant(tenantId);
+    expect(tenant?.provisioningStatus).toBe('PENDING');
+  });
+
+  it('sets the overall provisioningStatus to FAILED when the last step fails', async () => {
+    const tenantId = await insertDraftTenant();
+
+    await reportStepStatus({
+      tenantId,
+      step: 'VERIFY_CONTENT',
       status: 'FAILED',
-      error: 'Webhook creation returned 500',
+      error: 'missing required starter document(s): settings_site',
     });
 
     const tenant = await loadTenant(tenantId);

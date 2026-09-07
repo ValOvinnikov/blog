@@ -102,6 +102,7 @@ describe(computeTenantFieldLocks, () => {
       [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: done,
       [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: done,
       [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: done,
+      [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: done,
       [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
         status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
       },
@@ -118,7 +119,7 @@ describe(computeTenantFieldLocks, () => {
     });
   });
 
-  it('excludes OWNER_ELEVATION from the fold entirely — a 6th key never changes the result, even with a status the core sequence never produces', () => {
+  it('excludes OWNER_ELEVATION from the fold entirely — a 7th key never changes the result, even with a status the core sequence never produces', () => {
     const done = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
     const coreStepsDone = {
       [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: done,
@@ -126,6 +127,7 @@ describe(computeTenantFieldLocks, () => {
       [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: done,
       [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: done,
       [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: done,
+      [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: done,
       [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
         status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
       },

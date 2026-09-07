@@ -142,7 +142,7 @@ export type TUseProvisioningPollResult = {
   failedStepError: string | undefined;
   errorKind: TProvisioningErrorKind | undefined;
   domainStatus: TDomainVerificationStatus;
-  /** The most recent `elevateTenantOwner` check's outcome, independent of the five-step sequence above. `undefined` before any check has run. */
+  /** The most recent `elevateTenantOwner` check's outcome, independent of the core provisioning step sequence above. `undefined` before any check has run. */
   ownerElevationOutcome: TElevateTenantOwnerOutcome | undefined;
 };
 

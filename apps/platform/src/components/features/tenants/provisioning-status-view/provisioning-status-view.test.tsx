@@ -196,7 +196,7 @@ describe(ProvisioningStatusView, () => {
     expect(screen.getByRole('complementary')).toBeInTheDocument();
   });
 
-  it('titles the steps card "Steps" and shows a 0-of-5-done badge when every step is idle', () => {
+  it('titles the steps card "Steps" and shows a 0-of-6-done badge when every step is idle', () => {
     const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
@@ -206,7 +206,7 @@ describe(ProvisioningStatusView, () => {
     expect(
       within(sidebar).getByRole('heading', { level: 2, name: 'Steps' }),
     ).toBeVisible();
-    expect(within(sidebar).getByText('0 of 5 done')).toBeVisible();
+    expect(within(sidebar).getByText('0 of 6 done')).toBeVisible();
   });
 
   it("reflects the steps card's completion badge count from the tenant's actual step statuses", () => {
@@ -226,11 +226,11 @@ describe(ProvisioningStatusView, () => {
     );
 
     expect(
-      within(screen.getByRole('complementary')).getByText('2 of 5 done'),
+      within(screen.getByRole('complementary')).getByText('2 of 6 done'),
     ).toBeVisible();
   });
 
-  it('lists all five provisioning steps in order, in operator language', () => {
+  it('lists all six provisioning steps in order, in operator language', () => {
     const tenant = makeTenant();
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
@@ -242,6 +242,7 @@ describe(ProvisioningStatusView, () => {
       'Issue read credentials',
       'Connect domain',
       'Wire up CMS to website',
+      'Confirm content is ready',
     ];
     for (const heading of headings) {
       expect(screen.getByText(heading)).toBeVisible();
@@ -300,6 +301,9 @@ describe(ProvisioningStatusView, () => {
           status: TENANT_PROVISIONING_STEP_STATUS.DONE,
         },
         [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
+        },
+        [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: {
           status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
         },
         [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {

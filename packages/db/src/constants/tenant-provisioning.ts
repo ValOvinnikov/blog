@@ -17,7 +17,8 @@ export const TENANT_PROVISIONING_STEP = {
   PERSIST_TOKEN: 'PERSIST_TOKEN',
   MAP_DOMAIN: 'MAP_DOMAIN',
   CREATE_WEBHOOK: 'CREATE_WEBHOOK',
-  // Not one of the five core provisioning steps `overallStatusFor` and the
+  VERIFY_CONTENT: 'VERIFY_CONTENT',
+  // Not one of the six core provisioning steps `overallStatusFor` and the
   // operator UI's step sequencing reason about — a recurring
   // post-provisioning check (`elevateTenantOwner`) that never touches the
   // tenant's overall `provisioningStatus`. See `TElevateTenantOwnerOutcome`
@@ -31,12 +32,16 @@ export type TTenantProvisioningStep = TValueOf<typeof TENANT_PROVISIONING_STEP>;
 // order — excludes `OWNER_ELEVATION`, a recurring post-provisioning check
 // with no bearing on the sequenced-provisioning state machine, so a fold
 // over this list can't silently pick up a future unrelated step key.
+// `VERIFY_CONTENT` runs last: it asserts the dataset actually holds the
+// starter singletons the render path depends on, so `overallStatusFor`
+// only settles the tenant to READY once that assertion has passed.
 export const CORE_PROVISIONING_STEPS = [
   TENANT_PROVISIONING_STEP.SANITY_PROJECT,
   TENANT_PROVISIONING_STEP.SEED_CONTENT,
   TENANT_PROVISIONING_STEP.PERSIST_TOKEN,
   TENANT_PROVISIONING_STEP.MAP_DOMAIN,
   TENANT_PROVISIONING_STEP.CREATE_WEBHOOK,
+  TENANT_PROVISIONING_STEP.VERIFY_CONTENT,
 ] as const satisfies readonly TTenantProvisioningStep[];
 
 export type TCoreProvisioningStep = (typeof CORE_PROVISIONING_STEPS)[number];

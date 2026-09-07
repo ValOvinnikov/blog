@@ -162,6 +162,7 @@ describe(beginTenantProvisioning, () => {
       PERSIST_TOKEN: { status: 'IDLE' },
       MAP_DOMAIN: { status: 'IDLE' },
       CREATE_WEBHOOK: { status: 'IDLE' },
+      VERIFY_CONTENT: { status: 'IDLE' },
       OWNER_ELEVATION: { status: 'IDLE' },
       run: { startedAt: WEDGED_STARTED_AT },
     };
@@ -203,6 +204,7 @@ describe(beginTenantProvisioning, () => {
       PERSIST_TOKEN: { status: 'RUNNING' },
       MAP_DOMAIN: { status: 'IDLE' },
       CREATE_WEBHOOK: { status: 'IDLE' },
+      VERIFY_CONTENT: { status: 'IDLE' },
       OWNER_ELEVATION: { status: 'IDLE' },
       run: { startedAt: WEDGED_STARTED_AT },
     };
@@ -234,6 +236,7 @@ describe(beginTenantProvisioning, () => {
       PERSIST_TOKEN: { status: 'DONE' },
       MAP_DOMAIN: { status: 'DONE' },
       CREATE_WEBHOOK: { status: 'DONE' },
+      VERIFY_CONTENT: { status: 'DONE' },
       OWNER_ELEVATION: { status: 'IDLE' },
       run: {
         startedAt: WEDGED_STARTED_AT,
@@ -263,6 +266,7 @@ describe(beginTenantProvisioning, () => {
       PERSIST_TOKEN: { status: 'IDLE' },
       MAP_DOMAIN: { status: 'IDLE' },
       CREATE_WEBHOOK: { status: 'IDLE' },
+      VERIFY_CONTENT: { status: 'IDLE' },
       OWNER_ELEVATION: { status: 'IDLE' },
       run: { startedAt: staleStartedAt },
     };
@@ -286,6 +290,7 @@ describe(beginTenantProvisioning, () => {
       PERSIST_TOKEN: { status: 'IDLE' },
       MAP_DOMAIN: { status: 'IDLE' },
       CREATE_WEBHOOK: { status: 'IDLE' },
+      VERIFY_CONTENT: { status: 'IDLE' },
       OWNER_ELEVATION: { status: 'IDLE' },
       run: { startedAt: new Date().toISOString() },
     };
@@ -321,6 +326,7 @@ describe(beginTenantProvisioning, () => {
       PERSIST_TOKEN: { status: 'IDLE' },
       MAP_DOMAIN: { status: 'IDLE' },
       CREATE_WEBHOOK: { status: 'IDLE' },
+      VERIFY_CONTENT: { status: 'IDLE' },
       OWNER_ELEVATION: { status: 'IDLE' },
       run: { startedAt: WEDGED_STARTED_AT },
     };
@@ -385,6 +391,7 @@ describe(beginTenantProvisioning, () => {
       PERSIST_TOKEN: { status: 'IDLE' },
       MAP_DOMAIN: { status: 'IDLE' },
       CREATE_WEBHOOK: { status: 'IDLE' },
+      VERIFY_CONTENT: { status: 'IDLE' },
       OWNER_ELEVATION: { status: 'IDLE' },
       run: { startedAt: WEDGED_STARTED_AT },
     };
