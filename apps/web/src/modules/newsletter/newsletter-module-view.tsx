@@ -1,9 +1,11 @@
+import type { TMaybeUndefined } from '@blog/config';
 import type { TNewsletterModule } from '@blog/service';
 import { NewsletterForm } from '@web/components/shared/newsletter-form';
 import { Section } from '@web/components/shared/section';
 
 export interface INewsletterModuleViewProps extends TNewsletterModule {
   id: string;
+  trustCues: TMaybeUndefined<string[]>;
 }
 
 /**
@@ -17,6 +19,7 @@ export const NewsletterModuleView = ({
   sectionHeader,
   layout,
   contentAlignment,
+  trustCues,
 }: INewsletterModuleViewProps) => {
   const titleId = `newsletter-${id}`;
   const { heading, supportingText } = sectionHeader;
@@ -33,6 +36,7 @@ export const NewsletterModuleView = ({
         heading={heading}
         headingId={titleId}
         supportingText={supportingText}
+        trustCues={trustCues}
         align={contentAlignment}
       />
     </Section>
