@@ -65,3 +65,17 @@ export const WithoutCmsHeading: TStory = {
 export const Secondary: TStory = {
   args: { brandVariant: BRAND_VARIANT.SECONDARY },
 };
+
+const placeholderImage = (alt: string) => (
+  <img src="https://placehold.co/640x360" alt={alt} />
+);
+
+export const WithImages: TStory = {
+  args: {
+    hasImages: true,
+    items: items.map((item) => ({
+      ...item,
+      image: placeholderImage(item.title),
+    })),
+  },
+};

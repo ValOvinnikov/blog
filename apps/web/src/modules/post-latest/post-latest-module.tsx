@@ -1,5 +1,6 @@
 import { service } from '@blog/service';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { renderPostCardImage } from '@web/utils/render-post-card-image';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { getTranslations } from 'next-intl/server';
 
@@ -27,10 +28,19 @@ export const PostLatestModule = async ({
 
   if (!result.ok) return null;
 
-  const { brandVariant, sectionHeader, posts, layout, contentAlignment } =
-    result.data;
+  const {
+    brandVariant,
+    sectionHeader,
+    posts,
+    layout,
+    contentAlignment,
+    showImages,
+  } = result.data;
 
-  const items = await toPostListItems(posts);
+  const items = await toPostListItems(
+    posts,
+    showImages ? renderPostCardImage : undefined,
+  );
 
   if (items.length === 0) return null;
 
@@ -41,6 +51,7 @@ export const PostLatestModule = async ({
       items={items}
       layout={layout}
       contentAlignment={contentAlignment}
+      hasImages={showImages}
       titleId={`latest-posts-${id}`}
       dataTestId={`post-latest-module-${id}`}
       accessibleTitle={t('fallbackHeading')}

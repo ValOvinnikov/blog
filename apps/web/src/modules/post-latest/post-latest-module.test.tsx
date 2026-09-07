@@ -1,5 +1,6 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { PostLatestModule } from './post-latest-module';
@@ -197,5 +198,72 @@ describe(PostLatestModule, () => {
 
     expect(screen.getByText('First post')).toBeInTheDocument();
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+  });
+
+  it('renders each post image when showImages is true', async () => {
+    const sanityImage = makeSanityImage();
+    getPostLatestMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        sectionHeader: {
+          heading: 'Latest posts',
+          supportingText: undefined,
+        },
+        posts: [
+          {
+            id: 'post-1',
+            slug: 'first-post',
+            title: 'First post',
+            excerpt: 'An excerpt',
+            publishedAt: '2026-01-01T00:00:00.000Z',
+            topic: { id: 'topic-1', title: 'News', slug: 'news' },
+            readingTimeMinutes: 2,
+            heroImageSanity: sanityImage,
+          },
+        ],
+        layout: undefined,
+        contentAlignment: undefined,
+        showImages: true,
+      },
+    });
+
+    await setup();
+
+    expect(
+      screen.getByRole('img', { name: sanityImage.alt }),
+    ).toBeInTheDocument();
+  });
+
+  it('renders no post images when showImages is false', async () => {
+    getPostLatestMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        sectionHeader: {
+          heading: 'Latest posts',
+          supportingText: undefined,
+        },
+        posts: [
+          {
+            id: 'post-1',
+            slug: 'first-post',
+            title: 'First post',
+            excerpt: 'An excerpt',
+            publishedAt: '2026-01-01T00:00:00.000Z',
+            topic: { id: 'topic-1', title: 'News', slug: 'news' },
+            readingTimeMinutes: 2,
+            heroImageSanity: makeSanityImage(),
+          },
+        ],
+        layout: undefined,
+        contentAlignment: undefined,
+        showImages: false,
+      },
+    });
+
+    await setup();
+
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 });

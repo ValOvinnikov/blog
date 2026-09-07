@@ -2,6 +2,7 @@ import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
+import { renderPostCardImage } from '@web/utils/render-post-card-image';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
@@ -72,6 +73,7 @@ export const PostListModule = async ({
     currentPage,
     totalPages,
     contentAlignment,
+    showImages,
   } = result.data;
 
   // Out-of-range page (corpus shrank or hand-typed URL) → hard 404, never a
@@ -81,7 +83,10 @@ export const PostListModule = async ({
     notFound();
   }
 
-  const items = await toPostListItems(posts);
+  const items = await toPostListItems(
+    posts,
+    showImages ? renderPostCardImage : undefined,
+  );
 
   const pagination: IPostListModulePagination = {
     currentPage,
@@ -99,6 +104,7 @@ export const PostListModule = async ({
       items={items}
       layout={layout}
       contentAlignment={contentAlignment}
+      hasImages={showImages}
       titleId={titleId}
       dataTestId={`post-list-module-${id}`}
       accessibleTitle={accessibleTitle ?? blogListT('title')}

@@ -26,6 +26,7 @@ export interface IPostListModuleViewProps extends Omit<
   accessibleTitle: string;
   emptyMessage?: string;
   pagination?: IPostListModulePagination;
+  hasImages?: boolean;
 }
 
 /**
@@ -46,6 +47,7 @@ export const PostListModuleView = ({
   emptyMessage,
   pagination,
   contentAlignment,
+  hasImages,
 }: IPostListModuleViewProps) => {
   const { heading, supportingText } = sectionHeader;
 
@@ -66,6 +68,7 @@ export const PostListModuleView = ({
         linkAs={SmartLink}
         isWrapped={true}
         emptyMessage={emptyMessage}
+        hasImages={hasImages}
       />
       {pagination ? (
         <Pagination
