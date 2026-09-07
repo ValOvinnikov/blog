@@ -7,5 +7,4 @@ export const showImagesField = () =>
     type: 'boolean',
     description: "Show each post's image on its card.",
     initialValue: true,
-    validation: (rule) => rule.required(),
   });

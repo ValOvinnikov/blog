@@ -592,9 +592,9 @@ related-reading section, and that gets images unconditionally.
 One helper, `showImagesField()`, emitted by both listing modules right after
 `sectionHeaderField()`:
 
-| Field        | Type                                    | Notes                                            |
-| ------------ | --------------------------------------- | ------------------------------------------------ |
-| `showImages` | boolean, `initialValue: true`, required | "Show each post's image on its card." Default on |
+| Field        | Type                                              | Notes                                            |
+| ------------ | ------------------------------------------------- | ------------------------------------------------ |
+| `showImages` | boolean, `initialValue: true`, no validation rule | "Show each post's image on its card." Default on |
 
 `showImages` rather than `hasImages` on the schema, matching the existing
 verb-phrase booleans (`openInNewTab`, `newsletterEnabled`); the organism prop
@@ -674,7 +674,23 @@ passes it. `PostListModuleView` forwards `hasImages` to `PostsSection`.
 
 ### Validation
 
-None. A required boolean with an initial value cannot be invalid.
+None — and specifically **no `required()` rule either**.
+
+An earlier revision of this section specified `validation: rule.required()`,
+on the reasoning that "a required boolean with an initial value cannot be
+invalid." That is true only of documents created after the field exists.
+`initialValue` fills the form when an author creates a document; it never
+backfills documents already in a dataset. PR #2886 demonstrated the
+consequence: `Document validation` reported 18 errors, one per pre-existing
+module document (17 `module_postList`, 1 `module_postLatest`), each
+`showImages ✖ Required` — contradicting this design's own promise that
+existing documents keep validating.
+
+So the field carries `initialValue: true` and nothing else, matching
+`newsletterEnabled` on `blog_post`, which is the same shape for the same
+reason. New documents default to on through `initialValue`; existing ones
+read as on through the `coalesce(showImages, true)` projection below. The
+guarantee that makes this safe lives in the query, not in a validation rule.
 
 ### Migration
 
