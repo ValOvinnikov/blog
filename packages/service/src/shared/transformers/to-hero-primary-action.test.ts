@@ -1,3 +1,4 @@
+import { CTA_ACTION_APPEARANCE } from '@blog/config';
 import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
@@ -33,5 +34,30 @@ describe(toHeroPrimaryAction, () => {
       platform: undefined,
       hiddenLabelSuffix: undefined,
     });
+  });
+
+  it('leaves appearance undefined when the caller passes none — module_hero has no appearance field', () => {
+    const action = toHeroPrimaryAction('Discover the story', post);
+
+    expect(action?.appearance).toBeUndefined();
+  });
+
+  it.each([CTA_ACTION_APPEARANCE.CONTAINED, CTA_ACTION_APPEARANCE.INLINE])(
+    'carries an authored appearance %s through unchanged',
+    (appearance) => {
+      const action = toHeroPrimaryAction(
+        'Discover the story',
+        post,
+        appearance,
+      );
+
+      expect(action?.appearance).toBe(appearance);
+    },
+  );
+
+  it('leaves appearance undefined when explicitly passed null (no faked default)', () => {
+    const action = toHeroPrimaryAction('Discover the story', post, null);
+
+    expect(action?.appearance).toBeUndefined();
   });
 });

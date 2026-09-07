@@ -42,6 +42,9 @@ export const heroBlogModuleQuery = q
     imageSource: sub.field('imageSource').notNull(),
     image: sub.field('image').project(sanityImageFragment).nullable(true),
     primaryActionLabel: sub.field('primaryActionLabel').nullable(true),
+    primaryActionAppearance: sub
+      .field('primaryActionAppearance')
+      .nullable(true),
     secondaryAction: sub
       .field('secondaryAction')
       .project(ctaActionFragment)

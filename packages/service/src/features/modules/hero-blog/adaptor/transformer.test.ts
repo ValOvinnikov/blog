@@ -1,6 +1,7 @@
 import {
   BRAND_VARIANT,
   CONTENT_ALIGNMENT,
+  CTA_ACTION_APPEARANCE,
   CTA_ACTION_VARIANT,
   HERO_IMAGE_SOURCE,
   HERO_VARIANT,
@@ -163,6 +164,31 @@ describe(toHeroBlogModule, () => {
       label: 'Discover the story',
       hiddenLabelSuffix: undefined,
     });
+  });
+
+  it.each([CTA_ACTION_APPEARANCE.CONTAINED, CTA_ACTION_APPEARANCE.INLINE])(
+    'carries the authored primaryActionAppearance %s onto the primary action',
+    (appearance) => {
+      const raw = makeRawHeroBlogModule({
+        post: makeRawPostCard(),
+        primaryActionAppearance: appearance,
+      });
+
+      const hero = toHeroBlogModule(raw, tenant);
+
+      expect(hero.primaryAction?.appearance).toBe(appearance);
+    },
+  );
+
+  it('leaves primaryAction.appearance undefined when unset (no faked default)', () => {
+    const raw = makeRawHeroBlogModule({
+      post: makeRawPostCard(),
+      primaryActionAppearance: null,
+    });
+
+    const hero = toHeroBlogModule(raw, tenant);
+
+    expect(hero.primaryAction?.appearance).toBeUndefined();
   });
 
   it('leaves secondaryAction undefined when unset', () => {

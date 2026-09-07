@@ -54,6 +54,7 @@ export function makeRawHeroBlogModule(
     imageSource: HERO_IMAGE_SOURCE.POST,
     image: null,
     primaryActionLabel: null,
+    primaryActionAppearance: null,
     secondaryAction: null,
     variant: HERO_VARIANT.SPLIT,
     brandVariant: BRAND_VARIANT.PRIMARY,

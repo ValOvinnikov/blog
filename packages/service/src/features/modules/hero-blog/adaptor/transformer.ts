@@ -74,7 +74,11 @@ export function toHeroBlogModule(
     heading: raw.heading ?? post?.title,
     supportingText: raw.supportingText ?? post?.excerpt,
     sanityImage: toImage(raw, post, tenant),
-    primaryAction: toHeroPrimaryAction(raw.primaryActionLabel, post),
+    primaryAction: toHeroPrimaryAction(
+      raw.primaryActionLabel,
+      post,
+      raw.primaryActionAppearance,
+    ),
     secondaryAction: raw.secondaryAction
       ? toCtaAction(raw.secondaryAction)
       : undefined,
