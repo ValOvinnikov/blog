@@ -1,8 +1,8 @@
 import {
   BRAND_VARIANT,
   CONTENT_ALIGNMENT,
-  CTA_MOBILE_MEDIA_ORDER,
   CTA_VARIANT,
+  MOBILE_MEDIA_ORDER,
 } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
@@ -38,7 +38,7 @@ const meta = {
     },
     mobileMediaOrder: {
       control: 'select',
-      options: Object.values(CTA_MOBILE_MEDIA_ORDER),
+      options: Object.values(MOBILE_MEDIA_ORDER),
     },
   },
   args: {

@@ -5,11 +5,11 @@ import type {
   TCtaActionAppearance,
   TCtaActionVariant,
   TContentAlignment,
-  TCtaMobileMediaOrder,
   TCtaVariant,
   TFullBrandVariant,
   TLayout,
   TMaybeUndefined,
+  TMobileMediaOrder,
 } from '@blog/config';
 
 export type TCtaAction = {
@@ -31,7 +31,7 @@ export type TCtaModule = {
   image: TMaybeUndefined<ISanityImage>;
   contentPosition: TMaybeUndefined<TContentAlignment>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
-  mobileMediaOrder: TMaybeUndefined<TCtaMobileMediaOrder>;
+  mobileMediaOrder: TMaybeUndefined<TMobileMediaOrder>;
   actions: TCtaAction[];
   footnote: TMaybeUndefined<string>;
   layout: TMaybeUndefined<TLayout>;

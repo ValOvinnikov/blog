@@ -12,6 +12,22 @@ export type TModuleType = Extract<
 >['_type'];
 
 /**
+ * Every module whose schema `name:` starts with `module_hero` — membership
+ * in the hero family is a naming convention, not a hand-maintained list.
+ */
+export type THeroModuleType = Extract<TModuleType, `module_hero${string}`>;
+
+/**
+ * Every module that renders through a page's dedicated slot rather than
+ * through `modules[]`.
+ */
+export type TSlotModuleType =
+  THeroModuleType | 'module_postList' | 'module_taxonomyList';
+
+export const isHeroModuleType = (type: string): type is THeroModuleType =>
+  type.startsWith('module_hero');
+
+/**
  * Source-mode values for the hero module's mode/custom field pairs
  * (`heroEyebrowMode`, `heroTitleMode`, `heroSubtitleMode`, `heroImageMode`).
  */
@@ -25,3 +41,11 @@ export const HERO_FIELD_MODE = {
 } as const;
 
 export type THeroFieldMode = TValueOf<typeof HERO_FIELD_MODE>;
+
+export const HERO_VARIANT = {
+  SPLIT: 'SPLIT',
+  STACKED: 'STACKED',
+  BANNER: 'BANNER',
+} as const;
+
+export type THeroVariant = TValueOf<typeof HERO_VARIANT>;
