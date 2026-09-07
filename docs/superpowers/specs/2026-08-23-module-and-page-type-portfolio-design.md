@@ -156,6 +156,199 @@ additive.
 layer chain), _not_ a multi-layer epic — file each under #1919 when work on
 it starts, same pattern as any other item added to this catalogue.
 
+## Hero family & the generic home page
+
+**Goal:** the home page stops being blog-shaped. Its required `hero` slot
+accepts a _family_ of hero modules — one per kind of site (blog, statement,
+profile) — and every other page gains the same slot as an optional field
+that replaces its default header, so a tenant can compose a marketing landing
+page, a personal profile page, or a blog front page from the same catalogue
+with zero bespoke code. This section
+is the design of record for the family's infrastructure (epic #2778); each
+member hero gets its own design section as it is added (`module_heroBlog`
+first, under #2780).
+
+Interactive mock of every decision below:
+<https://claude.ai/code/artifact/ad822029-c1e5-42db-953b-5269fb45093d>.
+
+### Membership is a naming convention, enforced by the compiler
+
+A hero is any module whose schema `name:` starts with `module_hero`. Nothing
+is registered by hand:
+
+```ts
+// @blog/config — constants/module.ts
+type THeroModuleType = Extract<TModuleType, `module_hero${string}`>;
+type TSlotModuleType =
+  THeroModuleType | 'module_postList' | 'module_taxonomyList';
+```
+
+`THeroModuleType` is the same template-literal `Extract` that already derives
+`TModuleType` from the generated Sanity types, one level down. Today it
+resolves to `'module_hero'`; after M9 it is `'module_hero' |
+'module_heroBlog' | 'module_heroStatement' | 'module_heroProfile'`, and the
+legacy `module_hero` drops out of the union the day its schema is deleted
+(the retirement ticket, #2813).
+
+`TSlotModuleType` names every module that renders through a page's dedicated
+slot rather than `modules[]`, so `MODULE_MAP` is typed
+`Record<Exclude<TModuleType, TSlotModuleType>, …>` instead of listing three
+string literals. Both types live in `@blog/config` because studio, service
+and web all read them.
+
+Two maps are keyed on the family, and both refuse to compile until a new
+`module_hero*` schema is named in them — the same guarantee `MODULE_MAP`
+gives `modules[]` modules:
+
+- `apps/web/src/modules/hero-map.ts` — `HERO_MAP: Record<THeroModuleType,
+ComponentType<{ id: string }>>`, plus a `HeroSlot({ id, type })` component
+  that looks the type up and renders the module. `ModuleRenderer` keeps its
+  warn-and-render-nothing fallback for a runtime type the map does not know;
+  `HeroSlot` mirrors it, since the page query cannot narrow `_type` at the
+  GROQ level.
+- `apps/web`'s `REVALIDATE_TAGS` — already `Record<TModuleType | …>`, so it
+  needs no new guard; each hero adds its `modules:<kind>` tag entry.
+
+In the studio the equivalent guard is a `HERO_SCHEMA_TYPES` list (the hero
+schema objects, exported next to them) used by every page's `to:` list, and a
+test asserting that every registered `module_hero*` schema is in it — a hero
+added to the schema registry but not to the list fails `pnpm test` rather
+than silently being un-pickable.
+
+### Which pages get a hero slot
+
+One rule, no exceptions: **home has a required hero; every other page has an
+optional one; a hero always replaces that page's default header and owns the
+`<h1>`.**
+
+Every page other than home already opens with a header built from its own
+fields — the generic page's breadcrumbs and title, the blog page's authored
+`heading` and `supportingText`, the topic and tag pages' term-derived heading
+— so without a hero it renders exactly as it does today, and the first
+`modules[]` entry can never be the opener because the `<h1>` has a home
+either way. Home has no such fallback, which is why its slot is the only
+required one.
+
+| Page                           | Hero slot                                                                               | Without a hero                      | `modules[]` allow-list                                                                                                                        |
+| ------------------------------ | --------------------------------------------------------------------------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `page_home`                    | **Required**, `to:` = `HERO_SCHEMA_TYPES`                                               | —                                   | Widens to every `modules[]` module: `content`, `cta`, `newsletter`, `postLatest` (+ later `postFeatured`, carousel, placeable `taxonomyList`) |
+| `page_generic`                 | Optional, same list                                                                     | Breadcrumbs + title header          | Widens from `content` + `cta` to add `postLatest` + `newsletter`                                                                              |
+| `page_blog`                    | Optional, same list                                                                     | `heading` + `supportingText` header | Unchanged                                                                                                                                     |
+| `page_topic` · `page_tag`      | Optional, same list — one document per term, so a flagship topic can carry its own hero | Term header                         | Unchanged                                                                                                                                     |
+| `page_work` (portfolio strand) | Optional, when that page lands                                                          | Its own header                      | Designed with the work page                                                                                                                   |
+
+A hero's copy is always authored on the hero. A taxonomy-page hero that
+derives its heading from the term, the way `module_heroBlog` derives from a
+post, is a later add, not part of this phase. The document's `title` still
+feeds breadcrumbs, metadata and the Studio preview whether or not a hero is
+set, exactly as `page_home.title` does today.
+
+### The shared field tail — `defineHeroFields()`
+
+Every hero kind is _content fields first, shared tail last_. The tail is
+emitted by one studio helper so an editor who has configured one hero already
+knows the next, and so the web view for every kind maps the same props onto
+the same `@blog/ui` organism:
+
+| Field                   | Type                                      | Notes                                                                                |
+| ----------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------ |
+| `variant`               | `HERO_VARIANT` radio, required            | `SPLIT` (default) · `STACKED` · `BANNER` — the CTA module's three shapes, same names |
+| `brandVariant`          | `brandVariantField({ list: FULL })`       | Band tone; on `BANNER` the overlay tint over the image, as on the CTA banner         |
+| `image`                 | `imageWithAlt`                            | Required on `SPLIT` and `BANNER`, optional (below the copy) on `STACKED`             |
+| `contentPositionSplit`  | `LEFT` · `RIGHT`, hidden unless Split     | via `defineAlignmentFields()`                                                        |
+| `contentPositionBanner` | `LEFT` · `CENTER` · `RIGHT`, Banner only  | via `defineAlignmentFields()`                                                        |
+| `contentAlignment`      | `LEFT` · `CENTER` · `RIGHT`               | the baseline field `defineAlignmentFields()` always emits                            |
+| `mobileMediaOrder`      | `MOBILE_MEDIA_ORDER`, hidden unless Split | `LAST` (default) · `FIRST`                                                           |
+| `actions`               | `actionGroupField()`                      | up to two links, rendered by `apps/web`'s `ActionGroup`                              |
+| `layout`                | `heroLayoutField`                         | spacing + dividers, no container width                                               |
+
+`defineHeroFields()` takes two options: `variants` (a subset of
+`HERO_VARIANT`, for a kind that cannot sensibly be a banner) and `image:
+false`, for a kind that supplies its own image field — `module_heroBlog`'s
+image is a mode pair (post image / custom / none), so it omits the shared
+`image` and emits its pair in the same position. A kind's own content fields
+(post reference and mode pairs for Blog; eyebrow, heading and supporting text
+for Statement; name, role, bio, avatar and social links for Profile) are
+that kind's own design decision, made in its own section.
+
+Two constants move to `@blog/config` with this: `HERO_VARIANT = { SPLIT,
+STACKED, BANNER }`, and `MOBILE_MEDIA_ORDER = { LAST, FIRST }`, which
+**replaces** `CTA_MOBILE_MEDIA_ORDER` (same values, same stored strings, so
+no content migration — the CTA schema, service and UI consumers rename in the
+same PR).
+
+`defineHeroFields()` lands with its first consumer, `module_heroBlog`, not in
+Phase 0 — a helper with no caller fails `knip`, and `module_hero` is not
+retrofitted because it is being retired.
+
+### The `@blog/ui` organism
+
+One `Hero` organism serves every kind. It gains the props `CtaModule`
+already has for the same fields — `variant`, `tone`, `contentPosition`,
+`contentAlignment`, `mobileMediaOrder` — and keeps its compound slots
+(`Hero.Media`, `Hero.Cta`) plus a new `Hero.Aside` slot for kind-specific
+chrome such as the Profile avatar. DOM order is always copy before media;
+position and mobile order only move things visually, so the `<h1>` stays
+first for assistive tech. That change is the `ui` sub-issue of the first
+hero that needs it (#2807, under `module_heroBlog`); Phase 0 has no `ui`
+work.
+
+### Service
+
+`TModule` becomes generic over its type — `TModule<T extends TModuleType =
+TModuleType> = { id: string; type: T }` — and the page view models narrow the
+slot: `THomePage.hero: TModule<THeroModuleType>`, and the generic, blog,
+topic and tag page view models gain `hero?: TModule<THeroModuleType>`. The
+page queries already project `_id` and `_type` for a slot; a `toHeroSlot()` transformer applies an `isHeroModuleType()`
+guard from `@blog/config` (a `startsWith('module_hero')` check typed as a
+predicate) and a slot that fails it is a data error the loader returns
+through its existing failure path, never a silently blank page. Each hero
+kind keeps its own loader (`getHero(id)` today, `getHeroBlog(id)` next), so
+the slot stays two-step — page, then hero by id — as it is now.
+
+### Validation: the blank-heading rule generalises
+
+`validateSinglePostLatestWithoutHeading` exists because two
+`module_postLatest` instances on one page both fall back to the same
+"Latest posts" heading — duplicate landmark names. The widened allow-lists
+make that reachable on `page_generic` too, and the next modules
+(`module_postFeatured`, the carousel display mode) carry fallback headings
+of their own. It becomes `validateSingleBlankHeadingPerType(types)`, a helper
+that takes the list of module types with a heading fallback and enforces "at
+most one blank-heading instance per type per page", applied to `page_home`
+and `page_generic` in Phase 0 with `[module_postLatest]`, and extended by
+each later module that gains a fallback heading.
+
+### Migration
+
+None. Every change is additive: new optional fields, widened `to:` and
+`allow` lists, a renamed const whose stored values do not change.
+`module_hero` documents keep working until #2813 migrates each tenant's
+home page onto `module_heroBlog` and deletes the schema.
+
+### Phase 0 scope, per layer
+
+- **config** — `THeroModuleType`, `TSlotModuleType`, `isHeroModuleType()`,
+  `HERO_VARIANT`, `MOBILE_MEDIA_ORDER` (renaming `CTA_MOBILE_MEDIA_ORDER`'s
+  consumers).
+- **studio** — `HERO_SCHEMA_TYPES` + its registry test; `page_home.hero`
+  references the list; `page_generic`, `page_blog`, `page_topic` and
+  `page_tag` gain an optional `hero` referencing it; the home and generic
+  allow-lists widen; the generalised blank-heading validator. No
+  `defineHeroFields()` yet.
+- **service** — generic `TModule<T>`, `toHeroSlot()`, `hero?` on the
+  generic, blog, topic and tag page view models.
+- **ui** — none.
+- **web** — `HERO_MAP` + `HeroSlot`; `MODULE_MAP` excludes via
+  `TSlotModuleType`; the generic, blog, topic and tag page views render the
+  optional hero in place of their default header.
+
+**Acceptance:** `page_home.hero` and every other page's optional `hero`
+accept the family; adding a `module_hero*` schema without a `HERO_MAP` entry
+or a `HERO_SCHEMA_TYPES` entry fails `type-check`/`test`; every existing
+page renders unchanged while no hero is set on it and `module_hero` is the
+family's only member.
+
 ## Contact form / lead capture
 
 **Goal:** the module clients most want — and the only one in the catalogue
@@ -296,6 +489,14 @@ point; the graph stays acyclic.
 - **Contact form is store + notify only, v1** — no CRM/inbox UI, mirrors the
   newsletter boundary — and is a tenant-toggleable, plan-entitled
   capability like the newsletter (2026-09-06).
+- **The hero is a family, not one generalised module** — membership is the
+  `module_hero*` naming convention, derived into `THeroModuleType`; one
+  `defineHeroFields()` tail (variant, brand variant, image, position,
+  alignment, mobile media order, actions, layout) shared by every kind;
+  `page_home.hero` required, every other page's `hero` optional and
+  replacing that page's default header when set; `module_hero`
+  retired by content migration once `module_heroBlog` replaces it
+  (2026-09-07, #2791).
 
 ## Non-goals (recorded so #1919 doesn't sprawl)
 
@@ -312,6 +513,9 @@ point; the graph stays acyclic.
 - **Module catalogue** — one tracking epic (#1919 itself, or a dedicated
   sub-epic if the catalogue outgrows a flat issue list); each module is a
   single issue under it.
+- **Hero family & generic home page** — epic #2778 under `M9 — Portfolio`
+  (design #2791, then `config → studio → service → web`); each member hero
+  is its own epic with a design sub-issue first (`module_heroBlog` #2780).
 - **Contact form** — multi-layer epic under #1919; no longer gated.
 - **Portfolio** — multi-layer epic under #1919 (`config → studio → service
 → ui → web`), independent.
@@ -329,6 +533,10 @@ catalogue has enough shipped history to matter).
 
 ## Resync log
 
+- **2026-09-07** — added the "Hero family & the generic home page" design
+  section (#2791): derived `THeroModuleType`/`TSlotModuleType`, the hero slot
+  per page, the shared `defineHeroFields()` tail, the generalised
+  blank-heading validator and Phase 0's per-layer scope.
 - **2026-09-06** — brought back in line with what shipped between
   2026-08-23 and today: the `cms` layer is `packages/studio` (`@blog/studio`);
   the "appearance object" shipped as `brandVariant`/`layout`/

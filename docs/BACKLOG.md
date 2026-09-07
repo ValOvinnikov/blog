@@ -812,7 +812,9 @@ generalisation` — output: a design section covering the derived hero type,
   studio helper. Must answer: which pages get a hero slot (home required,
   landing page optional, work page later), and what the shared hero field set
   is (brand variant, hero layout, image, actions, content position, content
-  alignment, mobile media order).
+  alignment, mobile media order). **Answered 2026-09-07** in the portfolio
+  design doc: home required, every other page optional and replacing its
+  default header; the shared tail ships with `module_heroBlog`.
 - **Sub-issues (dependency order):**
   - **config** · `feat(config): derive THeroModuleType from the module_hero*
 naming convention` — `Extract<TModuleType, \`module_hero${string}\`>`, the
@@ -821,23 +823,26 @@ same template-literal trick that derives `TModuleType`; a
     of listing each.
   - **studio** · `feat(studio): hero family slot on page_home and
 page_generic` — `page_home.hero` `to:` accepts every hero type;
-    `page_generic` gains an optional `hero` slot with the same list;
+    `page_generic`, `page_blog`, `page_topic` and `page_tag` gain an optional
+    `hero` slot with the same list, replacing the page's default header when
+    set;
     `page_home.modules` allow-list widens to every `modules[]` module (today
     only latest/CTA/newsletter); the duplicate-blank-heading validator
     generalises past `module_postLatest`; `defineHeroFields()` helper emitting
     the shared hero tail. `pnpm typegen`, commit generated types.
   - **service** · `feat(service): project the hero slot's _type on home and
 generic page view models` — the page loaders return `{ id, type }` for the
-    slot so the web dispatcher can branch without a second fetch; landing
-    page loader gains the optional hero.
+    slot so the web dispatcher can branch without a second fetch; the
+    generic, blog, topic and tag page loaders gain the optional hero.
   - **ui** · none — no organism changes in this phase.
   - **web** · `feat(web): HERO_MAP dispatcher and hero slot on home and
 landing pages` — `Record<THeroModuleType, …>` so an unregistered hero kind
     is a compile error, mirroring `MODULE_MAP`; `MODULE_MAP` excludes via
-    `TSlotModuleType`; `[slug]` page renders the optional hero above
-    `modules[]`; `REVALIDATE_TAGS` keyed on the derived type.
-- **Acceptance:** `page_home.hero` and `page_generic.hero` accept the hero
-  family; adding a `module_hero*` schema without a `HERO_MAP` entry fails
+    `TSlotModuleType`; the generic, blog, topic and tag pages render the
+    optional hero in place of their default header; `REVALIDATE_TAGS` keyed
+    on the derived type.
+- **Acceptance:** `page_home.hero` and every other page's optional `hero`
+  accept the hero family; adding a `module_hero*` schema without a `HERO_MAP` entry fails
   `type-check`; every existing page renders unchanged (`module_hero` still
   the only member of the family at this point).
 
