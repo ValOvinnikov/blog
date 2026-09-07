@@ -364,17 +364,27 @@ Supported locales and the default are declared in `src/i18n/routing.ts`.
 
 ## New i18n keys that are tenant-customizable "voice" copy also need a Voice override
 
-Most visible copy is tenant-overridable through `apps/platform`'s Voice tab,
-backed by `packages/db`'s `voiceOverrides` JSONB column. `@blog/config`'s
-`VOICE_FIELDS` registry (`packages/config/src/voice/`) declares every editable
-string — its flat storage `id`, its dotted `path` into the catalog, its kind
-(`TEXT`/`MULTILINE`/`RICH`), and the surface it previews on.
+Visible copy is tenant-overridable through `apps/platform`'s Voice tab, backed
+by `packages/db`'s `voiceOverrides` JSONB column.
 
-**A new catalog string must be classified, not just added.** `VOICE_FIELDS`'s
-co-located test asserts both directions: every registry `path` resolves to a
-real catalog key, and every catalog key is either registered or listed on
-`VOICE_FIXED_KEYS`. Adding a string to the catalog alone fails that test, which
-is the mechanism that stops "is this editable?" from being decided by omission.
+**Two separate obligations, and doing only one ships a silent no-op.**
+
+_Classify it._ `@blog/config`'s `VOICE_FIELDS` registry
+(`packages/config/src/voice/`) names every editable string — its flat storage
+`id`, its dotted `path` into the catalog, its kind (`TEXT`/`MULTILINE`/`RICH`)
+and its preview surface — and `VOICE_FIXED_KEYS` names every string that is
+deliberately not editable. Their co-located test asserts both directions: every
+registry `path` resolves to a real catalog key, and every catalog key sits on
+one list or the other. A string added to the catalog and neither list fails
+that test, which is what stops "is this editable?" being decided by omission.
+
+_Wire it._ The registry is a declaration; it is not yet what the runtime reads.
+Three hand-duplicated lists are: `src/utils/apply-voice-overrides/apply-voice-overrides.ts`
+(yours — maps each storage key to its catalog path),
+`apps/platform/src/utils/voice-fields/voice-fields.ts` (`platform-app` owns it)
+and the Zod `voiceOverridesSchema` in `packages/db`'s `upsert-site-config.ts`
+(`db` owns it). An override that is missing from any of the three is accepted,
+stored, and never applied — with nothing failing. Coordinate all three.
 
 Fixed, never tenant-editable: accessibility-only strings, toast copy, anything
 carrying ICU plural syntax, metadata with no visible counterpart, archive titles

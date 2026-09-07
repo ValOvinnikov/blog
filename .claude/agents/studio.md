@@ -130,10 +130,10 @@ Tenant-overridable "voice" copy lives in Postgres, in `site_config`'s
 Studio schema for it — the `settings_voice` singleton was deleted once the
 Postgres cutover left it with no read path.
 
-The editable vocabulary is declared once, by `@blog/config`'s `VOICE_FIELDS`
-registry (`packages/config/src/voice/`), and policed by that registry's
-co-located coverage test. None of it is yours; do not add a Studio schema for
-voice copy.
+Which strings are editable is declared by `@blog/config`'s `VOICE_FIELDS`
+registry (`packages/config/src/voice/`); the platform, web and db layers hold
+the lists the runtime actually reads. None of it is yours; do not add a Studio
+schema for voice copy.
 
 Copy for a feature that _is_ Sanity-modelled belongs on that feature's
 `settings_*` singleton instead — the newsletter's form and landing-page

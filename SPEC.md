@@ -474,12 +474,19 @@ keys (e.g. `notFoundHeading`), matching `apps/platform`'s Voice tab
 `apps/web/src/utils/apply-voice-overrides/apply-voice-overrides.ts` maps each
 flat key back to its nested message path and applies it last, cloning only
 the objects along that path so untouched namespaces keep referencing the
-cached messages module instead of being mutated in place. Which keys are
-editable is declared by `@blog/config`'s `VOICE_FIELDS` registry, whose
-co-located test asserts every registry path resolves in the catalog and every
-catalog key is either registered or explicitly listed as fixed — so a new
-string cannot be added without classifying it. A fetch failure, or a tenant
-with no `site_config` row, yields the
+cached messages module instead of being mutated in place. Those three lists —
+the Voice tab's fields, the apply map, and `@blog/db`'s `voiceOverridesSchema`
+— are what the runtime reads, and they are hand-duplicated, so a key has to be
+added to all three to take effect.
+
+`@blog/config`'s `VOICE_FIELDS` registry (`packages/config/src/voice/`) is the
+declaration those three converge on: it names every editable string with its
+storage id, catalog path, kind and preview surface, alongside a copy of the
+neutral catalog. Its co-located test asserts every registry path resolves in
+the catalog and every catalog key is either registered or explicitly listed as
+fixed, so a new string cannot enter the catalog without being classified.
+
+A fetch failure, or a tenant with no `site_config` row, yields the
 neutral base messages with no overrides applied — never a thrown error or an
 empty page. (Theme's own fallback to the `CONSOLE` preset is a separate
 thing: copy has no preset layer to fall back to.) Same per-request tenant
