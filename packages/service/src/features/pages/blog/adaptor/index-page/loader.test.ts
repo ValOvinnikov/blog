@@ -100,6 +100,38 @@ describe('getIndexPage', () => {
     ]);
   });
 
+  it('leaves hero undefined when page_blog.hero is unset', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawBlogPage({ hero: null }))
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getIndexPage(tenant);
+    if (!result) throw new Error('expected a blog index page');
+
+    expect(result.hero).toBeUndefined();
+  });
+
+  it('maps a set page_blog.hero to a hero slot', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawBlogPage({ hero: { _id: 'hero-1', _type: 'module_hero' } }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getIndexPage(tenant);
+    if (!result) throw new Error('expected a blog index page');
+
+    expect(result.hero).toEqual({ id: 'hero-1', type: 'module_hero' });
+  });
+
+  it('rejects when page_blog.hero resolves to a non-hero module type', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawBlogPage({ hero: { _id: 'cta-1', _type: 'module_cta' as never } }),
+    );
+
+    await expect(getIndexPage(tenant)).rejects.toThrow();
+  });
+
   it('defaults modules to an empty array when the page has none', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawBlogPage({ modules: null }))

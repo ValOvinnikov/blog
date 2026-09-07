@@ -21,6 +21,7 @@ export const tagPageQuery = q
         description: tagSub.field('description').nullable(true),
       }))
       .notNull(),
+    hero: sub.field('hero').deref().project(moduleFragment).nullable(true),
     postList: sub
       .field('postList')
       .deref()

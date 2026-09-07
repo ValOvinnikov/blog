@@ -111,6 +111,40 @@ describe('getTopicPage', () => {
     expect(result.seo.description).toBe('Notes on building things.');
   });
 
+  it('leaves hero undefined when page_topic.hero is unset', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawTopicPage({ hero: null }))
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getTopicPage('engineering', tenant);
+    if (!result) throw new Error('expected a topic page');
+
+    expect(result.hero).toBeUndefined();
+  });
+
+  it('maps a set page_topic.hero to a hero slot', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawTopicPage({ hero: { _id: 'hero-1', _type: 'module_hero' } }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getTopicPage('engineering', tenant);
+    if (!result) throw new Error('expected a topic page');
+
+    expect(result.hero).toEqual({ id: 'hero-1', type: 'module_hero' });
+  });
+
+  it('rejects when page_topic.hero resolves to a non-hero module type', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawTopicPage({
+        hero: { _id: 'cta-1', _type: 'module_cta' as never },
+      }),
+    );
+
+    await expect(getTopicPage('engineering', tenant)).rejects.toThrow();
+  });
+
   it('passes the slug as a query parameter', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawTopicPage())

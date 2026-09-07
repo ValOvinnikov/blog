@@ -1,7 +1,10 @@
 import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
 import type { TImageTenant } from '@blog/service/sanity/image';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
-import { toModule } from '@blog/service/shared/transformers/to-module';
+import {
+  toHeroSlot,
+  toModule,
+} from '@blog/service/shared/transformers/to-module';
 import { toTopic } from '@blog/service/shared/transformers/to-topic';
 import type { InferResultType } from 'groqd';
 
@@ -20,6 +23,7 @@ export function toTopicDetailPage(
 
   return {
     topic,
+    hero: rawPage.hero ? toHeroSlot(rawPage.hero) : undefined,
     modules: (rawPage.modules ?? []).map(toModule),
     seo: resolveSeo(
       rawPage.seo ?? undefined,

@@ -10,6 +10,7 @@ export const genericPageQuery = q
   .project((sub) => ({
     title: sub.field('title').notNull(),
     slug: sub.field('slug.current').notNull(),
+    hero: sub.field('hero').deref().project(moduleFragment).nullable(true),
     modules: sub
       .field('modules[]')
       .deref()

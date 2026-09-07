@@ -23,6 +23,14 @@ describe('tagPageQuery', () => {
     expect(() => tagPageQuery.parse(raw)).not.toThrow();
   });
 
+  it('parses a tag page with its hero slot set', () => {
+    const raw = makeRawTagPage({
+      hero: { _id: 'hero-1', _type: 'module_hero' },
+    });
+
+    expect(() => tagPageQuery.parse(raw)).not.toThrow();
+  });
+
   it('parses null as no matching page_tag document, rather than throwing', () => {
     expect(tagPageQuery.parse(null)).toBeNull();
   });

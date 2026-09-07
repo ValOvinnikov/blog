@@ -20,6 +20,14 @@ describe('blogPageQuery', () => {
     expect(blogPageQuery.query).not.toContain('itemsPerPage');
   });
 
+  it('parses a blog page with its hero slot set', () => {
+    const raw = makeRawBlogPage({
+      hero: { _id: 'hero-1', _type: 'module_hero' },
+    });
+
+    expect(() => blogPageQuery.parse(raw)).not.toThrow();
+  });
+
   it('parses null as no matching page_blog document, rather than throwing', () => {
     expect(blogPageQuery.parse(null)).toBeNull();
   });
