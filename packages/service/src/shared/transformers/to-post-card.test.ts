@@ -53,6 +53,22 @@ describe('toPostCard', () => {
     });
   });
 
+  it('maps an author with no image to an undefined imageUrl', () => {
+    const result = toPostCard(
+      makeRawPostCard({
+        author: {
+          _id: 'author-1',
+          name: 'Jane Doe',
+          image: null,
+          profilePage: null,
+        },
+      }),
+      tenant,
+    );
+
+    expect(result.author.imageUrl).toBeUndefined();
+  });
+
   it('maps a missing profilePage reference to an undefined profilePageSlug', () => {
     const result = toPostCard(makeRawPostCard(), tenant);
 

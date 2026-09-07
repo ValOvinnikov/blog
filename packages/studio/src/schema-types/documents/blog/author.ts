@@ -21,8 +21,8 @@ export const authorSchema = defineType({
       name: 'image',
       title: 'Image',
       type: imageWithAltSchema.name,
-      description: 'Avatar shown on posts and the author profile page.',
-      validation: (rule) => rule.required(),
+      description:
+        'Avatar shown on posts and the author profile page. Leave empty to show initials instead.',
     }),
     defineField({
       name: 'bio',

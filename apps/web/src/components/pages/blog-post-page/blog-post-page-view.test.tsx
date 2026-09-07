@@ -94,6 +94,17 @@ describe(BlogPostPageView, () => {
     );
   });
 
+  it('renders the author initials fallback, not a broken image, when the author has no imageUrl', () => {
+    setup({
+      author: { ...mockPostDetail.author, imageUrl: undefined },
+    });
+
+    expect(screen.getByText('JD')).toBeVisible();
+    expect(
+      screen.queryByRole('img', { name: 'Jane Doe' }),
+    ).not.toBeInTheDocument();
+  });
+
   it('renders the author name as plain text when profilePageSlug is absent', () => {
     setup({
       author: { ...mockPostDetail.author, profilePageSlug: undefined },

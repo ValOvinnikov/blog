@@ -54,8 +54,7 @@ export const siteSchema = defineType({
       title: 'Default OG Image',
       type: imageWithAltSchema.name,
       description:
-        'Fallback social-sharing image used when a page has no own OG image.',
-      validation: (rule) => rule.required(),
+        'Fallback social-sharing image used when a page has no own OG image. Leave empty to use a generated branded card.',
       fieldset: 'seo',
     }),
   ],

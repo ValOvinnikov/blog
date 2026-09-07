@@ -109,6 +109,31 @@ describe('getPost', () => {
     });
   });
 
+  it('maps an author with no image to an undefined imageUrl', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawPostPage({
+          post: makeRawPostDetail({
+            author: {
+              _id: 'author-9',
+              name: 'Jane Doe',
+              image: null,
+              profilePage: null,
+              role: null,
+              bio: null,
+              socialLinks: null,
+            },
+          }),
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getPost('hello-world', tenant);
+    if (!result) throw new Error('expected a post detail');
+
+    expect(result.author.imageUrl).toBeUndefined();
+  });
+
   it('requests a right-sized author avatar instead of the full-resolution asset', async () => {
     const { urlForImage } = await import('@blog/service/sanity/image');
     const authorImage = makeRawImage('Jane avatar');

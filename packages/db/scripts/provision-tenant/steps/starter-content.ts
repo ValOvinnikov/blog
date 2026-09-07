@@ -25,11 +25,6 @@ export const STARTER_DOCUMENT_IDS = {
   HOME: 'provisioning.settings.home',
 } as const;
 
-export type TStarterAssetRefs = {
-  authorImageAssetId: string;
-  ogImageAssetId: string;
-};
-
 export type TSanityDocument = Record<string, unknown> & {
   _id: string;
   _type: string;
@@ -37,7 +32,6 @@ export type TSanityDocument = Record<string, unknown> & {
 
 export function buildStarterDocuments(
   tenant: Pick<TTenant, 'name'>,
-  assets: TStarterAssetRefs,
 ): TSanityDocument[] {
   const now = new Date().toISOString();
 
@@ -45,11 +39,6 @@ export function buildStarterDocuments(
     _id: STARTER_DOCUMENT_IDS.AUTHOR,
     _type: 'blog_author',
     name: `${tenant.name} Team`,
-    image: {
-      _type: 'imageWithAlt',
-      asset: { _type: 'reference', _ref: assets.authorImageAssetId },
-      alt: `${tenant.name} team avatar`,
-    },
   };
 
   const topic: TSanityDocument = {
@@ -135,11 +124,6 @@ export function buildStarterDocuments(
     description:
       `${tenant.name} was just provisioned on the platform. Edit this ` +
       'default description in Site Settings once you have real copy.',
-    defaultOgImage: {
-      _type: 'imageWithAlt',
-      asset: { _type: 'reference', _ref: assets.ogImageAssetId },
-      alt: `${tenant.name} social share image`,
-    },
   };
 
   const hero: TSanityDocument = {
