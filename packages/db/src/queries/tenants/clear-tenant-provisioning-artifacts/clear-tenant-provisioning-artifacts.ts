@@ -22,6 +22,7 @@ export async function clearTenantProvisioningArtifacts(
       sanityWriteTokenEncrypted: null,
       provisioningStatus: null,
       provisioningSteps: null,
+      seededAt: null,
     })
     .where(eq(tenants.id, tenantId));
 }

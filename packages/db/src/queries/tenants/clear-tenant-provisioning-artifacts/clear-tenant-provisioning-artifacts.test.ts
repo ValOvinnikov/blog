@@ -29,6 +29,7 @@ async function insertProvisionedTenant(): Promise<string> {
       sanityDataset: 'production',
       sanityReadTokenEncrypted: 'encrypted-token',
       sanityWriteTokenEncrypted: 'encrypted-write-token',
+      seededAt: new Date('2026-08-15T12:00:00.000Z'),
       locale: 'en',
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
@@ -47,6 +48,9 @@ async function insertProvisionedTenant(): Promise<string> {
           status: TENANT_PROVISIONING_STEP_STATUS.DONE,
         },
         [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
+        [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: {
           status: TENANT_PROVISIONING_STEP_STATUS.DONE,
         },
         [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
@@ -91,6 +95,7 @@ describe(clearTenantProvisioningArtifacts, () => {
       sanityWriteTokenEncrypted: null,
       provisioningStatus: null,
       provisioningSteps: null,
+      seededAt: null,
     });
   });
 

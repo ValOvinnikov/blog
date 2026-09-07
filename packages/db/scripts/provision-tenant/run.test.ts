@@ -39,6 +39,9 @@ const { mapTenantDomainMock } = vi.hoisted(() => ({
 const { createTenantRevalidateWebhookMock } = vi.hoisted(() => ({
   createTenantRevalidateWebhookMock: vi.fn(),
 }));
+const { verifyTenantSeededContentMock } = vi.hoisted(() => ({
+  verifyTenantSeededContentMock: vi.fn(),
+}));
 const { elevateTenantOwnerMock } = vi.hoisted(() => ({
   elevateTenantOwnerMock: vi.fn(),
 }));
@@ -82,6 +85,9 @@ vi.mock('./steps/map-domain', () => ({
 }));
 vi.mock('./steps/create-revalidate-webhook', () => ({
   createTenantRevalidateWebhook: createTenantRevalidateWebhookMock,
+}));
+vi.mock('./steps/verify-seeded-content', () => ({
+  verifyTenantSeededContent: verifyTenantSeededContentMock,
 }));
 vi.mock('./steps/elevate-tenant-owner', () => ({
   elevateTenantOwner: elevateTenantOwnerMock,
@@ -128,6 +134,7 @@ beforeEach(() => {
   persistTenantSanityTokenMock.mockReset().mockResolvedValue(undefined);
   mapTenantDomainMock.mockReset().mockResolvedValue(undefined);
   createTenantRevalidateWebhookMock.mockReset().mockResolvedValue(undefined);
+  verifyTenantSeededContentMock.mockReset().mockResolvedValue(undefined);
   elevateTenantOwnerMock.mockReset().mockResolvedValue('PENDING_ACCEPTANCE');
   notifyOwnerElevationOutcomeMock.mockReset().mockResolvedValue(undefined);
   seedEmailTemplateDefaultsMock.mockReset().mockResolvedValue(undefined);
@@ -145,6 +152,7 @@ describe(runSteps, () => {
     expect(persistTenantSanityTokenMock).toHaveBeenCalledTimes(1);
     expect(mapTenantDomainMock).toHaveBeenCalledTimes(1);
     expect(createTenantRevalidateWebhookMock).toHaveBeenCalledTimes(1);
+    expect(verifyTenantSeededContentMock).toHaveBeenCalledTimes(1);
 
     const statuses = reportStepStatusMock.mock.calls.map((call) => {
       const [input] = call as [{ step: string; status: string }];
@@ -192,6 +200,14 @@ describe(runSteps, () => {
         TENANT_PROVISIONING_STEP_STATUS.DONE,
       ],
       [
+        TENANT_PROVISIONING_STEP.VERIFY_CONTENT,
+        TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+      ],
+      [
+        TENANT_PROVISIONING_STEP.VERIFY_CONTENT,
+        TENANT_PROVISIONING_STEP_STATUS.DONE,
+      ],
+      [
         TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
         TENANT_PROVISIONING_STEP_STATUS.DONE,
       ],
@@ -225,6 +241,7 @@ describe(runSteps, () => {
     expect(persistTenantSanityTokenMock).not.toHaveBeenCalled();
     expect(mapTenantDomainMock).not.toHaveBeenCalled();
     expect(createTenantRevalidateWebhookMock).not.toHaveBeenCalled();
+    expect(verifyTenantSeededContentMock).not.toHaveBeenCalled();
 
     const lastCall = reportStepStatusMock.mock.calls.at(-1) as [
       { step: string; status: string; error: string },
@@ -233,6 +250,28 @@ describe(runSteps, () => {
       step: TENANT_PROVISIONING_STEP.SEED_CONTENT,
       status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
       error: 'seed failed',
+    });
+  });
+
+  it('fails the run when the final verification step finds the dataset missing required content, and never runs owner elevation', async () => {
+    createTenantSanityProjectMock.mockResolvedValue({});
+    verifyTenantSeededContentMock.mockRejectedValue(
+      new Error('missing required starter document(s): settings_site'),
+    );
+
+    const result = await runSteps('tenant-1', env);
+
+    expect(result).toEqual({ ok: false });
+    expect(elevateTenantOwnerMock).not.toHaveBeenCalled();
+    expect(seedEmailTemplateDefaultsMock).not.toHaveBeenCalled();
+
+    const lastCall = reportStepStatusMock.mock.calls.at(-1) as [
+      { step: string; status: string; error: string },
+    ];
+    expect(lastCall[0]).toMatchObject({
+      step: TENANT_PROVISIONING_STEP.VERIFY_CONTENT,
+      status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+      error: 'missing required starter document(s): settings_site',
     });
   });
 

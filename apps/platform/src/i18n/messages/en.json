@@ -496,7 +496,8 @@
       "SEED_CONTENT": "Seed content",
       "PERSIST_TOKEN": "Issue read credentials",
       "MAP_DOMAIN": "Connect domain",
-      "CREATE_WEBHOOK": "Wire up CMS to website"
+      "CREATE_WEBHOOK": "Wire up CMS to website",
+      "VERIFY_CONTENT": "Confirm content is ready"
     },
     "statusLabel": {
       "IDLE": "Not started",

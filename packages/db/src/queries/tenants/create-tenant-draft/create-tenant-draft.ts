@@ -40,7 +40,7 @@ export type TCreateTenantDraftInput = {
 };
 
 // Every step starts idle — the admin UI's per-step wizard view has
-// something to render for all five steps from the moment the tenant row
+// something to render for every step from the moment the tenant row
 // exists, before the provisioning workflow has run at all.
 function buildIdleProvisioningSteps(): TTenantProvisioningState {
   const steps = Object.values(

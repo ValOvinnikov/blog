@@ -5,18 +5,15 @@ import {
   deleteSanityRobotToken,
 } from '@blog/db/utils/sanity-management-client/sanity-management-client';
 import { SANITY_WRITE_TOKEN_LABEL } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
-import { ClientError, createClient } from '@sanity/client';
+import { createClient } from '@sanity/client';
 
 import type { TProvisionEnv } from '../lib/env';
+import { grantPropagationRetryOptions } from '../lib/grant-propagation-retry';
 import { retryWithBackoff } from '../lib/retry-with-backoff';
 
 import { buildStarterDocuments } from './starter-content';
 
 const SANITY_API_VERSION = '2024-01-01';
-
-// Bounded to ride out a freshly-minted token's grant-propagation delay, not to mask a genuine misconfiguration.
-export const SEED_GRANT_RETRY_MAX_ATTEMPTS = 5;
-const SEED_GRANT_RETRY_BASE_DELAY_MS = 1000;
 
 export type TSeedContentDeps = {
   createClient: typeof createClient;
@@ -32,39 +29,25 @@ const defaultDeps: TSeedContentDeps = {
   sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
 };
 
-const INSUFFICIENT_PERMISSIONS_STATUS_CODE = 403;
-
-function isGrantPropagationError(error: unknown): boolean {
-  if (
-    error instanceof ClientError &&
-    error.statusCode === INSUFFICIENT_PERMISSIONS_STATUS_CODE
-  ) {
-    return true;
-  }
-
-  return (
-    error instanceof Error && /insufficient permissions/i.test(error.message)
-  );
-}
+const SITE_SETTINGS_EXISTS_QUERY = '*[_type == "settings_site"][0]._id';
 
 /**
  * Step 2 — seeds the fixed starter content template (singletons + one
  * starter post + navigation, see `starter-content.ts`) into the tenant's
- * brand-new, empty dataset, using an Editor-scoped Sanity token minted for
- * this run.
+ * dataset, using an Editor-scoped Sanity token minted for this run.
  *
- * Idempotent: skips entirely once `tenants.seededAt` is set.
- * `createOrReplace` (rather than `create`) also makes a single run safe
- * against a mid-run crash-and-retry that happens before that marker gets
- * persisted.
+ * Idempotency is derived from the dataset's own observed state — whether
+ * `settings_site` already exists — not from `tenants.seededAt`, so an
+ * emptied or recreated dataset is re-seeded on the next run rather than
+ * skipped. `createOrReplace` (rather than `create`) also makes a single run
+ * safe against a mid-run crash-and-retry that happens before seeding is
+ * detectable this way.
  */
 export async function seedTenantContent(
   tenant: TTenant,
   env: TProvisionEnv,
   deps: TSeedContentDeps = defaultDeps,
 ): Promise<void> {
-  if (tenant.seededAt) return;
-
   if (!tenant.sanityProjectId || !tenant.sanityDataset) {
     throw new Error(
       `seedTenantContent: tenant "${tenant.id}" has no Sanity project yet — run the "Create Sanity project" step first.`,
@@ -89,12 +72,14 @@ export async function seedTenantContent(
       useCdn: false,
     });
 
-    const grantPropagationRetryOptions = {
-      maxAttempts: SEED_GRANT_RETRY_MAX_ATTEMPTS,
-      baseDelayMs: SEED_GRANT_RETRY_BASE_DELAY_MS,
-      isRetryable: isGrantPropagationError,
-      sleep: deps.sleep,
-    };
+    const retryOptions = grantPropagationRetryOptions(deps.sleep);
+
+    const alreadySeeded = await retryWithBackoff(
+      () => client.fetch<string | null>(SITE_SETTINGS_EXISTS_QUERY),
+      retryOptions,
+    );
+
+    if (alreadySeeded) return;
 
     const documents = buildStarterDocuments(tenant);
 
@@ -103,10 +88,7 @@ export async function seedTenantContent(
       transaction.createOrReplace(document);
     }
 
-    await retryWithBackoff(
-      () => transaction.commit(),
-      grantPropagationRetryOptions,
-    );
+    await retryWithBackoff(() => transaction.commit(), retryOptions);
 
     await setTenantSanityWriteTokenAndSeededAt(
       tenant.id,

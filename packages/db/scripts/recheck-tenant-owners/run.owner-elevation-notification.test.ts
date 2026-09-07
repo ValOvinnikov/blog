@@ -56,6 +56,12 @@ const { createTenantRevalidateWebhookMock } = vi.hoisted(() => ({
 vi.mock('../provision-tenant/steps/create-revalidate-webhook', () => ({
   createTenantRevalidateWebhook: createTenantRevalidateWebhookMock,
 }));
+const { verifyTenantSeededContentMock } = vi.hoisted(() => ({
+  verifyTenantSeededContentMock: vi.fn(),
+}));
+vi.mock('../provision-tenant/steps/verify-seeded-content', () => ({
+  verifyTenantSeededContent: verifyTenantSeededContentMock,
+}));
 
 const { notifyOperatorsOfOwnerElevationOutcomeMock } = vi.hoisted(() => ({
   notifyOperatorsOfOwnerElevationOutcomeMock: vi.fn(),
@@ -100,6 +106,7 @@ async function insertActiveTenant(): Promise<string> {
         PERSIST_TOKEN: { status: 'IDLE' },
         MAP_DOMAIN: { status: 'IDLE' },
         CREATE_WEBHOOK: { status: 'IDLE' },
+        VERIFY_CONTENT: { status: 'IDLE' },
         OWNER_ELEVATION: { status: 'IDLE' },
       },
     })
@@ -153,6 +160,7 @@ beforeEach(() => {
   persistTenantSanityTokenMock.mockReset().mockResolvedValue(undefined);
   mapTenantDomainMock.mockReset().mockResolvedValue(undefined);
   createTenantRevalidateWebhookMock.mockReset().mockResolvedValue(undefined);
+  verifyTenantSeededContentMock.mockReset().mockResolvedValue(undefined);
   elevateTenantOwnerMock.mockReset();
   notifyOperatorsOfOwnerElevationOutcomeMock
     .mockReset()

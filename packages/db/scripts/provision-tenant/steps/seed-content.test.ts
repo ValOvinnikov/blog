@@ -2,12 +2,9 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import { ClientError } from '@sanity/client';
 
 import type { TProvisionEnv } from '../lib/env';
+import { GRANT_PROPAGATION_RETRY_MAX_ATTEMPTS } from '../lib/grant-propagation-retry';
 
-import {
-  seedTenantContent,
-  SEED_GRANT_RETRY_MAX_ATTEMPTS,
-  type TSeedContentDeps,
-} from './seed-content';
+import { seedTenantContent, type TSeedContentDeps } from './seed-content';
 import { STARTER_DOCUMENT_IDS } from './starter-content';
 
 const { setTenantSanityWriteTokenAndSeededAtMock } = vi.hoisted(() => ({
@@ -56,17 +53,24 @@ function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
   } as TTenant;
 }
 
-function createClientStub(transaction: {
-  createOrReplace: ReturnType<typeof vi.fn>;
-  commit: ReturnType<typeof vi.fn>;
-}) {
+function createClientStub(
+  transaction: {
+    createOrReplace: ReturnType<typeof vi.fn>;
+    commit: ReturnType<typeof vi.fn>;
+  },
+  options: { fetchResult?: string | null } = {},
+) {
+  const { fetchResult = null } = options;
   const assetsUpload = vi.fn();
+  const fetch = vi.fn().mockResolvedValue(fetchResult);
   const client = {
     assets: { upload: assetsUpload },
+    fetch,
     transaction: () => transaction,
   };
   return {
     assetsUpload,
+    fetch,
     createClient: vi
       .fn()
       .mockReturnValue(client) as unknown as TSeedContentDeps['createClient'],
@@ -78,19 +82,70 @@ beforeEach(() => {
 });
 
 describe(seedTenantContent, () => {
-  it('skips entirely when seededAt is already set', async () => {
+  it('seeds when the dataset lacks settings_site even though seededAt is already set', async () => {
     const tenant = baseTenant({ seededAt: new Date() });
-    const deps: TSeedContentDeps = {
-      createClient: vi.fn(),
-      mintWriteToken: vi.fn(),
-      revokeWriteToken: vi.fn(),
-      sleep: vi.fn().mockResolvedValue(undefined),
-    };
+    const commit = vi.fn().mockResolvedValue(undefined);
+    const createOrReplace = vi.fn();
+    const { createClient, fetch } = createClientStub({
+      createOrReplace,
+      commit,
+    });
+    const mintWriteToken = vi
+      .fn()
+      .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
+    const revokeWriteToken = vi.fn().mockResolvedValue(undefined);
+    const sleep = vi.fn().mockResolvedValue(undefined);
 
-    await seedTenantContent(tenant, env, deps);
+    await seedTenantContent(tenant, env, {
+      createClient,
+      mintWriteToken,
+      revokeWriteToken,
+      sleep,
+    });
 
-    expect(deps.mintWriteToken).not.toHaveBeenCalled();
-    expect(deps.createClient).not.toHaveBeenCalled();
+    expect(fetch).toHaveBeenCalledWith('*[_type == "settings_site"][0]._id');
+    expect(createOrReplace).toHaveBeenCalledTimes(
+      Object.keys(STARTER_DOCUMENT_IDS).length,
+    );
+    expect(commit).toHaveBeenCalledTimes(1);
+    expect(setTenantSanityWriteTokenAndSeededAtMock).toHaveBeenCalledWith(
+      'tenant-1',
+      'sk-write',
+      expect.any(Date),
+    );
+    expect(revokeWriteToken).not.toHaveBeenCalled();
+  });
+
+  it('skips seeding when the dataset already has settings_site', async () => {
+    const tenant = baseTenant();
+    const commit = vi.fn();
+    const createOrReplace = vi.fn();
+    const { createClient, fetch } = createClientStub(
+      { createOrReplace, commit },
+      { fetchResult: STARTER_DOCUMENT_IDS.SITE },
+    );
+    const mintWriteToken = vi
+      .fn()
+      .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
+    const revokeWriteToken = vi.fn().mockResolvedValue(undefined);
+    const sleep = vi.fn().mockResolvedValue(undefined);
+
+    await seedTenantContent(tenant, env, {
+      createClient,
+      mintWriteToken,
+      revokeWriteToken,
+      sleep,
+    });
+
+    expect(fetch).toHaveBeenCalledWith('*[_type == "settings_site"][0]._id');
+    expect(createOrReplace).not.toHaveBeenCalled();
+    expect(commit).not.toHaveBeenCalled();
+    expect(setTenantSanityWriteTokenAndSeededAtMock).not.toHaveBeenCalled();
+    expect(revokeWriteToken).toHaveBeenCalledWith({
+      token: 'mgmt-token',
+      projectId: 'proj123',
+      robotId: 'robot-1',
+    });
   });
 
   it('throws when the Sanity project has not been created yet', async () => {
@@ -378,7 +433,7 @@ describe(seedTenantContent, () => {
       }),
     ).rejects.toThrow(grantError);
 
-    expect(commit).toHaveBeenCalledTimes(SEED_GRANT_RETRY_MAX_ATTEMPTS);
+    expect(commit).toHaveBeenCalledTimes(GRANT_PROPAGATION_RETRY_MAX_ATTEMPTS);
     expect(revokeWriteToken).toHaveBeenCalledWith({
       token: 'mgmt-token',
       projectId: 'proj123',

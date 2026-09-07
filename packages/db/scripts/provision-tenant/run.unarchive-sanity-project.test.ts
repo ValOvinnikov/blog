@@ -37,6 +37,9 @@ const { mapTenantDomainMock } = vi.hoisted(() => ({
 const { createTenantRevalidateWebhookMock } = vi.hoisted(() => ({
   createTenantRevalidateWebhookMock: vi.fn(),
 }));
+const { verifyTenantSeededContentMock } = vi.hoisted(() => ({
+  verifyTenantSeededContentMock: vi.fn(),
+}));
 const { elevateTenantOwnerMock } = vi.hoisted(() => ({
   elevateTenantOwnerMock: vi.fn(),
 }));
@@ -71,6 +74,9 @@ vi.mock('./steps/map-domain', () => ({
 }));
 vi.mock('./steps/create-revalidate-webhook', () => ({
   createTenantRevalidateWebhook: createTenantRevalidateWebhookMock,
+}));
+vi.mock('./steps/verify-seeded-content', () => ({
+  verifyTenantSeededContent: verifyTenantSeededContentMock,
 }));
 vi.mock('./steps/elevate-tenant-owner', () => ({
   elevateTenantOwner: elevateTenantOwnerMock,
@@ -133,6 +139,7 @@ beforeEach(() => {
   persistTenantSanityTokenMock.mockReset().mockResolvedValue(undefined);
   mapTenantDomainMock.mockReset().mockResolvedValue(undefined);
   createTenantRevalidateWebhookMock.mockReset().mockResolvedValue(undefined);
+  verifyTenantSeededContentMock.mockReset().mockResolvedValue(undefined);
   elevateTenantOwnerMock.mockReset().mockResolvedValue('PENDING_ACCEPTANCE');
   seedEmailTemplateDefaultsMock.mockReset().mockResolvedValue(undefined);
 });

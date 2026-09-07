@@ -11,7 +11,7 @@ import {
 // `provisioningStatus` to FAILED — leaving it at PROVISIONING would wedge
 // `beginTenantProvisioning`'s retry guard shut forever, since that guard
 // only admits a row that is NULL or not PROVISIONING. Only the workflow's
-// last step (CREATE_WEBHOOK) finishing settles it to READY; every other
+// last step (VERIFY_CONTENT) finishing settles it to READY; every other
 // success touches only that step's own entry in `provisioningSteps`.
 export function overallStatusFor(
   step: TTenantProvisioningStep,
@@ -21,7 +21,7 @@ export function overallStatusFor(
     return TENANT_PROVISIONING_STATUS.FAILED;
   }
   if (
-    step === TENANT_PROVISIONING_STEP.CREATE_WEBHOOK &&
+    step === TENANT_PROVISIONING_STEP.VERIFY_CONTENT &&
     status === TENANT_PROVISIONING_STEP_STATUS.DONE
   ) {
     return TENANT_PROVISIONING_STATUS.READY;
