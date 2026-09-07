@@ -13,6 +13,7 @@ export type TPostListModule = {
   posts: TPostCard[];
   layout: TMaybeUndefined<TLayout>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
+  showImages: boolean;
   currentPage: number;
   totalPages: number;
 };

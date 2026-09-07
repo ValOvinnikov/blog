@@ -32,6 +32,7 @@ export function toPostListModule(
     posts: rawPosts.map((rawPost) => toPostCard(rawPost, tenant)),
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,
+    showImages: raw.showImages,
     currentPage: pagination.currentPage,
     totalPages: pagination.totalPages,
   };

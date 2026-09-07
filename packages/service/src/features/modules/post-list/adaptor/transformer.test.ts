@@ -127,4 +127,20 @@ describe('toPostListModule', () => {
     expect(module.currentPage).toBe(2);
     expect(module.totalPages).toBe(5);
   });
+
+  it('passes showImages through when true', () => {
+    const raw = makeRawPostListModule({ showImages: true });
+
+    const module = toPostListModule(raw, rawPosts, pagination, tenant);
+
+    expect(module.showImages).toBe(true);
+  });
+
+  it('passes showImages through when false', () => {
+    const raw = makeRawPostListModule({ showImages: false });
+
+    const module = toPostListModule(raw, rawPosts, pagination, tenant);
+
+    expect(module.showImages).toBe(false);
+  });
 });

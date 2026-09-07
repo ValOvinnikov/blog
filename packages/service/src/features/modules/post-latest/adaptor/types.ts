@@ -13,4 +13,5 @@ export type TPostLatestModule = {
   posts: TPostCard[];
   layout: TMaybeUndefined<TLayout>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
+  showImages: boolean;
 };

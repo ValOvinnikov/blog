@@ -14,4 +14,8 @@ describe('postListModuleQuery', () => {
   it('projects contentAlignment', () => {
     expect(postListModuleQuery.query).toContain('contentAlignment');
   });
+
+  it('coalesces showImages to true for documents authored before the field existed', () => {
+    expect(postListModuleQuery.query).toContain('coalesce(showImages, true)');
+  });
 });
