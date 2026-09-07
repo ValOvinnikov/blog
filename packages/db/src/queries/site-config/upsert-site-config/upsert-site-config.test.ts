@@ -335,6 +335,100 @@ describe('voice overrides — RICH fields', () => {
   });
 });
 
+describe('voice overrides — RICH fields accept a plain string', () => {
+  it('normalizes a plain string into a single normal block', async () => {
+    const { id: tenantId } = await insertTestTenant(db);
+
+    const result = expectOk(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverrides: { notFoundSupportingText: 'Try the homepage instead.' },
+      }),
+    );
+
+    expect(result.voiceOverrides.notFoundSupportingText).toEqual([
+      expect.objectContaining({
+        _type: 'block',
+        style: 'normal',
+        children: [
+          expect.objectContaining({
+            _type: 'span',
+            text: 'Try the homepage instead.',
+          }),
+        ],
+      }),
+    ]);
+  });
+
+  it('drops the key for a blank/whitespace-only string', async () => {
+    const { id: tenantId } = await insertTestTenant(db);
+
+    const result = expectOk(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverrides: { notFoundSupportingText: '   ' },
+      }),
+    );
+
+    expect(result.voiceOverrides).toEqual({});
+  });
+
+  it('rejects a string exceeding the field cap, same message as authored rich text', async () => {
+    const { id: tenantId } = await insertTestTenant(db);
+    const overlong = 'x'.repeat(301);
+
+    const coerced = expectFieldErrors(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverrides: { notFoundSupportingText: overlong },
+      }),
+    );
+    const authored = expectFieldErrors(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverrides: { notFoundSupportingText: richTextOf(overlong) },
+      }),
+    );
+
+    expect(coerced.fieldErrors.notFoundSupportingText).toBe(
+      authored.fieldErrors.notFoundSupportingText,
+    );
+  });
+
+  it('catches a placeholder violation in a coerced string', async () => {
+    const { id: tenantId } = await insertTestTenant(db);
+
+    const result = expectFieldErrors(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverrides: {
+          topicEmpty: 'Nothing published under this topic yet.',
+        },
+      }),
+    );
+
+    expect(result.fieldErrors.topicEmpty).toMatch(/missing/i);
+    expect(result.fieldErrors.topicEmpty).toContain('{name}');
+  });
+
+  it('still rejects a non-string, non-array value', async () => {
+    const { id: tenantId } = await insertTestTenant(db);
+
+    const result = expectFieldErrors(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverrides: {
+          notFoundSupportingText: 42 as unknown as string,
+        },
+      }),
+    );
+
+    expect(result.fieldErrors.notFoundSupportingText).toBe(
+      'Must be rich text.',
+    );
+  });
+});
+
 describe('voice overrides — placeholders', () => {
   it('rejects a value missing a placeholder the registry declares', async () => {
     const { id: tenantId } = await insertTestTenant(db);

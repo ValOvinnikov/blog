@@ -221,21 +221,24 @@ function isBlankRichValue(value: TVoicePortableText): boolean {
   );
 }
 
-function validateRichField(
+function coercePlainStringToRichValue(text: string): TVoicePortableText {
+  return [
+    {
+      _type: 'block',
+      _key: crypto.randomUUID(),
+      style: 'normal',
+      children: [{ _type: 'span', _key: crypto.randomUUID(), text }],
+    },
+  ];
+}
+
+function finalizeRichValue(
   field: TVoiceField,
-  raw: unknown,
+  value: TVoicePortableText,
 ): TVoiceFieldValidation {
-  if (raw === undefined || raw === null) return { ok: true, value: undefined };
-  if (!Array.isArray(raw)) return { ok: false, error: 'Must be rich text.' };
-  if (raw.length === 0) return { ok: true, value: undefined };
+  if (isBlankRichValue(value)) return { ok: true, value: undefined };
 
-  const normalized = normalizeRichValue(raw);
-  if (!normalized.ok) return normalized;
-  if (isBlankRichValue(normalized.value)) {
-    return { ok: true, value: undefined };
-  }
-
-  const plainText = portableTextToPlainText(normalized.value);
+  const plainText = portableTextToPlainText(value);
   if (plainText.length > field.max) {
     return { ok: false, error: `Must be ${field.max} characters or fewer.` };
   }
@@ -243,7 +246,26 @@ function validateRichField(
   const placeholderError = findPlaceholderError(plainText, field.placeholders);
   if (placeholderError) return { ok: false, error: placeholderError };
 
-  return { ok: true, value: normalized.value };
+  return { ok: true, value };
+}
+
+function validateRichField(
+  field: TVoiceField,
+  raw: unknown,
+): TVoiceFieldValidation {
+  if (raw === undefined || raw === null) return { ok: true, value: undefined };
+
+  if (typeof raw === 'string') {
+    return finalizeRichValue(field, coercePlainStringToRichValue(raw));
+  }
+
+  if (!Array.isArray(raw)) return { ok: false, error: 'Must be rich text.' };
+  if (raw.length === 0) return { ok: true, value: undefined };
+
+  const normalized = normalizeRichValue(raw);
+  if (!normalized.ok) return normalized;
+
+  return finalizeRichValue(field, normalized.value);
 }
 
 function validateVoiceFieldValue(
