@@ -43,6 +43,7 @@ export function makeRawNewsletterSettings(
   return {
     heading: 'Stay in the loop',
     description: 'Get new posts in your inbox.',
+    trustCues: ['No spam', 'Unsubscribe anytime'],
     ...overrides,
   };
 }

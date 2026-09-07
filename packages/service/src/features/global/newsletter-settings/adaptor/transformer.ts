@@ -13,5 +13,6 @@ export function toNewsletterSettings(
   return {
     heading: raw.heading,
     description: raw.description ?? undefined,
+    trustCues: raw.trustCues ?? undefined,
   };
 }
