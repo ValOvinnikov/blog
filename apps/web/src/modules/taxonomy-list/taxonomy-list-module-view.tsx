@@ -18,7 +18,7 @@ export interface ITaxonomyListModuleItem {
 
 export interface ITaxonomyListModuleViewProps extends Omit<
   TTaxonomyListModule,
-  'entries'
+  'entries' | 'taxonomy'
 > {
   items: ITaxonomyListModuleItem[];
   titleId: string;

@@ -24,20 +24,17 @@ const {
   taxonomyListModuleMock: vi.fn(
     ({
       id,
-      accessibleTitle,
-      emptyMessage,
-      buildHref,
-      formatPostCount,
+      slot,
     }: {
       id: string;
-      accessibleTitle: string;
-      emptyMessage: string;
-      buildHref: (slug: string) => string;
-      formatPostCount: (count: number) => string;
+      slot: {
+        fallbackTaxonomy: string;
+        accessibleTitle: string;
+        emptyMessage: string;
+      };
     }) => (
       <div data-testid="taxonomy-list-module-stub">
-        {id}:{accessibleTitle}:{emptyMessage}:{buildHref('engineering')}:
-        {formatPostCount(5)}
+        {id}:{slot.fallbackTaxonomy}:{slot.accessibleTitle}:{slot.emptyMessage}
       </div>
     ),
   ),
@@ -116,7 +113,7 @@ describe(`<${TopicsPage.name}/>`, () => {
     errorSpy.mockRestore();
   });
 
-  it('passes the taxonomyListId, TOPICS kind, page heading as accessibleTitle, the empty-state copy, and the href/postcount builders through to TaxonomyListModule', async () => {
+  it('passes the taxonomyListId, TOPICS fallback kind, page heading as accessibleTitle, and the empty-state copy through to TaxonomyListModule', async () => {
     getIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -132,14 +129,16 @@ describe(`<${TopicsPage.name}/>`, () => {
     expect(taxonomyListModuleMock).toHaveBeenCalledWith(
       expect.objectContaining({
         id: 'topic-list-1',
-        taxonomy: 'TOPICS',
-        accessibleTitle: 'Topics',
-        emptyMessage: 'No topics yet.',
+        slot: expect.objectContaining({
+          fallbackTaxonomy: 'TOPICS',
+          accessibleTitle: 'Topics',
+          emptyMessage: 'No topics yet.',
+        }),
       }),
       undefined,
     );
     expect(screen.getByTestId('taxonomy-list-module-stub')).toHaveTextContent(
-      'topic-list-1:Topics:No topics yet.:/topics/engineering:5 posts',
+      'topic-list-1:TOPICS:Topics:No topics yet.',
     );
   });
 

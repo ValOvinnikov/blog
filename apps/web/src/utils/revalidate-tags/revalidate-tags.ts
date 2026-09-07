@@ -48,7 +48,7 @@ type TCachedDocumentType =
  * (`Record<TModuleType | TCachedDocumentType, …>`), so a schema addition to
  * either union without a matching entry here fails `type-check` —
  * regardless of whether that module type is ever added to `MODULE_MAP`
- * (`module_hero`, `module_postList`, and `module_taxonomyList` never are).
+ * (`module_hero` and `module_postList` never are).
  * Every other document/object `_type` stays `Partial`, since it legitimately
  * purges nothing. The tag strings themselves are the literals passed to
  * `isr(...)` in `@blog/service` loaders (a few predate a `{group}_{name}`
