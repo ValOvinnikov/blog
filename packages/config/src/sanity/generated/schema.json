@@ -983,6 +983,13 @@
         },
         "optional": true
       },
+      "showImages": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
       "contentAlignment": {
         "type": "objectAttribute",
         "value": {
@@ -2418,6 +2425,16 @@
           "type": "string"
         },
         "optional": true
+      },
+      "trustCues": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "array",
+          "of": {
+            "type": "string"
+          }
+        },
+        "optional": true
       }
     }
   },
@@ -3719,6 +3736,13 @@
         "value": {
           "type": "inline",
           "name": "sectionHeader"
+        },
+        "optional": true
+      },
+      "showImages": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
         },
         "optional": true
       },

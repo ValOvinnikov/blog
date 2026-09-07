@@ -106,9 +106,7 @@ describe(TenantDangerPage, () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'Danger zone' }),
     ).toBeVisible();
-    expect(
-      screen.getByRole('button', { name: 'Deprovision tenant' }),
-    ).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Deprovision' })).toBeVisible();
   });
 
   it('never offers reactivation for a live tenant', async () => {
@@ -227,7 +225,7 @@ describe(TenantDangerPage, () => {
     );
   });
 
-  it('renders the deprovisioning progress card in a starting state when a request was dispatched but no run marker has appeared yet', async () => {
+  it('renders the deprovisioning progress card in a starting state when a request was dispatched but no run marker has appeared yet, with the Starting badge in the fallback Run card header', async () => {
     listTenantsByIdsMock.mockResolvedValue([
       makeTenant({ deprovisioningSteps: null }),
     ]);
@@ -246,8 +244,8 @@ describe(TenantDangerPage, () => {
     expect(screen.getAllByText('Queued').length).toBe(6);
     expect(screen.queryByText('Not started')).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('heading', { level: 2, name: 'Run' }),
-    ).not.toBeInTheDocument();
+      screen.getByRole('heading', { level: 2, name: 'Run' }),
+    ).toBeVisible();
   });
 
   it('stops polling the starting state once it exceeds the same stale-run cap a live run is bound by', async () => {
@@ -336,5 +334,145 @@ describe(TenantDangerPage, () => {
     expect(
       screen.queryByRole('heading', { name: 'Deprovisioning progress' }),
     ).not.toBeInTheDocument();
+  });
+
+  describe('live-tenant reading order (scope guard: unaffected by the archived reorganisation)', () => {
+    it('reads header, then the Deprovision card, with no archived notice or history heading', async () => {
+      listTenantsByIdsMock.mockResolvedValue([
+        makeTenant({ deprovisionedAt: null }),
+      ]);
+
+      await setup();
+
+      expect(
+        screen.getByRole('heading', {
+          level: 2,
+          name: 'Deprovision this tenant',
+        }),
+      ).toBeVisible();
+      expect(
+        screen.queryByText('This tenant is archived'),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('heading', { name: 'Teardown history' }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  describe('archived-tenant reorganisation', () => {
+    const archivedTenant = () =>
+      makeTenant({
+        deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
+        deprovisioningSteps: {
+          ...idleDeprovisioningSteps(),
+          run: {
+            startedAt: '2026-08-12T14:18:00.000Z',
+            finishedAt: '2026-08-12T14:20:00.000Z',
+          },
+        },
+      });
+
+    it('shows the archived notice, an action row with both controls, and a Teardown history section', async () => {
+      listTenantsByIdsMock.mockResolvedValue([archivedTenant()]);
+
+      await setup();
+
+      expect(screen.getByText('This tenant is archived')).toBeVisible();
+      expect(
+        screen.getByRole('heading', {
+          level: 2,
+          name: 'Reactivate this tenant',
+        }),
+      ).toBeVisible();
+      expect(
+        screen.getByRole('heading', {
+          level: 2,
+          name: 'Delete this tenant permanently',
+        }),
+      ).toBeVisible();
+      expect(
+        screen.queryByRole('heading', { name: 'Deprovision this tenant' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { name: 'Teardown history' }),
+      ).toBeVisible();
+      expect(
+        screen.getByRole('heading', { name: 'Deprovisioning progress' }),
+      ).toBeVisible();
+    });
+
+    it('renders no Teardown history section when the tenant has never been through a deprovisioning run', async () => {
+      listTenantsByIdsMock.mockResolvedValue([
+        makeTenant({
+          deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
+          deprovisioningSteps: null,
+        }),
+      ]);
+
+      await setup();
+
+      expect(
+        screen.queryByRole('heading', { name: 'Teardown history' }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  describe('deprovision trigger disabled while a run is in progress', () => {
+    it('leaves the trigger enabled for a tenant that has never been deprovisioned', async () => {
+      listTenantsByIdsMock.mockResolvedValue([
+        makeTenant({ deprovisioningSteps: null }),
+      ]);
+
+      await setup();
+
+      expect(screen.getByRole('button', { name: 'Deprovision' })).toBeEnabled();
+    });
+
+    it('disables the trigger while a dispatched run is genuinely in progress', async () => {
+      listTenantsByIdsMock.mockResolvedValue([
+        makeTenant({
+          deprovisioningSteps: {
+            ...idleDeprovisioningSteps(),
+            [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
+              status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+            },
+            run: { startedAt: '2026-08-12T14:18:00.000Z' },
+          },
+        }),
+      ]);
+
+      await setup();
+
+      const trigger = screen.getByRole('button', { name: 'Deprovision' });
+      expect(trigger).toHaveAttribute('aria-disabled', 'true');
+      expect(trigger).not.toBeDisabled();
+      expect(
+        screen.getByText(
+          'A deprovisioning run is already in progress for this tenant.',
+        ),
+      ).toBeVisible();
+    });
+
+    it('re-enables the trigger once a dispatched run has failed', async () => {
+      listTenantsByIdsMock.mockResolvedValue([
+        makeTenant({
+          deprovisioningSteps: {
+            ...idleDeprovisioningSteps(),
+            [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
+              status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+              error: 'boom',
+            },
+            run: {
+              startedAt: '2026-08-12T14:18:00.000Z',
+              finishedAt: '2026-08-12T14:19:00.000Z',
+            },
+          },
+        }),
+      ]);
+
+      await setup();
+
+      expect(screen.getByRole('button', { name: 'Deprovision' })).toBeEnabled();
+    });
   });
 });

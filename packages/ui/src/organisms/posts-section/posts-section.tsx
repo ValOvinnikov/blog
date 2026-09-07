@@ -9,6 +9,7 @@ import { Heading } from '@blog/ui/atoms/heading';
 import { Icon } from '@blog/ui/atoms/icon';
 import { resolveComponent, type THeadingLevel } from '@blog/ui/lib/react';
 import { PostCard } from '@blog/ui/molecules/post-card';
+import type { ReactNode } from 'react';
 
 import {
   postsSectionVariants,
@@ -28,6 +29,8 @@ export interface IPostCardData {
   formattedDate: string;
   readingTime?: string;
   topic: IPostCardTopicData;
+  /** Pre-rendered image node the web layer builds; never a URL for this component to resolve. */
+  image?: ReactNode;
 }
 
 export type TPostsSectionProps = IWithClassName &
@@ -49,6 +52,8 @@ export type TPostsSectionProps = IWithClassName &
     cardHeadingLevel?: THeadingLevel;
     /** Optional supporting copy rendered under the heading. */
     supportingText?: string;
+    /** Renders a `PostCard.Media` region on every card — the empty frame when a post has no `image`. Omit to render no media region at all. */
+    hasImages?: boolean;
     /** Horizontal alignment of the heading and supporting text. Defaults to left. */
     align?: TPostsSectionVariants['align'];
     /** Message rendered under the heading when `posts` is empty. Omit to keep the section rendering nothing (existing behavior). */
@@ -82,6 +87,7 @@ export const PostsSection = ({
   linkAs,
   cardHeadingLevel = 3,
   supportingText,
+  hasImages,
   align,
   emptyMessage,
   isTinted,
@@ -116,6 +122,11 @@ export const PostsSection = ({
         <div className={s.grid()}>
           {posts.map((post) => (
             <PostCard key={post.id} excerpt={post.excerpt}>
+              {hasImages && (
+                <PostCard.Media dataTestId="post-card-media">
+                  {post.image}
+                </PostCard.Media>
+              )}
               <PostCard.Meta
                 dateValue={post.publishedAt}
                 dateLabel={post.formattedDate}

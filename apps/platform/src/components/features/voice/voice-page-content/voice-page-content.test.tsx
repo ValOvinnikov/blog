@@ -52,6 +52,9 @@ const tenant = makeTenant({
     [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
       status: TENANT_PROVISIONING_STEP_STATUS.DONE,
     },
+    [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: {
+      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+    },
     [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
       status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
     },
@@ -92,6 +95,30 @@ describe(`<${VoicePageContent.name}/>`, () => {
     expect(
       screen.getByRole('textbox', { name: 'Not Found Heading' }),
     ).toHaveValue('Nothing here');
+  });
+
+  it('renders a stored rich (Portable Text) override as its plain text, not blank', async () => {
+    getSiteConfigMock.mockResolvedValue({
+      voiceOverrides: {
+        blogListEmpty: [
+          {
+            _type: 'block',
+            _key: 'k1',
+            style: 'normal',
+            children: [
+              { _type: 'span', _key: 's1', text: 'Nothing published yet.' },
+            ],
+          },
+        ],
+      },
+    });
+
+    await setup();
+    await openAdvanced();
+
+    expect(
+      screen.getByRole('textbox', { name: 'Blog List Empty' }),
+    ).toHaveValue('Nothing published yet.');
   });
 
   it('passes the archived date through for a deprovisioned tenant', async () => {

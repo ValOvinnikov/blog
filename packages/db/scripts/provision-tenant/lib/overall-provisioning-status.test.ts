@@ -6,29 +6,38 @@ import {
 import { overallStatusFor } from './overall-provisioning-status';
 
 describe(overallStatusFor, () => {
-  it('returns READY when the last step (CREATE_WEBHOOK) finishes', () => {
+  it('returns READY when the last step (VERIFY_CONTENT) finishes', () => {
     expect(
       overallStatusFor(
-        TENANT_PROVISIONING_STEP.CREATE_WEBHOOK,
+        TENANT_PROVISIONING_STEP.VERIFY_CONTENT,
         TENANT_PROVISIONING_STEP_STATUS.DONE,
       ),
     ).toBe('READY');
   });
 
-  it('returns FAILED when the last step (CREATE_WEBHOOK) fails', () => {
+  it('returns FAILED when the last step (VERIFY_CONTENT) fails', () => {
     expect(
       overallStatusFor(
-        TENANT_PROVISIONING_STEP.CREATE_WEBHOOK,
+        TENANT_PROVISIONING_STEP.VERIFY_CONTENT,
         TENANT_PROVISIONING_STEP_STATUS.FAILED,
       ),
     ).toBe('FAILED');
   });
 
-  it('returns undefined when CREATE_WEBHOOK is only RUNNING', () => {
+  it('returns undefined when VERIFY_CONTENT is only RUNNING', () => {
+    expect(
+      overallStatusFor(
+        TENANT_PROVISIONING_STEP.VERIFY_CONTENT,
+        TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+      ),
+    ).toBeUndefined();
+  });
+
+  it('returns undefined when the second-to-last step (CREATE_WEBHOOK) finishes', () => {
     expect(
       overallStatusFor(
         TENANT_PROVISIONING_STEP.CREATE_WEBHOOK,
-        TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+        TENANT_PROVISIONING_STEP_STATUS.DONE,
       ),
     ).toBeUndefined();
   });

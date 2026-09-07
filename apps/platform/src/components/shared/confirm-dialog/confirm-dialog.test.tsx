@@ -136,4 +136,45 @@ describe(ConfirmDialog, () => {
 
     expect(await screen.findByTestId('extra')).toBeVisible();
   });
+
+  it('renders the trigger enabled by default', () => {
+    render(<ControlledConfirmDialog />);
+
+    expect(screen.getByRole('button', { name: 'Open dialog' })).toBeEnabled();
+  });
+
+  it('marks the trigger aria-disabled rather than natively disabled when isTriggerDisabled is set, so it stays reachable', async () => {
+    const user = userEvent.setup();
+    render(<ControlledConfirmDialog isTriggerDisabled={true} />);
+
+    const trigger = screen.getByRole('button', { name: 'Open dialog' });
+    expect(trigger).toHaveAttribute('aria-disabled', 'true');
+    expect(trigger).not.toBeDisabled();
+
+    await user.tab();
+    expect(trigger).toHaveFocus();
+
+    await user.click(trigger);
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+
+    await user.keyboard('{Enter}');
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+
+    await user.keyboard(' ');
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+
+  it('associates the disabled trigger with triggerAriaDescribedBy', () => {
+    render(
+      <ControlledConfirmDialog
+        isTriggerDisabled={true}
+        triggerAriaDescribedBy="hint-id"
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Open dialog' })).toHaveAttribute(
+      'aria-describedby',
+      'hint-id',
+    );
+  });
 });

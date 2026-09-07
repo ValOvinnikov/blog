@@ -1,4 +1,8 @@
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import {
+  renderWithIntl,
+  screen,
+  within,
+} from '@platform/testing/custom-render';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import userEvent from '@testing-library/user-event';
@@ -56,7 +60,7 @@ describe(DeprovisionTenantControl, () => {
     ).toBeVisible();
   });
 
-  it('titles the card "Deprovision this tenant" for an already-deprovisioned tenant', () => {
+  it('titles the card "Delete this tenant permanently" for an already-deprovisioned tenant', () => {
     const tenant = makeTenant({
       deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
     });
@@ -65,7 +69,7 @@ describe(DeprovisionTenantControl, () => {
     expect(
       screen.getByRole('heading', {
         level: 2,
-        name: 'Deprovision this tenant',
+        name: 'Delete this tenant permanently',
       }),
     ).toBeVisible();
   });
@@ -77,15 +81,15 @@ describe(DeprovisionTenantControl, () => {
     expect(screen.queryByText('Danger zone')).not.toBeInTheDocument();
   });
 
-  it('shows an archived badge instead of the trigger for an already-deprovisioned tenant', () => {
+  it('never renders the live-tenant trigger, or a Deprovisioned badge of its own, for an already-deprovisioned tenant', () => {
     const tenant = makeTenant({
       deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
     });
     render(<DeprovisionTenantControl tenant={tenant} />);
 
-    expect(screen.getByText('Deprovisioned')).toBeVisible();
+    expect(screen.queryByText('Deprovisioned')).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Deprovision tenant' }),
+      screen.queryByRole('button', { name: 'Deprovision' }),
     ).not.toBeInTheDocument();
   });
 
@@ -103,16 +107,15 @@ describe(DeprovisionTenantControl, () => {
     const tenant = makeTenant();
     render(<DeprovisionTenantControl tenant={tenant} />);
 
-    await user.click(
-      screen.getByRole('button', { name: 'Deprovision tenant' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Deprovision' }));
 
+    const dialog = await screen.findByRole('alertdialog', {
+      name: /deprovision acme inc\./i,
+    });
+    expect(dialog).toBeVisible();
     expect(
-      await screen.findByRole('alertdialog', {
-        name: /deprovision acme inc\./i,
-      }),
-    ).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Deprovision' })).toBeDisabled();
+      within(dialog).getByRole('button', { name: 'Deprovision' }),
+    ).toBeDisabled();
   });
 
   it('enables the confirm button only once the typed name matches, and calls the action on confirm', async () => {
@@ -120,15 +123,16 @@ describe(DeprovisionTenantControl, () => {
     const tenant = makeTenant();
     render(<DeprovisionTenantControl tenant={tenant} />);
 
-    await user.click(
-      screen.getByRole('button', { name: 'Deprovision tenant' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Deprovision' }));
     await user.type(
       screen.getByRole('textbox', { name: /type "acme inc\."/i }),
       'Acme Inc.',
     );
 
-    const confirmButton = screen.getByRole('button', { name: 'Deprovision' });
+    const dialog = screen.getByRole('alertdialog');
+    const confirmButton = within(dialog).getByRole('button', {
+      name: 'Deprovision',
+    });
     expect(confirmButton).toBeEnabled();
 
     await user.click(confirmButton);
@@ -148,14 +152,16 @@ describe(DeprovisionTenantControl, () => {
     const tenant = makeTenant();
     render(<DeprovisionTenantControl tenant={tenant} />);
 
-    await user.click(
-      screen.getByRole('button', { name: 'Deprovision tenant' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Deprovision' }));
     await user.type(
       screen.getByRole('textbox', { name: /type "acme inc\."/i }),
       'Acme Inc.',
     );
-    await user.click(screen.getByRole('button', { name: 'Deprovision' }));
+    await user.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', {
+        name: 'Deprovision',
+      }),
+    );
 
     expect(
       await screen.findByText("Doesn't match the tenant's name."),
@@ -233,5 +239,41 @@ describe(DeprovisionTenantControl, () => {
       await screen.findByText("Doesn't match the tenant's name."),
     ).toBeVisible();
     expect(pushMock).not.toHaveBeenCalled();
+  });
+
+  describe('isDeprovisioningInProgress', () => {
+    it('renders the trigger enabled by default, with no in-progress hint', () => {
+      const tenant = makeTenant({ deprovisionedAt: null });
+      render(<DeprovisionTenantControl tenant={tenant} />);
+
+      expect(screen.getByRole('button', { name: 'Deprovision' })).toBeEnabled();
+      expect(
+        screen.queryByText(
+          'A deprovisioning run is already in progress for this tenant.',
+        ),
+      ).not.toBeInTheDocument();
+    });
+
+    it('disables the trigger and shows the hint while a run is in progress', () => {
+      const tenant = makeTenant({ deprovisionedAt: null });
+      render(
+        <DeprovisionTenantControl
+          tenant={tenant}
+          isDeprovisioningInProgress={true}
+        />,
+      );
+
+      const trigger = screen.getByRole('button', { name: 'Deprovision' });
+      expect(trigger).toHaveAttribute('aria-disabled', 'true');
+      expect(trigger).not.toBeDisabled();
+      expect(
+        screen.getByText(
+          'A deprovisioning run is already in progress for this tenant.',
+        ),
+      ).toBeVisible();
+      expect(trigger).toHaveAccessibleDescription(
+        'A deprovisioning run is already in progress for this tenant.',
+      );
+    });
   });
 });

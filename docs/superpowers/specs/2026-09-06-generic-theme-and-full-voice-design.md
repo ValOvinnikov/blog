@@ -62,17 +62,40 @@ Two tasks, delivered in order:
   about. Those ~24 keys stay in the neutral catalog, fixed. Per-instance alt
   or aria text belongs on the Sanity schema of the thing it describes
   (already the case: the image-alt helper, CTA action labels).
-- **D4 — Copy for a Sanity-modelled feature lives in Studio, not Voice.**
-  Feature-wide copy goes on that feature's `settings_*` singleton; per-instance
-  content goes on the module. Voice covers only site chrome with no Sanity
-  model (navigation, auth, bookmarks, account, 404, errors, pagination,
-  archive titles and empty states). The newsletter is the first application:
-  its form strings and the confirm/unsubscribe page copy move to
-  `settings_newsletter`. Empty states stay in Voice — they are page-level
-  archive copy shared by `/blog`, topics and tags, and #1899 already
-  documented the module-field failure mode. This refines, not reverses, the
-  `SPEC.md` rule "curated UI copy lives in Voice, not on modules": a module
-  still never carries an override for copy Voice owns.
+- **D4 (revised 2026-09-07) — Studio owns a feature's authored content.
+  Operational form copy stays fixed in the catalog.** The dividing line is
+  authorship. Copy an editor _writes_ as the feature's content — its pitch,
+  its argument, the words that differ because this tenant has something
+  particular to say — goes on that feature's `settings_*` singleton
+  (feature-wide) or its module (per-instance). Copy that merely _operates_ the
+  interface — button labels, input placeholders, status and error messages,
+  confirmation-page wording — is neither content nor voice: it stays fixed in
+  the neutral catalog, for the same reason toast copy does under D5. It is
+  generic operation feedback, identical for every tenant, and nobody should be
+  editing it.
+
+  For the newsletter this means `settings_newsletter` gains exactly one field,
+  **`trustCues`**, joining the `heading` and `description` it already has. All
+  24 newsletter catalog keys stay where they are — `newsletterForm`'s seven
+  operational strings, and every `newsletterConfirm.*` / `newsletterUnsubscribe.*`
+  landing-page string — except the two `trustCue*` keys, which Studio takes
+  over. Nothing moves into `VOICE_FIELDS`; the newsletter contributes no Voice
+  surface.
+
+  Empty states stay in Voice — they are page-level archive copy shared by
+  `/blog`, topics and tags, and #1899 already documented the module-field
+  failure mode. The `SPEC.md` rule "curated UI copy lives in Voice, not on
+  modules" is unchanged.
+
+  **Superseded:** the original D4 ("copy for a Sanity-modelled feature lives
+  in Studio, not Voice") moved the newsletter's form strings and both landing
+  pages onto `settings_newsletter`. Implementing it put 21 labels,
+  placeholders and error messages into a CMS singleton as required fields,
+  which made the existing tenant document invalid and would have needed a
+  backfill migration to repair — a large amount of machinery for strings no
+  tenant has a reason to change. The rule above replaces it, and reduces the
+  newsletter's share of this epic to a single field.
+
 - **D5 — Toast copy is not voice.** Toasts are generic operation feedback
   ("Saved", "Removed from bookmarks"). Their strings stay fixed in the
   catalog and out of the registry.

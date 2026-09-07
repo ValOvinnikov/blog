@@ -64,6 +64,7 @@ export default defineMigration({
           brandVariant: BRAND_VARIANT.SECONDARY,
           limit: TAG_ITEMS_PER_PAGE,
           pageSize: TAG_ITEMS_PER_PAGE,
+          showImages: true,
         }),
         createIfNotExists({
           _id: pageTagId,

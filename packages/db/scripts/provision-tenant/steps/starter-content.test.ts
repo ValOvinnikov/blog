@@ -58,6 +58,14 @@ describe(buildStarterDocuments, () => {
     expect(site).not.toHaveProperty('defaultOgImage');
   });
 
+  it('newsletter starter document carries both trust cue strings', () => {
+    const newsletter = buildStarterDocuments(tenant).find(
+      (doc) => doc._id === STARTER_DOCUMENT_IDS.NEWSLETTER,
+    ) as unknown as { trustCues: string[] };
+
+    expect(newsletter.trustCues).toEqual(['No spam', 'Unsubscribe anytime']);
+  });
+
   it('the external nav link satisfies the link schema union (label + linkType + url)', () => {
     const navigation = buildStarterDocuments(tenant).find(
       (doc) => doc._id === STARTER_DOCUMENT_IDS.NAVIGATION,

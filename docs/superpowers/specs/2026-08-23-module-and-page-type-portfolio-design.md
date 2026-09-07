@@ -192,11 +192,13 @@ resolves to `'module_hero'`; after M9 it is `'module_hero' |
 legacy `module_hero` drops out of the union the day its schema is deleted
 (the retirement ticket, #2813).
 
-`TSlotModuleType` names every module that renders through a page's dedicated
-slot rather than `modules[]`, so `MODULE_MAP` is typed
+`TSlotModuleType` names every module that renders _only_ through a page's
+dedicated slot, never `modules[]`, so `MODULE_MAP` is typed
 `Record<Exclude<TModuleType, TSlotModuleType>, …>` instead of listing three
 string literals. Both types live in `@blog/config` because studio, service
-and web all read them.
+and web all read them. `module_taxonomyList` is a member until Phase 1.5
+makes it render both ways, at which point it leaves the union and takes its
+`MODULE_MAP` entry (see "The placeable taxonomy list" below).
 
 Two maps are keyed on the family, and both refuse to compile until a new
 `module_hero*` schema is named in them — the same guarantee `MODULE_MAP`
@@ -559,6 +561,380 @@ carrying the old document's values, repoint `page_home.hero`, then delete the
 `module_hero` document, in that order and as separate steps, because a Sanity
 `_type` is immutable.
 
+## Post grid images and the `showImages` toggle
+
+**Goal:** the post grid shows each post's image, on every surface that
+renders it, with one switch per listing module to turn images off. Today
+the grid renders no image at all: `PostsSection`'s `IPostCardData` has no
+image field, even though `PostCard` has carried a `Media` slot since it was
+built and the service already projects every post card's hero image. Most of
+this is wiring, not data. Design of record for epic #2782, settled in #2816.
+
+Interactive mock — switch surface, toggle, dataset gaps and viewport:
+<https://claude.ai/code/artifact/0723b862-08b2-41f4-b4bd-cb917cba7cad>.
+
+### Where the toggle lives
+
+| Surface                              | Renders through         | Toggle    | Why                                                                      |
+| ------------------------------------ | ----------------------- | --------- | ------------------------------------------------------------------------ |
+| Home and landing pages, latest posts | `module_postLatest`     | **Yes**   | Per instance — a dense home page may want a text-only teaser             |
+| Blog, topic and tag archives         | `module_postList`       | **Yes**   | The archive is a module too; same helper, same default                   |
+| Post page, related reading           | `PostsSection` directly | Always on | No module document exists to author a setting on, so the default applies |
+
+The ticket asked how "archive pages that render `PostsSection` outside a
+module" pass the image. They do not exist: the blog, topic and tag pages all
+render their list through `module_postList` in their required slot, so the
+toggle reaches them. The only grid outside a module is the post page's
+related-reading section, and that gets images unconditionally.
+
+### Fields
+
+One helper, `showImagesField()`, emitted by both listing modules right after
+`sectionHeaderField()`:
+
+| Field        | Type                                              | Notes                                            |
+| ------------ | ------------------------------------------------- | ------------------------------------------------ |
+| `showImages` | boolean, `initialValue: true`, no validation rule | "Show each post's image on its card." Default on |
+
+`showImages` rather than `hasImages` on the schema, matching the existing
+verb-phrase booleans (`openInNewTab`, `newsletterEnabled`); the organism prop
+is `hasImages`, matching the repo's `is`/`has` rule for React booleans.
+
+**Existing documents read as on.** Sanity's `initialValue` fills new
+documents only; every `module_postLatest` and `module_postList` already in a
+tenant dataset has no `showImages`. The service projects
+`coalesce(showImages, true)` rather than the bare field, so those documents
+behave as if the field had always been there. That is the schema's declared
+default applied at read time, not a faked value in the view model, and it is
+what makes this ship with **no content migration**. A bare `.notNull()` on
+the raw field would instead throw on every pre-existing document and 404
+its page.
+
+### Service
+
+Both module view models gain one field:
+
+```ts
+type TPostLatestModule = { …; showImages: boolean };
+type TPostListModule = { …; showImages: boolean };
+```
+
+`TPostCard` is **unchanged**. It already carries `heroImageSanity:
+TMaybeUndefined<ISanityImage>` with hotspot, crop, LQIP and alt, and the
+related-posts list on the post page is a `TPostCard[]` too. The service does
+not strip the image when the toggle is off: the flag says how the module
+wants to render, the card says what the post has, and the web layer combines
+them. Stripping data to express a presentation choice would also break the
+related-reading surface, which has no flag.
+
+### `@blog/ui`
+
+`PostsSection` gains `hasImages?: boolean`. `IPostCardData` gains
+`image?: ReactNode`. When `hasImages` is set, **every** card renders
+`PostCard.Media` — the node when there is one, the empty frame when there is
+not. `PostCard.Media` is already `aspect-video` with a `bg-surface-2` fill,
+so a post without an image keeps its tinted 16:9 block and the row stays
+aligned rather than going ragged because one editor forgot an image. When
+`hasImages` is unset, no card has a media region at all.
+
+The organism never builds an image. It receives a pre-rendered node per
+card, the same contract `CtaModule` uses for its `image` prop.
+
+### Web
+
+One helper owns the card image, so every surface sizes it identically:
+
+```tsx
+const renderPostCardImage = (post: TPostCard) =>
+  post.heroImageSanity ? (
+    <SanityImage
+      image={post.heroImageSanity}
+      width={640}
+      height={360}
+      sizes="(min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw"
+      loading="lazy"
+      className="size-full object-cover"
+    />
+  ) : undefined;
+```
+
+- `640 × 360` is the 16:9 frame at a comfortable density for a third-width
+  column; `sizes` follows the grid's own breakpoints (`grid-cols-1
+sm:grid-cols-2 md:grid-cols-3`).
+- **`loading="lazy"`, never `priority`.** The hero owns the page's LCP
+  image, and `SanityImage`'s `priority` withholds the LQIP placeholder and
+  hints `fetchPriority="high"`; a grid of six cards must not compete for
+  that.
+- `alt` comes from the asset via `ISanityImage.alt`; nothing is invented.
+
+`toPostListItems(posts, renderImage?)` takes the helper as an optional
+callback and sets `image` on each item when given. The two module components
+pass it when `showImages` is on; the post page's related-reading call always
+passes it. `PostListModuleView` forwards `hasImages` to `PostsSection`.
+
+### Validation
+
+None — and specifically **no `required()` rule either**.
+
+An earlier revision of this section specified `validation: rule.required()`,
+on the reasoning that "a required boolean with an initial value cannot be
+invalid." That is true only of documents created after the field exists.
+`initialValue` fills the form when an author creates a document; it never
+backfills documents already in a dataset. PR #2886 demonstrated the
+consequence: `Document validation` reported 18 errors, one per pre-existing
+module document (17 `module_postList`, 1 `module_postLatest`), each
+`showImages ✖ Required` — contradicting this design's own promise that
+existing documents keep validating.
+
+So the field carries `initialValue: true` and nothing else, matching
+`newsletterEnabled` on `blog_post`, which is the same shape for the same
+reason. New documents default to on through `initialValue`; existing ones
+read as on through the `coalesce(showImages, true)` projection below. The
+guarantee that makes this safe lives in the query, not in a validation rule.
+
+### Migration
+
+None. One additive field, defaulted at read time for existing documents.
+
+### Per-layer scope
+
+- **studio** — `showImagesField()` helper; both listing modules emit it;
+  schema tests; `pnpm typegen`, commit generated types.
+- **service** — `coalesce(showImages, true)` projection and `showImages` on
+  both module view models; transformer tests for present-true,
+  present-false and absent. `TPostCard` untouched.
+- **ui** — `hasImages` prop and `image` node; stories with images, without,
+  and mixed; a test that every card renders `PostCard.Media` when
+  `hasImages` is set, including cards with no node; `COMPONENTS.md`
+  regenerated.
+- **web** — `renderPostCardImage`; `toPostListItems` callback; the two
+  module components and the post page pass it; `PostListModuleView` forwards
+  `hasImages`. Lighthouse image audits unchanged, since every request
+  carries explicit dimensions and `sizes`.
+
+**Acceptance:** grids show each post's image by default on home, landing,
+blog, topic and tag pages and in related reading; the toggle hides them per
+module instance; a pre-existing module document with no `showImages`
+renders with images; a post with no image keeps its frame when the toggle
+is on; no grid image carries `priority`.
+
+### Not in scope
+
+- A site-wide default in `settings_site` — two places to set one thing; the
+  per-instance field with a default is the whole feature.
+- Alternate crops per module — 16:9 is the card's frame; a different ratio
+  is a different card, not a setting.
+- Images on author or topic cards — different molecules.
+- The carousel (1.4) reuses this exact card, so it inherits images and the
+  toggle with no work of its own.
+
+## The placeable taxonomy list
+
+**Goal:** `module_taxonomyList` — today a slot-only module that the Topics
+and Tags index pages hold in their required `taxonomyList` slot — becomes
+placeable in `page_home.modules[]` and `page_generic.modules[]`, so a blog
+home can show topic cards between its latest posts and the newsletter. One
+type, one authored field, no sibling. Design of record for epic #2787,
+settled in #2841.
+
+Interactive mock of the Studio form, the home composition, the validation
+states and the resolved view model:
+<https://claude.ai/code/artifact/7006d9e6-981f-47cb-a6c6-1428508036d3>.
+
+### One type, not a sibling
+
+The module already has everything a placed module needs — `titleField()`,
+`brandVariantField()`, `sectionHeaderField()`, alignment, `layoutField` —
+and a web view built from `PostGrid` + `TaxonomyCard`. The only thing it
+lacks in `modules[]` is knowing _which_ taxonomy to list, because today the
+index page holding it supplies that (`getTaxonomyList(id, taxonomy, …)`
+takes it as a parameter and never queries upward for the parent page).
+
+A sibling `module_taxonomyCards` would duplicate the schema, the service
+adaptor, the web view and the cache tags to carry one field, and the
+schema-derived registries (`MODULE_MAP`, `REVALIDATE_TAGS`) would each
+demand an entry for a type that renders identically. The authored field on
+the existing type is the whole feature.
+
+### Fields
+
+Added to `module_taxonomyList` between `brandVariantField()` and
+`sectionHeaderField()`:
+
+| Field       | Type                                                | Notes                                                                                                                     |
+| ----------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `taxonomy`  | `TAXONOMY_KIND` radio, optional                     | `TOPICS` · `TAGS`. "Which terms to list. The Topics and Tags pages list their own, so their module can leave this empty." |
+| `sortOrder` | `TAXONOMY_SORT` radio, `initialValue: ALPHABETICAL` | `ALPHABETICAL` · `MOST_POSTS`. Ties in `MOST_POSTS` fall back to title order                                              |
+| `limit`     | number, optional, integer ≥ 1                       | "Show at most this many terms. Empty shows all of them."                                                                  |
+
+`taxonomy` is the field the ticket asked for. `sortOrder` and `limit` are
+the two the placement needs to be usable: a blog with forty tags cannot put
+"all tags, A to Z" on its home page, and the index pages — where every term
+belongs and alphabetical is right — are exactly the surface that must not
+change. Both apply wherever the module sits; their defaults reproduce
+today's index-page behaviour, so an index page with the fields untouched
+renders as it does now.
+
+**`taxonomy` is optional on the document, required by the page.** A
+`module_taxonomyList` document cannot know what holds it: the page
+references the module, not the reverse, and Sanity's `hidden` callback is
+synchronous and sees only the module's own document. So there is no hidden
+rule. The field is always visible, and the two places its value matters
+each carry an async rule in the `validateSingleBlankHeadingPerType` mould —
+a page-level `custom()` on the referencing field that fetches the referenced
+module through `getDraftsClient(context)`:
+
+| Page field                                                    | Rule                                                               | Level                                                               |
+| ------------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| `page_home.modules[]` · `page_generic.modules[]`              | every referenced `module_taxonomyList` has a `taxonomy`            | Error — "Choose whether the '{title}' module lists topics or tags." |
+| `page_topicIndex.taxonomyList` · `page_tagIndex.taxonomyList` | the referenced module's `taxonomy`, if set, equals the page's kind | Error — "This page lists topics; the module is set to tags."        |
+| `module_taxonomyList.limit`                                   | integer, at least 1                                                | Error                                                               |
+
+The first rule is what "required in `modules[]`" means for a referenced
+document; the second is what stops an editor from pointing the Topics page
+at a module set to tags and wondering why nothing changed. An index-page
+module with `taxonomy` left empty is the common, correct case and passes
+both.
+
+### Service
+
+One query resolves the module and its terms together, following the
+`module_heroBlog` precedent, with the page's kind passed in as the fallback
+for index-page slots:
+
+```groq
+*[_type == "module_taxonomyList" && _id == $id][0]{
+  …,
+  "taxonomy": coalesce(taxonomy, $fallbackTaxonomy),
+  "sortOrder": coalesce(sortOrder, "ALPHABETICAL"),
+  limit,
+  "entries": select(
+    coalesce(taxonomy, $fallbackTaxonomy) == "TOPICS" =>
+      *[_type == "blog_topic"] | order(title asc){ topicFragment, postCount },
+    coalesce(taxonomy, $fallbackTaxonomy) == "TAGS" =>
+      *[_type == "blog_tag"] | order(title asc){ tagFragment, postCount }
+  )
+}
+```
+
+- **`coalesce(sortOrder, "ALPHABETICAL")`** is the read-time default for
+  documents that predate the field, same as `showImages` — no migration.
+- **Sorting and the limit are applied in the transformer**, not in GROQ. A
+  tenant has dozens of terms at most, `MOST_POSTS` needs the per-term
+  `postCount` the projection already computes, and a `$limit` inside a
+  slice is not something the groqd builder types. The entries projection
+  mirrors the one the entity loaders already use.
+- **The resolved `taxonomy` is nullable in the projection and checked in
+  the loader.** A module placed in `modules[]` with no `taxonomy` and no
+  fallback has nothing to list; the loader throws, `safeAsync` turns that
+  into a failed result, and the module component omits itself — the page
+  keeps rendering. Page validation makes that state unpublishable, so this
+  is the belt to the validator's braces, never the expected path.
+- **Cache tags:** `modules:taxonomyList`, `module:<id>`, plus `topics` or
+  `tags` for the terms and `posts` for their counts — the union of what the
+  two calls carry today.
+
+```ts
+type TTaxonomyListModule = {
+  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  sectionHeader: TSectionHeader;
+  layout: TMaybeUndefined<TLayout>;
+  contentAlignment: TMaybeUndefined<TContentAlignment>;
+  taxonomy: TTaxonomyKind;
+  entries: TTaxonomyEntry[];
+};
+
+getTaxonomyList(id, tenant, fallbackTaxonomy?: TTaxonomyKind)
+```
+
+`taxonomy` joins the view model because the web layer needs it to build
+hrefs and pick copy. `sortOrder` and `limit` do not: they are consumed by
+the transformer and `entries` comes out already ordered and cut.
+
+### Constants and the slot-type union
+
+- New in `@blog/config`: `TAXONOMY_SORT = { ALPHABETICAL, MOST_POSTS }`.
+  `TAXONOMY_KIND` already exists.
+- **`module_taxonomyList` leaves `TSlotModuleType`.** That union names the
+  modules that render _only_ through a page slot, and it is what
+  `MODULE_MAP`'s `Exclude<TModuleType, TSlotModuleType>` keys on. Removing
+  the member turns the missing `MODULE_MAP` entry into a compile error,
+  which is the registry doing its job; it also means the config change and
+  the web entry cannot merge separately. `TSlotModuleType` becomes
+  `THeroModuleType | 'module_postList'`.
+
+### `@blog/ui`
+
+None. The taxonomy list has no organism: the web view composes `PostGrid`
+and `TaxonomyCard` directly, and the ticket's "PostsSection-adjacent
+organism" does not exist. The view already takes a `headingLevel` prop from
+its caller; a `modules[]` placement passes `2`, the same level `PostsSection`
+fixes for every other module, because the page's `<h1>` belongs to the hero
+or the page header.
+
+### Web
+
+`TaxonomyListModule` takes the `MODULE_MAP` shape (`id`, `locale`, `tenant`)
+and resolves everything else itself: hrefs through `routes.topic` /
+`routes.tag` by the view model's `taxonomy`, and copy from one
+`taxonomyListModule` i18n namespace keyed by kind (`topics.postsCount`,
+`tags.postsCount`, `topics.fallbackHeading`, …). The index pages call the
+same component with two extra props — the fallback kind and their own
+accessible title — and stop passing `buildHref` / `formatPostCount`, which
+were only ever the page restating what the kind implies. `topicsPage` and
+`tagsPage` keep only the strings that are theirs.
+
+**Empty lists.** In `modules[]` an empty result omits the module, the way
+`PostLatestModule` returns `null` — a home page with no topics yet should
+not carry an empty section. In an index-page slot the empty message renders
+as today, because that page has nothing else to show.
+
+`REVALIDATE_TAGS` already carries `module_taxonomyList`; nothing changes
+there.
+
+### Migration
+
+None. `taxonomy` and `limit` are optional; `sortOrder` is defaulted at read
+time. The three seed migrations that create index-page modules keep
+creating them without a `taxonomy`, which is the correct value for a slot.
+
+### Per-layer scope, and why it is one PR
+
+- **config** — `TAXONOMY_SORT`; `module_taxonomyList` out of
+  `TSlotModuleType`.
+- **studio** — the three fields; the two page-level rules; `page_home` and
+  `page_generic` allow-lists gain `taxonomyListSchema.name`; schema tests;
+  `pnpm typegen`, commit generated types.
+- **service** — the merged query with `select()`; `fallbackTaxonomy`
+  parameter; transformer applies `sortOrder` then `limit`; tests for
+  authored-topics, fallback-tags, unresolved (throws), each sort order,
+  limit present and absent, and the read-time `sortOrder` default.
+- **web** — `MODULE_MAP` entry; the module resolves hrefs and copy from the
+  kind; index pages pass the fallback; `modules[]` placement omits itself
+  when empty; web tests and a story per kind.
+
+**One PR.** `TAXONOMY_SORT` has no consumer until the studio schema lands
+(knip fails on the unused export), and dropping `module_taxonomyList` from
+`TSlotModuleType` reds `MODULE_MAP` until the web entry lands. Neither
+config change merges green alone, so the epic ships as a single PR, the way
+Phase 0 (#2858) did.
+
+**Acceptance:** a home or landing page lists topics or tags between any two
+modules, ordered and capped as authored; the Topics and Tags pages render
+exactly as before with their module untouched; a placed module with no
+taxonomy fails page validation and, if it somehow publishes, omits itself;
+an index page whose module is set to the other kind fails validation.
+
+### Not in scope
+
+- A curated pick of specific terms (an array of references). `MOST_POSTS`
+  plus `limit` covers the teaser case; hand-picking is a different field
+  with its own validation, added when a tenant asks.
+- Hiding zero-post terms. They sort last under `MOST_POSTS` and fall off
+  under `limit`; on the index pages they stay, as they do today.
+- Term images. `blog_topic` / `blog_tag` carry none; a card with an image
+  is a different molecule.
+
 ## Contact form / lead capture
 
 **Goal:** the module clients most want — and the only one in the catalogue
@@ -699,6 +1075,13 @@ point; the graph stays acyclic.
 - **Contact form is store + notify only, v1** — no CRM/inbox UI, mirrors the
   newsletter boundary — and is a tenant-toggleable, plan-entitled
   capability like the newsletter (2026-09-06).
+- **Post grid images are a per-module `showImages` boolean, default on,
+  defaulted at read time** — `coalesce(showImages, true)` in the projection
+  so pre-existing documents need no migration; the service keeps the image
+  on every post card and exposes only the flag; the organism renders the
+  media frame on every card when images are on, so a post without one keeps
+  the row aligned; one web helper sizes the image, lazy and never `priority`
+  (2026-09-07, #2816).
 - **`module_heroBlog` replaces `module_hero` by addition, not migration** —
   mode pairs become optional overrides whose Studio placeholder shows the
   derived value; the newest-featured fallback becomes an explicit
@@ -713,6 +1096,14 @@ point; the graph stays acyclic.
   replacing that page's default header when set; `module_hero`
   retired by content migration once `module_heroBlog` replaces it
   (2026-09-07, #2791).
+- **The taxonomy list is one type with an authored `taxonomy`, not a
+  sibling** — optional on the document (a module cannot see what holds it,
+  so no hidden rule) and required by an async page-level rule on the home and
+  landing pages, with the index pages rejecting a mismatched kind;
+  `sortOrder` and `limit` make the placement usable and default to today's
+  index-page behaviour; one `select()` query resolves module and terms with
+  the index page's kind as the fallback; `module_taxonomyList` leaves
+  `TSlotModuleType`, so the epic ships as one PR (2026-09-07, #2841).
 
 ## Non-goals (recorded so #1919 doesn't sprawl)
 
@@ -729,6 +1120,10 @@ point; the graph stays acyclic.
 - **Module catalogue** — one tracking epic (#1919 itself, or a dedicated
   sub-epic if the catalogue outgrows a flat issue list); each module is a
   single issue under it.
+- **Post grid images** — epic #2782 (design #2816, then `studio → service →
+ui → web`); the featured spotlight (#2784) and carousel (#2785) wait on it.
+- **Placeable taxonomy list** — epic #2787 (design #2841, then `config →
+studio → service → web` in a single PR; no ui work).
 - **`module_heroBlog`** — epic #2780 (design #2802, then `studio → service →
 ui → web → db`), plus the retirement chore #2813 once production is moved.
 - **Hero family & generic home page** — epic #2778 under `M9 — Portfolio`
@@ -751,6 +1146,14 @@ catalogue has enough shipped history to matter).
 
 ## Resync log
 
+- **2026-09-07** — added "The placeable taxonomy list" design section
+  (#2841): one type with an optional authored `taxonomy` guarded by page-level
+  rules, `sortOrder` and `limit`, the merged `select()` query with a fallback
+  kind, and `module_taxonomyList` leaving `TSlotModuleType`.
+- **2026-09-07** — added the "Post grid images and the `showImages` toggle"
+  design section (#2816): where the toggle lives, the read-time default for
+  pre-existing documents, the unchanged post card, the organism's frame-on-
+  every-card rule and the single web image helper.
 - **2026-09-07** — corrected two claims this doc made about where constants
   land, after checking them against `main` while implementing #2780.
   `HERO_VARIANT` does **not** ship with `defineHeroFields()`: it landed early,

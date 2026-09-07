@@ -25,6 +25,12 @@ vi.mock('@blog/db', () => ({
     SUSPENDED: 'SUSPENDED',
     ARCHIVED: 'ARCHIVED',
   },
+  TENANT_PROVISIONING_STATUS: {
+    PENDING: 'PENDING',
+    PROVISIONING: 'PROVISIONING',
+    READY: 'READY',
+    FAILED: 'FAILED',
+  },
 }));
 
 vi.mock('@web/utils/is-production-environment', () => ({
@@ -39,6 +45,7 @@ const buildServableTenant = (overrides: Partial<TTenant> = {}): TTenant => {
     sanityProjectId: 'proj',
     sanityDataset: 'production',
     sanityReadTokenEncrypted: 'encrypted-token',
+    provisioningStatus: 'READY',
     ...overrides,
   } as TTenant;
 };
@@ -102,6 +109,25 @@ describe(resolveTenant, () => {
 
     await expect(resolveTenant('acme.example.com')).resolves.toEqual(tenant);
     expect(listTenantsMock).not.toHaveBeenCalled();
+  });
+
+  it('refuses a matched tenant whose provisioning is not READY in production', async () => {
+    isProductionEnvironmentMock.mockReturnValue(true);
+    getTenantByDomainMock.mockResolvedValue(
+      buildServableTenant({ provisioningStatus: 'FAILED' }),
+    );
+
+    await expect(
+      resolveTenant('half-provisioned.example.com'),
+    ).resolves.toBeUndefined();
+  });
+
+  it('falls back to a sole dev tenant with no provisioningStatus recorded', async () => {
+    const tenant = buildServableTenant({ provisioningStatus: null });
+    getTenantByDomainMock.mockResolvedValue(undefined);
+    listTenantsMock.mockResolvedValue([tenant]);
+
+    await expect(resolveTenant('unknown.example.com')).resolves.toEqual(tenant);
   });
 
   it('refuses an archived matched tenant instead of resolving it', async () => {

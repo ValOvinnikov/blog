@@ -1,6 +1,7 @@
+import { sanitizeHref } from '@blog/utils';
+
 import { FONT_STACK } from './email-layout';
 import { escapeHtml } from './escape-html';
-import { sanitizeHref } from './sanitize-href';
 
 export type TEmailAction = {
   /** The visible action text — a tenant may relabel this, but this is the only part of the action they can change. */

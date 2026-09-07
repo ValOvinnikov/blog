@@ -36,7 +36,7 @@ export const saveVoiceOverridesAction = async (
   const theme = existing ?? PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens;
 
   try {
-    await queries.siteConfig.upsertSiteConfig(tenant.id, {
+    const result = await queries.siteConfig.upsertSiteConfig(tenant.id, {
       preset: existing?.preset ?? PRESET_ID.CONSOLE,
       accentHue: theme.accentHue,
       logoHue: existing?.logoHue,
@@ -48,6 +48,15 @@ export const saveVoiceOverridesAction = async (
       faviconAssetUrl: existing?.faviconAssetUrl,
       voiceOverrides: overrides,
     });
+
+    if (!result.ok) {
+      logger.warn('site_config.voice_save_rejected', {
+        tenantId: tenant.id,
+        fieldErrors: result.fieldErrors,
+      });
+      return { ok: false };
+    }
+
     await revalidateSiteConfig(tenant.id);
 
     return { ok: true };

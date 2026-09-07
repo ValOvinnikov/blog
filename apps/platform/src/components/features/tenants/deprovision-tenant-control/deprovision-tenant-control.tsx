@@ -4,20 +4,20 @@ import { Switch } from '@base-ui/react/switch';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { Card } from '@platform/components/shared/card';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
-import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
 import { deleteTenantAction } from '@platform/server/provisioning/delete-tenant-action';
 import { deprovisionTenantAction } from '@platform/server/provisioning/deprovision-tenant-action';
-import { formatDate } from '@platform/utils/format-date/format-date';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useState, useTransition } from 'react';
+import { useId, useState, useTransition } from 'react';
 
 import { deprovisionTenantControlVariants } from './deprovision-tenant-control-variants';
 
 export type TDeprovisionTenantControlProps = {
   tenant: TTenant;
+  /** Disables the trigger, without hiding it, while a dispatched run for this tenant is already in progress. */
+  isDeprovisioningInProgress?: boolean;
 };
 
 /**
@@ -26,11 +26,12 @@ export type TDeprovisionTenantControlProps = {
  * confirm-before-destructive-action posture as `deprovision-tenant.yml`
  * itself — `DeprovisioningStatusView`, rendered below this once a run
  * exists, is what shows the dispatched workflow's live progress. An
- * already-archived tenant instead gets a read-only status row plus the
- * hard-delete escape hatch, confirmed the same way.
+ * already-archived tenant instead gets the hard-delete escape hatch,
+ * confirmed the same way.
  */
 export const DeprovisionTenantControl = ({
   tenant,
+  isDeprovisioningInProgress = false,
 }: TDeprovisionTenantControlProps) => {
   const t = useTranslations('deprovisionTenantControl');
   const router = useRouter();
@@ -39,13 +40,13 @@ export const DeprovisionTenantControl = ({
   const [dryRun, setDryRun] = useState(true);
   const [error, setError] = useState<string | undefined>(undefined);
   const [isPending, startTransition] = useTransition();
+  const inProgressHintId = useId();
 
   const {
     cardBorder,
     cardHeader,
     cardTitle,
     content,
-    archivedRow,
     switchRow,
     switchTrack,
     switchThumb,
@@ -80,18 +81,12 @@ export const DeprovisionTenantControl = ({
     return (
       <Card className={cardBorder()}>
         <Card.Header
-          title={<span className={cardTitle()}>{t('cardTitle')}</span>}
+          title={<span className={cardTitle()}>{t('archivedCardTitle')}</span>}
           headingLevel={2}
           className={cardHeader()}
         />
         <Card.Body>
           <div className={content()}>
-            <div className={archivedRow()}>
-              <StatusBadge tone="neutral">{t('archivedBadge')}</StatusBadge>
-              <Text variant="muted">
-                {t('archivedAt', { date: formatDate(tenant.deprovisionedAt) })}
-              </Text>
-            </div>
             <Text variant="supporting">{t('deleteDescription')}</Text>
             <DeleteTenantPermanentlyControl tenant={tenant} />
           </div>
@@ -129,6 +124,10 @@ export const DeprovisionTenantControl = ({
             confirmButtonLabel={t('confirmButton')}
             confirmingButtonLabel={t('confirmingButton')}
             cancelLabel={t('cancelButton')}
+            isTriggerDisabled={isDeprovisioningInProgress}
+            triggerAriaDescribedBy={
+              isDeprovisioningInProgress ? inProgressHintId : undefined
+            }
           >
             <div className={switchRow()}>
               <Switch.Root
@@ -142,6 +141,12 @@ export const DeprovisionTenantControl = ({
               <span>{t('dryRunLabel')}</span>
             </div>
           </ConfirmDialog>
+
+          {isDeprovisioningInProgress && (
+            <Text id={inProgressHintId} variant="hint">
+              {t('inProgressHint')}
+            </Text>
+          )}
         </div>
       </Card.Body>
     </Card>

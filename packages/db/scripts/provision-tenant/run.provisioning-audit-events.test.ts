@@ -46,6 +46,9 @@ const { mapTenantDomainMock } = vi.hoisted(() => ({
 const { createTenantRevalidateWebhookMock } = vi.hoisted(() => ({
   createTenantRevalidateWebhookMock: vi.fn(),
 }));
+const { verifyTenantSeededContentMock } = vi.hoisted(() => ({
+  verifyTenantSeededContentMock: vi.fn(),
+}));
 const { elevateTenantOwnerMock } = vi.hoisted(() => ({
   elevateTenantOwnerMock: vi.fn(),
 }));
@@ -93,6 +96,9 @@ vi.mock('./steps/map-domain', () => ({
 vi.mock('./steps/create-revalidate-webhook', () => ({
   createTenantRevalidateWebhook: createTenantRevalidateWebhookMock,
 }));
+vi.mock('./steps/verify-seeded-content', () => ({
+  verifyTenantSeededContent: verifyTenantSeededContentMock,
+}));
 vi.mock('./steps/elevate-tenant-owner', () => ({
   elevateTenantOwner: elevateTenantOwnerMock,
 }));
@@ -138,6 +144,7 @@ beforeEach(() => {
   persistTenantSanityTokenMock.mockReset().mockResolvedValue(undefined);
   mapTenantDomainMock.mockReset().mockResolvedValue(undefined);
   createTenantRevalidateWebhookMock.mockReset().mockResolvedValue(undefined);
+  verifyTenantSeededContentMock.mockReset().mockResolvedValue(undefined);
   elevateTenantOwnerMock.mockReset().mockResolvedValue('PENDING_ACCEPTANCE');
   seedEmailTemplateDefaultsMock.mockReset().mockResolvedValue(undefined);
 });
@@ -190,6 +197,22 @@ describe(runSteps, () => {
       env,
       AUDIT_ACTION.PROVISIONING_FAILED,
       TENANT_PROVISIONING_STEP.SEED_CONTENT,
+    );
+  });
+
+  it('records PROVISIONING_FAILED with VERIFY_CONTENT when the final verification step throws', async () => {
+    verifyTenantSeededContentMock.mockRejectedValue(
+      new Error('missing required starter document(s): settings_site'),
+    );
+
+    const result = await runSteps('tenant-1', env);
+
+    expect(result).toEqual({ ok: false });
+    expect(recordProvisioningAuditEventMock).toHaveBeenCalledWith(
+      'tenant-1',
+      env,
+      AUDIT_ACTION.PROVISIONING_FAILED,
+      TENANT_PROVISIONING_STEP.VERIFY_CONTENT,
     );
   });
 

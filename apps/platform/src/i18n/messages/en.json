@@ -496,7 +496,8 @@
       "SEED_CONTENT": "Seed content",
       "PERSIST_TOKEN": "Issue read credentials",
       "MAP_DOMAIN": "Connect domain",
-      "CREATE_WEBHOOK": "Wire up CMS to website"
+      "CREATE_WEBHOOK": "Wire up CMS to website",
+      "VERIFY_CONTENT": "Confirm content is ready"
     },
     "statusLabel": {
       "IDLE": "Not started",
@@ -536,7 +537,6 @@
       }
     },
     "technicalDetailsToggle": "Technical details",
-    "backToTenantAction": "Back to tenant",
     "ownerLabel": "Owner",
     "ownerInvitedPendingBadge": "Invited, pending",
     "stepRunningNow": "now",
@@ -554,6 +554,7 @@
   },
   "deprovisioningStatusView": {
     "cardTitle": "Deprovisioning progress",
+    "stepsCompletionBadge": "{done} of {total} done",
     "startingBadge": "Starting…",
     "preRunStepStatusLabel": "Queued",
     "stepLabel": {
@@ -607,7 +608,8 @@
   },
   "tenantDangerPage": {
     "title": "Danger zone",
-    "description": "Irreversible actions for this tenant. Restricted to superadmins."
+    "description": "Irreversible actions for this tenant. Restricted to superadmins.",
+    "historyHeading": "Teardown history"
   },
   "studioPage": {
     "title": "Studio",
@@ -650,8 +652,10 @@
   },
   "deprovisionTenantControl": {
     "cardTitle": "Deprovision this tenant",
+    "archivedCardTitle": "Delete this tenant permanently",
     "description": "Removes the tenant's custom domain, deletes its Studio project, and archives its Sanity project so it stops billing rather than deleting it. The tenant row itself is archived, not deleted. This cannot be undone.",
-    "triggerButton": "Deprovision tenant",
+    "triggerButton": "Deprovision",
+    "inProgressHint": "A deprovisioning run is already in progress for this tenant.",
     "dialogTitle": "Deprovision {name}",
     "dialogDescription": "This dispatches deprovision-tenant.yml, which tears down every provisioned resource for this tenant. Type the tenant's name to confirm.",
     "confirmLabel": "Type \"{name}\" to confirm",
@@ -660,8 +664,6 @@
     "cancelButton": "Cancel",
     "confirmButton": "Deprovision",
     "confirmingButton": "Dispatching…",
-    "archivedBadge": "Deprovisioned",
-    "archivedAt": "Deprovisioned {date}",
     "deleteDescription": "Permanently removes this tenant and every dependent row (memberships, subscribers, bookmarks, domains, site config) from the database. This cannot be undone, and releases its domain for reuse.",
     "deleteTriggerButton": "Delete tenant permanently",
     "deleteDialogTitle": "Delete {name}",

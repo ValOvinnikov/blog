@@ -2,8 +2,8 @@
 
 import { ICONS } from '@blog/config';
 import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { Card } from '@platform/components/shared/card';
+import { Disclosure } from '@platform/components/shared/disclosure';
 import { Heading } from '@platform/components/shared/heading';
 import { Icon } from '@platform/components/shared/icon';
 import { StatusBadge } from '@platform/components/shared/status-badge';
@@ -11,27 +11,29 @@ import { StepList } from '@platform/components/shared/step-list';
 import { Text } from '@platform/components/shared/text';
 import { formatRelativeTime } from '@platform/utils/format-relative-time/format-relative-time';
 import { provisioningStepTone } from '@platform/utils/status-tone/status-tone';
+import { useCollapseOnDone } from '@platform/utils/use-collapse-on-done/use-collapse-on-done';
 import { useRelativeTimeTick } from '@platform/utils/use-relative-time-tick/use-relative-time-tick';
 import { useTranslations } from 'next-intl';
 
 import { RunCard } from './components/run-card/run-card';
 import { deprovisioningStatusViewVariants } from './deprovisioning-status-view-variants';
-import { STEP_ORDER, useDeprovisioningPoll } from './use-deprovisioning-poll';
+import {
+  STEP_ORDER,
+  type TUseDeprovisioningPollResult,
+} from './use-deprovisioning-poll';
 
-type TDeprovisioningStatusViewProps = {
-  tenant: TTenant;
-  deprovisionRequestedAt?: string;
+export type TDeprovisioningStatusViewProps = {
+  poll: TUseDeprovisioningPollResult;
 };
 
 /**
- * The danger page's live teardown-progress card — the six deprovisioning
- * steps read live from `tenant.deprovisioningSteps`, polled while a run is
- * in progress. There is no retry control here: a failed run is re-dispatched
- * through `DeprovisionTenantControl`, the card above this one.
+ * The danger page's live teardown-progress view — the six deprovisioning
+ * steps read from the poll result its caller derived, paired with the run
+ * card. There is no retry control here: a failed run is re-dispatched
+ * through `DeprovisionTenantControl`, rendered above this by the page.
  */
 export const DeprovisioningStatusView = ({
-  tenant,
-  deprovisionRequestedAt,
+  poll,
 }: TDeprovisioningStatusViewProps) => {
   const t = useTranslations('deprovisioningStatusView');
   const {
@@ -40,18 +42,27 @@ export const DeprovisioningStatusView = ({
     stepUpdatedAt,
     run,
     overallStatus,
+    isDone,
     isFailed,
     failedStep,
     failedStepError,
     errorKind,
-  } = useDeprovisioningPoll(tenant, deprovisionRequestedAt);
+  } = poll;
   useRelativeTimeTick();
+  const { isOpen: isStepsOpen, onOpenChange: setIsStepsOpen } =
+    useCollapseOnDone(isDone);
 
   const isPreRun = deprovisioningSteps === null;
+  const doneStepCount = stepStatuses.filter(
+    (status) => status === TENANT_PROVISIONING_STEP_STATUS.DONE,
+  ).length;
 
   const {
     root,
-    cardBody,
+    cardsRow,
+    stepsCard,
+    stepsSummary,
+    overallStatusLive,
     errorCard,
     errorHeadingRow,
     errorHeadline,
@@ -95,20 +106,48 @@ export const DeprovisioningStatusView = ({
     </StatusBadge>
   );
 
+  const overallStatusBadgeLive = (
+    <span className={overallStatusLive()} aria-live="polite">
+      {overallStatusBadge}
+    </span>
+  );
+
   return (
     <div className={root()}>
-      <Card>
-        <Card.Header
-          title={t('cardTitle')}
-          headingLevel={2}
-          actions={overallStatusBadge}
-        />
-        <Card.Body className={cardBody()}>
+      <div className={cardsRow()}>
+        <Disclosure
+          className={stepsCard()}
+          isOpen={isStepsOpen}
+          onOpenChange={setIsStepsOpen}
+          summary={
+            <span className={stepsSummary()}>
+              <Heading level={2} size="cardTitle">
+                {t('cardTitle')}
+              </Heading>
+              <StatusBadge tone="neutral">
+                {t('stepsCompletionBadge', {
+                  done: doneStepCount,
+                  total: STEP_ORDER.length,
+                })}
+              </StatusBadge>
+            </span>
+          }
+        >
           <StepList steps={stepListSteps} />
-        </Card.Body>
-      </Card>
+        </Disclosure>
 
-      {run && <RunCard run={run} />}
+        {run ? (
+          <RunCard run={run} actions={overallStatusBadgeLive} />
+        ) : (
+          <Card>
+            <Card.Header
+              title={t('runCardTitle')}
+              headingLevel={2}
+              actions={overallStatusBadgeLive}
+            />
+          </Card>
+        )}
+      </div>
 
       {isFailed && errorKind && failedStep && (
         <div className={errorCard()} role="alert">

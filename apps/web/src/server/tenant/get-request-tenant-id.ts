@@ -11,7 +11,9 @@ import { TENANT_ID_HEADER } from './tenant-id-header';
  * the header is what makes a route dynamic, so a caller that can supply the
  * param must — falling through to the header keeps working for the callers
  * that genuinely can't (Server Actions, the auth-gated `account`/`bookmarks`
- * pages, the root `not-found.tsx`). `undefined` means neither is available
+ * pages, and the `not-found.tsx` boundaries outside `[tenant]/[locale]`'s
+ * layout — the root one and `[tenant]/not-found.tsx`). `undefined` means
+ * neither is available
  * (only possible outside production — an unmatched host in production never
  * reaches here, proxy.ts 404s first).
  *

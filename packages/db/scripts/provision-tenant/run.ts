@@ -1,5 +1,5 @@
 /**
- * Provisioning workflow entrypoint — runs the five independently-idempotent
+ * Provisioning workflow entrypoint — runs the six independently-idempotent
  * steps in order for one tenant, writing each step's status directly to
  * Postgres (via `reportStepStatus`) both on success and failure, then
  * best-effort seeds default email-template copy
@@ -49,6 +49,7 @@ import { elevateTenantOwner } from './steps/elevate-tenant-owner';
 import { mapTenantDomain } from './steps/map-domain';
 import { persistTenantSanityToken } from './steps/persist-sanity-token';
 import { seedTenantContent } from './steps/seed-content';
+import { verifyTenantSeededContent } from './steps/verify-seeded-content';
 
 const TENANT_ID_FLAG = '--tenant-id=';
 
@@ -85,6 +86,10 @@ const STEPS: TStep[] = [
   {
     key: TENANT_PROVISIONING_STEP.CREATE_WEBHOOK,
     run: createTenantRevalidateWebhook,
+  },
+  {
+    key: TENANT_PROVISIONING_STEP.VERIFY_CONTENT,
+    run: verifyTenantSeededContent,
   },
 ];
 

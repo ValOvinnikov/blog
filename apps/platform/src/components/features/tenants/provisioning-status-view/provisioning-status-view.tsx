@@ -7,17 +7,16 @@ import { Alert } from '@platform/components/shared/alert';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
+import { Disclosure } from '@platform/components/shared/disclosure';
 import { Heading } from '@platform/components/shared/heading';
 import { Icon } from '@platform/components/shared/icon';
-import { LinkButton } from '@platform/components/shared/link-button';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { StepList } from '@platform/components/shared/step-list';
 import { Text } from '@platform/components/shared/text';
-import { Link } from '@platform/i18n/navigation';
 import { formatRelativeTime } from '@platform/utils/format-relative-time/format-relative-time';
-import { adminRoutes } from '@platform/utils/routes/routes';
 import { provisioningStepTone } from '@platform/utils/status-tone/status-tone';
+import { useCollapseOnDone } from '@platform/utils/use-collapse-on-done/use-collapse-on-done';
 import { useRelativeTimeTick } from '@platform/utils/use-relative-time-tick/use-relative-time-tick';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
@@ -73,17 +72,18 @@ export const ProvisioningStatusView = ({
   ).length;
   const isArchived = Boolean(tenant.deprovisionedAt);
   const archivedNoticeId = useId();
+  const isOverallDone =
+    displayOverallStatus === TENANT_PROVISIONING_STEP_STATUS.DONE;
+  const { isOpen: isStepsOpen, onOpenChange: setIsStepsOpen } =
+    useCollapseOnDone(isOverallDone);
 
   const {
     root,
     ownerRow,
     startAction,
-    layout,
-    steps,
+    cardsRow,
     stepsCard,
-    stepsCardBody,
-    detailsColumn,
-    detailsHeader,
+    stepsSummary,
     overallStatusLive,
     errorCard,
     errorHeadingRow,
@@ -127,21 +127,36 @@ export const ProvisioningStatusView = ({
     </StatusBadge>
   );
 
+  const overallStatusBadgeLive = (
+    <span className={overallStatusLive()} aria-live="polite">
+      {overallStatusBadge}
+    </span>
+  );
+
+  const retryButtonNode = isOverallFailed ? (
+    <Button
+      type="button"
+      variant="secondary"
+      onClick={handleRetry}
+      isDisabled={isRetrying || isArchived || isProvisioningRunning}
+      aria-describedby={isArchived ? archivedNoticeId : undefined}
+    >
+      {isRetrying ? t('retryingButton') : t('retryButton')}
+    </Button>
+  ) : null;
+
+  const runCardActions = (
+    <>
+      {overallStatusBadgeLive}
+      {retryButtonNode}
+    </>
+  );
+
   return (
     <div className={root()}>
       <PageHeader
         title={t('pageTitle')}
         description={t('description', { tenantName: tenant.name })}
-        badges={overallStatusBadge}
-        actions={
-          <LinkButton
-            as={Link}
-            href={adminRoutes.tenantOverview(tenant.id)}
-            variant="secondary"
-          >
-            {t('backToTenantAction')}
-          </LinkButton>
-        }
       />
 
       {tenant.deprovisionedAt && (
@@ -191,73 +206,63 @@ export const ProvisioningStatusView = ({
         </div>
       )}
 
-      <div className={layout()}>
-        <aside className={steps()}>
-          <Card className={stepsCard()}>
-            <Card.Header
-              title={t('stepsCardTitle')}
-              headingLevel={2}
-              actions={
+      <div className={cardsRow()}>
+        <aside>
+          <Disclosure
+            className={stepsCard()}
+            isOpen={isStepsOpen}
+            onOpenChange={setIsStepsOpen}
+            summary={
+              <span className={stepsSummary()}>
+                <Heading level={2} size="cardTitle">
+                  {t('stepsCardTitle')}
+                </Heading>
                 <StatusBadge tone="neutral">
                   {t('stepsCompletionBadge', {
                     done: doneStepCount,
                     total: STEP_ORDER.length,
                   })}
                 </StatusBadge>
-              }
-            />
-            <Card.Body className={stepsCardBody()}>
-              <StepList steps={stepListSteps} />
-            </Card.Body>
-          </Card>
+              </span>
+            }
+          >
+            <StepList steps={stepListSteps} />
+          </Disclosure>
         </aside>
 
-        <div className={detailsColumn()}>
-          {(!allIdle || isProvisioningRunning) && (
-            <div className={detailsHeader()}>
-              <span className={overallStatusLive()} aria-live="polite">
-                {overallStatusBadge}
-              </span>
-              {isOverallFailed && (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={handleRetry}
-                  isDisabled={isRetrying || isArchived || isProvisioningRunning}
-                  aria-describedby={isArchived ? archivedNoticeId : undefined}
-                >
-                  {isRetrying ? t('retryingButton') : t('retryButton')}
-                </Button>
-              )}
-            </div>
-          )}
+        {provisioningRun ? (
+          <RunCard run={provisioningRun} actions={runCardActions} />
+        ) : (
+          <Card>
+            <Card.Header
+              title={t('runCardTitle')}
+              headingLevel={2}
+              actions={runCardActions}
+            />
+          </Card>
+        )}
+      </div>
 
-          {provisioningRun && <RunCard run={provisioningRun} />}
-
-          {isOverallFailed && errorKind && (
-            <div className={errorCard()} role="alert">
-              <div className={errorHeadingRow()}>
-                <Icon name={ICONS.WARNING} className={errorIcon()} />
-                <Heading level={2} size="cardTitle" className={errorHeadline()}>
-                  {t(`errorKind.${errorKind}.headline`)}
-                </Heading>
-              </div>
-              <Text variant="supporting">
-                {t(`errorKind.${errorKind}.body`)}
-              </Text>
-              <Text variant="hint">{t(`errorKind.${errorKind}.nextStep`)}</Text>
-              {failedStepError && (
-                <details className={errorDetails()}>
-                  <summary className={errorDetailsSummary()}>
-                    {t('technicalDetailsToggle')}
-                  </summary>
-                  <pre className={errorDetailsText()}>{failedStepError}</pre>
-                </details>
-              )}
-            </div>
+      {isOverallFailed && errorKind && (
+        <div className={errorCard()} role="alert">
+          <div className={errorHeadingRow()}>
+            <Icon name={ICONS.WARNING} className={errorIcon()} />
+            <Heading level={2} size="cardTitle" className={errorHeadline()}>
+              {t(`errorKind.${errorKind}.headline`)}
+            </Heading>
+          </div>
+          <Text variant="supporting">{t(`errorKind.${errorKind}.body`)}</Text>
+          <Text variant="hint">{t(`errorKind.${errorKind}.nextStep`)}</Text>
+          {failedStepError && (
+            <details className={errorDetails()}>
+              <summary className={errorDetailsSummary()}>
+                {t('technicalDetailsToggle')}
+              </summary>
+              <pre className={errorDetailsText()}>{failedStepError}</pre>
+            </details>
           )}
         </div>
-      </div>
+      )}
     </div>
   );
 };

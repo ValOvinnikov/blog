@@ -6,5 +6,6 @@ export const newsletterSettingsQuery = q.star
   .project((sub) => ({
     heading: sub.field('heading').notNull(),
     description: sub.field('description').nullable(true),
+    trustCues: sub.field('trustCues[]').nullable(true),
   }))
   .notNull();

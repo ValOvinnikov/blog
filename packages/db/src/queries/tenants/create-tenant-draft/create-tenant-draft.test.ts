@@ -64,6 +64,7 @@ describe(createTenantDraft, () => {
       PERSIST_TOKEN: { status: 'IDLE' },
       MAP_DOMAIN: { status: 'IDLE' },
       CREATE_WEBHOOK: { status: 'IDLE' },
+      VERIFY_CONTENT: { status: 'IDLE' },
       OWNER_ELEVATION: { status: 'IDLE' },
     });
   });

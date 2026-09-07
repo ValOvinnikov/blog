@@ -1,8 +1,5 @@
 import { queries } from '@blog/db';
-import { DeprovisionTenantControl } from '@platform/components/features/tenants/deprovision-tenant-control';
-import { DeprovisioningStatusView } from '@platform/components/features/tenants/deprovisioning-status-view';
-import { ReactivateTenantControl } from '@platform/components/features/tenants/reactivate-tenant-control';
-import { PageHeader } from '@platform/components/shared/page-header';
+import { TenantDangerPageContent } from '@platform/components/features/tenants/tenant-danger-page-content';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -32,27 +29,15 @@ export default async function TenantDangerPage({ params }: TProps) {
     notFound();
   }
 
-  const t = await getTranslations('tenantDangerPage');
-
   // Queried unconditionally: a request newer than the tenant's existing run
   // (even a stale FAILED one) is how a retry re-enters the starting state.
   const deprovisionRequestedAt =
     await queries.auditEvents.getLatestDeprovisionRequestedAt(tenantId);
-  const hasDeprovisioningRun = Boolean(tenant.deprovisioningSteps?.run);
-  const showDeprovisioningStatus =
-    hasDeprovisioningRun || Boolean(deprovisionRequestedAt);
 
   return (
-    <>
-      <PageHeader title={t('title')} description={t('description')} />
-      {tenant.deprovisionedAt && <ReactivateTenantControl tenant={tenant} />}
-      <DeprovisionTenantControl tenant={tenant} />
-      {showDeprovisioningStatus && (
-        <DeprovisioningStatusView
-          tenant={tenant}
-          deprovisionRequestedAt={deprovisionRequestedAt?.toISOString()}
-        />
-      )}
-    </>
+    <TenantDangerPageContent
+      tenant={tenant}
+      deprovisionRequestedAt={deprovisionRequestedAt?.toISOString()}
+    />
   );
 }

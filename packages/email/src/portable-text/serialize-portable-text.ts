@@ -1,5 +1,5 @@
 import { escapeHtml } from '@blog/email/html/escape-html';
-import { sanitizeHref } from '@blog/email/html/sanitize-href';
+import { sanitizeHref } from '@blog/utils';
 
 import type {
   TPortableTextBlock,

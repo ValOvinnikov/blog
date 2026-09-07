@@ -58,7 +58,7 @@ describe(TenantProvisioningPage, () => {
       screen.getByRole('heading', { level: 1, name: 'Provisioning' }),
     ).toBeVisible();
     expect(
-      screen.queryByRole('button', { name: 'Deprovision tenant' }),
+      screen.queryByRole('button', { name: 'Deprovision' }),
     ).not.toBeInTheDocument();
   });
 

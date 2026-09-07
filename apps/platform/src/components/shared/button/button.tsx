@@ -10,6 +10,13 @@ export type TButtonProps = {
   type?: 'button' | 'submit' | 'reset';
   isDisabled?: boolean;
   /**
+   * Disables the button without native `disabled` — sets `aria-disabled`
+   * instead, so the control stays focusable and reachable by a keyboard/AT
+   * user (e.g. one whose `aria-describedby` explains why it's unavailable),
+   * while a click/Enter/Space still can't invoke `onClick`.
+   */
+  isAriaDisabled?: boolean;
+  /**
    * Shows a spinner ahead of the label, sets `aria-busy`, and disables the
    * button (native `disabled`, so a click/Enter/Space can never double-submit).
    * A native-`disabled` control is force-blurred and stops being tracked by
@@ -40,6 +47,7 @@ export const Button = ({
   size,
   type = 'button',
   isDisabled,
+  isAriaDisabled = false,
   isPending = false,
   pendingLabel,
   onClick,
@@ -53,13 +61,22 @@ export const Button = ({
   const isPendingWithLabel = isPending && hasPendingLabel;
   const label = isPendingWithLabel ? pendingLabel : children;
 
+  const handleClick: MouseEventHandler<HTMLButtonElement> = (event) => {
+    if (isAriaDisabled) {
+      event.preventDefault();
+      return;
+    }
+    onClick?.(event);
+  };
+
   return (
     <>
       <button
         type={type}
         disabled={isDisabled || isPending}
+        aria-disabled={isAriaDisabled || undefined}
         aria-busy={isPending}
-        onClick={onClick}
+        onClick={handleClick}
         className={root({ class: className })}
         aria-describedby={ariaDescribedBy}
       >

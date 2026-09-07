@@ -110,23 +110,27 @@ describe(toIsReversedOnDark, () => {
   });
 });
 
-describe('ActionGroup — hero-shaped primary action', () => {
-  const heroPrimaryAction = {
-    label: 'Read more',
-    href: '/blog/welcome-to-the-blog',
-    target: undefined,
-    platform: undefined,
-    hiddenLabelSuffix: 'Welcome to the blog',
+describe('ActionGroup — hiddenLabelSuffix', () => {
+  const actionWithSuffix = {
+    variant: CTA_ACTION_VARIANT.PRIMARY,
     appearance: undefined,
+    link: {
+      label: 'Read more',
+      href: '/blog/welcome-to-the-blog',
+      target: undefined,
+      platform: undefined,
+      ariaLabel: undefined,
+    },
+    hiddenLabelSuffix: 'Welcome to the blog',
   };
 
-  const heroSetup = customRender(ActionGroup, {
-    actions: [heroPrimaryAction],
+  const hiddenLabelSetup = customRender(ActionGroup, {
+    actions: [actionWithSuffix],
     isOnDark: undefined,
   });
 
   it('renders a hiddenLabelSuffix as real (sr-only) text inside the accessible name', () => {
-    heroSetup();
+    hiddenLabelSetup();
 
     const link = screen.getByRole('link', {
       name: 'Read more: Welcome to the blog',
@@ -136,8 +140,8 @@ describe('ActionGroup — hero-shaped primary action', () => {
   });
 
   it('renders no suffix when hiddenLabelSuffix is unset', () => {
-    heroSetup({
-      actions: [{ ...heroPrimaryAction, hiddenLabelSuffix: undefined }],
+    hiddenLabelSetup({
+      actions: [{ ...actionWithSuffix, hiddenLabelSuffix: undefined }],
     });
 
     const link = screen.getByRole('link', { name: 'Read more' });

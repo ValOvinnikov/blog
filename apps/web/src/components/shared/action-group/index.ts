@@ -1,2 +1,2 @@
 export { ActionGroup } from './action-group';
-export type { TActionGroupAction } from './action-group';
+export type { IActionGroupAction } from './action-group';

@@ -1,51 +1,18 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
-import { NotFoundPage } from '@web/components/pages/not-found-page';
-import { ThemeScope } from '@web/components/shared/theme-scope';
-import { getThemeTokens } from '@web/utils/get-theme-tokens';
-import { resolveTenantMessages } from '@web/utils/resolve-tenant-messages';
+import { StandaloneNotFoundPage } from '@web/components/pages/standalone-not-found-page';
+import { buildNotFoundMetadata } from '@web/metadata/not-found-metadata';
 import type { Metadata } from 'next';
-import { NextIntlClientProvider } from 'next-intl';
-import {
-  getMessages,
-  getTranslations,
-  setRequestLocale,
-} from 'next-intl/server';
 
 /**
- * This root boundary sits outside `[tenant]/[locale]/layout.tsx` (see
- * `app/layout.tsx`'s doc comment), so it gets no request locale, no
- * `NextIntlClientProvider`, and none of that layout's theme rendering for
- * free — all three are resolved here directly instead. `setRequestLocale`
- * must run before any other next-intl API, or that API falls back to
- * reading `headers()` — fatal ("Page changed from static to dynamic at
- * runtime") on an on-demand render of the otherwise-static
- * `[tenant]/[locale]/[slug]` route. The provider
- * wraps `NotFoundPage` because its `SmartLink` renders next-intl's client
- * `Link`, which throws without one.
+ * The root-level not-found boundary — it renders outside
+ * `[tenant]/[locale]/layout.tsx` entirely (see `app/layout.tsx`'s doc
+ * comment), so it has no tenant/locale context to inherit and resolves its
+ * own theme tokens and messages via `StandaloneNotFoundPage` rather than
+ * depending on that layout's providers.
  */
 export async function generateMetadata(): Promise<Metadata> {
-  setRequestLocale(LOCALE_ISO_CODES.EN);
-  const t = await getTranslations('notFound');
-
-  return {
-    title: t('heading'),
-    description: t('supportingText'),
-  };
+  return buildNotFoundMetadata();
 }
 
 export default async function NotFound() {
-  setRequestLocale(LOCALE_ISO_CODES.EN);
-  const [baseMessages, themeTokens] = await Promise.all([
-    getMessages(),
-    getThemeTokens(),
-  ]);
-  const messages = await resolveTenantMessages(baseMessages);
-
-  return (
-    <ThemeScope themeTokens={themeTokens}>
-      <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={messages}>
-        <NotFoundPage />
-      </NextIntlClientProvider>
-    </ThemeScope>
-  );
+  return await StandaloneNotFoundPage();
 }

@@ -83,4 +83,15 @@ describe(RunCard, () => {
       screen.getByRole('heading', { level: 2, name: 'Run' }),
     ).toBeVisible();
   });
+
+  it('renders actions in the card header', () => {
+    render(
+      <RunCard
+        run={{ startedAt: '2026-08-12T14:18:00.000Z' }}
+        actions={<span>Complete</span>}
+      />,
+    );
+
+    expect(screen.getByText('Complete')).toBeVisible();
+  });
 });

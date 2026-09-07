@@ -31,7 +31,7 @@ vi.mock(
 );
 
 const idleStepStatuses = () =>
-  Array(5).fill(TENANT_PROVISIONING_STEP_STATUS.IDLE);
+  Array(6).fill(TENANT_PROVISIONING_STEP_STATUS.IDLE);
 
 describe(ProvisioningBanner, () => {
   it('renders nothing for a tenant that has not started provisioning', () => {
@@ -62,6 +62,7 @@ describe(ProvisioningBanner, () => {
       TENANT_PROVISIONING_STEP_STATUS.RUNNING,
       TENANT_PROVISIONING_STEP_STATUS.IDLE,
       TENANT_PROVISIONING_STEP_STATUS.IDLE,
+      TENANT_PROVISIONING_STEP_STATUS.IDLE,
     ];
 
     render(
@@ -76,7 +77,7 @@ describe(ProvisioningBanner, () => {
       />,
     );
 
-    expect(screen.getByText('Provisioning — step 3 of 5')).toBeVisible();
+    expect(screen.getByText('Provisioning — step 3 of 6')).toBeVisible();
     expect(screen.getByRole('link', { name: 'View steps' })).toHaveAttribute(
       'href',
       '/tenants/tenant-1/provisioning',
@@ -89,6 +90,7 @@ describe(ProvisioningBanner, () => {
       TENANT_PROVISIONING_STEP_STATUS.DONE,
       TENANT_PROVISIONING_STEP_STATUS.DONE,
       TENANT_PROVISIONING_STEP_STATUS.FAILED,
+      TENANT_PROVISIONING_STEP_STATUS.IDLE,
       TENANT_PROVISIONING_STEP_STATUS.IDLE,
     ];
 
@@ -105,7 +107,7 @@ describe(ProvisioningBanner, () => {
     );
 
     expect(
-      screen.getByText('Provisioning failed at step 4 of 5'),
+      screen.getByText('Provisioning failed at step 4 of 6'),
     ).toBeVisible();
     expect(
       screen.getByText('Connect domain — Already in use by another tenant'),
@@ -117,7 +119,7 @@ describe(ProvisioningBanner, () => {
       <ProvisioningBanner
         tenantId="tenant-1"
         provisioningStatus={TENANT_PROVISIONING_STATUS.READY}
-        stepStatuses={Array(5).fill(TENANT_PROVISIONING_STEP_STATUS.DONE)}
+        stepStatuses={Array(6).fill(TENANT_PROVISIONING_STEP_STATUS.DONE)}
         isOverallFailed={false}
         isProvisioningRunning={false}
         errorKind={undefined}
@@ -134,7 +136,7 @@ describe(ProvisioningBanner, () => {
       <ProvisioningBanner
         tenantId="tenant-1"
         provisioningStatus={TENANT_PROVISIONING_STATUS.READY}
-        stepStatuses={Array(5).fill(TENANT_PROVISIONING_STEP_STATUS.DONE)}
+        stepStatuses={Array(6).fill(TENANT_PROVISIONING_STEP_STATUS.DONE)}
         isOverallFailed={false}
         isProvisioningRunning={false}
         errorKind={undefined}
@@ -157,7 +159,7 @@ describe(ProvisioningBanner, () => {
       <ProvisioningBanner
         tenantId="tenant-1"
         provisioningStatus={TENANT_PROVISIONING_STATUS.READY}
-        stepStatuses={Array(5).fill(TENANT_PROVISIONING_STEP_STATUS.DONE)}
+        stepStatuses={Array(6).fill(TENANT_PROVISIONING_STEP_STATUS.DONE)}
         isOverallFailed={false}
         isProvisioningRunning={false}
         errorKind={undefined}
@@ -182,7 +184,7 @@ describe(ProvisioningBanner, () => {
         <ProvisioningBanner
           tenantId="tenant-1"
           provisioningStatus={TENANT_PROVISIONING_STATUS.READY}
-          stepStatuses={Array(5).fill(TENANT_PROVISIONING_STEP_STATUS.DONE)}
+          stepStatuses={Array(6).fill(TENANT_PROVISIONING_STEP_STATUS.DONE)}
           isOverallFailed={false}
           isProvisioningRunning={false}
           errorKind={undefined}

@@ -113,6 +113,7 @@ export function buildStarterDocuments(
     _type: 'settings_newsletter',
     title: 'Newsletter',
     heading: 'Subscribe for updates',
+    trustCues: ['No spam', 'Unsubscribe anytime'],
   };
 
   const site: TSanityDocument = {

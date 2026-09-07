@@ -82,8 +82,8 @@ describe(useProvisioningPoll, () => {
   });
 
   describe('STEP_ORDER', () => {
-    it('is the five core provisioning steps, excluding OWNER_ELEVATION', () => {
-      expect(STEP_ORDER).toHaveLength(5);
+    it('is the six core provisioning steps, excluding OWNER_ELEVATION', () => {
+      expect(STEP_ORDER).toHaveLength(6);
       expect(STEP_ORDER).not.toContain(
         TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
       );
@@ -141,6 +141,9 @@ describe(useProvisioningPoll, () => {
           status: TENANT_PROVISIONING_STEP_STATUS.DONE,
         },
         [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
+        [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: {
           status: TENANT_PROVISIONING_STEP_STATUS.DONE,
         },
         [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
