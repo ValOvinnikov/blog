@@ -24,7 +24,7 @@ import { voiceSettingsVariants } from './voice-settings-variants';
 
 export type TVoiceSettingsProps = {
   tenantId: string;
-  /** The tenant's saved `site_config.voiceOverrides` — matches its `Record<string, string>` JSONB shape directly rather than a narrower curated-key type, so the server component can pass it straight through. */
+  /** Only the string-valued entries of the tenant's saved `site_config.voiceOverrides` — `stringVoiceOverrides` filters out any rich (Portable Text) value before this component ever sees it. */
   initialOverrides: Record<string, string>;
   saveAction: (
     tenantId: string,
