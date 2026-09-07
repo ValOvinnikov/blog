@@ -1,4 +1,13 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import {
+  CONTENT_ALIGNMENT,
+  HERO_VARIANT,
+  MEDIA_ORDER,
+  type IWithClassName,
+  type IWithDataTestId,
+  type TContentAlignment,
+  type THeroVariant,
+  type TMediaOrder,
+} from '@blog/config';
 import { Eyebrow } from '@blog/ui/atoms/eyebrow';
 import { Heading } from '@blog/ui/atoms/heading';
 import { Text } from '@blog/ui/atoms/text';
@@ -24,25 +33,60 @@ export type THeroProps = IWithClassName &
     titleId: string;
     eyebrow?: string;
     excerpt?: string;
+    /** The hero's layout shape — the same three shapes `CtaModule` uses. */
+    variant?: THeroVariant;
+    /** Where the copy column sits relative to the media. Split uses LEFT/RIGHT; Banner uses all three. */
+    contentPosition?: TContentAlignment;
+    /** How text aligns within the copy column, on every variant. */
+    contentAlignment?: TContentAlignment;
+    /** Split applies this below the two-column breakpoint; Stacked at every width; Banner ignores it — its image is the background. */
+    mediaOrder?: TMediaOrder;
     children?: TCompoundChildren<typeof HeroParts>;
   };
 
 /**
- * Hero — the page-top hero band: renders `title` as an `<h1>` with optional
- * `eyebrow` and `excerpt`, plus `Hero.Cta` and `Hero.Media` slots. Switches to
- * a two-column layout when a `Hero.Media` slot is present.
+ * Hero — the page-top hero band shared by every hero kind: renders `title` as
+ * an `<h1>` with optional `eyebrow`/`excerpt`, plus `Hero.Cta` and `Hero.Media`
+ * slots. DOM order is always copy before media — `contentPosition` and
+ * `mediaOrder` only move things visually, via CSS.
  */
 const HeroRoot = ({
   title,
   titleId,
   eyebrow,
   excerpt,
+  variant,
+  contentPosition,
+  contentAlignment,
+  mediaOrder,
   children,
   className,
   dataTestId,
 }: THeroProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, HeroParts);
-  const s = heroVariants({ hasMedia: Boolean(slots.Media) });
+  const hasMedia = Boolean(slots.Media);
+  const resolvedVariant = variant ?? HERO_VARIANT.SPLIT;
+  const isSplit = resolvedVariant === HERO_VARIANT.SPLIT;
+  const isBanner = resolvedVariant === HERO_VARIANT.BANNER;
+
+  const resolvedPosition = contentPosition ?? CONTENT_ALIGNMENT.LEFT;
+  const resolvedAlignment = isSplit
+    ? contentAlignment
+    : (contentAlignment ??
+      (isBanner ? CONTENT_ALIGNMENT.LEFT : CONTENT_ALIGNMENT.CENTER));
+  // FIRST, not the shared field tail's own LAST default — keeps a caller
+  // that omits `mediaOrder` entirely on today's media-first mobile layout.
+  const resolvedMediaOrder = isBanner
+    ? undefined
+    : (mediaOrder ?? MEDIA_ORDER.FIRST);
+
+  const s = heroVariants({
+    variant: resolvedVariant,
+    hasMedia,
+    position: resolvedPosition,
+    alignment: resolvedAlignment,
+    mediaOrder: resolvedMediaOrder,
+  });
 
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>
@@ -61,7 +105,11 @@ const HeroRoot = ({
           )}
           {slots.Cta}
         </div>
-        {slots.Media}
+        {hasMedia && (
+          <div className={s.media()} data-testid="hero-media">
+            {slots.Media}
+          </div>
+        )}
       </div>
 
       {unmatched.map((node, i) => (
