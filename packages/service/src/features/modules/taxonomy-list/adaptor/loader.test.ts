@@ -143,4 +143,27 @@ describe('getTaxonomyList', () => {
       }),
     );
   });
+
+  it('covers both taxonomy tags when no fallback is given', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawTaxonomyListModule({ taxonomy: TAXONOMY_KIND.TOPICS }),
+    );
+
+    await getTaxonomyList('taxonomy-list-1', tenant);
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        next: expect.objectContaining({
+          tags: [
+            't:tenant-a:modules:taxonomyList',
+            't:tenant-a:module:taxonomy-list-1',
+            't:tenant-a:topics',
+            't:tenant-a:tags',
+            't:tenant-a:posts',
+          ],
+        }),
+      }),
+    );
+  });
 });

@@ -9,10 +9,27 @@ import { taxonomyListModuleQuery } from './query';
 import { toTaxonomyListModule } from './transformer';
 import type { TTaxonomyListModule } from './types';
 
-function taxonomyCacheTags(fallbackTaxonomy: TTaxonomyKind | undefined) {
-  if (fallbackTaxonomy === TAXONOMY_KIND.TOPICS) return ['topics'];
-  if (fallbackTaxonomy === TAXONOMY_KIND.TAGS) return ['tags'];
-  return ['topics', 'tags'];
+function getTaxonomyListCacheOptions(
+  id: string,
+  projectId: string,
+  fallbackTaxonomy: TTaxonomyKind | undefined,
+) {
+  if (fallbackTaxonomy === TAXONOMY_KIND.TOPICS) {
+    return isr(
+      ['modules:taxonomyList', `module:${id}`, 'topics', 'posts'],
+      projectId,
+    );
+  }
+  if (fallbackTaxonomy === TAXONOMY_KIND.TAGS) {
+    return isr(
+      ['modules:taxonomyList', `module:${id}`, 'tags', 'posts'],
+      projectId,
+    );
+  }
+  return isr(
+    ['modules:taxonomyList', `module:${id}`, 'topics', 'tags', 'posts'],
+    projectId,
+  );
 }
 
 /** Resolves a `module_taxonomyList` placement's authored terms, falling back to `fallbackTaxonomy` when the module has none authored. */
@@ -24,15 +41,7 @@ export async function getTaxonomyList(
   const raw = await runQuery(taxonomyListModuleQuery, {
     parameters: { id, fallbackTaxonomy: fallbackTaxonomy ?? null },
     tenant,
-    ...isr(
-      [
-        'modules:taxonomyList',
-        `module:${id}`,
-        ...taxonomyCacheTags(fallbackTaxonomy),
-        'posts',
-      ],
-      tenant.projectId,
-    ),
+    ...getTaxonomyListCacheOptions(id, tenant.projectId, fallbackTaxonomy),
   });
 
   return toTaxonomyListModule(raw);
