@@ -16,6 +16,7 @@ export interface IGenericPageViewProps {
   breadcrumbTrail: IBreadcrumbItem[];
   breadcrumbAriaLabel: string;
   breadcrumbListSchema?: ReturnType<typeof buildBreadcrumbListSchema>;
+  hero?: ReactNode;
   modulesContent: ReactNode;
 }
 
@@ -23,20 +24,20 @@ const s = genericPageVariants();
 
 /**
  * Pure view for `GenericPage` — the `Home › {title}` breadcrumb trail (plus
- * its `BreadcrumbList` JSON-LD) as a sibling before `<main>`, then the page's
- * own `title` as the page's `<h1>` — `page_generic` documents allow only
- * `module_content`/`module_cta` modules, neither of which renders a heading
- * of its own, so this page-level `<h1>` is the only heading guaranteed to
- * exist. `modulesContent` is pre-rendered by the wrapper (`ModuleRenderer`)
- * since it's an async Server Component. Each module owns its own full-bleed
+ * its `BreadcrumbList` JSON-LD) as a sibling before `<main>`. Hero replaces
+ * the page's default title heading; exactly one of the two ever renders.
+ * `modulesContent` is pre-rendered by the wrapper (`ModuleRenderer`) since
+ * it's an async Server Component. Each module owns its own full-bleed
  * background/width via `Section`, so `<main>` here is otherwise an
- * unconstrained root. `Header`/`Footer` stay owned by `[tenant]/[locale]/layout.tsx`.
+ * unconstrained root. `Header`/`Footer` stay owned by
+ * `[tenant]/[locale]/layout.tsx`.
  */
 export const GenericPageView = ({
   title,
   breadcrumbTrail,
   breadcrumbAriaLabel,
   breadcrumbListSchema,
+  hero,
   modulesContent,
 }: IGenericPageViewProps) => {
   return (
@@ -52,9 +53,11 @@ export const GenericPageView = ({
       </BreadcrumbBar>
 
       <main className={s.root()}>
-        <Heading level={1} visual="section" className={s.heading()}>
-          {title}
-        </Heading>
+        {hero ?? (
+          <Heading level={1} visual="section" className={s.heading()}>
+            {title}
+          </Heading>
+        )}
         {modulesContent}
       </main>
     </>

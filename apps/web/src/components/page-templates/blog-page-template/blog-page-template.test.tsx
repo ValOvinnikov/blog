@@ -85,4 +85,27 @@ describe(`<${BlogPageTemplate.name}/>`, () => {
     expect(modules.parentElement).toBe(main);
     expect(posts.parentElement).not.toBe(main);
   });
+
+  it('renders hero in place of the heading/supportingText pair, keeping exactly one h1', () => {
+    setup({
+      hero: (
+        <h1 data-testid="hero-slot">
+          <span>Hero title</span>
+        </h1>
+      ),
+      supportingText: 'Essays and notes on building this site.',
+    });
+
+    expect(screen.getByTestId('hero-slot')).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(
+      screen.queryByText('Essays and notes on building this site.'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders the default heading with exactly one h1 when no hero is passed', () => {
+    setup();
+
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+  });
 });

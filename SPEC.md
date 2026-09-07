@@ -214,8 +214,10 @@ Sanity schema → `pnpm typegen` → `@blog/config` generated types →
 `service.editorial.*` write path for the skim pipeline) → `apps/web`
 (`ModuleRenderer` maps each module reference through `MODULE_MAP` to a
 Server Component, which fetches its own module data and maps it onto a pure
-`@blog/ui` organism). Typegen output is committed and can be non-deterministic
-— re-run until minimal.
+`@blog/ui` organism). A page's dedicated `hero` slot dispatches the same
+way, through `HeroSlot` and `HERO_MAP` — keyed on `THeroModuleType`, so a
+hero kind with no registered component is a compile error. Typegen output is
+committed and can be non-deterministic — re-run until minimal.
 
 Full diagram, the service/view-model contract (`AsyncResult`, `TMaybeUndefined`,
 no faked defaults), the module-registry mechanism, and the editorial write path:
@@ -266,6 +268,29 @@ its rich-text `body` supplies any in-content headings, so a separate
 structured heading field would just be a second way to do the same thing.
 `module_hero` has no `sectionHeader` either — its heading fields are its
 own dedicated schema, unrelated to this shared shape.
+
+**The hero family.** A hero is any module whose schema `name` starts with
+`module_hero`; membership is that naming convention and nothing else.
+`@blog/config` derives `THeroModuleType` from it as
+``Extract<TModuleType, `module_hero${string}`>``, alongside
+`TSlotModuleType` — every module reached through a dedicated page slot
+rather than `modules[]`, which is how `MODULE_MAP` excludes them
+(`Record<Exclude<TModuleType, TSlotModuleType>, …>`). Nothing is
+hand-listed, so a new hero kind joins the union the day its schema lands and
+drops out the day it is deleted. The studio's equivalent guard is
+`HERO_SCHEMA_TYPES`, the list every page's `hero` `to:` points at, with a
+test asserting every registered `module_hero*` schema appears in it.
+
+`page_home` has a **required** hero; `page_generic`, `page_blog`,
+`page_topic` and `page_tag` each have an **optional** one. A hero replaces
+that page's default header and owns the `<h1>`; without one, each page
+renders the header it always has (generic: title; blog: `heading` plus
+`supportingText`; topic and tag: the term header), so exactly one `<h1>`
+renders either way. Breadcrumbs, metadata and the Studio preview keep
+reading the document's own `title`/`heading` whether or not a hero is set.
+`@blog/service` narrows the slot with `toHeroSlot()`, whose guard rejects a
+non-hero `_type` as a data error through the loader's normal failure path
+rather than rendering a blank page.
 
 `module_cta` additionally carries a required `variant` (`BANNER`/`SPLIT`/
 `CALLOUT`, from `CTA_VARIANT`, default `CALLOUT`), a required `bandTone`
@@ -336,7 +361,7 @@ schema allows), `layout` as `TLayout | undefined`, and (where applicable)
 either: unset stays unset end to end. In `apps/web`, every module component
 that renders a `@blog/ui` organism — including those reached through a
 dedicated slot rather than `MODULE_MAP`'s generic `ModuleRenderer` pipeline
-(§5 above): `module_hero` via the home template's `hero` slot,
+(§5 above): the hero family via each page's `hero` slot,
 `module_postList` via `page_blog`'s `postList` reference (and, since #1915,
 `page_topic`'s own `postList` reference on `/topics/[slug]`, and since #1964,
 `page_tag`'s own `postList` reference on `/tags/[slug]`), and

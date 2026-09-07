@@ -1,6 +1,7 @@
 import { routes, type ITenantLocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
+import { HeroSlot } from '@web/modules/hero-slot';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
@@ -29,7 +30,7 @@ export const GenericPage = async ({
     getTranslations('breadcrumbs'),
   ]);
 
-  const { title, modules } = guardPageLoaderResult(
+  const { title, hero, modules } = guardPageLoaderResult(
     result,
     'generic_page.fetch_failed',
     { slug },
@@ -51,6 +52,16 @@ export const GenericPage = async ({
       breadcrumbTrail={breadcrumbTrail}
       breadcrumbAriaLabel={breadcrumbsT('ariaLabel')}
       breadcrumbListSchema={breadcrumbListSchema}
+      hero={
+        hero && (
+          <HeroSlot
+            id={hero.id}
+            type={hero.type}
+            locale={locale}
+            tenant={tenant}
+          />
+        )
+      }
       modulesContent={
         <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />
       }

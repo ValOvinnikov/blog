@@ -1,6 +1,7 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
+import { HeroSlot } from '@web/modules/hero-slot';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import { PostListModule } from '@web/modules/post-list/post-list-module';
 import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
@@ -42,7 +43,7 @@ export const TopicPage = async ({
     getTranslations('topicPage'),
   ]);
 
-  const { topic, modules, postListId } = guardPageLoaderResult(
+  const { topic, hero, modules, postListId } = guardPageLoaderResult(
     result,
     'topic_page.fetch_failed',
     { slug },
@@ -62,6 +63,16 @@ export const TopicPage = async ({
     <TopicPageView
       heading={topic.title}
       supportingText={topic.description}
+      hero={
+        hero && (
+          <HeroSlot
+            id={hero.id}
+            type={hero.type}
+            locale={locale}
+            tenant={tenant}
+          />
+        )
+      }
       topics={topics}
       activeSlug={slug}
       breadcrumbTrail={breadcrumbTrail}

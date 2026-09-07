@@ -32,12 +32,14 @@ that #1285 already shipped.
   `pnpm typegen` (regenerates `TModuleType`) → the relevant pages'
   `defineModulesField({ allow })` → `service.modules.<type>` → web
   `MODULE_MAP`. `MODULE_MAP` is typed
-  `Record<Exclude<TModuleType, 'module_hero' | 'module_postList' |
-'module_taxonomyList'>, …>`: the three excluded types render through a
-  page's dedicated **slot** (`page_home.hero`, `page_blog.postList`,
-  `page_topicIndex.taxonomyList`) rather than `modules[]`, and every other
-  type fails to compile if left unregistered. A new slot-only module joins
-  that `Exclude` list; a new `modules[]` module joins the map.
+  `Record<Exclude<TModuleType, TSlotModuleType>, …>`: the excluded types
+  render through a page's dedicated **slot** (a page's `hero`,
+  `page_blog.postList`, `page_topicIndex.taxonomyList`) rather than
+  `modules[]`, and every other type fails to compile if left unregistered. A
+  new slot-only module joins `TSlotModuleType`; a new `modules[]` module
+  joins the map. The hero family needs neither: `TSlotModuleType` already
+  absorbs every `module_hero*` type through `THeroModuleType`, and a hero's
+  own component is registered in `HERO_MAP` instead.
 - **Module styling (shipped)** — the "section appearance object" the
   original design proposed shipped under different names, and every module
   in this doc's catalogue gets them from shared helpers rather than

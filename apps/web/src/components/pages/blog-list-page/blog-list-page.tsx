@@ -1,6 +1,7 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
+import { HeroSlot } from '@web/modules/hero-slot';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import { PostListModule } from '@web/modules/post-list/post-list-module';
 import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
@@ -32,7 +33,7 @@ export const BlogListPage = async ({
     getTranslations('breadcrumbs'),
   ]);
 
-  const { heading, supportingText, modules, postListId } =
+  const { heading, supportingText, hero, modules, postListId } =
     guardPageLoaderResult(result, 'blog_list_page.fetch_failed');
 
   const siteUrl = (await getTenantBaseUrl(tenant)) ?? '';
@@ -49,6 +50,16 @@ export const BlogListPage = async ({
     <BlogListPageView
       heading={heading}
       supportingText={supportingText}
+      hero={
+        hero && (
+          <HeroSlot
+            id={hero.id}
+            type={hero.type}
+            locale={locale}
+            tenant={tenant}
+          />
+        )
+      }
       topics={topics}
       breadcrumbTrail={breadcrumbTrail}
       breadcrumbAriaLabel={breadcrumbsT('ariaLabel')}

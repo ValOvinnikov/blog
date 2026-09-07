@@ -99,4 +99,26 @@ describe(BlogListPageView, () => {
       screen.getByRole('navigation', { name: 'Blog pages' }),
     ).toBeInTheDocument();
   });
+
+  it('renders the hero in place of the heading/supportingText pair, keeping exactly one h1', () => {
+    setup({
+      hero: (
+        <h1 data-testid="hero-slot">
+          <span>Hero title</span>
+        </h1>
+      ),
+    });
+
+    expect(screen.getByTestId('hero-slot')).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(
+      screen.queryByRole('heading', { level: 1, name: 'Blog' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders the default heading with exactly one h1 when no hero is passed', () => {
+    setup();
+
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+  });
 });

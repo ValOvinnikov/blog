@@ -13,6 +13,7 @@ const {
   getTopicsMock,
   moduleRendererMock,
   postListModuleMock,
+  heroSlotMock,
   getTenantSanityContextMock,
   getTenantBaseUrlMock,
 } = vi.hoisted(() => ({
@@ -20,6 +21,9 @@ const {
   getTopicsMock: vi.fn(),
   getTenantSanityContextMock: vi.fn(),
   getTenantBaseUrlMock: vi.fn(),
+  heroSlotMock: vi.fn(({ id }: { id: string }) => (
+    <h1 data-testid="hero-slot">{id}</h1>
+  )),
   // `ModuleRenderer`/`PostListModule` are async Server Components — real
   // RSC async-component nesting isn't renderable through
   // `@testing-library/react`'s client renderer. Stubbed as plain sync
@@ -72,6 +76,10 @@ vi.mock('@web/modules/post-list/post-list-module', () => ({
   PostListModule: postListModuleMock,
 }));
 
+vi.mock('@web/modules/hero-slot', () => ({
+  HeroSlot: heroSlotMock,
+}));
+
 vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
   getTenantSanityContext: getTenantSanityContextMock,
 }));
@@ -113,6 +121,7 @@ describe(`<${TopicPage.name}/>`, () => {
     getTopicsMock.mockReset();
     moduleRendererMock.mockClear();
     postListModuleMock.mockClear();
+    heroSlotMock.mockClear();
     getTenantSanityContextMock.mockReset();
     getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
     getTenantBaseUrlMock.mockReset();
@@ -240,6 +249,39 @@ describe(`<${TopicPage.name}/>`, () => {
     expect(screen.getByTestId('module-renderer-stub')).toHaveTextContent(
       'module_newsletter',
     );
+  });
+
+  it('renders the referenced blog_topic heading as the only h1 when no hero is set', async () => {
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: { topic, modules: [], seo: {}, postListId: 'post-list-1' },
+    });
+
+    await setup();
+
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(heroSlotMock).not.toHaveBeenCalled();
+  });
+
+  it('dispatches the hero through HeroSlot and keeps exactly one h1 when a hero is set', async () => {
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        topic,
+        hero: { id: 'hero-1', type: 'module_hero' },
+        modules: [],
+        seo: {},
+        postListId: 'post-list-1',
+      },
+    });
+
+    await setup();
+
+    expect(heroSlotMock).toHaveBeenCalledWith(
+      { id: 'hero-1', type: 'module_hero', locale: 'en', tenant: 'tenant-1' },
+      undefined,
+    );
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 
   it('renders the JSON-LD BreadcrumbList schema script', async () => {

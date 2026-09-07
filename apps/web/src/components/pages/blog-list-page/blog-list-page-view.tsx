@@ -14,6 +14,7 @@ import type { ReactNode } from 'react';
 export interface IBlogListPageViewProps {
   heading: string;
   supportingText?: string;
+  hero?: ReactNode;
   topics: TTopicsList;
   breadcrumbTrail: IBreadcrumbItem[];
   breadcrumbAriaLabel: string;
@@ -31,6 +32,7 @@ export interface IBlogListPageViewProps {
 export const BlogListPageView = ({
   heading,
   supportingText,
+  hero,
   topics,
   breadcrumbTrail,
   breadcrumbAriaLabel,
@@ -52,6 +54,7 @@ export const BlogListPageView = ({
       <BlogPageTemplate
         heading={heading}
         supportingText={supportingText}
+        hero={hero}
         topicChips={<TopicChipList topics={topics} />}
         modules={postsContent}
       />
