@@ -989,11 +989,32 @@ prev/next slots` — works before hydration; buttons and disabled states are
   an authored `taxonomy` field (topics / tags) — decide whether that field is
   hidden when the module sits in a slot, or whether a sibling
   `module_taxonomyCards` is cleaner. Proposed: authored field, one type.
-- **Sub-issues:** **studio** · allow on `page_home`/`page_generic` + the
-  field; **service** · read the authored taxonomy when present; **ui** · none
-  expected; **web** · `MODULE_MAP` entry (currently excluded).
+  **Answered 2026-09-07** in the portfolio design doc: one type; `taxonomy`
+  optional on the document with no hidden rule (a module cannot see its
+  holder), required by an async rule on the home and landing pages and
+  checked for a mismatch by the index pages; `sortOrder` and `limit` added
+  so a teaser is usable, defaulting to today's index behaviour; one
+  `select()` query with the index page's kind as the fallback.
+- **Sub-issues (dependency order):**
+  - **config** · `feat(config): TAXONOMY_SORT and module_taxonomyList out of
+TSlotModuleType` — the union then names only slot-only modules, so the
+    missing `MODULE_MAP` entry is a compile error.
+  - **studio** · `feat(studio): authored taxonomy on module_taxonomyList and
+home/landing allow-lists` — `taxonomy`, `sortOrder`, `limit`; the two
+    page-level rules; `page_home`/`page_generic` allow the type.
+  - **service** · `feat(service): taxonomyList reads the authored taxonomy
+when present` — one query resolving module and terms, `fallbackTaxonomy`
+    parameter, sort and limit in the transformer.
+  - **ui** · none — the web view composes `PostGrid` + `TaxonomyCard` and
+    already takes `headingLevel`.
+  - **web** · `feat(web): taxonomyList MODULE_MAP entry` — the module
+    resolves hrefs and copy from the kind; index pages pass the fallback; an
+    empty `modules[]` placement omits itself.
+- **One PR:** the config const has no consumer until studio lands (knip), and
+  the union change reds `MODULE_MAP` until web lands.
 - **Acceptance:** a blog home can show topic cards between latest posts and
-  the newsletter.
+  the newsletter, ordered and capped as authored; the Topics and Tags pages
+  render exactly as before.
 
 ### Phase 2 · Hero family — `prio:later` until Phase 1 ships
 
