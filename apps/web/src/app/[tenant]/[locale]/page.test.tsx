@@ -23,8 +23,8 @@ vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
   getTenantSanityContext: getTenantSanityContextMock,
 }));
 
-vi.mock('@web/modules/hero/hero-module', () => ({
-  HeroModule: ({ id }: { id: string }) => (
+vi.mock('@web/modules/hero-slot', () => ({
+  HeroSlot: ({ id }: { id: string }) => (
     <div data-testid="hero-module">{id}</div>
   ),
 }));
@@ -80,7 +80,7 @@ describe('HomePage', () => {
     getHomePageMock.mockResolvedValue({
       ok: true,
       data: {
-        hero: { id: 'hero-1' },
+        hero: { id: 'hero-1', type: 'module_hero' },
         modules: [{ id: 'module-1', type: 'module_content' }],
         seo: makeSeo(),
       },
@@ -153,7 +153,7 @@ describe('generateMetadata', () => {
     getHomePageMock.mockResolvedValue({
       ok: true,
       data: {
-        hero: { id: 'hero-1' },
+        hero: { id: 'hero-1', type: 'module_hero' },
         modules: [],
         seo: makeSeo({ title: 'Home' }),
       },

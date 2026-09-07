@@ -12,6 +12,7 @@ import type { ReactNode } from 'react';
 export interface ITagPageViewProps {
   heading: string;
   supportingText?: string;
+  hero?: ReactNode;
   breadcrumbTrail: IBreadcrumbItem[];
   breadcrumbAriaLabel: string;
   breadcrumbListSchema?: ReturnType<typeof buildBreadcrumbListSchema>;
@@ -29,6 +30,7 @@ export interface ITagPageViewProps {
 export const TagPageView = ({
   heading,
   supportingText,
+  hero,
   breadcrumbTrail,
   breadcrumbAriaLabel,
   breadcrumbListSchema,
@@ -49,6 +51,7 @@ export const TagPageView = ({
       <BlogPageTemplate
         heading={heading}
         supportingText={supportingText}
+        hero={hero}
         modules={postsContent}
       />
     </>

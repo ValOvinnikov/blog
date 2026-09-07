@@ -7,6 +7,7 @@ import { GenericPage } from './generic-page';
 const {
   getPageMock,
   moduleRendererMock,
+  heroSlotMock,
   getTenantSanityContextMock,
   getTenantBaseUrlMock,
 } = vi.hoisted(() => ({
@@ -23,6 +24,9 @@ const {
   moduleRendererMock: vi.fn(({ modules }: { modules: { id: string }[] }) => (
     <div data-testid="module-renderer">{modules.length} modules</div>
   )),
+  heroSlotMock: vi.fn(({ id }: { id: string }) => (
+    <h1 data-testid="hero-slot">{id}</h1>
+  )),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -35,6 +39,10 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/modules/module-renderer', () => ({
   ModuleRenderer: moduleRendererMock,
+}));
+
+vi.mock('@web/modules/hero-slot', () => ({
+  HeroSlot: heroSlotMock,
 }));
 
 vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
@@ -70,6 +78,7 @@ describe(`<${GenericPage.name}/>`, () => {
   beforeEach(() => {
     getPageMock.mockReset();
     moduleRendererMock.mockClear();
+    heroSlotMock.mockClear();
     getTenantSanityContextMock.mockReset();
     getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
     getTenantBaseUrlMock.mockReset();
@@ -170,6 +179,43 @@ describe(`<${GenericPage.name}/>`, () => {
     const moduleRenderer = screen.getByTestId('module-renderer');
 
     expect(moduleRenderer.parentElement).toBe(main);
+  });
+
+  it('renders the page title as the only h1 when no hero is set', async () => {
+    getPageMock.mockResolvedValue({
+      ok: true,
+      data: { title: 'About Us', slug: 'about-us', modules: [] },
+    });
+
+    await setup();
+
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(heroSlotMock).not.toHaveBeenCalled();
+  });
+
+  it('dispatches the hero through HeroSlot and keeps exactly one h1 when a hero is set', async () => {
+    getPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        title: 'About Us',
+        slug: 'about-us',
+        hero: { id: 'hero-1', type: 'module_hero' },
+        modules: [],
+      },
+    });
+
+    await setup();
+
+    expect(heroSlotMock).toHaveBeenCalledWith(
+      {
+        id: 'hero-1',
+        type: 'module_hero',
+        locale: 'EN',
+        tenant: 'tenant-1',
+      },
+      undefined,
+    );
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 
   it('forwards the resolved tenant Sanity context to getPage', async () => {

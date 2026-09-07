@@ -14,6 +14,7 @@ import type { ReactNode } from 'react';
 export interface ITopicPageViewProps {
   heading: string;
   supportingText?: string;
+  hero?: ReactNode;
   topics: TTopicsList;
   activeSlug: string;
   breadcrumbTrail: IBreadcrumbItem[];
@@ -33,6 +34,7 @@ export interface ITopicPageViewProps {
 export const TopicPageView = ({
   heading,
   supportingText,
+  hero,
   topics,
   activeSlug,
   breadcrumbTrail,
@@ -55,6 +57,7 @@ export const TopicPageView = ({
       <BlogPageTemplate
         heading={heading}
         supportingText={supportingText}
+        hero={hero}
         topicChips={<TopicChipList topics={topics} activeSlug={activeSlug} />}
         modules={postsContent}
       />
