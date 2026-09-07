@@ -66,7 +66,7 @@ permissions:
 env:
   PNPM_VERSION: 11.21.0
   NODE_VERSION: '24'
-  VERCEL_CLI_VERSION: 48.0.0
+  VERCEL_CLI_VERSION: 59.11.7
   # Keep in lockstep with the `turbo` devDependency version.
   TURBO_IGNORE_VERSION: 2.10.4
   # Sanity project/dataset defaults, sourced from repo Variables like ci.yml.

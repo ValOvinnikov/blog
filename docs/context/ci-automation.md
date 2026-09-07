@@ -238,6 +238,34 @@ of the listed paths moves.
 Everything outside a project's triggers skips, so an unrelated PR builds
 neither Storybook.
 
+## The Vercel CLI pin tracks the pinned Node version
+
+Both deploy workflows pin the CLI by exact version (`VERCEL_CLI_VERSION`, run
+via `npx --yes "vercel@${VERCEL_CLI_VERSION}"`), and that pin is **coupled to
+`NODE_VERSION`**: `vercel build` resolves `engines.node` against the supported
+list bundled in that CLI's own `@vercel/build-utils`, so a CLI released before
+a Node major exists rejects it outright —
+
+```
+Error: Found invalid Node.js Version: "24.x".
+Please set "engines": { "node": "22.x" } in your `package.json` file to use Node.js 22.
+```
+
+The message names the newest major that CLI knows, not a version this repo
+should adopt; the fix is a newer CLI, never a downgraded `engines`. Node 24
+support arrived in `@vercel/build-utils` 13.0.0, first shipped by CLI
+**49.0.0** — one major past the 48.0.0 pin that was in place when the repo
+moved to Node 24, which is why the first dev deploy after that bump failed in
+both the `deploy-web` and `deploy-admin` jobs while every other job stayed
+green.
+
+So a `NODE_VERSION` bump is not complete until a CLI that supports the new
+major is pinned in **both** `deploy-development.yml` and
+`deploy-production.yml`. The failure surfaces only at deploy time — nothing in
+`type-check`/`lint`/`test`/`build` exercises the Vercel builder — and while
+deploys are manual (see below) it can sit latent for as long as nobody
+dispatches one.
+
 ## Required env vars
 
 Every env var in this repo's `env.ts` modules is either required in the zod
