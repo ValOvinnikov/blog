@@ -160,9 +160,10 @@ it starts, same pattern as any other item added to this catalogue.
 
 **Goal:** the home page stops being blog-shaped. Its required `hero` slot
 accepts a _family_ of hero modules — one per kind of site (blog, statement,
-profile) — and `page_generic` gains the same slot as an optional field, so a
-tenant can compose a marketing landing page, a personal profile page, or a
-blog front page from the same catalogue with zero bespoke code. This section
+profile) — and every other page gains the same slot as an optional field
+that replaces its default header, so a tenant can compose a marketing landing
+page, a personal profile page, or a blog front page from the same catalogue
+with zero bespoke code. This section
 is the design of record for the family's infrastructure (epic #2778); each
 member hero gets its own design section as it is added (`module_heroBlog`
 first, under #2780).
@@ -216,18 +217,31 @@ than silently being un-pickable.
 
 ### Which pages get a hero slot
 
-| Page                                    | Hero slot                                 | Page `<h1>`                                          | `modules[]` allow-list                                                                                                                        |
-| --------------------------------------- | ----------------------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `page_home`                             | **Required**, `to:` = `HERO_SCHEMA_TYPES` | The hero's title                                     | Widens to every `modules[]` module: `content`, `cta`, `newsletter`, `postLatest` (+ later `postFeatured`, carousel, placeable `taxonomyList`) |
-| `page_generic`                          | **Optional**, same list                   | Hero title when set; the page title header otherwise | Widens from `content` + `cta` to add `postLatest` + `newsletter`                                                                              |
-| `page_blog` · `page_topic` · `page_tag` | None — their slot is the list             | Page title                                           | Unchanged                                                                                                                                     |
-| `page_work` (portfolio strand)          | Optional, added when that page lands      | Hero title when set                                  | Designed with the work page                                                                                                                   |
+One rule, no exceptions: **home has a required hero; every other page has an
+optional one; a hero always replaces that page's default header and owns the
+`<h1>`.**
 
-`page_generic` with a hero renders it above `modules[]` and **drops its own
-title header** — a page has one `<h1>`, and the hero owns it. The document's
-`title` still feeds breadcrumbs, metadata and the Studio preview, exactly as
-`page_home.title` does today. Without a hero the page renders as it does now,
-so every existing landing page is untouched.
+Every page other than home already opens with a header built from its own
+fields — the generic page's breadcrumbs and title, the blog page's authored
+`heading` and `supportingText`, the topic and tag pages' term-derived heading
+— so without a hero it renders exactly as it does today, and the first
+`modules[]` entry can never be the opener because the `<h1>` has a home
+either way. Home has no such fallback, which is why its slot is the only
+required one.
+
+| Page                           | Hero slot                                                                               | Without a hero                      | `modules[]` allow-list                                                                                                                        |
+| ------------------------------ | --------------------------------------------------------------------------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `page_home`                    | **Required**, `to:` = `HERO_SCHEMA_TYPES`                                               | —                                   | Widens to every `modules[]` module: `content`, `cta`, `newsletter`, `postLatest` (+ later `postFeatured`, carousel, placeable `taxonomyList`) |
+| `page_generic`                 | Optional, same list                                                                     | Breadcrumbs + title header          | Widens from `content` + `cta` to add `postLatest` + `newsletter`                                                                              |
+| `page_blog`                    | Optional, same list                                                                     | `heading` + `supportingText` header | Unchanged                                                                                                                                     |
+| `page_topic` · `page_tag`      | Optional, same list — one document per term, so a flagship topic can carry its own hero | Term header                         | Unchanged                                                                                                                                     |
+| `page_work` (portfolio strand) | Optional, when that page lands                                                          | Its own header                      | Designed with the work page                                                                                                                   |
+
+A hero's copy is always authored on the hero. A taxonomy-page hero that
+derives its heading from the term, the way `module_heroBlog` derives from a
+post, is a later add, not part of this phase. The document's `title` still
+feeds breadcrumbs, metadata and the Studio preview whether or not a hero is
+set, exactly as `page_home.title` does today.
 
 ### The shared field tail — `defineHeroFields()`
 
@@ -283,9 +297,9 @@ work.
 
 `TModule` becomes generic over its type — `TModule<T extends TModuleType =
 TModuleType> = { id: string; type: T }` — and the page view models narrow the
-slot: `THomePage.hero: TModule<THeroModuleType>`, `TGenericPage.hero?:
-TModule<THeroModuleType>`. The page queries already project `_id` and `_type`
-for the slot; a `toHeroSlot()` transformer applies an `isHeroModuleType()`
+slot: `THomePage.hero: TModule<THeroModuleType>`, and the generic, blog,
+topic and tag page view models gain `hero?: TModule<THeroModuleType>`. The
+page queries already project `_id` and `_type` for a slot; a `toHeroSlot()` transformer applies an `isHeroModuleType()`
 guard from `@blog/config` (a `startsWith('module_hero')` check typed as a
 predicate) and a slot that fails it is a data error the loader returns
 through its existing failure path, never a silently blank page. Each hero
@@ -317,19 +331,23 @@ home page onto `module_heroBlog` and deletes the schema.
 - **config** — `THeroModuleType`, `TSlotModuleType`, `isHeroModuleType()`,
   `HERO_VARIANT`, `MOBILE_MEDIA_ORDER` (renaming `CTA_MOBILE_MEDIA_ORDER`'s
   consumers).
-- **studio** — `HERO_SCHEMA_TYPES` + its registry test; `page_home.hero` and
-  the new optional `page_generic.hero` reference the list; both allow-lists
-  widen; the generalised blank-heading validator. No `defineHeroFields()` yet.
-- **service** — generic `TModule<T>`, `toHeroSlot()`, `TGenericPage.hero`.
+- **studio** — `HERO_SCHEMA_TYPES` + its registry test; `page_home.hero`
+  references the list; `page_generic`, `page_blog`, `page_topic` and
+  `page_tag` gain an optional `hero` referencing it; the home and generic
+  allow-lists widen; the generalised blank-heading validator. No
+  `defineHeroFields()` yet.
+- **service** — generic `TModule<T>`, `toHeroSlot()`, `hero?` on the
+  generic, blog, topic and tag page view models.
 - **ui** — none.
 - **web** — `HERO_MAP` + `HeroSlot`; `MODULE_MAP` excludes via
-  `TSlotModuleType`; the `[slug]` page renders the optional hero and drops
-  its title header when one is set.
+  `TSlotModuleType`; the generic, blog, topic and tag page views render the
+  optional hero in place of their default header.
 
-**Acceptance:** `page_home.hero` and `page_generic.hero` accept the family;
-adding a `module_hero*` schema without a `HERO_MAP` entry or a
-`HERO_SCHEMA_TYPES` entry fails `type-check`/`test`; every existing page
-renders unchanged while `module_hero` is the family's only member.
+**Acceptance:** `page_home.hero` and every other page's optional `hero`
+accept the family; adding a `module_hero*` schema without a `HERO_MAP` entry
+or a `HERO_SCHEMA_TYPES` entry fails `type-check`/`test`; every existing
+page renders unchanged while no hero is set on it and `module_hero` is the
+family's only member.
 
 ## Contact form / lead capture
 
@@ -475,7 +493,8 @@ point; the graph stays acyclic.
   `module_hero*` naming convention, derived into `THeroModuleType`; one
   `defineHeroFields()` tail (variant, brand variant, image, position,
   alignment, mobile media order, actions, layout) shared by every kind;
-  `page_home.hero` required and `page_generic.hero` optional; `module_hero`
+  `page_home.hero` required, every other page's `hero` optional and
+  replacing that page's default header when set; `module_hero`
   retired by content migration once `module_heroBlog` replaces it
   (2026-09-07, #2791).
 
