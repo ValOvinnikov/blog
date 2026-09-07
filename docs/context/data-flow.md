@@ -120,15 +120,17 @@ apps/web
   render. A human still reviews and publishes the draft in Studio before it
   goes live — the write path only stages content, it never publishes.
 - **Web renders modules generically.** `apps/web/src/modules/module-map.ts`
-  registers `MODULE_MAP: Record<Exclude<TModuleType, 'module_hero' |
-'module_postList' | 'module_taxonomyList'>, (props) => ReactNode>` — typed
-  exhaustively over `TModuleType` (`@blog/config`) minus those three, so
-  omitting any other module type from the map is a compile error. The three
-  are excluded because each is reached through a **dedicated slot** rather
-  than a page's `modules[]` array, so none can ever reach `ModuleRenderer`:
-  `module_hero` via the home template's `hero` prop, `module_postList` via
-  `page_blog`'s `postList` reference, and `module_taxonomyList` by the same
-  rule once the taxonomy index pages that hold it exist.
+  registers `MODULE_MAP: Record<Exclude<TModuleType, TSlotModuleType>,
+(props) => ReactNode>` — typed exhaustively over `TModuleType`
+  (`@blog/config`) minus the slot-rendered types, so omitting any other
+  module type from the map is a compile error. `TSlotModuleType` names every
+  module reached through a **dedicated slot** rather than a page's
+  `modules[]` array, so none of them can ever reach `ModuleRenderer`: the
+  hero family (every `module_hero*` type) via a page's `hero` reference,
+  `module_postList` via `page_blog`'s `postList` reference, and
+  `module_taxonomyList` via `page_topicIndex`'s `taxonomyList` reference.
+  Because the exclusion is derived rather than a hardcoded literal union, a
+  new hero kind leaves `MODULE_MAP` alone.
 
   Exclusion from `MODULE_MAP` does **not** exempt a module from
   `REVALIDATE_TAGS` (`apps/web/src/utils/revalidate-tags/revalidate-tags.ts`),
@@ -146,7 +148,18 @@ Partial<Record<TSanityType, …>>` — every module type needs a purge-tag entry
   (`apps/web/src/modules/<type>/<type>-module.tsx`) is an async Server
   Component that calls its `service.modules.<type>` fetcher, checks
   `result.ok`, and maps the view-model onto the matching pure `@blog/ui`
-  organism — this is the only place that module's service and ui meet. The
-  home route instead renders `HeroModule` directly, as a dedicated `hero` prop
-  on `HomePageTemplate`, for `page_home`'s required `hero` reference (kept
-  separate from `modules[]` and from `MODULE_MAP`/`ModuleRenderer` entirely).
+  organism — this is the only place that module's service and ui meet.
+
+  A page's `hero` reference is dispatched by its own pair,
+  `apps/web/src/modules/hero-map.ts` and `hero-slot.tsx`:
+  `HERO_MAP: Record<THeroModuleType, (props) => ReactNode>` is exhaustive
+  over the hero family, so adding a `module_hero*` schema without registering
+  a component is a compile error, and `HeroSlot({ id, type, … })` looks the
+  type up and renders it, mirroring `ModuleRenderer`'s warn-and-render-nothing
+  fallback for an unrecognized runtime type. `page_home`'s hero is required;
+  `page_generic`, `page_blog`, `page_topic` and `page_tag` each have an
+  optional one that replaces the page's default header and owns its `<h1>`.
+  The slot stays two-step — the page query projects `_id` and `_type`, and
+  the hero's own loader fetches it by id — and `@blog/service`'s
+  `toHeroSlot()` rejects a non-hero `_type` as a data error rather than
+  letting it render blank.
