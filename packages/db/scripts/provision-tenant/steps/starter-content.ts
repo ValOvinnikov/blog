@@ -1,14 +1,16 @@
 import {
   BRAND_VARIANT,
-  HERO_FIELD_MODE,
+  HERO_IMAGE_SOURCE,
+  HERO_POST_SOURCE,
+  HERO_VARIANT,
   PRESET_ID,
   LINK_TYPE,
 } from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
-// Fixed document ids (published, not `drafts.`-prefixed) — every field a
-// `blog_post`/`settings_*` singleton/`blog_author`/`blog_topic` document
-// requires per `apps/cms/src/schema-types`, so the seeded dataset validates
+// Fixed document ids (published, not `drafts.`-prefixed) — every field
+// each seeded document type requires per its schema in
+// `packages/studio/src/schema-types`, so the seeded dataset validates
 // against the real schema rather than an invented shape. No generated
 // `@blog/config` types exist for a not-yet-created project's dataset, so
 // these stay loosely typed (`TSanityDocument`), not `any`.
@@ -21,7 +23,7 @@ export const STARTER_DOCUMENT_IDS = {
   THEME: 'provisioning.settings.theme',
   NEWSLETTER: 'provisioning.settings.newsletter',
   SITE: 'provisioning.settings.site',
-  HERO: 'provisioning.module.hero',
+  HERO_BLOG: 'provisioning.module.hero-blog',
   HOME: 'provisioning.settings.home',
 } as const;
 
@@ -127,23 +129,22 @@ export function buildStarterDocuments(
       'default description in Site Settings once you have real copy.',
   };
 
-  const hero: TSanityDocument = {
-    _id: STARTER_DOCUMENT_IDS.HERO,
-    _type: 'module_hero',
+  const heroBlog: TSanityDocument = {
+    _id: STARTER_DOCUMENT_IDS.HERO_BLOG,
+    _type: 'module_heroBlog',
     title: 'Welcome Hero',
     brandVariant: BRAND_VARIANT.PRIMARY,
-    featuredPost: { _type: 'reference', _ref: STARTER_DOCUMENT_IDS.POST },
-    heroEyebrowMode: HERO_FIELD_MODE.POST_TOPIC,
-    heroTitleMode: HERO_FIELD_MODE.POST_TITLE,
-    heroSubtitleMode: HERO_FIELD_MODE.POST_EXCERPT,
-    heroImageMode: HERO_FIELD_MODE.POST_IMAGE,
+    postSource: HERO_POST_SOURCE.PINNED,
+    post: { _type: 'reference', _ref: STARTER_DOCUMENT_IDS.POST },
+    imageSource: HERO_IMAGE_SOURCE.POST,
+    variant: HERO_VARIANT.SPLIT,
   };
 
   const home: TSanityDocument = {
     _id: STARTER_DOCUMENT_IDS.HOME,
     _type: 'page_home',
     title: 'Home',
-    hero: { _type: 'reference', _ref: STARTER_DOCUMENT_IDS.HERO },
+    hero: { _type: 'reference', _ref: STARTER_DOCUMENT_IDS.HERO_BLOG },
   };
 
   return [
@@ -155,7 +156,7 @@ export function buildStarterDocuments(
     theme,
     newsletter,
     site,
-    hero,
+    heroBlog,
     home,
   ];
 }
