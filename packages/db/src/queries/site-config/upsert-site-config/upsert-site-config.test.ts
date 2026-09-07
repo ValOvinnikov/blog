@@ -427,6 +427,67 @@ describe('voice overrides — RICH fields accept a plain string', () => {
       'Must be rich text.',
     );
   });
+
+  it('trims a whitespace-padded string before storing it', async () => {
+    const { id: tenantId } = await insertTestTenant(db);
+
+    const result = expectOk(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverrides: {
+          notFoundSupportingText: '  Try the homepage instead.  \n',
+        },
+      }),
+    );
+
+    expect(result.voiceOverrides.notFoundSupportingText).toEqual([
+      expect.objectContaining({
+        children: [
+          expect.objectContaining({ text: 'Try the homepage instead.' }),
+        ],
+      }),
+    ]);
+  });
+
+  it('accepts a string that only exceeds the cap because of its padding', async () => {
+    const { id: tenantId } = await insertTestTenant(db);
+    const atCap = 'x'.repeat(300);
+
+    const result = expectOk(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverrides: { notFoundSupportingText: `  ${atCap}  ` },
+      }),
+    );
+
+    expect(result.voiceOverrides.notFoundSupportingText).toEqual([
+      expect.objectContaining({
+        children: [expect.objectContaining({ text: atCap })],
+      }),
+    ]);
+  });
+
+  it('still rejects a string exceeding the cap after trimming', async () => {
+    const { id: tenantId } = await insertTestTenant(db);
+    const overCap = 'x'.repeat(301);
+
+    const padded = expectFieldErrors(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverrides: { notFoundSupportingText: `  ${overCap}  ` },
+      }),
+    );
+    const unpadded = expectFieldErrors(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverrides: { notFoundSupportingText: overCap },
+      }),
+    );
+
+    expect(padded.fieldErrors.notFoundSupportingText).toBe(
+      unpadded.fieldErrors.notFoundSupportingText,
+    );
+  });
 });
 
 describe('voice overrides — placeholders', () => {

@@ -227,7 +227,9 @@ function coercePlainStringToRichValue(text: string): TVoicePortableText {
       _type: 'block',
       _key: crypto.randomUUID(),
       style: 'normal',
-      children: [{ _type: 'span', _key: crypto.randomUUID(), text }],
+      children: [
+        { _type: 'span', _key: crypto.randomUUID(), text: text.trim() },
+      ],
     },
   ];
 }
