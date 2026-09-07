@@ -1,4 +1,4 @@
-import NotFound, { generateMetadata } from './not-found';
+import TenantNotFound, { generateMetadata } from './not-found';
 
 const { standaloneNotFoundPageMock, buildNotFoundMetadataMock } = vi.hoisted(
   () => ({
@@ -15,7 +15,7 @@ vi.mock('@web/metadata/not-found-metadata', () => ({
   buildNotFoundMetadata: buildNotFoundMetadataMock,
 }));
 
-describe('NotFound (root not-found route)', () => {
+describe('TenantNotFound ([tenant] not-found route)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -29,10 +29,10 @@ describe('NotFound (root not-found route)', () => {
     });
   });
 
-  it('renders StandaloneNotFoundPage', async () => {
+  it('renders StandaloneNotFoundPage, independent of the tenant layout', async () => {
     const ui = { type: 'div', props: {} };
     standaloneNotFoundPageMock.mockResolvedValue(ui);
 
-    await expect(NotFound()).resolves.toBe(ui);
+    await expect(TenantNotFound()).resolves.toBe(ui);
   });
 });

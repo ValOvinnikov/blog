@@ -245,8 +245,11 @@ detected`, and a re-export with `it mustn't be reexported`, so a wrong form
   moved in #2625's first stage, because the root layout and
   `getRequestConfig` sit above any future `[tenant]` segment and can never
   receive it as a param. The root layout exists so root-level files
-  that need a layout to render into — chiefly `src/app/not-found.tsx` for
-  genuinely unmatched URLs — have one; `not-found.tsx` renders outside the
-  `[locale]` tree, so it has no `Header`/`Footer` chrome, just the terminal-
-  styled 404 body (#491), and it mounts its own `ThemeScope` and resolves its
-  own messages rather than inheriting either.
+  that need a layout to render into — chiefly `src/app/not-found.tsx` — have
+  one. There are two such boundaries: `app/not-found.tsx` and
+  `app/[tenant]/not-found.tsx`, the latter catching a `notFound()` thrown by
+  `[tenant]/[locale]/layout.tsx` itself, which a same-segment boundary cannot
+  reach. Both render outside the `[locale]` tree, so neither has
+  `Header`/`Footer` chrome — just the terminal-styled 404 body (#491) — and
+  both mount their own `ThemeScope` and resolve their own messages rather
+  than inheriting either.
