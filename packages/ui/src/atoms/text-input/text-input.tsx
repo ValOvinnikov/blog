@@ -12,7 +12,7 @@ export type TTextInputProps = IWithClassName &
     onChange: (value: string) => void;
     ariaLabel: string;
     isInvalid?: TTextInputVariants['invalid'];
-    /** Decorative leading glyph or icon (e.g. `$`, a chevron `Icon`) — the console prompt idiom. Purely visual; `ariaLabel` carries the accessible name. */
+    /** Decorative leading glyph or icon. Purely visual; `ariaLabel` carries the accessible name. */
     leadingIcon?: ReactNode;
     /** Decorative trailing glyph or icon. Purely visual; `ariaLabel` carries the accessible name. */
     trailingIcon?: ReactNode;

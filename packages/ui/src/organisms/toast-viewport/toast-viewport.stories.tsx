@@ -21,9 +21,8 @@ export const SingleToast: TStory = {
     children: (
       <Toast
         type={TOAST_TYPE.SUCCESS}
-        command="bookmark"
-        state="saved"
-        message="stashed to ~/bookmarks"
+        title="Saved"
+        message="Stashed to your bookmarks."
         time="just now"
         dismissLabel="Dismiss notification"
         onDismiss={() => {}}
@@ -41,9 +40,8 @@ export const StackedToasts: TStory = {
       <>
         <Toast
           type={TOAST_TYPE.INFO}
-          command="rate"
-          state="recorded"
-          message="your rating saved — 4★"
+          title="Recorded"
+          message="Your rating saved — 4★."
           time="1m ago"
           dismissLabel="Dismiss notification"
           onDismiss={() => {}}
@@ -52,9 +50,8 @@ export const StackedToasts: TStory = {
         />
         <Toast
           type={TOAST_TYPE.WARNING}
-          command="comment"
-          state="queued"
-          message="posted — awaiting review"
+          title="Queued"
+          message="Posted — awaiting review."
           time="12s ago"
           dismissLabel="Dismiss notification"
           onDismiss={() => {}}
@@ -63,9 +60,8 @@ export const StackedToasts: TStory = {
         />
         <Toast
           type={TOAST_TYPE.SUCCESS}
-          command="bookmark"
-          state="saved"
-          message="stashed to ~/bookmarks"
+          title="Saved"
+          message="Stashed to your bookmarks."
           time="just now"
           dismissLabel="Dismiss notification"
           onDismiss={() => {}}

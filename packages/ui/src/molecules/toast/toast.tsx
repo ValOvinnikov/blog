@@ -24,7 +24,7 @@ export type TToastProps = IWithClassName &
   IWithDataTestId & {
     type: TToastType;
     /**
-     * Overlays the type's glyph with a `Spinner` for an in-flight action (e.g.
+     * Overlays the type icon with a `Spinner` for an in-flight action (e.g.
      * a `toast.promise` pending state). The spinner is type-agnostic — it
      * always renders in `Spinner`'s own default accent color, so pairing
      * `isLoading: true` with `type: SUCCESS`/`WARNING`/`ERROR` won't tint it
@@ -32,15 +32,8 @@ export type TToastProps = IWithClassName &
      */
     isLoading?: boolean;
     /**
-     * Required unless `isPlain` is set — the terminal-style command/state chip
-     * (e.g. "bookmark · saved") is only rendered when `isPlain` is falsy.
-     * Takes precedence over `title` when both are given.
-     */
-    command?: string;
-    state?: string;
-    /**
-     * Short label shown beside the type icon. Ignored when `command` is set;
-     * omit both for an icon-and-message-only toast.
+     * Short label shown beside the type icon. Omit alongside `message` for
+     * an icon-and-message-only toast.
      */
     title?: ReactNode;
     message: ReactNode;
@@ -51,19 +44,7 @@ export type TToastProps = IWithClassName &
     durationMs?: number;
     onDismiss: () => void;
     phase: NonNullable<TToastVariants['phase']>;
-    /**
-     * Renders `message` alone, without the `command`/`state` chip — for
-     * presets that don't want the toast to read as terminal-log output.
-     */
-    isPlain?: boolean;
   };
-
-const TOAST_GLYPH: Record<TToastType, string> = {
-  [TOAST_TYPE.SUCCESS]: '✓',
-  [TOAST_TYPE.INFO]: '›',
-  [TOAST_TYPE.WARNING]: '●',
-  [TOAST_TYPE.ERROR]: '✕',
-};
 
 const TOAST_TYPE_ICON: Record<TToastType, TIconName> = {
   [TOAST_TYPE.SUCCESS]: ICONS.CHECK,
@@ -82,21 +63,16 @@ const TOAST_ANNOUNCEMENT: Record<
   [TOAST_TYPE.ERROR]: { role: 'alert', live: 'assertive' },
 };
 
-const getToastGlyph = (type: TToastType, isLoading: boolean): string =>
-  isLoading ? '◐' : TOAST_GLYPH[type];
-
 /**
- * Toast — a single compact terminal-window notification confirming or
- * reporting the result of an engagement action (bookmark, rating, comment,
- * subscription, auth). Purely presentational and controlled: the queue,
- * timers, and phase/pause transitions are owned by a stateful `apps/web`
- * island that re-renders this component with updated props.
+ * Toast — a single compact notification confirming or reporting the result
+ * of an engagement action (bookmark, rating, comment, subscription, auth).
+ * Purely presentational and controlled: the queue, timers, and phase/pause
+ * transitions are owned by a stateful `apps/web` island that re-renders
+ * this component with updated props.
  */
 export const Toast = ({
   type,
   isLoading = false,
-  command,
-  state,
   title,
   message,
   time,
@@ -106,7 +82,6 @@ export const Toast = ({
   durationMs,
   onDismiss,
   phase,
-  isPlain = false,
   className,
   dataTestId,
 }: TToastProps) => {
@@ -117,25 +92,10 @@ export const Toast = ({
     paused: isPaused,
   });
   const { role, live } = TOAST_ANNOUNCEMENT[type];
-  const hasCommand = command !== undefined;
-
-  const statusGlyph = isLoading ? (
-    <Spinner
-      label={state ?? type}
-      size={SIZE.SM}
-      className={s.spinner()}
-      aria-hidden="true"
-      dataTestId="toast-spinner"
-    />
-  ) : (
-    <span className={s.glyph()} aria-hidden="true">
-      {getToastGlyph(type, isLoading)}
-    </span>
-  );
 
   const typeIcon = isLoading ? (
     <Spinner
-      label={state ?? type}
+      label={type}
       size={SIZE.SM}
       className={s.spinner()}
       aria-hidden="true"
@@ -145,7 +105,7 @@ export const Toast = ({
     <Icon
       name={TOAST_TYPE_ICON[type]}
       size={SIZE.SM}
-      className={s.glyph()}
+      className={s.icon()}
       dataTestId="toast-icon"
     />
   );
@@ -178,52 +138,18 @@ export const Toast = ({
       className={s.root({ class: className })}
       data-testid={dataTestId}
     >
-      {isPlain ? (
-        <div className={s.plainRow()}>
-          {statusGlyph}
-          <span className={s.plainMessage()}>{message}</span>
-          {time && <span className={s.time()}>{time}</span>}
-          {dismissButton}
+      <div className={s.bar()}>
+        {typeIcon}
+        {title && <span className={s.titleText()}>{title}</span>}
+        {time && <span className={s.time()}>{time}</span>}
+        {dismissButton}
+      </div>
+      <div className={s.body()}>
+        <div className={s.message()}>
+          <span>{message}</span>
         </div>
-      ) : hasCommand ? (
-        <>
-          <div className={s.bar()}>
-            {statusGlyph}
-            <span className={s.cmdCommand()}>
-              {command} · <span className={s.cmdState()}>{state}</span>
-            </span>
-            {time && <span className={s.time()}>{time}</span>}
-            {dismissButton}
-          </div>
-          <div className={s.body()}>
-            <div className={s.message()}>
-              <span className={s.prompt()} aria-hidden="true">
-                {getToastGlyph(type, isLoading)}
-              </span>
-              <span>{message}</span>
-            </div>
-            {actionButton && <div className={s.actions()}>{actionButton}</div>}
-          </div>
-        </>
-      ) : (
-        <>
-          <div className={s.bar()}>
-            {typeIcon}
-            {title && <span className={s.titleText()}>{title}</span>}
-            {time && <span className={s.time()}>{time}</span>}
-            {dismissButton}
-          </div>
-          <div className={s.body()}>
-            <div className={s.message()}>
-              <span>{message}</span>
-            </div>
-            {actionButton && <div className={s.actions()}>{actionButton}</div>}
-          </div>
-        </>
-      )}
-      {isPlain && actionButton && (
-        <div className={s.plainActions()}>{actionButton}</div>
-      )}
+        {actionButton && <div className={s.actions()}>{actionButton}</div>}
+      </div>
       {durationMs !== undefined && (
         <div
           className={s.timer()}

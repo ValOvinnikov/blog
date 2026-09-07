@@ -25,8 +25,7 @@ describe(`<${ToastViewport.name}/>`, () => {
         <>
           <Toast
             type={TOAST_TYPE.SUCCESS}
-            command={first}
-            state="saved"
+            title={first}
             message="stashed"
             dismissLabel="Dismiss"
             onDismiss={vi.fn()}
@@ -34,8 +33,7 @@ describe(`<${ToastViewport.name}/>`, () => {
           />
           <Toast
             type={TOAST_TYPE.INFO}
-            command={second}
-            state="removed"
+            title={second}
             message="removed"
             dismissLabel="Dismiss"
             onDismiss={vi.fn()}

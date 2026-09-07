@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_57 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_54 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -133,11 +133,6 @@ small pill-shaped label.
 Props: className?: string _(extends Omit<TTagVariants, 'interactive'>, IWithDataTestId)_
 Variants: variant: default|accent · interactive: (boolean)
 
-### TerminalTyping — `atoms/terminal-typing/terminal-typing.tsx`
-
-TerminalTyping atom — a monospace, terminal-styled wordmark for a hero-intro flourish.
-Props: text: string · hasCursor?: boolean _(extends IWithClassName, IWithDataTestId)_
-
 ### Text — `atoms/text/text.tsx`
 
 the body-copy paragraph primitive: applies a `variant` from the type scale to a `<p>`.
@@ -260,29 +255,11 @@ Props: tags: (string | ITagListItem)[] · linkAs?: TAnchorElementType _(extends 
 summary card for a taxonomy entry (topic or tag) in a listing: title, optional description, and post count, linking to the entry's archive.
 Props: title: string · description?: string · postCountLabel: string · href: string · headingLevel: THeadingLevel · accessibleNameSeparator?: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 
-### TerminalChip — `molecules/terminal-chip/terminal-chip.tsx`
-
-TerminalChip molecule — a monospace, terminal-prompt-styled chip for the wordmark, with an optional blinking cursor.
-Props: prefix: string · suffix?: string · hasCursor?: boolean _(extends IWithClassName, IWithDataTestId)_
-
 ### Toast — `molecules/toast/toast.tsx`
 
-a single compact terminal-window notification confirming or reporting the result of an engagement action (bookmark, rating, comment, subscription, auth).
-Props: type: TToastType · isLoading?: boolean · command?: string · state?: string · title?: ReactNode · message: ReactNode · time?: string · action?: IToastAction · dismissLabel: string · isPaused?: boolean · durationMs?: number · onDismiss: () => void · phase: NonNullable<TToastVariants['phase']> · isPlain?: boolean _(extends IWithClassName, IWithDataTestId)_
+a single compact notification confirming or reporting the result of an engagement action (bookmark, rating, comment, subscription, auth).
+Props: type: TToastType · isLoading?: boolean · title?: ReactNode · message: ReactNode · time?: string · action?: IToastAction · dismissLabel: string · isPaused?: boolean · durationMs?: number · onDismiss: () => void · phase: NonNullable<TToastVariants['phase']> _(extends IWithClassName, IWithDataTestId)_
 Variants: type: TOAST_TYPE.SUCCESS|TOAST_TYPE.INFO|TOAST_TYPE.WARNING|TOAST_TYPE.ERROR · phase: entering|visible|leaving · hasTime: (boolean) · paused: (boolean)
-
-### WindowChrome — `molecules/window-chrome/window-chrome.tsx`
-
-the reusable terminal-window shell (a bordered, rounded surface with a prompt-styled title bar above a padded body) shared by every engagement feature — auth, comments, ratings, bookmarks, newsletter — so each one reads as part of the same console idiom instead of inventing its own card treatment.
-Props: children?: TCompoundChildren<typeof WindowChromeSlotParts> _(extends IWithClassName, IWithDataTestId)_
-
-Slots:
-
-- **WindowChrome.Bar** — the `WindowChrome` title bar. Props: headingLevel?: THeadingLevel · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **WindowChrome.Body** — the padded content slot below a `WindowChrome.Bar`. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **WindowChrome.User** — the accent-coloured "who" segment of a `WindowChrome.Bar` prompt (e.g. the `guest`/`val` in `guest@ovinnikov:~$`, or a highlighted path segment like a post's filename). Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **WindowChrome.Prompt** — the muted "where" segment of a `WindowChrome.Bar` prompt (e.g. the `@ovinnikov:~$` host/path portion, or a leading `$`/path prefix like `~/post/`). Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **WindowChrome.Tag** — the trailing uppercase pill on a `WindowChrome.Bar` (e.g. `popover`, `menu`, or a comment count), pushed to the end of the bar regardless of where it appears among the bar's other children. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ## Organisms
 
@@ -299,7 +276,7 @@ Slots:
 
 ### BookmarksList — `organisms/bookmarks-list/bookmarks-list.tsx`
 
-the `/bookmarks` page's terminal directory-listing body, styled as `ls -l` output: one row per saved post with an optional caller-supplied prefix glyph, a pre-formatted date, and the post rendered as a filename-styled link.
+renders a reader's saved posts as one row per bookmark, each with a date and a link to the post, or `emptyMessage` when there are none.
 Props: rows: IBookmarkRow[] · emptyMessage: string · hint?: string · prefix?: ReactNode · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 
 ### ContentModule — `organisms/content-module/content-module.tsx`

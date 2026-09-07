@@ -7,15 +7,13 @@ import { Toast } from './toast';
 
 faker.seed(123);
 
-const command = faker.hacker.noun();
-const state = faker.hacker.ingverb();
+const title = faker.word.noun();
 const message = faker.lorem.sentence();
 const dismissLabel = faker.lorem.words(2);
 
 const setup = customRender(Toast, {
   type: TOAST_TYPE.SUCCESS,
-  command,
-  state,
+  title,
   message,
   dismissLabel,
   onDismiss: vi.fn(),
@@ -23,12 +21,21 @@ const setup = customRender(Toast, {
 });
 
 describe(`<${Toast.name}/>`, () => {
-  it('renders the command, state, and message', () => {
+  it('renders the title and message', () => {
     setup();
-    expect(
-      screen.getByText((_, el) => el?.textContent === `${command} · ${state}`),
-    ).toBeVisible();
+    expect(screen.getByText(title)).toBeVisible();
     expect(screen.getByText(message)).toBeVisible();
+  });
+
+  it('renders the message alone when title is omitted', () => {
+    setup({ title: undefined });
+    expect(screen.getByText(message)).toBeVisible();
+  });
+
+  it('renders the type glyph using the Icon component, not a raw glyph span', () => {
+    setup();
+    expect(screen.getByTestId('toast-icon')).toBeInTheDocument();
+    expect(screen.queryByText('✓')).not.toBeInTheDocument();
   });
 
   it('renders as a polite status region for success/info/warning', () => {
@@ -95,11 +102,12 @@ describe(`<${Toast.name}/>`, () => {
     expect(screen.queryByTestId('toast-timer')).not.toBeInTheDocument();
   });
 
-  it('renders a decorative spinner when isLoading is true', () => {
+  it('renders a decorative spinner instead of the icon when isLoading is true', () => {
     setup({ isLoading: true });
     const spinner = screen.getByTestId('toast-spinner');
     expect(spinner).toBeVisible();
     expect(spinner).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.queryByTestId('toast-icon')).not.toBeInTheDocument();
   });
 
   it('exposes a single status region when isLoading is true, not a nested one from the spinner', () => {
@@ -110,107 +118,5 @@ describe(`<${Toast.name}/>`, () => {
   it('forwards data-testid to the root element', () => {
     setup({ dataTestId: 'toast' });
     expect(screen.getByTestId('toast')).toBeVisible();
-  });
-
-  describe('plain mode', () => {
-    it('renders the message but not the command/state chip', () => {
-      setup({ isPlain: true });
-      expect(screen.getByText(message)).toBeVisible();
-      expect(
-        screen.queryByText(
-          (_, el) => el?.textContent === `${command} · ${state}`,
-        ),
-      ).not.toBeInTheDocument();
-      expect(screen.queryByText(command)).not.toBeInTheDocument();
-      expect(screen.queryByText(state)).not.toBeInTheDocument();
-    });
-
-    it('still calls onDismiss when the dismiss button is clicked', async () => {
-      const onDismiss = vi.fn();
-      setup({ isPlain: true, onDismiss });
-      await userEvent.click(screen.getByRole('button', { name: dismissLabel }));
-      expect(onDismiss).toHaveBeenCalledTimes(1);
-    });
-
-    it('still renders the relative time when provided', () => {
-      setup({ isPlain: true, time: 'just now' });
-      expect(screen.getByText('just now')).toBeVisible();
-    });
-
-    it('still renders an action button and calls onAct when clicked', async () => {
-      const onAct = vi.fn();
-      const label = faker.word.verb();
-      setup({ isPlain: true, action: { label, onAct } });
-
-      const actionButton = screen.getByRole('button', { name: label });
-      await userEvent.click(actionButton);
-
-      expect(onAct).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe('title/message mode (no command)', () => {
-    it('renders the title and message but not the command/state chip', () => {
-      const title = faker.word.noun();
-      setup({ command: undefined, state: undefined, title });
-      expect(screen.getByText(title)).toBeVisible();
-      expect(screen.getByText(message)).toBeVisible();
-      expect(
-        screen.queryByText(
-          (_, el) => el?.textContent === `${command} · ${state}`,
-        ),
-      ).not.toBeInTheDocument();
-    });
-
-    it('renders the type glyph using the Icon component, not a raw glyph span', () => {
-      setup({ command: undefined, state: undefined, title: 'Saved' });
-      expect(screen.getByTestId('toast-icon')).toBeInTheDocument();
-      expect(screen.queryByText('✓')).not.toBeInTheDocument();
-    });
-
-    it('renders the message alone when title is omitted', () => {
-      setup({ command: undefined, state: undefined, title: undefined });
-      expect(screen.getByText(message)).toBeVisible();
-    });
-
-    it('renders a decorative spinner instead of the icon when isLoading is true', () => {
-      setup({
-        command: undefined,
-        state: undefined,
-        title: 'Saving',
-        isLoading: true,
-      });
-      const spinner = screen.getByTestId('toast-spinner');
-      expect(spinner).toBeVisible();
-      expect(screen.queryByTestId('toast-icon')).not.toBeInTheDocument();
-    });
-
-    it('still calls onDismiss when the dismiss button is clicked', async () => {
-      const onDismiss = vi.fn();
-      setup({
-        command: undefined,
-        state: undefined,
-        title: 'Saved',
-        onDismiss,
-      });
-      await userEvent.click(screen.getByRole('button', { name: dismissLabel }));
-      expect(onDismiss).toHaveBeenCalledTimes(1);
-    });
-
-    it('still renders an action button and calls onAct when clicked', async () => {
-      const onAct = vi.fn();
-      const label = faker.word.verb();
-      setup({
-        command: undefined,
-        state: undefined,
-        title: 'Saved',
-        action: { label, onAct },
-      });
-
-      const actionButton = screen.getByRole('button', { name: label });
-      await userEvent.click(actionButton);
-
-      expect(onAct).toHaveBeenCalledTimes(1);
-    });
   });
 });

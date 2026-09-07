@@ -128,7 +128,7 @@ src/atoms/theme-toggle/
     heading takes `level`, mirroring `Heading` itself (`PostCard.Title`). A
     component that merely _contains_ one among other content takes
     `headingLevel`, so the name says which of its parts it governs
-    (`TaxonomyCard`, `WindowChrome.Bar`). A component owning two heading
+    (`TaxonomyCard`, `Panel.Header`). A component owning two heading
     depths qualifies the subordinate one (`PostsSection.cardHeadingLevel`).
   - **Required in the library, optional at the app-facing edge.** Slot-level
     components take the level as a **required** prop, so composing one is a

@@ -1,7 +1,7 @@
 import { Avatar } from '@blog/ui/atoms/avatar';
 import { Button } from '@blog/ui/atoms/button';
 import { TextInput } from '@blog/ui/atoms/text-input';
-import { WindowChrome } from '@blog/ui/molecules/window-chrome';
+import { Panel } from '@blog/ui/molecules/panel';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
@@ -46,20 +46,13 @@ const WideControlDemo = () => {
   const [name, setName] = useState('Bartholomew Featherstonehaugh-Whitmore');
 
   return (
-    <WindowChrome>
-      <WindowChrome.Bar>
-        <WindowChrome.User>jane</WindowChrome.User>
-        <WindowChrome.Prompt>@janedoe:~$</WindowChrome.Prompt> account
-        --identity
-      </WindowChrome.Bar>
-      <WindowChrome.Body>
+    <Panel>
+      <Panel.Header headingLevel={2}>Account · Identity</Panel.Header>
+      <Panel.Body>
         <SettingRow
           label="Display name"
           description="Overrides your provider handle wherever your comments appear."
         >
-          {/* Mirrors a real avatar+input/save-button control so the content
-              column's max-width is exercised against the same flex-grow
-              chain. */}
           <div className="flex w-full flex-col gap-2 md:w-auto md:flex-row md:flex-wrap md:items-center">
             <div className="flex min-w-0 flex-1 items-center gap-2">
               <Avatar name={name} alt="" />
@@ -76,8 +69,8 @@ const WideControlDemo = () => {
             </Button>
           </div>
         </SettingRow>
-      </WindowChrome.Body>
-    </WindowChrome>
+      </Panel.Body>
+    </Panel>
   );
 };
 
@@ -109,13 +102,9 @@ export const Danger: TStory = {
 
 export const PrivacySection: TStory = {
   render: () => (
-    <WindowChrome>
-      <WindowChrome.Bar>
-        <WindowChrome.User>jane</WindowChrome.User>
-        <WindowChrome.Prompt>@janedoe:~$</WindowChrome.Prompt> account --privacy
-        <WindowChrome.Tag>data</WindowChrome.Tag>
-      </WindowChrome.Bar>
-      <WindowChrome.Body>
+    <Panel>
+      <Panel.Header headingLevel={2}>Account · Privacy</Panel.Header>
+      <Panel.Body>
         <SettingRow
           label="Export my data"
           description="Download your comments, ratings, bookmarks, subscription and profile as a single JSON archive."
@@ -137,7 +126,7 @@ export const PrivacySection: TStory = {
             delete account
           </Button>
         </SettingRow>
-      </WindowChrome.Body>
-    </WindowChrome>
+      </Panel.Body>
+    </Panel>
   ),
 };
