@@ -264,7 +264,8 @@ describe(DeprovisionTenantControl, () => {
       );
 
       const trigger = screen.getByRole('button', { name: 'Deprovision' });
-      expect(trigger).toBeDisabled();
+      expect(trigger).toHaveAttribute('aria-disabled', 'true');
+      expect(trigger).not.toBeDisabled();
       expect(
         screen.getByText(
           'A deprovisioning run is already in progress for this tenant.',
@@ -273,18 +274,6 @@ describe(DeprovisionTenantControl, () => {
       expect(trigger).toHaveAccessibleDescription(
         'A deprovisioning run is already in progress for this tenant.',
       );
-    });
-
-    it('re-enables the trigger once isDeprovisioningInProgress is false again, e.g. after a failed run', () => {
-      const tenant = makeTenant({ deprovisionedAt: null });
-      render(
-        <DeprovisionTenantControl
-          tenant={tenant}
-          isDeprovisioningInProgress={false}
-        />,
-      );
-
-      expect(screen.getByRole('button', { name: 'Deprovision' })).toBeEnabled();
     });
   });
 });

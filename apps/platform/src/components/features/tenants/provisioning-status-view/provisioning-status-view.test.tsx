@@ -621,6 +621,45 @@ describe(ProvisioningStatusView, () => {
     });
   });
 
+  it('mounts the overall status live region before Start is ever clicked, so the first status change is announced', async () => {
+    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    let resolveDispatch:
+      ((result: { outcome: 'dispatched' }) => void) | undefined;
+    retryProvisioningStepActionMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveDispatch = resolve;
+      }),
+    );
+    const user = userEvent.setup();
+    render(
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+    );
+
+    const runHeading = screen.getByRole('heading', { level: 2, name: 'Run' });
+    const runHeader = runHeading.parentElement?.parentElement as HTMLElement;
+    const liveRegionBefore = within(runHeader)
+      .getByText('Not started')
+      .closest('[aria-live="polite"]');
+    expect(liveRegionBefore).not.toBeNull();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Start provisioning' }),
+    );
+
+    // The live region present before the click is the same node now showing
+    // the transition — never one mounted at the same moment as this text,
+    // which some screen readers fail to announce.
+    const liveRegionAfter = within(runHeader)
+      .getByText('Running…')
+      .closest('[aria-live="polite"]');
+    expect(liveRegionAfter).toBe(liveRegionBefore);
+
+    await act(async () => {
+      resolveDispatch?.({ outcome: 'dispatched' });
+      await Promise.resolve();
+    });
+  });
+
   it('shows a distinguishable error and re-enables Start when the dispatch fails, reverting the optimistic running state', async () => {
     const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
     retryProvisioningStepActionMock.mockResolvedValue({
@@ -1540,7 +1579,7 @@ describe(ProvisioningStatusView, () => {
       expect(screen.queryByText(/\d{4}/)).not.toBeInTheDocument();
     });
 
-    it('renders no Run card for a tenant with no run', () => {
+    it('renders a Run card header with no run details for a tenant with no run', () => {
       const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
       render(
         <ProvisioningStatusView
@@ -1550,8 +1589,10 @@ describe(ProvisioningStatusView, () => {
       );
 
       expect(
-        screen.queryByRole('heading', { level: 2, name: 'Run' }),
-      ).not.toBeInTheDocument();
+        screen.getByRole('heading', { level: 2, name: 'Run' }),
+      ).toBeInTheDocument();
+      expect(screen.queryByText('Started')).not.toBeInTheDocument();
+      expect(screen.queryByText('Finished')).not.toBeInTheDocument();
     });
 
     it('renders a Run card with Started/Finished/Registry when the run exists, each showing relative and absolute UTC time together', () => {

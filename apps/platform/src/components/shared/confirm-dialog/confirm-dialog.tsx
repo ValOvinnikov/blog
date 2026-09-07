@@ -78,7 +78,7 @@ export const ConfirmDialog = ({
           <Button
             type="button"
             variant={tone}
-            isDisabled={isTriggerDisabled}
+            isAriaDisabled={isTriggerDisabled}
             aria-describedby={triggerAriaDescribedBy}
           />
         }

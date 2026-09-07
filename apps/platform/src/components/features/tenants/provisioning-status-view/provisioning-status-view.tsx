@@ -152,8 +152,6 @@ export const ProvisioningStatusView = ({
     </>
   );
 
-  const showOverallStatusRow = !allIdle || isProvisioningRunning;
-
   return (
     <div className={root()}>
       <PageHeader
@@ -235,15 +233,13 @@ export const ProvisioningStatusView = ({
         {provisioningRun ? (
           <RunCard run={provisioningRun} actions={runCardActions} />
         ) : (
-          showOverallStatusRow && (
-            <Card>
-              <Card.Header
-                title={t('runCardTitle')}
-                headingLevel={2}
-                actions={runCardActions}
-              />
-            </Card>
-          )
+          <Card>
+            <Card.Header
+              title={t('runCardTitle')}
+              headingLevel={2}
+              actions={runCardActions}
+            />
+          </Card>
         )}
       </div>
 

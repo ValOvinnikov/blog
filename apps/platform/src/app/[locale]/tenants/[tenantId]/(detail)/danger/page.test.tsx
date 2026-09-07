@@ -444,7 +444,8 @@ describe(TenantDangerPage, () => {
       await setup();
 
       const trigger = screen.getByRole('button', { name: 'Deprovision' });
-      expect(trigger).toBeDisabled();
+      expect(trigger).toHaveAttribute('aria-disabled', 'true');
+      expect(trigger).not.toBeDisabled();
       expect(
         screen.getByText(
           'A deprovisioning run is already in progress for this tenant.',
