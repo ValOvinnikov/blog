@@ -9,18 +9,9 @@ describe('showImagesField', () => {
     expect(field.initialValue).toBe(true);
   });
 
-  it('requires a value', () => {
+  it('defines no validation rule', () => {
     const field = showImagesField();
 
-    if (!field.validation) {
-      throw new Error('Expected showImagesField to define validation.');
-    }
-
-    const rule = { required: () => 'required-rule' };
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    const result = (field.validation as any)(rule);
-
-    expect(result).toBe('required-rule');
+    expect(field.validation).toBeUndefined();
   });
 });

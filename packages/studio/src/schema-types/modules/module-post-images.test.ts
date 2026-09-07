@@ -30,19 +30,16 @@ describe.each(modulesWithShowImages)(
       expect(field).toMatchObject({ type: 'boolean', initialValue: true });
     });
 
-    it('requires a value', () => {
+    it('defines no validation rule', () => {
       const field = getField(schema, 'showImages');
 
-      if (!field || !('validation' in field) || !field.validation) {
-        throw new Error('Expected showImages field to define validation.');
+      if (!field) {
+        throw new Error('Expected a showImages field.');
       }
 
-      const rule = { required: () => 'required-rule' };
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-      const result = (field.validation as any)(rule);
-
-      expect(result).toBe('required-rule');
+      expect(
+        'validation' in field ? field.validation : undefined,
+      ).toBeUndefined();
     });
 
     it('is emitted immediately after sectionHeader', () => {
