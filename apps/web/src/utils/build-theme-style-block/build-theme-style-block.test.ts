@@ -9,7 +9,6 @@ const CONSOLE_TOKENS: TThemeTokens = {
   bodyFont: 'NEWSREADER',
   radiusScale: 'MD',
   density: 'DEFAULT',
-  chromeOn: true,
 };
 
 describe('buildThemeStyleBlock', () => {
@@ -75,7 +74,6 @@ describe('buildThemeStyleBlock', () => {
       bodyFont: 'INTER',
       radiusScale: 'SM',
       density: 'COMPACT',
-      chromeOn: false,
     });
 
     expect(css).toContain('--brand-primary: oklch(0.53 0.17 28);');

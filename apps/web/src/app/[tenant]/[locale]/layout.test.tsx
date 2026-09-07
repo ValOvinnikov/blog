@@ -123,7 +123,6 @@ const THEME_TOKENS = {
   bodyFont: 'NEWSREADER',
   radiusScale: 'MD',
   density: 'DEFAULT',
-  chromeOn: true,
 };
 
 // `LocaleLayout` is an async Server Component — `customRenderAsync` awaits

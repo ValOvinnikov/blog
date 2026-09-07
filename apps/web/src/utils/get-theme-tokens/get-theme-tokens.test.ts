@@ -25,8 +25,8 @@ describe('getThemeTokens', () => {
 
     const tokens = await getThemeTokens();
 
-    expect(tokens.chromeOn).toBe(
-      PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens.chromeOn,
+    expect(tokens.logoHue).toBe(
+      PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens.accentHue,
     );
   });
 
@@ -59,7 +59,7 @@ describe('getThemeTokens', () => {
 
     expect(tokens).toEqual(
       expect.objectContaining({
-        chromeOn: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.chromeOn,
+        logoHue: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue,
       }),
     );
     expect(errorSpy).toHaveBeenCalledWith(
