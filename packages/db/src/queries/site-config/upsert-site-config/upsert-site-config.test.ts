@@ -471,21 +471,15 @@ describe('voice overrides — RICH fields accept a plain string', () => {
     const { id: tenantId } = await insertTestTenant(db);
     const overCap = 'x'.repeat(301);
 
-    const padded = expectFieldErrors(
+    const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
         voiceOverrides: { notFoundSupportingText: `  ${overCap}  ` },
       }),
     );
-    const unpadded = expectFieldErrors(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverrides: { notFoundSupportingText: overCap },
-      }),
-    );
 
-    expect(padded.fieldErrors.notFoundSupportingText).toBe(
-      unpadded.fieldErrors.notFoundSupportingText,
+    expect(result.fieldErrors.notFoundSupportingText).toBe(
+      'Must be 300 characters or fewer.',
     );
   });
 });
