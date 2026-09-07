@@ -17,8 +17,6 @@ export type TLookFormValues = {
   bodyFont: TFontChoice;
   radiusScale: TRadiusScale;
   density: TDensity;
-  /** Preview-only: `site_config` has no persisted column for this field yet. */
-  chromeOn: boolean;
   logoAssetUrl: string | undefined;
   faviconAssetUrl: string | undefined;
 };
@@ -39,17 +37,11 @@ export const defaultLookFormValues = (): TLookFormValues => {
     bodyFont: consoleTokens.bodyFont,
     radiusScale: consoleTokens.radiusScale,
     density: consoleTokens.density,
-    chromeOn: consoleTokens.chromeOn,
     logoAssetUrl: undefined,
     faviconAssetUrl: undefined,
   };
 };
 
-/**
- * `chromeOn` has no column on `site_config` — every load derives it fresh
- * from the saved preset's registry default rather than reading a stored
- * value, since none exists.
- */
 export const toLookFormValues = (
   siteConfig: TSiteConfigResult,
 ): TLookFormValues => {
@@ -61,7 +53,6 @@ export const toLookFormValues = (
     bodyFont: siteConfig.bodyFont,
     radiusScale: siteConfig.radiusScale,
     density: siteConfig.density,
-    chromeOn: PRESET_REGISTRY[siteConfig.preset].themeTokens.chromeOn,
     logoAssetUrl: siteConfig.logoAssetUrl,
     faviconAssetUrl: siteConfig.faviconAssetUrl,
   };

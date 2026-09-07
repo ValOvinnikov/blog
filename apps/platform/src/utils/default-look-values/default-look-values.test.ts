@@ -13,7 +13,6 @@ describe(defaultLookFormValues, () => {
       bodyFont: FONT_CHOICE.NEWSREADER,
       radiusScale: RADIUS_SCALE.MD,
       density: DENSITY.DEFAULT,
-      chromeOn: true,
       logoAssetUrl: undefined,
       faviconAssetUrl: undefined,
     });
@@ -47,30 +46,8 @@ describe(toLookFormValues, () => {
       bodyFont: FONT_CHOICE.INTER,
       radiusScale: RADIUS_SCALE.LG,
       density: DENSITY.COMPACT,
-      chromeOn: false,
       logoAssetUrl: 'https://example.blob.vercel-storage.com/logo.png',
       faviconAssetUrl: 'https://example.blob.vercel-storage.com/favicon.png',
     });
-  });
-
-  it("derives chromeOn from the stored preset's registry default, since no column stores it", () => {
-    const siteConfig: TSiteConfigResult = {
-      id: 'config-1',
-      tenantId: 'tenant-1',
-      preset: PRESET_ID.CONSOLE,
-      accentHue: 250,
-      logoHue: undefined,
-      headingFont: FONT_CHOICE.SPACE_GROTESK,
-      bodyFont: FONT_CHOICE.NEWSREADER,
-      radiusScale: RADIUS_SCALE.MD,
-      density: DENSITY.DEFAULT,
-      logoAssetUrl: undefined,
-      faviconAssetUrl: undefined,
-      voiceOverrides: {},
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    expect(toLookFormValues(siteConfig).chromeOn).toBe(true);
   });
 });
