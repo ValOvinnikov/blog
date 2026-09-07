@@ -74,11 +74,9 @@ const HeroRoot = ({
     ? contentAlignment
     : (contentAlignment ??
       (isBanner ? CONTENT_ALIGNMENT.LEFT : CONTENT_ALIGNMENT.CENTER));
-  // FIRST, not the shared field tail's own LAST default — keeps a caller
-  // that omits `mediaOrder` entirely on today's media-first mobile layout.
   const resolvedMediaOrder = isBanner
     ? undefined
-    : (mediaOrder ?? MEDIA_ORDER.FIRST);
+    : (mediaOrder ?? MEDIA_ORDER.LAST);
 
   const s = heroVariants({
     variant: resolvedVariant,

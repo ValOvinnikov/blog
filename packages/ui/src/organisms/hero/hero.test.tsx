@@ -98,7 +98,7 @@ describe(`<${Hero.name}/>`, () => {
     expect(screen.getByTestId('featured-hero')).toBeVisible();
   });
 
-  it('renders byte-identical output for a caller that sets none of the layout props', () => {
+  it('defaults mediaOrder to LAST for a caller that sets none of the layout props', () => {
     renderElement(
       <Hero title="Building a Design System" titleId="hero-title">
         <Hero.Media>
@@ -108,7 +108,8 @@ describe(`<${Hero.name}/>`, () => {
     );
 
     const media = screen.getByTestId('hero-media');
-    expect(media).toHaveClass('order-first', 'lg:order-none');
+    expect(media).not.toHaveClass('order-first');
+    expect(media).not.toHaveClass('lg:order-none');
   });
 
   it('keeps copy before media in the DOM at the mobile-collapsed order (mediaOrder FIRST)', () => {
