@@ -917,6 +917,15 @@ once module_heroBlog replaces it on production` — `prio:later`, blocked on
 - **Design sub-issue** · field name and default (`showImages`, default on),
   image crop/aspect for cards, whether `module_postList` (paginated archive)
   gets the same toggle (proposed: yes, same helper).
+- **Answered 2026-09-07** (#2816, design section in the portfolio design
+  doc): `showImages` via one `showImagesField()` helper on both listing
+  modules, default on, projected as `coalesce(showImages, true)` so existing
+  documents need no migration; `TPostCard` unchanged, the service exposes only
+  the flag; `PostsSection` gains `hasImages` + a pre-rendered `image` node per
+  card and renders the media frame on every card when on; one web
+  `renderPostCardImage` helper (640×360, grid-breakpoint `sizes`, lazy, never
+  `priority`) passed to `toPostListItems` as an optional callback; the post
+  page's related reading always shows images since no module owns it.
 - **Sub-issues:**
   - **studio** · `feat(studio): showImages on module_postLatest and
 module_postList`.
@@ -1091,6 +1100,5 @@ visible to a tenant on day one.
 
 Renaming `module_hero` in place (immutable `_type`; retirement is the path);
 a CRM for leads; per-module visuals beyond tokens and the shared styling
-helpers; carousel autoplay; a hero on `page_post` / taxonomy pages (their
-required slots already own the page top); site-wide announcement bar
+helpers; carousel autoplay; a hero on `page_post` (its own header owns the page top; topic and tag pages did gain an optional hero in Phase 0); site-wide announcement bar
 (belongs on `settings_site`, tracked separately if wanted).

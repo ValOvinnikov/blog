@@ -559,6 +559,157 @@ carrying the old document's values, repoint `page_home.hero`, then delete the
 `module_hero` document, in that order and as separate steps, because a Sanity
 `_type` is immutable.
 
+## Post grid images and the `showImages` toggle
+
+**Goal:** the post grid shows each post's image, on every surface that
+renders it, with one switch per listing module to turn images off. Today
+the grid renders no image at all: `PostsSection`'s `IPostCardData` has no
+image field, even though `PostCard` has carried a `Media` slot since it was
+built and the service already projects every post card's hero image. Most of
+this is wiring, not data. Design of record for epic #2782, settled in #2816.
+
+Interactive mock — switch surface, toggle, dataset gaps and viewport:
+<https://claude.ai/code/artifact/0723b862-08b2-41f4-b4bd-cb917cba7cad>.
+
+### Where the toggle lives
+
+| Surface                              | Renders through         | Toggle    | Why                                                                      |
+| ------------------------------------ | ----------------------- | --------- | ------------------------------------------------------------------------ |
+| Home and landing pages, latest posts | `module_postLatest`     | **Yes**   | Per instance — a dense home page may want a text-only teaser             |
+| Blog, topic and tag archives         | `module_postList`       | **Yes**   | The archive is a module too; same helper, same default                   |
+| Post page, related reading           | `PostsSection` directly | Always on | No module document exists to author a setting on, so the default applies |
+
+The ticket asked how "archive pages that render `PostsSection` outside a
+module" pass the image. They do not exist: the blog, topic and tag pages all
+render their list through `module_postList` in their required slot, so the
+toggle reaches them. The only grid outside a module is the post page's
+related-reading section, and that gets images unconditionally.
+
+### Fields
+
+One helper, `showImagesField()`, emitted by both listing modules right after
+`sectionHeaderField()`:
+
+| Field        | Type                                    | Notes                                            |
+| ------------ | --------------------------------------- | ------------------------------------------------ |
+| `showImages` | boolean, `initialValue: true`, required | "Show each post's image on its card." Default on |
+
+`showImages` rather than `hasImages` on the schema, matching the existing
+verb-phrase booleans (`openInNewTab`, `newsletterEnabled`); the organism prop
+is `hasImages`, matching the repo's `is`/`has` rule for React booleans.
+
+**Existing documents read as on.** Sanity's `initialValue` fills new
+documents only; every `module_postLatest` and `module_postList` already in a
+tenant dataset has no `showImages`. The service projects
+`coalesce(showImages, true)` rather than the bare field, so those documents
+behave as if the field had always been there. That is the schema's declared
+default applied at read time, not a faked value in the view model, and it is
+what makes this ship with **no content migration**. A bare `.notNull()` on
+the raw field would instead throw on every pre-existing document and 404
+its page.
+
+### Service
+
+Both module view models gain one field:
+
+```ts
+type TPostLatestModule = { …; showImages: boolean };
+type TPostListModule = { …; showImages: boolean };
+```
+
+`TPostCard` is **unchanged**. It already carries `heroImageSanity:
+TMaybeUndefined<ISanityImage>` with hotspot, crop, LQIP and alt, and the
+related-posts list on the post page is a `TPostCard[]` too. The service does
+not strip the image when the toggle is off: the flag says how the module
+wants to render, the card says what the post has, and the web layer combines
+them. Stripping data to express a presentation choice would also break the
+related-reading surface, which has no flag.
+
+### `@blog/ui`
+
+`PostsSection` gains `hasImages?: boolean`. `IPostCardData` gains
+`image?: ReactNode`. When `hasImages` is set, **every** card renders
+`PostCard.Media` — the node when there is one, the empty frame when there is
+not. `PostCard.Media` is already `aspect-video` with a `bg-surface-2` fill,
+so a post without an image keeps its tinted 16:9 block and the row stays
+aligned rather than going ragged because one editor forgot an image. When
+`hasImages` is unset, no card has a media region at all.
+
+The organism never builds an image. It receives a pre-rendered node per
+card, the same contract `CtaModule` uses for its `image` prop.
+
+### Web
+
+One helper owns the card image, so every surface sizes it identically:
+
+```tsx
+const renderPostCardImage = (post: TPostCard) =>
+  post.heroImageSanity ? (
+    <SanityImage
+      image={post.heroImageSanity}
+      width={640}
+      height={360}
+      sizes="(min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw"
+      loading="lazy"
+      className="size-full object-cover"
+    />
+  ) : undefined;
+```
+
+- `640 × 360` is the 16:9 frame at a comfortable density for a third-width
+  column; `sizes` follows the grid's own breakpoints (`grid-cols-1
+sm:grid-cols-2 md:grid-cols-3`).
+- **`loading="lazy"`, never `priority`.** The hero owns the page's LCP
+  image, and `SanityImage`'s `priority` withholds the LQIP placeholder and
+  hints `fetchPriority="high"`; a grid of six cards must not compete for
+  that.
+- `alt` comes from the asset via `ISanityImage.alt`; nothing is invented.
+
+`toPostListItems(posts, renderImage?)` takes the helper as an optional
+callback and sets `image` on each item when given. The two module components
+pass it when `showImages` is on; the post page's related-reading call always
+passes it. `PostListModuleView` forwards `hasImages` to `PostsSection`.
+
+### Validation
+
+None. A required boolean with an initial value cannot be invalid.
+
+### Migration
+
+None. One additive field, defaulted at read time for existing documents.
+
+### Per-layer scope
+
+- **studio** — `showImagesField()` helper; both listing modules emit it;
+  schema tests; `pnpm typegen`, commit generated types.
+- **service** — `coalesce(showImages, true)` projection and `showImages` on
+  both module view models; transformer tests for present-true,
+  present-false and absent. `TPostCard` untouched.
+- **ui** — `hasImages` prop and `image` node; stories with images, without,
+  and mixed; a test that every card renders `PostCard.Media` when
+  `hasImages` is set, including cards with no node; `COMPONENTS.md`
+  regenerated.
+- **web** — `renderPostCardImage`; `toPostListItems` callback; the two
+  module components and the post page pass it; `PostListModuleView` forwards
+  `hasImages`. Lighthouse image audits unchanged, since every request
+  carries explicit dimensions and `sizes`.
+
+**Acceptance:** grids show each post's image by default on home, landing,
+blog, topic and tag pages and in related reading; the toggle hides them per
+module instance; a pre-existing module document with no `showImages`
+renders with images; a post with no image keeps its frame when the toggle
+is on; no grid image carries `priority`.
+
+### Not in scope
+
+- A site-wide default in `settings_site` — two places to set one thing; the
+  per-instance field with a default is the whole feature.
+- Alternate crops per module — 16:9 is the card's frame; a different ratio
+  is a different card, not a setting.
+- Images on author or topic cards — different molecules.
+- The carousel (1.4) reuses this exact card, so it inherits images and the
+  toggle with no work of its own.
+
 ## Contact form / lead capture
 
 **Goal:** the module clients most want — and the only one in the catalogue
@@ -699,6 +850,13 @@ point; the graph stays acyclic.
 - **Contact form is store + notify only, v1** — no CRM/inbox UI, mirrors the
   newsletter boundary — and is a tenant-toggleable, plan-entitled
   capability like the newsletter (2026-09-06).
+- **Post grid images are a per-module `showImages` boolean, default on,
+  defaulted at read time** — `coalesce(showImages, true)` in the projection
+  so pre-existing documents need no migration; the service keeps the image
+  on every post card and exposes only the flag; the organism renders the
+  media frame on every card when images are on, so a post without one keeps
+  the row aligned; one web helper sizes the image, lazy and never `priority`
+  (2026-09-07, #2816).
 - **`module_heroBlog` replaces `module_hero` by addition, not migration** —
   mode pairs become optional overrides whose Studio placeholder shows the
   derived value; the newest-featured fallback becomes an explicit
@@ -729,6 +887,8 @@ point; the graph stays acyclic.
 - **Module catalogue** — one tracking epic (#1919 itself, or a dedicated
   sub-epic if the catalogue outgrows a flat issue list); each module is a
   single issue under it.
+- **Post grid images** — epic #2782 (design #2816, then `studio → service →
+ui → web`); the featured spotlight (#2784) and carousel (#2785) wait on it.
 - **`module_heroBlog`** — epic #2780 (design #2802, then `studio → service →
 ui → web → db`), plus the retirement chore #2813 once production is moved.
 - **Hero family & generic home page** — epic #2778 under `M9 — Portfolio`
@@ -751,6 +911,10 @@ catalogue has enough shipped history to matter).
 
 ## Resync log
 
+- **2026-09-07** — added the "Post grid images and the `showImages` toggle"
+  design section (#2816): where the toggle lives, the read-time default for
+  pre-existing documents, the unchanged post card, the organism's frame-on-
+  every-card rule and the single web image helper.
 - **2026-09-07** — corrected two claims this doc made about where constants
   land, after checking them against `main` while implementing #2780.
   `HERO_VARIANT` does **not** ship with `defineHeroFields()`: it landed early,
