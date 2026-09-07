@@ -1,5 +1,6 @@
+import { sanitizeHref } from '@blog/utils';
+
 import { escapeHtml } from './escape-html';
-import { sanitizeHref } from './sanitize-href';
 
 type TEmailPalette = {
   surface: string;

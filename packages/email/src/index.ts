@@ -5,7 +5,6 @@ export {
   type TEmailActionBrand,
   buildOperatorShell,
   type TBuildOperatorShellInput,
-  sanitizeHref,
   buildTenantShell,
   type TBuildTenantShellInput,
   type TTenantEmailBrand,
