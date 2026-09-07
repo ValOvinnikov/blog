@@ -8,13 +8,6 @@ export const CTA_VARIANT = {
 
 export type TCtaVariant = TValueOf<typeof CTA_VARIANT>;
 
-export const CTA_MOBILE_MEDIA_ORDER = {
-  LAST: 'LAST',
-  FIRST: 'FIRST',
-} as const;
-
-export type TCtaMobileMediaOrder = TValueOf<typeof CTA_MOBILE_MEDIA_ORDER>;
-
 export const CTA_ACTION_APPEARANCE = {
   CONTAINED: 'CONTAINED',
   INLINE: 'INLINE',

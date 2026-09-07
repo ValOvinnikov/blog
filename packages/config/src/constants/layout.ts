@@ -57,3 +57,10 @@ export type TSectionHeader = {
   heading?: string;
   supportingText?: string;
 };
+
+export const MOBILE_MEDIA_ORDER = {
+  LAST: 'LAST',
+  FIRST: 'FIRST',
+} as const;
+
+export type TMobileMediaOrder = TValueOf<typeof MOBILE_MEDIA_ORDER>;
