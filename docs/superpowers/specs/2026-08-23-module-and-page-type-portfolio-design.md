@@ -751,6 +751,18 @@ catalogue has enough shipped history to matter).
 
 ## Resync log
 
+- **2026-09-07** — corrected two claims this doc made about where constants
+  land, after checking them against `main` while implementing #2780.
+  `HERO_VARIANT` does **not** ship with `defineHeroFields()`: it landed early,
+  with #2794 (`packages/config/src/constants/module.ts`), so
+  `module_heroBlog` consumes it rather than introducing it. And `MEDIA_ORDER`
+  does not exist — #2794 renamed `CTA_MOBILE_MEDIA_ORDER` to
+  `MOBILE_MEDIA_ORDER`, not to `MEDIA_ORDER`. The doc's name and its
+  every-width rationale are the ones being kept: the rename to `MEDIA_ORDER`
+  is done in #2807, alongside the organism work that first needs it.
+  `module_heroBlog` also cannot ship as one PR per layer — `HERO_MAP` and
+  `REVALIDATE_TAGS` are exhaustive over the schema-derived module unions, so
+  the studio, service and web sub-issues share a PR; see #2780 for the stack.
 - **2026-09-07** — added the "`module_heroBlog`" design section (#2802) and
   corrected the shared tail's media-order row: two variant-scoped fields
   (`mediaOrderSplit`, `mediaOrderStacked`) collapsing to one `mediaOrder`

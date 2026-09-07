@@ -288,8 +288,8 @@ Variants: wrapped: (boolean)
 ### CtaModule — `organisms/cta-module/cta-module.tsx`
 
 page-builder organism rendering a call-to-action in one of three layouts.
-Props: variant: TCtaVariant · tone: TBrandVariant · eyebrow?: string · heading: string · headingId?: string · supportingText?: string · content?: ReactNode · image?: ReactNode · actions?: ReactNode · footnote?: string · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mobileMediaOrder?: TMobileMediaOrder · isWrapped?: TCtaModuleVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
-Variants: variant: CTA_VARIANT.BANNER|CTA_VARIANT.SPLIT|CTA_VARIANT.CALLOUT · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mobileMediaOrder: MOBILE_MEDIA_ORDER.FIRST|MOBILE_MEDIA_ORDER.LAST · wrapped: (boolean)
+Props: variant: TCtaVariant · tone: TBrandVariant · eyebrow?: string · heading: string · headingId?: string · supportingText?: string · content?: ReactNode · image?: ReactNode · actions?: ReactNode · footnote?: string · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mobileMediaOrder?: TMediaOrder · isWrapped?: TCtaModuleVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
+Variants: variant: CTA_VARIANT.BANNER|CTA_VARIANT.SPLIT|CTA_VARIANT.CALLOUT · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mobileMediaOrder: MEDIA_ORDER.FIRST|MEDIA_ORDER.LAST · wrapped: (boolean)
 
 ### Footer — `organisms/footer/footer.tsx`
 
@@ -314,13 +314,13 @@ Slots:
 
 ### Hero — `organisms/hero/hero.tsx`
 
-the page-top hero band: renders `title` as an `<h1>` with optional `eyebrow` and `excerpt`, plus `Hero.Cta` and `Hero.Media` slots.
-Props: title: string · titleId: string · eyebrow?: string · excerpt?: string · children?: TCompoundChildren<typeof HeroParts> _(extends IWithClassName, IWithDataTestId)_
-Variants: hasMedia: (boolean)
+the page-top hero band shared by every hero kind: renders `title` as an `<h1>` with optional `eyebrow`/`excerpt`, plus `Hero.Cta` and `Hero.Media` slots.
+Props: title: string · titleId: string · eyebrow?: string · excerpt?: string · variant?: THeroVariant · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mediaOrder?: TMediaOrder · children?: TCompoundChildren<typeof HeroParts> _(extends IWithClassName, IWithDataTestId)_
+Variants: variant: HERO_VARIANT.SPLIT|HERO_VARIANT.STACKED|HERO_VARIANT.BANNER · hasMedia: (boolean) · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mediaOrder: MEDIA_ORDER.FIRST|MEDIA_ORDER.LAST
 
 Slots:
 
-- **Hero.Media** — the media slot of a `Hero`; frames its content at a 16:9 ratio via `MediaFrame`. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Hero.Media** — the media slot of a `Hero`; frames its content at a 16:9 ratio via `MediaFrame`. Props: isFramed?: boolean · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **Hero.Cta** — the call-to-action slot of a `Hero`; a styled `<div>` for the hero's buttons or links. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### NewsletterSignup — `organisms/newsletter-signup/newsletter-signup.tsx`

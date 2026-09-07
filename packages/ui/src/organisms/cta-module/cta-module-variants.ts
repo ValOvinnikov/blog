@@ -2,7 +2,7 @@ import {
   BRAND_VARIANT,
   CONTENT_ALIGNMENT,
   CTA_VARIANT,
-  MOBILE_MEDIA_ORDER,
+  MEDIA_ORDER,
 } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
@@ -90,8 +90,8 @@ export const ctaModuleVariants = tv({
       },
     },
     mobileMediaOrder: {
-      [MOBILE_MEDIA_ORDER.FIRST]: { media: ['order-first md:order-none'] },
-      [MOBILE_MEDIA_ORDER.LAST]: {},
+      [MEDIA_ORDER.FIRST]: { media: ['order-first md:order-none'] },
+      [MEDIA_ORDER.LAST]: {},
     },
     wrapped: {
       true: { root: ['mt-0'] },

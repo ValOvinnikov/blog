@@ -1,4 +1,13 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import {
+  CONTENT_ALIGNMENT,
+  HERO_VARIANT,
+  MEDIA_ORDER,
+  type IWithClassName,
+  type IWithDataTestId,
+  type TContentAlignment,
+  type THeroVariant,
+  type TMediaOrder,
+} from '@blog/config';
 import { Eyebrow } from '@blog/ui/atoms/eyebrow';
 import { Heading } from '@blog/ui/atoms/heading';
 import { Text } from '@blog/ui/atoms/text';
@@ -7,10 +16,15 @@ import {
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@blog/ui/lib/react';
-import { Fragment, type ElementType } from 'react';
+import {
+  cloneElement,
+  Fragment,
+  type ElementType,
+  type ReactElement,
+} from 'react';
 
 import { HeroCta } from './components/cta/hero-cta';
-import { HeroMedia } from './components/media/hero-media';
+import { HeroMedia, type THeroMediaProps } from './components/media/hero-media';
 import { heroVariants } from './hero-variants';
 
 const HeroParts = {
@@ -24,25 +38,58 @@ export type THeroProps = IWithClassName &
     titleId: string;
     eyebrow?: string;
     excerpt?: string;
+    /** The hero's layout shape — the same three shapes `CtaModule` uses. */
+    variant?: THeroVariant;
+    /** Where the copy column sits relative to the media. Split uses LEFT/RIGHT; Banner uses all three; Stacked has no split axis, so it has no effect there. */
+    contentPosition?: TContentAlignment;
+    /** How text aligns within the copy column, on every variant. */
+    contentAlignment?: TContentAlignment;
+    /** Split applies this below the two-column breakpoint; Stacked at every width; Banner ignores it — its image is the background. */
+    mediaOrder?: TMediaOrder;
     children?: TCompoundChildren<typeof HeroParts>;
   };
 
 /**
- * Hero — the page-top hero band: renders `title` as an `<h1>` with optional
- * `eyebrow` and `excerpt`, plus `Hero.Cta` and `Hero.Media` slots. Switches to
- * a two-column layout when a `Hero.Media` slot is present.
+ * Hero — the page-top hero band shared by every hero kind: renders `title` as
+ * an `<h1>` with optional `eyebrow`/`excerpt`, plus `Hero.Cta` and `Hero.Media`
+ * slots. DOM order is always copy before media — `contentPosition` and
+ * `mediaOrder` only move things visually, via CSS.
  */
 const HeroRoot = ({
   title,
   titleId,
   eyebrow,
   excerpt,
+  variant,
+  contentPosition,
+  contentAlignment,
+  mediaOrder,
   children,
   className,
   dataTestId,
 }: THeroProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, HeroParts);
-  const s = heroVariants({ hasMedia: Boolean(slots.Media) });
+  const hasMedia = Boolean(slots.Media);
+  const resolvedVariant = variant ?? HERO_VARIANT.SPLIT;
+  const isSplit = resolvedVariant === HERO_VARIANT.SPLIT;
+  const isBanner = resolvedVariant === HERO_VARIANT.BANNER;
+
+  const resolvedPosition = contentPosition ?? CONTENT_ALIGNMENT.LEFT;
+  const resolvedAlignment = isSplit
+    ? contentAlignment
+    : (contentAlignment ??
+      (isBanner ? CONTENT_ALIGNMENT.LEFT : CONTENT_ALIGNMENT.CENTER));
+  const resolvedMediaOrder = isBanner
+    ? undefined
+    : (mediaOrder ?? MEDIA_ORDER.LAST);
+
+  const s = heroVariants({
+    variant: resolvedVariant,
+    hasMedia,
+    position: resolvedPosition,
+    alignment: resolvedAlignment,
+    mediaOrder: resolvedMediaOrder,
+  });
 
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>
@@ -61,7 +108,15 @@ const HeroRoot = ({
           )}
           {slots.Cta}
         </div>
-        {slots.Media}
+        {slots.Media && (
+          <div className={s.media()} data-testid="hero-media">
+            {isBanner
+              ? cloneElement(slots.Media as ReactElement<THeroMediaProps>, {
+                  isFramed: false,
+                })
+              : slots.Media}
+          </div>
+        )}
       </div>
 
       {unmatched.map((node, i) => (

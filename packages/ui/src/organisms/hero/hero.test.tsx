@@ -1,3 +1,4 @@
+import { CONTENT_ALIGNMENT, HERO_VARIANT, MEDIA_ORDER } from '@blog/config';
 import {
   customRender,
   renderElement,
@@ -95,5 +96,213 @@ describe(`<${Hero.name}/>`, () => {
   it('forwards data-testid to the root element', () => {
     setup({ dataTestId: 'featured-hero' });
     expect(screen.getByTestId('featured-hero')).toBeVisible();
+  });
+
+  it('defaults mediaOrder to LAST for a caller that sets none of the layout props', () => {
+    renderElement(
+      <Hero title="Building a Design System" titleId="hero-title">
+        <Hero.Media>
+          <img src="/img/hero.jpg" alt="Hero cover photo" />
+        </Hero.Media>
+      </Hero>,
+    );
+
+    const media = screen.getByTestId('hero-media');
+    expect(media).not.toHaveClass('order-first');
+    expect(media).not.toHaveClass('lg:order-none');
+  });
+
+  it('keeps copy before media in the DOM at the mobile-collapsed order (mediaOrder FIRST)', () => {
+    renderElement(
+      <Hero
+        title="Building a Design System"
+        titleId="hero-title"
+        variant={HERO_VARIANT.SPLIT}
+        mediaOrder={MEDIA_ORDER.FIRST}
+      >
+        <Hero.Media>
+          <img src="/img/hero.jpg" alt="Hero cover photo" />
+        </Hero.Media>
+      </Hero>,
+    );
+
+    const heading = screen.getByRole('heading');
+    const media = screen.getByTestId('hero-media');
+
+    expect(
+      heading.compareDocumentPosition(media) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it('keeps copy before media in the DOM at the two-column order (contentPosition RIGHT)', () => {
+    renderElement(
+      <Hero
+        title="Building a Design System"
+        titleId="hero-title"
+        variant={HERO_VARIANT.SPLIT}
+        contentPosition={CONTENT_ALIGNMENT.RIGHT}
+      >
+        <Hero.Media>
+          <img src="/img/hero.jpg" alt="Hero cover photo" />
+        </Hero.Media>
+      </Hero>,
+    );
+
+    const heading = screen.getByRole('heading');
+    const media = screen.getByTestId('hero-media');
+
+    expect(
+      heading.compareDocumentPosition(media) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it('keeps copy before media in the DOM on Banner, even though the media is a background', () => {
+    renderElement(
+      <Hero
+        title="Building a Design System"
+        titleId="hero-title"
+        variant={HERO_VARIANT.BANNER}
+      >
+        <Hero.Media>
+          <img src="/img/hero.jpg" alt="Hero cover photo" />
+        </Hero.Media>
+      </Hero>,
+    );
+
+    const heading = screen.getByRole('heading');
+    const media = screen.getByTestId('hero-media');
+
+    expect(
+      heading.compareDocumentPosition(media) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it('applies the two-column swap on Split independently of text alignment', () => {
+    renderElement(
+      <Hero
+        title="Building a Design System"
+        titleId="hero-title"
+        variant={HERO_VARIANT.SPLIT}
+        contentPosition={CONTENT_ALIGNMENT.RIGHT}
+        contentAlignment={CONTENT_ALIGNMENT.LEFT}
+      >
+        <Hero.Media>
+          <img src="/img/hero.jpg" alt="Hero cover photo" />
+        </Hero.Media>
+      </Hero>,
+    );
+
+    const copyColumn = screen.getByTestId('hero-copy');
+
+    expect(copyColumn).toHaveClass('lg:order-2');
+    expect(copyColumn).toHaveClass('text-left');
+    expect(copyColumn).not.toHaveClass('text-right');
+  });
+
+  it('applies STACKED media order at every width, not just below a breakpoint', () => {
+    renderElement(
+      <Hero
+        title="Building a Design System"
+        titleId="hero-title"
+        variant={HERO_VARIANT.STACKED}
+        mediaOrder={MEDIA_ORDER.FIRST}
+      >
+        <Hero.Media>
+          <img src="/img/hero.jpg" alt="Hero cover photo" />
+        </Hero.Media>
+      </Hero>,
+    );
+
+    const media = screen.getByTestId('hero-media');
+
+    expect(media).toHaveClass('order-first');
+    expect(media).not.toHaveClass('lg:order-none');
+  });
+
+  it('ignores mediaOrder on Banner — its media is a background, not a reordered sibling', () => {
+    renderElement(
+      <Hero
+        title="Building a Design System"
+        titleId="hero-title"
+        variant={HERO_VARIANT.BANNER}
+        mediaOrder={MEDIA_ORDER.FIRST}
+      >
+        <Hero.Media>
+          <img src="/img/hero.jpg" alt="Hero cover photo" />
+        </Hero.Media>
+      </Hero>,
+    );
+
+    const media = screen.getByTestId('hero-media');
+
+    expect(media).not.toHaveClass('order-first');
+    expect(media).toHaveClass('absolute', 'inset-0');
+  });
+
+  it('keeps Split and Stacked media framed by MediaFrame', () => {
+    for (const variant of [HERO_VARIANT.SPLIT, HERO_VARIANT.STACKED]) {
+      const { unmount } = renderElement(
+        <Hero
+          title="Building a Design System"
+          titleId="hero-title"
+          variant={variant}
+        >
+          <Hero.Media>
+            <img src="/img/hero.jpg" alt="Hero cover photo" />
+          </Hero.Media>
+        </Hero>,
+      );
+
+      const wrapper = screen.getByTestId('hero-media');
+      const image = screen.getByAltText('Hero cover photo');
+
+      expect(image.parentElement).not.toBe(wrapper);
+      expect(image.parentElement).toHaveClass(
+        'rounded-lg',
+        'border',
+        'bg-surface-2',
+      );
+
+      unmount();
+    }
+  });
+
+  it('renders Banner media unframed and edge-to-edge, with no MediaFrame chrome', () => {
+    renderElement(
+      <Hero
+        title="Building a Design System"
+        titleId="hero-title"
+        variant={HERO_VARIANT.BANNER}
+      >
+        <Hero.Media>
+          <img src="/img/hero.jpg" alt="Hero cover photo" />
+        </Hero.Media>
+      </Hero>,
+    );
+
+    const wrapper = screen.getByTestId('hero-media');
+    const image = screen.getByAltText('Hero cover photo');
+
+    expect(image.parentElement).toBe(wrapper);
+    expect(wrapper).not.toHaveClass('rounded-lg', 'border', 'bg-surface-2');
+    expect(wrapper).toHaveClass('absolute', 'inset-0');
+  });
+
+  it('renders all three variants without throwing', () => {
+    for (const variant of Object.values(HERO_VARIANT)) {
+      const { unmount } = renderElement(
+        <Hero
+          title="Building a Design System"
+          titleId="hero-title"
+          variant={variant}
+        >
+          <Hero.Media>
+            <img src="/img/hero.jpg" alt="Hero cover photo" />
+          </Hero.Media>
+        </Hero>,
+      );
+      expect(screen.getByRole('heading')).toBeVisible();
+      unmount();
+    }
   });
 });

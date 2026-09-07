@@ -1,13 +1,34 @@
+import { CONTENT_ALIGNMENT, HERO_VARIANT, MEDIA_ORDER } from '@blog/config';
+import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { NavLink } from '../../atoms/nav-link';
 
 import { Hero } from './hero';
+import { heroVariants } from './hero-variants';
 
 const meta = {
   title: 'Organisms/Hero',
   component: Hero,
   tags: ['autodocs'],
+  argTypes: {
+    variant: {
+      control: 'select',
+      options: objectKeys(heroVariants.variants.variant),
+    },
+    contentPosition: {
+      control: 'select',
+      options: objectKeys(heroVariants.variants.position),
+    },
+    contentAlignment: {
+      control: 'select',
+      options: objectKeys(heroVariants.variants.alignment),
+    },
+    mediaOrder: {
+      control: 'select',
+      options: objectKeys(heroVariants.variants.mediaOrder),
+    },
+  },
   args: {
     eyebrow: 'Architecture',
     title: 'Building a Design System from Scratch',
@@ -20,6 +41,7 @@ const meta = {
           <img
             src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&h=675&fit=crop"
             alt="Code editor showing component code"
+            className="size-full object-cover"
           />
         </Hero.Media>
         <Hero.Cta>
@@ -63,5 +85,77 @@ export const WithoutImage: TStory = {
         <NavLink href="/posts/design-system">Read more</NavLink>
       </Hero.Cta>
     ),
+  },
+};
+
+export const SplitContentLeft: TStory = {
+  args: {
+    variant: HERO_VARIANT.SPLIT,
+    contentPosition: CONTENT_ALIGNMENT.LEFT,
+  },
+};
+
+export const SplitContentRight: TStory = {
+  args: {
+    variant: HERO_VARIANT.SPLIT,
+    contentPosition: CONTENT_ALIGNMENT.RIGHT,
+  },
+};
+
+export const StackedDefault: TStory = {
+  args: {
+    variant: HERO_VARIANT.STACKED,
+  },
+};
+
+export const BannerContentLeft: TStory = {
+  args: {
+    variant: HERO_VARIANT.BANNER,
+    contentPosition: CONTENT_ALIGNMENT.LEFT,
+    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+  },
+};
+
+export const BannerContentCenter: TStory = {
+  args: {
+    variant: HERO_VARIANT.BANNER,
+    contentPosition: CONTENT_ALIGNMENT.CENTER,
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+  },
+};
+
+export const BannerContentRight: TStory = {
+  args: {
+    variant: HERO_VARIANT.BANNER,
+    contentPosition: CONTENT_ALIGNMENT.RIGHT,
+    contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+  },
+};
+
+export const SplitMediaOrderFirst: TStory = {
+  args: {
+    variant: HERO_VARIANT.SPLIT,
+    mediaOrder: MEDIA_ORDER.FIRST,
+  },
+};
+
+export const SplitMediaOrderLast: TStory = {
+  args: {
+    variant: HERO_VARIANT.SPLIT,
+    mediaOrder: MEDIA_ORDER.LAST,
+  },
+};
+
+export const StackedMediaOrderFirst: TStory = {
+  args: {
+    variant: HERO_VARIANT.STACKED,
+    mediaOrder: MEDIA_ORDER.FIRST,
+  },
+};
+
+export const StackedMediaOrderLast: TStory = {
+  args: {
+    variant: HERO_VARIANT.STACKED,
+    mediaOrder: MEDIA_ORDER.LAST,
   },
 };

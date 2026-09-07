@@ -3,7 +3,7 @@ import {
   CONTENT_ALIGNMENT,
   CTA_VARIANT,
   FULL_BRAND_VARIANT_LIST,
-  MOBILE_MEDIA_ORDER,
+  MEDIA_ORDER,
   type TCtaVariant,
 } from '@blog/config/constants';
 import { actionGroupField } from '@blog/studio/schema-types/helpers/action-group-field';
@@ -154,12 +154,12 @@ export const ctaSchema = defineType({
       type: 'string',
       options: {
         layout: 'radio',
-        list: Object.values(MOBILE_MEDIA_ORDER).map((value) => ({
+        list: Object.values(MEDIA_ORDER).map((value) => ({
           title: toTitleCase(value),
           value,
         })),
       },
-      initialValue: MOBILE_MEDIA_ORDER.LAST,
+      initialValue: MEDIA_ORDER.LAST,
       hidden: isNotSplitVariant,
     }),
     actionGroupField(),

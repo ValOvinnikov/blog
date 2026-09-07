@@ -6,6 +6,8 @@ import { heroMediaVariants } from './hero-media-variants';
 
 export type THeroMediaProps = IWithClassName &
   IWithDataTestId & {
+    /** Set by `Hero` on Banner, whose media is an edge-to-edge background rather than a framed block. */
+    isFramed?: boolean;
     children?: ReactNode;
   };
 
@@ -14,15 +16,19 @@ export type THeroMediaProps = IWithClassName &
  * `MediaFrame`.
  */
 export const HeroMedia = ({
+  isFramed = true,
   className,
   dataTestId,
   children,
-}: THeroMediaProps) => (
-  <MediaFrame
-    ratio="video"
-    className={heroMediaVariants({ class: className })}
-    dataTestId={dataTestId}
-  >
-    {children}
-  </MediaFrame>
-);
+}: THeroMediaProps) =>
+  isFramed ? (
+    <MediaFrame
+      ratio="video"
+      className={heroMediaVariants({ class: className })}
+      dataTestId={dataTestId}
+    >
+      {children}
+    </MediaFrame>
+  ) : (
+    children
+  );

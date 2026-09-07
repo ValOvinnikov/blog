@@ -58,9 +58,9 @@ export type TSectionHeader = {
   supportingText?: string;
 };
 
-export const MOBILE_MEDIA_ORDER = {
+export const MEDIA_ORDER = {
   LAST: 'LAST',
   FIRST: 'FIRST',
 } as const;
 
-export type TMobileMediaOrder = TValueOf<typeof MOBILE_MEDIA_ORDER>;
+export type TMediaOrder = TValueOf<typeof MEDIA_ORDER>;

@@ -1,3 +1,4 @@
+import { MEDIA_ORDER } from '@blog/config';
 import type { THeroModule } from '@blog/service';
 import { LinkButton } from '@blog/ui/molecules/link-button';
 import { Hero } from '@blog/ui/organisms/hero';
@@ -43,6 +44,7 @@ export const HeroModuleView = ({
         title={title}
         titleId={titleId}
         excerpt={subtitle}
+        mediaOrder={MEDIA_ORDER.FIRST}
       >
         {(primaryAction || secondaryAction) && (
           <Hero.Cta>
