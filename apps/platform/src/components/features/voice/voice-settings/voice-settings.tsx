@@ -24,7 +24,7 @@ import { voiceSettingsVariants } from './voice-settings-variants';
 
 export type TVoiceSettingsProps = {
   tenantId: string;
-  /** Only the string-valued entries of the tenant's saved `site_config.voiceOverrides` — `stringVoiceOverrides` filters out any rich (Portable Text) value before this component ever sees it. */
+  /** The tenant's saved `site_config.voiceOverrides`, already projected to plain text by `plainTextVoiceOverrides`. */
   initialOverrides: Record<string, string>;
   saveAction: (
     tenantId: string,
