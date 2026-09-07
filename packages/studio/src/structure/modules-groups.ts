@@ -38,10 +38,10 @@ export const modulesGroups: TStructureGroup[] = [
   {
     title: 'Content modules',
     items: [
-      { documentType: heroSchema.name, title: 'Hero', icon: Sparkles },
+      { documentType: heroSchema.name, title: 'Heroes', icon: Sparkles },
       {
         documentType: heroBlogSchema.name,
-        title: 'Hero (Blog)',
+        title: 'Blog heroes',
         icon: Star,
       },
       { documentType: contentSchema.name, title: 'Content', icon: FileText },
