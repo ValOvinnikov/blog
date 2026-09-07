@@ -239,6 +239,55 @@ describe(`<${Hero.name}/>`, () => {
     expect(media).toHaveClass('absolute', 'inset-0');
   });
 
+  it('keeps Split and Stacked media framed by MediaFrame', () => {
+    for (const variant of [HERO_VARIANT.SPLIT, HERO_VARIANT.STACKED]) {
+      const { unmount } = renderElement(
+        <Hero
+          title="Building a Design System"
+          titleId="hero-title"
+          variant={variant}
+        >
+          <Hero.Media>
+            <img src="/img/hero.jpg" alt="Hero cover photo" />
+          </Hero.Media>
+        </Hero>,
+      );
+
+      const wrapper = screen.getByTestId('hero-media');
+      const image = screen.getByAltText('Hero cover photo');
+
+      expect(image.parentElement).not.toBe(wrapper);
+      expect(image.parentElement).toHaveClass(
+        'rounded-lg',
+        'border',
+        'bg-surface-2',
+      );
+
+      unmount();
+    }
+  });
+
+  it('renders Banner media unframed and edge-to-edge, with no MediaFrame chrome', () => {
+    renderElement(
+      <Hero
+        title="Building a Design System"
+        titleId="hero-title"
+        variant={HERO_VARIANT.BANNER}
+      >
+        <Hero.Media>
+          <img src="/img/hero.jpg" alt="Hero cover photo" />
+        </Hero.Media>
+      </Hero>,
+    );
+
+    const wrapper = screen.getByTestId('hero-media');
+    const image = screen.getByAltText('Hero cover photo');
+
+    expect(image.parentElement).toBe(wrapper);
+    expect(wrapper).not.toHaveClass('rounded-lg', 'border', 'bg-surface-2');
+    expect(wrapper).toHaveClass('absolute', 'inset-0');
+  });
+
   it('renders all three variants without throwing', () => {
     for (const variant of Object.values(HERO_VARIANT)) {
       const { unmount } = renderElement(

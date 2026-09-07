@@ -16,10 +16,15 @@ import {
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@blog/ui/lib/react';
-import { Fragment, type ElementType } from 'react';
+import {
+  cloneElement,
+  Fragment,
+  type ElementType,
+  type ReactElement,
+} from 'react';
 
 import { HeroCta } from './components/cta/hero-cta';
-import { HeroMedia } from './components/media/hero-media';
+import { HeroMedia, type THeroMediaProps } from './components/media/hero-media';
 import { heroVariants } from './hero-variants';
 
 const HeroParts = {
@@ -35,7 +40,7 @@ export type THeroProps = IWithClassName &
     excerpt?: string;
     /** The hero's layout shape — the same three shapes `CtaModule` uses. */
     variant?: THeroVariant;
-    /** Where the copy column sits relative to the media. Split uses LEFT/RIGHT; Banner uses all three. */
+    /** Where the copy column sits relative to the media. Split uses LEFT/RIGHT; Banner uses all three; Stacked has no split axis, so it has no effect there. */
     contentPosition?: TContentAlignment;
     /** How text aligns within the copy column, on every variant. */
     contentAlignment?: TContentAlignment;
@@ -103,9 +108,13 @@ const HeroRoot = ({
           )}
           {slots.Cta}
         </div>
-        {hasMedia && (
+        {slots.Media && (
           <div className={s.media()} data-testid="hero-media">
-            {slots.Media}
+            {isBanner
+              ? cloneElement(slots.Media as ReactElement<THeroMediaProps>, {
+                  isFramed: false,
+                })
+              : slots.Media}
           </div>
         )}
       </div>

@@ -320,7 +320,7 @@ Variants: variant: HERO_VARIANT.SPLIT|HERO_VARIANT.STACKED|HERO_VARIANT.BANNER �
 
 Slots:
 
-- **Hero.Media** — the media slot of a `Hero`; frames its content at a 16:9 ratio via `MediaFrame`. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Hero.Media** — the media slot of a `Hero`; frames its content at a 16:9 ratio via `MediaFrame`. Props: isFramed?: boolean · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **Hero.Cta** — the call-to-action slot of a `Hero`; a styled `<div>` for the hero's buttons or links. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### NewsletterSignup — `organisms/newsletter-signup/newsletter-signup.tsx`
