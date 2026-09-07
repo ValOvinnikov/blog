@@ -706,7 +706,7 @@ point; the graph stays acyclic.
 - **The hero is a family, not one generalised module** — membership is the
   `module_hero*` naming convention, derived into `THeroModuleType`; one
   `defineHeroFields()` tail (variant, brand variant, image, position,
-  alignment, mobile media order, actions, layout) shared by every kind;
+  alignment, media order, actions, layout) shared by every kind;
   `page_home.hero` required, every other page's `hero` optional and
   replacing that page's default header when set; `module_hero`
   retired by content migration once `module_heroBlog` replaces it

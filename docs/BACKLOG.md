@@ -887,9 +887,9 @@ landing pages` — `Record<THeroModuleType, …>` so an unregistered hero kind
     its own `THeroBlogAction` view model instead of an `ILink` padded with
     `undefined`; no masking of an empty override.
   - **ui** · `feat(ui): Hero organism gains content position, alignment and
-mobile media order` — the one `Hero` organism serves the whole family;
-    props follow CTA's names (the media-order constant is `MEDIA_ORDER`,
-    renamed in Phase 0); stories per position.
+media order` — the one `Hero` organism serves the whole family; props
+    follow CTA's names (the media-order constant is `MEDIA_ORDER`, renamed
+    in Phase 0); stories per position.
   - **web** · `feat(web): heroBlog view + HERO_MAP entry` — view, `Section`
     wrapper, `REVALIDATE_TAGS`, an empty title unreachable rather than a
     silent `null`.
