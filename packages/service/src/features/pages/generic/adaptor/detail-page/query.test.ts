@@ -9,6 +9,14 @@ describe('genericPageQuery', () => {
     expect(() => genericPageQuery.parse(raw)).not.toThrow();
   });
 
+  it('parses a generic page with its hero slot set', () => {
+    const raw = makeRawGenericPage({
+      hero: { _id: 'hero-1', _type: 'module_hero' },
+    });
+
+    expect(() => genericPageQuery.parse(raw)).not.toThrow();
+  });
+
   it('parses null as no matching page_generic document, rather than throwing', () => {
     expect(genericPageQuery.parse(null)).toBeNull();
   });

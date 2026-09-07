@@ -23,6 +23,14 @@ describe('topicPageQuery', () => {
     expect(() => topicPageQuery.parse(raw)).not.toThrow();
   });
 
+  it('parses a topic page with its hero slot set', () => {
+    const raw = makeRawTopicPage({
+      hero: { _id: 'hero-1', _type: 'module_hero' },
+    });
+
+    expect(() => topicPageQuery.parse(raw)).not.toThrow();
+  });
+
   it('parses null as no matching page_topic document, rather than throwing', () => {
     expect(topicPageQuery.parse(null)).toBeNull();
   });

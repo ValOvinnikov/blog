@@ -111,6 +111,38 @@ describe('getTagPage', () => {
     expect(result.seo.description).toBe('Posts about TypeScript.');
   });
 
+  it('leaves hero undefined when page_tag.hero is unset', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawTagPage({ hero: null }))
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getTagPage('typescript', tenant);
+    if (!result) throw new Error('expected a tag page');
+
+    expect(result.hero).toBeUndefined();
+  });
+
+  it('maps a set page_tag.hero to a hero slot', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawTagPage({ hero: { _id: 'hero-1', _type: 'module_hero' } }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getTagPage('typescript', tenant);
+    if (!result) throw new Error('expected a tag page');
+
+    expect(result.hero).toEqual({ id: 'hero-1', type: 'module_hero' });
+  });
+
+  it('rejects when page_tag.hero resolves to a non-hero module type', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawTagPage({ hero: { _id: 'cta-1', _type: 'module_cta' as never } }),
+    );
+
+    await expect(getTagPage('typescript', tenant)).rejects.toThrow();
+  });
+
   it('passes the slug as a query parameter', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawTagPage())

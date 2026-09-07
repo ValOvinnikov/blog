@@ -1,7 +1,10 @@
 import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
 import type { TImageTenant } from '@blog/service/sanity/image';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
-import { toModule } from '@blog/service/shared/transformers/to-module';
+import {
+  toHeroSlot,
+  toModule,
+} from '@blog/service/shared/transformers/to-module';
 import type { InferResultType } from 'groqd';
 
 import type { genericPageQuery } from './query';
@@ -19,6 +22,7 @@ export function toGenericPage(
   return {
     title: raw.title,
     slug: raw.slug,
+    hero: raw.hero ? toHeroSlot(raw.hero) : undefined,
     modules: (raw.modules ?? []).map(toModule),
     // The page_generic schema has no excerpt/summary or image field, so the
     // content-derived tier only supplies a title; description/image fall

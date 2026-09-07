@@ -10,6 +10,7 @@ export const topicPageQuery = q
   .slice(0)
   .project((sub) => ({
     topic: sub.field('topic').deref().project(topicFragment).notNull(),
+    hero: sub.field('hero').deref().project(moduleFragment).nullable(true),
     postList: sub
       .field('postList')
       .deref()

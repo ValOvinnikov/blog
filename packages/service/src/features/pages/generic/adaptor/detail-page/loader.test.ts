@@ -35,6 +35,40 @@ describe('getPage', () => {
     ]);
   });
 
+  it('leaves hero undefined when page_generic.hero is unset', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawGenericPage({ hero: null }))
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const page = await getPage('about', tenant);
+    if (!page) throw new Error('expected a generic page');
+
+    expect(page.hero).toBeUndefined();
+  });
+
+  it('maps a set page_generic.hero to a hero slot', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawGenericPage({ hero: { _id: 'hero-1', _type: 'module_hero' } }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const page = await getPage('about', tenant);
+    if (!page) throw new Error('expected a generic page');
+
+    expect(page.hero).toEqual({ id: 'hero-1', type: 'module_hero' });
+  });
+
+  it('rejects when page_generic.hero resolves to a non-hero module type', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawGenericPage({
+        hero: { _id: 'cta-1', _type: 'module_cta' as never },
+      }),
+    );
+
+    await expect(getPage('about', tenant)).rejects.toThrow();
+  });
+
   it('resolves seo from the page title and site settings when the page has no authored seo', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawGenericPage({ seo: null }))

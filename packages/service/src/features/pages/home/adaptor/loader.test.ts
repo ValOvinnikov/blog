@@ -38,6 +38,16 @@ describe('getHomePage', () => {
     ]);
   });
 
+  it('rejects when page_home.hero resolves to a non-hero module type', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawHomePage({
+        hero: { _id: 'cta-1', _type: 'module_cta' as never },
+      }),
+    );
+
+    await expect(getHomePage(tenant)).rejects.toThrow();
+  });
+
   it('resolves seo from site settings when the page has no authored seo', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawHomePage({ seo: null }))

@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { THeroModuleType, TMaybeUndefined } from '@blog/config';
 import type { TSeoResolved } from '@blog/service/shared/transformers/resolve-seo';
 import type { TModule } from '@blog/service/shared/transformers/to-module';
 
@@ -14,6 +14,7 @@ export type TTagDetailPageTag = {
 
 export type TTagDetailPage = {
   tag: TTagDetailPageTag;
+  hero?: TModule<THeroModuleType>;
   modules: TModule[];
   seo: TSeoResolved;
   postListId: string;

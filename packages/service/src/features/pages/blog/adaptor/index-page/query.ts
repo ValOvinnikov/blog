@@ -8,6 +8,7 @@ export const blogPageQuery = q.star
   .project((sub) => ({
     heading: sub.field('heading').notNull(),
     supportingText: sub.field('supportingText').nullable(true),
+    hero: sub.field('hero').deref().project(moduleFragment).nullable(true),
     postList: sub
       .field('postList')
       .deref()

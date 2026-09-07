@@ -148,6 +148,7 @@ export function makeRawBlogPage(
   return {
     heading: 'The Blog',
     supportingText: 'Notes on building things.',
+    hero: null,
     postList: { _id: 'post-list-1' },
     modules: [],
     seo: null,
@@ -184,6 +185,7 @@ export function makeRawTopicPage(
 ): TRawTopicPage {
   return {
     topic: makeRawTopic(),
+    hero: null,
     postList: { _id: 'post-list-1' },
     modules: [],
     seo: null,
@@ -196,6 +198,7 @@ export function makeRawTagPage(
 ): TRawTagPage {
   return {
     tag: { ...makeRawTag(), description: 'Posts about TypeScript.' },
+    hero: null,
     postList: { _id: 'post-list-1' },
     modules: [],
     seo: null,
@@ -209,6 +212,7 @@ export function makeRawGenericPage(
   return {
     title: 'About',
     slug: 'about',
+    hero: null,
     modules: [
       { _id: 'content-1', _type: 'module_content' },
       { _id: 'cta-1', _type: 'module_cta' },
