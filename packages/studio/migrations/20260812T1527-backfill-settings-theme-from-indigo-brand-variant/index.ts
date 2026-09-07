@@ -1,10 +1,10 @@
 /**
- * Backfills the `settings_theme` singleton from the legacy
- * `settings_site.brand.variant` field (#1389), ahead of removing `variant`/
- * `BRAND_VARIANTS` from `objects/brand.ts` in a later change. For every
- * `settings_site` document with `brand.variant === 'INDIGO'`, creates/updates
- * `settings_theme` to `INDIGO_THEME_TARGET` — the exact values that reproduce
- * today's `.indigo` CSS class. `settings_site` documents with
+ * Backfills the `settings_theme` singleton from `settings_site.brand.variant`
+ * — a field no longer declared in the schema, but still present on older
+ * `settings_site` documents. For every `settings_site` document with
+ * `brand.variant === 'INDIGO'`, creates/updates `settings_theme` to
+ * `INDIGO_THEME_TARGET` — the hue values that reproduced the legacy
+ * `.indigo` CSS class. `settings_site` documents with
  * `brand.variant === 'CONSOLE'` (or unset) need no write.
  *
  * The pure transform (`indigoThemeMutations`) lives in `./transform.ts` and
@@ -19,13 +19,7 @@
  *   1. `pnpm --filter @blog/studio dataset:export -- migrations/backups/production-<date>.tar.gz`
  *   2. `pnpm --filter @blog/studio migrate:dry` — inspect the diff
  *   3. `pnpm --filter @blog/studio migrate:run` — human-gated, mutates `production`
- *
- * Deploy-ordering constraint: run this against `production` *before* the
- * follow-up change that removes `brand.variant`/`BRAND_VARIANTS`, so no
- * `settings_site` document is ever read for its variant after that field is
- * gone without `settings_theme` already carrying the equivalent values.
  */
-import { BRAND_VARIANTS } from '@blog/config/constants';
 import { defineMigration } from 'sanity/migrate';
 
 import {
@@ -44,7 +38,7 @@ export default defineMigration({
 
       // `indigoThemeMutations` ignores `currentTheme` for every non-INDIGO
       // variant, so skip the `getDocument` round-trip for those documents.
-      if (site.brand?.variant !== BRAND_VARIANTS.INDIGO) return [];
+      if (site.brand?.variant !== 'INDIGO') return [];
 
       // `context.filtered` is scoped to this migration's `documentTypes`
       // (`['settings_site']`), so it can never resolve `settings_theme` — a

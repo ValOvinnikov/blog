@@ -47,7 +47,6 @@ const THEME_TOKENS = {
   bodyFont: 'NEWSREADER',
   radiusScale: 'MD',
   density: 'DEFAULT',
-  chromeOn: true,
 };
 
 describe('NotFound (root not-found route)', () => {

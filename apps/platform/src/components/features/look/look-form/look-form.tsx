@@ -55,7 +55,6 @@ const applyPresetDefaults = (
     bodyFont: tokens.bodyFont,
     radiusScale: tokens.radiusScale,
     density: tokens.density,
-    chromeOn: tokens.chromeOn,
     logoAssetUrl: current.logoAssetUrl,
     faviconAssetUrl: current.faviconAssetUrl,
   };
@@ -70,7 +69,6 @@ const valuesEqual = (a: TLookFormValues, b: TLookFormValues): boolean => {
     a.bodyFont === b.bodyFont &&
     a.radiusScale === b.radiusScale &&
     a.density === b.density &&
-    a.chromeOn === b.chromeOn &&
     a.logoAssetUrl === b.logoAssetUrl &&
     a.faviconAssetUrl === b.faviconAssetUrl
   );

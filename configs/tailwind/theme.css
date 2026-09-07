@@ -223,7 +223,6 @@
   --tracking-section: 0.16em;
 
   /* Motion */
-  --ease-console: cubic-bezier(0.2, 0, 0, 1);
   --ease-smooth: cubic-bezier(0.2, 0, 0, 1);
 }
 
@@ -499,13 +498,6 @@
 
 @utility max-w-copy {
   max-width: var(--container-copy);
-}
-
-/* Terminal-form cursor for the brand mark. */
-@keyframes blink {
-  50% {
-    opacity: 0;
-  }
 }
 
 /* Toast timer/drain bar (#1140): the linear rate is applied per-instance via

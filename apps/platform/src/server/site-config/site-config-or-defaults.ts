@@ -27,7 +27,7 @@ export type TSiteConfigThemeAndAssets = {
  * the best-effort delete of a file an upload/clear is about to replace.
  * Falls back to the same Console defaults the Look tab itself starts from
  * when a tenant has no `site_config` row yet — imported for its theme
- * defaults only, this never touches the extra `chromeOn`/`logoHue` fields
+ * defaults only, this never touches the extra `logoHue` field
  * `TLookFormValues` carries for the Look form's own state.
  */
 export const getSiteConfigOrDefaults = async (

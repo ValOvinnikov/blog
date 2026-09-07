@@ -1,8 +1,8 @@
 /* Retained for `look-preview/preview-sample/` only — it renders the
-   tenant's own site (WindowChrome, BrandMark, Text, Button from `@blog/ui`)
-   fed unsaved form state, so it needs the site's real token vocabulary. It
-   is the one directory under apps/platform allowed to import `@blog/ui`; do
-   not drop this import to "clean up" the dependency. */
+   tenant's own site (BrandMark, Button, Heading, Text, Panel from
+   `@blog/ui`) fed unsaved form state, so it needs the site's real token
+   vocabulary. It is the one directory under apps/platform allowed to
+   import `@blog/ui`; do not drop this import to "clean up" the dependency. */
 
 /* Pre-registers Sanity's `sui` layer so it sorts below Tailwind's
    theme/base/components/utilities layers instead of above them — a

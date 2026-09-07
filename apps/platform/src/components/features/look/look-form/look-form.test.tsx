@@ -134,7 +134,7 @@ describe(LookForm, () => {
     expect(screen.getByText('28°')).toBeVisible();
   });
 
-  it('saves the current form state, excluding chromeOn, through updateLookAction', async () => {
+  it('saves the current form state through updateLookAction', async () => {
     const user = userEvent.setup();
     render(
       <LookForm

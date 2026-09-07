@@ -1,4 +1,4 @@
-import { BRAND_VARIANTS, PRESET_ID } from '@blog/config/constants';
+import { PRESET_ID } from '@blog/config/constants';
 import {
   at,
   createIfNotExists,
@@ -12,11 +12,10 @@ export const THEME_DOCUMENT_ID = 'settings_theme';
 export const THEME_DOCUMENT_TYPE = 'settings_theme';
 
 /**
- * The exact `settings_theme` values that reproduce today's `.indigo` CSS
- * class (independently WCAG-verified per #494/#515/#563): `--brand-primary`/
- * `-solid` use hue 65, `--logo-1/2/3` use hue 274. `PRESET_ID.CONSOLE` because
- * Indigo was always a palette swap on top of the Console preset, never its
- * own layout/typography preset.
+ * The `settings_theme` values that reproduced the legacy, WCAG-verified
+ * `.indigo` CSS class: `--brand-primary`/`-solid` use hue 65, `--logo-1/2/3`
+ * use hue 274. `PRESET_ID.CONSOLE` because Indigo was always a palette swap
+ * on top of the Console preset, never its own layout/typography preset.
  */
 export const INDIGO_THEME_TARGET = {
   preset: PRESET_ID.CONSOLE,
@@ -57,7 +56,7 @@ export const indigoThemeMutations = (
   site: TSiteSettingsDoc,
   currentTheme: TThemeDoc | undefined,
 ): Mutation[] | undefined => {
-  if (site.brand?.variant !== BRAND_VARIANTS.INDIGO) return undefined;
+  if (site.brand?.variant !== 'INDIGO') return undefined;
   if (isAlreadyMigrated(currentTheme)) return undefined;
 
   return [

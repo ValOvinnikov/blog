@@ -11,7 +11,7 @@ const SAMPLE = `
   --text-xl: clamp(1.35rem, 1.15rem + 0.7vw, 1.6rem);
   --text-xl--line-height: 1.35;
   --text-display--letter-spacing: -0.02em;
-  --ease-console: cubic-bezier(0.2, 0, 0, 1);
+  --ease-smooth: cubic-bezier(0.2, 0, 0, 1);
   --duration-fast: 120ms;
 }
 
@@ -69,7 +69,7 @@ describe(parseThemeTokens, () => {
     ['--spacing-gutter', 'spacing'],
     ['--container-content', 'layout'],
     ['--text-xl', 'typography'],
-    ['--ease-console', 'motion'],
+    ['--ease-smooth', 'motion'],
     ['--duration-fast', 'motion'],
   ] as const)('maps %s to category %s', (cssVar, category) => {
     const tokens = parseThemeTokens(SAMPLE);

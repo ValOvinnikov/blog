@@ -43,6 +43,5 @@ export const toThemeTokens = (
     bodyFont: row?.bodyFont ?? base.bodyFont,
     radiusScale: row?.radiusScale ?? base.radiusScale,
     density: row?.density ?? base.density,
-    chromeOn: base.chromeOn,
   };
 };
