@@ -8,7 +8,7 @@ import { defineField, defineType } from 'sanity';
  * signup's heading/description wherever it's rendered (the Blog page's
  * `module_newsletter` full variant and the per-post compact variant on post
  * pages), the signup form's own strings, and the confirm/unsubscribe
- * landing-page copy. Fields mirror `module_newsletter` (`../../modules/module-newsletter.ts`).
+ * landing-page copy.
  */
 export const newsletterSettingsSchema = defineType({
   name: 'settings_newsletter',
