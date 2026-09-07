@@ -7,6 +7,8 @@ import {
   HERO_IMAGE_SOURCE,
   HERO_VARIANT,
   LINK_TYPE,
+  TAXONOMY_KIND,
+  TAXONOMY_SORT,
 } from '@blog/config';
 import type { TRawContentModule } from '@blog/service/features/modules/content/adaptor/transformer';
 import type {
@@ -193,6 +195,10 @@ export function makeRawTaxonomyListModule(
     sectionHeader: { heading: 'Topics', supportingText: null },
     layout: null,
     contentAlignment: null,
+    taxonomy: TAXONOMY_KIND.TOPICS,
+    sortOrder: TAXONOMY_SORT.ALPHABETICAL,
+    limit: null,
+    entries: [],
     ...overrides,
   };
 }

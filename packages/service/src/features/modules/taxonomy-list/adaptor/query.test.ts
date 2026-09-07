@@ -26,4 +26,21 @@ describe('taxonomyListModuleQuery', () => {
   it('projects contentAlignment', () => {
     expect(taxonomyListModuleQuery.query).toContain('contentAlignment');
   });
+
+  it('resolves taxonomy from the authored field, falling back to $fallbackTaxonomy', () => {
+    expect(taxonomyListModuleQuery.query).toContain(
+      'coalesce(taxonomy, $fallbackTaxonomy)',
+    );
+  });
+
+  it('defaults sortOrder to ALPHABETICAL at read time', () => {
+    expect(taxonomyListModuleQuery.query).toContain(
+      'coalesce(sortOrder, "ALPHABETICAL")',
+    );
+  });
+
+  it('selects topic entries or tag entries by the resolved taxonomy', () => {
+    expect(taxonomyListModuleQuery.query).toContain('_type == "blog_topic"');
+    expect(taxonomyListModuleQuery.query).toContain('_type == "blog_tag"');
+  });
 });

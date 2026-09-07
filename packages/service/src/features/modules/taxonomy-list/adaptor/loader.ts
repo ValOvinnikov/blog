@@ -1,6 +1,4 @@
 import { TAXONOMY_KIND, type TTaxonomyKind } from '@blog/config';
-import { getTags } from '@blog/service/features/entities/tags/adaptor/loader';
-import { getTopics } from '@blog/service/features/entities/topics/adaptor/loader';
 import {
   isr,
   runQuery,
@@ -11,24 +9,31 @@ import { taxonomyListModuleQuery } from './query';
 import { toTaxonomyListModule } from './transformer';
 import type { TTaxonomyListModule } from './types';
 
-/**
- * Which taxonomy a slot lists is not authored on the module — it is
- * inferred by the caller from which index page's slot holds it, and passed
- * in here rather than re-derived by querying upward for the parent page.
- */
+function taxonomyCacheTags(fallbackTaxonomy: TTaxonomyKind | undefined) {
+  if (fallbackTaxonomy === TAXONOMY_KIND.TOPICS) return ['topics'];
+  if (fallbackTaxonomy === TAXONOMY_KIND.TAGS) return ['tags'];
+  return ['topics', 'tags'];
+}
+
+/** Resolves a `module_taxonomyList` placement's authored terms, falling back to `fallbackTaxonomy` when the module has none authored. */
 export async function getTaxonomyList(
   id: string,
-  taxonomy: TTaxonomyKind,
   tenant: TTenantSanityContext,
+  fallbackTaxonomy?: TTaxonomyKind,
 ): Promise<TTaxonomyListModule> {
-  const [raw, entries] = await Promise.all([
-    runQuery(taxonomyListModuleQuery, {
-      parameters: { id },
-      tenant,
-      ...isr(['modules:taxonomyList', `module:${id}`], tenant.projectId),
-    }),
-    taxonomy === TAXONOMY_KIND.TOPICS ? getTopics(tenant) : getTags(tenant),
-  ]);
+  const raw = await runQuery(taxonomyListModuleQuery, {
+    parameters: { id, fallbackTaxonomy: fallbackTaxonomy ?? null },
+    tenant,
+    ...isr(
+      [
+        'modules:taxonomyList',
+        `module:${id}`,
+        ...taxonomyCacheTags(fallbackTaxonomy),
+        'posts',
+      ],
+      tenant.projectId,
+    ),
+  });
 
-  return toTaxonomyListModule(raw, entries);
+  return toTaxonomyListModule(raw);
 }
