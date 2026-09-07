@@ -1,10 +1,12 @@
+import { TAXONOMY_KIND, TAXONOMY_SORT } from '@blog/config/constants';
 import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
 import { defineAlignmentFields } from '@blog/studio/schema-types/helpers/define-alignment-fields';
 import { layoutField } from '@blog/studio/schema-types/helpers/layout-field';
 import { sectionHeaderField } from '@blog/studio/schema-types/helpers/section-header-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
+import { toTitleCase } from '@blog/utils/primitives';
 import { LayoutGrid } from 'lucide-react';
-import { defineType } from 'sanity';
+import { defineField, defineType } from 'sanity';
 
 export const taxonomyListSchema = defineType({
   name: 'module_taxonomyList',
@@ -14,6 +16,40 @@ export const taxonomyListSchema = defineType({
   fields: [
     titleField(),
     brandVariantField(),
+    defineField({
+      name: 'taxonomy',
+      title: 'Taxonomy',
+      type: 'string',
+      description:
+        'Which terms to list. The Topics and Tags pages list their own, so their module can leave this empty.',
+      options: {
+        layout: 'radio',
+        list: Object.values(TAXONOMY_KIND).map((value) => ({
+          title: toTitleCase(value),
+          value,
+        })),
+      },
+    }),
+    defineField({
+      name: 'sortOrder',
+      title: 'Sort Order',
+      type: 'string',
+      options: {
+        layout: 'radio',
+        list: Object.values(TAXONOMY_SORT).map((value) => ({
+          title: toTitleCase(value),
+          value,
+        })),
+      },
+      initialValue: TAXONOMY_SORT.ALPHABETICAL,
+    }),
+    defineField({
+      name: 'limit',
+      title: 'Limit',
+      type: 'number',
+      description: 'Show at most this many terms. Empty shows all of them.',
+      validation: (rule) => rule.integer().min(1),
+    }),
     sectionHeaderField(),
     ...defineAlignmentFields([]),
     layoutField,

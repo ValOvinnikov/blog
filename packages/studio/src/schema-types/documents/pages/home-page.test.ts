@@ -25,6 +25,7 @@ describe('homePageSchema modules allow-list', () => {
       'module_cta',
       'module_newsletter',
       'module_postLatest',
+      'module_taxonomyList',
     ]);
     expect(allowedTypes).not.toContain('module_postList');
   });
