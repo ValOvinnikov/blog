@@ -35,7 +35,7 @@ import {
 import {
   getTenantById,
   getTenantSanityCredentials,
-  listTenantsForDocumentValidation,
+  listActiveTenants,
 } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
@@ -204,7 +204,7 @@ async function validateCandidates(
 // Exported for direct testing of the sweep logic without also exercising
 // tenant enumeration.
 export async function runValidation(): Promise<TValidateSummary> {
-  const candidates = await listTenantsForDocumentValidation();
+  const candidates = await listActiveTenants();
   return validateCandidates(candidates);
 }
 

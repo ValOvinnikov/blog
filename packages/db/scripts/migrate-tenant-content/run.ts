@@ -24,7 +24,7 @@ import { TENANT_STATUS } from '@blog/db/constants';
 import {
   getTenantById,
   getTenantSanityWriteCredentials,
-  listTenantsForDocumentValidation,
+  listActiveTenants,
 } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
@@ -124,7 +124,7 @@ async function migrateCandidates(
 // Exported for direct testing of the sweep logic without also exercising
 // tenant enumeration.
 export async function runMigration(): Promise<TMigrateSummary> {
-  const candidates = await listTenantsForDocumentValidation();
+  const candidates = await listActiveTenants();
   return migrateCandidates(candidates);
 }
 
