@@ -400,6 +400,13 @@ export type Settings_site = {
   defaultOgImage?: ImageWithAlt;
 };
 
+export type Module_heroReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_hero';
+};
+
 export type Blog_tagReference = {
   _ref: string;
   _type: 'reference';
@@ -443,6 +450,7 @@ export type Page_tag = {
   _rev: string;
   title?: string;
   slug?: Slug;
+  hero?: Module_heroReference;
   tag?: Blog_tagReference;
   postList?: Module_postListReference;
   modules?: Array<
@@ -506,6 +514,7 @@ export type Page_topic = {
   _rev: string;
   title?: string;
   slug?: Slug;
+  hero?: Module_heroReference;
   topic?: Blog_topicReference;
   postList?: Module_postListReference;
   modules?: Array<
@@ -555,6 +564,7 @@ export type Page_blog = {
   _updatedAt: string;
   _rev: string;
   title?: string;
+  hero?: Module_heroReference;
   heading?: string;
   supportingText?: string;
   postList?: Module_postListReference;
@@ -583,11 +593,11 @@ export type Module_postList = {
   layout?: Layout;
 };
 
-export type Module_heroReference = {
+export type Module_contentReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_hero';
+  [internalGroqTypeReferenceTo]?: 'module_content';
 };
 
 export type Page_home = {
@@ -601,37 +611,18 @@ export type Page_home = {
   modules?: Array<
     | ({
         _key: string;
-      } & Module_postLatestReference)
+      } & Module_contentReference)
     | ({
         _key: string;
       } & Module_ctaReference)
     | ({
         _key: string;
       } & Module_newsletterReference)
+    | ({
+        _key: string;
+      } & Module_postLatestReference)
   >;
   seo?: Seo;
-};
-
-export type Module_hero = {
-  _id: string;
-  _type: 'module_hero';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  featuredPost?: Blog_postReference;
-  heroEyebrowMode?: 'POST_TOPIC' | 'CUSTOM';
-  heroEyebrow?: string;
-  heroTitleMode?: 'POST_TITLE' | 'CUSTOM';
-  heroTitle?: string;
-  heroSubtitleMode?: 'POST_EXCERPT' | 'CUSTOM';
-  heroSubtitle?: string;
-  heroImageMode?: 'POST_IMAGE' | 'CUSTOM' | 'NONE';
-  heroImage?: ImageWithAlt;
-  primaryActionLabel?: string;
-  secondaryAction?: Link;
-  layout?: HeroLayout;
 };
 
 export type Blog_tag = {
@@ -723,13 +714,6 @@ export type Blog_author = {
   profilePage?: Page_genericReference;
 };
 
-export type Module_contentReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_content';
-};
-
 export type Page_generic = {
   _id: string;
   _type: 'page_generic';
@@ -738,6 +722,7 @@ export type Page_generic = {
   _rev: string;
   title?: string;
   slug?: Slug;
+  hero?: Module_heroReference;
   modules?: Array<
     | ({
         _key: string;
@@ -745,8 +730,36 @@ export type Page_generic = {
     | ({
         _key: string;
       } & Module_ctaReference)
+    | ({
+        _key: string;
+      } & Module_postLatestReference)
+    | ({
+        _key: string;
+      } & Module_newsletterReference)
   >;
   seo?: Seo;
+};
+
+export type Module_hero = {
+  _id: string;
+  _type: 'module_hero';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  featuredPost?: Blog_postReference;
+  heroEyebrowMode?: 'POST_TOPIC' | 'CUSTOM';
+  heroEyebrow?: string;
+  heroTitleMode?: 'POST_TITLE' | 'CUSTOM';
+  heroTitle?: string;
+  heroSubtitleMode?: 'POST_EXCERPT' | 'CUSTOM';
+  heroSubtitle?: string;
+  heroImageMode?: 'POST_IMAGE' | 'CUSTOM' | 'NONE';
+  heroImage?: ImageWithAlt;
+  primaryActionLabel?: string;
+  secondaryAction?: Link;
+  layout?: HeroLayout;
 };
 
 export type MediaTag = {
@@ -898,6 +911,7 @@ export type AllSanitySchemaTypes =
   | Settings_footer
   | Settings_navigation
   | Settings_site
+  | Module_heroReference
   | Blog_tagReference
   | Module_postListReference
   | Module_postLatestReference
@@ -913,9 +927,8 @@ export type AllSanitySchemaTypes =
   | Module_taxonomyList
   | Page_blog
   | Module_postList
-  | Module_heroReference
+  | Module_contentReference
   | Page_home
-  | Module_hero
   | Blog_tag
   | Blog_authorReference
   | Blog_post
@@ -923,8 +936,8 @@ export type AllSanitySchemaTypes =
   | SanityImageHotspot
   | Blog_topic
   | Blog_author
-  | Module_contentReference
   | Page_generic
+  | Module_hero
   | MediaTag
   | Code
   | SanityImagePaletteSwatch
