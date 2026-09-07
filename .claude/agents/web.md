@@ -376,10 +376,12 @@ that half) and the Zod `voiceOverridesSchema` in `packages/db`'s
 `upsert-site-config.ts` (`db` owns that one).
 
 Those three key lists are hand-duplicated — nothing type-level couples them.
-`pnpm check:voice-sync` is a required CI check that compares them by AST, so
-a key added to fewer than all three fails the build. Adding a key needs no
-`packages/db` migration (the column is open-ended JSONB), but **removing or
-renaming one does**, since existing rows still carry the old key.
+`pnpm check:voice-sync` compares them by AST and goes red when a key reaches
+fewer than all three. It is **not** in the branch ruleset's required checks,
+so it will not block a merge on its own — run it locally rather than relying
+on CI to stop you. Adding a key needs no `packages/db` migration (the column
+is open-ended JSONB), but **removing or renaming one does**, since existing
+rows still carry the old key.
 
 ## SEO / feeds / a11y
 

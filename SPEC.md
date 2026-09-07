@@ -477,9 +477,11 @@ the objects along that path so untouched namespaces keep referencing the
 cached messages module instead of being mutated in place. Those three
 key lists are hand-duplicated and coupled only by the `check:voice-sync` CI
 check, which compares them by AST — adding or renaming a key means editing
-all three. A fetch failure, or a tenant with no `site_config` row, falls
-back to the `CONSOLE` preset with no overrides — never a thrown error or an
-empty page. Same per-request tenant resolution as theme, above.
+all three. A fetch failure, or a tenant with no `site_config` row, yields the
+neutral base messages with no overrides applied — never a thrown error or an
+empty page. (Theme's own fallback to the `CONSOLE` preset is a separate
+thing: copy has no preset layer to fall back to.) Same per-request tenant
+resolution as theme, above.
 
 `get-site-config.ts`'s cache carries a 3600s
 (`TENANT_CONFIG_REVALIDATE_SECONDS`, `@blog/config`) fallback window as its
