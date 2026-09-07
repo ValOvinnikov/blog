@@ -85,7 +85,4 @@ export const heroVariants = tv({
       class: { grid: ['justify-items-end'] },
     },
   ],
-  defaultVariants: {
-    variant: HERO_VARIANT.SPLIT,
-  },
 });
