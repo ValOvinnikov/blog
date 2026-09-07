@@ -33,6 +33,10 @@ export type TConfirmDialogProps = {
   children?: ReactNode;
   /** Button styling for the trigger and confirm actions. */
   tone?: 'danger' | 'primary';
+  /** Disables the trigger without removing it — e.g. while a dispatched run for the same action is already in progress. */
+  isTriggerDisabled?: boolean;
+  /** Associates the disabled trigger with an explanatory hint rendered elsewhere on the page. */
+  triggerAriaDescribedBy?: string;
 };
 
 export const ConfirmDialog = ({
@@ -55,6 +59,8 @@ export const ConfirmDialog = ({
   cancelLabel,
   children,
   tone = 'danger',
+  isTriggerDisabled = false,
+  triggerAriaDescribedBy,
 }: TConfirmDialogProps) => {
   const {
     backdrop,
@@ -67,7 +73,16 @@ export const ConfirmDialog = ({
 
   return (
     <AlertDialog.Root open={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialog.Trigger render={<Button type="button" variant={tone} />}>
+      <AlertDialog.Trigger
+        render={
+          <Button
+            type="button"
+            variant={tone}
+            isDisabled={isTriggerDisabled}
+            aria-describedby={triggerAriaDescribedBy}
+          />
+        }
+      >
         {triggerLabel}
       </AlertDialog.Trigger>
       <AlertDialog.Portal>

@@ -1,5 +1,6 @@
 import { render, screen } from '@platform/testing/custom-render';
 import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
 
 import { Disclosure } from './disclosure';
 
@@ -89,5 +90,67 @@ describe(Disclosure, () => {
     );
 
     expect(screen.getByText('optional')).toBeVisible();
+  });
+
+  describe('controlled mode', () => {
+    it('reflects isOpen rather than internal state', () => {
+      const { container, rerender } = render(
+        <Disclosure summary="Advanced" isOpen={false} onOpenChange={vi.fn()}>
+          <p>Body</p>
+        </Disclosure>,
+      );
+
+      const details = container.querySelector('details');
+      expect(details).not.toHaveAttribute('open');
+
+      rerender(
+        <Disclosure summary="Advanced" isOpen={true} onOpenChange={vi.fn()}>
+          <p>Body</p>
+        </Disclosure>,
+      );
+
+      expect(details).toHaveAttribute('open');
+    });
+
+    it('calls onOpenChange with the next value when toggled', async () => {
+      const user = userEvent.setup();
+      const onOpenChange = vi.fn();
+      render(
+        <Disclosure
+          summary="Advanced"
+          isOpen={false}
+          onOpenChange={onOpenChange}
+        >
+          <p>Body</p>
+        </Disclosure>,
+      );
+
+      await user.click(screen.getByText('Advanced'));
+
+      expect(onOpenChange).toHaveBeenCalledWith(true);
+    });
+
+    it('round-trips through a caller that feeds onOpenChange back in as isOpen', async () => {
+      const user = userEvent.setup();
+      const ControlledDisclosure = () => {
+        const [isOpen, setIsOpen] = useState(false);
+        return (
+          <Disclosure
+            summary="Advanced"
+            isOpen={isOpen}
+            onOpenChange={setIsOpen}
+          >
+            <p>Body</p>
+          </Disclosure>
+        );
+      };
+      const { container } = render(<ControlledDisclosure />);
+      const details = container.querySelector('details');
+      expect(details).not.toHaveAttribute('open');
+
+      await user.click(screen.getByText('Advanced'));
+
+      expect(details).toHaveAttribute('open');
+    });
   });
 });

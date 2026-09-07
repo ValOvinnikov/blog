@@ -136,4 +136,35 @@ describe(ConfirmDialog, () => {
 
     expect(await screen.findByTestId('extra')).toBeVisible();
   });
+
+  it('renders the trigger enabled by default', () => {
+    render(<ControlledConfirmDialog />);
+
+    expect(screen.getByRole('button', { name: 'Open dialog' })).toBeEnabled();
+  });
+
+  it('disables the trigger, without removing it, when isTriggerDisabled is set', async () => {
+    const user = userEvent.setup();
+    render(<ControlledConfirmDialog isTriggerDisabled={true} />);
+
+    const trigger = screen.getByRole('button', { name: 'Open dialog' });
+    expect(trigger).toBeDisabled();
+
+    await user.click(trigger);
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+
+  it('associates the disabled trigger with triggerAriaDescribedBy', () => {
+    render(
+      <ControlledConfirmDialog
+        isTriggerDisabled={true}
+        triggerAriaDescribedBy="hint-id"
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Open dialog' })).toHaveAttribute(
+      'aria-describedby',
+      'hint-id',
+    );
+  });
 });

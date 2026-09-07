@@ -6,7 +6,6 @@ export const deprovisionTenantControlVariants = tv({
     cardHeader: ['border-admin-bad/20'],
     cardTitle: ['text-admin-bad'],
     content: ['flex flex-col items-start gap-3'],
-    archivedRow: ['flex flex-wrap items-center gap-3'],
     switchRow: ['flex items-center gap-2.5 text-[13px] text-admin-text'],
     switchTrack: [
       'relative h-5 w-9 shrink-0 cursor-pointer rounded-full bg-admin-line-2',
