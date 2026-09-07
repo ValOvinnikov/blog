@@ -72,31 +72,35 @@ describe(buildStarterDocuments, () => {
     });
   });
 
-  it('builds a module_hero document with the required mode fields, referencing the starter post', () => {
+  it('builds a module_heroBlog document pinned to the starter post, with no copy overrides', () => {
     const hero = buildStarterDocuments(tenant).find(
-      (doc) => doc._id === STARTER_DOCUMENT_IDS.HERO,
+      (doc) => doc._id === STARTER_DOCUMENT_IDS.HERO_BLOG,
     ) as unknown as {
       _type: string;
       title: string;
       brandVariant: string;
-      featuredPost: { _ref: string };
-      heroEyebrowMode: string;
-      heroTitleMode: string;
-      heroSubtitleMode: string;
-      heroImageMode: string;
+      postSource: string;
+      post: { _ref: string };
+      imageSource: string;
+      variant: string;
+      eyebrow?: string;
+      heading?: string;
+      supportingText?: string;
     };
 
-    expect(hero._type).toBe('module_hero');
+    expect(hero._type).toBe('module_heroBlog');
     expect(hero.title).toBeTruthy();
     expect(hero.brandVariant).toBeTruthy();
-    expect(hero.featuredPost._ref).toBe(STARTER_DOCUMENT_IDS.POST);
-    expect(hero.heroEyebrowMode).toBe('POST_TOPIC');
-    expect(hero.heroTitleMode).toBe('POST_TITLE');
-    expect(hero.heroSubtitleMode).toBe('POST_EXCERPT');
-    expect(hero.heroImageMode).toBe('POST_IMAGE');
+    expect(hero.postSource).toBe('PINNED');
+    expect(hero.post._ref).toBe(STARTER_DOCUMENT_IDS.POST);
+    expect(hero.imageSource).toBe('POST');
+    expect(hero.variant).toBe('SPLIT');
+    expect(hero).not.toHaveProperty('eyebrow');
+    expect(hero).not.toHaveProperty('heading');
+    expect(hero).not.toHaveProperty('supportingText');
   });
 
-  it('builds a page_home document whose hero reference resolves to the starter hero', () => {
+  it('builds a page_home document whose hero reference resolves to the starter heroBlog', () => {
     const home = buildStarterDocuments(tenant).find(
       (doc) => doc._id === STARTER_DOCUMENT_IDS.HOME,
     ) as unknown as {
@@ -107,6 +111,6 @@ describe(buildStarterDocuments, () => {
 
     expect(home._type).toBe('page_home');
     expect(home.title).toBeTruthy();
-    expect(home.hero._ref).toBe(STARTER_DOCUMENT_IDS.HERO);
+    expect(home.hero._ref).toBe(STARTER_DOCUMENT_IDS.HERO_BLOG);
   });
 });
