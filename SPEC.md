@@ -462,24 +462,24 @@ still carried a value keeps it as an unread key, which needs no migration.
 every `module_*` document's `brandVariant` field uses, is a different axis and
 is unaffected.)
 
-**Voice-as-content** (the config-to-Postgres transition's E4/E5, wired live
-for the first time by E5): `apps/web/src/i18n/request.ts` resolves each
-request's `next-intl` messages as a three-layer merge — the neutral base
-(`i18n/messages/en.json`, neutralized per #1420) ← the resolved preset's
-`voicePack` (`@blog/config`'s `PRESET_REGISTRY[preset].voicePack`, via
-`deepMergePartial`) ← the tenant's `site_config.voiceOverrides`. The
-`preset` and `voiceOverrides` come from the same `site_config` row and the
-same cached read as theme (`get-site-config.ts`, tenant-scoped tag) — one
-row backs both. `voiceOverrides` stores its 19 curated fields as flat
-camelCase keys (e.g. `notFoundCommandNotFound`), matching `apps/platform`'s
-Voice tab (`apps/platform/src/utils/voice-fields/voice-fields.ts`);
-`apps/web/src/utils/apply-voice-overrides.ts` maps each flat key back to its
-nested message path and applies it last, cloning only the objects along
-that path so untouched namespaces keep referencing the cached messages
-module instead of being mutated in place. A fetch failure, or a tenant with
-no `site_config` row, falls back to the `CONSOLE` preset with no overrides
-— never a thrown error or an empty page. Same per-request tenant resolution
-as theme, above.
+**Voice-as-content**: `apps/web/src/utils/resolve-tenant-messages/` resolves
+each request's `next-intl` messages as a two-layer merge — the neutral base
+(`i18n/messages/en.json`) ← the tenant's `site_config.voiceOverrides`. There
+is no preset layer: a preset is a _look_, and carries no copy. The `preset`
+and `voiceOverrides` still come from the same `site_config` row and the same
+cached read as theme (`get-site-config.ts`, tenant-scoped tag) — one row
+backs both. `voiceOverrides` stores its 8 curated fields as flat camelCase
+keys (e.g. `notFoundHeading`), matching `apps/platform`'s Voice tab
+(`apps/platform/src/utils/voice-fields/voice-fields.ts`);
+`apps/web/src/utils/apply-voice-overrides/apply-voice-overrides.ts` maps each
+flat key back to its nested message path and applies it last, cloning only
+the objects along that path so untouched namespaces keep referencing the
+cached messages module instead of being mutated in place. Those three
+key lists are hand-duplicated and coupled only by the `check:voice-sync` CI
+check, which compares them by AST — adding or renaming a key means editing
+all three. A fetch failure, or a tenant with no `site_config` row, falls
+back to the `CONSOLE` preset with no overrides — never a thrown error or an
+empty page. Same per-request tenant resolution as theme, above.
 
 `get-site-config.ts`'s cache carries a 3600s
 (`TENANT_CONFIG_REVALIDATE_SECONDS`, `@blog/config`) fallback window as its
