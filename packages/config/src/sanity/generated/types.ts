@@ -357,6 +357,7 @@ export type Settings_newsletter = {
   title?: string;
   heading?: string;
   description?: string;
+  trustCues?: Array<string>;
 };
 
 export type Settings_footer = {
