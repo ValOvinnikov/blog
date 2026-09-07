@@ -140,6 +140,9 @@ export default async function LocaleLayout({ children, params }: TProps) {
     logger.error('site_settings.layout_fetch_failed', {
       error: settingsResult.error,
     });
+    // Caught by `[tenant]/not-found.tsx`, not a boundary declared in this
+    // segment — a same-segment `not-found.tsx` only guards this layout's own
+    // children, not the layout itself.
     notFound();
   }
 

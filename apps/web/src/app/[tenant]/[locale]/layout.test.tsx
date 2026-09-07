@@ -6,6 +6,7 @@ import { ThemeScope } from '@web/components/shared/theme-scope';
 import realMessages from '@web/i18n/messages/en.json';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 import LocaleLayout, { generateMetadata, generateStaticParams } from './layout';
@@ -503,5 +504,35 @@ describe('LocaleLayout', () => {
       realMessages,
       'tenant-1',
     );
+  });
+
+  describe('when site settings fail to load', () => {
+    it('calls the real Next.js notFound() instead of rendering a broken shell', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      getSiteSettingsMock.mockResolvedValue({ ok: false, error: 'boom' });
+
+      await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+
+      expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+      errorSpy.mockRestore();
+    });
+
+    it('preserves the site_settings.layout_fetch_failed log call', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      getSiteSettingsMock.mockResolvedValue({ ok: false, error: 'boom' });
+
+      await expect(setup()).rejects.toThrow();
+
+      expect(
+        errorSpy.mock.calls.some((call) =>
+          call.some(
+            (arg) =>
+              typeof arg === 'string' &&
+              arg.includes('site_settings.layout_fetch_failed'),
+          ),
+        ),
+      ).toBe(true);
+      errorSpy.mockRestore();
+    });
   });
 });

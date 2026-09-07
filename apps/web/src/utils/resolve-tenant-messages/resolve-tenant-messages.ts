@@ -6,11 +6,11 @@ import { logger } from '@web/utils/logger/logger';
  * Applies the tenant's per-key voice overrides on top of the base locale
  * messages returned by `getMessages()`. Called from every route that builds
  * its own `NextIntlClientProvider` tree (`[tenant]/[locale]/layout.tsx`, and
- * the root `not-found.tsx`, which renders outside it) — `i18n/request.ts`'s
- * `getRequestConfig` only resolves the base, un-voiced messages since it has
- * no tenant to read. Accepts the `[tenant]` route param and forwards it to
- * `getSiteConfig`; the root `not-found.tsx` has no param to supply and falls
- * through to the header.
+ * the `not-found.tsx` boundaries that render outside it) —
+ * `i18n/request.ts`'s `getRequestConfig` only resolves the base, un-voiced
+ * messages since it has no tenant to read. Accepts the `[tenant]` route
+ * param and forwards it to `getSiteConfig`; a `not-found.tsx` boundary has
+ * no param to supply and falls through to the header.
  */
 export const resolveTenantMessages = async (
   base: Record<string, unknown>,

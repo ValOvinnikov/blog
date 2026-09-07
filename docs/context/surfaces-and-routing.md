@@ -86,9 +86,10 @@
   the canvas). The tint is applied **once** on the locale layout's content
   wrapper (the region between `<Header>` and `<Footer>`, #973) — individual
   page/template roots under `[locale]/` set no background of their own and
-  inherit it (home, blog index, post detail, topics, generic pages). The one
-  exception is the root `not-found.tsx`, which renders _outside_ the
-  `[locale]` layout (Next's not-found boundary), so it can't inherit that
-  wrapper — its own template keeps `--bg-subtle` on its root to stay visually
+  inherit it (home, blog index, post detail, topics, generic pages). The
+  exceptions are the two `not-found.tsx` boundaries — `app/not-found.tsx` and
+  `app/[tenant]/not-found.tsx` — which render _outside_ the `[locale]` layout
+  (Next's not-found boundary), so they can't inherit that wrapper; the shared
+  template they both render keeps `--bg-subtle` on its root to stay visually
   consistent with the rest of the site. The footer sits flush below the
   canvas on its own `--accent-muted` band.
