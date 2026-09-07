@@ -465,17 +465,20 @@ them to fix these.
   needs no permission.
 - **No SEO surface.** No `generateMetadata` beyond a plain title, no sitemap,
   no robots, no feeds. This app should not be indexed.
-- **Voice settings mirror a curated subset of `apps/web`'s i18n keys.**
+- **Voice settings edit a subset of the site's copy catalogue.**
   `src/utils/voice-fields/voice-fields.ts` (`TVoiceOverrideKey`,
-  `VOICE_FIELD_GROUPS`) is the Postgres-backed port of
-  `packages/studio/src/schema-types/documents/settings/voice.ts`'s field set — both
-  must stay in lockstep with `apps/web`'s
-  `src/utils/apply-voice-overrides/apply-voice-overrides.ts` mapping. When a
-  ticket adds a new tenant-customizable "voice" copy key (empty-states,
-  error/not-found messages, prompts, toasts — not nav labels or
-  `ariaLabel`s), add the field here and in the CMS schema alongside web's
-  i18n key. No `packages/db` migration is needed — `voiceOverrides` is an
-  open-ended JSONB column.
+  `VOICE_FIELD_GROUPS`) is one of three hand-duplicated lists the runtime
+  reads; the others are `apps/web`'s
+  `src/utils/apply-voice-overrides/apply-voice-overrides.ts` mapping and the
+  Zod `voiceOverridesSchema` in `packages/db`'s `upsert-site-config.ts`. An
+  override missing from any of the three is accepted, stored, and never
+  applied, with nothing failing — so a new key goes into all three. Which
+  strings are editable at all is declared by `@blog/config`'s `VOICE_FIELDS`
+  registry, whose coverage test refuses a catalog string that is neither
+  registered nor explicitly marked fixed. There is no Studio schema for voice
+  copy. No `packages/db` migration is needed to add a key — `voiceOverrides`
+  is an open-ended JSONB column — but removing or renaming one does need
+  one, since existing rows still carry the old key.
 - Per-role page access beyond the coarse split above is not fully settled — the
   design doc states the default assumption and flags it as open. Follow the
   ticket; if the ticket is silent, report the ambiguity rather than choosing.

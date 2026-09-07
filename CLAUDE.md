@@ -921,9 +921,8 @@ when it is all of:
 - **self-contained** — the body alone carries exact files, acceptance
   criteria, and the verification commands (`pnpm type-check && pnpm lint &&
 pnpm test && pnpm knip`), assuming the reader has only the ticket. Add
-  `pnpm gen:ui-index:check` when the ticket touches `packages/ui`,
-  `pnpm check:turbo-env-sync` when it touches env vars or `turbo.json`, and
-  `pnpm check:voice-sync` when it touches voice keys.
+  `pnpm gen:ui-index:check` when the ticket touches `packages/ui`, and
+  `pnpm check:turbo-env-sync` when it touches env vars or `turbo.json`.
 
   **Why these and not just the first three.** A cloud session has no `gh`
   (see "Solo-session mode" below), so it cannot read a red check after it
