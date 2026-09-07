@@ -14,6 +14,8 @@ import { isValidEmail } from '@web/utils/is-valid-email';
 import { useTranslations } from 'next-intl';
 import { useEffect, useId, useState } from 'react';
 
+const TRUST_CUE_ICONS = [ICONS.SHIELD_CHECK, ICONS.CLOSE];
+
 type TNewsletterFormProps = {
   /** `full` (Blog index page-builder module) vs `compact` (post page foot) — see `NewsletterSignup`'s two densities. */
   variant: 'full' | 'compact';
@@ -22,6 +24,12 @@ type TNewsletterFormProps = {
   headingId?: string;
   /** Ignored for `variant="compact"` — that density has no room for supporting copy. */
   supportingText?: string;
+  /**
+   * Ignored for `variant="compact"` — that density has no room for trust
+   * cues. Absent or empty renders no trust cues; each authored label is
+   * paired with a fixed icon by position (there are never more than two).
+   */
+  trustCues?: string[];
   /** Horizontal alignment of the pitch pane. Ignored for `variant="compact"` — Compact has no alignment control. */
   align?: TContentAlignment;
   className?: string;
@@ -30,8 +38,9 @@ type TNewsletterFormProps = {
 /**
  * The double opt-in newsletter signup island, composed into the Blog
  * index page's `module_newsletter` page-builder module and every post
- * page's foot. `heading`/`supportingText` are always CMS-sourced by the
- * caller — this component never falls back to i18n copy for them.
+ * page's foot. `heading`/`supportingText`/`trustCues` are always
+ * CMS-sourced by the caller — this component never falls back to i18n
+ * copy for them.
  *
  * Subscription isn't tied to a session (a signed-out reader can subscribe),
  * so there's no account-based way to know a reader already subscribed;
@@ -48,6 +57,7 @@ export const NewsletterForm = ({
   heading,
   headingId,
   supportingText,
+  trustCues,
   align,
   className,
 }: TNewsletterFormProps) => {
@@ -117,22 +127,21 @@ export const NewsletterForm = ({
     return <NewsletterSignup.Compact {...sharedProps} />;
   }
 
-  const trustCues = [
-    {
-      icon: <Icon name={ICONS.SHIELD_CHECK} size={SIZE.SM} />,
-      label: t('trustCueNoSpam'),
-    },
-    {
-      icon: <Icon name={ICONS.CLOSE} size={SIZE.SM} />,
-      label: t('trustCueUnsubscribe'),
-    },
-  ];
+  const trustCueItems = trustCues?.map((label, index) => ({
+    icon: (
+      <Icon
+        name={TRUST_CUE_ICONS[index] ?? ICONS.SHIELD_CHECK}
+        size={SIZE.SM}
+      />
+    ),
+    label,
+  }));
 
   return (
     <NewsletterSignup.Full
       {...sharedProps}
       supportingText={supportingText}
-      trustCues={trustCues}
+      trustCues={trustCueItems}
       align={align}
     />
   );

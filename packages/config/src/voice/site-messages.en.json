@@ -150,9 +150,7 @@
     "successMessage": "Almost there — check your inbox to confirm.",
     "errorInvalid": "Enter a valid email address.",
     "errorAlreadySubscribed": "That email is already subscribed.",
-    "errorServer": "Something went wrong. Please try again.",
-    "trustCueNoSpam": "No spam",
-    "trustCueUnsubscribe": "Unsubscribe anytime"
+    "errorServer": "Something went wrong. Please try again."
   },
   "newsletterConfirm": {
     "confirmedTitle": "Subscription confirmed",

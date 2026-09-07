@@ -23,6 +23,7 @@ const meta = {
     },
     layout: undefined,
     contentAlignment: undefined,
+    trustCues: ['No spam', 'Unsubscribe anytime'],
   },
 } satisfies Meta<typeof NewsletterModuleView>;
 

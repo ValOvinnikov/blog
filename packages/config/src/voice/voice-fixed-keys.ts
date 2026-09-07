@@ -3,7 +3,7 @@
  * grouped by why: accessibility-only text, generic toast/operation feedback,
  * counters carrying ICU plural syntax, metadata with no visible counterpart,
  * archive/breadcrumb labels derived from Studio content, a taxonomy label
- * tied to a Sanity-modelled enum, and newsletter copy moving to Studio. The
+ * tied to a Sanity-modelled enum, and fixed operational newsletter copy. The
  * coverage test fails if a catalog key is on neither this list nor
  * `VOICE_FIELDS`, so a new string can't be added without deciding which.
  */
@@ -88,8 +88,7 @@ export const VOICE_FIXED_KEYS = [
   'rss.fallbackTitle',
   'rss.fallbackDescription',
 
-  // Newsletter form and landing-page copy, moving to a Studio settings
-  // singleton.
+  // Fixed operational newsletter form and landing-page copy.
   'newsletterForm.submitLabel',
   'newsletterForm.emailAriaLabel',
   'newsletterForm.placeholder',
@@ -97,8 +96,6 @@ export const VOICE_FIXED_KEYS = [
   'newsletterForm.errorInvalid',
   'newsletterForm.errorAlreadySubscribed',
   'newsletterForm.errorServer',
-  'newsletterForm.trustCueNoSpam',
-  'newsletterForm.trustCueUnsubscribe',
   'newsletterConfirm.confirmedTitle',
   'newsletterConfirm.confirmedMessage',
   'newsletterConfirm.invalidTitle',

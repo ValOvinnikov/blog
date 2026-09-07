@@ -31,6 +31,7 @@ const setup = customRender(NewsletterModuleView, {
   },
   layout: undefined,
   contentAlignment: undefined,
+  trustCues: ['No spam', 'Unsubscribe anytime'],
 });
 
 describe(NewsletterModuleView, () => {
@@ -73,6 +74,35 @@ describe(NewsletterModuleView, () => {
 
     expect(vi.mocked(NewsletterForm)).toHaveBeenLastCalledWith(
       expect.objectContaining({ align: CONTENT_ALIGNMENT.CENTER }),
+      undefined,
+    );
+  });
+
+  it('passes the CMS-authored trustCues through to NewsletterForm unchanged', () => {
+    setup();
+
+    expect(vi.mocked(NewsletterForm)).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        trustCues: ['No spam', 'Unsubscribe anytime'],
+      }),
+      undefined,
+    );
+  });
+
+  it('passes trustCues through as undefined when the tenant never authored any', () => {
+    setup({ trustCues: undefined });
+
+    expect(vi.mocked(NewsletterForm)).toHaveBeenLastCalledWith(
+      expect.objectContaining({ trustCues: undefined }),
+      undefined,
+    );
+  });
+
+  it('passes trustCues through as an empty array when the author cleared it', () => {
+    setup({ trustCues: [] });
+
+    expect(vi.mocked(NewsletterForm)).toHaveBeenLastCalledWith(
+      expect.objectContaining({ trustCues: [] }),
       undefined,
     );
   });

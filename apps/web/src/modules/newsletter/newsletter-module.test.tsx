@@ -1,11 +1,16 @@
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
-import { customRenderAsync } from '@web/testing/custom-render';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { NewsletterModule } from './newsletter-module';
 
-const { getNewsletterMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const {
+  getNewsletterMock,
+  getNewsletterSettingsMock,
+  getTenantSanityContextMock,
+} = vi.hoisted(() => ({
   getNewsletterMock: vi.fn(),
+  getNewsletterSettingsMock: vi.fn(),
   getTenantSanityContextMock: vi.fn(),
 }));
 
@@ -13,6 +18,11 @@ vi.mock('@blog/service', () => ({
   service: {
     modules: {
       newsletter: { v1: { getNewsletter: getNewsletterMock } },
+    },
+    global: {
+      newsletterSettings: {
+        v1: { getNewsletterSettings: getNewsletterSettingsMock },
+      },
     },
   },
 }));
@@ -44,6 +54,11 @@ const setup = customRenderAsync(NewsletterModule, {
 describe(NewsletterModule, () => {
   beforeEach(() => {
     getNewsletterMock.mockReset();
+    getNewsletterSettingsMock.mockReset();
+    getNewsletterSettingsMock.mockResolvedValue({
+      ok: true,
+      data: { heading: 'Get new posts', trustCues: undefined },
+    });
     vi.mocked(isCapabilityEnabled).mockReset();
     vi.mocked(isCapabilityEnabled).mockResolvedValue(true);
     getTenantSanityContextMock.mockReset();
@@ -59,6 +74,51 @@ describe(NewsletterModule, () => {
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it('passes the settings-sourced trustCues through to the rendered form', async () => {
+    getNewsletterMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: 'PRIMARY',
+        sectionHeader: { heading: 'Get new posts', supportingText: undefined },
+        layout: undefined,
+        contentAlignment: undefined,
+      },
+    });
+    getNewsletterSettingsMock.mockResolvedValue({
+      ok: true,
+      data: {
+        heading: 'Get new posts',
+        trustCues: ['No spam', 'Unsubscribe anytime'],
+      },
+    });
+
+    await setup();
+
+    expect(screen.getByText('No spam')).toBeVisible();
+    expect(screen.getByText('Unsubscribe anytime')).toBeVisible();
+  });
+
+  it('renders no trust cues, without failing, when the newsletter settings fetch fails', async () => {
+    getNewsletterMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: 'PRIMARY',
+        sectionHeader: { heading: 'Get new posts', supportingText: undefined },
+        layout: undefined,
+        contentAlignment: undefined,
+      },
+    });
+    getNewsletterSettingsMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
+
+    await setup();
+
+    expect(screen.getByText('Get new posts')).toBeVisible();
+    expect(screen.queryByText('No spam')).not.toBeInTheDocument();
   });
 
   it('forwards the resolved tenant Sanity context to getNewsletter', async () => {

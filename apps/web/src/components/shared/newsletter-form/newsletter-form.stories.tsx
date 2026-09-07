@@ -19,6 +19,7 @@ const meta = {
     variant: 'full',
     heading: 'Get new posts in your inbox',
     supportingText: 'One email a week, no spam, unsubscribe anytime.',
+    trustCues: ['No spam', 'Unsubscribe anytime'],
   },
 } satisfies Meta<typeof NewsletterForm>;
 

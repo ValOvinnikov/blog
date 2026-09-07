@@ -236,15 +236,32 @@ describe(`<${NewsletterForm.name}/>`, () => {
     expect(screen.getByText('Subscribe for updates.')).toBeVisible();
   });
 
-  it('renders trust cues for the full variant', () => {
-    setup();
+  it('renders the CMS-authored trust cues for the full variant', () => {
+    setup({ trustCues: ['No spam', 'Unsubscribe anytime'] });
 
     expect(screen.getByText('No spam')).toBeVisible();
     expect(screen.getByText('Unsubscribe anytime')).toBeVisible();
   });
 
-  it('does not render trust cues for the compact variant', () => {
-    setup({ variant: 'compact' });
+  it('renders no trust cues when trustCues is undefined (not authored)', () => {
+    setup({ trustCues: undefined });
+
+    expect(screen.queryByText('No spam')).not.toBeInTheDocument();
+    expect(screen.queryByText('Unsubscribe anytime')).not.toBeInTheDocument();
+  });
+
+  it('renders no trust cues when trustCues is an empty array (author cleared it)', () => {
+    setup({ trustCues: [] });
+
+    expect(screen.queryByText('No spam')).not.toBeInTheDocument();
+    expect(screen.queryByText('Unsubscribe anytime')).not.toBeInTheDocument();
+  });
+
+  it('does not render trust cues for the compact variant even when authored', () => {
+    setup({
+      variant: 'compact',
+      trustCues: ['No spam', 'Unsubscribe anytime'],
+    });
 
     expect(screen.queryByText('No spam')).not.toBeInTheDocument();
     expect(screen.queryByText('Unsubscribe anytime')).not.toBeInTheDocument();

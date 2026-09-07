@@ -2,6 +2,7 @@ import { CAPABILITY } from '@blog/config';
 import { service } from '@blog/service';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { logger } from '@web/utils/logger/logger';
 
 import { NewsletterModuleView } from './newsletter-module-view';
 
@@ -12,7 +13,8 @@ export interface INewsletterModuleProps {
 }
 
 /**
- * NewsletterModule — fetches `module_newsletter` data and hands it to
+ * NewsletterModule — fetches `module_newsletter` data plus the tenant's
+ * `trustCues` from the `settings_newsletter` singleton, and hands both to
  * `NewsletterModuleView`. This is the Blog index page's optional
  * page-builder placement (`page_blog.modules`) — editors opt in by adding
  * the module there, no hardcoded mount point. `sectionHeader.heading` is a
@@ -31,12 +33,23 @@ export const NewsletterModule = async ({
   if (!isEnabled) return null;
 
   const tenantContext = await getTenantSanityContext(tenant);
-  const result = await service.modules.newsletter.v1.getNewsletter(
-    id,
-    tenantContext,
-  );
+  const [result, newsletterSettingsResult] = await Promise.all([
+    service.modules.newsletter.v1.getNewsletter(id, tenantContext),
+    service.global.newsletterSettings.v1.getNewsletterSettings(tenantContext),
+  ]);
 
   if (!result.ok) return null;
 
-  return <NewsletterModuleView id={id} {...result.data} />;
+  if (!newsletterSettingsResult.ok) {
+    logger.error('newsletter_module.newsletter_settings_fetch_failed', {
+      error: newsletterSettingsResult.error,
+    });
+  }
+  const trustCues = newsletterSettingsResult.ok
+    ? newsletterSettingsResult.data.trustCues
+    : undefined;
+
+  return (
+    <NewsletterModuleView id={id} {...result.data} trustCues={trustCues} />
+  );
 };
