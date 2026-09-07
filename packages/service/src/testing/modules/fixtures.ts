@@ -77,6 +77,7 @@ export function makeRawPostListModule(
     pageSize: 6,
     layout: null,
     contentAlignment: null,
+    showImages: true,
     ...overrides,
   };
 }
@@ -90,6 +91,7 @@ export function makeRawPostLatestModule(
     limit: 6,
     layout: null,
     contentAlignment: null,
+    showImages: true,
     ...overrides,
   };
 }

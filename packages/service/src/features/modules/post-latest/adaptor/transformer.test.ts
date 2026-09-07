@@ -115,4 +115,20 @@ describe('toPostLatestModule', () => {
 
     expect(module.posts).toEqual([]);
   });
+
+  it('passes showImages through when true', () => {
+    const raw = makeRawPostLatestModule({ showImages: true });
+
+    const module = toPostLatestModule(raw, rawPosts, tenant);
+
+    expect(module.showImages).toBe(true);
+  });
+
+  it('passes showImages through when false', () => {
+    const raw = makeRawPostLatestModule({ showImages: false });
+
+    const module = toPostLatestModule(raw, rawPosts, tenant);
+
+    expect(module.showImages).toBe(false);
+  });
 });
