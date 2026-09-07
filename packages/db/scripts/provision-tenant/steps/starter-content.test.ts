@@ -1,3 +1,5 @@
+import siteMessages from '@blog/config/voice/site-messages.en.json';
+
 import { buildStarterDocuments, STARTER_DOCUMENT_IDS } from './starter-content';
 
 describe(buildStarterDocuments, () => {
@@ -106,6 +108,83 @@ describe(buildStarterDocuments, () => {
     expect(hero.heroTitleMode).toBe('POST_TITLE');
     expect(hero.heroSubtitleMode).toBe('POST_EXCERPT');
     expect(hero.heroImageMode).toBe('POST_IMAGE');
+  });
+
+  it('seeds settings_newsletter formCopy and landing-page copy from the catalog defaults', () => {
+    const newsletter = buildStarterDocuments(tenant, assets).find(
+      (doc) => doc._id === STARTER_DOCUMENT_IDS.NEWSLETTER,
+    ) as unknown as {
+      submitLabel: string;
+      emailPlaceholder: string;
+      successMessage: string;
+      errorInvalid: string;
+      errorAlreadySubscribed: string;
+      errorServer: string;
+      trustCues: string[];
+      confirm: {
+        confirmedTitle: string;
+        confirmedMessage: string;
+        invalidTitle: string;
+        invalidMessage: string;
+        errorTitle: string;
+        errorMessage: string;
+        returnHome: string;
+      };
+      unsubscribe: {
+        confirmTitle: string;
+        confirmMessage: string;
+        confirmButtonLabel: string;
+        successTitle: string;
+        successMessage: string;
+        invalidTitle: string;
+        invalidMessage: string;
+        returnHome: string;
+      };
+    };
+
+    expect(newsletter.submitLabel).toBe(
+      siteMessages.newsletterForm.submitLabel,
+    );
+    expect(newsletter.emailPlaceholder).toBe(
+      siteMessages.newsletterForm.placeholder,
+    );
+    expect(newsletter.successMessage).toBe(
+      siteMessages.newsletterForm.successMessage,
+    );
+    expect(newsletter.errorInvalid).toBe(
+      siteMessages.newsletterForm.errorInvalid,
+    );
+    expect(newsletter.errorAlreadySubscribed).toBe(
+      siteMessages.newsletterForm.errorAlreadySubscribed,
+    );
+    expect(newsletter.errorServer).toBe(
+      siteMessages.newsletterForm.errorServer,
+    );
+    expect(newsletter.trustCues).toEqual([
+      siteMessages.newsletterForm.trustCueNoSpam,
+      siteMessages.newsletterForm.trustCueUnsubscribe,
+    ]);
+
+    expect(newsletter.confirm).toEqual({
+      confirmedTitle: siteMessages.newsletterConfirm.confirmedTitle,
+      confirmedMessage: siteMessages.newsletterConfirm.confirmedMessage,
+      invalidTitle: siteMessages.newsletterConfirm.invalidTitle,
+      invalidMessage: siteMessages.newsletterConfirm.invalidMessage,
+      errorTitle: siteMessages.newsletterConfirm.errorTitle,
+      errorMessage: siteMessages.newsletterConfirm.errorMessage,
+      returnHome: siteMessages.newsletterConfirm.returnHome,
+    });
+
+    expect(newsletter.unsubscribe).toEqual({
+      confirmTitle: siteMessages.newsletterUnsubscribe.confirmTitle,
+      confirmMessage: siteMessages.newsletterUnsubscribe.confirmMessage,
+      confirmButtonLabel: siteMessages.newsletterUnsubscribe.confirmButtonLabel,
+      successTitle: siteMessages.newsletterUnsubscribe.successTitle,
+      successMessage: siteMessages.newsletterUnsubscribe.successMessage,
+      invalidTitle: siteMessages.newsletterUnsubscribe.invalidTitle,
+      invalidMessage: siteMessages.newsletterUnsubscribe.invalidMessage,
+      returnHome: siteMessages.newsletterUnsubscribe.returnHome,
+    });
   });
 
   it('builds a page_home document whose hero reference resolves to the starter hero', () => {

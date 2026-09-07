@@ -4,6 +4,7 @@ import {
   PRESET_ID,
   LINK_TYPE,
 } from '@blog/config/constants';
+import siteMessages from '@blog/config/voice/site-messages.en.json';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 // Fixed document ids (published, not `drafts.`-prefixed) — every field a
@@ -122,6 +123,35 @@ export function buildStarterDocuments(
     _type: 'settings_newsletter',
     title: 'Newsletter',
     heading: 'Subscribe for updates',
+    submitLabel: siteMessages.newsletterForm.submitLabel,
+    emailPlaceholder: siteMessages.newsletterForm.placeholder,
+    successMessage: siteMessages.newsletterForm.successMessage,
+    errorInvalid: siteMessages.newsletterForm.errorInvalid,
+    errorAlreadySubscribed: siteMessages.newsletterForm.errorAlreadySubscribed,
+    errorServer: siteMessages.newsletterForm.errorServer,
+    trustCues: [
+      siteMessages.newsletterForm.trustCueNoSpam,
+      siteMessages.newsletterForm.trustCueUnsubscribe,
+    ],
+    confirm: {
+      confirmedTitle: siteMessages.newsletterConfirm.confirmedTitle,
+      confirmedMessage: siteMessages.newsletterConfirm.confirmedMessage,
+      invalidTitle: siteMessages.newsletterConfirm.invalidTitle,
+      invalidMessage: siteMessages.newsletterConfirm.invalidMessage,
+      errorTitle: siteMessages.newsletterConfirm.errorTitle,
+      errorMessage: siteMessages.newsletterConfirm.errorMessage,
+      returnHome: siteMessages.newsletterConfirm.returnHome,
+    },
+    unsubscribe: {
+      confirmTitle: siteMessages.newsletterUnsubscribe.confirmTitle,
+      confirmMessage: siteMessages.newsletterUnsubscribe.confirmMessage,
+      confirmButtonLabel: siteMessages.newsletterUnsubscribe.confirmButtonLabel,
+      successTitle: siteMessages.newsletterUnsubscribe.successTitle,
+      successMessage: siteMessages.newsletterUnsubscribe.successMessage,
+      invalidTitle: siteMessages.newsletterUnsubscribe.invalidTitle,
+      invalidMessage: siteMessages.newsletterUnsubscribe.invalidMessage,
+      returnHome: siteMessages.newsletterUnsubscribe.returnHome,
+    },
   };
 
   const site: TSanityDocument = {
