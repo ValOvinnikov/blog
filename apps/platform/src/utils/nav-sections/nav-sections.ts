@@ -51,13 +51,11 @@ const configurationNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
       label: t('look'),
       icon: ICONS.PALETTE,
       href: hrefs.look,
-      badge: shipping,
     },
     {
       label: t('voice'),
       icon: ICONS.QUOTE,
       href: hrefs.voice,
-      badge: shipping,
     },
     {
       label: t('features'),
