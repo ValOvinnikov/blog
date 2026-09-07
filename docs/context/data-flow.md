@@ -124,13 +124,18 @@ apps/web
 (props) => ReactNode>` — typed exhaustively over `TModuleType`
   (`@blog/config`) minus the slot-rendered types, so omitting any other
   module type from the map is a compile error. `TSlotModuleType` names every
-  module reached through a **dedicated slot** rather than a page's
+  module reached **only** through a dedicated slot and never through a page's
   `modules[]` array, so none of them can ever reach `ModuleRenderer`: the
-  hero family (every `module_hero*` type) via a page's `hero` reference,
-  `module_postList` via `page_blog`'s `postList` reference, and
-  `module_taxonomyList` via `page_topicIndex`'s `taxonomyList` reference.
-  Because the exclusion is derived rather than a hardcoded literal union, a
-  new hero kind leaves `MODULE_MAP` alone.
+  hero family (every `module_hero*` type) via a page's `hero` reference, and
+  `module_postList` via `page_blog`'s `postList` reference. Because the
+  exclusion is derived rather than a hardcoded literal union, a new hero kind
+  leaves `MODULE_MAP` alone.
+
+  `module_taxonomyList` is the one module that renders **both** ways, so it is
+  not in that union: it holds `page_topicIndex`'s and `page_tagIndex`'s
+  required `taxonomyList` slot, and it is also placeable in
+  `page_home.modules[]` and `page_generic.modules[]`, where it reaches
+  `ModuleRenderer` through its `MODULE_MAP` entry like any other module.
 
   Exclusion from `MODULE_MAP` does **not** exempt a module from
   `REVALIDATE_TAGS` (`apps/web/src/utils/revalidate-tags/revalidate-tags.ts`),

@@ -23,11 +23,11 @@ type is a compile error rather than silent drift, in two separate places:
 web's `MODULE_MAP`, and `REVALIDATE_TAGS`' required
 `Record<TModuleType, …>` half (see [`data-flow.md`](./data-flow.md)).
 
-`MODULE_MAP` excludes three types — `module_hero`, `module_postList` and
-`module_taxonomyList` — each rendered through a dedicated page slot rather
-than a `modules[]` array, so none can reach `ModuleRenderer`. Exclusion there
-does **not** exempt them from `REVALIDATE_TAGS`, which requires an entry for
-every module type.
+`MODULE_MAP` excludes two types — `module_hero` and `module_postList` — each
+rendered _only_ through a dedicated page slot and never through a `modules[]`
+array, so neither can reach `ModuleRenderer`. Exclusion there does **not**
+exempt them from `REVALIDATE_TAGS`, which requires an entry for every module
+type. `module_taxonomyList` renders both ways and so is in `MODULE_MAP`.
 
 **Module documents** (`packages/studio/src/schema-types/modules/`)
 
@@ -49,10 +49,15 @@ every module type.
   from `module_postList` so one type is never both a teaser and an archive;
   which mode you get is settled by the type, not by page context.
 - `module_taxonomyList` (`taxonomyListSchema`) — internal `title`,
-  `sectionHeader` (optional). Lists taxonomy entries as cards. It carries
-  **no "topics or tags" field** — which taxonomy it lists is inferred from
-  which index page's required slot holds it, the same inference-by-slot rule
-  the post list uses. It also carries **no `emptyMessage`**: empty-state copy
+  `sectionHeader` (optional), `taxonomy` (`TAXONOMY_KIND`, optional),
+  `sortOrder` (`TAXONOMY_SORT`, `ALPHABETICAL` by default) and `limit`
+  (optional integer ≥ 1). Lists taxonomy entries as cards. `taxonomy` is
+  optional on the document because a module cannot see what holds it, so the
+  requirement lives on the pages: `page_home`/`page_generic` reject a
+  `modules[]` placement that leaves it empty, while an index page leaves it
+  empty and the service falls back to that page's own kind — and that page's
+  slot rule rejects a module set to the other kind. It carries
+  **no `emptyMessage`**: empty-state copy
   belongs to Voice (`site_config.voiceOverrides`, edited in the platform's
   Voice page and overridable per tenant), not to modules — same
   as `module_postList` since #1899.
