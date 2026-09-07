@@ -147,4 +147,22 @@ describe(PostListModuleView, () => {
       undefined,
     );
   });
+
+  it('passes hasImages through to PostsSection', () => {
+    setup({ hasImages: true });
+
+    expect(vi.mocked(PostsSection)).toHaveBeenLastCalledWith(
+      expect.objectContaining({ hasImages: true }),
+      undefined,
+    );
+  });
+
+  it('leaves hasImages undefined on PostsSection when not given', () => {
+    setup();
+
+    expect(vi.mocked(PostsSection)).toHaveBeenLastCalledWith(
+      expect.objectContaining({ hasImages: undefined }),
+      undefined,
+    );
+  });
 });

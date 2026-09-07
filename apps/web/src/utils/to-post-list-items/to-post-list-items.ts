@@ -2,6 +2,7 @@ import { routes } from '@blog/config';
 import type { TPostCardTopic } from '@blog/service';
 import type { IPostCardData } from '@blog/ui/organisms/posts-section';
 import { getFormatter } from 'next-intl/server';
+import type { ReactNode } from 'react';
 
 /**
  * Structural source shape accepted by `toPostListItems` — satisfied by both
@@ -28,8 +29,9 @@ type TPostListItemSource = {
  * from the current request's config (`i18n/request.ts`) automatically, so no
  * `locale` argument is threaded through here or by callers.
  */
-export const toPostListItems = async (
-  posts: readonly TPostListItemSource[],
+export const toPostListItems = async <T extends TPostListItemSource>(
+  posts: readonly T[],
+  renderImage?: (post: T) => ReactNode | undefined,
 ): Promise<IPostCardData[]> => {
   const format = await getFormatter();
 
@@ -46,5 +48,6 @@ export const toPostListItems = async (
     }),
     readingTime: `${post.readingTimeMinutes} min`,
     topic: post.topic,
+    image: renderImage?.(post),
   }));
 };

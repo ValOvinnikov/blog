@@ -3,6 +3,7 @@ import {
   makePostCardTopic,
 } from '@web/testing/shared/post/fixtures';
 import { getFormatter } from 'next-intl/server';
+import type { ReactNode } from 'react';
 
 import { toPostListItems } from './to-post-list-items';
 
@@ -72,5 +73,24 @@ describe('toPostListItems', () => {
 
   it('maps an empty list to an empty list', async () => {
     expect(await toPostListItems([])).toEqual([]);
+  });
+
+  it('sets image from renderImage when given', async () => {
+    const post = makePostCard({ id: 'post-1' });
+    const image = 'rendered-image' as unknown as ReactNode;
+    const renderImage = vi.fn().mockReturnValue(image);
+
+    const [item] = await toPostListItems([post], renderImage);
+
+    expect(renderImage).toHaveBeenCalledWith(post);
+    expect(item?.image).toBe(image);
+  });
+
+  it('leaves image undefined when no renderImage is given', async () => {
+    const post = makePostCard({ id: 'post-1' });
+
+    const [item] = await toPostListItems([post]);
+
+    expect(item?.image).toBeUndefined();
   });
 });

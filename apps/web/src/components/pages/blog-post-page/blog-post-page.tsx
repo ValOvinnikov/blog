@@ -21,6 +21,7 @@ import {
 } from '@web/utils/extract-post-headings/extract-post-headings';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { logger } from '@web/utils/logger/logger';
+import { renderPostCardImage } from '@web/utils/render-post-card-image';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { toSocialIconName } from '@web/utils/to-social-icon-name';
 import { getFormatter, getTranslations } from 'next-intl/server';
@@ -85,7 +86,7 @@ export const BlogPostPage = async ({ slug, tenant }: TBlogPostPageProps) => {
     getFormatter(),
     getTranslations('breadcrumbs'),
     getTranslations('blogPostPage'),
-    toPostListItems(relatedPosts),
+    toPostListItems(relatedPosts, renderPostCardImage),
     service.global.newsletterSettings.v1.getNewsletterSettings(tenantContext),
     isCapabilityEnabled(CAPABILITY.BOOKMARKS, tenant),
   ]);

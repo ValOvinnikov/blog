@@ -283,6 +283,27 @@ describe(BlogPostPageView, () => {
     expect(screen.queryByText('Related reading')).not.toBeInTheDocument();
   });
 
+  it('renders a media region for related reading, unconditionally', () => {
+    setup({
+      relatedPostItems: [
+        {
+          id: 'related-1',
+          href: '/blog/a-related-post',
+          title: 'A Related Post',
+          excerpt: 'A related excerpt.',
+          publishedAt: '2026-01-10T00:00:00.000Z',
+          formattedDate: 'January 10, 2026',
+          readingTime: '3 min',
+          topic: { title: 'Design' },
+          image: <div data-testid="related-image-node" />,
+        },
+      ],
+    });
+
+    expect(screen.getByTestId('post-card-media')).toBeInTheDocument();
+    expect(screen.getByTestId('related-image-node')).toBeInTheDocument();
+  });
+
   it("renders no reading-depth control when the post has neither a skim nor asides (today's behavior)", () => {
     setup();
 

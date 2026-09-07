@@ -400,6 +400,54 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(screen.queryByText('Related reading')).not.toBeInTheDocument();
   });
 
+  it('renders a related post’s hero image unconditionally, with no priority/fetchpriority hint', async () => {
+    const relatedImage: ISanityImage = {
+      assetId: 'image-abc123-800x600-jpg',
+      alt: 'A related post hero image',
+      hotspot: undefined,
+      crop: undefined,
+      lqip: undefined,
+      dimensions: { width: 800, height: 600, aspectRatio: 800 / 600 },
+      cdnBaseUrl: 'https://cdn.sanity.io/images/test-project/test-dataset/',
+    };
+    getPostMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...mockPostDetail,
+        relatedPosts: [
+          {
+            id: 'related-1',
+            title: 'A Related Post',
+            slug: 'a-related-post',
+            excerpt: 'A related excerpt.',
+            publishedAt: '2026-01-10T00:00:00.000Z',
+            heroImageUrl: undefined,
+            heroImageAlt: undefined,
+            heroImageSanity: relatedImage,
+            featured: false,
+            author: {
+              id: 'author-1',
+              name: 'Jane Doe',
+              profilePageSlug: 'jane-doe',
+              imageUrl: undefined,
+            },
+            topic: {
+              id: 'topic-2',
+              title: 'Design',
+              slug: 'design',
+            },
+            readingTimeMinutes: 2,
+          },
+        ],
+      },
+    });
+
+    await setup();
+
+    const img = screen.getByRole('img', { name: relatedImage.alt });
+    expect(img).not.toHaveAttribute('fetchpriority');
+  });
+
   describe('newsletter signup', () => {
     it('renders the compact newsletter signup, sourced from the newsletter settings singleton, when newsletterEnabled is true', async () => {
       getPostMock.mockResolvedValue({

@@ -244,6 +244,7 @@ export const BlogPostPageView = ({
             titleId="related-posts-title"
             linkAs={SmartLink}
             isTinted={true}
+            hasImages={true}
           />
         )}
       </main>
