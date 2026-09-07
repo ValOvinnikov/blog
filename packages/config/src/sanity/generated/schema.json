@@ -2418,6 +2418,16 @@
           "type": "string"
         },
         "optional": true
+      },
+      "trustCues": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "array",
+          "of": {
+            "type": "string"
+          }
+        },
+        "optional": true
       }
     }
   },
