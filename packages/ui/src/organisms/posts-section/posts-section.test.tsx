@@ -269,4 +269,40 @@ describe(`<${PostsSection.name}/>`, () => {
     expect(heading).not.toHaveClass('sr-only');
     expect(screen.queryByText(accessibleTitle)).not.toBeInTheDocument();
   });
+
+  it('renders no media region on any card when hasImages is unset', () => {
+    setup();
+
+    expect(screen.queryAllByTestId('post-card-media')).toHaveLength(0);
+  });
+
+  it('renders a PostCard.Media region on every card when hasImages is set, including cards with no image node', () => {
+    const postsWithMixedImages = posts.map((post, index) =>
+      index === 0
+        ? { ...post, image: <img src="/cover.jpg" alt={post.title} /> }
+        : post,
+    );
+
+    setup({ posts: postsWithMixedImages, hasImages: true });
+
+    expect(screen.getAllByTestId('post-card-media')).toHaveLength(posts.length);
+    expect(screen.getByRole('img', { name: posts[0]?.title })).toBeVisible();
+  });
+
+  it('keeps the grid holding one PostCard per post with mixed image presence', () => {
+    const postsWithMixedImages = posts.map((post, index) =>
+      index === 1
+        ? { ...post, image: <img src="/cover.jpg" alt={post.title} /> }
+        : post,
+    );
+
+    setup({ posts: postsWithMixedImages, hasImages: true });
+
+    for (const post of posts) {
+      expect(
+        screen.getByRole('heading', { level: 3, name: post.title }),
+      ).toBeVisible();
+    }
+    expect(screen.getAllByTestId('post-card-media')).toHaveLength(posts.length);
+  });
 });
