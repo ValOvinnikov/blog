@@ -3,24 +3,9 @@
 // (`apps/platform/src/utils/voice-fields/voice-fields.ts`) one key at a time —
 // that's the write side, this is the read side of the same curated fields.
 const VOICE_OVERRIDE_PATHS: Record<string, readonly string[]> = {
-  notFoundMetaTitle: ['notFound', 'metaTitle'],
-  notFoundMetaDescription: ['notFound', 'metaDescription'],
-  notFoundCommandNotFound: ['notFound', 'heading'],
-  notFoundDescription: ['notFound', 'supportingText'],
+  notFoundHeading: ['notFound', 'heading'],
+  notFoundSupportingText: ['notFound', 'supportingText'],
   notFoundReturnHome: ['notFound', 'returnHome'],
-  terminalPromptHost: ['authMenu', 'promptHost'],
-  authPromptCommandSignIn: ['authMenu', 'promptCommandSignIn'],
-  authPromptCommandAccount: ['authMenu', 'promptCommandAccount'],
-  bookmarksPromptCommand: ['bookmarksPage', 'promptCommand'],
-  accountPrivacyPromptCommand: ['accountPage', 'privacy', 'promptCommand'],
-  accountNewsletterPromptCommand: [
-    'accountPage',
-    'newsletter',
-    'promptCommand',
-  ],
-  accountIdentityPromptCommand: ['accountPage', 'identity', 'promptCommand'],
-  bookmarkToastSavedMessage: ['bookmarkButton', 'toastSavedMessage'],
-  bookmarkToastRemovedMessage: ['bookmarkButton', 'toastRemovedMessage'],
   blogListEmpty: ['blogListPage', 'empty'],
   topicEmpty: ['topicPage', 'empty'],
   tagEmpty: ['tagPage', 'empty'],

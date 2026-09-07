@@ -1,31 +1,25 @@
+import realMessages from '@web/i18n/messages/en.json';
+
 import { applyVoiceOverrides } from './apply-voice-overrides';
 
 // Mirrors the source file's private VOICE_OVERRIDE_PATHS map — it isn't
 // exported, so the two must be kept in sync by hand.
 const CURATED_KEY_PATHS: Record<string, readonly string[]> = {
-  notFoundMetaTitle: ['notFound', 'metaTitle'],
-  notFoundMetaDescription: ['notFound', 'metaDescription'],
-  notFoundCommandNotFound: ['notFound', 'heading'],
-  notFoundDescription: ['notFound', 'supportingText'],
+  notFoundHeading: ['notFound', 'heading'],
+  notFoundSupportingText: ['notFound', 'supportingText'],
   notFoundReturnHome: ['notFound', 'returnHome'],
-  terminalPromptHost: ['authMenu', 'promptHost'],
-  authPromptCommandSignIn: ['authMenu', 'promptCommandSignIn'],
-  authPromptCommandAccount: ['authMenu', 'promptCommandAccount'],
-  bookmarksPromptCommand: ['bookmarksPage', 'promptCommand'],
-  accountPrivacyPromptCommand: ['accountPage', 'privacy', 'promptCommand'],
-  accountNewsletterPromptCommand: [
-    'accountPage',
-    'newsletter',
-    'promptCommand',
-  ],
-  accountIdentityPromptCommand: ['accountPage', 'identity', 'promptCommand'],
-  bookmarkToastSavedMessage: ['bookmarkButton', 'toastSavedMessage'],
-  bookmarkToastRemovedMessage: ['bookmarkButton', 'toastRemovedMessage'],
   blogListEmpty: ['blogListPage', 'empty'],
   topicEmpty: ['topicPage', 'empty'],
   tagEmpty: ['tagPage', 'empty'],
   topicsEmpty: ['topicsPage', 'empty'],
   bookmarksEmpty: ['bookmarksPage', 'empty'],
+};
+
+const getAtPath = (source: unknown, path: readonly string[]): unknown => {
+  return path.reduce<unknown>((node, segment) => {
+    if (typeof node !== 'object' || node === null) return undefined;
+    return (node as Record<string, unknown>)[segment];
+  }, source);
 };
 
 describe(applyVoiceOverrides, () => {
@@ -44,6 +38,13 @@ describe(applyVoiceOverrides, () => {
     },
   );
 
+  it.each(Object.entries(CURATED_KEY_PATHS))(
+    'has a path for %s that resolves to a real string in en.json',
+    (_key, path) => {
+      expect(getAtPath(realMessages, path)).toBeTypeOf('string');
+    },
+  );
+
   it('sets a nested path without touching its siblings', () => {
     const messages = {
       notFound: { heading: 'Page not found', supportingText: 'desc' },
@@ -51,7 +52,7 @@ describe(applyVoiceOverrides, () => {
     };
 
     const result = applyVoiceOverrides(messages, {
-      notFoundCommandNotFound: 'nope',
+      notFoundHeading: 'nope',
     });
 
     expect(result).toEqual({
@@ -63,26 +64,24 @@ describe(applyVoiceOverrides, () => {
   it('does not mutate the input object', () => {
     const messages = { notFound: { heading: 'Page not found' } };
 
-    applyVoiceOverrides(messages, { notFoundCommandNotFound: 'nope' });
+    applyVoiceOverrides(messages, { notFoundHeading: 'nope' });
 
     expect(messages.notFound.heading).toBe('Page not found');
   });
 
   it('applies a deeply nested override without disturbing its siblings', () => {
     const messages = {
-      accountPage: {
-        privacy: { promptCommand: 'Privacy' },
-        newsletter: { promptCommand: 'Newsletter' },
-      },
+      topicPage: { empty: 'No posts in this topic yet.' },
+      tagPage: { empty: 'No posts tagged this yet.' },
     };
 
     const result = applyVoiceOverrides(messages, {
-      accountPrivacyPromptCommand: 'my data',
+      topicEmpty: 'Nothing here yet',
     });
 
-    expect(result.accountPage).toEqual({
-      privacy: { promptCommand: 'my data' },
-      newsletter: { promptCommand: 'Newsletter' },
+    expect(result).toEqual({
+      topicPage: { empty: 'Nothing here yet' },
+      tagPage: { empty: 'No posts tagged this yet.' },
     });
   });
 
@@ -101,7 +100,7 @@ describe(applyVoiceOverrides, () => {
     };
 
     const result = applyVoiceOverrides(messages, {
-      notFoundCommandNotFound: 'nope',
+      notFoundHeading: 'nope',
       bookmarksEmpty: 'nothing saved',
     });
 
