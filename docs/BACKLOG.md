@@ -952,12 +952,32 @@ latest view models` — `postCardFragment` already carries `heroImageSanity`
   layout (first post large, rest as cards), an `h2` section for `modules[]`
   anywhere — distinct from `module_heroBlog` (owns the page `h1`) and from
   `module_postLatest` (automatic). Validation: unique refs, published only.
-- **Sub-issues:** **studio** · `feat(studio): module_postFeatured schema`;
-  **service** · `feat(service): postFeatured loader`; **ui** ·
-  `feat(ui): FeaturedPosts organism (spotlight layout)`; **web** ·
-  `feat(web): postFeatured MODULE_MAP entry`.
+  **Answered 2026-09-08** in the portfolio design doc: an explicit
+  `postSource` (`PINNED` array of one to three in authored order, or
+  `NEWEST_FEATURED` with a limit) under `POST_SOURCE`, the hero's constant
+  renamed; one `select()` query; the spotlight is `PostsSection` with a
+  `hasLead` first card (`PostCard` `isSplit` + `isLead`), tail in a row of
+  as many columns as cards, so no count leaves a hole; allowed on home,
+  landing and blog pages.
+- **Sub-issues** (config first; ui independent of the rest; studio → service
+  → web in that order):
+  - **config** · `feat(config): rename HERO_POST_SOURCE to POST_SOURCE` —
+    with its four consumers; its own PR, first.
+  - **studio** · `feat(studio): module_postFeatured schema` — source,
+    posts, limit, the async featured check, three allow-lists and validator
+    lists, the `featured` description.
+  - **service** · `feat(service): postFeatured loader` — merged query,
+    limit in the transformer.
+  - **ui** · `feat(ui): spotlight layout on PostsSection and PostCard` —
+    `isSplit`, `isLead`, `hasLead`; its own PR, additive.
+  - **web** · `feat(web): postFeatured MODULE_MAP entry` — module, `hasLead`
+    through the shared view, lead image helper, tags, i18n.
+- **PRs:** config alone, ui alone, then studio + service + web together
+  (typegen reds `MODULE_MAP` and `REVALIDATE_TAGS` until the web entries
+  land).
 - **Acceptance:** placeable on home, blog and landing pages; renders nothing
-  when every pinned post is unpublished; images follow the 1.2 toggle.
+  when nothing resolves to a published post; one, two and three posts each
+  fill their rows; images follow the 1.2 toggle.
 
 #### 1.4 Carousel display mode (Embla) — epic `feat: carousel display mode for listing modules`
 

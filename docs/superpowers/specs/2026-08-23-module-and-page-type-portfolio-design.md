@@ -935,6 +935,214 @@ an index page whose module is set to the other kind fails validation.
 - Term images. `blog_topic` / `blog_tag` carry none; a card with an image
   is a different molecule.
 
+## `module_postFeatured` — the editor-pinned spotlight
+
+**Goal:** a module an editor finds by name: one to three posts in a
+spotlight — the first large, the rest as cards — as an `h2` section
+anywhere in `modules[]`. It is neither `module_heroBlog` (one post, owns
+the page's `h1`) nor `module_postLatest` (automatic, never chosen). Design
+of record for epic #2784, settled in #2828.
+
+Interactive mock of the Studio form, the three layouts and every
+validation state:
+<https://claude.ai/code/artifact/d22ed2b2-0508-4bc3-afbe-ebe76ef74013>.
+
+### Fields
+
+| Field               | Type                                                      | Notes                                                                                      |
+| ------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `title`             | `titleField()`                                            | Editor-facing name, never rendered                                                         |
+| `brandVariant`      | `brandVariantField()`                                     |                                                                                            |
+| `sectionHeader`     | `sectionHeaderField()`                                    | Blank heading falls back to "Featured"                                                     |
+| `showImages`        | `showImagesField()`                                       | The 1.2 toggle, applied to the lead and the cards alike                                    |
+| `postSource`        | `POST_SOURCE` radio, required, initial `PINNED`           | `PINNED` · `NEWEST_FEATURED` — the `module_heroBlog` rule, under a name that is not "hero" |
+| `posts`             | array of references → `blog_post`, hidden unless `PINNED` | One to three; array order is display order, the first is the lead                          |
+| `limit`             | number, hidden unless `NEWEST_FEATURED`, initial `3`      | Integer, 1 to 3                                                                            |
+| _alignment, layout_ | `defineAlignmentFields([])`, `layoutField`                |                                                                                            |
+
+**The source is explicit, not inferred from an empty array.** The epic
+sketched "pinned when set, newest featured when the array is empty". That
+is the rule `module_heroBlog` replaced, for the reason recorded there: an
+editor cannot tell "I chose the fallback" from "I forgot to pin" without
+reading a field description. `postSource` makes the choice a control, the
+array and the limit each show only under the source that uses them, and an
+empty array under `PINNED` is an error rather than a silent mode switch.
+
+**The constant is `POST_SOURCE`.** `HERO_POST_SOURCE` shipped with
+`module_heroBlog` and has the exact two values this module needs; a
+non-hero module importing a `HERO_`-prefixed constant reads wrong for as
+long as it exists. It is renamed in `@blog/config` with its four consumers
+(the hero schema and its test, the hero query, the starter-content
+script) updated in the same small PR, before the module's own PR.
+
+### Validation
+
+| State                                          | Level   | Message                                                                                      |
+| ---------------------------------------------- | ------- | -------------------------------------------------------------------------------------------- |
+| `PINNED` with no posts                         | Error   | Pin at least one post, or switch the source to Newest featured.                              |
+| `PINNED` with more than three                  | Error   | A spotlight holds at most three posts.                                                       |
+| The same post pinned twice                     | Error   | `unique()` on the array                                                                      |
+| A pinned post's `publishedAt` is in the future | Warning | This post publishes later. The spotlight skips it until then.                                |
+| `NEWEST_FEATURED` with none in the dataset     | Error   | No published post is marked Featured, so this spotlight would render empty.                  |
+| Two blank-heading spotlights on one page       | Error   | `validateSingleBlankHeadingPerType` gains `module_postFeatured` on every page that allows it |
+
+"Published only" needs no picker filter. For a strong reference — the
+default, and what `posts` uses — Sanity refuses to publish a document that
+references an unpublished one, so a draft-only post cannot be pinned into
+a published module; a scheduled post can, and is skipped at
+read time until its date, hence the warning rather than an error. The
+async "none in the dataset" check runs against `getDraftsClient(context)`,
+as `module_heroBlog`'s does.
+
+`blog_post.featured`'s description — "Pin this post to the featured slot on
+the home page" — describes `module_hero`, which is being retired. It
+becomes "Marks this post for the Newest featured source of the blog hero
+and the featured spotlight."
+
+### Service
+
+One query, the `module_heroBlog` shape:
+
+```groq
+*[_type == "module_postFeatured" && _id == $id][0]{
+  …,
+  "posts": select(
+    postSource == "PINNED" =>
+      posts[]->[publishedAt <= now()]{ postCardFragment },
+    *[_type == "blog_post" && featured == true && publishedAt <= now()]
+      | order(publishedAt desc)[0...3]{ postCardFragment }
+  ),
+  limit
+}
+```
+
+- **Pinned order is authored order.** `posts[]->` keeps the array's
+  sequence, so the editor's first pick is the lead. The published filter
+  drops what cannot render; nothing re-sorts.
+- **The fallback fetches three and the transformer cuts to `limit`.** Three
+  is the ceiling, so the literal slice costs nothing, and it keeps a
+  parameter out of a slice expression.
+- **An empty result is a result, not an error.** Every pinned post
+  unpublished, or no featured post yet, yields `posts: []`; the module
+  omits itself. Only an unresolvable module id fails.
+- **Cache tags:** `modules:postFeatured`, `module:<id>`, `posts`, `author`,
+  `topic` — the same set `getPostLatest` carries, in one `isr(...)` rather
+  than two.
+
+```ts
+type TPostFeaturedModule = {
+  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  sectionHeader: TSectionHeader;
+  posts: TPostCard[];
+  layout: TMaybeUndefined<TLayout>;
+  contentAlignment: TMaybeUndefined<TContentAlignment>;
+  showImages: boolean;
+};
+```
+
+Structurally `TPostLatestModule`. That is deliberate: the web view, the
+card mapping and the carousel display mode (1.4) treat the two as the same
+thing with a different first card.
+
+### `@blog/ui` — a `PostsSection` layout, not a new organism
+
+The spotlight is `PostsSection` with a different first card. Everything
+else the section owns — the heading and its accessible fallback, the
+supporting text, the images toggle, the empty state, the tint and wrap
+variants — is unchanged, and 1.4's carousel will wrap this same section.
+A `FeaturedPosts` organism would duplicate all of it to change one card.
+
+**`PostCard` gains two booleans.**
+
+| Prop      | Effect                                                                                                             |
+| --------- | ------------------------------------------------------------------------------------------------------------------ |
+| `isSplit` | Below `md`, unchanged (media above copy). From `md`, media and copy sit side by side, media first, in a 1:1 split  |
+| `isLead`  | Display-size title, the excerpt at three lines instead of two, and a taller media frame; meta and footer unchanged |
+
+Both are presentation only. DOM order is media, meta, title, footer at
+every width, so the accessible reading order does not change with the
+layout.
+
+**`PostsSection` gains `hasLead?: boolean`.** When set, the first post
+renders as `isLead` + `isSplit` across the full width, and the rest render
+below in a row of as many columns as there are cards — two cards as
+ordinary cards, a single card as `isSplit` so it too fills its row:
+
+| Posts | Layout                                                            |
+| ----- | ----------------------------------------------------------------- |
+| 1     | The lead alone, split from `md`                                   |
+| 2     | The lead, then the second post as an `isSplit` card at full width |
+| 3     | The lead, then two ordinary cards in two columns from `sm`        |
+
+Every count fills its rows; there is no third-column hole because the tail
+never uses the section's own three-column grid (`PostsSection` lays out
+its cards with its own grid classes, not the `PostGrid` organism). Card heading level stays
+`cardHeadingLevel` (default 3) for the lead too — it is the section's
+first item, not a new heading tier.
+
+### Web
+
+`PostFeaturedModule` is `PostLatestModule` with a different loader and one
+extra prop through to the view: `PostListModuleView` gains `hasLead` and
+passes it to `PostsSection`. The image callback stays the 1.2 helper for
+the cards; the lead gets a sibling `renderPostLeadImage` — 960 × 540,
+`sizes="(min-width: 768px) 50vw, 100vw"`, still `loading="lazy"`, never
+`priority` — chosen per post by comparing against the first id. Copy:
+`postFeaturedModule.fallbackHeading` = "Featured". `REVALIDATE_TAGS`
+gains `module_postFeatured: ['modules:postFeatured']`.
+
+### Pages and desk
+
+`page_home`, `page_generic` and `page_blog` allow it — the blog page today
+allows only `cta` and `newsletter` beside its required list, and the
+spotlight is the first listing module that makes sense above or below a
+paginated archive. Each of the three adds `module_postFeatured` to its
+`validateSingleBlankHeadingPerType` list (the blog page gains the rule for
+the first time). It sits in the post-modules desk group beside
+`module_postLatest`.
+
+### Migration
+
+None — a new type and a constant rename whose stored values do not change.
+
+### Per-layer scope and PRs
+
+- **config** — `HERO_POST_SOURCE` → `POST_SOURCE`, with its four
+  consumers. **Its own PR, first**; merges green alone.
+- **ui** — `isSplit` / `isLead` on `PostCard`, `hasLead` on
+  `PostsSection`; stories for one, two and three posts with and without
+  images; tests that the first card carries both variants and the tail
+  never renders three columns; `COMPONENTS.md`. **Its own PR**; additive.
+- **studio** — the schema, `posts` and `limit` visibility and rules, the
+  async featured check, the `featured` description, three allow-lists and
+  three validator lists, desk entry; `pnpm typegen`.
+- **service** — the merged query, `limit` in the transformer, tests for
+  pinned, pinned-with-unpublished, fallback with and without limit, and
+  empty.
+- **web** — module component, `hasLead` through the view, the lead image
+  helper, i18n, `MODULE_MAP` and `REVALIDATE_TAGS`; tests; a story.
+
+**studio + service + web ship as one PR**: typegen adds
+`module_postFeatured` to `TModuleType`, which reds `MODULE_MAP` and
+`REVALIDATE_TAGS` until the web entries land — the same reason
+`module_heroBlog` shipped as one.
+
+**Acceptance:** placeable on home, landing and blog pages; pinned posts
+render in authored order with the first as the lead; the newest-featured
+source honours its limit; the module renders nothing when nothing
+resolves; one, two and three posts each fill their rows; images follow the
+toggle; a blank heading reads "Featured" and two blank spotlights on one
+page fail validation.
+
+### Not in scope
+
+- Per-post overrides (a custom title or image on a pin). The card shows
+  the post as published; the hero is where copy gets rewritten.
+- A "sticky" pin that survives the source switch. Switching source hides
+  the array; switching back restores it, since the field keeps its value.
+- The carousel display mode — 1.4 adds `displayMode` to this module and
+  `module_postLatest` together.
+
 ## Contact form / lead capture
 
 **Goal:** the module clients most want — and the only one in the catalogue
@@ -1104,6 +1312,13 @@ point; the graph stays acyclic.
   index-page behaviour; one `select()` query resolves module and terms with
   the index page's kind as the fallback; `module_taxonomyList` leaves
   `TSlotModuleType`, so the epic ships as one PR (2026-09-07, #2841).
+- **The featured spotlight is `PostsSection` with a lead card, sourced the
+  way the blog hero is** — an explicit `postSource` (`POST_SOURCE`, the
+  hero's constant renamed) with a one-to-three pinned array in authored
+  order or a limited newest-featured fallback, resolved in one `select()`
+  query; `PostCard` gains `isSplit`/`isLead`, `PostsSection` gains
+  `hasLead`, and the tail never uses the three-column grid so one, two and
+  three posts all fill their rows; no new organism (2026-09-08, #2828).
 
 ## Non-goals (recorded so #1919 doesn't sprawl)
 
@@ -1122,6 +1337,8 @@ point; the graph stays acyclic.
   single issue under it.
 - **Post grid images** — epic #2782 (design #2816, then `studio → service →
 ui → web`); the featured spotlight (#2784) and carousel (#2785) wait on it.
+- **Featured spotlight** — epic #2784 (design #2828, then config in its own
+  PR, ui in its own PR, and `studio → service → web` as one PR).
 - **Placeable taxonomy list** — epic #2787 (design #2841, then `config →
 studio → service → web` in a single PR; no ui work).
 - **`module_heroBlog`** — epic #2780 (design #2802, then `studio → service →
@@ -1146,6 +1363,10 @@ catalogue has enough shipped history to matter).
 
 ## Resync log
 
+- **2026-09-08** — added the "`module_postFeatured`" design section (#2828):
+  explicit `postSource` under a renamed `POST_SOURCE`, the one-to-three
+  pinned array, the merged query, `isSplit`/`isLead` on `PostCard` and
+  `hasLead` on `PostsSection`, and the three-PR split.
 - **2026-09-07** — added "The placeable taxonomy list" design section
   (#2841): one type with an optional authored `taxonomy` guarded by page-level
   rules, `sortOrder` and `limit`, the merged `select()` query with a fallback
