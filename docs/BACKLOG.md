@@ -812,7 +812,7 @@ generalisation` — output: a design section covering the derived hero type,
   studio helper. Must answer: which pages get a hero slot (home required,
   landing page optional, work page later), and what the shared hero field set
   is (brand variant, hero layout, image, actions, content position, content
-  alignment, mobile media order). **Answered 2026-09-07** in the portfolio
+  alignment, media order). **Answered 2026-09-07** in the portfolio
   design doc: home required, every other page optional and replacing its
   default header; the shared tail ships with `module_heroBlog`.
 - **Sub-issues (dependency order):**
@@ -855,25 +855,41 @@ landing pages` — `Record<THeroModuleType, …>` so an unregistered hero kind
   hero's known faults: (a) four mode/value pairs collapse to **optional
   override fields** (eyebrow, title, subtitle — unset means "use the
   post's", per the no-faked-defaults rule) with only the image keeping a
-  three-state mode (post / custom / none), so `HERO_FIELD_MODE` shrinks to
-  the image's values; (b) actions use the `ctaAction` shape (label, variant,
-  appearance) with the primary href derived from the post, and a real
-  secondary action instead of a bare link; (c) content position, alignment
-  and mobile media order via `defineHeroFields()`; (d) the newest-featured
-  fallback becomes an explicit, visible choice with an error (not a warning)
-  when neither a pinned post nor a featured post exists at author time.
+  three-state mode (post / custom / none); (b) actions use the `ctaAction`
+  shape (label, variant, appearance) with the primary href derived from the
+  post, and a real secondary action instead of a bare link; (c) content
+  position, alignment and media order via `defineHeroFields()`; (d) the
+  newest-featured fallback becomes an explicit, visible choice with an error
+  (not a warning) when neither a pinned post nor a featured post exists at
+  author time.
+- **Answered 2026-09-07** (#2802, design section in the portfolio design
+  doc): overrides are `eyebrow`/`heading`/`supportingText` with the derived
+  value shown as the Studio placeholder; the image mode is a new
+  `HERO_IMAGE_SOURCE`, and `HERO_FIELD_MODE` shrinks **only** when
+  `module_hero` is deleted (#2813), since that type still reads all six
+  values; the primary action is a label plus appearance with a derived href,
+  the secondary a full `ctaAction`; the fallback is an explicit
+  `HERO_POST_SOURCE` choice; the one query uses `select()` on `postSource`
+  rather than `coalesce()`, which would fall back over a stale pinned
+  reference. `defineHeroFields()` ships here, and its media order is two
+  variant-scoped fields (`mediaOrderSplit` for Split's mobile collapse,
+  `mediaOrderStacked` for every width) collapsing to one `mediaOrder` prop.
 - **Sub-issues:**
   - **studio** · `feat(studio): module_heroBlog schema` — new type beside
     `module_hero`; desk group "Heroes" lists both; `page_home`/`page_generic`
     slots admit it. Typegen.
-  - **service** · `feat(service): heroBlog loader with one coalesced query` —
+  - **service** · `feat(service): heroBlog loader with one resolved query` —
     the pinned-or-newest-featured resolution in **one** GROQ round trip (the
-    current hero fires the fallback query on every request, pinned or not);
+    current hero fires the fallback query on every request, pinned or not),
+    branching on `postSource` with `select()` — **not** `coalesce()`, which
+    would fall back over a stale pinned reference the editor has already
+    switched away from;
     its own `THeroBlogAction` view model instead of an `ILink` padded with
     `undefined`; no masking of an empty override.
   - **ui** · `feat(ui): Hero organism gains content position, alignment and
-mobile media order` — the one `Hero` organism serves the whole family;
-    props follow CTA's names; stories per position.
+media order` — the one `Hero` organism serves the whole family; props
+    follow CTA's names (the media-order constant is `MEDIA_ORDER`, renamed
+    in Phase 0); stories per position.
   - **web** · `feat(web): heroBlog view + HERO_MAP entry` — view, `Section`
     wrapper, `REVALIDATE_TAGS`, an empty title unreachable rather than a
     silent `null`.

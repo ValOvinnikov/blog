@@ -250,32 +250,53 @@ emitted by one studio helper so an editor who has configured one hero already
 knows the next, and so the web view for every kind maps the same props onto
 the same `@blog/ui` organism:
 
-| Field                   | Type                                      | Notes                                                                                |
-| ----------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------ |
-| `variant`               | `HERO_VARIANT` radio, required            | `SPLIT` (default) · `STACKED` · `BANNER` — the CTA module's three shapes, same names |
-| `brandVariant`          | `brandVariantField({ list: FULL })`       | Band tone; on `BANNER` the overlay tint over the image, as on the CTA banner         |
-| `image`                 | `imageWithAlt`                            | Required on `SPLIT` and `BANNER`, optional (below the copy) on `STACKED`             |
-| `contentPositionSplit`  | `LEFT` · `RIGHT`, hidden unless Split     | via `defineAlignmentFields()`                                                        |
-| `contentPositionBanner` | `LEFT` · `CENTER` · `RIGHT`, Banner only  | via `defineAlignmentFields()`                                                        |
-| `contentAlignment`      | `LEFT` · `CENTER` · `RIGHT`               | the baseline field `defineAlignmentFields()` always emits                            |
-| `mobileMediaOrder`      | `MOBILE_MEDIA_ORDER`, hidden unless Split | `LAST` (default) · `FIRST`                                                           |
-| `actions`               | `actionGroupField()`                      | up to two links, rendered by `apps/web`'s `ActionGroup`                              |
-| `layout`                | `heroLayoutField`                         | spacing + dividers, no container width                                               |
+| Field                   | Type                                     | Notes                                                                                |
+| ----------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------ |
+| `variant`               | `HERO_VARIANT` radio, required           | `SPLIT` (default) · `STACKED` · `BANNER` — the CTA module's three shapes, same names |
+| `brandVariant`          | `brandVariantField({ list: FULL })`      | Band tone; on `BANNER` the overlay tint over the image, as on the CTA banner         |
+| `image`                 | `imageWithAlt`                           | Required on `SPLIT` and `BANNER`, optional (below the copy) on `STACKED`             |
+| `contentPositionSplit`  | `LEFT` · `RIGHT`, hidden unless Split    | via `defineAlignmentFields()`                                                        |
+| `contentPositionBanner` | `LEFT` · `CENTER` · `RIGHT`, Banner only | via `defineAlignmentFields()`                                                        |
+| `contentAlignment`      | `LEFT` · `CENTER` · `RIGHT`              | the baseline field `defineAlignmentFields()` always emits                            |
+| `mediaOrderSplit`       | `MEDIA_ORDER`, hidden unless Split       | `LAST` (default) · `FIRST` — order once the two columns collapse on mobile           |
+| `mediaOrderStacked`     | `MEDIA_ORDER`, hidden unless Stacked     | `LAST` (default) · `FIRST` — order at every width; Stacked is one column throughout  |
+| `actions`               | `actionGroupField()`                     | up to two links, rendered by `apps/web`'s `ActionGroup`                              |
+| `layout`                | `heroLayoutField`                        | spacing + dividers, no container width                                               |
+
+**Why media order is two fields, not one.** They mean different things: on
+Split the layout is two columns and the field only decides what happens once
+they collapse, while Stacked is a single column at every width, so its field
+is the layout itself. A Sanity field's description and option list are fixed
+per named type, so one field cannot say both — the same constraint that makes
+`contentPositionSplit`/`contentPositionBanner` two fields. Both collapse to a
+single `mediaOrder` value in the service view model, so the `@blog/ui`
+organism still takes one prop. Banner emits neither: its image is the
+background, not a sibling block. Reordering is visual only — the DOM keeps the
+copy before the media at every width, so the `<h1>` stays first for assistive
+tech and search.
 
 `defineHeroFields()` takes two options: `variants` (a subset of
 `HERO_VARIANT`, for a kind that cannot sensibly be a banner) and `image:
-false`, for a kind that supplies its own image field — `module_heroBlog`'s
-image is a mode pair (post image / custom / none), so it omits the shared
-`image` and emits its pair in the same position. A kind's own content fields
-(post reference and mode pairs for Blog; eyebrow, heading and supporting text
-for Statement; name, role, bio, avatar and social links for Profile) are
+false`, for a kind that supplies its own image field — `module_heroBlog`
+chooses its image with an `imageSource` radio, so it omits the shared `image`
+and emits its own pair in the same position. A kind's own content fields
+(post reference and copy overrides for Blog; eyebrow, heading and supporting
+text for Statement; name, role, bio, avatar and social links for Profile) are
 that kind's own design decision, made in its own section.
 
-Two constants move to `@blog/config` with this: `HERO_VARIANT = { SPLIT,
-STACKED, BANNER }`, and `MOBILE_MEDIA_ORDER = { LAST, FIRST }`, which
-**replaces** `CTA_MOBILE_MEDIA_ORDER` (same values, same stored strings, so
-no content migration — the CTA schema, service and UI consumers rename in the
-same PR).
+Two constants back this tail, and they land in different phases because
+`@blog/config` has no `knip` exemption — an exported const with no importer
+fails that gate:
+
+- `MEDIA_ORDER = { LAST, FIRST }` lands in **Phase 0**, because it is a
+  **rename** of `CTA_MOBILE_MEDIA_ORDER` and keeps that const's existing CTA
+  consumers (same values, same stored strings, so no content migration; the
+  CTA schema, service and UI consumers rename in the same PR). It is
+  `MEDIA_ORDER`, not `MOBILE_MEDIA_ORDER`, because Stacked's field applies at
+  every width.
+- `HERO_VARIANT = { SPLIT, STACKED, BANNER }` lands **with
+  `defineHeroFields()`**, in `module_heroBlog` — it is genuinely new and has
+  no consumer before the helper exists.
 
 `defineHeroFields()` lands with its first consumer, `module_heroBlog`, not in
 Phase 0 — a helper with no caller fails `knip`, and `module_hero` is not
@@ -285,11 +306,12 @@ retrofitted because it is being retired.
 
 One `Hero` organism serves every kind. It gains the props `CtaModule`
 already has for the same fields — `variant`, `tone`, `contentPosition`,
-`contentAlignment`, `mobileMediaOrder` — and keeps its compound slots
+`contentAlignment`, `mediaOrder` — and keeps its compound slots
 (`Hero.Media`, `Hero.Cta`) plus a new `Hero.Aside` slot for kind-specific
-chrome such as the Profile avatar. DOM order is always copy before media;
-position and mobile order only move things visually, so the `<h1>` stays
-first for assistive tech. That change is the `ui` sub-issue of the first
+chrome such as the Profile avatar. `mediaOrder` is one prop: the service
+collapses the two variant-scoped Studio fields into it. DOM order is always
+copy before media; position and media order only move things visually, so the
+`<h1>` stays first for assistive tech. That change is the `ui` sub-issue of the first
 hero that needs it (#2807, under `module_heroBlog`); Phase 0 has no `ui`
 work.
 
@@ -329,8 +351,10 @@ home page onto `module_heroBlog` and deletes the schema.
 ### Phase 0 scope, per layer
 
 - **config** — `THeroModuleType`, `TSlotModuleType`, `isHeroModuleType()`,
-  `HERO_VARIANT`, `MOBILE_MEDIA_ORDER` (renaming `CTA_MOBILE_MEDIA_ORDER`'s
-  consumers).
+  and `MEDIA_ORDER` (renaming `CTA_MOBILE_MEDIA_ORDER` and its consumers).
+  **Not `HERO_VARIANT`:** nothing consumes it until `defineHeroFields()`
+  lands, and `@blog/config` has no `knip` exemption, so an export with no
+  importer fails that gate. It ships with the helper, in `module_heroBlog`.
 - **studio** — `HERO_SCHEMA_TYPES` + its registry test; `page_home.hero`
   references the list; `page_generic`, `page_blog`, `page_topic` and
   `page_tag` gain an optional `hero` referencing it; the home and generic
@@ -348,6 +372,190 @@ accept the family; adding a `module_hero*` schema without a `HERO_MAP` entry
 or a `HERO_SCHEMA_TYPES` entry fails `type-check`/`test`; every existing
 page renders unchanged while no hero is set on it and `module_hero` is the
 family's only member.
+
+## `module_heroBlog` — the featured-post hero, rebuilt
+
+**Goal:** the blog member of the hero family, replacing `module_hero` in
+function without replacing it in the dataset. It ships beside the old type
+with **no migration**; the old one keeps rendering until every production
+tenant's page points at a `module_heroBlog`, and a separate chore then
+removes it (#2813). Design of record for epic #2780, settled in #2802.
+
+Interactive mock of the Studio form, the rendered hero, the resolved view
+model and every validation state:
+<https://claude.ai/code/artifact/108d408d-0a5b-4564-a272-20193e4a2c2c>.
+
+### What it fixes
+
+| Today on `module_hero`                         | Rebuilt                              | Why                                                                                     |
+| ---------------------------------------------- | ------------------------------------ | --------------------------------------------------------------------------------------- |
+| `heroEyebrowMode` + `heroEyebrow`              | `eyebrow`                            | Two fields and a radio to express "use the post's topic", which is the default anyway   |
+| `heroTitleMode` + `heroTitle`                  | `heading`                            | Same. `title` is unavailable: `titleField()` owns it as the module's editor-facing name |
+| `heroSubtitleMode` + `heroSubtitle`            | `supportingText`                     | Same, and the name now matches every other module                                       |
+| `heroImageMode` + `heroImage`                  | `imageSource` + `image`              | Kept as a mode: three real states, and "no image" is not expressible as an empty field  |
+| `featuredPost`, empty meaning "use the newest" | `postSource` + `post`                | The fallback becomes a choice an editor makes, not a blank field they have to be taught |
+| warning "choose a featured post"               | error when nothing resolves          | A hero with no post has no CTA and no heading. That is broken, not merely risky         |
+| `secondaryAction: link`                        | `secondaryAction: ctaAction`         | Gains variant and appearance, so the pair can be a filled button beside a text link     |
+| `primaryActionLabel` alone                     | `primaryActionLabel` + `…Appearance` | The href stays derived from the post; only the styling is new                           |
+| no position/alignment/order controls           | the `defineHeroFields()` tail        | Shared with every other hero kind, and it ships here as its first consumer              |
+
+### Fields
+
+Content fields first, then the shared tail:
+
+| Field                     | Type                                            | Notes                                                                       |
+| ------------------------- | ----------------------------------------------- | --------------------------------------------------------------------------- |
+| `title`                   | `titleField()`                                  | Editor-facing name, never rendered                                          |
+| `postSource`              | `HERO_POST_SOURCE` radio, required              | `PINNED` (default) · `NEWEST_FEATURED`                                      |
+| `post`                    | reference → `blog_post`, hidden unless `PINNED` | Required when pinned                                                        |
+| `eyebrow`                 | string, max 40                                  | Empty renders the resolved post's topic title                               |
+| `heading`                 | string, max 120                                 | Empty renders the resolved post's title                                     |
+| `supportingText`          | text, 3 rows                                    | Empty renders the resolved post's excerpt                                   |
+| `imageSource`             | `HERO_IMAGE_SOURCE` radio, required             | `POST` (default) · `CUSTOM` · `NONE`                                        |
+| `image`                   | `imageWithAlt`, hidden unless `CUSTOM`          | Required when the source is custom                                          |
+| `primaryActionLabel`      | string, max 40                                  | Empty renders "Read more". Href is always the resolved post                 |
+| `primaryActionAppearance` | `CTA_ACTION_APPEARANCE` radio                   | `CONTAINED` (default) · `INLINE`                                            |
+| `secondaryAction`         | `ctaAction`                                     | Optional, fully authored. Validation requires its variant to be `SECONDARY` |
+| _shared tail_             | `defineHeroFields({ image: false })`            | variant, brand variant, content position, alignment, media order, layout    |
+
+**The three copy fields are plain optional strings, not mode pairs.** Unset
+means "the post's own value", and the Studio placeholder shows what that
+value currently is, so the derivation is visible without a second control. A
+mode pair buys nothing here: `CUSTOM` with an empty value and no custom mode
+at all render identically, which is why the current module has to mask empty
+custom values in its transformer.
+
+**`imageSource` stays a mode** because its three states are not
+"authored or not". `NONE` is a deliberate choice to render no image at all,
+and an empty image field already means "use the post's".
+
+**`image: false` on the shared tail** — the module supplies `imageSource` +
+`image` in the tail's place, so the tail's own `image` field is suppressed.
+The tail's "required on Split and Banner" rule still applies, expressed
+against the resolved image rather than the field (see validation).
+
+### Resolving the post
+
+`postSource` makes the choice explicit:
+
+- **`PINNED`** renders the referenced post. The reference is required, so an
+  unresolvable hero cannot be published.
+- **`NEWEST_FEATURED`** renders the newest published post marked `featured`,
+  re-resolving as the tenant publishes. The `post` field is hidden.
+
+This replaces the current behaviour, where leaving `featuredPost` empty
+silently opts into the fallback and a warning validator hints at it. An
+editor could not tell the two states apart without reading the field
+description.
+
+### Validation
+
+| State                                     | Level   | Message                                                                |
+| ----------------------------------------- | ------- | ---------------------------------------------------------------------- |
+| `PINNED` with no `post`                   | Error   | Choose a post, or switch the source to Newest featured.                |
+| `NEWEST_FEATURED` with none in dataset    | Error   | No published post is marked Featured, so this hero would render empty. |
+| Pinned post's `publishedAt` is future     | Warning | This post publishes later. The hero stays empty until then.            |
+| `SPLIT`/`BANNER` with `imageSource: NONE` | Error   | These variants are built around an image.                              |
+| `imageSource: POST`, post has no image    | Warning | Falls back to no image on the page.                                    |
+
+The "none in dataset" check is async and runs against `getDraftsClient(context)`,
+the helper `page_home` already uses for its duplicate-heading rule, so the
+error appears while authoring rather than after publish. The scheduled-post
+case is a warning because publishing ahead of a date is legitimate.
+
+### One query, not two
+
+The current hero runs the module query and the fallback-post query in
+parallel on every render, then picks between them in the transformer. The
+rebuilt one resolves the post inside the module projection:
+
+```groq
+*[_type == "module_heroBlog" && _id == $id][0]{
+  …,
+  "post": select(
+    postSource == "PINNED" => post->{ postCardFragment },
+    *[_type == "blog_post" && featured == true && publishedAt <= now()]
+      | order(publishedAt desc)[0]{ postCardFragment }
+  )
+}
+```
+
+**`select()`, not `coalesce()`.** A coalesce over `post->` would fall back to
+the newest featured post whenever the pinned reference failed to resolve —
+including when the editor deliberately chose `NEWEST_FEATURED` while a stale
+reference is still stored on the document. The branch has to follow
+`postSource`, not the reference's emptiness.
+
+The resolved post is **nullable**. A `notNull()` here would turn "this tenant
+has no posts yet" into a 404 for the entire page, since a hero slot failure
+propagates through the page loader.
+
+**Cache tags:** the module's own `modules:heroBlog` and `module:<id>`, plus
+`posts`, `post`, `author` and `topic` for the dereferenced post card, plus
+the secondary action's link targets (`topic`, `page_generic`, `page_blog`).
+One `isr(...)` call now covers what two did. `REVALIDATE_TAGS` gains
+`module_heroBlog: ['modules:heroBlog']`.
+
+### Service view model
+
+```ts
+type THeroBlogModule = {
+  brandVariant: TFullBrandVariant;
+  variant: THeroVariant;
+  eyebrow: TMaybeUndefined<string>;
+  heading: TMaybeUndefined<string>;
+  supportingText: TMaybeUndefined<string>;
+  sanityImage: TMaybeUndefined<ISanityImage>;
+  primaryAction: TMaybeUndefined<THeroPrimaryAction>;
+  secondaryAction: TMaybeUndefined<TCtaAction>;
+  contentPosition: TMaybeUndefined<TContentAlignment>;
+  contentAlignment: TMaybeUndefined<TContentAlignment>;
+  mediaOrder: TMaybeUndefined<TMediaOrder>;
+  layout: TMaybeUndefined<TLayout>;
+};
+```
+
+`THeroPrimaryAction` carries over unchanged from `module_hero`, including
+`hiddenLabelSuffix`: when the editor leaves the label empty, the generic
+"Read more" is followed by the post's own title as visually hidden text,
+because Lighthouse's link-text audit reads visible text and not `aria-label`.
+An authored label is trusted as already descriptive and gets no suffix.
+
+`contentPosition` and `mediaOrder` each collapse their two variant-scoped
+Studio fields into one value, so the organism takes one prop per concept.
+
+### `@blog/ui`
+
+No new organism. `Hero` gains the props the shared tail implies — `variant`,
+`tone`, `contentPosition`, `contentAlignment`, `mediaOrder` — and keeps its
+existing `Hero.Media` and `Hero.Cta` compound slots. DOM order stays copy
+before media at every width; position and media order move things visually
+only. That work is #2807, and it is what makes the organism serve every
+later hero kind rather than just this one.
+
+### Constants
+
+- New in `@blog/config`: `HERO_POST_SOURCE = { PINNED, NEWEST_FEATURED }` and
+  `HERO_IMAGE_SOURCE = { POST, CUSTOM, NONE }`.
+- **`HERO_FIELD_MODE` does not shrink in this epic.** `module_hero` still
+  reads all six of its values, and the whole premise is that it keeps
+  rendering unmigrated. It is deleted with that schema in #2813, not narrowed
+  here.
+
+### Pages and desk
+
+`module_heroBlog` joins `HERO_SCHEMA_TYPES`, so every page's hero slot
+accepts it with no per-page change, and it gets a desk entry in the modules
+group. Starter content seeds a `module_heroBlog` rather than a `module_hero`
+(#2812), so new tenants never author on the type that is being retired.
+
+### Migration
+
+None for this epic — a new type and new fields only. The retirement chore
+(#2813) is where migration happens: per tenant, create a `module_heroBlog`
+carrying the old document's values, repoint `page_home.hero`, then delete the
+`module_hero` document, in that order and as separate steps, because a Sanity
+`_type` is immutable.
 
 ## Contact form / lead capture
 
@@ -489,10 +697,16 @@ point; the graph stays acyclic.
 - **Contact form is store + notify only, v1** — no CRM/inbox UI, mirrors the
   newsletter boundary — and is a tenant-toggleable, plan-entitled
   capability like the newsletter (2026-09-06).
+- **`module_heroBlog` replaces `module_hero` by addition, not migration** —
+  mode pairs become optional overrides whose Studio placeholder shows the
+  derived value; the newest-featured fallback becomes an explicit
+  `postSource` choice with an error when nothing resolves; the two per-render
+  queries collapse into one `select()` projection; `HERO_FIELD_MODE` shrinks
+  only when the old schema is deleted (2026-09-07, #2802).
 - **The hero is a family, not one generalised module** — membership is the
   `module_hero*` naming convention, derived into `THeroModuleType`; one
   `defineHeroFields()` tail (variant, brand variant, image, position,
-  alignment, mobile media order, actions, layout) shared by every kind;
+  alignment, media order, actions, layout) shared by every kind;
   `page_home.hero` required, every other page's `hero` optional and
   replacing that page's default header when set; `module_hero`
   retired by content migration once `module_heroBlog` replaces it
@@ -513,6 +727,8 @@ point; the graph stays acyclic.
 - **Module catalogue** — one tracking epic (#1919 itself, or a dedicated
   sub-epic if the catalogue outgrows a flat issue list); each module is a
   single issue under it.
+- **`module_heroBlog`** — epic #2780 (design #2802, then `studio → service →
+ui → web → db`), plus the retirement chore #2813 once production is moved.
 - **Hero family & generic home page** — epic #2778 under `M9 — Portfolio`
   (design #2791, then `config → studio → service → web`); each member hero
   is its own epic with a design sub-issue first (`module_heroBlog` #2780).
@@ -533,6 +749,11 @@ catalogue has enough shipped history to matter).
 
 ## Resync log
 
+- **2026-09-07** — added the "`module_heroBlog`" design section (#2802) and
+  corrected the shared tail's media-order row: two variant-scoped fields
+  (`mediaOrderSplit`, `mediaOrderStacked`) collapsing to one `mediaOrder`
+  prop, and the constant is `MEDIA_ORDER` rather than `MOBILE_MEDIA_ORDER`
+  because Stacked's field applies at every width.
 - **2026-09-07** — added the "Hero family & the generic home page" design
   section (#2791): derived `THeroModuleType`/`TSlotModuleType`, the hero slot
   per page, the shared `defineHeroFields()` tail, the generalised
