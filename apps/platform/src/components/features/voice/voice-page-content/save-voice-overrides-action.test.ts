@@ -34,20 +34,9 @@ vi.mock('@blog/db', () => ({
 const tenant = { id: 'tenant-1' };
 
 const overrides = {
-  notFoundMetaTitle: '',
-  notFoundMetaDescription: '',
-  notFoundCommandNotFound: '',
-  notFoundDescription: 'Custom 404 copy.',
+  notFoundHeading: '',
+  notFoundSupportingText: 'Custom 404 copy.',
   notFoundReturnHome: '',
-  terminalPromptHost: '',
-  authPromptCommandSignIn: '',
-  authPromptCommandAccount: '',
-  bookmarksPromptCommand: '',
-  accountPrivacyPromptCommand: '',
-  accountNewsletterPromptCommand: '',
-  accountIdentityPromptCommand: '',
-  bookmarkToastSavedMessage: '',
-  bookmarkToastRemovedMessage: '',
   blogListEmpty: '',
   topicEmpty: '',
   tagEmpty: '',

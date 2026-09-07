@@ -71,7 +71,7 @@ describe('resolveTenantMessages', () => {
 
   it('applies a single voice override on top of the base messages, leaving the rest unchanged', async () => {
     getSiteConfigMock.mockResolvedValue(
-      siteConfigRow({ notFoundCommandNotFound: 'nope, try again' }),
+      siteConfigRow({ notFoundHeading: 'nope, try again' }),
     );
 
     const messages = await resolveTenantMessages(realMessages);

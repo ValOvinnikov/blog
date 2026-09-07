@@ -18,9 +18,8 @@ const HUE_MIN = 0;
 const HUE_MAX = 360;
 
 // Caps sized to each field's role, not one flat limit for all of them — a
-// prompt command reads nothing like a 404 description.
+// short label reads nothing like a 404 description.
 const SHORT_LABEL_MAX = 100;
-const TOAST_MESSAGE_MAX = 150;
 const LONG_COPY_MAX = 300;
 
 const hueSchema = z.number().int().min(HUE_MIN).max(HUE_MAX);
@@ -39,20 +38,9 @@ function overrideField(max: number) {
 
 export const voiceOverridesSchema = z
   .object({
-    notFoundMetaTitle: overrideField(SHORT_LABEL_MAX),
-    notFoundMetaDescription: overrideField(LONG_COPY_MAX),
-    notFoundCommandNotFound: overrideField(SHORT_LABEL_MAX),
-    notFoundDescription: overrideField(LONG_COPY_MAX),
+    notFoundHeading: overrideField(SHORT_LABEL_MAX),
+    notFoundSupportingText: overrideField(LONG_COPY_MAX),
     notFoundReturnHome: overrideField(SHORT_LABEL_MAX),
-    terminalPromptHost: overrideField(SHORT_LABEL_MAX),
-    authPromptCommandSignIn: overrideField(SHORT_LABEL_MAX),
-    authPromptCommandAccount: overrideField(SHORT_LABEL_MAX),
-    bookmarksPromptCommand: overrideField(SHORT_LABEL_MAX),
-    accountPrivacyPromptCommand: overrideField(SHORT_LABEL_MAX),
-    accountNewsletterPromptCommand: overrideField(SHORT_LABEL_MAX),
-    accountIdentityPromptCommand: overrideField(SHORT_LABEL_MAX),
-    bookmarkToastSavedMessage: overrideField(TOAST_MESSAGE_MAX),
-    bookmarkToastRemovedMessage: overrideField(TOAST_MESSAGE_MAX),
     blogListEmpty: overrideField(LONG_COPY_MAX),
     topicEmpty: overrideField(LONG_COPY_MAX),
     tagEmpty: overrideField(LONG_COPY_MAX),

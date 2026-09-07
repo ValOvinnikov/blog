@@ -79,14 +79,14 @@ describe(upsertSiteConfig, () => {
     const result = await upsertSiteConfig(tenantId, {
       ...baseInput,
       voiceOverrides: {
-        notFoundDescription: "That route doesn't resolve to anything here.",
-        bookmarkToastSavedMessage: 'stashed to ~/bookmarks',
+        notFoundSupportingText: "That route doesn't resolve to anything here.",
+        blogListEmpty: 'Nothing published yet.',
       },
     });
 
     expect(result.voiceOverrides).toEqual({
-      notFoundDescription: "That route doesn't resolve to anything here.",
-      bookmarkToastSavedMessage: 'stashed to ~/bookmarks',
+      notFoundSupportingText: "That route doesn't resolve to anything here.",
+      blogListEmpty: 'Nothing published yet.',
     });
   });
 
@@ -98,19 +98,19 @@ describe(upsertSiteConfig, () => {
     const { id: tenantId } = await insertTestTenant(db);
     await upsertSiteConfig(tenantId, {
       ...baseInput,
-      voiceOverrides: { notFoundDescription: 'Custom description.' },
+      voiceOverrides: { notFoundSupportingText: 'Custom description.' },
     });
 
     const result = await upsertSiteConfig(tenantId, {
       ...baseInput,
-      voiceOverrides: { notFoundDescription: '' },
+      voiceOverrides: { notFoundSupportingText: '' },
     });
 
     expect(result.voiceOverrides).toEqual({});
     expect(
       Object.prototype.hasOwnProperty.call(
         result.voiceOverrides,
-        'notFoundDescription',
+        'notFoundSupportingText',
       ),
     ).toBe(false);
   });
@@ -120,7 +120,7 @@ describe(upsertSiteConfig, () => {
 
     const result = await upsertSiteConfig(tenantId, {
       ...baseInput,
-      voiceOverrides: { terminalPromptHost: '   ' },
+      voiceOverrides: { notFoundReturnHome: '   ' },
     });
 
     expect(result.voiceOverrides).toEqual({});
@@ -140,7 +140,7 @@ describe(upsertSiteConfig, () => {
     await expect(
       upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: { terminalPromptHost: 'x'.repeat(101) },
+        voiceOverrides: { notFoundReturnHome: 'x'.repeat(101) },
       }),
     ).rejects.toThrow();
   });
@@ -161,7 +161,7 @@ describe('partial updates — omission leaves a field untouched, explicit null c
     const { id: tenantId } = await insertTestTenant(db);
     await upsertSiteConfig(tenantId, {
       ...baseInput,
-      voiceOverrides: { notFoundDescription: 'Custom description.' },
+      voiceOverrides: { notFoundSupportingText: 'Custom description.' },
     });
 
     const result = await upsertSiteConfig(tenantId, {
@@ -170,7 +170,7 @@ describe('partial updates — omission leaves a field untouched, explicit null c
     });
 
     expect(result.voiceOverrides).toEqual({
-      notFoundDescription: 'Custom description.',
+      notFoundSupportingText: 'Custom description.',
     });
   });
 
@@ -178,7 +178,7 @@ describe('partial updates — omission leaves a field untouched, explicit null c
     const { id: tenantId } = await insertTestTenant(db);
     await upsertSiteConfig(tenantId, {
       ...baseInput,
-      voiceOverrides: { notFoundDescription: 'Custom description.' },
+      voiceOverrides: { notFoundSupportingText: 'Custom description.' },
     });
 
     const result = await upsertSiteConfig(tenantId, {

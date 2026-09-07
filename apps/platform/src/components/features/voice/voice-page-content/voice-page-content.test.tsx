@@ -10,7 +10,7 @@ import userEvent from '@testing-library/user-event';
 
 import { VoicePageContent } from './voice-page-content';
 
-const ADVANCED_SUMMARY = 'Advanced — 19 curated strings, 4 groups';
+const ADVANCED_SUMMARY = 'Advanced — 8 curated strings, 2 groups';
 
 const openAdvanced = async () => {
   await userEvent.setup().click(screen.getByText(ADVANCED_SUMMARY));
@@ -74,24 +74,24 @@ describe(`<${VoicePageContent.name}/>`, () => {
     await openAdvanced();
 
     expect(
-      screen.getByRole('textbox', { name: 'Terminal Prompt Host' }),
+      screen.getByRole('textbox', { name: 'Not Found Heading' }),
     ).toHaveValue('');
     expect(
-      screen.getByRole('textbox', { name: 'Terminal Prompt Host' }),
+      screen.getByRole('textbox', { name: 'Not Found Heading' }),
     ).not.toHaveAttribute('placeholder');
   });
 
   it('renders a previously-saved override as the field value', async () => {
     getSiteConfigMock.mockResolvedValue({
-      voiceOverrides: { terminalPromptHost: 'guest@acme' },
+      voiceOverrides: { notFoundHeading: 'Nothing here' },
     });
 
     await setup();
     await openAdvanced();
 
     expect(
-      screen.getByRole('textbox', { name: 'Terminal Prompt Host' }),
-    ).toHaveValue('guest@acme');
+      screen.getByRole('textbox', { name: 'Not Found Heading' }),
+    ).toHaveValue('Nothing here');
   });
 
   it('passes the archived date through for a deprovisioned tenant', async () => {
