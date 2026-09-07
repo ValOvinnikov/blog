@@ -55,8 +55,7 @@ describe('HeroSlot', () => {
 
   it('renders nothing and warns for a hero type the map does not know', async () => {
     const { container } = await setup({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      type: 'module_heroUnknown' as any,
+      type: 'module_heroUnknown' as never,
     });
 
     expect(container).toBeEmptyDOMElement();
