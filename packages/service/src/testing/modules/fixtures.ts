@@ -4,6 +4,8 @@ import {
   CTA_ACTION_VARIANT,
   CTA_VARIANT,
   HERO_FIELD_MODE,
+  HERO_IMAGE_SOURCE,
+  HERO_VARIANT,
   LINK_TYPE,
 } from '@blog/config';
 import type { TRawContentModule } from '@blog/service/features/modules/content/adaptor/transformer';
@@ -14,6 +16,7 @@ import type {
   TRawCtaModule,
 } from '@blog/service/features/modules/cta/adaptor/transformer';
 import type { TRawHeroModule } from '@blog/service/features/modules/hero/adaptor/transformer';
+import type { TRawHeroBlogModule } from '@blog/service/features/modules/hero-blog/adaptor/transformer';
 import type { TRawNewsletterModule } from '@blog/service/features/modules/newsletter/adaptor/transformer';
 import type { TRawPostLatestModule } from '@blog/service/features/modules/post-latest/adaptor/transformer';
 import type { TRawPostListModule } from '@blog/service/features/modules/post-list/adaptor/transformer';
@@ -35,6 +38,30 @@ export function makeRawHeroModule(
     heroImageAsset: null,
     primaryActionLabel: null,
     secondaryAction: null,
+    layout: null,
+    ...overrides,
+  };
+}
+
+export function makeRawHeroBlogModule(
+  overrides: Partial<TRawHeroBlogModule> = {},
+): TRawHeroBlogModule {
+  return {
+    post: null,
+    eyebrow: null,
+    heading: null,
+    supportingText: null,
+    imageSource: HERO_IMAGE_SOURCE.POST,
+    image: null,
+    primaryActionLabel: null,
+    secondaryAction: null,
+    variant: HERO_VARIANT.SPLIT,
+    brandVariant: BRAND_VARIANT.PRIMARY,
+    contentPositionSplit: null,
+    contentPositionBanner: null,
+    contentAlignment: null,
+    mediaOrderSplit: null,
+    mediaOrderStacked: null,
     layout: null,
     ...overrides,
   };

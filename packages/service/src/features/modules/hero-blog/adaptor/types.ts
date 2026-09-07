@@ -1,32 +1,26 @@
 import type {
-  BasicText,
   ISanityImage,
   TContentAlignment,
-  TCtaVariant,
   TFullBrandVariant,
+  THeroVariant,
   TLayout,
   TMaybeUndefined,
   TMediaOrder,
 } from '@blog/config';
 import type { TCtaAction } from '@blog/service/shared/transformers/to-cta-action';
+import type { THeroPrimaryAction } from '@blog/service/shared/transformers/to-hero-primary-action';
 
-export type { TCtaAction };
-
-export type TCtaModule = {
-  variant: TCtaVariant;
+export type THeroBlogModule = {
   brandVariant: TFullBrandVariant;
-  bandTone: TFullBrandVariant;
+  variant: THeroVariant;
   eyebrow: TMaybeUndefined<string>;
-  sectionHeader: {
-    heading: string;
-    supportingText: TMaybeUndefined<string>;
-  };
-  content: TMaybeUndefined<BasicText>;
-  image: TMaybeUndefined<ISanityImage>;
+  heading: TMaybeUndefined<string>;
+  supportingText: TMaybeUndefined<string>;
+  sanityImage: TMaybeUndefined<ISanityImage>;
+  primaryAction: TMaybeUndefined<THeroPrimaryAction>;
+  secondaryAction: TMaybeUndefined<TCtaAction>;
   contentPosition: TMaybeUndefined<TContentAlignment>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
-  mobileMediaOrder: TMaybeUndefined<TMediaOrder>;
-  actions: TCtaAction[];
-  footnote: TMaybeUndefined<string>;
+  mediaOrder: TMaybeUndefined<TMediaOrder>;
   layout: TMaybeUndefined<TLayout>;
 };

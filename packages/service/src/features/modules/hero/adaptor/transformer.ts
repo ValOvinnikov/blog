@@ -1,5 +1,6 @@
-import { HERO_FIELD_MODE, routes } from '@blog/config';
+import { HERO_FIELD_MODE } from '@blog/config';
 import type { TImageTenant } from '@blog/service/sanity/image';
+import { toHeroPrimaryAction } from '@blog/service/shared/transformers/to-hero-primary-action';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import { toLink } from '@blog/service/shared/transformers/to-link';
 import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
@@ -14,8 +15,6 @@ export type TRawHeroModule = InferResultType<typeof heroModuleQuery>;
 export type TRawHeroFallbackPost = InferResultType<
   typeof heroFallbackFeaturedPostQuery
 >;
-
-const DEFAULT_PRIMARY_ACTION_LABEL = 'Read more';
 
 function getCustomOrFallback(
   mode: string | null | undefined,
@@ -67,26 +66,10 @@ export function toHeroModule(
       heroPost?.excerpt,
     ),
     sanityImage,
-    primaryAction: heroPost
-      ? {
-          label: raw.primaryActionLabel ?? DEFAULT_PRIMARY_ACTION_LABEL,
-          href: routes.post(heroPost.slug),
-          target: undefined,
-          platform: undefined,
-          // Lighthouse's SEO link-text audit reads the link's visible text
-          // content, not `aria-label` — an `aria-label` on the generic
-          // fallback label doesn't satisfy it. Only the fallback label needs
-          // a descriptive suffix; an editor-authored label is trusted as
-          // already descriptive. Uses the linked post's own title, not
-          // `title` above, since that can be an editor-overridden hero title
-          // that no longer matches the post the CTA actually links to. The
-          // web layer renders this as visually-hidden (sr-only) text
-          // appended to the visible label, so it counts as link text.
-          hiddenLabelSuffix: raw.primaryActionLabel
-            ? undefined
-            : heroPost.title,
-        }
-      : undefined,
+    // Uses the linked post's own title, not `title` above, since that can
+    // be an editor-overridden hero title that no longer matches the post
+    // the CTA actually links to.
+    primaryAction: toHeroPrimaryAction(raw.primaryActionLabel, heroPost),
     secondaryAction: toLink(raw.secondaryAction),
     layout: toLayout(raw.layout),
   };

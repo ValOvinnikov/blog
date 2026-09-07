@@ -5,18 +5,7 @@ import type {
   TLayout,
   TMaybeUndefined,
 } from '@blog/config';
-
-/**
- * The hero's primary CTA has no `ariaLabel` — unlike `ILink`, whose
- * `ariaLabel` targets assistive tech only. Lighthouse's SEO `link-text`
- * audit reads the link's visible text content, not `aria-label`, so a
- * descriptive suffix for the generic fallback label must be rendered as
- * real (if visually hidden) text. `hiddenLabelSuffix` carries that text;
- * the web layer renders it as an `sr-only` span appended to `label`.
- */
-type THeroPrimaryAction = Omit<ILink, 'ariaLabel'> & {
-  hiddenLabelSuffix: TMaybeUndefined<string>;
-};
+import type { THeroPrimaryAction } from '@blog/service/shared/transformers/to-hero-primary-action';
 
 export type THeroModule = {
   brandVariant: TFullBrandVariant;
