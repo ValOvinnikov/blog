@@ -137,3 +137,33 @@ export const CardsAsSecondLevelHeadings: TStory = {
     cardHeadingLevel: 2,
   },
 };
+
+const placeholderImage = (alt: string) => (
+  <img src="https://placehold.co/640x360" alt={alt} />
+);
+
+export const WithImages: TStory = {
+  args: {
+    hasImages: true,
+    posts: posts.map((post) => ({
+      ...post,
+      image: placeholderImage(post.title),
+    })),
+  },
+};
+
+export const WithoutImages: TStory = {
+  args: {
+    hasImages: false,
+    posts,
+  },
+};
+
+export const MixedImages: TStory = {
+  args: {
+    hasImages: true,
+    posts: posts.map((post, index) =>
+      index === 1 ? { ...post, image: placeholderImage(post.title) } : post,
+    ),
+  },
+};
