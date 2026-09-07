@@ -1,3 +1,5 @@
+import { portableTextToPlainText, type TVoicePortableText } from '@blog/config';
+
 // Flat `site_config.voiceOverrides` key -> nested `en.json` message path,
 // mirroring `apps/platform`'s curated `TVoiceOverrideKey` field set
 // (`apps/platform/src/utils/voice-fields/voice-fields.ts`) one key at a time —
@@ -38,18 +40,22 @@ const setAtPath = (
  * Applies `site_config.voiceOverrides`' flat curated keys onto the merged
  * message tree, cloning only the objects along each key's path so untouched
  * namespaces keep referencing the cached messages module instead of being
- * mutated in place.
+ * mutated in place. A message tree leaf must be a string, so a rich
+ * (Portable Text) override is projected to plain text rather than dropped —
+ * unformatted still beats falling back to the untouched default copy.
  */
 export const applyVoiceOverrides = (
   messages: Record<string, unknown>,
-  overrides: Record<string, string>,
+  overrides: Record<string, string | TVoicePortableText>,
 ): Record<string, unknown> => {
   let result = messages;
 
   for (const [key, value] of Object.entries(overrides)) {
     const path = VOICE_OVERRIDE_PATHS[key];
     if (!path) continue;
-    result = setAtPath(result, path, value);
+    const text =
+      typeof value === 'string' ? value : portableTextToPlainText(value);
+    result = setAtPath(result, path, text);
   }
 
   return result;

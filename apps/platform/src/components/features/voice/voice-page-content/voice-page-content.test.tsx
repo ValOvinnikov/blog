@@ -94,6 +94,30 @@ describe(`<${VoicePageContent.name}/>`, () => {
     ).toHaveValue('Nothing here');
   });
 
+  it('renders a stored rich (Portable Text) override as its plain text, not blank', async () => {
+    getSiteConfigMock.mockResolvedValue({
+      voiceOverrides: {
+        blogListEmpty: [
+          {
+            _type: 'block',
+            _key: 'k1',
+            style: 'normal',
+            children: [
+              { _type: 'span', _key: 's1', text: 'Nothing published yet.' },
+            ],
+          },
+        ],
+      },
+    });
+
+    await setup();
+    await openAdvanced();
+
+    expect(
+      screen.getByRole('textbox', { name: 'Blog List Empty' }),
+    ).toHaveValue('Nothing published yet.');
+  });
+
   it('passes the archived date through for a deprovisioned tenant', async () => {
     getSiteConfigMock.mockResolvedValue(undefined);
 

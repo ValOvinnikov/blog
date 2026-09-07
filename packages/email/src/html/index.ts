@@ -8,7 +8,7 @@ export {
   buildOperatorShell,
   type TBuildOperatorShellInput,
 } from './operator-shell';
-export { sanitizeHref } from './sanitize-href';
+export { sanitizeHref } from '@blog/utils';
 export {
   buildTenantShell,
   type TBuildTenantShellInput,
