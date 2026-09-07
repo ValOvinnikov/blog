@@ -7,7 +7,6 @@ import { navigationSchema } from '@blog/studio/schema-types/documents/settings/n
 import { newsletterSettingsSchema } from '@blog/studio/schema-types/documents/settings/newsletter';
 import { siteSchema } from '@blog/studio/schema-types/documents/settings/site-settings';
 import { themeSchema } from '@blog/studio/schema-types/documents/settings/theme';
-import { voiceSchema } from '@blog/studio/schema-types/documents/settings/voice';
 import { buildGroupedListItems } from '@blog/studio/structure/build-grouped-list';
 import { modulesGroups } from '@blog/studio/structure/modules-groups';
 import { pagesGroups } from '@blog/studio/structure/pages-groups';
@@ -16,7 +15,6 @@ import {
   Files,
   Mail,
   Menu,
-  MessageSquareText,
   Newspaper,
   Palette,
   PanelBottom,
@@ -123,15 +121,6 @@ export const studioStructure: StructureResolver = (S) =>
                   S.document()
                     .schemaType(themeSchema.name)
                     .documentId(themeSchema.name),
-                ),
-              S.listItem()
-                .title('Voice')
-                .id(voiceSchema.name)
-                .icon(MessageSquareText)
-                .child(
-                  S.document()
-                    .schemaType(voiceSchema.name)
-                    .documentId(voiceSchema.name),
                 ),
               S.divider(),
               S.listItem()

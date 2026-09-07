@@ -123,14 +123,22 @@ reusable module documents `module_hero`, `module_postList`, `module_content`,
   `@sanity/code-input`).
 - Singleton documents enforced through desk structure (`src/studio-structure.ts`).
 
-## `settings_voice` mirrors a curated subset of `apps/web`'s i18n keys
+## Voice copy is not a Studio concern
 
-`settings_voice.ts` defines the tenant-overridable "voice" copy fields
-(empty-states, error/not-found messages, prompts, toasts) — not nav labels
-or `ariaLabel`s, those stay i18n-only. It is hand-duplicated against
-`apps/platform`'s `voice-fields.ts` and `apps/web`'s `apply-voice-overrides.ts`
-mapping; a new field here needs a matching entry in both. See `web.md`/
-`platform-app.md` for the other two legs.
+Tenant-overridable "voice" copy lives in Postgres, in `site_config`'s
+`voiceOverrides`, and is edited in the platform's Voice page. There is no
+Studio schema for it — the `settings_voice` singleton was deleted once the
+Postgres cutover left it with no read path.
+
+The key vocabulary is hand-duplicated across three files —
+`apps/platform`'s `voice-fields.ts`, `apps/web`'s `apply-voice-overrides.ts`,
+and `@blog/db`'s `voiceOverridesSchema` — and `pnpm check:voice-sync` (a
+required CI job) fails if they drift. None of them is yours; do not add a
+Studio schema for voice copy.
+
+Copy for a feature that _is_ Sanity-modelled belongs on that feature's
+`settings_*` singleton instead — the newsletter's form and landing-page
+strings on `settings_newsletter`, for example.
 
 ## Typegen contract (critical)
 

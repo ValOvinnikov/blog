@@ -39,7 +39,7 @@ Studio from one deployment.
   `blog/` (`blog_post`, `blog_author`, `blog_category`, `blog_tag`),
   `pages/` (`page_home`, `page_blog`, `page_generic`), and `settings/`
   (singletons: `settings_site`, `settings_navigation`, `settings_footer`,
-  `settings_newsletter`, `settings_theme`, `settings_voice`)
+  `settings_newsletter`, `settings_theme`)
 - `src/schema-types/modules/` — reusable page modules
   (`module_hero`, `module_postList`, `module_content`, `module_cta`,
   `module_newsletter`)

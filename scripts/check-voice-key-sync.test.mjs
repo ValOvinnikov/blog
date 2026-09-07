@@ -11,27 +11,11 @@ import { describe, it } from 'node:test';
 import {
   compareKeySets,
   extractAdminKeys,
-  extractCmsKeys,
   extractDbKeys,
   extractWebKeys,
   parseSource,
   SOURCES,
 } from './check-voice-key-sync.mjs';
-
-const CMS_FIXTURE = `
-  import { titleField } from '@blog/studio/schema-types/helpers/title-field';
-  import { defineField, defineType } from 'sanity';
-
-  export const voiceSchema = defineType({
-    name: 'settings_voice',
-    type: 'document',
-    fields: [
-      titleField(),
-      defineField({ name: 'notFoundMetaTitle', type: 'string' }),
-      defineField({ name: 'notFoundMetaDescription', type: 'string' }),
-    ],
-  });
-`;
 
 const ADMIN_FIXTURE = `
   export const VOICE_FIELD_GROUPS = [
@@ -67,16 +51,6 @@ const DB_FIXTURE = `
     .transform((overrides) => overrides);
 `;
 
-describe('extractCmsKeys', () => {
-  it('reads every defineField name, ignoring titleField()', () => {
-    const sf = parseSource('/virtual/voice.ts', CMS_FIXTURE);
-    assert.deepEqual(extractCmsKeys(sf), [
-      'notFoundMetaTitle',
-      'notFoundMetaDescription',
-    ]);
-  });
-});
-
 describe('extractAdminKeys', () => {
   it('reads every key inside VOICE_FIELD_GROUPS nested fields', () => {
     const sf = parseSource('/virtual/voice-fields.ts', ADMIN_FIXTURE);
@@ -110,9 +84,9 @@ describe('extractDbKeys', () => {
 describe('compareKeySets', () => {
   it('reports in sync when every source has the same keys', () => {
     const result = compareKeySets([
-      { label: 'cms', keys: ['a', 'b'] },
       { label: 'admin', keys: ['a', 'b'] },
       { label: 'web', keys: ['a', 'b'] },
+      { label: 'db', keys: ['a', 'b'] },
     ]);
     assert.equal(result.inSync, true);
     assert.deepEqual(result.missing, {});
@@ -120,26 +94,25 @@ describe('compareKeySets', () => {
 
   it('detects a key missing from one source (drift)', () => {
     const result = compareKeySets([
-      { label: 'cms', keys: ['a', 'b', 'c'] },
-      { label: 'admin', keys: ['a', 'b'] },
-      { label: 'web', keys: ['a', 'b', 'c'] },
+      { label: 'admin', keys: ['a', 'b', 'c'] },
+      { label: 'web', keys: ['a', 'b'] },
+      { label: 'db', keys: ['a', 'b', 'c'] },
     ]);
     assert.equal(result.inSync, false);
-    assert.deepEqual(result.missing, { admin: ['c'] });
+    assert.deepEqual(result.missing, { web: ['c'] });
   });
 
   it('detects an extra key present in only one source', () => {
     const result = compareKeySets([
-      { label: 'cms', keys: ['a', 'b'] },
-      { label: 'admin', keys: ['a', 'b', 'extra'] },
-      { label: 'web', keys: ['a', 'b'] },
+      { label: 'admin', keys: ['a', 'b'] },
+      { label: 'web', keys: ['a', 'b', 'extra'] },
+      { label: 'db', keys: ['a', 'b'] },
     ]);
     assert.equal(result.inSync, false);
-    assert.deepEqual(result.missing, { cms: ['extra'], web: ['extra'] });
+    assert.deepEqual(result.missing, { admin: ['extra'], db: ['extra'] });
   });
 
-  it('detects a db source renamed out of sync with cms/admin/web (4-source drift)', () => {
-    const cmsSf = parseSource('/virtual/voice.ts', CMS_FIXTURE);
+  it('detects a db source renamed out of sync with admin/web (3-source drift)', () => {
     const adminSf = parseSource('/virtual/voice-fields.ts', ADMIN_FIXTURE);
     const webSf = parseSource('/virtual/apply-voice-overrides.ts', WEB_FIXTURE);
     const driftedDbFixture = DB_FIXTURE.replace(
@@ -152,7 +125,6 @@ describe('compareKeySets', () => {
     );
 
     const result = compareKeySets([
-      { label: 'cms', keys: extractCmsKeys(cmsSf) },
       { label: 'admin', keys: extractAdminKeys(adminSf) },
       { label: 'web', keys: extractWebKeys(webSf) },
       { label: 'db', keys: extractDbKeys(dbSf) },
@@ -161,7 +133,6 @@ describe('compareKeySets', () => {
     assert.equal(result.inSync, false);
     assert.deepEqual(result.missing, {
       db: ['notFoundMetaDescription'],
-      cms: ['notFoundMetaDescriptionRenamed'],
       admin: ['notFoundMetaDescriptionRenamed'],
       web: ['notFoundMetaDescriptionRenamed'],
     });

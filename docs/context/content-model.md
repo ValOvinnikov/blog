@@ -42,7 +42,7 @@ every module type.
   `title`, `sectionHeader` (optional — see below), `pageSize` (posts per page,
   1–24, required), and a vestigial `limit` awaiting removal alongside
   `page_blog.itemsPerPage`. It carries **no `emptyMessage`** (removed in
-  #1899) — empty-state copy belongs to Voice (`settings_voice.emptyStates`),
+  #1899) — empty-state copy belongs to Voice (`site_config.voiceOverrides`),
   same as every other module below.
 - `module_postLatest` (`postLatestSchema`) — the **latest-N teaser**: internal
   `title`, `sectionHeader` (optional), `limit` (posts to fetch, 1–12). Split
@@ -53,8 +53,8 @@ every module type.
   **no "topics or tags" field** — which taxonomy it lists is inferred from
   which index page's required slot holds it, the same inference-by-slot rule
   the post list uses. It also carries **no `emptyMessage`**: empty-state copy
-  belongs to Voice (`settings_voice.emptyStates`, surfaced in the admin
-  panel's Voice section and overridable per tenant), not to modules — same
+  belongs to Voice (`site_config.voiceOverrides`, edited in the platform's
+  Voice page and overridable per tenant), not to modules — same
   as `module_postList` since #1899.
 - `module_content` (`contentSchema`) — internal `title`, `body` (portable
   text). No `sectionHeader` — its rich-text `body` supplies any in-content
@@ -133,7 +133,7 @@ replacing a hand-duplicated block per page document.
   `/tag` archives + related-posts, alongside the section-level `category`).
 - `siteSettings` (singleton) — `titleField` (bare; see helper note below),
   brand
-  (`brand` object: name/logo/specLine/variant — `logo` is optional, falling
+  (`brand` object: name/logo/specLine — `logo` is optional, falling
   back to a default mark when unset; `specLine` is
   a `specLine` object, `{ items: string[] (max 4, each max 15 chars),
 separator: SPEC_LINE_SEPARATORS }`, replacing a plain string so the
@@ -148,19 +148,11 @@ separator: SPEC_LINE_SEPARATORS }`, replacing a plain string so the
   (optional, `RADIUS_SCALE`), `density` (optional, `DENSITY`) — a
   tenant-level theme override resolved against `PRESET_REGISTRY` in
   `@blog/config`; part of the Phase 2 configurability epic (#1285).
-- `settings_voice` (singleton, `voiceSchema`) — `titleField` (bare; see
-  helper note below), 19 optional string overrides grouped into 4 fieldsets:
-  404 page (`notFoundMetaTitle`/`notFoundMetaDescription`/
-  `notFoundCommandNotFound`/`notFoundDescription`/`notFoundReturnHome`),
-  terminal prompts (`terminalPromptHost`, `authPromptCommandSignIn`/
-  `authPromptCommandAccount`, `bookmarksPromptCommand`,
-  `accountPrivacyPromptCommand`/`accountNewsletterPromptCommand`/
-  `accountIdentityPromptCommand`), bookmarks
-  (`bookmarkToastSavedMessage`/`bookmarkToastRemovedMessage`), and empty
-  states (`blogListEmpty`/`topicEmpty`/`tagEmpty`/`topicsEmpty`/
-  `bookmarksEmpty`) — each blank falls through to the active
-  preset's own wording, then the neutral base; part of the Phase 3
-  voice-as-content epic (#1288).
+- Voice copy has no Studio schema. Tenant-overridable UI strings live in
+  Postgres, in `site_config`'s `voiceOverrides`, edited in the platform's
+  Voice page and merged over the neutral catalog at request time. The
+  `settings_voice` singleton that once held them was deleted after the
+  Postgres cutover left it with no read path.
 - `settings_navigation` (singleton) — `titleField` (bare; see helper note
   below), items (links).
 - `settings_footer` (singleton) — `titleField` (bare; see helper note below),
