@@ -9,11 +9,13 @@ vi.mock('@web/server/site-config/get-site-config', () => ({
 
 describe('getThemeTokens', () => {
   it('resolves theme tokens from the site_config row on success', async () => {
+    const rowAccentHue =
+      PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue;
     vi.mocked(getSiteConfig).mockResolvedValue({
       ok: true,
       data: {
         preset: PRESET_ID.EDITORIAL,
-        accentHue: PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens.accentHue,
+        accentHue: rowAccentHue,
         headingFont:
           PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens.headingFont,
         bodyFont: PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens.bodyFont,
@@ -25,9 +27,8 @@ describe('getThemeTokens', () => {
 
     const tokens = await getThemeTokens();
 
-    expect(tokens.logoHue).toBe(
-      PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens.accentHue,
-    );
+    expect(tokens.accentHue).toBe(rowAccentHue);
+    expect(tokens.logoHue).toBe(rowAccentHue);
   });
 
   it('forwards an explicitly supplied tenant to getSiteConfig', async () => {
