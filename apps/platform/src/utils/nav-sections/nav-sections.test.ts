@@ -82,7 +82,7 @@ describe('tenantNavSections', () => {
     expect(content!.items[0]?.badge).toBeUndefined();
   });
 
-  it('gives Look, Voice, Features, Domain and Email distinct real hrefs in the Configuration section, badged "this milestone" in neutral tone', () => {
+  it('gives Look, Voice, Features, Domain and Email distinct real hrefs in the Configuration section', () => {
     const [, , configuration] = tenantNavSections(t, 'tenant-1', 'Acme Co');
     const look = configuration!.items.find((item) => item.label === 'Look');
     const voice = configuration!.items.find((item) => item.label === 'Voice');
@@ -98,8 +98,25 @@ describe('tenantNavSections', () => {
     expect(domain?.href).toBe('/tenants/tenant-1/domain');
     expect(email?.href).toBe('/tenants/tenant-1/email');
     expect(look?.href).not.toBe(voice?.href);
-    expect(look?.badge).toEqual({ label: 'this milestone', tone: 'neutral' });
-    expect(voice?.badge).toEqual({ label: 'this milestone', tone: 'neutral' });
+  });
+
+  it('leaves Look and Voice unbadged, now that both have shipped', () => {
+    const [, , configuration] = tenantNavSections(t, 'tenant-1', 'Acme Co');
+    const look = configuration!.items.find((item) => item.label === 'Look');
+    const voice = configuration!.items.find((item) => item.label === 'Voice');
+
+    expect(look?.badge).toBeUndefined();
+    expect(voice?.badge).toBeUndefined();
+  });
+
+  it('still badges Features, Domain and Email "this milestone" in neutral tone', () => {
+    const [, , configuration] = tenantNavSections(t, 'tenant-1', 'Acme Co');
+    const features = configuration!.items.find(
+      (item) => item.label === 'Features',
+    );
+    const domain = configuration!.items.find((item) => item.label === 'Domain');
+    const email = configuration!.items.find((item) => item.label === 'Email');
+
     expect(features?.badge).toEqual({
       label: 'this milestone',
       tone: 'neutral',
