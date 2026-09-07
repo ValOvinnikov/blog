@@ -1,8 +1,9 @@
-import type { THeroBlogModule } from '@blog/service';
+import { CTA_ACTION_VARIANT } from '@blog/config';
+import type { THeroBlogModule, THeroPrimaryAction } from '@blog/service';
 import { Hero } from '@blog/ui/organisms/hero';
 import {
   ActionGroup,
-  type TActionGroupAction,
+  type IActionGroupAction,
 } from '@web/components/shared/action-group';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { Section } from '@web/components/shared/section';
@@ -14,6 +15,21 @@ export interface IHeroBlogModuleViewProps extends Omit<
   id: string;
   heading: string;
 }
+
+const toActionGroupAction = (
+  action: THeroPrimaryAction,
+): IActionGroupAction => ({
+  link: {
+    label: action.label,
+    href: action.href,
+    target: action.target,
+    platform: action.platform,
+    ariaLabel: undefined,
+  },
+  variant: CTA_ACTION_VARIANT.PRIMARY,
+  appearance: action.appearance,
+  hiddenLabelSuffix: action.hiddenLabelSuffix,
+});
 
 /**
  * Pure view for `HeroBlogModule` — the web-side wiring the `@blog/ui` `Hero`
@@ -36,9 +52,10 @@ export const HeroBlogModuleView = ({
   layout,
 }: IHeroBlogModuleViewProps) => {
   const titleId = `hero-blog-${id}`;
-  const actions = [primaryAction, secondaryAction].filter(
-    (action): action is TActionGroupAction => Boolean(action),
-  );
+  const actions = [
+    primaryAction ? toActionGroupAction(primaryAction) : undefined,
+    secondaryAction,
+  ].filter((action): action is IActionGroupAction => Boolean(action));
 
   return (
     <Section
