@@ -25,7 +25,6 @@
  * `settings_site` document is ever read for its variant after that field is
  * gone without `settings_theme` already carrying the equivalent values.
  */
-import { BRAND_VARIANTS } from '@blog/config/constants';
 import { defineMigration } from 'sanity/migrate';
 
 import {
@@ -44,7 +43,7 @@ export default defineMigration({
 
       // `indigoThemeMutations` ignores `currentTheme` for every non-INDIGO
       // variant, so skip the `getDocument` round-trip for those documents.
-      if (site.brand?.variant !== BRAND_VARIANTS.INDIGO) return [];
+      if (site.brand?.variant !== 'INDIGO') return [];
 
       // `context.filtered` is scoped to this migration's `documentTypes`
       // (`['settings_site']`), so it can never resolve `settings_theme` — a

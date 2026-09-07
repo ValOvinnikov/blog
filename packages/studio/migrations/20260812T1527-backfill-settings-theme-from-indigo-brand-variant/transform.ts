@@ -1,4 +1,4 @@
-import { BRAND_VARIANTS, PRESET_ID } from '@blog/config/constants';
+import { PRESET_ID } from '@blog/config/constants';
 import {
   at,
   createIfNotExists,
@@ -57,7 +57,7 @@ export const indigoThemeMutations = (
   site: TSiteSettingsDoc,
   currentTheme: TThemeDoc | undefined,
 ): Mutation[] | undefined => {
-  if (site.brand?.variant !== BRAND_VARIANTS.INDIGO) return undefined;
+  if (site.brand?.variant !== 'INDIGO') return undefined;
   if (isAlreadyMigrated(currentTheme)) return undefined;
 
   return [
