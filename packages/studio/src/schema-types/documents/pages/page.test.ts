@@ -96,3 +96,39 @@ describe('genericSchema slug validation', () => {
     expect(typeof slugField?.components?.input).toBe('function');
   });
 });
+
+describe('genericSchema hero field', () => {
+  it('is an optional reference to the hero family', () => {
+    const heroField = genericSchema.fields?.find(
+      (field) => field.name === 'hero',
+    ) as { type: string; to?: Array<{ type: string }>; validation?: unknown };
+
+    expect(heroField).toBeDefined();
+    expect(heroField.type).toBe('reference');
+    expect(heroField.to?.map((entry) => entry.type)).toEqual(['module_hero']);
+    expect(heroField.validation).toBeUndefined();
+  });
+});
+
+describe('genericSchema modules allow-list', () => {
+  it('permits content, cta, postLatest and newsletter modules', () => {
+    const modulesField = genericSchema.fields?.find(
+      (field) => field.name === 'modules',
+    ) as { type: 'array'; of?: Array<{ name?: string }> } | undefined;
+
+    if (!modulesField || modulesField.type !== 'array' || !modulesField.of) {
+      throw new Error(
+        'Expected genericSchema to define a modules array field.',
+      );
+    }
+
+    const allowedTypes = modulesField.of.map((member) => member.name);
+
+    expect(allowedTypes).toEqual([
+      'module_content',
+      'module_cta',
+      'module_postLatest',
+      'module_newsletter',
+    ]);
+  });
+});

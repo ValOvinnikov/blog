@@ -5,6 +5,7 @@ import { defineModulesField } from '@blog/studio/schema-types/helpers/define-mod
 import { getDraftsClient } from '@blog/studio/schema-types/helpers/get-drafts-client';
 import { slugField } from '@blog/studio/schema-types/helpers/slug-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
+import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
@@ -58,6 +59,14 @@ export const pageTopicSchema = defineType({
     slugField({
       description: 'URL path segment — auto-generated from title.',
       previewInput: topicSlugUrlPreviewInput,
+    }),
+    defineField({
+      name: 'hero',
+      title: 'Hero',
+      type: 'reference',
+      description:
+        "Optional. Replaces the page's default header and owns the page heading.",
+      to: HERO_SCHEMA_TYPES.map((schema) => ({ type: schema.name })),
     }),
     defineField({
       name: 'topic',

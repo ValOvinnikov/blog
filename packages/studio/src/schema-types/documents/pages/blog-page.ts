@@ -1,5 +1,6 @@
 import { defineModulesField } from '@blog/studio/schema-types/helpers/define-modules-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
+import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
 import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
@@ -25,6 +26,14 @@ export const blogPageSchema = defineType({
   },
   fields: [
     titleField(),
+    defineField({
+      name: 'hero',
+      title: 'Hero',
+      type: 'reference',
+      description:
+        "Optional. Replaces the page's default header and owns the page heading.",
+      to: HERO_SCHEMA_TYPES.map((schema) => ({ type: schema.name })),
+    }),
     defineField({
       name: 'heading',
       title: 'Heading',

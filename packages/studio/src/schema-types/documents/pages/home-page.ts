@@ -1,49 +1,14 @@
 import { defineModulesField } from '@blog/studio/schema-types/helpers/define-modules-field';
-import { getDraftsClient } from '@blog/studio/schema-types/helpers/get-drafts-client';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
+import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/helpers/validate-single-blank-heading-per-type';
+import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
+import { contentSchema } from '@blog/studio/schema-types/modules/module-content';
 import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
-import { heroSchema } from '@blog/studio/schema-types/modules/module-hero';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
 import { seoSchema } from '@blog/studio/schema-types/objects/seo';
 import { House } from 'lucide-react';
-import { defineField, defineType, type ValidationContext } from 'sanity';
-
-type TModuleReference = { _type?: string; _ref?: string };
-
-/**
- * More than one `module_postLatest` reference on the home page falls back to
- * the same "Latest posts" heading when its own `sectionHeader.heading` is
- * blank — duplicate landmark names/`<h2>`s for assistive tech.
- */
-const validateSinglePostLatestWithoutHeading = async (
-  modules: TModuleReference[] | undefined,
-  context: ValidationContext,
-): Promise<string | true> => {
-  const postLatestIds = (modules ?? [])
-    .filter(
-      (module): module is TModuleReference & { _ref: string } =>
-        module._type === postLatestSchema.name && Boolean(module._ref),
-    )
-    .map((module) => module._ref);
-
-  if (postLatestIds.length < 2) return true;
-
-  const client = getDraftsClient(context);
-
-  const candidates = await client.fetch<{ heading?: string | null }[]>(
-    `*[_id in $ids]{ "heading": sectionHeader.heading }`,
-    { ids: postLatestIds },
-  );
-
-  const blankCount = candidates.filter(
-    (candidate) => !candidate.heading?.trim(),
-  ).length;
-
-  return blankCount > 1
-    ? 'Only one Post Latest module without its own heading is allowed per page — give this one a heading or remove the duplicate.'
-    : true;
-};
+import { defineField, defineType } from 'sanity';
 
 export const homePageSchema = defineType({
   name: 'page_home',
@@ -68,13 +33,18 @@ export const homePageSchema = defineType({
       title: 'Hero',
       type: 'reference',
       description: 'The hero module rendered at the top of the home page.',
-      to: [{ type: heroSchema.name }],
+      to: HERO_SCHEMA_TYPES.map((schema) => ({ type: schema.name })),
       validation: (rule) => rule.required(),
     }),
     defineModulesField({
-      allow: [postLatestSchema.name, ctaSchema.name, newsletterSchema.name],
+      allow: [
+        contentSchema.name,
+        ctaSchema.name,
+        newsletterSchema.name,
+        postLatestSchema.name,
+      ],
       validateCustom: (rule) =>
-        rule.custom(validateSinglePostLatestWithoutHeading),
+        rule.custom(validateSingleBlankHeadingPerType([postLatestSchema.name])),
     }),
     defineField({
       name: 'seo',

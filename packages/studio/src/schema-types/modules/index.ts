@@ -15,3 +15,11 @@ export const modules = [
   ctaSchema,
   newsletterSchema,
 ];
+
+/**
+ * Every hero-family schema, listed by hand so a new `module_hero*` schema
+ * added to `modules` above but forgotten here is caught by
+ * the module registry test rather than silently being un-pickable in a page's
+ * `hero` reference field.
+ */
+export const HERO_SCHEMA_TYPES = [heroSchema];
