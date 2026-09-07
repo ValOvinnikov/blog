@@ -59,7 +59,7 @@ describe(saveVoiceOverridesAction, () => {
 
   it('resolves the tenant from the session-checked membership, never trusting a client-supplied id on its own', async () => {
     getSiteConfigMock.mockResolvedValue(undefined);
-    upsertSiteConfigMock.mockResolvedValue({});
+    upsertSiteConfigMock.mockResolvedValue({ ok: true });
 
     await saveVoiceOverridesAction('tenant-1', overrides);
 
@@ -73,7 +73,7 @@ describe(saveVoiceOverridesAction, () => {
 
   it('falls back to the CONSOLE preset defaults when the tenant has no site_config row yet', async () => {
     getSiteConfigMock.mockResolvedValue(undefined);
-    upsertSiteConfigMock.mockResolvedValue({});
+    upsertSiteConfigMock.mockResolvedValue({ ok: true });
 
     await saveVoiceOverridesAction('tenant-1', overrides);
 
@@ -105,7 +105,7 @@ describe(saveVoiceOverridesAction, () => {
       faviconAssetUrl: 'https://blob.example.com/favicon.png',
       voiceOverrides: {},
     });
-    upsertSiteConfigMock.mockResolvedValue({});
+    upsertSiteConfigMock.mockResolvedValue({ ok: true });
 
     await saveVoiceOverridesAction('tenant-1', overrides);
 
@@ -133,9 +133,22 @@ describe(saveVoiceOverridesAction, () => {
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
   });
 
+  it('does not report success or revalidate when upsertSiteConfig rejects a field', async () => {
+    getSiteConfigMock.mockResolvedValue(undefined);
+    upsertSiteConfigMock.mockResolvedValue({
+      ok: false,
+      fieldErrors: { notFoundHeading: 'Must be 80 characters or fewer.' },
+    });
+
+    const result = await saveVoiceOverridesAction('tenant-1', overrides);
+
+    expect(result).toEqual({ ok: false });
+    expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
+  });
+
   it('returns ok:true on a successful save', async () => {
     getSiteConfigMock.mockResolvedValue(undefined);
-    upsertSiteConfigMock.mockResolvedValue({});
+    upsertSiteConfigMock.mockResolvedValue({ ok: true });
 
     const result = await saveVoiceOverridesAction('tenant-1', overrides);
 
@@ -144,7 +157,7 @@ describe(saveVoiceOverridesAction, () => {
 
   it('calls the site-config revalidation webhook after a successful save', async () => {
     getSiteConfigMock.mockResolvedValue(undefined);
-    upsertSiteConfigMock.mockResolvedValue({});
+    upsertSiteConfigMock.mockResolvedValue({ ok: true });
 
     await saveVoiceOverridesAction('tenant-1', overrides);
 
