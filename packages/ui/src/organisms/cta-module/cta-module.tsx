@@ -1,13 +1,13 @@
 import {
   CONTENT_ALIGNMENT,
-  CTA_MOBILE_MEDIA_ORDER,
   CTA_VARIANT,
   type IWithClassName,
   type IWithDataTestId,
+  MOBILE_MEDIA_ORDER,
   type TBrandVariant,
   type TContentAlignment,
-  type TCtaMobileMediaOrder,
   type TCtaVariant,
+  type TMobileMediaOrder,
 } from '@blog/config';
 import { Eyebrow } from '@blog/ui/atoms/eyebrow';
 import { Heading } from '@blog/ui/atoms/heading';
@@ -40,7 +40,7 @@ export type TCtaModuleProps = IWithClassName &
     /** How text and actions align within the content block, on all three variants. */
     contentAlignment?: TContentAlignment;
     /** Split only. Defaults to `LAST` (image collapses below content on mobile). */
-    mobileMediaOrder?: TCtaMobileMediaOrder;
+    mobileMediaOrder?: TMobileMediaOrder;
     /**
      * Drops this component's own top margin. Set when a parent (e.g. `Section`)
      * already owns the vertical spacing around it, so the two don't stack.
@@ -90,7 +90,7 @@ export const CtaModule = ({
     position: resolvedPosition,
     alignment: resolvedAlignment,
     mobileMediaOrder: isSplit
-      ? (mobileMediaOrder ?? CTA_MOBILE_MEDIA_ORDER.LAST)
+      ? (mobileMediaOrder ?? MOBILE_MEDIA_ORDER.LAST)
       : undefined,
     wrapped: isWrapped,
   });
