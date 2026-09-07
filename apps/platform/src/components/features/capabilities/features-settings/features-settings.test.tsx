@@ -146,6 +146,63 @@ describe(FeaturesSettings, () => {
     );
   });
 
+  it('disables Save on initial render, with values unchanged', () => {
+    render(
+      <FeaturesSettings
+        tenantId="tenant-1"
+        entitledCapabilities={ALL_ENTITLED}
+        initialValues={INITIAL_VALUES}
+        saveAction={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+  });
+
+  it('enables Save after toggling an entitled capability, and disables it again once toggled back', async () => {
+    const user = userEvent.setup();
+    render(
+      <FeaturesSettings
+        tenantId="tenant-1"
+        entitledCapabilities={ALL_ENTITLED}
+        initialValues={INITIAL_VALUES}
+        saveAction={vi.fn()}
+      />,
+    );
+
+    const saveButton = screen.getByRole('button', { name: 'Save changes' });
+    const newsletterSwitch = screen.getByRole('switch', {
+      name: 'Newsletter',
+    });
+
+    await user.click(newsletterSwitch);
+    expect(saveButton).toBeEnabled();
+
+    await user.click(newsletterSwitch);
+    expect(saveButton).toBeDisabled();
+  });
+
+  it('disables Save again after a successful save, without a remount', async () => {
+    const user = userEvent.setup();
+    const saveAction = vi.fn().mockResolvedValue({ ok: true });
+    render(
+      <FeaturesSettings
+        tenantId="tenant-1"
+        entitledCapabilities={ALL_ENTITLED}
+        initialValues={INITIAL_VALUES}
+        saveAction={saveAction}
+      />,
+    );
+
+    const saveButton = screen.getByRole('button', { name: 'Save changes' });
+    await user.click(screen.getByRole('switch', { name: 'Newsletter' }));
+    expect(saveButton).toBeEnabled();
+
+    await user.click(saveButton);
+
+    await waitFor(() => expect(saveButton).toBeDisabled());
+  });
+
   it('saves the current toggle state through saveAction', async () => {
     const user = userEvent.setup();
     const saveAction = vi.fn().mockResolvedValue({ ok: true });
@@ -188,6 +245,7 @@ describe(FeaturesSettings, () => {
       />,
     );
 
+    await user.click(screen.getByRole('switch', { name: 'Newsletter' }));
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     expect(await screen.findByText('Features saved.')).toBeVisible();
@@ -212,6 +270,7 @@ describe(FeaturesSettings, () => {
       />,
     );
 
+    await user.click(screen.getByRole('switch', { name: 'Newsletter' }));
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     const saveButton = await screen.findByRole('button', {
@@ -248,6 +307,7 @@ describe(FeaturesSettings, () => {
       />,
     );
 
+    await user.click(screen.getByRole('switch', { name: 'Newsletter' }));
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't save");

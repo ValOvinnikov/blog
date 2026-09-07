@@ -16,9 +16,14 @@ import {
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useId } from 'react';
+import { useId, useState } from 'react';
 
 import { featuresSettingsVariants } from './features-settings-variants';
+
+const valuesEqual = (
+  a: TSettingsFeaturesValues,
+  b: TSettingsFeaturesValues,
+): boolean => CAPABILITY_TOGGLES.every(({ field }) => a[field] === b[field]);
 
 export type TFeaturesSettingsProps = {
   tenantId: string;
@@ -52,17 +57,23 @@ export const FeaturesSettings = ({
   const t = useTranslations('featuresSettings');
   const toast = useToast();
   const router = useRouter();
+  const [savedValues, setSavedValues] =
+    useState<TSettingsFeaturesValues>(initialValues);
   const { values, setValues, status, isPending, handleSubmit } =
     useFormSubmission<TSettingsFeaturesValues, { ok: boolean }>({
       initialValues,
       onSubmit: (vals) => saveAction(tenantId, vals),
-      onSuccess: () => {
+      onSuccess: (submittedValues) => {
+        // router.refresh() re-renders the server component but doesn't reset this hook's state, so the saved baseline is updated explicitly here.
+        setSavedValues(submittedValues);
         toast.success({
           message: t('alertSuccess'),
         });
         router.refresh();
       },
     });
+
+  const isDirty = !valuesEqual(values, savedValues);
 
   const { root, alert, switchTrack, switchThumb, switchLabel } =
     featuresSettingsVariants();
@@ -83,7 +94,7 @@ export const FeaturesSettings = ({
           <Button
             variant="primary"
             onClick={handleSubmit}
-            isDisabled={isArchived}
+            isDisabled={!isDirty || isArchived}
             isPending={isPending}
             pendingLabel={t('savingButton')}
             aria-describedby={isArchived ? archivedNoticeId : undefined}
