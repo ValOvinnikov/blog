@@ -357,6 +357,32 @@ export type Settings_newsletter = {
   title?: string;
   heading?: string;
   description?: string;
+  submitLabel?: string;
+  emailPlaceholder?: string;
+  successMessage?: string;
+  errorInvalid?: string;
+  errorAlreadySubscribed?: string;
+  errorServer?: string;
+  trustCues?: Array<string>;
+  confirm?: {
+    confirmedTitle?: string;
+    confirmedMessage?: string;
+    invalidTitle?: string;
+    invalidMessage?: string;
+    errorTitle?: string;
+    errorMessage?: string;
+    returnHome?: string;
+  };
+  unsubscribe?: {
+    confirmTitle?: string;
+    confirmMessage?: string;
+    confirmButtonLabel?: string;
+    successTitle?: string;
+    successMessage?: string;
+    invalidTitle?: string;
+    invalidMessage?: string;
+    returnHome?: string;
+  };
 };
 
 export type Settings_footer = {
