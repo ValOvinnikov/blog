@@ -1,3 +1,4 @@
+import type { TVoicePortableText } from '@blog/config';
 import realMessages from '@web/i18n/messages/en.json';
 
 import { applyVoiceOverrides } from './apply-voice-overrides';
@@ -82,6 +83,29 @@ describe(applyVoiceOverrides, () => {
     expect(result).toEqual({
       topicPage: { empty: 'Nothing here yet' },
       tagPage: { empty: 'No posts tagged this yet.' },
+    });
+  });
+
+  it('projects a rich (Portable Text) override to plain text', () => {
+    const richValue: TVoicePortableText = [
+      {
+        _type: 'block',
+        _key: 'a',
+        style: 'normal',
+        children: [
+          { _type: 'span', _key: 'a1', text: 'Bold', marks: ['strong'] },
+          { _type: 'span', _key: 'a2', text: ' and plain' },
+        ],
+      },
+    ];
+
+    const result = applyVoiceOverrides(
+      { notFound: { heading: 'Page not found' } },
+      { notFoundHeading: richValue },
+    );
+
+    expect(result).toEqual({
+      notFound: { heading: 'Bold and plain' },
     });
   });
 

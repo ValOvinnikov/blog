@@ -1,3 +1,4 @@
+import type { TVoicePortableText } from '@blog/config';
 import realMessages from '@web/i18n/messages/en.json';
 
 import { resolveTenantMessages } from './resolve-tenant-messages';
@@ -25,7 +26,9 @@ vi.mock('next/cache', () => ({
 
 const TENANT = { id: 'tenant-1' };
 
-const siteConfigRow = (voiceOverrides: Record<string, string> = {}) => {
+const siteConfigRow = (
+  voiceOverrides: Record<string, string | TVoicePortableText> = {},
+) => {
   return {
     preset: 'CONSOLE',
     accentHue: 250,
@@ -93,6 +96,26 @@ describe('resolveTenantMessages', () => {
 
     expect(getAtPath(messages, ['blogListPage', 'empty'])).toBe(
       'Nothing published to the blog yet.',
+    );
+  });
+
+  it('applies a rich voice override as plain text', async () => {
+    const richValue: TVoicePortableText = [
+      {
+        _type: 'block',
+        _key: 'a',
+        style: 'normal',
+        children: [{ _type: 'span', _key: 'a1', text: 'Nothing here yet.' }],
+      },
+    ];
+    getSiteConfigMock.mockResolvedValue(
+      siteConfigRow({ topicEmpty: richValue }),
+    );
+
+    const messages = await resolveTenantMessages(realMessages);
+
+    expect(getAtPath(messages, ['topicPage', 'empty'])).toBe(
+      'Nothing here yet.',
     );
   });
 
