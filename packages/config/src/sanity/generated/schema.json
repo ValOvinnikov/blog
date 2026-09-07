@@ -2659,6 +2659,36 @@
   },
   {
     "type": "type",
+    "name": "module_heroBlog.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "module_heroBlog"
+    }
+  },
+  {
+    "type": "type",
     "name": "blog_tag.reference",
     "value": {
       "type": "object",
@@ -2860,8 +2890,17 @@
       "hero": {
         "type": "objectAttribute",
         "value": {
-          "type": "inline",
-          "name": "module_hero.reference"
+          "type": "union",
+          "of": [
+            {
+              "type": "inline",
+              "name": "module_hero.reference"
+            },
+            {
+              "type": "inline",
+              "name": "module_heroBlog.reference"
+            }
+          ]
         },
         "optional": true
       },
@@ -3210,8 +3249,17 @@
       "hero": {
         "type": "objectAttribute",
         "value": {
-          "type": "inline",
-          "name": "module_hero.reference"
+          "type": "union",
+          "of": [
+            {
+              "type": "inline",
+              "name": "module_hero.reference"
+            },
+            {
+              "type": "inline",
+              "name": "module_heroBlog.reference"
+            }
+          ]
         },
         "optional": true
       },
@@ -3515,8 +3563,17 @@
       "hero": {
         "type": "objectAttribute",
         "value": {
-          "type": "inline",
-          "name": "module_hero.reference"
+          "type": "union",
+          "of": [
+            {
+              "type": "inline",
+              "name": "module_hero.reference"
+            },
+            {
+              "type": "inline",
+              "name": "module_heroBlog.reference"
+            }
+          ]
         },
         "optional": true
       },
@@ -3778,8 +3835,17 @@
       "hero": {
         "type": "objectAttribute",
         "value": {
-          "type": "inline",
-          "name": "module_hero.reference"
+          "type": "union",
+          "of": [
+            {
+              "type": "inline",
+              "name": "module_hero.reference"
+            },
+            {
+              "type": "inline",
+              "name": "module_heroBlog.reference"
+            }
+          ]
         },
         "optional": true
       },
@@ -4409,8 +4475,17 @@
       "hero": {
         "type": "objectAttribute",
         "value": {
-          "type": "inline",
-          "name": "module_hero.reference"
+          "type": "union",
+          "of": [
+            {
+              "type": "inline",
+              "name": "module_hero.reference"
+            },
+            {
+              "type": "inline",
+              "name": "module_heroBlog.reference"
+            }
+          ]
         },
         "optional": true
       },
@@ -4491,6 +4566,308 @@
         "value": {
           "type": "inline",
           "name": "seo"
+        },
+        "optional": true
+      }
+    }
+  },
+  {
+    "name": "module_heroBlog",
+    "type": "document",
+    "attributes": {
+      "_id": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_type": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string",
+          "value": "module_heroBlog"
+        }
+      },
+      "_createdAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_updatedAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_rev": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "title": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "postSource": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "PINNED"
+            },
+            {
+              "type": "string",
+              "value": "NEWEST_FEATURED"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "post": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "blog_post.reference"
+        },
+        "optional": true
+      },
+      "eyebrow": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "heading": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "supportingText": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "imageSource": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "POST"
+            },
+            {
+              "type": "string",
+              "value": "CUSTOM"
+            },
+            {
+              "type": "string",
+              "value": "NONE"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "image": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "imageWithAlt"
+        },
+        "optional": true
+      },
+      "primaryActionLabel": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "primaryActionAppearance": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "CONTAINED"
+            },
+            {
+              "type": "string",
+              "value": "INLINE"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "secondaryAction": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "ctaAction"
+        },
+        "optional": true
+      },
+      "variant": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "SPLIT"
+            },
+            {
+              "type": "string",
+              "value": "STACKED"
+            },
+            {
+              "type": "string",
+              "value": "BANNER"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "brandVariant": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "SECONDARY"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "contentPositionSplit": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "RIGHT"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "contentPositionBanner": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
+            },
+            {
+              "type": "string",
+              "value": "RIGHT"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "contentAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
+            },
+            {
+              "type": "string",
+              "value": "RIGHT"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "mediaOrderSplit": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LAST"
+            },
+            {
+              "type": "string",
+              "value": "FIRST"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "mediaOrderStacked": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LAST"
+            },
+            {
+              "type": "string",
+              "value": "FIRST"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "actions": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "actionGroup"
+        },
+        "optional": true
+      },
+      "layout": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "heroLayout"
         },
         "optional": true
       }
