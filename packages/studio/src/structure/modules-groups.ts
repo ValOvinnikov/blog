@@ -1,6 +1,7 @@
 import { contentSchema } from '@blog/studio/schema-types/modules/module-content';
 import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
 import { heroSchema } from '@blog/studio/schema-types/modules/module-hero';
+import { heroBlogSchema } from '@blog/studio/schema-types/modules/module-hero-blog';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
@@ -14,6 +15,7 @@ import {
   Mail,
   Megaphone,
   Sparkles,
+  Star,
 } from 'lucide-react';
 
 export const modulesGroups: TStructureGroup[] = [
@@ -36,7 +38,12 @@ export const modulesGroups: TStructureGroup[] = [
   {
     title: 'Content modules',
     items: [
-      { documentType: heroSchema.name, title: 'Heroes', icon: Sparkles },
+      { documentType: heroSchema.name, title: 'Hero', icon: Sparkles },
+      {
+        documentType: heroBlogSchema.name,
+        title: 'Hero (Blog)',
+        icon: Star,
+      },
       { documentType: contentSchema.name, title: 'Content', icon: FileText },
       { documentType: ctaSchema.name, title: 'CTAs', icon: Megaphone },
       {
