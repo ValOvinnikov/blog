@@ -55,6 +55,30 @@ describe(Button, () => {
     expect(handleClick).toHaveBeenCalledOnce();
   });
 
+  it('renders aria-disabled without native disabled, and blocks the click handler, when isAriaDisabled is set', async () => {
+    const user = userEvent.setup();
+    const handleClick = vi.fn();
+
+    render(
+      <Button isAriaDisabled={true} onClick={handleClick}>
+        Save
+      </Button>,
+    );
+
+    const button = screen.getByRole('button', { name: 'Save' });
+    expect(button).toHaveAttribute('aria-disabled', 'true');
+    expect(button).not.toBeDisabled();
+
+    await user.tab();
+    expect(button).toHaveFocus();
+
+    await user.click(button);
+    expect(handleClick).not.toHaveBeenCalled();
+
+    await user.keyboard('{Enter}');
+    expect(handleClick).not.toHaveBeenCalled();
+  });
+
   it('keeps a decorative arrow out of the accessible name', () => {
     render(<Button hasArrow={true}>Begin provisioning</Button>);
 

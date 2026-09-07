@@ -2,8 +2,11 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const deprovisioningStatusViewVariants = tv({
   slots: {
-    root: ['mt-6 flex flex-col gap-6'],
-    cardBody: ['flex flex-1 flex-col'],
+    root: ['flex flex-col gap-6'],
+    cardsRow: ['flex flex-col gap-6', 'lg:grid lg:grid-cols-2 lg:items-start'],
+    stepsCard: ['bg-admin-surface'],
+    stepsSummary: ['flex items-center gap-2.5'],
+    overallStatusLive: ['inline-flex items-center'],
     errorCard: [
       'flex flex-col gap-3 rounded-admin border p-[18px] shadow-admin',
       'border-admin-bad/30 bg-admin-bad-weak',

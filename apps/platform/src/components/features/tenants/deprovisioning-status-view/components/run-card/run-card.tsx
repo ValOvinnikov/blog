@@ -6,21 +6,28 @@ import { ExternalLinkButton } from '@platform/components/shared/external-link-bu
 import { formatDateTime } from '@platform/utils/format-date-time/format-date-time';
 import { formatRelativeTime } from '@platform/utils/format-relative-time/format-relative-time';
 import { useTranslations } from 'next-intl';
+import type { ReactNode } from 'react';
 
 import { runCardVariants } from './run-card-variants';
 
 type TRunCardProps = {
   run: TDeprovisioningRun;
+  /** Right-aligned in the card header, e.g. the overall status badge. */
+  actions?: ReactNode;
 };
 
 /** The teardown run's own record — when it started, when (or whether) it finished, and where to inspect it, independent of the per-step statuses in the steps card. */
-export const RunCard = ({ run }: TRunCardProps) => {
+export const RunCard = ({ run, actions }: TRunCardProps) => {
   const t = useTranslations('deprovisioningStatusView');
   const { workflowLogLink } = runCardVariants();
 
   return (
     <Card>
-      <Card.Header title={t('runCardTitle')} headingLevel={2} />
+      <Card.Header
+        title={t('runCardTitle')}
+        headingLevel={2}
+        actions={actions}
+      />
       <Card.Body>
         <DetailList>
           <DetailList.Row label={t('runStartedLabel')}>

@@ -8,6 +8,8 @@ export type TTextProps = {
   as?: 'p' | 'span';
   children: ReactNode;
   className?: string;
+  /** Lets another control's `aria-describedby` point at this text. */
+  id?: string;
 };
 
 export const Text = ({
@@ -15,11 +17,12 @@ export const Text = ({
   as = 'p',
   children,
   className,
+  id,
 }: TTextProps) => {
   const Component: ElementType = as;
 
   return (
-    <Component className={textVariants({ variant, class: className })}>
+    <Component id={id} className={textVariants({ variant, class: className })}>
       {children}
     </Component>
   );

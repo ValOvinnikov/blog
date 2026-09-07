@@ -126,8 +126,17 @@ describe(ProvisioningStatusView, () => {
     ).not.toBeInTheDocument();
   });
 
-  it("keeps an overall status badge in the page header even before the body's own status row appears", () => {
-    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+  it('renders the overall status badge in the Run card header, not the page header', () => {
+    const tenant = makeTenant({
+      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+      provisioningSteps: {
+        ...idleProvisioningSteps(),
+        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+        },
+        run: { startedAt: '2026-08-12T14:18:00.000Z' },
+      },
+    });
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
@@ -137,37 +146,12 @@ describe(ProvisioningStatusView, () => {
       name: 'Provisioning',
     });
     expect(
-      within(heading.parentElement as HTMLElement).getByText('Not started'),
-    ).toBeVisible();
-  });
+      within(heading.parentElement as HTMLElement).queryByText('Running…'),
+    ).not.toBeInTheDocument();
 
-  it('always shows a Back to tenant link to the tenant overview, regardless of provisioning status', () => {
-    const readyTenant = makeTenant({
-      provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-    });
-    const { unmount } = render(
-      <ProvisioningStatusView
-        tenant={readyTenant}
-        ownerEmail="owner@example.com"
-      />,
-    );
-    expect(
-      screen.getByRole('link', { name: 'Back to tenant' }),
-    ).toHaveAttribute('href', '/tenants/tenant-1');
-    unmount();
-
-    const provisioningTenant = makeTenant({
-      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-    });
-    render(
-      <ProvisioningStatusView
-        tenant={provisioningTenant}
-        ownerEmail="owner@example.com"
-      />,
-    );
-    expect(
-      screen.getByRole('link', { name: 'Back to tenant' }),
-    ).toHaveAttribute('href', '/tenants/tenant-1');
+    const runHeading = screen.getByRole('heading', { level: 2, name: 'Run' });
+    const runHeader = runHeading.parentElement?.parentElement as HTMLElement;
+    expect(within(runHeader).getByText('Running…')).toBeVisible();
   });
 
   it('shows the invited-pending owner badge when the tenant has no resolved owner email', () => {
@@ -340,7 +324,7 @@ describe(ProvisioningStatusView, () => {
     ).toBeVisible();
   });
 
-  it('shows a single Retry button in the tenant details header for a failed step, with no per-step Retry buttons in the sidebar', () => {
+  it('shows a single Retry button in the Run card header for a failed step, with no per-step Retry buttons in the sidebar', () => {
     const tenant = makeTenant({
       provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
       provisioningSteps: {
@@ -365,9 +349,9 @@ describe(ProvisioningStatusView, () => {
       }),
     ).not.toBeInTheDocument();
     // One "Failed" per the failed step's visually-hidden sidebar
-    // announcement, one for the page header's overall status badge, and one
-    // for the tenant details header's own overall status badge.
-    expect(screen.getAllByText('Failed')).toHaveLength(3);
+    // announcement, one for the overall status badge (this tenant has no
+    // run yet, so the badge renders in the fallback Run-card header).
+    expect(screen.getAllByText('Failed')).toHaveLength(2);
   });
 
   it("no longer renders a step's raw error text inline in the sidebar", () => {
@@ -493,7 +477,7 @@ describe(ProvisioningStatusView, () => {
         },
       });
 
-    it('shows a running indicator, not the stale Failed state, in both status badges', () => {
+    it('shows a running indicator, not the stale Failed state, in the overall status badge', () => {
       render(
         <ProvisioningStatusView
           tenant={staleFailedTenant()}
@@ -630,6 +614,45 @@ describe(ProvisioningStatusView, () => {
       screen.queryByRole('button', { name: 'Start provisioning' }),
     ).not.toBeInTheDocument();
     expect(screen.getAllByText('Running…').length).toBeGreaterThan(0);
+
+    await act(async () => {
+      resolveDispatch?.({ outcome: 'dispatched' });
+      await Promise.resolve();
+    });
+  });
+
+  it('mounts the overall status live region before Start is ever clicked, so the first status change is announced', async () => {
+    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    let resolveDispatch:
+      ((result: { outcome: 'dispatched' }) => void) | undefined;
+    retryProvisioningStepActionMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveDispatch = resolve;
+      }),
+    );
+    const user = userEvent.setup();
+    render(
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+    );
+
+    const runHeading = screen.getByRole('heading', { level: 2, name: 'Run' });
+    const runHeader = runHeading.parentElement?.parentElement as HTMLElement;
+    const liveRegionBefore = within(runHeader)
+      .getByText('Not started')
+      .closest('[aria-live="polite"]');
+    expect(liveRegionBefore).not.toBeNull();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Start provisioning' }),
+    );
+
+    // The live region present before the click is the same node now showing
+    // the transition — never one mounted at the same moment as this text,
+    // which some screen readers fail to announce.
+    const liveRegionAfter = within(runHeader)
+      .getByText('Running…')
+      .closest('[aria-live="polite"]');
+    expect(liveRegionAfter).toBe(liveRegionBefore);
 
     await act(async () => {
       resolveDispatch?.({ outcome: 'dispatched' });
@@ -1329,6 +1352,112 @@ describe(ProvisioningStatusView, () => {
     });
   });
 
+  describe('steps disclosure collapse', () => {
+    it('is expanded while the run is not done', () => {
+      const tenant = makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+          },
+        },
+      });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      const details = screen
+        .getByRole('complementary')
+        .querySelector('details');
+      expect(details).toHaveAttribute('open');
+    });
+
+    it('is collapsed by default once every step is already done on mount', () => {
+      const done = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
+      const tenant = makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: done,
+          [TENANT_PROVISIONING_STEP.SEED_CONTENT]: done,
+          [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: done,
+          [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: done,
+          [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: done,
+          [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: done,
+        },
+      });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      const details = screen
+        .getByRole('complementary')
+        .querySelector('details');
+      expect(details).not.toHaveAttribute('open');
+    });
+
+    it('auto-collapses once the run completes, and a later re-render does not undo a user-initiated reopen', async () => {
+      const done = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
+      const tenant = makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+          },
+        },
+      });
+      getTenantProvisioningStatusActionMock.mockResolvedValue({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: done,
+          [TENANT_PROVISIONING_STEP.SEED_CONTENT]: done,
+          [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: done,
+          [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: done,
+          [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: done,
+          [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: done,
+        },
+      });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      const sidebar = screen.getByRole('complementary');
+      const details = sidebar.querySelector('details') as HTMLDetailsElement;
+      expect(details).toHaveAttribute('open');
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+      });
+
+      expect(details).not.toHaveAttribute('open');
+
+      fireEvent.click(within(sidebar).getByText('Steps'));
+      expect(details).toHaveAttribute('open');
+
+      // Polling itself has already stopped (the run is terminal), but
+      // `useRelativeTimeTick` keeps forcing a periodic re-render regardless
+      // — an uncontrolled `Disclosure` writing `open` from `isDefaultOpen`
+      // on every render would slam this back shut here.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(60_000);
+      });
+
+      expect(details).toHaveAttribute('open');
+    });
+  });
+
   describe('step and run timestamps', () => {
     beforeEach(() => {
       vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'Date'] });
@@ -1450,7 +1579,7 @@ describe(ProvisioningStatusView, () => {
       expect(screen.queryByText(/\d{4}/)).not.toBeInTheDocument();
     });
 
-    it('renders no Run card for a tenant with no run', () => {
+    it('renders a Run card header with no run details for a tenant with no run', () => {
       const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
       render(
         <ProvisioningStatusView
@@ -1460,8 +1589,10 @@ describe(ProvisioningStatusView, () => {
       );
 
       expect(
-        screen.queryByRole('heading', { level: 2, name: 'Run' }),
-      ).not.toBeInTheDocument();
+        screen.getByRole('heading', { level: 2, name: 'Run' }),
+      ).toBeInTheDocument();
+      expect(screen.queryByText('Started')).not.toBeInTheDocument();
+      expect(screen.queryByText('Finished')).not.toBeInTheDocument();
     });
 
     it('renders a Run card with Started/Finished/Registry when the run exists, each showing relative and absolute UTC time together', () => {
