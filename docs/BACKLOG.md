@@ -812,7 +812,7 @@ generalisation` — output: a design section covering the derived hero type,
   studio helper. Must answer: which pages get a hero slot (home required,
   landing page optional, work page later), and what the shared hero field set
   is (brand variant, hero layout, image, actions, content position, content
-  alignment, mobile media order). **Answered 2026-09-07** in the portfolio
+  alignment, media order). **Answered 2026-09-07** in the portfolio
   design doc: home required, every other page optional and replacing its
   default header; the shared tail ships with `module_heroBlog`.
 - **Sub-issues (dependency order):**
@@ -878,9 +878,12 @@ landing pages` — `Record<THeroModuleType, …>` so an unregistered hero kind
   - **studio** · `feat(studio): module_heroBlog schema` — new type beside
     `module_hero`; desk group "Heroes" lists both; `page_home`/`page_generic`
     slots admit it. Typegen.
-  - **service** · `feat(service): heroBlog loader with one coalesced query` —
+  - **service** · `feat(service): heroBlog loader with one resolved query` —
     the pinned-or-newest-featured resolution in **one** GROQ round trip (the
-    current hero fires the fallback query on every request, pinned or not);
+    current hero fires the fallback query on every request, pinned or not),
+    branching on `postSource` with `select()` — **not** `coalesce()`, which
+    would fall back over a stale pinned reference the editor has already
+    switched away from;
     its own `THeroBlogAction` view model instead of an `ILink` padded with
     `undefined`; no masking of an empty override.
   - **ui** · `feat(ui): Hero organism gains content position, alignment and

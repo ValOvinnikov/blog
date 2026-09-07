@@ -284,12 +284,19 @@ and emits its own pair in the same position. A kind's own content fields
 text for Statement; name, role, bio, avatar and social links for Profile) are
 that kind's own design decision, made in its own section.
 
-Two constants move to `@blog/config` with this: `HERO_VARIANT = { SPLIT,
-STACKED, BANNER }`, and `MEDIA_ORDER = { LAST, FIRST }`, which **replaces**
-`CTA_MOBILE_MEDIA_ORDER` (same values, same stored strings, so no content
-migration — the CTA schema, service and UI consumers rename in the same PR).
-It is `MEDIA_ORDER`, not `MOBILE_MEDIA_ORDER`, because Stacked's field
-applies at every width.
+Two constants back this tail, and they land in different phases because
+`@blog/config` has no `knip` exemption — an exported const with no importer
+fails that gate:
+
+- `MEDIA_ORDER = { LAST, FIRST }` lands in **Phase 0**, because it is a
+  **rename** of `CTA_MOBILE_MEDIA_ORDER` and keeps that const's existing CTA
+  consumers (same values, same stored strings, so no content migration; the
+  CTA schema, service and UI consumers rename in the same PR). It is
+  `MEDIA_ORDER`, not `MOBILE_MEDIA_ORDER`, because Stacked's field applies at
+  every width.
+- `HERO_VARIANT = { SPLIT, STACKED, BANNER }` lands **with
+  `defineHeroFields()`**, in `module_heroBlog` — it is genuinely new and has
+  no consumer before the helper exists.
 
 `defineHeroFields()` lands with its first consumer, `module_heroBlog`, not in
 Phase 0 — a helper with no caller fails `knip`, and `module_hero` is not
@@ -299,11 +306,12 @@ retrofitted because it is being retired.
 
 One `Hero` organism serves every kind. It gains the props `CtaModule`
 already has for the same fields — `variant`, `tone`, `contentPosition`,
-`contentAlignment`, `mobileMediaOrder` — and keeps its compound slots
+`contentAlignment`, `mediaOrder` — and keeps its compound slots
 (`Hero.Media`, `Hero.Cta`) plus a new `Hero.Aside` slot for kind-specific
-chrome such as the Profile avatar. DOM order is always copy before media;
-position and mobile order only move things visually, so the `<h1>` stays
-first for assistive tech. That change is the `ui` sub-issue of the first
+chrome such as the Profile avatar. `mediaOrder` is one prop: the service
+collapses the two variant-scoped Studio fields into it. DOM order is always
+copy before media; position and media order only move things visually, so the
+`<h1>` stays first for assistive tech. That change is the `ui` sub-issue of the first
 hero that needs it (#2807, under `module_heroBlog`); Phase 0 has no `ui`
 work.
 
@@ -343,8 +351,10 @@ home page onto `module_heroBlog` and deletes the schema.
 ### Phase 0 scope, per layer
 
 - **config** — `THeroModuleType`, `TSlotModuleType`, `isHeroModuleType()`,
-  `HERO_VARIANT`, `MOBILE_MEDIA_ORDER` (renaming `CTA_MOBILE_MEDIA_ORDER`'s
-  consumers).
+  and `MEDIA_ORDER` (renaming `CTA_MOBILE_MEDIA_ORDER` and its consumers).
+  **Not `HERO_VARIANT`:** nothing consumes it until `defineHeroFields()`
+  lands, and `@blog/config` has no `knip` exemption, so an export with no
+  importer fails that gate. It ships with the helper, in `module_heroBlog`.
 - **studio** — `HERO_SCHEMA_TYPES` + its registry test; `page_home.hero`
   references the list; `page_generic`, `page_blog`, `page_topic` and
   `page_tag` gain an optional `hero` referencing it; the home and generic
