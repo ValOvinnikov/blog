@@ -2,7 +2,7 @@ import {
   BRAND_VARIANT,
   CONTENT_ALIGNMENT,
   CTA_VARIANT,
-  MOBILE_MEDIA_ORDER,
+  MEDIA_ORDER,
 } from '@blog/config';
 import { Button } from '@blog/ui/atoms/button';
 import { objectKeys } from '@blog/utils/primitives';
@@ -153,7 +153,7 @@ export const SplitImageLeft: TStory = {
 export const SplitMobileMediaFirst: TStory = {
   args: {
     ...SplitDefault.args,
-    mobileMediaOrder: MOBILE_MEDIA_ORDER.FIRST,
+    mobileMediaOrder: MEDIA_ORDER.FIRST,
   },
 };
 
