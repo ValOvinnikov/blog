@@ -6,11 +6,9 @@ import {
   type TMaybeUndefined,
 } from '@blog/config';
 import type { TImageTenant } from '@blog/service/sanity/image';
+import { toCtaAction } from '@blog/service/shared/transformers/to-cta-action';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
-import {
-  toInternalHref,
-  toLink,
-} from '@blog/service/shared/transformers/to-link';
+import { toInternalHref } from '@blog/service/shared/transformers/to-link';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import { toRequiredSectionHeader } from '@blog/service/shared/transformers/to-section-header';
 import type { InferResultType } from 'groqd';
@@ -75,17 +73,6 @@ function toContentPosition(
     case CTA_VARIANT.CALLOUT:
       return undefined;
   }
-}
-
-function toCtaAction(raw: TRawCtaAction): TCtaAction | undefined {
-  const link = toLink(raw.link);
-  if (!link) return undefined;
-
-  return {
-    variant: raw.variant,
-    appearance: raw.appearance ?? undefined,
-    link,
-  };
 }
 
 function toCtaActions(raw: TRawCtaModule['actions']): TCtaAction[] {

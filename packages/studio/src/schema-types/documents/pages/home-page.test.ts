@@ -1,4 +1,5 @@
 import { homePageSchema } from '@blog/studio/schema-types/documents/pages/home-page';
+import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 
 type TArrayFieldDefinition = {
   type: 'array';
@@ -40,6 +41,8 @@ describe('homePageSchema hero field', () => {
     }
 
     expect(heroField.type).toBe('reference');
-    expect(heroField.to?.map((entry) => entry.type)).toEqual(['module_hero']);
+    expect(heroField.to?.map((entry) => entry.type)).toEqual(
+      HERO_SCHEMA_TYPES.map((schema) => schema.name),
+    );
   });
 });

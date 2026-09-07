@@ -1,0 +1,234 @@
+import { HERO_VARIANT, MEDIA_ORDER } from '@blog/config/constants';
+import { defineHeroFields } from '@blog/studio/schema-types/helpers/define-hero-fields';
+
+type TCustomFn = (
+  value: unknown,
+  context: { parent?: unknown },
+) => string | true;
+
+type THiddenFn = (context: { parent?: unknown }) => boolean;
+
+const getField = (
+  fields: ReturnType<typeof defineHeroFields>,
+  name: string,
+) => {
+  const field = fields.find(
+    (field): field is typeof field & { name: string } =>
+      'name' in field && field.name === name,
+  );
+
+  if (!field) {
+    throw new Error(`Expected defineHeroFields() to define a "${name}" field.`);
+  }
+
+  return field;
+};
+
+const getOptionValues = (field: { options?: unknown }) => {
+  const options = field.options;
+  const list =
+    options && typeof options === 'object' && 'list' in options
+      ? (options as { list: unknown }).list
+      : undefined;
+
+  if (!list) {
+    throw new Error('Expected field to define an options.list.');
+  }
+
+  return (list as { title: string; value: string }[]).map(
+    (option) => option.value,
+  );
+};
+
+const getHidden = (field: { hidden?: unknown }): THiddenFn => {
+  if (typeof field.hidden !== 'function') {
+    throw new Error('Expected field to define a hidden() fn.');
+  }
+
+  return field.hidden as THiddenFn;
+};
+
+const getCustomValidator = (field: { validation?: unknown }): TCustomFn => {
+  if (!field.validation) {
+    throw new Error('Expected field to define validation.');
+  }
+
+  let customFn: TCustomFn | undefined;
+
+  const rule = {
+    custom: (fn: TCustomFn) => {
+      customFn = fn;
+      return rule;
+    },
+    required: () => rule,
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+  (field.validation as any)(rule);
+
+  if (!customFn) {
+    throw new Error('Expected field validation to register a custom() rule.');
+  }
+
+  return customFn;
+};
+
+describe('defineHeroFields variant field', () => {
+  it('offers Split, Stacked and Banner by default, defaulting to Split', () => {
+    const field = getField(defineHeroFields(), 'variant');
+
+    expect(getOptionValues(field)).toEqual([
+      HERO_VARIANT.SPLIT,
+      HERO_VARIANT.STACKED,
+      HERO_VARIANT.BANNER,
+    ]);
+    expect(field.initialValue).toBe(HERO_VARIANT.SPLIT);
+  });
+
+  it('restricts the option set to the given variants', () => {
+    const field = getField(
+      defineHeroFields({ variants: [HERO_VARIANT.STACKED] }),
+      'variant',
+    );
+
+    expect(getOptionValues(field)).toEqual([HERO_VARIANT.STACKED]);
+    expect(field.initialValue).toBe(HERO_VARIANT.STACKED);
+  });
+});
+
+describe('defineHeroFields image field', () => {
+  it('is included by default', () => {
+    const fields = defineHeroFields();
+
+    expect(
+      fields.some((field) => 'name' in field && field.name === 'image'),
+    ).toBe(true);
+  });
+
+  it('is suppressed entirely when image: false', () => {
+    const fields = defineHeroFields({ image: false });
+
+    expect(
+      fields.some((field) => 'name' in field && field.name === 'image'),
+    ).toBe(false);
+  });
+
+  it('requires an image for Split and Banner, not Stacked', () => {
+    const validate = getCustomValidator(getField(defineHeroFields(), 'image'));
+
+    expect(
+      validate(undefined, { parent: { variant: HERO_VARIANT.SPLIT } }),
+    ).toBe('Image is required for the Split and Banner variants.');
+    expect(
+      validate(undefined, { parent: { variant: HERO_VARIANT.BANNER } }),
+    ).toBe('Image is required for the Split and Banner variants.');
+    expect(
+      validate(undefined, { parent: { variant: HERO_VARIANT.STACKED } }),
+    ).toBe(true);
+  });
+
+  it('is valid when an image is present, regardless of variant', () => {
+    const validate = getCustomValidator(getField(defineHeroFields(), 'image'));
+
+    expect(
+      validate(
+        { asset: { _ref: 'image-abc' } },
+        { parent: { variant: HERO_VARIANT.SPLIT } },
+      ),
+    ).toBe(true);
+  });
+});
+
+describe('defineHeroFields content position fields', () => {
+  it('shows contentPositionSplit only for Split', () => {
+    const hidden = getHidden(
+      getField(defineHeroFields(), 'contentPositionSplit'),
+    );
+
+    expect(hidden({ parent: { variant: HERO_VARIANT.SPLIT } })).toBe(false);
+    expect(hidden({ parent: { variant: HERO_VARIANT.BANNER } })).toBe(true);
+    expect(hidden({ parent: { variant: HERO_VARIANT.STACKED } })).toBe(true);
+  });
+
+  it('shows contentPositionBanner only for Banner', () => {
+    const hidden = getHidden(
+      getField(defineHeroFields(), 'contentPositionBanner'),
+    );
+
+    expect(hidden({ parent: { variant: HERO_VARIANT.BANNER } })).toBe(false);
+    expect(hidden({ parent: { variant: HERO_VARIANT.SPLIT } })).toBe(true);
+    expect(hidden({ parent: { variant: HERO_VARIANT.STACKED } })).toBe(true);
+  });
+
+  it('always emits the contentAlignment baseline', () => {
+    const fields = defineHeroFields();
+
+    expect(
+      fields.some(
+        (field) => 'name' in field && field.name === 'contentAlignment',
+      ),
+    ).toBe(true);
+  });
+});
+
+describe('defineHeroFields media order fields', () => {
+  it('shows mediaOrderSplit only for Split, defaulting to Last', () => {
+    const field = getField(defineHeroFields(), 'mediaOrderSplit');
+    const hidden = getHidden(field);
+
+    expect(getOptionValues(field)).toEqual([
+      MEDIA_ORDER.LAST,
+      MEDIA_ORDER.FIRST,
+    ]);
+    expect(field.initialValue).toBe(MEDIA_ORDER.LAST);
+    expect(hidden({ parent: { variant: HERO_VARIANT.SPLIT } })).toBe(false);
+    expect(hidden({ parent: { variant: HERO_VARIANT.STACKED } })).toBe(true);
+    expect(hidden({ parent: { variant: HERO_VARIANT.BANNER } })).toBe(true);
+  });
+
+  it('shows mediaOrderStacked only for Stacked, defaulting to Last', () => {
+    const field = getField(defineHeroFields(), 'mediaOrderStacked');
+    const hidden = getHidden(field);
+
+    expect(getOptionValues(field)).toEqual([
+      MEDIA_ORDER.LAST,
+      MEDIA_ORDER.FIRST,
+    ]);
+    expect(field.initialValue).toBe(MEDIA_ORDER.LAST);
+    expect(hidden({ parent: { variant: HERO_VARIANT.STACKED } })).toBe(false);
+    expect(hidden({ parent: { variant: HERO_VARIANT.SPLIT } })).toBe(true);
+    expect(hidden({ parent: { variant: HERO_VARIANT.BANNER } })).toBe(true);
+  });
+
+  it('Banner emits neither media order field', () => {
+    const fields = defineHeroFields();
+
+    for (const name of ['mediaOrderSplit', 'mediaOrderStacked']) {
+      const hidden = getHidden(getField(fields, name));
+      expect(hidden({ parent: { variant: HERO_VARIANT.BANNER } })).toBe(true);
+    }
+  });
+});
+
+describe('defineHeroFields shared tail', () => {
+  it('emits an actions field and a layout field', () => {
+    const fields = defineHeroFields();
+
+    expect(
+      fields.some((field) => 'name' in field && field.name === 'actions'),
+    ).toBe(true);
+    expect(
+      fields.some((field) => 'name' in field && field.name === 'layout'),
+    ).toBe(true);
+  });
+
+  it('ends with actions then layout', () => {
+    const names = defineHeroFields()
+      .filter(
+        (field): field is typeof field & { name: string } => 'name' in field,
+      )
+      .map((field) => field.name);
+
+    expect(names.slice(-2)).toEqual(['actions', 'layout']);
+  });
+});

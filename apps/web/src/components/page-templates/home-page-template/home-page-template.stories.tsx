@@ -28,6 +28,7 @@ const meta = {
           target: undefined,
           platform: undefined,
           hiddenLabelSuffix: undefined,
+          appearance: undefined,
         }}
         secondaryAction={undefined}
         layout={undefined}

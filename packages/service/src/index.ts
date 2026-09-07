@@ -12,6 +12,7 @@ import { createThemeSettingsService } from './features/global/theme-settings';
 import { createContentModuleService } from './features/modules/content';
 import { createCtaModuleService } from './features/modules/cta';
 import { createHeroModuleService } from './features/modules/hero';
+import { createHeroBlogModuleService } from './features/modules/hero-blog';
 import { createNewsletterModuleService } from './features/modules/newsletter';
 import { createPostLatestModuleService } from './features/modules/post-latest';
 import { createPostListModuleService } from './features/modules/post-list';
@@ -41,6 +42,7 @@ export const service = {
   },
   modules: {
     hero: createHeroModuleService(),
+    heroBlog: createHeroBlogModuleService(),
     postList: createPostListModuleService(),
     postLatest: createPostLatestModuleService(),
     content: createContentModuleService(),
@@ -77,6 +79,7 @@ export type { TThemeTokens } from './features/global/theme-settings';
 export type { TContentModule } from './features/modules/content';
 export type { TCtaModule } from './features/modules/cta';
 export type { THeroModule } from './features/modules/hero';
+export type { THeroBlogModule } from './features/modules/hero-blog';
 export type { TNewsletterModule } from './features/modules/newsletter';
 export type { TPostLatestModule } from './features/modules/post-latest';
 export type { TPostListModule } from './features/modules/post-list';
@@ -103,6 +106,8 @@ export { getPlatformSanityWriteContext } from './sanity/write-client';
 export { buildImageUrl } from './shared/transformers/build-image-url';
 export type { TRawImage } from './shared/transformers/build-image-url';
 export type { TArchivePostCard } from './shared/transformers/to-archive-post-card';
+export type { TCtaAction } from './shared/transformers/to-cta-action';
+export type { THeroPrimaryAction } from './shared/transformers/to-hero-primary-action';
 export type { TModule } from './shared/transformers/to-module';
 export type {
   TPostCard,

@@ -109,3 +109,43 @@ describe(toIsReversedOnDark, () => {
     expect(toIsReversedOnDark(undefined, 'ghost')).toBe(false);
   });
 });
+
+describe('ActionGroup — hiddenLabelSuffix', () => {
+  const actionWithSuffix = {
+    variant: CTA_ACTION_VARIANT.PRIMARY,
+    appearance: undefined,
+    link: {
+      label: 'Read more',
+      href: '/blog/welcome-to-the-blog',
+      target: undefined,
+      platform: undefined,
+      ariaLabel: undefined,
+    },
+    hiddenLabelSuffix: 'Welcome to the blog',
+  };
+
+  const hiddenLabelSetup = customRender(ActionGroup, {
+    actions: [actionWithSuffix],
+    isOnDark: undefined,
+  });
+
+  it('renders a hiddenLabelSuffix as real (sr-only) text inside the accessible name', () => {
+    hiddenLabelSetup();
+
+    const link = screen.getByRole('link', {
+      name: 'Read more: Welcome to the blog',
+    });
+    expect(link).toBeVisible();
+    expect(link).toHaveTextContent('Read more: Welcome to the blog');
+  });
+
+  it('renders no suffix when hiddenLabelSuffix is unset', () => {
+    hiddenLabelSetup({
+      actions: [{ ...actionWithSuffix, hiddenLabelSuffix: undefined }],
+    });
+
+    const link = screen.getByRole('link', { name: 'Read more' });
+    expect(link).toBeVisible();
+    expect(link).toHaveTextContent('Read more');
+  });
+});

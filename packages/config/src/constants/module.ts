@@ -49,3 +49,24 @@ export const HERO_VARIANT = {
 } as const;
 
 export type THeroVariant = TValueOf<typeof HERO_VARIANT>;
+
+/**
+ * How a hero module picks the post it renders.
+ */
+export const HERO_POST_SOURCE = {
+  PINNED: 'PINNED',
+  NEWEST_FEATURED: 'NEWEST_FEATURED',
+} as const;
+
+export type THeroPostSource = TValueOf<typeof HERO_POST_SOURCE>;
+
+/**
+ * Where a hero module's image comes from.
+ */
+export const HERO_IMAGE_SOURCE = {
+  POST: 'POST',
+  CUSTOM: 'CUSTOM',
+  NONE: 'NONE',
+} as const;
+
+export type THeroImageSource = TValueOf<typeof HERO_IMAGE_SOURCE>;

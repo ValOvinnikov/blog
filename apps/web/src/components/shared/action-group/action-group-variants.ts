@@ -8,3 +8,7 @@ export const actionGroupVariants = tv({
     },
   },
 });
+
+export const actionGroupHiddenLabelVariants = tv({
+  base: ['sr-only'],
+});

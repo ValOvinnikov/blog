@@ -409,6 +409,13 @@ export type Module_heroReference = {
   [internalGroqTypeReferenceTo]?: 'module_hero';
 };
 
+export type Module_heroBlogReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_heroBlog';
+};
+
 export type Blog_tagReference = {
   _ref: string;
   _type: 'reference';
@@ -452,7 +459,7 @@ export type Page_tag = {
   _rev: string;
   title?: string;
   slug?: Slug;
-  hero?: Module_heroReference;
+  hero?: Module_heroReference | Module_heroBlogReference;
   tag?: Blog_tagReference;
   postList?: Module_postListReference;
   modules?: Array<
@@ -516,7 +523,7 @@ export type Page_topic = {
   _rev: string;
   title?: string;
   slug?: Slug;
-  hero?: Module_heroReference;
+  hero?: Module_heroReference | Module_heroBlogReference;
   topic?: Blog_topicReference;
   postList?: Module_postListReference;
   modules?: Array<
@@ -566,7 +573,7 @@ export type Page_blog = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  hero?: Module_heroReference;
+  hero?: Module_heroReference | Module_heroBlogReference;
   heading?: string;
   supportingText?: string;
   postList?: Module_postListReference;
@@ -610,7 +617,7 @@ export type Page_home = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  hero?: Module_heroReference;
+  hero?: Module_heroReference | Module_heroBlogReference;
   modules?: Array<
     | ({
         _key: string;
@@ -725,7 +732,7 @@ export type Page_generic = {
   _rev: string;
   title?: string;
   slug?: Slug;
-  hero?: Module_heroReference;
+  hero?: Module_heroReference | Module_heroBlogReference;
   modules?: Array<
     | ({
         _key: string;
@@ -741,6 +748,34 @@ export type Page_generic = {
       } & Module_newsletterReference)
   >;
   seo?: Seo;
+};
+
+export type Module_heroBlog = {
+  _id: string;
+  _type: 'module_heroBlog';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  postSource?: 'PINNED' | 'NEWEST_FEATURED';
+  post?: Blog_postReference;
+  eyebrow?: string;
+  heading?: string;
+  supportingText?: string;
+  imageSource?: 'POST' | 'CUSTOM' | 'NONE';
+  image?: ImageWithAlt;
+  primaryActionLabel?: string;
+  primaryActionAppearance?: 'CONTAINED' | 'INLINE';
+  secondaryAction?: CtaAction;
+  variant?: 'SPLIT' | 'STACKED' | 'BANNER';
+  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  contentPositionSplit?: 'LEFT' | 'RIGHT';
+  contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  mediaOrderSplit?: 'LAST' | 'FIRST';
+  mediaOrderStacked?: 'LAST' | 'FIRST';
+  actions?: ActionGroup;
+  layout?: HeroLayout;
 };
 
 export type Module_hero = {
@@ -915,6 +950,7 @@ export type AllSanitySchemaTypes =
   | Settings_navigation
   | Settings_site
   | Module_heroReference
+  | Module_heroBlogReference
   | Blog_tagReference
   | Module_postListReference
   | Module_postLatestReference
@@ -940,6 +976,7 @@ export type AllSanitySchemaTypes =
   | Blog_topic
   | Blog_author
   | Page_generic
+  | Module_heroBlog
   | Module_hero
   | MediaTag
   | Code

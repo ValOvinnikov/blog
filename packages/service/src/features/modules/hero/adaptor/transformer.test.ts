@@ -139,4 +139,14 @@ describe('toHeroModule', () => {
     expect(hero.title).toBeUndefined();
     expect(hero.subtitle).toBeUndefined();
   });
+
+  it('has no appearance on the primary action — module_hero has no appearance field', () => {
+    const raw = makeRawHeroModule({
+      featuredPost: makeRawPostCard({ _id: 'featured-ref' }),
+    });
+
+    const hero = toHeroModule(raw, null, tenant);
+
+    expect(hero.primaryAction?.appearance).toBeUndefined();
+  });
 });

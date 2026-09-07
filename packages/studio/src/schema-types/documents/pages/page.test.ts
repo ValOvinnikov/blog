@@ -1,4 +1,5 @@
 import { genericSchema } from '@blog/studio/schema-types/documents/pages/page';
+import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 
 type TValidationRule = {
   required: () => TValidationRule;
@@ -105,7 +106,9 @@ describe('genericSchema hero field', () => {
 
     expect(heroField).toBeDefined();
     expect(heroField.type).toBe('reference');
-    expect(heroField.to?.map((entry) => entry.type)).toEqual(['module_hero']);
+    expect(heroField.to?.map((entry) => entry.type)).toEqual(
+      HERO_SCHEMA_TYPES.map((schema) => schema.name),
+    );
     expect(heroField.validation).toBeUndefined();
   });
 });
