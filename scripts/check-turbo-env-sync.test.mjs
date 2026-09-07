@@ -1,5 +1,5 @@
 // Fixture-based tests for check-turbo-env-sync's extraction + comparison
-// helpers, mirroring check-voice-key-sync.test.mjs's approach: inline source
+// helpers, mirroring gen-ui-index.test.mjs's approach: inline source
 // strings via `parseSource` instead of touching the real repo files, so a
 // refactor of the extractors can't silently lose coverage.
 //

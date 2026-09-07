@@ -364,24 +364,26 @@ Supported locales and the default are declared in `src/i18n/routing.ts`.
 
 ## New i18n keys that are tenant-customizable "voice" copy also need a Voice override
 
-A curated 8-key subset of `src/i18n/messages/en.json` is tenant-overridable
-through `apps/platform`'s Voice settings tab (`packages/db`'s `voiceOverrides`
-JSONB column) — empty-states and the not-found page's copy.
-`src/utils/apply-voice-overrides/apply-voice-overrides.ts` maps each override
-key to its i18n path. When a new i18n key is genuinely that kind of copy (not
-a nav label, breadcrumb, or `ariaLabel` — those stay i18n-only), add its
-mapping there too, and coordinate the matching field in
-`apps/platform/src/utils/voice-fields/voice-fields.ts` (`platform-app` owns
-that half) and the Zod `voiceOverridesSchema` in `packages/db`'s
-`upsert-site-config.ts` (`db` owns that one).
+Most visible copy is tenant-overridable through `apps/platform`'s Voice tab,
+backed by `packages/db`'s `voiceOverrides` JSONB column. `@blog/config`'s
+`VOICE_FIELDS` registry (`packages/config/src/voice/`) declares every editable
+string — its flat storage `id`, its dotted `path` into the catalog, its kind
+(`TEXT`/`MULTILINE`/`RICH`), and the surface it previews on.
 
-Those three key lists are hand-duplicated — nothing type-level couples them.
-`pnpm check:voice-sync` compares them by AST and goes red when a key reaches
-fewer than all three. It is **not** in the branch ruleset's required checks,
-so it will not block a merge on its own — run it locally rather than relying
-on CI to stop you. Adding a key needs no `packages/db` migration (the column
-is open-ended JSONB), but **removing or renaming one does**, since existing
-rows still carry the old key.
+**A new catalog string must be classified, not just added.** `VOICE_FIELDS`'s
+co-located test asserts both directions: every registry `path` resolves to a
+real catalog key, and every catalog key is either registered or listed on
+`VOICE_FIXED_KEYS`. Adding a string to the catalog alone fails that test, which
+is the mechanism that stops "is this editable?" from being decided by omission.
+
+Fixed, never tenant-editable: accessibility-only strings, toast copy, anything
+carrying ICU plural syntax, metadata with no visible counterpart, archive titles
+and breadcrumb labels (Studio-derived), and newsletter copy (which lives on its
+Studio settings singleton). Everything else visible is a Voice field.
+
+Adding a field needs no `packages/db` migration — the column is open-ended
+JSONB — but **removing or renaming one does**, since existing rows still carry
+the old key.
 
 ## SEO / feeds / a11y
 
