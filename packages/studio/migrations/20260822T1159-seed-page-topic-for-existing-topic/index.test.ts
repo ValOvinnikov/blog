@@ -33,6 +33,7 @@ describe('seed-page-topic-for-existing-topic migration', () => {
       brandVariant: 'PRIMARY',
       limit: 9,
       pageSize: 9,
+      showImages: true,
     };
     const pageTopicPayload = {
       _id: pageTopicId,

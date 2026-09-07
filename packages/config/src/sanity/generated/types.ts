@@ -152,6 +152,7 @@ export type Module_postLatest = {
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
   sectionHeader?: SectionHeader;
+  showImages?: boolean;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   limit?: number;
   layout?: Layout;
@@ -589,6 +590,7 @@ export type Module_postList = {
   title?: string;
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   sectionHeader?: SectionHeader;
+  showImages?: boolean;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   pageSize?: number;
   layout?: Layout;

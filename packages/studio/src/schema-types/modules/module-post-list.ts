@@ -3,6 +3,7 @@ import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-varia
 import { defineAlignmentFields } from '@blog/studio/schema-types/helpers/define-alignment-fields';
 import { layoutField } from '@blog/studio/schema-types/helpers/layout-field';
 import { sectionHeaderField } from '@blog/studio/schema-types/helpers/section-header-field';
+import { showImagesField } from '@blog/studio/schema-types/helpers/show-images-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
 import { List } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -16,6 +17,7 @@ export const postListSchema = defineType({
     titleField(),
     brandVariantField({ list: FULL_BRAND_VARIANT_LIST }),
     sectionHeaderField(),
+    showImagesField(),
     ...defineAlignmentFields([]),
     defineField({
       name: 'pageSize',

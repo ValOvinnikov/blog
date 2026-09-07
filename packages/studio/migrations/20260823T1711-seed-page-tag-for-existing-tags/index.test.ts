@@ -33,6 +33,7 @@ describe('seed-page-tag-for-existing-tags migration', () => {
       brandVariant: 'SECONDARY',
       limit: 9,
       pageSize: 9,
+      showImages: true,
     };
     const pageTagPayload = {
       _id: pageTagId,
