@@ -67,6 +67,7 @@ export default defineMigration({
           brandVariant: BRAND_VARIANT.PRIMARY,
           limit: TOPIC_ITEMS_PER_PAGE,
           pageSize: TOPIC_ITEMS_PER_PAGE,
+          showImages: true,
         }),
         createIfNotExists({
           _id: pageTopicId,

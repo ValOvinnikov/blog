@@ -983,6 +983,13 @@
         },
         "optional": true
       },
+      "showImages": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
       "contentAlignment": {
         "type": "objectAttribute",
         "value": {
@@ -3672,6 +3679,13 @@
         "value": {
           "type": "inline",
           "name": "sectionHeader"
+        },
+        "optional": true
+      },
+      "showImages": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
         },
         "optional": true
       },
