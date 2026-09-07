@@ -1,3 +1,4 @@
+import type { TVoicePortableText } from '@blog/config';
 import {
   DENSITY,
   FONT_CHOICE,
@@ -63,7 +64,7 @@ export const siteConfig = pgTable('site_config', {
   logoAssetUrl: text('logo_asset_url'),
   faviconAssetUrl: text('favicon_asset_url'),
   voiceOverrides: jsonb('voice_overrides')
-    .$type<Record<string, string>>()
+    .$type<Record<string, string | TVoicePortableText>>()
     .notNull()
     .default({}),
   createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),

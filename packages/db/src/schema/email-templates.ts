@@ -1,3 +1,4 @@
+import type { TVoicePortableTextBlock } from '@blog/config';
 import type { TEmailTemplateType } from '@blog/config/constants';
 import {
   jsonb,
@@ -10,14 +11,11 @@ import {
 
 import { tenants } from './tenants';
 
-// A Portable Text block, typed loosely on purpose — this package never
-// interprets its contents (the email-HTML serializer that does lives in
-// `@blog/email`), it only stores and returns whatever shape was authored.
-export type TPortableTextBlock = {
-  _type: string;
-  _key: string;
-  [key: string]: unknown;
-};
+// Reuses Voice's restricted Portable Text shape rather than a second,
+// independently-typed one — this package never interprets the contents
+// either way (the email-HTML serializer that does lives in `@blog/email`),
+// it only stores and returns whatever shape was authored.
+export type TPortableTextBlock = TVoicePortableTextBlock;
 
 // A tenant's authored copy for one template type, one row per (tenant,
 // template type) pair. `subject`/`body` are nullable rather than required:

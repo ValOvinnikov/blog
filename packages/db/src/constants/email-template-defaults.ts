@@ -14,8 +14,7 @@ function paragraph(key: string, text: string): TPortableTextBlock {
     _type: 'block',
     _key: key,
     style: 'normal',
-    markDefs: [],
-    children: [{ _type: 'span', _key: `${key}-span`, text, marks: [] }],
+    children: [{ _type: 'span', _key: `${key}-span`, text }],
   };
 }
 

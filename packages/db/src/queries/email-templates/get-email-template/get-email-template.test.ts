@@ -1,6 +1,7 @@
 import { EMAIL_TEMPLATE_TYPE } from '@blog/config/constants';
 import { EMAIL_TEMPLATE_DEFAULT_COPY } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
+import type { TPortableTextBlock } from '@blog/db/schema/email-templates';
 import { createTestDb } from '@blog/db/testing/create-test-db';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
@@ -67,18 +68,16 @@ describe(getEmailTemplate, () => {
 
   it('renders the default subject when only the body has been authored', async () => {
     const { id: tenantId } = await insertTestTenant(db);
-    const customBody = [
+    const customBody: TPortableTextBlock[] = [
       {
         _type: 'block',
         _key: 'custom-1',
         style: 'normal',
-        markDefs: [],
         children: [
           {
             _type: 'span',
             _key: 'custom-1-span',
             text: 'Custom body.',
-            marks: [],
           },
         ],
       },
