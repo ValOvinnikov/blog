@@ -1,1 +1,2 @@
-export { ActionGroup, toButtonVariant } from './action-group';
+export { ActionGroup } from './action-group';
+export type { TActionGroupAction } from './action-group';

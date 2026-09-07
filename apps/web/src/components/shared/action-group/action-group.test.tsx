@@ -109,3 +109,39 @@ describe(toIsReversedOnDark, () => {
     expect(toIsReversedOnDark(undefined, 'ghost')).toBe(false);
   });
 });
+
+describe('ActionGroup — hero-shaped primary action', () => {
+  const heroPrimaryAction = {
+    label: 'Read more',
+    href: '/blog/welcome-to-the-blog',
+    target: undefined,
+    platform: undefined,
+    hiddenLabelSuffix: 'Welcome to the blog',
+    appearance: undefined,
+  };
+
+  const heroSetup = customRender(ActionGroup, {
+    actions: [heroPrimaryAction],
+    isOnDark: undefined,
+  });
+
+  it('renders a hiddenLabelSuffix as real (sr-only) text inside the accessible name', () => {
+    heroSetup();
+
+    const link = screen.getByRole('link', {
+      name: 'Read more: Welcome to the blog',
+    });
+    expect(link).toBeVisible();
+    expect(link).toHaveTextContent('Read more: Welcome to the blog');
+  });
+
+  it('renders no suffix when hiddenLabelSuffix is unset', () => {
+    heroSetup({
+      actions: [{ ...heroPrimaryAction, hiddenLabelSuffix: undefined }],
+    });
+
+    const link = screen.getByRole('link', { name: 'Read more' });
+    expect(link).toBeVisible();
+    expect(link).toHaveTextContent('Read more');
+  });
+});

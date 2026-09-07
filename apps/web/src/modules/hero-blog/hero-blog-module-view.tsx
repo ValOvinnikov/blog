@@ -1,16 +1,11 @@
-import { CTA_ACTION_VARIANT } from '@blog/config';
 import type { THeroBlogModule } from '@blog/service';
-import { LinkButton } from '@blog/ui/molecules/link-button';
 import { Hero } from '@blog/ui/organisms/hero';
 import {
   ActionGroup,
-  toButtonVariant,
+  type TActionGroupAction,
 } from '@web/components/shared/action-group';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { Section } from '@web/components/shared/section';
-import { SmartLink } from '@web/components/shared/smart-link';
-
-import { heroBlogHiddenLabelVariants } from './hero-blog-module-variants';
 
 export interface IHeroBlogModuleViewProps extends Omit<
   THeroBlogModule,
@@ -22,9 +17,8 @@ export interface IHeroBlogModuleViewProps extends Omit<
 
 /**
  * Pure view for `HeroBlogModule` — the web-side wiring the `@blog/ui` `Hero`
- * organism can't own itself: the `Section` full-bleed landmark, `SmartLink`-
- * composed CTAs, the `SanityImage` bridge, and the visually-hidden CTA label
- * suffix.
+ * organism can't own itself: the `Section` full-bleed landmark, the
+ * `SanityImage` bridge, and the primary/secondary CTAs via `ActionGroup`.
  */
 export const HeroBlogModuleView = ({
   id,
@@ -42,6 +36,9 @@ export const HeroBlogModuleView = ({
   layout,
 }: IHeroBlogModuleViewProps) => {
   const titleId = `hero-blog-${id}`;
+  const actions = [primaryAction, secondaryAction].filter(
+    (action): action is TActionGroupAction => Boolean(action),
+  );
 
   return (
     <Section
@@ -60,27 +57,9 @@ export const HeroBlogModuleView = ({
         contentAlignment={contentAlignment}
         mediaOrder={mediaOrder}
       >
-        {(primaryAction || secondaryAction) && (
+        {actions.length > 0 && (
           <Hero.Cta>
-            {primaryAction && (
-              <LinkButton
-                as={SmartLink}
-                href={primaryAction.href}
-                target={primaryAction.target}
-                variant={toButtonVariant(
-                  CTA_ACTION_VARIANT.PRIMARY,
-                  primaryAction.appearance,
-                )}
-              >
-                {primaryAction.label}
-                {primaryAction.hiddenLabelSuffix && (
-                  <span
-                    className={heroBlogHiddenLabelVariants()}
-                  >{`: ${primaryAction.hiddenLabelSuffix}`}</span>
-                )}
-              </LinkButton>
-            )}
-            {secondaryAction && <ActionGroup actions={[secondaryAction]} />}
+            <ActionGroup actions={actions} />
           </Hero.Cta>
         )}
 
