@@ -1,4 +1,5 @@
 import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
+import type { TPortableTextBlock } from '@blog/db/schema/email-templates';
 import type { TTenantEmailBrand } from '@blog/email/html';
 import {
   renderWithIntl,
@@ -44,9 +45,9 @@ const BRAND: TTenantEmailBrand = {
   logo3: '#c7d2fe',
 };
 
-const BODY_WITH_TEXT = [
+const BODY_WITH_TEXT: TPortableTextBlock[] = [
   {
-    _type: 'block' as const,
+    _type: 'block',
     _key: 'k1',
     style: 'normal',
     children: [{ _type: 'span', _key: 's1', text: 'Hello there', marks: [] }],

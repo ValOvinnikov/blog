@@ -1,6 +1,7 @@
 import { queries } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { VoiceSettings } from '@platform/components/features/voice/voice-settings';
+import { stringVoiceOverrides } from '@platform/utils/string-voice-overrides/string-voice-overrides';
 
 import { saveVoiceOverridesAction } from './save-voice-overrides-action';
 
@@ -19,7 +20,7 @@ export const VoicePageContent = async ({ tenant }: TVoicePageContentProps) => {
   return (
     <VoiceSettings
       tenantId={tenant.id}
-      initialOverrides={config?.voiceOverrides ?? {}}
+      initialOverrides={stringVoiceOverrides(config?.voiceOverrides ?? {})}
       saveAction={saveVoiceOverridesAction}
       archivedAt={tenant.deprovisionedAt ?? undefined}
     />
