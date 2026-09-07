@@ -8,9 +8,9 @@ import {
 } from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
-// Fixed document ids (published, not `drafts.`-prefixed) — every field a
-// `blog_post`/`settings_*` singleton/`blog_author`/`blog_topic` document
-// requires per `apps/cms/src/schema-types`, so the seeded dataset validates
+// Fixed document ids (published, not `drafts.`-prefixed) — every field
+// each seeded document type requires per its schema in
+// `packages/studio/src/schema-types`, so the seeded dataset validates
 // against the real schema rather than an invented shape. No generated
 // `@blog/config` types exist for a not-yet-created project's dataset, so
 // these stay loosely typed (`TSanityDocument`), not `any`.
