@@ -67,6 +67,7 @@ export const Secondary: TStory = {
 };
 
 const placeholderImage = (alt: string) => (
+  // eslint-disable-next-line @next/next/no-img-element -- Storybook placeholder image, not a production asset; next/image would be wrong here
   <img src="https://placehold.co/640x360" alt={alt} />
 );
 

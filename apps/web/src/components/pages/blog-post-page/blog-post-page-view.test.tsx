@@ -295,12 +295,13 @@ describe(BlogPostPageView, () => {
           formattedDate: 'January 10, 2026',
           readingTime: '3 min',
           topic: { title: 'Design' },
-          image: <img src="https://placehold.co/640x360" alt="" />,
+          image: <div data-testid="related-image-node" />,
         },
       ],
     });
 
     expect(screen.getByTestId('post-card-media')).toBeInTheDocument();
+    expect(screen.getByTestId('related-image-node')).toBeInTheDocument();
   });
 
   it("renders no reading-depth control when the post has neither a skim nor asides (today's behavior)", () => {
