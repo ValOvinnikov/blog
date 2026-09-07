@@ -1,11 +1,6 @@
 import type { TValueOf } from '@blog/config/utils';
 
 import { type TCapability, CAPABILITY } from './capability';
-import {
-  CONSOLE_VOICE_PACK,
-  EDITORIAL_VOICE_PACK,
-  type TVoicePack,
-} from './voice-pack';
 
 export const PRESET_ID = {
   CONSOLE: 'CONSOLE',
@@ -54,12 +49,10 @@ export type TThemeTokens = {
   bodyFont: TFontChoice;
   radiusScale: TRadiusScale;
   density: TDensity;
-  chromeOn: boolean;
 };
 
 export type TPresetBundle = {
   themeTokens: TThemeTokens;
-  voicePack: TVoicePack;
   featureDefaults: Record<TCapability, boolean>;
 };
 
@@ -71,9 +64,7 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
       bodyFont: FONT_CHOICE.NEWSREADER,
       radiusScale: RADIUS_SCALE.MD,
       density: DENSITY.DEFAULT,
-      chromeOn: true,
     },
-    voicePack: CONSOLE_VOICE_PACK,
     featureDefaults: {
       [CAPABILITY.COMMENTS]: true,
       [CAPABILITY.RATINGS]: true,
@@ -89,9 +80,7 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
       bodyFont: FONT_CHOICE.INTER,
       radiusScale: RADIUS_SCALE.SM,
       density: DENSITY.COMPACT,
-      chromeOn: false,
     },
-    voicePack: EDITORIAL_VOICE_PACK,
     featureDefaults: {
       [CAPABILITY.COMMENTS]: true,
       [CAPABILITY.RATINGS]: true,

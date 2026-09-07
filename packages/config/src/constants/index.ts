@@ -1,7 +1,6 @@
 export * from './alert';
 export * from './audit';
 export * from './aside';
-export * from './brand';
 export * from './cache';
 export * from './capability';
 export * from './cta';
@@ -23,4 +22,3 @@ export * from './size';
 export * from './spec-line';
 export * from './taxonomy';
 export * from './toast';
-export * from './voice-pack';
