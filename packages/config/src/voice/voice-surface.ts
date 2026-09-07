@@ -1,0 +1,13 @@
+export const VOICE_SURFACE = {
+  NAVIGATION: 'NAVIGATION',
+  ARCHIVE: 'ARCHIVE',
+  POST: 'POST',
+  SHARING: 'SHARING',
+  NOT_FOUND: 'NOT_FOUND',
+  ERROR: 'ERROR',
+  SIGN_IN: 'SIGN_IN',
+  BOOKMARKS: 'BOOKMARKS',
+  ACCOUNT: 'ACCOUNT',
+} as const;
+
+export type TVoiceSurface = (typeof VOICE_SURFACE)[keyof typeof VOICE_SURFACE];
