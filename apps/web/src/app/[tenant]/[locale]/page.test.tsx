@@ -166,4 +166,22 @@ describe('generateMetadata', () => {
     expect(metadata.title).toEqual({ absolute: 'Home' });
     expect(metadata.alternates?.canonical).toBe('/');
   });
+
+  it('falls back to the generated OG/Twitter card images when the resolved seo carries no ogImageUrl', async () => {
+    getHomePageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        hero: { id: 'hero-1', type: 'module_hero' },
+        modules: [],
+        seo: makeSeo(),
+      },
+    });
+
+    const metadata = await generateMetadata({
+      params: Promise.resolve({ tenant: 'tenant-1', locale: 'en' }),
+    });
+
+    expect(metadata.openGraph?.images).toEqual([{ url: '/opengraph-image' }]);
+    expect(metadata.twitter?.images).toEqual(['/twitter-image']);
+  });
 });

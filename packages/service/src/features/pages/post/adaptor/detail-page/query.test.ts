@@ -34,6 +34,17 @@ describe('postPageQuery', () => {
     expect(() => postPageQuery.parse(raw)).not.toThrow();
   });
 
+  it('parses a post whose author has no image', () => {
+    const raw = makeRawPostPage({
+      post: makeRawPostDetail({
+        author: makeRawAuthor({ image: null }),
+      }),
+    });
+
+    expect(() => postPageQuery.parse(raw)).not.toThrow();
+    expect(postPageQuery.parse(raw)?.post.author.image).toBeNull();
+  });
+
   it('resolves a bodyImage block, deref-ing its asset and keeping layout', () => {
     const raw = makeRawPostPage({
       post: makeRawPostDetail({

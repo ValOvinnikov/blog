@@ -8,7 +8,6 @@ import { SANITY_WRITE_TOKEN_LABEL } from '@blog/db/utils/sanity-management-clien
 import { ClientError, createClient } from '@sanity/client';
 
 import type { TProvisionEnv } from '../lib/env';
-import { placeholderPngBuffer } from '../lib/placeholder-image';
 import { retryWithBackoff } from '../lib/retry-with-backoff';
 
 import { buildStarterDocuments } from './starter-content';
@@ -16,7 +15,6 @@ import { buildStarterDocuments } from './starter-content';
 const SANITY_API_VERSION = '2024-01-01';
 
 // Bounded to ride out a freshly-minted token's grant-propagation delay, not to mask a genuine misconfiguration.
-// Shared by the asset uploads and the transaction commit — every write the freshly-minted token makes.
 export const SEED_GRANT_RETRY_MAX_ATTEMPTS = 5;
 const SEED_GRANT_RETRY_BASE_DELAY_MS = 1000;
 
@@ -58,8 +56,7 @@ function isGrantPropagationError(error: unknown): boolean {
  * Idempotent: skips entirely once `tenants.seededAt` is set.
  * `createOrReplace` (rather than `create`) also makes a single run safe
  * against a mid-run crash-and-retry that happens before that marker gets
- * persisted, and safe to retry within a single run once the assets are
- * already uploaded and the transaction already built.
+ * persisted.
  */
 export async function seedTenantContent(
   tenant: TTenant,
@@ -99,27 +96,7 @@ export async function seedTenantContent(
       sleep: deps.sleep,
     };
 
-    const [authorImage, ogImage] = await Promise.all([
-      retryWithBackoff(
-        () =>
-          client.assets.upload('image', placeholderPngBuffer(), {
-            filename: 'starter-avatar.png',
-          }),
-        grantPropagationRetryOptions,
-      ),
-      retryWithBackoff(
-        () =>
-          client.assets.upload('image', placeholderPngBuffer(), {
-            filename: 'starter-og-image.png',
-          }),
-        grantPropagationRetryOptions,
-      ),
-    ]);
-
-    const documents = buildStarterDocuments(tenant, {
-      authorImageAssetId: authorImage._id,
-      ogImageAssetId: ogImage._id,
-    });
+    const documents = buildStarterDocuments(tenant);
 
     const transaction = client.transaction();
     for (const document of documents) {

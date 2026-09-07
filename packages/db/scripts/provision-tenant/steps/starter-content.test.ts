@@ -2,13 +2,9 @@ import { buildStarterDocuments, STARTER_DOCUMENT_IDS } from './starter-content';
 
 describe(buildStarterDocuments, () => {
   const tenant = { name: 'Acme Corporation' };
-  const assets = {
-    authorImageAssetId: 'image-author',
-    ogImageAssetId: 'image-og',
-  };
 
   it('builds one document per starter id, all published (no drafts. prefix)', () => {
-    const documents = buildStarterDocuments(tenant, assets);
+    const documents = buildStarterDocuments(tenant);
     const ids = documents.map((doc) => doc._id);
 
     expect(ids).toEqual(Object.values(STARTER_DOCUMENT_IDS));
@@ -16,7 +12,7 @@ describe(buildStarterDocuments, () => {
   });
 
   it('site settings has description within the schema bounds (50-160 chars)', () => {
-    const site = buildStarterDocuments(tenant, assets).find(
+    const site = buildStarterDocuments(tenant).find(
       (doc) => doc._id === STARTER_DOCUMENT_IDS.SITE,
     );
 
@@ -27,7 +23,7 @@ describe(buildStarterDocuments, () => {
   });
 
   it('post excerpt is within the schema bounds (50-300 chars)', () => {
-    const post = buildStarterDocuments(tenant, assets).find(
+    const post = buildStarterDocuments(tenant).find(
       (doc) => doc._id === STARTER_DOCUMENT_IDS.POST,
     );
 
@@ -37,7 +33,7 @@ describe(buildStarterDocuments, () => {
   });
 
   it('post references the starter author and topic by id', () => {
-    const post = buildStarterDocuments(tenant, assets).find(
+    const post = buildStarterDocuments(tenant).find(
       (doc) => doc._id === STARTER_DOCUMENT_IDS.POST,
     ) as unknown as { author: { _ref: string }; topic: { _ref: string } };
 
@@ -45,33 +41,25 @@ describe(buildStarterDocuments, () => {
     expect(post.topic._ref).toBe(STARTER_DOCUMENT_IDS.TOPIC);
   });
 
-  it('wires the uploaded asset ids into author image and default OG image', () => {
-    const documents = buildStarterDocuments(tenant, assets);
-    const author = documents.find(
-      (doc) => doc._id === STARTER_DOCUMENT_IDS.AUTHOR,
-    ) as unknown as {
-      image: { asset: { _ref: string } };
-    };
-    const site = documents.find(
-      (doc) => doc._id === STARTER_DOCUMENT_IDS.SITE,
-    ) as unknown as {
-      defaultOgImage: { asset: { _ref: string } };
-    };
-
-    expect(author.image.asset._ref).toBe('image-author');
-    expect(site.defaultOgImage.asset._ref).toBe('image-og');
-  });
-
-  it('the author document has no slug field (not a blog_author schema field)', () => {
-    const author = buildStarterDocuments(tenant, assets).find(
+  it('the author document has no image and no slug field', () => {
+    const author = buildStarterDocuments(tenant).find(
       (doc) => doc._id === STARTER_DOCUMENT_IDS.AUTHOR,
     );
 
+    expect(author).not.toHaveProperty('image');
     expect(author).not.toHaveProperty('slug');
   });
 
+  it('the site settings document has no defaultOgImage field', () => {
+    const site = buildStarterDocuments(tenant).find(
+      (doc) => doc._id === STARTER_DOCUMENT_IDS.SITE,
+    );
+
+    expect(site).not.toHaveProperty('defaultOgImage');
+  });
+
   it('the external nav link satisfies the link schema union (label + linkType + url)', () => {
-    const navigation = buildStarterDocuments(tenant, assets).find(
+    const navigation = buildStarterDocuments(tenant).find(
       (doc) => doc._id === STARTER_DOCUMENT_IDS.NAVIGATION,
     ) as unknown as {
       items: Array<{ label: string; linkType: string; url: string }>;
@@ -85,7 +73,7 @@ describe(buildStarterDocuments, () => {
   });
 
   it('builds a module_hero document with the required mode fields, referencing the starter post', () => {
-    const hero = buildStarterDocuments(tenant, assets).find(
+    const hero = buildStarterDocuments(tenant).find(
       (doc) => doc._id === STARTER_DOCUMENT_IDS.HERO,
     ) as unknown as {
       _type: string;
@@ -109,7 +97,7 @@ describe(buildStarterDocuments, () => {
   });
 
   it('builds a page_home document whose hero reference resolves to the starter hero', () => {
-    const home = buildStarterDocuments(tenant, assets).find(
+    const home = buildStarterDocuments(tenant).find(
       (doc) => doc._id === STARTER_DOCUMENT_IDS.HOME,
     ) as unknown as {
       _type: string;

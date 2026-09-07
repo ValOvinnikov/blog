@@ -24,6 +24,6 @@ export const siteSettingsQuery = q.star
     defaultOgImage: sub
       .field('defaultOgImage')
       .project(imageWithAltFragment)
-      .notNull(),
+      .nullable(true),
   }))
   .notNull();

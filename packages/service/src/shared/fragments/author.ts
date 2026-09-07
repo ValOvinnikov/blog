@@ -13,7 +13,7 @@ export const authorCardFragment = q
   .project((sub) => ({
     _id: true,
     name: sub.field('name').notNull(),
-    image: sub.field('image').project(imageWithAltFragment).notNull(),
+    image: sub.field('image').project(imageWithAltFragment).nullable(true),
     profilePage: sub
       .field('profilePage')
       .deref()
@@ -28,7 +28,7 @@ export const authorDetailFragment = q
   .project((sub) => ({
     _id: true,
     name: sub.field('name').notNull(),
-    image: sub.field('image').project(imageWithAltFragment).notNull(),
+    image: sub.field('image').project(imageWithAltFragment).nullable(true),
     profilePage: sub
       .field('profilePage')
       .deref()
