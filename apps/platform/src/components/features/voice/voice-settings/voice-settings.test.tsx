@@ -19,7 +19,7 @@ vi.mocked(useRouter).mockReturnValue({
   refresh: vi.fn(),
 } as unknown as ReturnType<typeof useRouter>);
 
-const ADVANCED_SUMMARY = 'Advanced — 19 curated strings, 4 groups';
+const ADVANCED_SUMMARY = 'Advanced — 8 curated strings, 2 groups';
 
 // Advanced starts collapsed (matching the Look tab) — every test that reads
 // or interacts with a curated field opens it first, same as a real user
@@ -94,7 +94,7 @@ describe(VoiceSettings, () => {
     expect(screen.getByText('404 page')).toBeVisible();
   });
 
-  it('renders all 19 fields across the 4 named groups, with none invented, once expanded', async () => {
+  it('renders all 8 fields across the 2 named groups, with none invented, once expanded', async () => {
     const user = userEvent.setup();
     render(
       <VoiceSettings
@@ -106,10 +106,8 @@ describe(VoiceSettings, () => {
 
     await openAdvanced(user);
 
-    expect(screen.getAllByRole('textbox')).toHaveLength(19);
+    expect(screen.getAllByRole('textbox')).toHaveLength(8);
     expect(screen.getByText('404 page')).toBeVisible();
-    expect(screen.getByText('Terminal prompts')).toBeVisible();
-    expect(screen.getByText('Bookmarks')).toBeVisible();
     expect(screen.getByText('Empty states')).toBeVisible();
     expect(screen.queryByText(/Publish confirmation/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/No search results/i)).not.toBeInTheDocument();
@@ -126,7 +124,7 @@ describe(VoiceSettings, () => {
     );
     await openAdvanced(user);
 
-    const input = screen.getByRole('textbox', { name: 'Terminal Prompt Host' });
+    const input = screen.getByRole('textbox', { name: 'Not Found Heading' });
     expect(input).toHaveValue('');
     expect(input.getAttribute('placeholder')).toBeFalsy();
   });
@@ -136,15 +134,15 @@ describe(VoiceSettings, () => {
     render(
       <VoiceSettings
         tenantId="tenant-1"
-        initialOverrides={{ terminalPromptHost: 'guest@acme' }}
+        initialOverrides={{ notFoundHeading: 'Nothing here' }}
         saveAction={vi.fn()}
       />,
     );
     await openAdvanced(user);
 
     expect(
-      screen.getByRole('textbox', { name: 'Terminal Prompt Host' }),
-    ).toHaveValue('guest@acme');
+      screen.getByRole('textbox', { name: 'Not Found Heading' }),
+    ).toHaveValue('Nothing here');
   });
 
   it('saves every current field value, including a just-cleared override as an empty string', async () => {
@@ -153,17 +151,17 @@ describe(VoiceSettings, () => {
     render(
       <VoiceSettings
         tenantId="tenant-1"
-        initialOverrides={{ terminalPromptHost: 'guest@acme' }}
+        initialOverrides={{ notFoundHeading: 'Nothing here' }}
         saveAction={saveAction}
       />,
     );
     await openAdvanced(user);
 
     await user.clear(
-      screen.getByRole('textbox', { name: 'Terminal Prompt Host' }),
+      screen.getByRole('textbox', { name: 'Not Found Heading' }),
     );
     await user.type(
-      screen.getByRole('textbox', { name: 'Bookmark Toast — Saved' }),
+      screen.getByRole('textbox', { name: 'Blog List Empty' }),
       'saved!',
     );
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
@@ -171,9 +169,9 @@ describe(VoiceSettings, () => {
     expect(saveAction).toHaveBeenCalledWith(
       'tenant-1',
       expect.objectContaining({
-        terminalPromptHost: '',
-        bookmarkToastSavedMessage: 'saved!',
-        notFoundDescription: '',
+        notFoundHeading: '',
+        blogListEmpty: 'saved!',
+        notFoundSupportingText: '',
       }),
     );
   });
@@ -308,7 +306,7 @@ describe(VoiceSettings, () => {
     await openAdvanced(user);
 
     const fields = screen.getAllByRole('textbox');
-    expect(fields).toHaveLength(19);
+    expect(fields).toHaveLength(8);
     for (const field of fields) {
       expect(field).toHaveAttribute('readonly');
       expect(field).toBeEnabled();

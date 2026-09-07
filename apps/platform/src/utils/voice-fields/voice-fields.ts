@@ -1,26 +1,14 @@
 /**
- * The 19 curated voice-override fields, grouped exactly as
- * `packages/studio/src/schema-types/documents/settings/voice.ts` defines them
- * (fieldset `title`s for groups, field `title`s for labels) — this is the
- * Postgres-backed port of that schema's field set, not a redesign of it.
+ * The 8 curated voice-override fields, grouped for the admin form —
+ * the Postgres-backed field set matching
+ * `packages/db`'s `voiceOverridesSchema` (`upsert-site-config.ts`) exactly.
  * Display text for `groupKey`/`key` lives in `i18n/messages/en.json` under
  * `voiceFieldGroups`/`voiceFieldLabels`, not here.
  */
 export type TVoiceOverrideKey =
-  | 'notFoundMetaTitle'
-  | 'notFoundMetaDescription'
-  | 'notFoundCommandNotFound'
-  | 'notFoundDescription'
+  | 'notFoundHeading'
+  | 'notFoundSupportingText'
   | 'notFoundReturnHome'
-  | 'terminalPromptHost'
-  | 'authPromptCommandSignIn'
-  | 'authPromptCommandAccount'
-  | 'bookmarksPromptCommand'
-  | 'accountPrivacyPromptCommand'
-  | 'accountNewsletterPromptCommand'
-  | 'accountIdentityPromptCommand'
-  | 'bookmarkToastSavedMessage'
-  | 'bookmarkToastRemovedMessage'
   | 'blogListEmpty'
   | 'topicEmpty'
   | 'tagEmpty'
@@ -35,8 +23,7 @@ export type TVoiceField = {
   multiline?: boolean;
 };
 
-type TVoiceFieldGroupKey =
-  'notFoundPage' | 'terminalPrompts' | 'bookmarks' | 'emptyStates';
+type TVoiceFieldGroupKey = 'notFoundPage' | 'emptyStates';
 
 export type TVoiceFieldGroup = {
   groupKey: TVoiceFieldGroupKey;
@@ -47,30 +34,9 @@ export const VOICE_FIELD_GROUPS: TVoiceFieldGroup[] = [
   {
     groupKey: 'notFoundPage',
     fields: [
-      { key: 'notFoundMetaTitle' },
-      { key: 'notFoundMetaDescription', multiline: true },
-      { key: 'notFoundCommandNotFound' },
-      { key: 'notFoundDescription', multiline: true },
+      { key: 'notFoundHeading' },
+      { key: 'notFoundSupportingText', multiline: true },
       { key: 'notFoundReturnHome' },
-    ],
-  },
-  {
-    groupKey: 'terminalPrompts',
-    fields: [
-      { key: 'terminalPromptHost' },
-      { key: 'authPromptCommandSignIn' },
-      { key: 'authPromptCommandAccount' },
-      { key: 'bookmarksPromptCommand' },
-      { key: 'accountPrivacyPromptCommand' },
-      { key: 'accountNewsletterPromptCommand' },
-      { key: 'accountIdentityPromptCommand' },
-    ],
-  },
-  {
-    groupKey: 'bookmarks',
-    fields: [
-      { key: 'bookmarkToastSavedMessage' },
-      { key: 'bookmarkToastRemovedMessage' },
     ],
   },
   {

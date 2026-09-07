@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 
 import VoicePage from './page';
 
-const ADVANCED_SUMMARY = 'Advanced — 19 curated strings, 4 groups';
+const ADVANCED_SUMMARY = 'Advanced — 8 curated strings, 2 groups';
 
 // Advanced starts collapsed — open it before reading any curated field.
 const openAdvanced = async () => {
@@ -64,10 +64,10 @@ describe(`<${VoicePage.name}/>`, () => {
     await openAdvanced();
 
     expect(
-      screen.getByRole('textbox', { name: 'Terminal Prompt Host' }),
+      screen.getByRole('textbox', { name: 'Not Found Heading' }),
     ).toHaveValue('');
     expect(
-      screen.getByRole('textbox', { name: 'Terminal Prompt Host' }),
+      screen.getByRole('textbox', { name: 'Not Found Heading' }),
     ).not.toHaveAttribute('placeholder');
   });
 });

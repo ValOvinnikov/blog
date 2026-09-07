@@ -424,7 +424,7 @@
     "alertError": "Couldn't save — try again.",
     "basicHeading": "Basic",
     "basicAlert": "Nothing required here. The site already has sensible default wording. Most tenants never open the Advanced fields below.",
-    "advancedSummary": "Advanced — 19 curated strings, 4 groups",
+    "advancedSummary": "Advanced — 8 curated strings, 2 groups",
     "advancedOverrideInfo": "Every field is an override. Leave one blank to use the site's own default wording — clearing a field reverts to that default, it does not set the string to empty."
   },
   "voiceFieldGroup": {
@@ -432,25 +432,12 @@
   },
   "voiceFieldGroups": {
     "notFoundPage": "404 page",
-    "terminalPrompts": "Terminal prompts",
-    "bookmarks": "Bookmarks",
     "emptyStates": "Empty states"
   },
   "voiceFieldLabels": {
-    "notFoundMetaTitle": "Not Found Meta Title",
-    "notFoundMetaDescription": "Not Found Meta Description",
-    "notFoundCommandNotFound": "Not Found Command Not Found",
-    "notFoundDescription": "Not Found Description",
+    "notFoundHeading": "Not Found Heading",
+    "notFoundSupportingText": "Not Found Supporting Text",
     "notFoundReturnHome": "Not Found Return Home",
-    "terminalPromptHost": "Terminal Prompt Host",
-    "authPromptCommandSignIn": "Auth Prompt Command — Sign In",
-    "authPromptCommandAccount": "Auth Prompt Command — Account",
-    "bookmarksPromptCommand": "Bookmarks Prompt Command",
-    "accountPrivacyPromptCommand": "Account Privacy Prompt Command",
-    "accountNewsletterPromptCommand": "Account Newsletter Prompt Command",
-    "accountIdentityPromptCommand": "Account Identity Prompt Command",
-    "bookmarkToastSavedMessage": "Bookmark Toast — Saved",
-    "bookmarkToastRemovedMessage": "Bookmark Toast — Removed",
     "blogListEmpty": "Blog List Empty",
     "topicEmpty": "Topic Empty",
     "tagEmpty": "Tag Empty",

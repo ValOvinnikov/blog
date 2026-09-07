@@ -8,26 +8,26 @@ describe(VoiceField, () => {
   it('shows the inherited value as a placeholder, not as the field value, and exposes the shared input id', () => {
     render(
       <VoiceField
-        fieldKey="terminalPromptHost"
+        fieldKey="notFoundReturnHome"
         value=""
         onChange={vi.fn()}
-        placeholder="~$"
+        placeholder="Return home"
       />,
     );
 
     const input = screen.getByRole('textbox');
     expect(input).toHaveAttribute(
       'id',
-      voiceFieldInputId('terminalPromptHost'),
+      voiceFieldInputId('notFoundReturnHome'),
     );
-    expect(input).toHaveAttribute('placeholder', '~$');
+    expect(input).toHaveAttribute('placeholder', 'Return home');
     expect(input).toHaveValue('');
   });
 
   it('renders a Textarea for multiline fields and a single-line input otherwise', () => {
     const { rerender } = render(
       <VoiceField
-        fieldKey="notFoundDescription"
+        fieldKey="notFoundSupportingText"
         value=""
         onChange={vi.fn()}
         isMultiline={true}
@@ -36,7 +36,7 @@ describe(VoiceField, () => {
     expect(screen.getByRole('textbox').tagName).toBe('TEXTAREA');
 
     rerender(
-      <VoiceField fieldKey="terminalPromptHost" value="" onChange={vi.fn()} />,
+      <VoiceField fieldKey="notFoundReturnHome" value="" onChange={vi.fn()} />,
     );
     expect(screen.getByRole('textbox').tagName).toBe('INPUT');
   });
@@ -44,7 +44,7 @@ describe(VoiceField, () => {
   it('makes the field read-only, not disabled, when isReadOnly is true', () => {
     render(
       <VoiceField
-        fieldKey="terminalPromptHost"
+        fieldKey="notFoundReturnHome"
         value="custom"
         onChange={vi.fn()}
         isReadOnly={true}
@@ -61,10 +61,10 @@ describe(VoiceField, () => {
     const onChange = vi.fn();
     render(
       <VoiceField
-        fieldKey="terminalPromptHost"
+        fieldKey="notFoundReturnHome"
         value="custom"
         onChange={onChange}
-        placeholder="~$"
+        placeholder="Return home"
       />,
     );
 

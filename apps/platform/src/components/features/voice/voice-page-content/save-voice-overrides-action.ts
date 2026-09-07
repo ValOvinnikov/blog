@@ -10,7 +10,7 @@ import type { TVoiceOverrides } from '@platform/utils/voice-fields/voice-fields'
 export type TSaveVoiceOverridesResult = { ok: true } | { ok: false };
 
 /**
- * Persists the Voice tab's 19 curated overrides for the routed tenant.
+ * Persists the Voice tab's 8 curated overrides for the routed tenant.
  * Re-derives the tenant and re-checks membership from the session itself
  * via `requireTenantMembership` — the id only selects which tenant is in
  * scope, never an authorization decision on its own. Shared by both

@@ -46,7 +46,7 @@ const buildInitialValues = (
 
 /**
  * The Voice tab: Basic is deliberately empty (the preset already decides the
- * default voice), Advanced holds all 19 curated overrides. Every field is
+ * default voice), Advanced holds all 8 curated overrides. Every field is
  * blank-means-inherit, and saving sends the raw (possibly blank) strings
  * straight through; `upsertSiteConfig`'s own Zod schema is what turns a
  * blank entry into an absent JSONB key rather than a stored empty string.
