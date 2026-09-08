@@ -31,8 +31,7 @@ export interface IPostListModuleViewProps extends Omit<
 }
 
 /**
- * PostListModuleView — shared render shell for the archive (`PostListModule`),
- * the teaser (`PostLatestModule`) and the spotlight (`PostFeaturedModule`): a
+ * PostListModuleView — shared render shell for post-listing modules: a
  * labeled `Section` wrapping `PostsSection` plus an optional `Pagination`.
  * `titleId`/`dataTestId`/`accessibleTitle` are caller-supplied since the
  * accessible name and test id differ per module.
