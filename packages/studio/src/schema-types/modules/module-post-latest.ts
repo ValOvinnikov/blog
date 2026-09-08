@@ -4,14 +4,14 @@ import { layoutField } from '@blog/studio/schema-types/helpers/layout-field';
 import { sectionHeaderField } from '@blog/studio/schema-types/helpers/section-header-field';
 import { showImagesField } from '@blog/studio/schema-types/helpers/show-images-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
-import { List } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
 export const postLatestSchema = defineType({
   name: 'module_postLatest',
-  title: 'Post Latest',
+  title: 'Latest Posts',
   type: 'document',
-  icon: List,
+  icon: Clock,
   fields: [
     titleField(),
     brandVariantField(),

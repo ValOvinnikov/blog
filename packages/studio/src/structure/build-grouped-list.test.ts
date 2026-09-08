@@ -56,17 +56,15 @@ describe(buildGroupedListItems, () => {
       {
         title: 'Group A',
         items: [
-          { documentType: 'moduleOne', title: 'Module One', icon: List },
-          { documentType: 'moduleTwo', title: 'Module Two', icon: Tag },
+          { schema: { name: 'moduleOne', title: 'Module One', icon: List } },
+          { schema: { name: 'moduleTwo', title: 'Module Two', icon: Tag } },
         ],
       },
       {
         title: 'Group B',
         items: [
           {
-            documentType: 'homePage',
-            title: 'Home Page',
-            icon: House,
+            schema: { name: 'homePage', title: 'Home Page', icon: House },
             mode: 'singleton',
           },
         ],
@@ -74,11 +72,13 @@ describe(buildGroupedListItems, () => {
       {
         title: 'Group C',
         items: [
-          { documentType: 'tagPage', title: 'Tag Pages', icon: Tag },
+          { schema: { name: 'tagPage', title: 'Tag Pages', icon: Tag } },
           {
-            documentType: 'siteSettings',
-            title: 'Site Settings',
-            icon: Settings,
+            schema: {
+              name: 'siteSettings',
+              title: 'Site Settings',
+              icon: Settings,
+            },
             mode: 'singleton',
           },
         ],
@@ -120,12 +120,16 @@ describe(buildGroupedListItems, () => {
     const groups: TStructureGroup[] = [
       {
         title: 'Group A',
-        items: [{ documentType: 'moduleOne', title: 'Module One', icon: List }],
+        items: [
+          { schema: { name: 'moduleOne', title: 'Module One', icon: List } },
+        ],
       },
       { title: 'Group B (empty)', items: [] },
       {
         title: 'Group C',
-        items: [{ documentType: 'moduleTwo', title: 'Module Two', icon: Tag }],
+        items: [
+          { schema: { name: 'moduleTwo', title: 'Module Two', icon: Tag } },
+        ],
       },
     ];
 
@@ -150,11 +154,13 @@ describe(buildGroupedListItems, () => {
       {
         title: 'Group',
         items: [
-          { documentType: 'listType', title: 'List Item', icon: List },
+          { schema: { name: 'listType', title: 'List Item', icon: List } },
           {
-            documentType: 'singletonType',
-            title: 'Singleton Item',
-            icon: House,
+            schema: {
+              name: 'singletonType',
+              title: 'Singleton Item',
+              icon: House,
+            },
             mode: 'singleton',
           },
         ],
@@ -194,11 +200,11 @@ describe(buildGroupedListItems, () => {
       {
         title: 'Group',
         items: [
-          { documentType: 'defaultMode', title: 'Default Mode', icon: List },
           {
-            documentType: 'explicitList',
-            title: 'Explicit List',
-            icon: Tag,
+            schema: { name: 'defaultMode', title: 'Default Mode', icon: List },
+          },
+          {
+            schema: { name: 'explicitList', title: 'Explicit List', icon: Tag },
             mode: 'list',
           },
         ],
@@ -219,5 +225,50 @@ describe(buildGroupedListItems, () => {
     expect(S.documentTypeListItem).toHaveBeenCalledTimes(2);
     expect(S.listItem).not.toHaveBeenCalled();
     expect(S.document).not.toHaveBeenCalled();
+  });
+
+  it('emits an untitled group with no divider while a titled group still gets one', () => {
+    const groups: TStructureGroup[] = [
+      {
+        items: [
+          {
+            schema: { name: 'homePage', title: 'Home Page', icon: House },
+            mode: 'singleton',
+          },
+          {
+            schema: { name: 'landingPage', title: 'Landing Page', icon: List },
+          },
+        ],
+      },
+      {
+        title: 'Settings',
+        items: [
+          {
+            schema: {
+              name: 'siteSettings',
+              title: 'Site Settings',
+              icon: Settings,
+            },
+          },
+        ],
+      },
+    ];
+
+    const S = makeMockStructureBuilder();
+    const result = buildGroupedListItems(
+      asStructureBuilder(S),
+      groups,
+    ) as unknown as TMockBuilder[];
+
+    expect(result.map((builder) => builder.kind)).toEqual([
+      'listItem',
+      'documentTypeListItem',
+      'divider',
+      'documentTypeListItem',
+    ]);
+    expect(S.divider).toHaveBeenCalledTimes(1);
+    expect(callArgs(result[2]!, 'title')).toEqual(['Settings']);
+    expect(callArgs(result[0]!, 'id')).toEqual(['homePage']);
+    expect(callArgs(result[1]!, 'title')).toEqual(['Landing Page']);
   });
 });

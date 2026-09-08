@@ -1,27 +1,19 @@
-import { authorSchema } from '@blog/studio/schema-types/documents/blog/author';
-import { postSchema } from '@blog/studio/schema-types/documents/blog/post';
-import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag';
-import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic';
 import { footerSchema } from '@blog/studio/schema-types/documents/settings/footer';
 import { navigationSchema } from '@blog/studio/schema-types/documents/settings/navigation';
-import { newsletterSettingsSchema } from '@blog/studio/schema-types/documents/settings/newsletter';
 import { siteSchema } from '@blog/studio/schema-types/documents/settings/site-settings';
 import { themeSchema } from '@blog/studio/schema-types/documents/settings/theme';
+import { blogGroups } from '@blog/studio/structure/blog-groups';
 import { buildGroupedListItems } from '@blog/studio/structure/build-grouped-list';
 import { modulesGroups } from '@blog/studio/structure/modules-groups';
 import { pagesGroups } from '@blog/studio/structure/pages-groups';
 import {
   Blocks,
   Files,
-  Mail,
   Menu,
   Newspaper,
   Palette,
   PanelBottom,
   Settings,
-  Tag,
-  Tags,
-  UserRound,
 } from 'lucide-react';
 import type { StructureResolver } from 'sanity/structure';
 
@@ -38,6 +30,13 @@ export const studioStructure: StructureResolver = (S) =>
           S.list().title('Pages').items(buildGroupedListItems(S, pagesGroups)),
         ),
       S.listItem()
+        .title('Blog')
+        .id('blog')
+        .icon(Newspaper)
+        .child(
+          S.list().title('Blog').items(buildGroupedListItems(S, blogGroups)),
+        ),
+      S.listItem()
         .title('Modules')
         .id('modules')
         .icon(Blocks)
@@ -45,46 +44,6 @@ export const studioStructure: StructureResolver = (S) =>
           S.list()
             .title('Modules')
             .items(buildGroupedListItems(S, modulesGroups)),
-        ),
-      S.listItem()
-        .title('Blog')
-        .id('blog')
-        .icon(Newspaper)
-        .child(
-          S.list()
-            .title('Blog')
-            .items([
-              S.documentTypeListItem(postSchema.name)
-                .title('Posts')
-                .icon(Newspaper),
-              S.documentTypeListItem(topicSchema.name)
-                .title('Topics')
-                .icon(Tags),
-              S.documentTypeListItem(tagSchema.name).title('Tags').icon(Tag),
-              S.documentTypeListItem(authorSchema.name)
-                .title('Authors')
-                .icon(UserRound),
-              S.divider(),
-              S.listItem()
-                .title('Settings')
-                .id('blog-settings')
-                .icon(Settings)
-                .child(
-                  S.list()
-                    .title('Settings')
-                    .items([
-                      S.listItem()
-                        .title('Newsletter')
-                        .id(newsletterSettingsSchema.name)
-                        .icon(Mail)
-                        .child(
-                          S.document()
-                            .schemaType(newsletterSettingsSchema.name)
-                            .documentId(newsletterSettingsSchema.name),
-                        ),
-                    ]),
-                ),
-            ]),
         ),
       S.divider(),
       S.listItem()

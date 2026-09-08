@@ -123,7 +123,7 @@ const validatePostImageFallback = async (
 
 export const heroBlogSchema = defineType({
   name: 'module_heroBlog',
-  title: 'Hero (Blog)',
+  title: 'Blog Hero',
   type: 'document',
   icon: Star,
   validation: (rule) => [
