@@ -37,7 +37,7 @@ Studio from one deployment.
 
 - `src/schema-types/documents/` — document types, grouped by area:
   `blog/` (`blog_post`, `blog_author`, `blog_category`, `blog_tag`),
-  `pages/` (`page_home`, `page_blog`, `page_generic`), and `settings/`
+  `pages/` (`page_home`, `page_blog`, `page_landing`), and `settings/`
   (singletons: `settings_site`, `settings_navigation`, `settings_footer`,
   `settings_newsletter`, `settings_theme`)
 - `src/schema-types/modules/` — reusable page modules

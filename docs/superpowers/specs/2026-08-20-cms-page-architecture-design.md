@@ -24,7 +24,7 @@ records the starting point the design argued from.
 | ------------------------------- | -------------------- | ------------------------------------ | ------------------------------- |
 | `/`                             | `page_home`          | `module_postList`, latest-N          | `limit` on module               |
 | `/blog`, `/blog/page/N`         | `page_blog`          | hardcoded, paginated                 | `itemsPerPage` field            |
-| `/{slug}`                       | `page_generic`       | none — `module_postList` not allowed | —                               |
+| `/{slug}`                       | `page_landing`       | none — `module_postList` not allowed | —                               |
 | `/category/[slug]` (+`/page/N`) | none                 | hardcoded, paginated                 | `CATEGORY_ITEMS_PER_PAGE` const |
 | `/tag/[slug]` (+`/page/N`)      | none                 | hardcoded, paginated                 | `TAG_ITEMS_PER_PAGE` const      |
 | `/author/[slug]` (+`/page/N`)   | none                 | hardcoded, paginated                 | `AUTHOR_ITEMS_PER_PAGE` const   |
@@ -71,12 +71,12 @@ admitted by its own kind of slot.
 | `page_topic`      | per-entity | `postList` + `topic` ref | `slug` + `modules[]`         | `/topics/{slug}`, `…/page/N` |
 | `page_tagIndex`   | singleton  | `taxonomyList`           | `modules[]`                  | `/tags`                      |
 | `page_tag`        | per-entity | `postList` + `tag` ref   | `slug` + `modules[]`         | `/tags/{slug}`, `…/page/N`   |
-| `page_generic`    | per-entity | —                        | `slug` + `modules[]`         | `/{slug}`                    |
+| `page_landing`    | per-entity | —                        | `slug` + `modules[]`         | `/{slug}`                    |
 | `page_post`       | per-entity | `post` ref               | `slug`, `publishedAt`, `seo` | `/blog/{slug}`               |
 
 Per-entity pages own their URL slug directly — `page_topic.slug` /
 `page_tag.slug` / `page_post.slug`, sourced from the page document's own
-`title`, same mechanics as `page_generic.slug` already uses. This is a
+`title`, same mechanics as `page_landing.slug` already uses. This is a
 **revision** of the original design (which put the slug on the referenced
 taxonomy document instead — see "Decisions taken" below): the page is what
 actually defines the route, so the routing concern belongs there, not on the
@@ -106,7 +106,7 @@ already-published `post` is rejected.
 ### Slug fields show the resulting URL
 
 Every per-entity page's `slug` field (`page_topic`, `page_tag`, `page_post`,
-`page_generic`) gets a custom Studio input component rendering the full
+`page_landing`) gets a custom Studio input component rendering the full
 resulting path directly beneath the slug value — e.g. `/topics/my-slug` — so
 an editor sees the real URL while typing, not just the path segment. One
 shared component, parameterized by each schema's route prefix (`/topics/`,
@@ -149,8 +149,8 @@ both modules: a `module_postLatest` in `page_topic.modules[]` still scopes to
 that topic. Scope is therefore a data relationship in Sanity rather than
 something threaded down through the renderer.
 
-`module_postLatest` is not permitted in `page_generic.modules[]`, and
-`page_generic` has no required `postList` field for an archive to occupy — so
+`module_postLatest` is not permitted in `page_landing.modules[]`, and
+`page_landing` has no required `postList` field for an archive to occupy — so
 neither post-list module can appear on a generic page. A generic page is site
 furniture, not a blog surface. Same boundary that dropped E10.
 
@@ -206,7 +206,7 @@ Because a `_type` rename reds `type-check` until every layer lands, the rename
 
 Author archives (`/author/[slug]`, `/author/[slug]/page/[page]`) are deleted
 rather than converted. `blog_author` instead gains an optional reference to a
-`page_generic` document, so an author's profile is an ordinary page ("About").
+`page_landing` document, so an author's profile is an ordinary page ("About").
 Bylines link there when set, and render as plain text when not.
 
 This is low-risk — verified against the code, not assumed:
@@ -239,12 +239,12 @@ and the post detail page. Removing it therefore touches:
   not apply here.
 
 In its place `blog_author` gains an **optional `profilePage` reference to
-`page_generic`**. The fragments project the referenced page's slug so
-`apps/web` can build `routes.genericPage(slug)`; when the reference is unset
+`page_landing`**. The fragments project the referenced page's slug so
+`apps/web` can build `routes.landingPage(slug)`; when the reference is unset
 the byline renders as plain text, which `PostMeta` already supports.
 
-The reference is restricted to `page_generic` **only** — `to: [{ type:
-'page_generic' }]`, so the Studio picker offers nothing else. This is
+The reference is restricted to `page_landing` **only** — `to: [{ type:
+'page_landing' }]`, so the Studio picker offers nothing else. This is
 load-bearing rather than incidental: the page-document family grows from three
 types to seven in this design, and an unrestricted picker would offer
 `page_home`, `page_blog`, `page_topic`, `page_tag` and the two index
@@ -411,7 +411,7 @@ today.
 
 ### `RESERVED_SLUGS` must be updated
 
-`@blog/config`'s `RESERVED_SLUGS` guards `page_generic` slugs against colliding
+`@blog/config`'s `RESERVED_SLUGS` guards `page_landing` slugs against colliding
 with real routes. It is currently
 `blog, category, tag, author, api, page, topics`.
 
@@ -578,14 +578,14 @@ config → cms → service → web, plus a migration that drops the field.
 **Independent of E2–E8** — can run in parallel at any point after E1.
 
 **E10 — dropped 2026-08-20, closed not-planned (#1832).** It would have added
-`module_postList` to `page_generic`'s allowed `modules[]` types — pre-split
+`module_postList` to `page_landing`'s allowed `modules[]` types — pre-split
 vocabulary, when one module served both modes; the equivalent proposal today
 would concern `module_postLatest`. The maintainer
 rejected the premise: a generic page ("About", "Start here") is site furniture,
 not a blog surface, so a post list does not belong on it. This spec originally
 called the existing restriction "a restriction with no real justification",
 framing it as an implementation accident; it is a deliberate content-model
-boundary. `page_generic` already permits only `module_content` and
+boundary. `page_landing` already permits only `module_content` and
 `module_cta`, so nothing needs undoing.
 
 Generic pages still render their content and CTA modules through

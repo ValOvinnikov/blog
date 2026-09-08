@@ -229,7 +229,7 @@ describe('toCtaModule', () => {
     });
   });
 
-  it('resolves an internal blog_topic and page_generic reference the same way toLink does', () => {
+  it('resolves an internal blog_topic and page_landing reference the same way toLink does', () => {
     const topicRaw = makeRawCtaModule({
       content: [
         makeRawContentBlock({
@@ -248,7 +248,7 @@ describe('toCtaModule', () => {
           markDefs: [
             makeRawContentMarkDef({
               linkType: LINK_TYPE.INTERNAL,
-              internalReference: { _type: 'page_generic', slug: 'about' },
+              internalReference: { _type: 'page_landing', slug: 'about' },
             }),
           ],
         }),

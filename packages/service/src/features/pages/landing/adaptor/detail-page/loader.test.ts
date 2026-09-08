@@ -1,0 +1,149 @@
+import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
+import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeRawLandingPage } from '@blog/service/testing/pages/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
+
+import { getPage } from './loader';
+
+vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
+  runQuery: vi.fn(),
+}));
+
+vi.mock('@blog/service/sanity/image', () => ({
+  urlForImage: vi.fn(
+    () => 'https://cdn.sanity.io/images/proj/dataset/og-800x600.jpg',
+  ),
+}));
+
+const tenant = makeTenant();
+
+describe('getPage', () => {
+  it('maps the thin page_landing document to module refs', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawLandingPage())
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const page = await getPage('about', tenant);
+    if (!page) throw new Error('expected a landing page');
+
+    expect(page.title).toBe('About');
+    expect(page.slug).toBe('about');
+    expect(page.modules).toEqual([
+      { id: 'content-1', type: 'module_content' },
+      { id: 'cta-1', type: 'module_cta' },
+    ]);
+  });
+
+  it('leaves hero undefined when page_landing.hero is unset', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawLandingPage({ hero: null }))
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const page = await getPage('about', tenant);
+    if (!page) throw new Error('expected a landing page');
+
+    expect(page.hero).toBeUndefined();
+  });
+
+  it('maps a set page_landing.hero to a hero slot', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawLandingPage({ hero: { _id: 'hero-1', _type: 'module_hero' } }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const page = await getPage('about', tenant);
+    if (!page) throw new Error('expected a landing page');
+
+    expect(page.hero).toEqual({ id: 'hero-1', type: 'module_hero' });
+  });
+
+  it('rejects when page_landing.hero resolves to a non-hero module type', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawLandingPage({
+        hero: { _id: 'cta-1', _type: 'module_cta' as never },
+      }),
+    );
+
+    await expect(getPage('about', tenant)).rejects.toThrow();
+  });
+
+  it('resolves seo from the page title and site settings when the page has no authored seo', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawLandingPage({ seo: null }))
+      .mockResolvedValueOnce(
+        makeRawSiteSettings({
+          description: 'Settings description',
+        }),
+      );
+
+    const page = await getPage('about', tenant);
+    if (!page) throw new Error('expected a landing page');
+
+    expect(page.seo.title).toBe('About');
+    expect(page.seo.description).toBe('Settings description');
+    expect(page.seo.ogImageUrl).toContain('sanity.io');
+  });
+
+  it('lets authored seo override the resolved defaults', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawLandingPage({
+          seo: {
+            metaTitle: 'About Us',
+            metaDescription: null,
+            openGraph: null,
+          },
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const page = await getPage('about', tenant);
+    if (!page) throw new Error('expected a landing page');
+
+    expect(page.seo.title).toBe('About Us');
+    expect(page.seo.ogTitle).toBe('About Us');
+  });
+
+  it('resolves undefined, rather than rejecting, when no page_landing matches the slug', async () => {
+    mockRun.mockResolvedValueOnce(null);
+
+    const page = await getPage('missing', tenant);
+
+    expect(page).toBeUndefined();
+  });
+
+  it('does not fetch site settings when no page_landing matches the slug', async () => {
+    mockRun.mockResolvedValueOnce(null);
+
+    await getPage('missing', tenant);
+
+    expect(mockRun).toHaveBeenCalledTimes(1);
+  });
+
+  it('threads tenant context into both queries and scopes their tags to it', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawLandingPage())
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    await getPage('about', tenant);
+
+    expect(mockRun).toHaveBeenNthCalledWith(
+      1,
+      expect.anything(),
+      expect.objectContaining({
+        tenant,
+        next: expect.objectContaining({ tags: ['t:tenant-a:page_landing'] }),
+      }),
+    );
+    expect(mockRun).toHaveBeenNthCalledWith(
+      2,
+      expect.anything(),
+      expect.objectContaining({
+        tenant,
+        next: expect.objectContaining({ tags: ['t:tenant-a:site-settings'] }),
+      }),
+    );
+  });
+});

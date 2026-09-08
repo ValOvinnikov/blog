@@ -70,7 +70,7 @@ describe('getNavigation', () => {
             't:tenant-a:navigation',
             't:tenant-a:post',
             't:tenant-a:topic',
-            't:tenant-a:page_generic',
+            't:tenant-a:page_landing',
             't:tenant-a:page_blog',
           ],
         }),

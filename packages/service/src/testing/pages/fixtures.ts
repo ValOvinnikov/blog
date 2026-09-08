@@ -1,6 +1,6 @@
 import type { TRawBlogPage } from '@blog/service/features/pages/blog/adaptor/index-page/transformer';
-import type { TRawGenericPage } from '@blog/service/features/pages/generic/adaptor/detail-page/transformer';
 import type { TRawHomePage } from '@blog/service/features/pages/home/adaptor/transformer';
+import type { TRawLandingPage } from '@blog/service/features/pages/landing/adaptor/detail-page/transformer';
 import type {
   TRawPostDetail,
   TRawPostPage,
@@ -206,9 +206,9 @@ export function makeRawTagPage(
   };
 }
 
-export function makeRawGenericPage(
-  overrides: Partial<TRawGenericPage> = {},
-): TRawGenericPage {
+export function makeRawLandingPage(
+  overrides: Partial<TRawLandingPage> = {},
+): TRawLandingPage {
   return {
     title: 'About',
     slug: 'about',

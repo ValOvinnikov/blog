@@ -10,8 +10,8 @@ describe('service.modules', () => {
 });
 
 describe('service.pages', () => {
-  it('keeps home and exposes the new generic page fetcher', () => {
+  it('keeps home and exposes the landing page fetcher', () => {
     expect(typeof service.pages.home.v1.getHomePage).toBe('function');
-    expect(typeof service.pages.generic.v1.getPage).toBe('function');
+    expect(typeof service.pages.landing.v1.getPage).toBe('function');
   });
 });

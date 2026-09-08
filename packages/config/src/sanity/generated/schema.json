@@ -1535,7 +1535,7 @@
   },
   {
     "type": "type",
-    "name": "page_generic.reference",
+    "name": "page_landing.reference",
     "value": {
       "type": "object",
       "attributes": {
@@ -1560,7 +1560,7 @@
           "optional": true
         }
       },
-      "dereferencesTo": "page_generic"
+      "dereferencesTo": "page_landing"
     }
   },
   {
@@ -1652,7 +1652,7 @@
               },
               {
                 "type": "inline",
-                "name": "page_generic.reference"
+                "name": "page_landing.reference"
               },
               {
                 "type": "inline",
@@ -4707,14 +4707,14 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "page_generic.reference"
+          "name": "page_landing.reference"
         },
         "optional": true
       }
     }
   },
   {
-    "name": "page_generic",
+    "name": "page_landing",
     "type": "document",
     "attributes": {
       "_id": {
@@ -4727,7 +4727,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "string",
-          "value": "page_generic"
+          "value": "page_landing"
         }
       },
       "_createdAt": {

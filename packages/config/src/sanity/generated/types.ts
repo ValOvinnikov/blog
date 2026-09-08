@@ -240,11 +240,11 @@ export type Blog_topicReference = {
   [internalGroqTypeReferenceTo]?: 'blog_topic';
 };
 
-export type Page_genericReference = {
+export type Page_landingReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_generic';
+  [internalGroqTypeReferenceTo]?: 'page_landing';
 };
 
 export type Page_blogReference = {
@@ -262,7 +262,7 @@ export type Link = {
   internalReference?:
     | Blog_postReference
     | Blog_topicReference
-    | Page_genericReference
+    | Page_landingReference
     | Page_blogReference;
   url?: string;
   openInNewTab?: boolean;
@@ -761,12 +761,12 @@ export type Blog_author = {
       _key: string;
     } & SocialLink
   >;
-  profilePage?: Page_genericReference;
+  profilePage?: Page_landingReference;
 };
 
-export type Page_generic = {
+export type Page_landing = {
   _id: string;
-  _type: 'page_generic';
+  _type: 'page_landing';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -981,7 +981,7 @@ export type AllSanitySchemaTypes =
   | OpenGraph
   | CtaAction
   | Blog_topicReference
-  | Page_genericReference
+  | Page_landingReference
   | Page_blogReference
   | Link
   | SocialLink
@@ -1023,7 +1023,7 @@ export type AllSanitySchemaTypes =
   | SanityImageHotspot
   | Blog_topic
   | Blog_author
-  | Page_generic
+  | Page_landing
   | Module_heroBlog
   | Module_hero
   | MediaTag

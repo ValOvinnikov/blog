@@ -281,7 +281,7 @@ drops out the day it is deleted. The studio's equivalent guard is
 `HERO_SCHEMA_TYPES`, the list every page's `hero` `to:` points at, with a
 test asserting every registered `module_hero*` schema appears in it.
 
-`page_home` has a **required** hero; `page_generic`, `page_blog`,
+`page_home` has a **required** hero; `page_landing`, `page_blog`,
 `page_topic` and `page_tag` each have an **optional** one. A hero replaces
 that page's default header and owns the `<h1>`; without one, each page
 renders the header it always has (generic: title; blog: `heading` plus
@@ -344,7 +344,7 @@ one generated field described by two names and one of them named after what
 had become only one of its five callers.
 
 `module_taxonomyList` renders both ways. It reaches `ModuleRenderer` through
-`MODULE_MAP` when placed in `page_home.modules[]` or `page_generic.modules[]`,
+`MODULE_MAP` when placed in `page_home.modules[]` or `page_landing.modules[]`,
 and it renders through a taxonomy index page's own required slot —
 `page_topicIndex.taxonomyList` on `/topics`; `page_tagIndex` on `/tags` follows
 the same shape. It carries a `REVALIDATE_TAGS` entry, which every module type

@@ -23,7 +23,7 @@ export async function getCta(
         `module:${id}`,
         'post',
         'topic',
-        'page_generic',
+        'page_landing',
         'page_blog',
       ],
       tenant.projectId,

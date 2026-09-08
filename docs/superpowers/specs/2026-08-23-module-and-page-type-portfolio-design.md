@@ -236,7 +236,7 @@ required one.
 | Page                           | Hero slot                                                                               | Without a hero                      | `modules[]` allow-list                                                                                                                        |
 | ------------------------------ | --------------------------------------------------------------------------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | `page_home`                    | **Required**, `to:` = `HERO_SCHEMA_TYPES`                                               | —                                   | Widens to every `modules[]` module: `content`, `cta`, `newsletter`, `postLatest` (+ later `postFeatured`, carousel, placeable `taxonomyList`) |
-| `page_generic`                 | Optional, same list                                                                     | Breadcrumbs + title header          | Widens from `content` + `cta` to add `postLatest` + `newsletter`                                                                              |
+| `page_landing`                 | Optional, same list                                                                     | Breadcrumbs + title header          | Widens from `content` + `cta` to add `postLatest` + `newsletter`                                                                              |
 | `page_blog`                    | Optional, same list                                                                     | `heading` + `supportingText` header | Unchanged                                                                                                                                     |
 | `page_topic` · `page_tag`      | Optional, same list — one document per term, so a flagship topic can carry its own hero | Term header                         | Unchanged                                                                                                                                     |
 | `page_work` (portfolio strand) | Optional, when that page lands                                                          | Its own header                      | Designed with the work page                                                                                                                   |
@@ -337,12 +337,12 @@ the slot stays two-step — page, then hero by id — as it is now.
 `validateSinglePostLatestWithoutHeading` exists because two
 `module_postLatest` instances on one page both fall back to the same
 "Latest posts" heading — duplicate landmark names. The widened allow-lists
-make that reachable on `page_generic` too, and the next modules
+make that reachable on `page_landing` too, and the next modules
 (`module_postFeatured`, the carousel display mode) carry fallback headings
 of their own. It becomes `validateSingleBlankHeadingPerType(types)`, a helper
 that takes the list of module types with a heading fallback and enforces "at
 most one blank-heading instance per type per page", applied to `page_home`
-and `page_generic` in Phase 0 with `[module_postLatest]`, and extended by
+and `page_landing` in Phase 0 with `[module_postLatest]`, and extended by
 each later module that gains a fallback heading.
 
 ### Migration
@@ -360,7 +360,7 @@ home page onto `module_heroBlog` and deletes the schema.
   lands, and `@blog/config` has no `knip` exemption, so an export with no
   importer fails that gate. It ships with the helper, in `module_heroBlog`.
 - **studio** — `HERO_SCHEMA_TYPES` + its registry test; `page_home.hero`
-  references the list; `page_generic`, `page_blog`, `page_topic` and
+  references the list; `page_landing`, `page_blog`, `page_topic` and
   `page_tag` gain an optional `hero` referencing it; the home and generic
   allow-lists widen; the generalised blank-heading validator. No
   `defineHeroFields()` yet.
@@ -496,7 +496,7 @@ propagates through the page loader.
 
 **Cache tags:** the module's own `modules:heroBlog` and `module:<id>`, plus
 `posts`, `post`, `author` and `topic` for the dereferenced post card, plus
-the secondary action's link targets (`topic`, `page_generic`, `page_blog`).
+the secondary action's link targets (`topic`, `page_landing`, `page_blog`).
 One `isr(...)` call now covers what two did. `REVALIDATE_TAGS` gains
 `module_heroBlog: ['modules:heroBlog']`.
 
@@ -732,7 +732,7 @@ is on; no grid image carries `priority`.
 
 **Goal:** `module_taxonomyList` — today a slot-only module that the Topics
 and Tags index pages hold in their required `taxonomyList` slot — becomes
-placeable in `page_home.modules[]` and `page_generic.modules[]`, so a blog
+placeable in `page_home.modules[]` and `page_landing.modules[]`, so a blog
 home can show topic cards between its latest posts and the newsletter. One
 type, one authored field, no sibling. Design of record for epic #2787,
 settled in #2841.
@@ -786,7 +786,7 @@ module through `getDraftsClient(context)`:
 
 | Page field                                                    | Rule                                                               | Level                                                               |
 | ------------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------- |
-| `page_home.modules[]` · `page_generic.modules[]`              | every referenced `module_taxonomyList` has a `taxonomy`            | Error — "Choose whether the '{title}' module lists topics or tags." |
+| `page_home.modules[]` · `page_landing.modules[]`              | every referenced `module_taxonomyList` has a `taxonomy`            | Error — "Choose whether the '{title}' module lists topics or tags." |
 | `page_topicIndex.taxonomyList` · `page_tagIndex.taxonomyList` | the referenced module's `taxonomy`, if set, equals the page's kind | Error — "This page lists topics; the module is set to tags."        |
 | `module_taxonomyList.limit`                                   | integer, at least 1                                                | Error                                                               |
 
@@ -903,7 +903,7 @@ creating them without a `taxonomy`, which is the correct value for a slot.
 - **config** — `TAXONOMY_SORT`; `module_taxonomyList` out of
   `TSlotModuleType`.
 - **studio** — the three fields; the two page-level rules; `page_home` and
-  `page_generic` allow-lists gain `taxonomyListSchema.name`; schema tests;
+  `page_landing` allow-lists gain `taxonomyListSchema.name`; schema tests;
   `pnpm typegen`, commit generated types.
 - **service** — the merged query with `select()`; `fallbackTaxonomy`
   parameter; transformer applies `sortOrder` then `limit`; tests for
@@ -1101,7 +1101,7 @@ gains `module_postFeatured: ['modules:postFeatured']`.
 
 ### Pages and desk
 
-`page_home`, `page_generic` and `page_blog` allow it — the blog page today
+`page_home`, `page_landing` and `page_blog` allow it — the blog page today
 allows only `cta` and `newsletter` beside its required list, and the
 spotlight is the first listing module that makes sense above or below a
 paginated archive. Each of the three adds `module_postFeatured` to its
@@ -1566,17 +1566,20 @@ point; the graph stays acyclic.
   sidebar drift from the schemas it lists. Recorded in
   `.claude/agents/studio.md` "Naming & file layout", which is the durable
   home — this doc is deleted on completion (2026-09-08).
-- **`page_generic` is renamed to `page_landing`** — the `_type` catches up
-  with the `Landing Page` title #1907 already shipped, so the stored name and
-  every human-facing label finally agree. Unlike #1907's display-only rename
-  this **is** a content migration (`_type` is immutable: new id → repoint
-  `page_home`/`page_blog`/`page_topic` link references → delete the old in a
-  separate migration) and it reaches `studio`, `service` (queries, link
-  fragments, transformers), `apps/web` (generic-page route, metadata,
-  revalidate tags) and regenerated types — so it ships as an epic with
-  per-layer sub-issues, not a single change. The `genericSchema` export and
-  its file move to `landingSchema` / `documents/pages/landing/` in the same
-  studio change (2026-09-08).
+- **`page_generic` is renamed to `page_landing`, with no migration** — the
+  `_type` catches up with the `Landing Page` title #1907 already shipped, so
+  the stored name and every human-facing label finally agree. `_type`
+  immutability only bites when documents exist, and this one had none:
+  production, development and a freshly provisioned tenant all report zero
+  (`provision-tenant` seeds `page_home` and no other page document). So it is
+  a pure code rename reaching `studio`, the regenerated types, `service`,
+  `config` (`routes.genericPage` → `routes.landingPage`) and `apps/web` — and
+  because a `_type` rename reds `type-check` in every layer above it until all
+  of them land, it ships as **one PR**, not the expand/contract sequence an
+  earlier revision of this entry described. The schema moves to
+  `documents/pages/landing/` exporting `landingSchema`, and `service` and
+  `apps/web` rename their own `generic` directories and symbols to match
+  (2026-09-08, #2904).
 
 - **Grid vs. carousel is one `displayMode` field on the two teaser modules,
   and the carousel is a pure scroll-snap track that Embla takes over after

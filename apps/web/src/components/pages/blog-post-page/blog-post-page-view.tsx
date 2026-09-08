@@ -177,7 +177,7 @@ export const BlogPostPageView = ({
                 author: {
                   ...author,
                   href: author.profilePageSlug
-                    ? routes.genericPage(author.profilePageSlug)
+                    ? routes.landingPage(author.profilePageSlug)
                     : undefined,
                 },
                 publishedAt,
