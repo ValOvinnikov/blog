@@ -133,6 +133,29 @@ export const AsSecondLevelHeading: TStory = {
   },
 };
 
+export const Split: TStory = {
+  args: {
+    isSplit: true,
+  },
+};
+
+export const Lead: TStory = {
+  args: {
+    isLead: true,
+    excerpt:
+      'A step-by-step guide to building a scalable, token-driven design system using Tailwind CSS, tailwind-variants, and Atomic Design principles — from first primitives to a fully composed page.',
+  },
+};
+
+export const LeadSplit: TStory = {
+  args: {
+    isLead: true,
+    isSplit: true,
+    excerpt:
+      'A step-by-step guide to building a scalable, token-driven design system using Tailwind CSS, tailwind-variants, and Atomic Design principles — from first primitives to a fully composed page.',
+  },
+};
+
 export const WithAuthorFooter: TStory = {
   args: {
     children: (

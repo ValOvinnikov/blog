@@ -70,6 +70,14 @@ export type TPostsSectionProps = IWithClassName &
      * already owns the vertical spacing around it, so the two don't stack.
      */
     isWrapped?: TPostsSectionVariants['wrapped'];
+    /**
+     * Renders the first post as a full-width lead card (`isLead` and
+     * `isSplit` together) with the remaining posts below it instead of
+     * inside the standard grid — a two-column row for two remaining posts,
+     * or a single full-width `isSplit` card for one. Omit for the existing
+     * grid-only behavior.
+     */
+    hasLead?: boolean;
   };
 
 /**
@@ -92,6 +100,7 @@ export const PostsSection = ({
   emptyMessage,
   isTinted,
   isWrapped,
+  hasLead,
 }: TPostsSectionProps) => {
   const isEmpty = posts.length === 0;
   if (isEmpty && !emptyMessage) return null;
@@ -103,6 +112,48 @@ export const PostsSection = ({
   });
   const hasTitle = Boolean(title?.trim());
   const resolvedTitle = hasTitle ? title : accessibleTitle;
+
+  const renderPostCard = (
+    post: IPostCardData,
+    options?: { isLead?: boolean; isSplit?: boolean; dataTestId?: string },
+  ) => (
+    <PostCard
+      key={post.id}
+      excerpt={post.excerpt}
+      isLead={options?.isLead}
+      isSplit={options?.isSplit}
+      dataTestId={options?.dataTestId}
+    >
+      {hasImages && (
+        <PostCard.Media dataTestId="post-card-media">
+          {post.image}
+        </PostCard.Media>
+      )}
+      <PostCard.Meta
+        dateValue={post.publishedAt}
+        dateLabel={post.formattedDate}
+        readingTime={post.readingTime}
+      />
+      <PostCard.Title level={cardHeadingLevel}>
+        <Component href={post.href} className={s.titleLink()}>
+          {post.title}
+        </Component>
+      </PostCard.Title>
+      <PostCard.Footer
+        topic={post.topic.title}
+        trailingIcon={
+          <Icon
+            name={ICONS.ARROW}
+            size={SIZE.SM}
+            dataTestId="post-card-footer-arrow"
+          />
+        }
+      />
+    </PostCard>
+  );
+
+  const [leadPost, ...tailPosts] = posts;
+  const [soloTailPost] = tailPosts;
 
   const content = (
     <>
@@ -118,37 +169,28 @@ export const PostsSection = ({
       {supportingText && <p className={s.supportingText()}>{supportingText}</p>}
       {isEmpty ? (
         <p className={s.emptyMessage()}>{emptyMessage}</p>
+      ) : hasLead && leadPost ? (
+        <div className={s.leadGroup()}>
+          {renderPostCard(leadPost, {
+            isLead: true,
+            isSplit: true,
+            dataTestId: 'posts-section-lead',
+          })}
+          {tailPosts.length === 1 &&
+            soloTailPost &&
+            renderPostCard(soloTailPost, {
+              isSplit: true,
+              dataTestId: 'posts-section-tail',
+            })}
+          {tailPosts.length > 1 && (
+            <div className={s.tailGrid()} data-testid="posts-section-tail-grid">
+              {tailPosts.map((post) => renderPostCard(post))}
+            </div>
+          )}
+        </div>
       ) : (
         <div className={s.grid()}>
-          {posts.map((post) => (
-            <PostCard key={post.id} excerpt={post.excerpt}>
-              {hasImages && (
-                <PostCard.Media dataTestId="post-card-media">
-                  {post.image}
-                </PostCard.Media>
-              )}
-              <PostCard.Meta
-                dateValue={post.publishedAt}
-                dateLabel={post.formattedDate}
-                readingTime={post.readingTime}
-              />
-              <PostCard.Title level={cardHeadingLevel}>
-                <Component href={post.href} className={s.titleLink()}>
-                  {post.title}
-                </Component>
-              </PostCard.Title>
-              <PostCard.Footer
-                topic={post.topic.title}
-                trailingIcon={
-                  <Icon
-                    name={ICONS.ARROW}
-                    size={SIZE.SM}
-                    dataTestId="post-card-footer-arrow"
-                  />
-                }
-              />
-            </PostCard>
-          ))}
+          {posts.map((post) => renderPostCard(post))}
         </div>
       )}
     </>

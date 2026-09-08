@@ -305,4 +305,94 @@ describe(`<${PostsSection.name}/>`, () => {
     }
     expect(screen.getAllByTestId('post-card-media')).toHaveLength(posts.length);
   });
+
+  describe('hasLead', () => {
+    it('renders the first post as a lead card carrying both isSplit and isLead when hasImages is set', () => {
+      setup({ hasLead: true, hasImages: true });
+
+      const leadCard = screen.getByTestId('posts-section-lead');
+      expect(leadCard).toHaveClass('md:flex-row');
+      const firstPost = posts[0];
+      if (!firstPost?.excerpt) throw new Error('expected first post excerpt');
+      expect(screen.getByText(firstPost.excerpt)).toHaveClass('line-clamp-3');
+    });
+
+    it('renders the lead card at full width, not split, when hasImages is unset', () => {
+      setup({ hasLead: true });
+
+      const leadCard = screen.getByTestId('posts-section-lead');
+      expect(leadCard).not.toHaveClass('md:flex-row');
+      const firstPost = posts[0];
+      if (!firstPost?.excerpt) throw new Error('expected first post excerpt');
+      expect(screen.getByText(firstPost.excerpt)).toHaveClass('line-clamp-3');
+    });
+
+    it('applies cardHeadingLevel to the lead card too', () => {
+      setup({ hasLead: true, cardHeadingLevel: 2 });
+
+      const leadCard = screen.getByTestId('posts-section-lead');
+      const firstPost = posts[0];
+      if (!firstPost) throw new Error('expected first post');
+      expect(
+        screen.getByRole('heading', { level: 2, name: firstPost.title }),
+      ).toBeVisible();
+      expect(leadCard).toBeVisible();
+    });
+
+    it('renders a single remaining post as a full-width split card, not a grid, when hasImages is set', () => {
+      setup({ hasLead: true, hasImages: true, posts: posts.slice(0, 2) });
+
+      const tailCard = screen.getByTestId('posts-section-tail');
+      expect(tailCard).toHaveClass('md:flex-row');
+      expect(
+        screen.queryByTestId('posts-section-tail-grid'),
+      ).not.toBeInTheDocument();
+    });
+
+    it('renders a single remaining post at full width, not split, when hasImages is unset', () => {
+      setup({ hasLead: true, posts: posts.slice(0, 2) });
+
+      const tailCard = screen.getByTestId('posts-section-tail');
+      expect(tailCard).not.toHaveClass('md:flex-row');
+      expect(
+        screen.queryByTestId('posts-section-tail-grid'),
+      ).not.toBeInTheDocument();
+    });
+
+    it('renders two remaining posts in a two-column tail row that never widens to three columns', () => {
+      setup({ hasLead: true, posts: posts.slice(0, 3) });
+
+      const tailGrid = screen.getByTestId('posts-section-tail-grid');
+      expect(tailGrid).toHaveClass('sm:grid-cols-2');
+      expect(tailGrid).not.toHaveClass('md:grid-cols-3');
+      expect(
+        screen.queryByTestId('posts-section-tail'),
+      ).not.toBeInTheDocument();
+    });
+
+    it('renders only the lead card, with no tail, for a single post', () => {
+      setup({ hasLead: true, posts: posts.slice(0, 1) });
+
+      expect(screen.getByTestId('posts-section-lead')).toBeVisible();
+      expect(
+        screen.queryByTestId('posts-section-tail'),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('posts-section-tail-grid'),
+      ).not.toBeInTheDocument();
+    });
+
+    it('behaves exactly as before when hasLead is unset', () => {
+      setup();
+
+      expect(
+        screen.queryByTestId('posts-section-lead'),
+      ).not.toBeInTheDocument();
+      for (const post of posts) {
+        expect(
+          screen.getByRole('heading', { level: 3, name: post.title }),
+        ).toBeVisible();
+      }
+    });
+  });
 });

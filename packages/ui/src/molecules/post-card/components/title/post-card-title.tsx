@@ -9,6 +9,8 @@ export type TPostCardTitleProps = IWithClassName &
   IWithDataTestId & {
     /** Heading depth for the title — the caller decides based on where the card sits in the page outline. */
     level: THeadingLevel;
+    /** Set by `PostCard` on lead cards — renders the title at display size instead of the standard card size. */
+    isLead?: boolean;
     children?: ReactNode;
   };
 
@@ -18,13 +20,14 @@ export type TPostCardTitleProps = IWithClassName &
  */
 export const PostCardTitle = ({
   level,
+  isLead,
   className,
   dataTestId,
   children,
 }: TPostCardTitleProps) => (
   <Heading
     level={level}
-    visual="card"
+    visual={isLead ? 'post' : 'card'}
     className={postCardTitleVariants({ class: className })}
     dataTestId={dataTestId}
   >
