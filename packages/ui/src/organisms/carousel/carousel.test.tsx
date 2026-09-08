@@ -59,7 +59,7 @@ describe(`<${Carousel.name}/>`, () => {
     expect(viewport).not.toHaveClass('overflow-hidden');
   });
 
-  it('swaps to the Embla-driven viewport classes when isEnhanced is set', () => {
+  it('swaps to the enhanced (JS-driven) viewport classes when isEnhanced is set', () => {
     renderElement(
       <Carousel ariaLabel="Posts" dataTestId="carousel" isEnhanced={true}>
         <div>Slide one</div>
@@ -97,6 +97,34 @@ describe(`<${Carousel.name}/>`, () => {
     );
 
     expect(screen.getByTestId('posts-carousel')).toBeVisible();
+  });
+
+  it("keys each slide by the slide element's own key when present, not its index", () => {
+    const { rerender } = renderElement(
+      <Carousel ariaLabel="Posts">
+        <div key="a" data-testid="slide-a">
+          Slide A
+        </div>
+        <div key="b" data-testid="slide-b">
+          Slide B
+        </div>
+      </Carousel>,
+    );
+
+    const slideA = screen.getByTestId('slide-a');
+
+    rerender(
+      <Carousel ariaLabel="Posts">
+        <div key="b" data-testid="slide-b">
+          Slide B
+        </div>
+        <div key="a" data-testid="slide-a">
+          Slide A
+        </div>
+      </Carousel>,
+    );
+
+    expect(screen.getByTestId('slide-a')).toBe(slideA);
   });
 
   describe('Carousel.Controls', () => {
@@ -140,7 +168,7 @@ describe(`<${Carousel.name}/>`, () => {
       expect(onNext).toHaveBeenCalledTimes(1);
     });
 
-    it('disables previous/next independently via isPreviousDisabled/isNextDisabled', () => {
+    it('disables only the previous button via isPreviousDisabled', () => {
       renderElement(
         <Carousel ariaLabel="Posts">
           <div>Slide one</div>
@@ -156,6 +184,24 @@ describe(`<${Carousel.name}/>`, () => {
         screen.getByRole('button', { name: 'Previous slide' }),
       ).toBeDisabled();
       expect(screen.getByRole('button', { name: 'Next slide' })).toBeEnabled();
+    });
+
+    it('disables only the next button via isNextDisabled', () => {
+      renderElement(
+        <Carousel ariaLabel="Posts">
+          <div>Slide one</div>
+          <Carousel.Controls
+            previousLabel="Previous slide"
+            nextLabel="Next slide"
+            isNextDisabled={true}
+          />
+        </Carousel>,
+      );
+
+      expect(
+        screen.getByRole('button', { name: 'Previous slide' }),
+      ).toBeEnabled();
+      expect(screen.getByRole('button', { name: 'Next slide' })).toBeDisabled();
     });
 
     it('does not render controls when Carousel.Controls is omitted', () => {

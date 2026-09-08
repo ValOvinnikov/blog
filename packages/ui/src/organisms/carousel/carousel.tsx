@@ -1,6 +1,12 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import { mapCompoundSlots, type TCompoundComponent } from '@blog/ui/lib/react';
-import type { ElementType, ReactNode, Ref } from 'react';
+import {
+  isValidElement,
+  type ElementType,
+  type Key,
+  type ReactNode,
+  type Ref,
+} from 'react';
 
 import { carouselVariants } from './carousel-variants';
 import { CarouselControls } from './components/controls/carousel-controls';
@@ -13,12 +19,12 @@ export type TCarouselProps = IWithClassName &
   IWithDataTestId & {
     /** The slides — anything that isn't a `Carousel.Controls` element becomes one. */
     children: ReactNode;
-    /** Forwarded to the viewport element — the node Embla binds to once hydrated. */
+    /** Forwarded to the viewport element — the node a JS-driven carousel controller binds to once hydrated. */
     viewportRef?: Ref<HTMLDivElement>;
     /**
      * Off (default, pre-hydration): a native scroll-snap track with a thin
-     * scrollbar. On: Embla owns scrolling, so the viewport hides overflow
-     * and drops snap and the scrollbar.
+     * scrollbar. On: a JS-driven controller owns scrolling, so the viewport
+     * hides overflow and drops snap and the scrollbar.
      */
     isEnhanced?: boolean;
     ariaLabel: string;
@@ -27,7 +33,7 @@ export type TCarouselProps = IWithClassName &
 /**
  * Carousel — a scroll-snap track of slides with a `Carousel.Controls` slot;
  * works as a native swipeable row before hydration and hands scrolling to
- * Embla once `isEnhanced` is set.
+ * a JS-driven controller once `isEnhanced` is set.
  */
 const CarouselRoot = ({
   children,
@@ -50,11 +56,15 @@ const CarouselRoot = ({
     >
       <div ref={viewportRef} className={s.viewport()}>
         <ul role="list" className={s.track()}>
-          {unmatched.map((slide, i) => (
-            <li key={i} className={s.slide()}>
-              {slide}
-            </li>
-          ))}
+          {unmatched.map((slide, i) => {
+            const key: Key =
+              isValidElement(slide) && slide.key != null ? slide.key : i;
+            return (
+              <li key={key} className={s.slide()}>
+                {slide}
+              </li>
+            );
+          })}
         </ul>
       </div>
       {slots.Controls}

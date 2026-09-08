@@ -41,6 +41,7 @@ export const CarouselControls = ({
     <div className={s.root({ class: className })} data-testid={dataTestId}>
       <IconButton
         ariaLabel={previousLabel}
+        title={previousLabel}
         onClick={onPrevious}
         isDisabled={isPreviousDisabled}
       >
@@ -52,6 +53,7 @@ export const CarouselControls = ({
       </IconButton>
       <IconButton
         ariaLabel={nextLabel}
+        title={nextLabel}
         onClick={onNext}
         isDisabled={isNextDisabled}
       >
