@@ -5,6 +5,7 @@ export * from './cache';
 export * from './capability';
 export * from './cta';
 export * from './depth';
+export * from './display-mode';
 export * from './email-template';
 export * from './error';
 export * from './finding';
