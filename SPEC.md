@@ -234,7 +234,7 @@ incrementally (#251).
 Every `module_*` document also carries a **required** `brandVariant` field
 (stored values from `@blog/config`'s `BRAND_VARIANT` const —
 `PRIMARY`/`SECONDARY` for `module_content`/`module_newsletter`/
-`module_postLatest`/`module_taxonomyList`; `module_hero`, `module_cta` and
+`module_postLatest`/`module_postFeatured`/`module_taxonomyList`; `module_hero`, `module_cta` and
 `module_postList` additionally allow `BRAND_PRIMARY` — on `module_cta` this
 field means the card's own fill tone (Banner/Split/Callout below) rather
 than the full-bleed band tone every other module uses it for, which that
@@ -244,14 +244,14 @@ object (`spacingTop`/`spacingBottom`, `containerWidth` (not on
 `dividerBottom` — stored values from `SPACING_SCALE`/`CONTAINER_WIDTH`
 consts; there is no `align` field on `layout` — alignment is its own
 module-level field, below).
-`module_cta`/`module_postList`/`module_postLatest`/`module_taxonomyList`/`module_newsletter`
+`module_cta`/`module_postList`/`module_postLatest`/`module_postFeatured`/`module_taxonomyList`/`module_newsletter`
 additionally carry a `sectionHeader` object (`heading` and `supportingText`
 only — all optional on
-`module_postList`/`module_postLatest`/`module_taxonomyList`, `heading` required on
+`module_postList`/`module_postLatest`/`module_postFeatured`/`module_taxonomyList`, `heading` required on
 `module_cta`/`module_newsletter` via a per-module `requireHeading` override
 on the shared `sectionHeaderField()` helper).
 
-**Alignment is a module-level field, not part of `sectionHeader`.** All five
+**Alignment is a module-level field, not part of `sectionHeader`.** All six
 of those modules carry their own `contentAlignment`, emitted by the
 `defineAlignmentFields()` helper, which every caller gets whether or not it
 asks for variant-scoped extras. `sectionHeader` deliberately does not bundle

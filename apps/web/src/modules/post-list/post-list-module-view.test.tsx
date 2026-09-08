@@ -165,4 +165,22 @@ describe(PostListModuleView, () => {
       undefined,
     );
   });
+
+  it('passes hasLead through to PostsSection', () => {
+    setup({ hasLead: true });
+
+    expect(vi.mocked(PostsSection)).toHaveBeenLastCalledWith(
+      expect.objectContaining({ hasLead: true }),
+      undefined,
+    );
+  });
+
+  it('leaves hasLead undefined on PostsSection when not given', () => {
+    setup();
+
+    expect(vi.mocked(PostsSection)).toHaveBeenLastCalledWith(
+      expect.objectContaining({ hasLead: undefined }),
+      undefined,
+    );
+  });
 });

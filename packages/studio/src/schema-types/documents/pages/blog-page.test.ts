@@ -18,7 +18,7 @@ type TValidationRule = {
 };
 
 describe('blogPageSchema modules allow-list', () => {
-  it('permits module_cta and module_newsletter, and excludes module_postList', () => {
+  it('permits module_cta, module_newsletter and module_postFeatured, and excludes module_postList', () => {
     const modulesField = blogPageSchema.fields?.find(
       (field) => field.name === 'modules',
     ) as TArrayFieldDefinition | undefined;
@@ -31,7 +31,11 @@ describe('blogPageSchema modules allow-list', () => {
 
     const allowedTypes = modulesField.of.map((member) => member.name);
 
-    expect(allowedTypes).toEqual(['module_cta', 'module_newsletter']);
+    expect(allowedTypes).toEqual([
+      'module_cta',
+      'module_newsletter',
+      'module_postFeatured',
+    ]);
     expect(allowedTypes).not.toContain('module_postList');
   });
 });
