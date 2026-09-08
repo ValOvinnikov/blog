@@ -12,7 +12,7 @@ import { WORD_COUNT_EXPRESSION, wordCountParser } from './word-count';
  * for the same reason.
  */
 export const archivePostCardFragment = q
-  .fragmentForType<'blog_post'>()
+  .fragmentForType<'page_post'>()
   .project((sub) => ({
     _id: true,
     title: sub.field('title').notNull(),

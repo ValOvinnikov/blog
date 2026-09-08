@@ -3,16 +3,15 @@ import type {
   TContentAlignment,
   TLayout,
   TMaybeUndefined,
-  TNewsletterVariant,
+  TSectionHeader,
 } from '@blog/config';
+import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
 
-export type TNewsletterModule = {
+export type TPostRelatedModule = {
   brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
-  sectionHeader: {
-    heading: string;
-    supportingText: TMaybeUndefined<string>;
-  };
-  variant: TNewsletterVariant;
+  sectionHeader: TSectionHeader;
+  posts: TPostCard[];
   layout: TMaybeUndefined<TLayout>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
+  showImages: boolean;
 };

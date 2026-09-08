@@ -33,7 +33,5 @@ export type TPostDetail = Omit<TPostCard, 'author' | 'topic'> & {
   author: TPostDetailAuthor;
   topic: TTopic;
   tags: TTag[];
-  relatedPosts: TPostCard[];
   readingTimeMinutes: number;
-  newsletterEnabled: boolean;
 };

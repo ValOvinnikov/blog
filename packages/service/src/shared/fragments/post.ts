@@ -15,7 +15,7 @@ const skimFragment = q.fragmentForType<'skim'>().project((sub) => ({
 }));
 
 export const postCardFragment = q
-  .fragmentForType<'blog_post'>()
+  .fragmentForType<'page_post'>()
   .project((sub) => ({
     _id: true,
     title: sub.field('title').notNull(),
@@ -37,7 +37,7 @@ export const postCardFragment = q
   }));
 
 export const postDetailFragment = q
-  .fragmentForType<'blog_post'>()
+  .fragmentForType<'page_post'>()
   .project((sub) => ({
     _id: true,
     title: sub.field('title').notNull(),
@@ -53,7 +53,6 @@ export const postDetailFragment = q
       .project(sanityImageFragment)
       .nullable(true),
     featured: sub.field('featured').nullable(true),
-    newsletterEnabled: sub.field('newsletterEnabled').nullable(true),
     body: sub.field('body[]').project(portableTextBodyItemFragment).notNull(),
     skim: sub.field('skim').project(skimFragment).nullable(true),
     seo: sub.field('seo').project(seoFragment).nullable(true),

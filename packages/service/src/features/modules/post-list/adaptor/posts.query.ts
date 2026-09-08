@@ -1,5 +1,8 @@
 import { q } from '@blog/service/sanity/query';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
+import {
+  POST_CONTENT_READY_FILTER,
+  PUBLISHED_POST_FILTER,
+} from '@blog/service/shared/filters/published-post';
 import { postCardFragment } from '@blog/service/shared/fragments/post';
 
 /**
@@ -20,15 +23,16 @@ const SCOPE_FILTER =
   '(!defined(*[_type == "page_topic" && postList._ref == $id][0]._id) || references(*[_type == "page_topic" && postList._ref == $id][0].topic._ref))';
 
 const posts = q.star
-  .filterByType('blog_post')
+  .filterByType('page_post')
   .filterRaw(PUBLISHED_POST_FILTER)
+  .filterRaw(POST_CONTENT_READY_FILTER)
   .filterRaw(SCOPE_FILTER);
 
 /**
  * Windowed posts for the post-list archive, alongside the total match count
  * so the caller can compute total pages. Built per-request so `pageSize`
  * bounds the results in GROQ (end-exclusive `.slice(start, end)`) rather
- * than fetching the whole `blog_post` collection to slice in JS. The
+ * than fetching the whole `page_post` collection to slice in JS. The
  * `module_postList` document's own id binds `SCOPE_FILTER`'s `$id` via
  * the caller's `runQuery(query, { parameters: { id } })`.
  */

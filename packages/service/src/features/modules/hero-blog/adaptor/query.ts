@@ -1,15 +1,19 @@
 import { POST_SOURCE } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
+import {
+  POST_CONTENT_READY_FILTER,
+  PUBLISHED_POST_FILTER,
+} from '@blog/service/shared/filters/published-post';
 import { ctaActionFragment } from '@blog/service/shared/fragments/action-group';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image';
 import { heroLayoutFragment } from '@blog/service/shared/fragments/layout';
 import { postCardFragment } from '@blog/service/shared/fragments/post';
 
 const newestFeaturedPostQuery = q.star
-  .filterByType('blog_post')
+  .filterByType('page_post')
   .filterRaw('featured == true')
   .filterRaw(PUBLISHED_POST_FILTER)
+  .filterRaw(POST_CONTENT_READY_FILTER)
   .order('publishedAt desc')
   .slice(0)
   .project(postCardFragment)

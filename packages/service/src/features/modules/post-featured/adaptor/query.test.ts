@@ -16,7 +16,7 @@ describe('postFeaturedModuleQuery', () => {
 
   it('falls back to the newest featured, published posts capped at 3', () => {
     expect(postFeaturedModuleQuery.query).toContain(
-      '_type == "blog_post"][featured == true][publishedAt <= now()',
+      '_type == "page_post"][featured == true][publishedAt <= now()',
     );
     expect(postFeaturedModuleQuery.query).toContain(
       'order(publishedAt desc)[0...3]',

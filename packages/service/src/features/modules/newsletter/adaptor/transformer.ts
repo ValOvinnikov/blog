@@ -15,6 +15,7 @@ export function toNewsletterModule(
   return {
     brandVariant: raw.brandVariant,
     sectionHeader: toRequiredSectionHeader(raw.sectionHeader),
+    variant: raw.variant,
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,
   };

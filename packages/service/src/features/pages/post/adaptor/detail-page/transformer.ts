@@ -4,7 +4,6 @@ import type { TImageTenant } from '@blog/service/sanity/image';
 import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
 import { toPortableTextBody } from '@blog/service/shared/transformers/to-portable-text-body';
-import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import { toSocialLink } from '@blog/service/shared/transformers/to-social-link';
 import { toTag } from '@blog/service/shared/transformers/to-tag';
@@ -15,8 +14,7 @@ import type { InferResultType } from 'groqd';
 import type { postPageQuery } from './query';
 import type { TPostDetail, TPostDetailAuthor, TPostSkim } from './types';
 
-export type TRawPostPage = NonNullable<InferResultType<typeof postPageQuery>>;
-export type TRawPostDetail = TRawPostPage['post'];
+export type TRawPostDetail = NonNullable<InferResultType<typeof postPageQuery>>;
 
 // PostMeta renders the author avatar at SIZE.SM (32px, `avatar-variants.ts`)
 // — 64px covers a 2x DPR display without serving the source asset's full
@@ -56,39 +54,27 @@ function toPostSkim(raw: TRawPostDetail['skim']): TMaybeUndefined<TPostSkim> {
 }
 
 export function toPostDetail(
-  rawPage: TRawPostPage,
+  raw: TRawPostDetail,
   settings: TSiteSettings,
-  relatedPosts: TPostCard[],
   tenant: TImageTenant,
 ): TPostDetail {
-  const raw = rawPage.post;
   const heroImageUrl = buildImageUrl(raw.heroImage, tenant);
 
   return {
     id: raw._id,
     title: raw.title,
-    // `page_post`'s own slug/publishedAt, not `post`'s — that's the field
-    // this migration moves reads off of.
-    slug: rawPage.slug,
+    slug: raw.slug,
     excerpt: raw.excerpt,
-    publishedAt: rawPage.publishedAt,
+    publishedAt: raw.publishedAt,
     heroImageUrl,
     heroImageAlt: raw.heroImage?.alt,
     heroImageSanity: toSanityImage(raw.heroImageAsset, tenant),
     featured: raw.featured ?? false,
-    // Schema default is `initialValue: true` (studio-only, not a stored
-    // fallback) — the migration backfilled every existing post's stored
-    // value to `true`, so `?? true` here only covers a theoretical
-    // unmigrated row, mirroring `featured`'s own `?? false` shape.
-    newsletterEnabled: raw.newsletterEnabled ?? true,
     body: toPortableTextBody(raw.body, tenant),
     skim: toPostSkim(raw.skim),
     hasAsides: raw.body.some((block) => block._type === 'aside'),
-    // `page_post.seo` is the override — mirrors `page_topic`/`page_blog`,
-    // whose own `.seo` overrides a content-derived fallback, not the wrapped
-    // entity's own `seo` field.
     seo: resolveSeo(
-      rawPage.seo ?? undefined,
+      raw.seo ?? undefined,
       { title: raw.title, description: raw.excerpt, imageUrl: heroImageUrl },
       {
         description: settings.description,
@@ -99,7 +85,6 @@ export function toPostDetail(
     author: toPostDetailAuthor(raw.author, tenant),
     topic: toTopic(raw.topic),
     tags: (raw.tags ?? []).map(toTag),
-    relatedPosts,
     readingTimeMinutes: toReadingTimeMinutes(raw.wordCount),
   };
 }

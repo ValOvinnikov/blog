@@ -1,5 +1,8 @@
 import { q } from '@blog/service/sanity/query';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
+import {
+  POST_CONTENT_READY_FILTER,
+  PUBLISHED_POST_FILTER,
+} from '@blog/service/shared/filters/published-post';
 
 export const indexPageParamsQuery = q.star
   .filterByType('page_blog')
@@ -8,7 +11,10 @@ export const indexPageParamsQuery = q.star
     blogPosts: q.project((sub) => ({
       total: sub
         .count(
-          q.star.filterByType('blog_post').filterRaw(PUBLISHED_POST_FILTER),
+          q.star
+            .filterByType('page_post')
+            .filterRaw(PUBLISHED_POST_FILTER)
+            .filterRaw(POST_CONTENT_READY_FILTER),
         )
         .notNull(true),
     })),
