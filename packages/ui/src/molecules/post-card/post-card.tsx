@@ -38,7 +38,8 @@ export type TPostCardProps = IWithClassName &
     /**
      * From `md`, lays the media and copy side by side (media first) in an
      * equal 1:1 split; below `md` the layout is unchanged (media stacked
-     * above copy).
+     * above copy). Has no effect without a `PostCard.Media` slot — the copy
+     * stays full-width.
      */
     isSplit?: TPostCardVariants['isSplit'];
     /**
@@ -65,20 +66,21 @@ const PostCardRoot = ({
   dataTestId,
 }: TPostCardProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, PostCardParts);
-  const s = postCardVariants({ isSplit, isLead });
+  const hasMedia = Boolean(slots.Media);
+  const isSplitLayout = Boolean(isSplit) && hasMedia;
+  const s = postCardVariants({ isSplit: isSplitLayout, isLead });
+
+  const media =
+    isLead && slots.Media
+      ? cloneElement(slots.Media as ReactElement<TPostCardMediaProps>, {
+          isLead: true,
+        })
+      : slots.Media;
 
   return (
     <article className={s.root({ class: className })} data-testid={dataTestId}>
-      {slots.Media && (
-        <div className={s.media()}>
-          {isLead
-            ? cloneElement(slots.Media as ReactElement<TPostCardMediaProps>, {
-                isLead: true,
-              })
-            : slots.Media}
-        </div>
-      )}
-      <div className={s.content()}>
+      {isSplitLayout ? <div className={s.media()}>{media}</div> : media}
+      <div className={s.content()} data-testid="post-card-content">
         {slots.Meta}
         {isLead && slots.Title
           ? cloneElement(slots.Title as ReactElement<TPostCardTitleProps>, {

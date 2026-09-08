@@ -176,14 +176,60 @@ describe(`<${PostCard.name}/>`, () => {
     expect(screen.getByTestId('post-card')).toBeVisible();
   });
 
-  it('applies the split layout class to the root when isSplit is set', () => {
-    renderElement(<PostCard isSplit={true} dataTestId="post-card" />);
+  it('applies the split layout class to the root when isSplit is set and Media is present', () => {
+    renderElement(
+      <PostCard isSplit={true} dataTestId="post-card">
+        <PostCard.Media>
+          <img src="/cover.jpg" alt="Cover photo" />
+        </PostCard.Media>
+      </PostCard>,
+    );
     expect(screen.getByTestId('post-card')).toHaveClass('md:flex-row');
+    expect(screen.getByTestId('post-card-content')).toHaveClass('md:w-1/2');
   });
 
   it('does not apply the split layout class when isSplit is unset', () => {
     renderElement(<PostCard dataTestId="post-card" />);
     expect(screen.getByTestId('post-card')).not.toHaveClass('md:flex-row');
+  });
+
+  it('does not apply the split layout when isSplit is set but no Media slot is present', () => {
+    renderElement(
+      <PostCard isSplit={true} dataTestId="post-card">
+        <PostCard.Title level={3}>
+          <a href="/posts/hello-world">Hello World</a>
+        </PostCard.Title>
+      </PostCard>,
+    );
+    expect(screen.getByTestId('post-card')).not.toHaveClass('md:flex-row');
+    expect(screen.getByTestId('post-card-content')).not.toHaveClass('md:w-1/2');
+  });
+
+  it('wraps PostCard.Media in a split container only when isSplit is set and Media is present', () => {
+    renderElement(
+      <PostCard isSplit={true}>
+        <PostCard.Media dataTestId="post-card-media">
+          <img src="/cover.jpg" alt="Cover photo" />
+        </PostCard.Media>
+      </PostCard>,
+    );
+    const media = screen.getByTestId('post-card-media');
+    const article = screen.getByRole('article');
+    expect(media.parentElement).not.toBe(article);
+    expect(media.parentElement?.parentElement).toBe(article);
+  });
+
+  it('renders PostCard.Media as a direct child of the article when isSplit is unset', () => {
+    renderElement(
+      <PostCard>
+        <PostCard.Media dataTestId="post-card-media">
+          <img src="/cover.jpg" alt="Cover photo" />
+        </PostCard.Media>
+      </PostCard>,
+    );
+    const media = screen.getByTestId('post-card-media');
+    const article = screen.getByRole('article');
+    expect(media.parentElement).toBe(article);
   });
 
   it('clamps the excerpt to three lines when isLead is set', () => {

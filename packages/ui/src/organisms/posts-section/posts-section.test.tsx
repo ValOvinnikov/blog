@@ -307,11 +307,21 @@ describe(`<${PostsSection.name}/>`, () => {
   });
 
   describe('hasLead', () => {
-    it('renders the first post as a lead card carrying both isSplit and isLead', () => {
-      setup({ hasLead: true });
+    it('renders the first post as a lead card carrying both isSplit and isLead when hasImages is set', () => {
+      setup({ hasLead: true, hasImages: true });
 
       const leadCard = screen.getByTestId('posts-section-lead');
       expect(leadCard).toHaveClass('md:flex-row');
+      const firstPost = posts[0];
+      if (!firstPost?.excerpt) throw new Error('expected first post excerpt');
+      expect(screen.getByText(firstPost.excerpt)).toHaveClass('line-clamp-3');
+    });
+
+    it('renders the lead card at full width, not split, when hasImages is unset', () => {
+      setup({ hasLead: true });
+
+      const leadCard = screen.getByTestId('posts-section-lead');
+      expect(leadCard).not.toHaveClass('md:flex-row');
       const firstPost = posts[0];
       if (!firstPost?.excerpt) throw new Error('expected first post excerpt');
       expect(screen.getByText(firstPost.excerpt)).toHaveClass('line-clamp-3');
@@ -329,11 +339,21 @@ describe(`<${PostsSection.name}/>`, () => {
       expect(leadCard).toBeVisible();
     });
 
-    it('renders a single remaining post as a full-width split card, not a grid', () => {
-      setup({ hasLead: true, posts: posts.slice(0, 2) });
+    it('renders a single remaining post as a full-width split card, not a grid, when hasImages is set', () => {
+      setup({ hasLead: true, hasImages: true, posts: posts.slice(0, 2) });
 
       const tailCard = screen.getByTestId('posts-section-tail');
       expect(tailCard).toHaveClass('md:flex-row');
+      expect(
+        screen.queryByTestId('posts-section-tail-grid'),
+      ).not.toBeInTheDocument();
+    });
+
+    it('renders a single remaining post at full width, not split, when hasImages is unset', () => {
+      setup({ hasLead: true, posts: posts.slice(0, 2) });
+
+      const tailCard = screen.getByTestId('posts-section-tail');
+      expect(tailCard).not.toHaveClass('md:flex-row');
       expect(
         screen.queryByTestId('posts-section-tail-grid'),
       ).not.toBeInTheDocument();

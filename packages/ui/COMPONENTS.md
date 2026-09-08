@@ -219,7 +219,7 @@ Variants: isSplit: (boolean) · isLead: (boolean)
 
 Slots:
 
-- **PostCard.Media** — the media region at the top of a `PostCard`; a styled `<div>` wrapper you fill with an image or `MediaFrame`. Props: isLead?: TPostCardMediaVariants['isLead'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isLead: (boolean)
+- **PostCard.Media** — the media region of a `PostCard`; a styled `<div>` wrapper you fill with an image or `MediaFrame`. Props: isLead?: TPostCardMediaVariants['isLead'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isLead: (boolean)
 - **PostCard.Meta** — compact metadata row for post cards. Props: dateValue: string · dateLabel: string · readingTime?: string _(extends IWithClassName, IWithDataTestId)_
 - **PostCard.Title** — the post heading inside a `PostCard`, rendered at the caller-specified heading depth with the card title's visual treatment. Props: level: THeadingLevel · isLead?: boolean · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **PostCard.Footer** — the byline row at the bottom of a `PostCard`: optional author avatar and name, published date, and a topic tag. Props: authorName?: string · authorAvatarSrc?: string · publishedAt?: string · formattedDate?: string · topic?: string · leadingIcon?: ReactNode · trailingIcon?: ReactNode _(extends IWithClassName, IWithDataTestId)_
