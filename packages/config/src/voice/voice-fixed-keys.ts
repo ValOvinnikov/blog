@@ -37,6 +37,8 @@ export const VOICE_FIXED_KEYS = [
   // Archive/breadcrumb labels read only as the post list's accessible name,
   // or derived from Studio content rather than authored directly.
   'postLatestModule.fallbackHeading',
+  'taxonomyListModule.topics.fallbackHeading',
+  'taxonomyListModule.tags.fallbackHeading',
   'blogListPage.title',
   'topicPage.title',
   'tagPage.title',
@@ -77,8 +79,8 @@ export const VOICE_FIXED_KEYS = [
 
   // Counters carrying ICU plural syntax; they read the same in every voice.
   'pagination.pageSuffix',
-  'topicsPage.postsCount',
-  'tagsPage.postsCount',
+  'taxonomyListModule.topics.postsCount',
+  'taxonomyListModule.tags.postsCount',
   'toastProvider.mergeCountSuffix',
   'bookmarksPage.hint',
 

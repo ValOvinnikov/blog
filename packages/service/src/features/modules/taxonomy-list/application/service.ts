@@ -7,8 +7,11 @@ export function createTaxonomyListModuleService() {
   return {
     v1: {
       getTaxonomyList: safeAsync(
-        (id: string, taxonomy: TTaxonomyKind, tenant: TTenantSanityContext) =>
-          getTaxonomyList(id, taxonomy, tenant),
+        (
+          id: string,
+          tenant: TTenantSanityContext,
+          fallbackTaxonomy?: TTaxonomyKind,
+        ) => getTaxonomyList(id, tenant, fallbackTaxonomy),
       ),
     },
   };

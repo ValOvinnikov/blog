@@ -4,6 +4,7 @@ import type {
   TLayout,
   TMaybeUndefined,
   TSectionHeader,
+  TTaxonomyKind,
 } from '@blog/config';
 import type { TTagWithPostCount } from '@blog/service/features/entities/tags/adaptor/types';
 import type { TTopicWithPostCount } from '@blog/service/features/entities/topics/adaptor/types';
@@ -20,5 +21,6 @@ export type TTaxonomyListModule = {
   sectionHeader: TSectionHeader;
   layout: TMaybeUndefined<TLayout>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
+  taxonomy: TTaxonomyKind;
   entries: TTaxonomyEntry[];
 };

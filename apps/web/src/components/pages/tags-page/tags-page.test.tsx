@@ -24,20 +24,17 @@ const {
   taxonomyListModuleMock: vi.fn(
     ({
       id,
-      accessibleTitle,
-      emptyMessage,
-      buildHref,
-      formatPostCount,
+      slot,
     }: {
       id: string;
-      accessibleTitle: string;
-      emptyMessage: string;
-      buildHref: (slug: string) => string;
-      formatPostCount: (count: number) => string;
+      slot: {
+        fallbackTaxonomy: string;
+        accessibleTitle: string;
+        emptyMessage: string;
+      };
     }) => (
       <div data-testid="taxonomy-list-module-stub">
-        {id}:{accessibleTitle}:{emptyMessage}:{buildHref('typescript')}:
-        {formatPostCount(5)}
+        {id}:{slot.fallbackTaxonomy}:{slot.accessibleTitle}:{slot.emptyMessage}
       </div>
     ),
   ),
@@ -136,7 +133,7 @@ describe(`<${TagsPage.name}/>`, () => {
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('passes the taxonomyListId, TAGS kind, page heading as accessibleTitle, the empty-state copy, and the href/postcount builders through to TaxonomyListModule', async () => {
+  it('passes the taxonomyListId, TAGS fallback kind, page heading as accessibleTitle, and the empty-state copy through to TaxonomyListModule', async () => {
     getIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -152,14 +149,19 @@ describe(`<${TagsPage.name}/>`, () => {
     expect(taxonomyListModuleMock).toHaveBeenCalledWith(
       expect.objectContaining({
         id: 'tag-list-1',
-        taxonomy: 'TAGS',
-        accessibleTitle: 'Tags',
-        emptyMessage: 'No tags yet.',
+        slot: expect.objectContaining({
+          fallbackTaxonomy: 'TAGS',
+          titleId: 'tag-list-title',
+          dataTestId: 'taxonomy-list-module-tag-list-1',
+          headingLevel: 2,
+          accessibleTitle: 'Tags',
+          emptyMessage: 'No tags yet.',
+        }),
       }),
       undefined,
     );
     expect(screen.getByTestId('taxonomy-list-module-stub')).toHaveTextContent(
-      'tag-list-1:Tags:No tags yet.:/tags/typescript:5 posts',
+      'tag-list-1:TAGS:Tags:No tags yet.',
     );
   });
 

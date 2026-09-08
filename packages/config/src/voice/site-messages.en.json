@@ -84,12 +84,20 @@
     "paginationAriaLabel": "{name} pages"
   },
   "topicsPage": {
-    "empty": "No topics yet.",
-    "postsCount": "{count, plural, one {1 post} other {{count} posts}}"
+    "empty": "No topics yet."
   },
   "tagsPage": {
-    "empty": "No tags yet.",
-    "postsCount": "{count, plural, one {1 post} other {{count} posts}}"
+    "empty": "No tags yet."
+  },
+  "taxonomyListModule": {
+    "topics": {
+      "postsCount": "{count, plural, one {1 post} other {{count} posts}}",
+      "fallbackHeading": "Topics"
+    },
+    "tags": {
+      "postsCount": "{count, plural, one {1 post} other {{count} posts}}",
+      "fallbackHeading": "Tags"
+    }
   },
   "rss": {
     "fallbackTitle": "Blog",

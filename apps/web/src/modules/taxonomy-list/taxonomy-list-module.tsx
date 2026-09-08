@@ -1,72 +1,79 @@
-import type { TTaxonomyKind } from '@blog/config';
+import { routes, TAXONOMY_KIND, type TTaxonomyKind } from '@blog/config';
 import { service } from '@blog/service';
 import type { THeadingLevel } from '@blog/ui/lib/react';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 
 import {
   TaxonomyListModuleView,
   type ITaxonomyListModuleItem,
 } from './taxonomy-list-module-view';
 
-export interface ITaxonomyListModuleProps {
-  id: string;
-  tenant: string;
-  taxonomy: TTaxonomyKind;
+interface ITaxonomyListModuleSlot {
+  fallbackTaxonomy: TTaxonomyKind;
   titleId: string;
   dataTestId: string;
   headingLevel: THeadingLevel;
   accessibleTitle: string;
   emptyMessage: string;
-  buildHref: (slug: string) => string;
-  formatPostCount: (count: number) => string;
+}
+
+export interface ITaxonomyListModuleProps {
+  id: string;
+  locale?: string;
+  tenant: string;
+  slot?: ITaxonomyListModuleSlot;
 }
 
 /**
  * TaxonomyListModule — fetches a `module_taxonomyList` document's entries
- * (topics or tags, per `taxonomy`) and hands them to
- * `TaxonomyListModuleView`. Which taxonomy this instance lists, the
- * per-entry href, and the post-count copy are all supplied by the page —
- * the module carries no taxonomy-specific i18n namespace of its own, so a
- * second index page (tags) reuses it by passing its own strings.
+ * and hands them to `TaxonomyListModuleView`, resolving the taxonomy kind,
+ * per-entry hrefs and post-count copy from the fetched view model itself.
  */
 export const TaxonomyListModule = async ({
   id,
   tenant,
-  taxonomy,
-  titleId,
-  dataTestId,
-  headingLevel,
-  accessibleTitle,
-  emptyMessage,
-  buildHref,
-  formatPostCount,
+  slot,
 }: ITaxonomyListModuleProps) => {
   const tenantContext = await getTenantSanityContext(tenant);
   const result = await service.modules.taxonomyList.v1.getTaxonomyList(
     id,
-    taxonomy,
     tenantContext,
+    slot?.fallbackTaxonomy,
   );
 
   if (!result.ok) {
+    if (!slot) return null;
+
     logger.error('taxonomy_list_module.fetch_failed', {
       id,
-      taxonomy,
       error: result.error,
     });
     notFound();
   }
 
-  const { brandVariant, sectionHeader, layout, entries, contentAlignment } =
-    result.data;
+  const {
+    brandVariant,
+    sectionHeader,
+    layout,
+    contentAlignment,
+    taxonomy,
+    entries,
+  } = result.data;
+
+  if (!slot && entries.length === 0) return null;
+
+  const namespace = taxonomy === TAXONOMY_KIND.TAGS ? 'tags' : 'topics';
+  const t = await getTranslations(`taxonomyListModule.${namespace}`);
+  const buildHref = taxonomy === TAXONOMY_KIND.TAGS ? routes.tag : routes.topic;
 
   const items: ITaxonomyListModuleItem[] = entries.map((entry) => ({
     id: entry.id,
     title: entry.title,
     description: entry.description,
-    postCountLabel: formatPostCount(entry.postCount),
+    postCountLabel: t('postsCount', { count: entry.postCount }),
     href: buildHref(entry.slug),
   }));
 
@@ -77,11 +84,11 @@ export const TaxonomyListModule = async ({
       items={items}
       layout={layout}
       contentAlignment={contentAlignment}
-      titleId={titleId}
-      dataTestId={dataTestId}
-      headingLevel={headingLevel}
-      accessibleTitle={accessibleTitle}
-      emptyMessage={emptyMessage}
+      titleId={slot?.titleId ?? `taxonomy-list-${id}`}
+      dataTestId={slot?.dataTestId ?? `taxonomy-list-module-${id}`}
+      headingLevel={slot?.headingLevel ?? 2}
+      accessibleTitle={slot?.accessibleTitle ?? t('fallbackHeading')}
+      emptyMessage={slot?.emptyMessage ?? ''}
     />
   );
 };

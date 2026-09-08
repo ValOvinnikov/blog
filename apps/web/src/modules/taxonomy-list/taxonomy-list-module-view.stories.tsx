@@ -2,26 +2,13 @@ import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
 import { HEADING_LEVELS } from '@blog/ui/lib/react';
 import { objectKeys } from '@blog/utils';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import {
+  tagsListItems,
+  topicsListItems,
+} from '@web/testing/modules/taxonomy-list/fixtures';
 
 import { TaxonomyListModuleView } from './taxonomy-list-module-view';
 import { taxonomyListModuleViewVariants } from './taxonomy-list-module-view-variants';
-
-const items = [
-  {
-    id: 'topic-1',
-    title: 'Engineering',
-    description: 'Posts about building things.',
-    postCountLabel: '5 posts',
-    href: '/topics/engineering',
-  },
-  {
-    id: 'topic-2',
-    title: 'Design',
-    description: 'Posts about craft and process.',
-    postCountLabel: '1 post',
-    href: '/topics/design',
-  },
-];
 
 const meta = {
   title: 'Modules/TaxonomyListModule',
@@ -48,7 +35,7 @@ const meta = {
       heading: 'Browse by topic',
       supportingText: undefined,
     },
-    items,
+    items: topicsListItems,
     layout: undefined,
     contentAlignment: undefined,
     titleId: 'topic-list-title',
@@ -63,6 +50,28 @@ export default meta;
 type TStory = StoryObj<typeof meta>;
 
 export const Default: TStory = {};
+
+export const Topics: TStory = {
+  args: {
+    sectionHeader: { heading: 'Browse by topic', supportingText: undefined },
+    items: topicsListItems,
+    titleId: 'topic-list-title',
+    dataTestId: 'taxonomy-list-module-topic-list-1',
+    accessibleTitle: 'Topics',
+    emptyMessage: 'No topics yet.',
+  },
+};
+
+export const Tags: TStory = {
+  args: {
+    sectionHeader: { heading: 'Browse by tag', supportingText: undefined },
+    items: tagsListItems,
+    titleId: 'tag-list-title',
+    dataTestId: 'taxonomy-list-module-tag-list-1',
+    accessibleTitle: 'Tags',
+    emptyMessage: 'No tags yet.',
+  },
+};
 
 export const WithoutCmsHeading: TStory = {
   args: {

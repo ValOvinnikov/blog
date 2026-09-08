@@ -273,8 +273,8 @@ own dedicated schema, unrelated to this shared shape.
 `module_hero`; membership is that naming convention and nothing else.
 `@blog/config` derives `THeroModuleType` from it as
 ``Extract<TModuleType, `module_hero${string}`>``, alongside
-`TSlotModuleType` — every module reached through a dedicated page slot
-rather than `modules[]`, which is how `MODULE_MAP` excludes them
+`TSlotModuleType` — every module reached _only_ through a dedicated page slot
+and never through `modules[]`, which is how `MODULE_MAP` excludes them
 (`Record<Exclude<TModuleType, TSlotModuleType>, …>`). Nothing is
 hand-listed, so a new hero kind joins the union the day its schema lands and
 drops out the day it is deleted. The studio's equivalent guard is
@@ -343,16 +343,27 @@ not warrant separate types. It previously did have two: `CTA_ALIGNMENT` and
 one generated field described by two names and one of them named after what
 had become only one of its five callers.
 
-`module_taxonomyList` is excluded from `MODULE_MAP`, so it never reaches
-`ModuleRenderer`; it still carries a `REVALIDATE_TAGS` entry, which every
-module type requires regardless of how it is rendered. It renders through a
-taxonomy index page's own required slot — `page_topicIndex.taxonomyList` on
-`/topics`; `page_tagIndex` on `/tags` follows the same shape. Which taxonomy it
-lists is not an authored field: it is inferred from which index page's slot
-holds the module — the same inference-by-slot rule the post list uses — and the
-page passes that kind to
-`service.modules.taxonomyList.v1.getTaxonomyList(id, taxonomy)` rather than the
-loader querying upward for its parent page.
+`module_taxonomyList` renders both ways. It reaches `ModuleRenderer` through
+`MODULE_MAP` when placed in `page_home.modules[]` or `page_generic.modules[]`,
+and it renders through a taxonomy index page's own required slot —
+`page_topicIndex.taxonomyList` on `/topics`; `page_tagIndex` on `/tags` follows
+the same shape. It carries a `REVALIDATE_TAGS` entry, which every module type
+requires regardless of how it is rendered.
+
+Which taxonomy it lists is an optional authored field, because a module
+document cannot see what holds it: the page references the module, not the
+reverse, and Sanity's `hidden` callback is synchronous and sees only the
+module's own document. So the field is always visible and the requirement
+lives on the pages instead. A `modules[]` placement must set it — an async
+rule on both pages' `modules[]` fetches each referenced module and rejects one
+that has not. An index page leaves it empty and passes its own kind to
+`service.modules.taxonomyList.v1.getTaxonomyList(id, tenant, fallbackTaxonomy)`
+as the fallback, so the loader never queries upward for a parent page; that
+page's slot rule rejects a module whose authored kind disagrees with the page's
+own. `sortOrder` (`TAXONOMY_SORT`, coalesced to `ALPHABETICAL` at read time)
+and `limit` apply wherever the module sits, and their defaults reproduce the
+index pages' rendering. Sorting and the limit are applied in the service
+transformer, not in GROQ.
 
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its
@@ -365,7 +376,9 @@ dedicated slot rather than `MODULE_MAP`'s generic `ModuleRenderer` pipeline
 `module_postList` via `page_blog`'s `postList` reference (and, since #1915,
 `page_topic`'s own `postList` reference on `/topics/[slug]`, and since #1964,
 `page_tag`'s own `postList` reference on `/tags/[slug]`), and
-`module_taxonomyList` via `page_topicIndex`'s `taxonomyList` reference, all
+`module_taxonomyList` via `page_topicIndex`'s and `page_tagIndex`'s
+`taxonomyList` references — the one module that also renders through
+`MODULE_MAP`, when placed in `modules[]` — all
 still styled the same way as every other module — no exception — wraps it in `apps/web`'s own
 `Section` component (`apps/web/src/components/shared/section`, relocated
 from `packages/ui`), passing `brandVariant` and `layout` straight through,
