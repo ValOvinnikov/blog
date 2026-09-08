@@ -1,38 +1,43 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
-import {
-  makeTopic,
-  makeTopicWithPostCount,
-} from '@web/testing/shared/topic/fixtures';
+import { makeTopic } from '@web/testing/shared/topic/fixtures';
 import { notFound } from 'next/navigation';
 
 import { TopicPage } from './topic-page';
 
 const {
   getTopicPageMock,
-  getTopicsMock,
+  topicBreadcrumbsMock,
+  topicChipsMock,
   moduleRendererMock,
   postListModuleMock,
   heroSlotMock,
-  getTenantSanityContextMock,
-  getTenantBaseUrlMock,
 } = vi.hoisted(() => ({
   getTopicPageMock: vi.fn(),
-  getTopicsMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
-  getTenantBaseUrlMock: vi.fn(),
+  topicBreadcrumbsMock: vi.fn(
+    ({ slug, tenant }: { slug: string; tenant: string }) => (
+      <div data-testid="topic-breadcrumbs">
+        {slug}:{tenant}
+      </div>
+    ),
+  ),
+  topicChipsMock: vi.fn(
+    ({ activeSlug, tenant }: { activeSlug: string; tenant: string }) => (
+      <div data-testid="topic-chips">
+        {activeSlug}:{tenant}
+      </div>
+    ),
+  ),
   heroSlotMock: vi.fn(({ id }: { id: string }) => (
     <h1 data-testid="hero-slot">{id}</h1>
   )),
-  // `ModuleRenderer`/`PostListModule` are async Server Components — real
+  // `PostListModule`/`ModuleRenderer` are async Server Components — real
   // RSC async-component nesting isn't renderable through
   // `@testing-library/react`'s client renderer. Stubbed as plain sync
-  // components so this suite can assert `TopicPage` passes the right props
-  // through without needing a real async render; their own dispatch logic
-  // is covered by `module-renderer.test.tsx` and
-  // `post-list-module.test.tsx`. `TopicPageView`'s own rendering (h1,
-  // breadcrumbs, JSON-LD, topic chips, composed posts markup) is covered by
-  // `topic-page-view.test.tsx`.
+  // components so this suite can assert `TopicPage` composes them in the
+  // right order with the right props; each part's own behavior is covered
+  // by its own test file (`module-renderer.test.tsx`,
+  // `post-list-module.test.tsx`, `topic-breadcrumbs.test.tsx`,
+  // `topic-chips.test.tsx`).
   moduleRendererMock: vi.fn(
     ({ modules }: { modules: { id: string; type: string }[] }) => (
       <div data-testid="module-renderer-stub">
@@ -57,15 +62,16 @@ const {
   ),
 }));
 
-vi.mock('@blog/service', () => ({
-  service: {
-    pages: {
-      topic: { v1: { getTopicPage: getTopicPageMock } },
-    },
-    entities: {
-      topics: { v1: { getTopics: getTopicsMock } },
-    },
-  },
+vi.mock('@web/server/topic/get-topic-page', () => ({
+  getTopicPage: getTopicPageMock,
+}));
+
+vi.mock('@web/components/features/topic/topic-breadcrumbs', () => ({
+  TopicBreadcrumbs: topicBreadcrumbsMock,
+}));
+
+vi.mock('@web/components/features/topic/topic-chips', () => ({
+  TopicChips: topicChipsMock,
 }));
 
 vi.mock('@web/modules/module-renderer', () => ({
@@ -80,29 +86,6 @@ vi.mock('@web/modules/hero-slot', () => ({
   HeroSlot: heroSlotMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
-
-vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
-  getTenantBaseUrl: getTenantBaseUrlMock,
-}));
-
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: ({
-    href,
-    children,
-    ...rest
-  }: {
-    href: string;
-    children: React.ReactNode;
-  }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
-}));
-
 const topic = makeTopic({
   title: 'News',
   slug: 'news',
@@ -115,29 +98,14 @@ const setup = customRenderAsync(TopicPage, {
   tenant: 'tenant-1',
 });
 
-describe(`<${TopicPage.name}/>`, () => {
+describe(TopicPage, () => {
   beforeEach(() => {
     getTopicPageMock.mockReset();
-    getTopicsMock.mockReset();
+    topicBreadcrumbsMock.mockClear();
+    topicChipsMock.mockClear();
     moduleRendererMock.mockClear();
     postListModuleMock.mockClear();
     heroSlotMock.mockClear();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
-    getTenantBaseUrlMock.mockReset();
-    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
-    getTopicsMock.mockResolvedValue({
-      ok: true,
-      data: [
-        makeTopicWithPostCount({ title: 'News', slug: 'news', postCount: 1 }),
-        makeTopicWithPostCount({
-          id: 'topic-2',
-          title: 'Design',
-          slug: 'design',
-          postCount: 2,
-        }),
-      ],
-    });
   });
 
   it('calls notFound() and logs when the fetch fails', async () => {
@@ -182,6 +150,31 @@ describe(`<${TopicPage.name}/>`, () => {
     ).toBeVisible();
     expect(screen.getByText('The latest updates.')).toBeVisible();
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
+  });
+
+  it('renders the parts in order: breadcrumbs, topic chips, post list, module renderer', async () => {
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        topic,
+        modules: [{ id: 'newsletter-1', type: 'module_newsletter' }],
+        seo: {},
+        postListId: 'post-list-1',
+      },
+    });
+
+    const { container } = await setup();
+
+    const order = Array.from(
+      container.querySelectorAll<HTMLElement>('[data-testid]'),
+    ).map((el) => el.getAttribute('data-testid'));
+
+    expect(order).toEqual([
+      'topic-breadcrumbs',
+      'topic-chips',
+      'post-list-module-stub',
+      'module-renderer-stub',
+    ]);
   });
 
   it('passes the postList id, locale, page, and topic-scoped copy through to PostListModule', async () => {
@@ -284,33 +277,7 @@ describe(`<${TopicPage.name}/>`, () => {
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 
-  it('renders the JSON-LD BreadcrumbList schema script', async () => {
-    getTopicPageMock.mockResolvedValue({
-      ok: true,
-      data: { topic, modules: [], seo: {}, postListId: 'post-list-1' },
-    });
-
-    const { container } = await setup();
-
-    const scripts = container.querySelectorAll(
-      'script[type="application/ld+json"]',
-    );
-    const breadcrumbScript = Array.from(scripts).find((script) =>
-      script.textContent?.includes('"@type":"BreadcrumbList"'),
-    );
-    expect(breadcrumbScript).toBeDefined();
-    expect(breadcrumbScript?.textContent).toContain(
-      '"item":"https://example.com/topics/news"',
-    );
-  });
-
-  it('forwards the resolved tenant Sanity context to getTopicPage and getTopics', async () => {
-    const tenantContext = {
-      projectId: 'tenant-project',
-      dataset: 'production',
-      token: 'tenant-token',
-    };
-    getTenantSanityContextMock.mockResolvedValue(tenantContext);
+  it('forwards the slug and tenant to getTopicPage, TopicBreadcrumbs, and TopicChips', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
       data: { topic, modules: [], seo: {}, postListId: 'post-list-1' },
@@ -318,7 +285,12 @@ describe(`<${TopicPage.name}/>`, () => {
 
     await setup();
 
-    expect(getTopicPageMock).toHaveBeenCalledWith('news', tenantContext);
-    expect(getTopicsMock).toHaveBeenCalledWith(tenantContext);
+    expect(getTopicPageMock).toHaveBeenCalledWith('news', 'tenant-1');
+    expect(screen.getByTestId('topic-breadcrumbs')).toHaveTextContent(
+      'news:tenant-1',
+    );
+    expect(screen.getByTestId('topic-chips')).toHaveTextContent(
+      'news:tenant-1',
+    );
   });
 });

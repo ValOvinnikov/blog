@@ -1,23 +1,13 @@
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { buildTopicMetadata } from './build-topic-metadata';
 
-const { getTopicPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getTopicPageMock } = vi.hoisted(() => ({
   getTopicPageMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
 
-vi.mock('@blog/service', () => ({
-  service: {
-    pages: {
-      topic: { v1: { getTopicPage: getTopicPageMock } },
-    },
-  },
-}));
-
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
+vi.mock('@web/server/topic/get-topic-page', () => ({
+  getTopicPage: getTopicPageMock,
 }));
 
 const seo = makeSeo({
@@ -30,17 +20,10 @@ const seo = makeSeo({
 
 describe('buildTopicMetadata', () => {
   beforeEach(() => {
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getTopicPageMock.mockReset();
   });
 
-  it('forwards the resolved tenant Sanity context to getTopicPage', async () => {
-    const tenant = {
-      projectId: 'tenant-project',
-      dataset: 'production',
-      token: 'tenant-token',
-    };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
+  it('forwards the slug and tenant to getTopicPage — the same cached loader TopicPage reads', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
       data: { topic: {}, modules: [], seo, postListId: 'post-list-1' },
@@ -48,8 +31,7 @@ describe('buildTopicMetadata', () => {
 
     await buildTopicMetadata('engineering', 'tenant-1');
 
-    expect(getTopicPageMock).toHaveBeenCalledWith('engineering', tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
+    expect(getTopicPageMock).toHaveBeenCalledWith('engineering', 'tenant-1');
   });
 
   it('builds page-1 metadata from the resolved seo, self-canonical to /topics/[slug]', async () => {
@@ -66,10 +48,6 @@ describe('buildTopicMetadata', () => {
     expect(metadata.openGraph?.title).toBe('Engineering OG');
     expect(metadata.openGraph?.description).toBe(
       'Posts about building things OG.',
-    );
-    expect(getTopicPageMock).toHaveBeenCalledWith(
-      'engineering',
-      DEFAULT_TENANT_SANITY_CONTEXT,
     );
   });
 
@@ -96,10 +74,6 @@ describe('buildTopicMetadata', () => {
     expect(metadata.openGraph?.title).toBe('Engineering OG – Page 2');
     expect(metadata.alternates?.canonical).toBe('/topics/engineering/page/2');
     expect(metadata.alternates?.canonical).not.toBe('/topics/engineering');
-    expect(getTopicPageMock).toHaveBeenCalledWith(
-      'engineering',
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
   });
 
   it('returns empty metadata for page N when the topic fetch fails', async () => {
