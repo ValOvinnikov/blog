@@ -6,6 +6,7 @@ import { newsletterSchema } from './module-newsletter';
 import { postFeaturedSchema } from './module-post-featured';
 import { postLatestSchema } from './module-post-latest';
 import { postListSchema } from './module-post-list';
+import { postRelatedSchema } from './module-post-related';
 import { taxonomyListSchema } from './module-taxonomy-list';
 
 export const modules = [
@@ -14,6 +15,7 @@ export const modules = [
   postListSchema,
   postLatestSchema,
   postFeaturedSchema,
+  postRelatedSchema,
   taxonomyListSchema,
   contentSchema,
   ctaSchema,

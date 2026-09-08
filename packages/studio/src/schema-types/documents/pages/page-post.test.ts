@@ -1,5 +1,9 @@
 import { postSchema } from '@blog/studio/schema-types/documents/blog/post';
 import { pagePostSchema } from '@blog/studio/schema-types/documents/pages/page-post';
+import { contentSchema } from '@blog/studio/schema-types/modules/module-content';
+import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
+import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
+import { postRelatedSchema } from '@blog/studio/schema-types/modules/module-post-related';
 import type { ValidationContext } from 'sanity';
 
 type TReferenceFieldDefinition = {
@@ -10,33 +14,55 @@ type TReferenceFieldDefinition = {
 
 type TValidationRule = {
   required: () => TValidationRule;
+  min: (value: number) => TValidationRule;
+  max: (value: number) => TValidationRule;
   custom: (fn: unknown) => TValidationRule;
 };
 
 const getField = (name: string) =>
   pagePostSchema.fields?.find((field) => field.name === name);
 
+const createTrackingRule = () => {
+  const calls = {
+    required: false,
+    min: undefined as number | undefined,
+    max: undefined as number | undefined,
+  };
+
+  const rule: TValidationRule = {
+    required: () => {
+      calls.required = true;
+      return rule;
+    },
+    min: (value) => {
+      calls.min = value;
+      return rule;
+    },
+    max: (value) => {
+      calls.max = value;
+      return rule;
+    },
+    custom: () => rule,
+  };
+
+  return { rule, calls };
+};
+
 describe('pagePostSchema shape', () => {
-  it('title is required via the shared titleField() helper', () => {
+  it('title is required, max 120 — the headline, not the generic titleField()', () => {
     const titleFieldDefinition = getField('title');
 
     if (!titleFieldDefinition?.validation) {
       throw new Error('Expected pagePostSchema to define a title field.');
     }
 
-    let requiredCalled = false;
-    const rule: TValidationRule = {
-      required: () => {
-        requiredCalled = true;
-        return rule;
-      },
-      custom: () => rule,
-    };
+    const { rule, calls } = createTrackingRule();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
     (titleFieldDefinition.validation as any)(rule);
 
-    expect(requiredCalled).toBe(true);
+    expect(calls.required).toBe(true);
+    expect(calls.max).toBe(120);
   });
 
   it('publishedAt is a required datetime field', () => {
@@ -49,24 +75,109 @@ describe('pagePostSchema shape', () => {
       );
     }
 
-    let requiredCalled = false;
-    const rule: TValidationRule = {
-      required: () => {
-        requiredCalled = true;
-        return rule;
-      },
-      custom: () => rule,
-    };
+    const { rule, calls } = createTrackingRule();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
     (publishedAtField.validation as any)(rule);
 
-    expect(requiredCalled).toBe(true);
+    expect(calls.required).toBe(true);
   });
 
-  it('has no postList or modules slot', () => {
+  it('excerpt is required, min 50, max 300', () => {
+    const excerptField = getField('excerpt');
+
+    if (!excerptField?.validation) {
+      throw new Error('Expected pagePostSchema to define an excerpt field.');
+    }
+
+    const { rule, calls } = createTrackingRule();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (excerptField.validation as any)(rule);
+
+    expect(calls.required).toBe(true);
+    expect(calls.min).toBe(50);
+    expect(calls.max).toBe(300);
+  });
+
+  it('heroImage stays optional — no validation() builder attached', () => {
+    expect(getField('heroImage')?.validation).toBeUndefined();
+  });
+
+  it('author is a required reference', () => {
+    const authorField = getField('author') as
+      TReferenceFieldDefinition | undefined;
+
+    if (!authorField?.validation) {
+      throw new Error('Expected pagePostSchema to define an author field.');
+    }
+
+    const { rule, calls } = createTrackingRule();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (authorField.validation as any)(rule);
+
+    expect(calls.required).toBe(true);
+  });
+
+  it('topic is a required reference', () => {
+    const topicField = getField('topic') as
+      TReferenceFieldDefinition | undefined;
+
+    if (!topicField?.validation) {
+      throw new Error('Expected pagePostSchema to define a topic field.');
+    }
+
+    const { rule, calls } = createTrackingRule();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (topicField.validation as any)(rule);
+
+    expect(calls.required).toBe(true);
+  });
+
+  it('tags caps at 6 and is optional', () => {
+    const tagsField = getField('tags');
+
+    if (!tagsField?.validation) {
+      throw new Error('Expected pagePostSchema to define a tags field.');
+    }
+
+    const { rule, calls } = createTrackingRule();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (tagsField.validation as any)(rule);
+
+    expect(calls.required).toBe(false);
+    expect(calls.max).toBe(6);
+  });
+
+  it('body is a required richText field', () => {
+    const bodyField = getField('body');
+
+    if (!bodyField?.validation) {
+      throw new Error('Expected pagePostSchema to define a body field.');
+    }
+
+    const { rule, calls } = createTrackingRule();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (bodyField.validation as any)(rule);
+
+    expect(calls.required).toBe(true);
+  });
+
+  it('featured and skim stay optional — no validation() builder attached', () => {
+    expect(getField('featured')?.validation).toBeUndefined();
+    expect(getField('skim')?.validation).toBeUndefined();
+  });
+
+  it('has no newsletterEnabled field — the newsletter module in modules[] is the toggle', () => {
+    expect(getField('newsletterEnabled')).toBeUndefined();
+  });
+
+  it('has no postList slot', () => {
     expect(getField('postList')).toBeUndefined();
-    expect(getField('modules')).toBeUndefined();
   });
 
   it('seo stays optional — no validation() builder attached', () => {
@@ -109,19 +220,12 @@ describe('pagePostSchema slug field', () => {
       );
     }
 
-    let requiredCalled = false;
-    const rule: TValidationRule = {
-      required: () => {
-        requiredCalled = true;
-        return rule;
-      },
-      custom: () => rule,
-    };
+    const { rule, calls } = createTrackingRule();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
     (slugField.validation as any)(rule);
 
-    expect(requiredCalled).toBe(true);
+    expect(calls.required).toBe(true);
   });
 
   it('relies on the default per-document-type isUnique scope rather than overriding it', () => {
@@ -158,7 +262,7 @@ describe('pagePostSchema post field', () => {
     ]);
   });
 
-  it('is required', () => {
+  it('is optional — no required() in the validation chain', () => {
     const postField = getPostField();
 
     if (!postField?.validation) {
@@ -167,19 +271,36 @@ describe('pagePostSchema post field', () => {
       );
     }
 
-    let requiredCalled = false;
-    const rule: TValidationRule = {
-      required: () => {
-        requiredCalled = true;
-        return rule;
-      },
-      custom: () => rule,
-    };
+    const { rule, calls } = createTrackingRule();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
     (postField.validation as any)(rule);
 
-    expect(requiredCalled).toBe(true);
+    expect(calls.required).toBe(false);
+  });
+});
+
+describe('pagePostSchema modules field', () => {
+  const getModulesField = () =>
+    getField('modules') as
+      | { type: 'array'; of?: Array<{ to?: Array<{ type: string }> }> }
+      | undefined;
+
+  it('allows postRelated, newsletter, cta and content modules', () => {
+    const modulesField = getModulesField();
+
+    if (!modulesField || modulesField.type !== 'array') {
+      throw new Error('Expected pagePostSchema to define a modules field.');
+    }
+
+    const allowedTypes = modulesField.of?.map((member) => member.to?.[0]?.type);
+
+    expect(allowedTypes).toEqual([
+      postRelatedSchema.name,
+      newsletterSchema.name,
+      ctaSchema.name,
+      contentSchema.name,
+    ]);
   });
 });
 
@@ -302,5 +423,43 @@ describe('validateUniquePostReference', () => {
     await validate({ _ref: 'post-1' }, context);
 
     expect(withConfigCalls).toEqual([{ perspective: 'drafts' }]);
+  });
+});
+
+describe('pagePostSchema preview', () => {
+  it('shows title and author, matching blog/post.ts', () => {
+    const prepare = pagePostSchema.preview?.prepare;
+
+    if (!prepare) {
+      throw new Error('Expected pagePostSchema to define preview.prepare.');
+    }
+
+    expect(
+      prepare({
+        title: 'Understanding GROQ',
+        author: 'Jane Doe',
+        media: undefined,
+      }),
+    ).toEqual({
+      title: 'Understanding GROQ',
+      subtitle: 'by Jane Doe',
+      media: undefined,
+    });
+  });
+
+  it('falls back to "Unknown" title and an empty subtitle', () => {
+    const prepare = pagePostSchema.preview?.prepare;
+
+    if (!prepare) {
+      throw new Error('Expected pagePostSchema to define preview.prepare.');
+    }
+
+    expect(
+      prepare({ title: undefined, author: undefined, media: undefined }),
+    ).toEqual({
+      title: 'Unknown',
+      subtitle: '',
+      media: undefined,
+    });
   });
 });
