@@ -119,18 +119,6 @@ describe('resolveTenantMessages', () => {
     );
   });
 
-  it('applies a MULTILINE override at its registry path', async () => {
-    getSiteConfigMock.mockResolvedValue(
-      siteConfigRow({ authMenuRedirectHint: 'Redirecting you shortly…' }),
-    );
-
-    const { messages } = await resolveTenantMessages(SITE_MESSAGES);
-
-    expect(getAtPath(messages, ['authMenu', 'redirectHint'])).toBe(
-      'Redirecting you shortly…',
-    );
-  });
-
   it('ignores an override key absent from the VOICE_FIELDS registry rather than throwing', async () => {
     getSiteConfigMock.mockResolvedValue(
       siteConfigRow({ notARealVoiceField: 'ignored' }),

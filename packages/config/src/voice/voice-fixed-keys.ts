@@ -3,9 +3,10 @@
  * grouped by why: accessibility-only text, generic toast/operation feedback,
  * counters carrying ICU plural syntax, metadata with no visible counterpart,
  * archive/breadcrumb labels derived from Studio content, a taxonomy label
- * tied to a Sanity-modelled enum, and fixed operational newsletter copy. The
- * coverage test fails if a catalog key is on neither this list nor
- * `VOICE_FIELDS`, so a new string can't be added without deciding which.
+ * tied to a Sanity-modelled enum, fixed operational newsletter copy, and
+ * fixed sign-in interface mechanics. The coverage test fails if a catalog
+ * key is on neither this list nor `VOICE_FIELDS`, so a new string can't be
+ * added without deciding which.
  */
 export const VOICE_FIXED_KEYS = [
   // Accessibility-only: an aria-label, aria-live announcement, or visually
@@ -113,4 +114,24 @@ export const VOICE_FIXED_KEYS = [
   'newsletterUnsubscribe.invalidTitle',
   'newsletterUnsubscribe.invalidMessage',
   'newsletterUnsubscribe.returnHome',
+
+  // Sign-in interface mechanics — auth prompts, OAuth/magic-link flow
+  // states, and account controls, identical for every tenant.
+  'authMenu.signIn',
+  'authMenu.signInHeading',
+  'authMenu.accountHeading',
+  'authMenu.chooseProviderPrompt',
+  'authMenu.continueWithGithub',
+  'authMenu.continueWithGoogle',
+  'authMenu.continueWithEmail',
+  'authMenu.redirectHint',
+  'authMenu.emailPlaceholder',
+  'authMenu.sendLink',
+  'authMenu.sending',
+  'authMenu.checkYourInbox',
+  'authMenu.emailError',
+  'authMenu.oauthError',
+  'authMenu.signOut',
+  'authMenu.myBookmarks',
+  'authMenu.accountSettings',
 ] as const;
