@@ -1381,6 +1381,197 @@ with fewer than four posts warns in the Studio.
 - `displayMode` on `module_taxonomyList`, `module_postList` or the
   portfolio modules.
 
+## Topic cards list their latest posts
+
+**Goal:** every card in `module_taxonomyList` shows its term's two newest
+post titles, linked, under the description — so a topic block on a home
+page is a contents page rather than a second row of pictureless post
+cards, and the Topics and Tags pages, which are contents pages too, get the
+same treatment. One editor toggle on the module, on by default; one slot on
+the card; two extra titles per term inside the query that already runs.
+Design of record for epic #2891, settled in #2892.
+
+Interactive mock of the list on the home and Topics pages, both kinds,
+the Studio toggle, the card anatomy and every state:
+<https://claude.ai/code/artifact/7704e96d-ce14-479e-affd-d3d305e9b3e8>.
+
+### Fields
+
+One field, added to `module_taxonomyList` right after `limit`:
+
+| Field             | Type                                   | Notes                                                                                                                                   |
+| ----------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `showLatestPosts` | boolean, `initialValue: true`, no rule | "Lists each term's two newest posts under its description, as links. A term with no posts shows only its title, description and count." |
+
+**A toggle, on by default, defaulted at read time.** The epic's leaning
+holds: the contents look is what every placement wants — the three seeded
+index-page modules included — so it must apply to documents that predate
+the field, which `initialValue` alone never does. The projection reads
+`coalesce(showLatestPosts, true)`, the `showImages` pattern, and no
+migration runs. The toggle exists for the editor who wants a plain menu
+row (a landing page whose topics are navigation, not reading), and it
+costs one boolean. Always-on was the alternative and would have saved the
+studio layer; it was rejected because the placement was designed to sit
+anywhere in `modules[]`, and not every placement is a contents page.
+
+**Two posts, fixed, newest first.** Not authored: a third line makes the
+card taller than the post cards beside it on a home page, and the count
+already says how much more there is. Order is `publishedAt desc` under the
+published-post filter, so a scheduled post is excluded until its date, the
+way the count already excludes it. Nothing hides a term with no posts —
+its card renders exactly as today.
+
+### Validation
+
+None new. The field is optional and has no interaction with `taxonomy`,
+`sortOrder` or `limit`.
+
+### Service
+
+The two posts join each term inside the existing merged query — no second
+call — and the view model carries the flag:
+
+```groq
+*[_type == "module_taxonomyList" && _id == $id][0]{
+  …,
+  "showLatestPosts": coalesce(showLatestPosts, true),
+  "entries": select(
+    coalesce(taxonomy, $fallbackTaxonomy) == "TOPICS" => *[_type == "blog_topic"] | order(title asc){
+      topicFragment,
+      postCount,
+      "latestPosts": *[_type == "blog_post" && references(^._id) && publishedAt <= now()]
+        | order(publishedAt desc)[0...2]{ postLinkFragment }
+    },
+    coalesce(taxonomy, $fallbackTaxonomy) == "TAGS" => *[_type == "blog_tag"] | order(title asc){ tagFragment, postCount, "latestPosts": … }
+  )
+}
+```
+
+- **The module query stops importing the entity queries.** `topicsQuery`
+  feeds `topics.v1`, which `apps/web` already reads elsewhere (the topic
+  and blog-list pages), and `tagsQuery` is kept parallel to it; adding
+  `latestPosts` to them would widen a view model for two links only this
+  module wants. The module query builds
+  its own two term projections instead, and the `postCount` expression the
+  three queries would now share (`count(*[_type == "blog_post" &&
+references(^._id) && publishedAt <= now()])`) moves into one shared
+  helper so it is written once.
+- **`postLinkFragment`** is new in `shared/fragments/` — `id`, `title`,
+  `slug` — the lightest thing a post link needs. `postCardFragment` carries
+  excerpt, image, author and reading-time fields the card would throw
+  away.
+- **The service always projects the posts and exposes the flag**, as it
+  does for `showImages`: two titles per term is not a cost worth a
+  conditional projection, and the web layer branches in one place.
+- **Cache tags** are unchanged: the loader already carries `posts`
+  alongside `topics` / `tags`, because the counts depended on posts before
+  the titles did.
+
+```ts
+type TPostLink = { id: string; title: string; slug: string };
+
+type TTaxonomyEntry = TTopicWithPostCount | TTagWithPostCount; // each gains latestPosts: TPostLink[]
+
+type TTaxonomyListModule = {
+  …existing fields;
+  showLatestPosts: boolean;
+  entries: TTaxonomyEntry[];
+};
+```
+
+### `@blog/ui` — a slot on `TaxonomyCard`
+
+**`TaxonomyCard` gains a `TaxonomyCard.Posts` compound slot** — its first,
+resolved with `mapCompoundSlots` the way `PostCard`'s are. The card's own
+`linkAs` applies to the slot's links, so the web layer passes it once.
+
+| Prop                                                   | Effect                                                                                                                                          |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `posts: { id: string; title: string; href: string }[]` | Rendered as a `<ul>` between the description and the count, one link per post, each title on one truncated line. An empty array renders nothing |
+| `ariaLabel: string`                                    | Names the list ("Latest in Design"); a prop, never hardcoded                                                                                    |
+
+**The post links must stay clickable over the card's stretched link.** The
+title link's `before:absolute before:inset-0` pseudo-element covers the
+card; the post links are `relative` and come later in the DOM, so they
+paint above it. That is the one rule the slot's test asserts beyond
+rendering: a click on a post link reaches the post, not the term.
+
+**The count stays the last line.** With the list slotted between
+description and count, a card with no posts is pixel-identical to today's,
+and the list adds height only where there is something to read. The
+heading level, the accessible name (`title, N posts`), the hover tint and
+the focus-within tint are unchanged; the post links take their own
+`focus-visible` ring. No lead or double cell: the most-posts sort already
+ranks, and a bigger cell would say the same thing twice.
+
+### Web
+
+`TaxonomyListModule` reads `showLatestPosts` off the view model and maps
+each entry's `latestPosts` to `{ id, title, href: routes.post(slug) }`, the
+href the post cards use. `ITaxonomyListModuleItem` gains `posts` and
+`latestPostsLabel`; the view renders the slot when the flag is on and the
+array is non-empty, and omits it otherwise. The index pages change by
+construction — `TopicsPage` and `TagsPage` render this same module through
+their slot, and their seeded modules carry no `showLatestPosts`, which
+coalesces to on.
+
+Copy: `latestPostsLabel` = "Latest in {name}" under both
+`taxonomyListModule.topics` and `taxonomyListModule.tags`, the way
+`postsCount` already is, because the module reads a namespace-scoped `t()`;
+both are fixed keys, read only as the list's `aria-label` — the
+accessibility-only bucket of `VOICE_FIXED_KEYS`, not tenant-editable
+fields. Nothing on the
+card itself needs new words.
+
+### Pages and desk
+
+None. The module's allow-lists, desk entry and page-level rules are as
+1.5 left them.
+
+### Migration
+
+None — one optional boolean, defaulted at read time; the three seed
+migrations keep creating index-page modules without it.
+
+### Per-layer scope and PRs
+
+- **studio** — `showLatestPosts` on `module_taxonomyList` after `limit`;
+  schema test for its presence, position and initial value; `pnpm typegen`.
+- **service** — the shared `postCount` helper; `postLinkFragment`; the
+  module's own term projections with `latestPosts`; `showLatestPosts` in
+  the view model; transformer tests for two, one and zero posts, the
+  newest-first order, and the read-time default of the flag.
+- **ui** — `TaxonomyCard.Posts`; stories for two posts, one post, none and
+  a grid; tests that the slot renders the list with its label, that an
+  empty array renders nothing, and that a post link is clickable above the
+  card link; `COMPONENTS.md`.
+- **web** — the mapping and the `posts` / `latestPostsLabel` item fields,
+  the flag branch in the view, the copy key; tests for on, off and empty;
+  the module story gains posts.
+
+Four PRs, each green on `main` alone: **studio** (one optional field and
+typegen), then **service** (a raw coalesce and a new fragment; the entity
+loaders keep their shape), **ui** independently (additive slot), and
+**web** last.
+
+**Acceptance:** a topic card on the home, landing and Topics pages lists
+its two newest published posts as links, newest first; a tag card does
+the same on the Tags page; a term with no posts shows title, description
+and count only; a scheduled post is not listed; the toggle off renders
+today's card; a post link reaches the post; every existing module renders
+the lists without a migration.
+
+### Not in scope
+
+- Tags as a cloud of pills (option C in the 1.5 mock) — still a different
+  molecule, still unasked for.
+- More than two posts, or an authored count. Two is the design; the count
+  and the term's own page carry the rest.
+- Post dates or excerpts on the card. Titles are the contents page; the
+  term page is where the posts are read about.
+- Hiding zero-post terms. They sort last under most-posts and fall off
+  under `limit`; on the index pages they stay, as they do today.
+
 ## Contact form / lead capture
 
 **Goal:** the module clients most want — and the only one in the catalogue
@@ -1590,6 +1781,15 @@ point; the graph stays acyclic.
   and are disabled exactly when Embla cannot move; a spotlight in carousel
   mode drops its lead treatment; four PRs, ui first (2026-09-08, #2835).
 
+- **Topic cards list their two newest posts, behind a `showLatestPosts`
+  toggle that is on by default and defaulted at read time** — the titles
+  join each term inside the merged taxonomy-list query through a new
+  `postLinkFragment`, the module query stops sharing the entity queries so
+  `topics.v1` / `tags.v1` keep their shape, `TaxonomyCard` gains a
+  `TaxonomyCard.Posts` slot whose links sit above the card's stretched link,
+  the count stays the card's last line, the index pages get the lists by
+  construction, and it ships as four per-layer PRs (2026-09-08, #2892).
+
 ## Non-goals (recorded so #1919 doesn't sprawl)
 
 - A leads/CRM management UI — store + notify only.
@@ -1615,7 +1815,7 @@ ui → web`); the featured spotlight (#2784) and carousel (#2785) wait on it.
 - **Placeable taxonomy list** — epic #2787 (design #2841, then `config →
 studio → service → web` in a single PR; no ui work).
 - **Topic cards list their latest posts** — epic #2891 (design #2892, then
-  `service → ui → web`, studio only if a toggle is settled); waits on #2787.
+  `studio → service → ui → web`, one PR per layer, ui independent).
 - **`module_heroBlog`** — epic #2780 (design #2802, then `studio → service →
 ui → web → db`), plus the retirement chore #2813 once production is moved.
 - **Hero family & generic home page** — epic #2778 under `M9 — Portfolio`
@@ -1638,6 +1838,11 @@ catalogue has enough shipped history to matter).
 
 ## Resync log
 
+- **2026-09-08** — added the "Topic cards list their latest posts" design
+  section (#2892): the `showLatestPosts` toggle defaulted at read time, two
+  fixed newest-first posts per term inside the merged query via a new
+  `postLinkFragment`, the `TaxonomyCard.Posts` slot, the index pages by
+  construction, and the four-PR split.
 - **2026-09-08** — added "The carousel display mode" design section (#2835):
   one `displayMode` field defaulted at read time, the pure `Carousel`
   organism with an `isEnhanced` boundary, the `PostsSection.Carousel` slot,
