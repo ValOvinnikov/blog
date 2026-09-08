@@ -26,6 +26,8 @@ const { SYNTHETIC_MULTILINE_FIELD_ID, SYNTHETIC_MULTILINE_FIELD_MAX } =
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
+// VOICE_FIELDS has no MULTILINE member, so validateTextField's line-break
+// branch for non-TEXT fields is only reachable via a synthetic entry here.
 vi.mock('@blog/config', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@blog/config')>();
   return {
