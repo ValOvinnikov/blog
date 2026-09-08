@@ -1,13 +1,13 @@
-import { createGenericPageService } from './service';
+import { createLandingPageService } from './service';
 
-describe('createGenericPageService', () => {
+describe('createLandingPageService', () => {
   it('exposes v1.getPage as a function', () => {
-    const svc = createGenericPageService();
+    const svc = createLandingPageService();
     expect(typeof svc.v1.getPage).toBe('function');
   });
 
   it('exposes v1.getPageSlugs as a function', () => {
-    const svc = createGenericPageService();
+    const svc = createLandingPageService();
     expect(typeof svc.v1.getPageSlugs).toBe('function');
   });
 });

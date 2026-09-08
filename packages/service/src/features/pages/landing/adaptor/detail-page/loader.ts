@@ -6,21 +6,21 @@ import {
   type TTenantSanityContext,
 } from '@blog/service/sanity/query';
 
-import { genericPageQuery } from './query';
-import { toGenericPage } from './transformer';
-import type { TGenericPage } from './types';
+import { landingPageQuery } from './query';
+import { toLandingPage } from './transformer';
+import type { TLandingPage } from './types';
 
 export async function getPage(
   slug: string,
   tenant: TTenantSanityContext,
-): Promise<TMaybeUndefined<TGenericPage>> {
-  const raw = await runQuery(genericPageQuery, {
+): Promise<TMaybeUndefined<TLandingPage>> {
+  const raw = await runQuery(landingPageQuery, {
     parameters: { slug },
     tenant,
-    ...isr('page_generic', tenant.projectId),
+    ...isr('page_landing', tenant.projectId),
   });
   if (!raw) return undefined;
 
   const settings = await getSiteSettings(tenant);
-  return toGenericPage(raw, settings, tenant);
+  return toLandingPage(raw, settings, tenant);
 }

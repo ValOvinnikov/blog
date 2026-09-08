@@ -1,6 +1,6 @@
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawGenericPage } from '@blog/service/testing/pages/fixtures';
+import { makeRawLandingPage } from '@blog/service/testing/pages/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getPage } from './loader';
@@ -19,13 +19,13 @@ vi.mock('@blog/service/sanity/image', () => ({
 const tenant = makeTenant();
 
 describe('getPage', () => {
-  it('maps the thin page_generic document to module refs', async () => {
+  it('maps the thin page_landing document to module refs', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawGenericPage())
+      .mockResolvedValueOnce(makeRawLandingPage())
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const page = await getPage('about', tenant);
-    if (!page) throw new Error('expected a generic page');
+    if (!page) throw new Error('expected a landing page');
 
     expect(page.title).toBe('About');
     expect(page.slug).toBe('about');
@@ -35,33 +35,33 @@ describe('getPage', () => {
     ]);
   });
 
-  it('leaves hero undefined when page_generic.hero is unset', async () => {
+  it('leaves hero undefined when page_landing.hero is unset', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawGenericPage({ hero: null }))
+      .mockResolvedValueOnce(makeRawLandingPage({ hero: null }))
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const page = await getPage('about', tenant);
-    if (!page) throw new Error('expected a generic page');
+    if (!page) throw new Error('expected a landing page');
 
     expect(page.hero).toBeUndefined();
   });
 
-  it('maps a set page_generic.hero to a hero slot', async () => {
+  it('maps a set page_landing.hero to a hero slot', async () => {
     mockRun
       .mockResolvedValueOnce(
-        makeRawGenericPage({ hero: { _id: 'hero-1', _type: 'module_hero' } }),
+        makeRawLandingPage({ hero: { _id: 'hero-1', _type: 'module_hero' } }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const page = await getPage('about', tenant);
-    if (!page) throw new Error('expected a generic page');
+    if (!page) throw new Error('expected a landing page');
 
     expect(page.hero).toEqual({ id: 'hero-1', type: 'module_hero' });
   });
 
-  it('rejects when page_generic.hero resolves to a non-hero module type', async () => {
+  it('rejects when page_landing.hero resolves to a non-hero module type', async () => {
     mockRun.mockResolvedValueOnce(
-      makeRawGenericPage({
+      makeRawLandingPage({
         hero: { _id: 'cta-1', _type: 'module_cta' as never },
       }),
     );
@@ -71,7 +71,7 @@ describe('getPage', () => {
 
   it('resolves seo from the page title and site settings when the page has no authored seo', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawGenericPage({ seo: null }))
+      .mockResolvedValueOnce(makeRawLandingPage({ seo: null }))
       .mockResolvedValueOnce(
         makeRawSiteSettings({
           description: 'Settings description',
@@ -79,7 +79,7 @@ describe('getPage', () => {
       );
 
     const page = await getPage('about', tenant);
-    if (!page) throw new Error('expected a generic page');
+    if (!page) throw new Error('expected a landing page');
 
     expect(page.seo.title).toBe('About');
     expect(page.seo.description).toBe('Settings description');
@@ -89,7 +89,7 @@ describe('getPage', () => {
   it('lets authored seo override the resolved defaults', async () => {
     mockRun
       .mockResolvedValueOnce(
-        makeRawGenericPage({
+        makeRawLandingPage({
           seo: {
             metaTitle: 'About Us',
             metaDescription: null,
@@ -100,13 +100,13 @@ describe('getPage', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const page = await getPage('about', tenant);
-    if (!page) throw new Error('expected a generic page');
+    if (!page) throw new Error('expected a landing page');
 
     expect(page.seo.title).toBe('About Us');
     expect(page.seo.ogTitle).toBe('About Us');
   });
 
-  it('resolves undefined, rather than rejecting, when no page_generic matches the slug', async () => {
+  it('resolves undefined, rather than rejecting, when no page_landing matches the slug', async () => {
     mockRun.mockResolvedValueOnce(null);
 
     const page = await getPage('missing', tenant);
@@ -114,7 +114,7 @@ describe('getPage', () => {
     expect(page).toBeUndefined();
   });
 
-  it('does not fetch site settings when no page_generic matches the slug', async () => {
+  it('does not fetch site settings when no page_landing matches the slug', async () => {
     mockRun.mockResolvedValueOnce(null);
 
     await getPage('missing', tenant);
@@ -124,7 +124,7 @@ describe('getPage', () => {
 
   it('threads tenant context into both queries and scopes their tags to it', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawGenericPage())
+      .mockResolvedValueOnce(makeRawLandingPage())
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     await getPage('about', tenant);
@@ -134,7 +134,7 @@ describe('getPage', () => {
       expect.anything(),
       expect.objectContaining({
         tenant,
-        next: expect.objectContaining({ tags: ['t:tenant-a:page_generic'] }),
+        next: expect.objectContaining({ tags: ['t:tenant-a:page_landing'] }),
       }),
     );
     expect(mockRun).toHaveBeenNthCalledWith(

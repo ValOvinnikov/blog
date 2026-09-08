@@ -7,24 +7,24 @@ import {
 } from '@blog/service/shared/transformers/to-module';
 import type { InferResultType } from 'groqd';
 
-import type { genericPageQuery } from './query';
-import type { TGenericPage } from './types';
+import type { landingPageQuery } from './query';
+import type { TLandingPage } from './types';
 
-export type TRawGenericPage = NonNullable<
-  InferResultType<typeof genericPageQuery>
+export type TRawLandingPage = NonNullable<
+  InferResultType<typeof landingPageQuery>
 >;
 
-export function toGenericPage(
-  raw: TRawGenericPage,
+export function toLandingPage(
+  raw: TRawLandingPage,
   settings: TSiteSettings,
   tenant: TImageTenant,
-): TGenericPage {
+): TLandingPage {
   return {
     title: raw.title,
     slug: raw.slug,
     hero: raw.hero ? toHeroSlot(raw.hero) : undefined,
     modules: (raw.modules ?? []).map(toModule),
-    // The page_generic schema has no excerpt/summary or image field, so the
+    // The page_landing schema has no excerpt/summary or image field, so the
     // content-derived tier only supplies a title; description/image fall
     // through to the site defaults.
     seo: resolveSeo(

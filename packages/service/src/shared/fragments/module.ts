@@ -3,7 +3,7 @@ import { q } from '@blog/service/sanity/query';
 
 /**
  * Projects a dereferenced module reference down to its identity (`_id`/`_type`).
- * page_home's `modules[]` (postLatest|cta|newsletter), page_generic's
+ * page_home's `modules[]` (postLatest|cta|newsletter), page_landing's
  * `modules[]` (content|cta), and page_blog's `modules[]` (cta|newsletter)
  * each deref to a different document-type union, so this is built against a
  * synthetic input via `q.fragment` rather than a single module type — it

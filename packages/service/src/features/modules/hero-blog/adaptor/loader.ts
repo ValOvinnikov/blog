@@ -26,7 +26,7 @@ export async function getHeroBlog(
         'author',
         'topic',
         'post',
-        'page_generic',
+        'page_landing',
         'page_blog',
       ],
       tenant.projectId,

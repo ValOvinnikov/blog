@@ -4,13 +4,13 @@ import {
   type TTenantSanityContext,
 } from '@blog/service/sanity/query';
 
-import { genericPageParamsQuery } from './query';
+import { landingPageParamsQuery } from './query';
 
 export async function getPageSlugs(
   tenant: TTenantSanityContext,
 ): Promise<{ slug: string }[]> {
-  return runQuery(genericPageParamsQuery, {
+  return runQuery(landingPageParamsQuery, {
     tenant,
-    ...isr('page_generic', tenant.projectId),
+    ...isr('page_landing', tenant.projectId),
   });
 }

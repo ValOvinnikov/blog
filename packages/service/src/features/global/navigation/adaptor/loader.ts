@@ -10,7 +10,7 @@ import type { TNavigation } from './types';
 
 // `navigationQuery` projects `items[]` through `linkFragment`, whose
 // `internalReference` can resolve to `blog_post`/`blog_topic`/
-// `page_generic`/`page_blog` — every one of those types' tags must be
+// `page_landing`/`page_blog` — every one of those types' tags must be
 // included (tag-scope contract, `sanity/query.ts`).
 export async function getNavigation(
   tenant: TTenantSanityContext,
@@ -18,7 +18,7 @@ export async function getNavigation(
   const raw = await runQuery(navigationQuery, {
     tenant,
     ...isr(
-      ['navigation', 'post', 'topic', 'page_generic', 'page_blog'],
+      ['navigation', 'post', 'topic', 'page_landing', 'page_blog'],
       tenant.projectId,
     ),
   });

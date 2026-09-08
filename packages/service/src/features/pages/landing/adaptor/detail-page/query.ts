@@ -2,9 +2,9 @@ import { q, type TSlugParams } from '@blog/service/sanity/query';
 import { moduleFragment } from '@blog/service/shared/fragments/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo';
 
-export const genericPageQuery = q
+export const landingPageQuery = q
   .parameters<TSlugParams>()
-  .star.filterByType('page_generic')
+  .star.filterByType('page_landing')
   .filterBy('slug.current == $slug')
   .slice(0)
   .project((sub) => ({
@@ -18,6 +18,6 @@ export const genericPageQuery = q
       .nullable(true),
     seo: sub.field('seo').project(seoFragment).nullable(true),
   }))
-  // Nullable, not `.notNull()`: no matching `page_generic` is an ordinary
+  // Nullable, not `.notNull()`: no matching `page_landing` is an ordinary
   // not-found, not a parse failure — the loader turns `null` into `undefined`.
   .nullable(true);

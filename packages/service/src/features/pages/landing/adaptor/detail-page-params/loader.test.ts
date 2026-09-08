@@ -11,7 +11,7 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
 const tenant = makeTenant();
 
 describe('getPageSlugs', () => {
-  it('returns all page_generic slug entries', async () => {
+  it('returns all page_landing slug entries', async () => {
     mockRun.mockResolvedValue([{ slug: 'about' }, { slug: 'contact' }]);
 
     const params = await getPageSlugs(tenant);
@@ -19,7 +19,7 @@ describe('getPageSlugs', () => {
     expect(params).toEqual([{ slug: 'about' }, { slug: 'contact' }]);
   });
 
-  it('returns an empty array when no generic pages exist', async () => {
+  it('returns an empty array when no landing pages exist', async () => {
     mockRun.mockResolvedValue([]);
 
     const params = await getPageSlugs(tenant);
@@ -36,7 +36,7 @@ describe('getPageSlugs', () => {
       expect.anything(),
       expect.objectContaining({
         tenant,
-        next: expect.objectContaining({ tags: ['t:tenant-a:page_generic'] }),
+        next: expect.objectContaining({ tags: ['t:tenant-a:page_landing'] }),
       }),
     );
   });

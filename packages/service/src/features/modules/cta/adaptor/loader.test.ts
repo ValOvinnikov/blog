@@ -47,7 +47,7 @@ describe('getCta', () => {
             't:tenant-a:module:cta-1',
             't:tenant-a:post',
             't:tenant-a:topic',
-            't:tenant-a:page_generic',
+            't:tenant-a:page_landing',
             't:tenant-a:page_blog',
           ],
         }),

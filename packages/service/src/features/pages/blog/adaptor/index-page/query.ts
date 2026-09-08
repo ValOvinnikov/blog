@@ -17,7 +17,7 @@ export const blogPageQuery = q.star
       }))
       .nullable(true),
     // Page-builder placement (`cta`/`newsletter`), mirroring
-    // `page_home`/`page_generic`'s own thin `modules[]` ref projection —
+    // `page_home`/`page_landing`'s own thin `modules[]` ref projection —
     // resolved to a real component by `ModuleRenderer` (`apps/web`).
     modules: sub
       .field('modules[]')
