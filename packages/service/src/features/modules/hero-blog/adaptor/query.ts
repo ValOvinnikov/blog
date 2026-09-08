@@ -1,4 +1,4 @@
-import { HERO_POST_SOURCE } from '@blog/config';
+import { POST_SOURCE } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
 import { ctaActionFragment } from '@blog/service/shared/fragments/action-group';
@@ -27,7 +27,7 @@ export const heroBlogModuleQuery = q
     post: sub
       .select(
         {
-          [`postSource == "${HERO_POST_SOURCE.PINNED}"`]: sub
+          [`postSource == "${POST_SOURCE.PINNED}"`]: sub
             .field('post')
             .deref()
             .project(postCardFragment)
