@@ -175,4 +175,72 @@ describe(`<${PostCard.name}/>`, () => {
     renderElement(<PostCard dataTestId="post-card" />);
     expect(screen.getByTestId('post-card')).toBeVisible();
   });
+
+  it('applies the split layout class to the root when isSplit is set', () => {
+    renderElement(<PostCard isSplit={true} dataTestId="post-card" />);
+    expect(screen.getByTestId('post-card')).toHaveClass('md:flex-row');
+  });
+
+  it('does not apply the split layout class when isSplit is unset', () => {
+    renderElement(<PostCard dataTestId="post-card" />);
+    expect(screen.getByTestId('post-card')).not.toHaveClass('md:flex-row');
+  });
+
+  it('clamps the excerpt to three lines when isLead is set', () => {
+    renderElement(<PostCard isLead={true} excerpt="A short summary." />);
+    expect(screen.getByText('A short summary.')).toHaveClass('line-clamp-3');
+  });
+
+  it('clamps the excerpt to two lines when isLead is unset', () => {
+    renderElement(<PostCard excerpt="A short summary." />);
+    expect(screen.getByText('A short summary.')).toHaveClass('line-clamp-2');
+  });
+
+  it('renders the title at display size when isLead is set', () => {
+    renderElement(
+      <PostCard isLead={true}>
+        <PostCard.Title level={3}>
+          <a href="/posts/hello-world">Hello World</a>
+        </PostCard.Title>
+      </PostCard>,
+    );
+    expect(screen.getByRole('heading', { level: 3 })).toHaveClass(
+      'text-post-title',
+    );
+  });
+
+  it('renders the title at card size when isLead is unset', () => {
+    renderElement(
+      <PostCard>
+        <PostCard.Title level={3}>
+          <a href="/posts/hello-world">Hello World</a>
+        </PostCard.Title>
+      </PostCard>,
+    );
+    expect(screen.getByRole('heading', { level: 3 })).toHaveClass(
+      'text-card-title',
+    );
+  });
+
+  it('renders a taller media frame when isLead is set', () => {
+    renderElement(
+      <PostCard isLead={true}>
+        <PostCard.Media dataTestId="post-card-media">
+          <img src="/cover.jpg" alt="Cover photo" />
+        </PostCard.Media>
+      </PostCard>,
+    );
+    expect(screen.getByTestId('post-card-media')).toHaveClass('aspect-[4/3]');
+  });
+
+  it('renders the default media frame when isLead is unset', () => {
+    renderElement(
+      <PostCard>
+        <PostCard.Media dataTestId="post-card-media">
+          <img src="/cover.jpg" alt="Cover photo" />
+        </PostCard.Media>
+      </PostCard>,
+    );
+    expect(screen.getByTestId('post-card-media')).toHaveClass('aspect-video');
+  });
 });

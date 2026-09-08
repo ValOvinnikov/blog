@@ -167,3 +167,61 @@ export const MixedImages: TStory = {
     ),
   },
 };
+
+export const SpotlightOnePost: TStory = {
+  args: {
+    title: 'Featured',
+    hasLead: true,
+    posts: posts.slice(0, 1),
+  },
+};
+
+export const SpotlightOnePostWithImages: TStory = {
+  args: {
+    title: 'Featured',
+    hasLead: true,
+    hasImages: true,
+    posts: posts
+      .slice(0, 1)
+      .map((post) => ({ ...post, image: placeholderImage(post.title) })),
+  },
+};
+
+export const SpotlightTwoPosts: TStory = {
+  args: {
+    title: 'Featured',
+    hasLead: true,
+    posts: posts.slice(0, 2),
+  },
+};
+
+export const SpotlightTwoPostsWithImages: TStory = {
+  args: {
+    title: 'Featured',
+    hasLead: true,
+    hasImages: true,
+    posts: posts
+      .slice(0, 2)
+      .map((post) => ({ ...post, image: placeholderImage(post.title) })),
+  },
+};
+
+export const SpotlightThreePosts: TStory = {
+  args: {
+    title: 'Featured',
+    hasLead: true,
+    posts,
+  },
+};
+
+export const SpotlightThreePostsWithImages: TStory = {
+  args: {
+    title: 'Featured',
+    hasLead: true,
+    hasImages: true,
+    posts: posts.map((post) => ({
+      ...post,
+      image: placeholderImage(post.title),
+    })),
+  },
+};

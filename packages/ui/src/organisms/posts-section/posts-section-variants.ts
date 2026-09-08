@@ -17,6 +17,12 @@ export const postsSectionVariants = tv({
       'grid-cols-1 sm:grid-cols-2 md:grid-cols-3',
       'gap-3.5 md:gap-5 lg:gap-7',
     ],
+    leadGroup: ['flex flex-col', 'gap-3.5 md:gap-5 lg:gap-7'],
+    tailGrid: [
+      'grid',
+      'grid-cols-1 sm:grid-cols-2',
+      'gap-3.5 md:gap-5 lg:gap-7',
+    ],
     titleLink: ['before:absolute before:inset-0'],
     emptyMessage: ['text-copy text-muted'],
     labelFallback: ['sr-only'],

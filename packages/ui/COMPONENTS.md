@@ -214,13 +214,14 @@ Slots:
 ### PostCard — `molecules/post-card/post-card.tsx`
 
 the article summary card used in listings; composes `PostCard.Media`, `PostCard.Meta`, `PostCard.Title`, and `PostCard.Footer` slots around an optional `excerpt` and `tags` row, rendered as an `<article>`.
-Props: excerpt?: string · tags?: string[] · children?: TCompoundChildren<typeof PostCardParts> _(extends IWithClassName, IWithDataTestId)_
+Props: excerpt?: string · tags?: string[] · isSplit?: TPostCardVariants['isSplit'] · isLead?: TPostCardVariants['isLead'] · children?: TCompoundChildren<typeof PostCardParts> _(extends IWithClassName, IWithDataTestId)_
+Variants: isSplit: (boolean) · isLead: (boolean)
 
 Slots:
 
-- **PostCard.Media** — the media region at the top of a `PostCard`; a styled `<div>` wrapper you fill with an image or `MediaFrame`. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **PostCard.Media** — the media region at the top of a `PostCard`; a styled `<div>` wrapper you fill with an image or `MediaFrame`. Props: isLead?: TPostCardMediaVariants['isLead'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isLead: (boolean)
 - **PostCard.Meta** — compact metadata row for post cards. Props: dateValue: string · dateLabel: string · readingTime?: string _(extends IWithClassName, IWithDataTestId)_
-- **PostCard.Title** — the post heading inside a `PostCard`, rendered at the caller-specified heading depth with the card title's visual treatment. Props: level: THeadingLevel · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **PostCard.Title** — the post heading inside a `PostCard`, rendered at the caller-specified heading depth with the card title's visual treatment. Props: level: THeadingLevel · isLead?: boolean · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **PostCard.Footer** — the byline row at the bottom of a `PostCard`: optional author avatar and name, published date, and a topic tag. Props: authorName?: string · authorAvatarSrc?: string · publishedAt?: string · formattedDate?: string · topic?: string · leadingIcon?: ReactNode · trailingIcon?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### PostMeta — `molecules/post-meta/post-meta.tsx`
@@ -346,7 +347,7 @@ Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 ### PostsSection — `organisms/posts-section/posts-section.tsx`
 
 labeled section rendering a set of posts in a responsive grid, generic enough to reuse for other post listings (e.g. related posts, topic pages).
-Props: posts: IPostCardData[] · title?: string · titleId?: string · accessibleTitle?: string · linkAs?: TAnchorElementType · cardHeadingLevel?: THeadingLevel · supportingText?: string · hasImages?: boolean · align?: TPostsSectionVariants['align'] · emptyMessage?: string · isTinted?: TPostsSectionVariants['tinted'] · isWrapped?: TPostsSectionVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
+Props: posts: IPostCardData[] · title?: string · titleId?: string · accessibleTitle?: string · linkAs?: TAnchorElementType · cardHeadingLevel?: THeadingLevel · supportingText?: string · hasImages?: boolean · align?: TPostsSectionVariants['align'] · emptyMessage?: string · isTinted?: TPostsSectionVariants['tinted'] · isWrapped?: TPostsSectionVariants['wrapped'] · hasLead?: boolean _(extends IWithClassName, IWithDataTestId)_
 Variants: tinted: (boolean) · wrapped: (boolean) · align: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
 
 ### ToastViewport — `organisms/toast-viewport/toast-viewport.tsx`
