@@ -23,7 +23,7 @@ export const taxonomyListSchema = defineType({
       description:
         'Which terms to list. The Topics and Tags pages list their own, so their module can leave this empty.',
       options: {
-        layout: 'radio',
+        layout: 'dropdown',
         list: Object.values(TAXONOMY_KIND).map((value) => ({
           title: toTitleCase(value),
           value,
@@ -35,7 +35,7 @@ export const taxonomyListSchema = defineType({
       title: 'Sort Order',
       type: 'string',
       options: {
-        layout: 'radio',
+        layout: 'dropdown',
         list: Object.values(TAXONOMY_SORT).map((value) => ({
           title: toTitleCase(value),
           value,

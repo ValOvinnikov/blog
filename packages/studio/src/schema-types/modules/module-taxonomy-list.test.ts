@@ -19,27 +19,35 @@ const getField = (name: string) => {
   return field;
 };
 
-const getOptionValues = (field: ReturnType<typeof getField>) => {
+const getOptions = (field: ReturnType<typeof getField>) => {
   const options = 'options' in field ? field.options : undefined;
-  const list =
-    options && typeof options === 'object' && 'list' in options
-      ? options.list
-      : undefined;
+
+  if (!options || typeof options !== 'object') {
+    throw new Error('Expected field to define options.');
+  }
+
+  return options as {
+    layout?: string;
+    list?: { title: string; value: string }[];
+  };
+};
+
+const getOptionValues = (field: ReturnType<typeof getField>) => {
+  const { list } = getOptions(field);
 
   if (!list) {
     throw new Error('Expected field to define an options.list.');
   }
 
-  return (list as { title: string; value: string }[]).map(
-    (option) => option.value,
-  );
+  return list.map((option) => option.value);
 };
 
 describe('taxonomyListSchema taxonomy field', () => {
-  it('is a radio over the taxonomy kinds', () => {
+  it('is a select list over the taxonomy kinds', () => {
     const field = getField('taxonomy');
 
     expect(field.type).toBe('string');
+    expect(getOptions(field).layout).toBe('dropdown');
     expect(getOptionValues(field)).toEqual([
       TAXONOMY_KIND.TOPICS,
       TAXONOMY_KIND.TAGS,
@@ -63,10 +71,11 @@ describe('taxonomyListSchema taxonomy field', () => {
 });
 
 describe('taxonomyListSchema sortOrder field', () => {
-  it('is a radio over the sort orders', () => {
+  it('is a select list over the sort orders', () => {
     const field = getField('sortOrder');
 
     expect(field.type).toBe('string');
+    expect(getOptions(field).layout).toBe('dropdown');
     expect(getOptionValues(field)).toEqual([
       TAXONOMY_SORT.ALPHABETICAL,
       TAXONOMY_SORT.MOST_POSTS,
