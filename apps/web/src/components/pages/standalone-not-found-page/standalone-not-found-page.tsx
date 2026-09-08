@@ -22,7 +22,7 @@ export const StandaloneNotFoundPage = async () => {
     getMessages(),
     getThemeTokens(),
   ]);
-  const messages = await resolveTenantMessages(baseMessages);
+  const { messages } = await resolveTenantMessages(baseMessages);
 
   return (
     <ThemeScope themeTokens={themeTokens}>
