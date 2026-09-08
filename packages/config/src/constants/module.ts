@@ -50,6 +50,16 @@ export const HERO_VARIANT = {
 export type THeroVariant = TValueOf<typeof HERO_VARIANT>;
 
 /**
+ * Which form the newsletter module renders — full or compact.
+ */
+export const NEWSLETTER_VARIANT = {
+  FULL: 'FULL',
+  COMPACT: 'COMPACT',
+} as const;
+
+export type TNewsletterVariant = TValueOf<typeof NEWSLETTER_VARIANT>;
+
+/**
  * How a module picks the post it renders.
  */
 export const POST_SOURCE = {
