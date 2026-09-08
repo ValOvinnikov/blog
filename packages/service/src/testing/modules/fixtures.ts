@@ -7,6 +7,7 @@ import {
   HERO_IMAGE_SOURCE,
   HERO_VARIANT,
   LINK_TYPE,
+  POST_SOURCE,
   TAXONOMY_KIND,
   TAXONOMY_SORT,
 } from '@blog/config';
@@ -20,6 +21,7 @@ import type {
 import type { TRawHeroModule } from '@blog/service/features/modules/hero/adaptor/transformer';
 import type { TRawHeroBlogModule } from '@blog/service/features/modules/hero-blog/adaptor/transformer';
 import type { TRawNewsletterModule } from '@blog/service/features/modules/newsletter/adaptor/transformer';
+import type { TRawPostFeaturedModule } from '@blog/service/features/modules/post-featured/adaptor/transformer';
 import type { TRawPostLatestModule } from '@blog/service/features/modules/post-latest/adaptor/transformer';
 import type { TRawPostListModule } from '@blog/service/features/modules/post-list/adaptor/transformer';
 import type { TRawTaxonomyListModule } from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
@@ -91,6 +93,22 @@ export function makeRawPostLatestModule(
     brandVariant: BRAND_VARIANT.PRIMARY,
     sectionHeader: { heading: 'Latest', supportingText: null },
     limit: 6,
+    layout: null,
+    contentAlignment: null,
+    showImages: true,
+    ...overrides,
+  };
+}
+
+export function makeRawPostFeaturedModule(
+  overrides: Partial<TRawPostFeaturedModule> = {},
+): TRawPostFeaturedModule {
+  return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
+    sectionHeader: { heading: 'Featured', supportingText: null },
+    postSource: POST_SOURCE.PINNED,
+    posts: [],
+    limit: null,
     layout: null,
     contentAlignment: null,
     showImages: true,
