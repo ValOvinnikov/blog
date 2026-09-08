@@ -342,7 +342,8 @@ Variants: current: (boolean)
 ### PostGrid — `organisms/post-grid/post-grid.tsx`
 
 the responsive grid container that lays out `PostCard`s (or any children) in columns.
-Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
+Props: columns?: TPostGridVariants['columns'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
+Variants: columns: 1|2|3
 
 ### PostsSection — `organisms/posts-section/posts-section.tsx`
 
