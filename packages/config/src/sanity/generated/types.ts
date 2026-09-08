@@ -203,6 +203,7 @@ export type Module_postLatest = {
   brandVariant?: 'PRIMARY' | 'SECONDARY';
   headingBlock?: HeadingBlock;
   showImages?: boolean;
+  displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   limit?: number;
   layout?: Layout;

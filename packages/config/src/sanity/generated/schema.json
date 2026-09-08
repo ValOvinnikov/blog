@@ -1330,6 +1330,23 @@
         },
         "optional": true
       },
+      "displayMode": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "GRID"
+            },
+            {
+              "type": "string",
+              "value": "CAROUSEL"
+            }
+          ]
+        },
+        "optional": true
+      },
       "contentAlignment": {
         "type": "objectAttribute",
         "value": {
