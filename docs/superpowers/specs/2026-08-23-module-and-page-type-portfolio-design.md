@@ -934,6 +934,14 @@ an index page whose module is set to the other kind fails validation.
   under `limit`; on the index pages they stay, as they do today.
 - Term images. `blog_topic` / `blog_tag` carry none; a card with an image
   is a different molecule.
+- Latest post titles on each topic card. Worth doing — on a home page a
+  title, a description and a count read as a second row of post cards with
+  the pictures missing — but it is a presentation upgrade across service,
+  ui and web that the Topics index wants too, so it is Phase 1.6, epic
+  #2891 (design #2892), unblocked once this epic merges. Option B in the
+  mock is the proposed shape; the double lead cell there is dropped.
+- Tags as a cloud of pills (option C in the mock). A different molecule, and
+  nobody has asked for tags on the home page.
 
 ## `module_postFeatured` — the editor-pinned spotlight
 
@@ -1341,6 +1349,8 @@ ui → web`); the featured spotlight (#2784) and carousel (#2785) wait on it.
   PR, ui in its own PR, and `studio → service → web` as one PR).
 - **Placeable taxonomy list** — epic #2787 (design #2841, then `config →
 studio → service → web` in a single PR; no ui work).
+- **Topic cards list their latest posts** — epic #2891 (design #2892, then
+  `service → ui → web`, studio only if a toggle is settled); waits on #2787.
 - **`module_heroBlog`** — epic #2780 (design #2802, then `studio → service →
 ui → web → db`), plus the retirement chore #2813 once production is moved.
 - **Hero family & generic home page** — epic #2778 under `M9 — Portfolio`

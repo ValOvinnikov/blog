@@ -788,12 +788,14 @@ flowchart TD
   P1c["1.3 module_postFeatured"]
   P1d["1.4 carousel display mode (Embla)"]
   P1e["1.5 taxonomy list placeable"]
+  P1f["1.6 topic cards list latest posts"]
   P2["Phase 2 · Hero family<br/>heroStatement · heroProfile"]
   P3["Phase 3 · Marketing modules<br/>featureGrid · testimonial · logoWall · stats · faq · embed<br/>featureHighlights · team · location · contactForm"]
   P4["Phase 4 · Onboarding templates<br/>site-kind at tenant creation"]
   M9["Portfolio strand (#1919, same milestone)<br/>project entity · page_work · heroProject · projectList/Latest"]
   P0 --> P1a & P1b & P1e
   P1b --> P1c --> P1d
+  P1e --> P1f
   P0 --> P2 --> P3
   P2 --> M9
   P1d -.->|carousel reused| M9
@@ -1035,6 +1037,28 @@ when present` — one query resolving module and terms, `fallbackTaxonomy`
 - **Acceptance:** a blog home can show topic cards between latest posts and
   the newsletter, ordered and capped as authored; the Topics and Tags pages
   render exactly as before.
+
+#### 1.6 Topic cards list their latest posts — epic `feat: topic cards list their latest posts`
+
+- **Depends on:** 1.5.
+- **Why:** placed on a home page, a topic card that is a title, a description
+  and a count reads as a second row of post cards with the pictures missing
+  and says nothing the nav doesn't. Two linked post titles per topic turn
+  the block into a contents page — and the Topics index is a contents page
+  too, so it gets the same treatment. Split out of 1.5 on 2026-09-07 so the
+  placement lands small; see the "The placeable taxonomy list" section of
+  the portfolio design doc.
+- **Design sub-issue** · settle always-on vs an editor toggle (leaning: a
+  boolean like `showImages`, default on), posts per term and their order,
+  the `TaxonomyCard` posts slot, and the projection inside the existing
+  merged taxonomy-list query (no second call).
+- **Sub-issues (created by the design):** **service** · two newest posts per
+  term in the term projection; **ui** · `TaxonomyCard` posts slot, no lead
+  cell; **web** · map posts into the slot on home, landing and index pages;
+  **studio** · only if a toggle is settled.
+- **Not in scope:** tags as a cloud of pills.
+- **Acceptance:** a topic card lists its two newest posts as links; a topic
+  with no posts shows title, description and count only.
 
 ### Phase 2 · Hero family — `prio:later` until Phase 1 ships
 
