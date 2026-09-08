@@ -15,7 +15,7 @@ describe('routes', () => {
     expect(routes.blogIndex(10)).toBe('/blog/page/10');
   });
 
-  it('builds post, topic, topics, and generic-page paths', () => {
+  it('builds post, topic, topics, and landing-page paths', () => {
     expect(routes.post('my-post')).toBe('/blog/my-post');
     expect(routes.topic('design')).toBe('/topics/design');
     expect(routes.topics()).toBe('/topics');
