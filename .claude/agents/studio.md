@@ -46,9 +46,10 @@ When invoked, before writing any code:
   requires downstream work, describe it and let the `service`/`web`/
   `platform-app` agents handle it.
 - Source files live under `packages/studio/src/`. Schemas live in
-  `packages/studio/src/schema-types`. Each type is its own file with a **named
-  `{localName}Schema` export** from `defineType` (`postSchema`, `heroSchema`)
-  — never `export default` — registered in `src/schema-types/index.ts`.
+  `packages/studio/src/schema-types`. Each type is its **own directory** with a
+  **named `{localName}Schema` export** from `defineType` (`postSchema`,
+  `heroBlogSchema`) — never `export default` — registered in
+  `src/schema-types/index.ts`. Layout rules in "Naming & file layout" below.
 - `sanity.config.ts`, `sanity.cli.ts` and `sanity-env.ts` stay at the package
   root (Sanity CLI convention); `migrations/` and `scripts/` likewise.
   Everything else goes under `src/`.
@@ -106,6 +107,63 @@ Corollaries, verified rather than assumed — do not rediscover them:
 - **Do not spend time on `swr` overrides.** A clean install still resolves
   `swr` without the default export. It is moot once Sanity is out of the RSC
   graph.
+
+## Naming & file layout
+
+**`_type` (`name:`) — machine-facing, immutable, `{group}_{name}` with
+camelCase after the underscore.** `module_postList`, `page_topicIndex`.
+Renaming one is a content migration (`_type` is immutable: create under a new
+id → repoint references → delete the old in a _separate_ migration), so get it
+right at creation.
+
+- **The first token after the prefix is whatever code selects a set on.** This
+  is load-bearing, not cosmetic: `packages/config/src/constants/module.ts`
+  derives real unions from template literals (`module_${string}`,
+  `module_hero${string}`). That is why `module_heroBlog` is hero-first even
+  though English wants "blog hero" — a new `module_hero*` schema joins every
+  page's hero slot with no code change.
+- **A module reading a specific content type carries that subject as its
+  token** (`module_postList`, `module_postLatest`, `module_projectList`,
+  `module_taxonomyList`). A purely authored module takes a bare role name
+  (`module_content`, `module_cta`, `module_gallery`, `module_stats`,
+  `module_faq`). Do not invent a subject prefix for a module that reads no
+  subject.
+- **No member of a family may hold the bare family name.** `module_hero` is
+  the counter-example — it is retiring (#2813) precisely because nothing can
+  tell "the original hero" from "any hero".
+
+**`title:` — human-facing, one name, everywhere.** Singular, Title Case, plain
+English word order, no parentheses and no abbreviations: `Blog Hero` (not
+`Hero (Blog)`), `Call to Action` (not `CTAs`), `Latest Posts` (not
+`Post Latest`). The `_type` may keep a qualifier the title has outgrown — a
+rename costs a migration, a retitle costs nothing.
+
+**The desk never restates a schema's name, title or icon.** `schema.name`,
+`schema.title` and `schema.icon` are the single source; `src/structure/*`
+reads them off the schema rather than retyping them. Retyping is what let the
+sidebar drift from the schemas it lists (plural/singular splits, four
+icon mismatches, one module with no schema icon at all). Every schema declares
+its own `icon`.
+
+**One schema per directory, mirroring `packages/ui`'s component layout.** The
+directory is the unit; its test, and any object types or helpers used only by
+it, live beside it:
+
+```
+src/schema-types/modules/hero-blog/
+├─ hero-blog.ts        heroBlogSchema
+├─ hero-blog.test.ts
+└─ index.ts            barrel re-export
+```
+
+- Directory name is the `_type` minus its `{group}_` prefix, kebab-cased:
+  `module_heroBlog` → `modules/hero-blog/`, `page_topicIndex` →
+  `documents/pages/topic-index/`. Never repeat the group in the file name —
+  `modules/module-hero-blog.ts` says "module" twice.
+- The export is `{camelCase(name minus prefix)}Schema`: `module_heroBlog` →
+  `heroBlogSchema`, `page_topicIndex` → `topicIndexSchema`.
+- Helpers with a co-located test follow the same shape
+  (`helpers/define-hero-fields/`).
 
 ## Content model (see SPEC.md §6 for the current model)
 

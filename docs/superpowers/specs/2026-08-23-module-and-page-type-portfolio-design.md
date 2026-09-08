@@ -1327,6 +1327,26 @@ point; the graph stays acyclic.
   query; `PostCard` gains `isSplit`/`isLead`, `PostsSection` gains
   `hasLead`, and the tail never uses the three-column grid so one, two and
   three posts all fill their rows; no new organism (2026-09-08, #2828).
+- **Schema naming is a convention with one human-facing name per type** — the
+  `_type` stays machine-facing (`{group}_{camelName}`, family token first
+  where code selects on it, no member holding the bare family name), while
+  `title:` is a single singular Title-Case name reused verbatim by the desk,
+  the create menu and every reference picker; the desk reads `name`/`title`/
+  `icon` off the schema instead of restating them, which is what let the
+  sidebar drift from the schemas it lists. Recorded in
+  `.claude/agents/studio.md` "Naming & file layout", which is the durable
+  home — this doc is deleted on completion (2026-09-08).
+- **`page_generic` is renamed to `page_landing`** — the `_type` catches up
+  with the `Landing Page` title #1907 already shipped, so the stored name and
+  every human-facing label finally agree. Unlike #1907's display-only rename
+  this **is** a content migration (`_type` is immutable: new id → repoint
+  `page_home`/`page_blog`/`page_topic` link references → delete the old in a
+  separate migration) and it reaches `studio`, `service` (queries, link
+  fragments, transformers), `apps/web` (generic-page route, metadata,
+  revalidate tags) and regenerated types — so it ships as an epic with
+  per-layer sub-issues, not a single change. The `genericSchema` export and
+  its file move to `landingSchema` / `documents/pages/landing/` in the same
+  studio change (2026-09-08).
 
 ## Non-goals (recorded so #1919 doesn't sprawl)
 
