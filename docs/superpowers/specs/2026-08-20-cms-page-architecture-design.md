@@ -2,6 +2,12 @@
 
 **Status:** design approved, not yet implemented
 **Supersedes:** epic #1332 and its sub-issues #1333–#1336
+**Superseded in part (2026-09-08):** every passage below that describes
+`page_post` as a wrapper around a separate `post` document — the reference,
+its uniqueness rule, "`post` keeps the content, `page_post` keeps the route"
+— is history. The post is now one document, `page_post`, carrying content,
+route and `modules[]`; see
+[`2026-09-08-page-composition-design.md`](./2026-09-08-page-composition-design.md).
 
 ## Problem
 
@@ -74,6 +80,11 @@ admitted by its own kind of slot.
 | `page_landing`    | per-entity | —                        | `slug` + `modules[]`         | `/{slug}`                    |
 | `page_post`       | per-entity | `post` ref               | `slug`, `publishedAt`, `seo` | `/blog/{slug}`               |
 
+> **Superseded 2026-09-08 for `page_post`:** the post and its page become one
+> document — `page_post` absorbs every `blog_post` field and gains
+> `modules[]`; the `post` reference and `blog_post` retire. See
+> [`2026-09-08-page-composition-design.md`](./2026-09-08-page-composition-design.md).
+
 Per-entity pages own their URL slug directly — `page_topic.slug` /
 `page_tag.slug` / `page_post.slug`, sourced from the page document's own
 `title`, same mechanics as `page_landing.slug` already uses. This is a
@@ -95,13 +106,12 @@ from-the-start treatment to posts: `page_post` owns `slug` **and**
 `publishedAt`, and `post.slug`/`post.publishedAt` retire in the same epic.
 
 `page_post` differs from `page_topic`/`page_tag` in shape: it has no
-`postList`/`modules[]` slot, because an individual post page isn't a
-composed archive — it renders the referenced `post`'s own body. Its required
-relationship is the reverse direction too: `post` is the thing being
-published, `page_post` is the publication record around it (slug +
-published-at), enforced one-to-one by the same uniqueness pattern as
-`page_topic`'s topic reference — a second `page_post` referencing an
-already-published `post` is rejected.
+`postList` slot, because an individual post page isn't a composed archive.
+As originally built it rendered a referenced `post`'s body and was the
+publication record around it (slug + published-at), one-to-one by the same
+uniqueness pattern as `page_topic`'s topic reference. **Superseded
+2026-09-08:** the post's content lives on `page_post` itself and it gains
+`modules[]`; there is no `post` reference to keep unique.
 
 ### Slug fields show the resulting URL
 
@@ -434,17 +444,17 @@ with real routes. It is currently
 
 ## Decisions taken, with their rejected alternatives
 
-| Decision                                                  | Rejected alternative                                                                                         | Why                                                                                                                                                                                                              |
-| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Post list is a required slot                              | An item inside `modules[]` with a max-one validation rule                                                    | The field makes duplicates structurally impossible and a page can never render empty — no seeding fallback, no validation rule                                                                                   |
-| Two module types, `module_postList` + `module_postLatest` | One module with the mode inferred by slot; or an explicit editor mode field                                  | The type is the mode: impossible combinations become unrepresentable in the Studio and in TypeScript, each type carries only its own fields, and the editor picks by intent rather than by where they dropped it |
-| Per-entity page documents referencing the taxonomy        | A per-kind singleton configuring all archives; or `modules[]` on the taxonomy document (#1332's approach)    | Each entry gets its own composable page; the taxonomy document stays pure taxonomy rather than becoming page-shaped                                                                                              |
-| Rename to `topic` everywhere                              | URL-only rename keeping `blog_category`                                                                      | A lasting vocabulary mismatch between Studio and URLs is worse than one non-splittable PR                                                                                                                        |
-| Author pages removed                                      | Converting them to `page_author` documents                                                                   | An author profile is an ordinary page; the byline link is already optional and JSON-LD emits no author URL                                                                                                       |
-| 404 on missing page document                              | Runtime fallback to a default archive                                                                        | Keeps a single code path; guarded by two Studio validation rules                                                                                                                                                 |
-| `pageSize` widened to 1–24                                | Keeping the teaser's 1–12 for both                                                                           | 12 would silently cap the blog index below the 24 `itemsPerPage` already allowed                                                                                                                                 |
-| `page_topic`/`page_tag`/`page_post` own their `slug`      | Slug lives on the referenced content document (`blog_topic`/`blog_tag`/`post`), the page has none of its own | Superseded mid-E6 (see the slug-ownership revision above): the page document is what defines the route, so the routing concern belongs there — the content document stays pure content, not a URL source         |
-| `page_post` also owns `publishedAt` (E11)                 | Leave `publishedAt` on `post`, only move `slug`                                                              | Same reasoning extended one field further: "when this is published as a page" is a page-level fact, not a property of the content itself — `post` keeps title/body/author, `page_post` keeps slug + publish date |
+| Decision                                                  | Rejected alternative                                                                                         | Why                                                                                                                                                                                                                                                                    |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Post list is a required slot                              | An item inside `modules[]` with a max-one validation rule                                                    | The field makes duplicates structurally impossible and a page can never render empty — no seeding fallback, no validation rule                                                                                                                                         |
+| Two module types, `module_postList` + `module_postLatest` | One module with the mode inferred by slot; or an explicit editor mode field                                  | The type is the mode: impossible combinations become unrepresentable in the Studio and in TypeScript, each type carries only its own fields, and the editor picks by intent rather than by where they dropped it                                                       |
+| Per-entity page documents referencing the taxonomy        | A per-kind singleton configuring all archives; or `modules[]` on the taxonomy document (#1332's approach)    | Each entry gets its own composable page; the taxonomy document stays pure taxonomy rather than becoming page-shaped                                                                                                                                                    |
+| Rename to `topic` everywhere                              | URL-only rename keeping `blog_category`                                                                      | A lasting vocabulary mismatch between Studio and URLs is worse than one non-splittable PR                                                                                                                                                                              |
+| Author pages removed                                      | Converting them to `page_author` documents                                                                   | An author profile is an ordinary page; the byline link is already optional and JSON-LD emits no author URL                                                                                                                                                             |
+| 404 on missing page document                              | Runtime fallback to a default archive                                                                        | Keeps a single code path; guarded by two Studio validation rules                                                                                                                                                                                                       |
+| `pageSize` widened to 1–24                                | Keeping the teaser's 1–12 for both                                                                           | 12 would silently cap the blog index below the 24 `itemsPerPage` already allowed                                                                                                                                                                                       |
+| `page_topic`/`page_tag`/`page_post` own their `slug`      | Slug lives on the referenced content document (`blog_topic`/`blog_tag`/`post`), the page has none of its own | Superseded mid-E6 (see the slug-ownership revision above): the page document is what defines the route, so the routing concern belongs there — the content document stays pure content, not a URL source                                                               |
+| `page_post` also owns `publishedAt` (E11)                 | Leave `publishedAt` on `post`, only move `slug`                                                              | Same reasoning extended one field further: "when this is published as a page" is a page-level fact, not a property of the content itself — `post` keeps title/body/author, `page_post` keeps slug + publish date. Superseded 2026-09-08: `page_post` carries all of it |
 
 ## Delivery — one epic per page surface
 
@@ -610,6 +620,10 @@ not E8 — `/blog/{slug}` is a live, high-traffic detail route today, so the cut
 gets the same two-step care as `blog_topic.slug`. **Independent of E5–E9** —
 can run any time, though naturally sequenced after E4 since `/blog` itself
 already carries the page pattern this extends.
+
+> **Superseded 2026-09-08:** E11 shipped as described, then the split was
+> undone — `page_post` absorbs every `post` field, the reference and its
+> uniqueness rule go, and `blog_post` retires (page-composition epic #2943).
 
 ### Order
 

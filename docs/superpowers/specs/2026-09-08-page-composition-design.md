@@ -114,32 +114,62 @@ interface IModuleRendererProps {
 ```
 
 Every module component receives `context` alongside `id`, `locale` and
-`tenant`; only modules that need it read it. `module_postRelated` renders
+`tenant`; only modules that need it read it. `context.post.id` is the
+`page_post` document id. `module_postRelated` renders
 nothing without `context.post`, so placing it on a page that is not a post
 is harmless and logs a warning once.
 
 ## The blog post page — the worked example
 
-### Page document
+### `page_post` is the post
 
-`page_post` (today: `title`, `slug`, `post`, `publishedAt`, `seo`) gains
-`modules[]` through `defineModulesField`, allow-list
+Today a post is two documents: `blog_post` holds the content and
+`page_post` (title, `slug`, a required unique `post` reference,
+`publishedAt`, `seo`) holds the route — a wrapper the page-architecture
+programme added so that every public page would be a page document, seeded
+per post by migration and guarded by a uniqueness rule. The post's content
+is never placed on any other page, so the wrapper carries no payload of its
+own and costs an editor two documents per post. **Decided 2026-09-08: the
+post is the page.** One document, `page_post`, keeps its name and its
+`PAGE_POST_TYPE` constant (the `page_*` family stays consistent) and absorbs
+every `blog_post` field with its validations: `title` (the headline — the
+wrapper's "… Post Page" title is overwritten), `slug`, `excerpt`,
+`heroImage`, `author`, `topic`, `tags`, `publishedAt`, `body`, `featured`,
+`skim`, `seo`. `blog_post` retires, and with it the `post` reference,
+`validateUniquePostReference`, the "no Post Page yet" warning on the post,
+and the seed migration.
+
+`page_post` also gains `modules[]` through `defineModulesField`, allow-list
 `[module_postRelated, module_newsletter, module_cta, module_content]`, and
 the `validateSingleBlankHeadingPerType` rule for the types that carry a
-fallback heading. Two module documents are shared by every post page —
-one `module_postRelated` ("Related reading") and one `module_newsletter`
+fallback heading. Two module documents are shared by every post — one
+`module_postRelated` ("Related reading") and one `module_newsletter`
 (compact) — with fixed document ids, the `STARTER_DOCUMENT_IDS` pattern
-from tenant provisioning. Nothing creates `page_post` documents
-automatically today; an `initialValue` on `page_post.modules` referencing
-those two ids gives every new post page the same foot, and an editor
-removes or reorders them per post.
+from tenant provisioning; an `initialValue` on `page_post.modules`
+referencing those two ids gives every new post the same foot, and an
+editor removes or reorders them per post.
 
-**`blog_post.newsletterEnabled` retires.** Its job — "no signup under this
-post" — is now the module's absence from that post's page. A migration
-removes the shared newsletter module from every `page_post` whose post has
-`newsletterEnabled == false`, then the field goes; it is
-human-gated like every production migration and ships with the studio
-sub-issue.
+**`blog_post.newsletterEnabled` retires with `blog_post`.** Its job — "no
+signup under this post" — is the newsletter module's absence from that
+post's `modules[]`; the copy migration leaves the module out where the flag
+is `false`, and the field itself is never copied.
+
+**Because a Sanity `_type` cannot change in place, every post id changes.**
+The seed migration already gave each post a `page_post` whose id is the
+post's id behind a `page_post-` prefix, so the mapping is fixed and needs
+no lookup table — which is what makes the one place that holds post ids
+outside Sanity migratable by string rewrite: `bookmarks.post_id` in
+`@blog/db`. The delete-webhook bookmark cleanup keys on the id the webhook
+sends, so it follows the type switch in web. References inside Sanity —
+internal links (navigation, footer and the CTA module's text; post bodies
+carry only URL links), the pinned posts on the featured module, the pinned
+post on both hero modules — are rewritten by the same migration. Tenant
+provisioning today seeds a `blog_post` and no `page_post` at all (a fresh
+tenant's welcome post has no page); the starter post becomes a `page_post`.
+
+The desk keeps `page_post` under Pages. The blog "Content" group, left with
+topics, tags and authors once the post leaves it, splits into **Taxonomy**
+(topics, tags) and **People** (authors).
 
 ### `module_postRelated`
 
@@ -245,22 +275,40 @@ Expand, then contract, so every PR merges green alone:
    and 2.
 4. **ui · retire `PostsSection`** (#2947) — delete the organism, its stories,
    tests and `COMPONENTS.md` entry. After 1 and 3 (no callers remain).
-5. **studio · `page_post.modules[]`, `module_postRelated`,
-   `module_newsletter.variant`, retire `newsletterEnabled`** (#2948) — typegen;
-   the migration.
-6. **service · `modules.postRelated.v1`, `getPost` drops `relatedPosts`**
-   (#2949).
-7. **web · modules on the post page** (#2950) — `ModuleRenderer` context,
-   `PostRelatedModule`, the newsletter module's compact variant, the two
-   stand-in parts deleted.
+5. **studio · `page_post` absorbs `blog_post`, gains `modules[]`;
+   `module_postRelated`; `module_newsletter.variant`** (#2948) — the content
+   fields and their validations on `page_post`; `page_post` added next to
+   `blog_post` in the reference targets of `link.ts`, `module_hero`,
+   `module_heroBlog` and `module_postFeatured` (until step 9); typegen; the
+   copy-and-repoint migration.
+6. **service · every read on `page_post`; `modules.postRelated.v1`; `getPost`
+   drops `relatedPosts`** (#2949) — the 24 files that filter, fragment or
+   link on `blog_post` move to `page_post`.
+7. **web · modules on the post page; the post type in the webhook** (#2950) —
+   `ModuleRenderer` context, `PostRelatedModule`, the newsletter module's
+   compact variant, the two stand-in parts deleted; `BLOG_POST_TYPE` in the
+   revalidation path derivation and the `revalidate-tags` map move to
+   `page_post`, so bookmark cleanup on delete follows.
 
    Steps 5–7 **ship as one PR**: typegen adds `module_postRelated` to
-   `TModuleType`, which reds `MODULE_MAP` and `REVALIDATE_TAGS` until the
-   web entries land — the `module_postFeatured` precedent. They are three
-   sub-issues for three layer agents, one branch.
+   `TModuleType` and the content fields to the `page_post` type, and every
+   service read switches with it — the `module_postFeatured` precedent with
+   the type switch on top. Three sub-issues for three layer agents, one
+   branch. `blog_post` stays registered and untouched until step 9.
 
-8. **web · one PR per remaining page** — blog list (#2951), topic (#2952),
-   tag (#2953), topics and tags (#2954), landing (#2955). After 3; independent of each other.
+8. **db · bookmark ids and the starter post** (#2959) — a data migration
+   prefixes every `bookmarks.post_id`; the provisioning starter post becomes
+   a `page_post`. Own PR, deployed together with the step 5–7 PR: the
+   deploy workflow runs the Sanity and Drizzle migrations before the web
+   deploy, and deploys are manual today, so one dispatch carries both.
+9. **studio · retire `blog_post`** (#2960) — after 5–8 have deployed
+   and both migrations have run on the dataset: the delete migration, the
+   `blog_post` schema, `page_post.post` and its uniqueness rule, the seed
+   migration, `blog_post` in the reference targets and in the
+   `revalidate-tags` map; the desk regroup.
+10. **web · one PR per remaining page** — blog list (#2951), topic (#2952),
+    tag (#2953), topics and tags (#2954), landing (#2955). After 3;
+    independent of each other.
 
 The carousel epic (#2785) rebases on this: its ui PR keeps the `Carousel`
 organism and drops the `PostsSection.Carousel` slot; its web leaf composes
@@ -270,10 +318,32 @@ composes primitives.
 
 ## Migration
 
-One, human-gated, in step 5: reference the shared related-reading and
-newsletter modules from every existing `page_post`, skipping the
-newsletter module where the post's `newsletterEnabled` is `false`; then
-drop the field. Everything else is additive.
+Three human-gated runs, in this order, each dry-run → backup → run per
+`packages/studio/migrations/README.md`:
+
+1. **Copy and repoint (Sanity, step 5).** For every `blog_post`, published
+   and draft alike (`drafts.<id>` → `drafts.page_post-<id>`, so unpublished
+   edits survive): write the content fields onto the matching `page_post`,
+   creating it if the seed migration missed it. Where both documents hold
+   a value the page's `slug`, `publishedAt` and `seo` win (the page has
+   been the route's source of truth) and the post's `title` wins (the
+   wrapper's "… Post Page" title was never a headline). Set `modules` to
+   the two shared module ids — created first, with their fixed ids —
+   omitting the newsletter module where `newsletterEnabled == false`. Then
+   rewrite every `_ref` anywhere in the dataset that equals a `blog_post`
+   id to the `page_post` id: `*[references($ids)]`, walking each document
+   for `_ref` values, which covers `link.internalReference`,
+   `module_hero.featuredPost`, `module_heroBlog.post`,
+   `module_postFeatured.posts[]` and Portable Text mark definitions.
+   Idempotent: a second run changes nothing.
+2. **Bookmark ids (Drizzle, step 8).** `update "bookmarks" set "post_id" =
+'page_post-' || "post_id" where "post_id" not like 'page_post-%'`.
+3. **Delete `blog_post` (Sanity, step 9).** For each `blog_post`, assert its
+   `page_post` has `body` and that `count(*[references(^._id)]) == 0`, then
+   delete it and its draft. A separate migration from run 1, per the
+   `_type`-immutability rule: create, repoint, delete in a later run.
+
+Everything else is additive.
 
 ## Not in scope
 
@@ -291,6 +361,9 @@ drop the field. Everything else is additive.
 - Related reading and the post-foot newsletter are authorable per post
   through `page_post.modules[]`; an existing post renders both without an
   editor touching it.
+- `page_post` is the only post document — content, route and `modules[]`
+  in one; `blog_post` and the wrapper's `post` reference are gone;
+  bookmarks and every Sanity reference follow the prefixed ids.
 - `PostsSection` and every `*-page-view.tsx` are deleted; no `@blog/ui`
   component maps a post to a card or lays out a spotlight.
 - Every listing on the site renders through `PostCardItem` and `PostGrid`,

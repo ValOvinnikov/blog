@@ -88,9 +88,11 @@ that #1285 already shipped.
 - **CMS page architecture** — every public page is a CMS document with a
   required slot ([`2026-08-20-cms-page-architecture-design.md`](./2026-08-20-cms-page-architecture-design.md)).
   Its two settled patterns shape the portfolio strand below: a per-entity
-  page document owns the route (`page_post` owns `slug` + `publishedAt`; the
-  `post` entity has neither), and a listing is **two module types, one per
-  mode** — a paginated archive in a required slot (`module_postList`) and a
+  page document owns the route (`page_topic`/`page_tag` own `slug`; for
+  posts the page and the entity are one document since 2026-09-08 —
+  `page_post` carries content and route, see
+  [`2026-09-08-page-composition-design.md`](./2026-09-08-page-composition-design.md)),
+  and a listing is **two module types, one per mode** — a paginated archive in a required slot (`module_postList`) and a
   latest-N teaser in `modules[]` (`module_postLatest`).
 
 ## Purpose of this doc
@@ -102,7 +104,7 @@ Three related but independent strands of "make the page builder build more":
    get proposed and added to the catalogue below over time; this section is
    never "done."
 2. **Contact form / lead capture** — the one module needing a write path.
-3. **Portfolio content type** — `project`/`caseStudy` as a first-class
+3. **Portfolio content type** — `page_project` as a first-class
    document with its own surface.
 
 Each is independent of the others and of the flexibility spine — they inherit
@@ -1438,26 +1440,27 @@ notification; managing them is a later concern (mirrors the newsletter
 **Goal:** turn "a blog" into "a portfolio site that also blogs" by mirroring
 the proven `post` pattern rather than bolting portfolio onto posts.
 
-**Content model.** A new `project` (or `caseStudy`) entity document: title,
-client, role, stack (tags), year, `outcomeMetrics` (repeatable label+value),
-`heroImage`, `gallery`, `body` (richText), `featured`. Reuses the existing
-`topic` / `tag` taxonomy and `imageWithAlt`. It carries **no `slug` and no
-`publishedAt`** — those belong to its page document, below, exactly as
-`post` no longer carries them since `page_post`.
+**Content model.** A project is its own page, the shape `page_post` took on
+2026-09-08 (one document for content and route; no entity-plus-wrapper
+pair): `page_project` carries title, client, role, stack (tags), year,
+`outcomeMetrics` (repeatable label+value), `heroImage`, `gallery`, `body`
+(richText), `featured`, plus `slug`, `publishedAt`, `seo` and `modules[]`.
+Reuses the existing `topic` / `tag` taxonomy and `imageWithAlt`.
 
 **Page documents.** The page-architecture programme settled what the
 original design left open ("whether `/work/{slug}` is a page document or a
 plain entity route"): every public page is a CMS document.
 
-| Document       | Kind       | Required slot | Also                         | Route                   |
-| -------------- | ---------- | ------------- | ---------------------------- | ----------------------- |
-| `page_work`    | singleton  | `projectList` | `modules[]`, `seo`           | `/work`, `/work/page/N` |
-| `page_project` | per-entity | `project` ref | `slug`, `publishedAt`, `seo` | `/work/{slug}`          |
+| Document       | Kind       | Required slot | Also                                                      | Route                   |
+| -------------- | ---------- | ------------- | --------------------------------------------------------- | ----------------------- |
+| `page_work`    | singleton  | `projectList` | `modules[]`, `seo`                                        | `/work`, `/work/page/N` |
+| `page_project` | per-entity | —             | content fields, `slug`, `publishedAt`, `seo`, `modules[]` | `/work/{slug}`          |
 
-`page_project` mirrors `page_post` field-for-field: it owns `slug` (with the
-shared slug-URL preview input, prefix `/work/`) and `publishedAt`, and is
-one-to-one with its `project` via the same uniqueness validation. `page_work`
-mirrors `page_blog`: its `projectList` slot holds a `module_projectList`
+`page_project` mirrors `page_post` field-for-field: the content lives on the
+page document, which owns `slug` (with the shared slug-URL preview input,
+prefix `/work/`) and `publishedAt`; there is no separate `project` entity to
+reference. `page_work` mirrors `page_postIndex` (`page_blog` until its rename
+lands): its `projectList` slot holds a `module_projectList`
 (`pageSize`; the route supplies the page number).
 
 **Surfaces.** Routes under `app/[tenant]/[locale]/`: `/work` (+
@@ -1479,8 +1482,7 @@ Content
 ├─ Blog           Blog Page, Topics, Tags, Posts, Authors, Settings
 ├─ Work           ← this section
 │  ├─ Work Page       the /work index (page_work)
-│  ├─ Project Pages   page_project documents
-│  └─ Projects        the project / caseStudy entities
+│  └─ Projects        page_project documents (the project is its page)
 ├─ Modules
 └─ Settings
 ```
@@ -1500,7 +1502,7 @@ are additive. Existing posts are untouched.
 
 ```
 config  →  RESERVED_SLUGS + a CAPABILITY key; no module-type const — a module's _type derives from its studio schema via typegen
-studio  →  module_* schemas (shared styling helpers) + project entity + page_work / page_project
+studio  →  module_* schemas (shared styling helpers) + page_work / page_project (the project is its page)
 service →  service.modules.<type>.v1   service.pages.work.*
 db      →  leads table (tenantId) + settings_features column
 email   →  lead-notification template via sendEmail
@@ -1517,10 +1519,11 @@ point; the graph stays acyclic.
   shipped as shared helpers/an injector, so no per-module styling work is
   needed beyond choosing which tokens a module's own content (not its
   section chrome) uses.
-- **Portfolio mirrors `post` as a new `project` entity + `page_project` /
-  `page_work` pages + `/work` surface,** not a variant of `post` (carried
+- **Portfolio mirrors `post` as its own `page_project` document + a
+  `page_work` index + `/work` surface,** not a variant of `post` (carried
   from the original Feature 5 decision D7; page documents added 2026-09-06
-  per the page-architecture programme).
+  per the page-architecture programme; the separate `project` entity
+  dropped 2026-09-08 when the post became its page, see below).
 - **Project listing is two modules, one per mode** — `module_projectList`
   (slot, paginated) and `module_projectLatest` (`modules[]`, teaser) —
   replacing the single `module_projectGrid` (2026-09-06).
@@ -1606,6 +1609,18 @@ point; the graph stays acyclic.
   which supersedes the `PostsSection.Carousel` slot in the carousel section
   and `hasLead` on `PostsSection` in the spotlight section, and adds
   `page_post.modules[]` with a `module_postRelated` (2026-09-08).
+- **The post is its page** — `page_post` keeps its name and absorbs every
+  `blog_post` field; `blog_post` and the wrapper's `post` reference retire.
+  A Sanity `_type` is immutable, so every post moves to the `page_post-`
+  prefixed id the seed migration already assigned: copy-and-repoint
+  migration, a Drizzle rewrite of `bookmarks.post_id`, then a delete
+  migration. The same shape applies to `page_project` above (2026-09-08,
+  epic #2943).
+- **`page_blog` renames to `page_postIndex`** so the page family reads
+  `page_post`/`page_postIndex`, `page_topic`/`page_topicIndex`,
+  `page_tag`/`page_tagIndex`. Live documents and references exist, so it is
+  the expand → repoint → contract recipe with two migrations, unlike #2904.
+  Tracked in #2961 (2026-09-08).
 
 ## Non-goals (recorded so #1919 doesn't sprawl)
 
