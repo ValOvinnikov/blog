@@ -5,6 +5,10 @@ import {
 } from '@blog/config';
 import { getSiteConfig } from '@web/server/site-config/get-site-config';
 import { logger } from '@web/utils/logger/logger';
+import {
+  resolveVoiceRichFields,
+  type TVoiceRichFieldId,
+} from '@web/utils/resolve-voice-rich-fields';
 
 const VOICE_FIELDS_BY_ID = new Map<string, (typeof VOICE_FIELDS)[number]>(
   VOICE_FIELDS.map((field) => [field.id, field]),
@@ -61,28 +65,38 @@ const applyVoiceOverrides = (
   return result;
 };
 
+export interface ITenantMessages {
+  messages: Record<string, unknown>;
+  rich: Record<TVoiceRichFieldId, TVoicePortableText>;
+}
+
 /**
  * Applies the tenant's per-key voice overrides on top of the base locale
- * messages returned by `getMessages()`. Called from every route that builds
- * its own `NextIntlClientProvider` tree (`[tenant]/[locale]/layout.tsx`, and
- * the `not-found.tsx` boundaries that render outside it) —
- * `i18n/request.ts`'s `getRequestConfig` only resolves the base, un-voiced
- * messages since it has no tenant to read. Accepts the `[tenant]` route
- * param and forwards it to `getSiteConfig`; a `not-found.tsx` boundary has
- * no param to supply and falls through to the header.
+ * messages returned by `getMessages()`, and resolves the same overrides'
+ * RICH fields unflattened for `VoiceRichProvider`. Called from every route
+ * that builds its own `NextIntlClientProvider` tree
+ * (`[tenant]/[locale]/layout.tsx`, and the `not-found.tsx` boundaries that
+ * render outside it) — `i18n/request.ts`'s `getRequestConfig` only resolves
+ * the base, un-voiced messages since it has no tenant to read. Accepts the
+ * `[tenant]` route param and forwards it to `getSiteConfig`; a
+ * `not-found.tsx` boundary has no param to supply and falls through to the
+ * header.
  */
 export const resolveTenantMessages = async (
   base: Record<string, unknown>,
   tenant?: string,
-): Promise<Record<string, unknown>> => {
+): Promise<ITenantMessages> => {
   const result = await getSiteConfig(tenant);
 
   if (!result.ok) {
     logger.error('site_config.fetch_failed', { error: result.error });
-    return base;
+    return { messages: base, rich: resolveVoiceRichFields({}, base) };
   }
 
   const voiceOverrides = result.data?.voiceOverrides ?? {};
 
-  return applyVoiceOverrides(base, voiceOverrides);
+  return {
+    messages: applyVoiceOverrides(base, voiceOverrides),
+    rich: resolveVoiceRichFields(voiceOverrides, base),
+  };
 };

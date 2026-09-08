@@ -60,9 +60,16 @@
       // src/testing/server-only-stub.ts (#1107): same reason as
       // packages/service and packages/db's own entries above — reachable
       // only through a string in vitest.config.ts's `resolve.alias`.
+      //
+      // src/utils/voice-portable-text-to-basic-text/index.ts and
+      // src/context/voice-rich-provider/index.ts: the href→url voice link
+      // adapter and the `useVoiceRich` hook are built ahead of the
+      // page-template consumers that will call them.
       "entry": [
         "src/testing/custom-render.tsx",
-        "src/testing/server-only-stub.ts"
+        "src/testing/server-only-stub.ts",
+        "src/utils/voice-portable-text-to-basic-text/index.ts",
+        "src/context/voice-rich-provider/index.ts"
       ],
       // Referenced only as a Turbopack loader string (next.config.ts
       // `turbopack.rules['*.svg'].loaders: ['@svgr/webpack']`) — knip's

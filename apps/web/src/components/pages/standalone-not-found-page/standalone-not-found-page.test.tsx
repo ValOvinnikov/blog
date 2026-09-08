@@ -46,7 +46,10 @@ describe(StandaloneNotFoundPage, () => {
     vi.clearAllMocks();
     getMessagesMock.mockResolvedValue(messages);
     getThemeTokensMock.mockResolvedValue(THEME_TOKENS);
-    resolveTenantMessagesMock.mockResolvedValue(voicedMessages);
+    resolveTenantMessagesMock.mockResolvedValue({
+      messages: voicedMessages,
+      rich: {},
+    });
   });
 
   it('pins the request locale before resolving messages', async () => {

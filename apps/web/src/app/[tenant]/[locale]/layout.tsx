@@ -20,6 +20,7 @@ import { SmartLink } from '@web/components/shared/smart-link';
 import { ThemeScope } from '@web/components/shared/theme-scope';
 import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
 import { ToastProvider } from '@web/context/toast-provider';
+import { VoiceRichProvider } from '@web/context/voice-rich-provider';
 import { routing } from '@web/i18n/routing';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
 import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
@@ -146,7 +147,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
     notFound();
   }
 
-  const messages = await resolveTenantMessages(baseMessages, tenant);
+  const { messages, rich } = await resolveTenantMessages(baseMessages, tenant);
   const { brand } = settingsResult.data;
   const navItems = navResult.ok ? navResult.data.items : [];
   const social = footerResult.ok ? footerResult.data.social : [];
@@ -180,72 +181,74 @@ export default async function LocaleLayout({ children, params }: TProps) {
         <SessionProvider>
           {/* Mounted above `children` so a toast survives a client-side route change instead of being tied to the page that fired it. */}
           <ToastProvider>
-            <div className={s.root()}>
-              <Header>
-                <Header.Brand>
-                  <BrandLockupLink brand={brand} />
-                </Header.Brand>
-                <SiteNavigation
-                  links={navItems}
-                  actions={
-                    <>
-                      <ThemeToggleButton />
-                      <AuthMenu oauthProviderIds={oauthProviderIds} />
-                    </>
-                  }
-                />
-              </Header>
-              <div className={s.content()}>{children}</div>
-              <Footer dataTestId="site-footer">
-                <Footer.Copyright title={brand.name} year={currentYear} />
-                <Footer.Nav>
-                  {social.map((link) => {
-                    // `link.platform` is optional and free-form beyond the
-                    // `SOCIAL_PLATFORMS` enum's known icon set — an unmapped
-                    // platform falls back to the original label-only rendering
-                    // (no `icon`, `hasLabel` stays true) rather than hiding
-                    // the link.
-                    const iconName =
-                      link.platform && toSocialIconName(link.platform);
-
-                    return (
-                      <NavLink
-                        key={link.href}
-                        as={SmartLink}
-                        href={link.href}
-                        target={link.target}
-                        icon={
-                          iconName ? (
-                            <Icon
-                              name={iconName}
-                              size={SIZE.SM}
-                              dataTestId={`social-icon-${link.platform}`}
-                            />
-                          ) : undefined
-                        }
-                        hasLabel={!iconName}
-                      >
-                        {link.label}
-                      </NavLink>
-                    );
-                  })}
-                  <NavLink
-                    as={SmartLink}
-                    href={routes.rssFeed()}
-                    icon={
-                      <Icon
-                        name={ICONS.RSS}
-                        size={SIZE.SM}
-                        dataTestId="rss-icon"
-                      />
+            <VoiceRichProvider values={rich}>
+              <div className={s.root()}>
+                <Header>
+                  <Header.Brand>
+                    <BrandLockupLink brand={brand} />
+                  </Header.Brand>
+                  <SiteNavigation
+                    links={navItems}
+                    actions={
+                      <>
+                        <ThemeToggleButton />
+                        <AuthMenu oauthProviderIds={oauthProviderIds} />
+                      </>
                     }
-                    hasLabel={false}
-                  >
-                    {t('feedLinkLabel')}
-                  </NavLink>
-                </Footer.Nav>
-              </Footer>
-            </div>
+                  />
+                </Header>
+                <div className={s.content()}>{children}</div>
+                <Footer dataTestId="site-footer">
+                  <Footer.Copyright title={brand.name} year={currentYear} />
+                  <Footer.Nav>
+                    {social.map((link) => {
+                      // `link.platform` is optional and free-form beyond the
+                      // `SOCIAL_PLATFORMS` enum's known icon set — an unmapped
+                      // platform falls back to the original label-only rendering
+                      // (no `icon`, `hasLabel` stays true) rather than hiding
+                      // the link.
+                      const iconName =
+                        link.platform && toSocialIconName(link.platform);
+
+                      return (
+                        <NavLink
+                          key={link.href}
+                          as={SmartLink}
+                          href={link.href}
+                          target={link.target}
+                          icon={
+                            iconName ? (
+                              <Icon
+                                name={iconName}
+                                size={SIZE.SM}
+                                dataTestId={`social-icon-${link.platform}`}
+                              />
+                            ) : undefined
+                          }
+                          hasLabel={!iconName}
+                        >
+                          {link.label}
+                        </NavLink>
+                      );
+                    })}
+                    <NavLink
+                      as={SmartLink}
+                      href={routes.rssFeed()}
+                      icon={
+                        <Icon
+                          name={ICONS.RSS}
+                          size={SIZE.SM}
+                          dataTestId="rss-icon"
+                        />
+                      }
+                      hasLabel={false}
+                    >
+                      {t('feedLinkLabel')}
+                    </NavLink>
+                  </Footer.Nav>
+                </Footer>
+              </div>
+            </VoiceRichProvider>
           </ToastProvider>
         </SessionProvider>
       </NextIntlClientProvider>

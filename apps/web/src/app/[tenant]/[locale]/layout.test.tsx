@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { ThemeScope } from '@web/components/shared/theme-scope';
+import { VoiceRichProvider } from '@web/context/voice-rich-provider';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
@@ -158,7 +159,7 @@ describe('LocaleLayout', () => {
     isCapabilityEnabledMock.mockResolvedValue(true);
     isWebAnalyticsEnabledMock.mockReturnValue(false);
     resolveTenantMessagesMock.mockImplementation((messages: unknown) =>
-      Promise.resolve(messages),
+      Promise.resolve({ messages, rich: {} }),
     );
     getMessagesMock.mockResolvedValue(realMessages);
     getNowMock.mockResolvedValue(now);
@@ -303,6 +304,30 @@ describe('LocaleLayout', () => {
     );
     const [provider] = html.props.children;
     expect(provider.props.messages).toBe(realMessages);
+  });
+
+  it('mounts VoiceRichProvider with the rich voice values resolved by resolveTenantMessages', async () => {
+    const rich = { blogListEmpty: [{ _type: 'block' }] };
+    resolveTenantMessagesMock.mockResolvedValue({
+      messages: realMessages,
+      rich,
+    });
+
+    const html = await LocaleLayout({
+      children: <div>content</div>,
+      params: Promise.resolve({
+        tenant: 'tenant-1',
+        locale: LOCALE_ISO_CODES.EN,
+      }),
+    });
+
+    const [provider] = html.props.children;
+    const sessionProvider = provider.props.children;
+    const toastProvider = sessionProvider.props.children;
+    const voiceRichProvider = toastProvider.props.children;
+
+    expect(voiceRichProvider.type).toBe(VoiceRichProvider);
+    expect(voiceRichProvider.props.values).toBe(rich);
   });
 
   it('passes the resolved theme tokens through to ThemeScope', async () => {

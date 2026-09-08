@@ -67,7 +67,7 @@ describe('resolveTenantMessages', () => {
   it('returns the base messages unchanged when there are no voice overrides', async () => {
     getSiteConfigMock.mockResolvedValue(siteConfigRow());
 
-    const messages = await resolveTenantMessages(SITE_MESSAGES);
+    const { messages } = await resolveTenantMessages(SITE_MESSAGES);
 
     expect(messages).toEqual(SITE_MESSAGES);
   });
@@ -75,7 +75,7 @@ describe('resolveTenantMessages', () => {
   it('returns the base messages unchanged when no site config row exists for the tenant', async () => {
     getSiteConfigMock.mockResolvedValue(undefined);
 
-    const messages = await resolveTenantMessages(SITE_MESSAGES);
+    const { messages } = await resolveTenantMessages(SITE_MESSAGES);
 
     expect(messages).toEqual(SITE_MESSAGES);
   });
@@ -85,7 +85,7 @@ describe('resolveTenantMessages', () => {
       siteConfigRow({ notFoundHeading: 'nope, try again' }),
     );
 
-    const messages = await resolveTenantMessages(SITE_MESSAGES);
+    const { messages } = await resolveTenantMessages(SITE_MESSAGES);
 
     expect(getAtPath(messages, ['notFound', 'heading'])).toBe(
       'nope, try again',
@@ -100,7 +100,7 @@ describe('resolveTenantMessages', () => {
       siteConfigRow({ blogListEmpty: richTextOf('Nothing published yet.') }),
     );
 
-    const messages = await resolveTenantMessages(SITE_MESSAGES);
+    const { messages } = await resolveTenantMessages(SITE_MESSAGES);
 
     expect(getAtPath(messages, ['blogListPage', 'empty'])).toBe(
       'Nothing published yet.',
@@ -112,7 +112,7 @@ describe('resolveTenantMessages', () => {
       siteConfigRow({ topicEmpty: richTextOf('Nothing here yet.') }),
     );
 
-    const messages = await resolveTenantMessages(SITE_MESSAGES);
+    const { messages } = await resolveTenantMessages(SITE_MESSAGES);
 
     expect(getAtPath(messages, ['topicPage', 'empty'])).toBe(
       'Nothing here yet.',
@@ -124,7 +124,7 @@ describe('resolveTenantMessages', () => {
       siteConfigRow({ authMenuRedirectHint: 'Redirecting you shortly…' }),
     );
 
-    const messages = await resolveTenantMessages(SITE_MESSAGES);
+    const { messages } = await resolveTenantMessages(SITE_MESSAGES);
 
     expect(getAtPath(messages, ['authMenu', 'redirectHint'])).toBe(
       'Redirecting you shortly…',
@@ -136,7 +136,7 @@ describe('resolveTenantMessages', () => {
       siteConfigRow({ notARealVoiceField: 'ignored' }),
     );
 
-    const messages = await resolveTenantMessages(SITE_MESSAGES);
+    const { messages } = await resolveTenantMessages(SITE_MESSAGES);
 
     expect(messages).toEqual(SITE_MESSAGES);
   });
@@ -155,7 +155,7 @@ describe('resolveTenantMessages', () => {
       .spyOn(console, 'error')
       .mockImplementation(() => {});
 
-    const messages = await resolveTenantMessages(SITE_MESSAGES);
+    const { messages } = await resolveTenantMessages(SITE_MESSAGES);
 
     expect(messages).toEqual(SITE_MESSAGES);
     expect(consoleErrorSpy).toHaveBeenCalled();
@@ -178,8 +178,40 @@ describe('resolveTenantMessages', () => {
       siteConfigRow({ paginationPrevious: richTextOf('Prev') }),
     );
 
-    const messages = await resolveTenantMessages(SITE_MESSAGES);
+    const { messages } = await resolveTenantMessages(SITE_MESSAGES);
 
     expect(getAtPath(messages, ['pagination', 'previous'])).toBe('Prev');
+  });
+
+  it('returns a RICH override unflattened in the rich map, keyed by voice field id', async () => {
+    const override = richTextOf('Nothing published yet.');
+    getSiteConfigMock.mockResolvedValue(
+      siteConfigRow({ blogListEmpty: override }),
+    );
+
+    const { rich } = await resolveTenantMessages(SITE_MESSAGES);
+
+    expect(rich.blogListEmpty).toBe(override);
+  });
+
+  it('falls back the rich map to the catalog default wrapped as one paragraph when a RICH field has no override', async () => {
+    getSiteConfigMock.mockResolvedValue(siteConfigRow());
+
+    const { rich } = await resolveTenantMessages(SITE_MESSAGES);
+
+    expect(rich.blogListEmpty).toEqual([
+      {
+        _type: 'block',
+        _key: 'catalog-block',
+        style: 'normal',
+        children: [
+          {
+            _type: 'span',
+            _key: 'catalog-span',
+            text: SITE_MESSAGES.blogListPage.empty,
+          },
+        ],
+      },
+    ]);
   });
 });
