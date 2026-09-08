@@ -1,9 +1,13 @@
-import { LOCALE_ISO_CODES, routes, SOCIAL_PLATFORMS } from '@blog/config';
+import {
+  LOCALE_ISO_CODES,
+  routes,
+  SITE_MESSAGES as realMessages,
+  SOCIAL_PLATFORMS,
+} from '@blog/config';
 import userEvent from '@testing-library/user-event';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { ThemeScope } from '@web/components/shared/theme-scope';
-import realMessages from '@web/i18n/messages/en.json';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
@@ -128,7 +132,7 @@ const THEME_TOKENS = {
 
 // `LocaleLayout` is an async Server Component — `customRenderAsync` awaits
 // it, then mounts the resolved element tree via RTL's `render()`. The real
-// `en.json` messages (not a minimal stub) flow through the mocked
+// catalog messages (not a minimal stub) flow through the mocked
 // `getMessages()` below so every client component nested under `Header`/
 // `Footer` (`SiteNavigation`, `BrandLockupLink`, `AuthMenu`, ...) finds its
 // own namespace on the real `NextIntlClientProvider` `LocaleLayout` renders,

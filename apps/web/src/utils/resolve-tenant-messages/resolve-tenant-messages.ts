@@ -1,6 +1,65 @@
+import {
+  portableTextToPlainText,
+  VOICE_FIELDS,
+  type TVoicePortableText,
+} from '@blog/config';
 import { getSiteConfig } from '@web/server/site-config/get-site-config';
-import { applyVoiceOverrides } from '@web/utils/apply-voice-overrides';
 import { logger } from '@web/utils/logger/logger';
+
+const VOICE_FIELDS_BY_ID = new Map<string, (typeof VOICE_FIELDS)[number]>(
+  VOICE_FIELDS.map((field) => [field.id, field]),
+);
+
+const resolveOverrideText = (value: string | TVoicePortableText): string =>
+  typeof value === 'string' ? value : portableTextToPlainText(value);
+
+const setAtPath = (
+  target: Record<string, unknown>,
+  segments: readonly string[],
+  value: string,
+): Record<string, unknown> => {
+  const [key, ...rest] = segments;
+  if (key === undefined) return target;
+
+  if (rest.length === 0) {
+    return { ...target, [key]: value };
+  }
+
+  const child = target[key];
+  const childObject =
+    typeof child === 'object' && child !== null && !Array.isArray(child)
+      ? (child as Record<string, unknown>)
+      : {};
+
+  return { ...target, [key]: setAtPath(childObject, rest, value) };
+};
+
+/**
+ * Applies `site_config.voiceOverrides` onto the merged message tree at each
+ * override's own `VOICE_FIELDS` registry path, cloning only the objects
+ * along that path so untouched namespaces keep referencing the cached
+ * messages module instead of being mutated in place. A message tree leaf
+ * must be a string, so a RICH override is projected to plain text rather
+ * than dropped — unformatted still beats falling back to the untouched
+ * default copy. An override whose key is absent from the registry is
+ * ignored.
+ */
+const applyVoiceOverrides = (
+  messages: Record<string, unknown>,
+  overrides: Record<string, string | TVoicePortableText>,
+): Record<string, unknown> => {
+  let result = messages;
+
+  for (const [id, value] of Object.entries(overrides)) {
+    const field = VOICE_FIELDS_BY_ID.get(id);
+    if (!field) continue;
+
+    const text = resolveOverrideText(value);
+    result = setAtPath(result, field.path.split('.'), text);
+  }
+
+  return result;
+};
 
 /**
  * Applies the tenant's per-key voice overrides on top of the base locale

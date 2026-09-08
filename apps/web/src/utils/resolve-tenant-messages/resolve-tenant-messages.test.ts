@@ -1,5 +1,4 @@
-import type { TVoicePortableText } from '@blog/config';
-import realMessages from '@web/i18n/messages/en.json';
+import { SITE_MESSAGES, type TVoicePortableText } from '@blog/config';
 
 import { resolveTenantMessages } from './resolve-tenant-messages';
 
@@ -49,6 +48,15 @@ const getAtPath = (source: unknown, path: readonly string[]): unknown => {
   }, source);
 };
 
+const richTextOf = (text: string): TVoicePortableText => [
+  {
+    _type: 'block',
+    _key: 'a',
+    style: 'normal',
+    children: [{ _type: 'span', _key: 'a1', text }],
+  },
+];
+
 describe('resolveTenantMessages', () => {
   beforeEach(() => {
     getRequestTenantIdMock.mockReset();
@@ -59,70 +67,84 @@ describe('resolveTenantMessages', () => {
   it('returns the base messages unchanged when there are no voice overrides', async () => {
     getSiteConfigMock.mockResolvedValue(siteConfigRow());
 
-    const messages = await resolveTenantMessages(realMessages);
+    const messages = await resolveTenantMessages(SITE_MESSAGES);
 
-    expect(messages).toEqual(realMessages);
+    expect(messages).toEqual(SITE_MESSAGES);
   });
 
   it('returns the base messages unchanged when no site config row exists for the tenant', async () => {
     getSiteConfigMock.mockResolvedValue(undefined);
 
-    const messages = await resolveTenantMessages(realMessages);
+    const messages = await resolveTenantMessages(SITE_MESSAGES);
 
-    expect(messages).toEqual(realMessages);
+    expect(messages).toEqual(SITE_MESSAGES);
   });
 
-  it('applies a single voice override on top of the base messages, leaving the rest unchanged', async () => {
+  it('applies a TEXT override at its registry path, leaving the rest unchanged', async () => {
     getSiteConfigMock.mockResolvedValue(
       siteConfigRow({ notFoundHeading: 'nope, try again' }),
     );
 
-    const messages = await resolveTenantMessages(realMessages);
+    const messages = await resolveTenantMessages(SITE_MESSAGES);
 
     expect(getAtPath(messages, ['notFound', 'heading'])).toBe(
       'nope, try again',
     );
     expect(getAtPath(messages, ['notFound', 'supportingText'])).toBe(
-      (realMessages.notFound as { supportingText: string }).supportingText,
+      SITE_MESSAGES.notFound.supportingText,
     );
   });
 
-  it('a tenant blogListEmpty voice override reaches blogListPage.empty (#1899)', async () => {
+  it('a tenant blogListEmpty voice override reaches blogListPage.empty', async () => {
     getSiteConfigMock.mockResolvedValue(
-      siteConfigRow({ blogListEmpty: 'Nothing published to the blog yet.' }),
+      siteConfigRow({ blogListEmpty: richTextOf('Nothing published yet.') }),
     );
 
-    const messages = await resolveTenantMessages(realMessages);
+    const messages = await resolveTenantMessages(SITE_MESSAGES);
 
     expect(getAtPath(messages, ['blogListPage', 'empty'])).toBe(
-      'Nothing published to the blog yet.',
+      'Nothing published yet.',
     );
   });
 
-  it('applies a rich voice override as plain text', async () => {
-    const richValue: TVoicePortableText = [
-      {
-        _type: 'block',
-        _key: 'a',
-        style: 'normal',
-        children: [{ _type: 'span', _key: 'a1', text: 'Nothing here yet.' }],
-      },
-    ];
+  it('flattens a RICH override to plain text in the message tree', async () => {
     getSiteConfigMock.mockResolvedValue(
-      siteConfigRow({ topicEmpty: richValue }),
+      siteConfigRow({ topicEmpty: richTextOf('Nothing here yet.') }),
     );
 
-    const messages = await resolveTenantMessages(realMessages);
+    const messages = await resolveTenantMessages(SITE_MESSAGES);
 
     expect(getAtPath(messages, ['topicPage', 'empty'])).toBe(
       'Nothing here yet.',
     );
   });
 
+  it('applies a MULTILINE override at its registry path', async () => {
+    getSiteConfigMock.mockResolvedValue(
+      siteConfigRow({ authMenuRedirectHint: 'Redirecting you shortly…' }),
+    );
+
+    const messages = await resolveTenantMessages(SITE_MESSAGES);
+
+    expect(getAtPath(messages, ['authMenu', 'redirectHint'])).toBe(
+      'Redirecting you shortly…',
+    );
+  });
+
+  it('ignores an override key absent from the VOICE_FIELDS registry rather than throwing', async () => {
+    getSiteConfigMock.mockResolvedValue(
+      siteConfigRow({ notARealVoiceField: 'ignored' }),
+    );
+
+    const messages = await resolveTenantMessages(SITE_MESSAGES);
+
+    expect(messages).toEqual(SITE_MESSAGES);
+  });
+
   it('forwards an explicitly supplied tenant to getSiteConfig, through to getRequestTenantId', async () => {
     getSiteConfigMock.mockResolvedValue(siteConfigRow());
 
-    await resolveTenantMessages(realMessages, 'tenant-2');
+    await resolveTenantMessages(SITE_MESSAGES, 'tenant-2');
 
     expect(getRequestTenantIdMock).toHaveBeenCalledWith('tenant-2');
   });
@@ -133,10 +155,31 @@ describe('resolveTenantMessages', () => {
       .spyOn(console, 'error')
       .mockImplementation(() => {});
 
-    const messages = await resolveTenantMessages(realMessages);
+    const messages = await resolveTenantMessages(SITE_MESSAGES);
 
-    expect(messages).toEqual(realMessages);
+    expect(messages).toEqual(SITE_MESSAGES);
     expect(consoleErrorSpy).toHaveBeenCalled();
     consoleErrorSpy.mockRestore();
+  });
+
+  it('does not mutate the source object at the overridden path', async () => {
+    const base = { notFound: { heading: 'Original heading' } };
+    getSiteConfigMock.mockResolvedValue(
+      siteConfigRow({ notFoundHeading: 'Overridden heading' }),
+    );
+
+    await resolveTenantMessages(base);
+
+    expect(base.notFound.heading).toBe('Original heading');
+  });
+
+  it('flattens a TEXT-kind override to plain text when its stored value is Portable Text', async () => {
+    getSiteConfigMock.mockResolvedValue(
+      siteConfigRow({ paginationPrevious: richTextOf('Prev') }),
+    );
+
+    const messages = await resolveTenantMessages(SITE_MESSAGES);
+
+    expect(getAtPath(messages, ['pagination', 'previous'])).toBe('Prev');
   });
 });

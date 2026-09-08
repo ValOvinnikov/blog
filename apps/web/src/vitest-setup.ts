@@ -1,9 +1,8 @@
+import { SITE_MESSAGES } from '@blog/config';
 import { notFound } from 'next/navigation';
 import { createTranslator } from 'next-intl';
 
 import '@testing-library/jest-dom/vitest';
-
-import messages from './i18n/messages/en.json';
 
 // Placeholder values for the validated env module (`@/utils/env/env`) so
 // components/routes that read it can render under Vitest without requiring
@@ -52,7 +51,7 @@ const toNamespace = (arg: TGetTranslationsArg): string | undefined =>
 type TLooseTranslator = (key: string, values?: TTranslationValues) => string;
 const createLooseTranslator = createTranslator as unknown as (config: {
   locale: string;
-  messages: typeof messages;
+  messages: typeof SITE_MESSAGES;
   namespace?: string;
 }) => TLooseTranslator;
 
@@ -62,12 +61,12 @@ const createLooseTranslator = createTranslator as unknown as (config: {
 // mock's other stubs render under; a test that needs a different resolved
 // locale overrides it locally (e.g. the newsletter confirm route's test).
 // `getTranslations` is stubbed as a minimal
-// stand-in that resolves real strings from `i18n/messages/en.json` via
-// next-intl's own `createTranslator` (full ICU — interpolation, plurals,
-// select) so component tests assert on the actual rendered copy instead of
-// a fake. `getFormatter` is stubbed the same way for `dateTime`: it delegates
-// to the real `Intl.DateTimeFormat` (via `toLocaleDateString`) under the `en`
-// locale that `i18n/messages/en.json` represents, so tests assert the real
+// stand-in that resolves real strings from `@blog/config`'s `SITE_MESSAGES`
+// catalog via next-intl's own `createTranslator` (full ICU — interpolation,
+// plurals, select) so component tests assert on the actual rendered copy
+// instead of a fake. `getFormatter` is stubbed the same way for `dateTime`:
+// it delegates to the real `Intl.DateTimeFormat` (via `toLocaleDateString`)
+// under the `en` locale that catalog represents, so tests assert the real
 // rendered date string instead of a fake.
 vi.mock('next-intl/server', () => ({
   setRequestLocale: vi.fn(),
@@ -75,7 +74,7 @@ vi.mock('next-intl/server', () => ({
   getTranslations: vi.fn(async (arg?: TGetTranslationsArg) =>
     createLooseTranslator({
       locale: 'en',
-      messages,
+      messages: SITE_MESSAGES,
       namespace: toNamespace(arg),
     }),
   ),

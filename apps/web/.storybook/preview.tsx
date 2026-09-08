@@ -1,11 +1,9 @@
 import '../index.css';
 
-import { PRESET_ID, PRESET_REGISTRY } from '@blog/config';
+import { PRESET_ID, PRESET_REGISTRY, SITE_MESSAGES } from '@blog/config';
 import type { Decorator, Preview } from '@storybook/nextjs-vite';
 import { resolveFontVariableClassName } from '@web/config/fonts';
 import { NextIntlClientProvider } from 'next-intl';
-
-import messages from '../src/i18n/messages/en.json';
 
 // Must go on the root element, not a wrapper div: the `--font-*-family`
 // custom properties are read on `body`, which doesn't inherit them from a
@@ -29,7 +27,7 @@ document.documentElement.classList.add(
 // `children` required, and passing it as a variadic `createElement` argument
 // instead of a JSX child fails TS's overload resolution.
 const withIntl: Decorator = (storyFn) => (
-  <NextIntlClientProvider locale="en" messages={messages}>
+  <NextIntlClientProvider locale="en" messages={SITE_MESSAGES}>
     {storyFn()}
   </NextIntlClientProvider>
 );
