@@ -1108,20 +1108,31 @@ when present` — one query resolving module and terms, `fallbackTaxonomy`
   3. **web** · listing modules compose primitives (#2946); `PostListModuleView`
      retires; spotlight arrangement in web.
   4. **ui** · retire `PostsSection` (#2947).
-  5. **studio** (#2948) · `page_post.modules[]`, `module_postRelated`,
-     `module_newsletter.variant`, retire `blog_post.newsletterEnabled`
-     (migration, human-gated).
-  6. **service** (#2949) · `modules.postRelated.v1`; `getPost` drops
-     `relatedPosts`.
-  7. **web** (#2950) · `ModuleRenderer` page context; modules on the post page
-     (5–7 ship as one PR: typegen widens `TModuleType`).
-  8. **web** · one per page: blog list #2951, topic #2952, tag #2953,
-     topics and tags #2954, landing #2955.
+  5. **studio** (#2948) · `page_post` absorbs every `blog_post` field and
+     gains `modules[]`; `module_postRelated`; `module_newsletter.variant`;
+     the copy-and-repoint migration (human-gated).
+  6. **service** (#2949) · every read on `page_post`; `modules.postRelated.v1`;
+     `getPost` drops `relatedPosts`.
+  7. **web** (#2950) · `ModuleRenderer` page context; modules on the post page;
+     the post type in the webhook (5–7 ship as one PR: typegen widens
+     `TModuleType` and switches the post type).
+  8. **db** (#2959) · bookmark ids prefixed by data migration; the starter
+     post becomes a `page_post`. Own PR, same deploy as 5–7.
+  9. **studio** (#2960) · retire `blog_post` (delete migration,
+     human-gated); desk "Content" → "Taxonomy" + "People". After 5–8.
+  10. **web** · one per page: blog list #2951, topic #2952, tag #2953,
+      topics and tags #2954, landing #2955.
+- **Naming (2026-09-08):** the post is its page — `page_post` keeps the name
+  and absorbs `blog_post`, a Sanity `_type` being immutable, so every post
+  id gains the `page_post-` prefix the seed migration already used.
+  `page_blog` → `page_postIndex` is its own tracking issue, #2961
+  (expand → repoint → contract, the #2904 recipe with migrations).
 - **Not in scope:** header/footer as modules; account and bookmarks pages;
   `displayMode` on the related-posts module.
 - **Acceptance:** the post page fetches the post once and renders
   `ModuleRenderer` with the post context; related reading and the
-  newsletter are authorable per post; `PostsSection` and every
+  newsletter are authorable per post; `page_post` is the only post
+  document and `blog_post` is gone; `PostsSection` and every
   `*-page-view.tsx` are deleted; every listing renders through
   `PostCardItem` and `PostGrid`, or `Carousel` where `displayMode` says so.
 
