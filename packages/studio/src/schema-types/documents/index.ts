@@ -4,7 +4,7 @@ import { tagSchema } from './blog/tag';
 import { topicSchema } from './blog/topic';
 import { blogPageSchema } from './pages/blog-page';
 import { homePageSchema } from './pages/home-page';
-import { genericSchema } from './pages/page';
+import { landingSchema } from './pages/landing';
 import { pagePostSchema } from './pages/page-post';
 import { pageTagSchema } from './pages/page-tag';
 import { pageTopicSchema } from './pages/page-topic';
@@ -22,7 +22,7 @@ export const documents = [
   authorSchema,
   topicSchema,
   tagSchema,
-  genericSchema,
+  landingSchema,
   homePageSchema,
   blogPageSchema,
   topicIndexPageSchema,

@@ -17,7 +17,7 @@ type TSlugFieldOptions = {
  * Shared `slug` field for every document that derives a URL path segment
  * from its title. `previewInput` wires in a routed URL-preview component
  * (`createSlugUrlPreviewInput`); `validateSlug` adds a document-specific
- * constraint (e.g. `page_generic`'s reserved-path check) on top of the
+ * constraint (e.g. `page_landing`'s reserved-path check) on top of the
  * always-required base rule.
  */
 export const slugField = ({

@@ -1,4 +1,4 @@
-import { genericSchema } from '@blog/studio/schema-types/documents/pages/page';
+import { landingSchema } from '@blog/studio/schema-types/documents/pages/landing/landing';
 import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/helpers/validate-taxonomy-list-has-taxonomy';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
@@ -37,13 +37,13 @@ const createMockModulesRule = (
 });
 
 const getModulesCustomValidators = (): TModulesCustomFn[] => {
-  const modulesField = genericSchema.fields?.find(
+  const modulesField = landingSchema.fields?.find(
     (field) => field.name === 'modules',
   );
 
   if (!modulesField?.validation) {
     throw new Error(
-      'Expected genericSchema to define a modules field with validation.',
+      'Expected landingSchema to define a modules field with validation.',
     );
   }
 
@@ -55,7 +55,7 @@ const getModulesCustomValidators = (): TModulesCustomFn[] => {
   return customFns;
 };
 
-describe('genericSchema modules validateCustom chaining', () => {
+describe('landingSchema modules validateCustom chaining', () => {
   it('registers both the blank-heading and taxonomy-list validators', () => {
     const customFns = getModulesCustomValidators();
 
@@ -106,13 +106,13 @@ type TValidationRule = {
  * `.custom()` without spinning up a full Sanity Studio schema/rule instance.
  */
 const getSlugCustomValidator = () => {
-  const slugField = genericSchema.fields?.find(
+  const slugField = landingSchema.fields?.find(
     (field) => field.name === 'slug',
   );
 
   if (!slugField?.validation) {
     throw new Error(
-      'Expected genericSchema to define a slug field with validation.',
+      'Expected landingSchema to define a slug field with validation.',
     );
   }
 
@@ -143,7 +143,7 @@ const getSlugCustomValidator = () => {
   return { customFn, requiredCalled };
 };
 
-describe('genericSchema slug validation', () => {
+describe('landingSchema slug validation', () => {
   it('keeps the slug field required', () => {
     const { requiredCalled } = getSlugCustomValidator();
 
@@ -182,7 +182,7 @@ describe('genericSchema slug validation', () => {
   });
 
   it('renders the shared URL-preview input', () => {
-    const slugField = genericSchema.fields?.find(
+    const slugField = landingSchema.fields?.find(
       (field) => field.name === 'slug',
     ) as { components?: { input?: unknown } } | undefined;
 
@@ -190,9 +190,9 @@ describe('genericSchema slug validation', () => {
   });
 });
 
-describe('genericSchema hero field', () => {
+describe('landingSchema hero field', () => {
   it('is an optional reference to the hero family', () => {
-    const heroField = genericSchema.fields?.find(
+    const heroField = landingSchema.fields?.find(
       (field) => field.name === 'hero',
     ) as { type: string; to?: Array<{ type: string }>; validation?: unknown };
 
@@ -205,15 +205,15 @@ describe('genericSchema hero field', () => {
   });
 });
 
-describe('genericSchema modules allow-list', () => {
+describe('landingSchema modules allow-list', () => {
   it('permits content, cta, postLatest, postFeatured, newsletter and taxonomyList modules', () => {
-    const modulesField = genericSchema.fields?.find(
+    const modulesField = landingSchema.fields?.find(
       (field) => field.name === 'modules',
     ) as { type: 'array'; of?: Array<{ name?: string }> } | undefined;
 
     if (!modulesField || modulesField.type !== 'array' || !modulesField.of) {
       throw new Error(
-        'Expected genericSchema to define a modules array field.',
+        'Expected landingSchema to define a modules array field.',
       );
     }
 

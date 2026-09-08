@@ -16,10 +16,10 @@ import { seoSchema } from '@blog/studio/schema-types/objects/seo';
 import { FileText } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
-const genericSlugUrlPreviewInput = createSlugUrlPreviewInput('/');
+const landingSlugUrlPreviewInput = createSlugUrlPreviewInput('/');
 
-export const genericSchema = defineType({
-  name: 'page_generic',
+export const landingSchema = defineType({
+  name: 'page_landing',
   title: 'Landing Page',
   type: 'document',
   icon: FileText,
@@ -32,7 +32,7 @@ export const genericSchema = defineType({
     titleField(),
     slugField({
       description: 'URL path segment — auto-generated from title.',
-      previewInput: genericSlugUrlPreviewInput,
+      previewInput: landingSlugUrlPreviewInput,
       validateSlug: (value) => {
         const current = value?.current;
 
