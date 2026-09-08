@@ -3,12 +3,9 @@ import { navigationSchema } from '@blog/studio/schema-types/documents/settings/n
 import { siteSchema } from '@blog/studio/schema-types/documents/settings/site-settings';
 import { themeSchema } from '@blog/studio/schema-types/documents/settings/theme';
 import { blogGroups } from '@blog/studio/structure/blog-groups';
-import {
-  buildGroupedListItems,
-  buildListItems,
-} from '@blog/studio/structure/build-grouped-list';
+import { buildGroupedListItems } from '@blog/studio/structure/build-grouped-list';
 import { modulesGroups } from '@blog/studio/structure/modules-groups';
-import { pagesItems } from '@blog/studio/structure/pages-items';
+import { pagesGroups } from '@blog/studio/structure/pages-groups';
 import {
   Blocks,
   Files,
@@ -29,7 +26,9 @@ export const studioStructure: StructureResolver = (S) =>
         .title('Pages')
         .id('pages')
         .icon(Files)
-        .child(S.list().title('Pages').items(buildListItems(S, pagesItems))),
+        .child(
+          S.list().title('Pages').items(buildGroupedListItems(S, pagesGroups)),
+        ),
       S.listItem()
         .title('Blog')
         .id('blog')

@@ -3,9 +3,7 @@ import type { StructureBuilder } from 'sanity/structure';
 
 import {
   buildGroupedListItems,
-  buildListItems,
   type TStructureGroup,
-  type TStructureGroupItem,
 } from './build-grouped-list';
 
 type TCall = { method: string; args: unknown[] };
@@ -228,29 +226,48 @@ describe(buildGroupedListItems, () => {
     expect(S.listItem).not.toHaveBeenCalled();
     expect(S.document).not.toHaveBeenCalled();
   });
-});
 
-describe(buildListItems, () => {
-  it('builds items with no leading, trailing or interspersed divider', () => {
-    const items: TStructureGroupItem[] = [
+  it('emits an untitled group with no divider while a titled group still gets one', () => {
+    const groups: TStructureGroup[] = [
       {
-        schema: { name: 'homePage', title: 'Home Page', icon: House },
-        mode: 'singleton',
+        items: [
+          {
+            schema: { name: 'homePage', title: 'Home Page', icon: House },
+            mode: 'singleton',
+          },
+          {
+            schema: { name: 'landingPage', title: 'Landing Page', icon: List },
+          },
+        ],
       },
-      { schema: { name: 'landingPage', title: 'Landing Page', icon: List } },
+      {
+        title: 'Settings',
+        items: [
+          {
+            schema: {
+              name: 'siteSettings',
+              title: 'Site Settings',
+              icon: Settings,
+            },
+          },
+        ],
+      },
     ];
 
     const S = makeMockStructureBuilder();
-    const result = buildListItems(
+    const result = buildGroupedListItems(
       asStructureBuilder(S),
-      items,
+      groups,
     ) as unknown as TMockBuilder[];
 
     expect(result.map((builder) => builder.kind)).toEqual([
       'listItem',
       'documentTypeListItem',
+      'divider',
+      'documentTypeListItem',
     ]);
-    expect(S.divider).not.toHaveBeenCalled();
+    expect(S.divider).toHaveBeenCalledTimes(1);
+    expect(callArgs(result[2]!, 'title')).toEqual(['Settings']);
     expect(callArgs(result[0]!, 'id')).toEqual(['homePage']);
     expect(callArgs(result[1]!, 'title')).toEqual(['Landing Page']);
   });

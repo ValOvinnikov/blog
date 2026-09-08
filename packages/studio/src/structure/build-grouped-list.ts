@@ -11,7 +11,7 @@ export type TStructureGroupItem = {
 };
 
 export type TStructureGroup = {
-  title: string;
+  title?: string;
   items: TStructureGroupItem[];
 };
 
@@ -47,13 +47,7 @@ const buildGroupItem = (
   return S.documentTypeListItem(name).title(title).icon(icon);
 };
 
-/** Builds items with no grouping or dividers, for a root with too few entries to warrant either. */
-export const buildListItems = (
-  S: StructureBuilder,
-  items: TStructureGroupItem[],
-): ListItemBuilder[] => items.map((item) => buildGroupItem(S, item));
-
-/** Flattens groups into `[divider(A), ...itemsA, divider(B), ...itemsB, ...]`, dropping any empty group. */
+/** Flattens groups into a flat item list, prefixing a titled group with a divider and leaving an untitled group bare. */
 export const buildGroupedListItems = (
   S: StructureBuilder,
   groups: TStructureGroup[],
@@ -61,6 +55,6 @@ export const buildGroupedListItems = (
   groups
     .filter((group) => group.items.length > 0)
     .flatMap((group) => [
-      S.divider().title(group.title),
+      ...(group.title ? [S.divider().title(group.title)] : []),
       ...group.items.map((item) => buildGroupItem(S, item)),
     ]);
