@@ -14,6 +14,7 @@ import { createCtaModuleService } from './features/modules/cta';
 import { createHeroModuleService } from './features/modules/hero';
 import { createHeroBlogModuleService } from './features/modules/hero-blog';
 import { createNewsletterModuleService } from './features/modules/newsletter';
+import { createPostFeaturedModuleService } from './features/modules/post-featured';
 import { createPostLatestModuleService } from './features/modules/post-latest';
 import { createPostListModuleService } from './features/modules/post-list';
 import { createTaxonomyListModuleService } from './features/modules/taxonomy-list';
@@ -45,6 +46,7 @@ export const service = {
     heroBlog: createHeroBlogModuleService(),
     postList: createPostListModuleService(),
     postLatest: createPostLatestModuleService(),
+    postFeatured: createPostFeaturedModuleService(),
     content: createContentModuleService(),
     cta: createCtaModuleService(),
     newsletter: createNewsletterModuleService(),
@@ -81,6 +83,7 @@ export type { TCtaModule } from './features/modules/cta';
 export type { THeroModule } from './features/modules/hero';
 export type { THeroBlogModule } from './features/modules/hero-blog';
 export type { TNewsletterModule } from './features/modules/newsletter';
+export type { TPostFeaturedModule } from './features/modules/post-featured';
 export type { TPostLatestModule } from './features/modules/post-latest';
 export type { TPostListModule } from './features/modules/post-list';
 export type {

@@ -3,6 +3,7 @@ import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
 import { heroSchema } from '@blog/studio/schema-types/modules/module-hero';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/module-hero-blog';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
+import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/module-taxonomy-list';
@@ -14,6 +15,7 @@ export const modulesGroups: TStructureGroup[] = [
     items: [
       { schema: postListSchema },
       { schema: postLatestSchema },
+      { schema: postFeaturedSchema },
       { schema: taxonomyListSchema },
     ],
   },

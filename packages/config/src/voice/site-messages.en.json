@@ -49,6 +49,9 @@
   "postLatestModule": {
     "fallbackHeading": "Latest posts"
   },
+  "postFeaturedModule": {
+    "fallbackHeading": "Featured"
+  },
   "blogPostPage": {
     "relatedReading": "Related reading",
     "depthToggle": {

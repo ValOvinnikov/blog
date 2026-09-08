@@ -143,6 +143,40 @@ export type RichText = Array<
     } & Aside)
 >;
 
+export type Blog_postReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'blog_post';
+};
+
+export type Module_postFeatured = {
+  _id: string;
+  _type: 'module_postFeatured';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  sectionHeader?: SectionHeader;
+  showImages?: boolean;
+  postSource?: 'PINNED' | 'NEWEST_FEATURED';
+  posts?: Array<
+    {
+      _key: string;
+    } & Blog_postReference
+  >;
+  limit?: number;
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  layout?: Layout;
+};
+
+export type SectionHeader = {
+  _type: 'sectionHeader';
+  heading?: string;
+  supportingText?: string;
+};
+
 export type Module_postLatest = {
   _id: string;
   _type: 'module_postLatest';
@@ -156,12 +190,6 @@ export type Module_postLatest = {
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   limit?: number;
   layout?: Layout;
-};
-
-export type SectionHeader = {
-  _type: 'sectionHeader';
-  heading?: string;
-  supportingText?: string;
 };
 
 export type Skim = {
@@ -203,13 +231,6 @@ export type CtaAction = {
   variant?: 'PRIMARY' | 'SECONDARY';
   appearance?: 'CONTAINED' | 'INLINE';
   link?: Link;
-};
-
-export type Blog_postReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'blog_post';
 };
 
 export type Blog_topicReference = {
@@ -569,6 +590,13 @@ export type Module_taxonomyList = {
   layout?: Layout;
 };
 
+export type Module_postFeaturedReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_postFeatured';
+};
+
 export type Page_blog = {
   _id: string;
   _type: 'page_blog';
@@ -587,6 +615,9 @@ export type Page_blog = {
     | ({
         _key: string;
       } & Module_newsletterReference)
+    | ({
+        _key: string;
+      } & Module_postFeaturedReference)
   >;
   seo?: Seo;
 };
@@ -637,6 +668,9 @@ export type Page_home = {
     | ({
         _key: string;
       } & Module_taxonomyListReference)
+    | ({
+        _key: string;
+      } & Module_postFeaturedReference)
   >;
   seo?: Seo;
 };
@@ -749,6 +783,9 @@ export type Page_generic = {
     | ({
         _key: string;
       } & Module_postLatestReference)
+    | ({
+        _key: string;
+      } & Module_postFeaturedReference)
     | ({
         _key: string;
       } & Module_newsletterReference)
@@ -933,15 +970,16 @@ export type AllSanitySchemaTypes =
   | BasicText
   | Module_content
   | RichText
-  | Module_postLatest
+  | Blog_postReference
+  | Module_postFeatured
   | SectionHeader
+  | Module_postLatest
   | Skim
   | Brand
   | SpecLine
   | Seo
   | OpenGraph
   | CtaAction
-  | Blog_postReference
   | Blog_topicReference
   | Page_genericReference
   | Page_blogReference
@@ -973,6 +1011,7 @@ export type AllSanitySchemaTypes =
   | Page_topic
   | Page_topicIndex
   | Module_taxonomyList
+  | Module_postFeaturedReference
   | Page_blog
   | Module_postList
   | Module_contentReference

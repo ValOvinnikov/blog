@@ -9,6 +9,7 @@ import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { contentSchema } from '@blog/studio/schema-types/modules/module-content';
 import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
+import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/module-taxonomy-list';
 import { seoSchema } from '@blog/studio/schema-types/objects/seo';
@@ -58,12 +59,18 @@ export const genericSchema = defineType({
         contentSchema.name,
         ctaSchema.name,
         postLatestSchema.name,
+        postFeaturedSchema.name,
         newsletterSchema.name,
         taxonomyListSchema.name,
       ],
       validateCustom: (rule) =>
         rule
-          .custom(validateSingleBlankHeadingPerType([postLatestSchema.name]))
+          .custom(
+            validateSingleBlankHeadingPerType([
+              postLatestSchema.name,
+              postFeaturedSchema.name,
+            ]),
+          )
           .custom(validateTaxonomyListHasTaxonomy),
     }),
     defineField({

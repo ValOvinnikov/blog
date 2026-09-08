@@ -78,6 +78,7 @@ const REVALIDATE_TAGS = {
   module_postList: ['modules:postList'],
   module_taxonomyList: ['modules:taxonomyList'],
   module_postLatest: ['modules:postLatest'],
+  module_postFeatured: ['modules:postFeatured'],
   module_content: ['modules:content'],
   module_cta: ['modules:cta'],
   module_newsletter: ['modules:newsletter'],

@@ -1,6 +1,7 @@
 import { homePageSchema } from '@blog/studio/schema-types/documents/pages/home-page';
 import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/helpers/validate-taxonomy-list-has-taxonomy';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
+import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
 import type { ValidationContext } from 'sanity';
 
@@ -64,28 +65,34 @@ describe('homePageSchema modules validateCustom chaining', () => {
     expect(customFns[1]).toBe(validateTaxonomyListHasTaxonomy);
   });
 
-  it('keeps the blank-heading validator scoped to module_postLatest, not displaced by the taxonomy-list validator', async () => {
-    const [blankHeadingFn] = getModulesCustomValidators();
-    const context = {
-      getClient: () => ({
-        withConfig: () => ({
-          fetch: async () => [
-            { id: 'post-latest-1', heading: null },
-            { id: 'post-latest-2', heading: null },
-          ],
+  it.each([
+    ['module_postLatest', postLatestSchema.name],
+    ['module_postFeatured', postFeaturedSchema.name],
+  ])(
+    'keeps the blank-heading validator scoped to %s, not displaced by the taxonomy-list validator',
+    async (_label, moduleType) => {
+      const [blankHeadingFn] = getModulesCustomValidators();
+      const context = {
+        getClient: () => ({
+          withConfig: () => ({
+            fetch: async () => [
+              { id: 'module-1', heading: null },
+              { id: 'module-2', heading: null },
+            ],
+          }),
         }),
-      }),
-    } as unknown as ValidationContext;
+      } as unknown as ValidationContext;
 
-    const modules: TModuleReference[] = [
-      { _type: postLatestSchema.name, _ref: 'post-latest-1' },
-      { _type: postLatestSchema.name, _ref: 'post-latest-2' },
-    ];
+      const modules: TModuleReference[] = [
+        { _type: moduleType, _ref: 'module-1' },
+        { _type: moduleType, _ref: 'module-2' },
+      ];
 
-    await expect(blankHeadingFn?.(modules, context)).resolves.toContain(
-      'Only one module of this type without its own heading is allowed per page',
-    );
-  });
+      await expect(blankHeadingFn?.(modules, context)).resolves.toContain(
+        'Only one module of this type without its own heading is allowed per page',
+      );
+    },
+  );
 });
 
 describe('homePageSchema modules allow-list', () => {
@@ -108,6 +115,7 @@ describe('homePageSchema modules allow-list', () => {
       'module_newsletter',
       'module_postLatest',
       'module_taxonomyList',
+      'module_postFeatured',
     ]);
     expect(allowedTypes).not.toContain('module_postList');
   });
