@@ -182,6 +182,7 @@ export type Module_postFeatured = {
   brandVariant?: 'PRIMARY' | 'SECONDARY';
   headingBlock?: HeadingBlock;
   showImages?: boolean;
+  displayMode?: 'GRID' | 'CAROUSEL';
   postSource?: 'PINNED' | 'NEWEST_FEATURED';
   posts?: Array<
     {
