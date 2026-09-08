@@ -1,4 +1,4 @@
-import { POST_SOURCE } from '@blog/config/constants';
+import { DISPLAY_MODE, POST_SOURCE } from '@blog/config/constants';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
 import type { SanityDocument, ValidationContext } from 'sanity';
@@ -197,6 +197,34 @@ const createMockContext = (
   return { getClient } as unknown as ValidationContext;
 };
 
+describe('postFeaturedSchema displayMode field', () => {
+  it('is emitted immediately after showImages', () => {
+    const names =
+      postFeaturedSchema.fields
+        ?.map((field) => ('name' in field ? field.name : undefined))
+        .filter((name): name is string => Boolean(name)) ?? [];
+    const showImagesIndex = names.indexOf('showImages');
+    const displayModeIndex = names.indexOf('displayMode');
+
+    expect(showImagesIndex).toBeGreaterThanOrEqual(0);
+    expect(displayModeIndex).toBe(showImagesIndex + 1);
+  });
+
+  it('defaults to GRID', () => {
+    const field = getField('displayMode');
+
+    expect(field.initialValue).toBe(DISPLAY_MODE.GRID);
+  });
+
+  it('defines no validation rule', () => {
+    const field = getField('displayMode');
+
+    expect(
+      'validation' in field ? field.validation : undefined,
+    ).toBeUndefined();
+  });
+});
+
 describe('postFeaturedSchema postSource field', () => {
   it('offers Pinned and Newest Featured, defaulting to Pinned', () => {
     const field = getField('postSource');
@@ -326,6 +354,23 @@ describe('postFeaturedSchema document validation', () => {
       'error',
       'warning',
     ]);
+  });
+
+  it('defines no carousel/limit warning, unlike postLatestSchema', async () => {
+    const validators = getDocumentValidators();
+
+    for (const validator of validators) {
+      await expect(
+        validator.fn(
+          {
+            displayMode: DISPLAY_MODE.CAROUSEL,
+            postSource: POST_SOURCE.NEWEST_FEATURED,
+            limit: 1,
+          } as unknown as SanityDocument,
+          createMockContext(() => 1),
+        ),
+      ).resolves.toBe(true);
+    }
   });
 
   describe('newest-featured-has-candidate', () => {

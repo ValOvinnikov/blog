@@ -2,6 +2,7 @@ import { POST_SOURCE, type TPostSource } from '@blog/config/constants';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
 import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
 import { defineAlignmentFields } from '@blog/studio/schema-types/helpers/define-alignment-fields';
+import { displayModeField } from '@blog/studio/schema-types/helpers/display-mode-field';
 import { getDraftsClient } from '@blog/studio/schema-types/helpers/get-drafts-client';
 import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
 import { layoutField } from '@blog/studio/schema-types/helpers/layout-field';
@@ -71,6 +72,7 @@ export const postFeaturedSchema = defineType({
     brandVariantField(),
     headingBlockField(),
     showImagesField(),
+    displayModeField(),
     defineField({
       name: 'postSource',
       title: 'Post Source',
