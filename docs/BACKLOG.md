@@ -984,24 +984,49 @@ latest view models` — `postCardFragment` already carries `heroImageSanity`
 #### 1.4 Carousel display mode (Embla) — epic `feat: carousel display mode for listing modules`
 
 - **Depends on:** 1.2, 1.3.
-- **Design sub-issue** · `displayMode` (`GRID` / `CAROUSEL`) on
-  `module_postLatest` and `module_postFeatured` (not `module_postList`, which
-  paginates); the pure track markup vs. the Embla leaf boundary; Embla
-  options (align start, one slide per scroll, no autoplay, `dragFree` off);
-  reduced-motion and keyboard behaviour; verify the current Embla API via
-  context7 at implementation time.
-- **Sub-issues:**
-  - **config** · `feat(config): DISPLAY_MODE const`.
-  - **studio** · `feat(studio): displayMode on post listing modules`.
-  - **service** · `feat(service): project displayMode`.
+- **Design sub-issue** (#2835, settled — section "The carousel display
+  mode" in the spec of record) · `displayMode` (`GRID` / `CAROUSEL`) on
+  `module_postLatest` and `module_postFeatured` (not `module_postList`,
+  which paginates), `initialValue: GRID` with no `required()` and
+  `coalesce(displayMode, "GRID")` at read time, so every existing document
+  stays a grid with no migration. A pure `Carousel` organism in `@blog/ui`
+  (viewport `viewportRef`; `isEnhanced` swaps native scroll-snap for
+  Embla's clipping; `Carousel.Controls` with labels, handlers and disabled
+  state as props) and a `PostsSection.Carousel` slot that renders the
+  section's own cards as slides and ignores `hasLead`. The `apps/web`
+  `PostsCarousel` client leaf owns Embla — `align: 'start'`,
+  `slidesToScroll: 1`, `containScroll: 'trimSnaps'`, `dragFree` and `loop`
+  off, `duration: 0` under `prefers-reduced-motion`, no autoplay — and
+  carries the reader's pre-hydration scroll offset across `init`. Slides
+  match the grid's columns (85 % below `sm`, ½ at `sm`, ⅓ from `md`);
+  controls always render and are disabled exactly when Embla cannot move;
+  every card stays in the tab order and the viewport follows focus.
+  `embla-carousel-react@8.6.0`, pinned to the v8 major (the 9.0 rc renames
+  the methods). One Studio warning: a `module_postLatest` carousel with
+  `limit` < 4.
+- **Sub-issues** (ui first and independent; config + studio as one PR
+  because knip fails on the bare `DISPLAY_MODE` export; then service; then
+  web — each merges green alone; the `module_postFeatured` half waits on
+  1.3's studio → service → web PR):
+  - **config** · `feat(config): DISPLAY_MODE const` (#2836).
+  - **studio** · `feat(studio): displayMode on post listing modules` (#2837)
+    — shared `displayModeField()` helper, the `limit` warning, typegen.
+  - **service** · `feat(service): project displayMode` (#2838) — the
+    coalesced projection on both teasers.
   - **ui** · `feat(ui): Carousel organism — pure scroll-snap track with
-prev/next slots` — works before hydration; buttons and disabled states are
-    props.
-  - **web** · `feat(web): Embla client leaf wrapping the Carousel organism` —
-    `embla-carousel-react` added to `apps/web` only; web Storybook story.
-- **Acceptance:** grid remains the default; carousel mode is swipeable
-  without JS and Embla-driven with it; no autoplay; buttons keyboard
-  reachable; reduced motion respected.
+prev/next slots` (#2839) — plus the `PostsSection.Carousel` slot; works
+    before hydration; buttons and disabled states are props.
+  - **web** · `feat(web): Embla client leaf wrapping the Carousel organism`
+    (#2840) — `embla-carousel-react` added to `apps/web` only; the
+    `displayMode` branch in `PostListModuleView`; `carousel.previousAriaLabel` /
+    `carousel.nextAriaLabel` fixed copy; web Storybook story.
+- **PRs:** ui → config + studio → service → web.
+- **Acceptance:** grid remains the default for every existing document;
+  carousel mode swipes without JavaScript and is Embla-driven with it, and
+  keeps its position across hydration; no autoplay; both buttons keyboard
+  reachable, labelled, and disabled exactly when Embla cannot move; reduced
+  motion makes every position change instant; a spotlight in carousel mode
+  renders three equal slides.
 
 #### 1.5 Taxonomy list placeable in `modules[]` — epic `feat: topic cards on the home page`
 
