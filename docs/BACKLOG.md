@@ -824,8 +824,8 @@ same template-literal trick that derives `TModuleType`; a
 `TSlotModuleType`union covering the hero family plus`module_postList`/`module_taxonomyList`, so `MODULE_MAP`'s `Exclude` names one type instead
     of listing each.
   - **studio** · `feat(studio): hero family slot on page_home and
-page_generic` — `page_home.hero` `to:` accepts every hero type;
-    `page_generic`, `page_blog`, `page_topic` and `page_tag` gain an optional
+page_landing` — `page_home.hero` `to:` accepts every hero type;
+    `page_landing`, `page_blog`, `page_topic` and `page_tag` gain an optional
     `hero` slot with the same list, replacing the page's default header when
     set;
     `page_home.modules` allow-list widens to every `modules[]` module (today
@@ -878,7 +878,7 @@ landing pages` — `Record<THeroModuleType, …>` so an unregistered hero kind
   `mediaOrderStacked` for every width) collapsing to one `mediaOrder` prop.
 - **Sub-issues:**
   - **studio** · `feat(studio): module_heroBlog schema` — new type beside
-    `module_hero`; desk group "Heroes" lists both; `page_home`/`page_generic`
+    `module_hero`; desk group "Heroes" lists both; `page_home`/`page_landing`
     slots admit it. Typegen.
   - **service** · `feat(service): heroBlog loader with one resolved query` —
     the pinned-or-newest-featured resolution in **one** GROQ round trip (the
@@ -1048,7 +1048,7 @@ TSlotModuleType` — the union then names only slot-only modules, so the
     missing `MODULE_MAP` entry is a compile error.
   - **studio** · `feat(studio): authored taxonomy on module_taxonomyList and
 home/landing allow-lists` — `taxonomy`, `sortOrder`, `limit`; the two
-    page-level rules; `page_home`/`page_generic` allow the type.
+    page-level rules; `page_home`/`page_landing` allow the type.
   - **service** · `feat(service): taxonomyList reads the authored taxonomy
 when present` — one query resolving module and terms, `fallbackTaxonomy`
     parameter, sort and limit in the transformer.

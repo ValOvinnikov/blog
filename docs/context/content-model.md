@@ -8,7 +8,7 @@ Source of truth: `packages/studio/src/schema-types/` (documents grouped `blog/`,
 `pages/`, `settings/`; shared `objects/`; `modules/` — standalone,
 cross-referenceable page-builder documents, not embedded objects). Naming
 convention `{group}_{name}` is being applied incrementally (#251):
-`settings_navigation`, `settings_footer`, `page_home`, `page_generic`, and
+`settings_navigation`, `settings_footer`, `page_home`, `page_landing`, and
 every `module_*` document are done; `siteSettings` still carries a legacy
 name.
 
@@ -53,7 +53,7 @@ type. `module_taxonomyList` renders both ways and so is in `MODULE_MAP`.
   `sortOrder` (`TAXONOMY_SORT`, `ALPHABETICAL` by default) and `limit`
   (optional integer ≥ 1). Lists taxonomy entries as cards. `taxonomy` is
   optional on the document because a module cannot see what holds it, so the
-  requirement lives on the pages: `page_home`/`page_generic` reject a
+  requirement lives on the pages: `page_home`/`page_landing` reject a
   `modules[]` placement that leaves it empty, while an index page leaves it
   empty and the service falls back to that page's own kind — and that page's
   slot rule rejects a module set to the other kind. It carries
@@ -94,7 +94,7 @@ also gets an optional `layout` field via the shared `layoutField`/
   separate from the module list — it always renders first), `modules` (array of
   references via `defineModulesField({ allow: [postLatest, cta, newsletter] })`
   — the teaser, not the archive), `seo`.
-- `page_generic` (`genericSchema`) — `title`, `slug` (source: title),
+- `page_landing` (`landingSchema`) — `title`, `slug` (source: title),
   `modules` (array of references via `defineModulesField({ allow: [content,
 cta] })`), `seo`.
 - `page_blog` (`blogPageSchema`, singleton) — the `/blog` index page config:
@@ -132,7 +132,7 @@ replacing a hand-duplicated block per page document.
   `generatedAt`/`model` read-only in Studio; pipeline-populated for the
   choose-your-depth reading feature, #957).
 - `author` — name, slug, image, bio, role, socialLinks (unified `link`-based),
-  profilePage (optional ref, restricted to `page_generic`).
+  profilePage (optional ref, restricted to `page_landing`).
 - `category` — title, slug, description.
 - `tag` — title, slug, description, seo (topic taxonomy for posts; drives the
   `/tag` archives + related-posts, alongside the section-level `category`).
