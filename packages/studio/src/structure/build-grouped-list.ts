@@ -1,12 +1,12 @@
-import type { LucideIcon } from 'lucide-react';
+import type { SchemaTypeDefinition } from 'sanity';
 import type { ListItemBuilder, StructureBuilder } from 'sanity/structure';
 
 type TDividerBuilder = ReturnType<StructureBuilder['divider']>;
 
+type TStructureSchema = Pick<SchemaTypeDefinition, 'name' | 'title' | 'icon'>;
+
 export type TStructureGroupItem = {
-  documentType: string;
-  title: string;
-  icon: LucideIcon;
+  schema: TStructureSchema;
   mode?: 'list' | 'singleton';
 };
 
@@ -15,26 +15,43 @@ export type TStructureGroup = {
   items: TStructureGroupItem[];
 };
 
+const requireSchemaField = <TValue>(
+  value: TValue | undefined,
+  schemaName: string,
+  field: string,
+): TValue => {
+  if (value === undefined) {
+    throw new Error(
+      `Studio desk schema "${schemaName}" has no "${field}" — every desk entry needs one.`,
+    );
+  }
+  return value;
+};
+
 const buildGroupItem = (
   S: StructureBuilder,
   item: TStructureGroupItem,
 ): ListItemBuilder => {
+  const { name } = item.schema;
+  const title = requireSchemaField(item.schema.title, name, 'title');
+  const icon = requireSchemaField(item.schema.icon, name, 'icon');
+
   if (item.mode === 'singleton') {
     return S.listItem()
-      .title(item.title)
-      .id(item.documentType)
-      .icon(item.icon)
-      .child(
-        S.document()
-          .schemaType(item.documentType)
-          .documentId(item.documentType),
-      );
+      .title(title)
+      .id(name)
+      .icon(icon)
+      .child(S.document().schemaType(name).documentId(name));
   }
 
-  return S.documentTypeListItem(item.documentType)
-    .title(item.title)
-    .icon(item.icon);
+  return S.documentTypeListItem(name).title(title).icon(icon);
 };
+
+/** Builds items with no grouping or dividers, for a root with too few entries to warrant either. */
+export const buildListItems = (
+  S: StructureBuilder,
+  items: TStructureGroupItem[],
+): ListItemBuilder[] => items.map((item) => buildGroupItem(S, item));
 
 /** Flattens groups into `[divider(A), ...itemsA, divider(B), ...itemsB, ...]`, dropping any empty group. */
 export const buildGroupedListItems = (

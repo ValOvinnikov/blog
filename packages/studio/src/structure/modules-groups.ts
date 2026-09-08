@@ -7,50 +7,24 @@ import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-
 import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/module-taxonomy-list';
 import type { TStructureGroup } from '@blog/studio/structure/build-grouped-list';
-import {
-  Clock,
-  FileText,
-  LayoutGrid,
-  List,
-  Mail,
-  Megaphone,
-  Sparkles,
-  Star,
-} from 'lucide-react';
 
 export const modulesGroups: TStructureGroup[] = [
   {
     title: 'Post modules',
     items: [
-      { documentType: postListSchema.name, title: 'Post Lists', icon: List },
-      {
-        documentType: postLatestSchema.name,
-        title: 'Post Latest',
-        icon: Clock,
-      },
-      {
-        documentType: taxonomyListSchema.name,
-        title: 'Taxonomy Lists',
-        icon: LayoutGrid,
-      },
+      { schema: postListSchema },
+      { schema: postLatestSchema },
+      { schema: taxonomyListSchema },
     ],
   },
   {
     title: 'Content modules',
     items: [
-      { documentType: heroSchema.name, title: 'Heroes', icon: Sparkles },
-      {
-        documentType: heroBlogSchema.name,
-        title: 'Blog heroes',
-        icon: Star,
-      },
-      { documentType: contentSchema.name, title: 'Content', icon: FileText },
-      { documentType: ctaSchema.name, title: 'CTAs', icon: Megaphone },
-      {
-        documentType: newsletterSchema.name,
-        title: 'Newsletter Signups',
-        icon: Mail,
-      },
+      { schema: heroSchema },
+      { schema: heroBlogSchema },
+      { schema: contentSchema },
+      { schema: ctaSchema },
+      { schema: newsletterSchema },
     ],
   },
 ];
