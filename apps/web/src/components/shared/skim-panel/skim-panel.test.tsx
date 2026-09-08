@@ -15,22 +15,22 @@ const skim: TPostSkim = {
 
 // `SkimPanel` renders `SwitchToReadButton`, a client leaf that reads
 // `useDepth()` — every render needs a `DepthProvider` ancestor, matching how
-// `BlogPostPage` composes it in practice.
-const setup = (overrides?: Partial<ISkimPanelProps>) =>
-  renderElement(
+// `BlogPostPage` composes it in practice. `SkimPanel` is itself an async
+// Server Component now (it reads its own translations), so this awaits its
+// resolved element before wrapping it in the provider for a synchronous RTL
+// render.
+const setup = async (overrides?: Partial<ISkimPanelProps>) => {
+  const element = await SkimPanel({ skim, ...overrides });
+  return renderElement(
     <DepthProvider hasSkim={true} hasDeep={false}>
-      <SkimPanel
-        skim={skim}
-        label="30-second summary"
-        readFullArticleLabel="Read the full article"
-        {...overrides}
-      />
+      {element}
     </DepthProvider>,
   );
+};
 
-describe(`<${SkimPanel.name}/>`, () => {
-  it('renders one <li> per takeaway', () => {
-    setup();
+describe(SkimPanel, () => {
+  it('renders one <li> per takeaway', async () => {
+    await setup();
 
     expect(screen.getAllByRole('listitem')).toHaveLength(3);
     expect(screen.getByText('First takeaway.')).toBeVisible();
@@ -38,10 +38,21 @@ describe(`<${SkimPanel.name}/>`, () => {
     expect(screen.getByText('Third takeaway.')).toBeVisible();
   });
 
-  it('renders nothing when skim is undefined', () => {
-    const { container } = setup({ skim: undefined });
+  it('renders nothing when skim is undefined', async () => {
+    const { container } = await setup({ skim: undefined });
 
     expect(container.querySelector('section')).not.toBeInTheDocument();
+  });
+
+  it('renders the translated panel label and "read the full article" copy', async () => {
+    await setup();
+
+    expect(
+      screen.getByRole('region', { name: '30-second summary' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Read the full article' }),
+    ).toBeInTheDocument();
   });
 
   it('the "read the full article" button switches depth back to READ', async () => {
@@ -49,7 +60,7 @@ describe(`<${SkimPanel.name}/>`, () => {
     localStorage.setItem(DEPTH_STORAGE_KEY, DEPTH.SKIM);
     const user = userEvent.setup();
 
-    setup();
+    await setup();
 
     await user.click(
       screen.getByRole('button', { name: 'Read the full article' }),

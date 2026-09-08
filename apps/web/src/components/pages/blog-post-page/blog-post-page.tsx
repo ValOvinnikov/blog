@@ -1,170 +1,57 @@
-import {
-  ASIDE_KIND,
-  CAPABILITY,
-  ICONS,
-  SIZE,
-  type TAsideKind,
-  routes,
-} from '@blog/config';
-import { service } from '@blog/service';
-import { Icon } from '@blog/ui/atoms/icon';
-import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
-import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
-import { buildBlogPostingSchema } from '@web/utils/build-blog-posting-schema';
-import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
-import { buildShareLinks } from '@web/utils/build-share-links';
-import {
-  extractPostHeadings,
-  MIN_H2_HEADINGS_FOR_RAIL,
-} from '@web/utils/extract-post-headings/extract-post-headings';
+import { BlogPostingSchema } from '@web/components/features/post/blog-posting-schema';
+import { PostArticle } from '@web/components/features/post/post-article';
+import { PostBreadcrumbs } from '@web/components/features/post/post-breadcrumbs';
+import { PostNewsletter } from '@web/components/features/post/post-newsletter';
+import { PostRelated } from '@web/components/features/post/post-related';
+import { BackToTopButton } from '@web/components/shared/back-to-top-button';
+import { DepthToggle } from '@web/components/shared/depth-toggle';
+import { SkimPanel } from '@web/components/shared/skim-panel';
+import { DepthProvider } from '@web/context/depth-provider';
+import { getPostPage } from '@web/server/post/get-post-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
-import { logger } from '@web/utils/logger/logger';
-import { renderPostCardImage } from '@web/utils/render-post-card-image';
-import { toPostListItems } from '@web/utils/to-post-list-items';
-import { toSocialIconName } from '@web/utils/to-social-icon-name';
-import { getFormatter, getTranslations } from 'next-intl/server';
 
-import { BlogPostPageView } from './blog-post-page-view';
+import { blogPostPageVariants } from './blog-post-page-variants';
 
 type TBlogPostPageProps = { slug: string; tenant: string };
 
+const s = blogPostPageVariants();
+
 /**
  * `/blog/{slug}` composition. Site chrome (`Header`/`Footer`) stays owned by
- * `[tenant]/[locale]/layout.tsx`, not this component. Resolves every async concern
- * (the post fetch, next-intl translations/formatting, the newsletter
- * settings + bookmarks-capability checks) and hands the result to the pure
- * `BlogPostPageView`.
+ * `[tenant]/[locale]/layout.tsx`. Fetches the post once — purely to decide
+ * `notFound()` and to gate `DepthProvider`/`DepthToggle` on this post's
+ * skim/asides availability — and composes every other concern as a
+ * self-fetching part reading the same cached `getPostPage` loader.
  */
 export const BlogPostPage = async ({ slug, tenant }: TBlogPostPageProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
-  const result = await service.pages.post.v1.getPost(slug, tenantContext);
+  const result = await getPostPage(slug, tenant);
   const post = guardPageLoaderResult(result, 'blog_post_page.fetch_failed', {
     slug,
   });
-  const {
-    id,
-    title,
-    excerpt,
-    topic,
-    tags,
-    body,
-    skim,
-    hasAsides,
-    relatedPosts,
-    heroImageSanity,
-    heroImageAlt,
-    publishedAt,
-    author,
-    readingTimeMinutes,
-    newsletterEnabled,
-  } = post;
-
-  const headings = extractPostHeadings(body);
-  const hasContentsRail = headings.length >= MIN_H2_HEADINGS_FOR_RAIL;
-  const siteUrl = (await getTenantBaseUrl(tenant)) ?? '';
-  const url = `${siteUrl}${routes.post(slug)}`;
-  const blogPostingSchema = buildBlogPostingSchema(post, siteUrl);
-  const shareLinks = buildShareLinks({ url, title }).map((link) => ({
-    ...link,
-    icon: (
-      <Icon
-        name={toSocialIconName(link.platform) ?? ICONS.EXTERNAL_LINK}
-        size={SIZE.SM}
-      />
-    ),
-  }));
-  const [
-    format,
-    t,
-    blogPostT,
-    relatedPostItems,
-    newsletterSettingsResult,
-    isBookmarksEnabled,
-  ] = await Promise.all([
-    getFormatter(),
-    getTranslations('breadcrumbs'),
-    getTranslations('blogPostPage'),
-    toPostListItems(relatedPosts, renderPostCardImage),
-    service.global.newsletterSettings.v1.getNewsletterSettings(tenantContext),
-    isCapabilityEnabled(CAPABILITY.BOOKMARKS, tenant),
-  ]);
-
-  // Per-post opt-out (`newsletterEnabled`) gates the compact signup on this
-  // page; its heading is always CMS-sourced from the `settings_newsletter`
-  // singleton (never the page-builder module, never an i18n fallback). A
-  // failed settings fetch is optional/global data (SPEC.md's fetch-error
-  // stance): logged, and the signup is simply omitted rather than guessed at.
-  if (!newsletterSettingsResult.ok) {
-    logger.error('blog_post_page.newsletter_settings_fetch_failed', {
-      error: newsletterSettingsResult.error,
-    });
-  }
-  const newsletterHeading = newsletterSettingsResult.ok
-    ? newsletterSettingsResult.data.heading
-    : undefined;
-
-  const breadcrumbTrail: IBreadcrumbItem[] = [
-    { label: t('home'), href: routes.home() },
-    { label: topic.title, href: routes.topic(topic.slug) },
-    { label: title, href: routes.post(slug) },
-  ];
-  const breadcrumbListSchema = buildBreadcrumbListSchema(
-    breadcrumbTrail,
-    siteUrl,
-  );
-
-  const depthToggleLabels = {
-    skim: blogPostT('depthToggle.skim'),
-    read: blogPostT('depthToggle.read'),
-    deep: blogPostT('depthToggle.deep'),
-    ariaLabel: blogPostT('depthToggle.ariaLabel'),
-  };
-  const asideKindLabels: Record<TAsideKind, string> = {
-    [ASIDE_KIND.WHY_NOT]: blogPostT('asideKind.WHY_NOT'),
-    [ASIDE_KIND.DIGRESSION]: blogPostT('asideKind.DIGRESSION'),
-    [ASIDE_KIND.CONTEXT]: blogPostT('asideKind.CONTEXT'),
-  };
-  const formattedDate = format.dateTime(new Date(publishedAt), {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const { skim, hasAsides } = post;
+  const hasSkim = Boolean(skim);
 
   return (
-    <BlogPostPageView
-      id={id}
-      title={title}
-      excerpt={excerpt}
-      topic={topic}
-      tags={tags}
-      body={body}
-      skim={skim}
-      hasAsides={hasAsides}
-      author={author}
-      publishedAt={publishedAt}
-      formattedDate={formattedDate}
-      readingTimeMinutes={readingTimeMinutes}
-      heroImageSanity={heroImageSanity}
-      heroImageAlt={heroImageAlt}
-      headings={headings}
-      hasContentsRail={hasContentsRail}
-      url={url}
-      shareLinks={shareLinks}
-      isBookmarksEnabled={isBookmarksEnabled}
-      isNewsletterEnabled={newsletterEnabled}
-      newsletterHeading={newsletterHeading}
-      relatedPostItems={relatedPostItems}
-      relatedReadingLabel={blogPostT('relatedReading')}
-      breadcrumbTrail={breadcrumbTrail}
-      breadcrumbAriaLabel={t('ariaLabel')}
-      breadcrumbListSchema={breadcrumbListSchema}
-      blogPostingSchema={blogPostingSchema}
-      depthToggleLabels={depthToggleLabels}
-      asideKindLabels={asideKindLabels}
-      skimPanelLabel={blogPostT('skimPanel.label')}
-      skimPanelReadFullArticleLabel={blogPostT('skimPanel.readFullArticle')}
-    />
+    <>
+      <BlogPostingSchema slug={slug} tenant={tenant} />
+      <PostBreadcrumbs slug={slug} tenant={tenant} />
+
+      <main className={s.root()}>
+        <DepthProvider hasSkim={hasSkim} hasDeep={hasAsides}>
+          <DepthToggle
+            hasSkim={hasSkim}
+            hasDeep={hasAsides}
+            className={s.depthToggle()}
+          />
+          <PostArticle slug={slug} tenant={tenant} />
+          <SkimPanel skim={skim} />
+        </DepthProvider>
+
+        <PostRelated slug={slug} tenant={tenant} />
+        <PostNewsletter slug={slug} tenant={tenant} />
+      </main>
+
+      <BackToTopButton />
+    </>
   );
 };

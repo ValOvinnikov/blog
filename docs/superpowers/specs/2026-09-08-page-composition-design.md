@@ -59,12 +59,35 @@ Consequences, in the order they are ticketed:
 - **`PostsSection` retires.** Nothing replaces it in `@blog/ui`. A listing
   is composed in web from `Section`, `Heading`, `PostGrid`, `Carousel`
   and `PostCard`, with one web component mapping a post to a card.
-- **The `*-page-view.tsx` layer retires.** A page's parts are stories and
-  tests on their own; the page test asserts composition.
+- **The `*-page-view.tsx` layer retires.** A page's parts are tested on
+  their own and the page test asserts composition. A self-fetching part
+  gets no story — it cannot render outside a request — so the story that
+  used to cover a page view is not replaced. Only the pure, prop-driven
+  parts are storyable, and stories for them are optional.
 - **The post page gains `modules[]`**, and related reading and the
   post-foot newsletter become modules on it.
 
 ## Web building blocks
+
+### Where a part lives
+
+A part's directory is decided by whether it fetches, not by which page
+happens to use it first:
+
+- **`components/features/<page>/`** — parts that fetch. A part that reads
+  its own data through a `cache()`-wrapped loader is bound to the page
+  whose document that loader returns, so no other page can reuse it. The
+  post page's `PostArticle`, `PostBreadcrumbs`, `BlogPostingSchema`,
+  `PostRelated`, `PostNewsletter` and `BookmarkButtonGate` live under
+  `components/features/post/`.
+- **`components/shared/`** — parts that take props and nothing else.
+  `PostCardItem` and `PostShareLinks` are pure mappings of their inputs
+  and are reused across listings and pages.
+
+`components/pages/` and `components/page-templates/` are unchanged. The
+rule exists because "shared" had otherwise started to mean "any component
+that is not a page", which is how six post-only components ended up
+alongside genuinely reusable ones.
 
 ### `PostCardItem` — the one post-to-card mapping
 
