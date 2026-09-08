@@ -1,4 +1,4 @@
-import { ICONS, SIZE } from '@blog/config';
+import { ICONS, SIZE, type IWithDataTestId } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import type { THeadingLevel } from '@blog/ui/lib/react';
 import { PostCard } from '@blog/ui/molecules/post-card';
@@ -24,7 +24,7 @@ export interface IPostCardData {
   image?: ReactNode;
 }
 
-export type TPostCardItemProps = {
+export type TPostCardItemProps = IWithDataTestId & {
   item: IPostCardData;
   /** Renders a `PostCard.Media` region — the empty frame when `item.image` is absent. Omit to render no media region at all. */
   hasImage?: boolean;
@@ -47,8 +47,14 @@ export const PostCardItem = ({
   headingLevel = 3,
   isLead,
   isSplit,
+  dataTestId,
 }: TPostCardItemProps) => (
-  <PostCard excerpt={item.excerpt} isLead={isLead} isSplit={isSplit}>
+  <PostCard
+    excerpt={item.excerpt}
+    isLead={isLead}
+    isSplit={isSplit}
+    dataTestId={dataTestId}
+  >
     {hasImage && (
       <PostCard.Media dataTestId="post-card-media">{item.image}</PostCard.Media>
     )}

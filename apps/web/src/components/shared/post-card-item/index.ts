@@ -1,1 +1,1 @@
-export { PostCardItem } from './post-card-item';
+export { PostCardItem, type IPostCardData } from './post-card-item';

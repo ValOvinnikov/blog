@@ -48,7 +48,7 @@ export const PostRelated = async ({ slug, tenant }: TPostRelatedProps) => {
       <Heading level={2} id={TITLE_ID} className={s.label()}>
         {t('relatedReading')}
       </Heading>
-      <PostGrid>
+      <PostGrid className={s.grid()}>
         {items.map((item) => (
           <PostCardItem key={item.id} item={item} hasImage={true} />
         ))}

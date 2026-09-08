@@ -38,8 +38,8 @@ export interface ITaxonomyListModuleViewProps extends Omit<
 /**
  * TaxonomyListModuleView — render shell for `TaxonomyListModule`: a labeled
  * `Section` wrapping either a `PostGrid` of `TaxonomyCard`s or the empty
- * message. Built from primitives rather than `PostsSection` — that organism
- * is shaped around `PostCard`, not a taxonomy entry.
+ * message. Built from primitives — `PostCardItem` is shaped around a blog
+ * post, not a taxonomy entry, so no listing organism fits here.
  */
 export const TaxonomyListModuleView = ({
   brandVariant,

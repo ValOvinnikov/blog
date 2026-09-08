@@ -1,7 +1,9 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
+import { BRAND_VARIANT } from '@blog/config';
+import { Heading } from '@blog/ui/atoms/heading';
 import { Pagination } from '@blog/ui/organisms/pagination';
-import { PostsSection } from '@blog/ui/organisms/posts-section';
+import { PostGrid } from '@blog/ui/organisms/post-grid';
 import type { ITopicPageViewProps } from '@web/components/pages/topic-page';
+import { PostCardItem } from '@web/components/shared/post-card-item';
 import { Section } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
@@ -41,22 +43,19 @@ export const makeTopicPageView = (
         titleId="topic-posts-title"
         dataTestId="post-list-module-post-list-1"
       >
-        <PostsSection
-          posts={[
-            makePostListItem(),
-            makePostListItem({
+        <Heading level={2} id="topic-posts-title">
+          Posts in News
+        </Heading>
+        <PostGrid>
+          <PostCardItem item={makePostListItem()} />
+          <PostCardItem
+            item={makePostListItem({
               id: 'post-2',
               title: 'A tour of the new editor',
               href: '/blog/a-tour-of-the-new-editor',
-            }),
-          ]}
-          titleId="topic-posts-title"
-          accessibleTitle="Posts in News"
-          align={CONTENT_ALIGNMENT.LEFT}
-          linkAs={SmartLink}
-          isWrapped={true}
-          emptyMessage="No posts in News yet."
-        />
+            })}
+          />
+        </PostGrid>
         <Pagination
           currentPage={1}
           totalPages={3}

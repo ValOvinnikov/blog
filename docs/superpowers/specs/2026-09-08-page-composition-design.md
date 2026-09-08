@@ -279,11 +279,21 @@ becomes a self-fetching part, and listings compose the arrangements above.
 | Landing             | view (6 props)                             | hero slot + `ModuleRenderer` (already), view deleted                                                 |
 | Home                | already `HeroSlot` + `ModuleRenderer`      | unchanged                                                                                            |
 
-`PostListModuleView` retires with `PostsSection`: `PostListModule`,
-`PostLatestModule` and `PostFeaturedModule` each compose their own section
-(the three differ in source, pagination and arrangement, which is exactly
-what a shared view was hiding). Bookmarks and account pages are app pages,
-not CMS pages, and are out of scope.
+The **shared** `PostListModuleView` retires with `PostsSection`:
+`PostListModule`, `PostLatestModule` and `PostFeaturedModule` each get their
+own view instead (the three differ in source, pagination and arrangement,
+which is exactly what one shared view was hiding).
+
+Each module is therefore two files: an async component that fetches, and a
+pure presentational view that composes `Section`, `Heading`, the arrangement
+and — for the list — `Pagination`. The split is what keeps the arrangements
+storyable: a self-fetching component cannot render in Storybook, so folding
+the composition into it would delete the three listing layouts' story
+coverage, the spotlight's included. One view per module, storied; no view
+shared between modules.
+
+Bookmarks and account pages are app pages, not CMS pages, and are out of
+scope.
 
 ## Sequencing and PRs
 

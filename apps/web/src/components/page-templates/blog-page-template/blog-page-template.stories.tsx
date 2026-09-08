@@ -1,11 +1,13 @@
 import { routes } from '@blog/config';
 import type { TPostCard } from '@blog/service';
+import { Heading } from '@blog/ui/atoms/heading';
 import { Pagination } from '@blog/ui/organisms/pagination';
-import {
-  type IPostCardData,
-  PostsSection,
-} from '@blog/ui/organisms/posts-section';
+import { PostGrid } from '@blog/ui/organisms/post-grid';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import {
+  PostCardItem,
+  type IPostCardData,
+} from '@web/components/shared/post-card-item';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { TopicChipList } from '@web/components/shared/topic-chip-list';
 import {
@@ -72,12 +74,14 @@ const meta = {
   args: {
     heading: 'Blog',
     posts: (
-      <PostsSection
-        posts={posts}
-        title="Latest posts"
-        titleId="blog-posts-title"
-        linkAs={SmartLink}
-      />
+      <>
+        <Heading level={2}>Latest posts</Heading>
+        <PostGrid>
+          {posts.map((post) => (
+            <PostCardItem key={post.id} item={post} />
+          ))}
+        </PostGrid>
+      </>
     ),
   },
 } satisfies Meta<typeof BlogPageTemplate>;

@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
 import { toPostListItems } from './to-post-list-items';
 
 describe('toPostListItems', () => {
-  it('maps a post card into the href/formattedDate shape PostsSection expects', async () => {
+  it('maps a post card into the href/formattedDate shape PostCardItem expects', async () => {
     const topic = makePostCardTopic({ title: 'Engineering' });
     const post = makePostCard({
       id: 'post-1',
