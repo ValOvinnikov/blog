@@ -7,6 +7,7 @@ import { layoutField } from '@blog/studio/schema-types/helpers/layout-field';
 import { sectionHeaderField } from '@blog/studio/schema-types/helpers/section-header-field';
 import { showImagesField } from '@blog/studio/schema-types/helpers/show-images-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
+import { validateNewestFeaturedHasCandidate } from '@blog/studio/schema-types/helpers/validate-newest-featured-has-candidate';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Pin } from 'lucide-react';
 import {
@@ -26,24 +27,6 @@ const asPostFeaturedDocument = (
   document: SanityDocument | undefined,
 ): TPostFeaturedDocument | undefined =>
   document as TPostFeaturedDocument | undefined;
-
-const validateNewestFeaturedHasCandidate = async (
-  document: SanityDocument | undefined,
-  context: ValidationContext,
-): Promise<string | true> => {
-  const doc = asPostFeaturedDocument(document);
-
-  if (doc?.postSource !== POST_SOURCE.NEWEST_FEATURED) return true;
-
-  const client = getDraftsClient(context);
-  const count = await client.fetch<number>(
-    `count(*[_type == "blog_post" && featured == true && publishedAt <= now()])`,
-  );
-
-  return count > 0
-    ? true
-    : 'No published post is marked Featured, so this spotlight would render empty.';
-};
 
 const validatePinnedPostsPublishDate = async (
   document: SanityDocument | undefined,
@@ -80,7 +63,7 @@ export const postFeaturedSchema = defineType({
   type: 'document',
   icon: Pin,
   validation: (rule) => [
-    rule.custom(validateNewestFeaturedHasCandidate),
+    rule.custom(validateNewestFeaturedHasCandidate('spotlight')),
     rule.custom(validatePinnedPostsPublishDate).warning(),
   ],
   fields: [
