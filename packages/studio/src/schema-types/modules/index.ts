@@ -3,6 +3,7 @@ import { ctaSchema } from './module-cta';
 import { heroSchema } from './module-hero';
 import { heroBlogSchema } from './module-hero-blog';
 import { newsletterSchema } from './module-newsletter';
+import { postFeaturedSchema } from './module-post-featured';
 import { postLatestSchema } from './module-post-latest';
 import { postListSchema } from './module-post-list';
 import { taxonomyListSchema } from './module-taxonomy-list';
@@ -12,6 +13,7 @@ export const modules = [
   heroBlogSchema,
   postListSchema,
   postLatestSchema,
+  postFeaturedSchema,
   taxonomyListSchema,
   contentSchema,
   ctaSchema,

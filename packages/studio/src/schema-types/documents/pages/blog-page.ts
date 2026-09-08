@@ -1,8 +1,10 @@
 import { defineModulesField } from '@blog/studio/schema-types/helpers/define-modules-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
+import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/helpers/validate-single-blank-heading-per-type';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
+import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
 import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
 import { seoSchema } from '@blog/studio/schema-types/objects/seo';
 import { Newspaper } from 'lucide-react';
@@ -56,7 +58,11 @@ export const blogPageSchema = defineType({
       validation: (rule) => rule.required(),
     }),
     defineModulesField({
-      allow: [ctaSchema.name, newsletterSchema.name],
+      allow: [ctaSchema.name, newsletterSchema.name, postFeaturedSchema.name],
+      validateCustom: (rule) =>
+        rule.custom(
+          validateSingleBlankHeadingPerType([postFeaturedSchema.name]),
+        ),
     }),
     defineField({
       name: 'seo',

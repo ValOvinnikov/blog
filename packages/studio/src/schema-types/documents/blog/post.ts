@@ -124,7 +124,8 @@ export const postSchema = defineType({
       name: 'featured',
       title: 'Featured',
       type: 'boolean',
-      description: 'Pin this post to the featured slot on the home page.',
+      description:
+        'Marks this post for the Newest featured source of the blog hero and the featured spotlight.',
     }),
     defineField({
       name: 'newsletterEnabled',

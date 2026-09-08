@@ -108,6 +108,7 @@ describe('homePageSchema modules allow-list', () => {
       'module_newsletter',
       'module_postLatest',
       'module_taxonomyList',
+      'module_postFeatured',
     ]);
     expect(allowedTypes).not.toContain('module_postList');
   });

@@ -199,7 +199,7 @@ describe('genericSchema hero field', () => {
 });
 
 describe('genericSchema modules allow-list', () => {
-  it('permits content, cta, postLatest, newsletter and taxonomyList modules', () => {
+  it('permits content, cta, postLatest, postFeatured, newsletter and taxonomyList modules', () => {
     const modulesField = genericSchema.fields?.find(
       (field) => field.name === 'modules',
     ) as { type: 'array'; of?: Array<{ name?: string }> } | undefined;
@@ -216,6 +216,7 @@ describe('genericSchema modules allow-list', () => {
       'module_content',
       'module_cta',
       'module_postLatest',
+      'module_postFeatured',
       'module_newsletter',
       'module_taxonomyList',
     ]);
