@@ -1,7 +1,6 @@
 import { routes } from '@blog/config';
-import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getTagPage } from '@web/server/tag/get-tag-page';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
@@ -12,8 +11,8 @@ import { getTranslations } from 'next-intl/server';
  * `page_tag` document's own resolved `seo`. Every page self-canonicalizes —
  * page 2+ must never canonical to `/tags/[slug]`.
  *
- * Reuses `getTagPage` (also called by `TagPage`) — Next dedupes the fetch
- * per request, so this adds no extra round-trip.
+ * Reads the same cached `getTagPage` loader the route's own `TagPage`
+ * composition reads, so building metadata costs no second Sanity fetch.
  *
  * Every page also advertises the tag's own RSS feed
  * (`/tags/[slug]/rss.xml`) via `alternates.types['application/rss+xml']` —
@@ -24,9 +23,8 @@ export const buildTagMetadata = async (
   tenant: string,
   pageNumber?: number,
 ): Promise<Metadata> => {
-  const tenantContext = await getTenantSanityContext(tenant);
   const [result, t] = await Promise.all([
-    service.pages.tag.v1.getTagPage(slug, tenantContext),
+    getTagPage(slug, tenant),
     getTranslations('pagination'),
   ]);
 
