@@ -9,9 +9,9 @@ import { SmartLink } from '@web/components/shared/smart-link';
 import type { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import type { ReactNode } from 'react';
 
-import { genericPageVariants } from './generic-page-variants';
+import { landingPageVariants } from './landing-page-variants';
 
-export interface IGenericPageViewProps {
+export interface ILandingPageViewProps {
   title: string;
   breadcrumbTrail: IBreadcrumbItem[];
   breadcrumbAriaLabel: string;
@@ -20,10 +20,10 @@ export interface IGenericPageViewProps {
   modulesContent: ReactNode;
 }
 
-const s = genericPageVariants();
+const s = landingPageVariants();
 
 /**
- * Pure view for `GenericPage` — the `Home › {title}` breadcrumb trail (plus
+ * Pure view for `LandingPage` — the `Home › {title}` breadcrumb trail (plus
  * its `BreadcrumbList` JSON-LD) as a sibling before `<main>`. Hero replaces
  * the page's default title heading; exactly one of the two ever renders.
  * `modulesContent` is pre-rendered by the wrapper (`ModuleRenderer`) since
@@ -32,14 +32,14 @@ const s = genericPageVariants();
  * unconstrained root. `Header`/`Footer` stay owned by
  * `[tenant]/[locale]/layout.tsx`.
  */
-export const GenericPageView = ({
+export const LandingPageView = ({
   title,
   breadcrumbTrail,
   breadcrumbAriaLabel,
   breadcrumbListSchema,
   hero,
   modulesContent,
-}: IGenericPageViewProps) => {
+}: ILandingPageViewProps) => {
   return (
     <>
       {breadcrumbListSchema && <JsonLd schema={breadcrumbListSchema} />}

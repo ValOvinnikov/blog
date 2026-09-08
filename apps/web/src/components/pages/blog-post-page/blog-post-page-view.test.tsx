@@ -85,7 +85,7 @@ describe(BlogPostPageView, () => {
     expect(screen.getByText('January 15, 2026')).toBeVisible();
   });
 
-  it('links the author name to routes.genericPage(profilePageSlug)', () => {
+  it('links the author name to routes.landingPage(profilePageSlug)', () => {
     setup();
 
     expect(screen.getByRole('link', { name: 'Jane Doe' })).toHaveAttribute(

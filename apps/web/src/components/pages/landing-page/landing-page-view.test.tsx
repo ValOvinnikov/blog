@@ -1,11 +1,11 @@
 import { customRender, screen, within } from '@web/testing/custom-render';
-import { makeGenericPageView } from '@web/testing/pages/generic-page/fixtures';
+import { makeLandingPageView } from '@web/testing/pages/landing-page/fixtures';
 
-import { GenericPageView } from './generic-page-view';
+import { LandingPageView } from './landing-page-view';
 
-const setup = customRender(GenericPageView, makeGenericPageView());
+const setup = customRender(LandingPageView, makeLandingPageView());
 
-describe(GenericPageView, () => {
+describe(LandingPageView, () => {
   it('renders the title as the h1', () => {
     setup();
 

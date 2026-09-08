@@ -244,7 +244,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
     ];
     const secondModuleBody: TPortableTextBody = [
       // Same heading text as the first module's outline — this is exactly
-      // the scenario `module_content` can hit twice on one `page_generic`.
+      // the scenario `module_content` can hit twice on one `page_landing`.
       richTextBlock('h2', [richTextSpan('Overview')]),
       richTextBlock('h2', [richTextSpan('Details')]),
       richTextBlock('h2', [richTextSpan('Summary')]),

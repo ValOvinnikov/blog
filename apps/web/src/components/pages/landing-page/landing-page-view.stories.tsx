@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { makeGenericPageView } from '@web/testing/pages/generic-page/fixtures';
+import { makeLandingPageView } from '@web/testing/pages/landing-page/fixtures';
 
-import { GenericPageView } from './generic-page-view';
+import { LandingPageView } from './landing-page-view';
 
 const meta = {
-  title: 'Pages/GenericPageView',
-  component: GenericPageView,
+  title: 'Pages/LandingPageView',
+  component: LandingPageView,
   tags: ['autodocs'],
-  args: makeGenericPageView(),
-} satisfies Meta<typeof GenericPageView>;
+  args: makeLandingPageView(),
+} satisfies Meta<typeof LandingPageView>;
 
 export default meta;
 type TStory = StoryObj<typeof meta>;

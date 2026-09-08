@@ -1,5 +1,5 @@
 import { BRAND_VARIANT, CTA_VARIANT } from '@blog/config';
-import type { IGenericPageViewProps } from '@web/components/pages/generic-page';
+import type { ILandingPageViewProps } from '@web/components/pages/landing-page';
 import { ContentModuleView } from '@web/modules/content/content-module-view';
 import { CtaModuleView } from '@web/modules/cta/cta-module-view';
 import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
@@ -12,9 +12,9 @@ const DEFAULT_TRAIL = [
   { label: 'About Us', href: '/about-us' },
 ];
 
-export const makeGenericPageView = (
-  overrides: Partial<IGenericPageViewProps> = {},
-): IGenericPageViewProps => {
+export const makeLandingPageView = (
+  overrides: Partial<ILandingPageViewProps> = {},
+): ILandingPageViewProps => {
   return {
     title: 'About Us',
     breadcrumbTrail: DEFAULT_TRAIL,

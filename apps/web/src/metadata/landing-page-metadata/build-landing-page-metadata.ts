@@ -6,23 +6,23 @@ import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 
 /**
- * Metadata for a `/[slug]` standalone page (`page_generic`). Unlike
- * `TTopic`, `TGenericPage.seo` is already a fully-resolved `TSeoResolved`
+ * Metadata for a `/[slug]` standalone page (`page_landing`). Unlike
+ * `TTopic`, `TLandingPage.seo` is already a fully-resolved `TSeoResolved`
  * (authored → content → site defaults), so this maps it straight through
  * `toMetadata` rather than building fallback fields itself.
  *
- * Reuses `getPage` (also called by `GenericPage`) — Next dedupes the fetch
+ * Reuses `getPage` (also called by `LandingPage`) — Next dedupes the fetch
  * per request, so this adds no extra round-trip.
  */
-export const buildGenericPageMetadata = async (
+export const buildLandingPageMetadata = async (
   slug: string,
   tenant: string,
 ): Promise<Metadata> => {
   const tenantContext = await getTenantSanityContext(tenant);
-  const result = await service.pages.generic.v1.getPage(slug, tenantContext);
+  const result = await service.pages.landing.v1.getPage(slug, tenantContext);
 
   if (!result.ok) {
-    logger.error('generic_page_metadata.fetch_failed', {
+    logger.error('landing_page_metadata.fetch_failed', {
       slug,
       error: result.error,
     });
@@ -34,7 +34,7 @@ export const buildGenericPageMetadata = async (
   }
 
   return toMetadata(result.data.seo, {
-    canonical: routes.genericPage(slug),
+    canonical: routes.landingPage(slug),
     ogType: 'website',
   });
 };

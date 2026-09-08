@@ -2,7 +2,7 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
-import { GenericPage } from './generic-page';
+import { LandingPage } from './landing-page';
 
 const {
   getPageMock,
@@ -17,10 +17,10 @@ const {
   // `ModuleRenderer` is an async Server Component — real RSC async-component
   // nesting isn't renderable through `@testing-library/react`'s client
   // renderer. Stubbed as a plain sync component so this suite can assert
-  // `GenericPage` passes the right props through without needing a real
+  // `LandingPage` passes the right props through without needing a real
   // async render; its own dispatch logic is covered by
-  // `module-renderer.test.tsx`. `GenericPageView`'s own rendering (h1,
-  // breadcrumbs, JSON-LD) is covered by `generic-page-view.test.tsx`.
+  // `module-renderer.test.tsx`. `LandingPageView`'s own rendering (h1,
+  // breadcrumbs, JSON-LD) is covered by `landing-page-view.test.tsx`.
   moduleRendererMock: vi.fn(({ modules }: { modules: { id: string }[] }) => (
     <div data-testid="module-renderer">{modules.length} modules</div>
   )),
@@ -32,7 +32,7 @@ const {
 vi.mock('@blog/service', () => ({
   service: {
     pages: {
-      generic: { v1: { getPage: getPageMock } },
+      landing: { v1: { getPage: getPageMock } },
     },
   },
 }));
@@ -68,13 +68,13 @@ vi.mock('@web/components/shared/smart-link', () => ({
   ),
 }));
 
-const setup = customRenderAsync(GenericPage, {
+const setup = customRenderAsync(LandingPage, {
   slug: 'about-us',
   locale: 'EN',
   tenant: 'tenant-1',
 });
 
-describe(`<${GenericPage.name}/>`, () => {
+describe(`<${LandingPage.name}/>`, () => {
   beforeEach(() => {
     getPageMock.mockReset();
     moduleRendererMock.mockClear();
@@ -93,7 +93,7 @@ describe(`<${GenericPage.name}/>`, () => {
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('generic_page.fetch_failed'),
+      expect.stringContaining('landing_page.fetch_failed'),
     );
 
     errorSpy.mockRestore();

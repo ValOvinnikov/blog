@@ -1,7 +1,7 @@
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
-import { buildGenericPageMetadata } from './build-generic-page-metadata';
+import { buildLandingPageMetadata } from './build-landing-page-metadata';
 
 const { getPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
   getPageMock: vi.fn(),
@@ -11,7 +11,7 @@ const { getPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
 vi.mock('@blog/service', () => ({
   service: {
     pages: {
-      generic: { v1: { getPage: getPageMock } },
+      landing: { v1: { getPage: getPageMock } },
     },
   },
 }));
@@ -28,7 +28,7 @@ const seo = makeSeo({
   ogImageUrl: 'https://cdn.example.com/about-og.jpg',
 });
 
-describe('buildGenericPageMetadata', () => {
+describe('buildLandingPageMetadata', () => {
   beforeEach(() => {
     getTenantSanityContextMock.mockReset();
     getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
@@ -46,7 +46,7 @@ describe('buildGenericPageMetadata', () => {
       data: { title: 'About Us', slug: 'about-us', modules: [], seo },
     });
 
-    await buildGenericPageMetadata('about-us', 'tenant-1');
+    await buildLandingPageMetadata('about-us', 'tenant-1');
 
     expect(getPageMock).toHaveBeenCalledWith('about-us', tenant);
     expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
@@ -58,7 +58,7 @@ describe('buildGenericPageMetadata', () => {
       data: { title: 'About Us', slug: 'about-us', modules: [], seo },
     });
 
-    const metadata = await buildGenericPageMetadata('about-us', 'tenant-1');
+    const metadata = await buildLandingPageMetadata('about-us', 'tenant-1');
 
     expect(metadata.title).toBe('About Us');
     expect(metadata.description).toBe('Who we are.');
@@ -74,11 +74,11 @@ describe('buildGenericPageMetadata', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getPageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
 
-    const metadata = await buildGenericPageMetadata('missing', 'tenant-1');
+    const metadata = await buildLandingPageMetadata('missing', 'tenant-1');
 
     expect(metadata).toEqual({});
     expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('generic_page_metadata.fetch_failed'),
+      expect.stringContaining('landing_page_metadata.fetch_failed'),
     );
     errorSpy.mockRestore();
   });
@@ -87,7 +87,7 @@ describe('buildGenericPageMetadata', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getPageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    const metadata = await buildGenericPageMetadata('missing', 'tenant-1');
+    const metadata = await buildLandingPageMetadata('missing', 'tenant-1');
 
     expect(metadata).toEqual({});
     expect(errorSpy).not.toHaveBeenCalled();
