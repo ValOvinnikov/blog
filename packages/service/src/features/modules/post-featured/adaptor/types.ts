@@ -1,6 +1,7 @@
 import type {
   TBrandVariantOf,
   TContentAlignment,
+  TDisplayMode,
   TLayout,
   TMaybeUndefined,
   THeadingBlock,
@@ -14,4 +15,5 @@ export type TPostFeaturedModule = {
   layout: TMaybeUndefined<TLayout>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
   showImages: boolean;
+  displayMode: TDisplayMode;
 };

@@ -33,4 +33,10 @@ describe('postFeaturedModuleQuery', () => {
       'coalesce(showImages, true)',
     );
   });
+
+  it('coalesces displayMode to GRID for documents authored before the field existed', () => {
+    expect(postFeaturedModuleQuery.query).toContain(
+      'coalesce(displayMode, "GRID")',
+    );
+  });
 });

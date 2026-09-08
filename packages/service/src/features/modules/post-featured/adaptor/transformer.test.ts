@@ -2,6 +2,7 @@ import {
   BRAND_VARIANT,
   CONTAINER_WIDTH,
   CONTENT_ALIGNMENT,
+  DISPLAY_MODE,
   POST_SOURCE,
 } from '@blog/config';
 import { makeRawPostFeaturedModule } from '@blog/service/testing/modules/fixtures';
@@ -188,5 +189,23 @@ describe(toPostFeaturedModule, () => {
     const module = toPostFeaturedModule(raw, tenant);
 
     expect(module.showImages).toBe(false);
+  });
+
+  it('passes an authored CAROUSEL displayMode through', () => {
+    const raw = makeRawPostFeaturedModule({
+      displayMode: DISPLAY_MODE.CAROUSEL,
+    });
+
+    const module = toPostFeaturedModule(raw, tenant);
+
+    expect(module.displayMode).toBe(DISPLAY_MODE.CAROUSEL);
+  });
+
+  it('passes the read-time GRID default through when the field is absent from the document', () => {
+    const raw = makeRawPostFeaturedModule({ displayMode: DISPLAY_MODE.GRID });
+
+    const module = toPostFeaturedModule(raw, tenant);
+
+    expect(module.displayMode).toBe(DISPLAY_MODE.GRID);
   });
 });
