@@ -1,7 +1,7 @@
 import {
   CTA_ACTION_VARIANT,
   HERO_IMAGE_SOURCE,
-  HERO_POST_SOURCE,
+  POST_SOURCE,
   HERO_VARIANT,
 } from '@blog/config/constants';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/module-hero-blog';
@@ -130,10 +130,10 @@ describe('heroBlogSchema postSource field', () => {
     const field = getField('postSource');
 
     expect(getOptionValues(field)).toEqual([
-      HERO_POST_SOURCE.PINNED,
-      HERO_POST_SOURCE.NEWEST_FEATURED,
+      POST_SOURCE.PINNED,
+      POST_SOURCE.NEWEST_FEATURED,
     ]);
-    expect(field.initialValue).toBe(HERO_POST_SOURCE.PINNED);
+    expect(field.initialValue).toBe(POST_SOURCE.PINNED);
   });
 });
 
@@ -141,11 +141,9 @@ describe('heroBlogSchema post field', () => {
   it('is hidden unless Post Source is Pinned', () => {
     const hidden = getHidden(getField('post'));
 
-    expect(hidden({ parent: { postSource: HERO_POST_SOURCE.PINNED } })).toBe(
-      false,
-    );
+    expect(hidden({ parent: { postSource: POST_SOURCE.PINNED } })).toBe(false);
     expect(
-      hidden({ parent: { postSource: HERO_POST_SOURCE.NEWEST_FEATURED } }),
+      hidden({ parent: { postSource: POST_SOURCE.NEWEST_FEATURED } }),
     ).toBe(true);
   });
 
@@ -153,7 +151,7 @@ describe('heroBlogSchema post field', () => {
     const validate = getFieldCustomValidator(getField('post'));
 
     expect(
-      validate(undefined, { parent: { postSource: HERO_POST_SOURCE.PINNED } }),
+      validate(undefined, { parent: { postSource: POST_SOURCE.PINNED } }),
     ).toBe('Choose a post, or switch the source to Newest featured.');
   });
 
@@ -163,7 +161,7 @@ describe('heroBlogSchema post field', () => {
     expect(
       validate(
         { _ref: 'post-1' },
-        { parent: { postSource: HERO_POST_SOURCE.PINNED } },
+        { parent: { postSource: POST_SOURCE.PINNED } },
       ),
     ).toBe(true);
   });
@@ -173,7 +171,7 @@ describe('heroBlogSchema post field', () => {
 
     expect(
       validate(undefined, {
-        parent: { postSource: HERO_POST_SOURCE.NEWEST_FEATURED },
+        parent: { postSource: POST_SOURCE.NEWEST_FEATURED },
       }),
     ).toBe(true);
   });
@@ -286,7 +284,7 @@ describe('heroBlogSchema document validation', () => {
 
       await expect(
         validateNewestFeatured!.fn(
-          { postSource: HERO_POST_SOURCE.PINNED } as unknown as SanityDocument,
+          { postSource: POST_SOURCE.PINNED } as unknown as SanityDocument,
           context,
         ),
       ).resolves.toBe(true);
@@ -300,7 +298,7 @@ describe('heroBlogSchema document validation', () => {
       await expect(
         validateNewestFeatured!.fn(
           {
-            postSource: HERO_POST_SOURCE.NEWEST_FEATURED,
+            postSource: POST_SOURCE.NEWEST_FEATURED,
           } as unknown as SanityDocument,
           context,
         ),
@@ -316,7 +314,7 @@ describe('heroBlogSchema document validation', () => {
       await expect(
         validateNewestFeatured!.fn(
           {
-            postSource: HERO_POST_SOURCE.NEWEST_FEATURED,
+            postSource: POST_SOURCE.NEWEST_FEATURED,
           } as unknown as SanityDocument,
           context,
         ),
@@ -394,7 +392,7 @@ describe('heroBlogSchema document validation', () => {
       await expect(
         validatePublishDate!.fn(
           {
-            postSource: HERO_POST_SOURCE.NEWEST_FEATURED,
+            postSource: POST_SOURCE.NEWEST_FEATURED,
           } as unknown as SanityDocument,
           context,
         ),
@@ -413,7 +411,7 @@ describe('heroBlogSchema document validation', () => {
       await expect(
         validatePublishDate!.fn(
           {
-            postSource: HERO_POST_SOURCE.PINNED,
+            postSource: POST_SOURCE.PINNED,
             post: { _ref: 'post-1' },
           } as unknown as SanityDocument,
           context,
@@ -434,7 +432,7 @@ describe('heroBlogSchema document validation', () => {
       await expect(
         validatePublishDate!.fn(
           {
-            postSource: HERO_POST_SOURCE.PINNED,
+            postSource: POST_SOURCE.PINNED,
             post: { _ref: 'post-1' },
           } as unknown as SanityDocument,
           context,
@@ -473,7 +471,7 @@ describe('heroBlogSchema document validation', () => {
       await expect(
         validateImageFallback!.fn(
           {
-            postSource: HERO_POST_SOURCE.NEWEST_FEATURED,
+            postSource: POST_SOURCE.NEWEST_FEATURED,
             imageSource: HERO_IMAGE_SOURCE.POST,
           } as unknown as SanityDocument,
           context,
@@ -491,7 +489,7 @@ describe('heroBlogSchema document validation', () => {
       await expect(
         validateImageFallback!.fn(
           {
-            postSource: HERO_POST_SOURCE.NEWEST_FEATURED,
+            postSource: POST_SOURCE.NEWEST_FEATURED,
             imageSource: HERO_IMAGE_SOURCE.POST,
           } as unknown as SanityDocument,
           context,
@@ -512,7 +510,7 @@ describe('heroBlogSchema preview', () => {
     expect(
       prepare({
         title: 'My Hero',
-        postSource: HERO_POST_SOURCE.PINNED,
+        postSource: POST_SOURCE.PINNED,
         postTitle: 'Some Post',
       }),
     ).toEqual({
@@ -531,7 +529,7 @@ describe('heroBlogSchema preview', () => {
     expect(
       prepare({
         title: 'My Hero',
-        postSource: HERO_POST_SOURCE.NEWEST_FEATURED,
+        postSource: POST_SOURCE.NEWEST_FEATURED,
         postTitle: undefined,
       }),
     ).toEqual({

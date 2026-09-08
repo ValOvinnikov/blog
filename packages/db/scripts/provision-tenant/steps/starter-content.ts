@@ -1,7 +1,7 @@
 import {
   BRAND_VARIANT,
   HERO_IMAGE_SOURCE,
-  HERO_POST_SOURCE,
+  POST_SOURCE,
   HERO_VARIANT,
   PRESET_ID,
   LINK_TYPE,
@@ -134,7 +134,7 @@ export function buildStarterDocuments(
     _type: 'module_heroBlog',
     title: 'Welcome Hero',
     brandVariant: BRAND_VARIANT.PRIMARY,
-    postSource: HERO_POST_SOURCE.PINNED,
+    postSource: POST_SOURCE.PINNED,
     post: { _type: 'reference', _ref: STARTER_DOCUMENT_IDS.POST },
     imageSource: HERO_IMAGE_SOURCE.POST,
     variant: HERO_VARIANT.SPLIT,

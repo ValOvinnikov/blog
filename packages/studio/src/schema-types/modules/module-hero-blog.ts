@@ -2,10 +2,10 @@ import {
   CTA_ACTION_APPEARANCE,
   CTA_ACTION_VARIANT,
   HERO_IMAGE_SOURCE,
-  HERO_POST_SOURCE,
+  POST_SOURCE,
   HERO_VARIANT,
   type THeroImageSource,
-  type THeroPostSource,
+  type TPostSource,
   type THeroVariant,
 } from '@blog/config/constants';
 import { postSchema } from '@blog/studio/schema-types/documents/blog/post';
@@ -24,7 +24,7 @@ import {
 } from 'sanity';
 
 type THeroBlogDocument = {
-  postSource?: THeroPostSource;
+  postSource?: TPostSource;
   post?: { _ref?: string };
   imageSource?: THeroImageSource;
   variant?: THeroVariant;
@@ -45,7 +45,7 @@ const fetchResolvedPost = async (
 ): Promise<TResolvedPost | null> => {
   const client = getDraftsClient(context);
 
-  if (document.postSource === HERO_POST_SOURCE.PINNED) {
+  if (document.postSource === POST_SOURCE.PINNED) {
     const ref = document.post?._ref;
 
     if (!ref) return null;
@@ -67,7 +67,7 @@ const validateNewestFeaturedHasCandidate = async (
 ): Promise<string | true> => {
   const doc = asHeroBlogDocument(document);
 
-  if (doc?.postSource !== HERO_POST_SOURCE.NEWEST_FEATURED) return true;
+  if (doc?.postSource !== POST_SOURCE.NEWEST_FEATURED) return true;
 
   const client = getDraftsClient(context);
   const count = await client.fetch<number>(
@@ -97,7 +97,7 @@ const validatePinnedPostPublishDate = async (
 ): Promise<string | true> => {
   const doc = asHeroBlogDocument(document);
 
-  if (doc?.postSource !== HERO_POST_SOURCE.PINNED) return true;
+  if (doc?.postSource !== POST_SOURCE.PINNED) return true;
 
   const resolved = await fetchResolvedPost(doc, context);
 
@@ -142,12 +142,12 @@ export const heroBlogSchema = defineType({
         'Which post this hero renders: a specific pinned post, or the newest post marked Featured.',
       options: {
         layout: 'radio',
-        list: Object.values(HERO_POST_SOURCE).map((value) => ({
+        list: Object.values(POST_SOURCE).map((value) => ({
           title: toTitleCase(value),
           value,
         })),
       },
-      initialValue: HERO_POST_SOURCE.PINNED,
+      initialValue: POST_SOURCE.PINNED,
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -158,12 +158,12 @@ export const heroBlogSchema = defineType({
       to: [{ type: postSchema.name }],
       hidden: ({ parent }) =>
         (parent as THeroBlogDocument | undefined)?.postSource !==
-        HERO_POST_SOURCE.PINNED,
+        POST_SOURCE.PINNED,
       validation: (rule) =>
         rule.custom((value, context) => {
           const parent = context.parent as THeroBlogDocument | undefined;
 
-          return parent?.postSource === HERO_POST_SOURCE.PINNED && !value
+          return parent?.postSource === POST_SOURCE.PINNED && !value
             ? 'Choose a post, or switch the source to Newest featured.'
             : true;
         }),
@@ -272,7 +272,7 @@ export const heroBlogSchema = defineType({
       return {
         title: title ?? 'Unknown',
         subtitle:
-          postSource === HERO_POST_SOURCE.PINNED
+          postSource === POST_SOURCE.PINNED
             ? `Pinned: ${String(postTitle ?? 'no post chosen')}`
             : 'Newest featured post',
       };
