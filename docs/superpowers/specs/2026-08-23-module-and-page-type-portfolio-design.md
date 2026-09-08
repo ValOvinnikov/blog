@@ -1071,7 +1071,7 @@ Both are presentation only. DOM order is media, meta, title, footer at
 every width, so the accessible reading order does not change with the
 layout.
 
-**`PostsSection` gains `hasLead?: boolean`.** When set, the first post
+**`PostsSection` gains `hasLead?: boolean`.** _(Superseded 2026-09-08: `PostsSection` retires per [`2026-09-08-page-composition-design.md`](./2026-09-08-page-composition-design.md); the arrangement below moves to the featured module component in web, unchanged in shape.)_ When set, the first post
 renders as `isLead` + `isSplit` across the full width, and the rest render
 below in a row of as many columns as there are cards — two cards as
 ordinary cards, a single card as `isSplit` so it too fills its row:
@@ -1205,6 +1205,12 @@ in the service changes: the carousel is the same posts in a different
 layout, and `limit` already caps them.
 
 ### `@blog/ui` — `Carousel`, and a slot on `PostsSection`
+
+> **Superseded 2026-09-08** by
+> [`2026-09-08-page-composition-design.md`](./2026-09-08-page-composition-design.md):
+> `PostsSection` retires, so the `PostsSection.Carousel` slot below is not
+> built. `Carousel` stays exactly as specified; the latest and featured
+> module components compose it themselves from `PostCardItem` slides.
 
 **`Carousel` is a new pure organism.** It renders a viewport `<div>` that
 takes a `viewportRef`, a `<ul>` track, and one `<li>` slide per child,
@@ -1593,6 +1599,14 @@ point; the graph stays acyclic.
   and are disabled exactly when Embla cannot move; a spotlight in carousel
   mode drops its lead treatment; four PRs, ui first (2026-09-08, #2835).
 
+- **Pages are chrome, a heading and modules; every part fetches what it
+  alone needs; `PostsSection` and the `*-page-view.tsx` layer retire** —
+  recorded in
+  [`2026-09-08-page-composition-design.md`](./2026-09-08-page-composition-design.md),
+  which supersedes the `PostsSection.Carousel` slot in the carousel section
+  and `hasLead` on `PostsSection` in the spotlight section, and adds
+  `page_post.modules[]` with a `module_postRelated` (2026-09-08).
+
 ## Non-goals (recorded so #1919 doesn't sprawl)
 
 - A leads/CRM management UI — store + notify only.
@@ -1612,6 +1626,12 @@ point; the graph stays acyclic.
 ui → web`); the featured spotlight (#2784) and carousel (#2785) wait on it.
 - **Featured spotlight** — epic #2784 (design #2828, then config in its own
   PR, ui in its own PR, and `studio → service → web` as one PR).
+- **Page composition** — epic #2943 (sub-issues #2944–#2955) from
+  [`2026-09-08-page-composition-design.md`](./2026-09-08-page-composition-design.md)
+  (post page first, `PostGrid` columns alongside, then listing modules,
+  then `PostsSection` retirement,
+  then the related-posts module, then one sub-issue per page); the
+  carousel's ui and web sub-issues rebase on it.
 - **Carousel display mode** — epic #2785 (design #2835, then ui in its own
   PR, config + studio as one PR, service in its own PR, web in its own PR);
   the `module_postFeatured` half waits on #2784.
@@ -1641,6 +1661,10 @@ catalogue has enough shipped history to matter).
 
 ## Resync log
 
+- **2026-09-08** — page composition: marked the carousel section's
+  `PostsSection.Carousel` slot and the spotlight section's `hasLead` on
+  `PostsSection` as superseded by the new page-composition design doc, and
+  added its decision-log and ticketing entries.
 - **2026-09-08** — added "The carousel display mode" design section (#2835):
   one `displayMode` field defaulted at read time, the pure `Carousel`
   organism with an `isEnhanced` boundary, the `PostsSection.Carousel` slot,
