@@ -151,7 +151,7 @@ Two tasks, delivered in order:
   `settings_site`. `breadcrumbs.home/blog/topics/tags` are deleted from the
   catalog; only `breadcrumbs.ariaLabel` remains, fixed. The breadcrumb
   consumers (`blog-list-page`, `topics-page`, `tags-page`, `topic-page`,
-  `tag-page`, `blog-post-page`, `generic-page`) take the labels from the
+  `tag-page`, `blog-post-page`, `landing-page`) take the labels from the
   already-fetched settings and index-page data instead of `t()`.
 - **D14 — Every save action shows a spinner while pending.** The platform
   `Button` gains an `isPending` prop: it renders the shared `Spinner`
