@@ -27,14 +27,15 @@ export interface IPostListModuleViewProps extends Omit<
   emptyMessage?: string;
   pagination?: IPostListModulePagination;
   hasImages?: boolean;
+  hasLead?: boolean;
 }
 
 /**
- * PostListModuleView — shared render shell for the archive (`PostListModule`)
- * and the teaser (`PostLatestModule`): a labeled `Section` wrapping
- * `PostsSection` plus an optional `Pagination`. `titleId`/`dataTestId`/
- * `accessibleTitle` are caller-supplied since the accessible name and test id
- * differ per module.
+ * PostListModuleView — shared render shell for the archive (`PostListModule`),
+ * the teaser (`PostLatestModule`) and the spotlight (`PostFeaturedModule`): a
+ * labeled `Section` wrapping `PostsSection` plus an optional `Pagination`.
+ * `titleId`/`dataTestId`/`accessibleTitle` are caller-supplied since the
+ * accessible name and test id differ per module.
  */
 export const PostListModuleView = ({
   brandVariant,
@@ -48,6 +49,7 @@ export const PostListModuleView = ({
   pagination,
   contentAlignment,
   hasImages,
+  hasLead,
 }: IPostListModuleViewProps) => {
   const { heading, supportingText } = sectionHeader;
 
@@ -69,6 +71,7 @@ export const PostListModuleView = ({
         isWrapped={true}
         emptyMessage={emptyMessage}
         hasImages={hasImages}
+        hasLead={hasLead}
       />
       {pagination ? (
         <Pagination

@@ -22,6 +22,17 @@ const items = [
   }),
 ];
 
+const leadItems = [
+  ...items,
+  makePostListItem({
+    id: 'post-3',
+    href: '/blog/accessible-forms',
+    title: 'Designing Accessible Forms',
+    excerpt: 'Patterns for forms that work for everyone.',
+    topic: { title: 'Accessibility' },
+  }),
+];
+
 const meta = {
   title: 'Modules/PostListModule',
   component: PostListModuleView,
@@ -75,6 +86,21 @@ export const WithImages: TStory = {
   args: {
     hasImages: true,
     items: items.map((item) => ({
+      ...item,
+      image: placeholderImage(item.title),
+    })),
+  },
+};
+
+export const WithLead: TStory = {
+  args: {
+    sectionHeader: {
+      heading: 'Featured',
+      supportingText: undefined,
+    },
+    hasLead: true,
+    hasImages: true,
+    items: leadItems.map((item) => ({
       ...item,
       image: placeholderImage(item.title),
     })),
