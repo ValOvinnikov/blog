@@ -14,6 +14,12 @@
 
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
+type ArrayOf<T> = Array<
+  T & {
+    _key: string;
+  }
+>;
+
 // Source: ../config/src/sanity/generated/schema.json
 export type Module_newsletter = {
   _id: string;
@@ -24,6 +30,7 @@ export type Module_newsletter = {
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
   sectionHeader?: RequiredHeadingSectionHeader;
+  variant?: 'FULL' | 'COMPACT';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
 };
@@ -143,11 +150,39 @@ export type RichText = Array<
     } & Aside)
 >;
 
+export type Module_postRelated = {
+  _id: string;
+  _type: 'module_postRelated';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  sectionHeader?: SectionHeader;
+  showImages?: boolean;
+  limit?: number;
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  layout?: Layout;
+};
+
+export type SectionHeader = {
+  _type: 'sectionHeader';
+  heading?: string;
+  supportingText?: string;
+};
+
 export type Blog_postReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
   [internalGroqTypeReferenceTo]?: 'blog_post';
+};
+
+export type Page_postReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_post';
 };
 
 export type Module_postFeatured = {
@@ -161,20 +196,10 @@ export type Module_postFeatured = {
   sectionHeader?: SectionHeader;
   showImages?: boolean;
   postSource?: 'PINNED' | 'NEWEST_FEATURED';
-  posts?: Array<
-    {
-      _key: string;
-    } & Blog_postReference
-  >;
+  posts?: ArrayOf<Blog_postReference | Page_postReference>;
   limit?: number;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
-};
-
-export type SectionHeader = {
-  _type: 'sectionHeader';
-  heading?: string;
-  supportingText?: string;
 };
 
 export type Module_postLatest = {
@@ -261,6 +286,7 @@ export type Link = {
   linkType?: 'INTERNAL' | 'EXTERNAL';
   internalReference?:
     | Blog_postReference
+    | Page_postReference
     | Blog_topicReference
     | Page_landingReference
     | Page_blogReference;
@@ -523,19 +549,6 @@ export type Page_tagIndex = {
   seo?: Seo;
 };
 
-export type Page_post = {
-  _id: string;
-  _type: 'page_post';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  slug?: Slug;
-  post?: Blog_postReference;
-  publishedAt?: string;
-  seo?: Seo;
-};
-
 export type Page_topic = {
   _id: string;
   _type: 'page_topic';
@@ -719,33 +732,6 @@ export type Blog_post = {
   seo?: Seo;
 };
 
-export type SanityImageCrop = {
-  _type: 'sanity.imageCrop';
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
-
-export type SanityImageHotspot = {
-  _type: 'sanity.imageHotspot';
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
-};
-
-export type Blog_topic = {
-  _id: string;
-  _type: 'blog_topic';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  slug?: Slug;
-  description?: string;
-};
-
 export type Blog_author = {
   _id: string;
   _type: 'blog_author';
@@ -804,7 +790,7 @@ export type Module_heroBlog = {
   _rev: string;
   title?: string;
   postSource?: 'PINNED' | 'NEWEST_FEATURED';
-  post?: Blog_postReference;
+  post?: Blog_postReference | Page_postReference;
   eyebrow?: string;
   heading?: string;
   supportingText?: string;
@@ -832,7 +818,7 @@ export type Module_hero = {
   _rev: string;
   title?: string;
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  featuredPost?: Blog_postReference;
+  featuredPost?: Blog_postReference | Page_postReference;
   heroEyebrowMode?: 'POST_TOPIC' | 'CUSTOM';
   heroEyebrow?: string;
   heroTitleMode?: 'POST_TITLE' | 'CUSTOM';
@@ -844,6 +830,79 @@ export type Module_hero = {
   primaryActionLabel?: string;
   secondaryAction?: Link;
   layout?: HeroLayout;
+};
+
+export type Module_postRelatedReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_postRelated';
+};
+
+export type Page_post = {
+  _id: string;
+  _type: 'page_post';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  excerpt?: string;
+  heroImage?: ImageWithAlt;
+  author?: Blog_authorReference;
+  topic?: Blog_topicReference;
+  tags?: Array<
+    {
+      _key: string;
+    } & Blog_tagReference
+  >;
+  publishedAt?: string;
+  body?: RichText;
+  featured?: boolean;
+  skim?: Skim;
+  seo?: Seo;
+  post?: Blog_postReference;
+  modules?: Array<
+    | ({
+        _key: string;
+      } & Module_postRelatedReference)
+    | ({
+        _key: string;
+      } & Module_newsletterReference)
+    | ({
+        _key: string;
+      } & Module_ctaReference)
+    | ({
+        _key: string;
+      } & Module_contentReference)
+  >;
+};
+
+export type SanityImageCrop = {
+  _type: 'sanity.imageCrop';
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: 'sanity.imageHotspot';
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
+};
+
+export type Blog_topic = {
+  _id: string;
+  _type: 'blog_topic';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  description?: string;
 };
 
 export type MediaTag = {
@@ -970,9 +1029,11 @@ export type AllSanitySchemaTypes =
   | BasicText
   | Module_content
   | RichText
-  | Blog_postReference
-  | Module_postFeatured
+  | Module_postRelated
   | SectionHeader
+  | Blog_postReference
+  | Page_postReference
+  | Module_postFeatured
   | Module_postLatest
   | Skim
   | Brand
@@ -1007,7 +1068,6 @@ export type AllSanitySchemaTypes =
   | Slug
   | Module_taxonomyListReference
   | Page_tagIndex
-  | Page_post
   | Page_topic
   | Page_topicIndex
   | Module_taxonomyList
@@ -1019,13 +1079,15 @@ export type AllSanitySchemaTypes =
   | Blog_tag
   | Blog_authorReference
   | Blog_post
-  | SanityImageCrop
-  | SanityImageHotspot
-  | Blog_topic
   | Blog_author
   | Page_landing
   | Module_heroBlog
   | Module_hero
+  | Module_postRelatedReference
+  | Page_post
+  | SanityImageCrop
+  | SanityImageHotspot
+  | Blog_topic
   | MediaTag
   | Code
   | SanityImagePaletteSwatch
