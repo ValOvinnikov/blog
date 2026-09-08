@@ -1,9 +1,9 @@
+import { SITE_MESSAGES } from '@blog/config';
 import {
   render as rtlRender,
   type RenderOptions,
   type RenderResult,
 } from '@testing-library/react';
-import messages from '@web/i18n/messages/en.json';
 import { NextIntlClientProvider } from 'next-intl';
 import {
   createElement,
@@ -14,12 +14,12 @@ import {
 
 /**
  * Mounts the same NextIntlClientProvider the app layout provides, with the
- * real `en.json` messages — so a client component reading `useTranslations`
+ * real catalog messages — so a client component reading `useTranslations`
  * renders its actual copy under test instead of throwing/falling back on a
  * missing-message error.
  */
 const Providers = ({ children }: { children: ReactNode }) => (
-  <NextIntlClientProvider locale="en" messages={messages}>
+  <NextIntlClientProvider locale="en" messages={SITE_MESSAGES}>
     {children}
   </NextIntlClientProvider>
 );

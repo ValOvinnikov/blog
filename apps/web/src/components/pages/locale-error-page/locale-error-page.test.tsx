@@ -1,5 +1,5 @@
+import { SITE_MESSAGES } from '@blog/config';
 import userEvent from '@testing-library/user-event';
-import messages from '@web/i18n/messages/en.json';
 import { customRender, render, screen } from '@web/testing/custom-render';
 import { NextIntlClientProvider } from 'next-intl';
 
@@ -53,9 +53,11 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
 
     const liveRegion = container.querySelector('[aria-live="assertive"]');
     expect(liveRegion).not.toBeNull();
-    expect(liveRegion?.textContent).toBe(messages.localeErrorPage.announcement);
-    expect(messages.localeErrorPage.announcement).not.toBe(
-      messages.localeErrorPage.title,
+    expect(liveRegion?.textContent).toBe(
+      SITE_MESSAGES.localeErrorPage.announcement,
+    );
+    expect(SITE_MESSAGES.localeErrorPage.announcement).not.toBe(
+      SITE_MESSAGES.localeErrorPage.title,
     );
   });
 
@@ -105,13 +107,13 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
     // genuinely new `t` reference on the next render, independent of the
     // app's current (incidental) provider stability.
     const { rerender } = render(
-      <NextIntlClientProvider locale="en" messages={{ ...messages }}>
+      <NextIntlClientProvider locale="en" messages={{ ...SITE_MESSAGES }}>
         <LocaleErrorPage error={error} reset={reset} />
       </NextIntlClientProvider>,
     );
 
     rerender(
-      <NextIntlClientProvider locale="en" messages={{ ...messages }}>
+      <NextIntlClientProvider locale="en" messages={{ ...SITE_MESSAGES }}>
         <LocaleErrorPage error={error} reset={reset} />
       </NextIntlClientProvider>,
     );

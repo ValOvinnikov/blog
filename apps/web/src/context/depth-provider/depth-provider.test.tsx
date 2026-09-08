@@ -1,7 +1,6 @@
-import { DEPTH } from '@blog/config';
+import { DEPTH, SITE_MESSAGES } from '@blog/config';
 import userEvent from '@testing-library/user-event';
 import { DEPTH_STORAGE_KEY } from '@web/config/depth-script';
-import messages from '@web/i18n/messages/en.json';
 import { renderElement, screen, waitFor } from '@web/testing/custom-render';
 import { NextIntlClientProvider } from 'next-intl';
 import type { ReactElement } from 'react';
@@ -19,7 +18,7 @@ import { DepthProvider, useDepth } from './depth-provider';
  */
 const renderHydrated = (ui: ReactElement) => {
   const wrapped = (
-    <NextIntlClientProvider locale="en" messages={messages}>
+    <NextIntlClientProvider locale="en" messages={SITE_MESSAGES}>
       {ui}
     </NextIntlClientProvider>
   );
@@ -162,7 +161,7 @@ describe(`<${DepthProvider.name}/>`, () => {
 
   it('includes the bootstrap script in server-rendered markup — the browser executes it during the initial HTML parse, before React hydrates', () => {
     const html = renderToString(
-      <NextIntlClientProvider locale="en" messages={messages}>
+      <NextIntlClientProvider locale="en" messages={SITE_MESSAGES}>
         <DepthProvider hasSkim={true} hasDeep={true}>
           <p>Article body</p>
         </DepthProvider>
