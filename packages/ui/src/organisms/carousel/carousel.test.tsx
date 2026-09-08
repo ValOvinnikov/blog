@@ -145,6 +145,25 @@ describe(`<${Carousel.name}/>`, () => {
       expect(screen.getByRole('button', { name: 'Next slide' })).toBeVisible();
     });
 
+    it('sets title on both buttons, matching their labels', () => {
+      renderElement(
+        <Carousel ariaLabel="Posts">
+          <div>Slide one</div>
+          <Carousel.Controls
+            previousLabel="Previous slide"
+            nextLabel="Next slide"
+          />
+        </Carousel>,
+      );
+
+      expect(
+        screen.getByRole('button', { name: 'Previous slide' }),
+      ).toHaveAttribute('title', 'Previous slide');
+      expect(
+        screen.getByRole('button', { name: 'Next slide' }),
+      ).toHaveAttribute('title', 'Next slide');
+    });
+
     it('calls onPrevious and onNext when their buttons are clicked', async () => {
       const user = userEvent.setup();
       const onPrevious = vi.fn();
