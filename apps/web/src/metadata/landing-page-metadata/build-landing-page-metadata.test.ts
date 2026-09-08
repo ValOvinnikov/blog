@@ -1,62 +1,30 @@
-import { makeSeo } from '@web/testing/shared/seo/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockLandingPage } from '@web/testing/pages/landing-page/fixtures';
 
 import { buildLandingPageMetadata } from './build-landing-page-metadata';
 
-const { getPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
-  getPageMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
+const { getLandingPageMock } = vi.hoisted(() => ({
+  getLandingPageMock: vi.fn(),
 }));
 
-vi.mock('@blog/service', () => ({
-  service: {
-    pages: {
-      landing: { v1: { getPage: getPageMock } },
-    },
-  },
+vi.mock('@web/server/landing/get-landing-page', () => ({
+  getLandingPage: getLandingPageMock,
 }));
-
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
-
-const seo = makeSeo({
-  title: 'About Us',
-  description: 'Who we are.',
-  ogTitle: 'About Us OG',
-  ogDescription: 'Who we are OG.',
-  ogImageUrl: 'https://cdn.example.com/about-og.jpg',
-});
 
 describe('buildLandingPageMetadata', () => {
   beforeEach(() => {
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getLandingPageMock.mockReset();
   });
 
-  it('forwards the resolved tenant Sanity context to getPage', async () => {
-    const tenant = {
-      projectId: 'tenant-project',
-      dataset: 'production',
-      token: 'tenant-token',
-    };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
-    getPageMock.mockResolvedValue({
-      ok: true,
-      data: { title: 'About Us', slug: 'about-us', modules: [], seo },
-    });
+  it('forwards the slug and tenant to getLandingPage — the same cached loader LandingPage reads', async () => {
+    getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
 
     await buildLandingPageMetadata('about-us', 'tenant-1');
 
-    expect(getPageMock).toHaveBeenCalledWith('about-us', tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
+    expect(getLandingPageMock).toHaveBeenCalledWith('about-us', 'tenant-1');
   });
 
   it('maps the resolved seo straight through toMetadata, self-canonical to /[slug]', async () => {
-    getPageMock.mockResolvedValue({
-      ok: true,
-      data: { title: 'About Us', slug: 'about-us', modules: [], seo },
-    });
+    getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
 
     const metadata = await buildLandingPageMetadata('about-us', 'tenant-1');
 
@@ -72,7 +40,10 @@ describe('buildLandingPageMetadata', () => {
 
   it('returns empty metadata and logs when the page fetch fails', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getPageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
+    getLandingPageMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
 
     const metadata = await buildLandingPageMetadata('missing', 'tenant-1');
 
@@ -85,7 +56,7 @@ describe('buildLandingPageMetadata', () => {
 
   it('returns empty metadata without logging when the page simply does not exist', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getPageMock.mockResolvedValue({ ok: true, data: undefined });
+    getLandingPageMock.mockResolvedValue({ ok: true, data: undefined });
 
     const metadata = await buildLandingPageMetadata('missing', 'tenant-1');
 

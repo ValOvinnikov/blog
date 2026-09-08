@@ -1,70 +1,56 @@
-import { routes, type ITenantLocalizedParams } from '@blog/config';
-import { service } from '@blog/service';
-import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
+import type { ITenantLocalizedParams } from '@blog/config';
+import { Heading } from '@blog/ui/atoms/heading';
+import { LandingBreadcrumbs } from '@web/components/features/landing/landing-breadcrumbs';
 import { HeroSlot } from '@web/modules/hero-slot';
 import { ModuleRenderer } from '@web/modules/module-renderer';
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
-import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
+import { getLandingPage } from '@web/server/landing/get-landing-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
-import { getTranslations } from 'next-intl/server';
 
-import { LandingPageView } from './landing-page-view';
+import { landingPageVariants } from './landing-page-variants';
 
 type TLandingPageProps = ITenantLocalizedParams & { slug: string };
 
+const s = landingPageVariants();
+
 /**
  * LandingPage — `/{slug}` composition for standalone `page_landing`
- * documents: fetches the page via `service.pages.landing.v1.getPage`, then
- * hands the resolved data — plus the pre-rendered `modules[]` content — to
- * `LandingPageView`.
+ * documents. Site chrome (`Header`/`Footer`) stays owned by
+ * `[tenant]/[locale]/layout.tsx`. Fetches the page once — purely to decide
+ * `notFound()` and to choose between the hero slot and the plain title
+ * heading — and composes every other concern as a self-fetching part
+ * reading the same cached `getLandingPage` loader.
  */
 export const LandingPage = async ({
   slug,
   locale,
   tenant,
 }: TLandingPageProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
-  const [result, breadcrumbsT] = await Promise.all([
-    service.pages.landing.v1.getPage(slug, tenantContext),
-    getTranslations('breadcrumbs'),
-  ]);
-
-  const { title, hero, modules } = guardPageLoaderResult(
-    result,
-    'landing_page.fetch_failed',
-    { slug },
-  );
-
-  const siteUrl = (await getTenantBaseUrl(tenant)) ?? '';
-  const breadcrumbTrail: IBreadcrumbItem[] = [
-    { label: breadcrumbsT('home'), href: routes.home() },
-    { label: title, href: routes.landingPage(slug) },
-  ];
-  const breadcrumbListSchema = buildBreadcrumbListSchema(
-    breadcrumbTrail,
-    siteUrl,
-  );
+  const result = await getLandingPage(slug, tenant);
+  const page = guardPageLoaderResult(result, 'landing_page.fetch_failed', {
+    slug,
+  });
+  const { title, hero, modules } = page;
 
   return (
-    <LandingPageView
-      title={title}
-      breadcrumbTrail={breadcrumbTrail}
-      breadcrumbAriaLabel={breadcrumbsT('ariaLabel')}
-      breadcrumbListSchema={breadcrumbListSchema}
-      hero={
-        hero && (
+    <>
+      <LandingBreadcrumbs slug={slug} tenant={tenant} />
+
+      <main className={s.root()}>
+        {hero ? (
           <HeroSlot
             id={hero.id}
             type={hero.type}
             locale={locale}
             tenant={tenant}
           />
-        )
-      }
-      modulesContent={
+        ) : (
+          <Heading level={1} visual="section" className={s.heading()}>
+            {title}
+          </Heading>
+        )}
+
         <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />
-      }
-    />
+      </main>
+    </>
   );
 };

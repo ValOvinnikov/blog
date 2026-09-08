@@ -1,7 +1,6 @@
 import { routes } from '@blog/config';
-import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getLandingPage } from '@web/server/landing/get-landing-page';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 
@@ -11,15 +10,15 @@ import type { Metadata } from 'next';
  * (authored → content → site defaults), so this maps it straight through
  * `toMetadata` rather than building fallback fields itself.
  *
- * Reuses `getPage` (also called by `LandingPage`) — Next dedupes the fetch
- * per request, so this adds no extra round-trip.
+ * Reads the same cached `getLandingPage` loader the route's own
+ * `LandingPage` composition reads, so building metadata costs no second
+ * Sanity fetch.
  */
 export const buildLandingPageMetadata = async (
   slug: string,
   tenant: string,
 ): Promise<Metadata> => {
-  const tenantContext = await getTenantSanityContext(tenant);
-  const result = await service.pages.landing.v1.getPage(slug, tenantContext);
+  const result = await getLandingPage(slug, tenant);
 
   if (!result.ok) {
     logger.error('landing_page_metadata.fetch_failed', {
