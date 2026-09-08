@@ -37,34 +37,43 @@ const posts = [
   },
 ];
 
+const renderPostCards = (items: typeof posts) =>
+  items.map(
+    ({
+      href,
+      title,
+      excerpt,
+      tags,
+      publishedAt,
+      formattedDate,
+      authorName,
+    }) => (
+      <PostCard key={href} excerpt={excerpt} tags={tags}>
+        <PostCard.Title level={3}>
+          <a href={href}>{title}</a>
+        </PostCard.Title>
+        <PostCard.Footer
+          publishedAt={publishedAt}
+          formattedDate={formattedDate}
+          authorName={authorName}
+        />
+      </PostCard>
+    ),
+  );
+
 const meta = {
   title: 'Organisms/PostGrid',
   component: PostGrid,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
+  argTypes: {
+    columns: {
+      control: 'select',
+      options: [1, 2, 3],
+    },
+  },
   args: {
-    children: posts.map(
-      ({
-        href,
-        title,
-        excerpt,
-        tags,
-        publishedAt,
-        formattedDate,
-        authorName,
-      }) => (
-        <PostCard key={href} excerpt={excerpt} tags={tags}>
-          <PostCard.Title level={3}>
-            <a href={href}>{title}</a>
-          </PostCard.Title>
-          <PostCard.Footer
-            publishedAt={publishedAt}
-            formattedDate={formattedDate}
-            authorName={authorName}
-          />
-        </PostCard>
-      ),
-    ),
+    children: renderPostCards(posts),
   },
 } satisfies Meta<typeof PostGrid>;
 
@@ -73,31 +82,14 @@ type TStory = StoryObj<typeof meta>;
 
 export const Default: TStory = {};
 
-export const TwoColumn: TStory = {
-  args: {
-    children: posts
-      .slice(0, 2)
-      .map(
-        ({
-          href,
-          title,
-          excerpt,
-          tags,
-          publishedAt,
-          formattedDate,
-          authorName,
-        }) => (
-          <PostCard key={href} excerpt={excerpt} tags={tags}>
-            <PostCard.Title level={3}>
-              <a href={href}>{title}</a>
-            </PostCard.Title>
-            <PostCard.Footer
-              publishedAt={publishedAt}
-              formattedDate={formattedDate}
-              authorName={authorName}
-            />
-          </PostCard>
-        ),
-      ),
-  },
+export const ThreeColumns: TStory = {
+  args: { columns: 3 },
+};
+
+export const TwoColumns: TStory = {
+  args: { columns: 2, children: renderPostCards(posts.slice(0, 2)) },
+};
+
+export const SingleColumn: TStory = {
+  args: { columns: 1, children: renderPostCards(posts.slice(0, 1)) },
 };

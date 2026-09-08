@@ -1,10 +1,11 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import type { ReactNode } from 'react';
 
-import { postGridVariants } from './post-grid-variants';
+import { postGridVariants, type TPostGridVariants } from './post-grid-variants';
 
 export type TPostGridProps = IWithClassName &
   IWithDataTestId & {
+    columns?: TPostGridVariants['columns'];
     children: ReactNode;
   };
 
@@ -13,12 +14,13 @@ export type TPostGridProps = IWithClassName &
  * children) in columns. Layout only — no data or per-item chrome of its own.
  */
 export const PostGrid = ({
+  columns,
   children,
   className,
   dataTestId,
 }: TPostGridProps) => (
   <div
-    className={postGridVariants({ class: className })}
+    className={postGridVariants({ columns, class: className })}
     data-testid={dataTestId}
   >
     {children}
