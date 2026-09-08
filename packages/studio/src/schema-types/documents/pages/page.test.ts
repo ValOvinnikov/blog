@@ -1,5 +1,90 @@
 import { genericSchema } from '@blog/studio/schema-types/documents/pages/page';
+import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/helpers/validate-taxonomy-list-has-taxonomy';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
+import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
+import type { ValidationContext } from 'sanity';
+
+type TModulesCustomFn = (
+  modules: TModuleReference[] | undefined,
+  context: ValidationContext,
+) => Promise<string | true>;
+
+type TModuleReference = { _type?: string; _ref?: string };
+
+type TMockModulesRule = {
+  unique: () => TMockModulesRule;
+  error: (message: string) => TMockModulesRule;
+  custom: (fn: TModulesCustomFn) => TMockModulesRule;
+};
+
+/**
+ * `unique()`/`error()`/`custom()` each return a fresh mock rule wrapping the
+ * same shared `customFns` array, mirroring the real Sanity `Rule` chain
+ * (`rule.custom(a).custom(b)`) closely enough to observe whether both
+ * `.custom()` calls actually register, rather than the second silently
+ * displacing the first.
+ */
+const createMockModulesRule = (
+  customFns: TModulesCustomFn[],
+): TMockModulesRule => ({
+  unique: () => createMockModulesRule(customFns),
+  error: () => createMockModulesRule(customFns),
+  custom: (fn) => {
+    customFns.push(fn);
+    return createMockModulesRule(customFns);
+  },
+});
+
+const getModulesCustomValidators = (): TModulesCustomFn[] => {
+  const modulesField = genericSchema.fields?.find(
+    (field) => field.name === 'modules',
+  );
+
+  if (!modulesField?.validation) {
+    throw new Error(
+      'Expected genericSchema to define a modules field with validation.',
+    );
+  }
+
+  const customFns: TModulesCustomFn[] = [];
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+  (modulesField.validation as any)(createMockModulesRule(customFns));
+
+  return customFns;
+};
+
+describe('genericSchema modules validateCustom chaining', () => {
+  it('registers both the blank-heading and taxonomy-list validators', () => {
+    const customFns = getModulesCustomValidators();
+
+    expect(customFns).toHaveLength(2);
+    expect(customFns[1]).toBe(validateTaxonomyListHasTaxonomy);
+  });
+
+  it('keeps the blank-heading validator scoped to module_postLatest, not displaced by the taxonomy-list validator', async () => {
+    const [blankHeadingFn] = getModulesCustomValidators();
+    const context = {
+      getClient: () => ({
+        withConfig: () => ({
+          fetch: async () => [
+            { id: 'post-latest-1', heading: null },
+            { id: 'post-latest-2', heading: null },
+          ],
+        }),
+      }),
+    } as unknown as ValidationContext;
+
+    const modules: TModuleReference[] = [
+      { _type: postLatestSchema.name, _ref: 'post-latest-1' },
+      { _type: postLatestSchema.name, _ref: 'post-latest-2' },
+    ];
+
+    await expect(blankHeadingFn?.(modules, context)).resolves.toContain(
+      'Only one module of this type without its own heading is allowed per page',
+    );
+  });
+});
 
 type TValidationRule = {
   required: () => TValidationRule;
@@ -114,7 +199,7 @@ describe('genericSchema hero field', () => {
 });
 
 describe('genericSchema modules allow-list', () => {
-  it('permits content, cta, postLatest and newsletter modules', () => {
+  it('permits content, cta, postLatest, newsletter and taxonomyList modules', () => {
     const modulesField = genericSchema.fields?.find(
       (field) => field.name === 'modules',
     ) as { type: 'array'; of?: Array<{ name?: string }> } | undefined;
@@ -132,6 +217,7 @@ describe('genericSchema modules allow-list', () => {
       'module_cta',
       'module_postLatest',
       'module_newsletter',
+      'module_taxonomyList',
     ]);
   });
 });

@@ -561,6 +561,9 @@ export type Module_taxonomyList = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
+  taxonomy?: 'TOPICS' | 'TAGS';
+  sortOrder?: 'ALPHABETICAL' | 'MOST_POSTS';
+  limit?: number;
   sectionHeader?: SectionHeader;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
@@ -631,6 +634,9 @@ export type Page_home = {
     | ({
         _key: string;
       } & Module_postLatestReference)
+    | ({
+        _key: string;
+      } & Module_taxonomyListReference)
   >;
   seo?: Seo;
 };
@@ -746,6 +752,9 @@ export type Page_generic = {
     | ({
         _key: string;
       } & Module_newsletterReference)
+    | ({
+        _key: string;
+      } & Module_taxonomyListReference)
   >;
   seo?: Seo;
 };

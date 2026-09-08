@@ -1,4 +1,6 @@
+import { TAXONOMY_KIND } from '@blog/config/constants';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
+import { validateTaxonomyListMatchesKind } from '@blog/studio/schema-types/helpers/validate-taxonomy-list-matches-kind';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/module-taxonomy-list';
 import { seoSchema } from '@blog/studio/schema-types/objects/seo';
 import { Tags } from 'lucide-react';
@@ -41,7 +43,15 @@ export const topicIndexPageSchema = defineType({
       type: 'reference',
       description: 'The taxonomy list rendered on this page.',
       to: [{ type: taxonomyListSchema.name }],
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule
+          .required()
+          .custom(
+            validateTaxonomyListMatchesKind(
+              TAXONOMY_KIND.TOPICS,
+              'This page lists topics; the module is set to tags.',
+            ),
+          ),
     }),
     defineField({
       name: 'seo',

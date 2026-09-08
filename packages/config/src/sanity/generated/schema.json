@@ -3496,6 +3496,47 @@
         },
         "optional": true
       },
+      "taxonomy": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "TOPICS"
+            },
+            {
+              "type": "string",
+              "value": "TAGS"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "sortOrder": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "ALPHABETICAL"
+            },
+            {
+              "type": "string",
+              "value": "MOST_POSTS"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "limit": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "number"
+        },
+        "optional": true
+      },
       "sectionHeader": {
         "type": "objectAttribute",
         "value": {
@@ -3938,6 +3979,21 @@
                 "rest": {
                   "type": "inline",
                   "name": "module_postLatest.reference"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "module_taxonomyList.reference"
                 }
               }
             ]
@@ -4578,6 +4634,21 @@
                 "rest": {
                   "type": "inline",
                   "name": "module_newsletter.reference"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "module_taxonomyList.reference"
                 }
               }
             ]
