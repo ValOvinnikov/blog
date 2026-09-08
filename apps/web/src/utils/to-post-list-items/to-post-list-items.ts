@@ -1,6 +1,6 @@
 import { routes } from '@blog/config';
 import type { TPostCardTopic } from '@blog/service';
-import type { IPostCardData } from '@blog/ui/organisms/posts-section';
+import type { IPostCardData } from '@web/components/shared/post-card-item';
 import { getFormatter } from 'next-intl/server';
 import type { ReactNode } from 'react';
 
@@ -21,7 +21,7 @@ type TPostListItemSource = {
 
 /**
  * toPostListItems — maps service post-card view-models to the `IPostCardData`
- * shape `PostsSection` renders, resolving the two presentation concerns the
+ * shape `PostCardItem` renders, resolving the two presentation concerns the
  * (React-free, locale-agnostic) service layer deliberately doesn't own: the
  * post detail route (`routes.post`) and the formatted date, via next-intl's
  * `getFormatter` (async — this is a plain helper, not a component, so the

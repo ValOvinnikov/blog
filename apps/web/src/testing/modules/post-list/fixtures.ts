@@ -1,4 +1,4 @@
-import type { IPostCardData } from '@blog/ui/organisms/posts-section';
+import type { IPostCardData } from '@web/components/shared/post-card-item';
 
 export const makePostListItem = (
   overrides: Partial<IPostCardData> = {},

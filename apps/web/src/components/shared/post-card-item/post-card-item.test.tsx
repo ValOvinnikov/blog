@@ -82,4 +82,55 @@ describe(PostCardItem, () => {
 
     expect(screen.getByText(/engineering/)).toBeVisible();
   });
+
+  it('forwards dataTestId to the underlying PostCard', () => {
+    renderElement(<PostCardItem item={item} dataTestId="lead-card" />);
+
+    expect(screen.getByTestId('lead-card')).toBeInTheDocument();
+  });
+
+  it('renders no dataTestId on the underlying PostCard when omitted', () => {
+    const { container } = renderElement(<PostCardItem item={item} />);
+
+    expect(container.querySelector('article')).not.toHaveAttribute(
+      'data-testid',
+    );
+  });
+
+  it('applies the split layout class when isSplit is true and a media region is present', () => {
+    renderElement(
+      <PostCardItem
+        item={{ ...item, image: <div data-testid="post-image" /> }}
+        hasImage={true}
+        isSplit={true}
+        dataTestId="card"
+      />,
+    );
+
+    expect(screen.getByTestId('card')).toHaveClass('md:flex-row');
+  });
+
+  it('does not apply the split layout class when isSplit is omitted', () => {
+    renderElement(
+      <PostCardItem
+        item={{ ...item, image: <div data-testid="post-image" /> }}
+        hasImage={true}
+        dataTestId="card"
+      />,
+    );
+
+    expect(screen.getByTestId('card')).not.toHaveClass('md:flex-row');
+  });
+
+  it('clamps the excerpt to three lines when isLead is true', () => {
+    renderElement(<PostCardItem item={item} isLead={true} />);
+
+    expect(screen.getByText('An excerpt.')).toHaveClass('line-clamp-3');
+  });
+
+  it('clamps the excerpt to two lines when isLead is omitted', () => {
+    renderElement(<PostCardItem item={item} />);
+
+    expect(screen.getByText('An excerpt.')).toHaveClass('line-clamp-2');
+  });
 });

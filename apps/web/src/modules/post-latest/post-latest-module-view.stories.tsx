@@ -3,8 +3,8 @@ import { objectKeys } from '@blog/utils';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
 
-import { PostListModuleView } from './post-list-module-view';
-import { postListModuleViewVariants } from './post-list-module-view-variants';
+import { PostLatestModuleView } from './post-latest-module-view';
+import { postLatestModuleViewVariants } from './post-latest-module-view-variants';
 
 const items = [
   makePostListItem({
@@ -25,8 +25,8 @@ const items = [
 ];
 
 const meta = {
-  title: 'Modules/PostListModule',
-  component: PostListModuleView,
+  title: 'Modules/PostLatestModule',
+  component: PostLatestModuleView,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
   argTypes: {
@@ -36,7 +36,7 @@ const meta = {
     },
     contentAlignment: {
       control: 'select',
-      options: objectKeys(postListModuleViewVariants.variants.align),
+      options: objectKeys(postLatestModuleViewVariants.variants.align),
     },
   },
   args: {
@@ -48,12 +48,11 @@ const meta = {
     items,
     layout: undefined,
     contentAlignment: undefined,
-    titleId: 'post-list-title',
-    dataTestId: 'post-list-module-post-list-1',
+    titleId: 'latest-posts-title',
+    dataTestId: 'post-latest-module-post-latest-1',
     accessibleTitle: 'Latest posts',
-    emptyMessage: 'No posts yet.',
   },
-} satisfies Meta<typeof PostListModuleView>;
+} satisfies Meta<typeof PostLatestModuleView>;
 
 export default meta;
 type TStory = StoryObj<typeof meta>;
@@ -75,23 +74,6 @@ export const Secondary: TStory = {
 
 export const CenterAligned: TStory = {
   args: { contentAlignment: CONTENT_ALIGNMENT.CENTER },
-};
-
-export const Empty: TStory = {
-  args: { items: [] },
-};
-
-export const WithPagination: TStory = {
-  args: {
-    pagination: {
-      currentPage: 2,
-      totalPages: 5,
-      createHref: (page: number) => `/blog/page/${page}`,
-      ariaLabel: 'Blog pages',
-      previousLabel: 'Previous',
-      nextLabel: 'Next',
-    },
-  },
 };
 
 const placeholderImage = (alt: string) => (

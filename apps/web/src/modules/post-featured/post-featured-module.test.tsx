@@ -134,7 +134,7 @@ describe(PostFeaturedModule, () => {
     ).toBeInTheDocument();
   });
 
-  it('renders the first post as a lead card and forwards hasLead to PostsSection', async () => {
+  it('renders the first post as a lead card and the rest in a tail grid', async () => {
     getPostFeaturedMock.mockResolvedValue({
       ok: true,
       data: {
@@ -156,12 +156,11 @@ describe(PostFeaturedModule, () => {
     expect(screen.getByText('Lead post')).toBeInTheDocument();
     expect(screen.getByText('Second post')).toBeInTheDocument();
     expect(screen.getByText('Third post')).toBeInTheDocument();
-    expect(
-      container.querySelector('[data-testid="posts-section-lead"]'),
-    ).toBeInTheDocument();
-    expect(
-      container.querySelector('[data-testid="posts-section-tail-grid"]'),
-    ).toBeInTheDocument();
+    const tailGrid = container.querySelector(
+      '[data-testid="post-featured-module-post-featured-1-tail-grid"]',
+    );
+    expect(tailGrid).toBeInTheDocument();
+    expect(tailGrid).not.toHaveTextContent('Lead post');
   });
 
   it('renders the lead image sized differently from the tail card images', async () => {

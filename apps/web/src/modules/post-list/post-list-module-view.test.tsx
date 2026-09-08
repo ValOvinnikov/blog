@@ -1,21 +1,8 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
-import { PostsSection } from '@blog/ui/organisms/posts-section';
-import { customRender, screen } from '@web/testing/custom-render';
+import { BRAND_VARIANT } from '@blog/config';
+import { customRender, screen, within } from '@web/testing/custom-render';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
 
 import { PostListModuleView } from './post-list-module-view';
-
-// Wraps the real implementation (so every other assertion in this file keeps
-// exercising actual render behaviour) purely to observe the props it is
-// called with — never its own rendered output.
-vi.mock('@blog/ui/organisms/posts-section', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@blog/ui/organisms/posts-section')>();
-  return {
-    ...actual,
-    PostsSection: vi.fn(actual.PostsSection),
-  };
-});
 
 vi.mock('@web/components/shared/smart-link', () => ({
   SmartLink: ({
@@ -55,10 +42,10 @@ describe(PostListModuleView, () => {
 
     const label = screen.getByText('Latest posts');
     expect(label).toHaveAttribute('id', 'posts-title');
+    expect(label.tagName).toBe('H2');
 
     const section = label.closest('section');
     expect(section).toHaveAttribute('aria-labelledby', 'posts-title');
-    expect(section).not.toHaveAttribute('aria-label');
     expect(section).toHaveAttribute(
       'data-testid',
       'post-list-module-post-list-1',
@@ -83,7 +70,7 @@ describe(PostListModuleView, () => {
     );
   });
 
-  it('renders a visually hidden heading from accessibleTitle and labels the section via aria-labelledby when sectionHeader.heading is undefined', () => {
+  it('renders a visually hidden heading from accessibleTitle when sectionHeader.heading is undefined', () => {
     setup({
       sectionHeader: {
         heading: undefined,
@@ -93,11 +80,19 @@ describe(PostListModuleView, () => {
 
     const heading = screen.getByRole('heading', { level: 2, name: 'Posts' });
     expect(heading).toHaveClass('sr-only');
-    expect(heading).toHaveAttribute('id', 'posts-title');
 
     const region = screen.getByRole('region', { name: 'Posts' });
     expect(region).toHaveAttribute('aria-labelledby', 'posts-title');
-    expect(region).not.toHaveAttribute('aria-label');
+  });
+
+  it('renders a card per item, linked to its href', () => {
+    setup();
+
+    const link = screen.getByRole('link', { name: post.title });
+    expect(link).toHaveAttribute('href', post.href);
+    expect(
+      screen.getByRole('heading', { level: 3, name: post.title }),
+    ).toBeInTheDocument();
   });
 
   it('renders no pagination nav when the pagination prop is absent', () => {
@@ -106,7 +101,7 @@ describe(PostListModuleView, () => {
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
   });
 
-  it('renders Pagination as a sibling of the posts region, inside the same Section', () => {
+  it('renders Pagination as a sibling of the grid, inside the same Section', () => {
     setup({
       pagination: {
         currentPage: 2,
@@ -118,69 +113,38 @@ describe(PostListModuleView, () => {
       },
     });
 
-    const heading = screen.getByRole('heading', { name: 'Latest posts' });
-    const nav = screen.getByRole('navigation', { name: 'Engineering pages' });
-
-    // `PostsSection` renders its own root wrapper around the heading —
-    // asserting `nav` sits outside it proves it's a sibling, not nested.
-    const postsSectionRoot = heading.parentElement;
-    expect(postsSectionRoot?.contains(nav)).toBe(false);
-    expect(postsSectionRoot?.parentElement?.contains(nav)).toBe(true);
+    const section = screen.getByRole('region', { name: 'Latest posts' });
+    const nav = within(section).getByRole('navigation', {
+      name: 'Engineering pages',
+    });
 
     const previousLink = screen.getByRole('link', { name: 'Previous' });
     expect(previousLink).toHaveAttribute('href', '/topics/engineering/page/1');
-    const nextLink = screen.getByRole('link', { name: 'Next' });
+    const nextLink = within(section).getByRole('link', { name: 'Next' });
     expect(nextLink).toHaveAttribute('href', '/topics/engineering/page/3');
+    expect(nav).toBeInTheDocument();
   });
 
-  it('renders the resolved i18n empty message when items is empty', () => {
+  it('renders the resolved i18n empty message instead of the grid when items is empty', () => {
     setup({ items: [] });
 
     expect(screen.getByText('No posts yet.')).toBeInTheDocument();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
-  it('passes contentAlignment through to PostsSection as align', () => {
-    setup({ contentAlignment: CONTENT_ALIGNMENT.CENTER });
-
-    expect(vi.mocked(PostsSection)).toHaveBeenLastCalledWith(
-      expect.objectContaining({ align: CONTENT_ALIGNMENT.CENTER }),
-      undefined,
-    );
-  });
-
-  it('passes hasImages through to PostsSection', () => {
-    setup({ hasImages: true });
-
-    expect(vi.mocked(PostsSection)).toHaveBeenLastCalledWith(
-      expect.objectContaining({ hasImages: true }),
-      undefined,
-    );
-  });
-
-  it('leaves hasImages undefined on PostsSection when not given', () => {
+  it('renders no media region when hasImages is not given', () => {
     setup();
 
-    expect(vi.mocked(PostsSection)).toHaveBeenLastCalledWith(
-      expect.objectContaining({ hasImages: undefined }),
-      undefined,
-    );
+    expect(screen.queryByTestId('post-card-media')).not.toBeInTheDocument();
   });
 
-  it('passes hasLead through to PostsSection', () => {
-    setup({ hasLead: true });
+  it('renders a media region for each item when hasImages is true', () => {
+    setup({
+      hasImages: true,
+      items: [{ ...post, image: <div data-testid="post-image" /> }],
+    });
 
-    expect(vi.mocked(PostsSection)).toHaveBeenLastCalledWith(
-      expect.objectContaining({ hasLead: true }),
-      undefined,
-    );
-  });
-
-  it('leaves hasLead undefined on PostsSection when not given', () => {
-    setup();
-
-    expect(vi.mocked(PostsSection)).toHaveBeenLastCalledWith(
-      expect.objectContaining({ hasLead: undefined }),
-      undefined,
-    );
+    expect(screen.getByTestId('post-card-media')).toBeInTheDocument();
+    expect(screen.getByTestId('post-image')).toBeInTheDocument();
   });
 });

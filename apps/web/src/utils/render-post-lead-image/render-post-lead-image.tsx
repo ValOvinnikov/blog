@@ -3,9 +3,9 @@ import { SanityImage } from '@web/components/shared/sanity-image';
 import type { ReactNode } from 'react';
 
 /**
- * Builds the `image` node a `PostsSection` lead card renders, or `undefined`
- * when the post has no hero image. Never sets `priority` — a spotlight lead
- * never owns the page's LCP hero.
+ * Builds the `image` node a lead `PostCardItem` renders, or `undefined` when
+ * the post has no hero image. Never sets `priority` — a spotlight lead never
+ * owns the page's LCP hero.
  */
 export const renderPostLeadImage = (post: TPostCard): ReactNode | undefined =>
   post.heroImageSanity ? (
