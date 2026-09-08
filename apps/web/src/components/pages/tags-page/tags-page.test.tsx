@@ -151,6 +151,9 @@ describe(`<${TagsPage.name}/>`, () => {
         id: 'tag-list-1',
         slot: expect.objectContaining({
           fallbackTaxonomy: 'TAGS',
+          titleId: 'tag-list-title',
+          dataTestId: 'taxonomy-list-module-tag-list-1',
+          headingLevel: 2,
           accessibleTitle: 'Tags',
           emptyMessage: 'No tags yet.',
         }),

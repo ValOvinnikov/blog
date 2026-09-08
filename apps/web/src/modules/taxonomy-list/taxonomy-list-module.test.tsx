@@ -114,6 +114,21 @@ describe(TaxonomyListModule, () => {
       ).toBeInTheDocument();
     });
 
+    it('defaults titleId and dataTestId from the module id when no slot is given', async () => {
+      getTaxonomyListMock.mockResolvedValue(topicsResult([entry]));
+
+      await setup();
+
+      const heading = screen.getByRole('heading', {
+        level: 2,
+        name: 'Topics',
+      });
+      expect(heading).toHaveAttribute('id', 'taxonomy-list-taxonomy-list-1');
+      expect(screen.getByTestId('taxonomy-list-module-taxonomy-list-1')).toBe(
+        heading.closest('section'),
+      );
+    });
+
     it('renders tag entries with /tags hrefs and the tags postsCount copy', async () => {
       getTaxonomyListMock.mockResolvedValue(
         tagsResult([
