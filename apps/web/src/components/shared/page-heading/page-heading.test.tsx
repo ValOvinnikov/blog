@@ -7,6 +7,7 @@ const setup = customRender(PageHeading, {
   heading: 'Notes on building things',
   supportingText: undefined,
   align: undefined,
+  visual: undefined,
 });
 
 describe(PageHeading, () => {
@@ -67,5 +68,34 @@ describe(PageHeading, () => {
     expect(screen.getByText('Essays and notes from the team.')).toHaveClass(
       'text-right',
     );
+  });
+
+  it('renders a plain h1 with no Heading-atom styling by default, matching the archive pages', () => {
+    setup();
+
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: 'Notes on building things',
+    });
+
+    expect(heading).toHaveClass('mb-6');
+    expect(heading).not.toHaveClass('font-display');
+    expect(heading).not.toHaveClass('font-medium');
+    expect(heading).not.toHaveClass('text-title-2xl');
+    expect(heading).not.toHaveClass('text-display');
+  });
+
+  it('renders the section-styled Heading atom when visual is "section", matching the landing page', () => {
+    setup({ visual: 'section' });
+
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: 'Notes on building things',
+    });
+
+    expect(heading).toHaveClass('font-display');
+    expect(heading).toHaveClass('font-medium');
+    expect(heading).toHaveClass('text-title-2xl');
+    expect(heading).toHaveClass('mb-6');
   });
 });

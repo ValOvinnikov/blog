@@ -7,6 +7,7 @@ export interface IPageHeadingProps {
   heading: string;
   supportingText?: string;
   align?: TContentAlignment;
+  visual?: 'section';
 }
 
 /**
@@ -19,14 +20,19 @@ export const PageHeading = ({
   heading,
   supportingText,
   align,
+  visual,
 }: IPageHeadingProps) => {
   const s = pageHeadingVariants({ align });
 
   return (
     <div className={s.root()}>
-      <Heading level={1} visual="section" className={s.heading()}>
-        {heading}
-      </Heading>
+      {visual === 'section' ? (
+        <Heading level={1} visual="section" className={s.heading()}>
+          {heading}
+        </Heading>
+      ) : (
+        <h1 className={s.heading()}>{heading}</h1>
+      )}
       {supportingText ? (
         <p className={s.supportingText()}>{supportingText}</p>
       ) : null}

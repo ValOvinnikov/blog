@@ -42,7 +42,7 @@ export const LandingPage = async ({
             tenant={tenant}
           />
         ) : (
-          <PageHeading heading={title} />
+          <PageHeading heading={title} visual="section" />
         )}
       </PageShell.Heading>
       <PageShell.Content>
