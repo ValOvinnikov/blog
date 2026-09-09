@@ -4,6 +4,7 @@ import {
   POST_SOURCE,
   HERO_VARIANT,
 } from '@blog/config/constants';
+import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/module-hero-blog';
 import type { SanityDocument, ValidationContext } from 'sanity';
 
@@ -138,6 +139,12 @@ describe('heroBlogSchema postSource field', () => {
 });
 
 describe('heroBlogSchema post field', () => {
+  it('only accepts page_post references', () => {
+    const field = getField('post') as { to?: { type: string }[] };
+
+    expect(field.to).toEqual([{ type: PAGE_POST_TYPE }]);
+  });
+
   it('is hidden unless Post Source is Pinned', () => {
     const hidden = getHidden(getField('post'));
 

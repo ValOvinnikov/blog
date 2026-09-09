@@ -2,7 +2,6 @@ import {
   FULL_BRAND_VARIANT_LIST,
   HERO_FIELD_MODE,
 } from '@blog/config/constants';
-import { postSchema } from '@blog/studio/schema-types/documents/blog/post';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
 import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
 import { defineModeFieldPair } from '@blog/studio/schema-types/helpers/define-mode-field-pair';
@@ -26,7 +25,7 @@ export const heroSchema = defineType({
       type: 'reference',
       description:
         'Post featured in this hero. If empty, the newest post marked Featured is used.',
-      to: [{ type: postSchema.name }, { type: PAGE_POST_TYPE }],
+      to: [{ type: PAGE_POST_TYPE }],
       validation: (rule) =>
         rule
           .custom((value) =>

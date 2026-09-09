@@ -8,7 +8,6 @@ import {
   type TPostSource,
   type THeroVariant,
 } from '@blog/config/constants';
-import { postSchema } from '@blog/studio/schema-types/documents/blog/post';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
 import { defineHeroFields } from '@blog/studio/schema-types/helpers/define-hero-fields';
 import { getDraftsClient } from '@blog/studio/schema-types/helpers/get-drafts-client';
@@ -139,7 +138,7 @@ export const heroBlogSchema = defineType({
       title: 'Post',
       type: 'reference',
       description: 'The pinned post this hero renders.',
-      to: [{ type: postSchema.name }, { type: PAGE_POST_TYPE }],
+      to: [{ type: PAGE_POST_TYPE }],
       hidden: ({ parent }) =>
         (parent as THeroBlogDocument | undefined)?.postSource !==
         POST_SOURCE.PINNED,

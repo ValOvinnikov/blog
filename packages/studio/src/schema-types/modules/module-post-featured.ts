@@ -1,5 +1,4 @@
 import { POST_SOURCE, type TPostSource } from '@blog/config/constants';
-import { postSchema } from '@blog/studio/schema-types/documents/blog/post';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
 import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
 import { defineAlignmentFields } from '@blog/studio/schema-types/helpers/define-alignment-fields';
@@ -97,7 +96,7 @@ export const postFeaturedSchema = defineType({
       of: [
         defineArrayMember({
           type: 'reference',
-          to: [{ type: postSchema.name }, { type: PAGE_POST_TYPE }],
+          to: [{ type: PAGE_POST_TYPE }],
         }),
       ],
       hidden: ({ parent }) =>
