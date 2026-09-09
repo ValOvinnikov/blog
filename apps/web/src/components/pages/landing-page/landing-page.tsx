@@ -12,7 +12,7 @@ type TLandingPageProps = ITenantLocalizedParams & { slug: string };
  * LandingPage — `/{slug}` composition for standalone `page_landing`
  * documents. Site chrome (`Header`/`Footer`) stays owned by
  * `[tenant]/[locale]/layout.tsx`. Fetches the page once — purely to decide
- * `notFound()` and to choose between the hero slot and the plain title
+ * `notFound()` and to choose between the hero slot and the `headingBlock`
  * heading — and composes every other concern as a self-fetching part
  * reading the same cached `getLandingPage` loader.
  */
@@ -25,7 +25,7 @@ export const LandingPage = async ({
   const page = guardPageLoaderResult(result, 'landing_page.fetch_failed', {
     slug,
   });
-  const { title, hero, modules } = page;
+  const { headingBlock, hero, modules } = page;
 
   return (
     <PageShell>
@@ -35,7 +35,7 @@ export const LandingPage = async ({
       <PageShell.Heading>
         <PageIntro
           hero={hero}
-          headingBlock={{ heading: title, supportingText: undefined }}
+          headingBlock={headingBlock}
           locale={locale}
           tenant={tenant}
         />

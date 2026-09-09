@@ -202,6 +202,7 @@ export function makeRawLandingPage(
   return {
     title: 'About',
     slug: 'about',
+    headingBlock: null,
     hero: null,
     modules: [
       { _id: 'content-1', _type: 'module_content' },

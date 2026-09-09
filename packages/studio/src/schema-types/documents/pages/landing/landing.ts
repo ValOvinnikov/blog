@@ -1,11 +1,13 @@
 import { RESERVED_SLUGS } from '@blog/config/constants';
 import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/components/slug-url-preview-input';
 import { defineModulesField } from '@blog/studio/schema-types/helpers/define-modules-field';
+import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
+import { heroField } from '@blog/studio/schema-types/helpers/hero-field';
 import { slugField } from '@blog/studio/schema-types/helpers/slug-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
+import { validateHeroOrHeading } from '@blog/studio/schema-types/helpers/validate-hero-or-heading';
 import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/helpers/validate-single-blank-heading-per-type';
 import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/helpers/validate-taxonomy-list-has-taxonomy';
-import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { contentSchema } from '@blog/studio/schema-types/modules/module-content';
 import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
@@ -23,6 +25,7 @@ export const landingSchema = defineType({
   title: 'Landing Page',
   type: 'document',
   icon: FileText,
+  validation: validateHeroOrHeading(),
   preview: {
     select: {
       title: 'title',
@@ -46,14 +49,11 @@ export const landingSchema = defineType({
         return true;
       },
     }),
-    defineField({
-      name: 'hero',
-      title: 'Hero',
-      type: 'reference',
+    headingBlockField({
       description:
-        "Optional. Replaces the page's default header and owns the page heading.",
-      to: HERO_SCHEMA_TYPES.map((schema) => ({ type: schema.name })),
+        'The page heading (h1) and its optional supporting line. Not shown when a hero is set.',
     }),
+    heroField(),
     defineModulesField({
       allow: [
         contentSchema.name,

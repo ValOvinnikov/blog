@@ -27,12 +27,39 @@ describe('getPage', () => {
     const page = await getPage('about', tenant);
     if (!page) throw new Error('expected a landing page');
 
-    expect(page.title).toBe('About');
     expect(page.slug).toBe('about');
     expect(page.modules).toEqual([
       { id: 'content-1', type: 'module_content' },
       { id: 'cta-1', type: 'module_cta' },
     ]);
+  });
+
+  it('builds an all-undefined headingBlock when page_landing.headingBlock is unset', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawLandingPage({ headingBlock: null }))
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const page = await getPage('about', tenant);
+    if (!page) throw new Error('expected a landing page');
+
+    expect(page.headingBlock.heading).toBeUndefined();
+    expect(page.headingBlock.supportingText).toBeUndefined();
+  });
+
+  it('maps an authored page_landing.headingBlock through to the view model', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawLandingPage({
+          headingBlock: { heading: 'About Us', supportingText: 'Who we are' },
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const page = await getPage('about', tenant);
+    if (!page) throw new Error('expected a landing page');
+
+    expect(page.headingBlock.heading).toBe('About Us');
+    expect(page.headingBlock.supportingText).toBe('Who we are');
   });
 
   it('leaves hero undefined when page_landing.hero is unset', async () => {

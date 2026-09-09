@@ -284,18 +284,22 @@ test asserting every registered `module_hero*` schema appears in it.
 `page_home`, `page_landing`, `page_blog`, `page_topic` and `page_tag` each
 have an **optional** hero. A hero replaces that page's default header and
 owns the `<h1>`; without one, each page renders the header it always has
-(home: `headingBlock`'s `heading` plus `supportingText`; generic: title;
-blog: `heading` plus `supportingText`; topic and tag: the term header), so
-exactly one `<h1>` renders either way.
+(home and generic: `headingBlock`'s `heading` plus `supportingText`; blog:
+`heading` plus `supportingText`; topic and tag: the term header), so exactly
+one `<h1>` renders either way.
 
-`page_home`'s hero was required until #2975 made it optional and gave the
-document a `headingBlock` of its own. Because neither field is
-individually required, the requirement moved to the document:
+`page_home`'s hero was required until it was made optional and the document
+given a `headingBlock` of its own; `page_landing` followed, replacing the
+document `title` it previously rendered as its `<h1>`. Because neither field
+is individually required, the requirement moved to the document:
 `validateHeroOrHeading()` is an **error**-severity rule demanding at least
 one of `hero` or `headingBlock.heading`, so a page with an empty opening
 block cannot be published. The document `title` is never a fallback — it is
 Studio's internal list label, and a page with neither a hero nor a heading
-renders no header at all rather than leaking it.
+renders no header at all rather than leaking it. That holds for the
+breadcrumb trail too: `page_landing`'s trailing crumb comes from
+`headingBlock.heading`, and is omitted from the visible trail and the
+`BreadcrumbList` JSON-LD together when there is none.
 
 Breadcrumbs, metadata and the Studio preview keep
 reading the document's own `title`/`heading` whether or not a hero is set.

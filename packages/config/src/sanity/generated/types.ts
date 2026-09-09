@@ -757,6 +757,7 @@ export type Page_landing = {
   _rev: string;
   title?: string;
   slug?: Slug;
+  headingBlock?: HeadingBlock;
   hero?: Module_heroReference | Module_heroBlogReference;
   modules?: Array<
     | ({
