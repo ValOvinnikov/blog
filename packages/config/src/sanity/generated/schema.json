@@ -3887,6 +3887,14 @@
         },
         "optional": true
       },
+      "headingBlock": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "headingBlock"
+        },
+        "optional": true
+      },
       "hero": {
         "type": "objectAttribute",
         "value": {
@@ -3904,28 +3912,6 @@
         },
         "optional": true
       },
-      "heading": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
-      "supportingText": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
-      "postList": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "module_postList.reference"
-        },
-        "optional": true
-      },
       "modules": {
         "type": "objectAttribute",
         "value": {
@@ -3933,6 +3919,21 @@
           "of": {
             "type": "union",
             "of": [
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "module_postList.reference"
+                }
+              },
               {
                 "type": "object",
                 "attributes": {
@@ -3988,6 +3989,28 @@
         "value": {
           "type": "inline",
           "name": "seo"
+        },
+        "optional": true
+      },
+      "heading": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "supportingText": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "postList": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "module_postList.reference"
         },
         "optional": true
       }
