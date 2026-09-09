@@ -847,6 +847,8 @@ export type Page_post = {
   slug?: Slug;
   sectionHeader?: RequiredHeadingSectionHeader;
   heroImage?: ImageWithAlt;
+  content?: RichText;
+  featured?: boolean;
   author?: Blog_authorReference;
   topic?: Blog_topicReference;
   tags?: Array<
@@ -854,9 +856,6 @@ export type Page_post = {
       _key: string;
     } & Blog_tagReference
   >;
-  publishedAt?: string;
-  content?: RichText;
-  featured?: boolean;
   modules?: Array<
     | ({
         _key: string;
@@ -867,12 +866,21 @@ export type Page_post = {
     | ({
         _key: string;
       } & Module_ctaReference)
-    | ({
-        _key: string;
-      } & Module_contentReference)
   >;
+  publishedAt?: string;
   skim?: Skim;
   seo?: Seo;
+};
+
+export type Blog_topic = {
+  _id: string;
+  _type: 'blog_topic';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  description?: string;
 };
 
 export type SanityImageCrop = {
@@ -889,17 +897,6 @@ export type SanityImageHotspot = {
   y?: number;
   height?: number;
   width?: number;
-};
-
-export type Blog_topic = {
-  _id: string;
-  _type: 'blog_topic';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  slug?: Slug;
-  description?: string;
 };
 
 export type MediaTag = {
@@ -1082,9 +1079,9 @@ export type AllSanitySchemaTypes =
   | Module_hero
   | Module_postRelatedReference
   | Page_post
+  | Blog_topic
   | SanityImageCrop
   | SanityImageHotspot
-  | Blog_topic
   | MediaTag
   | Code
   | SanityImagePaletteSwatch
