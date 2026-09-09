@@ -15,6 +15,7 @@ const post: TPostDetail = {
   body: [],
   skim: undefined,
   hasAsides: false,
+  modules: [],
   seo: {
     title: 'Hello World',
     description: 'A sufficiently long excerpt for the post.',

@@ -21,6 +21,7 @@ export const mockPostDetail: TPostDetail = {
   ],
   skim: undefined,
   hasAsides: false,
+  modules: [{ id: 'related-1', type: 'module_postRelated' }],
   seo: {
     title: 'Hello World',
     description: 'A sufficiently long excerpt for the card.',

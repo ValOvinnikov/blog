@@ -22,6 +22,7 @@ const basePost: TPostDetail = {
   body: [],
   skim: undefined,
   hasAsides: false,
+  modules: [],
   seo: makeSeo({
     title: 'Hello World',
     description: 'A sufficiently long excerpt for the card.',
