@@ -128,20 +128,43 @@ export default mergeConfig(
   legitimately name real people on purpose.
 - Arrange–Act–Assert; one behaviour per `it`. Descriptive names:
   `it("renders the post title and author")`.
-- **When a suite targets a single exported function, pass the symbol itself to
-  `describe`, not a string.** Vitest derives the suite name from the
-  reference's `.name`, so the label can never drift from the code: rename the
-  symbol and the suite name follows, and deleting it is a compile error instead
-  of a stale string. Use a string only when no single symbol names the suite.
-  **Components are the exception** — they use the JSX-style template literal
-  ``describe(`<${Component.name}/>`, …)``. Existing string titles migrate
-  opportunistically when a test is touched; no mass rename.
+- **Never label a suite with a hand-written string when a symbol names it.**
+  Vitest derives the suite name from the reference's `.name`, so the label can
+  never drift: rename the symbol and the suite name follows, and deleting it is
+  a compile error instead of a stale string. Which form to use depends on
+  **what the suite targets**, and there are exactly two:
+
+  | the suite targets                            | form                                    |
+  | -------------------------------------------- | --------------------------------------- |
+  | a **component**                              | ``describe(`<${Component.name}/>`, …)`` |
+  | anything else (function, hook, class, const) | `describe(theSymbol, …)`                |
+
+  A string is correct only when no single symbol names the suite — a registry,
+  a route module, or a group of related behaviours.
+
+  **A component takes the JSX-style template literal — never the bare symbol.**
+  This is the rule most often got wrong, because the bare-symbol form looks
+  like it already satisfies "pass the symbol, not a string". It does not. The
+  two forms are not interchangeable, and a bare symbol on a component is a
+  defect to fix, not a legacy string awaiting migration.
+
+  ```tsx
+  // ✅ a component — JSX-style template literal
+  describe(`<${PostShare.name}/>`, () => {
+    it('renders the share links', () => {
+      /* … */
+    });
+  });
+
+  // ❌ describe(PostShare, () => { … })     — bare symbol; components take the JSX form
+  // ❌ describe('PostShare', () => { … })   — string drifts on rename
+  ```
 
   ```ts
+  // ✅ a plain function — the symbol itself
   import { objectKeys } from './objects';
 
   describe(objectKeys, () => {
-    // ✅ suite name tracks the symbol
     it("returns the object's keys", () => {
       /* … */
     });
@@ -149,6 +172,13 @@ export default mergeConfig(
 
   // ❌ describe('objectKeys', () => { … })  — string drifts on rename
   ```
+
+  Match the component form's spacing exactly — `<${X.name}/>`, no space before
+  the slash — so suite labels stay uniform in the test output.
+
+  Existing **string** titles migrate opportunistically when a test is touched;
+  no mass rename. A **bare symbol on a component** is different: fix it
+  whenever you touch that file, and never write a new one.
 
 - Prefer semantic queries (`getByRole`, `getByText`, `getByLabelText`) over
   `getByTestId`. Use `getByTestId` when a semantic query would be ambiguous —
