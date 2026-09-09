@@ -15,7 +15,7 @@ const rawRequiredSectionHeader: TRawRequiredSectionHeader = {
   supportingText: 'Hand-picked reads from the team',
 };
 
-describe('toSectionHeader', () => {
+describe(toSectionHeader, () => {
   it('maps a fully-authored sectionHeader object 1:1', () => {
     expect(toSectionHeader(rawSectionHeader)).toEqual(rawSectionHeader);
   });
@@ -31,9 +31,23 @@ describe('toSectionHeader', () => {
       supportingText: undefined,
     });
   });
+
+  it('builds an all-undefined container when raw is null', () => {
+    expect(toSectionHeader(null)).toEqual({
+      heading: undefined,
+      supportingText: undefined,
+    });
+  });
+
+  it('builds an all-undefined container when raw is undefined', () => {
+    expect(toSectionHeader(undefined)).toEqual({
+      heading: undefined,
+      supportingText: undefined,
+    });
+  });
 });
 
-describe('toRequiredSectionHeader', () => {
+describe(toRequiredSectionHeader, () => {
   it('maps a fully-authored requiredSectionHeader object 1:1', () => {
     expect(toRequiredSectionHeader(rawRequiredSectionHeader)).toEqual(
       rawRequiredSectionHeader,

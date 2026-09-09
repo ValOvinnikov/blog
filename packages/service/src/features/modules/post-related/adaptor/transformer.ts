@@ -65,9 +65,7 @@ export function toPostRelatedModule(
 ): TPostRelatedModule {
   return {
     brandVariant: raw.brandVariant,
-    sectionHeader: raw.sectionHeader
-      ? toSectionHeader(raw.sectionHeader)
-      : { heading: undefined, supportingText: undefined },
+    sectionHeader: toSectionHeader(raw.sectionHeader),
     posts,
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,

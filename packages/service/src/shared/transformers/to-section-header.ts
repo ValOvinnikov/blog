@@ -15,10 +15,12 @@ export type TRequiredSectionHeader = {
   supportingText: TMaybeUndefined<string>;
 };
 
-export function toSectionHeader(raw: TRawSectionHeader): TSectionHeader {
+export function toSectionHeader(
+  raw: TRawSectionHeader | null | undefined,
+): TSectionHeader {
   return {
-    heading: raw.heading ?? undefined,
-    supportingText: raw.supportingText ?? undefined,
+    heading: raw?.heading ?? undefined,
+    supportingText: raw?.supportingText ?? undefined,
   };
 }
 

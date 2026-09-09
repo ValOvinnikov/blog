@@ -20,9 +20,7 @@ export function toHomePage(
 ): THomePage {
   return {
     title: raw.title,
-    sectionHeader: raw.sectionHeader
-      ? toSectionHeader(raw.sectionHeader)
-      : { heading: undefined, supportingText: undefined },
+    sectionHeader: toSectionHeader(raw.sectionHeader),
     hero: raw.hero ? toHeroSlot(raw.hero) : undefined,
     modules: (raw.modules ?? []).map(toModule),
     seo: resolveSeo(
