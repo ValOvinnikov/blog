@@ -86,6 +86,7 @@ const getBlogPostIdMap = (
 };
 
 type TExistingPagePost = {
+  title?: string;
   slug?: { _type: 'slug'; current?: string };
   publishedAt?: string;
   seo?: unknown;
@@ -96,7 +97,7 @@ const getExistingPagePost = (
   pagePostId: string,
 ): Promise<TExistingPagePost | null> =>
   context.client.fetch<TExistingPagePost | null>(
-    '*[_id == $id][0]{ slug, publishedAt, seo }',
+    '*[_id == $id][0]{ title, slug, publishedAt, seo }',
     { id: pagePostId },
   );
 

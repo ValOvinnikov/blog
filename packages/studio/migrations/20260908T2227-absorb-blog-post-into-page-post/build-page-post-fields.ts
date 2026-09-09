@@ -19,6 +19,7 @@ export type TBlogPostDoc = {
 };
 
 export type TExistingPagePost = {
+  title?: string;
   slug?: { _type: 'slug'; current?: string };
   publishedAt?: string;
   seo?: unknown;
@@ -43,8 +44,9 @@ const buildModules = (newsletterEnabled: boolean | undefined) => [
 
 /**
  * Merges a `blog_post` document onto its `page_post` counterpart: the
- * page's own `slug`/`publishedAt`/`seo` win when already set, the post's
- * `title` always wins, every other content field comes from the post, and
+ * page's own `title` (its internal label)/`slug`/`publishedAt`/`seo` win
+ * when already set, the post's headline and excerpt land in
+ * `sectionHeader`, every other content field comes from the post, and
  * `modules` is the two shared modules — omitting the newsletter one when
  * `newsletterEnabled` is explicitly `false`.
  */
@@ -55,13 +57,11 @@ export const buildPagePostFields = (
 ): Record<string, unknown> => {
   const copiedFields = rewriteRefsDeep(
     {
-      title: post.title,
-      excerpt: post.excerpt,
       heroImage: post.heroImage,
       author: post.author,
       topic: post.topic,
       tags: post.tags,
-      body: post.body,
+      content: post.body,
       featured: post.featured,
       skim: post.skim,
     },
@@ -70,10 +70,15 @@ export const buildPagePostFields = (
 
   return {
     ...copiedFields,
+    title: existingPagePost?.title ?? post.title,
+    sectionHeader: {
+      _type: 'requiredHeadingSectionHeader',
+      heading: post.title,
+      supportingText: post.excerpt,
+    },
     slug: existingPagePost?.slug ?? post.slug,
     publishedAt: existingPagePost?.publishedAt ?? post.publishedAt,
     seo: existingPagePost?.seo ?? post.seo,
-    post: { _type: 'reference', _ref: post._id },
     modules: buildModules(post.newsletterEnabled),
   };
 };

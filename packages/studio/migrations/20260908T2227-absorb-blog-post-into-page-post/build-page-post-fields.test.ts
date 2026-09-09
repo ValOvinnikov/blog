@@ -37,15 +37,29 @@ describe('buildPagePostFields — no existing page_post (production shape)', () 
   it('sets every content field from the post', () => {
     const fields = buildPagePostFields(basePost, undefined, new Map());
 
-    expect(fields.title).toBe('Understanding GROQ');
-    expect(fields.excerpt).toBe(basePost.excerpt);
     expect(fields.heroImage).toEqual(basePost.heroImage);
     expect(fields.author).toEqual(basePost.author);
     expect(fields.topic).toEqual(basePost.topic);
     expect(fields.tags).toEqual(basePost.tags);
-    expect(fields.body).toEqual(basePost.body);
+    expect(fields.content).toEqual(basePost.body);
     expect(fields.featured).toBe(true);
     expect(fields.skim).toEqual(basePost.skim);
+  });
+
+  it('sets the internal title from the post title so the desk list is readable', () => {
+    const fields = buildPagePostFields(basePost, undefined, new Map());
+
+    expect(fields.title).toBe(basePost.title);
+  });
+
+  it('moves the post title and excerpt into sectionHeader', () => {
+    const fields = buildPagePostFields(basePost, undefined, new Map());
+
+    expect(fields.sectionHeader).toEqual({
+      _type: 'requiredHeadingSectionHeader',
+      heading: basePost.title,
+      supportingText: basePost.excerpt,
+    });
   });
 
   it('falls back to the post slug, publishedAt and seo when no page exists', () => {
@@ -56,10 +70,10 @@ describe('buildPagePostFields — no existing page_post (production shape)', () 
     expect(fields.seo).toEqual(basePost.seo);
   });
 
-  it('sets a post reference back to the original blog_post', () => {
+  it('has no post reference field — the page absorbed the post directly', () => {
     const fields = buildPagePostFields(basePost, undefined, new Map());
 
-    expect(fields.post).toEqual({ _type: 'reference', _ref: 'post-1' });
+    expect(fields.post).toBeUndefined();
   });
 
   it('includes both shared modules when newsletterEnabled is true', () => {
@@ -120,6 +134,7 @@ describe('buildPagePostFields — no existing page_post (production shape)', () 
 
 describe('buildPagePostFields — an existing page_post already carries its own values', () => {
   const existingPagePost = {
+    title: 'Editor-Chosen Wrapper Label',
     slug: { _type: 'slug' as const, current: 'custom-slug' },
     publishedAt: '2025-12-01T00:00:00Z',
     seo: { metaTitle: 'Custom SEO title' },
@@ -133,22 +148,33 @@ describe('buildPagePostFields — an existing page_post already carries its own 
     expect(fields.seo).toEqual(existingPagePost.seo);
   });
 
-  it('still overwrites the title with the post’s title', () => {
+  it('preserves the page’s own title rather than overwriting it with the post’s title', () => {
     const fields = buildPagePostFields(basePost, existingPagePost, new Map());
 
-    expect(fields.title).toBe('Understanding GROQ');
+    expect(fields.title).toBe(existingPagePost.title);
+  });
+
+  it('still derives sectionHeader from the post, independent of the existing title', () => {
+    const fields = buildPagePostFields(basePost, existingPagePost, new Map());
+
+    expect(fields.sectionHeader).toEqual({
+      _type: 'requiredHeadingSectionHeader',
+      heading: basePost.title,
+      supportingText: basePost.excerpt,
+    });
   });
 
   it('falls back to the post’s own field when the page never set it', () => {
     const fields = buildPagePostFields(basePost, {}, new Map());
 
+    expect(fields.title).toBe(basePost.title);
     expect(fields.slug).toEqual(basePost.slug);
     expect(fields.publishedAt).toBe(basePost.publishedAt);
     expect(fields.seo).toEqual(basePost.seo);
   });
 });
 
-describe('buildPagePostFields — internal links inside body get rewritten', () => {
+describe('buildPagePostFields — internal links inside content get rewritten', () => {
   it('rewrites an internal reference markDef pointing at another migrated post', () => {
     const postWithLink: TBlogPostDoc = {
       ...basePost,
@@ -170,11 +196,11 @@ describe('buildPagePostFields — internal links inside body get rewritten', () 
     const idMap = new Map([['post-2', 'page_post-post-2']]);
 
     const fields = buildPagePostFields(postWithLink, undefined, idMap);
-    const body = fields.body as {
+    const content = fields.content as {
       markDefs: { internalReference: { _ref: string } }[];
     }[];
 
-    expect(body[0]!.markDefs[0]!.internalReference._ref).toBe(
+    expect(content[0]!.markDefs[0]!.internalReference._ref).toBe(
       'page_post-post-2',
     );
   });
@@ -193,6 +219,7 @@ describe('buildPagePostFields — idempotency', () => {
     const secondRunResult = buildPagePostFields(
       basePost,
       {
+        title: firstRunResult.title as string,
         slug: firstRunResult.slug as { _type: 'slug'; current?: string },
         publishedAt: firstRunResult.publishedAt as string,
         seo: firstRunResult.seo as Record<string, unknown>,

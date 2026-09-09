@@ -16,6 +16,7 @@ import {
 import migration from './index';
 
 type TExistingPagePost = {
+  title?: string;
   slug?: { _type: 'slug'; current?: string };
   publishedAt?: string;
   seo?: unknown;
@@ -117,15 +118,21 @@ describe('absorb-blog-post-into-page-post migration — blog_post documents', ()
       title: 'Understanding GROQ',
       slug: { _type: 'slug', current: 'understanding-groq' },
       publishedAt: '2026-02-01T09:00:00Z',
-      post: { _type: 'reference', _ref: 'post-1' },
+      sectionHeader: {
+        _type: 'requiredHeadingSectionHeader',
+        heading: 'Understanding GROQ',
+        supportingText: postDoc.excerpt,
+      },
     });
+    expect(getCreateOrReplace(mutations).document).not.toHaveProperty('post');
   });
 
-  it('keeps the existing page_post’s own slug/publishedAt/seo (development shape)', async () => {
+  it('keeps the existing page_post’s own title/slug/publishedAt/seo (development shape)', async () => {
     const { context } = createMockContext({
       blogPostIds: ['post-1'],
       existingPagePosts: {
         'page_post-post-1': {
+          title: 'Editor-Chosen Wrapper Label',
           slug: { _type: 'slug', current: 'custom-slug' },
           publishedAt: '2025-01-01T00:00:00Z',
           seo: { metaTitle: 'Custom title' },
@@ -139,7 +146,7 @@ describe('absorb-blog-post-into-page-post migration — blog_post documents', ()
     )) as unknown[];
 
     expect(getCreateOrReplace(mutations).document).toMatchObject({
-      title: 'Understanding GROQ',
+      title: 'Editor-Chosen Wrapper Label',
       slug: { _type: 'slug', current: 'custom-slug' },
       publishedAt: '2025-01-01T00:00:00Z',
       seo: { metaTitle: 'Custom title' },
@@ -187,6 +194,7 @@ describe('absorb-blog-post-into-page-post migration — blog_post documents', ()
       blogPostIds: ['post-1'],
       existingPagePosts: {
         'page_post-post-1': {
+          title: postDoc.title,
           slug: postDoc.slug,
           publishedAt: postDoc.publishedAt,
           seo: postDoc.seo,

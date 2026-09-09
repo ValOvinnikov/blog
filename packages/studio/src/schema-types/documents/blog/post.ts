@@ -1,54 +1,20 @@
-import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
-import { getDraftsClient } from '@blog/studio/schema-types/helpers/get-drafts-client';
 import { slugField } from '@blog/studio/schema-types/helpers/slug-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt';
 import { richTextSchema } from '@blog/studio/schema-types/objects/rich-text';
 import { seoSchema } from '@blog/studio/schema-types/objects/seo';
 import { skimSchema } from '@blog/studio/schema-types/objects/skim';
 import { Newspaper } from 'lucide-react';
-import {
-  defineArrayMember,
-  defineField,
-  defineType,
-  type SanityDocument,
-  type ValidationContext,
-} from 'sanity';
+import { defineArrayMember, defineField, defineType } from 'sanity';
 
 import { authorSchema } from './author';
 import { tagSchema } from './tag';
 import { topicSchema } from './topic';
-
-/**
- * Warns (does not block publishing) when no `page_post` references this
- * post — `/blog/{slug}` 404s with no runtime fallback in that state, so
- * the editor should see the gap on the document they'd fix it from.
- */
-const validateHasPagePost = async (
-  document: SanityDocument | undefined,
-  context: ValidationContext,
-): Promise<string | true> => {
-  const publishedId = document?._id.replace(/^drafts\./, '');
-
-  if (!publishedId) return true;
-
-  const client = getDraftsClient(context);
-
-  const referencingCount = await client.fetch<number>(
-    `count(*[_type == $type && post._ref == $postId])`,
-    { type: PAGE_POST_TYPE, postId: publishedId },
-  );
-
-  return referencingCount > 0
-    ? true
-    : 'No Post Page references this post yet — /blog/{slug} will 404 until one is created.';
-};
 
 export const postSchema = defineType({
   name: 'blog_post',
   title: 'Post',
   type: 'document',
   icon: Newspaper,
-  validation: (rule) => rule.custom(validateHasPagePost).warning(),
   fields: [
     defineField({
       name: 'title',
