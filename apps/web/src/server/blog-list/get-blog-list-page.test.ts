@@ -34,7 +34,7 @@ describe(getBlogListPage, () => {
   });
 
   it('returns the raw TResult from getIndexPage unchanged', async () => {
-    const result = { ok: true, data: { heading: 'Blog' } };
+    const result = { ok: true, data: { title: 'Blog' } };
     getIndexPageMock.mockResolvedValue(result);
 
     await expect(getBlogListPage('tenant-1')).resolves.toBe(result);
