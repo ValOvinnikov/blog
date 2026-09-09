@@ -292,9 +292,9 @@ reading the document's own `title`/`heading` whether or not a hero is set.
 non-hero `_type` as a data error through the loader's normal failure path
 rather than rendering a blank page.
 
-**The post is the page.** `page_post` carries the post itself — `title`,
-`slug`, `excerpt`, `heroImage`, `author`, `topic`, `tags`, `publishedAt`,
-`body`, `featured`, `skim` and `seo` — rather than wrapping a separate
+**The post is the page.** `page_post` carries the post itself — `slug`,
+`sectionHeader`, `heroImage`, `author`, `topic`, `tags`, `publishedAt`,
+`content`, `featured`, `skim` and `seo` — rather than wrapping a separate
 `blog_post` and dereferencing it. Every post read in `@blog/service`
 projects those fields off `page_post` directly, and `apps/web` names
 `page_post` as the post's document type wherever it needs one: the
@@ -303,9 +303,20 @@ and the `revalidate-tags` map, whose `page_post` entry purges the
 post-content tags (`posts`, `author`, `topic`, `tag`) that the wrapper type
 used to own. `blog_post` still exists and is still a valid reference target
 alongside `page_post` everywhere a post can be linked, but nothing reads it
-for page content; it and `page_post.post` retire together, and a Sanity
-`_type` is immutable, so that retirement is its own migration rather than a
-rename.
+for page content; it retires in its own migration, since a Sanity `_type` is
+immutable and a retirement is therefore never a rename.
+
+**A page document's own `title` is an internal CMS label and is never
+rendered on the web.** It names the document in the desk, nothing more —
+`page_topic` and `page_tag` do not project theirs at all, taking their
+heading from the deref'd `blog_topic`/`blog_tag` instead. `page_post` has no
+entity to deref, so its headline and excerpt live in a **`sectionHeader`**
+object (`requiredHeadingSectionHeader`: `heading` required, `supportingText`
+optional) — the same shape the modules use. `@blog/service` maps
+`sectionHeader.heading` to the view models' `title` and
+`sectionHeader.supportingText` to their `excerpt`, so the field names every
+consumer sees are unchanged and no `apps/web` component reads a document
+label.
 
 `page_post.modules[]` allows `module_postRelated`, `module_newsletter`,
 `module_cta` and `module_content`. Two concerns that were once fields on the
@@ -317,17 +328,17 @@ post became modules in that array: related reading is `module_postRelated`
 `FULL`/`COMPACT`, coalesced to `FULL` at the query since the schema field is
 optional) selecting which form of the signup it renders.
 
-**Four of the absorbed fields are optional in the view models even though
-the schema marks them required.** `excerpt`, `author`, `topic` and `body`
+**Several fields are optional in the view models even though the schema
+marks them required.** `excerpt`, `author`, `topic` and the post body
 surface as `T | undefined` on `TPostCard`/`TPostDetail` (and `excerpt`/
 `topic` on `TArchivePostCard`, `excerpt` on `TFeedPost`), because a
-`page_post` that predates the absorption genuinely lacks them until a
-migration backfills it. Consumers omit the element rather than substituting
-a placeholder: no byline, no topic chip, no `<description>` in the feed, and
-no `author` key in the `BlogPosting` JSON-LD. The one place the assertion
-survives is the skim-generation query, a publish-webhook read where an
-absent body is a real precondition failure rather than something to render
-around.
+`page_post` that predates the absorption genuinely lacks them — including
+its whole `sectionHeader` — until a migration backfills it. Consumers omit
+the element rather than substituting a placeholder: no byline, no topic
+chip, no `<description>` in the feed, and no `author` key in the
+`BlogPosting` JSON-LD. The one place the assertion survives is the
+skim-generation query, a publish-webhook read where an absent body is a real
+precondition failure rather than something to render around.
 
 `module_cta` additionally carries a required `variant` (`BANNER`/`SPLIT`/
 `CALLOUT`, from `CTA_VARIANT`, default `CALLOUT`), a required `bandTone`
