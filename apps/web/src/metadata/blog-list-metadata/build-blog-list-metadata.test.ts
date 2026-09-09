@@ -1,3 +1,4 @@
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 
 import { buildBlogListMetadata } from './build-blog-list-metadata';
@@ -26,7 +27,12 @@ describe('buildBlogListMetadata', () => {
   it('forwards the slug-less tenant to getBlogListPage — the same cached loader BlogListPage reads', async () => {
     getBlogListPageMock.mockResolvedValue({
       ok: true,
-      data: { heading: 'Blog', seo, modules: [], postListId: 'post-list-1' },
+      data: {
+        title: 'Blog',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
+        seo,
+        modules: [],
+      },
     });
 
     await buildBlogListMetadata(1, 'tenant-1');
@@ -38,10 +44,10 @@ describe('buildBlogListMetadata', () => {
     getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Blog',
+        title: 'Blog',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         seo,
         modules: [],
-        postListId: 'post-list-1',
       },
     });
 
@@ -64,10 +70,10 @@ describe('buildBlogListMetadata', () => {
     getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Blog',
+        title: 'Blog',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         seo,
         modules: [],
-        postListId: 'post-list-1',
       },
     });
 

@@ -1,7 +1,7 @@
-import { MissingPostListError } from '@blog/service/features/pages/blog/adaptor/missing-post-list-error';
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawBlogPage } from '@blog/service/testing/pages/fixtures';
+import { makeRawOptionalHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getIndexPage } from './loader';
@@ -20,25 +20,14 @@ vi.mock('@blog/service/sanity/image', () => ({
 const tenant = makeTenant();
 
 describe('getIndexPage', () => {
-  it('exposes the postList module id from page_blog.postList', async () => {
-    mockRun
-      .mockResolvedValueOnce(
-        makeRawBlogPage({ postList: { _id: 'post-list-1' } }),
-      )
-      .mockResolvedValueOnce(makeRawSiteSettings());
-
-    const result = await getIndexPage(tenant);
-    if (!result) throw new Error('expected a blog index page');
-
-    expect(result.postListId).toBe('post-list-1');
-  });
-
-  it('takes heading/supportingText from the page_blog singleton', async () => {
+  it('exposes the headingBlock from the page_blog singleton', async () => {
     mockRun
       .mockResolvedValueOnce(
         makeRawBlogPage({
-          heading: 'Latest posts',
-          supportingText: 'Fresh from the team.',
+          headingBlock: makeRawOptionalHeadingBlock({
+            heading: 'Latest posts',
+            supportingText: 'Fresh from the team.',
+          }),
           seo: {
             metaTitle: 'Latest posts — Blog',
             metaDescription: 'Fresh from the team.',
@@ -51,8 +40,10 @@ describe('getIndexPage', () => {
     const result = await getIndexPage(tenant);
     if (!result) throw new Error('expected a blog index page');
 
-    expect(result.heading).toBe('Latest posts');
-    expect(result.supportingText).toBe('Fresh from the team.');
+    expect(result.headingBlock).toEqual({
+      heading: 'Latest posts',
+      supportingText: 'Fresh from the team.',
+    });
     expect(result.seo).toEqual({
       title: 'Latest posts — Blog',
       description: 'Fresh from the team.',
@@ -62,11 +53,23 @@ describe('getIndexPage', () => {
     });
   });
 
-  it('resolves seo from the heading and site settings when the page has no authored seo', async () => {
+  it('falls the headingBlock back to an empty object when unset', async () => {
     mockRun
-      .mockResolvedValueOnce(
-        makeRawBlogPage({ heading: 'The Blog', seo: null }),
-      )
+      .mockResolvedValueOnce(makeRawBlogPage({ headingBlock: null }))
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getIndexPage(tenant);
+    if (!result) throw new Error('expected a blog index page');
+
+    expect(result.headingBlock).toEqual({
+      heading: undefined,
+      supportingText: undefined,
+    });
+  });
+
+  it('resolves seo from the document title and site settings when the page has no authored seo', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawBlogPage({ title: 'The Blog', seo: null }))
       .mockResolvedValueOnce(
         makeRawSiteSettings({ description: 'Notes on building things.' }),
       );
@@ -143,16 +146,6 @@ describe('getIndexPage', () => {
     expect(result.modules).toEqual([]);
   });
 
-  // Regression guard for the decision that a missing slot is a loud failure,
-  // never a substituted default: this must reject rather than resolve with
-  // an invented module id.
-  it('rejects with MissingPostListError when page_blog.postList is unset, without fetching site settings', async () => {
-    mockRun.mockResolvedValueOnce(makeRawBlogPage({ postList: null }));
-
-    await expect(getIndexPage(tenant)).rejects.toThrow(MissingPostListError);
-    expect(mockRun).toHaveBeenCalledTimes(1);
-  });
-
   it('resolves undefined, rather than rejecting, when no page_blog document exists', async () => {
     mockRun.mockResolvedValueOnce(null);
 
@@ -182,7 +175,7 @@ describe('getIndexPage', () => {
       expect.objectContaining({
         tenant,
         next: expect.objectContaining({
-          tags: ['t:tenant-a:page_blog', 't:tenant-a:modules:postList'],
+          tags: ['t:tenant-a:page_blog'],
         }),
       }),
     );

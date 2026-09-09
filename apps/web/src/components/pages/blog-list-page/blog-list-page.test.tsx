@@ -1,41 +1,31 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { notFound } from 'next/navigation';
 
 import { BlogListPage } from './blog-list-page';
 
-const {
-  getBlogListPageMock,
-  moduleRendererMock,
-  postListModuleMock,
-  heroSlotMock,
-} = vi.hoisted(() => ({
-  getBlogListPageMock: vi.fn(),
-  heroSlotMock: vi.fn(({ id }: { id: string }) => (
-    <h1 data-testid="hero-slot">{id}</h1>
-  )),
-  // `PostListModule` and `ModuleRenderer` are async Server Components —
-  // real RSC async-component nesting isn't renderable through
-  // `@testing-library/react`'s client renderer (`blog-post-page.test.tsx`
-  // follows the same pattern). Stubbed as plain sync components so this
-  // suite can assert `BlogListPage` composes them in the right order with
-  // the right props; each part's own behavior is covered by its own test
-  // file (`module-renderer.test.tsx`, `post-list-module.test.tsx`,
-  // `blog-list-breadcrumbs.test.tsx`, `blog-list-topic-chips.test.tsx`).
-  moduleRendererMock: vi.fn(
-    ({ modules }: { modules: { id: string; type: string }[] }) => (
-      <div data-testid="module-renderer-stub">
-        {modules.map((module) => module.type).join(',')}
-      </div>
+const { getBlogListPageMock, moduleRendererMock, heroSlotMock } = vi.hoisted(
+  () => ({
+    getBlogListPageMock: vi.fn(),
+    heroSlotMock: vi.fn(({ id }: { id: string }) => (
+      <h1 data-testid="hero-slot">{id}</h1>
+    )),
+    // `ModuleRenderer` is an async Server Component — real RSC
+    // async-component nesting isn't renderable through
+    // `@testing-library/react`'s client renderer (`blog-post-page.test.tsx`
+    // follows the same pattern). Stubbed as a plain sync component so this
+    // suite can assert `BlogListPage` composes it with the right props; its
+    // own dispatch logic — including resolving a `module_postList` entry —
+    // is covered by its own test file (`module-renderer.test.tsx`).
+    moduleRendererMock: vi.fn(
+      ({ modules }: { modules: { id: string; type: string }[] }) => (
+        <div data-testid="module-renderer-stub">
+          {modules.map((module) => module.type).join(',')}
+        </div>
+      ),
     ),
-  ),
-  postListModuleMock: vi.fn(
-    ({ id, page }: { id: string; locale: string; page: number }) => (
-      <div data-testid="post-list-module-stub">
-        {id}:{page}
-      </div>
-    ),
-  ),
-}));
+  }),
+);
 
 vi.mock('@web/server/blog-list/get-blog-list-page', () => ({
   getBlogListPage: getBlogListPageMock,
@@ -57,10 +47,6 @@ vi.mock('@web/modules/module-renderer', () => ({
   ModuleRenderer: moduleRendererMock,
 }));
 
-vi.mock('@web/modules/post-list/post-list-module', () => ({
-  PostListModule: postListModuleMock,
-}));
-
 vi.mock('@web/modules/hero-slot', () => ({
   HeroSlot: heroSlotMock,
 }));
@@ -75,7 +61,6 @@ describe(`<${BlogListPage.name}/>`, () => {
   beforeEach(() => {
     getBlogListPageMock.mockReset();
     moduleRendererMock.mockClear();
-    postListModuleMock.mockClear();
     heroSlotMock.mockClear();
   });
 
@@ -109,10 +94,8 @@ describe(`<${BlogListPage.name}/>`, () => {
     getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         modules: [],
-        postListId: 'post-list-1',
       },
     });
 
@@ -124,14 +107,15 @@ describe(`<${BlogListPage.name}/>`, () => {
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('renders the parts in order: breadcrumbs, topic chips, post list, module renderer', async () => {
+  it('renders the parts in order: breadcrumbs, topic chips, module renderer', async () => {
     getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
-        modules: [{ id: 'newsletter-1', type: 'module_newsletter' }],
-        postListId: 'post-list-1',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
+        modules: [
+          { id: 'post-list-1', type: 'module_postList' },
+          { id: 'newsletter-1', type: 'module_newsletter' },
+        ],
       },
     });
 
@@ -144,7 +128,6 @@ describe(`<${BlogListPage.name}/>`, () => {
     expect(order).toEqual([
       'blog-list-breadcrumbs',
       'blog-list-topic-chips',
-      'post-list-module-stub',
       'module-renderer-stub',
     ]);
   });
@@ -153,10 +136,8 @@ describe(`<${BlogListPage.name}/>`, () => {
     getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         modules: [],
-        postListId: 'post-list-1',
       },
     });
 
@@ -164,7 +145,7 @@ describe(`<${BlogListPage.name}/>`, () => {
 
     const main = screen.getByRole('main');
     expect(main).toContainElement(screen.getByTestId('blog-list-topic-chips'));
-    expect(main).toContainElement(screen.getByTestId('post-list-module-stub'));
+    expect(main).toContainElement(screen.getByTestId('module-renderer-stub'));
     expect(
       screen.getByTestId('blog-list-breadcrumbs').closest('main'),
     ).toBeNull();
@@ -174,10 +155,8 @@ describe(`<${BlogListPage.name}/>`, () => {
     getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         modules: [],
-        postListId: 'post-list-1',
       },
     });
 
@@ -189,33 +168,12 @@ describe(`<${BlogListPage.name}/>`, () => {
     );
   });
 
-  it('passes the postList id, locale, and page through to PostListModule', async () => {
-    getBlogListPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
-        modules: [],
-        postListId: 'post-list-1',
-      },
-    });
-
-    await setup({ page: 2 });
-
-    expect(postListModuleMock).toHaveBeenCalledWith(
-      { id: 'post-list-1', locale: 'en', tenant: 'tenant-1', page: 2 },
-      undefined,
-    );
-  });
-
   it('passes an empty modules array to ModuleRenderer when the editor has not added any', async () => {
     getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         modules: [],
-        postListId: 'post-list-1',
       },
     });
 
@@ -227,14 +185,15 @@ describe(`<${BlogListPage.name}/>`, () => {
     );
   });
 
-  it('passes the page-builder modules through to ModuleRenderer when an editor has added one via page_blog.modules', async () => {
+  it('passes the page-builder modules through to ModuleRenderer, including the post list module', async () => {
     getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
-        modules: [{ id: 'newsletter-1', type: 'module_newsletter' }],
-        postListId: 'post-list-1',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
+        modules: [
+          { id: 'post-list-1', type: 'module_postList' },
+          { id: 'newsletter-1', type: 'module_newsletter' },
+        ],
       },
     });
 
@@ -242,13 +201,16 @@ describe(`<${BlogListPage.name}/>`, () => {
 
     expect(moduleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        modules: [{ id: 'newsletter-1', type: 'module_newsletter' }],
+        modules: [
+          { id: 'post-list-1', type: 'module_postList' },
+          { id: 'newsletter-1', type: 'module_newsletter' },
+        ],
         locale: 'en',
       }),
       undefined,
     );
     expect(screen.getByTestId('module-renderer-stub')).toHaveTextContent(
-      'module_newsletter',
+      'module_postList,module_newsletter',
     );
   });
 
@@ -256,10 +218,8 @@ describe(`<${BlogListPage.name}/>`, () => {
     getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         modules: [],
-        postListId: 'post-list-1',
       },
     });
 
@@ -273,11 +233,9 @@ describe(`<${BlogListPage.name}/>`, () => {
     getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         hero: { id: 'hero-1', type: 'module_hero' },
         modules: [],
-        postListId: 'post-list-1',
       },
     });
 
@@ -294,10 +252,8 @@ describe(`<${BlogListPage.name}/>`, () => {
     getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         modules: [],
-        postListId: 'post-list-1',
       },
     });
 

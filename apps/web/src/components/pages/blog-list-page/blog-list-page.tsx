@@ -3,7 +3,6 @@ import { BlogListTopicChips } from '@web/components/features/blog-list/blog-list
 import { PageShell } from '@web/components/page-templates/page-shell';
 import { PageIntro } from '@web/components/shared/page-intro';
 import { ModuleRenderer } from '@web/modules/module-renderer';
-import { PostListModule } from '@web/modules/post-list/post-list-module';
 import { getBlogListPage } from '@web/server/blog-list/get-blog-list-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 
@@ -11,9 +10,9 @@ type TBlogListPageProps = { page: number; locale: string; tenant: string };
 
 /**
  * `/blog` (page 1) and `/blog/page/[page]` (pages ≥ 2) composition. Fetches
- * the `page_blog` shell once — for its heading/hero and the page-builder
- * `modules[]` — and composes every other concern as a self-fetching part
- * reading the same cached `getBlogListPage` loader or its own data.
+ * the `page_blog` shell once and composes every other concern as a
+ * self-fetching part reading the same cached `getBlogListPage` loader or its
+ * own data.
  */
 export const BlogListPage = async ({
   page,
@@ -22,7 +21,7 @@ export const BlogListPage = async ({
 }: TBlogListPageProps) => {
   const result = await getBlogListPage(tenant);
   const pageData = guardPageLoaderResult(result, 'blog_list_page.fetch_failed');
-  const { heading, supportingText, hero, modules, postListId } = pageData;
+  const { headingBlock, hero, modules } = pageData;
 
   return (
     <PageShell>
@@ -32,19 +31,13 @@ export const BlogListPage = async ({
       <PageShell.Heading>
         <PageIntro
           hero={hero}
-          headingBlock={{ heading, supportingText }}
+          headingBlock={headingBlock}
           locale={locale}
           tenant={tenant}
         />
       </PageShell.Heading>
       <PageShell.Content>
         <BlogListTopicChips tenant={tenant} />
-        <PostListModule
-          id={postListId}
-          locale={locale}
-          tenant={tenant}
-          page={page}
-        />
         <ModuleRenderer
           modules={modules}
           context={{ page }}

@@ -615,11 +615,12 @@ export type Page_blog = {
   _updatedAt: string;
   _rev: string;
   title?: string;
+  headingBlock?: HeadingBlock;
   hero?: Module_heroReference | Module_heroBlogReference;
-  heading?: string;
-  supportingText?: string;
-  postList?: Module_postListReference;
   modules?: Array<
+    | ({
+        _key: string;
+      } & Module_postListReference)
     | ({
         _key: string;
       } & Module_ctaReference)
@@ -631,6 +632,9 @@ export type Page_blog = {
       } & Module_postFeaturedReference)
   >;
   seo?: Seo;
+  heading?: string;
+  supportingText?: string;
+  postList?: Module_postListReference;
 };
 
 export type Module_postList = {

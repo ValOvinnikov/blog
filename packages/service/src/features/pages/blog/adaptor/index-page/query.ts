@@ -1,4 +1,5 @@
 import { q } from '@blog/service/sanity/query';
+import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo';
 
@@ -6,17 +7,13 @@ export const blogPageQuery = q.star
   .filterByType('page_blog')
   .slice(0)
   .project((sub) => ({
-    heading: sub.field('heading').notNull(),
-    supportingText: sub.field('supportingText').nullable(true),
-    hero: sub.field('hero').deref().project(moduleFragment).nullable(true),
-    postList: sub
-      .field('postList')
-      .deref()
-      .project(() => ({
-        _id: true,
-      }))
+    title: sub.field('title').notNull(),
+    headingBlock: sub
+      .field('headingBlock')
+      .project(headingBlockFragment)
       .nullable(true),
-    // Page-builder placement (`cta`/`newsletter`), mirroring
+    hero: sub.field('hero').deref().project(moduleFragment).nullable(true),
+    // Page-builder placement (`cta`/`newsletter`/`postList`), mirroring
     // `page_home`/`page_landing`'s own thin `modules[]` ref projection —
     // resolved to a real component by `ModuleRenderer` (`apps/web`).
     modules: sub

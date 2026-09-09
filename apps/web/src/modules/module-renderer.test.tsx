@@ -2,9 +2,12 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { ModuleRenderer } from './module-renderer';
 
-const { ctaModuleMock } = vi.hoisted(() => ({
+const { ctaModuleMock, postListModuleMock } = vi.hoisted(() => ({
   ctaModuleMock: vi.fn(({ id }: { id: string; locale: string }) => (
     <div data-testid="stub-cta">{id}</div>
+  )),
+  postListModuleMock: vi.fn(({ id }: { id: string }) => (
+    <div data-testid="stub-post-list">{id}</div>
   )),
 }));
 
@@ -12,6 +15,7 @@ vi.mock('./module-map', () => ({
   MODULE_MAP: {
     module_content: undefined,
     module_cta: ctaModuleMock,
+    module_postList: postListModuleMock,
   },
 }));
 
@@ -24,6 +28,7 @@ const setup = customRenderAsync(ModuleRenderer, {
 describe(`<${ModuleRenderer.name}/>`, () => {
   beforeEach(() => {
     ctaModuleMock.mockClear();
+    postListModuleMock.mockClear();
   });
 
   it('renders the mapped component for a known module type with its id', async () => {
@@ -47,6 +52,14 @@ describe(`<${ModuleRenderer.name}/>`, () => {
 
     expect(ctaModuleMock).toHaveBeenCalledWith(
       expect.objectContaining({ context: { page: 2 } }),
+    );
+  });
+
+  it('renders a module_postList entry through the registered component', async () => {
+    await setup({ modules: [{ type: 'module_postList', id: 'post-list-id' }] });
+
+    expect(screen.getByTestId('stub-post-list')).toHaveTextContent(
+      'post-list-id',
     );
   });
 

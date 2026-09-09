@@ -1,6 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config';
 import { getSiteSettings } from '@blog/service/features/global/site-settings/adaptor/loader';
-import { MissingPostListError } from '@blog/service/features/pages/blog/adaptor/missing-post-list-error';
 import {
   isr,
   runQuery,
@@ -14,17 +13,12 @@ import type { TBlogIndexPage } from './types';
 export async function getIndexPage(
   tenant: TTenantSanityContext,
 ): Promise<TMaybeUndefined<TBlogIndexPage>> {
-  // `blogPageQuery` derefs `postList` — that tag must ride alongside
-  // `page_blog` (tag-scope contract, `sanity/query.ts`).
   const rawPage = await runQuery(blogPageQuery, {
     tenant,
-    ...isr(['page_blog', 'modules:postList'], tenant.projectId),
+    ...isr('page_blog', tenant.projectId),
   });
   if (!rawPage) return undefined;
-  if (!rawPage.postList) {
-    throw new MissingPostListError();
-  }
 
   const settings = await getSiteSettings(tenant);
-  return toIndexPage(rawPage, settings, rawPage.postList._id, tenant);
+  return toIndexPage(rawPage, settings, tenant);
 }
