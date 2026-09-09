@@ -56,7 +56,6 @@
     "fallbackHeading": "Related reading"
   },
   "blogPostPage": {
-    "relatedReading": "Related reading",
     "depthToggle": {
       "ariaLabel": "Reading depth",
       "skim": "30s",
