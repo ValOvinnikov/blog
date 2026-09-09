@@ -3992,20 +3992,6 @@
         },
         "optional": true
       },
-      "heading": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
-      "supportingText": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
       "postList": {
         "type": "objectAttribute",
         "value": {

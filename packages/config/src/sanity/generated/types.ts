@@ -632,8 +632,6 @@ export type Page_blog = {
       } & Module_postFeaturedReference)
   >;
   seo?: Seo;
-  heading?: string;
-  supportingText?: string;
   postList?: Module_postListReference;
 };
 
