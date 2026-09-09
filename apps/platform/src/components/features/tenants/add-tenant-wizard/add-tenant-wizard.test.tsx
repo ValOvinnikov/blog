@@ -1,3 +1,4 @@
+import { CORE_PROVISIONING_STEPS } from '@blog/db/constants';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 
 import { AddTenantWizard } from './add-tenant-wizard';
@@ -20,7 +21,7 @@ describe(AddTenantWizard, () => {
     ).toBeVisible();
   });
 
-  it('renders the five-step rail with Details as the active step', () => {
+  it('renders a rail item for Details plus every core provisioning step, with Details active', () => {
     render(<AddTenantWizard />);
 
     const rail = screen.getByRole('navigation', {
@@ -28,13 +29,15 @@ describe(AddTenantWizard, () => {
     });
     const items = screen.getAllByRole('listitem');
 
-    expect(items).toHaveLength(5);
+    expect(items).toHaveLength(CORE_PROVISIONING_STEPS.length + 1);
     expect(items[0]).toHaveAttribute('aria-current', 'step');
     expect(rail).toHaveTextContent('Details');
-    expect(rail).toHaveTextContent('Sanity project');
+    expect(rail).toHaveTextContent('Create workspace');
     expect(rail).toHaveTextContent('Seed content');
-    expect(rail).toHaveTextContent('Registry rows');
-    expect(rail).toHaveTextContent('Map domain');
+    expect(rail).toHaveTextContent('Issue read credentials');
+    expect(rail).toHaveTextContent('Connect domain');
+    expect(rail).toHaveTextContent('Wire up CMS to website');
+    expect(rail).toHaveTextContent('Confirm content is ready');
   });
 
   it("renders the Details form's fields", () => {

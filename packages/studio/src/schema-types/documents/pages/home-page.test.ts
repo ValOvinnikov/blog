@@ -3,40 +3,17 @@ import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/helpe
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
+import {
+  createMockModulesRule,
+  type TModuleReference,
+  type TModulesCustomFn,
+} from '@blog/studio/testing/create-mock-modules-rule';
 import type { ValidationContext } from 'sanity';
 
 type TArrayFieldDefinition = {
   type: 'array';
   of?: Array<{ name?: string }>;
 };
-
-type TModuleReference = { _type?: string; _ref?: string };
-type TCustomFn = (
-  modules: TModuleReference[] | undefined,
-  context: ValidationContext,
-) => Promise<string | true>;
-
-type TMockRule = {
-  unique: () => TMockRule;
-  error: (message: string) => TMockRule;
-  custom: (fn: TCustomFn) => TMockRule;
-};
-
-/**
- * `unique()`/`error()`/`custom()` each return a fresh mock rule wrapping the
- * same shared `customFns` array, mirroring the real Sanity `Rule` chain
- * (`rule.custom(a).custom(b)`) closely enough to observe whether both
- * `.custom()` calls actually register, rather than the second silently
- * displacing the first.
- */
-const createMockRule = (customFns: TCustomFn[]): TMockRule => ({
-  unique: () => createMockRule(customFns),
-  error: () => createMockRule(customFns),
-  custom: (fn) => {
-    customFns.push(fn);
-    return createMockRule(customFns);
-  },
-});
 
 type TDocumentCustomFn = (document: Record<string, unknown>) => string | true;
 
@@ -57,7 +34,7 @@ const createDocumentMockRule = (
   warning: () => createDocumentMockRule('warning', fn),
 });
 
-const getModulesCustomValidators = (): TCustomFn[] => {
+const getModulesCustomValidators = (): TModulesCustomFn[] => {
   const modulesField = homePageSchema.fields?.find(
     (field) => field.name === 'modules',
   );
@@ -68,10 +45,10 @@ const getModulesCustomValidators = (): TCustomFn[] => {
     );
   }
 
-  const customFns: TCustomFn[] = [];
+  const customFns: TModulesCustomFn[] = [];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (modulesField.validation as any)(createMockRule(customFns));
+  (modulesField.validation as any)(createMockModulesRule(customFns));
 
   return customFns;
 };
