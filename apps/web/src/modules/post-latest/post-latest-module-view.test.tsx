@@ -1,6 +1,7 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { PostLatestModuleView } from './post-latest-module-view';
 
@@ -23,10 +24,7 @@ const post = makePostListItem();
 
 const setup = customRender(PostLatestModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: {
-    heading: 'Latest posts',
-    supportingText: undefined,
-  },
+  headingBlock: makeHeadingBlock(),
   items: [post],
   layout: undefined,
   contentAlignment: undefined,
@@ -56,10 +54,7 @@ describe(`<${PostLatestModuleView.name}/>`, () => {
 
   it('renders a visually hidden heading from accessibleTitle when headingBlock.heading is undefined', () => {
     setup({
-      headingBlock: {
-        heading: undefined,
-        supportingText: undefined,
-      },
+      headingBlock: makeHeadingBlock({ heading: undefined }),
     });
 
     const heading = screen.getByRole('heading', {

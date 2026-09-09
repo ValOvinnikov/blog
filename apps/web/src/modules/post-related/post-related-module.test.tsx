@@ -1,6 +1,7 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { PostRelatedModule } from './post-related-module';
@@ -79,10 +80,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'Related reading',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock({ heading: 'Related reading' }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -127,10 +125,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'Related reading',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock({ heading: 'Related reading' }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -149,7 +144,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: { heading: undefined, supportingText: undefined },
+        headingBlock: makeHeadingBlock({ heading: undefined }),
         posts: [makePost()],
         layout: undefined,
         contentAlignment: undefined,
@@ -174,10 +169,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'Related reading',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock({ heading: 'Related reading' }),
         posts: [makePost()],
         layout: undefined,
         contentAlignment: undefined,
@@ -197,10 +189,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'Related reading',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock({ heading: 'Related reading' }),
         posts: [makePost({ heroImageSanity: sanityImage })],
         layout: undefined,
         contentAlignment: undefined,
@@ -220,10 +209,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'Related reading',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock({ heading: 'Related reading' }),
         posts: [makePost({ heroImageSanity: makeSanityImage() })],
         layout: undefined,
         contentAlignment: undefined,
@@ -241,10 +227,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'Related reading',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock({ heading: 'Related reading' }),
         posts: [makePost({ excerpt: undefined })],
         layout: undefined,
         contentAlignment: undefined,

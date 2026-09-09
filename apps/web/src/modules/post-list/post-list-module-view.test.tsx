@@ -1,6 +1,7 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { PostListModuleView } from './post-list-module-view';
 
@@ -23,10 +24,7 @@ const post = makePostListItem();
 
 const setup = customRender(PostListModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: {
-    heading: 'Latest posts',
-    supportingText: undefined,
-  },
+  headingBlock: makeHeadingBlock(),
   items: [post],
   layout: undefined,
   contentAlignment: undefined,
@@ -58,10 +56,7 @@ describe(`<${PostListModuleView.name}/>`, () => {
   it('derives a different section id when given a different titleId, avoiding duplicate DOM ids', () => {
     setup({
       titleId: 'other-posts-title',
-      headingBlock: {
-        heading: 'More posts',
-        supportingText: undefined,
-      },
+      headingBlock: makeHeadingBlock({ heading: 'More posts' }),
     });
 
     expect(screen.getByText('More posts')).toHaveAttribute(
@@ -72,10 +67,7 @@ describe(`<${PostListModuleView.name}/>`, () => {
 
   it('renders a visually hidden heading from accessibleTitle when headingBlock.heading is undefined', () => {
     setup({
-      headingBlock: {
-        heading: undefined,
-        supportingText: undefined,
-      },
+      headingBlock: makeHeadingBlock({ heading: undefined }),
     });
 
     const heading = screen.getByRole('heading', { level: 2, name: 'Posts' });

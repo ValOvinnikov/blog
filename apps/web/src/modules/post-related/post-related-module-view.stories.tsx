@@ -1,6 +1,7 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { PostRelatedModuleView } from './post-related-module-view';
 
@@ -39,10 +40,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: {
-      heading: 'Related reading',
-      supportingText: undefined,
-    },
+    headingBlock: makeHeadingBlock({ heading: 'Related reading' }),
     items,
     layout: undefined,
     contentAlignment: undefined,
@@ -59,10 +57,7 @@ export const Default: TStory = {};
 
 export const WithoutCmsHeading: TStory = {
   args: {
-    headingBlock: {
-      heading: undefined,
-      supportingText: undefined,
-    },
+    headingBlock: makeHeadingBlock({ heading: undefined }),
   },
 };
 

@@ -7,6 +7,7 @@ import {
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { CtaModuleView } from './cta-module-view';
 
@@ -47,11 +48,11 @@ const meta = {
     brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
     bandTone: BRAND_VARIANT.PRIMARY,
     eyebrow: 'Newsletter',
-    headingBlock: {
+    headingBlock: makeHeadingBlock({
       heading: 'Never miss a post',
       supportingText:
         'Subscribe to get new articles on design systems and engineering delivered straight to your inbox.',
-    },
+    }),
     content: undefined,
     image: undefined,
     contentPosition: undefined,

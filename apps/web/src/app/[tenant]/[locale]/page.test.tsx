@@ -1,5 +1,6 @@
 import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
@@ -80,7 +81,7 @@ describe('HomePage', () => {
     getHomePageMock.mockResolvedValue({
       ok: true,
       data: {
-        headingBlock: { heading: undefined, supportingText: undefined },
+        headingBlock: makeHeadingBlock({ heading: undefined }),
         hero: { id: 'hero-1', type: 'module_hero' },
         modules: [{ id: 'module-1', type: 'module_content' }],
         seo: makeSeo(),
@@ -99,7 +100,7 @@ describe('HomePage', () => {
     getHomePageMock.mockResolvedValue({
       ok: true,
       data: {
-        headingBlock: { heading: undefined, supportingText: undefined },
+        headingBlock: makeHeadingBlock({ heading: undefined }),
         hero: { id: 'hero-1', type: 'module_hero' },
         modules: [{ id: 'module-1', type: 'module_content' }],
         seo: makeSeo(),
@@ -129,7 +130,7 @@ describe('HomePage', () => {
     getHomePageMock.mockResolvedValue({
       ok: true,
       data: {
-        headingBlock: { heading: undefined, supportingText: undefined },
+        headingBlock: makeHeadingBlock({ heading: undefined }),
         hero: { id: 'hero-1' },
         modules: [],
         seo: makeSeo(),
@@ -146,10 +147,10 @@ describe('HomePage', () => {
       ok: true,
       data: {
         title: 'Home — internal label',
-        headingBlock: {
+        headingBlock: makeHeadingBlock({
           heading: 'Welcome to the blog',
           supportingText: 'Fresh posts every week.',
-        },
+        }),
         hero: undefined,
         modules: [],
         seo: makeSeo(),
@@ -170,10 +171,10 @@ describe('HomePage', () => {
       ok: true,
       data: {
         title: 'Home — internal label',
-        headingBlock: {
+        headingBlock: makeHeadingBlock({
           heading: 'Welcome to the blog',
           supportingText: 'Fresh posts every week.',
-        },
+        }),
         hero: { id: 'hero-1', type: 'module_hero' },
         modules: [],
         seo: makeSeo(),
@@ -192,7 +193,7 @@ describe('HomePage', () => {
       ok: true,
       data: {
         title: 'Home — internal label',
-        headingBlock: { heading: undefined, supportingText: undefined },
+        headingBlock: makeHeadingBlock({ heading: undefined }),
         hero: undefined,
         modules: [],
         seo: makeSeo(),
@@ -210,10 +211,7 @@ describe('HomePage', () => {
       ok: true,
       data: {
         title: 'Home — internal label',
-        headingBlock: {
-          heading: 'Welcome to the blog',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
         hero: undefined,
         modules: [],
         seo: makeSeo(),

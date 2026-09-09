@@ -1,5 +1,6 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { TaxonomyListModuleView } from './taxonomy-list-module-view';
 
@@ -28,10 +29,7 @@ const item = {
 
 const setup = customRender(TaxonomyListModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: {
-    heading: 'Browse by topic',
-    supportingText: undefined,
-  },
+  headingBlock: makeHeadingBlock({ heading: 'Browse by topic' }),
   items: [item],
   layout: undefined,
   contentAlignment: undefined,
@@ -76,10 +74,7 @@ describe(`<${TaxonomyListModuleView.name}/>`, () => {
 
   it('renders a visually hidden heading from accessibleTitle when headingBlock.heading is undefined', () => {
     setup({
-      headingBlock: {
-        heading: undefined,
-        supportingText: undefined,
-      },
+      headingBlock: makeHeadingBlock({ heading: undefined }),
     });
 
     const heading = screen.getByRole('heading', { level: 2, name: 'Topics' });

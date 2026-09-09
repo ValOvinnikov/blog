@@ -1,5 +1,6 @@
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { NewsletterModule } from './newsletter-module';
@@ -81,7 +82,7 @@ describe(`<${NewsletterModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: 'PRIMARY',
-        headingBlock: { heading: 'Get new posts', supportingText: undefined },
+        headingBlock: makeHeadingBlock({ heading: 'Get new posts' }),
         variant: 'FULL',
         layout: undefined,
         contentAlignment: undefined,
@@ -106,10 +107,10 @@ describe(`<${NewsletterModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: 'PRIMARY',
-        headingBlock: {
+        headingBlock: makeHeadingBlock({
           heading: 'Get new posts',
           supportingText: 'Only shown in the full form.',
-        },
+        }),
         variant: 'COMPACT',
         layout: undefined,
         contentAlignment: undefined,
@@ -129,7 +130,7 @@ describe(`<${NewsletterModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: 'PRIMARY',
-        headingBlock: { heading: 'Get new posts', supportingText: undefined },
+        headingBlock: makeHeadingBlock({ heading: 'Get new posts' }),
         variant: 'FULL',
         layout: undefined,
         contentAlignment: undefined,

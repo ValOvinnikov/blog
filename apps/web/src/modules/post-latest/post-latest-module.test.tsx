@@ -1,6 +1,7 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { PostLatestModule } from './post-latest-module';
@@ -55,10 +56,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'Latest posts',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock(),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -84,10 +82,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'Latest posts',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock(),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -116,10 +111,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'Latest posts',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock(),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -137,10 +129,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: undefined,
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock({ heading: undefined }),
         posts: [
           {
             id: 'post-1',
@@ -174,10 +163,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'Latest posts',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock(),
         posts: [
           {
             id: 'post-1',
@@ -206,10 +192,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'Latest posts',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock(),
         posts: [
           {
             id: 'post-1',
@@ -240,10 +223,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'Latest posts',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock(),
         posts: [
           {
             id: 'post-1',

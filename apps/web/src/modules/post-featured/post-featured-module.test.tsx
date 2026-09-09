@@ -1,6 +1,7 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { PostFeaturedModule } from './post-featured-module';
@@ -66,7 +67,7 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: { heading: 'Featured', supportingText: undefined },
+        headingBlock: makeHeadingBlock({ heading: 'Featured' }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -98,7 +99,7 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: { heading: 'Featured', supportingText: undefined },
+        headingBlock: makeHeadingBlock({ heading: 'Featured' }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -117,7 +118,7 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: { heading: undefined, supportingText: undefined },
+        headingBlock: makeHeadingBlock({ heading: undefined }),
         posts: [makePost()],
         layout: undefined,
         contentAlignment: undefined,
@@ -139,7 +140,7 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: { heading: 'Featured', supportingText: undefined },
+        headingBlock: makeHeadingBlock({ heading: 'Featured' }),
         posts: [
           makePost({ id: 'post-1', title: 'Lead post' }),
           makePost({ id: 'post-2', title: 'Second post' }),
@@ -168,7 +169,7 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: { heading: 'Featured', supportingText: undefined },
+        headingBlock: makeHeadingBlock({ heading: 'Featured' }),
         posts: [
           makePost({
             id: 'post-1',
@@ -212,7 +213,7 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: { heading: 'Featured', supportingText: undefined },
+        headingBlock: makeHeadingBlock({ heading: 'Featured' }),
         posts: [
           makePost({
             id: 'post-1',
