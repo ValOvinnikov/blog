@@ -196,14 +196,14 @@ topics, tags and authors once the post leaves it, splits into **Taxonomy**
 
 ### `module_postRelated`
 
-| Field             | Notes                                                                 |
-| ----------------- | --------------------------------------------------------------------- |
-| `title`           | `titleField()`                                                        |
-| `brandVariant`    | `brandVariantField()`                                                 |
-| `sectionHeader`   | `sectionHeaderField()`; blank heading falls back to "Related reading" |
-| `showImages`      | `showImagesField()`                                                   |
-| `limit`           | number, 1–6, initial 3                                                |
-| alignment, layout | `defineAlignmentFields([])`, `layoutField`                            |
+| Field             | Notes                                                                |
+| ----------------- | -------------------------------------------------------------------- |
+| `title`           | `titleField()`                                                       |
+| `brandVariant`    | `brandVariantField()`                                                |
+| `headingBlock`    | `headingBlockField()`; blank heading falls back to "Related reading" |
+| `showImages`      | `showImagesField()`                                                  |
+| `limit`           | number, 1–6, initial 3                                               |
+| alignment, layout | `defineAlignmentFields([])`, `layoutField`                           |
 
 No `displayMode` — grid only; the carousel is a latest/featured option.
 
@@ -212,7 +212,7 @@ tenant)` moves `getRelatedPosts` (shared-tag rank, then same-topic
 backfill, capped by `limit`) behind a module loader that also resolves the
 module's own fields; `getPost` stops embedding `relatedPosts`. Cache tags:
 `modules:postRelated`, `module:<id>`, `posts`, `author`, `topic`, `tag`.
-View model: `TPostRelatedModule = { brandVariant; sectionHeader; posts:
+View model: `TPostRelatedModule = { brandVariant; headingBlock; posts:
 TPostCard[]; layout; contentAlignment; showImages }`, structurally the
 latest module's.
 
@@ -331,14 +331,14 @@ page's heading and owns the h1."), optional on every page — `page_home`'s
 `required()` goes, since the home page now has heading settings to fall
 back on. Reordering is schema-only.
 
-### `headingSettings` is the `sectionHeader` object, on every page
+### `headingSettings` is the `headingBlock` object, on every page
 
 Three pages (`page_blog`, `page_topicIndex`, `page_tagIndex`) declare a
 `heading` string and a `supportingText` text inline; the topic and tag
 pages take their h1 from the entity, the landing page from the document
 `title` (an editor's label), and the home page has none. The pair becomes
 one field, **`headingSettings`**, on every page but the post, of the
-existing `sectionHeader` object (`objects/section-header.ts`: optional
+existing `headingBlock` object (`objects/heading-block.ts`: optional
 `heading` ≤ 80, optional `supportingText` ≤ 300 — the same object every
 module carries), so a page heading and a module heading are one shape in
 Studio, in the generated types and on web. `service` projects
@@ -486,7 +486,7 @@ Expand, then contract, so every PR merges green alone:
     deployed. The shared studio helpers (`heroField`, `headingSettingsField`,
     `validateHeroOrHeading`) ship with whichever page merges first — not to
     be confused with the existing `defineHeroFields()` (a hero module's own
-    field tail) or `sectionHeaderField()` (a module's `sectionHeader`).
+    field tail) or `headingBlockField()` (a module's `headingBlock`).
     After 11, except the post (after step 5 only); independent of each
     other.
 
@@ -564,7 +564,7 @@ Everything else is additive.
   or `Carousel` where `displayMode` says so.
 - Every page document declares `hero` and `modules[]` in the canonical field
   order, no page has a slot field beside `modules[]`, and `headingSettings`
-  (the `sectionHeader` object) sits on every page but the post; a page
+  (the `headingBlock` object) sits on every page but the post; a page
   without a hero renders its heading as the h1 and a page with one renders
   only the hero, through the one `CmsPageTemplate`; every CMS page
   renders breadcrumbs → hero or h1 → modules, with no page-owned list, and

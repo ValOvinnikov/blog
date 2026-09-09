@@ -29,7 +29,7 @@ frontend if a consumer is out of date.
 
 | Surface | Route                          | Status                                                                                                                                                                           |
 | ------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Home    | `/`                            | ✅ Built — modules-as-documents (optional hero **or** `sectionHeader` heading, plus `modules[]`)                                                                                 |
+| Home    | `/`                            | ✅ Built — modules-as-documents (optional hero **or** `headingBlock` heading, plus `modules[]`)                                                                                  |
 | Blog    | `/blog` + `/blog/page/N`       | ✅ Built — paginated index (#75)                                                                                                                                                 |
 | Post    | `/blog/[slug]`                 | ✅ Built — post detail page + JSON-LD (#76)                                                                                                                                      |
 | Topic   | `/topics/[slug]` (+ `/page/N`) | ✅ Built — unpaginated + paginated routes (#91/#588/#589); renamed from `category` in #1812; CMS-authored via the `page_topic` document since #1915                              |
@@ -245,28 +245,28 @@ object (`spacingTop`/`spacingBottom`, `containerWidth` (not on
 consts; there is no `align` field on `layout` — alignment is its own
 module-level field, below).
 `module_cta`/`module_postList`/`module_postLatest`/`module_postFeatured`/`module_taxonomyList`/`module_newsletter`
-additionally carry a `sectionHeader` object (`heading` and `supportingText`
+additionally carry a `headingBlock` object (`heading` and `supportingText`
 only — all optional on
 `module_postList`/`module_postLatest`/`module_postFeatured`/`module_taxonomyList`, `heading` required on
 `module_cta`/`module_newsletter` via a per-module `requireHeading` override
-on the shared `sectionHeaderField()` helper).
+on the shared `headingBlockField()` helper).
 
-**Alignment is a module-level field, not part of `sectionHeader`.** All six
+**Alignment is a module-level field, not part of `headingBlock`.** All six
 of those modules carry their own `contentAlignment`, emitted by the
 `defineAlignmentFields()` helper, which every caller gets whether or not it
-asks for variant-scoped extras. `sectionHeader` deliberately does not bundle
+asks for variant-scoped extras. `headingBlock` deliberately does not bundle
 it: a Sanity named object type's field list is fixed at registration, so a
 bundled field cannot be omitted for the one module that doesn't want it —
-the same constraint that forces `sectionHeader` and
-`requiredHeadingSectionHeader` to exist as two registered types rather than
+the same constraint that forces `headingBlock` and
+`requiredHeadingBlock` to exist as two registered types rather than
 one with conditional validation. Bundling it meant `module_cta`, which
 aligns its whole card rather than its heading, was forced to render an
 alignment control nothing read.
 
-`module_content` has no `sectionHeader` —
+`module_content` has no `headingBlock` —
 its rich-text `body` supplies any in-content headings, so a separate
 structured heading field would just be a second way to do the same thing.
-`module_hero` has no `sectionHeader` either — its heading fields are its
+`module_hero` has no `headingBlock` either — its heading fields are its
 own dedicated schema, unrelated to this shared shape.
 
 **The hero family.** A hero is any module whose schema `name` starts with
@@ -284,15 +284,15 @@ test asserting every registered `module_hero*` schema appears in it.
 `page_home`, `page_landing`, `page_blog`, `page_topic` and `page_tag` each
 have an **optional** hero. A hero replaces that page's default header and
 owns the `<h1>`; without one, each page renders the header it always has
-(home: `sectionHeader`'s `heading` plus `supportingText`; generic: title;
+(home: `headingBlock`'s `heading` plus `supportingText`; generic: title;
 blog: `heading` plus `supportingText`; topic and tag: the term header), so
 exactly one `<h1>` renders either way.
 
 `page_home`'s hero was required until #2975 made it optional and gave the
-document a `sectionHeader` of its own. Because neither field is
+document a `headingBlock` of its own. Because neither field is
 individually required, the requirement moved to the document:
 `validateHeroOrHeading()` is an **error**-severity rule demanding at least
-one of `hero` or `sectionHeader.heading`, so a page with an empty opening
+one of `hero` or `headingBlock.heading`, so a page with an empty opening
 block cannot be published. The document `title` is never a fallback — it is
 Studio's internal list label, and a page with neither a hero nor a heading
 renders no header at all rather than leaking it.
@@ -304,7 +304,7 @@ non-hero `_type` as a data error through the loader's normal failure path
 rather than rendering a blank page.
 
 **The post is the page.** `page_post` carries the post itself — `slug`,
-`sectionHeader`, `heroImage`, `content`, `featured`, `author`, `topic`,
+`headingBlock`, `heroImage`, `content`, `featured`, `author`, `topic`,
 `tags`, `publishedAt`, `skim` and `seo` — rather than wrapping a separate
 `blog_post` and dereferencing it. Every post read in `@blog/service`
 projects those fields off `page_post` directly, and `apps/web` names
@@ -321,11 +321,11 @@ immutable and a retirement is therefore never a rename.
 rendered on the web.** It names the document in the desk, nothing more —
 `page_topic` and `page_tag` do not project theirs at all, taking their
 heading from the deref'd `blog_topic`/`blog_tag` instead. `page_post` has no
-entity to deref, so its headline and excerpt live in a **`sectionHeader`**
-object (`requiredHeadingSectionHeader`: `heading` required, `supportingText`
+entity to deref, so its headline and excerpt live in a **`headingBlock`**
+object (`requiredHeadingBlock`: `heading` required, `supportingText`
 optional) — the same shape the modules use. `@blog/service` maps
-`sectionHeader.heading` to the view models' `title` and
-`sectionHeader.supportingText` to their `excerpt`, so the field names every
+`headingBlock.heading` to the view models' `title` and
+`headingBlock.supportingText` to their `excerpt`, so the field names every
 consumer sees are unchanged and no `apps/web` component reads a document
 label.
 
@@ -347,14 +347,14 @@ optional) selecting which form of the signup it renders.
 with `.notNull()` and types it as a plain value; where the schema leaves a
 field optional, the view model carries `T | undefined`. The two are kept in
 step deliberately, so the type a consumer sees is the same promise the
-editing experience makes. `sectionHeader.heading`, `publishedAt`, `author`,
+editing experience makes. `headingBlock.heading`, `publishedAt`, `author`,
 `topic` and `content` are required on both sides; `excerpt`
-(`sectionHeader.supportingText`), `heroImage`, `tags`, `featured`, `skim`
+(`headingBlock.supportingText`), `heroImage`, `tags`, `featured`, `skim`
 and `seo` are optional on both.
 
 **An incomplete post is not published.** `PUBLISHED_POST_FILTER` is what
 makes the paragraph above safe. It requires
-`defined(sectionHeader.heading) && defined(author) && defined(topic) &&
+`defined(headingBlock.heading) && defined(author) && defined(topic) &&
 defined(content)` alongside `publishedAt <= now()`, so a `page_post` missing
 any of them never appears in a listing and resolves as not-found on its own
 URL — the same treatment an unpublished post gets. Without that gate a
@@ -401,7 +401,7 @@ and nothing at all on Callout, whose image sits above the content. **Content
 alignment** is how text and actions align inside that block, and applies on
 every variant. Both draw their values from `CONTENT_ALIGNMENT`. They replaced a
 single `imageSide` field that claimed to move the image while actually moving
-the content column, plus a reuse of `sectionHeader.align` that CTA applied to
+the content column, plus a reuse of `headingBlock.align` that CTA applied to
 the whole card rather than the heading.
 
 Position is stored as **two** variant-scoped fields —
@@ -449,7 +449,7 @@ transformer, not in GROQ.
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its
 schema allows), `layout` as `TLayout | undefined`, and (where applicable)
-`sectionHeader` as `TSectionHeader | undefined` — with no faked defaults on
+`headingBlock` as `THeadingBlock | undefined` — with no faked defaults on
 either: unset stays unset end to end. In `apps/web`, every module component
 that renders a `@blog/ui` organism — including those reached through a
 dedicated slot rather than `MODULE_MAP`'s generic `ModuleRenderer` pipeline
@@ -704,7 +704,7 @@ settings surface. Any future module needing curated copy renders the i18n
 key directly; it does not grow its own override field.
 
 Full schema reference (every document/object, field-by-field), naming and
-validation conventions, incl. the `layout`/`sectionHeader` objects' own
+validation conventions, incl. the `layout`/`headingBlock` objects' own
 field lists:
 [`docs/context/content-model.md`](./docs/context/content-model.md).
 
