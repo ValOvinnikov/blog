@@ -73,6 +73,25 @@ describe('postPageQuery', () => {
     expect(postPageQuery.parse(null)).toBeNull();
   });
 
+  it('parses a post with no page-builder modules', () => {
+    const raw = makeRawPostDetail({ modules: null });
+
+    expect(() => postPageQuery.parse(raw)).not.toThrow();
+    expect(postPageQuery.parse(raw)?.modules).toBeNull();
+  });
+
+  it('parses a post with page-builder modules set', () => {
+    const raw = makeRawPostDetail({
+      modules: [{ _id: 'related-1', _type: 'module_postRelated' }],
+    });
+
+    const parsed = postPageQuery.parse(raw);
+
+    expect(parsed?.modules).toEqual([
+      { _id: 'related-1', _type: 'module_postRelated' },
+    ]);
+  });
+
   it('parses a sparse post seeded with only title, slug, and publishedAt', () => {
     const raw = makeRawPostDetail({
       excerpt: null,

@@ -3,6 +3,7 @@ import type { TSiteSettings } from '@blog/service/features/global/site-settings/
 import type { TImageTenant } from '@blog/service/sanity/image';
 import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
+import { toModule } from '@blog/service/shared/transformers/to-module';
 import { toPortableTextBody } from '@blog/service/shared/transformers/to-portable-text-body';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import { toSocialLink } from '@blog/service/shared/transformers/to-social-link';
@@ -89,6 +90,7 @@ export function toPostDetail(
     author: raw.author ? toPostDetailAuthor(raw.author, tenant) : undefined,
     topic: raw.topic ? toTopic(raw.topic) : undefined,
     tags: (raw.tags ?? []).map(toTag),
+    modules: (raw.modules ?? []).map(toModule),
     readingTimeMinutes: toReadingTimeMinutes(raw.wordCount),
   };
 }

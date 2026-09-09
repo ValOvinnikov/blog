@@ -1,4 +1,5 @@
 import { q } from '@blog/service/sanity/query';
+import { moduleFragment } from '@blog/service/shared/fragments/module';
 
 import { authorCardFragment, authorDetailFragment } from './author';
 import { imageWithAltFragment, sanityImageFragment } from './image';
@@ -70,5 +71,10 @@ export const postDetailFragment = q
       .nullable(true),
     topic: sub.field('topic').deref().project(topicFragment).nullable(true),
     tags: sub.field('tags[]').deref().project(tagFragment).nullable(true),
+    modules: sub
+      .field('modules[]')
+      .deref()
+      .project(moduleFragment)
+      .nullable(true),
     wordCount: sub.raw(WORD_COUNT_EXPRESSION, wordCountParser),
   }));

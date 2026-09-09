@@ -257,6 +257,38 @@ describe('getPost', () => {
     expect(result.tags).toEqual([]);
   });
 
+  it('maps the page-builder modules array to module refs', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawPostDetail({
+          modules: [
+            { _id: 'related-1', _type: 'module_postRelated' },
+            { _id: 'newsletter-1', _type: 'module_newsletter' },
+          ],
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getPost('hello-world', tenant);
+    if (!result) throw new Error('expected a post detail');
+
+    expect(result.modules).toEqual([
+      { id: 'related-1', type: 'module_postRelated' },
+      { id: 'newsletter-1', type: 'module_newsletter' },
+    ]);
+  });
+
+  it('defaults modules to an empty array when the post has none', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawPostDetail({ modules: null }))
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getPost('hello-world', tenant);
+    if (!result) throw new Error('expected a post detail');
+
+    expect(result.modules).toEqual([]);
+  });
+
   it('computes readingTimeMinutes from the server-computed word count', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawPostDetail({ wordCount: 401 }))
