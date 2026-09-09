@@ -803,9 +803,22 @@ a reconciled board rather than a stale one.
 | 2977                 | blog list page                      | web                    | `blog-list-page`             |
 | 2960                 | retire `blog_post`                  | studio                 | + seed migration             |
 | 🔵 **Next, in order**|                                     |                        |                              |
-| 2969                 | retire `BlogPageTemplate` props     | web                    | after all five of 2977–2981  |
-| 2988                 | rename `sectionHeader`              | studio + service + web | last — repo-wide rename      |
+| 2969                 | retire `BlogPageTemplate` props     | web                    | ⛓ stack on 2977              |
+| 2988                 | rename `sectionHeader`              | studio + service + web | sequential — reds type-check |
 ```
+
+**Mark a 🔵 row `⛓ stack on <#>` when it can ride a `gh stack` on the row above
+it; leave it unmarked when it cannot.** The 🔵 lane is where stacking gets
+decided, because it is by definition the lane of tickets that depend on another
+— but dependency alone does not make a chain stackable. The test is the one in
+"Stacked PRs" below: the **bottom** PR targets `main` and must be green there
+on its own, so a chain whose first link cannot compile alone is sequential, and
+marking it `⛓` sends the whole stack into a permanent `BLOCKED` state.
+
+That is why 2988 above is unmarked — a repo-wide rename reds `type-check` until
+every consumer lands, so it is one PR that waits, not a stack bottom. A `⛓`
+claim is a compile claim; hold it to the same "derive it, don't guess" standard
+as a `blocks` claim.
 
 **Lane order is fixed: 🟢 done, 🟡 parallel now, 🔵 next in order.** Parallel
 sits above next-in-order because it is the actionable lane — what can be
