@@ -28,7 +28,7 @@ const buildRules = (options?: Parameters<typeof validateHeroOrHeading>[0]) =>
     createMockRule() as unknown as DocumentRule,
   ) as unknown as TMockRule[];
 
-describe('validateHeroOrHeading', () => {
+describe(validateHeroOrHeading, () => {
   it('registers an error rule then a warning rule', () => {
     const rules = buildRules();
 

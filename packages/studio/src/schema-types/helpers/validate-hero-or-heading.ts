@@ -37,9 +37,8 @@ const validateNotBoth =
       : true;
 
 /**
- * Document-level rule for a page whose heading can come from `hero` or
- * `sectionHeader.heading` — pass `hasEntityTitle` when the page can also
- * derive its heading from a referenced entity (e.g. a topic page's topic).
+ * Document-level rule requiring at least one of `hero` or
+ * `sectionHeader.heading`, and warning (not erroring) when both are set.
  */
 export const validateHeroOrHeading =
   (options: { hasEntityTitle?: THasEntityTitle } = {}) =>
