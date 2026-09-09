@@ -17,8 +17,8 @@ export interface IPostListModuleProps {
   id: string;
   locale: string;
   tenant: string;
-  page: number;
-  /** Preferred over `page` when both are given, so a shared `ModuleRenderer` context can carry the current page instead. */
+  /** Falls back to `1` when omitted. Superseded by `context.page` when both are given, so a shared `ModuleRenderer` context can carry the current page instead. */
+  page?: number;
   context?: TModuleComponentProps['context'];
   /** Pagination href builder. Defaults to `routes.blogIndex` for `/blog`; archive callers other than `/blog` must supply their own. */
   createHref?: (page: number) => string;
@@ -32,11 +32,8 @@ export interface IPostListModuleProps {
 }
 
 /**
- * PostListModule — an archive's post list: fetches the `postList` slot's
- * `module_postList` document for the given page and hands it to
- * `PostListModuleView`. Reused by both `/blog` (no overrides — its own
- * copy/href are the defaults) and `/topics/{slug}` (which supplies its own
- * `createHref`/`ariaLabel`/`accessibleTitle`/`emptyMessageFallback`). Unlike
+ * PostListModule — an archive's post list: fetches a `module_postList`
+ * document for the given page and hands it to `PostListModuleView`. Unlike
  * every other module, it always renders — an archive must say something even
  * with zero posts — and 404s (after logging) both when the fetch fails and
  * when an explicit page number exceeds the corpus's page count, since either
@@ -45,7 +42,7 @@ export interface IPostListModuleProps {
 export const PostListModule = async ({
   id,
   tenant,
-  page,
+  page = 1,
   context,
   createHref = routes.blogIndex,
   ariaLabel,

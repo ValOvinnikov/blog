@@ -18,9 +18,9 @@ export interface IModuleRendererProps {
  * by a CMS uniqueness rule). Unknown module types render nothing and log a
  * warning rather than failing the whole page. `MODULE_MAP` deliberately
  * excludes every `TSlotModuleType` from its key type (see `module-map.ts`),
- * so the lookup below casts to `keyof typeof MODULE_MAP` — if one of those
- * types somehow reached here (schema-prevented in practice), it would still
- * hit the "unknown module type" fallback rather than type-error.
+ * so the lookup below casts to `keyof typeof MODULE_MAP` — a hero module
+ * reaching here (it renders through its own page's dedicated slot instead)
+ * would still hit the "unknown module type" fallback rather than type-error.
  */
 export const ModuleRenderer = async ({
   modules,
