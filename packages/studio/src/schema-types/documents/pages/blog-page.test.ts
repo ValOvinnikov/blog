@@ -155,20 +155,17 @@ describe('blogPageSchema modules validateCustom chaining', () => {
 });
 
 describe('blogPageSchema deprecated fields', () => {
-  it.each(['heading', 'supportingText', 'postList'])(
-    '%s is read-only and deprecated without required validation',
-    (name) => {
-      const field = getField(name);
+  it('postList is read-only and deprecated without required validation', () => {
+    const field = getField('postList');
 
-      if (!field) {
-        throw new Error(`Expected blogPageSchema to define a ${name} field.`);
-      }
+    if (!field) {
+      throw new Error('Expected blogPageSchema to define a postList field.');
+    }
 
-      expect(field.readOnly).toBe(true);
-      expect(field.deprecated?.reason).toBeTruthy();
-      expect(field.validation).toBeUndefined();
-    },
-  );
+    expect(field.readOnly).toBe(true);
+    expect(field.deprecated?.reason).toBeTruthy();
+    expect(field.validation).toBeUndefined();
+  });
 
   it('postList still references module_postList', () => {
     const postListField = getField('postList');
@@ -177,6 +174,15 @@ describe('blogPageSchema deprecated fields', () => {
       postListSchema.name,
     ]);
   });
+});
+
+describe('blogPageSchema removed legacy fields', () => {
+  it.each(['heading', 'supportingText'])(
+    '%s no longer exists on the schema',
+    (name) => {
+      expect(getField(name)).toBeUndefined();
+    },
+  );
 });
 
 describe('blogPageSchema document validation', () => {
