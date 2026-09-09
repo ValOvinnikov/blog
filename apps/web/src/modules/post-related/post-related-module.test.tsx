@@ -236,7 +236,7 @@ describe(PostRelatedModule, () => {
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
-  it('renders a related post whose excerpt and topic are absent, without throwing', async () => {
+  it('renders a related post whose excerpt is absent, without throwing', async () => {
     getPostRelatedMock.mockResolvedValue({
       ok: true,
       data: {
@@ -245,7 +245,7 @@ describe(PostRelatedModule, () => {
           heading: 'Related reading',
           supportingText: undefined,
         },
-        posts: [makePost({ excerpt: undefined, topic: undefined })],
+        posts: [makePost({ excerpt: undefined })],
         layout: undefined,
         contentAlignment: undefined,
         showImages: false,

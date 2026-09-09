@@ -83,26 +83,6 @@ describe(PostBreadcrumbs, () => {
     expect(current.tagName).not.toBe('A');
   });
 
-  it('renders the Home › Post trail (no topic crumb) for a sparse post with no topic, without throwing', async () => {
-    getPostPageMock.mockResolvedValue({
-      ok: true,
-      data: { ...mockPostDetail, topic: undefined },
-    });
-
-    await setup();
-
-    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
-
-    expect(within(nav).getByRole('link', { name: 'Home' })).toBeVisible();
-    expect(
-      within(nav).queryByRole('link', { name: 'Engineering' }),
-    ).not.toBeInTheDocument();
-    expect(within(nav).getByText('Hello World')).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
-  });
-
   it('renders the JSON-LD BreadcrumbList schema script', async () => {
     getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 

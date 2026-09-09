@@ -33,7 +33,7 @@ export const buildPostMetadata = async (
     ogType: 'article',
     article: {
       publishedTime: publishedAt,
-      ...(author ? { authors: [author.name] } : {}),
+      authors: [author.name],
     },
   });
 };

@@ -103,10 +103,4 @@ describe(PostRelatedModuleView, () => {
     expect(screen.getByTestId('post-card-media')).toBeInTheDocument();
     expect(screen.getByTestId('post-image')).toBeInTheDocument();
   });
-
-  it('renders an item with no topic chip, without throwing', () => {
-    setup({ items: [{ ...post, topic: undefined }] });
-
-    expect(screen.getByText(post.title)).toBeInTheDocument();
-  });
 });

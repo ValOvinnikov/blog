@@ -78,38 +78,30 @@ export const PostArticle = async ({ slug, tenant }: TPostArticleProps) => {
       <Article.Header
         className={s.hero()}
         title={title}
-        topic={
-          topic
-            ? {
-                label: topic.title,
-                href: routes.topic(topic.slug),
-                linkAs: SmartLink,
-              }
-            : undefined
-        }
+        topic={{
+          label: topic.title,
+          href: routes.topic(topic.slug),
+          linkAs: SmartLink,
+        }}
         lead={excerpt}
-        meta={
-          author
-            ? {
-                author: {
-                  ...author,
-                  href: author.profilePageSlug
-                    ? routes.landingPage(author.profilePageSlug)
-                    : undefined,
-                },
-                publishedAt,
-                formattedDate,
-                readingTimeMinutes,
-                linkAs: SmartLink,
-                share: (
-                  <div className={s.metaActions()}>
-                    <BookmarkButtonGate postId={id} tenant={tenant} />
-                    <PostShareLinks url={url} title={title} />
-                  </div>
-                ),
-              }
-            : undefined
-        }
+        meta={{
+          author: {
+            ...author,
+            href: author.profilePageSlug
+              ? routes.landingPage(author.profilePageSlug)
+              : undefined,
+          },
+          publishedAt,
+          formattedDate,
+          readingTimeMinutes,
+          linkAs: SmartLink,
+          share: (
+            <div className={s.metaActions()}>
+              <BookmarkButtonGate postId={id} tenant={tenant} />
+              <PostShareLinks url={url} title={title} />
+            </div>
+          ),
+        }}
         coverMedia={
           heroImageSanity ? (
             <SanityImage
@@ -126,25 +118,24 @@ export const PostArticle = async ({ slug, tenant }: TPostArticleProps) => {
       />
 
       <Article.Body className={s.body({ withRail: hasContentsRail })}>
-        {body &&
-          (hasContentsRail ? (
-            <>
-              <PostContentsRail className={s.rail()} headings={headings} />
-              <div className={s.content({ withRail: true })}>
-                <PortableTextRenderer
-                  value={body}
-                  headings={headings}
-                  asideKindLabels={asideKindLabels}
-                />
-              </div>
-            </>
-          ) : (
-            <PortableTextRenderer
-              value={body}
-              headings={headings}
-              asideKindLabels={asideKindLabels}
-            />
-          ))}
+        {hasContentsRail ? (
+          <>
+            <PostContentsRail className={s.rail()} headings={headings} />
+            <div className={s.content({ withRail: true })}>
+              <PortableTextRenderer
+                value={body}
+                headings={headings}
+                asideKindLabels={asideKindLabels}
+              />
+            </div>
+          </>
+        ) : (
+          <PortableTextRenderer
+            value={body}
+            headings={headings}
+            asideKindLabels={asideKindLabels}
+          />
+        )}
         <Article.Footer
           className={hasContentsRail ? s.footerInRail() : s.footer()}
           tags={footerTags}

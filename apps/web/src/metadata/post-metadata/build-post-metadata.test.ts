@@ -121,17 +121,4 @@ describe('buildPostMetadata', () => {
       'Jane Doe',
     ]);
   });
-
-  it('omits openGraph.authors when the post has no author, rather than throwing', async () => {
-    getPostPageMock.mockResolvedValue({
-      ok: true,
-      data: { ...basePost, author: undefined },
-    });
-
-    const metadata = await buildPostMetadata('hello-world', 'tenant-1');
-
-    expect(
-      (metadata.openGraph as { authors?: string[] })?.authors,
-    ).toBeUndefined();
-  });
 });

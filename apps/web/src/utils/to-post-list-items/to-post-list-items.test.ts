@@ -75,13 +75,12 @@ describe('toPostListItems', () => {
     expect(await toPostListItems([])).toEqual([]);
   });
 
-  it('maps a post card with no excerpt or topic, without throwing', async () => {
-    const post = makePostCard({ excerpt: undefined, topic: undefined });
+  it('maps a post card with no excerpt, without throwing', async () => {
+    const post = makePostCard({ excerpt: undefined });
 
     const [item] = await toPostListItems([post]);
 
     expect(item?.excerpt).toBeUndefined();
-    expect(item?.topic).toBeUndefined();
   });
 
   it('sets image from renderImage when given', async () => {

@@ -15,7 +15,7 @@ type TPostListItemSource = {
   title: string;
   excerpt?: string;
   publishedAt: string;
-  topic?: TPostCardTopic;
+  topic: TPostCardTopic;
   readingTimeMinutes: number;
 };
 

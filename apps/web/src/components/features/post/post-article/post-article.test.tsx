@@ -98,27 +98,16 @@ describe(PostArticle, () => {
     expect(screen.getByText('Jane Doe')).toBeVisible();
   });
 
-  it('renders a sparse post with no topic, author, or body, without throwing', async () => {
+  it('renders the bookmark button and share links even for a post with no tags or hero image', async () => {
     getPostPageMock.mockResolvedValue({
       ok: true,
-      data: {
-        ...mockPostDetail,
-        topic: undefined,
-        author: undefined,
-        body: undefined,
-      },
+      data: { ...mockPostDetail, tags: [], heroImageSanity: undefined },
     });
 
     await setup();
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Hello World' }),
-    ).toBeVisible();
-    expect(screen.queryByText('Jane Doe')).not.toBeInTheDocument();
-    expect(screen.queryByText('Body text.')).not.toBeInTheDocument();
-    expect(
-      screen.queryByTestId('bookmark-button-gate'),
-    ).not.toBeInTheDocument();
+    expect(screen.getByTestId('bookmark-button-gate')).toBeVisible();
+    expect(screen.getByRole('button', { name: /Share/ })).toBeVisible();
   });
 
   it('renders the published date formatted via next-intl (year/month/day) and the reading time', async () => {

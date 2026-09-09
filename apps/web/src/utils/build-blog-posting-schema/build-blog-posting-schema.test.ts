@@ -105,13 +105,12 @@ describe(buildBlogPostingSchema, () => {
     expect(schema?.keywords).toBeUndefined();
   });
 
-  it('omits description and author for a sparse post without throwing', () => {
+  it('omits description for a sparse post without throwing', () => {
     const schema = buildBlogPostingSchema(
-      { ...post, excerpt: undefined, author: undefined },
+      { ...post, excerpt: undefined },
       'https://example.com',
     );
 
     expect(schema?.description).toBeUndefined();
-    expect(schema?.author).toBeUndefined();
   });
 });
