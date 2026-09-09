@@ -1,4 +1,4 @@
-import type { TModuleType, TSlotModuleType } from '@blog/config';
+import type { TModuleType, TSlotModuleType, TTaxonomyKind } from '@blog/config';
 import type { ReactNode } from 'react';
 
 import { ContentModule } from './content/content-module';
@@ -16,11 +16,16 @@ export type TModuleComponentProps = {
   tenant: string;
   /**
    * Context a module may need beyond `id`/`locale`/`tenant`: the post it
-   * renders alongside, when it sits on a `page_post`'s `modules[]`, and the
-   * current page number, on a paginated listing page. Both absent
-   * everywhere else.
+   * renders alongside, when it sits on a `page_post`'s `modules[]`; the
+   * current page number, on a paginated listing page; and the taxonomy
+   * archive it lists posts for, on a `/topics/{slug}` or `/tags/{slug}`
+   * page. All absent everywhere else.
    */
-  context?: { post?: { id: string }; page?: number };
+  context?: {
+    post?: { id: string };
+    page?: number;
+    archive?: { kind: TTaxonomyKind; slug: string; name: string };
+  };
 };
 
 /**

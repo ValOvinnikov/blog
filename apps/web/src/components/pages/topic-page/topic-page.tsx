@@ -1,13 +1,11 @@
-import { routes } from '@blog/config';
+import { TAXONOMY_KIND } from '@blog/config';
 import { TopicBreadcrumbs } from '@web/components/features/topic/topic-breadcrumbs';
 import { TopicChips } from '@web/components/features/topic/topic-chips';
 import { PageShell } from '@web/components/page-templates/page-shell';
 import { PageIntro } from '@web/components/shared/page-intro';
 import { ModuleRenderer } from '@web/modules/module-renderer';
-import { PostListModule } from '@web/modules/post-list/post-list-module';
 import { getTopicPage } from '@web/server/topic/get-topic-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
-import { getTranslations } from 'next-intl/server';
 
 type TTopicPageProps = {
   slug: string;
@@ -32,9 +30,8 @@ export const TopicPage = async ({
   const pageData = guardPageLoaderResult(result, 'topic_page.fetch_failed', {
     slug,
   });
-  const { topic, hero, modules, postListId } = pageData;
+  const { topic, headingBlock, hero, modules } = pageData;
 
-  const topicPageT = await getTranslations('topicPage');
   const currentPage = page ?? 1;
 
   return (
@@ -45,30 +42,19 @@ export const TopicPage = async ({
       <PageShell.Heading>
         <PageIntro
           hero={hero}
-          headingBlock={{
-            heading: topic.title,
-            supportingText: topic.description,
-          }}
+          headingBlock={headingBlock}
           locale={locale}
           tenant={tenant}
         />
       </PageShell.Heading>
       <PageShell.Content>
         <TopicChips activeSlug={slug} tenant={tenant} />
-        <PostListModule
-          id={postListId}
-          locale={locale}
-          tenant={tenant}
-          page={currentPage}
-          createHref={(pageNumber) => routes.topic(slug, pageNumber)}
-          ariaLabel={topicPageT('paginationAriaLabel', { name: topic.title })}
-          accessibleTitle={topicPageT('title', { name: topic.title })}
-          emptyMessageFallback={topicPageT('empty', { name: topic.title })}
-          titleId="topic-posts-title"
-        />
         <ModuleRenderer
           modules={modules}
-          context={{ page: currentPage }}
+          context={{
+            page: currentPage,
+            archive: { kind: TAXONOMY_KIND.TOPICS, slug, name: topic.title },
+          }}
           locale={locale}
           tenant={tenant}
         />
