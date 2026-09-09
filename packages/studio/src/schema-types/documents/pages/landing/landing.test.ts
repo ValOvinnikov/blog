@@ -3,38 +3,12 @@ import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/helpe
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
+import {
+  createMockModulesRule,
+  type TModuleReference,
+  type TModulesCustomFn,
+} from '@blog/studio/testing/create-mock-modules-rule';
 import type { ValidationContext } from 'sanity';
-
-type TModulesCustomFn = (
-  modules: TModuleReference[] | undefined,
-  context: ValidationContext,
-) => Promise<string | true>;
-
-type TModuleReference = { _type?: string; _ref?: string };
-
-type TMockModulesRule = {
-  unique: () => TMockModulesRule;
-  error: (message: string) => TMockModulesRule;
-  custom: (fn: TModulesCustomFn) => TMockModulesRule;
-};
-
-/**
- * `unique()`/`error()`/`custom()` each return a fresh mock rule wrapping the
- * same shared `customFns` array, mirroring the real Sanity `Rule` chain
- * (`rule.custom(a).custom(b)`) closely enough to observe whether both
- * `.custom()` calls actually register, rather than the second silently
- * displacing the first.
- */
-const createMockModulesRule = (
-  customFns: TModulesCustomFn[],
-): TMockModulesRule => ({
-  unique: () => createMockModulesRule(customFns),
-  error: () => createMockModulesRule(customFns),
-  custom: (fn) => {
-    customFns.push(fn);
-    return createMockModulesRule(customFns);
-  },
-});
 
 const getModulesCustomValidators = (): TModulesCustomFn[] => {
   const modulesField = landingSchema.fields?.find(
