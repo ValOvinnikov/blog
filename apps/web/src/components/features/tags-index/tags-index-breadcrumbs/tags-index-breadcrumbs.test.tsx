@@ -27,7 +27,7 @@ vi.mock('@web/components/shared/smart-link', () => ({
 
 const setup = customRenderAsync(TagsIndexBreadcrumbs, { tenant: 'tenant-1' });
 
-describe(TagsIndexBreadcrumbs, () => {
+describe(`<${TagsIndexBreadcrumbs.name}/>`, () => {
   beforeEach(() => {
     getTenantBaseUrlMock.mockReset();
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');

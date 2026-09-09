@@ -42,7 +42,7 @@ const setup = customRender(TaxonomyListModuleView, {
   emptyMessage: 'No topics yet.',
 });
 
-describe(TaxonomyListModuleView, () => {
+describe(`<${TaxonomyListModuleView.name}/>`, () => {
   it('labels the section with the given titleId', () => {
     setup();
 

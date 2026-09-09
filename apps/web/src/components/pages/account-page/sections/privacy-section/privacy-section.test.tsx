@@ -26,7 +26,7 @@ vi.mock('@web/components/shared/delete-account-control', () => ({
 
 const setup = customRender(PrivacySection, makePrivacySection());
 
-describe(PrivacySection, () => {
+describe(`<${PrivacySection.name}/>`, () => {
   it('renders the panel heading as a level-2 heading', () => {
     setup();
 

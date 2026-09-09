@@ -7,7 +7,7 @@ const setup = customRender(SmartLink, {
   children: 'Read post',
 });
 
-describe('SmartLink', () => {
+describe(`<${SmartLink.name}/>`, () => {
   it('renders the locale-aware router Link for an internal href, without target or rel', () => {
     setup();
 

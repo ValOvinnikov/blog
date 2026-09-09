@@ -71,7 +71,7 @@ const setup = customRenderAsync(BlogListPage, {
   tenant: 'tenant-1',
 });
 
-describe(BlogListPage, () => {
+describe(`<${BlogListPage.name}/>`, () => {
   beforeEach(() => {
     getBlogListPageMock.mockReset();
     moduleRendererMock.mockClear();

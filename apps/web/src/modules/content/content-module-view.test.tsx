@@ -10,7 +10,7 @@ const setup = customRender(ContentModuleView, {
   layout: undefined,
 });
 
-describe(ContentModuleView, () => {
+describe(`<${ContentModuleView.name}/>`, () => {
   it('renders the body content, with no accessible name on the section landmark', () => {
     const { container } = setup();
 

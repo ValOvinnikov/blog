@@ -28,7 +28,7 @@ const setup = customRenderAsync(ContentModule, {
   tenant: 'tenant-1',
 });
 
-describe(ContentModule, () => {
+describe(`<${ContentModule.name}/>`, () => {
   beforeEach(() => {
     getContentMock.mockReset();
     getTenantSanityContextMock.mockReset();

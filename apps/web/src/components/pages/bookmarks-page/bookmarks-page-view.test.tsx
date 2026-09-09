@@ -5,7 +5,7 @@ import { BookmarksPageView } from './bookmarks-page-view';
 
 const setup = customRender(BookmarksPageView, makeBookmarksPageView());
 
-describe(BookmarksPageView, () => {
+describe(`<${BookmarksPageView.name}/>`, () => {
   it('renders the heading', () => {
     setup();
 

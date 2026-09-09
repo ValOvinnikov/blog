@@ -53,7 +53,7 @@ const value: BasicText = [
 
 const setup = customRender(BasicTextRenderer, { value });
 
-describe(BasicTextRenderer, () => {
+describe(`<${BasicTextRenderer.name}/>`, () => {
   it('renders paragraphs with bold and italic marks', () => {
     setup();
 

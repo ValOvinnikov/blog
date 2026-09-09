@@ -37,7 +37,7 @@ const setup = customRenderAsync(PostBreadcrumbs, {
   tenant: 'tenant-1',
 });
 
-describe(PostBreadcrumbs, () => {
+describe(`<${PostBreadcrumbs.name}/>`, () => {
   beforeEach(() => {
     getPostPageMock.mockReset();
     getTenantBaseUrlMock.mockReset();

@@ -21,7 +21,7 @@ const setup = customRenderAsync(ModuleRenderer, {
   tenant: 'tenant-1',
 });
 
-describe('ModuleRenderer', () => {
+describe(`<${ModuleRenderer.name}/>`, () => {
   beforeEach(() => {
     ctaModuleMock.mockClear();
   });

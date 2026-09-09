@@ -26,7 +26,7 @@ const setup = customRenderAsync(CtaModule, {
   tenant: 'tenant-1',
 });
 
-describe(CtaModule, () => {
+describe(`<${CtaModule.name}/>`, () => {
   beforeEach(() => {
     getCtaMock.mockReset();
     getTenantSanityContextMock.mockReset();

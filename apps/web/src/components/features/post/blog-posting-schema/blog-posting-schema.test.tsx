@@ -22,7 +22,7 @@ const setup = customRenderAsync(BlogPostingSchema, {
   tenant: 'tenant-1',
 });
 
-describe(BlogPostingSchema, () => {
+describe(`<${BlogPostingSchema.name}/>`, () => {
   beforeEach(() => {
     getPostPageMock.mockReset();
     getTenantBaseUrlMock.mockReset();

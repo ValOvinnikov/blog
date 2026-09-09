@@ -39,7 +39,7 @@ const setup = customRenderAsync(TopicBreadcrumbs, {
   tenant: 'tenant-1',
 });
 
-describe(TopicBreadcrumbs, () => {
+describe(`<${TopicBreadcrumbs.name}/>`, () => {
   beforeEach(() => {
     getTopicPageMock.mockReset();
     getTenantBaseUrlMock.mockReset();

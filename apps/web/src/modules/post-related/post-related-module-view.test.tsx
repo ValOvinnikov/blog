@@ -35,7 +35,7 @@ const setup = customRender(PostRelatedModuleView, {
   accessibleTitle: 'Related reading',
 });
 
-describe(PostRelatedModuleView, () => {
+describe(`<${PostRelatedModuleView.name}/>`, () => {
   it('labels the section with the given titleId', () => {
     setup();
 

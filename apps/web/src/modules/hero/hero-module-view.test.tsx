@@ -18,7 +18,7 @@ const setup = customRender(HeroModuleView, {
   layout: undefined,
 });
 
-describe(HeroModuleView, () => {
+describe(`<${HeroModuleView.name}/>`, () => {
   it('renders the resolved title as the top-level heading, labelling the Section via a unique id derived from the module id', () => {
     setup();
 

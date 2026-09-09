@@ -28,7 +28,7 @@ const setup = async (overrides?: Partial<ISkimPanelProps>) => {
   );
 };
 
-describe(SkimPanel, () => {
+describe(`<${SkimPanel.name}/>`, () => {
   it('renders one <li> per takeaway', async () => {
     await setup();
 

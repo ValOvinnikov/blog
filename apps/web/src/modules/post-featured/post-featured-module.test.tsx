@@ -54,7 +54,7 @@ const setup = customRenderAsync(PostFeaturedModule, {
   tenant: 'tenant-1',
 });
 
-describe(PostFeaturedModule, () => {
+describe(`<${PostFeaturedModule.name}/>`, () => {
   beforeEach(() => {
     getPostFeaturedMock.mockReset();
     getTenantSanityContextMock.mockReset();

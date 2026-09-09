@@ -75,7 +75,7 @@ const entry = {
   postCount: 5,
 };
 
-describe(TaxonomyListModule, () => {
+describe(`<${TaxonomyListModule.name}/>`, () => {
   beforeEach(() => {
     getTaxonomyListMock.mockReset();
     getTenantSanityContextMock.mockReset();

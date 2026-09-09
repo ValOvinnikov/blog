@@ -51,7 +51,7 @@ const setup = customRenderAsync(NewsletterModule, {
   tenant: 'tenant-1',
 });
 
-describe(NewsletterModule, () => {
+describe(`<${NewsletterModule.name}/>`, () => {
   beforeEach(() => {
     getNewsletterMock.mockReset();
     getNewsletterSettingsMock.mockReset();

@@ -36,7 +36,7 @@ const setup = customRender(PostListModuleView, {
   emptyMessage: 'No posts yet.',
 });
 
-describe(PostListModuleView, () => {
+describe(`<${PostListModuleView.name}/>`, () => {
   it('labels the section with the given titleId', () => {
     setup();
 

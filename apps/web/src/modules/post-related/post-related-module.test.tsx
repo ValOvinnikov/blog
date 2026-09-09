@@ -66,7 +66,7 @@ const setup = customRenderAsync(PostRelatedModule, {
   context: { post: { id: 'anchor-post-1' } },
 });
 
-describe(PostRelatedModule, () => {
+describe(`<${PostRelatedModule.name}/>`, () => {
   beforeEach(() => {
     getPostRelatedMock.mockReset();
     getTenantSanityContextMock.mockReset();

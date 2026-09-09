@@ -24,7 +24,7 @@ const setup = customRenderAsync(BookmarkButtonGate, {
   tenant: 'tenant-1',
 });
 
-describe(BookmarkButtonGate, () => {
+describe(`<${BookmarkButtonGate.name}/>`, () => {
   beforeEach(() => {
     isCapabilityEnabledMock.mockReset();
   });

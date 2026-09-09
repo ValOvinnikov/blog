@@ -158,6 +158,14 @@ CI-enforced guard was deliberately not added.
   story (follow `ui-storybook` skill). Both are required, not optional.
 - New/changed `service` functions have a co-located `*.test.ts`.
 - Bug fixes include a regression test that failed before the fix.
+- **Suite labels — a component takes ``describe(`<${Component.name}/>`, …)``,
+  everything else takes the bare symbol `describe(theSymbol, …)`.** A string
+  literal is correct only where no single symbol names the suite (a registry, a
+  route module, a group of behaviours). The common miss is a **bare symbol on a
+  component** — `describe(PostShare, …)` — which looks like it satisfies "pass
+  the symbol, not a string" but is the wrong form. Flag it in any file the diff
+  creates or touches; a pre-existing string title elsewhere is not this diff's
+  problem. Full rule: `testing-practices` → suite naming.
 - **Class assertions — allowed when the class is prop-driven, flagged when it
   is static.** A class that changes with a prop, variant, or state is part of
   the component's contract: `align="CENTER"` producing `text-center` is

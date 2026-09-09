@@ -55,7 +55,7 @@ const setup = customRenderAsync(PostArticle, {
   tenant: 'tenant-1',
 });
 
-describe(PostArticle, () => {
+describe(`<${PostArticle.name}/>`, () => {
   beforeEach(() => {
     getPostPageMock.mockReset();
     getTenantBaseUrlMock.mockReset();

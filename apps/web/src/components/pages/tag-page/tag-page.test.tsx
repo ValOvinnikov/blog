@@ -85,7 +85,7 @@ const setup = customRenderAsync(TagPage, {
   tenant: 'tenant-1',
 });
 
-describe(TagPage, () => {
+describe(`<${TagPage.name}/>`, () => {
   beforeEach(() => {
     getTagPageMock.mockReset();
     tagBreadcrumbsMock.mockClear();

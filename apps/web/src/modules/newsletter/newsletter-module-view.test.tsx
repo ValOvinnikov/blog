@@ -39,7 +39,7 @@ const setup = customRender(NewsletterModuleView, {
   trustCues: ['No spam', 'Unsubscribe anytime'],
 });
 
-describe(NewsletterModuleView, () => {
+describe(`<${NewsletterModuleView.name}/>`, () => {
   afterEach(() => {
     document.cookie =
       'newsletter_subscribed=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';

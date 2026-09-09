@@ -1,6 +1,6 @@
 import type { TPostRelatedModule } from '@blog/service';
-import { Heading } from '@blog/ui/atoms/heading';
 import { PostGrid } from '@blog/ui/organisms/post-grid';
+import { ModuleHeading } from '@web/components/shared/module-heading';
 import {
   type IPostCardData,
   PostCardItem,
@@ -36,10 +36,7 @@ export const PostRelatedModuleView = ({
   contentAlignment,
   hasImages,
 }: IPostRelatedModuleViewProps) => {
-  const { heading, supportingText } = sectionHeader;
-  const hasHeading = Boolean(heading?.trim());
-  const resolvedTitle = hasHeading ? heading : accessibleTitle;
-  const s = postRelatedModuleViewVariants({ align: contentAlignment });
+  const s = postRelatedModuleViewVariants();
 
   return (
     <Section
@@ -48,14 +45,14 @@ export const PostRelatedModuleView = ({
       titleId={titleId}
       dataTestId={dataTestId}
     >
-      <Heading
-        level={2}
+      <ModuleHeading
+        heading={sectionHeader.heading}
+        supportingText={sectionHeader.supportingText}
+        accessibleTitle={accessibleTitle}
         id={titleId}
-        className={hasHeading ? s.label() : s.labelFallback()}
-      >
-        {resolvedTitle}
-      </Heading>
-      {supportingText && <p className={s.supportingText()}>{supportingText}</p>}
+        level={2}
+        align={contentAlignment}
+      />
       <PostGrid className={s.grid()}>
         {items.map((item) => (
           <PostCardItem key={item.id} item={item} hasImage={hasImages} />

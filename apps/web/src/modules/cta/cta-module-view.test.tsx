@@ -59,7 +59,7 @@ const setup = customRender(CtaModuleView, {
   layout: undefined,
 });
 
-describe(CtaModuleView, () => {
+describe(`<${CtaModuleView.name}/>`, () => {
   it('renders the heading with a unique id derived from the module id', () => {
     setup();
 

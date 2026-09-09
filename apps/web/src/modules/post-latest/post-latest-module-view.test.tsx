@@ -35,7 +35,7 @@ const setup = customRender(PostLatestModuleView, {
   accessibleTitle: 'Latest posts',
 });
 
-describe(PostLatestModuleView, () => {
+describe(`<${PostLatestModuleView.name}/>`, () => {
   it('labels the section with the given titleId', () => {
     setup();
 
