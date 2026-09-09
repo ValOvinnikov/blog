@@ -8,7 +8,6 @@ import { sectionHeaderField } from '@blog/studio/schema-types/helpers/section-he
 import { slugField } from '@blog/studio/schema-types/helpers/slug-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
 import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/helpers/validate-single-blank-heading-per-type';
-import { contentSchema } from '@blog/studio/schema-types/modules/module-content';
 import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
 import { postRelatedSchema } from '@blog/studio/schema-types/modules/module-post-related';
@@ -45,6 +44,21 @@ export const pagePostSchema = defineType({
         'Optional hero image shown at the top of the post and in social shares.',
     }),
     defineField({
+      name: 'content',
+      title: 'Content',
+      type: richTextSchema.name,
+      description:
+        'Full post content — supports rich text, images, and code blocks.',
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'featured',
+      title: 'Featured',
+      type: 'boolean',
+      description:
+        'Marks this post for the Newest featured source of the blog hero and the featured spotlight.',
+    }),
+    defineField({
       name: 'author',
       title: 'Author',
       type: 'reference',
@@ -74,39 +88,19 @@ export const pagePostSchema = defineType({
       ],
       validation: (rule) => rule.max(6),
     }),
+    defineModulesField({
+      allow: [postRelatedSchema.name, newsletterSchema.name, ctaSchema.name],
+      validateCustom: (rule) =>
+        rule.custom(
+          validateSingleBlankHeadingPerType([postRelatedSchema.name]),
+        ),
+    }),
     defineField({
       name: 'publishedAt',
       title: 'Published At',
       type: 'datetime',
       description: 'Controls sort order and the date shown to readers.',
       validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'content',
-      title: 'Content',
-      type: richTextSchema.name,
-      description:
-        'Full post content — supports rich text, images, and code blocks.',
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'featured',
-      title: 'Featured',
-      type: 'boolean',
-      description:
-        'Marks this post for the Newest featured source of the blog hero and the featured spotlight.',
-    }),
-    defineModulesField({
-      allow: [
-        postRelatedSchema.name,
-        newsletterSchema.name,
-        ctaSchema.name,
-        contentSchema.name,
-      ],
-      validateCustom: (rule) =>
-        rule.custom(
-          validateSingleBlankHeadingPerType([postRelatedSchema.name]),
-        ),
     }),
     defineField({
       name: 'skim',
