@@ -284,8 +284,9 @@ test asserting every registered `module_hero*` schema appears in it.
 `page_home`, `page_landing`, `page_blog`, `page_topic` and `page_tag` each
 have an **optional** hero. A hero replaces that page's default header and
 owns the `<h1>`; without one, each page renders the header it always has
-(home, generic and blog: `headingBlock`'s `heading` plus `supportingText`;
-topic and tag: the term header), so exactly one `<h1>` renders either way.
+(home, generic, blog and topic: `headingBlock`'s `heading` plus
+`supportingText`; tag: the term header), so exactly one `<h1>` renders
+either way.
 
 `page_home`'s hero was required until it was made optional and the document
 given a `headingBlock` of its own; `page_landing` followed, replacing the
@@ -322,8 +323,10 @@ immutable and a retirement is therefore never a rename.
 
 **A page document's own `title` is an internal CMS label and is never
 rendered on the web.** It names the document in the desk, nothing more —
-`page_topic` and `page_tag` do not project theirs at all, taking their
-heading from the deref'd `blog_topic`/`blog_tag` instead. `page_post` has no
+`page_tag` does not project its own at all, taking its heading from the
+deref'd `blog_tag` instead, while `page_topic` carries a `headingBlock`
+whose `heading` and `supportingText` fall back to the deref'd
+`blog_topic`'s `title` and `description`. `page_post` has no
 entity to deref, so its headline and excerpt live in a **`headingBlock`**
 object (`requiredHeadingBlock`: `heading` required, `supportingText`
 optional) — the same shape the modules use. `@blog/service` maps
@@ -457,12 +460,11 @@ either: unset stays unset end to end. In `apps/web`, every module component
 that renders a `@blog/ui` organism — including those reached through a
 dedicated slot rather than `MODULE_MAP`'s generic `ModuleRenderer` pipeline
 (§5 above): the hero family via each page's `hero` slot,
-`module_postList` via `page_topic`'s `postList` reference on
-`/topics/[slug]` and `page_tag`'s on `/tags/[slug]`, and
-`module_taxonomyList` via `page_topicIndex`'s and `page_tagIndex`'s
+`module_postList` via `page_tag`'s `postList` reference on `/tags/[slug]`,
+and `module_taxonomyList` via `page_topicIndex`'s and `page_tagIndex`'s
 `taxonomyList` references — both of those also render through `MODULE_MAP`
-when placed in `modules[]`, which is how `page_blog` reaches its post
-list — all
+when placed in `modules[]`, which is how `page_blog` and `page_topic` reach
+their post lists — all
 still styled the same way as every other module — no exception — wraps it in `apps/web`'s own
 `Section` component (`apps/web/src/components/shared/section`, relocated
 from `packages/ui`), passing `brandVariant` and `layout` straight through,

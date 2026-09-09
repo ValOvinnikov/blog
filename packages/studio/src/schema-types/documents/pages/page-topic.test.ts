@@ -1,5 +1,7 @@
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic';
 import { pageTopicSchema } from '@blog/studio/schema-types/documents/pages/page-topic';
+import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
+import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
 import type { ValidationContext } from 'sanity';
 
@@ -7,6 +9,8 @@ type TReferenceFieldDefinition = {
   type: 'reference';
   to?: Array<{ type?: string }>;
   validation?: unknown;
+  readOnly?: boolean;
+  deprecated?: { reason: string };
 };
 
 type TArrayFieldDefinition = {
@@ -21,6 +25,21 @@ type TValidationRule = {
 
 const getField = (name: string) =>
   pageTopicSchema.fields?.find((field) => field.name === name);
+
+describe('pageTopicSchema field order', () => {
+  it('orders fields title, slug, topic, headingBlock, hero, modules, seo, with postList deprecated at the end', () => {
+    expect(pageTopicSchema.fields?.map((field) => field.name)).toEqual([
+      'title',
+      'slug',
+      'topic',
+      'headingBlock',
+      'hero',
+      'modules',
+      'seo',
+      'postList',
+    ]);
+  });
+});
 
 describe('pageTopicSchema shape', () => {
   it('title is required via the shared titleField() helper', () => {
@@ -45,7 +64,7 @@ describe('pageTopicSchema shape', () => {
     expect(requiredCalled).toBe(true);
   });
 
-  it('postList references module_postList and stays optional', () => {
+  it('postList is a deprecated, read-only reference to module_postList with no validation', () => {
     const postListField = getField('postList') as
       TReferenceFieldDefinition | undefined;
 
@@ -58,10 +77,12 @@ describe('pageTopicSchema shape', () => {
     expect(postListField.to?.map((target) => target.type)).toEqual([
       postListSchema.name,
     ]);
+    expect(postListField.readOnly).toBe(true);
+    expect(postListField.deprecated?.reason).toBeTruthy();
     expect(postListField.validation).toBeUndefined();
   });
 
-  it('modules allows module_postLatest, module_cta, and module_newsletter', () => {
+  it('modules allows module_postList, module_postLatest, module_cta, and module_newsletter', () => {
     const modulesField = getField('modules') as
       TArrayFieldDefinition | undefined;
 
@@ -70,6 +91,7 @@ describe('pageTopicSchema shape', () => {
     }
 
     expect(modulesField.of.map((member) => member.name)).toEqual([
+      'module_postList',
       'module_postLatest',
       'module_cta',
       'module_newsletter',
@@ -78,6 +100,41 @@ describe('pageTopicSchema shape', () => {
 
   it('seo stays optional — no validation() builder attached', () => {
     expect(getField('seo')?.validation).toBeUndefined();
+  });
+});
+
+type THeadingBlockFieldDefinition = {
+  type: string;
+  description?: string;
+};
+
+describe('pageTopicSchema headingBlock field', () => {
+  it('is built via headingBlockField() with a page-scoped description', () => {
+    const headingBlockField = getField('headingBlock') as
+      THeadingBlockFieldDefinition | undefined;
+
+    expect(headingBlockField?.type).toBe('headingBlock');
+    expect(headingBlockField?.description).toBe(
+      'The page heading (h1) and its optional supporting line. Not shown when a hero is set.',
+    );
+  });
+});
+
+describe('pageTopicSchema hero field', () => {
+  it('is an optional reference to the hero family via heroField()', () => {
+    const heroField = getField('hero') as
+      | { type: string; to?: Array<{ type: string }>; validation?: unknown }
+      | undefined;
+
+    if (!heroField) {
+      throw new Error('Expected pageTopicSchema to define a hero field.');
+    }
+
+    expect(heroField.type).toBe('reference');
+    expect(heroField.to?.map((entry) => entry.type)).toEqual(
+      HERO_SCHEMA_TYPES.map((schema) => schema.name),
+    );
+    expect(heroField.validation).toBeUndefined();
   });
 });
 
@@ -211,9 +268,7 @@ const getUniqueTopicValidator = (): TCustomFn => {
   );
 
   if (!topicField?.validation) {
-    throw new Error(
-      'Expected pageTopicSchema to define a topic field with validation.',
-    );
+    throw new Error('Expected topic field validation to register custom().');
   }
 
   let customFn: TCustomFn | undefined;
@@ -237,7 +292,7 @@ const getUniqueTopicValidator = (): TCustomFn => {
 };
 
 const createMockContext = (
-  conflictingCount: number,
+  fetchResult: unknown,
   documentId = 'page-topic-1',
 ) => {
   const fetchCalls: { query: string; params: unknown }[] = [];
@@ -250,7 +305,7 @@ const createMockContext = (
       return {
         fetch: async (query: string, params: unknown) => {
           fetchCalls.push({ query, params });
-          return conflictingCount;
+          return fetchResult;
         },
       };
     },
@@ -309,5 +364,176 @@ describe('validateUniqueTopicReference', () => {
     await validate({ _ref: 'topic-1' }, context);
 
     expect(withConfigCalls).toEqual([{ perspective: 'drafts' }]);
+  });
+});
+
+type TDocumentCustomFn = (
+  document: Record<string, unknown>,
+  context: ValidationContext,
+) => string | true | Promise<string | true>;
+
+type TDocumentMockRule = {
+  level: 'error' | 'warning';
+  fn?: TDocumentCustomFn;
+  custom: (fn: TDocumentCustomFn) => TDocumentMockRule;
+  warning: () => TDocumentMockRule;
+};
+
+const createDocumentMockRule = (
+  level: TDocumentMockRule['level'] = 'error',
+  fn?: TDocumentCustomFn,
+): TDocumentMockRule => ({
+  level,
+  fn,
+  custom: (nextFn) => createDocumentMockRule('error', nextFn),
+  warning: () => createDocumentMockRule('warning', fn),
+});
+
+const buildDocumentRules = (): TDocumentMockRule[] => {
+  if (!pageTopicSchema.validation) {
+    throw new Error('Expected pageTopicSchema to define a validation rule.');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+  return (pageTopicSchema.validation as any)(
+    createDocumentMockRule(),
+  ) as TDocumentMockRule[];
+};
+
+describe('pageTopicSchema document validation — hero or heading', () => {
+  it('errors when neither hero, headingBlock.heading, nor a resolvable topic is set', async () => {
+    const [heroOrHeadingRule] = buildDocumentRules();
+    const { context } = createMockContext(null);
+
+    await expect(heroOrHeadingRule?.fn?.({}, context)).resolves.toBe(
+      'Add a hero or a heading',
+    );
+  });
+
+  it('passes when hero is set, without querying the topic', async () => {
+    const [heroOrHeadingRule] = buildDocumentRules();
+    const { context, fetchCalls } = createMockContext(null);
+
+    await expect(
+      heroOrHeadingRule?.fn?.({ hero: { _ref: 'hero-1' } }, context),
+    ).resolves.toBe(true);
+    expect(fetchCalls).toHaveLength(0);
+  });
+
+  it('passes when headingBlock.heading is set, without querying the topic', async () => {
+    const [heroOrHeadingRule] = buildDocumentRules();
+    const { context, fetchCalls } = createMockContext(null);
+
+    await expect(
+      heroOrHeadingRule?.fn?.(
+        { headingBlock: { heading: 'Welcome' } },
+        context,
+      ),
+    ).resolves.toBe(true);
+    expect(fetchCalls).toHaveLength(0);
+  });
+
+  it('passes when neither hero nor heading is set but the referenced topic has a title', async () => {
+    const [heroOrHeadingRule] = buildDocumentRules();
+    const { context, fetchCalls } = createMockContext('Design');
+
+    await expect(
+      heroOrHeadingRule?.fn?.({ topic: { _ref: 'topic-1' } }, context),
+    ).resolves.toBe(true);
+    expect(fetchCalls[0]?.params).toEqual({ id: 'topic-1' });
+  });
+
+  it('errors when a topic is referenced but resolves to no title', async () => {
+    const [heroOrHeadingRule] = buildDocumentRules();
+    const { context } = createMockContext(null);
+
+    await expect(
+      heroOrHeadingRule?.fn?.({ topic: { _ref: 'topic-1' } }, context),
+    ).resolves.toBe('Add a hero or a heading');
+  });
+});
+
+describe('pageTopicSchema document validation — hero hides heading', () => {
+  it('warns when both hero and headingBlock.heading are set', () => {
+    const [, heroHidesHeadingRule] = buildDocumentRules();
+
+    expect(heroHidesHeadingRule?.level).toBe('warning');
+    expect(
+      heroHidesHeadingRule?.fn?.(
+        {
+          hero: { _ref: 'hero-1' },
+          headingBlock: { heading: 'Welcome' },
+        },
+        {} as ValidationContext,
+      ),
+    ).toBe('The hero hides the heading');
+  });
+
+  it('passes when only one of hero or heading is set', () => {
+    const [, heroHidesHeadingRule] = buildDocumentRules();
+
+    expect(
+      heroHidesHeadingRule?.fn?.(
+        { hero: { _ref: 'hero-1' } },
+        {} as ValidationContext,
+      ),
+    ).toBe(true);
+  });
+});
+
+describe('pageTopicSchema document validation — modules[] post list count', () => {
+  it('errors when more than one module_postList is referenced', () => {
+    const [, , singlePostListRule] = buildDocumentRules();
+
+    expect(singlePostListRule?.level).toBe('error');
+    expect(
+      singlePostListRule?.fn?.(
+        {
+          modules: [
+            { _type: postListSchema.name, _ref: 'list-1' },
+            { _type: postListSchema.name, _ref: 'list-2' },
+          ],
+        },
+        {} as ValidationContext,
+      ),
+    ).toBe('Only one Post List module is allowed per page.');
+  });
+
+  it('passes with exactly one module_postList reference', () => {
+    const [, , singlePostListRule, hasPostListRule] = buildDocumentRules();
+
+    const document = {
+      modules: [
+        { _type: postListSchema.name, _ref: 'list-1' },
+        { _type: postLatestSchema.name, _ref: 'latest-1' },
+      ],
+    };
+
+    expect(singlePostListRule?.fn?.(document, {} as ValidationContext)).toBe(
+      true,
+    );
+    expect(hasPostListRule?.fn?.(document, {} as ValidationContext)).toBe(true);
+  });
+
+  it('warns when no module_postList is referenced', () => {
+    const [, , , hasPostListRule] = buildDocumentRules();
+
+    expect(hasPostListRule?.level).toBe('warning');
+    expect(
+      hasPostListRule?.fn?.(
+        { modules: [{ _type: postLatestSchema.name, _ref: 'latest-1' }] },
+        {} as ValidationContext,
+      ),
+    ).toBe(
+      'This page has no Post List module — the archive will be empty until one is added.',
+    );
+  });
+
+  it('warns when modules is undefined', () => {
+    const [, , , hasPostListRule] = buildDocumentRules();
+
+    expect(hasPostListRule?.fn?.({}, {} as ValidationContext)).toBe(
+      'This page has no Post List module — the archive will be empty until one is added.',
+    );
   });
 });

@@ -76,7 +76,7 @@ describe(`<${TopicBreadcrumbs.name}/>`, () => {
   it('renders the Home › {topic} breadcrumbs trail', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
-      data: { topic, modules: [], seo: {}, postListId: 'post-list-1' },
+      data: { topic, modules: [], seo: {} },
     });
 
     await setup();
@@ -94,7 +94,7 @@ describe(`<${TopicBreadcrumbs.name}/>`, () => {
   it('renders the JSON-LD BreadcrumbList schema script', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
-      data: { topic, modules: [], seo: {}, postListId: 'post-list-1' },
+      data: { topic, modules: [], seo: {} },
     });
 
     const { container } = await setup();
@@ -112,7 +112,7 @@ describe(`<${TopicBreadcrumbs.name}/>`, () => {
   it('renders no JSON-LD script when the base URL cannot be resolved', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
-      data: { topic, modules: [], seo: {}, postListId: 'post-list-1' },
+      data: { topic, modules: [], seo: {} },
     });
     getTenantBaseUrlMock.mockResolvedValue(undefined);
 
@@ -126,7 +126,7 @@ describe(`<${TopicBreadcrumbs.name}/>`, () => {
   it('forwards the slug and tenant to getTopicPage', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
-      data: { topic, modules: [], seo: {}, postListId: 'post-list-1' },
+      data: { topic, modules: [], seo: {} },
     });
 
     await setup();

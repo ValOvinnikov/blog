@@ -26,7 +26,7 @@ describe('buildTopicMetadata', () => {
   it('forwards the slug and tenant to getTopicPage — the same cached loader TopicPage reads', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
-      data: { topic: {}, modules: [], seo, postListId: 'post-list-1' },
+      data: { topic: {}, modules: [], seo },
     });
 
     await buildTopicMetadata('engineering', 'tenant-1');
@@ -37,7 +37,7 @@ describe('buildTopicMetadata', () => {
   it('builds page-1 metadata from the resolved seo, self-canonical to /topics/[slug]', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
-      data: { topic: {}, modules: [], seo, postListId: 'post-list-1' },
+      data: { topic: {}, modules: [], seo },
     });
 
     const metadata = await buildTopicMetadata('engineering', 'tenant-1');
@@ -65,7 +65,7 @@ describe('buildTopicMetadata', () => {
   it('builds page-N metadata with a "– Page N" suffix, self-canonical to /topics/[slug]/page/N — never /topics/[slug]', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
-      data: { topic: {}, modules: [], seo, postListId: 'post-list-1' },
+      data: { topic: {}, modules: [], seo },
     });
 
     const metadata = await buildTopicMetadata('engineering', 'tenant-1', 2);

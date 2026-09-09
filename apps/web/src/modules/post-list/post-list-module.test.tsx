@@ -1,4 +1,4 @@
-import { BRAND_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, TAXONOMY_KIND } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
@@ -483,5 +483,140 @@ describe(`<${PostListModule.name}/>`, () => {
     await setup();
 
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
+  });
+
+  it('derives href, aria-label, accessible title, empty message, and titleId from context.archive (topic kind)', async () => {
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        headingBlock: makeHeadingBlock(),
+        posts: [
+          {
+            id: 'post-1',
+            slug: 'first-post',
+            title: 'First post',
+            excerpt: 'An excerpt',
+            publishedAt: '2026-01-01T00:00:00.000Z',
+            topic: { id: 'topic-1', title: 'News', slug: 'news' },
+            readingTimeMinutes: 2,
+          },
+        ],
+        layout: undefined,
+        contentAlignment: undefined,
+        currentPage: 2,
+        totalPages: 3,
+      },
+    });
+
+    await setup({
+      page: 2,
+      context: {
+        page: 2,
+        archive: { kind: TAXONOMY_KIND.TOPICS, slug: 'news', name: 'News' },
+      },
+    });
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Posts in News' }),
+    ).toHaveAttribute('id', 'topic-posts-title');
+    expect(
+      screen.getByRole('region', { name: 'Posts in News' }),
+    ).toHaveAttribute('aria-labelledby', 'topic-posts-title');
+    expect(
+      screen.getByRole('navigation', { name: 'News pages' }),
+    ).toBeInTheDocument();
+
+    const previousLink = screen.getByRole('link', { name: 'Previous' });
+    expect(previousLink).toHaveAttribute('href', '/topics/news');
+
+    const nextLink = screen.getByRole('link', { name: 'Next' });
+    expect(nextLink).toHaveAttribute('href', '/topics/news/page/3');
+  });
+
+  it('derives the empty message from context.archive (tag kind)', async () => {
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        headingBlock: makeHeadingBlock(),
+        posts: [],
+        layout: undefined,
+        contentAlignment: undefined,
+        currentPage: 1,
+        totalPages: 1,
+      },
+    });
+
+    await setup({
+      context: {
+        archive: {
+          kind: TAXONOMY_KIND.TAGS,
+          slug: 'typescript',
+          name: 'TypeScript',
+        },
+      },
+    });
+
+    expect(
+      screen.getByText('No posts tagged TypeScript yet.'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', {
+        level: 2,
+        name: 'Posts tagged TypeScript',
+      }),
+    ).toHaveAttribute('id', 'tag-posts-title');
+  });
+
+  it('lets an explicit prop win over context.archive-derived defaults', async () => {
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        headingBlock: makeHeadingBlock(),
+        posts: [],
+        layout: undefined,
+        contentAlignment: undefined,
+        currentPage: 1,
+        totalPages: 1,
+      },
+    });
+
+    await setup({
+      accessibleTitle: 'Custom heading',
+      emptyMessageFallback: 'Custom empty copy',
+      context: {
+        archive: { kind: TAXONOMY_KIND.TOPICS, slug: 'news', name: 'News' },
+      },
+    });
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Custom heading' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Custom empty copy')).toBeInTheDocument();
+    expect(screen.queryByText('No posts in News yet.')).not.toBeInTheDocument();
+  });
+
+  it('keeps the blog-archive defaults intact when context.archive is absent', async () => {
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        headingBlock: makeHeadingBlock(),
+        posts: [],
+        layout: undefined,
+        contentAlignment: undefined,
+        currentPage: 1,
+        totalPages: 1,
+      },
+    });
+
+    await setup({ context: { page: 1 } });
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'All posts' }),
+    ).toHaveAttribute('id', 'blog-posts-title');
+    expect(screen.getByText('No posts yet.')).toBeInTheDocument();
   });
 });

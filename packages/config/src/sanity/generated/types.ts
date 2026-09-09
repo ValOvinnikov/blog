@@ -555,10 +555,13 @@ export type Page_topic = {
   _rev: string;
   title?: string;
   slug?: Slug;
-  hero?: Module_heroReference | Module_heroBlogReference;
   topic?: Blog_topicReference;
-  postList?: Module_postListReference;
+  headingBlock?: HeadingBlock;
+  hero?: Module_heroReference | Module_heroBlogReference;
   modules?: Array<
+    | ({
+        _key: string;
+      } & Module_postListReference)
     | ({
         _key: string;
       } & Module_postLatestReference)
@@ -570,6 +573,7 @@ export type Page_topic = {
       } & Module_newsletterReference)
   >;
   seo?: Seo;
+  postList?: Module_postListReference;
 };
 
 export type Page_topicIndex = {
