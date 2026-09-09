@@ -149,6 +149,46 @@ describe(BlogListPage, () => {
     ]);
   });
 
+  it('renders through PageShell: breadcrumbs outside main, everything else inside it', async () => {
+    getBlogListPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        heading: 'Blog',
+        supportingText: 'Essays and notes.',
+        modules: [],
+        postListId: 'post-list-1',
+      },
+    });
+
+    await setup();
+
+    const main = screen.getByRole('main');
+    expect(main).toContainElement(screen.getByTestId('blog-list-topic-chips'));
+    expect(main).toContainElement(screen.getByTestId('post-list-module-stub'));
+    expect(
+      screen.getByTestId('blog-list-breadcrumbs').closest('main'),
+    ).toBeNull();
+  });
+
+  it('passes the current page as context to ModuleRenderer', async () => {
+    getBlogListPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        heading: 'Blog',
+        supportingText: 'Essays and notes.',
+        modules: [],
+        postListId: 'post-list-1',
+      },
+    });
+
+    await setup({ page: 2 });
+
+    expect(moduleRendererMock).toHaveBeenCalledWith(
+      expect.objectContaining({ context: { page: 2 } }),
+      undefined,
+    );
+  });
+
   it('passes the postList id, locale, and page through to PostListModule', async () => {
     getBlogListPageMock.mockResolvedValue({
       ok: true,

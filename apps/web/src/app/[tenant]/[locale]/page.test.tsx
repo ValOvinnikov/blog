@@ -94,6 +94,29 @@ describe('HomePage', () => {
     );
   });
 
+  it('renders through PageShell: hero, then module renderer, inside a single main landmark, with no breadcrumb region', async () => {
+    getHomePageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        hero: { id: 'hero-1', type: 'module_hero' },
+        modules: [{ id: 'module-1', type: 'module_content' }],
+        seo: makeSeo(),
+      },
+    });
+
+    const { container } = await setup();
+
+    const main = screen.getByRole('main');
+    expect(main).toContainElement(screen.getByTestId('hero-module'));
+    expect(main).toContainElement(screen.getByTestId('module-renderer'));
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+
+    const order = Array.from(
+      container.querySelectorAll<HTMLElement>('[data-testid]'),
+    ).map((el) => el.getAttribute('data-testid'));
+    expect(order).toEqual(['hero-module', 'module-renderer']);
+  });
+
   it('forwards the resolved tenant Sanity context to getHomePage', async () => {
     const tenant = {
       projectId: 'tenant-project',

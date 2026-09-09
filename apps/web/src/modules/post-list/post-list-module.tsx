@@ -1,5 +1,6 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
+import type { TModuleComponentProps } from '@web/modules/module-map';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import { renderPostCardImage } from '@web/utils/render-post-card-image';
@@ -17,6 +18,8 @@ export interface IPostListModuleProps {
   locale: string;
   tenant: string;
   page: number;
+  /** Preferred over `page` when both are given, so a shared `ModuleRenderer` context can carry the current page instead. */
+  context?: TModuleComponentProps['context'];
   /** Pagination href builder. Defaults to `routes.blogIndex` for `/blog`; archive callers other than `/blog` must supply their own. */
   createHref?: (page: number) => string;
   /** Pagination nav `aria-label`. Defaults to the blog archive's own copy. */
@@ -43,15 +46,17 @@ export const PostListModule = async ({
   id,
   tenant,
   page,
+  context,
   createHref = routes.blogIndex,
   ariaLabel,
   accessibleTitle,
   emptyMessageFallback,
   titleId = 'blog-posts-title',
 }: IPostListModuleProps) => {
+  const resolvedPage = context?.page ?? page;
   const tenantContext = await getTenantSanityContext(tenant);
   const [result, blogListT, paginationT] = await Promise.all([
-    service.modules.postList.v1.getPostList(id, tenantContext, page),
+    service.modules.postList.v1.getPostList(id, tenantContext, resolvedPage),
     getTranslations('blogListPage'),
     getTranslations('pagination'),
   ]);
@@ -59,7 +64,7 @@ export const PostListModule = async ({
   if (!result.ok) {
     logger.error('post_list_module.fetch_failed', {
       id,
-      page,
+      page: resolvedPage,
       error: result.error,
     });
     notFound();
@@ -79,7 +84,7 @@ export const PostListModule = async ({
   // Out-of-range page (corpus shrank or hand-typed URL) → hard 404, never a
   // soft-404 or a redirect to the last page (spec SEO rules). Page 1 of an
   // empty archive is `totalPages === 1`, so page 1 never 404s.
-  if (page > totalPages) {
+  if (resolvedPage > totalPages) {
     notFound();
   }
 

@@ -124,6 +124,28 @@ describe(TopicsPage, () => {
     ]);
   });
 
+  it('renders through PageShell: breadcrumbs outside main, the taxonomy list inside it', async () => {
+    getTopicsIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        heading: 'Topics',
+        supportingText: 'Browse every post by topic.',
+        seo: {},
+        taxonomyListId: 'topic-list-1',
+      },
+    });
+
+    await setup();
+
+    const main = screen.getByRole('main');
+    expect(main).toContainElement(
+      screen.getByTestId('taxonomy-list-module-stub'),
+    );
+    expect(
+      screen.getByTestId('topics-index-breadcrumbs').closest('main'),
+    ).toBeNull();
+  });
+
   it('passes the taxonomyListId, TOPICS fallback kind, page heading as accessibleTitle, and the empty-state copy through to TaxonomyListModule', async () => {
     getTopicsIndexPageMock.mockResolvedValue({
       ok: true,

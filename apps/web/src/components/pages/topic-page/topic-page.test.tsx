@@ -177,6 +177,48 @@ describe(TopicPage, () => {
     ]);
   });
 
+  it('renders through PageShell: breadcrumbs outside main, everything else inside it', async () => {
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: { topic, modules: [], seo: {}, postListId: 'post-list-1' },
+    });
+
+    await setup();
+
+    const main = screen.getByRole('main');
+    expect(main).toContainElement(screen.getByTestId('topic-chips'));
+    expect(main).toContainElement(screen.getByTestId('post-list-module-stub'));
+    expect(screen.getByTestId('topic-breadcrumbs').closest('main')).toBeNull();
+  });
+
+  it('passes the current page as context to ModuleRenderer', async () => {
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: { topic, modules: [], seo: {}, postListId: 'post-list-1' },
+    });
+
+    await setup({ page: 3 });
+
+    expect(moduleRendererMock).toHaveBeenCalledWith(
+      expect.objectContaining({ context: { page: 3 } }),
+      undefined,
+    );
+  });
+
+  it('defaults the ModuleRenderer context page to 1 when no page is given', async () => {
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: { topic, modules: [], seo: {}, postListId: 'post-list-1' },
+    });
+
+    await setup();
+
+    expect(moduleRendererMock).toHaveBeenCalledWith(
+      expect.objectContaining({ context: { page: 1 } }),
+      undefined,
+    );
+  });
+
   it('passes the postList id, locale, page, and topic-scoped copy through to PostListModule', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,

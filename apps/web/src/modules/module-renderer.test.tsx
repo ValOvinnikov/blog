@@ -42,6 +42,14 @@ describe('ModuleRenderer', () => {
     });
   });
 
+  it('forwards a caller-provided context, including page, to every module component', async () => {
+    await setup({ context: { page: 2 } });
+
+    expect(ctaModuleMock).toHaveBeenCalledWith(
+      expect.objectContaining({ context: { page: 2 } }),
+    );
+  });
+
   it('renders nothing for an unknown module type and warns', async () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 

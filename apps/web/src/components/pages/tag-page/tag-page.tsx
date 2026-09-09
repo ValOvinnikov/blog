@@ -1,6 +1,7 @@
 import { routes } from '@blog/config';
 import { TagBreadcrumbs } from '@web/components/features/tag/tag-breadcrumbs';
-import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
+import { PageShell } from '@web/components/page-templates/page-shell';
+import { PageHeading } from '@web/components/shared/page-heading';
 import { HeroSlot } from '@web/modules/hero-slot';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import { PostListModule } from '@web/modules/post-list/post-list-module';
@@ -34,41 +35,48 @@ export const TagPage = async ({
   const { tag, hero, modules, postListId } = pageData;
 
   const tagPageT = await getTranslations('tagPage');
+  const currentPage = page ?? 1;
 
   return (
-    <>
-      <TagBreadcrumbs slug={slug} tenant={tenant} />
-
-      <BlogPageTemplate
-        heading={tag.title}
-        supportingText={tag.description}
-        hero={
-          hero && (
-            <HeroSlot
-              id={hero.id}
-              type={hero.type}
-              locale={locale}
-              tenant={tenant}
-            />
-          )
-        }
-        modules={
-          <>
-            <PostListModule
-              id={postListId}
-              locale={locale}
-              tenant={tenant}
-              page={page ?? 1}
-              createHref={(pageNumber) => routes.tag(slug, pageNumber)}
-              ariaLabel={tagPageT('paginationAriaLabel', { name: tag.title })}
-              accessibleTitle={tagPageT('title', { name: tag.title })}
-              emptyMessageFallback={tagPageT('empty', { name: tag.title })}
-              titleId="tag-posts-title"
-            />
-            <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />
-          </>
-        }
-      />
-    </>
+    <PageShell>
+      <PageShell.Breadcrumbs>
+        <TagBreadcrumbs slug={slug} tenant={tenant} />
+      </PageShell.Breadcrumbs>
+      <PageShell.Heading>
+        {hero ? (
+          <HeroSlot
+            id={hero.id}
+            type={hero.type}
+            locale={locale}
+            tenant={tenant}
+          />
+        ) : (
+          <PageHeading
+            heading={tag.title}
+            supportingText={tag.description}
+            hasTrailingSpace={false}
+          />
+        )}
+      </PageShell.Heading>
+      <PageShell.Content>
+        <PostListModule
+          id={postListId}
+          locale={locale}
+          tenant={tenant}
+          page={currentPage}
+          createHref={(pageNumber) => routes.tag(slug, pageNumber)}
+          ariaLabel={tagPageT('paginationAriaLabel', { name: tag.title })}
+          accessibleTitle={tagPageT('title', { name: tag.title })}
+          emptyMessageFallback={tagPageT('empty', { name: tag.title })}
+          titleId="tag-posts-title"
+        />
+        <ModuleRenderer
+          modules={modules}
+          context={{ page: currentPage }}
+          locale={locale}
+          tenant={tenant}
+        />
+      </PageShell.Content>
+    </PageShell>
   );
 };

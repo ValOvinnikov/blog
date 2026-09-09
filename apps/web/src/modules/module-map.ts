@@ -13,8 +13,13 @@ export type TModuleComponentProps = {
   id: string;
   locale: string;
   tenant: string;
-  /** The post the module renders alongside, when the module sits on a `page_post`'s `modules[]`. Absent everywhere else. */
-  context?: { post?: { id: string } };
+  /**
+   * Context a module may need beyond `id`/`locale`/`tenant`: the post it
+   * renders alongside, when it sits on a `page_post`'s `modules[]`, and the
+   * current page number, on a paginated listing page. Both absent
+   * everywhere else.
+   */
+  context?: { post?: { id: string }; page?: number };
 };
 
 /**

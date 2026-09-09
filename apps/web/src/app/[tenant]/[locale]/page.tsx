@@ -1,6 +1,6 @@
 import type { ITenantLocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { HomePageTemplate } from '@web/components/page-templates/home-page-template';
+import { PageShell } from '@web/components/page-templates/page-shell';
 import { toMetadata } from '@web/metadata/to-metadata';
 import { HeroSlot } from '@web/modules/hero-slot';
 import { ModuleRenderer } from '@web/modules/module-renderer';
@@ -50,18 +50,18 @@ export default async function HomePage({ params }: TProps) {
   );
 
   return (
-    <HomePageTemplate
-      hero={
+    <PageShell>
+      <PageShell.Heading>
         <HeroSlot
           id={hero.id}
           type={hero.type}
           locale={locale}
           tenant={tenant}
         />
-      }
-      modules={
+      </PageShell.Heading>
+      <PageShell.Content>
         <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />
-      }
-    />
+      </PageShell.Content>
+    </PageShell>
   );
 }
