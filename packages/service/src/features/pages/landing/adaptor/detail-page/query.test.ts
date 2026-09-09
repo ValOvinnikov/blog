@@ -17,6 +17,20 @@ describe('landingPageQuery', () => {
     expect(() => landingPageQuery.parse(raw)).not.toThrow();
   });
 
+  it('parses a landing page with no headingBlock', () => {
+    const raw = makeRawLandingPage({ headingBlock: null });
+
+    expect(() => landingPageQuery.parse(raw)).not.toThrow();
+  });
+
+  it('parses a landing page with a headingBlock heading and supportingText', () => {
+    const raw = makeRawLandingPage({
+      headingBlock: { heading: 'About Us', supportingText: 'Who we are' },
+    });
+
+    expect(() => landingPageQuery.parse(raw)).not.toThrow();
+  });
+
   it('parses null as no matching page_landing document, rather than throwing', () => {
     expect(landingPageQuery.parse(null)).toBeNull();
   });

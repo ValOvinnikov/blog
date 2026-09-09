@@ -1,4 +1,5 @@
 import { q, type TSlugParams } from '@blog/service/sanity/query';
+import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo';
 
@@ -10,6 +11,10 @@ export const landingPageQuery = q
   .project((sub) => ({
     title: sub.field('title').notNull(),
     slug: sub.field('slug.current').notNull(),
+    headingBlock: sub
+      .field('headingBlock')
+      .project(headingBlockFragment)
+      .nullable(true),
     hero: sub.field('hero').deref().project(moduleFragment).nullable(true),
     modules: sub
       .field('modules[]')
