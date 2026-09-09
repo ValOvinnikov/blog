@@ -1,4 +1,5 @@
 import { makeRawFeedPost } from '@blog/service/testing/entities/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 
 import { toAllPublishedPosts } from './transformer';
 
@@ -6,17 +7,17 @@ describe(toAllPublishedPosts, () => {
   it('maps every raw feed post into a domain feed post', () => {
     const raw = [
       makeRawFeedPost({
-        headingBlock: {
+        headingBlock: makeRawHeadingBlock({
           heading: 'First',
           supportingText: 'A sufficiently long excerpt for the card.',
-        },
+        }),
         slug: 'first',
       }),
       makeRawFeedPost({
-        headingBlock: {
+        headingBlock: makeRawHeadingBlock({
           heading: 'Second',
           supportingText: 'A sufficiently long excerpt for the card.',
-        },
+        }),
         slug: 'second',
       }),
     ];
@@ -55,7 +56,10 @@ describe(toAllPublishedPosts, () => {
   it('maps a sparse feed post with no excerpt to undefined', () => {
     const [result] = toAllPublishedPosts([
       makeRawFeedPost({
-        headingBlock: { heading: 'Hello World', supportingText: null },
+        headingBlock: makeRawHeadingBlock({
+          heading: 'Hello World',
+          supportingText: null,
+        }),
       }),
     ]);
 

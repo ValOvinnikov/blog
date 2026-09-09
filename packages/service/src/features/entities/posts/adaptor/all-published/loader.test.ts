@@ -1,5 +1,6 @@
 import { makeRawFeedPost } from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getAllPublishedPosts } from './loader';
@@ -15,11 +16,17 @@ describe(getAllPublishedPosts, () => {
   it('fetches every published post with no pagination parameters', async () => {
     mockRun.mockResolvedValue([
       makeRawFeedPost({
-        headingBlock: { heading: 'First', supportingText: null },
+        headingBlock: makeRawHeadingBlock({
+          heading: 'First',
+          supportingText: null,
+        }),
         slug: 'first',
       }),
       makeRawFeedPost({
-        headingBlock: { heading: 'Second', supportingText: null },
+        headingBlock: makeRawHeadingBlock({
+          heading: 'Second',
+          supportingText: null,
+        }),
         slug: 'second',
       }),
     ]);

@@ -1,6 +1,7 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawPostListModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getPostList } from './loader';
@@ -17,10 +18,10 @@ describe('getPostList', () => {
     mockRun
       .mockResolvedValueOnce(
         makeRawPostListModule({
-          headingBlock: {
+          headingBlock: makeRawHeadingBlock({
             heading: 'Recent writing',
             supportingText: null,
-          },
+          }),
           pageSize: 3,
         }),
       )

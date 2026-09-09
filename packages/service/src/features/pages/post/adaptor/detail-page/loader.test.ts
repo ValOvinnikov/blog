@@ -1,7 +1,10 @@
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawPostDetail } from '@blog/service/testing/pages/fixtures';
-import { makeRawImage } from '@blog/service/testing/shared/fixtures';
+import {
+  makeRawHeadingBlock,
+  makeRawImage,
+} from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getPost } from './loader';
@@ -35,7 +38,10 @@ describe('getPost', () => {
       .mockResolvedValueOnce(
         makeRawPostDetail({
           _id: 'post-abc',
-          headingBlock: { heading: 'Test Post', supportingText: null },
+          headingBlock: makeRawHeadingBlock({
+            heading: 'Test Post',
+            supportingText: null,
+          }),
         }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
@@ -201,10 +207,10 @@ describe('getPost', () => {
       .mockResolvedValueOnce(
         makeRawPostDetail({
           seo: null,
-          headingBlock: {
+          headingBlock: makeRawHeadingBlock({
             heading: 'Fallback Post',
             supportingText: 'Fallback excerpt',
-          },
+          }),
         }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
@@ -462,7 +468,10 @@ describe('getPost', () => {
     mockRun
       .mockResolvedValueOnce(
         makeRawPostDetail({
-          headingBlock: { heading: 'Hello World', supportingText: null },
+          headingBlock: makeRawHeadingBlock({
+            heading: 'Hello World',
+            supportingText: null,
+          }),
           body: [],
         }),
       )

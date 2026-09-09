@@ -5,6 +5,7 @@ import {
   NEWSLETTER_VARIANT,
 } from '@blog/config';
 import { makeRawNewsletterModule } from '@blog/service/testing/modules/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 
 import { toNewsletterModule } from './transformer';
 
@@ -42,10 +43,10 @@ describe('toNewsletterModule', () => {
 
   it('leaves supportingText undefined when not set (no faked default)', () => {
     const raw = makeRawNewsletterModule({
-      headingBlock: {
+      headingBlock: makeRawHeadingBlock({
         heading: 'Stay in the loop',
         supportingText: null,
-      },
+      }),
     });
 
     const module = toNewsletterModule(raw);

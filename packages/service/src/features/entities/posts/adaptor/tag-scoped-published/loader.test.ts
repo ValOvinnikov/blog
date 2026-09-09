@@ -1,5 +1,6 @@
 import { makeRawFeedPost } from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getPublishedPostsByTag } from './loader';
@@ -15,17 +16,17 @@ describe(getPublishedPostsByTag, () => {
   it('fetches every published post tagged with the given tag id', async () => {
     mockRun.mockResolvedValue([
       makeRawFeedPost({
-        headingBlock: {
+        headingBlock: makeRawHeadingBlock({
           heading: 'First',
           supportingText: 'A sufficiently long excerpt for the card.',
-        },
+        }),
         slug: 'first',
       }),
       makeRawFeedPost({
-        headingBlock: {
+        headingBlock: makeRawHeadingBlock({
           heading: 'Second',
           supportingText: 'A sufficiently long excerpt for the card.',
-        },
+        }),
         slug: 'second',
       }),
     ]);

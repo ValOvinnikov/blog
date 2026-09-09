@@ -1,8 +1,19 @@
 import type { imageWithAltFragment } from '@blog/service/shared/fragments/image';
+import type { TRawRequiredHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import type { TRawSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import type { InferFragmentType } from 'groqd';
 
 type TRawImage = InferFragmentType<typeof imageWithAltFragment>;
+
+export function makeRawHeadingBlock(
+  overrides: Partial<TRawRequiredHeadingBlock> = {},
+): TRawRequiredHeadingBlock {
+  return {
+    heading: 'Hello World',
+    supportingText: null,
+    ...overrides,
+  };
+}
 
 export function makeRawImage(alt = 'Alt text'): TRawImage {
   return {

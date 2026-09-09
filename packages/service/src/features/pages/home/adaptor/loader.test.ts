@@ -1,6 +1,7 @@
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawHomePage } from '@blog/service/testing/pages/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getHomePage } from './loader';
@@ -58,7 +59,10 @@ describe('getHomePage', () => {
       .mockResolvedValueOnce(
         makeRawHomePage({
           hero: null,
-          headingBlock: { heading: 'Welcome', supportingText: null },
+          headingBlock: makeRawHeadingBlock({
+            heading: 'Welcome',
+            supportingText: null,
+          }),
         }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
@@ -75,7 +79,10 @@ describe('getHomePage', () => {
     mockRun
       .mockResolvedValueOnce(
         makeRawHomePage({
-          headingBlock: { heading: 'Welcome', supportingText: 'A subtitle' },
+          headingBlock: makeRawHeadingBlock({
+            heading: 'Welcome',
+            supportingText: 'A subtitle',
+          }),
         }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
