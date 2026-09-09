@@ -1,7 +1,7 @@
-import { MissingPostListError } from '@blog/service/features/pages/topic/adaptor/missing-post-list-error';
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawTopicPage } from '@blog/service/testing/pages/fixtures';
+import { makeRawOptionalHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getTopicPage } from './loader';
@@ -20,17 +20,14 @@ vi.mock('@blog/service/sanity/image', () => ({
 const tenant = makeTenant();
 
 describe('getTopicPage', () => {
-  it('exposes the postList module id from page_topic.postList', async () => {
+  it('loads a topic page with no list module in modules[]', async () => {
     mockRun
-      .mockResolvedValueOnce(
-        makeRawTopicPage({ postList: { _id: 'post-list-1' } }),
-      )
+      .mockResolvedValueOnce(makeRawTopicPage({ modules: [] }))
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getTopicPage('engineering', tenant);
-    if (!result) throw new Error('expected a topic page');
 
-    expect(result.postListId).toBe('post-list-1');
+    expect(result).toBeDefined();
   });
 
   it('takes the heading/supporting text from the referenced topic, not page_topic.title', async () => {
@@ -111,6 +108,83 @@ describe('getTopicPage', () => {
     expect(result.seo.description).toBe('Notes on building things.');
   });
 
+  it('uses the authored headingBlock over the topic fallback', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawTopicPage({
+          topic: {
+            _id: 'topic-1',
+            title: 'Engineering',
+            slug: 'engineering',
+            description: 'Notes on building things.',
+          },
+          headingBlock: makeRawOptionalHeadingBlock({
+            heading: 'Engineering, curated',
+            supportingText: 'Hand-picked reads.',
+          }),
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getTopicPage('engineering', tenant);
+    if (!result) throw new Error('expected a topic page');
+
+    expect(result.headingBlock).toEqual({
+      heading: 'Engineering, curated',
+      supportingText: 'Hand-picked reads.',
+    });
+  });
+
+  it('falls back to the topic title/description when headingBlock is unset', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawTopicPage({
+          topic: {
+            _id: 'topic-1',
+            title: 'Engineering',
+            slug: 'engineering',
+            description: 'Notes on building things.',
+          },
+          headingBlock: null,
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getTopicPage('engineering', tenant);
+    if (!result) throw new Error('expected a topic page');
+
+    expect(result.headingBlock).toEqual({
+      heading: 'Engineering',
+      supportingText: 'Notes on building things.',
+    });
+  });
+
+  it('falls back to the topic description only for an unset supportingText, keeping an authored heading', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawTopicPage({
+          topic: {
+            _id: 'topic-1',
+            title: 'Engineering',
+            slug: 'engineering',
+            description: 'Notes on building things.',
+          },
+          headingBlock: makeRawOptionalHeadingBlock({
+            heading: 'Engineering, curated',
+          }),
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getTopicPage('engineering', tenant);
+    if (!result) throw new Error('expected a topic page');
+
+    expect(result.headingBlock).toEqual({
+      heading: 'Engineering, curated',
+      supportingText: 'Notes on building things.',
+    });
+  });
+
   it('leaves hero undefined when page_topic.hero is unset', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawTopicPage({ hero: null }))
@@ -159,18 +233,6 @@ describe('getTopicPage', () => {
     );
   });
 
-  // Regression guard for the decision that a missing slot is a loud failure,
-  // never a substituted default: this must reject rather than resolve with
-  // an invented module id.
-  it('rejects with MissingPostListError when page_topic.postList is unset, without fetching site settings', async () => {
-    mockRun.mockResolvedValueOnce(makeRawTopicPage({ postList: null }));
-
-    await expect(getTopicPage('engineering', tenant)).rejects.toThrow(
-      MissingPostListError,
-    );
-    expect(mockRun).toHaveBeenCalledTimes(1);
-  });
-
   it('resolves undefined, rather than rejecting, when no page_topic matches the slug', async () => {
     mockRun.mockResolvedValueOnce(null);
 
@@ -200,11 +262,7 @@ describe('getTopicPage', () => {
       expect.objectContaining({
         tenant,
         next: expect.objectContaining({
-          tags: [
-            't:tenant-a:page_topic',
-            't:tenant-a:topic',
-            't:tenant-a:modules:postList',
-          ],
+          tags: ['t:tenant-a:page_topic', 't:tenant-a:topic'],
         }),
       }),
     );

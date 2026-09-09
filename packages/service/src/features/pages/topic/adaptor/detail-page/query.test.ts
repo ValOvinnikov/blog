@@ -1,4 +1,5 @@
 import { makeRawTopicPage } from '@blog/service/testing/pages/fixtures';
+import { makeRawOptionalHeadingBlock } from '@blog/service/testing/shared/fixtures';
 
 import { topicPageQuery } from './query';
 
@@ -8,15 +9,18 @@ describe('topicPageQuery', () => {
     expect(topicPageQuery.query).toContain('slug.current == $slug');
   });
 
-  it('parses a topic page with no postList slot set and no modules/SEO', () => {
-    const raw = makeRawTopicPage({ postList: null, modules: null, seo: null });
+  it('parses a topic page with no modules/SEO', () => {
+    const raw = makeRawTopicPage({ modules: null, seo: null });
 
     expect(() => topicPageQuery.parse(raw)).not.toThrow();
   });
 
-  it('parses a topic page with a postList slot, modules, and SEO', () => {
+  it('parses a topic page with a list module alongside other modules, and SEO', () => {
     const raw = makeRawTopicPage({
-      modules: [{ _id: 'cta-1', _type: 'module_cta' }],
+      modules: [
+        { _id: 'post-list-1', _type: 'module_postList' },
+        { _id: 'cta-1', _type: 'module_cta' },
+      ],
       seo: { metaTitle: 'Engineering', metaDescription: null, openGraph: null },
     });
 
@@ -26,6 +30,14 @@ describe('topicPageQuery', () => {
   it('parses a topic page with its hero slot set', () => {
     const raw = makeRawTopicPage({
       hero: { _id: 'hero-1', _type: 'module_hero' },
+    });
+
+    expect(() => topicPageQuery.parse(raw)).not.toThrow();
+  });
+
+  it('parses a topic page with an authored headingBlock', () => {
+    const raw = makeRawTopicPage({
+      headingBlock: makeRawOptionalHeadingBlock({ heading: 'Engineering' }),
     });
 
     expect(() => topicPageQuery.parse(raw)).not.toThrow();
