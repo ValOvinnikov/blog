@@ -1046,7 +1046,7 @@ confirms status and labels, links it to a parent if given, and only then
 reports the issue number back — creation and placement happen as one
 verified operation instead of two steps where the second could be skipped.
 Before dispatching, gather every required field — **title** (conventional-
-commit style), **body** (context + acceptance criteria), **at least one
+commit style), **body** (the sectioned template below), **at least one
 label including exactly one `prio:*` label** (the taxonomy and defaults in
 "Ticket priority & triage" below — `board-keeper` rejects a creation
 dispatch without one), and a **parent issue number** if this is a sub-issue
@@ -1056,6 +1056,64 @@ this gathering only happens here, before dispatch, never inside it. In the
 same pass, check the ticket against the `cloud-ok` criteria (same section)
 and include that label when it qualifies — cloud-eligibility is assessed
 at creation, not discovered later.
+
+### Issue body template
+
+**An issue body is a work item in fixed sections, not a design document.** A
+ticket says why the work exists, what "done" means, and where the design lives
+— the design itself belongs in a `docs/superpowers/specs/*` doc while the work
+is in flight, and in `SPEC.md` once it ships.
+
+A sub-issue, in this order and no other sections:
+
+```
+## Why
+<1–3 sentences: what is wrong or missing today>
+
+## Scope
+- <layer>: <what changes>
+
+## Acceptance criteria
+- [ ] <observable outcome, not an implementation step>
+
+## Verify
+pnpm type-check && pnpm lint && pnpm test && pnpm knip
+
+## Design
+<link to the spec doc, or "none — the criteria above are the whole design">
+```
+
+An epic swaps `Acceptance criteria` and `Verify` for the shape of the work,
+since its sub-issues carry those:
+
+```
+## Why
+## Shape        — the rule the epic establishes, ≤5 bullets
+## Order        — what blocks what, and what can run in parallel
+## Done when    — the SPEC.md sections the final PR must update
+## Design       — link to the spec doc
+```
+
+`## Order` is the same information the epic status table renders as its 🟡 and
+🔵 lanes; writing it into the epic once is what lets that table be regenerated
+rather than re-derived.
+
+**Never put these in an issue body:**
+
+- **A roll-up of sibling issues** — "Shipped: #2944, #2945, …", "Closed as
+  superseded: #2970–#2973". GitHub renders the sub-issue list natively with
+  live state; a hand-written copy is stale the day the next one merges.
+- **The design narrative** — field-order tables, migration transcripts,
+  per-component walkthroughs, the reasoning behind a shape. That is the spec
+  doc's job, and `SPEC.md`'s afterwards.
+- **Progress edits.** A body is written once. Status lives on the board, in the
+  sub-issue list, and in the PRs; editing the body to record what has landed
+  turns the ticket into a changelog.
+
+The `cloud-ok` criteria still apply and are not in tension with this: a
+`cloud-ok` ticket keeps its exact file list and verification commands, because
+those are `## Scope` and `## Verify`. What it drops is the design narrative,
+which a cloud session does not need in order to execute the criteria.
 
 **A feature spanning 2+ layers always gets an epic (parent) issue plus one
 sub-issue per layer — never a single flat issue covering multiple layers.**
