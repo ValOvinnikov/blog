@@ -7,11 +7,12 @@ type TPostSourceDocument = { postSource?: string };
 
 /**
  * Mirrors `PUBLISHED_POST_FILTER` (`packages/service/src/shared/filters/published-post.ts`)
- * so this warning tracks exactly what the runtime hero/spotlight query
- * considers a candidate. `@blog/studio` cannot import `@blog/service`, so
- * the condition is duplicated here — keep the two in sync by hand.
+ * so Studio-side validation queries track exactly what the runtime
+ * hero/spotlight query considers a candidate. `@blog/studio` cannot import
+ * `@blog/service`, so the condition is duplicated here — keep the two in
+ * sync by hand.
  */
-const PUBLISHED_POST_CONDITION =
+export const PUBLISHED_POST_CONDITION =
   'publishedAt <= now() && defined(sectionHeader.heading) && defined(author) && defined(topic) && defined(content)';
 
 /**
