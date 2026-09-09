@@ -88,16 +88,5 @@ export const blogPageSchema = defineType({
       description:
         'Override Blog page meta title, description, and social sharing image.',
     }),
-    defineField({
-      name: 'postList',
-      title: 'Post List',
-      type: 'reference',
-      description: 'The paginated post archive rendered on this page.',
-      to: [{ type: postListSchema.name }],
-      readOnly: true,
-      deprecated: {
-        reason: 'Replaced by a module_postList entry in modules[].',
-      },
-    }),
   ],
 });
