@@ -18,14 +18,11 @@ export function toHomePage(
   settings: TSiteSettings,
   tenant: TImageTenant,
 ): THomePage {
-  const header = raw.sectionHeader
-    ? toSectionHeader(raw.sectionHeader)
-    : { heading: undefined, supportingText: undefined };
-
   return {
     title: raw.title,
-    heading: header.heading,
-    supportingText: header.supportingText,
+    sectionHeader: raw.sectionHeader
+      ? toSectionHeader(raw.sectionHeader)
+      : { heading: undefined, supportingText: undefined },
     hero: raw.hero ? toHeroSlot(raw.hero) : undefined,
     modules: (raw.modules ?? []).map(toModule),
     seo: resolveSeo(

@@ -49,8 +49,8 @@ describe('getHomePage', () => {
     if (!page) throw new Error('expected a home page');
 
     expect(page.hero).toEqual({ id: 'hero-1', type: 'module_hero' });
-    expect(page.heading).toBeUndefined();
-    expect(page.supportingText).toBeUndefined();
+    expect(page.sectionHeader.heading).toBeUndefined();
+    expect(page.sectionHeader.supportingText).toBeUndefined();
   });
 
   it('maps a sectionHeader heading with no hero to an undefined hero', async () => {
@@ -67,8 +67,8 @@ describe('getHomePage', () => {
     if (!page) throw new Error('expected a home page');
 
     expect(page.hero).toBeUndefined();
-    expect(page.heading).toBe('Welcome');
-    expect(page.supportingText).toBeUndefined();
+    expect(page.sectionHeader.heading).toBe('Welcome');
+    expect(page.sectionHeader.supportingText).toBeUndefined();
   });
 
   it('maps both a hero and a sectionHeader heading when both are authored', async () => {
@@ -84,8 +84,8 @@ describe('getHomePage', () => {
     if (!page) throw new Error('expected a home page');
 
     expect(page.hero).toEqual({ id: 'hero-1', type: 'module_hero' });
-    expect(page.heading).toBe('Welcome');
-    expect(page.supportingText).toBe('A subtitle');
+    expect(page.sectionHeader.heading).toBe('Welcome');
+    expect(page.sectionHeader.supportingText).toBe('A subtitle');
   });
 
   it('rejects when page_home.hero resolves to a non-hero module type', async () => {
