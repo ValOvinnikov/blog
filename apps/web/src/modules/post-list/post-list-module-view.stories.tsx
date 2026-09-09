@@ -1,10 +1,8 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
-import { objectKeys } from '@blog/utils';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
 
 import { PostListModuleView } from './post-list-module-view';
-import { postListModuleViewVariants } from './post-list-module-view-variants';
 
 const items = [
   makePostListItem({
@@ -36,7 +34,7 @@ const meta = {
     },
     contentAlignment: {
       control: 'select',
-      options: objectKeys(postListModuleViewVariants.variants.align),
+      options: Object.values(CONTENT_ALIGNMENT),
     },
   },
   args: {

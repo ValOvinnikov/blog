@@ -1,8 +1,8 @@
 import type { TTaxonomyListModule } from '@blog/service';
-import { Heading } from '@blog/ui/atoms/heading';
 import type { THeadingLevel } from '@blog/ui/lib/react';
 import { TaxonomyCard } from '@blog/ui/molecules/taxonomy-card';
 import { PostGrid } from '@blog/ui/organisms/post-grid';
+import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';
 
@@ -53,11 +53,8 @@ export const TaxonomyListModuleView = ({
   emptyMessage,
   contentAlignment,
 }: ITaxonomyListModuleViewProps) => {
-  const { heading, supportingText } = sectionHeader;
-  const hasHeading = Boolean(heading?.trim());
-  const resolvedTitle = hasHeading ? heading : accessibleTitle;
   const isEmpty = items.length === 0;
-  const s = taxonomyListModuleViewVariants({ align: contentAlignment });
+  const s = taxonomyListModuleViewVariants();
 
   return (
     <Section
@@ -66,14 +63,14 @@ export const TaxonomyListModuleView = ({
       titleId={titleId}
       dataTestId={dataTestId}
     >
-      <Heading
-        level={headingLevel}
+      <ModuleHeading
+        heading={sectionHeader.heading}
+        supportingText={sectionHeader.supportingText}
+        accessibleTitle={accessibleTitle}
         id={titleId}
-        className={hasHeading ? s.label() : s.labelFallback()}
-      >
-        {resolvedTitle}
-      </Heading>
-      {supportingText && <p className={s.supportingText()}>{supportingText}</p>}
+        level={headingLevel}
+        align={contentAlignment}
+      />
       {isEmpty ? (
         <p className={s.emptyMessage()}>{emptyMessage}</p>
       ) : (

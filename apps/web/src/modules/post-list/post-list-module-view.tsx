@@ -1,7 +1,7 @@
 import type { TPostListModule } from '@blog/service';
-import { Heading } from '@blog/ui/atoms/heading';
 import { Pagination } from '@blog/ui/organisms/pagination';
 import { PostGrid } from '@blog/ui/organisms/post-grid';
+import { ModuleHeading } from '@web/components/shared/module-heading';
 import {
   type IPostCardData,
   PostCardItem,
@@ -51,11 +51,8 @@ export const PostListModuleView = ({
   contentAlignment,
   hasImages,
 }: IPostListModuleViewProps) => {
-  const { heading, supportingText } = sectionHeader;
-  const hasHeading = Boolean(heading?.trim());
-  const resolvedTitle = hasHeading ? heading : accessibleTitle;
   const isEmpty = items.length === 0;
-  const s = postListModuleViewVariants({ align: contentAlignment });
+  const s = postListModuleViewVariants();
 
   return (
     <Section
@@ -64,14 +61,14 @@ export const PostListModuleView = ({
       titleId={titleId}
       dataTestId={dataTestId}
     >
-      <Heading
-        level={2}
+      <ModuleHeading
+        heading={sectionHeader.heading}
+        supportingText={sectionHeader.supportingText}
+        accessibleTitle={accessibleTitle}
         id={titleId}
-        className={hasHeading ? s.label() : s.labelFallback()}
-      >
-        {resolvedTitle}
-      </Heading>
-      {supportingText && <p className={s.supportingText()}>{supportingText}</p>}
+        level={2}
+        align={contentAlignment}
+      />
       {isEmpty ? (
         <p className={s.emptyMessage()}>{emptyMessage}</p>
       ) : (

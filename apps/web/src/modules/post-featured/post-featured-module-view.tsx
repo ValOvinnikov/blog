@@ -1,6 +1,6 @@
 import type { TPostFeaturedModule } from '@blog/service';
-import { Heading } from '@blog/ui/atoms/heading';
 import { PostGrid } from '@blog/ui/organisms/post-grid';
+import { ModuleHeading } from '@web/components/shared/module-heading';
 import {
   type IPostCardData,
   PostCardItem,
@@ -38,10 +38,7 @@ export const PostFeaturedModuleView = ({
   contentAlignment,
   hasImages,
 }: IPostFeaturedModuleViewProps) => {
-  const { heading, supportingText } = sectionHeader;
-  const hasHeading = Boolean(heading?.trim());
-  const resolvedTitle = hasHeading ? heading : accessibleTitle;
-  const s = postFeaturedModuleViewVariants({ align: contentAlignment });
+  const s = postFeaturedModuleViewVariants();
 
   const [leadPost, ...tailPosts] = items;
   const [soloTailPost] = tailPosts;
@@ -53,14 +50,14 @@ export const PostFeaturedModuleView = ({
       titleId={titleId}
       dataTestId={dataTestId}
     >
-      <Heading
-        level={2}
+      <ModuleHeading
+        heading={sectionHeader.heading}
+        supportingText={sectionHeader.supportingText}
+        accessibleTitle={accessibleTitle}
         id={titleId}
-        className={hasHeading ? s.label() : s.labelFallback()}
-      >
-        {resolvedTitle}
-      </Heading>
-      {supportingText && <p className={s.supportingText()}>{supportingText}</p>}
+        level={2}
+        align={contentAlignment}
+      />
       {leadPost && (
         <div className={s.leadGroup()}>
           <PostCardItem
