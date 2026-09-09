@@ -54,9 +54,8 @@ export const rewriteRefsDeep = <T>(
 };
 
 /**
- * `page_post.post` keeps pointing at the `blog_post` it was seeded from
- * until #2960 retires that field — the one field the dataset-wide rewrite
- * below must not touch.
+ * `page_post.post` points at the `blog_post` it was seeded from — the one
+ * field the dataset-wide rewrite below must not touch.
  */
 const EXCLUDED_REF_PATHS: Record<string, (string | number)[][]> = {
   [PAGE_POST_TYPE]: [['post']],
