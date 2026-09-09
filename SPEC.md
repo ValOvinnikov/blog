@@ -328,30 +328,36 @@ post became modules in that array: related reading is `module_postRelated`
 `FULL`/`COMPACT`, coalesced to `FULL` at the query since the schema field is
 optional) selecting which form of the signup it renders.
 
-**A post with no heading is not published.** `PUBLISHED_POST_FILTER` requires
-`defined(sectionHeader.heading)` alongside `publishedAt <= now()`, so a
-`page_post` lacking one never appears in a listing and resolves as not-found
-on its own URL — the same treatment an unpublished post gets. That is what
-lets the view models keep `title` as a plain `string`: every consumer of it
-(RSS `<title>`, the `BlogPosting` `headline`, breadcrumb labels, card
-headings, the bookmarks list) structurally needs a string, and the only way
-to satisfy them from an absent heading would be to invent one. Excluding the
-document is the honest alternative to a placeholder, and it is an exclusion
-rather than a fallback: nothing is substituted, and the document's own
-`title` is never borrowed for the purpose.
+**A view model's nullability mirrors the schema's validation.** Where a
+`page_post` field is `required()` in the Studio, `@blog/service` projects it
+with `.notNull()` and types it as a plain value; where the schema leaves a
+field optional, the view model carries `T | undefined`. The two are kept in
+step deliberately, so the type a consumer sees is the same promise the
+editing experience makes. `sectionHeader.heading`, `publishedAt`, `author`,
+`topic` and `content` are required on both sides; `excerpt`
+(`sectionHeader.supportingText`), `heroImage`, `tags`, `featured`, `skim`
+and `seo` are optional on both.
 
-**Several other fields are optional in the view models even though the
-schema marks them required.** `excerpt`, `author`, `topic` and the post body
-surface as `T | undefined` on `TPostCard`/`TPostDetail` (and `excerpt`/
-`topic` on `TArchivePostCard`, `excerpt` on `TFeedPost`), because a
-`page_post` that predates the absorption genuinely lacks them until a
-migration backfills it. Unlike a heading, each of these has an honest
-degrade, so consumers omit the element rather than substituting a
-placeholder: no byline, no topic chip, no `<description>` in the feed, and
-no `author` key in the `BlogPosting` JSON-LD. The one place the assertion
-survives is the skim-generation query, a publish-webhook read where an
-absent body is a real precondition failure rather than something to render
-around.
+**An incomplete post is not published.** `PUBLISHED_POST_FILTER` is what
+makes the paragraph above safe. It requires
+`defined(sectionHeader.heading) && defined(author) && defined(topic) &&
+defined(content)` alongside `publishedAt <= now()`, so a `page_post` missing
+any of them never appears in a listing and resolves as not-found on its own
+URL — the same treatment an unpublished post gets. Without that gate a
+`.notNull()` projection would throw at parse time and take down an entire
+listing rather than dropping one card.
+
+This is an **exclusion, not a fallback**: nothing is substituted. Every
+consumer of these fields structurally needs a value — RSS `<title>`, the
+`BlogPosting` `headline` and `author`, breadcrumb labels, card headings, the
+topic chip, the bookmarks list — and the only way to satisfy them from an
+absent field would be to invent one. Excluding the document is the honest
+alternative to a placeholder, and the document's own `title` is never
+borrowed for the purpose.
+
+`excerpt` is the one post field that still degrades by omission rather than
+excluding the document, because `supportingText` is genuinely optional in
+the schema: the feed omits its `<description>` and the card omits its lead.
 
 `module_cta` additionally carries a required `variant` (`BANNER`/`SPLIT`/
 `CALLOUT`, from `CTA_VARIANT`, default `CALLOUT`), a required `bandTone`
