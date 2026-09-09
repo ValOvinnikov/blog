@@ -1,6 +1,7 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
@@ -72,10 +73,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'Blog',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -98,7 +96,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: { heading: 'Blog', supportingText: undefined },
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -121,7 +119,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: { heading: 'Blog', supportingText: undefined },
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -150,10 +148,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'Blog',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -173,10 +168,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: undefined,
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock(),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -202,10 +194,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'Blog',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -224,10 +213,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'Blog',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         posts: [
           {
             id: 'post-1',
@@ -263,10 +249,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'Blog',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -285,10 +268,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'Blog',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -308,10 +288,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'News',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock({ heading: 'News' }),
         posts: [
           {
             id: 'post-1',
@@ -345,10 +322,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: undefined,
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock(),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -372,10 +346,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'News',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock({ heading: 'News' }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -395,10 +366,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'News',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock({ heading: 'News' }),
         posts: [
           {
             id: 'post-1',
@@ -434,10 +402,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'News',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock({ heading: 'News' }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -461,10 +426,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'Blog',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         posts: [
           {
             id: 'post-1',
@@ -497,10 +459,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: {
-          heading: 'Blog',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         posts: [
           {
             id: 'post-1',

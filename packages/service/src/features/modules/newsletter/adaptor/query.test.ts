@@ -1,3 +1,5 @@
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
+
 import { newsletterModuleQuery } from './query';
 
 describe('newsletterModuleQuery', () => {
@@ -15,7 +17,7 @@ describe('newsletterModuleQuery', () => {
   it('parses an authored COMPACT variant', () => {
     const raw = {
       brandVariant: 'PRIMARY',
-      headingBlock: { heading: 'Stay in the loop', supportingText: null },
+      headingBlock: makeRawHeadingBlock('Stay in the loop'),
       variant: 'COMPACT',
       layout: null,
       contentAlignment: null,

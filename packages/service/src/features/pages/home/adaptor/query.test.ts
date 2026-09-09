@@ -1,4 +1,5 @@
 import { makeRawHomePage } from '@blog/service/testing/pages/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 
 import { homePageQuery } from './query';
 
@@ -28,7 +29,7 @@ describe('homePageQuery', () => {
   it('parses a home page with a headingBlock heading and no hero', () => {
     const raw = makeRawHomePage({
       hero: null,
-      headingBlock: { heading: 'Welcome', supportingText: null },
+      headingBlock: makeRawHeadingBlock('Welcome'),
     });
 
     expect(() => homePageQuery.parse(raw)).not.toThrow();
@@ -36,7 +37,9 @@ describe('homePageQuery', () => {
 
   it('parses a home page with both a hero and a headingBlock heading', () => {
     const raw = makeRawHomePage({
-      headingBlock: { heading: 'Welcome', supportingText: 'A subtitle' },
+      headingBlock: makeRawHeadingBlock('Welcome', {
+        supportingText: 'A subtitle',
+      }),
     });
 
     expect(() => homePageQuery.parse(raw)).not.toThrow();

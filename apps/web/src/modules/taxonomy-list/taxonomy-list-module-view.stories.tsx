@@ -5,6 +5,7 @@ import {
   tagsListItems,
   topicsListItems,
 } from '@web/testing/modules/taxonomy-list/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { TaxonomyListModuleView } from './taxonomy-list-module-view';
 
@@ -29,10 +30,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: {
-      heading: 'Browse by topic',
-      supportingText: undefined,
-    },
+    headingBlock: makeHeadingBlock({ heading: 'Browse by topic' }),
     items: topicsListItems,
     layout: undefined,
     contentAlignment: undefined,
@@ -51,7 +49,7 @@ export const Default: TStory = {};
 
 export const Topics: TStory = {
   args: {
-    headingBlock: { heading: 'Browse by topic', supportingText: undefined },
+    headingBlock: makeHeadingBlock({ heading: 'Browse by topic' }),
     items: topicsListItems,
     titleId: 'topic-list-title',
     dataTestId: 'taxonomy-list-module-topic-list-1',
@@ -62,7 +60,7 @@ export const Topics: TStory = {
 
 export const Tags: TStory = {
   args: {
-    headingBlock: { heading: 'Browse by tag', supportingText: undefined },
+    headingBlock: makeHeadingBlock({ heading: 'Browse by tag' }),
     items: tagsListItems,
     titleId: 'tag-list-title',
     dataTestId: 'taxonomy-list-module-tag-list-1',
@@ -73,10 +71,7 @@ export const Tags: TStory = {
 
 export const WithoutCmsHeading: TStory = {
   args: {
-    headingBlock: {
-      heading: undefined,
-      supportingText: undefined,
-    },
+    headingBlock: makeHeadingBlock(),
   },
 };
 

@@ -13,6 +13,7 @@ import {
   makeRawTopic,
 } from '@blog/service/testing/entities/fixtures';
 import {
+  makeRawHeadingBlock,
   makeRawImage,
   makeRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
@@ -37,10 +38,9 @@ export function makeRawPostCard(
 ): TRawPostCard {
   return {
     _id: 'post-1',
-    headingBlock: {
-      heading: 'Hello World',
+    headingBlock: makeRawHeadingBlock('Hello World', {
       supportingText: 'A sufficiently long excerpt for the card.',
-    },
+    }),
     slug: 'hello-world',
     publishedAt: '2026-01-15T00:00:00Z',
     heroImage: makeRawImage(),
@@ -70,10 +70,9 @@ export function makeRawArchivePostCard(
 ): TRawArchivePostCard {
   return {
     _id: 'post-1',
-    headingBlock: {
-      heading: 'Hello World',
+    headingBlock: makeRawHeadingBlock('Hello World', {
       supportingText: 'A sufficiently long excerpt for the card.',
-    },
+    }),
     slug: 'hello-world',
     publishedAt: '2026-01-15T00:00:00Z',
     topic: {
@@ -92,10 +91,9 @@ export function makeRawPostDetail(
 ): TRawPostDetail {
   return {
     _id: 'post-1',
-    headingBlock: {
-      heading: 'Hello World',
+    headingBlock: makeRawHeadingBlock('Hello World', {
       supportingText: 'A sufficiently long excerpt for the card.',
-    },
+    }),
     slug: 'hello-world',
     publishedAt: '2026-01-15T00:00:00Z',
     heroImage: makeRawImage(),
