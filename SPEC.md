@@ -318,8 +318,11 @@ optional) — the same shape the modules use. `@blog/service` maps
 consumer sees are unchanged and no `apps/web` component reads a document
 label.
 
-`page_post.modules[]` allows `module_postRelated`, `module_newsletter`,
-`module_cta` and `module_content`. Two concerns that were once fields on the
+`page_post.modules[]` allows `module_postRelated`, `module_newsletter` and
+`module_cta`. It deliberately does **not** allow `module_content`: a post
+already carries its own `content` rich text, and offering a Content module
+beside it would give an editor two places to put the article's prose with no
+rule about which one is the article. Two concerns that were once fields on the
 post became modules in that array: related reading is `module_postRelated`
 (its own `limit`, 1–6, default 3), and the newsletter's presence is the
 `module_newsletter` module being in the array at all rather than a
