@@ -5,8 +5,8 @@ describe('PUBLISHED_POST_FILTER', () => {
     expect(PUBLISHED_POST_FILTER).toContain('publishedAt <= now()');
   });
 
-  it('excludes a post with no sectionHeader.heading, whether sectionHeader is entirely absent or present without a heading', () => {
-    expect(PUBLISHED_POST_FILTER).toContain('defined(sectionHeader.heading)');
+  it('excludes a post with no headingBlock.heading, whether headingBlock is entirely absent or present without a heading', () => {
+    expect(PUBLISHED_POST_FILTER).toContain('defined(headingBlock.heading)');
   });
 
   it('excludes a post with no author', () => {

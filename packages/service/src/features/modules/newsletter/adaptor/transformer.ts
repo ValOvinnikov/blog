@@ -1,5 +1,5 @@
+import { toRequiredHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
-import { toRequiredSectionHeader } from '@blog/service/shared/transformers/to-section-header';
 import type { InferResultType } from 'groqd';
 
 import type { newsletterModuleQuery } from './query';
@@ -14,7 +14,7 @@ export function toNewsletterModule(
 ): TNewsletterModule {
   return {
     brandVariant: raw.brandVariant,
-    sectionHeader: toRequiredSectionHeader(raw.sectionHeader),
+    headingBlock: toRequiredHeadingBlock(raw.headingBlock),
     variant: raw.variant,
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,

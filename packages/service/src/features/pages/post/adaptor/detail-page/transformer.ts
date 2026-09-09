@@ -61,7 +61,7 @@ export function toPostDetail(
   tenant: TImageTenant,
 ): TPostDetail {
   const heroImageUrl = buildImageUrl(raw.heroImage, tenant);
-  const { title, excerpt } = toPostHeading(raw.sectionHeader);
+  const { title, excerpt } = toPostHeading(raw.headingBlock);
 
   return {
     id: raw._id,

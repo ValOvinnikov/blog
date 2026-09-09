@@ -23,7 +23,7 @@ export type TArchivePostCard = {
 };
 
 export function toArchivePostCard(raw: TRawArchivePostCard): TArchivePostCard {
-  const { title, excerpt } = toPostHeading(raw.sectionHeader);
+  const { title, excerpt } = toPostHeading(raw.headingBlock);
 
   return {
     id: raw._id,

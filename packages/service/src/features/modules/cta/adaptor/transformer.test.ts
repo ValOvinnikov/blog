@@ -19,12 +19,12 @@ import { makeTenant } from '@blog/service/testing/tenant';
 import { toCtaModule } from './transformer';
 
 describe('toCtaModule', () => {
-  it('maps sectionHeader and brandVariant', () => {
+  it('maps headingBlock and brandVariant', () => {
     const raw = makeRawCtaModule();
 
     const cta = toCtaModule(raw, makeTenant());
 
-    expect(cta.sectionHeader).toEqual({
+    expect(cta.headingBlock).toEqual({
       heading: 'Subscribe to the newsletter',
       supportingText: 'Get new posts in your inbox.',
     });
@@ -149,7 +149,7 @@ describe('toCtaModule', () => {
 
   it('leaves supportingText undefined when not set (no faked default)', () => {
     const raw = makeRawCtaModule({
-      sectionHeader: {
+      headingBlock: {
         heading: 'Subscribe to the newsletter',
         supportingText: null,
       },
@@ -157,7 +157,7 @@ describe('toCtaModule', () => {
 
     const cta = toCtaModule(raw, makeTenant());
 
-    expect(cta.sectionHeader.supportingText).toBeUndefined();
+    expect(cta.headingBlock.supportingText).toBeUndefined();
   });
 
   it('leaves eyebrow and footnote undefined when unset', () => {

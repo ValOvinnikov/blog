@@ -1,8 +1,8 @@
 import type { TMaybeUndefined } from '@blog/config';
 import {
-  toRequiredSectionHeader,
-  type TRawRequiredSectionHeader,
-} from '@blog/service/shared/transformers/to-section-header';
+  toRequiredHeadingBlock,
+  type TRawRequiredHeadingBlock,
+} from '@blog/service/shared/transformers/to-heading-block';
 
 export type TPostHeading = {
   title: string;
@@ -10,10 +10,10 @@ export type TPostHeading = {
 };
 
 /**
- * Maps a `page_post`'s `sectionHeader` into its `title`/`excerpt` view-model
+ * Maps a `page_post`'s `headingBlock` into its `title`/`excerpt` view-model
  * fields.
  */
-export function toPostHeading(raw: TRawRequiredSectionHeader): TPostHeading {
-  const header = toRequiredSectionHeader(raw);
+export function toPostHeading(raw: TRawRequiredHeadingBlock): TPostHeading {
+  const header = toRequiredHeadingBlock(raw);
   return { title: header.heading, excerpt: header.supportingText };
 }

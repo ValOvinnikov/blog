@@ -17,7 +17,7 @@ describe('getPostLatest', () => {
     mockRun
       .mockResolvedValueOnce(
         makeRawPostLatestModule({
-          sectionHeader: {
+          headingBlock: {
             heading: 'Recent writing',
             supportingText: null,
           },
@@ -30,7 +30,7 @@ describe('getPostLatest', () => {
 
     // The module's `limit` is threaded into the GROQ posts query's slice bound.
     expect(mockRun.mock.calls[1]?.[0]?.query).toContain('[0...3]');
-    expect(postLatest.sectionHeader.heading).toBe('Recent writing');
+    expect(postLatest.headingBlock.heading).toBe('Recent writing');
     expect(postLatest.posts.map((p) => p.id)).toEqual(['a']);
   });
 

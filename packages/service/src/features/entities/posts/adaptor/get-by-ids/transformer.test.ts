@@ -10,11 +10,11 @@ describe(toPostsByIds, () => {
     const raw = [
       makeRawPostCard({
         _id: 'a',
-        sectionHeader: { heading: 'First', supportingText: null },
+        headingBlock: { heading: 'First', supportingText: null },
       }),
       makeRawPostCard({
         _id: 'b',
-        sectionHeader: { heading: 'Second', supportingText: null },
+        headingBlock: { heading: 'Second', supportingText: null },
       }),
     ];
 

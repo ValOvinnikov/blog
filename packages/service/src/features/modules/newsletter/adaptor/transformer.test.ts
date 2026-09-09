@@ -9,12 +9,12 @@ import { makeRawNewsletterModule } from '@blog/service/testing/modules/fixtures'
 import { toNewsletterModule } from './transformer';
 
 describe('toNewsletterModule', () => {
-  it('maps sectionHeader straight through', () => {
+  it('maps headingBlock straight through', () => {
     const raw = makeRawNewsletterModule();
 
     const module = toNewsletterModule(raw);
 
-    expect(module.sectionHeader).toEqual({
+    expect(module.headingBlock).toEqual({
       heading: 'Stay in the loop',
       supportingText: 'Get new posts in your inbox.',
     });
@@ -42,7 +42,7 @@ describe('toNewsletterModule', () => {
 
   it('leaves supportingText undefined when not set (no faked default)', () => {
     const raw = makeRawNewsletterModule({
-      sectionHeader: {
+      headingBlock: {
         heading: 'Stay in the loop',
         supportingText: null,
       },
@@ -50,7 +50,7 @@ describe('toNewsletterModule', () => {
 
     const module = toNewsletterModule(raw);
 
-    expect(module.sectionHeader.supportingText).toBeUndefined();
+    expect(module.headingBlock.supportingText).toBeUndefined();
   });
 
   it('leaves contentAlignment undefined when unset (no faked default)', () => {

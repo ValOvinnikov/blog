@@ -8,7 +8,7 @@ import type {
 
 export type TNewsletterModule = {
   brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
-  sectionHeader: {
+  headingBlock: {
     heading: string;
     supportingText: TMaybeUndefined<string>;
   };

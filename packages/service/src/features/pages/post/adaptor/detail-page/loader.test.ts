@@ -35,7 +35,7 @@ describe('getPost', () => {
       .mockResolvedValueOnce(
         makeRawPostDetail({
           _id: 'post-abc',
-          sectionHeader: { heading: 'Test Post', supportingText: null },
+          headingBlock: { heading: 'Test Post', supportingText: null },
         }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
@@ -201,7 +201,7 @@ describe('getPost', () => {
       .mockResolvedValueOnce(
         makeRawPostDetail({
           seo: null,
-          sectionHeader: {
+          headingBlock: {
             heading: 'Fallback Post',
             supportingText: 'Fallback excerpt',
           },
@@ -462,7 +462,7 @@ describe('getPost', () => {
     mockRun
       .mockResolvedValueOnce(
         makeRawPostDetail({
-          sectionHeader: { heading: 'Hello World', supportingText: null },
+          headingBlock: { heading: 'Hello World', supportingText: null },
           body: [],
         }),
       )

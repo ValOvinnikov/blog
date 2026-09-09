@@ -13,7 +13,7 @@ export type TFeedPost = {
 };
 
 function toFeedPost(raw: TRawFeedPost): TFeedPost {
-  const { title, excerpt } = toPostHeading(raw.sectionHeader);
+  const { title, excerpt } = toPostHeading(raw.headingBlock);
 
   return {
     title,

@@ -17,7 +17,7 @@ export type TCtaModule = {
   brandVariant: TFullBrandVariant;
   bandTone: TFullBrandVariant;
   eyebrow: TMaybeUndefined<string>;
-  sectionHeader: {
+  headingBlock: {
     heading: string;
     supportingText: TMaybeUndefined<string>;
   };

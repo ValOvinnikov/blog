@@ -1,11 +1,11 @@
 import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
 import type { TImageTenant } from '@blog/service/sanity/image';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
+import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import {
   toHeroSlot,
   toModule,
 } from '@blog/service/shared/transformers/to-module';
-import { toSectionHeader } from '@blog/service/shared/transformers/to-section-header';
 import type { InferResultType } from 'groqd';
 
 import type { homePageQuery } from './query';
@@ -20,7 +20,7 @@ export function toHomePage(
 ): THomePage {
   return {
     title: raw.title,
-    sectionHeader: toSectionHeader(raw.sectionHeader),
+    headingBlock: toHeadingBlock(raw.headingBlock),
     hero: raw.hero ? toHeroSlot(raw.hero) : undefined,
     modules: (raw.modules ?? []).map(toModule),
     seo: resolveSeo(

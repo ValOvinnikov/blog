@@ -15,7 +15,7 @@ describe('newsletterModuleQuery', () => {
   it('parses an authored COMPACT variant', () => {
     const raw = {
       brandVariant: 'PRIMARY',
-      sectionHeader: { heading: 'Stay in the loop', supportingText: null },
+      headingBlock: { heading: 'Stay in the loop', supportingText: null },
       variant: 'COMPACT',
       layout: null,
       contentAlignment: null,

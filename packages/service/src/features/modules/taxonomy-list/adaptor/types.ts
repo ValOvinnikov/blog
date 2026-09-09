@@ -3,7 +3,7 @@ import type {
   TContentAlignment,
   TLayout,
   TMaybeUndefined,
-  TSectionHeader,
+  THeadingBlock,
   TTaxonomyKind,
 } from '@blog/config';
 import type { TTagWithPostCount } from '@blog/service/features/entities/tags/adaptor/types';
@@ -18,7 +18,7 @@ export type TTaxonomyEntry = TTopicWithPostCount | TTagWithPostCount;
 
 export type TTaxonomyListModule = {
   brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
-  sectionHeader: TSectionHeader;
+  headingBlock: THeadingBlock;
   layout: TMaybeUndefined<TLayout>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
   taxonomy: TTaxonomyKind;

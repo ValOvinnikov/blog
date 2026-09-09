@@ -1,10 +1,10 @@
 import type { TImageTenant } from '@blog/service/sanity/image';
+import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import {
   toPostCard,
   type TPostCard,
 } from '@blog/service/shared/transformers/to-post-card';
-import { toSectionHeader } from '@blog/service/shared/transformers/to-section-header';
 import type { InferResultType } from 'groqd';
 
 import type { relatedByTagsQuery, relatedByTopicQuery } from './posts.query';
@@ -65,7 +65,7 @@ export function toPostRelatedModule(
 ): TPostRelatedModule {
   return {
     brandVariant: raw.brandVariant,
-    sectionHeader: toSectionHeader(raw.sectionHeader),
+    headingBlock: toHeadingBlock(raw.headingBlock),
     posts,
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,

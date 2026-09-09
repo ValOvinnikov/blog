@@ -17,7 +17,7 @@ describe('getPostList', () => {
     mockRun
       .mockResolvedValueOnce(
         makeRawPostListModule({
-          sectionHeader: {
+          headingBlock: {
             heading: 'Recent writing',
             supportingText: null,
           },
@@ -33,7 +33,7 @@ describe('getPostList', () => {
 
     // The module's `pageSize` is threaded into the GROQ posts query's slice bound.
     expect(mockRun.mock.calls[1]?.[0]?.query).toContain('[0...3]');
-    expect(postList.sectionHeader.heading).toBe('Recent writing');
+    expect(postList.headingBlock.heading).toBe('Recent writing');
     expect(postList.posts.map((p) => p.id)).toEqual(['a']);
   });
 

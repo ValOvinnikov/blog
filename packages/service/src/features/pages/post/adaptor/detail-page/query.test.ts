@@ -94,16 +94,16 @@ describe('postPageQuery', () => {
 
   it('parses a post whose only optional heading field, supportingText, is absent', () => {
     const raw = makeRawPostDetail({
-      sectionHeader: { heading: 'Hello World', supportingText: null },
+      headingBlock: { heading: 'Hello World', supportingText: null },
     });
 
     const parsed = postPageQuery.parse(raw);
 
-    expect(parsed?.sectionHeader?.supportingText).toBeNull();
+    expect(parsed?.headingBlock?.supportingText).toBeNull();
   });
 
-  it('throws when a post has no sectionHeader, relying on PUBLISHED_POST_FILTER to keep such a document out of this query', () => {
-    const raw = { ...makeRawPostDetail(), sectionHeader: null };
+  it('throws when a post has no headingBlock, relying on PUBLISHED_POST_FILTER to keep such a document out of this query', () => {
+    const raw = { ...makeRawPostDetail(), headingBlock: null };
 
     expect(() => postPageQuery.parse(raw)).toThrow();
   });

@@ -19,24 +19,24 @@ describe('homePageQuery', () => {
     expect(homePageQuery.parse(null)).toBeNull();
   });
 
-  it('parses a home page with a hero and no sectionHeader', () => {
-    const raw = makeRawHomePage({ sectionHeader: null });
+  it('parses a home page with a hero and no headingBlock', () => {
+    const raw = makeRawHomePage({ headingBlock: null });
 
     expect(() => homePageQuery.parse(raw)).not.toThrow();
   });
 
-  it('parses a home page with a sectionHeader heading and no hero', () => {
+  it('parses a home page with a headingBlock heading and no hero', () => {
     const raw = makeRawHomePage({
       hero: null,
-      sectionHeader: { heading: 'Welcome', supportingText: null },
+      headingBlock: { heading: 'Welcome', supportingText: null },
     });
 
     expect(() => homePageQuery.parse(raw)).not.toThrow();
   });
 
-  it('parses a home page with both a hero and a sectionHeader heading', () => {
+  it('parses a home page with both a hero and a headingBlock heading', () => {
     const raw = makeRawHomePage({
-      sectionHeader: { heading: 'Welcome', supportingText: 'A subtitle' },
+      headingBlock: { heading: 'Welcome', supportingText: 'A subtitle' },
     });
 
     expect(() => homePageQuery.parse(raw)).not.toThrow();

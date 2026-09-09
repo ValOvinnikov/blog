@@ -1,6 +1,6 @@
 import { q } from '@blog/service/sanity/query';
+import { requiredHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module';
-import { requiredSectionHeaderFragment } from '@blog/service/shared/fragments/section-header';
 
 import { authorCardFragment, authorDetailFragment } from './author';
 import { imageWithAltFragment, sanityImageFragment } from './image';
@@ -20,9 +20,9 @@ export const postCardFragment = q
   .fragmentForType<'page_post'>()
   .project((sub) => ({
     _id: true,
-    sectionHeader: sub
-      .field('sectionHeader')
-      .project(requiredSectionHeaderFragment)
+    headingBlock: sub
+      .field('headingBlock')
+      .project(requiredHeadingBlockFragment)
       .notNull(),
     slug: sub.field('slug.current').notNull(),
     publishedAt: sub.field('publishedAt').notNull(),
@@ -44,9 +44,9 @@ export const postDetailFragment = q
   .fragmentForType<'page_post'>()
   .project((sub) => ({
     _id: true,
-    sectionHeader: sub
-      .field('sectionHeader')
-      .project(requiredSectionHeaderFragment)
+    headingBlock: sub
+      .field('headingBlock')
+      .project(requiredHeadingBlockFragment)
       .notNull(),
     slug: sub.field('slug.current').notNull(),
     publishedAt: sub.field('publishedAt').notNull(),
