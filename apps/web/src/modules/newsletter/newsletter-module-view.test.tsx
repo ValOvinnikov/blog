@@ -5,12 +5,9 @@ import {
 } from '@blog/config';
 import { NewsletterForm } from '@web/components/shared/newsletter-form';
 import { customRender, screen } from '@web/testing/custom-render';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { makeRequiredHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
-import {
-  NewsletterModuleView,
-  type INewsletterModuleViewProps,
-} from './newsletter-module-view';
+import { NewsletterModuleView } from './newsletter-module-view';
 
 vi.mock('@web/server/newsletter/newsletter-actions', () => ({
   subscribeToNewsletterAction: vi.fn(),
@@ -33,10 +30,10 @@ vi.mock('@web/components/shared/newsletter-form', async (importOriginal) => {
 const setup = customRender(NewsletterModuleView, {
   id: 'newsletter-1',
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({
+  headingBlock: makeRequiredHeadingBlock({
     heading: 'Get new posts',
     supportingText: 'Straight to inbox.',
-  }) as INewsletterModuleViewProps['headingBlock'],
+  }),
   variant: NEWSLETTER_VARIANT.FULL,
   layout: undefined,
   contentAlignment: undefined,
