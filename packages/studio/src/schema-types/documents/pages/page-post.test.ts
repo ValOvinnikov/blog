@@ -1,5 +1,4 @@
 import { pagePostSchema } from '@blog/studio/schema-types/documents/pages/page-post';
-import { contentSchema } from '@blog/studio/schema-types/modules/module-content';
 import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
 import { postRelatedSchema } from '@blog/studio/schema-types/modules/module-post-related';
@@ -248,7 +247,7 @@ describe('pagePostSchema modules field', () => {
       | { type: 'array'; of?: Array<{ to?: Array<{ type: string }> }> }
       | undefined;
 
-  it('allows postRelated, newsletter, cta and content modules', () => {
+  it('allows postRelated, newsletter and cta modules, and no content module', () => {
     const modulesField = getModulesField();
 
     if (!modulesField || modulesField.type !== 'array') {
@@ -261,7 +260,28 @@ describe('pagePostSchema modules field', () => {
       postRelatedSchema.name,
       newsletterSchema.name,
       ctaSchema.name,
-      contentSchema.name,
+    ]);
+  });
+});
+
+describe('pagePostSchema field order', () => {
+  it('lists fields in authoring order', () => {
+    const fieldNames = pagePostSchema.fields?.map((field) => field.name);
+
+    expect(fieldNames).toEqual([
+      'title',
+      'slug',
+      'sectionHeader',
+      'heroImage',
+      'content',
+      'featured',
+      'author',
+      'topic',
+      'tags',
+      'modules',
+      'publishedAt',
+      'skim',
+      'seo',
     ]);
   });
 });
