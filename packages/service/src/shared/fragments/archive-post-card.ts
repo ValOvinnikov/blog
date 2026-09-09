@@ -5,12 +5,9 @@ import { topicFragment } from './topic';
 import { WORD_COUNT_EXPRESSION, wordCountParser } from './word-count';
 
 /**
- * Archive-listing cards render text-only — unlike
- * `postCardFragment`, which the post-detail "related posts" feature still
- * needs in full, this fragment skips `heroImage`/`featured`/`author`
- * entirely rather than fetching fields no archive card renders. `wordCount`
- * is computed server-side (see `word-count.ts`) rather than fetching `body`,
- * for the same reason.
+ * Archive-listing cards render text-only, so this fragment omits
+ * `heroImage`/`featured`/`author`. `wordCount` is computed server-side (see
+ * `word-count.ts`) rather than fetched from `body`.
  */
 export const archivePostCardFragment = q
   .fragmentForType<'page_post'>()

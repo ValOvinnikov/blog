@@ -39,17 +39,10 @@ export const relatedPostAnchorQuery = q
   .nullable(true);
 
 /**
- * Candidate pool of published posts sharing at least one tag with the
- * anchor post. groqd's typed `.order()` only accepts a literal projected
- * field path, not a raw `count(...)` expression, so the exact
- * shared-tag-count ranking (desc, `publishedAt` tiebreak) can't be expressed
- * in the query itself — this fetches the `RELATED_POSTS_TAG_CANDIDATE_LIMIT`
- * most recent qualifying candidates plus each candidate's own tag ids, and
- * `toRelatedPosts` computes the exact rank in JS over that bounded set.
- * `RELATED_POSTS_TAG_CANDIDATE_LIMIT` is a deliberate cap: large enough that
- * a genuinely closer (higher shared-tag-count) match published slightly
- * earlier than the cutoff is vanishingly unlikely to be missed, but bounded
- * so a popular tag can't grow this fetch unboundedly.
+ * Candidate pool of published posts sharing at least one tag with the anchor
+ * post. groqd's typed `.order()` only accepts a literal projected field, not
+ * a raw `count(...)` expression, so the exact shared-tag-count ranking runs
+ * in JS (`toRelatedPosts`) over this candidate set instead.
  */
 export const relatedByTagsQuery = q
   .parameters<TRelatedByTagsParams>()
