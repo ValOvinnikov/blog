@@ -774,36 +774,70 @@ lacks:**
   delete this label?" buried under a report either gets missed or derails the
   thread. Hold it, or ask it on its own.
 
-### After a PR merges on an epic
+### Reporting epic status
 
-**A merge on a tracked epic gets one report, in this shape, and nothing else:**
+**One format answers both triggers** — a PR on a tracked epic merging, and the
+user asking where an epic stands ("epic status", "where are we on #2943?",
+"what's left"). Same table either way; the only difference is the opening
+sentence, which names the merge when there was one and is dropped when there
+wasn't.
 
-1. **One line on what merged** — what it delivered, not which layers it
-   touched, not that the checks were green, not that the board was updated.
-2. **What's next, in dependency order** — a ticket that blocks another comes
-   before it, so the list can be read top-down as the order to work in.
-3. **Which of those can start in parallel right now** — stated explicitly.
-   This is the one part of the report the user cannot derive from the issue
-   list, so it is the part that most earns its line.
+**The report is exactly:** that sentence, then **one table** carrying every
+open ticket in the epic, grouped into three lanes by a band row. Nothing else
+— no board recap, no verification statistics, no retelling of the
+`board-keeper` report.
+
+Before answering a status question, dispatch `board-keeper` first (per "Board
+reconciliation" below, which already calls for this) so the table is built from
+a reconciled board rather than a stale one.
 
 ```
-🟢 **Done** — #2975: the home page can now open with a heading instead of a hero.
+#2975 merged — the home page can now open with a heading instead of a hero.
 
-🔵 **Next, in order**
-- #2987 fold the section-header transformer (blocks #2988)
-- #2988 rename headingBlock
-
-🟡 **Parallel now** — #2976, #2977, #2960: independent, no shared files.
+| #                    | What                                | Scope                  | Note                         |
+| -------------------- | ----------------------------------- | ---------------------- | ---------------------------- |
+| 🟢 **Done**          |                                     |                        |                              |
+| 2975                 | home page — headingSettings         | web                    | merged in #3001              |
+| 🟡 **Parallel now**  |                                     |                        |                              |
+| 2976                 | landing page                        | web                    | `landing-page-view`          |
+| 2977                 | blog list page                      | web                    | `blog-list-page`             |
+| 2960                 | retire `blog_post`                  | studio                 | + seed migration             |
+| 🔵 **Next, in order**|                                     |                        |                              |
+| 2969                 | retire `BlogPageTemplate` props     | web                    | ⛓ stack on 2977              |
+| 2988                 | rename `sectionHeader`              | studio + service + web | sequential — reds type-check |
 ```
 
-**The three markers are fixed, and they are the colour.** Terminal markdown has
-no colour primitive and raw ANSI escapes are not reliably rendered, so the
-emoji is what makes done / next / parallel scannable apart at a glance:
-`🟢` done, `🔵` next in order, `🟡` startable in parallel. Use these three,
-always in this order, and don't substitute other emoji — the point is that the
-same mark means the same thing every time. This is the one place in these
-instructions where decorative-looking markup is deliberate; everywhere else,
-prose stays plain.
+**Mark a 🔵 row `⛓ stack on <#>` when it can ride a `gh stack` on the row above
+it; leave it unmarked when it cannot.** The 🔵 lane is where stacking gets
+decided, because it is by definition the lane of tickets that depend on another
+— but dependency alone does not make a chain stackable. The test is the one in
+"Stacked PRs" below: the **bottom** PR targets `main` and must be green there
+on its own, so a chain whose first link cannot compile alone is sequential, and
+marking it `⛓` sends the whole stack into a permanent `BLOCKED` state.
+
+That is why 2988 above is unmarked — a repo-wide rename reds `type-check` until
+every consumer lands, so it is one PR that waits, not a stack bottom. A `⛓`
+claim is a compile claim; hold it to the same "derive it, don't guess" standard
+as a `blocks` claim.
+
+**Lane order is fixed: 🟢 done, 🟡 parallel now, 🔵 next in order.** Parallel
+sits above next-in-order because it is the actionable lane — what can be
+dispatched this minute — while 🔵 is the queue behind it. Within 🔵, a blocker
+comes above what it blocks, so the lane reads top-down as the order to work in.
+
+**The `Scope` column is not decoration.** It is what makes the 🟡 lane
+checkable rather than asserted: six tickets all scoped `web` are parallel-safe
+only because they are separate files in the same layer, and seeing that stated
+is what prompts the check. A 🟡 lane whose rows share a scope _and_ a file is a
+bug in the report.
+
+**The three markers are the colour.** Terminal markdown has no colour
+primitive, raw ANSI escapes are not rendered, and neither is raw HTML — so
+`<td colspan>` is not available and a band row is a normal row with its label
+in the first cell and the rest empty. That is the closest achievable to a
+merged cell; don't reach for HTML to improve it, it renders as literal tags.
+Never substitute other emoji — the same mark must mean the same thing every
+time.
 
 **Why solid discs and not pictographs.** The obvious picks — `✅` done, `🔜`
 next, `⚡` parallel — fail on a dark terminal: `🔜` in particular is a dark
@@ -818,9 +852,10 @@ other — not from issue-number order or a guess. If two tickets' relationship
 is genuinely unclear, say they are unordered rather than inventing a sequence;
 a wrong "blocks" sends a parallel dispatch into a collision.
 
-This replaces the prose retelling, not the progress table the user asks for
-after each unit of work — where that table is in play, the dependency order
-and the parallel set are what its lanes are sorted and grouped by.
+**This table _is_ the progress table** the user asks for after each unit of
+work, in its epic-merge form — not a second artefact alongside it. Regenerate
+it live from `gh` every time; a pasted snapshot from an earlier turn is exactly
+the staleness the table exists to prevent.
 
 ### Asking the user a question
 
@@ -960,9 +995,10 @@ destructive (e.g. reopening a wrongly-closed issue) comes back in its report
 for you to act on.
 
 When the merged PR belongs to an epic, what the user gets back once that
-dispatch returns is the post-merge report in "Reporting to the user" above —
-one line on what merged, what's next in dependency order, and what can start
-in parallel — not a retelling of the board-keeper report.
+dispatch returns is the lane-banded table in "Reporting epic status" above —
+never a retelling of the board-keeper report. The same applies to the
+status-question dispatch mentioned above: reconcile first, then answer with
+that table.
 
 **Never call `gh issue create` directly — creating an issue always goes
 through `board-keeper`.** Dispatch it with `"create issue: title=..., body=...,
