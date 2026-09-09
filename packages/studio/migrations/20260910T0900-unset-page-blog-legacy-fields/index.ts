@@ -46,7 +46,7 @@ const hasPostListModule = (doc: TLegacyBlogPageDoc): boolean =>
   (doc.modules ?? []).some((item) => item._type === MODULE_POST_LIST_TYPE);
 
 const hasHeadingBlockHeading = (doc: TLegacyBlogPageDoc): boolean =>
-  doc.headingBlock?.heading !== undefined && doc.headingBlock.heading !== null;
+  (doc.headingBlock?.heading ?? '').trim().length > 0;
 
 export const isPageBlogTargetShapeReady = (doc: TLegacyBlogPageDoc): boolean =>
   hasPostListModule(doc) && hasHeadingBlockHeading(doc);

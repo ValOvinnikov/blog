@@ -35,6 +35,36 @@ describe(isPageBlogTargetShapeReady, () => {
       }),
     ).toBe(false);
   });
+
+  it('is not ready when headingBlock.heading is an empty string', () => {
+    expect(
+      isPageBlogTargetShapeReady({
+        _id: 'page-blog',
+        modules: migratedModules,
+        headingBlock: { heading: '' },
+      }),
+    ).toBe(false);
+  });
+
+  it('is not ready when headingBlock.heading is whitespace only', () => {
+    expect(
+      isPageBlogTargetShapeReady({
+        _id: 'page-blog',
+        modules: migratedModules,
+        headingBlock: { heading: '   ' },
+      }),
+    ).toBe(false);
+  });
+
+  it('is ready when headingBlock.heading has real content surrounded by whitespace', () => {
+    expect(
+      isPageBlogTargetShapeReady({
+        _id: 'page-blog',
+        modules: migratedModules,
+        headingBlock: { heading: '  Blog  ' },
+      }),
+    ).toBe(true);
+  });
 });
 
 describe(unsetLegacyBlogPageFields, () => {
@@ -128,5 +158,48 @@ describe(unsetLegacyBlogPageFields, () => {
     });
 
     expect(result).toBeUndefined();
+  });
+
+  it('skips a document whose headingBlock.heading is an empty string', () => {
+    const result = unsetLegacyBlogPageFields({
+      _id: 'page-blog',
+      heading: 'Blog',
+      supportingText: 'Fresh posts',
+      postList: { _ref: 'postList-1' },
+      modules: migratedModules,
+      headingBlock: { heading: '' },
+    });
+
+    expect(result).toBeUndefined();
+  });
+
+  it('skips a document whose headingBlock.heading is whitespace only', () => {
+    const result = unsetLegacyBlogPageFields({
+      _id: 'page-blog',
+      heading: 'Blog',
+      supportingText: 'Fresh posts',
+      postList: { _ref: 'postList-1' },
+      modules: migratedModules,
+      headingBlock: { heading: '   ' },
+    });
+
+    expect(result).toBeUndefined();
+  });
+
+  it('unsets when headingBlock.heading has real content surrounded by whitespace', () => {
+    const result = unsetLegacyBlogPageFields({
+      _id: 'page-blog',
+      heading: 'Blog',
+      supportingText: 'Fresh posts',
+      postList: { _ref: 'postList-1' },
+      modules: migratedModules,
+      headingBlock: { heading: '  Blog  ' },
+    });
+
+    expect(result).toEqual([
+      at('heading', unset()),
+      at('supportingText', unset()),
+      at('postList', unset()),
+    ]);
   });
 });
