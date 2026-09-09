@@ -21,7 +21,6 @@ export function toLandingPage(
   tenant: TImageTenant,
 ): TLandingPage {
   return {
-    documentTitle: raw.title,
     slug: raw.slug,
     headingBlock: toHeadingBlock(raw.headingBlock),
     hero: raw.hero ? toHeroSlot(raw.hero) : undefined,

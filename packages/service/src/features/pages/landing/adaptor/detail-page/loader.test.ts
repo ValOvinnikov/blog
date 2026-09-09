@@ -27,7 +27,6 @@ describe('getPage', () => {
     const page = await getPage('about', tenant);
     if (!page) throw new Error('expected a landing page');
 
-    expect(page.documentTitle).toBe('About');
     expect(page.slug).toBe('about');
     expect(page.modules).toEqual([
       { id: 'content-1', type: 'module_content' },
