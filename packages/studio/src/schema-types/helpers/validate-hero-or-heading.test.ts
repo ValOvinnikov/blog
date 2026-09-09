@@ -23,8 +23,8 @@ const createMockRule = (
 const asDocument = (doc: Record<string, unknown>): SanityDocument =>
   doc as unknown as SanityDocument;
 
-const buildRules = (options?: Parameters<typeof validateHeroOrHeading>[0]) =>
-  validateHeroOrHeading(options)(
+const buildRules = () =>
+  validateHeroOrHeading()(
     createMockRule() as unknown as DocumentRule,
   ) as unknown as TMockRule[];
 
@@ -67,23 +67,6 @@ describe(validateHeroOrHeading, () => {
     });
 
     expect(requiredRule?.fn?.(document)).toBe(true);
-    expect(notBothRule?.fn?.(document)).toBe('The hero hides the heading');
-  });
-
-  it('counts an entity title as a heading via hasEntityTitle', () => {
-    const [requiredRule, notBothRule] = buildRules({
-      hasEntityTitle: () => true,
-    });
-    const document = asDocument({});
-
-    expect(requiredRule?.fn?.(document)).toBe(true);
-    expect(notBothRule?.fn?.(document)).toBe(true);
-  });
-
-  it('warns when hero and an entity title are both present', () => {
-    const [, notBothRule] = buildRules({ hasEntityTitle: () => true });
-    const document = asDocument({ hero: { _ref: 'hero-1' } });
-
     expect(notBothRule?.fn?.(document)).toBe('The hero hides the heading');
   });
 });

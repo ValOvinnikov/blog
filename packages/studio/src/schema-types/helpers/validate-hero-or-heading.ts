@@ -5,8 +5,6 @@ type THeroOrHeadingDocument = {
   sectionHeader?: { heading?: string };
 };
 
-type THasEntityTitle = (document: SanityDocument | undefined) => boolean;
-
 const asHeroOrHeadingDocument = (
   document: SanityDocument | undefined,
 ): THeroOrHeadingDocument | undefined =>
@@ -15,38 +13,28 @@ const asHeroOrHeadingDocument = (
 const hasHero = (document: SanityDocument | undefined): boolean =>
   Boolean(asHeroOrHeadingDocument(document)?.hero?._ref);
 
-const hasHeading = (
+const hasHeading = (document: SanityDocument | undefined): boolean =>
+  Boolean(asHeroOrHeadingDocument(document)?.sectionHeader?.heading);
+
+const validateRequired = (
   document: SanityDocument | undefined,
-  hasEntityTitle: THasEntityTitle,
-): boolean =>
-  Boolean(asHeroOrHeadingDocument(document)?.sectionHeader?.heading) ||
-  hasEntityTitle(document);
+): string | true =>
+  hasHero(document) || hasHeading(document) ? true : 'Add a hero or a heading';
 
-const validateRequired =
-  (hasEntityTitle: THasEntityTitle) =>
-  (document: SanityDocument | undefined): string | true =>
-    hasHero(document) || hasHeading(document, hasEntityTitle)
-      ? true
-      : 'Add a hero or a heading';
-
-const validateNotBoth =
-  (hasEntityTitle: THasEntityTitle) =>
-  (document: SanityDocument | undefined): string | true =>
-    hasHero(document) && hasHeading(document, hasEntityTitle)
-      ? 'The hero hides the heading'
-      : true;
+const validateNotBoth = (
+  document: SanityDocument | undefined,
+): string | true =>
+  hasHero(document) && hasHeading(document)
+    ? 'The hero hides the heading'
+    : true;
 
 /**
  * Document-level rule requiring at least one of `hero` or
  * `sectionHeader.heading`, and warning (not erroring) when both are set.
  */
 export const validateHeroOrHeading =
-  (options: { hasEntityTitle?: THasEntityTitle } = {}) =>
-  (rule: DocumentRule): DocumentRule[] => {
-    const hasEntityTitle = options.hasEntityTitle ?? (() => false);
-
-    return [
-      rule.custom(validateRequired(hasEntityTitle)),
-      rule.custom(validateNotBoth(hasEntityTitle)).warning(),
-    ];
-  };
+  () =>
+  (rule: DocumentRule): DocumentRule[] => [
+    rule.custom(validateRequired),
+    rule.custom(validateNotBoth).warning(),
+  ];
