@@ -1,4 +1,3 @@
-import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
 import { at, patch, set, type Mutation, type NodePatch } from 'sanity/migrate';
 
 type TPathSegment = string | number | { _key: string };
@@ -53,24 +52,6 @@ export const rewriteRefsDeep = <T>(
   return value;
 };
 
-/**
- * `page_post.post` points at the `blog_post` it was seeded from — the one
- * field the dataset-wide rewrite below must not touch.
- */
-const EXCLUDED_REF_PATHS: Record<string, (string | number)[][]> = {
-  [PAGE_POST_TYPE]: [['post']],
-};
-
-const isExcludedPath = (
-  excluded: (string | number)[][],
-  path: TPathSegment[],
-): boolean =>
-  excluded.some(
-    (candidate) =>
-      candidate.length === path.length &&
-      candidate.every((segment, index) => segment === path[index]),
-  );
-
 type TRawDocument = { _id: string; _type: string; [key: string]: unknown };
 
 /**
@@ -83,7 +64,6 @@ export const collectRefRewritePatches = (
   doc: TRawDocument,
   idMap: ReadonlyMap<string, string>,
 ): Mutation | undefined => {
-  const excludedPaths = EXCLUDED_REF_PATHS[doc._type] ?? [];
   const patches: NodePatch[] = [];
 
   const walk = (value: unknown, path: TPathSegment[]): void => {
@@ -96,7 +76,7 @@ export const collectRefRewritePatches = (
 
     if (!value || typeof value !== 'object') return;
 
-    if (isReferenceNode(value) && !isExcludedPath(excludedPaths, path)) {
+    if (isReferenceNode(value)) {
       const mapped = idMap.get(value._ref);
 
       if (mapped) {

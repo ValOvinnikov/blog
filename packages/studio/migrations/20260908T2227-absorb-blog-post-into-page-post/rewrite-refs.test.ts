@@ -134,23 +134,11 @@ describe('collectRefRewritePatches', () => {
     );
   });
 
-  it('never rewrites page_post.post — that field intentionally keeps its blog_post reference', () => {
-    const idMap = new Map([['post-1', 'page_post-post-1']]);
-    const doc = {
-      _id: 'page_post-post-1',
-      _type: 'page_post',
-      post: { _type: 'reference', _ref: 'post-1' },
-    };
-
-    expect(collectRefRewritePatches(doc, idMap)).toBeUndefined();
-  });
-
   it('still rewrites other reference fields on a page_post document', () => {
     const idMap = new Map([['post-1', 'page_post-post-1']]);
     const doc = {
       _id: 'page_post-post-2',
       _type: 'page_post',
-      post: { _type: 'reference', _ref: 'post-2' },
       author: { _type: 'reference', _ref: 'post-1' },
     };
 

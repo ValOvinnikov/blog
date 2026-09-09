@@ -224,20 +224,6 @@ describe('absorb-blog-post-into-page-post migration — reference rewriting', ()
     ]);
   });
 
-  it('never rewrites page_post.post — that field intentionally keeps its blog_post reference', async () => {
-    const { context } = createMockContext({ blogPostIds: ['post-1'] });
-    const pagePostDoc = {
-      ...baseDoc,
-      _id: 'page_post-post-1',
-      _type: 'page_post',
-      post: { _type: 'reference', _ref: 'post-1' },
-    };
-
-    const mutations = await migration.migrate.document(pagePostDoc, context);
-
-    expect(mutations).toEqual([]);
-  });
-
   it('produces no mutations for a document with no matching references', async () => {
     const { context } = createMockContext({ blogPostIds: ['post-1'] });
     const otherDoc = {
