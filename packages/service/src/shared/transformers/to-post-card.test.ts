@@ -91,10 +91,7 @@ describe('toPostCard', () => {
   it('maps a sparse post-card with no excerpt to undefined', () => {
     const result = toPostCard(
       makeRawPostCard({
-        headingBlock: makeRawHeadingBlock({
-          heading: 'Hello World',
-          supportingText: null,
-        }),
+        headingBlock: makeRawHeadingBlock('Hello World'),
       }),
       tenant,
     );

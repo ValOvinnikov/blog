@@ -95,10 +95,7 @@ describe('postPageQuery', () => {
 
   it('parses a post whose only optional heading field, supportingText, is absent', () => {
     const raw = makeRawPostDetail({
-      headingBlock: makeRawHeadingBlock({
-        heading: 'Hello World',
-        supportingText: null,
-      }),
+      headingBlock: makeRawHeadingBlock('Hello World'),
     });
 
     const parsed = postPageQuery.parse(raw);

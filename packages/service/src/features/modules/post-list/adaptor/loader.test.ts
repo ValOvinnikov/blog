@@ -18,10 +18,7 @@ describe('getPostList', () => {
     mockRun
       .mockResolvedValueOnce(
         makeRawPostListModule({
-          headingBlock: makeRawHeadingBlock({
-            heading: 'Recent writing',
-            supportingText: null,
-          }),
+          headingBlock: makeRawHeadingBlock('Recent writing'),
           pageSize: 3,
         }),
       )

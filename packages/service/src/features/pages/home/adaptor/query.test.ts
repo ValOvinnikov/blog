@@ -29,10 +29,7 @@ describe('homePageQuery', () => {
   it('parses a home page with a headingBlock heading and no hero', () => {
     const raw = makeRawHomePage({
       hero: null,
-      headingBlock: makeRawHeadingBlock({
-        heading: 'Welcome',
-        supportingText: null,
-      }),
+      headingBlock: makeRawHeadingBlock('Welcome'),
     });
 
     expect(() => homePageQuery.parse(raw)).not.toThrow();
@@ -40,8 +37,7 @@ describe('homePageQuery', () => {
 
   it('parses a home page with both a hero and a headingBlock heading', () => {
     const raw = makeRawHomePage({
-      headingBlock: makeRawHeadingBlock({
-        heading: 'Welcome',
+      headingBlock: makeRawHeadingBlock('Welcome', {
         supportingText: 'A subtitle',
       }),
     });

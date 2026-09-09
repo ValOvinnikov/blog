@@ -43,10 +43,7 @@ describe('toNewsletterModule', () => {
 
   it('leaves supportingText undefined when not set (no faked default)', () => {
     const raw = makeRawNewsletterModule({
-      headingBlock: makeRawHeadingBlock({
-        heading: 'Stay in the loop',
-        supportingText: null,
-      }),
+      headingBlock: makeRawHeadingBlock('Stay in the loop'),
     });
 
     const module = toNewsletterModule(raw);

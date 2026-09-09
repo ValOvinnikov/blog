@@ -49,10 +49,7 @@ describe(toArchivePostCard, () => {
   it('maps a sparse archive card with no excerpt to undefined', () => {
     const result = toArchivePostCard(
       makeRawArchivePostCard({
-        headingBlock: makeRawHeadingBlock({
-          heading: 'Hello World',
-          supportingText: null,
-        }),
+        headingBlock: makeRawHeadingBlock('Hello World'),
       }),
     );
 

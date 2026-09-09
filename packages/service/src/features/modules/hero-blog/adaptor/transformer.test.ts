@@ -36,10 +36,7 @@ describe(toHeroBlogModule, () => {
     const raw = makeRawHeroBlogModule({
       post: makeRawPostCard({
         _id: 'pinned-post',
-        headingBlock: makeRawHeadingBlock({
-          heading: 'Pinned title',
-          supportingText: null,
-        }),
+        headingBlock: makeRawHeadingBlock('Pinned title'),
       }),
     });
 
@@ -53,10 +50,7 @@ describe(toHeroBlogModule, () => {
     const raw = makeRawHeroBlogModule({
       post: makeRawPostCard({
         _id: 'newest-featured-post',
-        headingBlock: makeRawHeadingBlock({
-          heading: 'Newest featured title',
-          supportingText: null,
-        }),
+        headingBlock: makeRawHeadingBlock('Newest featured title'),
       }),
     });
 

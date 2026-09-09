@@ -152,10 +152,7 @@ describe('toCtaModule', () => {
 
   it('leaves supportingText undefined when not set (no faked default)', () => {
     const raw = makeRawCtaModule({
-      headingBlock: makeRawHeadingBlock({
-        heading: 'Subscribe to the newsletter',
-        supportingText: null,
-      }),
+      headingBlock: makeRawHeadingBlock('Subscribe to the newsletter'),
     });
 
     const cta = toCtaModule(raw, makeTenant());

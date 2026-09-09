@@ -59,10 +59,7 @@ describe('getHomePage', () => {
       .mockResolvedValueOnce(
         makeRawHomePage({
           hero: null,
-          headingBlock: makeRawHeadingBlock({
-            heading: 'Welcome',
-            supportingText: null,
-          }),
+          headingBlock: makeRawHeadingBlock('Welcome'),
         }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
@@ -79,8 +76,7 @@ describe('getHomePage', () => {
     mockRun
       .mockResolvedValueOnce(
         makeRawHomePage({
-          headingBlock: makeRawHeadingBlock({
-            heading: 'Welcome',
+          headingBlock: makeRawHeadingBlock('Welcome', {
             supportingText: 'A subtitle',
           }),
         }),

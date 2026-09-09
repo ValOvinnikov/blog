@@ -18,10 +18,7 @@ describe('getPostLatest', () => {
     mockRun
       .mockResolvedValueOnce(
         makeRawPostLatestModule({
-          headingBlock: makeRawHeadingBlock({
-            heading: 'Recent writing',
-            supportingText: null,
-          }),
+          headingBlock: makeRawHeadingBlock('Recent writing'),
           limit: 3,
         }),
       )

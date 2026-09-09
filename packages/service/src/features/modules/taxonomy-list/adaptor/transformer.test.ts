@@ -27,8 +27,7 @@ describe('toTaxonomyListModule', () => {
 
   it('maps headingBlock when authored', () => {
     const raw = makeRawTaxonomyListModule({
-      headingBlock: makeRawHeadingBlock({
-        heading: 'Browse by topic',
+      headingBlock: makeRawHeadingBlock('Browse by topic', {
         supportingText: 'Pick a subject.',
       }),
     });

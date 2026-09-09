@@ -16,15 +16,13 @@ describe(getPublishedPostsByTag, () => {
   it('fetches every published post tagged with the given tag id', async () => {
     mockRun.mockResolvedValue([
       makeRawFeedPost({
-        headingBlock: makeRawHeadingBlock({
-          heading: 'First',
+        headingBlock: makeRawHeadingBlock('First', {
           supportingText: 'A sufficiently long excerpt for the card.',
         }),
         slug: 'first',
       }),
       makeRawFeedPost({
-        headingBlock: makeRawHeadingBlock({
-          heading: 'Second',
+        headingBlock: makeRawHeadingBlock('Second', {
           supportingText: 'A sufficiently long excerpt for the card.',
         }),
         slug: 'second',
