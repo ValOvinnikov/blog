@@ -17,6 +17,7 @@ import { createNewsletterModuleService } from './features/modules/newsletter';
 import { createPostFeaturedModuleService } from './features/modules/post-featured';
 import { createPostLatestModuleService } from './features/modules/post-latest';
 import { createPostListModuleService } from './features/modules/post-list';
+import { createPostRelatedModuleService } from './features/modules/post-related';
 import { createTaxonomyListModuleService } from './features/modules/taxonomy-list';
 import { createBlogService } from './features/pages/blog';
 import { createHomeService } from './features/pages/home';
@@ -47,6 +48,7 @@ export const service = {
     postList: createPostListModuleService(),
     postLatest: createPostLatestModuleService(),
     postFeatured: createPostFeaturedModuleService(),
+    postRelated: createPostRelatedModuleService(),
     content: createContentModuleService(),
     cta: createCtaModuleService(),
     newsletter: createNewsletterModuleService(),
@@ -86,6 +88,7 @@ export type { TNewsletterModule } from './features/modules/newsletter';
 export type { TPostFeaturedModule } from './features/modules/post-featured';
 export type { TPostLatestModule } from './features/modules/post-latest';
 export type { TPostListModule } from './features/modules/post-list';
+export type { TPostRelatedModule } from './features/modules/post-related';
 export type {
   TTaxonomyEntry,
   TTaxonomyListModule,

@@ -53,6 +53,7 @@ describe(getHeroBlog, () => {
             't:tenant-a:author',
             't:tenant-a:topic',
             't:tenant-a:post',
+            't:tenant-a:page_post',
             't:tenant-a:page_landing',
             't:tenant-a:page_blog',
           ],

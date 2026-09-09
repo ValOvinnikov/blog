@@ -2,6 +2,7 @@ import {
   BRAND_VARIANT,
   CONTAINER_WIDTH,
   CONTENT_ALIGNMENT,
+  NEWSLETTER_VARIANT,
 } from '@blog/config';
 import { makeRawNewsletterModule } from '@blog/service/testing/modules/fixtures';
 
@@ -27,6 +28,16 @@ describe('toNewsletterModule', () => {
     const module = toNewsletterModule(raw);
 
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
+  });
+
+  it('maps variant straight through', () => {
+    const raw = makeRawNewsletterModule({
+      variant: NEWSLETTER_VARIANT.COMPACT,
+    });
+
+    const module = toNewsletterModule(raw);
+
+    expect(module.variant).toBe(NEWSLETTER_VARIANT.COMPACT);
   });
 
   it('leaves supportingText undefined when not set (no faked default)', () => {

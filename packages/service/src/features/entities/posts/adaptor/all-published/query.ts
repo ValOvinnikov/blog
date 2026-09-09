@@ -8,7 +8,7 @@ import { feedPostFragment } from '@blog/service/shared/fragments/feed-post';
  * walking the paginated archive windows.
  */
 export const allPublishedPostsQuery = q.star
-  .filterByType('blog_post')
+  .filterByType('page_post')
   .filterRaw(PUBLISHED_POST_FILTER)
   .order('publishedAt desc')
   .project(feedPostFragment);

@@ -22,6 +22,7 @@ export async function getCta(
         'modules:cta',
         `module:${id}`,
         'post',
+        'page_post',
         'topic',
         'page_landing',
         'page_blog',

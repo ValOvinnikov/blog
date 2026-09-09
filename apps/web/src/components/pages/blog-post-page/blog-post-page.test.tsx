@@ -14,10 +14,10 @@ vi.mock('@web/server/post/get-post-page', () => ({
 // RSC async-component nesting isn't renderable through
 // `@testing-library/react`'s client renderer (`blog-list-page.test.tsx`
 // follows the same pattern). Each is stubbed as a plain sync component
-// rendering its own testid plus the `slug`/`tenant` it received, so this
-// suite can assert `BlogPostPage` composes them in the right order with the
-// right props, without needing a real async render; each part's own
-// behavior is covered by its own test file.
+// rendering its own testid plus the props it received, so this suite can
+// assert `BlogPostPage` composes them in the right order with the right
+// props, without needing a real async render; each part's own behavior is
+// covered by its own test file.
 vi.mock('@web/components/features/post/blog-posting-schema', () => ({
   BlogPostingSchema: ({ slug, tenant }: { slug: string; tenant: string }) => (
     <div data-testid="blog-posting-schema">
@@ -46,24 +46,27 @@ vi.mock('@web/components/shared/skim-panel', () => ({
   SkimPanel: () => <div data-testid="skim-panel" />,
 }));
 
-vi.mock('@web/components/features/post/post-related', () => ({
-  PostRelated: ({ slug, tenant }: { slug: string; tenant: string }) => (
-    <div data-testid="post-related">
-      {slug}:{tenant}
-    </div>
-  ),
-}));
-
-vi.mock('@web/components/features/post/post-newsletter', () => ({
-  PostNewsletter: ({ slug, tenant }: { slug: string; tenant: string }) => (
-    <div data-testid="post-newsletter">
-      {slug}:{tenant}
+vi.mock('@web/modules/module-renderer', () => ({
+  ModuleRenderer: ({
+    modules,
+    locale,
+    tenant,
+    context,
+  }: {
+    modules?: { id: string; type: string }[];
+    locale: string;
+    tenant: string;
+    context?: { post?: { id: string } };
+  }) => (
+    <div data-testid="module-renderer">
+      {modules?.length ?? 0}:{locale}:{tenant}:{context?.post?.id}
     </div>
   ),
 }));
 
 const setup = customRenderAsync(BlogPostPage, {
   slug: 'hello-world',
+  locale: 'en',
   tenant: 'tenant-1',
 });
 
@@ -93,7 +96,7 @@ describe(BlogPostPage, () => {
     errorSpy.mockRestore();
   });
 
-  it('renders the parts in order: schema, breadcrumbs, article, skim panel, related reading, newsletter', async () => {
+  it('renders the parts in order: schema, breadcrumbs, article, skim panel, modules', async () => {
     getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 
     const { container } = await setup();
@@ -107,12 +110,11 @@ describe(BlogPostPage, () => {
       'post-breadcrumbs',
       'post-article',
       'skim-panel',
-      'post-related',
-      'post-newsletter',
+      'module-renderer',
     ]);
   });
 
-  it('forwards the slug and tenant to every part', async () => {
+  it('forwards the slug and tenant to every self-fetching part', async () => {
     getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 
     await setup();
@@ -126,11 +128,22 @@ describe(BlogPostPage, () => {
     expect(screen.getByTestId('post-article')).toHaveTextContent(
       'hello-world:tenant-1',
     );
-    expect(screen.getByTestId('post-related')).toHaveTextContent(
-      'hello-world:tenant-1',
-    );
-    expect(screen.getByTestId('post-newsletter')).toHaveTextContent(
-      'hello-world:tenant-1',
+  });
+
+  it("passes the post's modules, locale, tenant, and post context to ModuleRenderer", async () => {
+    getPostPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...mockPostDetail,
+        id: 'post-1',
+        modules: [{ type: 'module_postRelated', id: 'related-1' }],
+      },
+    });
+
+    await setup();
+
+    expect(screen.getByTestId('module-renderer')).toHaveTextContent(
+      '1:en:tenant-1:post-1',
     );
   });
 

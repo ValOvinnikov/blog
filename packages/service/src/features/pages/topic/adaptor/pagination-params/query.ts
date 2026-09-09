@@ -1,7 +1,7 @@
 import { q } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
 
-// `^.topic._ref` (GROQ's parent-scope operator) correlates each `blog_post`
+// `^.topic._ref` (GROQ's parent-scope operator) correlates each `page_post`
 // back to the enclosing `page_topic` document's own topic reference within
 // this per-item projection — one round-trip for every topic page's slug,
 // post count, and archive page size, no per-slug fan-out. Matching by
@@ -22,7 +22,7 @@ export const topicPaginationParamsQuery = q.star
     postCount: sub
       .count(
         sub.star
-          .filterByType('blog_post')
+          .filterByType('page_post')
           .filterRaw('references(^.topic._ref)')
           .filterRaw(PUBLISHED_POST_FILTER),
       )

@@ -1,4 +1,8 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  NEWSLETTER_VARIANT,
+} from '@blog/config';
 import { NewsletterForm } from '@web/components/shared/newsletter-form';
 import { customRender, screen } from '@web/testing/custom-render';
 
@@ -29,6 +33,7 @@ const setup = customRender(NewsletterModuleView, {
     heading: 'Get new posts',
     supportingText: 'Straight to inbox.',
   },
+  variant: NEWSLETTER_VARIANT.FULL,
   layout: undefined,
   contentAlignment: undefined,
   trustCues: ['No spam', 'Unsubscribe anytime'],
@@ -67,6 +72,24 @@ describe(NewsletterModuleView, () => {
 
     const inner = wrapper.firstElementChild;
     expect(inner?.children).toHaveLength(1);
+  });
+
+  it('renders NewsletterForm with variant="full" for a FULL module', () => {
+    setup();
+
+    expect(vi.mocked(NewsletterForm)).toHaveBeenLastCalledWith(
+      expect.objectContaining({ variant: 'full' }),
+      undefined,
+    );
+  });
+
+  it('renders NewsletterForm with variant="compact" for a COMPACT module', () => {
+    setup({ variant: NEWSLETTER_VARIANT.COMPACT });
+
+    expect(vi.mocked(NewsletterForm)).toHaveBeenLastCalledWith(
+      expect.objectContaining({ variant: 'compact' }),
+      undefined,
+    );
   });
 
   it('passes contentAlignment through to NewsletterForm as align', () => {

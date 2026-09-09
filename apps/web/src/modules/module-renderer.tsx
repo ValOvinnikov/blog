@@ -2,12 +2,13 @@ import type { TModule } from '@blog/service';
 import { logger } from '@web/utils/logger/logger';
 import { Fragment, type ReactNode } from 'react';
 
-import { MODULE_MAP } from './module-map';
+import { MODULE_MAP, type TModuleComponentProps } from './module-map';
 
 export interface IModuleRendererProps {
   modules: TModule[];
   locale: string;
   tenant: string;
+  context?: TModuleComponentProps['context'];
 }
 
 /**
@@ -25,6 +26,7 @@ export const ModuleRenderer = async ({
   modules,
   locale,
   tenant,
+  context,
 }: IModuleRendererProps): Promise<ReactNode> => {
   const rendered = await Promise.all(
     modules.map(async (module) => {
@@ -39,7 +41,7 @@ export const ModuleRenderer = async ({
 
       return {
         key: module.id,
-        node: await Component({ id: module.id, locale, tenant }),
+        node: await Component({ id: module.id, locale, tenant, context }),
       };
     }),
   );

@@ -6,12 +6,15 @@ import { CtaModule } from './cta/cta-module';
 import { NewsletterModule } from './newsletter/newsletter-module';
 import { PostFeaturedModule } from './post-featured/post-featured-module';
 import { PostLatestModule } from './post-latest/post-latest-module';
+import { PostRelatedModule } from './post-related/post-related-module';
 import { TaxonomyListModule } from './taxonomy-list/taxonomy-list-module';
 
 export type TModuleComponentProps = {
   id: string;
   locale: string;
   tenant: string;
+  /** The post the module renders alongside, when the module sits on a `page_post`'s `modules[]`. Absent everywhere else. */
+  context?: { post?: { id: string } };
 };
 
 /**
@@ -29,6 +32,7 @@ export const MODULE_MAP: Record<
 > = {
   module_postLatest: PostLatestModule,
   module_postFeatured: PostFeaturedModule,
+  module_postRelated: PostRelatedModule,
   module_content: ContentModule,
   module_cta: CtaModule,
   module_newsletter: NewsletterModule,

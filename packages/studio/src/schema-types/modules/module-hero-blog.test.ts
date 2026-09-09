@@ -4,6 +4,7 @@ import {
   POST_SOURCE,
   HERO_VARIANT,
 } from '@blog/config/constants';
+import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/module-hero-blog';
 import type { SanityDocument, ValidationContext } from 'sanity';
 
@@ -138,6 +139,12 @@ describe('heroBlogSchema postSource field', () => {
 });
 
 describe('heroBlogSchema post field', () => {
+  it('only accepts page_post references', () => {
+    const field = getField('post') as { to?: { type: string }[] };
+
+    expect(field.to).toEqual([{ type: PAGE_POST_TYPE }]);
+  });
+
   it('is hidden unless Post Source is Pinned', () => {
     const hidden = getHidden(getField('post'));
 
@@ -459,6 +466,27 @@ describe('heroBlogSchema document validation', () => {
         ),
       ).resolves.toBe(true);
       expect(called).toBe(false);
+    });
+
+    it('queries page_post for the newest featured, published post', async () => {
+      const [, , , validateImageFallback] = getDocumentValidators();
+      let receivedQuery = '';
+      const context = createMockContext((query) => {
+        receivedQuery = query;
+        return { publishedAt: null, heroImage: undefined };
+      });
+
+      await validateImageFallback!.fn(
+        {
+          postSource: POST_SOURCE.NEWEST_FEATURED,
+          imageSource: HERO_IMAGE_SOURCE.POST,
+        } as unknown as SanityDocument,
+        context,
+      );
+
+      expect(receivedQuery).toBe(
+        '*[_type == "page_post" && featured == true && publishedAt <= now() && defined(sectionHeader.heading) && defined(author) && defined(topic) && defined(content)] | order(publishedAt desc)[0]{ publishedAt, heroImage }',
+      );
     });
 
     it('warns when Image Source is Post and the resolved post has no image', async () => {

@@ -44,4 +44,14 @@ describe(toArchivePostCard, () => {
 
     expect(result.readingTimeMinutes).toBe(1);
   });
+
+  it('maps a sparse archive card with no excerpt to undefined', () => {
+    const result = toArchivePostCard(
+      makeRawArchivePostCard({
+        sectionHeader: { heading: 'Hello World', supportingText: null },
+      }),
+    );
+
+    expect(result.excerpt).toBeUndefined();
+  });
 });

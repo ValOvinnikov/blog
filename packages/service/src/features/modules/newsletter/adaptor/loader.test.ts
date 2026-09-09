@@ -21,6 +21,7 @@ describe('getNewsletter', () => {
     expect(newsletter.sectionHeader.supportingText).toBe(
       'Get new posts in your inbox.',
     );
+    expect(newsletter.variant).toBe('FULL');
   });
 
   it('propagates when the module document is missing', async () => {

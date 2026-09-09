@@ -11,7 +11,6 @@ export const mockPostDetail: TPostDetail = {
   heroImageAlt: 'A hero image',
   heroImageSanity: undefined,
   featured: false,
-  newsletterEnabled: true,
   body: [
     {
       _type: 'block',
@@ -22,6 +21,7 @@ export const mockPostDetail: TPostDetail = {
   ],
   skim: undefined,
   hasAsides: false,
+  modules: [{ id: 'related-1', type: 'module_postRelated' }],
   seo: {
     title: 'Hello World',
     description: 'A sufficiently long excerpt for the card.',
@@ -52,6 +52,5 @@ export const mockPostDetail: TPostDetail = {
     description: undefined,
   },
   tags: [],
-  relatedPosts: [],
   readingTimeMinutes: 4,
 };

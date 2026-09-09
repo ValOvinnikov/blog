@@ -1,7 +1,10 @@
+import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
+import { makeRawPostRelatedModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import {
+  toPostRelatedModule,
   toRelatedPosts,
   type TRawRelatedByTags,
   type TRawRelatedByTopic,
@@ -49,6 +52,7 @@ describe(toRelatedPosts, () => {
       [oneShared, newerOneShared, twoShared],
       [],
       ['tag-a', 'tag-b'],
+      3,
       tenant,
     );
 
@@ -59,25 +63,35 @@ describe(toRelatedPosts, () => {
     ]);
   });
 
-  it('returns at most 3 posts', () => {
+  it('caps the result at the given limit', () => {
     const byTags = Array.from({ length: 5 }, (_, i) =>
       byTagsPost({ _id: `post-${i}`, tagIds: [{ _id: 'tag-a' }] }),
     );
 
-    const result = toRelatedPosts(byTags, [], ['tag-a'], tenant);
+    const result = toRelatedPosts(byTags, [], ['tag-a'], 3, tenant);
 
     expect(result).toHaveLength(3);
+  });
+
+  it('allows a larger limit, up to the schema max', () => {
+    const byTags = Array.from({ length: 8 }, (_, i) =>
+      byTagsPost({ _id: `post-${i}`, tagIds: [{ _id: 'tag-a' }] }),
+    );
+
+    const result = toRelatedPosts(byTags, [], ['tag-a'], 6, tenant);
+
+    expect(result).toHaveLength(6);
   });
 
   it('excludes the current post (the query already filters it, this asserts no re-inclusion by the transformer)', () => {
     const other = byTagsPost({ _id: 'other', tagIds: [{ _id: 'tag-a' }] });
 
-    const result = toRelatedPosts([other], [], ['tag-a'], tenant);
+    const result = toRelatedPosts([other], [], ['tag-a'], 3, tenant);
 
     expect(result.map((post) => post.id)).not.toContain('current');
   });
 
-  it('backfills remaining slots from the primary-topic pool when fewer than 3 share a tag', () => {
+  it('backfills remaining slots from the primary-topic pool when fewer than the limit share a tag', () => {
     const shared = byTagsPost({ _id: 'shared', tagIds: [{ _id: 'tag-a' }] });
     const topicOnlyA = byTopicPost({ _id: 'topic-a' });
     const topicOnlyB = byTopicPost({ _id: 'topic-b' });
@@ -86,6 +100,7 @@ describe(toRelatedPosts, () => {
       [shared],
       [topicOnlyA, topicOnlyB],
       ['tag-a'],
+      3,
       tenant,
     );
 
@@ -105,6 +120,7 @@ describe(toRelatedPosts, () => {
       [shared],
       [duplicate, topicOnly],
       ['tag-a'],
+      3,
       tenant,
     );
 
@@ -115,8 +131,38 @@ describe(toRelatedPosts, () => {
     const topicOnlyA = byTopicPost({ _id: 'topic-a' });
     const topicOnlyB = byTopicPost({ _id: 'topic-b' });
 
-    const result = toRelatedPosts([], [topicOnlyA, topicOnlyB], [], tenant);
+    const result = toRelatedPosts([], [topicOnlyA, topicOnlyB], [], 3, tenant);
 
     expect(result.map((post) => post.id)).toEqual(['topic-a', 'topic-b']);
+  });
+
+  it('returns an empty array when nothing qualifies', () => {
+    const result = toRelatedPosts([], [], [], 3, tenant);
+
+    expect(result).toEqual([]);
+  });
+});
+
+describe(toPostRelatedModule, () => {
+  it('maps the module fields alongside the given posts', () => {
+    const posts = [toPostCard(makeRawPostCard({ _id: 'related-1' }), tenant)];
+
+    const result = toPostRelatedModule(makeRawPostRelatedModule(), posts);
+
+    expect(result.posts).toBe(posts);
+    expect(result.brandVariant).toBe('PRIMARY');
+    expect(result.showImages).toBe(true);
+  });
+
+  it('falls back to an undefined heading and supporting text when sectionHeader is absent', () => {
+    const result = toPostRelatedModule(
+      makeRawPostRelatedModule({ sectionHeader: null }),
+      [],
+    );
+
+    expect(result.sectionHeader).toEqual({
+      heading: undefined,
+      supportingText: undefined,
+    });
   });
 });

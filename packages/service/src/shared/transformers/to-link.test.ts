@@ -66,6 +66,17 @@ describe('toLink', () => {
     expect(result?.href).toBe('/blog/hello-world');
   });
 
+  it('resolves an internal page_post reference to its post route', () => {
+    const result = toLink(
+      makeRawLink({
+        linkType: LINK_TYPE.INTERNAL,
+        internalReference: { _type: 'page_post', slug: 'hello-world' },
+      }),
+    );
+
+    expect(result?.href).toBe('/blog/hello-world');
+  });
+
   it('resolves an internal blog_topic reference to its topic route', () => {
     const result = toLink(
       makeRawLink({

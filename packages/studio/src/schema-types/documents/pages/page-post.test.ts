@@ -1,6 +1,8 @@
-import { postSchema } from '@blog/studio/schema-types/documents/blog/post';
 import { pagePostSchema } from '@blog/studio/schema-types/documents/pages/page-post';
-import type { ValidationContext } from 'sanity';
+import { contentSchema } from '@blog/studio/schema-types/modules/module-content';
+import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
+import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
+import { postRelatedSchema } from '@blog/studio/schema-types/modules/module-post-related';
 
 type TReferenceFieldDefinition = {
   type: 'reference';
@@ -10,33 +12,55 @@ type TReferenceFieldDefinition = {
 
 type TValidationRule = {
   required: () => TValidationRule;
+  min: (value: number) => TValidationRule;
+  max: (value: number) => TValidationRule;
   custom: (fn: unknown) => TValidationRule;
 };
 
 const getField = (name: string) =>
   pagePostSchema.fields?.find((field) => field.name === name);
 
+const createTrackingRule = () => {
+  const calls = {
+    required: false,
+    min: undefined as number | undefined,
+    max: undefined as number | undefined,
+  };
+
+  const rule: TValidationRule = {
+    required: () => {
+      calls.required = true;
+      return rule;
+    },
+    min: (value) => {
+      calls.min = value;
+      return rule;
+    },
+    max: (value) => {
+      calls.max = value;
+      return rule;
+    },
+    custom: () => rule,
+  };
+
+  return { rule, calls };
+};
+
 describe('pagePostSchema shape', () => {
-  it('title is required via the shared titleField() helper', () => {
+  it('title is required via the shared titleField() helper — an internal label, not the rendered headline', () => {
     const titleFieldDefinition = getField('title');
 
     if (!titleFieldDefinition?.validation) {
       throw new Error('Expected pagePostSchema to define a title field.');
     }
 
-    let requiredCalled = false;
-    const rule: TValidationRule = {
-      required: () => {
-        requiredCalled = true;
-        return rule;
-      },
-      custom: () => rule,
-    };
+    const { rule, calls } = createTrackingRule();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
     (titleFieldDefinition.validation as any)(rule);
 
-    expect(requiredCalled).toBe(true);
+    expect(calls.required).toBe(true);
+    expect(calls.max).toBeUndefined();
   });
 
   it('publishedAt is a required datetime field', () => {
@@ -49,24 +73,109 @@ describe('pagePostSchema shape', () => {
       );
     }
 
-    let requiredCalled = false;
-    const rule: TValidationRule = {
-      required: () => {
-        requiredCalled = true;
-        return rule;
-      },
-      custom: () => rule,
-    };
+    const { rule, calls } = createTrackingRule();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
     (publishedAtField.validation as any)(rule);
 
-    expect(requiredCalled).toBe(true);
+    expect(calls.required).toBe(true);
   });
 
-  it('has no postList or modules slot', () => {
+  it('has no top-level excerpt field — the excerpt lives in sectionHeader.supportingText', () => {
+    expect(getField('excerpt')).toBeUndefined();
+  });
+
+  it('sectionHeader uses the required-heading variant — the heading is the post headline', () => {
+    const sectionHeaderFieldDefinition = getField('sectionHeader') as
+      { type?: string } | undefined;
+
+    expect(sectionHeaderFieldDefinition?.type).toBe(
+      'requiredHeadingSectionHeader',
+    );
+  });
+
+  it('heroImage stays optional — no validation() builder attached', () => {
+    expect(getField('heroImage')?.validation).toBeUndefined();
+  });
+
+  it('author is a required reference', () => {
+    const authorField = getField('author') as
+      TReferenceFieldDefinition | undefined;
+
+    if (!authorField?.validation) {
+      throw new Error('Expected pagePostSchema to define an author field.');
+    }
+
+    const { rule, calls } = createTrackingRule();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (authorField.validation as any)(rule);
+
+    expect(calls.required).toBe(true);
+  });
+
+  it('topic is a required reference', () => {
+    const topicField = getField('topic') as
+      TReferenceFieldDefinition | undefined;
+
+    if (!topicField?.validation) {
+      throw new Error('Expected pagePostSchema to define a topic field.');
+    }
+
+    const { rule, calls } = createTrackingRule();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (topicField.validation as any)(rule);
+
+    expect(calls.required).toBe(true);
+  });
+
+  it('tags caps at 6 and is optional', () => {
+    const tagsField = getField('tags');
+
+    if (!tagsField?.validation) {
+      throw new Error('Expected pagePostSchema to define a tags field.');
+    }
+
+    const { rule, calls } = createTrackingRule();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (tagsField.validation as any)(rule);
+
+    expect(calls.required).toBe(false);
+    expect(calls.max).toBe(6);
+  });
+
+  it('content is a required richText field', () => {
+    const contentField = getField('content');
+
+    if (!contentField?.validation) {
+      throw new Error('Expected pagePostSchema to define a content field.');
+    }
+
+    const { rule, calls } = createTrackingRule();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (contentField.validation as any)(rule);
+
+    expect(calls.required).toBe(true);
+  });
+
+  it('has no top-level post reference — the page absorbed the post directly', () => {
+    expect(getField('post')).toBeUndefined();
+  });
+
+  it('featured and skim stay optional — no validation() builder attached', () => {
+    expect(getField('featured')?.validation).toBeUndefined();
+    expect(getField('skim')?.validation).toBeUndefined();
+  });
+
+  it('has no newsletterEnabled field — the newsletter module in modules[] is the toggle', () => {
+    expect(getField('newsletterEnabled')).toBeUndefined();
+  });
+
+  it('has no postList slot', () => {
     expect(getField('postList')).toBeUndefined();
-    expect(getField('modules')).toBeUndefined();
   });
 
   it('seo stays optional — no validation() builder attached', () => {
@@ -109,19 +218,12 @@ describe('pagePostSchema slug field', () => {
       );
     }
 
-    let requiredCalled = false;
-    const rule: TValidationRule = {
-      required: () => {
-        requiredCalled = true;
-        return rule;
-      },
-      custom: () => rule,
-    };
+    const { rule, calls } = createTrackingRule();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
     (slugField.validation as any)(rule);
 
-    expect(requiredCalled).toBe(true);
+    expect(calls.required).toBe(true);
   });
 
   it('relies on the default per-document-type isUnique scope rather than overriding it', () => {
@@ -140,167 +242,91 @@ describe('pagePostSchema slug field', () => {
   });
 });
 
-describe('pagePostSchema post field', () => {
-  const getPostField = () =>
-    getField('post') as TReferenceFieldDefinition | undefined;
+describe('pagePostSchema modules field', () => {
+  const getModulesField = () =>
+    getField('modules') as
+      | { type: 'array'; of?: Array<{ to?: Array<{ type: string }> }> }
+      | undefined;
 
-  it('references blog_post', () => {
-    const postField = getPostField();
+  it('allows postRelated, newsletter, cta and content modules', () => {
+    const modulesField = getModulesField();
 
-    if (!postField || postField.type !== 'reference') {
-      throw new Error(
-        'Expected pagePostSchema to define a post reference field.',
-      );
+    if (!modulesField || modulesField.type !== 'array') {
+      throw new Error('Expected pagePostSchema to define a modules field.');
     }
 
-    expect(postField.to?.map((target) => target.type)).toEqual([
-      postSchema.name,
+    const allowedTypes = modulesField.of?.map((member) => member.to?.[0]?.type);
+
+    expect(allowedTypes).toEqual([
+      postRelatedSchema.name,
+      newsletterSchema.name,
+      ctaSchema.name,
+      contentSchema.name,
     ]);
-  });
-
-  it('is required', () => {
-    const postField = getPostField();
-
-    if (!postField?.validation) {
-      throw new Error(
-        'Expected pagePostSchema post field to define validation.',
-      );
-    }
-
-    let requiredCalled = false;
-    const rule: TValidationRule = {
-      required: () => {
-        requiredCalled = true;
-        return rule;
-      },
-      custom: () => rule,
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    (postField.validation as any)(rule);
-
-    expect(requiredCalled).toBe(true);
   });
 });
 
-type TReferenceValue = { _ref?: string } | undefined;
-type TCustomFn = (
-  value: TReferenceValue,
-  context: ValidationContext,
-) => Promise<string | true>;
+describe('pagePostSchema preview', () => {
+  it('shows the section header heading and author', () => {
+    const prepare = pagePostSchema.preview?.prepare;
 
-const UNIQUENESS_ERROR =
-  'Another Post Page already references this post — each post can only back one Post Page.';
+    if (!prepare) {
+      throw new Error('Expected pagePostSchema to define preview.prepare.');
+    }
 
-/**
- * `validateUniquePostReference` is private to page-post.ts; the `post`
- * field's `validation` builder registers it via `rule.custom(fn)`, so a
- * minimal chainable mock rule captures it the same way page-topic.test.ts
- * captures its topic-field custom validator — no export needed.
- */
-const getUniquePostValidator = (): TCustomFn => {
-  const postField = pagePostSchema.fields?.find(
-    (field) => field.name === 'post',
-  );
-
-  if (!postField?.validation) {
-    throw new Error(
-      'Expected pagePostSchema to define a post field with validation.',
-    );
-  }
-
-  let customFn: TCustomFn | undefined;
-
-  const rule = {
-    required: () => rule,
-    custom: (fn: TCustomFn) => {
-      customFn = fn;
-      return rule;
-    },
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (postField.validation as any)(rule);
-
-  if (!customFn) {
-    throw new Error('Expected post field validation to register custom().');
-  }
-
-  return customFn;
-};
-
-const createMockContext = (
-  conflictingCount: number,
-  documentId = 'page-post-1',
-) => {
-  const fetchCalls: { query: string; params: unknown }[] = [];
-  const withConfigCalls: unknown[] = [];
-
-  const getClient = () => ({
-    withConfig: (config: unknown) => {
-      withConfigCalls.push(config);
-
-      return {
-        fetch: async (query: string, params: unknown) => {
-          fetchCalls.push({ query, params });
-          return conflictingCount;
-        },
-      };
-    },
-  });
-
-  const context = {
-    getClient,
-    document: { _id: documentId },
-  } as unknown as ValidationContext;
-
-  return { context, fetchCalls, withConfigCalls };
-};
-
-describe('validateUniquePostReference', () => {
-  it('passes without querying when no reference is set', async () => {
-    const validate = getUniquePostValidator();
-    const { context, fetchCalls } = createMockContext(0);
-
-    await expect(validate(undefined, context)).resolves.toBe(true);
-    expect(fetchCalls).toHaveLength(0);
-  });
-
-  it('passes when no other page_post references the same post', async () => {
-    const validate = getUniquePostValidator();
-    const { context } = createMockContext(0);
-
-    await expect(validate({ _ref: 'post-1' }, context)).resolves.toBe(true);
-  });
-
-  it('flags a conflicting page_post referencing the same post', async () => {
-    const validate = getUniquePostValidator();
-    const { context } = createMockContext(1);
-
-    await expect(validate({ _ref: 'post-1' }, context)).resolves.toBe(
-      UNIQUENESS_ERROR,
-    );
-  });
-
-  it('excludes both the draft and published id of the current document', async () => {
-    const validate = getUniquePostValidator();
-    const { context, fetchCalls } = createMockContext(0, 'drafts.page-post-1');
-
-    await validate({ _ref: 'post-1' }, context);
-
-    expect(fetchCalls[0]?.params).toEqual({
-      type: 'page_post',
-      postId: 'post-1',
-      publishedId: 'page-post-1',
+    expect(
+      prepare({
+        heading: 'Understanding GROQ',
+        title: 'Wrapper Label',
+        author: 'Jane Doe',
+        media: undefined,
+      }),
+    ).toEqual({
+      title: 'Understanding GROQ',
+      subtitle: 'by Jane Doe',
+      media: undefined,
     });
   });
 
-  it('requests the drafts perspective so an unpublished conflict still counts', async () => {
-    const validate = getUniquePostValidator();
-    const { context, withConfigCalls } = createMockContext(0);
+  it('falls back to the internal title when sectionHeader is absent', () => {
+    const prepare = pagePostSchema.preview?.prepare;
 
-    await validate({ _ref: 'post-1' }, context);
+    if (!prepare) {
+      throw new Error('Expected pagePostSchema to define preview.prepare.');
+    }
 
-    expect(withConfigCalls).toEqual([{ perspective: 'drafts' }]);
+    expect(
+      prepare({
+        heading: undefined,
+        title: 'Wrapper Label',
+        author: 'Jane Doe',
+        media: undefined,
+      }),
+    ).toEqual({
+      title: 'Wrapper Label',
+      subtitle: 'by Jane Doe',
+      media: undefined,
+    });
+  });
+
+  it('falls back to "Unknown" title and an empty subtitle', () => {
+    const prepare = pagePostSchema.preview?.prepare;
+
+    if (!prepare) {
+      throw new Error('Expected pagePostSchema to define preview.prepare.');
+    }
+
+    expect(
+      prepare({
+        heading: undefined,
+        title: undefined,
+        author: undefined,
+        media: undefined,
+      }),
+    ).toEqual({
+      title: 'Unknown',
+      subtitle: '',
+      media: undefined,
+    });
   });
 });

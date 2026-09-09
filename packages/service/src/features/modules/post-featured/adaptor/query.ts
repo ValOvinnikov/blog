@@ -10,7 +10,7 @@ import {
 } from '@blog/service/shared/fragments/show-images';
 
 const newestFeaturedPostsQuery = q.star
-  .filterByType('blog_post')
+  .filterByType('page_post')
   .filterRaw('featured == true')
   .filterRaw(PUBLISHED_POST_FILTER)
   .order('publishedAt desc')

@@ -85,6 +85,17 @@ describe('toPostCard', () => {
     });
   });
 
+  it('maps a sparse post-card with no excerpt to undefined', () => {
+    const result = toPostCard(
+      makeRawPostCard({
+        sectionHeader: { heading: 'Hello World', supportingText: null },
+      }),
+      tenant,
+    );
+
+    expect(result.excerpt).toBeUndefined();
+  });
+
   it('defaults featured to false when null', () => {
     const result = toPostCard(makeRawPostCard({ featured: null }), tenant);
     expect(result.featured).toBe(false);

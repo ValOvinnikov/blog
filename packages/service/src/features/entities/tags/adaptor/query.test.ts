@@ -27,7 +27,7 @@ describe('tagsQuery', () => {
     expect(tagsQuery.query).toContain('publishedAt <= now()');
   });
 
-  it('counts only blog posts', () => {
-    expect(tagsQuery.query).toContain('_type == "blog_post"');
+  it('counts only page posts', () => {
+    expect(tagsQuery.query).toContain('_type == "page_post"');
   });
 });

@@ -292,6 +292,73 @@ reading the document's own `title`/`heading` whether or not a hero is set.
 non-hero `_type` as a data error through the loader's normal failure path
 rather than rendering a blank page.
 
+**The post is the page.** `page_post` carries the post itself — `slug`,
+`sectionHeader`, `heroImage`, `author`, `topic`, `tags`, `publishedAt`,
+`content`, `featured`, `skim` and `seo` — rather than wrapping a separate
+`blog_post` and dereferencing it. Every post read in `@blog/service`
+projects those fields off `page_post` directly, and `apps/web` names
+`page_post` as the post's document type wherever it needs one: the
+revalidation webhook's path derivation and its `bookmarks` cleanup (§9),
+and the `revalidate-tags` map, whose `page_post` entry purges the
+post-content tags (`posts`, `author`, `topic`, `tag`) that the wrapper type
+used to own. `blog_post` still exists and is still a valid reference target
+alongside `page_post` everywhere a post can be linked, but nothing reads it
+for page content; it retires in its own migration, since a Sanity `_type` is
+immutable and a retirement is therefore never a rename.
+
+**A page document's own `title` is an internal CMS label and is never
+rendered on the web.** It names the document in the desk, nothing more —
+`page_topic` and `page_tag` do not project theirs at all, taking their
+heading from the deref'd `blog_topic`/`blog_tag` instead. `page_post` has no
+entity to deref, so its headline and excerpt live in a **`sectionHeader`**
+object (`requiredHeadingSectionHeader`: `heading` required, `supportingText`
+optional) — the same shape the modules use. `@blog/service` maps
+`sectionHeader.heading` to the view models' `title` and
+`sectionHeader.supportingText` to their `excerpt`, so the field names every
+consumer sees are unchanged and no `apps/web` component reads a document
+label.
+
+`page_post.modules[]` allows `module_postRelated`, `module_newsletter`,
+`module_cta` and `module_content`. Two concerns that were once fields on the
+post became modules in that array: related reading is `module_postRelated`
+(its own `limit`, 1–6, default 3), and the newsletter's presence is the
+`module_newsletter` module being in the array at all rather than a
+`newsletterEnabled` boolean — which is why `page_post` has no such field.
+`module_newsletter` carries a `variant` (`NEWSLETTER_VARIANT`,
+`FULL`/`COMPACT`, coalesced to `FULL` at the query since the schema field is
+optional) selecting which form of the signup it renders.
+
+**A view model's nullability mirrors the schema's validation.** Where a
+`page_post` field is `required()` in the Studio, `@blog/service` projects it
+with `.notNull()` and types it as a plain value; where the schema leaves a
+field optional, the view model carries `T | undefined`. The two are kept in
+step deliberately, so the type a consumer sees is the same promise the
+editing experience makes. `sectionHeader.heading`, `publishedAt`, `author`,
+`topic` and `content` are required on both sides; `excerpt`
+(`sectionHeader.supportingText`), `heroImage`, `tags`, `featured`, `skim`
+and `seo` are optional on both.
+
+**An incomplete post is not published.** `PUBLISHED_POST_FILTER` is what
+makes the paragraph above safe. It requires
+`defined(sectionHeader.heading) && defined(author) && defined(topic) &&
+defined(content)` alongside `publishedAt <= now()`, so a `page_post` missing
+any of them never appears in a listing and resolves as not-found on its own
+URL — the same treatment an unpublished post gets. Without that gate a
+`.notNull()` projection would throw at parse time and take down an entire
+listing rather than dropping one card.
+
+This is an **exclusion, not a fallback**: nothing is substituted. Every
+consumer of these fields structurally needs a value — RSS `<title>`, the
+`BlogPosting` `headline` and `author`, breadcrumb labels, card headings, the
+topic chip, the bookmarks list — and the only way to satisfy them from an
+absent field would be to invent one. Excluding the document is the honest
+alternative to a placeholder, and the document's own `title` is never
+borrowed for the purpose.
+
+`excerpt` is the one post field that still degrades by omission rather than
+excluding the document, because `supportingText` is genuinely optional in
+the schema: the feed omits its `<description>` and the card omits its lead.
+
 `module_cta` additionally carries a required `variant` (`BANNER`/`SPLIT`/
 `CALLOUT`, from `CTA_VARIANT`, default `CALLOUT`), a required `bandTone`
 (the section band behind the card — same three `BRAND_VARIANT` values its
@@ -696,7 +763,7 @@ webhook purges both that form and the legacy unprefixed one per publish, keyed
 off Sanity's own `sanity-project-id` webhook header. Tag expiry alone does not
 invalidate a prerendered route on Vercel, so the webhook also purges resolved,
 tenant-scoped paths (`revalidatePath('/<tenantId>/<locale>/blog/my-post')`) —
-precisely derived for a published `blog_post`: its own page, the home and blog
+precisely derived for a published `page_post`: its own page, the home and blog
 archive with pagination, and **every** tag/topic page of the tenant with their
 own pagination, not only the ones the post currently belongs to (a
 re-categorisation or removal would otherwise leave stale HTML on the page the
@@ -719,7 +786,7 @@ route declares its own, kept in step with `@blog/config`'s
 `CONTENT_ROUTE_REVALIDATE_SECONDS` by test rather than by import.
 
 The same webhook also cleans
-up orphaned `@blog/db` `bookmarks` rows when it receives a `blog_post` delete
+up orphaned `@blog/db` `bookmarks` rows when it receives a `page_post` delete
 (Sanity's `sanity-operation` header — unpublish fires the same trigger as
 true deletion), scoped to the tenant resolved from that project-id header.
 `@blog/service`'s

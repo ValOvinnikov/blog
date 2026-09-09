@@ -1,6 +1,7 @@
 import { SOCIAL_PLATFORMS, LINK_TYPE } from '@blog/config/constants';
 import { postSchema } from '@blog/studio/schema-types/documents/blog/post';
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic';
+import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Link2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -55,6 +56,7 @@ export const linkSchema = defineType({
       type: 'reference',
       to: [
         { type: postSchema.name },
+        { type: PAGE_POST_TYPE },
         { type: topicSchema.name },
         // Literal (not `landingSchema.name` / `blogPageSchema.name`):
         // importing landing.ts or blog-page.ts here closes a circular import

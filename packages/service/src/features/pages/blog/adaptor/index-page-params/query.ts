@@ -8,7 +8,7 @@ export const indexPageParamsQuery = q.star
     blogPosts: q.project((sub) => ({
       total: sub
         .count(
-          q.star.filterByType('blog_post').filterRaw(PUBLISHED_POST_FILTER),
+          q.star.filterByType('page_post').filterRaw(PUBLISHED_POST_FILTER),
         )
         .notNull(true),
     })),

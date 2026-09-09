@@ -7,6 +7,12 @@ describe('service.modules', () => {
     expect(typeof service.modules.content.v1.getContent).toBe('function');
     expect(typeof service.modules.cta.v1.getCta).toBe('function');
   });
+
+  it('exposes v1.getPostRelated as a function', () => {
+    expect(typeof service.modules.postRelated.v1.getPostRelated).toBe(
+      'function',
+    );
+  });
 });
 
 describe('service.pages', () => {

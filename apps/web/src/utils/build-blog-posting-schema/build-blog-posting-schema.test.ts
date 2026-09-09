@@ -12,10 +12,10 @@ const post: TPostDetail = {
   heroImageAlt: 'A hero image',
   heroImageSanity: undefined,
   featured: false,
-  newsletterEnabled: true,
   body: [],
   skim: undefined,
   hasAsides: false,
+  modules: [],
   seo: {
     title: 'Hello World',
     description: 'A sufficiently long excerpt for the post.',
@@ -39,7 +39,6 @@ const post: TPostDetail = {
     description: undefined,
   },
   tags: [],
-  relatedPosts: [],
   readingTimeMinutes: 4,
 };
 
@@ -104,5 +103,14 @@ describe(buildBlogPostingSchema, () => {
     const schema = buildBlogPostingSchema(post, 'https://example.com');
 
     expect(schema?.keywords).toBeUndefined();
+  });
+
+  it('omits description for a sparse post without throwing', () => {
+    const schema = buildBlogPostingSchema(
+      { ...post, excerpt: undefined },
+      'https://example.com',
+    );
+
+    expect(schema?.description).toBeUndefined();
   });
 });

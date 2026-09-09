@@ -19,10 +19,10 @@ const basePost: TPostDetail = {
   heroImageAlt: 'A hero image',
   heroImageSanity: undefined,
   featured: false,
-  newsletterEnabled: true,
   body: [],
   skim: undefined,
   hasAsides: false,
+  modules: [],
   seo: makeSeo({
     title: 'Hello World',
     description: 'A sufficiently long excerpt for the card.',
@@ -46,7 +46,6 @@ const basePost: TPostDetail = {
     description: undefined,
   },
   tags: [],
-  relatedPosts: [],
   readingTimeMinutes: 4,
 };
 

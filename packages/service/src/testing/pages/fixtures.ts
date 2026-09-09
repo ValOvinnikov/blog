@@ -1,10 +1,7 @@
 import type { TRawBlogPage } from '@blog/service/features/pages/blog/adaptor/index-page/transformer';
 import type { TRawHomePage } from '@blog/service/features/pages/home/adaptor/transformer';
 import type { TRawLandingPage } from '@blog/service/features/pages/landing/adaptor/detail-page/transformer';
-import type {
-  TRawPostDetail,
-  TRawPostPage,
-} from '@blog/service/features/pages/post/adaptor/detail-page/transformer';
+import type { TRawPostDetail } from '@blog/service/features/pages/post/adaptor/detail-page/transformer';
 import type { TRawTagPage } from '@blog/service/features/pages/tag/adaptor/detail-page/transformer';
 import type { TRawTagIndexPage } from '@blog/service/features/pages/tag-index/adaptor/transformer';
 import type { TRawTopicPage } from '@blog/service/features/pages/topic/adaptor/detail-page/transformer';
@@ -40,9 +37,11 @@ export function makeRawPostCard(
 ): TRawPostCard {
   return {
     _id: 'post-1',
-    title: 'Hello World',
+    sectionHeader: {
+      heading: 'Hello World',
+      supportingText: 'A sufficiently long excerpt for the card.',
+    },
     slug: 'hello-world',
-    excerpt: 'A sufficiently long excerpt for the card.',
     publishedAt: '2026-01-15T00:00:00Z',
     heroImage: makeRawImage(),
     heroImageAsset: makeRawSanityImage(),
@@ -71,9 +70,11 @@ export function makeRawArchivePostCard(
 ): TRawArchivePostCard {
   return {
     _id: 'post-1',
-    title: 'Hello World',
+    sectionHeader: {
+      heading: 'Hello World',
+      supportingText: 'A sufficiently long excerpt for the card.',
+    },
     slug: 'hello-world',
-    excerpt: 'A sufficiently long excerpt for the card.',
     publishedAt: '2026-01-15T00:00:00Z',
     topic: {
       _id: 'topic-1',
@@ -91,14 +92,15 @@ export function makeRawPostDetail(
 ): TRawPostDetail {
   return {
     _id: 'post-1',
-    title: 'Hello World',
+    sectionHeader: {
+      heading: 'Hello World',
+      supportingText: 'A sufficiently long excerpt for the card.',
+    },
     slug: 'hello-world',
-    excerpt: 'A sufficiently long excerpt for the card.',
     publishedAt: '2026-01-15T00:00:00Z',
     heroImage: makeRawImage(),
     heroImageAsset: makeRawSanityImage(),
     featured: false,
-    newsletterEnabled: true,
     body: [],
     skim: null,
     seo: null,
@@ -110,19 +112,8 @@ export function makeRawPostDetail(
       description: 'Engineering posts',
     },
     tags: [{ _id: 'tag-1', title: 'TypeScript', slug: 'typescript' }],
+    modules: [],
     wordCount: 400,
-    ...overrides,
-  };
-}
-
-export function makeRawPostPage(
-  overrides: Partial<TRawPostPage> = {},
-): TRawPostPage {
-  return {
-    slug: 'hello-world',
-    publishedAt: '2026-01-15T00:00:00Z',
-    seo: null,
-    post: makeRawPostDetail(),
     ...overrides,
   };
 }

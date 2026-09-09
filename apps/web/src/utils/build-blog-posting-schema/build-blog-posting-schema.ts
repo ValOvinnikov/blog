@@ -5,7 +5,7 @@ export type TBlogPostingSchema = {
   '@context': 'https://schema.org';
   '@type': 'BlogPosting';
   headline: string;
-  description: string;
+  description: string | undefined;
   image: string | undefined;
   datePublished: string;
   dateModified: string;

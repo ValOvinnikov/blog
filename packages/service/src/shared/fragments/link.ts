@@ -11,10 +11,11 @@ export const linkFragment = q.fragmentForType<'link'>().project((sub) => ({
       _type: true,
       // `page_blog` (the blog index singleton) has no `slug` field, so it's
       // absent from this map — `selectByType` falls through to `null` for
-      // it. The three slug-having types assert `.notNull()` since their
+      // it. The four slug-having types assert `.notNull()` since their
       // schema requires the field.
       slug: ref.selectByType({
         blog_post: (s) => s.field('slug.current').notNull(),
+        page_post: (s) => s.field('slug.current').notNull(),
         blog_topic: (s) => s.field('slug.current').notNull(),
         page_landing: (s) => s.field('slug.current').notNull(),
       }),
