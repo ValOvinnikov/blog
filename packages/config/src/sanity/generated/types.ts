@@ -662,6 +662,7 @@ export type Page_home = {
   _updatedAt: string;
   _rev: string;
   title?: string;
+  sectionHeader?: SectionHeader;
   hero?: Module_heroReference | Module_heroBlogReference;
   modules?: Array<
     | ({
