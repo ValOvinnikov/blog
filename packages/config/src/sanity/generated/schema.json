@@ -4181,6 +4181,14 @@
         },
         "optional": true
       },
+      "sectionHeader": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "sectionHeader"
+        },
+        "optional": true
+      },
       "hero": {
         "type": "objectAttribute",
         "value": {

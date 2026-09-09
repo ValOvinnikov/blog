@@ -5,6 +5,7 @@ import {
   toHeroSlot,
   toModule,
 } from '@blog/service/shared/transformers/to-module';
+import { toSectionHeader } from '@blog/service/shared/transformers/to-section-header';
 import type { InferResultType } from 'groqd';
 
 import type { homePageQuery } from './query';
@@ -19,7 +20,10 @@ export function toHomePage(
 ): THomePage {
   return {
     title: raw.title,
-    hero: toHeroSlot(raw.hero),
+    sectionHeader: raw.sectionHeader
+      ? toSectionHeader(raw.sectionHeader)
+      : { heading: undefined, supportingText: undefined },
+    hero: raw.hero ? toHeroSlot(raw.hero) : undefined,
     modules: (raw.modules ?? []).map(toModule),
     seo: resolveSeo(
       raw.seo ?? undefined,

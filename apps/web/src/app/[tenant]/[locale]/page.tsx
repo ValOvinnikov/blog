@@ -1,6 +1,7 @@
 import type { ITenantLocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { PageShell } from '@web/components/page-templates/page-shell';
+import { PageHeading } from '@web/components/shared/page-heading';
 import { PageIntro } from '@web/components/shared/page-intro';
 import { toMetadata } from '@web/metadata/to-metadata';
 import { ModuleRenderer } from '@web/modules/module-renderer';
@@ -44,15 +45,20 @@ export default async function HomePage({ params }: TProps) {
 
   const tenantContext = await getTenantSanityContext(tenant);
   const result = await service.pages.home.v1.getHomePage(tenantContext);
-  const { hero, modules } = guardPageLoaderResult(
+  const { sectionHeader, hero, modules } = guardPageLoaderResult(
     result,
     'home_page.fetch_failed',
   );
+  const { heading, supportingText } = sectionHeader;
 
   return (
     <PageShell>
       <PageShell.Heading>
-        <PageIntro hero={hero} locale={locale} tenant={tenant} />
+        <PageIntro hero={hero} locale={locale} tenant={tenant}>
+          {heading ? (
+            <PageHeading heading={heading} supportingText={supportingText} />
+          ) : null}
+        </PageIntro>
       </PageShell.Heading>
       <PageShell.Content>
         <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />

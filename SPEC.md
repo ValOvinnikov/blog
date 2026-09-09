@@ -29,7 +29,7 @@ frontend if a consumer is out of date.
 
 | Surface | Route                          | Status                                                                                                                                                                           |
 | ------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Home    | `/`                            | ✅ Built — modules-as-documents (hero + `modules[]`)                                                                                                                             |
+| Home    | `/`                            | ✅ Built — modules-as-documents (optional hero **or** `sectionHeader` heading, plus `modules[]`)                                                                                 |
 | Blog    | `/blog` + `/blog/page/N`       | ✅ Built — paginated index (#75)                                                                                                                                                 |
 | Post    | `/blog/[slug]`                 | ✅ Built — post detail page + JSON-LD (#76)                                                                                                                                      |
 | Topic   | `/topics/[slug]` (+ `/page/N`) | ✅ Built — unpaginated + paginated routes (#91/#588/#589); renamed from `category` in #1812; CMS-authored via the `page_topic` document since #1915                              |
@@ -281,12 +281,23 @@ drops out the day it is deleted. The studio's equivalent guard is
 `HERO_SCHEMA_TYPES`, the list every page's `hero` `to:` points at, with a
 test asserting every registered `module_hero*` schema appears in it.
 
-`page_home` has a **required** hero; `page_landing`, `page_blog`,
-`page_topic` and `page_tag` each have an **optional** one. A hero replaces
-that page's default header and owns the `<h1>`; without one, each page
-renders the header it always has (generic: title; blog: `heading` plus
-`supportingText`; topic and tag: the term header), so exactly one `<h1>`
-renders either way. Breadcrumbs, metadata and the Studio preview keep
+`page_home`, `page_landing`, `page_blog`, `page_topic` and `page_tag` each
+have an **optional** hero. A hero replaces that page's default header and
+owns the `<h1>`; without one, each page renders the header it always has
+(home: `sectionHeader`'s `heading` plus `supportingText`; generic: title;
+blog: `heading` plus `supportingText`; topic and tag: the term header), so
+exactly one `<h1>` renders either way.
+
+`page_home`'s hero was required until #2975 made it optional and gave the
+document a `sectionHeader` of its own. Because neither field is
+individually required, the requirement moved to the document:
+`validateHeroOrHeading()` is an **error**-severity rule demanding at least
+one of `hero` or `sectionHeader.heading`, so a page with an empty opening
+block cannot be published. The document `title` is never a fallback — it is
+Studio's internal list label, and a page with neither a hero nor a heading
+renders no header at all rather than leaking it.
+
+Breadcrumbs, metadata and the Studio preview keep
 reading the document's own `title`/`heading` whether or not a hero is set.
 `@blog/service` narrows the slot with `toHeroSlot()`, whose guard rejects a
 non-hero `_type` as a data error through the loader's normal failure path

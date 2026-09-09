@@ -123,6 +123,7 @@ export function makeRawHomePage(
 ): TRawHomePage {
   return {
     title: 'Home Page',
+    sectionHeader: null,
     hero: { _id: 'hero-1', _type: 'module_hero' },
     modules: [
       { _id: 'post-latest-1', _type: 'module_postLatest' },
