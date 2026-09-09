@@ -1,6 +1,7 @@
 import { TAXONOMY_KIND } from '@blog/config';
 import { TagsIndexBreadcrumbs } from '@web/components/features/tags-index/tags-index-breadcrumbs';
-import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
+import { PageShell } from '@web/components/page-templates/page-shell';
+import { PageHeading } from '@web/components/shared/page-heading';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
 import { getTagsIndexPage } from '@web/server/tags-index/get-tags-index-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
@@ -26,27 +27,27 @@ export const TagsPage = async ({ tenant }: TTagsPageProps) => {
   );
 
   return (
-    <>
-      <TagsIndexBreadcrumbs tenant={tenant} />
-
-      <BlogPageTemplate
-        heading={heading}
-        supportingText={supportingText}
-        modules={
-          <TaxonomyListModule
-            id={taxonomyListId}
-            tenant={tenant}
-            slot={{
-              fallbackTaxonomy: TAXONOMY_KIND.TAGS,
-              titleId: 'tag-list-title',
-              dataTestId: `taxonomy-list-module-${taxonomyListId}`,
-              headingLevel: 2,
-              accessibleTitle: heading,
-              emptyMessage: t('empty'),
-            }}
-          />
-        }
-      />
-    </>
+    <PageShell>
+      <PageShell.Breadcrumbs>
+        <TagsIndexBreadcrumbs tenant={tenant} />
+      </PageShell.Breadcrumbs>
+      <PageShell.Heading>
+        <PageHeading heading={heading} supportingText={supportingText} />
+      </PageShell.Heading>
+      <PageShell.Content>
+        <TaxonomyListModule
+          id={taxonomyListId}
+          tenant={tenant}
+          slot={{
+            fallbackTaxonomy: TAXONOMY_KIND.TAGS,
+            titleId: 'tag-list-title',
+            dataTestId: `taxonomy-list-module-${taxonomyListId}`,
+            headingLevel: 2,
+            accessibleTitle: heading,
+            emptyMessage: t('empty'),
+          }}
+        />
+      </PageShell.Content>
+    </PageShell>
   );
 };

@@ -162,6 +162,47 @@ describe(TagPage, () => {
     ]);
   });
 
+  it('renders through PageShell: breadcrumbs outside main, everything else inside it', async () => {
+    getTagPageMock.mockResolvedValue({
+      ok: true,
+      data: { tag, modules: [], seo: {}, postListId: 'post-list-1' },
+    });
+
+    await setup();
+
+    const main = screen.getByRole('main');
+    expect(main).toContainElement(screen.getByTestId('post-list-module-stub'));
+    expect(screen.getByTestId('tag-breadcrumbs').closest('main')).toBeNull();
+  });
+
+  it('passes the current page as context to ModuleRenderer', async () => {
+    getTagPageMock.mockResolvedValue({
+      ok: true,
+      data: { tag, modules: [], seo: {}, postListId: 'post-list-1' },
+    });
+
+    await setup({ page: 3 });
+
+    expect(moduleRendererMock).toHaveBeenCalledWith(
+      expect.objectContaining({ context: { page: 3 } }),
+      undefined,
+    );
+  });
+
+  it('defaults the ModuleRenderer context page to 1 when no page is given', async () => {
+    getTagPageMock.mockResolvedValue({
+      ok: true,
+      data: { tag, modules: [], seo: {}, postListId: 'post-list-1' },
+    });
+
+    await setup();
+
+    expect(moduleRendererMock).toHaveBeenCalledWith(
+      expect.objectContaining({ context: { page: 1 } }),
+      undefined,
+    );
+  });
+
   it('passes the postList id, locale, page, and tag-scoped copy through to PostListModule', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,

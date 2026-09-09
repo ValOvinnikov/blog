@@ -93,6 +93,52 @@ describe(PostListModule, () => {
     );
   });
 
+  it('prefers context.page over the page prop when both are given', async () => {
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        sectionHeader: { heading: 'Blog', supportingText: undefined },
+        posts: [],
+        layout: undefined,
+        contentAlignment: undefined,
+        currentPage: 3,
+        totalPages: 3,
+      },
+    });
+
+    await setup({ page: 1, context: { page: 3 } });
+
+    expect(getPostListMock).toHaveBeenCalledWith(
+      'post-list-1',
+      DEFAULT_TENANT_SANITY_CONTEXT,
+      3,
+    );
+  });
+
+  it('falls back to the page prop when context is absent', async () => {
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        sectionHeader: { heading: 'Blog', supportingText: undefined },
+        posts: [],
+        layout: undefined,
+        contentAlignment: undefined,
+        currentPage: 2,
+        totalPages: 2,
+      },
+    });
+
+    await setup({ page: 2, context: undefined });
+
+    expect(getPostListMock).toHaveBeenCalledWith(
+      'post-list-1',
+      DEFAULT_TENANT_SANITY_CONTEXT,
+      2,
+    );
+  });
+
   it('forwards the resolved tenant Sanity context to getPostList', async () => {
     const tenant = {
       projectId: 'tenant-project',

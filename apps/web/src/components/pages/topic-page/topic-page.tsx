@@ -1,7 +1,8 @@
 import { routes } from '@blog/config';
 import { TopicBreadcrumbs } from '@web/components/features/topic/topic-breadcrumbs';
 import { TopicChips } from '@web/components/features/topic/topic-chips';
-import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
+import { PageShell } from '@web/components/page-templates/page-shell';
+import { PageHeading } from '@web/components/shared/page-heading';
 import { HeroSlot } from '@web/modules/hero-slot';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import { PostListModule } from '@web/modules/post-list/post-list-module';
@@ -35,44 +36,48 @@ export const TopicPage = async ({
   const { topic, hero, modules, postListId } = pageData;
 
   const topicPageT = await getTranslations('topicPage');
+  const currentPage = page ?? 1;
 
   return (
-    <>
-      <TopicBreadcrumbs slug={slug} tenant={tenant} />
-
-      <BlogPageTemplate
-        heading={topic.title}
-        supportingText={topic.description}
-        hero={
-          hero && (
-            <HeroSlot
-              id={hero.id}
-              type={hero.type}
-              locale={locale}
-              tenant={tenant}
-            />
-          )
-        }
-        topicChips={<TopicChips activeSlug={slug} tenant={tenant} />}
-        modules={
-          <>
-            <PostListModule
-              id={postListId}
-              locale={locale}
-              tenant={tenant}
-              page={page ?? 1}
-              createHref={(pageNumber) => routes.topic(slug, pageNumber)}
-              ariaLabel={topicPageT('paginationAriaLabel', {
-                name: topic.title,
-              })}
-              accessibleTitle={topicPageT('title', { name: topic.title })}
-              emptyMessageFallback={topicPageT('empty', { name: topic.title })}
-              titleId="topic-posts-title"
-            />
-            <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />
-          </>
-        }
-      />
-    </>
+    <PageShell>
+      <PageShell.Breadcrumbs>
+        <TopicBreadcrumbs slug={slug} tenant={tenant} />
+      </PageShell.Breadcrumbs>
+      <PageShell.Heading>
+        {hero ? (
+          <HeroSlot
+            id={hero.id}
+            type={hero.type}
+            locale={locale}
+            tenant={tenant}
+          />
+        ) : (
+          <PageHeading
+            heading={topic.title}
+            supportingText={topic.description}
+          />
+        )}
+      </PageShell.Heading>
+      <PageShell.Content>
+        <TopicChips activeSlug={slug} tenant={tenant} />
+        <PostListModule
+          id={postListId}
+          locale={locale}
+          tenant={tenant}
+          page={currentPage}
+          createHref={(pageNumber) => routes.topic(slug, pageNumber)}
+          ariaLabel={topicPageT('paginationAriaLabel', { name: topic.title })}
+          accessibleTitle={topicPageT('title', { name: topic.title })}
+          emptyMessageFallback={topicPageT('empty', { name: topic.title })}
+          titleId="topic-posts-title"
+        />
+        <ModuleRenderer
+          modules={modules}
+          context={{ page: currentPage }}
+          locale={locale}
+          tenant={tenant}
+        />
+      </PageShell.Content>
+    </PageShell>
   );
 };

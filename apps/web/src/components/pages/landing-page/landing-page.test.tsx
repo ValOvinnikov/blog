@@ -95,6 +95,18 @@ describe(LandingPage, () => {
     expect(order).toEqual(['landing-breadcrumbs', 'module-renderer']);
   });
 
+  it('renders through PageShell: breadcrumbs outside the main landmark, module renderer inside it', async () => {
+    getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
+
+    await setup();
+
+    const main = screen.getByRole('main');
+    expect(main).toContainElement(screen.getByTestId('module-renderer'));
+    expect(
+      screen.getByTestId('landing-breadcrumbs').closest('main'),
+    ).toBeNull();
+  });
+
   it('forwards the slug and tenant to LandingBreadcrumbs', async () => {
     getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
 

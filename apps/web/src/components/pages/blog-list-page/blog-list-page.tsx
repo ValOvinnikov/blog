@@ -1,6 +1,7 @@
 import { BlogListBreadcrumbs } from '@web/components/features/blog-list/blog-list-breadcrumbs';
 import { BlogListTopicChips } from '@web/components/features/blog-list/blog-list-topic-chips';
-import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
+import { PageShell } from '@web/components/page-templates/page-shell';
+import { PageHeading } from '@web/components/shared/page-heading';
 import { HeroSlot } from '@web/modules/hero-slot';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import { PostListModule } from '@web/modules/post-list/post-list-module';
@@ -25,35 +26,37 @@ export const BlogListPage = async ({
   const { heading, supportingText, hero, modules, postListId } = pageData;
 
   return (
-    <>
-      <BlogListBreadcrumbs tenant={tenant} />
-
-      <BlogPageTemplate
-        heading={heading}
-        supportingText={supportingText}
-        hero={
-          hero && (
-            <HeroSlot
-              id={hero.id}
-              type={hero.type}
-              locale={locale}
-              tenant={tenant}
-            />
-          )
-        }
-        topicChips={<BlogListTopicChips tenant={tenant} />}
-        modules={
-          <>
-            <PostListModule
-              id={postListId}
-              locale={locale}
-              tenant={tenant}
-              page={page}
-            />
-            <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />
-          </>
-        }
-      />
-    </>
+    <PageShell>
+      <PageShell.Breadcrumbs>
+        <BlogListBreadcrumbs tenant={tenant} />
+      </PageShell.Breadcrumbs>
+      <PageShell.Heading>
+        {hero ? (
+          <HeroSlot
+            id={hero.id}
+            type={hero.type}
+            locale={locale}
+            tenant={tenant}
+          />
+        ) : (
+          <PageHeading heading={heading} supportingText={supportingText} />
+        )}
+      </PageShell.Heading>
+      <PageShell.Content>
+        <BlogListTopicChips tenant={tenant} />
+        <PostListModule
+          id={postListId}
+          locale={locale}
+          tenant={tenant}
+          page={page}
+        />
+        <ModuleRenderer
+          modules={modules}
+          context={{ page }}
+          locale={locale}
+          tenant={tenant}
+        />
+      </PageShell.Content>
+    </PageShell>
   );
 };

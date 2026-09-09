@@ -121,6 +121,28 @@ describe(TagsPage, () => {
     ]);
   });
 
+  it('renders through PageShell: breadcrumbs outside main, the taxonomy list inside it', async () => {
+    getTagsIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        heading: 'Tags',
+        supportingText: 'Browse every post by tag.',
+        seo: {},
+        taxonomyListId: 'tag-list-1',
+      },
+    });
+
+    await setup();
+
+    const main = screen.getByRole('main');
+    expect(main).toContainElement(
+      screen.getByTestId('taxonomy-list-module-stub'),
+    );
+    expect(
+      screen.getByTestId('tags-index-breadcrumbs').closest('main'),
+    ).toBeNull();
+  });
+
   it('passes the taxonomyListId, TAGS fallback kind, page heading as accessibleTitle, and the empty-state copy through to TaxonomyListModule', async () => {
     getTagsIndexPageMock.mockResolvedValue({
       ok: true,

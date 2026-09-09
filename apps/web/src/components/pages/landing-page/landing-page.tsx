@@ -1,16 +1,13 @@
 import type { ITenantLocalizedParams } from '@blog/config';
-import { Heading } from '@blog/ui/atoms/heading';
 import { LandingBreadcrumbs } from '@web/components/features/landing/landing-breadcrumbs';
+import { PageShell } from '@web/components/page-templates/page-shell';
+import { PageHeading } from '@web/components/shared/page-heading';
 import { HeroSlot } from '@web/modules/hero-slot';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import { getLandingPage } from '@web/server/landing/get-landing-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 
-import { landingPageVariants } from './landing-page-variants';
-
 type TLandingPageProps = ITenantLocalizedParams & { slug: string };
-
-const s = landingPageVariants();
 
 /**
  * LandingPage — `/{slug}` composition for standalone `page_landing`
@@ -32,10 +29,11 @@ export const LandingPage = async ({
   const { title, hero, modules } = page;
 
   return (
-    <>
-      <LandingBreadcrumbs slug={slug} tenant={tenant} />
-
-      <main className={s.root()}>
+    <PageShell>
+      <PageShell.Breadcrumbs>
+        <LandingBreadcrumbs slug={slug} tenant={tenant} />
+      </PageShell.Breadcrumbs>
+      <PageShell.Heading>
         {hero ? (
           <HeroSlot
             id={hero.id}
@@ -44,13 +42,12 @@ export const LandingPage = async ({
             tenant={tenant}
           />
         ) : (
-          <Heading level={1} visual="section" className={s.heading()}>
-            {title}
-          </Heading>
+          <PageHeading heading={title} />
         )}
-
+      </PageShell.Heading>
+      <PageShell.Content>
         <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />
-      </main>
-    </>
+      </PageShell.Content>
+    </PageShell>
   );
 };
