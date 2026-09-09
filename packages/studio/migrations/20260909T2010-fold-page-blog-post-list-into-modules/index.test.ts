@@ -7,7 +7,7 @@ describe(foldPostListIntoModules, () => {
     const result = foldPostListIntoModules({
       _id: 'page-blog',
       postList: { _ref: 'postList-1' },
-      modules: [{ _key: 'cta-1', _type: 'reference', _ref: 'cta-1' }],
+      modules: [{ _key: 'cta-1', _type: 'module_cta', _ref: 'cta-1' }],
     });
 
     expect(result).toEqual([
@@ -16,7 +16,7 @@ describe(foldPostListIntoModules, () => {
         'modules',
         prepend([
           {
-            _type: 'reference',
+            _type: 'module_postList',
             _key: 'postList-postList-1',
             _ref: 'postList-1',
           },
@@ -37,7 +37,7 @@ describe(foldPostListIntoModules, () => {
         'modules',
         prepend([
           {
-            _type: 'reference',
+            _type: 'module_postList',
             _key: 'postList-postList-1',
             _ref: 'postList-1',
           },
@@ -51,7 +51,11 @@ describe(foldPostListIntoModules, () => {
       _id: 'page-blog',
       postList: { _ref: 'postList-1' },
       modules: [
-        { _key: 'postList-postList-1', _type: 'reference', _ref: 'postList-1' },
+        {
+          _key: 'postList-postList-1',
+          _type: 'module_postList',
+          _ref: 'postList-1',
+        },
       ],
     });
 

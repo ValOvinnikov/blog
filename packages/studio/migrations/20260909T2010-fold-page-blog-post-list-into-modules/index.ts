@@ -71,7 +71,7 @@ export const foldPostListIntoModules = (doc: TLegacyBlogPageDoc) => {
       'modules',
       prepend([
         {
-          _type: 'reference',
+          _type: 'module_postList',
           _key: toPostListModuleKey(postListRef),
           _ref: postListRef,
         },
