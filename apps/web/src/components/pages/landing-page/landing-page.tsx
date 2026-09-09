@@ -2,7 +2,7 @@ import type { ITenantLocalizedParams } from '@blog/config';
 import { LandingBreadcrumbs } from '@web/components/features/landing/landing-breadcrumbs';
 import { PageShell } from '@web/components/page-templates/page-shell';
 import { PageHeading } from '@web/components/shared/page-heading';
-import { HeroSlot } from '@web/modules/hero-slot';
+import { PageIntro } from '@web/components/shared/page-intro';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import { getLandingPage } from '@web/server/landing/get-landing-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
@@ -34,16 +34,9 @@ export const LandingPage = async ({
         <LandingBreadcrumbs slug={slug} tenant={tenant} />
       </PageShell.Breadcrumbs>
       <PageShell.Heading>
-        {hero ? (
-          <HeroSlot
-            id={hero.id}
-            type={hero.type}
-            locale={locale}
-            tenant={tenant}
-          />
-        ) : (
+        <PageIntro hero={hero} locale={locale} tenant={tenant}>
           <PageHeading heading={title} visual="section" />
-        )}
+        </PageIntro>
       </PageShell.Heading>
       <PageShell.Content>
         <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />

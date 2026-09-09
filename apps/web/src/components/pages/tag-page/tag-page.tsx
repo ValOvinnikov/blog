@@ -2,7 +2,7 @@ import { routes } from '@blog/config';
 import { TagBreadcrumbs } from '@web/components/features/tag/tag-breadcrumbs';
 import { PageShell } from '@web/components/page-templates/page-shell';
 import { PageHeading } from '@web/components/shared/page-heading';
-import { HeroSlot } from '@web/modules/hero-slot';
+import { PageIntro } from '@web/components/shared/page-intro';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import { PostListModule } from '@web/modules/post-list/post-list-module';
 import { getTagPage } from '@web/server/tag/get-tag-page';
@@ -43,20 +43,13 @@ export const TagPage = async ({
         <TagBreadcrumbs slug={slug} tenant={tenant} />
       </PageShell.Breadcrumbs>
       <PageShell.Heading>
-        {hero ? (
-          <HeroSlot
-            id={hero.id}
-            type={hero.type}
-            locale={locale}
-            tenant={tenant}
-          />
-        ) : (
+        <PageIntro hero={hero} locale={locale} tenant={tenant}>
           <PageHeading
             heading={tag.title}
             supportingText={tag.description}
             hasTrailingSpace={false}
           />
-        )}
+        </PageIntro>
       </PageShell.Heading>
       <PageShell.Content>
         <PostListModule
