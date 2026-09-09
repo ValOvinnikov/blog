@@ -4712,6 +4712,14 @@
         },
         "optional": true
       },
+      "headingBlock": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "headingBlock"
+        },
+        "optional": true
+      },
       "hero": {
         "type": "objectAttribute",
         "value": {
