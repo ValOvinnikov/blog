@@ -1,6 +1,7 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { PostFeaturedModuleView } from './post-featured-module-view';
 
@@ -46,10 +47,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: {
-      heading: 'Featured',
-      supportingText: undefined,
-    },
+    headingBlock: makeHeadingBlock({ heading: 'Featured' }),
     items: [leadItem, secondItem, thirdItem],
     layout: undefined,
     contentAlignment: undefined,
@@ -77,10 +75,7 @@ export const LeadOnly: TStory = {
 
 export const WithoutCmsHeading: TStory = {
   args: {
-    headingBlock: {
-      heading: undefined,
-      supportingText: undefined,
-    },
+    headingBlock: makeHeadingBlock(),
   },
 };
 

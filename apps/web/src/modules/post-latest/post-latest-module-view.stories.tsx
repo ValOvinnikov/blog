@@ -2,6 +2,7 @@ import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
 import { objectKeys } from '@blog/utils';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { PostLatestModuleView } from './post-latest-module-view';
 import { postLatestModuleViewVariants } from './post-latest-module-view-variants';
@@ -41,10 +42,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: {
-      heading: 'Latest posts',
-      supportingText: undefined,
-    },
+    headingBlock: makeHeadingBlock({ heading: 'Latest posts' }),
     items,
     layout: undefined,
     contentAlignment: undefined,
@@ -61,10 +59,7 @@ export const Default: TStory = {};
 
 export const WithoutCmsHeading: TStory = {
   args: {
-    headingBlock: {
-      heading: undefined,
-      supportingText: undefined,
-    },
+    headingBlock: makeHeadingBlock(),
   },
 };
 

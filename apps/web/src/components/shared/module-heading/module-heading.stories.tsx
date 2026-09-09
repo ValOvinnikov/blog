@@ -1,6 +1,7 @@
 import { CONTENT_ALIGNMENT } from '@blog/config';
 import { HEADING_LEVELS } from '@blog/ui/lib/react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { ModuleHeading } from './module-heading';
 
@@ -19,7 +20,7 @@ const meta = {
     },
   },
   args: {
-    headingBlock: { heading: 'Latest posts', supportingText: undefined },
+    headingBlock: makeHeadingBlock({ heading: 'Latest posts' }),
     accessibleTitle: 'Posts',
     id: 'module-heading-story-title',
     level: 2,
@@ -34,33 +35,33 @@ export const Default: TStory = {};
 
 export const WithSupportingText: TStory = {
   args: {
-    headingBlock: {
+    headingBlock: makeHeadingBlock({
       heading: 'Latest posts',
       supportingText: 'Fresh from the blog, updated weekly.',
-    },
+    }),
   },
 };
 
 export const BlankHeadingFallback: TStory = {
-  args: { headingBlock: { heading: undefined, supportingText: undefined } },
+  args: { headingBlock: makeHeadingBlock() },
 };
 
 export const CenterAligned: TStory = {
   args: {
     align: CONTENT_ALIGNMENT.CENTER,
-    headingBlock: {
+    headingBlock: makeHeadingBlock({
       heading: 'Latest posts',
       supportingText: 'Fresh from the blog, updated weekly.',
-    },
+    }),
   },
 };
 
 export const RightAligned: TStory = {
   args: {
     align: CONTENT_ALIGNMENT.RIGHT,
-    headingBlock: {
+    headingBlock: makeHeadingBlock({
       heading: 'Latest posts',
       supportingText: 'Fresh from the blog, updated weekly.',
-    },
+    }),
   },
 };

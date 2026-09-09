@@ -1,6 +1,7 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { PostFeaturedModuleView } from './post-featured-module-view';
 
@@ -39,10 +40,7 @@ const thirdPost = makePostListItem({
 
 const setup = customRender(PostFeaturedModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: {
-    heading: 'Featured',
-    supportingText: undefined,
-  },
+  headingBlock: makeHeadingBlock({ heading: 'Featured' }),
   items: [leadPost],
   layout: undefined,
   contentAlignment: undefined,
@@ -72,10 +70,7 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
 
   it('renders a visually hidden heading from accessibleTitle when headingBlock.heading is undefined', () => {
     setup({
-      headingBlock: {
-        heading: undefined,
-        supportingText: undefined,
-      },
+      headingBlock: makeHeadingBlock(),
     });
 
     const heading = screen.getByRole('heading', {

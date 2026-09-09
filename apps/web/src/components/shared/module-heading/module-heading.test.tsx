@@ -1,10 +1,11 @@
 import { CONTENT_ALIGNMENT } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { ModuleHeading } from './module-heading';
 
 const setup = customRender(ModuleHeading, {
-  headingBlock: { heading: 'Latest posts', supportingText: undefined },
+  headingBlock: makeHeadingBlock({ heading: 'Latest posts' }),
   accessibleTitle: 'Posts',
   id: 'section-title',
   level: 2,
@@ -24,7 +25,7 @@ describe(`<${ModuleHeading.name}/>`, () => {
   });
 
   it('renders the accessible title as a visually hidden fallback when heading is blank', () => {
-    setup({ headingBlock: { heading: '   ', supportingText: undefined } });
+    setup({ headingBlock: makeHeadingBlock({ heading: '   ' }) });
 
     const heading = screen.getByRole('heading', { level: 2, name: 'Posts' });
     expect(heading).toHaveClass('sr-only');
@@ -32,7 +33,7 @@ describe(`<${ModuleHeading.name}/>`, () => {
 
   it('renders the accessible title as a visually hidden fallback when heading is undefined', () => {
     setup({
-      headingBlock: { heading: undefined, supportingText: undefined },
+      headingBlock: makeHeadingBlock(),
     });
 
     const heading = screen.getByRole('heading', { level: 2, name: 'Posts' });
@@ -55,10 +56,9 @@ describe(`<${ModuleHeading.name}/>`, () => {
 
   it('renders the supporting text when given', () => {
     setup({
-      headingBlock: {
-        heading: 'Latest posts',
+      headingBlock: makeHeadingBlock({
         supportingText: 'Fresh from the blog.',
-      },
+      }),
     });
 
     expect(screen.getByText('Fresh from the blog.')).toBeVisible();
@@ -75,10 +75,10 @@ describe(`<${ModuleHeading.name}/>`, () => {
   it('aligns the heading and supporting text center when align is CENTER', () => {
     setup({
       align: CONTENT_ALIGNMENT.CENTER,
-      headingBlock: {
+      headingBlock: makeHeadingBlock({
         heading: 'Latest posts',
         supportingText: 'Fresh from the blog.',
-      },
+      }),
     });
 
     expect(screen.getByRole('heading', { name: 'Latest posts' })).toHaveClass(
@@ -90,10 +90,10 @@ describe(`<${ModuleHeading.name}/>`, () => {
   it('aligns the heading and supporting text right when align is RIGHT', () => {
     setup({
       align: CONTENT_ALIGNMENT.RIGHT,
-      headingBlock: {
+      headingBlock: makeHeadingBlock({
         heading: 'Latest posts',
         supportingText: 'Fresh from the blog.',
-      },
+      }),
     });
 
     expect(screen.getByRole('heading', { name: 'Latest posts' })).toHaveClass(
