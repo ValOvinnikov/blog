@@ -1,7 +1,7 @@
-import { MissingPostListError } from '@blog/service/features/pages/tag/adaptor/missing-post-list-error';
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawTagPage } from '@blog/service/testing/pages/fixtures';
+import { makeRawOptionalHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getTagPage } from './loader';
@@ -20,17 +20,14 @@ vi.mock('@blog/service/sanity/image', () => ({
 const tenant = makeTenant();
 
 describe('getTagPage', () => {
-  it('exposes the postList module id from page_tag.postList', async () => {
+  it('loads a tag page with no list module in modules[]', async () => {
     mockRun
-      .mockResolvedValueOnce(
-        makeRawTagPage({ postList: { _id: 'post-list-1' } }),
-      )
+      .mockResolvedValueOnce(makeRawTagPage({ modules: [] }))
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getTagPage('typescript', tenant);
-    if (!result) throw new Error('expected a tag page');
 
-    expect(result.postListId).toBe('post-list-1');
+    expect(result).toBeDefined();
   });
 
   it('takes the heading/supporting text from the referenced tag, not page_tag.title', async () => {
@@ -111,6 +108,83 @@ describe('getTagPage', () => {
     expect(result.seo.description).toBe('Posts about TypeScript.');
   });
 
+  it('uses the authored headingBlock over the tag fallback', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawTagPage({
+          tag: {
+            _id: 'tag-1',
+            title: 'TypeScript',
+            slug: 'typescript',
+            description: 'Posts about TypeScript.',
+          },
+          headingBlock: makeRawOptionalHeadingBlock({
+            heading: 'TypeScript, curated',
+            supportingText: 'Hand-picked reads.',
+          }),
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getTagPage('typescript', tenant);
+    if (!result) throw new Error('expected a tag page');
+
+    expect(result.headingBlock).toEqual({
+      heading: 'TypeScript, curated',
+      supportingText: 'Hand-picked reads.',
+    });
+  });
+
+  it('falls back to the tag title/description when headingBlock is unset', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawTagPage({
+          tag: {
+            _id: 'tag-1',
+            title: 'TypeScript',
+            slug: 'typescript',
+            description: 'Posts about TypeScript.',
+          },
+          headingBlock: null,
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getTagPage('typescript', tenant);
+    if (!result) throw new Error('expected a tag page');
+
+    expect(result.headingBlock).toEqual({
+      heading: 'TypeScript',
+      supportingText: 'Posts about TypeScript.',
+    });
+  });
+
+  it('falls back to the tag description only for an unset supportingText, keeping an authored heading', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawTagPage({
+          tag: {
+            _id: 'tag-1',
+            title: 'TypeScript',
+            slug: 'typescript',
+            description: 'Posts about TypeScript.',
+          },
+          headingBlock: makeRawOptionalHeadingBlock({
+            heading: 'TypeScript, curated',
+          }),
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getTagPage('typescript', tenant);
+    if (!result) throw new Error('expected a tag page');
+
+    expect(result.headingBlock).toEqual({
+      heading: 'TypeScript, curated',
+      supportingText: 'Posts about TypeScript.',
+    });
+  });
+
   it('leaves hero undefined when page_tag.hero is unset', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawTagPage({ hero: null }))
@@ -157,18 +231,6 @@ describe('getTagPage', () => {
     );
   });
 
-  // Regression guard for the decision that a missing slot is a loud failure,
-  // never a substituted default: this must reject rather than resolve with
-  // an invented module id.
-  it('rejects with MissingPostListError when page_tag.postList is unset, without fetching site settings', async () => {
-    mockRun.mockResolvedValueOnce(makeRawTagPage({ postList: null }));
-
-    await expect(getTagPage('typescript', tenant)).rejects.toThrow(
-      MissingPostListError,
-    );
-    expect(mockRun).toHaveBeenCalledTimes(1);
-  });
-
   it('resolves undefined, rather than rejecting, when no page_tag matches the slug', async () => {
     mockRun.mockResolvedValueOnce(null);
 
@@ -198,11 +260,7 @@ describe('getTagPage', () => {
       expect.objectContaining({
         tenant,
         next: expect.objectContaining({
-          tags: [
-            't:tenant-a:page_tag',
-            't:tenant-a:tag',
-            't:tenant-a:modules:postList',
-          ],
+          tags: ['t:tenant-a:page_tag', 't:tenant-a:tag'],
         }),
       }),
     );

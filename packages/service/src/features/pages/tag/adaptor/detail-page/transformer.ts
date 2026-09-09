@@ -1,6 +1,7 @@
 import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
 import type { TImageTenant } from '@blog/service/sanity/image';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
+import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import {
   toHeroSlot,
   toModule,
@@ -25,13 +26,17 @@ function toTagDetailPageTag(raw: TRawTagDetailPageTag): TTagDetailPageTag {
 export function toTagDetailPage(
   rawPage: TRawTagPage,
   settings: TSiteSettings,
-  postListId: string,
   tenant: TImageTenant,
 ): TTagDetailPage {
   const tag = toTagDetailPageTag(rawPage.tag);
+  const headingBlock = toHeadingBlock(rawPage.headingBlock);
 
   return {
     tag,
+    headingBlock: {
+      heading: headingBlock.heading ?? tag.title,
+      supportingText: headingBlock.supportingText ?? tag.description,
+    },
     hero: rawPage.hero ? toHeroSlot(rawPage.hero) : undefined,
     modules: (rawPage.modules ?? []).map(toModule),
     seo: resolveSeo(
@@ -43,6 +48,5 @@ export function toTagDetailPage(
       },
       tenant,
     ),
-    postListId,
   };
 }

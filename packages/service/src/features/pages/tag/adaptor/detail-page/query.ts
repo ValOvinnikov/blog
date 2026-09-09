@@ -1,4 +1,5 @@
 import { q, type TSlugParams } from '@blog/service/sanity/query';
+import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo';
 import { tagFragment } from '@blog/service/shared/fragments/tag';
@@ -21,14 +22,11 @@ export const tagPageQuery = q
         description: tagSub.field('description').nullable(true),
       }))
       .notNull(),
-    hero: sub.field('hero').deref().project(moduleFragment).nullable(true),
-    postList: sub
-      .field('postList')
-      .deref()
-      .project(() => ({
-        _id: true,
-      }))
+    headingBlock: sub
+      .field('headingBlock')
+      .project(headingBlockFragment)
       .nullable(true),
+    hero: sub.field('hero').deref().project(moduleFragment).nullable(true),
     modules: sub
       .field('modules[]')
       .deref()
