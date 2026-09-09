@@ -292,6 +292,43 @@ reading the document's own `title`/`heading` whether or not a hero is set.
 non-hero `_type` as a data error through the loader's normal failure path
 rather than rendering a blank page.
 
+**The post is the page.** `page_post` carries the post itself — `title`,
+`slug`, `excerpt`, `heroImage`, `author`, `topic`, `tags`, `publishedAt`,
+`body`, `featured`, `skim` and `seo` — rather than wrapping a separate
+`blog_post` and dereferencing it. Every post read in `@blog/service`
+projects those fields off `page_post` directly, and `apps/web` names
+`page_post` as the post's document type wherever it needs one: the
+revalidation webhook's path derivation and its `bookmarks` cleanup (§9),
+and the `revalidate-tags` map, whose `page_post` entry purges the
+post-content tags (`posts`, `author`, `topic`, `tag`) that the wrapper type
+used to own. `blog_post` still exists and is still a valid reference target
+alongside `page_post` everywhere a post can be linked, but nothing reads it
+for page content; it and `page_post.post` retire together, and a Sanity
+`_type` is immutable, so that retirement is its own migration rather than a
+rename.
+
+`page_post.modules[]` allows `module_postRelated`, `module_newsletter`,
+`module_cta` and `module_content`. Two concerns that were once fields on the
+post became modules in that array: related reading is `module_postRelated`
+(its own `limit`, 1–6, default 3), and the newsletter's presence is the
+`module_newsletter` module being in the array at all rather than a
+`newsletterEnabled` boolean — which is why `page_post` has no such field.
+`module_newsletter` carries a `variant` (`NEWSLETTER_VARIANT`,
+`FULL`/`COMPACT`, coalesced to `FULL` at the query since the schema field is
+optional) selecting which form of the signup it renders.
+
+**Four of the absorbed fields are optional in the view models even though
+the schema marks them required.** `excerpt`, `author`, `topic` and `body`
+surface as `T | undefined` on `TPostCard`/`TPostDetail` (and `excerpt`/
+`topic` on `TArchivePostCard`, `excerpt` on `TFeedPost`), because a
+`page_post` that predates the absorption genuinely lacks them until a
+migration backfills it. Consumers omit the element rather than substituting
+a placeholder: no byline, no topic chip, no `<description>` in the feed, and
+no `author` key in the `BlogPosting` JSON-LD. The one place the assertion
+survives is the skim-generation query, a publish-webhook read where an
+absent body is a real precondition failure rather than something to render
+around.
+
 `module_cta` additionally carries a required `variant` (`BANNER`/`SPLIT`/
 `CALLOUT`, from `CTA_VARIANT`, default `CALLOUT`), a required `bandTone`
 (the section band behind the card — same three `BRAND_VARIANT` values its
@@ -696,7 +733,7 @@ webhook purges both that form and the legacy unprefixed one per publish, keyed
 off Sanity's own `sanity-project-id` webhook header. Tag expiry alone does not
 invalidate a prerendered route on Vercel, so the webhook also purges resolved,
 tenant-scoped paths (`revalidatePath('/<tenantId>/<locale>/blog/my-post')`) —
-precisely derived for a published `blog_post`: its own page, the home and blog
+precisely derived for a published `page_post`: its own page, the home and blog
 archive with pagination, and **every** tag/topic page of the tenant with their
 own pagination, not only the ones the post currently belongs to (a
 re-categorisation or removal would otherwise leave stale HTML on the page the
@@ -719,7 +756,7 @@ route declares its own, kept in step with `@blog/config`'s
 `CONTENT_ROUTE_REVALIDATE_SECONDS` by test rather than by import.
 
 The same webhook also cleans
-up orphaned `@blog/db` `bookmarks` rows when it receives a `blog_post` delete
+up orphaned `@blog/db` `bookmarks` rows when it receives a `page_post` delete
 (Sanity's `sanity-operation` header — unpublish fires the same trigger as
 true deletion), scoped to the tenant resolved from that project-id header.
 `@blog/service`'s
