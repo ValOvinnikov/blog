@@ -757,7 +757,7 @@ every sub-issue):**
   its own sub-issue too; where a layer has nothing to do, the epic says so
   rather than filing an empty ticket.
 - **Platform style is mandatory and identical for every module.** Studio:
-  `titleField`, `brandVariantField`, `sectionHeaderField` (where the module
+  `titleField`, `brandVariantField`, `headingBlockField` (where the module
   has a heading), `defineAlignmentFields`, `layoutField`, a named
   `{name}Schema` export, a desk-group entry, page allow-list entries.
   Service: `service.modules.<name>.v1`, explicit projections, `T | undefined`
@@ -1128,8 +1128,8 @@ when present` — one query resolving module and terms, `fallbackTaxonomy`
   12. **One ticket per page, every layer** — home #2975, landing #2976,
       blog list #2977, topic #2978, tag #2979, topics index #2980, tags
       index #2981, post #2983 (order only, after 5). Each: canonical
-      field order (identity → entity → headingSettings → hero → modules →
-      seo), `hero` optional + `headingSettings` (`sectionHeader` object) +
+      field order (identity → entity → headingBlock → hero → modules →
+      seo), `hero` optional + `headingBlock` +
       `modules[]` with the hero-or-heading rule, its slot folded into
       `modules[]`, its service projection, its web page through the
       template — expand PR (old fields `readOnly`, migration, typegen,
@@ -1149,7 +1149,7 @@ when present` — one query resolving module and terms, `fallbackTaxonomy`
   `*-page-view.tsx` are deleted; every listing renders through
   `PostCardItem` and `PostGrid`, or `Carousel` where `displayMode` says so.
   Every page document declares `hero` and `modules[]` in the canonical
-  order with no slot field beside them and `headingSettings` on every page
+  order with no slot field beside them and `headingBlock` on every page
   but the post; every CMS page renders breadcrumbs → hero, else the heading
   as h1 → modules (2026-09-08).
 
