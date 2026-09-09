@@ -1,12 +1,11 @@
-import type { THeroModuleType } from '@blog/config';
+import type { THeadingBlock, THeroModuleType } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { PageHeading } from '@web/components/shared/page-heading';
 import { HeroSlot } from '@web/modules/hero-slot';
 
 export interface IPageIntroProps {
   hero?: TModule<THeroModuleType>;
-  heading?: string;
-  supportingText?: string;
+  headingBlock?: THeadingBlock;
   hasTrailingSpace?: boolean;
   locale: string;
   tenant: string;
@@ -18,18 +17,16 @@ export interface IPageIntroProps {
  */
 export const PageIntro = ({
   hero,
-  heading,
-  supportingText,
+  headingBlock,
   hasTrailingSpace,
   locale,
   tenant,
 }: IPageIntroProps) =>
   hero ? (
     <HeroSlot id={hero.id} type={hero.type} locale={locale} tenant={tenant} />
-  ) : heading ? (
+  ) : headingBlock?.heading ? (
     <PageHeading
-      heading={heading}
-      supportingText={supportingText}
+      headingBlock={headingBlock}
       hasTrailingSpace={hasTrailingSpace}
     />
   ) : null;

@@ -4,8 +4,10 @@ import { customRender, screen } from '@web/testing/custom-render';
 import { PageHeading } from './page-heading';
 
 const setup = customRender(PageHeading, {
-  heading: 'Notes on building things',
-  supportingText: undefined,
+  headingBlock: {
+    heading: 'Notes on building things',
+    supportingText: undefined,
+  },
   align: undefined,
 });
 
@@ -28,7 +30,12 @@ describe(`<${PageHeading.name}/>`, () => {
   });
 
   it('renders the supporting text when given', () => {
-    setup({ supportingText: 'Essays and notes from the team.' });
+    setup({
+      headingBlock: {
+        heading: 'Notes on building things',
+        supportingText: 'Essays and notes from the team.',
+      },
+    });
 
     expect(screen.getByText('Essays and notes from the team.')).toBeVisible();
   });
@@ -44,7 +51,10 @@ describe(`<${PageHeading.name}/>`, () => {
   it('aligns the heading and supporting text center when align is CENTER', () => {
     setup({
       align: CONTENT_ALIGNMENT.CENTER,
-      supportingText: 'Essays and notes from the team.',
+      headingBlock: {
+        heading: 'Notes on building things',
+        supportingText: 'Essays and notes from the team.',
+      },
     });
 
     expect(
@@ -58,7 +68,10 @@ describe(`<${PageHeading.name}/>`, () => {
   it('aligns the heading and supporting text right when align is RIGHT', () => {
     setup({
       align: CONTENT_ALIGNMENT.RIGHT,
-      supportingText: 'Essays and notes from the team.',
+      headingBlock: {
+        heading: 'Notes on building things',
+        supportingText: 'Essays and notes from the team.',
+      },
     });
 
     expect(
@@ -104,7 +117,10 @@ describe(`<${PageHeading.name}/>`, () => {
 
   it('keeps the heading margin but drops the supporting text margin when hasTrailingSpace is false and supporting text is given', () => {
     setup({
-      supportingText: 'Essays and notes from the team.',
+      headingBlock: {
+        heading: 'Notes on building things',
+        supportingText: 'Essays and notes from the team.',
+      },
       hasTrailingSpace: false,
     });
 
@@ -119,7 +135,12 @@ describe(`<${PageHeading.name}/>`, () => {
   });
 
   it('keeps the supporting text trailing margin by default when supporting text is given', () => {
-    setup({ supportingText: 'Essays and notes from the team.' });
+    setup({
+      headingBlock: {
+        heading: 'Notes on building things',
+        supportingText: 'Essays and notes from the team.',
+      },
+    });
 
     expect(screen.getByText('Essays and notes from the team.')).toHaveClass(
       'mb-6',

@@ -48,15 +48,13 @@ export default async function HomePage({ params }: TProps) {
     result,
     'home_page.fetch_failed',
   );
-  const { heading, supportingText } = headingBlock;
 
   return (
     <PageShell>
       <PageShell.Heading>
         <PageIntro
           hero={hero}
-          heading={heading}
-          supportingText={supportingText}
+          headingBlock={headingBlock}
           locale={locale}
           tenant={tenant}
         />

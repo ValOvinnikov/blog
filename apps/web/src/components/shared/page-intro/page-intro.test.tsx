@@ -14,8 +14,7 @@ vi.mock('@web/modules/hero-slot', () => ({
 
 const setup = customRender(PageIntro, {
   hero: undefined,
-  heading: undefined,
-  supportingText: undefined,
+  headingBlock: undefined,
   hasTrailingSpace: undefined,
   locale: 'en',
   tenant: 'tenant-1',
@@ -29,7 +28,10 @@ describe(`<${PageIntro.name}/>`, () => {
   it('renders the hero and not the heading when a hero is set', () => {
     setup({
       hero: { id: 'hero-1', type: 'module_hero' },
-      heading: 'Notes on building things',
+      headingBlock: {
+        heading: 'Notes on building things',
+        supportingText: undefined,
+      },
     });
 
     expect(screen.getByTestId('hero-slot')).toHaveTextContent('hero-1');
@@ -47,8 +49,10 @@ describe(`<${PageIntro.name}/>`, () => {
 
   it('renders the PageHeading when there is no hero and a heading is given', () => {
     setup({
-      heading: 'Notes on building things',
-      supportingText: 'Essays and notes from the team.',
+      headingBlock: {
+        heading: 'Notes on building things',
+        supportingText: 'Essays and notes from the team.',
+      },
     });
 
     expect(
@@ -63,6 +67,15 @@ describe(`<${PageIntro.name}/>`, () => {
 
   it('renders nothing when there is no hero and no heading', () => {
     const { container } = setup();
+
+    expect(container).toBeEmptyDOMElement();
+    expect(heroSlotMock).not.toHaveBeenCalled();
+  });
+
+  it('renders nothing when there is no hero and headingBlock has no heading', () => {
+    const { container } = setup({
+      headingBlock: { heading: undefined, supportingText: 'Orphaned text' },
+    });
 
     expect(container).toBeEmptyDOMElement();
     expect(heroSlotMock).not.toHaveBeenCalled();

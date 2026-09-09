@@ -44,8 +44,7 @@ export const TagPage = async ({
       <PageShell.Heading>
         <PageIntro
           hero={hero}
-          heading={tag.title}
-          supportingText={tag.description}
+          headingBlock={{ heading: tag.title, supportingText: tag.description }}
           hasTrailingSpace={false}
           locale={locale}
           tenant={tenant}
