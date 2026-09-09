@@ -19,8 +19,7 @@ const meta = {
     },
   },
   args: {
-    heading: 'Latest posts',
-    supportingText: undefined,
+    headingBlock: { heading: 'Latest posts', supportingText: undefined },
     accessibleTitle: 'Posts',
     id: 'module-heading-story-title',
     level: 2,
@@ -34,23 +33,34 @@ type TStory = StoryObj<typeof meta>;
 export const Default: TStory = {};
 
 export const WithSupportingText: TStory = {
-  args: { supportingText: 'Fresh from the blog, updated weekly.' },
+  args: {
+    headingBlock: {
+      heading: 'Latest posts',
+      supportingText: 'Fresh from the blog, updated weekly.',
+    },
+  },
 };
 
 export const BlankHeadingFallback: TStory = {
-  args: { heading: undefined },
+  args: { headingBlock: { heading: undefined, supportingText: undefined } },
 };
 
 export const CenterAligned: TStory = {
   args: {
     align: CONTENT_ALIGNMENT.CENTER,
-    supportingText: 'Fresh from the blog, updated weekly.',
+    headingBlock: {
+      heading: 'Latest posts',
+      supportingText: 'Fresh from the blog, updated weekly.',
+    },
   },
 };
 
 export const RightAligned: TStory = {
   args: {
     align: CONTENT_ALIGNMENT.RIGHT,
-    supportingText: 'Fresh from the blog, updated weekly.',
+    headingBlock: {
+      heading: 'Latest posts',
+      supportingText: 'Fresh from the blog, updated weekly.',
+    },
   },
 };

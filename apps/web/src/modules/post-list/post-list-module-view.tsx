@@ -62,8 +62,7 @@ export const PostListModuleView = ({
       dataTestId={dataTestId}
     >
       <ModuleHeading
-        heading={headingBlock.heading}
-        supportingText={headingBlock.supportingText}
+        headingBlock={headingBlock}
         accessibleTitle={accessibleTitle}
         id={titleId}
         level={2}
