@@ -1,12 +1,10 @@
-import { routes } from '@blog/config';
+import { TAXONOMY_KIND } from '@blog/config';
 import { TagBreadcrumbs } from '@web/components/features/tag/tag-breadcrumbs';
 import { PageShell } from '@web/components/page-templates/page-shell';
 import { PageIntro } from '@web/components/shared/page-intro';
 import { ModuleRenderer } from '@web/modules/module-renderer';
-import { PostListModule } from '@web/modules/post-list/post-list-module';
 import { getTagPage } from '@web/server/tag/get-tag-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
-import { getTranslations } from 'next-intl/server';
 
 type TTagPageProps = {
   slug: string;
@@ -31,9 +29,8 @@ export const TagPage = async ({
   const pageData = guardPageLoaderResult(result, 'tag_page.fetch_failed', {
     slug,
   });
-  const { tag, hero, modules, postListId } = pageData;
+  const { tag, headingBlock, hero, modules } = pageData;
 
-  const tagPageT = await getTranslations('tagPage');
   const currentPage = page ?? 1;
 
   return (
@@ -44,27 +41,19 @@ export const TagPage = async ({
       <PageShell.Heading>
         <PageIntro
           hero={hero}
-          headingBlock={{ heading: tag.title, supportingText: tag.description }}
+          headingBlock={headingBlock}
           hasTrailingSpace={false}
           locale={locale}
           tenant={tenant}
         />
       </PageShell.Heading>
       <PageShell.Content>
-        <PostListModule
-          id={postListId}
-          locale={locale}
-          tenant={tenant}
-          page={currentPage}
-          createHref={(pageNumber) => routes.tag(slug, pageNumber)}
-          ariaLabel={tagPageT('paginationAriaLabel', { name: tag.title })}
-          accessibleTitle={tagPageT('title', { name: tag.title })}
-          emptyMessageFallback={tagPageT('empty', { name: tag.title })}
-          titleId="tag-posts-title"
-        />
         <ModuleRenderer
           modules={modules}
-          context={{ page: currentPage }}
+          context={{
+            page: currentPage,
+            archive: { kind: TAXONOMY_KIND.TAGS, slug, name: tag.title },
+          }}
           locale={locale}
           tenant={tenant}
         />

@@ -1,4 +1,5 @@
 import type { TTagDetailPage } from '@blog/service';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 type TTagDetailPageTag = TTagDetailPage['tag'];
 
@@ -19,6 +20,7 @@ export const makeTagDetailPage = (
 ): TTagDetailPage => {
   return {
     tag: makeTag(),
+    headingBlock: makeHeadingBlock({ heading: 'TypeScript' }),
     modules: [],
     seo: {
       title: 'TypeScript',
@@ -27,7 +29,6 @@ export const makeTagDetailPage = (
       ogDescription: 'Posts about TypeScript.',
       ogImageUrl: undefined,
     },
-    postListId: 'post-list-1',
     ...overrides,
   };
 };
