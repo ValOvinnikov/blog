@@ -133,6 +133,87 @@ describe('HomePage', () => {
 
     expect(getHomePageMock).toHaveBeenCalledWith(tenant);
   });
+
+  it('renders the heading and supporting text when there is no hero', async () => {
+    getHomePageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        title: 'Home — internal label',
+        heading: 'Welcome to the blog',
+        supportingText: 'Fresh posts every week.',
+        hero: undefined,
+        modules: [],
+        seo: makeSeo(),
+      },
+    });
+
+    await setup();
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Welcome to the blog' }),
+    ).toBeVisible();
+    expect(screen.getByText('Fresh posts every week.')).toBeVisible();
+    expect(screen.queryByTestId('hero-module')).not.toBeInTheDocument();
+  });
+
+  it('renders the hero, not the heading, when both are present', async () => {
+    getHomePageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        title: 'Home — internal label',
+        heading: 'Welcome to the blog',
+        supportingText: 'Fresh posts every week.',
+        hero: { id: 'hero-1', type: 'module_hero' },
+        modules: [],
+        seo: makeSeo(),
+      },
+    });
+
+    await setup();
+
+    expect(screen.getByTestId('hero-module')).toHaveTextContent('hero-1');
+    expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
+    expect(screen.queryByText('Welcome to the blog')).not.toBeInTheDocument();
+  });
+
+  it('renders nothing in the heading region — never the internal title — when there is no hero and no heading', async () => {
+    getHomePageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        title: 'Home — internal label',
+        heading: undefined,
+        supportingText: undefined,
+        hero: undefined,
+        modules: [],
+        seo: makeSeo(),
+      },
+    });
+
+    await setup();
+
+    expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
+    expect(screen.queryByText('Home — internal label')).not.toBeInTheDocument();
+  });
+
+  it('never renders the internal title as the visible h1 when a heading is set', async () => {
+    getHomePageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        title: 'Home — internal label',
+        heading: 'Welcome to the blog',
+        supportingText: undefined,
+        hero: undefined,
+        modules: [],
+        seo: makeSeo(),
+      },
+    });
+
+    await setup();
+
+    const h1 = screen.getByRole('heading', { level: 1 });
+    expect(h1).toHaveTextContent('Welcome to the blog');
+    expect(h1).not.toHaveTextContent('Home — internal label');
+  });
 });
 
 describe('generateMetadata', () => {
