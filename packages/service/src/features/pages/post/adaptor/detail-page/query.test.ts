@@ -4,6 +4,7 @@ import {
   makeRawAuthor,
   makeRawPostDetail,
 } from '@blog/service/testing/pages/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 
 import { postPageQuery } from './query';
 
@@ -94,7 +95,7 @@ describe('postPageQuery', () => {
 
   it('parses a post whose only optional heading field, supportingText, is absent', () => {
     const raw = makeRawPostDetail({
-      headingBlock: { heading: 'Hello World', supportingText: null },
+      headingBlock: makeRawHeadingBlock('Hello World'),
     });
 
     const parsed = postPageQuery.parse(raw);

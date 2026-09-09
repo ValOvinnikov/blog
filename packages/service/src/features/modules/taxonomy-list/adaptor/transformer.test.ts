@@ -10,6 +10,7 @@ import {
   makeRawTopicWithPostCount,
 } from '@blog/service/testing/entities/fixtures';
 import { makeRawTaxonomyListModule } from '@blog/service/testing/modules/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 
 import { toTaxonomyListModule } from './transformer';
 
@@ -26,10 +27,9 @@ describe('toTaxonomyListModule', () => {
 
   it('maps headingBlock when authored', () => {
     const raw = makeRawTaxonomyListModule({
-      headingBlock: {
-        heading: 'Browse by topic',
+      headingBlock: makeRawHeadingBlock('Browse by topic', {
         supportingText: 'Pick a subject.',
-      },
+      }),
     });
 
     const module = toTaxonomyListModule(raw);

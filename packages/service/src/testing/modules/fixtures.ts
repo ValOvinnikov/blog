@@ -27,6 +27,10 @@ import type { TRawPostLatestModule } from '@blog/service/features/modules/post-l
 import type { TRawPostListModule } from '@blog/service/features/modules/post-list/adaptor/transformer';
 import type { TRawPostRelatedModule } from '@blog/service/features/modules/post-related/adaptor/transformer';
 import type { TRawTaxonomyListModule } from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
+import {
+  makeRawHeadingBlock,
+  makeRawOptionalHeadingBlock,
+} from '@blog/service/testing/shared/fixtures';
 
 export function makeRawHeroModule(
   overrides: Partial<TRawHeroModule> = {},
@@ -79,7 +83,7 @@ export function makeRawPostListModule(
 ): TRawPostListModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: { heading: 'Latest', supportingText: null },
+    headingBlock: makeRawOptionalHeadingBlock({ heading: 'Latest' }),
     pageSize: 6,
     layout: null,
     contentAlignment: null,
@@ -93,7 +97,7 @@ export function makeRawPostLatestModule(
 ): TRawPostLatestModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: { heading: 'Latest', supportingText: null },
+    headingBlock: makeRawOptionalHeadingBlock({ heading: 'Latest' }),
     limit: 6,
     layout: null,
     contentAlignment: null,
@@ -107,7 +111,7 @@ export function makeRawPostFeaturedModule(
 ): TRawPostFeaturedModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: { heading: 'Featured', supportingText: null },
+    headingBlock: makeRawOptionalHeadingBlock({ heading: 'Featured' }),
     postSource: POST_SOURCE.PINNED,
     posts: [],
     limit: null,
@@ -123,7 +127,7 @@ export function makeRawPostRelatedModule(
 ): TRawPostRelatedModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: { heading: 'Related reading', supportingText: null },
+    headingBlock: makeRawOptionalHeadingBlock({ heading: 'Related reading' }),
     limit: 3,
     layout: null,
     contentAlignment: null,
@@ -155,10 +159,9 @@ export function makeRawCtaModule(
     brandVariant: BRAND_VARIANT.PRIMARY,
     bandTone: BRAND_VARIANT.PRIMARY,
     eyebrow: null,
-    headingBlock: {
-      heading: 'Subscribe to the newsletter',
+    headingBlock: makeRawHeadingBlock('Subscribe to the newsletter', {
       supportingText: 'Get new posts in your inbox.',
-    },
+    }),
     content: null,
     image: null,
     contentPositionSplit: null,
@@ -226,7 +229,7 @@ export function makeRawTaxonomyListModule(
 ): TRawTaxonomyListModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: { heading: 'Topics', supportingText: null },
+    headingBlock: makeRawOptionalHeadingBlock({ heading: 'Topics' }),
     layout: null,
     contentAlignment: null,
     taxonomy: TAXONOMY_KIND.TOPICS,
@@ -242,10 +245,9 @@ export function makeRawNewsletterModule(
 ): TRawNewsletterModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: {
-      heading: 'Stay in the loop',
+    headingBlock: makeRawHeadingBlock('Stay in the loop', {
       supportingText: 'Get new posts in your inbox.',
-    },
+    }),
     variant: NEWSLETTER_VARIANT.FULL,
     layout: null,
     contentAlignment: null,

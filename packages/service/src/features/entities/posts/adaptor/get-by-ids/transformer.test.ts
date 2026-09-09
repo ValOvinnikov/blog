@@ -1,4 +1,5 @@
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { toPostsByIds } from './transformer';
@@ -10,11 +11,11 @@ describe(toPostsByIds, () => {
     const raw = [
       makeRawPostCard({
         _id: 'a',
-        headingBlock: { heading: 'First', supportingText: null },
+        headingBlock: makeRawHeadingBlock('First'),
       }),
       makeRawPostCard({
         _id: 'b',
-        headingBlock: { heading: 'Second', supportingText: null },
+        headingBlock: makeRawHeadingBlock('Second'),
       }),
     ];
 

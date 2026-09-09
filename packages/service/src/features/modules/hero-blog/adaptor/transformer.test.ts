@@ -9,7 +9,10 @@ import {
 } from '@blog/config';
 import { makeRawHeroBlogModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
-import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
+import {
+  makeRawHeadingBlock,
+  makeRawSanityImage,
+} from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { toHeroBlogModule } from './transformer';
@@ -33,7 +36,7 @@ describe(toHeroBlogModule, () => {
     const raw = makeRawHeroBlogModule({
       post: makeRawPostCard({
         _id: 'pinned-post',
-        headingBlock: { heading: 'Pinned title', supportingText: null },
+        headingBlock: makeRawHeadingBlock('Pinned title'),
       }),
     });
 
@@ -47,10 +50,7 @@ describe(toHeroBlogModule, () => {
     const raw = makeRawHeroBlogModule({
       post: makeRawPostCard({
         _id: 'newest-featured-post',
-        headingBlock: {
-          heading: 'Newest featured title',
-          supportingText: null,
-        },
+        headingBlock: makeRawHeadingBlock('Newest featured title'),
       }),
     });
 

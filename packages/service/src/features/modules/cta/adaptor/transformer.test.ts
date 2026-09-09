@@ -13,7 +13,10 @@ import {
   makeRawCtaAction,
   makeRawCtaModule,
 } from '@blog/service/testing/modules/fixtures';
-import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
+import {
+  makeRawHeadingBlock,
+  makeRawSanityImage,
+} from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { toCtaModule } from './transformer';
@@ -149,10 +152,7 @@ describe('toCtaModule', () => {
 
   it('leaves supportingText undefined when not set (no faked default)', () => {
     const raw = makeRawCtaModule({
-      headingBlock: {
-        heading: 'Subscribe to the newsletter',
-        supportingText: null,
-      },
+      headingBlock: makeRawHeadingBlock('Subscribe to the newsletter'),
     });
 
     const cta = toCtaModule(raw, makeTenant());

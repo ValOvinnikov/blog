@@ -1,5 +1,8 @@
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
-import { makeRawImage } from '@blog/service/testing/shared/fixtures';
+import {
+  makeRawHeadingBlock,
+  makeRawImage,
+} from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { toPostCard } from './to-post-card';
@@ -88,7 +91,7 @@ describe('toPostCard', () => {
   it('maps a sparse post-card with no excerpt to undefined', () => {
     const result = toPostCard(
       makeRawPostCard({
-        headingBlock: { heading: 'Hello World', supportingText: null },
+        headingBlock: makeRawHeadingBlock('Hello World'),
       }),
       tenant,
     );
