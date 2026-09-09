@@ -42,9 +42,7 @@ export function toTaxonomyListModule(
 
   return {
     brandVariant: raw.brandVariant,
-    sectionHeader: raw.sectionHeader
-      ? toSectionHeader(raw.sectionHeader)
-      : { heading: undefined, supportingText: undefined },
+    sectionHeader: toSectionHeader(raw.sectionHeader),
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,
     taxonomy: raw.taxonomy,

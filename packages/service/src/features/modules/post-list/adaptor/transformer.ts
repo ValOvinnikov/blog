@@ -26,9 +26,7 @@ export function toPostListModule(
 ): TPostListModule {
   return {
     brandVariant: raw.brandVariant,
-    sectionHeader: raw.sectionHeader
-      ? toSectionHeader(raw.sectionHeader)
-      : { heading: undefined, supportingText: undefined },
+    sectionHeader: toSectionHeader(raw.sectionHeader),
     posts: rawPosts.map((rawPost) => toPostCard(rawPost, tenant)),
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,

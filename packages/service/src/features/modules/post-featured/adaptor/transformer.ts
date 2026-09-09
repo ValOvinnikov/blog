@@ -24,9 +24,7 @@ export function toPostFeaturedModule(
 
   return {
     brandVariant: raw.brandVariant,
-    sectionHeader: raw.sectionHeader
-      ? toSectionHeader(raw.sectionHeader)
-      : { heading: undefined, supportingText: undefined },
+    sectionHeader: toSectionHeader(raw.sectionHeader),
     posts: limitedPosts.map((post) => toPostCard(post, tenant)),
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,
