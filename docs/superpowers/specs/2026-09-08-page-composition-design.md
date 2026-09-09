@@ -564,7 +564,7 @@ Everything else is additive.
   or `Carousel` where `displayMode` says so.
 - Every page document declares `hero` and `modules[]` in the canonical field
   order, no page has a slot field beside `modules[]`, and `headingBlock`
-  (the `headingBlock` object) sits on every page but the post; a page
+  sits on every page but the post; a page
   without a hero renders its heading as the h1 and a page with one renders
   only the hero, through the one `CmsPageTemplate`; every CMS page
   renders breadcrumbs → hero or h1 → modules, with no page-owned list, and
