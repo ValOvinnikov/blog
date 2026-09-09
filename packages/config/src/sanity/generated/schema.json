@@ -1077,36 +1077,6 @@
   },
   {
     "type": "type",
-    "name": "blog_post.reference",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_ref": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          }
-        },
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "reference"
-          }
-        },
-        "_weak": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      },
-      "dereferencesTo": "blog_post"
-    }
-  },
-  {
-    "type": "type",
     "name": "page_post.reference",
     "value": {
       "type": "object",
@@ -1231,17 +1201,19 @@
         "value": {
           "type": "array",
           "of": {
-            "type": "union",
-            "of": [
-              {
-                "type": "inline",
-                "name": "blog_post.reference"
-              },
-              {
-                "type": "inline",
-                "name": "page_post.reference"
+            "type": "object",
+            "attributes": {
+              "_key": {
+                "type": "objectAttribute",
+                "value": {
+                  "type": "string"
+                }
               }
-            ]
+            },
+            "rest": {
+              "type": "inline",
+              "name": "page_post.reference"
+            }
           }
         },
         "optional": true
@@ -1658,6 +1630,36 @@
           "optional": true
         }
       }
+    }
+  },
+  {
+    "type": "type",
+    "name": "blog_post.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "blog_post"
     }
   },
   {
@@ -4893,17 +4895,8 @@
       "post": {
         "type": "objectAttribute",
         "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "inline",
-              "name": "blog_post.reference"
-            },
-            {
-              "type": "inline",
-              "name": "page_post.reference"
-            }
-          ]
+          "type": "inline",
+          "name": "page_post.reference"
         },
         "optional": true
       },
@@ -5208,17 +5201,8 @@
       "featuredPost": {
         "type": "objectAttribute",
         "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "inline",
-              "name": "blog_post.reference"
-            },
-            {
-              "type": "inline",
-              "name": "page_post.reference"
-            }
-          ]
+          "type": "inline",
+          "name": "page_post.reference"
         },
         "optional": true
       },

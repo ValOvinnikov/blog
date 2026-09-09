@@ -14,12 +14,6 @@
 
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
-type ArrayOf<T> = Array<
-  T & {
-    _key: string;
-  }
->;
-
 // Source: ../config/src/sanity/generated/schema.json
 export type Module_newsletter = {
   _id: string;
@@ -171,13 +165,6 @@ export type SectionHeader = {
   supportingText?: string;
 };
 
-export type Blog_postReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'blog_post';
-};
-
 export type Page_postReference = {
   _ref: string;
   _type: 'reference';
@@ -196,7 +183,11 @@ export type Module_postFeatured = {
   sectionHeader?: SectionHeader;
   showImages?: boolean;
   postSource?: 'PINNED' | 'NEWEST_FEATURED';
-  posts?: ArrayOf<Blog_postReference | Page_postReference>;
+  posts?: Array<
+    {
+      _key: string;
+    } & Page_postReference
+  >;
   limit?: number;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
@@ -256,6 +247,13 @@ export type CtaAction = {
   variant?: 'PRIMARY' | 'SECONDARY';
   appearance?: 'CONTAINED' | 'INLINE';
   link?: Link;
+};
+
+export type Blog_postReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'blog_post';
 };
 
 export type Blog_topicReference = {
@@ -790,7 +788,7 @@ export type Module_heroBlog = {
   _rev: string;
   title?: string;
   postSource?: 'PINNED' | 'NEWEST_FEATURED';
-  post?: Blog_postReference | Page_postReference;
+  post?: Page_postReference;
   eyebrow?: string;
   heading?: string;
   supportingText?: string;
@@ -818,7 +816,7 @@ export type Module_hero = {
   _rev: string;
   title?: string;
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  featuredPost?: Blog_postReference | Page_postReference;
+  featuredPost?: Page_postReference;
   heroEyebrowMode?: 'POST_TOPIC' | 'CUSTOM';
   heroEyebrow?: string;
   heroTitleMode?: 'POST_TITLE' | 'CUSTOM';
@@ -1030,7 +1028,6 @@ export type AllSanitySchemaTypes =
   | RichText
   | Module_postRelated
   | SectionHeader
-  | Blog_postReference
   | Page_postReference
   | Module_postFeatured
   | Module_postLatest
@@ -1040,6 +1037,7 @@ export type AllSanitySchemaTypes =
   | Seo
   | OpenGraph
   | CtaAction
+  | Blog_postReference
   | Blog_topicReference
   | Page_landingReference
   | Page_blogReference
