@@ -13,23 +13,7 @@ import {
   type IPostListModulePagination,
 } from './post-list-module-view';
 
-export interface IPostListModuleProps {
-  id: string;
-  locale: string;
-  tenant: string;
-  /** Falls back to `1` when omitted. Superseded by `context.page` when both are given, so a shared `ModuleRenderer` context can carry the current page instead. */
-  page?: number;
-  context?: TModuleComponentProps['context'];
-  /** Pagination href builder. Defaults to `routes.blogIndex`, or to `context.archive`'s own route when set. */
-  createHref?: (page: number) => string;
-  /** Pagination nav `aria-label`. Defaults to the blog archive's own copy, or to `context.archive`'s own copy when set. */
-  ariaLabel?: string;
-  /** Fallback heading for screen readers when the CMS `headingBlock.heading` is blank. Defaults to the blog archive's own copy, or to `context.archive`'s own copy when set. */
-  accessibleTitle?: string;
-  /** Empty-state copy for this archive. Defaults to the blog archive's own copy, or to `context.archive`'s own copy when set. */
-  emptyMessageFallback?: string;
-  titleId?: string;
-}
+export type TPostListModuleProps = TModuleComponentProps;
 
 const ARCHIVE_ROUTE_BUILDER: Record<
   TTaxonomyKind,
@@ -60,26 +44,17 @@ const ARCHIVE_TITLE_ID: Record<TTaxonomyKind, string> = {
 export const PostListModule = async ({
   id,
   tenant,
-  page = 1,
   context,
-  createHref,
-  ariaLabel,
-  accessibleTitle,
-  emptyMessageFallback,
-  titleId,
-}: IPostListModuleProps) => {
-  const resolvedPage = context?.page ?? page;
+}: TPostListModuleProps) => {
+  const resolvedPage = context?.page ?? 1;
   const archive = context?.archive;
 
   const tenantContext = await getTenantSanityContext(tenant);
-  const [result, blogListT, paginationT] = await Promise.all([
+  const [result, paginationT, scopedT] = await Promise.all([
     service.modules.postList.v1.getPostList(id, tenantContext, resolvedPage),
-    getTranslations('blogListPage'),
     getTranslations('pagination'),
+    getTranslations(archive ? ARCHIVE_NAMESPACE[archive.kind] : 'blogListPage'),
   ]);
-  const archiveT = archive
-    ? await getTranslations(ARCHIVE_NAMESPACE[archive.kind])
-    : undefined;
 
   if (!result.ok) {
     logger.error('post_list_module.fetch_failed', {
@@ -113,29 +88,18 @@ export const PostListModule = async ({
     showImages ? renderPostCardImage : undefined,
   );
 
-  const archiveDefaults =
-    archive && archiveT
-      ? {
-          createHref: (pageNumber: number) =>
-            ARCHIVE_ROUTE_BUILDER[archive.kind](archive.slug, pageNumber),
-          ariaLabel: archiveT('paginationAriaLabel', { name: archive.name }),
-          accessibleTitle: archiveT('title', { name: archive.name }),
-          emptyMessageFallback: archiveT('empty', { name: archive.name }),
-          titleId: ARCHIVE_TITLE_ID[archive.kind],
-        }
-      : {
-          createHref: routes.blogIndex,
-          ariaLabel: blogListT('paginationAriaLabel'),
-          accessibleTitle: blogListT('title'),
-          emptyMessageFallback: blogListT('empty'),
-          titleId: 'blog-posts-title',
-        };
+  const scopedParams = archive ? { name: archive.name } : undefined;
+  const createHref = archive
+    ? (pageNumber: number) =>
+        ARCHIVE_ROUTE_BUILDER[archive.kind](archive.slug, pageNumber)
+    : routes.blogIndex;
+  const titleId = archive ? ARCHIVE_TITLE_ID[archive.kind] : 'blog-posts-title';
 
   const pagination: IPostListModulePagination = {
     currentPage,
     totalPages,
-    createHref: createHref ?? archiveDefaults.createHref,
-    ariaLabel: ariaLabel ?? archiveDefaults.ariaLabel,
+    createHref,
+    ariaLabel: scopedT('paginationAriaLabel', scopedParams),
     previousLabel: paginationT('previous'),
     nextLabel: paginationT('next'),
   };
@@ -148,12 +112,10 @@ export const PostListModule = async ({
       layout={layout}
       contentAlignment={contentAlignment}
       hasImages={showImages}
-      titleId={titleId ?? archiveDefaults.titleId}
+      titleId={titleId}
       dataTestId={`post-list-module-${id}`}
-      accessibleTitle={accessibleTitle ?? archiveDefaults.accessibleTitle}
-      emptyMessage={
-        emptyMessageFallback ?? archiveDefaults.emptyMessageFallback
-      }
+      accessibleTitle={scopedT('title', scopedParams)}
+      emptyMessage={scopedT('empty', scopedParams)}
       pagination={pagination}
     />
   );

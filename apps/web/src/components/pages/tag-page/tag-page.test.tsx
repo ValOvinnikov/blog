@@ -1,57 +1,38 @@
+import { TAXONOMY_KIND } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { makeTag } from '@web/testing/shared/tag/fixtures';
 import { notFound } from 'next/navigation';
 
 import { TagPage } from './tag-page';
 
-const {
-  getTagPageMock,
-  tagBreadcrumbsMock,
-  moduleRendererMock,
-  postListModuleMock,
-  heroSlotMock,
-} = vi.hoisted(() => ({
-  getTagPageMock: vi.fn(),
-  tagBreadcrumbsMock: vi.fn(
-    ({ slug, tenant }: { slug: string; tenant: string }) => (
-      <div data-testid="tag-breadcrumbs">
-        {slug}:{tenant}
-      </div>
+const { getTagPageMock, tagBreadcrumbsMock, moduleRendererMock, heroSlotMock } =
+  vi.hoisted(() => ({
+    getTagPageMock: vi.fn(),
+    tagBreadcrumbsMock: vi.fn(
+      ({ slug, tenant }: { slug: string; tenant: string }) => (
+        <div data-testid="tag-breadcrumbs">
+          {slug}:{tenant}
+        </div>
+      ),
     ),
-  ),
-  heroSlotMock: vi.fn(({ id }: { id: string }) => (
-    <h1 data-testid="hero-slot">{id}</h1>
-  )),
-  // `PostListModule`/`ModuleRenderer` are async Server Components — real
-  // RSC async-component nesting isn't renderable through
-  // `@testing-library/react`'s client renderer. Stubbed as plain sync
-  // components so this suite can assert `TagPage` composes them in the
-  // right order with the right props; each part's own behavior is covered
-  // by its own test file (`module-renderer.test.tsx`,
-  // `post-list-module.test.tsx`, `tag-breadcrumbs.test.tsx`).
-  moduleRendererMock: vi.fn(
-    ({ modules }: { modules: { id: string; type: string }[] }) => (
-      <div data-testid="module-renderer-stub">
-        {modules.map((module) => module.type).join(',')}
-      </div>
+    heroSlotMock: vi.fn(({ id }: { id: string }) => (
+      <h1 data-testid="hero-slot">{id}</h1>
+    )),
+    // `ModuleRenderer` is an async Server Component — real RSC async-component
+    // nesting isn't renderable through `@testing-library/react`'s client
+    // renderer. Stubbed as a plain sync component so this suite can assert
+    // `TagPage` composes it with the right props; its own behavior (and the
+    // post-list module it renders) is covered by `module-renderer.test.tsx`
+    // and `post-list-module.test.tsx`.
+    moduleRendererMock: vi.fn(
+      ({ modules }: { modules: { id: string; type: string }[] }) => (
+        <div data-testid="module-renderer-stub">
+          {modules.map((module) => module.type).join(',')}
+        </div>
+      ),
     ),
-  ),
-  postListModuleMock: vi.fn(
-    ({
-      id,
-      page,
-    }: {
-      id: string;
-      locale: string;
-      page: number;
-      createHref: (page: number) => string;
-    }) => (
-      <div data-testid="post-list-module-stub">
-        {id}:{page}
-      </div>
-    ),
-  ),
-}));
+  }));
 
 vi.mock('@web/server/tag/get-tag-page', () => ({
   getTagPage: getTagPageMock,
@@ -63,10 +44,6 @@ vi.mock('@web/components/features/tag/tag-breadcrumbs', () => ({
 
 vi.mock('@web/modules/module-renderer', () => ({
   ModuleRenderer: moduleRendererMock,
-}));
-
-vi.mock('@web/modules/post-list/post-list-module', () => ({
-  PostListModule: postListModuleMock,
 }));
 
 vi.mock('@web/modules/hero-slot', () => ({
@@ -90,7 +67,6 @@ describe(`<${TagPage.name}/>`, () => {
     getTagPageMock.mockReset();
     tagBreadcrumbsMock.mockClear();
     moduleRendererMock.mockClear();
-    postListModuleMock.mockClear();
     heroSlotMock.mockClear();
   });
 
@@ -123,10 +99,18 @@ describe(`<${TagPage.name}/>`, () => {
     errorSpy.mockRestore();
   });
 
-  it('renders the h1 and supporting text from the tag', async () => {
+  it('renders the h1 and supporting text from the view model headingBlock', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
-      data: { tag, modules: [], seo: {}, postListId: 'post-list-1' },
+      data: {
+        tag,
+        headingBlock: makeHeadingBlock({
+          heading: 'TypeScript',
+          supportingText: 'Posts about TypeScript.',
+        }),
+        modules: [],
+        seo: {},
+      },
     });
 
     await setup();
@@ -138,14 +122,14 @@ describe(`<${TagPage.name}/>`, () => {
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('renders the parts in order: breadcrumbs, post list, module renderer', async () => {
+  it('renders the parts in order: breadcrumbs, module renderer', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: {
         tag,
+        headingBlock: makeHeadingBlock({ heading: 'TypeScript' }),
         modules: [{ id: 'newsletter-1', type: 'module_newsletter' }],
         seo: {},
-        postListId: 'post-list-1',
       },
     });
 
@@ -155,36 +139,51 @@ describe(`<${TagPage.name}/>`, () => {
       container.querySelectorAll<HTMLElement>('[data-testid]'),
     ).map((el) => el.getAttribute('data-testid'));
 
-    expect(order).toEqual([
-      'tag-breadcrumbs',
-      'post-list-module-stub',
-      'module-renderer-stub',
-    ]);
+    expect(order).toEqual(['tag-breadcrumbs', 'module-renderer-stub']);
   });
 
   it('renders through PageShell: breadcrumbs outside main, everything else inside it', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
-      data: { tag, modules: [], seo: {}, postListId: 'post-list-1' },
+      data: {
+        tag,
+        headingBlock: makeHeadingBlock({ heading: 'TypeScript' }),
+        modules: [],
+        seo: {},
+      },
     });
 
     await setup();
 
     const main = screen.getByRole('main');
-    expect(main).toContainElement(screen.getByTestId('post-list-module-stub'));
+    expect(main).toContainElement(screen.getByTestId('module-renderer-stub'));
     expect(screen.getByTestId('tag-breadcrumbs').closest('main')).toBeNull();
   });
 
-  it('passes the current page as context to ModuleRenderer', async () => {
+  it('passes the current page and the tag archive scope as context to ModuleRenderer', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
-      data: { tag, modules: [], seo: {}, postListId: 'post-list-1' },
+      data: {
+        tag,
+        headingBlock: makeHeadingBlock({ heading: 'TypeScript' }),
+        modules: [],
+        seo: {},
+      },
     });
 
     await setup({ page: 3 });
 
     expect(moduleRendererMock).toHaveBeenCalledWith(
-      expect.objectContaining({ context: { page: 3 } }),
+      expect.objectContaining({
+        context: {
+          page: 3,
+          archive: {
+            kind: TAXONOMY_KIND.TAGS,
+            slug: 'typescript',
+            name: 'TypeScript',
+          },
+        },
+      }),
       undefined,
     );
   });
@@ -192,55 +191,27 @@ describe(`<${TagPage.name}/>`, () => {
   it('defaults the ModuleRenderer context page to 1 when no page is given', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
-      data: { tag, modules: [], seo: {}, postListId: 'post-list-1' },
+      data: {
+        tag,
+        headingBlock: makeHeadingBlock({ heading: 'TypeScript' }),
+        modules: [],
+        seo: {},
+      },
     });
 
     await setup();
 
     expect(moduleRendererMock).toHaveBeenCalledWith(
-      expect.objectContaining({ context: { page: 1 } }),
-      undefined,
-    );
-  });
-
-  it('passes the postList id, locale, page, and tag-scoped copy through to PostListModule', async () => {
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: { tag, modules: [], seo: {}, postListId: 'post-list-1' },
-    });
-
-    await setup({ page: 2 });
-
-    expect(postListModuleMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        id: 'post-list-1',
-        locale: 'en',
-        page: 2,
-        ariaLabel: 'TypeScript pages',
-        accessibleTitle: 'Posts tagged TypeScript',
-        emptyMessageFallback: 'No posts tagged TypeScript yet.',
-        titleId: 'tag-posts-title',
+        context: {
+          page: 1,
+          archive: {
+            kind: TAXONOMY_KIND.TAGS,
+            slug: 'typescript',
+            name: 'TypeScript',
+          },
+        },
       }),
-      undefined,
-    );
-
-    const call = postListModuleMock.mock.calls[0];
-    if (!call) throw new Error('PostListModule was not called');
-    const { createHref } = call[0];
-    expect(createHref(1)).toBe('/tags/typescript');
-    expect(createHref(3)).toBe('/tags/typescript/page/3');
-  });
-
-  it('defaults to page 1 when no page is given', async () => {
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: { tag, modules: [], seo: {}, postListId: 'post-list-1' },
-    });
-
-    await setup();
-
-    expect(postListModuleMock).toHaveBeenCalledWith(
-      expect.objectContaining({ page: 1 }),
       undefined,
     );
   });
@@ -250,9 +221,9 @@ describe(`<${TagPage.name}/>`, () => {
       ok: true,
       data: {
         tag,
+        headingBlock: makeHeadingBlock({ heading: 'TypeScript' }),
         modules: [{ id: 'newsletter-1', type: 'module_newsletter' }],
         seo: {},
-        postListId: 'post-list-1',
       },
     });
 
@@ -270,10 +241,15 @@ describe(`<${TagPage.name}/>`, () => {
     );
   });
 
-  it('renders the tag heading as the only h1 when no hero is set', async () => {
+  it('renders the view-model headingBlock heading as the only h1 when no hero is set', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
-      data: { tag, modules: [], seo: {}, postListId: 'post-list-1' },
+      data: {
+        tag,
+        headingBlock: makeHeadingBlock({ heading: 'TypeScript' }),
+        modules: [],
+        seo: {},
+      },
     });
 
     await setup();
@@ -287,10 +263,10 @@ describe(`<${TagPage.name}/>`, () => {
       ok: true,
       data: {
         tag,
+        headingBlock: makeHeadingBlock({ heading: 'TypeScript' }),
         hero: { id: 'hero-1', type: 'module_hero' },
         modules: [],
         seo: {},
-        postListId: 'post-list-1',
       },
     });
 
@@ -306,7 +282,12 @@ describe(`<${TagPage.name}/>`, () => {
   it('forwards the slug and tenant to getTagPage and TagBreadcrumbs', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
-      data: { tag, modules: [], seo: {}, postListId: 'post-list-1' },
+      data: {
+        tag,
+        headingBlock: makeHeadingBlock({ heading: 'TypeScript' }),
+        modules: [],
+        seo: {},
+      },
     });
 
     await setup();

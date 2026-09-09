@@ -76,7 +76,7 @@ describe(`<${TagBreadcrumbs.name}/>`, () => {
   it('renders the Home › {tag} breadcrumbs trail', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
-      data: { tag, modules: [], seo: {}, postListId: 'post-list-1' },
+      data: { tag, modules: [], seo: {} },
     });
 
     await setup();
@@ -94,7 +94,7 @@ describe(`<${TagBreadcrumbs.name}/>`, () => {
   it('renders the JSON-LD BreadcrumbList schema script', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
-      data: { tag, modules: [], seo: {}, postListId: 'post-list-1' },
+      data: { tag, modules: [], seo: {} },
     });
 
     const { container } = await setup();
@@ -112,7 +112,7 @@ describe(`<${TagBreadcrumbs.name}/>`, () => {
   it('renders no JSON-LD script when the base URL cannot be resolved', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
-      data: { tag, modules: [], seo: {}, postListId: 'post-list-1' },
+      data: { tag, modules: [], seo: {} },
     });
     getTenantBaseUrlMock.mockResolvedValue(undefined);
 
@@ -126,7 +126,7 @@ describe(`<${TagBreadcrumbs.name}/>`, () => {
   it('forwards the slug and tenant to getTagPage', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
-      data: { tag, modules: [], seo: {}, postListId: 'post-list-1' },
+      data: { tag, modules: [], seo: {} },
     });
 
     await setup();

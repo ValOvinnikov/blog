@@ -43,7 +43,6 @@ const setup = customRenderAsync(PostListModule, {
   id: 'post-list-1',
   locale: 'en',
   tenant: 'tenant-1',
-  page: 1,
 });
 
 describe(`<${PostListModule.name}/>`, () => {
@@ -58,7 +57,9 @@ describe(`<${PostListModule.name}/>`, () => {
     const error = new Error('boom');
     getPostListMock.mockResolvedValue({ ok: false, error });
 
-    await expect(setup({ page: 2 })).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup({ context: { page: 2 } })).rejects.toThrow(
+      'NEXT_NOT_FOUND',
+    );
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(errorSpy).toHaveBeenCalledWith(
@@ -68,7 +69,7 @@ describe(`<${PostListModule.name}/>`, () => {
     errorSpy.mockRestore();
   });
 
-  it('calls getPostList with the module id and page', async () => {
+  it('calls getPostList with the module id and context.page', async () => {
     getPostListMock.mockResolvedValue({
       ok: true,
       data: {
@@ -82,7 +83,7 @@ describe(`<${PostListModule.name}/>`, () => {
       },
     });
 
-    await setup({ page: 2 });
+    await setup({ context: { page: 2 } });
 
     expect(getPostListMock).toHaveBeenCalledWith(
       'post-list-1',
@@ -91,7 +92,7 @@ describe(`<${PostListModule.name}/>`, () => {
     );
   });
 
-  it('prefers context.page over the page prop when both are given', async () => {
+  it('defaults the resolved page to 1 when context is absent', async () => {
     getPostListMock.mockResolvedValue({
       ok: true,
       data: {
@@ -100,40 +101,17 @@ describe(`<${PostListModule.name}/>`, () => {
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
-        currentPage: 3,
-        totalPages: 3,
+        currentPage: 1,
+        totalPages: 1,
       },
     });
 
-    await setup({ page: 1, context: { page: 3 } });
+    await setup({ context: undefined });
 
     expect(getPostListMock).toHaveBeenCalledWith(
       'post-list-1',
       DEFAULT_TENANT_SANITY_CONTEXT,
-      3,
-    );
-  });
-
-  it('falls back to the page prop when context is absent', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-        posts: [],
-        layout: undefined,
-        contentAlignment: undefined,
-        currentPage: 2,
-        totalPages: 2,
-      },
-    });
-
-    await setup({ page: 2, context: undefined });
-
-    expect(getPostListMock).toHaveBeenCalledWith(
-      'post-list-1',
-      DEFAULT_TENANT_SANITY_CONTEXT,
-      2,
+      1,
     );
   });
 
@@ -232,7 +210,7 @@ describe(`<${PostListModule.name}/>`, () => {
       },
     });
 
-    await setup({ page: 2 });
+    await setup({ context: { page: 2 } });
 
     const nav = screen.getByRole('navigation', { name: 'Blog pages' });
     expect(nav).toBeInTheDocument();
@@ -258,7 +236,9 @@ describe(`<${PostListModule.name}/>`, () => {
       },
     });
 
-    await expect(setup({ page: 5 })).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup({ context: { page: 5 } })).rejects.toThrow(
+      'NEXT_NOT_FOUND',
+    );
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
   });
@@ -277,147 +257,10 @@ describe(`<${PostListModule.name}/>`, () => {
       },
     });
 
-    await setup({ page: 1 });
+    await setup({ context: { page: 1 } });
 
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
     expect(screen.getByText('No posts yet.')).toBeInTheDocument();
-  });
-
-  it('uses the caller-supplied ariaLabel for the pagination nav instead of the translated default', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'News' }),
-        posts: [
-          {
-            id: 'post-1',
-            slug: 'first-post',
-            title: 'First post',
-            excerpt: 'An excerpt',
-            publishedAt: '2026-01-01T00:00:00.000Z',
-            topic: { id: 'topic-1', title: 'News', slug: 'news' },
-            readingTimeMinutes: 2,
-          },
-        ],
-        layout: undefined,
-        contentAlignment: undefined,
-        currentPage: 2,
-        totalPages: 3,
-      },
-    });
-
-    await setup({ page: 2, ariaLabel: 'News pages' });
-
-    expect(
-      screen.getByRole('navigation', { name: 'News pages' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole('navigation', { name: 'Blog pages' }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('uses the caller-supplied accessibleTitle as the fallback heading instead of the blog archive default', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock(),
-        posts: [],
-        layout: undefined,
-        contentAlignment: undefined,
-        currentPage: 1,
-        totalPages: 1,
-      },
-    });
-
-    await setup({ accessibleTitle: 'News' });
-
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'News' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole('heading', { level: 2, name: 'All posts' }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('renders the caller-supplied emptyMessageFallback when zero posts resolve, instead of the blog archive default', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'News' }),
-        posts: [],
-        layout: undefined,
-        contentAlignment: undefined,
-        currentPage: 1,
-        totalPages: 1,
-      },
-    });
-
-    await setup({ emptyMessageFallback: 'No posts in this topic yet.' });
-
-    expect(screen.getByText('No posts in this topic yet.')).toBeInTheDocument();
-    expect(screen.queryByText('No posts yet.')).not.toBeInTheDocument();
-  });
-
-  it('builds pagination links with the caller-supplied createHref instead of the blog index default', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'News' }),
-        posts: [
-          {
-            id: 'post-1',
-            slug: 'first-post',
-            title: 'First post',
-            excerpt: 'An excerpt',
-            publishedAt: '2026-01-01T00:00:00.000Z',
-            topic: { id: 'topic-1', title: 'News', slug: 'news' },
-            readingTimeMinutes: 2,
-          },
-        ],
-        layout: undefined,
-        contentAlignment: undefined,
-        currentPage: 2,
-        totalPages: 3,
-      },
-    });
-
-    await setup({
-      page: 2,
-      createHref: (page: number) => `/topics/news/page/${page}`,
-    });
-
-    const previousLink = screen.getByRole('link', { name: 'Previous' });
-    expect(previousLink).toHaveAttribute('href', '/topics/news/page/1');
-
-    const nextLink = screen.getByRole('link', { name: 'Next' });
-    expect(nextLink).toHaveAttribute('href', '/topics/news/page/3');
-  });
-
-  it('wires the caller-supplied titleId to both the heading id and the section aria-labelledby', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'News' }),
-        posts: [],
-        layout: undefined,
-        contentAlignment: undefined,
-        currentPage: 1,
-        totalPages: 1,
-      },
-    });
-
-    await setup({ titleId: 'topic-news-title' });
-
-    const heading = screen.getByRole('heading', { level: 2, name: 'News' });
-    expect(heading).toHaveAttribute('id', 'topic-news-title');
-
-    const region = screen.getByRole('region', { name: 'News' });
-    expect(region).toHaveAttribute('aria-labelledby', 'topic-news-title');
   });
 
   it('renders each post image when showImages is true', async () => {
@@ -510,7 +353,6 @@ describe(`<${PostListModule.name}/>`, () => {
     });
 
     await setup({
-      page: 2,
       context: {
         page: 2,
         archive: { kind: TAXONOMY_KIND.TOPICS, slug: 'news', name: 'News' },
@@ -532,6 +374,58 @@ describe(`<${PostListModule.name}/>`, () => {
 
     const nextLink = screen.getByRole('link', { name: 'Next' });
     expect(nextLink).toHaveAttribute('href', '/topics/news/page/3');
+  });
+
+  it('derives href, aria-label, and titleId from context.archive (tag kind)', async () => {
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        headingBlock: makeHeadingBlock(),
+        posts: [
+          {
+            id: 'post-1',
+            slug: 'first-post',
+            title: 'First post',
+            excerpt: 'An excerpt',
+            publishedAt: '2026-01-01T00:00:00.000Z',
+            topic: { id: 'topic-1', title: 'News', slug: 'news' },
+            readingTimeMinutes: 2,
+          },
+        ],
+        layout: undefined,
+        contentAlignment: undefined,
+        currentPage: 2,
+        totalPages: 3,
+      },
+    });
+
+    await setup({
+      context: {
+        page: 2,
+        archive: {
+          kind: TAXONOMY_KIND.TAGS,
+          slug: 'typescript',
+          name: 'TypeScript',
+        },
+      },
+    });
+
+    expect(
+      screen.getByRole('heading', {
+        level: 2,
+        name: 'Posts tagged TypeScript',
+      }),
+    ).toHaveAttribute('id', 'tag-posts-title');
+    expect(
+      screen.getByRole('navigation', { name: 'TypeScript pages' }),
+    ).toBeInTheDocument();
+
+    const previousLink = screen.getByRole('link', { name: 'Previous' });
+    expect(previousLink).toHaveAttribute('href', '/tags/typescript');
+
+    const nextLink = screen.getByRole('link', { name: 'Next' });
+    expect(nextLink).toHaveAttribute('href', '/tags/typescript/page/3');
   });
 
   it('derives the empty message from context.archive (tag kind)', async () => {
@@ -567,35 +461,6 @@ describe(`<${PostListModule.name}/>`, () => {
         name: 'Posts tagged TypeScript',
       }),
     ).toHaveAttribute('id', 'tag-posts-title');
-  });
-
-  it('lets an explicit prop win over context.archive-derived defaults', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock(),
-        posts: [],
-        layout: undefined,
-        contentAlignment: undefined,
-        currentPage: 1,
-        totalPages: 1,
-      },
-    });
-
-    await setup({
-      accessibleTitle: 'Custom heading',
-      emptyMessageFallback: 'Custom empty copy',
-      context: {
-        archive: { kind: TAXONOMY_KIND.TOPICS, slug: 'news', name: 'News' },
-      },
-    });
-
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Custom heading' }),
-    ).toBeInTheDocument();
-    expect(screen.getByText('Custom empty copy')).toBeInTheDocument();
-    expect(screen.queryByText('No posts in News yet.')).not.toBeInTheDocument();
   });
 
   it('keeps the blog-archive defaults intact when context.archive is absent', async () => {

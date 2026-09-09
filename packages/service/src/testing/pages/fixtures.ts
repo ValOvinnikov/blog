@@ -191,9 +191,9 @@ export function makeRawTagPage(
 ): TRawTagPage {
   return {
     tag: { ...makeRawTag(), description: 'Posts about TypeScript.' },
+    headingBlock: null,
     hero: null,
-    postList: { _id: 'post-list-1' },
-    modules: [],
+    modules: [{ _id: 'post-list-1', _type: 'module_postList' }],
     seo: null,
     ...overrides,
   };

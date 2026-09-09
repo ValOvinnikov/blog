@@ -4,16 +4,17 @@ import { postCardFragment } from '@blog/service/shared/fragments/post';
 
 /**
  * Scopes posts to the enclosing `page_tag`/`page_topic`'s own tag/topic when
- * one references this module as its `postList` (a no-op otherwise) — looked
- * up by this module's `$id` since there's no parent context to reach via
- * GROQ's `^`. The `&&` (not `||`) means a `postList` referenced by both a
+ * one references this module — either via the deprecated `postList` field or
+ * via `modules[]` — as its list module (a no-op otherwise). Looked up by
+ * this module's `$id` since there's no parent context to reach via GROQ's
+ * `^`. The `&&` (not `||`) means a list module referenced by both a
  * `page_tag` and a `page_topic` at once must satisfy both scopes rather than
  * throw.
  */
 const SCOPE_FILTER =
-  '(!defined(*[_type == "page_tag" && postList._ref == $id][0]._id) || references(*[_type == "page_tag" && postList._ref == $id][0].tag._ref))' +
+  '(!defined(*[_type == "page_tag" && (postList._ref == $id || $id in modules[]._ref)][0]._id) || references(*[_type == "page_tag" && (postList._ref == $id || $id in modules[]._ref)][0].tag._ref))' +
   ' && ' +
-  '(!defined(*[_type == "page_topic" && postList._ref == $id][0]._id) || references(*[_type == "page_topic" && postList._ref == $id][0].topic._ref))';
+  '(!defined(*[_type == "page_topic" && (postList._ref == $id || $id in modules[]._ref)][0]._id) || references(*[_type == "page_topic" && (postList._ref == $id || $id in modules[]._ref)][0].topic._ref))';
 
 const posts = q.star
   .filterByType('page_post')
