@@ -58,7 +58,7 @@ describe('postRelatedSchema shape', () => {
       expect.arrayContaining([
         'title',
         'brandVariant',
-        'sectionHeader',
+        'headingBlock',
         'showImages',
         'limit',
         'contentAlignment',

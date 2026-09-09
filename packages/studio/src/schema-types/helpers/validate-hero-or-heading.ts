@@ -2,7 +2,7 @@ import type { DocumentRule, SanityDocument } from 'sanity';
 
 type THeroOrHeadingDocument = {
   hero?: { _ref?: string };
-  sectionHeader?: { heading?: string };
+  headingBlock?: { heading?: string };
 };
 
 const asHeroOrHeadingDocument = (
@@ -14,7 +14,7 @@ const hasHero = (document: SanityDocument | undefined): boolean =>
   Boolean(asHeroOrHeadingDocument(document)?.hero?._ref);
 
 const hasHeading = (document: SanityDocument | undefined): boolean =>
-  Boolean(asHeroOrHeadingDocument(document)?.sectionHeader?.heading);
+  Boolean(asHeroOrHeadingDocument(document)?.headingBlock?.heading);
 
 const validateRequired = (
   document: SanityDocument | undefined,
@@ -30,7 +30,7 @@ const validateNotBoth = (
 
 /**
  * Document-level rule requiring at least one of `hero` or
- * `sectionHeader.heading`, and warning (not erroring) when both are set.
+ * `headingBlock.heading`, and warning (not erroring) when both are set.
  */
 export const validateHeroOrHeading =
   () =>

@@ -13,7 +13,7 @@ type TPostSourceDocument = { postSource?: string };
  * sync by hand.
  */
 export const PUBLISHED_POST_CONDITION =
-  'publishedAt <= now() && defined(sectionHeader.heading) && defined(author) && defined(topic) && defined(content)';
+  'publishedAt <= now() && defined(headingBlock.heading) && defined(author) && defined(topic) && defined(content)';
 
 /**
  * Builds a document-level validator erroring when Post Source is Newest

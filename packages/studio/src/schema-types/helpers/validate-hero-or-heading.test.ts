@@ -53,7 +53,7 @@ describe(validateHeroOrHeading, () => {
 
   it('passes when only the heading is set', () => {
     const [requiredRule, notBothRule] = buildRules();
-    const document = asDocument({ sectionHeader: { heading: 'Welcome' } });
+    const document = asDocument({ headingBlock: { heading: 'Welcome' } });
 
     expect(requiredRule?.fn?.(document)).toBe(true);
     expect(notBothRule?.fn?.(document)).toBe(true);
@@ -63,7 +63,7 @@ describe(validateHeroOrHeading, () => {
     const [requiredRule, notBothRule] = buildRules();
     const document = asDocument({
       hero: { _ref: 'hero-1' },
-      sectionHeader: { heading: 'Welcome' },
+      headingBlock: { heading: 'Welcome' },
     });
 
     expect(requiredRule?.fn?.(document)).toBe(true);

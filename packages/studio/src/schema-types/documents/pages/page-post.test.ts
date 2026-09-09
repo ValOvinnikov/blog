@@ -80,17 +80,15 @@ describe('pagePostSchema shape', () => {
     expect(calls.required).toBe(true);
   });
 
-  it('has no top-level excerpt field — the excerpt lives in sectionHeader.supportingText', () => {
+  it('has no top-level excerpt field — the excerpt lives in headingBlock.supportingText', () => {
     expect(getField('excerpt')).toBeUndefined();
   });
 
-  it('sectionHeader uses the required-heading variant — the heading is the post headline', () => {
-    const sectionHeaderFieldDefinition = getField('sectionHeader') as
+  it('headingBlock uses the required-heading variant — the heading is the post headline', () => {
+    const headingBlockFieldDefinition = getField('headingBlock') as
       { type?: string } | undefined;
 
-    expect(sectionHeaderFieldDefinition?.type).toBe(
-      'requiredHeadingSectionHeader',
-    );
+    expect(headingBlockFieldDefinition?.type).toBe('requiredHeadingBlock');
   });
 
   it('heroImage stays optional — no validation() builder attached', () => {
@@ -271,7 +269,7 @@ describe('pagePostSchema field order', () => {
     expect(fieldNames).toEqual([
       'title',
       'slug',
-      'sectionHeader',
+      'headingBlock',
       'heroImage',
       'content',
       'featured',
@@ -308,7 +306,7 @@ describe('pagePostSchema preview', () => {
     });
   });
 
-  it('falls back to the internal title when sectionHeader is absent', () => {
+  it('falls back to the internal title when headingBlock is absent', () => {
     const prepare = pagePostSchema.preview?.prepare;
 
     if (!prepare) {

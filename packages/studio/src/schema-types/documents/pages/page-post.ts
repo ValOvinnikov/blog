@@ -4,7 +4,7 @@ import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag';
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
 import { defineModulesField } from '@blog/studio/schema-types/helpers/define-modules-field';
-import { sectionHeaderField } from '@blog/studio/schema-types/helpers/section-header-field';
+import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
 import { slugField } from '@blog/studio/schema-types/helpers/slug-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
 import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/helpers/validate-single-blank-heading-per-type';
@@ -35,7 +35,7 @@ export const pagePostSchema = defineType({
       description: 'URL path segment — auto-generated from title.',
       previewInput: postSlugUrlPreviewInput,
     }),
-    sectionHeaderField({ requireHeading: true }),
+    headingBlockField({ requireHeading: true }),
     defineField({
       name: 'heroImage',
       title: 'Hero Image',
@@ -119,7 +119,7 @@ export const pagePostSchema = defineType({
   ],
   preview: {
     select: {
-      heading: 'sectionHeader.heading',
+      heading: 'headingBlock.heading',
       title: 'title',
       author: 'author.name',
       media: 'heroImage',

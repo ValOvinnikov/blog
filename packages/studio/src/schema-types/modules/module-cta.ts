@@ -9,8 +9,8 @@ import {
 import { actionGroupField } from '@blog/studio/schema-types/helpers/action-group-field';
 import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
 import { defineAlignmentFields } from '@blog/studio/schema-types/helpers/define-alignment-fields';
+import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
 import { layoutField } from '@blog/studio/schema-types/helpers/layout-field';
-import { sectionHeaderField } from '@blog/studio/schema-types/helpers/section-header-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
 import { basicTextSchema } from '@blog/studio/schema-types/objects/blocks/basic-text';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt';
@@ -97,7 +97,7 @@ export const ctaSchema = defineType({
       description: 'Optional kicker label shown above the heading.',
       validation: (rule) => rule.max(40),
     }),
-    sectionHeaderField({ requireHeading: true }),
+    headingBlockField({ requireHeading: true }),
     defineField({
       name: 'content',
       title: 'Content',
@@ -175,7 +175,7 @@ export const ctaSchema = defineType({
   preview: {
     select: {
       title: 'title',
-      subtitle: 'sectionHeader.heading',
+      subtitle: 'headingBlock.heading',
     },
     prepare({ title, subtitle }) {
       return {
