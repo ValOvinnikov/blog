@@ -7,7 +7,6 @@ export interface IPageHeadingProps {
   heading: string;
   supportingText?: string;
   align?: TContentAlignment;
-  visual?: 'section';
   /**
    * Whether the heading (or its supporting text, if given) keeps its own
    * trailing margin. Set `false` when nothing else renders between this
@@ -27,7 +26,6 @@ export const PageHeading = ({
   heading,
   supportingText,
   align,
-  visual,
   hasTrailingSpace = true,
 }: IPageHeadingProps) => {
   const s = pageHeadingVariants({
@@ -38,13 +36,9 @@ export const PageHeading = ({
 
   return (
     <div className={s.root()}>
-      {visual === 'section' ? (
-        <Heading level={1} visual="section" className={s.heading()}>
-          {heading}
-        </Heading>
-      ) : (
-        <h1 className={s.heading()}>{heading}</h1>
-      )}
+      <Heading level={1} visual="section" className={s.heading()}>
+        {heading}
+      </Heading>
       {supportingText ? (
         <p className={s.supportingText()}>{supportingText}</p>
       ) : null}

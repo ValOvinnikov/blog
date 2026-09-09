@@ -1,7 +1,6 @@
 import type { ITenantLocalizedParams } from '@blog/config';
 import { LandingBreadcrumbs } from '@web/components/features/landing/landing-breadcrumbs';
 import { PageShell } from '@web/components/page-templates/page-shell';
-import { PageHeading } from '@web/components/shared/page-heading';
 import { PageIntro } from '@web/components/shared/page-intro';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import { getLandingPage } from '@web/server/landing/get-landing-page';
@@ -34,9 +33,12 @@ export const LandingPage = async ({
         <LandingBreadcrumbs slug={slug} tenant={tenant} />
       </PageShell.Breadcrumbs>
       <PageShell.Heading>
-        <PageIntro hero={hero} locale={locale} tenant={tenant}>
-          <PageHeading heading={title} visual="section" />
-        </PageIntro>
+        <PageIntro
+          hero={hero}
+          heading={title}
+          locale={locale}
+          tenant={tenant}
+        />
       </PageShell.Heading>
       <PageShell.Content>
         <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />

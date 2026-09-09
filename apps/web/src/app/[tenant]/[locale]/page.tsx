@@ -1,7 +1,6 @@
 import type { ITenantLocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { PageShell } from '@web/components/page-templates/page-shell';
-import { PageHeading } from '@web/components/shared/page-heading';
 import { PageIntro } from '@web/components/shared/page-intro';
 import { toMetadata } from '@web/metadata/to-metadata';
 import { ModuleRenderer } from '@web/modules/module-renderer';
@@ -54,11 +53,13 @@ export default async function HomePage({ params }: TProps) {
   return (
     <PageShell>
       <PageShell.Heading>
-        <PageIntro hero={hero} locale={locale} tenant={tenant}>
-          {heading ? (
-            <PageHeading heading={heading} supportingText={supportingText} />
-          ) : null}
-        </PageIntro>
+        <PageIntro
+          hero={hero}
+          heading={heading}
+          supportingText={supportingText}
+          locale={locale}
+          tenant={tenant}
+        />
       </PageShell.Heading>
       <PageShell.Content>
         <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />

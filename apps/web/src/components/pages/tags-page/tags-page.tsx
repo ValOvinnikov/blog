@@ -1,13 +1,13 @@
 import { TAXONOMY_KIND } from '@blog/config';
 import { TagsIndexBreadcrumbs } from '@web/components/features/tags-index/tags-index-breadcrumbs';
 import { PageShell } from '@web/components/page-templates/page-shell';
-import { PageHeading } from '@web/components/shared/page-heading';
+import { PageIntro } from '@web/components/shared/page-intro';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
 import { getTagsIndexPage } from '@web/server/tags-index/get-tags-index-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { getTranslations } from 'next-intl/server';
 
-type TTagsPageProps = { tenant: string };
+type TTagsPageProps = { locale: string; tenant: string };
 
 /**
  * TagsPage — `/tags` composition. Fetches the `page_tagIndex` document once
@@ -15,7 +15,7 @@ type TTagsPageProps = { tenant: string };
  * composes every other concern as a self-fetching part reading the same
  * cached `getTagsIndexPage` loader or its own data.
  */
-export const TagsPage = async ({ tenant }: TTagsPageProps) => {
+export const TagsPage = async ({ locale, tenant }: TTagsPageProps) => {
   const [result, t] = await Promise.all([
     getTagsIndexPage(tenant),
     getTranslations('tagsPage'),
@@ -32,10 +32,12 @@ export const TagsPage = async ({ tenant }: TTagsPageProps) => {
         <TagsIndexBreadcrumbs tenant={tenant} />
       </PageShell.Breadcrumbs>
       <PageShell.Heading>
-        <PageHeading
+        <PageIntro
           heading={heading}
           supportingText={supportingText}
           hasTrailingSpace={false}
+          locale={locale}
+          tenant={tenant}
         />
       </PageShell.Heading>
       <PageShell.Content>

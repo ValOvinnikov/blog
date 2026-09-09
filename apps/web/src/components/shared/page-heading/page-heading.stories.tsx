@@ -17,7 +17,6 @@ const meta = {
     heading: 'Notes on building things',
     supportingText: undefined,
     align: undefined,
-    visual: undefined,
     hasTrailingSpace: undefined,
   },
 } satisfies Meta<typeof PageHeading>;
@@ -29,13 +28,6 @@ export const Default: TStory = {};
 
 export const WithSupportingText: TStory = {
   args: {
-    supportingText: 'Essays and notes from the team, published as we ship.',
-  },
-};
-
-export const SectionVisual: TStory = {
-  args: {
-    visual: 'section',
     supportingText: 'Essays and notes from the team, published as we ship.',
   },
 };

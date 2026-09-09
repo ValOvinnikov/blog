@@ -1,7 +1,6 @@
 import { BlogListBreadcrumbs } from '@web/components/features/blog-list/blog-list-breadcrumbs';
 import { BlogListTopicChips } from '@web/components/features/blog-list/blog-list-topic-chips';
 import { PageShell } from '@web/components/page-templates/page-shell';
-import { PageHeading } from '@web/components/shared/page-heading';
 import { PageIntro } from '@web/components/shared/page-intro';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import { PostListModule } from '@web/modules/post-list/post-list-module';
@@ -31,9 +30,13 @@ export const BlogListPage = async ({
         <BlogListBreadcrumbs tenant={tenant} />
       </PageShell.Breadcrumbs>
       <PageShell.Heading>
-        <PageIntro hero={hero} locale={locale} tenant={tenant}>
-          <PageHeading heading={heading} supportingText={supportingText} />
-        </PageIntro>
+        <PageIntro
+          hero={hero}
+          heading={heading}
+          supportingText={supportingText}
+          locale={locale}
+          tenant={tenant}
+        />
       </PageShell.Heading>
       <PageShell.Content>
         <BlogListTopicChips tenant={tenant} />

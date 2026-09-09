@@ -1,13 +1,13 @@
 import { TAXONOMY_KIND } from '@blog/config';
 import { TopicsIndexBreadcrumbs } from '@web/components/features/topics-index/topics-index-breadcrumbs';
 import { PageShell } from '@web/components/page-templates/page-shell';
-import { PageHeading } from '@web/components/shared/page-heading';
+import { PageIntro } from '@web/components/shared/page-intro';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
 import { getTopicsIndexPage } from '@web/server/topics-index/get-topics-index-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { getTranslations } from 'next-intl/server';
 
-type TTopicsPageProps = { tenant: string };
+type TTopicsPageProps = { locale: string; tenant: string };
 
 /**
  * TopicsPage — `/topics` composition. Fetches the `page_topicIndex`
@@ -15,7 +15,7 @@ type TTopicsPageProps = { tenant: string };
  * reference — and composes every other concern as a self-fetching part
  * reading the same cached `getTopicsIndexPage` loader or its own data.
  */
-export const TopicsPage = async ({ tenant }: TTopicsPageProps) => {
+export const TopicsPage = async ({ locale, tenant }: TTopicsPageProps) => {
   const [result, t] = await Promise.all([
     getTopicsIndexPage(tenant),
     getTranslations('topicsPage'),
@@ -32,10 +32,12 @@ export const TopicsPage = async ({ tenant }: TTopicsPageProps) => {
         <TopicsIndexBreadcrumbs tenant={tenant} />
       </PageShell.Breadcrumbs>
       <PageShell.Heading>
-        <PageHeading
+        <PageIntro
           heading={heading}
           supportingText={supportingText}
           hasTrailingSpace={false}
+          locale={locale}
+          tenant={tenant}
         />
       </PageShell.Heading>
       <PageShell.Content>
