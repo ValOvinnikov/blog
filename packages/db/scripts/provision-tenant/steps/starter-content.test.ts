@@ -32,6 +32,15 @@ describe(buildStarterDocuments, () => {
     expect(excerpt.length).toBeLessThanOrEqual(300);
   });
 
+  it('post is a page_post with an empty modules array', () => {
+    const post = buildStarterDocuments(tenant).find(
+      (doc) => doc._id === STARTER_DOCUMENT_IDS.POST,
+    ) as unknown as { _type: string; modules: unknown[] };
+
+    expect(post._type).toBe('page_post');
+    expect(post.modules).toEqual([]);
+  });
+
   it('post references the starter author and topic by id', () => {
     const post = buildStarterDocuments(tenant).find(
       (doc) => doc._id === STARTER_DOCUMENT_IDS.POST,
