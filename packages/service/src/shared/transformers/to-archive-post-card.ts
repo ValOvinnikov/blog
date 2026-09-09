@@ -4,6 +4,7 @@ import {
   toPostCardTopic,
   type TPostCardTopic,
 } from '@blog/service/shared/transformers/to-post-card';
+import { toPostHeading } from '@blog/service/shared/transformers/to-post-heading';
 import { toReadingTimeMinutes } from '@blog/utils';
 import type { InferFragmentType } from 'groqd';
 
@@ -13,7 +14,7 @@ export type TRawArchivePostCard = InferFragmentType<
 
 export type TArchivePostCard = {
   id: string;
-  title: string;
+  title: TMaybeUndefined<string>;
   slug: string;
   excerpt: TMaybeUndefined<string>;
   publishedAt: string;
@@ -22,11 +23,13 @@ export type TArchivePostCard = {
 };
 
 export function toArchivePostCard(raw: TRawArchivePostCard): TArchivePostCard {
+  const { title, excerpt } = toPostHeading(raw.sectionHeader);
+
   return {
     id: raw._id,
-    title: raw.title,
+    title,
     slug: raw.slug,
-    excerpt: raw.excerpt ?? undefined,
+    excerpt,
     publishedAt: raw.publishedAt,
     topic: raw.topic ? toPostCardTopic(raw.topic) : undefined,
     readingTimeMinutes: toReadingTimeMinutes(raw.wordCount),

@@ -1,5 +1,6 @@
 import { q } from '@blog/service/sanity/query';
 import { moduleFragment } from '@blog/service/shared/fragments/module';
+import { requiredSectionHeaderFragment } from '@blog/service/shared/fragments/section-header';
 
 import { authorCardFragment, authorDetailFragment } from './author';
 import { imageWithAltFragment, sanityImageFragment } from './image';
@@ -19,9 +20,11 @@ export const postCardFragment = q
   .fragmentForType<'page_post'>()
   .project((sub) => ({
     _id: true,
-    title: sub.field('title').notNull(),
+    sectionHeader: sub
+      .field('sectionHeader')
+      .project(requiredSectionHeaderFragment)
+      .nullable(true),
     slug: sub.field('slug.current').notNull(),
-    excerpt: sub.field('excerpt').nullable(true),
     publishedAt: sub.field('publishedAt').notNull(),
     heroImage: sub
       .field('heroImage')
@@ -45,9 +48,11 @@ export const postDetailFragment = q
   .fragmentForType<'page_post'>()
   .project((sub) => ({
     _id: true,
-    title: sub.field('title').notNull(),
+    sectionHeader: sub
+      .field('sectionHeader')
+      .project(requiredSectionHeaderFragment)
+      .nullable(true),
     slug: sub.field('slug.current').notNull(),
-    excerpt: sub.field('excerpt').nullable(true),
     publishedAt: sub.field('publishedAt').notNull(),
     heroImage: sub
       .field('heroImage')
@@ -59,7 +64,7 @@ export const postDetailFragment = q
       .nullable(true),
     featured: sub.field('featured').nullable(true),
     body: sub
-      .field('body[]')
+      .field('content[]')
       .project(portableTextBodyItemFragment)
       .nullable(true),
     skim: sub.field('skim').project(skimFragment).nullable(true),

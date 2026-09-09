@@ -94,7 +94,7 @@ describe('postPageQuery', () => {
 
   it('parses a sparse post seeded with only title, slug, and publishedAt', () => {
     const raw = makeRawPostDetail({
-      excerpt: null,
+      sectionHeader: { heading: 'Hello World', supportingText: null },
       author: null,
       topic: null,
       body: null,
@@ -102,10 +102,17 @@ describe('postPageQuery', () => {
 
     const parsed = postPageQuery.parse(raw);
 
-    expect(parsed?.excerpt).toBeNull();
+    expect(parsed?.sectionHeader?.supportingText).toBeNull();
     expect(parsed?.author).toBeNull();
     expect(parsed?.topic).toBeNull();
     expect(parsed?.body).toBeNull();
+  });
+
+  it('parses a post with no sectionHeader at all, rather than throwing or filtering it out', () => {
+    const raw = makeRawPostDetail({ sectionHeader: null });
+
+    expect(() => postPageQuery.parse(raw)).not.toThrow();
+    expect(postPageQuery.parse(raw)?.sectionHeader).toBeNull();
   });
 
   // A bodyImage block's asset is `.nullable(true)`, not `.notNull()` — an

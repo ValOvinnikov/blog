@@ -14,8 +14,20 @@ const tenant = makeTenant();
 describe(getPublishedPostsByTag, () => {
   it('fetches every published post tagged with the given tag id', async () => {
     mockRun.mockResolvedValue([
-      makeRawFeedPost({ title: 'First', slug: 'first' }),
-      makeRawFeedPost({ title: 'Second', slug: 'second' }),
+      makeRawFeedPost({
+        sectionHeader: {
+          heading: 'First',
+          supportingText: 'A sufficiently long excerpt for the card.',
+        },
+        slug: 'first',
+      }),
+      makeRawFeedPost({
+        sectionHeader: {
+          heading: 'Second',
+          supportingText: 'A sufficiently long excerpt for the card.',
+        },
+        slug: 'second',
+      }),
     ]);
 
     const result = await getPublishedPostsByTag('tag-1', tenant);

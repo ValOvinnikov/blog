@@ -1,4 +1,5 @@
 import { q } from '@blog/service/sanity/query';
+import { requiredSectionHeaderFragment } from '@blog/service/shared/fragments/section-header';
 
 /**
  * Deliberately leaner than `postCardFragment`/`archivePostCardFragment` — an
@@ -8,8 +9,10 @@ import { q } from '@blog/service/sanity/query';
 export const feedPostFragment = q
   .fragmentForType<'page_post'>()
   .project((sub) => ({
-    title: sub.field('title').notNull(),
+    sectionHeader: sub
+      .field('sectionHeader')
+      .project(requiredSectionHeaderFragment)
+      .nullable(true),
     slug: sub.field('slug.current').notNull(),
-    excerpt: sub.field('excerpt').nullable(true),
     publishedAt: sub.field('publishedAt').notNull(),
   }));

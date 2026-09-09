@@ -14,8 +14,14 @@ const tenant = makeTenant();
 describe(getAllPublishedPosts, () => {
   it('fetches every published post with no pagination parameters', async () => {
     mockRun.mockResolvedValue([
-      makeRawFeedPost({ title: 'First', slug: 'first' }),
-      makeRawFeedPost({ title: 'Second', slug: 'second' }),
+      makeRawFeedPost({
+        sectionHeader: { heading: 'First', supportingText: null },
+        slug: 'first',
+      }),
+      makeRawFeedPost({
+        sectionHeader: { heading: 'Second', supportingText: null },
+        slug: 'second',
+      }),
     ]);
 
     const result = await getAllPublishedPosts(tenant);
@@ -24,13 +30,13 @@ describe(getAllPublishedPosts, () => {
       {
         title: 'First',
         slug: 'first',
-        excerpt: 'A sufficiently long excerpt for the card.',
+        excerpt: undefined,
         publishedAt: '2026-01-15T00:00:00Z',
       },
       {
         title: 'Second',
         slug: 'second',
-        excerpt: 'A sufficiently long excerpt for the card.',
+        excerpt: undefined,
         publishedAt: '2026-01-15T00:00:00Z',
       },
     ]);

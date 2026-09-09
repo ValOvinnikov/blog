@@ -33,7 +33,10 @@ describe('getPost', () => {
   it('maps the raw post into a domain detail object', async () => {
     mockRun
       .mockResolvedValueOnce(
-        makeRawPostDetail({ _id: 'post-abc', title: 'Test Post' }),
+        makeRawPostDetail({
+          _id: 'post-abc',
+          sectionHeader: { heading: 'Test Post', supportingText: null },
+        }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
@@ -198,8 +201,10 @@ describe('getPost', () => {
       .mockResolvedValueOnce(
         makeRawPostDetail({
           seo: null,
-          title: 'Fallback Post',
-          excerpt: 'Fallback excerpt',
+          sectionHeader: {
+            heading: 'Fallback Post',
+            supportingText: 'Fallback excerpt',
+          },
         }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
@@ -457,7 +462,7 @@ describe('getPost', () => {
     mockRun
       .mockResolvedValueOnce(
         makeRawPostDetail({
-          excerpt: null,
+          sectionHeader: { heading: 'Hello World', supportingText: null },
           author: null,
           topic: null,
           body: null,
@@ -473,6 +478,38 @@ describe('getPost', () => {
     expect(result.topic).toBeUndefined();
     expect(result.body).toBeUndefined();
     expect(result.hasAsides).toBe(false);
+  });
+
+  it('renders a sparse post with no sectionHeader at all', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawPostDetail({
+          sectionHeader: null,
+          author: null,
+          topic: null,
+          body: null,
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getPost('hello-world', tenant);
+    if (!result) throw new Error('expected a post detail');
+
+    expect(result.title).toBeUndefined();
+    expect(result.excerpt).toBeUndefined();
+  });
+
+  it('falls back the SEO title to the site brand name when no sectionHeader is authored', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawPostDetail({ seo: null, sectionHeader: null }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getPost('hello-world', tenant);
+    if (!result) throw new Error('expected a post detail');
+
+    expect(result.seo.title).toBe('My Blog');
   });
 
   it('threads tenant context into both queries and scopes their tags to it', async () => {

@@ -1,4 +1,5 @@
 import { q } from '@blog/service/sanity/query';
+import { requiredSectionHeaderFragment } from '@blog/service/shared/fragments/section-header';
 
 import { topicFragment } from './topic';
 import { WORD_COUNT_EXPRESSION, wordCountParser } from './word-count';
@@ -15,9 +16,11 @@ export const archivePostCardFragment = q
   .fragmentForType<'page_post'>()
   .project((sub) => ({
     _id: true,
-    title: sub.field('title').notNull(),
+    sectionHeader: sub
+      .field('sectionHeader')
+      .project(requiredSectionHeaderFragment)
+      .nullable(true),
     slug: sub.field('slug.current').notNull(),
-    excerpt: sub.field('excerpt').nullable(true),
     publishedAt: sub.field('publishedAt').notNull(),
     topic: sub.field('topic').deref().project(topicFragment).nullable(true),
     wordCount: sub.raw(WORD_COUNT_EXPRESSION, wordCountParser),

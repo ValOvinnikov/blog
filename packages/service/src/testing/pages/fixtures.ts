@@ -37,9 +37,11 @@ export function makeRawPostCard(
 ): TRawPostCard {
   return {
     _id: 'post-1',
-    title: 'Hello World',
+    sectionHeader: {
+      heading: 'Hello World',
+      supportingText: 'A sufficiently long excerpt for the card.',
+    },
     slug: 'hello-world',
-    excerpt: 'A sufficiently long excerpt for the card.',
     publishedAt: '2026-01-15T00:00:00Z',
     heroImage: makeRawImage(),
     heroImageAsset: makeRawSanityImage(),
@@ -68,9 +70,11 @@ export function makeRawArchivePostCard(
 ): TRawArchivePostCard {
   return {
     _id: 'post-1',
-    title: 'Hello World',
+    sectionHeader: {
+      heading: 'Hello World',
+      supportingText: 'A sufficiently long excerpt for the card.',
+    },
     slug: 'hello-world',
-    excerpt: 'A sufficiently long excerpt for the card.',
     publishedAt: '2026-01-15T00:00:00Z',
     topic: {
       _id: 'topic-1',
@@ -88,9 +92,11 @@ export function makeRawPostDetail(
 ): TRawPostDetail {
   return {
     _id: 'post-1',
-    title: 'Hello World',
+    sectionHeader: {
+      heading: 'Hello World',
+      supportingText: 'A sufficiently long excerpt for the card.',
+    },
     slug: 'hello-world',
-    excerpt: 'A sufficiently long excerpt for the card.',
     publishedAt: '2026-01-15T00:00:00Z',
     heroImage: makeRawImage(),
     heroImageAsset: makeRawSanityImage(),

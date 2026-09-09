@@ -10,6 +10,6 @@ export const publishedPostBodyQuery = q
   .filterRaw(PUBLISHED_POST_FILTER)
   .slice(0)
   .project((sub) => ({
-    body: sub.field('body[]').notNull(),
+    body: sub.field('content[]').notNull(),
   }))
   .notNull();

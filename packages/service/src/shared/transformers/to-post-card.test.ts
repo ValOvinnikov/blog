@@ -88,7 +88,7 @@ describe('toPostCard', () => {
   it('maps a sparse post-card with no excerpt, author, or topic to undefined', () => {
     const result = toPostCard(
       makeRawPostCard({
-        excerpt: null,
+        sectionHeader: { heading: 'Hello World', supportingText: null },
         author: null,
         topic: null,
       }),
@@ -98,6 +98,13 @@ describe('toPostCard', () => {
     expect(result.excerpt).toBeUndefined();
     expect(result.author).toBeUndefined();
     expect(result.topic).toBeUndefined();
+  });
+
+  it('maps an entirely absent sectionHeader to undefined title and excerpt', () => {
+    const result = toPostCard(makeRawPostCard({ sectionHeader: null }), tenant);
+
+    expect(result.title).toBeUndefined();
+    expect(result.excerpt).toBeUndefined();
   });
 
   it('defaults featured to false when null', () => {

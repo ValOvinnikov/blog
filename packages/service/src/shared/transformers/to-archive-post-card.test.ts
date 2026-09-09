@@ -47,10 +47,22 @@ describe(toArchivePostCard, () => {
 
   it('maps a sparse archive card with no excerpt or topic to undefined', () => {
     const result = toArchivePostCard(
-      makeRawArchivePostCard({ excerpt: null, topic: null }),
+      makeRawArchivePostCard({
+        sectionHeader: { heading: 'Hello World', supportingText: null },
+        topic: null,
+      }),
     );
 
     expect(result.excerpt).toBeUndefined();
     expect(result.topic).toBeUndefined();
+  });
+
+  it('maps an entirely absent sectionHeader to undefined title and excerpt', () => {
+    const result = toArchivePostCard(
+      makeRawArchivePostCard({ sectionHeader: null }),
+    );
+
+    expect(result.title).toBeUndefined();
+    expect(result.excerpt).toBeUndefined();
   });
 });

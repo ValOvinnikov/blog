@@ -8,8 +8,14 @@ const tenant = makeTenant();
 describe(toPostsByIds, () => {
   it('maps every raw post card into a domain post card', () => {
     const raw = [
-      makeRawPostCard({ _id: 'a', title: 'First' }),
-      makeRawPostCard({ _id: 'b', title: 'Second' }),
+      makeRawPostCard({
+        _id: 'a',
+        sectionHeader: { heading: 'First', supportingText: null },
+      }),
+      makeRawPostCard({
+        _id: 'b',
+        sectionHeader: { heading: 'Second', supportingText: null },
+      }),
     ];
 
     const result = toPostsByIds(raw, tenant);

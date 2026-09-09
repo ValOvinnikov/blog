@@ -2,6 +2,7 @@ import type { ISanityImage, TMaybeUndefined } from '@blog/config';
 import type { TImageTenant } from '@blog/service/sanity/image';
 import type { postCardFragment } from '@blog/service/shared/fragments/post';
 import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
+import { toPostHeading } from '@blog/service/shared/transformers/to-post-heading';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import { toReadingTimeMinutes } from '@blog/utils';
 import type { InferFragmentType } from 'groqd';
@@ -23,7 +24,7 @@ export type TPostCardTopic = {
 
 export type TPostCard = {
   id: string;
-  title: string;
+  title: TMaybeUndefined<string>;
   slug: string;
   excerpt: TMaybeUndefined<string>;
   publishedAt: string;
@@ -59,11 +60,13 @@ export function toPostCardTopic(
 }
 
 export function toPostCard(raw: TRawPostCard, tenant: TImageTenant): TPostCard {
+  const { title, excerpt } = toPostHeading(raw.sectionHeader);
+
   return {
     id: raw._id,
-    title: raw.title,
+    title,
     slug: raw.slug,
-    excerpt: raw.excerpt ?? undefined,
+    excerpt,
     publishedAt: raw.publishedAt,
     heroImageUrl: buildImageUrl(raw.heroImage, tenant),
     heroImageAlt: raw.heroImage?.alt,

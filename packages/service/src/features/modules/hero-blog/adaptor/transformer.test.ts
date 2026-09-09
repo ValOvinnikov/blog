@@ -31,7 +31,10 @@ describe(toHeroBlogModule, () => {
 
   it('renders using the resolved pinned post', () => {
     const raw = makeRawHeroBlogModule({
-      post: makeRawPostCard({ _id: 'pinned-post', title: 'Pinned title' }),
+      post: makeRawPostCard({
+        _id: 'pinned-post',
+        sectionHeader: { heading: 'Pinned title', supportingText: null },
+      }),
     });
 
     const hero = toHeroBlogModule(raw, tenant);
@@ -44,7 +47,10 @@ describe(toHeroBlogModule, () => {
     const raw = makeRawHeroBlogModule({
       post: makeRawPostCard({
         _id: 'newest-featured-post',
-        title: 'Newest featured title',
+        sectionHeader: {
+          heading: 'Newest featured title',
+          supportingText: null,
+        },
       }),
     });
 

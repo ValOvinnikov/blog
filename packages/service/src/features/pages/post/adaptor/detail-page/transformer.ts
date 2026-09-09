@@ -5,6 +5,7 @@ import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
 import { toModule } from '@blog/service/shared/transformers/to-module';
 import { toPortableTextBody } from '@blog/service/shared/transformers/to-portable-text-body';
+import { toPostHeading } from '@blog/service/shared/transformers/to-post-heading';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import { toSocialLink } from '@blog/service/shared/transformers/to-social-link';
 import { toTag } from '@blog/service/shared/transformers/to-tag';
@@ -60,12 +61,13 @@ export function toPostDetail(
   tenant: TImageTenant,
 ): TPostDetail {
   const heroImageUrl = buildImageUrl(raw.heroImage, tenant);
+  const { title, excerpt } = toPostHeading(raw.sectionHeader);
 
   return {
     id: raw._id,
-    title: raw.title,
+    title,
     slug: raw.slug,
-    excerpt: raw.excerpt ?? undefined,
+    excerpt,
     publishedAt: raw.publishedAt,
     heroImageUrl,
     heroImageAlt: raw.heroImage?.alt,
@@ -77,8 +79,8 @@ export function toPostDetail(
     seo: resolveSeo(
       raw.seo ?? undefined,
       {
-        title: raw.title,
-        description: raw.excerpt ?? undefined,
+        title: title ?? settings.brand.name,
+        description: excerpt,
         imageUrl: heroImageUrl,
       },
       {
