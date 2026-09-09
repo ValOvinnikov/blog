@@ -80,6 +80,7 @@ describe('HomePage', () => {
     getHomePageMock.mockResolvedValue({
       ok: true,
       data: {
+        sectionHeader: { heading: undefined, supportingText: undefined },
         hero: { id: 'hero-1', type: 'module_hero' },
         modules: [{ id: 'module-1', type: 'module_content' }],
         seo: makeSeo(),
@@ -98,6 +99,7 @@ describe('HomePage', () => {
     getHomePageMock.mockResolvedValue({
       ok: true,
       data: {
+        sectionHeader: { heading: undefined, supportingText: undefined },
         hero: { id: 'hero-1', type: 'module_hero' },
         modules: [{ id: 'module-1', type: 'module_content' }],
         seo: makeSeo(),
@@ -126,7 +128,12 @@ describe('HomePage', () => {
     getTenantSanityContextMock.mockResolvedValue(tenant);
     getHomePageMock.mockResolvedValue({
       ok: true,
-      data: { hero: { id: 'hero-1' }, modules: [], seo: makeSeo() },
+      data: {
+        sectionHeader: { heading: undefined, supportingText: undefined },
+        hero: { id: 'hero-1' },
+        modules: [],
+        seo: makeSeo(),
+      },
     });
 
     await setup();
@@ -139,8 +146,10 @@ describe('HomePage', () => {
       ok: true,
       data: {
         title: 'Home — internal label',
-        heading: 'Welcome to the blog',
-        supportingText: 'Fresh posts every week.',
+        sectionHeader: {
+          heading: 'Welcome to the blog',
+          supportingText: 'Fresh posts every week.',
+        },
         hero: undefined,
         modules: [],
         seo: makeSeo(),
@@ -161,8 +170,10 @@ describe('HomePage', () => {
       ok: true,
       data: {
         title: 'Home — internal label',
-        heading: 'Welcome to the blog',
-        supportingText: 'Fresh posts every week.',
+        sectionHeader: {
+          heading: 'Welcome to the blog',
+          supportingText: 'Fresh posts every week.',
+        },
         hero: { id: 'hero-1', type: 'module_hero' },
         modules: [],
         seo: makeSeo(),
@@ -181,8 +192,7 @@ describe('HomePage', () => {
       ok: true,
       data: {
         title: 'Home — internal label',
-        heading: undefined,
-        supportingText: undefined,
+        sectionHeader: { heading: undefined, supportingText: undefined },
         hero: undefined,
         modules: [],
         seo: makeSeo(),
@@ -200,8 +210,10 @@ describe('HomePage', () => {
       ok: true,
       data: {
         title: 'Home — internal label',
-        heading: 'Welcome to the blog',
-        supportingText: undefined,
+        sectionHeader: {
+          heading: 'Welcome to the blog',
+          supportingText: undefined,
+        },
         hero: undefined,
         modules: [],
         seo: makeSeo(),
