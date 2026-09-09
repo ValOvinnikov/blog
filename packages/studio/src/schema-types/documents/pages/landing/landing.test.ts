@@ -10,6 +10,25 @@ import {
 } from '@blog/studio/testing/create-mock-modules-rule';
 import type { ValidationContext } from 'sanity';
 
+type TDocumentCustomFn = (document: Record<string, unknown>) => string | true;
+
+type TDocumentMockRule = {
+  level: 'error' | 'warning';
+  fn?: TDocumentCustomFn;
+  custom: (fn: TDocumentCustomFn) => TDocumentMockRule;
+  warning: () => TDocumentMockRule;
+};
+
+const createDocumentMockRule = (
+  level: TDocumentMockRule['level'] = 'error',
+  fn?: TDocumentCustomFn,
+): TDocumentMockRule => ({
+  level,
+  fn,
+  custom: (nextFn) => createDocumentMockRule('error', nextFn),
+  warning: () => createDocumentMockRule('warning', fn),
+});
+
 const getModulesCustomValidators = (): TModulesCustomFn[] => {
   const modulesField = landingSchema.fields?.find(
     (field) => field.name === 'modules',
@@ -201,5 +220,64 @@ describe('landingSchema modules allow-list', () => {
       'module_newsletter',
       'module_taxonomyList',
     ]);
+  });
+});
+
+describe('landingSchema field order', () => {
+  it('orders fields title, slug, headingBlock, hero, modules, seo', () => {
+    expect(landingSchema.fields?.map((field) => field.name)).toEqual([
+      'title',
+      'slug',
+      'headingBlock',
+      'hero',
+      'modules',
+      'seo',
+    ]);
+  });
+});
+
+describe('landingSchema document validation', () => {
+  const buildDocumentRules = (): TDocumentMockRule[] => {
+    if (!landingSchema.validation) {
+      throw new Error('Expected landingSchema to define a validation rule.');
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    return (landingSchema.validation as any)(
+      createDocumentMockRule(),
+    ) as TDocumentMockRule[];
+  };
+
+  it('errors when neither hero nor headingBlock.heading is set', () => {
+    const [requiredRule] = buildDocumentRules();
+
+    expect(requiredRule?.fn?.({})).toBe('Add a hero or a heading');
+  });
+
+  it('warns when both hero and headingBlock.heading are set', () => {
+    const [, notBothRule] = buildDocumentRules();
+
+    expect(
+      notBothRule?.fn?.({
+        hero: { _ref: 'hero-1' },
+        headingBlock: { heading: 'Welcome' },
+      }),
+    ).toBe('The hero hides the heading');
+  });
+
+  it('passes when only hero is set', () => {
+    const [requiredRule, notBothRule] = buildDocumentRules();
+    const document = { hero: { _ref: 'hero-1' } };
+
+    expect(requiredRule?.fn?.(document)).toBe(true);
+    expect(notBothRule?.fn?.(document)).toBe(true);
+  });
+
+  it('passes when only headingBlock.heading is set', () => {
+    const [requiredRule, notBothRule] = buildDocumentRules();
+    const document = { headingBlock: { heading: 'Welcome' } };
+
+    expect(requiredRule?.fn?.(document)).toBe(true);
+    expect(notBothRule?.fn?.(document)).toBe(true);
   });
 });
