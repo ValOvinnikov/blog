@@ -787,14 +787,23 @@ lacks:**
    list, so it is the part that most earns its line.
 
 ```
-#2975 merged — the home page can now open with a heading instead of a hero.
+✅ **Done** — #2975: the home page can now open with a heading instead of a hero.
 
-Next, in order:
+🔜 **Next, in order**
 - #2987 fold the section-header transformer (blocks #2988)
 - #2988 rename headingBlock
 
-Parallel now: #2976, #2977, #2960 — independent, no shared files.
+⚡ **Parallel now** — #2976, #2977, #2960: independent, no shared files.
 ```
+
+**The three markers are fixed, and they are the colour.** Terminal markdown has
+no colour primitive and raw ANSI escapes are not reliably rendered, so the
+emoji is what makes done / next / parallel scannable apart at a glance:
+`✅` done, `🔜` next in order, `⚡` startable in parallel. Use these three,
+always in this order, and don't substitute other emoji — the point is that the
+same mark means the same thing every time. This is the one place in these
+instructions where decorative-looking markup is deliberate; everywhere else,
+prose stays plain.
 
 **The dependency claim has to be real.** Derive it from what the tickets
 actually touch — a shared file, a renamed symbol, a type one consumes from the
