@@ -3,9 +3,9 @@ import { service, type TTenantSanityContext } from '@blog/service';
 import { buildPostPublishPaths } from '@web/utils/build-post-publish-paths';
 import { logger } from '@web/utils/logger/logger';
 
-export const BLOG_POST_TYPE = 'page_post';
+export const POST_TYPE = 'page_post';
 
-const DERIVABLE_REVALIDATE_TYPES = new Set<string>([BLOG_POST_TYPE]);
+const DERIVABLE_REVALIDATE_TYPES = new Set<string>([POST_TYPE]);
 
 /** Whether `deriveRevalidatePaths` can precisely resolve paths for this document `_type` — every other type falls back to the whole-site purge. */
 export const isDerivableRevalidateType = (type: string): boolean =>
@@ -117,7 +117,7 @@ const deriveBlogPostPublishPaths = async ({
 export const deriveRevalidatePaths = async (
   input: TDeriveRevalidatePathsInput,
 ): Promise<TDeriveRevalidatePathsResult> => {
-  if (input.type === BLOG_POST_TYPE) {
+  if (input.type === POST_TYPE) {
     return deriveBlogPostPublishPaths(input);
   }
   return { ok: false, reason: 'unsupported_type' };

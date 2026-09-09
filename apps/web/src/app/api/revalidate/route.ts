@@ -1,9 +1,9 @@
 import { queries } from '@blog/db';
 import { isValidSignature, SIGNATURE_HEADER_NAME } from '@sanity/webhook';
 import {
-  BLOG_POST_TYPE,
   deriveRevalidatePaths,
   isDerivableRevalidateType,
+  POST_TYPE,
 } from '@web/server/revalidate/derive-revalidate-paths';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
@@ -219,7 +219,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   let bookmarksRemoved = 0;
   const operation = request.headers.get(SANITY_OPERATION_HEADER);
-  if (operation === DELETE_OPERATION && type === BLOG_POST_TYPE && tenantId) {
+  if (operation === DELETE_OPERATION && type === POST_TYPE && tenantId) {
     try {
       bookmarksRemoved = await queries.bookmarks.removeBookmarksForPost(
         tenantId,

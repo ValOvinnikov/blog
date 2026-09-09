@@ -56,7 +56,7 @@ vi.mock('@blog/db', () => ({
 }));
 
 vi.mock('@web/server/revalidate/derive-revalidate-paths', () => ({
-  BLOG_POST_TYPE: 'page_post',
+  POST_TYPE: 'page_post',
   isDerivableRevalidateType: isDerivableRevalidateTypeMock,
   deriveRevalidatePaths: deriveRevalidatePathsMock,
 }));

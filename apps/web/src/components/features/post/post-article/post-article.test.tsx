@@ -98,7 +98,7 @@ describe(PostArticle, () => {
     expect(screen.getByText('Jane Doe')).toBeVisible();
   });
 
-  it('renders the bookmark button and share links even for a post with no tags or hero image', async () => {
+  it('renders the bookmark button and share links in the header meta strip even for a post with no tags or hero image', async () => {
     getPostPageMock.mockResolvedValue({
       ok: true,
       data: { ...mockPostDetail, tags: [], heroImageSanity: undefined },
@@ -106,8 +106,19 @@ describe(PostArticle, () => {
 
     await setup();
 
-    expect(screen.getByTestId('bookmark-button-gate')).toBeVisible();
-    expect(screen.getByRole('button', { name: /Share/ })).toBeVisible();
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: 'Hello World',
+    });
+    const header = heading.closest('header');
+    expect(header).not.toBeNull();
+
+    expect(
+      within(header as HTMLElement).getByTestId('bookmark-button-gate'),
+    ).toBeVisible();
+    expect(
+      within(header as HTMLElement).getByRole('button', { name: /Share/ }),
+    ).toBeVisible();
   });
 
   it('renders the published date formatted via next-intl (year/month/day) and the reading time', async () => {
