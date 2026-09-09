@@ -79,7 +79,7 @@ export function makeRawPostListModule(
 ): TRawPostListModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: { heading: 'Latest', supportingText: null },
+    headingBlock: { heading: 'Latest', supportingText: null },
     pageSize: 6,
     layout: null,
     contentAlignment: null,
@@ -93,7 +93,7 @@ export function makeRawPostLatestModule(
 ): TRawPostLatestModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: { heading: 'Latest', supportingText: null },
+    headingBlock: { heading: 'Latest', supportingText: null },
     limit: 6,
     layout: null,
     contentAlignment: null,
@@ -107,7 +107,7 @@ export function makeRawPostFeaturedModule(
 ): TRawPostFeaturedModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: { heading: 'Featured', supportingText: null },
+    headingBlock: { heading: 'Featured', supportingText: null },
     postSource: POST_SOURCE.PINNED,
     posts: [],
     limit: null,
@@ -123,7 +123,7 @@ export function makeRawPostRelatedModule(
 ): TRawPostRelatedModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: { heading: 'Related reading', supportingText: null },
+    headingBlock: { heading: 'Related reading', supportingText: null },
     limit: 3,
     layout: null,
     contentAlignment: null,
@@ -155,7 +155,7 @@ export function makeRawCtaModule(
     brandVariant: BRAND_VARIANT.PRIMARY,
     bandTone: BRAND_VARIANT.PRIMARY,
     eyebrow: null,
-    sectionHeader: {
+    headingBlock: {
       heading: 'Subscribe to the newsletter',
       supportingText: 'Get new posts in your inbox.',
     },
@@ -226,7 +226,7 @@ export function makeRawTaxonomyListModule(
 ): TRawTaxonomyListModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: { heading: 'Topics', supportingText: null },
+    headingBlock: { heading: 'Topics', supportingText: null },
     layout: null,
     contentAlignment: null,
     taxonomy: TAXONOMY_KIND.TOPICS,
@@ -242,7 +242,7 @@ export function makeRawNewsletterModule(
 ): TRawNewsletterModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: {
+    headingBlock: {
       heading: 'Stay in the loop',
       supportingText: 'Get new posts in your inbox.',
     },

@@ -14,9 +14,9 @@ describe('taxonomyListModuleQuery', () => {
     expect(taxonomyListModuleQuery.query).not.toContain('emptyMessage');
   });
 
-  it('parses a module with no sectionHeader/layout set', () => {
+  it('parses a module with no headingBlock/layout set', () => {
     const raw = makeRawTaxonomyListModule({
-      sectionHeader: null,
+      headingBlock: null,
       layout: null,
     });
 

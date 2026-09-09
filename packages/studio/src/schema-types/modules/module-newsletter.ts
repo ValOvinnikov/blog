@@ -1,8 +1,8 @@
 import { NEWSLETTER_VARIANT } from '@blog/config/constants';
 import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
 import { defineAlignmentFields } from '@blog/studio/schema-types/helpers/define-alignment-fields';
+import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
 import { layoutField } from '@blog/studio/schema-types/helpers/layout-field';
-import { sectionHeaderField } from '@blog/studio/schema-types/helpers/section-header-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Mail } from 'lucide-react';
@@ -16,7 +16,7 @@ export const newsletterSchema = defineType({
   fields: [
     titleField({ description: 'Internal label shown in the Studio.' }),
     brandVariantField(),
-    sectionHeaderField({ requireHeading: true }),
+    headingBlockField({ requireHeading: true }),
     defineField({
       name: 'variant',
       title: 'Variant',
@@ -37,7 +37,7 @@ export const newsletterSchema = defineType({
   preview: {
     select: {
       title: 'title',
-      subtitle: 'sectionHeader.heading',
+      subtitle: 'headingBlock.heading',
     },
     prepare({ title, subtitle }) {
       return {

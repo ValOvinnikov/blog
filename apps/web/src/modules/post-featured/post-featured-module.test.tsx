@@ -66,7 +66,7 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: { heading: 'Featured', supportingText: undefined },
+        headingBlock: { heading: 'Featured', supportingText: undefined },
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -98,7 +98,7 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: { heading: 'Featured', supportingText: undefined },
+        headingBlock: { heading: 'Featured', supportingText: undefined },
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -112,12 +112,12 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
     expect(container.querySelector('section')).not.toBeInTheDocument();
   });
 
-  it("resolves the module's own translated fallback heading (never a hardcoded string) when sectionHeader.heading is undefined", async () => {
+  it("resolves the module's own translated fallback heading (never a hardcoded string) when headingBlock.heading is undefined", async () => {
     getPostFeaturedMock.mockResolvedValue({
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: { heading: undefined, supportingText: undefined },
+        headingBlock: { heading: undefined, supportingText: undefined },
         posts: [makePost()],
         layout: undefined,
         contentAlignment: undefined,
@@ -139,7 +139,7 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: { heading: 'Featured', supportingText: undefined },
+        headingBlock: { heading: 'Featured', supportingText: undefined },
         posts: [
           makePost({ id: 'post-1', title: 'Lead post' }),
           makePost({ id: 'post-2', title: 'Second post' }),
@@ -168,7 +168,7 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: { heading: 'Featured', supportingText: undefined },
+        headingBlock: { heading: 'Featured', supportingText: undefined },
         posts: [
           makePost({
             id: 'post-1',
@@ -212,7 +212,7 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: { heading: 'Featured', supportingText: undefined },
+        headingBlock: { heading: 'Featured', supportingText: undefined },
         posts: [
           makePost({
             id: 'post-1',

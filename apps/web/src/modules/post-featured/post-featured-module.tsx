@@ -32,7 +32,7 @@ export const PostFeaturedModule = async ({
 
   const {
     brandVariant,
-    sectionHeader,
+    headingBlock,
     posts,
     layout,
     contentAlignment,
@@ -55,7 +55,7 @@ export const PostFeaturedModule = async ({
   return (
     <PostFeaturedModuleView
       brandVariant={brandVariant}
-      sectionHeader={sectionHeader}
+      headingBlock={headingBlock}
       items={items}
       layout={layout}
       contentAlignment={contentAlignment}

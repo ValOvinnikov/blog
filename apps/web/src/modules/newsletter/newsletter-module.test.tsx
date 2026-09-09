@@ -81,7 +81,7 @@ describe(`<${NewsletterModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: 'PRIMARY',
-        sectionHeader: { heading: 'Get new posts', supportingText: undefined },
+        headingBlock: { heading: 'Get new posts', supportingText: undefined },
         variant: 'FULL',
         layout: undefined,
         contentAlignment: undefined,
@@ -106,7 +106,7 @@ describe(`<${NewsletterModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: 'PRIMARY',
-        sectionHeader: {
+        headingBlock: {
           heading: 'Get new posts',
           supportingText: 'Only shown in the full form.',
         },
@@ -129,7 +129,7 @@ describe(`<${NewsletterModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: 'PRIMARY',
-        sectionHeader: { heading: 'Get new posts', supportingText: undefined },
+        headingBlock: { heading: 'Get new posts', supportingText: undefined },
         variant: 'FULL',
         layout: undefined,
         contentAlignment: undefined,

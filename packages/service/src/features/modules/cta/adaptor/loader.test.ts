@@ -22,7 +22,7 @@ describe('getCta', () => {
 
     const cta = await getCta('cta-1', tenant);
 
-    expect(cta.sectionHeader.heading).toBe('Subscribe to the newsletter');
+    expect(cta.headingBlock.heading).toBe('Subscribe to the newsletter');
     expect(cta.actions?.[0]?.link.href).toBe('/newsletter');
   });
 

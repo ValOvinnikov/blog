@@ -1,12 +1,11 @@
-import type { TContentAlignment } from '@blog/config';
+import type { TContentAlignment, THeadingBlock } from '@blog/config';
 import { Heading } from '@blog/ui/atoms/heading';
 import type { THeadingLevel } from '@blog/ui/lib/react';
 
 import { moduleHeadingVariants } from './module-heading-variants';
 
 export interface IModuleHeadingProps {
-  heading?: string;
-  supportingText?: string;
+  headingBlock: THeadingBlock;
   accessibleTitle: string;
   id: string;
   level: THeadingLevel;
@@ -19,13 +18,13 @@ export interface IModuleHeadingProps {
  * accessible title when no heading was authored.
  */
 export const ModuleHeading = ({
-  heading,
-  supportingText,
+  headingBlock,
   accessibleTitle,
   id,
   level,
   align,
 }: IModuleHeadingProps) => {
+  const { heading, supportingText } = headingBlock;
   const hasHeading = Boolean(heading?.trim());
   const resolvedTitle = hasHeading ? heading : accessibleTitle;
   const s = moduleHeadingVariants({ align });

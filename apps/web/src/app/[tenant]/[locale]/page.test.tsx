@@ -80,7 +80,7 @@ describe('HomePage', () => {
     getHomePageMock.mockResolvedValue({
       ok: true,
       data: {
-        sectionHeader: { heading: undefined, supportingText: undefined },
+        headingBlock: { heading: undefined, supportingText: undefined },
         hero: { id: 'hero-1', type: 'module_hero' },
         modules: [{ id: 'module-1', type: 'module_content' }],
         seo: makeSeo(),
@@ -99,7 +99,7 @@ describe('HomePage', () => {
     getHomePageMock.mockResolvedValue({
       ok: true,
       data: {
-        sectionHeader: { heading: undefined, supportingText: undefined },
+        headingBlock: { heading: undefined, supportingText: undefined },
         hero: { id: 'hero-1', type: 'module_hero' },
         modules: [{ id: 'module-1', type: 'module_content' }],
         seo: makeSeo(),
@@ -129,7 +129,7 @@ describe('HomePage', () => {
     getHomePageMock.mockResolvedValue({
       ok: true,
       data: {
-        sectionHeader: { heading: undefined, supportingText: undefined },
+        headingBlock: { heading: undefined, supportingText: undefined },
         hero: { id: 'hero-1' },
         modules: [],
         seo: makeSeo(),
@@ -146,7 +146,7 @@ describe('HomePage', () => {
       ok: true,
       data: {
         title: 'Home — internal label',
-        sectionHeader: {
+        headingBlock: {
           heading: 'Welcome to the blog',
           supportingText: 'Fresh posts every week.',
         },
@@ -170,7 +170,7 @@ describe('HomePage', () => {
       ok: true,
       data: {
         title: 'Home — internal label',
-        sectionHeader: {
+        headingBlock: {
           heading: 'Welcome to the blog',
           supportingText: 'Fresh posts every week.',
         },
@@ -192,7 +192,7 @@ describe('HomePage', () => {
       ok: true,
       data: {
         title: 'Home — internal label',
-        sectionHeader: { heading: undefined, supportingText: undefined },
+        headingBlock: { heading: undefined, supportingText: undefined },
         hero: undefined,
         modules: [],
         seo: makeSeo(),
@@ -210,7 +210,7 @@ describe('HomePage', () => {
       ok: true,
       data: {
         title: 'Home — internal label',
-        sectionHeader: {
+        headingBlock: {
           heading: 'Welcome to the blog',
           supportingText: undefined,
         },

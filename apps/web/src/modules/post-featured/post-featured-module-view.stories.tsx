@@ -46,7 +46,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: {
+    headingBlock: {
       heading: 'Featured',
       supportingText: undefined,
     },
@@ -77,7 +77,7 @@ export const LeadOnly: TStory = {
 
 export const WithoutCmsHeading: TStory = {
   args: {
-    sectionHeader: {
+    headingBlock: {
       heading: undefined,
       supportingText: undefined,
     },

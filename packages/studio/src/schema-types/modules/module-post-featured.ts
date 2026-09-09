@@ -3,8 +3,8 @@ import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-p
 import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
 import { defineAlignmentFields } from '@blog/studio/schema-types/helpers/define-alignment-fields';
 import { getDraftsClient } from '@blog/studio/schema-types/helpers/get-drafts-client';
+import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
 import { layoutField } from '@blog/studio/schema-types/helpers/layout-field';
-import { sectionHeaderField } from '@blog/studio/schema-types/helpers/section-header-field';
 import { showImagesField } from '@blog/studio/schema-types/helpers/show-images-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
 import { validateNewestFeaturedHasCandidate } from '@blog/studio/schema-types/helpers/validate-newest-featured-has-candidate';
@@ -69,7 +69,7 @@ export const postFeaturedSchema = defineType({
   fields: [
     titleField(),
     brandVariantField(),
-    sectionHeaderField(),
+    headingBlockField(),
     showImagesField(),
     defineField({
       name: 'postSource',

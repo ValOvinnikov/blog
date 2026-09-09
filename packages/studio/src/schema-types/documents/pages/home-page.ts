@@ -1,6 +1,6 @@
 import { defineModulesField } from '@blog/studio/schema-types/helpers/define-modules-field';
+import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
 import { heroField } from '@blog/studio/schema-types/helpers/hero-field';
-import { sectionHeaderField } from '@blog/studio/schema-types/helpers/section-header-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
 import { validateHeroOrHeading } from '@blog/studio/schema-types/helpers/validate-hero-or-heading';
 import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/helpers/validate-single-blank-heading-per-type';
@@ -34,7 +34,7 @@ export const homePageSchema = defineType({
   },
   fields: [
     titleField(),
-    sectionHeaderField({
+    headingBlockField({
       description:
         'The page heading (h1) and its optional supporting line. Not shown when a hero is set.',
     }),

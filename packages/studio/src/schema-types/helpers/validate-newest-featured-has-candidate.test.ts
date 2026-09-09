@@ -93,7 +93,7 @@ describe('validateNewestFeaturedHasCandidate', () => {
     );
 
     expect(receivedQuery).toBe(
-      'count(*[_type == "page_post" && featured == true && publishedAt <= now() && defined(sectionHeader.heading) && defined(author) && defined(topic) && defined(content)])',
+      'count(*[_type == "page_post" && featured == true && publishedAt <= now() && defined(headingBlock.heading) && defined(author) && defined(topic) && defined(content)])',
     );
   });
 });

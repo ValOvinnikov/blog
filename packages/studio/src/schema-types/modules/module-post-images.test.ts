@@ -42,13 +42,13 @@ describe.each(modulesWithShowImages)(
       ).toBeUndefined();
     });
 
-    it('is emitted immediately after sectionHeader', () => {
+    it('is emitted immediately after headingBlock', () => {
       const names = schema.fields?.map((field) => field.name) ?? [];
-      const sectionHeaderIndex = names.indexOf('sectionHeader');
+      const headingBlockIndex = names.indexOf('headingBlock');
       const showImagesIndex = names.indexOf('showImages');
 
-      expect(sectionHeaderIndex).toBeGreaterThanOrEqual(0);
-      expect(showImagesIndex).toBe(sectionHeaderIndex + 1);
+      expect(headingBlockIndex).toBeGreaterThanOrEqual(0);
+      expect(showImagesIndex).toBe(headingBlockIndex + 1);
     });
   },
 );

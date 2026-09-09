@@ -24,9 +24,9 @@ describe('toTaxonomyListModule', () => {
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
 
-  it('maps sectionHeader when authored', () => {
+  it('maps headingBlock when authored', () => {
     const raw = makeRawTaxonomyListModule({
-      sectionHeader: {
+      headingBlock: {
         heading: 'Browse by topic',
         supportingText: 'Pick a subject.',
       },
@@ -34,18 +34,18 @@ describe('toTaxonomyListModule', () => {
 
     const module = toTaxonomyListModule(raw);
 
-    expect(module.sectionHeader).toEqual({
+    expect(module.headingBlock).toEqual({
       heading: 'Browse by topic',
       supportingText: 'Pick a subject.',
     });
   });
 
-  it('leaves every sectionHeader field undefined when unset (no faked default)', () => {
-    const raw = makeRawTaxonomyListModule({ sectionHeader: null });
+  it('leaves every headingBlock field undefined when unset (no faked default)', () => {
+    const raw = makeRawTaxonomyListModule({ headingBlock: null });
 
     const module = toTaxonomyListModule(raw);
 
-    expect(module.sectionHeader).toEqual({
+    expect(module.headingBlock).toEqual({
       heading: undefined,
       supportingText: undefined,
     });

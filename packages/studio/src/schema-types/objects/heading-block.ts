@@ -1,6 +1,6 @@
 import { defineField, defineType } from 'sanity';
 
-const sectionHeaderFields = (options: { requireHeading?: boolean } = {}) => [
+const headingBlockFields = (options: { requireHeading?: boolean } = {}) => [
   defineField({
     name: 'heading',
     title: 'Heading',
@@ -16,23 +16,23 @@ const sectionHeaderFields = (options: { requireHeading?: boolean } = {}) => [
   }),
 ];
 
-export const sectionHeaderSchema = defineType({
-  name: 'sectionHeader',
-  title: 'Section Header',
+export const headingBlockSchema = defineType({
+  name: 'headingBlock',
+  title: 'Heading Block',
   type: 'object',
-  fields: sectionHeaderFields(),
+  fields: headingBlockFields(),
 });
 
 /**
- * Same shape as `sectionHeaderSchema` but `heading` is required — for
+ * Same shape as `headingBlockSchema` but `heading` is required — for
  * modules where an empty heading isn't a valid state (CTA, Newsletter).
  * Sanity field validation is fixed per named type, so a per-module override
  * needs a second registered type rather than one shared type with
  * conditional validation.
  */
-export const requiredHeadingSectionHeaderSchema = defineType({
-  name: 'requiredHeadingSectionHeader',
-  title: 'Section Header',
+export const requiredHeadingBlockSchema = defineType({
+  name: 'requiredHeadingBlock',
+  title: 'Heading Block',
   type: 'object',
-  fields: sectionHeaderFields({ requireHeading: true }),
+  fields: headingBlockFields({ requireHeading: true }),
 });

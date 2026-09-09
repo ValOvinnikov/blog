@@ -24,7 +24,7 @@ export interface IPostListModuleProps {
   createHref?: (page: number) => string;
   /** Pagination nav `aria-label`. Defaults to the blog archive's own copy. */
   ariaLabel?: string;
-  /** Fallback heading for screen readers when the CMS `sectionHeader.heading` is blank. Defaults to the blog archive's own copy. */
+  /** Fallback heading for screen readers when the CMS `headingBlock.heading` is blank. Defaults to the blog archive's own copy. */
   accessibleTitle?: string;
   /** Empty-state copy for this archive. Defaults to the blog archive's own copy. */
   emptyMessageFallback?: string;
@@ -72,7 +72,7 @@ export const PostListModule = async ({
 
   const {
     brandVariant,
-    sectionHeader,
+    headingBlock,
     posts,
     layout,
     currentPage,
@@ -105,7 +105,7 @@ export const PostListModule = async ({
   return (
     <PostListModuleView
       brandVariant={brandVariant}
-      sectionHeader={sectionHeader}
+      headingBlock={headingBlock}
       items={items}
       layout={layout}
       contentAlignment={contentAlignment}

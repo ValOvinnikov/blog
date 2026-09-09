@@ -118,10 +118,10 @@ describe('homePageSchema modules allow-list', () => {
 });
 
 describe('homePageSchema field order', () => {
-  it('orders fields title, sectionHeader, hero, modules, seo', () => {
+  it('orders fields title, headingBlock, hero, modules, seo', () => {
     expect(homePageSchema.fields?.map((field) => field.name)).toEqual([
       'title',
-      'sectionHeader',
+      'headingBlock',
       'hero',
       'modules',
       'seo',
@@ -161,24 +161,24 @@ describe('homePageSchema document validation', () => {
     ) as TDocumentMockRule[];
   };
 
-  it('errors when neither hero nor sectionHeader.heading is set', () => {
+  it('errors when neither hero nor headingBlock.heading is set', () => {
     const [requiredRule] = buildDocumentRules();
 
     expect(requiredRule?.fn?.({})).toBe('Add a hero or a heading');
   });
 
-  it('warns when both hero and sectionHeader.heading are set', () => {
+  it('warns when both hero and headingBlock.heading are set', () => {
     const [, notBothRule] = buildDocumentRules();
 
     expect(
       notBothRule?.fn?.({
         hero: { _ref: 'hero-1' },
-        sectionHeader: { heading: 'Welcome' },
+        headingBlock: { heading: 'Welcome' },
       }),
     ).toBe('The hero hides the heading');
   });
 
-  it('passes when exactly one of hero or sectionHeader.heading is set', () => {
+  it('passes when exactly one of hero or headingBlock.heading is set', () => {
     const [requiredRule, notBothRule] = buildDocumentRules();
     const document = { hero: { _ref: 'hero-1' } };
 

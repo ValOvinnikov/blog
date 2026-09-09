@@ -79,7 +79,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
+        headingBlock: {
           heading: 'Related reading',
           supportingText: undefined,
         },
@@ -127,7 +127,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
+        headingBlock: {
           heading: 'Related reading',
           supportingText: undefined,
         },
@@ -144,12 +144,12 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     expect(container.querySelector('section')).not.toBeInTheDocument();
   });
 
-  it("resolves the module's own translated fallback heading (never a hardcoded string) when sectionHeader.heading is undefined", async () => {
+  it("resolves the module's own translated fallback heading (never a hardcoded string) when headingBlock.heading is undefined", async () => {
     getPostRelatedMock.mockResolvedValue({
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: { heading: undefined, supportingText: undefined },
+        headingBlock: { heading: undefined, supportingText: undefined },
         posts: [makePost()],
         layout: undefined,
         contentAlignment: undefined,
@@ -174,7 +174,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
+        headingBlock: {
           heading: 'Related reading',
           supportingText: undefined,
         },
@@ -197,7 +197,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
+        headingBlock: {
           heading: 'Related reading',
           supportingText: undefined,
         },
@@ -220,7 +220,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
+        headingBlock: {
           heading: 'Related reading',
           supportingText: undefined,
         },
@@ -241,7 +241,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
+        headingBlock: {
           heading: 'Related reading',
           supportingText: undefined,
         },

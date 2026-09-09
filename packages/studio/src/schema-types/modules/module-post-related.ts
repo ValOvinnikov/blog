@@ -1,7 +1,7 @@
 import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
 import { defineAlignmentFields } from '@blog/studio/schema-types/helpers/define-alignment-fields';
+import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
 import { layoutField } from '@blog/studio/schema-types/helpers/layout-field';
-import { sectionHeaderField } from '@blog/studio/schema-types/helpers/section-header-field';
 import { showImagesField } from '@blog/studio/schema-types/helpers/show-images-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
 import { BookOpen } from 'lucide-react';
@@ -15,7 +15,7 @@ export const postRelatedSchema = defineType({
   fields: [
     titleField(),
     brandVariantField(),
-    sectionHeaderField(),
+    headingBlockField(),
     showImagesField(),
     defineField({
       name: 'limit',

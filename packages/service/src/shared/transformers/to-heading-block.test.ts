@@ -1,28 +1,28 @@
 import {
-  toRequiredSectionHeader,
-  toSectionHeader,
-  type TRawRequiredSectionHeader,
-  type TRawSectionHeader,
-} from './to-section-header';
+  toHeadingBlock,
+  toRequiredHeadingBlock,
+  type TRawHeadingBlock,
+  type TRawRequiredHeadingBlock,
+} from './to-heading-block';
 
-const rawSectionHeader: TRawSectionHeader = {
+const rawHeadingBlock: TRawHeadingBlock = {
   heading: 'Featured posts',
   supportingText: 'Hand-picked reads from the team',
 };
 
-const rawRequiredSectionHeader: TRawRequiredSectionHeader = {
+const rawRequiredHeadingBlock: TRawRequiredHeadingBlock = {
   heading: 'Featured posts',
   supportingText: 'Hand-picked reads from the team',
 };
 
-describe(toSectionHeader, () => {
-  it('maps a fully-authored sectionHeader object 1:1', () => {
-    expect(toSectionHeader(rawSectionHeader)).toEqual(rawSectionHeader);
+describe(toHeadingBlock, () => {
+  it('maps a fully-authored headingBlock object 1:1', () => {
+    expect(toHeadingBlock(rawHeadingBlock)).toEqual(rawHeadingBlock);
   });
 
   it('leaves individually-unset fields undefined when null (no faked default)', () => {
     expect(
-      toSectionHeader({
+      toHeadingBlock({
         heading: null,
         supportingText: null,
       }),
@@ -33,30 +33,30 @@ describe(toSectionHeader, () => {
   });
 
   it('builds an all-undefined container when raw is null', () => {
-    expect(toSectionHeader(null)).toEqual({
+    expect(toHeadingBlock(null)).toEqual({
       heading: undefined,
       supportingText: undefined,
     });
   });
 
   it('builds an all-undefined container when raw is undefined', () => {
-    expect(toSectionHeader(undefined)).toEqual({
+    expect(toHeadingBlock(undefined)).toEqual({
       heading: undefined,
       supportingText: undefined,
     });
   });
 });
 
-describe(toRequiredSectionHeader, () => {
-  it('maps a fully-authored requiredSectionHeader object 1:1', () => {
-    expect(toRequiredSectionHeader(rawRequiredSectionHeader)).toEqual(
-      rawRequiredSectionHeader,
+describe(toRequiredHeadingBlock, () => {
+  it('maps a fully-authored requiredHeadingBlock object 1:1', () => {
+    expect(toRequiredHeadingBlock(rawRequiredHeadingBlock)).toEqual(
+      rawRequiredHeadingBlock,
     );
   });
 
   it('maps heading through unchanged (never coalesced away)', () => {
     expect(
-      toRequiredSectionHeader({
+      toRequiredHeadingBlock({
         heading: 'Latest from the blog',
         supportingText: null,
       }),

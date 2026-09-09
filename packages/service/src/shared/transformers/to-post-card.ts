@@ -58,7 +58,7 @@ export function toPostCardTopic(raw: TRawPostCard['topic']): TPostCardTopic {
 }
 
 export function toPostCard(raw: TRawPostCard, tenant: TImageTenant): TPostCard {
-  const { title, excerpt } = toPostHeading(raw.sectionHeader);
+  const { title, excerpt } = toPostHeading(raw.headingBlock);
 
   return {
     id: raw._id,

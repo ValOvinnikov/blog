@@ -21,7 +21,7 @@ const meta = {
   args: {
     id: 'newsletter-1',
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: {
+    headingBlock: {
       heading: 'Get new posts in your inbox',
       supportingText: 'One email a week, no spam, unsubscribe anytime.',
     },

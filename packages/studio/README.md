@@ -46,7 +46,7 @@ Studio from one deployment.
 - `src/schema-types/objects/` — shared object types (`link`, `socialLink`,
   `brand`, `imageWithAlt`, `richText`, `blockText`, `seo`, `openGraph`, …)
 - `src/schema-types/helpers/` — DRY field factories reused across schemas
-  (e.g. `define-modules-field.ts`, `section-header-field.ts`)
+  (e.g. `define-modules-field.ts`, `heading-block-field.ts`)
 - `src/schema-types/components/` — custom Studio input components
 - `src/studio-structure.ts` — the desk structure, directive-free
 - `src/studio-config.ts` — `buildStudioConfig`, which assembles schema +

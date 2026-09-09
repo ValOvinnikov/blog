@@ -154,13 +154,13 @@ describe(toPostRelatedModule, () => {
     expect(result.showImages).toBe(true);
   });
 
-  it('falls back to an undefined heading and supporting text when sectionHeader is absent', () => {
+  it('falls back to an undefined heading and supporting text when headingBlock is absent', () => {
     const result = toPostRelatedModule(
-      makeRawPostRelatedModule({ sectionHeader: null }),
+      makeRawPostRelatedModule({ headingBlock: null }),
       [],
     );
 
-    expect(result.sectionHeader).toEqual({
+    expect(result.headingBlock).toEqual({
       heading: undefined,
       supportingText: undefined,
     });

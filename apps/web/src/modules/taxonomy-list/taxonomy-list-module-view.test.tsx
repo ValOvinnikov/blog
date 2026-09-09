@@ -28,7 +28,7 @@ const item = {
 
 const setup = customRender(TaxonomyListModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  sectionHeader: {
+  headingBlock: {
     heading: 'Browse by topic',
     supportingText: undefined,
   },
@@ -74,9 +74,9 @@ describe(`<${TaxonomyListModuleView.name}/>`, () => {
     expect(label.tagName).toBe('H3');
   });
 
-  it('renders a visually hidden heading from accessibleTitle when sectionHeader.heading is undefined', () => {
+  it('renders a visually hidden heading from accessibleTitle when headingBlock.heading is undefined', () => {
     setup({
-      sectionHeader: {
+      headingBlock: {
         heading: undefined,
         supportingText: undefined,
       },

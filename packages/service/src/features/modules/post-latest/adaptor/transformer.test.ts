@@ -16,12 +16,12 @@ const rawPosts: TRawPostLatestModulePosts = [];
 const tenant = makeTenant();
 
 describe('toPostLatestModule', () => {
-  it('maps sectionHeader straight through', () => {
+  it('maps headingBlock straight through', () => {
     const raw = makeRawPostLatestModule();
 
     const module = toPostLatestModule(raw, rawPosts, tenant);
 
-    expect(module.sectionHeader).toEqual({
+    expect(module.headingBlock).toEqual({
       heading: 'Latest',
       supportingText: undefined,
     });
@@ -37,12 +37,12 @@ describe('toPostLatestModule', () => {
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
 
-  it('leaves every sectionHeader field undefined when the field itself is unset (no faked default)', () => {
-    const raw = makeRawPostLatestModule({ sectionHeader: null });
+  it('leaves every headingBlock field undefined when the field itself is unset (no faked default)', () => {
+    const raw = makeRawPostLatestModule({ headingBlock: null });
 
     const module = toPostLatestModule(raw, rawPosts, tenant);
 
-    expect(module.sectionHeader).toEqual({
+    expect(module.headingBlock).toEqual({
       heading: undefined,
       supportingText: undefined,
     });

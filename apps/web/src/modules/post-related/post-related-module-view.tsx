@@ -27,7 +27,7 @@ export interface IPostRelatedModuleViewProps extends Omit<
  */
 export const PostRelatedModuleView = ({
   brandVariant,
-  sectionHeader,
+  headingBlock,
   items,
   layout,
   titleId,
@@ -46,8 +46,7 @@ export const PostRelatedModuleView = ({
       dataTestId={dataTestId}
     >
       <ModuleHeading
-        heading={sectionHeader.heading}
-        supportingText={sectionHeader.supportingText}
+        headingBlock={headingBlock}
         accessibleTitle={accessibleTitle}
         id={titleId}
         level={2}

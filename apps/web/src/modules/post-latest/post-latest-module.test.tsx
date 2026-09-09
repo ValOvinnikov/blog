@@ -55,7 +55,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
+        headingBlock: {
           heading: 'Latest posts',
           supportingText: undefined,
         },
@@ -84,7 +84,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
+        headingBlock: {
           heading: 'Latest posts',
           supportingText: undefined,
         },
@@ -116,7 +116,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
+        headingBlock: {
           heading: 'Latest posts',
           supportingText: undefined,
         },
@@ -132,12 +132,12 @@ describe(`<${PostLatestModule.name}/>`, () => {
     expect(container.querySelector('section')).not.toBeInTheDocument();
   });
 
-  it("resolves the module's own translated fallback heading (never a hardcoded string) when sectionHeader.heading is undefined", async () => {
+  it("resolves the module's own translated fallback heading (never a hardcoded string) when headingBlock.heading is undefined", async () => {
     getPostLatestMock.mockResolvedValue({
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
+        headingBlock: {
           heading: undefined,
           supportingText: undefined,
         },
@@ -174,7 +174,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
+        headingBlock: {
           heading: 'Latest posts',
           supportingText: undefined,
         },
@@ -206,7 +206,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
+        headingBlock: {
           heading: 'Latest posts',
           supportingText: undefined,
         },
@@ -240,7 +240,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
+        headingBlock: {
           heading: 'Latest posts',
           supportingText: undefined,
         },

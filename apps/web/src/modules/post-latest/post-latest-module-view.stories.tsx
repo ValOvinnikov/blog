@@ -41,7 +41,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: {
+    headingBlock: {
       heading: 'Latest posts',
       supportingText: undefined,
     },
@@ -61,7 +61,7 @@ export const Default: TStory = {};
 
 export const WithoutCmsHeading: TStory = {
   args: {
-    sectionHeader: {
+    headingBlock: {
       heading: undefined,
       supportingText: undefined,
     },

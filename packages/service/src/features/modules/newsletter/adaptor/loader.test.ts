@@ -17,8 +17,8 @@ describe('getNewsletter', () => {
 
     const newsletter = await getNewsletter('newsletter-1', tenant);
 
-    expect(newsletter.sectionHeader.heading).toBe('Stay in the loop');
-    expect(newsletter.sectionHeader.supportingText).toBe(
+    expect(newsletter.headingBlock.heading).toBe('Stay in the loop');
+    expect(newsletter.headingBlock.supportingText).toBe(
       'Get new posts in your inbox.',
     );
     expect(newsletter.variant).toBe('FULL');

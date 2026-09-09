@@ -48,7 +48,7 @@ export function makeRawFeedPost(
   overrides: Partial<TRawFeedPost> = {},
 ): TRawFeedPost {
   return {
-    sectionHeader: {
+    headingBlock: {
       heading: 'Hello World',
       supportingText: 'A sufficiently long excerpt for the card.',
     },

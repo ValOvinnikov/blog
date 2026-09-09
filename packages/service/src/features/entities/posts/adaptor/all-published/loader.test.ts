@@ -15,11 +15,11 @@ describe(getAllPublishedPosts, () => {
   it('fetches every published post with no pagination parameters', async () => {
     mockRun.mockResolvedValue([
       makeRawFeedPost({
-        sectionHeader: { heading: 'First', supportingText: null },
+        headingBlock: { heading: 'First', supportingText: null },
         slug: 'first',
       }),
       makeRawFeedPost({
-        sectionHeader: { heading: 'Second', supportingText: null },
+        headingBlock: { heading: 'Second', supportingText: null },
         slug: 'second',
       }),
     ]);

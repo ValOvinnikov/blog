@@ -6,14 +6,14 @@ describe(toAllPublishedPosts, () => {
   it('maps every raw feed post into a domain feed post', () => {
     const raw = [
       makeRawFeedPost({
-        sectionHeader: {
+        headingBlock: {
           heading: 'First',
           supportingText: 'A sufficiently long excerpt for the card.',
         },
         slug: 'first',
       }),
       makeRawFeedPost({
-        sectionHeader: {
+        headingBlock: {
           heading: 'Second',
           supportingText: 'A sufficiently long excerpt for the card.',
         },
@@ -55,7 +55,7 @@ describe(toAllPublishedPosts, () => {
   it('maps a sparse feed post with no excerpt to undefined', () => {
     const [result] = toAllPublishedPosts([
       makeRawFeedPost({
-        sectionHeader: { heading: 'Hello World', supportingText: null },
+        headingBlock: { heading: 'Hello World', supportingText: null },
       }),
     ]);
 
