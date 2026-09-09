@@ -38,6 +38,25 @@ const createMockRule = (customFns: TCustomFn[]): TMockRule => ({
   },
 });
 
+type TDocumentCustomFn = (document: Record<string, unknown>) => string | true;
+
+type TDocumentMockRule = {
+  level: 'error' | 'warning';
+  fn?: TDocumentCustomFn;
+  custom: (fn: TDocumentCustomFn) => TDocumentMockRule;
+  warning: () => TDocumentMockRule;
+};
+
+const createDocumentMockRule = (
+  level: TDocumentMockRule['level'] = 'error',
+  fn?: TDocumentCustomFn,
+): TDocumentMockRule => ({
+  level,
+  fn,
+  custom: (nextFn) => createDocumentMockRule('error', nextFn),
+  warning: () => createDocumentMockRule('warning', fn),
+});
+
 const getModulesCustomValidators = (): TCustomFn[] => {
   const modulesField = homePageSchema.fields?.find(
     (field) => field.name === 'modules',
@@ -121,11 +140,25 @@ describe('homePageSchema modules allow-list', () => {
   });
 });
 
+describe('homePageSchema field order', () => {
+  it('orders fields title, sectionHeader, hero, modules, seo', () => {
+    expect(homePageSchema.fields?.map((field) => field.name)).toEqual([
+      'title',
+      'sectionHeader',
+      'hero',
+      'modules',
+      'seo',
+    ]);
+  });
+});
+
 describe('homePageSchema hero field', () => {
-  it('is a required reference to the hero family', () => {
+  it('is an optional reference to the hero family', () => {
     const heroField = homePageSchema.fields?.find(
       (field) => field.name === 'hero',
-    ) as { type: string; to?: Array<{ type: string }> } | undefined;
+    ) as
+      | { type: string; to?: Array<{ type: string }>; validation?: unknown }
+      | undefined;
 
     if (!heroField) {
       throw new Error('Expected homePageSchema to define a hero field.');
@@ -135,5 +168,44 @@ describe('homePageSchema hero field', () => {
     expect(heroField.to?.map((entry) => entry.type)).toEqual(
       HERO_SCHEMA_TYPES.map((schema) => schema.name),
     );
+    expect(heroField.validation).toBeUndefined();
+  });
+});
+
+describe('homePageSchema document validation', () => {
+  const buildDocumentRules = (): TDocumentMockRule[] => {
+    if (!homePageSchema.validation) {
+      throw new Error('Expected homePageSchema to define a validation rule.');
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    return (homePageSchema.validation as any)(
+      createDocumentMockRule(),
+    ) as TDocumentMockRule[];
+  };
+
+  it('errors when neither hero nor sectionHeader.heading is set', () => {
+    const [requiredRule] = buildDocumentRules();
+
+    expect(requiredRule?.fn?.({})).toBe('Add a hero or a heading');
+  });
+
+  it('warns when both hero and sectionHeader.heading are set', () => {
+    const [, notBothRule] = buildDocumentRules();
+
+    expect(
+      notBothRule?.fn?.({
+        hero: { _ref: 'hero-1' },
+        sectionHeader: { heading: 'Welcome' },
+      }),
+    ).toBe('The hero hides the heading');
+  });
+
+  it('passes when exactly one of hero or sectionHeader.heading is set', () => {
+    const [requiredRule, notBothRule] = buildDocumentRules();
+    const document = { hero: { _ref: 'hero-1' } };
+
+    expect(requiredRule?.fn?.(document)).toBe(true);
+    expect(notBothRule?.fn?.(document)).toBe(true);
   });
 });

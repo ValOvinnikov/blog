@@ -5,7 +5,7 @@ import {
 import { defineField } from 'sanity';
 
 export const sectionHeaderField = (
-  options: { requireHeading?: boolean } = {},
+  options: { requireHeading?: boolean; description?: string } = {},
 ) =>
   defineField({
     name: 'sectionHeader',
@@ -14,5 +14,6 @@ export const sectionHeaderField = (
       ? requiredHeadingSectionHeaderSchema.name
       : sectionHeaderSchema.name,
     description:
+      options.description ??
       'Optional heading and supporting text shown above this module.',
   });
