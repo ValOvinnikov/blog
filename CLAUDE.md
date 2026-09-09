@@ -652,6 +652,13 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   (local or `Merge pull request #…`) are explicitly skipped; Dependabot's
   `chore(deps): …` messages are not separately exempted — they pass because
   they're already conventional.
+- **A PR body is a highlight list — 12 lines and 1200 characters, hard cap.**
+  One line of what this makes possible, one line per layer touched,
+  `Closes #<n>`. No code blocks, no per-file or per-function enumeration, no
+  design-rationale sections, and **no test-plan checklist** — the gates already
+  require the checks to pass before commit and CI re-runs them on the PR, so a
+  hand-ticked copy proves nothing. Full contract and the exception list in
+  `open-pull-request`'s "PR body template" section.
 - **Prefer per-layer PRs.** Split a multi-layer feature into separate PRs per
   layer (`config → studio → service → ui → web` when config changes are involved,
   otherwise `studio → service → ui → web`; dependency order) so each review stays
@@ -735,6 +742,56 @@ main` fires no workflow. CodeQL runs here through GitHub's _default setup_
   changes agent tooling (`.claude/` hooks/agents/skills/settings) updates
   [`docs/context/claude-code.md`](docs/context/claude-code.md).
 - `.claude/skills/` is the single home for skills — edit one copy, no mirror.
+
+## Reporting to the user
+
+**Default shape of a chat message: the outcome first, then at most a handful
+of lines.** Roughly 8 lines of prose is the budget for a routine status
+update; a genuinely complex decision can run longer, but it has to earn every
+line past that. The progress table the user asks for after each unit of work
+is exempt from the budget — it is the requested format, not prose.
+
+**Six things bloat these messages. None of them are information the user
+lacks:**
+
+- **Restating a subagent's report.** The orchestrator's job is the
+  _conclusion_ — "#2987 landed, service green" — not a prose retelling of what
+  the agent said it did. Never paraphrase a report section by section.
+- **Verification statistics.** "135 files / 730 tests, type-check green across
+  all 11 tasks, all three greps zero" is one word to the reader: green. Give
+  the numbers only when something failed, or when the user asked for them.
+- **Narrating abandoned paths and internal reasoning.** "I abandoned
+  55eb160cb rather than resolving its conflict — it was written against the
+  pre-#3001 shape…" describes work the user never sees and cannot act on.
+  Report the state that exists now.
+- **Self-assessment and blame attribution.** "That came from my dispatch",
+  "it's my fault rather than its judgment", "that's the right behaviour" — the
+  user needs the decision, not a review of how it arose.
+- **Repeating unchanged state.** Board status, epic counts, and remaining
+  sub-issue lists get one mention when they _change_. Re-printing "epic #2943
+  In Progress with 8 sub-issues left" in consecutive messages is noise.
+- **Bundling an unrelated ask into a status update.** A stray "also, should I
+  delete this label?" buried under a report either gets missed or derails the
+  thread. Hold it, or ask it on its own.
+
+**When a decision genuinely needs the user, ask it as a question — not as a
+brief.** State the recommendation first, then the single fact that could
+change it, then the question. A paragraph headed "the case for X" followed by
+a paragraph headed "the case for Y" is a memo the user has to read to extract a
+yes/no from; three lines get the same answer:
+
+```
+I'd apply it to all five call sites — the other four are byte-identical and
+behaviour-preserving. Cost is four extra files on a prio:later ticket.
+All five, or home only?
+```
+
+This does not license withholding a real tension — the "don't let a subagent
+silently resolve an ambiguity" rule above still stands, and surfacing one is
+mandatory. It governs the _length_ of the surfacing, not whether it happens.
+
+**One question per message.** If two decisions are pending, ask the blocking
+one and hold the other until it is answered.
 
 ## Delivery gate sequence (mandatory — never skip or bundle)
 
