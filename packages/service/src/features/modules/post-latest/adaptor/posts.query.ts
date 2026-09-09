@@ -1,8 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import {
-  POST_CONTENT_READY_FILTER,
-  PUBLISHED_POST_FILTER,
-} from '@blog/service/shared/filters/published-post';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
 import { postCardFragment } from '@blog/service/shared/fragments/post';
 
 /**
@@ -15,7 +12,6 @@ export function postLatestModulePostsQuery(limit: number) {
   return q.star
     .filterByType('page_post')
     .filterRaw(PUBLISHED_POST_FILTER)
-    .filterRaw(POST_CONTENT_READY_FILTER)
     .order('publishedAt desc')
     .slice(0, limit)
     .project(postCardFragment);

@@ -1,8 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import {
-  POST_CONTENT_READY_FILTER,
-  PUBLISHED_POST_FILTER,
-} from '@blog/service/shared/filters/published-post';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
 import { postCardFragment } from '@blog/service/shared/fragments/post';
 
 import { RELATED_POSTS_TAG_CANDIDATE_LIMIT } from './constants';
@@ -59,7 +56,6 @@ export const relatedByTagsQuery = q
   .star.filterByType('page_post')
   .filterRaw('_id != $currentId && count((tags[]->_id)[@ in $tagIds]) > 0')
   .filterRaw(PUBLISHED_POST_FILTER)
-  .filterRaw(POST_CONTENT_READY_FILTER)
   .order('publishedAt desc')
   .slice(0, RELATED_POSTS_TAG_CANDIDATE_LIMIT)
   .project((sub) => ({
@@ -82,7 +78,6 @@ export function relatedByTopicQuery(topicCandidateLimit: number) {
     .star.filterByType('page_post')
     .filterRaw('_id != $currentId && topic._ref == $topicId')
     .filterRaw(PUBLISHED_POST_FILTER)
-    .filterRaw(POST_CONTENT_READY_FILTER)
     .order('publishedAt desc')
     .slice(0, topicCandidateLimit)
     .project(postCardFragment);

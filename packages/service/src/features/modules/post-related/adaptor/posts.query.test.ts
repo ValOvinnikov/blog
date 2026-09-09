@@ -23,12 +23,6 @@ describe('relatedByTagsQuery', () => {
   it('excludes posts whose publishedAt is in the future', () => {
     expect(relatedByTagsQuery.query).toContain('publishedAt <= now()');
   });
-
-  it('excludes posts whose content fields are not yet populated', () => {
-    expect(relatedByTagsQuery.query).toContain(
-      'defined(excerpt) && defined(author) && defined(topic) && defined(body)',
-    );
-  });
 });
 
 describe('relatedByTopicQuery', () => {

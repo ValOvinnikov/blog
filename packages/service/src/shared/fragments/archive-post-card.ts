@@ -17,8 +17,8 @@ export const archivePostCardFragment = q
     _id: true,
     title: sub.field('title').notNull(),
     slug: sub.field('slug.current').notNull(),
-    excerpt: sub.field('excerpt').notNull(),
+    excerpt: sub.field('excerpt').nullable(true),
     publishedAt: sub.field('publishedAt').notNull(),
-    topic: sub.field('topic').deref().project(topicFragment).notNull(),
+    topic: sub.field('topic').deref().project(topicFragment).nullable(true),
     wordCount: sub.raw(WORD_COUNT_EXPRESSION, wordCountParser),
   }));

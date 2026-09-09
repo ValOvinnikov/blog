@@ -66,13 +66,13 @@ describe('toPostCard', () => {
       tenant,
     );
 
-    expect(result.author.imageUrl).toBeUndefined();
+    expect(result.author?.imageUrl).toBeUndefined();
   });
 
   it('maps a missing profilePage reference to an undefined profilePageSlug', () => {
     const result = toPostCard(makeRawPostCard(), tenant);
 
-    expect(result.author.profilePageSlug).toBeUndefined();
+    expect(result.author?.profilePageSlug).toBeUndefined();
   });
 
   it('maps the topic', () => {
@@ -83,6 +83,21 @@ describe('toPostCard', () => {
       title: 'Engineering',
       slug: 'engineering',
     });
+  });
+
+  it('maps a sparse post-card with no excerpt, author, or topic to undefined', () => {
+    const result = toPostCard(
+      makeRawPostCard({
+        excerpt: null,
+        author: null,
+        topic: null,
+      }),
+      tenant,
+    );
+
+    expect(result.excerpt).toBeUndefined();
+    expect(result.author).toBeUndefined();
+    expect(result.topic).toBeUndefined();
   });
 
   it('defaults featured to false when null', () => {

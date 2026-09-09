@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import type { archivePostCardFragment } from '@blog/service/shared/fragments/archive-post-card';
 import {
   toPostCardTopic,
@@ -14,9 +15,9 @@ export type TArchivePostCard = {
   id: string;
   title: string;
   slug: string;
-  excerpt: string;
+  excerpt: TMaybeUndefined<string>;
   publishedAt: string;
-  topic: TPostCardTopic;
+  topic: TMaybeUndefined<TPostCardTopic>;
   readingTimeMinutes: number;
 };
 
@@ -25,9 +26,9 @@ export function toArchivePostCard(raw: TRawArchivePostCard): TArchivePostCard {
     id: raw._id,
     title: raw.title,
     slug: raw.slug,
-    excerpt: raw.excerpt,
+    excerpt: raw.excerpt ?? undefined,
     publishedAt: raw.publishedAt,
-    topic: toPostCardTopic(raw.topic),
+    topic: raw.topic ? toPostCardTopic(raw.topic) : undefined,
     readingTimeMinutes: toReadingTimeMinutes(raw.wordCount),
   };
 }

@@ -1,8 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import {
-  POST_CONTENT_READY_FILTER,
-  PUBLISHED_POST_FILTER,
-} from '@blog/service/shared/filters/published-post';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
 import { tagFragment } from '@blog/service/shared/fragments/tag';
 
 export const tagsQuery = q.star
@@ -18,8 +15,7 @@ export const tagsQuery = q.star
         sub.star
           .filterByType('page_post')
           .filterRaw('references(^._id)')
-          .filterRaw(PUBLISHED_POST_FILTER)
-          .filterRaw(POST_CONTENT_READY_FILTER),
+          .filterRaw(PUBLISHED_POST_FILTER),
       )
       .notNull(true),
   }));

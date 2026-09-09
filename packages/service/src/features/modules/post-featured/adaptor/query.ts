@@ -1,9 +1,6 @@
 import { POST_SOURCE } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
-import {
-  POST_CONTENT_READY_FILTER,
-  PUBLISHED_POST_FILTER,
-} from '@blog/service/shared/filters/published-post';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
 import { layoutFragment } from '@blog/service/shared/fragments/layout';
 import { postCardFragment } from '@blog/service/shared/fragments/post';
 import { sectionHeaderFragment } from '@blog/service/shared/fragments/section-header';
@@ -16,7 +13,6 @@ const newestFeaturedPostsQuery = q.star
   .filterByType('page_post')
   .filterRaw('featured == true')
   .filterRaw(PUBLISHED_POST_FILTER)
-  .filterRaw(POST_CONTENT_READY_FILTER)
   .order('publishedAt desc')
   .slice(0, 3)
   .project(postCardFragment);
@@ -40,7 +36,6 @@ export const postFeaturedModuleQuery = q
             .field('posts[]')
             .deref()
             .filterRaw(PUBLISHED_POST_FILTER)
-            .filterRaw(POST_CONTENT_READY_FILTER)
             .project(postCardFragment)
             .nullable(true),
         },

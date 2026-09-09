@@ -25,19 +25,19 @@ export type TPostCard = {
   id: string;
   title: string;
   slug: string;
-  excerpt: string;
+  excerpt: TMaybeUndefined<string>;
   publishedAt: string;
   heroImageUrl: TMaybeUndefined<string>;
   heroImageAlt: TMaybeUndefined<string>;
   heroImageSanity: TMaybeUndefined<ISanityImage>;
   featured: boolean;
-  author: TPostCardAuthor;
-  topic: TPostCardTopic;
+  author: TMaybeUndefined<TPostCardAuthor>;
+  topic: TMaybeUndefined<TPostCardTopic>;
   readingTimeMinutes: number;
 };
 
 function toPostCardAuthor(
-  raw: TRawPostCard['author'],
+  raw: NonNullable<TRawPostCard['author']>,
   tenant: TImageTenant,
 ): TPostCardAuthor {
   return {
@@ -48,7 +48,9 @@ function toPostCardAuthor(
   };
 }
 
-export function toPostCardTopic(raw: TRawPostCard['topic']): TPostCardTopic {
+export function toPostCardTopic(
+  raw: NonNullable<TRawPostCard['topic']>,
+): TPostCardTopic {
   return {
     id: raw._id,
     title: raw.title,
@@ -61,14 +63,14 @@ export function toPostCard(raw: TRawPostCard, tenant: TImageTenant): TPostCard {
     id: raw._id,
     title: raw.title,
     slug: raw.slug,
-    excerpt: raw.excerpt,
+    excerpt: raw.excerpt ?? undefined,
     publishedAt: raw.publishedAt,
     heroImageUrl: buildImageUrl(raw.heroImage, tenant),
     heroImageAlt: raw.heroImage?.alt,
     heroImageSanity: toSanityImage(raw.heroImageAsset, tenant),
     featured: raw.featured ?? false,
-    author: toPostCardAuthor(raw.author, tenant),
-    topic: toPostCardTopic(raw.topic),
+    author: raw.author ? toPostCardAuthor(raw.author, tenant) : undefined,
+    topic: raw.topic ? toPostCardTopic(raw.topic) : undefined,
     readingTimeMinutes: toReadingTimeMinutes(raw.wordCount),
   };
 }

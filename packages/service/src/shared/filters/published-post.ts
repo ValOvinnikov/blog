@@ -6,14 +6,3 @@
  * arrives.
  */
 export const PUBLISHED_POST_FILTER = 'publishedAt <= now()';
-
-/**
- * Restricts a `page_post` read to documents whose absorbed content fields
- * are actually populated — the schema marks them required, but a document
- * can exist with only its route/identity fields set. Chain alongside
- * `.filterRaw(PUBLISHED_POST_FILTER)` so an incomplete post is excluded
- * everywhere a complete one would be read, the same way an unpublished post
- * is.
- */
-export const POST_CONTENT_READY_FILTER =
-  'defined(excerpt) && defined(author) && defined(topic) && defined(body)';

@@ -17,12 +17,6 @@ describe('allPublishedPostsQuery', () => {
     expect(allPublishedPostsQuery.query).toContain('publishedAt <= now()');
   });
 
-  it('excludes posts whose absorbed content fields are not yet populated', () => {
-    expect(allPublishedPostsQuery.query).toContain(
-      'defined(excerpt) && defined(author) && defined(topic) && defined(body)',
-    );
-  });
-
   it('orders newest first, same as the paginated post-list query', () => {
     expect(allPublishedPostsQuery.query).toContain('order(publishedAt desc)');
   });

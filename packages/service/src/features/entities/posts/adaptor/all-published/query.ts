@@ -1,8 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import {
-  POST_CONTENT_READY_FILTER,
-  PUBLISHED_POST_FILTER,
-} from '@blog/service/shared/filters/published-post';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
 import { feedPostFragment } from '@blog/service/shared/fragments/feed-post';
 
 /**
@@ -13,6 +10,5 @@ import { feedPostFragment } from '@blog/service/shared/fragments/feed-post';
 export const allPublishedPostsQuery = q.star
   .filterByType('page_post')
   .filterRaw(PUBLISHED_POST_FILTER)
-  .filterRaw(POST_CONTENT_READY_FILTER)
   .order('publishedAt desc')
   .project(feedPostFragment);

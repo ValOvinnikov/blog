@@ -1,8 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import {
-  POST_CONTENT_READY_FILTER,
-  PUBLISHED_POST_FILTER,
-} from '@blog/service/shared/filters/published-post';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
 import { postCardFragment } from '@blog/service/shared/fragments/post';
 
 // Fallback when the hero module has no `featuredPost` configured: newest
@@ -13,7 +10,6 @@ export const heroFallbackFeaturedPostQuery = q.star
   .filterByType('page_post')
   .filterRaw('featured == true')
   .filterRaw(PUBLISHED_POST_FILTER)
-  .filterRaw(POST_CONTENT_READY_FILTER)
   .order('publishedAt desc')
   .slice(0)
   .project(postCardFragment)

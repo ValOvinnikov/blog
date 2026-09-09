@@ -1,8 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import {
-  POST_CONTENT_READY_FILTER,
-  PUBLISHED_POST_FILTER,
-} from '@blog/service/shared/filters/published-post';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
 
 // `^.topic._ref` (GROQ's parent-scope operator) correlates each `page_post`
 // back to the enclosing `page_topic` document's own topic reference within
@@ -27,8 +24,7 @@ export const topicPaginationParamsQuery = q.star
         sub.star
           .filterByType('page_post')
           .filterRaw('references(^.topic._ref)')
-          .filterRaw(PUBLISHED_POST_FILTER)
-          .filterRaw(POST_CONTENT_READY_FILTER),
+          .filterRaw(PUBLISHED_POST_FILTER),
       )
       .notNull(true),
   }));

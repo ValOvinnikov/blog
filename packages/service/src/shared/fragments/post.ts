@@ -20,7 +20,7 @@ export const postCardFragment = q
     _id: true,
     title: sub.field('title').notNull(),
     slug: sub.field('slug.current').notNull(),
-    excerpt: sub.field('excerpt').notNull(),
+    excerpt: sub.field('excerpt').nullable(true),
     publishedAt: sub.field('publishedAt').notNull(),
     heroImage: sub
       .field('heroImage')
@@ -31,8 +31,12 @@ export const postCardFragment = q
       .project(sanityImageFragment)
       .nullable(true),
     featured: sub.field('featured').nullable(true),
-    author: sub.field('author').deref().project(authorCardFragment).notNull(),
-    topic: sub.field('topic').deref().project(topicFragment).notNull(),
+    author: sub
+      .field('author')
+      .deref()
+      .project(authorCardFragment)
+      .nullable(true),
+    topic: sub.field('topic').deref().project(topicFragment).nullable(true),
     wordCount: sub.raw(WORD_COUNT_EXPRESSION, wordCountParser),
   }));
 
@@ -42,7 +46,7 @@ export const postDetailFragment = q
     _id: true,
     title: sub.field('title').notNull(),
     slug: sub.field('slug.current').notNull(),
-    excerpt: sub.field('excerpt').notNull(),
+    excerpt: sub.field('excerpt').nullable(true),
     publishedAt: sub.field('publishedAt').notNull(),
     heroImage: sub
       .field('heroImage')
@@ -53,11 +57,18 @@ export const postDetailFragment = q
       .project(sanityImageFragment)
       .nullable(true),
     featured: sub.field('featured').nullable(true),
-    body: sub.field('body[]').project(portableTextBodyItemFragment).notNull(),
+    body: sub
+      .field('body[]')
+      .project(portableTextBodyItemFragment)
+      .nullable(true),
     skim: sub.field('skim').project(skimFragment).nullable(true),
     seo: sub.field('seo').project(seoFragment).nullable(true),
-    author: sub.field('author').deref().project(authorDetailFragment).notNull(),
-    topic: sub.field('topic').deref().project(topicFragment).notNull(),
+    author: sub
+      .field('author')
+      .deref()
+      .project(authorDetailFragment)
+      .nullable(true),
+    topic: sub.field('topic').deref().project(topicFragment).nullable(true),
     tags: sub.field('tags[]').deref().project(tagFragment).nullable(true),
     wordCount: sub.raw(WORD_COUNT_EXPRESSION, wordCountParser),
   }));

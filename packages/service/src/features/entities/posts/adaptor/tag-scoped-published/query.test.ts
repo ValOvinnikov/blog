@@ -21,12 +21,6 @@ describe('tagScopedPublishedPostsQuery', () => {
     );
   });
 
-  it('excludes posts whose absorbed content fields are not yet populated', () => {
-    expect(tagScopedPublishedPostsQuery.query).toContain(
-      'defined(excerpt) && defined(author) && defined(topic) && defined(body)',
-    );
-  });
-
   it('orders newest first, same as the site-wide feed query', () => {
     expect(tagScopedPublishedPostsQuery.query).toContain(
       'order(publishedAt desc)',

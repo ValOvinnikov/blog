@@ -14,10 +14,4 @@ describe('postParamsQuery', () => {
   it('excludes page_post documents whose publishedAt is in the future', () => {
     expect(postParamsQuery.query).toContain('publishedAt <= now()');
   });
-
-  it('excludes page_post documents whose content fields are not yet populated', () => {
-    expect(postParamsQuery.query).toContain(
-      'defined(excerpt) && defined(author) && defined(topic) && defined(body)',
-    );
-  });
 });

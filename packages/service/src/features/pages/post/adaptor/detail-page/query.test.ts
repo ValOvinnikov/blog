@@ -17,12 +17,6 @@ describe('postPageQuery', () => {
     expect(postPageQuery.query).toContain('publishedAt <= now()');
   });
 
-  it('excludes page_post documents whose content fields are not yet populated', () => {
-    expect(postPageQuery.query).toContain(
-      'defined(excerpt) && defined(author) && defined(topic) && defined(body)',
-    );
-  });
-
   it('parses a post whose optional fields are all absent', () => {
     const raw = makeRawPostDetail({
       heroImage: null,
@@ -42,7 +36,7 @@ describe('postPageQuery', () => {
     });
 
     expect(() => postPageQuery.parse(raw)).not.toThrow();
-    expect(postPageQuery.parse(raw)?.author.image).toBeNull();
+    expect(postPageQuery.parse(raw)?.author?.image).toBeNull();
   });
 
   it('resolves a bodyImage block, deref-ing its asset and keeping layout', () => {
@@ -68,7 +62,7 @@ describe('postPageQuery', () => {
 
     const parsed = postPageQuery.parse(raw);
 
-    expect(parsed?.body[0]).toMatchObject({
+    expect(parsed?.body?.[0]).toMatchObject({
       _type: 'bodyImage',
       layout: 'FLOAT_LEFT',
       asset: { _id: 'image-abc123-800x600-jpg' },
@@ -77,6 +71,22 @@ describe('postPageQuery', () => {
 
   it('parses null as no matching page_post document, rather than throwing', () => {
     expect(postPageQuery.parse(null)).toBeNull();
+  });
+
+  it('parses a sparse post seeded with only title, slug, and publishedAt', () => {
+    const raw = makeRawPostDetail({
+      excerpt: null,
+      author: null,
+      topic: null,
+      body: null,
+    });
+
+    const parsed = postPageQuery.parse(raw);
+
+    expect(parsed?.excerpt).toBeNull();
+    expect(parsed?.author).toBeNull();
+    expect(parsed?.topic).toBeNull();
+    expect(parsed?.body).toBeNull();
   });
 
   // A bodyImage block's asset is `.nullable(true)`, not `.notNull()` — an
@@ -98,7 +108,7 @@ describe('postPageQuery', () => {
     });
 
     expect(() => postPageQuery.parse(raw)).not.toThrow();
-    expect(postPageQuery.parse(raw)?.body[0]).toMatchObject({
+    expect(postPageQuery.parse(raw)?.body?.[0]).toMatchObject({
       _type: 'bodyImage',
       layout: null,
       asset: null,
@@ -128,7 +138,7 @@ describe('postPageQuery', () => {
     });
 
     expect(() => postPageQuery.parse(raw)).not.toThrow();
-    expect(postPageQuery.parse(raw)?.body[0]).toMatchObject({
+    expect(postPageQuery.parse(raw)?.body?.[0]).toMatchObject({
       _type: 'bodyImage',
       alt: null,
     });
@@ -154,7 +164,7 @@ describe('postPageQuery', () => {
 
     const parsed = postPageQuery.parse(raw);
 
-    expect(parsed?.body[0]).toEqual(richBlock);
+    expect(parsed?.body?.[0]).toEqual(richBlock);
   });
 
   it('keeps a rich aside block intact alongside a resolved bodyImage block', () => {
@@ -192,8 +202,8 @@ describe('postPageQuery', () => {
 
     const parsed = postPageQuery.parse(raw);
 
-    expect(parsed?.body[0]).toEqual(asideBlock);
-    expect(parsed?.body[1]).toMatchObject({
+    expect(parsed?.body?.[0]).toEqual(asideBlock);
+    expect(parsed?.body?.[1]).toMatchObject({
       _type: 'bodyImage',
       layout: 'FLOAT_LEFT',
       asset: { _id: 'image-abc123-800x600-jpg' },

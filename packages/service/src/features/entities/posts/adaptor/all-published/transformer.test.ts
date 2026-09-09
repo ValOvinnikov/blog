@@ -39,4 +39,10 @@ describe(toAllPublishedPosts, () => {
     expect(result).not.toHaveProperty('topic');
     expect(result).not.toHaveProperty('readingTimeMinutes');
   });
+
+  it('maps a sparse feed post with no excerpt to undefined', () => {
+    const [result] = toAllPublishedPosts([makeRawFeedPost({ excerpt: null })]);
+
+    expect(result?.excerpt).toBeUndefined();
+  });
 });

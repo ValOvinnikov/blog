@@ -22,7 +22,7 @@ export type TRawPostDetail = NonNullable<InferResultType<typeof postPageQuery>>;
 const AUTHOR_AVATAR_SIZE_PX = 64;
 
 function toPostDetailAuthor(
-  raw: TRawPostDetail['author'],
+  raw: NonNullable<TRawPostDetail['author']>,
   tenant: TImageTenant,
 ): TPostDetailAuthor {
   return {
@@ -64,26 +64,30 @@ export function toPostDetail(
     id: raw._id,
     title: raw.title,
     slug: raw.slug,
-    excerpt: raw.excerpt,
+    excerpt: raw.excerpt ?? undefined,
     publishedAt: raw.publishedAt,
     heroImageUrl,
     heroImageAlt: raw.heroImage?.alt,
     heroImageSanity: toSanityImage(raw.heroImageAsset, tenant),
     featured: raw.featured ?? false,
-    body: toPortableTextBody(raw.body, tenant),
+    body: raw.body ? toPortableTextBody(raw.body, tenant) : undefined,
     skim: toPostSkim(raw.skim),
-    hasAsides: raw.body.some((block) => block._type === 'aside'),
+    hasAsides: raw.body?.some((block) => block._type === 'aside') ?? false,
     seo: resolveSeo(
       raw.seo ?? undefined,
-      { title: raw.title, description: raw.excerpt, imageUrl: heroImageUrl },
+      {
+        title: raw.title,
+        description: raw.excerpt ?? undefined,
+        imageUrl: heroImageUrl,
+      },
       {
         description: settings.description,
         defaultOgImageUrl: settings.defaultOgImageUrl,
       },
       tenant,
     ),
-    author: toPostDetailAuthor(raw.author, tenant),
-    topic: toTopic(raw.topic),
+    author: raw.author ? toPostDetailAuthor(raw.author, tenant) : undefined,
+    topic: raw.topic ? toTopic(raw.topic) : undefined,
     tags: (raw.tags ?? []).map(toTag),
     readingTimeMinutes: toReadingTimeMinutes(raw.wordCount),
   };

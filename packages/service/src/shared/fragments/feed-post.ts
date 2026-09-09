@@ -10,6 +10,6 @@ export const feedPostFragment = q
   .project((sub) => ({
     title: sub.field('title').notNull(),
     slug: sub.field('slug.current').notNull(),
-    excerpt: sub.field('excerpt').notNull(),
+    excerpt: sub.field('excerpt').nullable(true),
     publishedAt: sub.field('publishedAt').notNull(),
   }));
