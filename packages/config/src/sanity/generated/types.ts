@@ -447,6 +447,13 @@ export type Settings_site = {
   defaultOgImage?: ImageWithAlt;
 };
 
+export type Blog_tagReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'blog_tag';
+};
+
 export type Module_heroReference = {
   _ref: string;
   _type: 'reference';
@@ -459,13 +466,6 @@ export type Module_heroBlogReference = {
   _type: 'reference';
   _weak?: boolean;
   [internalGroqTypeReferenceTo]?: 'module_heroBlog';
-};
-
-export type Blog_tagReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'blog_tag';
 };
 
 export type Module_postListReference = {
@@ -504,10 +504,13 @@ export type Page_tag = {
   _rev: string;
   title?: string;
   slug?: Slug;
-  hero?: Module_heroReference | Module_heroBlogReference;
   tag?: Blog_tagReference;
-  postList?: Module_postListReference;
+  headingBlock?: HeadingBlock;
+  hero?: Module_heroReference | Module_heroBlogReference;
   modules?: Array<
+    | ({
+        _key: string;
+      } & Module_postListReference)
     | ({
         _key: string;
       } & Module_postLatestReference)
@@ -519,6 +522,7 @@ export type Page_tag = {
       } & Module_newsletterReference)
   >;
   seo?: Seo;
+  postList?: Module_postListReference;
 };
 
 export type Slug = {
@@ -1061,9 +1065,9 @@ export type AllSanitySchemaTypes =
   | Settings_footer
   | Settings_navigation
   | Settings_site
+  | Blog_tagReference
   | Module_heroReference
   | Module_heroBlogReference
-  | Blog_tagReference
   | Module_postListReference
   | Module_postLatestReference
   | Module_ctaReference
