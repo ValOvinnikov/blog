@@ -730,11 +730,24 @@ main` fires no workflow. CodeQL runs here through GitHub's _default setup_
   same PR that does that `SPEC.md` sync. `SPEC.md` is the durable record of
   final behavior; a design doc's job ends once its decisions are reflected
   there, so it doesn't linger as a second, driftable copy. See
-  `docs/README.md` for the live index. (Superseded 2026-07-27: earlier
+  `docs/README.md` for the live index.
+
+  **A doc may also be retired early, before its work ships,** when the epic
+  it belongs to has been cut into self-contained tickets and the doc has
+  become a second copy of them. Move the cross-cutting shape (the parts no
+  single ticket owns) into the **epic issue body**, repoint every ticket and
+  every sibling doc at the epic, and delete the doc in that same change. The
+  epic body then states plainly that it is the design of record and that the
+  `SPEC.md` sync is owed by the epic's final PR — `SPEC.md` still only ever
+  describes built behaviour, so it is not written ahead of the work. Adopted
+  2026-09-09 for the page-composition epic (#2943), after the doc and its
+  tickets drifted apart repeatedly within one session; the drift, not the
+  doc's age, is the trigger. (Superseded 2026-07-27: earlier
   revisions of this rule archived shipped docs into
   `docs/archive/superpowers/{specs,plans}/` instead of deleting them — that
   bucket is now frozen history, not an active destination; do not add new
   entries to it.)
+
 - **Docs sync:** [`docs/context/ci-automation.md`](docs/context/ci-automation.md)
   documents every workflow in
   `.github/workflows/` and the required status checks — a PR that adds or

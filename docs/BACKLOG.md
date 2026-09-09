@@ -1095,8 +1095,8 @@ when present` — one query resolving module and terms, `fallbackTaxonomy`
 - **Why:** every page fetches and pre-computes for all of its sections and
   hands a 31-prop bag to a "view"; `PostsSection` carries a prop for every
   listing variant a page ever needed; related reading and the post-foot
-  newsletter are hardcoded rather than authorable. Design of record:
-  [`docs/superpowers/specs/2026-09-08-page-composition-design.md`](superpowers/specs/2026-09-08-page-composition-design.md).
+  newsletter are hardcoded rather than authorable. Design of record: the epic body of #2943 (no design doc — the
+  decisions live on the epic and its sub-issues).
 - **Rule:** site header → page heading → `ModuleRenderer` over the page
   document's `modules[]` → site footer; each part is a Server Component
   that fetches what it alone needs, shared reads go through `cache()`.
@@ -1122,7 +1122,7 @@ when present` — one query resolving module and terms, `fallbackTaxonomy`
      human-gated); desk "Content" → "Taxonomy" + "People". After 5–8.
   10. **web** · one per page: blog list #2951, topic #2952, tag #2953,
       topics and tags #2954, landing #2955.
-  11. **web** (#2974) · `CmsPageTemplate` — one furniture component for
+  11. **web** (#2974) · `PageShell` — one furniture component for
       every CMS page (`hero`, `heading`, `supportingText`, `chips`,
       `modules`); `page` in the `ModuleRenderer` context. After #2953.
   12. **One ticket per page, every layer** — home #2975, landing #2976,
@@ -1151,7 +1151,8 @@ when present` — one query resolving module and terms, `fallbackTaxonomy`
   Every page document declares `hero` and `modules[]` in the canonical
   order with no slot field beside them and `headingBlock` on every page
   but the post; every CMS page renders breadcrumbs → hero, else the heading
-  as h1 → modules (2026-09-08).
+  as h1 → modules, through one `PageShell` (2026-09-09). The internal
+  document `title` is never rendered as page content.
 
 ### Phase 2 · Hero family — `prio:later` until Phase 1 ships
 
