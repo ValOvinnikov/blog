@@ -44,11 +44,11 @@ export default async function HomePage({ params }: TProps) {
 
   const tenantContext = await getTenantSanityContext(tenant);
   const result = await service.pages.home.v1.getHomePage(tenantContext);
-  const { sectionHeader, hero, modules } = guardPageLoaderResult(
+  const { headingBlock, hero, modules } = guardPageLoaderResult(
     result,
     'home_page.fetch_failed',
   );
-  const { heading, supportingText } = sectionHeader;
+  const { heading, supportingText } = headingBlock;
 
   return (
     <PageShell>

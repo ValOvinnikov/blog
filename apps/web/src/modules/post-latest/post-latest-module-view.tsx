@@ -27,7 +27,7 @@ export interface IPostLatestModuleViewProps extends Omit<
  */
 export const PostLatestModuleView = ({
   brandVariant,
-  sectionHeader,
+  headingBlock,
   items,
   layout,
   titleId,
@@ -36,7 +36,7 @@ export const PostLatestModuleView = ({
   contentAlignment,
   hasImages,
 }: IPostLatestModuleViewProps) => {
-  const { heading, supportingText } = sectionHeader;
+  const { heading, supportingText } = headingBlock;
   const hasHeading = Boolean(heading?.trim());
   const resolvedTitle = hasHeading ? heading : accessibleTitle;
   const s = postLatestModuleViewVariants({ align: contentAlignment });

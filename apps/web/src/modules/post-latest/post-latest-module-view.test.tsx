@@ -23,7 +23,7 @@ const post = makePostListItem();
 
 const setup = customRender(PostLatestModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  sectionHeader: {
+  headingBlock: {
     heading: 'Latest posts',
     supportingText: undefined,
   },
@@ -54,9 +54,9 @@ describe(`<${PostLatestModuleView.name}/>`, () => {
     ).toBeInTheDocument();
   });
 
-  it('renders a visually hidden heading from accessibleTitle when sectionHeader.heading is undefined', () => {
+  it('renders a visually hidden heading from accessibleTitle when headingBlock.heading is undefined', () => {
     setup({
-      sectionHeader: {
+      headingBlock: {
         heading: undefined,
         supportingText: undefined,
       },

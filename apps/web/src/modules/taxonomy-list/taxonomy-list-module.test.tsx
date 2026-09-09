@@ -41,7 +41,7 @@ const topicsResult = (entries: unknown[] = []) => ({
   ok: true,
   data: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: {
+    headingBlock: {
       heading: undefined,
       supportingText: undefined,
     },
@@ -56,7 +56,7 @@ const tagsResult = (entries: unknown[] = []) => ({
   ok: true,
   data: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: {
+    headingBlock: {
       heading: undefined,
       supportingText: undefined,
     },

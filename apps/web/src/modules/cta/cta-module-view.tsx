@@ -22,7 +22,7 @@ export const CtaModuleView = ({
   brandVariant,
   bandTone,
   eyebrow,
-  sectionHeader,
+  headingBlock,
   content,
   image,
   contentPosition,
@@ -33,7 +33,7 @@ export const CtaModuleView = ({
   layout,
 }: ICtaModuleViewProps) => {
   const titleId = `cta-${id}`;
-  const { heading, supportingText } = sectionHeader;
+  const { heading, supportingText } = headingBlock;
 
   return (
     <Section

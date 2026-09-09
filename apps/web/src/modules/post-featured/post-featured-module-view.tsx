@@ -29,7 +29,7 @@ export interface IPostFeaturedModuleViewProps extends Omit<
  */
 export const PostFeaturedModuleView = ({
   brandVariant,
-  sectionHeader,
+  headingBlock,
   items,
   layout,
   titleId,
@@ -51,8 +51,8 @@ export const PostFeaturedModuleView = ({
       dataTestId={dataTestId}
     >
       <ModuleHeading
-        heading={sectionHeader.heading}
-        supportingText={sectionHeader.supportingText}
+        heading={headingBlock.heading}
+        supportingText={headingBlock.supportingText}
         accessibleTitle={accessibleTitle}
         id={titleId}
         level={2}

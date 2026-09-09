@@ -39,7 +39,7 @@ const thirdPost = makePostListItem({
 
 const setup = customRender(PostFeaturedModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  sectionHeader: {
+  headingBlock: {
     heading: 'Featured',
     supportingText: undefined,
   },
@@ -70,9 +70,9 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
     ).toBeInTheDocument();
   });
 
-  it('renders a visually hidden heading from accessibleTitle when sectionHeader.heading is undefined', () => {
+  it('renders a visually hidden heading from accessibleTitle when headingBlock.heading is undefined', () => {
     setup({
-      sectionHeader: {
+      headingBlock: {
         heading: undefined,
         supportingText: undefined,
       },

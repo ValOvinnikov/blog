@@ -37,7 +37,7 @@ export const PostRelatedModule = async ({
 
   const {
     brandVariant,
-    sectionHeader,
+    headingBlock,
     posts,
     layout,
     contentAlignment,
@@ -54,7 +54,7 @@ export const PostRelatedModule = async ({
   return (
     <PostRelatedModuleView
       brandVariant={brandVariant}
-      sectionHeader={sectionHeader}
+      headingBlock={headingBlock}
       items={items}
       layout={layout}
       contentAlignment={contentAlignment}

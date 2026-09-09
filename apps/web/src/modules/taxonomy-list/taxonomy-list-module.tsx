@@ -56,7 +56,7 @@ export const TaxonomyListModule = async ({
 
   const {
     brandVariant,
-    sectionHeader,
+    headingBlock,
     layout,
     contentAlignment,
     taxonomy,
@@ -80,7 +80,7 @@ export const TaxonomyListModule = async ({
   return (
     <TaxonomyListModuleView
       brandVariant={brandVariant}
-      sectionHeader={sectionHeader}
+      headingBlock={headingBlock}
       items={items}
       layout={layout}
       contentAlignment={contentAlignment}

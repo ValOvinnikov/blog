@@ -29,7 +29,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: {
+    headingBlock: {
       heading: 'Browse by topic',
       supportingText: undefined,
     },
@@ -51,7 +51,7 @@ export const Default: TStory = {};
 
 export const Topics: TStory = {
   args: {
-    sectionHeader: { heading: 'Browse by topic', supportingText: undefined },
+    headingBlock: { heading: 'Browse by topic', supportingText: undefined },
     items: topicsListItems,
     titleId: 'topic-list-title',
     dataTestId: 'taxonomy-list-module-topic-list-1',
@@ -62,7 +62,7 @@ export const Topics: TStory = {
 
 export const Tags: TStory = {
   args: {
-    sectionHeader: { heading: 'Browse by tag', supportingText: undefined },
+    headingBlock: { heading: 'Browse by tag', supportingText: undefined },
     items: tagsListItems,
     titleId: 'tag-list-title',
     dataTestId: 'taxonomy-list-module-tag-list-1',
@@ -73,7 +73,7 @@ export const Tags: TStory = {
 
 export const WithoutCmsHeading: TStory = {
   args: {
-    sectionHeader: {
+    headingBlock: {
       heading: undefined,
       supportingText: undefined,
     },

@@ -47,7 +47,7 @@ const meta = {
     brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
     bandTone: BRAND_VARIANT.PRIMARY,
     eyebrow: 'Newsletter',
-    sectionHeader: {
+    headingBlock: {
       heading: 'Never miss a post',
       supportingText:
         'Subscribe to get new articles on design systems and engineering delivered straight to your inbox.',

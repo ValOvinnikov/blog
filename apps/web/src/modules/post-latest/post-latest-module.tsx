@@ -30,7 +30,7 @@ export const PostLatestModule = async ({
 
   const {
     brandVariant,
-    sectionHeader,
+    headingBlock,
     posts,
     layout,
     contentAlignment,
@@ -47,7 +47,7 @@ export const PostLatestModule = async ({
   return (
     <PostLatestModuleView
       brandVariant={brandVariant}
-      sectionHeader={sectionHeader}
+      headingBlock={headingBlock}
       items={items}
       layout={layout}
       contentAlignment={contentAlignment}

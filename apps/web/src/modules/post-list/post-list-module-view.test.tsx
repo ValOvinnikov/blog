@@ -23,7 +23,7 @@ const post = makePostListItem();
 
 const setup = customRender(PostListModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  sectionHeader: {
+  headingBlock: {
     heading: 'Latest posts',
     supportingText: undefined,
   },
@@ -58,7 +58,7 @@ describe(`<${PostListModuleView.name}/>`, () => {
   it('derives a different section id when given a different titleId, avoiding duplicate DOM ids', () => {
     setup({
       titleId: 'other-posts-title',
-      sectionHeader: {
+      headingBlock: {
         heading: 'More posts',
         supportingText: undefined,
       },
@@ -70,9 +70,9 @@ describe(`<${PostListModuleView.name}/>`, () => {
     );
   });
 
-  it('renders a visually hidden heading from accessibleTitle when sectionHeader.heading is undefined', () => {
+  it('renders a visually hidden heading from accessibleTitle when headingBlock.heading is undefined', () => {
     setup({
-      sectionHeader: {
+      headingBlock: {
         heading: undefined,
         supportingText: undefined,
       },

@@ -40,7 +40,7 @@ export interface IPostListModuleViewProps extends Omit<
  */
 export const PostListModuleView = ({
   brandVariant,
-  sectionHeader,
+  headingBlock,
   items,
   layout,
   titleId,
@@ -62,8 +62,8 @@ export const PostListModuleView = ({
       dataTestId={dataTestId}
     >
       <ModuleHeading
-        heading={sectionHeader.heading}
-        supportingText={sectionHeader.supportingText}
+        heading={headingBlock.heading}
+        supportingText={headingBlock.supportingText}
         accessibleTitle={accessibleTitle}
         id={titleId}
         level={2}

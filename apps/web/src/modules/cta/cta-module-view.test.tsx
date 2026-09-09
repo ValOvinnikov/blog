@@ -45,7 +45,7 @@ const setup = customRender(CtaModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
   bandTone: BRAND_VARIANT.SECONDARY,
   eyebrow: undefined,
-  sectionHeader: {
+  headingBlock: {
     heading: 'Get started',
     supportingText: undefined,
   },
@@ -76,7 +76,7 @@ describe(`<${CtaModuleView.name}/>`, () => {
   it('derives a different heading id for a different module id, avoiding duplicate DOM ids', () => {
     setup({
       id: 'cta-2',
-      sectionHeader: {
+      headingBlock: {
         heading: 'Join us',
         supportingText: undefined,
       },

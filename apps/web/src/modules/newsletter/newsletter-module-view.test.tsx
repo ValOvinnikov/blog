@@ -29,7 +29,7 @@ vi.mock('@web/components/shared/newsletter-form', async (importOriginal) => {
 const setup = customRender(NewsletterModuleView, {
   id: 'newsletter-1',
   brandVariant: BRAND_VARIANT.PRIMARY,
-  sectionHeader: {
+  headingBlock: {
     heading: 'Get new posts',
     supportingText: 'Straight to inbox.',
   },

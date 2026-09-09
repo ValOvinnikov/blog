@@ -17,14 +17,14 @@ export interface INewsletterModuleViewProps extends TNewsletterModule {
 export const NewsletterModuleView = ({
   id,
   brandVariant,
-  sectionHeader,
+  headingBlock,
   variant,
   layout,
   contentAlignment,
   trustCues,
 }: INewsletterModuleViewProps) => {
   const titleId = `newsletter-${id}`;
-  const { heading, supportingText } = sectionHeader;
+  const { heading, supportingText } = headingBlock;
   const formVariant =
     variant === NEWSLETTER_VARIANT.COMPACT ? 'compact' : 'full';
 
