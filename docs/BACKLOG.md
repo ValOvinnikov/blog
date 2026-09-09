@@ -1122,6 +1122,19 @@ when present` — one query resolving module and terms, `fallbackTaxonomy`
      human-gated); desk "Content" → "Taxonomy" + "People". After 5–8.
   10. **web** · one per page: blog list #2951, topic #2952, tag #2953,
       topics and tags #2954, landing #2955.
+  11. **web** (#2974) · `CmsPageTemplate` — one furniture component for
+      every CMS page (`hero`, `heading`, `supportingText`, `chips`,
+      `modules`); `page` in the `ModuleRenderer` context. After #2953.
+  12. **One ticket per page, every layer** — home #2975, landing #2976,
+      blog list #2977, topic #2978, tag #2979, topics index #2980, tags
+      index #2981, post #2983 (order only, after 5). Each: canonical
+      field order (identity → entity → headingSettings → hero → modules →
+      seo), `hero` optional + `headingSettings` (`sectionHeader` object) +
+      `modules[]` with the hero-or-heading rule, its slot folded into
+      `modules[]`, its service projection, its web page through the
+      template — expand PR (old fields `readOnly`, migration, typegen,
+      service, web) then contract PR (unset + drop). After 11; independent
+      of each other. (#2970–#2973 closed as superseded.)
 - **Naming (2026-09-08):** the post is its page — `page_post` keeps the name
   and absorbs `blog_post`, a Sanity `_type` being immutable, so every post
   id gains the `page_post-` prefix the seed migration already used.
@@ -1135,6 +1148,10 @@ when present` — one query resolving module and terms, `fallbackTaxonomy`
   document and `blog_post` is gone; `PostsSection` and every
   `*-page-view.tsx` are deleted; every listing renders through
   `PostCardItem` and `PostGrid`, or `Carousel` where `displayMode` says so.
+  Every page document declares `hero` and `modules[]` in the canonical
+  order with no slot field beside them and `headingSettings` on every page
+  but the post; every CMS page renders breadcrumbs → hero, else the heading
+  as h1 → modules (2026-09-08).
 
 ### Phase 2 · Hero family — `prio:later` until Phase 1 ships
 

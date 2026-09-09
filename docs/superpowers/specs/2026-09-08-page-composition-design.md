@@ -1,7 +1,7 @@
 # Page composition — pages are chrome, a heading and modules
 
 **Status:** design of record for the page-composition epic #2943 (sub-issues
-#2944–#2955, created from this doc). Worked example: the blog post page, which ships first.
+#2944–#2955, #2959–#2960, #2974–#2981 and #2983, created from this doc). Worked example: the blog post page, which ships first.
 **Supersedes:** the `PostsSection` organism and every `*-page-view.tsx` in
 `apps/web/src/components/pages/`; the `PostsSection.Carousel` slot in the
 carousel design (`2026-08-23-module-and-page-type-portfolio-design.md`,
@@ -295,6 +295,133 @@ shared between modules.
 Bookmarks and account pages are app pages, not CMS pages, and are out of
 scope.
 
+## Every page carries the same furniture
+
+Inspecting the eight page documents (2026-09-08) showed three shapes where
+there should be one: the topic and tag index pages have no `hero` and no
+`modules[]`; the post page has neither; five pages carry a dedicated
+"slot" field for their list (`postList` on the blog, topic and tag pages,
+`taxonomyList` on the two index pages — `required()` on three of them,
+and only the three listing pages have a `modules[]` beside it); and the
+field order differs from document to document. Decided: **every page document
+has a `modules[]` slot and, the post page aside (its article header is its
+hero), a `hero` slot; the required-slot fields fold into `modules[]`; the
+fields are declared in one canonical order; and the web page renders them
+in that order.**
+
+### The canonical field order
+
+Identity, then the entity, then the heading settings, then the hero, then
+the modules, then SEO:
+
+| Document          | Order                                                                                                                                        |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `page_home`       | `title → headingSettings → hero → modules → seo`                                                                                             |
+| `page_landing`    | `title → slug → headingSettings → hero → modules → seo`                                                                                      |
+| `page_blog`       | `title → headingSettings → hero → modules → seo`                                                                                             |
+| `page_topic`      | `title → slug → topic → headingSettings → hero → modules → seo`                                                                              |
+| `page_tag`        | `title → slug → tag → headingSettings → hero → modules → seo`                                                                                |
+| `page_topicIndex` | `title → headingSettings → hero → modules → seo`                                                                                             |
+| `page_tagIndex`   | `title → headingSettings → hero → modules → seo`                                                                                             |
+| `page_post`       | `title → slug → the post's content fields (excerpt … skim) → modules → publishedAt → seo` — no `hero`: the article header is the post's hero |
+
+The `hero` field is one shared definition (`heroField()` in
+`schema-types/helpers/`, over `HERO_SCHEMA_TYPES`, "Optional. Replaces the
+page's heading and owns the h1."), optional on every page — `page_home`'s
+`required()` goes, since the home page now has heading settings to fall
+back on. Reordering is schema-only.
+
+### `headingSettings` is the `sectionHeader` object, on every page
+
+Three pages (`page_blog`, `page_topicIndex`, `page_tagIndex`) declare a
+`heading` string and a `supportingText` text inline; the topic and tag
+pages take their h1 from the entity, the landing page from the document
+`title` (an editor's label), and the home page has none. The pair becomes
+one field, **`headingSettings`**, on every page but the post, of the
+existing `sectionHeader` object (`objects/section-header.ts`: optional
+`heading` ≤ 80, optional `supportingText` ≤ 300 — the same object every
+module carries), so a page heading and a module heading are one shape in
+Studio, in the generated types and on web. `service` projects
+`headingSettings.heading` / `.supportingText` into the `heading` /
+`supportingText` view-model fields the pages already have; on the topic
+page `heading` is `coalesce(headingSettings.heading, topic->title)` and on
+the tag page `coalesce(headingSettings.heading, tag->title)`, so nothing
+has to be retyped.
+
+**Hero or heading.** The hero is optional because it delivers the h1; when
+there is no hero the page renders `headingSettings` — the heading as h1,
+the supporting text under it; when both are set only the hero renders. A
+document-level rule on the seven pages enforces it: an **error** when
+neither `hero` nor `headingSettings.heading` is set (the entity title
+counts on the topic and tag pages), a **warning** when both are set ("The
+hero hides the heading") — a warning, not a hidden field, because a filled
+heading is harmless and stays ready if the hero is removed. Every hero
+module renders the page's only h1; that is the condition the rule rests
+on, and a test per hero module asserts it.
+
+Nothing else repeats across the eight documents that is not already a
+helper: `slug` (`slugField`), `seo` (the `seo` object), `modules[]`
+(`defineModulesField`), and now `hero` (`heroField`). The entity reference
+(`topic`, `tag`) and the post's content fields are each unique to their
+page.
+
+Expand → contract, per page and in the same two runs as the slots: the
+expand run copies `heading`/`supportingText` into `headingSettings` where
+absent on the three pages that had them, and on landing pages with no hero
+copies the document `title` into `headingSettings.heading` so today's
+render is preserved; the old inline fields stay `readOnly`; the contract
+run unsets them and the schema drops them.
+
+### The required slots fold into `modules[]`
+
+`page_blog.postList`, `page_topic.postList`, `page_tag.postList`,
+`page_topicIndex.taxonomyList` and `page_tagIndex.taxonomyList` retire.
+`module_postList` joins the allow-list of the three listing pages and
+`module_taxonomyList` the allow-list of the two index pages; the list is
+one more module in the page's `modules[]`, placed wherever the editor puts
+it. Two rules replace the slot field and its `required()`, where it had
+one: **at most one**
+`module_postList` per page (an error — the route's page number can drive
+only one), and a **warning** when a listing or index page has no list
+module at all, in the style of the missing-page warning on the post. The
+"required slot" pattern from the page-architecture programme is therefore
+superseded on every page.
+
+**Expand → contract, per page, two migrations each (human-gated):** the
+expand run, in that page's ticket, inserts a reference to the slot's target
+at the front of `modules[]` where `modules[]` does not already reference it
+(idempotent), while the slot field stays in the schema, `readOnly` and
+marked deprecated, and the allow-list widens; service and web read the list
+from `modules[]` in the same PR. Once that has deployed, the page's
+contract PR unsets the slot field and the schema drops it (the `#2904`
+recipe).
+
+### The web rule
+
+One component injects the hero and the modules on every page:
+`CmsPageTemplate` (`components/page-templates/cms-page-template/`) with
+the slots `hero`, `heading`, `supportingText`, `chips` and `modules`. It
+renders, inside `<main>`: `hero` when the document has one, else the h1
+`heading` with its `supportingText` from `headingSettings` → `chips` where
+the page has them → `modules` (`ModuleRenderer` over `modules[]`). Nothing
+else: no page-owned list, no page-specific template. Every CMS page but
+the post renders through it, each page's breadcrumbs part above it;
+`BlogPageTemplate`, `HomePageTemplate` and the landing page's hand-built
+`<main>` retire. The post page keeps its article (its hero) and injects
+its modules through the same `ModuleRenderer`.
+
+Pagination reaches the list module through the renderer: `ModuleRenderer`'s
+context gains `page?: number` next to `post`, supplied by the
+`/blog/page/N`, `/topic/{slug}/page/N` and `/tag/{slug}/page/N` routes
+(1 when absent); `PostListModule` reads it and renders its own
+`Pagination`. `generateStaticParams` for those routes reads `pageSize` from
+the page's first `module_postList` in `modules[]`
+(`modules[]->[_type == "module_postList"][0].pageSize`),
+where the `*-params` queries read the slot today. `service` projects `hero`
+and `modules[]` on the index page queries and `headingSettings` on every
+page query, following the topic page's projection, and stops projecting
+the slot ids.
+
 ## Sequencing and PRs
 
 Expand, then contract, so every PR merges green alone:
@@ -343,6 +470,26 @@ Expand, then contract, so every PR merges green alone:
     tag (#2953), topics and tags (#2954), landing (#2955). After 3;
     independent of each other.
 
+11. **web · `CmsPageTemplate`; `page` in the renderer context** (#2974) —
+    web only, additive; every page moves onto the one template with the
+    data it has today; after #2953.
+12. **One ticket per page, every layer** — home (#2975), landing (#2976),
+    blog list (#2977), topic (#2978), tag (#2979), topics index (#2980),
+    tags index (#2981), post (#2983, order only, after step 5). Each
+    covers its own studio schema (order, `hero`, `headingSettings`,
+    `modules[]`, allow-list, the hero-or-heading rule), its migration, its
+    service projection and its web page, in **two PRs**: expand + read
+    (schema with the old fields kept `readOnly`, migration, typegen,
+    service, web — one PR, since dropping a slot read reds the page; the
+    deploy runs the migration before `deploy-web`), then contract (unset
+    the old fields, drop them from the schema) once the first has
+    deployed. The shared studio helpers (`heroField`, `headingSettingsField`,
+    `validateHeroOrHeading`) ship with whichever page merges first — not to
+    be confused with the existing `defineHeroFields()` (a hero module's own
+    field tail) or `sectionHeaderField()` (a module's `sectionHeader`).
+    After 11, except the post (after step 5 only); independent of each
+    other.
+
 The carousel epic (#2785) rebases on this: its ui PR keeps the `Carousel`
 organism and drops the `PostsSection.Carousel` slot; its web leaf composes
 `Carousel` of `PostCardItem` inside the latest and featured modules after
@@ -351,7 +498,7 @@ composes primitives.
 
 ## Migration
 
-Three human-gated runs, in this order, each dry-run → backup → run per
+Five human-gated runs, in this order, each dry-run → backup → run per
 `packages/studio/migrations/README.md`:
 
 1. **Copy and repoint (Sanity, step 5).** For every `blog_post`, published
@@ -375,6 +522,20 @@ Three human-gated runs, in this order, each dry-run → backup → run per
    `page_post` has `body` and that `count(*[references(^._id)]) == 0`, then
    delete it and its draft. A separate migration from run 1, per the
    `_type`-immutability rule: create, repoint, delete in a later run.
+
+4. **Per page, expand (Sanity, step 12, PR 1).** On that page's document
+   type, published and draft, idempotent: where `modules[]` holds no
+   reference equal to the slot's `_ref` (`postList` on the blog, topic and
+   tag pages; `taxonomyList` on the two index pages), insert
+   `{ _type: 'reference', _key, _ref }` at index 0; on the blog and index
+   pages, where `headingSettings` is absent, set it from the inline
+   `heading` / `supportingText`; on landing pages with no `hero` and no
+   `headingSettings`, set `headingSettings.heading` from the document
+   `title`. The old fields are untouched here.
+5. **Per page, contract (Sanity, step 12, PR 2).** Once PR 1 has deployed,
+   `unset` that page's old fields (the slot; the inline heading pair) and
+   drop them from the schema in the same PR; a guard skips and reports any
+   document whose `modules[]` does not yet reference the list module.
 
 Everything else is additive.
 
@@ -401,3 +562,10 @@ Everything else is additive.
   component maps a post to a card or lays out a spotlight.
 - Every listing on the site renders through `PostCardItem` and `PostGrid`,
   or `Carousel` where `displayMode` says so.
+- Every page document declares `hero` and `modules[]` in the canonical field
+  order, no page has a slot field beside `modules[]`, and `headingSettings`
+  (the `sectionHeader` object) sits on every page but the post; a page
+  without a hero renders its heading as the h1 and a page with one renders
+  only the hero, through the one `CmsPageTemplate`; every CMS page
+  renders breadcrumbs → hero or h1 → modules, with no page-owned list, and
+  `/blog/page/N` still paginates through the list module.
