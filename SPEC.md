@@ -328,17 +328,30 @@ post became modules in that array: related reading is `module_postRelated`
 `FULL`/`COMPACT`, coalesced to `FULL` at the query since the schema field is
 optional) selecting which form of the signup it renders.
 
-**Several fields are optional in the view models even though the schema
-marks them required.** `excerpt`, `author`, `topic` and the post body
+**A post with no heading is not published.** `PUBLISHED_POST_FILTER` requires
+`defined(sectionHeader.heading)` alongside `publishedAt <= now()`, so a
+`page_post` lacking one never appears in a listing and resolves as not-found
+on its own URL — the same treatment an unpublished post gets. That is what
+lets the view models keep `title` as a plain `string`: every consumer of it
+(RSS `<title>`, the `BlogPosting` `headline`, breadcrumb labels, card
+headings, the bookmarks list) structurally needs a string, and the only way
+to satisfy them from an absent heading would be to invent one. Excluding the
+document is the honest alternative to a placeholder, and it is an exclusion
+rather than a fallback: nothing is substituted, and the document's own
+`title` is never borrowed for the purpose.
+
+**Several other fields are optional in the view models even though the
+schema marks them required.** `excerpt`, `author`, `topic` and the post body
 surface as `T | undefined` on `TPostCard`/`TPostDetail` (and `excerpt`/
 `topic` on `TArchivePostCard`, `excerpt` on `TFeedPost`), because a
-`page_post` that predates the absorption genuinely lacks them — including
-its whole `sectionHeader` — until a migration backfills it. Consumers omit
-the element rather than substituting a placeholder: no byline, no topic
-chip, no `<description>` in the feed, and no `author` key in the
-`BlogPosting` JSON-LD. The one place the assertion survives is the
-skim-generation query, a publish-webhook read where an absent body is a real
-precondition failure rather than something to render around.
+`page_post` that predates the absorption genuinely lacks them until a
+migration backfills it. Unlike a heading, each of these has an honest
+degrade, so consumers omit the element rather than substituting a
+placeholder: no byline, no topic chip, no `<description>` in the feed, and
+no `author` key in the `BlogPosting` JSON-LD. The one place the assertion
+survives is the skim-generation query, a publish-webhook read where an
+absent body is a real precondition failure rather than something to render
+around.
 
 `module_cta` additionally carries a required `variant` (`BANNER`/`SPLIT`/
 `CALLOUT`, from `CTA_VARIANT`, default `CALLOUT`), a required `bandTone`
