@@ -15,6 +15,7 @@ import {
 import {
   makeRawHeadingBlock,
   makeRawImage,
+  makeRawOptionalHeadingBlock,
   makeRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
 
@@ -136,10 +137,12 @@ export function makeRawBlogPage(
   overrides: Partial<NonNullable<TRawBlogPage>> = {},
 ): NonNullable<TRawBlogPage> {
   return {
-    heading: 'The Blog',
-    supportingText: 'Notes on building things.',
+    title: 'The Blog',
+    headingBlock: makeRawOptionalHeadingBlock({
+      heading: 'The Blog',
+      supportingText: 'Notes on building things.',
+    }),
     hero: null,
-    postList: { _id: 'post-list-1' },
     modules: [],
     seo: null,
     ...overrides,
