@@ -19,7 +19,7 @@ const setup = customRender(SanityImage, {
   height: 720,
 });
 
-describe('SanityImage', () => {
+describe(`<${SanityImage.name}/>`, () => {
   it('renders an img pointing at the Sanity CDN with a srcset', () => {
     setup();
 

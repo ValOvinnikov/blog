@@ -10,7 +10,7 @@ const setup = customRender(PageHeading, {
   visual: undefined,
 });
 
-describe(PageHeading, () => {
+describe(`<${PageHeading.name}/>`, () => {
   it('renders the heading as an h1', () => {
     setup();
 

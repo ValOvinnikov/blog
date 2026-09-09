@@ -49,7 +49,7 @@ vi.mock(
 
 const setup = customRenderAsync(TopicsPage, { tenant: 'tenant-1' });
 
-describe(TopicsPage, () => {
+describe(`<${TopicsPage.name}/>`, () => {
   beforeEach(() => {
     getTopicsIndexPageMock.mockReset();
     taxonomyListModuleMock.mockClear();

@@ -34,7 +34,7 @@ vi.mock('@web/components/shared/smart-link', () => ({
 
 const setup = customRenderAsync(BlogListTopicChips, { tenant: 'tenant-1' });
 
-describe(BlogListTopicChips, () => {
+describe(`<${BlogListTopicChips.name}/>`, () => {
   beforeEach(() => {
     getTopicsSafelyMock.mockReset();
     getTenantSanityContextMock.mockReset();

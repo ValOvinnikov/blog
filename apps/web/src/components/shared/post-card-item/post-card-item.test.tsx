@@ -28,7 +28,7 @@ const item: IPostCardData = {
   topic: { title: 'Engineering' },
 };
 
-describe(PostCardItem, () => {
+describe(`<${PostCardItem.name}/>`, () => {
   it('renders the title linked via SmartLink to item.href', () => {
     renderElement(<PostCardItem item={item} />);
 

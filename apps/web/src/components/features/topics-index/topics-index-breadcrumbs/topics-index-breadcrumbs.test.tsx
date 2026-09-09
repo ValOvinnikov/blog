@@ -29,7 +29,7 @@ const setup = customRenderAsync(TopicsIndexBreadcrumbs, {
   tenant: 'tenant-1',
 });
 
-describe(TopicsIndexBreadcrumbs, () => {
+describe(`<${TopicsIndexBreadcrumbs.name}/>`, () => {
   beforeEach(() => {
     getTenantBaseUrlMock.mockReset();
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');

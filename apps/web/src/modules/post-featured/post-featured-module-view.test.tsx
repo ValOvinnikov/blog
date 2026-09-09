@@ -51,7 +51,7 @@ const setup = customRender(PostFeaturedModuleView, {
   accessibleTitle: 'Featured posts',
 });
 
-describe(PostFeaturedModuleView, () => {
+describe(`<${PostFeaturedModuleView.name}/>`, () => {
   it('labels the section with the given titleId', () => {
     setup();
 

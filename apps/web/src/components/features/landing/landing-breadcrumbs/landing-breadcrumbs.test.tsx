@@ -37,7 +37,7 @@ const setup = customRenderAsync(LandingBreadcrumbs, {
   tenant: 'tenant-1',
 });
 
-describe(LandingBreadcrumbs, () => {
+describe(`<${LandingBreadcrumbs.name}/>`, () => {
   beforeEach(() => {
     getLandingPageMock.mockReset();
     getTenantBaseUrlMock.mockReset();

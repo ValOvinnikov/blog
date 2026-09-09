@@ -55,7 +55,7 @@ const setup = customRenderAsync(HeroBlogModule, {
   tenant: 'tenant-1',
 });
 
-describe(HeroBlogModule, () => {
+describe(`<${HeroBlogModule.name}/>`, () => {
   beforeEach(() => {
     getHeroBlogMock.mockReset();
     getTenantSanityContextMock.mockReset();

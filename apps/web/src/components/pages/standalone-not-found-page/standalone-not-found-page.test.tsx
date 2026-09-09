@@ -41,7 +41,7 @@ const THEME_TOKENS = {
   density: 'DEFAULT',
 };
 
-describe(StandaloneNotFoundPage, () => {
+describe(`<${StandaloneNotFoundPage.name}/>`, () => {
   beforeEach(() => {
     vi.clearAllMocks();
     getMessagesMock.mockResolvedValue(messages);

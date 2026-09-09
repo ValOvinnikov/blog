@@ -12,7 +12,7 @@ const setup = customRender(ModuleHeading, {
   align: undefined,
 });
 
-describe(ModuleHeading, () => {
+describe(`<${ModuleHeading.name}/>`, () => {
   it('renders the authored heading text at the given level and id', () => {
     setup();
 

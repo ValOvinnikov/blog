@@ -98,7 +98,7 @@ const setup = customRenderAsync(TopicPage, {
   tenant: 'tenant-1',
 });
 
-describe(TopicPage, () => {
+describe(`<${TopicPage.name}/>`, () => {
   beforeEach(() => {
     getTopicPageMock.mockReset();
     topicBreadcrumbsMock.mockClear();

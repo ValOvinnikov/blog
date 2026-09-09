@@ -37,7 +37,7 @@ const setup = customRenderAsync(TopicChips, {
   tenant: 'tenant-1',
 });
 
-describe(TopicChips, () => {
+describe(`<${TopicChips.name}/>`, () => {
   beforeEach(() => {
     getTopicsSafelyMock.mockReset();
     getTenantSanityContextMock.mockReset();

@@ -8,7 +8,7 @@ const setup = customRender(PostShareLinks, {
   title: 'Hello World',
 });
 
-describe(PostShareLinks, () => {
+describe(`<${PostShareLinks.name}/>`, () => {
   it('renders an X share link and a LinkedIn share link, each with its own platform icon', async () => {
     setup();
 

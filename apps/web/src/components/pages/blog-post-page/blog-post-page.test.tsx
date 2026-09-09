@@ -70,7 +70,7 @@ const setup = customRenderAsync(BlogPostPage, {
   tenant: 'tenant-1',
 });
 
-describe(BlogPostPage, () => {
+describe(`<${BlogPostPage.name}/>`, () => {
   beforeEach(() => {
     getPostPageMock.mockReset();
   });

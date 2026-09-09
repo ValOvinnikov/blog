@@ -43,7 +43,7 @@ const setup = customRenderAsync(PostLatestModule, {
   tenant: 'tenant-1',
 });
 
-describe(PostLatestModule, () => {
+describe(`<${PostLatestModule.name}/>`, () => {
   beforeEach(() => {
     getPostLatestMock.mockReset();
     getTenantSanityContextMock.mockReset();

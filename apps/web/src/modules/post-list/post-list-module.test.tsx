@@ -45,7 +45,7 @@ const setup = customRenderAsync(PostListModule, {
   page: 1,
 });
 
-describe(PostListModule, () => {
+describe(`<${PostListModule.name}/>`, () => {
   beforeEach(() => {
     getPostListMock.mockReset();
     getTenantSanityContextMock.mockReset();

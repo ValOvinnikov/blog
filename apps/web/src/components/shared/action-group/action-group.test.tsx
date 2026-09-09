@@ -36,7 +36,7 @@ const setup = customRender(ActionGroup, {
   isOnDark: undefined,
 });
 
-describe(ActionGroup, () => {
+describe(`<${ActionGroup.name}/>`, () => {
   it('renders every action in authored order', () => {
     setup();
 

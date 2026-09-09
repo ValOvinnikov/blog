@@ -49,7 +49,7 @@ const setup = customRenderAsync(LandingPage, {
   tenant: 'tenant-1',
 });
 
-describe(LandingPage, () => {
+describe(`<${LandingPage.name}/>`, () => {
   beforeEach(() => {
     getLandingPageMock.mockReset();
     moduleRendererMock.mockClear();

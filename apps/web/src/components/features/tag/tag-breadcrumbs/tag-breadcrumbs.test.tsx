@@ -39,7 +39,7 @@ const setup = customRenderAsync(TagBreadcrumbs, {
   tenant: 'tenant-1',
 });
 
-describe(TagBreadcrumbs, () => {
+describe(`<${TagBreadcrumbs.name}/>`, () => {
   beforeEach(() => {
     getTagPageMock.mockReset();
     getTenantBaseUrlMock.mockReset();

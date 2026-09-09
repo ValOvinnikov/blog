@@ -46,7 +46,7 @@ vi.mock('@web/components/features/tags-index/tags-index-breadcrumbs', () => ({
 
 const setup = customRenderAsync(TagsPage, { tenant: 'tenant-1' });
 
-describe(TagsPage, () => {
+describe(`<${TagsPage.name}/>`, () => {
   beforeEach(() => {
     getTagsIndexPageMock.mockReset();
     taxonomyListModuleMock.mockClear();
