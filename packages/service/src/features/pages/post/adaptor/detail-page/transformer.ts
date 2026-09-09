@@ -79,7 +79,7 @@ export function toPostDetail(
     seo: resolveSeo(
       raw.seo ?? undefined,
       {
-        title: title ?? settings.brand.name,
+        title,
         description: excerpt,
         imageUrl: heroImageUrl,
       },

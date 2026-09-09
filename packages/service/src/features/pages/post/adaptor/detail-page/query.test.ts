@@ -108,11 +108,10 @@ describe('postPageQuery', () => {
     expect(parsed?.body).toBeNull();
   });
 
-  it('parses a post with no sectionHeader at all, rather than throwing or filtering it out', () => {
-    const raw = makeRawPostDetail({ sectionHeader: null });
+  it('throws when a post has no sectionHeader, relying on PUBLISHED_POST_FILTER to keep such a document out of this query', () => {
+    const raw = { ...makeRawPostDetail(), sectionHeader: null };
 
-    expect(() => postPageQuery.parse(raw)).not.toThrow();
-    expect(postPageQuery.parse(raw)?.sectionHeader).toBeNull();
+    expect(() => postPageQuery.parse(raw)).toThrow();
   });
 
   // A bodyImage block's asset is `.nullable(true)`, not `.notNull()` — an

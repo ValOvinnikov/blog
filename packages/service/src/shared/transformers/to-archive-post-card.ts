@@ -14,7 +14,7 @@ export type TRawArchivePostCard = InferFragmentType<
 
 export type TArchivePostCard = {
   id: string;
-  title: TMaybeUndefined<string>;
+  title: string;
   slug: string;
   excerpt: TMaybeUndefined<string>;
   publishedAt: string;

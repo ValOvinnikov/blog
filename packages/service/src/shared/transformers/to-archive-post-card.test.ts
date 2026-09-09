@@ -56,13 +56,4 @@ describe(toArchivePostCard, () => {
     expect(result.excerpt).toBeUndefined();
     expect(result.topic).toBeUndefined();
   });
-
-  it('maps an entirely absent sectionHeader to undefined title and excerpt', () => {
-    const result = toArchivePostCard(
-      makeRawArchivePostCard({ sectionHeader: null }),
-    );
-
-    expect(result.title).toBeUndefined();
-    expect(result.excerpt).toBeUndefined();
-  });
 });

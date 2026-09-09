@@ -19,7 +19,7 @@ export const archivePostCardFragment = q
     sectionHeader: sub
       .field('sectionHeader')
       .project(requiredSectionHeaderFragment)
-      .nullable(true),
+      .notNull(),
     slug: sub.field('slug.current').notNull(),
     publishedAt: sub.field('publishedAt').notNull(),
     topic: sub.field('topic').deref().project(topicFragment).nullable(true),

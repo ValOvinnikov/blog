@@ -61,13 +61,4 @@ describe(toAllPublishedPosts, () => {
 
     expect(result?.excerpt).toBeUndefined();
   });
-
-  it('maps an entirely absent sectionHeader to undefined title and excerpt', () => {
-    const [result] = toAllPublishedPosts([
-      makeRawFeedPost({ sectionHeader: null }),
-    ]);
-
-    expect(result?.title).toBeUndefined();
-    expect(result?.excerpt).toBeUndefined();
-  });
 });

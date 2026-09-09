@@ -12,7 +12,7 @@ export const feedPostFragment = q
     sectionHeader: sub
       .field('sectionHeader')
       .project(requiredSectionHeaderFragment)
-      .nullable(true),
+      .notNull(),
     slug: sub.field('slug.current').notNull(),
     publishedAt: sub.field('publishedAt').notNull(),
   }));

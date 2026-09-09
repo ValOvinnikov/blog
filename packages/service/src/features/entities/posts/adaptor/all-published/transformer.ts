@@ -6,7 +6,7 @@ import type { InferFragmentType } from 'groqd';
 export type TRawFeedPost = InferFragmentType<typeof feedPostFragment>;
 
 export type TFeedPost = {
-  title: TMaybeUndefined<string>;
+  title: string;
   slug: string;
   excerpt: TMaybeUndefined<string>;
   publishedAt: string;

@@ -5,19 +5,15 @@ import {
 } from '@blog/service/shared/transformers/to-section-header';
 
 export type TPostHeading = {
-  title: TMaybeUndefined<string>;
+  title: string;
   excerpt: TMaybeUndefined<string>;
 };
 
 /**
  * Maps a `page_post`'s `sectionHeader` into its `title`/`excerpt` view-model
- * fields, treating an entirely absent `sectionHeader` as both undefined.
+ * fields.
  */
-export function toPostHeading(
-  raw: TRawRequiredSectionHeader | null | undefined,
-): TPostHeading {
-  if (!raw) return { title: undefined, excerpt: undefined };
-
+export function toPostHeading(raw: TRawRequiredSectionHeader): TPostHeading {
   const header = toRequiredSectionHeader(raw);
   return { title: header.heading, excerpt: header.supportingText };
 }

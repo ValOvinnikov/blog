@@ -100,13 +100,6 @@ describe('toPostCard', () => {
     expect(result.topic).toBeUndefined();
   });
 
-  it('maps an entirely absent sectionHeader to undefined title and excerpt', () => {
-    const result = toPostCard(makeRawPostCard({ sectionHeader: null }), tenant);
-
-    expect(result.title).toBeUndefined();
-    expect(result.excerpt).toBeUndefined();
-  });
-
   it('defaults featured to false when null', () => {
     const result = toPostCard(makeRawPostCard({ featured: null }), tenant);
     expect(result.featured).toBe(false);

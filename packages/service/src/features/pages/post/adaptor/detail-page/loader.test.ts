@@ -480,38 +480,6 @@ describe('getPost', () => {
     expect(result.hasAsides).toBe(false);
   });
 
-  it('renders a sparse post with no sectionHeader at all', async () => {
-    mockRun
-      .mockResolvedValueOnce(
-        makeRawPostDetail({
-          sectionHeader: null,
-          author: null,
-          topic: null,
-          body: null,
-        }),
-      )
-      .mockResolvedValueOnce(makeRawSiteSettings());
-
-    const result = await getPost('hello-world', tenant);
-    if (!result) throw new Error('expected a post detail');
-
-    expect(result.title).toBeUndefined();
-    expect(result.excerpt).toBeUndefined();
-  });
-
-  it('falls back the SEO title to the site brand name when no sectionHeader is authored', async () => {
-    mockRun
-      .mockResolvedValueOnce(
-        makeRawPostDetail({ seo: null, sectionHeader: null }),
-      )
-      .mockResolvedValueOnce(makeRawSiteSettings());
-
-    const result = await getPost('hello-world', tenant);
-    if (!result) throw new Error('expected a post detail');
-
-    expect(result.seo.title).toBe('My Blog');
-  });
-
   it('threads tenant context into both queries and scopes their tags to it', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawPostDetail())

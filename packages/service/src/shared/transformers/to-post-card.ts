@@ -24,7 +24,7 @@ export type TPostCardTopic = {
 
 export type TPostCard = {
   id: string;
-  title: TMaybeUndefined<string>;
+  title: string;
   slug: string;
   excerpt: TMaybeUndefined<string>;
   publishedAt: string;

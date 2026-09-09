@@ -21,18 +21,4 @@ describe(toPostHeading, () => {
 
     expect(result).toEqual({ title: 'Hello World', excerpt: undefined });
   });
-
-  it('leaves title and excerpt undefined when sectionHeader is null', () => {
-    expect(toPostHeading(null)).toEqual({
-      title: undefined,
-      excerpt: undefined,
-    });
-  });
-
-  it('leaves title and excerpt undefined when sectionHeader is undefined', () => {
-    expect(toPostHeading(undefined)).toEqual({
-      title: undefined,
-      excerpt: undefined,
-    });
-  });
 });
