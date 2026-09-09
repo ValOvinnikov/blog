@@ -2,7 +2,7 @@ import { BlogListBreadcrumbs } from '@web/components/features/blog-list/blog-lis
 import { BlogListTopicChips } from '@web/components/features/blog-list/blog-list-topic-chips';
 import { PageShell } from '@web/components/page-templates/page-shell';
 import { PageHeading } from '@web/components/shared/page-heading';
-import { HeroSlot } from '@web/modules/hero-slot';
+import { PageIntro } from '@web/components/shared/page-intro';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import { PostListModule } from '@web/modules/post-list/post-list-module';
 import { getBlogListPage } from '@web/server/blog-list/get-blog-list-page';
@@ -31,16 +31,9 @@ export const BlogListPage = async ({
         <BlogListBreadcrumbs tenant={tenant} />
       </PageShell.Breadcrumbs>
       <PageShell.Heading>
-        {hero ? (
-          <HeroSlot
-            id={hero.id}
-            type={hero.type}
-            locale={locale}
-            tenant={tenant}
-          />
-        ) : (
+        <PageIntro hero={hero} locale={locale} tenant={tenant}>
           <PageHeading heading={heading} supportingText={supportingText} />
-        )}
+        </PageIntro>
       </PageShell.Heading>
       <PageShell.Content>
         <BlogListTopicChips tenant={tenant} />
