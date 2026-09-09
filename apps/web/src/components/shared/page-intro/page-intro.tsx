@@ -1,30 +1,35 @@
 import type { THeroModuleType } from '@blog/config';
 import type { TModule } from '@blog/service';
+import { PageHeading } from '@web/components/shared/page-heading';
 import { HeroSlot } from '@web/modules/hero-slot';
-import type { ReactNode } from 'react';
 
 export interface IPageIntroProps {
   hero?: TModule<THeroModuleType>;
+  heading?: string;
+  supportingText?: string;
+  hasTrailingSpace?: boolean;
   locale: string;
   tenant: string;
-  children?: ReactNode;
 }
 
 /**
  * PageIntro — a page's opening block: its hero when the page has one,
- * otherwise the caller's fallback.
+ * otherwise its page-level heading, otherwise nothing.
  */
 export const PageIntro = ({
   hero,
+  heading,
+  supportingText,
+  hasTrailingSpace,
   locale,
   tenant,
-  children,
-}: IPageIntroProps) => (
-  <>
-    {hero ? (
-      <HeroSlot id={hero.id} type={hero.type} locale={locale} tenant={tenant} />
-    ) : (
-      children
-    )}
-  </>
-);
+}: IPageIntroProps) =>
+  hero ? (
+    <HeroSlot id={hero.id} type={hero.type} locale={locale} tenant={tenant} />
+  ) : heading ? (
+    <PageHeading
+      heading={heading}
+      supportingText={supportingText}
+      hasTrailingSpace={hasTrailingSpace}
+    />
+  ) : null;

@@ -14,24 +14,26 @@ vi.mock('@web/modules/hero-slot', () => ({
 
 const setup = customRender(PageIntro, {
   hero: undefined,
+  heading: undefined,
+  supportingText: undefined,
+  hasTrailingSpace: undefined,
   locale: 'en',
   tenant: 'tenant-1',
-  children: undefined,
 });
 
-describe(PageIntro, () => {
+describe(`<${PageIntro.name}/>`, () => {
   beforeEach(() => {
     heroSlotMock.mockClear();
   });
 
-  it('renders the hero and not the children when a hero is set', () => {
+  it('renders the hero and not the heading when a hero is set', () => {
     setup({
       hero: { id: 'hero-1', type: 'module_hero' },
-      children: <div data-testid="fallback">fallback</div>,
+      heading: 'Notes on building things',
     });
 
     expect(screen.getByTestId('hero-slot')).toHaveTextContent('hero-1');
-    expect(screen.queryByTestId('fallback')).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
   });
 
   it('forwards id, type, locale, and tenant to HeroSlot', () => {
@@ -43,14 +45,23 @@ describe(PageIntro, () => {
     );
   });
 
-  it('renders the children when no hero is set', () => {
-    setup({ children: <div data-testid="fallback">fallback</div> });
+  it('renders the PageHeading when there is no hero and a heading is given', () => {
+    setup({
+      heading: 'Notes on building things',
+      supportingText: 'Essays and notes from the team.',
+    });
 
-    expect(screen.getByTestId('fallback')).toBeVisible();
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+        name: 'Notes on building things',
+      }),
+    ).toBeVisible();
+    expect(screen.getByText('Essays and notes from the team.')).toBeVisible();
     expect(heroSlotMock).not.toHaveBeenCalled();
   });
 
-  it('renders nothing when there is no hero and no children', () => {
+  it('renders nothing when there is no hero and no heading', () => {
     const { container } = setup();
 
     expect(container).toBeEmptyDOMElement();

@@ -7,8 +7,10 @@ vi.mock('@web/metadata/tags-metadata', () => ({
 }));
 
 vi.mock('@web/components/pages/tags-page', () => ({
-  TagsPage: ({ tenant }: { tenant: string }) => (
-    <div data-testid="tags-page">{tenant}</div>
+  TagsPage: ({ locale, tenant }: { locale: string; tenant: string }) => (
+    <div data-testid="tags-page">
+      {locale}:{tenant}
+    </div>
   ),
 }));
 
@@ -27,11 +29,12 @@ describe('TagsIndexPage', () => {
     });
   });
 
-  it('renders TagsPage with the resolved tenant', async () => {
+  it('renders TagsPage with the resolved locale and tenant', async () => {
     const ui = await TagsIndexPage({
       params: Promise.resolve({ tenant: 'tenant-1', locale: 'EN' }),
     });
 
+    expect(ui.props.locale).toBe('EN');
     expect(ui.props.tenant).toBe('tenant-1');
   });
 });

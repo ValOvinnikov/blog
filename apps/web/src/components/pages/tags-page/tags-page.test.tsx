@@ -44,7 +44,14 @@ vi.mock('@web/components/features/tags-index/tags-index-breadcrumbs', () => ({
   ),
 }));
 
-const setup = customRenderAsync(TagsPage, { tenant: 'tenant-1' });
+vi.mock('@web/modules/hero-slot', () => ({
+  HeroSlot: vi.fn(),
+}));
+
+const setup = customRenderAsync(TagsPage, {
+  locale: 'en',
+  tenant: 'tenant-1',
+});
 
 describe(`<${TagsPage.name}/>`, () => {
   beforeEach(() => {

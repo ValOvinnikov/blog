@@ -7,8 +7,10 @@ vi.mock('@web/metadata/topics-metadata', () => ({
 }));
 
 vi.mock('@web/components/pages/topics-page', () => ({
-  TopicsPage: ({ tenant }: { tenant: string }) => (
-    <div data-testid="topics-page">{tenant}</div>
+  TopicsPage: ({ locale, tenant }: { locale: string; tenant: string }) => (
+    <div data-testid="topics-page">
+      {locale}:{tenant}
+    </div>
   ),
 }));
 
@@ -27,11 +29,12 @@ describe('TopicsIndexPage', () => {
     });
   });
 
-  it('renders TopicsPage with the resolved tenant', async () => {
+  it('renders TopicsPage with the resolved locale and tenant', async () => {
     const ui = await TopicsIndexPage({
       params: Promise.resolve({ tenant: 'tenant-1', locale: 'EN' }),
     });
 
+    expect(ui.props.locale).toBe('EN');
     expect(ui.props.tenant).toBe('tenant-1');
   });
 });

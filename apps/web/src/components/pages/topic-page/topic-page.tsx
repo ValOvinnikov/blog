@@ -2,7 +2,6 @@ import { routes } from '@blog/config';
 import { TopicBreadcrumbs } from '@web/components/features/topic/topic-breadcrumbs';
 import { TopicChips } from '@web/components/features/topic/topic-chips';
 import { PageShell } from '@web/components/page-templates/page-shell';
-import { PageHeading } from '@web/components/shared/page-heading';
 import { PageIntro } from '@web/components/shared/page-intro';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import { PostListModule } from '@web/modules/post-list/post-list-module';
@@ -44,12 +43,13 @@ export const TopicPage = async ({
         <TopicBreadcrumbs slug={slug} tenant={tenant} />
       </PageShell.Breadcrumbs>
       <PageShell.Heading>
-        <PageIntro hero={hero} locale={locale} tenant={tenant}>
-          <PageHeading
-            heading={topic.title}
-            supportingText={topic.description}
-          />
-        </PageIntro>
+        <PageIntro
+          hero={hero}
+          heading={topic.title}
+          supportingText={topic.description}
+          locale={locale}
+          tenant={tenant}
+        />
       </PageShell.Heading>
       <PageShell.Content>
         <TopicChips activeSlug={slug} tenant={tenant} />

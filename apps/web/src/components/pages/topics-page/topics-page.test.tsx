@@ -47,7 +47,14 @@ vi.mock(
   }),
 );
 
-const setup = customRenderAsync(TopicsPage, { tenant: 'tenant-1' });
+vi.mock('@web/modules/hero-slot', () => ({
+  HeroSlot: vi.fn(),
+}));
+
+const setup = customRenderAsync(TopicsPage, {
+  locale: 'en',
+  tenant: 'tenant-1',
+});
 
 describe(`<${TopicsPage.name}/>`, () => {
   beforeEach(() => {

@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { PageHeading } from '@web/components/shared/page-heading';
 
 import { PageIntro } from './page-intro';
 
@@ -9,14 +8,10 @@ const meta = {
   tags: ['autodocs'],
   args: {
     hero: undefined,
+    heading: 'Notes on building things',
+    supportingText: 'Essays and notes from the team, published as we ship.',
     locale: 'en',
     tenant: 'tenant-1',
-    children: (
-      <PageHeading
-        heading="Notes on building things"
-        supportingText="Essays and notes from the team, published as we ship."
-      />
-    ),
   },
 } satisfies Meta<typeof PageIntro>;
 
