@@ -2,8 +2,9 @@ import type { TLandingPage } from '@blog/service';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 
 export const mockLandingPage: TLandingPage = {
-  title: 'About Us',
+  documentTitle: 'About Us',
   slug: 'about-us',
+  headingBlock: { heading: 'About Us', supportingText: undefined },
   hero: undefined,
   modules: [],
   seo: makeSeo({

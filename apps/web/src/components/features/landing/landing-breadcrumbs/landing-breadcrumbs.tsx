@@ -18,9 +18,9 @@ export type TLandingBreadcrumbsProps = {
 };
 
 /**
- * LandingBreadcrumbs — the standalone `/{slug}` page's Home › {title}
- * trail, rendered alongside its `BreadcrumbList` JSON-LD. Fetches the
- * cached page and its own `breadcrumbs` copy.
+ * LandingBreadcrumbs — the standalone `/{slug}` page's Home trail,
+ * rendered alongside its `BreadcrumbList` JSON-LD. Fetches the cached page
+ * and its own `breadcrumbs` copy.
  */
 export const LandingBreadcrumbs = async ({
   slug,
@@ -32,7 +32,7 @@ export const LandingBreadcrumbs = async ({
     'landing_breadcrumbs.fetch_failed',
     { slug },
   );
-  const { title } = page;
+  const { headingBlock } = page;
 
   const [t, siteUrl] = await Promise.all([
     getTranslations('breadcrumbs'),
@@ -41,7 +41,9 @@ export const LandingBreadcrumbs = async ({
 
   const breadcrumbTrail: IBreadcrumbItem[] = [
     { label: t('home'), href: routes.home() },
-    { label: title, href: routes.landingPage(slug) },
+    ...(headingBlock.heading
+      ? [{ label: headingBlock.heading, href: routes.landingPage(slug) }]
+      : []),
   ];
   const breadcrumbListSchema = buildBreadcrumbListSchema(
     breadcrumbTrail,
