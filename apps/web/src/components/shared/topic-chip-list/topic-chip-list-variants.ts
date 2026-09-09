@@ -5,6 +5,5 @@ export const topicChipListVariants = tv({
     'mx-auto w-full',
     'max-w-page px-gutter',
     'flex flex-wrap items-center gap-2',
-    'mb-8',
   ],
 });

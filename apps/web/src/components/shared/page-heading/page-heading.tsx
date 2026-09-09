@@ -8,6 +8,13 @@ export interface IPageHeadingProps {
   supportingText?: string;
   align?: TContentAlignment;
   visual?: 'section';
+  /**
+   * Whether the heading (or its supporting text, if given) keeps its own
+   * trailing margin. Set `false` when nothing else renders between this
+   * heading and the content that follows it, so that content's own spacing
+   * is the only gap.
+   */
+  hasTrailingSpace?: boolean;
 }
 
 /**
@@ -21,8 +28,13 @@ export const PageHeading = ({
   supportingText,
   align,
   visual,
+  hasTrailingSpace = true,
 }: IPageHeadingProps) => {
-  const s = pageHeadingVariants({ align });
+  const s = pageHeadingVariants({
+    align,
+    hasTrailingSpace,
+    hasSupportingText: Boolean(supportingText),
+  });
 
   return (
     <div className={s.root()}>

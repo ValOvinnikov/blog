@@ -22,6 +22,30 @@ export const pageHeadingVariants = tv({
         supportingText: ['text-right'],
       },
     },
+    hasTrailingSpace: {
+      true: {},
+      false: {},
+    },
+    hasSupportingText: {
+      true: {},
+      false: {},
+    },
   },
-  defaultVariants: { align: CONTENT_ALIGNMENT.LEFT },
+  compoundVariants: [
+    {
+      hasTrailingSpace: false,
+      hasSupportingText: false,
+      class: { heading: ['mb-0'] },
+    },
+    {
+      hasTrailingSpace: false,
+      hasSupportingText: true,
+      class: { supportingText: ['mb-0'] },
+    },
+  ],
+  defaultVariants: {
+    align: CONTENT_ALIGNMENT.LEFT,
+    hasTrailingSpace: true,
+    hasSupportingText: false,
+  },
 });

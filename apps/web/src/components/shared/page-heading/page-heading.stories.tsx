@@ -18,6 +18,7 @@ const meta = {
     supportingText: undefined,
     align: undefined,
     visual: undefined,
+    hasTrailingSpace: undefined,
   },
 } satisfies Meta<typeof PageHeading>;
 
@@ -50,5 +51,12 @@ export const RightAligned: TStory = {
   args: {
     align: CONTENT_ALIGNMENT.RIGHT,
     supportingText: 'Essays and notes from the team, published as we ship.',
+  },
+};
+
+export const NoTrailingSpace: TStory = {
+  args: {
+    supportingText: 'Essays and notes from the team, published as we ship.',
+    hasTrailingSpace: false,
   },
 };

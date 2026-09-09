@@ -32,7 +32,11 @@ export const TagsPage = async ({ tenant }: TTagsPageProps) => {
         <TagsIndexBreadcrumbs tenant={tenant} />
       </PageShell.Breadcrumbs>
       <PageShell.Heading>
-        <PageHeading heading={heading} supportingText={supportingText} />
+        <PageHeading
+          heading={heading}
+          supportingText={supportingText}
+          hasTrailingSpace={false}
+        />
       </PageShell.Heading>
       <PageShell.Content>
         <TaxonomyListModule

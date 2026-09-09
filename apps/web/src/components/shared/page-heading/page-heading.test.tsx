@@ -98,4 +98,47 @@ describe(PageHeading, () => {
     expect(heading).toHaveClass('text-title-2xl');
     expect(heading).toHaveClass('mb-6');
   });
+
+  it('keeps the heading trailing margin by default, with no supporting text', () => {
+    setup();
+
+    expect(
+      screen.getByRole('heading', { name: 'Notes on building things' }),
+    ).toHaveClass('mb-6');
+  });
+
+  it('drops the heading trailing margin when hasTrailingSpace is false and there is no supporting text', () => {
+    setup({ hasTrailingSpace: false });
+
+    const heading = screen.getByRole('heading', {
+      name: 'Notes on building things',
+    });
+
+    expect(heading).toHaveClass('mb-0');
+    expect(heading).not.toHaveClass('mb-6');
+  });
+
+  it('keeps the heading margin but drops the supporting text margin when hasTrailingSpace is false and supporting text is given', () => {
+    setup({
+      supportingText: 'Essays and notes from the team.',
+      hasTrailingSpace: false,
+    });
+
+    const heading = screen.getByRole('heading', {
+      name: 'Notes on building things',
+    });
+    const supportingText = screen.getByText('Essays and notes from the team.');
+
+    expect(heading).toHaveClass('mb-6');
+    expect(supportingText).toHaveClass('mb-0');
+    expect(supportingText).not.toHaveClass('mb-6');
+  });
+
+  it('keeps the supporting text trailing margin by default when supporting text is given', () => {
+    setup({ supportingText: 'Essays and notes from the team.' });
+
+    expect(screen.getByText('Essays and notes from the team.')).toHaveClass(
+      'mb-6',
+    );
+  });
 });

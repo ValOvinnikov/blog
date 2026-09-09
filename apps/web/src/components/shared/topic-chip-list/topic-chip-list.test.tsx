@@ -99,4 +99,13 @@ describe(`<${TopicChipList.name}/>`, () => {
       'aria-current',
     );
   });
+
+  it('renders no trailing bottom margin, leaving the gap before the following module entirely to that module', () => {
+    setup();
+
+    const nav = screen.getByRole('navigation', { name: 'Topics' });
+
+    expect(nav).not.toHaveClass('mb-8');
+    expect(nav.className).not.toMatch(/\bmb-\d/);
+  });
 });

@@ -51,7 +51,11 @@ export const TagPage = async ({
             tenant={tenant}
           />
         ) : (
-          <PageHeading heading={tag.title} supportingText={tag.description} />
+          <PageHeading
+            heading={tag.title}
+            supportingText={tag.description}
+            hasTrailingSpace={false}
+          />
         )}
       </PageShell.Heading>
       <PageShell.Content>
