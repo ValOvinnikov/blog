@@ -284,9 +284,8 @@ test asserting every registered `module_hero*` schema appears in it.
 `page_home`, `page_landing`, `page_blog`, `page_topic` and `page_tag` each
 have an **optional** hero. A hero replaces that page's default header and
 owns the `<h1>`; without one, each page renders the header it always has
-(home and generic: `headingBlock`'s `heading` plus `supportingText`; blog:
-`heading` plus `supportingText`; topic and tag: the term header), so exactly
-one `<h1>` renders either way.
+(home, generic and blog: `headingBlock`'s `heading` plus `supportingText`;
+topic and tag: the term header), so exactly one `<h1>` renders either way.
 
 `page_home`'s hero was required until it was made optional and the document
 given a `headingBlock` of its own; `page_landing` followed, replacing the
@@ -458,12 +457,12 @@ either: unset stays unset end to end. In `apps/web`, every module component
 that renders a `@blog/ui` organism — including those reached through a
 dedicated slot rather than `MODULE_MAP`'s generic `ModuleRenderer` pipeline
 (§5 above): the hero family via each page's `hero` slot,
-`module_postList` via `page_blog`'s `postList` reference (and, since #1915,
-`page_topic`'s own `postList` reference on `/topics/[slug]`, and since #1964,
-`page_tag`'s own `postList` reference on `/tags/[slug]`), and
+`module_postList` via `page_topic`'s `postList` reference on
+`/topics/[slug]` and `page_tag`'s on `/tags/[slug]`, and
 `module_taxonomyList` via `page_topicIndex`'s and `page_tagIndex`'s
-`taxonomyList` references — the one module that also renders through
-`MODULE_MAP`, when placed in `modules[]` — all
+`taxonomyList` references — both of those also render through `MODULE_MAP`
+when placed in `modules[]`, which is how `page_blog` reaches its post
+list — all
 still styled the same way as every other module — no exception — wraps it in `apps/web`'s own
 `Section` component (`apps/web/src/components/shared/section`, relocated
 from `packages/ui`), passing `brandVariant` and `layout` straight through,
