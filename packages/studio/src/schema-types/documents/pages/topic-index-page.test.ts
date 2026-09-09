@@ -1,5 +1,6 @@
 import { TAXONOMY_KIND } from '@blog/config/constants';
 import { topicIndexPageSchema } from '@blog/studio/schema-types/documents/pages/topic-index-page';
+import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/helpers/validate-taxonomy-list-has-taxonomy';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
@@ -134,6 +135,13 @@ describe('topicIndexPageSchema modules allow-list', () => {
 });
 
 describe('topicIndexPageSchema modules validateCustom chaining', () => {
+  it('registers both the blank-heading and taxonomy-list validators', () => {
+    const customFns = getModulesCustomValidators();
+
+    expect(customFns).toHaveLength(2);
+    expect(customFns[1]).toBe(validateTaxonomyListHasTaxonomy);
+  });
+
   it('registers the blank-heading validator scoped to module_postLatest', async () => {
     const [blankHeadingFn] = getModulesCustomValidators();
     const context = {

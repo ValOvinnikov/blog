@@ -5,6 +5,7 @@ import { heroField } from '@blog/studio/schema-types/helpers/hero-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
 import { validateHeroOrHeading } from '@blog/studio/schema-types/helpers/validate-hero-or-heading';
 import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/helpers/validate-single-blank-heading-per-type';
+import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/helpers/validate-taxonomy-list-has-taxonomy';
 import { validateTaxonomyListReferencesMatchKind } from '@blog/studio/schema-types/helpers/validate-taxonomy-list-matches-kind';
 import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
@@ -89,7 +90,9 @@ export const topicIndexPageSchema = defineType({
         newsletterSchema.name,
       ],
       validateCustom: (rule) =>
-        rule.custom(validateSingleBlankHeadingPerType([postLatestSchema.name])),
+        rule
+          .custom(validateSingleBlankHeadingPerType([postLatestSchema.name]))
+          .custom(validateTaxonomyListHasTaxonomy),
     }),
     defineField({
       name: 'seo',

@@ -1,9 +1,17 @@
 /**
  * Folds `page_topicIndex.taxonomyList` into `modules[]` as a
- * `module_taxonomyList` array member, and backfills the new `headingBlock`
- * object from the legacy `heading`/`supportingText` pair — two independent
- * transforms applied to every `page_topicIndex` document (published and
+ * `module_taxonomyList` array member, backfills the new `headingBlock`
+ * object from the legacy `heading`/`supportingText` pair, and authors
+ * `taxonomy: 'TOPICS'` on any referenced `module_taxonomyList` document that
+ * doesn't already have one — three independent transforms applied to every
+ * `page_topicIndex` and `module_taxonomyList` document (published and
  * draft).
+ *
+ * The `taxonomy` backfill exists because folding the reference into
+ * `modules[]` removes the only channel (a dedicated slot passing a
+ * `fallbackTaxonomy`) that let an un-authored module still resolve which
+ * terms to list — `ModuleRenderer` has no way to supply that fallback to a
+ * generically rendered module.
  *
  * Idempotency guards:
  *   - The `taxonomyList` fold is skipped once `modules[]` already contains a
@@ -16,6 +24,9 @@
  *   - A document with no `taxonomyList` reference, or with neither
  *     `heading` nor `supportingText` set, produces no patch for that half —
  *     never an error.
+ *   - The `taxonomy` backfill is skipped once the module already has a
+ *     `taxonomy` — including one set to `TAGS` — and skipped entirely for a
+ *     `module_taxonomyList` no `page_topicIndex` references.
  *
  * The legacy `taxonomyList`, `heading` and `supportingText` fields are left
  * in place; they stay `readOnly` and `deprecated` in the schema until a
@@ -30,7 +41,19 @@
  * service/web code that reads `modules[]`/`headingBlock` instead of
  * `taxonomyList`/`heading`/`supportingText`.
  */
-import { at, defineMigration, prepend, setIfMissing } from 'sanity/migrate';
+import {
+  at,
+  defineMigration,
+  prepend,
+  setIfMissing,
+  type MigrationContext,
+} from 'sanity/migrate';
+
+import {
+  authorTaxonomyOnModule,
+  type TTaxonomyListModuleDoc,
+} from './author-taxonomy-on-module';
+import { getReferencedTaxonomyListIds } from './referenced-taxonomy-list-ids';
 
 const TAXONOMY_LIST_MODULE_TYPE = 'module_taxonomyList';
 
@@ -101,11 +124,22 @@ export const migrateTopicIndexPage = (doc: TTopicIndexPageDoc) => {
 
 export default defineMigration({
   title:
-    'Fold page_topicIndex taxonomyList into modules[] and backfill headingBlock',
-  documentTypes: ['page_topicIndex'],
+    'Fold page_topicIndex taxonomyList into modules[], backfill headingBlock, and author module taxonomy',
+  documentTypes: ['page_topicIndex', TAXONOMY_LIST_MODULE_TYPE],
   migrate: {
-    document(doc) {
-      return migrateTopicIndexPage(doc as unknown as TTopicIndexPageDoc);
+    async document(doc, context: MigrationContext) {
+      if (doc._type === TAXONOMY_LIST_MODULE_TYPE) {
+        const referencedIds = await getReferencedTaxonomyListIds(context);
+
+        return (
+          authorTaxonomyOnModule(
+            doc as unknown as TTaxonomyListModuleDoc,
+            referencedIds,
+          ) ?? []
+        );
+      }
+
+      return migrateTopicIndexPage(doc as unknown as TTopicIndexPageDoc) ?? [];
     },
   },
 });
