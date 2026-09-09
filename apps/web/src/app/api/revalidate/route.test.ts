@@ -56,7 +56,7 @@ vi.mock('@blog/db', () => ({
 }));
 
 vi.mock('@web/server/revalidate/derive-revalidate-paths', () => ({
-  BLOG_POST_TYPE: 'blog_post',
+  BLOG_POST_TYPE: 'page_post',
   isDerivableRevalidateType: isDerivableRevalidateTypeMock,
   deriveRevalidatePaths: deriveRevalidatePathsMock,
 }));
@@ -112,12 +112,12 @@ describe('POST /api/revalidate', () => {
     vi.resetModules();
   });
 
-  it('revalidates post, posts, and homePage tags for a valid blog_post webhook', async () => {
+  it('revalidates page_post, posts, author, topic, and tag tags for a valid page_post webhook', async () => {
     isValidSignatureMock.mockResolvedValue(true);
     const { POST } = await import('./route');
 
     const request = makeRequest(
-      { _type: 'blog_post', _id: 'post-1' },
+      { _type: 'page_post', _id: 'post-1' },
       't=1,v=valid-signature',
     );
     const response = await POST(request);
@@ -125,16 +125,20 @@ describe('POST /api/revalidate', () => {
 
     expect(response.status).toBe(200);
     expect(json).toEqual({
-      revalidated: ['post', 'posts', 'homePage'],
+      revalidated: ['page_post', 'posts', 'author', 'topic', 'tag'],
       pathPurged: true,
-      type: 'blog_post',
+      type: 'page_post',
       id: 'post-1',
       bookmarksRemoved: 0,
     });
-    expect(revalidateTagMock).toHaveBeenCalledWith('post', { expire: 0 });
+    expect(revalidateTagMock).toHaveBeenCalledWith('page_post', {
+      expire: 0,
+    });
     expect(revalidateTagMock).toHaveBeenCalledWith('posts', { expire: 0 });
-    expect(revalidateTagMock).toHaveBeenCalledWith('homePage', { expire: 0 });
-    expect(revalidateTagMock).toHaveBeenCalledTimes(3);
+    expect(revalidateTagMock).toHaveBeenCalledWith('author', { expire: 0 });
+    expect(revalidateTagMock).toHaveBeenCalledWith('topic', { expire: 0 });
+    expect(revalidateTagMock).toHaveBeenCalledWith('tag', { expire: 0 });
+    expect(revalidateTagMock).toHaveBeenCalledTimes(5);
     expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
     expect(revalidatePathMock).toHaveBeenCalledTimes(1);
   });
@@ -144,26 +148,37 @@ describe('POST /api/revalidate', () => {
     const { POST } = await import('./route');
 
     const request = makeRequest(
-      { _type: 'blog_post', _id: 'post-1' },
+      { _type: 'page_post', _id: 'post-1' },
       't=1,v=valid-signature',
       { [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project' },
     );
     await POST(request);
 
-    expect(revalidateTagMock).toHaveBeenCalledWith('post', { expire: 0 });
-    expect(revalidateTagMock).toHaveBeenCalledWith('t:tenant-a-project:post', {
+    expect(revalidateTagMock).toHaveBeenCalledWith('page_post', {
       expire: 0,
     });
+    expect(revalidateTagMock).toHaveBeenCalledWith(
+      't:tenant-a-project:page_post',
+      { expire: 0 },
+    );
     expect(revalidateTagMock).toHaveBeenCalledWith('posts', { expire: 0 });
     expect(revalidateTagMock).toHaveBeenCalledWith('t:tenant-a-project:posts', {
       expire: 0,
     });
-    expect(revalidateTagMock).toHaveBeenCalledWith('homePage', { expire: 0 });
+    expect(revalidateTagMock).toHaveBeenCalledWith('author', { expire: 0 });
     expect(revalidateTagMock).toHaveBeenCalledWith(
-      't:tenant-a-project:homePage',
+      't:tenant-a-project:author',
       { expire: 0 },
     );
-    expect(revalidateTagMock).toHaveBeenCalledTimes(6);
+    expect(revalidateTagMock).toHaveBeenCalledWith('topic', { expire: 0 });
+    expect(revalidateTagMock).toHaveBeenCalledWith('t:tenant-a-project:topic', {
+      expire: 0,
+    });
+    expect(revalidateTagMock).toHaveBeenCalledWith('tag', { expire: 0 });
+    expect(revalidateTagMock).toHaveBeenCalledWith('t:tenant-a-project:tag', {
+      expire: 0,
+    });
+    expect(revalidateTagMock).toHaveBeenCalledTimes(10);
   });
 
   it('revalidates only the legacy tags when sanity-project-id is absent', async () => {
@@ -171,13 +186,15 @@ describe('POST /api/revalidate', () => {
     const { POST } = await import('./route');
 
     const request = makeRequest(
-      { _type: 'blog_post', _id: 'post-1' },
+      { _type: 'page_post', _id: 'post-1' },
       't=1,v=valid-signature',
     );
     await POST(request);
 
-    expect(revalidateTagMock).toHaveBeenCalledWith('post', { expire: 0 });
-    expect(revalidateTagMock).toHaveBeenCalledTimes(3);
+    expect(revalidateTagMock).toHaveBeenCalledWith('page_post', {
+      expire: 0,
+    });
+    expect(revalidateTagMock).toHaveBeenCalledTimes(5);
     expect(revalidateTagMock).not.toHaveBeenCalledWith(
       expect.stringMatching(/^t:/),
       expect.anything(),
@@ -192,7 +209,7 @@ describe('POST /api/revalidate', () => {
       const { POST } = await import('./route');
 
       const request = makeRequest(
-        { _type: 'blog_post', _id: 'post-1' },
+        { _type: 'page_post', _id: 'post-1' },
         't=1,v=valid-signature',
         { [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project' },
       );
@@ -210,14 +227,14 @@ describe('POST /api/revalidate', () => {
       const { POST } = await import('./route');
 
       const request = makeRequest(
-        { _type: 'blog_post', _id: 'post-1' },
+        { _type: 'page_post', _id: 'post-1' },
         't=1,v=valid-signature',
       );
       const response = await POST(request);
 
       expect(response.status).toBe(200);
       expect(getTenantByIdMock).not.toHaveBeenCalled();
-      expect(revalidateTagMock).toHaveBeenCalledTimes(3);
+      expect(revalidateTagMock).toHaveBeenCalledTimes(5);
     });
   });
 
@@ -230,7 +247,7 @@ describe('POST /api/revalidate', () => {
       const { POST } = await import('./route');
 
       const request = makeRequest(
-        { _type: 'blog_post', _id: 'post-1' },
+        { _type: 'page_post', _id: 'post-1' },
         't=1,v=valid-signature',
         { [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project' },
       );
@@ -256,7 +273,7 @@ describe('POST /api/revalidate', () => {
       const { POST } = await import('./route');
 
       const request = makeRequest(
-        { _type: 'blog_post', _id: 'post-1' },
+        { _type: 'page_post', _id: 'post-1' },
         't=1,v=valid-signature',
         { [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project' },
       );
@@ -280,7 +297,7 @@ describe('POST /api/revalidate', () => {
     const { POST } = await import('./route');
 
     const request = makeRequest(
-      { _type: 'blog_post', _id: 'post-1' },
+      { _type: 'page_post', _id: 'post-1' },
       't=1,v=invalid-signature',
     );
     const response = await POST(request);
@@ -293,7 +310,7 @@ describe('POST /api/revalidate', () => {
     isValidSignatureMock.mockResolvedValue(false);
     const { POST } = await import('./route');
 
-    const request = makeRequest({ _type: 'blog_post', _id: 'post-1' });
+    const request = makeRequest({ _type: 'page_post', _id: 'post-1' });
     const response = await POST(request);
 
     expect(response.status).toBe(401);
@@ -351,14 +368,14 @@ describe('POST /api/revalidate', () => {
   });
 
   describe('bookmark cleanup on delete', () => {
-    it('removes bookmarks for a deleted blog_post with a resolvable tenant', async () => {
+    it('removes bookmarks for a deleted page_post with a resolvable tenant', async () => {
       isValidSignatureMock.mockResolvedValue(true);
       getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-uuid-1');
       removeBookmarksForPostMock.mockResolvedValue(3);
       const { POST } = await import('./route');
 
       const request = makeRequest(
-        { _type: 'blog_post', _id: 'post-1' },
+        { _type: 'page_post', _id: 'post-1' },
         't=1,v=valid-signature',
         {
           [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project',
@@ -379,13 +396,13 @@ describe('POST /api/revalidate', () => {
       expect(response.status).toBe(200);
     });
 
-    it('does not clean up bookmarks for an update to a blog_post', async () => {
+    it('does not clean up bookmarks for an update to a page_post', async () => {
       isValidSignatureMock.mockResolvedValue(true);
       getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-uuid-1');
       const { POST } = await import('./route');
 
       const request = makeRequest(
-        { _type: 'blog_post', _id: 'post-1' },
+        { _type: 'page_post', _id: 'post-1' },
         't=1,v=valid-signature',
         {
           [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project',
@@ -399,13 +416,13 @@ describe('POST /api/revalidate', () => {
       expect(json.bookmarksRemoved).toBe(0);
     });
 
-    it('does not clean up bookmarks for a create of a blog_post', async () => {
+    it('does not clean up bookmarks for a create of a page_post', async () => {
       isValidSignatureMock.mockResolvedValue(true);
       getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-uuid-1');
       const { POST } = await import('./route');
 
       const request = makeRequest(
-        { _type: 'blog_post', _id: 'post-1' },
+        { _type: 'page_post', _id: 'post-1' },
         't=1,v=valid-signature',
         {
           [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project',
@@ -419,7 +436,7 @@ describe('POST /api/revalidate', () => {
       expect(json.bookmarksRemoved).toBe(0);
     });
 
-    it('does not clean up bookmarks when a deleted document is not a blog_post', async () => {
+    it('does not clean up bookmarks when a deleted document is not a page_post', async () => {
       isValidSignatureMock.mockResolvedValue(true);
       getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-uuid-1');
       const { POST } = await import('./route');
@@ -444,7 +461,7 @@ describe('POST /api/revalidate', () => {
       const { POST } = await import('./route');
 
       const request = makeRequest(
-        { _type: 'blog_post', _id: 'post-1' },
+        { _type: 'page_post', _id: 'post-1' },
         't=1,v=valid-signature',
         { [SANITY_OPERATION_HEADER]: 'delete' },
       );
@@ -463,7 +480,7 @@ describe('POST /api/revalidate', () => {
       const { POST } = await import('./route');
 
       const request = makeRequest(
-        { _type: 'blog_post', _id: 'post-1' },
+        { _type: 'page_post', _id: 'post-1' },
         't=1,v=valid-signature',
         {
           [SANITY_PROJECT_ID_HEADER]: 'unknown-project',
@@ -485,7 +502,7 @@ describe('POST /api/revalidate', () => {
       const { POST } = await import('./route');
 
       const request = makeRequest(
-        { _type: 'blog_post', _id: 'post-1' },
+        { _type: 'page_post', _id: 'post-1' },
         't=1,v=valid-signature',
         {
           [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project',
@@ -498,21 +515,25 @@ describe('POST /api/revalidate', () => {
       expect(response.status).toBe(200);
       expect(json).toEqual({
         revalidated: [
-          'post',
+          'page_post',
           'posts',
-          'homePage',
-          't:tenant-a-project:post',
+          'author',
+          'topic',
+          'tag',
+          't:tenant-a-project:page_post',
           't:tenant-a-project:posts',
-          't:tenant-a-project:homePage',
+          't:tenant-a-project:author',
+          't:tenant-a-project:topic',
+          't:tenant-a-project:tag',
         ],
         pathPurged: true,
-        type: 'blog_post',
+        type: 'page_post',
         id: 'post-1',
         bookmarksRemoved: 0,
       });
       expect(loggerErrorMock).toHaveBeenCalledWith(
         'revalidate.bookmark_cleanup_failed',
-        expect.objectContaining({ type: 'blog_post', id: 'post-1' }),
+        expect.objectContaining({ type: 'page_post', id: 'post-1' }),
       );
     });
   });
@@ -534,7 +555,7 @@ describe('POST /api/revalidate', () => {
       const { POST } = await import('./route');
 
       const request = makeRequest(
-        { _type: 'blog_post', _id: 'post-1' },
+        { _type: 'page_post', _id: 'post-1' },
         't=1,v=valid-signature',
         { [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project' },
       );
@@ -558,7 +579,7 @@ describe('POST /api/revalidate', () => {
       const { POST } = await import('./route');
 
       const request = makeRequest(
-        { _type: 'blog_post', _id: 'post-1' },
+        { _type: 'page_post', _id: 'post-1' },
         't=1,v=valid-signature',
         { [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project' },
       );
@@ -567,7 +588,7 @@ describe('POST /api/revalidate', () => {
       expect(deriveRevalidatePathsMock).not.toHaveBeenCalled();
       expect(loggerErrorMock).toHaveBeenCalledWith(
         'revalidate.tenant_sanity_credentials_missing',
-        expect.objectContaining({ type: 'blog_post', id: 'post-1' }),
+        expect.objectContaining({ type: 'page_post', id: 'post-1' }),
       );
       expect(loggerWarnMock).toHaveBeenCalledWith(
         'revalidate.path_purge_fallback',
@@ -586,7 +607,7 @@ describe('POST /api/revalidate', () => {
       const { POST } = await import('./route');
 
       const request = makeRequest(
-        { _type: 'blog_post', _id: 'post-1' },
+        { _type: 'page_post', _id: 'post-1' },
         't=1,v=valid-signature',
         { [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project' },
       );
@@ -596,7 +617,7 @@ describe('POST /api/revalidate', () => {
       expect(deriveRevalidatePathsMock).not.toHaveBeenCalled();
       expect(loggerErrorMock).toHaveBeenCalledWith(
         'revalidate.tenant_sanity_credentials_fetch_threw',
-        expect.objectContaining({ type: 'blog_post', id: 'post-1' }),
+        expect.objectContaining({ type: 'page_post', id: 'post-1' }),
       );
       expect(loggerWarnMock).toHaveBeenCalledWith(
         'revalidate.path_purge_fallback',
@@ -621,7 +642,7 @@ describe('POST /api/revalidate', () => {
       const { POST } = await import('./route');
 
       const request = makeRequest(
-        { _type: 'blog_post', _id: 'post-1' },
+        { _type: 'page_post', _id: 'post-1' },
         't=1,v=valid-signature',
         { [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project' },
       );
@@ -639,7 +660,7 @@ describe('POST /api/revalidate', () => {
       const { POST } = await import('./route');
 
       const request = makeRequest(
-        { _type: 'blog_post', _id: 'post-1' },
+        { _type: 'page_post', _id: 'post-1' },
         't=1,v=valid-signature',
       );
       await POST(request);
@@ -679,7 +700,7 @@ describe('POST /api/revalidate', () => {
     const { POST } = await import('./route');
 
     const request = makeRequest(
-      { _type: 'blog_post', _id: 'post-1' },
+      { _type: 'page_post', _id: 'post-1' },
       't=1,v=valid-signature',
     );
     const response = await POST(request);

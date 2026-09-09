@@ -19,7 +19,6 @@ const basePost: TPostDetail = {
   heroImageAlt: 'A hero image',
   heroImageSanity: undefined,
   featured: false,
-  newsletterEnabled: true,
   body: [],
   skim: undefined,
   hasAsides: false,
@@ -46,7 +45,6 @@ const basePost: TPostDetail = {
     description: undefined,
   },
   tags: [],
-  relatedPosts: [],
   readingTimeMinutes: 4,
 };
 
@@ -121,5 +119,18 @@ describe('buildPostMetadata', () => {
     expect((metadata.openGraph as { authors?: string[] })?.authors).toEqual([
       'Jane Doe',
     ]);
+  });
+
+  it('omits openGraph.authors when the post has no author, rather than throwing', async () => {
+    getPostPageMock.mockResolvedValue({
+      ok: true,
+      data: { ...basePost, author: undefined },
+    });
+
+    const metadata = await buildPostMetadata('hello-world', 'tenant-1');
+
+    expect(
+      (metadata.openGraph as { authors?: string[] })?.authors,
+    ).toBeUndefined();
   });
 });

@@ -3,7 +3,7 @@ import { service, type TTenantSanityContext } from '@blog/service';
 import { buildPostPublishPaths } from '@web/utils/build-post-publish-paths';
 import { logger } from '@web/utils/logger/logger';
 
-export const BLOG_POST_TYPE = 'blog_post';
+export const BLOG_POST_TYPE = 'page_post';
 
 const DERIVABLE_REVALIDATE_TYPES = new Set<string>([BLOG_POST_TYPE]);
 
@@ -111,7 +111,7 @@ const deriveBlogPostPublishPaths = async ({
 /**
  * Resolves the tenant-scoped, resolved paths a published document affects,
  * for the webhook to purge individually instead of the whole site. Only
- * `blog_post` is precisely derived today — every other `_type` reports
+ * `page_post` is precisely derived today — every other `_type` reports
  * `unsupported_type` so the caller falls back to the whole-site purge.
  */
 export const deriveRevalidatePaths = async (

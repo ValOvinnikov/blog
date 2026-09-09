@@ -5,11 +5,11 @@ export type TBlogPostingSchema = {
   '@context': 'https://schema.org';
   '@type': 'BlogPosting';
   headline: string;
-  description: string;
+  description: string | undefined;
   image: string | undefined;
   datePublished: string;
   dateModified: string;
-  author: { '@type': 'Person'; name: string };
+  author: { '@type': 'Person'; name: string } | undefined;
   url: string;
   keywords: string | undefined;
 };
@@ -51,7 +51,9 @@ export const buildBlogPostingSchema = (
     image: post.heroImageUrl,
     datePublished: post.publishedAt,
     dateModified: post.publishedAt,
-    author: { '@type': 'Person', name: post.author.name },
+    author: post.author
+      ? { '@type': 'Person', name: post.author.name }
+      : undefined,
     url: `${siteUrl}${routes.post(post.slug)}`,
     keywords:
       post.tags.length > 0

@@ -30,7 +30,7 @@ const toCardData = (post: TPostCard): IPostCardData => ({
     day: 'numeric',
   }),
   readingTime: `${post.readingTimeMinutes} min`,
-  topic: { title: post.topic.title },
+  topic: post.topic ? { title: post.topic.title } : undefined,
 });
 
 const posts = [

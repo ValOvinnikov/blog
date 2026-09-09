@@ -52,6 +52,9 @@
   "postFeaturedModule": {
     "fallbackHeading": "Featured"
   },
+  "postRelatedModule": {
+    "fallbackHeading": "Related reading"
+  },
   "blogPostPage": {
     "relatedReading": "Related reading",
     "depthToggle": {

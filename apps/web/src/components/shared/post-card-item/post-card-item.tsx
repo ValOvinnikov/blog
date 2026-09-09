@@ -19,7 +19,7 @@ export interface IPostCardData {
   publishedAt: string;
   formattedDate: string;
   readingTime?: string;
-  topic: IPostCardTopicData;
+  topic?: IPostCardTopicData;
   /** Pre-rendered image node the web layer builds; never a URL for this component to resolve. */
   image?: ReactNode;
 }
@@ -69,7 +69,7 @@ export const PostCardItem = ({
       </SmartLink>
     </PostCard.Title>
     <PostCard.Footer
-      topic={item.topic.title}
+      topic={item.topic?.title}
       trailingIcon={
         <Icon
           name={ICONS.ARROW}

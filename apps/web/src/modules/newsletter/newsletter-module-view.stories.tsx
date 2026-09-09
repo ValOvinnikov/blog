@@ -1,4 +1,4 @@
-import { BRAND_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, NEWSLETTER_VARIANT } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { NewsletterModuleView } from './newsletter-module-view';
@@ -13,6 +13,10 @@ const meta = {
       control: 'select',
       options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
     },
+    variant: {
+      control: 'select',
+      options: [NEWSLETTER_VARIANT.FULL, NEWSLETTER_VARIANT.COMPACT],
+    },
   },
   args: {
     id: 'newsletter-1',
@@ -21,6 +25,7 @@ const meta = {
       heading: 'Get new posts in your inbox',
       supportingText: 'One email a week, no spam, unsubscribe anytime.',
     },
+    variant: NEWSLETTER_VARIANT.FULL,
     layout: undefined,
     contentAlignment: undefined,
     trustCues: ['No spam', 'Unsubscribe anytime'],
@@ -34,4 +39,8 @@ export const Default: TStory = {};
 
 export const Secondary: TStory = {
   args: { brandVariant: BRAND_VARIANT.SECONDARY },
+};
+
+export const Compact: TStory = {
+  args: { variant: NEWSLETTER_VARIANT.COMPACT },
 };

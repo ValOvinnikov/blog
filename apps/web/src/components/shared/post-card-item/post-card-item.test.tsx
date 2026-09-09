@@ -83,6 +83,12 @@ describe(PostCardItem, () => {
     expect(screen.getByText(/engineering/)).toBeVisible();
   });
 
+  it('renders no topic chip when item.topic is absent, without throwing', () => {
+    renderElement(<PostCardItem item={{ ...item, topic: undefined }} />);
+
+    expect(screen.queryByText(/engineering/)).not.toBeInTheDocument();
+  });
+
   it('forwards dataTestId to the underlying PostCard', () => {
     renderElement(<PostCardItem item={item} dataTestId="lead-card" />);
 
