@@ -168,7 +168,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: undefined }),
+        headingBlock: makeHeadingBlock(),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -322,7 +322,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: undefined }),
+        headingBlock: makeHeadingBlock(),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,

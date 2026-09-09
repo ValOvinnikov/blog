@@ -42,7 +42,7 @@ const topicsResult = (entries: unknown[] = []) => ({
   ok: true,
   data: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: undefined }),
+    headingBlock: makeHeadingBlock(),
     layout: undefined,
     contentAlignment: undefined,
     taxonomy: TAXONOMY_KIND.TOPICS,
@@ -54,7 +54,7 @@ const tagsResult = (entries: unknown[] = []) => ({
   ok: true,
   data: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: undefined }),
+    headingBlock: makeHeadingBlock(),
     layout: undefined,
     contentAlignment: undefined,
     taxonomy: TAXONOMY_KIND.TAGS,

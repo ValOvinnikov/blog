@@ -40,7 +40,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock(),
+    headingBlock: makeHeadingBlock({ heading: 'Latest posts' }),
     items,
     layout: undefined,
     contentAlignment: undefined,
@@ -58,7 +58,7 @@ export const Default: TStory = {};
 
 export const WithoutCmsHeading: TStory = {
   args: {
-    headingBlock: makeHeadingBlock({ heading: undefined }),
+    headingBlock: makeHeadingBlock(),
   },
 };
 

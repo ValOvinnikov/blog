@@ -118,7 +118,7 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: undefined }),
+        headingBlock: makeHeadingBlock(),
         posts: [makePost()],
         layout: undefined,
         contentAlignment: undefined,

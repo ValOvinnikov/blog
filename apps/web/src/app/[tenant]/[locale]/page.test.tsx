@@ -81,7 +81,7 @@ describe('HomePage', () => {
     getHomePageMock.mockResolvedValue({
       ok: true,
       data: {
-        headingBlock: makeHeadingBlock({ heading: undefined }),
+        headingBlock: makeHeadingBlock(),
         hero: { id: 'hero-1', type: 'module_hero' },
         modules: [{ id: 'module-1', type: 'module_content' }],
         seo: makeSeo(),
@@ -100,7 +100,7 @@ describe('HomePage', () => {
     getHomePageMock.mockResolvedValue({
       ok: true,
       data: {
-        headingBlock: makeHeadingBlock({ heading: undefined }),
+        headingBlock: makeHeadingBlock(),
         hero: { id: 'hero-1', type: 'module_hero' },
         modules: [{ id: 'module-1', type: 'module_content' }],
         seo: makeSeo(),
@@ -130,7 +130,7 @@ describe('HomePage', () => {
     getHomePageMock.mockResolvedValue({
       ok: true,
       data: {
-        headingBlock: makeHeadingBlock({ heading: undefined }),
+        headingBlock: makeHeadingBlock(),
         hero: { id: 'hero-1' },
         modules: [],
         seo: makeSeo(),
@@ -193,7 +193,7 @@ describe('HomePage', () => {
       ok: true,
       data: {
         title: 'Home — internal label',
-        headingBlock: makeHeadingBlock({ heading: undefined }),
+        headingBlock: makeHeadingBlock(),
         hero: undefined,
         modules: [],
         seo: makeSeo(),

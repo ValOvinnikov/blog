@@ -24,7 +24,7 @@ const post = makePostListItem();
 
 const setup = customRender(PostLatestModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock(),
+  headingBlock: makeHeadingBlock({ heading: 'Latest posts' }),
   items: [post],
   layout: undefined,
   contentAlignment: undefined,
@@ -54,7 +54,7 @@ describe(`<${PostLatestModuleView.name}/>`, () => {
 
   it('renders a visually hidden heading from accessibleTitle when headingBlock.heading is undefined', () => {
     setup({
-      headingBlock: makeHeadingBlock({ heading: undefined }),
+      headingBlock: makeHeadingBlock(),
     });
 
     const heading = screen.getByRole('heading', {

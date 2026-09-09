@@ -2,7 +2,10 @@ import { BRAND_VARIANT, NEWSLETTER_VARIANT } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
-import { NewsletterModuleView } from './newsletter-module-view';
+import {
+  NewsletterModuleView,
+  type INewsletterModuleViewProps,
+} from './newsletter-module-view';
 
 const meta = {
   title: 'Modules/NewsletterModule',
@@ -25,7 +28,7 @@ const meta = {
     headingBlock: makeHeadingBlock({
       heading: 'Get new posts in your inbox',
       supportingText: 'One email a week, no spam, unsubscribe anytime.',
-    }),
+    }) as INewsletterModuleViewProps['headingBlock'],
     variant: NEWSLETTER_VARIANT.FULL,
     layout: undefined,
     contentAlignment: undefined,

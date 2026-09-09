@@ -75,7 +75,7 @@ export const LeadOnly: TStory = {
 
 export const WithoutCmsHeading: TStory = {
   args: {
-    headingBlock: makeHeadingBlock({ heading: undefined }),
+    headingBlock: makeHeadingBlock(),
   },
 };
 

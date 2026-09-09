@@ -9,7 +9,7 @@ import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
-import { CtaModuleView } from './cta-module-view';
+import { CtaModuleView, type ICtaModuleViewProps } from './cta-module-view';
 
 const meta = {
   title: 'Modules/CtaModule',
@@ -52,7 +52,7 @@ const meta = {
       heading: 'Never miss a post',
       supportingText:
         'Subscribe to get new articles on design systems and engineering delivered straight to your inbox.',
-    }),
+    }) as ICtaModuleViewProps['headingBlock'],
     content: undefined,
     image: undefined,
     contentPosition: undefined,

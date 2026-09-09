@@ -74,7 +74,7 @@ describe(`<${TaxonomyListModuleView.name}/>`, () => {
 
   it('renders a visually hidden heading from accessibleTitle when headingBlock.heading is undefined', () => {
     setup({
-      headingBlock: makeHeadingBlock({ heading: undefined }),
+      headingBlock: makeHeadingBlock(),
     });
 
     const heading = screen.getByRole('heading', { level: 2, name: 'Topics' });

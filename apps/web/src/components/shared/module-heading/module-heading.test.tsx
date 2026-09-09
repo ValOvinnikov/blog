@@ -5,7 +5,7 @@ import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { ModuleHeading } from './module-heading';
 
 const setup = customRender(ModuleHeading, {
-  headingBlock: makeHeadingBlock(),
+  headingBlock: makeHeadingBlock({ heading: 'Latest posts' }),
   accessibleTitle: 'Posts',
   id: 'section-title',
   level: 2,
@@ -33,7 +33,7 @@ describe(`<${ModuleHeading.name}/>`, () => {
 
   it('renders the accessible title as a visually hidden fallback when heading is undefined', () => {
     setup({
-      headingBlock: makeHeadingBlock({ heading: undefined }),
+      headingBlock: makeHeadingBlock(),
     });
 
     const heading = screen.getByRole('heading', { level: 2, name: 'Posts' });
@@ -76,6 +76,7 @@ describe(`<${ModuleHeading.name}/>`, () => {
     setup({
       align: CONTENT_ALIGNMENT.CENTER,
       headingBlock: makeHeadingBlock({
+        heading: 'Latest posts',
         supportingText: 'Fresh from the blog.',
       }),
     });
@@ -90,6 +91,7 @@ describe(`<${ModuleHeading.name}/>`, () => {
     setup({
       align: CONTENT_ALIGNMENT.RIGHT,
       headingBlock: makeHeadingBlock({
+        heading: 'Latest posts',
         supportingText: 'Fresh from the blog.',
       }),
     });

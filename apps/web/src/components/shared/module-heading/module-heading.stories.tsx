@@ -20,7 +20,7 @@ const meta = {
     },
   },
   args: {
-    headingBlock: makeHeadingBlock(),
+    headingBlock: makeHeadingBlock({ heading: 'Latest posts' }),
     accessibleTitle: 'Posts',
     id: 'module-heading-story-title',
     level: 2,
@@ -36,19 +36,21 @@ export const Default: TStory = {};
 export const WithSupportingText: TStory = {
   args: {
     headingBlock: makeHeadingBlock({
+      heading: 'Latest posts',
       supportingText: 'Fresh from the blog, updated weekly.',
     }),
   },
 };
 
 export const BlankHeadingFallback: TStory = {
-  args: { headingBlock: makeHeadingBlock({ heading: undefined }) },
+  args: { headingBlock: makeHeadingBlock() },
 };
 
 export const CenterAligned: TStory = {
   args: {
     align: CONTENT_ALIGNMENT.CENTER,
     headingBlock: makeHeadingBlock({
+      heading: 'Latest posts',
       supportingText: 'Fresh from the blog, updated weekly.',
     }),
   },
@@ -58,6 +60,7 @@ export const RightAligned: TStory = {
   args: {
     align: CONTENT_ALIGNMENT.RIGHT,
     headingBlock: makeHeadingBlock({
+      heading: 'Latest posts',
       supportingText: 'Fresh from the blog, updated weekly.',
     }),
   },

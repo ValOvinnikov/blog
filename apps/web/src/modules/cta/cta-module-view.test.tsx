@@ -8,7 +8,7 @@ import {
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import type { ReactNode } from 'react';
 
-import { CtaModuleView } from './cta-module-view';
+import { CtaModuleView, type ICtaModuleViewProps } from './cta-module-view';
 
 // Wraps the real implementation (so every other assertion in this file keeps
 // exercising actual render behaviour) purely to observe the props it is
@@ -46,7 +46,9 @@ const setup = customRender(CtaModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
   bandTone: BRAND_VARIANT.SECONDARY,
   eyebrow: undefined,
-  headingBlock: makeHeadingBlock({ heading: 'Get started' }),
+  headingBlock: makeHeadingBlock({
+    heading: 'Get started',
+  }) as ICtaModuleViewProps['headingBlock'],
   content: undefined,
   image: undefined,
   contentPosition: undefined,
@@ -74,7 +76,9 @@ describe(`<${CtaModuleView.name}/>`, () => {
   it('derives a different heading id for a different module id, avoiding duplicate DOM ids', () => {
     setup({
       id: 'cta-2',
-      headingBlock: makeHeadingBlock({ heading: 'Join us' }),
+      headingBlock: makeHeadingBlock({
+        heading: 'Join us',
+      }) as ICtaModuleViewProps['headingBlock'],
     });
 
     const heading = screen.getByRole('heading', { level: 2, name: 'Join us' });
