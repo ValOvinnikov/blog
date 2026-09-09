@@ -774,6 +774,40 @@ lacks:**
   delete this label?" buried under a report either gets missed or derails the
   thread. Hold it, or ask it on its own.
 
+### After a PR merges on an epic
+
+**A merge on a tracked epic gets one report, in this shape, and nothing else:**
+
+1. **One line on what merged** — what it delivered, not which layers it
+   touched, not that the checks were green, not that the board was updated.
+2. **What's next, in dependency order** — a ticket that blocks another comes
+   before it, so the list can be read top-down as the order to work in.
+3. **Which of those can start in parallel right now** — stated explicitly.
+   This is the one part of the report the user cannot derive from the issue
+   list, so it is the part that most earns its line.
+
+```
+#2975 merged — the home page can now open with a heading instead of a hero.
+
+Next, in order:
+- #2987 fold the section-header transformer (blocks #2988)
+- #2988 rename headingBlock
+
+Parallel now: #2976, #2977, #2960 — independent, no shared files.
+```
+
+**The dependency claim has to be real.** Derive it from what the tickets
+actually touch — a shared file, a renamed symbol, a type one consumes from the
+other — not from issue-number order or a guess. If two tickets' relationship
+is genuinely unclear, say they are unordered rather than inventing a sequence;
+a wrong "blocks" sends a parallel dispatch into a collision.
+
+This replaces the prose retelling, not the progress table the user asks for
+after each unit of work — where that table is in play, the dependency order
+and the parallel set are what its lanes are sorted and grouped by.
+
+### Asking the user a question
+
 **When a decision genuinely needs the user, ask it as a question — not as a
 brief.** State the recommendation first, then the single fact that could
 change it, then the question. A paragraph headed "the case for X" followed by
@@ -908,6 +942,11 @@ before answering a project-status question). It never edits code and only
 applies safe, forward-only status corrections; anything that looks
 destructive (e.g. reopening a wrongly-closed issue) comes back in its report
 for you to act on.
+
+When the merged PR belongs to an epic, what the user gets back once that
+dispatch returns is the post-merge report in "Reporting to the user" above —
+one line on what merged, what's next in dependency order, and what can start
+in parallel — not a retelling of the board-keeper report.
 
 **Never call `gh issue create` directly — creating an issue always goes
 through `board-keeper`.** Dispatch it with `"create issue: title=..., body=...,
