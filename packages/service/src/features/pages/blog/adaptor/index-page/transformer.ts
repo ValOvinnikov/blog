@@ -19,7 +19,6 @@ export function toIndexPage(
   tenant: TImageTenant,
 ): TBlogIndexPage {
   return {
-    title: rawPage.title,
     headingBlock: toHeadingBlock(rawPage.headingBlock),
     hero: rawPage.hero ? toHeroSlot(rawPage.hero) : undefined,
     modules: (rawPage.modules ?? []).map(toModule),
