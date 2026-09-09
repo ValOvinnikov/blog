@@ -878,6 +878,45 @@ mandatory. It governs the _length_ of the surfacing, not whether it happens.
 **One question per message.** If two decisions are pending, ask the blocking
 one and hold the other until it is answered.
 
+**Every question carries an urgency glyph**, because a question and a status
+line look identical once they scroll past:
+
+- 🟥 **Blocking** — work has stopped; nothing proceeds until the user answers.
+- 🟧 **Needed soon** — work continues on a stated assumption that costs rework
+  if it turns out wrong.
+- ⬜ **Whenever** — a preference or a tidy-up; answering late costs nothing.
+
+Squares, not the discs the status lanes use — a 🟦 beside a 🔵 is the same hue
+in a near-identical shape and the two systems blur at terminal size. Red and
+orange are unused by the lanes, and white reads as neutral, so a question mark
+can never be mistaken for a status lane. Three levels is the whole scale: the
+only distinction that changes what the user does is whether they must answer
+now, before the next dispatch, or never really.
+
+**🟥 means work actually stops.** If the work carried on regardless, the
+question was not blocking — label it 🟧 and name the assumption. Mislabelling
+is how a glyph becomes decoration.
+
+### An open question is carried, not dropped
+
+A question asked once and then buried under later messages is worse than a
+verbose report: the work continues on an assumption the user never confirmed,
+and nothing on screen shows that it is outstanding. So until it is answered:
+
+- **Restate it as the last line of every message**, in one line, with its
+  glyph. Last line specifically — that is what sits directly above the user's
+  input box, and a question in the middle of a report is the one that gets
+  lost.
+- **Never resolve it by picking the best option.** A reply that addresses
+  something else is not an answer to it; it stays open and stays carried. (The
+  standing rule against silently settling an ambiguity is what this enforces —
+  the carry line is what makes a breach visible rather than silent.)
+- **If work continued past it, say what was assumed** in that same restatement,
+  and whether the assumption is still cheap to reverse.
+- **Drop the carry line only when the user actually answers it**, or explicitly
+  waves it away. Nothing else clears it — not a topic change, not a new
+  instruction, not the question becoming awkward to keep repeating.
+
 ## Delivery gate sequence (mandatory — never skip or bundle)
 
 Every issue follows this exact order. **Committing is free (no approval needed); stop and wait for explicit user approval at the push and PR gates.**
