@@ -38,6 +38,56 @@ describe('getHomePage', () => {
     ]);
   });
 
+  it('maps a hero with no sectionHeader to an undefined heading/supportingText', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawHomePage({ hero: { _id: 'hero-1', _type: 'module_hero' } }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const page = await getHomePage(tenant);
+    if (!page) throw new Error('expected a home page');
+
+    expect(page.hero).toEqual({ id: 'hero-1', type: 'module_hero' });
+    expect(page.heading).toBeUndefined();
+    expect(page.supportingText).toBeUndefined();
+  });
+
+  it('maps a sectionHeader heading with no hero to an undefined hero', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawHomePage({
+          hero: null,
+          sectionHeader: { heading: 'Welcome', supportingText: null },
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const page = await getHomePage(tenant);
+    if (!page) throw new Error('expected a home page');
+
+    expect(page.hero).toBeUndefined();
+    expect(page.heading).toBe('Welcome');
+    expect(page.supportingText).toBeUndefined();
+  });
+
+  it('maps both a hero and a sectionHeader heading when both are authored', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawHomePage({
+          sectionHeader: { heading: 'Welcome', supportingText: 'A subtitle' },
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const page = await getHomePage(tenant);
+    if (!page) throw new Error('expected a home page');
+
+    expect(page.hero).toEqual({ id: 'hero-1', type: 'module_hero' });
+    expect(page.heading).toBe('Welcome');
+    expect(page.supportingText).toBe('A subtitle');
+  });
+
   it('rejects when page_home.hero resolves to a non-hero module type', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawHomePage({
