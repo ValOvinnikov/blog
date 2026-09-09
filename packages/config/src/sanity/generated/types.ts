@@ -847,7 +847,7 @@ export type Page_post = {
   _rev: string;
   title?: string;
   slug?: Slug;
-  excerpt?: string;
+  sectionHeader?: RequiredHeadingSectionHeader;
   heroImage?: ImageWithAlt;
   author?: Blog_authorReference;
   topic?: Blog_topicReference;
@@ -857,11 +857,8 @@ export type Page_post = {
     } & Blog_tagReference
   >;
   publishedAt?: string;
-  body?: RichText;
+  content?: RichText;
   featured?: boolean;
-  skim?: Skim;
-  seo?: Seo;
-  post?: Blog_postReference;
   modules?: Array<
     | ({
         _key: string;
@@ -876,6 +873,8 @@ export type Page_post = {
         _key: string;
       } & Module_contentReference)
   >;
+  skim?: Skim;
+  seo?: Seo;
 };
 
 export type SanityImageCrop = {

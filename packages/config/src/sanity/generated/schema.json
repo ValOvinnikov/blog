@@ -5428,10 +5428,11 @@
         },
         "optional": true
       },
-      "excerpt": {
+      "sectionHeader": {
         "type": "objectAttribute",
         "value": {
-          "type": "string"
+          "type": "inline",
+          "name": "requiredHeadingSectionHeader"
         },
         "optional": true
       },
@@ -5488,7 +5489,7 @@
         },
         "optional": true
       },
-      "body": {
+      "content": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
@@ -5500,30 +5501,6 @@
         "type": "objectAttribute",
         "value": {
           "type": "boolean"
-        },
-        "optional": true
-      },
-      "skim": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "skim"
-        },
-        "optional": true
-      },
-      "seo": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "seo"
-        },
-        "optional": true
-      },
-      "post": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "blog_post.reference"
         },
         "optional": true
       },
@@ -5596,6 +5573,22 @@
               }
             ]
           }
+        },
+        "optional": true
+      },
+      "skim": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "skim"
+        },
+        "optional": true
+      },
+      "seo": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "seo"
         },
         "optional": true
       }
