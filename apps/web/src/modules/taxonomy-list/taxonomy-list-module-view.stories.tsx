@@ -1,6 +1,5 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
 import { HEADING_LEVELS } from '@blog/ui/lib/react';
-import { objectKeys } from '@blog/utils';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import {
   tagsListItems,
@@ -8,7 +7,6 @@ import {
 } from '@web/testing/modules/taxonomy-list/fixtures';
 
 import { TaxonomyListModuleView } from './taxonomy-list-module-view';
-import { taxonomyListModuleViewVariants } from './taxonomy-list-module-view-variants';
 
 const meta = {
   title: 'Modules/TaxonomyListModule',
@@ -26,7 +24,7 @@ const meta = {
     },
     contentAlignment: {
       control: 'select',
-      options: objectKeys(taxonomyListModuleViewVariants.variants.align),
+      options: Object.values(CONTENT_ALIGNMENT),
     },
   },
   args: {
