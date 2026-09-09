@@ -15,8 +15,11 @@ const meta = {
         </PageShell.Breadcrumbs>
         <PageShell.Heading>
           <PageIntro
-            heading="Notes on building things"
-            supportingText="Essays and notes from the team, published as we ship."
+            headingBlock={{
+              heading: 'Notes on building things',
+              supportingText:
+                'Essays and notes from the team, published as we ship.',
+            }}
             locale="en"
             tenant="tenant-1"
           />
@@ -41,7 +44,11 @@ export const NoBreadcrumbs: TStory = {
     children: (
       <>
         <PageShell.Heading>
-          <PageIntro heading="Home" locale="en" tenant="tenant-1" />
+          <PageIntro
+            headingBlock={{ heading: 'Home', supportingText: undefined }}
+            locale="en"
+            tenant="tenant-1"
+          />
         </PageShell.Heading>
         <PageShell.Content>
           <div className="px-gutter py-section text-muted text-center">
@@ -58,7 +65,10 @@ export const HeadingOnly: TStory = {
     children: (
       <PageShell.Heading>
         <PageIntro
-          heading="Only a heading, no content region"
+          headingBlock={{
+            heading: 'Only a heading, no content region',
+            supportingText: undefined,
+          }}
           locale="en"
           tenant="tenant-1"
         />

@@ -45,8 +45,10 @@ export const TopicPage = async ({
       <PageShell.Heading>
         <PageIntro
           hero={hero}
-          heading={topic.title}
-          supportingText={topic.description}
+          headingBlock={{
+            heading: topic.title,
+            supportingText: topic.description,
+          }}
           locale={locale}
           tenant={tenant}
         />

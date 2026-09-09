@@ -8,8 +8,10 @@ const meta = {
   tags: ['autodocs'],
   args: {
     hero: undefined,
-    heading: 'Notes on building things',
-    supportingText: 'Essays and notes from the team, published as we ship.',
+    headingBlock: {
+      heading: 'Notes on building things',
+      supportingText: 'Essays and notes from the team, published as we ship.',
+    },
     locale: 'en',
     tenant: 'tenant-1',
   },

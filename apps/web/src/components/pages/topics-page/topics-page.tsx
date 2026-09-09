@@ -33,8 +33,7 @@ export const TopicsPage = async ({ locale, tenant }: TTopicsPageProps) => {
       </PageShell.Breadcrumbs>
       <PageShell.Heading>
         <PageIntro
-          heading={heading}
-          supportingText={supportingText}
+          headingBlock={{ heading, supportingText }}
           hasTrailingSpace={false}
           locale={locale}
           tenant={tenant}

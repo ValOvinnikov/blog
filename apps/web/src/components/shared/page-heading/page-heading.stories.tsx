@@ -14,8 +14,10 @@ const meta = {
     },
   },
   args: {
-    heading: 'Notes on building things',
-    supportingText: undefined,
+    headingBlock: {
+      heading: 'Notes on building things',
+      supportingText: undefined,
+    },
     align: undefined,
     hasTrailingSpace: undefined,
   },
@@ -28,27 +30,39 @@ export const Default: TStory = {};
 
 export const WithSupportingText: TStory = {
   args: {
-    supportingText: 'Essays and notes from the team, published as we ship.',
+    headingBlock: {
+      heading: 'Notes on building things',
+      supportingText: 'Essays and notes from the team, published as we ship.',
+    },
   },
 };
 
 export const CenterAligned: TStory = {
   args: {
     align: CONTENT_ALIGNMENT.CENTER,
-    supportingText: 'Essays and notes from the team, published as we ship.',
+    headingBlock: {
+      heading: 'Notes on building things',
+      supportingText: 'Essays and notes from the team, published as we ship.',
+    },
   },
 };
 
 export const RightAligned: TStory = {
   args: {
     align: CONTENT_ALIGNMENT.RIGHT,
-    supportingText: 'Essays and notes from the team, published as we ship.',
+    headingBlock: {
+      heading: 'Notes on building things',
+      supportingText: 'Essays and notes from the team, published as we ship.',
+    },
   },
 };
 
 export const NoTrailingSpace: TStory = {
   args: {
-    supportingText: 'Essays and notes from the team, published as we ship.',
+    headingBlock: {
+      heading: 'Notes on building things',
+      supportingText: 'Essays and notes from the team, published as we ship.',
+    },
     hasTrailingSpace: false,
   },
 };

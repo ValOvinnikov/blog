@@ -33,8 +33,7 @@ export const TagsPage = async ({ locale, tenant }: TTagsPageProps) => {
       </PageShell.Breadcrumbs>
       <PageShell.Heading>
         <PageIntro
-          heading={heading}
-          supportingText={supportingText}
+          headingBlock={{ heading, supportingText }}
           hasTrailingSpace={false}
           locale={locale}
           tenant={tenant}

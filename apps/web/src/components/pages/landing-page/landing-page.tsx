@@ -35,7 +35,7 @@ export const LandingPage = async ({
       <PageShell.Heading>
         <PageIntro
           hero={hero}
-          heading={title}
+          headingBlock={{ heading: title, supportingText: undefined }}
           locale={locale}
           tenant={tenant}
         />

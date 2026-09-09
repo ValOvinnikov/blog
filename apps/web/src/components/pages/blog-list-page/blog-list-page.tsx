@@ -32,8 +32,7 @@ export const BlogListPage = async ({
       <PageShell.Heading>
         <PageIntro
           hero={hero}
-          heading={heading}
-          supportingText={supportingText}
+          headingBlock={{ heading, supportingText }}
           locale={locale}
           tenant={tenant}
         />

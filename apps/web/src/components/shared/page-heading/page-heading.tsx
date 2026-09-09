@@ -1,11 +1,10 @@
-import type { TContentAlignment } from '@blog/config';
+import type { TContentAlignment, THeadingBlock } from '@blog/config';
 import { Heading } from '@blog/ui/atoms/heading';
 
 import { pageHeadingVariants } from './page-heading-variants';
 
 export interface IPageHeadingProps {
-  heading: string;
-  supportingText?: string;
+  headingBlock: THeadingBlock;
   align?: TContentAlignment;
   /**
    * Whether the heading (or its supporting text, if given) keeps its own
@@ -23,11 +22,11 @@ export interface IPageHeadingProps {
  * instead of the document itself.
  */
 export const PageHeading = ({
-  heading,
-  supportingText,
+  headingBlock,
   align,
   hasTrailingSpace = true,
 }: IPageHeadingProps) => {
+  const { heading, supportingText } = headingBlock;
   const s = pageHeadingVariants({
     align,
     hasTrailingSpace,
