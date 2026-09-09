@@ -293,8 +293,8 @@ non-hero `_type` as a data error through the loader's normal failure path
 rather than rendering a blank page.
 
 **The post is the page.** `page_post` carries the post itself — `slug`,
-`sectionHeader`, `heroImage`, `author`, `topic`, `tags`, `publishedAt`,
-`content`, `featured`, `skim` and `seo` — rather than wrapping a separate
+`sectionHeader`, `heroImage`, `content`, `featured`, `author`, `topic`,
+`tags`, `publishedAt`, `skim` and `seo` — rather than wrapping a separate
 `blog_post` and dereferencing it. Every post read in `@blog/service`
 projects those fields off `page_post` directly, and `apps/web` names
 `page_post` as the post's document type wherever it needs one: the
