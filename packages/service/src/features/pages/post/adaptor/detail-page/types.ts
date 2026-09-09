@@ -27,12 +27,12 @@ export type TPostSkim = {
 };
 
 export type TPostDetail = Omit<TPostCard, 'author' | 'topic'> & {
-  body: TMaybeUndefined<TPortableTextBody>;
+  body: TPortableTextBody;
   skim: TMaybeUndefined<TPostSkim>;
   hasAsides: boolean;
   seo: TSeoResolved;
-  author: TMaybeUndefined<TPostDetailAuthor>;
-  topic: TMaybeUndefined<TTopic>;
+  author: TPostDetailAuthor;
+  topic: TTopic;
   tags: TTag[];
   modules: TModule[];
   readingTimeMinutes: number;

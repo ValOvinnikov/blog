@@ -18,7 +18,7 @@ export type TArchivePostCard = {
   slug: string;
   excerpt: TMaybeUndefined<string>;
   publishedAt: string;
-  topic: TMaybeUndefined<TPostCardTopic>;
+  topic: TPostCardTopic;
   readingTimeMinutes: number;
 };
 
@@ -31,7 +31,7 @@ export function toArchivePostCard(raw: TRawArchivePostCard): TArchivePostCard {
     slug: raw.slug,
     excerpt,
     publishedAt: raw.publishedAt,
-    topic: raw.topic ? toPostCardTopic(raw.topic) : undefined,
+    topic: toPostCardTopic(raw.topic),
     readingTimeMinutes: toReadingTimeMinutes(raw.wordCount),
   };
 }

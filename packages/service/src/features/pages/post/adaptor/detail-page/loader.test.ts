@@ -115,7 +115,7 @@ describe('getPost', () => {
     const result = await getPost('hello-world', tenant);
     if (!result) throw new Error('expected a post detail');
 
-    expect(result.author?.imageUrl).toBeUndefined();
+    expect(result.author.imageUrl).toBeUndefined();
   });
 
   it('requests a right-sized author avatar instead of the full-resolution asset', async () => {
@@ -421,7 +421,7 @@ describe('getPost', () => {
     const result = await getPost('hello-world', tenant);
     if (!result) throw new Error('expected a post detail');
 
-    expect(result.body?.[0]).toEqual({
+    expect(result.body[0]).toEqual({
       _type: 'bodyImage',
       _key: 'image-1',
       layout: 'FLOAT_RIGHT',
@@ -452,20 +452,18 @@ describe('getPost', () => {
     if (!result) throw new Error('expected a post detail');
 
     expect(result.body).toHaveLength(1);
-    expect(result.body?.[0]).toMatchObject({
+    expect(result.body[0]).toMatchObject({
       _type: 'bodyImage',
       image: undefined,
     });
   });
 
-  it('renders a sparse post seeded with only title, slug, and publishedAt', async () => {
+  it('renders a post with no supportingText as an undefined excerpt', async () => {
     mockRun
       .mockResolvedValueOnce(
         makeRawPostDetail({
           sectionHeader: { heading: 'Hello World', supportingText: null },
-          author: null,
-          topic: null,
-          body: null,
+          body: [],
         }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
@@ -474,9 +472,6 @@ describe('getPost', () => {
     if (!result) throw new Error('expected a post detail');
 
     expect(result.excerpt).toBeUndefined();
-    expect(result.author).toBeUndefined();
-    expect(result.topic).toBeUndefined();
-    expect(result.body).toBeUndefined();
     expect(result.hasAsides).toBe(false);
   });
 

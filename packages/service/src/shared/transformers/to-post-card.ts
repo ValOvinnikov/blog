@@ -32,13 +32,13 @@ export type TPostCard = {
   heroImageAlt: TMaybeUndefined<string>;
   heroImageSanity: TMaybeUndefined<ISanityImage>;
   featured: boolean;
-  author: TMaybeUndefined<TPostCardAuthor>;
-  topic: TMaybeUndefined<TPostCardTopic>;
+  author: TPostCardAuthor;
+  topic: TPostCardTopic;
   readingTimeMinutes: number;
 };
 
 function toPostCardAuthor(
-  raw: NonNullable<TRawPostCard['author']>,
+  raw: TRawPostCard['author'],
   tenant: TImageTenant,
 ): TPostCardAuthor {
   return {
@@ -49,9 +49,7 @@ function toPostCardAuthor(
   };
 }
 
-export function toPostCardTopic(
-  raw: NonNullable<TRawPostCard['topic']>,
-): TPostCardTopic {
+export function toPostCardTopic(raw: TRawPostCard['topic']): TPostCardTopic {
   return {
     id: raw._id,
     title: raw.title,
@@ -72,8 +70,8 @@ export function toPostCard(raw: TRawPostCard, tenant: TImageTenant): TPostCard {
     heroImageAlt: raw.heroImage?.alt,
     heroImageSanity: toSanityImage(raw.heroImageAsset, tenant),
     featured: raw.featured ?? false,
-    author: raw.author ? toPostCardAuthor(raw.author, tenant) : undefined,
-    topic: raw.topic ? toPostCardTopic(raw.topic) : undefined,
+    author: toPostCardAuthor(raw.author, tenant),
+    topic: toPostCardTopic(raw.topic),
     readingTimeMinutes: toReadingTimeMinutes(raw.wordCount),
   };
 }

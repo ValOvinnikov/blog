@@ -24,7 +24,7 @@ export type TRawPostDetail = NonNullable<InferResultType<typeof postPageQuery>>;
 const AUTHOR_AVATAR_SIZE_PX = 64;
 
 function toPostDetailAuthor(
-  raw: NonNullable<TRawPostDetail['author']>,
+  raw: TRawPostDetail['author'],
   tenant: TImageTenant,
 ): TPostDetailAuthor {
   return {
@@ -73,9 +73,9 @@ export function toPostDetail(
     heroImageAlt: raw.heroImage?.alt,
     heroImageSanity: toSanityImage(raw.heroImageAsset, tenant),
     featured: raw.featured ?? false,
-    body: raw.body ? toPortableTextBody(raw.body, tenant) : undefined,
+    body: toPortableTextBody(raw.body, tenant),
     skim: toPostSkim(raw.skim),
-    hasAsides: raw.body?.some((block) => block._type === 'aside') ?? false,
+    hasAsides: raw.body.some((block) => block._type === 'aside'),
     seo: resolveSeo(
       raw.seo ?? undefined,
       {
@@ -89,8 +89,8 @@ export function toPostDetail(
       },
       tenant,
     ),
-    author: raw.author ? toPostDetailAuthor(raw.author, tenant) : undefined,
-    topic: raw.topic ? toTopic(raw.topic) : undefined,
+    author: toPostDetailAuthor(raw.author, tenant),
+    topic: toTopic(raw.topic),
     tags: (raw.tags ?? []).map(toTag),
     modules: (raw.modules ?? []).map(toModule),
     readingTimeMinutes: toReadingTimeMinutes(raw.wordCount),

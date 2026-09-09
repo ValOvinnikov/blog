@@ -10,7 +10,7 @@ describe('heroBlogModuleQuery', () => {
 
   it('falls back to the newest published featured post when postSource is not PINNED', () => {
     expect(heroBlogModuleQuery.query).toContain(
-      '*[_type == "page_post"][featured == true][publishedAt <= now() && defined(sectionHeader.heading)] | order(publishedAt desc)[0]',
+      '*[_type == "page_post"][featured == true][publishedAt <= now() && defined(sectionHeader.heading) && defined(author) && defined(topic) && defined(content)] | order(publishedAt desc)[0]',
     );
   });
 

@@ -35,12 +35,8 @@ export const postCardFragment = q
       .project(sanityImageFragment)
       .nullable(true),
     featured: sub.field('featured').nullable(true),
-    author: sub
-      .field('author')
-      .deref()
-      .project(authorCardFragment)
-      .nullable(true),
-    topic: sub.field('topic').deref().project(topicFragment).nullable(true),
+    author: sub.field('author').deref().project(authorCardFragment).notNull(),
+    topic: sub.field('topic').deref().project(topicFragment).notNull(),
     wordCount: sub.raw(WORD_COUNT_EXPRESSION, wordCountParser),
   }));
 
@@ -66,15 +62,11 @@ export const postDetailFragment = q
     body: sub
       .field('content[]')
       .project(portableTextBodyItemFragment)
-      .nullable(true),
+      .notNull(),
     skim: sub.field('skim').project(skimFragment).nullable(true),
     seo: sub.field('seo').project(seoFragment).nullable(true),
-    author: sub
-      .field('author')
-      .deref()
-      .project(authorDetailFragment)
-      .nullable(true),
-    topic: sub.field('topic').deref().project(topicFragment).nullable(true),
+    author: sub.field('author').deref().project(authorDetailFragment).notNull(),
+    topic: sub.field('topic').deref().project(topicFragment).notNull(),
     tags: sub.field('tags[]').deref().project(tagFragment).nullable(true),
     modules: sub
       .field('modules[]')

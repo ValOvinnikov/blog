@@ -22,6 +22,6 @@ export const archivePostCardFragment = q
       .notNull(),
     slug: sub.field('slug.current').notNull(),
     publishedAt: sub.field('publishedAt').notNull(),
-    topic: sub.field('topic').deref().project(topicFragment).nullable(true),
+    topic: sub.field('topic').deref().project(topicFragment).notNull(),
     wordCount: sub.raw(WORD_COUNT_EXPRESSION, wordCountParser),
   }));
