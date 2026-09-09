@@ -23,14 +23,14 @@ export type Module_newsletter = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  sectionHeader?: RequiredHeadingSectionHeader;
+  headingBlock?: RequiredHeadingBlock;
   variant?: 'FULL' | 'COMPACT';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
 };
 
-export type RequiredHeadingSectionHeader = {
-  _type: 'requiredHeadingSectionHeader';
+export type RequiredHeadingBlock = {
+  _type: 'requiredHeadingBlock';
   heading?: string;
   supportingText?: string;
 };
@@ -46,7 +46,7 @@ export type Module_cta = {
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   bandTone?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   eyebrow?: string;
-  sectionHeader?: RequiredHeadingSectionHeader;
+  headingBlock?: RequiredHeadingBlock;
   content?: BasicText;
   image?: ImageWithAlt;
   contentPositionSplit?: 'LEFT' | 'RIGHT';
@@ -152,15 +152,15 @@ export type Module_postRelated = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  sectionHeader?: SectionHeader;
+  headingBlock?: HeadingBlock;
   showImages?: boolean;
   limit?: number;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
 };
 
-export type SectionHeader = {
-  _type: 'sectionHeader';
+export type HeadingBlock = {
+  _type: 'headingBlock';
   heading?: string;
   supportingText?: string;
 };
@@ -180,7 +180,7 @@ export type Module_postFeatured = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  sectionHeader?: SectionHeader;
+  headingBlock?: HeadingBlock;
   showImages?: boolean;
   postSource?: 'PINNED' | 'NEWEST_FEATURED';
   posts?: Array<
@@ -201,7 +201,7 @@ export type Module_postLatest = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  sectionHeader?: SectionHeader;
+  headingBlock?: HeadingBlock;
   showImages?: boolean;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   limit?: number;
@@ -596,7 +596,7 @@ export type Module_taxonomyList = {
   taxonomy?: 'TOPICS' | 'TAGS';
   sortOrder?: 'ALPHABETICAL' | 'MOST_POSTS';
   limit?: number;
-  sectionHeader?: SectionHeader;
+  headingBlock?: HeadingBlock;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
 };
@@ -641,7 +641,7 @@ export type Module_postList = {
   _rev: string;
   title?: string;
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  sectionHeader?: SectionHeader;
+  headingBlock?: HeadingBlock;
   showImages?: boolean;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   pageSize?: number;
@@ -662,7 +662,7 @@ export type Page_home = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  sectionHeader?: SectionHeader;
+  headingBlock?: HeadingBlock;
   hero?: Module_heroReference | Module_heroBlogReference;
   modules?: Array<
     | ({
@@ -846,7 +846,7 @@ export type Page_post = {
   _rev: string;
   title?: string;
   slug?: Slug;
-  sectionHeader?: RequiredHeadingSectionHeader;
+  headingBlock?: RequiredHeadingBlock;
   heroImage?: ImageWithAlt;
   content?: RichText;
   featured?: boolean;
@@ -1016,7 +1016,7 @@ export type Geopoint = {
 
 export type AllSanitySchemaTypes =
   | Module_newsletter
-  | RequiredHeadingSectionHeader
+  | RequiredHeadingBlock
   | Module_cta
   | ActionGroup
   | SanityImageAssetReference
@@ -1025,7 +1025,7 @@ export type AllSanitySchemaTypes =
   | Module_content
   | RichText
   | Module_postRelated
-  | SectionHeader
+  | HeadingBlock
   | Page_postReference
   | Module_postFeatured
   | Module_postLatest

@@ -58,11 +58,11 @@
         },
         "optional": true
       },
-      "sectionHeader": {
+      "headingBlock": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "requiredHeadingSectionHeader"
+          "name": "requiredHeadingBlock"
         },
         "optional": true
       },
@@ -115,7 +115,7 @@
     }
   },
   {
-    "name": "requiredHeadingSectionHeader",
+    "name": "requiredHeadingBlock",
     "type": "type",
     "value": {
       "type": "object",
@@ -124,7 +124,7 @@
           "type": "objectAttribute",
           "value": {
             "type": "string",
-            "value": "requiredHeadingSectionHeader"
+            "value": "requiredHeadingBlock"
           }
         },
         "heading": {
@@ -256,11 +256,11 @@
         },
         "optional": true
       },
-      "sectionHeader": {
+      "headingBlock": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "requiredHeadingSectionHeader"
+          "name": "requiredHeadingBlock"
         },
         "optional": true
       },
@@ -992,11 +992,11 @@
         },
         "optional": true
       },
-      "sectionHeader": {
+      "headingBlock": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "sectionHeader"
+          "name": "headingBlock"
         },
         "optional": true
       },
@@ -1046,7 +1046,7 @@
     }
   },
   {
-    "name": "sectionHeader",
+    "name": "headingBlock",
     "type": "type",
     "value": {
       "type": "object",
@@ -1055,7 +1055,7 @@
           "type": "objectAttribute",
           "value": {
             "type": "string",
-            "value": "sectionHeader"
+            "value": "headingBlock"
           }
         },
         "heading": {
@@ -1164,11 +1164,11 @@
         },
         "optional": true
       },
-      "sectionHeader": {
+      "headingBlock": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "sectionHeader"
+          "name": "headingBlock"
         },
         "optional": true
       },
@@ -1315,11 +1315,11 @@
         },
         "optional": true
       },
-      "sectionHeader": {
+      "headingBlock": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "sectionHeader"
+          "name": "headingBlock"
         },
         "optional": true
       },
@@ -3776,11 +3776,11 @@
         },
         "optional": true
       },
-      "sectionHeader": {
+      "headingBlock": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "sectionHeader"
+          "name": "headingBlock"
         },
         "optional": true
       },
@@ -4056,11 +4056,11 @@
         },
         "optional": true
       },
-      "sectionHeader": {
+      "headingBlock": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "sectionHeader"
+          "name": "headingBlock"
         },
         "optional": true
       },
@@ -4181,11 +4181,11 @@
         },
         "optional": true
       },
-      "sectionHeader": {
+      "headingBlock": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "sectionHeader"
+          "name": "headingBlock"
         },
         "optional": true
       },
@@ -5420,11 +5420,11 @@
         },
         "optional": true
       },
-      "sectionHeader": {
+      "headingBlock": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "requiredHeadingSectionHeader"
+          "name": "requiredHeadingBlock"
         },
         "optional": true
       },
