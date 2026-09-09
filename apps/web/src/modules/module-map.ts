@@ -14,7 +14,7 @@ export type TModuleComponentProps = {
   locale: string;
   tenant: string;
   /** The post the module renders alongside, when the module sits on a `page_post`'s `modules[]`. Absent everywhere else. */
-  context?: { post?: { id: string; slug: string } };
+  context?: { post?: { id: string } };
 };
 
 /**

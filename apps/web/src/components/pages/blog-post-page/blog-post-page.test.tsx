@@ -56,11 +56,10 @@ vi.mock('@web/modules/module-renderer', () => ({
     modules?: { id: string; type: string }[];
     locale: string;
     tenant: string;
-    context?: { post?: { id: string; slug: string } };
+    context?: { post?: { id: string } };
   }) => (
     <div data-testid="module-renderer">
-      {modules?.length ?? 0}:{locale}:{tenant}:{context?.post?.id}:
-      {context?.post?.slug}
+      {modules?.length ?? 0}:{locale}:{tenant}:{context?.post?.id}
     </div>
   ),
 }));
@@ -144,7 +143,7 @@ describe(BlogPostPage, () => {
     await setup();
 
     expect(screen.getByTestId('module-renderer')).toHaveTextContent(
-      '1:en:tenant-1:post-1:hello-world',
+      '1:en:tenant-1:post-1',
     );
   });
 

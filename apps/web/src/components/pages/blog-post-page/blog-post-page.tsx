@@ -56,7 +56,7 @@ export const BlogPostPage = async ({
           modules={modules}
           locale={locale}
           tenant={tenant}
-          context={{ post: { id, slug } }}
+          context={{ post: { id } }}
         />
       </main>
 

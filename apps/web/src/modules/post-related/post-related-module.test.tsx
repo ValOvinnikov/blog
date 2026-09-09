@@ -63,7 +63,7 @@ const setup = customRenderAsync(PostRelatedModule, {
   id: 'post-related-1',
   locale: 'en',
   tenant: 'tenant-1',
-  context: { post: { id: 'anchor-post-1', slug: 'anchor-post' } },
+  context: { post: { id: 'anchor-post-1' } },
 });
 
 describe(PostRelatedModule, () => {
