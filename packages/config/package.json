@@ -6,7 +6,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./react": "./src/react/polymorphic.ts",
-    "./constants": "./src/constants/index.ts"
+    "./constants": "./src/constants/index.ts",
+    "./utils": "./src/utils.ts"
   },
   "scripts": {
     "lint": "eslint .",

@@ -1180,9 +1180,9 @@ runtime state and the layer contracts:
 One field, added by a shared `displayModeField()` helper right after
 `showImagesField()` on both modules:
 
-| Field         | Type                                                | Notes                                                                                                                                                                                    |
-| ------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `displayMode` | `DISPLAY_MODE` radio, `initialValue: GRID`, no rule | "Grid stacks the posts in rows. Carousel puts them in one row the reader swipes or steps through. On a wide screen where every post already fits, the carousel's buttons stay disabled." |
+| Field         | Type                                                   | Notes                                                                                                                                                                                    |
+| ------------- | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `displayMode` | `DISPLAY_MODE` dropdown, `initialValue: GRID`, no rule | "Grid stacks the posts in rows. Carousel puts them in one row the reader swipes or steps through. On a wide screen where every post already fits, the carousel's buttons stay disabled." |
 
 **No `required()` rule, and a read-time default.** A new field on an
 existing type never backfills: `initialValue` applies to documents created
