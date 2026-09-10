@@ -127,25 +127,17 @@ const validateHasPostListModule = (
 const POST_LIST_UNIQUENESS_ERROR =
   'Another Tag Page already references this Post List — each Post List can only back one Tag Page.';
 
-const getOwnPostListRef = (
-  document: SanityDocument | undefined,
-): string | undefined =>
-  getPostListModuleRefs(document)[0] ??
-  (document as { postList?: { _ref?: string } } | undefined)?.postList?._ref;
-
 /**
  * Rejects a second `page_tag` referencing an already-used `module_postList`
  * — `posts.query.ts` correlates a postList back to its owning page_tag via
  * an unindexed lookup, which would pick an arbitrary owner if two pages
- * shared one list. Reads the reference from either `modules[]` or the
- * deprecated `postList` field, and matches a conflicting page the same way,
- * since both shapes coexist until a later migration drops `postList`.
+ * shared one list.
  */
 const validateUniquePostListReference = async (
   document: SanityDocument | undefined,
   context: ValidationContext,
 ): Promise<string | true> => {
-  const postListRef = getOwnPostListRef(document);
+  const postListRef = getPostListModuleRefs(document)[0];
 
   if (!postListRef) return true;
 
@@ -156,7 +148,7 @@ const validateUniquePostListReference = async (
   const client = getDraftsClient(context);
 
   const conflictingCount = await client.fetch<number>(
-    `count(*[_type == $type && (postList._ref == $postListId || $postListId in modules[]._ref) && !(_id in [$publishedId, "drafts." + $publishedId])])`,
+    `count(*[_type == $type && $postListId in modules[]._ref && !(_id in [$publishedId, "drafts." + $publishedId])])`,
     { type: PAGE_TAG_TYPE, postListId: postListRef, publishedId },
   );
 
@@ -212,19 +204,6 @@ export const pageTagSchema = defineType({
       type: seoSchema.name,
       description:
         'Override Tag page meta title, description, and social sharing image.',
-    }),
-    defineField({
-      name: 'postList',
-      title: 'Post List',
-      type: 'reference',
-      description:
-        'Superseded by the module_postList reference now folded into modules[].',
-      to: [{ type: postListSchema.name }],
-      readOnly: true,
-      deprecated: {
-        reason:
-          'Superseded by module_postList in modules[]. Left in place so already-deployed code keeps reading it until a follow-up migration drops it.',
-      },
     }),
   ],
   preview: {
