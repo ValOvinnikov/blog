@@ -1014,8 +1014,8 @@ latest view models` — `postCardFragment` already carries `heroImageSanity`
   `module_postLatest` carousel with `limit` < 4.
 - **Sub-issues** (ui first and independent; config + studio as one PR
   because knip fails on the bare `DISPLAY_MODE` export; then service; then
-  web — each merges green alone; the `module_postFeatured` half waits on
-  1.3's studio → service → web PR):
+  web — each merges green alone; 1.3 has shipped, so both teasers are in
+  scope of every PR):
   - **config** · `feat(config): DISPLAY_MODE const` (#2836).
   - **studio** · `feat(studio): displayMode on post listing modules` (#2837)
     — shared `displayModeField()` helper, the `limit` warning, typegen.
