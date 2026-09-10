@@ -34,6 +34,8 @@ export const VOICE_FIXED_KEYS = [
   'bookmarkButton.removeAriaLabel',
   'accountPage.privacy.deleteConfirmAriaLabel',
   'accountPage.identity.displayNameAriaLabel',
+  'carousel.previousAriaLabel',
+  'carousel.nextAriaLabel',
 
   // Archive/breadcrumb labels read only as the post list's accessible name,
   // or derived from Studio content rather than authored directly.
