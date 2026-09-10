@@ -1247,6 +1247,7 @@ exception in the ui PR.
 | `previousLabel: string`                      | `aria-label` and `title` of the previous button; icon-only, so this is its whole name                                                                                     |
 | `nextLabel: string`                          | Same for next                                                                                                                                                             |
 | `slideClassName?: string`                    | Layout only, on every `<li>`: the caller sizes the slide, the organism sets no width — the post wrapper passes the grid's columns (table below), the gallery `basis-full` |
+| `tone?: TBrandVariant`                       | The module's brand variant, the `CtaModule` prop name; default `PRIMARY`. Reaches only the two buttons, where it picks the hover (below)                                  |
 | `className`, `dataTestId`                    | The usual                                                                                                                                                                 |
 
 Everything Embla owns is internal state, never a prop:
@@ -1318,6 +1319,24 @@ organism hardcodes none. The previous button reuses `ICONS.CHEVRON_RIGHT`
 rotated, `aria-hidden`, its name coming only from `previousLabel`; a real
 `CHEVRON_LEFT` is #2922.
 
+**The buttons are `IconButton`'s new `control` variant** (added in the ui PR;
+no existing variant is a bordered circle). At rest it is one look on every
+section ground: `size-9 rounded-full bg-transparent border
+border-brand-primary text-brand-primary` — a brand outline, because
+`--brand-primary`'s role in the theme is "interactive", so the ring reads as
+a control on the page, the secondary field and the brand tint alike, in both
+modes; the base focus ring; the base `disabled:opacity-50`, which fades ring
+and chevron together since there is no fill to lose. **Only the hover depends
+on the ground, through `tone`:** on `PRIMARY` and `SECONDARY` the tint fills
+inside the ring (`hover:bg-brand-primary-muted`, ring and chevron staying
+brand); on `BRAND_PRIMARY`, where the ground already is the tint, the button
+fills (`hover:bg-brand-primary-solid hover:text-brand-primary-contrast`) —
+momentary, so it never competes with a CTA the way a resting solid would.
+The variant carries the tint hover; one compound variant, `control` ×
+`BRAND_PRIMARY`, swaps in the fill. Settled 2026-09-10 on the mock after
+comparing tone-driven neutral fills, no background, a brand solid and the
+outline on all three grounds.
+
 **Accessibility is the list's, not a slideshow's.** Every slide stays in the
 DOM and in the tab order; nothing is `aria-hidden` or `inert` off-screen.
 Tab reaches each slide's link in DOM order, then the two buttons. Arrow
@@ -1349,7 +1368,8 @@ directive; `PostCardItem` renders on the client from here, and its
 `IPostCardData` is strings plus a pre-rendered `image?: ReactNode`, all
 serialisable); `renderItem`, one `PostCardItem` per item with no `isLead`
 and no `isSplit`, keyed by the item's `id`; the slide width, the grid's
-columns as `slideClassName` from its own variants file; and the labels —
+columns as `slideClassName` from its own variants file; the module's
+`brandVariant`, passed on as `tone`; and the labels —
 `carousel.previousAriaLabel` and `carousel.nextAriaLabel`, read with
 `useTranslations`, so one place names the buttons for every post carousel.
 The buttons are icon-only, so the text is an `aria-label` no sighted
@@ -1364,7 +1384,7 @@ not.
 are composed in web since the page-composition work: each module has its
 own view that renders `Section`, its heading and its `PostCardItem`s. `PostLatestModuleView` and
 `PostFeaturedModuleView` gain `displayMode: TDisplayMode` from their view
-models and branch on it: `CAROUSEL` renders `<PostsCarousel items hasImages ariaLabel>` with the
+models and branch on it: `CAROUSEL` renders `<PostsCarousel items hasImages ariaLabel tone>` with the
 view's items — plain data across the boundary — and anything else renders
 what the
 view renders today (the `PostGrid` for latest, the lead-plus-tail spotlight
@@ -1884,6 +1904,14 @@ point; the graph stays acyclic.
   web owns `renderItem`, the grid-column `slideClassName` and the labels,
   and the Server Component views pass plain data; `slideSize` is gone.
   Settled in the PR #2925 review (2026-09-10, #2839).
+- **The carousel buttons are a brand outline everywhere, and only their
+  hover follows the section ground** — `IconButton` gains a `control`
+  variant (`rounded-full`, transparent, `border-brand-primary`,
+  `text-brand-primary`, base focus and disabled); `Carousel` takes `tone`
+  (the `CtaModule` name) and the buttons hover to the tint on the neutral
+  grounds and to the solid fill on the brand tint. Chosen on the mock over
+  tone-driven neutral fills, no background and a resting brand solid
+  (2026-09-10, #2839).
 - **Topic cards list their two newest posts, behind a `showLatestPosts`
   toggle that is on by default and defaulted at read time** — the titles
   join each term inside the merged taxonomy-list query through a new
@@ -1946,6 +1974,9 @@ catalogue has enough shipped history to matter).
 
 ## Resync log
 
+- **2026-09-10** — carousel buttons: `IconButton` `control` variant (brand
+  outline, one look on every ground), `tone` on `Carousel` and
+  `PostsCarousel` for the hover only; recorded in #2839 / #2840.
 - **2026-09-10** — carousel organism API after the #2925 review: `items` +
   `renderItem` + `getItemKey` + `slideClassName` replace `children` and
   `slideSize`; the state moves into an internal `useCarousel` hook; the
