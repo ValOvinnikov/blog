@@ -1,3 +1,4 @@
+import { BRAND_VARIANT } from '@blog/config';
 import { renderElement, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 import { act } from '@testing-library/react';
@@ -331,6 +332,58 @@ describe(`<${Carousel.name}/>`, () => {
     const next = screen.getByRole('button', { name: 'Next slide' });
     expect(previous).toHaveAttribute('title', 'Previous slide');
     expect(next).toHaveAttribute('title', 'Next slide');
+  });
+
+  it('renders both buttons with the control variant', () => {
+    renderElement(
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous slide"
+        nextLabel="Next slide"
+      />,
+    );
+
+    const previous = screen.getByRole('button', { name: 'Previous slide' });
+    const next = screen.getByRole('button', { name: 'Next slide' });
+    expect(previous).toHaveClass('rounded-full');
+    expect(next).toHaveClass('rounded-full');
+  });
+
+  it('defaults tone to PRIMARY, giving both buttons the tint hover', () => {
+    renderElement(
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous slide"
+        nextLabel="Next slide"
+      />,
+    );
+
+    const previous = screen.getByRole('button', { name: 'Previous slide' });
+    const next = screen.getByRole('button', { name: 'Next slide' });
+    expect(previous).toHaveClass('hover:bg-brand-primary-muted');
+    expect(next).toHaveClass('hover:bg-brand-primary-muted');
+  });
+
+  it('passes tone through to both buttons, swapping in the solid hover for BRAND_PRIMARY', () => {
+    renderElement(
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous slide"
+        nextLabel="Next slide"
+        tone={BRAND_VARIANT.BRAND_PRIMARY}
+      />,
+    );
+
+    const previous = screen.getByRole('button', { name: 'Previous slide' });
+    const next = screen.getByRole('button', { name: 'Next slide' });
+    expect(previous).toHaveClass('hover:bg-brand-primary-solid');
+    expect(next).toHaveClass('hover:bg-brand-primary-solid');
   });
 
   it('calls scrollPrev/scrollNext on the Embla api when the buttons are clicked', async () => {

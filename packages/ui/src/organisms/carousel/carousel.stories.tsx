@@ -1,3 +1,4 @@
+import { BRAND_VARIANT } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -47,6 +48,12 @@ const meta = {
   component: Carousel,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
+  argTypes: {
+    tone: {
+      control: 'select',
+      options: Object.values(BRAND_VARIANT),
+    },
+  },
   args: {
     ariaLabel: 'Latest posts',
     previousLabel: 'Previous slide',

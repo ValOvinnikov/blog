@@ -1,3 +1,4 @@
+import { BRAND_VARIANT } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -37,8 +38,30 @@ export const iconButtonVariants = tv({
         // clears it (3.54:1 / 3.94:1).
         'hover:ring-2 hover:ring-border-emphasis hover:ring-offset-2 hover:ring-offset-primary',
       ],
+      control: [
+        'size-9 rounded-full',
+        'border border-brand-primary bg-transparent text-brand-primary',
+        // `--brand-primary`'s role in the theme is "interactive", so the
+        // ring reads as a control on every ground (≈5:1 / 4.2:1 / 4.6:1
+        // light, ≈7:1 / 5.5:1 / 4.5:1 dark against primary/secondary/brand
+        // tint) — the tint hover below is the PRIMARY/SECONDARY case; the
+        // BRAND_PRIMARY-tone compound variant swaps it for a solid fill.
+        'hover:border-brand-primary hover:bg-brand-primary-muted hover:text-brand-primary',
+      ],
+    },
+    tone: {
+      [BRAND_VARIANT.PRIMARY]: [],
+      [BRAND_VARIANT.SECONDARY]: [],
+      [BRAND_VARIANT.BRAND_PRIMARY]: [],
     },
   },
+  compoundVariants: [
+    {
+      variant: 'control',
+      tone: BRAND_VARIANT.BRAND_PRIMARY,
+      class: 'hover:bg-brand-primary-solid hover:text-brand-primary-contrast',
+    },
+  ],
 });
 
 export type TIconButtonVariants = VariantProps<typeof iconButtonVariants>;

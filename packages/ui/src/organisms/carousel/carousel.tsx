@@ -1,8 +1,10 @@
 import {
+  BRAND_VARIANT,
   ICONS,
   SIZE,
   type IWithClassName,
   type IWithDataTestId,
+  type TBrandVariant,
 } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import { IconButton } from '@blog/ui/atoms/icon-button';
@@ -23,6 +25,8 @@ export interface ICarouselProps<T> extends IWithClassName, IWithDataTestId {
   ariaLabel: string;
   previousLabel: string;
   nextLabel: string;
+  /** Section-ground hover for the nav buttons. Defaults to `PRIMARY`. */
+  tone?: TBrandVariant;
 }
 
 /**
@@ -40,6 +44,7 @@ export const Carousel = <T,>({
   ariaLabel,
   previousLabel,
   nextLabel,
+  tone = BRAND_VARIANT.PRIMARY,
   className,
   dataTestId,
 }: ICarouselProps<T>) => {
@@ -86,6 +91,8 @@ export const Carousel = <T,>({
           title={previousLabel}
           onClick={scrollPrev}
           isDisabled={isPreviousDisabled}
+          variant="control"
+          tone={tone}
         >
           <Icon name={ICONS.CHEVRON_LEFT} size={SIZE.SM} />
         </IconButton>
@@ -95,6 +102,8 @@ export const Carousel = <T,>({
           title={nextLabel}
           onClick={scrollNext}
           isDisabled={isNextDisabled}
+          variant="control"
+          tone={tone}
         >
           <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
         </IconButton>
