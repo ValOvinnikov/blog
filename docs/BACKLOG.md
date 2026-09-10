@@ -1024,12 +1024,13 @@ latest view models` — `postCardFragment` already carries `heroImageSanity`
     coalesced projection on both teasers.
   - **ui** · `feat(ui): Carousel organism owning Embla — items, renderItem,
 no slide width` (#2839) — `embla-carousel-react` added to `packages/ui`;
-    an internal `useCarousel` hook; no directive; the governance
+    an internal `useCarousel` hook; no directive; `IconButton`'s new
+    `control` variant (brand outline, hover by `tone`); the governance
     amendments; PR #2925 reworked in place (drops its `posts-section`
     changes, the `Controls` slot and the `compound.tsx` change).
   - **web** · `feat(web): PostsCarousel 'use client' wrapper and the
-displayMode branch in both teaser views` (#2840) — the wrapper owns
-    `renderItem` (one `PostCardItem` per item), the column widths and
+displayMode branch in both teaser views` (#2840) — the wrapper owns `renderItem` (one `PostCardItem` per item), the column widths,
+    `tone` and
     `carousel.previousAriaLabel` / `carousel.nextAriaLabel`; `CAROUSEL`
     renders it in `PostLatestModuleView` and `PostFeaturedModuleView`; web
     Storybook story.
