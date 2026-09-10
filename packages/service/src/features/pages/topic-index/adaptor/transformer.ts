@@ -22,6 +22,6 @@ export function toTopicIndexPage(
     headingBlock: toHeadingBlock(rawPage.headingBlock),
     hero: toHeroSlot(rawPage.hero),
     modules: (rawPage.modules ?? []).map(toModule),
-    seo: resolveSeo(rawPage.seo ?? undefined, tenant),
+    seo: resolveSeo(rawPage.seo, tenant),
   };
 }

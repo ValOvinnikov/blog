@@ -74,7 +74,7 @@ export function toPostDetail(
     body: toPortableTextBody(raw.body, tenant),
     skim: toPostSkim(raw.skim),
     hasAsides: raw.body.some((block) => block._type === 'aside'),
-    seo: resolveSeo(raw.seo ?? undefined, tenant),
+    seo: resolveSeo(raw.seo, tenant),
     author: toPostDetailAuthor(raw.author, tenant),
     topic: toTopic(raw.topic),
     tags: (raw.tags ?? []).map(toTag),

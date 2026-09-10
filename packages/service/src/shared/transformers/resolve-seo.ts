@@ -28,7 +28,7 @@ export class MissingSeoTitleError extends Error {
 }
 
 export function resolveSeo(
-  authored: TRawSeo | undefined,
+  authored: TRawSeo | null | undefined,
   tenant: TImageTenant,
 ): TSeoResolved {
   if (!authored?.metaTitle) throw new MissingSeoTitleError();

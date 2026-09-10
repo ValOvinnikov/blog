@@ -23,6 +23,6 @@ export function toLandingPage(
     headingBlock: toHeadingBlock(raw.headingBlock),
     hero: toHeroSlot(raw.hero),
     modules: (raw.modules ?? []).map(toModule),
-    seo: resolveSeo(raw.seo ?? undefined, tenant),
+    seo: resolveSeo(raw.seo, tenant),
   };
 }

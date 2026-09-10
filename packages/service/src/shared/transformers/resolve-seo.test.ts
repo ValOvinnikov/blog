@@ -79,6 +79,10 @@ describe(resolveSeo, () => {
     expect(() => resolveSeo(undefined, tenant)).toThrow(MissingSeoTitleError);
   });
 
+  it('throws MissingSeoTitleError when the seo field is null', () => {
+    expect(() => resolveSeo(null, tenant)).toThrow(MissingSeoTitleError);
+  });
+
   it('throws MissingSeoTitleError when the seo object carries a blank metaTitle', () => {
     expect(() =>
       resolveSeo(makeAuthoredSeo({ metaTitle: '' }), tenant),
