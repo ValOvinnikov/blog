@@ -88,9 +88,11 @@ that #1285 already shipped.
 - **CMS page architecture** — every public page is a CMS document with a
   required slot ([`2026-08-20-cms-page-architecture-design.md`](./2026-08-20-cms-page-architecture-design.md)).
   Its two settled patterns shape the portfolio strand below: a per-entity
-  page document owns the route (`page_post` owns `slug` + `publishedAt`; the
-  `post` entity has neither), and a listing is **two module types, one per
-  mode** — a paginated archive in a required slot (`module_postList`) and a
+  page document owns the route (`page_topic`/`page_tag` own `slug`; for
+  posts the page and the entity are one document since 2026-09-08 —
+  `page_post` carries content and route, see
+  the page-composition epic #2943),
+  and a listing is **two module types, one per mode** — a paginated archive in a required slot (`module_postList`) and a
   latest-N teaser in `modules[]` (`module_postLatest`).
 
 ## Purpose of this doc
@@ -102,7 +104,7 @@ Three related but independent strands of "make the page builder build more":
    get proposed and added to the catalogue below over time; this section is
    never "done."
 2. **Contact form / lead capture** — the one module needing a write path.
-3. **Portfolio content type** — `project`/`caseStudy` as a first-class
+3. **Portfolio content type** — `page_project` as a first-class
    document with its own surface.
 
 Each is independent of the others and of the flexibility spine — they inherit
@@ -236,7 +238,7 @@ required one.
 | Page                           | Hero slot                                                                               | Without a hero                      | `modules[]` allow-list                                                                                                                        |
 | ------------------------------ | --------------------------------------------------------------------------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | `page_home`                    | **Required**, `to:` = `HERO_SCHEMA_TYPES`                                               | —                                   | Widens to every `modules[]` module: `content`, `cta`, `newsletter`, `postLatest` (+ later `postFeatured`, carousel, placeable `taxonomyList`) |
-| `page_generic`                 | Optional, same list                                                                     | Breadcrumbs + title header          | Widens from `content` + `cta` to add `postLatest` + `newsletter`                                                                              |
+| `page_landing`                 | Optional, same list                                                                     | Breadcrumbs + title header          | Widens from `content` + `cta` to add `postLatest` + `newsletter`                                                                              |
 | `page_blog`                    | Optional, same list                                                                     | `heading` + `supportingText` header | Unchanged                                                                                                                                     |
 | `page_topic` · `page_tag`      | Optional, same list — one document per term, so a flagship topic can carry its own hero | Term header                         | Unchanged                                                                                                                                     |
 | `page_work` (portfolio strand) | Optional, when that page lands                                                          | Its own header                      | Designed with the work page                                                                                                                   |
@@ -337,12 +339,12 @@ the slot stays two-step — page, then hero by id — as it is now.
 `validateSinglePostLatestWithoutHeading` exists because two
 `module_postLatest` instances on one page both fall back to the same
 "Latest posts" heading — duplicate landmark names. The widened allow-lists
-make that reachable on `page_generic` too, and the next modules
+make that reachable on `page_landing` too, and the next modules
 (`module_postFeatured`, the carousel display mode) carry fallback headings
 of their own. It becomes `validateSingleBlankHeadingPerType(types)`, a helper
 that takes the list of module types with a heading fallback and enforces "at
 most one blank-heading instance per type per page", applied to `page_home`
-and `page_generic` in Phase 0 with `[module_postLatest]`, and extended by
+and `page_landing` in Phase 0 with `[module_postLatest]`, and extended by
 each later module that gains a fallback heading.
 
 ### Migration
@@ -360,7 +362,7 @@ home page onto `module_heroBlog` and deletes the schema.
   lands, and `@blog/config` has no `knip` exemption, so an export with no
   importer fails that gate. It ships with the helper, in `module_heroBlog`.
 - **studio** — `HERO_SCHEMA_TYPES` + its registry test; `page_home.hero`
-  references the list; `page_generic`, `page_blog`, `page_topic` and
+  references the list; `page_landing`, `page_blog`, `page_topic` and
   `page_tag` gain an optional `hero` referencing it; the home and generic
   allow-lists widen; the generalised blank-heading validator. No
   `defineHeroFields()` yet.
@@ -496,7 +498,7 @@ propagates through the page loader.
 
 **Cache tags:** the module's own `modules:heroBlog` and `module:<id>`, plus
 `posts`, `post`, `author` and `topic` for the dereferenced post card, plus
-the secondary action's link targets (`topic`, `page_generic`, `page_blog`).
+the secondary action's link targets (`topic`, `page_landing`, `page_blog`).
 One `isr(...)` call now covers what two did. `REVALIDATE_TAGS` gains
 `module_heroBlog: ['modules:heroBlog']`.
 
@@ -732,7 +734,7 @@ is on; no grid image carries `priority`.
 
 **Goal:** `module_taxonomyList` — today a slot-only module that the Topics
 and Tags index pages hold in their required `taxonomyList` slot — becomes
-placeable in `page_home.modules[]` and `page_generic.modules[]`, so a blog
+placeable in `page_home.modules[]` and `page_landing.modules[]`, so a blog
 home can show topic cards between its latest posts and the newsletter. One
 type, one authored field, no sibling. Design of record for epic #2787,
 settled in #2841.
@@ -786,7 +788,7 @@ module through `getDraftsClient(context)`:
 
 | Page field                                                    | Rule                                                               | Level                                                               |
 | ------------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------- |
-| `page_home.modules[]` · `page_generic.modules[]`              | every referenced `module_taxonomyList` has a `taxonomy`            | Error — "Choose whether the '{title}' module lists topics or tags." |
+| `page_home.modules[]` · `page_landing.modules[]`              | every referenced `module_taxonomyList` has a `taxonomy`            | Error — "Choose whether the '{title}' module lists topics or tags." |
 | `page_topicIndex.taxonomyList` · `page_tagIndex.taxonomyList` | the referenced module's `taxonomy`, if set, equals the page's kind | Error — "This page lists topics; the module is set to tags."        |
 | `module_taxonomyList.limit`                                   | integer, at least 1                                                | Error                                                               |
 
@@ -903,7 +905,7 @@ creating them without a `taxonomy`, which is the correct value for a slot.
 - **config** — `TAXONOMY_SORT`; `module_taxonomyList` out of
   `TSlotModuleType`.
 - **studio** — the three fields; the two page-level rules; `page_home` and
-  `page_generic` allow-lists gain `taxonomyListSchema.name`; schema tests;
+  `page_landing` allow-lists gain `taxonomyListSchema.name`; schema tests;
   `pnpm typegen`, commit generated types.
 - **service** — the merged query with `select()`; `fallbackTaxonomy`
   parameter; transformer applies `sortOrder` then `limit`; tests for
@@ -1071,7 +1073,7 @@ Both are presentation only. DOM order is media, meta, title, footer at
 every width, so the accessible reading order does not change with the
 layout.
 
-**`PostsSection` gains `hasLead?: boolean`.** When set, the first post
+**`PostsSection` gains `hasLead?: boolean`.** _(Superseded 2026-09-08: `PostsSection` retires per the page-composition epic #2943; the arrangement below moves to the featured module component in web, unchanged in shape.)_ When set, the first post
 renders as `isLead` + `isSplit` across the full width, and the rest render
 below in a row of as many columns as there are cards — two cards as
 ordinary cards, a single card as `isSplit` so it too fills its row:
@@ -1101,7 +1103,7 @@ gains `module_postFeatured: ['modules:postFeatured']`.
 
 ### Pages and desk
 
-`page_home`, `page_generic` and `page_blog` allow it — the blog page today
+`page_home`, `page_landing` and `page_blog` allow it — the blog page today
 allows only `cta` and `newsletter` beside its required list, and the
 spotlight is the first listing module that makes sense above or below a
 paginated archive. Each of the three adds `module_postFeatured` to its
@@ -1158,9 +1160,16 @@ choosing a different module. `displayMode` (`GRID` | `CAROUSEL`) is a
 per-instance presentation field on the two teaser modules,
 `module_postLatest` and `module_postFeatured`; the data scope stays what
 the module already is. `module_postList` paginates and never gets it. The
-row is a pure `@blog/ui` scroll-snap track that works before hydration; an
-`apps/web` client leaf hands it to Embla once hydrated. Nothing autoplays.
-Design of record for epic #2785, settled in #2835.
+row is one `@blog/ui` organism that **owns Embla** — the pre-hydration
+scroll-snap track, the hook, the buttons, the disabled flags and the
+scroll-position handoff are all inside it — rendered through a thin
+`'use client'` wrapper in `apps/web`, the `SanityImage` shape. **Neither
+knows what a slide is**: the organism and the wrapper carry nothing
+post-specific, so `module_gallery` and `page_project.gallery` reuse both
+unchanged. Nothing autoplays. Design of record for epic #2785, settled in
+#2835 and re-cut 2026-09-10: Embla moved from a web leaf into the organism,
+and the section was rewritten against the page-composition shape (epic
+#2943: `PostsSection` is gone; listings are composed in web).
 
 Interactive mock of both modes at three widths, the Studio field, every
 runtime state and the layer contracts:
@@ -1204,76 +1213,39 @@ type, defaulted in the query, never faked in the transformer. Nothing else
 in the service changes: the carousel is the same posts in a different
 layout, and `limit` already caps them.
 
-### `@blog/ui` — `Carousel`, and a slot on `PostsSection`
+### `@blog/ui` — `Carousel` owns Embla
 
-**`Carousel` is a new pure organism.** It renders a viewport `<div>` that
-takes a `viewportRef`, a `<ul>` track, and one `<li>` slide per child,
-plus a `Carousel.Controls` slot. It has no hook, no `'use client'` and no
-Embla import — it is the markup Embla needs and the CSS that makes that
-markup a carousel on its own.
+**`Carousel` is a new organism, generic, and the first in `@blog/ui` to
+carry a hook.** It renders a `role="region"` root, a viewport `<div>`
+bound to `useEmblaCarousel`, a `<ul>` track with one `<li>` per child, and
+the two previous/next `IconButton`s centred under the track. A slide is
+whatever the caller passes — a `PostCardItem` today, an `ImageWithCaption`
+when the gallery is built. The organism never maps data to slides and
+never names a content type. `embla-carousel-react@8.6.0` (peer
+`react ^19`, MIT) becomes a `packages/ui` dependency; the v8 API is the one
+this design names (`scrollPrev`/`canScrollPrev`, `reInit`) and the
+`9.0.0-rc` line renames them, so pin the major.
 
-| Prop                                | Effect                                                                                                                                                  |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `children`                          | The slides. Anything that is not a `Carousel.Controls` element becomes an `<li>`                                                                        |
-| `viewportRef?: Ref<HTMLDivElement>` | Forwarded to the viewport element — the node Embla binds to. React 19 ref-as-prop, the `IconButton` precedent                                           |
-| `isEnhanced?: boolean`              | Off: `overflow-x-auto snap-x snap-mandatory scroll-smooth motion-reduce:scroll-auto` and a thin scrollbar. On: `overflow-hidden`, no snap, no scrollbar |
-| `ariaLabel: string`                 | Names the region; with `aria-roledescription="carousel"` on the root                                                                                    |
-| `Carousel.Controls`                 | Two `IconButton`s centred under the track: `previousLabel`, `nextLabel`, `onPrevious`, `onNext`, `isPreviousDisabled`, `isNextDisabled`                 |
+**It has no `'use client'` directive — the boundary is declared by the
+consumer.** `packages/ui` carries no directive anywhere and this organism
+does not add one; it is client-only by virtue of its hook, the way
+`sanity-image`'s `SanityImage` is, and it is rendered through a wrapper
+that says so (Web, below). Rendering it directly from a Server Component
+throws on the hook, which is the correct failure. This is the one
+hook-bearing component in the design system, decided 2026-09-10; the
+`ui-library-practices` Purity section, `ui.md` and `SPEC.md` §4 record the
+exception in the ui PR.
 
-`isEnhanced` is the boundary. Before hydration the viewport is a native
-scroll container: swipe, trackpad and shift-wheel all work, mandatory snap
-keeps a card aligned, and the thin scrollbar is the mouse user's
-affordance. Embla needs `overflow: hidden` on the viewport it drives, so the
-leaf flips the flag once Embla reports `init`, and the two mechanisms never
-run at once.
+| Prop                      | Effect                                                                                                                       |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `children`                | The slides; every child becomes an `<li>`, keyed by its own key where it has one                                             |
+| `ariaLabel: string`       | Names the region; with `aria-roledescription="carousel"` on the root                                                         |
+| `previousLabel: string`   | `aria-label` and `title` of the previous button; icon-only, so this is its whole name                                        |
+| `nextLabel: string`       | Same for next                                                                                                                |
+| `slideSize?`              | `columns` (default): the grid's own columns, the table below. `full`: one slide per view at every width, the gallery's shape |
+| `className`, `dataTestId` | The usual                                                                                                                    |
 
-**Slide widths track the grid's columns**, so a carousel with three posts
-at `md` is pixel-identical to the grid apart from the buttons:
-
-| Width       | Grid      | Slide                       | Why                                                                                                |
-| ----------- | --------- | --------------------------- | -------------------------------------------------------------------------------------------------- |
-| below `sm`  | 1 column  | 85 % of the viewport        | The 15 % peek of the next card is the only cue that the row scrolls while the buttons are disabled |
-| `sm`        | 2 columns | ½ minus half a gap          | Two whole cards; a half-card at this width reads as a layout bug                                   |
-| `md` and up | 3 columns | ⅓ minus two-thirds of a gap | Three whole cards, the grid's own count                                                            |
-
-Gaps reuse the grid's tokens (`gap-3.5 md:gap-5 lg:gap-7`); slides are
-`shrink-0 min-w-0 snap-start`; the track carries
-`touch-action: pan-y pinch-zoom` so vertical page scrolling survives a
-horizontal drag.
-
-**The controls always render.** They sit centred under the track rather than
-in the heading row, so a centred or right-aligned section header keeps
-its shape, and they are never hidden — not before hydration (disabled, because
-they cannot work yet) and not when every post already fits (both disabled).
-Hiding them would shift the layout the moment Embla reports, and a disabled
-button is the honest state of "nothing to scroll". Labels are props; the
-organism hardcodes none.
-
-**Accessibility is the list's, not a slideshow's.** Every card stays in the
-DOM and in the tab order; nothing is `aria-hidden` or `inert` off-screen.
-Tab reaches each card link in DOM order, then the two buttons; the viewport
-follows focus (the browser natively, Embla through its default
-`watchFocus`). Arrow keys are not captured. The root carries
-`aria-roledescription="carousel"` and the `ariaLabel`; slides carry no
-"n of m" labels, because they are not hidden and the count is the list's.
-
-**`PostsSection` gains a `PostsSection.Carousel` compound slot.** The
-section already owns the heading and its accessible fallback, the
-supporting text, the images toggle, the empty state, the tint and wrap
-variants, and — since 1.3 — a single `renderPostCard`. When the slot is
-present the section renders its cards as the track's slides inside a
-`Carousel` instead of its grid, passing the slot's props (`viewportRef`,
-`isEnhanced`) and its `Carousel.Controls` child through. `hasLead` is
-ignored in a carousel: every slide is an ordinary card, because a carousel
-is a row of peers. The slot exists so the web leaf never maps a post to a
-card — that mapping stays in one place.
-
-### Web
-
-**`PostsCarousel` is the `'use client'` leaf**, under
-`apps/web/src/components/shared/`, the `NewsletterForm` shape: it takes
-`PostsSection`'s props, imports `SmartLink` itself for `linkAs`, and renders
-`PostsSection` with the slot. Its whole job is state Embla owns:
+Everything Embla owns is internal state, never a prop:
 
 ```ts
 const [viewportRef, embla] = useEmblaCarousel({
@@ -1286,39 +1258,107 @@ const [viewportRef, embla] = useEmblaCarousel({
 });
 ```
 
-- `align: 'start'` and `slidesToScroll: 1` — one card per step, the first
-  visible card flush left, the same step a drag takes. `containScroll:
+- `align: 'start'` and `slidesToScroll: 1` — one slide per step, the first
+  visible slide flush left, the same step a drag takes. `containScroll:
 'trimSnaps'` (Embla's default, stated because it matters) lands the last
   slide flush right with no empty tail. `dragFree` off and `loop` off; no
   autoplay plugin is installed.
-- `isEnhanced`, `isPreviousDisabled` and `isNextDisabled` are `useState`
-  fed from `init`, `select` and `reInit` via `canScrollPrev()` /
-  `canScrollNext()`. Server render and first client render both have
-  `isEnhanced` false, so there is no hydration mismatch.
-- **On `init` the leaf reads the viewport's native `scrollLeft`, resets it
-  to `0`, and jumps (`scrollTo(index, true)`) to the slide the reader had
+- **`isEnhanced` is internal `useState`**, false on the server render and
+  the first client render (no hydration mismatch), flipped on Embla's
+  `init`. Off, the viewport is a native scroll container —
+  `overflow-x-auto snap-x snap-mandatory scroll-smooth motion-reduce:scroll-auto`
+  with a thin scrollbar: swipe, trackpad and shift-wheel all work, mandatory
+  snap keeps a slide aligned, and the scrollbar is the mouse user's
+  affordance. On, it is `overflow-hidden` with no snap and no scrollbar,
+  because Embla needs to own the overflow it drives. The two mechanisms
+  never run at once.
+- `isPreviousDisabled` and `isNextDisabled` are `useState` fed from `init`,
+  `select` and `reInit` via `canScrollPrev()` / `canScrollNext()`; the
+  buttons call `scrollPrev()` / `scrollNext()`.
+- **On `init` the organism reads the viewport's native `scrollLeft`, resets
+  it to `0`, and jumps (`scrollTo(index, true)`) to the slide the reader had
   already scrolled to.** A reader who swiped before hydration would
   otherwise see the row snap back to the start when Embla takes over the
   viewport — the one genuinely non-obvious step, and the one to test.
 - Reduced motion: the native track uses `motion-reduce:scroll-auto`; Embla
   gets `duration: 0` through its `breakpoints` option, which takes any
   media query. Position changes become instant; nothing else changes.
-- Labels: `carousel.previousAriaLabel` and `carousel.nextAriaLabel`, read
-  with `useTranslations` in the leaf. The buttons are icon-only, so the
-  text is an `aria-label` no sighted reader sees — the accessibility-only
-  bucket of `VOICE_FIXED_KEYS` (`blogPostPage.backToTop.ariaLabel`,
-  `bookmarkButton.saveAriaLabel`), not a tenant-editable `VOICE_FIELDS`
-  entry the way pagination's visible Previous/Next are.
+- Default `watchFocus` stays on, so the viewport follows keyboard focus
+  into an off-screen slide.
 
-`PostListModuleView` gains `displayMode?: TDisplayMode` and branches once:
-`CAROUSEL` renders `PostsCarousel`, anything else the existing
-`PostsSection`. `PostLatestModule` and `PostFeaturedModule` pass it through;
-`PostListModule` (the archive) never does. The leaf is a static import —
-Embla is small enough that a `next/dynamic` split would cost more than it
-saves — and `embla-carousel-react@8.6.0` (peer `react ^19`, MIT) is added
-to `apps/web` only. The v8 API is the one this design names
-(`scrollPrev`/`canScrollPrev`, `reInit`); the `9.0.0-rc` line renames them,
-so pin the major.
+**`slideSize: columns` tracks the grid's columns**, so a carousel with
+three posts at `md` is pixel-identical to the grid apart from the buttons:
+
+| Width       | Grid      | Slide                       | Why                                                                                                |
+| ----------- | --------- | --------------------------- | -------------------------------------------------------------------------------------------------- |
+| below `sm`  | 1 column  | 85 % of the viewport        | The 15 % peek of the next card is the only cue that the row scrolls while the buttons are disabled |
+| `sm`        | 2 columns | ½ minus half a gap          | Two whole cards; a half-card at this width reads as a layout bug                                   |
+| `md` and up | 3 columns | ⅓ minus two-thirds of a gap | Three whole cards, the grid's own count                                                            |
+
+Gaps reuse the grid's tokens (`gap-3.5 md:gap-5 lg:gap-7`); slides are
+`shrink-0 min-w-0 snap-start`; the track carries
+`touch-action: pan-y pinch-zoom` so vertical page scrolling survives a
+horizontal drag. `slideSize: full` is `basis-full` at every width with the
+same gap; it exists so the gallery has a shape to reach for on day one and
+the sizing never has to be forked into a second organism.
+
+**The controls always render.** They sit centred under the track rather than
+in the heading row, so a centred or right-aligned section header keeps
+its shape, and they are never hidden — not before hydration (disabled, because
+they cannot work yet) and not when every slide already fits (both disabled).
+Hiding them would shift the layout the moment Embla reports, and a disabled
+button is the honest state of "nothing to scroll". Labels are props; the
+organism hardcodes none. The previous button reuses `ICONS.CHEVRON_RIGHT`
+rotated, `aria-hidden`, its name coming only from `previousLabel`; a real
+`CHEVRON_LEFT` is #2922.
+
+**Accessibility is the list's, not a slideshow's.** Every slide stays in the
+DOM and in the tab order; nothing is `aria-hidden` or `inert` off-screen.
+Tab reaches each slide's link in DOM order, then the two buttons. Arrow
+keys are not captured. The root carries `aria-roledescription="carousel"`
+and the `ariaLabel`; slides carry no "n of m" labels, because they are not
+hidden and the count is the list's. `ariaLabel` is required, so a nameless
+`role="region"` is a compile error rather than an axe failure.
+
+**Stories and tests.** Storybook renders the real Embla — a row that fits,
+a row that scrolls, each `slideSize`, and one story whose slides are plain
+images so the story itself proves the organism is not a post component.
+Unit tests mock `embla-carousel-react` (the hook returns a ref and a stub
+API) and assert the button wiring, the disabled flags from
+`canScrollPrev`/`canScrollNext`, the `isEnhanced` class swap on `init`, the
+`scrollLeft` handoff, the `slideSize` class swap, and that every child
+becomes a slide with its own key.
+
+### Web
+
+**`Carousel` is the `'use client'` wrapper**, under
+`apps/web/src/components/shared/carousel/`, exactly the `SanityImage`
+shape: `import { Carousel as CarouselBase } from '@blog/ui/organisms/carousel'`,
+the directive, and nothing Embla-shaped of its own. Its two jobs are the
+client boundary — `@blog/ui` is in `transpilePackages`, so the organism's
+hook bundles under this file's directive — and the labels: it reads
+`carousel.previousAriaLabel` and `carousel.nextAriaLabel` with
+`useTranslations` and passes them down, so one place names the buttons for
+every caller. Everything else (`children`, `ariaLabel`, `slideSize`,
+`className`, `dataTestId`) passes through. The buttons are icon-only, so
+the text is an `aria-label` no sighted reader sees — the accessibility-only
+bucket of `VOICE_FIXED_KEYS` (`blogPostPage.backToTop.ariaLabel`,
+`bookmarkButton.saveAriaLabel`), not a tenant-editable `VOICE_FIELDS`
+entry the way pagination's visible Previous/Next are.
+
+**The two module views branch once, and map their own slides.** Listings
+are composed in web since the page-composition work: each module has its
+own view that renders `Section`, its heading and its `PostCardItem`s. `PostLatestModuleView` and
+`PostFeaturedModuleView` gain `displayMode: TDisplayMode` from their view
+models and branch on it: `CAROUSEL` renders the web `Carousel` with one
+`PostCardItem` per item as its children — the same mapping the grid uses,
+in the same file; server-rendered cards passed as children of a client
+component is the ordinary RSC pattern — and anything else renders what the
+view renders today (the `PostGrid` for latest, the lead-plus-tail spotlight
+for featured). A featured carousel is three equal slides: no `isLead`, no
+`isSplit`, because a carousel is a row of peers. `PostListModuleView` (the
+archive) never branches. The wrapper is a static import — Embla is small
+enough that a `next/dynamic` split would cost more than it saves.
 
 ### Pages and desk
 
@@ -1337,16 +1377,19 @@ None — one optional field, defaulted at read time.
 - **service** — the coalesced projection and the view-model field on both
   teasers; transformer tests for an authored value and the read-time
   default.
-- **ui** — `Carousel` with `Controls`; the `PostsSection.Carousel` slot;
-  stories for a row that fits, a row that scrolls, enhanced and not,
-  with and without images, and a carousel spotlight; tests that
-  `isEnhanced` swaps the viewport classes, that controls carry their props,
-  that the slot replaces the grid and ignores `hasLead`; `COMPONENTS.md`.
-- **web** — the dependency, `PostsCarousel`, the `displayMode` branch in
-  the view and both modules, the copy keys; a test with
-  `embla-carousel-react` mocked that asserts the button wiring, the
-  `isEnhanced` flip and the scroll-offset handoff; a web story with real
-  Embla.
+- **ui** — the dependency; `Carousel` with the hook, the internal state,
+  the handoff, the buttons and `slideSize`; the stories and mocked tests
+  above; `COMPONENTS.md`; and the governance amendments — the
+  `ui-library-practices` Purity section, `.claude/agents/ui.md` and
+  `SPEC.md` §4 each gain the one-component exception. PR #2925 already
+  carries the pure organism from the earlier cut; it is reworked in place:
+  drop the `posts-section` changes (those files no longer exist on `main`)
+  and the `Carousel.Controls` slot (the buttons are internal now), add the
+  hook, the state and `slideSize`.
+- **web** — the wrapper, the `displayMode` branch in both views, the copy
+  keys; a wrapper test that the labels reach the organism; a view test per
+  module that `CAROUSEL` renders the wrapper with one slide per item and
+  `GRID` does not; a web story with real Embla inside a module view.
 
 Four PRs, each green on `main` alone:
 
@@ -1355,12 +1398,10 @@ Four PRs, each green on `main` alone:
    schema uses it, and knip fails on the bare export (the taxonomy-list
    precedent).
 3. **service** — a field nothing reads yet is a type member, not an export.
-4. **web** — the dependency and the leaf; the only PR whose dependency
-   review matters.
+4. **web** — the wrapper and the branches.
 
-The `module_postFeatured` half of the studio, service and web work waits
-on that module existing on `main` (epic #2784's studio → service → web
-PR); the ui PR and the `module_postLatest` half do not.
+`module_postFeatured` is on `main` (epic #2784 shipped), so both teasers
+are in scope of every PR above; nothing waits on it.
 
 **Acceptance:** grid remains the default for every existing document;
 carousel mode swipes without JavaScript and is Embla-driven with it; the
@@ -1368,18 +1409,215 @@ row keeps its position across hydration; no autoplay; both buttons are
 keyboard reachable, labelled, and disabled exactly when Embla cannot move;
 reduced motion makes every position change instant; a spotlight in
 carousel mode renders three equal slides; a `module_postLatest` carousel
-with fewer than four posts warns in the Studio.
+with fewer than four posts warns in the Studio; **the organism carries no
+`'use client'` and nothing post-specific** — the web wrapper is the only
+boundary, and a story renders the organism with plain image slides.
 
 ### Not in scope
 
 - Dot navigation or a position readout. Two buttons and the peek are the
-  whole affordance; dots are a slideshow idiom for a row of cards.
-- Grouped stepping (`slidesToScroll: 'auto'`). One card per step matches
-  the drag and is predictable; a paging step can be added if a tenant asks.
+  whole affordance for a row of cards. If the gallery wants them, they are
+  props on this organism — never a second carousel.
+- Grouped stepping (`slidesToScroll: 'auto'`) and `loop`. One card per
+  step matches the drag and is predictable; both are options a later
+  caller can ask the organism to expose.
+- A lightbox. `module_gallery`'s lightbox is that module's design; the
+  carousel is at most the strip inside it.
 - An edge-to-edge bleed. The row stays in the content column like the
   grid; a bleed is a `Section` layout decision, not a carousel one.
 - `displayMode` on `module_taxonomyList`, `module_postList` or the
   portfolio modules.
+
+## Topic cards list their latest posts
+
+**Goal:** every card in `module_taxonomyList` shows its term's two newest
+post titles, linked, under the description — so a topic block on a home
+page is a contents page rather than a second row of pictureless post
+cards, and the Topics and Tags pages, which are contents pages too, get the
+same treatment. One editor toggle on the module, on by default; one slot on
+the card; two extra titles per term inside the query that already runs.
+Design of record for epic #2891, settled in #2892.
+
+Interactive mock of the list on the home and Topics pages, both kinds,
+the Studio toggle, the card anatomy and every state:
+<https://claude.ai/code/artifact/7704e96d-ce14-479e-affd-d3d305e9b3e8>.
+
+### Fields
+
+One field, added to `module_taxonomyList` right after `limit`:
+
+| Field             | Type                                   | Notes                                                                                                                                   |
+| ----------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `showLatestPosts` | boolean, `initialValue: true`, no rule | "Lists each term's two newest posts under its description, as links. A term with no posts shows only its title, description and count." |
+
+**A toggle, on by default, defaulted at read time.** The epic's leaning
+holds: the contents look is what every placement wants — the three seeded
+index-page modules included — so it must apply to documents that predate
+the field, which `initialValue` alone never does. The projection reads
+`coalesce(showLatestPosts, true)`, the `showImages` pattern, and no
+migration runs. The toggle exists for the editor who wants a plain menu
+row (a landing page whose topics are navigation, not reading), and it
+costs one boolean. Always-on was the alternative and would have saved the
+studio layer; it was rejected because the placement was designed to sit
+anywhere in `modules[]`, and not every placement is a contents page.
+
+**Two posts, fixed, newest first.** Not authored: a third line makes the
+card taller than the post cards beside it on a home page, and the count
+already says how much more there is. Order is `publishedAt desc` under the
+published-post filter, so a scheduled post is excluded until its date, the
+way the count already excludes it. Nothing hides a term with no posts —
+its card renders exactly as today.
+
+### Validation
+
+None new. The field is optional and has no interaction with `taxonomy`,
+`sortOrder` or `limit`.
+
+### Service
+
+The two posts join each term inside the existing merged query — no second
+call — and the view model carries the flag:
+
+```groq
+*[_type == "module_taxonomyList" && _id == $id][0]{
+  …,
+  "showLatestPosts": coalesce(showLatestPosts, true),
+  "entries": select(
+    coalesce(taxonomy, $fallbackTaxonomy) == "TOPICS" => *[_type == "blog_topic"] | order(title asc){
+      topicFragment,
+      postCount,
+      "latestPosts": *[_type == "blog_post" && references(^._id) && publishedAt <= now()]
+        | order(publishedAt desc)[0...2]{ postLinkFragment }
+    },
+    coalesce(taxonomy, $fallbackTaxonomy) == "TAGS" => *[_type == "blog_tag"] | order(title asc){ tagFragment, postCount, "latestPosts": … }
+  )
+}
+```
+
+- **The module query stops importing the entity queries.** `topicsQuery`
+  feeds `topics.v1`, which `apps/web` already reads elsewhere (the topic
+  and blog-list pages), and `tagsQuery` is kept parallel to it; adding
+  `latestPosts` to them would widen a view model for two links only this
+  module wants. The module query builds
+  its own two term projections instead, and the `postCount` expression the
+  three queries would now share (`count(*[_type == "blog_post" &&
+references(^._id) && publishedAt <= now()])`) moves into one shared
+  helper so it is written once.
+- **`postLinkFragment`** is new in `shared/fragments/` — `id`, `title`,
+  `slug` — the lightest thing a post link needs. `postCardFragment` carries
+  excerpt, image, author and reading-time fields the card would throw
+  away.
+- **The service always projects the posts and exposes the flag**, as it
+  does for `showImages`: two titles per term is not a cost worth a
+  conditional projection, and the web layer branches in one place.
+- **Cache tags** are unchanged: the loader already carries `posts`
+  alongside `topics` / `tags`, because the counts depended on posts before
+  the titles did.
+
+```ts
+type TPostLink = { id: string; title: string; slug: string };
+
+type TTaxonomyEntry = TTopicWithPostCount | TTagWithPostCount; // each gains latestPosts: TPostLink[]
+
+type TTaxonomyListModule = {
+  …existing fields;
+  showLatestPosts: boolean;
+  entries: TTaxonomyEntry[];
+};
+```
+
+### `@blog/ui` — a slot on `TaxonomyCard`
+
+**`TaxonomyCard` gains a `TaxonomyCard.Posts` compound slot** — its first,
+resolved with `mapCompoundSlots` the way `PostCard`'s are. The card's own
+`linkAs` applies to the slot's links, so the web layer passes it once.
+
+| Prop                                                   | Effect                                                                                                                                          |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `posts: { id: string; title: string; href: string }[]` | Rendered as a `<ul>` between the description and the count, one link per post, each title on one truncated line. An empty array renders nothing |
+| `ariaLabel: string`                                    | Names the list ("Latest in Design"); a prop, never hardcoded                                                                                    |
+
+**The post links must stay clickable over the card's stretched link.** The
+title link's `before:absolute before:inset-0` pseudo-element covers the
+card; the post links are `relative` and come later in the DOM, so they
+paint above it. That is the one rule the slot's test asserts beyond
+rendering: a click on a post link reaches the post, not the term.
+
+**The count stays the last line.** With the list slotted between
+description and count, a card with no posts is pixel-identical to today's,
+and the list adds height only where there is something to read. The
+heading level, the accessible name (`title, N posts`), the hover tint and
+the focus-within tint are unchanged; the post links take their own
+`focus-visible` ring. No lead or double cell: the most-posts sort already
+ranks, and a bigger cell would say the same thing twice.
+
+### Web
+
+`TaxonomyListModule` reads `showLatestPosts` off the view model and maps
+each entry's `latestPosts` to `{ id, title, href: routes.post(slug) }`, the
+href the post cards use. `ITaxonomyListModuleItem` gains `posts` and
+`latestPostsLabel`; the view renders the slot when the flag is on and the
+array is non-empty, and omits it otherwise. The index pages change by
+construction — `TopicsPage` and `TagsPage` render this same module through
+their slot, and their seeded modules carry no `showLatestPosts`, which
+coalesces to on.
+
+Copy: `latestPostsLabel` = "Latest in {name}" under both
+`taxonomyListModule.topics` and `taxonomyListModule.tags`, the way
+`postsCount` already is, because the module reads a namespace-scoped `t()`;
+both are fixed keys, read only as the list's `aria-label` — the
+accessibility-only bucket of `VOICE_FIXED_KEYS`, not tenant-editable
+fields. Nothing on the
+card itself needs new words.
+
+### Pages and desk
+
+None. The module's allow-lists, desk entry and page-level rules are as
+1.5 left them.
+
+### Migration
+
+None — one optional boolean, defaulted at read time; the three seed
+migrations keep creating index-page modules without it.
+
+### Per-layer scope and PRs
+
+- **studio** — `showLatestPosts` on `module_taxonomyList` after `limit`;
+  schema test for its presence, position and initial value; `pnpm typegen`.
+- **service** — the shared `postCount` helper; `postLinkFragment`; the
+  module's own term projections with `latestPosts`; `showLatestPosts` in
+  the view model; transformer tests for two, one and zero posts, the
+  newest-first order, and the read-time default of the flag.
+- **ui** — `TaxonomyCard.Posts`; stories for two posts, one post, none and
+  a grid; tests that the slot renders the list with its label, that an
+  empty array renders nothing, and that a post link is clickable above the
+  card link; `COMPONENTS.md`.
+- **web** — the mapping and the `posts` / `latestPostsLabel` item fields,
+  the flag branch in the view, the copy key; tests for on, off and empty;
+  the module story gains posts.
+
+Four PRs, each green on `main` alone: **studio** (one optional field and
+typegen), then **service** (a raw coalesce and a new fragment; the entity
+loaders keep their shape), **ui** independently (additive slot), and
+**web** last.
+
+**Acceptance:** a topic card on the home, landing and Topics pages lists
+its two newest published posts as links, newest first; a tag card does
+the same on the Tags page; a term with no posts shows title, description
+and count only; a scheduled post is not listed; the toggle off renders
+today's card; a post link reaches the post; every existing module renders
+the lists without a migration.
+
+### Not in scope
+
+- Tags as a cloud of pills (option C in the 1.5 mock) — still a different
+  molecule, still unasked for.
+- More than two posts, or an authored count. Two is the design; the count
+  and the term's own page carry the rest.
+- Post dates or excerpts on the card. Titles are the contents page; the
+  term page is where the posts are read about.
+- Hiding zero-post terms. They sort last under most-posts and fall off
+  under `limit`; on the index pages they stay, as they do today.
 
 ## Contact form / lead capture
 
@@ -1432,26 +1670,27 @@ notification; managing them is a later concern (mirrors the newsletter
 **Goal:** turn "a blog" into "a portfolio site that also blogs" by mirroring
 the proven `post` pattern rather than bolting portfolio onto posts.
 
-**Content model.** A new `project` (or `caseStudy`) entity document: title,
-client, role, stack (tags), year, `outcomeMetrics` (repeatable label+value),
-`heroImage`, `gallery`, `body` (richText), `featured`. Reuses the existing
-`topic` / `tag` taxonomy and `imageWithAlt`. It carries **no `slug` and no
-`publishedAt`** — those belong to its page document, below, exactly as
-`post` no longer carries them since `page_post`.
+**Content model.** A project is its own page, the shape `page_post` took on
+2026-09-08 (one document for content and route; no entity-plus-wrapper
+pair): `page_project` carries title, client, role, stack (tags), year,
+`outcomeMetrics` (repeatable label+value), `heroImage`, `gallery`, `body`
+(richText), `featured`, plus `slug`, `publishedAt`, `seo` and `modules[]`.
+Reuses the existing `topic` / `tag` taxonomy and `imageWithAlt`.
 
 **Page documents.** The page-architecture programme settled what the
 original design left open ("whether `/work/{slug}` is a page document or a
 plain entity route"): every public page is a CMS document.
 
-| Document       | Kind       | Required slot | Also                         | Route                   |
-| -------------- | ---------- | ------------- | ---------------------------- | ----------------------- |
-| `page_work`    | singleton  | `projectList` | `modules[]`, `seo`           | `/work`, `/work/page/N` |
-| `page_project` | per-entity | `project` ref | `slug`, `publishedAt`, `seo` | `/work/{slug}`          |
+| Document       | Kind       | Required slot | Also                                                      | Route                   |
+| -------------- | ---------- | ------------- | --------------------------------------------------------- | ----------------------- |
+| `page_work`    | singleton  | `projectList` | `modules[]`, `seo`                                        | `/work`, `/work/page/N` |
+| `page_project` | per-entity | —             | content fields, `slug`, `publishedAt`, `seo`, `modules[]` | `/work/{slug}`          |
 
-`page_project` mirrors `page_post` field-for-field: it owns `slug` (with the
-shared slug-URL preview input, prefix `/work/`) and `publishedAt`, and is
-one-to-one with its `project` via the same uniqueness validation. `page_work`
-mirrors `page_blog`: its `projectList` slot holds a `module_projectList`
+`page_project` mirrors `page_post` field-for-field: the content lives on the
+page document, which owns `slug` (with the shared slug-URL preview input,
+prefix `/work/`) and `publishedAt`; there is no separate `project` entity to
+reference. `page_work` mirrors `page_postIndex` (`page_blog` until its rename
+lands): its `projectList` slot holds a `module_projectList`
 (`pageSize`; the route supplies the page number).
 
 **Surfaces.** Routes under `app/[tenant]/[locale]/`: `/work` (+
@@ -1473,8 +1712,7 @@ Content
 ├─ Blog           Blog Page, Topics, Tags, Posts, Authors, Settings
 ├─ Work           ← this section
 │  ├─ Work Page       the /work index (page_work)
-│  ├─ Project Pages   page_project documents
-│  └─ Projects        the project / caseStudy entities
+│  └─ Projects        page_project documents (the project is its page)
 ├─ Modules
 └─ Settings
 ```
@@ -1494,7 +1732,7 @@ are additive. Existing posts are untouched.
 
 ```
 config  →  RESERVED_SLUGS + a CAPABILITY key; no module-type const — a module's _type derives from its studio schema via typegen
-studio  →  module_* schemas (shared styling helpers) + project entity + page_work / page_project
+studio  →  module_* schemas (shared styling helpers) + page_work / page_project (the project is its page)
 service →  service.modules.<type>.v1   service.pages.work.*
 db      →  leads table (tenantId) + settings_features column
 email   →  lead-notification template via sendEmail
@@ -1511,10 +1749,11 @@ point; the graph stays acyclic.
   shipped as shared helpers/an injector, so no per-module styling work is
   needed beyond choosing which tokens a module's own content (not its
   section chrome) uses.
-- **Portfolio mirrors `post` as a new `project` entity + `page_project` /
-  `page_work` pages + `/work` surface,** not a variant of `post` (carried
+- **Portfolio mirrors `post` as its own `page_project` document + a
+  `page_work` index + `/work` surface,** not a variant of `post` (carried
   from the original Feature 5 decision D7; page documents added 2026-09-06
-  per the page-architecture programme).
+  per the page-architecture programme; the separate `project` entity
+  dropped 2026-09-08 when the post became its page, see below).
 - **Project listing is two modules, one per mode** — `module_projectList`
   (slot, paginated) and `module_projectLatest` (`modules[]`, teaser) —
   replacing the single `module_projectGrid` (2026-09-06).
@@ -1566,17 +1805,20 @@ point; the graph stays acyclic.
   sidebar drift from the schemas it lists. Recorded in
   `.claude/agents/studio.md` "Naming & file layout", which is the durable
   home — this doc is deleted on completion (2026-09-08).
-- **`page_generic` is renamed to `page_landing`** — the `_type` catches up
-  with the `Landing Page` title #1907 already shipped, so the stored name and
-  every human-facing label finally agree. Unlike #1907's display-only rename
-  this **is** a content migration (`_type` is immutable: new id → repoint
-  `page_home`/`page_blog`/`page_topic` link references → delete the old in a
-  separate migration) and it reaches `studio`, `service` (queries, link
-  fragments, transformers), `apps/web` (generic-page route, metadata,
-  revalidate tags) and regenerated types — so it ships as an epic with
-  per-layer sub-issues, not a single change. The `genericSchema` export and
-  its file move to `landingSchema` / `documents/pages/landing/` in the same
-  studio change (2026-09-08).
+- **`page_generic` is renamed to `page_landing`, with no migration** — the
+  `_type` catches up with the `Landing Page` title #1907 already shipped, so
+  the stored name and every human-facing label finally agree. `_type`
+  immutability only bites when documents exist, and this one had none:
+  production, development and a freshly provisioned tenant all report zero
+  (`provision-tenant` seeds `page_home` and no other page document). So it is
+  a pure code rename reaching `studio`, the regenerated types, `service`,
+  `config` (`routes.genericPage` → `routes.landingPage`) and `apps/web` — and
+  because a `_type` rename reds `type-check` in every layer above it until all
+  of them land, it ships as **one PR**, not the expand/contract sequence an
+  earlier revision of this entry described. The schema moves to
+  `documents/pages/landing/` exporting `landingSchema`, and `service` and
+  `apps/web` rename their own `generic` directories and symbols to match
+  (2026-09-08, #2904).
 
 - **Grid vs. carousel is one `displayMode` field on the two teaser modules,
   and the carousel is a pure scroll-snap track that Embla takes over after
@@ -1589,6 +1831,45 @@ point; the graph stays acyclic.
   reader's pre-hydration scroll position across; the buttons always render
   and are disabled exactly when Embla cannot move; a spotlight in carousel
   mode drops its lead treatment; four PRs, ui first (2026-09-08, #2835).
+  _Superseded 2026-09-10: Embla moved into the organism and the slot is
+  gone — see the 2026-09-10 entry below._
+
+- **Pages are chrome, a heading and modules; every part fetches what it
+  alone needs; `PostsSection` and the `*-page-view.tsx` layer retire** —
+  recorded in
+  the page-composition epic #2943,
+  which supersedes the `PostsSection.Carousel` slot in the carousel section
+  and `hasLead` on `PostsSection` in the spotlight section, and adds
+  `page_post.modules[]` with a `module_postRelated` (2026-09-08).
+- **The post is its page** — `page_post` keeps its name and absorbs every
+  `blog_post` field; `blog_post` and the wrapper's `post` reference retire.
+  A Sanity `_type` is immutable, so every post moves to the `page_post-`
+  prefixed id the seed migration already assigned: copy-and-repoint
+  migration, a Drizzle rewrite of `bookmarks.post_id`, then a delete
+  migration. The same shape applies to `page_project` above (2026-09-08,
+  epic #2943).
+- **`page_blog` renames to `page_postIndex`** so the page family reads
+  `page_post`/`page_postIndex`, `page_topic`/`page_topicIndex`,
+  `page_tag`/`page_tagIndex`. Live documents and references exist, so it is
+  the expand → repoint → contract recipe with two migrations, unlike #2904.
+  Tracked in #2961 (2026-09-08).
+- **The carousel organism owns Embla, and `@blog/ui` gains its one
+  hook-bearing component** — `Carousel` carries `useEmblaCarousel`, the
+  buttons, the disabled flags and the scroll-position handoff, with no
+  `'use client'` of its own; a thin `apps/web` wrapper (the `SanityImage`
+  shape) declares the boundary and supplies the labels. Both are generic
+  — a slide is any child, `slideSize` is `columns` or `full` — so the
+  gallery reuses them. Replaces the pure-organism-plus-web-leaf split of
+  2026-09-08, and rewrites the Web section against the per-module views
+  (`PostsSection` is gone) (2026-09-10, #2785).
+- **Topic cards list their two newest posts, behind a `showLatestPosts`
+  toggle that is on by default and defaulted at read time** — the titles
+  join each term inside the merged taxonomy-list query through a new
+  `postLinkFragment`, the module query stops sharing the entity queries so
+  `topics.v1` / `tags.v1` keep their shape, `TaxonomyCard` gains a
+  `TaxonomyCard.Posts` slot whose links sit above the card's stretched link,
+  the count stays the card's last line, the index pages get the lists by
+  construction, and it ships as four per-layer PRs (2026-09-08, #2892).
 
 ## Non-goals (recorded so #1919 doesn't sprawl)
 
@@ -1609,13 +1890,18 @@ point; the graph stays acyclic.
 ui → web`); the featured spotlight (#2784) and carousel (#2785) wait on it.
 - **Featured spotlight** — epic #2784 (design #2828, then config in its own
   PR, ui in its own PR, and `studio → service → web` as one PR).
+- **Page composition** — epic #2943, which carries its own design of record
+  in its body (post page first, `PostGrid` columns alongside, then listing modules,
+  then `PostsSection` retirement,
+  then the related-posts module, then one sub-issue per page); the
+  carousel's ui and web sub-issues rebase on it.
 - **Carousel display mode** — epic #2785 (design #2835, then ui in its own
   PR, config + studio as one PR, service in its own PR, web in its own PR);
   the `module_postFeatured` half waits on #2784.
 - **Placeable taxonomy list** — epic #2787 (design #2841, then `config →
 studio → service → web` in a single PR; no ui work).
 - **Topic cards list their latest posts** — epic #2891 (design #2892, then
-  `service → ui → web`, studio only if a toggle is settled); waits on #2787.
+  `studio → service → ui → web`, one PR per layer, ui independent).
 - **`module_heroBlog`** — epic #2780 (design #2802, then `studio → service →
 ui → web → db`), plus the retirement chore #2813 once production is moved.
 - **Hero family & generic home page** — epic #2778 under `M9 — Portfolio`
@@ -1638,6 +1924,22 @@ catalogue has enough shipped history to matter).
 
 ## Resync log
 
+- **2026-09-10** — re-cut "The carousel display mode" (#2785): Embla
+  moves from a web leaf into the `@blog/ui` organism (hook, buttons,
+  flags, handoff internal; `Carousel.Controls`, `viewportRef` and
+  `isEnhanced` are no longer props), `slideSize` added for the gallery,
+  the web side becomes a `'use client'` wrapper plus a branch in
+  `PostLatestModuleView`/`PostFeaturedModuleView`, and every
+  `PostsSection` reference in the section is gone.
+- **2026-09-08** — page composition: marked the carousel section's
+  `PostsSection.Carousel` slot and the spotlight section's `hasLead` on
+  `PostsSection` as superseded by the new page-composition design doc, and
+  added its decision-log and ticketing entries.
+- **2026-09-08** — added the "Topic cards list their latest posts" design
+  section (#2892): the `showLatestPosts` toggle defaulted at read time, two
+  fixed newest-first posts per term inside the merged query via a new
+  `postLinkFragment`, the `TaxonomyCard.Posts` slot, the index pages by
+  construction, and the four-PR split.
 - **2026-09-08** — added "The carousel display mode" design section (#2835):
   one `displayMode` field defaulted at read time, the pure `Carousel`
   organism with an `isEnhanced` boundary, the `PostsSection.Carousel` slot,

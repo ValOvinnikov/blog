@@ -7,6 +7,7 @@ import {
   HERO_IMAGE_SOURCE,
   HERO_VARIANT,
   LINK_TYPE,
+  NEWSLETTER_VARIANT,
   POST_SOURCE,
   TAXONOMY_KIND,
   TAXONOMY_SORT,
@@ -24,7 +25,12 @@ import type { TRawNewsletterModule } from '@blog/service/features/modules/newsle
 import type { TRawPostFeaturedModule } from '@blog/service/features/modules/post-featured/adaptor/transformer';
 import type { TRawPostLatestModule } from '@blog/service/features/modules/post-latest/adaptor/transformer';
 import type { TRawPostListModule } from '@blog/service/features/modules/post-list/adaptor/transformer';
+import type { TRawPostRelatedModule } from '@blog/service/features/modules/post-related/adaptor/transformer';
 import type { TRawTaxonomyListModule } from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
+import {
+  makeRawHeadingBlock,
+  makeRawOptionalHeadingBlock,
+} from '@blog/service/testing/shared/fixtures';
 
 export function makeRawHeroModule(
   overrides: Partial<TRawHeroModule> = {},
@@ -77,7 +83,7 @@ export function makeRawPostListModule(
 ): TRawPostListModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: { heading: 'Latest', supportingText: null },
+    headingBlock: makeRawOptionalHeadingBlock({ heading: 'Latest' }),
     pageSize: 6,
     layout: null,
     contentAlignment: null,
@@ -91,7 +97,7 @@ export function makeRawPostLatestModule(
 ): TRawPostLatestModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: { heading: 'Latest', supportingText: null },
+    headingBlock: makeRawOptionalHeadingBlock({ heading: 'Latest' }),
     limit: 6,
     layout: null,
     contentAlignment: null,
@@ -105,10 +111,24 @@ export function makeRawPostFeaturedModule(
 ): TRawPostFeaturedModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: { heading: 'Featured', supportingText: null },
+    headingBlock: makeRawOptionalHeadingBlock({ heading: 'Featured' }),
     postSource: POST_SOURCE.PINNED,
     posts: [],
     limit: null,
+    layout: null,
+    contentAlignment: null,
+    showImages: true,
+    ...overrides,
+  };
+}
+
+export function makeRawPostRelatedModule(
+  overrides: Partial<TRawPostRelatedModule> = {},
+): TRawPostRelatedModule {
+  return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
+    headingBlock: makeRawOptionalHeadingBlock({ heading: 'Related reading' }),
+    limit: 3,
     layout: null,
     contentAlignment: null,
     showImages: true,
@@ -139,10 +159,9 @@ export function makeRawCtaModule(
     brandVariant: BRAND_VARIANT.PRIMARY,
     bandTone: BRAND_VARIANT.PRIMARY,
     eyebrow: null,
-    sectionHeader: {
-      heading: 'Subscribe to the newsletter',
+    headingBlock: makeRawHeadingBlock('Subscribe to the newsletter', {
       supportingText: 'Get new posts in your inbox.',
-    },
+    }),
     content: null,
     image: null,
     contentPositionSplit: null,
@@ -210,7 +229,7 @@ export function makeRawTaxonomyListModule(
 ): TRawTaxonomyListModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: { heading: 'Topics', supportingText: null },
+    headingBlock: makeRawOptionalHeadingBlock({ heading: 'Topics' }),
     layout: null,
     contentAlignment: null,
     taxonomy: TAXONOMY_KIND.TOPICS,
@@ -226,10 +245,10 @@ export function makeRawNewsletterModule(
 ): TRawNewsletterModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: {
-      heading: 'Stay in the loop',
+    headingBlock: makeRawHeadingBlock('Stay in the loop', {
       supportingText: 'Get new posts in your inbox.',
-    },
+    }),
+    variant: NEWSLETTER_VARIANT.FULL,
     layout: null,
     contentAlignment: null,
     ...overrides,

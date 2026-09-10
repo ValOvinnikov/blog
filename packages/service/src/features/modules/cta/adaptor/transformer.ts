@@ -7,10 +7,10 @@ import {
 } from '@blog/config';
 import type { TImageTenant } from '@blog/service/sanity/image';
 import { toCtaAction } from '@blog/service/shared/transformers/to-cta-action';
+import { toRequiredHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import { toInternalHref } from '@blog/service/shared/transformers/to-link';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
-import { toRequiredSectionHeader } from '@blog/service/shared/transformers/to-section-header';
 import type { InferResultType } from 'groqd';
 
 import type { ctaModuleQuery } from './query';
@@ -93,7 +93,7 @@ export function toCtaModule(
     brandVariant: raw.brandVariant,
     bandTone: raw.bandTone,
     eyebrow: raw.eyebrow ?? undefined,
-    sectionHeader: toRequiredSectionHeader(raw.sectionHeader),
+    headingBlock: toRequiredHeadingBlock(raw.headingBlock),
     content: toContent(raw.content),
     image: toSanityImage(raw.image, tenant),
     contentPosition: toContentPosition(raw),

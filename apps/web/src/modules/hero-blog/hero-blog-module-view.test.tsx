@@ -27,7 +27,7 @@ const setup = customRender(HeroBlogModuleView, {
   layout: undefined,
 });
 
-describe(HeroBlogModuleView, () => {
+describe(`<${HeroBlogModuleView.name}/>`, () => {
   it('renders the resolved heading as the top-level heading, labelling the Section via a unique id derived from the module id', () => {
     setup();
 

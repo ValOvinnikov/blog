@@ -1,4 +1,5 @@
 import { q } from '@blog/service/sanity/query';
+import { requiredHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 
 /**
  * Deliberately leaner than `postCardFragment`/`archivePostCardFragment` — an
@@ -6,10 +7,12 @@ import { q } from '@blog/service/sanity/query';
  * fragment skips `author`, every image, `topic`, and `wordCount` entirely.
  */
 export const feedPostFragment = q
-  .fragmentForType<'blog_post'>()
+  .fragmentForType<'page_post'>()
   .project((sub) => ({
-    title: sub.field('title').notNull(),
+    headingBlock: sub
+      .field('headingBlock')
+      .project(requiredHeadingBlockFragment)
+      .notNull(),
     slug: sub.field('slug.current').notNull(),
-    excerpt: sub.field('excerpt').notNull(),
     publishedAt: sub.field('publishedAt').notNull(),
   }));

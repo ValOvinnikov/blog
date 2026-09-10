@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
 import { toPostListItems } from './to-post-list-items';
 
 describe('toPostListItems', () => {
-  it('maps a post card into the href/formattedDate shape PostsSection expects', async () => {
+  it('maps a post card into the href/formattedDate shape PostCardItem expects', async () => {
     const topic = makePostCardTopic({ title: 'Engineering' });
     const post = makePostCard({
       id: 'post-1',
@@ -73,6 +73,14 @@ describe('toPostListItems', () => {
 
   it('maps an empty list to an empty list', async () => {
     expect(await toPostListItems([])).toEqual([]);
+  });
+
+  it('maps a post card with no excerpt, without throwing', async () => {
+    const post = makePostCard({ excerpt: undefined });
+
+    const [item] = await toPostListItems([post]);
+
+    expect(item?.excerpt).toBeUndefined();
   });
 
   it('sets image from renderImage when given', async () => {

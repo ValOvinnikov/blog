@@ -2,12 +2,13 @@ import type { TModule } from '@blog/service';
 import { logger } from '@web/utils/logger/logger';
 import { Fragment, type ReactNode } from 'react';
 
-import { MODULE_MAP } from './module-map';
+import { MODULE_MAP, type TModuleComponentProps } from './module-map';
 
 export interface IModuleRendererProps {
   modules: TModule[];
   locale: string;
   tenant: string;
+  context?: TModuleComponentProps['context'];
 }
 
 /**
@@ -17,14 +18,15 @@ export interface IModuleRendererProps {
  * by a CMS uniqueness rule). Unknown module types render nothing and log a
  * warning rather than failing the whole page. `MODULE_MAP` deliberately
  * excludes every `TSlotModuleType` from its key type (see `module-map.ts`),
- * so the lookup below casts to `keyof typeof MODULE_MAP` — if one of those
- * types somehow reached here (schema-prevented in practice), it would still
- * hit the "unknown module type" fallback rather than type-error.
+ * so the lookup below casts to `keyof typeof MODULE_MAP` — a hero module
+ * reaching here (it renders through its own page's dedicated slot instead)
+ * would still hit the "unknown module type" fallback rather than type-error.
  */
 export const ModuleRenderer = async ({
   modules,
   locale,
   tenant,
+  context,
 }: IModuleRendererProps): Promise<ReactNode> => {
   const rendered = await Promise.all(
     modules.map(async (module) => {
@@ -39,7 +41,7 @@ export const ModuleRenderer = async ({
 
       return {
         key: module.id,
-        node: await Component({ id: module.id, locale, tenant }),
+        node: await Component({ id: module.id, locale, tenant, context }),
       };
     }),
   );

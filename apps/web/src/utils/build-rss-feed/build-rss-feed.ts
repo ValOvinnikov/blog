@@ -9,19 +9,21 @@ export type TRssChannel = {
 export type TRssItem = {
   title: string;
   link: string;
-  description: string;
+  description?: string;
   /** ISO 8601 — converted to RFC-822 (`pubDate`'s required format) internally. */
   publishedAt: string;
 };
 
 const toRssItemXml = (item: TRssItem): string => {
   const pubDate = new Date(item.publishedAt).toUTCString();
+  const descriptionLine = item.description
+    ? `\n      <description>${escapeXml(item.description)}</description>`
+    : '';
 
   return `    <item>
       <title>${escapeXml(item.title)}</title>
       <link>${escapeXml(item.link)}</link>
-      <guid>${escapeXml(item.link)}</guid>
-      <description>${escapeXml(item.description)}</description>
+      <guid>${escapeXml(item.link)}</guid>${descriptionLine}
       <pubDate>${pubDate}</pubDate>
     </item>`;
 };

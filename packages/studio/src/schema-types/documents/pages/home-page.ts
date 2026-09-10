@@ -1,8 +1,10 @@
 import { defineModulesField } from '@blog/studio/schema-types/helpers/define-modules-field';
+import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
+import { heroField } from '@blog/studio/schema-types/helpers/hero-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
+import { validateHeroOrHeading } from '@blog/studio/schema-types/helpers/validate-hero-or-heading';
 import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/helpers/validate-single-blank-heading-per-type';
 import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/helpers/validate-taxonomy-list-has-taxonomy';
-import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { contentSchema } from '@blog/studio/schema-types/modules/module-content';
 import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
@@ -18,6 +20,7 @@ export const homePageSchema = defineType({
   title: 'Home Page',
   type: 'document',
   icon: House,
+  validation: validateHeroOrHeading(),
   preview: {
     select: {
       title: 'title',
@@ -31,14 +34,11 @@ export const homePageSchema = defineType({
   },
   fields: [
     titleField(),
-    defineField({
-      name: 'hero',
-      title: 'Hero',
-      type: 'reference',
-      description: 'The hero module rendered at the top of the home page.',
-      to: HERO_SCHEMA_TYPES.map((schema) => ({ type: schema.name })),
-      validation: (rule) => rule.required(),
+    headingBlockField({
+      description:
+        'The page heading (h1) and its optional supporting line. Not shown when a hero is set.',
     }),
+    heroField(),
     defineModulesField({
       allow: [
         contentSchema.name,

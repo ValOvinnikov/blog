@@ -1,19 +1,12 @@
 import { DepthProvider } from '@web/context/depth-provider';
 import { renderElement, screen, within } from '@web/testing/custom-render';
 
-import { DepthToggle, type IDepthToggleLabels } from './depth-toggle';
-
-const labels: IDepthToggleLabels = {
-  skim: '30s',
-  read: 'Read',
-  deep: 'Deep',
-  ariaLabel: 'Reading depth',
-};
+import { DepthToggle } from './depth-toggle';
 
 const setup = (hasSkim: boolean, hasDeep: boolean) =>
   renderElement(
     <DepthProvider hasSkim={hasSkim} hasDeep={hasDeep}>
-      <DepthToggle hasSkim={hasSkim} hasDeep={hasDeep} labels={labels} />
+      <DepthToggle hasSkim={hasSkim} hasDeep={hasDeep} />
     </DepthProvider>,
   );
 

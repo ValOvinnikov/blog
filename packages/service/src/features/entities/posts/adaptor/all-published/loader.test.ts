@@ -1,5 +1,6 @@
 import { makeRawFeedPost } from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getAllPublishedPosts } from './loader';
@@ -14,8 +15,14 @@ const tenant = makeTenant();
 describe(getAllPublishedPosts, () => {
   it('fetches every published post with no pagination parameters', async () => {
     mockRun.mockResolvedValue([
-      makeRawFeedPost({ title: 'First', slug: 'first' }),
-      makeRawFeedPost({ title: 'Second', slug: 'second' }),
+      makeRawFeedPost({
+        headingBlock: makeRawHeadingBlock('First'),
+        slug: 'first',
+      }),
+      makeRawFeedPost({
+        headingBlock: makeRawHeadingBlock('Second'),
+        slug: 'second',
+      }),
     ]);
 
     const result = await getAllPublishedPosts(tenant);
@@ -24,13 +31,13 @@ describe(getAllPublishedPosts, () => {
       {
         title: 'First',
         slug: 'first',
-        excerpt: 'A sufficiently long excerpt for the card.',
+        excerpt: undefined,
         publishedAt: '2026-01-15T00:00:00Z',
       },
       {
         title: 'Second',
         slug: 'second',
-        excerpt: 'A sufficiently long excerpt for the card.',
+        excerpt: undefined,
         publishedAt: '2026-01-15T00:00:00Z',
       },
     ]);

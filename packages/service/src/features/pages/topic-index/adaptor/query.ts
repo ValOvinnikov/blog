@@ -1,18 +1,21 @@
 import { q } from '@blog/service/sanity/query';
+import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
+import { moduleFragment } from '@blog/service/shared/fragments/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo';
 
 export const topicIndexPageQuery = q.star
   .filterByType('page_topicIndex')
   .slice(0)
   .project((sub) => ({
-    heading: sub.field('heading').notNull(),
-    supportingText: sub.field('supportingText').nullable(true),
-    taxonomyList: sub
-      .field('taxonomyList')
+    headingBlock: sub
+      .field('headingBlock')
+      .project(headingBlockFragment)
+      .nullable(true),
+    hero: sub.field('hero').deref().project(moduleFragment).nullable(true),
+    modules: sub
+      .field('modules[]')
       .deref()
-      .project(() => ({
-        _id: true,
-      }))
+      .project(moduleFragment)
       .nullable(true),
     seo: sub.field('seo').project(seoFragment).nullable(true),
   }))

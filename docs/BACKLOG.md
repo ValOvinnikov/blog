@@ -757,7 +757,7 @@ every sub-issue):**
   its own sub-issue too; where a layer has nothing to do, the epic says so
   rather than filing an empty ticket.
 - **Platform style is mandatory and identical for every module.** Studio:
-  `titleField`, `brandVariantField`, `sectionHeaderField` (where the module
+  `titleField`, `brandVariantField`, `headingBlockField` (where the module
   has a heading), `defineAlignmentFields`, `layoutField`, a named
   `{name}Schema` export, a desk-group entry, page allow-list entries.
   Service: `service.modules.<name>.v1`, explicit projections, `T | undefined`
@@ -770,11 +770,14 @@ every sub-issue):**
   `isTenantActive()` gate.
 - **Grid vs. carousel is a display option on listing modules, not two
   modules.** Data scope (which posts, how many) is the one-module-per-mode
-  axis; presentation is a per-instance field, like CTA's `variant`. Carousel
-  uses **Embla** (`embla-carousel-react`) in an `apps/web` client leaf; the
-  `@blog/ui` organism stays pure and renders a scroll-snap track that works
-  before hydration. No autoplay, reduced motion honoured, previous/next
-  buttons for keyboard reach.
+  axis; presentation is a per-instance field, like CTA's `variant`. The
+  `@blog/ui` `Carousel` organism **owns Embla** (`embla-carousel-react`) —
+  hook, buttons, disabled flags, the pre-hydration scroll-snap track and
+  the handoff — with no `'use client'` of its own; a thin `apps/web`
+  wrapper declares the boundary and supplies the labels (the `SanityImage`
+  shape). Both are generic: a slide is any child, so the gallery reuses
+  them. No autoplay, reduced motion honoured, previous/next buttons for
+  keyboard reach.
 - **Blog first.** Phase 0 (make the home page generic) and Phase 1 (the blog
   modules) are `prio:next`; Phases 2–4 are `prio:later` until Phase 1 ships.
 
@@ -789,12 +792,14 @@ flowchart TD
   P1d["1.4 carousel display mode (Embla)"]
   P1e["1.5 taxonomy list placeable"]
   P1f["1.6 topic cards list latest posts"]
+  P1g["1.7 page composition<br/>retire PostsSection · post page modules"]
   P2["Phase 2 · Hero family<br/>heroStatement · heroProfile"]
   P3["Phase 3 · Marketing modules<br/>featureGrid · testimonial · logoWall · stats · faq · embed<br/>featureHighlights · team · location · contactForm"]
   P4["Phase 4 · Onboarding templates<br/>site-kind at tenant creation"]
   M9["Portfolio strand (#1919, same milestone)<br/>project entity · page_work · heroProject · projectList/Latest"]
   P0 --> P1a & P1b & P1e
   P1b --> P1c --> P1d
+  P1c --> P1g --> P1d
   P1e --> P1f
   P0 --> P2 --> P3
   P2 --> M9
@@ -824,8 +829,8 @@ same template-literal trick that derives `TModuleType`; a
 `TSlotModuleType`union covering the hero family plus`module_postList`/`module_taxonomyList`, so `MODULE_MAP`'s `Exclude` names one type instead
     of listing each.
   - **studio** · `feat(studio): hero family slot on page_home and
-page_generic` — `page_home.hero` `to:` accepts every hero type;
-    `page_generic`, `page_blog`, `page_topic` and `page_tag` gain an optional
+page_landing` — `page_home.hero` `to:` accepts every hero type;
+    `page_landing`, `page_blog`, `page_topic` and `page_tag` gain an optional
     `hero` slot with the same list, replacing the page's default header when
     set;
     `page_home.modules` allow-list widens to every `modules[]` module (today
@@ -878,7 +883,7 @@ landing pages` — `Record<THeroModuleType, …>` so an unregistered hero kind
   `mediaOrderStacked` for every width) collapsing to one `mediaOrder` prop.
 - **Sub-issues:**
   - **studio** · `feat(studio): module_heroBlog schema` — new type beside
-    `module_hero`; desk group "Heroes" lists both; `page_home`/`page_generic`
+    `module_hero`; desk group "Heroes" lists both; `page_home`/`page_landing`
     slots admit it. Typegen.
   - **service** · `feat(service): heroBlog loader with one resolved query` —
     the pinned-or-newest-featured resolution in **one** GROQ round trip (the
@@ -989,37 +994,43 @@ latest view models` — `postCardFragment` already carries `heroImageSanity`
   `module_postLatest` and `module_postFeatured` (not `module_postList`,
   which paginates), `initialValue: GRID` with no `required()` and
   `coalesce(displayMode, "GRID")` at read time, so every existing document
-  stays a grid with no migration. A pure `Carousel` organism in `@blog/ui`
-  (viewport `viewportRef`; `isEnhanced` swaps native scroll-snap for
-  Embla's clipping; `Carousel.Controls` with labels, handlers and disabled
-  state as props) and a `PostsSection.Carousel` slot that renders the
-  section's own cards as slides and ignores `hasLead`. The `apps/web`
-  `PostsCarousel` client leaf owns Embla — `align: 'start'`,
-  `slidesToScroll: 1`, `containScroll: 'trimSnaps'`, `dragFree` and `loop`
-  off, `duration: 0` under `prefers-reduced-motion`, no autoplay — and
-  carries the reader's pre-hydration scroll offset across `init`. Slides
-  match the grid's columns (85 % below `sm`, ½ at `sm`, ⅓ from `md`);
-  controls always render and are disabled exactly when Embla cannot move;
-  every card stays in the tab order and the viewport follows focus.
-  `embla-carousel-react@8.6.0`, pinned to the v8 major (the 9.0 rc renames
-  the methods). One Studio warning: a `module_postLatest` carousel with
-  `limit` < 4.
+  stays a grid with no migration. Re-cut 2026-09-10: the `@blog/ui`
+  `Carousel` organism **owns Embla** — `useEmblaCarousel` (`align:
+'start'`, `slidesToScroll: 1`, `containScroll: 'trimSnaps'`, `dragFree`
+  and `loop` off, `duration: 0` under `prefers-reduced-motion`, no
+  autoplay), the previous/next buttons, the disabled flags, an internal
+  `isEnhanced` that swaps the native scroll-snap track for Embla's clipping
+  on `init`, and the pre-hydration scroll-offset handoff — with **no
+  `'use client'` of its own**; it is the design system's one hook-bearing
+  component (`ui-library-practices`, `ui.md` and `SPEC.md` §4 record the
+  exception). A thin `apps/web` `Carousel` wrapper (the `SanityImage`
+  shape) declares the boundary and reads the two labels. Both are
+  generic: a slide is any child, `slideSize` is `columns` (85 % below
+  `sm`, ½ at `sm`, ⅓ from `md` — the grid's own) or `full` (one per view,
+  for the gallery). Controls always render and are disabled exactly when
+  Embla cannot move; every slide stays in the tab order and the viewport
+  follows focus. `embla-carousel-react@8.6.0` in `packages/ui`, pinned to
+  the v8 major (the 9.0 rc renames the methods). One Studio warning: a
+  `module_postLatest` carousel with `limit` < 4.
 - **Sub-issues** (ui first and independent; config + studio as one PR
   because knip fails on the bare `DISPLAY_MODE` export; then service; then
-  web — each merges green alone; the `module_postFeatured` half waits on
-  1.3's studio → service → web PR):
+  web — each merges green alone; 1.3 has shipped, so both teasers are in
+  scope of every PR):
   - **config** · `feat(config): DISPLAY_MODE const` (#2836).
   - **studio** · `feat(studio): displayMode on post listing modules` (#2837)
     — shared `displayModeField()` helper, the `limit` warning, typegen.
   - **service** · `feat(service): project displayMode` (#2838) — the
     coalesced projection on both teasers.
-  - **ui** · `feat(ui): Carousel organism — pure scroll-snap track with
-prev/next slots` (#2839) — plus the `PostsSection.Carousel` slot; works
-    before hydration; buttons and disabled states are props.
-  - **web** · `feat(web): Embla client leaf wrapping the Carousel organism`
-    (#2840) — `embla-carousel-react` added to `apps/web` only; the
-    `displayMode` branch in `PostListModuleView`; `carousel.previousAriaLabel` /
-    `carousel.nextAriaLabel` fixed copy; web Storybook story.
+  - **ui** · `feat(ui): Carousel organism owning Embla, generic slides,
+slideSize` (#2839) — `embla-carousel-react` added to `packages/ui`; hook,
+    buttons, flags and handoff internal; no directive; the governance
+    amendments; PR #2925 reworked in place (drops its `posts-section`
+    changes and the `Controls` slot).
+  - **web** · `feat(web): 'use client' Carousel wrapper and the displayMode
+branch in both teaser views` (#2840) — the wrapper reads
+    `carousel.previousAriaLabel` / `carousel.nextAriaLabel`; `CAROUSEL`
+    renders it with one `PostCardItem` per item in `PostLatestModuleView`
+    and `PostFeaturedModuleView`; web Storybook story.
 - **PRs:** ui → config + studio → service → web.
 - **Acceptance:** grid remains the default for every existing document;
   carousel mode swipes without JavaScript and is Embla-driven with it, and
@@ -1048,7 +1059,7 @@ TSlotModuleType` — the union then names only slot-only modules, so the
     missing `MODULE_MAP` entry is a compile error.
   - **studio** · `feat(studio): authored taxonomy on module_taxonomyList and
 home/landing allow-lists` — `taxonomy`, `sortOrder`, `limit`; the two
-    page-level rules; `page_home`/`page_generic` allow the type.
+    page-level rules; `page_home`/`page_landing` allow the type.
   - **service** · `feat(service): taxonomyList reads the authored taxonomy
 when present` — one query resolving module and terms, `fallbackTaxonomy`
     parameter, sort and limit in the transformer.
@@ -1065,25 +1076,111 @@ when present` — one query resolving module and terms, `fallbackTaxonomy`
 
 #### 1.6 Topic cards list their latest posts — epic `feat: topic cards list their latest posts`
 
-- **Depends on:** 1.5.
+- **Depends on:** 1.5 (shipped).
 - **Why:** placed on a home page, a topic card that is a title, a description
   and a count reads as a second row of post cards with the pictures missing
   and says nothing the nav doesn't. Two linked post titles per topic turn
   the block into a contents page — and the Topics index is a contents page
   too, so it gets the same treatment. Split out of 1.5 on 2026-09-07 so the
-  placement lands small; see the "The placeable taxonomy list" section of
-  the portfolio design doc.
-- **Design sub-issue** · settle always-on vs an editor toggle (leaning: a
-  boolean like `showImages`, default on), posts per term and their order,
-  the `TaxonomyCard` posts slot, and the projection inside the existing
-  merged taxonomy-list query (no second call).
-- **Sub-issues (created by the design):** **service** · two newest posts per
-  term in the term projection; **ui** · `TaxonomyCard` posts slot, no lead
-  cell; **web** · map posts into the slot on home, landing and index pages;
-  **studio** · only if a toggle is settled.
-- **Not in scope:** tags as a cloud of pills.
-- **Acceptance:** a topic card lists its two newest posts as links; a topic
-  with no posts shows title, description and count only.
+  placement lands small.
+- **Design sub-issue** (#2892, settled — section "Topic cards list their
+  latest posts" in the spec of record) · a `showLatestPosts` boolean on
+  `module_taxonomyList` after `limit`, `initialValue: true`, no
+  `required()`, `coalesce(showLatestPosts, true)` at read time, so every
+  existing module (the seeded index-page ones included) shows the lists
+  with no migration; two posts per term, fixed, `publishedAt desc` under
+  the published filter; the titles join each term inside the merged query
+  through a new `postLinkFragment` (`id`, `title`, `slug`), the module
+  query building its own term projections so `topics.v1` / `tags.v1` keep
+  their shape and the shared `postCount` expression moves into one helper;
+  `TaxonomyCard.Posts` (`posts`, `ariaLabel`) renders a `<ul>` between the
+  description and the count, each link `relative` above the card's
+  stretched link, empty array renders nothing, no lead cell; the web view
+  maps `latestPosts` to `routes.post(slug)` and passes a fixed
+  accessibility-only `latestPostsLabel` key under both copy namespaces; the index
+  pages change by construction.
+- **Sub-issues** (one PR per layer, each green alone; ui independent):
+  - **studio** · `feat(studio): showLatestPosts toggle on module_taxonomyList`.
+  - **service** · `feat(service): two newest posts per term in the
+taxonomy-list query`.
+  - **ui** · `feat(ui): TaxonomyCard.Posts slot`.
+  - **web** · `feat(web): map latest posts into TaxonomyCard on home,
+landing and index pages`.
+- **PRs:** studio → service → web, with ui alongside.
+- **Not in scope:** tags as a cloud of pills; more than two posts or an
+  authored count; dates or excerpts on the card; hiding zero-post terms.
+- **Acceptance:** a term card on the home, landing, Topics and Tags pages
+  lists its two newest published posts as links, newest first; a term with
+  no posts shows title, description and count only; a scheduled post is not
+  listed; the toggle off renders today's card; a post link reaches the post.
+
+#### 1.7 Page composition — epic #2943 `refactor(web): pages are chrome, a heading and modules; retire PostsSection`
+
+- **Depends on:** 1.3 (shipped). **Blocks:** 1.4's web sub-issue (#2840
+  branches on `displayMode` inside `PostLatestModuleView` and
+  `PostFeaturedModuleView`, the per-module views this epic created); the
+  ui sub-issue (#2839) is independent of it.
+- **Why:** every page fetches and pre-computes for all of its sections and
+  hands a 31-prop bag to a "view"; `PostsSection` carries a prop for every
+  listing variant a page ever needed; related reading and the post-foot
+  newsletter are hardcoded rather than authorable. Design of record: the epic body of #2943 (no design doc — the
+  decisions live on the epic and its sub-issues).
+- **Rule:** site header → page heading → `ModuleRenderer` over the page
+  document's `modules[]` → site footer; each part is a Server Component
+  that fetches what it alone needs, shared reads go through `cache()`.
+- **Sub-issues** (expand then contract; each PR green alone):
+  1. **web** · post page decomposed (#2944) — `PostCardItem`, the cached post
+     loader, self-fetching parts, `blog-post-page-view.tsx` deleted.
+     **First.**
+  2. **ui** · `PostGrid` gains `columns` (#2945, independent).
+  3. **web** · listing modules compose primitives (#2946); `PostListModuleView`
+     retires; spotlight arrangement in web.
+  4. **ui** · retire `PostsSection` (#2947).
+  5. **studio** (#2948) · `page_post` absorbs every `blog_post` field and
+     gains `modules[]`; `module_postRelated`; `module_newsletter.variant`;
+     the copy-and-repoint migration (human-gated).
+  6. **service** (#2949) · every read on `page_post`; `modules.postRelated.v1`;
+     `getPost` drops `relatedPosts`.
+  7. **web** (#2950) · `ModuleRenderer` page context; modules on the post page;
+     the post type in the webhook (5–7 ship as one PR: typegen widens
+     `TModuleType` and switches the post type).
+  8. **db** (#2959) · bookmark ids prefixed by data migration; the starter
+     post becomes a `page_post`. Own PR, same deploy as 5–7.
+  9. **studio** (#2960) · retire `blog_post` (delete migration,
+     human-gated); desk "Content" → "Taxonomy" + "People". After 5–8.
+  10. **web** · one per page: blog list #2951, topic #2952, tag #2953,
+      topics and tags #2954, landing #2955.
+  11. **web** (#2974) · `PageShell` — one furniture component for
+      every CMS page (`hero`, `heading`, `supportingText`, `chips`,
+      `modules`); `page` in the `ModuleRenderer` context. After #2953.
+  12. **One ticket per page, every layer** — home #2975, landing #2976,
+      blog list #2977, topic #2978, tag #2979, topics index #2980, tags
+      index #2981, post #2983 (order only, after 5). Each: canonical
+      field order (identity → entity → headingBlock → hero → modules →
+      seo), `hero` optional + `headingBlock` +
+      `modules[]` with the hero-or-heading rule, its slot folded into
+      `modules[]`, its service projection, its web page through the
+      template — expand PR (old fields `readOnly`, migration, typegen,
+      service, web) then contract PR (unset + drop). After 11; independent
+      of each other. (#2970–#2973 closed as superseded.)
+- **Naming (2026-09-08):** the post is its page — `page_post` keeps the name
+  and absorbs `blog_post`, a Sanity `_type` being immutable, so every post
+  id gains the `page_post-` prefix the seed migration already used.
+  `page_blog` → `page_postIndex` is its own tracking issue, #2961
+  (expand → repoint → contract, the #2904 recipe with migrations).
+- **Not in scope:** header/footer as modules; account and bookmarks pages;
+  `displayMode` on the related-posts module.
+- **Acceptance:** the post page fetches the post once and renders
+  `ModuleRenderer` with the post context; related reading and the
+  newsletter are authorable per post; `page_post` is the only post
+  document and `blog_post` is gone; `PostsSection` and every
+  `*-page-view.tsx` are deleted; every listing renders through
+  `PostCardItem` and `PostGrid`, or `Carousel` where `displayMode` says so.
+  Every page document declares `hero` and `modules[]` in the canonical
+  order with no slot field beside them and `headingBlock` on every page
+  but the post; every CMS page renders breadcrumbs → hero, else the heading
+  as h1 → modules, through one `PageShell` (2026-09-09). The internal
+  document `title` is never rendered as page content.
 
 ### Phase 2 · Hero family — `prio:later` until Phase 1 ships
 

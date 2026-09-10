@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config';
+import { NEWSLETTER_VARIANT, type TMaybeUndefined } from '@blog/config';
 import type { TNewsletterModule } from '@blog/service';
 import { NewsletterForm } from '@web/components/shared/newsletter-form';
 import { Section } from '@web/components/shared/section';
@@ -10,19 +10,23 @@ export interface INewsletterModuleViewProps extends TNewsletterModule {
 
 /**
  * Pure view for `NewsletterModule` — the `Section` full-bleed landmark
- * wrapping the `NewsletterForm` client island (`full` density) as its direct
- * child, with no extra wrapping element in between.
+ * wrapping the `NewsletterForm` client island as its direct child, with no
+ * extra wrapping element in between. Density follows the module's own
+ * `variant` field.
  */
 export const NewsletterModuleView = ({
   id,
   brandVariant,
-  sectionHeader,
+  headingBlock,
+  variant,
   layout,
   contentAlignment,
   trustCues,
 }: INewsletterModuleViewProps) => {
   const titleId = `newsletter-${id}`;
-  const { heading, supportingText } = sectionHeader;
+  const { heading, supportingText } = headingBlock;
+  const formVariant =
+    variant === NEWSLETTER_VARIANT.COMPACT ? 'compact' : 'full';
 
   return (
     <Section
@@ -32,7 +36,7 @@ export const NewsletterModuleView = ({
       dataTestId={`newsletter-module-${id}`}
     >
       <NewsletterForm
-        variant="full"
+        variant={formVariant}
         heading={heading}
         headingId={titleId}
         supportingText={supportingText}

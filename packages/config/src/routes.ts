@@ -28,7 +28,7 @@ export const routes = {
   /** The no-session unsubscribe link — a Route Handler, not a page, so it's outside `[locale]` like `accountExport` above. */
   newsletterUnsubscribe: (token: string) =>
     `/api/newsletter/unsubscribe?token=${encodeURIComponent(token)}`,
-  genericPage: (slug: string) => `/${slug}`,
+  landingPage: (slug: string) => `/${slug}`,
   rssFeed: () => '/rss.xml',
   /** No pagination variant — always the tag's base path + `/rss.xml`. */
   tagRssFeed: (slug: string) => `${routes.tag(slug)}/rss.xml`,

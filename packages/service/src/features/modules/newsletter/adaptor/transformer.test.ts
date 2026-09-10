@@ -2,18 +2,20 @@ import {
   BRAND_VARIANT,
   CONTAINER_WIDTH,
   CONTENT_ALIGNMENT,
+  NEWSLETTER_VARIANT,
 } from '@blog/config';
 import { makeRawNewsletterModule } from '@blog/service/testing/modules/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 
 import { toNewsletterModule } from './transformer';
 
 describe('toNewsletterModule', () => {
-  it('maps sectionHeader straight through', () => {
+  it('maps headingBlock straight through', () => {
     const raw = makeRawNewsletterModule();
 
     const module = toNewsletterModule(raw);
 
-    expect(module.sectionHeader).toEqual({
+    expect(module.headingBlock).toEqual({
       heading: 'Stay in the loop',
       supportingText: 'Get new posts in your inbox.',
     });
@@ -29,17 +31,24 @@ describe('toNewsletterModule', () => {
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
 
-  it('leaves supportingText undefined when not set (no faked default)', () => {
+  it('maps variant straight through', () => {
     const raw = makeRawNewsletterModule({
-      sectionHeader: {
-        heading: 'Stay in the loop',
-        supportingText: null,
-      },
+      variant: NEWSLETTER_VARIANT.COMPACT,
     });
 
     const module = toNewsletterModule(raw);
 
-    expect(module.sectionHeader.supportingText).toBeUndefined();
+    expect(module.variant).toBe(NEWSLETTER_VARIANT.COMPACT);
+  });
+
+  it('leaves supportingText undefined when not set (no faked default)', () => {
+    const raw = makeRawNewsletterModule({
+      headingBlock: makeRawHeadingBlock('Stay in the loop'),
+    });
+
+    const module = toNewsletterModule(raw);
+
+    expect(module.headingBlock.supportingText).toBeUndefined();
   });
 
   it('leaves contentAlignment undefined when unset (no faked default)', () => {

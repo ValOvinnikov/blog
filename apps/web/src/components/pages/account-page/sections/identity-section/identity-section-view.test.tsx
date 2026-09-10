@@ -5,7 +5,7 @@ import { IdentitySectionView } from './identity-section-view';
 
 const setup = customRender(IdentitySectionView, makeIdentitySectionView());
 
-describe(IdentitySectionView, () => {
+describe(`<${IdentitySectionView.name}/>`, () => {
   it('renders the panel heading as a level-2 heading', () => {
     setup();
 

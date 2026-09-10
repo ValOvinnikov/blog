@@ -22,7 +22,7 @@ describe('getCta', () => {
 
     const cta = await getCta('cta-1', tenant);
 
-    expect(cta.sectionHeader.heading).toBe('Subscribe to the newsletter');
+    expect(cta.headingBlock.heading).toBe('Subscribe to the newsletter');
     expect(cta.actions?.[0]?.link.href).toBe('/newsletter');
   });
 
@@ -46,8 +46,9 @@ describe('getCta', () => {
             't:tenant-a:modules:cta',
             't:tenant-a:module:cta-1',
             't:tenant-a:post',
+            't:tenant-a:page_post',
             't:tenant-a:topic',
-            't:tenant-a:page_generic',
+            't:tenant-a:page_landing',
             't:tenant-a:page_blog',
           ],
         }),

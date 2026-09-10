@@ -5,7 +5,7 @@ import { renderPostLeadImage } from '@web/utils/render-post-lead-image';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { getTranslations } from 'next-intl/server';
 
-import { PostListModuleView } from '../post-list/post-list-module-view';
+import { PostFeaturedModuleView } from './post-featured-module-view';
 
 export interface IPostFeaturedModuleProps {
   id: string;
@@ -15,8 +15,8 @@ export interface IPostFeaturedModuleProps {
 
 /**
  * PostFeaturedModule — fetches `module_postFeatured` data (one to three
- * editor-pinned posts) and hands it to the shared `PostListModuleView` with
- * the first post rendered as a full-width lead card.
+ * editor-pinned posts) and hands it to `PostFeaturedModuleView`, which
+ * renders the first post as a full-width lead card.
  */
 export const PostFeaturedModule = async ({
   id,
@@ -32,7 +32,7 @@ export const PostFeaturedModule = async ({
 
   const {
     brandVariant,
-    sectionHeader,
+    headingBlock,
     posts,
     layout,
     contentAlignment,
@@ -53,14 +53,13 @@ export const PostFeaturedModule = async ({
   if (items.length === 0) return null;
 
   return (
-    <PostListModuleView
+    <PostFeaturedModuleView
       brandVariant={brandVariant}
-      sectionHeader={sectionHeader}
+      headingBlock={headingBlock}
       items={items}
       layout={layout}
       contentAlignment={contentAlignment}
       hasImages={showImages}
-      hasLead={true}
       titleId={`featured-posts-${id}`}
       dataTestId={`post-featured-module-${id}`}
       accessibleTitle={t('fallbackHeading')}

@@ -1,4 +1,5 @@
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { toPostsByIds } from './transformer';
@@ -8,8 +9,14 @@ const tenant = makeTenant();
 describe(toPostsByIds, () => {
   it('maps every raw post card into a domain post card', () => {
     const raw = [
-      makeRawPostCard({ _id: 'a', title: 'First' }),
-      makeRawPostCard({ _id: 'b', title: 'Second' }),
+      makeRawPostCard({
+        _id: 'a',
+        headingBlock: makeRawHeadingBlock('First'),
+      }),
+      makeRawPostCard({
+        _id: 'b',
+        headingBlock: makeRawHeadingBlock('Second'),
+      }),
     ];
 
     const result = toPostsByIds(raw, tenant);

@@ -1,6 +1,7 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { PostLatestModule } from './post-latest-module';
@@ -43,7 +44,7 @@ const setup = customRenderAsync(PostLatestModule, {
   tenant: 'tenant-1',
 });
 
-describe(PostLatestModule, () => {
+describe(`<${PostLatestModule.name}/>`, () => {
   beforeEach(() => {
     getPostLatestMock.mockReset();
     getTenantSanityContextMock.mockReset();
@@ -55,10 +56,7 @@ describe(PostLatestModule, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
-          heading: 'Latest posts',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock(),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -84,10 +82,7 @@ describe(PostLatestModule, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
-          heading: 'Latest posts',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock(),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -116,10 +111,7 @@ describe(PostLatestModule, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
-          heading: 'Latest posts',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock(),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -132,15 +124,12 @@ describe(PostLatestModule, () => {
     expect(container.querySelector('section')).not.toBeInTheDocument();
   });
 
-  it("resolves the module's own translated fallback heading (never a hardcoded string) when sectionHeader.heading is undefined", async () => {
+  it("resolves the module's own translated fallback heading (never a hardcoded string) when headingBlock.heading is undefined", async () => {
     getPostLatestMock.mockResolvedValue({
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
-          heading: undefined,
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock(),
         posts: [
           {
             id: 'post-1',
@@ -174,10 +163,7 @@ describe(PostLatestModule, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
-          heading: 'Latest posts',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock(),
         posts: [
           {
             id: 'post-1',
@@ -206,10 +192,7 @@ describe(PostLatestModule, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
-          heading: 'Latest posts',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock(),
         posts: [
           {
             id: 'post-1',
@@ -240,10 +223,7 @@ describe(PostLatestModule, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
-          heading: 'Latest posts',
-          supportingText: undefined,
-        },
+        headingBlock: makeHeadingBlock(),
         posts: [
           {
             id: 'post-1',

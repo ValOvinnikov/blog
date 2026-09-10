@@ -1,12 +1,23 @@
 import { makeRawFeedPost } from '@blog/service/testing/entities/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 
 import { toAllPublishedPosts } from './transformer';
 
 describe(toAllPublishedPosts, () => {
   it('maps every raw feed post into a domain feed post', () => {
     const raw = [
-      makeRawFeedPost({ title: 'First', slug: 'first' }),
-      makeRawFeedPost({ title: 'Second', slug: 'second' }),
+      makeRawFeedPost({
+        headingBlock: makeRawHeadingBlock('First', {
+          supportingText: 'A sufficiently long excerpt for the card.',
+        }),
+        slug: 'first',
+      }),
+      makeRawFeedPost({
+        headingBlock: makeRawHeadingBlock('Second', {
+          supportingText: 'A sufficiently long excerpt for the card.',
+        }),
+        slug: 'second',
+      }),
     ];
 
     const result = toAllPublishedPosts(raw);
@@ -38,5 +49,15 @@ describe(toAllPublishedPosts, () => {
     expect(result).not.toHaveProperty('heroImageUrl');
     expect(result).not.toHaveProperty('topic');
     expect(result).not.toHaveProperty('readingTimeMinutes');
+  });
+
+  it('maps a sparse feed post with no excerpt to undefined', () => {
+    const [result] = toAllPublishedPosts([
+      makeRawFeedPost({
+        headingBlock: makeRawHeadingBlock('Hello World'),
+      }),
+    ]);
+
+    expect(result?.excerpt).toBeUndefined();
   });
 });

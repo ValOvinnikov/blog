@@ -1,23 +1,13 @@
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { buildTopicsMetadata } from './build-topics-metadata';
 
-const { getIndexPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
-  getIndexPageMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
+const { getTopicsIndexPageMock } = vi.hoisted(() => ({
+  getTopicsIndexPageMock: vi.fn(),
 }));
 
-vi.mock('@blog/service', () => ({
-  service: {
-    pages: {
-      topicIndex: { v1: { getIndexPage: getIndexPageMock } },
-    },
-  },
-}));
-
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
+vi.mock('@web/server/topics-index/get-topics-index-page', () => ({
+  getTopicsIndexPage: getTopicsIndexPageMock,
 }));
 
 const seo = makeSeo({
@@ -30,35 +20,27 @@ const seo = makeSeo({
 
 describe('buildTopicsMetadata', () => {
   beforeEach(() => {
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getTopicsIndexPageMock.mockReset();
   });
 
-  it('forwards the resolved tenant Sanity context to getIndexPage', async () => {
-    const tenant = {
-      projectId: 'tenant-project',
-      dataset: 'production',
-      token: 'tenant-token',
-    };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
-    getIndexPageMock.mockResolvedValue({
+  it('forwards the tenant to getTopicsIndexPage — the same cached loader TopicsPage reads', async () => {
+    getTopicsIndexPageMock.mockResolvedValue({
       ok: true,
-      data: { heading: 'Topics', seo, taxonomyListId: 'topic-list-1' },
+      data: { headingBlock: { heading: 'Topics' }, seo, modules: [] },
     });
 
     await buildTopicsMetadata('tenant-1');
 
-    expect(getIndexPageMock).toHaveBeenCalledWith(tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
+    expect(getTopicsIndexPageMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('builds metadata from the resolved seo, self-canonical to /topics', async () => {
-    getIndexPageMock.mockResolvedValue({
+    getTopicsIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Topics',
+        headingBlock: { heading: 'Topics' },
         seo,
-        taxonomyListId: 'topic-list-1',
+        modules: [],
       },
     });
 
@@ -77,7 +59,7 @@ describe('buildTopicsMetadata', () => {
   });
 
   it('returns empty metadata when the index page fetch fails', async () => {
-    getIndexPageMock.mockResolvedValue({
+    getTopicsIndexPageMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
     });
@@ -89,7 +71,7 @@ describe('buildTopicsMetadata', () => {
 
   it('returns empty metadata without logging when the index page simply does not exist', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
+    getTopicsIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
 
     const metadata = await buildTopicsMetadata('tenant-1');
 

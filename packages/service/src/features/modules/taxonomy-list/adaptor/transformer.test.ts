@@ -10,6 +10,7 @@ import {
   makeRawTopicWithPostCount,
 } from '@blog/service/testing/entities/fixtures';
 import { makeRawTaxonomyListModule } from '@blog/service/testing/modules/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 
 import { toTaxonomyListModule } from './transformer';
 
@@ -24,28 +25,27 @@ describe('toTaxonomyListModule', () => {
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
 
-  it('maps sectionHeader when authored', () => {
+  it('maps headingBlock when authored', () => {
     const raw = makeRawTaxonomyListModule({
-      sectionHeader: {
-        heading: 'Browse by topic',
+      headingBlock: makeRawHeadingBlock('Browse by topic', {
         supportingText: 'Pick a subject.',
-      },
+      }),
     });
 
     const module = toTaxonomyListModule(raw);
 
-    expect(module.sectionHeader).toEqual({
+    expect(module.headingBlock).toEqual({
       heading: 'Browse by topic',
       supportingText: 'Pick a subject.',
     });
   });
 
-  it('leaves every sectionHeader field undefined when unset (no faked default)', () => {
-    const raw = makeRawTaxonomyListModule({ sectionHeader: null });
+  it('leaves every headingBlock field undefined when unset (no faked default)', () => {
+    const raw = makeRawTaxonomyListModule({ headingBlock: null });
 
     const module = toTaxonomyListModule(raw);
 
-    expect(module.sectionHeader).toEqual({
+    expect(module.headingBlock).toEqual({
       heading: undefined,
       supportingText: undefined,
     });

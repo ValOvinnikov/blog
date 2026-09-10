@@ -5,7 +5,7 @@ import { NewsletterSectionView } from './newsletter-section-view';
 
 const setup = customRender(NewsletterSectionView, makeNewsletterSectionView());
 
-describe(NewsletterSectionView, () => {
+describe(`<${NewsletterSectionView.name}/>`, () => {
   it('renders the panel heading as a level-2 heading', () => {
     setup();
 

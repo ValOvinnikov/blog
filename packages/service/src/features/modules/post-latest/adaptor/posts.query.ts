@@ -6,11 +6,11 @@ import { postCardFragment } from '@blog/service/shared/fragments/post';
  * Newest posts for a post-latest teaser module, unscoped (no topic/tag
  * filtering). Built per-request so `limit` bounds the results in GROQ
  * (end-exclusive `.slice(0, limit)`) rather than fetching the whole
- * `blog_post` collection to slice in JS.
+ * `page_post` collection to slice in JS.
  */
 export function postLatestModulePostsQuery(limit: number) {
   return q.star
-    .filterByType('blog_post')
+    .filterByType('page_post')
     .filterRaw(PUBLISHED_POST_FILTER)
     .order('publishedAt desc')
     .slice(0, limit)

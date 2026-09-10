@@ -1,6 +1,7 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { PostFeaturedModule } from './post-featured-module';
@@ -54,7 +55,7 @@ const setup = customRenderAsync(PostFeaturedModule, {
   tenant: 'tenant-1',
 });
 
-describe(PostFeaturedModule, () => {
+describe(`<${PostFeaturedModule.name}/>`, () => {
   beforeEach(() => {
     getPostFeaturedMock.mockReset();
     getTenantSanityContextMock.mockReset();
@@ -66,7 +67,7 @@ describe(PostFeaturedModule, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: { heading: 'Featured', supportingText: undefined },
+        headingBlock: makeHeadingBlock({ heading: 'Featured' }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -98,7 +99,7 @@ describe(PostFeaturedModule, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: { heading: 'Featured', supportingText: undefined },
+        headingBlock: makeHeadingBlock({ heading: 'Featured' }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -112,12 +113,12 @@ describe(PostFeaturedModule, () => {
     expect(container.querySelector('section')).not.toBeInTheDocument();
   });
 
-  it("resolves the module's own translated fallback heading (never a hardcoded string) when sectionHeader.heading is undefined", async () => {
+  it("resolves the module's own translated fallback heading (never a hardcoded string) when headingBlock.heading is undefined", async () => {
     getPostFeaturedMock.mockResolvedValue({
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: { heading: undefined, supportingText: undefined },
+        headingBlock: makeHeadingBlock(),
         posts: [makePost()],
         layout: undefined,
         contentAlignment: undefined,
@@ -134,12 +135,12 @@ describe(PostFeaturedModule, () => {
     ).toBeInTheDocument();
   });
 
-  it('renders the first post as a lead card and forwards hasLead to PostsSection', async () => {
+  it('renders the first post as a lead card and the rest in a tail grid', async () => {
     getPostFeaturedMock.mockResolvedValue({
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: { heading: 'Featured', supportingText: undefined },
+        headingBlock: makeHeadingBlock({ heading: 'Featured' }),
         posts: [
           makePost({ id: 'post-1', title: 'Lead post' }),
           makePost({ id: 'post-2', title: 'Second post' }),
@@ -156,12 +157,11 @@ describe(PostFeaturedModule, () => {
     expect(screen.getByText('Lead post')).toBeInTheDocument();
     expect(screen.getByText('Second post')).toBeInTheDocument();
     expect(screen.getByText('Third post')).toBeInTheDocument();
-    expect(
-      container.querySelector('[data-testid="posts-section-lead"]'),
-    ).toBeInTheDocument();
-    expect(
-      container.querySelector('[data-testid="posts-section-tail-grid"]'),
-    ).toBeInTheDocument();
+    const tailGrid = container.querySelector(
+      '[data-testid="post-featured-module-post-featured-1-tail-grid"]',
+    );
+    expect(tailGrid).toBeInTheDocument();
+    expect(tailGrid).not.toHaveTextContent('Lead post');
   });
 
   it('renders the lead image sized differently from the tail card images', async () => {
@@ -169,7 +169,7 @@ describe(PostFeaturedModule, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: { heading: 'Featured', supportingText: undefined },
+        headingBlock: makeHeadingBlock({ heading: 'Featured' }),
         posts: [
           makePost({
             id: 'post-1',
@@ -213,7 +213,7 @@ describe(PostFeaturedModule, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: { heading: 'Featured', supportingText: undefined },
+        headingBlock: makeHeadingBlock({ heading: 'Featured' }),
         posts: [
           makePost({
             id: 'post-1',

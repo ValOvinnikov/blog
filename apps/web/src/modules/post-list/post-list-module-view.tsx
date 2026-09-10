@@ -1,11 +1,15 @@
 import type { TPostListModule } from '@blog/service';
 import { Pagination } from '@blog/ui/organisms/pagination';
+import { PostGrid } from '@blog/ui/organisms/post-grid';
+import { ModuleHeading } from '@web/components/shared/module-heading';
 import {
   type IPostCardData,
-  PostsSection,
-} from '@blog/ui/organisms/posts-section';
+  PostCardItem,
+} from '@web/components/shared/post-card-item';
 import { Section } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';
+
+import { postListModuleViewVariants } from './post-list-module-view-variants';
 
 export interface IPostListModulePagination {
   currentPage: number;
@@ -27,18 +31,16 @@ export interface IPostListModuleViewProps extends Omit<
   emptyMessage?: string;
   pagination?: IPostListModulePagination;
   hasImages?: boolean;
-  hasLead?: boolean;
 }
 
 /**
- * PostListModuleView — shared render shell for post-listing modules: a
- * labeled `Section` wrapping `PostsSection` plus an optional `Pagination`.
- * `titleId`/`dataTestId`/`accessibleTitle` are caller-supplied since the
- * accessible name and test id differ per module.
+ * PostListModuleView — render shell for `PostListModule`: a labeled
+ * `Section` wrapping a `PostGrid` of `PostCardItem`s (or the empty message)
+ * plus an optional `Pagination`.
  */
 export const PostListModuleView = ({
   brandVariant,
-  sectionHeader,
+  headingBlock,
   items,
   layout,
   titleId,
@@ -48,9 +50,9 @@ export const PostListModuleView = ({
   pagination,
   contentAlignment,
   hasImages,
-  hasLead,
 }: IPostListModuleViewProps) => {
-  const { heading, supportingText } = sectionHeader;
+  const isEmpty = items.length === 0;
+  const s = postListModuleViewVariants();
 
   return (
     <Section
@@ -59,19 +61,22 @@ export const PostListModuleView = ({
       titleId={titleId}
       dataTestId={dataTestId}
     >
-      <PostsSection
-        posts={items}
-        title={heading}
-        titleId={titleId}
+      <ModuleHeading
+        headingBlock={headingBlock}
         accessibleTitle={accessibleTitle}
-        supportingText={supportingText}
+        id={titleId}
+        level={2}
         align={contentAlignment}
-        linkAs={SmartLink}
-        isWrapped={true}
-        emptyMessage={emptyMessage}
-        hasImages={hasImages}
-        hasLead={hasLead}
       />
+      {isEmpty ? (
+        <p className={s.emptyMessage()}>{emptyMessage}</p>
+      ) : (
+        <PostGrid className={s.grid()}>
+          {items.map((item) => (
+            <PostCardItem key={item.id} item={item} hasImage={hasImages} />
+          ))}
+        </PostGrid>
+      )}
       {pagination ? (
         <Pagination
           currentPage={pagination.currentPage}

@@ -3,14 +3,16 @@ import type {
   TContentAlignment,
   TLayout,
   TMaybeUndefined,
+  TNewsletterVariant,
 } from '@blog/config';
 
 export type TNewsletterModule = {
   brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
-  sectionHeader: {
+  headingBlock: {
     heading: string;
     supportingText: TMaybeUndefined<string>;
   };
+  variant: TNewsletterVariant;
   layout: TMaybeUndefined<TLayout>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
 };

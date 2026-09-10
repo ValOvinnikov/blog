@@ -29,7 +29,7 @@ frontend if a consumer is out of date.
 
 | Surface | Route                          | Status                                                                                                                                                                           |
 | ------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Home    | `/`                            | ✅ Built — modules-as-documents (hero + `modules[]`)                                                                                                                             |
+| Home    | `/`                            | ✅ Built — modules-as-documents (optional hero **or** `headingBlock` heading, plus `modules[]`)                                                                                  |
 | Blog    | `/blog` + `/blog/page/N`       | ✅ Built — paginated index (#75)                                                                                                                                                 |
 | Post    | `/blog/[slug]`                 | ✅ Built — post detail page + JSON-LD (#76)                                                                                                                                      |
 | Topic   | `/topics/[slug]` (+ `/page/N`) | ✅ Built — unpaginated + paginated routes (#91/#588/#589); renamed from `category` in #1812; CMS-authored via the `page_topic` document since #1915                              |
@@ -245,28 +245,28 @@ object (`spacingTop`/`spacingBottom`, `containerWidth` (not on
 consts; there is no `align` field on `layout` — alignment is its own
 module-level field, below).
 `module_cta`/`module_postList`/`module_postLatest`/`module_postFeatured`/`module_taxonomyList`/`module_newsletter`
-additionally carry a `sectionHeader` object (`heading` and `supportingText`
+additionally carry a `headingBlock` object (`heading` and `supportingText`
 only — all optional on
 `module_postList`/`module_postLatest`/`module_postFeatured`/`module_taxonomyList`, `heading` required on
 `module_cta`/`module_newsletter` via a per-module `requireHeading` override
-on the shared `sectionHeaderField()` helper).
+on the shared `headingBlockField()` helper).
 
-**Alignment is a module-level field, not part of `sectionHeader`.** All six
+**Alignment is a module-level field, not part of `headingBlock`.** All six
 of those modules carry their own `contentAlignment`, emitted by the
 `defineAlignmentFields()` helper, which every caller gets whether or not it
-asks for variant-scoped extras. `sectionHeader` deliberately does not bundle
+asks for variant-scoped extras. `headingBlock` deliberately does not bundle
 it: a Sanity named object type's field list is fixed at registration, so a
 bundled field cannot be omitted for the one module that doesn't want it —
-the same constraint that forces `sectionHeader` and
-`requiredHeadingSectionHeader` to exist as two registered types rather than
+the same constraint that forces `headingBlock` and
+`requiredHeadingBlock` to exist as two registered types rather than
 one with conditional validation. Bundling it meant `module_cta`, which
 aligns its whole card rather than its heading, was forced to render an
 alignment control nothing read.
 
-`module_content` has no `sectionHeader` —
+`module_content` has no `headingBlock` —
 its rich-text `body` supplies any in-content headings, so a separate
 structured heading field would just be a second way to do the same thing.
-`module_hero` has no `sectionHeader` either — its heading fields are its
+`module_hero` has no `headingBlock` either — its heading fields are its
 own dedicated schema, unrelated to this shared shape.
 
 **The hero family.** A hero is any module whose schema `name` starts with
@@ -281,16 +281,102 @@ drops out the day it is deleted. The studio's equivalent guard is
 `HERO_SCHEMA_TYPES`, the list every page's `hero` `to:` points at, with a
 test asserting every registered `module_hero*` schema appears in it.
 
-`page_home` has a **required** hero; `page_generic`, `page_blog`,
-`page_topic` and `page_tag` each have an **optional** one. A hero replaces
-that page's default header and owns the `<h1>`; without one, each page
-renders the header it always has (generic: title; blog: `heading` plus
-`supportingText`; topic and tag: the term header), so exactly one `<h1>`
-renders either way. Breadcrumbs, metadata and the Studio preview keep
+`page_home`, `page_landing`, `page_blog`, `page_topic`, `page_tag`,
+`page_topicIndex` and `page_tagIndex` each have an **optional** hero. A hero
+replaces that page's default header and owns the `<h1>`; without one, each page
+renders the header it always has (every one of them: `headingBlock`'s `heading`
+plus `supportingText`), so exactly one `<h1>` renders either way.
+
+`page_home`'s hero was required until it was made optional and the document
+given a `headingBlock` of its own; `page_landing` followed, replacing the
+document `title` it previously rendered as its `<h1>`. Because neither field
+is individually required, the requirement moved to the document:
+`validateHeroOrHeading()` is an **error**-severity rule demanding at least
+one of `hero` or `headingBlock.heading`, so a page with an empty opening
+block cannot be published. The document `title` is never a fallback — it is
+Studio's internal list label, and a page with neither a hero nor a heading
+renders no header at all rather than leaking it. That holds for the
+breadcrumb trail too: `page_landing`'s trailing crumb comes from
+`headingBlock.heading`, and is omitted from the visible trail and the
+`BreadcrumbList` JSON-LD together when there is none.
+
+Breadcrumbs, metadata and the Studio preview keep
 reading the document's own `title`/`heading` whether or not a hero is set.
 `@blog/service` narrows the slot with `toHeroSlot()`, whose guard rejects a
 non-hero `_type` as a data error through the loader's normal failure path
 rather than rendering a blank page.
+
+**The post is the page.** `page_post` carries the post itself — `slug`,
+`headingBlock`, `heroImage`, `content`, `featured`, `author`, `topic`,
+`tags`, `publishedAt`, `skim` and `seo` — rather than wrapping a separate
+`blog_post` and dereferencing it. Every post read in `@blog/service`
+projects those fields off `page_post` directly, and `apps/web` names
+`page_post` as the post's document type wherever it needs one: the
+revalidation webhook's path derivation and its `bookmarks` cleanup (§9),
+and the `revalidate-tags` map, whose `page_post` entry purges the
+post-content tags (`posts`, `author`, `topic`, `tag`) that the wrapper type
+used to own. `blog_post` still exists and is still a valid reference target
+alongside `page_post` everywhere a post can be linked, but nothing reads it
+for page content; it retires in its own migration, since a Sanity `_type` is
+immutable and a retirement is therefore never a rename.
+
+**A page document's own `title` is an internal CMS label and is never
+rendered on the web.** It names the document in the desk, nothing more —
+`page_topic` and `page_tag` each carry a `headingBlock` whose `heading` and
+`supportingText` fall back to the deref'd `blog_topic`/`blog_tag`'s `title`
+and `description`, so an unauthored page still renders the term's own
+header. `page_post` has no
+entity to deref, so its headline and excerpt live in a **`headingBlock`**
+object (`requiredHeadingBlock`: `heading` required, `supportingText`
+optional) — the same shape the modules use. `@blog/service` maps
+`headingBlock.heading` to the view models' `title` and
+`headingBlock.supportingText` to their `excerpt`, so the field names every
+consumer sees are unchanged and no `apps/web` component reads a document
+label.
+
+`page_post.modules[]` allows `module_postRelated`, `module_newsletter` and
+`module_cta`. It deliberately does **not** allow `module_content`: a post
+already carries its own `content` rich text, and offering a Content module
+beside it would give an editor two places to put the article's prose with no
+rule about which one is the article. Two concerns that were once fields on the
+post became modules in that array: related reading is `module_postRelated`
+(its own `limit`, 1–6, default 3), and the newsletter's presence is the
+`module_newsletter` module being in the array at all rather than a
+`newsletterEnabled` boolean — which is why `page_post` has no such field.
+`module_newsletter` carries a `variant` (`NEWSLETTER_VARIANT`,
+`FULL`/`COMPACT`, coalesced to `FULL` at the query since the schema field is
+optional) selecting which form of the signup it renders.
+
+**A view model's nullability mirrors the schema's validation.** Where a
+`page_post` field is `required()` in the Studio, `@blog/service` projects it
+with `.notNull()` and types it as a plain value; where the schema leaves a
+field optional, the view model carries `T | undefined`. The two are kept in
+step deliberately, so the type a consumer sees is the same promise the
+editing experience makes. `headingBlock.heading`, `publishedAt`, `author`,
+`topic` and `content` are required on both sides; `excerpt`
+(`headingBlock.supportingText`), `heroImage`, `tags`, `featured`, `skim`
+and `seo` are optional on both.
+
+**An incomplete post is not published.** `PUBLISHED_POST_FILTER` is what
+makes the paragraph above safe. It requires
+`defined(headingBlock.heading) && defined(author) && defined(topic) &&
+defined(content)` alongside `publishedAt <= now()`, so a `page_post` missing
+any of them never appears in a listing and resolves as not-found on its own
+URL — the same treatment an unpublished post gets. Without that gate a
+`.notNull()` projection would throw at parse time and take down an entire
+listing rather than dropping one card.
+
+This is an **exclusion, not a fallback**: nothing is substituted. Every
+consumer of these fields structurally needs a value — RSS `<title>`, the
+`BlogPosting` `headline` and `author`, breadcrumb labels, card headings, the
+topic chip, the bookmarks list — and the only way to satisfy them from an
+absent field would be to invent one. Excluding the document is the honest
+alternative to a placeholder, and the document's own `title` is never
+borrowed for the purpose.
+
+`excerpt` is the one post field that still degrades by omission rather than
+excluding the document, because `supportingText` is genuinely optional in
+the schema: the feed omits its `<description>` and the card omits its lead.
 
 `module_cta` additionally carries a required `variant` (`BANNER`/`SPLIT`/
 `CALLOUT`, from `CTA_VARIANT`, default `CALLOUT`), a required `bandTone`
@@ -320,7 +406,7 @@ and nothing at all on Callout, whose image sits above the content. **Content
 alignment** is how text and actions align inside that block, and applies on
 every variant. Both draw their values from `CONTENT_ALIGNMENT`. They replaced a
 single `imageSide` field that claimed to move the image while actually moving
-the content column, plus a reuse of `sectionHeader.align` that CTA applied to
+the content column, plus a reuse of `headingBlock.align` that CTA applied to
 the whole card rather than the heading.
 
 Position is stored as **two** variant-scoped fields —
@@ -343,24 +429,34 @@ not warrant separate types. It previously did have two: `CTA_ALIGNMENT` and
 one generated field described by two names and one of them named after what
 had become only one of its five callers.
 
-`module_taxonomyList` renders both ways. It reaches `ModuleRenderer` through
-`MODULE_MAP` when placed in `page_home.modules[]` or `page_generic.modules[]`,
-and it renders through a taxonomy index page's own required slot —
-`page_topicIndex.taxonomyList` on `/topics`; `page_tagIndex` on `/tags` follows
-the same shape. It carries a `REVALIDATE_TAGS` entry, which every module type
-requires regardless of how it is rendered.
+`module_taxonomyList` reaches `ModuleRenderer` through `MODULE_MAP` wherever it
+is placed — `page_home.modules[]`, `page_landing.modules[]`,
+`page_topicIndex.modules[]` and `page_tagIndex.modules[]`. It used to render a
+second way as well, through a dedicated `taxonomyList` reference on each
+taxonomy index page; neither page has one any more, and both fields are
+retained only as `readOnly`, `deprecated` pending removal. It carries a
+`REVALIDATE_TAGS` entry, which every module type requires regardless of how it
+is rendered.
 
 Which taxonomy it lists is an optional authored field, because a module
 document cannot see what holds it: the page references the module, not the
 reverse, and Sanity's `hidden` callback is synchronous and sees only the
 module's own document. So the field is always visible and the requirement
-lives on the pages instead. A `modules[]` placement must set it — an async
-rule on both pages' `modules[]` fetches each referenced module and rejects one
-that has not. An index page leaves it empty and passes its own kind to
+lives on the pages instead: every page placing one must set it, enforced by an
+async rule on `modules[]` that fetches each referenced module and rejects one
+that has not.
+
+The taxonomy index pages used to be the exception. Each reached its module
+through a dedicated slot and could leave `taxonomy` empty, passing its own kind
+to
 `service.modules.taxonomyList.v1.getTaxonomyList(id, tenant, fallbackTaxonomy)`
-as the fallback, so the loader never queries upward for a parent page; that
-page's slot rule rejects a module whose authored kind disagrees with the page's
-own. `sortOrder` (`TAXONOMY_SORT`, coalesced to `ALPHABETICAL` at read time)
+so the loader never queried upward for a parent page. That channel is gone with
+the slots: `ModuleRenderer` calls every module with the same arguments and
+cannot supply a fallback, so a module it renders must carry an authored
+`taxonomy`. The `fallbackTaxonomy` parameter remains in the loader's signature
+with no caller passing it.
+
+`sortOrder` (`TAXONOMY_SORT`, coalesced to `ALPHABETICAL` at read time)
 and `limit` apply wherever the module sits, and their defaults reproduce the
 index pages' rendering. Sorting and the limit are applied in the service
 transformer, not in GROQ.
@@ -368,17 +464,13 @@ transformer, not in GROQ.
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its
 schema allows), `layout` as `TLayout | undefined`, and (where applicable)
-`sectionHeader` as `TSectionHeader | undefined` — with no faked defaults on
+`headingBlock` as `THeadingBlock | undefined` — with no faked defaults on
 either: unset stays unset end to end. In `apps/web`, every module component
 that renders a `@blog/ui` organism — including those reached through a
 dedicated slot rather than `MODULE_MAP`'s generic `ModuleRenderer` pipeline
-(§5 above): the hero family via each page's `hero` slot,
-`module_postList` via `page_blog`'s `postList` reference (and, since #1915,
-`page_topic`'s own `postList` reference on `/topics/[slug]`, and since #1964,
-`page_tag`'s own `postList` reference on `/tags/[slug]`), and
-`module_taxonomyList` via `page_topicIndex`'s and `page_tagIndex`'s
-`taxonomyList` references — the one module that also renders through
-`MODULE_MAP`, when placed in `modules[]` — all
+(§5 above): the hero family, via each page's `hero` slot, is now the only such
+case — `module_taxonomyList` and `module_postList` both render through
+`MODULE_MAP` wherever they sit — all
 still styled the same way as every other module — no exception — wraps it in `apps/web`'s own
 `Section` component (`apps/web/src/components/shared/section`, relocated
 from `packages/ui`), passing `brandVariant` and `layout` straight through,
@@ -623,7 +715,7 @@ settings surface. Any future module needing curated copy renders the i18n
 key directly; it does not grow its own override field.
 
 Full schema reference (every document/object, field-by-field), naming and
-validation conventions, incl. the `layout`/`sectionHeader` objects' own
+validation conventions, incl. the `layout`/`headingBlock` objects' own
 field lists:
 [`docs/context/content-model.md`](./docs/context/content-model.md).
 
@@ -696,7 +788,7 @@ webhook purges both that form and the legacy unprefixed one per publish, keyed
 off Sanity's own `sanity-project-id` webhook header. Tag expiry alone does not
 invalidate a prerendered route on Vercel, so the webhook also purges resolved,
 tenant-scoped paths (`revalidatePath('/<tenantId>/<locale>/blog/my-post')`) —
-precisely derived for a published `blog_post`: its own page, the home and blog
+precisely derived for a published `page_post`: its own page, the home and blog
 archive with pagination, and **every** tag/topic page of the tenant with their
 own pagination, not only the ones the post currently belongs to (a
 re-categorisation or removal would otherwise leave stale HTML on the page the
@@ -719,7 +811,7 @@ route declares its own, kept in step with `@blog/config`'s
 `CONTENT_ROUTE_REVALIDATE_SECONDS` by test rather than by import.
 
 The same webhook also cleans
-up orphaned `@blog/db` `bookmarks` rows when it receives a `blog_post` delete
+up orphaned `@blog/db` `bookmarks` rows when it receives a `page_post` delete
 (Sanity's `sanity-operation` header — unpublish fires the same trigger as
 true deletion), scoped to the tenant resolved from that project-id header.
 `@blog/service`'s

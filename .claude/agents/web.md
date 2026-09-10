@@ -314,8 +314,8 @@ for the live surface). Route inventory (built + planned; see SPEC.md §1):
   `@blog/ui` components, incl. code blocks). Add JSON-LD `BlogPosting` and
   `generateMetadata`.
 - `/category/[slug]` — `service.pages.category.v1`.
-- `/[slug]` — standalone `page_generic` documents; the modules[] page-builder
-  data layer is live (`service.pages.generic.v1`, `service.modules.*`).
+- `/[slug]` — standalone `page_landing` documents; the modules[] page-builder
+  data layer is live (`service.pages.landing.v1`, `service.modules.*`).
 - `app/api/revalidate/route.ts` — verify `SANITY_REVALIDATE_SECRET`, call
   `revalidateTag`/`revalidatePath`.
 

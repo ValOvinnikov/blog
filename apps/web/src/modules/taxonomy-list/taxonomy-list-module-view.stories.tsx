@@ -1,14 +1,13 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
 import { HEADING_LEVELS } from '@blog/ui/lib/react';
-import { objectKeys } from '@blog/utils';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import {
   tagsListItems,
   topicsListItems,
 } from '@web/testing/modules/taxonomy-list/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { TaxonomyListModuleView } from './taxonomy-list-module-view';
-import { taxonomyListModuleViewVariants } from './taxonomy-list-module-view-variants';
 
 const meta = {
   title: 'Modules/TaxonomyListModule',
@@ -26,15 +25,12 @@ const meta = {
     },
     contentAlignment: {
       control: 'select',
-      options: objectKeys(taxonomyListModuleViewVariants.variants.align),
+      options: Object.values(CONTENT_ALIGNMENT),
     },
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: {
-      heading: 'Browse by topic',
-      supportingText: undefined,
-    },
+    headingBlock: makeHeadingBlock({ heading: 'Browse by topic' }),
     items: topicsListItems,
     layout: undefined,
     contentAlignment: undefined,
@@ -53,7 +49,7 @@ export const Default: TStory = {};
 
 export const Topics: TStory = {
   args: {
-    sectionHeader: { heading: 'Browse by topic', supportingText: undefined },
+    headingBlock: makeHeadingBlock({ heading: 'Browse by topic' }),
     items: topicsListItems,
     titleId: 'topic-list-title',
     dataTestId: 'taxonomy-list-module-topic-list-1',
@@ -64,7 +60,7 @@ export const Topics: TStory = {
 
 export const Tags: TStory = {
   args: {
-    sectionHeader: { heading: 'Browse by tag', supportingText: undefined },
+    headingBlock: makeHeadingBlock({ heading: 'Browse by tag' }),
     items: tagsListItems,
     titleId: 'tag-list-title',
     dataTestId: 'taxonomy-list-module-tag-list-1',
@@ -75,10 +71,7 @@ export const Tags: TStory = {
 
 export const WithoutCmsHeading: TStory = {
   args: {
-    sectionHeader: {
-      heading: undefined,
-      supportingText: undefined,
-    },
+    headingBlock: makeHeadingBlock(),
   },
 };
 

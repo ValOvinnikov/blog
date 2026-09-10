@@ -652,6 +652,13 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   (local or `Merge pull request #…`) are explicitly skipped; Dependabot's
   `chore(deps): …` messages are not separately exempted — they pass because
   they're already conventional.
+- **A PR body is a highlight list — 12 lines and 1200 characters, hard cap.**
+  One line of what this makes possible, one line per layer touched,
+  `Closes #<n>`. No code blocks, no per-file or per-function enumeration, no
+  design-rationale sections, and **no test-plan checklist** — the gates already
+  require the checks to pass before commit and CI re-runs them on the PR, so a
+  hand-ticked copy proves nothing. Full contract and the exception list in
+  `open-pull-request`'s "PR body template" section.
 - **Prefer per-layer PRs.** Split a multi-layer feature into separate PRs per
   layer (`config → studio → service → ui → web` when config changes are involved,
   otherwise `studio → service → ui → web`; dependency order) so each review stays
@@ -723,11 +730,24 @@ main` fires no workflow. CodeQL runs here through GitHub's _default setup_
   same PR that does that `SPEC.md` sync. `SPEC.md` is the durable record of
   final behavior; a design doc's job ends once its decisions are reflected
   there, so it doesn't linger as a second, driftable copy. See
-  `docs/README.md` for the live index. (Superseded 2026-07-27: earlier
+  `docs/README.md` for the live index.
+
+  **A doc may also be retired early, before its work ships,** when the epic
+  it belongs to has been cut into self-contained tickets and the doc has
+  become a second copy of them. Move the cross-cutting shape (the parts no
+  single ticket owns) into the **epic issue body**, repoint every ticket and
+  every sibling doc at the epic, and delete the doc in that same change. The
+  epic body then states plainly that it is the design of record and that the
+  `SPEC.md` sync is owed by the epic's final PR — `SPEC.md` still only ever
+  describes built behaviour, so it is not written ahead of the work. Adopted
+  2026-09-09 for the page-composition epic (#2943), after the doc and its
+  tickets drifted apart repeatedly within one session; the drift, not the
+  doc's age, is the trigger. (Superseded 2026-07-27: earlier
   revisions of this rule archived shipped docs into
   `docs/archive/superpowers/{specs,plans}/` instead of deleting them — that
   bucket is now frozen history, not an active destination; do not add new
   entries to it.)
+
 - **Docs sync:** [`docs/context/ci-automation.md`](docs/context/ci-automation.md)
   documents every workflow in
   `.github/workflows/` and the required status checks — a PR that adds or
@@ -735,6 +755,180 @@ main` fires no workflow. CodeQL runs here through GitHub's _default setup_
   changes agent tooling (`.claude/` hooks/agents/skills/settings) updates
   [`docs/context/claude-code.md`](docs/context/claude-code.md).
 - `.claude/skills/` is the single home for skills — edit one copy, no mirror.
+
+## Reporting to the user
+
+**Default shape of a chat message: the outcome first, then at most a handful
+of lines.** Roughly 8 lines of prose is the budget for a routine status
+update; a genuinely complex decision can run longer, but it has to earn every
+line past that. The progress table the user asks for after each unit of work
+is exempt from the budget — it is the requested format, not prose.
+
+**Six things bloat these messages. None of them are information the user
+lacks:**
+
+- **Restating a subagent's report.** The orchestrator's job is the
+  _conclusion_ — "#2987 landed, service green" — not a prose retelling of what
+  the agent said it did. Never paraphrase a report section by section.
+- **Verification statistics.** "135 files / 730 tests, type-check green across
+  all 11 tasks, all three greps zero" is one word to the reader: green. Give
+  the numbers only when something failed, or when the user asked for them.
+- **Narrating abandoned paths and internal reasoning.** "I abandoned
+  55eb160cb rather than resolving its conflict — it was written against the
+  pre-#3001 shape…" describes work the user never sees and cannot act on.
+  Report the state that exists now.
+- **Self-assessment and blame attribution.** "That came from my dispatch",
+  "it's my fault rather than its judgment", "that's the right behaviour" — the
+  user needs the decision, not a review of how it arose.
+- **Repeating unchanged state.** Board status, epic counts, and remaining
+  sub-issue lists get one mention when they _change_. Re-printing "epic #2943
+  In Progress with 8 sub-issues left" in consecutive messages is noise.
+- **Bundling an unrelated ask into a status update.** A stray "also, should I
+  delete this label?" buried under a report either gets missed or derails the
+  thread. Hold it, or ask it on its own.
+
+### Reporting epic status
+
+**One format answers both triggers** — a PR on a tracked epic merging, and the
+user asking where an epic stands ("epic status", "where are we on #2943?",
+"what's left"). Same table either way; the only difference is the opening
+sentence, which names the merge when there was one and is dropped when there
+wasn't.
+
+**The report is exactly:** that sentence, then **one table** carrying every
+open ticket in the epic, grouped into three lanes by a band row. Nothing else
+— no board recap, no verification statistics, no retelling of the
+`board-keeper` report.
+
+Before answering a status question, dispatch `board-keeper` first (per "Board
+reconciliation" below, which already calls for this) so the table is built from
+a reconciled board rather than a stale one.
+
+```
+#2975 merged — the home page can now open with a heading instead of a hero.
+
+| #                    | What                                | Scope                  | Note                         |
+| -------------------- | ----------------------------------- | ---------------------- | ---------------------------- |
+| 🟢 **Done**          |                                     |                        |                              |
+| 2975                 | home page — headingSettings         | web                    | merged in #3001              |
+| 🟡 **Parallel now**  |                                     |                        |                              |
+| 2976                 | landing page                        | web                    | `landing-page-view`          |
+| 2977                 | blog list page                      | web                    | `blog-list-page`             |
+| 2960                 | retire `blog_post`                  | studio                 | + seed migration             |
+| 🔵 **Next, in order**|                                     |                        |                              |
+| 2969                 | retire `BlogPageTemplate` props     | web                    | ⛓ stack on 2977              |
+| 2988                 | rename `sectionHeader`              | studio + service + web | sequential — reds type-check |
+```
+
+**Mark a 🔵 row `⛓ stack on <#>` when it can ride a `gh stack` on the row above
+it; leave it unmarked when it cannot.** The 🔵 lane is where stacking gets
+decided, because it is by definition the lane of tickets that depend on another
+— but dependency alone does not make a chain stackable. The test is the one in
+"Stacked PRs" below: the **bottom** PR targets `main` and must be green there
+on its own, so a chain whose first link cannot compile alone is sequential, and
+marking it `⛓` sends the whole stack into a permanent `BLOCKED` state.
+
+That is why 2988 above is unmarked — a repo-wide rename reds `type-check` until
+every consumer lands, so it is one PR that waits, not a stack bottom. A `⛓`
+claim is a compile claim; hold it to the same "derive it, don't guess" standard
+as a `blocks` claim.
+
+**Lane order is fixed: 🟢 done, 🟡 parallel now, 🔵 next in order.** Parallel
+sits above next-in-order because it is the actionable lane — what can be
+dispatched this minute — while 🔵 is the queue behind it. Within 🔵, a blocker
+comes above what it blocks, so the lane reads top-down as the order to work in.
+
+**The `Scope` column is not decoration.** It is what makes the 🟡 lane
+checkable rather than asserted: six tickets all scoped `web` are parallel-safe
+only because they are separate files in the same layer, and seeing that stated
+is what prompts the check. A 🟡 lane whose rows share a scope _and_ a file is a
+bug in the report.
+
+**The three markers are the colour.** Terminal markdown has no colour
+primitive, raw ANSI escapes are not rendered, and neither is raw HTML — so
+`<td colspan>` is not available and a band row is a normal row with its label
+in the first cell and the rest empty. That is the closest achievable to a
+merged cell; don't reach for HTML to improve it, it renders as literal tags.
+Never substitute other emoji — the same mark must mean the same thing every
+time.
+
+**Why solid discs and not pictographs.** The obvious picks — `✅` done, `🔜`
+next, `⚡` parallel — fail on a dark terminal: `🔜` in particular is a dark
+navy glyph that all but disappears on black. The filled circles are one shape
+in three saturated hues, so they read at the same strength on any background
+and the only thing distinguishing them is the colour, which is the entire
+point. Don't "improve" them back into pictographs.
+
+**The dependency claim has to be real.** Derive it from what the tickets
+actually touch — a shared file, a renamed symbol, a type one consumes from the
+other — not from issue-number order or a guess. If two tickets' relationship
+is genuinely unclear, say they are unordered rather than inventing a sequence;
+a wrong "blocks" sends a parallel dispatch into a collision.
+
+**This table _is_ the progress table** the user asks for after each unit of
+work, in its epic-merge form — not a second artefact alongside it. Regenerate
+it live from `gh` every time; a pasted snapshot from an earlier turn is exactly
+the staleness the table exists to prevent.
+
+### Asking the user a question
+
+**When a decision genuinely needs the user, ask it as a question — not as a
+brief.** State the recommendation first, then the single fact that could
+change it, then the question. A paragraph headed "the case for X" followed by
+a paragraph headed "the case for Y" is a memo the user has to read to extract a
+yes/no from; three lines get the same answer:
+
+```
+I'd apply it to all five call sites — the other four are byte-identical and
+behaviour-preserving. Cost is four extra files on a prio:later ticket.
+All five, or home only?
+```
+
+This does not license withholding a real tension — the "don't let a subagent
+silently resolve an ambiguity" rule above still stands, and surfacing one is
+mandatory. It governs the _length_ of the surfacing, not whether it happens.
+
+**One question per message.** If two decisions are pending, ask the blocking
+one and hold the other until it is answered.
+
+**Every question carries an urgency glyph**, because a question and a status
+line look identical once they scroll past:
+
+- 🟥 **Blocking** — work has stopped; nothing proceeds until the user answers.
+- 🟧 **Needed soon** — work continues on a stated assumption that costs rework
+  if it turns out wrong.
+- ⬜ **Whenever** — a preference or a tidy-up; answering late costs nothing.
+
+Squares, not the discs the status lanes use — a 🟦 beside a 🔵 is the same hue
+in a near-identical shape and the two systems blur at terminal size. Red and
+orange are unused by the lanes, and white reads as neutral, so a question mark
+can never be mistaken for a status lane. Three levels is the whole scale: the
+only distinction that changes what the user does is whether they must answer
+now, before the next dispatch, or never really.
+
+**🟥 means work actually stops.** If the work carried on regardless, the
+question was not blocking — label it 🟧 and name the assumption. Mislabelling
+is how a glyph becomes decoration.
+
+### An open question is carried, not dropped
+
+A question asked once and then buried under later messages is worse than a
+verbose report: the work continues on an assumption the user never confirmed,
+and nothing on screen shows that it is outstanding. So until it is answered:
+
+- **Restate it as the last line of every message**, in one line, with its
+  glyph. Last line specifically — that is what sits directly above the user's
+  input box, and a question in the middle of a report is the one that gets
+  lost.
+- **Never resolve it by picking the best option.** A reply that addresses
+  something else is not an answer to it; it stays open and stays carried. (The
+  standing rule against silently settling an ambiguity is what this enforces —
+  the carry line is what makes a breach visible rather than silent.)
+- **If work continued past it, say what was assumed** in that same restatement,
+  and whether the assumption is still cheap to reverse.
+- **Drop the carry line only when the user actually answers it**, or explicitly
+  waves it away. Nothing else clears it — not a topic change, not a new
+  instruction, not the question becoming awkward to keep repeating.
 
 ## Delivery gate sequence (mandatory — never skip or bundle)
 
@@ -852,6 +1046,12 @@ applies safe, forward-only status corrections; anything that looks
 destructive (e.g. reopening a wrongly-closed issue) comes back in its report
 for you to act on.
 
+When the merged PR belongs to an epic, what the user gets back once that
+dispatch returns is the lane-banded table in "Reporting epic status" above —
+never a retelling of the board-keeper report. The same applies to the
+status-question dispatch mentioned above: reconcile first, then answer with
+that table.
+
 **Never call `gh issue create` directly — creating an issue always goes
 through `board-keeper`.** Dispatch it with `"create issue: title=..., body=...,
 labels=...(, parent=#<n>)"`; it creates the issue, places it on the board,
@@ -859,7 +1059,7 @@ confirms status and labels, links it to a parent if given, and only then
 reports the issue number back — creation and placement happen as one
 verified operation instead of two steps where the second could be skipped.
 Before dispatching, gather every required field — **title** (conventional-
-commit style), **body** (context + acceptance criteria), **at least one
+commit style), **body** (the sectioned template below), **at least one
 label including exactly one `prio:*` label** (the taxonomy and defaults in
 "Ticket priority & triage" below — `board-keeper` rejects a creation
 dispatch without one), and a **parent issue number** if this is a sub-issue
@@ -869,6 +1069,64 @@ this gathering only happens here, before dispatch, never inside it. In the
 same pass, check the ticket against the `cloud-ok` criteria (same section)
 and include that label when it qualifies — cloud-eligibility is assessed
 at creation, not discovered later.
+
+### Issue body template
+
+**An issue body is a work item in fixed sections, not a design document.** A
+ticket says why the work exists, what "done" means, and where the design lives
+— the design itself belongs in a `docs/superpowers/specs/*` doc while the work
+is in flight, and in `SPEC.md` once it ships.
+
+A sub-issue, in this order and no other sections:
+
+```
+## Why
+<1–3 sentences: what is wrong or missing today>
+
+## Scope
+- <layer>: <what changes>
+
+## Acceptance criteria
+- [ ] <observable outcome, not an implementation step>
+
+## Verify
+pnpm type-check && pnpm lint && pnpm test && pnpm knip
+
+## Design
+<link to the spec doc, or "none — the criteria above are the whole design">
+```
+
+An epic swaps `Acceptance criteria` and `Verify` for the shape of the work,
+since its sub-issues carry those:
+
+```
+## Why
+## Shape        — the rule the epic establishes, ≤5 bullets
+## Order        — what blocks what, and what can run in parallel
+## Done when    — the SPEC.md sections the final PR must update
+## Design       — link to the spec doc
+```
+
+`## Order` is the same information the epic status table renders as its 🟡 and
+🔵 lanes; writing it into the epic once is what lets that table be regenerated
+rather than re-derived.
+
+**Never put these in an issue body:**
+
+- **A roll-up of sibling issues** — "Shipped: #2944, #2945, …", "Closed as
+  superseded: #2970–#2973". GitHub renders the sub-issue list natively with
+  live state; a hand-written copy is stale the day the next one merges.
+- **The design narrative** — field-order tables, migration transcripts,
+  per-component walkthroughs, the reasoning behind a shape. That is the spec
+  doc's job, and `SPEC.md`'s afterwards.
+- **Progress edits.** A body is written once. Status lives on the board, in the
+  sub-issue list, and in the PRs; editing the body to record what has landed
+  turns the ticket into a changelog.
+
+The `cloud-ok` criteria still apply and are not in tension with this: a
+`cloud-ok` ticket keeps its exact file list and verification commands, because
+those are `## Scope` and `## Verify`. What it drops is the design narrative,
+which a cloud session does not need in order to execute the criteria.
 
 **A feature spanning 2+ layers always gets an epic (parent) issue plus one
 sub-issue per layer — never a single flat issue covering multiple layers.**

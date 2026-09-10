@@ -13,7 +13,7 @@ export type TBuildPostPublishPathsInput = {
 };
 
 /**
- * Every tenant-scoped, resolved path a published `blog_post` can affect:
+ * Every tenant-scoped, resolved path a published `page_post` can affect:
  * its own detail page, the home and blog archive (with pagination), and
  * every tag/topic page of the tenant (with their own pagination) — not
  * only the ones this post currently belongs to, since a tag/topic

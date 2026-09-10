@@ -1,95 +1,54 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
-import { makeTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { notFound } from 'next/navigation';
 
 import { BlogListPage } from './blog-list-page';
 
-const {
-  getIndexPageMock,
-  getTopicsMock,
-  moduleRendererMock,
-  postListModuleMock,
-  heroSlotMock,
-  getTenantSanityContextMock,
-  getTenantBaseUrlMock,
-} = vi.hoisted(() => ({
-  getIndexPageMock: vi.fn(),
-  getTopicsMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
-  getTenantBaseUrlMock: vi.fn(),
-  heroSlotMock: vi.fn(({ id }: { id: string }) => (
-    <h1 data-testid="hero-slot">{id}</h1>
-  )),
-  // Both `ModuleRenderer` and `PostListModule` are async Server Components —
-  // real RSC async-component nesting isn't renderable through
-  // `@testing-library/react`'s client renderer. Stubbed as plain sync
-  // components so this suite can assert `BlogListPage` passes the right
-  // props through without needing a real async render; their own dispatch
-  // logic is covered by `module-renderer.test.tsx` and
-  // `post-list-module.test.tsx`. `BlogListPageView`'s own rendering (h1,
-  // breadcrumbs, topic chips, JSON-LD) is covered by
-  // `blog-list-page-view.test.tsx`.
-  moduleRendererMock: vi.fn(
-    ({ modules }: { modules: { id: string; type: string }[] }) => (
-      <div data-testid="module-renderer-stub">
-        {modules.map((module) => module.type).join(',')}
-      </div>
+const { getBlogListPageMock, moduleRendererMock, heroSlotMock } = vi.hoisted(
+  () => ({
+    getBlogListPageMock: vi.fn(),
+    heroSlotMock: vi.fn(({ id }: { id: string }) => (
+      <h1 data-testid="hero-slot">{id}</h1>
+    )),
+    // `ModuleRenderer` is an async Server Component — real RSC
+    // async-component nesting isn't renderable through
+    // `@testing-library/react`'s client renderer (`blog-post-page.test.tsx`
+    // follows the same pattern). Stubbed as a plain sync component so this
+    // suite can assert `BlogListPage` composes it with the right props; its
+    // own dispatch logic — including resolving a `module_postList` entry —
+    // is covered by its own test file (`module-renderer.test.tsx`).
+    moduleRendererMock: vi.fn(
+      ({ modules }: { modules: { id: string; type: string }[] }) => (
+        <div data-testid="module-renderer-stub">
+          {modules.map((module) => module.type).join(',')}
+        </div>
+      ),
     ),
-  ),
-  postListModuleMock: vi.fn(
-    ({ id, page }: { id: string; locale: string; page: number }) => (
-      <div data-testid="post-list-module-stub">
-        {id}:{page}
-      </div>
-    ),
+  }),
+);
+
+vi.mock('@web/server/blog-list/get-blog-list-page', () => ({
+  getBlogListPage: getBlogListPageMock,
+}));
+
+vi.mock('@web/components/features/blog-list/blog-list-breadcrumbs', () => ({
+  BlogListBreadcrumbs: ({ tenant }: { tenant: string }) => (
+    <div data-testid="blog-list-breadcrumbs">{tenant}</div>
   ),
 }));
 
-vi.mock('@blog/service', () => ({
-  service: {
-    pages: {
-      blog: { v1: { getIndexPage: getIndexPageMock } },
-    },
-    entities: {
-      topics: { v1: { getTopics: getTopicsMock } },
-    },
-  },
+vi.mock('@web/components/features/blog-list/blog-list-topic-chips', () => ({
+  BlogListTopicChips: ({ tenant }: { tenant: string }) => (
+    <div data-testid="blog-list-topic-chips">{tenant}</div>
+  ),
 }));
 
 vi.mock('@web/modules/module-renderer', () => ({
   ModuleRenderer: moduleRendererMock,
 }));
 
-vi.mock('@web/modules/post-list/post-list-module', () => ({
-  PostListModule: postListModuleMock,
-}));
-
 vi.mock('@web/modules/hero-slot', () => ({
   HeroSlot: heroSlotMock,
-}));
-
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
-
-vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
-  getTenantBaseUrl: getTenantBaseUrlMock,
-}));
-
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: ({
-    href,
-    children,
-    ...rest
-  }: {
-    href: string;
-    children: React.ReactNode;
-  }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
 }));
 
 const setup = customRenderAsync(BlogListPage, {
@@ -100,30 +59,14 @@ const setup = customRenderAsync(BlogListPage, {
 
 describe(`<${BlogListPage.name}/>`, () => {
   beforeEach(() => {
-    getIndexPageMock.mockReset();
-    getTopicsMock.mockReset();
+    getBlogListPageMock.mockReset();
     moduleRendererMock.mockClear();
-    postListModuleMock.mockClear();
     heroSlotMock.mockClear();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
-    getTenantBaseUrlMock.mockReset();
-    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
-    getTopicsMock.mockResolvedValue({
-      ok: true,
-      data: [
-        makeTopicWithPostCount({
-          title: 'News',
-          slug: 'news',
-          postCount: 1,
-        }),
-      ],
-    });
   });
 
   it('calls notFound() when the fetch fails', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getIndexPageMock.mockResolvedValue({
+    getBlogListPageMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
     });
@@ -137,7 +80,7 @@ describe(`<${BlogListPage.name}/>`, () => {
 
   it('calls notFound() without logging when the index page simply does not exist', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
+    getBlogListPageMock.mockResolvedValue({ ok: true, data: undefined });
 
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
@@ -148,13 +91,11 @@ describe(`<${BlogListPage.name}/>`, () => {
   });
 
   it('renders the h1 from the fetched page shell', async () => {
-    getIndexPageMock.mockResolvedValue({
+    getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         modules: [],
-        postListId: 'post-list-1',
       },
     });
 
@@ -166,33 +107,73 @@ describe(`<${BlogListPage.name}/>`, () => {
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('passes the postList id, locale, and page through to PostListModule', async () => {
-    getIndexPageMock.mockResolvedValue({
+  it('renders the parts in order: breadcrumbs, topic chips, module renderer', async () => {
+    getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
+        modules: [
+          { id: 'post-list-1', type: 'module_postList' },
+          { id: 'newsletter-1', type: 'module_newsletter' },
+        ],
+      },
+    });
+
+    const { container } = await setup();
+
+    const order = Array.from(
+      container.querySelectorAll<HTMLElement>('[data-testid]'),
+    ).map((el) => el.getAttribute('data-testid'));
+
+    expect(order).toEqual([
+      'blog-list-breadcrumbs',
+      'blog-list-topic-chips',
+      'module-renderer-stub',
+    ]);
+  });
+
+  it('renders through PageShell: breadcrumbs outside main, everything else inside it', async () => {
+    getBlogListPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         modules: [],
-        postListId: 'post-list-1',
+      },
+    });
+
+    await setup();
+
+    const main = screen.getByRole('main');
+    expect(main).toContainElement(screen.getByTestId('blog-list-topic-chips'));
+    expect(main).toContainElement(screen.getByTestId('module-renderer-stub'));
+    expect(
+      screen.getByTestId('blog-list-breadcrumbs').closest('main'),
+    ).toBeNull();
+  });
+
+  it('passes the current page as context to ModuleRenderer', async () => {
+    getBlogListPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
+        modules: [],
       },
     });
 
     await setup({ page: 2 });
 
-    expect(postListModuleMock).toHaveBeenCalledWith(
-      { id: 'post-list-1', locale: 'en', tenant: 'tenant-1', page: 2 },
+    expect(moduleRendererMock).toHaveBeenCalledWith(
+      expect.objectContaining({ context: { page: 2 } }),
       undefined,
     );
   });
 
   it('passes an empty modules array to ModuleRenderer when the editor has not added any', async () => {
-    getIndexPageMock.mockResolvedValue({
+    getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         modules: [],
-        postListId: 'post-list-1',
       },
     });
 
@@ -204,14 +185,15 @@ describe(`<${BlogListPage.name}/>`, () => {
     );
   });
 
-  it('passes the page-builder modules through to ModuleRenderer when an editor has added one via page_blog.modules', async () => {
-    getIndexPageMock.mockResolvedValue({
+  it('passes the page-builder modules through to ModuleRenderer, including the post list module', async () => {
+    getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
-        modules: [{ id: 'newsletter-1', type: 'module_newsletter' }],
-        postListId: 'post-list-1',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
+        modules: [
+          { id: 'post-list-1', type: 'module_postList' },
+          { id: 'newsletter-1', type: 'module_newsletter' },
+        ],
       },
     });
 
@@ -219,24 +201,25 @@ describe(`<${BlogListPage.name}/>`, () => {
 
     expect(moduleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        modules: [{ id: 'newsletter-1', type: 'module_newsletter' }],
+        modules: [
+          { id: 'post-list-1', type: 'module_postList' },
+          { id: 'newsletter-1', type: 'module_newsletter' },
+        ],
         locale: 'en',
       }),
       undefined,
     );
     expect(screen.getByTestId('module-renderer-stub')).toHaveTextContent(
-      'module_newsletter',
+      'module_postList,module_newsletter',
     );
   });
 
   it('renders the fetched heading as the only h1 when no hero is set', async () => {
-    getIndexPageMock.mockResolvedValue({
+    getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         modules: [],
-        postListId: 'post-list-1',
       },
     });
 
@@ -247,14 +230,12 @@ describe(`<${BlogListPage.name}/>`, () => {
   });
 
   it('dispatches the hero through HeroSlot and keeps exactly one h1 when a hero is set', async () => {
-    getIndexPageMock.mockResolvedValue({
+    getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         hero: { id: 'hero-1', type: 'module_hero' },
         modules: [],
-        postListId: 'post-list-1',
       },
     });
 
@@ -267,26 +248,23 @@ describe(`<${BlogListPage.name}/>`, () => {
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 
-  it('forwards the resolved tenant Sanity context to getIndexPage and getTopics', async () => {
-    const tenant = {
-      projectId: 'tenant-project',
-      dataset: 'production',
-      token: 'tenant-token',
-    };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
-    getIndexPageMock.mockResolvedValue({
+  it('forwards the tenant to getBlogListPage, BlogListBreadcrumbs, and BlogListTopicChips', async () => {
+    getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         modules: [],
-        postListId: 'post-list-1',
       },
     });
 
     await setup();
 
-    expect(getIndexPageMock).toHaveBeenCalledWith(tenant);
-    expect(getTopicsMock).toHaveBeenCalledWith(tenant);
+    expect(getBlogListPageMock).toHaveBeenCalledWith('tenant-1');
+    expect(screen.getByTestId('blog-list-breadcrumbs')).toHaveTextContent(
+      'tenant-1',
+    );
+    expect(screen.getByTestId('blog-list-topic-chips')).toHaveTextContent(
+      'tenant-1',
+    );
   });
 });

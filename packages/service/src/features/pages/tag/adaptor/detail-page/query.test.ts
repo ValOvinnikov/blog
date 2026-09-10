@@ -1,4 +1,5 @@
 import { makeRawTagPage } from '@blog/service/testing/pages/fixtures';
+import { makeRawOptionalHeadingBlock } from '@blog/service/testing/shared/fixtures';
 
 import { tagPageQuery } from './query';
 
@@ -8,15 +9,18 @@ describe('tagPageQuery', () => {
     expect(tagPageQuery.query).toContain('slug.current == $slug');
   });
 
-  it('parses a tag page with no postList slot set and no modules/SEO', () => {
-    const raw = makeRawTagPage({ postList: null, modules: null, seo: null });
+  it('parses a tag page with no modules/SEO', () => {
+    const raw = makeRawTagPage({ modules: null, seo: null });
 
     expect(() => tagPageQuery.parse(raw)).not.toThrow();
   });
 
-  it('parses a tag page with a postList slot, modules, and SEO', () => {
+  it('parses a tag page with a list module alongside other modules, and SEO', () => {
     const raw = makeRawTagPage({
-      modules: [{ _id: 'cta-1', _type: 'module_cta' }],
+      modules: [
+        { _id: 'post-list-1', _type: 'module_postList' },
+        { _id: 'cta-1', _type: 'module_cta' },
+      ],
       seo: { metaTitle: 'TypeScript', metaDescription: null, openGraph: null },
     });
 
@@ -26,6 +30,14 @@ describe('tagPageQuery', () => {
   it('parses a tag page with its hero slot set', () => {
     const raw = makeRawTagPage({
       hero: { _id: 'hero-1', _type: 'module_hero' },
+    });
+
+    expect(() => tagPageQuery.parse(raw)).not.toThrow();
+  });
+
+  it('parses a tag page with an authored headingBlock', () => {
+    const raw = makeRawTagPage({
+      headingBlock: makeRawOptionalHeadingBlock({ heading: 'TypeScript' }),
     });
 
     expect(() => tagPageQuery.parse(raw)).not.toThrow();

@@ -8,7 +8,7 @@ Source of truth: `packages/studio/src/schema-types/` (documents grouped `blog/`,
 `pages/`, `settings/`; shared `objects/`; `modules/` — standalone,
 cross-referenceable page-builder documents, not embedded objects). Naming
 convention `{group}_{name}` is being applied incrementally (#251):
-`settings_navigation`, `settings_footer`, `page_home`, `page_generic`, and
+`settings_navigation`, `settings_footer`, `page_home`, `page_landing`, and
 every `module_*` document are done; `siteSettings` still carries a legacy
 name.
 
@@ -39,21 +39,21 @@ type. `module_taxonomyList` renders both ways and so is in `MODULE_MAP`.
   `POST_TITLE`/`POST_EXCERPT`/`POST_IMAGE`), `primaryActionLabel`,
   `secondaryAction` (`link`).
 - `module_postList` (`postListSchema`) — the **paginated archive**: internal
-  `title`, `sectionHeader` (optional — see below), `pageSize` (posts per page,
+  `title`, `headingBlock` (optional — see below), `pageSize` (posts per page,
   1–24, required), and a vestigial `limit` awaiting removal alongside
   `page_blog.itemsPerPage`. It carries **no `emptyMessage`** (removed in
   #1899) — empty-state copy belongs to Voice (`site_config.voiceOverrides`),
   same as every other module below.
 - `module_postLatest` (`postLatestSchema`) — the **latest-N teaser**: internal
-  `title`, `sectionHeader` (optional), `limit` (posts to fetch, 1–12). Split
+  `title`, `headingBlock` (optional), `limit` (posts to fetch, 1–12). Split
   from `module_postList` so one type is never both a teaser and an archive;
   which mode you get is settled by the type, not by page context.
 - `module_taxonomyList` (`taxonomyListSchema`) — internal `title`,
-  `sectionHeader` (optional), `taxonomy` (`TAXONOMY_KIND`, optional),
+  `headingBlock` (optional), `taxonomy` (`TAXONOMY_KIND`, optional),
   `sortOrder` (`TAXONOMY_SORT`, `ALPHABETICAL` by default) and `limit`
   (optional integer ≥ 1). Lists taxonomy entries as cards. `taxonomy` is
   optional on the document because a module cannot see what holds it, so the
-  requirement lives on the pages: `page_home`/`page_generic` reject a
+  requirement lives on the pages: `page_home`/`page_landing` reject a
   `modules[]` placement that leaves it empty, while an index page leaves it
   empty and the service falls back to that page's own kind — and that page's
   slot rule rejects a module set to the other kind. It carries
@@ -62,13 +62,13 @@ type. `module_taxonomyList` renders both ways and so is in `MODULE_MAP`.
   Voice page and overridable per tenant), not to modules — same
   as `module_postList` since #1899.
 - `module_content` (`contentSchema`) — internal `title`, `body` (portable
-  text). No `sectionHeader` — its rich-text `body` supplies any in-content
+  text). No `headingBlock` — its rich-text `body` supplies any in-content
   headings, so a separate structured heading field would just be a second
   way to do the same thing.
-- `module_cta` (`ctaSchema`) — internal `title`, `sectionHeader` (heading
+- `module_cta` (`ctaSchema`) — internal `title`, `headingBlock` (heading
   **required**), `action` (`link`, required).
 - `module_newsletter` (`newsletterSchema`) — internal `title`,
-  `sectionHeader` (heading **required**).
+  `headingBlock` (heading **required**).
 
 Every module document gets a required internal `title` via the reusable
 `titleField` helper (§ below) so it's listable/previewable in Studio
@@ -78,9 +78,9 @@ independent of its display fields, immediately followed by a **required**
 `@blog/config`'s `BRAND_VARIANT` const, `PRIMARY`/`SECONDARY` by default;
 `module_hero` passes the wider `BRAND_PRIMARY`/`PRIMARY`/`SECONDARY` option
 list. `module_cta`/`module_postList`/`module_newsletter` also get a
-`sectionHeader` field via the shared `sectionHeaderField({ requireHeading?
-})` helper (`schema-types/helpers/section-header-field.ts`) — see the
-`sectionHeader` object below. Every module document (incl. `module_hero`)
+`headingBlock` field via the shared `headingBlockField({ requireHeading?
+})` helper (`schema-types/helpers/heading-block-field.ts`) — see the
+`headingBlock` object below. Every module document (incl. `module_hero`)
 also gets an optional `layout` field via the shared `layoutField`/
 `heroLayoutField` values (`schema-types/helpers/layout-field.ts`) — see the
 `layout`/`heroLayout` objects below.
@@ -94,7 +94,7 @@ also gets an optional `layout` field via the shared `layoutField`/
   separate from the module list — it always renders first), `modules` (array of
   references via `defineModulesField({ allow: [postLatest, cta, newsletter] })`
   — the teaser, not the archive), `seo`.
-- `page_generic` (`genericSchema`) — `title`, `slug` (source: title),
+- `page_landing` (`landingSchema`) — `title`, `slug` (source: title),
   `modules` (array of references via `defineModulesField({ allow: [content,
 cta] })`), `seo`.
 - `page_blog` (`blogPageSchema`, singleton) — the `/blog` index page config:
@@ -132,7 +132,7 @@ replacing a hand-duplicated block per page document.
   `generatedAt`/`model` read-only in Studio; pipeline-populated for the
   choose-your-depth reading feature, #957).
 - `author` — name, slug, image, bio, role, socialLinks (unified `link`-based),
-  profilePage (optional ref, restricted to `page_generic`).
+  profilePage (optional ref, restricted to `page_landing`).
 - `category` — title, slug, description.
 - `tag` — title, slug, description, seo (topic taxonomy for posts; drives the
   `/tag` archives + related-posts, alongside the section-level `category`).
@@ -202,13 +202,13 @@ overlapping fields via `spacingAndDividerFields()` (same
 two-named-types-sharing-a-helper pattern as `imageWithAlt`/`bodyImage`), and
 are attached to every `module_*` document via the shared `layoutField`/
 `heroLayoutField` values; `service`/`apps/web`'s `Section` component decide
-unset-vs-set and rendering defaults), `sectionHeader`/
-`requiredHeadingSectionHeader` (`heading` (string, max 80 — required on the
-`requiredHeadingSectionHeader` variant used by `module_cta`/
+unset-vs-set and rendering defaults), `headingBlock`/
+`requiredHeadingBlock` (`heading` (string, max 80 — required on the
+`requiredHeadingBlock` variant used by `module_cta`/
 `module_newsletter`, optional on `module_postList`'s plain
-`sectionHeader`), `supportingText` (text, max 300), `align`
+`headingBlock`), `supportingText` (text, max 300), `align`
 (`CONTENT_ALIGNMENT`) — same shared-fields/two-named-types pattern, via
-`sectionHeaderField({ requireHeading? })`; attached to `module_cta`/
+`headingBlockField({ requireHeading? })`; attached to `module_cta`/
 `module_postList`/`module_newsletter` only — `module_content` and
 `module_hero` don't get one). Every `module_*` document gets its own
 standalone, **required** `brandVariant` field (`@blog/config`'s

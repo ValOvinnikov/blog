@@ -4,7 +4,7 @@ import { renderPostCardImage } from '@web/utils/render-post-card-image';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { getTranslations } from 'next-intl/server';
 
-import { PostListModuleView } from '../post-list/post-list-module-view';
+import { PostLatestModuleView } from './post-latest-module-view';
 
 export interface IPostLatestModuleProps {
   id: string;
@@ -14,7 +14,7 @@ export interface IPostLatestModuleProps {
 
 /**
  * PostLatestModule — fetches `module_postLatest` data (a latest-N teaser,
- * never paginated) and hands it to the shared `PostListModuleView`.
+ * never paginated) and hands it to `PostLatestModuleView`.
  */
 export const PostLatestModule = async ({
   id,
@@ -30,7 +30,7 @@ export const PostLatestModule = async ({
 
   const {
     brandVariant,
-    sectionHeader,
+    headingBlock,
     posts,
     layout,
     contentAlignment,
@@ -45,9 +45,9 @@ export const PostLatestModule = async ({
   if (items.length === 0) return null;
 
   return (
-    <PostListModuleView
+    <PostLatestModuleView
       brandVariant={brandVariant}
-      sectionHeader={sectionHeader}
+      headingBlock={headingBlock}
       items={items}
       layout={layout}
       contentAlignment={contentAlignment}

@@ -1,6 +1,12 @@
 import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
 import type { TImageTenant } from '@blog/service/sanity/image';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
+import { toContentTitle } from '@blog/service/shared/transformers/to-content-title';
+import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
+import {
+  toHeroSlot,
+  toModule,
+} from '@blog/service/shared/transformers/to-module';
 import type { InferResultType } from 'groqd';
 
 import type { topicIndexPageQuery } from './query';
@@ -13,21 +19,22 @@ export type TRawTopicIndexPage = NonNullable<
 export function toTopicIndexPage(
   rawPage: TRawTopicIndexPage,
   settings: TSiteSettings,
-  taxonomyListId: string,
   tenant: TImageTenant,
 ): TTopicIndexPage {
+  const headingBlock = toHeadingBlock(rawPage.headingBlock);
+
   return {
-    heading: rawPage.heading,
-    supportingText: rawPage.supportingText ?? undefined,
+    headingBlock,
+    hero: rawPage.hero ? toHeroSlot(rawPage.hero) : undefined,
+    modules: (rawPage.modules ?? []).map(toModule),
     seo: resolveSeo(
       rawPage.seo ?? undefined,
-      { title: rawPage.heading },
+      { title: toContentTitle(headingBlock.heading, settings.brand.name) },
       {
         description: settings.description,
         defaultOgImageUrl: settings.defaultOgImageUrl,
       },
       tenant,
     ),
-    taxonomyListId,
   };
 }

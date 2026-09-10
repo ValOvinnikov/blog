@@ -1,23 +1,14 @@
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { buildBlogListMetadata } from './build-blog-list-metadata';
 
-const { getIndexPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
-  getIndexPageMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
+const { getBlogListPageMock } = vi.hoisted(() => ({
+  getBlogListPageMock: vi.fn(),
 }));
 
-vi.mock('@blog/service', () => ({
-  service: {
-    pages: {
-      blog: { v1: { getIndexPage: getIndexPageMock } },
-    },
-  },
-}));
-
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
+vi.mock('@web/server/blog-list/get-blog-list-page', () => ({
+  getBlogListPage: getBlogListPageMock,
 }));
 
 const seo = makeSeo({
@@ -30,36 +21,33 @@ const seo = makeSeo({
 
 describe('buildBlogListMetadata', () => {
   beforeEach(() => {
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getBlogListPageMock.mockReset();
   });
 
-  it('forwards the resolved tenant Sanity context to getIndexPage', async () => {
-    const tenant = {
-      projectId: 'tenant-project',
-      dataset: 'production',
-      token: 'tenant-token',
-    };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
-    getIndexPageMock.mockResolvedValue({
+  it('forwards the slug-less tenant to getBlogListPage — the same cached loader BlogListPage reads', async () => {
+    getBlogListPageMock.mockResolvedValue({
       ok: true,
-      data: { heading: 'Blog', seo, modules: [], postListId: 'post-list-1' },
+      data: {
+        title: 'Blog',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
+        seo,
+        modules: [],
+      },
     });
 
     await buildBlogListMetadata(1, 'tenant-1');
 
-    expect(getIndexPageMock).toHaveBeenCalledWith(tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
+    expect(getBlogListPageMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('builds page-1 metadata from the resolved seo, self-canonical to /blog', async () => {
-    getIndexPageMock.mockResolvedValue({
+    getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Blog',
+        title: 'Blog',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         seo,
         modules: [],
-        postListId: 'post-list-1',
       },
     });
 
@@ -79,13 +67,13 @@ describe('buildBlogListMetadata', () => {
   });
 
   it('builds page-N metadata with a "– Page N" suffix, self-canonical to /blog/page/N — never /blog', async () => {
-    getIndexPageMock.mockResolvedValue({
+    getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Blog',
+        title: 'Blog',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         seo,
         modules: [],
-        postListId: 'post-list-1',
       },
     });
 
@@ -102,7 +90,7 @@ describe('buildBlogListMetadata', () => {
   });
 
   it('returns empty metadata when the index page fetch fails', async () => {
-    getIndexPageMock.mockResolvedValue({
+    getBlogListPageMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
     });
@@ -114,7 +102,7 @@ describe('buildBlogListMetadata', () => {
 
   it('returns empty metadata without logging when the index page simply does not exist', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
+    getBlogListPageMock.mockResolvedValue({ ok: true, data: undefined });
 
     const metadata = await buildBlogListMetadata(1, 'tenant-1');
 

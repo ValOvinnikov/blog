@@ -21,7 +21,7 @@ export type THeroModuleType = Extract<TModuleType, `module_hero${string}`>;
  * Every module that renders only through a page's dedicated slot, never
  * through `modules[]`.
  */
-export type TSlotModuleType = THeroModuleType | 'module_postList';
+export type TSlotModuleType = THeroModuleType;
 
 export const isHeroModuleType = (type: string): type is THeroModuleType =>
   type.startsWith('module_hero');
@@ -48,6 +48,16 @@ export const HERO_VARIANT = {
 } as const;
 
 export type THeroVariant = TValueOf<typeof HERO_VARIANT>;
+
+/**
+ * Which form the newsletter module renders — full or compact.
+ */
+export const NEWSLETTER_VARIANT = {
+  FULL: 'FULL',
+  COMPACT: 'COMPACT',
+} as const;
+
+export type TNewsletterVariant = TValueOf<typeof NEWSLETTER_VARIANT>;
 
 /**
  * How a module picks the post it renders.

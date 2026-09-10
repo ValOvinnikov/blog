@@ -6,8 +6,8 @@ type TModuleReference = { _type?: string; _ref?: string };
 
 /**
  * A `modules[]` validator requiring every referenced `module_taxonomyList`
- * to have an authored `taxonomy` — a page composing modules freely (unlike a
- * topic/tag index page's dedicated slot) has no other way to know which
+ * to have an authored `taxonomy` — a page composing modules freely (unlike
+ * the tag index page's dedicated slot) has no other way to know which
  * terms the module should list.
  */
 export const validateTaxonomyListHasTaxonomy = async (

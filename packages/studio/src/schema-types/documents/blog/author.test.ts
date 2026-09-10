@@ -13,7 +13,7 @@ describe('authorSchema profilePage field', () => {
   const getProfilePageField = () =>
     getField('profilePage') as TReferenceFieldDefinition | undefined;
 
-  it('references page_generic only', () => {
+  it('references page_landing only', () => {
     const profilePageField = getProfilePageField();
 
     if (!profilePageField || profilePageField.type !== 'reference') {
@@ -23,7 +23,7 @@ describe('authorSchema profilePage field', () => {
     }
 
     expect(profilePageField.to?.map((target) => target.type)).toEqual([
-      'page_generic',
+      'page_landing',
     ]);
   });
 

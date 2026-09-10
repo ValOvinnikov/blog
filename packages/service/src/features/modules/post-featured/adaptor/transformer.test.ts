@@ -13,12 +13,12 @@ import { toPostFeaturedModule } from './transformer';
 const tenant = makeTenant();
 
 describe(toPostFeaturedModule, () => {
-  it('maps sectionHeader straight through', () => {
+  it('maps headingBlock straight through', () => {
     const raw = makeRawPostFeaturedModule();
 
     const module = toPostFeaturedModule(raw, tenant);
 
-    expect(module.sectionHeader).toEqual({
+    expect(module.headingBlock).toEqual({
       heading: 'Featured',
       supportingText: undefined,
     });
@@ -34,12 +34,12 @@ describe(toPostFeaturedModule, () => {
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
 
-  it('leaves every sectionHeader field undefined when the field itself is unset (no faked default)', () => {
-    const raw = makeRawPostFeaturedModule({ sectionHeader: null });
+  it('leaves every headingBlock field undefined when the field itself is unset (no faked default)', () => {
+    const raw = makeRawPostFeaturedModule({ headingBlock: null });
 
     const module = toPostFeaturedModule(raw, tenant);
 
-    expect(module.sectionHeader).toEqual({
+    expect(module.headingBlock).toEqual({
       heading: undefined,
       supportingText: undefined,
     });

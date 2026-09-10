@@ -2,8 +2,8 @@ import { TAXONOMY_KIND, TAXONOMY_SORT, type TTaxonomyKind } from '@blog/config';
 import { tagsQuery } from '@blog/service/features/entities/tags/adaptor/query';
 import { topicsQuery } from '@blog/service/features/entities/topics/adaptor/query';
 import { q } from '@blog/service/sanity/query';
+import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { layoutFragment } from '@blog/service/shared/fragments/layout';
-import { sectionHeaderFragment } from '@blog/service/shared/fragments/section-header';
 import { z } from 'zod';
 
 const RESOLVED_TAXONOMY_EXPRESSION = 'coalesce(taxonomy, $fallbackTaxonomy)';
@@ -24,9 +24,9 @@ export const taxonomyListModuleQuery = q
   .slice(0)
   .project((sub) => ({
     brandVariant: sub.field('brandVariant').notNull(),
-    sectionHeader: sub
-      .field('sectionHeader')
-      .project(sectionHeaderFragment)
+    headingBlock: sub
+      .field('headingBlock')
+      .project(headingBlockFragment)
       .nullable(true),
     layout: sub.field('layout').project(layoutFragment).nullable(true),
     contentAlignment: sub.field('contentAlignment').nullable(true),

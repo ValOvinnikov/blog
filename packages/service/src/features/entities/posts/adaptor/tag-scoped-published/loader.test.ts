@@ -1,5 +1,6 @@
 import { makeRawFeedPost } from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getPublishedPostsByTag } from './loader';
@@ -14,8 +15,18 @@ const tenant = makeTenant();
 describe(getPublishedPostsByTag, () => {
   it('fetches every published post tagged with the given tag id', async () => {
     mockRun.mockResolvedValue([
-      makeRawFeedPost({ title: 'First', slug: 'first' }),
-      makeRawFeedPost({ title: 'Second', slug: 'second' }),
+      makeRawFeedPost({
+        headingBlock: makeRawHeadingBlock('First', {
+          supportingText: 'A sufficiently long excerpt for the card.',
+        }),
+        slug: 'first',
+      }),
+      makeRawFeedPost({
+        headingBlock: makeRawHeadingBlock('Second', {
+          supportingText: 'A sufficiently long excerpt for the card.',
+        }),
+        slug: 'second',
+      }),
     ]);
 
     const result = await getPublishedPostsByTag('tag-1', tenant);

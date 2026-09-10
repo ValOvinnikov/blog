@@ -1,5 +1,6 @@
 import { BRAND_VARIANT, TAXONOMY_KIND } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
@@ -41,10 +42,7 @@ const topicsResult = (entries: unknown[] = []) => ({
   ok: true,
   data: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: {
-      heading: undefined,
-      supportingText: undefined,
-    },
+    headingBlock: makeHeadingBlock(),
     layout: undefined,
     contentAlignment: undefined,
     taxonomy: TAXONOMY_KIND.TOPICS,
@@ -56,10 +54,7 @@ const tagsResult = (entries: unknown[] = []) => ({
   ok: true,
   data: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: {
-      heading: undefined,
-      supportingText: undefined,
-    },
+    headingBlock: makeHeadingBlock(),
     layout: undefined,
     contentAlignment: undefined,
     taxonomy: TAXONOMY_KIND.TAGS,
@@ -75,7 +70,7 @@ const entry = {
   postCount: 5,
 };
 
-describe(TaxonomyListModule, () => {
+describe(`<${TaxonomyListModule.name}/>`, () => {
   beforeEach(() => {
     getTaxonomyListMock.mockReset();
     getTenantSanityContextMock.mockReset();

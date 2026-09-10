@@ -50,10 +50,10 @@ export const authorSchema = defineType({
       title: 'Profile Page',
       type: 'reference',
       description: "Optional page this author's byline links to.",
-      // Literal (not `genericSchema.name`): importing page.ts here closes a
-      // circular import (page → module-cta → link → post → author) —
+      // Literal (not `landingSchema.name`): importing landing.ts here closes
+      // a circular import (landing → module-cta → link → post → author) —
       // typegen fails otherwise.
-      to: [{ type: 'page_generic' }],
+      to: [{ type: 'page_landing' }],
     }),
   ],
   preview: {

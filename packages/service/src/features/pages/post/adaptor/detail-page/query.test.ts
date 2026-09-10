@@ -3,8 +3,8 @@ import { makeRawTopic } from '@blog/service/testing/entities/fixtures';
 import {
   makeRawAuthor,
   makeRawPostDetail,
-  makeRawPostPage,
 } from '@blog/service/testing/pages/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 
 import { postPageQuery } from './query';
 
@@ -18,59 +18,52 @@ describe('postPageQuery', () => {
     expect(postPageQuery.query).toContain('publishedAt <= now()');
   });
 
-  it('parses a post page whose optional fields are all absent', () => {
-    const raw = makeRawPostPage({
+  it('parses a post whose optional fields are all absent', () => {
+    const raw = makeRawPostDetail({
+      heroImage: null,
+      heroImageAsset: null,
+      featured: null,
       seo: null,
-      post: makeRawPostDetail({
-        heroImage: null,
-        heroImageAsset: null,
-        featured: null,
-        seo: null,
-        author: makeRawAuthor({ role: null }),
-        topic: makeRawTopic({ description: null }),
-      }),
+      author: makeRawAuthor({ role: null }),
+      topic: makeRawTopic({ description: null }),
     });
 
     expect(() => postPageQuery.parse(raw)).not.toThrow();
   });
 
   it('parses a post whose author has no image', () => {
-    const raw = makeRawPostPage({
-      post: makeRawPostDetail({
-        author: makeRawAuthor({ image: null }),
-      }),
+    const raw = makeRawPostDetail({
+      author: makeRawAuthor({ image: null }),
     });
 
     expect(() => postPageQuery.parse(raw)).not.toThrow();
-    expect(postPageQuery.parse(raw)?.post.author.image).toBeNull();
+    expect(postPageQuery.parse(raw)?.author?.image).toBeNull();
   });
 
   it('resolves a bodyImage block, deref-ing its asset and keeping layout', () => {
-    const raw = makeRawPostPage({
-      post: makeRawPostDetail({
-        body: [
-          {
-            _type: 'bodyImage',
-            _key: 'image-1',
-            asset: {
-              _id: 'image-abc123-800x600-jpg',
-              metadata: {
-                lqip: null,
-                dimensions: { width: 800, height: 600, aspectRatio: 1.333 },
-              },
+    const raw = makeRawPostDetail({
+      body: [
+        {
+          _type: 'bodyImage',
+          _key: 'image-1',
+          asset: {
+            _id: 'image-abc123-800x600-jpg',
+            metadata: {
+              lqip: null,
+              dimensions: { width: 800, height: 600, aspectRatio: 1.333 },
             },
-            hotspot: null,
-            crop: null,
-            alt: 'A diagram',
-            layout: 'FLOAT_LEFT',
           },
-        ],
-      }),
+          hotspot: null,
+          crop: null,
+          alt: 'A diagram',
+          layout: 'FLOAT_LEFT',
+        },
+      ],
     });
 
     const parsed = postPageQuery.parse(raw);
 
-    expect(parsed?.post.body[0]).toMatchObject({
+    expect(parsed?.body?.[0]).toMatchObject({
       _type: 'bodyImage',
       layout: 'FLOAT_LEFT',
       asset: { _id: 'image-abc123-800x600-jpg' },
@@ -81,28 +74,79 @@ describe('postPageQuery', () => {
     expect(postPageQuery.parse(null)).toBeNull();
   });
 
+  it('parses a post with no page-builder modules', () => {
+    const raw = makeRawPostDetail({ modules: null });
+
+    expect(() => postPageQuery.parse(raw)).not.toThrow();
+    expect(postPageQuery.parse(raw)?.modules).toBeNull();
+  });
+
+  it('parses a post with page-builder modules set', () => {
+    const raw = makeRawPostDetail({
+      modules: [{ _id: 'related-1', _type: 'module_postRelated' }],
+    });
+
+    const parsed = postPageQuery.parse(raw);
+
+    expect(parsed?.modules).toEqual([
+      { _id: 'related-1', _type: 'module_postRelated' },
+    ]);
+  });
+
+  it('parses a post whose only optional heading field, supportingText, is absent', () => {
+    const raw = makeRawPostDetail({
+      headingBlock: makeRawHeadingBlock('Hello World'),
+    });
+
+    const parsed = postPageQuery.parse(raw);
+
+    expect(parsed?.headingBlock?.supportingText).toBeNull();
+  });
+
+  it('throws when a post has no headingBlock, relying on PUBLISHED_POST_FILTER to keep such a document out of this query', () => {
+    const raw = { ...makeRawPostDetail(), headingBlock: null };
+
+    expect(() => postPageQuery.parse(raw)).toThrow();
+  });
+
+  it('throws when a post has no author, relying on PUBLISHED_POST_FILTER to keep such a document out of this query', () => {
+    const raw = { ...makeRawPostDetail(), author: null };
+
+    expect(() => postPageQuery.parse(raw)).toThrow();
+  });
+
+  it('throws when a post has no topic, relying on PUBLISHED_POST_FILTER to keep such a document out of this query', () => {
+    const raw = { ...makeRawPostDetail(), topic: null };
+
+    expect(() => postPageQuery.parse(raw)).toThrow();
+  });
+
+  it('throws when a post has no content, relying on PUBLISHED_POST_FILTER to keep such a document out of this query', () => {
+    const raw = { ...makeRawPostDetail(), body: null };
+
+    expect(() => postPageQuery.parse(raw)).toThrow();
+  });
+
   // A bodyImage block's asset is `.nullable(true)`, not `.notNull()` — an
   // image never selected (or pointing at a deleted asset) must not throw the
   // whole query; `layout` survives regardless.
   it('allows a bodyImage body block with no asset selected and no layout', () => {
-    const raw = makeRawPostPage({
-      post: makeRawPostDetail({
-        body: [
-          {
-            _type: 'bodyImage',
-            _key: 'image-1',
-            asset: null,
-            hotspot: null,
-            crop: null,
-            alt: 'A diagram',
-            layout: null,
-          },
-        ],
-      }),
+    const raw = makeRawPostDetail({
+      body: [
+        {
+          _type: 'bodyImage',
+          _key: 'image-1',
+          asset: null,
+          hotspot: null,
+          crop: null,
+          alt: 'A diagram',
+          layout: null,
+        },
+      ],
     });
 
     expect(() => postPageQuery.parse(raw)).not.toThrow();
-    expect(postPageQuery.parse(raw)?.post.body[0]).toMatchObject({
+    expect(postPageQuery.parse(raw)?.body?.[0]).toMatchObject({
       _type: 'bodyImage',
       layout: null,
       asset: null,
@@ -111,30 +155,28 @@ describe('postPageQuery', () => {
 
   // `alt` is `.nullable(true)` — missing alt text must not 404 the post.
   it('allows a bodyImage body block with no alt text', () => {
-    const raw = makeRawPostPage({
-      post: makeRawPostDetail({
-        body: [
-          {
-            _type: 'bodyImage',
-            _key: 'image-1',
-            asset: {
-              _id: 'image-abc123-800x600-jpg',
-              metadata: {
-                lqip: null,
-                dimensions: { width: 800, height: 600, aspectRatio: 1.333 },
-              },
+    const raw = makeRawPostDetail({
+      body: [
+        {
+          _type: 'bodyImage',
+          _key: 'image-1',
+          asset: {
+            _id: 'image-abc123-800x600-jpg',
+            metadata: {
+              lqip: null,
+              dimensions: { width: 800, height: 600, aspectRatio: 1.333 },
             },
-            hotspot: null,
-            crop: null,
-            alt: null,
-            layout: 'FLOAT_LEFT',
           },
-        ],
-      }),
+          hotspot: null,
+          crop: null,
+          alt: null,
+          layout: 'FLOAT_LEFT',
+        },
+      ],
     });
 
     expect(() => postPageQuery.parse(raw)).not.toThrow();
-    expect(postPageQuery.parse(raw)?.post.body[0]).toMatchObject({
+    expect(postPageQuery.parse(raw)?.body?.[0]).toMatchObject({
       _type: 'bodyImage',
       alt: null,
     });
@@ -154,15 +196,13 @@ describe('postPageQuery', () => {
         { _type: 'span', _key: 'span-1', text: 'Hello', marks: ['strong'] },
       ],
     };
-    const raw = makeRawPostPage({
-      post: makeRawPostDetail({
-        body: [richBlock] as TRawPostDetail['body'],
-      }),
+    const raw = makeRawPostDetail({
+      body: [richBlock] as TRawPostDetail['body'],
     });
 
     const parsed = postPageQuery.parse(raw);
 
-    expect(parsed?.post.body[0]).toEqual(richBlock);
+    expect(parsed?.body?.[0]).toEqual(richBlock);
   });
 
   it('keeps a rich aside block intact alongside a resolved bodyImage block', () => {
@@ -194,16 +234,14 @@ describe('postPageQuery', () => {
       alt: 'A diagram',
       layout: 'FLOAT_LEFT',
     };
-    const raw = makeRawPostPage({
-      post: makeRawPostDetail({
-        body: [asideBlock, bodyImageBlock] as TRawPostDetail['body'],
-      }),
+    const raw = makeRawPostDetail({
+      body: [asideBlock, bodyImageBlock] as TRawPostDetail['body'],
     });
 
     const parsed = postPageQuery.parse(raw);
 
-    expect(parsed?.post.body[0]).toEqual(asideBlock);
-    expect(parsed?.post.body[1]).toMatchObject({
+    expect(parsed?.body?.[0]).toEqual(asideBlock);
+    expect(parsed?.body?.[1]).toMatchObject({
       _type: 'bodyImage',
       layout: 'FLOAT_LEFT',
       asset: { _id: 'image-abc123-800x600-jpg' },

@@ -168,7 +168,7 @@ src/schema-types/modules/hero-blog/
 ## Content model (see SPEC.md §6 for the current model)
 
 Type names follow `{group}_{name}`. Documents: `blog_post`, `blog_author`,
-`blog_category`; page documents `page_home`, `page_blog`, `page_generic`;
+`blog_category`; page documents `page_home`, `page_blog`, `page_landing`;
 singletons `settings_site`, `settings_navigation`, `settings_footer`; and the
 reusable module documents `module_hero`, `module_postList`, `module_content`,
 `module_cta`. Shared objects: unified `link`, `socialLink`, `brand`,

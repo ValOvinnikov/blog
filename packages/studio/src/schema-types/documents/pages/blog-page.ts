@@ -1,20 +1,56 @@
 import { defineModulesField } from '@blog/studio/schema-types/helpers/define-modules-field';
+import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
+import { heroField } from '@blog/studio/schema-types/helpers/hero-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
+import { validateHeroOrHeading } from '@blog/studio/schema-types/helpers/validate-hero-or-heading';
 import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/helpers/validate-single-blank-heading-per-type';
-import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
 import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
 import { seoSchema } from '@blog/studio/schema-types/objects/seo';
 import { Newspaper } from 'lucide-react';
-import { defineField, defineType } from 'sanity';
+import { defineField, defineType, type SanityDocument } from 'sanity';
+
+type TModuleReference = { _type?: string; _ref?: string };
+
+type TBlogPageDocument = {
+  modules?: TModuleReference[];
+};
+
+const asBlogPageDocument = (
+  document: SanityDocument | undefined,
+): TBlogPageDocument | undefined => document as TBlogPageDocument | undefined;
+
+const countPostListModules = (document: SanityDocument | undefined): number =>
+  (asBlogPageDocument(document)?.modules ?? []).filter(
+    (module) => module._type === postListSchema.name,
+  ).length;
+
+const validatePostListModuleCount = (
+  document: SanityDocument | undefined,
+): string | true =>
+  countPostListModules(document) > 1
+    ? 'Only one Post List module is allowed per page.'
+    : true;
+
+const validatePostListModulePresent = (
+  document: SanityDocument | undefined,
+): string | true =>
+  countPostListModules(document) === 0
+    ? 'Add a Post List module so this page can list posts.'
+    : true;
 
 export const blogPageSchema = defineType({
   name: 'page_blog',
   title: 'Post Index Page',
   type: 'document',
   icon: Newspaper,
+  validation: (rule) => [
+    ...validateHeroOrHeading()(rule),
+    rule.custom(validatePostListModuleCount),
+    rule.custom(validatePostListModulePresent).warning(),
+  ],
   preview: {
     select: {
       title: 'title',
@@ -28,37 +64,18 @@ export const blogPageSchema = defineType({
   },
   fields: [
     titleField(),
-    defineField({
-      name: 'hero',
-      title: 'Hero',
-      type: 'reference',
+    headingBlockField({
       description:
-        "Optional. Replaces the page's default header and owns the page heading.",
-      to: HERO_SCHEMA_TYPES.map((schema) => ({ type: schema.name })),
+        'The page heading (h1) and its optional supporting line. Not shown when a hero is set.',
     }),
-    defineField({
-      name: 'heading',
-      title: 'Heading',
-      type: 'string',
-      description: 'The main heading shown at the top of the page.',
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'supportingText',
-      title: 'Supporting Text',
-      type: 'text',
-      description: 'Optional line shown under the heading.',
-    }),
-    defineField({
-      name: 'postList',
-      title: 'Post List',
-      type: 'reference',
-      description: 'The paginated post archive rendered on this page.',
-      to: [{ type: postListSchema.name }],
-      validation: (rule) => rule.required(),
-    }),
+    heroField(),
     defineModulesField({
-      allow: [ctaSchema.name, newsletterSchema.name, postFeaturedSchema.name],
+      allow: [
+        postListSchema.name,
+        ctaSchema.name,
+        newsletterSchema.name,
+        postFeaturedSchema.name,
+      ],
       validateCustom: (rule) =>
         rule.custom(
           validateSingleBlankHeadingPerType([postFeaturedSchema.name]),

@@ -5,6 +5,7 @@ import {
   ctaActionsDemo,
   ctaContentDemo,
 } from '@web/testing/modules/cta/fixtures';
+import { makeRequiredHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import type { ReactNode } from 'react';
 
 import { CtaModuleView } from './cta-module-view';
@@ -45,10 +46,9 @@ const setup = customRender(CtaModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
   bandTone: BRAND_VARIANT.SECONDARY,
   eyebrow: undefined,
-  sectionHeader: {
+  headingBlock: makeRequiredHeadingBlock({
     heading: 'Get started',
-    supportingText: undefined,
-  },
+  }),
   content: undefined,
   image: undefined,
   contentPosition: undefined,
@@ -59,7 +59,7 @@ const setup = customRender(CtaModuleView, {
   layout: undefined,
 });
 
-describe(CtaModuleView, () => {
+describe(`<${CtaModuleView.name}/>`, () => {
   it('renders the heading with a unique id derived from the module id', () => {
     setup();
 
@@ -76,10 +76,9 @@ describe(CtaModuleView, () => {
   it('derives a different heading id for a different module id, avoiding duplicate DOM ids', () => {
     setup({
       id: 'cta-2',
-      sectionHeader: {
+      headingBlock: makeRequiredHeadingBlock({
         heading: 'Join us',
-        supportingText: undefined,
-      },
+      }),
     });
 
     const heading = screen.getByRole('heading', { level: 2, name: 'Join us' });

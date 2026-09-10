@@ -13,7 +13,7 @@ describe('heroFallbackFeaturedPostQuery', () => {
 
     expect(heroFallbackFeaturedPostQuery.parse(rawPost)).toMatchObject({
       _id: rawPost._id,
-      title: rawPost.title,
+      headingBlock: rawPost.headingBlock,
     });
   });
 

@@ -4,19 +4,12 @@ import { userEvent, within } from 'storybook/test';
 
 import { DepthToggle } from './depth-toggle';
 
-const labels = {
-  skim: '30s',
-  read: 'Read',
-  deep: 'Deep',
-  ariaLabel: 'Reading depth',
-};
-
 const meta = {
   title: 'Components/DepthToggle',
   component: DepthToggle,
   tags: ['autodocs'],
   parameters: { layout: 'centered' },
-  args: { hasSkim: true, hasDeep: true, labels },
+  args: { hasSkim: true, hasDeep: true },
   decorators: [
     (Story, { args }) => (
       <DepthProvider

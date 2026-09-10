@@ -1,8 +1,8 @@
 import { POST_SOURCE } from '@blog/config';
 import type { TImageTenant } from '@blog/service/sanity/image';
+import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
-import { toSectionHeader } from '@blog/service/shared/transformers/to-section-header';
 import type { InferResultType } from 'groqd';
 
 import type { postFeaturedModuleQuery } from './query';
@@ -24,9 +24,7 @@ export function toPostFeaturedModule(
 
   return {
     brandVariant: raw.brandVariant,
-    sectionHeader: raw.sectionHeader
-      ? toSectionHeader(raw.sectionHeader)
-      : { heading: undefined, supportingText: undefined },
+    headingBlock: toHeadingBlock(raw.headingBlock),
     posts: limitedPosts.map((post) => toPostCard(post, tenant)),
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,

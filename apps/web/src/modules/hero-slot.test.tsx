@@ -31,7 +31,7 @@ const setup = customRenderAsync(HeroSlot, {
   tenant: 'tenant-1',
 });
 
-describe('HeroSlot', () => {
+describe(`<${HeroSlot.name}/>`, () => {
   beforeEach(() => {
     heroModuleMock.mockClear();
     loggerWarnMock.mockClear();

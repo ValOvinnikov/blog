@@ -20,5 +20,5 @@ export default async function TopicsIndexPage({ params }: TProps) {
   const { locale, tenant } = await params;
   setRequestLocale(locale);
 
-  return <TopicsPage tenant={tenant} />;
+  return <TopicsPage locale={locale} tenant={tenant} />;
 }

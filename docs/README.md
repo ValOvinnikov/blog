@@ -40,6 +40,11 @@ same PR that syncs `SPEC.md` (`CLAUDE.md`'s "Design-doc retention" rule) —
 `SPEC.md` is the durable record; the design doc doesn't stick around as a
 second copy that can drift from it.
 
+A doc can also be retired **early**, before its work ships, once its epic has
+been cut into self-contained tickets: the cross-cutting shape moves into the
+epic issue body, which then says it is the design of record, and the
+`SPEC.md` sync is owed by the epic's final PR. Same rule in `CLAUDE.md`.
+
 ## Archived design docs (frozen history — pre-2026-07-27 only)
 
 `docs/archive/` — same idea as `IMPLEMENTATION_BRIEF.md`/`ROADMAP.md` already

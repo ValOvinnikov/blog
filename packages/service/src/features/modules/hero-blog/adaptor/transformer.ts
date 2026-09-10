@@ -70,7 +70,7 @@ export function toHeroBlogModule(
   return {
     brandVariant: raw.brandVariant,
     variant: raw.variant,
-    eyebrow: raw.eyebrow ?? post?.topic.title,
+    eyebrow: raw.eyebrow ?? post?.topic?.title,
     heading: raw.heading ?? post?.title,
     supportingText: raw.supportingText ?? post?.excerpt,
     sanityImage: toImage(raw, post, tenant),

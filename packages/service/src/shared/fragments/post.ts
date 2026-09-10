@@ -1,4 +1,6 @@
 import { q } from '@blog/service/sanity/query';
+import { requiredHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block';
+import { moduleFragment } from '@blog/service/shared/fragments/module';
 
 import { authorCardFragment, authorDetailFragment } from './author';
 import { imageWithAltFragment, sanityImageFragment } from './image';
@@ -15,12 +17,14 @@ const skimFragment = q.fragmentForType<'skim'>().project((sub) => ({
 }));
 
 export const postCardFragment = q
-  .fragmentForType<'blog_post'>()
+  .fragmentForType<'page_post'>()
   .project((sub) => ({
     _id: true,
-    title: sub.field('title').notNull(),
+    headingBlock: sub
+      .field('headingBlock')
+      .project(requiredHeadingBlockFragment)
+      .notNull(),
     slug: sub.field('slug.current').notNull(),
-    excerpt: sub.field('excerpt').notNull(),
     publishedAt: sub.field('publishedAt').notNull(),
     heroImage: sub
       .field('heroImage')
@@ -37,12 +41,14 @@ export const postCardFragment = q
   }));
 
 export const postDetailFragment = q
-  .fragmentForType<'blog_post'>()
+  .fragmentForType<'page_post'>()
   .project((sub) => ({
     _id: true,
-    title: sub.field('title').notNull(),
+    headingBlock: sub
+      .field('headingBlock')
+      .project(requiredHeadingBlockFragment)
+      .notNull(),
     slug: sub.field('slug.current').notNull(),
-    excerpt: sub.field('excerpt').notNull(),
     publishedAt: sub.field('publishedAt').notNull(),
     heroImage: sub
       .field('heroImage')
@@ -53,12 +59,19 @@ export const postDetailFragment = q
       .project(sanityImageFragment)
       .nullable(true),
     featured: sub.field('featured').nullable(true),
-    newsletterEnabled: sub.field('newsletterEnabled').nullable(true),
-    body: sub.field('body[]').project(portableTextBodyItemFragment).notNull(),
+    body: sub
+      .field('content[]')
+      .project(portableTextBodyItemFragment)
+      .notNull(),
     skim: sub.field('skim').project(skimFragment).nullable(true),
     seo: sub.field('seo').project(seoFragment).nullable(true),
     author: sub.field('author').deref().project(authorDetailFragment).notNull(),
     topic: sub.field('topic').deref().project(topicFragment).notNull(),
     tags: sub.field('tags[]').deref().project(tagFragment).nullable(true),
+    modules: sub
+      .field('modules[]')
+      .deref()
+      .project(moduleFragment)
+      .nullable(true),
     wordCount: sub.raw(WORD_COUNT_EXPRESSION, wordCountParser),
   }));

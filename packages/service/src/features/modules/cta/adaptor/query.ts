@@ -1,9 +1,9 @@
 import { q } from '@blog/service/sanity/query';
 import { actionGroupFragment } from '@blog/service/shared/fragments/action-group';
+import { requiredHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image';
 import { layoutFragment } from '@blog/service/shared/fragments/layout';
 import { linkFragment } from '@blog/service/shared/fragments/link';
-import { requiredSectionHeaderFragment } from '@blog/service/shared/fragments/section-header';
 
 export const ctaModuleQuery = q
   .parameters<{ id: string }>()
@@ -15,9 +15,9 @@ export const ctaModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     bandTone: sub.field('bandTone').notNull(),
     eyebrow: sub.field('eyebrow').nullable(true),
-    sectionHeader: sub
-      .field('sectionHeader')
-      .project(requiredSectionHeaderFragment)
+    headingBlock: sub
+      .field('headingBlock')
+      .project(requiredHeadingBlockFragment)
       .notNull(),
     // Blocks are spread as-is (`'...': true`); only `markDefs` is
     // re-projected, to deref `link` annotations' `internalReference`.

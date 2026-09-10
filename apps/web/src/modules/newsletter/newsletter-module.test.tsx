@@ -1,5 +1,6 @@
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { NewsletterModule } from './newsletter-module';
@@ -51,7 +52,7 @@ const setup = customRenderAsync(NewsletterModule, {
   tenant: 'tenant-1',
 });
 
-describe(NewsletterModule, () => {
+describe(`<${NewsletterModule.name}/>`, () => {
   beforeEach(() => {
     getNewsletterMock.mockReset();
     getNewsletterSettingsMock.mockReset();
@@ -81,7 +82,8 @@ describe(NewsletterModule, () => {
       ok: true,
       data: {
         brandVariant: 'PRIMARY',
-        sectionHeader: { heading: 'Get new posts', supportingText: undefined },
+        headingBlock: makeHeadingBlock({ heading: 'Get new posts' }),
+        variant: 'FULL',
         layout: undefined,
         contentAlignment: undefined,
       },
@@ -100,12 +102,36 @@ describe(NewsletterModule, () => {
     expect(screen.getByText('Unsubscribe anytime')).toBeVisible();
   });
 
+  it('renders the compact form (no supporting text) for a COMPACT module', async () => {
+    getNewsletterMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: 'PRIMARY',
+        headingBlock: makeHeadingBlock({
+          heading: 'Get new posts',
+          supportingText: 'Only shown in the full form.',
+        }),
+        variant: 'COMPACT',
+        layout: undefined,
+        contentAlignment: undefined,
+      },
+    });
+
+    await setup();
+
+    expect(screen.getByText('Get new posts')).toBeVisible();
+    expect(
+      screen.queryByText('Only shown in the full form.'),
+    ).not.toBeInTheDocument();
+  });
+
   it('renders no trust cues, without failing, when the newsletter settings fetch fails', async () => {
     getNewsletterMock.mockResolvedValue({
       ok: true,
       data: {
         brandVariant: 'PRIMARY',
-        sectionHeader: { heading: 'Get new posts', supportingText: undefined },
+        headingBlock: makeHeadingBlock({ heading: 'Get new posts' }),
+        variant: 'FULL',
         layout: undefined,
         contentAlignment: undefined,
       },

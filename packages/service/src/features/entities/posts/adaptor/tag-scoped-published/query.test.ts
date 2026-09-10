@@ -9,9 +9,9 @@ describe('tagScopedPublishedPostsQuery', () => {
     expect(() => tagScopedPublishedPostsQuery.parse(raw)).not.toThrow();
   });
 
-  it('filters by blog_post type', () => {
+  it('filters by page_post type', () => {
     expect(tagScopedPublishedPostsQuery.query).toContain(
-      '_type == "blog_post"',
+      '_type == "page_post"',
     );
   });
 
@@ -32,9 +32,9 @@ describe('tagScopedPublishedPostsQuery', () => {
   });
 
   it('does not deref author or an image asset', () => {
-    expect(tagScopedPublishedPostsQuery.query).not.toContain('author');
+    expect(tagScopedPublishedPostsQuery.query).not.toContain('author->');
     expect(tagScopedPublishedPostsQuery.query).not.toContain('heroImage');
-    expect(tagScopedPublishedPostsQuery.query).not.toContain('topic');
+    expect(tagScopedPublishedPostsQuery.query).not.toContain('topic->');
     expect(tagScopedPublishedPostsQuery.query).not.toContain('wordCount');
   });
 });
