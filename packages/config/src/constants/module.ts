@@ -1,4 +1,5 @@
 import type { AllSanitySchemaTypes } from '@blog/config/sanity/generated/types';
+
 import type { TValueOf } from '@blog/config/utils';
 
 /**
