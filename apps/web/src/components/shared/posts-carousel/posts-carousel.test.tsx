@@ -39,7 +39,7 @@ const items = [
 
 const setup = customRender(PostsCarousel, {
   items,
-  ariaLabel: 'Latest posts',
+  title: 'Latest posts',
 });
 
 const getCarouselProps = () => {
@@ -51,11 +51,11 @@ const getCarouselProps = () => {
 };
 
 describe(`<${PostsCarousel.name}/>`, () => {
-  it('passes ariaLabel through, with the Voice-fixed previous/next labels', () => {
+  it('composes the region label from the carousel.regionLabel Voice key rather than passing the title straight through, with the Voice-fixed previous/next labels', () => {
     setup();
 
     expect(getCarouselProps()).toMatchObject({
-      ariaLabel: 'Latest posts',
+      ariaLabel: 'Latest posts carousel',
       previousLabel: 'Previous slide',
       nextLabel: 'Next slide',
     });

@@ -17,7 +17,7 @@ import { postsCarouselVariants } from './posts-carousel-variants';
 export interface IPostsCarouselProps extends IWithClassName, IWithDataTestId {
   items: IPostCardData[];
   hasImages?: boolean;
-  ariaLabel: string;
+  title: string;
   tone?: TBrandVariant;
 }
 
@@ -27,12 +27,14 @@ const s = postsCarouselVariants();
  * PostsCarousel — the `'use client'` wrapper that gives a row of post cards
  * a swipeable carousel via `@blog/ui`'s `Carousel`. `renderItem` is defined
  * here rather than in a Server Component view because a function prop can
- * never cross the server→client boundary.
+ * never cross the server→client boundary. The inner region is named
+ * distinctly from the enclosing `Section`'s landmark so the two don't share
+ * an identical name in the accessibility tree.
  */
 export const PostsCarousel = ({
   items,
   hasImages,
-  ariaLabel,
+  title,
   tone,
   className,
   dataTestId,
@@ -47,7 +49,7 @@ export const PostsCarousel = ({
       )}
       getItemKey={({ item }) => item.id}
       slideClassName={s.slide()}
-      ariaLabel={ariaLabel}
+      ariaLabel={t('regionLabel', { title })}
       previousLabel={t('previousAriaLabel')}
       nextLabel={t('nextAriaLabel')}
       tone={tone}

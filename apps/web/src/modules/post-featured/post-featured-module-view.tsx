@@ -68,7 +68,7 @@ export const PostFeaturedModuleView = ({
         <PostsCarousel
           items={items}
           hasImages={hasImages}
-          ariaLabel={resolvedTitle}
+          title={resolvedTitle}
           tone={brandVariant}
         />
       )}
