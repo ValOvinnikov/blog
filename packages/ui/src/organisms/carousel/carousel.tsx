@@ -11,17 +11,18 @@ import type { ReactNode } from 'react';
 import { carouselVariants, type TCarouselVariants } from './carousel-variants';
 import { useCarousel } from './use-carousel';
 
-export type TCarouselProps<T> = IWithClassName &
-  IWithDataTestId & {
-    /** The items to render as slides. */
-    items: T[];
-    /** Renders one item's slide content. */
-    renderItem: (item: T, index: number) => ReactNode;
-    ariaLabel: string;
-    previousLabel: string;
-    nextLabel: string;
-    slideSize?: TCarouselVariants['slideSize'];
-  };
+export type TCarouselProps<TItem extends NonNullable<unknown>> =
+  IWithClassName &
+    IWithDataTestId & {
+      /** The items to render as slides. */
+      items: TItem[];
+      /** Renders one item's slide content. */
+      renderItem: (item: TItem, index: number) => ReactNode;
+      ariaLabel: string;
+      previousLabel: string;
+      nextLabel: string;
+      slideSize?: TCarouselVariants['slideSize'];
+    };
 
 /**
  * Carousel — a generic swipeable row of slides. A native scroll-snap track
@@ -29,7 +30,7 @@ export type TCarouselProps<T> = IWithClassName &
  * buttons that always render. A slide is whatever `renderItem` returns; the
  * organism never maps data or names a content type.
  */
-export const Carousel = <T,>({
+export const Carousel = <TItem extends NonNullable<unknown>>({
   items,
   renderItem,
   ariaLabel,
@@ -38,7 +39,7 @@ export const Carousel = <T,>({
   slideSize,
   className,
   dataTestId,
-}: TCarouselProps<T>) => {
+}: TCarouselProps<TItem>) => {
   const {
     isEnhanced,
     isPreviousDisabled,
