@@ -643,6 +643,7 @@ export type Module_taxonomyList = {
   taxonomy?: 'TOPICS' | 'TAGS';
   sortOrder?: 'ALPHABETICAL' | 'MOST_POSTS';
   limit?: number;
+  showLatestPosts?: boolean;
   headingBlock?: HeadingBlock;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;

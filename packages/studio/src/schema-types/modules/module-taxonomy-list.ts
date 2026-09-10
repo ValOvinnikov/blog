@@ -50,6 +50,14 @@ export const taxonomyListSchema = defineType({
       description: 'Show at most this many terms. Empty shows all of them.',
       validation: (rule) => rule.integer().min(1),
     }),
+    defineField({
+      name: 'showLatestPosts',
+      title: 'Show latest posts',
+      type: 'boolean',
+      description:
+        "Lists each term's two newest posts under its description, as links. A term with no posts shows only its title, description and count.",
+      initialValue: true,
+    }),
     headingBlockField(),
     ...defineAlignmentFields([]),
     layoutField,
