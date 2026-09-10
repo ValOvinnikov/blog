@@ -604,7 +604,9 @@ Content fields first, then the shared tail:
 qualification.** On `heroBlog` an empty heading falls back to the post's
 title; here there is no post, and a hero whose `<h1>` is blank is a broken
 page, not a sparse one. The `required()` rule is safe on a new type: there
-are no existing documents to strand — the no-`required()`-on-a-new-field rule is about fields added to types that already have documents, which this is not.
+are no existing documents to strand. The no-`required()`-on-a-new-field rule
+is about fields added to types that already have documents, which this is
+not.
 
 **The heading is plain text, not Portable Text.** It is an `<h1>` that also
 feeds the page's `<title>`-adjacent metadata and every crawler's idea of what
@@ -723,14 +725,14 @@ type THeroStatementModule = {
   brandVariant: TFullBrandVariant;
   variant: THeroVariant;
   heading: string;
-  eyebrow?: string;
-  supportingText?: string;
-  sanityImage?: ISanityImage;
-  actions?: readonly TCtaAction[];
-  contentPosition?: TContentAlignment;
-  contentAlignment?: TContentAlignment;
-  mediaOrder?: TMediaOrder;
-  layout?: TLayout;
+  eyebrow: TMaybeUndefined<string>;
+  supportingText: TMaybeUndefined<string>;
+  sanityImage: TMaybeUndefined<ISanityImage>;
+  actions: TMaybeUndefined<readonly TCtaAction[]>;
+  contentPosition: TMaybeUndefined<TContentAlignment>;
+  contentAlignment: TMaybeUndefined<TContentAlignment>;
+  mediaOrder: TMaybeUndefined<TMediaOrder>;
+  layout: TMaybeUndefined<TLayout>;
 };
 ```
 
