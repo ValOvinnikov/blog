@@ -1160,9 +1160,16 @@ choosing a different module. `displayMode` (`GRID` | `CAROUSEL`) is a
 per-instance presentation field on the two teaser modules,
 `module_postLatest` and `module_postFeatured`; the data scope stays what
 the module already is. `module_postList` paginates and never gets it. The
-row is a pure `@blog/ui` scroll-snap track that works before hydration; an
-`apps/web` client leaf hands it to Embla once hydrated. Nothing autoplays.
-Design of record for epic #2785, settled in #2835.
+row is one `@blog/ui` organism that **owns Embla** — the pre-hydration
+scroll-snap track, the hook, the buttons, the disabled flags and the
+scroll-position handoff are all inside it — rendered through a thin
+`'use client'` wrapper in `apps/web`, the `SanityImage` shape. **Neither
+knows what a slide is**: the organism and the wrapper carry nothing
+post-specific, so `module_gallery` and `page_project.gallery` reuse both
+unchanged. Nothing autoplays. Design of record for epic #2785, settled in
+#2835 and re-cut 2026-09-10: Embla moved from a web leaf into the organism,
+and the section was rewritten against the page-composition shape (epic
+#2943: `PostsSection` is gone; listings are composed in web).
 
 Interactive mock of both modes at three widths, the Studio field, every
 runtime state and the layer contracts:
@@ -1206,82 +1213,39 @@ type, defaulted in the query, never faked in the transformer. Nothing else
 in the service changes: the carousel is the same posts in a different
 layout, and `limit` already caps them.
 
-### `@blog/ui` — `Carousel`, and a slot on `PostsSection`
+### `@blog/ui` — `Carousel` owns Embla
 
-> **Superseded 2026-09-08** by
-> the page-composition epic #2943:
-> `PostsSection` retires, so the `PostsSection.Carousel` slot below is not
-> built. `Carousel` stays exactly as specified; the latest and featured
-> module components compose it themselves from `PostCardItem` slides.
+**`Carousel` is a new organism, generic, and the first in `@blog/ui` to
+carry a hook.** It renders a `role="region"` root, a viewport `<div>`
+bound to `useEmblaCarousel`, a `<ul>` track with one `<li>` per child, and
+the two previous/next `IconButton`s centred under the track. A slide is
+whatever the caller passes — a `PostCardItem` today, an `ImageWithCaption`
+when the gallery is built. The organism never maps data to slides and
+never names a content type. `embla-carousel-react@8.6.0` (peer
+`react ^19`, MIT) becomes a `packages/ui` dependency; the v8 API is the one
+this design names (`scrollPrev`/`canScrollPrev`, `reInit`) and the
+`9.0.0-rc` line renames them, so pin the major.
 
-**`Carousel` is a new pure organism.** It renders a viewport `<div>` that
-takes a `viewportRef`, a `<ul>` track, and one `<li>` slide per child,
-plus a `Carousel.Controls` slot. It has no hook, no `'use client'` and no
-Embla import — it is the markup Embla needs and the CSS that makes that
-markup a carousel on its own.
+**It has no `'use client'` directive — the boundary is declared by the
+consumer.** `packages/ui` carries no directive anywhere and this organism
+does not add one; it is client-only by virtue of its hook, the way
+`sanity-image`'s `SanityImage` is, and it is rendered through a wrapper
+that says so (Web, below). Rendering it directly from a Server Component
+throws on the hook, which is the correct failure. This is the one
+hook-bearing component in the design system, decided 2026-09-10; the
+`ui-library-practices` Purity section, `ui.md` and `SPEC.md` §4 record the
+exception in the ui PR.
 
-| Prop                                | Effect                                                                                                                                                  |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `children`                          | The slides. Anything that is not a `Carousel.Controls` element becomes an `<li>`                                                                        |
-| `viewportRef?: Ref<HTMLDivElement>` | Forwarded to the viewport element — the node Embla binds to. React 19 ref-as-prop, the `IconButton` precedent                                           |
-| `isEnhanced?: boolean`              | Off: `overflow-x-auto snap-x snap-mandatory scroll-smooth motion-reduce:scroll-auto` and a thin scrollbar. On: `overflow-hidden`, no snap, no scrollbar |
-| `ariaLabel: string`                 | Names the region; with `aria-roledescription="carousel"` on the root                                                                                    |
-| `Carousel.Controls`                 | Two `IconButton`s centred under the track: `previousLabel`, `nextLabel`, `onPrevious`, `onNext`, `isPreviousDisabled`, `isNextDisabled`                 |
+| Prop                      | Effect                                                                                                                       |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `children`                | The slides; every child becomes an `<li>`, keyed by its own key where it has one                                             |
+| `ariaLabel: string`       | Names the region; with `aria-roledescription="carousel"` on the root                                                         |
+| `previousLabel: string`   | `aria-label` and `title` of the previous button; icon-only, so this is its whole name                                        |
+| `nextLabel: string`       | Same for next                                                                                                                |
+| `slideSize?`              | `columns` (default): the grid's own columns, the table below. `full`: one slide per view at every width, the gallery's shape |
+| `className`, `dataTestId` | The usual                                                                                                                    |
 
-`isEnhanced` is the boundary. Before hydration the viewport is a native
-scroll container: swipe, trackpad and shift-wheel all work, mandatory snap
-keeps a card aligned, and the thin scrollbar is the mouse user's
-affordance. Embla needs `overflow: hidden` on the viewport it drives, so the
-leaf flips the flag once Embla reports `init`, and the two mechanisms never
-run at once.
-
-**Slide widths track the grid's columns**, so a carousel with three posts
-at `md` is pixel-identical to the grid apart from the buttons:
-
-| Width       | Grid      | Slide                       | Why                                                                                                |
-| ----------- | --------- | --------------------------- | -------------------------------------------------------------------------------------------------- |
-| below `sm`  | 1 column  | 85 % of the viewport        | The 15 % peek of the next card is the only cue that the row scrolls while the buttons are disabled |
-| `sm`        | 2 columns | ½ minus half a gap          | Two whole cards; a half-card at this width reads as a layout bug                                   |
-| `md` and up | 3 columns | ⅓ minus two-thirds of a gap | Three whole cards, the grid's own count                                                            |
-
-Gaps reuse the grid's tokens (`gap-3.5 md:gap-5 lg:gap-7`); slides are
-`shrink-0 min-w-0 snap-start`; the track carries
-`touch-action: pan-y pinch-zoom` so vertical page scrolling survives a
-horizontal drag.
-
-**The controls always render.** They sit centred under the track rather than
-in the heading row, so a centred or right-aligned section header keeps
-its shape, and they are never hidden — not before hydration (disabled, because
-they cannot work yet) and not when every post already fits (both disabled).
-Hiding them would shift the layout the moment Embla reports, and a disabled
-button is the honest state of "nothing to scroll". Labels are props; the
-organism hardcodes none.
-
-**Accessibility is the list's, not a slideshow's.** Every card stays in the
-DOM and in the tab order; nothing is `aria-hidden` or `inert` off-screen.
-Tab reaches each card link in DOM order, then the two buttons; the viewport
-follows focus (the browser natively, Embla through its default
-`watchFocus`). Arrow keys are not captured. The root carries
-`aria-roledescription="carousel"` and the `ariaLabel`; slides carry no
-"n of m" labels, because they are not hidden and the count is the list's.
-
-**`PostsSection` gains a `PostsSection.Carousel` compound slot.** The
-section already owns the heading and its accessible fallback, the
-supporting text, the images toggle, the empty state, the tint and wrap
-variants, and — since 1.3 — a single `renderPostCard`. When the slot is
-present the section renders its cards as the track's slides inside a
-`Carousel` instead of its grid, passing the slot's props (`viewportRef`,
-`isEnhanced`) and its `Carousel.Controls` child through. `hasLead` is
-ignored in a carousel: every slide is an ordinary card, because a carousel
-is a row of peers. The slot exists so the web leaf never maps a post to a
-card — that mapping stays in one place.
-
-### Web
-
-**`PostsCarousel` is the `'use client'` leaf**, under
-`apps/web/src/components/shared/`, the `NewsletterForm` shape: it takes
-`PostsSection`'s props, imports `SmartLink` itself for `linkAs`, and renders
-`PostsSection` with the slot. Its whole job is state Embla owns:
+Everything Embla owns is internal state, never a prop:
 
 ```ts
 const [viewportRef, embla] = useEmblaCarousel({
@@ -1294,39 +1258,108 @@ const [viewportRef, embla] = useEmblaCarousel({
 });
 ```
 
-- `align: 'start'` and `slidesToScroll: 1` — one card per step, the first
-  visible card flush left, the same step a drag takes. `containScroll:
+- `align: 'start'` and `slidesToScroll: 1` — one slide per step, the first
+  visible slide flush left, the same step a drag takes. `containScroll:
 'trimSnaps'` (Embla's default, stated because it matters) lands the last
   slide flush right with no empty tail. `dragFree` off and `loop` off; no
   autoplay plugin is installed.
-- `isEnhanced`, `isPreviousDisabled` and `isNextDisabled` are `useState`
-  fed from `init`, `select` and `reInit` via `canScrollPrev()` /
-  `canScrollNext()`. Server render and first client render both have
-  `isEnhanced` false, so there is no hydration mismatch.
-- **On `init` the leaf reads the viewport's native `scrollLeft`, resets it
-  to `0`, and jumps (`scrollTo(index, true)`) to the slide the reader had
+- **`isEnhanced` is internal `useState`**, false on the server render and
+  the first client render (no hydration mismatch), flipped on Embla's
+  `init`. Off, the viewport is a native scroll container —
+  `overflow-x-auto snap-x snap-mandatory scroll-smooth motion-reduce:scroll-auto`
+  with a thin scrollbar: swipe, trackpad and shift-wheel all work, mandatory
+  snap keeps a slide aligned, and the scrollbar is the mouse user's
+  affordance. On, it is `overflow-hidden` with no snap and no scrollbar,
+  because Embla needs to own the overflow it drives. The two mechanisms
+  never run at once.
+- `isPreviousDisabled` and `isNextDisabled` are `useState` fed from `init`,
+  `select` and `reInit` via `canScrollPrev()` / `canScrollNext()`; the
+  buttons call `scrollPrev()` / `scrollNext()`.
+- **On `init` the organism reads the viewport's native `scrollLeft`, resets
+  it to `0`, and jumps (`scrollTo(index, true)`) to the slide the reader had
   already scrolled to.** A reader who swiped before hydration would
   otherwise see the row snap back to the start when Embla takes over the
   viewport — the one genuinely non-obvious step, and the one to test.
 - Reduced motion: the native track uses `motion-reduce:scroll-auto`; Embla
   gets `duration: 0` through its `breakpoints` option, which takes any
   media query. Position changes become instant; nothing else changes.
-- Labels: `carousel.previousAriaLabel` and `carousel.nextAriaLabel`, read
-  with `useTranslations` in the leaf. The buttons are icon-only, so the
-  text is an `aria-label` no sighted reader sees — the accessibility-only
-  bucket of `VOICE_FIXED_KEYS` (`blogPostPage.backToTop.ariaLabel`,
-  `bookmarkButton.saveAriaLabel`), not a tenant-editable `VOICE_FIELDS`
-  entry the way pagination's visible Previous/Next are.
+- Default `watchFocus` stays on, so the viewport follows keyboard focus
+  into an off-screen slide.
 
-`PostListModuleView` gains `displayMode?: TDisplayMode` and branches once:
-`CAROUSEL` renders `PostsCarousel`, anything else the existing
-`PostsSection`. `PostLatestModule` and `PostFeaturedModule` pass it through;
-`PostListModule` (the archive) never does. The leaf is a static import —
-Embla is small enough that a `next/dynamic` split would cost more than it
-saves — and `embla-carousel-react@8.6.0` (peer `react ^19`, MIT) is added
-to `apps/web` only. The v8 API is the one this design names
-(`scrollPrev`/`canScrollPrev`, `reInit`); the `9.0.0-rc` line renames them,
-so pin the major.
+**`slideSize: columns` tracks the grid's columns**, so a carousel with
+three posts at `md` is pixel-identical to the grid apart from the buttons:
+
+| Width       | Grid      | Slide                       | Why                                                                                                |
+| ----------- | --------- | --------------------------- | -------------------------------------------------------------------------------------------------- |
+| below `sm`  | 1 column  | 85 % of the viewport        | The 15 % peek of the next card is the only cue that the row scrolls while the buttons are disabled |
+| `sm`        | 2 columns | ½ minus half a gap          | Two whole cards; a half-card at this width reads as a layout bug                                   |
+| `md` and up | 3 columns | ⅓ minus two-thirds of a gap | Three whole cards, the grid's own count                                                            |
+
+Gaps reuse the grid's tokens (`gap-3.5 md:gap-5 lg:gap-7`); slides are
+`shrink-0 min-w-0 snap-start`; the track carries
+`touch-action: pan-y pinch-zoom` so vertical page scrolling survives a
+horizontal drag. `slideSize: full` is `basis-full` at every width with the
+same gap; it exists so the gallery has a shape to reach for on day one and
+the sizing never has to be forked into a second organism.
+
+**The controls always render.** They sit centred under the track rather than
+in the heading row, so a centred or right-aligned section header keeps
+its shape, and they are never hidden — not before hydration (disabled, because
+they cannot work yet) and not when every slide already fits (both disabled).
+Hiding them would shift the layout the moment Embla reports, and a disabled
+button is the honest state of "nothing to scroll". Labels are props; the
+organism hardcodes none. The previous button reuses `ICONS.CHEVRON_RIGHT`
+rotated, `aria-hidden`, its name coming only from `previousLabel`; a real
+`CHEVRON_LEFT` is #2922.
+
+**Accessibility is the list's, not a slideshow's.** Every slide stays in the
+DOM and in the tab order; nothing is `aria-hidden` or `inert` off-screen.
+Tab reaches each slide's link in DOM order, then the two buttons. Arrow
+keys are not captured. The root carries `aria-roledescription="carousel"`
+and the `ariaLabel`; slides carry no "n of m" labels, because they are not
+hidden and the count is the list's. `ariaLabel` is required, so a nameless
+`role="region"` is a compile error rather than an axe failure.
+
+**Stories and tests.** Storybook renders the real Embla — a row that fits,
+a row that scrolls, each `slideSize`, and one story whose slides are plain
+images so the story itself proves the organism is not a post component.
+Unit tests mock `embla-carousel-react` (the hook returns a ref and a stub
+API) and assert the button wiring, the disabled flags from
+`canScrollPrev`/`canScrollNext`, the `isEnhanced` class swap on `init`, the
+`scrollLeft` handoff, the `slideSize` class swap, and that every child
+becomes a slide with its own key.
+
+### Web
+
+**`Carousel` is the `'use client'` wrapper**, under
+`apps/web/src/components/shared/carousel/`, exactly the `SanityImage`
+shape: `import { Carousel as CarouselBase } from '@blog/ui/organisms/carousel'`,
+the directive, and nothing Embla-shaped of its own. Its two jobs are the
+client boundary — `@blog/ui` is in `transpilePackages`, so the organism's
+hook bundles under this file's directive — and the labels: it reads
+`carousel.previousAriaLabel` and `carousel.nextAriaLabel` with
+`useTranslations` and passes them down, so one place names the buttons for
+every caller. Everything else (`children`, `ariaLabel`, `slideSize`,
+`className`, `dataTestId`) passes through. The buttons are icon-only, so
+the text is an `aria-label` no sighted reader sees — the accessibility-only
+bucket of `VOICE_FIXED_KEYS` (`blogPostPage.backToTop.ariaLabel`,
+`bookmarkButton.saveAriaLabel`), not a tenant-editable `VOICE_FIELDS`
+entry the way pagination's visible Previous/Next are.
+
+**The two module views branch once, and map their own slides.** Listings
+are composed in web since the page-composition work: each module has its
+own view that renders `Section`, the heading (`ModuleHeading` once #2989
+lands), and its `PostCardItem`s. `PostLatestModuleView` and
+`PostFeaturedModuleView` gain `displayMode: TDisplayMode` from their view
+models and branch on it: `CAROUSEL` renders the web `Carousel` with one
+`PostCardItem` per item as its children — the same mapping the grid uses,
+in the same file; server-rendered cards passed as children of a client
+component is the ordinary RSC pattern — and anything else renders what the
+view renders today (the `PostGrid` for latest, the lead-plus-tail spotlight
+for featured). A featured carousel is three equal slides: no `isLead`, no
+`isSplit`, because a carousel is a row of peers. `PostListModuleView` (the
+archive) never branches. The wrapper is a static import — Embla is small
+enough that a `next/dynamic` split would cost more than it saves.
 
 ### Pages and desk
 
@@ -1345,16 +1378,19 @@ None — one optional field, defaulted at read time.
 - **service** — the coalesced projection and the view-model field on both
   teasers; transformer tests for an authored value and the read-time
   default.
-- **ui** — `Carousel` with `Controls`; the `PostsSection.Carousel` slot;
-  stories for a row that fits, a row that scrolls, enhanced and not,
-  with and without images, and a carousel spotlight; tests that
-  `isEnhanced` swaps the viewport classes, that controls carry their props,
-  that the slot replaces the grid and ignores `hasLead`; `COMPONENTS.md`.
-- **web** — the dependency, `PostsCarousel`, the `displayMode` branch in
-  the view and both modules, the copy keys; a test with
-  `embla-carousel-react` mocked that asserts the button wiring, the
-  `isEnhanced` flip and the scroll-offset handoff; a web story with real
-  Embla.
+- **ui** — the dependency; `Carousel` with the hook, the internal state,
+  the handoff, the buttons and `slideSize`; the stories and mocked tests
+  above; `COMPONENTS.md`; and the governance amendments — the
+  `ui-library-practices` Purity section, `.claude/agents/ui.md` and
+  `SPEC.md` §4 each gain the one-component exception. PR #2925 already
+  carries the pure organism from the earlier cut; it is reworked in place:
+  drop the `posts-section` changes (those files no longer exist on `main`)
+  and the `Carousel.Controls` slot (the buttons are internal now), add the
+  hook, the state and `slideSize`.
+- **web** — the wrapper, the `displayMode` branch in both views, the copy
+  keys; a wrapper test that the labels reach the organism; a view test per
+  module that `CAROUSEL` renders the wrapper with one slide per item and
+  `GRID` does not; a web story with real Embla inside a module view.
 
 Four PRs, each green on `main` alone:
 
@@ -1363,8 +1399,7 @@ Four PRs, each green on `main` alone:
    schema uses it, and knip fails on the bare export (the taxonomy-list
    precedent).
 3. **service** — a field nothing reads yet is a type member, not an export.
-4. **web** — the dependency and the leaf; the only PR whose dependency
-   review matters.
+4. **web** — the wrapper and the branches.
 
 The `module_postFeatured` half of the studio, service and web work waits
 on that module existing on `main` (epic #2784's studio → service → web
@@ -1376,14 +1411,20 @@ row keeps its position across hydration; no autoplay; both buttons are
 keyboard reachable, labelled, and disabled exactly when Embla cannot move;
 reduced motion makes every position change instant; a spotlight in
 carousel mode renders three equal slides; a `module_postLatest` carousel
-with fewer than four posts warns in the Studio.
+with fewer than four posts warns in the Studio; **the organism carries no
+`'use client'` and nothing post-specific** — the web wrapper is the only
+boundary, and a story renders the organism with plain image slides.
 
 ### Not in scope
 
 - Dot navigation or a position readout. Two buttons and the peek are the
-  whole affordance; dots are a slideshow idiom for a row of cards.
-- Grouped stepping (`slidesToScroll: 'auto'`). One card per step matches
-  the drag and is predictable; a paging step can be added if a tenant asks.
+  whole affordance for a row of cards. If the gallery wants them, they are
+  props on this organism — never a second carousel.
+- Grouped stepping (`slidesToScroll: 'auto'`) and `loop`. One card per
+  step matches the drag and is predictable; both are options a later
+  caller can ask the organism to expose.
+- A lightbox. `module_gallery`'s lightbox is that module's design; the
+  carousel is at most the strip inside it.
 - An edge-to-edge bleed. The row stays in the content column like the
   grid; a bleed is a `Section` layout decision, not a carousel one.
 - `displayMode` on `module_taxonomyList`, `module_postList` or the
@@ -1601,6 +1642,8 @@ point; the graph stays acyclic.
   reader's pre-hydration scroll position across; the buttons always render
   and are disabled exactly when Embla cannot move; a spotlight in carousel
   mode drops its lead treatment; four PRs, ui first (2026-09-08, #2835).
+  _Superseded 2026-09-10: Embla moved into the organism and the slot is
+  gone — see the 2026-09-10 entry below._
 
 - **Pages are chrome, a heading and modules; every part fetches what it
   alone needs; `PostsSection` and the `*-page-view.tsx` layer retire** —
@@ -1621,6 +1664,15 @@ point; the graph stays acyclic.
   `page_tag`/`page_tagIndex`. Live documents and references exist, so it is
   the expand → repoint → contract recipe with two migrations, unlike #2904.
   Tracked in #2961 (2026-09-08).
+- **The carousel organism owns Embla, and `@blog/ui` gains its one
+  hook-bearing component** — `Carousel` carries `useEmblaCarousel`, the
+  buttons, the disabled flags and the scroll-position handoff, with no
+  `'use client'` of its own; a thin `apps/web` wrapper (the `SanityImage`
+  shape) declares the boundary and supplies the labels. Both are generic
+  — a slide is any child, `slideSize` is `columns` or `full` — so the
+  gallery reuses them. Replaces the pure-organism-plus-web-leaf split of
+  2026-09-08, and rewrites the Web section against the per-module views
+  (`PostsSection` is gone) (2026-09-10, #2785).
 
 ## Non-goals (recorded so #1919 doesn't sprawl)
 
@@ -1675,6 +1727,13 @@ catalogue has enough shipped history to matter).
 
 ## Resync log
 
+- **2026-09-10** — re-cut "The carousel display mode" (#2785): Embla
+  moves from a web leaf into the `@blog/ui` organism (hook, buttons,
+  flags, handoff internal; `Carousel.Controls`, `viewportRef` and
+  `isEnhanced` are no longer props), `slideSize` added for the gallery,
+  the web side becomes a `'use client'` wrapper plus a branch in
+  `PostLatestModuleView`/`PostFeaturedModuleView`, and every
+  `PostsSection` reference in the section is gone.
 - **2026-09-08** — page composition: marked the carousel section's
   `PostsSection.Carousel` slot and the spotlight section's `hasLead` on
   `PostsSection` as superseded by the new page-composition design doc, and
