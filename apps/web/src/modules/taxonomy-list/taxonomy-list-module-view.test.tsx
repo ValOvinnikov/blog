@@ -1,5 +1,5 @@
 import { BRAND_VARIANT } from '@blog/config';
-import { customRender, screen } from '@web/testing/custom-render';
+import { customRender, screen, within } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { TaxonomyListModuleView } from './taxonomy-list-module-view';
@@ -25,6 +25,19 @@ const item = {
   description: 'Posts about building things.',
   postCountLabel: '5 posts',
   href: '/topics/engineering',
+  posts: [
+    {
+      id: 'post-1',
+      title: 'Shipping the new build pipeline',
+      href: '/blog/shipping-the-new-build-pipeline',
+    },
+    {
+      id: 'post-2',
+      title: 'Why we rewrote our test runner',
+      href: '/blog/why-we-rewrote-our-test-runner',
+    },
+  ],
+  latestPostsLabel: 'Latest in Engineering',
 };
 
 const setup = customRender(TaxonomyListModuleView, {
@@ -38,6 +51,7 @@ const setup = customRender(TaxonomyListModuleView, {
   headingLevel: 2,
   accessibleTitle: 'Topics',
   emptyMessage: 'No topics yet.',
+  showLatestPosts: true,
 });
 
 describe(`<${TaxonomyListModuleView.name}/>`, () => {
@@ -99,5 +113,39 @@ describe(`<${TaxonomyListModuleView.name}/>`, () => {
 
     expect(screen.getByText('No topics yet.')).toBeVisible();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('lists an entry’s latest posts, newest first, when showLatestPosts is on', () => {
+    setup();
+
+    const list = screen.getByRole('list', { name: 'Latest in Engineering' });
+    const postLinks = within(list).getAllByRole('link');
+    expect(postLinks.map((link) => link.textContent)).toEqual([
+      'Shipping the new build pipeline',
+      'Why we rewrote our test runner',
+    ]);
+    expect(postLinks[0]).toHaveAttribute(
+      'href',
+      '/blog/shipping-the-new-build-pipeline',
+    );
+  });
+
+  it('omits the latest-posts list when showLatestPosts is off, even though posts exist', () => {
+    setup({ showLatestPosts: false });
+
+    expect(
+      screen.queryByRole('list', { name: 'Latest in Engineering' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Shipping the new build pipeline'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('omits the latest-posts list when the entry has no posts, even though the flag is on', () => {
+    setup({ items: [{ ...item, posts: [] }] });
+
+    expect(
+      screen.queryByRole('list', { name: 'Latest in Engineering' }),
+    ).not.toBeInTheDocument();
   });
 });

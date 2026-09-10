@@ -1,8 +1,7 @@
-import { TAXONOMY_KIND, TAXONOMY_SORT } from '@blog/config';
-import { toTags } from '@blog/service/features/entities/tags/adaptor/transformer';
-import { toTopics } from '@blog/service/features/entities/topics/adaptor/transformer';
+import { TAXONOMY_SORT } from '@blog/config';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
+import { toPostLink } from '@blog/service/shared/transformers/to-post-link';
 import type { InferResultType } from 'groqd';
 
 import type { taxonomyListModuleQuery } from './query';
@@ -12,6 +11,21 @@ import { UnresolvedTaxonomyError } from './unresolved-taxonomy-error';
 export type TRawTaxonomyListModule = InferResultType<
   typeof taxonomyListModuleQuery
 >;
+
+export type TRawTaxonomyEntry = NonNullable<
+  TRawTaxonomyListModule['entries']
+>[number];
+
+function toTaxonomyEntry(raw: TRawTaxonomyEntry): TTaxonomyEntry {
+  return {
+    id: raw._id,
+    title: raw.title,
+    slug: raw.slug,
+    description: raw.description ?? undefined,
+    postCount: raw.postCount,
+    latestPosts: raw.latestPosts.map(toPostLink),
+  };
+}
 
 function orderEntries(
   entries: TTaxonomyEntry[],
@@ -34,9 +48,7 @@ export function toTaxonomyListModule(
   }
 
   const entries = orderEntries(
-    raw.taxonomy === TAXONOMY_KIND.TOPICS
-      ? toTopics(raw.entries)
-      : toTags(raw.entries),
+    raw.entries.map(toTaxonomyEntry),
     raw.sortOrder,
   ).slice(0, raw.limit ?? undefined);
 
@@ -46,6 +58,7 @@ export function toTaxonomyListModule(
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,
     taxonomy: raw.taxonomy,
+    showLatestPosts: raw.showLatestPosts,
     entries,
   };
 }

@@ -4,6 +4,7 @@ import type {
   TRawHeadingBlock,
   TRawRequiredHeadingBlock,
 } from '@blog/service/shared/transformers/to-heading-block';
+import type { TRawPostLink } from '@blog/service/shared/transformers/to-post-link';
 import type { TRawSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import type { InferFragmentType } from 'groqd';
 
@@ -37,6 +38,17 @@ export function makeRawImage(alt = 'Alt text'): TRawImage {
     alt,
     hotspot: null,
     crop: null,
+  };
+}
+
+export function makeRawPostLink(
+  overrides: Partial<TRawPostLink> = {},
+): TRawPostLink {
+  return {
+    _id: 'post-1',
+    headingBlock: { heading: 'Hello World' },
+    slug: 'hello-world',
+    ...overrides,
   };
 }
 
