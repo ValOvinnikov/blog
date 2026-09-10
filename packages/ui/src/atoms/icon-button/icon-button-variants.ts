@@ -65,12 +65,12 @@ export const iconButtonVariants = tv({
       variant: 'control',
       tone: BRAND_VARIANT.BRAND_PRIMARY,
       // `:hover` and `:focus-visible` can both match at once (mousing over
-      // a tabbed-to control), and either can win the cascade — so the fill,
-      // glyph and ring for this pairing are pinned to the same values under
+      // a tabbed-to control), and either can win the cascade — so the fill
+      // and glyph for this pairing are pinned to the same values under
       // both pseudo-classes rather than left to whichever one wins.
       class: [
         'hover:bg-brand-primary-solid hover:text-brand-primary-contrast',
-        'focus-visible:bg-brand-primary-solid focus-visible:text-brand-primary-contrast focus-visible:ring-brand-primary-contrast',
+        'focus-visible:bg-brand-primary-solid focus-visible:text-brand-primary-contrast',
       ],
     },
   ],
