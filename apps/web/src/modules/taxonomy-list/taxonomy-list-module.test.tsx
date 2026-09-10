@@ -1,5 +1,5 @@
 import { BRAND_VARIANT, TAXONOMY_KIND } from '@blog/config';
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
@@ -38,7 +38,7 @@ vi.mock('@web/components/shared/smart-link', () => ({
   ),
 }));
 
-const topicsResult = (entries: unknown[] = []) => ({
+const topicsResult = (entries: unknown[] = [], showLatestPosts = true) => ({
   ok: true,
   data: {
     brandVariant: BRAND_VARIANT.PRIMARY,
@@ -46,11 +46,12 @@ const topicsResult = (entries: unknown[] = []) => ({
     layout: undefined,
     contentAlignment: undefined,
     taxonomy: TAXONOMY_KIND.TOPICS,
+    showLatestPosts,
     entries,
   },
 });
 
-const tagsResult = (entries: unknown[] = []) => ({
+const tagsResult = (entries: unknown[] = [], showLatestPosts = true) => ({
   ok: true,
   data: {
     brandVariant: BRAND_VARIANT.PRIMARY,
@@ -58,6 +59,7 @@ const tagsResult = (entries: unknown[] = []) => ({
     layout: undefined,
     contentAlignment: undefined,
     taxonomy: TAXONOMY_KIND.TAGS,
+    showLatestPosts,
     entries,
   },
 });
@@ -68,6 +70,18 @@ const entry = {
   slug: 'engineering',
   description: 'Posts about building things.',
   postCount: 5,
+  latestPosts: [
+    {
+      id: 'post-1',
+      title: 'Shipping the new build pipeline',
+      slug: 'shipping-the-new-build-pipeline',
+    },
+    {
+      id: 'post-2',
+      title: 'Why we rewrote our test runner',
+      slug: 'why-we-rewrote-our-test-runner',
+    },
+  ],
 };
 
 describe(`<${TaxonomyListModule.name}/>`, () => {
@@ -159,6 +173,45 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
 
       expect(container).toBeEmptyDOMElement();
       expect(vi.mocked(notFound)).not.toHaveBeenCalled();
+    });
+
+    it('maps latestPosts to post-detail links, newest first, when showLatestPosts is on', async () => {
+      getTaxonomyListMock.mockResolvedValue(topicsResult([entry], true));
+
+      await setup();
+
+      const list = screen.getByRole('list', { name: 'Latest in Engineering' });
+      const postLinks = within(list).getAllByRole('link');
+      expect(postLinks.map((link) => link.textContent)).toEqual([
+        'Shipping the new build pipeline',
+        'Why we rewrote our test runner',
+      ]);
+      expect(postLinks[0]).toHaveAttribute(
+        'href',
+        '/blog/shipping-the-new-build-pipeline',
+      );
+    });
+
+    it('omits the latest-posts list when showLatestPosts is off, even though the entry has posts', async () => {
+      getTaxonomyListMock.mockResolvedValue(topicsResult([entry], false));
+
+      await setup();
+
+      expect(
+        screen.queryByRole('list', { name: 'Latest in Engineering' }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('omits the latest-posts list when the entry has no posts, even though the flag is on', async () => {
+      getTaxonomyListMock.mockResolvedValue(
+        topicsResult([{ ...entry, latestPosts: [] }], true),
+      );
+
+      await setup();
+
+      expect(
+        screen.queryByRole('list', { name: 'Latest in Engineering' }),
+      ).not.toBeInTheDocument();
     });
   });
 

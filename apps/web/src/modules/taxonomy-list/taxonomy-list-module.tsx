@@ -60,6 +60,7 @@ export const TaxonomyListModule = async ({
     layout,
     contentAlignment,
     taxonomy,
+    showLatestPosts,
     entries,
   } = result.data;
 
@@ -75,6 +76,12 @@ export const TaxonomyListModule = async ({
     description: entry.description,
     postCountLabel: t('postsCount', { count: entry.postCount }),
     href: buildHref(entry.slug),
+    posts: entry.latestPosts.map((post) => ({
+      id: post.id,
+      title: post.title,
+      href: routes.post(post.slug),
+    })),
+    latestPostsLabel: t('latestPostsLabel', { name: entry.title }),
   }));
 
   return (
@@ -84,6 +91,7 @@ export const TaxonomyListModule = async ({
       items={items}
       layout={layout}
       contentAlignment={contentAlignment}
+      showLatestPosts={showLatestPosts}
       titleId={slot?.titleId ?? `taxonomy-list-${id}`}
       dataTestId={slot?.dataTestId ?? `taxonomy-list-module-${id}`}
       headingLevel={slot?.headingLevel ?? 2}
