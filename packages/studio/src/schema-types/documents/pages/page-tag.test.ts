@@ -27,7 +27,7 @@ const getField = (name: string) =>
   pageTagSchema.fields?.find((field) => field.name === name);
 
 describe('pageTagSchema field order', () => {
-  it('orders fields title, slug, tag, headingBlock, hero, modules, seo, with postList deprecated at the end', () => {
+  it('orders fields title, slug, tag, headingBlock, hero, modules, seo', () => {
     expect(pageTagSchema.fields?.map((field) => field.name)).toEqual([
       'title',
       'slug',
@@ -36,7 +36,6 @@ describe('pageTagSchema field order', () => {
       'hero',
       'modules',
       'seo',
-      'postList',
     ]);
   });
 });
@@ -64,22 +63,8 @@ describe('pageTagSchema shape', () => {
     expect(requiredCalled).toBe(true);
   });
 
-  it('postList is a deprecated, read-only reference to module_postList with no validation', () => {
-    const postListField = getField('postList') as
-      TReferenceFieldDefinition | undefined;
-
-    if (!postListField || postListField.type !== 'reference') {
-      throw new Error(
-        'Expected pageTagSchema to define a postList reference field.',
-      );
-    }
-
-    expect(postListField.to?.map((target) => target.type)).toEqual([
-      postListSchema.name,
-    ]);
-    expect(postListField.readOnly).toBe(true);
-    expect(postListField.deprecated?.reason).toBeTruthy();
-    expect(postListField.validation).toBeUndefined();
+  it('no longer defines a postList field', () => {
+    expect(getField('postList')).toBeUndefined();
   });
 
   it('modules allows module_postList, module_postLatest, module_cta, and module_newsletter', () => {
@@ -533,7 +518,7 @@ const POST_LIST_UNIQUENESS_ERROR =
   'Another Tag Page already references this Post List — each Post List can only back one Tag Page.';
 
 describe('pageTagSchema document validation — unique post list reference', () => {
-  it('passes without querying when neither postList nor modules[] carries a reference', async () => {
+  it('passes without querying when modules[] carries no post list reference', async () => {
     const [, , , , uniquePostListRule] = buildDocumentRules();
     const { context, fetchCalls } = createMockContext(0);
 
@@ -556,19 +541,7 @@ describe('pageTagSchema document validation — unique post list reference', () 
     expect(fetchCalls[0]?.params).toMatchObject({ postListId: 'post-list-1' });
   });
 
-  it('falls back to the deprecated postList field when modules[] has no post list', async () => {
-    const [, , , , uniquePostListRule] = buildDocumentRules();
-    const { context, fetchCalls } = createMockContext(0);
-
-    await uniquePostListRule?.fn?.(
-      { _id: 'page-tag-1', postList: { _ref: 'post-list-1' } },
-      context,
-    );
-
-    expect(fetchCalls[0]?.params).toMatchObject({ postListId: 'post-list-1' });
-  });
-
-  it('flags a conflicting page_tag whose postList field references the same list', async () => {
+  it('flags a conflicting page_tag referencing the same modules[] post list', async () => {
     const [, , , , uniquePostListRule] = buildDocumentRules();
     const { context } = createMockContext(1);
 
