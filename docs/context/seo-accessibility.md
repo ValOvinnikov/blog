@@ -9,19 +9,20 @@
   `primaryDomain`, falling back to `NEXT_PUBLIC_SITE_URL` when no tenant
   resolves — a single deployment-wide origin would otherwise emit the
   deployment's host for every tenant.
-- **SEO fallback resolution lives in `service`**, not the routes: a single
-  `resolveSeo` transformer applies the ladder **authored `seo` →
-  content-derived → site defaults** once per field, returning a fully-resolved
-  `TSeoResolved`. `web` maps it to `Metadata` with one shared `toMetadata`
-  helper — no `??` fallback chains in route files. Page loaders
-  (`getHomePage`, `getIndexPage`, `getPage` for the generic page — #370,
-  `getPost` for the post detail page — #371) fetch site settings internally
-  (Next dedupes) and return `seo: TSeoResolved`. The home title is emitted
-  **absolute** (it is the brand) so the layout `%s | Brand` template does not
-  double-append; site settings contribute only `description` +
-  `defaultOgImage` as the final rung. If no image resolves at any rung,
-  `ogImageUrl` is absent and the route omits `og:image` / the twitter image
-  rather than emitting an empty tag. Post detail's `toMetadata` call also
+- **SEO resolution lives in `service`**, not the routes, and is
+  **authored-only**: a single `resolveSeo` transformer reads the authored
+  `seo` object and the tenant image context, nothing else. There is no
+  fallback ladder — no content-derived tier and no site defaults. `web` maps
+  the result to `Metadata` with one shared `toMetadata` helper — no `??`
+  fallback chains in route files. Page loaders return `seo: TSeoResolved`.
+  `metaTitle` is required (30–60 characters) and `resolveSeo` throws rather
+  than invent one; every other field is optional and **omitted** when
+  unauthored, so an absent `ogImageUrl` emits no `og:image` and no twitter
+  image rather than an empty tag. There is no site-wide default OG image and
+  no post-hero substitute, so `twitter:card` is `summary_large_image` only
+  when an image was actually authored, and `summary` otherwise. The home
+  title is emitted **absolute** (it is the brand) so the layout `%s | Brand`
+  template does not double-append. Post detail's `toMetadata` call also
   passes `article.publishedTime`/`article.authors` (from the post
   view-model) — an opt-in extension to `toMetadata`'s options, only emitted
   for `ogType: 'article'` callers.

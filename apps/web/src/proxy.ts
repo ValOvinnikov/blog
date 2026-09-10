@@ -129,5 +129,5 @@ export default async function proxy(
 }
 
 export const config = {
-  matcher: '/((?!api|_next|_vercel|icon|opengraph-image|twitter-image).*)',
+  matcher: '/((?!api|_next|_vercel|icon).*)',
 };

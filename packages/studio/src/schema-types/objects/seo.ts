@@ -2,6 +2,10 @@ import { defineField, defineType } from 'sanity';
 
 import { openGraphSchema } from './open-graph';
 
+/** Must stay in sync with the backfill migration's own copy of these bounds. */
+export const SEO_META_TITLE_MIN_LENGTH = 30;
+export const SEO_META_TITLE_MAX_LENGTH = 60;
+
 export const seoSchema = defineType({
   name: 'seo',
   title: 'SEO',
@@ -13,15 +17,19 @@ export const seoSchema = defineType({
       title: 'Meta Title',
       type: 'string',
       description:
-        'Overrides the page title in search results. Leave empty to use the page content. Keep under 60 characters.',
-      validation: (rule) => rule.max(60),
+        'The page title shown in search results. Required — keep between 30 and 60 characters.',
+      validation: (rule) =>
+        rule
+          .required()
+          .min(SEO_META_TITLE_MIN_LENGTH)
+          .max(SEO_META_TITLE_MAX_LENGTH),
     }),
     defineField({
       name: 'metaDescription',
       title: 'Meta Description',
       type: 'text',
       description:
-        'Overrides the summary shown in search results. Leave empty to use the page content. Keep between 120–160 characters.',
+        'The summary shown in search results. Omitted entirely when empty. Keep between 120–160 characters.',
       validation: (rule) => rule.max(160),
     }),
     defineField({
@@ -29,7 +37,7 @@ export const seoSchema = defineType({
       title: 'Open Graph',
       type: openGraphSchema.name,
       description:
-        'Overrides the social-sharing title, description, and image. Leave empty to use the page content.',
+        'The social-sharing title, description, and image. Each is omitted entirely when empty.',
     }),
   ],
 });

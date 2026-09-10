@@ -453,7 +453,6 @@ export type Settings_site = {
   brand?: Brand;
   description?: string;
   tagline?: string;
-  defaultOgImage?: ImageWithAlt;
 };
 
 export type Blog_tagReference = {
@@ -730,7 +729,6 @@ export type Blog_tag = {
   title?: string;
   slug?: Slug;
   description?: string;
-  seo?: Seo;
 };
 
 export type Blog_author = {

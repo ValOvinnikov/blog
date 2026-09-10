@@ -45,7 +45,9 @@ export const buildBlogListMetadata = async (
       : {
           ...seo,
           title: `${seo.title} ${t('pageSuffix', { page })}`,
-          ogTitle: `${seo.ogTitle} ${t('pageSuffix', { page })}`,
+          ogTitle: seo.ogTitle
+            ? `${seo.ogTitle} ${t('pageSuffix', { page })}`
+            : undefined,
         };
 
   return toMetadata(resolvedSeo, {

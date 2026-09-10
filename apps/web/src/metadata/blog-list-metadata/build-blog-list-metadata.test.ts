@@ -89,6 +89,23 @@ describe('buildBlogListMetadata', () => {
     });
   });
 
+  it('leaves ogTitle omitted on page 2+ when unauthored, rather than suffixing "undefined"', async () => {
+    getBlogListPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        title: 'Blog',
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
+        seo: makeSeo({ title: 'The Blog', ogTitle: undefined }),
+        modules: [],
+      },
+    });
+
+    const metadata = await buildBlogListMetadata(2, 'tenant-1');
+
+    expect(metadata.openGraph?.title).toBeUndefined();
+    expect(metadata.twitter?.title).toBeUndefined();
+  });
+
   it('returns empty metadata when the index page fetch fails', async () => {
     getBlogListPageMock.mockResolvedValue({
       ok: false,

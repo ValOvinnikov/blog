@@ -1,6 +1,6 @@
-import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawLandingPage } from '@blog/service/testing/pages/fixtures';
+import { makeRawSeo } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getPage } from './loader';
@@ -20,9 +20,7 @@ const tenant = makeTenant();
 
 describe('getPage', () => {
   it('maps the thin page_landing document to module refs', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawLandingPage())
-      .mockResolvedValueOnce(makeRawSiteSettings());
+    mockRun.mockResolvedValueOnce(makeRawLandingPage());
 
     const page = await getPage('about', tenant);
     if (!page) throw new Error('expected a landing page');
@@ -35,9 +33,7 @@ describe('getPage', () => {
   });
 
   it('builds an all-undefined headingBlock when page_landing.headingBlock is unset', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawLandingPage({ headingBlock: null }))
-      .mockResolvedValueOnce(makeRawSiteSettings());
+    mockRun.mockResolvedValueOnce(makeRawLandingPage({ headingBlock: null }));
 
     const page = await getPage('about', tenant);
     if (!page) throw new Error('expected a landing page');
@@ -47,13 +43,11 @@ describe('getPage', () => {
   });
 
   it('maps an authored page_landing.headingBlock through to the view model', async () => {
-    mockRun
-      .mockResolvedValueOnce(
-        makeRawLandingPage({
-          headingBlock: { heading: 'About Us', supportingText: 'Who we are' },
-        }),
-      )
-      .mockResolvedValueOnce(makeRawSiteSettings());
+    mockRun.mockResolvedValueOnce(
+      makeRawLandingPage({
+        headingBlock: { heading: 'About Us', supportingText: 'Who we are' },
+      }),
+    );
 
     const page = await getPage('about', tenant);
     if (!page) throw new Error('expected a landing page');
@@ -63,9 +57,7 @@ describe('getPage', () => {
   });
 
   it('leaves hero undefined when page_landing.hero is unset', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawLandingPage({ hero: null }))
-      .mockResolvedValueOnce(makeRawSiteSettings());
+    mockRun.mockResolvedValueOnce(makeRawLandingPage({ hero: null }));
 
     const page = await getPage('about', tenant);
     if (!page) throw new Error('expected a landing page');
@@ -74,11 +66,9 @@ describe('getPage', () => {
   });
 
   it('maps a set page_landing.hero to a hero slot', async () => {
-    mockRun
-      .mockResolvedValueOnce(
-        makeRawLandingPage({ hero: { _id: 'hero-1', _type: 'module_hero' } }),
-      )
-      .mockResolvedValueOnce(makeRawSiteSettings());
+    mockRun.mockResolvedValueOnce(
+      makeRawLandingPage({ hero: { _id: 'hero-1', _type: 'module_hero' } }),
+    );
 
     const page = await getPage('about', tenant);
     if (!page) throw new Error('expected a landing page');
@@ -96,76 +86,26 @@ describe('getPage', () => {
     await expect(getPage('about', tenant)).rejects.toThrow();
   });
 
-  it('resolves seo from the authored heading and site settings when the page has no authored seo', async () => {
-    mockRun
-      .mockResolvedValueOnce(
-        makeRawLandingPage({
-          headingBlock: { heading: 'About', supportingText: null },
-          seo: null,
-        }),
-      )
-      .mockResolvedValueOnce(
-        makeRawSiteSettings({
-          description: 'Settings description',
-        }),
-      );
+  it('rejects when the page has no authored seo', async () => {
+    mockRun.mockResolvedValueOnce(makeRawLandingPage({ seo: null }));
 
-    const page = await getPage('about', tenant);
-    if (!page) throw new Error('expected a landing page');
-
-    expect(page.seo.title).toBe('About');
-    expect(page.seo.description).toBe('Settings description');
-    expect(page.seo.ogImageUrl).toContain('sanity.io');
+    await expect(getPage('about', tenant)).rejects.toThrow(
+      'seo.metaTitle is required but missing',
+    );
   });
 
-  it('falls the seo title back to the brand name when no heading is authored', async () => {
-    mockRun
-      .mockResolvedValueOnce(
-        makeRawLandingPage({ headingBlock: null, hero: null, seo: null }),
-      )
-      .mockResolvedValueOnce(makeRawSiteSettings());
-
-    const page = await getPage('about', tenant);
-    if (!page) throw new Error('expected a landing page');
-
-    expect(page.seo.title).toBe('My Blog');
-  });
-
-  it('falls the seo title back to the brand name when the authored heading is blank', async () => {
-    mockRun
-      .mockResolvedValueOnce(
-        makeRawLandingPage({
-          headingBlock: { heading: '   ', supportingText: null },
-          seo: null,
-        }),
-      )
-      .mockResolvedValueOnce(makeRawSiteSettings());
-
-    const page = await getPage('about', tenant);
-    if (!page) throw new Error('expected a landing page');
-
-    expect(page.seo.title).toBe('My Blog');
-    expect(page.headingBlock.heading).toBe('   ');
-  });
-
-  it('lets authored seo override the resolved defaults', async () => {
-    mockRun
-      .mockResolvedValueOnce(
-        makeRawLandingPage({
-          seo: {
-            metaTitle: 'About Us',
-            metaDescription: null,
-            openGraph: null,
-          },
-        }),
-      )
-      .mockResolvedValueOnce(makeRawSiteSettings());
+  it('lets authored seo override the resolved defaults, with no fallback for an unauthored openGraph', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawLandingPage({
+        seo: makeRawSeo({ metaTitle: 'About Us' }),
+      }),
+    );
 
     const page = await getPage('about', tenant);
     if (!page) throw new Error('expected a landing page');
 
     expect(page.seo.title).toBe('About Us');
-    expect(page.seo.ogTitle).toBe('About Us');
+    expect(page.seo.ogTitle).toBeUndefined();
   });
 
   it('resolves undefined, rather than rejecting, when no page_landing matches the slug', async () => {
@@ -176,35 +116,16 @@ describe('getPage', () => {
     expect(page).toBeUndefined();
   });
 
-  it('does not fetch site settings when no page_landing matches the slug', async () => {
-    mockRun.mockResolvedValueOnce(null);
-
-    await getPage('missing', tenant);
-
-    expect(mockRun).toHaveBeenCalledTimes(1);
-  });
-
-  it('threads tenant context into both queries and scopes their tags to it', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawLandingPage())
-      .mockResolvedValueOnce(makeRawSiteSettings());
+  it('threads tenant context into the query and scopes its tags to it', async () => {
+    mockRun.mockResolvedValueOnce(makeRawLandingPage());
 
     await getPage('about', tenant);
 
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
+    expect(mockRun).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({
         tenant,
         next: expect.objectContaining({ tags: ['t:tenant-a:page_landing'] }),
-      }),
-    );
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({ tags: ['t:tenant-a:site-settings'] }),
       }),
     );
   });

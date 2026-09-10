@@ -1,6 +1,5 @@
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
 import { brandSchema } from '@blog/studio/schema-types/objects/brand';
-import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt';
 import { Settings } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -47,14 +46,6 @@ export const siteSchema = defineType({
       type: 'string',
       description: 'Short strapline shown in the site header or hero.',
       validation: (rule) => rule.max(120),
-      fieldset: 'seo',
-    }),
-    defineField({
-      name: 'defaultOgImage',
-      title: 'Default OG Image',
-      type: imageWithAltSchema.name,
-      description:
-        'Fallback social-sharing image used when a page has no own OG image. Leave empty to use a generated branded card.',
       fieldset: 'seo',
     }),
   ],
