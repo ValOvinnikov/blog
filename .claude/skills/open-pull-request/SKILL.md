@@ -264,7 +264,7 @@ Wait for explicit approval. Only then run:
 ```
 gh pr create --base main \
   --title "<conventional title>" \
-  --body "<summary + test plan + Closes #<n>>"
+  --body "<summary + Closes #<n>, per the PR body template below>"
 ```
 
 ### Gate 5 — Set Code Review on the board, then tag the session
@@ -468,19 +468,50 @@ Do not manually set Done.
 
 ## PR body template
 
-```
-## Summary
-- <what changed, listed per layer: config / studio / service / db / auth / ui / web / platform-app / insight / email>
+**A PR body is a highlight list, not a write-up. Hard cap: 12 lines and
+1200 characters.** If it doesn't fit, the body is describing the diff instead
+of summarising it — cut, don't reformat.
 
-## Test plan
-- [ ] pnpm typegen (if schema changed)
-- [ ] pnpm type-check
-- [ ] pnpm lint
-- [ ] pnpm test
-- [ ] Storybook stories present (if ui components were added or changed)
+```
+<one sentence: what this PR makes possible that wasn't possible before>
+
+## Summary
+- <layer>: <what changed, one line — no more than one line per layer touched>
 
 Closes #<n>
 ```
+
+**There is no test-plan checklist.** The delivery gate sequence already
+requires `type-check`, `lint` and `test` to pass before the work is committed,
+and CI re-runs them as required checks on the PR itself. A hand-ticked copy in
+the body is a claim, not evidence — it proves nothing the checks don't, and it
+cost a third of the body's budget. Mention verification only when it is
+_not_ routine: a check knowingly red, a step deliberately skipped, or
+something a reviewer must run by hand.
+
+**Never put these in a PR body** — each one is the diff restating itself, and
+the diff is already attached:
+
+- **Code blocks.** No `tsx`/`ts`/`groq` snippets, no before/after pairs, no
+  type signatures. A reviewer who wants the code clicks "Files changed".
+- **Per-file or per-function enumeration.** "Touched `x.tsx`, `y.ts`,
+  `z.test.ts`" and "added `foo()`, renamed `bar()`" are both the file list
+  spelled out longhand.
+- **Design-rationale essays.** `## The validation rule`, `## Why no fallback`,
+  `## Service nullability mirrors the schema` — sections explaining _how_ the
+  implementation reasons. One line of _why_ belongs in the opening sentence;
+  the rest belongs in the code or in the issue.
+- **Test narration.** "Verified the test fails without the fix by
+  reintroducing …" — the gates and CI already establish that the suite passes.
+  Say it only if a reviewer must do something differently because of it.
+- **Tables that restate the Summary.** A per-layer table and a per-layer bullet
+  list are the same content twice.
+
+The test to apply before opening: **does this sentence tell the reviewer
+something the diff cannot?** If no, delete it. Genuine exceptions — a
+migration's rollback plan, a deliberate behaviour change a reviewer would
+otherwise flag as a bug, a known-broken check — are worth their lines; they
+are also rare, and one or two sentences each.
 
 **`Closes #<n>` is conditional — only the PR that completes the tracked
 issue includes it.** In a per-layer split (see "Scope: prefer per-layer PRs"

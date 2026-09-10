@@ -73,14 +73,6 @@ export const VOICE_FIELDS = [
     max: 40,
   },
   {
-    id: 'blogPostRelatedReading',
-    path: 'blogPostPage.relatedReading',
-    kind: VOICE_FIELD_KIND.TEXT,
-    surface: VOICE_SURFACE.POST,
-    placeholders: [],
-    max: 100,
-  },
-  {
     id: 'blogPostDepthToggleSkim',
     path: 'blogPostPage.depthToggle.skim',
     kind: VOICE_FIELD_KIND.TEXT,

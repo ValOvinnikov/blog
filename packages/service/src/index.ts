@@ -17,10 +17,11 @@ import { createNewsletterModuleService } from './features/modules/newsletter';
 import { createPostFeaturedModuleService } from './features/modules/post-featured';
 import { createPostLatestModuleService } from './features/modules/post-latest';
 import { createPostListModuleService } from './features/modules/post-list';
+import { createPostRelatedModuleService } from './features/modules/post-related';
 import { createTaxonomyListModuleService } from './features/modules/taxonomy-list';
 import { createBlogService } from './features/pages/blog';
-import { createGenericPageService } from './features/pages/generic';
 import { createHomeService } from './features/pages/home';
+import { createLandingPageService } from './features/pages/landing';
 import { createPostService } from './features/pages/post';
 import { createTagService } from './features/pages/tag';
 import { createTagIndexService } from './features/pages/tag-index';
@@ -33,7 +34,7 @@ export const service = {
   },
   pages: {
     home: createHomeService(),
-    generic: createGenericPageService(),
+    landing: createLandingPageService(),
     blog: createBlogService(),
     post: createPostService(),
     topic: createTopicService(),
@@ -47,6 +48,7 @@ export const service = {
     postList: createPostListModuleService(),
     postLatest: createPostLatestModuleService(),
     postFeatured: createPostFeaturedModuleService(),
+    postRelated: createPostRelatedModuleService(),
     content: createContentModuleService(),
     cta: createCtaModuleService(),
     newsletter: createNewsletterModuleService(),
@@ -86,13 +88,14 @@ export type { TNewsletterModule } from './features/modules/newsletter';
 export type { TPostFeaturedModule } from './features/modules/post-featured';
 export type { TPostLatestModule } from './features/modules/post-latest';
 export type { TPostListModule } from './features/modules/post-list';
+export type { TPostRelatedModule } from './features/modules/post-related';
 export type {
   TTaxonomyEntry,
   TTaxonomyListModule,
 } from './features/modules/taxonomy-list';
 export type { TBlogIndexPage } from './features/pages/blog';
-export type { TGenericPage } from './features/pages/generic';
 export type { THomePage } from './features/pages/home';
+export type { TLandingPage } from './features/pages/landing';
 export type {
   TPostDetail,
   TPostDetailAuthor,
@@ -117,6 +120,7 @@ export type {
   TPostCardAuthor,
   TPostCardTopic,
 } from './shared/transformers/to-post-card';
+export type { TRequiredHeadingBlock } from './shared/transformers/to-heading-block';
 export type { TSeoResolved } from './shared/transformers/resolve-seo';
 export type { TSocialLink } from './shared/transformers/to-social-link';
 export type { TTag } from './shared/transformers/to-tag';

@@ -37,7 +37,7 @@ Studio from one deployment.
 
 - `src/schema-types/documents/` — document types, grouped by area:
   `blog/` (`blog_post`, `blog_author`, `blog_category`, `blog_tag`),
-  `pages/` (`page_home`, `page_blog`, `page_generic`), and `settings/`
+  `pages/` (`page_home`, `page_blog`, `page_landing`), and `settings/`
   (singletons: `settings_site`, `settings_navigation`, `settings_footer`,
   `settings_newsletter`, `settings_theme`)
 - `src/schema-types/modules/` — reusable page modules
@@ -46,7 +46,7 @@ Studio from one deployment.
 - `src/schema-types/objects/` — shared object types (`link`, `socialLink`,
   `brand`, `imageWithAlt`, `richText`, `blockText`, `seo`, `openGraph`, …)
 - `src/schema-types/helpers/` — DRY field factories reused across schemas
-  (e.g. `define-modules-field.ts`, `section-header-field.ts`)
+  (e.g. `define-modules-field.ts`, `heading-block-field.ts`)
 - `src/schema-types/components/` — custom Studio input components
 - `src/studio-structure.ts` — the desk structure, directive-free
 - `src/studio-config.ts` — `buildStudioConfig`, which assembles schema +

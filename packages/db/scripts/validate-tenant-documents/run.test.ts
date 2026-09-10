@@ -129,7 +129,7 @@ describe(runValidation, () => {
       .mockReturnValueOnce([
         {
           documentId: 'doc-1',
-          documentType: 'blog_post',
+          documentType: 'page_post',
           level: 'warning',
           markers: [],
         },
@@ -137,7 +137,7 @@ describe(runValidation, () => {
       .mockReturnValueOnce([
         {
           documentId: 'doc-2',
-          documentType: 'blog_post',
+          documentType: 'page_post',
           level: 'error',
           markers: [],
         },
@@ -245,7 +245,7 @@ describe(runValidation, () => {
     validateTenantDocumentsMock.mockReturnValue([
       {
         documentId: 'doc-1',
-        documentType: 'blog_post',
+        documentType: 'page_post',
         level: 'error',
         markers: [],
       },
@@ -269,7 +269,7 @@ describe(runValidation, () => {
     validateTenantDocumentsMock.mockReturnValue([
       {
         documentId: 'doc-1',
-        documentType: 'blog_post',
+        documentType: 'page_post',
         level: 'warning',
         markers: [],
       },

@@ -7,7 +7,7 @@ import { heroLayoutFragment } from '@blog/service/shared/fragments/layout';
 import { postCardFragment } from '@blog/service/shared/fragments/post';
 
 const newestFeaturedPostQuery = q.star
-  .filterByType('blog_post')
+  .filterByType('page_post')
   .filterRaw('featured == true')
   .filterRaw(PUBLISHED_POST_FILTER)
   .order('publishedAt desc')

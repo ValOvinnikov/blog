@@ -7,11 +7,17 @@ describe('service.modules', () => {
     expect(typeof service.modules.content.v1.getContent).toBe('function');
     expect(typeof service.modules.cta.v1.getCta).toBe('function');
   });
+
+  it('exposes v1.getPostRelated as a function', () => {
+    expect(typeof service.modules.postRelated.v1.getPostRelated).toBe(
+      'function',
+    );
+  });
 });
 
 describe('service.pages', () => {
-  it('keeps home and exposes the new generic page fetcher', () => {
+  it('keeps home and exposes the landing page fetcher', () => {
     expect(typeof service.pages.home.v1.getHomePage).toBe('function');
-    expect(typeof service.pages.generic.v1.getPage).toBe('function');
+    expect(typeof service.pages.landing.v1.getPage).toBe('function');
   });
 });

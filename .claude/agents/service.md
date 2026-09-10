@@ -72,7 +72,7 @@ relative paths only within a single slice (`./query`, `./types`).
 ## Folder structure
 
 - **Domains** group features in `features/`: `pages/*` (route data: home,
-  generic, blog, post, category, tag, author), `modules/*` (page-builder
+  landing, blog, post, category, tag, author), `modules/*` (page-builder
   module data: hero, post-list, content, cta), `entities/*` (content entities:
   categories), `global/*` (global settings: site-settings, navigation, footer).
   The root `service` object mirrors these domains →

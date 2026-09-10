@@ -52,7 +52,7 @@ export function buildStarterDocuments(
 
   const post: TSanityDocument = {
     _id: STARTER_DOCUMENT_IDS.POST,
-    _type: 'blog_post',
+    _type: 'page_post',
     title: `Welcome to ${tenant.name}`,
     slug: { _type: 'slug', current: 'welcome' },
     excerpt:
@@ -77,6 +77,7 @@ export function buildStarterDocuments(
         ],
       },
     ],
+    modules: [],
   };
 
   const navigation: TSanityDocument = {

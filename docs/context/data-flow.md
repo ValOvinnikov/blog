@@ -74,7 +74,7 @@ apps/web
   no longer means "the document exists", and `type-check` cannot catch a
   consumer that still assumes it does — `.ok` stays a valid boolean access
   either way. Gate on `result.ok && result.data`.
-- **Page queries are thin.** `page_home`/`page_generic` project only page
+- **Page queries are thin.** `page_home`/`page_landing` project only page
   fields plus lightweight module descriptors (`TModule = { id, type }`, from
   `to-module.ts`) — no module internals, no `conditionalByType`. Each
   module type owns its own fetcher (`service.modules.<type>.v1.get<Type>(id)`)
@@ -134,7 +134,7 @@ apps/web
   `module_taxonomyList` is the one module that renders **both** ways, so it is
   not in that union: it holds `page_topicIndex`'s and `page_tagIndex`'s
   required `taxonomyList` slot, and it is also placeable in
-  `page_home.modules[]` and `page_generic.modules[]`, where it reaches
+  `page_home.modules[]` and `page_landing.modules[]`, where it reaches
   `ModuleRenderer` through its `MODULE_MAP` entry like any other module.
 
   Exclusion from `MODULE_MAP` does **not** exempt a module from
@@ -162,7 +162,7 @@ Partial<Record<TSanityType, …>>` — every module type needs a purge-tag entry
   a component is a compile error, and `HeroSlot({ id, type, … })` looks the
   type up and renders it, mirroring `ModuleRenderer`'s warn-and-render-nothing
   fallback for an unrecognized runtime type. `page_home`'s hero is required;
-  `page_generic`, `page_blog`, `page_topic` and `page_tag` each have an
+  `page_landing`, `page_blog`, `page_topic` and `page_tag` each have an
   optional one that replaces the page's default header and owns its `<h1>`.
   The slot stays two-step — the page query projects `_id` and `_type`, and
   the hero's own loader fetches it by id — and `@blog/service`'s

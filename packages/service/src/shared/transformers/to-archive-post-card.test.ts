@@ -1,4 +1,5 @@
 import { makeRawArchivePostCard } from '@blog/service/testing/pages/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 
 import { toArchivePostCard } from './to-archive-post-card';
 
@@ -43,5 +44,15 @@ describe(toArchivePostCard, () => {
     const result = toArchivePostCard(makeRawArchivePostCard({ wordCount: 0 }));
 
     expect(result.readingTimeMinutes).toBe(1);
+  });
+
+  it('maps a sparse archive card with no excerpt to undefined', () => {
+    const result = toArchivePostCard(
+      makeRawArchivePostCard({
+        headingBlock: makeRawHeadingBlock('Hello World'),
+      }),
+    );
+
+    expect(result.excerpt).toBeUndefined();
   });
 });

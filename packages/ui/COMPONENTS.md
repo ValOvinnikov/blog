@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_54 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_53 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -342,13 +342,8 @@ Variants: current: (boolean)
 ### PostGrid — `organisms/post-grid/post-grid.tsx`
 
 the responsive grid container that lays out `PostCard`s (or any children) in columns.
-Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
-
-### PostsSection — `organisms/posts-section/posts-section.tsx`
-
-labeled section rendering a set of posts in a responsive grid, generic enough to reuse for other post listings (e.g. related posts, topic pages).
-Props: posts: IPostCardData[] · title?: string · titleId?: string · accessibleTitle?: string · linkAs?: TAnchorElementType · cardHeadingLevel?: THeadingLevel · supportingText?: string · hasImages?: boolean · align?: TPostsSectionVariants['align'] · emptyMessage?: string · isTinted?: TPostsSectionVariants['tinted'] · isWrapped?: TPostsSectionVariants['wrapped'] · hasLead?: boolean _(extends IWithClassName, IWithDataTestId)_
-Variants: tinted: (boolean) · wrapped: (boolean) · align: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
+Props: columns?: TPostGridVariants['columns'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
+Variants: columns: 1|2|3
 
 ### ToastViewport — `organisms/toast-viewport/toast-viewport.tsx`
 

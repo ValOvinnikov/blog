@@ -40,7 +40,7 @@ export const validateSingleBlankHeadingPerType =
 
     const candidates = await client.fetch<
       { id: string; heading?: string | null }[]
-    >(`*[_id in $ids]{ "id": _id, "heading": sectionHeader.heading }`, {
+    >(`*[_id in $ids]{ "id": _id, "heading": headingBlock.heading }`, {
       ids: idsNeedingCheck.flat(),
     });
 

@@ -13,12 +13,12 @@ const pagination = { currentPage: 1, totalPages: 1 };
 const tenant = makeTenant();
 
 describe('toPostListModule', () => {
-  it('maps sectionHeader straight through', () => {
+  it('maps headingBlock straight through', () => {
     const raw = makeRawPostListModule();
 
     const module = toPostListModule(raw, rawPosts, pagination, tenant);
 
-    expect(module.sectionHeader).toEqual({
+    expect(module.headingBlock).toEqual({
       heading: 'Latest',
       supportingText: undefined,
     });
@@ -44,12 +44,12 @@ describe('toPostListModule', () => {
     expect(module.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
   });
 
-  it('leaves every sectionHeader field undefined when the field itself is unset (no faked default)', () => {
-    const raw = makeRawPostListModule({ sectionHeader: null });
+  it('leaves every headingBlock field undefined when the field itself is unset (no faked default)', () => {
+    const raw = makeRawPostListModule({ headingBlock: null });
 
     const module = toPostListModule(raw, rawPosts, pagination, tenant);
 
-    expect(module.sectionHeader).toEqual({
+    expect(module.headingBlock).toEqual({
       heading: undefined,
       supportingText: undefined,
     });

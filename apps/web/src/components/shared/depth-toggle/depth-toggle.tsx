@@ -6,21 +6,13 @@ import {
   type ISegmentedControlOption,
 } from '@blog/ui/atoms/segmented-control';
 import { useDepth } from '@web/context/depth-provider';
-
-export interface IDepthToggleLabels {
-  skim: string;
-  read: string;
-  deep: string;
-  ariaLabel: string;
-}
+import { useTranslations } from 'next-intl';
 
 export interface IDepthToggleProps {
   /** Whether the post has an approved skim — omits the `30s` option when `false`. */
   hasSkim: boolean;
   /** Whether the post has any authored asides — omits the `Deep` option when `false`. */
   hasDeep: boolean;
-  /** Copy for each option and the control's `aria-label` — supplied by the caller (next-intl at the page level). */
-  labels: IDepthToggleLabels;
   className?: string;
 }
 
@@ -31,26 +23,22 @@ export interface IDepthToggleProps {
  * than a toggle with only one meaningful option.
  *
  * @example
- * <DepthToggle
- *   hasSkim={Boolean(post.skim)}
- *   hasDeep={post.hasAsides}
- *   labels={{ skim: '30s', read: 'Read', deep: 'Deep', ariaLabel: 'Reading depth' }}
- * />
+ * <DepthToggle hasSkim={Boolean(post.skim)} hasDeep={post.hasAsides} />
  */
 export const DepthToggle = ({
   hasSkim,
   hasDeep,
-  labels,
   className,
 }: IDepthToggleProps) => {
   const { depth, setDepth } = useDepth();
+  const t = useTranslations('blogPostPage');
 
   if (!hasSkim && !hasDeep) return null;
 
   const options: ISegmentedControlOption<TDepth>[] = [
-    ...(hasSkim ? [{ value: DEPTH.SKIM, label: labels.skim }] : []),
-    { value: DEPTH.READ, label: labels.read },
-    ...(hasDeep ? [{ value: DEPTH.DEEP, label: labels.deep }] : []),
+    ...(hasSkim ? [{ value: DEPTH.SKIM, label: t('depthToggle.skim') }] : []),
+    { value: DEPTH.READ, label: t('depthToggle.read') },
+    ...(hasDeep ? [{ value: DEPTH.DEEP, label: t('depthToggle.deep') }] : []),
   ];
 
   return (
@@ -58,7 +46,7 @@ export const DepthToggle = ({
       options={options}
       value={depth}
       onChange={setDepth}
-      ariaLabel={labels.ariaLabel}
+      ariaLabel={t('depthToggle.ariaLabel')}
       className={className}
     />
   );

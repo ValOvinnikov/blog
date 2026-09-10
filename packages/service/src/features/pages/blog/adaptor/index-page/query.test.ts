@@ -3,21 +3,23 @@ import { makeRawBlogPage } from '@blog/service/testing/pages/fixtures';
 import { blogPageQuery } from './query';
 
 describe('blogPageQuery', () => {
-  it('parses a blog page with no supporting text and no SEO', () => {
-    const raw = makeRawBlogPage({ supportingText: null, seo: null });
+  it('parses a blog page with no headingBlock and no SEO', () => {
+    const raw = makeRawBlogPage({ headingBlock: null, seo: null });
 
     expect(() => blogPageQuery.parse(raw)).not.toThrow();
   });
 
-  it('parses a blog page with no postList slot set', () => {
-    const raw = makeRawBlogPage({ postList: null });
+  it('parses a blog page with no modules set', () => {
+    const raw = makeRawBlogPage({ modules: null });
 
     expect(() => blogPageQuery.parse(raw)).not.toThrow();
   });
 
-  it('projects the postList module id, not the retired itemsPerPage field', () => {
-    expect(blogPageQuery.query).toContain('postList');
-    expect(blogPageQuery.query).not.toContain('itemsPerPage');
+  it('projects the headingBlock object, not the retired postList reference', () => {
+    expect(blogPageQuery.query).toContain(
+      '"headingBlock": headingBlock { heading, supportingText }',
+    );
+    expect(blogPageQuery.query).not.toContain('postList');
   });
 
   it('parses a blog page with its hero slot set', () => {

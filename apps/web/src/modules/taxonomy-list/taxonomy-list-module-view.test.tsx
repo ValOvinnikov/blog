@@ -1,5 +1,6 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { TaxonomyListModuleView } from './taxonomy-list-module-view';
 
@@ -28,10 +29,7 @@ const item = {
 
 const setup = customRender(TaxonomyListModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  sectionHeader: {
-    heading: 'Browse by topic',
-    supportingText: undefined,
-  },
+  headingBlock: makeHeadingBlock({ heading: 'Browse by topic' }),
   items: [item],
   layout: undefined,
   contentAlignment: undefined,
@@ -42,7 +40,7 @@ const setup = customRender(TaxonomyListModuleView, {
   emptyMessage: 'No topics yet.',
 });
 
-describe(TaxonomyListModuleView, () => {
+describe(`<${TaxonomyListModuleView.name}/>`, () => {
   it('labels the section with the given titleId', () => {
     setup();
 
@@ -74,12 +72,9 @@ describe(TaxonomyListModuleView, () => {
     expect(label.tagName).toBe('H3');
   });
 
-  it('renders a visually hidden heading from accessibleTitle when sectionHeader.heading is undefined', () => {
+  it('renders a visually hidden heading from accessibleTitle when headingBlock.heading is undefined', () => {
     setup({
-      sectionHeader: {
-        heading: undefined,
-        supportingText: undefined,
-      },
+      headingBlock: makeHeadingBlock(),
     });
 
     const heading = screen.getByRole('heading', { level: 2, name: 'Topics' });

@@ -104,7 +104,6 @@ describe('TopicNumberedPage', () => {
             ogDescription: 'Posts about building things.',
             ogImageUrl: undefined,
           },
-          postListId: 'post-list-1',
         },
       });
 

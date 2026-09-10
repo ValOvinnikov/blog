@@ -51,7 +51,7 @@ vi.mock('@blog/service', () => ({
         },
       },
       blog: { v1: { getIndexPageParams: getIndexPageParamsMock } },
-      generic: { v1: { getPageSlugs: getPageSlugsMock } },
+      landing: { v1: { getPageSlugs: getPageSlugsMock } },
       topicIndex: { v1: { getIndexPage: getTopicIndexPageMock } },
       tagIndex: { v1: { getIndexPage: getTagIndexPageMock } },
     },
@@ -95,7 +95,7 @@ describe('sitemap', () => {
     getTenantBaseUrlMock.mockReset();
   });
 
-  it('includes home, blog index, topics hub, post, topic, tag, blog page and generic page entries', async () => {
+  it('includes home, blog index, topics hub, post, topic, tag, blog page and landing page entries', async () => {
     mockAllEmpty();
     getPostParamsMock.mockResolvedValue({
       ok: true,
@@ -296,7 +296,7 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/');
   });
 
-  it('omits generic pages when the slugs fetch fails', async () => {
+  it('omits landing pages when the slugs fetch fails', async () => {
     mockAllEmpty();
     getPageSlugsMock.mockResolvedValue({
       ok: false,

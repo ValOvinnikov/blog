@@ -138,7 +138,7 @@ src/metadata/author-metadata/build-author-metadata.test.ts
 src/metadata/blog-list-metadata/build-blog-list-metadata.test.ts
 src/metadata/bookmarks-metadata/build-bookmarks-metadata.test.ts
 src/metadata/category-metadata/build-category-metadata.test.ts
-src/metadata/generic-page-metadata/build-generic-page-metadata.test.ts
+src/metadata/landing-page-metadata/build-landing-page-metadata.test.ts
 src/metadata/post-metadata/build-post-metadata.test.ts
 src/metadata/tag-metadata/build-tag-metadata.test.ts
 src/metadata/to-metadata.test.ts

@@ -66,8 +66,8 @@ const tenant = {
 const okPost = { id: 'post-1', slug: 'my-post' };
 
 describe('isDerivableRevalidateType', () => {
-  it('is true only for blog_post', () => {
-    expect(isDerivableRevalidateType('blog_post')).toBe(true);
+  it('is true only for page_post', () => {
+    expect(isDerivableRevalidateType('page_post')).toBe(true);
     expect(isDerivableRevalidateType('blog_author')).toBe(false);
     expect(isDerivableRevalidateType('page_home')).toBe(false);
   });
@@ -111,7 +111,7 @@ describe(deriveRevalidatePaths, () => {
     getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
 
     const result = await deriveRevalidatePaths({
-      type: 'blog_post',
+      type: 'page_post',
       id: 'post-1',
       tenantId: 'tenant-1',
       tenant,
@@ -139,7 +139,7 @@ describe(deriveRevalidatePaths, () => {
     getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
 
     const result = await deriveRevalidatePaths({
-      type: 'blog_post',
+      type: 'page_post',
       id: 'post-1',
       tenantId: 'tenant-1',
       tenant,
@@ -161,7 +161,7 @@ describe(deriveRevalidatePaths, () => {
     getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
 
     const result = await deriveRevalidatePaths({
-      type: 'blog_post',
+      type: 'page_post',
       id: 'post-1',
       tenantId: 'tenant-1',
       tenant,
@@ -186,7 +186,7 @@ describe(deriveRevalidatePaths, () => {
     getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
 
     const result = await deriveRevalidatePaths({
-      type: 'blog_post',
+      type: 'page_post',
       id: 'post-1',
       tenantId: 'tenant-1',
       tenant,
@@ -211,7 +211,7 @@ describe(deriveRevalidatePaths, () => {
     getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
 
     const result = await deriveRevalidatePaths({
-      type: 'blog_post',
+      type: 'page_post',
       id: 'post-1',
       tenantId: 'tenant-1',
       tenant,
@@ -236,7 +236,7 @@ describe(deriveRevalidatePaths, () => {
     getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
 
     const result = await deriveRevalidatePaths({
-      type: 'blog_post',
+      type: 'page_post',
       id: 'post-1',
       tenantId: 'tenant-1',
       tenant,
@@ -261,7 +261,7 @@ describe(deriveRevalidatePaths, () => {
     getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
 
     const result = await deriveRevalidatePaths({
-      type: 'blog_post',
+      type: 'page_post',
       id: 'post-1',
       tenantId: 'tenant-1',
       tenant,
@@ -286,7 +286,7 @@ describe(deriveRevalidatePaths, () => {
     });
 
     const result = await deriveRevalidatePaths({
-      type: 'blog_post',
+      type: 'page_post',
       id: 'post-1',
       tenantId: 'tenant-1',
       tenant,

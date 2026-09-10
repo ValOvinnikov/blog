@@ -31,9 +31,13 @@ describe('getRevalidateTagsForType', () => {
     ]);
   });
 
-  it('maps the post page document to its ISR tag', () => {
+  it('maps the post page document to its ISR tags, including what blog_post used to purge', () => {
     expect(getRevalidateTagsForType('page_post', 'page_post-1')).toEqual([
       'page_post',
+      'posts',
+      'author',
+      'topic',
+      'tag',
     ]);
   });
 
@@ -80,6 +84,12 @@ describe('getRevalidateTagsForType', () => {
     ).toEqual(['modules:postLatest', 'module:post-latest-1']);
   });
 
+  it('maps the post-related module to its ISR tag plus the per-document tag', () => {
+    expect(
+      getRevalidateTagsForType('module_postRelated', 'post-related-1'),
+    ).toEqual(['modules:postRelated', 'module:post-related-1']);
+  });
+
   it('maps the newsletter module to its ISR tag plus the per-document tag', () => {
     expect(
       getRevalidateTagsForType('module_newsletter', 'newsletter-1'),
@@ -105,6 +115,7 @@ describe('getRevalidateTagsForType', () => {
     'module_postList',
     'module_taxonomyList',
     'module_postLatest',
+    'module_postRelated',
     'module_content',
     'module_cta',
     'module_newsletter',

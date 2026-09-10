@@ -1,15 +1,12 @@
 import type { TMaybeUndefined } from '@blog/config';
 import type { TPostSkim } from '@blog/service';
 import { SwitchToReadButton } from '@web/components/shared/switch-to-read-button';
+import { getTranslations } from 'next-intl/server';
 
 import { skimPanelVariants } from './skim-panel-variants';
 
 export interface ISkimPanelProps {
   skim: TMaybeUndefined<TPostSkim>;
-  /** Panel's accessible label (e.g. "30-second summary"). */
-  label: string;
-  /** Copy for the "read the full article" affordance. */
-  readFullArticleLabel: string;
 }
 
 const s = skimPanelVariants();
@@ -25,17 +22,15 @@ const s = skimPanelVariants();
  * post has no approved skim.
  *
  * @example
- * <SkimPanel skim={post.skim} label={t('skimPanel.label')} readFullArticleLabel={t('skimPanel.readFullArticle')} />
+ * <SkimPanel skim={post.skim} />
  */
-export const SkimPanel = ({
-  skim,
-  label,
-  readFullArticleLabel,
-}: ISkimPanelProps) => {
+export const SkimPanel = async ({ skim }: ISkimPanelProps) => {
   if (!skim) return null;
 
+  const t = await getTranslations('blogPostPage');
+
   return (
-    <section className={s.root()} aria-label={label}>
+    <section className={s.root()} aria-label={t('skimPanel.label')}>
       <ul className={s.list()}>
         {skim.takeaways.map((takeaway, index) => (
           // Index key is safe here: a static, once-rendered list (the
@@ -46,7 +41,7 @@ export const SkimPanel = ({
           </li>
         ))}
       </ul>
-      <SwitchToReadButton label={readFullArticleLabel} />
+      <SwitchToReadButton label={t('skimPanel.readFullArticle')} />
     </section>
   );
 };

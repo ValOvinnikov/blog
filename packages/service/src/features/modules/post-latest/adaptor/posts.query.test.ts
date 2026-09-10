@@ -18,9 +18,9 @@ describe('postLatestModulePostsQuery', () => {
     );
   });
 
-  it('filters to blog_post documents only', () => {
+  it('filters to page_post documents only', () => {
     expect(postLatestModulePostsQuery(3).query).toContain(
-      '_type == "blog_post"',
+      '_type == "page_post"',
     );
   });
 });

@@ -4,6 +4,7 @@ import type {
   TPortableTextBody,
 } from '@blog/config';
 import type { TSeoResolved } from '@blog/service/shared/transformers/resolve-seo';
+import type { TModule } from '@blog/service/shared/transformers/to-module';
 import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
 import type { TSocialLink } from '@blog/service/shared/transformers/to-social-link';
 import type { TTag } from '@blog/service/shared/transformers/to-tag';
@@ -33,7 +34,6 @@ export type TPostDetail = Omit<TPostCard, 'author' | 'topic'> & {
   author: TPostDetailAuthor;
   topic: TTopic;
   tags: TTag[];
-  relatedPosts: TPostCard[];
+  modules: TModule[];
   readingTimeMinutes: number;
-  newsletterEnabled: boolean;
 };

@@ -43,7 +43,7 @@ describe(validateTenantDocuments, () => {
     const results = [
       {
         documentId: 'doc-1',
-        documentType: 'blog_post',
+        documentType: 'page_post',
         level: 'warning',
         markers: [{ level: 'warning', message: 'Missing SEO title' }],
       },
@@ -57,7 +57,7 @@ describe(validateTenantDocuments, () => {
     const results = [
       {
         documentId: 'doc-1',
-        documentType: 'blog_post',
+        documentType: 'page_post',
         level: 'error',
         markers: [{ level: 'error', message: 'Required field is missing' }],
       },

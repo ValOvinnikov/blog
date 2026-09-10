@@ -1,8 +1,8 @@
 import { TAXONOMY_KIND, TAXONOMY_SORT } from '@blog/config';
 import { toTags } from '@blog/service/features/entities/tags/adaptor/transformer';
 import { toTopics } from '@blog/service/features/entities/topics/adaptor/transformer';
+import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
-import { toSectionHeader } from '@blog/service/shared/transformers/to-section-header';
 import type { InferResultType } from 'groqd';
 
 import type { taxonomyListModuleQuery } from './query';
@@ -42,9 +42,7 @@ export function toTaxonomyListModule(
 
   return {
     brandVariant: raw.brandVariant,
-    sectionHeader: raw.sectionHeader
-      ? toSectionHeader(raw.sectionHeader)
-      : { heading: undefined, supportingText: undefined },
+    headingBlock: toHeadingBlock(raw.headingBlock),
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,
     taxonomy: raw.taxonomy,

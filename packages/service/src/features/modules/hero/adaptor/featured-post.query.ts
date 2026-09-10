@@ -7,7 +7,7 @@ import { postCardFragment } from '@blog/service/shared/fragments/post';
 // a fresh dataset with no featured post yet), so mark the query nullable —
 // otherwise groqd throws at parse time instead of returning null.
 export const heroFallbackFeaturedPostQuery = q.star
-  .filterByType('blog_post')
+  .filterByType('page_post')
   .filterRaw('featured == true')
   .filterRaw(PUBLISHED_POST_FILTER)
   .order('publishedAt desc')

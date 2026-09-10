@@ -1,6 +1,7 @@
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawHomePage } from '@blog/service/testing/pages/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getHomePage } from './loader';
@@ -27,7 +28,6 @@ describe('getHomePage', () => {
     const page = await getHomePage(tenant);
     if (!page) throw new Error('expected a home page');
 
-    expect(page.title).toBe('Home Page');
     expect(page.hero).toEqual({
       id: 'hero-1',
       type: 'module_hero',
@@ -36,6 +36,58 @@ describe('getHomePage', () => {
       { id: 'post-latest-1', type: 'module_postLatest' },
       { id: 'cta-1', type: 'module_cta' },
     ]);
+  });
+
+  it('maps a hero with no headingBlock to an undefined heading/supportingText', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawHomePage({ hero: { _id: 'hero-1', _type: 'module_hero' } }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const page = await getHomePage(tenant);
+    if (!page) throw new Error('expected a home page');
+
+    expect(page.hero).toEqual({ id: 'hero-1', type: 'module_hero' });
+    expect(page.headingBlock.heading).toBeUndefined();
+    expect(page.headingBlock.supportingText).toBeUndefined();
+  });
+
+  it('maps a headingBlock heading with no hero to an undefined hero', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawHomePage({
+          hero: null,
+          headingBlock: makeRawHeadingBlock('Welcome'),
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const page = await getHomePage(tenant);
+    if (!page) throw new Error('expected a home page');
+
+    expect(page.hero).toBeUndefined();
+    expect(page.headingBlock.heading).toBe('Welcome');
+    expect(page.headingBlock.supportingText).toBeUndefined();
+  });
+
+  it('maps both a hero and a headingBlock heading when both are authored', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawHomePage({
+          headingBlock: makeRawHeadingBlock('Welcome', {
+            supportingText: 'A subtitle',
+          }),
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const page = await getHomePage(tenant);
+    if (!page) throw new Error('expected a home page');
+
+    expect(page.hero).toEqual({ id: 'hero-1', type: 'module_hero' });
+    expect(page.headingBlock.heading).toBe('Welcome');
+    expect(page.headingBlock.supportingText).toBe('A subtitle');
   });
 
   it('rejects when page_home.hero resolves to a non-hero module type', async () => {

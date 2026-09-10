@@ -3,6 +3,11 @@ import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/helpe
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
+import {
+  createMockModulesRule,
+  type TModuleReference,
+  type TModulesCustomFn,
+} from '@blog/studio/testing/create-mock-modules-rule';
 import type { ValidationContext } from 'sanity';
 
 type TArrayFieldDefinition = {
@@ -10,35 +15,26 @@ type TArrayFieldDefinition = {
   of?: Array<{ name?: string }>;
 };
 
-type TModuleReference = { _type?: string; _ref?: string };
-type TCustomFn = (
-  modules: TModuleReference[] | undefined,
-  context: ValidationContext,
-) => Promise<string | true>;
+type TDocumentCustomFn = (document: Record<string, unknown>) => string | true;
 
-type TMockRule = {
-  unique: () => TMockRule;
-  error: (message: string) => TMockRule;
-  custom: (fn: TCustomFn) => TMockRule;
+type TDocumentMockRule = {
+  level: 'error' | 'warning';
+  fn?: TDocumentCustomFn;
+  custom: (fn: TDocumentCustomFn) => TDocumentMockRule;
+  warning: () => TDocumentMockRule;
 };
 
-/**
- * `unique()`/`error()`/`custom()` each return a fresh mock rule wrapping the
- * same shared `customFns` array, mirroring the real Sanity `Rule` chain
- * (`rule.custom(a).custom(b)`) closely enough to observe whether both
- * `.custom()` calls actually register, rather than the second silently
- * displacing the first.
- */
-const createMockRule = (customFns: TCustomFn[]): TMockRule => ({
-  unique: () => createMockRule(customFns),
-  error: () => createMockRule(customFns),
-  custom: (fn) => {
-    customFns.push(fn);
-    return createMockRule(customFns);
-  },
+const createDocumentMockRule = (
+  level: TDocumentMockRule['level'] = 'error',
+  fn?: TDocumentCustomFn,
+): TDocumentMockRule => ({
+  level,
+  fn,
+  custom: (nextFn) => createDocumentMockRule('error', nextFn),
+  warning: () => createDocumentMockRule('warning', fn),
 });
 
-const getModulesCustomValidators = (): TCustomFn[] => {
+const getModulesCustomValidators = (): TModulesCustomFn[] => {
   const modulesField = homePageSchema.fields?.find(
     (field) => field.name === 'modules',
   );
@@ -49,10 +45,10 @@ const getModulesCustomValidators = (): TCustomFn[] => {
     );
   }
 
-  const customFns: TCustomFn[] = [];
+  const customFns: TModulesCustomFn[] = [];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (modulesField.validation as any)(createMockRule(customFns));
+  (modulesField.validation as any)(createMockModulesRule(customFns));
 
   return customFns;
 };
@@ -121,11 +117,25 @@ describe('homePageSchema modules allow-list', () => {
   });
 });
 
+describe('homePageSchema field order', () => {
+  it('orders fields title, headingBlock, hero, modules, seo', () => {
+    expect(homePageSchema.fields?.map((field) => field.name)).toEqual([
+      'title',
+      'headingBlock',
+      'hero',
+      'modules',
+      'seo',
+    ]);
+  });
+});
+
 describe('homePageSchema hero field', () => {
-  it('is a required reference to the hero family', () => {
+  it('is an optional reference to the hero family', () => {
     const heroField = homePageSchema.fields?.find(
       (field) => field.name === 'hero',
-    ) as { type: string; to?: Array<{ type: string }> } | undefined;
+    ) as
+      | { type: string; to?: Array<{ type: string }>; validation?: unknown }
+      | undefined;
 
     if (!heroField) {
       throw new Error('Expected homePageSchema to define a hero field.');
@@ -135,5 +145,44 @@ describe('homePageSchema hero field', () => {
     expect(heroField.to?.map((entry) => entry.type)).toEqual(
       HERO_SCHEMA_TYPES.map((schema) => schema.name),
     );
+    expect(heroField.validation).toBeUndefined();
+  });
+});
+
+describe('homePageSchema document validation', () => {
+  const buildDocumentRules = (): TDocumentMockRule[] => {
+    if (!homePageSchema.validation) {
+      throw new Error('Expected homePageSchema to define a validation rule.');
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    return (homePageSchema.validation as any)(
+      createDocumentMockRule(),
+    ) as TDocumentMockRule[];
+  };
+
+  it('errors when neither hero nor headingBlock.heading is set', () => {
+    const [requiredRule] = buildDocumentRules();
+
+    expect(requiredRule?.fn?.({})).toBe('Add a hero or a heading');
+  });
+
+  it('warns when both hero and headingBlock.heading are set', () => {
+    const [, notBothRule] = buildDocumentRules();
+
+    expect(
+      notBothRule?.fn?.({
+        hero: { _ref: 'hero-1' },
+        headingBlock: { heading: 'Welcome' },
+      }),
+    ).toBe('The hero hides the heading');
+  });
+
+  it('passes when exactly one of hero or headingBlock.heading is set', () => {
+    const [requiredRule, notBothRule] = buildDocumentRules();
+    const document = { hero: { _ref: 'hero-1' } };
+
+    expect(requiredRule?.fn?.(document)).toBe(true);
+    expect(notBothRule?.fn?.(document)).toBe(true);
   });
 });

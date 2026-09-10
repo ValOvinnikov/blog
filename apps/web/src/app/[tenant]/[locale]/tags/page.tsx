@@ -20,5 +20,5 @@ export default async function TagsIndexPage({ params }: TProps) {
   const { locale, tenant } = await params;
   setRequestLocale(locale);
 
-  return <TagsPage tenant={tenant} />;
+  return <TagsPage locale={locale} tenant={tenant} />;
 }

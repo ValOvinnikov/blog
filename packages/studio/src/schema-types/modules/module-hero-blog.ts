@@ -8,11 +8,14 @@ import {
   type TPostSource,
   type THeroVariant,
 } from '@blog/config/constants';
-import { postSchema } from '@blog/studio/schema-types/documents/blog/post';
+import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
 import { defineHeroFields } from '@blog/studio/schema-types/helpers/define-hero-fields';
 import { getDraftsClient } from '@blog/studio/schema-types/helpers/get-drafts-client';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
-import { validateNewestFeaturedHasCandidate } from '@blog/studio/schema-types/helpers/validate-newest-featured-has-candidate';
+import {
+  PUBLISHED_POST_CONDITION,
+  validateNewestFeaturedHasCandidate,
+} from '@blog/studio/schema-types/helpers/validate-newest-featured-has-candidate';
 import { ctaActionSchema } from '@blog/studio/schema-types/objects/blocks/action-group';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt';
 import { toTitleCase } from '@blog/utils/primitives';
@@ -58,7 +61,7 @@ const fetchResolvedPost = async (
   }
 
   return client.fetch<TResolvedPost | null>(
-    `*[_type == "blog_post" && featured == true && publishedAt <= now()] | order(publishedAt desc)[0]{ publishedAt, heroImage }`,
+    `*[_type == "${PAGE_POST_TYPE}" && featured == true && ${PUBLISHED_POST_CONDITION}] | order(publishedAt desc)[0]{ publishedAt, heroImage }`,
   );
 };
 
@@ -138,7 +141,7 @@ export const heroBlogSchema = defineType({
       title: 'Post',
       type: 'reference',
       description: 'The pinned post this hero renders.',
-      to: [{ type: postSchema.name }],
+      to: [{ type: PAGE_POST_TYPE }],
       hidden: ({ parent }) =>
         (parent as THeroBlogDocument | undefined)?.postSource !==
         POST_SOURCE.PINNED,

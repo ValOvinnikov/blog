@@ -1,5 +1,6 @@
 import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
@@ -80,6 +81,7 @@ describe('HomePage', () => {
     getHomePageMock.mockResolvedValue({
       ok: true,
       data: {
+        headingBlock: makeHeadingBlock(),
         hero: { id: 'hero-1', type: 'module_hero' },
         modules: [{ id: 'module-1', type: 'module_content' }],
         seo: makeSeo(),
@@ -94,6 +96,30 @@ describe('HomePage', () => {
     );
   });
 
+  it('renders through PageShell: hero, then module renderer, inside a single main landmark, with no breadcrumb region', async () => {
+    getHomePageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        headingBlock: makeHeadingBlock(),
+        hero: { id: 'hero-1', type: 'module_hero' },
+        modules: [{ id: 'module-1', type: 'module_content' }],
+        seo: makeSeo(),
+      },
+    });
+
+    const { container } = await setup();
+
+    const main = screen.getByRole('main');
+    expect(main).toContainElement(screen.getByTestId('hero-module'));
+    expect(main).toContainElement(screen.getByTestId('module-renderer'));
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+
+    const order = Array.from(
+      container.querySelectorAll<HTMLElement>('[data-testid]'),
+    ).map((el) => el.getAttribute('data-testid'));
+    expect(order).toEqual(['hero-module', 'module-renderer']);
+  });
+
   it('forwards the resolved tenant Sanity context to getHomePage', async () => {
     const tenant = {
       projectId: 'tenant-project',
@@ -103,12 +129,77 @@ describe('HomePage', () => {
     getTenantSanityContextMock.mockResolvedValue(tenant);
     getHomePageMock.mockResolvedValue({
       ok: true,
-      data: { hero: { id: 'hero-1' }, modules: [], seo: makeSeo() },
+      data: {
+        headingBlock: makeHeadingBlock(),
+        hero: { id: 'hero-1' },
+        modules: [],
+        seo: makeSeo(),
+      },
     });
 
     await setup();
 
     expect(getHomePageMock).toHaveBeenCalledWith(tenant);
+  });
+
+  it('renders the heading and supporting text when there is no hero', async () => {
+    getHomePageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        headingBlock: makeHeadingBlock({
+          heading: 'Welcome to the blog',
+          supportingText: 'Fresh posts every week.',
+        }),
+        hero: undefined,
+        modules: [],
+        seo: makeSeo(),
+      },
+    });
+
+    await setup();
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Welcome to the blog' }),
+    ).toBeVisible();
+    expect(screen.getByText('Fresh posts every week.')).toBeVisible();
+    expect(screen.queryByTestId('hero-module')).not.toBeInTheDocument();
+  });
+
+  it('renders the hero, not the heading, when both are present', async () => {
+    getHomePageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        headingBlock: makeHeadingBlock({
+          heading: 'Welcome to the blog',
+          supportingText: 'Fresh posts every week.',
+        }),
+        hero: { id: 'hero-1', type: 'module_hero' },
+        modules: [],
+        seo: makeSeo(),
+      },
+    });
+
+    await setup();
+
+    expect(screen.getByTestId('hero-module')).toHaveTextContent('hero-1');
+    expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
+    expect(screen.queryByText('Welcome to the blog')).not.toBeInTheDocument();
+  });
+
+  it('renders nothing in the heading region when there is no hero and no heading', async () => {
+    getHomePageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        headingBlock: makeHeadingBlock(),
+        hero: undefined,
+        modules: [],
+        seo: makeSeo(),
+      },
+    });
+
+    await setup();
+
+    expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
   });
 });
 

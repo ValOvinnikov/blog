@@ -1,6 +1,7 @@
-import { BRAND_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { PostListModuleView } from './post-list-module-view';
 
@@ -22,17 +23,6 @@ const items = [
   }),
 ];
 
-const leadItems = [
-  ...items,
-  makePostListItem({
-    id: 'post-3',
-    href: '/blog/accessible-forms',
-    title: 'Designing Accessible Forms',
-    excerpt: 'Patterns for forms that work for everyone.',
-    topic: { title: 'Accessibility' },
-  }),
-];
-
 const meta = {
   title: 'Modules/PostListModule',
   component: PostListModuleView,
@@ -43,19 +33,21 @@ const meta = {
       control: 'select',
       options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
     },
+    contentAlignment: {
+      control: 'select',
+      options: Object.values(CONTENT_ALIGNMENT),
+    },
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    sectionHeader: {
-      heading: 'Latest posts',
-      supportingText: undefined,
-    },
+    headingBlock: makeHeadingBlock({ heading: 'Latest posts' }),
     items,
     layout: undefined,
     contentAlignment: undefined,
     titleId: 'post-list-title',
     dataTestId: 'post-list-module-post-list-1',
     accessibleTitle: 'Latest posts',
+    emptyMessage: 'No posts yet.',
   },
 } satisfies Meta<typeof PostListModuleView>;
 
@@ -66,15 +58,33 @@ export const Default: TStory = {};
 
 export const WithoutCmsHeading: TStory = {
   args: {
-    sectionHeader: {
-      heading: undefined,
-      supportingText: undefined,
-    },
+    headingBlock: makeHeadingBlock(),
   },
 };
 
 export const Secondary: TStory = {
   args: { brandVariant: BRAND_VARIANT.SECONDARY },
+};
+
+export const CenterAligned: TStory = {
+  args: { contentAlignment: CONTENT_ALIGNMENT.CENTER },
+};
+
+export const Empty: TStory = {
+  args: { items: [] },
+};
+
+export const WithPagination: TStory = {
+  args: {
+    pagination: {
+      currentPage: 2,
+      totalPages: 5,
+      createHref: (page: number) => `/blog/page/${page}`,
+      ariaLabel: 'Blog pages',
+      previousLabel: 'Previous',
+      nextLabel: 'Next',
+    },
+  },
 };
 
 const placeholderImage = (alt: string) => (
@@ -86,21 +96,6 @@ export const WithImages: TStory = {
   args: {
     hasImages: true,
     items: items.map((item) => ({
-      ...item,
-      image: placeholderImage(item.title),
-    })),
-  },
-};
-
-export const WithLead: TStory = {
-  args: {
-    sectionHeader: {
-      heading: 'Featured',
-      supportingText: undefined,
-    },
-    hasLead: true,
-    hasImages: true,
-    items: leadItems.map((item) => ({
       ...item,
       image: placeholderImage(item.title),
     })),

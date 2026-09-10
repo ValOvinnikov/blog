@@ -13,18 +13,21 @@ import {
   makeRawCtaAction,
   makeRawCtaModule,
 } from '@blog/service/testing/modules/fixtures';
-import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
+import {
+  makeRawHeadingBlock,
+  makeRawSanityImage,
+} from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { toCtaModule } from './transformer';
 
 describe('toCtaModule', () => {
-  it('maps sectionHeader and brandVariant', () => {
+  it('maps headingBlock and brandVariant', () => {
     const raw = makeRawCtaModule();
 
     const cta = toCtaModule(raw, makeTenant());
 
-    expect(cta.sectionHeader).toEqual({
+    expect(cta.headingBlock).toEqual({
       heading: 'Subscribe to the newsletter',
       supportingText: 'Get new posts in your inbox.',
     });
@@ -149,15 +152,12 @@ describe('toCtaModule', () => {
 
   it('leaves supportingText undefined when not set (no faked default)', () => {
     const raw = makeRawCtaModule({
-      sectionHeader: {
-        heading: 'Subscribe to the newsletter',
-        supportingText: null,
-      },
+      headingBlock: makeRawHeadingBlock('Subscribe to the newsletter'),
     });
 
     const cta = toCtaModule(raw, makeTenant());
 
-    expect(cta.sectionHeader.supportingText).toBeUndefined();
+    expect(cta.headingBlock.supportingText).toBeUndefined();
   });
 
   it('leaves eyebrow and footnote undefined when unset', () => {
@@ -229,7 +229,7 @@ describe('toCtaModule', () => {
     });
   });
 
-  it('resolves an internal blog_topic and page_generic reference the same way toLink does', () => {
+  it('resolves an internal blog_topic and page_landing reference the same way toLink does', () => {
     const topicRaw = makeRawCtaModule({
       content: [
         makeRawContentBlock({
@@ -248,7 +248,7 @@ describe('toCtaModule', () => {
           markDefs: [
             makeRawContentMarkDef({
               linkType: LINK_TYPE.INTERNAL,
-              internalReference: { _type: 'page_generic', slug: 'about' },
+              internalReference: { _type: 'page_landing', slug: 'about' },
             }),
           ],
         }),

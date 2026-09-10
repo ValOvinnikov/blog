@@ -88,9 +88,11 @@ that #1285 already shipped.
 - **CMS page architecture** — every public page is a CMS document with a
   required slot ([`2026-08-20-cms-page-architecture-design.md`](./2026-08-20-cms-page-architecture-design.md)).
   Its two settled patterns shape the portfolio strand below: a per-entity
-  page document owns the route (`page_post` owns `slug` + `publishedAt`; the
-  `post` entity has neither), and a listing is **two module types, one per
-  mode** — a paginated archive in a required slot (`module_postList`) and a
+  page document owns the route (`page_topic`/`page_tag` own `slug`; for
+  posts the page and the entity are one document since 2026-09-08 —
+  `page_post` carries content and route, see
+  [`2026-09-08-page-composition-design.md`](./2026-09-08-page-composition-design.md)),
+  and a listing is **two module types, one per mode** — a paginated archive in a required slot (`module_postList`) and a
   latest-N teaser in `modules[]` (`module_postLatest`).
 
 ## Purpose of this doc
@@ -102,7 +104,7 @@ Three related but independent strands of "make the page builder build more":
    get proposed and added to the catalogue below over time; this section is
    never "done."
 2. **Contact form / lead capture** — the one module needing a write path.
-3. **Portfolio content type** — `project`/`caseStudy` as a first-class
+3. **Portfolio content type** — `page_project` as a first-class
    document with its own surface.
 
 Each is independent of the others and of the flexibility spine — they inherit
@@ -236,7 +238,7 @@ required one.
 | Page                           | Hero slot                                                                               | Without a hero                      | `modules[]` allow-list                                                                                                                        |
 | ------------------------------ | --------------------------------------------------------------------------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | `page_home`                    | **Required**, `to:` = `HERO_SCHEMA_TYPES`                                               | —                                   | Widens to every `modules[]` module: `content`, `cta`, `newsletter`, `postLatest` (+ later `postFeatured`, carousel, placeable `taxonomyList`) |
-| `page_generic`                 | Optional, same list                                                                     | Breadcrumbs + title header          | Widens from `content` + `cta` to add `postLatest` + `newsletter`                                                                              |
+| `page_landing`                 | Optional, same list                                                                     | Breadcrumbs + title header          | Widens from `content` + `cta` to add `postLatest` + `newsletter`                                                                              |
 | `page_blog`                    | Optional, same list                                                                     | `heading` + `supportingText` header | Unchanged                                                                                                                                     |
 | `page_topic` · `page_tag`      | Optional, same list — one document per term, so a flagship topic can carry its own hero | Term header                         | Unchanged                                                                                                                                     |
 | `page_work` (portfolio strand) | Optional, when that page lands                                                          | Its own header                      | Designed with the work page                                                                                                                   |
@@ -337,12 +339,12 @@ the slot stays two-step — page, then hero by id — as it is now.
 `validateSinglePostLatestWithoutHeading` exists because two
 `module_postLatest` instances on one page both fall back to the same
 "Latest posts" heading — duplicate landmark names. The widened allow-lists
-make that reachable on `page_generic` too, and the next modules
+make that reachable on `page_landing` too, and the next modules
 (`module_postFeatured`, the carousel display mode) carry fallback headings
 of their own. It becomes `validateSingleBlankHeadingPerType(types)`, a helper
 that takes the list of module types with a heading fallback and enforces "at
 most one blank-heading instance per type per page", applied to `page_home`
-and `page_generic` in Phase 0 with `[module_postLatest]`, and extended by
+and `page_landing` in Phase 0 with `[module_postLatest]`, and extended by
 each later module that gains a fallback heading.
 
 ### Migration
@@ -360,7 +362,7 @@ home page onto `module_heroBlog` and deletes the schema.
   lands, and `@blog/config` has no `knip` exemption, so an export with no
   importer fails that gate. It ships with the helper, in `module_heroBlog`.
 - **studio** — `HERO_SCHEMA_TYPES` + its registry test; `page_home.hero`
-  references the list; `page_generic`, `page_blog`, `page_topic` and
+  references the list; `page_landing`, `page_blog`, `page_topic` and
   `page_tag` gain an optional `hero` referencing it; the home and generic
   allow-lists widen; the generalised blank-heading validator. No
   `defineHeroFields()` yet.
@@ -496,7 +498,7 @@ propagates through the page loader.
 
 **Cache tags:** the module's own `modules:heroBlog` and `module:<id>`, plus
 `posts`, `post`, `author` and `topic` for the dereferenced post card, plus
-the secondary action's link targets (`topic`, `page_generic`, `page_blog`).
+the secondary action's link targets (`topic`, `page_landing`, `page_blog`).
 One `isr(...)` call now covers what two did. `REVALIDATE_TAGS` gains
 `module_heroBlog: ['modules:heroBlog']`.
 
@@ -732,7 +734,7 @@ is on; no grid image carries `priority`.
 
 **Goal:** `module_taxonomyList` — today a slot-only module that the Topics
 and Tags index pages hold in their required `taxonomyList` slot — becomes
-placeable in `page_home.modules[]` and `page_generic.modules[]`, so a blog
+placeable in `page_home.modules[]` and `page_landing.modules[]`, so a blog
 home can show topic cards between its latest posts and the newsletter. One
 type, one authored field, no sibling. Design of record for epic #2787,
 settled in #2841.
@@ -786,7 +788,7 @@ module through `getDraftsClient(context)`:
 
 | Page field                                                    | Rule                                                               | Level                                                               |
 | ------------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------- |
-| `page_home.modules[]` · `page_generic.modules[]`              | every referenced `module_taxonomyList` has a `taxonomy`            | Error — "Choose whether the '{title}' module lists topics or tags." |
+| `page_home.modules[]` · `page_landing.modules[]`              | every referenced `module_taxonomyList` has a `taxonomy`            | Error — "Choose whether the '{title}' module lists topics or tags." |
 | `page_topicIndex.taxonomyList` · `page_tagIndex.taxonomyList` | the referenced module's `taxonomy`, if set, equals the page's kind | Error — "This page lists topics; the module is set to tags."        |
 | `module_taxonomyList.limit`                                   | integer, at least 1                                                | Error                                                               |
 
@@ -903,7 +905,7 @@ creating them without a `taxonomy`, which is the correct value for a slot.
 - **config** — `TAXONOMY_SORT`; `module_taxonomyList` out of
   `TSlotModuleType`.
 - **studio** — the three fields; the two page-level rules; `page_home` and
-  `page_generic` allow-lists gain `taxonomyListSchema.name`; schema tests;
+  `page_landing` allow-lists gain `taxonomyListSchema.name`; schema tests;
   `pnpm typegen`, commit generated types.
 - **service** — the merged query with `select()`; `fallbackTaxonomy`
   parameter; transformer applies `sortOrder` then `limit`; tests for
@@ -1071,7 +1073,7 @@ Both are presentation only. DOM order is media, meta, title, footer at
 every width, so the accessible reading order does not change with the
 layout.
 
-**`PostsSection` gains `hasLead?: boolean`.** When set, the first post
+**`PostsSection` gains `hasLead?: boolean`.** _(Superseded 2026-09-08: `PostsSection` retires per [`2026-09-08-page-composition-design.md`](./2026-09-08-page-composition-design.md); the arrangement below moves to the featured module component in web, unchanged in shape.)_ When set, the first post
 renders as `isLead` + `isSplit` across the full width, and the rest render
 below in a row of as many columns as there are cards — two cards as
 ordinary cards, a single card as `isSplit` so it too fills its row:
@@ -1101,7 +1103,7 @@ gains `module_postFeatured: ['modules:postFeatured']`.
 
 ### Pages and desk
 
-`page_home`, `page_generic` and `page_blog` allow it — the blog page today
+`page_home`, `page_landing` and `page_blog` allow it — the blog page today
 allows only `cta` and `newsletter` beside its required list, and the
 spotlight is the first listing module that makes sense above or below a
 paginated archive. Each of the three adds `module_postFeatured` to its
@@ -1205,6 +1207,12 @@ in the service changes: the carousel is the same posts in a different
 layout, and `limit` already caps them.
 
 ### `@blog/ui` — `Carousel`, and a slot on `PostsSection`
+
+> **Superseded 2026-09-08** by
+> [`2026-09-08-page-composition-design.md`](./2026-09-08-page-composition-design.md):
+> `PostsSection` retires, so the `PostsSection.Carousel` slot below is not
+> built. `Carousel` stays exactly as specified; the latest and featured
+> module components compose it themselves from `PostCardItem` slides.
 
 **`Carousel` is a new pure organism.** It renders a viewport `<div>` that
 takes a `viewportRef`, a `<ul>` track, and one `<li>` slide per child,
@@ -1623,26 +1631,27 @@ notification; managing them is a later concern (mirrors the newsletter
 **Goal:** turn "a blog" into "a portfolio site that also blogs" by mirroring
 the proven `post` pattern rather than bolting portfolio onto posts.
 
-**Content model.** A new `project` (or `caseStudy`) entity document: title,
-client, role, stack (tags), year, `outcomeMetrics` (repeatable label+value),
-`heroImage`, `gallery`, `body` (richText), `featured`. Reuses the existing
-`topic` / `tag` taxonomy and `imageWithAlt`. It carries **no `slug` and no
-`publishedAt`** — those belong to its page document, below, exactly as
-`post` no longer carries them since `page_post`.
+**Content model.** A project is its own page, the shape `page_post` took on
+2026-09-08 (one document for content and route; no entity-plus-wrapper
+pair): `page_project` carries title, client, role, stack (tags), year,
+`outcomeMetrics` (repeatable label+value), `heroImage`, `gallery`, `body`
+(richText), `featured`, plus `slug`, `publishedAt`, `seo` and `modules[]`.
+Reuses the existing `topic` / `tag` taxonomy and `imageWithAlt`.
 
 **Page documents.** The page-architecture programme settled what the
 original design left open ("whether `/work/{slug}` is a page document or a
 plain entity route"): every public page is a CMS document.
 
-| Document       | Kind       | Required slot | Also                         | Route                   |
-| -------------- | ---------- | ------------- | ---------------------------- | ----------------------- |
-| `page_work`    | singleton  | `projectList` | `modules[]`, `seo`           | `/work`, `/work/page/N` |
-| `page_project` | per-entity | `project` ref | `slug`, `publishedAt`, `seo` | `/work/{slug}`          |
+| Document       | Kind       | Required slot | Also                                                      | Route                   |
+| -------------- | ---------- | ------------- | --------------------------------------------------------- | ----------------------- |
+| `page_work`    | singleton  | `projectList` | `modules[]`, `seo`                                        | `/work`, `/work/page/N` |
+| `page_project` | per-entity | —             | content fields, `slug`, `publishedAt`, `seo`, `modules[]` | `/work/{slug}`          |
 
-`page_project` mirrors `page_post` field-for-field: it owns `slug` (with the
-shared slug-URL preview input, prefix `/work/`) and `publishedAt`, and is
-one-to-one with its `project` via the same uniqueness validation. `page_work`
-mirrors `page_blog`: its `projectList` slot holds a `module_projectList`
+`page_project` mirrors `page_post` field-for-field: the content lives on the
+page document, which owns `slug` (with the shared slug-URL preview input,
+prefix `/work/`) and `publishedAt`; there is no separate `project` entity to
+reference. `page_work` mirrors `page_postIndex` (`page_blog` until its rename
+lands): its `projectList` slot holds a `module_projectList`
 (`pageSize`; the route supplies the page number).
 
 **Surfaces.** Routes under `app/[tenant]/[locale]/`: `/work` (+
@@ -1664,8 +1673,7 @@ Content
 ├─ Blog           Blog Page, Topics, Tags, Posts, Authors, Settings
 ├─ Work           ← this section
 │  ├─ Work Page       the /work index (page_work)
-│  ├─ Project Pages   page_project documents
-│  └─ Projects        the project / caseStudy entities
+│  └─ Projects        page_project documents (the project is its page)
 ├─ Modules
 └─ Settings
 ```
@@ -1685,7 +1693,7 @@ are additive. Existing posts are untouched.
 
 ```
 config  →  RESERVED_SLUGS + a CAPABILITY key; no module-type const — a module's _type derives from its studio schema via typegen
-studio  →  module_* schemas (shared styling helpers) + project entity + page_work / page_project
+studio  →  module_* schemas (shared styling helpers) + page_work / page_project (the project is its page)
 service →  service.modules.<type>.v1   service.pages.work.*
 db      →  leads table (tenantId) + settings_features column
 email   →  lead-notification template via sendEmail
@@ -1702,10 +1710,11 @@ point; the graph stays acyclic.
   shipped as shared helpers/an injector, so no per-module styling work is
   needed beyond choosing which tokens a module's own content (not its
   section chrome) uses.
-- **Portfolio mirrors `post` as a new `project` entity + `page_project` /
-  `page_work` pages + `/work` surface,** not a variant of `post` (carried
+- **Portfolio mirrors `post` as its own `page_project` document + a
+  `page_work` index + `/work` surface,** not a variant of `post` (carried
   from the original Feature 5 decision D7; page documents added 2026-09-06
-  per the page-architecture programme).
+  per the page-architecture programme; the separate `project` entity
+  dropped 2026-09-08 when the post became its page, see below).
 - **Project listing is two modules, one per mode** — `module_projectList`
   (slot, paginated) and `module_projectLatest` (`modules[]`, teaser) —
   replacing the single `module_projectGrid` (2026-09-06).
@@ -1757,17 +1766,20 @@ point; the graph stays acyclic.
   sidebar drift from the schemas it lists. Recorded in
   `.claude/agents/studio.md` "Naming & file layout", which is the durable
   home — this doc is deleted on completion (2026-09-08).
-- **`page_generic` is renamed to `page_landing`** — the `_type` catches up
-  with the `Landing Page` title #1907 already shipped, so the stored name and
-  every human-facing label finally agree. Unlike #1907's display-only rename
-  this **is** a content migration (`_type` is immutable: new id → repoint
-  `page_home`/`page_blog`/`page_topic` link references → delete the old in a
-  separate migration) and it reaches `studio`, `service` (queries, link
-  fragments, transformers), `apps/web` (generic-page route, metadata,
-  revalidate tags) and regenerated types — so it ships as an epic with
-  per-layer sub-issues, not a single change. The `genericSchema` export and
-  its file move to `landingSchema` / `documents/pages/landing/` in the same
-  studio change (2026-09-08).
+- **`page_generic` is renamed to `page_landing`, with no migration** — the
+  `_type` catches up with the `Landing Page` title #1907 already shipped, so
+  the stored name and every human-facing label finally agree. `_type`
+  immutability only bites when documents exist, and this one had none:
+  production, development and a freshly provisioned tenant all report zero
+  (`provision-tenant` seeds `page_home` and no other page document). So it is
+  a pure code rename reaching `studio`, the regenerated types, `service`,
+  `config` (`routes.genericPage` → `routes.landingPage`) and `apps/web` — and
+  because a `_type` rename reds `type-check` in every layer above it until all
+  of them land, it ships as **one PR**, not the expand/contract sequence an
+  earlier revision of this entry described. The schema moves to
+  `documents/pages/landing/` exporting `landingSchema`, and `service` and
+  `apps/web` rename their own `generic` directories and symbols to match
+  (2026-09-08, #2904).
 
 - **Grid vs. carousel is one `displayMode` field on the two teaser modules,
   and the carousel is a pure scroll-snap track that Embla takes over after
@@ -1781,6 +1793,25 @@ point; the graph stays acyclic.
   and are disabled exactly when Embla cannot move; a spotlight in carousel
   mode drops its lead treatment; four PRs, ui first (2026-09-08, #2835).
 
+- **Pages are chrome, a heading and modules; every part fetches what it
+  alone needs; `PostsSection` and the `*-page-view.tsx` layer retire** —
+  recorded in
+  [`2026-09-08-page-composition-design.md`](./2026-09-08-page-composition-design.md),
+  which supersedes the `PostsSection.Carousel` slot in the carousel section
+  and `hasLead` on `PostsSection` in the spotlight section, and adds
+  `page_post.modules[]` with a `module_postRelated` (2026-09-08).
+- **The post is its page** — `page_post` keeps its name and absorbs every
+  `blog_post` field; `blog_post` and the wrapper's `post` reference retire.
+  A Sanity `_type` is immutable, so every post moves to the `page_post-`
+  prefixed id the seed migration already assigned: copy-and-repoint
+  migration, a Drizzle rewrite of `bookmarks.post_id`, then a delete
+  migration. The same shape applies to `page_project` above (2026-09-08,
+  epic #2943).
+- **`page_blog` renames to `page_postIndex`** so the page family reads
+  `page_post`/`page_postIndex`, `page_topic`/`page_topicIndex`,
+  `page_tag`/`page_tagIndex`. Live documents and references exist, so it is
+  the expand → repoint → contract recipe with two migrations, unlike #2904.
+  Tracked in #2961 (2026-09-08).
 - **Topic cards list their two newest posts, behind a `showLatestPosts`
   toggle that is on by default and defaulted at read time** — the titles
   join each term inside the merged taxonomy-list query through a new
@@ -1809,6 +1840,12 @@ point; the graph stays acyclic.
 ui → web`); the featured spotlight (#2784) and carousel (#2785) wait on it.
 - **Featured spotlight** — epic #2784 (design #2828, then config in its own
   PR, ui in its own PR, and `studio → service → web` as one PR).
+- **Page composition** — epic #2943 (sub-issues #2944–#2955) from
+  [`2026-09-08-page-composition-design.md`](./2026-09-08-page-composition-design.md)
+  (post page first, `PostGrid` columns alongside, then listing modules,
+  then `PostsSection` retirement,
+  then the related-posts module, then one sub-issue per page); the
+  carousel's ui and web sub-issues rebase on it.
 - **Carousel display mode** — epic #2785 (design #2835, then ui in its own
   PR, config + studio as one PR, service in its own PR, web in its own PR);
   the `module_postFeatured` half waits on #2784.
@@ -1838,6 +1875,10 @@ catalogue has enough shipped history to matter).
 
 ## Resync log
 
+- **2026-09-08** — page composition: marked the carousel section's
+  `PostsSection.Carousel` slot and the spotlight section's `hasLead` on
+  `PostsSection` as superseded by the new page-composition design doc, and
+  added its decision-log and ticketing entries.
 - **2026-09-08** — added the "Topic cards list their latest posts" design
   section (#2892): the `showLatestPosts` toggle defaulted at read time, two
   fixed newest-first posts per term inside the merged query via a new

@@ -9,11 +9,11 @@ export const tagsQuery = q.star
     ...tagFragment,
     description: sub.field('description').nullable(true),
     // `references(^._id)` matches regardless of whether the referencing field
-    // is a single reference or (as `blog_post.tags` is) an array of them.
+    // is a single reference or (as `page_post.tags` is) an array of them.
     postCount: sub
       .count(
         sub.star
-          .filterByType('blog_post')
+          .filterByType('page_post')
           .filterRaw('references(^._id)')
           .filterRaw(PUBLISHED_POST_FILTER),
       )

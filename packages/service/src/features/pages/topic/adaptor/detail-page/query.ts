@@ -1,4 +1,5 @@
 import { q, type TSlugParams } from '@blog/service/sanity/query';
+import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo';
 import { topicFragment } from '@blog/service/shared/fragments/topic';
@@ -10,17 +11,14 @@ export const topicPageQuery = q
   .slice(0)
   .project((sub) => ({
     topic: sub.field('topic').deref().project(topicFragment).notNull(),
-    hero: sub.field('hero').deref().project(moduleFragment).nullable(true),
-    postList: sub
-      .field('postList')
-      .deref()
-      .project(() => ({
-        _id: true,
-      }))
+    headingBlock: sub
+      .field('headingBlock')
+      .project(headingBlockFragment)
       .nullable(true),
-    // Page-builder placement (`postLatest`/`cta`/`newsletter`), mirroring
-    // `page_blog`'s own thin `modules[]` ref projection — resolved to a
-    // real component by `ModuleRenderer` (`apps/web`).
+    hero: sub.field('hero').deref().project(moduleFragment).nullable(true),
+    // Page-builder placement (`postList`/`postLatest`/`cta`/`newsletter`),
+    // mirroring `page_blog`'s own thin `modules[]` ref projection —
+    // resolved to a real component by `ModuleRenderer` (`apps/web`).
     modules: sub
       .field('modules[]')
       .deref()

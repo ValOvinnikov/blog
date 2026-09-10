@@ -17,7 +17,7 @@ describe('getIndexPageParams', () => {
   it('delegates the raw query result to the pagination transformer', async () => {
     mockRun.mockResolvedValueOnce({
       blogPosts: { total: 20 },
-      postList: { pageSize: 9 },
+      pageSize: 9,
     });
 
     const params = await getIndexPageParams(tenant);
@@ -28,7 +28,7 @@ describe('getIndexPageParams', () => {
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     mockRun.mockResolvedValueOnce({
       blogPosts: { total: 0 },
-      postList: { pageSize: 9 },
+      pageSize: 9,
     });
 
     await getIndexPageParams(tenant);

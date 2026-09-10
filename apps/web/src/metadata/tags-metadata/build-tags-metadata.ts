@@ -1,13 +1,16 @@
 import { routes } from '@blog/config';
-import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getTagsIndexPage } from '@web/server/tags-index/get-tags-index-page';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 
+/**
+ * Metadata for the `/tags` hub, sourced from `page_tagIndex`'s resolved
+ * `seo`. Reuses `getTagsIndexPage` (also called by `TagsPage`), so this
+ * adds no extra round-trip.
+ */
 export const buildTagsMetadata = async (tenant: string): Promise<Metadata> => {
-  const tenantContext = await getTenantSanityContext(tenant);
-  const result = await service.pages.tagIndex.v1.getIndexPage(tenantContext);
+  const result = await getTagsIndexPage(tenant);
 
   if (!result.ok) {
     logger.error('tags_metadata.fetch_failed', { error: result.error });

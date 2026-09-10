@@ -1,5 +1,6 @@
-import { routes } from '@blog/config';
+import { routes, TAXONOMY_KIND, type TTaxonomyKind } from '@blog/config';
 import { service } from '@blog/service';
+import type { TModuleComponentProps } from '@web/modules/module-map';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import { renderPostCardImage } from '@web/utils/render-post-card-image';
@@ -12,28 +13,29 @@ import {
   type IPostListModulePagination,
 } from './post-list-module-view';
 
-export interface IPostListModuleProps {
-  id: string;
-  locale: string;
-  tenant: string;
-  page: number;
-  /** Pagination href builder. Defaults to `routes.blogIndex` for `/blog`; archive callers other than `/blog` must supply their own. */
-  createHref?: (page: number) => string;
-  /** Pagination nav `aria-label`. Defaults to the blog archive's own copy. */
-  ariaLabel?: string;
-  /** Fallback heading for screen readers when the CMS `sectionHeader.heading` is blank. Defaults to the blog archive's own copy. */
-  accessibleTitle?: string;
-  /** Empty-state copy for this archive. Defaults to the blog archive's own copy. */
-  emptyMessageFallback?: string;
-  titleId?: string;
-}
+export type TPostListModuleProps = TModuleComponentProps;
+
+const ARCHIVE_ROUTE_BUILDER: Record<
+  TTaxonomyKind,
+  (slug: string, page?: number) => string
+> = {
+  [TAXONOMY_KIND.TOPICS]: routes.topic,
+  [TAXONOMY_KIND.TAGS]: routes.tag,
+};
+
+const ARCHIVE_NAMESPACE: Record<TTaxonomyKind, string> = {
+  [TAXONOMY_KIND.TOPICS]: 'topicPage',
+  [TAXONOMY_KIND.TAGS]: 'tagPage',
+};
+
+const ARCHIVE_TITLE_ID: Record<TTaxonomyKind, string> = {
+  [TAXONOMY_KIND.TOPICS]: 'topic-posts-title',
+  [TAXONOMY_KIND.TAGS]: 'tag-posts-title',
+};
 
 /**
- * PostListModule — an archive's post list: fetches the `postList` slot's
- * `module_postList` document for the given page and hands it to
- * `PostListModuleView`. Reused by both `/blog` (no overrides — its own
- * copy/href are the defaults) and `/topics/{slug}` (which supplies its own
- * `createHref`/`ariaLabel`/`accessibleTitle`/`emptyMessageFallback`). Unlike
+ * PostListModule — an archive's post list: fetches a `module_postList`
+ * document for the given page and hands it to `PostListModuleView`. Unlike
  * every other module, it always renders — an archive must say something even
  * with zero posts — and 404s (after logging) both when the fetch fails and
  * when an explicit page number exceeds the corpus's page count, since either
@@ -42,24 +44,22 @@ export interface IPostListModuleProps {
 export const PostListModule = async ({
   id,
   tenant,
-  page,
-  createHref = routes.blogIndex,
-  ariaLabel,
-  accessibleTitle,
-  emptyMessageFallback,
-  titleId = 'blog-posts-title',
-}: IPostListModuleProps) => {
+  context,
+}: TPostListModuleProps) => {
+  const resolvedPage = context?.page ?? 1;
+  const archive = context?.archive;
+
   const tenantContext = await getTenantSanityContext(tenant);
-  const [result, blogListT, paginationT] = await Promise.all([
-    service.modules.postList.v1.getPostList(id, tenantContext, page),
-    getTranslations('blogListPage'),
+  const [result, paginationT, scopedT] = await Promise.all([
+    service.modules.postList.v1.getPostList(id, tenantContext, resolvedPage),
     getTranslations('pagination'),
+    getTranslations(archive ? ARCHIVE_NAMESPACE[archive.kind] : 'blogListPage'),
   ]);
 
   if (!result.ok) {
     logger.error('post_list_module.fetch_failed', {
       id,
-      page,
+      page: resolvedPage,
       error: result.error,
     });
     notFound();
@@ -67,7 +67,7 @@ export const PostListModule = async ({
 
   const {
     brandVariant,
-    sectionHeader,
+    headingBlock,
     posts,
     layout,
     currentPage,
@@ -79,7 +79,7 @@ export const PostListModule = async ({
   // Out-of-range page (corpus shrank or hand-typed URL) → hard 404, never a
   // soft-404 or a redirect to the last page (spec SEO rules). Page 1 of an
   // empty archive is `totalPages === 1`, so page 1 never 404s.
-  if (page > totalPages) {
+  if (resolvedPage > totalPages) {
     notFound();
   }
 
@@ -88,11 +88,18 @@ export const PostListModule = async ({
     showImages ? renderPostCardImage : undefined,
   );
 
+  const scopedParams = archive ? { name: archive.name } : undefined;
+  const createHref = archive
+    ? (pageNumber: number) =>
+        ARCHIVE_ROUTE_BUILDER[archive.kind](archive.slug, pageNumber)
+    : routes.blogIndex;
+  const titleId = archive ? ARCHIVE_TITLE_ID[archive.kind] : 'blog-posts-title';
+
   const pagination: IPostListModulePagination = {
     currentPage,
     totalPages,
     createHref,
-    ariaLabel: ariaLabel ?? blogListT('paginationAriaLabel'),
+    ariaLabel: scopedT('paginationAriaLabel', scopedParams),
     previousLabel: paginationT('previous'),
     nextLabel: paginationT('next'),
   };
@@ -100,15 +107,15 @@ export const PostListModule = async ({
   return (
     <PostListModuleView
       brandVariant={brandVariant}
-      sectionHeader={sectionHeader}
+      headingBlock={headingBlock}
       items={items}
       layout={layout}
       contentAlignment={contentAlignment}
       hasImages={showImages}
       titleId={titleId}
       dataTestId={`post-list-module-${id}`}
-      accessibleTitle={accessibleTitle ?? blogListT('title')}
-      emptyMessage={emptyMessageFallback ?? blogListT('empty')}
+      accessibleTitle={scopedT('title', scopedParams)}
+      emptyMessage={scopedT('empty', scopedParams)}
       pagination={pagination}
     />
   );

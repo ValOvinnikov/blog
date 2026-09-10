@@ -38,6 +38,7 @@ export const VOICE_FIXED_KEYS = [
   // or derived from Studio content rather than authored directly.
   'postLatestModule.fallbackHeading',
   'postFeaturedModule.fallbackHeading',
+  'postRelatedModule.fallbackHeading',
   'taxonomyListModule.topics.fallbackHeading',
   'taxonomyListModule.tags.fallbackHeading',
   'blogListPage.title',

@@ -1,17 +1,11 @@
-import { routes } from '@blog/config';
-import { service } from '@blog/service';
-import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
-import { HeroSlot } from '@web/modules/hero-slot';
+import { TAXONOMY_KIND } from '@blog/config';
+import { TopicBreadcrumbs } from '@web/components/features/topic/topic-breadcrumbs';
+import { TopicChips } from '@web/components/features/topic/topic-chips';
+import { PageShell } from '@web/components/page-templates/page-shell';
+import { PageIntro } from '@web/components/shared/page-intro';
 import { ModuleRenderer } from '@web/modules/module-renderer';
-import { PostListModule } from '@web/modules/post-list/post-list-module';
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
-import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
-import { getTopicsSafely } from '@web/utils/get-topics-safely';
+import { getTopicPage } from '@web/server/topic/get-topic-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
-import { getTranslations } from 'next-intl/server';
-
-import { TopicPageView } from './topic-page-view';
 
 type TTopicPageProps = {
   slug: string;
@@ -22,12 +16,9 @@ type TTopicPageProps = {
 
 /**
  * TopicPage — shared composition for `/topics/[slug]` (page 1, `page`
- * omitted) and `/topics/[slug]/page/[page]` (pages ≥ 2, `page` provided):
- * fetches the `page_topic` shell via the topic service, then hands the
- * resolved data — plus the pre-rendered archive/page-builder modules
- * content — to `TopicPageView`. `topic.title`/`topic.description` (from the
- * deref'd `blog_topic`, not `page_topic`'s own CMS-label `title`) drive the
- * heading and supporting text.
+ * omitted) and `/topics/[slug]/page/[page]` (pages ≥ 2, `page` provided).
+ * Fetches the `page_topic` shell once, then composes every other concern
+ * as a self-fetching part reading the same cached `getTopicPage` loader.
  */
 export const TopicPage = async ({
   slug,
@@ -35,67 +26,39 @@ export const TopicPage = async ({
   locale,
   tenant,
 }: TTopicPageProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
-  const [result, topics, breadcrumbsT, topicPageT] = await Promise.all([
-    service.pages.topic.v1.getTopicPage(slug, tenantContext),
-    getTopicsSafely(tenantContext),
-    getTranslations('breadcrumbs'),
-    getTranslations('topicPage'),
-  ]);
+  const result = await getTopicPage(slug, tenant);
+  const pageData = guardPageLoaderResult(result, 'topic_page.fetch_failed', {
+    slug,
+  });
+  const { topic, headingBlock, hero, modules } = pageData;
 
-  const { topic, hero, modules, postListId } = guardPageLoaderResult(
-    result,
-    'topic_page.fetch_failed',
-    { slug },
-  );
-
-  const siteUrl = (await getTenantBaseUrl(tenant)) ?? '';
-  const breadcrumbTrail: IBreadcrumbItem[] = [
-    { label: breadcrumbsT('home'), href: routes.home() },
-    { label: topic.title, href: routes.topic(slug) },
-  ];
-  const breadcrumbListSchema = buildBreadcrumbListSchema(
-    breadcrumbTrail,
-    siteUrl,
-  );
+  const currentPage = page ?? 1;
 
   return (
-    <TopicPageView
-      heading={topic.title}
-      supportingText={topic.description}
-      hero={
-        hero && (
-          <HeroSlot
-            id={hero.id}
-            type={hero.type}
-            locale={locale}
-            tenant={tenant}
-          />
-        )
-      }
-      topics={topics}
-      activeSlug={slug}
-      breadcrumbTrail={breadcrumbTrail}
-      breadcrumbAriaLabel={breadcrumbsT('ariaLabel')}
-      breadcrumbListSchema={breadcrumbListSchema}
-      postsContent={
-        <>
-          <PostListModule
-            id={postListId}
-            locale={locale}
-            tenant={tenant}
-            page={page ?? 1}
-            createHref={(pageNumber) => routes.topic(slug, pageNumber)}
-            ariaLabel={topicPageT('paginationAriaLabel', {
-              name: topic.title,
-            })}
-            accessibleTitle={topicPageT('title', { name: topic.title })}
-            emptyMessageFallback={topicPageT('empty', { name: topic.title })}
-            titleId="topic-posts-title"
-          />
-          <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />
-        </>
-      }
-    />
+    <PageShell>
+      <PageShell.Breadcrumbs>
+        <TopicBreadcrumbs slug={slug} tenant={tenant} />
+      </PageShell.Breadcrumbs>
+      <PageShell.Heading>
+        <PageIntro
+          hero={hero}
+          headingBlock={headingBlock}
+          locale={locale}
+          tenant={tenant}
+        />
+      </PageShell.Heading>
+      <PageShell.Content>
+        <TopicChips activeSlug={slug} tenant={tenant} />
+        <ModuleRenderer
+          modules={modules}
+          context={{
+            page: currentPage,
+            archive: { kind: TAXONOMY_KIND.TOPICS, slug, name: topic.title },
+          }}
+          locale={locale}
+          tenant={tenant}
+        />
+      </PageShell.Content>
+    </PageShell>
   );
 };

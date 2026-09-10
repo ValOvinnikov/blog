@@ -1,6 +1,7 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawPostLatestModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getPostLatest } from './loader';
@@ -17,10 +18,7 @@ describe('getPostLatest', () => {
     mockRun
       .mockResolvedValueOnce(
         makeRawPostLatestModule({
-          sectionHeader: {
-            heading: 'Recent writing',
-            supportingText: null,
-          },
+          headingBlock: makeRawHeadingBlock('Recent writing'),
           limit: 3,
         }),
       )
@@ -30,7 +28,7 @@ describe('getPostLatest', () => {
 
     // The module's `limit` is threaded into the GROQ posts query's slice bound.
     expect(mockRun.mock.calls[1]?.[0]?.query).toContain('[0...3]');
-    expect(postLatest.sectionHeader.heading).toBe('Recent writing');
+    expect(postLatest.headingBlock.heading).toBe('Recent writing');
     expect(postLatest.posts.map((p) => p.id)).toEqual(['a']);
   });
 

@@ -5,11 +5,11 @@ import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-po
 // read half of the publish-time skim pipeline, not a page-render query.
 export const publishedPostBodyQuery = q
   .parameters<{ id: string }>()
-  .star.filterByType('blog_post')
+  .star.filterByType('page_post')
   .filterBy('_id == $id')
   .filterRaw(PUBLISHED_POST_FILTER)
   .slice(0)
   .project((sub) => ({
-    body: sub.field('body[]').notNull(),
+    body: sub.field('content[]').notNull(),
   }))
   .notNull();

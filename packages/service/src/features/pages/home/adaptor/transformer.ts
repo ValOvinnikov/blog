@@ -1,6 +1,7 @@
 import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
 import type { TImageTenant } from '@blog/service/sanity/image';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
+import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import {
   toHeroSlot,
   toModule,
@@ -18,8 +19,8 @@ export function toHomePage(
   tenant: TImageTenant,
 ): THomePage {
   return {
-    title: raw.title,
-    hero: toHeroSlot(raw.hero),
+    headingBlock: toHeadingBlock(raw.headingBlock),
+    hero: raw.hero ? toHeroSlot(raw.hero) : undefined,
     modules: (raw.modules ?? []).map(toModule),
     seo: resolveSeo(
       raw.seo ?? undefined,

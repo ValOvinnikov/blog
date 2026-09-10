@@ -18,7 +18,7 @@ vi.mock('@web/components/shared/delete-account-control', () => ({
 
 const setup = customRender(AccountPageView, makeAccountPageView());
 
-describe(AccountPageView, () => {
+describe(`<${AccountPageView.name}/>`, () => {
   it('renders the page heading', () => {
     setup();
 

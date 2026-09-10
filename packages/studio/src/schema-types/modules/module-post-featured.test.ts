@@ -1,4 +1,5 @@
 import { POST_SOURCE } from '@blog/config/constants';
+import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
 import type { SanityDocument, ValidationContext } from 'sanity';
 
@@ -209,6 +210,14 @@ describe('postFeaturedSchema postSource field', () => {
 });
 
 describe('postFeaturedSchema posts field', () => {
+  it('only accepts page_post references', () => {
+    const field = getField('posts') as {
+      of?: { to?: { type: string }[] }[];
+    };
+
+    expect(field.of?.[0]?.to).toEqual([{ type: PAGE_POST_TYPE }]);
+  });
+
   it('is hidden unless Post Source is Pinned', () => {
     const hidden = getHidden(getField('posts'));
 

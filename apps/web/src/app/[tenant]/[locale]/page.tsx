@@ -1,8 +1,8 @@
 import type { ITenantLocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { HomePageTemplate } from '@web/components/page-templates/home-page-template';
+import { PageShell } from '@web/components/page-templates/page-shell';
+import { PageIntro } from '@web/components/shared/page-intro';
 import { toMetadata } from '@web/metadata/to-metadata';
-import { HeroSlot } from '@web/modules/hero-slot';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
@@ -44,24 +44,24 @@ export default async function HomePage({ params }: TProps) {
 
   const tenantContext = await getTenantSanityContext(tenant);
   const result = await service.pages.home.v1.getHomePage(tenantContext);
-  const { hero, modules } = guardPageLoaderResult(
+  const { headingBlock, hero, modules } = guardPageLoaderResult(
     result,
     'home_page.fetch_failed',
   );
 
   return (
-    <HomePageTemplate
-      hero={
-        <HeroSlot
-          id={hero.id}
-          type={hero.type}
+    <PageShell>
+      <PageShell.Heading>
+        <PageIntro
+          hero={hero}
+          headingBlock={headingBlock}
           locale={locale}
           tenant={tenant}
         />
-      }
-      modules={
+      </PageShell.Heading>
+      <PageShell.Content>
         <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />
-      }
-    />
+      </PageShell.Content>
+    </PageShell>
   );
 }

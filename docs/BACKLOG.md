@@ -757,7 +757,7 @@ every sub-issue):**
   its own sub-issue too; where a layer has nothing to do, the epic says so
   rather than filing an empty ticket.
 - **Platform style is mandatory and identical for every module.** Studio:
-  `titleField`, `brandVariantField`, `sectionHeaderField` (where the module
+  `titleField`, `brandVariantField`, `headingBlockField` (where the module
   has a heading), `defineAlignmentFields`, `layoutField`, a named
   `{name}Schema` export, a desk-group entry, page allow-list entries.
   Service: `service.modules.<name>.v1`, explicit projections, `T | undefined`
@@ -789,12 +789,14 @@ flowchart TD
   P1d["1.4 carousel display mode (Embla)"]
   P1e["1.5 taxonomy list placeable"]
   P1f["1.6 topic cards list latest posts"]
+  P1g["1.7 page composition<br/>retire PostsSection · post page modules"]
   P2["Phase 2 · Hero family<br/>heroStatement · heroProfile"]
   P3["Phase 3 · Marketing modules<br/>featureGrid · testimonial · logoWall · stats · faq · embed<br/>featureHighlights · team · location · contactForm"]
   P4["Phase 4 · Onboarding templates<br/>site-kind at tenant creation"]
   M9["Portfolio strand (#1919, same milestone)<br/>project entity · page_work · heroProject · projectList/Latest"]
   P0 --> P1a & P1b & P1e
   P1b --> P1c --> P1d
+  P1c --> P1g --> P1d
   P1e --> P1f
   P0 --> P2 --> P3
   P2 --> M9
@@ -824,8 +826,8 @@ same template-literal trick that derives `TModuleType`; a
 `TSlotModuleType`union covering the hero family plus`module_postList`/`module_taxonomyList`, so `MODULE_MAP`'s `Exclude` names one type instead
     of listing each.
   - **studio** · `feat(studio): hero family slot on page_home and
-page_generic` — `page_home.hero` `to:` accepts every hero type;
-    `page_generic`, `page_blog`, `page_topic` and `page_tag` gain an optional
+page_landing` — `page_home.hero` `to:` accepts every hero type;
+    `page_landing`, `page_blog`, `page_topic` and `page_tag` gain an optional
     `hero` slot with the same list, replacing the page's default header when
     set;
     `page_home.modules` allow-list widens to every `modules[]` module (today
@@ -878,7 +880,7 @@ landing pages` — `Record<THeroModuleType, …>` so an unregistered hero kind
   `mediaOrderStacked` for every width) collapsing to one `mediaOrder` prop.
 - **Sub-issues:**
   - **studio** · `feat(studio): module_heroBlog schema` — new type beside
-    `module_hero`; desk group "Heroes" lists both; `page_home`/`page_generic`
+    `module_hero`; desk group "Heroes" lists both; `page_home`/`page_landing`
     slots admit it. Typegen.
   - **service** · `feat(service): heroBlog loader with one resolved query` —
     the pinned-or-newest-featured resolution in **one** GROQ round trip (the
@@ -1048,7 +1050,7 @@ TSlotModuleType` — the union then names only slot-only modules, so the
     missing `MODULE_MAP` entry is a compile error.
   - **studio** · `feat(studio): authored taxonomy on module_taxonomyList and
 home/landing allow-lists` — `taxonomy`, `sortOrder`, `limit`; the two
-    page-level rules; `page_home`/`page_generic` allow the type.
+    page-level rules; `page_home`/`page_landing` allow the type.
   - **service** · `feat(service): taxonomyList reads the authored taxonomy
 when present` — one query resolving module and terms, `fallbackTaxonomy`
     parameter, sort and limit in the transformer.
@@ -1102,6 +1104,72 @@ landing and index pages`.
   lists its two newest published posts as links, newest first; a term with
   no posts shows title, description and count only; a scheduled post is not
   listed; the toggle off renders today's card; a post link reaches the post.
+
+#### 1.7 Page composition — epic #2943 `refactor(web): pages are chrome, a heading and modules; retire PostsSection`
+
+- **Depends on:** 1.3 (shipped). **Blocks:** 1.4's ui and web sub-issues
+  (#2839 drops its `PostsSection.Carousel` slot; #2840 composes `Carousel`
+  inside the latest and featured modules).
+- **Why:** every page fetches and pre-computes for all of its sections and
+  hands a 31-prop bag to a "view"; `PostsSection` carries a prop for every
+  listing variant a page ever needed; related reading and the post-foot
+  newsletter are hardcoded rather than authorable. Design of record:
+  [`docs/superpowers/specs/2026-09-08-page-composition-design.md`](superpowers/specs/2026-09-08-page-composition-design.md).
+- **Rule:** site header → page heading → `ModuleRenderer` over the page
+  document's `modules[]` → site footer; each part is a Server Component
+  that fetches what it alone needs, shared reads go through `cache()`.
+- **Sub-issues** (expand then contract; each PR green alone):
+  1. **web** · post page decomposed (#2944) — `PostCardItem`, the cached post
+     loader, self-fetching parts, `blog-post-page-view.tsx` deleted.
+     **First.**
+  2. **ui** · `PostGrid` gains `columns` (#2945, independent).
+  3. **web** · listing modules compose primitives (#2946); `PostListModuleView`
+     retires; spotlight arrangement in web.
+  4. **ui** · retire `PostsSection` (#2947).
+  5. **studio** (#2948) · `page_post` absorbs every `blog_post` field and
+     gains `modules[]`; `module_postRelated`; `module_newsletter.variant`;
+     the copy-and-repoint migration (human-gated).
+  6. **service** (#2949) · every read on `page_post`; `modules.postRelated.v1`;
+     `getPost` drops `relatedPosts`.
+  7. **web** (#2950) · `ModuleRenderer` page context; modules on the post page;
+     the post type in the webhook (5–7 ship as one PR: typegen widens
+     `TModuleType` and switches the post type).
+  8. **db** (#2959) · bookmark ids prefixed by data migration; the starter
+     post becomes a `page_post`. Own PR, same deploy as 5–7.
+  9. **studio** (#2960) · retire `blog_post` (delete migration,
+     human-gated); desk "Content" → "Taxonomy" + "People". After 5–8.
+  10. **web** · one per page: blog list #2951, topic #2952, tag #2953,
+      topics and tags #2954, landing #2955.
+  11. **web** (#2974) · `CmsPageTemplate` — one furniture component for
+      every CMS page (`hero`, `heading`, `supportingText`, `chips`,
+      `modules`); `page` in the `ModuleRenderer` context. After #2953.
+  12. **One ticket per page, every layer** — home #2975, landing #2976,
+      blog list #2977, topic #2978, tag #2979, topics index #2980, tags
+      index #2981, post #2983 (order only, after 5). Each: canonical
+      field order (identity → entity → headingBlock → hero → modules →
+      seo), `hero` optional + `headingBlock` +
+      `modules[]` with the hero-or-heading rule, its slot folded into
+      `modules[]`, its service projection, its web page through the
+      template — expand PR (old fields `readOnly`, migration, typegen,
+      service, web) then contract PR (unset + drop). After 11; independent
+      of each other. (#2970–#2973 closed as superseded.)
+- **Naming (2026-09-08):** the post is its page — `page_post` keeps the name
+  and absorbs `blog_post`, a Sanity `_type` being immutable, so every post
+  id gains the `page_post-` prefix the seed migration already used.
+  `page_blog` → `page_postIndex` is its own tracking issue, #2961
+  (expand → repoint → contract, the #2904 recipe with migrations).
+- **Not in scope:** header/footer as modules; account and bookmarks pages;
+  `displayMode` on the related-posts module.
+- **Acceptance:** the post page fetches the post once and renders
+  `ModuleRenderer` with the post context; related reading and the
+  newsletter are authorable per post; `page_post` is the only post
+  document and `blog_post` is gone; `PostsSection` and every
+  `*-page-view.tsx` are deleted; every listing renders through
+  `PostCardItem` and `PostGrid`, or `Carousel` where `displayMode` says so.
+  Every page document declares `hero` and `modules[]` in the canonical
+  order with no slot field beside them and `headingBlock` on every page
+  but the post; every CMS page renders breadcrumbs → hero, else the heading
+  as h1 → modules (2026-09-08).
 
 ### Phase 2 · Hero family — `prio:later` until Phase 1 ships
 

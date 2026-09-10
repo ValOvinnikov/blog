@@ -451,23 +451,15 @@
       "details": {
         "title": "Details",
         "description": "Name, domain, plan"
-      },
-      "sanityProject": {
-        "title": "Sanity project",
-        "description": "Create + configure"
-      },
-      "seedContent": {
-        "title": "Seed content",
-        "description": "Starter documents"
-      },
-      "registryRows": {
-        "title": "Registry rows",
-        "description": "tenants + memberships"
-      },
-      "mapDomain": {
-        "title": "Map domain",
-        "description": "DNS + verification"
       }
+    },
+    "stepDescriptions": {
+      "SANITY_PROJECT": "Create + configure",
+      "SEED_CONTENT": "Starter documents",
+      "PERSIST_TOKEN": "Read credentials",
+      "MAP_DOMAIN": "DNS + verification",
+      "CREATE_WEBHOOK": "CMS to website",
+      "VERIFY_CONTENT": "Starter content check"
     }
   },
   "tenantDetailsForm": {

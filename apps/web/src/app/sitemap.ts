@@ -7,7 +7,7 @@ import { logger } from '@web/utils/logger/logger';
 import type { MetadataRoute } from 'next';
 
 // Only `getPostParams()` projects a `publishedAt` field, so `lastModified`
-// stays unset for topic/tag/generic-page entries.
+// stays unset for topic/tag/landing-page entries.
 const toEntry = (
   path: string,
   siteUrl: string,
@@ -58,7 +58,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     topicPaginationParamsResult,
     tagPaginationParamsResult,
     blogParamsResult,
-    genericPageSlugsResult,
+    landingPageSlugsResult,
     topicIndexPageResult,
     tagIndexPageResult,
   ] = await Promise.all([
@@ -68,7 +68,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     service.pages.topic.v1.getTopicPaginationParams(tenant),
     service.pages.tag.v1.getTagPaginationParams(tenant),
     service.pages.blog.v1.getIndexPageParams(tenant),
-    service.pages.generic.v1.getPageSlugs(tenant),
+    service.pages.landing.v1.getPageSlugs(tenant),
     service.pages.topicIndex.v1.getIndexPage(tenant),
     service.pages.tagIndex.v1.getIndexPage(tenant),
   ]);
@@ -121,13 +121,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ? blogParamsResult.data.map(({ page }) => Number(page))
     : [];
 
-  if (!genericPageSlugsResult.ok) {
-    logger.error('sitemap.generic_page_slugs_fetch_failed', {
-      error: genericPageSlugsResult.error,
+  if (!landingPageSlugsResult.ok) {
+    logger.error('sitemap.landing_page_slugs_fetch_failed', {
+      error: landingPageSlugsResult.error,
     });
   }
-  const genericPageSlugs = genericPageSlugsResult.ok
-    ? genericPageSlugsResult.data
+  const landingPageSlugs = landingPageSlugsResult.ok
+    ? landingPageSlugsResult.data
     : [];
 
   if (!topicIndexPageResult.ok) {
@@ -164,8 +164,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...tagPages.map(({ slug, page }) =>
       toEntry(routes.tag(slug, Number(page)), siteUrl),
     ),
-    ...genericPageSlugs.map(({ slug }) =>
-      toEntry(routes.genericPage(slug), siteUrl),
+    ...landingPageSlugs.map(({ slug }) =>
+      toEntry(routes.landingPage(slug), siteUrl),
     ),
   ];
 }

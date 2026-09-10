@@ -1,10 +1,7 @@
 import type { TRawBlogPage } from '@blog/service/features/pages/blog/adaptor/index-page/transformer';
-import type { TRawGenericPage } from '@blog/service/features/pages/generic/adaptor/detail-page/transformer';
 import type { TRawHomePage } from '@blog/service/features/pages/home/adaptor/transformer';
-import type {
-  TRawPostDetail,
-  TRawPostPage,
-} from '@blog/service/features/pages/post/adaptor/detail-page/transformer';
+import type { TRawLandingPage } from '@blog/service/features/pages/landing/adaptor/detail-page/transformer';
+import type { TRawPostDetail } from '@blog/service/features/pages/post/adaptor/detail-page/transformer';
 import type { TRawTagPage } from '@blog/service/features/pages/tag/adaptor/detail-page/transformer';
 import type { TRawTagIndexPage } from '@blog/service/features/pages/tag-index/adaptor/transformer';
 import type { TRawTopicPage } from '@blog/service/features/pages/topic/adaptor/detail-page/transformer';
@@ -16,7 +13,9 @@ import {
   makeRawTopic,
 } from '@blog/service/testing/entities/fixtures';
 import {
+  makeRawHeadingBlock,
   makeRawImage,
+  makeRawOptionalHeadingBlock,
   makeRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
 
@@ -40,9 +39,10 @@ export function makeRawPostCard(
 ): TRawPostCard {
   return {
     _id: 'post-1',
-    title: 'Hello World',
+    headingBlock: makeRawHeadingBlock('Hello World', {
+      supportingText: 'A sufficiently long excerpt for the card.',
+    }),
     slug: 'hello-world',
-    excerpt: 'A sufficiently long excerpt for the card.',
     publishedAt: '2026-01-15T00:00:00Z',
     heroImage: makeRawImage(),
     heroImageAsset: makeRawSanityImage(),
@@ -71,9 +71,10 @@ export function makeRawArchivePostCard(
 ): TRawArchivePostCard {
   return {
     _id: 'post-1',
-    title: 'Hello World',
+    headingBlock: makeRawHeadingBlock('Hello World', {
+      supportingText: 'A sufficiently long excerpt for the card.',
+    }),
     slug: 'hello-world',
-    excerpt: 'A sufficiently long excerpt for the card.',
     publishedAt: '2026-01-15T00:00:00Z',
     topic: {
       _id: 'topic-1',
@@ -91,14 +92,14 @@ export function makeRawPostDetail(
 ): TRawPostDetail {
   return {
     _id: 'post-1',
-    title: 'Hello World',
+    headingBlock: makeRawHeadingBlock('Hello World', {
+      supportingText: 'A sufficiently long excerpt for the card.',
+    }),
     slug: 'hello-world',
-    excerpt: 'A sufficiently long excerpt for the card.',
     publishedAt: '2026-01-15T00:00:00Z',
     heroImage: makeRawImage(),
     heroImageAsset: makeRawSanityImage(),
     featured: false,
-    newsletterEnabled: true,
     body: [],
     skim: null,
     seo: null,
@@ -110,19 +111,8 @@ export function makeRawPostDetail(
       description: 'Engineering posts',
     },
     tags: [{ _id: 'tag-1', title: 'TypeScript', slug: 'typescript' }],
+    modules: [],
     wordCount: 400,
-    ...overrides,
-  };
-}
-
-export function makeRawPostPage(
-  overrides: Partial<TRawPostPage> = {},
-): TRawPostPage {
-  return {
-    slug: 'hello-world',
-    publishedAt: '2026-01-15T00:00:00Z',
-    seo: null,
-    post: makeRawPostDetail(),
     ...overrides,
   };
 }
@@ -131,7 +121,7 @@ export function makeRawHomePage(
   overrides: Partial<TRawHomePage> = {},
 ): TRawHomePage {
   return {
-    title: 'Home Page',
+    headingBlock: null,
     hero: { _id: 'hero-1', _type: 'module_hero' },
     modules: [
       { _id: 'post-latest-1', _type: 'module_postLatest' },
@@ -146,10 +136,11 @@ export function makeRawBlogPage(
   overrides: Partial<NonNullable<TRawBlogPage>> = {},
 ): NonNullable<TRawBlogPage> {
   return {
-    heading: 'The Blog',
-    supportingText: 'Notes on building things.',
+    headingBlock: makeRawOptionalHeadingBlock({
+      heading: 'The Blog',
+      supportingText: 'Notes on building things.',
+    }),
     hero: null,
-    postList: { _id: 'post-list-1' },
     modules: [],
     seo: null,
     ...overrides,
@@ -157,12 +148,12 @@ export function makeRawBlogPage(
 }
 
 export function makeRawTopicIndexPage(
-  overrides: Partial<NonNullable<TRawTopicIndexPage>> = {},
-): NonNullable<TRawTopicIndexPage> {
+  overrides: Partial<TRawTopicIndexPage> = {},
+): TRawTopicIndexPage {
   return {
-    heading: 'Browse by topic',
-    supportingText: 'Find posts by subject.',
-    taxonomyList: { _id: 'taxonomy-list-1' },
+    headingBlock: makeRawOptionalHeadingBlock({ heading: 'Browse by topic' }),
+    hero: null,
+    modules: [{ _id: 'taxonomy-list-1', _type: 'module_taxonomyList' }],
     seo: null,
     ...overrides,
   };
@@ -185,9 +176,9 @@ export function makeRawTopicPage(
 ): TRawTopicPage {
   return {
     topic: makeRawTopic(),
+    headingBlock: null,
     hero: null,
-    postList: { _id: 'post-list-1' },
-    modules: [],
+    modules: [{ _id: 'post-list-1', _type: 'module_postList' }],
     seo: null,
     ...overrides,
   };
@@ -198,20 +189,20 @@ export function makeRawTagPage(
 ): TRawTagPage {
   return {
     tag: { ...makeRawTag(), description: 'Posts about TypeScript.' },
+    headingBlock: null,
     hero: null,
-    postList: { _id: 'post-list-1' },
-    modules: [],
+    modules: [{ _id: 'post-list-1', _type: 'module_postList' }],
     seo: null,
     ...overrides,
   };
 }
 
-export function makeRawGenericPage(
-  overrides: Partial<TRawGenericPage> = {},
-): TRawGenericPage {
+export function makeRawLandingPage(
+  overrides: Partial<TRawLandingPage> = {},
+): TRawLandingPage {
   return {
-    title: 'About',
     slug: 'about',
+    headingBlock: null,
     hero: null,
     modules: [
       { _id: 'content-1', _type: 'module_content' },

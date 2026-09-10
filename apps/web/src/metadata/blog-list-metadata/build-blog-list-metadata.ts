@@ -1,7 +1,6 @@
 import { routes } from '@blog/config';
-import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getBlogListPage } from '@web/server/blog-list/get-blog-list-page';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
@@ -14,16 +13,16 @@ import { getTranslations } from 'next-intl/server';
  * whose content (every published post) matches the feed's content, and it's
  * the same feed regardless of which page of the list is showing.
  *
- * Reuses `getIndexPage` (also called by `BlogListPage`) — Next dedupes the
- * fetch per request, so this adds no extra round-trip.
+ * Reads the same cached `getBlogListPage` loader the route's own
+ * `BlogListPage` composition reads, so building metadata costs no second
+ * Sanity fetch.
  */
 export const buildBlogListMetadata = async (
   page: number,
   tenant: string,
 ): Promise<Metadata> => {
-  const tenantContext = await getTenantSanityContext(tenant);
   const [result, t] = await Promise.all([
-    service.pages.blog.v1.getIndexPage(tenantContext),
+    getBlogListPage(tenant),
     getTranslations('pagination'),
   ]);
 

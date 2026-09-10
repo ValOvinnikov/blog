@@ -1,5 +1,8 @@
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
-import { makeRawImage } from '@blog/service/testing/shared/fixtures';
+import {
+  makeRawHeadingBlock,
+  makeRawImage,
+} from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { toPostCard } from './to-post-card';
@@ -83,6 +86,17 @@ describe('toPostCard', () => {
       title: 'Engineering',
       slug: 'engineering',
     });
+  });
+
+  it('maps a sparse post-card with no excerpt to undefined', () => {
+    const result = toPostCard(
+      makeRawPostCard({
+        headingBlock: makeRawHeadingBlock('Hello World'),
+      }),
+      tenant,
+    );
+
+    expect(result.excerpt).toBeUndefined();
   });
 
   it('defaults featured to false when null', () => {

@@ -1,4 +1,5 @@
 import { makeRawHomePage } from '@blog/service/testing/pages/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 
 import { homePageQuery } from './query';
 
@@ -17,5 +18,30 @@ describe('homePageQuery', () => {
 
   it('parses null as no matching page_home document, rather than throwing', () => {
     expect(homePageQuery.parse(null)).toBeNull();
+  });
+
+  it('parses a home page with a hero and no headingBlock', () => {
+    const raw = makeRawHomePage({ headingBlock: null });
+
+    expect(() => homePageQuery.parse(raw)).not.toThrow();
+  });
+
+  it('parses a home page with a headingBlock heading and no hero', () => {
+    const raw = makeRawHomePage({
+      hero: null,
+      headingBlock: makeRawHeadingBlock('Welcome'),
+    });
+
+    expect(() => homePageQuery.parse(raw)).not.toThrow();
+  });
+
+  it('parses a home page with both a hero and a headingBlock heading', () => {
+    const raw = makeRawHomePage({
+      headingBlock: makeRawHeadingBlock('Welcome', {
+        supportingText: 'A subtitle',
+      }),
+    });
+
+    expect(() => homePageQuery.parse(raw)).not.toThrow();
   });
 });
