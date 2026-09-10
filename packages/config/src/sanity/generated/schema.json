@@ -3649,6 +3649,122 @@
     }
   },
   {
+    "name": "module_postList",
+    "type": "document",
+    "attributes": {
+      "_id": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_type": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string",
+          "value": "module_postList"
+        }
+      },
+      "_createdAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_updatedAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_rev": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "title": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "brandVariant": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "SECONDARY"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "headingBlock": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "headingBlock"
+        },
+        "optional": true
+      },
+      "showImages": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
+      "contentAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
+            },
+            {
+              "type": "string",
+              "value": "RIGHT"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "pageSize": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "number"
+        },
+        "optional": true
+      },
+      "layout": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "layout"
+        },
+        "optional": true
+      }
+    }
+  },
+  {
     "name": "page_topicIndex",
     "type": "document",
     "attributes": {
@@ -4035,144 +4151,6 @@
         "value": {
           "type": "inline",
           "name": "seo"
-        },
-        "optional": true
-      },
-      "heading": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
-      "supportingText": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
-      "postList": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "module_postList.reference"
-        },
-        "optional": true
-      }
-    }
-  },
-  {
-    "name": "module_postList",
-    "type": "document",
-    "attributes": {
-      "_id": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        }
-      },
-      "_type": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string",
-          "value": "module_postList"
-        }
-      },
-      "_createdAt": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        }
-      },
-      "_updatedAt": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        }
-      },
-      "_rev": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        }
-      },
-      "title": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
-      "brandVariant": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "BRAND_PRIMARY"
-            },
-            {
-              "type": "string",
-              "value": "PRIMARY"
-            },
-            {
-              "type": "string",
-              "value": "SECONDARY"
-            }
-          ]
-        },
-        "optional": true
-      },
-      "headingBlock": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "headingBlock"
-        },
-        "optional": true
-      },
-      "showImages": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "boolean"
-        },
-        "optional": true
-      },
-      "contentAlignment": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "LEFT"
-            },
-            {
-              "type": "string",
-              "value": "CENTER"
-            },
-            {
-              "type": "string",
-              "value": "RIGHT"
-            }
-          ]
-        },
-        "optional": true
-      },
-      "pageSize": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "number"
-        },
-        "optional": true
-      },
-      "layout": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "layout"
         },
         "optional": true
       }

@@ -580,6 +580,21 @@ export type Page_topic = {
   postList?: Module_postListReference;
 };
 
+export type Module_postList = {
+  _id: string;
+  _type: 'module_postList';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  headingBlock?: HeadingBlock;
+  showImages?: boolean;
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  pageSize?: number;
+  layout?: Layout;
+};
+
 export type Page_topicIndex = {
   _id: string;
   _type: 'page_topicIndex';
@@ -640,24 +655,6 @@ export type Page_blog = {
       } & Module_postFeaturedReference)
   >;
   seo?: Seo;
-  heading?: string;
-  supportingText?: string;
-  postList?: Module_postListReference;
-};
-
-export type Module_postList = {
-  _id: string;
-  _type: 'module_postList';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
-  showImages?: boolean;
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  pageSize?: number;
-  layout?: Layout;
 };
 
 export type Module_contentReference = {
@@ -1077,11 +1074,11 @@ export type AllSanitySchemaTypes =
   | Module_taxonomyListReference
   | Page_tagIndex
   | Page_topic
+  | Module_postList
   | Page_topicIndex
   | Module_taxonomyList
   | Module_postFeaturedReference
   | Page_blog
-  | Module_postList
   | Module_contentReference
   | Page_home
   | Blog_tag

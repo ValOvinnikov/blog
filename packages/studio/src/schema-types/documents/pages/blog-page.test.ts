@@ -1,7 +1,6 @@
 import { blogPageSchema } from '@blog/studio/schema-types/documents/pages/blog-page';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
-import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
 import {
   createMockModulesRule,
   type TModuleReference,
@@ -17,8 +16,6 @@ type TArrayFieldDefinition = {
 type TFieldDefinition = {
   name: string;
   type: string;
-  readOnly?: boolean;
-  deprecated?: { reason: string };
   validation?: unknown;
   to?: Array<{ type?: string }>;
 };
@@ -154,29 +151,13 @@ describe('blogPageSchema modules validateCustom chaining', () => {
   });
 });
 
-describe('blogPageSchema deprecated fields', () => {
+describe('blogPageSchema removed legacy fields', () => {
   it.each(['heading', 'supportingText', 'postList'])(
-    '%s is read-only and deprecated without required validation',
+    '%s no longer exists on the schema',
     (name) => {
-      const field = getField(name);
-
-      if (!field) {
-        throw new Error(`Expected blogPageSchema to define a ${name} field.`);
-      }
-
-      expect(field.readOnly).toBe(true);
-      expect(field.deprecated?.reason).toBeTruthy();
-      expect(field.validation).toBeUndefined();
+      expect(getField(name)).toBeUndefined();
     },
   );
-
-  it('postList still references module_postList', () => {
-    const postListField = getField('postList');
-
-    expect(postListField?.to?.map((entry) => entry.type)).toEqual([
-      postListSchema.name,
-    ]);
-  });
 });
 
 describe('blogPageSchema document validation', () => {
