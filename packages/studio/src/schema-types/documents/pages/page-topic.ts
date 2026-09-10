@@ -173,19 +173,6 @@ export const pageTopicSchema = defineType({
       description:
         'Override Topic page meta title, description, and social sharing image.',
     }),
-    defineField({
-      name: 'postList',
-      title: 'Post List',
-      type: 'reference',
-      description:
-        'Superseded by the module_postList reference now folded into modules[].',
-      to: [{ type: postListSchema.name }],
-      readOnly: true,
-      deprecated: {
-        reason:
-          'Superseded by module_postList in modules[]. Left in place so already-deployed code keeps reading it until a follow-up migration drops it.',
-      },
-    }),
   ],
   preview: {
     select: {
