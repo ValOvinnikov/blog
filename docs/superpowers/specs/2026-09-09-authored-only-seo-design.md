@@ -125,9 +125,10 @@ brand-name fallback it introduced is banned by rule 5. Under this design the
 blog index page authors its own `metaTitle` like every other page, and the
 projection stays deleted.
 
-**Therefore the merged PRs still pass the document `title` into `resolveSeo`
-on the blog index page.** That is a known, accepted gap for the interval
-between those merges and this epic — not an oversight to re-report.
+That gap persisted longer than this doc originally assumed — PRs #3019 / #3020
+/ #3021 did not in fact apply the change described above, so the blog index
+page went on passing its document `title` into `resolveSeo` until #3022 (PR
+#3034) closed it on 2026-09-10. It is closed now, on every page.
 
 **2. Blank `headingBlock` text treated as absent.** `toHeadingBlock` normalised
 an empty or whitespace-only `heading`/`supportingText` to `undefined`, via a
