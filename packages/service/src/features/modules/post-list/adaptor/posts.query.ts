@@ -1,40 +1,46 @@
+import { TAXONOMY_KIND, type TTaxonomyKind } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
 import { postCardFragment } from '@blog/service/shared/fragments/post';
 
-/**
- * Scopes posts to the enclosing `page_tag`/`page_topic`'s own tag/topic when
- * one references this module via `modules[]` as its list module (a no-op
- * otherwise). Looked up by this module's `$id` since there's no parent
- * context to reach via GROQ's `^`. The `&&` (not `||`) means a list module
- * referenced by both a `page_tag` and a `page_topic` at once must satisfy
- * both scopes rather than throw.
- */
-const SCOPE_FILTER =
-  '(!defined(*[_type == "page_tag" && $id in modules[]._ref][0]._id) || references(*[_type == "page_tag" && $id in modules[]._ref][0].tag._ref))' +
-  ' && ' +
-  '(!defined(*[_type == "page_topic" && $id in modules[]._ref][0]._id) || references(*[_type == "page_topic" && $id in modules[]._ref][0].topic._ref))';
+export type TPostListScope = {
+  kind: TTaxonomyKind;
+  slug: string;
+};
 
-const posts = q.star
-  .filterByType('page_post')
-  .filterRaw(PUBLISHED_POST_FILTER)
-  .filterRaw(SCOPE_FILTER);
+const SCOPE_TAXONOMY_TYPE: Record<TTaxonomyKind, string> = {
+  [TAXONOMY_KIND.TAGS]: 'blog_tag',
+  [TAXONOMY_KIND.TOPICS]: 'blog_topic',
+};
+
+function scopeFilter(kind: TTaxonomyKind) {
+  return `references(*[_type == "${SCOPE_TAXONOMY_TYPE[kind]}" && slug.current == $scopeSlug][0]._id)`;
+}
 
 /**
  * Windowed posts for the post-list archive, alongside the total match count
  * so the caller can compute total pages. Built per-request so `pageSize`
- * bounds the results in GROQ (end-exclusive `.slice(start, end)`); `$id` in
- * `SCOPE_FILTER` is bound by the caller's `runQuery(query, { parameters: { id } })`.
+ * bounds the results in GROQ (end-exclusive `.slice(start, end)`); `scope`
+ * restricts the results to the tag/topic it names, and is omitted entirely
+ * (no predicate at all) for an unscoped listing.
  */
 export function postListModulePaginatedPostsQuery(
   page: number,
   pageSize: number,
+  scope?: TPostListScope,
 ) {
   const start = (page - 1) * pageSize;
   const end = start + pageSize;
 
+  const posts = scope
+    ? q.star
+        .filterByType('page_post')
+        .filterRaw(PUBLISHED_POST_FILTER)
+        .filterRaw(scopeFilter(scope.kind))
+    : q.star.filterByType('page_post').filterRaw(PUBLISHED_POST_FILTER);
+
   return q
-    .parameters<{ id: string }>()
+    .parameters<{ scopeSlug?: string }>()
     .project((sub) => ({
       posts: posts
         .order('publishedAt desc')
