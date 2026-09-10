@@ -83,4 +83,52 @@ describe(`<${TaxonomyCard.name}/>`, () => {
     setup({ className: 'mt-4', dataTestId: 'taxonomy-card' });
     expect(screen.getByTestId('taxonomy-card').className).toContain('mt-4');
   });
+
+  it('renders TaxonomyCard.Posts as a labelled list of post links', () => {
+    setup({
+      children: (
+        <TaxonomyCard.Posts
+          ariaLabel="Latest posts"
+          posts={[
+            { id: '1', title: 'First post', href: '/posts/first' },
+            { id: '2', title: 'Second post', href: '/posts/second' },
+          ]}
+        />
+      ),
+    });
+
+    expect(screen.getByRole('list', { name: 'Latest posts' })).toBeVisible();
+    expect(screen.getByRole('link', { name: 'First post' })).toHaveAttribute(
+      'href',
+      '/posts/first',
+    );
+    expect(screen.getByRole('link', { name: 'Second post' })).toHaveAttribute(
+      'href',
+      '/posts/second',
+    );
+  });
+
+  it('renders nothing for TaxonomyCard.Posts when posts is empty', () => {
+    setup({
+      children: <TaxonomyCard.Posts ariaLabel="Latest posts" posts={[]} />,
+    });
+
+    expect(screen.queryByRole('list')).not.toBeInTheDocument();
+  });
+
+  it('resolves a post link to its own href rather than the taxonomy term href', () => {
+    setup({
+      href: '/topics/engineering',
+      children: (
+        <TaxonomyCard.Posts
+          ariaLabel="Latest posts"
+          posts={[{ id: '1', title: 'First post', href: '/posts/first' }]}
+        />
+      ),
+    });
+
+    const postLink = screen.getByRole('link', { name: 'First post' });
+    expect(postLink).toHaveAttribute('href', '/posts/first');
+    expect(postLink).not.toHaveAttribute('href', '/topics/engineering');
+  });
 });
