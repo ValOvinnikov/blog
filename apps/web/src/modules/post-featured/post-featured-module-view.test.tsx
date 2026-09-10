@@ -1,4 +1,4 @@
-import { BRAND_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, DISPLAY_MODE } from '@blog/config';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
@@ -19,6 +19,16 @@ vi.mock('@web/components/shared/smart-link', () => ({
     </a>
   ),
 }));
+
+const { PostsCarousel } = vi.hoisted(() => ({
+  PostsCarousel: vi.fn(() => <div data-testid="posts-carousel-stub" />),
+}));
+
+vi.mock('@web/components/shared/posts-carousel', () => ({ PostsCarousel }));
+
+beforeEach(() => {
+  PostsCarousel.mockClear();
+});
 
 const leadPost = makePostListItem({
   id: 'post-1',
@@ -47,6 +57,7 @@ const setup = customRender(PostFeaturedModuleView, {
   titleId: 'featured-posts-title',
   dataTestId: 'post-featured-module-featured-1',
   accessibleTitle: 'Featured posts',
+  displayMode: DISPLAY_MODE.GRID,
 });
 
 describe(`<${PostFeaturedModuleView.name}/>`, () => {
@@ -182,5 +193,25 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
 
     expect(screen.getByTestId('post-card-media')).toBeInTheDocument();
     expect(screen.getByTestId('lead-image')).toBeInTheDocument();
+  });
+
+  it('renders PostsCarousel with the view items when displayMode is CAROUSEL', () => {
+    setup({
+      items: [leadPost, secondPost, thirdPost],
+      displayMode: DISPLAY_MODE.CAROUSEL,
+    });
+
+    expect(screen.getByTestId('posts-carousel-stub')).toBeInTheDocument();
+    expect(PostsCarousel).toHaveBeenCalledWith(
+      expect.objectContaining({ items: [leadPost, secondPost, thirdPost] }),
+      undefined,
+    );
+    expect(screen.queryByRole('article')).not.toBeInTheDocument();
+  });
+
+  it('never renders PostsCarousel when displayMode is GRID', () => {
+    setup();
+
+    expect(PostsCarousel).not.toHaveBeenCalled();
   });
 });

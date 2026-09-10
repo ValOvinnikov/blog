@@ -35,6 +35,7 @@ export const PostLatestModule = async ({
     layout,
     contentAlignment,
     showImages,
+    displayMode,
   } = result.data;
 
   const items = await toPostListItems(
@@ -52,6 +53,7 @@ export const PostLatestModule = async ({
       layout={layout}
       contentAlignment={contentAlignment}
       hasImages={showImages}
+      displayMode={displayMode}
       titleId={`latest-posts-${id}`}
       dataTestId={`post-latest-module-${id}`}
       accessibleTitle={t('fallbackHeading')}

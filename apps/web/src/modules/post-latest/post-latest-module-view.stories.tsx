@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
+import { BRAND_VARIANT, CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
 import { objectKeys } from '@blog/utils';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
@@ -39,6 +39,10 @@ const meta = {
       control: 'select',
       options: objectKeys(postLatestModuleViewVariants.variants.align),
     },
+    displayMode: {
+      control: 'select',
+      options: Object.values(DISPLAY_MODE),
+    },
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
@@ -49,6 +53,7 @@ const meta = {
     titleId: 'latest-posts-title',
     dataTestId: 'post-latest-module-post-latest-1',
     accessibleTitle: 'Latest posts',
+    displayMode: DISPLAY_MODE.GRID,
   },
 } satisfies Meta<typeof PostLatestModuleView>;
 
@@ -83,5 +88,22 @@ export const WithImages: TStory = {
       ...item,
       image: placeholderImage(item.title),
     })),
+  },
+};
+
+const carouselItems = Array.from({ length: 6 }, (_, index) =>
+  makePostListItem({
+    id: `carousel-post-${index + 1}`,
+    href: `/blog/carousel-post-${index + 1}`,
+    title: `Carousel post ${index + 1}`,
+    excerpt: 'A short excerpt describing this post.',
+    topic: { title: 'News' },
+  }),
+);
+
+export const Carousel: TStory = {
+  args: {
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    items: carouselItems,
   },
 };

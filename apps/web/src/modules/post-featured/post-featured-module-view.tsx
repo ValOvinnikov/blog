@@ -1,3 +1,4 @@
+import { DISPLAY_MODE } from '@blog/config';
 import type { TPostFeaturedModule } from '@blog/service';
 import { PostGrid } from '@blog/ui/organisms/post-grid';
 import { ModuleHeading } from '@web/components/shared/module-heading';
@@ -5,6 +6,7 @@ import {
   type IPostCardData,
   PostCardItem,
 } from '@web/components/shared/post-card-item';
+import { PostsCarousel } from '@web/components/shared/posts-carousel';
 import { Section } from '@web/components/shared/section';
 
 import { postFeaturedModuleViewVariants } from './post-featured-module-view-variants';
@@ -22,10 +24,11 @@ export interface IPostFeaturedModuleViewProps extends Omit<
 
 /**
  * PostFeaturedModuleView — render shell for `PostFeaturedModule`: a labeled
- * `Section` wrapping a spotlight arrangement — the first item as a lead
- * `PostCardItem`, then either the one remaining item (also full-width) or a
- * two-column `PostGrid` of the rest. Never called with an empty `items` —
- * `PostFeaturedModule` renders nothing itself in that case.
+ * `Section` wrapping either a `PostsCarousel` or the default spotlight
+ * arrangement — the first item as a lead `PostCardItem`, then either the one
+ * remaining item (also full-width) or a two-column `PostGrid` of the rest.
+ * Never called with an empty `items` — `PostFeaturedModule` renders nothing
+ * itself in that case.
  */
 export const PostFeaturedModuleView = ({
   brandVariant,
@@ -37,8 +40,12 @@ export const PostFeaturedModuleView = ({
   accessibleTitle,
   contentAlignment,
   hasImages,
+  displayMode,
 }: IPostFeaturedModuleViewProps) => {
   const s = postFeaturedModuleViewVariants();
+
+  const { heading } = headingBlock;
+  const resolvedTitle = heading?.trim() ? heading : accessibleTitle;
 
   const [leadPost, ...tailPosts] = items;
   const [soloTailPost] = tailPosts;
@@ -57,7 +64,15 @@ export const PostFeaturedModuleView = ({
         level={2}
         align={contentAlignment}
       />
-      {leadPost && (
+      {leadPost && displayMode === DISPLAY_MODE.CAROUSEL && (
+        <PostsCarousel
+          items={items}
+          hasImages={hasImages}
+          ariaLabel={resolvedTitle}
+          tone={brandVariant}
+        />
+      )}
+      {leadPost && displayMode !== DISPLAY_MODE.CAROUSEL && (
         <div className={s.leadGroup()}>
           <PostCardItem
             item={leadPost}
