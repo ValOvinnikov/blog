@@ -129,6 +129,20 @@ describe(`<${TaxonomyCard.name}/>`, () => {
 
     const postLink = screen.getByRole('link', { name: 'First post' });
     expect(postLink).toHaveAttribute('href', '/posts/first');
-    expect(postLink).not.toHaveAttribute('href', '/topics/engineering');
+  });
+
+  it('keeps a post link positioned above the card link overlay', () => {
+    setup({
+      href: '/topics/engineering',
+      children: (
+        <TaxonomyCard.Posts
+          ariaLabel="Latest posts"
+          posts={[{ id: '1', title: 'First post', href: '/posts/first' }]}
+        />
+      ),
+    });
+
+    const postLink = screen.getByRole('link', { name: 'First post' });
+    expect(postLink.className.split(' ')).toContain('relative');
   });
 });
