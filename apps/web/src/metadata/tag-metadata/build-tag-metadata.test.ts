@@ -81,6 +81,18 @@ describe('buildTagMetadata', () => {
     });
   });
 
+  it('leaves ogTitle omitted on page 2+ when unauthored, rather than suffixing "undefined"', async () => {
+    getTagPageMock.mockResolvedValue({
+      ok: true,
+      data: makeTagDetailPage({ seo: makeSeo({ ogTitle: undefined }) }),
+    });
+
+    const metadata = await buildTagMetadata('typescript', 'tenant-1', 2);
+
+    expect(metadata.openGraph?.title).toBeUndefined();
+    expect(metadata.twitter?.title).toBeUndefined();
+  });
+
   it('returns empty metadata for page N when the tag fetch fails', async () => {
     getTagPageMock.mockResolvedValue({
       ok: false,

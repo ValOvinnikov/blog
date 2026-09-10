@@ -895,11 +895,28 @@ one). `window.onerror`/`unhandledrejection` are deliberately out of scope.
 
 ## 10. SEO & accessibility
 
-Per-route `generateMetadata` with a `service`-owned SEO fallback ladder
-(authored → content-derived → site defaults), JSON-LD (`Article`/`BlogPosting`,
+Per-route `generateMetadata`, JSON-LD (`Article`/`BlogPosting`,
 `BreadcrumbList`), self-canonical pagination, per-environment `noindex`
 outside `production`, and the accessibility non-negotiables (no hardcoded
 `aria-label`s in `ui`, semantic heading tags, Lighthouse ≥ 95 target).
+
+**SEO is authored-only: what an editor types is what ships, and what they
+leave empty is omitted.** There is no fallback ladder. `resolveSeo` reads the
+authored `seo` object and the tenant image context, nothing else — no
+content-derived tier, no site defaults.
+
+`seo.metaTitle` is **required**, 30–60 characters, so no page ships a title
+nobody chose; `resolveSeo` throws rather than invent one, which surfaces a
+missing title as a failed page rather than a quietly wrong `<title>`.
+Everything else is optional and omitted when unset: an unauthored
+`metaDescription` emits no `description` tag, and `ogTitle`/`ogDescription`/
+`ogImage` are authored per page or absent — `og:title` is never inherited
+from the meta title, and there is no site-wide default OG image nor a
+post-hero-image substitute.
+
+A page document's own `title` is a Studio list label and never reaches the
+web in any form (§6). **Fallbacks on SEO are forbidden generally**: a new
+case is surfaced to a human, not resolved by whoever meets it.
 
 Full checklist:
 [`docs/context/seo-accessibility.md`](./docs/context/seo-accessibility.md).

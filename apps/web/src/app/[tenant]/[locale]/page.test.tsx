@@ -258,7 +258,7 @@ describe('generateMetadata', () => {
     expect(metadata.alternates?.canonical).toBe('/');
   });
 
-  it('falls back to the generated OG/Twitter card images when the resolved seo carries no ogImageUrl', async () => {
+  it('omits the OG/Twitter card images when the resolved seo carries no ogImageUrl', async () => {
     getHomePageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -272,7 +272,7 @@ describe('generateMetadata', () => {
       params: Promise.resolve({ tenant: 'tenant-1', locale: 'en' }),
     });
 
-    expect(metadata.openGraph?.images).toEqual([{ url: '/opengraph-image' }]);
-    expect(metadata.twitter?.images).toEqual(['/twitter-image']);
+    expect(metadata.openGraph?.images).toBeUndefined();
+    expect(metadata.twitter?.images).toBeUndefined();
   });
 });

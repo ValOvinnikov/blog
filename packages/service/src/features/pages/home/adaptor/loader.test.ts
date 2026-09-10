@@ -1,7 +1,9 @@
-import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawHomePage } from '@blog/service/testing/pages/fixtures';
-import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
+import {
+  makeRawHeadingBlock,
+  makeRawSeo,
+} from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getHomePage } from './loader';
@@ -21,9 +23,7 @@ const tenant = makeTenant();
 
 describe('getHomePage', () => {
   it('maps the thin page_home document to module refs', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawHomePage())
-      .mockResolvedValueOnce(makeRawSiteSettings());
+    mockRun.mockResolvedValueOnce(makeRawHomePage());
 
     const page = await getHomePage(tenant);
     if (!page) throw new Error('expected a home page');
@@ -39,11 +39,9 @@ describe('getHomePage', () => {
   });
 
   it('maps a hero with no headingBlock to an undefined heading/supportingText', async () => {
-    mockRun
-      .mockResolvedValueOnce(
-        makeRawHomePage({ hero: { _id: 'hero-1', _type: 'module_hero' } }),
-      )
-      .mockResolvedValueOnce(makeRawSiteSettings());
+    mockRun.mockResolvedValueOnce(
+      makeRawHomePage({ hero: { _id: 'hero-1', _type: 'module_hero' } }),
+    );
 
     const page = await getHomePage(tenant);
     if (!page) throw new Error('expected a home page');
@@ -54,14 +52,12 @@ describe('getHomePage', () => {
   });
 
   it('maps a headingBlock heading with no hero to an undefined hero', async () => {
-    mockRun
-      .mockResolvedValueOnce(
-        makeRawHomePage({
-          hero: null,
-          headingBlock: makeRawHeadingBlock('Welcome'),
-        }),
-      )
-      .mockResolvedValueOnce(makeRawSiteSettings());
+    mockRun.mockResolvedValueOnce(
+      makeRawHomePage({
+        hero: null,
+        headingBlock: makeRawHeadingBlock('Welcome'),
+      }),
+    );
 
     const page = await getHomePage(tenant);
     if (!page) throw new Error('expected a home page');
@@ -72,15 +68,13 @@ describe('getHomePage', () => {
   });
 
   it('maps both a hero and a headingBlock heading when both are authored', async () => {
-    mockRun
-      .mockResolvedValueOnce(
-        makeRawHomePage({
-          headingBlock: makeRawHeadingBlock('Welcome', {
-            supportingText: 'A subtitle',
-          }),
+    mockRun.mockResolvedValueOnce(
+      makeRawHomePage({
+        headingBlock: makeRawHeadingBlock('Welcome', {
+          supportingText: 'A subtitle',
         }),
-      )
-      .mockResolvedValueOnce(makeRawSiteSettings());
+      }),
+    );
 
     const page = await getHomePage(tenant);
     if (!page) throw new Error('expected a home page');
@@ -100,37 +94,27 @@ describe('getHomePage', () => {
     await expect(getHomePage(tenant)).rejects.toThrow();
   });
 
-  it('resolves seo from site settings when the page has no authored seo', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawHomePage({ seo: null }))
-      .mockResolvedValueOnce(
-        makeRawSiteSettings({
-          description: 'Settings description',
-        }),
-      );
+  it('rejects when the page has no authored seo', async () => {
+    mockRun.mockResolvedValueOnce(makeRawHomePage({ seo: null }));
 
-    const page = await getHomePage(tenant);
-    if (!page) throw new Error('expected a home page');
-
-    expect(page.seo.title).toBe('My Blog');
-    expect(page.seo.description).toBe('Settings description');
-    expect(page.seo.ogImageUrl).toContain('sanity.io');
+    await expect(getHomePage(tenant)).rejects.toThrow(
+      'seo.metaTitle is required but missing',
+    );
   });
 
-  it('lets authored seo override the resolved defaults', async () => {
-    mockRun
-      .mockResolvedValueOnce(
-        makeRawHomePage({
-          seo: { metaTitle: 'Home', metaDescription: null, openGraph: null },
-        }),
-      )
-      .mockResolvedValueOnce(makeRawSiteSettings());
+  it('resolves seo from the authored value, with no fallback for an unauthored description', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawHomePage({
+        seo: makeRawSeo({ metaTitle: 'Home', metaDescription: null }),
+      }),
+    );
 
     const page = await getHomePage(tenant);
     if (!page) throw new Error('expected a home page');
 
     expect(page.seo.title).toBe('Home');
-    expect(page.seo.ogTitle).toBe('Home');
+    expect(page.seo.description).toBeUndefined();
+    expect(page.seo.ogTitle).toBeUndefined();
   });
 
   it('resolves undefined, rather than rejecting, when no page_home document exists', async () => {
@@ -141,35 +125,16 @@ describe('getHomePage', () => {
     expect(page).toBeUndefined();
   });
 
-  it('does not fetch site settings when no page_home document exists', async () => {
-    mockRun.mockResolvedValueOnce(null);
+  it('threads tenant context into the query and scopes its tags to it', async () => {
+    mockRun.mockResolvedValueOnce(makeRawHomePage());
 
     await getHomePage(tenant);
 
-    expect(mockRun).toHaveBeenCalledTimes(1);
-  });
-
-  it('threads tenant context into both queries and scopes their tags to it', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawHomePage())
-      .mockResolvedValueOnce(makeRawSiteSettings());
-
-    await getHomePage(tenant);
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
+    expect(mockRun).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({
         tenant,
         next: expect.objectContaining({ tags: ['t:tenant-a:homePage'] }),
-      }),
-    );
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({ tags: ['t:tenant-a:site-settings'] }),
       }),
     );
   });

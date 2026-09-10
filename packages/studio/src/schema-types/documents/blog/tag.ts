@@ -1,7 +1,6 @@
 import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/page-tag-type';
 import { getDraftsClient } from '@blog/studio/schema-types/helpers/get-drafts-client';
 import { slugField } from '@blog/studio/schema-types/helpers/slug-field';
-import { seoSchema } from '@blog/studio/schema-types/objects/seo';
 import { Tag } from 'lucide-react';
 import {
   defineField,
@@ -60,13 +59,6 @@ export const tagSchema = defineType({
       description:
         'Brief topic summary — shown on the tag archive page and used as its meta description.',
       validation: (rule) => rule.max(300),
-    }),
-    defineField({
-      name: 'seo',
-      title: 'SEO',
-      type: seoSchema.name,
-      description:
-        'Override meta title, description, and OG image for search engines.',
     }),
   ],
   preview: {

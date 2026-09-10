@@ -134,8 +134,10 @@ replacing a hand-duplicated block per page document.
 - `author` — name, slug, image, bio, role, socialLinks (unified `link`-based),
   profilePage (optional ref, restricted to `page_landing`).
 - `category` — title, slug, description.
-- `tag` — title, slug, description, seo (topic taxonomy for posts; drives the
+- `tag` — title, slug, description (topic taxonomy for posts; drives the
   `/tag` archives + related-posts, alongside the section-level `category`).
+  Carries no `seo` of its own — the tag archive's metadata lives on the
+  `page_tag` document that renders it.
 - `siteSettings` (singleton) — `titleField` (bare; see helper note below),
   brand
   (`brand` object: name/logo/specLine — `logo` is optional, falling
@@ -143,8 +145,7 @@ replacing a hand-duplicated block per page document.
   a `specLine` object, `{ items: string[] (max 4, each max 15 chars),
 separator: SPEC_LINE_SEPARATORS }`, replacing a plain string so the
   service layer can join it with a chosen separator glyph), description,
-  tagline, `defaultOgImage` (`imageWithAlt`, required — the last-resort
-  social image).
+  tagline.
 - `settings_theme` (singleton, `themeSchema`) — `titleField` (bare; see
   helper note below), `preset` (required, `PRESET_ID` stored value:
   `CONSOLE`/`EDITORIAL`), `accentHue`/`logoHue` (optional numbers, 0-360,
@@ -188,8 +189,9 @@ site-settings favicon/logo), `bodyImage` (required alt; optional `layout`
 from `IMAGE_LAYOUT`, undefined = Inline — shares its `alt`/hotspot shape with
 `imageWithAlt` via the `image-alt-field` helper, but is a distinct type
 registered only as `richText`'s body-array image member, so the layout
-choice can't leak into hero/avatar/OG/brand images), `seo` (all-optional
-override bag) + `openGraph`,
+choice can't leak into hero/avatar/OG/brand images), `seo` (`metaTitle`
+required, 30–60 characters; every other field optional and omitted from the
+page head when unset — there is no fallback) + `openGraph`,
 `blockText` / `richText`, `aside` (deep-dive block type registered in
 `richText`'s portable-text array; `kind` from `ASIDE_KIND`, required; `body`
 via `blockText`, required — part of the choose-your-depth reading feature,

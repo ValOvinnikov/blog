@@ -12,7 +12,7 @@ export const openGraphSchema = defineType({
       title: 'OG Title',
       type: 'string',
       description:
-        'Title shown when shared on social media. Defaults to meta title if empty.',
+        'Title shown when shared on social media. Omitted entirely when empty.',
       validation: (rule) => rule.max(70),
     }),
     defineField({
@@ -20,7 +20,7 @@ export const openGraphSchema = defineType({
       title: 'OG Description',
       type: 'text',
       description:
-        'Description shown when shared on social media. Defaults to meta description if empty.',
+        'Description shown when shared on social media. Omitted entirely when empty.',
       validation: (rule) => rule.max(200),
     }),
     defineField({

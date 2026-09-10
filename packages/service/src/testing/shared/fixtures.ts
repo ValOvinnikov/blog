@@ -1,4 +1,5 @@
 import type { imageWithAltFragment } from '@blog/service/shared/fragments/image';
+import type { TRawSeo } from '@blog/service/shared/transformers/resolve-seo';
 import type {
   TRawHeadingBlock,
   TRawRequiredHeadingBlock,
@@ -36,6 +37,15 @@ export function makeRawImage(alt = 'Alt text'): TRawImage {
     alt,
     hotspot: null,
     crop: null,
+  };
+}
+
+export function makeRawSeo(overrides: Partial<TRawSeo> = {}): TRawSeo {
+  return {
+    metaTitle: 'A sufficiently descriptive meta title for testing',
+    metaDescription: null,
+    openGraph: null,
+    ...overrides,
   };
 }
 

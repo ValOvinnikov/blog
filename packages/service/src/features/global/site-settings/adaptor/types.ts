@@ -13,5 +13,4 @@ export type TSiteSettings = {
   brand: TBrand;
   description: string;
   tagline: TMaybeUndefined<string>;
-  defaultOgImageUrl: TMaybeUndefined<string>;
 };
