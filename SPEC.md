@@ -315,10 +315,12 @@ projects those fields off `page_post` directly, and `apps/web` names
 revalidation webhook's path derivation and its `bookmarks` cleanup (§9),
 and the `revalidate-tags` map, whose `page_post` entry purges the
 post-content tags (`posts`, `author`, `topic`, `tag`) that the wrapper type
-used to own. `blog_post` still exists and is still a valid reference target
-alongside `page_post` everywhere a post can be linked, but nothing reads it
-for page content; it retires in its own migration, since a Sanity `_type` is
-immutable and a retirement is therefore never a rename.
+used to own. `blog_post` is gone — the schema type, its documents, and every
+reference target that accepted it. `page_post` is the only post type there
+is. Retiring it took its own migration rather than a rename, because a
+Sanity `_type` is immutable: the content was copied into `page_post`
+documents first, every referrer was repointed, and only then were the
+originals deleted.
 
 **A page document's own `title` is an internal CMS label and is never
 rendered on the web.** It names the document in the desk, nothing more —
