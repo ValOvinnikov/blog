@@ -68,7 +68,6 @@ describe('getFooter', () => {
         next: expect.objectContaining({
           tags: [
             't:tenant-a:footer',
-            't:tenant-a:post',
             't:tenant-a:page_post',
             't:tenant-a:topic',
             't:tenant-a:page_landing',

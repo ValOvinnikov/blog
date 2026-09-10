@@ -45,7 +45,6 @@ describe('getCta', () => {
           tags: [
             't:tenant-a:modules:cta',
             't:tenant-a:module:cta-1',
-            't:tenant-a:post',
             't:tenant-a:page_post',
             't:tenant-a:topic',
             't:tenant-a:page_landing',

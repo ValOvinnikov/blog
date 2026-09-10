@@ -18,7 +18,7 @@ export async function getNavigation(
   const raw = await runQuery(navigationQuery, {
     tenant,
     ...isr(
-      ['navigation', 'post', 'page_post', 'topic', 'page_landing', 'page_blog'],
+      ['navigation', 'page_post', 'topic', 'page_landing', 'page_blog'],
       tenant.projectId,
     ),
   });

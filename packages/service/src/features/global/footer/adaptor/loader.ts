@@ -18,7 +18,7 @@ export async function getFooter(
   const raw = await runQuery(footerQuery, {
     tenant,
     ...isr(
-      ['footer', 'post', 'page_post', 'topic', 'page_landing', 'page_blog'],
+      ['footer', 'page_post', 'topic', 'page_landing', 'page_blog'],
       tenant.projectId,
     ),
   });

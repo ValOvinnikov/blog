@@ -30,7 +30,6 @@ export async function getHero(
           'posts',
           'author',
           'topic',
-          'post',
           'page_post',
           'page_landing',
           'page_blog',
