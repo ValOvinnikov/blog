@@ -1098,9 +1098,10 @@ when present` — one query resolving module and terms, `fallbackTaxonomy`
 
 #### 1.7 Page composition — epic #2943 `refactor(web): pages are chrome, a heading and modules; retire PostsSection`
 
-- **Depends on:** 1.3 (shipped). **Blocks:** 1.4's ui and web sub-issues
-  (#2839 drops its `PostsSection.Carousel` slot; #2840 composes `Carousel`
-  inside the latest and featured modules).
+- **Depends on:** 1.3 (shipped). **Blocks:** 1.4's web sub-issue (#2840
+  branches on `displayMode` inside `PostLatestModuleView` and
+  `PostFeaturedModuleView`, the per-module views this epic created); the
+  ui sub-issue (#2839) is independent of it.
 - **Why:** every page fetches and pre-computes for all of its sections and
   hands a 31-prop bag to a "view"; `PostsSection` carries a prop for every
   listing variant a page ever needed; related reading and the post-foot

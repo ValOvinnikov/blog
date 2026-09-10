@@ -1348,8 +1348,7 @@ entry the way pagination's visible Previous/Next are.
 
 **The two module views branch once, and map their own slides.** Listings
 are composed in web since the page-composition work: each module has its
-own view that renders `Section`, the heading (`ModuleHeading` once #2989
-lands), and its `PostCardItem`s. `PostLatestModuleView` and
+own view that renders `Section`, its heading and its `PostCardItem`s. `PostLatestModuleView` and
 `PostFeaturedModuleView` gain `displayMode: TDisplayMode` from their view
 models and branch on it: `CAROUSEL` renders the web `Carousel` with one
 `PostCardItem` per item as its children — the same mapping the grid uses,
