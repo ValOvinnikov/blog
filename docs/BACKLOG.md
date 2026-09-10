@@ -1076,25 +1076,43 @@ when present` — one query resolving module and terms, `fallbackTaxonomy`
 
 #### 1.6 Topic cards list their latest posts — epic `feat: topic cards list their latest posts`
 
-- **Depends on:** 1.5.
+- **Depends on:** 1.5 (shipped).
 - **Why:** placed on a home page, a topic card that is a title, a description
   and a count reads as a second row of post cards with the pictures missing
   and says nothing the nav doesn't. Two linked post titles per topic turn
   the block into a contents page — and the Topics index is a contents page
   too, so it gets the same treatment. Split out of 1.5 on 2026-09-07 so the
-  placement lands small; see the "The placeable taxonomy list" section of
-  the portfolio design doc.
-- **Design sub-issue** · settle always-on vs an editor toggle (leaning: a
-  boolean like `showImages`, default on), posts per term and their order,
-  the `TaxonomyCard` posts slot, and the projection inside the existing
-  merged taxonomy-list query (no second call).
-- **Sub-issues (created by the design):** **service** · two newest posts per
-  term in the term projection; **ui** · `TaxonomyCard` posts slot, no lead
-  cell; **web** · map posts into the slot on home, landing and index pages;
-  **studio** · only if a toggle is settled.
-- **Not in scope:** tags as a cloud of pills.
-- **Acceptance:** a topic card lists its two newest posts as links; a topic
-  with no posts shows title, description and count only.
+  placement lands small.
+- **Design sub-issue** (#2892, settled — section "Topic cards list their
+  latest posts" in the spec of record) · a `showLatestPosts` boolean on
+  `module_taxonomyList` after `limit`, `initialValue: true`, no
+  `required()`, `coalesce(showLatestPosts, true)` at read time, so every
+  existing module (the seeded index-page ones included) shows the lists
+  with no migration; two posts per term, fixed, `publishedAt desc` under
+  the published filter; the titles join each term inside the merged query
+  through a new `postLinkFragment` (`id`, `title`, `slug`), the module
+  query building its own term projections so `topics.v1` / `tags.v1` keep
+  their shape and the shared `postCount` expression moves into one helper;
+  `TaxonomyCard.Posts` (`posts`, `ariaLabel`) renders a `<ul>` between the
+  description and the count, each link `relative` above the card's
+  stretched link, empty array renders nothing, no lead cell; the web view
+  maps `latestPosts` to `routes.post(slug)` and passes a fixed
+  accessibility-only `latestPostsLabel` key under both copy namespaces; the index
+  pages change by construction.
+- **Sub-issues** (one PR per layer, each green alone; ui independent):
+  - **studio** · `feat(studio): showLatestPosts toggle on module_taxonomyList`.
+  - **service** · `feat(service): two newest posts per term in the
+taxonomy-list query`.
+  - **ui** · `feat(ui): TaxonomyCard.Posts slot`.
+  - **web** · `feat(web): map latest posts into TaxonomyCard on home,
+landing and index pages`.
+- **PRs:** studio → service → web, with ui alongside.
+- **Not in scope:** tags as a cloud of pills; more than two posts or an
+  authored count; dates or excerpts on the card; hiding zero-post terms.
+- **Acceptance:** a term card on the home, landing, Topics and Tags pages
+  lists its two newest published posts as links, newest first; a term with
+  no posts shows title, description and count only; a scheduled post is not
+  listed; the toggle off renders today's card; a post link reaches the post.
 
 #### 1.7 Page composition — epic #2943 `refactor(web): pages are chrome, a heading and modules; retire PostsSection`
 
