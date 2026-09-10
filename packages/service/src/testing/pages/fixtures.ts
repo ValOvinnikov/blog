@@ -150,12 +150,12 @@ export function makeRawBlogPage(
 }
 
 export function makeRawTopicIndexPage(
-  overrides: Partial<NonNullable<TRawTopicIndexPage>> = {},
-): NonNullable<TRawTopicIndexPage> {
+  overrides: Partial<TRawTopicIndexPage> = {},
+): TRawTopicIndexPage {
   return {
-    heading: 'Browse by topic',
-    supportingText: 'Find posts by subject.',
-    taxonomyList: { _id: 'taxonomy-list-1' },
+    headingBlock: makeRawOptionalHeadingBlock({ heading: 'Browse by topic' }),
+    hero: null,
+    modules: [{ _id: 'taxonomy-list-1', _type: 'module_taxonomyList' }],
     seo: null,
     ...overrides,
   };
