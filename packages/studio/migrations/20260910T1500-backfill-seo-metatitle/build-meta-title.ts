@@ -18,48 +18,56 @@ const isWithinRange = (text: string): boolean =>
   text.length >= META_TITLE_MIN_LENGTH;
 
 /**
- * `page_post`: `headingBlock.heading` is required on every post, so it's
- * always a real, meaningful subject. Used verbatim when it already clears
- * the floor; padded with the brand name only when it's too short.
+ * Appends `pads` to `subject` one at a time, in order, until the result
+ * clears `META_TITLE_MIN_LENGTH`; returns `undefined` when every pad is
+ * exhausted and it's still short, rather than returning an invalid title.
  */
-export const buildPostMetaTitle = (heading: string, brandName: string): string => {
-  const trimmed = heading.trim();
+const composeWithPads = (
+  subject: string,
+  pads: readonly (string | undefined)[],
+): string | undefined => {
+  let candidate = subject;
 
-  if (isWithinRange(trimmed)) return clampToMax(trimmed);
+  for (const pad of pads) {
+    if (isWithinRange(candidate)) break;
 
-  return clampToMax(`${trimmed} — ${brandName}`);
+    const trimmedPad = pad?.trim();
+
+    if (trimmedPad) candidate = `${candidate} — ${trimmedPad}`;
+  }
+
+  return isWithinRange(candidate) ? clampToMax(candidate) : undefined;
 };
 
 /**
- * `page_blog` / `page_tagIndex` / `page_topicIndex`: singletons whose own
- * heading (`headingBlock.heading`) is a bare word ("Blog", "Tags", "Topics")
- * — never long enough alone, so it's paired with the site tagline/description
- * for real, site-specific padding rather than a generic brand suffix.
+ * `page_post` / `page_landing`: subject is the document's own heading,
+ * padded with the brand name and then, if still short, the site tagline.
+ */
+export const buildHeadingMetaTitle = (
+  heading: string,
+  brandName: string,
+  tagline?: string,
+): string | undefined => composeWithPads(heading.trim(), [brandName, tagline]);
+
+/**
+ * `page_home` / `page_blog` / `page_tagIndex` / `page_topicIndex`: singletons
+ * whose own heading is a bare word ("Home", "Blog", "Tags", "Topics"), padded
+ * with the site tagline/description and then, if still short, the brand name.
  */
 export const buildIndexPageMetaTitle = (
   heading: string,
   padText: string,
-): string => {
-  const trimmed = heading.trim();
-
-  if (isWithinRange(trimmed)) return clampToMax(trimmed);
-
-  return clampToMax(`${trimmed} — ${padText.trim()}`);
-};
+  brandName?: string,
+): string | undefined => composeWithPads(heading.trim(), [padText, brandName]);
 
 /**
- * `page_tag` / `page_topic`: subject is the page's own `headingBlock.heading`
- * when authored, else the referenced `blog_tag`/`blog_topic` title. Tag/topic
- * names are frequently short (e.g. "SEO"), so the pad phrase names what the
- * page actually lists rather than just repeating the brand.
+ * `page_tag` / `page_topic`: subject is the page's own heading when
+ * authored, else the referenced `blog_tag`/`blog_topic` title, padded with
+ * what the page lists and then, if still short, the site tagline.
  */
 export const buildEntityPageMetaTitle = (
   subject: string,
   brandName: string,
-): string => {
-  const trimmed = subject.trim();
-
-  if (isWithinRange(trimmed)) return clampToMax(trimmed);
-
-  return clampToMax(`${trimmed} — Articles on ${brandName}`);
-};
+  tagline?: string,
+): string | undefined =>
+  composeWithPads(subject.trim(), [`Articles on ${brandName.trim()}`, tagline]);

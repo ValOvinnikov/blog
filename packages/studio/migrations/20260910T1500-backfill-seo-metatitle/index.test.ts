@@ -127,9 +127,7 @@ describe('seo.metaTitle backfill document() wiring', () => {
       fakeContext({ ...settingsSite(), 'blog_tag-seo': { title: 'SEO' } }),
     );
 
-    expect(result).toEqual(
-      expectedMutations('SEO — Articles on valstack.dev'),
-    );
+    expect(result).toEqual(expectedMutations('SEO — Articles on valstack.dev'));
   });
 
   it('prefers page_tag headingBlock.heading over the referenced tag title', async () => {
@@ -200,6 +198,92 @@ describe('seo.metaTitle backfill document() wiring', () => {
     const result = await runDocument(
       { _id: 'page_tag-orphan', _type: 'page_tag' },
       fakeContext(settingsSite()),
+    );
+
+    expect(result).toEqual([]);
+  });
+
+  it('backfills page_home from its own heading', async () => {
+    const result = await runDocument(
+      {
+        _id: 'page_home',
+        _type: 'page_home',
+        headingBlock: { heading: 'Home' },
+      },
+      fakeContext(settingsSite()),
+    );
+
+    expect(result).toEqual(
+      expectedMutations('Home — Field notes on building software'),
+    );
+  });
+
+  it('skips page_home when it uses a hero instead of a heading', async () => {
+    const result = await runDocument(
+      { _id: 'page_home', _type: 'page_home', hero: { _ref: 'module_hero-1' } },
+      fakeContext(settingsSite()),
+    );
+
+    expect(result).toEqual([]);
+  });
+
+  it('backfills page_landing from its own heading padded with the brand name', async () => {
+    const result = await runDocument(
+      {
+        _id: 'page_landing-1',
+        _type: 'page_landing',
+        headingBlock: { heading: 'SEO That Generates Itself' },
+      },
+      fakeContext(settingsSite()),
+    );
+
+    expect(result).toEqual(
+      expectedMutations('SEO That Generates Itself — valstack.dev'),
+    );
+  });
+
+  it('leaves an already-long page_landing heading untouched', async () => {
+    const heading = 'Shipping Heroes Without a Designer';
+
+    const result = await runDocument(
+      {
+        _id: 'page_landing-2',
+        _type: 'page_landing',
+        headingBlock: { heading },
+      },
+      fakeContext(settingsSite()),
+    );
+
+    expect(result).toEqual(expectedMutations(heading));
+  });
+
+  it('skips a page_landing with no brand name to pad a short heading with', async () => {
+    const result = await runDocument(
+      {
+        _id: 'page_landing-3',
+        _type: 'page_landing',
+        headingBlock: { heading: 'Launch' },
+      },
+      fakeContext(settingsSite({ brand: undefined })),
+    );
+
+    expect(result).toEqual([]);
+  });
+
+  it('skips a document whose heading, brand and tagline pad still leave it too short', async () => {
+    const result = await runDocument(
+      {
+        _id: 'page_landing-4',
+        _type: 'page_landing',
+        headingBlock: { heading: 'AI' },
+      },
+      fakeContext(
+        settingsSite({
+          brand: { name: 'X' },
+          tagline: undefined,
+          description: undefined,
+        }),
+      ),
     );
 
     expect(result).toEqual([]);

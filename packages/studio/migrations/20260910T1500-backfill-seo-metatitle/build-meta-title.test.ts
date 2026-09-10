@@ -1,7 +1,7 @@
 import {
   buildEntityPageMetaTitle,
+  buildHeadingMetaTitle,
   buildIndexPageMetaTitle,
-  buildPostMetaTitle,
   META_TITLE_MAX_LENGTH,
   META_TITLE_MIN_LENGTH,
 } from './build-meta-title';
@@ -9,11 +9,11 @@ import {
 const BRAND = 'valstack.dev';
 const TAGLINE = 'Field notes on building software';
 
-describe(buildPostMetaTitle, () => {
+describe(buildHeadingMetaTitle, () => {
   it('uses the heading verbatim once it already clears the floor', () => {
-    expect(buildPostMetaTitle('Shipping Heroes Without a Designer', BRAND)).toBe(
-      'Shipping Heroes Without a Designer',
-    );
+    expect(
+      buildHeadingMetaTitle('Shipping Heroes Without a Designer', BRAND),
+    ).toBe('Shipping Heroes Without a Designer');
   });
 
   it('uses a 60-character heading verbatim at the ceiling', () => {
@@ -21,28 +21,47 @@ describe(buildPostMetaTitle, () => {
       '24 Days, ~1,250 Commits: What the Agents Got Right and Wrong';
 
     expect(heading).toHaveLength(60);
-    expect(buildPostMetaTitle(heading, BRAND)).toBe(heading);
+    expect(buildHeadingMetaTitle(heading, BRAND)).toBe(heading);
   });
 
   it('pads a too-short heading with the brand name', () => {
-    expect(buildPostMetaTitle('SEO That Generates Itself', BRAND)).toBe(
+    expect(buildHeadingMetaTitle('SEO That Generates Itself', BRAND)).toBe(
       'SEO That Generates Itself — valstack.dev',
     );
   });
 
   it('trims the heading before measuring it', () => {
     expect(
-      buildPostMetaTitle('  Shipping Heroes Without a Designer  ', BRAND),
+      buildHeadingMetaTitle('  Shipping Heroes Without a Designer  ', BRAND),
     ).toBe('Shipping Heroes Without a Designer');
   });
 
   it('truncates a heading longer than the ceiling', () => {
     const heading = 'x'.repeat(70);
 
-    const result = buildPostMetaTitle(heading, BRAND);
+    const result = buildHeadingMetaTitle(heading, BRAND);
 
-    expect(result.length).toBeLessThanOrEqual(META_TITLE_MAX_LENGTH);
+    expect(result).toBeDefined();
+    expect(result?.length).toBeLessThanOrEqual(META_TITLE_MAX_LENGTH);
     expect(result).toBe('x'.repeat(60));
+  });
+
+  it('falls through to the tagline when heading + brand alone is still short', () => {
+    const result = buildHeadingMetaTitle('AI', 'X', TAGLINE);
+
+    expect(result).toBeDefined();
+    expect(result?.length).toBeGreaterThanOrEqual(META_TITLE_MIN_LENGTH);
+    expect(result?.length).toBeLessThanOrEqual(META_TITLE_MAX_LENGTH);
+    expect(result).toContain('AI');
+    expect(result).toContain(TAGLINE);
+  });
+
+  it('returns undefined when heading + brand is short and no tagline is available', () => {
+    expect(buildHeadingMetaTitle('AI', 'X')).toBeUndefined();
+  });
+
+  it('returns undefined when every pad is exhausted and still short', () => {
+    expect(buildHeadingMetaTitle('AI', 'X', '')).toBeUndefined();
   });
 });
 
@@ -63,6 +82,18 @@ describe(buildIndexPageMetaTitle, () => {
     const heading = 'A Heading That Is Already Long Enough On Its Own';
 
     expect(buildIndexPageMetaTitle(heading, TAGLINE)).toBe(heading);
+  });
+
+  it('returns undefined when the tagline pad alone is still short and no brand is given', () => {
+    expect(buildIndexPageMetaTitle('Blog', '')).toBeUndefined();
+  });
+
+  it('returns undefined when neither the pad text nor the brand clears the floor', () => {
+    expect(buildIndexPageMetaTitle('Blog', '', BRAND)).toBeUndefined();
+  });
+
+  it('returns undefined when there is no usable pad material at all', () => {
+    expect(buildIndexPageMetaTitle('Blog', '', '')).toBeUndefined();
   });
 });
 
@@ -96,8 +127,9 @@ describe(buildEntityPageMetaTitle, () => {
     for (const tag of tags) {
       const result = buildEntityPageMetaTitle(tag, BRAND);
 
-      expect(result.length).toBeGreaterThanOrEqual(META_TITLE_MIN_LENGTH);
-      expect(result.length).toBeLessThanOrEqual(META_TITLE_MAX_LENGTH);
+      expect(result).toBeDefined();
+      expect(result?.length).toBeGreaterThanOrEqual(META_TITLE_MIN_LENGTH);
+      expect(result?.length).toBeLessThanOrEqual(META_TITLE_MAX_LENGTH);
     }
   });
 
@@ -117,5 +149,18 @@ describe(buildEntityPageMetaTitle, () => {
     const subject = 'A Subject Long Enough To Need No Padding At All';
 
     expect(buildEntityPageMetaTitle(subject, BRAND)).toBe(subject);
+  });
+
+  it('falls through to the tagline when subject + brand pad is still short', () => {
+    const result = buildEntityPageMetaTitle('AI', 'X', TAGLINE);
+
+    expect(result).toBeDefined();
+    expect(result?.length).toBeGreaterThanOrEqual(META_TITLE_MIN_LENGTH);
+    expect(result?.length).toBeLessThanOrEqual(META_TITLE_MAX_LENGTH);
+    expect(result).toContain(TAGLINE);
+  });
+
+  it('returns undefined when subject + brand pad is short and no tagline is available', () => {
+    expect(buildEntityPageMetaTitle('AI', 'X')).toBeUndefined();
   });
 });

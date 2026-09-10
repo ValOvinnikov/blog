@@ -4,19 +4,27 @@
  * — without this, every existing document missing the field becomes
  * unpublishable the moment that validation lands.
  *
- * Runs against `page_blog`, `page_tagIndex`, `page_topicIndex`, `page_tag`,
- * `page_topic` and `page_post` (published and draft ids alike — no
- * `documentTypes` filter narrows by draft status, so both are visited):
+ * Runs against `page_home`, `page_blog`, `page_tagIndex`, `page_topicIndex`,
+ * `page_tag`, `page_topic`, `page_post` and `page_landing` (published and
+ * draft ids alike — no `documentTypes` filter narrows by draft status, so
+ * both are visited):
  *
  *   - `page_post`: `headingBlock.heading` is required on every post, so it's
  *     always available as the title's subject.
- *   - `page_blog` / `page_tagIndex` / `page_topicIndex`: singletons whose own
- *     heading is a bare word ("Blog", "Tags", "Topics") — paired with the
- *     `settings_site` tagline (or description, if no tagline is set) for
+ *   - `page_home` / `page_blog` / `page_tagIndex` / `page_topicIndex`:
+ *     singletons whose own heading is a bare word ("Home", "Blog", "Tags",
+ *     "Topics") — paired with the `settings_site` tagline (or description) for
  *     real padding.
  *   - `page_tag` / `page_topic`: subject is the page's own
  *     `headingBlock.heading` when authored, else the referenced
  *     `blog_tag`/`blog_topic` title, paired with the site brand name.
+ *   - `page_landing`: not a singleton — subject is the page's own
+ *     `headingBlock.heading`, paired with the site brand name like a post.
+ *
+ * Every document type may also carry a `hero` reference in place of
+ * `headingBlock.heading` (see `validateHeroOrHeading`); this migration only
+ * backfills from an authored heading and skips a hero-only document, same as
+ * it skips any other document with no usable subject.
  *
  * See `./build-meta-title.ts` for the pure title construction and its tests.
  *
@@ -43,16 +51,18 @@ import {
 
 import {
   buildEntityPageMetaTitle,
+  buildHeadingMetaTitle,
   buildIndexPageMetaTitle,
-  buildPostMetaTitle,
 } from './build-meta-title';
 
+const PAGE_HOME_TYPE = 'page_home';
 const PAGE_BLOG_TYPE = 'page_blog';
 const PAGE_TAG_INDEX_TYPE = 'page_tagIndex';
 const PAGE_TOPIC_INDEX_TYPE = 'page_topicIndex';
 const PAGE_TAG_TYPE = 'page_tag';
 const PAGE_TOPIC_TYPE = 'page_topic';
 const PAGE_POST_TYPE = 'page_post';
+const PAGE_LANDING_TYPE = 'page_landing';
 
 const SETTINGS_SITE_ID = 'settings_site';
 
@@ -90,9 +100,8 @@ const getSettingsSite = (
 
   if (cached) return cached;
 
-  const computed = context.client.getDocument<TSettingsSiteDoc>(
-    SETTINGS_SITE_ID,
-  );
+  const computed =
+    context.client.getDocument<TSettingsSiteDoc>(SETTINGS_SITE_ID);
 
   settingsSiteCache.set(context, computed);
 
@@ -121,12 +130,14 @@ const toMetaTitleMutations = (metaTitle: string): NodePatch[] => [
 export default defineMigration({
   title: 'Backfill seo.metaTitle for pages that lack one',
   documentTypes: [
+    PAGE_HOME_TYPE,
     PAGE_BLOG_TYPE,
     PAGE_TAG_INDEX_TYPE,
     PAGE_TOPIC_INDEX_TYPE,
     PAGE_TAG_TYPE,
     PAGE_TOPIC_TYPE,
     PAGE_POST_TYPE,
+    PAGE_LANDING_TYPE,
   ],
 
   migrate: {
@@ -138,6 +149,7 @@ export default defineMigration({
       const heading = doc.headingBlock?.heading?.trim() || undefined;
 
       switch (doc._type) {
+        case PAGE_HOME_TYPE:
         case PAGE_BLOG_TYPE:
         case PAGE_TAG_INDEX_TYPE:
         case PAGE_TOPIC_INDEX_TYPE: {
@@ -145,19 +157,25 @@ export default defineMigration({
 
           const settings = await getSettingsSite(context);
           const padText = resolvePadText(settings);
+          const brandName = settings?.brand?.name?.trim();
 
-          if (!padText) return [];
-
-          return toMetaTitleMutations(
-            buildIndexPageMetaTitle(heading, padText),
+          const metaTitle = buildIndexPageMetaTitle(
+            heading,
+            padText,
+            brandName,
           );
+
+          if (!metaTitle) return [];
+
+          return toMetaTitleMutations(metaTitle);
         }
 
         case PAGE_TAG_TYPE:
         case PAGE_TOPIC_TYPE: {
           const entityRef =
             doc._type === PAGE_TAG_TYPE ? doc.tag?._ref : doc.topic?._ref;
-          const subject = heading ?? (await resolveEntityTitle(context, entityRef));
+          const subject =
+            heading ?? (await resolveEntityTitle(context, entityRef));
 
           if (!subject) return [];
 
@@ -166,12 +184,20 @@ export default defineMigration({
 
           if (!brandName) return [];
 
-          return toMetaTitleMutations(
-            buildEntityPageMetaTitle(subject, brandName),
+          const padText = resolvePadText(settings);
+          const metaTitle = buildEntityPageMetaTitle(
+            subject,
+            brandName,
+            padText,
           );
+
+          if (!metaTitle) return [];
+
+          return toMetaTitleMutations(metaTitle);
         }
 
-        case PAGE_POST_TYPE: {
+        case PAGE_POST_TYPE:
+        case PAGE_LANDING_TYPE: {
           if (!heading) return [];
 
           const settings = await getSettingsSite(context);
@@ -179,7 +205,12 @@ export default defineMigration({
 
           if (!brandName) return [];
 
-          return toMetaTitleMutations(buildPostMetaTitle(heading, brandName));
+          const padText = resolvePadText(settings);
+          const metaTitle = buildHeadingMetaTitle(heading, brandName, padText);
+
+          if (!metaTitle) return [];
+
+          return toMetaTitleMutations(metaTitle);
         }
 
         default:
