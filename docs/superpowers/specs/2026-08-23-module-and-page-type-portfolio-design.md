@@ -1848,7 +1848,7 @@ point; the graph stays acyclic.
   and are disabled exactly when Embla cannot move; a spotlight in carousel
   mode drops its lead treatment; four PRs, ui first (2026-09-08, #2835).
   _Superseded 2026-09-10: Embla moved into the organism and the slot is
-  gone — see the 2026-09-10 entry below._
+  gone — see the two 2026-09-10 entries below._
 
 - **Pages are chrome, a heading and modules; every part fetches what it
   alone needs; `PostsSection` and the `*-page-view.tsx` layer retire** —
