@@ -2,15 +2,16 @@ import type { MigrationContext } from 'sanity/migrate';
 
 import { assertBlogPostDeletable } from './precondition';
 
-const createContext = (
-  result: { target: { content?: unknown } | null; refCount: number },
-): MigrationContext => {
+const createContext = (result: {
+  target: { content?: unknown } | null;
+  refCount: number;
+}): MigrationContext => {
   const fetch = async () => result;
 
   return { client: { fetch } } as unknown as MigrationContext;
 };
 
-describe('assertBlogPostDeletable', () => {
+describe(assertBlogPostDeletable, () => {
   it('resolves when the page_post counterpart has content and no references remain', async () => {
     const context = createContext({
       target: { content: [{ _type: 'block' }] },

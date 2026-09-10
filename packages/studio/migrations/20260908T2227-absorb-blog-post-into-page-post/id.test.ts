@@ -1,6 +1,6 @@
 import { toPagePostId } from './id';
 
-describe('toPagePostId', () => {
+describe(toPagePostId, () => {
   it('prefixes a published blog_post id', () => {
     expect(toPagePostId('abc123')).toBe('page_post-abc123');
   });
