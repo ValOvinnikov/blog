@@ -1,4 +1,10 @@
-import { CONTENT_ALIGNMENT, HERO_VARIANT, MEDIA_ORDER } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  HERO_VARIANT,
+  MEDIA_ORDER,
+} from '@blog/config';
+import { AZURE_SCRIM, NEUTRAL_SCRIM } from '@blog/ui/lib/styling';
 import {
   customRender,
   renderElement,
@@ -304,5 +310,148 @@ describe(`<${Hero.name}/>`, () => {
       expect(screen.getByRole('heading')).toBeVisible();
       unmount();
     }
+  });
+
+  it('renders an aria-hidden AZURE_SCRIM overlay on Banner with BRAND_PRIMARY tone', () => {
+    renderElement(
+      <Hero
+        title="Building a Design System"
+        titleId="hero-title"
+        variant={HERO_VARIANT.BANNER}
+        tone={BRAND_VARIANT.BRAND_PRIMARY}
+      >
+        <Hero.Media>
+          <img src="/img/hero.jpg" alt="Hero cover photo" />
+        </Hero.Media>
+      </Hero>,
+    );
+
+    const overlay = screen.getByTestId('hero-overlay');
+    expect(overlay).toHaveAttribute('aria-hidden', 'true');
+    expect(overlay).toHaveClass(AZURE_SCRIM);
+    expect(overlay).not.toHaveClass(NEUTRAL_SCRIM);
+  });
+
+  it.each([BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY])(
+    'renders a NEUTRAL_SCRIM overlay on Banner with %s tone',
+    (tone) => {
+      renderElement(
+        <Hero
+          title="Building a Design System"
+          titleId="hero-title"
+          variant={HERO_VARIANT.BANNER}
+          tone={tone}
+        >
+          <Hero.Media>
+            <img src="/img/hero.jpg" alt="Hero cover photo" />
+          </Hero.Media>
+        </Hero>,
+      );
+
+      const overlay = screen.getByTestId('hero-overlay');
+      expect(overlay).toHaveClass(NEUTRAL_SCRIM);
+      expect(overlay).not.toHaveClass(AZURE_SCRIM);
+    },
+  );
+
+  it('moves Banner media behind the overlay in the stacking order', () => {
+    renderElement(
+      <Hero
+        title="Building a Design System"
+        titleId="hero-title"
+        variant={HERO_VARIANT.BANNER}
+        tone={BRAND_VARIANT.PRIMARY}
+      >
+        <Hero.Media>
+          <img src="/img/hero.jpg" alt="Hero cover photo" />
+        </Hero.Media>
+      </Hero>,
+    );
+
+    expect(screen.getByTestId('hero-media')).toHaveClass('-z-20');
+    expect(screen.getByTestId('hero-overlay')).toHaveClass('-z-10');
+  });
+
+  it('renders no overlay on Split or Stacked, regardless of tone', () => {
+    for (const variant of [HERO_VARIANT.SPLIT, HERO_VARIANT.STACKED]) {
+      const { unmount } = renderElement(
+        <Hero
+          title="Building a Design System"
+          titleId="hero-title"
+          variant={variant}
+          tone={BRAND_VARIANT.BRAND_PRIMARY}
+        >
+          <Hero.Media>
+            <img src="/img/hero.jpg" alt="Hero cover photo" />
+          </Hero.Media>
+        </Hero>,
+      );
+
+      expect(screen.queryByTestId('hero-overlay')).not.toBeInTheDocument();
+
+      unmount();
+    }
+  });
+
+  it('leaves Split rendering unaffected by tone', () => {
+    const { unmount: unmountWithTone, container: withTone } = renderElement(
+      <Hero
+        title="Building a Design System"
+        titleId="hero-title"
+        variant={HERO_VARIANT.SPLIT}
+        tone={BRAND_VARIANT.BRAND_PRIMARY}
+      >
+        <Hero.Media>
+          <img src="/img/hero.jpg" alt="Hero cover photo" />
+        </Hero.Media>
+      </Hero>,
+    );
+    const withToneHtml = withTone.innerHTML;
+    unmountWithTone();
+
+    const { container: withoutTone } = renderElement(
+      <Hero
+        title="Building a Design System"
+        titleId="hero-title"
+        variant={HERO_VARIANT.SPLIT}
+      >
+        <Hero.Media>
+          <img src="/img/hero.jpg" alt="Hero cover photo" />
+        </Hero.Media>
+      </Hero>,
+    );
+
+    expect(withToneHtml).toBe(withoutTone.innerHTML);
+  });
+
+  it('leaves Stacked rendering unaffected by tone', () => {
+    const { unmount: unmountWithTone, container: withTone } = renderElement(
+      <Hero
+        title="Building a Design System"
+        titleId="hero-title"
+        variant={HERO_VARIANT.STACKED}
+        tone={BRAND_VARIANT.SECONDARY}
+      >
+        <Hero.Media>
+          <img src="/img/hero.jpg" alt="Hero cover photo" />
+        </Hero.Media>
+      </Hero>,
+    );
+    const withToneHtml = withTone.innerHTML;
+    unmountWithTone();
+
+    const { container: withoutTone } = renderElement(
+      <Hero
+        title="Building a Design System"
+        titleId="hero-title"
+        variant={HERO_VARIANT.STACKED}
+      >
+        <Hero.Media>
+          <img src="/img/hero.jpg" alt="Hero cover photo" />
+        </Hero.Media>
+      </Hero>,
+    );
+
+    expect(withToneHtml).toBe(withoutTone.innerHTML);
   });
 });

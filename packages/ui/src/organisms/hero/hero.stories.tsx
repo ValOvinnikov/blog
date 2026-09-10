@@ -1,4 +1,9 @@
-import { CONTENT_ALIGNMENT, HERO_VARIANT, MEDIA_ORDER } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  HERO_VARIANT,
+  MEDIA_ORDER,
+} from '@blog/config';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -6,6 +11,21 @@ import { NavLink } from '../../atoms/nav-link';
 
 import { Hero } from './hero';
 import { heroVariants } from './hero-variants';
+
+const bannerContent = (alt: string) => (
+  <>
+    <Hero.Media>
+      <img
+        src="https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1600&h=900&fit=crop"
+        alt={alt}
+        className="size-full object-cover"
+      />
+    </Hero.Media>
+    <Hero.Cta>
+      <NavLink href="/posts/design-system">Read more</NavLink>
+    </Hero.Cta>
+  </>
+);
 
 const meta = {
   title: 'Organisms/Hero',
@@ -27,6 +47,10 @@ const meta = {
     mediaOrder: {
       control: 'select',
       options: objectKeys(heroVariants.variants.mediaOrder),
+    },
+    tone: {
+      control: 'select',
+      options: objectKeys(heroVariants.variants.tone),
     },
   },
   args: {
@@ -111,24 +135,60 @@ export const StackedDefault: TStory = {
 export const BannerContentLeft: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
+    tone: BRAND_VARIANT.BRAND_PRIMARY,
     contentPosition: CONTENT_ALIGNMENT.LEFT,
     contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    children: bannerContent('Bright mountain sunrise'),
   },
 };
 
 export const BannerContentCenter: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
+    tone: BRAND_VARIANT.PRIMARY,
     contentPosition: CONTENT_ALIGNMENT.CENTER,
     contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    children: bannerContent('Bright mountain sunrise'),
   },
 };
 
 export const BannerContentRight: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
+    tone: BRAND_VARIANT.SECONDARY,
     contentPosition: CONTENT_ALIGNMENT.RIGHT,
     contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+    children: bannerContent('Bright mountain sunrise'),
+  },
+};
+
+export const BannerToneBrandPrimary: TStory = {
+  args: {
+    variant: HERO_VARIANT.BANNER,
+    tone: BRAND_VARIANT.BRAND_PRIMARY,
+    contentPosition: CONTENT_ALIGNMENT.LEFT,
+    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    children: bannerContent('Bright mountain sunrise'),
+  },
+};
+
+export const BannerTonePrimary: TStory = {
+  args: {
+    variant: HERO_VARIANT.BANNER,
+    tone: BRAND_VARIANT.PRIMARY,
+    contentPosition: CONTENT_ALIGNMENT.LEFT,
+    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    children: bannerContent('Bright mountain sunrise'),
+  },
+};
+
+export const BannerToneSecondary: TStory = {
+  args: {
+    variant: HERO_VARIANT.BANNER,
+    tone: BRAND_VARIANT.SECONDARY,
+    contentPosition: CONTENT_ALIGNMENT.LEFT,
+    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    children: bannerContent('Bright mountain sunrise'),
   },
 };
 
