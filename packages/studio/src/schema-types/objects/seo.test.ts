@@ -48,8 +48,6 @@ const runFieldValidation = (
   return (field.validation as any)(baseRule) as TMockRule;
 };
 
-const metaTitleOfLength = (length: number): string => 'a'.repeat(length);
-
 describe('seoSchema metaTitle validation', () => {
   it('is required, with min(30) then max(60)', () => {
     const callLog: TCallLog = [];
@@ -75,36 +73,6 @@ describe('seoSchema metaTitle validation', () => {
     );
     expect(getField('openGraph')?.description).not.toMatch(/page content/i);
   });
-
-  describe.each([
-    ['a 29-character title', 29, false],
-    ['a 30-character title (floor)', 30, true],
-    ['a 60-character title (ceiling)', 60, true],
-    ['a 61-character title', 61, false],
-  ])('%s', (_label, length, expected) => {
-    it(`is ${expected ? 'within' : 'outside'} the 30–60 range`, () => {
-      const title = metaTitleOfLength(length as number);
-      const withinRange =
-        title.length >= SEO_META_TITLE_MIN_LENGTH &&
-        title.length <= SEO_META_TITLE_MAX_LENGTH;
-
-      expect(withinRange).toBe(expected);
-    });
-  });
-
-  describe.each([32, 37, 43, 45, 48, 48, 50, 51])(
-    'a known-good already-authored title of length %i',
-    (length) => {
-      it('still validates', () => {
-        const title = metaTitleOfLength(length);
-        const withinRange =
-          title.length >= SEO_META_TITLE_MIN_LENGTH &&
-          title.length <= SEO_META_TITLE_MAX_LENGTH;
-
-        expect(withinRange).toBe(true);
-      });
-    },
-  );
 });
 
 describe('seoSchema metaDescription validation', () => {
