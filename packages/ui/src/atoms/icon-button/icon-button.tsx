@@ -1,4 +1,8 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type {
+  IWithClassName,
+  IWithDataTestId,
+  TBrandVariant,
+} from '@blog/config';
 import type { AriaAttributes, MouseEventHandler, ReactNode, Ref } from 'react';
 
 import {
@@ -15,6 +19,8 @@ export type TIconButtonProps = IWithClassName &
     onClick?: MouseEventHandler<HTMLButtonElement>;
     isDisabled?: boolean;
     isInert?: boolean;
+    /** Section-ground hover for the `control` variant; unused by the others. Defaults to the PRIMARY/SECONDARY tint hover. */
+    tone?: TBrandVariant;
     'aria-expanded'?: AriaAttributes['aria-expanded'];
     'aria-controls'?: AriaAttributes['aria-controls'];
     'aria-haspopup'?: AriaAttributes['aria-haspopup'];
@@ -24,15 +30,17 @@ export type TIconButtonProps = IWithClassName &
 
 /**
  * A compact button for icon, labelled, or avatar-triggered actions: a 22×22
- * icon-only default, a `bordered` variant sized to its text label, and a
- * 32×32 circular `avatar` variant. Pass `ariaLabel` — no hardcoded
- * accessible name.
+ * icon-only default, a `bordered` variant sized to its text label, a 32×32
+ * circular `avatar` variant, and a 36×36 outlined `control` variant for a
+ * standalone control (e.g. carousel navigation). Pass `ariaLabel` — no
+ * hardcoded accessible name.
  */
 export const IconButton = ({
   ariaLabel,
   title,
   className,
   variant,
+  tone,
   children,
   dataTestId,
   ref,
@@ -55,7 +63,7 @@ export const IconButton = ({
     aria-controls={ariaControls}
     aria-haspopup={ariaHaspopup}
     data-testid={dataTestId}
-    className={iconButtonVariants({ variant, class: className })}
+    className={iconButtonVariants({ variant, tone, class: className })}
   >
     {children}
   </button>

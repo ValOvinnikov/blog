@@ -1,0 +1,545 @@
+import { BRAND_VARIANT } from '@blog/config';
+import { renderElement, screen } from '@blog/ui/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { act } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+import { Carousel } from './carousel';
+
+faker.seed(123);
+
+type TListener = (api: TMockEmblaApi) => void;
+
+type TMockEmblaApi = {
+  rootNode: () => { scrollLeft: number };
+  slideNodes: () => { offsetLeft: number }[];
+  scrollTo: ReturnType<typeof vi.fn>;
+  scrollPrev: ReturnType<typeof vi.fn>;
+  scrollNext: ReturnType<typeof vi.fn>;
+  canScrollPrev: ReturnType<typeof vi.fn>;
+  canScrollNext: ReturnType<typeof vi.fn>;
+  on: (event: string, handler: TListener) => TMockEmblaApi;
+  off: (event: string, handler: TListener) => TMockEmblaApi;
+};
+
+const listeners = new Map<string, Set<TListener>>();
+let currentApi: TMockEmblaApi | undefined;
+let mockViewport: { scrollLeft: number };
+let mockSlides: { offsetLeft: number }[];
+
+const emblaApi: TMockEmblaApi = {
+  rootNode: () => mockViewport,
+  slideNodes: () => mockSlides,
+  scrollTo: vi.fn(),
+  scrollPrev: vi.fn(),
+  scrollNext: vi.fn(),
+  canScrollPrev: vi.fn(() => true),
+  canScrollNext: vi.fn(() => true),
+  on: (event, handler) => {
+    if (!listeners.has(event)) listeners.set(event, new Set());
+    listeners.get(event)?.add(handler);
+    return emblaApi;
+  },
+  off: (event, handler) => {
+    listeners.get(event)?.delete(handler);
+    return emblaApi;
+  },
+};
+
+const emitEvent = (event: string) => {
+  act(() => {
+    listeners.get(event)?.forEach((handler) => handler(emblaApi));
+  });
+};
+
+const { emblaCarouselOptionsSpy } = vi.hoisted(() => ({
+  emblaCarouselOptionsSpy: vi.fn(),
+}));
+
+vi.mock('embla-carousel-react', () => ({
+  default: (...args: unknown[]) => {
+    emblaCarouselOptionsSpy(...args);
+    return [vi.fn(), currentApi];
+  },
+}));
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  listeners.clear();
+  mockViewport = { scrollLeft: 0 };
+  mockSlides = [];
+  currentApi = emblaApi;
+  // `mockReturnValue` persists through `clearAllMocks` (it only clears call
+  // history), so each test starts both flags enabled unless it overrides them.
+  emblaApi.canScrollPrev.mockReturnValue(true);
+  emblaApi.canScrollNext.mockReturnValue(true);
+});
+
+const renderItem = ({ item }: { item: string }) => <div>{item}</div>;
+
+describe(`<${Carousel.name}/>`, () => {
+  it('renders a region carrying aria-roledescription and the given ariaLabel', () => {
+    const ariaLabel = faker.lorem.words(3);
+    renderElement(
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel={ariaLabel}
+        previousLabel="Previous"
+        nextLabel="Next"
+      />,
+    );
+
+    const region = screen.getByRole('region', { name: ariaLabel });
+    expect(region).toHaveAttribute('aria-roledescription', 'carousel');
+  });
+
+  it('renders one list item per item, keeping every slide in the DOM', () => {
+    renderElement(
+      <Carousel
+        items={['Slide one', 'Slide two', 'Slide three']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+      />,
+    );
+
+    const slides = screen.getAllByRole('listitem');
+    expect(slides).toHaveLength(3);
+    for (const slide of slides) {
+      expect(slide).not.toHaveAttribute('aria-hidden');
+      expect(slide).not.toHaveAttribute('inert');
+    }
+  });
+
+  it('renders no "n of m" text on any slide', () => {
+    renderElement(
+      <Carousel
+        items={['Slide one', 'Slide two']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+      />,
+    );
+
+    expect(screen.queryByText(/\d+ of \d+/i)).not.toBeInTheDocument();
+  });
+
+  it('calls renderItem for every item and renders each as a slide, in order', () => {
+    const items = ['alpha', 'bravo', 'charlie'];
+    const renderItemSpy = vi.fn(({ item }: { item: string }) => (
+      <div>{item}</div>
+    ));
+    renderElement(
+      <Carousel
+        items={items}
+        renderItem={renderItemSpy}
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+      />,
+    );
+
+    items.forEach((item, index) => {
+      expect(renderItemSpy).toHaveBeenCalledWith({ item, index });
+    });
+
+    const slides = screen.getAllByRole('listitem');
+    expect(slides.map((slide) => slide.textContent)).toEqual(items);
+  });
+
+  it('keys each slide with getItemKey when supplied', () => {
+    const items = [
+      { id: 'b', label: 'Bravo' },
+      { id: 'a', label: 'Alpha' },
+    ];
+    const { rerender } = renderElement(
+      <Carousel
+        items={items}
+        renderItem={({ item }) => (
+          <div data-testid={`slide-${item.id}`}>{item.label}</div>
+        )}
+        getItemKey={({ item }) => item.id}
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+      />,
+    );
+
+    const slideB = screen.getByTestId('slide-b');
+
+    rerender(
+      <Carousel
+        items={[...items].reverse()}
+        renderItem={({ item }) => (
+          <div data-testid={`slide-${item.id}`}>{item.label}</div>
+        )}
+        getItemKey={({ item }) => item.id}
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+      />,
+    );
+
+    expect(screen.getByTestId('slide-b')).toBe(slideB);
+  });
+
+  it('keys each slide by its index when getItemKey is omitted', () => {
+    renderElement(
+      <Carousel
+        items={['alpha', 'bravo']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+      />,
+    );
+
+    expect(screen.getAllByRole('listitem')).toHaveLength(2);
+  });
+
+  it('applies slideClassName to every slide', () => {
+    renderElement(
+      <Carousel
+        items={['Slide one', 'Slide two']}
+        renderItem={renderItem}
+        slideClassName="basis-full"
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+      />,
+    );
+
+    for (const slide of screen.getAllByRole('listitem')) {
+      expect(slide).toHaveClass('basis-full');
+    }
+  });
+
+  it('forwards data-testid to the root element', () => {
+    renderElement(
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+        dataTestId="posts-carousel"
+      />,
+    );
+
+    expect(screen.getByTestId('posts-carousel')).toBeVisible();
+  });
+
+  it('applies the native scroll-snap viewport classes before Embla initializes', () => {
+    currentApi = undefined;
+    renderElement(
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+        dataTestId="carousel"
+      />,
+    );
+
+    const viewport = screen.getByTestId('carousel').firstElementChild;
+    expect(viewport).toHaveClass('overflow-x-auto', 'snap-x', 'snap-mandatory');
+    expect(viewport).not.toHaveClass('overflow-hidden');
+  });
+
+  it('swaps to the enhanced (Embla-driven) viewport classes once Embla initializes', () => {
+    currentApi = undefined;
+    const { rerender } = renderElement(
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+        dataTestId="carousel"
+      />,
+    );
+
+    currentApi = emblaApi;
+    rerender(
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+        dataTestId="carousel"
+      />,
+    );
+
+    const viewport = screen.getByTestId('carousel').firstElementChild;
+    expect(viewport).toHaveClass('overflow-hidden');
+    expect(viewport).not.toHaveClass('overflow-x-auto');
+    expect(viewport).not.toHaveClass('snap-x');
+  });
+
+  it('resets the native scrollLeft and jumps Embla to the slide already in view', () => {
+    mockViewport = { scrollLeft: 240 };
+    mockSlides = [
+      { offsetLeft: 0 },
+      { offsetLeft: 100 },
+      { offsetLeft: 200 },
+      { offsetLeft: 300 },
+    ];
+    currentApi = undefined;
+    const { rerender } = renderElement(
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+        dataTestId="carousel"
+      />,
+    );
+
+    currentApi = emblaApi;
+    rerender(
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+        dataTestId="carousel"
+      />,
+    );
+
+    expect(mockViewport.scrollLeft).toBe(0);
+    expect(emblaApi.scrollTo).toHaveBeenCalledWith(2, true);
+  });
+
+  it('renders both buttons, labelled and titled from previousLabel/nextLabel', () => {
+    renderElement(
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous slide"
+        nextLabel="Next slide"
+      />,
+    );
+
+    const previous = screen.getByRole('button', { name: 'Previous slide' });
+    const next = screen.getByRole('button', { name: 'Next slide' });
+    expect(previous).toHaveAttribute('title', 'Previous slide');
+    expect(next).toHaveAttribute('title', 'Next slide');
+  });
+
+  it('renders both buttons with the control variant', () => {
+    renderElement(
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous slide"
+        nextLabel="Next slide"
+      />,
+    );
+
+    const previous = screen.getByRole('button', { name: 'Previous slide' });
+    const next = screen.getByRole('button', { name: 'Next slide' });
+    expect(previous).toHaveClass('rounded-full');
+    expect(next).toHaveClass('rounded-full');
+  });
+
+  it('renders the tint hover, not the solid fill, when tone is omitted', () => {
+    renderElement(
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous slide"
+        nextLabel="Next slide"
+      />,
+    );
+
+    const previous = screen.getByRole('button', { name: 'Previous slide' });
+    const next = screen.getByRole('button', { name: 'Next slide' });
+    expect(previous).toHaveClass('hover:bg-brand-primary-muted');
+    expect(next).toHaveClass('hover:bg-brand-primary-muted');
+    expect(previous).not.toHaveClass('hover:bg-brand-primary-solid');
+    expect(next).not.toHaveClass('hover:bg-brand-primary-solid');
+  });
+
+  it('passes tone through to both buttons, swapping in the solid hover for BRAND_PRIMARY', () => {
+    renderElement(
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous slide"
+        nextLabel="Next slide"
+        tone={BRAND_VARIANT.BRAND_PRIMARY}
+      />,
+    );
+
+    const previous = screen.getByRole('button', { name: 'Previous slide' });
+    const next = screen.getByRole('button', { name: 'Next slide' });
+    expect(previous).toHaveClass('hover:bg-brand-primary-solid');
+    expect(next).toHaveClass('hover:bg-brand-primary-solid');
+  });
+
+  it('calls scrollPrev/scrollNext on the Embla api when the buttons are clicked', async () => {
+    const user = userEvent.setup();
+    renderElement(
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous slide"
+        nextLabel="Next slide"
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Previous slide' }));
+    await user.click(screen.getByRole('button', { name: 'Next slide' }));
+
+    expect(emblaApi.scrollPrev).toHaveBeenCalledTimes(1);
+    expect(emblaApi.scrollNext).toHaveBeenCalledTimes(1);
+  });
+
+  it('disables the previous/next buttons from canScrollPrev/canScrollNext, and follows select', () => {
+    emblaApi.canScrollPrev.mockReturnValue(false);
+    emblaApi.canScrollNext.mockReturnValue(true);
+    renderElement(
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous slide"
+        nextLabel="Next slide"
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Previous slide' }),
+    ).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Next slide' })).toBeEnabled();
+
+    emblaApi.canScrollPrev.mockReturnValue(true);
+    emblaApi.canScrollNext.mockReturnValue(false);
+    emitEvent('select');
+
+    expect(
+      screen.getByRole('button', { name: 'Previous slide' }),
+    ).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Next slide' })).toBeDisabled();
+  });
+
+  it('re-reads the disabled flags on reInit', () => {
+    emblaApi.canScrollPrev.mockReturnValue(true);
+    emblaApi.canScrollNext.mockReturnValue(true);
+    renderElement(
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous slide"
+        nextLabel="Next slide"
+      />,
+    );
+
+    emblaApi.canScrollNext.mockReturnValue(false);
+    emitEvent('reInit');
+
+    expect(screen.getByRole('button', { name: 'Next slide' })).toBeDisabled();
+  });
+
+  it("configures Embla with the design's fixed options", () => {
+    renderElement(
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+      />,
+    );
+
+    expect(emblaCarouselOptionsSpy).toHaveBeenCalledWith({
+      align: 'start',
+      slidesToScroll: 1,
+      containScroll: 'trimSnaps',
+      dragFree: false,
+      loop: false,
+      breakpoints: { '(prefers-reduced-motion: reduce)': { duration: 0 } },
+    });
+  });
+
+  it('moves focus to the sibling nav button before disabling the one that holds it', () => {
+    renderElement(
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous slide"
+        nextLabel="Next slide"
+      />,
+    );
+
+    const next = screen.getByRole('button', { name: 'Next slide' });
+    next.focus();
+    expect(next).toHaveFocus();
+
+    emblaApi.canScrollPrev.mockReturnValue(true);
+    emblaApi.canScrollNext.mockReturnValue(false);
+    emitEvent('select');
+
+    expect(
+      screen.getByRole('button', { name: 'Previous slide' }),
+    ).toHaveFocus();
+  });
+
+  it('moves focus to the region when both nav buttons disable at once', () => {
+    renderElement(
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous slide"
+        nextLabel="Next slide"
+      />,
+    );
+
+    const next = screen.getByRole('button', { name: 'Next slide' });
+    next.focus();
+    expect(next).toHaveFocus();
+
+    emblaApi.canScrollPrev.mockReturnValue(false);
+    emblaApi.canScrollNext.mockReturnValue(false);
+    emitEvent('select');
+
+    expect(screen.getByRole('region', { name: 'Posts' })).toHaveFocus();
+  });
+
+  it('leaves focus alone when the disabled flags change without focus on a nav button', () => {
+    renderElement(
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous slide"
+        nextLabel="Next slide"
+      />,
+    );
+
+    const previous = screen.getByRole('button', { name: 'Previous slide' });
+    previous.focus();
+    expect(previous).toHaveFocus();
+
+    emblaApi.canScrollPrev.mockReturnValue(true);
+    emblaApi.canScrollNext.mockReturnValue(false);
+    emitEvent('select');
+
+    expect(previous).toHaveFocus();
+  });
+});

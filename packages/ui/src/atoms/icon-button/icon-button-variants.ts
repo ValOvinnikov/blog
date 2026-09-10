@@ -1,3 +1,4 @@
+import { BRAND_VARIANT } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -6,13 +7,6 @@ export const iconButtonVariants = tv({
     'inline-grid size-[22px] place-items-center',
     'rounded-sm border border-transparent bg-transparent p-0',
     'text-muted transition-colors duration-base ease-smooth',
-    // `bg-surface-2` alone reads as near-invisible here (page `--primary` vs
-    // `--surface-2` is ~1.04:1 light / ~1.16:1 dark) — this button has no
-    // resting border/bg, so the hover boundary is the only affordance a
-    // user gets and must clear WCAG 1.4.11's 3:1 non-text minimum on its
-    // own (sub-threshold signals don't stack). `--border-emphasis` does:
-    // verified (OKLCH → sRGB → WCAG contrast, independently computed)
-    // against `--primary` directly — light 3.54:1, dark 3.94:1.
     'hover:border-border-emphasis hover:bg-surface-2 hover:text-text',
     'cursor-pointer',
     'focus-visible:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
@@ -31,14 +25,31 @@ export const iconButtonVariants = tv({
       avatar: [
         'size-8 rounded-full border-0',
         'transition-shadow duration-base ease-smooth',
-        // `border-emphasis`, not `border-strong`, for the hover ring —
-        // `border-strong` fails WCAG 1.4.11's 3:1 non-text contrast against
-        // `--primary` (1.81:1 light / 2.26:1 dark); `border-emphasis`
-        // clears it (3.54:1 / 3.94:1).
         'hover:ring-2 hover:ring-border-emphasis hover:ring-offset-2 hover:ring-offset-primary',
       ],
+      control: [
+        'size-9 rounded-full',
+        'border border-brand-primary bg-transparent text-brand-primary',
+        'hover:border-brand-primary hover:bg-brand-primary-muted hover:text-brand-primary',
+        'focus-visible:bg-transparent',
+      ],
+    },
+    tone: {
+      [BRAND_VARIANT.PRIMARY]: [],
+      [BRAND_VARIANT.SECONDARY]: [],
+      [BRAND_VARIANT.BRAND_PRIMARY]: [],
     },
   },
+  compoundVariants: [
+    {
+      variant: 'control',
+      tone: BRAND_VARIANT.BRAND_PRIMARY,
+      class: [
+        'hover:border-brand-primary-solid hover:bg-brand-primary-solid hover:text-brand-primary-contrast',
+        'focus-visible:bg-brand-primary-solid focus-visible:text-brand-primary-contrast',
+      ],
+    },
+  ],
 });
 
 export type TIconButtonVariants = VariantProps<typeof iconButtonVariants>;

@@ -24,8 +24,17 @@ Heavy reference lives in two on-demand files, loaded only when relevant:
   if passed in as props/slots — prefer accepting `as`/`children` so the app
   owns framework specifics. Default to plain elements.
 - Depend only on `@blog/config` for shapes. No business logic.
-- **No `"use client"` directive.** `@blog/ui` must be fully server-component-safe.
-  Client boundaries are declared in `apps/web` only — never inside the library.
+- **No `"use client"` directive.** Client boundaries are declared in `apps/web`
+  only — never inside the library.
+
+  **One component is client-only without carrying the directive: `Carousel`,
+  which owns `useEmblaCarousel`.** It is client-only by virtue of its hook, the
+  way `sanity-image`'s `SanityImage` is, and the consumer declares the boundary
+  by rendering it under its own `'use client'` wrapper. Rendering it from a
+  Server Component throws on the hook — the correct failure, not a bug to guard
+  against. The directive itself still never appears anywhere in this package,
+  and this exception is not a precedent: a new hook-bearing component needs the
+  same explicit decision this one got.
 
 ## Atomic Design layering
 
@@ -274,7 +283,8 @@ variant.
   exposes `imageUrl`, `PostMeta`'s author prop is `{ name; imageUrl? }` — not
   `avatarUrl`, which forces every caller to hand-map. (`@blog/ui` still never
   imports `@blog/service`; structural typing bridges it.)
-- Server-component-safe by default. **No `"use client"` allowed** — see Purity.
+- Server-component-safe by default. **No `"use client"` allowed** — see Purity,
+  including why `Carousel` is client-only without the directive.
 - **Every exported component carries a JSDoc description — REQUIRED, not a
   preference.** This covers compound roots and every slot/part component
   (`Header.Brand`, `PostCard.Media`, …), even when the name looks
@@ -515,7 +525,8 @@ issues and ensures every committed file is consistently formatted.
 ## Checklist before finishing
 
 - [ ] **Ran `pnpm --filter @blog/ui format`** on all created and edited files.
-- [ ] No `service`/`sanity`/`fetch` imports. No `"use client"` directive.
+- [ ] No `service`/`sanity`/`fetch` imports. No `"use client"` directive (and no
+      React hook, unless you are `Carousel` — see Purity).
 - [ ] Arrow-function component; no inline sub-components — each lives in
       `components/{child-name}/` with its own `{child-name}-variants.ts` (never
       importing the parent's variants).
