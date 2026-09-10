@@ -30,9 +30,8 @@ export const iconButtonVariants = tv({
       control: [
         'size-9 rounded-full',
         'border border-brand-primary bg-transparent text-brand-primary',
-        'hover:bg-brand-primary-muted',
+        'hover:border-brand-primary hover:bg-brand-primary-muted hover:text-brand-primary',
         'focus-visible:bg-transparent',
-        'disabled:opacity-100 disabled:border-border-strong disabled:text-muted',
       ],
     },
     tone: {
@@ -46,7 +45,7 @@ export const iconButtonVariants = tv({
       variant: 'control',
       tone: BRAND_VARIANT.BRAND_PRIMARY,
       class: [
-        'hover:bg-brand-primary-solid hover:text-brand-primary-contrast',
+        'hover:border-brand-primary-solid hover:bg-brand-primary-solid hover:text-brand-primary-contrast',
         'focus-visible:bg-brand-primary-solid focus-visible:text-brand-primary-contrast',
       ],
     },

@@ -123,10 +123,7 @@ export const ControlOnGrounds: TStory = {
   ),
 };
 
-// A disabled control swaps its brand ring for a neutral one instead of
-// fading it — the neutral ring reads as "not interactive" on every ground,
-// where a faded brand ring would still read as interactive. Toggle the
-// toolbar theme to check both light and dark.
+// A disabled control keeps its brand ring and fades with it; toggle the toolbar theme to check both modes.
 export const ControlDisabledOnGrounds: TStory = {
   name: 'Control — disabled, on every ground',
   render: () => (
