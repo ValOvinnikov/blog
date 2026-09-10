@@ -122,3 +122,57 @@ export const ControlOnGrounds: TStory = {
     </div>
   ),
 };
+
+// A disabled control swaps its brand ring for a neutral one instead of
+// fading it — the neutral ring reads as "not interactive" on every ground,
+// where a faded brand ring would still read as interactive. Toggle the
+// toolbar theme to check both light and dark.
+export const ControlDisabledOnGrounds: TStory = {
+  name: 'Control — disabled, on every ground',
+  render: () => (
+    <div style={{ display: 'flex', gap: '1.5rem' }}>
+      <div
+        className="bg-primary"
+        style={{ padding: '1.5rem', borderRadius: '0.5rem' }}
+      >
+        <IconButton
+          variant="control"
+          tone={BRAND_VARIANT.PRIMARY}
+          ariaLabel="Next slide"
+          title="Next slide"
+          isDisabled={true}
+        >
+          <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
+        </IconButton>
+      </div>
+      <div
+        className="bg-secondary"
+        style={{ padding: '1.5rem', borderRadius: '0.5rem' }}
+      >
+        <IconButton
+          variant="control"
+          tone={BRAND_VARIANT.SECONDARY}
+          ariaLabel="Next slide"
+          title="Next slide"
+          isDisabled={true}
+        >
+          <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
+        </IconButton>
+      </div>
+      <div
+        className="bg-brand-primary-muted"
+        style={{ padding: '1.5rem', borderRadius: '0.5rem' }}
+      >
+        <IconButton
+          variant="control"
+          tone={BRAND_VARIANT.BRAND_PRIMARY}
+          ariaLabel="Next slide"
+          title="Next slide"
+          isDisabled={true}
+        >
+          <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
+        </IconButton>
+      </div>
+    </div>
+  ),
+};

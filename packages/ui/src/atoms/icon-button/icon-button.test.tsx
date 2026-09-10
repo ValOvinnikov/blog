@@ -38,4 +38,27 @@ describe(`<${IconButton.name}/>`, () => {
     expect(button).toHaveClass('focus-visible:ring-brand-primary');
     expect(button).not.toHaveClass('focus-visible:ring-brand-primary-contrast');
   });
+
+  it('swaps the control variant to a neutral disabled outline instead of the base fade', () => {
+    setup({
+      ariaLabel: 'Next slide',
+      variant: 'control',
+      isDisabled: true,
+      children: <span />,
+    });
+    const button = screen.getByRole('button', { name: 'Next slide' });
+    expect(button).toHaveClass(
+      'disabled:opacity-100',
+      'disabled:border-border-strong',
+      'disabled:text-muted',
+    );
+    expect(button).not.toHaveClass('disabled:opacity-50');
+  });
+
+  it('keeps the base 50% fade for the default variant when disabled', () => {
+    setup({ ariaLabel: 'Toggle theme', isDisabled: true, children: <span /> });
+    const button = screen.getByRole('button', { name: 'Toggle theme' });
+    expect(button).toHaveClass('disabled:opacity-50');
+    expect(button).not.toHaveClass('disabled:opacity-100');
+  });
 });

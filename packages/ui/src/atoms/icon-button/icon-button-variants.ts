@@ -52,6 +52,11 @@ export const iconButtonVariants = tv({
         // that never fills at rest or on hover — keep it transparent here
         // so only the ring itself signals focus.
         'focus-visible:bg-transparent',
+        // A brand-tone ring reads as interactive, so disabling this
+        // variant swaps it for a neutral one instead of fading it — the
+        // base's 50% opacity is overridden here, its pointer-events-none
+        // still applies.
+        'disabled:opacity-100 disabled:border-border-strong disabled:text-muted',
       ],
     },
     tone: {
