@@ -770,11 +770,14 @@ every sub-issue):**
   `isTenantActive()` gate.
 - **Grid vs. carousel is a display option on listing modules, not two
   modules.** Data scope (which posts, how many) is the one-module-per-mode
-  axis; presentation is a per-instance field, like CTA's `variant`. Carousel
-  uses **Embla** (`embla-carousel-react`) in an `apps/web` client leaf; the
-  `@blog/ui` organism stays pure and renders a scroll-snap track that works
-  before hydration. No autoplay, reduced motion honoured, previous/next
-  buttons for keyboard reach.
+  axis; presentation is a per-instance field, like CTA's `variant`. The
+  `@blog/ui` `Carousel` organism **owns Embla** (`embla-carousel-react`) —
+  hook, buttons, disabled flags, the pre-hydration scroll-snap track and
+  the handoff — with no `'use client'` of its own; a thin `apps/web`
+  wrapper declares the boundary and supplies the labels (the `SanityImage`
+  shape). Both are generic: a slide is any child, so the gallery reuses
+  them. No autoplay, reduced motion honoured, previous/next buttons for
+  keyboard reach.
 - **Blog first.** Phase 0 (make the home page generic) and Phase 1 (the blog
   modules) are `prio:next`; Phases 2–4 are `prio:later` until Phase 1 ships.
 
@@ -991,21 +994,24 @@ latest view models` — `postCardFragment` already carries `heroImageSanity`
   `module_postLatest` and `module_postFeatured` (not `module_postList`,
   which paginates), `initialValue: GRID` with no `required()` and
   `coalesce(displayMode, "GRID")` at read time, so every existing document
-  stays a grid with no migration. A pure `Carousel` organism in `@blog/ui`
-  (viewport `viewportRef`; `isEnhanced` swaps native scroll-snap for
-  Embla's clipping; `Carousel.Controls` with labels, handlers and disabled
-  state as props) and a `PostsSection.Carousel` slot that renders the
-  section's own cards as slides and ignores `hasLead`. The `apps/web`
-  `PostsCarousel` client leaf owns Embla — `align: 'start'`,
-  `slidesToScroll: 1`, `containScroll: 'trimSnaps'`, `dragFree` and `loop`
-  off, `duration: 0` under `prefers-reduced-motion`, no autoplay — and
-  carries the reader's pre-hydration scroll offset across `init`. Slides
-  match the grid's columns (85 % below `sm`, ½ at `sm`, ⅓ from `md`);
-  controls always render and are disabled exactly when Embla cannot move;
-  every card stays in the tab order and the viewport follows focus.
-  `embla-carousel-react@8.6.0`, pinned to the v8 major (the 9.0 rc renames
-  the methods). One Studio warning: a `module_postLatest` carousel with
-  `limit` < 4.
+  stays a grid with no migration. Re-cut 2026-09-10: the `@blog/ui`
+  `Carousel` organism **owns Embla** — `useEmblaCarousel` (`align:
+'start'`, `slidesToScroll: 1`, `containScroll: 'trimSnaps'`, `dragFree`
+  and `loop` off, `duration: 0` under `prefers-reduced-motion`, no
+  autoplay), the previous/next buttons, the disabled flags, an internal
+  `isEnhanced` that swaps the native scroll-snap track for Embla's clipping
+  on `init`, and the pre-hydration scroll-offset handoff — with **no
+  `'use client'` of its own**; it is the design system's one hook-bearing
+  component (`ui-library-practices`, `ui.md` and `SPEC.md` §4 record the
+  exception). A thin `apps/web` `Carousel` wrapper (the `SanityImage`
+  shape) declares the boundary and reads the two labels. Both are
+  generic: a slide is any child, `slideSize` is `columns` (85 % below
+  `sm`, ½ at `sm`, ⅓ from `md` — the grid's own) or `full` (one per view,
+  for the gallery). Controls always render and are disabled exactly when
+  Embla cannot move; every slide stays in the tab order and the viewport
+  follows focus. `embla-carousel-react@8.6.0` in `packages/ui`, pinned to
+  the v8 major (the 9.0 rc renames the methods). One Studio warning: a
+  `module_postLatest` carousel with `limit` < 4.
 - **Sub-issues** (ui first and independent; config + studio as one PR
   because knip fails on the bare `DISPLAY_MODE` export; then service; then
   web — each merges green alone; the `module_postFeatured` half waits on
@@ -1015,13 +1021,16 @@ latest view models` — `postCardFragment` already carries `heroImageSanity`
     — shared `displayModeField()` helper, the `limit` warning, typegen.
   - **service** · `feat(service): project displayMode` (#2838) — the
     coalesced projection on both teasers.
-  - **ui** · `feat(ui): Carousel organism — pure scroll-snap track with
-prev/next slots` (#2839) — plus the `PostsSection.Carousel` slot; works
-    before hydration; buttons and disabled states are props.
-  - **web** · `feat(web): Embla client leaf wrapping the Carousel organism`
-    (#2840) — `embla-carousel-react` added to `apps/web` only; the
-    `displayMode` branch in `PostListModuleView`; `carousel.previousAriaLabel` /
-    `carousel.nextAriaLabel` fixed copy; web Storybook story.
+  - **ui** · `feat(ui): Carousel organism owning Embla, generic slides,
+slideSize` (#2839) — `embla-carousel-react` added to `packages/ui`; hook,
+    buttons, flags and handoff internal; no directive; the governance
+    amendments; PR #2925 reworked in place (drops its `posts-section`
+    changes and the `Controls` slot).
+  - **web** · `feat(web): 'use client' Carousel wrapper and the displayMode
+branch in both teaser views` (#2840) — the wrapper reads
+    `carousel.previousAriaLabel` / `carousel.nextAriaLabel`; `CAROUSEL`
+    renders it with one `PostCardItem` per item in `PostLatestModuleView`
+    and `PostFeaturedModuleView`; web Storybook story.
 - **PRs:** ui → config + studio → service → web.
 - **Acceptance:** grid remains the default for every existing document;
   carousel mode swipes without JavaScript and is Embla-driven with it, and
@@ -1089,9 +1098,10 @@ when present` — one query resolving module and terms, `fallbackTaxonomy`
 
 #### 1.7 Page composition — epic #2943 `refactor(web): pages are chrome, a heading and modules; retire PostsSection`
 
-- **Depends on:** 1.3 (shipped). **Blocks:** 1.4's ui and web sub-issues
-  (#2839 drops its `PostsSection.Carousel` slot; #2840 composes `Carousel`
-  inside the latest and featured modules).
+- **Depends on:** 1.3 (shipped). **Blocks:** 1.4's web sub-issue (#2840
+  branches on `displayMode` inside `PostLatestModuleView` and
+  `PostFeaturedModuleView`, the per-module views this epic created); the
+  ui sub-issue (#2839) is independent of it.
 - **Why:** every page fetches and pre-computes for all of its sections and
   hands a 31-prop bag to a "view"; `PostsSection` carries a prop for every
   listing variant a page ever needed; related reading and the post-foot
