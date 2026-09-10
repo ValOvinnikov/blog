@@ -1,6 +1,7 @@
 import {
   isHeroModuleType,
   type THeroModuleType,
+  type TMaybeUndefined,
   type TModuleType,
 } from '@blog/config';
 import type { moduleFragment } from '@blog/service/shared/fragments/module';
@@ -28,7 +29,11 @@ export class InvalidHeroModuleTypeError extends Error {
   }
 }
 
-export function toHeroSlot(raw: TRawModule): TModule<THeroModuleType> {
+export function toHeroSlot(
+  raw: TRawModule | null | undefined,
+): TMaybeUndefined<TModule<THeroModuleType>> {
+  if (!raw) return undefined;
+
   if (!isHeroModuleType(raw._type)) {
     throw new InvalidHeroModuleTypeError(raw._type);
   }

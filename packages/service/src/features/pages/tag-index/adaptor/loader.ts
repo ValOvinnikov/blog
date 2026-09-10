@@ -1,5 +1,4 @@
 import type { TMaybeUndefined } from '@blog/config';
-import { getSiteSettings } from '@blog/service/features/global/site-settings/adaptor/loader';
 import {
   isr,
   runQuery,
@@ -19,6 +18,5 @@ export async function getIndexPage(
   });
   if (!rawPage) return undefined;
 
-  const settings = await getSiteSettings(tenant);
-  return toTagIndexPage(rawPage, settings, tenant);
+  return toTagIndexPage(rawPage, tenant);
 }

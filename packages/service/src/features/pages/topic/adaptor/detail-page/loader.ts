@@ -1,5 +1,4 @@
 import type { TMaybeUndefined } from '@blog/config';
-import { getSiteSettings } from '@blog/service/features/global/site-settings/adaptor/loader';
 import {
   isr,
   runQuery,
@@ -24,6 +23,5 @@ export async function getTopicPage(
   });
   if (!rawPage) return undefined;
 
-  const settings = await getSiteSettings(tenant);
-  return toTopicDetailPage(rawPage, settings, tenant);
+  return toTopicDetailPage(rawPage, tenant);
 }

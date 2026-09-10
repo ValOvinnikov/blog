@@ -17,6 +17,7 @@ import {
   makeRawImage,
   makeRawOptionalHeadingBlock,
   makeRawSanityImage,
+  makeRawSeo,
 } from '@blog/service/testing/shared/fixtures';
 
 export function makeRawAuthor(
@@ -102,7 +103,7 @@ export function makeRawPostDetail(
     featured: false,
     body: [],
     skim: null,
-    seo: null,
+    seo: makeRawSeo(),
     author: makeRawAuthor(),
     topic: {
       _id: 'topic-1',
@@ -127,7 +128,7 @@ export function makeRawHomePage(
       { _id: 'post-latest-1', _type: 'module_postLatest' },
       { _id: 'cta-1', _type: 'module_cta' },
     ],
-    seo: null,
+    seo: makeRawSeo(),
     ...overrides,
   };
 }
@@ -142,7 +143,7 @@ export function makeRawBlogPage(
     }),
     hero: null,
     modules: [],
-    seo: null,
+    seo: makeRawSeo(),
     ...overrides,
   };
 }
@@ -154,7 +155,7 @@ export function makeRawTopicIndexPage(
     headingBlock: makeRawOptionalHeadingBlock({ heading: 'Browse by topic' }),
     hero: null,
     modules: [{ _id: 'taxonomy-list-1', _type: 'module_taxonomyList' }],
-    seo: null,
+    seo: makeRawSeo(),
     ...overrides,
   };
 }
@@ -166,7 +167,7 @@ export function makeRawTagIndexPage(
     headingBlock: makeRawOptionalHeadingBlock({ heading: 'Browse by tag' }),
     hero: null,
     modules: [{ _id: 'taxonomy-list-1', _type: 'module_taxonomyList' }],
-    seo: null,
+    seo: makeRawSeo(),
     ...overrides,
   };
 }
@@ -179,7 +180,7 @@ export function makeRawTopicPage(
     headingBlock: null,
     hero: null,
     modules: [{ _id: 'post-list-1', _type: 'module_postList' }],
-    seo: null,
+    seo: makeRawSeo(),
     ...overrides,
   };
 }
@@ -192,7 +193,7 @@ export function makeRawTagPage(
     headingBlock: null,
     hero: null,
     modules: [{ _id: 'post-list-1', _type: 'module_postList' }],
-    seo: null,
+    seo: makeRawSeo(),
     ...overrides,
   };
 }
@@ -208,7 +209,7 @@ export function makeRawLandingPage(
       { _id: 'content-1', _type: 'module_content' },
       { _id: 'cta-1', _type: 'module_cta' },
     ],
-    seo: null,
+    seo: makeRawSeo(),
     ...overrides,
   };
 }

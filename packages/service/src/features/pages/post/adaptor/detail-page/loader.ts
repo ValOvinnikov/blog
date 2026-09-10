@@ -1,5 +1,4 @@
 import type { TMaybeUndefined } from '@blog/config';
-import { getSiteSettings } from '@blog/service/features/global/site-settings/adaptor/loader';
 import {
   isr,
   runQuery,
@@ -16,15 +15,12 @@ export async function getPost(
 ): Promise<TMaybeUndefined<TPostDetail>> {
   // `postPageQuery` derefs `author`/`topic`/`tags[]` — all three tags must
   // ride alongside `page_post` (tag-scope contract, `sanity/query.ts`).
-  const [raw, settings] = await Promise.all([
-    runQuery(postPageQuery, {
-      parameters: { slug },
-      tenant,
-      ...isr(['page_post', 'author', 'topic', 'tag'], tenant.projectId),
-    }),
-    getSiteSettings(tenant),
-  ]);
+  const raw = await runQuery(postPageQuery, {
+    parameters: { slug },
+    tenant,
+    ...isr(['page_post', 'author', 'topic', 'tag'], tenant.projectId),
+  });
   if (!raw) return undefined;
 
-  return toPostDetail(raw, settings, tenant);
+  return toPostDetail(raw, tenant);
 }

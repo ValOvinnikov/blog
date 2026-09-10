@@ -1,7 +1,5 @@
-import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
 import type { TImageTenant } from '@blog/service/sanity/image';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
-import { toContentTitle } from '@blog/service/shared/transformers/to-content-title';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import {
   toHeroSlot,
@@ -16,23 +14,12 @@ export type TRawBlogPage = NonNullable<InferResultType<typeof blogPageQuery>>;
 
 export function toIndexPage(
   rawPage: TRawBlogPage,
-  settings: TSiteSettings,
   tenant: TImageTenant,
 ): TBlogIndexPage {
-  const headingBlock = toHeadingBlock(rawPage.headingBlock);
-
   return {
-    headingBlock,
-    hero: rawPage.hero ? toHeroSlot(rawPage.hero) : undefined,
+    headingBlock: toHeadingBlock(rawPage.headingBlock),
+    hero: toHeroSlot(rawPage.hero),
     modules: (rawPage.modules ?? []).map(toModule),
-    seo: resolveSeo(
-      rawPage.seo ?? undefined,
-      { title: toContentTitle(headingBlock.heading, settings.brand.name) },
-      {
-        description: settings.description,
-        defaultOgImageUrl: settings.defaultOgImageUrl,
-      },
-      tenant,
-    ),
+    seo: resolveSeo(rawPage.seo ?? undefined, tenant),
   };
 }

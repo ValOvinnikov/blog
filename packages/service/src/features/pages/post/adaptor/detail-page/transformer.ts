@@ -1,5 +1,4 @@
 import type { TMaybeUndefined } from '@blog/config';
-import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
 import type { TImageTenant } from '@blog/service/sanity/image';
 import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
@@ -57,7 +56,6 @@ function toPostSkim(raw: TRawPostDetail['skim']): TMaybeUndefined<TPostSkim> {
 
 export function toPostDetail(
   raw: TRawPostDetail,
-  settings: TSiteSettings,
   tenant: TImageTenant,
 ): TPostDetail {
   const heroImageUrl = buildImageUrl(raw.heroImage, tenant);
@@ -76,19 +74,7 @@ export function toPostDetail(
     body: toPortableTextBody(raw.body, tenant),
     skim: toPostSkim(raw.skim),
     hasAsides: raw.body.some((block) => block._type === 'aside'),
-    seo: resolveSeo(
-      raw.seo ?? undefined,
-      {
-        title,
-        description: excerpt,
-        imageUrl: heroImageUrl,
-      },
-      {
-        description: settings.description,
-        defaultOgImageUrl: settings.defaultOgImageUrl,
-      },
-      tenant,
-    ),
+    seo: resolveSeo(raw.seo ?? undefined, tenant),
     author: toPostDetailAuthor(raw.author, tenant),
     topic: toTopic(raw.topic),
     tags: (raw.tags ?? []).map(toTag),
