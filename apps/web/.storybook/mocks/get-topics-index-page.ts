@@ -1,5 +1,6 @@
 import type { TTopicIndexPage } from '@blog/service';
-import type { TResult } from '@blog/utils';
+
+import { makeIndexPageLoader } from './index-page-fixtures';
 
 const seo: TTopicIndexPage['seo'] = {
   title: 'Topics',
@@ -33,9 +34,7 @@ const withoutHero: TTopicIndexPage = {
  * the exact specifier to this module). Selects between a hero and a plain
  * heading by the `tenant` argument each story already passes in as an arg.
  */
-export const getTopicsIndexPage = async (
-  tenant: string,
-): Promise<TResult<TTopicIndexPage | undefined>> => ({
-  ok: true,
-  data: tenant === 'tenant-with-hero' ? withHero : withoutHero,
+export const getTopicsIndexPage = makeIndexPageLoader({
+  withHero,
+  withoutHero,
 });
