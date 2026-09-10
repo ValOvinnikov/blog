@@ -34,6 +34,8 @@ export const VOICE_FIXED_KEYS = [
   'bookmarkButton.removeAriaLabel',
   'accountPage.privacy.deleteConfirmAriaLabel',
   'accountPage.identity.displayNameAriaLabel',
+  'taxonomyListModule.topics.latestPostsLabel',
+  'taxonomyListModule.tags.latestPostsLabel',
   'carousel.previousAriaLabel',
   'carousel.nextAriaLabel',
   'carousel.regionLabel',

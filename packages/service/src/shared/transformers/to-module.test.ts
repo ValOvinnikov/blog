@@ -22,4 +22,12 @@ describe('toHeroSlot', () => {
       InvalidHeroModuleTypeError,
     );
   });
+
+  it('returns undefined when the reference is null', () => {
+    expect(toHeroSlot(null)).toBeUndefined();
+  });
+
+  it('returns undefined when the reference is undefined', () => {
+    expect(toHeroSlot(undefined)).toBeUndefined();
+  });
 });

@@ -1,5 +1,8 @@
 import { q } from '@blog/service/sanity/query';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
+import {
+  POST_COUNT_EXPRESSION,
+  postCountParser,
+} from '@blog/service/shared/fragments/post-count';
 import { tagFragment } from '@blog/service/shared/fragments/tag';
 
 export const tagsQuery = q.star
@@ -8,14 +11,5 @@ export const tagsQuery = q.star
   .project((sub) => ({
     ...tagFragment,
     description: sub.field('description').nullable(true),
-    // `references(^._id)` matches regardless of whether the referencing field
-    // is a single reference or (as `page_post.tags` is) an array of them.
-    postCount: sub
-      .count(
-        sub.star
-          .filterByType('page_post')
-          .filterRaw('references(^._id)')
-          .filterRaw(PUBLISHED_POST_FILTER),
-      )
-      .notNull(true),
+    postCount: sub.raw(POST_COUNT_EXPRESSION, postCountParser),
   }));

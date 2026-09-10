@@ -19,7 +19,7 @@ export type TTagDetailPageTag = {
 export type TTagDetailPage = {
   tag: TTagDetailPageTag;
   headingBlock: THeadingBlock;
-  hero?: TModule<THeroModuleType>;
+  hero: TMaybeUndefined<TModule<THeroModuleType>>;
   modules: TModule[];
   seo: TSeoResolved;
 };

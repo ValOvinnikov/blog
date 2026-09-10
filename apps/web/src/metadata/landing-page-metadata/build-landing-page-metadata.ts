@@ -5,10 +5,8 @@ import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 
 /**
- * Metadata for a `/[slug]` standalone page (`page_landing`). Unlike
- * `TTopic`, `TLandingPage.seo` is already a fully-resolved `TSeoResolved`
- * (authored → content → site defaults), so this maps it straight through
- * `toMetadata` rather than building fallback fields itself.
+ * Metadata for a `/[slug]` standalone page (`page_landing`), mapping its
+ * authored `seo` straight through `toMetadata`.
  *
  * Reads the same cached `getLandingPage` loader the route's own
  * `LandingPage` composition reads, so building metadata costs no second

@@ -121,6 +121,7 @@ export type {
   TPostCardTopic,
 } from './shared/transformers/to-post-card';
 export type { TRequiredHeadingBlock } from './shared/transformers/to-heading-block';
+export type { TPostLink } from './shared/transformers/to-post-link';
 export type { TSeoResolved } from './shared/transformers/resolve-seo';
 export type { TSocialLink } from './shared/transformers/to-social-link';
 export type { TTag } from './shared/transformers/to-tag';

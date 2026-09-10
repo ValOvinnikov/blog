@@ -6,11 +6,13 @@ import {
   TAXONOMY_SORT,
 } from '@blog/config';
 import {
-  makeRawTagWithPostCount,
-  makeRawTopicWithPostCount,
-} from '@blog/service/testing/entities/fixtures';
-import { makeRawTaxonomyListModule } from '@blog/service/testing/modules/fixtures';
-import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
+  makeRawTaxonomyEntry,
+  makeRawTaxonomyListModule,
+} from '@blog/service/testing/modules/fixtures';
+import {
+  makeRawHeadingBlock,
+  makeRawPostLink,
+} from '@blog/service/testing/shared/fixtures';
 
 import { toTaxonomyListModule } from './transformer';
 
@@ -102,9 +104,7 @@ describe('toTaxonomyListModule', () => {
   it('maps topic entries when the resolved taxonomy is TOPICS', () => {
     const raw = makeRawTaxonomyListModule({
       taxonomy: TAXONOMY_KIND.TOPICS,
-      entries: [
-        makeRawTopicWithPostCount({ _id: 'topic-1', title: 'Engineering' }),
-      ],
+      entries: [makeRawTaxonomyEntry({ _id: 'topic-1', title: 'Engineering' })],
     });
 
     const module = toTaxonomyListModule(raw);
@@ -117,6 +117,7 @@ describe('toTaxonomyListModule', () => {
         slug: 'engineering',
         description: 'Engineering posts',
         postCount: 0,
+        latestPosts: [],
       },
     ]);
   });
@@ -124,7 +125,7 @@ describe('toTaxonomyListModule', () => {
   it('maps tag entries when the resolved taxonomy is TAGS', () => {
     const raw = makeRawTaxonomyListModule({
       taxonomy: TAXONOMY_KIND.TAGS,
-      entries: [makeRawTagWithPostCount({ _id: 'tag-1', title: 'TypeScript' })],
+      entries: [makeRawTaxonomyEntry({ _id: 'tag-1', title: 'TypeScript' })],
     });
 
     const module = toTaxonomyListModule(raw);
@@ -134,9 +135,10 @@ describe('toTaxonomyListModule', () => {
       {
         id: 'tag-1',
         title: 'TypeScript',
-        slug: 'typescript',
-        description: 'TypeScript posts',
+        slug: 'engineering',
+        description: 'Engineering posts',
         postCount: 0,
+        latestPosts: [],
       },
     ]);
   });
@@ -154,8 +156,8 @@ describe('toTaxonomyListModule', () => {
       taxonomy: TAXONOMY_KIND.TOPICS,
       sortOrder: TAXONOMY_SORT.ALPHABETICAL,
       entries: [
-        makeRawTopicWithPostCount({ _id: 'topic-1', title: 'Alpha' }),
-        makeRawTopicWithPostCount({ _id: 'topic-2', title: 'Beta' }),
+        makeRawTaxonomyEntry({ _id: 'topic-1', title: 'Alpha' }),
+        makeRawTaxonomyEntry({ _id: 'topic-2', title: 'Beta' }),
       ],
     });
 
@@ -172,17 +174,17 @@ describe('toTaxonomyListModule', () => {
       taxonomy: TAXONOMY_KIND.TOPICS,
       sortOrder: TAXONOMY_SORT.MOST_POSTS,
       entries: [
-        makeRawTopicWithPostCount({
+        makeRawTaxonomyEntry({
           _id: 'topic-1',
           title: 'Beta',
           postCount: 3,
         }),
-        makeRawTopicWithPostCount({
+        makeRawTaxonomyEntry({
           _id: 'topic-2',
           title: 'Gamma',
           postCount: 5,
         }),
-        makeRawTopicWithPostCount({
+        makeRawTaxonomyEntry({
           _id: 'topic-3',
           title: 'Alpha',
           postCount: 3,
@@ -204,8 +206,8 @@ describe('toTaxonomyListModule', () => {
       taxonomy: TAXONOMY_KIND.TOPICS,
       limit: 1,
       entries: [
-        makeRawTopicWithPostCount({ _id: 'topic-1', title: 'Alpha' }),
-        makeRawTopicWithPostCount({ _id: 'topic-2', title: 'Beta' }),
+        makeRawTaxonomyEntry({ _id: 'topic-1', title: 'Alpha' }),
+        makeRawTaxonomyEntry({ _id: 'topic-2', title: 'Beta' }),
       ],
     });
 
@@ -220,13 +222,86 @@ describe('toTaxonomyListModule', () => {
       taxonomy: TAXONOMY_KIND.TOPICS,
       limit: null,
       entries: [
-        makeRawTopicWithPostCount({ _id: 'topic-1', title: 'Alpha' }),
-        makeRawTopicWithPostCount({ _id: 'topic-2', title: 'Beta' }),
+        makeRawTaxonomyEntry({ _id: 'topic-1', title: 'Alpha' }),
+        makeRawTaxonomyEntry({ _id: 'topic-2', title: 'Beta' }),
       ],
     });
 
     const module = toTaxonomyListModule(raw);
 
     expect(module.entries).toHaveLength(2);
+  });
+
+  it('maps two latest posts per entry, newest first as returned by the query', () => {
+    const raw = makeRawTaxonomyListModule({
+      taxonomy: TAXONOMY_KIND.TOPICS,
+      entries: [
+        makeRawTaxonomyEntry({
+          _id: 'topic-1',
+          latestPosts: [
+            makeRawPostLink({
+              _id: 'post-2',
+              headingBlock: { heading: 'Newer post' },
+              slug: 'newer-post',
+            }),
+            makeRawPostLink({
+              _id: 'post-1',
+              headingBlock: { heading: 'Older post' },
+              slug: 'older-post',
+            }),
+          ],
+        }),
+      ],
+    });
+
+    const module = toTaxonomyListModule(raw);
+
+    expect(module.entries[0]?.latestPosts).toEqual([
+      { id: 'post-2', title: 'Newer post', slug: 'newer-post' },
+      { id: 'post-1', title: 'Older post', slug: 'older-post' },
+    ]);
+  });
+
+  it('maps a single latest post per entry', () => {
+    const raw = makeRawTaxonomyListModule({
+      taxonomy: TAXONOMY_KIND.TOPICS,
+      entries: [
+        makeRawTaxonomyEntry({
+          _id: 'topic-1',
+          latestPosts: [makeRawPostLink({ _id: 'post-1' })],
+        }),
+      ],
+    });
+
+    const module = toTaxonomyListModule(raw);
+
+    expect(module.entries[0]?.latestPosts).toHaveLength(1);
+  });
+
+  it('leaves latestPosts empty for a term with no posts', () => {
+    const raw = makeRawTaxonomyListModule({
+      taxonomy: TAXONOMY_KIND.TOPICS,
+      entries: [makeRawTaxonomyEntry({ _id: 'topic-1', latestPosts: [] })],
+    });
+
+    const module = toTaxonomyListModule(raw);
+
+    expect(module.entries[0]?.latestPosts).toEqual([]);
+  });
+
+  it('passes showLatestPosts through when authored false', () => {
+    const raw = makeRawTaxonomyListModule({ showLatestPosts: false });
+
+    const module = toTaxonomyListModule(raw);
+
+    expect(module.showLatestPosts).toBe(false);
+  });
+
+  it('passes showLatestPosts through when authored true', () => {
+    const raw = makeRawTaxonomyListModule({ showLatestPosts: true });
+
+    const module = toTaxonomyListModule(raw);
+
+    expect(module.showLatestPosts).toBe(true);
   });
 });

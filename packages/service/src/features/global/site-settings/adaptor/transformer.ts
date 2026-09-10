@@ -30,6 +30,5 @@ export function toSiteSettings(
     },
     description: raw.description,
     tagline: raw.tagline ?? undefined,
-    defaultOgImageUrl: buildImageUrl(raw.defaultOgImage, tenant),
   };
 }

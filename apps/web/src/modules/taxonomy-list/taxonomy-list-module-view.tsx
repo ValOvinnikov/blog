@@ -8,12 +8,20 @@ import { SmartLink } from '@web/components/shared/smart-link';
 
 import { taxonomyListModuleViewVariants } from './taxonomy-list-module-view-variants';
 
+type TTaxonomyListModulePost = {
+  id: string;
+  title: string;
+  href: string;
+};
+
 export interface ITaxonomyListModuleItem {
   id: string;
   title: string;
   description?: string;
   postCountLabel: string;
   href: string;
+  posts: TTaxonomyListModulePost[];
+  latestPostsLabel: string;
 }
 
 export interface ITaxonomyListModuleViewProps extends Omit<
@@ -52,6 +60,7 @@ export const TaxonomyListModuleView = ({
   accessibleTitle,
   emptyMessage,
   contentAlignment,
+  showLatestPosts,
 }: ITaxonomyListModuleViewProps) => {
   const isEmpty = items.length === 0;
   const s = taxonomyListModuleViewVariants();
@@ -83,7 +92,14 @@ export const TaxonomyListModuleView = ({
               href={item.href}
               headingLevel={3}
               linkAs={SmartLink}
-            />
+            >
+              {showLatestPosts && item.posts.length > 0 && (
+                <TaxonomyCard.Posts
+                  posts={item.posts}
+                  ariaLabel={item.latestPostsLabel}
+                />
+              )}
+            </TaxonomyCard>
           ))}
         </PostGrid>
       )}

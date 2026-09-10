@@ -55,8 +55,6 @@ describe('proxy matcher', () => {
     const matcher = buildMatcherRegExp();
 
     expect(matcher.test('/icon')).toBe(false);
-    expect(matcher.test('/opengraph-image')).toBe(false);
-    expect(matcher.test('/twitter-image')).toBe(false);
   });
 
   it('still rewrites real content routes through locale middleware', () => {

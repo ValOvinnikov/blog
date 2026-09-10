@@ -123,3 +123,32 @@ describe('taxonomyListSchema limit field', () => {
     expect(minValue).toBe(1);
   });
 });
+
+describe('taxonomyListSchema showLatestPosts field', () => {
+  it('is a boolean field positioned immediately after limit', () => {
+    const names = taxonomyListSchema.fields?.map((field) =>
+      'name' in field ? field.name : undefined,
+    );
+    const limitIndex = names?.indexOf('limit');
+    const showLatestPostsIndex = names?.indexOf('showLatestPosts');
+
+    expect(showLatestPostsIndex).toBe((limitIndex ?? -1) + 1);
+
+    const field = getField('showLatestPosts');
+    expect(field.type).toBe('boolean');
+  });
+
+  it('defaults to true', () => {
+    const field = getField('showLatestPosts');
+
+    expect(field.initialValue).toBe(true);
+  });
+
+  it('defines no validation rule — it is optional so existing documents are not invalidated', () => {
+    const field = getField('showLatestPosts');
+
+    expect(
+      'validation' in field ? field.validation : undefined,
+    ).toBeUndefined();
+  });
+});

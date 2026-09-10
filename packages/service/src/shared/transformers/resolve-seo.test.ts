@@ -1,7 +1,7 @@
 import { makeRawImage } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
-import { type TRawSeo, resolveSeo } from './resolve-seo';
+import { MissingSeoTitleError, resolveSeo, type TRawSeo } from './resolve-seo';
 
 vi.mock('@blog/service/sanity/image', () => ({
   urlForImage: vi.fn(
@@ -10,16 +10,6 @@ vi.mock('@blog/service/sanity/image', () => ({
 }));
 
 const tenant = makeTenant();
-
-const content = {
-  title: 'Content title',
-  description: 'Content description',
-  imageUrl: 'https://cdn.sanity.io/content.jpg',
-};
-const settings = {
-  description: 'Settings description',
-  defaultOgImageUrl: 'https://cdn.sanity.io/settings.jpg',
-};
 
 function makeAuthoredSeo(overrides: Partial<TRawSeo> = {}): TRawSeo {
   return {
@@ -36,7 +26,7 @@ function makeAuthoredSeo(overrides: Partial<TRawSeo> = {}): TRawSeo {
 
 describe(resolveSeo, () => {
   it('uses authored values when present', () => {
-    const result = resolveSeo(makeAuthoredSeo(), content, settings, tenant);
+    const result = resolveSeo(makeAuthoredSeo(), tenant);
 
     expect(result.title).toBe('Authored title');
     expect(result.description).toBe('Authored description');
@@ -45,90 +35,57 @@ describe(resolveSeo, () => {
     expect(result.ogImageUrl).toContain('sanity.io');
   });
 
-  it('falls back to content-derived defaults when unauthored', () => {
-    const result = resolveSeo(undefined, content, settings, tenant);
-
-    expect(result.title).toBe('Content title');
-    expect(result.description).toBe('Content description');
-    expect(result.ogImageUrl).toBe(content.imageUrl);
-  });
-
-  it('bottoms out at site settings when neither authored nor content-derived', () => {
+  it('leaves metaDescription undefined when unauthored, with no fallback', () => {
     const result = resolveSeo(
-      undefined,
-      { title: 'Content title' },
-      settings,
+      makeAuthoredSeo({ metaDescription: null }),
       tenant,
     );
 
-    expect(result.description).toBe(settings.description);
-    expect(result.ogImageUrl).toBe(settings.defaultOgImageUrl);
+    expect(result.description).toBeUndefined();
   });
 
-  it('yields an undefined ogImageUrl when no image resolves at any rung', () => {
+  it('leaves ogTitle/ogDescription undefined when unauthored, without inheriting the meta title/description', () => {
     const result = resolveSeo(
-      makeAuthoredSeo({ openGraph: null }),
-      { title: 'Content title' },
-      { description: 'Settings description', defaultOgImageUrl: undefined },
+      makeAuthoredSeo({
+        openGraph: { ogTitle: null, ogDescription: null, ogImage: null },
+      }),
+      tenant,
+    );
+
+    expect(result.ogTitle).toBeUndefined();
+    expect(result.ogDescription).toBeUndefined();
+  });
+
+  it('treats an absent openGraph object the same as an empty one', () => {
+    const result = resolveSeo(makeAuthoredSeo({ openGraph: null }), tenant);
+
+    expect(result.ogTitle).toBeUndefined();
+    expect(result.ogDescription).toBeUndefined();
+    expect(result.ogImageUrl).toBeUndefined();
+  });
+
+  it('leaves ogImageUrl undefined when unauthored, with no site or content fallback', () => {
+    const result = resolveSeo(
+      makeAuthoredSeo({
+        openGraph: { ogTitle: null, ogDescription: null, ogImage: null },
+      }),
       tenant,
     );
 
     expect(result.ogImageUrl).toBeUndefined();
   });
 
-  it('defaults ogTitle/ogDescription to the resolved title/description, not the raw authored openGraph', () => {
-    const result = resolveSeo(
-      makeAuthoredSeo({
-        openGraph: { ogTitle: null, ogDescription: null, ogImage: null },
-      }),
-      content,
-      settings,
-      tenant,
-    );
-
-    expect(result.ogTitle).toBe(result.title);
-    expect(result.ogDescription).toBe(result.description);
+  it('throws MissingSeoTitleError when no seo object is authored at all', () => {
+    expect(() => resolveSeo(undefined, tenant)).toThrow(MissingSeoTitleError);
   });
 
-  it('treats an absent openGraph object the same as an empty one', () => {
-    const result = resolveSeo(
-      makeAuthoredSeo({ openGraph: null }),
-      content,
-      settings,
-      tenant,
-    );
-
-    expect(result.ogTitle).toBe(result.title);
-    expect(result.ogDescription).toBe(result.description);
-    expect(result.ogImageUrl).toBe(content.imageUrl);
+  it('throws MissingSeoTitleError when the seo field is null', () => {
+    expect(() => resolveSeo(null, tenant)).toThrow(MissingSeoTitleError);
   });
 
-  it('resolves title ladder: authored wins over content title', () => {
-    const result = resolveSeo(
-      makeAuthoredSeo({ metaTitle: 'Authored title' }),
-      { title: 'Content title' },
-      settings,
-      tenant,
-    );
-
-    expect(result.title).toBe('Authored title');
-  });
-
-  it('resolves the ogImageUrl ladder: authored wins over content and settings', () => {
-    const result = resolveSeo(makeAuthoredSeo(), content, settings, tenant);
-
-    expect(result.ogImageUrl).not.toBe(content.imageUrl);
-    expect(result.ogImageUrl).not.toBe(settings.defaultOgImageUrl);
-  });
-
-  it('resolves the ogImageUrl ladder: content wins over settings when unauthored', () => {
-    const result = resolveSeo(
-      makeAuthoredSeo({ openGraph: null }),
-      content,
-      settings,
-      tenant,
-    );
-
-    expect(result.ogImageUrl).toBe(content.imageUrl);
+  it('throws MissingSeoTitleError when the seo object carries a blank metaTitle', () => {
+    expect(() =>
+      resolveSeo(makeAuthoredSeo({ metaTitle: '' }), tenant),
+    ).toThrow(MissingSeoTitleError);
   });
 });

@@ -76,6 +76,18 @@ describe('buildTopicMetadata', () => {
     expect(metadata.alternates?.canonical).not.toBe('/topics/engineering');
   });
 
+  it('leaves ogTitle omitted on page 2+ when unauthored, rather than suffixing "undefined"', async () => {
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: { topic: {}, modules: [], seo: makeSeo({ ogTitle: undefined }) },
+    });
+
+    const metadata = await buildTopicMetadata('engineering', 'tenant-1', 2);
+
+    expect(metadata.openGraph?.title).toBeUndefined();
+    expect(metadata.twitter?.title).toBeUndefined();
+  });
+
   it('returns empty metadata for page N when the topic fetch fails', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: false,

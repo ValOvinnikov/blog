@@ -39,6 +39,7 @@ const meta = {
     headingLevel: 2,
     accessibleTitle: 'Topics',
     emptyMessage: 'No topics yet.',
+    showLatestPosts: true,
   },
 } satisfies Meta<typeof TaxonomyListModuleView>;
 
@@ -77,6 +78,10 @@ export const WithoutCmsHeading: TStory = {
 
 export const Empty: TStory = {
   args: { items: [] },
+};
+
+export const WithoutLatestPosts: TStory = {
+  args: { showLatestPosts: false },
 };
 
 export const Secondary: TStory = {

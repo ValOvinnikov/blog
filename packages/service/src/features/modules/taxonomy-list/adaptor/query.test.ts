@@ -43,4 +43,27 @@ describe('taxonomyListModuleQuery', () => {
     expect(taxonomyListModuleQuery.query).toContain('_type == "blog_topic"');
     expect(taxonomyListModuleQuery.query).toContain('_type == "blog_tag"');
   });
+
+  it('defaults showLatestPosts to true at read time', () => {
+    expect(taxonomyListModuleQuery.query).toContain(
+      'coalesce(showLatestPosts, true)',
+    );
+  });
+
+  it('projects each entry post count via the shared published-post filter', () => {
+    expect(taxonomyListModuleQuery.query).toContain(
+      'count(*[_type == "page_post" && references(^._id) && publishedAt <= now() && defined(headingBlock.heading) && defined(author) && defined(topic) && defined(content)])',
+    );
+  });
+
+  it('orders latestPosts newest first, sliced to two, excluding scheduled posts', () => {
+    expect(taxonomyListModuleQuery.query).toContain(
+      '*[_type == "page_post"][references(^._id)][publishedAt <= now() && defined(headingBlock.heading) && defined(author) && defined(topic) && defined(content)] | order(publishedAt desc)[0...2]',
+    );
+  });
+
+  it('projects only the id, heading and slug for each latest post', () => {
+    expect(taxonomyListModuleQuery.query).toContain('"slug": slug.current');
+    expect(taxonomyListModuleQuery.query).not.toContain('wordCount');
+  });
 });

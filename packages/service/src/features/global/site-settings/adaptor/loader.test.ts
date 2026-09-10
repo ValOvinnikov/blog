@@ -161,26 +161,6 @@ describe('getSiteSettings', () => {
     expect(result.brand.specLine).toBeUndefined();
   });
 
-  it('maps the default OG image to a URL', async () => {
-    mockRun.mockResolvedValue(makeRawSiteSettings());
-
-    const result = await getSiteSettings(tenant);
-
-    expect(result.defaultOgImageUrl).toContain('sanity.io');
-  });
-
-  it('leaves defaultOgImageUrl undefined when no default OG image is uploaded', async () => {
-    mockRun.mockResolvedValue(
-      makeRawSiteSettings({
-        defaultOgImage: null,
-      }),
-    );
-
-    const result = await getSiteSettings(tenant);
-
-    expect(result.defaultOgImageUrl).toBeUndefined();
-  });
-
   it('leaves logoUrl undefined when no logo is uploaded (D7 fallback)', async () => {
     mockRun.mockResolvedValue(
       makeRawSiteSettings({

@@ -3063,14 +3063,6 @@
           "type": "string"
         },
         "optional": true
-      },
-      "defaultOgImage": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "imageWithAlt"
-        },
-        "optional": true
       }
     }
   },
@@ -4116,6 +4108,13 @@
         },
         "optional": true
       },
+      "showLatestPosts": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
       "headingBlock": {
         "type": "objectAttribute",
         "value": {
@@ -4597,14 +4596,6 @@
         "type": "objectAttribute",
         "value": {
           "type": "string"
-        },
-        "optional": true
-      },
-      "seo": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "seo"
         },
         "optional": true
       }

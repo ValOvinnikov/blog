@@ -13,24 +13,29 @@ Target Lighthouse SEO ≥ 95. Canonical origin comes from the resolved tenant's
 `primaryDomain`, falling back to `NEXT_PUBLIC_SITE_URL` (`getTenantBaseUrl()`,
 feeding `metadataBase` in `[locale]/layout.tsx`).
 
-**The service layer owns SEO resolution.** Page view-models from
-`@blog/service` carry a fully-resolved `seo: TSeoResolved` — the fallback
-ladder (authored `seo` overrides → content fields → site defaults) has already
-been applied, every field non-empty:
+**The service layer owns SEO resolution, and it is authored-only.** Page
+view-models from `@blog/service` carry `seo: TSeoResolved` holding exactly
+what an editor typed. There is **no fallback ladder** — no content-derived
+tier, no site defaults. Anything unauthored is `undefined` and must be
+**omitted** from the document head, never emitted as an empty tag:
 
 ```ts
 type TSeoResolved = {
   title: string; // page-part only — the layout template appends "| Brand"
-  description: string;
-  ogTitle: string;
-  ogDescription: string;
-  ogImageUrl: string; // absolute, 1200×630
+  description: TMaybeUndefined<string>;
+  ogTitle: TMaybeUndefined<string>;
+  ogDescription: TMaybeUndefined<string>;
+  ogImageUrl: TMaybeUndefined<string>; // absolute, 1200×630
 };
 ```
 
-> Contract defined in
-> `docs/archive/superpowers/specs/2026-07-15-seo-metadata-design.md` (#355,
-> shipped — current shape documented in `SPEC.md` §10).
+`title` is the only guaranteed field: `seo.metaTitle` is required in Studio
+(30–60 characters) and `resolveSeo` throws `MissingSeoTitleError` rather than
+invent one. There is no site-wide default OG image, so `twitter:card` must be
+`summary_large_image` only when an image was authored and `summary` otherwise.
+
+> **Fallbacks on SEO are forbidden.** A new case is surfaced to a human, not
+> resolved by whoever meets it. Current shape documented in `SPEC.md` §10.
 
 ## Per-route metadata
 

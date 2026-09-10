@@ -16,7 +16,6 @@ export function makeRawSiteSettings(
     },
     description: 'A blog about things',
     tagline: null,
-    defaultOgImage: makeRawImage('Default OG image'),
     ...overrides,
   };
 }
