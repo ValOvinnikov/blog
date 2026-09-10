@@ -1,4 +1,4 @@
-import { DISPLAY_MODE } from '@blog/config';
+import { DISPLAY_MODE } from '@blog/config/constants';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
 import type { SanityDocument } from 'sanity';
 

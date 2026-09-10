@@ -1,4 +1,4 @@
-import { DISPLAY_MODE, type TDisplayMode } from '@blog/config';
+import { DISPLAY_MODE, type TDisplayMode } from '@blog/config/constants';
 import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
 import { defineAlignmentFields } from '@blog/studio/schema-types/helpers/define-alignment-fields';
 import { displayModeField } from '@blog/studio/schema-types/helpers/display-mode-field';

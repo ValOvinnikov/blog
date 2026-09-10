@@ -1,4 +1,4 @@
-import { DISPLAY_MODE } from '@blog/config';
+import { DISPLAY_MODE } from '@blog/config/constants';
 import { displayModeField } from '@blog/studio/schema-types/helpers/display-mode-field';
 
 describe('displayModeField', () => {

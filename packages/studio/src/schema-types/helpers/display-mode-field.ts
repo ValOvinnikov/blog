@@ -1,4 +1,4 @@
-import { DISPLAY_MODE } from '@blog/config';
+import { DISPLAY_MODE } from '@blog/config/constants';
 import { toTitleCase } from '@blog/utils/primitives';
 import { defineField } from 'sanity';
 
