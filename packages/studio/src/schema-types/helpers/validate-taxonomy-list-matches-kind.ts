@@ -5,7 +5,7 @@ import type { SanityDocument, ValidationContext } from 'sanity';
 type TReference = { _ref?: string } | undefined;
 
 /**
- * Builds a `taxonomyList` reference validator for a topic/tag index page,
+ * Builds a `taxonomyList` reference validator for a tag index page,
  * rejecting a referenced module whose authored `taxonomy` names the other
  * kind. A module left with no `taxonomy` passes — that's the common case for
  * a dedicated index-page slot, which infers its kind from the page itself.
