@@ -44,7 +44,9 @@ export const buildTagMetadata = async (
       : {
           ...seo,
           title: `${seo.title} ${t('pageSuffix', { page: pageNumber })}`,
-          ogTitle: `${seo.ogTitle} ${t('pageSuffix', { page: pageNumber })}`,
+          ogTitle: seo.ogTitle
+            ? `${seo.ogTitle} ${t('pageSuffix', { page: pageNumber })}`
+            : undefined,
         };
 
   return toMetadata(resolvedSeo, {

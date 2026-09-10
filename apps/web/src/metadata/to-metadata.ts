@@ -13,26 +13,15 @@ type TToMetadataOptions = {
   };
 };
 
-// Route-relative fallbacks to the file-convention-derived default images
-// (`app/opengraph-image.tsx` / `app/twitter-image.tsx`). Next resolves a
-// relative image URL against `metadataBase` (set once, in `[tenant]/[locale]/layout.tsx`'s
-// `generateMetadata`) when building the final `<meta>` tags.
-//
-// This fallback is required, not optional: Next's per-segment metadata merge
-// does not deep-merge object-type fields like `openGraph`/`twitter` — a leaf
-// segment's own `openGraph` key wholesale *replaces* the root segment's
-// (`resolve-metadata.js`'s `mergeMetadata`, case `'openGraph'`), including
-// whatever file-convention image Next would otherwise have auto-injected
-// there. Every route calls `toMetadata`, so every route sets its own
-// `openGraph`/`twitter` — meaning the root's auto-injected image is always
-// discarded unless this function supplies an explicit replacement itself.
-const FALLBACK_OG_IMAGE_PATH = '/opengraph-image';
-const FALLBACK_TWITTER_IMAGE_PATH = '/twitter-image';
-
 /**
- * Maps a fully-resolved `TSeoResolved` view-model to Next `Metadata` —
- * the one shared place routes turn service SEO output into `title`,
- * `description`, `alternates.canonical`, `openGraph`, and `twitter`.
+ * Maps an authored `TSeoResolved` view-model to Next `Metadata` — the one
+ * shared place routes turn service SEO output into `title`, `description`,
+ * `alternates.canonical`, `openGraph`, and `twitter`. Every field but
+ * `title` is optional and, when absent, is passed through as `undefined`
+ * rather than substituted — Next's per-segment merge (`resolve-metadata.js`'s
+ * `mergeMetadata`) treats an explicit `undefined` as "clear this field", not
+ * "inherit the parent segment's value", which is what keeps an unauthored
+ * field from silently picking up the root layout's site-wide description.
  *
  * @example
  * return toMetadata(result.data.seo, { canonical: '/', ogType: 'website', titleAbsolute: true });
@@ -42,12 +31,8 @@ export const toMetadata = (
   opts: TToMetadataOptions,
 ): Metadata => {
   const { canonical, ogType, titleAbsolute, feedUrl, article } = opts;
-  const ogImages = seo.ogImageUrl
-    ? [{ url: seo.ogImageUrl }]
-    : [{ url: FALLBACK_OG_IMAGE_PATH }];
-  const twitterImages = seo.ogImageUrl
-    ? [seo.ogImageUrl]
-    : [FALLBACK_TWITTER_IMAGE_PATH];
+  const ogImages = seo.ogImageUrl ? [{ url: seo.ogImageUrl }] : undefined;
+  const twitterImages = seo.ogImageUrl ? [seo.ogImageUrl] : undefined;
 
   return {
     title: titleAbsolute ? { absolute: seo.title } : seo.title,

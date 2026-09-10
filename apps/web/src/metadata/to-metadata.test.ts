@@ -1,10 +1,9 @@
 import type { TSeoResolved } from '@blog/service';
-// Next's real per-segment metadata resolver — used below to prove the
-// relative fallback image path actually resolves to an absolute URL via
-// `metadataBase`, the way the App Router does it at request time. Not a
-// public `next` export, but there's no other way to verify this without
-// standing up a full Next render; the deep import mirrors how `reviewer`
-// traced the underlying bug.
+// Next's real per-segment metadata resolver — used below to prove an absent
+// `ogImageUrl` resolves to no image at all, the way the App Router does it
+// at request time, rather than an injected default. Not a public `next`
+// export, but there's no other way to verify this without standing up a
+// full Next render.
 import {
   resolveOpenGraph,
   resolveTwitter,
@@ -74,14 +73,34 @@ describe('toMetadata', () => {
     ]);
   });
 
-  it('falls back to the default image routes when ogImageUrl is absent', () => {
+  it('omits openGraph and twitter images when ogImageUrl is absent', () => {
     const metadata = toMetadata(
       { ...seo, ogImageUrl: undefined },
       { canonical: '/', ogType: 'website' },
     );
 
-    expect(metadata.openGraph?.images).toEqual([{ url: '/opengraph-image' }]);
-    expect(metadata.twitter?.images).toEqual(['/twitter-image']);
+    expect(metadata.openGraph?.images).toBeUndefined();
+    expect(metadata.twitter?.images).toBeUndefined();
+  });
+
+  it('omits description, openGraph.title/description, and twitter.title/description when the source fields are absent', () => {
+    const metadata = toMetadata(
+      {
+        title: 'Example Title',
+        description: undefined,
+        ogTitle: undefined,
+        ogDescription: undefined,
+        ogImageUrl: undefined,
+      },
+      { canonical: '/', ogType: 'website' },
+    );
+
+    expect(metadata.title).toBe('Example Title');
+    expect(metadata.description).toBeUndefined();
+    expect(metadata.openGraph?.title).toBeUndefined();
+    expect(metadata.openGraph?.description).toBeUndefined();
+    expect(metadata.twitter?.title).toBeUndefined();
+    expect(metadata.twitter?.description).toBeUndefined();
   });
 
   it('maps twitter card, title, description, and images', () => {
@@ -146,7 +165,7 @@ describe('toMetadata', () => {
   });
 });
 
-describe('toMetadata output resolved by Next itself (regression for #490)', () => {
+describe('toMetadata output resolved by Next itself', () => {
   // Mirrors `[locale]/layout.tsx`'s `metadataBase` — the leaf route (this
   // function's output) never sets its own, so Next's resolver falls back to
   // this parent-segment value even though the leaf's `openGraph`/`twitter`
@@ -157,7 +176,7 @@ describe('toMetadata output resolved by Next itself (regression for #490)', () =
     isStaticMetadataRouteFile: false,
   };
 
-  it('resolves the relative opengraph-image fallback to an absolute URL', async () => {
+  it('resolves openGraph.images to undefined, never an injected default, when ogImageUrl is absent', async () => {
     const metadata = toMetadata(
       { ...seo, ogImageUrl: undefined },
       { canonical: '/', ogType: 'website' },
@@ -171,12 +190,10 @@ describe('toMetadata output resolved by Next itself (regression for #490)', () =
       null,
     );
 
-    expect(resolved?.images).toEqual([
-      { url: new URL('https://example.com/opengraph-image') },
-    ]);
+    expect(resolved?.images).toBeUndefined();
   });
 
-  it('resolves the relative twitter-image fallback to an absolute URL', () => {
+  it('resolves twitter.images to undefined, never an injected default, when ogImageUrl is absent', () => {
     const metadata = toMetadata(
       { ...seo, ogImageUrl: undefined },
       { canonical: '/', ogType: 'website' },
@@ -189,9 +206,7 @@ describe('toMetadata output resolved by Next itself (regression for #490)', () =
       null,
     );
 
-    expect(resolved?.images).toEqual([
-      { url: new URL('https://example.com/twitter-image') },
-    ]);
+    expect(resolved?.images).toBeUndefined();
   });
 
   it('still resolves an explicit ogImageUrl unchanged (no fallback applied)', async () => {
