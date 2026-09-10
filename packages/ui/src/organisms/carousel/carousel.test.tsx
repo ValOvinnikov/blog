@@ -51,8 +51,15 @@ const emitEvent = (event: string) => {
   });
 };
 
+const { emblaCarouselOptionsSpy } = vi.hoisted(() => ({
+  emblaCarouselOptionsSpy: vi.fn(),
+}));
+
 vi.mock('embla-carousel-react', () => ({
-  default: () => [vi.fn(), currentApi],
+  default: (...args: unknown[]) => {
+    emblaCarouselOptionsSpy(...args);
+    return [vi.fn(), currentApi];
+  },
 }));
 
 beforeEach(() => {
@@ -61,6 +68,10 @@ beforeEach(() => {
   mockViewport = { scrollLeft: 0 };
   mockSlides = [];
   currentApi = emblaApi;
+  // `mockReturnValue` persists through `clearAllMocks` (it only clears call
+  // history), so each test starts both flags enabled unless it overrides them.
+  emblaApi.canScrollPrev.mockReturnValue(true);
+  emblaApi.canScrollNext.mockReturnValue(true);
 });
 
 describe(`<${Carousel.name}/>`, () => {
@@ -342,5 +353,90 @@ describe(`<${Carousel.name}/>`, () => {
     emitEvent('reInit');
 
     expect(screen.getByRole('button', { name: 'Next slide' })).toBeDisabled();
+  });
+
+  it("configures Embla with the design's fixed options", () => {
+    renderElement(
+      <Carousel ariaLabel="Posts" previousLabel="Previous" nextLabel="Next">
+        <div>Slide one</div>
+      </Carousel>,
+    );
+
+    expect(emblaCarouselOptionsSpy).toHaveBeenCalledWith({
+      align: 'start',
+      slidesToScroll: 1,
+      containScroll: 'trimSnaps',
+      dragFree: false,
+      loop: false,
+      breakpoints: { '(prefers-reduced-motion: reduce)': { duration: 0 } },
+    });
+  });
+
+  it('moves focus to the sibling nav button before disabling the one that holds it', () => {
+    renderElement(
+      <Carousel
+        ariaLabel="Posts"
+        previousLabel="Previous slide"
+        nextLabel="Next slide"
+      >
+        <div>Slide one</div>
+      </Carousel>,
+    );
+
+    const next = screen.getByRole('button', { name: 'Next slide' });
+    next.focus();
+    expect(next).toHaveFocus();
+
+    emblaApi.canScrollPrev.mockReturnValue(true);
+    emblaApi.canScrollNext.mockReturnValue(false);
+    emitEvent('select');
+
+    expect(
+      screen.getByRole('button', { name: 'Previous slide' }),
+    ).toHaveFocus();
+  });
+
+  it('moves focus to the region when both nav buttons disable at once', () => {
+    renderElement(
+      <Carousel
+        ariaLabel="Posts"
+        previousLabel="Previous slide"
+        nextLabel="Next slide"
+      >
+        <div>Slide one</div>
+      </Carousel>,
+    );
+
+    const next = screen.getByRole('button', { name: 'Next slide' });
+    next.focus();
+    expect(next).toHaveFocus();
+
+    emblaApi.canScrollPrev.mockReturnValue(false);
+    emblaApi.canScrollNext.mockReturnValue(false);
+    emitEvent('select');
+
+    expect(screen.getByRole('region', { name: 'Posts' })).toHaveFocus();
+  });
+
+  it('leaves focus alone when the disabled flags change without focus on a nav button', () => {
+    renderElement(
+      <Carousel
+        ariaLabel="Posts"
+        previousLabel="Previous slide"
+        nextLabel="Next slide"
+      >
+        <div>Slide one</div>
+      </Carousel>,
+    );
+
+    const previous = screen.getByRole('button', { name: 'Previous slide' });
+    previous.focus();
+    expect(previous).toHaveFocus();
+
+    emblaApi.canScrollPrev.mockReturnValue(true);
+    emblaApi.canScrollNext.mockReturnValue(false);
+    emitEvent('select');
+
+    expect(previous).toHaveFocus();
   });
 });
