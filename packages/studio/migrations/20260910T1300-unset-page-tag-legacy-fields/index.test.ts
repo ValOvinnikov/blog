@@ -117,11 +117,8 @@ describe(unsetLegacyTagPageFields, () => {
   });
 
   /**
-   * Regression guard: a `postList !== undefined` check alone (no check
-   * that `modules[]` actually references it) would incorrectly unset an
-   * unfolded document — deleting its only pointer to the list. This test
-   * fails against that weaker, definedness-only guard; see the report for
-   * the failure output captured before the correct guard was restored.
+   * Regression guard: `postList` must not be unset merely because it is still
+   * defined — `modules[]` must actually reference it.
    */
   it('never unsets an unfolded document just because postList is still defined', () => {
     const result = unsetLegacyTagPageFields({
