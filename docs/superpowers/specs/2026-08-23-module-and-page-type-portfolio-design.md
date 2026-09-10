@@ -1400,9 +1400,8 @@ Four PRs, each green on `main` alone:
 3. **service** — a field nothing reads yet is a type member, not an export.
 4. **web** — the wrapper and the branches.
 
-The `module_postFeatured` half of the studio, service and web work waits
-on that module existing on `main` (epic #2784's studio → service → web
-PR); the ui PR and the `module_postLatest` half do not.
+`module_postFeatured` is on `main` (epic #2784 shipped), so both teasers
+are in scope of every PR above; nothing waits on it.
 
 **Acceptance:** grid remains the default for every existing document;
 carousel mode swipes without JavaScript and is Embla-driven with it; the
