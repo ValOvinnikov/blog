@@ -814,6 +814,257 @@ hero is legible over a light photograph in both colour modes; `heroBlog`'s
 Banner is legible the same way; `pnpm type-check && pnpm lint && pnpm test
 && pnpm knip && pnpm gen:ui-index:check` green.
 
+## `module_heroProfile` — the person hero
+
+**Goal:** the profile member of the hero family — a person's photo, name,
+role, a line of bio, their social profiles and up to two actions — for a
+personal, freelancer or consultant home page. Design of record for epic
+#2776, settled in #2808.
+
+Interactive mock of the Studio form, the rendered hero on every variant and
+tone, the view model and the validation states:
+<https://claude.ai/code/artifact/fec4ab69-bdb2-41c7-9a5c-9b751d4d83ad>.
+
+### A reference to `blog_author`, not inline fields
+
+The ticket's first question was whether the person is authored inline on
+the module or referenced. **Referenced.** `blog_author` already carries
+exactly this hero's content — `name` (required), `image`, `bio` (Portable
+Text), `role`, `socialLinks[]`, `profilePage` — and on a personal site the
+person in the hero is the person in every byline. Two copies of a name, a
+role and a set of profile URLs drift the first time one is edited; one
+document cannot. The module is then the same shape as `module_heroBlog`: a
+reference plus optional copy overrides, with the Studio placeholder showing
+what the reference currently supplies.
+
+The cost is that a profile hero needs an author document to exist. That is
+the right dependency: a site with no author has no bylines either, and
+starter content already seeds one.
+
+### Fields
+
+Content fields first, then the shared tail:
+
+| Field             | Type                                                    | Notes                                                                                    |
+| ----------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `title`           | `titleField()`                                          | Editor-facing name, never rendered                                                       |
+| `author`          | reference → `blog_author`, required                     | The person                                                                               |
+| `eyebrow`         | string, max 40                                          | Empty renders the author's `role`; a role-less author renders no eyebrow                 |
+| `heading`         | string, max 120                                         | Empty renders the author's `name` — the page `<h1>` is the person's name by default      |
+| `supportingText`  | text, 3 rows                                            | Empty renders the author's bio as plain text (`pt::text()` of its first block)           |
+| `imageSource`     | `PROFILE_IMAGE_SOURCE` radio, required                  | `AUTHOR` (default) · `CUSTOM` · `NONE` — the author's avatar, a different photo, or none |
+| `image`           | `imageWithAlt`, hidden unless `CUSTOM`                  | Required when the source is custom                                                       |
+| `showSocialLinks` | boolean, `initialValue: true`                           | Whether the author's `socialLinks` render in the hero                                    |
+| _shared tail_     | `defineHeroFields({ image: false, mediaOrder: false })` | variant, brand variant, content position, alignment, actions, layout                     |
+
+**The three copy fields are the `heroBlog` pattern**: plain optional
+strings, unset means "the author's own", placeholder shows the derived
+value. `heading` falls back to `name`, which the author schema already
+requires, so a profile hero can never have a blank `<h1>` — no `required()`
+needed here.
+
+**`supportingText` falls back to the bio's first block as plain text.** The
+author's bio is Portable Text because the author page renders it in full; a
+hero lede is one plain paragraph, so the query takes `pt::text(bio[0])` and
+the editor overrides it when the first paragraph is not the right one.
+Marks and links in that paragraph are dropped, which is the correct
+behaviour for a hero, not a loss.
+
+**`imageSource` is a mode, with a new three-value constant.**
+`HERO_IMAGE_SOURCE`'s values are `POST` / `CUSTOM` / `NONE`; reusing it
+would store `POST` on a profile hero, and renaming its first value to
+something neutral is a content migration on every `heroBlog` document.
+`PROFILE_IMAGE_SOURCE = { AUTHOR, CUSTOM, NONE }` is the honest constant,
+lands in `@blog/config` with its studio consumer in the same PR (knip), and
+the tail takes `image: false` exactly as `heroBlog`'s does.
+
+**`showSocialLinks` is a toggle because the footer usually has them too.**
+Site settings already render the tenant's social links in the footer; a
+personal site whose owner is the only author would otherwise show the same
+five icons twice on the home page. On by default, because the hero is where
+a visitor looks for them first.
+
+### The photo: media on Split and Banner, an avatar on Stacked
+
+One image, placed by the variant — no placement field:
+
+- **`SPLIT`** — the photo is `Hero.Media` beside the copy, framed **square**
+  rather than 16:9: a portrait crops well to a square and badly to a
+  letterbox. `Hero.Media` gains a `ratio` prop (the `MediaFrame` ratios,
+  default `video`) and the profile view passes `square`.
+- **`BANNER`** — the photo is the background, through #3071's finished
+  Banner (scrim by tone, on-image copy).
+- **`STACKED`** — the photo is a **round avatar above the eyebrow**, the
+  classic personal-site opening: a new `Hero.Avatar` slot renders inside the
+  copy column before the eyebrow (so DOM order is avatar, eyebrow, `<h1>`),
+  `size-24 sm:size-32`, `rounded-full`, `object-cover`. It is not media, so
+  Stacked's media-order field has nothing to order — the tail therefore
+  gains a third option, `mediaOrder: false`, which omits both media-order
+  fields, the same shape as `image: false`.
+
+The tail's image rule carries over against the resolved image: `SPLIT` and
+`BANNER` need one (`NONE` is an error there; `AUTHOR` on an author with no
+image is a warning, as on `heroBlog`); `STACKED` with `NONE` renders no
+avatar and is fine.
+
+### Social links: a `Hero.Social` slot, the footer's rendering
+
+`Hero.Social` renders a `<ul>` of icon links after `Hero.Cta` in the copy
+column, one `<li>` per link: the platform icon where `ICONS` has one, the
+platform label as a small pill where it does not — the same fallback the
+footer already uses through `toSocialIconName()`. Each link's accessible
+name is the platform label; the list takes an `ariaLabel` (`"Profiles"`, a
+fixed accessibility-only Voice key, `hero.socialLinksAriaLabel`). External
+links open in a new tab as every social link does today.
+
+The five platforms with no icon yet (`YOUTUBE`, `INSTAGRAM`, `MASTODON`,
+`BLUESKY`, `THREADS`) render as pills in the hero exactly as they do in the
+footer; adding those icons is a shared `ICONS` follow-up, not this epic's.
+
+### Heading level
+
+Always `<h1>`, for the same reason as every hero kind. By default it is the
+person's name, which is also what the page is about.
+
+### Validation
+
+| State                                            | Level   | Message                                                        |
+| ------------------------------------------------ | ------- | -------------------------------------------------------------- |
+| no `author`                                      | Error   | Choose the person this hero introduces.                        |
+| `SPLIT`/`BANNER` with `imageSource: NONE`        | Error   | These variants are built around a photo.                       |
+| `imageSource: AUTHOR`, author has no image       | Warning | This author has no photo yet, so the hero renders without one. |
+| `showSocialLinks` on, author has no social links | Warning | This author has no social links yet, so none will show.        |
+| `actions` rule violations                        | Error   | (the shared `actionGroup` rules, unchanged)                    |
+
+No async dataset rule: everything derives from one referenced document, and
+the two warnings read it through the reference in the validator's own
+context.
+
+### Service
+
+`service.modules.heroProfile.v1`: one query, one dereference.
+
+```groq
+*[_type == "module_heroProfile" && _id == $id][0]{
+  _id, brandVariant, variant, eyebrow, heading, supportingText,
+  imageSource, image{ …image },
+  "showSocialLinks": coalesce(showSocialLinks, true),
+  author->{
+    name, role, "bioText": pt::text(bio[0]),
+    image{ …image },
+    socialLinks[]{ platform, url }
+  },
+  actions{ actions[]{ …ctaAction } },
+  contentPositionSplit, contentPositionBanner, layout
+}
+```
+
+```ts
+type THeroProfileModule = {
+  brandVariant: TFullBrandVariant;
+  variant: THeroVariant;
+  heading: string;
+  eyebrow: TMaybeUndefined<string>;
+  supportingText: TMaybeUndefined<string>;
+  sanityImage: TMaybeUndefined<ISanityImage>;
+  socialLinks: TMaybeUndefined<readonly ILink[]>;
+  actions: TMaybeUndefined<readonly TCtaAction[]>;
+  contentPosition: TMaybeUndefined<TContentAlignment>;
+  contentAlignment: TMaybeUndefined<TContentAlignment>;
+  layout: TMaybeUndefined<TLayout>;
+};
+```
+
+`heading` is `heading ?? author.name`, always a string. `sanityImage`
+follows `imageSource` (`CUSTOM` → `image`, `AUTHOR` → `author.image`,
+`NONE` → `undefined`), the `heroBlog` transformer's branch. `socialLinks` is
+`undefined` when the toggle is off or the author has none, otherwise each
+entry is an `ILink` with `platform` set and `target: '_blank'`, through the
+same transformer the footer's links use. No `mediaOrder` on this kind.
+`contentPosition` collapses through `toHeroPresentation()` (#3073).
+
+**Cache tags:** `modules:heroProfile`, `module:<id>`, `author` (the
+dereference), plus the action link targets `page_landing`, `page_blog`,
+`page_post`, `topic`. `REVALIDATE_TAGS` gains
+`module_heroProfile: ['modules:heroProfile']`.
+
+### `@blog/ui`
+
+No new organism. `Hero` gains:
+
+- **`Hero.Avatar`** — a slot rendered first in the copy column; a
+  `rounded-full` `size-24 sm:size-32` frame with `object-cover` children.
+  Only the web view decides when to use it (Stacked); the organism just
+  places it.
+- **`Hero.Social`** — a slot rendered after `Hero.Cta`: a `<ul>` with
+  `ariaLabel`, `flex flex-wrap gap-2`, children are the links.
+- **`Hero.Media` `ratio?: TMediaFrameRatio`** — default `video`, passed
+  through to `MediaFrame`.
+
+Stories: a Stacked profile with avatar and social links on each tone; a
+Split with a square portrait; a Banner. Tests: slot placement order
+(avatar before eyebrow, social after cta), `ratio` reaching `MediaFrame`.
+Depends on #3071 for the Banner finish, not for the slots.
+
+### Web
+
+`apps/web/src/modules/hero-profile/` — `HeroProfileModule` (loader + view)
+and `HeroProfileModuleView`: `Section` with `brandVariant` and `layout`;
+`Hero` with `tone={brandVariant}`; on `STACKED` the photo in `Hero.Avatar`
+(`SanityImage` 256×256), otherwise in `Hero.Media` (`ratio="square"` on
+Split, 900×900; Banner as `heroBlog`, 1200×675, `priority`); `ActionGroup`
+in `Hero.Cta` when there are actions, `isOnDark` on Banner; `Hero.Social`
+when there are links, each a `NavLink` with the icon from
+`toSocialIconName()` or the label pill, `ariaLabel` from the new fixed key.
+`HERO_MAP` gains `module_heroProfile`.
+
+### Pages and desk
+
+`module_heroProfile` joins `HERO_SCHEMA_TYPES`; a desk entry beside the
+other heroes. Starter content unchanged (blog tenants keep `heroBlog`); the
+site-kind templates (#2798) seed it for a personal site.
+
+### Migration
+
+None — a new type, a new constant, two additive slots and one additive
+helper option.
+
+### Per-layer scope and PRs
+
+Five implementation sub-issues under #2776:
+
+- **ui** · `feat(ui): Hero.Avatar and Hero.Social slots; Hero.Media ratio`
+  — own PR, first, additive.
+- **config** · `feat(config): PROFILE_IMAGE_SOURCE const` — no consumer
+  until studio lands (knip), so it ships in the next PR, not alone.
+- **studio** · `feat(studio): module_heroProfile schema; defineHeroFields
+mediaOrder option` — the schema, the helper's third option,
+  `HERO_SCHEMA_TYPES`, desk, typegen.
+- **service** · `feat(service): heroProfile loader` — query, view model,
+  tags; the social-link transformer shared with the footer.
+- **web** · `feat(web): heroProfile view + HERO_MAP entry` — module, view,
+  the fixed Voice key, `REVALIDATE_TAGS`, story, tests.
+
+**PRs:** ui alone; then config + studio + service + web as one PR (the
+const has no consumer without studio; typegen reds `HERO_MAP` until the web
+entry lands).
+
+### Not in scope
+
+- Inline person fields on the module, or a second person.
+- Icons for the five platforms that have none (shared `ICONS` follow-up).
+- Rendering the full Portable Text bio in the hero.
+- A "contact" or email action beyond what `actionGroup` links to.
+- Seeding a profile hero (that is #2798's personal-site template).
+
+**Acceptance:** an editor can open a personal home page with the site's
+author as its hero, with nothing typed but the reference; the name is the
+page's only `<h1>`; the photo renders as a round avatar on Stacked, a square
+portrait on Split and a legible background on Banner; social links render
+with icons or label pills and can be switched off; overrides replace the
+derived copy only when set; `pnpm type-check && pnpm lint && pnpm test &&
+pnpm knip && pnpm gen:ui-index:check` green.
+
 ## Post grid images and the `showImages` toggle
 
 **Goal:** the post grid shows each post's image, on every surface that
@@ -2188,6 +2439,16 @@ point; the graph stays acyclic.
   Banner; ui alone, then studio + service + web as one PR (2026-09-10,
   #2806).
 
+- **`module_heroProfile` references a `blog_author` rather than re-declaring
+  the person** — name, role, photo, bio and social links come through the
+  reference with the `heroBlog`-style optional copy overrides; one photo,
+  placed by the variant (a round `Hero.Avatar` on Stacked, a square
+  `Hero.Media` on Split, the background on Banner), chosen by a new
+  `PROFILE_IMAGE_SOURCE` mode; the author's social links behind a
+  `showSocialLinks` toggle in a new `Hero.Social` slot; the tail gains
+  `mediaOrder: false`; ui alone, then config + studio + service + web as
+  one PR (2026-09-11, #2808).
+
 ## Non-goals (recorded so #1919 doesn't sprawl)
 
 - A leads/CRM management UI — store + notify only.
@@ -2241,6 +2502,11 @@ catalogue has enough shipped history to matter).
 
 ## Resync log
 
+- **2026-09-11** — "`module_heroProfile` — the person hero" added (#2808),
+  the third hero kind, designed against `blog_author` as it stands (name,
+  image, Portable Text bio, role, `socialLinks[]`) and the footer's
+  `toSocialIconName()` fallback; depends on #3071's Banner finish and
+  #3073's `toHeroPresentation()`.
 - **2026-09-10** — "`module_heroStatement` — the marketing hero" added
   (#2806): the second hero kind, designed against the tail as shipped in
   #2780/#2807. Reading the organism for it surfaced that `Hero`'s Banner has
