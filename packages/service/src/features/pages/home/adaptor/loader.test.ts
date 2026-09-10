@@ -28,7 +28,6 @@ describe('getHomePage', () => {
     const page = await getHomePage(tenant);
     if (!page) throw new Error('expected a home page');
 
-    expect(page.title).toBe('Home Page');
     expect(page.hero).toEqual({
       id: 'hero-1',
       type: 'module_hero',

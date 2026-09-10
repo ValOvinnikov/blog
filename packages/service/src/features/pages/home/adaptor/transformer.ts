@@ -19,7 +19,6 @@ export function toHomePage(
   tenant: TImageTenant,
 ): THomePage {
   return {
-    title: raw.title,
     headingBlock: toHeadingBlock(raw.headingBlock),
     hero: raw.hero ? toHeroSlot(raw.hero) : undefined,
     modules: (raw.modules ?? []).map(toModule),

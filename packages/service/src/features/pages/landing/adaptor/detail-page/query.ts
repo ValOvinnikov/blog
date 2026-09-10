@@ -9,7 +9,6 @@ export const landingPageQuery = q
   .filterBy('slug.current == $slug')
   .slice(0)
   .project((sub) => ({
-    title: sub.field('title').notNull(),
     slug: sub.field('slug.current').notNull(),
     headingBlock: sub
       .field('headingBlock')

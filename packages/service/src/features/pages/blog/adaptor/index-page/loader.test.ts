@@ -67,9 +67,14 @@ describe('getIndexPage', () => {
     });
   });
 
-  it('resolves seo from the document title and site settings when the page has no authored seo', async () => {
+  it('resolves seo from the authored heading and site settings when the page has no authored seo', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawBlogPage({ title: 'The Blog', seo: null }))
+      .mockResolvedValueOnce(
+        makeRawBlogPage({
+          headingBlock: makeRawOptionalHeadingBlock({ heading: 'The Blog' }),
+          seo: null,
+        }),
+      )
       .mockResolvedValueOnce(
         makeRawSiteSettings({ description: 'Notes on building things.' }),
       );
@@ -84,6 +89,36 @@ describe('getIndexPage', () => {
       ogDescription: 'Notes on building things.',
       ogImageUrl: expect.stringContaining('sanity.io'),
     });
+  });
+
+  it('falls the seo title back to the brand name when no heading is authored', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawBlogPage({ headingBlock: null, hero: null, seo: null }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getIndexPage(tenant);
+    if (!result) throw new Error('expected a blog index page');
+
+    expect(result.seo.title).toBe('My Blog');
+  });
+
+  it('falls the seo title back to the brand name when the authored heading is blank', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawBlogPage({
+          headingBlock: makeRawOptionalHeadingBlock({ heading: '   ' }),
+          seo: null,
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getIndexPage(tenant);
+    if (!result) throw new Error('expected a blog index page');
+
+    expect(result.seo.title).toBe('My Blog');
+    expect(result.headingBlock.heading).toBe('   ');
   });
 
   it('maps the thin page-builder modules array to module refs', async () => {
