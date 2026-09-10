@@ -25,7 +25,13 @@ types is what ships; what they leave empty is omitted.
 
 1. **A page document's own `title` never reaches the web** — not as rendered
    copy, not as metadata, not as a fallback for either. It is a desk label.
-2. **`seo.metaTitle` is required**, `min(60)`, **no maximum**.
+2. **`seo.metaTitle` is required**, `min(30)`, `max(60)`. Settled 2026-09-10,
+   replacing an earlier `min(60)` with no maximum. Google truncates titles on
+   pixel width — roughly 600px, or 50–60 characters — so a 60-character
+   _minimum_ would have mandated the one length that reliably gets cut off in
+   search results; `max(60)` is the conventional direction and is what the
+   schema already had. The minimum exists only to reject a lazy one-word
+   title.
 3. **`seo.metaDescription` stays optional**, with no fallback — when empty the
    description tag is omitted entirely rather than filled from anywhere.
 4. **Open Graph stays optional, with no fallbacks** — `ogTitle`,
@@ -56,10 +62,19 @@ entity's title is what satisfies it today.
 **A backfill migration is mandatory and must land first.** Making `metaTitle`
 required renders every existing document unpublishable until filled. This repo
 already has a standing rule against adding `required()` to a field of an
-existing type for exactly this reason. The migration has to author a
-`metaTitle` of at least 60 characters for every existing page document, which
-is not mechanical — a generated string that merely clears the length gate is
-worse than no rule at all.
+existing type for exactly this reason. The migration has to author a real
+`metaTitle` for every existing page document that lacks one, which is not
+mechanical — a generated string that merely clears the length gate is worse
+than no rule at all.
+
+Measured against the `development` dataset on 2026-09-10, that is 32 published
+page documents: **8 already carry a usable `metaTitle`** (32–51 characters,
+all of which pass `min(30).max(60)` untouched — the migration must not edit
+them) and **24 have none**. Of the 24, fifteen are `page_tag` documents, plus
+`page_blog`, `page_topicIndex`, `page_tagIndex`, one `page_topic` and six
+`page_post`. Tag pages are the hardest case: a natural title such as
+"React articles — Valstack.dev" is about 29 characters, sitting right on the
+floor, so they need a deliberate wording choice rather than a formula.
 
 **Scope is repo-wide**, not the pages currently in flight: `page_home`,
 `page_landing`, `page_blog`, `page_topic`, `page_tag`, `page_post`,
@@ -68,21 +83,29 @@ transformer.
 
 ## Relationship to the open work
 
-PRs #3019 / #3020 / #3021 (issues #2977 / #2978 / #2979) removed the document
-`title` from the blog index page, satisfying rule 1 there — but did it by
-introducing `headingBlock.heading ?? settings.brand.name`, which rule 5 bans.
-That fallback is superseded by this design rather than by a further fix to
-those PRs.
+**Correction 2026-09-10.** An earlier revision of this section said PRs #3019 /
+#3020 / #3021 (issues #2977 / #2978 / #2979) had removed the document `title`
+from the blog index page. They had not. #3019's service commit touched
+`features/pages/blog/adaptor/index-page/query.ts` and left both the `title`
+projection and the `{ title: rawPage.title }` argument to `resolveSeo` in
+place; the claim propagated into two ticket bodies before anyone read the file.
 
-Issue #3022 covers the same rule-1 violation on the landing and home pages.
+Rule 1 was satisfied on the blog index, landing and home pages by issue #3022
+(PR #3034, merged), and on the topic index by #2980 (PR #3032, merged). All of
+them did it with `toContentTitle(headingBlock.heading, settings.brand.name)`,
+which rule 5 bans — a deliberate bridge, since removing the fallback before
+`metaTitle` is required would leave those pages emitting an empty `<title>`.
+The sweep removing the helper and all its call sites is scoped on #3030.
 
 ## Open
 
 - Whether `metaDescription`, being optional with no fallback, should warn at
   publish time when empty rather than silently shipping a page with no
   description.
-- What the backfill migration authors for each existing document, given the
-  60-character minimum.
+- What the backfill migration authors for each of the 24 documents that have
+  no `metaTitle`. The length range is settled (`min(30).max(60)`) and the eight
+  already-authored titles are known to pass, so what remains is the editorial
+  copy itself, not the rule.
 
 ## Work folded in from the page-refactor PRs
 
@@ -102,9 +125,10 @@ brand-name fallback it introduced is banned by rule 5. Under this design the
 blog index page authors its own `metaTitle` like every other page, and the
 projection stays deleted.
 
-**Therefore the merged PRs still pass the document `title` into `resolveSeo`
-on the blog index page.** That is a known, accepted gap for the interval
-between those merges and this epic — not an oversight to re-report.
+That gap persisted longer than this doc originally assumed — PRs #3019 / #3020
+/ #3021 did not in fact apply the change described above, so the blog index
+page went on passing its document `title` into `resolveSeo` until #3022 (PR
+#3034) closed it on 2026-09-10. It is closed now, on every page.
 
 **2. Blank `headingBlock` text treated as absent.** `toHeadingBlock` normalised
 an empty or whitespace-only `heading`/`supportingText` to `undefined`, via a
