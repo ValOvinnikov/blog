@@ -1,14 +1,24 @@
-import { isr } from '@blog/service/sanity/query';
-import { createTaxonomyIndexPageLoader } from '@blog/service/shared/loaders/create-taxonomy-index-page-loader';
+import type { TMaybeUndefined } from '@blog/config';
+import { getSiteSettings } from '@blog/service/features/global/site-settings/adaptor/loader';
+import {
+  isr,
+  runQuery,
+  type TTenantSanityContext,
+} from '@blog/service/sanity/query';
 
-import { MissingTaxonomyListError } from './missing-taxonomy-list-error';
 import { tagIndexPageQuery } from './query';
 import { toTagIndexPage } from './transformer';
+import type { TTagIndexPage } from './types';
 
-export const getIndexPage = createTaxonomyIndexPageLoader({
-  query: tagIndexPageQuery,
-  transformer: toTagIndexPage,
-  getCacheOptions: (tenant) =>
-    isr(['page_tagIndex', 'modules:taxonomyList'], tenant.projectId),
-  MissingTaxonomyListError,
-});
+export async function getIndexPage(
+  tenant: TTenantSanityContext,
+): Promise<TMaybeUndefined<TTagIndexPage>> {
+  const rawPage = await runQuery(tagIndexPageQuery, {
+    tenant,
+    ...isr(['page_tagIndex', 'modules:taxonomyList'], tenant.projectId),
+  });
+  if (!rawPage) return undefined;
+
+  const settings = await getSiteSettings(tenant);
+  return toTagIndexPage(rawPage, settings, tenant);
+}

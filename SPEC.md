@@ -281,12 +281,11 @@ drops out the day it is deleted. The studio's equivalent guard is
 `HERO_SCHEMA_TYPES`, the list every page's `hero` `to:` points at, with a
 test asserting every registered `module_hero*` schema appears in it.
 
-`page_home`, `page_landing`, `page_blog`, `page_topic`, `page_tag` and
-`page_topicIndex` each have an **optional** hero. A hero replaces that page's
-default header and owns the `<h1>`; without one, each page renders the header
-it always has (every one of them: `headingBlock`'s `heading` plus
-`supportingText`), so
-exactly one `<h1>` renders either way.
+`page_home`, `page_landing`, `page_blog`, `page_topic`, `page_tag`,
+`page_topicIndex` and `page_tagIndex` each have an **optional** hero. A hero
+replaces that page's default header and owns the `<h1>`; without one, each page
+renders the header it always has (every one of them: `headingBlock`'s `heading`
+plus `supportingText`), so exactly one `<h1>` renders either way.
 
 `page_home`'s hero was required until it was made optional and the document
 given a `headingBlock` of its own; `page_landing` followed, replacing the
@@ -430,31 +429,32 @@ not warrant separate types. It previously did have two: `CTA_ALIGNMENT` and
 one generated field described by two names and one of them named after what
 had become only one of its five callers.
 
-`module_taxonomyList` renders both ways. It reaches `ModuleRenderer` through
-`MODULE_MAP` when placed in `page_home.modules[]`, `page_landing.modules[]` or
-`page_topicIndex.modules[]`, and it renders through a dedicated page slot on
-`page_tagIndex.taxonomyList` (`/tags`). `/topics` used to work that way too;
-`page_topicIndex` now carries the reference in `modules[]` like any other
-module, and its `taxonomyList` field is retained only as a `readOnly`,
-`deprecated` field pending removal. It carries a `REVALIDATE_TAGS` entry,
-which every module type requires regardless of how it is rendered.
+`module_taxonomyList` reaches `ModuleRenderer` through `MODULE_MAP` wherever it
+is placed — `page_home.modules[]`, `page_landing.modules[]`,
+`page_topicIndex.modules[]` and `page_tagIndex.modules[]`. It used to render a
+second way as well, through a dedicated `taxonomyList` reference on each
+taxonomy index page; neither page has one any more, and both fields are
+retained only as `readOnly`, `deprecated` pending removal. It carries a
+`REVALIDATE_TAGS` entry, which every module type requires regardless of how it
+is rendered.
 
 Which taxonomy it lists is an optional authored field, because a module
 document cannot see what holds it: the page references the module, not the
 reverse, and Sanity's `hidden` callback is synchronous and sees only the
 module's own document. So the field is always visible and the requirement
-lives on the pages instead. A `modules[]` placement must set it — an async
-rule on those pages' `modules[]` fetches each referenced module and rejects one
-that has not. A page that still reaches the module through a dedicated slot —
-`page_tagIndex` — may leave it empty and pass its own kind to
+lives on the pages instead: every page placing one must set it, enforced by an
+async rule on `modules[]` that fetches each referenced module and rejects one
+that has not.
+
+The taxonomy index pages used to be the exception. Each reached its module
+through a dedicated slot and could leave `taxonomy` empty, passing its own kind
+to
 `service.modules.taxonomyList.v1.getTaxonomyList(id, tenant, fallbackTaxonomy)`
-as the fallback, so the loader never queries upward for a parent page; that
-page's slot rule rejects a module whose authored kind disagrees with the page's
-own. `page_topicIndex` no longer has that slot, and so no longer has that
-channel: `ModuleRenderer` calls every module with the same arguments and cannot
-supply a fallback, so a module it renders must carry an authored `taxonomy` —
-the same requirement `page_home` and `page_landing` already impose, now
-enforced on `page_topicIndex.modules[]` by the same async rule.
+so the loader never queried upward for a parent page. That channel is gone with
+the slots: `ModuleRenderer` calls every module with the same arguments and
+cannot supply a fallback, so a module it renders must carry an authored
+`taxonomy`. The `fallbackTaxonomy` parameter remains in the loader's signature
+with no caller passing it.
 
 `sortOrder` (`TAXONOMY_SORT`, coalesced to `ALPHABETICAL` at read time)
 and `limit` apply wherever the module sits, and their defaults reproduce the
@@ -468,10 +468,9 @@ schema allows), `layout` as `TLayout | undefined`, and (where applicable)
 either: unset stays unset end to end. In `apps/web`, every module component
 that renders a `@blog/ui` organism — including those reached through a
 dedicated slot rather than `MODULE_MAP`'s generic `ModuleRenderer` pipeline
-(§5 above): the hero family via each page's `hero` slot, and
-`module_taxonomyList` via `page_tagIndex`'s `taxonomyList` reference — which
-also renders through `MODULE_MAP` when placed in `modules[]`, as
-`module_postList` and `page_topicIndex`'s taxonomy list now always do — all
+(§5 above): the hero family, via each page's `hero` slot, is now the only such
+case — `module_taxonomyList` and `module_postList` both render through
+`MODULE_MAP` wherever they sit — all
 still styled the same way as every other module — no exception — wraps it in `apps/web`'s own
 `Section` component (`apps/web/src/components/shared/section`, relocated
 from `packages/ui`), passing `brandVariant` and `layout` straight through,

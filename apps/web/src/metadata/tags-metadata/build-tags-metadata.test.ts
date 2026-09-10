@@ -26,7 +26,7 @@ describe('buildTagsMetadata', () => {
   it('forwards the tenant to getTagsIndexPage — the same cached loader TagsPage reads', async () => {
     getTagsIndexPageMock.mockResolvedValue({
       ok: true,
-      data: { heading: 'Tags', seo, taxonomyListId: 'tag-list-1' },
+      data: { headingBlock: { heading: 'Tags' }, seo, modules: [] },
     });
 
     await buildTagsMetadata('tenant-1');
@@ -38,9 +38,9 @@ describe('buildTagsMetadata', () => {
     getTagsIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Tags',
+        headingBlock: { heading: 'Tags' },
         seo,
-        taxonomyListId: 'tag-list-1',
+        modules: [],
       },
     });
 

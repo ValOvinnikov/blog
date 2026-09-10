@@ -160,12 +160,12 @@ export function makeRawTopicIndexPage(
 }
 
 export function makeRawTagIndexPage(
-  overrides: Partial<NonNullable<TRawTagIndexPage>> = {},
-): NonNullable<TRawTagIndexPage> {
+  overrides: Partial<TRawTagIndexPage> = {},
+): TRawTagIndexPage {
   return {
-    heading: 'Browse by tag',
-    supportingText: 'Find posts by keyword.',
-    taxonomyList: { _id: 'taxonomy-list-1' },
+    headingBlock: makeRawOptionalHeadingBlock({ heading: 'Browse by tag' }),
+    hero: null,
+    modules: [{ _id: 'taxonomy-list-1', _type: 'module_taxonomyList' }],
     seo: null,
     ...overrides,
   };

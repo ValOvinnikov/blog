@@ -91,6 +91,17 @@ const config: StorybookConfig = {
         fileURLToPath(
           new URL('./mocks/topics-index-breadcrumbs.tsx', import.meta.url),
         ),
+      // `TagsPage` fetches its page document through this loader, same
+      // live-Sanity problem as the topic-index loader above.
+      '@web/server/tags-index/get-tags-index-page': fileURLToPath(
+        new URL('./mocks/get-tags-index-page.ts', import.meta.url),
+      ),
+      // `TagsPage` renders this for its breadcrumb trail, same live-database
+      // problem as the topic-index breadcrumbs above.
+      '@web/components/features/tags-index/tags-index-breadcrumbs':
+        fileURLToPath(
+          new URL('./mocks/tags-index-breadcrumbs.tsx', import.meta.url),
+        ),
     };
     const encryptSecretMockPath = fileURLToPath(
       new URL('./mocks/encrypt-secret.ts', import.meta.url),
