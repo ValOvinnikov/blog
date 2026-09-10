@@ -91,7 +91,7 @@ that #1285 already shipped.
   page document owns the route (`page_topic`/`page_tag` own `slug`; for
   posts the page and the entity are one document since 2026-09-08 —
   `page_post` carries content and route, see
-  [`2026-09-08-page-composition-design.md`](./2026-09-08-page-composition-design.md)),
+  the page-composition epic #2943),
   and a listing is **two module types, one per mode** — a paginated archive in a required slot (`module_postList`) and a
   latest-N teaser in `modules[]` (`module_postLatest`).
 
@@ -1073,7 +1073,7 @@ Both are presentation only. DOM order is media, meta, title, footer at
 every width, so the accessible reading order does not change with the
 layout.
 
-**`PostsSection` gains `hasLead?: boolean`.** _(Superseded 2026-09-08: `PostsSection` retires per [`2026-09-08-page-composition-design.md`](./2026-09-08-page-composition-design.md); the arrangement below moves to the featured module component in web, unchanged in shape.)_ When set, the first post
+**`PostsSection` gains `hasLead?: boolean`.** _(Superseded 2026-09-08: `PostsSection` retires per the page-composition epic #2943; the arrangement below moves to the featured module component in web, unchanged in shape.)_ When set, the first post
 renders as `isLead` + `isSplit` across the full width, and the rest render
 below in a row of as many columns as there are cards — two cards as
 ordinary cards, a single card as `isSplit` so it too fills its row:
@@ -1209,7 +1209,7 @@ layout, and `limit` already caps them.
 ### `@blog/ui` — `Carousel`, and a slot on `PostsSection`
 
 > **Superseded 2026-09-08** by
-> [`2026-09-08-page-composition-design.md`](./2026-09-08-page-composition-design.md):
+> the page-composition epic #2943:
 > `PostsSection` retires, so the `PostsSection.Carousel` slot below is not
 > built. `Carousel` stays exactly as specified; the latest and featured
 > module components compose it themselves from `PostCardItem` slides.
@@ -1605,7 +1605,7 @@ point; the graph stays acyclic.
 - **Pages are chrome, a heading and modules; every part fetches what it
   alone needs; `PostsSection` and the `*-page-view.tsx` layer retire** —
   recorded in
-  [`2026-09-08-page-composition-design.md`](./2026-09-08-page-composition-design.md),
+  the page-composition epic #2943,
   which supersedes the `PostsSection.Carousel` slot in the carousel section
   and `hasLead` on `PostsSection` in the spotlight section, and adds
   `page_post.modules[]` with a `module_postRelated` (2026-09-08).
@@ -1641,9 +1641,8 @@ point; the graph stays acyclic.
 ui → web`); the featured spotlight (#2784) and carousel (#2785) wait on it.
 - **Featured spotlight** — epic #2784 (design #2828, then config in its own
   PR, ui in its own PR, and `studio → service → web` as one PR).
-- **Page composition** — epic #2943 (sub-issues #2944–#2955) from
-  [`2026-09-08-page-composition-design.md`](./2026-09-08-page-composition-design.md)
-  (post page first, `PostGrid` columns alongside, then listing modules,
+- **Page composition** — epic #2943, which carries its own design of record
+  in its body (post page first, `PostGrid` columns alongside, then listing modules,
   then `PostsSection` retirement,
   then the related-posts module, then one sub-issue per page); the
   carousel's ui and web sub-issues rebase on it.

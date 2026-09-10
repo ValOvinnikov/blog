@@ -7,7 +7,7 @@
 its uniqueness rule, "`post` keeps the content, `page_post` keeps the route"
 — is history. The post is now one document, `page_post`, carrying content,
 route and `modules[]`; see
-[`2026-09-08-page-composition-design.md`](./2026-09-08-page-composition-design.md).
+the page-composition epic #2943.
 
 ## Problem
 
@@ -83,7 +83,7 @@ admitted by its own kind of slot.
 > **Superseded 2026-09-08 for `page_post`:** the post and its page become one
 > document — `page_post` absorbs every `blog_post` field and gains
 > `modules[]`; the `post` reference and `blog_post` retire. See
-> [`2026-09-08-page-composition-design.md`](./2026-09-08-page-composition-design.md).
+> the page-composition epic #2943.
 
 Per-entity pages own their URL slug directly — `page_topic.slug` /
 `page_tag.slug` / `page_post.slug`, sourced from the page document's own
