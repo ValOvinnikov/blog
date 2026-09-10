@@ -27,9 +27,6 @@ export const useCarousel = () => {
     const nextIsPreviousDisabled = !api.canScrollPrev();
     const nextIsNextDisabled = !api.canScrollNext();
 
-    // A button about to become `disabled` is moved off of first, while it
-    // can still take focus — disabling a focused native button drops focus
-    // to <body>, which a later effect can't undo without a visible jump.
     if (
       nextIsPreviousDisabled &&
       document.activeElement === previousButtonRef.current
@@ -49,10 +46,6 @@ export const useCarousel = () => {
   useEffect(() => {
     if (!embla) return;
 
-    // `init` is emitted on a macrotask (a `setTimeout` inside Embla's own
-    // engine), so a `.on('init', …)` subscribed here would race React's own
-    // effect scheduling rather than reliably catch it — doing this work
-    // eagerly, the first time `embla` is defined, is deterministic instead.
     const viewport = embla.rootNode();
     const scrollLeft = viewport.scrollLeft;
     viewport.scrollLeft = 0;
@@ -66,10 +59,6 @@ export const useCarousel = () => {
       distances.length > 0 ? distances.indexOf(Math.min(...distances)) : 0;
     embla.scrollTo(index, true);
 
-    // isEnhanced must not flip to `overflow-hidden` until after the
-    // scrollLeft handoff above has repositioned the track — deriving it
-    // straight from `embla` would apply that class in the same render Embla
-    // becomes available, one render before this handoff has run.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsEnhanced(true);
     updateDisabledState(embla);
