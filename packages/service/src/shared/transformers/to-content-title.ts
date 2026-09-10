@@ -6,5 +6,5 @@ export function toContentTitle(
   heading: string | undefined,
   brandName: string,
 ): string {
-  return heading?.trim() ? heading : brandName;
+  return heading?.trim() ? heading.trim() : brandName;
 }

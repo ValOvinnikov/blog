@@ -18,4 +18,8 @@ describe(toContentTitle, () => {
   it('falls back to the brand name when heading is whitespace-only', () => {
     expect(toContentTitle('   ', 'Acme')).toBe('Acme');
   });
+
+  it('trims surrounding whitespace from an authored heading', () => {
+    expect(toContentTitle('  Hello World  ', 'Acme')).toBe('Hello World');
+  });
 });
