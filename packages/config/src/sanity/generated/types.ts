@@ -525,6 +525,21 @@ export type Page_tag = {
   postList?: Module_postListReference;
 };
 
+export type Module_postList = {
+  _id: string;
+  _type: 'module_postList';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  headingBlock?: HeadingBlock;
+  showImages?: boolean;
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  pageSize?: number;
+  layout?: Layout;
+};
+
 export type Slug = {
   _type: 'slug';
   current?: string;
@@ -593,22 +608,6 @@ export type Page_topic = {
       } & Module_newsletterReference)
   >;
   seo?: Seo;
-  postList?: Module_postListReference;
-};
-
-export type Module_postList = {
-  _id: string;
-  _type: 'module_postList';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
-  showImages?: boolean;
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  pageSize?: number;
-  layout?: Layout;
 };
 
 export type Page_topicIndex = {
@@ -1102,11 +1101,11 @@ export type AllSanitySchemaTypes =
   | Module_ctaReference
   | Module_newsletterReference
   | Page_tag
+  | Module_postList
   | Slug
   | Module_taxonomyListReference
   | Page_tagIndex
   | Page_topic
-  | Module_postList
   | Page_topicIndex
   | Module_taxonomyList
   | Module_postFeaturedReference

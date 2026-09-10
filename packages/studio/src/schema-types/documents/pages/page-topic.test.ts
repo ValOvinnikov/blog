@@ -27,7 +27,7 @@ const getField = (name: string) =>
   pageTopicSchema.fields?.find((field) => field.name === name);
 
 describe('pageTopicSchema field order', () => {
-  it('orders fields title, slug, topic, headingBlock, hero, modules, seo, with postList deprecated at the end', () => {
+  it('orders fields title, slug, topic, headingBlock, hero, modules, seo', () => {
     expect(pageTopicSchema.fields?.map((field) => field.name)).toEqual([
       'title',
       'slug',
@@ -36,7 +36,6 @@ describe('pageTopicSchema field order', () => {
       'hero',
       'modules',
       'seo',
-      'postList',
     ]);
   });
 });
@@ -64,22 +63,8 @@ describe('pageTopicSchema shape', () => {
     expect(requiredCalled).toBe(true);
   });
 
-  it('postList is a deprecated, read-only reference to module_postList with no validation', () => {
-    const postListField = getField('postList') as
-      TReferenceFieldDefinition | undefined;
-
-    if (!postListField || postListField.type !== 'reference') {
-      throw new Error(
-        'Expected pageTopicSchema to define a postList reference field.',
-      );
-    }
-
-    expect(postListField.to?.map((target) => target.type)).toEqual([
-      postListSchema.name,
-    ]);
-    expect(postListField.readOnly).toBe(true);
-    expect(postListField.deprecated?.reason).toBeTruthy();
-    expect(postListField.validation).toBeUndefined();
+  it('has no deprecated postList field', () => {
+    expect(getField('postList')).toBeUndefined();
   });
 
   it('modules allows module_postList, module_postLatest, module_cta, and module_newsletter', () => {
