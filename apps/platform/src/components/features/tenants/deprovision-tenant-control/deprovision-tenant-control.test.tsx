@@ -45,6 +45,7 @@ describe(DeprovisionTenantControl, () => {
       back: vi.fn(),
       forward: vi.fn(),
       refresh: refreshMock,
+      bfcacheId: '',
     });
   });
 
