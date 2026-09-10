@@ -3029,14 +3029,6 @@
           "type": "string"
         },
         "optional": true
-      },
-      "defaultOgImage": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "imageWithAlt"
-        },
-        "optional": true
       }
     }
   },
@@ -4563,14 +4555,6 @@
         "type": "objectAttribute",
         "value": {
           "type": "string"
-        },
-        "optional": true
-      },
-      "seo": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "seo"
         },
         "optional": true
       }
