@@ -46,7 +46,12 @@ export const iconButtonVariants = tv({
         // light, ≈7:1 / 5.5:1 / 4.5:1 dark against primary/secondary/brand
         // tint) — the tint hover below is the PRIMARY/SECONDARY case; the
         // BRAND_PRIMARY-tone compound variant swaps it for a solid fill.
-        'hover:border-brand-primary hover:bg-brand-primary-muted hover:text-brand-primary',
+        'hover:bg-brand-primary-muted',
+        // A transparent outline getting an opaque `surface-2` fill on focus
+        // (the base's default) reads as an unrelated swatch on a circle
+        // that never fills at rest or on hover — keep it transparent here
+        // so only the ring itself signals focus.
+        'focus-visible:bg-transparent',
       ],
     },
     tone: {
@@ -59,7 +64,14 @@ export const iconButtonVariants = tv({
     {
       variant: 'control',
       tone: BRAND_VARIANT.BRAND_PRIMARY,
-      class: 'hover:bg-brand-primary-solid hover:text-brand-primary-contrast',
+      // `:hover` and `:focus-visible` can both match at once (mousing over
+      // a tabbed-to control), and either can win the cascade — so the fill,
+      // glyph and ring for this pairing are pinned to the same values under
+      // both pseudo-classes rather than left to whichever one wins.
+      class: [
+        'hover:bg-brand-primary-solid hover:text-brand-primary-contrast',
+        'focus-visible:bg-brand-primary-solid focus-visible:text-brand-primary-contrast focus-visible:ring-brand-primary-contrast',
+      ],
     },
   ],
 });

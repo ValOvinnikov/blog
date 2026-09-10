@@ -351,7 +351,7 @@ describe(`<${Carousel.name}/>`, () => {
     expect(next).toHaveClass('rounded-full');
   });
 
-  it('defaults tone to PRIMARY, giving both buttons the tint hover', () => {
+  it('renders the tint hover, not the solid fill, when tone is omitted', () => {
     renderElement(
       <Carousel
         items={['Slide one']}
@@ -366,6 +366,8 @@ describe(`<${Carousel.name}/>`, () => {
     const next = screen.getByRole('button', { name: 'Next slide' });
     expect(previous).toHaveClass('hover:bg-brand-primary-muted');
     expect(next).toHaveClass('hover:bg-brand-primary-muted');
+    expect(previous).not.toHaveClass('hover:bg-brand-primary-solid');
+    expect(next).not.toHaveClass('hover:bg-brand-primary-solid');
   });
 
   it('passes tone through to both buttons, swapping in the solid hover for BRAND_PRIMARY', () => {
