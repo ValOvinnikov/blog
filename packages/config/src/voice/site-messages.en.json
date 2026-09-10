@@ -242,6 +242,7 @@
   },
   "carousel": {
     "previousAriaLabel": "Previous slide",
-    "nextAriaLabel": "Next slide"
+    "nextAriaLabel": "Next slide",
+    "regionLabel": "{title} carousel"
   }
 }
