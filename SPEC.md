@@ -782,6 +782,26 @@ skim-generation pipeline (`/api/generate-skim`); the Sanity CDN is
 deliberately bypassed; i18n runs through `next-intl` with a locale-prefix-free
 URL scheme and a single `SmartLink` for all in-app navigation.
 
+**Every CMS page but the post renders through one skeleton.** `PageShell`
+(`apps/web/src/components/page-templates/page-shell`) is a compound component
+with three regions: `PageShell.Breadcrumbs`, which renders **before**
+`<main>`; then `PageShell.Heading` and `PageShell.Content` inside it. A page
+composes those regions and nothing else — there is no per-page layout.
+
+`Heading` holds the hero when the document has one, and otherwise the
+`headingBlock` `<h1>` with its `supportingText` (§6). `Content` holds the
+page's chips where it has them, then `ModuleRenderer` over `modules[]`. No
+page owns a bespoke list slot: a post list is a `module_postList` in
+`modules[]` like any other module, which is what lets one shell serve the
+home, landing, blog, topic, tag and taxonomy-index pages alike.
+
+`PageShell` owns **only** the `<main>` landmark and the order of the three
+regions. It deliberately owns no heading fallback, no container width, no
+spacing between regions, and no knowledge of what a region contains — so the
+hero-or-heading requirement stays a Studio document rule (§6) rather than
+something the shell silently papers over. The post page is the one page that
+does not use it.
+
 Full mechanics:
 [`docs/context/rendering-caching-i18n.md`](./docs/context/rendering-caching-i18n.md).
 
