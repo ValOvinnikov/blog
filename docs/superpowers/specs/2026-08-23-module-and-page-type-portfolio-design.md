@@ -47,7 +47,7 @@ that #1285 already shipped.
   full-bleed band tone), an all-optional `layout` object (`layoutField()` —
   `spacingTop`/`spacingBottom`, `containerWidth`, `dividerTop`/
   `dividerBottom`; `heroLayoutField` is the `containerWidth`-less variant),
-  an optional `sectionHeader` (`sectionHeaderField()` — `heading` +
+  an optional `headingBlock` (`headingBlockField()` — `heading` +
   `supportingText`, with a `requireHeading` override), and a module-level
   `contentAlignment` (`defineAlignmentFields()`). `apps/web`'s `Section`
   component (`apps/web/src/components/shared/section`) — **not** `@blog/ui` —
@@ -144,7 +144,7 @@ end rather than renumbering):
 web` — **no config-const step**, since a module's `_type` is derived from its
 schema, not declared in `@blog/config`): add the `packages/studio` `module_*`
 document schema (`titleField()` + `brandVariantField()` + the module's own
-display fields + `sectionHeaderField()`/`defineAlignmentFields()` where the
+display fields + `headingBlockField()`/`defineAlignmentFields()` where the
 module has a heading + `layoutField()`) and add it to the relevant pages'
 `defineModulesField({ allow })`; run `pnpm typegen` so `TModuleType` picks up
 the new `_type`; add `service.modules.<type>.v1` (query + transformer +
@@ -413,7 +413,7 @@ Content fields first, then the shared tail:
 | ------------------------- | ----------------------------------------------- | --------------------------------------------------------------------------- |
 | `title`                   | `titleField()`                                  | Editor-facing name, never rendered                                          |
 | `postSource`              | `HERO_POST_SOURCE` radio, required              | `PINNED` (default) · `NEWEST_FEATURED`                                      |
-| `post`                    | reference → `blog_post`, hidden unless `PINNED` | Required when pinned                                                        |
+| `post`                    | reference → `page_post`, hidden unless `PINNED` | Required when pinned                                                        |
 | `eyebrow`                 | string, max 40                                  | Empty renders the resolved post's topic title                               |
 | `heading`                 | string, max 120                                 | Empty renders the resolved post's title                                     |
 | `supportingText`          | text, 3 rows                                    | Empty renders the resolved post's excerpt                                   |
@@ -480,7 +480,7 @@ rebuilt one resolves the post inside the module projection:
   …,
   "post": select(
     postSource == "PINNED" => post->{ postCardFragment },
-    *[_type == "blog_post" && featured == true && publishedAt <= now()]
+    *[_type == "page_post" && featured == true && PUBLISHED_POST_FILTER]
       | order(publishedAt desc)[0]{ postCardFragment }
   )
 }
@@ -592,7 +592,7 @@ related-reading section, and that gets images unconditionally.
 ### Fields
 
 One helper, `showImagesField()`, emitted by both listing modules right after
-`sectionHeaderField()`:
+`headingBlockField()`:
 
 | Field        | Type                                              | Notes                                            |
 | ------------ | ------------------------------------------------- | ------------------------------------------------ |
@@ -689,7 +689,7 @@ module document (17 `module_postList`, 1 `module_postLatest`), each
 existing documents keep validating.
 
 So the field carries `initialValue: true` and nothing else, matching
-`newsletterEnabled` on `blog_post`, which is the same shape for the same
+`newsletterEnabled` on `page_post`, which is the same shape for the same
 reason. New documents default to on through `initialValue`; existing ones
 read as on through the `coalesce(showImages, true)` projection below. The
 guarantee that makes this safe lives in the query, not in a validation rule.
@@ -746,7 +746,7 @@ states and the resolved view model:
 ### One type, not a sibling
 
 The module already has everything a placed module needs — `titleField()`,
-`brandVariantField()`, `sectionHeaderField()`, alignment, `layoutField` —
+`brandVariantField()`, `headingBlockField()`, alignment, `layoutField` —
 and a web view built from `PostGrid` + `TaxonomyCard`. The only thing it
 lacks in `modules[]` is knowing _which_ taxonomy to list, because today the
 index page holding it supplies that (`getTaxonomyList(id, taxonomy, …)`
@@ -761,7 +761,7 @@ the existing type is the whole feature.
 ### Fields
 
 Added to `module_taxonomyList` between `brandVariantField()` and
-`sectionHeaderField()`:
+`headingBlockField()`:
 
 | Field       | Type                                                | Notes                                                                                                                     |
 | ----------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
@@ -839,7 +839,7 @@ for index-page slots:
 ```ts
 type TTaxonomyListModule = {
   brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
-  sectionHeader: TSectionHeader;
+  headingBlock: THeadingBlock;
   layout: TMaybeUndefined<TLayout>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
   taxonomy: TTaxonomyKind;
@@ -963,10 +963,10 @@ validation state:
 | ------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
 | `title`             | `titleField()`                                            | Editor-facing name, never rendered                                                         |
 | `brandVariant`      | `brandVariantField()`                                     |                                                                                            |
-| `sectionHeader`     | `sectionHeaderField()`                                    | Blank heading falls back to "Featured"                                                     |
+| `headingBlock`      | `headingBlockField()`                                     | Blank heading falls back to "Featured"                                                     |
 | `showImages`        | `showImagesField()`                                       | The 1.2 toggle, applied to the lead and the cards alike                                    |
 | `postSource`        | `POST_SOURCE` radio, required, initial `PINNED`           | `PINNED` · `NEWEST_FEATURED` — the `module_heroBlog` rule, under a name that is not "hero" |
-| `posts`             | array of references → `blog_post`, hidden unless `PINNED` | One to three; array order is display order, the first is the lead                          |
+| `posts`             | array of references → `page_post`, hidden unless `PINNED` | One to three; array order is display order, the first is the lead                          |
 | `limit`             | number, hidden unless `NEWEST_FEATURED`, initial `3`      | Integer, 1 to 3                                                                            |
 | _alignment, layout_ | `defineAlignmentFields([])`, `layoutField`                |                                                                                            |
 
@@ -1004,7 +1004,7 @@ read time until its date, hence the warning rather than an error. The
 async "none in the dataset" check runs against `getDraftsClient(context)`,
 as `module_heroBlog`'s does.
 
-`blog_post.featured`'s description — "Pin this post to the featured slot on
+`page_post.featured`'s description — "Pin this post to the featured slot on
 the home page" — describes `module_hero`, which is being retired. It
 becomes "Marks this post for the Newest featured source of the blog hero
 and the featured spotlight."
@@ -1018,8 +1018,8 @@ One query, the `module_heroBlog` shape:
   …,
   "posts": select(
     postSource == "PINNED" =>
-      posts[]->[publishedAt <= now()]{ postCardFragment },
-    *[_type == "blog_post" && featured == true && publishedAt <= now()]
+      posts[]->[PUBLISHED_POST_FILTER]{ postCardFragment },
+    *[_type == "page_post" && featured == true && PUBLISHED_POST_FILTER]
       | order(publishedAt desc)[0...3]{ postCardFragment }
   ),
   limit
@@ -1042,7 +1042,7 @@ One query, the `module_heroBlog` shape:
 ```ts
 type TPostFeaturedModule = {
   brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
-  sectionHeader: TSectionHeader;
+  headingBlock: THeadingBlock;
   posts: TPostCard[];
   layout: TMaybeUndefined<TLayout>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
@@ -1980,6 +1980,16 @@ catalogue has enough shipped history to matter).
 
 ## Resync log
 
+- **2026-09-10** — the shipped-module sections brought in line with two
+  renames that had landed since they were written: every live `blog_post`
+  reference is `page_post` (`module_heroPost`'s `post`,
+  `module_postFeatured`'s `posts`, both featured-post GROQ blocks,
+  `newsletterEnabled`, `featured`'s description), and the bare
+  `publishedAt <= now()` in those blocks is `PUBLISHED_POST_FILTER`;
+  `sectionHeader` / `sectionHeaderField()` / `TSectionHeader` are
+  `headingBlock` / `headingBlockField()` / `THeadingBlock` throughout. The
+  dated entries below are left as written — they record what was true when
+  they were made.
 - **2026-09-10** — "Topic cards list their latest posts" (#2891) brought in
   line with the post type #2960 left behind: the term-scoped post query is
   `page_post` under `PUBLISHED_POST_FILTER`, not `blog_post` under a bare
