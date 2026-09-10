@@ -208,6 +208,21 @@ export type Module_postLatest = {
   layout?: Layout;
 };
 
+export type Module_postList = {
+  _id: string;
+  _type: 'module_postList';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  headingBlock?: HeadingBlock;
+  showImages?: boolean;
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  pageSize?: number;
+  layout?: Layout;
+};
+
 export type Skim = {
   _type: 'skim';
   takeaways?: Array<string>;
@@ -522,22 +537,6 @@ export type Page_tag = {
       } & Module_newsletterReference)
   >;
   seo?: Seo;
-  postList?: Module_postListReference;
-};
-
-export type Module_postList = {
-  _id: string;
-  _type: 'module_postList';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
-  showImages?: boolean;
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  pageSize?: number;
-  layout?: Layout;
 };
 
 export type Slug = {
@@ -1070,6 +1069,7 @@ export type AllSanitySchemaTypes =
   | Page_postReference
   | Module_postFeatured
   | Module_postLatest
+  | Module_postList
   | Skim
   | Brand
   | SpecLine
@@ -1101,7 +1101,6 @@ export type AllSanitySchemaTypes =
   | Module_ctaReference
   | Module_newsletterReference
   | Page_tag
-  | Module_postList
   | Slug
   | Module_taxonomyListReference
   | Page_tagIndex
