@@ -7,7 +7,6 @@ export const homePageQuery = q.star
   .filterByType('page_home')
   .slice(0)
   .project((sub) => ({
-    title: sub.field('title').notNull(),
     headingBlock: sub
       .field('headingBlock')
       .project(headingBlockFragment)

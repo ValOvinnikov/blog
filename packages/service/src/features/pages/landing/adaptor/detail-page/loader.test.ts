@@ -96,9 +96,14 @@ describe('getPage', () => {
     await expect(getPage('about', tenant)).rejects.toThrow();
   });
 
-  it('resolves seo from the page title and site settings when the page has no authored seo', async () => {
+  it('resolves seo from the authored heading and site settings when the page has no authored seo', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawLandingPage({ seo: null }))
+      .mockResolvedValueOnce(
+        makeRawLandingPage({
+          headingBlock: { heading: 'About', supportingText: null },
+          seo: null,
+        }),
+      )
       .mockResolvedValueOnce(
         makeRawSiteSettings({
           description: 'Settings description',
@@ -111,6 +116,36 @@ describe('getPage', () => {
     expect(page.seo.title).toBe('About');
     expect(page.seo.description).toBe('Settings description');
     expect(page.seo.ogImageUrl).toContain('sanity.io');
+  });
+
+  it('falls the seo title back to the brand name when no heading is authored', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawLandingPage({ headingBlock: null, hero: null, seo: null }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const page = await getPage('about', tenant);
+    if (!page) throw new Error('expected a landing page');
+
+    expect(page.seo.title).toBe('My Blog');
+  });
+
+  it('falls the seo title back to the brand name when the authored heading is blank', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawLandingPage({
+          headingBlock: { heading: '   ', supportingText: null },
+          seo: null,
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const page = await getPage('about', tenant);
+    if (!page) throw new Error('expected a landing page');
+
+    expect(page.seo.title).toBe('My Blog');
+    expect(page.headingBlock.heading).toBe('   ');
   });
 
   it('lets authored seo override the resolved defaults', async () => {

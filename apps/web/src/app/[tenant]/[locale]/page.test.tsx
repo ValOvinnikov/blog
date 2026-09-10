@@ -146,7 +146,6 @@ describe('HomePage', () => {
     getHomePageMock.mockResolvedValue({
       ok: true,
       data: {
-        title: 'Home — internal label',
         headingBlock: makeHeadingBlock({
           heading: 'Welcome to the blog',
           supportingText: 'Fresh posts every week.',
@@ -170,7 +169,6 @@ describe('HomePage', () => {
     getHomePageMock.mockResolvedValue({
       ok: true,
       data: {
-        title: 'Home — internal label',
         headingBlock: makeHeadingBlock({
           heading: 'Welcome to the blog',
           supportingText: 'Fresh posts every week.',
@@ -188,11 +186,10 @@ describe('HomePage', () => {
     expect(screen.queryByText('Welcome to the blog')).not.toBeInTheDocument();
   });
 
-  it('renders nothing in the heading region — never the internal title — when there is no hero and no heading', async () => {
+  it('renders nothing in the heading region when there is no hero and no heading', async () => {
     getHomePageMock.mockResolvedValue({
       ok: true,
       data: {
-        title: 'Home — internal label',
         headingBlock: makeHeadingBlock(),
         hero: undefined,
         modules: [],
@@ -203,26 +200,6 @@ describe('HomePage', () => {
     await setup();
 
     expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
-    expect(screen.queryByText('Home — internal label')).not.toBeInTheDocument();
-  });
-
-  it('never renders the internal title as the visible h1 when a heading is set', async () => {
-    getHomePageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        title: 'Home — internal label',
-        headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
-        hero: undefined,
-        modules: [],
-        seo: makeSeo(),
-      },
-    });
-
-    await setup();
-
-    const h1 = screen.getByRole('heading', { level: 1 });
-    expect(h1).toHaveTextContent('Welcome to the blog');
-    expect(h1).not.toHaveTextContent('Home — internal label');
   });
 });
 

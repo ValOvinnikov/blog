@@ -1,6 +1,7 @@
 import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
 import type { TImageTenant } from '@blog/service/sanity/image';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
+import { toContentTitle } from '@blog/service/shared/transformers/to-content-title';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import {
   toHeroSlot,
@@ -20,9 +21,11 @@ export function toLandingPage(
   settings: TSiteSettings,
   tenant: TImageTenant,
 ): TLandingPage {
+  const headingBlock = toHeadingBlock(raw.headingBlock);
+
   return {
     slug: raw.slug,
-    headingBlock: toHeadingBlock(raw.headingBlock),
+    headingBlock,
     hero: raw.hero ? toHeroSlot(raw.hero) : undefined,
     modules: (raw.modules ?? []).map(toModule),
     // The page_landing schema has no excerpt/summary or image field, so the
@@ -30,7 +33,7 @@ export function toLandingPage(
     // through to the site defaults.
     seo: resolveSeo(
       raw.seo ?? undefined,
-      { title: raw.title },
+      { title: toContentTitle(headingBlock.heading, settings.brand.name) },
       {
         description: settings.description,
         defaultOgImageUrl: settings.defaultOgImageUrl,

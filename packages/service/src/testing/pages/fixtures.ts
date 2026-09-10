@@ -121,7 +121,6 @@ export function makeRawHomePage(
   overrides: Partial<TRawHomePage> = {},
 ): TRawHomePage {
   return {
-    title: 'Home Page',
     headingBlock: null,
     hero: { _id: 'hero-1', _type: 'module_hero' },
     modules: [
@@ -137,7 +136,6 @@ export function makeRawBlogPage(
   overrides: Partial<NonNullable<TRawBlogPage>> = {},
 ): NonNullable<TRawBlogPage> {
   return {
-    title: 'The Blog',
     headingBlock: makeRawOptionalHeadingBlock({
       heading: 'The Blog',
       supportingText: 'Notes on building things.',
@@ -203,7 +201,6 @@ export function makeRawLandingPage(
   overrides: Partial<TRawLandingPage> = {},
 ): TRawLandingPage {
   return {
-    title: 'About',
     slug: 'about',
     headingBlock: null,
     hero: null,
