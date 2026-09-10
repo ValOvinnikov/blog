@@ -26,7 +26,10 @@ import type { TRawPostFeaturedModule } from '@blog/service/features/modules/post
 import type { TRawPostLatestModule } from '@blog/service/features/modules/post-latest/adaptor/transformer';
 import type { TRawPostListModule } from '@blog/service/features/modules/post-list/adaptor/transformer';
 import type { TRawPostRelatedModule } from '@blog/service/features/modules/post-related/adaptor/transformer';
-import type { TRawTaxonomyListModule } from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
+import type {
+  TRawTaxonomyEntry,
+  TRawTaxonomyListModule,
+} from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
 import {
   makeRawHeadingBlock,
   makeRawOptionalHeadingBlock,
@@ -235,7 +238,22 @@ export function makeRawTaxonomyListModule(
     taxonomy: TAXONOMY_KIND.TOPICS,
     sortOrder: TAXONOMY_SORT.ALPHABETICAL,
     limit: null,
+    showLatestPosts: true,
     entries: [],
+    ...overrides,
+  };
+}
+
+export function makeRawTaxonomyEntry(
+  overrides: Partial<TRawTaxonomyEntry> = {},
+): TRawTaxonomyEntry {
+  return {
+    _id: 'topic-1',
+    title: 'Engineering',
+    slug: 'engineering',
+    description: 'Engineering posts',
+    postCount: 0,
+    latestPosts: [],
     ...overrides,
   };
 }

@@ -1,10 +1,9 @@
 import { TAXONOMY_KIND } from '@blog/config';
-import {
-  makeRawTagWithPostCount,
-  makeRawTopicWithPostCount,
-} from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawTaxonomyListModule } from '@blog/service/testing/modules/fixtures';
+import {
+  makeRawTaxonomyEntry,
+  makeRawTaxonomyListModule,
+} from '@blog/service/testing/modules/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getTaxonomyList } from './loader';
@@ -22,7 +21,7 @@ describe('getTaxonomyList', () => {
       makeRawTaxonomyListModule({
         taxonomy: TAXONOMY_KIND.TOPICS,
         entries: [
-          makeRawTopicWithPostCount({ _id: 'topic-1', title: 'Engineering' }),
+          makeRawTaxonomyEntry({ _id: 'topic-1', title: 'Engineering' }),
         ],
       }),
     );
@@ -37,6 +36,7 @@ describe('getTaxonomyList', () => {
         slug: 'engineering',
         description: 'Engineering posts',
         postCount: 0,
+        latestPosts: [],
       },
     ]);
   });
@@ -45,9 +45,7 @@ describe('getTaxonomyList', () => {
     mockRun.mockResolvedValueOnce(
       makeRawTaxonomyListModule({
         taxonomy: TAXONOMY_KIND.TAGS,
-        entries: [
-          makeRawTagWithPostCount({ _id: 'tag-1', title: 'TypeScript' }),
-        ],
+        entries: [makeRawTaxonomyEntry({ _id: 'tag-1', title: 'TypeScript' })],
       }),
     );
 
@@ -62,9 +60,10 @@ describe('getTaxonomyList', () => {
       {
         id: 'tag-1',
         title: 'TypeScript',
-        slug: 'typescript',
-        description: 'TypeScript posts',
+        slug: 'engineering',
+        description: 'Engineering posts',
         postCount: 0,
+        latestPosts: [],
       },
     ]);
   });
@@ -74,7 +73,7 @@ describe('getTaxonomyList', () => {
       makeRawTaxonomyListModule({
         taxonomy: TAXONOMY_KIND.TOPICS,
         entries: [
-          makeRawTopicWithPostCount({ _id: 'topic-1', title: 'Engineering' }),
+          makeRawTaxonomyEntry({ _id: 'topic-1', title: 'Engineering' }),
         ],
       }),
     );

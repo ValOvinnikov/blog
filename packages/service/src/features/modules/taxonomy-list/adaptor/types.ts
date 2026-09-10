@@ -6,15 +6,21 @@ import type {
   THeadingBlock,
   TTaxonomyKind,
 } from '@blog/config';
-import type { TTagWithPostCount } from '@blog/service/features/entities/tags/adaptor/types';
-import type { TTopicWithPostCount } from '@blog/service/features/entities/topics/adaptor/types';
+import type { TPostLink } from '@blog/service/shared/transformers/to-post-link';
 
 /**
- * `TTopicWithPostCount` and `TTagWithPostCount` are structurally identical
- * (`{ id, title, slug, description, postCount }`) by design — one card
- * renders either.
+ * A resolved taxonomy term (topic or tag) as rendered by the module — the two
+ * entities are structurally identical here (`{ id, title, slug, description,
+ * postCount, latestPosts }`) by design, so one card renders either.
  */
-export type TTaxonomyEntry = TTopicWithPostCount | TTagWithPostCount;
+export type TTaxonomyEntry = {
+  id: string;
+  title: string;
+  slug: string;
+  description: TMaybeUndefined<string>;
+  postCount: number;
+  latestPosts: TPostLink[];
+};
 
 export type TTaxonomyListModule = {
   brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
@@ -22,5 +28,6 @@ export type TTaxonomyListModule = {
   layout: TMaybeUndefined<TLayout>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
   taxonomy: TTaxonomyKind;
+  showLatestPosts: boolean;
   entries: TTaxonomyEntry[];
 };
