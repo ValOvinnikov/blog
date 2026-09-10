@@ -13,11 +13,38 @@ import {
   upsertSiteConfig,
   type TUpdateSiteConfigInput,
   type TUpsertSiteConfigResult,
+  type TVoiceOverridesInput,
 } from './upsert-site-config';
 
 const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
+const { SYNTHETIC_MULTILINE_FIELD_ID, SYNTHETIC_MULTILINE_FIELD_MAX } =
+  vi.hoisted(() => ({
+    SYNTHETIC_MULTILINE_FIELD_ID: 'testMultilineField',
+    SYNTHETIC_MULTILINE_FIELD_MAX: 300,
+  }));
+
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+
+// VOICE_FIELDS has no MULTILINE member, so validateTextField's line-break
+// branch for non-TEXT fields is only reachable via a synthetic entry here.
+vi.mock('@blog/config', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@blog/config')>();
+  return {
+    ...actual,
+    VOICE_FIELDS: [
+      ...actual.VOICE_FIELDS,
+      {
+        id: SYNTHETIC_MULTILINE_FIELD_ID,
+        path: 'test.multilineField',
+        kind: actual.VOICE_FIELD_KIND.MULTILINE,
+        surface: actual.VOICE_SURFACE.ACCOUNT,
+        placeholders: [],
+        max: SYNTHETIC_MULTILINE_FIELD_MAX,
+      },
+    ],
+  };
+});
 
 let db: PgliteDatabase<typeof schema>;
 
@@ -218,31 +245,43 @@ describe('voice overrides — MULTILINE fields', () => {
   it('stores a trimmed MULTILINE override without rejecting line breaks', async () => {
     const { id: tenantId } = await insertTestTenant(db);
 
+    const overrides = {
+      [SYNTHETIC_MULTILINE_FIELD_ID]: '  Line one\nLine two  ',
+    } as TVoiceOverridesInput;
+
     const result = expectOk(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: {
-          authMenuRedirectHint: '  Line one\nLine two  ',
-        },
+        voiceOverrides: overrides,
       }),
     );
 
     expect(result.voiceOverrides).toEqual({
-      authMenuRedirectHint: 'Line one\nLine two',
+      [SYNTHETIC_MULTILINE_FIELD_ID]: 'Line one\nLine two',
     });
   });
 
   it('rejects a MULTILINE override longer than its field-specific cap', async () => {
     const { id: tenantId } = await insertTestTenant(db);
 
+    const overrides = {
+      [SYNTHETIC_MULTILINE_FIELD_ID]: 'x'.repeat(
+        SYNTHETIC_MULTILINE_FIELD_MAX + 1,
+      ),
+    } as TVoiceOverridesInput;
+
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: { authMenuRedirectHint: 'x'.repeat(301) },
+        voiceOverrides: overrides,
       }),
     );
 
-    expect(result.fieldErrors.authMenuRedirectHint).toBeDefined();
+    expect(
+      result.fieldErrors[
+        SYNTHETIC_MULTILINE_FIELD_ID as keyof typeof result.fieldErrors
+      ],
+    ).toBeDefined();
   });
 });
 

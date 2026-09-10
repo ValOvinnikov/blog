@@ -5,7 +5,6 @@ export const VOICE_SURFACE = {
   SHARING: 'SHARING',
   NOT_FOUND: 'NOT_FOUND',
   ERROR: 'ERROR',
-  SIGN_IN: 'SIGN_IN',
   BOOKMARKS: 'BOOKMARKS',
   ACCOUNT: 'ACCOUNT',
 } as const;
