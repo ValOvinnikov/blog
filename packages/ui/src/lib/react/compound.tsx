@@ -16,18 +16,18 @@ interface ICompoundSlots<M extends TComponentMap> {
 }
 
 /**
- * Flattens `children` into a plain array, descending into `<>...</>`
- * Fragments — unlike `Children.forEach`/`Children.toArray`, which treat a
- * Fragment as one opaque child (common when `children` is built as a single
- * JSX expression, e.g. Storybook `args`). Drops `null`/`false`/`undefined`.
+ * `Children.forEach` treats a `<>...</>` Fragment as one opaque child instead
+ * of descending into it — common when a compound root's `children` is built
+ * as a single JSX expression (e.g. Storybook `args`). Recursing here lets
+ * `mapCompoundSlots` match slots the same way regardless of Fragment wrapping.
  */
-export const flattenChildren = (children: ReactNode): ReactNode[] => {
+const flattenFragments = (children: ReactNode): ReactNode[] => {
   const flat: ReactNode[] = [];
   Children.forEach(children, (child) => {
     if (isValidElement(child) && child.type === Fragment) {
       const fragmentProps = child.props as { children?: ReactNode };
-      flat.push(...flattenChildren(fragmentProps.children));
-    } else if (child != null && child !== false) {
+      flat.push(...flattenFragments(fragmentProps.children));
+    } else {
       flat.push(child);
     }
   });
@@ -49,9 +49,9 @@ export const mapCompoundSlots = <M extends TComponentMap>(
   const slots: ICompoundSlots<M>['slots'] = {};
   const unmatched: ReactNode[] = [];
 
-  flattenChildren(children).forEach((child) => {
+  flattenFragments(children).forEach((child) => {
     if (!isValidElement(child)) {
-      unmatched.push(child);
+      if (child != null && child !== false) unmatched.push(child);
       return;
     }
     const match = pairs.find(

@@ -283,7 +283,7 @@ Props: rows: IBookmarkRow[] · emptyMessage: string · hint?: string · prefix?:
 ### Carousel — `organisms/carousel/carousel.tsx`
 
 a generic swipeable row of slides.
-Props: children: ReactNode · ariaLabel: string · previousLabel: string · nextLabel: string · slideSize?: TCarouselVariants['slideSize'] _(extends IWithClassName, IWithDataTestId)_
+Props: items: T[] · renderItem: (item: T, index: number) => ReactNode · ariaLabel: string · previousLabel: string · nextLabel: string · slideSize?: TCarouselVariants['slideSize'] _(extends IWithClassName, IWithDataTestId)_
 Variants: isEnhanced: (boolean) · slideSize: columns|full
 
 ### ContentModule — `organisms/content-module/content-module.tsx`

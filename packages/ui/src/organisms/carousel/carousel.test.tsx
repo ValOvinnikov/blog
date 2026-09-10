@@ -74,26 +74,34 @@ beforeEach(() => {
   emblaApi.canScrollNext.mockReturnValue(true);
 });
 
+const renderItem = (item: string) => <div>{item}</div>;
+
 describe(`<${Carousel.name}/>`, () => {
   it('renders a region carrying aria-roledescription and the given ariaLabel', () => {
     const ariaLabel = faker.lorem.words(3);
     renderElement(
-      <Carousel ariaLabel={ariaLabel} previousLabel="Previous" nextLabel="Next">
-        <div>Slide one</div>
-      </Carousel>,
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel={ariaLabel}
+        previousLabel="Previous"
+        nextLabel="Next"
+      />,
     );
 
     const region = screen.getByRole('region', { name: ariaLabel });
     expect(region).toHaveAttribute('aria-roledescription', 'carousel');
   });
 
-  it('renders one list item per slide, keeping every slide in the DOM', () => {
+  it('renders one list item per item, keeping every slide in the DOM', () => {
     renderElement(
-      <Carousel ariaLabel="Posts" previousLabel="Previous" nextLabel="Next">
-        <div>Slide one</div>
-        <div>Slide two</div>
-        <div>Slide three</div>
-      </Carousel>,
+      <Carousel
+        items={['Slide one', 'Slide two', 'Slide three']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+      />,
     );
 
     const slides = screen.getAllByRole('listitem');
@@ -106,53 +114,49 @@ describe(`<${Carousel.name}/>`, () => {
 
   it('renders no "n of m" text on any slide', () => {
     renderElement(
-      <Carousel ariaLabel="Posts" previousLabel="Previous" nextLabel="Next">
-        <div>Slide one</div>
-        <div>Slide two</div>
-      </Carousel>,
+      <Carousel
+        items={['Slide one', 'Slide two']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+      />,
     );
 
     expect(screen.queryByText(/\d+ of \d+/i)).not.toBeInTheDocument();
   });
 
-  it("keys each slide by the slide element's own key when present, not its index", () => {
-    const { rerender } = renderElement(
-      <Carousel ariaLabel="Posts" previousLabel="Previous" nextLabel="Next">
-        <div key="a" data-testid="slide-a">
-          Slide A
-        </div>
-        <div key="b" data-testid="slide-b">
-          Slide B
-        </div>
-      </Carousel>,
+  it('calls renderItem for every item and renders each as a slide, in order', () => {
+    const items = ['alpha', 'bravo', 'charlie'];
+    const renderItemSpy = vi.fn((item: string) => <div>{item}</div>);
+    renderElement(
+      <Carousel
+        items={items}
+        renderItem={renderItemSpy}
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+      />,
     );
 
-    const slideA = screen.getByTestId('slide-a');
+    items.forEach((item, index) => {
+      expect(renderItemSpy).toHaveBeenCalledWith(item, index);
+    });
 
-    rerender(
-      <Carousel ariaLabel="Posts" previousLabel="Previous" nextLabel="Next">
-        <div key="b" data-testid="slide-b">
-          Slide B
-        </div>
-        <div key="a" data-testid="slide-a">
-          Slide A
-        </div>
-      </Carousel>,
-    );
-
-    expect(screen.getByTestId('slide-a')).toBe(slideA);
+    const slides = screen.getAllByRole('listitem');
+    expect(slides.map((slide) => slide.textContent)).toEqual(items);
   });
 
   it('forwards data-testid to the root element', () => {
     renderElement(
       <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
         ariaLabel="Posts"
         previousLabel="Previous"
         nextLabel="Next"
         dataTestId="posts-carousel"
-      >
-        <div>Slide one</div>
-      </Carousel>,
+      />,
     );
 
     expect(screen.getByTestId('posts-carousel')).toBeVisible();
@@ -162,13 +166,13 @@ describe(`<${Carousel.name}/>`, () => {
     currentApi = undefined;
     renderElement(
       <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
         ariaLabel="Posts"
         previousLabel="Previous"
         nextLabel="Next"
         dataTestId="carousel"
-      >
-        <div>Slide one</div>
-      </Carousel>,
+      />,
     );
 
     const viewport = screen.getByTestId('carousel').firstElementChild;
@@ -180,25 +184,25 @@ describe(`<${Carousel.name}/>`, () => {
     currentApi = undefined;
     const { rerender } = renderElement(
       <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
         ariaLabel="Posts"
         previousLabel="Previous"
         nextLabel="Next"
         dataTestId="carousel"
-      >
-        <div>Slide one</div>
-      </Carousel>,
+      />,
     );
 
     currentApi = emblaApi;
     rerender(
       <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
         ariaLabel="Posts"
         previousLabel="Previous"
         nextLabel="Next"
         dataTestId="carousel"
-      >
-        <div>Slide one</div>
-      </Carousel>,
+      />,
     );
 
     const viewport = screen.getByTestId('carousel').firstElementChild;
@@ -218,25 +222,25 @@ describe(`<${Carousel.name}/>`, () => {
     currentApi = undefined;
     const { rerender } = renderElement(
       <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
         ariaLabel="Posts"
         previousLabel="Previous"
         nextLabel="Next"
         dataTestId="carousel"
-      >
-        <div>Slide one</div>
-      </Carousel>,
+      />,
     );
 
     currentApi = emblaApi;
     rerender(
       <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
         ariaLabel="Posts"
         previousLabel="Previous"
         nextLabel="Next"
         dataTestId="carousel"
-      >
-        <div>Slide one</div>
-      </Carousel>,
+      />,
     );
 
     expect(mockViewport.scrollLeft).toBe(0);
@@ -245,9 +249,13 @@ describe(`<${Carousel.name}/>`, () => {
 
   it('applies the grid-tracking slide classes by default', () => {
     renderElement(
-      <Carousel ariaLabel="Posts" previousLabel="Previous" nextLabel="Next">
-        <div data-testid="slide">Slide one</div>
-      </Carousel>,
+      <Carousel
+        items={['Slide one']}
+        renderItem={(item) => <div data-testid="slide">{item}</div>}
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+      />,
     );
 
     const slide = screen.getByTestId('slide').parentElement;
@@ -258,13 +266,13 @@ describe(`<${Carousel.name}/>`, () => {
   it('applies the full-width slide classes when slideSize is "full"', () => {
     renderElement(
       <Carousel
+        items={['Slide one']}
+        renderItem={(item) => <div data-testid="slide">{item}</div>}
         ariaLabel="Posts"
         previousLabel="Previous"
         nextLabel="Next"
         slideSize="full"
-      >
-        <div data-testid="slide">Slide one</div>
-      </Carousel>,
+      />,
     );
 
     const slide = screen.getByTestId('slide').parentElement;
@@ -275,12 +283,12 @@ describe(`<${Carousel.name}/>`, () => {
   it('renders both buttons, labelled and titled from previousLabel/nextLabel', () => {
     renderElement(
       <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
         ariaLabel="Posts"
         previousLabel="Previous slide"
         nextLabel="Next slide"
-      >
-        <div>Slide one</div>
-      </Carousel>,
+      />,
     );
 
     const previous = screen.getByRole('button', { name: 'Previous slide' });
@@ -293,12 +301,12 @@ describe(`<${Carousel.name}/>`, () => {
     const user = userEvent.setup();
     renderElement(
       <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
         ariaLabel="Posts"
         previousLabel="Previous slide"
         nextLabel="Next slide"
-      >
-        <div>Slide one</div>
-      </Carousel>,
+      />,
     );
 
     await user.click(screen.getByRole('button', { name: 'Previous slide' }));
@@ -313,12 +321,12 @@ describe(`<${Carousel.name}/>`, () => {
     emblaApi.canScrollNext.mockReturnValue(true);
     renderElement(
       <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
         ariaLabel="Posts"
         previousLabel="Previous slide"
         nextLabel="Next slide"
-      >
-        <div>Slide one</div>
-      </Carousel>,
+      />,
     );
 
     expect(
@@ -341,12 +349,12 @@ describe(`<${Carousel.name}/>`, () => {
     emblaApi.canScrollNext.mockReturnValue(true);
     renderElement(
       <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
         ariaLabel="Posts"
         previousLabel="Previous slide"
         nextLabel="Next slide"
-      >
-        <div>Slide one</div>
-      </Carousel>,
+      />,
     );
 
     emblaApi.canScrollNext.mockReturnValue(false);
@@ -357,9 +365,13 @@ describe(`<${Carousel.name}/>`, () => {
 
   it("configures Embla with the design's fixed options", () => {
     renderElement(
-      <Carousel ariaLabel="Posts" previousLabel="Previous" nextLabel="Next">
-        <div>Slide one</div>
-      </Carousel>,
+      <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+      />,
     );
 
     expect(emblaCarouselOptionsSpy).toHaveBeenCalledWith({
@@ -375,12 +387,12 @@ describe(`<${Carousel.name}/>`, () => {
   it('moves focus to the sibling nav button before disabling the one that holds it', () => {
     renderElement(
       <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
         ariaLabel="Posts"
         previousLabel="Previous slide"
         nextLabel="Next slide"
-      >
-        <div>Slide one</div>
-      </Carousel>,
+      />,
     );
 
     const next = screen.getByRole('button', { name: 'Next slide' });
@@ -399,12 +411,12 @@ describe(`<${Carousel.name}/>`, () => {
   it('moves focus to the region when both nav buttons disable at once', () => {
     renderElement(
       <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
         ariaLabel="Posts"
         previousLabel="Previous slide"
         nextLabel="Next slide"
-      >
-        <div>Slide one</div>
-      </Carousel>,
+      />,
     );
 
     const next = screen.getByRole('button', { name: 'Next slide' });
@@ -421,12 +433,12 @@ describe(`<${Carousel.name}/>`, () => {
   it('leaves focus alone when the disabled flags change without focus on a nav button', () => {
     renderElement(
       <Carousel
+        items={['Slide one']}
+        renderItem={renderItem}
         ariaLabel="Posts"
         previousLabel="Previous slide"
         nextLabel="Next slide"
-      >
-        <div>Slide one</div>
-      </Carousel>,
+      />,
     );
 
     const previous = screen.getByRole('button', { name: 'Previous slide' });
