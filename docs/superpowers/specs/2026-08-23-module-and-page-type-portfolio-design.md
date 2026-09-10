@@ -1217,11 +1217,13 @@ layout, and `limit` already caps them.
 
 **`Carousel` is a new organism, generic, and the first in `@blog/ui` to
 carry a hook.** It renders a `role="region"` root, a viewport `<div>`
-bound to `useEmblaCarousel`, a `<ul>` track with one `<li>` per child, and
-the two previous/next `IconButton`s centred under the track. A slide is
-whatever the caller passes — a `PostCardItem` today, an `ImageWithCaption`
-when the gallery is built. The organism never maps data to slides and
-never names a content type. `embla-carousel-react@8.6.0` (peer
+bound to `useEmblaCarousel`, a `<ul>` track with one `<li>` per item, and
+the two previous/next `IconButton`s centred under the track. The caller
+passes `items` and a `renderItem` — `({ item }) => <PostCardItem {...item} />`
+today, an image when the gallery is built — so a slide is whatever that
+function returns, and sizes it through `slideClassName`. The organism never
+names a content type and never sets a slide width; its Embla state lives in
+one internal `useCarousel` hook, and the component is markup over it. `embla-carousel-react@8.6.0` (peer
 `react ^19`, MIT) becomes a `packages/ui` dependency; the v8 API is the one
 this design names (`scrollPrev`/`canScrollPrev`, `reInit`) and the
 `9.0.0-rc` line renames them, so pin the major.
@@ -1236,14 +1238,16 @@ hook-bearing component in the design system, decided 2026-09-10; the
 `ui-library-practices` Purity section, `ui.md` and `SPEC.md` §4 record the
 exception in the ui PR.
 
-| Prop                      | Effect                                                                                                                       |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `children`                | The slides; every child becomes an `<li>`, keyed by its own key where it has one                                             |
-| `ariaLabel: string`       | Names the region; with `aria-roledescription="carousel"` on the root                                                         |
-| `previousLabel: string`   | `aria-label` and `title` of the previous button; icon-only, so this is its whole name                                        |
-| `nextLabel: string`       | Same for next                                                                                                                |
-| `slideSize?`              | `columns` (default): the grid's own columns, the table below. `full`: one slide per view at every width, the gallery's shape |
-| `className`, `dataTestId` | The usual                                                                                                                    |
+| Prop                                         | Effect                                                                                                                                                                    |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `items: readonly T[]`                        | The list; generic over `T`                                                                                                                                                |
+| `renderItem: ({ item, index }) => ReactNode` | Renders one slide's content; the organism never names a content type                                                                                                      |
+| `getItemKey?: ({ item, index }) => Key`      | The slide's React key; `index` when omitted                                                                                                                               |
+| `ariaLabel: string`                          | Names the region; with `aria-roledescription="carousel"` on the root                                                                                                      |
+| `previousLabel: string`                      | `aria-label` and `title` of the previous button; icon-only, so this is its whole name                                                                                     |
+| `nextLabel: string`                          | Same for next                                                                                                                                                             |
+| `slideClassName?: string`                    | Layout only, on every `<li>`: the caller sizes the slide, the organism sets no width — the post wrapper passes the grid's columns (table below), the gallery `basis-full` |
+| `className`, `dataTestId`                    | The usual                                                                                                                                                                 |
 
 Everything Embla owns is internal state, never a prop:
 
@@ -1286,8 +1290,9 @@ const [viewportRef, embla] = useEmblaCarousel({
 - Default `watchFocus` stays on, so the viewport follows keyboard focus
   into an off-screen slide.
 
-**`slideSize: columns` tracks the grid's columns**, so a carousel with
-three posts at `md` is pixel-identical to the grid apart from the buttons:
+**The post wrapper's `slideClassName` tracks the grid's columns**, so a
+carousel with three posts at `md` is pixel-identical to the grid apart from
+the buttons:
 
 | Width       | Grid      | Slide                       | Why                                                                                                |
 | ----------- | --------- | --------------------------- | -------------------------------------------------------------------------------------------------- |
@@ -1298,9 +1303,10 @@ three posts at `md` is pixel-identical to the grid apart from the buttons:
 Gaps reuse the grid's tokens (`gap-3.5 md:gap-5 lg:gap-7`); slides are
 `shrink-0 min-w-0 snap-start`; the track carries
 `touch-action: pan-y pinch-zoom` so vertical page scrolling survives a
-horizontal drag. `slideSize: full` is `basis-full` at every width with the
-same gap; it exists so the gallery has a shape to reach for on day one and
-the sizing never has to be forked into a second organism.
+horizontal drag. Those widths are the post wrapper's, not the organism's;
+the gallery's wrapper passes `basis-full` for one image per view. The
+organism ships no width of its own, so no consumer's shape is ever baked
+into it.
 
 **The controls always render.** They sit centred under the track rather than
 in the heading row, so a centred or right-aligned section header keeps
@@ -1321,39 +1327,46 @@ hidden and the count is the list's. `ariaLabel` is required, so a nameless
 `role="region"` is a compile error rather than an axe failure.
 
 **Stories and tests.** Storybook renders the real Embla — a row that fits,
-a row that scrolls, each `slideSize`, and one story whose slides are plain
-images so the story itself proves the organism is not a post component.
+a row that scrolls, and one story whose `renderItem` returns plain images
+so the story itself proves the organism is not a post component.
 Unit tests mock `embla-carousel-react` (the hook returns a ref and a stub
 API) and assert the button wiring, the disabled flags from
 `canScrollPrev`/`canScrollNext`, the `isEnhanced` class swap on `init`, the
-`scrollLeft` handoff, the `slideSize` class swap, and that every child
-becomes a slide with its own key.
+`scrollLeft` handoff, `slideClassName` on every `<li>`, and that every item
+renders once through `renderItem`, keyed by `getItemKey`.
 
 ### Web
 
-**`Carousel` is the `'use client'` wrapper**, under
-`apps/web/src/components/shared/carousel/`, exactly the `SanityImage`
-shape: `import { Carousel as CarouselBase } from '@blog/ui/organisms/carousel'`,
-the directive, and nothing Embla-shaped of its own. Its two jobs are the
-client boundary — `@blog/ui` is in `transpilePackages`, so the organism's
-hook bundles under this file's directive — and the labels: it reads
-`carousel.previousAriaLabel` and `carousel.nextAriaLabel` with
-`useTranslations` and passes them down, so one place names the buttons for
-every caller. Everything else (`children`, `ariaLabel`, `slideSize`,
-`className`, `dataTestId`) passes through. The buttons are icon-only, so
-the text is an `aria-label` no sighted reader sees — the accessibility-only
-bucket of `VOICE_FIXED_KEYS` (`blogPostPage.backToTop.ariaLabel`,
-`bookmarkButton.saveAriaLabel`), not a tenant-editable `VOICE_FIELDS`
-entry the way pagination's visible Previous/Next are.
+**`PostsCarousel` is the `'use client'` wrapper**, under
+`apps/web/src/components/shared/posts-carousel/`, the `SanityImage` shape:
+the directive, `import { Carousel } from '@blog/ui/organisms/carousel'`, and
+nothing Embla-shaped of its own. **The wrapper is per item type by
+construction**: a function cannot cross the server→client boundary, so
+the Server Component views pass plain data and the wrapper is where
+`renderItem` is born. Its jobs: the client boundary (`@blog/ui` is in
+`transpilePackages`, so the organism's hook bundles under this file's
+directive; `PostCardItem` renders on the client from here, and its
+`IPostCardData` is strings plus a pre-rendered `image?: ReactNode`, all
+serialisable); `renderItem`, one `PostCardItem` per item with no `isLead`
+and no `isSplit`, keyed by the item's `id`; the slide width, the grid's
+columns as `slideClassName` from its own variants file; and the labels —
+`carousel.previousAriaLabel` and `carousel.nextAriaLabel`, read with
+`useTranslations`, so one place names the buttons for every post carousel.
+The buttons are icon-only, so the text is an `aria-label` no sighted
+reader sees — the accessibility-only bucket of `VOICE_FIXED_KEYS`
+(`blogPostPage.backToTop.ariaLabel`, `bookmarkButton.saveAriaLabel`), not
+a tenant-editable `VOICE_FIELDS` entry the way pagination's visible
+Previous/Next are. A future gallery gets its own wrapper with its own
+`renderItem` and `basis-full`; the organism is shared, the wrappers are
+not.
 
-**The two module views branch once, and map their own slides.** Listings
+**The two module views branch once.** Listings
 are composed in web since the page-composition work: each module has its
 own view that renders `Section`, its heading and its `PostCardItem`s. `PostLatestModuleView` and
 `PostFeaturedModuleView` gain `displayMode: TDisplayMode` from their view
-models and branch on it: `CAROUSEL` renders the web `Carousel` with one
-`PostCardItem` per item as its children — the same mapping the grid uses,
-in the same file; server-rendered cards passed as children of a client
-component is the ordinary RSC pattern — and anything else renders what the
+models and branch on it: `CAROUSEL` renders `<PostsCarousel items hasImages ariaLabel>` with the
+view's items — plain data across the boundary — and anything else renders
+what the
 view renders today (the `PostGrid` for latest, the lead-plus-tail spotlight
 for featured). A featured carousel is three equal slides: no `isLead`, no
 `isSplit`, because a carousel is a row of peers. `PostListModuleView` (the
@@ -1377,19 +1390,21 @@ None — one optional field, defaulted at read time.
 - **service** — the coalesced projection and the view-model field on both
   teasers; transformer tests for an authored value and the read-time
   default.
-- **ui** — the dependency; `Carousel` with the hook, the internal state,
-  the handoff, the buttons and `slideSize`; the stories and mocked tests
+- **ui** — the dependency; `Carousel` over an internal `useCarousel` hook,
+  with `items`/`renderItem`/`getItemKey`/`slideClassName`; the stories and
+  mocked tests
   above; `COMPONENTS.md`; and the governance amendments — the
   `ui-library-practices` Purity section, `.claude/agents/ui.md` and
   `SPEC.md` §4 each gain the one-component exception. PR #2925 already
   carries the pure organism from the earlier cut; it is reworked in place:
   drop the `posts-section` changes (those files no longer exist on `main`)
-  and the `Carousel.Controls` slot (the buttons are internal now), add the
-  hook, the state and `slideSize`.
-- **web** — the wrapper, the `displayMode` branch in both views, the copy
-  keys; a wrapper test that the labels reach the organism; a view test per
-  module that `CAROUSEL` renders the wrapper with one slide per item and
-  `GRID` does not; a web story with real Embla inside a module view.
+  and the `Carousel.Controls` slot with its `compound.tsx` change (the
+  buttons are internal now), add the hook, the state and the `items` API.
+- **web** — `PostsCarousel`, the `displayMode` branch in both views, the
+  copy keys; a wrapper test that the labels reach the organism, one
+  `PostCardItem` per item with no lead treatment, and the column widths as
+  `slideClassName`; a view test per module that `CAROUSEL` renders the
+  wrapper with the view's items and `GRID` does not; a web story with real Embla inside a module view.
 
 Four PRs, each green on `main` alone:
 
@@ -1410,8 +1425,9 @@ keyboard reachable, labelled, and disabled exactly when Embla cannot move;
 reduced motion makes every position change instant; a spotlight in
 carousel mode renders three equal slides; a `module_postLatest` carousel
 with fewer than four posts warns in the Studio; **the organism carries no
-`'use client'` and nothing post-specific** — the web wrapper is the only
-boundary, and a story renders the organism with plain image slides.
+`'use client'` and nothing post-specific** — it sets no slide width, no function prop
+crosses a server→client boundary, each consumer's `'use client'` wrapper is
+the only boundary, and a story renders the organism with plain image slides.
 
 ### Not in scope
 
@@ -1862,6 +1878,12 @@ point; the graph stays acyclic.
   gallery reuses them. Replaces the pure-organism-plus-web-leaf split of
   2026-09-08, and rewrites the Web section against the per-module views
   (`PostsSection` is gone) (2026-09-10, #2785).
+- **The carousel organism takes `items` and `renderItem`, sets no slide
+  width, and each consumer has its own `'use client'` wrapper** — a
+  function cannot cross the server→client boundary, so `PostsCarousel` in
+  web owns `renderItem`, the grid-column `slideClassName` and the labels,
+  and the Server Component views pass plain data; `slideSize` is gone.
+  Settled in the PR #2925 review (2026-09-10, #2839).
 - **Topic cards list their two newest posts, behind a `showLatestPosts`
   toggle that is on by default and defaulted at read time** — the titles
   join each term inside the merged taxonomy-list query through a new
@@ -1924,6 +1946,10 @@ catalogue has enough shipped history to matter).
 
 ## Resync log
 
+- **2026-09-10** — carousel organism API after the #2925 review: `items` +
+  `renderItem` + `getItemKey` + `slideClassName` replace `children` and
+  `slideSize`; the state moves into an internal `useCarousel` hook; the
+  web wrapper becomes the per-consumer `PostsCarousel`.
 - **2026-09-10** — re-cut "The carousel display mode" (#2785): Embla
   moves from a web leaf into the `@blog/ui` organism (hook, buttons,
   flags, handoff internal; `Carousel.Controls`, `viewportRef` and

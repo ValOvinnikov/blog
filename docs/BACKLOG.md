@@ -1003,11 +1003,12 @@ latest view models` — `postCardFragment` already carries `heroImageSanity`
   on `init`, and the pre-hydration scroll-offset handoff — with **no
   `'use client'` of its own**; it is the design system's one hook-bearing
   component (`ui-library-practices`, `ui.md` and `SPEC.md` §4 record the
-  exception). A thin `apps/web` `Carousel` wrapper (the `SanityImage`
-  shape) declares the boundary and reads the two labels. Both are
-  generic: a slide is any child, `slideSize` is `columns` (85 % below
-  `sm`, ½ at `sm`, ⅓ from `md` — the grid's own) or `full` (one per view,
-  for the gallery). Controls always render and are disabled exactly when
+  exception). The organism takes `items` + `renderItem`
+  (`({ item }) => <PostCardItem {...item} />`) and sets no slide width. The
+  `apps/web` wrapper is per item type — `PostsCarousel` (the `SanityImage`
+  shape) owns `renderItem`, the grid-column `slideClassName` (85 % below
+  `sm`, ½ at `sm`, ⅓ from `md`) and the two labels — because a function
+  cannot cross the server→client boundary; the views pass plain data. Controls always render and are disabled exactly when
   Embla cannot move; every slide stays in the tab order and the viewport
   follows focus. `embla-carousel-react@8.6.0` in `packages/ui`, pinned to
   the v8 major (the 9.0 rc renames the methods). One Studio warning: a
@@ -1021,16 +1022,17 @@ latest view models` — `postCardFragment` already carries `heroImageSanity`
     — shared `displayModeField()` helper, the `limit` warning, typegen.
   - **service** · `feat(service): project displayMode` (#2838) — the
     coalesced projection on both teasers.
-  - **ui** · `feat(ui): Carousel organism owning Embla, generic slides,
-slideSize` (#2839) — `embla-carousel-react` added to `packages/ui`; hook,
-    buttons, flags and handoff internal; no directive; the governance
+  - **ui** · `feat(ui): Carousel organism owning Embla — items, renderItem,
+no slide width` (#2839) — `embla-carousel-react` added to `packages/ui`;
+    an internal `useCarousel` hook; no directive; the governance
     amendments; PR #2925 reworked in place (drops its `posts-section`
-    changes and the `Controls` slot).
-  - **web** · `feat(web): 'use client' Carousel wrapper and the displayMode
-branch in both teaser views` (#2840) — the wrapper reads
+    changes, the `Controls` slot and the `compound.tsx` change).
+  - **web** · `feat(web): PostsCarousel 'use client' wrapper and the
+displayMode branch in both teaser views` (#2840) — the wrapper owns
+    `renderItem` (one `PostCardItem` per item), the column widths and
     `carousel.previousAriaLabel` / `carousel.nextAriaLabel`; `CAROUSEL`
-    renders it with one `PostCardItem` per item in `PostLatestModuleView`
-    and `PostFeaturedModuleView`; web Storybook story.
+    renders it in `PostLatestModuleView` and `PostFeaturedModuleView`; web
+    Storybook story.
 - **PRs:** ui → config + studio → service → web.
 - **Acceptance:** grid remains the default for every existing document;
   carousel mode swipes without JavaScript and is Embla-driven with it, and
