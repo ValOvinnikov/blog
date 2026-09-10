@@ -553,7 +553,10 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
   moves. "Only one app happens to use it today" is not enough — the layer has
   to be where the values are actually persisted.
 
-- `'use client'` never in `@blog/ui` (it stays pure and prop-driven). The one
+- `'use client'` never in `@blog/ui` (it stays pure and prop-driven). One
+  component there, `Carousel`, is nonetheless client-only — it owns
+  `useEmblaCarousel` — and carries no directive: the consumer declares the
+  boundary, the way `sanity-image`'s `SanityImage` works. The one
   package that may carry it is `@blog/studio`, whose mount component is
   irreducibly client-side; that exception is scoped to that component and does
   not license the directive anywhere else in `packages/*`. In

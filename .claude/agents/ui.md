@@ -88,7 +88,10 @@ archived brief.
 - Token utilities only (`bg-bg`, `text-fg`, `text-muted`, `text-accent`,
   `border-border`, `max-w-prose`) defined by `@blog/tailwind-config`'s
   `theme.css`, which each app imports — no raw hex. Keep dark mode intact.
-- Server-component-safe by default; `"use client"` only for interactivity.
+- Server-component-safe by default; the `"use client"` directive is never used
+  in this package. The one exception is `Carousel`, which owns
+  `useEmblaCarousel` and is therefore client-only without carrying a directive —
+  its consumer declares the boundary.
 - **Every exported component gets a JSDoc description** (incl. compound roots
   and every slot/part, e.g. `PostCard.Media`), even when the name seems
   obvious — it feeds the generated `packages/ui/COMPONENTS.md` index and the CI
