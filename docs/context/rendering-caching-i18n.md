@@ -67,7 +67,7 @@
   `revalidateTag(tag, { expire: 0 })` — immediate expiry, not a stale-while-
   revalidate profile) from a Sanity publish webhook. Tag expiry alone does not
   invalidate prerendered route entries on Vercel (#318), so the route also
-  purges paths, on top of the tag purge above. A published `blog_post` purges
+  purges paths, on top of the tag purge above. A published `page_post` purges
   only its own tenant's affected paths; every other type still purges every
   page of every tenant, as described below.
 
@@ -85,7 +85,7 @@
 
   Purging **resolved** paths does work — `revalidatePath('/<tenantId>/<locale>/
 blog/my-post')` matches the resolved-pathname tag exactly — and is how the
-  route now purges a published `blog_post` (#2666):
+  route now purges a published `page_post` (#2666):
   `@web/server/revalidate/derive-revalidate-paths` queries `@blog/service` for
   the post's own slug, every archive's current pagination extent
   (`getIndexPageParams`), and **every** tag/topic page of the tenant
@@ -149,7 +149,7 @@ detected`, and a re-export with `it mustn't be reexported`, so a wrong form
   routes import.
 
   The same route also cleans up orphaned `bookmarks` rows (`@blog/db`) when the
-  webhook's `sanity-operation` header reads `delete` for a `blog_post` —
+  webhook's `sanity-operation` header reads `delete` for a `page_post` —
   unpublish fires the same trigger as true deletion, so one check covers
   both. Detection is header-only, never a re-query against Sanity: a
   re-query result can't distinguish "post deleted" from "Sanity temporarily

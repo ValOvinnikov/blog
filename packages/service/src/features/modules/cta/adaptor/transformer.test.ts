@@ -213,7 +213,7 @@ describe('toCtaModule', () => {
           markDefs: [
             makeRawContentMarkDef({
               linkType: LINK_TYPE.INTERNAL,
-              internalReference: { _type: 'blog_post', slug: 'hello-world' },
+              internalReference: { _type: 'page_post', slug: 'hello-world' },
             }),
           ],
         }),

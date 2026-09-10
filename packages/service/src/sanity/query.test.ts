@@ -32,7 +32,7 @@ describe(runQuery, () => {
 
     const query = q
       .parameters<TSlugParams>()
-      .star.filterByType('blog_post')
+      .star.filterByType('page_post')
       .filterBy('slug.current == $slug')
       .slice(0)
       .project((sub) => ({ title: sub.field('title').notNull() }));
@@ -70,7 +70,7 @@ describe(isr, () => {
 
 describe('runQuery tenant threading', () => {
   it('rejects a call site that omits tenant context at compile time', async () => {
-    const query = q.star.filterByType('blog_post').slice(0);
+    const query = q.star.filterByType('page_post').slice(0);
 
     // @ts-expect-error -- `tenant` is required on `runQuery`'s options; there is no form that silently reads the platform's project.
     await runQuery(query, {}).catch(() => {});
@@ -79,7 +79,7 @@ describe('runQuery tenant threading', () => {
   it('passes the tenant context through to getClient', async () => {
     mockFetch.mockResolvedValue(null);
 
-    const query = q.star.filterByType('blog_post').slice(0);
+    const query = q.star.filterByType('page_post').slice(0);
     await runQuery(query, { tenant: testTenant }).catch(() => {
       // The slice(0)+notNull edge case from the test above doesn't apply
       // here (no .notNull() fragment); a null fetch resolves to null, not a

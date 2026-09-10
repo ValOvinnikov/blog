@@ -19,7 +19,7 @@ function makeMockClient(
   const transaction = vi.fn().mockReturnValue({ createIfNotExists });
   const getDocument =
     overrides.getDocument ??
-    vi.fn().mockResolvedValue({ _id: 'post-1', _type: 'blog_post' });
+    vi.fn().mockResolvedValue({ _id: 'post-1', _type: 'page_post' });
 
   return { getDocument, transaction, createIfNotExists, patch, commit };
 }
@@ -56,7 +56,7 @@ describe(saveSkimDraft, () => {
     const client = makeMockClient({
       getDocument: vi.fn().mockResolvedValue({
         _id: 'post-1',
-        _type: 'blog_post',
+        _type: 'page_post',
         title: 'Hello',
       }),
     });

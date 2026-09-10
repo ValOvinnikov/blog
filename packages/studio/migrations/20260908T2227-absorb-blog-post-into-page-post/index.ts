@@ -43,12 +43,11 @@ import {
   type Mutation,
 } from 'sanity/migrate';
 
-import { toPagePostId } from '../20260822T2057-seed-page-post-for-existing-post/id';
-
 import {
   buildPagePostFields,
   type TBlogPostDoc,
 } from './build-page-post-fields';
+import { toPagePostId } from './id';
 import { collectRefRewritePatches } from './rewrite-refs';
 import {
   sharedNewsletterModule,

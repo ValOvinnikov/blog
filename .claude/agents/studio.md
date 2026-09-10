@@ -167,12 +167,20 @@ src/schema-types/modules/hero-blog/
 
 ## Content model (see SPEC.md §6 for the current model)
 
-Type names follow `{group}_{name}`. Documents: `blog_post`, `blog_author`,
-`blog_category`; page documents `page_home`, `page_blog`, `page_landing`;
-singletons `settings_site`, `settings_navigation`, `settings_footer`; and the
-reusable module documents `module_hero`, `module_postList`, `module_content`,
-`module_cta`. Shared objects: unified `link`, `socialLink`, `brand`,
-`imageWithAlt`, `seo`/`openGraph`, `blockText`/`richText`. Use:
+Type names follow `{group}_{name}`. Documents: `blog_author`, `blog_tag`,
+`blog_topic`; page documents `page_home`, `page_blog`, `page_landing`,
+`page_post`, `page_tag`, `page_topic`, `page_tagIndex`, `page_topicIndex`;
+singletons `settings_site`, `settings_navigation`, `settings_footer`,
+`settings_newsletter`, `settings_theme`; and the reusable module documents
+`module_content`, `module_cta`, `module_hero`, `module_heroBlog`,
+`module_newsletter`, `module_postFeatured`, `module_postLatest`,
+`module_postList`, `module_postRelated`, `module_taxonomyList`. Shared
+objects: unified `link`, `socialLink`, `brand`, `imageWithAlt`,
+`seo`/`openGraph`, `blockText`/`richText`.
+
+**The post is `page_post`.** There is no separate post document — `blog_post`
+was retired, and a Sanity `_type` is immutable, so that retirement was a
+copy-then-delete migration rather than a rename. Use:
 
 - `defineType` / `defineField` / `defineArrayMember` everywhere for typed schemas.
 - `validation: (rule) => rule.required()` on every field the frontend assumes.

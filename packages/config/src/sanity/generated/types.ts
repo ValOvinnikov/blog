@@ -264,13 +264,6 @@ export type CtaAction = {
   link?: Link;
 };
 
-export type Blog_postReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'blog_post';
-};
-
 export type Blog_topicReference = {
   _ref: string;
   _type: 'reference';
@@ -298,7 +291,6 @@ export type Link = {
   accessibleLabel?: string;
   linkType?: 'INTERNAL' | 'EXTERNAL';
   internalReference?:
-    | Blog_postReference
     | Page_postReference
     | Blog_topicReference
     | Page_landingReference
@@ -738,38 +730,6 @@ export type Blog_tag = {
   seo?: Seo;
 };
 
-export type Blog_authorReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'blog_author';
-};
-
-export type Blog_post = {
-  _id: string;
-  _type: 'blog_post';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  slug?: Slug;
-  excerpt?: string;
-  heroImage?: ImageWithAlt;
-  author?: Blog_authorReference;
-  topic?: Blog_topicReference;
-  tags?: Array<
-    {
-      _key: string;
-    } & Blog_tagReference
-  >;
-  publishedAt?: string;
-  body?: RichText;
-  featured?: boolean;
-  newsletterEnabled?: boolean;
-  skim?: Skim;
-  seo?: Seo;
-};
-
 export type Blog_author = {
   _id: string;
   _type: 'blog_author';
@@ -869,6 +829,13 @@ export type Module_hero = {
   primaryActionLabel?: string;
   secondaryAction?: Link;
   layout?: HeroLayout;
+};
+
+export type Blog_authorReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'blog_author';
 };
 
 export type Module_postRelatedReference = {
@@ -1076,7 +1043,6 @@ export type AllSanitySchemaTypes =
   | Seo
   | OpenGraph
   | CtaAction
-  | Blog_postReference
   | Blog_topicReference
   | Page_landingReference
   | Page_blogReference
@@ -1112,12 +1078,11 @@ export type AllSanitySchemaTypes =
   | Module_contentReference
   | Page_home
   | Blog_tag
-  | Blog_authorReference
-  | Blog_post
   | Blog_author
   | Page_landing
   | Module_heroBlog
   | Module_hero
+  | Blog_authorReference
   | Module_postRelatedReference
   | Page_post
   | Blog_topic

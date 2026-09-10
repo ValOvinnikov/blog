@@ -29,7 +29,6 @@ type TCachedDocumentType =
   | 'page_landing'
   | 'page_post'
   | 'page_home'
-  | 'blog_post'
   | 'blog_author'
   | 'blog_topic'
   | 'blog_tag'
@@ -56,7 +55,6 @@ type TCachedDocumentType =
  * keep them in sync with `packages/service/src`.
  */
 const REVALIDATE_TAGS = {
-  blog_post: ['post', 'posts', 'homePage'],
   blog_author: ['author', 'posts'],
   blog_topic: ['topic', 'topics', 'posts'],
   blog_tag: ['tag', 'tags', 'posts'],
@@ -99,7 +97,7 @@ const REVALIDATE_TAGS = {
  * invoked function (CodeQL `js/unvalidated-dynamic-method-call`).
  *
  * @example
- * getRevalidateTagsForType('blog_post', 'post-123') // ['post', 'posts', 'homePage']
+ * getRevalidateTagsForType('page_post', 'page_post-123') // ['page_post', 'posts', 'author', 'topic', 'tag']
  */
 export const getRevalidateTagsForType = (
   type: string,

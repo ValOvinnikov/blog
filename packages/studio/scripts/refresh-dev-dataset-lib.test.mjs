@@ -109,7 +109,7 @@ describe(WIPE_QUERY, () => {
       'drafts.03ad7c3e-ccb6-4b2a-8be3-fcd37a5fdce7',
     ];
     const survivors = await runWipeQuery(
-      ordinaryIds.map((_id) => ({ _id, _type: 'blog_post' })),
+      ordinaryIds.map((_id) => ({ _id, _type: 'page_post' })),
     );
 
     expect(survivors).toEqual(ordinaryIds);

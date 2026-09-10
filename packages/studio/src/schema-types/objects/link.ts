@@ -1,5 +1,4 @@
 import { SOCIAL_PLATFORMS, LINK_TYPE } from '@blog/config/constants';
-import { postSchema } from '@blog/studio/schema-types/documents/blog/post';
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
 import { toTitleCase } from '@blog/utils/primitives';
@@ -55,7 +54,6 @@ export const linkSchema = defineType({
       title: 'Internal Document',
       type: 'reference',
       to: [
-        { type: postSchema.name },
         { type: PAGE_POST_TYPE },
         { type: topicSchema.name },
         // Literal (not `landingSchema.name` / `blogPageSchema.name`):

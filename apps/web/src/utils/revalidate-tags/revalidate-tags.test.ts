@@ -17,21 +17,13 @@ describe('getRevalidateTagsForType', () => {
     ]);
   });
 
-  it('maps a known document type to its ISR tags', () => {
-    expect(getRevalidateTagsForType('blog_post', 'post-1')).toEqual([
-      'post',
-      'posts',
-      'homePage',
-    ]);
-  });
-
   it('maps the blog-index singleton to its ISR tag', () => {
     expect(getRevalidateTagsForType('page_blog', 'page_blog')).toEqual([
       'page_blog',
     ]);
   });
 
-  it('maps the post page document to its ISR tags, including what blog_post used to purge', () => {
+  it('maps the post page document to its ISR tags', () => {
     expect(getRevalidateTagsForType('page_post', 'page_post-1')).toEqual([
       'page_post',
       'posts',

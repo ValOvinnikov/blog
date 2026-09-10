@@ -1,5 +1,4 @@
 import { authorSchema } from '@blog/studio/schema-types/documents/blog/author';
-import { postSchema } from '@blog/studio/schema-types/documents/blog/post';
 import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag';
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic';
 import { blogPageSchema } from '@blog/studio/schema-types/documents/pages/blog-page';
@@ -24,13 +23,12 @@ export const blogGroups: TStructureGroup[] = [
     ],
   },
   {
-    title: 'Content',
-    items: [
-      { schema: postSchema },
-      { schema: topicSchema },
-      { schema: tagSchema },
-      { schema: authorSchema },
-    ],
+    title: 'Taxonomy',
+    items: [{ schema: topicSchema }, { schema: tagSchema }],
+  },
+  {
+    title: 'People',
+    items: [{ schema: authorSchema }],
   },
   {
     title: 'Settings',

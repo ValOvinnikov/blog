@@ -33,7 +33,7 @@ describe(DocumentValidationTable, () => {
     const documents: TSanityValidationResult[] = [
       {
         documentId: 'doc-1',
-        documentType: 'blog_post',
+        documentType: 'page_post',
         markers: [
           { level: 'error', message: 'Missing required field' },
           { level: 'warning', message: 'Deprecated field used' },
