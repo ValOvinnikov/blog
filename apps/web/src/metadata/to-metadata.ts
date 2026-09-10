@@ -14,14 +14,9 @@ type TToMetadataOptions = {
 };
 
 /**
- * Maps an authored `TSeoResolved` view-model to Next `Metadata` — the one
- * shared place routes turn service SEO output into `title`, `description`,
- * `alternates.canonical`, `openGraph`, and `twitter`. Every field but
- * `title` is optional and, when absent, is passed through as `undefined`
- * rather than substituted — Next's per-segment merge (`resolve-metadata.js`'s
- * `mergeMetadata`) treats an explicit `undefined` as "clear this field", not
- * "inherit the parent segment's value", which is what keeps an unauthored
- * field from silently picking up the root layout's site-wide description.
+ * Maps an authored `TSeoResolved` view-model to Next `Metadata`, passing
+ * unauthored fields through as `undefined` so they are omitted rather than
+ * inheriting a parent segment's value.
  *
  * @example
  * return toMetadata(result.data.seo, { canonical: '/', ogType: 'website', titleAbsolute: true });
@@ -33,6 +28,7 @@ export const toMetadata = (
   const { canonical, ogType, titleAbsolute, feedUrl, article } = opts;
   const ogImages = seo.ogImageUrl ? [{ url: seo.ogImageUrl }] : undefined;
   const twitterImages = seo.ogImageUrl ? [seo.ogImageUrl] : undefined;
+  const twitterCard = seo.ogImageUrl ? 'summary_large_image' : 'summary';
 
   return {
     title: titleAbsolute ? { absolute: seo.title } : seo.title,
@@ -50,7 +46,7 @@ export const toMetadata = (
       ...(article?.authors && { authors: article.authors }),
     },
     twitter: {
-      card: 'summary_large_image',
+      card: twitterCard,
       title: seo.ogTitle,
       description: seo.ogDescription,
       images: twitterImages,

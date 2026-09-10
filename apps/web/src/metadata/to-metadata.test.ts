@@ -81,6 +81,7 @@ describe('toMetadata', () => {
 
     expect(metadata.openGraph?.images).toBeUndefined();
     expect(metadata.twitter?.images).toBeUndefined();
+    expect((metadata.twitter as TTwitterWithCard | null)?.card).toBe('summary');
   });
 
   it('omits description, openGraph.title/description, and twitter.title/description when the source fields are absent', () => {
