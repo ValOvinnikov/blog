@@ -463,6 +463,24 @@ and `limit` apply wherever the module sits, and their defaults reproduce the
 index pages' rendering. Sorting and the limit are applied in the service
 transformer, not in GROQ.
 
+Each term card also lists its two newest published posts as links, so the
+block reads as a contents page rather than a row of pictureless post cards.
+`showLatestPosts` turns them off; it is optional and carries no validation
+rule, because a new field on an existing document type never backfills — the
+projection reads `coalesce(showLatestPosts, true)`, so every module authored
+before the field shows the lists with no migration, the same read-time pattern
+`showImages` uses. The titles join each term inside the merged taxonomy-list
+query rather than a second call, through a `postLinkFragment` projecting only
+`_id`, `headingBlock.heading` and `slug.current` (a post carries no `title` of
+its own; the heading is the title). Order is `publishedAt desc` under
+`PUBLISHED_POST_FILTER`, so a scheduled post is excluded until its date, as the
+post count already excludes it. The service always projects the posts and
+exposes the flag; `apps/web` branches in one place and renders them through
+`TaxonomyCard.Posts`, between the description and the count, with the label
+supplied as an accessibility-only voice key. Because the module builds its own
+term projections, `entities.topics.v1` and `entities.tags.v1` keep their
+shapes for the other pages that read them.
+
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its
 schema allows), `layout` as `TLayout | undefined`, and (where applicable)
