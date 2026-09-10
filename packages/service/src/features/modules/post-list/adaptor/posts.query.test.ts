@@ -30,39 +30,39 @@ describe('postListModulePaginatedPostsQuery', () => {
     );
   });
 
-  it('scopes posts to the enclosing page_tag when one references this module as its postList', () => {
+  it('scopes posts to the enclosing page_tag when one references this module via modules[]', () => {
     expect(postListModulePaginatedPostsQuery(1, 9).query).toContain(
-      '*[_type == "page_tag" && (postList._ref == $id || $id in modules[]._ref)][0].tag._ref',
+      '*[_type == "page_tag" && $id in modules[]._ref][0].tag._ref',
     );
   });
 
   it('stays unscoped when no page_tag references this module', () => {
     expect(postListModulePaginatedPostsQuery(1, 9).query).toContain(
-      '!defined(*[_type == "page_tag" && (postList._ref == $id || $id in modules[]._ref)][0]._id)',
+      '!defined(*[_type == "page_tag" && $id in modules[]._ref][0]._id)',
     );
   });
 
-  it('scopes posts to the enclosing page_topic when one references this module as its postList', () => {
+  it('scopes posts to the enclosing page_topic when one references this module via modules[]', () => {
     expect(postListModulePaginatedPostsQuery(1, 9).query).toContain(
-      '*[_type == "page_topic" && (postList._ref == $id || $id in modules[]._ref)][0].topic._ref',
+      '*[_type == "page_topic" && $id in modules[]._ref][0].topic._ref',
     );
   });
 
   it('stays unscoped when no page_topic references this module', () => {
     expect(postListModulePaginatedPostsQuery(1, 9).query).toContain(
-      '!defined(*[_type == "page_topic" && (postList._ref == $id || $id in modules[]._ref)][0]._id)',
+      '!defined(*[_type == "page_topic" && $id in modules[]._ref][0]._id)',
     );
   });
 
-  it('matches a page_tag owner that references this module only via modules[] (postList unset)', () => {
+  it('matches a page_tag owner that references this module via modules[]', () => {
     expect(postListModulePaginatedPostsQuery(1, 9).query).toContain(
-      'page_tag" && (postList._ref == $id || $id in modules[]._ref)',
+      'page_tag" && $id in modules[]._ref',
     );
   });
 
-  it('matches a page_topic owner that references this module only via modules[] (postList unset)', () => {
+  it('matches a page_topic owner that references this module via modules[]', () => {
     expect(postListModulePaginatedPostsQuery(1, 9).query).toContain(
-      'page_topic" && (postList._ref == $id || $id in modules[]._ref)',
+      'page_topic" && $id in modules[]._ref',
     );
   });
 });
