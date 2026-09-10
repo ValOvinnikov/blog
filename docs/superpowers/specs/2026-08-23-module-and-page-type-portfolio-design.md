@@ -1522,7 +1522,7 @@ call — and the view model carries the flag:
     coalesce(taxonomy, $fallbackTaxonomy) == "TOPICS" => *[_type == "blog_topic"] | order(title asc){
       topicFragment,
       postCount,
-      "latestPosts": *[_type == "blog_post" && references(^._id) && publishedAt <= now()]
+      "latestPosts": *[_type == "page_post" && references(^._id) && PUBLISHED_POST_FILTER]
         | order(publishedAt desc)[0...2]{ postLinkFragment }
     },
     coalesce(taxonomy, $fallbackTaxonomy) == "TAGS" => *[_type == "blog_tag"] | order(title asc){ tagFragment, postCount, "latestPosts": … }
@@ -1536,13 +1536,18 @@ call — and the view model carries the flag:
   `latestPosts` to them would widen a view model for two links only this
   module wants. The module query builds
   its own two term projections instead, and the `postCount` expression the
-  three queries would now share (`count(*[_type == "blog_post" &&
-references(^._id) && publishedAt <= now()])`) moves into one shared
-  helper so it is written once.
-- **`postLinkFragment`** is new in `shared/fragments/` — `id`, `title`,
-  `slug` — the lightest thing a post link needs. `postCardFragment` carries
-  excerpt, image, author and reading-time fields the card would throw
-  away.
+  three queries would now share (`count(*[_type == "page_post" &&
+references(^._id) && PUBLISHED_POST_FILTER])`) moves into one shared
+  helper so it is written once. The transformers move with it: `toTopics`
+  and `toTags` are typed off the entity queries' `InferResultType`, so the
+  module needs its own entry transformer rather than reusing theirs.
+- **`postLinkFragment`** is new in `shared/fragments/` — `_id`,
+  `headingBlock.heading` and `slug.current`, the lightest thing a post link
+  needs. A post carries no `title` field of its own since `blog_post` was
+  absorbed into `page_post`; the heading is the title, and the transformer
+  is what flattens the three into `{ id, title, slug }`.
+  `postCardFragment` carries image, author and reading-time fields the card
+  would throw away.
 - **The service always projects the posts and exposes the flag**, as it
   does for `showImages`: two titles per term is not a cost worth a
   conditional projection, and the web layer branches in one place.
@@ -1621,9 +1626,10 @@ migrations keep creating index-page modules without it.
 - **studio** — `showLatestPosts` on `module_taxonomyList` after `limit`;
   schema test for its presence, position and initial value; `pnpm typegen`.
 - **service** — the shared `postCount` helper; `postLinkFragment`; the
-  module's own term projections with `latestPosts`; `showLatestPosts` in
-  the view model; transformer tests for two, one and zero posts, the
-  newest-first order, and the read-time default of the flag.
+  module's own term projections and entry transformer with `latestPosts`;
+  `showLatestPosts` in the view model; transformer tests for two, one and
+  zero posts, the newest-first order, and the read-time default of the
+  flag.
 - **ui** — `TaxonomyCard.Posts`; stories for two posts, one post, none and
   a grid; tests that the slot renders the list with its label, that an
   empty array renders nothing, and that a post link is clickable above the
@@ -1974,6 +1980,13 @@ catalogue has enough shipped history to matter).
 
 ## Resync log
 
+- **2026-09-10** — "Topic cards list their latest posts" (#2891) brought in
+  line with the post type #2960 left behind: the term-scoped post query is
+  `page_post` under `PUBLISHED_POST_FILTER`, not `blog_post` under a bare
+  `publishedAt <= now()`, and `postLinkFragment` projects
+  `headingBlock.heading` because a post has no `title` field of its own.
+  The module also needs its own entry transformer, since `toTopics` /
+  `toTags` are typed off the entity queries it stops sharing.
 - **2026-09-10** — carousel buttons: `IconButton` `control` variant (brand
   outline, one look on every ground), `tone` on `Carousel` and
   `PostsCarousel` for the hover only; recorded in #2839 / #2840.
