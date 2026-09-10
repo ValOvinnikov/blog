@@ -218,13 +218,105 @@ describe('seo.metaTitle backfill document() wiring', () => {
     );
   });
 
-  it('skips page_home when it uses a hero instead of a heading', async () => {
+  it('skips page_home when its hero reference cannot be resolved', async () => {
     const result = await runDocument(
       { _id: 'page_home', _type: 'page_home', hero: { _ref: 'module_hero-1' } },
       fakeContext(settingsSite()),
     );
 
     expect(result).toEqual([]);
+  });
+
+  it('backfills page_home from its hero heroTitle when no heading is authored', async () => {
+    const result = await runDocument(
+      { _id: 'page_home', _type: 'page_home', hero: { _ref: 'module_hero-1' } },
+      fakeContext({
+        ...settingsSite(),
+        'module_hero-1': { _type: 'module_hero', heroTitle: 'Welcome' },
+      }),
+    );
+
+    expect(result).toEqual(
+      expectedMutations('Welcome — Field notes on building software'),
+    );
+  });
+
+  it('backfills page_tagIndex from its hero heading when the hero is a module_heroBlog', async () => {
+    const result = await runDocument(
+      {
+        _id: 'page_tagIndex',
+        _type: 'page_tagIndex',
+        hero: { _ref: 'module_heroBlog-1' },
+      },
+      fakeContext({
+        ...settingsSite(),
+        'module_heroBlog-1': {
+          _type: 'module_heroBlog',
+          heading: 'A Hero Blog Heading Long Enough On Its Own',
+        },
+      }),
+    );
+
+    expect(result).toEqual(
+      expectedMutations('A Hero Blog Heading Long Enough On Its Own'),
+    );
+  });
+
+  it('prefers the authored heading over the hero when both are present', async () => {
+    const result = await runDocument(
+      {
+        _id: 'page_home',
+        _type: 'page_home',
+        headingBlock: { heading: 'Home' },
+        hero: { _ref: 'module_hero-1' },
+      },
+      fakeContext({
+        ...settingsSite(),
+        'module_hero-1': { _type: 'module_hero', heroTitle: 'Welcome' },
+      }),
+    );
+
+    expect(result).toEqual(
+      expectedMutations('Home — Field notes on building software'),
+    );
+  });
+
+  it('skips page_home when the hero resolves but has no usable title (post-title mode)', async () => {
+    const result = await runDocument(
+      { _id: 'page_home', _type: 'page_home', hero: { _ref: 'module_hero-1' } },
+      fakeContext({
+        ...settingsSite(),
+        'module_hero-1': {
+          _type: 'module_hero',
+          heroTitleMode: 'POST_TITLE',
+        },
+      }),
+    );
+
+    expect(result).toEqual([]);
+  });
+
+  it('prefers the hero title over the referenced tag title on page_tag', async () => {
+    const result = await runDocument(
+      {
+        _id: 'page_tag-seo',
+        _type: 'page_tag',
+        tag: { _ref: 'blog_tag-seo' },
+        hero: { _ref: 'module_hero-1' },
+      },
+      fakeContext({
+        ...settingsSite(),
+        'blog_tag-seo': { title: 'SEO' },
+        'module_hero-1': {
+          _type: 'module_hero',
+          heroTitle: 'Everything We Have Written About SEO',
+        },
+      }),
+    );
+
+    expect(result).toEqual(
+      expectedMutations('Everything We Have Written About SEO'),
+    );
   });
 
   it('backfills page_landing from its own heading padded with the brand name', async () => {
