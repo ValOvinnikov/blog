@@ -563,6 +563,257 @@ carrying the old document's values, repoint `page_home.hero`, then delete the
 `module_hero` document, in that order and as separate steps, because a Sanity
 `_type` is immutable.
 
+## `module_heroStatement` — the marketing hero
+
+**Goal:** the statement member of the hero family — a headline, a line of
+support and up to two actions, with nothing derived from a post. It is the
+hero of a marketing, agency, product or consultant home page, and the first
+hero kind an editor authors entirely by hand. Design of record for epic
+#2775, settled in #2806.
+
+Interactive mock of the Studio form, the rendered hero on every variant and
+tone, the view model and the validation states:
+<https://claude.ai/code/artifact/10bb3631-d359-49d1-855a-705bad13134e>.
+
+### What it is, against the other two kinds
+
+| Kind            | Its content fields                               | What the tail adds                                                  |
+| --------------- | ------------------------------------------------ | ------------------------------------------------------------------- |
+| `heroBlog`      | a post source, copy overrides, an image source   | the shape; actions are its own (primary derived from the post)      |
+| `heroStatement` | eyebrow, heading, supporting text — all authored | the shape, **the image and the actions**, unchanged from the helper |
+| `heroProfile`   | name, role, bio, avatar, social links (#2808)    | the shape; the avatar takes the image's place                       |
+
+The statement hero is the tail's simplest consumer: it calls
+`defineHeroFields()` with **no options**, so the shared `image` field and the
+shared `actions` group are the module's image and actions. Nothing here is a
+mode, because nothing here has a second source to fall back to.
+
+### Fields
+
+Content fields first, then the shared tail:
+
+| Field            | Type                        | Notes                                                                                            |
+| ---------------- | --------------------------- | ------------------------------------------------------------------------------------------------ |
+| `title`          | `titleField()`              | Editor-facing name, never rendered                                                               |
+| `eyebrow`        | string, max 40              | Optional. The small line above the heading                                                       |
+| `heading`        | string, max 120, `required` | The page `<h1>`. Nothing derives it, so it cannot be empty                                       |
+| `supportingText` | text, 3 rows                | Optional. The one paragraph under the heading; long copy belongs in a module below               |
+| _shared tail_    | `defineHeroFields()`        | variant, brand variant, **image**, content position, alignment, media order, **actions**, layout |
+
+**`heading` is the only required content field, and it is required without
+qualification.** On `heroBlog` an empty heading falls back to the post's
+title; here there is no post, and a hero whose `<h1>` is blank is a broken
+page, not a sparse one. The `required()` rule is safe on a new type: there
+are no existing documents to strand. The no-`required()`-on-a-new-field rule
+is about fields added to types that already have documents, which this is
+not.
+
+**The heading is plain text, not Portable Text.** It is an `<h1>` that also
+feeds the page's `<title>`-adjacent metadata and every crawler's idea of what
+the page is about; a marked-up heading would have to be flattened for each of
+those. Emphasis inside a hero headline is a design-system decision (the
+`hero` visual of `Heading`), not an editor's.
+
+**`supportingText` stays a plain `text` field**, as on every other module
+with one. A hero with two paragraphs of copy is a landing page that has not
+been split into modules yet.
+
+**The image and the actions are the tail's own.** `heroBlog` had to replace
+both — its image has a post to fall back to and its primary action's href is
+derived — so it passed `image: false` and emitted its own pair. The statement
+hero has no such derivation, so the helper's plain `image` (required on
+`SPLIT` and `BANNER`, optional and below the copy on `STACKED`) and its
+`actions` group are exactly right and are not re-declared.
+
+### Actions: zero to two, through the shared group
+
+The tail's `actions` field is `actionGroupField()`, the object `module_cta`
+already uses: **at most two `ctaAction`s, a `PRIMARY` first if there are any,
+each variant at most once.** The statement hero adds no rule of its own:
+
+- **Zero actions is valid.** A personal or editorial statement hero — "I
+  write about X" above a list of posts — has nowhere to send the reader that
+  the modules below don't already. The group is optional and an empty group
+  renders no `Hero.Cta` slot at all.
+- **One action is the common case** — a single contained primary.
+- **Two is the ceiling**, primary plus secondary, and the secondary's
+  `appearance` decides whether the pair reads as two buttons or a button and
+  a text link. Three actions is a nav, not a hero; the shared `max(2)`
+  already says so.
+
+Every action is a fully authored `ctaAction` (variant, appearance, `link`),
+so an action can point at a landing page, a topic, a post, or an external
+URL; nothing is derived. That is the whole difference from `heroBlog`'s
+primary, whose href is the post and whose label is optional.
+
+### The Banner variant is the background-image hero — and the organism has to finish it
+
+The ticket's open question was whether a background-image, Banner-like
+variant belongs to this module or whether `module_cta`'s Banner covers the
+need. Neither: **the shared tail already has `HERO_VARIANT.BANNER`**, so
+every hero kind can be a full-bleed image with copy over it, and the
+statement hero — the kind most likely to open a marketing page that way —
+gets it by construction. `module_cta`'s Banner is a `modules[]` band with an
+`<h2>`; it cannot own the page's `<h1>`, so it is not a substitute.
+
+But the `Hero` organism's Banner today is **unfinished**: it places the image
+`absolute inset-0 -z-10` behind the copy and stops. There is no scrim, the
+copy keeps the band's ink colour, and the web view passes nothing to
+`ActionGroup` about being on an image — so a light photograph makes the
+heading illegible and the buttons invisible. `CtaModule`'s Banner solved the
+same problem with a tone-driven gradient scrim (`AZURE_SCRIM` on
+`BRAND_PRIMARY`, `NEUTRAL_SCRIM` otherwise), on-image copy colours, and
+`isOnDark` on its `ActionGroup`. The hero gets the same, in this epic's `ui`
+sub-issue, because this is the hero that makes Banner common:
+
+- `Hero` gains `tone?: TFullBrandVariant`, the prop the family section
+  already promised it. **Only Banner reads it**: it picks the scrim — the two
+  gradient constants move out of `cta-module-variants.ts` into a shared
+  `packages/ui/src/lib/styling/scrims.ts` so the two organisms cannot drift —
+  and switches the copy to the on-image colours `CtaModule` uses. On `SPLIT`
+  and `STACKED` the band colour is `Section`'s, as today, and `tone` changes
+  nothing.
+- The scrim is a sibling of the media slot, `aria-hidden`, at `-z-10` with
+  the image at `-z-20`, the same stacking as `CtaModule`.
+- The web view passes `isOnDark={variant === HERO_VARIANT.BANNER}` to
+  `ActionGroup`, as the CTA view does.
+- Stories: Banner on each of the three tones, light and dark. The existing
+  three Banner position stories gain a `tone` control.
+
+`module_heroBlog`'s Banner is fixed by the same change, since it renders
+through the same organism and its view gains the same one-line `isOnDark`.
+
+### Heading level
+
+**Always `<h1>`, never an option.** The `Hero` organism renders its title at
+level 1 by construction, and a hero slot replaces the page's heading region
+(`PageIntro` / `headingBlock`) rather than sitting beside it, so a page with
+a hero has exactly one `<h1>` and it is the hero's. A `headingLevel` field
+would let an editor produce a page with no `<h1>` or two; the family section
+already fixes DOM order (copy before media) for the same reason.
+
+### Validation
+
+| State                                              | Level | Message                                                         |
+| -------------------------------------------------- | ----- | --------------------------------------------------------------- |
+| `heading` empty                                    | Error | A statement hero is its heading. Give it one.                   |
+| `SPLIT` or `BANNER` with no `image`                | Error | These variants are built around an image. (the tail's own rule) |
+| `actions` with two `PRIMARY`, or `SECONDARY` first | Error | (the shared `actionGroup` rules, unchanged)                     |
+| `eyebrow` longer than 40 characters                | Error | (the field's `max(40)`)                                         |
+
+No async rule and no warning: nothing on this module depends on another
+document, so nothing can drift after publish.
+
+### Service
+
+`service.modules.heroStatement.v1`: one query, no dereference beyond the
+actions' links.
+
+```groq
+*[_type == "module_heroStatement" && _id == $id][0]{
+  _id, brandVariant, variant, eyebrow, heading, supportingText,
+  image{ ...imageWithAltFragment },
+  actions{ actions[]{ ...ctaActionFragment } },
+  contentPositionSplit, contentPositionBanner,
+  mediaOrderSplit, mediaOrderStacked,
+  layout
+}
+```
+
+```ts
+type THeroStatementModule = {
+  brandVariant: TFullBrandVariant;
+  variant: THeroVariant;
+  heading: string;
+  eyebrow: TMaybeUndefined<string>;
+  supportingText: TMaybeUndefined<string>;
+  sanityImage: TMaybeUndefined<ISanityImage>;
+  actions: TMaybeUndefined<readonly TCtaAction[]>;
+  contentPosition: TMaybeUndefined<TContentAlignment>;
+  contentAlignment: TMaybeUndefined<TContentAlignment>;
+  mediaOrder: TMaybeUndefined<TMediaOrder>;
+  layout: TMaybeUndefined<TLayout>;
+};
+```
+
+`heading` is the one non-optional string, mirroring the schema. `actions` is
+`undefined` when the group is empty rather than `[]`, per the no-faked-defaults
+rule, and every entry is the same `TCtaAction` `module_cta` produces, through
+the same `toCtaAction()` transformer. `contentPosition` and `mediaOrder` each
+collapse their two variant-scoped Studio fields exactly as `heroBlog`'s
+transformer does — that collapse moves into a shared
+`toHeroPresentation()` helper in `packages/service/src/shared/transformers/`
+so the third kind does not copy it a third time.
+
+**Cache tags:** `modules:heroStatement`, `module:<id>`, plus the link targets
+an action can name — `page_landing`, `page_blog`, `page_post`, `topic` — so
+a renamed slug invalidates the hero that links to it. `REVALIDATE_TAGS`
+gains `module_heroStatement: ['modules:heroStatement']`.
+
+### `@blog/ui`
+
+No new organism. The one change is the Banner finish above: `tone`, the
+shared scrim constants, the on-image copy colours, the stories. Everything
+else the statement hero needs — `eyebrow`, `title`, `excerpt`, `Hero.Cta`,
+`Hero.Media`, the three variants and their position, alignment and order
+props — shipped with #2807.
+
+### Web
+
+`apps/web/src/modules/hero-statement/` — `HeroStatementModule` (loader +
+view, the `heroBlog` shape) and `HeroStatementModuleView`: `Section` with
+`brandVariant` and `layout`; `Hero` with `tone={brandVariant}`; `ActionGroup`
+in `Hero.Cta` when there are actions, `isOnDark` on Banner; `SanityImage` in
+`Hero.Media` at 1200×675, `priority`, the same `sizes` as `heroBlog`.
+`HERO_MAP` gains `module_heroStatement` — the `Record<THeroModuleType, …>`
+makes the missing entry a compile error the moment typegen adds the type.
+
+### Pages and desk
+
+`module_heroStatement` joins `HERO_SCHEMA_TYPES`, so every page's hero slot
+accepts it with no per-page change; it gets a desk entry in the modules
+group beside the other heroes. Starter content is unchanged — new tenants
+still seed a `module_heroBlog`; the site-kind templates (#2798) are where a
+marketing tenant would be seeded a statement hero instead.
+
+### Migration
+
+None — a new type only.
+
+### Per-layer scope and PRs
+
+Four implementation sub-issues under #2775, in this order:
+
+- **ui** · `feat(ui): Hero Banner gets a tone-driven scrim and on-image
+copy` — `tone` prop, shared scrim constants, stories, tests. **Own PR,
+  first, additive**; it also fixes `heroBlog`'s Banner.
+- **studio** · `feat(studio): module_heroStatement schema` — the schema,
+  `HERO_SCHEMA_TYPES`, the desk entry, typegen.
+- **service** · `feat(service): heroStatement loader` — query, the shared
+  `toHeroPresentation()` helper (with `heroBlog` moved onto it), view model,
+  tags.
+- **web** · `feat(web): heroStatement view + HERO_MAP entry` — module, view,
+  `REVALIDATE_TAGS`, the `isOnDark` line on both hero views.
+
+**PRs:** ui alone; then studio + service + web as one PR — typegen reds
+`HERO_MAP` and `REVALIDATE_TAGS` until the web entries land, the same
+reason `module_postFeatured` shipped its three data layers together.
+
+### Not in scope
+
+- A background video or a second image per breakpoint.
+- Rich text in the heading or the supporting text.
+- A `headingLevel` option.
+- A statement hero seeded by starter content (that is #2798's template).
+- Retiring `module_hero` (#2813) or touching `module_heroBlog`'s fields.
+
+**Acceptance:** an editor can author a marketing home page whose hero has no
+post behind it; the heading is the page's only `<h1>`; zero, one and two
+actions each render correctly, on every variant and tone; a Banner statement
+hero is legible over a light photograph in both colour modes; `heroBlog`'s
+Banner is legible the same way; `pnpm type-check && pnpm lint && pnpm test
+&& pnpm knip && pnpm gen:ui-index:check` green.
+
 ## Post grid images and the `showImages` toggle
 
 **Goal:** the post grid shows each post's image, on every surface that
@@ -1927,6 +2178,16 @@ point; the graph stays acyclic.
   the count stays the card's last line, the index pages get the lists by
   construction, and it ships as four per-layer PRs (2026-09-08, #2892).
 
+- **`module_heroStatement` is the tail's plainest consumer** — eyebrow, a
+  required plain-text heading and supporting text, then `defineHeroFields()`
+  with no options, so the shared `image` and `actions` (0–2 through the
+  `actionGroup` object) are the module's own; the heading is always the
+  page's `<h1>`; the background-image hero is the tail's `BANNER`, and the
+  `Hero` organism's Banner gets the `CtaModule` scrim, on-image copy and a
+  `tone` prop in this epic's `ui` sub-issue, which also fixes `heroBlog`'s
+  Banner; ui alone, then studio + service + web as one PR (2026-09-10,
+  #2806).
+
 ## Non-goals (recorded so #1919 doesn't sprawl)
 
 - A leads/CRM management UI — store + notify only.
@@ -1980,6 +2241,11 @@ catalogue has enough shipped history to matter).
 
 ## Resync log
 
+- **2026-09-10** — "`module_heroStatement` — the marketing hero" added
+  (#2806): the second hero kind, designed against the tail as shipped in
+  #2780/#2807. Reading the organism for it surfaced that `Hero`'s Banner has
+  no scrim and no on-image copy colour, unlike `CtaModule`'s; the section
+  makes that this epic's `ui` sub-issue.
 - **2026-09-10** — the shipped-module sections brought in line with two
   renames that had landed since they were written: every live `blog_post`
   reference is `page_post` (`module_heroPost`'s `post`,

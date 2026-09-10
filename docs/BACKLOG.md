@@ -1119,10 +1119,9 @@ landing and index pages`.
 
 #### 1.7 Page composition — epic #2943 `refactor(web): pages are chrome, a heading and modules; retire PostsSection`
 
-- **Depends on:** 1.3 (shipped). **Blocks:** 1.4's web sub-issue (#2840
-  branches on `displayMode` inside `PostLatestModuleView` and
-  `PostFeaturedModuleView`, the per-module views this epic created); the
-  ui sub-issue (#2839) is independent of it.
+- **Depends on:** 1.3 (shipped). **Shipped 2026-09-10** (#2943 closed); 1.4's
+  web sub-issue (#2840) branches inside the per-module views this epic
+  created.
 - **Why:** every page fetches and pre-computes for all of its sections and
   hands a 31-prop bag to a "view"; `PostsSection` carries a prop for every
   listing variant a page ever needed; related reading and the post-foot
@@ -1191,11 +1190,18 @@ Each is an epic with a design sub-issue and `studio → service → ui → web`
 implementation sub-issues. `service` returns a per-kind view model; the `ui`
 `Hero` organism grows compound slots rather than new organisms.
 
-- **2.1 `module_heroStatement`** — marketing headline: eyebrow, required
-  heading, supporting text, optional image, `actionGroup`, the shared hero
-  tail. Sub-issues: studio (schema + slots), service (loader), ui (none
-  beyond Phase 1.1's organism, unless the design adds a background-image
-  variant), web (`HERO_MAP` entry).
+- **2.1 `module_heroStatement`** (#2775, designed 2026-09-10 in #2806 —
+  section "`module_heroStatement` — the marketing hero" in the spec of
+  record) — eyebrow, a required plain-text heading (always the page `<h1>`),
+  supporting text, then `defineHeroFields()` with no options, so the tail's
+  own image and actions (0–2 through the shared `actionGroup`) are the
+  module's. The background-image hero is the tail's `BANNER`, not a new
+  variant — but the `Hero` organism's Banner has no scrim and no on-image
+  copy today, so this epic's **ui** sub-issue gives it `tone`, the
+  `CtaModule` scrim and on-image colours (fixing `heroBlog`'s Banner too).
+  Sub-issues: ui (own PR, first), then studio + service + web as one PR
+  (typegen reds `HERO_MAP` until the web entry lands); service adds a shared
+  `toHeroPresentation()` collapse that `heroBlog` moves onto.
 - **2.2 `module_heroProfile`** — person or freelancer: name, role, avatar,
   short bio, social links, `actionGroup`. Sub-issues: studio, service, ui
   (`Hero.Avatar` and `Hero.Social` slots), web.
