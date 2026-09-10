@@ -12,7 +12,8 @@ type TFakeDocStore = Record<string, unknown>;
 const fakeContext = (docStore: TFakeDocStore): MigrationContext =>
   ({
     client: {
-      getDocument: async (id: string) => docStore[id],
+      fetch: async (_query: string, params: { id?: string; ref?: string }) =>
+        docStore[params.id ?? params.ref ?? ''] ?? null,
     },
   }) as unknown as MigrationContext;
 
@@ -39,9 +40,9 @@ const runDocument = (doc: Record<string, unknown>, context: MigrationContext) =>
 
 describe('seo.metaTitle backfill document() wiring', () => {
   it('skips a document that already has a metaTitle, without any lookups', async () => {
-    const getDocument = vi.fn(async () => undefined);
+    const fetch = vi.fn(async () => null);
     const context = {
-      client: { getDocument },
+      client: { fetch },
     } as unknown as MigrationContext;
 
     const result = await runDocument(
@@ -54,7 +55,7 @@ describe('seo.metaTitle backfill document() wiring', () => {
     );
 
     expect(result).toEqual([]);
-    expect(getDocument).not.toHaveBeenCalled();
+    expect(fetch).not.toHaveBeenCalled();
   });
 
   it('backfills page_blog from headingBlock.heading padded with the tagline', async () => {

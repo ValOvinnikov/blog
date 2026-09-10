@@ -115,8 +115,12 @@ const getSettingsSite = (
 
   if (cached) return cached;
 
-  const computed =
-    context.client.getDocument<TSettingsSiteDoc>(SETTINGS_SITE_ID);
+  const computed = context.client
+    .fetch<TSettingsSiteDoc | null>(
+      '*[_id == $id][0]{ brand, tagline, description }',
+      { id: SETTINGS_SITE_ID },
+    )
+    .then((doc) => doc ?? undefined);
 
   settingsSiteCache.set(context, computed);
 
@@ -132,7 +136,10 @@ const resolveEntityTitle = async (
 ): Promise<string | undefined> => {
   if (!ref) return undefined;
 
-  const entity = await context.client.getDocument<TEntityDoc>(ref);
+  const entity = await context.client.fetch<TEntityDoc | null>(
+    '*[_id == $ref][0]{ title }',
+    { ref },
+  );
 
   return entity?.title?.trim() || undefined;
 };
@@ -150,7 +157,10 @@ const resolveHeroSubject = async (
 ): Promise<string | undefined> => {
   if (!ref) return undefined;
 
-  const hero = await context.client.getDocument<THeroDoc>(ref);
+  const hero = await context.client.fetch<THeroDoc | null>(
+    '*[_id == $ref][0]{ _type, heroTitle, heading }',
+    { ref },
+  );
 
   if (hero?._type === MODULE_HERO_TYPE) {
     return hero.heroTitle?.trim() || undefined;
