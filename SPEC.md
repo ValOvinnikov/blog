@@ -281,10 +281,11 @@ drops out the day it is deleted. The studio's equivalent guard is
 `HERO_SCHEMA_TYPES`, the list every page's `hero` `to:` points at, with a
 test asserting every registered `module_hero*` schema appears in it.
 
-`page_home`, `page_landing`, `page_blog`, `page_topic` and `page_tag` each
-have an **optional** hero. A hero replaces that page's default header and
-owns the `<h1>`; without one, each page renders the header it always has
-(every one of them: `headingBlock`'s `heading` plus `supportingText`), so
+`page_home`, `page_landing`, `page_blog`, `page_topic`, `page_tag` and
+`page_topicIndex` each have an **optional** hero. A hero replaces that page's
+default header and owns the `<h1>`; without one, each page renders the header
+it always has (every one of them: `headingBlock`'s `heading` plus
+`supportingText`), so
 exactly one `<h1>` renders either way.
 
 `page_home`'s hero was required until it was made optional and the document
@@ -430,23 +431,32 @@ one generated field described by two names and one of them named after what
 had become only one of its five callers.
 
 `module_taxonomyList` renders both ways. It reaches `ModuleRenderer` through
-`MODULE_MAP` when placed in `page_home.modules[]` or `page_landing.modules[]`,
-and it renders through a taxonomy index page's own required slot —
-`page_topicIndex.taxonomyList` on `/topics`; `page_tagIndex` on `/tags` follows
-the same shape. It carries a `REVALIDATE_TAGS` entry, which every module type
-requires regardless of how it is rendered.
+`MODULE_MAP` when placed in `page_home.modules[]`, `page_landing.modules[]` or
+`page_topicIndex.modules[]`, and it renders through a dedicated page slot on
+`page_tagIndex.taxonomyList` (`/tags`). `/topics` used to work that way too;
+`page_topicIndex` now carries the reference in `modules[]` like any other
+module, and its `taxonomyList` field is retained only as a `readOnly`,
+`deprecated` field pending removal. It carries a `REVALIDATE_TAGS` entry,
+which every module type requires regardless of how it is rendered.
 
 Which taxonomy it lists is an optional authored field, because a module
 document cannot see what holds it: the page references the module, not the
 reverse, and Sanity's `hidden` callback is synchronous and sees only the
 module's own document. So the field is always visible and the requirement
 lives on the pages instead. A `modules[]` placement must set it — an async
-rule on both pages' `modules[]` fetches each referenced module and rejects one
-that has not. An index page leaves it empty and passes its own kind to
+rule on those pages' `modules[]` fetches each referenced module and rejects one
+that has not. A page that still reaches the module through a dedicated slot —
+`page_tagIndex` — may leave it empty and pass its own kind to
 `service.modules.taxonomyList.v1.getTaxonomyList(id, tenant, fallbackTaxonomy)`
 as the fallback, so the loader never queries upward for a parent page; that
 page's slot rule rejects a module whose authored kind disagrees with the page's
-own. `sortOrder` (`TAXONOMY_SORT`, coalesced to `ALPHABETICAL` at read time)
+own. `page_topicIndex` no longer has that slot, and so no longer has that
+channel: `ModuleRenderer` calls every module with the same arguments and cannot
+supply a fallback, so a module it renders must carry an authored `taxonomy` —
+the same requirement `page_home` and `page_landing` already impose, now
+enforced on `page_topicIndex.modules[]` by the same async rule.
+
+`sortOrder` (`TAXONOMY_SORT`, coalesced to `ALPHABETICAL` at read time)
 and `limit` apply wherever the module sits, and their defaults reproduce the
 index pages' rendering. Sorting and the limit are applied in the service
 transformer, not in GROQ.
@@ -459,9 +469,9 @@ either: unset stays unset end to end. In `apps/web`, every module component
 that renders a `@blog/ui` organism — including those reached through a
 dedicated slot rather than `MODULE_MAP`'s generic `ModuleRenderer` pipeline
 (§5 above): the hero family via each page's `hero` slot, and
-`module_taxonomyList` via `page_topicIndex`'s and `page_tagIndex`'s
-`taxonomyList` references — which also renders through `MODULE_MAP` when
-placed in `modules[]`, as `module_postList` now always does — all
+`module_taxonomyList` via `page_tagIndex`'s `taxonomyList` reference — which
+also renders through `MODULE_MAP` when placed in `modules[]`, as
+`module_postList` and `page_topicIndex`'s taxonomy list now always do — all
 still styled the same way as every other module — no exception — wraps it in `apps/web`'s own
 `Section` component (`apps/web/src/components/shared/section`, relocated
 from `packages/ui`), passing `brandVariant` and `layout` straight through,
