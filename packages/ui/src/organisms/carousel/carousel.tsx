@@ -6,40 +6,43 @@ import {
 } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import { IconButton } from '@blog/ui/atoms/icon-button';
-import type { ReactNode } from 'react';
+import type { Key, ReactNode } from 'react';
 
-import { carouselVariants, type TCarouselVariants } from './carousel-variants';
+import { carouselVariants } from './carousel-variants';
 import { useCarousel } from './use-carousel';
 
-export type TCarouselProps<TItem extends NonNullable<unknown>> =
-  IWithClassName &
-    IWithDataTestId & {
-      /** The items to render as slides. */
-      items: TItem[];
-      /** Renders one item's slide content. */
-      renderItem: (item: TItem, index: number) => ReactNode;
-      ariaLabel: string;
-      previousLabel: string;
-      nextLabel: string;
-      slideSize?: TCarouselVariants['slideSize'];
-    };
+export interface ICarouselProps<T> extends IWithClassName, IWithDataTestId {
+  /** The items to render as slides. */
+  items: readonly T[];
+  /** Renders one item's slide content. */
+  renderItem: (args: { item: T; index: number }) => ReactNode;
+  /** Returns a slide's React key; falls back to its index when omitted. */
+  getItemKey?: (args: { item: T; index: number }) => Key;
+  /** Layout only, applied to every slide — the caller sizes it. */
+  slideClassName?: string;
+  ariaLabel: string;
+  previousLabel: string;
+  nextLabel: string;
+}
 
 /**
  * Carousel — a generic swipeable row of slides. A native scroll-snap track
  * before hydration, handed off to Embla once it mounts, with previous/next
- * buttons that always render. A slide is whatever `renderItem` returns; the
- * organism never maps data or names a content type.
+ * buttons that always render. A slide is whatever `renderItem` returns and
+ * is sized by `slideClassName`; the organism never maps data, names a
+ * content type, or sets a slide width of its own.
  */
-export const Carousel = <TItem extends NonNullable<unknown>>({
+export const Carousel = <T,>({
   items,
   renderItem,
+  getItemKey,
+  slideClassName,
   ariaLabel,
   previousLabel,
   nextLabel,
-  slideSize,
   className,
   dataTestId,
-}: TCarouselProps<TItem>) => {
+}: ICarouselProps<T>) => {
   const {
     isEnhanced,
     isPreviousDisabled,
@@ -52,7 +55,7 @@ export const Carousel = <TItem extends NonNullable<unknown>>({
     scrollNext,
   } = useCarousel();
 
-  const s = carouselVariants({ isEnhanced, slideSize });
+  const s = carouselVariants({ isEnhanced });
 
   return (
     <div
@@ -67,8 +70,11 @@ export const Carousel = <TItem extends NonNullable<unknown>>({
       <div ref={viewportRef} className={s.viewport()}>
         <ul role="list" className={s.track()}>
           {items.map((item, index) => (
-            <li key={index} className={s.slide()}>
-              {renderItem(item, index)}
+            <li
+              key={getItemKey ? getItemKey({ item, index }) : index}
+              className={s.slide({ class: slideClassName })}
+            >
+              {renderItem({ item, index })}
             </li>
           ))}
         </ul>

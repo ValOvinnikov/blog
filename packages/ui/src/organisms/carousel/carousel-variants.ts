@@ -25,25 +25,9 @@ export const carouselVariants = tv({
         ],
       },
     },
-    slideSize: {
-      columns: {
-        // Half/two-thirds of the track's own gap at each breakpoint
-        // (gap-3.5 / md:gap-5 / lg:gap-7) so slides land flush with the grid.
-        slide: [
-          'basis-[85%]',
-          'sm:basis-[calc(50%_-_0.4375rem)]',
-          'md:basis-[calc(33.3333%_-_0.8333rem)]',
-          'lg:basis-[calc(33.3333%_-_1.1667rem)]',
-        ],
-      },
-      full: {
-        slide: ['basis-full'],
-      },
-    },
   },
   defaultVariants: {
     isEnhanced: false,
-    slideSize: 'columns',
   },
 });
 

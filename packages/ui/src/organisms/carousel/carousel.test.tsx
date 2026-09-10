@@ -74,7 +74,7 @@ beforeEach(() => {
   emblaApi.canScrollNext.mockReturnValue(true);
 });
 
-const renderItem = (item: string) => <div>{item}</div>;
+const renderItem = ({ item }: { item: string }) => <div>{item}</div>;
 
 describe(`<${Carousel.name}/>`, () => {
   it('renders a region carrying aria-roledescription and the given ariaLabel', () => {
@@ -128,7 +128,9 @@ describe(`<${Carousel.name}/>`, () => {
 
   it('calls renderItem for every item and renders each as a slide, in order', () => {
     const items = ['alpha', 'bravo', 'charlie'];
-    const renderItemSpy = vi.fn((item: string) => <div>{item}</div>);
+    const renderItemSpy = vi.fn(({ item }: { item: string }) => (
+      <div>{item}</div>
+    ));
     renderElement(
       <Carousel
         items={items}
@@ -140,11 +142,78 @@ describe(`<${Carousel.name}/>`, () => {
     );
 
     items.forEach((item, index) => {
-      expect(renderItemSpy).toHaveBeenCalledWith(item, index);
+      expect(renderItemSpy).toHaveBeenCalledWith({ item, index });
     });
 
     const slides = screen.getAllByRole('listitem');
     expect(slides.map((slide) => slide.textContent)).toEqual(items);
+  });
+
+  it('keys each slide with getItemKey when supplied', () => {
+    const items = [
+      { id: 'b', label: 'Bravo' },
+      { id: 'a', label: 'Alpha' },
+    ];
+    const { rerender } = renderElement(
+      <Carousel
+        items={items}
+        renderItem={({ item }) => (
+          <div data-testid={`slide-${item.id}`}>{item.label}</div>
+        )}
+        getItemKey={({ item }) => item.id}
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+      />,
+    );
+
+    const slideB = screen.getByTestId('slide-b');
+
+    rerender(
+      <Carousel
+        items={[...items].reverse()}
+        renderItem={({ item }) => (
+          <div data-testid={`slide-${item.id}`}>{item.label}</div>
+        )}
+        getItemKey={({ item }) => item.id}
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+      />,
+    );
+
+    expect(screen.getByTestId('slide-b')).toBe(slideB);
+  });
+
+  it('keys each slide by its index when getItemKey is omitted', () => {
+    renderElement(
+      <Carousel
+        items={['alpha', 'bravo']}
+        renderItem={renderItem}
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+      />,
+    );
+
+    expect(screen.getAllByRole('listitem')).toHaveLength(2);
+  });
+
+  it('applies slideClassName to every slide', () => {
+    renderElement(
+      <Carousel
+        items={['Slide one', 'Slide two']}
+        renderItem={renderItem}
+        slideClassName="basis-full"
+        ariaLabel="Posts"
+        previousLabel="Previous"
+        nextLabel="Next"
+      />,
+    );
+
+    for (const slide of screen.getAllByRole('listitem')) {
+      expect(slide).toHaveClass('basis-full');
+    }
   });
 
   it('forwards data-testid to the root element', () => {
@@ -245,39 +314,6 @@ describe(`<${Carousel.name}/>`, () => {
 
     expect(mockViewport.scrollLeft).toBe(0);
     expect(emblaApi.scrollTo).toHaveBeenCalledWith(2, true);
-  });
-
-  it('applies the grid-tracking slide classes by default', () => {
-    renderElement(
-      <Carousel
-        items={['Slide one']}
-        renderItem={(item) => <div data-testid="slide">{item}</div>}
-        ariaLabel="Posts"
-        previousLabel="Previous"
-        nextLabel="Next"
-      />,
-    );
-
-    const slide = screen.getByTestId('slide').parentElement;
-    expect(slide).toHaveClass('basis-[85%]');
-    expect(slide).not.toHaveClass('basis-full');
-  });
-
-  it('applies the full-width slide classes when slideSize is "full"', () => {
-    renderElement(
-      <Carousel
-        items={['Slide one']}
-        renderItem={(item) => <div data-testid="slide">{item}</div>}
-        ariaLabel="Posts"
-        previousLabel="Previous"
-        nextLabel="Next"
-        slideSize="full"
-      />,
-    );
-
-    const slide = screen.getByTestId('slide').parentElement;
-    expect(slide).toHaveClass('basis-full');
-    expect(slide).not.toHaveClass('basis-[85%]');
   });
 
   it('renders both buttons, labelled and titled from previousLabel/nextLabel', () => {
