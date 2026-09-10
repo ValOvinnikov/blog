@@ -1,39 +1,31 @@
+import { objectKeys } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Carousel } from './carousel';
+import { carouselVariants } from './carousel-variants';
 
-const SampleSlide = ({
-  index,
-  imageSrc,
-}: {
-  index: number;
-  imageSrc?: string;
-}) => (
+const SampleSlide = ({ index }: { index: number }) => (
   <div className="flex h-full flex-col gap-3 rounded-lg border border-border bg-surface p-4">
-    {imageSrc && (
-      <img
-        src={imageSrc}
-        alt=""
-        className="h-40 w-full rounded-md object-cover"
-      />
-    )}
     <p className="font-mono text-label text-muted uppercase">
       Slide {index + 1}
     </p>
-    <p className="text-copy text-text">Sample carousel slide content.</p>
+    <p className="text-copy text-text">{faker.lorem.sentences(2)}</p>
   </div>
 );
 
-const buildSlides = (count: number, withImages?: boolean) =>
+const buildSlides = (count: number) =>
   Array.from({ length: count }, (_, index) => (
-    <SampleSlide
+    <SampleSlide key={index} index={index} />
+  ));
+
+const buildImageSlides = (count: number) =>
+  Array.from({ length: count }, (_, index) => (
+    <img
       key={index}
-      index={index}
-      imageSrc={
-        withImages
-          ? `https://picsum.photos/seed/carousel-${index}/640/360`
-          : undefined
-      }
+      src={`https://picsum.photos/seed/carousel-${index}/640/360`}
+      alt={faker.lorem.words(4)}
+      className="h-56 w-full rounded-lg object-cover"
     />
   ));
 
@@ -42,18 +34,17 @@ const meta = {
   component: Carousel,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
+  argTypes: {
+    slideSize: {
+      control: 'select',
+      options: objectKeys(carouselVariants.variants.slideSize),
+    },
+  },
   args: {
     ariaLabel: 'Latest posts',
-    children: [
-      ...buildSlides(3),
-      <Carousel.Controls
-        key="controls"
-        previousLabel="Previous slide"
-        nextLabel="Next slide"
-        isPreviousDisabled={true}
-        isNextDisabled={true}
-      />,
-    ],
+    previousLabel: 'Previous slide',
+    nextLabel: 'Next slide',
+    children: buildSlides(3),
   },
 } satisfies Meta<typeof Carousel>;
 
@@ -64,51 +55,19 @@ export const RowThatFits: TStory = {};
 
 export const RowThatScrolls: TStory = {
   args: {
-    children: [
-      ...buildSlides(8),
-      <Carousel.Controls
-        key="controls"
-        previousLabel="Previous slide"
-        nextLabel="Next slide"
-        isPreviousDisabled={true}
-      />,
-    ],
+    children: buildSlides(8),
   },
 };
 
-export const Enhanced: TStory = {
+export const FullWidthSlides: TStory = {
   args: {
-    isEnhanced: true,
-    children: [
-      ...buildSlides(8),
-      <Carousel.Controls
-        key="controls"
-        previousLabel="Previous slide"
-        nextLabel="Next slide"
-      />,
-    ],
+    slideSize: 'full',
+    children: buildSlides(4),
   },
 };
 
-export const NotEnhanced: TStory = {
+export const WithPlainImages: TStory = {
   args: {
-    isEnhanced: false,
+    children: buildImageSlides(6),
   },
 };
-
-export const WithImages: TStory = {
-  args: {
-    children: [
-      ...buildSlides(3, true),
-      <Carousel.Controls
-        key="controls"
-        previousLabel="Previous slide"
-        nextLabel="Next slide"
-        isPreviousDisabled={true}
-        isNextDisabled={true}
-      />,
-    ],
-  },
-};
-
-export const WithoutImages: TStory = {};

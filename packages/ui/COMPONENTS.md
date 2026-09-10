@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_53 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_54 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -279,6 +279,12 @@ Slots:
 
 renders a reader's saved posts as one row per bookmark, each with a date and a link to the post, or `emptyMessage` when there are none.
 Props: rows: IBookmarkRow[] · emptyMessage: string · hint?: string · prefix?: ReactNode · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
+
+### Carousel — `organisms/carousel/carousel.tsx`
+
+a generic swipeable row of slides.
+Props: children: ReactNode · ariaLabel: string · previousLabel: string · nextLabel: string · slideSize?: TCarouselVariants['slideSize'] _(extends IWithClassName, IWithDataTestId)_
+Variants: isEnhanced: (boolean) · slideSize: columns|full
 
 ### ContentModule — `organisms/content-module/content-module.tsx`
 

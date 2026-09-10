@@ -19,6 +19,7 @@
     "@blog/config": "workspace:*",
     "@blog/tailwind-config": "workspace:*",
     "@blog/utils": "workspace:*",
+    "embla-carousel-react": "^8.6.0",
     "tailwind-merge": "^3.6.0",
     "tailwind-variants": "^3.2.2"
   },
@@ -44,6 +45,7 @@
     "@testing-library/user-event": "^14.5.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "embla-carousel": "8.6.0",
     "eslint": "catalog:",
     "jsdom": "^29.1.1",
     "prettier": "catalog:",
