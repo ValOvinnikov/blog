@@ -1,3 +1,4 @@
+import { TAXONOMY_KIND } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawPostListModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
@@ -41,7 +42,29 @@ describe('getPostList', () => {
     await expect(getPostList('missing', 1, tenant)).rejects.toThrow();
   });
 
-  it('passes the module id as a posts-query parameter', async () => {
+  it('binds the scope slug as a posts-query parameter when scoped', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawPostListModule({ pageSize: 3 }))
+      .mockResolvedValueOnce({
+        posts: [makeRawPostCard({ _id: 'a' })],
+        total: 1,
+      });
+
+    await getPostList('post-list-1', 1, tenant, {
+      kind: TAXONOMY_KIND.TAGS,
+      slug: 'engineering',
+    });
+
+    expect(mockRun).toHaveBeenNthCalledWith(
+      2,
+      expect.anything(),
+      expect.objectContaining({
+        parameters: { scopeSlug: 'engineering' },
+      }),
+    );
+  });
+
+  it('binds no parameters to the posts query when unscoped', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawPostListModule({ pageSize: 3 }))
       .mockResolvedValueOnce({
@@ -55,7 +78,7 @@ describe('getPostList', () => {
       2,
       expect.anything(),
       expect.objectContaining({
-        parameters: { id: 'post-list-1' },
+        parameters: {},
       }),
     );
   });
@@ -124,9 +147,7 @@ describe('getPostList', () => {
             't:tenant-a:posts',
             't:tenant-a:author',
             't:tenant-a:topic',
-            't:tenant-a:page_tag',
             't:tenant-a:tag',
-            't:tenant-a:page_topic',
           ],
         }),
       }),

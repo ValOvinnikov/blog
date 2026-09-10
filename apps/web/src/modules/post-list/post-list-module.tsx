@@ -51,7 +51,12 @@ export const PostListModule = async ({
 
   const tenantContext = await getTenantSanityContext(tenant);
   const [result, paginationT, scopedT] = await Promise.all([
-    service.modules.postList.v1.getPostList(id, tenantContext, resolvedPage),
+    service.modules.postList.v1.getPostList(
+      id,
+      tenantContext,
+      resolvedPage,
+      archive && { kind: archive.kind, slug: archive.slug },
+    ),
     getTranslations('pagination'),
     getTranslations(archive ? ARCHIVE_NAMESPACE[archive.kind] : 'blogListPage'),
   ]);

@@ -1,3 +1,5 @@
+import { TAXONOMY_KIND } from '@blog/config';
+
 import { postListModulePaginatedPostsQuery } from './posts.query';
 
 describe('postListModulePaginatedPostsQuery', () => {
@@ -30,39 +32,36 @@ describe('postListModulePaginatedPostsQuery', () => {
     );
   });
 
-  it('scopes posts to the enclosing page_tag when one references this module as its postList', () => {
-    expect(postListModulePaginatedPostsQuery(1, 9).query).toContain(
-      '*[_type == "page_tag" && (postList._ref == $id || $id in modules[]._ref)][0].tag._ref',
+  it('scopes posts to a tag with a single direct lookup', () => {
+    const query = postListModulePaginatedPostsQuery(1, 9, {
+      kind: TAXONOMY_KIND.TAGS,
+      slug: 'engineering',
+    }).query;
+
+    expect(query).toContain(
+      'references(*[_type == "blog_tag" && slug.current == $scopeSlug][0]._id)',
     );
+    expect(query).not.toContain('blog_topic');
   });
 
-  it('stays unscoped when no page_tag references this module', () => {
-    expect(postListModulePaginatedPostsQuery(1, 9).query).toContain(
-      '!defined(*[_type == "page_tag" && (postList._ref == $id || $id in modules[]._ref)][0]._id)',
+  it('scopes posts to a topic with a single direct lookup', () => {
+    const query = postListModulePaginatedPostsQuery(1, 9, {
+      kind: TAXONOMY_KIND.TOPICS,
+      slug: 'news',
+    }).query;
+
+    expect(query).toContain(
+      'references(*[_type == "blog_topic" && slug.current == $scopeSlug][0]._id)',
     );
+    expect(query).not.toContain('blog_tag');
   });
 
-  it('scopes posts to the enclosing page_topic when one references this module as its postList', () => {
-    expect(postListModulePaginatedPostsQuery(1, 9).query).toContain(
-      '*[_type == "page_topic" && (postList._ref == $id || $id in modules[]._ref)][0].topic._ref',
-    );
-  });
+  it('omits the scope predicate entirely when unscoped', () => {
+    const query = postListModulePaginatedPostsQuery(1, 9).query;
 
-  it('stays unscoped when no page_topic references this module', () => {
-    expect(postListModulePaginatedPostsQuery(1, 9).query).toContain(
-      '!defined(*[_type == "page_topic" && (postList._ref == $id || $id in modules[]._ref)][0]._id)',
-    );
-  });
-
-  it('matches a page_tag owner that references this module only via modules[] (postList unset)', () => {
-    expect(postListModulePaginatedPostsQuery(1, 9).query).toContain(
-      'page_tag" && (postList._ref == $id || $id in modules[]._ref)',
-    );
-  });
-
-  it('matches a page_topic owner that references this module only via modules[] (postList unset)', () => {
-    expect(postListModulePaginatedPostsQuery(1, 9).query).toContain(
-      'page_topic" && (postList._ref == $id || $id in modules[]._ref)',
-    );
+    expect(query).not.toContain('references(');
+    expect(query).not.toContain('$scopeSlug');
+    expect(query).not.toContain('blog_tag');
+    expect(query).not.toContain('blog_topic');
   });
 });

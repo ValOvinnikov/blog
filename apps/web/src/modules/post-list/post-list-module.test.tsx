@@ -89,6 +89,7 @@ describe(`<${PostListModule.name}/>`, () => {
       'post-list-1',
       DEFAULT_TENANT_SANITY_CONTEXT,
       2,
+      undefined,
     );
   });
 
@@ -112,6 +113,7 @@ describe(`<${PostListModule.name}/>`, () => {
       'post-list-1',
       DEFAULT_TENANT_SANITY_CONTEXT,
       1,
+      undefined,
     );
   });
 
@@ -137,7 +139,12 @@ describe(`<${PostListModule.name}/>`, () => {
 
     await setup();
 
-    expect(getPostListMock).toHaveBeenCalledWith('post-list-1', tenant, 1);
+    expect(getPostListMock).toHaveBeenCalledWith(
+      'post-list-1',
+      tenant,
+      1,
+      undefined,
+    );
     expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
@@ -368,6 +375,12 @@ describe(`<${PostListModule.name}/>`, () => {
     expect(
       screen.getByRole('navigation', { name: 'News pages' }),
     ).toBeInTheDocument();
+    expect(getPostListMock).toHaveBeenCalledWith(
+      'post-list-1',
+      DEFAULT_TENANT_SANITY_CONTEXT,
+      2,
+      { kind: TAXONOMY_KIND.TOPICS, slug: 'news' },
+    );
 
     const previousLink = screen.getByRole('link', { name: 'Previous' });
     expect(previousLink).toHaveAttribute('href', '/topics/news');
@@ -420,6 +433,12 @@ describe(`<${PostListModule.name}/>`, () => {
     expect(
       screen.getByRole('navigation', { name: 'TypeScript pages' }),
     ).toBeInTheDocument();
+    expect(getPostListMock).toHaveBeenCalledWith(
+      'post-list-1',
+      DEFAULT_TENANT_SANITY_CONTEXT,
+      2,
+      { kind: TAXONOMY_KIND.TAGS, slug: 'typescript' },
+    );
 
     const previousLink = screen.getByRole('link', { name: 'Previous' });
     expect(previousLink).toHaveAttribute('href', '/tags/typescript');
