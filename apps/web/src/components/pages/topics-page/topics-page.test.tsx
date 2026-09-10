@@ -1,41 +1,34 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { notFound } from 'next/navigation';
 
 import { TopicsPage } from './topics-page';
 
-const { getTopicsIndexPageMock, taxonomyListModuleMock } = vi.hoisted(() => ({
-  getTopicsIndexPageMock: vi.fn(),
-  // `TaxonomyListModule` is an async Server Component — real RSC async-
-  // component nesting isn't renderable through `@testing-library/react`'s
-  // client renderer. Stubbed as a plain sync component so this suite can
-  // assert `TopicsPage` passes the right props through without needing a
-  // real async render; its own fetch/render logic is covered by
-  // `taxonomy-list-module.test.tsx`.
-  taxonomyListModuleMock: vi.fn(
-    ({
-      id,
-      slot,
-    }: {
-      id: string;
-      slot: {
-        fallbackTaxonomy: string;
-        accessibleTitle: string;
-        emptyMessage: string;
-      };
-    }) => (
-      <div data-testid="taxonomy-list-module-stub">
-        {id}:{slot.fallbackTaxonomy}:{slot.accessibleTitle}:{slot.emptyMessage}
-      </div>
+const { getTopicsIndexPageMock, moduleRendererMock, heroSlotMock } = vi.hoisted(
+  () => ({
+    getTopicsIndexPageMock: vi.fn(),
+    heroSlotMock: vi.fn(({ id }: { id: string }) => (
+      <h1 data-testid="hero-slot">{id}</h1>
+    )),
+    // `ModuleRenderer` is an async Server Component — real RSC
+    // async-component nesting isn't renderable through
+    // `@testing-library/react`'s client renderer. Stubbed as a plain sync
+    // component so this suite can assert `TopicsPage` composes it with the
+    // right props; its own dispatch logic — including resolving a
+    // `module_taxonomyList` entry — is covered by its own test file
+    // (`module-renderer.test.tsx`).
+    moduleRendererMock: vi.fn(
+      ({ modules }: { modules: { id: string; type: string }[] }) => (
+        <div data-testid="module-renderer-stub">
+          {modules.map((module) => module.type).join(',')}
+        </div>
+      ),
     ),
-  ),
-}));
+  }),
+);
 
 vi.mock('@web/server/topics-index/get-topics-index-page', () => ({
   getTopicsIndexPage: getTopicsIndexPageMock,
-}));
-
-vi.mock('@web/modules/taxonomy-list/taxonomy-list-module', () => ({
-  TaxonomyListModule: taxonomyListModuleMock,
 }));
 
 vi.mock(
@@ -47,8 +40,12 @@ vi.mock(
   }),
 );
 
+vi.mock('@web/modules/module-renderer', () => ({
+  ModuleRenderer: moduleRendererMock,
+}));
+
 vi.mock('@web/modules/hero-slot', () => ({
-  HeroSlot: vi.fn(),
+  HeroSlot: heroSlotMock,
 }));
 
 const setup = customRenderAsync(TopicsPage, {
@@ -59,7 +56,8 @@ const setup = customRenderAsync(TopicsPage, {
 describe(`<${TopicsPage.name}/>`, () => {
   beforeEach(() => {
     getTopicsIndexPageMock.mockReset();
-    taxonomyListModuleMock.mockClear();
+    moduleRendererMock.mockClear();
+    heroSlotMock.mockClear();
   });
 
   it('calls notFound() when the fetch fails', async () => {
@@ -88,14 +86,15 @@ describe(`<${TopicsPage.name}/>`, () => {
     errorSpy.mockRestore();
   });
 
-  it('renders the h1 and supporting text from the fetched page document', async () => {
+  it('renders the h1 from the fetched headingBlock when there is no hero', async () => {
     getTopicsIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Topics',
-        supportingText: 'Browse every post by topic.',
-        seo: {},
-        taxonomyListId: 'topic-list-1',
+        headingBlock: makeHeadingBlock({
+          heading: 'Topics',
+          supportingText: 'Browse every post by topic.',
+        }),
+        modules: [],
       },
     });
 
@@ -106,16 +105,34 @@ describe(`<${TopicsPage.name}/>`, () => {
     ).toBeVisible();
     expect(screen.getByText('Browse every post by topic.')).toBeVisible();
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
+    expect(heroSlotMock).not.toHaveBeenCalled();
   });
 
-  it('renders the parts in order: breadcrumbs, then the taxonomy list', async () => {
+  it('dispatches the hero through HeroSlot and keeps exactly one h1 when a hero is set', async () => {
     getTopicsIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Topics',
-        supportingText: 'Browse every post by topic.',
-        seo: {},
-        taxonomyListId: 'topic-list-1',
+        headingBlock: makeHeadingBlock({ heading: 'Topics' }),
+        hero: { id: 'hero-1', type: 'module_hero' },
+        modules: [],
+      },
+    });
+
+    await setup();
+
+    expect(heroSlotMock).toHaveBeenCalledWith(
+      { id: 'hero-1', type: 'module_hero', locale: 'en', tenant: 'tenant-1' },
+      undefined,
+    );
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+  });
+
+  it('renders the parts in order: breadcrumbs, then the module renderer', async () => {
+    getTopicsIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        headingBlock: makeHeadingBlock({ heading: 'Topics' }),
+        modules: [{ id: 'topic-list-1', type: 'module_taxonomyList' }],
       },
     });
 
@@ -125,63 +142,53 @@ describe(`<${TopicsPage.name}/>`, () => {
       container.querySelectorAll<HTMLElement>('[data-testid]'),
     ).map((el) => el.getAttribute('data-testid'));
 
-    expect(order).toEqual([
-      'topics-index-breadcrumbs',
-      'taxonomy-list-module-stub',
-    ]);
+    expect(order).toEqual(['topics-index-breadcrumbs', 'module-renderer-stub']);
   });
 
-  it('renders through PageShell: breadcrumbs outside main, the taxonomy list inside it', async () => {
+  it('renders through PageShell: breadcrumbs outside main, module renderer inside it', async () => {
     getTopicsIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Topics',
-        supportingText: 'Browse every post by topic.',
-        seo: {},
-        taxonomyListId: 'topic-list-1',
+        headingBlock: makeHeadingBlock({ heading: 'Topics' }),
+        modules: [],
       },
     });
 
     await setup();
 
     const main = screen.getByRole('main');
-    expect(main).toContainElement(
-      screen.getByTestId('taxonomy-list-module-stub'),
-    );
+    expect(main).toContainElement(screen.getByTestId('module-renderer-stub'));
     expect(
       screen.getByTestId('topics-index-breadcrumbs').closest('main'),
     ).toBeNull();
   });
 
-  it('passes the taxonomyListId, TOPICS fallback kind, page heading as accessibleTitle, and the empty-state copy through to TaxonomyListModule', async () => {
+  it('passes the page-builder modules through to ModuleRenderer, in order, including the taxonomy list module', async () => {
     getTopicsIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Topics',
-        supportingText: 'Browse every post by topic.',
-        seo: {},
-        taxonomyListId: 'topic-list-1',
+        headingBlock: makeHeadingBlock({ heading: 'Topics' }),
+        modules: [
+          { id: 'topic-list-1', type: 'module_taxonomyList' },
+          { id: 'newsletter-1', type: 'module_newsletter' },
+        ],
       },
     });
 
     await setup();
 
-    expect(taxonomyListModuleMock).toHaveBeenCalledWith(
+    expect(moduleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        id: 'topic-list-1',
-        slot: expect.objectContaining({
-          fallbackTaxonomy: 'TOPICS',
-          titleId: 'topic-list-title',
-          dataTestId: 'taxonomy-list-module-topic-list-1',
-          headingLevel: 2,
-          accessibleTitle: 'Topics',
-          emptyMessage: 'No topics yet.',
-        }),
+        modules: [
+          { id: 'topic-list-1', type: 'module_taxonomyList' },
+          { id: 'newsletter-1', type: 'module_newsletter' },
+        ],
+        locale: 'en',
       }),
       undefined,
     );
-    expect(screen.getByTestId('taxonomy-list-module-stub')).toHaveTextContent(
-      'topic-list-1:TOPICS:Topics:No topics yet.',
+    expect(screen.getByTestId('module-renderer-stub')).toHaveTextContent(
+      'module_taxonomyList,module_newsletter',
     );
   });
 
@@ -189,10 +196,8 @@ describe(`<${TopicsPage.name}/>`, () => {
     getTopicsIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
-        heading: 'Topics',
-        supportingText: 'Browse every post by topic.',
-        seo: {},
-        taxonomyListId: 'topic-list-1',
+        headingBlock: makeHeadingBlock({ heading: 'Topics' }),
+        modules: [],
       },
     });
 
