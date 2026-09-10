@@ -33,6 +33,7 @@ describe(ReactivateTenantControl, () => {
       back: vi.fn(),
       forward: vi.fn(),
       refresh: refreshMock,
+      bfcacheId: '',
     });
   });
 
