@@ -10,7 +10,7 @@ export const displayModeField = () =>
     description:
       "Grid stacks the posts in rows. Carousel puts them in one row the reader swipes or steps through. On a wide screen where every post already fits, the carousel's buttons stay disabled.",
     options: {
-      layout: 'radio',
+      layout: 'dropdown',
       list: Object.values(DISPLAY_MODE).map((value) => ({
         title: toTitleCase(value),
         value,

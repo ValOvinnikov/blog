@@ -10,10 +10,10 @@ describe('displayModeField', () => {
     expect(field.initialValue).toBe(DISPLAY_MODE.GRID);
   });
 
-  it('lists both display modes as a radio', () => {
+  it('lists both display modes as a dropdown', () => {
     const field = displayModeField();
 
-    expect(field.options?.layout).toBe('radio');
+    expect(field.options?.layout).toBe('dropdown');
     expect(field.options?.list).toEqual([
       { title: 'Grid', value: DISPLAY_MODE.GRID },
       { title: 'Carousel', value: DISPLAY_MODE.CAROUSEL },
