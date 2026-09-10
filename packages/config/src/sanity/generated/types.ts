@@ -602,10 +602,26 @@ export type Page_topicIndex = {
   _updatedAt: string;
   _rev: string;
   title?: string;
+  headingBlock?: HeadingBlock;
+  hero?: Module_heroReference | Module_heroBlogReference;
+  modules?: Array<
+    | ({
+        _key: string;
+      } & Module_taxonomyListReference)
+    | ({
+        _key: string;
+      } & Module_postLatestReference)
+    | ({
+        _key: string;
+      } & Module_ctaReference)
+    | ({
+        _key: string;
+      } & Module_newsletterReference)
+  >;
+  seo?: Seo;
   heading?: string;
   supportingText?: string;
   taxonomyList?: Module_taxonomyListReference;
-  seo?: Seo;
 };
 
 export type Module_taxonomyList = {
