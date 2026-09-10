@@ -1,5 +1,4 @@
 import { authorSchema } from './blog/author';
-import { postSchema } from './blog/post';
 import { tagSchema } from './blog/tag';
 import { topicSchema } from './blog/topic';
 import { blogPageSchema } from './pages/blog-page';
@@ -18,7 +17,6 @@ import { themeSchema } from './settings/theme';
 import { migrationStateSchema } from './system/migration-state';
 
 export const documents = [
-  postSchema,
   authorSchema,
   topicSchema,
   tagSchema,
