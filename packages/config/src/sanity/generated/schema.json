@@ -4082,6 +4082,13 @@
         },
         "optional": true
       },
+      "showLatestPosts": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
       "headingBlock": {
         "type": "objectAttribute",
         "value": {
