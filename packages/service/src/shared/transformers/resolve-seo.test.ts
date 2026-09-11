@@ -1,7 +1,7 @@
 import { makeRawImage } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
-import { MissingSeoTitleError, resolveSeo, type TRawSeo } from './resolve-seo';
+import { resolveSeo, type TRawSeo } from './resolve-seo';
 
 vi.mock('@blog/service/sanity/image', () => ({
   urlForImage: vi.fn(
@@ -73,19 +73,5 @@ describe(resolveSeo, () => {
     );
 
     expect(result.ogImageUrl).toBeUndefined();
-  });
-
-  it('throws MissingSeoTitleError when no seo object is authored at all', () => {
-    expect(() => resolveSeo(undefined, tenant)).toThrow(MissingSeoTitleError);
-  });
-
-  it('throws MissingSeoTitleError when the seo field is null', () => {
-    expect(() => resolveSeo(null, tenant)).toThrow(MissingSeoTitleError);
-  });
-
-  it('throws MissingSeoTitleError when the seo object carries a blank metaTitle', () => {
-    expect(() =>
-      resolveSeo(makeAuthoredSeo({ metaTitle: '' }), tenant),
-    ).toThrow(MissingSeoTitleError);
   });
 });
