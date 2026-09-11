@@ -24,7 +24,7 @@ export interface IActionGroupAction {
 }
 
 export interface IActionGroupProps {
-  actions: IActionGroupAction[];
+  actions: readonly IActionGroupAction[];
   /** Reverses non-primary button colors for use on a dark or image background. */
   isOnDark?: boolean;
 }

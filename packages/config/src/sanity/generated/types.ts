@@ -476,6 +476,13 @@ export type Module_heroBlogReference = {
   [internalGroqTypeReferenceTo]?: 'module_heroBlog';
 };
 
+export type Module_heroStatementReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_heroStatement';
+};
+
 export type Module_postListReference = {
   _ref: string;
   _type: 'reference';
@@ -514,7 +521,10 @@ export type Page_tag = {
   slug?: Slug;
   tag?: Blog_tagReference;
   headingBlock?: HeadingBlock;
-  hero?: Module_heroReference | Module_heroBlogReference;
+  hero?:
+    | Module_heroReference
+    | Module_heroBlogReference
+    | Module_heroStatementReference;
   modules?: Array<
     | ({
         _key: string;
@@ -553,7 +563,10 @@ export type Page_tagIndex = {
   _rev: string;
   title?: string;
   headingBlock?: HeadingBlock;
-  hero?: Module_heroReference | Module_heroBlogReference;
+  hero?:
+    | Module_heroReference
+    | Module_heroBlogReference
+    | Module_heroStatementReference;
   modules?: Array<
     | ({
         _key: string;
@@ -584,7 +597,10 @@ export type Page_topic = {
   slug?: Slug;
   topic?: Blog_topicReference;
   headingBlock?: HeadingBlock;
-  hero?: Module_heroReference | Module_heroBlogReference;
+  hero?:
+    | Module_heroReference
+    | Module_heroBlogReference
+    | Module_heroStatementReference;
   modules?: Array<
     | ({
         _key: string;
@@ -610,7 +626,10 @@ export type Page_topicIndex = {
   _rev: string;
   title?: string;
   headingBlock?: HeadingBlock;
-  hero?: Module_heroReference | Module_heroBlogReference;
+  hero?:
+    | Module_heroReference
+    | Module_heroBlogReference
+    | Module_heroStatementReference;
   modules?: Array<
     | ({
         _key: string;
@@ -663,7 +682,10 @@ export type Page_blog = {
   _rev: string;
   title?: string;
   headingBlock?: HeadingBlock;
-  hero?: Module_heroReference | Module_heroBlogReference;
+  hero?:
+    | Module_heroReference
+    | Module_heroBlogReference
+    | Module_heroStatementReference;
   modules?: Array<
     | ({
         _key: string;
@@ -696,7 +718,10 @@ export type Page_home = {
   _rev: string;
   title?: string;
   headingBlock?: HeadingBlock;
-  hero?: Module_heroReference | Module_heroBlogReference;
+  hero?:
+    | Module_heroReference
+    | Module_heroBlogReference
+    | Module_heroStatementReference;
   modules?: Array<
     | ({
         _key: string;
@@ -758,7 +783,10 @@ export type Page_landing = {
   title?: string;
   slug?: Slug;
   headingBlock?: HeadingBlock;
-  hero?: Module_heroReference | Module_heroBlogReference;
+  hero?:
+    | Module_heroReference
+    | Module_heroBlogReference
+    | Module_heroStatementReference;
   modules?: Array<
     | ({
         _key: string;
@@ -780,6 +808,28 @@ export type Page_landing = {
       } & Module_taxonomyListReference)
   >;
   seo?: Seo;
+};
+
+export type Module_heroStatement = {
+  _id: string;
+  _type: 'module_heroStatement';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  eyebrow?: string;
+  heading?: string;
+  supportingText?: string;
+  variant?: 'SPLIT' | 'STACKED' | 'BANNER';
+  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  image?: ImageWithAlt;
+  contentPositionSplit?: 'LEFT' | 'RIGHT';
+  contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  mediaOrderSplit?: 'LAST' | 'FIRST';
+  mediaOrderStacked?: 'LAST' | 'FIRST';
+  actions?: ActionGroup;
+  layout?: HeroLayout;
 };
 
 export type Module_heroBlog = {
@@ -1063,6 +1113,7 @@ export type AllSanitySchemaTypes =
   | Blog_tagReference
   | Module_heroReference
   | Module_heroBlogReference
+  | Module_heroStatementReference
   | Module_postListReference
   | Module_postLatestReference
   | Module_ctaReference
@@ -1081,6 +1132,7 @@ export type AllSanitySchemaTypes =
   | Blog_tag
   | Blog_author
   | Page_landing
+  | Module_heroStatement
   | Module_heroBlog
   | Module_hero
   | Blog_authorReference

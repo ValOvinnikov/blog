@@ -56,7 +56,7 @@ export const postDetailFragment = q
       .project(portableTextBodyItemFragment)
       .notNull(),
     skim: sub.field('skim').project(skimFragment).nullable(true),
-    seo: sub.field('seo').project(seoFragment).nullable(true),
+    seo: sub.field('seo').project(seoFragment).notNull(),
     author: sub.field('author').deref().project(authorDetailFragment).notNull(),
     topic: sub.field('topic').deref().project(topicFragment).notNull(),
     tags: sub.field('tags[]').deref().project(tagFragment).nullable(true),

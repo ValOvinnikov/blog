@@ -1,4 +1,4 @@
-import { CTA_ACTION_VARIANT } from '@blog/config';
+import { CTA_ACTION_VARIANT, HERO_VARIANT } from '@blog/config';
 import type { THeroBlogModule, THeroPrimaryAction } from '@blog/service';
 import { Hero } from '@blog/ui/organisms/hero';
 import {
@@ -65,6 +65,7 @@ export const HeroBlogModuleView = ({
       dataTestId={`hero-blog-module-${id}`}
     >
       <Hero
+        tone={brandVariant}
         variant={variant}
         eyebrow={eyebrow}
         title={heading}
@@ -76,7 +77,10 @@ export const HeroBlogModuleView = ({
       >
         {actions.length > 0 && (
           <Hero.Cta>
-            <ActionGroup actions={actions} />
+            <ActionGroup
+              actions={actions}
+              isOnDark={variant === HERO_VARIANT.BANNER}
+            />
           </Hero.Cta>
         )}
 

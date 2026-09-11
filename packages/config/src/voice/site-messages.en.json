@@ -88,22 +88,18 @@
     "empty": "No posts tagged {name} yet.",
     "paginationAriaLabel": "{name} pages"
   },
-  "topicsPage": {
-    "empty": "No topics yet."
-  },
-  "tagsPage": {
-    "empty": "No tags yet."
-  },
   "taxonomyListModule": {
     "topics": {
       "postsCount": "{count, plural, one {1 post} other {{count} posts}}",
       "fallbackHeading": "Topics",
-      "latestPostsLabel": "Latest in {name}"
+      "latestPostsLabel": "Latest in {name}",
+      "empty": "No topics yet."
     },
     "tags": {
       "postsCount": "{count, plural, one {1 post} other {{count} posts}}",
       "fallbackHeading": "Tags",
-      "latestPostsLabel": "Latest in {name}"
+      "latestPostsLabel": "Latest in {name}",
+      "empty": "No tags yet."
     }
   },
   "rss": {

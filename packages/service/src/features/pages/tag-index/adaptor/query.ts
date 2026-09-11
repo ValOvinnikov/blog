@@ -17,7 +17,7 @@ export const tagIndexPageQuery = q.star
       .deref()
       .project(moduleFragment)
       .nullable(true),
-    seo: sub.field('seo').project(seoFragment).nullable(true),
+    seo: sub.field('seo').project(seoFragment).notNull(),
   }))
   // Nullable, not `.notNull()`: no `page_tagIndex` document is an
   // ordinary not-found, not a parse failure — the loader turns `null` into

@@ -295,6 +295,26 @@ drops out the day it is deleted. The studio's equivalent guard is
 `HERO_SCHEMA_TYPES`, the list every page's `hero` `to:` points at, with a
 test asserting every registered `module_hero*` schema appears in it.
 
+Three kinds are registered. **`module_hero`** is the original, kept until
+#2813 retires it. **`module_heroBlog`** is the featured-post hero: its
+heading, image and primary action all derive from a post, and publish is
+blocked when none resolves. **`module_heroStatement`** is the plainest
+member — a headline, a line of support and up to two actions, with nothing
+derived from anything — and is the hero a marketing, agency, product or
+consultant home page opens with.
+
+`module_heroStatement`'s own content fields are `title` (Studio's list
+label, never rendered), an optional `eyebrow` (max 40), a **required**
+`heading` (max 120, always the page `<h1>`) and an optional
+`supportingText` (plain `text`, not Portable Text — a hero with two
+paragraphs is a landing page that has not been split into modules yet). It
+then calls `defineHeroFields()` with **no options**, so the shared tail's
+own `image` and `actions` are the module's, where `module_heroBlog`
+replaces both. `heading` is required without qualification because nothing
+can derive it; that is safe here precisely because the type shipped with no
+existing documents to strand, which is the standing exception to the rule
+against adding a `required()` field to a type already in use.
+
 `page_home`, `page_landing`, `page_blog`, `page_topic`, `page_tag`,
 `page_topicIndex` and `page_tagIndex` each have an **optional** hero. A hero
 replaces that page's default header and owns the `<h1>`; without one, each page
@@ -537,6 +557,21 @@ for that variant; `SPLIT`/`CALLOUT` stay bounded,
 rounded cards inside `Section`'s inner container like every other module's
 organism. `Section` itself is unmodified either way — what differs is only
 how `CtaModule` uses the space `Section` gives it.
+
+**`Hero`'s Banner carries the same scrim contract**, for the same reason:
+its image is a full-bleed background, so the copy needs a floor under it.
+`Hero` takes an optional `tone` that **only `BANNER` reads** — it renders an
+`aria-hidden` gradient scrim between the image (`-z-20`) and the copy
+(`-z-10`), picking `AZURE_SCRIM` on `BRAND_PRIMARY` and `NEUTRAL_SCRIM`
+otherwise, and switches the copy to on-image colours. `SPLIT` and `STACKED`
+ignore `tone` entirely. The two gradients live in
+`packages/ui/src/lib/styling/scrims.ts` so the two organisms cannot drift
+apart. `tone` **defaults to `PRIMARY` at the variant level** rather than
+being left unset, so a Banner is never scrim-less: the on-image copy colours
+apply on `BANNER` unconditionally, and white copy over an unscrimmed
+photograph is less legible than no treatment at all. Each hero view passes
+`isOnDark` to its `ActionGroup` on Banner, so the actions are painted for a
+dark ground too.
 
 **Theme-as-content** (Phase 2 of the configurability epic, #1285/#1287,
 storage cut over to Postgres by the config-to-Postgres transition's E5): a

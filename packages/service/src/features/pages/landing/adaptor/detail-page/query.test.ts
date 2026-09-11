@@ -3,10 +3,16 @@ import { makeRawLandingPage } from '@blog/service/testing/pages/fixtures';
 import { landingPageQuery } from './query';
 
 describe('landingPageQuery', () => {
-  it('parses a landing page with no modules and no SEO', () => {
-    const raw = makeRawLandingPage({ modules: null, seo: null });
+  it('parses a landing page with no modules', () => {
+    const raw = makeRawLandingPage({ modules: null });
 
     expect(() => landingPageQuery.parse(raw)).not.toThrow();
+  });
+
+  it('rejects a landing page with no authored SEO', () => {
+    const raw = { ...makeRawLandingPage(), seo: null };
+
+    expect(() => landingPageQuery.parse(raw)).toThrow();
   });
 
   it('parses a landing page with its hero slot set', () => {

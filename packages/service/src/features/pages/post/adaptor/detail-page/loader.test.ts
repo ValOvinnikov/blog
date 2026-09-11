@@ -143,21 +143,6 @@ describe('getPost', () => {
     expect(result.seo.ogTitle).toBeUndefined();
   });
 
-  it('rejects when the post has no authored seo', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawPostDetail({
-        seo: null,
-        headingBlock: makeRawHeadingBlock('Fallback Post', {
-          supportingText: 'Fallback excerpt',
-        }),
-      }),
-    );
-
-    await expect(getPost('hello-world', tenant)).rejects.toThrow(
-      'seo.metaTitle is required but missing',
-    );
-  });
-
   it('leaves seo.ogImage undefined when no ogImage is authored, without falling back to the hero image', async () => {
     mockRun.mockResolvedValueOnce(makeRawPostDetail({ heroImage: null }));
 

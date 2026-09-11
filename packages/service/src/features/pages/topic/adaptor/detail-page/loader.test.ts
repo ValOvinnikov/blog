@@ -47,14 +47,6 @@ describe('getTopicPage', () => {
     });
   });
 
-  it('rejects when the page has no authored seo', async () => {
-    mockRun.mockResolvedValueOnce(makeRawTopicPage({ seo: null }));
-
-    await expect(getTopicPage('engineering', tenant)).rejects.toThrow(
-      'seo.metaTitle is required but missing',
-    );
-  });
-
   it('resolves seo from the authored value, with no fallback for an unauthored description', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawTopicPage({

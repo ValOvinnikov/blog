@@ -50,7 +50,7 @@ export const VOICE_FIELDS = [
   },
   {
     id: 'topicsEmpty',
-    path: 'topicsPage.empty',
+    path: 'taxonomyListModule.topics.empty',
     kind: VOICE_FIELD_KIND.RICH,
     surface: VOICE_SURFACE.ARCHIVE,
     placeholders: [],
@@ -58,7 +58,7 @@ export const VOICE_FIELDS = [
   },
   {
     id: 'tagsEmpty',
-    path: 'tagsPage.empty',
+    path: 'taxonomyListModule.tags.empty',
     kind: VOICE_FIELD_KIND.RICH,
     surface: VOICE_SURFACE.ARCHIVE,
     placeholders: [],

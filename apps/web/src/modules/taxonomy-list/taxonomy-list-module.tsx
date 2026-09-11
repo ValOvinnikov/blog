@@ -64,8 +64,6 @@ export const TaxonomyListModule = async ({
     entries,
   } = result.data;
 
-  if (!slot && entries.length === 0) return null;
-
   const namespace = taxonomy === TAXONOMY_KIND.TAGS ? 'tags' : 'topics';
   const t = await getTranslations(`taxonomyListModule.${namespace}`);
   const buildHref = taxonomy === TAXONOMY_KIND.TAGS ? routes.tag : routes.topic;
@@ -96,7 +94,7 @@ export const TaxonomyListModule = async ({
       dataTestId={slot?.dataTestId ?? `taxonomy-list-module-${id}`}
       headingLevel={slot?.headingLevel ?? 2}
       accessibleTitle={slot?.accessibleTitle ?? t('fallbackHeading')}
-      emptyMessage={slot?.emptyMessage ?? ''}
+      emptyMessage={slot?.emptyMessage ?? t('empty')}
     />
   );
 };

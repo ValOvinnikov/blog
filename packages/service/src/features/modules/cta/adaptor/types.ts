@@ -9,6 +9,7 @@ import type {
   TMediaOrder,
 } from '@blog/config';
 import type { TCtaAction } from '@blog/service/shared/transformers/to-cta-action';
+import type { TRequiredHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 
 export type { TCtaAction };
 
@@ -17,10 +18,7 @@ export type TCtaModule = {
   brandVariant: TFullBrandVariant;
   bandTone: TFullBrandVariant;
   eyebrow: TMaybeUndefined<string>;
-  headingBlock: {
-    heading: string;
-    supportingText: TMaybeUndefined<string>;
-  };
+  headingBlock: TRequiredHeadingBlock;
   content: TMaybeUndefined<BasicText>;
   image: TMaybeUndefined<ISanityImage>;
   contentPosition: TMaybeUndefined<TContentAlignment>;

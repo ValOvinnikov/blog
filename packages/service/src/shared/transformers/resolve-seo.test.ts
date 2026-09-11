@@ -1,6 +1,6 @@
 import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
 
-import { MissingSeoTitleError, resolveSeo, type TRawSeo } from './resolve-seo';
+import { resolveSeo, type TRawSeo } from './resolve-seo';
 
 function makeAuthoredSeo(overrides: Partial<TRawSeo> = {}): TRawSeo {
   return {
@@ -61,19 +61,5 @@ describe(resolveSeo, () => {
     );
 
     expect(result.ogImage).toBeUndefined();
-  });
-
-  it('throws MissingSeoTitleError when no seo object is authored at all', () => {
-    expect(() => resolveSeo(undefined)).toThrow(MissingSeoTitleError);
-  });
-
-  it('throws MissingSeoTitleError when the seo field is null', () => {
-    expect(() => resolveSeo(null)).toThrow(MissingSeoTitleError);
-  });
-
-  it('throws MissingSeoTitleError when the seo object carries a blank metaTitle', () => {
-    expect(() => resolveSeo(makeAuthoredSeo({ metaTitle: '' }))).toThrow(
-      MissingSeoTitleError,
-    );
   });
 });
