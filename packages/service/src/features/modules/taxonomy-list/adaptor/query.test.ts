@@ -52,13 +52,13 @@ describe('taxonomyListModuleQuery', () => {
 
   it('projects each entry post count via the shared published-post filter', () => {
     expect(taxonomyListModuleQuery.query).toContain(
-      'count(*[_type == "page_post" && references(^._id) && publishedAt <= now() && defined(headingBlock.heading) && defined(author) && defined(topic) && defined(content)])',
+      'count(*[_type == "page_post" && references(^._id) && publishedAt <= now() && defined(headingBlock.heading) && defined(author) && defined(topic) && defined(content) && defined(seo)])',
     );
   });
 
   it('orders latestPosts newest first, sliced to two, excluding scheduled posts', () => {
     expect(taxonomyListModuleQuery.query).toContain(
-      '*[_type == "page_post"][references(^._id)][publishedAt <= now() && defined(headingBlock.heading) && defined(author) && defined(topic) && defined(content)] | order(publishedAt desc)[0...2]',
+      '*[_type == "page_post"][references(^._id)][publishedAt <= now() && defined(headingBlock.heading) && defined(author) && defined(topic) && defined(content) && defined(seo)] | order(publishedAt desc)[0...2]',
     );
   });
 

@@ -20,4 +20,8 @@ describe('PUBLISHED_POST_FILTER', () => {
   it('excludes a post with no content', () => {
     expect(PUBLISHED_POST_FILTER).toContain('defined(content)');
   });
+
+  it('excludes a post with no seo', () => {
+    expect(PUBLISHED_POST_FILTER).toContain('defined(seo)');
+  });
 });
