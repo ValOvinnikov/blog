@@ -1,0 +1,2 @@
+export const SEO_META_TITLE_MIN_LENGTH = 30;
+export const SEO_META_TITLE_MAX_LENGTH = 60;

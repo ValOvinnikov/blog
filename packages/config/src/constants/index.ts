@@ -19,6 +19,7 @@ export * from './operator-alert';
 export * from './path';
 export * from './preset';
 export * from './reserved-slug';
+export * from './seo';
 export * from './size';
 export * from './spec-line';
 export * from './taxonomy';
