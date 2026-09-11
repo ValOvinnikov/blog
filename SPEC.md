@@ -244,7 +244,7 @@ object (`spacingTop`/`spacingBottom`, `containerWidth` (not on
 `dividerBottom` — stored values from `SPACING_SCALE`/`CONTAINER_WIDTH`
 consts; there is no `align` field on `layout` — alignment is its own
 module-level field, below).
-`module_cta`/`module_postList`/`module_postLatest`/`module_postFeatured`/`module_taxonomyList`/`module_newsletter`
+`module_cta`/`module_postList`/`module_postLatest`/`module_postFeatured`/`module_postRelated`/`module_taxonomyList`/`module_newsletter`
 additionally carry a `headingBlock` object (`heading` and `supportingText`
 only). There is **one registered `headingBlock` type**, and requiredness is
 a property of the **field**, not of the type: `headingBlockField({
