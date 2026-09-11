@@ -3,6 +3,7 @@ import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/components/
 import { defineModulesField } from '@blog/studio/schema-types/helpers/define-modules-field';
 import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
 import { heroField } from '@blog/studio/schema-types/helpers/hero-field';
+import { seoField } from '@blog/studio/schema-types/helpers/seo-field';
 import { slugField } from '@blog/studio/schema-types/helpers/slug-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
 import { validateHeroOrHeading } from '@blog/studio/schema-types/helpers/validate-hero-or-heading';
@@ -14,9 +15,8 @@ import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsl
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/module-taxonomy-list';
-import { seoSchema } from '@blog/studio/schema-types/objects/seo';
 import { FileText } from 'lucide-react';
-import { defineField, defineType } from 'sanity';
+import { defineType } from 'sanity';
 
 const landingSlugUrlPreviewInput = createSlugUrlPreviewInput('/');
 
@@ -73,12 +73,9 @@ export const landingSchema = defineType({
           )
           .custom(validateTaxonomyListHasTaxonomy),
     }),
-    defineField({
-      name: 'seo',
-      title: 'SEO',
-      type: seoSchema.name,
+    seoField({
       description:
-        'Override meta title, description, and OG image for search engines.',
+        'Landing page meta title, description, and social sharing image.',
     }),
   ],
 });

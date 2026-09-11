@@ -1,11 +1,15 @@
 import { pageTagSchema } from '@blog/studio/schema-types/documents/pages/page-tag';
 import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
+import {
+  SEO_META_TITLE_MAX_LENGTH,
+  SEO_META_TITLE_MIN_LENGTH,
+} from '@blog/studio/schema-types/objects/seo';
 import { assertSatisfiesRequiredFields } from '@blog/studio/testing/assert-satisfies-required-fields';
 import { createIfNotExists } from 'sanity/migrate';
 
 import { toPageTagId, toTagPostListId } from './id';
 
-import migration from './index';
+import migration, { buildTagMetaTitle } from './index';
 
 const baseDoc = {
   _createdAt: '2026-01-01T00:00:00Z',
@@ -42,6 +46,7 @@ describe('seed-page-tag-for-existing-tags migration', () => {
       slug: { _type: 'slug', current: 'react' },
       tag: { _type: 'reference', _ref: tagDoc._id },
       postList: { _type: 'reference', _ref: postListId },
+      seo: { _type: 'seo', metaTitle: buildTagMetaTitle('React') },
     };
 
     assertSatisfiesRequiredFields(postListSchema, postListPayload);
@@ -85,10 +90,24 @@ describe('seed-page-tag-for-existing-tags migration', () => {
         _type: 'reference',
         _ref: toTagPostListId(otherSlugDoc._id),
       },
+      seo: { _type: 'seo', metaTitle: buildTagMetaTitle('TypeScript') },
     };
 
     assertSatisfiesRequiredFields(pageTagSchema, pageTagPayload);
 
     expect(pageTagMutation).toEqual(createIfNotExists(pageTagPayload));
+  });
+
+  it('seeds a seo.metaTitle within bounds for a one-character tag title', () => {
+    const metaTitle = buildTagMetaTitle('A');
+
+    expect(metaTitle.length).toBeGreaterThanOrEqual(SEO_META_TITLE_MIN_LENGTH);
+    expect(metaTitle.length).toBeLessThanOrEqual(SEO_META_TITLE_MAX_LENGTH);
+  });
+
+  it('clamps a seo.metaTitle built from a very long tag title to the ceiling', () => {
+    const metaTitle = buildTagMetaTitle('A'.repeat(200));
+
+    expect(metaTitle.length).toBe(SEO_META_TITLE_MAX_LENGTH);
   });
 });

@@ -1,5 +1,9 @@
 import { topicIndexPageSchema } from '@blog/studio/schema-types/documents/pages/topic-index-page';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/module-taxonomy-list';
+import {
+  SEO_META_TITLE_MAX_LENGTH,
+  SEO_META_TITLE_MIN_LENGTH,
+} from '@blog/studio/schema-types/objects/seo';
 import { assertSatisfiesRequiredFields } from '@blog/studio/testing/assert-satisfies-required-fields';
 import { createIfNotExists } from 'sanity/migrate';
 
@@ -28,6 +32,7 @@ const pageTopicIndexPayload = {
   heading: 'Topics',
   supportingText: 'Browse every post by topic.',
   taxonomyList: { _type: 'reference', _ref: TAXONOMY_LIST_TOPICS_ID },
+  seo: { _type: 'seo', metaTitle: 'Browse every post by topic on the blog' },
 };
 
 const expectedMutations = [
@@ -64,5 +69,12 @@ describe('seed-page-topic-index migration', () => {
     expect(migration.migrate.document(differentlyIdAnchor)).toEqual(
       expectedMutations,
     );
+  });
+
+  it('seeds a seo.metaTitle within the required length bounds', () => {
+    const metaTitleLength = pageTopicIndexPayload.seo.metaTitle.length;
+
+    expect(metaTitleLength).toBeGreaterThanOrEqual(SEO_META_TITLE_MIN_LENGTH);
+    expect(metaTitleLength).toBeLessThanOrEqual(SEO_META_TITLE_MAX_LENGTH);
   });
 });

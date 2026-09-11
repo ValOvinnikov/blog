@@ -1,6 +1,7 @@
 import { defineModulesField } from '@blog/studio/schema-types/helpers/define-modules-field';
 import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
 import { heroField } from '@blog/studio/schema-types/helpers/hero-field';
+import { seoField } from '@blog/studio/schema-types/helpers/seo-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
 import { validateHeroOrHeading } from '@blog/studio/schema-types/helpers/validate-hero-or-heading';
 import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/helpers/validate-single-blank-heading-per-type';
@@ -11,9 +12,8 @@ import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsl
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/module-taxonomy-list';
-import { seoSchema } from '@blog/studio/schema-types/objects/seo';
 import { House } from 'lucide-react';
-import { defineField, defineType } from 'sanity';
+import { defineType } from 'sanity';
 
 export const homePageSchema = defineType({
   name: 'page_home',
@@ -58,12 +58,9 @@ export const homePageSchema = defineType({
           )
           .custom(validateTaxonomyListHasTaxonomy),
     }),
-    defineField({
-      name: 'seo',
-      title: 'SEO',
-      type: seoSchema.name,
+    seoField({
       description:
-        'Override Home page meta title, description, and social sharing image.',
+        'Home page meta title, description, and social sharing image.',
     }),
   ],
 });

@@ -83,8 +83,26 @@ describe('pageTagSchema shape', () => {
     ]);
   });
 
-  it('seo stays optional — no validation() builder attached', () => {
-    expect(getField('seo')?.validation).toBeUndefined();
+  it('seo is required via the shared seoField() helper', () => {
+    const seoFieldDefinition = getField('seo');
+
+    if (!seoFieldDefinition?.validation) {
+      throw new Error('Expected pageTagSchema to define a seo field.');
+    }
+
+    let requiredCalled = false;
+    const rule: TValidationRule = {
+      required: () => {
+        requiredCalled = true;
+        return rule;
+      },
+      custom: () => rule,
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (seoFieldDefinition.validation as any)(rule);
+
+    expect(requiredCalled).toBe(true);
   });
 });
 

@@ -175,8 +175,19 @@ describe('pagePostSchema shape', () => {
     expect(getField('postList')).toBeUndefined();
   });
 
-  it('seo stays optional — no validation() builder attached', () => {
-    expect(getField('seo')?.validation).toBeUndefined();
+  it('seo is required via the shared seoField() helper', () => {
+    const seoFieldDefinition = getField('seo');
+
+    if (!seoFieldDefinition?.validation) {
+      throw new Error('Expected pagePostSchema to define a seo field.');
+    }
+
+    const { rule, calls } = createTrackingRule();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (seoFieldDefinition.validation as any)(rule);
+
+    expect(calls.required).toBe(true);
   });
 });
 

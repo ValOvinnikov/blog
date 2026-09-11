@@ -29,6 +29,7 @@
  *   3. `pnpm --filter @blog/studio migrate:run` — human-gated, mutates `production`
  */
 import { BRAND_VARIANT } from '@blog/config/constants';
+import { SEO_META_TITLE_MAX_LENGTH } from '@blog/studio/schema-types/objects/seo';
 import { createIfNotExists, defineMigration } from 'sanity/migrate';
 
 import { toPageTagId, toTagPostListId } from './id';
@@ -40,6 +41,18 @@ type TBlogTagDoc = {
   _id: string;
   title?: string;
   slug?: { current?: string };
+};
+
+/**
+ * A fixed skeleton around the tag title clears the schema's metaTitle floor
+ * regardless of how short the title is; only the ceiling needs clamping.
+ */
+export const buildTagMetaTitle = (tagTitle: string): string => {
+  const title = `Browse every post tagged "${tagTitle}" on the blog`;
+
+  return title.length > SEO_META_TITLE_MAX_LENGTH
+    ? title.slice(0, SEO_META_TITLE_MAX_LENGTH).trimEnd()
+    : title;
 };
 
 export default defineMigration({
@@ -73,6 +86,10 @@ export default defineMigration({
           slug: tag.slug,
           tag: { _type: 'reference', _ref: tag._id },
           postList: { _type: 'reference', _ref: postListId },
+          seo: {
+            _type: 'seo',
+            metaTitle: buildTagMetaTitle(tag.title ?? ''),
+          },
         }),
       ];
     },

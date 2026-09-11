@@ -1,6 +1,7 @@
 import { defineModulesField } from '@blog/studio/schema-types/helpers/define-modules-field';
 import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
 import { heroField } from '@blog/studio/schema-types/helpers/hero-field';
+import { seoField } from '@blog/studio/schema-types/helpers/seo-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
 import { validateHeroOrHeading } from '@blog/studio/schema-types/helpers/validate-hero-or-heading';
 import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/helpers/validate-single-blank-heading-per-type';
@@ -8,9 +9,8 @@ import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
 import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
-import { seoSchema } from '@blog/studio/schema-types/objects/seo';
 import { Newspaper } from 'lucide-react';
-import { defineField, defineType, type SanityDocument } from 'sanity';
+import { defineType, type SanityDocument } from 'sanity';
 
 type TModuleReference = { _type?: string; _ref?: string };
 
@@ -81,12 +81,9 @@ export const blogPageSchema = defineType({
           validateSingleBlankHeadingPerType([postFeaturedSchema.name]),
         ),
     }),
-    defineField({
-      name: 'seo',
-      title: 'SEO',
-      type: seoSchema.name,
+    seoField({
       description:
-        'Override Blog page meta title, description, and social sharing image.',
+        'Blog page meta title, description, and social sharing image.',
     }),
   ],
 });
