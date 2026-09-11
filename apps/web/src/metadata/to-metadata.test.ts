@@ -1,6 +1,6 @@
 import type { ISanityImage } from '@blog/config';
 import {
-  type TImageTenant,
+  type TSanityProjectRef,
   type TSeoResolved,
   urlForSanityImage,
 } from '@blog/service';
@@ -19,7 +19,7 @@ import { toMetadata } from './to-metadata';
 type TOpenGraphWithType = { type?: string };
 type TTwitterWithCard = { card?: string };
 
-const tenant: TImageTenant = {
+const project: TSanityProjectRef = {
   projectId: 'test-project',
   dataset: 'test-dataset',
 };
@@ -33,7 +33,7 @@ const ogImage: ISanityImage = {
   dimensions: { width: 800, height: 600, aspectRatio: 800 / 600 },
 };
 
-const EXPECTED_OG_IMAGE_URL = urlForSanityImage(ogImage, tenant);
+const EXPECTED_OG_IMAGE_URL = urlForSanityImage(ogImage, project);
 
 const seo: TSeoResolved = {
   title: 'The Blog',
@@ -45,7 +45,7 @@ const seo: TSeoResolved = {
 
 describe('toMetadata', () => {
   it('maps canonical, description, and ogType', () => {
-    const metadata = toMetadata(seo, tenant, {
+    const metadata = toMetadata(seo, project, {
       canonical: '/blog',
       ogType: 'website',
     });
@@ -58,7 +58,7 @@ describe('toMetadata', () => {
   });
 
   it('maps title as a plain string when titleAbsolute is not set', () => {
-    const metadata = toMetadata(seo, tenant, {
+    const metadata = toMetadata(seo, project, {
       canonical: '/blog',
       ogType: 'website',
     });
@@ -67,7 +67,7 @@ describe('toMetadata', () => {
   });
 
   it('maps title as an absolute title object when titleAbsolute is true', () => {
-    const metadata = toMetadata(seo, tenant, {
+    const metadata = toMetadata(seo, project, {
       canonical: '/',
       ogType: 'website',
       titleAbsolute: true,
@@ -77,7 +77,7 @@ describe('toMetadata', () => {
   });
 
   it('maps ogType article', () => {
-    const metadata = toMetadata(seo, tenant, {
+    const metadata = toMetadata(seo, project, {
       canonical: '/blog/my-post',
       ogType: 'article',
     });
@@ -88,7 +88,7 @@ describe('toMetadata', () => {
   });
 
   it('maps openGraph title/description/images from ogTitle/ogDescription/ogImage', () => {
-    const metadata = toMetadata(seo, tenant, {
+    const metadata = toMetadata(seo, project, {
       canonical: '/blog',
       ogType: 'website',
     });
@@ -101,7 +101,7 @@ describe('toMetadata', () => {
   });
 
   it('omits openGraph and twitter images when ogImage is absent', () => {
-    const metadata = toMetadata({ ...seo, ogImage: undefined }, tenant, {
+    const metadata = toMetadata({ ...seo, ogImage: undefined }, project, {
       canonical: '/',
       ogType: 'website',
     });
@@ -120,7 +120,7 @@ describe('toMetadata', () => {
         ogDescription: undefined,
         ogImage: undefined,
       },
-      tenant,
+      project,
       { canonical: '/', ogType: 'website' },
     );
 
@@ -133,7 +133,7 @@ describe('toMetadata', () => {
   });
 
   it('maps twitter card, title, description, and images', () => {
-    const metadata = toMetadata(seo, tenant, {
+    const metadata = toMetadata(seo, project, {
       canonical: '/blog',
       ogType: 'website',
     });
@@ -147,7 +147,7 @@ describe('toMetadata', () => {
   });
 
   it('adds openGraph.publishedTime and authors for article type when provided', () => {
-    const metadata = toMetadata(seo, tenant, {
+    const metadata = toMetadata(seo, project, {
       canonical: '/blog/my-post',
       ogType: 'article',
       article: {
@@ -165,7 +165,7 @@ describe('toMetadata', () => {
   });
 
   it('omits openGraph.publishedTime and authors when article option is not passed', () => {
-    const metadata = toMetadata(seo, tenant, {
+    const metadata = toMetadata(seo, project, {
       canonical: '/blog',
       ogType: 'website',
     });
@@ -179,7 +179,7 @@ describe('toMetadata', () => {
   });
 
   it('adds alternates.types["application/rss+xml"] when feedUrl is provided', () => {
-    const metadata = toMetadata(seo, tenant, {
+    const metadata = toMetadata(seo, project, {
       canonical: '/blog',
       ogType: 'website',
       feedUrl: '/rss.xml',
@@ -192,7 +192,7 @@ describe('toMetadata', () => {
   });
 
   it('omits alternates.types when feedUrl is not provided', () => {
-    const metadata = toMetadata(seo, tenant, {
+    const metadata = toMetadata(seo, project, {
       canonical: '/blog',
       ogType: 'website',
     });
@@ -213,7 +213,7 @@ describe('toMetadata output resolved by Next itself', () => {
   };
 
   it('resolves openGraph.images to undefined, never an injected default, when ogImage is absent', async () => {
-    const metadata = toMetadata({ ...seo, ogImage: undefined }, tenant, {
+    const metadata = toMetadata({ ...seo, ogImage: undefined }, project, {
       canonical: '/',
       ogType: 'website',
     });
@@ -230,7 +230,7 @@ describe('toMetadata output resolved by Next itself', () => {
   });
 
   it('resolves twitter.images to undefined, never an injected default, when ogImage is absent', () => {
-    const metadata = toMetadata({ ...seo, ogImage: undefined }, tenant, {
+    const metadata = toMetadata({ ...seo, ogImage: undefined }, project, {
       canonical: '/',
       ogType: 'website',
     });
@@ -246,7 +246,7 @@ describe('toMetadata output resolved by Next itself', () => {
   });
 
   it('still resolves an explicit ogImage unchanged (no fallback applied)', async () => {
-    const metadata = toMetadata(seo, tenant, {
+    const metadata = toMetadata(seo, project, {
       canonical: '/blog',
       ogType: 'website',
     });

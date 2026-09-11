@@ -1,7 +1,7 @@
 import { routes } from '@blog/config';
 import {
-  type TImageTenant,
   type TPostDetail,
+  type TSanityProjectRef,
   urlForSanityImage,
 } from '@blog/service';
 
@@ -44,7 +44,7 @@ export type TBlogPostingSchema = {
 export const buildBlogPostingSchema = (
   post: TPostDetail,
   siteUrl: string,
-  tenant: TImageTenant,
+  project: TSanityProjectRef,
 ): TBlogPostingSchema | undefined => {
   if (!siteUrl) return undefined;
 
@@ -54,7 +54,7 @@ export const buildBlogPostingSchema = (
     headline: post.title,
     description: post.excerpt,
     image: post.heroImage
-      ? urlForSanityImage(post.heroImage, tenant)
+      ? urlForSanityImage(post.heroImage, project)
       : undefined,
     datePublished: post.publishedAt,
     dateModified: post.publishedAt,

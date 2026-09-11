@@ -1,13 +1,13 @@
 import {
-  type TImageTenant,
   type TPostDetail,
+  type TSanityProjectRef,
   urlForSanityImage,
 } from '@blog/service';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 
 import { buildBlogPostingSchema } from './build-blog-posting-schema';
 
-const tenant: TImageTenant = {
+const project: TSanityProjectRef = {
   projectId: 'test-project',
   dataset: 'test-dataset',
 };
@@ -54,14 +54,14 @@ const post: TPostDetail = {
 
 describe(buildBlogPostingSchema, () => {
   it('maps a post detail to a BlogPosting schema', () => {
-    const schema = buildBlogPostingSchema(post, 'https://example.com', tenant);
+    const schema = buildBlogPostingSchema(post, 'https://example.com', project);
 
     expect(schema).toEqual({
       '@context': 'https://schema.org',
       '@type': 'BlogPosting',
       headline: 'Hello World',
       description: 'A sufficiently long excerpt for the post.',
-      image: urlForSanityImage(heroImage, tenant),
+      image: urlForSanityImage(heroImage, project),
       datePublished: '2026-01-15T00:00:00Z',
       dateModified: '2026-01-15T00:00:00Z',
       author: { '@type': 'Person', name: 'Jane Doe' },
@@ -74,7 +74,7 @@ describe(buildBlogPostingSchema, () => {
     const schema = buildBlogPostingSchema(
       { ...post, heroImage: undefined },
       'https://example.com',
-      tenant,
+      project,
     );
 
     expect(schema?.image).toBeUndefined();
@@ -84,14 +84,14 @@ describe(buildBlogPostingSchema, () => {
     const schema = buildBlogPostingSchema(
       { ...post, slug: 'another-post' },
       'https://blog.example.com',
-      tenant,
+      project,
     );
 
     expect(schema?.url).toBe('https://blog.example.com/blog/another-post');
   });
 
   it('returns undefined when siteUrl is empty, rather than emitting a relative (invalid) url', () => {
-    const schema = buildBlogPostingSchema(post, '', tenant);
+    const schema = buildBlogPostingSchema(post, '', project);
 
     expect(schema).toBeUndefined();
   });
@@ -106,14 +106,14 @@ describe(buildBlogPostingSchema, () => {
         ],
       },
       'https://example.com',
-      tenant,
+      project,
     );
 
     expect(schema?.keywords).toBe('TypeScript, React');
   });
 
   it('omits keywords when the post has no tags', () => {
-    const schema = buildBlogPostingSchema(post, 'https://example.com', tenant);
+    const schema = buildBlogPostingSchema(post, 'https://example.com', project);
 
     expect(schema?.keywords).toBeUndefined();
   });
@@ -122,7 +122,7 @@ describe(buildBlogPostingSchema, () => {
     const schema = buildBlogPostingSchema(
       { ...post, excerpt: undefined },
       'https://example.com',
-      tenant,
+      project,
     );
 
     expect(schema?.description).toBeUndefined();

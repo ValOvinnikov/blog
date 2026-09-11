@@ -1,5 +1,9 @@
 import type { ISanityImage } from '@blog/config';
-import { service, type TImageTenant, urlForSanityImage } from '@blog/service';
+import {
+  service,
+  type TSanityProjectRef,
+  urlForSanityImage,
+} from '@blog/service';
 import { getHostTenantSanityContext } from '@web/server/tenant/get-host-tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 
@@ -25,9 +29,9 @@ const FALLBACK_MARK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="80" he
 
 const fetchLogoIcon = async (
   logo: ISanityImage,
-  tenant: TImageTenant,
+  project: TSanityProjectRef,
 ): Promise<Response | undefined> => {
-  const iconUrl = urlForSanityImage(logo, tenant, {
+  const iconUrl = urlForSanityImage(logo, project, {
     width: FAVICON_SIZE,
     height: FAVICON_SIZE,
     fit: 'crop',

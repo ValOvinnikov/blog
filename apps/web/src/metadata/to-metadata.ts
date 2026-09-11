@@ -1,5 +1,5 @@
 import {
-  type TImageTenant,
+  type TSanityProjectRef,
   type TSeoResolved,
   urlForSanityImage,
 } from '@blog/service';
@@ -27,12 +27,12 @@ type TToMetadataOptions = {
  */
 export const toMetadata = (
   seo: TSeoResolved,
-  tenant: TImageTenant,
+  project: TSanityProjectRef,
   opts: TToMetadataOptions,
 ): Metadata => {
   const { canonical, ogType, titleAbsolute, feedUrl, article } = opts;
   const ogImageUrl = seo.ogImage
-    ? urlForSanityImage(seo.ogImage, tenant)
+    ? urlForSanityImage(seo.ogImage, project)
     : undefined;
   const ogImages = ogImageUrl ? [{ url: ogImageUrl }] : undefined;
   const twitterImages = ogImageUrl ? [ogImageUrl] : undefined;
