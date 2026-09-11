@@ -211,7 +211,7 @@ registered `headingBlock` type; requiredness is a property of the field,
 not the type, attached via `headingBlockField({ requireHeading? })`, which
 adds a field-level rule checking the nested `heading`. It is required on
 `module_cta`/`module_newsletter`/`module_postLatest`/`module_postFeatured`/
-`module_postRelated` and optional on `module_postList`/
+`module_postRelated`/`module_heroStatement` and optional on `module_postList`/
 `module_taxonomyList`; `module_content` and `module_hero` get none, and
 alignment is not bundled here — it is a separate module-level
 `contentAlignment` field. Every `module_*` document gets its own
