@@ -1,6 +1,6 @@
 import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/components/slug-url-preview-input';
 import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag';
-import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/page-tag-type';
+import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/tag/tag-type';
 import { defineModulesField } from '@blog/studio/schema-types/helpers/define-modules-field';
 import { getDraftsClient } from '@blog/studio/schema-types/helpers/get-drafts-client';
 import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';

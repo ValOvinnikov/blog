@@ -1,6 +1,6 @@
 import { SOCIAL_PLATFORMS, LINK_TYPE } from '@blog/config/constants';
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic';
-import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
+import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Link2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';

@@ -1,4 +1,4 @@
-import { pageTopicSchema } from '@blog/studio/schema-types/documents/pages/page-topic';
+import { pageTopicSchema } from '@blog/studio/schema-types/documents/pages/topic';
 import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
 import {
   SEO_META_TITLE_MAX_LENGTH,

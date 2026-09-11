@@ -1,4 +1,4 @@
-import { topicIndexPageSchema } from '@blog/studio/schema-types/documents/pages/topic-index-page';
+import { topicIndexPageSchema } from '@blog/studio/schema-types/documents/pages/topic-index';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/module-taxonomy-list';
 import {
   SEO_META_TITLE_MAX_LENGTH,

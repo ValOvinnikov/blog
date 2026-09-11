@@ -1,12 +1,12 @@
 import { authorSchema } from '@blog/studio/schema-types/documents/blog/author';
 import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag';
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic';
-import { blogPageSchema } from '@blog/studio/schema-types/documents/pages/blog-page';
-import { pagePostSchema } from '@blog/studio/schema-types/documents/pages/page-post';
-import { pageTagSchema } from '@blog/studio/schema-types/documents/pages/page-tag';
-import { pageTopicSchema } from '@blog/studio/schema-types/documents/pages/page-topic';
-import { tagIndexPageSchema } from '@blog/studio/schema-types/documents/pages/tag-index-page';
-import { topicIndexPageSchema } from '@blog/studio/schema-types/documents/pages/topic-index-page';
+import { blogPageSchema } from '@blog/studio/schema-types/documents/pages/blog';
+import { pagePostSchema } from '@blog/studio/schema-types/documents/pages/post';
+import { pageTagSchema } from '@blog/studio/schema-types/documents/pages/tag';
+import { tagIndexPageSchema } from '@blog/studio/schema-types/documents/pages/tag-index';
+import { pageTopicSchema } from '@blog/studio/schema-types/documents/pages/topic';
+import { topicIndexPageSchema } from '@blog/studio/schema-types/documents/pages/topic-index';
 import { newsletterSettingsSchema } from '@blog/studio/schema-types/documents/settings/newsletter';
 import type { TStructureGroup } from '@blog/studio/structure/build-grouped-list';
 

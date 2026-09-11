@@ -2,7 +2,7 @@ import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/components/
 import { authorSchema } from '@blog/studio/schema-types/documents/blog/author';
 import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag';
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic';
-import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
+import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { defineModulesField } from '@blog/studio/schema-types/helpers/define-modules-field';
 import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/helpers/seo-field';

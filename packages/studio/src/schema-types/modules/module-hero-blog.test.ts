@@ -4,7 +4,7 @@ import {
   POST_SOURCE,
   HERO_VARIANT,
 } from '@blog/config/constants';
-import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
+import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/module-hero-blog';
 import type { SanityDocument, ValidationContext } from 'sanity';
 

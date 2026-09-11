@@ -1,5 +1,5 @@
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic';
-import { pageTopicSchema } from '@blog/studio/schema-types/documents/pages/page-topic';
+import { pageTopicSchema } from '@blog/studio/schema-types/documents/pages/topic';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
@@ -260,9 +260,9 @@ const UNIQUENESS_ERROR =
   'Another Topic Page already references this topic — each topic can only back one Topic Page.';
 
 /**
- * `validateUniqueTopicReference` is private to page-topic.ts; the `topic`
+ * `validateUniqueTopicReference` is private to topic.ts; the `topic`
  * field's `validation` builder registers it via `rule.custom(fn)`, so a
- * minimal chainable mock rule captures it the same way home-page.test.ts
+ * minimal chainable mock rule captures it the same way home.test.ts
  * captures its modules-field custom validator — no export needed.
  */
 const getUniqueTopicValidator = (): TCustomFn => {

@@ -1,0 +1,1 @@
+export { blogPageSchema } from './blog';

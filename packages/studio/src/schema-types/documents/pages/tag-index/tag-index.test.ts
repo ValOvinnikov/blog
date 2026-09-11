@@ -1,5 +1,5 @@
 import { TAXONOMY_KIND } from '@blog/config/constants';
-import { topicIndexPageSchema } from '@blog/studio/schema-types/documents/pages/topic-index-page';
+import { tagIndexPageSchema } from '@blog/studio/schema-types/documents/pages/tag-index';
 import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/helpers/validate-taxonomy-list-has-taxonomy';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
@@ -46,17 +46,17 @@ const createDocumentMockRule = (
 });
 
 const getField = (name: string): TFieldDefinition | undefined =>
-  topicIndexPageSchema.fields?.find((field) => field.name === name) as
+  tagIndexPageSchema.fields?.find((field) => field.name === name) as
     TFieldDefinition | undefined;
 
 const getModulesCustomValidators = (): TModulesCustomFn[] => {
-  const modulesField = topicIndexPageSchema.fields?.find(
+  const modulesField = tagIndexPageSchema.fields?.find(
     (field) => field.name === 'modules',
   );
 
   if (!modulesField?.validation) {
     throw new Error(
-      'Expected topicIndexPageSchema to define a modules field with validation.',
+      'Expected tagIndexPageSchema to define a modules field with validation.',
     );
   }
 
@@ -69,21 +69,19 @@ const getModulesCustomValidators = (): TModulesCustomFn[] => {
 };
 
 const buildDocumentRules = (): TDocumentMockRule[] => {
-  if (!topicIndexPageSchema.validation) {
-    throw new Error(
-      'Expected topicIndexPageSchema to define a validation rule.',
-    );
+  if (!tagIndexPageSchema.validation) {
+    throw new Error('Expected tagIndexPageSchema to define a validation rule.');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  return (topicIndexPageSchema.validation as any)(
+  return (tagIndexPageSchema.validation as any)(
     createDocumentMockRule(),
   ) as TDocumentMockRule[];
 };
 
-describe('topicIndexPageSchema field order', () => {
+describe('tagIndexPageSchema field order', () => {
   it('orders fields title, headingBlock, hero, modules, seo, then the deprecated fields', () => {
-    expect(topicIndexPageSchema.fields?.map((field) => field.name)).toEqual([
+    expect(tagIndexPageSchema.fields?.map((field) => field.name)).toEqual([
       'title',
       'headingBlock',
       'hero',
@@ -96,14 +94,14 @@ describe('topicIndexPageSchema field order', () => {
   });
 });
 
-describe('topicIndexPageSchema hero field', () => {
+describe('tagIndexPageSchema hero field', () => {
   it('is an optional reference to the hero family', () => {
     const heroField = getField('hero') as
       | { type: string; to?: Array<{ type: string }>; validation?: unknown }
       | undefined;
 
     if (!heroField) {
-      throw new Error('Expected topicIndexPageSchema to define a hero field.');
+      throw new Error('Expected tagIndexPageSchema to define a hero field.');
     }
 
     expect(heroField.type).toBe('reference');
@@ -114,14 +112,14 @@ describe('topicIndexPageSchema hero field', () => {
   });
 });
 
-describe('topicIndexPageSchema modules allow-list', () => {
+describe('tagIndexPageSchema modules allow-list', () => {
   it('permits taxonomyList, postLatest, cta and newsletter modules', () => {
     const modulesField = getField('modules') as
       TArrayFieldDefinition | undefined;
 
     if (!modulesField || modulesField.type !== 'array' || !modulesField.of) {
       throw new Error(
-        'Expected topicIndexPageSchema to define a modules array field.',
+        'Expected tagIndexPageSchema to define a modules array field.',
       );
     }
 
@@ -134,7 +132,7 @@ describe('topicIndexPageSchema modules allow-list', () => {
   });
 });
 
-describe('topicIndexPageSchema modules validateCustom chaining', () => {
+describe('tagIndexPageSchema modules validateCustom chaining', () => {
   it('registers both the blank-heading and taxonomy-list validators', () => {
     const customFns = getModulesCustomValidators();
 
@@ -166,7 +164,7 @@ describe('topicIndexPageSchema modules validateCustom chaining', () => {
   });
 });
 
-describe('topicIndexPageSchema document validation', () => {
+describe('tagIndexPageSchema document validation', () => {
   it('registers hero-or-heading, taxonomy-list cardinality, and taxonomy-kind rules', () => {
     const rules = buildDocumentRules();
 
@@ -225,18 +223,41 @@ describe('topicIndexPageSchema document validation', () => {
     const [, , , hasTaxonomyListRule] = buildDocumentRules();
 
     expect(hasTaxonomyListRule?.fn?.({ modules: [] })).toBe(
-      'This page has no Taxonomy List module — the topic list will be empty until one is added.',
+      'This page has no Taxonomy List module — the tag list will be empty until one is added.',
     );
   });
 });
 
-describe('topicIndexPageSchema taxonomy-kind rule', () => {
+describe('tagIndexPageSchema taxonomy-kind rule', () => {
   const getTaxonomyKindRuleFn = () => {
     const rules = buildDocumentRules();
     return rules[4]?.fn;
   };
 
   it('passes when the modules[] taxonomy list matches the page kind', async () => {
+    const fn = getTaxonomyKindRuleFn();
+    const context = {
+      getClient: () => ({
+        withConfig: () => ({
+          fetch: async () => [{ taxonomy: TAXONOMY_KIND.TAGS }],
+        }),
+      }),
+    } as unknown as ValidationContext;
+
+    await expect(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- validation fn is document-level async, the mock TDocumentMockRule type models the synchronous shared shape
+      (fn as any)(
+        {
+          modules: [
+            { _type: taxonomyListSchema.name, _ref: 'taxonomy-list-1' },
+          ],
+        },
+        context,
+      ),
+    ).resolves.toBe(true);
+  });
+
+  it('fails when the modules[] taxonomy list is set to topics', async () => {
     const fn = getTaxonomyKindRuleFn();
     const context = {
       getClient: () => ({
@@ -256,38 +277,15 @@ describe('topicIndexPageSchema taxonomy-kind rule', () => {
         },
         context,
       ),
-    ).resolves.toBe(true);
+    ).resolves.toBe('This page lists tags; the module is set to topics.');
   });
 
-  it('fails when the modules[] taxonomy list is set to tags', async () => {
+  it('fails when the deprecated taxonomyList field is set to topics', async () => {
     const fn = getTaxonomyKindRuleFn();
     const context = {
       getClient: () => ({
         withConfig: () => ({
-          fetch: async () => [{ taxonomy: TAXONOMY_KIND.TAGS }],
-        }),
-      }),
-    } as unknown as ValidationContext;
-
-    await expect(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- validation fn is document-level async, the mock TDocumentMockRule type models the synchronous shared shape
-      (fn as any)(
-        {
-          modules: [
-            { _type: taxonomyListSchema.name, _ref: 'taxonomy-list-1' },
-          ],
-        },
-        context,
-      ),
-    ).resolves.toBe('This page lists topics; the module is set to tags.');
-  });
-
-  it('fails when the deprecated taxonomyList field is set to tags', async () => {
-    const fn = getTaxonomyKindRuleFn();
-    const context = {
-      getClient: () => ({
-        withConfig: () => ({
-          fetch: async () => [{ taxonomy: TAXONOMY_KIND.TAGS }],
+          fetch: async () => [{ taxonomy: TAXONOMY_KIND.TOPICS }],
         }),
       }),
     } as unknown as ValidationContext;
@@ -295,11 +293,11 @@ describe('topicIndexPageSchema taxonomy-kind rule', () => {
     await expect(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- validation fn is document-level async, the mock TDocumentMockRule type models the synchronous shared shape
       (fn as any)({ taxonomyList: { _ref: 'taxonomy-list-legacy' } }, context),
-    ).resolves.toBe('This page lists topics; the module is set to tags.');
+    ).resolves.toBe('This page lists tags; the module is set to topics.');
   });
 });
 
-describe('topicIndexPageSchema deprecated heading field', () => {
+describe('tagIndexPageSchema deprecated heading field', () => {
   it('is readOnly, deprecated, and no longer required', () => {
     const headingField = getField('heading');
 
@@ -309,7 +307,7 @@ describe('topicIndexPageSchema deprecated heading field', () => {
   });
 });
 
-describe('topicIndexPageSchema deprecated supportingText field', () => {
+describe('tagIndexPageSchema deprecated supportingText field', () => {
   it('is readOnly and deprecated — always optional', () => {
     const supportingTextField = getField('supportingText');
 
@@ -319,7 +317,7 @@ describe('topicIndexPageSchema deprecated supportingText field', () => {
   });
 });
 
-describe('topicIndexPageSchema deprecated taxonomyList field', () => {
+describe('tagIndexPageSchema deprecated taxonomyList field', () => {
   it('references module_taxonomyList, is readOnly, deprecated, and no longer required', () => {
     const taxonomyListField = getField('taxonomyList') as
       { to?: Array<{ type?: string }> } | undefined;

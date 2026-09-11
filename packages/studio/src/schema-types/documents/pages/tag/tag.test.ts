@@ -1,5 +1,5 @@
 import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag';
-import { pageTagSchema } from '@blog/studio/schema-types/documents/pages/page-tag';
+import { pageTagSchema } from '@blog/studio/schema-types/documents/pages/tag';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
@@ -256,9 +256,9 @@ const TAG_UNIQUENESS_ERROR =
   'Another Tag Page already references this tag — each tag can only back one Tag Page.';
 
 /**
- * `validateUniqueTagReference` is private to page-tag.ts; the `tag` field's
+ * `validateUniqueTagReference` is private to tag.ts; the `tag` field's
  * `validation` builder registers it via `rule.custom(fn)`, so a minimal
- * chainable mock rule captures it the same way home-page.test.ts captures
+ * chainable mock rule captures it the same way home.test.ts captures
  * its modules-field custom validator — no export needed.
  */
 const getUniqueTagValidator = (): TCustomFn => {
