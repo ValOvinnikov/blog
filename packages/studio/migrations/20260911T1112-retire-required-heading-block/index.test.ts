@@ -2,20 +2,28 @@ import { at, set, unset } from 'sanity/migrate';
 
 import {
   moveHeroStatementHeadingFields,
-  renamePagePostHeadingBlockType,
+  renameRequiredHeadingBlockType,
 } from './index';
 
-describe(renamePagePostHeadingBlockType, () => {
+describe(renameRequiredHeadingBlockType, () => {
   it('rewrites headingBlock._type from requiredHeadingBlock to headingBlock', () => {
-    const result = renamePagePostHeadingBlockType({
+    const result = renameRequiredHeadingBlockType({
       headingBlock: { _type: 'requiredHeadingBlock' },
     });
 
     expect(result).toEqual([at('headingBlock._type', set('headingBlock'))]);
   });
 
+  it('is keyed off headingBlock._type, not the document type — applies the same to page_post, module_cta and module_newsletter shapes', () => {
+    const shape = { headingBlock: { _type: 'requiredHeadingBlock' } };
+
+    expect(renameRequiredHeadingBlockType(shape)).toEqual([
+      at('headingBlock._type', set('headingBlock')),
+    ]);
+  });
+
   it('is idempotent — a doc already on headingBlock is left alone', () => {
-    const result = renamePagePostHeadingBlockType({
+    const result = renameRequiredHeadingBlockType({
       headingBlock: { _type: 'headingBlock' },
     });
 
@@ -23,7 +31,7 @@ describe(renamePagePostHeadingBlockType, () => {
   });
 
   it('is a no-op for a doc with no headingBlock at all', () => {
-    const result = renamePagePostHeadingBlockType({});
+    const result = renameRequiredHeadingBlockType({});
 
     expect(result).toBeUndefined();
   });
