@@ -1,6 +1,7 @@
 import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { STATIC_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { HeroStatementModule } from './hero-statement-module';
@@ -95,10 +96,8 @@ describe(`<${HeroStatementModule.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('renders the hero image using its own cdnBaseUrl, not a hardcoded origin', async () => {
-    const sanityImage = makeSanityImage({
-      cdnBaseUrl: 'https://cdn.sanity.io/images/tenant-project/production/',
-    });
+  it('renders the hero image src from the configured Sanity CDN base URL, not a hardcoded origin', async () => {
+    const sanityImage = makeSanityImage();
     getHeroStatementMock.mockResolvedValue({
       ok: true,
       data: makeHeroStatementData({ sanityImage }),
@@ -107,6 +106,8 @@ describe(`<${HeroStatementModule.name}/>`, () => {
     await setup();
 
     const img = screen.getByRole('img', { name: sanityImage.alt });
-    expect(img.getAttribute('src')).toContain('tenant-project/production');
+    expect(
+      img.getAttribute('src')?.startsWith(STATIC_SANITY_IMAGE_BASE_URL),
+    ).toBe(true);
   });
 });

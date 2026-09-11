@@ -1,8 +1,8 @@
+import type { ISanityImage } from '@blog/config';
 import {
-  buildImageUrl,
   service,
-  type TRawImage,
-  type TTenantSanityContext,
+  type TSanityProjectRef,
+  urlForSanityImage,
 } from '@blog/service';
 import { getHostTenantSanityContext } from '@web/server/tenant/get-host-tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
@@ -28,16 +28,14 @@ const FALLBACK_MARK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="80" he
 </svg>`;
 
 const fetchLogoIcon = async (
-  logoAsset: TRawImage,
-  tenant: TTenantSanityContext,
+  logo: ISanityImage,
+  project: TSanityProjectRef,
 ): Promise<Response | undefined> => {
-  const iconUrl = buildImageUrl(logoAsset, tenant, {
+  const iconUrl = urlForSanityImage(logo, project, {
     width: FAVICON_SIZE,
     height: FAVICON_SIZE,
     fit: 'crop',
   });
-
-  if (!iconUrl) return undefined;
 
   const response = await fetch(iconUrl, {
     signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
@@ -81,13 +79,13 @@ export default async function Icon() {
     return buildFallbackResponse();
   }
 
-  const { logoAsset } = result.data.brand;
-  if (!logoAsset) {
+  const { logo } = result.data.brand;
+  if (!logo) {
     return buildFallbackResponse();
   }
 
   try {
-    const logoResponse = await fetchLogoIcon(logoAsset, hostTenant.tenant);
+    const logoResponse = await fetchLogoIcon(logo, hostTenant.tenant);
     if (logoResponse) {
       const bytes = await logoResponse.arrayBuffer();
 

@@ -7,9 +7,9 @@ import type { ReactNode } from 'react';
  * post has no hero image.
  */
 export const renderPostCardImage = (post: TPostCard): ReactNode | undefined =>
-  post.heroImageSanity ? (
+  post.heroImage ? (
     <SanityImage
-      image={post.heroImageSanity}
+      image={post.heroImage}
       width={640}
       height={360}
       sizes="(min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw"

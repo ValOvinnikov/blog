@@ -7,7 +7,7 @@ const seo: TTopicIndexPage['seo'] = {
   description: 'Browse every post by topic.',
   ogTitle: 'Topics',
   ogDescription: 'Browse every post by topic.',
-  ogImageUrl: undefined,
+  ogImage: undefined,
 };
 
 const withHero: TTopicIndexPage = {

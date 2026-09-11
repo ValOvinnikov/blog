@@ -78,6 +78,10 @@ export default defineMigration({
             _type: 'reference',
             _ref: TAXONOMY_LIST_TOPICS_ID,
           },
+          seo: {
+            _type: 'seo',
+            metaTitle: 'Browse every post by topic on the blog',
+          },
         }),
       ];
     },

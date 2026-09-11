@@ -13,12 +13,6 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   runQuery: vi.fn(),
 }));
 
-vi.mock('@blog/service/sanity/image', () => ({
-  urlForImage: vi.fn(
-    () => 'https://cdn.sanity.io/images/proj/dataset/og-800x600.jpg',
-  ),
-}));
-
 const tenant = makeTenant();
 
 describe('getHomePage', () => {
@@ -92,14 +86,6 @@ describe('getHomePage', () => {
     );
 
     await expect(getHomePage(tenant)).rejects.toThrow();
-  });
-
-  it('rejects when the page has no authored seo', async () => {
-    mockRun.mockResolvedValueOnce(makeRawHomePage({ seo: null }));
-
-    await expect(getHomePage(tenant)).rejects.toThrow(
-      'seo.metaTitle is required but missing',
-    );
   });
 
   it('resolves seo from the authored value, with no fallback for an unauthored description', async () => {

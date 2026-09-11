@@ -102,7 +102,7 @@ describe('TagNumberedPage', () => {
             description: 'Posts about TypeScript.',
             ogTitle: 'TypeScript',
             ogDescription: 'Posts about TypeScript.',
-            ogImageUrl: undefined,
+            ogImage: undefined,
           },
         },
       });

@@ -1,16 +1,5 @@
 import { q } from '@blog/service/sanity/query';
 
-// `alt` is our field (required); the rest are Sanity's built-in image fields.
-export const imageWithAltFragment = q
-  .fragmentForType<'imageWithAlt'>()
-  .project((sub) => ({
-    _type: true,
-    asset: true,
-    alt: sub.field('alt').notNull(),
-    hotspot: true,
-    crop: true,
-  }));
-
 // Exposes the fields `sanity-image` needs from a dereferenced asset
 // (asset id, blur placeholder, dimensions). Shared by every fragment below
 // that derefs an image asset, whether or not the reference itself is required.

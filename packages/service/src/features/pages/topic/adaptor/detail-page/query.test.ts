@@ -9,10 +9,16 @@ describe('topicPageQuery', () => {
     expect(topicPageQuery.query).toContain('slug.current == $slug');
   });
 
-  it('parses a topic page with no modules/SEO', () => {
-    const raw = makeRawTopicPage({ modules: null, seo: null });
+  it('parses a topic page with no modules', () => {
+    const raw = makeRawTopicPage({ modules: null });
 
     expect(() => topicPageQuery.parse(raw)).not.toThrow();
+  });
+
+  it('rejects a topic page with no authored SEO', () => {
+    const raw = { ...makeRawTopicPage(), seo: null };
+
+    expect(() => topicPageQuery.parse(raw)).toThrow();
   });
 
   it('parses a topic page with a list module alongside other modules, and SEO', () => {

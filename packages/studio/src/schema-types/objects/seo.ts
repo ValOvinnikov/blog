@@ -10,7 +10,7 @@ export const seoSchema = defineType({
   name: 'seo',
   title: 'SEO',
   type: 'object',
-  options: { collapsible: true, collapsed: true },
+  options: { collapsible: true, collapsed: false },
   fields: [
     defineField({
       name: 'metaTitle',

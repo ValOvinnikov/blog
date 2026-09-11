@@ -7,7 +7,7 @@ const seo: TTagIndexPage['seo'] = {
   description: 'Browse every post by tag.',
   ogTitle: 'Tags',
   ogDescription: 'Browse every post by tag.',
-  ogImageUrl: undefined,
+  ogImage: undefined,
 };
 
 const withHero: TTagIndexPage = {

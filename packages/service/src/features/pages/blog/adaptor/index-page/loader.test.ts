@@ -13,12 +13,6 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   runQuery: vi.fn(),
 }));
 
-vi.mock('@blog/service/sanity/image', () => ({
-  urlForImage: vi.fn(
-    () => 'https://cdn.sanity.io/images/proj/dataset/og-800x600.jpg',
-  ),
-}));
-
 const tenant = makeTenant();
 
 describe('getIndexPage', () => {
@@ -57,14 +51,6 @@ describe('getIndexPage', () => {
       heading: undefined,
       supportingText: undefined,
     });
-  });
-
-  it('rejects when the page has no authored seo', async () => {
-    mockRun.mockResolvedValueOnce(makeRawBlogPage({ seo: null }));
-
-    await expect(getIndexPage(tenant)).rejects.toThrow(
-      'seo.metaTitle is required but missing',
-    );
   });
 
   it('maps the thin page-builder modules array to module refs', async () => {

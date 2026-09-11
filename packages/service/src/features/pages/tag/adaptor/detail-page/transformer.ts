@@ -1,4 +1,3 @@
-import type { TImageTenant } from '@blog/service/sanity/image';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import {
@@ -22,10 +21,7 @@ function toTagDetailPageTag(rawTag: TRawTagDetailPageTag): TTagDetailPageTag {
   };
 }
 
-export function toTagDetailPage(
-  rawPage: TRawTagPage,
-  tenant: TImageTenant,
-): TTagDetailPage {
+export function toTagDetailPage(rawPage: TRawTagPage): TTagDetailPage {
   const tag = toTagDetailPageTag(rawPage.tag);
   const headingBlock = toHeadingBlock(rawPage.headingBlock);
 
@@ -37,6 +33,6 @@ export function toTagDetailPage(
     },
     hero: toHeroSlot(rawPage.hero),
     modules: (rawPage.modules ?? []).map(toModule),
-    seo: resolveSeo(rawPage.seo, tenant),
+    seo: resolveSeo(rawPage.seo),
   };
 }

@@ -1,4 +1,4 @@
-import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/page-topic-type';
+import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic/topic-type';
 import { getDraftsClient } from '@blog/studio/schema-types/helpers/get-drafts-client';
 import { slugField } from '@blog/studio/schema-types/helpers/slug-field';
 import { Tags } from 'lucide-react';

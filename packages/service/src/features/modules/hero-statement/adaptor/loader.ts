@@ -30,5 +30,5 @@ export async function getHeroStatement(
     ),
   });
 
-  return toHeroStatementModule(raw, tenant);
+  return toHeroStatementModule(raw);
 }

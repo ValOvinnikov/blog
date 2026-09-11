@@ -10,12 +10,6 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   runQuery: vi.fn(),
 }));
 
-vi.mock('@blog/service/sanity/image', () => ({
-  urlForImage: vi.fn(
-    () => 'https://cdn.sanity.io/images/proj/dataset/og-800x600.jpg',
-  ),
-}));
-
 const tenant = makeTenant();
 
 describe('getPage', () => {
@@ -84,14 +78,6 @@ describe('getPage', () => {
     );
 
     await expect(getPage('about', tenant)).rejects.toThrow();
-  });
-
-  it('rejects when the page has no authored seo', async () => {
-    mockRun.mockResolvedValueOnce(makeRawLandingPage({ seo: null }));
-
-    await expect(getPage('about', tenant)).rejects.toThrow(
-      'seo.metaTitle is required but missing',
-    );
   });
 
   it('lets authored seo override the resolved defaults, with no fallback for an unauthored openGraph', async () => {

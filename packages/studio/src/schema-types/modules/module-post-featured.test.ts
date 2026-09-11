@@ -1,5 +1,5 @@
 import { DISPLAY_MODE, POST_SOURCE } from '@blog/config/constants';
-import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
+import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
 import type { SanityDocument, ValidationContext } from 'sanity';
 

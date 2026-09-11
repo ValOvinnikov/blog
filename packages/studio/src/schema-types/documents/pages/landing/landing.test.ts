@@ -1,4 +1,4 @@
-import { landingSchema } from '@blog/studio/schema-types/documents/pages/landing/landing';
+import { landingSchema } from '@blog/studio/schema-types/documents/pages/landing';
 import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/helpers/validate-taxonomy-list-has-taxonomy';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';

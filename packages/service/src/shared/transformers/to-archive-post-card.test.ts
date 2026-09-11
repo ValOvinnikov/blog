@@ -27,7 +27,7 @@ describe(toArchivePostCard, () => {
   it('does not include hero image, featured, or author fields', () => {
     const result = toArchivePostCard(makeRawArchivePostCard());
 
-    expect(result).not.toHaveProperty('heroImageUrl');
+    expect(result).not.toHaveProperty('heroImage');
     expect(result).not.toHaveProperty('featured');
     expect(result).not.toHaveProperty('author');
   });

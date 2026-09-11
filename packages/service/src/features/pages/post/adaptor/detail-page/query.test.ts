@@ -21,14 +21,18 @@ describe('postPageQuery', () => {
   it('parses a post whose optional fields are all absent', () => {
     const raw = makeRawPostDetail({
       heroImage: null,
-      heroImageAsset: null,
       featured: null,
-      seo: null,
       author: makeRawAuthor({ role: null }),
       topic: makeRawTopic({ description: null }),
     });
 
     expect(() => postPageQuery.parse(raw)).not.toThrow();
+  });
+
+  it('throws when a post has no authored SEO', () => {
+    const raw = { ...makeRawPostDetail(), seo: null };
+
+    expect(() => postPageQuery.parse(raw)).toThrow();
   });
 
   it('parses a post whose author has no image', () => {

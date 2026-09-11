@@ -3,7 +3,7 @@ import { requiredHeadingBlockFragment } from '@blog/service/shared/fragments/hea
 import { moduleFragment } from '@blog/service/shared/fragments/module';
 
 import { authorCardFragment, authorDetailFragment } from './author';
-import { imageWithAltFragment, sanityImageFragment } from './image';
+import { sanityImageFragment } from './image';
 import { portableTextBodyItemFragment } from './portable-text-body';
 import { seoFragment } from './seo';
 import { tagFragment } from './tag';
@@ -28,10 +28,6 @@ export const postCardFragment = q
     publishedAt: sub.field('publishedAt').notNull(),
     heroImage: sub
       .field('heroImage')
-      .project(imageWithAltFragment)
-      .nullable(true),
-    heroImageAsset: sub
-      .field('heroImage')
       .project(sanityImageFragment)
       .nullable(true),
     featured: sub.field('featured').nullable(true),
@@ -52,10 +48,6 @@ export const postDetailFragment = q
     publishedAt: sub.field('publishedAt').notNull(),
     heroImage: sub
       .field('heroImage')
-      .project(imageWithAltFragment)
-      .nullable(true),
-    heroImageAsset: sub
-      .field('heroImage')
       .project(sanityImageFragment)
       .nullable(true),
     featured: sub.field('featured').nullable(true),
@@ -64,7 +56,7 @@ export const postDetailFragment = q
       .project(portableTextBodyItemFragment)
       .notNull(),
     skim: sub.field('skim').project(skimFragment).nullable(true),
-    seo: sub.field('seo').project(seoFragment).nullable(true),
+    seo: sub.field('seo').project(seoFragment).notNull(),
     author: sub.field('author').deref().project(authorDetailFragment).notNull(),
     topic: sub.field('topic').deref().project(topicFragment).notNull(),
     tags: sub.field('tags[]').deref().project(tagFragment).nullable(true),

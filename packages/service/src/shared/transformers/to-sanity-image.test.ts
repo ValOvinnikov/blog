@@ -1,43 +1,20 @@
 import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
 
 import { toSanityImage } from './to-sanity-image';
 
 describe('toSanityImage', () => {
   it('maps all fields from raw input', () => {
     const raw = makeRawSanityImage();
-    const result = toSanityImage(raw, makeTenant());
+    const result = toSanityImage(raw);
 
     expect(result).toEqual({
       assetId: 'image-abc123-800x600-jpg',
       alt: 'Alt text',
-      cdnBaseUrl: 'https://cdn.sanity.io/images/tenant-a/production/',
       hotspot: undefined,
       crop: undefined,
       lqip: 'data:image/png;base64,abc123',
       dimensions: { width: 800, height: 600, aspectRatio: 1.333 },
     });
-  });
-
-  it('derives cdnBaseUrl from the given tenant, not a shared default', () => {
-    const raw = makeRawSanityImage();
-
-    const tenantA = toSanityImage(
-      raw,
-      makeTenant({ projectId: 'proj-a', dataset: 'production' }),
-    );
-    const tenantB = toSanityImage(
-      raw,
-      makeTenant({ projectId: 'proj-b', dataset: 'staging' }),
-    );
-
-    expect(tenantA?.cdnBaseUrl).toBe(
-      'https://cdn.sanity.io/images/proj-a/production/',
-    );
-    expect(tenantB?.cdnBaseUrl).toBe(
-      'https://cdn.sanity.io/images/proj-b/staging/',
-    );
-    expect(tenantA?.cdnBaseUrl).not.toBe(tenantB?.cdnBaseUrl);
   });
 
   it('maps hotspot and crop when present', () => {
@@ -59,7 +36,7 @@ describe('toSanityImage', () => {
       },
     };
 
-    const result = toSanityImage(raw, makeTenant());
+    const result = toSanityImage(raw);
 
     expect(result?.hotspot).toEqual({
       x: 0.5,
@@ -81,22 +58,22 @@ describe('toSanityImage', () => {
       asset: { _id: 'image-abc123-800x600-jpg', metadata: null },
     };
 
-    const result = toSanityImage(raw, makeTenant());
+    const result = toSanityImage(raw);
 
     expect(result?.lqip).toBeUndefined();
     expect(result?.dimensions).toBeUndefined();
   });
 
   it('returns undefined for null', () => {
-    expect(toSanityImage(null, makeTenant())).toBeUndefined();
+    expect(toSanityImage(null)).toBeUndefined();
   });
 
   it('returns undefined for undefined', () => {
-    expect(toSanityImage(undefined, makeTenant())).toBeUndefined();
+    expect(toSanityImage(undefined)).toBeUndefined();
   });
 
   it('returns undefined when asset is absent', () => {
     const raw = { ...makeRawSanityImage(), asset: null };
-    expect(toSanityImage(raw, makeTenant())).toBeUndefined();
+    expect(toSanityImage(raw)).toBeUndefined();
   });
 });

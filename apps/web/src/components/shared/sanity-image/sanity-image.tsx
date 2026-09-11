@@ -3,6 +3,7 @@
 // `sanity-image` uses `useState` internally (LQIP blur-up), so this bridge
 // must be a Client Component boundary when rendered from Server Components.
 import type { ISanityImage } from '@blog/config';
+import { useSanityImageBaseUrl } from '@web/context/sanity-image-base-url-provider';
 import { SanityImage as SanityImageBase } from 'sanity-image';
 
 export interface ISanityImageProps {
@@ -24,8 +25,9 @@ export interface ISanityImageProps {
 
 /**
  * Framework-coupled bridge between the service layer's `ISanityImage`
- * view-model and the `sanity-image` package. `image.cdnBaseUrl` already
- * carries the CDN origin, so this component needs no separate origin prop.
+ * view-model and the `sanity-image` package. The CDN origin comes from
+ * `useSanityImageBaseUrl` (resolved once per request by the surrounding
+ * `SanityImageBaseUrlProvider`), not from the image itself.
  *
  * `preview` (the LQIP blur-up placeholder) is withheld when `priority` is
  * set. When a `preview` is passed, the underlying package renders the real
@@ -49,20 +51,24 @@ export const SanityImage = ({
   priority = false,
   className,
   alt,
-}: ISanityImageProps) => (
-  <SanityImageBase
-    id={image.assetId}
-    baseUrl={image.cdnBaseUrl}
-    hotspot={image.hotspot}
-    crop={image.crop}
-    preview={priority ? undefined : image.lqip}
-    width={width}
-    height={height}
-    mode={mode}
-    sizes={sizes}
-    loading={loading}
-    fetchPriority={priority ? 'high' : undefined}
-    className={className}
-    alt={alt ?? image.alt}
-  />
-);
+}: ISanityImageProps) => {
+  const baseUrl = useSanityImageBaseUrl();
+
+  return (
+    <SanityImageBase
+      id={image.assetId}
+      baseUrl={baseUrl}
+      hotspot={image.hotspot}
+      crop={image.crop}
+      preview={priority ? undefined : image.lqip}
+      width={width}
+      height={height}
+      mode={mode}
+      sizes={sizes}
+      loading={loading}
+      fetchPriority={priority ? 'high' : undefined}
+      className={className}
+      alt={alt ?? image.alt}
+    />
+  );
+};

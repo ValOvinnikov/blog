@@ -1,5 +1,4 @@
 import type { TMaybeUndefined } from '@blog/config';
-import type { TImageTenant } from '@blog/service/sanity/image';
 import {
   toCtaAction,
   type TCtaAction,
@@ -32,7 +31,6 @@ function toActions(
 
 export function toHeroStatementModule(
   raw: TRawHeroStatementModule,
-  tenant: TImageTenant,
 ): THeroStatementModule {
   const { contentPosition, mediaOrder } = toHeroPresentation(raw);
   const headingBlock = toRequiredHeadingBlock(raw.headingBlock);
@@ -43,7 +41,7 @@ export function toHeroStatementModule(
     heading: headingBlock.heading,
     eyebrow: raw.eyebrow ?? undefined,
     supportingText: headingBlock.supportingText,
-    sanityImage: toSanityImage(raw.image, tenant),
+    sanityImage: toSanityImage(raw.image),
     actions: toActions(raw.actions),
     contentPosition,
     contentAlignment: raw.contentAlignment ?? undefined,

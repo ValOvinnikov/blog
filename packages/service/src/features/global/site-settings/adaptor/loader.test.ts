@@ -1,7 +1,7 @@
 import { SPEC_LINE_SEPARATOR_CHARS, SPEC_LINE_SEPARATORS } from '@blog/config';
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawImage } from '@blog/service/testing/shared/fixtures';
+import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getSiteSettings } from './loader';
@@ -9,12 +9,6 @@ import { getSiteSettings } from './loader';
 vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
   runQuery: vi.fn(),
-}));
-
-vi.mock('@blog/service/sanity/image', () => ({
-  urlForImage: vi.fn(
-    () => 'https://cdn.sanity.io/images/proj/dataset/og-800x600.jpg',
-  ),
 }));
 
 const tenant = makeTenant();
@@ -36,7 +30,7 @@ describe('getSiteSettings', () => {
             items: ['build 2026.07', 'online'],
             separator: SPEC_LINE_SEPARATORS.DOT,
           },
-          logo: makeRawImage('Logo'),
+          logo: makeRawSanityImage('Logo'),
         },
       }),
     );
@@ -56,7 +50,7 @@ describe('getSiteSettings', () => {
         brand: {
           name: 'Awesome Blog',
           specLine: null,
-          logo: makeRawImage('Logo'),
+          logo: makeRawSanityImage('Logo'),
         },
       }),
     );
@@ -75,7 +69,7 @@ describe('getSiteSettings', () => {
             items: ['build 2026.07', 'online'],
             separator: SPEC_LINE_SEPARATORS.PIPE,
           },
-          logo: makeRawImage('Logo'),
+          logo: makeRawSanityImage('Logo'),
         },
       }),
     );
@@ -96,7 +90,7 @@ describe('getSiteSettings', () => {
             items: ['build 2026.07', 'online'],
             separator: SPEC_LINE_SEPARATORS.BULLET,
           },
-          logo: makeRawImage('Logo'),
+          logo: makeRawSanityImage('Logo'),
         },
       }),
     );
@@ -117,7 +111,7 @@ describe('getSiteSettings', () => {
             items: ['build 2026.07', 'online'],
             separator: SPEC_LINE_SEPARATORS.SLASH,
           },
-          logo: makeRawImage('Logo'),
+          logo: makeRawSanityImage('Logo'),
         },
       }),
     );
@@ -135,7 +129,7 @@ describe('getSiteSettings', () => {
         brand: {
           name: 'Awesome Blog',
           specLine: { items: ['online'], separator: SPEC_LINE_SEPARATORS.DOT },
-          logo: makeRawImage('Logo'),
+          logo: makeRawSanityImage('Logo'),
         },
       }),
     );
@@ -151,7 +145,7 @@ describe('getSiteSettings', () => {
         brand: {
           name: 'Awesome Blog',
           specLine: { items: [], separator: SPEC_LINE_SEPARATORS.DOT },
-          logo: makeRawImage('Logo'),
+          logo: makeRawSanityImage('Logo'),
         },
       }),
     );
@@ -161,7 +155,7 @@ describe('getSiteSettings', () => {
     expect(result.brand.specLine).toBeUndefined();
   });
 
-  it('leaves logoUrl undefined when no logo is uploaded (D7 fallback)', async () => {
+  it('leaves logo undefined when no logo is uploaded', async () => {
     mockRun.mockResolvedValue(
       makeRawSiteSettings({
         brand: {
@@ -174,41 +168,25 @@ describe('getSiteSettings', () => {
 
     const result = await getSiteSettings(tenant);
 
-    expect(result.brand.logoUrl).toBeUndefined();
+    expect(result.brand.logo).toBeUndefined();
   });
 
-  it('exposes the raw logo asset reference alongside the built logoUrl', async () => {
-    const logo = makeRawImage('Logo');
+  it('maps an uploaded logo to an image view-model', async () => {
     mockRun.mockResolvedValue(
       makeRawSiteSettings({
         brand: {
           name: 'Awesome Blog',
           specLine: null,
-          logo,
+          logo: makeRawSanityImage('Logo'),
         },
       }),
     );
 
     const result = await getSiteSettings(tenant);
 
-    expect(result.brand.logoAsset).toEqual(logo);
-    expect(result.brand.logoUrl).toBeDefined();
-  });
-
-  it('leaves logoAsset undefined when no logo is uploaded', async () => {
-    mockRun.mockResolvedValue(
-      makeRawSiteSettings({
-        brand: {
-          name: 'Awesome Blog',
-          specLine: null,
-          logo: null,
-        },
-      }),
+    expect(result.brand.logo).toEqual(
+      expect.objectContaining({ assetId: 'image-abc123-800x600-jpg' }),
     );
-
-    const result = await getSiteSettings(tenant);
-
-    expect(result.brand.logoAsset).toBeUndefined();
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {

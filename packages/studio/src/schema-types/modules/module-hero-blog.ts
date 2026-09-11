@@ -8,7 +8,7 @@ import {
   type TPostSource,
   type THeroVariant,
 } from '@blog/config/constants';
-import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
+import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { defineHeroFields } from '@blog/studio/schema-types/helpers/define-hero-fields';
 import { getDraftsClient } from '@blog/studio/schema-types/helpers/get-drafts-client';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';

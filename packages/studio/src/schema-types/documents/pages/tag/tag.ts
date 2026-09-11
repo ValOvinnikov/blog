@@ -1,17 +1,17 @@
 import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/components/slug-url-preview-input';
 import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag';
-import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/page-tag-type';
+import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/tag/tag-type';
 import { defineModulesField } from '@blog/studio/schema-types/helpers/define-modules-field';
 import { getDraftsClient } from '@blog/studio/schema-types/helpers/get-drafts-client';
 import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
 import { heroField } from '@blog/studio/schema-types/helpers/hero-field';
+import { seoField } from '@blog/studio/schema-types/helpers/seo-field';
 import { slugField } from '@blog/studio/schema-types/helpers/slug-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
 import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
-import { seoSchema } from '@blog/studio/schema-types/objects/seo';
 import { Tag } from 'lucide-react';
 import {
   defineField,
@@ -198,13 +198,7 @@ export const pageTagSchema = defineType({
         newsletterSchema.name,
       ],
     }),
-    defineField({
-      name: 'seo',
-      title: 'SEO',
-      type: seoSchema.name,
-      description:
-        'Override Tag page meta title, description, and social sharing image.',
-    }),
+    seoField(),
   ],
   preview: {
     select: {

@@ -1,0 +1,1 @@
+export { pagePostSchema } from './post';

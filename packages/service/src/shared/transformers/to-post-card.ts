@@ -1,7 +1,5 @@
 import type { ISanityImage, TMaybeUndefined } from '@blog/config';
-import type { TImageTenant } from '@blog/service/sanity/image';
 import type { postCardFragment } from '@blog/service/shared/fragments/post';
-import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
 import { toPostHeading } from '@blog/service/shared/transformers/to-post-heading';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import { toReadingTimeMinutes } from '@blog/utils';
@@ -13,7 +11,7 @@ export type TPostCardAuthor = {
   id: string;
   name: string;
   profilePageSlug: TMaybeUndefined<string>;
-  imageUrl: TMaybeUndefined<string>;
+  image: TMaybeUndefined<ISanityImage>;
 };
 
 export type TPostCardTopic = {
@@ -28,24 +26,19 @@ export type TPostCard = {
   slug: string;
   excerpt: TMaybeUndefined<string>;
   publishedAt: string;
-  heroImageUrl: TMaybeUndefined<string>;
-  heroImageAlt: TMaybeUndefined<string>;
-  heroImageSanity: TMaybeUndefined<ISanityImage>;
+  heroImage: TMaybeUndefined<ISanityImage>;
   featured: boolean;
   author: TPostCardAuthor;
   topic: TPostCardTopic;
   readingTimeMinutes: number;
 };
 
-function toPostCardAuthor(
-  raw: TRawPostCard['author'],
-  tenant: TImageTenant,
-): TPostCardAuthor {
+function toPostCardAuthor(raw: TRawPostCard['author']): TPostCardAuthor {
   return {
     id: raw._id,
     name: raw.name,
     profilePageSlug: raw.profilePage?.slug ?? undefined,
-    imageUrl: buildImageUrl(raw.image, tenant),
+    image: toSanityImage(raw.image),
   };
 }
 
@@ -57,7 +50,7 @@ export function toPostCardTopic(raw: TRawPostCard['topic']): TPostCardTopic {
   };
 }
 
-export function toPostCard(raw: TRawPostCard, tenant: TImageTenant): TPostCard {
+export function toPostCard(raw: TRawPostCard): TPostCard {
   const { title, excerpt } = toPostHeading(raw.headingBlock);
 
   return {
@@ -66,11 +59,9 @@ export function toPostCard(raw: TRawPostCard, tenant: TImageTenant): TPostCard {
     slug: raw.slug,
     excerpt,
     publishedAt: raw.publishedAt,
-    heroImageUrl: buildImageUrl(raw.heroImage, tenant),
-    heroImageAlt: raw.heroImage?.alt,
-    heroImageSanity: toSanityImage(raw.heroImageAsset, tenant),
+    heroImage: toSanityImage(raw.heroImage),
     featured: raw.featured ?? false,
-    author: toPostCardAuthor(raw.author, tenant),
+    author: toPostCardAuthor(raw.author),
     topic: toPostCardTopic(raw.topic),
     readingTimeMinutes: toReadingTimeMinutes(raw.wordCount),
   };

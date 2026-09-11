@@ -5,8 +5,6 @@ import type {
   ISanityImageHotspot,
   TMaybeUndefined,
 } from '@blog/config';
-import type { TImageTenant } from '@blog/service/sanity/image';
-import { getSanityImageBaseUrl } from '@blog/service/sanity/image-base-url';
 import type { sanityImageFragment } from '@blog/service/shared/fragments/image';
 import type { InferFragmentType } from 'groqd';
 
@@ -75,14 +73,12 @@ function toDimensions(
 
 export function toSanityImage(
   raw: TRawSanityImageInput | null | undefined,
-  tenant: TImageTenant,
 ): TMaybeUndefined<ISanityImage> {
   if (!raw?.asset) return undefined;
 
   return {
     assetId: raw.asset._id,
     alt: raw.alt ?? '',
-    cdnBaseUrl: getSanityImageBaseUrl(tenant),
     hotspot: toHotspot(raw.hotspot),
     crop: toCrop(raw.crop),
     lqip: raw.asset.metadata?.lqip ?? undefined,

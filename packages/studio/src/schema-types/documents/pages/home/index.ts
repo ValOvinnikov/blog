@@ -1,0 +1,1 @@
+export { homePageSchema } from './home';
