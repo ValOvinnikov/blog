@@ -1,15 +1,12 @@
 // @vitest-environment node
 //
-// `icon.tsx` runs the real `@sanity/image-url` transform (`buildImageUrl`)
+// `icon.tsx` runs the real `@sanity/image-url` transform (`urlForSanityImage`)
 // against `@blog/service`'s validated env module, which throws on any
 // server-var access when `typeof window !== 'undefined'` (`@t3-oss/env-core`'s
 // client/server guard) — the default jsdom environment defines `window`, so
 // this file overrides to `node` to let that real transform run unmocked.
-import {
-  buildImageUrl,
-  type TRawImage,
-  type TTenantSanityContext,
-} from '@blog/service';
+import type { ISanityImage } from '@blog/config';
+import { type TTenantSanityContext, urlForSanityImage } from '@blog/service';
 
 const { getSiteSettingsMock, getHostTenantSanityContextMock } = vi.hoisted(
   () => ({
@@ -34,14 +31,15 @@ vi.mock('@web/server/tenant/get-host-tenant-sanity-context', () => ({
   getHostTenantSanityContext: getHostTenantSanityContextMock,
 }));
 
-const logoAsset: TRawImage = {
-  _type: 'imageWithAlt',
-  asset: { _type: 'reference', _ref: 'image-abc123def-800x600-svg' },
+const logo: ISanityImage = {
+  assetId: 'image-abc123def-800x600-svg',
   alt: 'Logo',
-  hotspot: null,
-  crop: null,
+  hotspot: undefined,
+  crop: undefined,
+  lqip: undefined,
+  dimensions: undefined,
 };
-const brand = { logoAsset };
+const brand = { logo };
 const FALLBACK_CONTENT = '.l1{fill:#2E6BD6}';
 
 const DEFAULT_TENANT: TTenantSanityContext = {
@@ -50,11 +48,11 @@ const DEFAULT_TENANT: TTenantSanityContext = {
   token: 'tenant-token',
 };
 
-// Computed via the real (unmocked) `buildImageUrl`/`urlForImage` transform,
-// the same one `icon.tsx` must call — asserting against this, rather than a
-// hand-typed string, is what would catch a regression back to building the
-// URL against the wrong (e.g. platform) tenant project/dataset.
-const EXPECTED_ICON_URL = buildImageUrl(logoAsset, DEFAULT_TENANT, {
+// Computed via the real (unmocked) `urlForSanityImage`/`urlForImage`
+// transform, the same one `icon.tsx` must call — asserting against this,
+// rather than a hand-typed string, is what would catch a regression back to
+// building the URL against the wrong (e.g. platform) tenant project/dataset.
+const EXPECTED_ICON_URL = urlForSanityImage(logo, DEFAULT_TENANT, {
   width: 64,
   height: 64,
   fit: 'crop',
@@ -104,7 +102,7 @@ describe('icon', () => {
   it('falls back to the static mark when no logo is uploaded', async () => {
     getSiteSettingsMock.mockResolvedValue({
       ok: true,
-      data: { brand: { logoAsset: undefined } },
+      data: { brand: { logo: undefined } },
     });
 
     const { default: Icon } = await import('./icon');
@@ -181,7 +179,7 @@ describe('icon', () => {
     });
     getSiteSettingsMock.mockResolvedValue({
       ok: true,
-      data: { brand: { logoAsset: undefined } },
+      data: { brand: { logo: undefined } },
     });
 
     const { default: Icon } = await import('./icon');

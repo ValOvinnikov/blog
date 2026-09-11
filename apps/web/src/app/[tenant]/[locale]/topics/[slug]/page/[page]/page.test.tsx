@@ -102,7 +102,7 @@ describe('TopicNumberedPage', () => {
             description: 'Posts about building things.',
             ogTitle: 'Engineering',
             ogDescription: 'Posts about building things.',
-            ogImageUrl: undefined,
+            ogImage: undefined,
           },
         },
       });

@@ -1,6 +1,11 @@
-import type { TSeoResolved } from '@blog/service';
+import type { ISanityImage } from '@blog/config';
+import {
+  type TSanityProjectRef,
+  type TSeoResolved,
+  urlForSanityImage,
+} from '@blog/service';
 // Next's real per-segment metadata resolver — used below to prove an absent
-// `ogImageUrl` resolves to no image at all, the way the App Router does it
+// `ogImage` resolves to no image at all, the way the App Router does it
 // at request time, rather than an injected default. Not a public `next`
 // export, but there's no other way to verify this without standing up a
 // full Next render.
@@ -14,17 +19,33 @@ import { toMetadata } from './to-metadata';
 type TOpenGraphWithType = { type?: string };
 type TTwitterWithCard = { card?: string };
 
+const project: TSanityProjectRef = {
+  projectId: 'test-project',
+  dataset: 'test-dataset',
+};
+
+const ogImage: ISanityImage = {
+  assetId: 'image-6205dacc42424f7a83d8e20a7000d895f7cdc7de-800x600-jpg',
+  alt: 'The blog OG image',
+  hotspot: undefined,
+  crop: undefined,
+  lqip: undefined,
+  dimensions: { width: 800, height: 600, aspectRatio: 800 / 600 },
+};
+
+const EXPECTED_OG_IMAGE_URL = urlForSanityImage(ogImage, project);
+
 const seo: TSeoResolved = {
   title: 'The Blog',
   description: 'All the posts.',
   ogTitle: 'The Blog OG',
   ogDescription: 'All the posts OG.',
-  ogImageUrl: 'https://cdn.example.com/blog-og.jpg',
+  ogImage,
 };
 
 describe('toMetadata', () => {
   it('maps canonical, description, and ogType', () => {
-    const metadata = toMetadata(seo, {
+    const metadata = toMetadata(seo, project, {
       canonical: '/blog',
       ogType: 'website',
     });
@@ -37,13 +58,16 @@ describe('toMetadata', () => {
   });
 
   it('maps title as a plain string when titleAbsolute is not set', () => {
-    const metadata = toMetadata(seo, { canonical: '/blog', ogType: 'website' });
+    const metadata = toMetadata(seo, project, {
+      canonical: '/blog',
+      ogType: 'website',
+    });
 
     expect(metadata.title).toBe('The Blog');
   });
 
   it('maps title as an absolute title object when titleAbsolute is true', () => {
-    const metadata = toMetadata(seo, {
+    const metadata = toMetadata(seo, project, {
       canonical: '/',
       ogType: 'website',
       titleAbsolute: true,
@@ -53,7 +77,7 @@ describe('toMetadata', () => {
   });
 
   it('maps ogType article', () => {
-    const metadata = toMetadata(seo, {
+    const metadata = toMetadata(seo, project, {
       canonical: '/blog/my-post',
       ogType: 'article',
     });
@@ -63,21 +87,24 @@ describe('toMetadata', () => {
     );
   });
 
-  it('maps openGraph title/description/images from ogTitle/ogDescription/ogImageUrl', () => {
-    const metadata = toMetadata(seo, { canonical: '/blog', ogType: 'website' });
+  it('maps openGraph title/description/images from ogTitle/ogDescription/ogImage', () => {
+    const metadata = toMetadata(seo, project, {
+      canonical: '/blog',
+      ogType: 'website',
+    });
 
     expect(metadata.openGraph?.title).toBe('The Blog OG');
     expect(metadata.openGraph?.description).toBe('All the posts OG.');
     expect(metadata.openGraph?.images).toEqual([
-      { url: 'https://cdn.example.com/blog-og.jpg' },
+      { url: EXPECTED_OG_IMAGE_URL },
     ]);
   });
 
-  it('omits openGraph and twitter images when ogImageUrl is absent', () => {
-    const metadata = toMetadata(
-      { ...seo, ogImageUrl: undefined },
-      { canonical: '/', ogType: 'website' },
-    );
+  it('omits openGraph and twitter images when ogImage is absent', () => {
+    const metadata = toMetadata({ ...seo, ogImage: undefined }, project, {
+      canonical: '/',
+      ogType: 'website',
+    });
 
     expect(metadata.openGraph?.images).toBeUndefined();
     expect(metadata.twitter?.images).toBeUndefined();
@@ -91,8 +118,9 @@ describe('toMetadata', () => {
         description: undefined,
         ogTitle: undefined,
         ogDescription: undefined,
-        ogImageUrl: undefined,
+        ogImage: undefined,
       },
+      project,
       { canonical: '/', ogType: 'website' },
     );
 
@@ -105,20 +133,21 @@ describe('toMetadata', () => {
   });
 
   it('maps twitter card, title, description, and images', () => {
-    const metadata = toMetadata(seo, { canonical: '/blog', ogType: 'website' });
+    const metadata = toMetadata(seo, project, {
+      canonical: '/blog',
+      ogType: 'website',
+    });
 
     expect((metadata.twitter as TTwitterWithCard | null)?.card).toBe(
       'summary_large_image',
     );
     expect(metadata.twitter?.title).toBe('The Blog OG');
     expect(metadata.twitter?.description).toBe('All the posts OG.');
-    expect(metadata.twitter?.images).toEqual([
-      'https://cdn.example.com/blog-og.jpg',
-    ]);
+    expect(metadata.twitter?.images).toEqual([EXPECTED_OG_IMAGE_URL]);
   });
 
   it('adds openGraph.publishedTime and authors for article type when provided', () => {
-    const metadata = toMetadata(seo, {
+    const metadata = toMetadata(seo, project, {
       canonical: '/blog/my-post',
       ogType: 'article',
       article: {
@@ -136,7 +165,10 @@ describe('toMetadata', () => {
   });
 
   it('omits openGraph.publishedTime and authors when article option is not passed', () => {
-    const metadata = toMetadata(seo, { canonical: '/blog', ogType: 'website' });
+    const metadata = toMetadata(seo, project, {
+      canonical: '/blog',
+      ogType: 'website',
+    });
 
     expect(
       (metadata.openGraph as { publishedTime?: string })?.publishedTime,
@@ -147,7 +179,7 @@ describe('toMetadata', () => {
   });
 
   it('adds alternates.types["application/rss+xml"] when feedUrl is provided', () => {
-    const metadata = toMetadata(seo, {
+    const metadata = toMetadata(seo, project, {
       canonical: '/blog',
       ogType: 'website',
       feedUrl: '/rss.xml',
@@ -160,7 +192,10 @@ describe('toMetadata', () => {
   });
 
   it('omits alternates.types when feedUrl is not provided', () => {
-    const metadata = toMetadata(seo, { canonical: '/blog', ogType: 'website' });
+    const metadata = toMetadata(seo, project, {
+      canonical: '/blog',
+      ogType: 'website',
+    });
 
     expect(metadata.alternates?.types).toBeUndefined();
   });
@@ -177,11 +212,11 @@ describe('toMetadata output resolved by Next itself', () => {
     isStaticMetadataRouteFile: false,
   };
 
-  it('resolves openGraph.images to undefined, never an injected default, when ogImageUrl is absent', async () => {
-    const metadata = toMetadata(
-      { ...seo, ogImageUrl: undefined },
-      { canonical: '/', ogType: 'website' },
-    );
+  it('resolves openGraph.images to undefined, never an injected default, when ogImage is absent', async () => {
+    const metadata = toMetadata({ ...seo, ogImage: undefined }, project, {
+      canonical: '/',
+      ogType: 'website',
+    });
 
     const resolved = await resolveOpenGraph(
       metadata.openGraph,
@@ -194,11 +229,11 @@ describe('toMetadata output resolved by Next itself', () => {
     expect(resolved?.images).toBeUndefined();
   });
 
-  it('resolves twitter.images to undefined, never an injected default, when ogImageUrl is absent', () => {
-    const metadata = toMetadata(
-      { ...seo, ogImageUrl: undefined },
-      { canonical: '/', ogType: 'website' },
-    );
+  it('resolves twitter.images to undefined, never an injected default, when ogImage is absent', () => {
+    const metadata = toMetadata({ ...seo, ogImage: undefined }, project, {
+      canonical: '/',
+      ogType: 'website',
+    });
 
     const resolved = resolveTwitter(
       metadata.twitter,
@@ -210,8 +245,11 @@ describe('toMetadata output resolved by Next itself', () => {
     expect(resolved?.images).toBeUndefined();
   });
 
-  it('still resolves an explicit ogImageUrl unchanged (no fallback applied)', async () => {
-    const metadata = toMetadata(seo, { canonical: '/blog', ogType: 'website' });
+  it('still resolves an explicit ogImage unchanged (no fallback applied)', async () => {
+    const metadata = toMetadata(seo, project, {
+      canonical: '/blog',
+      ogType: 'website',
+    });
 
     const resolved = await resolveOpenGraph(
       metadata.openGraph,
@@ -221,8 +259,6 @@ describe('toMetadata output resolved by Next itself', () => {
       null,
     );
 
-    expect(resolved?.images).toEqual([
-      { url: new URL('https://cdn.example.com/blog-og.jpg') },
-    ]);
+    expect(resolved?.images).toEqual([{ url: new URL(EXPECTED_OG_IMAGE_URL) }]);
   });
 });

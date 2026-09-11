@@ -1,16 +1,13 @@
 import { BRAND_VARIANT, CONTAINER_WIDTH, SPACING_SCALE } from '@blog/config';
 import { makeRawContentModule } from '@blog/service/testing/modules/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
 
 import { toContentModule } from './transformer';
-
-const tenant = makeTenant();
 
 describe('toContentModule', () => {
   it('maps body straight through (schema-required)', () => {
     const raw = makeRawContentModule();
 
-    const module = toContentModule(raw, tenant);
+    const module = toContentModule(raw);
 
     expect(module.body).toHaveLength(1);
   });
@@ -18,7 +15,7 @@ describe('toContentModule', () => {
   it('maps brandVariant straight through', () => {
     const raw = makeRawContentModule({ brandVariant: BRAND_VARIANT.SECONDARY });
 
-    const module = toContentModule(raw, tenant);
+    const module = toContentModule(raw);
 
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
@@ -34,7 +31,7 @@ describe('toContentModule', () => {
       },
     });
 
-    const module = toContentModule(raw, tenant);
+    const module = toContentModule(raw);
 
     expect(module.layout).toEqual({
       spacingTop: SPACING_SCALE.XL,
@@ -48,7 +45,7 @@ describe('toContentModule', () => {
   it('leaves layout undefined when the field is unset (no faked default)', () => {
     const raw = makeRawContentModule({ layout: null });
 
-    const module = toContentModule(raw, tenant);
+    const module = toContentModule(raw);
 
     expect(module.layout).toBeUndefined();
   });
@@ -74,7 +71,7 @@ describe('toContentModule', () => {
       ],
     });
 
-    const module = toContentModule(raw, tenant);
+    const module = toContentModule(raw);
 
     expect(module.body[0]).toEqual({
       _type: 'bodyImage',
@@ -99,7 +96,7 @@ describe('toContentModule', () => {
       ],
     });
 
-    const module = toContentModule(raw, tenant);
+    const module = toContentModule(raw);
 
     expect(module.body).toHaveLength(1);
     expect(module.body[0]).toMatchObject({

@@ -4,19 +4,17 @@ import {
   CONTENT_ALIGNMENT,
 } from '@blog/config';
 import { makeRawPostListModule } from '@blog/service/testing/modules/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
 
 import { toPostListModule, type TRawPostListModulePosts } from './transformer';
 
 const rawPosts: TRawPostListModulePosts = [];
 const pagination = { currentPage: 1, totalPages: 1 };
-const tenant = makeTenant();
 
 describe('toPostListModule', () => {
   it('maps headingBlock straight through', () => {
     const raw = makeRawPostListModule();
 
-    const module = toPostListModule(raw, rawPosts, pagination, tenant);
+    const module = toPostListModule(raw, rawPosts, pagination);
 
     expect(module.headingBlock).toEqual({
       heading: 'Latest',
@@ -29,7 +27,7 @@ describe('toPostListModule', () => {
       brandVariant: BRAND_VARIANT.SECONDARY,
     });
 
-    const module = toPostListModule(raw, rawPosts, pagination, tenant);
+    const module = toPostListModule(raw, rawPosts, pagination);
 
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
@@ -39,7 +37,7 @@ describe('toPostListModule', () => {
       brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
     });
 
-    const module = toPostListModule(raw, rawPosts, pagination, tenant);
+    const module = toPostListModule(raw, rawPosts, pagination);
 
     expect(module.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
   });
@@ -47,7 +45,7 @@ describe('toPostListModule', () => {
   it('leaves every headingBlock field undefined when the field itself is unset (no faked default)', () => {
     const raw = makeRawPostListModule({ headingBlock: null });
 
-    const module = toPostListModule(raw, rawPosts, pagination, tenant);
+    const module = toPostListModule(raw, rawPosts, pagination);
 
     expect(module.headingBlock).toEqual({
       heading: undefined,
@@ -58,7 +56,7 @@ describe('toPostListModule', () => {
   it('leaves contentAlignment undefined when unset (no faked default)', () => {
     const raw = makeRawPostListModule({ contentAlignment: null });
 
-    const module = toPostListModule(raw, rawPosts, pagination, tenant);
+    const module = toPostListModule(raw, rawPosts, pagination);
 
     expect(module.contentAlignment).toBeUndefined();
   });
@@ -68,7 +66,7 @@ describe('toPostListModule', () => {
       contentAlignment: CONTENT_ALIGNMENT.RIGHT,
     });
 
-    const module = toPostListModule(raw, rawPosts, pagination, tenant);
+    const module = toPostListModule(raw, rawPosts, pagination);
 
     expect(module.contentAlignment).toBe(CONTENT_ALIGNMENT.RIGHT);
   });
@@ -84,7 +82,7 @@ describe('toPostListModule', () => {
       },
     });
 
-    const module = toPostListModule(raw, rawPosts, pagination, tenant);
+    const module = toPostListModule(raw, rawPosts, pagination);
 
     expect(module.layout).toEqual({
       spacingTop: 'MD',
@@ -98,7 +96,7 @@ describe('toPostListModule', () => {
   it('leaves layout undefined when the field is unset (no faked default)', () => {
     const raw = makeRawPostListModule({ layout: null });
 
-    const module = toPostListModule(raw, rawPosts, pagination, tenant);
+    const module = toPostListModule(raw, rawPosts, pagination);
 
     expect(module.layout).toBeUndefined();
   });
@@ -106,7 +104,7 @@ describe('toPostListModule', () => {
   it('maps posts through toPostCard', () => {
     const raw = makeRawPostListModule();
 
-    const module = toPostListModule(raw, rawPosts, pagination, tenant);
+    const module = toPostListModule(raw, rawPosts, pagination);
 
     expect(module.posts).toEqual([]);
   });
@@ -114,15 +112,10 @@ describe('toPostListModule', () => {
   it('maps currentPage/totalPages straight through', () => {
     const raw = makeRawPostListModule();
 
-    const module = toPostListModule(
-      raw,
-      rawPosts,
-      {
-        currentPage: 2,
-        totalPages: 5,
-      },
-      tenant,
-    );
+    const module = toPostListModule(raw, rawPosts, {
+      currentPage: 2,
+      totalPages: 5,
+    });
 
     expect(module.currentPage).toBe(2);
     expect(module.totalPages).toBe(5);
@@ -131,7 +124,7 @@ describe('toPostListModule', () => {
   it('passes showImages through when true', () => {
     const raw = makeRawPostListModule({ showImages: true });
 
-    const module = toPostListModule(raw, rawPosts, pagination, tenant);
+    const module = toPostListModule(raw, rawPosts, pagination);
 
     expect(module.showImages).toBe(true);
   });
@@ -139,7 +132,7 @@ describe('toPostListModule', () => {
   it('passes showImages through when false', () => {
     const raw = makeRawPostListModule({ showImages: false });
 
-    const module = toPostListModule(raw, rawPosts, pagination, tenant);
+    const module = toPostListModule(raw, rawPosts, pagination);
 
     expect(module.showImages).toBe(false);
   });

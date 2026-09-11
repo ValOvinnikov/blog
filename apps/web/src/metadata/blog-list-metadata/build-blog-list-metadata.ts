@@ -1,6 +1,7 @@
 import { routes } from '@blog/config';
 import { toMetadata } from '@web/metadata/to-metadata';
 import { getBlogListPage } from '@web/server/blog-list/get-blog-list-page';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
@@ -21,9 +22,10 @@ export const buildBlogListMetadata = async (
   page: number,
   tenant: string,
 ): Promise<Metadata> => {
-  const [result, t] = await Promise.all([
+  const [result, t, tenantContext] = await Promise.all([
     getBlogListPage(tenant),
     getTranslations('pagination'),
+    getTenantSanityContext(tenant),
   ]);
 
   if (!result.ok) {
@@ -50,7 +52,7 @@ export const buildBlogListMetadata = async (
             : undefined,
         };
 
-  return toMetadata(resolvedSeo, {
+  return toMetadata(resolvedSeo, tenantContext, {
     canonical: routes.blogIndex(page),
     ogType: 'website',
     feedUrl: routes.rssFeed(),

@@ -1,6 +1,6 @@
 import { q } from '@blog/service/sanity/query';
 
-import { imageWithAltFragment } from './image';
+import { sanityImageFragment } from './image';
 import { socialLinkFragment } from './social-link';
 
 // `profilePage` is optional and restricted to `page_landing` in the schema
@@ -13,7 +13,7 @@ export const authorCardFragment = q
   .project((sub) => ({
     _id: true,
     name: sub.field('name').notNull(),
-    image: sub.field('image').project(imageWithAltFragment).nullable(true),
+    image: sub.field('image').project(sanityImageFragment).nullable(true),
     profilePage: sub
       .field('profilePage')
       .deref()
@@ -28,7 +28,7 @@ export const authorDetailFragment = q
   .project((sub) => ({
     _id: true,
     name: sub.field('name').notNull(),
-    image: sub.field('image').project(imageWithAltFragment).nullable(true),
+    image: sub.field('image').project(sanityImageFragment).nullable(true),
     profilePage: sub
       .field('profilePage')
       .deref()

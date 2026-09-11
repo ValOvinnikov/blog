@@ -8,7 +8,7 @@ export const makeSeo = (
     description: 'Example description.',
     ogTitle: 'Example OG Title',
     ogDescription: 'Example OG description.',
-    ogImageUrl: undefined,
+    ogImage: undefined,
     ...overrides,
   };
 };

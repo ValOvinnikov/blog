@@ -1,5 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import { imageWithAltFragment } from '@blog/service/shared/fragments/image';
+import { sanityImageFragment } from '@blog/service/shared/fragments/image';
 
 export const siteSettingsQuery = q.star
   .filterByType('settings_site')
@@ -16,7 +16,7 @@ export const siteSettingsQuery = q.star
             separator: sl.field('separator').notNull(),
           }))
           .nullable(true),
-        logo: b.field('logo').project(imageWithAltFragment).nullable(true),
+        logo: b.field('logo').project(sanityImageFragment).nullable(true),
       }))
       .notNull(),
     description: sub.field('description').notNull(),

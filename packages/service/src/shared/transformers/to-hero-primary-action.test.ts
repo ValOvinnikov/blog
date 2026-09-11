@@ -1,11 +1,10 @@
 import { CTA_ACTION_APPEARANCE } from '@blog/config';
 import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
 
 import { toHeroPrimaryAction } from './to-hero-primary-action';
 
-const post = toPostCard(makeRawPostCard(), makeTenant());
+const post = toPostCard(makeRawPostCard());
 
 describe(toHeroPrimaryAction, () => {
   it('returns undefined when there is no post to link to', () => {

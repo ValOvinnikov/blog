@@ -1,6 +1,4 @@
 import type { TMaybeUndefined } from '@blog/config';
-import type { TImageTenant } from '@blog/service/sanity/image';
-import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
 import { toModule } from '@blog/service/shared/transformers/to-module';
 import { toPortableTextBody } from '@blog/service/shared/transformers/to-portable-text-body';
@@ -17,25 +15,12 @@ import type { TPostDetail, TPostDetailAuthor, TPostSkim } from './types';
 
 export type TRawPostDetail = NonNullable<InferResultType<typeof postPageQuery>>;
 
-// PostMeta renders the author avatar at SIZE.SM (32px, `avatar-variants.ts`)
-// — 64px covers a 2x DPR display without serving the source asset's full
-// natural resolution.
-const AUTHOR_AVATAR_SIZE_PX = 64;
-
-function toPostDetailAuthor(
-  raw: TRawPostDetail['author'],
-  tenant: TImageTenant,
-): TPostDetailAuthor {
+function toPostDetailAuthor(raw: TRawPostDetail['author']): TPostDetailAuthor {
   return {
     id: raw._id,
     name: raw.name,
     profilePageSlug: raw.profilePage?.slug ?? undefined,
-    imageUrl: buildImageUrl(raw.image, tenant, {
-      width: AUTHOR_AVATAR_SIZE_PX,
-      height: AUTHOR_AVATAR_SIZE_PX,
-      fit: 'crop',
-      quality: 75,
-    }),
+    image: toSanityImage(raw.image),
     role: raw.role ?? undefined,
     bio: raw.bio ?? undefined,
     socialLinks: (raw.socialLinks ?? []).map(toSocialLink),
@@ -54,11 +39,7 @@ function toPostSkim(raw: TRawPostDetail['skim']): TMaybeUndefined<TPostSkim> {
   };
 }
 
-export function toPostDetail(
-  raw: TRawPostDetail,
-  tenant: TImageTenant,
-): TPostDetail {
-  const heroImageUrl = buildImageUrl(raw.heroImage, tenant);
+export function toPostDetail(raw: TRawPostDetail): TPostDetail {
   const { title, excerpt } = toPostHeading(raw.headingBlock);
 
   return {
@@ -67,15 +48,13 @@ export function toPostDetail(
     slug: raw.slug,
     excerpt,
     publishedAt: raw.publishedAt,
-    heroImageUrl,
-    heroImageAlt: raw.heroImage?.alt,
-    heroImageSanity: toSanityImage(raw.heroImageAsset, tenant),
+    heroImage: toSanityImage(raw.heroImage),
     featured: raw.featured ?? false,
-    body: toPortableTextBody(raw.body, tenant),
+    body: toPortableTextBody(raw.body),
     skim: toPostSkim(raw.skim),
     hasAsides: raw.body.some((block) => block._type === 'aside'),
-    seo: resolveSeo(raw.seo, tenant),
-    author: toPostDetailAuthor(raw.author, tenant),
+    seo: resolveSeo(raw.seo),
+    author: toPostDetailAuthor(raw.author),
     topic: toTopic(raw.topic),
     tags: (raw.tags ?? []).map(toTag),
     modules: (raw.modules ?? []).map(toModule),

@@ -1,13 +1,28 @@
-import type { TPostDetail } from '@blog/service';
+import { type TPostDetail, urlForSanityImage } from '@blog/service';
+import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { buildPostMetadata } from './build-post-metadata';
 
-const { getPostPageMock } = vi.hoisted(() => ({ getPostPageMock: vi.fn() }));
+const { getPostPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+  getPostPageMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
+}));
 
 vi.mock('@web/server/post/get-post-page', () => ({
   getPostPage: getPostPageMock,
 }));
+
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
+}));
+
+const ogImage = makeSanityImage();
+const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
+  ogImage,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+);
 
 const basePost: TPostDetail = {
   id: 'post-1',
@@ -15,9 +30,7 @@ const basePost: TPostDetail = {
   slug: 'hello-world',
   excerpt: 'A sufficiently long excerpt for the card.',
   publishedAt: '2026-01-15T00:00:00Z',
-  heroImageUrl: 'https://cdn.example.com/hero.jpg',
-  heroImageAlt: 'A hero image',
-  heroImageSanity: undefined,
+  heroImage: ogImage,
   featured: false,
   body: [],
   skim: undefined,
@@ -28,13 +41,13 @@ const basePost: TPostDetail = {
     description: 'A sufficiently long excerpt for the card.',
     ogTitle: 'Hello World OG',
     ogDescription: 'A sufficiently long excerpt for the card OG.',
-    ogImageUrl: 'https://cdn.example.com/hero.jpg',
+    ogImage,
   }),
   author: {
     id: 'author-1',
     name: 'Jane Doe',
     profilePageSlug: 'jane-doe',
-    imageUrl: undefined,
+    image: undefined,
     role: undefined,
     bio: undefined,
     socialLinks: [],
@@ -52,6 +65,8 @@ const basePost: TPostDetail = {
 describe('buildPostMetadata', () => {
   beforeEach(() => {
     getPostPageMock.mockReset();
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('forwards the slug and tenant to getPostPage — the same cached loader BlogPostPage reads', async () => {
@@ -98,7 +113,7 @@ describe('buildPostMetadata', () => {
       'A sufficiently long excerpt for the card OG.',
     );
     expect(metadata.openGraph?.images).toEqual([
-      { url: 'https://cdn.example.com/hero.jpg' },
+      { url: EXPECTED_OG_IMAGE_URL },
     ]);
   });
 

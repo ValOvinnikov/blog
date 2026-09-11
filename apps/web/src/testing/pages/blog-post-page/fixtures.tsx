@@ -1,5 +1,10 @@
 import type { TPostDetail } from '@blog/service';
-import { AUTHOR_IMAGE_URL } from '@web/testing/shared/author/fixtures';
+import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+
+export const POST_DETAIL_AUTHOR_IMAGE = makeSanityImage({
+  assetId: 'image-6205dacc42424f7a83d8e20a7000d895f7cdc7de-400x400-jpg',
+  alt: 'Jane Doe',
+});
 
 export const mockPostDetail: TPostDetail = {
   id: 'post-1',
@@ -7,9 +12,7 @@ export const mockPostDetail: TPostDetail = {
   slug: 'hello-world',
   excerpt: 'A sufficiently long excerpt for the card.',
   publishedAt: '2026-01-15T00:00:00Z',
-  heroImageUrl: 'https://cdn.example.com/hero.jpg',
-  heroImageAlt: 'A hero image',
-  heroImageSanity: undefined,
+  heroImage: makeSanityImage({ alt: 'A hero image' }),
   featured: false,
   body: [
     {
@@ -27,13 +30,13 @@ export const mockPostDetail: TPostDetail = {
     description: 'A sufficiently long excerpt for the card.',
     ogTitle: 'Hello World',
     ogDescription: 'A sufficiently long excerpt for the card.',
-    ogImageUrl: 'https://cdn.example.com/hero.jpg',
+    ogImage: makeSanityImage({ alt: 'A hero image' }),
   },
   author: {
     id: 'author-1',
     name: 'Jane Doe',
     profilePageSlug: 'jane-doe',
-    imageUrl: AUTHOR_IMAGE_URL,
+    image: POST_DETAIL_AUTHOR_IMAGE,
     role: 'Writer',
     bio: [
       {

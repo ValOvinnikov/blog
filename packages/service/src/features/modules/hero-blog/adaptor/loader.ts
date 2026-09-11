@@ -33,5 +33,5 @@ export async function getHeroBlog(
     ),
   });
 
-  return toHeroBlogModule(raw, tenant);
+  return toHeroBlogModule(raw);
 }

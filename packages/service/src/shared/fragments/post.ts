@@ -3,7 +3,7 @@ import { requiredHeadingBlockFragment } from '@blog/service/shared/fragments/hea
 import { moduleFragment } from '@blog/service/shared/fragments/module';
 
 import { authorCardFragment, authorDetailFragment } from './author';
-import { imageWithAltFragment, sanityImageFragment } from './image';
+import { sanityImageFragment } from './image';
 import { portableTextBodyItemFragment } from './portable-text-body';
 import { seoFragment } from './seo';
 import { tagFragment } from './tag';
@@ -28,10 +28,6 @@ export const postCardFragment = q
     publishedAt: sub.field('publishedAt').notNull(),
     heroImage: sub
       .field('heroImage')
-      .project(imageWithAltFragment)
-      .nullable(true),
-    heroImageAsset: sub
-      .field('heroImage')
       .project(sanityImageFragment)
       .nullable(true),
     featured: sub.field('featured').nullable(true),
@@ -51,10 +47,6 @@ export const postDetailFragment = q
     slug: sub.field('slug.current').notNull(),
     publishedAt: sub.field('publishedAt').notNull(),
     heroImage: sub
-      .field('heroImage')
-      .project(imageWithAltFragment)
-      .nullable(true),
-    heroImageAsset: sub
       .field('heroImage')
       .project(sanityImageFragment)
       .nullable(true),

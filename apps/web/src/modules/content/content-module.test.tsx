@@ -65,58 +65,28 @@ describe(`<${ContentModule.name}/>`, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("renders a body image against its own image's cdnBaseUrl, not another tenant's", async () => {
-    const bodyForTenantA: TPortableTextBody = [
+  it('renders a body image resolving through the Sanity CDN', async () => {
+    const body: TPortableTextBody = [
       {
         _type: 'bodyImage',
         _key: 'image-1',
         layout: undefined,
-        image: makeSanityImage({
-          alt: 'A scenic mountain range',
-          cdnBaseUrl: 'https://cdn.sanity.io/images/tenant-a/production/',
-        }),
-      },
-    ];
-    const bodyForTenantB: TPortableTextBody = [
-      {
-        _type: 'bodyImage',
-        _key: 'image-1',
-        layout: undefined,
-        image: makeSanityImage({
-          alt: 'A scenic mountain range',
-          cdnBaseUrl: 'https://cdn.sanity.io/images/tenant-b/staging/',
-        }),
+        image: makeSanityImage({ alt: 'A scenic mountain range' }),
       },
     ];
 
-    getContentMock.mockResolvedValueOnce({
+    getContentMock.mockResolvedValue({
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        body: bodyForTenantA,
+        body,
         layout: undefined,
       },
     });
-    const { container: containerA } = await setup();
-    const imgA = within(containerA).getByRole('img', {
+    const { container } = await setup();
+    const img = within(container).getByRole('img', {
       name: 'A scenic mountain range',
     });
-    expect(imgA.getAttribute('src')).toContain('tenant-a/production');
-    expect(imgA.getAttribute('src')).not.toContain('tenant-b/staging');
-
-    getContentMock.mockResolvedValueOnce({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        body: bodyForTenantB,
-        layout: undefined,
-      },
-    });
-    const { container: containerB } = await setup();
-    const imgB = within(containerB).getByRole('img', {
-      name: 'A scenic mountain range',
-    });
-    expect(imgB.getAttribute('src')).toContain('tenant-b/staging');
-    expect(imgB.getAttribute('src')).not.toContain('tenant-a/production');
+    expect(img.getAttribute('src')).toContain('cdn.sanity.io');
   });
 });

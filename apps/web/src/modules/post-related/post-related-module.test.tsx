@@ -190,7 +190,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock({ heading: 'Related reading' }),
-        posts: [makePost({ heroImageSanity: sanityImage })],
+        posts: [makePost({ heroImage: sanityImage })],
         layout: undefined,
         contentAlignment: undefined,
         showImages: true,
@@ -210,7 +210,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
         headingBlock: makeHeadingBlock({ heading: 'Related reading' }),
-        posts: [makePost({ heroImageSanity: makeSanityImage() })],
+        posts: [makePost({ heroImage: makeSanityImage() })],
         layout: undefined,
         contentAlignment: undefined,
         showImages: false,

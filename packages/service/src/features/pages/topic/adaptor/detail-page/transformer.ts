@@ -1,4 +1,3 @@
-import type { TImageTenant } from '@blog/service/sanity/image';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import {
@@ -13,10 +12,7 @@ import type { TTopicDetailPage } from './types';
 
 export type TRawTopicPage = NonNullable<InferResultType<typeof topicPageQuery>>;
 
-export function toTopicDetailPage(
-  rawPage: TRawTopicPage,
-  tenant: TImageTenant,
-): TTopicDetailPage {
+export function toTopicDetailPage(rawPage: TRawTopicPage): TTopicDetailPage {
   const topic = toTopic(rawPage.topic);
   const headingBlock = toHeadingBlock(rawPage.headingBlock);
 
@@ -28,6 +24,6 @@ export function toTopicDetailPage(
     },
     hero: toHeroSlot(rawPage.hero),
     modules: (rawPage.modules ?? []).map(toModule),
-    seo: resolveSeo(rawPage.seo, tenant),
+    seo: resolveSeo(rawPage.seo),
   };
 }

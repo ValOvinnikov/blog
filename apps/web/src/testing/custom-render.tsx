@@ -1,10 +1,9 @@
-import { SITE_MESSAGES } from '@blog/config';
 import {
   render as rtlRender,
   type RenderOptions,
   type RenderResult,
 } from '@testing-library/react';
-import { NextIntlClientProvider } from 'next-intl';
+import { AppProviders } from '@web/testing/providers';
 import {
   createElement,
   type ComponentType,
@@ -12,17 +11,7 @@ import {
   type ReactNode,
 } from 'react';
 
-/**
- * Mounts the same NextIntlClientProvider the app layout provides, with the
- * real catalog messages — so a client component reading `useTranslations`
- * renders its actual copy under test instead of throwing/falling back on a
- * missing-message error.
- */
-const Providers = ({ children }: { children: ReactNode }) => (
-  <NextIntlClientProvider locale="en" messages={SITE_MESSAGES}>
-    {children}
-  </NextIntlClientProvider>
-);
+const Providers = AppProviders;
 
 type TRenderOpts = Omit<RenderOptions, 'wrapper'>;
 

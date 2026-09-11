@@ -1,4 +1,8 @@
-import type { TSeoResolved } from '@blog/service';
+import {
+  type TSanityProjectRef,
+  type TSeoResolved,
+  urlForSanityImage,
+} from '@blog/service';
 import type { Metadata } from 'next';
 
 type TToMetadataOptions = {
@@ -19,16 +23,20 @@ type TToMetadataOptions = {
  * inheriting a parent segment's value.
  *
  * @example
- * return toMetadata(result.data.seo, { canonical: '/', ogType: 'website', titleAbsolute: true });
+ * return toMetadata(result.data.seo, tenantContext, { canonical: '/', ogType: 'website', titleAbsolute: true });
  */
 export const toMetadata = (
   seo: TSeoResolved,
+  project: TSanityProjectRef,
   opts: TToMetadataOptions,
 ): Metadata => {
   const { canonical, ogType, titleAbsolute, feedUrl, article } = opts;
-  const ogImages = seo.ogImageUrl ? [{ url: seo.ogImageUrl }] : undefined;
-  const twitterImages = seo.ogImageUrl ? [seo.ogImageUrl] : undefined;
-  const twitterCard = seo.ogImageUrl ? 'summary_large_image' : 'summary';
+  const ogImageUrl = seo.ogImage
+    ? urlForSanityImage(seo.ogImage, project)
+    : undefined;
+  const ogImages = ogImageUrl ? [{ url: ogImageUrl }] : undefined;
+  const twitterImages = ogImageUrl ? [ogImageUrl] : undefined;
+  const twitterCard = ogImageUrl ? 'summary_large_image' : 'summary';
 
   return {
     title: titleAbsolute ? { absolute: seo.title } : seo.title,

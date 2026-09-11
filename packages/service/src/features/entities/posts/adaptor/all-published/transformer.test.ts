@@ -46,7 +46,7 @@ describe(toAllPublishedPosts, () => {
     const [result] = toAllPublishedPosts([makeRawFeedPost()]);
 
     expect(result).not.toHaveProperty('author');
-    expect(result).not.toHaveProperty('heroImageUrl');
+    expect(result).not.toHaveProperty('heroImage');
     expect(result).not.toHaveProperty('topic');
     expect(result).not.toHaveProperty('readingTimeMinutes');
   });

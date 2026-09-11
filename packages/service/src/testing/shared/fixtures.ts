@@ -1,4 +1,3 @@
-import type { imageWithAltFragment } from '@blog/service/shared/fragments/image';
 import type { TRawSeo } from '@blog/service/shared/transformers/resolve-seo';
 import type {
   TRawHeadingBlock,
@@ -6,9 +5,6 @@ import type {
 } from '@blog/service/shared/transformers/to-heading-block';
 import type { TRawPostLink } from '@blog/service/shared/transformers/to-post-link';
 import type { TRawSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
-import type { InferFragmentType } from 'groqd';
-
-type TRawImage = InferFragmentType<typeof imageWithAltFragment>;
 
 export function makeRawHeadingBlock(
   heading: string,
@@ -28,16 +24,6 @@ export function makeRawOptionalHeadingBlock(
     heading: null,
     supportingText: null,
     ...overrides,
-  };
-}
-
-export function makeRawImage(alt = 'Alt text'): TRawImage {
-  return {
-    _type: 'imageWithAlt',
-    asset: { _ref: 'image-abc123-800x600-jpg', _type: 'reference' },
-    alt,
-    hotspot: null,
-    crop: null,
   };
 }
 

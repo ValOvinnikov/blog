@@ -1,21 +1,13 @@
-import type { TBrand } from '@blog/service';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { BrandLockupLink } from './brand-lockup-link';
-
-const brand: TBrand = {
-  name: 'Field Notes',
-  specLine: 'engineering journal',
-  logoUrl: undefined,
-  logoAsset: undefined,
-};
 
 const meta = {
   title: 'Components/BrandLockupLink',
   component: BrandLockupLink,
   tags: ['autodocs'],
   parameters: { layout: 'centered' },
-  args: { brand },
+  args: { logoUrl: undefined, specLine: 'engineering journal' },
 } satisfies Meta<typeof BrandLockupLink>;
 
 export default meta;
@@ -25,5 +17,5 @@ export const Default: TStory = {};
 
 /** No `specLine` — the mark renders alone, with no monospace line beneath it. */
 export const NoSpecLine: TStory = {
-  args: { brand: { ...brand, specLine: undefined } },
+  args: { specLine: undefined },
 };

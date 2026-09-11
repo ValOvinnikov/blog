@@ -21,5 +21,5 @@ export async function getPostFeatured(
     ),
   });
 
-  return toPostFeaturedModule(raw, tenant);
+  return toPostFeaturedModule(raw);
 }

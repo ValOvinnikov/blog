@@ -23,5 +23,5 @@ export async function getTopicPage(
   });
   if (!rawPage) return undefined;
 
-  return toTopicDetailPage(rawPage, tenant);
+  return toTopicDetailPage(rawPage);
 }

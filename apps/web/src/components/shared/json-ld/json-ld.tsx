@@ -31,7 +31,7 @@ const escapeJsonForScript = (json: string): string => {
  * serialized object, never raw HTML.
  *
  * @example
- * <JsonLd schema={buildBlogPostingSchema(post, siteUrl)} />
+ * <JsonLd schema={buildBlogPostingSchema(post, siteUrl, tenantContext)} />
  */
 export const JsonLd = ({ schema }: TJsonLdProps) => {
   const serialized = escapeJsonForScript(JSON.stringify(schema));

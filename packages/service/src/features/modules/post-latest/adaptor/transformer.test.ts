@@ -6,7 +6,6 @@ import {
 } from '@blog/config';
 import { makeRawPostLatestModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
 
 import {
   toPostLatestModule,
@@ -14,13 +13,12 @@ import {
 } from './transformer';
 
 const rawPosts: TRawPostLatestModulePosts = [];
-const tenant = makeTenant();
 
 describe('toPostLatestModule', () => {
   it('maps headingBlock straight through', () => {
     const raw = makeRawPostLatestModule();
 
-    const module = toPostLatestModule(raw, rawPosts, tenant);
+    const module = toPostLatestModule(raw, rawPosts);
 
     expect(module.headingBlock).toEqual({
       heading: 'Latest',
@@ -33,7 +31,7 @@ describe('toPostLatestModule', () => {
       brandVariant: BRAND_VARIANT.SECONDARY,
     });
 
-    const module = toPostLatestModule(raw, rawPosts, tenant);
+    const module = toPostLatestModule(raw, rawPosts);
 
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
@@ -41,7 +39,7 @@ describe('toPostLatestModule', () => {
   it('leaves every headingBlock field undefined when the field itself is unset (no faked default)', () => {
     const raw = makeRawPostLatestModule({ headingBlock: null });
 
-    const module = toPostLatestModule(raw, rawPosts, tenant);
+    const module = toPostLatestModule(raw, rawPosts);
 
     expect(module.headingBlock).toEqual({
       heading: undefined,
@@ -52,7 +50,7 @@ describe('toPostLatestModule', () => {
   it('leaves contentAlignment undefined when unset (no faked default)', () => {
     const raw = makeRawPostLatestModule({ contentAlignment: null });
 
-    const module = toPostLatestModule(raw, rawPosts, tenant);
+    const module = toPostLatestModule(raw, rawPosts);
 
     expect(module.contentAlignment).toBeUndefined();
   });
@@ -62,7 +60,7 @@ describe('toPostLatestModule', () => {
       contentAlignment: CONTENT_ALIGNMENT.RIGHT,
     });
 
-    const module = toPostLatestModule(raw, rawPosts, tenant);
+    const module = toPostLatestModule(raw, rawPosts);
 
     expect(module.contentAlignment).toBe(CONTENT_ALIGNMENT.RIGHT);
   });
@@ -78,7 +76,7 @@ describe('toPostLatestModule', () => {
       },
     });
 
-    const module = toPostLatestModule(raw, rawPosts, tenant);
+    const module = toPostLatestModule(raw, rawPosts);
 
     expect(module.layout).toEqual({
       spacingTop: 'MD',
@@ -92,7 +90,7 @@ describe('toPostLatestModule', () => {
   it('leaves layout undefined when the field is unset (no faked default)', () => {
     const raw = makeRawPostLatestModule({ layout: null });
 
-    const module = toPostLatestModule(raw, rawPosts, tenant);
+    const module = toPostLatestModule(raw, rawPosts);
 
     expect(module.layout).toBeUndefined();
   });
@@ -100,11 +98,7 @@ describe('toPostLatestModule', () => {
   it('maps posts through toPostCard', () => {
     const raw = makeRawPostLatestModule();
 
-    const module = toPostLatestModule(
-      raw,
-      [makeRawPostCard({ _id: 'a' })],
-      tenant,
-    );
+    const module = toPostLatestModule(raw, [makeRawPostCard({ _id: 'a' })]);
 
     expect(module.posts.map((p) => p.id)).toEqual(['a']);
   });
@@ -112,7 +106,7 @@ describe('toPostLatestModule', () => {
   it('returns an empty posts array when nothing resolves', () => {
     const raw = makeRawPostLatestModule();
 
-    const module = toPostLatestModule(raw, rawPosts, tenant);
+    const module = toPostLatestModule(raw, rawPosts);
 
     expect(module.posts).toEqual([]);
   });
@@ -120,7 +114,7 @@ describe('toPostLatestModule', () => {
   it('passes showImages through when true', () => {
     const raw = makeRawPostLatestModule({ showImages: true });
 
-    const module = toPostLatestModule(raw, rawPosts, tenant);
+    const module = toPostLatestModule(raw, rawPosts);
 
     expect(module.showImages).toBe(true);
   });
@@ -128,7 +122,7 @@ describe('toPostLatestModule', () => {
   it('passes showImages through when false', () => {
     const raw = makeRawPostLatestModule({ showImages: false });
 
-    const module = toPostLatestModule(raw, rawPosts, tenant);
+    const module = toPostLatestModule(raw, rawPosts);
 
     expect(module.showImages).toBe(false);
   });
@@ -138,7 +132,7 @@ describe('toPostLatestModule', () => {
       displayMode: DISPLAY_MODE.CAROUSEL,
     });
 
-    const module = toPostLatestModule(raw, rawPosts, tenant);
+    const module = toPostLatestModule(raw, rawPosts);
 
     expect(module.displayMode).toBe(DISPLAY_MODE.CAROUSEL);
   });
@@ -146,7 +140,7 @@ describe('toPostLatestModule', () => {
   it('passes the read-time GRID default through when the field is absent from the document', () => {
     const raw = makeRawPostLatestModule({ displayMode: DISPLAY_MODE.GRID });
 
-    const module = toPostLatestModule(raw, rawPosts, tenant);
+    const module = toPostLatestModule(raw, rawPosts);
 
     expect(module.displayMode).toBe(DISPLAY_MODE.GRID);
   });

@@ -11,7 +11,6 @@ const sanityImage: ISanityImage = {
   crop: undefined,
   lqip: undefined,
   dimensions: { width: 800, height: 600, aspectRatio: 800 / 600 },
-  cdnBaseUrl: 'https://cdn.sanity.io/images/test-project/test-dataset/',
 };
 
 const RenderPostLeadImageHarness = ({
@@ -21,7 +20,7 @@ const RenderPostLeadImageHarness = ({
 }) => <>{renderPostLeadImage(post)}</>;
 
 const setup = customRender(RenderPostLeadImageHarness, {
-  post: makePostCard({ heroImageSanity: sanityImage }),
+  post: makePostCard({ heroImage: sanityImage }),
 });
 
 describe('renderPostLeadImage', () => {
@@ -40,7 +39,7 @@ describe('renderPostLeadImage', () => {
   });
 
   it('renders nothing for a post with no hero image', () => {
-    setup({ post: makePostCard({ heroImageSanity: undefined }) });
+    setup({ post: makePostCard({ heroImage: undefined }) });
 
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });

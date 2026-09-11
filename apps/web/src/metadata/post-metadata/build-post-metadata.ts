@@ -1,6 +1,7 @@
 import { routes } from '@blog/config';
 import { toMetadata } from '@web/metadata/to-metadata';
 import { getPostPage } from '@web/server/post/get-post-page';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 
@@ -15,7 +16,10 @@ export const buildPostMetadata = async (
   slug: string,
   tenant: string,
 ): Promise<Metadata> => {
-  const result = await getPostPage(slug, tenant);
+  const [result, tenantContext] = await Promise.all([
+    getPostPage(slug, tenant),
+    getTenantSanityContext(tenant),
+  ]);
 
   if (!result.ok) {
     logger.error('post_metadata.fetch_failed', { slug, error: result.error });
@@ -28,7 +32,7 @@ export const buildPostMetadata = async (
 
   const { seo, publishedAt, author } = result.data;
 
-  return toMetadata(seo, {
+  return toMetadata(seo, tenantContext, {
     canonical: routes.post(slug),
     ogType: 'article',
     article: {

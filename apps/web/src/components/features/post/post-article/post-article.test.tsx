@@ -1,19 +1,26 @@
 import type { ISanityImage, TPortableTextBody } from '@blog/config';
+import { urlForSanityImage } from '@blog/service';
 import userEvent from '@testing-library/user-event';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
-import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
+import {
+  mockPostDetail,
+  POST_DETAIL_AUTHOR_IMAGE,
+} from '@web/testing/pages/blog-post-page/fixtures';
 import {
   richTextBlock,
   richTextSpan,
 } from '@web/testing/shared/portable-text-renderer/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
 import { PostArticle } from './post-article';
 
-const { getPostPageMock, getTenantBaseUrlMock } = vi.hoisted(() => ({
-  getPostPageMock: vi.fn(),
-  getTenantBaseUrlMock: vi.fn(),
-}));
+const { getPostPageMock, getTenantBaseUrlMock, getTenantSanityContextMock } =
+  vi.hoisted(() => ({
+    getPostPageMock: vi.fn(),
+    getTenantBaseUrlMock: vi.fn(),
+    getTenantSanityContextMock: vi.fn(),
+  }));
 
 vi.mock('@web/server/post/get-post-page', () => ({
   getPostPage: getPostPageMock,
@@ -21,6 +28,10 @@ vi.mock('@web/server/post/get-post-page', () => ({
 
 vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
   getTenantBaseUrl: getTenantBaseUrlMock,
+}));
+
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
 }));
 
 // `BookmarkButtonGate` is itself an async Server Component — real RSC
@@ -60,6 +71,8 @@ describe(`<${PostArticle.name}/>`, () => {
     getPostPageMock.mockReset();
     getTenantBaseUrlMock.mockReset();
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('calls notFound() without logging when no page_post matches the slug', async () => {
@@ -101,7 +114,7 @@ describe(`<${PostArticle.name}/>`, () => {
   it('renders the bookmark button and share links in the header meta strip even for a post with no tags or hero image', async () => {
     getPostPageMock.mockResolvedValue({
       ok: true,
-      data: { ...mockPostDetail, tags: [], heroImageSanity: undefined },
+      data: { ...mockPostDetail, tags: [], heroImage: undefined },
     });
 
     await setup();
@@ -168,25 +181,40 @@ describe(`<${PostArticle.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('renders the hero image using its own cdnBaseUrl, not a hardcoded origin', async () => {
-    const heroImageSanity: ISanityImage = {
+  it('renders the hero image with its own alt text', async () => {
+    const heroImage: ISanityImage = {
       assetId: 'image-abc123-1600x1200-jpg',
       alt: 'A scenic mountain range',
       hotspot: { x: 0.5, y: 0.5, width: 1, height: 1 },
       crop: undefined,
       lqip: undefined,
       dimensions: { width: 1600, height: 1200, aspectRatio: 1600 / 1200 },
-      cdnBaseUrl: 'https://cdn.sanity.io/images/tenant-project/production/',
     };
     getPostPageMock.mockResolvedValue({
       ok: true,
-      data: { ...mockPostDetail, heroImageSanity },
+      data: { ...mockPostDetail, heroImage },
     });
 
     await setup();
 
-    const img = screen.getByRole('img', { name: mockPostDetail.heroImageAlt });
-    expect(img.getAttribute('src')).toContain('tenant-project/production');
+    expect(screen.getByRole('img', { name: heroImage.alt })).toBeVisible();
+  });
+
+  it('builds the author avatar at a fixed 64x64 crop (2x the 32px SIZE.SM avatar), never the source asset at full resolution', async () => {
+    getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
+
+    await setup();
+
+    const expectedAvatarUrl = urlForSanityImage(
+      POST_DETAIL_AUTHOR_IMAGE,
+      DEFAULT_TENANT_SANITY_CONTEXT,
+      { width: 64, height: 64, fit: 'crop', quality: 75 },
+    );
+
+    expect(screen.getByAltText('Jane Doe')).toHaveAttribute(
+      'src',
+      expectedAvatarUrl,
+    );
   });
 
   it('renders no PostContentsRail (and stays single-column) when the body has fewer than 3 H2 headings', async () => {

@@ -1,6 +1,7 @@
 import { JsonLd } from '@web/components/shared/json-ld';
 import { getPostPage } from '@web/server/post/get-post-page';
 import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { buildBlogPostingSchema } from '@web/utils/build-blog-posting-schema';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 
@@ -20,8 +21,11 @@ export const BlogPostingSchema = async ({
     'blog_posting_schema.fetch_failed',
     { slug },
   );
-  const siteUrl = (await getTenantBaseUrl(tenant)) ?? '';
-  const schema = buildBlogPostingSchema(post, siteUrl);
+  const [siteUrl, tenantContext] = await Promise.all([
+    getTenantBaseUrl(tenant).then((url) => url ?? ''),
+    getTenantSanityContext(tenant),
+  ]);
+  const schema = buildBlogPostingSchema(post, siteUrl, tenantContext);
 
   return schema ? <JsonLd schema={schema} /> : null;
 };

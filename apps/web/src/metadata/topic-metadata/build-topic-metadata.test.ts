@@ -1,26 +1,42 @@
+import { urlForSanityImage } from '@blog/service';
+import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { buildTopicMetadata } from './build-topic-metadata';
 
-const { getTopicPageMock } = vi.hoisted(() => ({
+const { getTopicPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
   getTopicPageMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@web/server/topic/get-topic-page', () => ({
   getTopicPage: getTopicPageMock,
 }));
 
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
+}));
+
+const ogImage = makeSanityImage();
+const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
+  ogImage,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+);
+
 const seo = makeSeo({
   title: 'Engineering',
   description: 'Posts about building things.',
   ogTitle: 'Engineering OG',
   ogDescription: 'Posts about building things OG.',
-  ogImageUrl: 'https://cdn.example.com/engineering-og.jpg',
+  ogImage,
 });
 
 describe('buildTopicMetadata', () => {
   beforeEach(() => {
     getTopicPageMock.mockReset();
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('forwards the slug and tenant to getTopicPage — the same cached loader TopicPage reads', async () => {
@@ -49,6 +65,9 @@ describe('buildTopicMetadata', () => {
     expect(metadata.openGraph?.description).toBe(
       'Posts about building things OG.',
     );
+    expect(metadata.openGraph?.images).toEqual([
+      { url: EXPECTED_OG_IMAGE_URL },
+    ]);
   });
 
   it('returns empty metadata when the topic fetch fails', async () => {

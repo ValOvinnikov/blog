@@ -1,4 +1,3 @@
-import type { TImageTenant } from '@blog/service/sanity/image';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
@@ -22,12 +21,11 @@ export function toPostListModule(
   raw: TRawPostListModule,
   rawPosts: TRawPostListModulePosts,
   pagination: TPostListModulePagination,
-  tenant: TImageTenant,
 ): TPostListModule {
   return {
     brandVariant: raw.brandVariant,
     headingBlock: toHeadingBlock(raw.headingBlock),
-    posts: rawPosts.map((rawPost) => toPostCard(rawPost, tenant)),
+    posts: rawPosts.map((rawPost) => toPostCard(rawPost)),
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,
     showImages: raw.showImages,

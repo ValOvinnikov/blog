@@ -1,4 +1,3 @@
-import type { TImageTenant } from '@blog/service/sanity/image';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import {
@@ -30,7 +29,6 @@ export function toRelatedPosts(
   byTopic: TRawRelatedByTopic,
   currentTagIds: string[],
   limit: number,
-  tenant: TImageTenant,
 ): TPostCard[] {
   const ranked = byTags
     .map((raw) => ({
@@ -46,7 +44,7 @@ export function toRelatedPosts(
       return b.raw.publishedAt.localeCompare(a.raw.publishedAt);
     })
     .slice(0, limit)
-    .map(({ raw }) => toPostCard(raw, tenant));
+    .map(({ raw }) => toPostCard(raw));
 
   if (ranked.length >= limit) return ranked;
 
@@ -54,7 +52,7 @@ export function toRelatedPosts(
   const backfill = byTopic
     .filter((raw) => !rankedIds.has(raw._id))
     .slice(0, limit - ranked.length)
-    .map((raw) => toPostCard(raw, tenant));
+    .map((raw) => toPostCard(raw));
 
   return [...ranked, ...backfill];
 }

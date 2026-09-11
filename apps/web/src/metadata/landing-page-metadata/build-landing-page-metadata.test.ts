@@ -1,18 +1,35 @@
-import { mockLandingPage } from '@web/testing/pages/landing-page/fixtures';
+import { urlForSanityImage } from '@blog/service';
+import {
+  LANDING_PAGE_OG_IMAGE,
+  mockLandingPage,
+} from '@web/testing/pages/landing-page/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { buildLandingPageMetadata } from './build-landing-page-metadata';
 
-const { getLandingPageMock } = vi.hoisted(() => ({
+const { getLandingPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
   getLandingPageMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@web/server/landing/get-landing-page', () => ({
   getLandingPage: getLandingPageMock,
 }));
 
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
+}));
+
+const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
+  LANDING_PAGE_OG_IMAGE,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+);
+
 describe('buildLandingPageMetadata', () => {
   beforeEach(() => {
     getLandingPageMock.mockReset();
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('forwards the slug and tenant to getLandingPage — the same cached loader LandingPage reads', async () => {
@@ -34,7 +51,7 @@ describe('buildLandingPageMetadata', () => {
     expect(metadata.openGraph?.title).toBe('About Us OG');
     expect(metadata.openGraph?.description).toBe('Who we are OG.');
     expect(metadata.openGraph?.images).toEqual([
-      { url: 'https://cdn.example.com/about-og.jpg' },
+      { url: EXPECTED_OG_IMAGE_URL },
     ]);
   });
 

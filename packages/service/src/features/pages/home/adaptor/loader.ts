@@ -18,5 +18,5 @@ export async function getHomePage(
   });
   if (!raw) return undefined;
 
-  return toHomePage(raw, tenant);
+  return toHomePage(raw);
 }

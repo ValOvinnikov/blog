@@ -13,11 +13,8 @@ import {
   makeRawHeadingBlock,
   makeRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
 
 import { toHeroBlogModule } from './transformer';
-
-const tenant = makeTenant();
 
 describe(toHeroBlogModule, () => {
   it('maps brandVariant and variant straight through', () => {
@@ -26,7 +23,7 @@ describe(toHeroBlogModule, () => {
       variant: HERO_VARIANT.BANNER,
     });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
     expect(hero.variant).toBe(HERO_VARIANT.BANNER);
@@ -40,7 +37,7 @@ describe(toHeroBlogModule, () => {
       }),
     });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.heading).toBe('Pinned title');
     expect(hero.primaryAction?.href).toBe('/blog/hello-world');
@@ -54,7 +51,7 @@ describe(toHeroBlogModule, () => {
       }),
     });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.heading).toBe('Newest featured title');
     expect(hero.primaryAction?.href).toBe('/blog/hello-world');
@@ -63,7 +60,7 @@ describe(toHeroBlogModule, () => {
   it('has no derived copy, image or primary action when no post resolves at all', () => {
     const raw = makeRawHeroBlogModule({ post: null });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.eyebrow).toBeUndefined();
     expect(hero.heading).toBeUndefined();
@@ -80,7 +77,7 @@ describe(toHeroBlogModule, () => {
       supportingText: null,
     });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.eyebrow).toBe('Engineering');
     expect(hero.heading).toBe('Hello World');
@@ -97,7 +94,7 @@ describe(toHeroBlogModule, () => {
       supportingText: 'Custom supporting text.',
     });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.eyebrow).toBe('Field notes');
     expect(hero.heading).toBe('Custom heading');
@@ -111,7 +108,7 @@ describe(toHeroBlogModule, () => {
       image: makeRawSanityImage('Custom alt'),
     });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.sanityImage?.assetId).toBe('image-abc123-800x600-jpg');
     expect(hero.sanityImage?.alt).toBe('Alt text');
@@ -124,7 +121,7 @@ describe(toHeroBlogModule, () => {
       image: makeRawSanityImage('Custom alt'),
     });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.sanityImage?.alt).toBe('Custom alt');
   });
@@ -136,7 +133,7 @@ describe(toHeroBlogModule, () => {
       image: makeRawSanityImage(),
     });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.sanityImage).toBeUndefined();
   });
@@ -147,7 +144,7 @@ describe(toHeroBlogModule, () => {
       primaryActionLabel: null,
     });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.primaryAction).toEqual({
       label: 'Read more',
@@ -164,7 +161,7 @@ describe(toHeroBlogModule, () => {
       primaryActionLabel: 'Discover the story',
     });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.primaryAction).toMatchObject({
       label: 'Discover the story',
@@ -180,7 +177,7 @@ describe(toHeroBlogModule, () => {
         primaryActionAppearance: appearance,
       });
 
-      const hero = toHeroBlogModule(raw, tenant);
+      const hero = toHeroBlogModule(raw);
 
       expect(hero.primaryAction?.appearance).toBe(appearance);
     },
@@ -192,7 +189,7 @@ describe(toHeroBlogModule, () => {
       primaryActionAppearance: null,
     });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.primaryAction?.appearance).toBeUndefined();
   });
@@ -200,7 +197,7 @@ describe(toHeroBlogModule, () => {
   it('leaves secondaryAction undefined when unset', () => {
     const raw = makeRawHeroBlogModule({ secondaryAction: null });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.secondaryAction).toBeUndefined();
   });
@@ -222,7 +219,7 @@ describe(toHeroBlogModule, () => {
       },
     });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.secondaryAction).toEqual({
       variant: CTA_ACTION_VARIANT.SECONDARY,
@@ -244,7 +241,7 @@ describe(toHeroBlogModule, () => {
       contentPositionBanner: CONTENT_ALIGNMENT.LEFT,
     });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.contentPosition).toBe(CONTENT_ALIGNMENT.RIGHT);
   });
@@ -256,7 +253,7 @@ describe(toHeroBlogModule, () => {
       contentPositionBanner: CONTENT_ALIGNMENT.CENTER,
     });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.contentPosition).toBe(CONTENT_ALIGNMENT.CENTER);
   });
@@ -268,7 +265,7 @@ describe(toHeroBlogModule, () => {
       contentPositionBanner: CONTENT_ALIGNMENT.CENTER,
     });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.contentPosition).toBeUndefined();
   });
@@ -276,7 +273,7 @@ describe(toHeroBlogModule, () => {
   it('leaves contentAlignment undefined when unset', () => {
     const raw = makeRawHeroBlogModule({ contentAlignment: null });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.contentAlignment).toBeUndefined();
   });
@@ -286,7 +283,7 @@ describe(toHeroBlogModule, () => {
       contentAlignment: CONTENT_ALIGNMENT.CENTER,
     });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.contentAlignment).toBe(CONTENT_ALIGNMENT.CENTER);
   });
@@ -298,7 +295,7 @@ describe(toHeroBlogModule, () => {
       mediaOrderStacked: MEDIA_ORDER.LAST,
     });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.mediaOrder).toBe(MEDIA_ORDER.FIRST);
   });
@@ -310,7 +307,7 @@ describe(toHeroBlogModule, () => {
       mediaOrderStacked: MEDIA_ORDER.LAST,
     });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.mediaOrder).toBe(MEDIA_ORDER.LAST);
   });
@@ -322,7 +319,7 @@ describe(toHeroBlogModule, () => {
       mediaOrderStacked: MEDIA_ORDER.FIRST,
     });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.mediaOrder).toBeUndefined();
   });
@@ -330,7 +327,7 @@ describe(toHeroBlogModule, () => {
   it('leaves layout undefined when unset (no faked default)', () => {
     const raw = makeRawHeroBlogModule({ layout: null });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.layout).toBeUndefined();
   });
@@ -345,7 +342,7 @@ describe(toHeroBlogModule, () => {
       },
     });
 
-    const hero = toHeroBlogModule(raw, tenant);
+    const hero = toHeroBlogModule(raw);
 
     expect(hero.layout).toEqual({
       spacingTop: 'LG',

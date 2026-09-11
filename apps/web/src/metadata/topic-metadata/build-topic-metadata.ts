@@ -1,5 +1,6 @@
 import { routes } from '@blog/config';
 import { toMetadata } from '@web/metadata/to-metadata';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { getTopicPage } from '@web/server/topic/get-topic-page';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
@@ -19,9 +20,10 @@ export const buildTopicMetadata = async (
   tenant: string,
   pageNumber?: number,
 ): Promise<Metadata> => {
-  const [result, t] = await Promise.all([
+  const [result, t, tenantContext] = await Promise.all([
     getTopicPage(slug, tenant),
     getTranslations('pagination'),
+    getTenantSanityContext(tenant),
   ]);
 
   if (!result.ok) {
@@ -48,7 +50,7 @@ export const buildTopicMetadata = async (
             : undefined,
         };
 
-  return toMetadata(resolvedSeo, {
+  return toMetadata(resolvedSeo, tenantContext, {
     canonical: routes.topic(slug, pageNumber),
     ogType: 'website',
   });

@@ -1,5 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import { makeRawImage } from '@blog/service/testing/shared/fixtures';
+import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
 
 import { authorCardFragment, authorDetailFragment } from './author';
 
@@ -30,12 +30,12 @@ describe('authorCardFragment', () => {
     const raw = {
       _id: 'author-1',
       name: 'Jane Doe',
-      image: makeRawImage('Jane avatar'),
+      image: makeRawSanityImage('Jane avatar'),
       profilePage: null,
     };
 
     expect(authorCardDocQuery.parse(raw)?.image).toEqual(
-      makeRawImage('Jane avatar'),
+      makeRawSanityImage('Jane avatar'),
     );
   });
 });

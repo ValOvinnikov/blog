@@ -1,5 +1,11 @@
 import type { ISanityImage } from '@blog/config';
-import { customRender, screen } from '@web/testing/custom-render';
+import { SanityImageBaseUrlProvider } from '@web/context/sanity-image-base-url-provider';
+import {
+  customRender,
+  renderElement,
+  screen,
+} from '@web/testing/custom-render';
+import { STATIC_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
 
 import { SanityImage } from './sanity-image';
 
@@ -10,7 +16,6 @@ const image: ISanityImage = {
   crop: undefined,
   lqip: undefined,
   dimensions: { width: 800, height: 600, aspectRatio: 800 / 600 },
-  cdnBaseUrl: 'https://cdn.sanity.io/images/test-project/test-dataset/',
 };
 
 const setup = customRender(SanityImage, {
@@ -31,17 +36,26 @@ describe(`<${SanityImage.name}/>`, () => {
     expect(img.getAttribute('srcset')).toContain('cdn.sanity.io');
   });
 
-  it("forwards the image's own cdnBaseUrl to the rendered src/srcset, not a hardcoded origin", () => {
-    setup({
-      image: {
-        ...image,
-        cdnBaseUrl: 'https://cdn.sanity.io/images/other-project/other-dataset/',
-      },
-    });
+  it('renders against the tenant baseUrl supplied by the surrounding SanityImageBaseUrlProvider, not a hardcoded origin', () => {
+    const otherBaseUrl =
+      'https://cdn.sanity.io/images/other-project/other-dataset/';
+
+    renderElement(
+      <SanityImageBaseUrlProvider baseUrl={otherBaseUrl}>
+        <SanityImage image={image} width={960} height={720} />
+      </SanityImageBaseUrlProvider>,
+    );
 
     const img = screen.getByRole('img', { name: image.alt });
     expect(img.getAttribute('src')).toContain('other-project/other-dataset');
     expect(img.getAttribute('srcset')).toContain('other-project/other-dataset');
+  });
+
+  it('renders against the default test baseUrl when no override provider is nested', () => {
+    setup();
+
+    const img = screen.getByRole('img', { name: image.alt });
+    expect(img.getAttribute('src')).toContain(STATIC_SANITY_IMAGE_BASE_URL);
   });
 
   it('falls back to the image alt text when no override is provided', () => {

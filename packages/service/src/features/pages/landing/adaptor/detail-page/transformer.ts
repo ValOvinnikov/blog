@@ -1,4 +1,3 @@
-import type { TImageTenant } from '@blog/service/sanity/image';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import {
@@ -14,15 +13,12 @@ export type TRawLandingPage = NonNullable<
   InferResultType<typeof landingPageQuery>
 >;
 
-export function toLandingPage(
-  raw: TRawLandingPage,
-  tenant: TImageTenant,
-): TLandingPage {
+export function toLandingPage(raw: TRawLandingPage): TLandingPage {
   return {
     slug: raw.slug,
     headingBlock: toHeadingBlock(raw.headingBlock),
     hero: toHeroSlot(raw.hero),
     modules: (raw.modules ?? []).map(toModule),
-    seo: resolveSeo(raw.seo, tenant),
+    seo: resolveSeo(raw.seo),
   };
 }

@@ -174,12 +174,12 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
           makePost({
             id: 'post-1',
             title: 'Lead post',
-            heroImageSanity: makeSanityImage({ alt: 'Lead image' }),
+            heroImage: makeSanityImage({ alt: 'Lead image' }),
           }),
           makePost({
             id: 'post-2',
             title: 'Second post',
-            heroImageSanity: makeSanityImage({ alt: 'Tail image' }),
+            heroImage: makeSanityImage({ alt: 'Tail image' }),
           }),
         ],
         layout: undefined,
@@ -217,7 +217,7 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
         posts: [
           makePost({
             id: 'post-1',
-            heroImageSanity: makeSanityImage(),
+            heroImage: makeSanityImage(),
           }),
         ],
         layout: undefined,

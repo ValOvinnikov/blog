@@ -28,7 +28,7 @@ export const makeTagDetailPage = (
       description: 'Posts about TypeScript.',
       ogTitle: 'TypeScript',
       ogDescription: 'Posts about TypeScript.',
-      ogImageUrl: undefined,
+      ogImage: undefined,
     },
     ...overrides,
   };

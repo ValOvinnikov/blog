@@ -14,7 +14,6 @@ import {
 } from '@blog/service/testing/entities/fixtures';
 import {
   makeRawHeadingBlock,
-  makeRawImage,
   makeRawOptionalHeadingBlock,
   makeRawSanityImage,
   makeRawSeo,
@@ -26,7 +25,7 @@ export function makeRawAuthor(
   return {
     _id: 'author-1',
     name: 'Jane Doe',
-    image: makeRawImage('Jane avatar'),
+    image: makeRawSanityImage('Jane avatar'),
     profilePage: null,
     role: 'Writer',
     bio: null,
@@ -45,13 +44,12 @@ export function makeRawPostCard(
     }),
     slug: 'hello-world',
     publishedAt: '2026-01-15T00:00:00Z',
-    heroImage: makeRawImage(),
-    heroImageAsset: makeRawSanityImage(),
+    heroImage: makeRawSanityImage(),
     featured: false,
     author: {
       _id: 'author-1',
       name: 'Jane Doe',
-      image: makeRawImage('Jane avatar'),
+      image: makeRawSanityImage('Jane avatar'),
       profilePage: null,
     },
     topic: {
@@ -98,8 +96,7 @@ export function makeRawPostDetail(
     }),
     slug: 'hello-world',
     publishedAt: '2026-01-15T00:00:00Z',
-    heroImage: makeRawImage(),
-    heroImageAsset: makeRawSanityImage(),
+    heroImage: makeRawSanityImage(),
     featured: false,
     body: [],
     skim: null,
