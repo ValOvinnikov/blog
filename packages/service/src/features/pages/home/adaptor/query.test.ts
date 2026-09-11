@@ -16,6 +16,12 @@ describe('homePageQuery', () => {
     expect(() => homePageQuery.parse(raw)).not.toThrow();
   });
 
+  it('rejects a home page with no authored SEO', () => {
+    const raw = { ...makeRawHomePage(), seo: null };
+
+    expect(() => homePageQuery.parse(raw)).toThrow();
+  });
+
   it('parses null as no matching page_home document, rather than throwing', () => {
     expect(homePageQuery.parse(null)).toBeNull();
   });
