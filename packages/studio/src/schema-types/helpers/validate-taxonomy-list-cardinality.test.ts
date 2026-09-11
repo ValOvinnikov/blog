@@ -18,7 +18,7 @@ const buildDocument = (
   modules,
 });
 
-describe('validateSingleTaxonomyListModule', () => {
+describe(validateSingleTaxonomyListModule, () => {
   it('passes with no modules', () => {
     expect(validateSingleTaxonomyListModule(undefined)).toBe(true);
   });
@@ -54,7 +54,7 @@ describe('validateSingleTaxonomyListModule', () => {
   });
 });
 
-describe('validateHasTaxonomyListModule', () => {
+describe(validateHasTaxonomyListModule, () => {
   const warning = 'This page has no Taxonomy List module.';
 
   it('warns with the supplied message when no module is referenced', () => {
