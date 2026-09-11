@@ -1,10 +1,10 @@
+import {
+  SEO_META_TITLE_MAX_LENGTH,
+  SEO_META_TITLE_MIN_LENGTH,
+} from '@blog/config';
 import { defineField, defineType } from 'sanity';
 
 import { openGraphSchema } from './open-graph';
-
-/** Must stay in sync with the backfill migration's own copy of these bounds. */
-export const SEO_META_TITLE_MIN_LENGTH = 30;
-export const SEO_META_TITLE_MAX_LENGTH = 60;
 
 export const seoSchema = defineType({
   name: 'seo',

@@ -1,9 +1,12 @@
 import {
+  SEO_META_TITLE_MAX_LENGTH,
+  SEO_META_TITLE_MIN_LENGTH,
+} from '@blog/config';
+
+import {
   buildEntityPageMetaTitle,
   buildHeadingMetaTitle,
   buildIndexPageMetaTitle,
-  META_TITLE_MAX_LENGTH,
-  META_TITLE_MIN_LENGTH,
 } from './build-meta-title';
 
 const BRAND = 'valstack.dev';
@@ -42,7 +45,7 @@ describe(buildHeadingMetaTitle, () => {
     const result = buildHeadingMetaTitle(heading, BRAND);
 
     expect(result).toBeDefined();
-    expect(result?.length).toBeLessThanOrEqual(META_TITLE_MAX_LENGTH);
+    expect(result?.length).toBeLessThanOrEqual(SEO_META_TITLE_MAX_LENGTH);
     expect(result).toBe('x'.repeat(60));
   });
 
@@ -50,8 +53,8 @@ describe(buildHeadingMetaTitle, () => {
     const result = buildHeadingMetaTitle('AI', 'X', TAGLINE);
 
     expect(result).toBeDefined();
-    expect(result?.length).toBeGreaterThanOrEqual(META_TITLE_MIN_LENGTH);
-    expect(result?.length).toBeLessThanOrEqual(META_TITLE_MAX_LENGTH);
+    expect(result?.length).toBeGreaterThanOrEqual(SEO_META_TITLE_MIN_LENGTH);
+    expect(result?.length).toBeLessThanOrEqual(SEO_META_TITLE_MAX_LENGTH);
     expect(result).toContain('AI');
     expect(result).toContain(TAGLINE);
   });
@@ -102,7 +105,7 @@ describe(buildEntityPageMetaTitle, () => {
     const result = buildEntityPageMetaTitle('SEO', BRAND);
 
     expect(result).toBe('SEO — Articles on valstack.dev');
-    expect(result).toHaveLength(META_TITLE_MIN_LENGTH);
+    expect(result).toHaveLength(SEO_META_TITLE_MIN_LENGTH);
   });
 
   it('pads every known page_tag subject within 30–60', () => {
@@ -128,8 +131,8 @@ describe(buildEntityPageMetaTitle, () => {
       const result = buildEntityPageMetaTitle(tag, BRAND);
 
       expect(result).toBeDefined();
-      expect(result?.length).toBeGreaterThanOrEqual(META_TITLE_MIN_LENGTH);
-      expect(result?.length).toBeLessThanOrEqual(META_TITLE_MAX_LENGTH);
+      expect(result?.length).toBeGreaterThanOrEqual(SEO_META_TITLE_MIN_LENGTH);
+      expect(result?.length).toBeLessThanOrEqual(SEO_META_TITLE_MAX_LENGTH);
     }
   });
 
@@ -155,8 +158,8 @@ describe(buildEntityPageMetaTitle, () => {
     const result = buildEntityPageMetaTitle('AI', 'X', TAGLINE);
 
     expect(result).toBeDefined();
-    expect(result?.length).toBeGreaterThanOrEqual(META_TITLE_MIN_LENGTH);
-    expect(result?.length).toBeLessThanOrEqual(META_TITLE_MAX_LENGTH);
+    expect(result?.length).toBeGreaterThanOrEqual(SEO_META_TITLE_MIN_LENGTH);
+    expect(result?.length).toBeLessThanOrEqual(SEO_META_TITLE_MAX_LENGTH);
     expect(result).toContain(TAGLINE);
   });
 

@@ -1,8 +1,8 @@
 import {
   SEO_META_TITLE_MAX_LENGTH,
   SEO_META_TITLE_MIN_LENGTH,
-  seoSchema,
-} from '@blog/studio/schema-types/objects/seo';
+} from '@blog/config';
+import { seoSchema } from '@blog/studio/schema-types/objects/seo';
 
 type TCallLog = { method: string; args: unknown[] }[];
 

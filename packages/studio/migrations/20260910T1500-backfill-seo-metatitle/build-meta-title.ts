@@ -1,25 +1,24 @@
+import {
+  SEO_META_TITLE_MAX_LENGTH,
+  SEO_META_TITLE_MIN_LENGTH,
+} from '@blog/config';
+
 /**
  * Pure title-construction helpers for the `seo.metaTitle` backfill. Kept
  * dependency-free (no `sanity/migrate` imports) so they're testable without a
- * migration context. Must stay in sync with `../../src/schema-types/objects/seo.ts`'s
- * `SEO_META_TITLE_MIN_LENGTH` / `SEO_META_TITLE_MAX_LENGTH` — duplicated here
- * rather than imported, matching this repo's convention of keeping migrations
- * self-contained from the schema module graph.
+ * migration context.
  */
-export const META_TITLE_MIN_LENGTH = 30;
-export const META_TITLE_MAX_LENGTH = 60;
-
 const clampToMax = (text: string): string =>
-  text.length > META_TITLE_MAX_LENGTH
-    ? text.slice(0, META_TITLE_MAX_LENGTH).trimEnd()
+  text.length > SEO_META_TITLE_MAX_LENGTH
+    ? text.slice(0, SEO_META_TITLE_MAX_LENGTH).trimEnd()
     : text;
 
 const isWithinRange = (text: string): boolean =>
-  text.length >= META_TITLE_MIN_LENGTH;
+  text.length >= SEO_META_TITLE_MIN_LENGTH;
 
 /**
  * Appends `pads` to `subject` one at a time, in order, until the result
- * clears `META_TITLE_MIN_LENGTH`; returns `undefined` when every pad is
+ * clears `SEO_META_TITLE_MIN_LENGTH`; returns `undefined` when every pad is
  * exhausted and it's still short, rather than returning an invalid title.
  */
 const composeWithPads = (
