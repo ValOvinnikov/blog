@@ -22,6 +22,7 @@ import type {
 } from '@blog/service/features/modules/cta/adaptor/transformer';
 import type { TRawHeroModule } from '@blog/service/features/modules/hero/adaptor/transformer';
 import type { TRawHeroBlogModule } from '@blog/service/features/modules/hero-blog/adaptor/transformer';
+import type { TRawHeroStatementModule } from '@blog/service/features/modules/hero-statement/adaptor/transformer';
 import type { TRawNewsletterModule } from '@blog/service/features/modules/newsletter/adaptor/transformer';
 import type { TRawPostFeaturedModule } from '@blog/service/features/modules/post-featured/adaptor/transformer';
 import type { TRawPostLatestModule } from '@blog/service/features/modules/post-latest/adaptor/transformer';
@@ -72,6 +73,27 @@ export function makeRawHeroBlogModule(
     secondaryAction: null,
     variant: HERO_VARIANT.SPLIT,
     brandVariant: BRAND_VARIANT.PRIMARY,
+    contentPositionSplit: null,
+    contentPositionBanner: null,
+    contentAlignment: null,
+    mediaOrderSplit: null,
+    mediaOrderStacked: null,
+    layout: null,
+    ...overrides,
+  };
+}
+
+export function makeRawHeroStatementModule(
+  overrides: Partial<TRawHeroStatementModule> = {},
+): TRawHeroStatementModule {
+  return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
+    variant: HERO_VARIANT.SPLIT,
+    eyebrow: null,
+    heading: 'Statement heading',
+    supportingText: null,
+    image: null,
+    actions: null,
     contentPositionSplit: null,
     contentPositionBanner: null,
     contentAlignment: null,

@@ -1,13 +1,11 @@
 import {
   HERO_IMAGE_SOURCE,
-  HERO_VARIANT,
   type ISanityImage,
-  type TContentAlignment,
   type TMaybeUndefined,
-  type TMediaOrder,
 } from '@blog/config';
 import type { TImageTenant } from '@blog/service/sanity/image';
 import { toCtaAction } from '@blog/service/shared/transformers/to-cta-action';
+import { toHeroPresentation } from '@blog/service/shared/transformers/to-hero-presentation';
 import { toHeroPrimaryAction } from '@blog/service/shared/transformers/to-hero-primary-action';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import {
@@ -21,30 +19,6 @@ import type { heroBlogModuleQuery } from './query';
 import type { THeroBlogModule } from './types';
 
 export type TRawHeroBlogModule = InferResultType<typeof heroBlogModuleQuery>;
-
-function toContentPosition(
-  raw: TRawHeroBlogModule,
-): TMaybeUndefined<TContentAlignment> {
-  switch (raw.variant) {
-    case HERO_VARIANT.SPLIT:
-      return raw.contentPositionSplit ?? undefined;
-    case HERO_VARIANT.BANNER:
-      return raw.contentPositionBanner ?? undefined;
-    case HERO_VARIANT.STACKED:
-      return undefined;
-  }
-}
-
-function toMediaOrder(raw: TRawHeroBlogModule): TMaybeUndefined<TMediaOrder> {
-  switch (raw.variant) {
-    case HERO_VARIANT.SPLIT:
-      return raw.mediaOrderSplit ?? undefined;
-    case HERO_VARIANT.STACKED:
-      return raw.mediaOrderStacked ?? undefined;
-    case HERO_VARIANT.BANNER:
-      return undefined;
-  }
-}
 
 function toImage(
   raw: TRawHeroBlogModule,
@@ -66,6 +40,7 @@ export function toHeroBlogModule(
   tenant: TImageTenant,
 ): THeroBlogModule {
   const post = raw.post ? toPostCard(raw.post, tenant) : undefined;
+  const { contentPosition, mediaOrder } = toHeroPresentation(raw);
 
   return {
     brandVariant: raw.brandVariant,
@@ -82,9 +57,9 @@ export function toHeroBlogModule(
     secondaryAction: raw.secondaryAction
       ? toCtaAction(raw.secondaryAction)
       : undefined,
-    contentPosition: toContentPosition(raw),
+    contentPosition,
     contentAlignment: raw.contentAlignment ?? undefined,
-    mediaOrder: toMediaOrder(raw),
+    mediaOrder,
     layout: toLayout(raw.layout),
   };
 }
