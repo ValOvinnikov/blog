@@ -27,5 +27,6 @@ export function toPostLatestModule(
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,
     showImages: raw.showImages,
+    displayMode: raw.displayMode,
   };
 }

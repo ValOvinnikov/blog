@@ -241,5 +241,10 @@
       "saveToastSuccessMessage": "Display name updated.",
       "saveError": "Couldn't update your display name. Try again."
     }
+  },
+  "carousel": {
+    "previousAriaLabel": "Previous slide",
+    "nextAriaLabel": "Next slide",
+    "regionLabel": "{title} carousel"
   }
 }

@@ -3,6 +3,7 @@ import {
   CTA_ACTION_APPEARANCE,
   CTA_ACTION_VARIANT,
   CTA_VARIANT,
+  DISPLAY_MODE,
   HERO_FIELD_MODE,
   HERO_IMAGE_SOURCE,
   HERO_VARIANT,
@@ -105,6 +106,7 @@ export function makeRawPostLatestModule(
     layout: null,
     contentAlignment: null,
     showImages: true,
+    displayMode: DISPLAY_MODE.GRID,
     ...overrides,
   };
 }
@@ -121,6 +123,7 @@ export function makeRawPostFeaturedModule(
     layout: null,
     contentAlignment: null,
     showImages: true,
+    displayMode: DISPLAY_MODE.GRID,
     ...overrides,
   };
 }

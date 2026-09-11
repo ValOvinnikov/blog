@@ -29,5 +29,6 @@ export function toPostFeaturedModule(
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,
     showImages: raw.showImages,
+    displayMode: raw.displayMode,
   };
 }

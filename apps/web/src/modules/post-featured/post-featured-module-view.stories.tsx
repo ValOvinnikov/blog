@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
+import { BRAND_VARIANT, CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
@@ -44,6 +44,10 @@ const meta = {
       control: 'select',
       options: Object.values(CONTENT_ALIGNMENT),
     },
+    displayMode: {
+      control: 'select',
+      options: Object.values(DISPLAY_MODE),
+    },
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
@@ -54,6 +58,7 @@ const meta = {
     titleId: 'featured-posts-title',
     dataTestId: 'post-featured-module-featured-1',
     accessibleTitle: 'Featured posts',
+    displayMode: DISPLAY_MODE.GRID,
   },
 } satisfies Meta<typeof PostFeaturedModuleView>;
 

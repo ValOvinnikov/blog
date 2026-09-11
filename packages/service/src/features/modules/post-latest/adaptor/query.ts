@@ -1,4 +1,8 @@
 import { q } from '@blog/service/sanity/query';
+import {
+  DISPLAY_MODE_EXPRESSION,
+  displayModeParser,
+} from '@blog/service/shared/fragments/display-mode';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { layoutFragment } from '@blog/service/shared/fragments/layout';
 import {
@@ -21,5 +25,6 @@ export const postLatestModuleQuery = q
     layout: sub.field('layout').project(layoutFragment).nullable(true),
     contentAlignment: sub.field('contentAlignment').nullable(true),
     showImages: sub.raw(SHOW_IMAGES_EXPRESSION, showImagesParser),
+    displayMode: sub.raw(DISPLAY_MODE_EXPRESSION, displayModeParser),
   }))
   .notNull();

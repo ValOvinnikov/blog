@@ -2,6 +2,7 @@ import {
   BRAND_VARIANT,
   CONTAINER_WIDTH,
   CONTENT_ALIGNMENT,
+  DISPLAY_MODE,
 } from '@blog/config';
 import { makeRawPostLatestModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
@@ -130,5 +131,23 @@ describe('toPostLatestModule', () => {
     const module = toPostLatestModule(raw, rawPosts, tenant);
 
     expect(module.showImages).toBe(false);
+  });
+
+  it('passes an authored CAROUSEL displayMode through', () => {
+    const raw = makeRawPostLatestModule({
+      displayMode: DISPLAY_MODE.CAROUSEL,
+    });
+
+    const module = toPostLatestModule(raw, rawPosts, tenant);
+
+    expect(module.displayMode).toBe(DISPLAY_MODE.CAROUSEL);
+  });
+
+  it('passes the read-time GRID default through when the field is absent from the document', () => {
+    const raw = makeRawPostLatestModule({ displayMode: DISPLAY_MODE.GRID });
+
+    const module = toPostLatestModule(raw, rawPosts, tenant);
+
+    expect(module.displayMode).toBe(DISPLAY_MODE.GRID);
   });
 });

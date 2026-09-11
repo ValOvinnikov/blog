@@ -37,6 +37,7 @@ export const PostFeaturedModule = async ({
     layout,
     contentAlignment,
     showImages,
+    displayMode,
   } = result.data;
 
   const leadPostId = posts[0]?.id;
@@ -60,6 +61,7 @@ export const PostFeaturedModule = async ({
       layout={layout}
       contentAlignment={contentAlignment}
       hasImages={showImages}
+      displayMode={displayMode}
       titleId={`featured-posts-${id}`}
       dataTestId={`post-featured-module-${id}`}
       accessibleTitle={t('fallbackHeading')}

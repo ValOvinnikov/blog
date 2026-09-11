@@ -36,6 +36,9 @@ export const VOICE_FIXED_KEYS = [
   'accountPage.identity.displayNameAriaLabel',
   'taxonomyListModule.topics.latestPostsLabel',
   'taxonomyListModule.tags.latestPostsLabel',
+  'carousel.previousAriaLabel',
+  'carousel.nextAriaLabel',
+  'carousel.regionLabel',
 
   // Archive/breadcrumb labels read only as the post list's accessible name,
   // or derived from Studio content rather than authored directly.
