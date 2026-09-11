@@ -902,6 +902,12 @@ One image, placed by the variant — no placement field:
   gains a third option, `mediaOrder: false`, which omits both media-order
   fields, the same shape as `image: false`.
 
+**The avatar has one size, and no field controls it.** `size-24 sm:size-32`
+is the design system's decision, the way every other module's presentation
+is; an editor-facing size radio would be a per-instance knob with no content
+meaning, and a tenant that wants a larger portrait everywhere has the theme's
+density preset for that. Considered and rejected 2026-09-11.
+
 The tail's image rule carries over against the resolved image: `SPLIT` and
 `BANNER` need one (`NONE` is an error there; `AUTHOR` on an author with no
 image is a warning, as on `heroBlog`); `STACKED` with `NONE` renders no
