@@ -845,17 +845,17 @@ starter content already seeds one.
 
 Content fields first, then the shared tail:
 
-| Field             | Type                                                    | Notes                                                                                    |
-| ----------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `title`           | `titleField()`                                          | Editor-facing name, never rendered                                                       |
-| `author`          | reference → `blog_author`, required                     | The person                                                                               |
-| `eyebrow`         | string, max 40                                          | Empty renders the author's `role`; a role-less author renders no eyebrow                 |
-| `heading`         | string, max 120                                         | Empty renders the author's `name` — the page `<h1>` is the person's name by default      |
-| `supportingText`  | text, 3 rows                                            | Empty renders the author's bio as plain text (`pt::text()` of its first block)           |
-| `imageSource`     | `PROFILE_IMAGE_SOURCE` radio, required                  | `AUTHOR` (default) · `CUSTOM` · `NONE` — the author's avatar, a different photo, or none |
-| `image`           | `imageWithAlt`, hidden unless `CUSTOM`                  | Required when the source is custom                                                       |
-| `showSocialLinks` | boolean, `initialValue: true`                           | Whether the author's `socialLinks` render in the hero                                    |
-| _shared tail_     | `defineHeroFields({ image: false, mediaOrder: false })` | variant, brand variant, content position, alignment, actions, layout                     |
+| Field             | Type                                                           | Notes                                                                                    |
+| ----------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `title`           | `titleField()`                                                 | Editor-facing name, never rendered                                                       |
+| `author`          | reference → `blog_author`, required                            | The person                                                                               |
+| `eyebrow`         | string, max 40                                                 | Empty renders the author's `role`; a role-less author renders no eyebrow                 |
+| `heading`         | string, max 120                                                | Empty renders the author's `name` — the page `<h1>` is the person's name by default      |
+| `supportingText`  | text, 3 rows                                                   | Empty renders the author's bio as plain text (`pt::text()` of its first block)           |
+| `imageSource`     | `PROFILE_IMAGE_SOURCE` radio, required                         | `AUTHOR` (default) · `CUSTOM` · `NONE` — the author's avatar, a different photo, or none |
+| `image`           | `imageWithAlt`, hidden unless `CUSTOM`                         | Required when the source is custom                                                       |
+| `showSocialLinks` | boolean, `initialValue: true`                                  | Whether the author's `socialLinks` render in the hero                                    |
+| _shared tail_     | `defineHeroFields({ image: false, mediaOrderStacked: false })` | variant, brand variant, content position, alignment, Split media order, actions, layout  |
 
 **The three copy fields are the `heroBlog` pattern**: plain optional
 strings, unset means "the author's own", placeholder shows the derived
@@ -892,21 +892,16 @@ One image, placed by the variant — no placement field:
   rather than 16:9: a portrait crops well to a square and badly to a
   letterbox. `Hero.Media` gains a `ratio` prop (the `MediaFrame` ratios,
   default `video`) and the profile view passes `square`.
-- **`BANNER`** — the photo is the background, through #3071's finished
-  Banner (scrim by tone, on-image copy).
+- **`BANNER`** — the photo is the background, through the Banner finish #3071 delivers (scrim by tone, on-image copy).
 - **`STACKED`** — the photo is a **round avatar above the eyebrow**, the
   classic personal-site opening: a new `Hero.Avatar` slot renders inside the
   copy column before the eyebrow (so DOM order is avatar, eyebrow, `<h1>`),
-  `size-24 sm:size-32`, `rounded-full`, `object-cover`. It is not media, so
-  Stacked's media-order field has nothing to order — the tail therefore
-  gains a third option, `mediaOrder: false`, which omits both media-order
-  fields, the same shape as `image: false`.
+  `size-24 sm:size-32`, `rounded-full`, `object-cover`. It is not media, so Stacked's media-order field has nothing to order — the tail therefore gains a third option, `mediaOrderStacked: false`, which omits that one field, the same shape as `image: false`. Split keeps `mediaOrderSplit`: its photo is real media that collapses on mobile like every other kind's.
 
 **The avatar has one size, and no field controls it.** `size-24 sm:size-32`
 is the design system's decision, the way every other module's presentation
 is; an editor-facing size radio would be a per-instance knob with no content
-meaning, and a tenant that wants a larger portrait everywhere has the theme's
-density preset for that. Considered and rejected 2026-09-11.
+meaning, and a tenant that wants a larger portrait everywhere is a theme-level change, not a per-module one. Considered and rejected 2026-09-11.
 
 The tail's image rule carries over against the resolved image: `SPLIT` and
 `BANNER` need one (`NONE` is an error there; `AUTHOR` on an author with no
@@ -942,9 +937,7 @@ person's name, which is also what the page is about.
 | `showSocialLinks` on, author has no social links | Warning | This author has no social links yet, so none will show.        |
 | `actions` rule violations                        | Error   | (the shared `actionGroup` rules, unchanged)                    |
 
-No async dataset rule: everything derives from one referenced document, and
-the two warnings read it through the reference in the validator's own
-context.
+Both warnings are async, through `getDraftsClient(context)`, because a reference field's validation context carries only the `_ref` — the same mechanism `module_heroBlog`'s post checks use. Nothing else on this module depends on another document.
 
 ### Service
 
@@ -953,15 +946,15 @@ context.
 ```groq
 *[_type == "module_heroProfile" && _id == $id][0]{
   _id, brandVariant, variant, eyebrow, heading, supportingText,
-  imageSource, image{ …image },
+  imageSource, image{ ...imageWithAltFragment },
   "showSocialLinks": coalesce(showSocialLinks, true),
   author->{
     name, role, "bioText": pt::text(bio[0]),
-    image{ …image },
+    image{ ...imageWithAltFragment },
     socialLinks[]{ platform, url }
   },
-  actions{ actions[]{ …ctaAction } },
-  contentPositionSplit, contentPositionBanner, layout
+  actions{ actions[]{ ...ctaActionFragment } },
+  contentPositionSplit, contentPositionBanner, mediaOrderSplit, layout
 }
 ```
 
@@ -973,21 +966,18 @@ type THeroProfileModule = {
   eyebrow: TMaybeUndefined<string>;
   supportingText: TMaybeUndefined<string>;
   sanityImage: TMaybeUndefined<ISanityImage>;
-  socialLinks: TMaybeUndefined<readonly ILink[]>;
+  socialLinks: TMaybeUndefined<readonly TSocialLink[]>;
   actions: TMaybeUndefined<readonly TCtaAction[]>;
   contentPosition: TMaybeUndefined<TContentAlignment>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
+  mediaOrder: TMaybeUndefined<TMediaOrder>;
   layout: TMaybeUndefined<TLayout>;
 };
 ```
 
 `heading` is `heading ?? author.name`, always a string. `sanityImage`
 follows `imageSource` (`CUSTOM` → `image`, `AUTHOR` → `author.image`,
-`NONE` → `undefined`), the `heroBlog` transformer's branch. `socialLinks` is
-`undefined` when the toggle is off or the author has none, otherwise each
-entry is an `ILink` with `platform` set and `target: '_blank'`, through the
-same transformer the footer's links use. No `mediaOrder` on this kind.
-`contentPosition` collapses through `toHeroPresentation()` (#3073).
+`NONE` → `undefined`), the `heroBlog` transformer's branch. `socialLinks` is `undefined` when the toggle is off or the author has none, otherwise the author's entries through the existing `toSocialLink()` — `{ platform, url }`, the shape the post page's author byline already consumes; there is no label in the data, so the web view derives the accessible name from the platform. `contentPosition` and `mediaOrder` collapse through `toHeroPresentation()` (#3073); `mediaOrder` is set on Split only.
 
 **Cache tags:** `modules:heroProfile`, `module:<id>`, `author` (the
 dereference), plus the action link targets `page_landing`, `page_blog`,
@@ -1043,8 +1033,7 @@ Five implementation sub-issues under #2776:
   — own PR, first, additive.
 - **config** · `feat(config): PROFILE_IMAGE_SOURCE const` — no consumer
   until studio lands (knip), so it ships in the next PR, not alone.
-- **studio** · `feat(studio): module_heroProfile schema; defineHeroFields
-mediaOrder option` — the schema, the helper's third option,
+- **studio** · `feat(studio): module_heroProfile schema; defineHeroFields mediaOrderStacked option` — the schema, the helper's third option,
   `HERO_SCHEMA_TYPES`, desk, typegen.
 - **service** · `feat(service): heroProfile loader` — query, view model,
   tags; the social-link transformer shared with the footer.
@@ -2452,7 +2441,7 @@ point; the graph stays acyclic.
   `Hero.Media` on Split, the background on Banner), chosen by a new
   `PROFILE_IMAGE_SOURCE` mode; the author's social links behind a
   `showSocialLinks` toggle in a new `Hero.Social` slot; the tail gains
-  `mediaOrder: false`; ui alone, then config + studio + service + web as
+  `mediaOrderStacked: false`; ui alone, then config + studio + service + web as
   one PR (2026-09-11, #2808).
 
 ## Non-goals (recorded so #1919 doesn't sprawl)

@@ -1210,7 +1210,7 @@ implementation sub-issues. `service` returns a per-kind view model; the `ui`
   mode and placed by the variant (round `Hero.Avatar` on Stacked, square
   `Hero.Media` on Split, background on Banner); the author's social links
   behind `showSocialLinks` in a new `Hero.Social` slot; the tail gains
-  `mediaOrder: false`. Sub-issues: ui (slots + `Hero.Media` ratio, own PR,
+  `mediaOrderStacked: false`. Sub-issues: ui (slots + `Hero.Media` ratio, own PR,
   first), then config + studio + service + web as one PR.
 - **`module_heroProject`** stays with #1291 in M9 — it needs the `project`
   entity.
