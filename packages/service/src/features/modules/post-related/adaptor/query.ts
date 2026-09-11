@@ -1,5 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
+import { requiredHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { layoutFragment } from '@blog/service/shared/fragments/layout';
 import {
   SHOW_IMAGES_EXPRESSION,
@@ -15,8 +15,8 @@ export const postRelatedModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(headingBlockFragment)
-      .nullable(true),
+      .project(requiredHeadingBlockFragment)
+      .notNull(),
     showImages: sub.raw(SHOW_IMAGES_EXPRESSION, showImagesParser),
     limit: sub.field('limit').notNull(),
     layout: sub.field('layout').project(layoutFragment).nullable(true),

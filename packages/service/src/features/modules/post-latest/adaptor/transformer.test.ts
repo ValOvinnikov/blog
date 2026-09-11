@@ -6,6 +6,7 @@ import {
 } from '@blog/config';
 import { makeRawPostLatestModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import {
@@ -38,15 +39,14 @@ describe('toPostLatestModule', () => {
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
 
-  it('leaves every headingBlock field undefined when the field itself is unset (no faked default)', () => {
-    const raw = makeRawPostLatestModule({ headingBlock: null });
+  it('leaves supportingText undefined when not set (no faked default)', () => {
+    const raw = makeRawPostLatestModule({
+      headingBlock: makeRawHeadingBlock('Latest'),
+    });
 
     const module = toPostLatestModule(raw, rawPosts, tenant);
 
-    expect(module.headingBlock).toEqual({
-      heading: undefined,
-      supportingText: undefined,
-    });
+    expect(module.headingBlock.supportingText).toBeUndefined();
   });
 
   it('leaves contentAlignment undefined when unset (no faked default)', () => {

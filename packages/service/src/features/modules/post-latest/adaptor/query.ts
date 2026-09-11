@@ -3,7 +3,7 @@ import {
   DISPLAY_MODE_EXPRESSION,
   displayModeParser,
 } from '@blog/service/shared/fragments/display-mode';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
+import { requiredHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { layoutFragment } from '@blog/service/shared/fragments/layout';
 import {
   SHOW_IMAGES_EXPRESSION,
@@ -19,8 +19,8 @@ export const postLatestModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(headingBlockFragment)
-      .nullable(true),
+      .project(requiredHeadingBlockFragment)
+      .notNull(),
     limit: sub.field('limit').notNull(),
     layout: sub.field('layout').project(layoutFragment).nullable(true),
     contentAlignment: sub.field('contentAlignment').nullable(true),

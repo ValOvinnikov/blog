@@ -8,7 +8,7 @@ export const headingBlockFragment = q
   }));
 
 export const requiredHeadingBlockFragment = q
-  .fragmentForType<'requiredHeadingBlock'>()
+  .fragmentForType<'headingBlock'>()
   .project((sub) => ({
     heading: sub.field('heading').notNull(),
     supportingText: sub.field('supportingText').nullable(true),

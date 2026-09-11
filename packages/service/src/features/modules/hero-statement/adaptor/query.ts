@@ -1,5 +1,6 @@
 import { q } from '@blog/service/sanity/query';
 import { actionGroupFragment } from '@blog/service/shared/fragments/action-group';
+import { requiredHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image';
 import { heroLayoutFragment } from '@blog/service/shared/fragments/layout';
 
@@ -12,8 +13,10 @@ export const heroStatementModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     variant: sub.field('variant').notNull(),
     eyebrow: sub.field('eyebrow').nullable(true),
-    heading: sub.field('heading').notNull(),
-    supportingText: sub.field('supportingText').nullable(true),
+    headingBlock: sub
+      .field('headingBlock')
+      .project(requiredHeadingBlockFragment)
+      .notNull(),
     image: sub.field('image').project(sanityImageFragment).nullable(true),
     actions: sub.field('actions').project(actionGroupFragment).nullable(true),
     contentPositionSplit: sub.field('contentPositionSplit').nullable(true),

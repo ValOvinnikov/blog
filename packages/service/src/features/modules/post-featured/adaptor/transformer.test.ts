@@ -7,6 +7,7 @@ import {
 } from '@blog/config';
 import { makeRawPostFeaturedModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { toPostFeaturedModule } from './transformer';
@@ -35,15 +36,14 @@ describe(toPostFeaturedModule, () => {
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
 
-  it('leaves every headingBlock field undefined when the field itself is unset (no faked default)', () => {
-    const raw = makeRawPostFeaturedModule({ headingBlock: null });
+  it('leaves supportingText undefined when not set (no faked default)', () => {
+    const raw = makeRawPostFeaturedModule({
+      headingBlock: makeRawHeadingBlock('Featured'),
+    });
 
     const module = toPostFeaturedModule(raw, tenant);
 
-    expect(module.headingBlock).toEqual({
-      heading: undefined,
-      supportingText: undefined,
-    });
+    expect(module.headingBlock.supportingText).toBeUndefined();
   });
 
   it('leaves contentAlignment undefined when unset (no faked default)', () => {
