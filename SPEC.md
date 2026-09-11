@@ -280,7 +280,7 @@ required only after documents existed without a heading, so their view
 models keep `heading` optional; the types that required it from the start
 do not.
 
-**Alignment is a module-level field, not part of `headingBlock`.** All six
+**Alignment is a module-level field, not part of `headingBlock`.** All seven
 of those modules carry their own `contentAlignment`, emitted by the
 `defineAlignmentFields()` helper, which every caller gets whether or not it
 asks for variant-scoped extras. `headingBlock` deliberately does not bundle

@@ -204,15 +204,17 @@ overlapping fields via `spacingAndDividerFields()` (same
 two-named-types-sharing-a-helper pattern as `imageWithAlt`/`bodyImage`), and
 are attached to every `module_*` document via the shared `layoutField`/
 `heroLayoutField` values; `service`/`apps/web`'s `Section` component decide
-unset-vs-set and rendering defaults), `headingBlock`/
-`requiredHeadingBlock` (`heading` (string, max 80 — required on the
-`requiredHeadingBlock` variant used by `module_cta`/
-`module_newsletter`, optional on `module_postList`'s plain
-`headingBlock`), `supportingText` (text, max 300), `align`
-(`CONTENT_ALIGNMENT`) — same shared-fields/two-named-types pattern, via
-`headingBlockField({ requireHeading? })`; attached to `module_cta`/
-`module_postList`/`module_newsletter` only — `module_content` and
-`module_hero` don't get one). Every `module_*` document gets its own
+unset-vs-set and rendering defaults), `headingBlock` (`heading` (string)
+and `supportingText` (text) — neither carries a length cap, forced `max()`
+validation having been removed as editor-hostile). There is **one**
+registered `headingBlock` type; requiredness is a property of the field,
+not the type, attached via `headingBlockField({ requireHeading? })`, which
+adds a field-level rule checking the nested `heading`. It is required on
+`module_cta`/`module_newsletter`/`module_postLatest`/`module_postFeatured`/
+`module_postRelated` and optional on `module_postList`/
+`module_taxonomyList`; `module_content` and `module_hero` get none, and
+alignment is not bundled here — it is a separate module-level
+`contentAlignment` field. Every `module_*` document gets its own
 standalone, **required** `brandVariant` field (`@blog/config`'s
 `BRAND_VARIANT` const) via the shared `brandVariantField()` helper, placed
 immediately after `titleField` in each schema's `fields` array (see

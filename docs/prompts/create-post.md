@@ -42,7 +42,7 @@ references):
 | -------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `title`        | string                            | **required**. **Internal Studio label only — never rendered on the web.** Name the document, don't write the headline here.                                                                     |
 | `slug`         | slug                              | **required**, generated from `title`, kebab-case. Becomes `/blog/{slug}`. Studio truncates the generated value at 96 chars — nothing blocks a longer hand-typed one, so keep it short yourself. |
-| `headingBlock` | object (`requiredHeadingBlock`)   | `heading` **required**, ≤ 80 — the rendered `<h1>`, card headline and feed title. `supportingText` optional, ≤ 300 — see below.                                                                 |
+| `headingBlock` | object (`headingBlock`)           | `heading` **required** — the rendered `<h1>`, card headline and feed title. `supportingText` optional — see below.                                                                              |
 | `heroImage`    | image (`imageWithAlt`)            | optional. If present, `alt` is **required**. Shown at the top of the post. **Not** the social image — that is `seo.openGraph.ogImage` or nothing.                                               |
 | `content`      | Portable Text (`richText`)        | **required**. The article body — see "Body capabilities" below.                                                                                                                                 |
 | `featured`     | boolean                           | optional. Makes the post eligible for the blog hero's "newest featured" source and the featured spotlight.                                                                                      |
@@ -178,7 +178,8 @@ code, use `filename`.
 2. **Length**: keep it scannable — aim **400–800 words** unless told otherwise.
    Short intro (2–3 sentences, no throat-clearing), 2–4 `h2` sections, one or
    two real code blocks, a one-line takeaway. Readers bounce on walls of text.
-3. **`heading` ≤ 80, `supportingText` ≤ 300** and genuinely summarizing (it
+3. **Keep `heading` near 80 characters and `supportingText` near 300** —
+   house style, not schema validation — and genuinely summarizing (it
    drives the card lead and the feed description). Give `title` a plain
    internal label — the heading again is fine, but nobody reads it.
 4. **SEO**: `seo.metaTitle` (30–60) is **required** — always draft one, a
@@ -210,8 +211,8 @@ A table (or key list) of every CMS field with its final value:
 ```
 title:           …            (internal Studio label — not rendered)
 slug:            …
-headingBlock:    heading: …         (≤80 chars — note the count)
-                 supportingText: …  (≤300 chars — note the count)
+headingBlock:    heading: …         (aim ≤80 chars — note the count)
+                 supportingText: …  (aim ≤300 chars — note the count)
 author:          …            (name; flag if a new author document is needed)
 topic:           …            (title + slug; flag NEW if proposing one)
 tags:            […]          (title + slug each; flag NEW ones; ≤6)
@@ -338,7 +339,7 @@ Rules — these must be exact or the import fails or orphans data:
   documents must exist in the file or the dataset (use `"_weak": true` only if
   intentionally dangling — normally never).
 - `headingBlock` is an object with its own `_type`:
-  `{"_type": "requiredHeadingBlock", "heading": "…", "supportingText": "…"}`.
+  `{"_type": "headingBlock", "heading": "…", "supportingText": "…"}`.
 - `seo` is **not** optional on a post — `metaTitle` is required, so always
   emit it: `"seo": {"_type": "seo", "metaTitle": "…", "metaDescription": "…"}`.
   Add `"openGraph": {"_type": "openGraph", "ogTitle": "…"}` when authored;
@@ -398,7 +399,8 @@ Rules — these must be exact or the import fails or orphans data:
 
 - [ ] Every **required** field present (`title`, `slug`, `headingBlock.heading`,
       `content`, `author`, `topic`, `publishedAt`, `seo.metaTitle`).
-- [ ] `heading` ≤ 80; `supportingText` ≤ 300; `tags` ≤ 6; topic is exactly one.
+- [ ] `heading` and `supportingText` within house style (~80 / ~300); `tags` ≤ 6;
+      topic is exactly one.
 - [ ] `title` is an internal label — no copy that assumes a reader will see it.
 - [ ] Body uses **only** supported constructs (no `h1`, tables, video, footnotes).
 - [ ] Every image slot has **alt text**; every code block has a **language**;
