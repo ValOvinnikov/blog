@@ -9,10 +9,16 @@ describe('tagPageQuery', () => {
     expect(tagPageQuery.query).toContain('slug.current == $slug');
   });
 
-  it('parses a tag page with no modules/SEO', () => {
-    const raw = makeRawTagPage({ modules: null, seo: null });
+  it('parses a tag page with no modules', () => {
+    const raw = makeRawTagPage({ modules: null });
 
     expect(() => tagPageQuery.parse(raw)).not.toThrow();
+  });
+
+  it('rejects a tag page with no authored SEO', () => {
+    const raw = { ...makeRawTagPage(), seo: null };
+
+    expect(() => tagPageQuery.parse(raw)).toThrow();
   });
 
   it('parses a tag page with a list module alongside other modules, and SEO', () => {

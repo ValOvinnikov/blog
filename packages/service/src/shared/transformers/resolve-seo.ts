@@ -14,25 +14,10 @@ export type TSeoResolved = {
   ogImageUrl: TMaybeUndefined<string>;
 };
 
-/**
- * `seo.metaTitle` is required and validated in the schema, so a published
- * document should always carry one; a missing value signals unpublished or
- * otherwise invalid content, not an ordinary absence.
- */
-export class MissingSeoTitleError extends Error {
-  readonly code = 'SEO_META_TITLE_MISSING' as const;
-
-  constructor() {
-    super('seo.metaTitle is required but missing');
-  }
-}
-
 export function resolveSeo(
-  authored: TRawSeo | null | undefined,
+  authored: TRawSeo,
   tenant: TImageTenant,
 ): TSeoResolved {
-  if (!authored?.metaTitle) throw new MissingSeoTitleError();
-
   return {
     title: authored.metaTitle,
     description: authored.metaDescription ?? undefined,

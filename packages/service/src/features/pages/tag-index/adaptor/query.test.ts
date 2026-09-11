@@ -8,15 +8,20 @@ describe('tagIndexPageQuery', () => {
     expect(tagIndexPageQuery.query).toContain('_type == "page_tagIndex"');
   });
 
-  it('parses a tag index page with no headingBlock/hero/modules/SEO', () => {
+  it('parses a tag index page with no headingBlock/hero/modules', () => {
     const raw = makeRawTagIndexPage({
       headingBlock: null,
       hero: null,
       modules: null,
-      seo: null,
     });
 
     expect(() => tagIndexPageQuery.parse(raw)).not.toThrow();
+  });
+
+  it('rejects a tag index page with no authored SEO', () => {
+    const raw = { ...makeRawTagIndexPage(), seo: null };
+
+    expect(() => tagIndexPageQuery.parse(raw)).toThrow();
   });
 
   it('parses a tag index page with a taxonomy list module alongside other modules', () => {

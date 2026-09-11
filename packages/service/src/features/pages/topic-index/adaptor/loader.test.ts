@@ -61,14 +61,6 @@ describe('getIndexPage', () => {
     });
   });
 
-  it('rejects when the page has no authored seo', async () => {
-    mockRun.mockResolvedValueOnce(makeRawTopicIndexPage({ seo: null }));
-
-    await expect(getIndexPage(tenant)).rejects.toThrow(
-      'seo.metaTitle is required but missing',
-    );
-  });
-
   it('maps the thin page-builder modules array to module refs', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawTopicIndexPage({

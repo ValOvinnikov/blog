@@ -53,14 +53,6 @@ describe('getTagPage', () => {
     });
   });
 
-  it('rejects when the page has no authored seo', async () => {
-    mockRun.mockResolvedValueOnce(makeRawTagPage({ seo: null }));
-
-    await expect(getTagPage('typescript', tenant)).rejects.toThrow(
-      'seo.metaTitle is required but missing',
-    );
-  });
-
   it('resolves seo from the authored value, with no fallback for an unauthored description', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawTagPage({

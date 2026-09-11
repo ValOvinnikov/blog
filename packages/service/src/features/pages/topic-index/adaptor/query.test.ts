@@ -8,15 +8,20 @@ describe('topicIndexPageQuery', () => {
     expect(topicIndexPageQuery.query).toContain('_type == "page_topicIndex"');
   });
 
-  it('parses a topic index page with no headingBlock/hero/modules/SEO', () => {
+  it('parses a topic index page with no headingBlock/hero/modules', () => {
     const raw = makeRawTopicIndexPage({
       headingBlock: null,
       hero: null,
       modules: null,
-      seo: null,
     });
 
     expect(() => topicIndexPageQuery.parse(raw)).not.toThrow();
+  });
+
+  it('rejects a topic index page with no authored SEO', () => {
+    const raw = { ...makeRawTopicIndexPage(), seo: null };
+
+    expect(() => topicIndexPageQuery.parse(raw)).toThrow();
   });
 
   it('parses a topic index page with a taxonomy list module alongside other modules', () => {
