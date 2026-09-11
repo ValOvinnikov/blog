@@ -23,14 +23,14 @@ export type Module_newsletter = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: RequiredHeadingBlock;
+  headingBlock?: HeadingBlock;
   variant?: 'FULL' | 'COMPACT';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
 };
 
-export type RequiredHeadingBlock = {
-  _type: 'requiredHeadingBlock';
+export type HeadingBlock = {
+  _type: 'headingBlock';
   heading?: string;
   supportingText?: string;
 };
@@ -46,7 +46,7 @@ export type Module_cta = {
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   bandTone?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   eyebrow?: string;
-  headingBlock?: RequiredHeadingBlock;
+  headingBlock?: HeadingBlock;
   content?: BasicText;
   image?: ImageWithAlt;
   contentPositionSplit?: 'LEFT' | 'RIGHT';
@@ -157,12 +157,6 @@ export type Module_postRelated = {
   limit?: number;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
-};
-
-export type HeadingBlock = {
-  _type: 'headingBlock';
-  heading?: string;
-  supportingText?: string;
 };
 
 export type Page_postReference = {
@@ -818,8 +812,7 @@ export type Module_heroStatement = {
   _rev: string;
   title?: string;
   eyebrow?: string;
-  heading?: string;
-  supportingText?: string;
+  headingBlock?: HeadingBlock;
   variant?: 'SPLIT' | 'STACKED' | 'BANNER';
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   image?: ImageWithAlt;
@@ -904,7 +897,7 @@ export type Page_post = {
   _rev: string;
   title?: string;
   slug?: Slug;
-  headingBlock?: RequiredHeadingBlock;
+  headingBlock?: HeadingBlock;
   heroImage?: ImageWithAlt;
   content?: RichText;
   featured?: boolean;
@@ -1074,7 +1067,7 @@ export type Geopoint = {
 
 export type AllSanitySchemaTypes =
   | Module_newsletter
-  | RequiredHeadingBlock
+  | HeadingBlock
   | Module_cta
   | ActionGroup
   | SanityImageAssetReference
@@ -1083,7 +1076,6 @@ export type AllSanitySchemaTypes =
   | Module_content
   | RichText
   | Module_postRelated
-  | HeadingBlock
   | Page_postReference
   | Module_postFeatured
   | Module_postLatest
