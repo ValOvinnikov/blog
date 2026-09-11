@@ -246,20 +246,36 @@ consts; there is no `align` field on `layout` — alignment is its own
 module-level field, below).
 `module_cta`/`module_postList`/`module_postLatest`/`module_postFeatured`/`module_taxonomyList`/`module_newsletter`
 additionally carry a `headingBlock` object (`heading` and `supportingText`
-only — all optional on
-`module_postList`/`module_postLatest`/`module_postFeatured`/`module_taxonomyList`, `heading` required on
-`module_cta`/`module_newsletter` via a per-module `requireHeading` override
-on the shared `headingBlockField()` helper).
+only). There is **one registered `headingBlock` type**, and requiredness is
+a property of the **field**, not of the type: `headingBlockField({
+requireHeading })` attaches a field-level rule checking the nested
+`heading`. `heading` is required on
+`module_cta`/`module_newsletter`/`module_postLatest`/`module_postFeatured`/`module_postRelated`
+(and on `page_post` and `module_heroStatement`), and optional on
+`module_postList`/`module_taxonomyList`, which are page-related. Neither
+field carries a length cap — forced `max()` validation was removed as
+editor-hostile.
+
+**Schema-required is not the same as present in stored data**, and the
+service layer draws that line deliberately. `required()` blocks the next
+publish; it never backfills what is already stored. So a `.notNull()` in a
+GROQ projection — which throws and 404s the page rather than degrading — is
+applied only where the data was _already_ guaranteed when it was written.
+`module_postLatest`/`module_postFeatured`/`module_postRelated` became
+required only after documents existed without a heading, so their view
+models keep `heading` optional; the types that required it from the start
+do not.
 
 **Alignment is a module-level field, not part of `headingBlock`.** All six
 of those modules carry their own `contentAlignment`, emitted by the
 `defineAlignmentFields()` helper, which every caller gets whether or not it
 asks for variant-scoped extras. `headingBlock` deliberately does not bundle
 it: a Sanity named object type's field list is fixed at registration, so a
-bundled field cannot be omitted for the one module that doesn't want it —
-the same constraint that forces `headingBlock` and
-`requiredHeadingBlock` to exist as two registered types rather than
-one with conditional validation. Bundling it meant `module_cta`, which
+bundled field cannot be omitted for the one module that doesn't want it.
+That is a **field-list** constraint, and it has no workaround — unlike the
+**validation** constraint alongside it, which once forced a second
+`requiredHeadingBlock` type to exist purely to vary one rule. Validation can
+move onto the field, and did; a field's presence cannot. Bundling it meant `module_cta`, which
 aligns its whole card rather than its heading, was forced to render an
 alignment control nothing read.
 
@@ -349,8 +365,8 @@ rendered on the web.** It names the document in the desk, nothing more —
 and `description`, so an unauthored page still renders the term's own
 header. `page_post` has no
 entity to deref, so its headline and excerpt live in a **`headingBlock`**
-object (`requiredHeadingBlock`: `heading` required, `supportingText`
-optional) — the same shape the modules use. `@blog/service` maps
+object with `heading` required and `supportingText` optional — the same
+shape, and the same registered type, the modules use. `@blog/service` maps
 `headingBlock.heading` to the view models' `title` and
 `headingBlock.supportingText` to their `excerpt`, so the field names every
 consumer sees are unchanged and no `apps/web` component reads a document
