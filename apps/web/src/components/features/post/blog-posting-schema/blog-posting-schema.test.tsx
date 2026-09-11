@@ -1,13 +1,16 @@
 import { customRenderAsync } from '@web/testing/custom-render';
 import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
 import { BlogPostingSchema } from './blog-posting-schema';
 
-const { getPostPageMock, getTenantBaseUrlMock } = vi.hoisted(() => ({
-  getPostPageMock: vi.fn(),
-  getTenantBaseUrlMock: vi.fn(),
-}));
+const { getPostPageMock, getTenantBaseUrlMock, getTenantSanityContextMock } =
+  vi.hoisted(() => ({
+    getPostPageMock: vi.fn(),
+    getTenantBaseUrlMock: vi.fn(),
+    getTenantSanityContextMock: vi.fn(),
+  }));
 
 vi.mock('@web/server/post/get-post-page', () => ({
   getPostPage: getPostPageMock,
@@ -15,6 +18,10 @@ vi.mock('@web/server/post/get-post-page', () => ({
 
 vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
   getTenantBaseUrl: getTenantBaseUrlMock,
+}));
+
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
 }));
 
 const setup = customRenderAsync(BlogPostingSchema, {
@@ -27,6 +34,8 @@ describe(`<${BlogPostingSchema.name}/>`, () => {
     getPostPageMock.mockReset();
     getTenantBaseUrlMock.mockReset();
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('calls notFound() without logging when no page_post matches the slug', async () => {

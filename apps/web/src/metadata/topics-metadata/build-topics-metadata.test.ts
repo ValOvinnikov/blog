@@ -1,26 +1,44 @@
+import { urlForSanityImage } from '@blog/service';
+import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { buildTopicsMetadata } from './build-topics-metadata';
 
-const { getTopicsIndexPageMock } = vi.hoisted(() => ({
-  getTopicsIndexPageMock: vi.fn(),
-}));
+const { getTopicsIndexPageMock, getTenantSanityContextMock } = vi.hoisted(
+  () => ({
+    getTopicsIndexPageMock: vi.fn(),
+    getTenantSanityContextMock: vi.fn(),
+  }),
+);
 
 vi.mock('@web/server/topics-index/get-topics-index-page', () => ({
   getTopicsIndexPage: getTopicsIndexPageMock,
 }));
+
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
+}));
+
+const ogImage = makeSanityImage();
+const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
+  ogImage,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+);
 
 const seo = makeSeo({
   title: 'Topics',
   description: 'Browse every post by topic.',
   ogTitle: 'Topics OG',
   ogDescription: 'Browse every post by topic OG.',
-  ogImageUrl: 'https://cdn.example.com/topics-og.jpg',
+  ogImage,
 });
 
 describe('buildTopicsMetadata', () => {
   beforeEach(() => {
     getTopicsIndexPageMock.mockReset();
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('forwards the tenant to getTopicsIndexPage — the same cached loader TopicsPage reads', async () => {
@@ -54,7 +72,7 @@ describe('buildTopicsMetadata', () => {
       'Browse every post by topic OG.',
     );
     expect(metadata.openGraph?.images).toEqual([
-      { url: 'https://cdn.example.com/topics-og.jpg' },
+      { url: EXPECTED_OG_IMAGE_URL },
     ]);
   });
 

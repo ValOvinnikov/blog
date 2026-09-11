@@ -1,4 +1,5 @@
 import { ASIDE_KIND, routes, type TAsideKind } from '@blog/config';
+import { type TImageTransformOptions, urlForSanityImage } from '@blog/service';
 import { Article } from '@blog/ui/organisms/article';
 import { BookmarkButtonGate } from '@web/components/features/post/bookmark-button-gate';
 import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
@@ -8,6 +9,7 @@ import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { getPostPage } from '@web/server/post/get-post-page';
 import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import {
   extractPostHeadings,
   MIN_H2_HEADINGS_FOR_RAIL,
@@ -23,6 +25,17 @@ export type TPostArticleProps = {
 };
 
 const s = postArticleVariants();
+
+// `PostMeta` renders the author avatar at `SIZE.SM` (32px,
+// `avatar-variants.ts`) — 64px covers a 2x DPR display without serving the
+// source asset's full natural resolution.
+const AUTHOR_AVATAR_SIZE_PX = 64;
+const AUTHOR_AVATAR_TRANSFORM: TImageTransformOptions = {
+  width: AUTHOR_AVATAR_SIZE_PX,
+  height: AUTHOR_AVATAR_SIZE_PX,
+  fit: 'crop',
+  quality: 75,
+};
 
 /**
  * PostArticle — the post detail's `Article.Header`/`Body`/`Footer` shell:
@@ -45,15 +58,18 @@ export const PostArticle = async ({ slug, tenant }: TPostArticleProps) => {
     author,
     publishedAt,
     readingTimeMinutes,
-    heroImageSanity,
-    heroImageAlt,
+    heroImage,
   } = post;
 
-  const [format, blogPostT, siteUrl] = await Promise.all([
+  const [format, blogPostT, siteUrl, tenantContext] = await Promise.all([
     getFormatter(),
     getTranslations('blogPostPage'),
     getTenantBaseUrl(tenant),
+    getTenantSanityContext(tenant),
   ]);
+  const authorImageUrl = author.image
+    ? urlForSanityImage(author.image, tenantContext, AUTHOR_AVATAR_TRANSFORM)
+    : undefined;
 
   const formattedDate = format.dateTime(new Date(publishedAt), {
     year: 'numeric',
@@ -86,7 +102,8 @@ export const PostArticle = async ({ slug, tenant }: TPostArticleProps) => {
         lead={excerpt}
         meta={{
           author: {
-            ...author,
+            name: author.name,
+            imageUrl: authorImageUrl,
             href: author.profilePageSlug
               ? routes.landingPage(author.profilePageSlug)
               : undefined,
@@ -103,14 +120,13 @@ export const PostArticle = async ({ slug, tenant }: TPostArticleProps) => {
           ),
         }}
         coverMedia={
-          heroImageSanity ? (
+          heroImage ? (
             <SanityImage
-              image={heroImageSanity}
+              image={heroImage}
               width={1200}
               height={675}
               sizes="(min-width: 1024px) 800px, 100vw"
               priority={true}
-              alt={heroImageAlt}
               className={s.coverImage()}
             />
           ) : undefined

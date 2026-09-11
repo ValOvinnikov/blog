@@ -1,27 +1,43 @@
+import { urlForSanityImage } from '@blog/service';
+import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { buildBlogListMetadata } from './build-blog-list-metadata';
 
-const { getBlogListPageMock } = vi.hoisted(() => ({
+const { getBlogListPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
   getBlogListPageMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@web/server/blog-list/get-blog-list-page', () => ({
   getBlogListPage: getBlogListPageMock,
 }));
 
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
+}));
+
+const ogImage = makeSanityImage();
+const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
+  ogImage,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+);
+
 const seo = makeSeo({
   title: 'The Blog',
   description: 'All the posts.',
   ogTitle: 'The Blog OG',
   ogDescription: 'All the posts OG.',
-  ogImageUrl: 'https://cdn.example.com/blog-og.jpg',
+  ogImage,
 });
 
 describe('buildBlogListMetadata', () => {
   beforeEach(() => {
     getBlogListPageMock.mockReset();
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('forwards the slug-less tenant to getBlogListPage — the same cached loader BlogListPage reads', async () => {
@@ -59,7 +75,7 @@ describe('buildBlogListMetadata', () => {
     expect(metadata.openGraph?.title).toBe('The Blog OG');
     expect(metadata.openGraph?.description).toBe('All the posts OG.');
     expect(metadata.openGraph?.images).toEqual([
-      { url: 'https://cdn.example.com/blog-og.jpg' },
+      { url: EXPECTED_OG_IMAGE_URL },
     ]);
     expect(metadata.alternates?.types).toEqual({
       'application/rss+xml': '/rss.xml',

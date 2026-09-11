@@ -1,5 +1,9 @@
 import { routes } from '@blog/config';
-import type { TPostDetail } from '@blog/service';
+import {
+  type TImageTenant,
+  type TPostDetail,
+  urlForSanityImage,
+} from '@blog/service';
 
 export type TBlogPostingSchema = {
   '@context': 'https://schema.org';
@@ -34,12 +38,13 @@ export type TBlogPostingSchema = {
  * when this returns `undefined`.
  *
  * @example
- * const schema = buildBlogPostingSchema(post, (await getTenantBaseUrl()) ?? '');
+ * const schema = buildBlogPostingSchema(post, (await getTenantBaseUrl()) ?? '', tenantContext);
  * return schema ? <JsonLd schema={schema} /> : null;
  */
 export const buildBlogPostingSchema = (
   post: TPostDetail,
   siteUrl: string,
+  tenant: TImageTenant,
 ): TBlogPostingSchema | undefined => {
   if (!siteUrl) return undefined;
 
@@ -48,7 +53,9 @@ export const buildBlogPostingSchema = (
     '@type': 'BlogPosting',
     headline: post.title,
     description: post.excerpt,
-    image: post.heroImageUrl,
+    image: post.heroImage
+      ? urlForSanityImage(post.heroImage, tenant)
+      : undefined,
     datePublished: post.publishedAt,
     dateModified: post.publishedAt,
     author: { '@type': 'Person', name: post.author.name },

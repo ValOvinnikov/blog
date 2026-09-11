@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: TProps): Promise<Metadata> {
     return {};
   }
 
-  return toMetadata(result.data.seo, {
+  return toMetadata(result.data.seo, tenantContext, {
     canonical: '/',
     ogType: 'website',
     titleAbsolute: true,

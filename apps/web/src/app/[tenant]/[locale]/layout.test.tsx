@@ -34,6 +34,8 @@ const {
   getEnabledOAuthProviderIdsMock,
   getTenantSanityContextMock,
   getTenantBaseUrlMock,
+  getSanityImageBaseUrlMock,
+  urlForSanityImageMock,
 } = vi.hoisted(() => ({
   getSiteSettingsMock: vi.fn(),
   getNavigationMock: vi.fn(),
@@ -52,6 +54,8 @@ const {
   getEnabledOAuthProviderIdsMock: vi.fn(),
   getTenantSanityContextMock: vi.fn(),
   getTenantBaseUrlMock: vi.fn(),
+  getSanityImageBaseUrlMock: vi.fn(),
+  urlForSanityImageMock: vi.fn(),
 }));
 
 vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
@@ -94,6 +98,8 @@ vi.mock('@blog/service', () => ({
       footer: { v1: { getFooter: getFooterMock } },
     },
   },
+  getSanityImageBaseUrl: getSanityImageBaseUrlMock,
+  urlForSanityImage: urlForSanityImageMock,
 }));
 
 const rssTranslations: Record<string, string> = {
@@ -120,7 +126,7 @@ vi.mock('next-auth/react', () => ({
   SessionProvider: ({ children }: { children: ReactNode }) => children,
 }));
 
-const brand = { name: 'Blog', logo: null };
+const brand = { name: 'Blog', logo: undefined };
 const now = new Date('2026-07-21T00:00:00.000Z');
 
 const THEME_TOKENS = {
@@ -172,6 +178,9 @@ describe('LocaleLayout', () => {
     getEnabledOAuthProviderIdsMock.mockReturnValue(['github', 'google']);
     getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
     getTenantBaseUrlMock.mockResolvedValue(undefined);
+    getSanityImageBaseUrlMock.mockReturnValue(
+      'https://cdn.sanity.io/images/mock-project/mock-dataset/',
+    );
   });
 
   describe('generateStaticParams', () => {
@@ -280,7 +289,8 @@ describe('LocaleLayout', () => {
       }),
     });
 
-    const [provider] = html.props.children;
+    const [sanityImageBaseUrlProvider] = html.props.children;
+    const provider = sanityImageBaseUrlProvider.props.children;
 
     expect(setRequestLocaleMock).toHaveBeenCalledWith(LOCALE_ISO_CODES.EN);
     expect(provider.props.locale).toBe(LOCALE_ISO_CODES.EN);
@@ -302,7 +312,8 @@ describe('LocaleLayout', () => {
       realMessages,
       'tenant-1',
     );
-    const [provider] = html.props.children;
+    const [sanityImageBaseUrlProvider] = html.props.children;
+    const provider = sanityImageBaseUrlProvider.props.children;
     expect(provider.props.messages).toBe(realMessages);
   });
 
@@ -321,7 +332,8 @@ describe('LocaleLayout', () => {
       }),
     });
 
-    const [provider] = html.props.children;
+    const [sanityImageBaseUrlProvider] = html.props.children;
+    const provider = sanityImageBaseUrlProvider.props.children;
     const sessionProvider = provider.props.children;
     const toastProvider = sessionProvider.props.children;
     const voiceRichProvider = toastProvider.props.children;

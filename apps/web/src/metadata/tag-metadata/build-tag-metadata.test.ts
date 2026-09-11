@@ -1,27 +1,43 @@
+import { urlForSanityImage } from '@blog/service';
+import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { buildTagMetadata } from './build-tag-metadata';
 
-const { getTagPageMock } = vi.hoisted(() => ({
+const { getTagPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
   getTagPageMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@web/server/tag/get-tag-page', () => ({
   getTagPage: getTagPageMock,
 }));
 
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
+}));
+
+const ogImage = makeSanityImage();
+const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
+  ogImage,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+);
+
 const seo = makeSeo({
   title: 'TypeScript',
   description: 'Posts about TypeScript.',
   ogTitle: 'TypeScript',
   ogDescription: 'Posts about TypeScript.',
-  ogImageUrl: 'https://cdn.example.com/og.jpg',
+  ogImage,
 });
 
 describe('buildTagMetadata', () => {
   beforeEach(() => {
     getTagPageMock.mockReset();
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('forwards the slug and tenant to getTagPage — the same cached loader TagPage reads', async () => {
@@ -51,6 +67,9 @@ describe('buildTagMetadata', () => {
     });
     expect(metadata.openGraph?.title).toBe('TypeScript');
     expect(metadata.openGraph?.description).toBe('Posts about TypeScript.');
+    expect(metadata.openGraph?.images).toEqual([
+      { url: EXPECTED_OG_IMAGE_URL },
+    ]);
   });
 
   it('returns empty metadata when the tag fetch fails', async () => {

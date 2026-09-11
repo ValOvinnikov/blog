@@ -8,9 +8,9 @@ import type { ReactNode } from 'react';
  * owns the page's LCP hero.
  */
 export const renderPostLeadImage = (post: TPostCard): ReactNode | undefined =>
-  post.heroImageSanity ? (
+  post.heroImage ? (
     <SanityImage
-      image={post.heroImageSanity}
+      image={post.heroImage}
       width={960}
       height={540}
       sizes="(min-width: 768px) 50vw, 100vw"

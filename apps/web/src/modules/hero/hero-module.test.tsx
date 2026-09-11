@@ -91,10 +91,8 @@ describe(`<${HeroModule.name}/>`, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders the hero image using its own cdnBaseUrl, not a hardcoded origin', async () => {
-    const sanityImage = makeSanityImage({
-      cdnBaseUrl: 'https://cdn.sanity.io/images/tenant-project/production/',
-    });
+  it('renders the hero image resolving through the Sanity CDN', async () => {
+    const sanityImage = makeSanityImage();
     getHeroMock.mockResolvedValue({
       ok: true,
       data: {
@@ -112,6 +110,6 @@ describe(`<${HeroModule.name}/>`, () => {
     await setup();
 
     const img = screen.getByRole('img', { name: sanityImage.alt });
-    expect(img.getAttribute('src')).toContain('tenant-project/production');
+    expect(img.getAttribute('src')).toContain('cdn.sanity.io');
   });
 });
