@@ -1,7 +1,6 @@
 import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
 import { makeRawPostRelatedModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
-import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import {
@@ -155,14 +154,15 @@ describe(toPostRelatedModule, () => {
     expect(result.showImages).toBe(true);
   });
 
-  it('leaves supportingText undefined when not set (no faked default)', () => {
+  it('falls back to an undefined heading and supporting text when headingBlock is absent', () => {
     const result = toPostRelatedModule(
-      makeRawPostRelatedModule({
-        headingBlock: makeRawHeadingBlock('Related reading'),
-      }),
+      makeRawPostRelatedModule({ headingBlock: null }),
       [],
     );
 
-    expect(result.headingBlock.supportingText).toBeUndefined();
+    expect(result.headingBlock).toEqual({
+      heading: undefined,
+      supportingText: undefined,
+    });
   });
 });

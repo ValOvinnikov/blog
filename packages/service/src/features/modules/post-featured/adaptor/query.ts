@@ -5,7 +5,7 @@ import {
   DISPLAY_MODE_EXPRESSION,
   displayModeParser,
 } from '@blog/service/shared/fragments/display-mode';
-import { requiredHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block';
+import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { layoutFragment } from '@blog/service/shared/fragments/layout';
 import { postCardFragment } from '@blog/service/shared/fragments/post';
 import {
@@ -30,8 +30,8 @@ export const postFeaturedModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(requiredHeadingBlockFragment)
-      .notNull(),
+      .project(headingBlockFragment)
+      .nullable(true),
     postSource: sub.field('postSource').notNull(),
     posts: sub
       .select(

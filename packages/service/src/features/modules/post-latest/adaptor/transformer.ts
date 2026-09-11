@@ -1,5 +1,5 @@
 import type { TImageTenant } from '@blog/service/sanity/image';
-import { toRequiredHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
+import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
 import type { InferResultType } from 'groqd';
@@ -22,7 +22,7 @@ export function toPostLatestModule(
 ): TPostLatestModule {
   return {
     brandVariant: raw.brandVariant,
-    headingBlock: toRequiredHeadingBlock(raw.headingBlock),
+    headingBlock: toHeadingBlock(raw.headingBlock),
     posts: rawPosts.map((rawPost) => toPostCard(rawPost, tenant)),
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,
