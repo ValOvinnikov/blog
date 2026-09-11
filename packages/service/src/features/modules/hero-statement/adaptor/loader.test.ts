@@ -1,5 +1,6 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawHeroStatementModule } from '@blog/service/testing/modules/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getHeroStatement } from './loader';
@@ -14,7 +15,9 @@ const tenant = makeTenant();
 describe(getHeroStatement, () => {
   it('resolves the hero in a single round trip — exactly one runQuery call', async () => {
     mockRun.mockResolvedValueOnce(
-      makeRawHeroStatementModule({ heading: 'Ship confidently' }),
+      makeRawHeroStatementModule({
+        headingBlock: makeRawHeadingBlock('Ship confidently'),
+      }),
     );
 
     const hero = await getHeroStatement('hero-statement-1', tenant);

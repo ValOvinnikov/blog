@@ -51,12 +51,12 @@ const getFieldCustomValidator = (field: {
 };
 
 describe('heroStatementSchema field order', () => {
-  it('places title, eyebrow, heading, supportingText before the shared hero tail', () => {
+  it('places title, eyebrow, headingBlock before the shared hero tail', () => {
     const names = heroStatementSchema.fields
       ?.map((field) => ('name' in field ? field.name : undefined))
-      .slice(0, 4);
+      .slice(0, 3);
 
-    expect(names).toEqual(['title', 'eyebrow', 'heading', 'supportingText']);
+    expect(names).toEqual(['title', 'eyebrow', 'headingBlock']);
   });
 });
 
@@ -70,31 +70,20 @@ describe('heroStatementSchema eyebrow field', () => {
   });
 });
 
-describe('heroStatementSchema heading field', () => {
-  it('is required with a custom message, and separately capped at 120', () => {
-    const field = getField('heading');
-    const rule = {
-      required: () => ({
-        error: (message: string) => `required-error:${message}`,
-      }),
-      max: (n: number) => `max:${n}`,
-    };
+describe('heroStatementSchema headingBlock field', () => {
+  it('uses the shared headingBlock object type', () => {
+    const field = getField('headingBlock') as { type: string };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    expect((field.validation as any)(rule)).toEqual([
-      'required-error:A statement hero is its heading. Give it one.',
-      'max:120',
-    ]);
+    expect(field.type).toBe('headingBlock');
   });
-});
 
-describe('heroStatementSchema supportingText field', () => {
-  it('is a plain, optional text field', () => {
-    const field = getField('supportingText') as { type: string; rows?: number };
+  it('is required with the statement hero custom message', () => {
+    const validate = getFieldCustomValidator(getField('headingBlock'));
 
-    expect(field.type).toBe('text');
-    expect(field.rows).toBe(3);
-    expect('validation' in field).toBe(false);
+    expect(validate(undefined, {})).toBe(
+      'A statement hero is its heading. Give it one.',
+    );
+    expect(validate({ heading: 'We build things.' }, {})).toBe(true);
   });
 });
 
@@ -139,6 +128,13 @@ describe('heroStatementSchema hero tail', () => {
 });
 
 describe('heroStatementSchema preview', () => {
+  it('selects subtitle from headingBlock.heading', () => {
+    expect(heroStatementSchema.preview?.select).toEqual({
+      title: 'title',
+      subtitle: 'headingBlock.heading',
+    });
+  });
+
   it('falls back to Unknown / No heading yet when empty', () => {
     const prepare = heroStatementSchema.preview?.prepare;
 

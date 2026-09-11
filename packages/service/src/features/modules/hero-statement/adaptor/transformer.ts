@@ -3,6 +3,7 @@ import {
   toCtaAction,
   type TCtaAction,
 } from '@blog/service/shared/transformers/to-cta-action';
+import { toRequiredHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toHeroPresentation } from '@blog/service/shared/transformers/to-hero-presentation';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
@@ -32,13 +33,14 @@ export function toHeroStatementModule(
   raw: TRawHeroStatementModule,
 ): THeroStatementModule {
   const { contentPosition, mediaOrder } = toHeroPresentation(raw);
+  const headingBlock = toRequiredHeadingBlock(raw.headingBlock);
 
   return {
     brandVariant: raw.brandVariant,
     variant: raw.variant,
-    heading: raw.heading,
+    heading: headingBlock.heading,
     eyebrow: raw.eyebrow ?? undefined,
-    supportingText: raw.supportingText ?? undefined,
+    supportingText: headingBlock.supportingText,
     sanityImage: toSanityImage(raw.image),
     actions: toActions(raw.actions),
     contentPosition,

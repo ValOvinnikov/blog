@@ -15,7 +15,7 @@ export const postRelatedSchema = defineType({
   fields: [
     titleField(),
     brandVariantField(),
-    headingBlockField(),
+    headingBlockField({ requireHeading: true }),
     showImagesField(),
     defineField({
       name: 'limit',

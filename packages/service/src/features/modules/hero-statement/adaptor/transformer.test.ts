@@ -10,7 +10,10 @@ import {
   makeRawCtaAction,
   makeRawHeroStatementModule,
 } from '@blog/service/testing/modules/fixtures';
-import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
+import {
+  makeRawHeadingBlock,
+  makeRawSanityImage,
+} from '@blog/service/testing/shared/fixtures';
 
 import { toHeroStatementModule } from './transformer';
 
@@ -19,7 +22,7 @@ describe(toHeroStatementModule, () => {
     const raw = makeRawHeroStatementModule({
       brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
       variant: HERO_VARIANT.BANNER,
-      heading: 'Ship confidently',
+      headingBlock: makeRawHeadingBlock('Ship confidently'),
     });
 
     const hero = toHeroStatementModule(raw);
@@ -32,7 +35,9 @@ describe(toHeroStatementModule, () => {
   it('leaves eyebrow and supportingText undefined when unset', () => {
     const raw = makeRawHeroStatementModule({
       eyebrow: null,
-      supportingText: null,
+      headingBlock: makeRawHeadingBlock('Statement heading', {
+        supportingText: null,
+      }),
     });
 
     const hero = toHeroStatementModule(raw);
@@ -44,7 +49,9 @@ describe(toHeroStatementModule, () => {
   it('maps an authored eyebrow and supportingText', () => {
     const raw = makeRawHeroStatementModule({
       eyebrow: 'Field notes',
-      supportingText: 'Supporting copy.',
+      headingBlock: makeRawHeadingBlock('Statement heading', {
+        supportingText: 'Supporting copy.',
+      }),
     });
 
     const hero = toHeroStatementModule(raw);

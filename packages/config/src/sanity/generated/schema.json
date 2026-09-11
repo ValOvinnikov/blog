@@ -62,7 +62,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "requiredHeadingBlock"
+          "name": "headingBlock"
         },
         "optional": true
       },
@@ -115,7 +115,7 @@
     }
   },
   {
-    "name": "requiredHeadingBlock",
+    "name": "headingBlock",
     "type": "type",
     "value": {
       "type": "object",
@@ -124,7 +124,7 @@
           "type": "objectAttribute",
           "value": {
             "type": "string",
-            "value": "requiredHeadingBlock"
+            "value": "headingBlock"
           }
         },
         "heading": {
@@ -260,7 +260,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "requiredHeadingBlock"
+          "name": "headingBlock"
         },
         "optional": true
       },
@@ -1042,36 +1042,6 @@
           "name": "layout"
         },
         "optional": true
-      }
-    }
-  },
-  {
-    "name": "headingBlock",
-    "type": "type",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "headingBlock"
-          }
-        },
-        "heading": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          },
-          "optional": true
-        },
-        "supportingText": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          },
-          "optional": true
-        }
       }
     }
   },
@@ -4992,17 +4962,11 @@
         },
         "optional": true
       },
-      "heading": {
+      "headingBlock": {
         "type": "objectAttribute",
         "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
-      "supportingText": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
+          "type": "inline",
+          "name": "headingBlock"
         },
         "optional": true
       },
@@ -5780,7 +5744,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "requiredHeadingBlock"
+          "name": "headingBlock"
         },
         "optional": true
       },
