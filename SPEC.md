@@ -389,18 +389,25 @@ with `.notNull()` and types it as a plain value; where the schema leaves a
 field optional, the view model carries `T | undefined`. The two are kept in
 step deliberately, so the type a consumer sees is the same promise the
 editing experience makes. `headingBlock.heading`, `publishedAt`, `author`,
-`topic` and `content` are required on both sides; `excerpt`
-(`headingBlock.supportingText`), `heroImage`, `tags`, `featured`, `skim`
-and `seo` are optional on both.
+`topic`, `content` and `seo` are required on both sides; `excerpt`
+(`headingBlock.supportingText`), `heroImage`, `tags`, `featured` and `skim`
+are optional on both.
 
 **An incomplete post is not published.** `PUBLISHED_POST_FILTER` is what
-makes the paragraph above safe. It requires
+makes most of the paragraph above safe. It requires
 `defined(headingBlock.heading) && defined(author) && defined(topic) &&
 defined(content)` alongside `publishedAt <= now()`, so a `page_post` missing
 any of them never appears in a listing and resolves as not-found on its own
 URL — the same treatment an unpublished post gets. Without that gate a
 `.notNull()` projection would throw at parse time and take down an entire
 listing rather than dropping one card.
+
+`seo` is the one required field the gate does **not** cover. Listings are
+unaffected either way — `postCardFragment` never projects `seo` — but a
+`page_post` written through the Sanity client without one passes the filter,
+appears as a card, and then fails to parse on its own detail page, which
+404s. Studio cannot produce such a document, since `seo` is required there;
+only a client write can, which is the same bypass the SEO section describes.
 
 This is an **exclusion, not a fallback**: nothing is substituted. Every
 consumer of these fields structurally needs a value — RSS `<title>`, the
@@ -972,9 +979,23 @@ leave empty is omitted.** There is no fallback ladder. `resolveSeo` reads the
 authored `seo` object and the tenant image context, nothing else — no
 content-derived tier, no site defaults.
 
-`seo.metaTitle` is **required**, 30–60 characters, so no page ships a title
-nobody chose; `resolveSeo` throws rather than invent one, which surfaces a
-missing title as a failed page rather than a quietly wrong `<title>`.
+**The `seo` object is required on every page document type**, via the shared
+`seoField()` helper, and `seo.metaTitle` is required within it at 30–60
+characters — so no page ships a title nobody chose. Both halves are
+load-bearing: Sanity only evaluates validation for an object that exists, so
+a `required()` on `metaTitle` alone is unreachable whenever the whole `seo`
+object is absent, and a page with no SEO block at all would validate clean.
+The block renders expanded rather than collapsed, so a required field is
+never hidden behind a closed disclosure.
+
+The runtime half is enforced in the query, not the transformer: the `seo`
+projection and `metaTitle` are both `.notNull()`, so a document missing
+either fails to parse and the route logs and 404s through the shared
+page-loader guard, exactly like any other required field. `resolveSeo`
+carries no guard and throws nothing of its own. Studio validation never runs
+on writes made through the Sanity client, so the query is what actually
+holds — the schema rule is the editing experience, not the guarantee.
+
 Everything else is optional and omitted when unset: an unauthored
 `metaDescription` emits no `description` tag, and `ogTitle`/`ogDescription`/
 `ogImage` are authored per page or absent — `og:title` is never inherited

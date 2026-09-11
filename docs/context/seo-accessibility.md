@@ -15,8 +15,15 @@
   fallback ladder — no content-derived tier and no site defaults. `web` maps
   the result to `Metadata` with one shared `toMetadata` helper — no `??`
   fallback chains in route files. Page loaders return `seo: TSeoResolved`.
-  `metaTitle` is required (30–60 characters) and `resolveSeo` throws rather
-  than invent one; every other field is optional and **omitted** when
+  The `seo` object itself is required on every page document type, and
+  `metaTitle` is required within it (30–60 characters) — Sanity skips
+  validation for an object that is absent, so requiring only `metaTitle`
+  would leave a page with no SEO block at all passing validation. The
+  runtime half is enforced in the query: the `seo` projection and
+  `metaTitle` are `.notNull()`, so a document missing either fails to parse
+  and the route logs and 404s through the shared page-loader guard;
+  `resolveSeo` carries no guard and throws nothing of its own. Every other
+  field is optional and **omitted** when
   unauthored, so an absent `ogImageUrl` emits no `og:image` and no twitter
   image rather than an empty tag. There is no site-wide default OG image and
   no post-hero substitute, so `twitter:card` is `summary_large_image` only
