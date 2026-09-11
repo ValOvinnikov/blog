@@ -152,4 +152,44 @@ describe(`<${HeroBlogModuleView.name}/>`, () => {
 
     expect(screen.getAllByRole('link')).toHaveLength(1);
   });
+
+  it('reverses the non-primary action for legibility on a Banner over an image', () => {
+    setup({
+      variant: HERO_VARIANT.BANNER,
+      secondaryAction: {
+        variant: CTA_ACTION_VARIANT.SECONDARY,
+        appearance: CTA_ACTION_APPEARANCE.CONTAINED,
+        link: {
+          label: 'View all posts',
+          href: '/blog',
+          target: undefined,
+          platform: undefined,
+          ariaLabel: undefined,
+        },
+      },
+    });
+
+    const link = screen.getByRole('link', { name: 'View all posts' });
+    expect(link.className).toContain('border-white/55');
+  });
+
+  it('does not reverse the non-primary action on Split or Stacked', () => {
+    setup({
+      variant: HERO_VARIANT.SPLIT,
+      secondaryAction: {
+        variant: CTA_ACTION_VARIANT.SECONDARY,
+        appearance: CTA_ACTION_APPEARANCE.CONTAINED,
+        link: {
+          label: 'View all posts',
+          href: '/blog',
+          target: undefined,
+          platform: undefined,
+          ariaLabel: undefined,
+        },
+      },
+    });
+
+    const link = screen.getByRole('link', { name: 'View all posts' });
+    expect(link.className).not.toContain('border-white/55');
+  });
 });

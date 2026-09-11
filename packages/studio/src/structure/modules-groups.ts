@@ -2,6 +2,7 @@ import { contentSchema } from '@blog/studio/schema-types/modules/module-content'
 import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
 import { heroSchema } from '@blog/studio/schema-types/modules/module-hero';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/module-hero-blog';
+import { heroStatementSchema } from '@blog/studio/schema-types/modules/module-hero-statement';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
@@ -26,6 +27,7 @@ export const modulesGroups: TStructureGroup[] = [
     items: [
       { schema: heroSchema },
       { schema: heroBlogSchema },
+      { schema: heroStatementSchema },
       { schema: contentSchema },
       { schema: ctaSchema },
       { schema: newsletterSchema },

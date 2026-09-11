@@ -1,42 +1,20 @@
-import { CTA_ACTION_VARIANT, HERO_VARIANT } from '@blog/config';
-import type { THeroBlogModule, THeroPrimaryAction } from '@blog/service';
+import { HERO_VARIANT } from '@blog/config';
+import type { THeroStatementModule } from '@blog/service';
 import { Hero } from '@blog/ui/organisms/hero';
-import {
-  ActionGroup,
-  type IActionGroupAction,
-} from '@web/components/shared/action-group';
+import { ActionGroup } from '@web/components/shared/action-group';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { Section } from '@web/components/shared/section';
 
-export interface IHeroBlogModuleViewProps extends Omit<
-  THeroBlogModule,
-  'heading'
-> {
+export interface IHeroStatementModuleViewProps extends THeroStatementModule {
   id: string;
-  heading: string;
 }
 
-const toActionGroupAction = (
-  action: THeroPrimaryAction,
-): IActionGroupAction => ({
-  link: {
-    label: action.label,
-    href: action.href,
-    target: action.target,
-    platform: action.platform,
-    ariaLabel: undefined,
-  },
-  variant: CTA_ACTION_VARIANT.PRIMARY,
-  appearance: action.appearance,
-  hiddenLabelSuffix: action.hiddenLabelSuffix,
-});
-
 /**
- * Pure view for `HeroBlogModule` — the web-side wiring the `@blog/ui` `Hero`
- * organism can't own itself: the `Section` full-bleed landmark, the
- * `SanityImage` bridge, and the primary/secondary CTAs via `ActionGroup`.
+ * Pure view for `HeroStatementModule` — the web-side wiring the `@blog/ui`
+ * `Hero` organism can't own itself: the `Section` full-bleed landmark, the
+ * `SanityImage` bridge, and the authored actions via `ActionGroup`.
  */
-export const HeroBlogModuleView = ({
+export const HeroStatementModuleView = ({
   id,
   brandVariant,
   variant,
@@ -44,25 +22,20 @@ export const HeroBlogModuleView = ({
   heading,
   supportingText,
   sanityImage,
-  primaryAction,
-  secondaryAction,
+  actions,
   contentPosition,
   contentAlignment,
   mediaOrder,
   layout,
-}: IHeroBlogModuleViewProps) => {
-  const titleId = `hero-blog-${id}`;
-  const actions = [
-    primaryAction ? toActionGroupAction(primaryAction) : undefined,
-    secondaryAction,
-  ].filter((action): action is IActionGroupAction => Boolean(action));
+}: IHeroStatementModuleViewProps) => {
+  const titleId = `hero-statement-${id}`;
 
   return (
     <Section
       brandVariant={brandVariant}
       layout={layout}
       titleId={titleId}
-      dataTestId={`hero-blog-module-${id}`}
+      dataTestId={`hero-statement-module-${id}`}
     >
       <Hero
         tone={brandVariant}
@@ -75,7 +48,7 @@ export const HeroBlogModuleView = ({
         contentAlignment={contentAlignment}
         mediaOrder={mediaOrder}
       >
-        {actions.length > 0 && (
+        {actions && actions.length > 0 && (
           <Hero.Cta>
             <ActionGroup
               actions={actions}
