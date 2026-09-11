@@ -2,6 +2,7 @@ import { TAXONOMY_KIND } from '@blog/config/constants';
 import { defineModulesField } from '@blog/studio/schema-types/helpers/define-modules-field';
 import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
 import { heroField } from '@blog/studio/schema-types/helpers/hero-field';
+import { seoField } from '@blog/studio/schema-types/helpers/seo-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
 import { validateHeroOrHeading } from '@blog/studio/schema-types/helpers/validate-hero-or-heading';
 import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/helpers/validate-single-blank-heading-per-type';
@@ -11,7 +12,6 @@ import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/module-taxonomy-list';
-import { seoSchema } from '@blog/studio/schema-types/objects/seo';
 import { Tag } from 'lucide-react';
 import { defineField, defineType, type SanityDocument } from 'sanity';
 
@@ -94,13 +94,7 @@ export const tagIndexPageSchema = defineType({
           .custom(validateSingleBlankHeadingPerType([postLatestSchema.name]))
           .custom(validateTaxonomyListHasTaxonomy),
     }),
-    defineField({
-      name: 'seo',
-      title: 'SEO',
-      type: seoSchema.name,
-      description:
-        'Override Tag Index page meta title, description, and social sharing image.',
-    }),
+    seoField(),
     defineField({
       name: 'heading',
       title: 'Heading',

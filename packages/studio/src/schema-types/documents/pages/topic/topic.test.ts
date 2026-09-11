@@ -1,5 +1,5 @@
-import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag';
-import { pageTagSchema } from '@blog/studio/schema-types/documents/pages/page-tag';
+import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic';
+import { pageTopicSchema } from '@blog/studio/schema-types/documents/pages/topic';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
@@ -24,14 +24,14 @@ type TValidationRule = {
 };
 
 const getField = (name: string) =>
-  pageTagSchema.fields?.find((field) => field.name === name);
+  pageTopicSchema.fields?.find((field) => field.name === name);
 
-describe('pageTagSchema field order', () => {
-  it('orders fields title, slug, tag, headingBlock, hero, modules, seo', () => {
-    expect(pageTagSchema.fields?.map((field) => field.name)).toEqual([
+describe('pageTopicSchema field order', () => {
+  it('orders fields title, slug, topic, headingBlock, hero, modules, seo', () => {
+    expect(pageTopicSchema.fields?.map((field) => field.name)).toEqual([
       'title',
       'slug',
-      'tag',
+      'topic',
       'headingBlock',
       'hero',
       'modules',
@@ -40,12 +40,12 @@ describe('pageTagSchema field order', () => {
   });
 });
 
-describe('pageTagSchema shape', () => {
+describe('pageTopicSchema shape', () => {
   it('title is required via the shared titleField() helper', () => {
     const titleFieldDefinition = getField('title');
 
     if (!titleFieldDefinition?.validation) {
-      throw new Error('Expected pageTagSchema to define a title field.');
+      throw new Error('Expected pageTopicSchema to define a title field.');
     }
 
     let requiredCalled = false;
@@ -63,7 +63,7 @@ describe('pageTagSchema shape', () => {
     expect(requiredCalled).toBe(true);
   });
 
-  it('no longer defines a postList field', () => {
+  it('has no deprecated postList field', () => {
     expect(getField('postList')).toBeUndefined();
   });
 
@@ -72,7 +72,7 @@ describe('pageTagSchema shape', () => {
       TArrayFieldDefinition | undefined;
 
     if (!modulesField || modulesField.type !== 'array' || !modulesField.of) {
-      throw new Error('Expected pageTagSchema to define a modules field.');
+      throw new Error('Expected pageTopicSchema to define a modules field.');
     }
 
     expect(modulesField.of.map((member) => member.name)).toEqual([
@@ -83,8 +83,26 @@ describe('pageTagSchema shape', () => {
     ]);
   });
 
-  it('seo stays optional — no validation() builder attached', () => {
-    expect(getField('seo')?.validation).toBeUndefined();
+  it('seo is required via the shared seoField() helper', () => {
+    const seoFieldDefinition = getField('seo');
+
+    if (!seoFieldDefinition?.validation) {
+      throw new Error('Expected pageTopicSchema to define a seo field.');
+    }
+
+    let requiredCalled = false;
+    const rule: TValidationRule = {
+      required: () => {
+        requiredCalled = true;
+        return rule;
+      },
+      custom: () => rule,
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (seoFieldDefinition.validation as any)(rule);
+
+    expect(requiredCalled).toBe(true);
   });
 });
 
@@ -93,7 +111,7 @@ type THeadingBlockFieldDefinition = {
   description?: string;
 };
 
-describe('pageTagSchema headingBlock field', () => {
+describe('pageTopicSchema headingBlock field', () => {
   it('is built via headingBlockField() with a page-scoped description', () => {
     const headingBlockField = getField('headingBlock') as
       THeadingBlockFieldDefinition | undefined;
@@ -105,14 +123,14 @@ describe('pageTagSchema headingBlock field', () => {
   });
 });
 
-describe('pageTagSchema hero field', () => {
+describe('pageTopicSchema hero field', () => {
   it('is an optional reference to the hero family via heroField()', () => {
     const heroField = getField('hero') as
       | { type: string; to?: Array<{ type: string }>; validation?: unknown }
       | undefined;
 
     if (!heroField) {
-      throw new Error('Expected pageTagSchema to define a hero field.');
+      throw new Error('Expected pageTopicSchema to define a hero field.');
     }
 
     expect(heroField.type).toBe('reference');
@@ -134,7 +152,7 @@ type TSlugFieldDefinition = {
   validation?: unknown;
 };
 
-describe('pageTagSchema slug field', () => {
+describe('pageTopicSchema slug field', () => {
   const getSlugField = () =>
     getField('slug') as TSlugFieldDefinition | undefined;
 
@@ -142,7 +160,7 @@ describe('pageTagSchema slug field', () => {
     const slugField = getSlugField();
 
     if (!slugField || slugField.type !== 'slug') {
-      throw new Error('Expected pageTagSchema to define a slug field.');
+      throw new Error('Expected pageTopicSchema to define a slug field.');
     }
 
     expect(slugField.options?.source).toBe('title');
@@ -154,7 +172,7 @@ describe('pageTagSchema slug field', () => {
 
     if (!slugField?.validation) {
       throw new Error(
-        'Expected pageTagSchema slug field to define validation.',
+        'Expected pageTopicSchema slug field to define validation.',
       );
     }
 
@@ -174,9 +192,9 @@ describe('pageTagSchema slug field', () => {
   });
 
   it('relies on the default per-document-type isUnique scope rather than overriding it', () => {
-    // /tags/{slug} collisions only matter within page_tag itself, which is
-    // exactly Sanity's default slug uniqueness scope — no custom `isUnique`
-    // is needed on top of it.
+    // /topics/{slug} collisions only matter within page_topic itself, which
+    // is exactly Sanity's default slug uniqueness scope — no custom
+    // `isUnique` is needed on top of it.
     const slugField = getSlugField();
 
     expect(slugField?.options?.isUnique).toBeUndefined();
@@ -189,27 +207,31 @@ describe('pageTagSchema slug field', () => {
   });
 });
 
-describe('pageTagSchema tag field', () => {
-  const getTagField = () =>
-    getField('tag') as TReferenceFieldDefinition | undefined;
+describe('pageTopicSchema topic field', () => {
+  const getTopicField = () =>
+    getField('topic') as TReferenceFieldDefinition | undefined;
 
-  it('references blog_tag', () => {
-    const tagField = getTagField();
+  it('references blog_topic', () => {
+    const topicField = getTopicField();
 
-    if (!tagField || tagField.type !== 'reference') {
+    if (!topicField || topicField.type !== 'reference') {
       throw new Error(
-        'Expected pageTagSchema to define a tag reference field.',
+        'Expected pageTopicSchema to define a topic reference field.',
       );
     }
 
-    expect(tagField.to?.map((target) => target.type)).toEqual([tagSchema.name]);
+    expect(topicField.to?.map((target) => target.type)).toEqual([
+      topicSchema.name,
+    ]);
   });
 
   it('is required', () => {
-    const tagField = getTagField();
+    const topicField = getTopicField();
 
-    if (!tagField?.validation) {
-      throw new Error('Expected pageTagSchema tag field to define validation.');
+    if (!topicField?.validation) {
+      throw new Error(
+        'Expected pageTopicSchema topic field to define validation.',
+      );
     }
 
     let requiredCalled = false;
@@ -222,7 +244,7 @@ describe('pageTagSchema tag field', () => {
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    (tagField.validation as any)(rule);
+    (topicField.validation as any)(rule);
 
     expect(requiredCalled).toBe(true);
   });
@@ -234,20 +256,22 @@ type TCustomFn = (
   context: ValidationContext,
 ) => Promise<string | true>;
 
-const TAG_UNIQUENESS_ERROR =
-  'Another Tag Page already references this tag — each tag can only back one Tag Page.';
+const UNIQUENESS_ERROR =
+  'Another Topic Page already references this topic — each topic can only back one Topic Page.';
 
 /**
- * `validateUniqueTagReference` is private to page-tag.ts; the `tag` field's
- * `validation` builder registers it via `rule.custom(fn)`, so a minimal
- * chainable mock rule captures it the same way home-page.test.ts captures
- * its modules-field custom validator — no export needed.
+ * `validateUniqueTopicReference` is private to topic.ts; the `topic`
+ * field's `validation` builder registers it via `rule.custom(fn)`, so a
+ * minimal chainable mock rule captures it the same way home.test.ts
+ * captures its modules-field custom validator — no export needed.
  */
-const getUniqueTagValidator = (): TCustomFn => {
-  const tagField = pageTagSchema.fields?.find((field) => field.name === 'tag');
+const getUniqueTopicValidator = (): TCustomFn => {
+  const topicField = pageTopicSchema.fields?.find(
+    (field) => field.name === 'topic',
+  );
 
-  if (!tagField?.validation) {
-    throw new Error('Expected tag field validation to register custom().');
+  if (!topicField?.validation) {
+    throw new Error('Expected topic field validation to register custom().');
   }
 
   let customFn: TCustomFn | undefined;
@@ -261,16 +285,19 @@ const getUniqueTagValidator = (): TCustomFn => {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (tagField.validation as any)(rule);
+  (topicField.validation as any)(rule);
 
   if (!customFn) {
-    throw new Error('Expected tag field validation to register custom().');
+    throw new Error('Expected topic field validation to register custom().');
   }
 
   return customFn;
 };
 
-const createMockContext = (fetchResult: unknown, documentId = 'page-tag-1') => {
+const createMockContext = (
+  fetchResult: unknown,
+  documentId = 'page-topic-1',
+) => {
   const fetchCalls: { query: string; params: unknown }[] = [];
   const withConfigCalls: unknown[] = [];
 
@@ -295,49 +322,49 @@ const createMockContext = (fetchResult: unknown, documentId = 'page-tag-1') => {
   return { context, fetchCalls, withConfigCalls };
 };
 
-describe('validateUniqueTagReference', () => {
+describe('validateUniqueTopicReference', () => {
   it('passes without querying when no reference is set', async () => {
-    const validate = getUniqueTagValidator();
+    const validate = getUniqueTopicValidator();
     const { context, fetchCalls } = createMockContext(0);
 
     await expect(validate(undefined, context)).resolves.toBe(true);
     expect(fetchCalls).toHaveLength(0);
   });
 
-  it('passes when no other page_tag references the same tag', async () => {
-    const validate = getUniqueTagValidator();
+  it('passes when no other page_topic references the same topic', async () => {
+    const validate = getUniqueTopicValidator();
     const { context } = createMockContext(0);
 
-    await expect(validate({ _ref: 'tag-1' }, context)).resolves.toBe(true);
+    await expect(validate({ _ref: 'topic-1' }, context)).resolves.toBe(true);
   });
 
-  it('flags a conflicting page_tag referencing the same tag', async () => {
-    const validate = getUniqueTagValidator();
+  it('flags a conflicting page_topic referencing the same topic', async () => {
+    const validate = getUniqueTopicValidator();
     const { context } = createMockContext(1);
 
-    await expect(validate({ _ref: 'tag-1' }, context)).resolves.toBe(
-      TAG_UNIQUENESS_ERROR,
+    await expect(validate({ _ref: 'topic-1' }, context)).resolves.toBe(
+      UNIQUENESS_ERROR,
     );
   });
 
   it('excludes both the draft and published id of the current document', async () => {
-    const validate = getUniqueTagValidator();
-    const { context, fetchCalls } = createMockContext(0, 'drafts.page-tag-1');
+    const validate = getUniqueTopicValidator();
+    const { context, fetchCalls } = createMockContext(0, 'drafts.page-topic-1');
 
-    await validate({ _ref: 'tag-1' }, context);
+    await validate({ _ref: 'topic-1' }, context);
 
     expect(fetchCalls[0]?.params).toEqual({
-      type: 'page_tag',
-      tagId: 'tag-1',
-      publishedId: 'page-tag-1',
+      type: 'page_topic',
+      topicId: 'topic-1',
+      publishedId: 'page-topic-1',
     });
   });
 
   it('requests the drafts perspective so an unpublished conflict still counts', async () => {
-    const validate = getUniqueTagValidator();
+    const validate = getUniqueTopicValidator();
     const { context, withConfigCalls } = createMockContext(0);
 
-    await validate({ _ref: 'tag-1' }, context);
+    await validate({ _ref: 'topic-1' }, context);
 
     expect(withConfigCalls).toEqual([{ perspective: 'drafts' }]);
   });
@@ -366,18 +393,18 @@ const createDocumentMockRule = (
 });
 
 const buildDocumentRules = (): TDocumentMockRule[] => {
-  if (!pageTagSchema.validation) {
-    throw new Error('Expected pageTagSchema to define a validation rule.');
+  if (!pageTopicSchema.validation) {
+    throw new Error('Expected pageTopicSchema to define a validation rule.');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  return (pageTagSchema.validation as any)(
+  return (pageTopicSchema.validation as any)(
     createDocumentMockRule(),
   ) as TDocumentMockRule[];
 };
 
-describe('pageTagSchema document validation — hero or heading', () => {
-  it('errors when neither hero, headingBlock.heading, nor a resolvable tag is set', async () => {
+describe('pageTopicSchema document validation — hero or heading', () => {
+  it('errors when neither hero, headingBlock.heading, nor a resolvable topic is set', async () => {
     const [heroOrHeadingRule] = buildDocumentRules();
     const { context } = createMockContext(null);
 
@@ -386,7 +413,7 @@ describe('pageTagSchema document validation — hero or heading', () => {
     );
   });
 
-  it('passes when hero is set, without querying the tag', async () => {
+  it('passes when hero is set, without querying the topic', async () => {
     const [heroOrHeadingRule] = buildDocumentRules();
     const { context, fetchCalls } = createMockContext(null);
 
@@ -396,7 +423,7 @@ describe('pageTagSchema document validation — hero or heading', () => {
     expect(fetchCalls).toHaveLength(0);
   });
 
-  it('passes when headingBlock.heading is set, without querying the tag', async () => {
+  it('passes when headingBlock.heading is set, without querying the topic', async () => {
     const [heroOrHeadingRule] = buildDocumentRules();
     const { context, fetchCalls } = createMockContext(null);
 
@@ -409,27 +436,27 @@ describe('pageTagSchema document validation — hero or heading', () => {
     expect(fetchCalls).toHaveLength(0);
   });
 
-  it('passes when neither hero nor heading is set but the referenced tag has a title', async () => {
+  it('passes when neither hero nor heading is set but the referenced topic has a title', async () => {
     const [heroOrHeadingRule] = buildDocumentRules();
     const { context, fetchCalls } = createMockContext('Design');
 
     await expect(
-      heroOrHeadingRule?.fn?.({ tag: { _ref: 'tag-1' } }, context),
+      heroOrHeadingRule?.fn?.({ topic: { _ref: 'topic-1' } }, context),
     ).resolves.toBe(true);
-    expect(fetchCalls[0]?.params).toEqual({ id: 'tag-1' });
+    expect(fetchCalls[0]?.params).toEqual({ id: 'topic-1' });
   });
 
-  it('errors when a tag is referenced but resolves to no title', async () => {
+  it('errors when a topic is referenced but resolves to no title', async () => {
     const [heroOrHeadingRule] = buildDocumentRules();
     const { context } = createMockContext(null);
 
     await expect(
-      heroOrHeadingRule?.fn?.({ tag: { _ref: 'tag-1' } }, context),
+      heroOrHeadingRule?.fn?.({ topic: { _ref: 'topic-1' } }, context),
     ).resolves.toBe('Add a hero or a heading');
   });
 });
 
-describe('pageTagSchema document validation — hero hides heading', () => {
+describe('pageTopicSchema document validation — hero hides heading', () => {
   it('warns when both hero and headingBlock.heading are set', () => {
     const [, heroHidesHeadingRule] = buildDocumentRules();
 
@@ -457,7 +484,7 @@ describe('pageTagSchema document validation — hero hides heading', () => {
   });
 });
 
-describe('pageTagSchema document validation — modules[] post list count', () => {
+describe('pageTopicSchema document validation — modules[] post list count', () => {
   it('errors when more than one module_postList is referenced', () => {
     const [, , singlePostListRule] = buildDocumentRules();
 
@@ -511,82 +538,5 @@ describe('pageTagSchema document validation — modules[] post list count', () =
     expect(hasPostListRule?.fn?.({}, {} as ValidationContext)).toBe(
       'This page has no Post List module — the archive will be empty until one is added.',
     );
-  });
-});
-
-const POST_LIST_UNIQUENESS_ERROR =
-  'Another Tag Page already references this Post List — each Post List can only back one Tag Page.';
-
-describe('pageTagSchema document validation — unique post list reference', () => {
-  it('passes without querying when modules[] carries no post list reference', async () => {
-    const [, , , , uniquePostListRule] = buildDocumentRules();
-    const { context, fetchCalls } = createMockContext(0);
-
-    await expect(uniquePostListRule?.fn?.({}, context)).resolves.toBe(true);
-    expect(fetchCalls).toHaveLength(0);
-  });
-
-  it('reads the reference from modules[] when present', async () => {
-    const [, , , , uniquePostListRule] = buildDocumentRules();
-    const { context, fetchCalls } = createMockContext(0);
-
-    await uniquePostListRule?.fn?.(
-      {
-        _id: 'page-tag-1',
-        modules: [{ _type: postListSchema.name, _ref: 'post-list-1' }],
-      },
-      context,
-    );
-
-    expect(fetchCalls[0]?.params).toMatchObject({ postListId: 'post-list-1' });
-  });
-
-  it('flags a conflicting page_tag referencing the same modules[] post list', async () => {
-    const [, , , , uniquePostListRule] = buildDocumentRules();
-    const { context } = createMockContext(1);
-
-    await expect(
-      uniquePostListRule?.fn?.(
-        {
-          _id: 'page-tag-1',
-          modules: [{ _type: postListSchema.name, _ref: 'post-list-1' }],
-        },
-        context,
-      ),
-    ).resolves.toBe(POST_LIST_UNIQUENESS_ERROR);
-  });
-
-  it('excludes both the draft and published id of the current document', async () => {
-    const [, , , , uniquePostListRule] = buildDocumentRules();
-    const { context, fetchCalls } = createMockContext(0, 'drafts.page-tag-1');
-
-    await uniquePostListRule?.fn?.(
-      {
-        _id: 'drafts.page-tag-1',
-        modules: [{ _type: postListSchema.name, _ref: 'post-list-1' }],
-      },
-      context,
-    );
-
-    expect(fetchCalls[0]?.params).toEqual({
-      type: 'page_tag',
-      postListId: 'post-list-1',
-      publishedId: 'page-tag-1',
-    });
-  });
-
-  it('requests the drafts perspective so an unpublished conflict still counts', async () => {
-    const [, , , , uniquePostListRule] = buildDocumentRules();
-    const { context, withConfigCalls } = createMockContext(0);
-
-    await uniquePostListRule?.fn?.(
-      {
-        _id: 'page-tag-1',
-        modules: [{ _type: postListSchema.name, _ref: 'post-list-1' }],
-      },
-      context,
-    );
-
-    expect(withConfigCalls).toEqual([{ perspective: 'drafts' }]);
   });
 });

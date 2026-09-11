@@ -42,6 +42,28 @@ type TBlogTagDoc = {
   slug?: { current?: string };
 };
 
+/**
+ * Must stay in sync with `../../src/schema-types/objects/seo.ts`'s
+ * `SEO_META_TITLE_MAX_LENGTH` — duplicated here rather than imported.
+ * `sanity/migrate`'s Node loader cannot resolve that module's `sanity`
+ * import chain (it bundles a `.css` asset), so any migration importing
+ * from the Studio schema module fails every migration's `list`/`run`,
+ * not just its own.
+ */
+const SEO_META_TITLE_MAX_LENGTH = 60;
+
+/**
+ * A fixed skeleton around the tag title clears the schema's metaTitle floor
+ * regardless of how short the title is; only the ceiling needs clamping.
+ */
+export const buildTagMetaTitle = (tagTitle: string): string => {
+  const title = `Browse every post tagged "${tagTitle}" on the blog`;
+
+  return title.length > SEO_META_TITLE_MAX_LENGTH
+    ? title.slice(0, SEO_META_TITLE_MAX_LENGTH).trimEnd()
+    : title;
+};
+
 export default defineMigration({
   title: 'Seed page_tag and module_postList for the existing blog_tag',
   documentTypes: ['blog_tag'],
@@ -73,6 +95,10 @@ export default defineMigration({
           slug: tag.slug,
           tag: { _type: 'reference', _ref: tag._id },
           postList: { _type: 'reference', _ref: postListId },
+          seo: {
+            _type: 'seo',
+            metaTitle: buildTagMetaTitle(tag.title ?? ''),
+          },
         }),
       ];
     },

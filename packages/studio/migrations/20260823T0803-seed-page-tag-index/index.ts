@@ -77,6 +77,10 @@ export default defineMigration({
             _type: 'reference',
             _ref: TAXONOMY_LIST_TAGS_ID,
           },
+          seo: {
+            _type: 'seo',
+            metaTitle: 'Browse every post by tag on the blog',
+          },
         }),
       ];
     },

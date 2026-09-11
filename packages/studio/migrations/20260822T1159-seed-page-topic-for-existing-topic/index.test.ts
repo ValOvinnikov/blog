@@ -1,11 +1,15 @@
-import { pageTopicSchema } from '@blog/studio/schema-types/documents/pages/page-topic';
+import { pageTopicSchema } from '@blog/studio/schema-types/documents/pages/topic';
 import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
+import {
+  SEO_META_TITLE_MAX_LENGTH,
+  SEO_META_TITLE_MIN_LENGTH,
+} from '@blog/studio/schema-types/objects/seo';
 import { assertSatisfiesRequiredFields } from '@blog/studio/testing/assert-satisfies-required-fields';
 import { createIfNotExists } from 'sanity/migrate';
 
 import { toPageTopicId, toTopicPostListId } from './id';
 
-import migration from './index';
+import migration, { buildTopicMetaTitle } from './index';
 
 const baseDoc = {
   _createdAt: '2026-01-01T00:00:00Z',
@@ -42,6 +46,7 @@ describe('seed-page-topic-for-existing-topic migration', () => {
       slug: { _type: 'slug', current: 'react' },
       topic: { _type: 'reference', _ref: topicDoc._id },
       postList: { _type: 'reference', _ref: postListId },
+      seo: { _type: 'seo', metaTitle: buildTopicMetaTitle('React') },
     };
 
     assertSatisfiesRequiredFields(postListSchema, postListPayload);
@@ -85,10 +90,24 @@ describe('seed-page-topic-for-existing-topic migration', () => {
         _type: 'reference',
         _ref: toTopicPostListId(otherSlugDoc._id),
       },
+      seo: { _type: 'seo', metaTitle: buildTopicMetaTitle('TypeScript') },
     };
 
     assertSatisfiesRequiredFields(pageTopicSchema, pageTopicPayload);
 
     expect(pageTopicMutation).toEqual(createIfNotExists(pageTopicPayload));
+  });
+
+  it('seeds a seo.metaTitle within bounds for a one-character topic title', () => {
+    const metaTitle = buildTopicMetaTitle('A');
+
+    expect(metaTitle.length).toBeGreaterThanOrEqual(SEO_META_TITLE_MIN_LENGTH);
+    expect(metaTitle.length).toBeLessThanOrEqual(SEO_META_TITLE_MAX_LENGTH);
+  });
+
+  it('clamps a seo.metaTitle built from a very long topic title to the ceiling', () => {
+    const metaTitle = buildTopicMetaTitle('A'.repeat(200));
+
+    expect(metaTitle.length).toBe(SEO_META_TITLE_MAX_LENGTH);
   });
 });

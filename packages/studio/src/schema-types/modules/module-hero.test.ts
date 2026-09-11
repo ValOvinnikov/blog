@@ -1,4 +1,4 @@
-import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
+import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { heroSchema } from '@blog/studio/schema-types/modules/module-hero';
 
 const getField = (name: string) => {

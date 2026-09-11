@@ -2,9 +2,10 @@ import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/components/
 import { authorSchema } from '@blog/studio/schema-types/documents/blog/author';
 import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag';
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic';
-import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/page-post-type';
+import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { defineModulesField } from '@blog/studio/schema-types/helpers/define-modules-field';
 import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
+import { seoField } from '@blog/studio/schema-types/helpers/seo-field';
 import { slugField } from '@blog/studio/schema-types/helpers/slug-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
 import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/helpers/validate-single-blank-heading-per-type';
@@ -13,7 +14,6 @@ import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsl
 import { postRelatedSchema } from '@blog/studio/schema-types/modules/module-post-related';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt';
 import { richTextSchema } from '@blog/studio/schema-types/objects/rich-text';
-import { seoSchema } from '@blog/studio/schema-types/objects/seo';
 import { skimSchema } from '@blog/studio/schema-types/objects/skim';
 import { Newspaper } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
@@ -109,13 +109,7 @@ export const pagePostSchema = defineType({
       description:
         '30-second-skim takeaways for the choose-your-depth reading experience.',
     }),
-    defineField({
-      name: 'seo',
-      title: 'SEO',
-      type: seoSchema.name,
-      description:
-        'Override Post page meta title, description, and social sharing image.',
-    }),
+    seoField(),
   ],
   preview: {
     select: {

@@ -1,4 +1,4 @@
-import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/page-tag-type';
+import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/tag/tag-type';
 import { getDraftsClient } from '@blog/studio/schema-types/helpers/get-drafts-client';
 import { slugField } from '@blog/studio/schema-types/helpers/slug-field';
 import { Tag } from 'lucide-react';

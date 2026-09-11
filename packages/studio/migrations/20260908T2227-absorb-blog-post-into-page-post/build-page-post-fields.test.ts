@@ -1,4 +1,4 @@
-import { pagePostSchema } from '@blog/studio/schema-types/documents/pages/page-post';
+import { pagePostSchema } from '@blog/studio/schema-types/documents/pages/post';
 import { assertSatisfiesRequiredFields } from '@blog/studio/testing/assert-satisfies-required-fields';
 
 import {
