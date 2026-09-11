@@ -5,7 +5,6 @@ import {
   type TContentAlignment,
   type TMaybeUndefined,
 } from '@blog/config';
-import type { TImageTenant } from '@blog/service/sanity/image';
 import { toCtaAction } from '@blog/service/shared/transformers/to-cta-action';
 import { toRequiredHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
@@ -84,10 +83,7 @@ function toCtaActions(raw: TRawCtaModule['actions']): TCtaAction[] {
     .filter((action): action is TCtaAction => action !== undefined);
 }
 
-export function toCtaModule(
-  raw: TRawCtaModule,
-  tenant: TImageTenant,
-): TCtaModule {
+export function toCtaModule(raw: TRawCtaModule): TCtaModule {
   return {
     variant: raw.variant,
     brandVariant: raw.brandVariant,
@@ -95,7 +91,7 @@ export function toCtaModule(
     eyebrow: raw.eyebrow ?? undefined,
     headingBlock: toRequiredHeadingBlock(raw.headingBlock),
     content: toContent(raw.content),
-    image: toSanityImage(raw.image, tenant),
+    image: toSanityImage(raw.image),
     contentPosition: toContentPosition(raw),
     contentAlignment: raw.contentAlignment ?? undefined,
     mobileMediaOrder: raw.mobileMediaOrder ?? undefined,

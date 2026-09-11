@@ -1,7 +1,6 @@
-import type { TMaybeUndefined } from '@blog/config';
-import type { TImageTenant } from '@blog/service/sanity/image';
+import type { ISanityImage, TMaybeUndefined } from '@blog/config';
 import type { seoFragment } from '@blog/service/shared/fragments/seo';
-import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
+import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawSeo = InferFragmentType<typeof seoFragment>;
@@ -11,7 +10,7 @@ export type TSeoResolved = {
   description: TMaybeUndefined<string>;
   ogTitle: TMaybeUndefined<string>;
   ogDescription: TMaybeUndefined<string>;
-  ogImageUrl: TMaybeUndefined<string>;
+  ogImage: TMaybeUndefined<ISanityImage>;
 };
 
 /**
@@ -27,10 +26,7 @@ export class MissingSeoTitleError extends Error {
   }
 }
 
-export function resolveSeo(
-  authored: TRawSeo | null | undefined,
-  tenant: TImageTenant,
-): TSeoResolved {
+export function resolveSeo(authored: TRawSeo | null | undefined): TSeoResolved {
   if (!authored?.metaTitle) throw new MissingSeoTitleError();
 
   return {
@@ -38,6 +34,6 @@ export function resolveSeo(
     description: authored.metaDescription ?? undefined,
     ogTitle: authored.openGraph?.ogTitle ?? undefined,
     ogDescription: authored.openGraph?.ogDescription ?? undefined,
-    ogImageUrl: buildImageUrl(authored.openGraph?.ogImage, tenant),
+    ogImage: toSanityImage(authored.openGraph?.ogImage),
   };
 }

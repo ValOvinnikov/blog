@@ -17,7 +17,6 @@ import {
   makeRawHeadingBlock,
   makeRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
 
 import { toCtaModule } from './transformer';
 
@@ -25,7 +24,7 @@ describe('toCtaModule', () => {
   it('maps headingBlock and brandVariant', () => {
     const raw = makeRawCtaModule();
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.headingBlock).toEqual({
       heading: 'Subscribe to the newsletter',
@@ -37,7 +36,7 @@ describe('toCtaModule', () => {
   it('maps brandVariant straight through, including BRAND_PRIMARY', () => {
     const raw = makeRawCtaModule({ brandVariant: BRAND_VARIANT.BRAND_PRIMARY });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
   });
@@ -45,7 +44,7 @@ describe('toCtaModule', () => {
   it('maps bandTone straight through', () => {
     const raw = makeRawCtaModule({ bandTone: BRAND_VARIANT.SECONDARY });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.bandTone).toBe(BRAND_VARIANT.SECONDARY);
   });
@@ -53,7 +52,7 @@ describe('toCtaModule', () => {
   it('maps bandTone straight through, including BRAND_PRIMARY', () => {
     const raw = makeRawCtaModule({ bandTone: BRAND_VARIANT.BRAND_PRIMARY });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.bandTone).toBe(BRAND_VARIANT.BRAND_PRIMARY);
   });
@@ -63,7 +62,7 @@ describe('toCtaModule', () => {
     (variant) => {
       const raw = makeRawCtaModule({ variant });
 
-      const cta = toCtaModule(raw, makeTenant());
+      const cta = toCtaModule(raw);
 
       expect(cta.variant).toBe(variant);
     },
@@ -76,7 +75,7 @@ describe('toCtaModule', () => {
       contentPositionBanner: CONTENT_ALIGNMENT.LEFT,
     });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.contentPosition).toBe(CONTENT_ALIGNMENT.RIGHT);
   });
@@ -88,7 +87,7 @@ describe('toCtaModule', () => {
       contentPositionBanner: CONTENT_ALIGNMENT.LEFT,
     });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.contentPosition).toBe(CONTENT_ALIGNMENT.LEFT);
   });
@@ -99,7 +98,7 @@ describe('toCtaModule', () => {
       contentPositionBanner: CONTENT_ALIGNMENT.CENTER,
     });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.contentPosition).toBe(CONTENT_ALIGNMENT.CENTER);
   });
@@ -111,7 +110,7 @@ describe('toCtaModule', () => {
       contentPositionBanner: CONTENT_ALIGNMENT.CENTER,
     });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.contentPosition).toBeUndefined();
   });
@@ -126,16 +125,14 @@ describe('toCtaModule', () => {
       contentPositionBanner: null,
     });
 
-    expect(toCtaModule(splitRaw, makeTenant()).contentPosition).toBeUndefined();
-    expect(
-      toCtaModule(bannerRaw, makeTenant()).contentPosition,
-    ).toBeUndefined();
+    expect(toCtaModule(splitRaw).contentPosition).toBeUndefined();
+    expect(toCtaModule(bannerRaw).contentPosition).toBeUndefined();
   });
 
   it('leaves contentAlignment undefined when unset', () => {
     const raw = makeRawCtaModule({ contentAlignment: null });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.contentAlignment).toBeUndefined();
   });
@@ -145,7 +142,7 @@ describe('toCtaModule', () => {
       contentAlignment: CONTENT_ALIGNMENT.CENTER,
     });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.contentAlignment).toBe(CONTENT_ALIGNMENT.CENTER);
   });
@@ -155,7 +152,7 @@ describe('toCtaModule', () => {
       headingBlock: makeRawHeadingBlock('Subscribe to the newsletter'),
     });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.headingBlock.supportingText).toBeUndefined();
   });
@@ -163,7 +160,7 @@ describe('toCtaModule', () => {
   it('leaves eyebrow and footnote undefined when unset', () => {
     const raw = makeRawCtaModule({ eyebrow: null, footnote: null });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.eyebrow).toBeUndefined();
     expect(cta.footnote).toBeUndefined();
@@ -175,7 +172,7 @@ describe('toCtaModule', () => {
       footnote: 'No spam, unsubscribe anytime.',
     });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.eyebrow).toBe('Limited time');
     expect(cta.footnote).toBe('No spam, unsubscribe anytime.');
@@ -184,7 +181,7 @@ describe('toCtaModule', () => {
   it('leaves content undefined when unset', () => {
     const raw = makeRawCtaModule({ content: null });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.content).toBeUndefined();
   });
@@ -201,7 +198,7 @@ describe('toCtaModule', () => {
     ];
     const raw = makeRawCtaModule({ content: body });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.content).toEqual([{ ...body[0], markDefs: undefined }]);
   });
@@ -220,7 +217,7 @@ describe('toCtaModule', () => {
       ],
     });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.content?.[0]?.markDefs?.[0]).toMatchObject({
       _key: 'mark-1',
@@ -255,12 +252,12 @@ describe('toCtaModule', () => {
       ],
     });
 
-    expect(
-      toCtaModule(topicRaw, makeTenant()).content?.[0]?.markDefs?.[0]?.url,
-    ).toBe('/topics/engineering');
-    expect(
-      toCtaModule(pageRaw, makeTenant()).content?.[0]?.markDefs?.[0]?.url,
-    ).toBe('/about');
+    expect(toCtaModule(topicRaw).content?.[0]?.markDefs?.[0]?.url).toBe(
+      '/topics/engineering',
+    );
+    expect(toCtaModule(pageRaw).content?.[0]?.markDefs?.[0]?.url).toBe(
+      '/about',
+    );
   });
 
   it('keeps an external content link working as before', () => {
@@ -277,7 +274,7 @@ describe('toCtaModule', () => {
       ],
     });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.content?.[0]?.markDefs?.[0]?.url).toBe('https://example.com');
   });
@@ -297,8 +294,8 @@ describe('toCtaModule', () => {
       ],
     });
 
-    expect(() => toCtaModule(raw, makeTenant())).not.toThrow();
-    const cta = toCtaModule(raw, makeTenant());
+    expect(() => toCtaModule(raw)).not.toThrow();
+    const cta = toCtaModule(raw);
     expect(cta.content?.[0]?.markDefs?.[0]?.url).toBeUndefined();
     expect(cta.content?.[0]?.markDefs?.[0]?._key).toBe('mark-1');
   });
@@ -306,7 +303,7 @@ describe('toCtaModule', () => {
   it('leaves image undefined when unset', () => {
     const raw = makeRawCtaModule({ image: null });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.image).toBeUndefined();
   });
@@ -314,12 +311,11 @@ describe('toCtaModule', () => {
   it('maps image when authored', () => {
     const raw = makeRawCtaModule({ image: makeRawSanityImage() });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.image).toEqual({
       assetId: 'image-abc123-800x600-jpg',
       alt: 'Alt text',
-      cdnBaseUrl: 'https://cdn.sanity.io/images/tenant-a/production/',
       hotspot: undefined,
       crop: undefined,
       lqip: 'data:image/png;base64,abc123',
@@ -327,24 +323,10 @@ describe('toCtaModule', () => {
     });
   });
 
-  it('derives the image cdnBaseUrl from the given tenant, not a shared default', () => {
-    const raw = makeRawCtaModule({ image: makeRawSanityImage() });
-
-    const ctaA = toCtaModule(raw, makeTenant({ projectId: 'proj-a' }));
-    const ctaB = toCtaModule(raw, makeTenant({ projectId: 'proj-b' }));
-
-    expect(ctaA.image?.cdnBaseUrl).toBe(
-      'https://cdn.sanity.io/images/proj-a/production/',
-    );
-    expect(ctaB.image?.cdnBaseUrl).toBe(
-      'https://cdn.sanity.io/images/proj-b/production/',
-    );
-  });
-
   it('returns an empty array for an absent actions field', () => {
     const raw = makeRawCtaModule({ actions: null });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.actions).toEqual([]);
   });
@@ -352,7 +334,7 @@ describe('toCtaModule', () => {
   it('returns an empty array when the actions array is present but empty', () => {
     const raw = makeRawCtaModule({ actions: { actions: [] } });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.actions).toEqual([]);
   });
@@ -362,7 +344,7 @@ describe('toCtaModule', () => {
       actions: { actions: [makeRawCtaAction()] },
     });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.actions).toEqual([
       {
@@ -401,7 +383,7 @@ describe('toCtaModule', () => {
       },
     });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.actions).toHaveLength(2);
     expect(cta.actions?.[0]).toMatchObject({
@@ -423,7 +405,7 @@ describe('toCtaModule', () => {
       actions: { actions: [makeRawCtaAction({ variant, appearance })] },
     });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.actions?.[0]).toMatchObject({ variant, appearance });
   });
@@ -447,7 +429,7 @@ describe('toCtaModule', () => {
       },
     });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.actions).toEqual([]);
   });
@@ -471,7 +453,7 @@ describe('toCtaModule', () => {
       },
     });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.actions?.[0]?.link.ariaLabel).toBe(
       'Subscribe to the newsletter',
@@ -489,7 +471,7 @@ describe('toCtaModule', () => {
       },
     });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.layout).toEqual({
       spacingTop: 'LG',
@@ -503,7 +485,7 @@ describe('toCtaModule', () => {
   it('leaves layout undefined when the field is unset (no faked default)', () => {
     const raw = makeRawCtaModule({ layout: null });
 
-    const cta = toCtaModule(raw, makeTenant());
+    const cta = toCtaModule(raw);
 
     expect(cta.layout).toBeUndefined();
   });

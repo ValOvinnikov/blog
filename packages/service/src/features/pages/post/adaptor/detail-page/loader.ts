@@ -22,5 +22,5 @@ export async function getPost(
   });
   if (!raw) return undefined;
 
-  return toPostDetail(raw, tenant);
+  return toPostDetail(raw);
 }

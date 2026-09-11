@@ -1,6 +1,5 @@
 import { SPEC_LINE_SEPARATOR_CHARS } from '@blog/config';
-import type { TImageTenant } from '@blog/service/sanity/image';
-import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
+import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import type { InferResultType } from 'groqd';
 
 import type { siteSettingsQuery } from './query';
@@ -10,10 +9,7 @@ export type TRawSiteSettings = NonNullable<
   InferResultType<typeof siteSettingsQuery>
 >;
 
-export function toSiteSettings(
-  raw: TRawSiteSettings,
-  tenant: TImageTenant,
-): TSiteSettings {
+export function toSiteSettings(raw: TRawSiteSettings): TSiteSettings {
   const specLineItems = raw.brand.specLine?.items ?? [];
   const specLineSeparator = raw.brand.specLine?.separator;
   const specLine =
@@ -25,8 +21,7 @@ export function toSiteSettings(
     brand: {
       name: raw.brand.name,
       specLine,
-      logoUrl: buildImageUrl(raw.brand.logo, tenant),
-      logoAsset: raw.brand.logo ?? undefined,
+      logo: toSanityImage(raw.brand.logo),
     },
     description: raw.description,
     tagline: raw.tagline ?? undefined,

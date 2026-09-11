@@ -1,9 +1,19 @@
+import type { ISanityImage } from '@blog/config';
 import type { SanityImageSource } from '@sanity/image-url';
 
-import { urlForImage } from './image';
+import { urlForImage, urlForSanityImage } from './image';
 
 const image: SanityImageSource = {
   asset: { _ref: 'image-abc123-800x600-jpg' },
+};
+
+const sanityImage: ISanityImage = {
+  assetId: 'image-abc123-800x600-jpg',
+  alt: 'Alt text',
+  hotspot: undefined,
+  crop: undefined,
+  lqip: undefined,
+  dimensions: undefined,
 };
 
 describe(urlForImage, () => {
@@ -51,6 +61,44 @@ describe(urlForImage, () => {
     expect(url).toContain('w=64');
     expect(url).toContain('h=64');
     expect(url).toContain('fit=crop');
+  });
+});
+
+describe(urlForSanityImage, () => {
+  const tenant = { projectId: 'tenant-a', dataset: 'production' };
+
+  it('produces the same URL as urlForImage for the same asset', () => {
+    expect(urlForSanityImage(sanityImage, tenant)).toBe(
+      urlForImage(image, tenant),
+    );
+  });
+
+  it('produces the same URL as urlForImage with transform options applied', () => {
+    const options = { width: 64, height: 64, fit: 'crop' as const };
+
+    expect(urlForSanityImage(sanityImage, tenant, options)).toBe(
+      urlForImage(image, tenant, options),
+    );
+  });
+
+  it('carries crop and hotspot through to the URL, matching urlForImage given the same source', () => {
+    const hotspot = { x: 0.5, y: 0.5, height: 0.8, width: 0.8 };
+    const crop = { top: 0.1, bottom: 0.1, left: 0.1, right: 0.1 };
+    const options = { width: 400, height: 300 };
+
+    const fromSanityImage = urlForSanityImage(
+      { ...sanityImage, hotspot, crop },
+      tenant,
+      options,
+    );
+    const fromRawSource = urlForImage(
+      { ...image, hotspot, crop },
+      tenant,
+      options,
+    );
+
+    expect(fromSanityImage).toBe(fromRawSource);
+    expect(fromSanityImage).toContain('rect=');
   });
 });
 

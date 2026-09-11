@@ -7,17 +7,14 @@ import {
 } from '@blog/config';
 import { makeRawPostFeaturedModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
 
 import { toPostFeaturedModule } from './transformer';
-
-const tenant = makeTenant();
 
 describe(toPostFeaturedModule, () => {
   it('maps headingBlock straight through', () => {
     const raw = makeRawPostFeaturedModule();
 
-    const module = toPostFeaturedModule(raw, tenant);
+    const module = toPostFeaturedModule(raw);
 
     expect(module.headingBlock).toEqual({
       heading: 'Featured',
@@ -30,7 +27,7 @@ describe(toPostFeaturedModule, () => {
       brandVariant: BRAND_VARIANT.SECONDARY,
     });
 
-    const module = toPostFeaturedModule(raw, tenant);
+    const module = toPostFeaturedModule(raw);
 
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
@@ -38,7 +35,7 @@ describe(toPostFeaturedModule, () => {
   it('leaves every headingBlock field undefined when the field itself is unset (no faked default)', () => {
     const raw = makeRawPostFeaturedModule({ headingBlock: null });
 
-    const module = toPostFeaturedModule(raw, tenant);
+    const module = toPostFeaturedModule(raw);
 
     expect(module.headingBlock).toEqual({
       heading: undefined,
@@ -49,7 +46,7 @@ describe(toPostFeaturedModule, () => {
   it('leaves contentAlignment undefined when unset (no faked default)', () => {
     const raw = makeRawPostFeaturedModule({ contentAlignment: null });
 
-    const module = toPostFeaturedModule(raw, tenant);
+    const module = toPostFeaturedModule(raw);
 
     expect(module.contentAlignment).toBeUndefined();
   });
@@ -59,7 +56,7 @@ describe(toPostFeaturedModule, () => {
       contentAlignment: CONTENT_ALIGNMENT.RIGHT,
     });
 
-    const module = toPostFeaturedModule(raw, tenant);
+    const module = toPostFeaturedModule(raw);
 
     expect(module.contentAlignment).toBe(CONTENT_ALIGNMENT.RIGHT);
   });
@@ -75,7 +72,7 @@ describe(toPostFeaturedModule, () => {
       },
     });
 
-    const module = toPostFeaturedModule(raw, tenant);
+    const module = toPostFeaturedModule(raw);
 
     expect(module.layout).toEqual({
       spacingTop: 'MD',
@@ -89,7 +86,7 @@ describe(toPostFeaturedModule, () => {
   it('leaves layout undefined when the field is unset (no faked default)', () => {
     const raw = makeRawPostFeaturedModule({ layout: null });
 
-    const module = toPostFeaturedModule(raw, tenant);
+    const module = toPostFeaturedModule(raw);
 
     expect(module.layout).toBeUndefined();
   });
@@ -103,7 +100,7 @@ describe(toPostFeaturedModule, () => {
       ],
     });
 
-    const module = toPostFeaturedModule(raw, tenant);
+    const module = toPostFeaturedModule(raw);
 
     expect(module.posts.map((p) => p.id)).toEqual(['b', 'a']);
   });
@@ -114,7 +111,7 @@ describe(toPostFeaturedModule, () => {
       posts: [makeRawPostCard({ _id: 'a' }), makeRawPostCard({ _id: 'c' })],
     });
 
-    const module = toPostFeaturedModule(raw, tenant);
+    const module = toPostFeaturedModule(raw);
 
     expect(module.posts.map((p) => p.id)).toEqual(['a', 'c']);
   });
@@ -126,7 +123,7 @@ describe(toPostFeaturedModule, () => {
       posts: [makeRawPostCard({ _id: 'a' }), makeRawPostCard({ _id: 'b' })],
     });
 
-    const module = toPostFeaturedModule(raw, tenant);
+    const module = toPostFeaturedModule(raw);
 
     expect(module.posts.map((p) => p.id)).toEqual(['a', 'b']);
   });
@@ -142,7 +139,7 @@ describe(toPostFeaturedModule, () => {
       ],
     });
 
-    const module = toPostFeaturedModule(raw, tenant);
+    const module = toPostFeaturedModule(raw);
 
     expect(module.posts.map((p) => p.id)).toEqual(['a']);
   });
@@ -158,7 +155,7 @@ describe(toPostFeaturedModule, () => {
       ],
     });
 
-    const module = toPostFeaturedModule(raw, tenant);
+    const module = toPostFeaturedModule(raw);
 
     expect(module.posts.map((p) => p.id)).toEqual(['a', 'b', 'c']);
   });
@@ -170,7 +167,7 @@ describe(toPostFeaturedModule, () => {
       posts: [],
     });
 
-    const module = toPostFeaturedModule(raw, tenant);
+    const module = toPostFeaturedModule(raw);
 
     expect(module.posts).toEqual([]);
   });
@@ -178,7 +175,7 @@ describe(toPostFeaturedModule, () => {
   it('passes showImages through when true', () => {
     const raw = makeRawPostFeaturedModule({ showImages: true });
 
-    const module = toPostFeaturedModule(raw, tenant);
+    const module = toPostFeaturedModule(raw);
 
     expect(module.showImages).toBe(true);
   });
@@ -186,7 +183,7 @@ describe(toPostFeaturedModule, () => {
   it('passes showImages through when false', () => {
     const raw = makeRawPostFeaturedModule({ showImages: false });
 
-    const module = toPostFeaturedModule(raw, tenant);
+    const module = toPostFeaturedModule(raw);
 
     expect(module.showImages).toBe(false);
   });
@@ -196,7 +193,7 @@ describe(toPostFeaturedModule, () => {
       displayMode: DISPLAY_MODE.CAROUSEL,
     });
 
-    const module = toPostFeaturedModule(raw, tenant);
+    const module = toPostFeaturedModule(raw);
 
     expect(module.displayMode).toBe(DISPLAY_MODE.CAROUSEL);
   });
@@ -204,7 +201,7 @@ describe(toPostFeaturedModule, () => {
   it('passes the read-time GRID default through when the field is absent from the document', () => {
     const raw = makeRawPostFeaturedModule({ displayMode: DISPLAY_MODE.GRID });
 
-    const module = toPostFeaturedModule(raw, tenant);
+    const module = toPostFeaturedModule(raw);
 
     expect(module.displayMode).toBe(DISPLAY_MODE.GRID);
   });

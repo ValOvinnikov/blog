@@ -3,7 +3,6 @@ import type {
   RichText,
   TPortableTextBody,
 } from '@blog/config';
-import type { TImageTenant } from '@blog/service/sanity/image';
 import type { portableTextBodyItemFragment } from '@blog/service/shared/fragments/portable-text-body';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import type { InferFragmentType } from 'groqd';
@@ -17,25 +16,21 @@ type TRawBodyImageBlock = Extract<
   { _type: 'bodyImage' }
 >;
 
-function toBodyImageBlock(
-  raw: TRawBodyImageBlock,
-  tenant: TImageTenant,
-): IBodyImageBlock {
+function toBodyImageBlock(raw: TRawBodyImageBlock): IBodyImageBlock {
   return {
     _type: 'bodyImage',
     _key: raw._key,
     layout: raw.layout ?? undefined,
-    image: toSanityImage(raw, tenant),
+    image: toSanityImage(raw),
   };
 }
 
 export function toPortableTextBody(
   raw: TRawPortableTextBody,
-  tenant: TImageTenant,
 ): TPortableTextBody {
   return raw.map((block) => {
     if (block._type === 'bodyImage') {
-      return toBodyImageBlock(block, tenant);
+      return toBodyImageBlock(block);
     }
 
     // `conditionalByType`'s `'...'` spread on this heterogeneous array

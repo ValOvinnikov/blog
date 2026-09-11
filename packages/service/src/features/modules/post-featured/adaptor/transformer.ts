@@ -1,5 +1,4 @@
 import { POST_SOURCE } from '@blog/config';
-import type { TImageTenant } from '@blog/service/sanity/image';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
@@ -14,7 +13,6 @@ export type TRawPostFeaturedModule = InferResultType<
 
 export function toPostFeaturedModule(
   raw: TRawPostFeaturedModule,
-  tenant: TImageTenant,
 ): TPostFeaturedModule {
   const posts = raw.posts ?? [];
   const limitedPosts =
@@ -25,7 +23,7 @@ export function toPostFeaturedModule(
   return {
     brandVariant: raw.brandVariant,
     headingBlock: toHeadingBlock(raw.headingBlock),
-    posts: limitedPosts.map((post) => toPostCard(post, tenant)),
+    posts: limitedPosts.map((post) => toPostCard(post)),
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,
     showImages: raw.showImages,

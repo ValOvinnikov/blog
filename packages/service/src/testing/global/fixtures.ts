@@ -3,7 +3,7 @@ import type { TRawNavigation } from '@blog/service/features/global/navigation/ad
 import type { TRawNewsletterSettings } from '@blog/service/features/global/newsletter-settings/adaptor/transformer';
 import type { TRawSiteSettings } from '@blog/service/features/global/site-settings/adaptor/transformer';
 import type { TRawThemeSettings } from '@blog/service/features/global/theme-settings/adaptor/transformer';
-import { makeRawImage } from '@blog/service/testing/shared/fixtures';
+import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
 
 export function makeRawSiteSettings(
   overrides: Partial<TRawSiteSettings> = {},
@@ -12,7 +12,7 @@ export function makeRawSiteSettings(
     brand: {
       name: 'My Blog',
       specLine: null,
-      logo: makeRawImage('Logo'),
+      logo: makeRawSanityImage('Logo'),
     },
     description: 'A blog about things',
     tagline: null,

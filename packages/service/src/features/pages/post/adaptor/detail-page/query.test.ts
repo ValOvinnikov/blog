@@ -21,7 +21,6 @@ describe('postPageQuery', () => {
   it('parses a post whose optional fields are all absent', () => {
     const raw = makeRawPostDetail({
       heroImage: null,
-      heroImageAsset: null,
       featured: null,
       seo: null,
       author: makeRawAuthor({ role: null }),

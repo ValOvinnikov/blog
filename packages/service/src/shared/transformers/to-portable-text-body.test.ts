@@ -1,5 +1,3 @@
-import { makeTenant } from '@blog/service/testing/tenant';
-
 import {
   toPortableTextBody,
   type TRawPortableTextBody,
@@ -30,7 +28,7 @@ function makeRawBody(
 
 describe('toPortableTextBody', () => {
   it('resolves a bodyImage block into an image view-model', () => {
-    const result = toPortableTextBody(makeRawBody(), makeTenant());
+    const result = toPortableTextBody(makeRawBody());
 
     expect(result).toEqual([
       {
@@ -40,7 +38,6 @@ describe('toPortableTextBody', () => {
         image: {
           assetId: 'image-abc123-800x600-jpg',
           alt: 'Alt text',
-          cdnBaseUrl: 'https://cdn.sanity.io/images/tenant-a/production/',
           hotspot: undefined,
           crop: undefined,
           lqip: 'data:image/png;base64,abc123',
@@ -50,42 +47,10 @@ describe('toPortableTextBody', () => {
     ]);
   });
 
-  it('derives the image cdnBaseUrl from the given tenant, not a shared default', () => {
-    const raw = makeRawBody();
-
-    const tenantA = toPortableTextBody(
-      raw,
-      makeTenant({ projectId: 'proj-a', dataset: 'production' }),
-    );
-    const tenantB = toPortableTextBody(
-      raw,
-      makeTenant({ projectId: 'proj-b', dataset: 'staging' }),
-    );
-
-    const [imageA] = tenantA;
-    const [imageB] = tenantB;
-    if (
-      !imageA ||
-      !imageB ||
-      imageA._type !== 'bodyImage' ||
-      imageB._type !== 'bodyImage'
-    ) {
-      throw new Error('expected bodyImage blocks');
-    }
-
-    expect(imageA.image?.cdnBaseUrl).toBe(
-      'https://cdn.sanity.io/images/proj-a/production/',
-    );
-    expect(imageB.image?.cdnBaseUrl).toBe(
-      'https://cdn.sanity.io/images/proj-b/staging/',
-    );
-    expect(imageA.image?.cdnBaseUrl).not.toBe(imageB.image?.cdnBaseUrl);
-  });
-
   it('keeps a bodyImage block whose asset never resolved, with image undefined', () => {
     const raw = makeRawBody({ asset: null });
 
-    const result = toPortableTextBody(raw, makeTenant());
+    const result = toPortableTextBody(raw);
 
     expect(result).toHaveLength(1);
     expect(result[0]).toEqual({
@@ -99,7 +64,7 @@ describe('toPortableTextBody', () => {
   it('maps a bodyImage block with no alt text to an empty string, not undefined', () => {
     const raw = makeRawBody({ alt: null });
 
-    const result = toPortableTextBody(raw, makeTenant());
+    const result = toPortableTextBody(raw);
 
     expect(result[0]).toMatchObject({
       image: expect.objectContaining({ alt: '' }),
@@ -109,7 +74,7 @@ describe('toPortableTextBody', () => {
   it('maps a missing layout to undefined (no faked default)', () => {
     const raw = makeRawBody({ layout: null });
 
-    const result = toPortableTextBody(raw, makeTenant());
+    const result = toPortableTextBody(raw);
 
     expect(result[0]).toMatchObject({ layout: undefined });
   });
@@ -118,7 +83,7 @@ describe('toPortableTextBody', () => {
     const block = { _type: 'block' as const, _key: 'block-1' };
     const raw = [block] as TRawPortableTextBody;
 
-    const result = toPortableTextBody(raw, makeTenant());
+    const result = toPortableTextBody(raw);
 
     expect(result).toEqual([block]);
   });

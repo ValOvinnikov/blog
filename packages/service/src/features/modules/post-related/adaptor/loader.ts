@@ -64,7 +64,7 @@ export async function getPostRelated(
       : Promise.resolve([]),
   ]);
 
-  const posts = toRelatedPosts(byTags, byTopic, tagIds, raw.limit, tenant);
+  const posts = toRelatedPosts(byTags, byTopic, tagIds, raw.limit);
 
   return toPostRelatedModule(raw, posts);
 }

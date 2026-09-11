@@ -1,5 +1,4 @@
 import { HERO_FIELD_MODE } from '@blog/config';
-import type { TImageTenant } from '@blog/service/sanity/image';
 import { toHeroPrimaryAction } from '@blog/service/shared/transformers/to-hero-primary-action';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import { toLink } from '@blog/service/shared/transformers/to-link';
@@ -31,22 +30,21 @@ function getCustomOrFallback(
 export function toHeroModule(
   raw: TRawHeroModule,
   rawFallbackPost: TRawHeroFallbackPost,
-  tenant: TImageTenant,
 ): THeroModule {
   const configuredFeaturedPost = raw.featuredPost
-    ? toPostCard(raw.featuredPost, tenant)
+    ? toPostCard(raw.featuredPost)
     : undefined;
   const fallbackPost = rawFallbackPost
-    ? toPostCard(rawFallbackPost, tenant)
+    ? toPostCard(rawFallbackPost)
     : undefined;
   const heroPost = configuredFeaturedPost ?? fallbackPost;
 
   const sanityImage =
     raw.heroImageMode === HERO_FIELD_MODE.CUSTOM
-      ? toSanityImage(raw.heroImageAsset, tenant)
+      ? toSanityImage(raw.heroImageAsset)
       : raw.heroImageMode === HERO_FIELD_MODE.NONE
         ? undefined
-        : heroPost?.heroImageSanity;
+        : heroPost?.heroImage;
 
   return {
     brandVariant: raw.brandVariant,

@@ -1,3 +1,4 @@
+import type { ISanityImage } from '@blog/config';
 import {
   createImageUrlBuilder,
   type FitMode,
@@ -63,4 +64,18 @@ export function urlForImage(
   if (options?.fit) image = image.fit(options.fit);
   if (options?.quality) image = image.quality(options.quality);
   return image.url();
+}
+
+/** Builds a rendered URL for an `ISanityImage` view-model, at the tenant/options the caller supplies. */
+export function urlForSanityImage(
+  image: ISanityImage,
+  tenant: TImageTenant,
+  options?: TImageTransformOptions,
+): string {
+  const source: SanityImageSource = {
+    asset: { _id: image.assetId },
+    hotspot: image.hotspot,
+    crop: image.crop,
+  };
+  return urlForImage(source, tenant, options);
 }

@@ -1,7 +1,6 @@
 import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
 import { makeRawPostRelatedModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
 
 import {
   toPostRelatedModule,
@@ -28,8 +27,6 @@ function byTopicPost(
   return makeRawPostCard(overrides);
 }
 
-const tenant = makeTenant();
-
 describe(toRelatedPosts, () => {
   it('ranks candidates by shared-tag count desc, then publishedAt desc', () => {
     const oneShared = byTagsPost({
@@ -53,7 +50,6 @@ describe(toRelatedPosts, () => {
       [],
       ['tag-a', 'tag-b'],
       3,
-      tenant,
     );
 
     expect(result.map((post) => post.id)).toEqual([
@@ -68,7 +64,7 @@ describe(toRelatedPosts, () => {
       byTagsPost({ _id: `post-${i}`, tagIds: [{ _id: 'tag-a' }] }),
     );
 
-    const result = toRelatedPosts(byTags, [], ['tag-a'], 3, tenant);
+    const result = toRelatedPosts(byTags, [], ['tag-a'], 3);
 
     expect(result).toHaveLength(3);
   });
@@ -78,7 +74,7 @@ describe(toRelatedPosts, () => {
       byTagsPost({ _id: `post-${i}`, tagIds: [{ _id: 'tag-a' }] }),
     );
 
-    const result = toRelatedPosts(byTags, [], ['tag-a'], 6, tenant);
+    const result = toRelatedPosts(byTags, [], ['tag-a'], 6);
 
     expect(result).toHaveLength(6);
   });
@@ -86,7 +82,7 @@ describe(toRelatedPosts, () => {
   it('excludes the current post (the query already filters it, this asserts no re-inclusion by the transformer)', () => {
     const other = byTagsPost({ _id: 'other', tagIds: [{ _id: 'tag-a' }] });
 
-    const result = toRelatedPosts([other], [], ['tag-a'], 3, tenant);
+    const result = toRelatedPosts([other], [], ['tag-a'], 3);
 
     expect(result.map((post) => post.id)).not.toContain('current');
   });
@@ -101,7 +97,6 @@ describe(toRelatedPosts, () => {
       [topicOnlyA, topicOnlyB],
       ['tag-a'],
       3,
-      tenant,
     );
 
     expect(result.map((post) => post.id)).toEqual([
@@ -121,7 +116,6 @@ describe(toRelatedPosts, () => {
       [duplicate, topicOnly],
       ['tag-a'],
       3,
-      tenant,
     );
 
     expect(result.map((post) => post.id)).toEqual(['shared', 'topic-only']);
@@ -131,13 +125,13 @@ describe(toRelatedPosts, () => {
     const topicOnlyA = byTopicPost({ _id: 'topic-a' });
     const topicOnlyB = byTopicPost({ _id: 'topic-b' });
 
-    const result = toRelatedPosts([], [topicOnlyA, topicOnlyB], [], 3, tenant);
+    const result = toRelatedPosts([], [topicOnlyA, topicOnlyB], [], 3);
 
     expect(result.map((post) => post.id)).toEqual(['topic-a', 'topic-b']);
   });
 
   it('returns an empty array when nothing qualifies', () => {
-    const result = toRelatedPosts([], [], [], 3, tenant);
+    const result = toRelatedPosts([], [], [], 3);
 
     expect(result).toEqual([]);
   });
@@ -145,7 +139,7 @@ describe(toRelatedPosts, () => {
 
 describe(toPostRelatedModule, () => {
   it('maps the module fields alongside the given posts', () => {
-    const posts = [toPostCard(makeRawPostCard({ _id: 'related-1' }), tenant)];
+    const posts = [toPostCard(makeRawPostCard({ _id: 'related-1' }))];
 
     const result = toPostRelatedModule(makeRawPostRelatedModule(), posts);
 

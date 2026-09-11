@@ -20,5 +20,5 @@ export async function getPage(
   });
   if (!raw) return undefined;
 
-  return toLandingPage(raw, tenant);
+  return toLandingPage(raw);
 }

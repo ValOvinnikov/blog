@@ -2,7 +2,7 @@ import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawPostDetail } from '@blog/service/testing/pages/fixtures';
 import {
   makeRawHeadingBlock,
-  makeRawImage,
+  makeRawSanityImage,
   makeRawSeo,
 } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
@@ -12,12 +12,6 @@ import { getPost } from './loader';
 vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
   runQuery: vi.fn(),
-}));
-
-vi.mock('@blog/service/sanity/image', () => ({
-  urlForImage: vi.fn(
-    () => 'https://cdn.sanity.io/images/proj/dataset/og-800x600.jpg',
-  ),
 }));
 
 const tenant = makeTenant();
@@ -67,7 +61,7 @@ describe('getPost', () => {
         author: {
           _id: 'author-9',
           name: 'Jane Doe',
-          image: makeRawImage('Jane avatar'),
+          image: makeRawSanityImage('Jane avatar'),
           profilePage: { slug: 'jane-doe' },
           role: 'Editor',
           bio: null,
@@ -83,14 +77,14 @@ describe('getPost', () => {
       id: 'author-9',
       name: 'Jane Doe',
       profilePageSlug: 'jane-doe',
-      imageUrl: 'https://cdn.sanity.io/images/proj/dataset/og-800x600.jpg',
+      image: expect.objectContaining({ assetId: 'image-abc123-800x600-jpg' }),
       role: 'Editor',
       bio: undefined,
       socialLinks: [],
     });
   });
 
-  it('maps an author with no image to an undefined imageUrl', async () => {
+  it('maps an author with no image to an undefined image', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawPostDetail({
         author: {
@@ -108,47 +102,16 @@ describe('getPost', () => {
     const result = await getPost('hello-world', tenant);
     if (!result) throw new Error('expected a post detail');
 
-    expect(result.author.imageUrl).toBeUndefined();
+    expect(result.author.image).toBeUndefined();
   });
 
-  it('requests a right-sized author avatar instead of the full-resolution asset', async () => {
-    const { urlForImage } = await import('@blog/service/sanity/image');
-    const authorImage = makeRawImage('Jane avatar');
-    mockRun.mockResolvedValueOnce(
-      makeRawPostDetail({
-        author: {
-          _id: 'author-9',
-          name: 'Jane Doe',
-          image: authorImage,
-          profilePage: { slug: 'jane-doe' },
-          role: 'Editor',
-          bio: null,
-          socialLinks: null,
-        },
-      }),
-    );
-
-    await getPost('hello-world', tenant);
-
-    expect(urlForImage).toHaveBeenCalledWith(authorImage, tenant, {
-      width: 64,
-      height: 64,
-      fit: 'crop',
-      quality: 75,
-    });
-  });
-
-  it('maps a post with no heroImage to undefined image fields', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawPostDetail({ heroImage: null, heroImageAsset: null }),
-    );
+  it('maps a post with no heroImage to an undefined heroImage', async () => {
+    mockRun.mockResolvedValueOnce(makeRawPostDetail({ heroImage: null }));
 
     const result = await getPost('hello-world', tenant);
     if (!result) throw new Error('expected a post detail');
 
-    expect(result.heroImageUrl).toBeUndefined();
-    expect(result.heroImageAlt).toBeUndefined();
-    expect(result.heroImageSanity).toBeUndefined();
+    expect(result.heroImage).toBeUndefined();
   });
 
   it('passes the slug as a query parameter', async () => {
@@ -195,15 +158,13 @@ describe('getPost', () => {
     );
   });
 
-  it('leaves ogImageUrl undefined when no ogImage is authored, without falling back to the hero image', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawPostDetail({ heroImage: null, heroImageAsset: null }),
-    );
+  it('leaves seo.ogImage undefined when no ogImage is authored, without falling back to the hero image', async () => {
+    mockRun.mockResolvedValueOnce(makeRawPostDetail({ heroImage: null }));
 
     const result = await getPost('hello-world', tenant);
     if (!result) throw new Error('expected a post detail');
 
-    expect(result.seo.ogImageUrl).toBeUndefined();
+    expect(result.seo.ogImage).toBeUndefined();
   });
 
   it('maps tags from raw input', async () => {

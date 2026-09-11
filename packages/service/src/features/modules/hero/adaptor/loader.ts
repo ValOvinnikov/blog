@@ -43,5 +43,5 @@ export async function getHero(
     }),
   ]);
 
-  return toHeroModule(raw, rawFallbackPost, tenant);
+  return toHeroModule(raw, rawFallbackPost);
 }

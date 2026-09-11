@@ -18,5 +18,5 @@ export async function getIndexPage(
   });
   if (!rawPage) return undefined;
 
-  return toTagIndexPage(rawPage, tenant);
+  return toTagIndexPage(rawPage);
 }

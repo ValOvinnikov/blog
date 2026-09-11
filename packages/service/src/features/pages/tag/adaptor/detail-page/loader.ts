@@ -23,5 +23,5 @@ export async function getTagPage(
   });
   if (!rawPage) return undefined;
 
-  return toTagDetailPage(rawPage, tenant);
+  return toTagDetailPage(rawPage);
 }
