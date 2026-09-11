@@ -74,6 +74,40 @@ describe('postRelatedSchema shape', () => {
   });
 });
 
+describe('postRelatedSchema headingBlock field', () => {
+  it('blocks publish on an empty heading', () => {
+    const field = getField('headingBlock');
+
+    if (typeof field.validation !== 'function') {
+      throw new Error('Expected headingBlock field to define validation.');
+    }
+
+    let customFn:
+      ((value: { heading?: string } | undefined) => string | true) | undefined;
+
+    const rule = {
+      custom: (
+        fn: (value: { heading?: string } | undefined) => string | true,
+      ) => {
+        customFn = fn;
+        return rule;
+      },
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (field.validation as any)(rule);
+
+    if (!customFn) {
+      throw new Error(
+        'Expected headingBlock validation to register a custom() rule.',
+      );
+    }
+
+    expect(customFn(undefined)).toBe('Heading is required.');
+    expect(customFn({ heading: 'Related reading' })).toBe(true);
+  });
+});
+
 describe('postRelatedSchema limit field', () => {
   it('defaults to 3', () => {
     expect(getField('limit').initialValue).toBe(3);

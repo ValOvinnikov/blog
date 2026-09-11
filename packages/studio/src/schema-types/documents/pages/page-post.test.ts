@@ -84,11 +84,41 @@ describe('pagePostSchema shape', () => {
     expect(getField('excerpt')).toBeUndefined();
   });
 
-  it('headingBlock uses the required-heading variant — the heading is the post headline', () => {
+  it('headingBlock uses the shared headingBlock object type, required at the field level — the heading is the post headline', () => {
     const headingBlockFieldDefinition = getField('headingBlock') as
-      { type?: string } | undefined;
+      { type?: string; validation?: unknown } | undefined;
 
-    expect(headingBlockFieldDefinition?.type).toBe('requiredHeadingBlock');
+    expect(headingBlockFieldDefinition?.type).toBe('headingBlock');
+
+    if (!headingBlockFieldDefinition?.validation) {
+      throw new Error(
+        'Expected pagePostSchema headingBlock to define validation.',
+      );
+    }
+
+    let customFn:
+      ((value: { heading?: string } | undefined) => string | true) | undefined;
+
+    const rule = {
+      custom: (
+        fn: (value: { heading?: string } | undefined) => string | true,
+      ) => {
+        customFn = fn;
+        return rule;
+      },
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (headingBlockFieldDefinition.validation as any)(rule);
+
+    if (!customFn) {
+      throw new Error(
+        'Expected pagePostSchema headingBlock validation to register a custom() rule.',
+      );
+    }
+
+    expect(customFn(undefined)).toBe('Heading is required.');
+    expect(customFn({ heading: 'Understanding GROQ' })).toBe(true);
   });
 
   it('heroImage stays optional — no validation() builder attached', () => {

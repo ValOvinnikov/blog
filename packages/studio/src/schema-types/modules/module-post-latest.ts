@@ -35,7 +35,7 @@ export const postLatestSchema = defineType({
   fields: [
     titleField(),
     brandVariantField(),
-    headingBlockField(),
+    headingBlockField({ requireHeading: true }),
     showImagesField(),
     displayModeField(),
     ...defineAlignmentFields([]),
