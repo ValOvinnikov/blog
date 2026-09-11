@@ -9,38 +9,41 @@ import type { TTenantSanityContext } from './client';
 
 type TImageUrlBuilder = ReturnType<typeof createImageUrlBuilder>;
 
-export type TImageTenant = Pick<TTenantSanityContext, 'projectId' | 'dataset'>;
+export type TSanityProjectRef = Pick<
+  TTenantSanityContext,
+  'projectId' | 'dataset'
+>;
 
-function imageTenantKey(tenant: TImageTenant): string {
-  return `${tenant.projectId}:${tenant.dataset}`;
+function sanityProjectRefKey(project: TSanityProjectRef): string {
+  return `${project.projectId}:${project.dataset}`;
 }
 
 // Small LRU (insertion-order Map: re-set moves an entry to the end),
 // mirroring `client.ts`'s tenant client cache. Keyed per project/dataset
 // rather than a single module-level singleton — a bare `builder ??=` would
-// freeze the first tenant rendered for the process lifetime and leak its
-// asset URLs into every tenant rendered after it.
-const MAX_CACHED_TENANT_IMAGE_BUILDERS = 20;
-const tenantImageBuilders = new Map<string, TImageUrlBuilder>();
+// freeze the first project rendered for the process lifetime and leak its
+// asset URLs into every project rendered after it.
+const MAX_CACHED_PROJECT_IMAGE_BUILDERS = 20;
+const projectImageBuilders = new Map<string, TImageUrlBuilder>();
 
-function getImageUrlBuilder(tenant: TImageTenant): TImageUrlBuilder {
-  const key = imageTenantKey(tenant);
-  const cached = tenantImageBuilders.get(key);
+function getImageUrlBuilder(project: TSanityProjectRef): TImageUrlBuilder {
+  const key = sanityProjectRefKey(project);
+  const cached = projectImageBuilders.get(key);
   if (cached) {
-    tenantImageBuilders.delete(key);
-    tenantImageBuilders.set(key, cached);
+    projectImageBuilders.delete(key);
+    projectImageBuilders.set(key, cached);
     return cached;
   }
 
   const builder = createImageUrlBuilder({
-    projectId: tenant.projectId,
-    dataset: tenant.dataset,
+    projectId: project.projectId,
+    dataset: project.dataset,
   });
 
-  tenantImageBuilders.set(key, builder);
-  if (tenantImageBuilders.size > MAX_CACHED_TENANT_IMAGE_BUILDERS) {
-    const oldestKey = tenantImageBuilders.keys().next().value;
-    if (oldestKey !== undefined) tenantImageBuilders.delete(oldestKey);
+  projectImageBuilders.set(key, builder);
+  if (projectImageBuilders.size > MAX_CACHED_PROJECT_IMAGE_BUILDERS) {
+    const oldestKey = projectImageBuilders.keys().next().value;
+    if (oldestKey !== undefined) projectImageBuilders.delete(oldestKey);
   }
 
   return builder;
@@ -55,10 +58,10 @@ export type TImageTransformOptions = {
 
 export function urlForImage(
   source: SanityImageSource,
-  tenant: TImageTenant,
+  project: TSanityProjectRef,
   options?: TImageTransformOptions,
 ): string {
-  let image = getImageUrlBuilder(tenant).image(source).auto('format');
+  let image = getImageUrlBuilder(project).image(source).auto('format');
   if (options?.width) image = image.width(options.width);
   if (options?.height) image = image.height(options.height);
   if (options?.fit) image = image.fit(options.fit);
@@ -66,10 +69,10 @@ export function urlForImage(
   return image.url();
 }
 
-/** Builds a rendered URL for an `ISanityImage` view-model, at the tenant/options the caller supplies. */
+/** Builds a rendered URL for an `ISanityImage` view-model, at the project/options the caller supplies. */
 export function urlForSanityImage(
   image: ISanityImage,
-  tenant: TImageTenant,
+  project: TSanityProjectRef,
   options?: TImageTransformOptions,
 ): string {
   const source: SanityImageSource = {
@@ -77,5 +80,5 @@ export function urlForSanityImage(
     hotspot: image.hotspot,
     crop: image.crop,
   };
-  return urlForImage(source, tenant, options);
+  return urlForImage(source, project, options);
 }

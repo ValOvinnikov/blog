@@ -17,7 +17,7 @@ const sanityImage: ISanityImage = {
 };
 
 describe(urlForImage, () => {
-  it('builds a URL scoped to the given tenant project and dataset', () => {
+  it('builds a URL scoped to the given project and dataset', () => {
     const url = urlForImage(image, {
       projectId: 'tenant-a',
       dataset: 'production',
@@ -26,7 +26,7 @@ describe(urlForImage, () => {
     expect(url).toContain('/images/tenant-a/production/');
   });
 
-  it('resolves two different tenants rendered in the same process to their own project', () => {
+  it('resolves two different projects rendered in the same process to their own project', () => {
     const urlA = urlForImage(image, {
       projectId: 'tenant-a',
       dataset: 'production',
@@ -40,18 +40,18 @@ describe(urlForImage, () => {
     expect(urlB).toContain('/images/tenant-b/');
   });
 
-  it('does not carry a tenant resolved earlier in the process into a later call for a different tenant', () => {
+  it('does not carry a project resolved earlier in the process into a later call for a different project', () => {
     urlForImage(image, { projectId: 'tenant-a', dataset: 'production' });
-    const urlForSecondTenant = urlForImage(image, {
+    const urlForSecondProject = urlForImage(image, {
       projectId: 'tenant-b',
       dataset: 'production',
     });
 
-    expect(urlForSecondTenant).toContain('/images/tenant-b/');
-    expect(urlForSecondTenant).not.toContain('/images/tenant-a/');
+    expect(urlForSecondProject).toContain('/images/tenant-b/');
+    expect(urlForSecondProject).not.toContain('/images/tenant-a/');
   });
 
-  it('applies transform options on top of the tenant-scoped builder', () => {
+  it('applies transform options on top of the project-scoped builder', () => {
     const url = urlForImage(
       image,
       { projectId: 'tenant-a', dataset: 'production' },
@@ -65,19 +65,19 @@ describe(urlForImage, () => {
 });
 
 describe(urlForSanityImage, () => {
-  const tenant = { projectId: 'tenant-a', dataset: 'production' };
+  const project = { projectId: 'tenant-a', dataset: 'production' };
 
   it('produces the same URL as urlForImage for the same asset', () => {
-    expect(urlForSanityImage(sanityImage, tenant)).toBe(
-      urlForImage(image, tenant),
+    expect(urlForSanityImage(sanityImage, project)).toBe(
+      urlForImage(image, project),
     );
   });
 
   it('produces the same URL as urlForImage with transform options applied', () => {
     const options = { width: 64, height: 64, fit: 'crop' as const };
 
-    expect(urlForSanityImage(sanityImage, tenant, options)).toBe(
-      urlForImage(image, tenant, options),
+    expect(urlForSanityImage(sanityImage, project, options)).toBe(
+      urlForImage(image, project, options),
     );
   });
 
@@ -88,12 +88,12 @@ describe(urlForSanityImage, () => {
 
     const fromSanityImage = urlForSanityImage(
       { ...sanityImage, hotspot, crop },
-      tenant,
+      project,
       options,
     );
     const fromRawSource = urlForImage(
       { ...image, hotspot, crop },
-      tenant,
+      project,
       options,
     );
 
@@ -104,8 +104,11 @@ describe(urlForSanityImage, () => {
   it('still emits a rect for a crop with no transform options', () => {
     const crop = { top: 0.1, bottom: 0.1, left: 0.1, right: 0.1 };
 
-    const fromSanityImage = urlForSanityImage({ ...sanityImage, crop }, tenant);
-    const fromRawSource = urlForImage({ ...image, crop }, tenant);
+    const fromSanityImage = urlForSanityImage(
+      { ...sanityImage, crop },
+      project,
+    );
+    const fromRawSource = urlForImage({ ...image, crop }, project);
 
     expect(fromSanityImage).toBe(fromRawSource);
     expect(fromSanityImage).toContain('rect=');
@@ -118,34 +121,34 @@ describe(urlForSanityImage, () => {
 
     const urlLeft = urlForSanityImage(
       { ...sanityImage, hotspot: hotspotLeft },
-      tenant,
+      project,
       options,
     );
     const urlRight = urlForSanityImage(
       { ...sanityImage, hotspot: hotspotRight },
-      tenant,
+      project,
       options,
     );
 
     expect(urlLeft).toContain('rect=');
     expect(urlLeft).not.toBe(urlRight);
     expect(urlLeft).toBe(
-      urlForImage({ ...image, hotspot: hotspotLeft }, tenant, options),
+      urlForImage({ ...image, hotspot: hotspotLeft }, project, options),
     );
     expect(urlRight).toBe(
-      urlForImage({ ...image, hotspot: hotspotRight }, tenant, options),
+      urlForImage({ ...image, hotspot: hotspotRight }, project, options),
     );
   });
 
   it('omits rect entirely for an image with neither crop nor hotspot', () => {
-    const url = urlForSanityImage(sanityImage, tenant);
+    const url = urlForSanityImage(sanityImage, project);
 
     expect(url).not.toContain('rect=');
-    expect(url).toBe(urlForImage(image, tenant));
+    expect(url).toBe(urlForImage(image, project));
   });
 });
 
-describe('tenant image builder cache', () => {
+describe('project image builder cache', () => {
   afterEach(() => {
     vi.doUnmock('@sanity/image-url');
     vi.resetModules();
@@ -160,7 +163,7 @@ describe('tenant image builder cache', () => {
     return builder;
   }
 
-  it('reuses the cached builder for a repeated tenant instead of recreating it', async () => {
+  it('reuses the cached builder for a repeated project instead of recreating it', async () => {
     vi.resetModules();
     const createImageUrlBuilderMock = vi.fn(() => makeFakeBuilder());
     vi.doMock('@sanity/image-url', () => ({
@@ -168,15 +171,15 @@ describe('tenant image builder cache', () => {
     }));
 
     const { urlForImage: freshUrlForImage } = await import('./image');
-    const tenant = { projectId: 'tenant-a', dataset: 'production' };
+    const project = { projectId: 'tenant-a', dataset: 'production' };
 
-    freshUrlForImage(image, tenant);
-    freshUrlForImage(image, tenant);
+    freshUrlForImage(image, project);
+    freshUrlForImage(image, project);
 
     expect(createImageUrlBuilderMock).toHaveBeenCalledTimes(1);
   });
 
-  it('creates a distinct builder per tenant', async () => {
+  it('creates a distinct builder per project', async () => {
     vi.resetModules();
     const createImageUrlBuilderMock = vi.fn(() => makeFakeBuilder());
     vi.doMock('@sanity/image-url', () => ({
