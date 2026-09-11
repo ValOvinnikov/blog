@@ -5,6 +5,7 @@ import {
   type IWithClassName,
   type IWithDataTestId,
   type TContentAlignment,
+  type TFullBrandVariant,
   type THeroVariant,
   type TMediaOrder,
 } from '@blog/config';
@@ -46,6 +47,8 @@ export type THeroProps = IWithClassName &
     contentAlignment?: TContentAlignment;
     /** Split applies this below the two-column breakpoint; Stacked at every width; Banner ignores it — its image is the background. */
     mediaOrder?: TMediaOrder;
+    /** Picks Banner's scrim and on-image copy color. Split and Stacked ignore it — their band color stays `Section`'s. */
+    tone?: TFullBrandVariant;
     children?: TCompoundChildren<typeof HeroParts>;
   };
 
@@ -64,6 +67,7 @@ const HeroRoot = ({
   contentPosition,
   contentAlignment,
   mediaOrder,
+  tone,
   children,
   className,
   dataTestId,
@@ -89,15 +93,21 @@ const HeroRoot = ({
     position: resolvedPosition,
     alignment: resolvedAlignment,
     mediaOrder: resolvedMediaOrder,
+    tone,
   });
 
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>
       <div className={s.grid()}>
         <div className={s.copy()} data-testid="hero-copy">
-          {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
+          {eyebrow && <Eyebrow className={s.eyebrow()}>{eyebrow}</Eyebrow>}
           <div className={s.title()}>
-            <Heading id={titleId} level={1} visual="hero">
+            <Heading
+              id={titleId}
+              level={1}
+              visual="hero"
+              className={s.heading()}
+            >
               {title}
             </Heading>
           </div>
@@ -116,6 +126,13 @@ const HeroRoot = ({
                 })
               : slots.Media}
           </div>
+        )}
+        {isBanner && (
+          <div
+            className={s.overlay()}
+            aria-hidden="true"
+            data-testid="hero-overlay"
+          />
         )}
       </div>
 

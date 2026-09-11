@@ -326,8 +326,8 @@ Slots:
 ### Hero — `organisms/hero/hero.tsx`
 
 the page-top hero band shared by every hero kind: renders `title` as an `<h1>` with optional `eyebrow`/`excerpt`, plus `Hero.Cta` and `Hero.Media` slots.
-Props: title: string · titleId: string · eyebrow?: string · excerpt?: string · variant?: THeroVariant · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mediaOrder?: TMediaOrder · children?: TCompoundChildren<typeof HeroParts> _(extends IWithClassName, IWithDataTestId)_
-Variants: variant: HERO_VARIANT.SPLIT|HERO_VARIANT.STACKED|HERO_VARIANT.BANNER · hasMedia: (boolean) · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mediaOrder: MEDIA_ORDER.FIRST|MEDIA_ORDER.LAST
+Props: title: string · titleId: string · eyebrow?: string · excerpt?: string · variant?: THeroVariant · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mediaOrder?: TMediaOrder · tone?: TFullBrandVariant · children?: TCompoundChildren<typeof HeroParts> _(extends IWithClassName, IWithDataTestId)_
+Variants: variant: HERO_VARIANT.SPLIT|HERO_VARIANT.STACKED|HERO_VARIANT.BANNER · hasMedia: (boolean) · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mediaOrder: MEDIA_ORDER.FIRST|MEDIA_ORDER.LAST · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY
 
 Slots:
 

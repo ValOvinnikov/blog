@@ -1,14 +1,22 @@
-import { CONTENT_ALIGNMENT, HERO_VARIANT, MEDIA_ORDER } from '@blog/config';
-import { tv } from '@blog/ui/lib/styling';
+import {
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  HERO_VARIANT,
+  MEDIA_ORDER,
+} from '@blog/config';
+import { AZURE_SCRIM, NEUTRAL_SCRIM, tv } from '@blog/ui/lib/styling';
 
 export const heroVariants = tv({
   slots: {
     root: ['w-full'],
     grid: ['grid grid-cols-1 items-stretch gap-[clamp(1.25rem,4vw,2rem)]'],
     copy: ['flex h-full flex-col', 'min-w-0'],
+    eyebrow: [],
     title: ['mt-2.5 mb-3'],
+    heading: [],
     excerpt: ['m-0', 'max-w-[52ch]'],
     media: [],
+    overlay: [],
   },
   variants: {
     variant: {
@@ -17,6 +25,9 @@ export const heroVariants = tv({
       [HERO_VARIANT.BANNER]: {
         root: ['relative isolate overflow-hidden rounded-xl', 'min-h-[360px]'],
         grid: ['relative z-0 items-center', 'p-8 sm:p-10'],
+        eyebrow: ['text-white'],
+        heading: ['text-white'],
+        excerpt: ['text-white/85'],
       },
     },
     hasMedia: {
@@ -35,6 +46,11 @@ export const heroVariants = tv({
     mediaOrder: {
       [MEDIA_ORDER.FIRST]: {},
       [MEDIA_ORDER.LAST]: {},
+    },
+    tone: {
+      [BRAND_VARIANT.PRIMARY]: {},
+      [BRAND_VARIANT.SECONDARY]: {},
+      [BRAND_VARIANT.BRAND_PRIMARY]: {},
     },
   },
   compoundVariants: [
@@ -64,9 +80,10 @@ export const heroVariants = tv({
       variant: HERO_VARIANT.BANNER,
       class: {
         media: [
-          'absolute inset-0 -z-10',
+          'absolute inset-0 -z-20',
           '[&>*]:block [&>*]:h-full [&>*]:w-full [&>*]:object-cover',
         ],
+        overlay: ['pointer-events-none absolute inset-0 -z-10'],
       },
     },
     {
@@ -84,5 +101,18 @@ export const heroVariants = tv({
       position: CONTENT_ALIGNMENT.RIGHT,
       class: { grid: ['justify-items-end'] },
     },
+    {
+      variant: HERO_VARIANT.BANNER,
+      tone: BRAND_VARIANT.BRAND_PRIMARY,
+      class: { overlay: [AZURE_SCRIM] },
+    },
+    {
+      variant: HERO_VARIANT.BANNER,
+      tone: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
+      class: { overlay: [NEUTRAL_SCRIM] },
+    },
   ],
+  defaultVariants: {
+    tone: BRAND_VARIANT.PRIMARY,
+  },
 });
