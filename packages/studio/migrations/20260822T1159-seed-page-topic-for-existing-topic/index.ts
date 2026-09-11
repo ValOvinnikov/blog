@@ -28,7 +28,6 @@
  *   3. `pnpm --filter @blog/studio migrate:run` — human-gated, mutates `production`
  */
 import { BRAND_VARIANT } from '@blog/config/constants';
-import { SEO_META_TITLE_MAX_LENGTH } from '@blog/studio/schema-types/objects/seo';
 import { createIfNotExists, defineMigration } from 'sanity/migrate';
 
 import { toPageTopicId, toTopicPostListId } from './id';
@@ -41,6 +40,16 @@ type TBlogTopicDoc = {
   title?: string;
   slug?: { current?: string };
 };
+
+/**
+ * Must stay in sync with `../../src/schema-types/objects/seo.ts`'s
+ * `SEO_META_TITLE_MAX_LENGTH` — duplicated here rather than imported.
+ * `sanity/migrate`'s Node loader cannot resolve that module's `sanity`
+ * import chain (it bundles a `.css` asset), so any migration importing
+ * from the Studio schema module fails every migration's `list`/`run`,
+ * not just its own.
+ */
+const SEO_META_TITLE_MAX_LENGTH = 60;
 
 /**
  * A fixed skeleton around the topic title clears the schema's metaTitle
