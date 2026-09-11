@@ -4,8 +4,8 @@ import {
   customRender,
   renderElement,
   screen,
-  TEST_SANITY_IMAGE_BASE_URL,
 } from '@web/testing/custom-render';
+import { STATIC_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
 
 import { SanityImage } from './sanity-image';
 
@@ -55,7 +55,7 @@ describe(`<${SanityImage.name}/>`, () => {
     setup();
 
     const img = screen.getByRole('img', { name: image.alt });
-    expect(img.getAttribute('src')).toContain(TEST_SANITY_IMAGE_BASE_URL);
+    expect(img.getAttribute('src')).toContain(STATIC_SANITY_IMAGE_BASE_URL);
   });
 
   it('falls back to the image alt text when no override is provided', () => {

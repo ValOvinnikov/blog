@@ -1,11 +1,9 @@
-import { SITE_MESSAGES } from '@blog/config';
 import {
   render as rtlRender,
   type RenderOptions,
   type RenderResult,
 } from '@testing-library/react';
-import { SanityImageBaseUrlProvider } from '@web/context/sanity-image-base-url-provider';
-import { NextIntlClientProvider } from 'next-intl';
+import { AppProviders } from '@web/testing/providers';
 import {
   createElement,
   type ComponentType,
@@ -13,23 +11,7 @@ import {
   type ReactNode,
 } from 'react';
 
-/** The `SanityImage` bridge's base URL under test, unless a test nests its own override provider. */
-export const TEST_SANITY_IMAGE_BASE_URL =
-  'https://cdn.sanity.io/images/test-project/test-dataset/';
-
-/**
- * Mounts the same NextIntlClientProvider and SanityImageBaseUrlProvider the
- * app layout provides, with the real catalog messages — so a client
- * component reading `useTranslations` or rendering a `SanityImage` behaves
- * as it does under the real app instead of throwing/falling back.
- */
-const Providers = ({ children }: { children: ReactNode }) => (
-  <NextIntlClientProvider locale="en" messages={SITE_MESSAGES}>
-    <SanityImageBaseUrlProvider baseUrl={TEST_SANITY_IMAGE_BASE_URL}>
-      {children}
-    </SanityImageBaseUrlProvider>
-  </NextIntlClientProvider>
-);
+const Providers = AppProviders;
 
 type TRenderOpts = Omit<RenderOptions, 'wrapper'>;
 

@@ -1,9 +1,9 @@
 import '../index.css';
 
-import { PRESET_ID, PRESET_REGISTRY, SITE_MESSAGES } from '@blog/config';
+import { PRESET_ID, PRESET_REGISTRY } from '@blog/config';
 import type { Decorator, Preview } from '@storybook/nextjs-vite';
 import { resolveFontVariableClassName } from '@web/config/fonts';
-import { NextIntlClientProvider } from 'next-intl';
+import { AppProviders } from '@web/testing/providers';
 
 // Must go on the root element, not a wrapper div: the `--font-*-family`
 // custom properties are read on `body`, which doesn't inherit them from a
@@ -14,26 +14,18 @@ document.documentElement.classList.add(
   ...resolveFontVariableClassName(headingFont, bodyFont).split(' '),
 );
 
-// `SmartLink` (the app's one link component — used directly by, or composed
-// into, most `apps/web` components: `PortableTextRenderer`'s link mark,
-// `PostContentsRail`, `Breadcrumbs`, ...) renders next-intl's `Link`, which
-// reads locale/messages off React context via `useLocale`/`useIntlContext`.
-// `@storybook/nextjs-vite` stubs Next's own navigation but doesn't supply
-// this context, so any story rendering a real `SmartLink` throws "No intl
-// context found" without it. Mirrors the same provider apps/web's own
-// `[locale]/layout.tsx` and `@web/testing/custom-render` wrap every real
-// render with. JSX (hence this file being `.tsx`, unlike `packages/ui`'s
-// plain-`.ts` decorators) — `NextIntlClientProviderProps` declares
-// `children` required, and passing it as a variadic `createElement` argument
-// instead of a JSX child fails TS's overload resolution.
-const withIntl: Decorator = (storyFn) => (
-  <NextIntlClientProvider locale="en" messages={SITE_MESSAGES}>
-    {storyFn()}
-  </NextIntlClientProvider>
+// `AppProviders` supplies the same `NextIntlClientProvider` +
+// `SanityImageBaseUrlProvider` stack `[tenant]/[locale]/layout.tsx` provides
+// in the real app — every story rendering a real `SmartLink` (next-intl's
+// `Link`, reading locale/messages off context) or a `SanityImage` throws
+// without it. Shared with `@web/testing/custom-render` rather than
+// redeclared here, so the two entry points can't drift.
+const withProviders: Decorator = (storyFn) => (
+  <AppProviders>{storyFn()}</AppProviders>
 );
 
 const preview: Preview = {
-  decorators: [withIntl],
+  decorators: [withProviders],
   parameters: {
     controls: {
       matchers: {
