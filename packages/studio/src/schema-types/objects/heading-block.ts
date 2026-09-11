@@ -5,14 +5,12 @@ const headingBlockFields = (options: { requireHeading?: boolean } = {}) => [
     name: 'heading',
     title: 'Heading',
     type: 'string',
-    validation: (rule) =>
-      options.requireHeading ? rule.required().max(80) : rule.max(80),
+    validation: options.requireHeading ? (rule) => rule.required() : undefined,
   }),
   defineField({
     name: 'supportingText',
     title: 'Supporting Text',
     type: 'text',
-    validation: (rule) => rule.max(300),
   }),
 ];
 
@@ -20,6 +18,7 @@ export const headingBlockSchema = defineType({
   name: 'headingBlock',
   title: 'Heading Block',
   type: 'object',
+  options: { collapsible: true, collapsed: false },
   fields: headingBlockFields(),
 });
 
@@ -34,5 +33,6 @@ export const requiredHeadingBlockSchema = defineType({
   name: 'requiredHeadingBlock',
   title: 'Heading Block',
   type: 'object',
+  options: { collapsible: true, collapsed: false },
   fields: headingBlockFields({ requireHeading: true }),
 });
