@@ -109,10 +109,7 @@ export const pagePostSchema = defineType({
       description:
         '30-second-skim takeaways for the choose-your-depth reading experience.',
     }),
-    seoField({
-      description:
-        'Post page meta title, description, and social sharing image.',
-    }),
+    seoField(),
   ],
   preview: {
     select: {

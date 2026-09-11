@@ -58,9 +58,6 @@ export const homePageSchema = defineType({
           )
           .custom(validateTaxonomyListHasTaxonomy),
     }),
-    seoField({
-      description:
-        'Home page meta title, description, and social sharing image.',
-    }),
+    seoField(),
   ],
 });

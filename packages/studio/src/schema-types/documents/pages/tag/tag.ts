@@ -198,10 +198,7 @@ export const pageTagSchema = defineType({
         newsletterSchema.name,
       ],
     }),
-    seoField({
-      description:
-        'Tag page meta title, description, and social sharing image.',
-    }),
+    seoField(),
   ],
   preview: {
     select: {

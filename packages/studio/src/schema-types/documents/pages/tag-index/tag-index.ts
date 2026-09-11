@@ -94,10 +94,7 @@ export const tagIndexPageSchema = defineType({
           .custom(validateSingleBlankHeadingPerType([postLatestSchema.name]))
           .custom(validateTaxonomyListHasTaxonomy),
     }),
-    seoField({
-      description:
-        'Tag Index page meta title, description, and social sharing image.',
-    }),
+    seoField(),
     defineField({
       name: 'heading',
       title: 'Heading',

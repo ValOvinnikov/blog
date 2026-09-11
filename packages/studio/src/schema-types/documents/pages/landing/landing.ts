@@ -73,9 +73,6 @@ export const landingSchema = defineType({
           )
           .custom(validateTaxonomyListHasTaxonomy),
     }),
-    seoField({
-      description:
-        'Landing page meta title, description, and social sharing image.',
-    }),
+    seoField(),
   ],
 });

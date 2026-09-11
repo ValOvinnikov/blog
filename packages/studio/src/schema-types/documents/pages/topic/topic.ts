@@ -166,10 +166,7 @@ export const pageTopicSchema = defineType({
         newsletterSchema.name,
       ],
     }),
-    seoField({
-      description:
-        'Topic page meta title, description, and social sharing image.',
-    }),
+    seoField(),
   ],
   preview: {
     select: {

@@ -81,9 +81,6 @@ export const blogPageSchema = defineType({
           validateSingleBlankHeadingPerType([postFeaturedSchema.name]),
         ),
     }),
-    seoField({
-      description:
-        'Blog page meta title, description, and social sharing image.',
-    }),
+    seoField(),
   ],
 });
