@@ -112,4 +112,7 @@ export const heroVariants = tv({
       class: { overlay: [NEUTRAL_SCRIM] },
     },
   ],
+  defaultVariants: {
+    tone: BRAND_VARIANT.PRIMARY,
+  },
 });

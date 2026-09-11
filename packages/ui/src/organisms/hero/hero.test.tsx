@@ -332,6 +332,24 @@ describe(`<${Hero.name}/>`, () => {
     expect(overlay).not.toHaveClass(NEUTRAL_SCRIM);
   });
 
+  it('defaults to a NEUTRAL_SCRIM overlay on Banner when tone is omitted', () => {
+    renderElement(
+      <Hero
+        title="Building a Design System"
+        titleId="hero-title"
+        variant={HERO_VARIANT.BANNER}
+      >
+        <Hero.Media>
+          <img src="/img/hero.jpg" alt="Hero cover photo" />
+        </Hero.Media>
+      </Hero>,
+    );
+
+    const overlay = screen.getByTestId('hero-overlay');
+    expect(overlay).toHaveClass(NEUTRAL_SCRIM);
+    expect(overlay).not.toHaveClass(AZURE_SCRIM);
+  });
+
   it.each([BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY])(
     'renders a NEUTRAL_SCRIM overlay on Banner with %s tone',
     (tone) => {
