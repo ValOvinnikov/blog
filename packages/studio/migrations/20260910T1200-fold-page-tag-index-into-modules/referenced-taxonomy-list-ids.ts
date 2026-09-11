@@ -13,8 +13,7 @@ type TPageTagIndexRefs = {
 
 /**
  * Keyed by `context` (one stable object per migration run, per `run()` in
- * `@sanity/migrate`) the same way `20260909T2230-fold-page-topic-index-into-modules`
- * caches its id map — a plain module-level variable would leak the first
+ * `@sanity/migrate`) — a plain module-level variable would leak the first
  * run's result across later runs sharing the same process, and across tests
  * sharing the same module instance.
  */
