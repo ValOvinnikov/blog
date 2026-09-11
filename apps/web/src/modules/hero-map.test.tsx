@@ -4,19 +4,24 @@ import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtur
 
 import { HeroSlot } from './hero-slot';
 
-const { getHeroMock, getHeroBlogMock, getTenantSanityContextMock } = vi.hoisted(
-  () => ({
-    getHeroMock: vi.fn(),
-    getHeroBlogMock: vi.fn(),
-    getTenantSanityContextMock: vi.fn(),
-  }),
-);
+const {
+  getHeroMock,
+  getHeroBlogMock,
+  getHeroStatementMock,
+  getTenantSanityContextMock,
+} = vi.hoisted(() => ({
+  getHeroMock: vi.fn(),
+  getHeroBlogMock: vi.fn(),
+  getHeroStatementMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
+}));
 
 vi.mock('@blog/service', () => ({
   service: {
     modules: {
       hero: { v1: { getHero: getHeroMock } },
       heroBlog: { v1: { getHeroBlog: getHeroBlogMock } },
+      heroStatement: { v1: { getHeroStatement: getHeroStatementMock } },
     },
   },
 }));
@@ -36,6 +41,7 @@ describe('HERO_MAP', () => {
   beforeEach(() => {
     getHeroMock.mockReset();
     getHeroBlogMock.mockReset();
+    getHeroStatementMock.mockReset();
     getTenantSanityContextMock.mockReset();
     getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
@@ -93,6 +99,38 @@ describe('HERO_MAP', () => {
     );
     expect(
       screen.getByRole('heading', { level: 1, name: 'Featured this week' }),
+    ).toBeVisible();
+  });
+
+  it('dispatches module_heroStatement through the real registry to the real HeroStatementModule', async () => {
+    getHeroStatementMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        variant: HERO_VARIANT.SPLIT,
+        eyebrow: undefined,
+        heading: 'Build faster, ship sooner',
+        supportingText: undefined,
+        sanityImage: undefined,
+        actions: undefined,
+        contentPosition: undefined,
+        contentAlignment: undefined,
+        mediaOrder: undefined,
+        layout: undefined,
+      },
+    });
+
+    await setup({ id: 'hero-statement-1', type: 'module_heroStatement' });
+
+    expect(getHeroStatementMock).toHaveBeenCalledWith(
+      'hero-statement-1',
+      DEFAULT_TENANT_SANITY_CONTEXT,
+    );
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+        name: 'Build faster, ship sooner',
+      }),
     ).toBeVisible();
   });
 });
