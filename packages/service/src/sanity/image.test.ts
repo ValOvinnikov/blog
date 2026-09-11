@@ -100,6 +100,49 @@ describe(urlForSanityImage, () => {
     expect(fromSanityImage).toBe(fromRawSource);
     expect(fromSanityImage).toContain('rect=');
   });
+
+  it('still emits a rect for a crop with no transform options', () => {
+    const crop = { top: 0.1, bottom: 0.1, left: 0.1, right: 0.1 };
+
+    const fromSanityImage = urlForSanityImage({ ...sanityImage, crop }, tenant);
+    const fromRawSource = urlForImage({ ...image, crop }, tenant);
+
+    expect(fromSanityImage).toBe(fromRawSource);
+    expect(fromSanityImage).toContain('rect=');
+  });
+
+  it('computes a hotspot-aware rect when width and height are both given', () => {
+    const options = { width: 300, height: 400 };
+    const hotspotLeft = { x: 0.15, y: 0.5, height: 0.2, width: 0.2 };
+    const hotspotRight = { x: 0.85, y: 0.5, height: 0.2, width: 0.2 };
+
+    const urlLeft = urlForSanityImage(
+      { ...sanityImage, hotspot: hotspotLeft },
+      tenant,
+      options,
+    );
+    const urlRight = urlForSanityImage(
+      { ...sanityImage, hotspot: hotspotRight },
+      tenant,
+      options,
+    );
+
+    expect(urlLeft).toContain('rect=');
+    expect(urlLeft).not.toBe(urlRight);
+    expect(urlLeft).toBe(
+      urlForImage({ ...image, hotspot: hotspotLeft }, tenant, options),
+    );
+    expect(urlRight).toBe(
+      urlForImage({ ...image, hotspot: hotspotRight }, tenant, options),
+    );
+  });
+
+  it('omits rect entirely for an image with neither crop nor hotspot', () => {
+    const url = urlForSanityImage(sanityImage, tenant);
+
+    expect(url).not.toContain('rect=');
+    expect(url).toBe(urlForImage(image, tenant));
+  });
 });
 
 describe('tenant image builder cache', () => {
