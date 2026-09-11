@@ -155,12 +155,22 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
       ).toBeInTheDocument();
     });
 
-    it('renders nothing when entries is empty', async () => {
+    it('renders a labeled section with the topics empty message when entries is empty', async () => {
       getTaxonomyListMock.mockResolvedValue(topicsResult());
 
-      const { container } = await setup();
+      await setup();
 
-      expect(container).toBeEmptyDOMElement();
+      const section = screen.getByRole('region', { name: 'Topics' });
+      expect(within(section).getByText('No topics yet.')).toBeVisible();
+    });
+
+    it('renders a labeled section with the tags empty message when entries is empty', async () => {
+      getTaxonomyListMock.mockResolvedValue(tagsResult());
+
+      await setup();
+
+      const section = screen.getByRole('region', { name: 'Tags' });
+      expect(within(section).getByText('No tags yet.')).toBeVisible();
     });
 
     it('renders nothing when the fetch fails, without calling notFound()', async () => {
