@@ -394,20 +394,17 @@ editing experience makes. `headingBlock.heading`, `publishedAt`, `author`,
 are optional on both.
 
 **An incomplete post is not published.** `PUBLISHED_POST_FILTER` is what
-makes most of the paragraph above safe. It requires
+makes the paragraph above safe. It requires
 `defined(headingBlock.heading) && defined(author) && defined(topic) &&
-defined(content)` alongside `publishedAt <= now()`, so a `page_post` missing
-any of them never appears in a listing and resolves as not-found on its own
-URL — the same treatment an unpublished post gets. Without that gate a
-`.notNull()` projection would throw at parse time and take down an entire
-listing rather than dropping one card.
+defined(content) && defined(seo)` alongside `publishedAt <= now()`, so a
+`page_post` missing any of them never appears in a listing and resolves as
+not-found on its own URL — the same treatment an unpublished post gets.
+Without that gate a `.notNull()` projection would throw at parse time and
+take down an entire listing rather than dropping one card.
 
-`seo` is the one required field the gate does **not** cover. Listings are
-unaffected either way — `postCardFragment` never projects `seo` — but a
-`page_post` written through the Sanity client without one passes the filter,
-appears as a card, and then fails to parse on its own detail page, which
-404s. Studio cannot produce such a document, since `seo` is required there;
-only a client write can, which is the same bypass the SEO section describes.
+The gate covers every field the paragraph above calls required, `seo`
+included — which is what keeps a client-written document (the one path that
+bypasses Studio's validation) from surfacing as a card that links to a 404.
 
 This is an **exclusion, not a fallback**: nothing is substituted. Every
 consumer of these fields structurally needs a value — RSS `<title>`, the
