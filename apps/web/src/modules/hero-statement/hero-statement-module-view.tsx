@@ -51,7 +51,7 @@ export const HeroStatementModuleView = ({
         {actions && actions.length > 0 && (
           <Hero.Cta>
             <ActionGroup
-              actions={[...actions]}
+              actions={actions}
               isOnDark={variant === HERO_VARIANT.BANNER}
             />
           </Hero.Cta>
