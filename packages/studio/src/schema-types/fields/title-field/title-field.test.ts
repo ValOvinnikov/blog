@@ -44,7 +44,7 @@ describe('titleField', () => {
     expect(result.path).toBe('rule.required()');
   });
 
-  it('defaults to the internal-use-only description when no slug is generated', () => {
+  it('defaults to the internal-use-only description', () => {
     const field = titleField();
 
     expect(field.description).toBe(
@@ -52,24 +52,7 @@ describe('titleField', () => {
     );
   });
 
-  it('describes seeding the slug when generatesSlug is true', () => {
-    const field = titleField({ generatesSlug: true });
-
-    expect(field.description).toBe(
-      'Give this document a clear, descriptive title to help identify it in Studio. This title also is used to automatically generate the slug. This title for internal use only',
-    );
-  });
-
-  it('lets a caller-supplied description override the default, with generatesSlug true', () => {
-    const field = titleField({
-      generatesSlug: true,
-      description: 'Internal label shown in the Studio.',
-    });
-
-    expect(field.description).toBe('Internal label shown in the Studio.');
-  });
-
-  it('lets a caller-supplied description override the default, with generatesSlug omitted', () => {
+  it('lets a caller-supplied description override the default', () => {
     const field = titleField({
       description: 'Internal label shown in the Studio.',
     });
