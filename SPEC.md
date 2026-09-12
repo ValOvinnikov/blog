@@ -396,7 +396,7 @@ are optional on both.
 **An incomplete post is not published.** `PUBLISHED_POST_FILTER` is what
 makes the paragraph above safe. It requires
 `defined(headingBlock.heading) && defined(author) && defined(topic) &&
-defined(content) && defined(seo)` alongside `publishedAt <= now()`, so a
+defined(content) && defined(seo.metaTitle)` alongside `publishedAt <= now()`, so a
 `page_post` missing any of them never appears in a listing and resolves as
 not-found on its own URL — the same treatment an unpublished post gets.
 Without that gate a `.notNull()` projection would throw at parse time and
