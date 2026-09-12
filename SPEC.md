@@ -801,6 +801,36 @@ Voice override with no error or warning — the worst failure mode for a
 settings surface. Any future module needing curated copy renders the i18n
 key directly; it does not grow its own override field.
 
+**The authoring surface explains itself.** Every registered schema type and
+every field an editor can see carries a `description`: the type's says what
+the thing is **for** in one sentence, the field's says what it is for **and
+when to set it**, both in an editor's vocabulary rather than the codebase's.
+They **never restate validation** — the Studio already renders the required
+marker and the character counter, so a prose copy is redundant when written
+and wrong once the rule changes; where a real but unenforced expectation is
+worth stating, it is expressed as a consequence ("a single word displays
+poorly") rather than a number. Two guards in
+`packages/studio/src/schema-types/index.test.ts` fail the build on a type or
+field that ships without one, with a single exemption for `migrationState`,
+which no editor ever opens. The guards check presence, not quality.
+
+`titleField()` is the internal Studio label on every document that has one,
+and says so — it is never rendered. On the four slug-bearing documents that
+use it (`page_post`, `page_tag`, `page_topic`, `page_landing`) it also seeds
+the slug, and its `generatesSlug` option selects the wording that says that.
+`blog_tag` and `blog_topic` are slug-bearing too but declare their own
+`title`, because theirs **is** public — rendered on chips, archives, filters
+and navigation.
+
+**Option lists default to a dropdown; `layout: 'radio'` is the opt-out, and
+requiredness decides.** A Sanity dropdown always renders a blank option for
+the unset state which cannot be removed or renamed, and neither
+`initialValue` nor validation suppresses it. So a `required()` field uses a
+radio — the blank is otherwise a selectable trap that only fails at publish —
+and any field that is not required uses a dropdown, where blank is already
+legal and compactness is free. Option count does not enter into it. Both are
+stated explicitly in the schema rather than left to the default.
+
 Full schema reference (every document/object, field-by-field), naming and
 validation conventions, incl. the `layout`/`headingBlock` objects' own
 field lists:

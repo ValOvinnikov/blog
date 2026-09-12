@@ -129,6 +129,70 @@ defineType(...)` (`heroSchema`, `postPageSchema`, `siteSettingsSchema`), never
 - Type the `prepare` input instead of scattering `as` casts where practical
   (`prepare({ title }: { title?: string })`).
 
+### Descriptions — every type, every field, written for an editor
+
+**Every registered type and every field an editor can see carries a
+`description`.** A type's says what the thing is **for**, in one sentence. A
+field's says what it is for **and when to set it**. Both are read by
+non-technical people inside the Studio, so they use the words an editor would
+use for what appears on the page — never an internal `_type` value, an
+uppercase enum identifier (`SPLIT`, `PRIMARY`), or a component name.
+
+**Never restate validation.** No "required", no "max 60 characters", no "up to
+two". The Studio already renders the required marker and the character
+counter, so a prose copy is redundant the day it is written and wrong the day
+the rule changes. Say what the field is for; let the widget state the rule.
+
+The distinction that matters when you are tempted: describing a **constraint**
+is out, describing a **consequence** is in. "Required — keep between 30 and 60
+characters" is a constraint. "Aim for a full sentence or two so it reads well;
+a single word displays poorly" is a consequence, survives a change to
+`max()`, and is genuinely more useful. When a rule is real but unenforced,
+express it qualitatively rather than reintroducing the number.
+
+Two guards in `schema-types/index.test.ts` fail the build when a type or a
+field ships without a description — one over the `schemaTypes` registry, one
+over each registered type's own fields. **They check presence, not quality**;
+nothing but review catches a description that is present and useless. The only
+exemption is a type no editor ever opens (`migrationState`, the migration
+tooling's own ledger), named explicitly in the guard's `NOT_EDITOR_FACING`
+set — extend that set only for another genuinely hidden system type, never to
+silence a real gap.
+
+Where the same description would be pasted into more than one schema, it is a
+shared constant like any other repeated literal (`PAGE_HEADING_DESCRIPTION`
+beside `headingBlockField`), not copy-paste.
+
+### Option lists — dropdown by default, radio when the field is required
+
+`dropdown` is Sanity's default for a `list`; `layout: 'radio'` is an explicit
+opt-out. The choice turns on one documented behaviour: **a dropdown always
+renders a blank option for the unset state, and it cannot be removed or
+renamed.** Neither `initialValue` nor `validation` suppresses it.
+
+So the test is:
+
+- **`required()` → radio.** The blank is a selectable trap that passes
+  unnoticed in the form and only surfaces as an error at publish. Radio is the
+  documented way to avoid it. A required field that also drives other fields'
+  `hidden:` predicates is the strongest case of all — the editor flips it to
+  reveal the rest of the form, and wants every option visible at once.
+- **Not required → dropdown.** Blank is already a legal value, so the
+  dropdown's blank costs nothing and buys a compact, scannable form. This
+  holds whether or not the field has an `initialValue`: a default value does
+  not make blank invalid.
+
+Option count is not the test. A 4-option optional field is a dropdown and a
+3-option required one is a radio; more options only reinforce a conclusion the
+`required()` check has already reached.
+
+**State the layout explicitly either way** rather than relying on the default,
+so a reader can tell a decision was made from the code alone.
+
+The `modeFieldPair` factory above keeps `layout: 'radio'` under this rule, not
+in spite of it: its mode field is `required()` and gates a conditional custom
+field.
+
 ## Migration quality
 
 - **Idempotency via target-state guard, symmetric across all document types.**
@@ -156,6 +220,11 @@ Beyond the studio agent's checklist:
 
 - No copy-pasted field pattern that a helper should own.
 - No stored-value literal repeated across files.
+- Every new type and field has a description, written for an editor, restating
+  no validation.
+- Every new `options.list` states its `layout`, chosen by the `required()`
+  test — and a radio on a field that is not required is justified in the
+  report, or changed.
 - Restructure PRs state explicitly which constraints moved, were added, or
   were dropped — and why.
 - Migration has its test and both guards.
