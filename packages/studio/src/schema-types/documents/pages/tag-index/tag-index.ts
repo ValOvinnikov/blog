@@ -75,28 +75,6 @@ export const tagIndexPageSchema = defineType({
     }),
     seoField(),
     defineField({
-      name: 'heading',
-      title: 'Heading',
-      type: 'string',
-      description: 'The main heading shown at the top of the page.',
-      readOnly: true,
-      deprecated: {
-        reason:
-          'Superseded by headingBlock.heading. Left in place so already-deployed code keeps reading it until a follow-up migration drops it.',
-      },
-    }),
-    defineField({
-      name: 'supportingText',
-      title: 'Supporting Text',
-      type: 'text',
-      description: 'Optional line shown under the heading.',
-      readOnly: true,
-      deprecated: {
-        reason:
-          'Superseded by headingBlock.supportingText. Left in place so already-deployed code keeps reading it until a follow-up migration drops it.',
-      },
-    }),
-    defineField({
       name: 'taxonomyList',
       title: 'Taxonomy List',
       type: 'reference',
