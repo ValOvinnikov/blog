@@ -39,17 +39,17 @@ type. `module_taxonomyList` renders both ways and so is in `MODULE_MAP`.
   `POST_TITLE`/`POST_EXCERPT`/`POST_IMAGE`), `primaryActionLabel`,
   `secondaryAction` (`link`).
 - `module_postList` (`postListSchema`) — the **paginated archive**: internal
-  `title`, `headingBlock` (optional — see below), `pageSize` (posts per page,
+  `title`, `headingBlock` (required heading — see below), `pageSize` (posts per page,
   1–24, required), and a vestigial `limit` awaiting removal alongside
   `page_blog.itemsPerPage`. It carries **no `emptyMessage`** (removed in
   #1899) — empty-state copy belongs to Voice (`site_config.voiceOverrides`),
   same as every other module below.
 - `module_postLatest` (`postLatestSchema`) — the **latest-N teaser**: internal
-  `title`, `headingBlock` (optional), `limit` (posts to fetch, 1–12). Split
+  `title`, `headingBlock` (required heading), `limit` (posts to fetch, 1–12). Split
   from `module_postList` so one type is never both a teaser and an archive;
   which mode you get is settled by the type, not by page context.
 - `module_taxonomyList` (`taxonomyListSchema`) — internal `title`,
-  `headingBlock` (optional), `taxonomy` (`TAXONOMY_KIND`, optional),
+  `headingBlock` (required heading), `taxonomy` (`TAXONOMY_KIND`, optional),
   `sortOrder` (`TAXONOMY_SORT`, `ALPHABETICAL` by default) and `limit`
   (optional integer ≥ 1). Lists taxonomy entries as cards. `taxonomy` is
   optional on the document because a module cannot see what holds it, so the
@@ -209,10 +209,10 @@ and `supportingText` (text) — neither carries a length cap, forced `max()`
 validation having been removed as editor-hostile). There is **one**
 registered `headingBlock` type; requiredness is a property of the field,
 not the type, attached via `headingBlockField({ requireHeading? })`, which
-adds a field-level rule checking the nested `heading`. It is required on
-`module_cta`/`module_newsletter`/`module_postLatest`/`module_postFeatured`/
-`module_postRelated`/`module_heroStatement` and optional on `module_postList`/
-`module_taxonomyList`; `module_content` and `module_hero` get none, and
+adds a field-level rule checking the nested `heading`. The heading is
+**required on every call site** — every module and every page — so no layer
+has to reason about which case it is holding; `module_content` and
+`module_hero` carry no `headingBlock` at all, and
 alignment is not bundled here — it is a separate module-level
 `contentAlignment` field. Every `module_*` document gets its own
 standalone, **required** `brandVariant` field (`@blog/config`'s
