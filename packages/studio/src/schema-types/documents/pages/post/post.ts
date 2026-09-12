@@ -28,7 +28,7 @@ export const postPageSchema = defineType({
     'A single blog post — its title, hero image, body content, and metadata.',
   icon: Newspaper,
   fields: [
-    titleField({ generatesSlug: true }),
+    titleField(),
     // Sanity's default slug `isUnique` check — scoped to this document type
     // — is exactly the scope this field needs: /blog/{slug} collisions only
     // matter within page_post itself, never against page_landing's /{slug}.
