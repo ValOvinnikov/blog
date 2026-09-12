@@ -12,7 +12,8 @@ export const skimSchema = defineType({
       name: 'takeaways',
       title: 'Takeaways',
       type: 'array',
-      description: '3–7 short takeaways, each under 160 characters.',
+      description:
+        'The bullet points a reader scans before committing to the full post.',
       of: [{ type: 'string', validation: (rule) => rule.max(160) }],
       validation: (rule) => rule.min(3).max(7),
     }),

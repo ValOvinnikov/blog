@@ -7,4 +7,5 @@ export const actionGroupField = (options: { title?: string } = {}) =>
     name: 'actions',
     title: options.title ?? 'Actions',
     type: actionGroupSchema.name,
+    description: 'The buttons or links this module offers as calls to action.',
   });

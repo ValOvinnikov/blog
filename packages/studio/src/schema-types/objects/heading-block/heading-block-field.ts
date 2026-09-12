@@ -6,6 +6,9 @@ type THeadingBlockValue = { heading?: string };
 
 const DEFAULT_REQUIRED_HEADING_MESSAGE = 'Heading is required.';
 
+export const PAGE_HEADING_DESCRIPTION =
+  "The page heading, shown as the page's H1 — except when a hero is set, which supplies its own H1 instead. Keep this filled in even then, so the page still has a heading if the hero is ever removed.";
+
 /**
  * The shared `headingBlock` object field. `requireHeading` adds a
  * field-level rule blocking publish on an empty nested `heading`, with an

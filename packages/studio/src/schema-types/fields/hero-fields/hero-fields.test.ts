@@ -82,6 +82,15 @@ describe('heroFields variant field', () => {
     expect(field.initialValue).toBe(HERO_VARIANT.SPLIT);
   });
 
+  it('describes what each variant looks like', () => {
+    const field = getField(heroFields(), 'variant') as { description?: string };
+
+    expect(field.description).toBeTruthy();
+    expect(field.description).toMatch(/split/i);
+    expect(field.description).toMatch(/stacked/i);
+    expect(field.description).toMatch(/banner/i);
+  });
+
   it('restricts the option set to the given variants', () => {
     const field = getField(
       heroFields({ variants: [HERO_VARIANT.STACKED] }),
@@ -133,6 +142,14 @@ describe('heroFields image field', () => {
         { parent: { variant: HERO_VARIANT.SPLIT } },
       ),
     ).toBe(true);
+  });
+
+  it('describes what the image is for without naming variant values as validation', () => {
+    const field = getField(heroFields(), 'image') as { description?: string };
+
+    expect(field.description).toBeTruthy();
+    expect(field.description).not.toMatch(/required/i);
+    expect(field.description).not.toMatch(/SPLIT|STACKED|BANNER/);
   });
 });
 
