@@ -79,6 +79,28 @@ describe('getTagPage', () => {
     });
   });
 
+  it('falls back to the tag description only for an unset supportingText, keeping an authored heading', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawTagPage({
+        tag: {
+          _id: 'tag-1',
+          title: 'TypeScript',
+          slug: 'typescript',
+          description: 'Posts about TypeScript.',
+        },
+        headingBlock: makeRawHeadingBlock('TypeScript, curated'),
+      }),
+    );
+
+    const result = await getTagPage('typescript', tenant);
+    if (!result) throw new Error('expected a tag page');
+
+    expect(result.headingBlock).toEqual({
+      heading: 'TypeScript, curated',
+      supportingText: 'Posts about TypeScript.',
+    });
+  });
+
   it('leaves hero undefined when page_tag.hero is unset', async () => {
     mockRun.mockResolvedValueOnce(makeRawTagPage({ hero: null }));
 

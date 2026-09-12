@@ -79,6 +79,28 @@ describe('getTopicPage', () => {
     });
   });
 
+  it('falls back to the topic description only for an unset supportingText, keeping an authored heading', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawTopicPage({
+        topic: {
+          _id: 'topic-1',
+          title: 'Engineering',
+          slug: 'engineering',
+          description: 'Notes on building things.',
+        },
+        headingBlock: makeRawHeadingBlock('Engineering, curated'),
+      }),
+    );
+
+    const result = await getTopicPage('engineering', tenant);
+    if (!result) throw new Error('expected a topic page');
+
+    expect(result.headingBlock).toEqual({
+      heading: 'Engineering, curated',
+      supportingText: 'Notes on building things.',
+    });
+  });
+
   it('leaves hero undefined when page_topic.hero is unset', async () => {
     mockRun.mockResolvedValueOnce(makeRawTopicPage({ hero: null }));
 
