@@ -30,7 +30,7 @@ export const landingPageSchema = defineType({
     },
   },
   fields: [
-    titleField(),
+    titleField({ generatesSlug: true }),
     slugField({
       description: 'URL path segment — auto-generated from title.',
       previewInput: landingSlugUrlPreviewInput,

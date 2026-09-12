@@ -62,6 +62,14 @@ describe('postPageSchema shape', () => {
     expect(calls.max).toBeUndefined();
   });
 
+  it('title description tells the editor it also seeds the slug', () => {
+    const titleFieldDefinition = getField('title');
+
+    expect(titleFieldDefinition?.description).toBe(
+      'Give this document a clear, descriptive title to help identify it in Studio. This title also is used to automatically generate the slug. This title for internal use only',
+    );
+  });
+
   it('publishedAt is a required datetime field', () => {
     const publishedAtField = getField('publishedAt') as
       { type: string; validation?: unknown } | undefined;
