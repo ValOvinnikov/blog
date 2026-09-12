@@ -373,11 +373,13 @@ originals deleted.
 
 **A page document's own `title` is an internal CMS label and is never
 rendered on the web.** It names the document in the desk, nothing more —
-`page_topic` and `page_tag` each carry a `headingBlock` whose `heading` is
-required and so never falls back to the deref'd `blog_topic`/`blog_tag`'s
-`title`. Its optional `supportingText` still falls back to that term's
-`description`, so a page that names itself but adds no standfirst renders
-the term's own. `page_post` has no
+`page_topic` and `page_tag` each carry a `headingBlock`, and neither of its
+fields falls back to the deref'd `blog_topic`/`blog_tag`: `heading` is
+required, and an unauthored `supportingText` stays unset rather than
+borrowing the term's `description`, which is the term's copy and not the
+page's. Every `headingBlock` is built by the one shared transformer,
+`toHeadingBlock`, and assigned whole — no caller re-wraps its result to
+layer a fallback on top. `page_post` has no
 entity to deref, so its headline and excerpt live in a **`headingBlock`**
 object with `heading` required and `supportingText` optional — the same
 shape, and the same registered type, the modules use. `@blog/service` maps
