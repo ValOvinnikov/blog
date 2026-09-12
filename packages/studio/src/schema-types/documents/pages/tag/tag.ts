@@ -118,7 +118,7 @@ export const tagPageSchema = defineType({
     rule.custom(validateUniquePostListReference),
   ],
   fields: [
-    titleField(),
+    titleField({ generatesSlug: true }),
     // Sanity's default slug `isUnique` check — scoped to this document type
     // — is exactly the scope this field needs: /tags/{slug} collisions only
     // matter within page_tag itself, never against page_landing's /{slug}.

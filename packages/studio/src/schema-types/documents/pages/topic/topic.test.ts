@@ -63,6 +63,14 @@ describe('topicPageSchema shape', () => {
     expect(requiredCalled).toBe(true);
   });
 
+  it('title description tells the editor it also seeds the slug', () => {
+    const titleFieldDefinition = getField('title');
+
+    expect(titleFieldDefinition?.description).toBe(
+      'Give this document a clear, descriptive title to help identify it in Studio. This title also is used to automatically generate the slug. This title for internal use only',
+    );
+  });
+
   it('has no deprecated postList field', () => {
     expect(getField('postList')).toBeUndefined();
   });
