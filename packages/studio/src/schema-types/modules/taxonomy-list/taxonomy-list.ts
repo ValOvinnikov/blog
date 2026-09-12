@@ -36,6 +36,8 @@ export const taxonomyListSchema = defineType({
       name: 'sortOrder',
       title: 'Sort Order',
       type: 'string',
+      description:
+        'How the listed terms are ordered — alphabetically, or by how many posts each has.',
       options: {
         layout: 'dropdown',
         list: Object.values(TAXONOMY_SORT).map((value) => ({

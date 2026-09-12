@@ -1,6 +1,7 @@
 import { blogPageSchema } from '@blog/studio/schema-types/documents/pages/blog/blog';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
+import { PAGE_HEADING_DESCRIPTION } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import {
   createMockModulesRule,
   type TModuleReference,
@@ -66,9 +67,7 @@ describe('blogPageSchema headingBlock field', () => {
     const headingBlockField = getField('headingBlock');
 
     expect(headingBlockField?.type).toBe('headingBlock');
-    expect(headingBlockField?.description).toBe(
-      "The page heading, shown as the page's H1. Hidden when a hero is set — the hero's heading becomes the H1 instead. Still required, so the page keeps a heading if the hero is ever removed.",
-    );
+    expect(headingBlockField?.description).toBe(PAGE_HEADING_DESCRIPTION);
     expect(headingBlockField?.validation).toBeDefined();
   });
 });

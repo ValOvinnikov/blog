@@ -47,7 +47,7 @@ export const heroFields = (options: THeroFieldsOptions = {}) => {
             title: 'Image',
             type: imageWithAltSchema.name,
             description:
-              'Required for Split and Banner; optional (below the copy) for Stacked.',
+              "The hero's image — sits beside the copy for Split, below the copy for Stacked, or behind the copy as a full-bleed background for Banner.",
             validation: (rule) =>
               rule.custom((value, context) => {
                 const variant = (
@@ -72,6 +72,8 @@ export const heroFields = (options: THeroFieldsOptions = {}) => {
       name: 'variant',
       title: 'Variant',
       type: 'string',
+      description:
+        'Which shape the hero takes: Split shows the image beside the heading and copy, Stacked shows it below the copy, and Banner uses it as a full-bleed background behind the copy.',
       options: {
         layout: 'radio',
         list: variantList.map((value) => ({

@@ -18,7 +18,7 @@ export const seoSchema = defineType({
       title: 'Meta Title',
       type: 'string',
       description:
-        'The page title shown in search results. Required — keep between 30 and 60 characters.',
+        "The page title shown in search results and browser tabs — distinct from the page's own on-page heading.",
       validation: (rule) =>
         rule
           .required()
@@ -30,7 +30,7 @@ export const seoSchema = defineType({
       title: 'Meta Description',
       type: 'text',
       description:
-        'The summary shown in search results. Omitted entirely when empty. Keep between 120–160 characters.',
+        'The summary shown beneath the title in search results — aim for a full sentence or two so it reads well; a single word or fragment displays poorly. Left empty, no summary is shown there.',
       validation: (rule) => rule.max(160),
     }),
     defineField({

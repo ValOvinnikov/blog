@@ -32,6 +32,8 @@ export const siteSettingsSchema = defineType({
       name: 'brand',
       title: 'Brand',
       type: brandSchema.name,
+      description:
+        "The site's identity — name, logo, and optional status line — used across the header and footer.",
       validation: (rule) => rule.required(),
     }),
     defineField({

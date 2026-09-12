@@ -44,12 +44,15 @@ const modeFieldPair = ({
       ? `Custom ${title.toLowerCase()} is required when ${title} Source is Custom.`
       : true;
 
+  const customFieldDescription = `Your own ${title.toLowerCase()}, used when ${title} Source is set to Custom.`;
+
   const customField =
     customType === 'text'
       ? defineField({
           name,
           title: `Custom ${title}`,
           type: 'text',
+          description: customFieldDescription,
           rows,
           hidden,
           validation: (rule) => rule.custom(requiredWhenCustom),
@@ -59,6 +62,7 @@ const modeFieldPair = ({
             name,
             title: `Custom ${title}`,
             type: imageWithAltSchema.name,
+            description: customFieldDescription,
             hidden,
             validation: (rule) => rule.custom(requiredWhenCustom),
           })
@@ -66,6 +70,7 @@ const modeFieldPair = ({
             name,
             title: `Custom ${title}`,
             type: 'string',
+            description: customFieldDescription,
             hidden,
             validation: (rule) => rule.custom(requiredWhenCustom),
           });

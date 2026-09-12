@@ -3,6 +3,7 @@ import { tagPageSchema } from '@blog/studio/schema-types/documents/pages/tag/tag
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
+import { PAGE_HEADING_DESCRIPTION } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import type { ValidationContext } from 'sanity';
 
 type TReferenceFieldDefinition = {
@@ -129,9 +130,7 @@ describe('pageTagSchema headingBlock field', () => {
       THeadingBlockFieldDefinition | undefined;
 
     expect(headingBlockField?.type).toBe('headingBlock');
-    expect(headingBlockField?.description).toBe(
-      "The page heading, shown as the page's H1. Hidden when a hero is set — the hero's heading becomes the H1 instead. Still required, so the page keeps a heading if the hero is ever removed.",
-    );
+    expect(headingBlockField?.description).toBe(PAGE_HEADING_DESCRIPTION);
   });
 
   it('is required at the field level', () => {

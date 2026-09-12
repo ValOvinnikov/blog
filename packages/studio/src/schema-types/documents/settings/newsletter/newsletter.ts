@@ -47,7 +47,7 @@ export const newsletterSettingsSchema = defineType({
       title: 'Trust cues',
       type: 'array',
       description:
-        'Up to 2 short reassurance phrases shown under the newsletter signup form (e.g. "No spam", "Unsubscribe anytime").',
+        'Short reassurance phrases shown under the newsletter signup form (e.g. "No spam", "Unsubscribe anytime").',
       of: [{ type: 'string', validation: (rule) => rule.max(40) }],
       validation: (rule) => rule.max(2),
     }),
