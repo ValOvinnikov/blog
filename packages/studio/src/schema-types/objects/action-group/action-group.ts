@@ -11,6 +11,8 @@ export const ctaActionSchema = defineType({
   name: 'ctaAction',
   title: 'Action',
   type: 'object',
+  description:
+    'A single button or text link used inside a call to action or action group.',
   icon: MousePointerClick,
   initialValue: {
     variant: CTA_ACTION_VARIANT.PRIMARY,
@@ -75,6 +77,8 @@ export const actionGroupSchema = defineType({
   name: 'actionGroup',
   title: 'Actions',
   type: 'object',
+  description:
+    'Up to two actions — a required primary and an optional secondary — offered together.',
   fields: [
     defineField({
       name: 'actions',

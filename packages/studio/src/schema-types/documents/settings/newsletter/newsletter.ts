@@ -29,6 +29,8 @@ export const newsletterSettingsSchema = defineType({
   name: 'settings_newsletter',
   title: 'Newsletter',
   type: 'document',
+  description:
+    'Shared newsletter-signup copy, reused wherever the signup form appears.',
   icon: Mail,
   preview: {
     select: { title: 'title' },

@@ -5,6 +5,8 @@ export const openGraphSchema = defineType({
   name: 'openGraph',
   title: 'Open Graph',
   type: 'object',
+  description:
+    'The title, description, and image shown when a page is shared on social media.',
   fields: [
     defineField({
       name: 'ogTitle',

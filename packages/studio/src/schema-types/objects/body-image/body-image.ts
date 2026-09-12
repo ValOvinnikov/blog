@@ -17,6 +17,8 @@ export const bodyImageSchema = defineType({
   name: 'bodyImage',
   title: 'Body Image',
   type: 'image',
+  description:
+    'An image placed within body content, with its alt text and its position relative to the surrounding text.',
   options: imageHotspotOptions,
   fields: [
     imageAltField(),

@@ -27,6 +27,8 @@ export const topicIndexPageSchema = defineType({
   name: 'page_topicIndex',
   title: 'Topic Index Page',
   type: 'document',
+  description:
+    'The page that lists every topic, for readers browsing by subject.',
   icon: Tags,
   validation: (rule) => [
     rule.custom(validateSingleTaxonomyListModule),

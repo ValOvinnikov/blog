@@ -77,6 +77,8 @@ export const topicPageSchema = defineType({
   name: PAGE_TOPIC_TYPE,
   title: 'Topic Page',
   type: 'document',
+  description:
+    'The archive page for one topic, listing the posts classified under it.',
   icon: Tags,
   validation: (rule) => [
     rule.custom(validateSinglePostListModule),

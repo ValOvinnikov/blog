@@ -4,6 +4,8 @@ export const socialLinkSchema = defineType({
   name: 'socialLink',
   title: 'Social Link',
   type: 'object',
+  description:
+    'A link to one social media profile, together with its platform name.',
   fields: [
     defineField({
       name: 'platform',

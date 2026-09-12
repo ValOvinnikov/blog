@@ -12,6 +12,7 @@ export const postListSchema = defineType({
   name: 'module_postList',
   title: 'Post List',
   type: 'document',
+  description: 'A paginated list of every post, used for the blog archive.',
   icon: List,
   fields: [
     titleField(),

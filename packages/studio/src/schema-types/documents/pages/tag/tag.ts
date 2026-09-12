@@ -111,6 +111,8 @@ export const tagPageSchema = defineType({
   name: PAGE_TAG_TYPE,
   title: 'Tag Page',
   type: 'document',
+  description:
+    'The archive page for one tag, listing the posts labeled with it.',
   icon: Tag,
   validation: (rule) => [
     rule.custom(validateSinglePostListModule),

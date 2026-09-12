@@ -36,6 +36,8 @@ export const ctaSchema = defineType({
   name: 'module_cta',
   title: 'Call to Action',
   type: 'document',
+  description:
+    'A short prompt with one or two buttons, used to send readers somewhere specific.',
   icon: Megaphone,
   fields: [
     titleField(),

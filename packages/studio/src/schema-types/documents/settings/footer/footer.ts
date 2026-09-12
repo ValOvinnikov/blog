@@ -7,6 +7,7 @@ export const footerSettingsSchema = defineType({
   name: 'settings_footer',
   title: 'Footer',
   type: 'document',
+  description: 'The social links shown in the site footer.',
   icon: PanelBottom,
   preview: { select: { title: 'title' } },
   fields: [

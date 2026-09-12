@@ -38,6 +38,8 @@ export const topicSchema = defineType({
   name: 'blog_topic',
   title: 'Topic',
   type: 'document',
+  description:
+    'A subject category used to classify posts, powering topic filters and the topic archive page.',
   icon: Tags,
   validation: (rule) => rule.custom(validateHasPageTopic).warning(),
   fields: [

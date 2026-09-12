@@ -12,6 +12,8 @@ export const taxonomyListSchema = defineType({
   name: 'module_taxonomyList',
   title: 'Taxonomy List',
   type: 'document',
+  description:
+    'A list of topics or tags, used on the topic and tag index pages and anywhere else readers browse by category.',
   icon: LayoutGrid,
   fields: [
     titleField(),

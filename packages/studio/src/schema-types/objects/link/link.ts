@@ -16,6 +16,8 @@ export const linkSchema = defineType({
   name: 'link',
   title: 'Link',
   type: 'object',
+  description:
+    'A link to either an internal page or an external URL, with its own visible label.',
   icon: Link2,
   initialValue: {
     linkType: LINK_TYPE.INTERNAL,
