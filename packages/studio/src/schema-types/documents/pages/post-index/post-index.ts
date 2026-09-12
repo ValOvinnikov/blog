@@ -7,22 +7,24 @@ import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featu
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
+import { validateHeroOrHeading } from '@blog/studio/schema-types/validation/validate-hero-or-heading/validate-hero-or-heading';
 import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/validation/validate-single-blank-heading-per-type/validate-single-blank-heading-per-type';
 import { Newspaper } from 'lucide-react';
 import { defineType, type SanityDocument } from 'sanity';
 
 type TModuleReference = { _type?: string; _ref?: string };
 
-type TBlogPageDocument = {
+type TPostIndexPageDocument = {
   modules?: TModuleReference[];
 };
 
-const asBlogPageDocument = (
+const asPostIndexPageDocument = (
   document: SanityDocument | undefined,
-): TBlogPageDocument | undefined => document as TBlogPageDocument | undefined;
+): TPostIndexPageDocument | undefined =>
+  document as TPostIndexPageDocument | undefined;
 
 const countPostListModules = (document: SanityDocument | undefined): number =>
-  (asBlogPageDocument(document)?.modules ?? []).filter(
+  (asPostIndexPageDocument(document)?.modules ?? []).filter(
     (module) => module._type === postListSchema.name,
   ).length;
 
@@ -40,12 +42,13 @@ const validatePostListModulePresent = (
     ? 'Add a Post List module so this page can list posts.'
     : true;
 
-export const blogPageSchema = defineType({
-  name: 'page_blog',
-  title: 'Post Index Page (legacy)',
+export const postIndexPageSchema = defineType({
+  name: 'page_postIndex',
+  title: 'Post Index Page',
   type: 'document',
   icon: Newspaper,
   validation: (rule) => [
+    ...validateHeroOrHeading()(rule),
     rule.custom(validatePostListModuleCount),
     rule.custom(validatePostListModulePresent).warning(),
   ],
@@ -63,9 +66,8 @@ export const blogPageSchema = defineType({
   fields: [
     titleField(),
     headingBlockField({
-      requireHeading: true,
       description:
-        "The page heading, shown as the page's H1. Hidden when a hero is set — the hero's heading becomes the H1 instead. Still required, so the page keeps a heading if the hero is ever removed.",
+        'The page heading (h1) and its optional supporting line. Not shown when a hero is set.',
     }),
     heroField(),
     modulesField({
