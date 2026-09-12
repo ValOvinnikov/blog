@@ -540,8 +540,8 @@ shapes for the other pages that read them.
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its
 schema allows), `layout` as `TLayout | undefined`, and (where applicable)
 `headingBlock` as a required `THeadingBlock` — with no faked defaults
-anywhere: what is unset stays unset end to end. In `apps/web`, every module component
-that renders a `@blog/ui` organism — including those reached through a
+anywhere: what is unset stays unset end to end. In `apps/web`, every module
+component that renders a `@blog/ui` organism — including those reached through a
 dedicated slot rather than `MODULE_MAP`'s generic `ModuleRenderer` pipeline
 (§5 above): the hero family, via each page's `hero` slot, is now the only such
 case — `module_taxonomyList` and `module_postList` both render through
