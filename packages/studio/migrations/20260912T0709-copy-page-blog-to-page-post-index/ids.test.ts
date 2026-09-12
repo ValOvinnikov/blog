@@ -1,20 +1,13 @@
 import {
-  PAGE_BLOG_ID,
   PAGE_BLOG_TO_POST_INDEX_ID_MAP,
   PAGE_BLOG_TYPE,
-  PAGE_POST_INDEX_ID,
   PAGE_POST_INDEX_TYPE,
 } from './ids';
 
 describe('copy-page-blog-to-page-post-index ids', () => {
   it('matches the page_blog and page_postIndex singleton Studio document ids', () => {
-    expect(PAGE_BLOG_ID).toBe('page_blog');
-    expect(PAGE_POST_INDEX_ID).toBe('page_postIndex');
-  });
-
-  it('derives the singleton ids from their schema type names', () => {
-    expect(PAGE_BLOG_ID).toBe(PAGE_BLOG_TYPE);
-    expect(PAGE_POST_INDEX_ID).toBe(PAGE_POST_INDEX_TYPE);
+    expect(PAGE_BLOG_TYPE).toBe('page_blog');
+    expect(PAGE_POST_INDEX_TYPE).toBe('page_postIndex');
   });
 
   it('maps both the published and draft page_blog id to their page_postIndex counterpart', () => {
