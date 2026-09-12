@@ -79,7 +79,7 @@ describe('getTagPage', () => {
     });
   });
 
-  it('falls back to the tag description only for an unset supportingText, keeping an authored heading', async () => {
+  it('leaves supportingText undefined for an unset value, never falling back to the tag description', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawTagPage({
         tag: {
@@ -97,7 +97,7 @@ describe('getTagPage', () => {
 
     expect(result.headingBlock).toEqual({
       heading: 'TypeScript, curated',
-      supportingText: 'Posts about TypeScript.',
+      supportingText: undefined,
     });
   });
 

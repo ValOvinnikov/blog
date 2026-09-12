@@ -79,7 +79,7 @@ describe('getTopicPage', () => {
     });
   });
 
-  it('falls back to the topic description only for an unset supportingText, keeping an authored heading', async () => {
+  it('leaves supportingText undefined for an unset value, never falling back to the topic description', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawTopicPage({
         topic: {
@@ -97,7 +97,7 @@ describe('getTopicPage', () => {
 
     expect(result.headingBlock).toEqual({
       heading: 'Engineering, curated',
-      supportingText: 'Notes on building things.',
+      supportingText: undefined,
     });
   });
 
