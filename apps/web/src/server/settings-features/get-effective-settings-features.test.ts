@@ -147,4 +147,17 @@ describe(getEffectiveSettingsFeatures, () => {
     expect(getSettingsFeaturesMock).toHaveBeenCalledWith(TENANT_A_ID);
     expect(getSettingsFeaturesMock).toHaveBeenCalledWith(TENANT_B_ID);
   });
+
+  it("propagates the header read's dynamic-rendering signal rather than reporting it as a fetch failure", async () => {
+    const dynamicSignal = Object.assign(
+      new Error(
+        "Dynamic server usage: Route /[tenant]/[locale] couldn't be rendered statically because it used `headers`",
+      ),
+      { digest: 'DYNAMIC_SERVER_USAGE' },
+    );
+    getRequestTenantIdMock.mockRejectedValue(dynamicSignal);
+
+    await expect(getEffectiveSettingsFeatures()).rejects.toBe(dynamicSignal);
+    expect(getSettingsFeaturesMock).not.toHaveBeenCalled();
+  });
 });
