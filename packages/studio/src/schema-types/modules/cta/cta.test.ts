@@ -368,9 +368,33 @@ const getLayout = (field: ReturnType<typeof getField>) => {
     : undefined;
 };
 
+const wasRequiredCalled = (field: ReturnType<typeof getField>) => {
+  const validation = 'validation' in field ? field.validation : undefined;
+
+  if (!validation) {
+    throw new Error('Expected field to define validation.');
+  }
+
+  let requiredCalled = false;
+  const rule = {
+    required: () => {
+      requiredCalled = true;
+      return rule;
+    },
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+  (validation as any)(rule);
+
+  return requiredCalled;
+};
+
 describe('ctaSchema variant field', () => {
   it('keeps variant as a radio: required, and it drives several other fields', () => {
-    expect(getLayout(getField('variant'))).toBe('radio');
+    const field = getField('variant');
+
+    expect(getLayout(field)).toBe('radio');
+    expect(wasRequiredCalled(field)).toBe(true);
   });
 });
 
@@ -386,6 +410,11 @@ describe('ctaSchema mobileMediaOrder field', () => {
   });
 
   it('converts to a dropdown: optional, no field depends on it', () => {
-    expect(getLayout(getField('mobileMediaOrder'))).toBe('dropdown');
+    const field = getField('mobileMediaOrder');
+
+    expect(getLayout(field)).toBe('dropdown');
+    expect(
+      'validation' in field ? field.validation : undefined,
+    ).toBeUndefined();
   });
 });

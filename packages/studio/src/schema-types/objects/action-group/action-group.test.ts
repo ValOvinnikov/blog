@@ -182,10 +182,30 @@ describe('ctaActionSchema control choices', () => {
     return list as { title: string; value: string }[];
   };
 
+  const wasRequiredCalled = (field: { validation?: unknown }) => {
+    if (!field.validation) {
+      throw new Error('Expected field to define validation.');
+    }
+
+    let requiredCalled = false;
+    const rule = {
+      required: () => {
+        requiredCalled = true;
+        return rule;
+      },
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (field.validation as any)(rule);
+
+    return requiredCalled;
+  };
+
   it('keeps variant as a radio: required, and picking it sets which sibling variant is unavailable', () => {
     const field = getField('variant');
 
     expect(getLayout(field)).toBe('radio');
+    expect(wasRequiredCalled(field)).toBe(true);
     expect(getOptionValues(field)).toEqual(
       Object.values(CTA_ACTION_VARIANT).map((value) => ({
         title: toTitleCase(value),
@@ -198,6 +218,7 @@ describe('ctaActionSchema control choices', () => {
     const field = getField('appearance');
 
     expect(getLayout(field)).toBe('dropdown');
+    expect(field.validation).toBeUndefined();
     expect(getOptionValues(field)).toEqual(
       Object.values(CTA_ACTION_APPEARANCE).map((value) => ({
         title: toTitleCase(value),

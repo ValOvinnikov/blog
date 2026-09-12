@@ -66,6 +66,25 @@ const getHidden = (field: { hidden?: unknown }): THiddenFn => {
   return field.hidden as THiddenFn;
 };
 
+const wasRequiredCalled = (field: { validation?: unknown }) => {
+  if (!field.validation) {
+    throw new Error('Expected field to define validation.');
+  }
+
+  let requiredCalled = false;
+  const rule = {
+    required: () => {
+      requiredCalled = true;
+      return rule;
+    },
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+  (field.validation as any)(rule);
+
+  return requiredCalled;
+};
+
 const getFieldCustomValidator = (field: {
   validation?: unknown;
 }): TCustomFn => {
@@ -147,7 +166,10 @@ describe('heroBlogSchema postSource field', () => {
   });
 
   it('keeps postSource as a radio: required, and it drives the post field', () => {
-    expect(getLayout(getField('postSource'))).toBe('radio');
+    const field = getField('postSource');
+
+    expect(getLayout(field)).toBe('radio');
+    expect(wasRequiredCalled(field)).toBe(true);
   });
 });
 
@@ -220,7 +242,10 @@ describe('heroBlogSchema imageSource field', () => {
   });
 
   it('keeps imageSource as a radio: required, and it drives the image field', () => {
-    expect(getLayout(getField('imageSource'))).toBe('radio');
+    const field = getField('imageSource');
+
+    expect(getLayout(field)).toBe('radio');
+    expect(wasRequiredCalled(field)).toBe(true);
   });
 });
 
@@ -236,7 +261,10 @@ describe('heroBlogSchema primaryActionAppearance field', () => {
   });
 
   it('converts to a dropdown: optional, no field depends on it', () => {
-    expect(getLayout(getField('primaryActionAppearance'))).toBe('dropdown');
+    const field = getField('primaryActionAppearance');
+
+    expect(getLayout(field)).toBe('dropdown');
+    expect(field.validation).toBeUndefined();
   });
 });
 
