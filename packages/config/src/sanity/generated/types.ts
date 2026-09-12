@@ -576,8 +576,6 @@ export type Page_tagIndex = {
       } & Module_newsletterReference)
   >;
   seo?: Seo;
-  heading?: string;
-  supportingText?: string;
   taxonomyList?: Module_taxonomyListReference;
 };
 
@@ -639,8 +637,6 @@ export type Page_topicIndex = {
       } & Module_newsletterReference)
   >;
   seo?: Seo;
-  heading?: string;
-  supportingText?: string;
   taxonomyList?: Module_taxonomyListReference;
 };
 

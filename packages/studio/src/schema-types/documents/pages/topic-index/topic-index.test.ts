@@ -82,15 +82,13 @@ const buildDocumentRules = (): TDocumentMockRule[] => {
 };
 
 describe('topicIndexPageSchema field order', () => {
-  it('orders fields title, headingBlock, hero, modules, seo, then the deprecated fields', () => {
+  it('orders fields title, headingBlock, hero, modules, seo, then the deprecated taxonomyList field', () => {
     expect(topicIndexPageSchema.fields?.map((field) => field.name)).toEqual([
       'title',
       'headingBlock',
       'hero',
       'modules',
       'seo',
-      'heading',
-      'supportingText',
       'taxonomyList',
     ]);
   });
@@ -296,26 +294,6 @@ describe('topicIndexPageSchema taxonomy-kind rule', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- validation fn is document-level async, the mock TDocumentMockRule type models the synchronous shared shape
       (fn as any)({ taxonomyList: { _ref: 'taxonomy-list-legacy' } }, context),
     ).resolves.toBe('This page lists topics; the module is set to tags.');
-  });
-});
-
-describe('topicIndexPageSchema deprecated heading field', () => {
-  it('is readOnly, deprecated, and no longer required', () => {
-    const headingField = getField('heading');
-
-    expect(headingField?.readOnly).toBe(true);
-    expect(headingField?.deprecated?.reason).toBeTruthy();
-    expect(headingField?.validation).toBeUndefined();
-  });
-});
-
-describe('topicIndexPageSchema deprecated supportingText field', () => {
-  it('is readOnly and deprecated — always optional', () => {
-    const supportingTextField = getField('supportingText');
-
-    expect(supportingTextField?.readOnly).toBe(true);
-    expect(supportingTextField?.deprecated?.reason).toBeTruthy();
-    expect(supportingTextField?.validation).toBeUndefined();
   });
 });
 

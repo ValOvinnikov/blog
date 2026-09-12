@@ -3656,20 +3656,6 @@
         },
         "optional": true
       },
-      "heading": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
-      "supportingText": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
       "taxonomyList": {
         "type": "objectAttribute",
         "value": {
@@ -3997,20 +3983,6 @@
         "value": {
           "type": "inline",
           "name": "seo"
-        },
-        "optional": true
-      },
-      "heading": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
-      "supportingText": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
         },
         "optional": true
       },
