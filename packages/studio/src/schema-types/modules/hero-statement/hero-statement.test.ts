@@ -61,12 +61,10 @@ describe('heroStatementSchema field order', () => {
 });
 
 describe('heroStatementSchema eyebrow field', () => {
-  it('caps at 40 characters and is optional', () => {
+  it('is optional with no length cap', () => {
     const field = getField('eyebrow');
-    const rule = { max: (n: number) => `max:${n}` };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    expect((field.validation as any)(rule)).toBe('max:40');
+    expect(field.validation).toBeUndefined();
   });
 });
 

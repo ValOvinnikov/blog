@@ -160,7 +160,6 @@ export const heroBlogSchema = defineType({
       type: 'string',
       description:
         "Optional kicker label. Empty renders the resolved post's topic title.",
-      validation: (rule) => rule.max(40),
     }),
     defineField({
       name: 'heading',

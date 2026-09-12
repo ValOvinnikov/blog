@@ -16,7 +16,6 @@ export const heroStatementSchema = defineType({
       title: 'Eyebrow',
       type: 'string',
       description: 'Optional small line above the heading.',
-      validation: (rule) => rule.max(40),
     }),
     headingBlockField({
       requireHeading: true,
