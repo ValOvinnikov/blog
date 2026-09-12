@@ -1,8 +1,8 @@
-import { homePageSchema } from '@blog/studio/schema-types/documents/pages/home';
-import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/helpers/validate-taxonomy-list-has-taxonomy';
+import { homePageSchema } from '@blog/studio/schema-types/documents/pages/home/home';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
-import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
-import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
+import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
+import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
+import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/validation/validate-taxonomy-list-has-taxonomy/validate-taxonomy-list-has-taxonomy';
 import {
   createMockModulesRule,
   type TModuleReference,

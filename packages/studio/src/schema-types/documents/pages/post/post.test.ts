@@ -1,7 +1,7 @@
-import { pagePostSchema } from '@blog/studio/schema-types/documents/pages/post';
-import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
-import { postRelatedSchema } from '@blog/studio/schema-types/modules/module-post-related';
+import { postPageSchema } from '@blog/studio/schema-types/documents/pages/post/post';
+import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
+import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
+import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
 
 type TReferenceFieldDefinition = {
   type: 'reference';
@@ -17,7 +17,7 @@ type TValidationRule = {
 };
 
 const getField = (name: string) =>
-  pagePostSchema.fields?.find((field) => field.name === name);
+  postPageSchema.fields?.find((field) => field.name === name);
 
 const createTrackingRule = () => {
   const calls = {
@@ -45,12 +45,12 @@ const createTrackingRule = () => {
   return { rule, calls };
 };
 
-describe('pagePostSchema shape', () => {
+describe('postPageSchema shape', () => {
   it('title is required via the shared titleField() helper — an internal label, not the rendered headline', () => {
     const titleFieldDefinition = getField('title');
 
     if (!titleFieldDefinition?.validation) {
-      throw new Error('Expected pagePostSchema to define a title field.');
+      throw new Error('Expected postPageSchema to define a title field.');
     }
 
     const { rule, calls } = createTrackingRule();
@@ -68,7 +68,7 @@ describe('pagePostSchema shape', () => {
 
     if (!publishedAtField || publishedAtField.type !== 'datetime') {
       throw new Error(
-        'Expected pagePostSchema to define a publishedAt datetime field.',
+        'Expected postPageSchema to define a publishedAt datetime field.',
       );
     }
 
@@ -92,7 +92,7 @@ describe('pagePostSchema shape', () => {
 
     if (!headingBlockFieldDefinition?.validation) {
       throw new Error(
-        'Expected pagePostSchema headingBlock to define validation.',
+        'Expected postPageSchema headingBlock to define validation.',
       );
     }
 
@@ -113,7 +113,7 @@ describe('pagePostSchema shape', () => {
 
     if (!customFn) {
       throw new Error(
-        'Expected pagePostSchema headingBlock validation to register a custom() rule.',
+        'Expected postPageSchema headingBlock validation to register a custom() rule.',
       );
     }
 
@@ -130,7 +130,7 @@ describe('pagePostSchema shape', () => {
       TReferenceFieldDefinition | undefined;
 
     if (!authorField?.validation) {
-      throw new Error('Expected pagePostSchema to define an author field.');
+      throw new Error('Expected postPageSchema to define an author field.');
     }
 
     const { rule, calls } = createTrackingRule();
@@ -146,7 +146,7 @@ describe('pagePostSchema shape', () => {
       TReferenceFieldDefinition | undefined;
 
     if (!topicField?.validation) {
-      throw new Error('Expected pagePostSchema to define a topic field.');
+      throw new Error('Expected postPageSchema to define a topic field.');
     }
 
     const { rule, calls } = createTrackingRule();
@@ -161,7 +161,7 @@ describe('pagePostSchema shape', () => {
     const tagsField = getField('tags');
 
     if (!tagsField?.validation) {
-      throw new Error('Expected pagePostSchema to define a tags field.');
+      throw new Error('Expected postPageSchema to define a tags field.');
     }
 
     const { rule, calls } = createTrackingRule();
@@ -177,7 +177,7 @@ describe('pagePostSchema shape', () => {
     const contentField = getField('content');
 
     if (!contentField?.validation) {
-      throw new Error('Expected pagePostSchema to define a content field.');
+      throw new Error('Expected postPageSchema to define a content field.');
     }
 
     const { rule, calls } = createTrackingRule();
@@ -209,7 +209,7 @@ describe('pagePostSchema shape', () => {
     const seoFieldDefinition = getField('seo');
 
     if (!seoFieldDefinition?.validation) {
-      throw new Error('Expected pagePostSchema to define a seo field.');
+      throw new Error('Expected postPageSchema to define a seo field.');
     }
 
     const { rule, calls } = createTrackingRule();
@@ -232,7 +232,7 @@ type TSlugFieldDefinition = {
   validation?: unknown;
 };
 
-describe('pagePostSchema slug field', () => {
+describe('postPageSchema slug field', () => {
   const getSlugField = () =>
     getField('slug') as TSlugFieldDefinition | undefined;
 
@@ -240,7 +240,7 @@ describe('pagePostSchema slug field', () => {
     const slugField = getSlugField();
 
     if (!slugField || slugField.type !== 'slug') {
-      throw new Error('Expected pagePostSchema to define a slug field.');
+      throw new Error('Expected postPageSchema to define a slug field.');
     }
 
     expect(slugField.options?.source).toBe('title');
@@ -252,7 +252,7 @@ describe('pagePostSchema slug field', () => {
 
     if (!slugField?.validation) {
       throw new Error(
-        'Expected pagePostSchema slug field to define validation.',
+        'Expected postPageSchema slug field to define validation.',
       );
     }
 
@@ -280,7 +280,7 @@ describe('pagePostSchema slug field', () => {
   });
 });
 
-describe('pagePostSchema modules field', () => {
+describe('postPageSchema modules field', () => {
   const getModulesField = () =>
     getField('modules') as
       | { type: 'array'; of?: Array<{ to?: Array<{ type: string }> }> }
@@ -290,7 +290,7 @@ describe('pagePostSchema modules field', () => {
     const modulesField = getModulesField();
 
     if (!modulesField || modulesField.type !== 'array') {
-      throw new Error('Expected pagePostSchema to define a modules field.');
+      throw new Error('Expected postPageSchema to define a modules field.');
     }
 
     const allowedTypes = modulesField.of?.map((member) => member.to?.[0]?.type);
@@ -303,9 +303,9 @@ describe('pagePostSchema modules field', () => {
   });
 });
 
-describe('pagePostSchema field order', () => {
+describe('postPageSchema field order', () => {
   it('lists fields in authoring order', () => {
-    const fieldNames = pagePostSchema.fields?.map((field) => field.name);
+    const fieldNames = postPageSchema.fields?.map((field) => field.name);
 
     expect(fieldNames).toEqual([
       'title',
@@ -325,12 +325,12 @@ describe('pagePostSchema field order', () => {
   });
 });
 
-describe('pagePostSchema preview', () => {
+describe('postPageSchema preview', () => {
   it('shows the section header heading and author', () => {
-    const prepare = pagePostSchema.preview?.prepare;
+    const prepare = postPageSchema.preview?.prepare;
 
     if (!prepare) {
-      throw new Error('Expected pagePostSchema to define preview.prepare.');
+      throw new Error('Expected postPageSchema to define preview.prepare.');
     }
 
     expect(
@@ -348,10 +348,10 @@ describe('pagePostSchema preview', () => {
   });
 
   it('falls back to the internal title when headingBlock is absent', () => {
-    const prepare = pagePostSchema.preview?.prepare;
+    const prepare = postPageSchema.preview?.prepare;
 
     if (!prepare) {
-      throw new Error('Expected pagePostSchema to define preview.prepare.');
+      throw new Error('Expected postPageSchema to define preview.prepare.');
     }
 
     expect(
@@ -369,10 +369,10 @@ describe('pagePostSchema preview', () => {
   });
 
   it('falls back to "Unknown" title and an empty subtitle', () => {
-    const prepare = pagePostSchema.preview?.prepare;
+    const prepare = postPageSchema.preview?.prepare;
 
     if (!prepare) {
-      throw new Error('Expected pagePostSchema to define preview.prepare.');
+      throw new Error('Expected postPageSchema to define preview.prepare.');
     }
 
     expect(

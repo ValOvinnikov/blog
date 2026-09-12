@@ -4,6 +4,6 @@
  * validation can reference it without an import cycle back through
  * `topic.ts`, which itself imports `topicSchema`. Import this module
  * directly rather than through the folder's `index.ts` barrel, which
- * re-exports `pageTopicSchema` and would pull the same cycle back in.
+ * re-exports `topicPageSchema` and would pull the same cycle back in.
  */
 export const PAGE_TOPIC_TYPE = 'page_topic';

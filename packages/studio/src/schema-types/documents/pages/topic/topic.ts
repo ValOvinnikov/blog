@@ -1,17 +1,17 @@
-import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/components/slug-url-preview-input';
-import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic';
+import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic/topic';
 import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic/topic-type';
-import { defineModulesField } from '@blog/studio/schema-types/helpers/define-modules-field';
-import { getDraftsClient } from '@blog/studio/schema-types/helpers/get-drafts-client';
-import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
-import { heroField } from '@blog/studio/schema-types/helpers/hero-field';
-import { seoField } from '@blog/studio/schema-types/helpers/seo-field';
-import { slugField } from '@blog/studio/schema-types/helpers/slug-field';
-import { titleField } from '@blog/studio/schema-types/helpers/title-field';
-import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
-import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
-import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
+import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-field';
+import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
+import { slugField } from '@blog/studio/schema-types/fields/slug-field/slug-field';
+import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/slug-url-preview/slug-url-preview-input';
+import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
+import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
+import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
+import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
+import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
+import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
+import { getDraftsClient } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
 import { Tags } from 'lucide-react';
 import {
   defineField,
@@ -123,7 +123,7 @@ const validateHasPostListModule = (
 ): string | true =>
   countPostListModules(document) === 0 ? NO_POST_LIST_WARNING : true;
 
-export const pageTopicSchema = defineType({
+export const topicPageSchema = defineType({
   name: PAGE_TOPIC_TYPE,
   title: 'Topic Page',
   type: 'document',
@@ -158,7 +158,7 @@ export const pageTopicSchema = defineType({
         'The page heading (h1) and its optional supporting line. Not shown when a hero is set.',
     }),
     heroField(),
-    defineModulesField({
+    modulesField({
       allow: [
         postListSchema.name,
         postLatestSchema.name,

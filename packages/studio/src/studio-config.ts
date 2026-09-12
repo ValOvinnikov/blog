@@ -1,5 +1,5 @@
 import { schemaTypes } from '@blog/studio/schema-types';
-import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state';
+import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state/migration-state';
 import { codeInput } from '@sanity/code-input';
 import { visionTool } from '@sanity/vision';
 import { defineConfig } from 'sanity';

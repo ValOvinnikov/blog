@@ -1,14 +1,14 @@
-import { contentSchema } from './module-content';
-import { ctaSchema } from './module-cta';
-import { heroSchema } from './module-hero';
-import { heroBlogSchema } from './module-hero-blog';
-import { heroStatementSchema } from './module-hero-statement';
-import { newsletterSchema } from './module-newsletter';
-import { postFeaturedSchema } from './module-post-featured';
-import { postLatestSchema } from './module-post-latest';
-import { postListSchema } from './module-post-list';
-import { postRelatedSchema } from './module-post-related';
-import { taxonomyListSchema } from './module-taxonomy-list';
+import { contentSchema } from './content/content';
+import { ctaSchema } from './cta/cta';
+import { heroSchema } from './hero/hero';
+import { heroBlogSchema } from './hero-blog/hero-blog';
+import { heroStatementSchema } from './hero-statement/hero-statement';
+import { newsletterSchema } from './newsletter/newsletter';
+import { postFeaturedSchema } from './post-featured/post-featured';
+import { postLatestSchema } from './post-latest/post-latest';
+import { postListSchema } from './post-list/post-list';
+import { postRelatedSchema } from './post-related/post-related';
+import { taxonomyListSchema } from './taxonomy-list/taxonomy-list';
 
 export const modules = [
   heroSchema,

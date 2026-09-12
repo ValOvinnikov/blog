@@ -1,1 +1,0 @@
-export { pageTopicSchema } from './topic';

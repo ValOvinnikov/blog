@@ -1,37 +1,37 @@
-import { authorSchema } from './blog/author';
-import { tagSchema } from './blog/tag';
-import { topicSchema } from './blog/topic';
-import { blogPageSchema } from './pages/blog';
-import { homePageSchema } from './pages/home';
-import { landingSchema } from './pages/landing';
-import { pagePostSchema } from './pages/post';
-import { pageTagSchema } from './pages/tag';
-import { tagIndexPageSchema } from './pages/tag-index';
-import { pageTopicSchema } from './pages/topic';
-import { topicIndexPageSchema } from './pages/topic-index';
-import { footerSchema } from './settings/footer';
-import { navigationSchema } from './settings/navigation';
-import { newsletterSettingsSchema } from './settings/newsletter';
-import { siteSchema } from './settings/site-settings';
-import { themeSchema } from './settings/theme';
-import { migrationStateSchema } from './system/migration-state';
+import { authorSchema } from './blog/author/author';
+import { tagSchema } from './blog/tag/tag';
+import { topicSchema } from './blog/topic/topic';
+import { blogPageSchema } from './pages/blog/blog';
+import { homePageSchema } from './pages/home/home';
+import { landingPageSchema } from './pages/landing/landing';
+import { postPageSchema } from './pages/post/post';
+import { tagPageSchema } from './pages/tag/tag';
+import { tagIndexPageSchema } from './pages/tag-index/tag-index';
+import { topicPageSchema } from './pages/topic/topic';
+import { topicIndexPageSchema } from './pages/topic-index/topic-index';
+import { footerSettingsSchema } from './settings/footer/footer';
+import { navigationSettingsSchema } from './settings/navigation/navigation';
+import { newsletterSettingsSchema } from './settings/newsletter/newsletter';
+import { siteSettingsSchema } from './settings/site-settings/site-settings';
+import { themeSettingsSchema } from './settings/theme/theme';
+import { migrationStateSchema } from './system/migration-state/migration-state';
 
 export const documents = [
   authorSchema,
   topicSchema,
   tagSchema,
-  landingSchema,
+  landingPageSchema,
   homePageSchema,
   blogPageSchema,
   topicIndexPageSchema,
-  pageTopicSchema,
-  pagePostSchema,
+  topicPageSchema,
+  postPageSchema,
   tagIndexPageSchema,
-  pageTagSchema,
-  siteSchema,
-  navigationSchema,
-  footerSchema,
+  tagPageSchema,
+  siteSettingsSchema,
+  navigationSettingsSchema,
+  footerSettingsSchema,
   newsletterSettingsSchema,
-  themeSchema,
+  themeSettingsSchema,
   migrationStateSchema,
 ];

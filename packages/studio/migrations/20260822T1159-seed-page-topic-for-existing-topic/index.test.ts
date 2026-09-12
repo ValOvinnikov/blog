@@ -1,9 +1,9 @@
-import { pageTopicSchema } from '@blog/studio/schema-types/documents/pages/topic';
-import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
+import { topicPageSchema } from '@blog/studio/schema-types/documents/pages/topic/topic';
+import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import {
   SEO_META_TITLE_MAX_LENGTH,
   SEO_META_TITLE_MIN_LENGTH,
-} from '@blog/studio/schema-types/objects/seo';
+} from '@blog/studio/schema-types/objects/seo/seo';
 import { assertSatisfiesRequiredFields } from '@blog/studio/testing/assert-satisfies-required-fields';
 import { createIfNotExists } from 'sanity/migrate';
 
@@ -50,7 +50,7 @@ describe('seed-page-topic-for-existing-topic migration', () => {
     };
 
     assertSatisfiesRequiredFields(postListSchema, postListPayload);
-    assertSatisfiesRequiredFields(pageTopicSchema, pageTopicPayload);
+    assertSatisfiesRequiredFields(topicPageSchema, pageTopicPayload);
 
     expect(migration.migrate.document(topicDoc)).toEqual([
       createIfNotExists(postListPayload),
@@ -93,7 +93,7 @@ describe('seed-page-topic-for-existing-topic migration', () => {
       seo: { _type: 'seo', metaTitle: buildTopicMetaTitle('TypeScript') },
     };
 
-    assertSatisfiesRequiredFields(pageTopicSchema, pageTopicPayload);
+    assertSatisfiesRequiredFields(topicPageSchema, pageTopicPayload);
 
     expect(pageTopicMutation).toEqual(createIfNotExists(pageTopicPayload));
   });

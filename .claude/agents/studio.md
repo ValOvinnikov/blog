@@ -72,8 +72,8 @@ implementation detail.
 
 The package presents two distinct surfaces:
 
-1. **The schema and desk structure** — `src/schema-types/` and
-   `src/studio-structure.ts`, consumed by typegen.
+1. **The schema and desk structure** — `src/schema-types/` (consumed by
+   typegen) and `src/studio-structure.ts` + `src/structure/`.
 2. **The mount component** — `StudioMount`, which takes plain strings
    (`projectId`, `dataset`, `basePath`, `title`), builds the Studio config
    **internally**, and renders it.
@@ -138,6 +138,15 @@ English word order, no parentheses and no abbreviations: `Blog Hero` (not
 `Post Latest`). The `_type` may keep a qualifier the title has outgrown — a
 rename costs a migration, a retitle costs nothing.
 
+**The desk is data, rendered by one builder.** Each top-level desk section is
+one object in `src/structure/sections/<name>-section.ts` (`<name>Section`:
+title, id, icon, groups of `{ schema, mode? }`), `sections/index.ts` lists
+them in order, and `src/studio-structure.ts` is only
+`buildSections(S, sections)` from `src/structure/build-section/`. Adding a
+document type to the desk — singleton or list — is one entry in a section's
+group, never a hand-built `S.listItem()…child(S.document())` chain in the
+entry file; Settings used to be exactly that exception and it is gone.
+
 **The desk never restates a schema's name, title or icon.** `schema.name`,
 `schema.title` and `schema.icon` are the single source; `src/structure/*`
 reads them off the schema rather than retyping them. Retyping is what let the
@@ -145,25 +154,46 @@ sidebar drift from the schemas it lists (plural/singular splits, four
 icon mismatches, one module with no schema icon at all). Every schema declares
 its own `icon`.
 
-**One schema per directory, mirroring `packages/ui`'s component layout.** The
-directory is the unit; its test, and any object types or helpers used only by
-it, live beside it:
+**One schema per directory, and one kind of thing per folder.** Everything
+registered in `schemaTypes` — `documents/**`, `modules/`, `objects/`,
+`portable-text/` — gets its own directory, single-file units included; the
+test lives beside the schema:
 
 ```
 src/schema-types/modules/hero-blog/
 ├─ hero-blog.ts        heroBlogSchema
-├─ hero-blog.test.ts
-└─ index.ts            barrel re-export
+└─ hero-blog.test.ts
 ```
 
 - Directory name is the `_type` minus its `{group}_` prefix, kebab-cased:
   `module_heroBlog` → `modules/hero-blog/`, `page_topicIndex` →
   `documents/pages/topic-index/`. Never repeat the group in the file name —
-  `modules/module-hero-blog.ts` says "module" twice.
-- The export is `{camelCase(name minus prefix)}Schema`: `module_heroBlog` →
-  `heroBlogSchema`, `page_topicIndex` → `topicIndexSchema`.
-- Helpers with a co-located test follow the same shape
-  (`helpers/define-hero-fields/`).
+  `module-hero-blog.ts` would say "module" twice.
+- No per-directory `index.ts` barrels — import the file directly
+  (`@blog/studio/schema-types/modules/hero-blog/hero-blog`). `index.ts` is
+  only ever a registry (`modules/index.ts`, `objects/index.ts`, …).
+- The export is `{camelCase(name minus prefix)}Schema`, with a group suffix
+  only where the bare name would collide across groups: pages are
+  `<name>PageSchema` (`page_tag` → `tagPageSchema`, because `blog_tag` →
+  `tagSchema`) and settings are `<name>SettingsSchema` (`settings_newsletter`
+  → `newsletterSettingsSchema`, because `module_newsletter` →
+  `newsletterSchema`). Blog, modules, objects and portable-text use the bare
+  form.
+- `objects/` holds `type: 'object'`/image types only; the `type: 'array'`
+  block editors (`richText`, `blockText`, `basicText`) live in
+  `portable-text/`.
+- A field factory goes where its reach is: used by exactly one schema → a
+  local, non-exported function inside that schema file (`modeFieldPair` in
+  `modules/hero/hero.ts`); wraps a single object type → beside that object
+  (`objects/seo/seo-field.ts`), imported by its consumers via the alias and
+  by the object itself via `./x` — the one relative form the repo allows.
+- The genuinely shared remainder is grouped by kind, folder-per-unit like
+  the schemas: `fields/` for field factories (`x-field.ts` → `xField()`
+  returns one `defineField`, `x-fields.ts` → `xFields()` returns an array —
+  no `define` prefix), `validation/` for `validate-*.ts` and
+  `get-drafts-client.ts`, `inputs/` for custom form input components. There
+  is no `helpers/`: a folder that can't be defined is a folder that collects
+  mixed things.
 
 ## Content model (see SPEC.md §6 for the current model)
 
@@ -187,7 +217,8 @@ copy-then-delete migration rather than a rename. Use:
 - `image` fields: `options: { hotspot: true }` and a **required `alt`** field.
 - Rich text (`richText`): block + `imageWithAlt` + `code` (via
   `@sanity/code-input`).
-- Singleton documents enforced through desk structure (`src/studio-structure.ts`).
+- Singleton documents enforced through desk structure: `{ schema, mode:
+'singleton' }` in the owning `src/structure/sections/*-section.ts`.
 
 ## Voice copy is not a Studio concern
 
