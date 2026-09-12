@@ -26,6 +26,7 @@ type TCachedDocumentType =
   | 'page_tagIndex'
   | 'page_topicIndex'
   | 'page_blog'
+  | 'page_postIndex'
   | 'page_landing'
   | 'page_post'
   | 'page_home'
@@ -65,6 +66,7 @@ const REVALIDATE_TAGS = {
   settings_theme: ['theme-settings'],
   page_home: ['homePage'],
   page_blog: ['page_blog'],
+  page_postIndex: ['page_postIndex'],
   page_landing: ['page_landing'],
   page_post: ['page_post', 'posts', 'author', 'topic', 'tag'],
   page_tag: ['page_tag'],
