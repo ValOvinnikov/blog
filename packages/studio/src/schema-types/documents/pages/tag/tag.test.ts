@@ -1,5 +1,5 @@
-import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag';
-import { pageTagSchema } from '@blog/studio/schema-types/documents/pages/tag';
+import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag/tag';
+import { tagPageSchema } from '@blog/studio/schema-types/documents/pages/tag/tag';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
@@ -24,11 +24,11 @@ type TValidationRule = {
 };
 
 const getField = (name: string) =>
-  pageTagSchema.fields?.find((field) => field.name === name);
+  tagPageSchema.fields?.find((field) => field.name === name);
 
-describe('pageTagSchema field order', () => {
+describe('tagPageSchema field order', () => {
   it('orders fields title, slug, tag, headingBlock, hero, modules, seo', () => {
-    expect(pageTagSchema.fields?.map((field) => field.name)).toEqual([
+    expect(tagPageSchema.fields?.map((field) => field.name)).toEqual([
       'title',
       'slug',
       'tag',
@@ -40,12 +40,12 @@ describe('pageTagSchema field order', () => {
   });
 });
 
-describe('pageTagSchema shape', () => {
+describe('tagPageSchema shape', () => {
   it('title is required via the shared titleField() helper', () => {
     const titleFieldDefinition = getField('title');
 
     if (!titleFieldDefinition?.validation) {
-      throw new Error('Expected pageTagSchema to define a title field.');
+      throw new Error('Expected tagPageSchema to define a title field.');
     }
 
     let requiredCalled = false;
@@ -72,7 +72,7 @@ describe('pageTagSchema shape', () => {
       TArrayFieldDefinition | undefined;
 
     if (!modulesField || modulesField.type !== 'array' || !modulesField.of) {
-      throw new Error('Expected pageTagSchema to define a modules field.');
+      throw new Error('Expected tagPageSchema to define a modules field.');
     }
 
     expect(modulesField.of.map((member) => member.name)).toEqual([
@@ -87,7 +87,7 @@ describe('pageTagSchema shape', () => {
     const seoFieldDefinition = getField('seo');
 
     if (!seoFieldDefinition?.validation) {
-      throw new Error('Expected pageTagSchema to define a seo field.');
+      throw new Error('Expected tagPageSchema to define a seo field.');
     }
 
     let requiredCalled = false;
@@ -111,7 +111,7 @@ type THeadingBlockFieldDefinition = {
   description?: string;
 };
 
-describe('pageTagSchema headingBlock field', () => {
+describe('tagPageSchema headingBlock field', () => {
   it('is built via headingBlockField() with a page-scoped description', () => {
     const headingBlockField = getField('headingBlock') as
       THeadingBlockFieldDefinition | undefined;
@@ -123,14 +123,14 @@ describe('pageTagSchema headingBlock field', () => {
   });
 });
 
-describe('pageTagSchema hero field', () => {
+describe('tagPageSchema hero field', () => {
   it('is an optional reference to the hero family via heroField()', () => {
     const heroField = getField('hero') as
       | { type: string; to?: Array<{ type: string }>; validation?: unknown }
       | undefined;
 
     if (!heroField) {
-      throw new Error('Expected pageTagSchema to define a hero field.');
+      throw new Error('Expected tagPageSchema to define a hero field.');
     }
 
     expect(heroField.type).toBe('reference');
@@ -152,7 +152,7 @@ type TSlugFieldDefinition = {
   validation?: unknown;
 };
 
-describe('pageTagSchema slug field', () => {
+describe('tagPageSchema slug field', () => {
   const getSlugField = () =>
     getField('slug') as TSlugFieldDefinition | undefined;
 
@@ -160,7 +160,7 @@ describe('pageTagSchema slug field', () => {
     const slugField = getSlugField();
 
     if (!slugField || slugField.type !== 'slug') {
-      throw new Error('Expected pageTagSchema to define a slug field.');
+      throw new Error('Expected tagPageSchema to define a slug field.');
     }
 
     expect(slugField.options?.source).toBe('title');
@@ -172,7 +172,7 @@ describe('pageTagSchema slug field', () => {
 
     if (!slugField?.validation) {
       throw new Error(
-        'Expected pageTagSchema slug field to define validation.',
+        'Expected tagPageSchema slug field to define validation.',
       );
     }
 
@@ -207,7 +207,7 @@ describe('pageTagSchema slug field', () => {
   });
 });
 
-describe('pageTagSchema tag field', () => {
+describe('tagPageSchema tag field', () => {
   const getTagField = () =>
     getField('tag') as TReferenceFieldDefinition | undefined;
 
@@ -216,7 +216,7 @@ describe('pageTagSchema tag field', () => {
 
     if (!tagField || tagField.type !== 'reference') {
       throw new Error(
-        'Expected pageTagSchema to define a tag reference field.',
+        'Expected tagPageSchema to define a tag reference field.',
       );
     }
 
@@ -227,7 +227,7 @@ describe('pageTagSchema tag field', () => {
     const tagField = getTagField();
 
     if (!tagField?.validation) {
-      throw new Error('Expected pageTagSchema tag field to define validation.');
+      throw new Error('Expected tagPageSchema tag field to define validation.');
     }
 
     let requiredCalled = false;
@@ -262,7 +262,7 @@ const TAG_UNIQUENESS_ERROR =
  * its modules-field custom validator — no export needed.
  */
 const getUniqueTagValidator = (): TCustomFn => {
-  const tagField = pageTagSchema.fields?.find((field) => field.name === 'tag');
+  const tagField = tagPageSchema.fields?.find((field) => field.name === 'tag');
 
   if (!tagField?.validation) {
     throw new Error('Expected tag field validation to register custom().');
@@ -384,17 +384,17 @@ const createDocumentMockRule = (
 });
 
 const buildDocumentRules = (): TDocumentMockRule[] => {
-  if (!pageTagSchema.validation) {
-    throw new Error('Expected pageTagSchema to define a validation rule.');
+  if (!tagPageSchema.validation) {
+    throw new Error('Expected tagPageSchema to define a validation rule.');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  return (pageTagSchema.validation as any)(
+  return (tagPageSchema.validation as any)(
     createDocumentMockRule(),
   ) as TDocumentMockRule[];
 };
 
-describe('pageTagSchema document validation — hero or heading', () => {
+describe('tagPageSchema document validation — hero or heading', () => {
   it('errors when neither hero, headingBlock.heading, nor a resolvable tag is set', async () => {
     const [heroOrHeadingRule] = buildDocumentRules();
     const { context } = createMockContext(null);
@@ -447,7 +447,7 @@ describe('pageTagSchema document validation — hero or heading', () => {
   });
 });
 
-describe('pageTagSchema document validation — hero hides heading', () => {
+describe('tagPageSchema document validation — hero hides heading', () => {
   it('warns when both hero and headingBlock.heading are set', () => {
     const [, heroHidesHeadingRule] = buildDocumentRules();
 
@@ -475,7 +475,7 @@ describe('pageTagSchema document validation — hero hides heading', () => {
   });
 });
 
-describe('pageTagSchema document validation — modules[] post list count', () => {
+describe('tagPageSchema document validation — modules[] post list count', () => {
   it('errors when more than one module_postList is referenced', () => {
     const [, , singlePostListRule] = buildDocumentRules();
 
@@ -535,7 +535,7 @@ describe('pageTagSchema document validation — modules[] post list count', () =
 const POST_LIST_UNIQUENESS_ERROR =
   'Another Tag Page already references this Post List — each Post List can only back one Tag Page.';
 
-describe('pageTagSchema document validation — unique post list reference', () => {
+describe('tagPageSchema document validation — unique post list reference', () => {
   it('passes without querying when modules[] carries no post list reference', async () => {
     const [, , , , uniquePostListRule] = buildDocumentRules();
     const { context, fetchCalls } = createMockContext(0);

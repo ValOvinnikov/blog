@@ -46,6 +46,18 @@ const getField = (name: string) => {
   return field;
 };
 
+describe('postLatestSchema contentAlignment field', () => {
+  it('includes a contentAlignment field', () => {
+    expect(getField('contentAlignment')).toBeDefined();
+  });
+});
+
+describe('postLatestSchema showImages field', () => {
+  it('includes a showImages field', () => {
+    expect(getField('showImages')).toBeDefined();
+  });
+});
+
 describe('postLatestSchema headingBlock field', () => {
   it('blocks publish on an empty heading', () => {
     const field = getField('headingBlock');

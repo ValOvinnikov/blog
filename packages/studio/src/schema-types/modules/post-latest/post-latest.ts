@@ -1,11 +1,11 @@
 import { DISPLAY_MODE, type TDisplayMode } from '@blog/config/constants';
-import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
-import { defineAlignmentFields } from '@blog/studio/schema-types/helpers/define-alignment-fields';
-import { displayModeField } from '@blog/studio/schema-types/helpers/display-mode-field';
-import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
-import { layoutField } from '@blog/studio/schema-types/helpers/layout-field';
-import { showImagesField } from '@blog/studio/schema-types/helpers/show-images-field';
-import { titleField } from '@blog/studio/schema-types/helpers/title-field';
+import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
+import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
+import { showImagesField } from '@blog/studio/schema-types/fields/show-images-field/show-images-field';
+import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
+import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
 import { Clock } from 'lucide-react';
 import { defineField, defineType, type SanityDocument } from 'sanity';
 
@@ -38,7 +38,7 @@ export const postLatestSchema = defineType({
     headingBlockField({ requireHeading: true }),
     showImagesField(),
     displayModeField(),
-    ...defineAlignmentFields([]),
+    ...alignmentFields([]),
     defineField({
       name: 'limit',
       title: 'Limit',

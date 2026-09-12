@@ -1,14 +1,14 @@
 import { POST_SOURCE, type TPostSource } from '@blog/config/constants';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
-import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
-import { defineAlignmentFields } from '@blog/studio/schema-types/helpers/define-alignment-fields';
-import { displayModeField } from '@blog/studio/schema-types/helpers/display-mode-field';
-import { getDraftsClient } from '@blog/studio/schema-types/helpers/get-drafts-client';
-import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
-import { layoutField } from '@blog/studio/schema-types/helpers/layout-field';
-import { showImagesField } from '@blog/studio/schema-types/helpers/show-images-field';
-import { titleField } from '@blog/studio/schema-types/helpers/title-field';
-import { validateNewestFeaturedHasCandidate } from '@blog/studio/schema-types/helpers/validate-newest-featured-has-candidate';
+import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
+import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
+import { showImagesField } from '@blog/studio/schema-types/fields/show-images-field/show-images-field';
+import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
+import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
+import { getDraftsClient } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { validateNewestFeaturedHasCandidate } from '@blog/studio/schema-types/validation/validate-newest-featured-has-candidate/validate-newest-featured-has-candidate';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Pin } from 'lucide-react';
 import {
@@ -140,7 +140,7 @@ export const postFeaturedSchema = defineType({
               : true;
           }),
     }),
-    ...defineAlignmentFields([]),
+    ...alignmentFields([]),
     layoutField,
   ],
   preview: {

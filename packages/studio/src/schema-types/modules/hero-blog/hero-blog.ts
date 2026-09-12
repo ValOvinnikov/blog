@@ -9,15 +9,15 @@ import {
   type THeroVariant,
 } from '@blog/config/constants';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
-import { defineHeroFields } from '@blog/studio/schema-types/helpers/define-hero-fields';
-import { getDraftsClient } from '@blog/studio/schema-types/helpers/get-drafts-client';
-import { titleField } from '@blog/studio/schema-types/helpers/title-field';
+import { heroFields } from '@blog/studio/schema-types/fields/hero-fields/hero-fields';
+import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { ctaActionSchema } from '@blog/studio/schema-types/objects/action-group/action-group';
+import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
+import { getDraftsClient } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
 import {
   PUBLISHED_POST_CONDITION,
   validateNewestFeaturedHasCandidate,
-} from '@blog/studio/schema-types/helpers/validate-newest-featured-has-candidate';
-import { ctaActionSchema } from '@blog/studio/schema-types/objects/blocks/action-group';
-import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt';
+} from '@blog/studio/schema-types/validation/validate-newest-featured-has-candidate/validate-newest-featured-has-candidate';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Star } from 'lucide-react';
 import {
@@ -246,7 +246,7 @@ export const heroBlogSchema = defineType({
             : true;
         }),
     }),
-    ...defineHeroFields({ image: false }),
+    ...heroFields({ image: false }),
   ],
   preview: {
     select: {

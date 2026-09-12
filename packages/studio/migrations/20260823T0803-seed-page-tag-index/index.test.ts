@@ -1,9 +1,9 @@
-import { tagIndexPageSchema } from '@blog/studio/schema-types/documents/pages/tag-index';
+import { tagIndexPageSchema } from '@blog/studio/schema-types/documents/pages/tag-index/tag-index';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import {
   SEO_META_TITLE_MAX_LENGTH,
   SEO_META_TITLE_MIN_LENGTH,
-} from '@blog/studio/schema-types/objects/seo';
+} from '@blog/studio/schema-types/objects/seo/seo';
 import { assertSatisfiesRequiredFields } from '@blog/studio/testing/assert-satisfies-required-fields';
 import { createIfNotExists } from 'sanity/migrate';
 

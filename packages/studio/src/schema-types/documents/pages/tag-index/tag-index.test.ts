@@ -1,11 +1,11 @@
 import { TAXONOMY_KIND } from '@blog/config/constants';
-import { tagIndexPageSchema } from '@blog/studio/schema-types/documents/pages/tag-index';
-import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/helpers/validate-taxonomy-list-has-taxonomy';
+import { tagIndexPageSchema } from '@blog/studio/schema-types/documents/pages/tag-index/tag-index';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
+import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/validation/validate-taxonomy-list-has-taxonomy/validate-taxonomy-list-has-taxonomy';
 import {
   createMockModulesRule,
   type TModuleReference,

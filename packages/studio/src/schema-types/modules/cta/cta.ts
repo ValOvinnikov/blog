@@ -6,14 +6,14 @@ import {
   MEDIA_ORDER,
   type TCtaVariant,
 } from '@blog/config/constants';
-import { actionGroupField } from '@blog/studio/schema-types/helpers/action-group-field';
-import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
-import { defineAlignmentFields } from '@blog/studio/schema-types/helpers/define-alignment-fields';
-import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
-import { layoutField } from '@blog/studio/schema-types/helpers/layout-field';
-import { titleField } from '@blog/studio/schema-types/helpers/title-field';
-import { basicTextSchema } from '@blog/studio/schema-types/objects/blocks/basic-text';
-import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt';
+import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
+import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { actionGroupField } from '@blog/studio/schema-types/objects/action-group/action-group-field';
+import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
+import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
+import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
+import { basicTextSchema } from '@blog/studio/schema-types/portable-text/basic-text/basic-text';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Megaphone } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -124,7 +124,7 @@ export const ctaSchema = defineType({
           return true;
         }),
     }),
-    ...defineAlignmentFields([
+    ...alignmentFields([
       {
         name: 'contentPositionSplit',
         title: 'Content Position',

@@ -1,8 +1,8 @@
-import { landingSchema } from '@blog/studio/schema-types/documents/pages/landing';
-import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/helpers/validate-taxonomy-list-has-taxonomy';
+import { landingPageSchema } from '@blog/studio/schema-types/documents/pages/landing/landing';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
+import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/validation/validate-taxonomy-list-has-taxonomy/validate-taxonomy-list-has-taxonomy';
 import {
   createMockModulesRule,
   type TModuleReference,
@@ -30,13 +30,13 @@ const createDocumentMockRule = (
 });
 
 const getModulesCustomValidators = (): TModulesCustomFn[] => {
-  const modulesField = landingSchema.fields?.find(
+  const modulesField = landingPageSchema.fields?.find(
     (field) => field.name === 'modules',
   );
 
   if (!modulesField?.validation) {
     throw new Error(
-      'Expected landingSchema to define a modules field with validation.',
+      'Expected landingPageSchema to define a modules field with validation.',
     );
   }
 
@@ -48,7 +48,7 @@ const getModulesCustomValidators = (): TModulesCustomFn[] => {
   return customFns;
 };
 
-describe('landingSchema modules validateCustom chaining', () => {
+describe('landingPageSchema modules validateCustom chaining', () => {
   it('registers both the blank-heading and taxonomy-list validators', () => {
     const customFns = getModulesCustomValidators();
 
@@ -99,13 +99,13 @@ type TValidationRule = {
  * `.custom()` without spinning up a full Sanity Studio schema/rule instance.
  */
 const getSlugCustomValidator = () => {
-  const slugField = landingSchema.fields?.find(
+  const slugField = landingPageSchema.fields?.find(
     (field) => field.name === 'slug',
   );
 
   if (!slugField?.validation) {
     throw new Error(
-      'Expected landingSchema to define a slug field with validation.',
+      'Expected landingPageSchema to define a slug field with validation.',
     );
   }
 
@@ -136,7 +136,7 @@ const getSlugCustomValidator = () => {
   return { customFn, requiredCalled };
 };
 
-describe('landingSchema slug validation', () => {
+describe('landingPageSchema slug validation', () => {
   it('keeps the slug field required', () => {
     const { requiredCalled } = getSlugCustomValidator();
 
@@ -175,7 +175,7 @@ describe('landingSchema slug validation', () => {
   });
 
   it('renders the shared URL-preview input', () => {
-    const slugField = landingSchema.fields?.find(
+    const slugField = landingPageSchema.fields?.find(
       (field) => field.name === 'slug',
     ) as { components?: { input?: unknown } } | undefined;
 
@@ -183,9 +183,9 @@ describe('landingSchema slug validation', () => {
   });
 });
 
-describe('landingSchema hero field', () => {
+describe('landingPageSchema hero field', () => {
   it('is an optional reference to the hero family', () => {
-    const heroField = landingSchema.fields?.find(
+    const heroField = landingPageSchema.fields?.find(
       (field) => field.name === 'hero',
     ) as { type: string; to?: Array<{ type: string }>; validation?: unknown };
 
@@ -198,15 +198,15 @@ describe('landingSchema hero field', () => {
   });
 });
 
-describe('landingSchema modules allow-list', () => {
+describe('landingPageSchema modules allow-list', () => {
   it('permits content, cta, postLatest, postFeatured, newsletter and taxonomyList modules', () => {
-    const modulesField = landingSchema.fields?.find(
+    const modulesField = landingPageSchema.fields?.find(
       (field) => field.name === 'modules',
     ) as { type: 'array'; of?: Array<{ name?: string }> } | undefined;
 
     if (!modulesField || modulesField.type !== 'array' || !modulesField.of) {
       throw new Error(
-        'Expected landingSchema to define a modules array field.',
+        'Expected landingPageSchema to define a modules array field.',
       );
     }
 
@@ -223,9 +223,9 @@ describe('landingSchema modules allow-list', () => {
   });
 });
 
-describe('landingSchema field order', () => {
+describe('landingPageSchema field order', () => {
   it('orders fields title, slug, headingBlock, hero, modules, seo', () => {
-    expect(landingSchema.fields?.map((field) => field.name)).toEqual([
+    expect(landingPageSchema.fields?.map((field) => field.name)).toEqual([
       'title',
       'slug',
       'headingBlock',
@@ -236,14 +236,16 @@ describe('landingSchema field order', () => {
   });
 });
 
-describe('landingSchema document validation', () => {
+describe('landingPageSchema document validation', () => {
   const buildDocumentRules = (): TDocumentMockRule[] => {
-    if (!landingSchema.validation) {
-      throw new Error('Expected landingSchema to define a validation rule.');
+    if (!landingPageSchema.validation) {
+      throw new Error(
+        'Expected landingPageSchema to define a validation rule.',
+      );
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    return (landingSchema.validation as any)(
+    return (landingPageSchema.validation as any)(
       createDocumentMockRule(),
     ) as TDocumentMockRule[];
   };

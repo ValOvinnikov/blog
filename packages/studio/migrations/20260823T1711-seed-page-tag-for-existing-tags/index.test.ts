@@ -1,9 +1,9 @@
-import { pageTagSchema } from '@blog/studio/schema-types/documents/pages/tag';
+import { tagPageSchema } from '@blog/studio/schema-types/documents/pages/tag/tag';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import {
   SEO_META_TITLE_MAX_LENGTH,
   SEO_META_TITLE_MIN_LENGTH,
-} from '@blog/studio/schema-types/objects/seo';
+} from '@blog/studio/schema-types/objects/seo/seo';
 import { assertSatisfiesRequiredFields } from '@blog/studio/testing/assert-satisfies-required-fields';
 import { createIfNotExists } from 'sanity/migrate';
 
@@ -50,7 +50,7 @@ describe('seed-page-tag-for-existing-tags migration', () => {
     };
 
     assertSatisfiesRequiredFields(postListSchema, postListPayload);
-    assertSatisfiesRequiredFields(pageTagSchema, pageTagPayload);
+    assertSatisfiesRequiredFields(tagPageSchema, pageTagPayload);
 
     expect(migration.migrate.document(tagDoc)).toEqual([
       createIfNotExists(postListPayload),
@@ -93,7 +93,7 @@ describe('seed-page-tag-for-existing-tags migration', () => {
       seo: { _type: 'seo', metaTitle: buildTagMetaTitle('TypeScript') },
     };
 
-    assertSatisfiesRequiredFields(pageTagSchema, pageTagPayload);
+    assertSatisfiesRequiredFields(tagPageSchema, pageTagPayload);
 
     expect(pageTagMutation).toEqual(createIfNotExists(pageTagPayload));
   });

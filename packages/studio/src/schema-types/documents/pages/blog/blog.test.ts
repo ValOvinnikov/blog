@@ -1,4 +1,4 @@
-import { blogPageSchema } from '@blog/studio/schema-types/documents/pages/blog';
+import { blogPageSchema } from '@blog/studio/schema-types/documents/pages/blog/blog';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import {

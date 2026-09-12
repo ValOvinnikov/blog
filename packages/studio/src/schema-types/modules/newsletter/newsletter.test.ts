@@ -30,6 +30,16 @@ const getOptionValues = (field: { options?: unknown }) => {
   );
 };
 
+describe('newsletterSchema contentAlignment field', () => {
+  it('includes a contentAlignment field', () => {
+    const names = newsletterSchema.fields?.map((field) =>
+      'name' in field ? field.name : undefined,
+    );
+
+    expect(names).toContain('contentAlignment');
+  });
+});
+
 describe('newsletterSchema variant field', () => {
   it('offers Full and Compact, defaulting to Full', () => {
     const field = getField('variant');

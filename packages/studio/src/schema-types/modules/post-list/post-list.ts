@@ -1,10 +1,10 @@
 import { FULL_BRAND_VARIANT_LIST } from '@blog/config/constants';
-import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
-import { defineAlignmentFields } from '@blog/studio/schema-types/helpers/define-alignment-fields';
-import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
-import { layoutField } from '@blog/studio/schema-types/helpers/layout-field';
-import { showImagesField } from '@blog/studio/schema-types/helpers/show-images-field';
-import { titleField } from '@blog/studio/schema-types/helpers/title-field';
+import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
+import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { showImagesField } from '@blog/studio/schema-types/fields/show-images-field/show-images-field';
+import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
+import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
 import { List } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -18,7 +18,7 @@ export const postListSchema = defineType({
     brandVariantField({ list: FULL_BRAND_VARIANT_LIST }),
     headingBlockField(),
     showImagesField(),
-    ...defineAlignmentFields([]),
+    ...alignmentFields([]),
     defineField({
       name: 'pageSize',
       title: 'Page Size',

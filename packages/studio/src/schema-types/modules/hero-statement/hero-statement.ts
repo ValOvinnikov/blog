@@ -1,6 +1,6 @@
-import { defineHeroFields } from '@blog/studio/schema-types/helpers/define-hero-fields';
-import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
-import { titleField } from '@blog/studio/schema-types/helpers/title-field';
+import { heroFields } from '@blog/studio/schema-types/fields/hero-fields/hero-fields';
+import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { Quote } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -22,7 +22,7 @@ export const heroStatementSchema = defineType({
       requireHeading: true,
       requiredMessage: 'A statement hero is its heading. Give it one.',
     }),
-    ...defineHeroFields(),
+    ...heroFields(),
   ],
   preview: {
     select: {

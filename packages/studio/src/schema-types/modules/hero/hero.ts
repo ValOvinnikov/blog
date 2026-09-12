@@ -1,15 +1,90 @@
 import {
   FULL_BRAND_VARIANT_LIST,
   HERO_FIELD_MODE,
+  type THeroFieldMode,
 } from '@blog/config/constants';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
-import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
-import { defineModeFieldPair } from '@blog/studio/schema-types/helpers/define-mode-field-pair';
-import { heroLayoutField } from '@blog/studio/schema-types/helpers/layout-field';
-import { titleField } from '@blog/studio/schema-types/helpers/title-field';
-import { linkSchema } from '@blog/studio/schema-types/objects/link';
+import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
+import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
+import { linkSchema } from '@blog/studio/schema-types/objects/link/link';
 import { Sparkles } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
+
+type TModeFieldPairParent = Record<string, THeroFieldMode | undefined>;
+
+const isMode = (parent: unknown, key: string, mode: THeroFieldMode): boolean =>
+  (parent as TModeFieldPairParent | undefined)?.[key] === mode;
+
+type TModeFieldPair = {
+  name: string;
+  title: string;
+  description: string;
+  modeOptions: { title: string; value: THeroFieldMode }[];
+  customType?: 'string' | 'text' | 'imageWithAlt';
+  rows?: number;
+};
+
+const modeFieldPair = ({
+  name,
+  title,
+  description,
+  modeOptions,
+  customType = 'string',
+  rows,
+}: TModeFieldPair) => {
+  const modeName = `${name}Mode`;
+
+  const hidden = ({ parent }: { parent?: unknown }) =>
+    !isMode(parent, modeName, HERO_FIELD_MODE.CUSTOM);
+
+  const requiredWhenCustom = (value: unknown, context: { parent?: unknown }) =>
+    isMode(context.parent, modeName, HERO_FIELD_MODE.CUSTOM) && !value
+      ? `Custom ${title.toLowerCase()} is required when ${title} Source is Custom.`
+      : true;
+
+  const customField =
+    customType === 'text'
+      ? defineField({
+          name,
+          title: `Custom ${title}`,
+          type: 'text',
+          rows,
+          hidden,
+          validation: (rule) => rule.custom(requiredWhenCustom),
+        })
+      : customType === 'imageWithAlt'
+        ? defineField({
+            name,
+            title: `Custom ${title}`,
+            type: imageWithAltSchema.name,
+            hidden,
+            validation: (rule) => rule.custom(requiredWhenCustom),
+          })
+        : defineField({
+            name,
+            title: `Custom ${title}`,
+            type: 'string',
+            hidden,
+            validation: (rule) => rule.custom(requiredWhenCustom),
+          });
+
+  return [
+    defineField({
+      name: modeName,
+      title: `${title} Source`,
+      type: 'string',
+      description,
+      options: {
+        layout: 'radio',
+        list: modeOptions,
+      },
+      validation: (rule) => rule.required(),
+    }),
+    customField,
+  ];
+};
 
 export const heroSchema = defineType({
   name: 'module_hero',
@@ -35,7 +110,7 @@ export const heroSchema = defineType({
           )
           .warning('Choose a featured post for predictable hero content.'),
     }),
-    ...defineModeFieldPair({
+    ...modeFieldPair({
       name: 'heroEyebrow',
       title: 'Hero Eyebrow',
       description:
@@ -45,7 +120,7 @@ export const heroSchema = defineType({
         { title: 'Custom', value: HERO_FIELD_MODE.CUSTOM },
       ],
     }),
-    ...defineModeFieldPair({
+    ...modeFieldPair({
       name: 'heroTitle',
       title: 'Hero Title',
       description:
@@ -55,7 +130,7 @@ export const heroSchema = defineType({
         { title: 'Custom', value: HERO_FIELD_MODE.CUSTOM },
       ],
     }),
-    ...defineModeFieldPair({
+    ...modeFieldPair({
       name: 'heroSubtitle',
       title: 'Hero Subtitle',
       description:
@@ -67,7 +142,7 @@ export const heroSchema = defineType({
       customType: 'text',
       rows: 3,
     }),
-    ...defineModeFieldPair({
+    ...modeFieldPair({
       name: 'heroImage',
       title: 'Hero Image',
       description:

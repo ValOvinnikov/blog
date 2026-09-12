@@ -1,9 +1,9 @@
 import { NEWSLETTER_VARIANT } from '@blog/config/constants';
-import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
-import { defineAlignmentFields } from '@blog/studio/schema-types/helpers/define-alignment-fields';
-import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
-import { layoutField } from '@blog/studio/schema-types/helpers/layout-field';
-import { titleField } from '@blog/studio/schema-types/helpers/title-field';
+import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
+import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
+import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Mail } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -31,7 +31,7 @@ export const newsletterSchema = defineType({
       },
       initialValue: NEWSLETTER_VARIANT.FULL,
     }),
-    ...defineAlignmentFields([]),
+    ...alignmentFields([]),
     layoutField,
   ],
   preview: {

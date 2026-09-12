@@ -1,4 +1,4 @@
-import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state';
+import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state/migration-state';
 import type { DocumentActionComponent, DocumentActionsContext } from 'sanity';
 
 import { buildStudioConfig } from './studio-config';

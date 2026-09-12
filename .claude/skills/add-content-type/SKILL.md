@@ -29,10 +29,23 @@ Build in dependency order. Never skip a layer; never reverse the arrows.
   schema. Additive optional-only changes need none — say so explicitly.
 - Define/extend the type in `packages/studio/src/schema-types/` with
   `defineType`/`defineField`; follow the `{group}_{name}` naming convention.
+  A new type gets its own directory named after the type minus its group
+  prefix, with the test beside it and no barrel — `modules/hero-blog/hero-blog.ts`
+  - `hero-blog.test.ts`; documents under `documents/{blog,pages,settings,system}/`,
+    plain objects under `objects/`, Portable Text editors under `portable-text/`.
+    Export `<name>Schema` (`<name>PageSchema` / `<name>SettingsSchema` for pages
+    and settings). A field factory used by this one schema is a local function
+    in the schema file; one that wraps a single object lives beside that object
+    (`objects/seo/seo-field.ts`); one shared more widely goes in `fields/`.
+    Full rules in `.claude/agents/studio.md` § "One schema per directory".
 - Add `validation: rule => rule.required()` on any field consumers will assume;
   images get `options: { hotspot: true }` + a required `alt`. Enum-ish stored
   values use UPPERCASE key/value constants from `@blog/config` (`constants/`).
-- Register it in the schema index (and desk structure if it's a singleton).
+- Register it in the group's registry (`modules/index.ts`, `objects/index.ts`,
+  `documents/index.ts`, `portable-text/index.ts`) and, for anything an editor
+  opens from the desk, add `{ schema }` (or `{ schema, mode: 'singleton' }`)
+  to the right group in `src/structure/sections/<section>-section.ts` — never
+  a hand-built `S.listItem()` chain in `studio-structure.ts`.
 - If any `defineType`/`defineField`/`defineArrayMember` option or the typegen
   workflow is uncertain, use the `use-context7` skill to fetch Sanity v6 docs
   before writing schema code.

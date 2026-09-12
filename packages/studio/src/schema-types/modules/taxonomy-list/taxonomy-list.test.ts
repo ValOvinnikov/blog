@@ -42,6 +42,12 @@ const getOptionValues = (field: ReturnType<typeof getField>) => {
   return list.map((option) => option.value);
 };
 
+describe('taxonomyListSchema contentAlignment field', () => {
+  it('includes a contentAlignment field', () => {
+    expect(getField('contentAlignment')).toBeDefined();
+  });
+});
+
 describe('taxonomyListSchema taxonomy field', () => {
   it('is a select list over the taxonomy kinds', () => {
     const field = getField('taxonomy');

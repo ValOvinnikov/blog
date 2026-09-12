@@ -1,7 +1,7 @@
-import { brandVariantField } from '@blog/studio/schema-types/helpers/brand-variant-field';
-import { layoutField } from '@blog/studio/schema-types/helpers/layout-field';
-import { titleField } from '@blog/studio/schema-types/helpers/title-field';
-import { richTextSchema } from '@blog/studio/schema-types/objects/rich-text';
+import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
+import { richTextSchema } from '@blog/studio/schema-types/portable-text/rich-text/rich-text';
 import { FileText } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 

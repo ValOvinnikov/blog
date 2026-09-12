@@ -1,4 +1,4 @@
-import { pagePostSchema } from '@blog/studio/schema-types/documents/pages/post';
+import { postPageSchema } from '@blog/studio/schema-types/documents/pages/post/post';
 import { assertSatisfiesRequiredFields } from '@blog/studio/testing/assert-satisfies-required-fields';
 
 import {
@@ -124,7 +124,7 @@ describe('buildPagePostFields — no existing page_post (production shape)', () 
   it('produces a payload satisfying every field page_post requires', () => {
     const fields = buildPagePostFields(basePost, undefined, new Map());
 
-    assertSatisfiesRequiredFields(pagePostSchema, {
+    assertSatisfiesRequiredFields(postPageSchema, {
       _id: 'page_post-post-1',
       _type: 'page_post',
       ...fields,
