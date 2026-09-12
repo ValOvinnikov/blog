@@ -502,15 +502,14 @@ lives on the pages instead: every page placing one must set it, enforced by an
 async rule on `modules[]` that fetches each referenced module and rejects one
 that has not.
 
-The taxonomy index pages used to be the exception. Each reached its module
-through a dedicated slot and could leave `taxonomy` empty, passing its own kind
-to
-`service.modules.taxonomyList.v1.getTaxonomyList(id, tenant, fallbackTaxonomy)`
-so the loader never queried upward for a parent page. That channel is gone with
-the slots: `ModuleRenderer` calls every module with the same arguments and
-cannot supply a fallback, so a module it renders must carry an authored
-`taxonomy`. The `fallbackTaxonomy` parameter remains in the loader's signature
-with no caller passing it.
+Nothing overrides that field at read time. `ModuleRenderer` calls every module
+with the same arguments, so there is no channel by which a page could supply a
+kind the module itself lacks, and
+`service.modules.taxonomyList.v1.getTaxonomyList(id, tenant)` projects the
+authored field alone. A module reaching the loader without one resolves to
+`null` and raises `UnresolvedTaxonomyError` in the transformer — a failed
+fetch, never an empty list, so an unauthored module is visible as a fault
+rather than as a section that renders nothing.
 
 `sortOrder` (`TAXONOMY_SORT`, coalesced to `ALPHABETICAL` at read time)
 and `limit` apply wherever the module sits, and their defaults reproduce the
