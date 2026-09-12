@@ -2228,8 +2228,8 @@ plain entity route"): every public page is a CMS document.
 `page_project` mirrors `page_post` field-for-field: the content lives on the
 page document, which owns `slug` (with the shared slug-URL preview input,
 prefix `/work/`) and `publishedAt`; there is no separate `project` entity to
-reference. `page_work` mirrors `page_postIndex` (`page_blog` until its rename
-lands): its `projectList` slot holds a `module_projectList`
+reference. `page_work` mirrors `page_postIndex`: its `projectList` slot holds
+a `module_projectList`
 (`pageSize`; the route supplies the page number).
 
 **Surfaces.** Routes under `app/[tenant]/[locale]/`: `/work` (+

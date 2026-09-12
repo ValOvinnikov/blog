@@ -99,14 +99,14 @@ also gets an optional `layout` field via the shared `layoutField`/
 cta] })`), `seo`.
 - `page_postIndex` (`postIndexPageSchema`, singleton) — the `/blog` index page
   config: `titleField` (internal Studio label; `preview.prepare` falls back to
-  the generic "Unknown" when unset), `headingBlock` (the page `<h1>` and its
-  optional supporting line, not shown when a hero is set), `hero` (optional),
+  the generic "Unknown" when unset), `headingBlock` (the required page `<h1>`
+  plus an optional supporting line; hidden when a hero is set, which then owns
+  the `<h1>`), `hero` (optional),
   `modules` (array of references via `modulesField({ allow: [postList, cta,
 newsletter, postFeatured] })` — the archive is a `module_postList` placed
   here, and the module's own `pageSize` drives the pagination window), `seo`.
   Document validation errors on more than one `module_postList` and warns when
-  none is present. The type it replaces, `page_blog`, is still registered and
-  still carries the live documents until a later contract migration.
+  none is present.
 - `page_topicIndex` (`topicIndexPageSchema`, singleton) — the `/topics` index:
   `titleField` (internal Studio label), `heading` (the page `<h1>`),
   `supportingText` (optional), `taxonomyList` (**required** singular reference
