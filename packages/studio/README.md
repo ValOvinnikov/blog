@@ -46,10 +46,14 @@ Studio from one deployment.
   `module_postFeatured`, `module_postLatest`, `module_postList`,
   `module_postRelated`, `module_taxonomyList`)
 - `src/schema-types/objects/` — shared object types (`link`, `socialLink`,
-  `brand`, `imageWithAlt`, `richText`, `blockText`, `seo`, `openGraph`, …)
-- `src/schema-types/helpers/` — DRY field factories reused across schemas
-  (e.g. `define-modules-field.ts`, `heading-block-field.ts`)
-- `src/schema-types/components/` — custom Studio input components
+  `brand`, `imageWithAlt`, `seo`, `openGraph`, …)
+- `src/schema-types/portable-text/` — the Portable Text block editors
+  (`richText`, `blockText`, `basicText`)
+- `src/schema-types/fields/` — DRY field factories reused across schemas
+  (e.g. `title-field`, `slug-field`, `modules-field`); a factory that serves one
+  object or schema lives beside it instead
+- `src/schema-types/validation/` — shared `validate-*` rule functions
+- `src/schema-types/inputs/` — custom Studio input components
 - `src/studio-structure.ts` — the desk structure, directive-free
 - `src/studio-config.ts` — `buildStudioConfig`, which assembles schema +
   desk structure + plugins into a Sanity `Config`, directive-free so it can

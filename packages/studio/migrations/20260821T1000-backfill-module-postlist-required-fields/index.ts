@@ -1,7 +1,7 @@
 /**
  * Backfills `module_postList.title` and `.brandVariant` on any document
  * missing either — both are required on the schema
- * (`../../src/schema-types/modules/module-post-list.ts`), but a migration
+ * (`../../src/schema-types/modules/post-list/post-list.ts`), but a migration
  * writes raw documents directly, so Studio `initialValue` defaults never
  * fire. The seed migration that first created `postList-blog`
  * (`../20260821T0900-seed-page-blog-post-list`) only set `pageSize`/`limit`,

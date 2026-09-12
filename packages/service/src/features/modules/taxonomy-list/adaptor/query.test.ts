@@ -27,10 +27,9 @@ describe('taxonomyListModuleQuery', () => {
     expect(taxonomyListModuleQuery.query).toContain('contentAlignment');
   });
 
-  it('resolves taxonomy from the authored field, falling back to $fallbackTaxonomy', () => {
-    expect(taxonomyListModuleQuery.query).toContain(
-      'coalesce(taxonomy, $fallbackTaxonomy)',
-    );
+  it('resolves taxonomy from the authored field, with no coalesce/fallback', () => {
+    expect(taxonomyListModuleQuery.query).not.toContain('coalesce(taxonomy');
+    expect(taxonomyListModuleQuery.query).not.toContain('fallbackTaxonomy');
   });
 
   it('defaults sortOrder to ALPHABETICAL at read time', () => {
@@ -39,7 +38,9 @@ describe('taxonomyListModuleQuery', () => {
     );
   });
 
-  it('selects topic entries or tag entries by the resolved taxonomy', () => {
+  it('selects topic entries or tag entries by the authored taxonomy', () => {
+    expect(taxonomyListModuleQuery.query).toContain('taxonomy == "TOPICS"');
+    expect(taxonomyListModuleQuery.query).toContain('taxonomy == "TAGS"');
     expect(taxonomyListModuleQuery.query).toContain('_type == "blog_topic"');
     expect(taxonomyListModuleQuery.query).toContain('_type == "blog_tag"');
   });

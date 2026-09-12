@@ -1,14 +1,14 @@
-import { defineModulesField } from '@blog/studio/schema-types/helpers/define-modules-field';
-import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
-import { heroField } from '@blog/studio/schema-types/helpers/hero-field';
-import { seoField } from '@blog/studio/schema-types/helpers/seo-field';
-import { titleField } from '@blog/studio/schema-types/helpers/title-field';
-import { validateHeroOrHeading } from '@blog/studio/schema-types/helpers/validate-hero-or-heading';
-import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/helpers/validate-single-blank-heading-per-type';
-import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
-import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
-import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
+import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-field';
+import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
+import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
+import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
+import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
+import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
+import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
+import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
+import { validateHeroOrHeading } from '@blog/studio/schema-types/validation/validate-hero-or-heading/validate-hero-or-heading';
+import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/validation/validate-single-blank-heading-per-type/validate-single-blank-heading-per-type';
 import { Newspaper } from 'lucide-react';
 import { defineType, type SanityDocument } from 'sanity';
 
@@ -69,7 +69,7 @@ export const blogPageSchema = defineType({
         'The page heading (h1) and its optional supporting line. Not shown when a hero is set.',
     }),
     heroField(),
-    defineModulesField({
+    modulesField({
       allow: [
         postListSchema.name,
         ctaSchema.name,

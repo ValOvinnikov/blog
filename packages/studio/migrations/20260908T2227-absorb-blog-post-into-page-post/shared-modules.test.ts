@@ -1,6 +1,6 @@
 import { NEWSLETTER_VARIANT } from '@blog/config/constants';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
-import { postRelatedSchema } from '@blog/studio/schema-types/modules/module-post-related';
+import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
+import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
 import { assertSatisfiesRequiredFields } from '@blog/studio/testing/assert-satisfies-required-fields';
 
 import {

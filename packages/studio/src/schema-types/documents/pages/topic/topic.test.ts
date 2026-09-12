@@ -1,8 +1,8 @@
-import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic';
-import { pageTopicSchema } from '@blog/studio/schema-types/documents/pages/topic';
+import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic/topic';
+import { topicPageSchema } from '@blog/studio/schema-types/documents/pages/topic/topic';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
-import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
-import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
+import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
+import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import type { ValidationContext } from 'sanity';
 
 type TReferenceFieldDefinition = {
@@ -24,11 +24,11 @@ type TValidationRule = {
 };
 
 const getField = (name: string) =>
-  pageTopicSchema.fields?.find((field) => field.name === name);
+  topicPageSchema.fields?.find((field) => field.name === name);
 
-describe('pageTopicSchema field order', () => {
+describe('topicPageSchema field order', () => {
   it('orders fields title, slug, topic, headingBlock, hero, modules, seo', () => {
-    expect(pageTopicSchema.fields?.map((field) => field.name)).toEqual([
+    expect(topicPageSchema.fields?.map((field) => field.name)).toEqual([
       'title',
       'slug',
       'topic',
@@ -40,12 +40,12 @@ describe('pageTopicSchema field order', () => {
   });
 });
 
-describe('pageTopicSchema shape', () => {
+describe('topicPageSchema shape', () => {
   it('title is required via the shared titleField() helper', () => {
     const titleFieldDefinition = getField('title');
 
     if (!titleFieldDefinition?.validation) {
-      throw new Error('Expected pageTopicSchema to define a title field.');
+      throw new Error('Expected topicPageSchema to define a title field.');
     }
 
     let requiredCalled = false;
@@ -72,7 +72,7 @@ describe('pageTopicSchema shape', () => {
       TArrayFieldDefinition | undefined;
 
     if (!modulesField || modulesField.type !== 'array' || !modulesField.of) {
-      throw new Error('Expected pageTopicSchema to define a modules field.');
+      throw new Error('Expected topicPageSchema to define a modules field.');
     }
 
     expect(modulesField.of.map((member) => member.name)).toEqual([
@@ -87,7 +87,7 @@ describe('pageTopicSchema shape', () => {
     const seoFieldDefinition = getField('seo');
 
     if (!seoFieldDefinition?.validation) {
-      throw new Error('Expected pageTopicSchema to define a seo field.');
+      throw new Error('Expected topicPageSchema to define a seo field.');
     }
 
     let requiredCalled = false;
@@ -111,7 +111,7 @@ type THeadingBlockFieldDefinition = {
   description?: string;
 };
 
-describe('pageTopicSchema headingBlock field', () => {
+describe('topicPageSchema headingBlock field', () => {
   it('is built via headingBlockField() with a page-scoped description', () => {
     const headingBlockField = getField('headingBlock') as
       THeadingBlockFieldDefinition | undefined;
@@ -123,14 +123,14 @@ describe('pageTopicSchema headingBlock field', () => {
   });
 });
 
-describe('pageTopicSchema hero field', () => {
+describe('topicPageSchema hero field', () => {
   it('is an optional reference to the hero family via heroField()', () => {
     const heroField = getField('hero') as
       | { type: string; to?: Array<{ type: string }>; validation?: unknown }
       | undefined;
 
     if (!heroField) {
-      throw new Error('Expected pageTopicSchema to define a hero field.');
+      throw new Error('Expected topicPageSchema to define a hero field.');
     }
 
     expect(heroField.type).toBe('reference');
@@ -152,7 +152,7 @@ type TSlugFieldDefinition = {
   validation?: unknown;
 };
 
-describe('pageTopicSchema slug field', () => {
+describe('topicPageSchema slug field', () => {
   const getSlugField = () =>
     getField('slug') as TSlugFieldDefinition | undefined;
 
@@ -160,7 +160,7 @@ describe('pageTopicSchema slug field', () => {
     const slugField = getSlugField();
 
     if (!slugField || slugField.type !== 'slug') {
-      throw new Error('Expected pageTopicSchema to define a slug field.');
+      throw new Error('Expected topicPageSchema to define a slug field.');
     }
 
     expect(slugField.options?.source).toBe('title');
@@ -172,7 +172,7 @@ describe('pageTopicSchema slug field', () => {
 
     if (!slugField?.validation) {
       throw new Error(
-        'Expected pageTopicSchema slug field to define validation.',
+        'Expected topicPageSchema slug field to define validation.',
       );
     }
 
@@ -207,7 +207,7 @@ describe('pageTopicSchema slug field', () => {
   });
 });
 
-describe('pageTopicSchema topic field', () => {
+describe('topicPageSchema topic field', () => {
   const getTopicField = () =>
     getField('topic') as TReferenceFieldDefinition | undefined;
 
@@ -216,7 +216,7 @@ describe('pageTopicSchema topic field', () => {
 
     if (!topicField || topicField.type !== 'reference') {
       throw new Error(
-        'Expected pageTopicSchema to define a topic reference field.',
+        'Expected topicPageSchema to define a topic reference field.',
       );
     }
 
@@ -230,7 +230,7 @@ describe('pageTopicSchema topic field', () => {
 
     if (!topicField?.validation) {
       throw new Error(
-        'Expected pageTopicSchema topic field to define validation.',
+        'Expected topicPageSchema topic field to define validation.',
       );
     }
 
@@ -266,7 +266,7 @@ const UNIQUENESS_ERROR =
  * captures its modules-field custom validator — no export needed.
  */
 const getUniqueTopicValidator = (): TCustomFn => {
-  const topicField = pageTopicSchema.fields?.find(
+  const topicField = topicPageSchema.fields?.find(
     (field) => field.name === 'topic',
   );
 
@@ -393,17 +393,17 @@ const createDocumentMockRule = (
 });
 
 const buildDocumentRules = (): TDocumentMockRule[] => {
-  if (!pageTopicSchema.validation) {
-    throw new Error('Expected pageTopicSchema to define a validation rule.');
+  if (!topicPageSchema.validation) {
+    throw new Error('Expected topicPageSchema to define a validation rule.');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  return (pageTopicSchema.validation as any)(
+  return (topicPageSchema.validation as any)(
     createDocumentMockRule(),
   ) as TDocumentMockRule[];
 };
 
-describe('pageTopicSchema document validation — hero or heading', () => {
+describe('topicPageSchema document validation — hero or heading', () => {
   it('errors when neither hero, headingBlock.heading, nor a resolvable topic is set', async () => {
     const [heroOrHeadingRule] = buildDocumentRules();
     const { context } = createMockContext(null);
@@ -456,7 +456,7 @@ describe('pageTopicSchema document validation — hero or heading', () => {
   });
 });
 
-describe('pageTopicSchema document validation — hero hides heading', () => {
+describe('topicPageSchema document validation — hero hides heading', () => {
   it('warns when both hero and headingBlock.heading are set', () => {
     const [, heroHidesHeadingRule] = buildDocumentRules();
 
@@ -484,7 +484,7 @@ describe('pageTopicSchema document validation — hero hides heading', () => {
   });
 });
 
-describe('pageTopicSchema document validation — modules[] post list count', () => {
+describe('topicPageSchema document validation — modules[] post list count', () => {
   it('errors when more than one module_postList is referenced', () => {
     const [, , singlePostListRule] = buildDocumentRules();
 

@@ -1,1 +1,0 @@
-export { landingSchema } from './landing';

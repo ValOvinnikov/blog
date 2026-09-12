@@ -1,20 +1,20 @@
-import { asideSchema } from './aside';
-import { blockTextSchema } from './block-text';
-import { actionGroupSchema, ctaActionSchema } from './blocks/action-group';
-import { basicTextSchema } from './blocks/basic-text';
-import { bodyImageSchema } from './body-image';
-import { brandSchema } from './brand';
-import { headingBlockSchema } from './heading-block';
-import { heroLayoutSchema } from './hero-layout';
-import { imageWithAltSchema } from './image-with-alt';
-import { layoutSchema } from './layout';
-import { linkSchema } from './link';
-import { openGraphSchema } from './open-graph';
-import { richTextSchema } from './rich-text';
-import { seoSchema } from './seo';
-import { skimSchema } from './skim';
-import { socialLinkSchema } from './social-link';
-import { specLineSchema } from './spec-line';
+import {
+  actionGroupSchema,
+  ctaActionSchema,
+} from './action-group/action-group';
+import { asideSchema } from './aside/aside';
+import { bodyImageSchema } from './body-image/body-image';
+import { brandSchema } from './brand/brand';
+import { headingBlockSchema } from './heading-block/heading-block';
+import { heroLayoutSchema } from './hero-layout/hero-layout';
+import { imageWithAltSchema } from './image-with-alt/image-with-alt';
+import { layoutSchema } from './layout/layout';
+import { linkSchema } from './link/link';
+import { openGraphSchema } from './open-graph/open-graph';
+import { seoSchema } from './seo/seo';
+import { skimSchema } from './skim/skim';
+import { socialLinkSchema } from './social-link/social-link';
+import { specLineSchema } from './spec-line/spec-line';
 
 export const objects = [
   layoutSchema,
@@ -23,9 +23,6 @@ export const objects = [
   imageWithAltSchema,
   bodyImageSchema,
   asideSchema,
-  richTextSchema,
-  blockTextSchema,
-  basicTextSchema,
   socialLinkSchema,
   linkSchema,
   ctaActionSchema,

@@ -282,7 +282,7 @@ do not.
 
 **Alignment is a module-level field, not part of `headingBlock`.** All seven
 of those modules carry their own `contentAlignment`, emitted by the
-`defineAlignmentFields()` helper, which every caller gets whether or not it
+`alignmentFields()` helper, which every caller gets whether or not it
 asks for variant-scoped extras. `headingBlock` deliberately does not bundle
 it: a Sanity named object type's field list is fixed at registration, so a
 bundled field cannot be omitted for the one module that doesn't want it.
@@ -324,7 +324,7 @@ label, never rendered), an optional `eyebrow` (max 40), a **required**
 `heading` (max 120, always the page `<h1>`) and an optional
 `supportingText` (plain `text`, not Portable Text — a hero with two
 paragraphs is a landing page that has not been split into modules yet). It
-then calls `defineHeroFields()` with **no options**, so the shared tail's
+then calls `heroFields()` with **no options**, so the shared tail's
 own `image` and `actions` are the module's, where `module_heroBlog`
 replaces both. `heading` is required without qualification because nothing
 can derive it; that is safe here precisely because the type shipped with no
@@ -449,7 +449,7 @@ used elsewhere), an optional `image` (`imageWithAlt`, required for
 `BANNER`/`SPLIT` via a custom validator, since Sanity can't make
 `.required()` conditional on a sibling field), two independent alignment
 axes (below), `mobileMediaOrder` (Split only), an optional `actions` (`actionGroup` — a
-reusable object under `objects/blocks/`, not CTA-specific: an `actions`
+reusable object under `objects/action-group/`, not CTA-specific: an `actions`
 array of `ctaAction` items, each with its own `variant` (`PRIMARY`/
 `SECONDARY`) and `appearance` (`CONTAINED`/`INLINE`, available on either
 variant), validated so a `PRIMARY` item is required and comes first,
@@ -472,7 +472,7 @@ and `readOnly` accept callbacks, so one field cannot vary its own option set
 by variant. `hidden` keeps exactly one visible. `@blog/service` collapses the
 pair into a single `contentPosition` on the view model, so no layer below the
 service knows the split exists. Both are emitted by the
-`defineAlignmentFields()` helper, which also appends the `contentAlignment`
+`alignmentFields()` helper, which also appends the `contentAlignment`
 field every caller is guaranteed to have.
 
 CTA's `contentAlignment` and the other four modules' are the same field from
@@ -502,15 +502,14 @@ lives on the pages instead: every page placing one must set it, enforced by an
 async rule on `modules[]` that fetches each referenced module and rejects one
 that has not.
 
-The taxonomy index pages used to be the exception. Each reached its module
-through a dedicated slot and could leave `taxonomy` empty, passing its own kind
-to
-`service.modules.taxonomyList.v1.getTaxonomyList(id, tenant, fallbackTaxonomy)`
-so the loader never queried upward for a parent page. That channel is gone with
-the slots: `ModuleRenderer` calls every module with the same arguments and
-cannot supply a fallback, so a module it renders must carry an authored
-`taxonomy`. The `fallbackTaxonomy` parameter remains in the loader's signature
-with no caller passing it.
+Nothing overrides that field at read time. `ModuleRenderer` calls every module
+with the same arguments, so there is no channel by which a page could supply a
+kind the module itself lacks, and
+`service.modules.taxonomyList.v1.getTaxonomyList(id, tenant)` projects the
+authored field alone. A module reaching the loader without one resolves to
+`null` and raises `UnresolvedTaxonomyError` in the transformer — a failed
+fetch, never an empty list, so an unauthored module is visible as a fault
+rather than as a section that renders nothing.
 
 `sortOrder` (`TAXONOMY_SORT`, coalesced to `ALPHABETICAL` at read time)
 and `limit` apply wherever the module sits, and their defaults reproduce the

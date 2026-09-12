@@ -30,13 +30,17 @@ const getCachedEffectiveSettingsFeaturesForTenant = (tenantId: string) =>
     },
   )(tenantId);
 
-const getUncachedEffectiveSettingsFeatures = async (
-  tenant?: string,
-): Promise<Record<TCapability, boolean> | undefined> => {
-  const tenantId = await getRequestTenantId(tenant);
-  if (!tenantId) return undefined;
-  return getCachedEffectiveSettingsFeaturesForTenant(tenantId);
-};
+// `getRequestTenantId`'s `headers()` read must stay outside this
+// `safeAsync` boundary: its `DynamicServerError` is Next's signal that the
+// route is dynamic, and swallowing it renders the route static, then 500s.
+const getEffectiveSettingsFeaturesForTenantId = safeAsync(
+  async (
+    tenantId?: string,
+  ): Promise<Record<TCapability, boolean> | undefined> => {
+    if (!tenantId) return undefined;
+    return getCachedEffectiveSettingsFeaturesForTenant(tenantId);
+  },
+);
 
 /**
  * getEffectiveSettingsFeatures — the `settings_features` counterpart to
@@ -49,6 +53,5 @@ const getUncachedEffectiveSettingsFeatures = async (
  * precedent). Cached per tenant, same as `getSiteConfig`. Accepts the
  * `[tenant]` route param and forwards it to `getRequestTenantId`.
  */
-export const getEffectiveSettingsFeatures = safeAsync(
-  getUncachedEffectiveSettingsFeatures,
-);
+export const getEffectiveSettingsFeatures = async (tenant?: string) =>
+  getEffectiveSettingsFeaturesForTenantId(await getRequestTenantId(tenant));
