@@ -21,7 +21,13 @@ describe('PUBLISHED_POST_FILTER', () => {
     expect(PUBLISHED_POST_FILTER).toContain('defined(content)');
   });
 
-  it('excludes a post with no seo', () => {
-    expect(PUBLISHED_POST_FILTER).toContain('defined(seo)');
+  it('excludes a post with no seo.metaTitle, whether seo is entirely absent or present without a metaTitle', () => {
+    expect(PUBLISHED_POST_FILTER).toContain('defined(seo.metaTitle)');
+  });
+
+  it('is exactly the expected predicate', () => {
+    expect(PUBLISHED_POST_FILTER).toBe(
+      'publishedAt <= now() && defined(headingBlock.heading) && defined(author) && defined(topic) && defined(content) && defined(seo.metaTitle)',
+    );
   });
 });
