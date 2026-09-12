@@ -14,7 +14,7 @@ export const topicPageQuery = q
     headingBlock: sub
       .field('headingBlock')
       .project(headingBlockFragment)
-      .nullable(true),
+      .notNull(),
     hero: sub.field('hero').deref().project(moduleFragment).nullable(true),
     // Page-builder placement (`postList`/`postLatest`/`cta`/`newsletter`),
     // mirroring `page_blog`'s own thin `modules[]` ref projection —

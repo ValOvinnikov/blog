@@ -1,7 +1,7 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawBlogPage } from '@blog/service/testing/pages/fixtures';
 import {
-  makeRawOptionalHeadingBlock,
+  makeRawHeadingBlock,
   makeRawSeo,
 } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
@@ -19,8 +19,7 @@ describe('getIndexPage', () => {
   it('exposes the headingBlock from the page_blog singleton', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawBlogPage({
-        headingBlock: makeRawOptionalHeadingBlock({
-          heading: 'Latest posts',
+        headingBlock: makeRawHeadingBlock('Latest posts', {
           supportingText: 'Fresh from the team.',
         }),
         seo: makeRawSeo({
@@ -39,18 +38,6 @@ describe('getIndexPage', () => {
     });
     expect(result.seo.title).toBe('Latest posts — Blog');
     expect(result.seo.description).toBe('Fresh from the team.');
-  });
-
-  it('falls the headingBlock back to an empty object when unset', async () => {
-    mockRun.mockResolvedValueOnce(makeRawBlogPage({ headingBlock: null }));
-
-    const result = await getIndexPage(tenant);
-    if (!result) throw new Error('expected a blog index page');
-
-    expect(result.headingBlock).toEqual({
-      heading: undefined,
-      supportingText: undefined,
-    });
   });
 
   it('maps the thin page-builder modules array to module refs', async () => {

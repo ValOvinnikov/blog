@@ -31,7 +31,7 @@ export const postFeaturedModuleQuery = q
     headingBlock: sub
       .field('headingBlock')
       .project(headingBlockFragment)
-      .nullable(true),
+      .notNull(),
     postSource: sub.field('postSource').notNull(),
     posts: sub
       .select(

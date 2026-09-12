@@ -1,5 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import { requiredHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block';
+import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 
 import { topicFragment } from './topic';
 import { WORD_COUNT_EXPRESSION, wordCountParser } from './word-count';
@@ -15,7 +15,7 @@ export const archivePostCardFragment = q
     _id: true,
     headingBlock: sub
       .field('headingBlock')
-      .project(requiredHeadingBlockFragment)
+      .project(headingBlockFragment)
       .notNull(),
     slug: sub.field('slug.current').notNull(),
     publishedAt: sub.field('publishedAt').notNull(),

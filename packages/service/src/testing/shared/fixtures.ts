@@ -1,27 +1,14 @@
 import type { TRawSeo } from '@blog/service/shared/transformers/resolve-seo';
-import type {
-  TRawHeadingBlock,
-  TRawRequiredHeadingBlock,
-} from '@blog/service/shared/transformers/to-heading-block';
+import type { TRawHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import type { TRawPostLink } from '@blog/service/shared/transformers/to-post-link';
 import type { TRawSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 
 export function makeRawHeadingBlock(
   heading: string,
-  overrides: Partial<Omit<TRawRequiredHeadingBlock, 'heading'>> = {},
-): TRawRequiredHeadingBlock {
-  return {
-    heading,
-    supportingText: null,
-    ...overrides,
-  };
-}
-
-export function makeRawOptionalHeadingBlock(
-  overrides: Partial<TRawHeadingBlock> = {},
+  overrides: Partial<Omit<TRawHeadingBlock, 'heading'>> = {},
 ): TRawHeadingBlock {
   return {
-    heading: null,
+    heading,
     supportingText: null,
     ...overrides,
   };

@@ -66,7 +66,7 @@ export const taxonomyListModuleQuery = q
     headingBlock: sub
       .field('headingBlock')
       .project(headingBlockFragment)
-      .nullable(true),
+      .notNull(),
     layout: sub.field('layout').project(layoutFragment).nullable(true),
     contentAlignment: sub.field('contentAlignment').nullable(true),
     taxonomy: sub.raw('taxonomy', taxonomyParser),

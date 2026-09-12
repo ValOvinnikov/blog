@@ -10,7 +10,7 @@ export const blogPageQuery = q.star
     headingBlock: sub
       .field('headingBlock')
       .project(headingBlockFragment)
-      .nullable(true),
+      .notNull(),
     hero: sub.field('hero').deref().project(moduleFragment).nullable(true),
     // Page-builder placement (`cta`/`newsletter`/`postList`), mirroring
     // `page_home`/`page_landing`'s own thin `modules[]` ref projection —

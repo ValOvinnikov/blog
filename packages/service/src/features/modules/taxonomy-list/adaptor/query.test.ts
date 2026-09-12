@@ -14,13 +14,16 @@ describe('taxonomyListModuleQuery', () => {
     expect(taxonomyListModuleQuery.query).not.toContain('emptyMessage');
   });
 
-  it('parses a module with no headingBlock/layout set', () => {
-    const raw = makeRawTaxonomyListModule({
-      headingBlock: null,
-      layout: null,
-    });
+  it('parses a module with no layout set', () => {
+    const raw = makeRawTaxonomyListModule({ layout: null });
 
     expect(() => taxonomyListModuleQuery.parse(raw)).not.toThrow();
+  });
+
+  it('rejects a module with no headingBlock', () => {
+    const raw = { ...makeRawTaxonomyListModule(), headingBlock: null };
+
+    expect(() => taxonomyListModuleQuery.parse(raw)).toThrow();
   });
 
   it('projects contentAlignment', () => {

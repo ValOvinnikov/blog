@@ -13,15 +13,9 @@ import type { TTopicDetailPage } from './types';
 export type TRawTopicPage = NonNullable<InferResultType<typeof topicPageQuery>>;
 
 export function toTopicDetailPage(rawPage: TRawTopicPage): TTopicDetailPage {
-  const topic = toTopic(rawPage.topic);
-  const headingBlock = toHeadingBlock(rawPage.headingBlock);
-
   return {
-    topic,
-    headingBlock: {
-      heading: headingBlock.heading ?? topic.title,
-      supportingText: headingBlock.supportingText ?? topic.description,
-    },
+    topic: toTopic(rawPage.topic),
+    headingBlock: toHeadingBlock(rawPage.headingBlock),
     hero: toHeroSlot(rawPage.hero),
     modules: (rawPage.modules ?? []).map(toModule),
     seo: resolveSeo(rawPage.seo),

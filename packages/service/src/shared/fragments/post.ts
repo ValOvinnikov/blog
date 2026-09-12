@@ -1,5 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import { requiredHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block';
+import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module';
 
 import { authorCardFragment, authorDetailFragment } from './author';
@@ -22,7 +22,7 @@ export const postCardFragment = q
     _id: true,
     headingBlock: sub
       .field('headingBlock')
-      .project(requiredHeadingBlockFragment)
+      .project(headingBlockFragment)
       .notNull(),
     slug: sub.field('slug.current').notNull(),
     publishedAt: sub.field('publishedAt').notNull(),
@@ -42,7 +42,7 @@ export const postDetailFragment = q
     _id: true,
     headingBlock: sub
       .field('headingBlock')
-      .project(requiredHeadingBlockFragment)
+      .project(headingBlockFragment)
       .notNull(),
     slug: sub.field('slug.current').notNull(),
     publishedAt: sub.field('publishedAt').notNull(),

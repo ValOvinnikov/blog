@@ -1,5 +1,5 @@
 import { makeRawTagPage } from '@blog/service/testing/pages/fixtures';
-import { makeRawOptionalHeadingBlock } from '@blog/service/testing/shared/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 
 import { tagPageQuery } from './query';
 
@@ -43,10 +43,16 @@ describe('tagPageQuery', () => {
 
   it('parses a tag page with an authored headingBlock', () => {
     const raw = makeRawTagPage({
-      headingBlock: makeRawOptionalHeadingBlock({ heading: 'TypeScript' }),
+      headingBlock: makeRawHeadingBlock('TypeScript'),
     });
 
     expect(() => tagPageQuery.parse(raw)).not.toThrow();
+  });
+
+  it('rejects a tag page with no headingBlock', () => {
+    const raw = { ...makeRawTagPage(), headingBlock: null };
+
+    expect(() => tagPageQuery.parse(raw)).toThrow();
   });
 
   it('parses null as no matching page_tag document, rather than throwing', () => {

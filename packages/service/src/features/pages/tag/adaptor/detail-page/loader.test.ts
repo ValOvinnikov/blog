@@ -1,7 +1,7 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawTagPage } from '@blog/service/testing/pages/fixtures';
 import {
-  makeRawOptionalHeadingBlock,
+  makeRawHeadingBlock,
   makeRawSeo,
 } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
@@ -61,17 +61,10 @@ describe('getTagPage', () => {
     expect(result.seo.description).toBeUndefined();
   });
 
-  it('uses the authored headingBlock over the tag fallback', async () => {
+  it('maps the authored headingBlock straight through', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawTagPage({
-        tag: {
-          _id: 'tag-1',
-          title: 'TypeScript',
-          slug: 'typescript',
-          description: 'Posts about TypeScript.',
-        },
-        headingBlock: makeRawOptionalHeadingBlock({
-          heading: 'TypeScript, curated',
+        headingBlock: makeRawHeadingBlock('TypeScript, curated', {
           supportingText: 'Hand-picked reads.',
         }),
       }),
@@ -83,52 +76,6 @@ describe('getTagPage', () => {
     expect(result.headingBlock).toEqual({
       heading: 'TypeScript, curated',
       supportingText: 'Hand-picked reads.',
-    });
-  });
-
-  it('falls back to the tag title/description when headingBlock is unset', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTagPage({
-        tag: {
-          _id: 'tag-1',
-          title: 'TypeScript',
-          slug: 'typescript',
-          description: 'Posts about TypeScript.',
-        },
-        headingBlock: null,
-      }),
-    );
-
-    const result = await getTagPage('typescript', tenant);
-    if (!result) throw new Error('expected a tag page');
-
-    expect(result.headingBlock).toEqual({
-      heading: 'TypeScript',
-      supportingText: 'Posts about TypeScript.',
-    });
-  });
-
-  it('falls back to the tag description only for an unset supportingText, keeping an authored heading', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTagPage({
-        tag: {
-          _id: 'tag-1',
-          title: 'TypeScript',
-          slug: 'typescript',
-          description: 'Posts about TypeScript.',
-        },
-        headingBlock: makeRawOptionalHeadingBlock({
-          heading: 'TypeScript, curated',
-        }),
-      }),
-    );
-
-    const result = await getTagPage('typescript', tenant);
-    if (!result) throw new Error('expected a tag page');
-
-    expect(result.headingBlock).toEqual({
-      heading: 'TypeScript, curated',
-      supportingText: 'Posts about TypeScript.',
     });
   });
 

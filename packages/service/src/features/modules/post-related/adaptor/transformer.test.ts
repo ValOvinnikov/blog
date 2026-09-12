@@ -147,16 +147,4 @@ describe(toPostRelatedModule, () => {
     expect(result.brandVariant).toBe('PRIMARY');
     expect(result.showImages).toBe(true);
   });
-
-  it('falls back to an undefined heading and supporting text when headingBlock is absent', () => {
-    const result = toPostRelatedModule(
-      makeRawPostRelatedModule({ headingBlock: null }),
-      [],
-    );
-
-    expect(result.headingBlock).toEqual({
-      heading: undefined,
-      supportingText: undefined,
-    });
-  });
 });

@@ -22,15 +22,9 @@ function toTagDetailPageTag(rawTag: TRawTagDetailPageTag): TTagDetailPageTag {
 }
 
 export function toTagDetailPage(rawPage: TRawTagPage): TTagDetailPage {
-  const tag = toTagDetailPageTag(rawPage.tag);
-  const headingBlock = toHeadingBlock(rawPage.headingBlock);
-
   return {
-    tag,
-    headingBlock: {
-      heading: headingBlock.heading ?? tag.title,
-      supportingText: headingBlock.supportingText ?? tag.description,
-    },
+    tag: toTagDetailPageTag(rawPage.tag),
+    headingBlock: toHeadingBlock(rawPage.headingBlock),
     hero: toHeroSlot(rawPage.hero),
     modules: (rawPage.modules ?? []).map(toModule),
     seo: resolveSeo(rawPage.seo),

@@ -32,19 +32,6 @@ describe('getHomePage', () => {
     ]);
   });
 
-  it('maps a hero with no headingBlock to an undefined heading/supportingText', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawHomePage({ hero: { _id: 'hero-1', _type: 'module_hero' } }),
-    );
-
-    const page = await getHomePage(tenant);
-    if (!page) throw new Error('expected a home page');
-
-    expect(page.hero).toEqual({ id: 'hero-1', type: 'module_hero' });
-    expect(page.headingBlock.heading).toBeUndefined();
-    expect(page.headingBlock.supportingText).toBeUndefined();
-  });
-
   it('maps a headingBlock heading with no hero to an undefined hero', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawHomePage({

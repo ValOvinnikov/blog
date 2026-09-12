@@ -1,5 +1,5 @@
 import { makeRawTopicIndexPage } from '@blog/service/testing/pages/fixtures';
-import { makeRawOptionalHeadingBlock } from '@blog/service/testing/shared/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 
 import { topicIndexPageQuery } from './query';
 
@@ -8,14 +8,19 @@ describe('topicIndexPageQuery', () => {
     expect(topicIndexPageQuery.query).toContain('_type == "page_topicIndex"');
   });
 
-  it('parses a topic index page with no headingBlock/hero/modules', () => {
+  it('parses a topic index page with no hero/modules', () => {
     const raw = makeRawTopicIndexPage({
-      headingBlock: null,
       hero: null,
       modules: null,
     });
 
     expect(() => topicIndexPageQuery.parse(raw)).not.toThrow();
+  });
+
+  it('rejects a topic index page with no headingBlock', () => {
+    const raw = { ...makeRawTopicIndexPage(), headingBlock: null };
+
+    expect(() => topicIndexPageQuery.parse(raw)).toThrow();
   });
 
   it('rejects a topic index page with no authored SEO', () => {
@@ -45,9 +50,7 @@ describe('topicIndexPageQuery', () => {
 
   it('parses a topic index page with an authored headingBlock', () => {
     const raw = makeRawTopicIndexPage({
-      headingBlock: makeRawOptionalHeadingBlock({
-        heading: 'Browse by topic',
-      }),
+      headingBlock: makeRawHeadingBlock('Browse by topic'),
     });
 
     expect(() => topicIndexPageQuery.parse(raw)).not.toThrow();

@@ -1,7 +1,7 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawTopicPage } from '@blog/service/testing/pages/fixtures';
 import {
-  makeRawOptionalHeadingBlock,
+  makeRawHeadingBlock,
   makeRawSeo,
 } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
@@ -61,17 +61,10 @@ describe('getTopicPage', () => {
     expect(result.seo.description).toBeUndefined();
   });
 
-  it('uses the authored headingBlock over the topic fallback', async () => {
+  it('maps the authored headingBlock straight through', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawTopicPage({
-        topic: {
-          _id: 'topic-1',
-          title: 'Engineering',
-          slug: 'engineering',
-          description: 'Notes on building things.',
-        },
-        headingBlock: makeRawOptionalHeadingBlock({
-          heading: 'Engineering, curated',
+        headingBlock: makeRawHeadingBlock('Engineering, curated', {
           supportingText: 'Hand-picked reads.',
         }),
       }),
@@ -83,52 +76,6 @@ describe('getTopicPage', () => {
     expect(result.headingBlock).toEqual({
       heading: 'Engineering, curated',
       supportingText: 'Hand-picked reads.',
-    });
-  });
-
-  it('falls back to the topic title/description when headingBlock is unset', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTopicPage({
-        topic: {
-          _id: 'topic-1',
-          title: 'Engineering',
-          slug: 'engineering',
-          description: 'Notes on building things.',
-        },
-        headingBlock: null,
-      }),
-    );
-
-    const result = await getTopicPage('engineering', tenant);
-    if (!result) throw new Error('expected a topic page');
-
-    expect(result.headingBlock).toEqual({
-      heading: 'Engineering',
-      supportingText: 'Notes on building things.',
-    });
-  });
-
-  it('falls back to the topic description only for an unset supportingText, keeping an authored heading', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTopicPage({
-        topic: {
-          _id: 'topic-1',
-          title: 'Engineering',
-          slug: 'engineering',
-          description: 'Notes on building things.',
-        },
-        headingBlock: makeRawOptionalHeadingBlock({
-          heading: 'Engineering, curated',
-        }),
-      }),
-    );
-
-    const result = await getTopicPage('engineering', tenant);
-    if (!result) throw new Error('expected a topic page');
-
-    expect(result.headingBlock).toEqual({
-      heading: 'Engineering, curated',
-      supportingText: 'Notes on building things.',
     });
   });
 

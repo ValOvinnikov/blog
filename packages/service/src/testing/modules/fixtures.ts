@@ -32,10 +32,7 @@ import type {
   TRawTaxonomyEntry,
   TRawTaxonomyListModule,
 } from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
-import {
-  makeRawHeadingBlock,
-  makeRawOptionalHeadingBlock,
-} from '@blog/service/testing/shared/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 
 export function makeRawHeroModule(
   overrides: Partial<TRawHeroModule> = {},
@@ -108,7 +105,7 @@ export function makeRawPostListModule(
 ): TRawPostListModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRawOptionalHeadingBlock({ heading: 'Latest' }),
+    headingBlock: makeRawHeadingBlock('Latest'),
     pageSize: 6,
     layout: null,
     contentAlignment: null,
@@ -122,7 +119,7 @@ export function makeRawPostLatestModule(
 ): TRawPostLatestModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRawOptionalHeadingBlock({ heading: 'Latest' }),
+    headingBlock: makeRawHeadingBlock('Latest'),
     limit: 6,
     layout: null,
     contentAlignment: null,
@@ -137,7 +134,7 @@ export function makeRawPostFeaturedModule(
 ): TRawPostFeaturedModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRawOptionalHeadingBlock({ heading: 'Featured' }),
+    headingBlock: makeRawHeadingBlock('Featured'),
     postSource: POST_SOURCE.PINNED,
     posts: [],
     limit: null,
@@ -154,7 +151,7 @@ export function makeRawPostRelatedModule(
 ): TRawPostRelatedModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRawOptionalHeadingBlock({ heading: 'Related reading' }),
+    headingBlock: makeRawHeadingBlock('Related reading'),
     limit: 3,
     layout: null,
     contentAlignment: null,
@@ -256,7 +253,7 @@ export function makeRawTaxonomyListModule(
 ): TRawTaxonomyListModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRawOptionalHeadingBlock({ heading: 'Topics' }),
+    headingBlock: makeRawHeadingBlock('Topics'),
     layout: null,
     contentAlignment: null,
     taxonomy: TAXONOMY_KIND.TOPICS,
