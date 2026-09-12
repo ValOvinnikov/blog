@@ -3,6 +3,7 @@ import {
   toCtaAction,
   type TCtaAction,
 } from '@blog/service/shared/transformers/to-cta-action';
+import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toHeroPresentation } from '@blog/service/shared/transformers/to-hero-presentation';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
@@ -36,9 +37,8 @@ export function toHeroStatementModule(
   return {
     brandVariant: raw.brandVariant,
     variant: raw.variant,
-    heading: raw.headingBlock.heading,
+    headingBlock: toHeadingBlock(raw.headingBlock),
     eyebrow: raw.eyebrow ?? undefined,
-    supportingText: raw.headingBlock.supportingText ?? undefined,
     sanityImage: toSanityImage(raw.image),
     actions: toActions(raw.actions),
     contentPosition,
