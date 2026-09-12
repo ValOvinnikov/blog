@@ -111,15 +111,50 @@ type THeadingBlockFieldDefinition = {
   description?: string;
 };
 
-describe('tagPageSchema headingBlock field', () => {
+type THeadingBlockCustomFn = (
+  value: { heading?: string } | undefined,
+) => string | true;
+
+describe('pageTagSchema headingBlock field', () => {
   it('is built via headingBlockField() with a page-scoped description', () => {
     const headingBlockField = getField('headingBlock') as
       THeadingBlockFieldDefinition | undefined;
 
     expect(headingBlockField?.type).toBe('headingBlock');
     expect(headingBlockField?.description).toBe(
-      'The page heading (h1) and its optional supporting line. Not shown when a hero is set.',
+      "The page heading, shown as the page's H1. Hidden when a hero is set — the hero's heading becomes the H1 instead. Still required, so the page keeps a heading if the hero is ever removed.",
     );
+  });
+
+  it('is required at the field level', () => {
+    const headingBlockField = getField('headingBlock') as
+      { validation?: unknown } | undefined;
+
+    if (!headingBlockField?.validation) {
+      throw new Error(
+        'Expected pageTagSchema headingBlock to define validation.',
+      );
+    }
+
+    let customFn: THeadingBlockCustomFn | undefined;
+    const rule = {
+      custom: (fn: THeadingBlockCustomFn) => {
+        customFn = fn;
+        return rule;
+      },
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (headingBlockField.validation as any)(rule);
+
+    if (!customFn) {
+      throw new Error(
+        'Expected pageTagSchema headingBlock validation to register a custom() rule.',
+      );
+    }
+
+    expect(customFn(undefined)).toBe('Heading is required.');
+    expect(customFn({ heading: 'Design' })).toBe(true);
   });
 });
 
@@ -394,90 +429,9 @@ const buildDocumentRules = (): TDocumentMockRule[] => {
   ) as TDocumentMockRule[];
 };
 
-describe('tagPageSchema document validation — hero or heading', () => {
-  it('errors when neither hero, headingBlock.heading, nor a resolvable tag is set', async () => {
-    const [heroOrHeadingRule] = buildDocumentRules();
-    const { context } = createMockContext(null);
-
-    await expect(heroOrHeadingRule?.fn?.({}, context)).resolves.toBe(
-      'Add a hero or a heading',
-    );
-  });
-
-  it('passes when hero is set, without querying the tag', async () => {
-    const [heroOrHeadingRule] = buildDocumentRules();
-    const { context, fetchCalls } = createMockContext(null);
-
-    await expect(
-      heroOrHeadingRule?.fn?.({ hero: { _ref: 'hero-1' } }, context),
-    ).resolves.toBe(true);
-    expect(fetchCalls).toHaveLength(0);
-  });
-
-  it('passes when headingBlock.heading is set, without querying the tag', async () => {
-    const [heroOrHeadingRule] = buildDocumentRules();
-    const { context, fetchCalls } = createMockContext(null);
-
-    await expect(
-      heroOrHeadingRule?.fn?.(
-        { headingBlock: { heading: 'Welcome' } },
-        context,
-      ),
-    ).resolves.toBe(true);
-    expect(fetchCalls).toHaveLength(0);
-  });
-
-  it('passes when neither hero nor heading is set but the referenced tag has a title', async () => {
-    const [heroOrHeadingRule] = buildDocumentRules();
-    const { context, fetchCalls } = createMockContext('Design');
-
-    await expect(
-      heroOrHeadingRule?.fn?.({ tag: { _ref: 'tag-1' } }, context),
-    ).resolves.toBe(true);
-    expect(fetchCalls[0]?.params).toEqual({ id: 'tag-1' });
-  });
-
-  it('errors when a tag is referenced but resolves to no title', async () => {
-    const [heroOrHeadingRule] = buildDocumentRules();
-    const { context } = createMockContext(null);
-
-    await expect(
-      heroOrHeadingRule?.fn?.({ tag: { _ref: 'tag-1' } }, context),
-    ).resolves.toBe('Add a hero or a heading');
-  });
-});
-
-describe('tagPageSchema document validation — hero hides heading', () => {
-  it('warns when both hero and headingBlock.heading are set', () => {
-    const [, heroHidesHeadingRule] = buildDocumentRules();
-
-    expect(heroHidesHeadingRule?.level).toBe('warning');
-    expect(
-      heroHidesHeadingRule?.fn?.(
-        {
-          hero: { _ref: 'hero-1' },
-          headingBlock: { heading: 'Welcome' },
-        },
-        {} as ValidationContext,
-      ),
-    ).toBe('The hero hides the heading');
-  });
-
-  it('passes when only one of hero or heading is set', () => {
-    const [, heroHidesHeadingRule] = buildDocumentRules();
-
-    expect(
-      heroHidesHeadingRule?.fn?.(
-        { hero: { _ref: 'hero-1' } },
-        {} as ValidationContext,
-      ),
-    ).toBe(true);
-  });
-});
-
-describe('tagPageSchema document validation — modules[] post list count', () => {
+describe('pageTagSchema document validation — modules[] post list count', () => {
   it('errors when more than one module_postList is referenced', () => {
-    const [, , singlePostListRule] = buildDocumentRules();
+    const [singlePostListRule] = buildDocumentRules();
 
     expect(singlePostListRule?.level).toBe('error');
     expect(
@@ -494,7 +448,7 @@ describe('tagPageSchema document validation — modules[] post list count', () =
   });
 
   it('passes with exactly one module_postList reference', () => {
-    const [, , singlePostListRule, hasPostListRule] = buildDocumentRules();
+    const [singlePostListRule, hasPostListRule] = buildDocumentRules();
 
     const document = {
       modules: [
@@ -510,7 +464,7 @@ describe('tagPageSchema document validation — modules[] post list count', () =
   });
 
   it('warns when no module_postList is referenced', () => {
-    const [, , , hasPostListRule] = buildDocumentRules();
+    const [, hasPostListRule] = buildDocumentRules();
 
     expect(hasPostListRule?.level).toBe('warning');
     expect(
@@ -524,7 +478,7 @@ describe('tagPageSchema document validation — modules[] post list count', () =
   });
 
   it('warns when modules is undefined', () => {
-    const [, , , hasPostListRule] = buildDocumentRules();
+    const [, hasPostListRule] = buildDocumentRules();
 
     expect(hasPostListRule?.fn?.({}, {} as ValidationContext)).toBe(
       'This page has no Post List module — the archive will be empty until one is added.',
@@ -537,7 +491,7 @@ const POST_LIST_UNIQUENESS_ERROR =
 
 describe('tagPageSchema document validation — unique post list reference', () => {
   it('passes without querying when modules[] carries no post list reference', async () => {
-    const [, , , , uniquePostListRule] = buildDocumentRules();
+    const [, , uniquePostListRule] = buildDocumentRules();
     const { context, fetchCalls } = createMockContext(0);
 
     await expect(uniquePostListRule?.fn?.({}, context)).resolves.toBe(true);
@@ -545,7 +499,7 @@ describe('tagPageSchema document validation — unique post list reference', () 
   });
 
   it('reads the reference from modules[] when present', async () => {
-    const [, , , , uniquePostListRule] = buildDocumentRules();
+    const [, , uniquePostListRule] = buildDocumentRules();
     const { context, fetchCalls } = createMockContext(0);
 
     await uniquePostListRule?.fn?.(
@@ -560,7 +514,7 @@ describe('tagPageSchema document validation — unique post list reference', () 
   });
 
   it('flags a conflicting page_tag referencing the same modules[] post list', async () => {
-    const [, , , , uniquePostListRule] = buildDocumentRules();
+    const [, , uniquePostListRule] = buildDocumentRules();
     const { context } = createMockContext(1);
 
     await expect(
@@ -575,7 +529,7 @@ describe('tagPageSchema document validation — unique post list reference', () 
   });
 
   it('excludes both the draft and published id of the current document', async () => {
-    const [, , , , uniquePostListRule] = buildDocumentRules();
+    const [, , uniquePostListRule] = buildDocumentRules();
     const { context, fetchCalls } = createMockContext(0, 'drafts.page-tag-1');
 
     await uniquePostListRule?.fn?.(
@@ -594,7 +548,7 @@ describe('tagPageSchema document validation — unique post list reference', () 
   });
 
   it('requests the drafts perspective so an unpublished conflict still counts', async () => {
-    const [, , , , uniquePostListRule] = buildDocumentRules();
+    const [, , uniquePostListRule] = buildDocumentRules();
     const { context, withConfigCalls } = createMockContext(0);
 
     await uniquePostListRule?.fn?.(

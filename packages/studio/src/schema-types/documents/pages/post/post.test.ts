@@ -121,6 +121,15 @@ describe('postPageSchema shape', () => {
     expect(customFn({ heading: 'Understanding GROQ' })).toBe(true);
   });
 
+  it('headingBlock describes the field as the post title, with no hero wording', () => {
+    const headingBlockFieldDefinition = getField('headingBlock') as
+      { type?: string; description?: string } | undefined;
+
+    expect(headingBlockFieldDefinition?.description).toBe(
+      "The post title, shown as the page's H1.",
+    );
+  });
+
   it('heroImage stays optional — no validation() builder attached', () => {
     expect(getField('heroImage')?.validation).toBeUndefined();
   });

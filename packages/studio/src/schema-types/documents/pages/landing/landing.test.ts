@@ -10,25 +10,6 @@ import {
 } from '@blog/studio/testing/create-mock-modules-rule';
 import type { ValidationContext } from 'sanity';
 
-type TDocumentCustomFn = (document: Record<string, unknown>) => string | true;
-
-type TDocumentMockRule = {
-  level: 'error' | 'warning';
-  fn?: TDocumentCustomFn;
-  custom: (fn: TDocumentCustomFn) => TDocumentMockRule;
-  warning: () => TDocumentMockRule;
-};
-
-const createDocumentMockRule = (
-  level: TDocumentMockRule['level'] = 'error',
-  fn?: TDocumentCustomFn,
-): TDocumentMockRule => ({
-  level,
-  fn,
-  custom: (nextFn) => createDocumentMockRule('error', nextFn),
-  warning: () => createDocumentMockRule('warning', fn),
-});
-
 const getModulesCustomValidators = (): TModulesCustomFn[] => {
   const modulesField = landingPageSchema.fields?.find(
     (field) => field.name === 'modules',
@@ -237,49 +218,22 @@ describe('landingPageSchema field order', () => {
 });
 
 describe('landingPageSchema document validation', () => {
-  const buildDocumentRules = (): TDocumentMockRule[] => {
-    if (!landingPageSchema.validation) {
-      throw new Error(
-        'Expected landingPageSchema to define a validation rule.',
-      );
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    return (landingPageSchema.validation as any)(
-      createDocumentMockRule(),
-    ) as TDocumentMockRule[];
-  };
-
-  it('errors when neither hero nor headingBlock.heading is set', () => {
-    const [requiredRule] = buildDocumentRules();
-
-    expect(requiredRule?.fn?.({})).toBe('Add a hero or a heading');
+  it('defines no document-level validation — heading requiredness lives on the field', () => {
+    expect(landingPageSchema.validation).toBeUndefined();
   });
+});
 
-  it('warns when both hero and headingBlock.heading are set', () => {
-    const [, notBothRule] = buildDocumentRules();
+describe('landingPageSchema headingBlock field', () => {
+  it('is required and states that a hero hides it', () => {
+    const headingBlockFieldDefinition = landingPageSchema.fields?.find(
+      (field) => field.name === 'headingBlock',
+    ) as
+      { type?: string; description?: string; validation?: unknown } | undefined;
 
-    expect(
-      notBothRule?.fn?.({
-        hero: { _ref: 'hero-1' },
-        headingBlock: { heading: 'Welcome' },
-      }),
-    ).toBe('The hero hides the heading');
-  });
-
-  it('passes when only hero is set', () => {
-    const [requiredRule, notBothRule] = buildDocumentRules();
-    const document = { hero: { _ref: 'hero-1' } };
-
-    expect(requiredRule?.fn?.(document)).toBe(true);
-    expect(notBothRule?.fn?.(document)).toBe(true);
-  });
-
-  it('passes when only headingBlock.heading is set', () => {
-    const [requiredRule, notBothRule] = buildDocumentRules();
-    const document = { headingBlock: { heading: 'Welcome' } };
-
-    expect(requiredRule?.fn?.(document)).toBe(true);
-    expect(notBothRule?.fn?.(document)).toBe(true);
+    expect(headingBlockFieldDefinition?.type).toBe('headingBlock');
+    expect(headingBlockFieldDefinition?.description).toBe(
+      "The page heading, shown as the page's H1. Hidden when a hero is set — the hero's heading becomes the H1 instead. Still required, so the page keeps a heading if the hero is ever removed.",
+    );
+    expect(headingBlockFieldDefinition?.validation).toBeDefined();
   });
 });

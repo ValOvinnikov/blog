@@ -29,7 +29,7 @@ frontend if a consumer is out of date.
 
 | Surface | Route                          | Status                                                                                                                                                                           |
 | ------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Home    | `/`                            | ✅ Built — modules-as-documents (optional hero **or** `headingBlock` heading, plus `modules[]`)                                                                                  |
+| Home    | `/`                            | ✅ Built — modules-as-documents (optional hero, required `headingBlock` heading, plus `modules[]`)                                                                               |
 | Blog    | `/blog` + `/blog/page/N`       | ✅ Built — paginated index (#75)                                                                                                                                                 |
 | Post    | `/blog/[slug]`                 | ✅ Built — post detail page + JSON-LD (#76)                                                                                                                                      |
 | Topic   | `/topics/[slug]` (+ `/page/N`) | ✅ Built — unpaginated + paginated routes (#91/#588/#589); renamed from `category` in #1812; CMS-authored via the `page_topic` document since #1915                              |
@@ -263,11 +263,9 @@ additionally carry a `headingBlock` object (`heading` and `supportingText`
 only). There is **one registered `headingBlock` type**, and requiredness is
 a property of the **field**, not of the type: `headingBlockField({
 requireHeading })` attaches a field-level rule checking the nested
-`heading`. `heading` is required on
-`module_cta`/`module_newsletter`/`module_postLatest`/`module_postFeatured`/`module_postRelated`
-(and on `page_post` and `module_heroStatement`), and optional on
-`module_postList`/`module_taxonomyList`, which are page-related. Neither
-field carries a length cap — forced `max()` validation was removed as
+`heading`. `heading` is **required on every call site** — every module and every
+page — so no layer has to reason about which case it is holding. Neither
+field carries a length cap; forced `max()` validation was removed as
 editor-hostile.
 
 **Schema-required is not the same as present in stored data**, and the
@@ -339,11 +337,12 @@ plus `supportingText`), so exactly one `<h1>` renders either way.
 
 `page_home`'s hero was required until it was made optional and the document
 given a `headingBlock` of its own; `page_landing` followed, replacing the
-document `title` it previously rendered as its `<h1>`. Because neither field
-is individually required, the requirement moved to the document:
-`validateHeroOrHeading()` is an **error**-severity rule demanding at least
-one of `hero` or `headingBlock.heading`, so a page with an empty opening
-block cannot be published. The document `title` is never a fallback — it is
+document `title` it previously rendered as its `<h1>`. The hero stays
+optional and the heading is required, so a page always has one to fall back
+on and no document-level rule is needed to guarantee it. Setting a hero
+hides the heading rather than excusing it — every hero-capable page's
+heading field says so, and says why it is still required. The document
+`title` is never a fallback — it is
 Studio's internal list label, and a page with neither a hero nor a heading
 renders no header at all rather than leaking it. That holds for the
 breadcrumb trail too: `page_landing`'s trailing crumb comes from
@@ -884,7 +883,7 @@ home, landing, blog, topic, tag and taxonomy-index pages alike.
 `PageShell` owns **only** the `<main>` landmark and the order of the three
 regions. It deliberately owns no heading fallback, no container width, no
 spacing between regions, and no knowledge of what a region contains — so the
-hero-or-heading requirement stays a Studio document rule (§6) rather than
+heading requirement stays a Studio field rule (§6) rather than
 something the shell silently papers over. The post page is the one page that
 does not use it.
 
