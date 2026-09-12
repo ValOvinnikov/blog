@@ -2,6 +2,7 @@ import {
   BRAND_VARIANT,
   CONTENT_ALIGNMENT,
   CTA_VARIANT,
+  MEDIA_ORDER,
 } from '@blog/config/constants';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 
@@ -356,5 +357,35 @@ describe('ctaSchema bandTone validation', () => {
         },
       }),
     ).toBe(true);
+  });
+});
+
+const getLayout = (field: ReturnType<typeof getField>) => {
+  const options = 'options' in field ? field.options : undefined;
+
+  return options && typeof options === 'object' && 'layout' in options
+    ? (options as { layout?: string }).layout
+    : undefined;
+};
+
+describe('ctaSchema variant field', () => {
+  it('keeps variant as a radio: required, and it drives several other fields', () => {
+    expect(getLayout(getField('variant'))).toBe('radio');
+  });
+});
+
+describe('ctaSchema mobileMediaOrder field', () => {
+  it('offers Last and First, defaulting to Last', () => {
+    const field = getField('mobileMediaOrder');
+
+    expect(getOptionValues(field)).toEqual([
+      MEDIA_ORDER.LAST,
+      MEDIA_ORDER.FIRST,
+    ]);
+    expect(field.initialValue).toBe(MEDIA_ORDER.LAST);
+  });
+
+  it('converts to a dropdown: optional, no field depends on it', () => {
+    expect(getLayout(getField('mobileMediaOrder'))).toBe('dropdown');
   });
 });

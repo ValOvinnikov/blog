@@ -1,4 +1,5 @@
 import {
+  CTA_ACTION_APPEARANCE,
   CTA_ACTION_VARIANT,
   HERO_IMAGE_SOURCE,
   POST_SOURCE,
@@ -47,6 +48,14 @@ const getOptionValues = (field: { options?: unknown }) => {
   return (list as { title: string; value: string }[]).map(
     (option) => option.value,
   );
+};
+
+const getLayout = (field: { options?: unknown }) => {
+  const options = field.options;
+
+  return options && typeof options === 'object' && 'layout' in options
+    ? (options as { layout?: string }).layout
+    : undefined;
 };
 
 const getHidden = (field: { hidden?: unknown }): THiddenFn => {
@@ -136,6 +145,10 @@ describe('heroBlogSchema postSource field', () => {
     ]);
     expect(field.initialValue).toBe(POST_SOURCE.PINNED);
   });
+
+  it('keeps postSource as a radio: required, and it drives the post field', () => {
+    expect(getLayout(getField('postSource'))).toBe('radio');
+  });
 });
 
 describe('heroBlogSchema post field', () => {
@@ -204,6 +217,26 @@ describe('heroBlogSchema imageSource field', () => {
       HERO_IMAGE_SOURCE.NONE,
     ]);
     expect(field.initialValue).toBe(HERO_IMAGE_SOURCE.POST);
+  });
+
+  it('keeps imageSource as a radio: required, and it drives the image field', () => {
+    expect(getLayout(getField('imageSource'))).toBe('radio');
+  });
+});
+
+describe('heroBlogSchema primaryActionAppearance field', () => {
+  it('offers Contained and Inline, defaulting to Contained', () => {
+    const field = getField('primaryActionAppearance');
+
+    expect(getOptionValues(field)).toEqual([
+      CTA_ACTION_APPEARANCE.CONTAINED,
+      CTA_ACTION_APPEARANCE.INLINE,
+    ]);
+    expect(field.initialValue).toBe(CTA_ACTION_APPEARANCE.CONTAINED);
+  });
+
+  it('converts to a dropdown: optional, no field depends on it', () => {
+    expect(getLayout(getField('primaryActionAppearance'))).toBe('dropdown');
   });
 });
 

@@ -118,7 +118,7 @@ export const heroFields = (options: THeroFieldsOptions = {}) => {
       type: 'string',
       description: 'Order of media once the two columns collapse on mobile.',
       options: {
-        layout: 'radio',
+        layout: 'dropdown',
         list: Object.values(MEDIA_ORDER).map((value) => ({
           title: toTitleCase(value),
           value,
@@ -133,7 +133,7 @@ export const heroFields = (options: THeroFieldsOptions = {}) => {
       type: 'string',
       description: 'Order of media and content at every width.',
       options: {
-        layout: 'radio',
+        layout: 'dropdown',
         list: Object.values(MEDIA_ORDER).map((value) => ({
           title: toTitleCase(value),
           value,

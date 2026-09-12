@@ -1,5 +1,12 @@
-import { CTA_ACTION_VARIANT } from '@blog/config/constants';
-import { actionGroupSchema } from '@blog/studio/schema-types/objects/action-group/action-group';
+import {
+  CTA_ACTION_APPEARANCE,
+  CTA_ACTION_VARIANT,
+} from '@blog/config/constants';
+import {
+  actionGroupSchema,
+  ctaActionSchema,
+} from '@blog/studio/schema-types/objects/action-group/action-group';
+import { toTitleCase } from '@blog/utils/primitives';
 
 type TCustomFn = (value: unknown) => string | true;
 
@@ -136,5 +143,66 @@ describe('actionGroupSchema actions validation', () => {
     (actionsField.validation as any)(rule);
 
     expect(maxArg).toBe(2);
+  });
+});
+
+describe('ctaActionSchema control choices', () => {
+  const getField = (name: string) => {
+    const field = ctaActionSchema.fields.find(
+      (field): field is typeof field & { name: string } =>
+        'name' in field && field.name === name,
+    );
+
+    if (!field) {
+      throw new Error(`Expected ctaActionSchema to define a "${name}" field.`);
+    }
+
+    return field;
+  };
+
+  const getLayout = (field: { options?: unknown }) => {
+    const options = field.options;
+
+    return options && typeof options === 'object' && 'layout' in options
+      ? (options as { layout?: string }).layout
+      : undefined;
+  };
+
+  const getOptionValues = (field: { options?: unknown }) => {
+    const options = field.options;
+    const list =
+      options && typeof options === 'object' && 'list' in options
+        ? (options as { list: unknown }).list
+        : undefined;
+
+    if (!list) {
+      throw new Error('Expected field to define an options.list.');
+    }
+
+    return list as { title: string; value: string }[];
+  };
+
+  it('keeps variant as a radio: required, and picking it sets which sibling variant is unavailable', () => {
+    const field = getField('variant');
+
+    expect(getLayout(field)).toBe('radio');
+    expect(getOptionValues(field)).toEqual(
+      Object.values(CTA_ACTION_VARIANT).map((value) => ({
+        title: toTitleCase(value),
+        value,
+      })),
+    );
+  });
+
+  it('converts appearance to a dropdown: optional, no field depends on it', () => {
+    const field = getField('appearance');
+
+    expect(getLayout(field)).toBe('dropdown');
+    expect(getOptionValues(field)).toEqual(
+      Object.values(CTA_ACTION_APPEARANCE).map((value) => ({
+        title: toTitleCase(value),
+        value,
+      })),
+    );
   });
 });

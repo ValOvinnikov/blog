@@ -21,6 +21,14 @@ const getField = (fields: ReturnType<typeof heroFields>, name: string) => {
   return field;
 };
 
+const getLayout = (field: { options?: unknown }) => {
+  const options = field.options;
+
+  return options && typeof options === 'object' && 'layout' in options
+    ? (options as { layout?: string }).layout
+    : undefined;
+};
+
 const getOptionValues = (field: { options?: unknown }) => {
   const options = field.options;
   const list =
@@ -80,6 +88,12 @@ describe('heroFields variant field', () => {
       HERO_VARIANT.BANNER,
     ]);
     expect(field.initialValue).toBe(HERO_VARIANT.SPLIT);
+  });
+
+  it('keeps variant as a radio: required, and it drives which other fields show', () => {
+    const field = getField(heroFields(), 'variant');
+
+    expect(getLayout(field)).toBe('radio');
   });
 
   it('describes what each variant looks like', () => {
@@ -194,6 +208,7 @@ describe('heroFields media order fields', () => {
     expect(hidden({ parent: { variant: HERO_VARIANT.SPLIT } })).toBe(false);
     expect(hidden({ parent: { variant: HERO_VARIANT.STACKED } })).toBe(true);
     expect(hidden({ parent: { variant: HERO_VARIANT.BANNER } })).toBe(true);
+    expect(getLayout(field)).toBe('dropdown');
   });
 
   it('shows mediaOrderStacked only for Stacked, defaulting to Last', () => {
@@ -208,6 +223,7 @@ describe('heroFields media order fields', () => {
     expect(hidden({ parent: { variant: HERO_VARIANT.STACKED } })).toBe(false);
     expect(hidden({ parent: { variant: HERO_VARIANT.SPLIT } })).toBe(true);
     expect(hidden({ parent: { variant: HERO_VARIANT.BANNER } })).toBe(true);
+    expect(getLayout(field)).toBe('dropdown');
   });
 
   it('Banner emits neither media order field', () => {
