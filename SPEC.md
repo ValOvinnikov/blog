@@ -274,9 +274,10 @@ publish; it never backfills what is already stored. So a `.notNull()` in a
 GROQ projection — which throws and 404s the page rather than degrading — is
 applied only where the data was _already_ guaranteed when it was written.
 `module_postLatest`/`module_postFeatured`/`module_postRelated` became
-required only after documents existed without a heading, so their view
-models keep `heading` optional; the types that required it from the start
-do not.
+required only after documents existed without a heading, so projecting
+their heading as `.notNull()` was safe only once a migration had backfilled
+every stored document. With that done, one heading view model serves every
+call site and its `heading` is `string`, never optional.
 
 **Alignment is a module-level field, not part of `headingBlock`.** All seven
 of those modules carry their own `contentAlignment`, emitted by the
@@ -343,11 +344,10 @@ on and no document-level rule is needed to guarantee it. Setting a hero
 hides the heading rather than excusing it — every hero-capable page's
 heading field says so, and says why it is still required. The document
 `title` is never a fallback — it is
-Studio's internal list label, and a page with neither a hero nor a heading
-renders no header at all rather than leaking it. That holds for the
-breadcrumb trail too: `page_landing`'s trailing crumb comes from
-`headingBlock.heading`, and is omitted from the visible trail and the
-`BreadcrumbList` JSON-LD together when there is none.
+Studio's internal list label. The breadcrumb trail rests on the same
+guarantee: `page_landing`'s trailing crumb comes from
+`headingBlock.heading`, which always exists, so it is always present in
+both the visible trail and the `BreadcrumbList` JSON-LD.
 
 Breadcrumbs, metadata and the Studio preview keep
 reading the document's own `title`/`heading` whether or not a hero is set.
@@ -373,10 +373,11 @@ originals deleted.
 
 **A page document's own `title` is an internal CMS label and is never
 rendered on the web.** It names the document in the desk, nothing more —
-`page_topic` and `page_tag` each carry a `headingBlock` whose `heading` and
-`supportingText` fall back to the deref'd `blog_topic`/`blog_tag`'s `title`
-and `description`, so an unauthored page still renders the term's own
-header. `page_post` has no
+`page_topic` and `page_tag` each carry a `headingBlock` whose `heading` is
+required and so never falls back to the deref'd `blog_topic`/`blog_tag`'s
+`title`. Its optional `supportingText` still falls back to that term's
+`description`, so a page that names itself but adds no standfirst renders
+the term's own. `page_post` has no
 entity to deref, so its headline and excerpt live in a **`headingBlock`**
 object with `heading` required and `supportingText` optional — the same
 shape, and the same registered type, the modules use. `@blog/service` maps
@@ -536,8 +537,8 @@ shapes for the other pages that read them.
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its
 schema allows), `layout` as `TLayout | undefined`, and (where applicable)
-`headingBlock` as `THeadingBlock | undefined` — with no faked defaults on
-either: unset stays unset end to end. In `apps/web`, every module component
+`headingBlock` as a required `THeadingBlock` — with no faked defaults
+anywhere: what is unset stays unset end to end. In `apps/web`, every module component
 that renders a `@blog/ui` organism — including those reached through a
 dedicated slot rather than `MODULE_MAP`'s generic `ModuleRenderer` pipeline
 (§5 above): the hero family, via each page's `hero` slot, is now the only such
