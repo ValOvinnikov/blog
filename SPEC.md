@@ -815,12 +815,13 @@ field that ships without one, with a single exemption for `migrationState`,
 which no editor ever opens. The guards check presence, not quality.
 
 `titleField()` is the internal Studio label on every document that has one,
-and says so — it is never rendered. On the four slug-bearing documents that
-use it (`page_post`, `page_tag`, `page_topic`, `page_landing`) it also seeds
-the slug, and its `generatesSlug` option selects the wording that says that.
-`blog_tag` and `blog_topic` are slug-bearing too but declare their own
-`title`, because theirs **is** public — rendered on chips, archives, filters
-and navigation.
+and its one default description says so — the field is never rendered. It
+carries no slug-specific wording, even though `slugField()` always derives
+from the title: the slug field's own description already states that one row
+below, and a second copy on the title would be a claim nothing keeps true if
+a document's fields change. `blog_tag` and `blog_topic` are slug-bearing but
+declare their own `title` rather than using the helper, because theirs **is**
+public — rendered on chips, archives, filters and navigation.
 
 **Option lists default to a dropdown; `layout: 'radio'` is the opt-out, and
 requiredness decides.** A Sanity dropdown always renders a blank option for

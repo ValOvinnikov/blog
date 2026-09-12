@@ -172,13 +172,13 @@ separator: SPEC_LINE_SEPARATORS }`, replacing a plain string so the
   Settings group.
 
 **Reusable `titleField` helper** (`schema-types/fields/title-field/title-field.ts`) —
-`titleField({ initialValue?, readOnly?, description?, generatesSlug? })`
+`titleField({ initialValue?, readOnly?, description? })`
 returns a required `defineField({ name: 'title', type: 'string', … })`. The
-field is an **internal Studio label**, never rendered, and its default
-description says so; `generatesSlug` swaps in the wording for the four
-slug-bearing documents that use the helper (`page_post`, `page_tag`,
-`page_topic`, `page_landing`), where the title also seeds the slug. A caller
-passing its own `description` still overrides both defaults. Keep it **bare**
+field is an **internal Studio label**, never rendered, and its single default
+description says so. It says nothing about the slug even on the documents
+whose slug derives from it — `slugField()`'s own description already does, one
+field below. A caller passing its own `description` overrides the default.
+Keep it **bare**
 for singletons: a fixed `initialValue` + `readOnly: true` does **not** fix the
 Studio "Untitled" heading — `initialValue` doesn't fire for a singleton
 opened by `documentId`, and `readOnly` then leaves the field permanently
