@@ -17,12 +17,6 @@ describe('getRevalidateTagsForType', () => {
     ]);
   });
 
-  it('maps the blog-index singleton to its ISR tag', () => {
-    expect(getRevalidateTagsForType('page_blog', 'page_blog')).toEqual([
-      'page_blog',
-    ]);
-  });
-
   it('maps the post-index singleton to its ISR tag', () => {
     expect(
       getRevalidateTagsForType('page_postIndex', 'page_postIndex'),
