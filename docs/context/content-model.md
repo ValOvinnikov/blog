@@ -23,11 +23,11 @@ type is a compile error rather than silent drift, in two separate places:
 web's `MODULE_MAP`, and `REVALIDATE_TAGS`' required
 `Record<TModuleType, …>` half (see [`data-flow.md`](./data-flow.md)).
 
-`MODULE_MAP` excludes two types — `module_hero` and `module_postList` — each
-rendered _only_ through a dedicated page slot and never through a `modules[]`
-array, so neither can reach `ModuleRenderer`. Exclusion there does **not**
-exempt them from `REVALIDATE_TAGS`, which requires an entry for every module
-type. `module_taxonomyList` renders both ways and so is in `MODULE_MAP`.
+`MODULE_MAP` is keyed `Exclude<TModuleType, TSlotModuleType>`, so it excludes
+the hero family — the only modules rendered _through_ a dedicated page slot
+(`hero`) rather than a `modules[]` array, and so the only ones that can never
+reach `ModuleRenderer`. Exclusion there does **not** exempt them from
+`REVALIDATE_TAGS`, which requires an entry for every module type.
 
 **Module documents** (`packages/studio/src/schema-types/modules/`)
 
