@@ -485,7 +485,7 @@ describe('heroBlogSchema document validation', () => {
       );
 
       expect(receivedQuery).toBe(
-        '*[_type == "page_post" && featured == true && publishedAt <= now() && defined(headingBlock.heading) && defined(author) && defined(topic) && defined(content)] | order(publishedAt desc)[0]{ publishedAt, heroImage }',
+        '*[_type == "page_post" && featured == true && publishedAt <= now() && defined(headingBlock.heading) && defined(author) && defined(topic) && defined(content) && defined(seo.metaTitle)] | order(publishedAt desc)[0]{ publishedAt, heroImage }',
       );
     });
 
