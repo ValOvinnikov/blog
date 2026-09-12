@@ -28,7 +28,7 @@ const alignmentField = ({
     type: 'string',
     description,
     options: {
-      layout: 'radio',
+      layout: 'dropdown',
       list: (list ?? Object.values(CONTENT_ALIGNMENT)).map((value) => ({
         title: toTitleCase(value),
         value,

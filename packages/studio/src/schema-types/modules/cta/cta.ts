@@ -158,7 +158,7 @@ export const ctaSchema = defineType({
       description:
         'Order of media and content once the two columns collapse on mobile.',
       options: {
-        layout: 'radio',
+        layout: 'dropdown',
         list: Object.values(MEDIA_ORDER).map((value) => ({
           title: toTitleCase(value),
           value,

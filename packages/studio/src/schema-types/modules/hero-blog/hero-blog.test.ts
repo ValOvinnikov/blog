@@ -1,4 +1,5 @@
 import {
+  CTA_ACTION_APPEARANCE,
   CTA_ACTION_VARIANT,
   HERO_IMAGE_SOURCE,
   POST_SOURCE,
@@ -49,12 +50,39 @@ const getOptionValues = (field: { options?: unknown }) => {
   );
 };
 
+const getLayout = (field: { options?: unknown }) => {
+  const options = field.options;
+
+  return options && typeof options === 'object' && 'layout' in options
+    ? (options as { layout?: string }).layout
+    : undefined;
+};
+
 const getHidden = (field: { hidden?: unknown }): THiddenFn => {
   if (typeof field.hidden !== 'function') {
     throw new Error('Expected field to define a hidden() fn.');
   }
 
   return field.hidden as THiddenFn;
+};
+
+const wasRequiredCalled = (field: { validation?: unknown }) => {
+  if (!field.validation) {
+    throw new Error('Expected field to define validation.');
+  }
+
+  let requiredCalled = false;
+  const rule = {
+    required: () => {
+      requiredCalled = true;
+      return rule;
+    },
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+  (field.validation as any)(rule);
+
+  return requiredCalled;
 };
 
 const getFieldCustomValidator = (field: {
@@ -136,6 +164,13 @@ describe('heroBlogSchema postSource field', () => {
     ]);
     expect(field.initialValue).toBe(POST_SOURCE.PINNED);
   });
+
+  it('keeps postSource as a radio: required, and it drives the post field', () => {
+    const field = getField('postSource');
+
+    expect(getLayout(field)).toBe('radio');
+    expect(wasRequiredCalled(field)).toBe(true);
+  });
 });
 
 describe('heroBlogSchema post field', () => {
@@ -204,6 +239,32 @@ describe('heroBlogSchema imageSource field', () => {
       HERO_IMAGE_SOURCE.NONE,
     ]);
     expect(field.initialValue).toBe(HERO_IMAGE_SOURCE.POST);
+  });
+
+  it('keeps imageSource as a radio: required, and it drives the image field', () => {
+    const field = getField('imageSource');
+
+    expect(getLayout(field)).toBe('radio');
+    expect(wasRequiredCalled(field)).toBe(true);
+  });
+});
+
+describe('heroBlogSchema primaryActionAppearance field', () => {
+  it('offers Contained and Inline, defaulting to Contained', () => {
+    const field = getField('primaryActionAppearance');
+
+    expect(getOptionValues(field)).toEqual([
+      CTA_ACTION_APPEARANCE.CONTAINED,
+      CTA_ACTION_APPEARANCE.INLINE,
+    ]);
+    expect(field.initialValue).toBe(CTA_ACTION_APPEARANCE.CONTAINED);
+  });
+
+  it('converts to a dropdown: optional, no field depends on it', () => {
+    const field = getField('primaryActionAppearance');
+
+    expect(getLayout(field)).toBe('dropdown');
+    expect(field.validation).toBeUndefined();
   });
 });
 
