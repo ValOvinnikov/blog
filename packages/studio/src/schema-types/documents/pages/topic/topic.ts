@@ -51,56 +51,6 @@ const validateUniqueTopicReference = async (
     : true;
 };
 
-const HERO_OR_HEADING_ERROR = 'Add a hero or a heading';
-const HERO_HIDES_HEADING_WARNING = 'The hero hides the heading';
-
-type TTopicPageDocument = {
-  hero?: { _ref?: string };
-  headingBlock?: { heading?: string };
-  topic?: { _ref?: string };
-};
-
-const asTopicPageDocument = (
-  document: SanityDocument | undefined,
-): TTopicPageDocument | undefined => document as TTopicPageDocument | undefined;
-
-const hasHero = (document: SanityDocument | undefined): boolean =>
-  Boolean(asTopicPageDocument(document)?.hero?._ref);
-
-const hasHeading = (document: SanityDocument | undefined): boolean =>
-  Boolean(asTopicPageDocument(document)?.headingBlock?.heading);
-
-/**
- * The referenced topic's own title satisfies the hero-or-heading
- * requirement — a Topic Page can render its h1 from the topic alone, so
- * only a page with neither a hero, a heading, nor a resolvable topic title
- * errors.
- */
-const validateTopicHeroOrHeading = async (
-  document: SanityDocument | undefined,
-  context: ValidationContext,
-): Promise<string | true> => {
-  if (hasHero(document) || hasHeading(document)) return true;
-
-  const topicRef = asTopicPageDocument(document)?.topic?._ref;
-
-  if (!topicRef) return HERO_OR_HEADING_ERROR;
-
-  const client = getDraftsClient(context);
-
-  const topicTitle = await client.fetch<string | null>(
-    `*[_id == $id][0].title`,
-    { id: topicRef },
-  );
-
-  return topicTitle ? true : HERO_OR_HEADING_ERROR;
-};
-
-const validateHeroHidesHeading = (
-  document: SanityDocument | undefined,
-): string | true =>
-  hasHero(document) && hasHeading(document) ? HERO_HIDES_HEADING_WARNING : true;
-
 const MULTIPLE_POST_LIST_ERROR =
   'Only one Post List module is allowed per page.';
 const NO_POST_LIST_WARNING =
@@ -129,8 +79,6 @@ export const pageTopicSchema = defineType({
   type: 'document',
   icon: Tags,
   validation: (rule) => [
-    rule.custom(validateTopicHeroOrHeading),
-    rule.custom(validateHeroHidesHeading).warning(),
     rule.custom(validateSinglePostListModule),
     rule.custom(validateHasPostListModule).warning(),
   ],
@@ -154,8 +102,9 @@ export const pageTopicSchema = defineType({
         rule.required().custom(validateUniqueTopicReference),
     }),
     headingBlockField({
+      requireHeading: true,
       description:
-        'The page heading (h1) and its optional supporting line. Not shown when a hero is set.',
+        "The page heading, shown as the page's H1. Hidden when a hero is set — the hero's heading becomes the H1 instead. Still required, so the page keeps a heading if the hero is ever removed.",
     }),
     heroField(),
     defineModulesField({

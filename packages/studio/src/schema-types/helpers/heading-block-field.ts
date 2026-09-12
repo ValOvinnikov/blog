@@ -23,8 +23,7 @@ export const headingBlockField = (
     title: 'Heading Block',
     type: headingBlockSchema.name,
     description:
-      options.description ??
-      'Optional heading and supporting text shown above this module.',
+      options.description ?? 'The section heading shown above this module.',
     validation: options.requireHeading
       ? (rule) =>
           rule.custom((value: THeadingBlockValue | undefined) =>

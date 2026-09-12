@@ -16,7 +16,7 @@ export const postListSchema = defineType({
   fields: [
     titleField(),
     brandVariantField({ list: FULL_BRAND_VARIANT_LIST }),
-    headingBlockField(),
+    headingBlockField({ requireHeading: true }),
     showImagesField(),
     ...defineAlignmentFields([]),
     defineField({

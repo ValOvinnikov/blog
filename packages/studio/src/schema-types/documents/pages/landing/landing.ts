@@ -6,7 +6,6 @@ import { heroField } from '@blog/studio/schema-types/helpers/hero-field';
 import { seoField } from '@blog/studio/schema-types/helpers/seo-field';
 import { slugField } from '@blog/studio/schema-types/helpers/slug-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
-import { validateHeroOrHeading } from '@blog/studio/schema-types/helpers/validate-hero-or-heading';
 import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/helpers/validate-single-blank-heading-per-type';
 import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/helpers/validate-taxonomy-list-has-taxonomy';
 import { contentSchema } from '@blog/studio/schema-types/modules/module-content';
@@ -25,7 +24,6 @@ export const landingSchema = defineType({
   title: 'Landing Page',
   type: 'document',
   icon: FileText,
-  validation: validateHeroOrHeading(),
   preview: {
     select: {
       title: 'title',
@@ -50,8 +48,9 @@ export const landingSchema = defineType({
       },
     }),
     headingBlockField({
+      requireHeading: true,
       description:
-        'The page heading (h1) and its optional supporting line. Not shown when a hero is set.',
+        "The page heading, shown as the page's H1. Hidden when a hero is set — the hero's heading becomes the H1 instead. Still required, so the page keeps a heading if the hero is ever removed.",
     }),
     heroField(),
     defineModulesField({

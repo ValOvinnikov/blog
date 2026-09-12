@@ -15,25 +15,6 @@ type TArrayFieldDefinition = {
   of?: Array<{ name?: string }>;
 };
 
-type TDocumentCustomFn = (document: Record<string, unknown>) => string | true;
-
-type TDocumentMockRule = {
-  level: 'error' | 'warning';
-  fn?: TDocumentCustomFn;
-  custom: (fn: TDocumentCustomFn) => TDocumentMockRule;
-  warning: () => TDocumentMockRule;
-};
-
-const createDocumentMockRule = (
-  level: TDocumentMockRule['level'] = 'error',
-  fn?: TDocumentCustomFn,
-): TDocumentMockRule => ({
-  level,
-  fn,
-  custom: (nextFn) => createDocumentMockRule('error', nextFn),
-  warning: () => createDocumentMockRule('warning', fn),
-});
-
 const getModulesCustomValidators = (): TModulesCustomFn[] => {
   const modulesField = homePageSchema.fields?.find(
     (field) => field.name === 'modules',
@@ -150,39 +131,22 @@ describe('homePageSchema hero field', () => {
 });
 
 describe('homePageSchema document validation', () => {
-  const buildDocumentRules = (): TDocumentMockRule[] => {
-    if (!homePageSchema.validation) {
-      throw new Error('Expected homePageSchema to define a validation rule.');
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    return (homePageSchema.validation as any)(
-      createDocumentMockRule(),
-    ) as TDocumentMockRule[];
-  };
-
-  it('errors when neither hero nor headingBlock.heading is set', () => {
-    const [requiredRule] = buildDocumentRules();
-
-    expect(requiredRule?.fn?.({})).toBe('Add a hero or a heading');
+  it('defines no document-level validation — heading requiredness lives on the field', () => {
+    expect(homePageSchema.validation).toBeUndefined();
   });
+});
 
-  it('warns when both hero and headingBlock.heading are set', () => {
-    const [, notBothRule] = buildDocumentRules();
+describe('homePageSchema headingBlock field', () => {
+  it('is required and states that a hero hides it', () => {
+    const headingBlockFieldDefinition = homePageSchema.fields?.find(
+      (field) => field.name === 'headingBlock',
+    ) as
+      { type?: string; description?: string; validation?: unknown } | undefined;
 
-    expect(
-      notBothRule?.fn?.({
-        hero: { _ref: 'hero-1' },
-        headingBlock: { heading: 'Welcome' },
-      }),
-    ).toBe('The hero hides the heading');
-  });
-
-  it('passes when exactly one of hero or headingBlock.heading is set', () => {
-    const [requiredRule, notBothRule] = buildDocumentRules();
-    const document = { hero: { _ref: 'hero-1' } };
-
-    expect(requiredRule?.fn?.(document)).toBe(true);
-    expect(notBothRule?.fn?.(document)).toBe(true);
+    expect(headingBlockFieldDefinition?.type).toBe('headingBlock');
+    expect(headingBlockFieldDefinition?.description).toBe(
+      "The page heading, shown as the page's H1. Hidden when a hero is set — the hero's heading becomes the H1 instead. Still required, so the page keeps a heading if the hero is ever removed.",
+    );
+    expect(headingBlockFieldDefinition?.validation).toBeDefined();
   });
 });

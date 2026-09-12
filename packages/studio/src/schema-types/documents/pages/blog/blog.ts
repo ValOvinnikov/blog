@@ -3,7 +3,6 @@ import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-blo
 import { heroField } from '@blog/studio/schema-types/helpers/hero-field';
 import { seoField } from '@blog/studio/schema-types/helpers/seo-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
-import { validateHeroOrHeading } from '@blog/studio/schema-types/helpers/validate-hero-or-heading';
 import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/helpers/validate-single-blank-heading-per-type';
 import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
@@ -47,7 +46,6 @@ export const blogPageSchema = defineType({
   type: 'document',
   icon: Newspaper,
   validation: (rule) => [
-    ...validateHeroOrHeading()(rule),
     rule.custom(validatePostListModuleCount),
     rule.custom(validatePostListModulePresent).warning(),
   ],
@@ -65,8 +63,9 @@ export const blogPageSchema = defineType({
   fields: [
     titleField(),
     headingBlockField({
+      requireHeading: true,
       description:
-        'The page heading (h1) and its optional supporting line. Not shown when a hero is set.',
+        "The page heading, shown as the page's H1. Hidden when a hero is set — the hero's heading becomes the H1 instead. Still required, so the page keeps a heading if the hero is ever removed.",
     }),
     heroField(),
     defineModulesField({

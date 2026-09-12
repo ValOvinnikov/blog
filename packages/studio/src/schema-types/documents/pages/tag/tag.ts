@@ -51,54 +51,6 @@ const validateUniqueTagReference = async (
     : true;
 };
 
-const HERO_OR_HEADING_ERROR = 'Add a hero or a heading';
-const HERO_HIDES_HEADING_WARNING = 'The hero hides the heading';
-
-type TTagPageDocument = {
-  hero?: { _ref?: string };
-  headingBlock?: { heading?: string };
-  tag?: { _ref?: string };
-};
-
-const asTagPageDocument = (
-  document: SanityDocument | undefined,
-): TTagPageDocument | undefined => document as TTagPageDocument | undefined;
-
-const hasHero = (document: SanityDocument | undefined): boolean =>
-  Boolean(asTagPageDocument(document)?.hero?._ref);
-
-const hasHeading = (document: SanityDocument | undefined): boolean =>
-  Boolean(asTagPageDocument(document)?.headingBlock?.heading);
-
-/**
- * The referenced tag's own title satisfies the hero-or-heading requirement
- * — a Tag Page can render its h1 from the tag alone, so only a page with
- * neither a hero, a heading, nor a resolvable tag title errors.
- */
-const validateTagHeroOrHeading = async (
-  document: SanityDocument | undefined,
-  context: ValidationContext,
-): Promise<string | true> => {
-  if (hasHero(document) || hasHeading(document)) return true;
-
-  const tagRef = asTagPageDocument(document)?.tag?._ref;
-
-  if (!tagRef) return HERO_OR_HEADING_ERROR;
-
-  const client = getDraftsClient(context);
-
-  const tagTitle = await client.fetch<string | null>(`*[_id == $id][0].title`, {
-    id: tagRef,
-  });
-
-  return tagTitle ? true : HERO_OR_HEADING_ERROR;
-};
-
-const validateHeroHidesHeading = (
-  document: SanityDocument | undefined,
-): string | true =>
-  hasHero(document) && hasHeading(document) ? HERO_HIDES_HEADING_WARNING : true;
-
 const MULTIPLE_POST_LIST_ERROR =
   'Only one Post List module is allowed per page.';
 const NO_POST_LIST_WARNING =
@@ -161,8 +113,6 @@ export const pageTagSchema = defineType({
   type: 'document',
   icon: Tag,
   validation: (rule) => [
-    rule.custom(validateTagHeroOrHeading),
-    rule.custom(validateHeroHidesHeading).warning(),
     rule.custom(validateSinglePostListModule),
     rule.custom(validateHasPostListModule).warning(),
     rule.custom(validateUniquePostListReference),
@@ -186,8 +136,9 @@ export const pageTagSchema = defineType({
       validation: (rule) => rule.required().custom(validateUniqueTagReference),
     }),
     headingBlockField({
+      requireHeading: true,
       description:
-        'The page heading (h1) and its optional supporting line. Not shown when a hero is set.',
+        "The page heading, shown as the page's H1. Hidden when a hero is set — the hero's heading becomes the H1 instead. Still required, so the page keeps a heading if the hero is ever removed.",
     }),
     heroField(),
     defineModulesField({

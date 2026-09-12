@@ -61,10 +61,11 @@ describe('blogPageSchema field order', () => {
 });
 
 describe('blogPageSchema headingBlock field', () => {
-  it('describes the page heading and that a hero hides it', () => {
+  it('is required, and describes the page heading and that a hero hides it', () => {
     const headingBlockField = getField('headingBlock');
 
     expect(headingBlockField?.type).toBe('headingBlock');
+    expect(headingBlockField?.validation).toBeDefined();
   });
 });
 
@@ -172,33 +173,6 @@ describe('blogPageSchema document validation', () => {
     ) as TDocumentMockRule[];
   };
 
-  describe('hero-or-heading', () => {
-    it('errors when neither hero nor headingBlock.heading is set', () => {
-      const [requiredRule] = buildDocumentRules();
-
-      expect(requiredRule?.fn?.({})).toBe('Add a hero or a heading');
-    });
-
-    it('warns when both hero and headingBlock.heading are set', () => {
-      const [, notBothRule] = buildDocumentRules();
-
-      expect(
-        notBothRule?.fn?.({
-          hero: { _ref: 'hero-1' },
-          headingBlock: { heading: 'Latest posts' },
-        }),
-      ).toBe('The hero hides the heading');
-    });
-
-    it('passes when exactly one of hero or headingBlock.heading is set', () => {
-      const [requiredRule, notBothRule] = buildDocumentRules();
-      const document = { hero: { _ref: 'hero-1' } };
-
-      expect(requiredRule?.fn?.(document)).toBe(true);
-      expect(notBothRule?.fn?.(document)).toBe(true);
-    });
-  });
-
   describe('post list module count', () => {
     const postListModule = (ref: string) => ({
       _type: 'module_postList',
@@ -206,7 +180,7 @@ describe('blogPageSchema document validation', () => {
     });
 
     it('errors when more than one module_postList is referenced', () => {
-      const [, , countRule] = buildDocumentRules();
+      const [countRule] = buildDocumentRules();
 
       expect(
         countRule?.fn?.({
@@ -216,7 +190,7 @@ describe('blogPageSchema document validation', () => {
     });
 
     it('warns when no module_postList is referenced', () => {
-      const [, , , presentRule] = buildDocumentRules();
+      const [, presentRule] = buildDocumentRules();
 
       expect(presentRule?.level).toBe('warning');
       expect(presentRule?.fn?.({ modules: [] })).toBe(
@@ -228,7 +202,7 @@ describe('blogPageSchema document validation', () => {
     });
 
     it('passes when exactly one module_postList is referenced', () => {
-      const [, , countRule, presentRule] = buildDocumentRules();
+      const [countRule, presentRule] = buildDocumentRules();
       const document = { modules: [postListModule('list-1')] };
 
       expect(countRule?.fn?.(document)).toBe(true);

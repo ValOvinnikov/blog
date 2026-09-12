@@ -21,6 +21,7 @@ type TArrayFieldDefinition = {
 type TFieldDefinition = {
   name?: string;
   type?: string;
+  description?: string;
   readOnly?: boolean;
   deprecated?: { reason?: string };
   validation?: unknown;
@@ -114,6 +115,18 @@ describe('topicIndexPageSchema hero field', () => {
   });
 });
 
+describe('topicIndexPageSchema headingBlock field', () => {
+  it('is required and states that a hero hides it', () => {
+    const headingBlockField = getField('headingBlock');
+
+    expect(headingBlockField?.type).toBe('headingBlock');
+    expect(headingBlockField?.description).toBe(
+      "The page heading, shown as the page's H1. Hidden when a hero is set — the hero's heading becomes the H1 instead. Still required, so the page keeps a heading if the hero is ever removed.",
+    );
+    expect(headingBlockField?.validation).toBeDefined();
+  });
+});
+
 describe('topicIndexPageSchema modules allow-list', () => {
   it('permits taxonomyList, postLatest, cta and newsletter modules', () => {
     const modulesField = getField('modules') as
@@ -167,38 +180,19 @@ describe('topicIndexPageSchema modules validateCustom chaining', () => {
 });
 
 describe('topicIndexPageSchema document validation', () => {
-  it('registers hero-or-heading, taxonomy-list cardinality, and taxonomy-kind rules', () => {
+  it('registers taxonomy-list cardinality and taxonomy-kind rules', () => {
     const rules = buildDocumentRules();
 
-    expect(rules).toHaveLength(5);
+    expect(rules).toHaveLength(3);
     expect(rules.map((rule) => rule.level)).toEqual([
-      'error',
-      'warning',
       'error',
       'warning',
       'error',
     ]);
   });
 
-  it('errors when neither hero nor headingBlock.heading is set', () => {
-    const [requiredRule] = buildDocumentRules();
-
-    expect(requiredRule?.fn?.({})).toBe('Add a hero or a heading');
-  });
-
-  it('warns when both hero and headingBlock.heading are set', () => {
-    const [, heroNotBothRule] = buildDocumentRules();
-
-    expect(
-      heroNotBothRule?.fn?.({
-        hero: { _ref: 'hero-1' },
-        headingBlock: { heading: 'Welcome' },
-      }),
-    ).toBe('The hero hides the heading');
-  });
-
   it('errors when more than one module_taxonomyList is referenced', () => {
-    const [, , singleTaxonomyListRule] = buildDocumentRules();
+    const [singleTaxonomyListRule] = buildDocumentRules();
 
     expect(
       singleTaxonomyListRule?.fn?.({
@@ -211,8 +205,7 @@ describe('topicIndexPageSchema document validation', () => {
   });
 
   it('passes cardinality when exactly one module_taxonomyList is referenced', () => {
-    const [, , singleTaxonomyListRule, hasTaxonomyListRule] =
-      buildDocumentRules();
+    const [singleTaxonomyListRule, hasTaxonomyListRule] = buildDocumentRules();
     const document = {
       modules: [{ _type: taxonomyListSchema.name, _ref: 'list-1' }],
     };
@@ -222,7 +215,7 @@ describe('topicIndexPageSchema document validation', () => {
   });
 
   it('warns when no module_taxonomyList is referenced', () => {
-    const [, , , hasTaxonomyListRule] = buildDocumentRules();
+    const [, hasTaxonomyListRule] = buildDocumentRules();
 
     expect(hasTaxonomyListRule?.fn?.({ modules: [] })).toBe(
       'This page has no Taxonomy List module — the topic list will be empty until one is added.',
@@ -233,7 +226,7 @@ describe('topicIndexPageSchema document validation', () => {
 describe('topicIndexPageSchema taxonomy-kind rule', () => {
   const getTaxonomyKindRuleFn = () => {
     const rules = buildDocumentRules();
-    return rules[4]?.fn;
+    return rules[2]?.fn;
   };
 
   it('passes when the modules[] taxonomy list matches the page kind', async () => {
