@@ -293,13 +293,6 @@ export type Page_landingReference = {
   [internalGroqTypeReferenceTo]?: 'page_landing';
 };
 
-export type Page_blogReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_blog';
-};
-
 export type Page_postIndexReference = {
   _ref: string;
   _type: 'reference';
@@ -316,7 +309,6 @@ export type Link = {
     | Page_postReference
     | Blog_topicReference
     | Page_landingReference
-    | Page_blogReference
     | Page_postIndexReference;
   url?: string;
   openInNewTab?: boolean;
@@ -675,35 +667,6 @@ export type Module_postFeaturedReference = {
 export type Page_postIndex = {
   _id: string;
   _type: 'page_postIndex';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  headingBlock?: HeadingBlock;
-  hero?:
-    | Module_heroReference
-    | Module_heroBlogReference
-    | Module_heroStatementReference;
-  modules?: Array<
-    | ({
-        _key: string;
-      } & Module_postListReference)
-    | ({
-        _key: string;
-      } & Module_ctaReference)
-    | ({
-        _key: string;
-      } & Module_newsletterReference)
-    | ({
-        _key: string;
-      } & Module_postFeaturedReference)
-  >;
-  seo?: Seo;
-};
-
-export type Page_blog = {
-  _id: string;
-  _type: 'page_blog';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -1122,7 +1085,6 @@ export type AllSanitySchemaTypes =
   | CtaAction
   | Blog_topicReference
   | Page_landingReference
-  | Page_blogReference
   | Page_postIndexReference
   | Link
   | SocialLink
@@ -1153,7 +1115,6 @@ export type AllSanitySchemaTypes =
   | Module_taxonomyList
   | Module_postFeaturedReference
   | Page_postIndex
-  | Page_blog
   | Module_contentReference
   | Page_home
   | Blog_tag
