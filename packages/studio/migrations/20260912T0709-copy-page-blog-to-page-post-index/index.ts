@@ -45,10 +45,11 @@ import {
   collectRefRewritePatches,
 } from '../20260908T2227-absorb-blog-post-into-page-post/rewrite-refs';
 
-import { PAGE_BLOG_TO_POST_INDEX_ID_MAP } from './ids';
-
-const PAGE_BLOG_TYPE = 'page_blog';
-const PAGE_POST_INDEX_TYPE = 'page_postIndex';
+import {
+  PAGE_BLOG_TO_POST_INDEX_ID_MAP,
+  PAGE_BLOG_TYPE,
+  PAGE_POST_INDEX_TYPE,
+} from './ids';
 
 type TRawDocument = { _id: string; _type: string; [key: string]: unknown };
 
