@@ -91,22 +91,22 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
     getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
-  describe('modules[] placement (no slot)', () => {
+  describe('modules[] placement', () => {
     const setup = customRenderAsync(TaxonomyListModule, {
       id: 'taxonomy-list-1',
       locale: 'en',
       tenant: 'tenant-1',
     });
 
-    it('calls getTaxonomyList with no fallback taxonomy', async () => {
+    it('resolves the tenant Sanity context from the tenant slug and forwards it to getTaxonomyList', async () => {
       getTaxonomyListMock.mockResolvedValue(topicsResult());
 
       await setup();
 
+      expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
       expect(getTaxonomyListMock).toHaveBeenCalledWith(
         'taxonomy-list-1',
         DEFAULT_TENANT_SANITY_CONTEXT,
-        undefined,
       );
     });
 
@@ -123,7 +123,7 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
       ).toBeInTheDocument();
     });
 
-    it('defaults titleId and dataTestId from the module id when no slot is given', async () => {
+    it('derives titleId and dataTestId from the module id', async () => {
       getTaxonomyListMock.mockResolvedValue(topicsResult([entry]));
 
       await setup();
@@ -173,16 +173,21 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
       expect(within(section).getByText('No tags yet.')).toBeVisible();
     });
 
-    it('renders nothing when the fetch fails, without calling notFound()', async () => {
+    it('logs and calls notFound() when the fetch fails', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       getTaxonomyListMock.mockResolvedValue({
         ok: false,
         error: new Error('boom'),
       });
 
-      const { container } = await setup();
+      await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
-      expect(container).toBeEmptyDOMElement();
-      expect(vi.mocked(notFound)).not.toHaveBeenCalled();
+      expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('taxonomy_list_module.fetch_failed'),
+      );
+
+      errorSpy.mockRestore();
     });
 
     it('maps latestPosts to post-detail links, newest first, when showLatestPosts is on', async () => {
@@ -222,88 +227,6 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
       expect(
         screen.queryByRole('list', { name: 'Latest in Engineering' }),
       ).not.toBeInTheDocument();
-    });
-  });
-
-  describe('index-page slot', () => {
-    const setup = customRenderAsync(TaxonomyListModule, {
-      id: 'topic-list-1',
-      locale: 'en',
-      tenant: 'tenant-1',
-      slot: {
-        fallbackTaxonomy: TAXONOMY_KIND.TOPICS,
-        titleId: 'topic-list-title',
-        dataTestId: 'taxonomy-list-module-topic-list-1',
-        headingLevel: 2 as const,
-        accessibleTitle: 'Topics',
-        emptyMessage: 'No topics yet.',
-      },
-    });
-
-    it('calls getTaxonomyList with the slot fallback taxonomy', async () => {
-      getTaxonomyListMock.mockResolvedValue(topicsResult());
-
-      await setup();
-
-      expect(getTaxonomyListMock).toHaveBeenCalledWith(
-        'topic-list-1',
-        DEFAULT_TENANT_SANITY_CONTEXT,
-        TAXONOMY_KIND.TOPICS,
-      );
-    });
-
-    it('logs and calls notFound() when the fetch fails', async () => {
-      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      getTaxonomyListMock.mockResolvedValue({
-        ok: false,
-        error: new Error('boom'),
-      });
-
-      await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
-
-      expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-      expect(errorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('taxonomy_list_module.fetch_failed'),
-      );
-
-      errorSpy.mockRestore();
-    });
-
-    it('renders the given emptyMessage when entries is empty', async () => {
-      getTaxonomyListMock.mockResolvedValue(topicsResult());
-
-      await setup();
-
-      expect(screen.getByText('No topics yet.')).toBeVisible();
-    });
-
-    it('renders each entry linking through the resolved taxonomy href', async () => {
-      getTaxonomyListMock.mockResolvedValue(topicsResult([entry]));
-
-      await setup();
-
-      const link = screen.getByRole('link', { name: /Engineering/ });
-      expect(link).toHaveAttribute('href', '/topics/engineering');
-      expect(screen.getByText('5 posts')).toBeVisible();
-    });
-
-    it('forwards the resolved tenant Sanity context to getTaxonomyList', async () => {
-      const tenant = {
-        projectId: 'tenant-project',
-        dataset: 'production',
-        token: 'tenant-token',
-      };
-      getTenantSanityContextMock.mockResolvedValue(tenant);
-      getTaxonomyListMock.mockResolvedValue(topicsResult());
-
-      await setup();
-
-      expect(getTaxonomyListMock).toHaveBeenCalledWith(
-        'topic-list-1',
-        tenant,
-        TAXONOMY_KIND.TOPICS,
-      );
-      expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
     });
   });
 });

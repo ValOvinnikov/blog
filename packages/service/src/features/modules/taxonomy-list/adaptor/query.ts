@@ -1,4 +1,4 @@
-import { TAXONOMY_KIND, TAXONOMY_SORT, type TTaxonomyKind } from '@blog/config';
+import { TAXONOMY_KIND, TAXONOMY_SORT } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
@@ -12,11 +12,9 @@ import { tagFragment } from '@blog/service/shared/fragments/tag';
 import { topicFragment } from '@blog/service/shared/fragments/topic';
 import { z } from 'zod';
 
-const RESOLVED_TAXONOMY_EXPRESSION = 'coalesce(taxonomy, $fallbackTaxonomy)';
-
 const LATEST_POSTS_LIMIT = 2;
 
-const resolvedTaxonomyParser = z
+const taxonomyParser = z
   .enum([TAXONOMY_KIND.TOPICS, TAXONOMY_KIND.TAGS])
   .nullable();
 
@@ -59,7 +57,7 @@ const tagEntriesQuery = q.star
   }));
 
 export const taxonomyListModuleQuery = q
-  .parameters<{ id: string; fallbackTaxonomy: TTaxonomyKind | null }>()
+  .parameters<{ id: string }>()
   .star.filterByType('module_taxonomyList')
   .filterRaw('_id == $id')
   .slice(0)
@@ -71,7 +69,7 @@ export const taxonomyListModuleQuery = q
       .nullable(true),
     layout: sub.field('layout').project(layoutFragment).nullable(true),
     contentAlignment: sub.field('contentAlignment').nullable(true),
-    taxonomy: sub.raw(RESOLVED_TAXONOMY_EXPRESSION, resolvedTaxonomyParser),
+    taxonomy: sub.raw('taxonomy', taxonomyParser),
     sortOrder: sub.raw(
       `coalesce(sortOrder, "${TAXONOMY_SORT.ALPHABETICAL}")`,
       resolvedSortOrderParser,
@@ -82,10 +80,8 @@ export const taxonomyListModuleQuery = q
       showLatestPostsParser,
     ),
     entries: sub.select({
-      [`${RESOLVED_TAXONOMY_EXPRESSION} == "${TAXONOMY_KIND.TOPICS}"`]:
-        topicEntriesQuery,
-      [`${RESOLVED_TAXONOMY_EXPRESSION} == "${TAXONOMY_KIND.TAGS}"`]:
-        tagEntriesQuery,
+      [`taxonomy == "${TAXONOMY_KIND.TOPICS}"`]: topicEntriesQuery,
+      [`taxonomy == "${TAXONOMY_KIND.TAGS}"`]: tagEntriesQuery,
     }),
   }))
   .notNull();

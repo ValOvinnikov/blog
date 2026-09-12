@@ -1,6 +1,5 @@
-import { routes, TAXONOMY_KIND, type TTaxonomyKind } from '@blog/config';
+import { routes, TAXONOMY_KIND } from '@blog/config';
 import { service } from '@blog/service';
-import type { THeadingLevel } from '@blog/ui/lib/react';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
@@ -11,20 +10,10 @@ import {
   type ITaxonomyListModuleItem,
 } from './taxonomy-list-module-view';
 
-interface ITaxonomyListModuleSlot {
-  fallbackTaxonomy: TTaxonomyKind;
-  titleId: string;
-  dataTestId: string;
-  headingLevel: THeadingLevel;
-  accessibleTitle: string;
-  emptyMessage: string;
-}
-
 export interface ITaxonomyListModuleProps {
   id: string;
   locale?: string;
   tenant: string;
-  slot?: ITaxonomyListModuleSlot;
 }
 
 /**
@@ -35,18 +24,14 @@ export interface ITaxonomyListModuleProps {
 export const TaxonomyListModule = async ({
   id,
   tenant,
-  slot,
 }: ITaxonomyListModuleProps) => {
   const tenantContext = await getTenantSanityContext(tenant);
   const result = await service.modules.taxonomyList.v1.getTaxonomyList(
     id,
     tenantContext,
-    slot?.fallbackTaxonomy,
   );
 
   if (!result.ok) {
-    if (!slot) return null;
-
     logger.error('taxonomy_list_module.fetch_failed', {
       id,
       error: result.error,
@@ -90,11 +75,11 @@ export const TaxonomyListModule = async ({
       layout={layout}
       contentAlignment={contentAlignment}
       showLatestPosts={showLatestPosts}
-      titleId={slot?.titleId ?? `taxonomy-list-${id}`}
-      dataTestId={slot?.dataTestId ?? `taxonomy-list-module-${id}`}
-      headingLevel={slot?.headingLevel ?? 2}
-      accessibleTitle={slot?.accessibleTitle ?? t('fallbackHeading')}
-      emptyMessage={slot?.emptyMessage ?? t('empty')}
+      titleId={`taxonomy-list-${id}`}
+      dataTestId={`taxonomy-list-module-${id}`}
+      headingLevel={2}
+      accessibleTitle={t('fallbackHeading')}
+      emptyMessage={t('empty')}
     />
   );
 };
