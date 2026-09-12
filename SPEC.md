@@ -29,7 +29,7 @@ frontend if a consumer is out of date.
 
 | Surface | Route                          | Status                                                                                                                                                                           |
 | ------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Home    | `/`                            | ✅ Built — modules-as-documents (optional hero **or** `headingBlock` heading, plus `modules[]`)                                                                                  |
+| Home    | `/`                            | ✅ Built — modules-as-documents (optional hero, required `headingBlock` heading, plus `modules[]`)                                                                               |
 | Blog    | `/blog` + `/blog/page/N`       | ✅ Built — paginated index (#75)                                                                                                                                                 |
 | Post    | `/blog/[slug]`                 | ✅ Built — post detail page + JSON-LD (#76)                                                                                                                                      |
 | Topic   | `/topics/[slug]` (+ `/page/N`) | ✅ Built — unpaginated + paginated routes (#91/#588/#589); renamed from `category` in #1812; CMS-authored via the `page_topic` document since #1915                              |
