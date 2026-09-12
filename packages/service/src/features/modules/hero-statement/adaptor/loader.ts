@@ -23,6 +23,7 @@ export async function getHeroStatement(
         `module:${id}`,
         'page_landing',
         'page_blog',
+        'page_postIndex',
         'page_post',
         'topic',
       ],

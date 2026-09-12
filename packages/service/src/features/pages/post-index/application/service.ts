@@ -1,5 +1,5 @@
-import { getIndexPage } from '@blog/service/features/pages/blog/adaptor/index-page/loader';
-import { getIndexPageParams } from '@blog/service/features/pages/blog/adaptor/index-page-params/loader';
+import { getIndexPage } from '@blog/service/features/pages/post-index/adaptor/index-page/loader';
+import { getIndexPageParams } from '@blog/service/features/pages/post-index/adaptor/index-page-params/loader';
 import type { TTenantSanityContext } from '@blog/service/sanity/query';
 import { safeAsync } from '@blog/utils';
 
