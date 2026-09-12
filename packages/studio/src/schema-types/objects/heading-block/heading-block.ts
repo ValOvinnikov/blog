@@ -15,6 +15,7 @@ export const headingBlockSchema = defineType({
       name: 'supportingText',
       title: 'Supporting Text',
       type: 'text',
+      rows: 3,
     }),
   ],
 });

@@ -4,7 +4,7 @@ import { moduleFragment } from '@blog/service/shared/fragments/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo';
 
 export const blogPageQuery = q.star
-  .filterByType('page_blog')
+  .filterByType('page_postIndex')
   .slice(0)
   .project((sub) => ({
     headingBlock: sub
@@ -22,7 +22,7 @@ export const blogPageQuery = q.star
       .nullable(true),
     seo: sub.field('seo').project(seoFragment).notNull(),
   }))
-  // Nullable, not `.notNull()`: no `page_blog` document is an ordinary
+  // Nullable, not `.notNull()`: no `page_postIndex` document is an ordinary
   // not-found, not a parse failure — the loader turns `null` into
   // `undefined`.
   .nullable(true);

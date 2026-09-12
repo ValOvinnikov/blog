@@ -56,11 +56,13 @@ export const linkSchema = defineType({
       to: [
         { type: PAGE_POST_TYPE },
         { type: topicSchema.name },
-        // Literal (not `landingPageSchema.name` / `blogPageSchema.name`):
-        // importing landing.ts or blog-page.ts here closes a circular import
-        // (landing/blog-page → module-cta → link) — typegen fails otherwise.
+        // Literal (not `landingPageSchema.name` / `blogPageSchema.name` /
+        // `postIndexPageSchema.name`): importing landing.ts, blog.ts or
+        // post-index.ts here closes a circular import
+        // (landing/blog/post-index → module-cta → link) — typegen fails otherwise.
         { type: 'page_landing' },
         { type: 'page_blog' },
+        { type: 'page_postIndex' },
       ],
       hidden: ({ parent }) => !isLinkType(parent, LINK_TYPE.INTERNAL),
       validation: (rule) =>

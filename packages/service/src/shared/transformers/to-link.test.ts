@@ -99,6 +99,17 @@ describe('toLink', () => {
     expect(result?.href).toBe('/blog');
   });
 
+  it('resolves an internal page_postIndex reference to the blog index — no slug required', () => {
+    const result = toLink(
+      makeRawLink({
+        linkType: LINK_TYPE.INTERNAL,
+        internalReference: { _type: 'page_postIndex', slug: null },
+      }),
+    );
+
+    expect(result?.href).toBe('/blog');
+  });
+
   it('returns undefined when a slug-having internal reference is genuinely missing its slug', () => {
     const result = toLink(
       makeRawLink({

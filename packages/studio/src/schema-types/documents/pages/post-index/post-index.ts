@@ -13,16 +13,17 @@ import { defineType, type SanityDocument } from 'sanity';
 
 type TModuleReference = { _type?: string; _ref?: string };
 
-type TBlogPageDocument = {
+type TPostIndexPageDocument = {
   modules?: TModuleReference[];
 };
 
-const asBlogPageDocument = (
+const asPostIndexPageDocument = (
   document: SanityDocument | undefined,
-): TBlogPageDocument | undefined => document as TBlogPageDocument | undefined;
+): TPostIndexPageDocument | undefined =>
+  document as TPostIndexPageDocument | undefined;
 
 const countPostListModules = (document: SanityDocument | undefined): number =>
-  (asBlogPageDocument(document)?.modules ?? []).filter(
+  (asPostIndexPageDocument(document)?.modules ?? []).filter(
     (module) => module._type === postListSchema.name,
   ).length;
 
@@ -40,9 +41,9 @@ const validatePostListModulePresent = (
     ? 'Add a Post List module so this page can list posts.'
     : true;
 
-export const blogPageSchema = defineType({
-  name: 'page_blog',
-  title: 'Post Index Page (legacy)',
+export const postIndexPageSchema = defineType({
+  name: 'page_postIndex',
+  title: 'Post Index Page',
   type: 'document',
   icon: Newspaper,
   validation: (rule) => [
