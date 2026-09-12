@@ -88,11 +88,11 @@ describe('toLink', () => {
     expect(result?.href).toBe('/about');
   });
 
-  it('resolves an internal page_blog reference to the blog index — no slug required', () => {
+  it('resolves an internal page_postIndex reference to the blog index — no slug required', () => {
     const result = toLink(
       makeRawLink({
         linkType: LINK_TYPE.INTERNAL,
-        internalReference: { _type: 'page_blog', slug: null },
+        internalReference: { _type: 'page_postIndex', slug: null },
       }),
     );
 

@@ -6,7 +6,7 @@ const FIRST_POST_LIST_PAGE_SIZE_EXPRESSION =
   'modules[]->[_type == "module_postList"][0].pageSize';
 
 export const indexPageParamsQuery = q.star
-  .filterByType('page_blog')
+  .filterByType('page_postIndex')
   .slice(0)
   .project((page) => ({
     blogPosts: q.project((sub) => ({

@@ -16,7 +16,7 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
 const tenant = makeTenant();
 
 describe('getIndexPage', () => {
-  it('exposes the headingBlock from the page_blog singleton', async () => {
+  it('exposes the headingBlock from the page_postIndex singleton', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawBlogPage({
         headingBlock: makeRawOptionalHeadingBlock({
@@ -68,7 +68,7 @@ describe('getIndexPage', () => {
     ]);
   });
 
-  it('leaves hero undefined when page_blog.hero is unset', async () => {
+  it('leaves hero undefined when page_postIndex.hero is unset', async () => {
     mockRun.mockResolvedValueOnce(makeRawBlogPage({ hero: null }));
 
     const result = await getIndexPage(tenant);
@@ -77,7 +77,7 @@ describe('getIndexPage', () => {
     expect(result.hero).toBeUndefined();
   });
 
-  it('maps a set page_blog.hero to a hero slot', async () => {
+  it('maps a set page_postIndex.hero to a hero slot', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawBlogPage({ hero: { _id: 'hero-1', _type: 'module_hero' } }),
     );
@@ -88,7 +88,7 @@ describe('getIndexPage', () => {
     expect(result.hero).toEqual({ id: 'hero-1', type: 'module_hero' });
   });
 
-  it('rejects when page_blog.hero resolves to a non-hero module type', async () => {
+  it('rejects when page_postIndex.hero resolves to a non-hero module type', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawBlogPage({ hero: { _id: 'cta-1', _type: 'module_cta' as never } }),
     );
@@ -105,7 +105,7 @@ describe('getIndexPage', () => {
     expect(result.modules).toEqual([]);
   });
 
-  it('resolves undefined, rather than rejecting, when no page_blog document exists', async () => {
+  it('resolves undefined, rather than rejecting, when no page_postIndex document exists', async () => {
     mockRun.mockResolvedValueOnce(null);
 
     const result = await getIndexPage(tenant);
@@ -123,7 +123,7 @@ describe('getIndexPage', () => {
       expect.objectContaining({
         tenant,
         next: expect.objectContaining({
-          tags: ['t:tenant-a:page_blog'],
+          tags: ['t:tenant-a:page_postIndex'],
         }),
       }),
     );

@@ -14,10 +14,13 @@ export type TInternalReference = NonNullable<TRawLink['internalReference']>;
 // Keyed by the generated document `_type` union rather than a hand-typed
 // switch: renaming/removing one of these types in the schema (link.ts's
 // `to: [...]`) fails this object literal at compile time instead of leaving
-// a silently-dead case branch. `page_blog` is slug-less (a singleton), so
-// its builder ignores the slug argument entirely; the other three return
-// `undefined` when the slug is genuinely missing (bad data) rather than
-// building a broken href.
+// a silently-dead case branch. `page_blog` and `page_postIndex` are both
+// slug-less (singletons) and both resolve to the same `/blog` route — the
+// dataset carries either `_type` as an internal-link target during the
+// transition from the former to the latter, so both builders stay until
+// `page_blog` is retired from the schema. Their builders ignore the slug
+// argument entirely; the other three return `undefined` when the slug is
+// genuinely missing (bad data) rather than building a broken href.
 const INTERNAL_HREF_BUILDERS: Record<
   TInternalReference['_type'],
   (slug: string | null) => TMaybeUndefined<string>
@@ -26,6 +29,7 @@ const INTERNAL_HREF_BUILDERS: Record<
   blog_topic: (slug) => (slug ? routes.topic(slug) : undefined),
   page_landing: (slug) => (slug ? routes.landingPage(slug) : undefined),
   page_blog: () => routes.blogIndex(),
+  page_postIndex: () => routes.blogIndex(),
 };
 
 export function toInternalHref(
