@@ -186,7 +186,7 @@ describe('heroBlogSchema post field', () => {
 
 describe('heroBlogSchema copy fields', () => {
   it('eyebrow, heading and supportingText are plain optional fields', () => {
-    expect(getField('eyebrow').validation).toBeDefined();
+    expect(getField('eyebrow').validation).toBeUndefined();
     expect(getField('heading').validation).toBeDefined();
     expect('hidden' in getField('eyebrow')).toBe(false);
     expect('hidden' in getField('heading')).toBe(false);

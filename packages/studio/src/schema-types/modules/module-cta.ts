@@ -95,7 +95,6 @@ export const ctaSchema = defineType({
       title: 'Eyebrow',
       type: 'string',
       description: 'Optional kicker label shown above the heading.',
-      validation: (rule) => rule.max(40),
     }),
     headingBlockField({ requireHeading: true }),
     defineField({
