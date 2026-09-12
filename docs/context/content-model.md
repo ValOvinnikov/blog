@@ -34,7 +34,7 @@ type. `module_taxonomyList` renders both ways and so is in `MODULE_MAP`.
 - `module_hero` (`heroSchema`) — internal `title`, `featuredPost` (ref to
   `post`, warning-only — falls back to the newest featured post), four
   mode/custom field pairs (`heroEyebrow`, `heroTitle`, `heroSubtitle`,
-  `heroImage`) built via the `defineModeFieldPair` helper and driven by the
+  `heroImage`) built via the `modeFieldPair` helper and driven by the
   UPPERCASE `HERO_FIELD_MODE` const (`CUSTOM`/`NONE`/`POST_TOPIC`/
   `POST_TITLE`/`POST_EXCERPT`/`POST_IMAGE`), `primaryActionLabel`,
   `secondaryAction` (`link`).
@@ -74,28 +74,28 @@ Every module document gets a required internal `title` via the reusable
 `titleField` helper (§ below) so it's listable/previewable in Studio
 independent of its display fields, immediately followed by a **required**
 `brandVariant` field via the shared `brandVariantField()` helper
-(`schema-types/helpers/brand-variant-field.ts`) — stored values from
+(`schema-types/fields/brand-variant-field/brand-variant-field.ts`) — stored values from
 `@blog/config`'s `BRAND_VARIANT` const, `PRIMARY`/`SECONDARY` by default;
 `module_hero` passes the wider `BRAND_PRIMARY`/`PRIMARY`/`SECONDARY` option
 list. `module_cta`/`module_postList`/`module_newsletter` also get a
 `headingBlock` field via the shared `headingBlockField({ requireHeading?
-})` helper (`schema-types/helpers/heading-block-field.ts`) — see the
+})` helper (`schema-types/objects/heading-block/heading-block-field.ts`) — see the
 `headingBlock` object below. Every module document (incl. `module_hero`)
 also gets an optional `layout` field via the shared `layoutField`/
-`heroLayoutField` values (`schema-types/helpers/layout-field.ts`) — see the
+`heroLayoutField` values (`schema-types/objects/hero-layout/hero-layout-field.ts`) — see the
 `layout`/`heroLayout` objects below.
 
 **Page documents reference modules**
 
-- `page_home` (`homeSchema`, singleton) — `titleField` (internal Studio label;
+- `page_home` (`homePageSchema`, singleton) — `titleField` (internal Studio label;
   `preview.prepare` falls back to the generic "Unknown" when unset), `hero`
   (single **required**
   reference to a `module_hero`, kept
   separate from the module list — it always renders first), `modules` (array of
-  references via `defineModulesField({ allow: [postLatest, cta, newsletter] })`
+  references via `modulesField({ allow: [postLatest, cta, newsletter] })`
   — the teaser, not the archive), `seo`.
-- `page_landing` (`landingSchema`) — `title`, `slug` (source: title),
-  `modules` (array of references via `defineModulesField({ allow: [content,
+- `page_landing` (`landingPageSchema`) — `title`, `slug` (source: title),
+  `modules` (array of references via `modulesField({ allow: [content,
 cta] })`), `seo`.
 - `page_blog` (`blogPageSchema`, singleton) — the `/blog` index page config:
   `titleField` (internal Studio label; `preview.prepare` falls back to the
@@ -103,7 +103,7 @@ cta] })`), `seo`.
   (optional line under it), `postList` (singular reference to the
   `module_postList` that renders the archive — the module's own `pageSize`
   drives the pagination window), `modules` (array of references via
-  `defineModulesField({ allow: [cta, newsletter] })`, optional — editors opt a
+  `modulesField({ allow: [cta, newsletter] })`, optional — editors opt a
   newsletter-signup module into this page rather than it being hardcoded),
   `seo`. `itemsPerPage` survives on the document but no longer drives
   anything; it goes with `module_postList.limit`.
@@ -113,8 +113,8 @@ cta] })`), `seo`.
   to a `module_taxonomyList`), `seo`. No `modules[]` array — one required slot
   and nothing else.
 
-`defineModulesField({ allow, description? })`
-(`schema-types/helpers/define-modules-field.ts`) builds the `modules` array
+`modulesField({ allow, description? })`
+(`schema-types/fields/modules-field/modules-field.ts`) builds the `modules` array
 field's `of` from the allowed `TModuleType[]`, one strong `reference` array
 member per allowed type — the single place that field shape is defined,
 replacing a hand-duplicated block per page document.
@@ -146,7 +146,7 @@ replacing a hand-duplicated block per page document.
 separator: SPEC_LINE_SEPARATORS }`, replacing a plain string so the
   service layer can join it with a chosen separator glyph), description,
   tagline.
-- `settings_theme` (singleton, `themeSchema`) — `titleField` (bare; see
+- `settings_theme` (singleton, `themeSettingsSchema`) — `titleField` (bare; see
   helper note below), `preset` (required, `PRESET_ID` stored value:
   `CONSOLE`/`EDITORIAL`), `accentHue`/`logoHue` (optional numbers, 0-360,
   OKLCH hue channels — `logoHue` falls back to `accentHue` when unset),
@@ -171,7 +171,7 @@ separator: SPEC_LINE_SEPARATORS }`, replacing a plain string so the
   desk's **Blog** section, directly after Authors, not the top-level
   Settings group.
 
-**Reusable `titleField` helper** (`schema-types/helpers/title-field.ts`) —
+**Reusable `titleField` helper** (`schema-types/fields/title-field/title-field.ts`) —
 `titleField({ initialValue?, readOnly?, description?, max? })` returns a
 required `defineField({ name: 'title', type: 'string', … })`. Keep it **bare**
 for singletons: a fixed `initialValue` + `readOnly: true` does **not** fix the

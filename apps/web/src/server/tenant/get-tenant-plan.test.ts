@@ -88,4 +88,17 @@ describe(getTenantPlan, () => {
     expect(resultA).toEqual({ ok: true, data: 'GROWTH' });
     expect(resultB).toEqual({ ok: true, data: 'STARTER' });
   });
+
+  it("propagates the header read's dynamic-rendering signal rather than reporting it as a fetch failure", async () => {
+    const dynamicSignal = Object.assign(
+      new Error(
+        "Dynamic server usage: Route /[tenant]/[locale] couldn't be rendered statically because it used `headers`",
+      ),
+      { digest: 'DYNAMIC_SERVER_USAGE' },
+    );
+    getRequestTenantIdMock.mockRejectedValue(dynamicSignal);
+
+    await expect(getTenantPlan()).rejects.toBe(dynamicSignal);
+    expect(listTenantsByIdsMock).not.toHaveBeenCalled();
+  });
 });

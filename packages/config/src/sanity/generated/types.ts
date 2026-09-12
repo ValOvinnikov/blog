@@ -219,6 +219,25 @@ export type Module_postList = {
   layout?: Layout;
 };
 
+export type BlockText = Array<{
+  children?: Array<{
+    marks?: Array<string>;
+    text?: string;
+    _type: 'span';
+    _key: string;
+  }>;
+  style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote';
+  listItem?: 'bullet' | 'number';
+  markDefs?: Array<{
+    href?: string;
+    _type: 'link';
+    _key: string;
+  }>;
+  level?: number;
+  _type: 'block';
+  _key: string;
+}>;
+
 export type Skim = {
   _type: 'skim';
   takeaways?: Array<string>;
@@ -311,25 +330,6 @@ export type SocialLink = {
   platform?: string;
   url?: string;
 };
-
-export type BlockText = Array<{
-  children?: Array<{
-    marks?: Array<string>;
-    text?: string;
-    _type: 'span';
-    _key: string;
-  }>;
-  style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote';
-  listItem?: 'bullet' | 'number';
-  markDefs?: Array<{
-    href?: string;
-    _type: 'link';
-    _key: string;
-  }>;
-  level?: number;
-  _type: 'block';
-  _key: string;
-}>;
 
 export type Aside = {
   _type: 'aside';
@@ -576,8 +576,6 @@ export type Page_tagIndex = {
       } & Module_newsletterReference)
   >;
   seo?: Seo;
-  heading?: string;
-  supportingText?: string;
   taxonomyList?: Module_taxonomyListReference;
 };
 
@@ -639,8 +637,6 @@ export type Page_topicIndex = {
       } & Module_newsletterReference)
   >;
   seo?: Seo;
-  heading?: string;
-  supportingText?: string;
   taxonomyList?: Module_taxonomyListReference;
 };
 
@@ -1080,6 +1076,7 @@ export type AllSanitySchemaTypes =
   | Module_postFeatured
   | Module_postLatest
   | Module_postList
+  | BlockText
   | Skim
   | Brand
   | SpecLine
@@ -1091,7 +1088,6 @@ export type AllSanitySchemaTypes =
   | Page_blogReference
   | Link
   | SocialLink
-  | BlockText
   | Aside
   | BodyImage
   | HeroLayout

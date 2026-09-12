@@ -19,13 +19,15 @@ const getCachedTenantPlanForTenant = (tenantId: string) =>
     },
   )(tenantId);
 
-const getUncachedTenantPlan = async (
-  tenant?: string,
-): Promise<TTenantPlan | undefined> => {
-  const tenantId = await getRequestTenantId(tenant);
-  if (!tenantId) return undefined;
-  return getCachedTenantPlanForTenant(tenantId);
-};
+// `getRequestTenantId`'s `headers()` read must stay outside this
+// `safeAsync` boundary: its `DynamicServerError` is Next's signal that the
+// route is dynamic, and swallowing it renders the route static, then 500s.
+const getTenantPlanForTenantId = safeAsync(
+  async (tenantId?: string): Promise<TTenantPlan | undefined> => {
+    if (!tenantId) return undefined;
+    return getCachedTenantPlanForTenant(tenantId);
+  },
+);
 
 /**
  * getTenantPlan — the `TENANT_PLAN` half of capability entitlement
@@ -33,4 +35,5 @@ const getUncachedTenantPlan = async (
  * `settings_features` are. Accepts the `[tenant]` route param and forwards
  * it to `getRequestTenantId`.
  */
-export const getTenantPlan = safeAsync(getUncachedTenantPlan);
+export const getTenantPlan = async (tenant?: string) =>
+  getTenantPlanForTenantId(await getRequestTenantId(tenant));

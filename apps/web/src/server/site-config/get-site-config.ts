@@ -20,11 +20,13 @@ const getCachedSiteConfigForTenant = (tenantId: string) =>
     },
   )(tenantId);
 
-const getUncachedSiteConfig = async (tenant?: string) => {
-  const tenantId = await getRequestTenantId(tenant);
+// `getRequestTenantId`'s `headers()` read must stay outside this
+// `safeAsync` boundary: its `DynamicServerError` is Next's signal that the
+// route is dynamic, and swallowing it renders the route static, then 500s.
+const getSiteConfigForTenantId = safeAsync(async (tenantId?: string) => {
   if (!tenantId) return undefined;
   return getCachedSiteConfigForTenant(tenantId);
-};
+});
 
 /**
  * The single `@blog/db` read shared by `getThemeTokens` (the theme
@@ -33,4 +35,5 @@ const getUncachedSiteConfig = async (tenant?: string) => {
  * no tenant is ever served another's config. Accepts the `[tenant]` route
  * param and forwards it to `getRequestTenantId`.
  */
-export const getSiteConfig = safeAsync(getUncachedSiteConfig);
+export const getSiteConfig = async (tenant?: string) =>
+  getSiteConfigForTenantId(await getRequestTenantId(tenant));

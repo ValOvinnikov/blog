@@ -16,7 +16,7 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
 const tenant = makeTenant();
 
 describe('getTaxonomyList', () => {
-  it('resolves topic entries from an authored taxonomy, with no fallback', async () => {
+  it('resolves topic entries from an authored taxonomy', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawTaxonomyListModule({
         taxonomy: TAXONOMY_KIND.TOPICS,
@@ -41,7 +41,7 @@ describe('getTaxonomyList', () => {
     ]);
   });
 
-  it('resolves tag entries from a fallback when nothing is authored', async () => {
+  it('resolves tag entries from an authored taxonomy', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawTaxonomyListModule({
         taxonomy: TAXONOMY_KIND.TAGS,
@@ -49,11 +49,7 @@ describe('getTaxonomyList', () => {
       }),
     );
 
-    const module = await getTaxonomyList(
-      'taxonomy-list-1',
-      tenant,
-      TAXONOMY_KIND.TAGS,
-    );
+    const module = await getTaxonomyList('taxonomy-list-1', tenant);
 
     expect(module.taxonomy).toBe(TAXONOMY_KIND.TAGS);
     expect(module.entries).toEqual([
@@ -68,26 +64,7 @@ describe('getTaxonomyList', () => {
     ]);
   });
 
-  it('prefers the authored taxonomy over a conflicting fallback', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTaxonomyListModule({
-        taxonomy: TAXONOMY_KIND.TOPICS,
-        entries: [
-          makeRawTaxonomyEntry({ _id: 'topic-1', title: 'Engineering' }),
-        ],
-      }),
-    );
-
-    const module = await getTaxonomyList(
-      'taxonomy-list-1',
-      tenant,
-      TAXONOMY_KIND.TAGS,
-    );
-
-    expect(module.taxonomy).toBe(TAXONOMY_KIND.TOPICS);
-  });
-
-  it('throws when neither an authored taxonomy nor a fallback resolves', async () => {
+  it('throws when the module has no authored taxonomy', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawTaxonomyListModule({ taxonomy: null, entries: null }),
     );
@@ -103,47 +80,7 @@ describe('getTaxonomyList', () => {
     await expect(getTaxonomyList('missing', tenant)).rejects.toThrow();
   });
 
-  it('scopes the cache tags to the fallback taxonomy kind, plus posts', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTaxonomyListModule({ taxonomy: TAXONOMY_KIND.TOPICS }),
-    );
-
-    await getTaxonomyList('taxonomy-list-1', tenant, TAXONOMY_KIND.TOPICS);
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({
-          tags: [
-            't:tenant-a:modules:taxonomyList',
-            't:tenant-a:module:taxonomy-list-1',
-            't:tenant-a:topics',
-            't:tenant-a:posts',
-          ],
-        }),
-      }),
-    );
-  });
-
-  it('scopes the cache tags to a tags fallback kind', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTaxonomyListModule({ taxonomy: TAXONOMY_KIND.TAGS }),
-    );
-
-    await getTaxonomyList('taxonomy-list-1', tenant, TAXONOMY_KIND.TAGS);
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        next: expect.objectContaining({
-          tags: expect.arrayContaining(['t:tenant-a:tags']),
-        }),
-      }),
-    );
-  });
-
-  it('covers both taxonomy tags when no fallback is given', async () => {
+  it('scopes the cache tags to the module id, both taxonomy kinds, and posts', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawTaxonomyListModule({ taxonomy: TAXONOMY_KIND.TOPICS }),
     );
@@ -153,6 +90,7 @@ describe('getTaxonomyList', () => {
     expect(mockRun).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({
+        tenant,
         next: expect.objectContaining({
           tags: [
             't:tenant-a:modules:taxonomyList',

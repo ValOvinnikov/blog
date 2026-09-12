@@ -1,1 +1,0 @@
-export { pageTagSchema } from './tag';

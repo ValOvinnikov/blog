@@ -25,7 +25,7 @@ pair (radio source selector + hidden custom field + conditional
 Write it once:
 
 ```ts
-// schema-types/helpers/define-mode-field-pair.ts
+// schema-types/modules/hero/hero.ts — local to the one schema that uses it
 type TModeFieldPair = {
   name: string; // 'heroTitle' → mode field is `${name}Mode`
   title: string;
@@ -33,7 +33,7 @@ type TModeFieldPair = {
   customType?: 'string' | 'text';
 };
 
-export const defineModeFieldPair = ({
+const modeFieldPair = ({
   name,
   title,
   modeOptions,
@@ -61,7 +61,11 @@ export const defineModeFieldPair = ({
 ];
 ```
 
-Shared helpers live in `packages/studio/src/schema-types/helpers/` — schema-only
+Where a factory lives follows its reach: used by one schema → a local,
+non-exported function in that schema file; wraps one object type → beside the
+object (`objects/seo/seo-field.ts`); shared more widely →
+`schema-types/fields/<name>/<name>.ts`. Validators with more than one caller
+live in `schema-types/validation/<name>/<name>.ts`. All are schema-only
 utilities, never exported to other packages.
 
 ### No magic strings — every stored value is a constant
@@ -113,7 +117,7 @@ the constraints must move with them or be consciously re-decided:
 - Follow `{group}_{name}` for new types; each type in its own file; register
   in the group index.
 - **Schema defs are named exports** — `export const {localName}Schema =
-defineType(...)` (`heroSchema`, `postSchema`, `siteSchema`), never
+defineType(...)` (`heroSchema`, `postPageSchema`, `siteSettingsSchema`), never
   `export default defineType`. Registration indexes and cross-references
   import the named symbol (`to: [{ type: heroSchema.name }]`), so a rename is
   compiler-checked instead of a stringly-typed hunt.

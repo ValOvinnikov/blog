@@ -1,26 +1,26 @@
-import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/components/slug-url-preview-input';
-import { authorSchema } from '@blog/studio/schema-types/documents/blog/author';
-import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag';
-import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic';
+import { authorSchema } from '@blog/studio/schema-types/documents/blog/author/author';
+import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag/tag';
+import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic/topic';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
-import { defineModulesField } from '@blog/studio/schema-types/helpers/define-modules-field';
-import { headingBlockField } from '@blog/studio/schema-types/helpers/heading-block-field';
-import { seoField } from '@blog/studio/schema-types/helpers/seo-field';
-import { slugField } from '@blog/studio/schema-types/helpers/slug-field';
-import { titleField } from '@blog/studio/schema-types/helpers/title-field';
-import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/helpers/validate-single-blank-heading-per-type';
-import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
-import { postRelatedSchema } from '@blog/studio/schema-types/modules/module-post-related';
-import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt';
-import { richTextSchema } from '@blog/studio/schema-types/objects/rich-text';
-import { skimSchema } from '@blog/studio/schema-types/objects/skim';
+import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
+import { slugField } from '@blog/studio/schema-types/fields/slug-field/slug-field';
+import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/slug-url-preview/slug-url-preview-input';
+import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
+import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
+import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
+import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
+import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
+import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
+import { skimSchema } from '@blog/studio/schema-types/objects/skim/skim';
+import { richTextSchema } from '@blog/studio/schema-types/portable-text/rich-text/rich-text';
+import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/validation/validate-single-blank-heading-per-type/validate-single-blank-heading-per-type';
 import { Newspaper } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
 const postSlugUrlPreviewInput = createSlugUrlPreviewInput('/blog/');
 
-export const pagePostSchema = defineType({
+export const postPageSchema = defineType({
   name: PAGE_POST_TYPE,
   title: 'Post Page',
   type: 'document',
@@ -91,7 +91,7 @@ export const pagePostSchema = defineType({
       ],
       validation: (rule) => rule.max(6),
     }),
-    defineModulesField({
+    modulesField({
       allow: [postRelatedSchema.name, newsletterSchema.name, ctaSchema.name],
       validateCustom: (rule) =>
         rule.custom(

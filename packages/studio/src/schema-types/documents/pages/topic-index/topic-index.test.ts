@@ -1,11 +1,11 @@
 import { TAXONOMY_KIND } from '@blog/config/constants';
-import { topicIndexPageSchema } from '@blog/studio/schema-types/documents/pages/topic-index';
-import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/helpers/validate-taxonomy-list-has-taxonomy';
+import { topicIndexPageSchema } from '@blog/studio/schema-types/documents/pages/topic-index/topic-index';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
-import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
-import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
-import { taxonomyListSchema } from '@blog/studio/schema-types/modules/module-taxonomy-list';
+import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
+import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
+import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
+import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
+import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/validation/validate-taxonomy-list-has-taxonomy/validate-taxonomy-list-has-taxonomy';
 import {
   createMockModulesRule,
   type TModuleReference,
@@ -83,15 +83,13 @@ const buildDocumentRules = (): TDocumentMockRule[] => {
 };
 
 describe('topicIndexPageSchema field order', () => {
-  it('orders fields title, headingBlock, hero, modules, seo, then the deprecated fields', () => {
+  it('orders fields title, headingBlock, hero, modules, seo, then the deprecated taxonomyList field', () => {
     expect(topicIndexPageSchema.fields?.map((field) => field.name)).toEqual([
       'title',
       'headingBlock',
       'hero',
       'modules',
       'seo',
-      'heading',
-      'supportingText',
       'taxonomyList',
     ]);
   });
@@ -289,26 +287,6 @@ describe('topicIndexPageSchema taxonomy-kind rule', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- validation fn is document-level async, the mock TDocumentMockRule type models the synchronous shared shape
       (fn as any)({ taxonomyList: { _ref: 'taxonomy-list-legacy' } }, context),
     ).resolves.toBe('This page lists topics; the module is set to tags.');
-  });
-});
-
-describe('topicIndexPageSchema deprecated heading field', () => {
-  it('is readOnly, deprecated, and no longer required', () => {
-    const headingField = getField('heading');
-
-    expect(headingField?.readOnly).toBe(true);
-    expect(headingField?.deprecated?.reason).toBeTruthy();
-    expect(headingField?.validation).toBeUndefined();
-  });
-});
-
-describe('topicIndexPageSchema deprecated supportingText field', () => {
-  it('is readOnly and deprecated — always optional', () => {
-    const supportingTextField = getField('supportingText');
-
-    expect(supportingTextField?.readOnly).toBe(true);
-    expect(supportingTextField?.deprecated?.reason).toBeTruthy();
-    expect(supportingTextField?.validation).toBeUndefined();
   });
 });
 
