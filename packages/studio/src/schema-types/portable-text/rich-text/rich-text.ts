@@ -6,6 +6,8 @@ export const richTextSchema = defineType({
   name: 'richText',
   title: 'Rich Text',
   type: 'array',
+  description:
+    'The main body of a post or content module, supporting headings, images, code blocks, and asides.',
   of: [
     defineArrayMember({
       type: 'block',

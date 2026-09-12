@@ -23,6 +23,8 @@ export const landingPageSchema = defineType({
   name: 'page_landing',
   title: 'Landing Page',
   type: 'document',
+  description:
+    'A standalone page built from modules, used for marketing or informational content at its own URL.',
   icon: FileText,
   preview: {
     select: {

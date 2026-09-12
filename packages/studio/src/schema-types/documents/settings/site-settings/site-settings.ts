@@ -7,6 +7,8 @@ export const siteSettingsSchema = defineType({
   name: 'settings_site',
   title: 'Site Settings',
   type: 'document',
+  description:
+    'Site-wide identity and default SEO copy used across every page.',
   icon: Settings,
   preview: {
     select: { title: 'title' },

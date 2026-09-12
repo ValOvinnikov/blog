@@ -14,6 +14,8 @@ export const heroLayoutSchema = defineType({
   name: 'heroLayout',
   title: 'Layout',
   type: 'object',
+  description:
+    'Spacing and divider controls for a hero module, without the container-width option other modules have.',
   icon: SlidersHorizontal,
   options: { collapsible: true, collapsed: true },
   fields: spacingAndDividerFields(),

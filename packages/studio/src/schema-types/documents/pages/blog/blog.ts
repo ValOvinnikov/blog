@@ -44,6 +44,8 @@ export const blogPageSchema = defineType({
   name: 'page_blog',
   title: 'Post Index Page',
   type: 'document',
+  description:
+    'The main blog index page, listing posts alongside any surrounding modules.',
   icon: Newspaper,
   validation: (rule) => [
     rule.custom(validatePostListModuleCount),

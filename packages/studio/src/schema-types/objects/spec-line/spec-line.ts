@@ -9,6 +9,8 @@ export const specLineSchema = defineType({
   name: 'specLine',
   title: 'Spec Line',
   type: 'object',
+  description:
+    'A short line of status-style text segments joined by a separator, shown under the logo.',
   fields: [
     defineField({
       name: 'items',

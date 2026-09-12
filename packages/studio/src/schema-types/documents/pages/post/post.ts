@@ -24,6 +24,8 @@ export const postPageSchema = defineType({
   name: PAGE_POST_TYPE,
   title: 'Post Page',
   type: 'document',
+  description:
+    'A single blog post — its title, hero image, body content, and metadata.',
   icon: Newspaper,
   fields: [
     titleField({ generatesSlug: true }),

@@ -9,6 +9,8 @@ export const contentSchema = defineType({
   name: 'module_content',
   title: 'Content',
   type: 'document',
+  description:
+    'A block of freeform rich text, used for prose sections outside the main post body.',
   icon: FileText,
   fields: [
     titleField(),

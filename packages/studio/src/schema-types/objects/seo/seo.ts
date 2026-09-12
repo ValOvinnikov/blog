@@ -9,6 +9,8 @@ export const seoSchema = defineType({
   name: 'seo',
   title: 'SEO',
   type: 'object',
+  description:
+    'The search-engine title and description for a page, plus its social-sharing preview.',
   options: { collapsible: true, collapsed: false },
   fields: [
     defineField({

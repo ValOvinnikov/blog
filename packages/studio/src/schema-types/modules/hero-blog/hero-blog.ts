@@ -111,6 +111,8 @@ export const heroBlogSchema = defineType({
   name: 'module_heroBlog',
   title: 'Blog Hero',
   type: 'document',
+  description:
+    'A hero built around one blog post — pinned or the newest featured — with its image, heading, and a link to read it.',
   icon: Star,
   validation: (rule) => [
     rule.custom(validateNewestFeaturedHasCandidate('hero')),

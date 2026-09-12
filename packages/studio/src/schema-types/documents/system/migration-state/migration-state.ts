@@ -13,6 +13,8 @@ export const migrationStateSchema = defineType({
   name: 'migrationState',
   title: 'Migration State',
   type: 'document',
+  description:
+    'Internal record of which content migrations have already run — not edited by hand.',
   icon: Database,
   __experimental_omnisearch_visibility: false,
   fields: [

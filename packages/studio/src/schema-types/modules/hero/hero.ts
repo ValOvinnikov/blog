@@ -90,6 +90,8 @@ export const heroSchema = defineType({
   name: 'module_hero',
   title: 'Hero',
   type: 'document',
+  description:
+    'A hero built around a featured post, pulling its image, heading, and excerpt, or letting each be overridden by hand.',
   icon: Sparkles,
   fields: [
     titleField(),
