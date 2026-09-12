@@ -1,5 +1,5 @@
 import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/helpers/validate-taxonomy-list-has-taxonomy';
-import { taxonomyListSchema } from '@blog/studio/schema-types/modules/module-taxonomy-list';
+import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import type { ValidationContext } from 'sanity';
 
 type TModuleReference = { _type?: string; _ref?: string };

@@ -1,5 +1,5 @@
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
-import { heroSchema } from '@blog/studio/schema-types/modules/module-hero';
+import { heroSchema } from '@blog/studio/schema-types/modules/hero/hero';
 
 const getField = (name: string) => {
   const field = heroSchema.fields?.find(

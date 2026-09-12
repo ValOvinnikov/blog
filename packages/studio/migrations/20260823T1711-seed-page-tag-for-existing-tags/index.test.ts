@@ -1,5 +1,5 @@
 import { pageTagSchema } from '@blog/studio/schema-types/documents/pages/tag';
-import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
+import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import {
   SEO_META_TITLE_MAX_LENGTH,
   SEO_META_TITLE_MIN_LENGTH,

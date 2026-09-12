@@ -1,5 +1,5 @@
 import { getDraftsClient } from '@blog/studio/schema-types/helpers/get-drafts-client';
-import { taxonomyListSchema } from '@blog/studio/schema-types/modules/module-taxonomy-list';
+import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import type { ValidationContext } from 'sanity';
 
 type TModuleReference = { _type?: string; _ref?: string };

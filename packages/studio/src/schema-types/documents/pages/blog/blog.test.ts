@@ -1,6 +1,6 @@
 import { blogPageSchema } from '@blog/studio/schema-types/documents/pages/blog';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
-import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
+import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import {
   createMockModulesRule,
   type TModuleReference,

@@ -1,4 +1,4 @@
-import { postRelatedSchema } from '@blog/studio/schema-types/modules/module-post-related';
+import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
 
 const getField = (name: string) => {
   const field = postRelatedSchema.fields?.find(

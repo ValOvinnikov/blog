@@ -3,7 +3,7 @@ import {
   CONTENT_ALIGNMENT,
   CTA_VARIANT,
 } from '@blog/config/constants';
-import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
+import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 
 type TCustomFn = (
   value: unknown,

@@ -1,5 +1,5 @@
 import { tagIndexPageSchema } from '@blog/studio/schema-types/documents/pages/tag-index';
-import { taxonomyListSchema } from '@blog/studio/schema-types/modules/module-taxonomy-list';
+import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import {
   SEO_META_TITLE_MAX_LENGTH,
   SEO_META_TITLE_MIN_LENGTH,

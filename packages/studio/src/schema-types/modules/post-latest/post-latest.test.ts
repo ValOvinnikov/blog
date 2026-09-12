@@ -1,5 +1,5 @@
 import { DISPLAY_MODE } from '@blog/config/constants';
-import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
+import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import type { SanityDocument } from 'sanity';
 
 type TDocFn = (document: SanityDocument | undefined) => string | true;

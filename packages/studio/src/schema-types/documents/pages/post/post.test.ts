@@ -1,7 +1,7 @@
 import { pagePostSchema } from '@blog/studio/schema-types/documents/pages/post';
-import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
-import { postRelatedSchema } from '@blog/studio/schema-types/modules/module-post-related';
+import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
+import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
+import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
 
 type TReferenceFieldDefinition = {
   type: 'reference';

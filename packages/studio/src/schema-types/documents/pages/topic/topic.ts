@@ -8,10 +8,10 @@ import { heroField } from '@blog/studio/schema-types/helpers/hero-field';
 import { seoField } from '@blog/studio/schema-types/helpers/seo-field';
 import { slugField } from '@blog/studio/schema-types/helpers/slug-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
-import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
-import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
-import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
+import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
+import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
+import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
+import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import { Tags } from 'lucide-react';
 import {
   defineField,

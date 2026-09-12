@@ -1,5 +1,5 @@
 import { TAXONOMY_KIND, TAXONOMY_SORT } from '@blog/config/constants';
-import { taxonomyListSchema } from '@blog/studio/schema-types/modules/module-taxonomy-list';
+import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 
 type TValidationRule = {
   integer: () => TValidationRule;

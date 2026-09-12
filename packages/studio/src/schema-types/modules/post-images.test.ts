@@ -1,5 +1,5 @@
-import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
-import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
+import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
+import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 
 type TModuleSchema = {
   fields?: readonly { name: string }[];

@@ -2,10 +2,10 @@ import { TAXONOMY_KIND } from '@blog/config/constants';
 import { topicIndexPageSchema } from '@blog/studio/schema-types/documents/pages/topic-index';
 import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/helpers/validate-taxonomy-list-has-taxonomy';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
-import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
-import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
-import { taxonomyListSchema } from '@blog/studio/schema-types/modules/module-taxonomy-list';
+import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
+import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
+import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
+import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import {
   createMockModulesRule,
   type TModuleReference,

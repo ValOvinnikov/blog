@@ -1,5 +1,5 @@
 import { NEWSLETTER_VARIANT } from '@blog/config/constants';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
+import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 
 const getField = (name: string) => {
   const field = newsletterSchema.fields?.find(

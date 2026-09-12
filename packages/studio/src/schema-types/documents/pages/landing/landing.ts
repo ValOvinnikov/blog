@@ -9,12 +9,12 @@ import { titleField } from '@blog/studio/schema-types/helpers/title-field';
 import { validateHeroOrHeading } from '@blog/studio/schema-types/helpers/validate-hero-or-heading';
 import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/helpers/validate-single-blank-heading-per-type';
 import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/helpers/validate-taxonomy-list-has-taxonomy';
-import { contentSchema } from '@blog/studio/schema-types/modules/module-content';
-import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
-import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
-import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
-import { taxonomyListSchema } from '@blog/studio/schema-types/modules/module-taxonomy-list';
+import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
+import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
+import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
+import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
+import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
+import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { FileText } from 'lucide-react';
 import { defineType } from 'sanity';
 

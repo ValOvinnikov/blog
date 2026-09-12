@@ -1,8 +1,8 @@
 import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag';
 import { pageTagSchema } from '@blog/studio/schema-types/documents/pages/tag';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
-import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
-import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
+import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
+import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import type { ValidationContext } from 'sanity';
 
 type TReferenceFieldDefinition = {

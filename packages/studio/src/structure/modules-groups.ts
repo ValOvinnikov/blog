@@ -1,14 +1,14 @@
-import { contentSchema } from '@blog/studio/schema-types/modules/module-content';
-import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
-import { heroSchema } from '@blog/studio/schema-types/modules/module-hero';
-import { heroBlogSchema } from '@blog/studio/schema-types/modules/module-hero-blog';
-import { heroStatementSchema } from '@blog/studio/schema-types/modules/module-hero-statement';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
-import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
-import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
-import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
-import { postRelatedSchema } from '@blog/studio/schema-types/modules/module-post-related';
-import { taxonomyListSchema } from '@blog/studio/schema-types/modules/module-taxonomy-list';
+import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
+import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
+import { heroSchema } from '@blog/studio/schema-types/modules/hero/hero';
+import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
+import { heroStatementSchema } from '@blog/studio/schema-types/modules/hero-statement/hero-statement';
+import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
+import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
+import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
+import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
+import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
+import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import type { TStructureGroup } from '@blog/studio/structure/build-grouped-list';
 
 export const modulesGroups: TStructureGroup[] = [

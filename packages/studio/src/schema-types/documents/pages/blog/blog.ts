@@ -5,10 +5,10 @@ import { seoField } from '@blog/studio/schema-types/helpers/seo-field';
 import { titleField } from '@blog/studio/schema-types/helpers/title-field';
 import { validateHeroOrHeading } from '@blog/studio/schema-types/helpers/validate-hero-or-heading';
 import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/helpers/validate-single-blank-heading-per-type';
-import { ctaSchema } from '@blog/studio/schema-types/modules/module-cta';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
-import { postFeaturedSchema } from '@blog/studio/schema-types/modules/module-post-featured';
-import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
+import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
+import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
+import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
+import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import { Newspaper } from 'lucide-react';
 import { defineType, type SanityDocument } from 'sanity';
 

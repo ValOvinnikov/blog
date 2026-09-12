@@ -2,7 +2,7 @@ import { HERO_VARIANT } from '@blog/config/constants';
 import { actionGroupSchema } from '@blog/studio/schema-types/objects/blocks/action-group';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt';
 
-import { heroStatementSchema } from './module-hero-statement';
+import { heroStatementSchema } from './hero-statement';
 
 type TCustomFn = (
   value: unknown,

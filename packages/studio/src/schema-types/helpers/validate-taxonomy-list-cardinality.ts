@@ -1,4 +1,4 @@
-import { taxonomyListSchema } from '@blog/studio/schema-types/modules/module-taxonomy-list';
+import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import type { SanityDocument } from 'sanity';
 
 type TModuleReference = { _type?: string; _ref?: string };

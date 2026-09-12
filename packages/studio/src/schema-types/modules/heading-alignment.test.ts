@@ -1,8 +1,8 @@
 import { CONTENT_ALIGNMENT } from '@blog/config/constants';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/module-newsletter';
-import { postLatestSchema } from '@blog/studio/schema-types/modules/module-post-latest';
-import { postListSchema } from '@blog/studio/schema-types/modules/module-post-list';
-import { taxonomyListSchema } from '@blog/studio/schema-types/modules/module-taxonomy-list';
+import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
+import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
+import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
+import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 
 type TModuleSchema = {
   fields?: readonly { name: string; options?: unknown }[];
