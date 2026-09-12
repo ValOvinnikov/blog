@@ -5,7 +5,7 @@ import { HeroSlot } from '@web/modules/hero-slot';
 
 export interface IPageIntroProps {
   hero?: TModule<THeroModuleType>;
-  headingBlock?: THeadingBlock;
+  headingBlock: THeadingBlock;
   hasTrailingSpace?: boolean;
   locale: string;
   tenant: string;
@@ -13,7 +13,7 @@ export interface IPageIntroProps {
 
 /**
  * PageIntro — a page's opening block: its hero when the page has one,
- * otherwise its page-level heading, otherwise nothing.
+ * otherwise its page-level heading.
  */
 export const PageIntro = ({
   hero,
@@ -24,9 +24,9 @@ export const PageIntro = ({
 }: IPageIntroProps) =>
   hero ? (
     <HeroSlot id={hero.id} type={hero.type} locale={locale} tenant={tenant} />
-  ) : headingBlock?.heading ? (
+  ) : (
     <PageHeading
       headingBlock={headingBlock}
       hasTrailingSpace={hasTrailingSpace}
     />
-  ) : null;
+  );

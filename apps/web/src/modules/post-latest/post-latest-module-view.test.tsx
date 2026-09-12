@@ -63,9 +63,9 @@ describe(`<${PostLatestModuleView.name}/>`, () => {
     ).toBeInTheDocument();
   });
 
-  it('renders a visually hidden heading from accessibleTitle when headingBlock.heading is undefined', () => {
+  it('renders a visually hidden heading from accessibleTitle when headingBlock.heading is empty', () => {
     setup({
-      headingBlock: makeHeadingBlock(),
+      headingBlock: makeHeadingBlock({ heading: '' }),
     });
 
     const heading = screen.getByRole('heading', {

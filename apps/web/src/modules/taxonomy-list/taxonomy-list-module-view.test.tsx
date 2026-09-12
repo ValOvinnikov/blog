@@ -86,9 +86,9 @@ describe(`<${TaxonomyListModuleView.name}/>`, () => {
     expect(label.tagName).toBe('H3');
   });
 
-  it('renders a visually hidden heading from accessibleTitle when headingBlock.heading is undefined', () => {
+  it('renders a visually hidden heading from accessibleTitle when headingBlock.heading is empty', () => {
     setup({
-      headingBlock: makeHeadingBlock(),
+      headingBlock: makeHeadingBlock({ heading: '' }),
     });
 
     const heading = screen.getByRole('heading', { level: 2, name: 'Topics' });

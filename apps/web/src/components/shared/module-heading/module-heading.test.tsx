@@ -31,9 +31,9 @@ describe(`<${ModuleHeading.name}/>`, () => {
     expect(heading).toHaveClass('sr-only');
   });
 
-  it('renders the accessible title as a visually hidden fallback when heading is undefined', () => {
+  it('renders the accessible title as a visually hidden fallback when heading is empty', () => {
     setup({
-      headingBlock: makeHeadingBlock(),
+      headingBlock: makeHeadingBlock({ heading: '' }),
     });
 
     const heading = screen.getByRole('heading', { level: 2, name: 'Posts' });

@@ -153,7 +153,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock(),
+        headingBlock: makeHeadingBlock({ heading: '' }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -340,7 +340,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock(),
+        headingBlock: makeHeadingBlock({ heading: '' }),
         posts: [
           {
             id: 'post-1',
@@ -394,7 +394,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock(),
+        headingBlock: makeHeadingBlock({ heading: '' }),
         posts: [
           {
             id: 'post-1',
@@ -452,7 +452,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock(),
+        headingBlock: makeHeadingBlock({ heading: '' }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -487,7 +487,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock(),
+        headingBlock: makeHeadingBlock({ heading: '' }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,

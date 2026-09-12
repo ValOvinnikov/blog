@@ -113,12 +113,12 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
     expect(container.querySelector('section')).not.toBeInTheDocument();
   });
 
-  it("resolves the module's own translated fallback heading (never a hardcoded string) when headingBlock.heading is undefined", async () => {
+  it("resolves the module's own translated fallback heading (never a hardcoded string) when headingBlock.heading is empty", async () => {
     getPostFeaturedMock.mockResolvedValue({
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock(),
+        headingBlock: makeHeadingBlock({ heading: '' }),
         posts: [makePost()],
         layout: undefined,
         contentAlignment: undefined,

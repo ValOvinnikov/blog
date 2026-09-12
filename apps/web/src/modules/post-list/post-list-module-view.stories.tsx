@@ -58,7 +58,7 @@ export const Default: TStory = {};
 
 export const WithoutCmsHeading: TStory = {
   args: {
-    headingBlock: makeHeadingBlock(),
+    headingBlock: makeHeadingBlock({ heading: '' }),
   },
 };
 

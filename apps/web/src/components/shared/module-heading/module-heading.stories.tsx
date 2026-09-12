@@ -43,7 +43,7 @@ export const WithSupportingText: TStory = {
 };
 
 export const BlankHeadingFallback: TStory = {
-  args: { headingBlock: makeHeadingBlock() },
+  args: { headingBlock: makeHeadingBlock({ heading: '' }) },
 };
 
 export const CenterAligned: TStory = {

@@ -72,7 +72,7 @@ export const Tags: TStory = {
 
 export const WithoutCmsHeading: TStory = {
   args: {
-    headingBlock: makeHeadingBlock(),
+    headingBlock: makeHeadingBlock({ heading: '' }),
   },
 };
 

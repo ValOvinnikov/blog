@@ -41,9 +41,7 @@ export const LandingBreadcrumbs = async ({
 
   const breadcrumbTrail: IBreadcrumbItem[] = [
     { label: t('home'), href: routes.home() },
-    ...(headingBlock.heading
-      ? [{ label: headingBlock.heading, href: routes.landingPage(slug) }]
-      : []),
+    { label: headingBlock.heading, href: routes.landingPage(slug) },
   ];
   const breadcrumbListSchema = buildBreadcrumbListSchema(
     breadcrumbTrail,

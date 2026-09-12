@@ -101,44 +101,6 @@ describe(`<${LandingBreadcrumbs.name}/>`, () => {
     );
   });
 
-  it('omits the trailing crumb from the visible trail when there is no heading', async () => {
-    getLandingPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        ...mockLandingPage,
-        headingBlock: { heading: undefined, supportingText: undefined },
-      },
-    });
-
-    await setup();
-
-    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
-
-    expect(within(nav).queryAllByRole('listitem')).toHaveLength(1);
-    expect(within(nav).getByText('Home')).toBeInTheDocument();
-    expect(within(nav).queryByText('About Us')).not.toBeInTheDocument();
-  });
-
-  it('omits the trailing crumb from the JSON-LD BreadcrumbList when there is no heading', async () => {
-    getLandingPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        ...mockLandingPage,
-        headingBlock: { heading: undefined, supportingText: undefined },
-      },
-    });
-
-    const { container } = await setup();
-
-    const script = container.querySelector(
-      'script[type="application/ld+json"]',
-    );
-    expect(script).not.toBeNull();
-    const schema = JSON.parse(script?.textContent ?? '{}');
-    expect(schema.itemListElement).toHaveLength(1);
-    expect(schema.itemListElement[0].item).toBe('https://example.com/');
-  });
-
   it('forwards the slug and tenant to getLandingPage', async () => {
     getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
 

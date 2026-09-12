@@ -42,7 +42,7 @@ const topicsResult = (entries: unknown[] = [], showLatestPosts = true) => ({
   ok: true,
   data: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock(),
+    headingBlock: makeHeadingBlock({ heading: '' }),
     layout: undefined,
     contentAlignment: undefined,
     taxonomy: TAXONOMY_KIND.TOPICS,
@@ -55,7 +55,7 @@ const tagsResult = (entries: unknown[] = [], showLatestPosts = true) => ({
   ok: true,
   data: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock(),
+    headingBlock: makeHeadingBlock({ heading: '' }),
     layout: undefined,
     contentAlignment: undefined,
     taxonomy: TAXONOMY_KIND.TAGS,
