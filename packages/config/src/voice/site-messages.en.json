@@ -42,18 +42,8 @@
     "all": "All"
   },
   "blogListPage": {
-    "title": "All posts",
     "empty": "No posts yet.",
     "paginationAriaLabel": "Blog pages"
-  },
-  "postLatestModule": {
-    "fallbackHeading": "Latest posts"
-  },
-  "postFeaturedModule": {
-    "fallbackHeading": "Featured"
-  },
-  "postRelatedModule": {
-    "fallbackHeading": "Related reading"
   },
   "blogPostPage": {
     "depthToggle": {
@@ -79,25 +69,21 @@
     "label": "Topics"
   },
   "topicPage": {
-    "title": "Posts in {name}",
     "empty": "No posts in {name} yet.",
     "paginationAriaLabel": "{name} pages"
   },
   "tagPage": {
-    "title": "Posts tagged {name}",
     "empty": "No posts tagged {name} yet.",
     "paginationAriaLabel": "{name} pages"
   },
   "taxonomyListModule": {
     "topics": {
       "postsCount": "{count, plural, one {1 post} other {{count} posts}}",
-      "fallbackHeading": "Topics",
       "latestPostsLabel": "Latest in {name}",
       "empty": "No topics yet."
     },
     "tags": {
       "postsCount": "{count, plural, one {1 post} other {{count} posts}}",
-      "fallbackHeading": "Tags",
       "latestPostsLabel": "Latest in {name}",
       "empty": "No tags yet."
     }

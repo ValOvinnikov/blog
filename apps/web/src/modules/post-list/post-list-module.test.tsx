@@ -148,32 +148,6 @@ describe(`<${PostListModule.name}/>`, () => {
     expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
-  it('renders an archive-appropriate accessible heading (never "Latest posts")', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: '' }),
-        posts: [],
-        layout: undefined,
-        contentAlignment: undefined,
-        currentPage: 1,
-        totalPages: 1,
-      },
-    });
-
-    await setup();
-
-    const heading = screen.getByRole('heading', {
-      level: 2,
-      name: 'All posts',
-    });
-    expect(heading).toHaveClass('sr-only');
-    expect(
-      screen.getByRole('region', { name: 'All posts' }),
-    ).toBeInTheDocument();
-  });
-
   it('renders the i18n default empty message when zero posts resolve, unconditionally', async () => {
     getPostListMock.mockResolvedValue({
       ok: true,
@@ -335,12 +309,12 @@ describe(`<${PostListModule.name}/>`, () => {
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
-  it('derives href, aria-label, accessible title, empty message, and titleId from context.archive (topic kind)', async () => {
+  it('derives href, aria-label, empty message, and titleId from context.archive (topic kind)', async () => {
     getPostListMock.mockResolvedValue({
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: '' }),
+        headingBlock: makeHeadingBlock({ heading: 'Posts in News' }),
         posts: [
           {
             id: 'post-1',
@@ -394,7 +368,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: '' }),
+        headingBlock: makeHeadingBlock({ heading: 'Posts tagged TypeScript' }),
         posts: [
           {
             id: 'post-1',
@@ -452,7 +426,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: '' }),
+        headingBlock: makeHeadingBlock({ heading: 'Posts tagged TypeScript' }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,
@@ -487,7 +461,7 @@ describe(`<${PostListModule.name}/>`, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: '' }),
+        headingBlock: makeHeadingBlock({ heading: 'All posts' }),
         posts: [],
         layout: undefined,
         contentAlignment: undefined,

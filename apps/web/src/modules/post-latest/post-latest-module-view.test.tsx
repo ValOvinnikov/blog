@@ -40,7 +40,6 @@ const setup = customRender(PostLatestModuleView, {
   contentAlignment: undefined,
   titleId: 'latest-posts-title',
   dataTestId: 'post-latest-module-post-latest-1',
-  accessibleTitle: 'Latest posts',
   displayMode: DISPLAY_MODE.GRID,
 });
 
@@ -58,21 +57,6 @@ describe(`<${PostLatestModuleView.name}/>`, () => {
       'data-testid',
       'post-latest-module-post-latest-1',
     );
-    expect(
-      screen.getByRole('region', { name: 'Latest posts' }),
-    ).toBeInTheDocument();
-  });
-
-  it('renders a visually hidden heading from accessibleTitle when headingBlock.heading is empty', () => {
-    setup({
-      headingBlock: makeHeadingBlock({ heading: '' }),
-    });
-
-    const heading = screen.getByRole('heading', {
-      level: 2,
-      name: 'Latest posts',
-    });
-    expect(heading).toHaveClass('sr-only');
     expect(
       screen.getByRole('region', { name: 'Latest posts' }),
     ).toBeInTheDocument();

@@ -56,7 +56,6 @@ const setup = customRender(PostFeaturedModuleView, {
   contentAlignment: undefined,
   titleId: 'featured-posts-title',
   dataTestId: 'post-featured-module-featured-1',
-  accessibleTitle: 'Featured posts',
   displayMode: DISPLAY_MODE.GRID,
 });
 
@@ -76,21 +75,6 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
     );
     expect(
       screen.getByRole('region', { name: 'Featured' }),
-    ).toBeInTheDocument();
-  });
-
-  it('renders a visually hidden heading from accessibleTitle when headingBlock.heading is empty', () => {
-    setup({
-      headingBlock: makeHeadingBlock({ heading: '' }),
-    });
-
-    const heading = screen.getByRole('heading', {
-      level: 2,
-      name: 'Featured posts',
-    });
-    expect(heading).toHaveClass('sr-only');
-    expect(
-      screen.getByRole('region', { name: 'Featured posts' }),
     ).toBeInTheDocument();
   });
 

@@ -3,7 +3,6 @@ import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-con
 import { renderPostCardImage } from '@web/utils/render-post-card-image';
 import { renderPostLeadImage } from '@web/utils/render-post-lead-image';
 import { toPostListItems } from '@web/utils/to-post-list-items';
-import { getTranslations } from 'next-intl/server';
 
 import { PostFeaturedModuleView } from './post-featured-module-view';
 
@@ -23,10 +22,10 @@ export const PostFeaturedModule = async ({
   tenant,
 }: IPostFeaturedModuleProps) => {
   const tenantContext = await getTenantSanityContext(tenant);
-  const [result, t] = await Promise.all([
-    service.modules.postFeatured.v1.getPostFeatured(id, tenantContext),
-    getTranslations('postFeaturedModule'),
-  ]);
+  const result = await service.modules.postFeatured.v1.getPostFeatured(
+    id,
+    tenantContext,
+  );
 
   if (!result.ok) return null;
 
@@ -64,7 +63,6 @@ export const PostFeaturedModule = async ({
       displayMode={displayMode}
       titleId={`featured-posts-${id}`}
       dataTestId={`post-featured-module-${id}`}
-      accessibleTitle={t('fallbackHeading')}
     />
   );
 };

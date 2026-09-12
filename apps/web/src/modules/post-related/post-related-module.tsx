@@ -4,7 +4,6 @@ import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-con
 import { logger } from '@web/utils/logger/logger';
 import { renderPostCardImage } from '@web/utils/render-post-card-image';
 import { toPostListItems } from '@web/utils/to-post-list-items';
-import { getTranslations } from 'next-intl/server';
 
 import { PostRelatedModuleView } from './post-related-module-view';
 
@@ -28,10 +27,11 @@ export const PostRelatedModule = async ({
   }
 
   const tenantContext = await getTenantSanityContext(tenant);
-  const [result, t] = await Promise.all([
-    service.modules.postRelated.v1.getPostRelated(id, postId, tenantContext),
-    getTranslations('postRelatedModule'),
-  ]);
+  const result = await service.modules.postRelated.v1.getPostRelated(
+    id,
+    postId,
+    tenantContext,
+  );
 
   if (!result.ok) return null;
 
@@ -61,7 +61,6 @@ export const PostRelatedModule = async ({
       hasImages={showImages}
       titleId={`related-posts-${id}`}
       dataTestId={`post-related-module-${id}`}
-      accessibleTitle={t('fallbackHeading')}
     />
   );
 };

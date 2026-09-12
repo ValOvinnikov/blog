@@ -30,7 +30,6 @@ const setup = customRender(PostListModuleView, {
   contentAlignment: undefined,
   titleId: 'posts-title',
   dataTestId: 'post-list-module-post-list-1',
-  accessibleTitle: 'Posts',
   emptyMessage: 'No posts yet.',
 });
 
@@ -63,18 +62,6 @@ describe(`<${PostListModuleView.name}/>`, () => {
       'id',
       'other-posts-title',
     );
-  });
-
-  it('renders a visually hidden heading from accessibleTitle when headingBlock.heading is empty', () => {
-    setup({
-      headingBlock: makeHeadingBlock({ heading: '' }),
-    });
-
-    const heading = screen.getByRole('heading', { level: 2, name: 'Posts' });
-    expect(heading).toHaveClass('sr-only');
-
-    const region = screen.getByRole('region', { name: 'Posts' });
-    expect(region).toHaveAttribute('aria-labelledby', 'posts-title');
   });
 
   it('renders a card per item, linked to its href', () => {

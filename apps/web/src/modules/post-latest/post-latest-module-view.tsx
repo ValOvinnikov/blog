@@ -18,7 +18,6 @@ export interface IPostLatestModuleViewProps extends Omit<
   items: IPostCardData[];
   titleId: string;
   dataTestId: string;
-  accessibleTitle: string;
   hasImages?: boolean;
 }
 
@@ -35,14 +34,11 @@ export const PostLatestModuleView = ({
   layout,
   titleId,
   dataTestId,
-  accessibleTitle,
   contentAlignment,
   hasImages,
   displayMode,
 }: IPostLatestModuleViewProps) => {
   const { heading, supportingText } = headingBlock;
-  const hasHeading = Boolean(heading?.trim());
-  const resolvedTitle = hasHeading && heading ? heading : accessibleTitle;
   const s = postLatestModuleViewVariants({ align: contentAlignment });
 
   return (
@@ -52,19 +48,15 @@ export const PostLatestModuleView = ({
       titleId={titleId}
       dataTestId={dataTestId}
     >
-      <Heading
-        level={2}
-        id={titleId}
-        className={hasHeading ? s.label() : s.labelFallback()}
-      >
-        {resolvedTitle}
+      <Heading level={2} id={titleId} className={s.label()}>
+        {heading}
       </Heading>
       {supportingText && <p className={s.supportingText()}>{supportingText}</p>}
       {displayMode === DISPLAY_MODE.CAROUSEL ? (
         <PostsCarousel
           items={items}
           hasImages={hasImages}
-          title={resolvedTitle}
+          title={heading}
           tone={brandVariant}
         />
       ) : (

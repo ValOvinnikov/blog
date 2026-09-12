@@ -40,16 +40,8 @@ export const VOICE_FIXED_KEYS = [
   'carousel.nextAriaLabel',
   'carousel.regionLabel',
 
-  // Archive/breadcrumb labels read only as the post list's accessible name,
-  // or derived from Studio content rather than authored directly.
-  'postLatestModule.fallbackHeading',
-  'postFeaturedModule.fallbackHeading',
-  'postRelatedModule.fallbackHeading',
-  'taxonomyListModule.topics.fallbackHeading',
-  'taxonomyListModule.tags.fallbackHeading',
-  'blogListPage.title',
-  'topicPage.title',
-  'tagPage.title',
+  // Archive/breadcrumb labels derived from Studio content rather than
+  // authored directly.
   'breadcrumbs.home',
   'breadcrumbs.topics',
   'breadcrumbs.tags',

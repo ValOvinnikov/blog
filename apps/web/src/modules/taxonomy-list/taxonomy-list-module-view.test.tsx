@@ -49,7 +49,6 @@ const setup = customRender(TaxonomyListModuleView, {
   titleId: 'topic-list-title',
   dataTestId: 'taxonomy-list-module-topic-list-1',
   headingLevel: 2,
-  accessibleTitle: 'Topics',
   emptyMessage: 'No topics yet.',
   showLatestPosts: true,
 });
@@ -84,16 +83,6 @@ describe(`<${TaxonomyListModuleView.name}/>`, () => {
 
     const label = screen.getByText('Browse by topic');
     expect(label.tagName).toBe('H3');
-  });
-
-  it('renders a visually hidden heading from accessibleTitle when headingBlock.heading is empty', () => {
-    setup({
-      headingBlock: makeHeadingBlock({ heading: '' }),
-    });
-
-    const heading = screen.getByRole('heading', { level: 2, name: 'Topics' });
-    expect(heading).toHaveClass('sr-only');
-    expect(screen.getByRole('region', { name: 'Topics' })).toBeInTheDocument();
   });
 
   it('renders a card per entry, linking to its href with the post count as level-3 heading', () => {
