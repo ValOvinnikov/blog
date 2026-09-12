@@ -49,6 +49,7 @@ describe(getHeroStatement, () => {
             't:tenant-a:modules:heroStatement',
             't:tenant-a:module:hero-statement-1',
             't:tenant-a:page_landing',
+            't:tenant-a:page_blog',
             't:tenant-a:page_postIndex',
             't:tenant-a:page_post',
             't:tenant-a:topic',
