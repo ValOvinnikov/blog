@@ -20,6 +20,5 @@ export const siteSettingsQuery = q.star
       }))
       .notNull(),
     description: sub.field('description').notNull(),
-    tagline: sub.field('tagline').nullable(true),
   }))
   .notNull();
