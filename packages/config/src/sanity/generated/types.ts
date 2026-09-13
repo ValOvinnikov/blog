@@ -830,8 +830,6 @@ export type Module_heroBlog = {
   postSource?: 'PINNED' | 'NEWEST_FEATURED';
   post?: Page_postReference;
   eyebrow?: string;
-  heading?: string;
-  supportingText?: string;
   imageSource?: 'POST' | 'CUSTOM' | 'NONE';
   image?: ImageWithAlt;
   primaryActionLabel?: string;
