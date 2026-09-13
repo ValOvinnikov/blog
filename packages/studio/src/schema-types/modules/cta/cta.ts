@@ -45,6 +45,8 @@ export const ctaSchema = defineType({
       name: 'variant',
       title: 'Variant',
       type: 'string',
+      description:
+        'Which shape this call to action takes: Banner uses the image as a full-bleed background, Split places it alongside the copy, and Callout keeps it in a simple card with the image above the content.',
       options: {
         layout: 'radio',
         list: Object.values(CTA_VARIANT).map((value) => ({
@@ -110,7 +112,7 @@ export const ctaSchema = defineType({
       title: 'Image',
       type: imageWithAltSchema.name,
       description:
-        'Required for Banner (background) and Split (side); optional for Callout (above the content).',
+        "This CTA's image — the full-bleed background for Banner, alongside the copy for Split, or above the content for Callout.",
       validation: (rule) =>
         rule.custom((value, context) => {
           const variant = (context.parent as TCtaParent | undefined)?.variant;
@@ -153,6 +155,8 @@ export const ctaSchema = defineType({
       name: 'mobileMediaOrder',
       title: 'Mobile Media Order',
       type: 'string',
+      description:
+        'Order of media and content once the two columns collapse on mobile.',
       options: {
         layout: 'radio',
         list: Object.values(MEDIA_ORDER).map((value) => ({

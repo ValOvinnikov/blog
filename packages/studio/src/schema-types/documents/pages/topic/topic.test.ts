@@ -116,14 +116,11 @@ type THeadingBlockCustomFn = (
 ) => string | true;
 
 describe('pageTopicSchema headingBlock field', () => {
-  it('is built via headingBlockField() with a page-scoped description', () => {
+  it('is built via headingBlockField()', () => {
     const headingBlockField = getField('headingBlock') as
       THeadingBlockFieldDefinition | undefined;
 
     expect(headingBlockField?.type).toBe('headingBlock');
-    expect(headingBlockField?.description).toBe(
-      "The page heading, shown as the page's H1. Hidden when a hero is set — the hero's heading becomes the H1 instead. Still required, so the page keeps a heading if the hero is ever removed.",
-    );
   });
 
   it('is required at the field level', () => {

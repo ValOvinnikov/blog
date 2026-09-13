@@ -17,7 +17,7 @@ export const specLineSchema = defineType({
       title: 'Items',
       type: 'array',
       description:
-        'Up to 4 short segments (e.g. "build 2026.07", "online"), joined with the separator below.',
+        'Short segments (e.g. "build 2026.07", "online"), joined with the separator below.',
       of: [{ type: 'string', validation: (rule) => rule.min(1).max(15) }],
       validation: (rule) => rule.max(4),
     }),

@@ -42,6 +42,8 @@ export const linkSchema = defineType({
       name: 'linkType',
       title: 'Link Type',
       type: 'string',
+      description:
+        'Whether this link goes to a page within the site or to an external address.',
       options: {
         layout: 'radio',
         list: [
@@ -55,6 +57,8 @@ export const linkSchema = defineType({
       name: 'internalReference',
       title: 'Internal Document',
       type: 'reference',
+      description:
+        'The page this link goes to, when Link Type is Internal document.',
       to: [
         { type: PAGE_POST_TYPE },
         { type: topicSchema.name },

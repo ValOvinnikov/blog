@@ -66,8 +66,6 @@ export const blogPageSchema = defineType({
     titleField(),
     headingBlockField({
       requireHeading: true,
-      description:
-        "The page heading, shown as the page's H1. Hidden when a hero is set — the hero's heading becomes the H1 instead. Still required, so the page keeps a heading if the hero is ever removed.",
     }),
     heroField(),
     modulesField({

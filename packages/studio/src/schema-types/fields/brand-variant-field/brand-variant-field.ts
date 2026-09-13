@@ -12,7 +12,8 @@ export const brandVariantField = (options?: {
     title: 'Brand Variant',
     type: 'string',
     description:
-      options?.description ?? 'Background tone for this section — required.',
+      options?.description ??
+      "Sets this section's background color, so it reads as its own block against the sections around it.",
     options: {
       list: (
         options?.list ?? [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY]

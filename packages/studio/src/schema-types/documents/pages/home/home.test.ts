@@ -137,16 +137,13 @@ describe('homePageSchema document validation', () => {
 });
 
 describe('homePageSchema headingBlock field', () => {
-  it('is required and states that a hero hides it', () => {
+  it('is required', () => {
     const headingBlockFieldDefinition = homePageSchema.fields?.find(
       (field) => field.name === 'headingBlock',
     ) as
       { type?: string; description?: string; validation?: unknown } | undefined;
 
     expect(headingBlockFieldDefinition?.type).toBe('headingBlock');
-    expect(headingBlockFieldDefinition?.description).toBe(
-      "The page heading, shown as the page's H1. Hidden when a hero is set — the hero's heading becomes the H1 instead. Still required, so the page keeps a heading if the hero is ever removed.",
-    );
     expect(headingBlockFieldDefinition?.validation).toBeDefined();
   });
 });

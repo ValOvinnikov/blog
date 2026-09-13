@@ -11,12 +11,15 @@ export const headingBlockSchema = defineType({
       name: 'heading',
       title: 'Heading',
       type: 'string',
+      description: 'The heading text shown to readers.',
     }),
     defineField({
       name: 'supportingText',
       title: 'Supporting Text',
       type: 'text',
       rows: 3,
+      description:
+        'Optional line of supporting text shown beneath the heading.',
     }),
   ],
 });

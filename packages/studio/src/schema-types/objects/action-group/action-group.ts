@@ -53,6 +53,7 @@ export const ctaActionSchema = defineType({
       name: 'link',
       title: 'Link',
       type: linkSchema.name,
+      description: 'Where this action goes, and its visible label.',
       validation: (rule) => rule.required(),
     }),
   ],
@@ -85,7 +86,7 @@ export const actionGroupSchema = defineType({
       title: 'Actions',
       type: 'array',
       description:
-        'Up to two actions. Primary is required and comes first; Secondary is optional.',
+        'The buttons or links offered here — Primary drives the main click, Secondary offers an alternative alongside it.',
       of: [defineArrayMember({ type: ctaActionSchema.name })],
       validation: (rule) =>
         rule.max(2).custom((value) => {
