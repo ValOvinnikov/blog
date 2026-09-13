@@ -454,7 +454,6 @@ export type Settings_site = {
   title?: string;
   brand?: Brand;
   description?: string;
-  tagline?: string;
 };
 
 export type Blog_tagReference = {
