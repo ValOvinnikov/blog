@@ -46,7 +46,7 @@ export const postIndexPageSchema = defineType({
   title: 'Post Index Page',
   type: 'document',
   description:
-    "The page that lists posts, built from a hero, a heading, and a stack of modules — this is the post index in current use; ignore any page titled 'Post Index Page (legacy)'.",
+    'The page that lists posts, built from a hero, a heading, and a stack of modules.',
   icon: Newspaper,
   validation: (rule) => [
     rule.custom(validatePostListModuleCount),
