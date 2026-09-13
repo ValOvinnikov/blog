@@ -184,7 +184,6 @@ describe(`<${TagPage.name}/>`, () => {
           },
         },
       }),
-      undefined,
     );
   });
 
@@ -212,7 +211,6 @@ describe(`<${TagPage.name}/>`, () => {
           },
         },
       }),
-      undefined,
     );
   });
 
@@ -234,7 +232,6 @@ describe(`<${TagPage.name}/>`, () => {
         modules: [{ id: 'newsletter-1', type: 'module_newsletter' }],
         locale: 'en',
       }),
-      undefined,
     );
     expect(screen.getByTestId('module-renderer-stub')).toHaveTextContent(
       'module_newsletter',

@@ -164,7 +164,6 @@ describe(`<${BlogListPage.name}/>`, () => {
 
     expect(moduleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({ context: { page: 2 } }),
-      undefined,
     );
   });
 
@@ -181,7 +180,6 @@ describe(`<${BlogListPage.name}/>`, () => {
 
     expect(moduleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({ modules: [], locale: 'en' }),
-      undefined,
     );
   });
 
@@ -207,7 +205,6 @@ describe(`<${BlogListPage.name}/>`, () => {
         ],
         locale: 'en',
       }),
-      undefined,
     );
     expect(screen.getByTestId('module-renderer-stub')).toHaveTextContent(
       'module_postList,module_newsletter',

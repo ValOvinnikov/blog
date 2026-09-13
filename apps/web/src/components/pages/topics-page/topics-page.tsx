@@ -1,9 +1,8 @@
 import { TopicsIndexBreadcrumbs } from '@web/components/features/topics-index/topics-index-breadcrumbs';
 import { PageShell } from '@web/components/page-templates/page-shell';
-import { PageIntro } from '@web/components/shared/page-intro';
-import { ModuleRenderer } from '@web/modules/module-renderer';
 import { getTopicsIndexPage } from '@web/server/topics-index/get-topics-index-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
+import { resolvePageIntroAndContent } from '@web/utils/resolve-page-intro-and-content';
 
 type TTopicsPageProps = { locale: string; tenant: string };
 
@@ -19,10 +18,11 @@ export const TopicsPage = async ({ locale, tenant }: TTopicsPageProps) => {
     result,
     'topics_page.fetch_failed',
   );
-  const intro = await PageIntro({
+  const { intro, content } = await resolvePageIntroAndContent({
     hero,
     headingBlock,
     hasTrailingSpace: false,
+    modules,
     locale,
     tenant,
   });
@@ -33,9 +33,7 @@ export const TopicsPage = async ({ locale, tenant }: TTopicsPageProps) => {
         <TopicsIndexBreadcrumbs tenant={tenant} />
       </PageShell.Breadcrumbs>
       <PageShell.Heading>{intro}</PageShell.Heading>
-      <PageShell.Content>
-        <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />
-      </PageShell.Content>
+      <PageShell.Content>{content}</PageShell.Content>
     </PageShell>
   );
 };

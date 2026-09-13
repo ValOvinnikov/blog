@@ -202,7 +202,6 @@ describe(`<${TopicPage.name}/>`, () => {
           archive: { kind: TAXONOMY_KIND.TOPICS, slug: 'news', name: 'News' },
         },
       }),
-      undefined,
     );
   });
 
@@ -226,7 +225,6 @@ describe(`<${TopicPage.name}/>`, () => {
           archive: { kind: TAXONOMY_KIND.TOPICS, slug: 'news', name: 'News' },
         },
       }),
-      undefined,
     );
   });
 
@@ -248,7 +246,6 @@ describe(`<${TopicPage.name}/>`, () => {
         modules: [{ id: 'newsletter-1', type: 'module_newsletter' }],
         locale: 'en',
       }),
-      undefined,
     );
     expect(screen.getByTestId('module-renderer-stub')).toHaveTextContent(
       'module_newsletter',

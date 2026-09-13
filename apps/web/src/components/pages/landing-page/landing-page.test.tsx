@@ -132,10 +132,11 @@ describe(`<${LandingPage.name}/>`, () => {
 
     await setup();
 
-    expect(moduleRendererMock).toHaveBeenCalledWith(
-      { modules: [], locale: 'EN', tenant: 'tenant-1' },
-      undefined,
-    );
+    expect(moduleRendererMock).toHaveBeenCalledWith({
+      modules: [],
+      locale: 'EN',
+      tenant: 'tenant-1',
+    });
   });
 
   it('passes the fetched modules and locale through to ModuleRenderer when an editor has added some', async () => {
@@ -149,14 +150,11 @@ describe(`<${LandingPage.name}/>`, () => {
 
     await setup();
 
-    expect(moduleRendererMock).toHaveBeenCalledWith(
-      {
-        modules: [{ id: 'module-1', type: 'module_content' }],
-        locale: 'EN',
-        tenant: 'tenant-1',
-      },
-      undefined,
-    );
+    expect(moduleRendererMock).toHaveBeenCalledWith({
+      modules: [{ id: 'module-1', type: 'module_content' }],
+      locale: 'EN',
+      tenant: 'tenant-1',
+    });
     expect(screen.getByTestId('module-renderer')).toHaveTextContent(
       '1 modules',
     );

@@ -184,7 +184,6 @@ describe(`<${TagsPage.name}/>`, () => {
         ],
         locale: 'en',
       }),
-      undefined,
     );
     expect(screen.getByTestId('module-renderer-stub')).toHaveTextContent(
       'module_taxonomyList,module_newsletter',
