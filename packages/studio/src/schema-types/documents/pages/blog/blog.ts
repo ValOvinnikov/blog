@@ -5,10 +5,7 @@ import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
-import {
-  headingBlockField,
-  PAGE_HEADING_DESCRIPTION,
-} from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
+import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
 import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/validation/validate-single-blank-heading-per-type/validate-single-blank-heading-per-type';
 import { Newspaper } from 'lucide-react';
@@ -69,7 +66,6 @@ export const blogPageSchema = defineType({
     titleField(),
     headingBlockField({
       requireHeading: true,
-      description: PAGE_HEADING_DESCRIPTION,
     }),
     heroField(),
     modulesField({

@@ -1,7 +1,6 @@
 import { blogPageSchema } from '@blog/studio/schema-types/documents/pages/blog/blog';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
-import { PAGE_HEADING_DESCRIPTION } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import {
   createMockModulesRule,
   type TModuleReference,
@@ -63,11 +62,10 @@ describe('blogPageSchema field order', () => {
 });
 
 describe('blogPageSchema headingBlock field', () => {
-  it('is required, and describes the page heading and that a hero hides it', () => {
+  it('is required', () => {
     const headingBlockField = getField('headingBlock');
 
     expect(headingBlockField?.type).toBe('headingBlock');
-    expect(headingBlockField?.description).toBe(PAGE_HEADING_DESCRIPTION);
     expect(headingBlockField?.validation).toBeDefined();
   });
 });

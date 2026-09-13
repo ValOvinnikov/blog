@@ -6,8 +6,8 @@ type THeadingBlockValue = { heading?: string };
 
 const DEFAULT_REQUIRED_HEADING_MESSAGE = 'Heading is required.';
 
-export const PAGE_HEADING_DESCRIPTION =
-  "The page heading, shown as the page's H1 — except when a hero is set, which supplies its own H1 instead. Keep this filled in even then, so the page still has a heading if the hero is ever removed.";
+const DEFAULT_HEADING_BLOCK_DESCRIPTION =
+  'The heading shown at the top of this page or module, with its optional supporting line.';
 
 /**
  * The shared `headingBlock` object field. `requireHeading` adds a
@@ -26,8 +26,7 @@ export const headingBlockField = (
     name: 'headingBlock',
     title: 'Heading Block',
     type: headingBlockSchema.name,
-    description:
-      options.description ?? 'The section heading shown above this module.',
+    description: options.description ?? DEFAULT_HEADING_BLOCK_DESCRIPTION,
     validation: options.requireHeading
       ? (rule) =>
           rule.custom((value: THeadingBlockValue | undefined) =>
