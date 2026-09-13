@@ -14,7 +14,10 @@ vi.mock('@web/modules/hero-slot', () => ({
 
 const setup = customRender(PageIntro, {
   hero: undefined,
-  headingBlock: undefined,
+  headingBlock: {
+    heading: 'Notes on building things',
+    supportingText: undefined,
+  },
   hasTrailingSpace: undefined,
   locale: 'en',
   tenant: 'tenant-1',
@@ -62,22 +65,6 @@ describe(`<${PageIntro.name}/>`, () => {
       }),
     ).toBeVisible();
     expect(screen.getByText('Essays and notes from the team.')).toBeVisible();
-    expect(heroSlotMock).not.toHaveBeenCalled();
-  });
-
-  it('renders nothing when there is no hero and no heading', () => {
-    const { container } = setup();
-
-    expect(container).toBeEmptyDOMElement();
-    expect(heroSlotMock).not.toHaveBeenCalled();
-  });
-
-  it('renders nothing when there is no hero and headingBlock has no heading', () => {
-    const { container } = setup({
-      headingBlock: { heading: undefined, supportingText: 'Orphaned text' },
-    });
-
-    expect(container).toBeEmptyDOMElement();
     expect(heroSlotMock).not.toHaveBeenCalled();
   });
 });

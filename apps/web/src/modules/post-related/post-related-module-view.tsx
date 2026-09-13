@@ -16,7 +16,6 @@ export interface IPostRelatedModuleViewProps extends Omit<
   items: IPostCardData[];
   titleId: string;
   dataTestId: string;
-  accessibleTitle: string;
   hasImages?: boolean;
 }
 
@@ -32,7 +31,6 @@ export const PostRelatedModuleView = ({
   layout,
   titleId,
   dataTestId,
-  accessibleTitle,
   contentAlignment,
   hasImages,
 }: IPostRelatedModuleViewProps) => {
@@ -47,7 +45,6 @@ export const PostRelatedModuleView = ({
     >
       <ModuleHeading
         headingBlock={headingBlock}
-        accessibleTitle={accessibleTitle}
         id={titleId}
         level={2}
         align={contentAlignment}

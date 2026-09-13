@@ -33,13 +33,6 @@ export interface ITaxonomyListModuleViewProps extends Omit<
   dataTestId: string;
   /** Heading depth for the section title — the caller decides based on where the module sits in the page outline. */
   headingLevel: THeadingLevel;
-  /**
-   * Accessible heading text used when `headingBlock.heading` is empty or
-   * blank, so the section keeps a landmark name and the page's heading
-   * outline stays intact. Rendered visually hidden — pass an i18n string,
-   * never invent one here.
-   */
-  accessibleTitle: string;
   emptyMessage: string;
 }
 
@@ -57,7 +50,6 @@ export const TaxonomyListModuleView = ({
   titleId,
   dataTestId,
   headingLevel,
-  accessibleTitle,
   emptyMessage,
   contentAlignment,
   showLatestPosts,
@@ -74,7 +66,6 @@ export const TaxonomyListModuleView = ({
     >
       <ModuleHeading
         headingBlock={headingBlock}
-        accessibleTitle={accessibleTitle}
         id={titleId}
         level={headingLevel}
         align={contentAlignment}

@@ -1,4 +1,5 @@
 import { makeRawLandingPage } from '@blog/service/testing/pages/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 
 import { landingPageQuery } from './query';
 
@@ -23,15 +24,17 @@ describe('landingPageQuery', () => {
     expect(() => landingPageQuery.parse(raw)).not.toThrow();
   });
 
-  it('parses a landing page with no headingBlock', () => {
-    const raw = makeRawLandingPage({ headingBlock: null });
+  it('rejects a landing page with no headingBlock', () => {
+    const raw = { ...makeRawLandingPage(), headingBlock: null };
 
-    expect(() => landingPageQuery.parse(raw)).not.toThrow();
+    expect(() => landingPageQuery.parse(raw)).toThrow();
   });
 
   it('parses a landing page with a headingBlock heading and supportingText', () => {
     const raw = makeRawLandingPage({
-      headingBlock: { heading: 'About Us', supportingText: 'Who we are' },
+      headingBlock: makeRawHeadingBlock('About Us', {
+        supportingText: 'Who we are',
+      }),
     });
 
     expect(() => landingPageQuery.parse(raw)).not.toThrow();

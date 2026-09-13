@@ -6,7 +6,6 @@ import { ModuleHeading } from './module-heading';
 
 const setup = customRender(ModuleHeading, {
   headingBlock: makeHeadingBlock({ heading: 'Latest posts' }),
-  accessibleTitle: 'Posts',
   id: 'section-title',
   level: 2,
   align: undefined,
@@ -22,22 +21,6 @@ describe(`<${ModuleHeading.name}/>`, () => {
     });
     expect(heading).toHaveAttribute('id', 'section-title');
     expect(heading).not.toHaveClass('sr-only');
-  });
-
-  it('renders the accessible title as a visually hidden fallback when heading is blank', () => {
-    setup({ headingBlock: makeHeadingBlock({ heading: '   ' }) });
-
-    const heading = screen.getByRole('heading', { level: 2, name: 'Posts' });
-    expect(heading).toHaveClass('sr-only');
-  });
-
-  it('renders the accessible title as a visually hidden fallback when heading is undefined', () => {
-    setup({
-      headingBlock: makeHeadingBlock(),
-    });
-
-    const heading = screen.getByRole('heading', { level: 2, name: 'Posts' });
-    expect(heading).toHaveClass('sr-only');
   });
 
   it('renders the heading tag at the given level', () => {
