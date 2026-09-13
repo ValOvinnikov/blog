@@ -195,7 +195,7 @@ every field** (`.notNull()` or `.nullable(true)`).
 - **Slug → project `sub.field('slug.current').notNull()`** so the result is a
   plain `string`, not the `{ current?: string }` Slug object. No `?.current`
   dance in the transformer afterwards.
-- **Block content** (`blockText` / `richText`) rejects the bare field name in
+- **Block content** (`proseText` / `richText`) rejects the bare field name in
   `.field()`. Use the array form: `sub.field('body[]')` (add `.notNull()` if
   required). Same array form for object arrays you want to re-project:
   `sub.field('socialLinks[]').project((s) => ({ … }))`.
