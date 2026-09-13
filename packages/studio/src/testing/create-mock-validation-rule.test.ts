@@ -46,7 +46,7 @@ const documentType = defineType({
   fields: [singleRuleField],
 });
 
-describe('getRecordedValidators', () => {
+describe(getRecordedValidators, () => {
   it('records every custom() callback in registration order, with its level', () => {
     const validators = getRecordedValidators<TStringCustomFn>(documentType);
 
@@ -62,7 +62,7 @@ describe('getRecordedValidators', () => {
   });
 });
 
-describe('getCustomValidator', () => {
+describe(getCustomValidator, () => {
   it('returns the single registered callback', () => {
     const validate = getCustomValidator<TStringCustomFn>(singleRuleField);
 
@@ -82,9 +82,15 @@ describe('getCustomValidator', () => {
       getCustomValidator<TStringCustomFn>(requiredOnlyField),
     ).toThrow(/custom/);
   });
+
+  it('throws when more than one custom() rule was registered', () => {
+    expect(() => getCustomValidator<TStringCustomFn>(documentType)).toThrow(
+      /exactly one/,
+    );
+  });
 });
 
-describe('getCustomValidatorWithLevel', () => {
+describe(getCustomValidatorWithLevel, () => {
   it('reports error severity by default', () => {
     const { isWarning } =
       getCustomValidatorWithLevel<TStringCustomFn>(singleRuleField);

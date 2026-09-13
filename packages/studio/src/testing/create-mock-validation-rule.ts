@@ -41,15 +41,11 @@ const createRecordingRule = <TFn>(
 };
 
 /**
- * Every field/document `validation` builder in this codebase registers its
- * checks by chaining `rule.custom(fn)`, optionally followed by `.warning()`
- * — this exercises that builder against a minimal chainable mock `Rule` and
- * records each `custom()` callback in registration order together with the
- * severity it was chained to, so a test can invoke a validator directly
- * without spinning up a real Sanity `Rule`. A validator's severity defaults
- * to `'error'` and only flips to `'warning'` when `.warning()` is chained
- * directly onto that same `.custom()` call, mirroring how Sanity itself
- * reads the chain.
+ * Exercises a field's or document's `validation` builder against a minimal
+ * chainable mock `Rule` and records each `custom()` callback in registration
+ * order, along with its severity — a validator defaults to `'error'` and
+ * only becomes `'warning'` when `.warning()` is chained onto that same
+ * `.custom()` call.
  */
 export const getRecordedValidators = <TFn>(
   source: { validation?: unknown } | undefined,
@@ -66,21 +62,31 @@ export const getRecordedValidators = <TFn>(
   return recorded;
 };
 
+const getSingleRecordedValidator = <TFn>(
+  source: { validation?: unknown } | undefined,
+): TRecordedValidator<TFn> => {
+  const validators = getRecordedValidators<TFn>(source);
+
+  if (validators.length === 0) {
+    throw new Error('Expected validation to register a custom() rule.');
+  }
+
+  if (validators.length > 1) {
+    throw new Error(
+      `Expected validation to register exactly one custom() rule, found ${validators.length}.`,
+    );
+  }
+
+  return validators[0]!;
+};
+
 /**
  * Asserts a `validation` builder registered exactly one `custom()` rule and
  * returns its callback, for the common case of a single field-level check.
  */
 export const getCustomValidator = <TFn>(
   source: { validation?: unknown } | undefined,
-): TFn => {
-  const [validator] = getRecordedValidators<TFn>(source);
-
-  if (!validator) {
-    throw new Error('Expected validation to register a custom() rule.');
-  }
-
-  return validator.fn;
-};
+): TFn => getSingleRecordedValidator<TFn>(source).fn;
 
 /**
  * Same as `getCustomValidator`, but also reports whether that single rule
@@ -89,11 +95,7 @@ export const getCustomValidator = <TFn>(
 export const getCustomValidatorWithLevel = <TFn>(
   source: { validation?: unknown } | undefined,
 ): { fn: TFn; isWarning: boolean } => {
-  const [validator] = getRecordedValidators<TFn>(source);
-
-  if (!validator) {
-    throw new Error('Expected validation to register a custom() rule.');
-  }
+  const validator = getSingleRecordedValidator<TFn>(source);
 
   return { fn: validator.fn, isWarning: validator.level === 'warning' };
 };
