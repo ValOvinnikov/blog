@@ -2,10 +2,9 @@ import { TAXONOMY_KIND } from '@blog/config';
 import { TopicBreadcrumbs } from '@web/components/features/topic/topic-breadcrumbs';
 import { TopicChips } from '@web/components/features/topic/topic-chips';
 import { PageShell } from '@web/components/page-templates/page-shell';
-import { PageIntro } from '@web/components/shared/page-intro';
-import { ModuleRenderer } from '@web/modules/module-renderer';
 import { getTopicPage } from '@web/server/topic/get-topic-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
+import { resolvePageIntroAndContent } from '@web/utils/resolve-page-intro-and-content';
 
 type TTopicPageProps = {
   slug: string;
@@ -33,31 +32,27 @@ export const TopicPage = async ({
   const { topic, headingBlock, hero, modules } = pageData;
 
   const currentPage = page ?? 1;
+  const { intro, content } = await resolvePageIntroAndContent({
+    hero,
+    headingBlock,
+    modules,
+    context: {
+      page: currentPage,
+      archive: { kind: TAXONOMY_KIND.TOPICS, slug, name: topic.title },
+    },
+    locale,
+    tenant,
+  });
 
   return (
     <PageShell>
       <PageShell.Breadcrumbs>
         <TopicBreadcrumbs slug={slug} tenant={tenant} />
       </PageShell.Breadcrumbs>
-      <PageShell.Heading>
-        <PageIntro
-          hero={hero}
-          headingBlock={headingBlock}
-          locale={locale}
-          tenant={tenant}
-        />
-      </PageShell.Heading>
+      <PageShell.Heading>{intro}</PageShell.Heading>
       <PageShell.Content>
         <TopicChips activeSlug={slug} tenant={tenant} />
-        <ModuleRenderer
-          modules={modules}
-          context={{
-            page: currentPage,
-            archive: { kind: TAXONOMY_KIND.TOPICS, slug, name: topic.title },
-          }}
-          locale={locale}
-          tenant={tenant}
-        />
+        {content}
       </PageShell.Content>
     </PageShell>
   );
