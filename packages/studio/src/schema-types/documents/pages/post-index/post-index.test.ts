@@ -63,12 +63,12 @@ describe('postIndexPageSchema field order', () => {
 });
 
 describe('postIndexPageSchema headingBlock field', () => {
-  it('is required, and describes the page heading and that a hero hides it', () => {
+  it('is required, and uses the shared headingBlock description', () => {
     const headingBlockField = getField('headingBlock');
 
     expect(headingBlockField?.type).toBe('headingBlock');
     expect(headingBlockField?.description).toBe(
-      "The page heading, shown as the page's H1. Hidden when a hero is set — the hero's heading becomes the H1 instead. Still required, so the page keeps a heading if the hero is ever removed.",
+      'The heading shown at the top of this page or module, with its optional supporting line.',
     );
     expect(headingBlockField?.validation).toBeDefined();
   });
