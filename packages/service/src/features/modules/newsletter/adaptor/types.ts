@@ -1,15 +1,15 @@
 import type {
   TBrandVariantOf,
   TContentAlignment,
+  THeadingBlock,
   TLayout,
   TMaybeUndefined,
   TNewsletterVariant,
 } from '@blog/config';
-import type { TRequiredHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 
 export type TNewsletterModule = {
   brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
-  headingBlock: TRequiredHeadingBlock;
+  headingBlock: THeadingBlock;
   variant: TNewsletterVariant;
   layout: TMaybeUndefined<TLayout>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;

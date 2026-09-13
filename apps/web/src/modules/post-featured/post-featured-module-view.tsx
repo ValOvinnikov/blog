@@ -18,7 +18,6 @@ export interface IPostFeaturedModuleViewProps extends Omit<
   items: IPostCardData[];
   titleId: string;
   dataTestId: string;
-  accessibleTitle: string;
   hasImages?: boolean;
 }
 
@@ -37,7 +36,6 @@ export const PostFeaturedModuleView = ({
   layout,
   titleId,
   dataTestId,
-  accessibleTitle,
   contentAlignment,
   hasImages,
   displayMode,
@@ -45,7 +43,6 @@ export const PostFeaturedModuleView = ({
   const s = postFeaturedModuleViewVariants();
 
   const { heading } = headingBlock;
-  const resolvedTitle = heading?.trim() ? heading : accessibleTitle;
 
   const [leadPost, ...tailPosts] = items;
   const [soloTailPost] = tailPosts;
@@ -59,7 +56,6 @@ export const PostFeaturedModuleView = ({
     >
       <ModuleHeading
         headingBlock={headingBlock}
-        accessibleTitle={accessibleTitle}
         id={titleId}
         level={2}
         align={contentAlignment}
@@ -68,7 +64,7 @@ export const PostFeaturedModuleView = ({
         <PostsCarousel
           items={items}
           hasImages={hasImages}
-          title={resolvedTitle}
+          title={heading}
           tone={brandVariant}
         />
       )}

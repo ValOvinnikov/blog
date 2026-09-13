@@ -46,7 +46,6 @@ const meta = {
     contentAlignment: undefined,
     titleId: 'post-list-title',
     dataTestId: 'post-list-module-post-list-1',
-    accessibleTitle: 'Latest posts',
     emptyMessage: 'No posts yet.',
   },
 } satisfies Meta<typeof PostListModuleView>;
@@ -55,12 +54,6 @@ export default meta;
 type TStory = StoryObj<typeof meta>;
 
 export const Default: TStory = {};
-
-export const WithoutCmsHeading: TStory = {
-  args: {
-    headingBlock: makeHeadingBlock(),
-  },
-};
 
 export const Secondary: TStory = {
   args: { brandVariant: BRAND_VARIANT.SECONDARY },

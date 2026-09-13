@@ -1,6 +1,6 @@
 import { BRAND_VARIANT, NEWSLETTER_VARIANT } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { makeRequiredHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { NewsletterModuleView } from './newsletter-module-view';
 
@@ -22,7 +22,7 @@ const meta = {
   args: {
     id: 'newsletter-1',
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRequiredHeadingBlock({
+    headingBlock: makeHeadingBlock({
       heading: 'Get new posts in your inbox',
       supportingText: 'One email a week, no spam, unsubscribe anytime.',
     }),

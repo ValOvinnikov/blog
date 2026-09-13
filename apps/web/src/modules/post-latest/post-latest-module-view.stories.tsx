@@ -52,7 +52,6 @@ const meta = {
     contentAlignment: undefined,
     titleId: 'latest-posts-title',
     dataTestId: 'post-latest-module-post-latest-1',
-    accessibleTitle: 'Latest posts',
     displayMode: DISPLAY_MODE.GRID,
   },
 } satisfies Meta<typeof PostLatestModuleView>;
@@ -61,12 +60,6 @@ export default meta;
 type TStory = StoryObj<typeof meta>;
 
 export const Default: TStory = {};
-
-export const WithoutCmsHeading: TStory = {
-  args: {
-    headingBlock: makeHeadingBlock(),
-  },
-};
 
 export const Secondary: TStory = {
   args: { brandVariant: BRAND_VARIANT.SECONDARY },

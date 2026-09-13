@@ -1,10 +1,9 @@
 import type { ITenantLocalizedParams } from '@blog/config';
 import { LandingBreadcrumbs } from '@web/components/features/landing/landing-breadcrumbs';
 import { PageShell } from '@web/components/page-templates/page-shell';
-import { PageIntro } from '@web/components/shared/page-intro';
-import { ModuleRenderer } from '@web/modules/module-renderer';
 import { getLandingPage } from '@web/server/landing/get-landing-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
+import { resolvePageIntroAndContent } from '@web/utils/resolve-page-intro-and-content';
 
 type TLandingPageProps = ITenantLocalizedParams & { slug: string };
 
@@ -26,23 +25,21 @@ export const LandingPage = async ({
     slug,
   });
   const { headingBlock, hero, modules } = page;
+  const { intro, content } = await resolvePageIntroAndContent({
+    hero,
+    headingBlock,
+    modules,
+    locale,
+    tenant,
+  });
 
   return (
     <PageShell>
       <PageShell.Breadcrumbs>
         <LandingBreadcrumbs slug={slug} tenant={tenant} />
       </PageShell.Breadcrumbs>
-      <PageShell.Heading>
-        <PageIntro
-          hero={hero}
-          headingBlock={headingBlock}
-          locale={locale}
-          tenant={tenant}
-        />
-      </PageShell.Heading>
-      <PageShell.Content>
-        <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />
-      </PageShell.Content>
+      <PageShell.Heading>{intro}</PageShell.Heading>
+      <PageShell.Content>{content}</PageShell.Content>
     </PageShell>
   );
 };

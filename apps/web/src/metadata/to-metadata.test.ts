@@ -125,7 +125,7 @@ describe('toMetadata', () => {
     );
 
     expect(metadata.title).toBe('Example Title');
-    expect(metadata.description).toBeUndefined();
+    expect(metadata).not.toHaveProperty('description');
     expect(metadata.openGraph?.title).toBeUndefined();
     expect(metadata.openGraph?.description).toBeUndefined();
     expect(metadata.twitter?.title).toBeUndefined();

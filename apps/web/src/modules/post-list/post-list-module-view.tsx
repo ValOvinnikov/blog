@@ -27,7 +27,6 @@ export interface IPostListModuleViewProps extends Omit<
   items: IPostCardData[];
   titleId: string;
   dataTestId: string;
-  accessibleTitle: string;
   emptyMessage?: string;
   pagination?: IPostListModulePagination;
   hasImages?: boolean;
@@ -45,7 +44,6 @@ export const PostListModuleView = ({
   layout,
   titleId,
   dataTestId,
-  accessibleTitle,
   emptyMessage,
   pagination,
   contentAlignment,
@@ -63,7 +61,6 @@ export const PostListModuleView = ({
     >
       <ModuleHeading
         headingBlock={headingBlock}
-        accessibleTitle={accessibleTitle}
         id={titleId}
         level={2}
         align={contentAlignment}

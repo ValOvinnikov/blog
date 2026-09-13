@@ -132,10 +132,11 @@ describe(`<${LandingPage.name}/>`, () => {
 
     await setup();
 
-    expect(moduleRendererMock).toHaveBeenCalledWith(
-      { modules: [], locale: 'EN', tenant: 'tenant-1' },
-      undefined,
-    );
+    expect(moduleRendererMock).toHaveBeenCalledWith({
+      modules: [],
+      locale: 'EN',
+      tenant: 'tenant-1',
+    });
   });
 
   it('passes the fetched modules and locale through to ModuleRenderer when an editor has added some', async () => {
@@ -149,14 +150,11 @@ describe(`<${LandingPage.name}/>`, () => {
 
     await setup();
 
-    expect(moduleRendererMock).toHaveBeenCalledWith(
-      {
-        modules: [{ id: 'module-1', type: 'module_content' }],
-        locale: 'EN',
-        tenant: 'tenant-1',
-      },
-      undefined,
-    );
+    expect(moduleRendererMock).toHaveBeenCalledWith({
+      modules: [{ id: 'module-1', type: 'module_content' }],
+      locale: 'EN',
+      tenant: 'tenant-1',
+    });
     expect(screen.getByTestId('module-renderer')).toHaveTextContent(
       '1 modules',
     );
@@ -188,21 +186,6 @@ describe(`<${LandingPage.name}/>`, () => {
     expect(heroSlotMock).not.toHaveBeenCalled();
   });
 
-  it('renders no heading region when there is neither a hero nor a heading', async () => {
-    getLandingPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        ...mockLandingPage,
-        headingBlock: { heading: undefined, supportingText: undefined },
-      },
-    });
-
-    await setup();
-
-    expect(screen.queryAllByRole('heading', { level: 1 })).toHaveLength(0);
-    expect(heroSlotMock).not.toHaveBeenCalled();
-  });
-
   it('dispatches the hero through HeroSlot and keeps exactly one h1 when a hero is set', async () => {
     getLandingPageMock.mockResolvedValue({
       ok: true,
@@ -214,15 +197,12 @@ describe(`<${LandingPage.name}/>`, () => {
 
     await setup();
 
-    expect(heroSlotMock).toHaveBeenCalledWith(
-      {
-        id: 'hero-1',
-        type: 'module_hero',
-        locale: 'EN',
-        tenant: 'tenant-1',
-      },
-      undefined,
-    );
+    expect(heroSlotMock).toHaveBeenCalledWith({
+      id: 'hero-1',
+      type: 'module_hero',
+      locale: 'EN',
+      tenant: 'tenant-1',
+    });
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 

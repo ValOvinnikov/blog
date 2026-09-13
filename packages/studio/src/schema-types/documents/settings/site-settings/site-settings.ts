@@ -40,7 +40,8 @@ export const siteSettingsSchema = defineType({
       name: 'description',
       title: 'Site Description',
       type: 'text',
-      description: 'Default meta description for the home page and RSS feed.',
+      description:
+        'Used as the meta, Open Graph and Twitter description for any page that leaves its own empty, and as the RSS feed description.',
       validation: (rule) => rule.required().min(50).max(160),
       fieldset: 'seo',
     }),

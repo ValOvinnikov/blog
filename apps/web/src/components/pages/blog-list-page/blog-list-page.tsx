@@ -1,10 +1,9 @@
 import { BlogListBreadcrumbs } from '@web/components/features/blog-list/blog-list-breadcrumbs';
 import { BlogListTopicChips } from '@web/components/features/blog-list/blog-list-topic-chips';
 import { PageShell } from '@web/components/page-templates/page-shell';
-import { PageIntro } from '@web/components/shared/page-intro';
-import { ModuleRenderer } from '@web/modules/module-renderer';
 import { getBlogListPage } from '@web/server/blog-list/get-blog-list-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
+import { resolvePageIntroAndContent } from '@web/utils/resolve-page-intro-and-content';
 
 type TBlogListPageProps = { page: number; locale: string; tenant: string };
 
@@ -22,28 +21,24 @@ export const BlogListPage = async ({
   const result = await getBlogListPage(tenant);
   const pageData = guardPageLoaderResult(result, 'blog_list_page.fetch_failed');
   const { headingBlock, hero, modules } = pageData;
+  const { intro, content } = await resolvePageIntroAndContent({
+    hero,
+    headingBlock,
+    modules,
+    context: { page },
+    locale,
+    tenant,
+  });
 
   return (
     <PageShell>
       <PageShell.Breadcrumbs>
         <BlogListBreadcrumbs tenant={tenant} />
       </PageShell.Breadcrumbs>
-      <PageShell.Heading>
-        <PageIntro
-          hero={hero}
-          headingBlock={headingBlock}
-          locale={locale}
-          tenant={tenant}
-        />
-      </PageShell.Heading>
+      <PageShell.Heading>{intro}</PageShell.Heading>
       <PageShell.Content>
         <BlogListTopicChips tenant={tenant} />
-        <ModuleRenderer
-          modules={modules}
-          context={{ page }}
-          locale={locale}
-          tenant={tenant}
-        />
+        {content}
       </PageShell.Content>
     </PageShell>
   );

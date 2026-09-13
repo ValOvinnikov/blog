@@ -113,28 +113,6 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
     expect(container.querySelector('section')).not.toBeInTheDocument();
   });
 
-  it("resolves the module's own translated fallback heading (never a hardcoded string) when headingBlock.heading is undefined", async () => {
-    getPostFeaturedMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock(),
-        posts: [makePost()],
-        layout: undefined,
-        contentAlignment: undefined,
-        showImages: false,
-      },
-    });
-
-    await setup();
-
-    const heading = screen.getByRole('heading', { level: 2, name: 'Featured' });
-    expect(heading).toHaveClass('sr-only');
-    expect(
-      screen.getByRole('region', { name: 'Featured' }),
-    ).toBeInTheDocument();
-  });
-
   it('renders the first post as a lead card and the rest in a tail grid', async () => {
     getPostFeaturedMock.mockResolvedValue({
       ok: true,

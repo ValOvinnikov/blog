@@ -1,9 +1,10 @@
-import { customRender, screen } from '@web/testing/custom-render';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
+import type { ReactNode } from 'react';
 
 import { PageIntro } from './page-intro';
 
 const { heroSlotMock } = vi.hoisted(() => ({
-  heroSlotMock: vi.fn(({ id }: { id: string }) => (
+  heroSlotMock: vi.fn(({ id }: { id: string }): ReactNode => (
     <div data-testid="hero-slot">{id}</div>
   )),
 }));
@@ -12,9 +13,12 @@ vi.mock('@web/modules/hero-slot', () => ({
   HeroSlot: heroSlotMock,
 }));
 
-const setup = customRender(PageIntro, {
+const setup = customRenderAsync(PageIntro, {
   hero: undefined,
-  headingBlock: undefined,
+  headingBlock: {
+    heading: 'Notes on building things',
+    supportingText: undefined,
+  },
   hasTrailingSpace: undefined,
   locale: 'en',
   tenant: 'tenant-1',
@@ -25,8 +29,8 @@ describe(`<${PageIntro.name}/>`, () => {
     heroSlotMock.mockClear();
   });
 
-  it('renders the hero and not the heading when a hero is set', () => {
-    setup({
+  it('renders the hero and not the heading when a hero resolves to content', async () => {
+    await setup({
       hero: { id: 'hero-1', type: 'module_hero' },
       headingBlock: {
         heading: 'Notes on building things',
@@ -38,17 +42,19 @@ describe(`<${PageIntro.name}/>`, () => {
     expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
   });
 
-  it('forwards id, type, locale, and tenant to HeroSlot', () => {
-    setup({ hero: { id: 'hero-1', type: 'module_hero' } });
+  it('forwards id, type, locale, and tenant to HeroSlot', async () => {
+    await setup({ hero: { id: 'hero-1', type: 'module_hero' } });
 
-    expect(heroSlotMock).toHaveBeenCalledWith(
-      { id: 'hero-1', type: 'module_hero', locale: 'en', tenant: 'tenant-1' },
-      undefined,
-    );
+    expect(heroSlotMock).toHaveBeenCalledWith({
+      id: 'hero-1',
+      type: 'module_hero',
+      locale: 'en',
+      tenant: 'tenant-1',
+    });
   });
 
-  it('renders the PageHeading when there is no hero and a heading is given', () => {
-    setup({
+  it('renders the PageHeading when there is no hero and a heading is given', async () => {
+    await setup({
       headingBlock: {
         heading: 'Notes on building things',
         supportingText: 'Essays and notes from the team.',
@@ -65,19 +71,23 @@ describe(`<${PageIntro.name}/>`, () => {
     expect(heroSlotMock).not.toHaveBeenCalled();
   });
 
-  it('renders nothing when there is no hero and no heading', () => {
-    const { container } = setup();
+  it('falls back to the PageHeading when the hero resolves to nothing', async () => {
+    heroSlotMock.mockReturnValueOnce(null);
 
-    expect(container).toBeEmptyDOMElement();
-    expect(heroSlotMock).not.toHaveBeenCalled();
-  });
-
-  it('renders nothing when there is no hero and headingBlock has no heading', () => {
-    const { container } = setup({
-      headingBlock: { heading: undefined, supportingText: 'Orphaned text' },
+    await setup({
+      hero: { id: 'hero-1', type: 'module_hero' },
+      headingBlock: {
+        heading: 'Notes on building things',
+        supportingText: undefined,
+      },
     });
 
-    expect(container).toBeEmptyDOMElement();
-    expect(heroSlotMock).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('hero-slot')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+        name: 'Notes on building things',
+      }),
+    ).toBeVisible();
   });
 });
