@@ -124,40 +124,6 @@ describe(`<${PostLatestModule.name}/>`, () => {
     expect(container.querySelector('section')).not.toBeInTheDocument();
   });
 
-  it("resolves the module's own translated fallback heading (never a hardcoded string) when headingBlock.heading is undefined", async () => {
-    getPostLatestMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock(),
-        posts: [
-          {
-            id: 'post-1',
-            slug: 'first-post',
-            title: 'First post',
-            excerpt: 'An excerpt',
-            publishedAt: '2026-01-01T00:00:00.000Z',
-            topic: { id: 'topic-1', title: 'News', slug: 'news' },
-            readingTimeMinutes: 2,
-          },
-        ],
-        layout: undefined,
-        contentAlignment: undefined,
-      },
-    });
-
-    await setup();
-
-    const heading = screen.getByRole('heading', {
-      level: 2,
-      name: 'Latest posts',
-    });
-    expect(heading).toHaveClass('sr-only');
-    expect(
-      screen.getByRole('region', { name: 'Latest posts' }),
-    ).toBeInTheDocument();
-  });
-
   it('renders the resolved posts and no pagination nav', async () => {
     getPostLatestMock.mockResolvedValue({
       ok: true,

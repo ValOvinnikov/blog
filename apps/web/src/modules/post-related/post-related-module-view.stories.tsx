@@ -46,7 +46,6 @@ const meta = {
     contentAlignment: undefined,
     titleId: 'related-posts-title',
     dataTestId: 'post-related-module-post-related-1',
-    accessibleTitle: 'Related reading',
   },
 } satisfies Meta<typeof PostRelatedModuleView>;
 
@@ -54,12 +53,6 @@ export default meta;
 type TStory = StoryObj<typeof meta>;
 
 export const Default: TStory = {};
-
-export const WithoutCmsHeading: TStory = {
-  args: {
-    headingBlock: makeHeadingBlock(),
-  },
-};
 
 export const Secondary: TStory = {
   args: { brandVariant: BRAND_VARIANT.SECONDARY },

@@ -14,7 +14,6 @@ import {
 } from '@blog/service/testing/entities/fixtures';
 import {
   makeRawHeadingBlock,
-  makeRawOptionalHeadingBlock,
   makeRawSanityImage,
   makeRawSeo,
 } from '@blog/service/testing/shared/fixtures';
@@ -119,7 +118,7 @@ export function makeRawHomePage(
   overrides: Partial<TRawHomePage> = {},
 ): TRawHomePage {
   return {
-    headingBlock: null,
+    headingBlock: makeRawHeadingBlock('Welcome'),
     hero: { _id: 'hero-1', _type: 'module_hero' },
     modules: [
       { _id: 'post-latest-1', _type: 'module_postLatest' },
@@ -134,8 +133,7 @@ export function makeRawBlogPage(
   overrides: Partial<NonNullable<TRawBlogPage>> = {},
 ): NonNullable<TRawBlogPage> {
   return {
-    headingBlock: makeRawOptionalHeadingBlock({
-      heading: 'The Blog',
+    headingBlock: makeRawHeadingBlock('The Blog', {
       supportingText: 'Notes on building things.',
     }),
     hero: null,
@@ -149,7 +147,7 @@ export function makeRawTopicIndexPage(
   overrides: Partial<TRawTopicIndexPage> = {},
 ): TRawTopicIndexPage {
   return {
-    headingBlock: makeRawOptionalHeadingBlock({ heading: 'Browse by topic' }),
+    headingBlock: makeRawHeadingBlock('Browse by topic'),
     hero: null,
     modules: [{ _id: 'taxonomy-list-1', _type: 'module_taxonomyList' }],
     seo: makeRawSeo(),
@@ -161,7 +159,7 @@ export function makeRawTagIndexPage(
   overrides: Partial<TRawTagIndexPage> = {},
 ): TRawTagIndexPage {
   return {
-    headingBlock: makeRawOptionalHeadingBlock({ heading: 'Browse by tag' }),
+    headingBlock: makeRawHeadingBlock('Browse by tag'),
     hero: null,
     modules: [{ _id: 'taxonomy-list-1', _type: 'module_taxonomyList' }],
     seo: makeRawSeo(),
@@ -174,7 +172,7 @@ export function makeRawTopicPage(
 ): TRawTopicPage {
   return {
     topic: makeRawTopic(),
-    headingBlock: null,
+    headingBlock: makeRawHeadingBlock('Engineering'),
     hero: null,
     modules: [{ _id: 'post-list-1', _type: 'module_postList' }],
     seo: makeRawSeo(),
@@ -187,7 +185,7 @@ export function makeRawTagPage(
 ): TRawTagPage {
   return {
     tag: { ...makeRawTag(), description: 'Posts about TypeScript.' },
-    headingBlock: null,
+    headingBlock: makeRawHeadingBlock('TypeScript'),
     hero: null,
     modules: [{ _id: 'post-list-1', _type: 'module_postList' }],
     seo: makeRawSeo(),
@@ -200,7 +198,7 @@ export function makeRawLandingPage(
 ): TRawLandingPage {
   return {
     slug: 'about',
-    headingBlock: null,
+    headingBlock: makeRawHeadingBlock('About Us'),
     hero: null,
     modules: [
       { _id: 'content-1', _type: 'module_content' },

@@ -24,6 +24,5 @@ export function toSiteSettings(raw: TRawSiteSettings): TSiteSettings {
       logo: toSanityImage(raw.brand.logo),
     },
     description: raw.description,
-    tagline: raw.tagline ?? undefined,
   };
 }

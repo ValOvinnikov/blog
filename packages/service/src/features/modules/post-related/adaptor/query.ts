@@ -16,7 +16,7 @@ export const postRelatedModuleQuery = q
     headingBlock: sub
       .field('headingBlock')
       .project(headingBlockFragment)
-      .nullable(true),
+      .notNull(),
     showImages: sub.raw(SHOW_IMAGES_EXPRESSION, showImagesParser),
     limit: sub.field('limit').notNull(),
     layout: sub.field('layout').project(layoutFragment).nullable(true),

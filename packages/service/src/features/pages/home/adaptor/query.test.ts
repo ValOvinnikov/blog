@@ -26,10 +26,10 @@ describe('homePageQuery', () => {
     expect(homePageQuery.parse(null)).toBeNull();
   });
 
-  it('parses a home page with a hero and no headingBlock', () => {
-    const raw = makeRawHomePage({ headingBlock: null });
+  it('rejects a home page with no headingBlock', () => {
+    const raw = { ...makeRawHomePage(), headingBlock: null };
 
-    expect(() => homePageQuery.parse(raw)).not.toThrow();
+    expect(() => homePageQuery.parse(raw)).toThrow();
   });
 
   it('parses a home page with a headingBlock heading and no hero', () => {

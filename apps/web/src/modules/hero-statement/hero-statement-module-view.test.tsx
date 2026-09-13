@@ -6,6 +6,7 @@ import {
 } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { HeroStatementModuleView } from './hero-statement-module-view';
 
@@ -40,8 +41,7 @@ const setup = customRender(HeroStatementModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
   variant: HERO_VARIANT.SPLIT,
   eyebrow: undefined,
-  heading: 'Build faster, ship sooner',
-  supportingText: undefined,
+  headingBlock: makeHeadingBlock({ heading: 'Build faster, ship sooner' }),
   sanityImage: undefined,
   actions: undefined,
   contentPosition: undefined,

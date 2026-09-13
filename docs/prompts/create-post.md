@@ -121,18 +121,22 @@ relation checklist whenever you propose a new topic or tag.
 
 **SEO here is authored-only: what you type is what ships, and what you leave
 empty is omitted.** There is no fallback ladder — nothing is derived from the
-heading, the supporting text, the hero image or any site-wide default.
+heading, the supporting text or the hero image; the one site-wide default is
+the `description` noted below.
 
 That makes `metaTitle` non-negotiable: **always draft one, 30–60 characters.**
 A post without it does not merely lose its `<title>` — the page fails to
 build. "Inherit" is not an option this model offers.
 
-Everything else is genuinely optional, and absent means absent: no
-`metaDescription` emits no description tag, `og:title` is **never** inherited
-from `metaTitle`, and there is no site-wide default OG image and no
-hero-image substitute — an unauthored `ogImage` means the post shares with no
-image at all. Draft `metaDescription` (120–160) as a matter of course, and
-author the `openGraph` fields whenever the post is meant to be shared.
+Everything else is genuinely optional. An empty `metaDescription` is the one
+exception to "absent means absent": the page then carries the site-wide
+description from Site Settings (and OG/Twitter descriptions inherit it too),
+which is generic — so it is a floor, not a substitute for a real one.
+`og:title` is **never** inherited from `metaTitle`, and there is no site-wide
+default OG image and no hero-image substitute — an unauthored `ogImage` means
+the post shares with no image at all. Draft `metaDescription` (120–160) as a
+matter of course, and author the `openGraph` fields whenever the post is
+meant to be shared.
 
 ## BODY CAPABILITIES (`content` Portable Text — what actually renders)
 

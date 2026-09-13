@@ -164,7 +164,6 @@ describe(`<${BlogListPage.name}/>`, () => {
 
     expect(moduleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({ context: { page: 2 } }),
-      undefined,
     );
   });
 
@@ -181,7 +180,6 @@ describe(`<${BlogListPage.name}/>`, () => {
 
     expect(moduleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({ modules: [], locale: 'en' }),
-      undefined,
     );
   });
 
@@ -207,7 +205,6 @@ describe(`<${BlogListPage.name}/>`, () => {
         ],
         locale: 'en',
       }),
-      undefined,
     );
     expect(screen.getByTestId('module-renderer-stub')).toHaveTextContent(
       'module_postList,module_newsletter',
@@ -241,10 +238,12 @@ describe(`<${BlogListPage.name}/>`, () => {
 
     await setup();
 
-    expect(heroSlotMock).toHaveBeenCalledWith(
-      { id: 'hero-1', type: 'module_hero', locale: 'en', tenant: 'tenant-1' },
-      undefined,
-    );
+    expect(heroSlotMock).toHaveBeenCalledWith({
+      id: 'hero-1',
+      type: 'module_hero',
+      locale: 'en',
+      tenant: 'tenant-1',
+    });
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 

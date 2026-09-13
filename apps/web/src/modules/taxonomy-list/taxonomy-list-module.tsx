@@ -78,7 +78,6 @@ export const TaxonomyListModule = async ({
       titleId={`taxonomy-list-${id}`}
       dataTestId={`taxonomy-list-module-${id}`}
       headingLevel={2}
-      accessibleTitle={t('fallbackHeading')}
       emptyMessage={t('empty')}
     />
   );

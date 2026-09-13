@@ -119,7 +119,6 @@ export const PostListModule = async ({
       hasImages={showImages}
       titleId={titleId}
       dataTestId={`post-list-module-${id}`}
-      accessibleTitle={scopedT('title', scopedParams)}
       emptyMessage={scopedT('empty', scopedParams)}
       pagination={pagination}
     />

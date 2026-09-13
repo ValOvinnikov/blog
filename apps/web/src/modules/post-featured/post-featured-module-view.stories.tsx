@@ -57,7 +57,6 @@ const meta = {
     contentAlignment: undefined,
     titleId: 'featured-posts-title',
     dataTestId: 'post-featured-module-featured-1',
-    accessibleTitle: 'Featured posts',
     displayMode: DISPLAY_MODE.GRID,
   },
 } satisfies Meta<typeof PostFeaturedModuleView>;
@@ -76,12 +75,6 @@ export const LeadWithSingleTail: TStory = {
 /** Only the lead card, no tail posts at all. */
 export const LeadOnly: TStory = {
   args: { items: [leadItem] },
-};
-
-export const WithoutCmsHeading: TStory = {
-  args: {
-    headingBlock: makeHeadingBlock(),
-  },
 };
 
 export const Secondary: TStory = {

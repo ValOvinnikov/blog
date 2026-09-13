@@ -1,6 +1,9 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawLandingPage } from '@blog/service/testing/pages/fixtures';
-import { makeRawSeo } from '@blog/service/testing/shared/fixtures';
+import {
+  makeRawHeadingBlock,
+  makeRawSeo,
+} from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getPage } from './loader';
@@ -26,20 +29,12 @@ describe('getPage', () => {
     ]);
   });
 
-  it('builds an all-undefined headingBlock when page_landing.headingBlock is unset', async () => {
-    mockRun.mockResolvedValueOnce(makeRawLandingPage({ headingBlock: null }));
-
-    const page = await getPage('about', tenant);
-    if (!page) throw new Error('expected a landing page');
-
-    expect(page.headingBlock.heading).toBeUndefined();
-    expect(page.headingBlock.supportingText).toBeUndefined();
-  });
-
   it('maps an authored page_landing.headingBlock through to the view model', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawLandingPage({
-        headingBlock: { heading: 'About Us', supportingText: 'Who we are' },
+        headingBlock: makeRawHeadingBlock('About Us', {
+          supportingText: 'Who we are',
+        }),
       }),
     );
 

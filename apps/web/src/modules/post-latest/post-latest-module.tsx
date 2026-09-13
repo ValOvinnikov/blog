@@ -2,7 +2,6 @@ import { service } from '@blog/service';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { renderPostCardImage } from '@web/utils/render-post-card-image';
 import { toPostListItems } from '@web/utils/to-post-list-items';
-import { getTranslations } from 'next-intl/server';
 
 import { PostLatestModuleView } from './post-latest-module-view';
 
@@ -21,10 +20,10 @@ export const PostLatestModule = async ({
   tenant,
 }: IPostLatestModuleProps) => {
   const tenantContext = await getTenantSanityContext(tenant);
-  const [result, t] = await Promise.all([
-    service.modules.postLatest.v1.getPostLatest(id, tenantContext),
-    getTranslations('postLatestModule'),
-  ]);
+  const result = await service.modules.postLatest.v1.getPostLatest(
+    id,
+    tenantContext,
+  );
 
   if (!result.ok) return null;
 
@@ -56,7 +55,6 @@ export const PostLatestModule = async ({
       displayMode={displayMode}
       titleId={`latest-posts-${id}`}
       dataTestId={`post-latest-module-${id}`}
-      accessibleTitle={t('fallbackHeading')}
     />
   );
 };

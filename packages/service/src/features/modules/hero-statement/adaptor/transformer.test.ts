@@ -18,7 +18,7 @@ import {
 import { toHeroStatementModule } from './transformer';
 
 describe(toHeroStatementModule, () => {
-  it('maps brandVariant, variant and heading straight through', () => {
+  it('maps brandVariant, variant and headingBlock straight through', () => {
     const raw = makeRawHeroStatementModule({
       brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
       variant: HERO_VARIANT.BANNER,
@@ -29,10 +29,13 @@ describe(toHeroStatementModule, () => {
 
     expect(hero.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
     expect(hero.variant).toBe(HERO_VARIANT.BANNER);
-    expect(hero.heading).toBe('Ship confidently');
+    expect(hero.headingBlock).toEqual({
+      heading: 'Ship confidently',
+      supportingText: undefined,
+    });
   });
 
-  it('leaves eyebrow and supportingText undefined when unset', () => {
+  it('leaves eyebrow and headingBlock.supportingText undefined when unset', () => {
     const raw = makeRawHeroStatementModule({
       eyebrow: null,
       headingBlock: makeRawHeadingBlock('Statement heading', {
@@ -43,10 +46,10 @@ describe(toHeroStatementModule, () => {
     const hero = toHeroStatementModule(raw);
 
     expect(hero.eyebrow).toBeUndefined();
-    expect(hero.supportingText).toBeUndefined();
+    expect(hero.headingBlock.supportingText).toBeUndefined();
   });
 
-  it('maps an authored eyebrow and supportingText', () => {
+  it('maps an authored eyebrow and headingBlock.supportingText', () => {
     const raw = makeRawHeroStatementModule({
       eyebrow: 'Field notes',
       headingBlock: makeRawHeadingBlock('Statement heading', {
@@ -57,7 +60,7 @@ describe(toHeroStatementModule, () => {
     const hero = toHeroStatementModule(raw);
 
     expect(hero.eyebrow).toBe('Field notes');
-    expect(hero.supportingText).toBe('Supporting copy.');
+    expect(hero.headingBlock.supportingText).toBe('Supporting copy.');
   });
 
   it('leaves sanityImage undefined when unset', () => {

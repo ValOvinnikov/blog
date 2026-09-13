@@ -42,17 +42,6 @@ describe('toTaxonomyListModule', () => {
     });
   });
 
-  it('leaves every headingBlock field undefined when unset (no faked default)', () => {
-    const raw = makeRawTaxonomyListModule({ headingBlock: null });
-
-    const module = toTaxonomyListModule(raw);
-
-    expect(module.headingBlock).toEqual({
-      heading: undefined,
-      supportingText: undefined,
-    });
-  });
-
   it('leaves contentAlignment undefined when unset (no faked default)', () => {
     const raw = makeRawTaxonomyListModule({ contentAlignment: null });
 

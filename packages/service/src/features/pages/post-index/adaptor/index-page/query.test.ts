@@ -3,10 +3,10 @@ import { makeRawBlogPage } from '@blog/service/testing/pages/fixtures';
 import { blogPageQuery } from './query';
 
 describe('blogPageQuery', () => {
-  it('parses a blog page with no headingBlock', () => {
-    const raw = makeRawBlogPage({ headingBlock: null });
+  it('rejects a blog page with no headingBlock', () => {
+    const raw = { ...makeRawBlogPage(), headingBlock: null };
 
-    expect(() => blogPageQuery.parse(raw)).not.toThrow();
+    expect(() => blogPageQuery.parse(raw)).toThrow();
   });
 
   it('rejects a blog page with no authored SEO', () => {
