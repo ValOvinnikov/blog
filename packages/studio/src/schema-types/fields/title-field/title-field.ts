@@ -17,7 +17,8 @@ export const titleField = (options: TTitleFieldOptions = {}) =>
     name: 'title',
     title: 'Title',
     type: 'string',
-    description: 'The main title / headline for this document.',
+    description:
+      'Give this document a clear, descriptive title to help identify it in Studio. This title for internal use only',
     validation: (rule: StringRule) => rule.required(),
     ...options,
   });
