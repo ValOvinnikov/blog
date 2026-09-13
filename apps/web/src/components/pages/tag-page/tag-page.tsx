@@ -32,21 +32,20 @@ export const TagPage = async ({
   const { tag, headingBlock, hero, modules } = pageData;
 
   const currentPage = page ?? 1;
+  const intro = await PageIntro({
+    hero,
+    headingBlock,
+    hasTrailingSpace: false,
+    locale,
+    tenant,
+  });
 
   return (
     <PageShell>
       <PageShell.Breadcrumbs>
         <TagBreadcrumbs slug={slug} tenant={tenant} />
       </PageShell.Breadcrumbs>
-      <PageShell.Heading>
-        <PageIntro
-          hero={hero}
-          headingBlock={headingBlock}
-          hasTrailingSpace={false}
-          locale={locale}
-          tenant={tenant}
-        />
-      </PageShell.Heading>
+      <PageShell.Heading>{intro}</PageShell.Heading>
       <PageShell.Content>
         <ModuleRenderer
           modules={modules}

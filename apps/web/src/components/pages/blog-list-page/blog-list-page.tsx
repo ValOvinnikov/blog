@@ -22,20 +22,14 @@ export const BlogListPage = async ({
   const result = await getBlogListPage(tenant);
   const pageData = guardPageLoaderResult(result, 'blog_list_page.fetch_failed');
   const { headingBlock, hero, modules } = pageData;
+  const intro = await PageIntro({ hero, headingBlock, locale, tenant });
 
   return (
     <PageShell>
       <PageShell.Breadcrumbs>
         <BlogListBreadcrumbs tenant={tenant} />
       </PageShell.Breadcrumbs>
-      <PageShell.Heading>
-        <PageIntro
-          hero={hero}
-          headingBlock={headingBlock}
-          locale={locale}
-          tenant={tenant}
-        />
-      </PageShell.Heading>
+      <PageShell.Heading>{intro}</PageShell.Heading>
       <PageShell.Content>
         <BlogListTopicChips tenant={tenant} />
         <ModuleRenderer

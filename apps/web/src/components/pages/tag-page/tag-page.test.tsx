@@ -272,10 +272,12 @@ describe(`<${TagPage.name}/>`, () => {
 
     await setup();
 
-    expect(heroSlotMock).toHaveBeenCalledWith(
-      { id: 'hero-1', type: 'module_hero', locale: 'en', tenant: 'tenant-1' },
-      undefined,
-    );
+    expect(heroSlotMock).toHaveBeenCalledWith({
+      id: 'hero-1',
+      type: 'module_hero',
+      locale: 'en',
+      tenant: 'tenant-1',
+    });
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 

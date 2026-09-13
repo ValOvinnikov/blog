@@ -48,17 +48,11 @@ export default async function HomePage({ params }: TProps) {
     result,
     'home_page.fetch_failed',
   );
+  const intro = await PageIntro({ hero, headingBlock, locale, tenant });
 
   return (
     <PageShell>
-      <PageShell.Heading>
-        <PageIntro
-          hero={hero}
-          headingBlock={headingBlock}
-          locale={locale}
-          tenant={tenant}
-        />
-      </PageShell.Heading>
+      <PageShell.Heading>{intro}</PageShell.Heading>
       <PageShell.Content>
         <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />
       </PageShell.Content>

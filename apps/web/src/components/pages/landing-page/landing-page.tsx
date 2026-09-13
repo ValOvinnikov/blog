@@ -26,20 +26,14 @@ export const LandingPage = async ({
     slug,
   });
   const { headingBlock, hero, modules } = page;
+  const intro = await PageIntro({ hero, headingBlock, locale, tenant });
 
   return (
     <PageShell>
       <PageShell.Breadcrumbs>
         <LandingBreadcrumbs slug={slug} tenant={tenant} />
       </PageShell.Breadcrumbs>
-      <PageShell.Heading>
-        <PageIntro
-          hero={hero}
-          headingBlock={headingBlock}
-          locale={locale}
-          tenant={tenant}
-        />
-      </PageShell.Heading>
+      <PageShell.Heading>{intro}</PageShell.Heading>
       <PageShell.Content>
         <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />
       </PageShell.Content>

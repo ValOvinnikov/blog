@@ -33,20 +33,14 @@ export const TopicPage = async ({
   const { topic, headingBlock, hero, modules } = pageData;
 
   const currentPage = page ?? 1;
+  const intro = await PageIntro({ hero, headingBlock, locale, tenant });
 
   return (
     <PageShell>
       <PageShell.Breadcrumbs>
         <TopicBreadcrumbs slug={slug} tenant={tenant} />
       </PageShell.Breadcrumbs>
-      <PageShell.Heading>
-        <PageIntro
-          hero={hero}
-          headingBlock={headingBlock}
-          locale={locale}
-          tenant={tenant}
-        />
-      </PageShell.Heading>
+      <PageShell.Heading>{intro}</PageShell.Heading>
       <PageShell.Content>
         <TopicChips activeSlug={slug} tenant={tenant} />
         <ModuleRenderer

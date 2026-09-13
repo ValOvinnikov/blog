@@ -19,21 +19,20 @@ export const TopicsPage = async ({ locale, tenant }: TTopicsPageProps) => {
     result,
     'topics_page.fetch_failed',
   );
+  const intro = await PageIntro({
+    hero,
+    headingBlock,
+    hasTrailingSpace: false,
+    locale,
+    tenant,
+  });
 
   return (
     <PageShell>
       <PageShell.Breadcrumbs>
         <TopicsIndexBreadcrumbs tenant={tenant} />
       </PageShell.Breadcrumbs>
-      <PageShell.Heading>
-        <PageIntro
-          hero={hero}
-          headingBlock={headingBlock}
-          hasTrailingSpace={false}
-          locale={locale}
-          tenant={tenant}
-        />
-      </PageShell.Heading>
+      <PageShell.Heading>{intro}</PageShell.Heading>
       <PageShell.Content>
         <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />
       </PageShell.Content>
