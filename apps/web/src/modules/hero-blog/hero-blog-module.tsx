@@ -11,11 +11,8 @@ export interface IHeroBlogModuleProps {
 }
 
 /**
- * HeroBlogModule — fetches `module_heroBlog` data and hands it to
- * `HeroBlogModuleView`. The schema requires a resolvable post at author
- * time, but Sanity validation doesn't re-run on an already-published
- * document — its pinned or newest-featured post can be unpublished,
- * unfeatured, or deleted afterwards, leaving `heading` unresolved.
+ * HeroBlogModule — fetches `module_heroBlog` data and renders nothing when
+ * no post resolves for it.
  */
 export const HeroBlogModule = async ({ id, tenant }: IHeroBlogModuleProps) => {
   const tenantContext = await getTenantSanityContext(tenant);
@@ -26,9 +23,9 @@ export const HeroBlogModule = async ({ id, tenant }: IHeroBlogModuleProps) => {
 
   if (!result.ok) return null;
 
-  const { heading } = result.data;
+  const { hasPost, heading } = result.data;
 
-  if (!heading) {
+  if (!hasPost || !heading) {
     logger.error('hero_blog_module.post_unresolved', { id });
     return null;
   }
