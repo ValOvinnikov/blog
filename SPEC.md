@@ -989,9 +989,11 @@ outside `production`, and the accessibility non-negotiables (no hardcoded
 `aria-label`s in `ui`, semantic heading tags, Lighthouse ≥ 95 target).
 
 **SEO is authored-only: what an editor types is what ships, and what they
-leave empty is omitted.** There is no fallback ladder. `resolveSeo` reads the
+leave empty is omitted — with one sanctioned site default, `description`,
+described below.** There is no fallback ladder. `resolveSeo` reads the
 authored `seo` object and the tenant image context, nothing else — no
-content-derived tier, no site defaults.
+content-derived tier, and no site defaults anywhere in `service` or the
+routes.
 
 **The `seo` object is required on every page document type**, via the shared
 `seoField()` helper, and `seo.metaTitle` is required within it at 30–60
@@ -1010,11 +1012,17 @@ carries no guard and throws nothing of its own. Studio validation never runs
 on writes made through the Sanity client, so the query is what actually
 holds — the schema rule is the editing experience, not the guarantee.
 
-Everything else is optional and omitted when unset: an unauthored
-`metaDescription` emits no `description` tag, and `ogTitle`/`ogDescription`/
-`ogImage` are authored per page or absent — `og:title` is never inherited
-from the meta title, and there is no site-wide default OG image nor a
-post-hero-image substitute.
+Everything else is optional. An unauthored `metaDescription` is the one
+field with a site default: `toMetadata` leaves the `description` key out of
+the returned `Metadata` rather than setting it to `undefined`, so Next's
+segment merge keeps the locale layout's `description` —
+`settings_site.description` — and Next's own OG/Twitter inheritance then
+fills `og:description`/`twitter:description` from it. The default is Next's
+layout→page inheritance, not a `??` chain in this codebase; `resolveSeo`
+still sees only authored data. `ogTitle`/`ogDescription`/`ogImage` are
+authored per page or absent — `og:title` is never inherited from the meta
+title, and there is no site-wide default OG image nor a post-hero-image
+substitute.
 
 A page document's own `title` is a Studio list label and never reaches the
 web in any form (§6). **Fallbacks on SEO are forbidden generally**: a new
