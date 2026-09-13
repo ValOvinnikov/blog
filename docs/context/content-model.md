@@ -23,11 +23,11 @@ type is a compile error rather than silent drift, in two separate places:
 web's `MODULE_MAP`, and `REVALIDATE_TAGS`' required
 `Record<TModuleType, …>` half (see [`data-flow.md`](./data-flow.md)).
 
-`MODULE_MAP` excludes two types — `module_hero` and `module_postList` — each
-rendered _only_ through a dedicated page slot and never through a `modules[]`
-array, so neither can reach `ModuleRenderer`. Exclusion there does **not**
-exempt them from `REVALIDATE_TAGS`, which requires an entry for every module
-type. `module_taxonomyList` renders both ways and so is in `MODULE_MAP`.
+`MODULE_MAP` is keyed `Exclude<TModuleType, TSlotModuleType>`, so it excludes
+the hero family — the only modules rendered _through_ a dedicated page slot
+(`hero`) rather than a `modules[]` array, and so the only ones that can never
+reach `ModuleRenderer`. Exclusion there does **not** exempt them from
+`REVALIDATE_TAGS`, which requires an entry for every module type.
 
 **Module documents** (`packages/studio/src/schema-types/modules/`)
 
@@ -39,9 +39,9 @@ type. `module_taxonomyList` renders both ways and so is in `MODULE_MAP`.
   `POST_TITLE`/`POST_EXCERPT`/`POST_IMAGE`), `primaryActionLabel`,
   `secondaryAction` (`link`).
 - `module_postList` (`postListSchema`) — the **paginated archive**: internal
-  `title`, `headingBlock` (required heading — see below), `pageSize` (posts per page,
-  1–24, required), and a vestigial `limit` awaiting removal alongside
-  `page_blog.itemsPerPage`. It carries **no `emptyMessage`** (removed in
+  `title`, `headingBlock` (required heading — see below), `pageSize` (posts per
+  page, 1–24, required), and a vestigial `limit` awaiting removal. It carries
+  **no `emptyMessage`** (removed in
   #1899) — empty-state copy belongs to Voice (`site_config.voiceOverrides`),
   same as every other module below.
 - `module_postLatest` (`postLatestSchema`) — the **latest-N teaser**: internal
@@ -97,16 +97,16 @@ also gets an optional `layout` field via the shared `layoutField`/
 - `page_landing` (`landingPageSchema`) — `title`, `slug` (source: title),
   `modules` (array of references via `modulesField({ allow: [content,
 cta] })`), `seo`.
-- `page_blog` (`blogPageSchema`, singleton) — the `/blog` index page config:
-  `titleField` (internal Studio label; `preview.prepare` falls back to the
-  generic "Unknown" when unset), `heading` (the page `<h1>`), `supportingText`
-  (optional line under it), `postList` (singular reference to the
-  `module_postList` that renders the archive — the module's own `pageSize`
-  drives the pagination window), `modules` (array of references via
-  `modulesField({ allow: [cta, newsletter] })`, optional — editors opt a
-  newsletter-signup module into this page rather than it being hardcoded),
-  `seo`. `itemsPerPage` survives on the document but no longer drives
-  anything; it goes with `module_postList.limit`.
+- `page_postIndex` (`postIndexPageSchema`, singleton) — the `/blog` index page
+  config: `titleField` (internal Studio label; `preview.prepare` falls back to
+  the generic "Unknown" when unset), `headingBlock` (the page `<h1>` and its
+  optional supporting line, not shown when a hero is set), `hero` (optional),
+  `modules` (array of references via `modulesField({ allow: [postList, cta,
+newsletter, postFeatured] })` — the archive is a `module_postList` placed
+  here, and the module's own `pageSize` drives the pagination window), `seo`.
+  Document validation errors on more than one `module_postList` and warns when
+  none is present. The type it replaces, `page_blog`, is still registered and
+  still carries the live documents until a later contract migration.
 - `page_topicIndex` (`topicIndexPageSchema`, singleton) — the `/topics` index:
   `titleField` (internal Studio label), `heading` (the page `<h1>`),
   `supportingText` (optional), `taxonomyList` (**required** singular reference

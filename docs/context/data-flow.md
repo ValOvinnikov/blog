@@ -125,11 +125,10 @@ apps/web
   (`@blog/config`) minus the slot-rendered types, so omitting any other
   module type from the map is a compile error. `TSlotModuleType` names every
   module reached **only** through a dedicated slot and never through a page's
-  `modules[]` array, so none of them can ever reach `ModuleRenderer`: the
-  hero family (every `module_hero*` type) via a page's `hero` reference, and
-  `module_postList` via `page_blog`'s `postList` reference. Because the
-  exclusion is derived rather than a hardcoded literal union, a new hero kind
-  leaves `MODULE_MAP` alone.
+  `modules[]` array, so none of them can ever reach `ModuleRenderer`: that is
+  the hero family (every `module_hero*` type), reached via a page's `hero`
+  reference. Because the exclusion is derived rather than a hardcoded literal
+  union, a new hero kind leaves `MODULE_MAP` alone.
 
   `module_taxonomyList` is the one module that renders **both** ways, so it is
   not in that union: it holds `page_topicIndex`'s and `page_tagIndex`'s
@@ -162,7 +161,7 @@ Partial<Record<TSanityType, …>>` — every module type needs a purge-tag entry
   a component is a compile error, and `HeroSlot({ id, type, … })` looks the
   type up and renders it, mirroring `ModuleRenderer`'s warn-and-render-nothing
   fallback for an unrecognized runtime type. `page_home`'s hero is required;
-  `page_landing`, `page_blog`, `page_topic` and `page_tag` each have an
+  `page_landing`, `page_postIndex`, `page_topic` and `page_tag` each have an
   optional one that replaces the page's default header and owns its `<h1>`.
   The slot stays two-step — the page query projects `_id` and `_type`, and
   the hero's own loader fetches it by id — and `@blog/service`'s
