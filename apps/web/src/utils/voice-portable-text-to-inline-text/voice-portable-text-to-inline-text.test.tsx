@@ -1,8 +1,8 @@
 import type { TVoicePortableText } from '@blog/config';
-import { BasicTextRenderer } from '@web/components/shared/basic-text-renderer';
+import { InlineTextRenderer } from '@web/components/shared/inline-text-renderer';
 import { customRender, screen } from '@web/testing/custom-render';
 
-import { voicePortableTextToBasicText } from './voice-portable-text-to-basic-text';
+import { voicePortableTextToInlineText } from './voice-portable-text-to-inline-text';
 
 const VOICE_VALUE: TVoicePortableText = [
   {
@@ -20,9 +20,9 @@ const VOICE_VALUE: TVoicePortableText = [
   },
 ];
 
-describe(voicePortableTextToBasicText, () => {
+describe(voicePortableTextToInlineText, () => {
   it("renames a link markDef's href to url, leaving other fields untouched", () => {
-    const result = voicePortableTextToBasicText(VOICE_VALUE);
+    const result = voicePortableTextToInlineText(VOICE_VALUE);
 
     expect(result[0]?.markDefs).toEqual([
       { _key: 'link-1', _type: 'link', url: 'https://example.com/docs' },
@@ -30,9 +30,9 @@ describe(voicePortableTextToBasicText, () => {
     expect(result[0]?.children).toEqual(VOICE_VALUE[0]?.children);
   });
 
-  it('produces a value BasicTextRenderer renders as a working anchor', () => {
-    const setup = customRender(BasicTextRenderer, {
-      value: voicePortableTextToBasicText(VOICE_VALUE),
+  it('produces a value InlineTextRenderer renders as a working anchor', () => {
+    const setup = customRender(InlineTextRenderer, {
+      value: voicePortableTextToInlineText(VOICE_VALUE),
     });
 
     setup();

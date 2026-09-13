@@ -1,7 +1,7 @@
 import {
   CTA_ACTION_APPEARANCE,
   CTA_ACTION_VARIANT,
-  type BasicText,
+  type InlineText,
 } from '@blog/config';
 import type { TCtaModule } from '@blog/service';
 
@@ -32,7 +32,7 @@ export const ctaActionsDemo: TCtaAction[] = [
   },
 ];
 
-export const ctaContentDemo: BasicText = [
+export const ctaContentDemo: InlineText = [
   {
     _type: 'block',
     _key: 'cta-content-b1',

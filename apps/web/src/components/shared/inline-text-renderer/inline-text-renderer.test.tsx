@@ -1,9 +1,9 @@
-import type { BasicText } from '@blog/config';
+import type { InlineText } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 
-import { BasicTextRenderer } from './basic-text-renderer';
+import { InlineTextRenderer } from './inline-text-renderer';
 
-const value: BasicText = [
+const value: InlineText = [
   {
     _type: 'block',
     _key: 'b1',
@@ -51,9 +51,9 @@ const value: BasicText = [
   },
 ];
 
-const setup = customRender(BasicTextRenderer, { value });
+const setup = customRender(InlineTextRenderer, { value });
 
-describe(`<${BasicTextRenderer.name}/>`, () => {
+describe(`<${InlineTextRenderer.name}/>`, () => {
   it('renders paragraphs with bold and italic marks', () => {
     setup();
 
