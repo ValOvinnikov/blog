@@ -297,6 +297,14 @@ Run these checks **once, after all schema work is complete**:
   in `@blog/config`); restructures kept validation parity (or the dropped
   constraint is called out in the report); previews present; any new migration
   has a target-state idempotency guard on every branch and a co-located test.
+- Every new type and field carries an editor-facing `description` that says
+  what it is **for** and never restates validation, and every new
+  `options.list` states its `layout` — radio only where the field is
+  `required()`, dropdown otherwise. Both rules, and why the dropdown's
+  unremovable blank option drives the second, are in
+  `studio-schema-practices`. Nothing enforces either mechanically — no test
+  will tell you a description is missing, let alone useless, so check it
+  yourself before reporting done.
 
 **Report back to the orchestrator** with:
 

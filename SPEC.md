@@ -804,6 +804,40 @@ Voice override with no error or warning — the worst failure mode for a
 settings surface. Any future module needing curated copy renders the i18n
 key directly; it does not grow its own override field.
 
+**The authoring surface explains itself.** Every registered schema type and
+every field an editor can see carries a `description`: the type's says what
+the thing is **for** in one sentence, the field's says what it is for **and
+when to set it**, both in an editor's vocabulary rather than the codebase's.
+They **never restate validation** — the Studio already renders the required
+marker and the character counter, so a prose copy is redundant when written
+and wrong once the rule changes; where a real but unenforced expectation is
+worth stating, it is expressed as a consequence ("a single word displays
+poorly") rather than a number. The rule is held by authoring and review, not
+by a test: a mechanical check can only confirm a description exists, which is
+the easy half, while whether it tells an editor something true and useful
+needs a reader. Where a shared field factory would otherwise have every caller
+repeat the same text, the default lives on the factory — `headingBlockField`
+carries one generic default covering both pages and modules, and only a caller
+with genuinely different copy overrides it.
+
+`titleField()` is the internal Studio label on every document that has one,
+and its one default description says so — the field is never rendered. It
+carries no slug-specific wording, even though `slugField()` always derives
+from the title: the slug field's own description already states that one row
+below, and a second copy on the title would be a claim nothing keeps true if
+a document's fields change. `blog_tag` and `blog_topic` are slug-bearing but
+declare their own `title` rather than using the helper, because theirs **is**
+public — rendered on chips, archives, filters and navigation.
+
+**Option lists default to a dropdown; `layout: 'radio'` is the opt-out, and
+requiredness decides.** A Sanity dropdown always renders a blank option for
+the unset state which cannot be removed or renamed, and neither
+`initialValue` nor validation suppresses it. So a `required()` field uses a
+radio — the blank is otherwise a selectable trap that only fails at publish —
+and any field that is not required uses a dropdown, where blank is already
+legal and compactness is free. Option count does not enter into it. Both are
+stated explicitly in the schema rather than left to the default.
+
 Full schema reference (every document/object, field-by-field), naming and
 validation conventions, incl. the `layout`/`headingBlock` objects' own
 field lists:
