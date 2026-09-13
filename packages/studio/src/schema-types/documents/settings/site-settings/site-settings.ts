@@ -40,13 +40,5 @@ export const siteSettingsSchema = defineType({
       validation: (rule) => rule.required().min(50).max(160),
       fieldset: 'seo',
     }),
-    defineField({
-      name: 'tagline',
-      title: 'Tagline',
-      type: 'string',
-      description: 'Short strapline shown in the site header or hero.',
-      validation: (rule) => rule.max(120),
-      fieldset: 'seo',
-    }),
   ],
 });
