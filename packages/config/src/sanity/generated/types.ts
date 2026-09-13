@@ -47,7 +47,7 @@ export type Module_cta = {
   bandTone?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   eyebrow?: string;
   headingBlock?: HeadingBlock;
-  content?: BasicText;
+  content?: InlineText;
   image?: ImageWithAlt;
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
@@ -83,7 +83,7 @@ export type ImageWithAlt = {
   alt?: string;
 };
 
-export type BasicText = Array<{
+export type InlineText = Array<{
   children?: Array<{
     marks?: Array<string>;
     text?: string;
@@ -219,7 +219,7 @@ export type Module_postList = {
   layout?: Layout;
 };
 
-export type BlockText = Array<{
+export type ProseText = Array<{
   children?: Array<{
     marks?: Array<string>;
     text?: string;
@@ -334,7 +334,7 @@ export type SocialLink = {
 export type Aside = {
   _type: 'aside';
   kind?: 'WHY_NOT' | 'DIGRESSION' | 'CONTEXT';
-  body?: BlockText;
+  body?: ProseText;
 };
 
 export type BodyImage = {
@@ -753,7 +753,7 @@ export type Blog_author = {
   _rev: string;
   name?: string;
   image?: ImageWithAlt;
-  bio?: BlockText;
+  bio?: ProseText;
   role?: string;
   socialLinks?: Array<
     {
@@ -1067,7 +1067,7 @@ export type AllSanitySchemaTypes =
   | ActionGroup
   | SanityImageAssetReference
   | ImageWithAlt
-  | BasicText
+  | InlineText
   | Module_content
   | RichText
   | Module_postRelated
@@ -1075,7 +1075,7 @@ export type AllSanitySchemaTypes =
   | Module_postFeatured
   | Module_postLatest
   | Module_postList
-  | BlockText
+  | ProseText
   | Skim
   | Brand
   | SpecLine
