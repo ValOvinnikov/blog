@@ -10,7 +10,7 @@ type TBlogListPageProps = { page: number; locale: string; tenant: string };
 
 /**
  * `/blog` (page 1) and `/blog/page/[page]` (pages ≥ 2) composition. Fetches
- * the `page_blog` shell once and composes every other concern as a
+ * the `page_postIndex` shell once and composes every other concern as a
  * self-fetching part reading the same cached `getBlogListPage` loader or its
  * own data.
  */

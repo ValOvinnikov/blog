@@ -211,7 +211,7 @@ describe(toHeroBlogModule, () => {
           label: 'View all posts',
           linkType: 'INTERNAL',
           url: null,
-          internalReference: { _type: 'page_blog', slug: null },
+          internalReference: { _type: 'page_postIndex', slug: null },
           openInNewTab: null,
           platform: null,
           accessibleLabel: null,

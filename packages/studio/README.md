@@ -37,10 +37,12 @@ Studio from one deployment.
 
 - `src/schema-types/documents/` — document types, grouped by area:
   `blog/` (`blog_author`, `blog_tag`, `blog_topic`), `pages/` (`page_home`,
-  `page_blog`, `page_landing`, `page_post`, `page_tag`, `page_topic`,
-  `page_tagIndex`, `page_topicIndex`), and `settings/` (singletons:
-  `settings_site`, `settings_navigation`, `settings_footer`,
-  `settings_newsletter`, `settings_theme`)
+  `page_postIndex`, `page_blog`, `page_landing`, `page_post`, `page_tag`,
+  `page_topic`, `page_tagIndex`, `page_topicIndex`), and `settings/`
+  (singletons: `settings_site`, `settings_navigation`, `settings_footer`,
+  `settings_newsletter`, `settings_theme`). `page_postIndex` is the
+  go-forward post-index singleton; `page_blog` is retained only until a
+  later contract migration retires it.
 - `src/schema-types/modules/` — reusable page modules (`module_content`,
   `module_cta`, `module_hero`, `module_heroBlog`, `module_newsletter`,
   `module_postFeatured`, `module_postLatest`, `module_postList`,

@@ -17,6 +17,7 @@ export const headingBlockSchema = defineType({
       name: 'supportingText',
       title: 'Supporting Text',
       type: 'text',
+      rows: 3,
       description:
         'Optional line of supporting text shown beneath the heading.',
     }),

@@ -13,16 +13,17 @@ import { defineType, type SanityDocument } from 'sanity';
 
 type TModuleReference = { _type?: string; _ref?: string };
 
-type TBlogPageDocument = {
+type TPostIndexPageDocument = {
   modules?: TModuleReference[];
 };
 
-const asBlogPageDocument = (
+const asPostIndexPageDocument = (
   document: SanityDocument | undefined,
-): TBlogPageDocument | undefined => document as TBlogPageDocument | undefined;
+): TPostIndexPageDocument | undefined =>
+  document as TPostIndexPageDocument | undefined;
 
 const countPostListModules = (document: SanityDocument | undefined): number =>
-  (asBlogPageDocument(document)?.modules ?? []).filter(
+  (asPostIndexPageDocument(document)?.modules ?? []).filter(
     (module) => module._type === postListSchema.name,
   ).length;
 
@@ -40,12 +41,12 @@ const validatePostListModulePresent = (
     ? 'Add a Post List module so this page can list posts.'
     : true;
 
-export const blogPageSchema = defineType({
-  name: 'page_blog',
-  title: 'Post Index Page (legacy)',
+export const postIndexPageSchema = defineType({
+  name: 'page_postIndex',
+  title: 'Post Index Page',
   type: 'document',
   description:
-    'The main blog index page, listing posts alongside any surrounding modules.',
+    'The page that lists posts, built from a hero, a heading, and a stack of modules.',
   icon: Newspaper,
   validation: (rule) => [
     rule.custom(validatePostListModuleCount),
@@ -66,6 +67,8 @@ export const blogPageSchema = defineType({
     titleField(),
     headingBlockField({
       requireHeading: true,
+      description:
+        "The page heading, shown as the page's H1. Hidden when a hero is set — the hero's heading becomes the H1 instead. Still required, so the page keeps a heading if the hero is ever removed.",
     }),
     heroField(),
     modulesField({

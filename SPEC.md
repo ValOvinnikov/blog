@@ -329,7 +329,7 @@ can derive it; that is safe here precisely because the type shipped with no
 existing documents to strand, which is the standing exception to the rule
 against adding a `required()` field to a type already in use.
 
-`page_home`, `page_landing`, `page_blog`, `page_topic`, `page_tag`,
+`page_home`, `page_landing`, `page_postIndex`, `page_topic`, `page_tag`,
 `page_topicIndex` and `page_tagIndex` each have an **optional** hero. A hero
 replaces that page's default header and owns the `<h1>`; without one, each page
 renders the header it always has (every one of them: `headingBlock`'s `heading`

@@ -40,7 +40,7 @@ describe('getIndexPageParams', () => {
         next: expect.objectContaining({
           tags: [
             't:tenant-a:posts',
-            't:tenant-a:page_blog',
+            't:tenant-a:page_postIndex',
             't:tenant-a:modules:postList',
           ],
         }),

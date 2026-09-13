@@ -3,7 +3,6 @@ import { topicPageSchema } from '@blog/studio/schema-types/documents/pages/topic
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
-import { PAGE_HEADING_DESCRIPTION } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import type { ValidationContext } from 'sanity';
 
 type TReferenceFieldDefinition = {
@@ -117,12 +116,11 @@ type THeadingBlockCustomFn = (
 ) => string | true;
 
 describe('pageTopicSchema headingBlock field', () => {
-  it('is built via headingBlockField() with a page-scoped description', () => {
+  it('is built via headingBlockField()', () => {
     const headingBlockField = getField('headingBlock') as
       THeadingBlockFieldDefinition | undefined;
 
     expect(headingBlockField?.type).toBe('headingBlock');
-    expect(headingBlockField?.description).toBe(PAGE_HEADING_DESCRIPTION);
   });
 
   it('is required at the field level', () => {

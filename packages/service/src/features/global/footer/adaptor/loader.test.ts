@@ -72,6 +72,7 @@ describe('getFooter', () => {
             't:tenant-a:topic',
             't:tenant-a:page_landing',
             't:tenant-a:page_blog',
+            't:tenant-a:page_postIndex',
           ],
         }),
       }),

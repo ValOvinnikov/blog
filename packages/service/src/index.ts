@@ -20,10 +20,10 @@ import { createPostLatestModuleService } from './features/modules/post-latest';
 import { createPostListModuleService } from './features/modules/post-list';
 import { createPostRelatedModuleService } from './features/modules/post-related';
 import { createTaxonomyListModuleService } from './features/modules/taxonomy-list';
-import { createBlogService } from './features/pages/blog';
 import { createHomeService } from './features/pages/home';
 import { createLandingPageService } from './features/pages/landing';
 import { createPostService } from './features/pages/post';
+import { createBlogService } from './features/pages/post-index';
 import { createTagService } from './features/pages/tag';
 import { createTagIndexService } from './features/pages/tag-index';
 import { createTopicService } from './features/pages/topic';
@@ -96,7 +96,6 @@ export type {
   TTaxonomyEntry,
   TTaxonomyListModule,
 } from './features/modules/taxonomy-list';
-export type { TBlogIndexPage } from './features/pages/blog';
 export type { THomePage } from './features/pages/home';
 export type { TLandingPage } from './features/pages/landing';
 export type {
@@ -104,6 +103,7 @@ export type {
   TPostDetailAuthor,
   TPostSkim,
 } from './features/pages/post';
+export type { TBlogIndexPage } from './features/pages/post-index';
 export type { TTagDetailPage } from './features/pages/tag';
 export type { TTagIndexPage } from './features/pages/tag-index';
 export type { TTopicDetailPage } from './features/pages/topic';

@@ -16,7 +16,7 @@ export interface INewsletterModuleProps {
  * NewsletterModule — fetches `module_newsletter` data plus the tenant's
  * `trustCues` from the `settings_newsletter` singleton, and hands both to
  * `NewsletterModuleView`. This is the Blog index page's optional
- * page-builder placement (`page_blog.modules`) — editors opt in by adding
+ * page-builder placement (`page_postIndex.modules`) — editors opt in by adding
  * the module there, no hardcoded mount point. `headingBlock.heading` is a
  * CMS-required field for this module (`requireHeading: true`), so it's
  * always a non-empty string here.

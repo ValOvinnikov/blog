@@ -28,6 +28,7 @@ export async function getHeroBlog(
         'page_post',
         'page_landing',
         'page_blog',
+        'page_postIndex',
       ],
       tenant.projectId,
     ),
