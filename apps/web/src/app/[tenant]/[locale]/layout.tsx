@@ -63,9 +63,10 @@ export async function generateMetadata({
     await service.global.siteSettings.v1.getSiteSettings(tenantContext);
 
   // Every route's own `openGraph`/`twitter` replaces (not merges with) this
-  // root segment's — `metadataBase` is the one field that still inherits
-  // down (see `toMetadata`), which is what lets a leaf's relative fallback
-  // image path resolve to an absolute URL.
+  // root segment's. `metadataBase` inherits down, letting a leaf's relative
+  // fallback image path resolve to an absolute URL, and `description`
+  // inherits too whenever a page's `toMetadata` call has none of its own
+  // (see `toMetadata`).
   const tenantBaseUrl = await getTenantBaseUrl(tenant);
   const metadataBase = tenantBaseUrl ? new URL(tenantBaseUrl) : undefined;
 

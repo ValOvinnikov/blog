@@ -18,9 +18,10 @@ type TToMetadataOptions = {
 };
 
 /**
- * Maps an authored `TSeoResolved` view-model to Next `Metadata`, passing
- * unauthored fields through as `undefined` so they are omitted rather than
- * inheriting a parent segment's value.
+ * Maps an authored `TSeoResolved` view-model to Next `Metadata`. An
+ * unauthored field is passed through as `undefined`, except `description`,
+ * which is omitted entirely so it inherits a parent segment's value via
+ * Next's metadata merge.
  *
  * @example
  * return toMetadata(result.data.seo, tenantContext, { canonical: '/', ogType: 'website', titleAbsolute: true });
@@ -40,7 +41,7 @@ export const toMetadata = (
 
   return {
     title: titleAbsolute ? { absolute: seo.title } : seo.title,
-    description: seo.description,
+    ...(seo.description && { description: seo.description }),
     alternates: {
       canonical,
       ...(feedUrl && { types: { 'application/rss+xml': feedUrl } }),
