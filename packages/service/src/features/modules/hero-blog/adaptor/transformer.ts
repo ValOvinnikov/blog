@@ -40,9 +40,10 @@ export function toHeroBlogModule(raw: TRawHeroBlogModule): THeroBlogModule {
   return {
     brandVariant: raw.brandVariant,
     variant: raw.variant,
+    hasPost: post !== undefined,
     eyebrow: raw.eyebrow ?? post?.topic?.title,
-    heading: raw.heading ?? post?.title,
-    supportingText: raw.supportingText ?? post?.excerpt,
+    heading: post?.title,
+    supportingText: post?.excerpt,
     sanityImage: toImage(raw, post),
     primaryAction: toHeroPrimaryAction(
       raw.primaryActionLabel,

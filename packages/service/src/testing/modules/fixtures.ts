@@ -61,8 +61,6 @@ export function makeRawHeroBlogModule(
   return {
     post: null,
     eyebrow: null,
-    heading: null,
-    supportingText: null,
     imageSource: HERO_IMAGE_SOURCE.POST,
     image: null,
     primaryActionLabel: null,

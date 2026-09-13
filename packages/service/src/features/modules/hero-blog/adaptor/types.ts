@@ -13,6 +13,7 @@ import type { THeroPrimaryAction } from '@blog/service/shared/transformers/to-he
 export type THeroBlogModule = {
   brandVariant: TFullBrandVariant;
   variant: THeroVariant;
+  hasPost: boolean;
   eyebrow: TMaybeUndefined<string>;
   heading: TMaybeUndefined<string>;
   supportingText: TMaybeUndefined<string>;
