@@ -29,6 +29,7 @@ export const seoSchema = defineType({
       name: 'metaDescription',
       title: 'Meta Description',
       type: 'text',
+      rows: 3,
       description:
         'The summary shown beneath the title in search results — aim for a full sentence or two so it reads well; a single word or fragment displays poorly. Left empty, no summary is shown there.',
       validation: (rule) => rule.max(160),

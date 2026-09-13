@@ -36,7 +36,7 @@ describe('blogPageQuery', () => {
     expect(() => blogPageQuery.parse(raw)).not.toThrow();
   });
 
-  it('parses null as no matching page_blog document, rather than throwing', () => {
+  it('parses null as no matching page_postIndex document, rather than throwing', () => {
     expect(blogPageQuery.parse(null)).toBeNull();
   });
 });

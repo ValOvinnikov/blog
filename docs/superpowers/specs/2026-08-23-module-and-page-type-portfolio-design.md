@@ -2444,6 +2444,19 @@ point; the graph stays acyclic.
   `mediaOrderStacked: false`; ui alone, then config + studio + service + web as
   one PR (2026-09-11, #2808).
 
+- **The `page_postIndex` expand ships as one PR, and the copy migration runs
+  before its deploy** — studio adds `page_postIndex` beside `page_blog`, and
+  service and web switch every read in the same PR, because typegen widens the
+  internal-reference union and `to-link.ts`'s exhaustive `INTERNAL_HREF_BUILDERS`
+  Record stops compiling until service adds the key. Through the transition
+  `page_blog` stays registered, keeps its `link.ts` target and desk entry
+  (titled "Post Index Page (legacy)"), and keeps its entry in that Record, so an
+  internal link resolves to `/blog` whichever type it points at. Ordering is
+  migrate-then-deploy: deploying first would 404 `/blog` until the
+  `page_postIndex` document exists, whereas migrating first leaves the old code
+  serving `/blog` from `page_blog` unharmed. Deleting `page_blog` and its
+  migration are the separate contract PR (2026-09-12, #2961).
+
 ## Non-goals (recorded so #1919 doesn't sprawl)
 
 - A leads/CRM management UI — store + notify only.

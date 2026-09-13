@@ -25,6 +25,7 @@ export async function getCta(
         'topic',
         'page_landing',
         'page_blog',
+        'page_postIndex',
       ],
       tenant.projectId,
     ),

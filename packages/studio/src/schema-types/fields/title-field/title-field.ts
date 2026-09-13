@@ -1,8 +1,5 @@
 import { defineField, type StringDefinition, type StringRule } from 'sanity';
 
-const TITLE_FIELD_DESCRIPTION =
-  'Give this document a clear, descriptive title to help identify it in Studio. This title for internal use only';
-
 type TTitleFieldOptions = Partial<
   Pick<StringDefinition, 'description' | 'initialValue' | 'readOnly'>
 >;
@@ -20,7 +17,8 @@ export const titleField = (options: TTitleFieldOptions = {}) =>
     name: 'title',
     title: 'Title',
     type: 'string',
-    description: TITLE_FIELD_DESCRIPTION,
+    description:
+      'Give this document a clear, descriptive title to help identify it in Studio. This title for internal use only',
     validation: (rule: StringRule) => rule.required(),
     ...options,
   });

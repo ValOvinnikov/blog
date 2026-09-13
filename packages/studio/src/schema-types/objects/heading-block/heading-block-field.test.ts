@@ -41,7 +41,7 @@ describe('headingBlockField', () => {
     const field = headingBlockField();
 
     expect(field.description).toBe(
-      'The section heading shown above this module.',
+      'The heading shown at the top of this page or module, with its optional supporting line.',
     );
   });
 

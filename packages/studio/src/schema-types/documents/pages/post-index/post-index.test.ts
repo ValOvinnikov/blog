@@ -1,4 +1,4 @@
-import { blogPageSchema } from '@blog/studio/schema-types/documents/pages/blog/blog';
+import { postIndexPageSchema } from '@blog/studio/schema-types/documents/pages/post-index/post-index';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import {
@@ -41,10 +41,10 @@ const createDocumentMockRule = (
 });
 
 const getField = (name: string) =>
-  blogPageSchema.fields?.find((field) => field.name === name) as
+  postIndexPageSchema.fields?.find((field) => field.name === name) as
     TFieldDefinition | undefined;
 
-describe('blogPageSchema field order', () => {
+describe('postIndexPageSchema field order', () => {
   it('orders the primary fields title, headingBlock, hero, modules, seo', () => {
     const primaryFieldNames = [
       'title',
@@ -53,7 +53,8 @@ describe('blogPageSchema field order', () => {
       'modules',
       'seo',
     ];
-    const fieldNames = blogPageSchema.fields?.map((field) => field.name) ?? [];
+    const fieldNames =
+      postIndexPageSchema.fields?.map((field) => field.name) ?? [];
 
     expect(
       fieldNames.filter((name) => primaryFieldNames.includes(name)),
@@ -61,21 +62,24 @@ describe('blogPageSchema field order', () => {
   });
 });
 
-describe('blogPageSchema headingBlock field', () => {
-  it('is required', () => {
+describe('postIndexPageSchema headingBlock field', () => {
+  it('is required, and describes the page heading and that a hero hides it', () => {
     const headingBlockField = getField('headingBlock');
 
     expect(headingBlockField?.type).toBe('headingBlock');
+    expect(headingBlockField?.description).toBe(
+      "The page heading, shown as the page's H1. Hidden when a hero is set — the hero's heading becomes the H1 instead. Still required, so the page keeps a heading if the hero is ever removed.",
+    );
     expect(headingBlockField?.validation).toBeDefined();
   });
 });
 
-describe('blogPageSchema hero field', () => {
+describe('postIndexPageSchema hero field', () => {
   it('is an optional reference to the hero family', () => {
     const heroField = getField('hero');
 
     if (!heroField) {
-      throw new Error('Expected blogPageSchema to define a hero field.');
+      throw new Error('Expected postIndexPageSchema to define a hero field.');
     }
 
     expect(heroField.type).toBe('reference');
@@ -86,15 +90,15 @@ describe('blogPageSchema hero field', () => {
   });
 });
 
-describe('blogPageSchema modules allow-list', () => {
+describe('postIndexPageSchema modules allow-list', () => {
   it('permits module_postList, module_cta, module_newsletter and module_postFeatured', () => {
-    const modulesField = blogPageSchema.fields?.find(
+    const modulesField = postIndexPageSchema.fields?.find(
       (field) => field.name === 'modules',
     ) as TArrayFieldDefinition | undefined;
 
     if (!modulesField || modulesField.type !== 'array' || !modulesField.of) {
       throw new Error(
-        'Expected blogPageSchema to define a modules array field.',
+        'Expected postIndexPageSchema to define a modules array field.',
       );
     }
 
@@ -109,15 +113,15 @@ describe('blogPageSchema modules allow-list', () => {
   });
 });
 
-describe('blogPageSchema modules validateCustom chaining', () => {
+describe('postIndexPageSchema modules validateCustom chaining', () => {
   const getModulesCustomValidators = (): TModulesCustomFn[] => {
-    const modulesField = blogPageSchema.fields?.find(
+    const modulesField = postIndexPageSchema.fields?.find(
       (field) => field.name === 'modules',
     );
 
     if (!modulesField?.validation) {
       throw new Error(
-        'Expected blogPageSchema to define a modules field with validation.',
+        'Expected postIndexPageSchema to define a modules field with validation.',
       );
     }
 
@@ -153,7 +157,7 @@ describe('blogPageSchema modules validateCustom chaining', () => {
   });
 });
 
-describe('blogPageSchema removed legacy fields', () => {
+describe('postIndexPageSchema removed legacy fields', () => {
   it.each(['heading', 'supportingText', 'postList'])(
     '%s no longer exists on the schema',
     (name) => {
@@ -162,14 +166,16 @@ describe('blogPageSchema removed legacy fields', () => {
   );
 });
 
-describe('blogPageSchema document validation', () => {
+describe('postIndexPageSchema document validation', () => {
   const buildDocumentRules = (): TDocumentMockRule[] => {
-    if (!blogPageSchema.validation) {
-      throw new Error('Expected blogPageSchema to define a validation rule.');
+    if (!postIndexPageSchema.validation) {
+      throw new Error(
+        'Expected postIndexPageSchema to define a validation rule.',
+      );
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    return (blogPageSchema.validation as any)(
+    return (postIndexPageSchema.validation as any)(
       createDocumentMockRule(),
     ) as TDocumentMockRule[];
   };

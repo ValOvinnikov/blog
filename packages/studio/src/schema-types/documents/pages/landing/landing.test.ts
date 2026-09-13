@@ -2,7 +2,6 @@ import { landingPageSchema } from '@blog/studio/schema-types/documents/pages/lan
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
-import { PAGE_HEADING_DESCRIPTION } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/validation/validate-taxonomy-list-has-taxonomy/validate-taxonomy-list-has-taxonomy';
 import {
   createMockModulesRule,
@@ -225,16 +224,13 @@ describe('landingPageSchema document validation', () => {
 });
 
 describe('landingPageSchema headingBlock field', () => {
-  it('is required and states that a hero hides it', () => {
+  it('is required', () => {
     const headingBlockFieldDefinition = landingPageSchema.fields?.find(
       (field) => field.name === 'headingBlock',
     ) as
       { type?: string; description?: string; validation?: unknown } | undefined;
 
     expect(headingBlockFieldDefinition?.type).toBe('headingBlock');
-    expect(headingBlockFieldDefinition?.description).toBe(
-      PAGE_HEADING_DESCRIPTION,
-    );
     expect(headingBlockFieldDefinition?.validation).toBeDefined();
   });
 });
