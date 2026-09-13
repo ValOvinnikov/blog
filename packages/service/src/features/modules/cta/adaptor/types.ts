@@ -1,6 +1,6 @@
 import type {
-  BasicText,
   ISanityImage,
+  InlineText,
   TContentAlignment,
   TCtaVariant,
   TFullBrandVariant,
@@ -19,7 +19,7 @@ export type TCtaModule = {
   bandTone: TFullBrandVariant;
   eyebrow: TMaybeUndefined<string>;
   headingBlock: THeadingBlock;
-  content: TMaybeUndefined<BasicText>;
+  content: TMaybeUndefined<InlineText>;
   image: TMaybeUndefined<ISanityImage>;
   contentPosition: TMaybeUndefined<TContentAlignment>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
