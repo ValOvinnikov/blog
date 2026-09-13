@@ -144,8 +144,7 @@ replacing a hand-duplicated block per page document.
   back to a default mark when unset; `specLine` is
   a `specLine` object, `{ items: string[] (max 4, each max 15 chars),
 separator: SPEC_LINE_SEPARATORS }`, replacing a plain string so the
-  service layer can join it with a chosen separator glyph), description,
-  tagline.
+  service layer can join it with a chosen separator glyph), description.
 - `settings_theme` (singleton, `themeSettingsSchema`) — `titleField` (bare; see
   helper note below), `preset` (required, `PRESET_ID` stored value:
   `CONSOLE`/`EDITORIAL`), `accentHue`/`logoHue` (optional numbers, 0-360,
