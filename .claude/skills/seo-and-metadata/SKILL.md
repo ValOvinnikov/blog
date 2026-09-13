@@ -16,8 +16,13 @@ feeding `metadataBase` in `[locale]/layout.tsx`).
 **The service layer owns SEO resolution, and it is authored-only.** Page
 view-models from `@blog/service` carry `seo: TSeoResolved` holding exactly
 what an editor typed. There is **no fallback ladder** — no content-derived
-tier, no site defaults. Anything unauthored is `undefined` and must be
-**omitted** from the document head, never emitted as an empty tag:
+tier, no site defaults in `service` or the routes. Anything unauthored is
+`undefined` and must be **omitted** from the document head, never emitted
+as an empty tag. The one site default is `description`: `toMetadata` leaves
+the key out entirely when a page's `metaDescription` is empty, so Next's
+segment merge keeps the locale layout's `settings_site.description` (and
+fills OG/Twitter descriptions from it) — inheritance in Next, not a `??`
+chain here:
 
 ```ts
 type TSeoResolved = {

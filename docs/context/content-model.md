@@ -190,8 +190,10 @@ from `IMAGE_LAYOUT`, undefined = Inline — shares its `alt`/hotspot shape with
 `imageWithAlt` via the `image-alt-field` helper, but is a distinct type
 registered only as `richText`'s body-array image member, so the layout
 choice can't leak into hero/avatar/OG/brand images), `seo` (`metaTitle`
-required, 30–60 characters; every other field optional and omitted from the
-page head when unset — there is no fallback) + `openGraph`,
+required, 30–60 characters; every other field optional — an empty
+`metaDescription` inherits `settings_site.description` through the locale
+layout's metadata, everything else is omitted from the page head when
+unset) + `openGraph`,
 `blockText` / `richText`, `aside` (deep-dive block type registered in
 `richText`'s portable-text array; `kind` from `ASIDE_KIND`, required; `body`
 via `blockText`, required — part of the choose-your-depth reading feature,
