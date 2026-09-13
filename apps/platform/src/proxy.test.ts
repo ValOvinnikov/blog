@@ -23,12 +23,31 @@ describe('proxy matcher', () => {
     expect(matcher.test('/dashboard/select-tenant')).toBe(true);
   });
 
-  it('excludes api, _next, _vercel, and dotted-extension paths', () => {
+  it('rewrites Studio routes whose structure ids contain dots', () => {
+    const matcher = buildMatcherRegExp();
+
+    expect(
+      matcher.test(
+        '/tenants/tenant-1/studio/structure/blog;page_post;page_post-provisioning.post.starter',
+      ),
+    ).toBe(true);
+    expect(
+      matcher.test(
+        '/dashboard/studio/structure/blog;page_post;page_post-provisioning.post.starter',
+      ),
+    ).toBe(true);
+    expect(
+      matcher.test('/tenants/tenant-1/studio/structure/settings.site'),
+    ).toBe(true);
+  });
+
+  it('excludes api, _next, _vercel, and root-level dotted paths', () => {
     const matcher = buildMatcherRegExp();
 
     expect(matcher.test('/api/auth/signin')).toBe(false);
     expect(matcher.test('/_next/static/chunk.js')).toBe(false);
     expect(matcher.test('/_vercel/insights')).toBe(false);
     expect(matcher.test('/favicon.ico')).toBe(false);
+    expect(matcher.test('/robots.txt')).toBe(false);
   });
 });

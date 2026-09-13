@@ -31,6 +31,7 @@ export const seoSchema = defineType({
       type: 'text',
       description:
         'The summary shown in search results. Omitted entirely when empty. Keep between 120–160 characters.',
+      rows: 3,
       validation: (rule) => rule.max(160),
     }),
     defineField({

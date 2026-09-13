@@ -11,10 +11,10 @@ export async function getIndexPageParams(
   tenant: TTenantSanityContext,
 ): Promise<{ page: string }[]> {
   // Reads pageSize off the module_postList document, so `modules:postList`
-  // must ride alongside `posts`/`page_blog` (tag-scope contract, `sanity/query.ts`).
+  // must ride alongside `posts`/`page_postIndex` (tag-scope contract, `sanity/query.ts`).
   const raw = await runQuery(indexPageParamsQuery, {
     tenant,
-    ...isr(['posts', 'page_blog', 'modules:postList'], tenant.projectId),
+    ...isr(['posts', 'page_postIndex', 'modules:postList'], tenant.projectId),
   });
   return toIndexPageParams(raw);
 }

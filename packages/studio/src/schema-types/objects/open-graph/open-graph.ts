@@ -22,6 +22,7 @@ export const openGraphSchema = defineType({
       type: 'text',
       description:
         'Description shown when shared on social media. Omitted entirely when empty.',
+      rows: 3,
       validation: (rule) => rule.max(200),
     }),
     defineField({

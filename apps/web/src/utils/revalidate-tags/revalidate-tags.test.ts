@@ -23,6 +23,12 @@ describe('getRevalidateTagsForType', () => {
     ]);
   });
 
+  it('maps the post-index singleton to its ISR tag', () => {
+    expect(
+      getRevalidateTagsForType('page_postIndex', 'page_postIndex'),
+    ).toEqual(['page_postIndex']);
+  });
+
   it('maps the post page document to its ISR tags', () => {
     expect(getRevalidateTagsForType('page_post', 'page_post-1')).toEqual([
       'page_post',
