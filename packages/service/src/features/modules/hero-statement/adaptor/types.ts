@@ -2,6 +2,7 @@ import type {
   ISanityImage,
   TContentAlignment,
   TFullBrandVariant,
+  THeadingBlock,
   THeroVariant,
   TLayout,
   TMaybeUndefined,
@@ -12,9 +13,8 @@ import type { TCtaAction } from '@blog/service/shared/transformers/to-cta-action
 export type THeroStatementModule = {
   brandVariant: TFullBrandVariant;
   variant: THeroVariant;
-  heading: string;
+  headingBlock: THeadingBlock;
   eyebrow: TMaybeUndefined<string>;
-  supportingText: TMaybeUndefined<string>;
   sanityImage: TMaybeUndefined<ISanityImage>;
   actions: TMaybeUndefined<readonly TCtaAction[]>;
   contentPosition: TMaybeUndefined<TContentAlignment>;

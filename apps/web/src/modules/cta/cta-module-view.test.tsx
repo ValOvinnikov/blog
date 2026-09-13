@@ -5,7 +5,7 @@ import {
   ctaActionsDemo,
   ctaContentDemo,
 } from '@web/testing/modules/cta/fixtures';
-import { makeRequiredHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import type { ReactNode } from 'react';
 
 import { CtaModuleView } from './cta-module-view';
@@ -46,7 +46,7 @@ const setup = customRender(CtaModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
   bandTone: BRAND_VARIANT.SECONDARY,
   eyebrow: undefined,
-  headingBlock: makeRequiredHeadingBlock({
+  headingBlock: makeHeadingBlock({
     heading: 'Get started',
   }),
   content: undefined,
@@ -76,7 +76,7 @@ describe(`<${CtaModuleView.name}/>`, () => {
   it('derives a different heading id for a different module id, avoiding duplicate DOM ids', () => {
     setup({
       id: 'cta-2',
-      headingBlock: makeRequiredHeadingBlock({
+      headingBlock: makeHeadingBlock({
         heading: 'Join us',
       }),
     });

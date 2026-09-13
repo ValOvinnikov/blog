@@ -6,7 +6,7 @@ import {
   type TMaybeUndefined,
 } from '@blog/config';
 import { toCtaAction } from '@blog/service/shared/transformers/to-cta-action';
-import { toRequiredHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
+import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import { toInternalHref } from '@blog/service/shared/transformers/to-link';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
@@ -89,7 +89,7 @@ export function toCtaModule(raw: TRawCtaModule): TCtaModule {
     brandVariant: raw.brandVariant,
     bandTone: raw.bandTone,
     eyebrow: raw.eyebrow ?? undefined,
-    headingBlock: toRequiredHeadingBlock(raw.headingBlock),
+    headingBlock: toHeadingBlock(raw.headingBlock),
     content: toContent(raw.content),
     image: toSanityImage(raw.image),
     contentPosition: toContentPosition(raw),

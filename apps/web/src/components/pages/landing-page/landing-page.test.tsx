@@ -188,21 +188,6 @@ describe(`<${LandingPage.name}/>`, () => {
     expect(heroSlotMock).not.toHaveBeenCalled();
   });
 
-  it('renders no heading region when there is neither a hero nor a heading', async () => {
-    getLandingPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        ...mockLandingPage,
-        headingBlock: { heading: undefined, supportingText: undefined },
-      },
-    });
-
-    await setup();
-
-    expect(screen.queryAllByRole('heading', { level: 1 })).toHaveLength(0);
-    expect(heroSlotMock).not.toHaveBeenCalled();
-  });
-
   it('dispatches the hero through HeroSlot and keeps exactly one h1 when a hero is set', async () => {
     getLandingPageMock.mockResolvedValue({
       ok: true,

@@ -25,7 +25,7 @@ export const tagPageQuery = q
     headingBlock: sub
       .field('headingBlock')
       .project(headingBlockFragment)
-      .nullable(true),
+      .notNull(),
     hero: sub.field('hero').deref().project(moduleFragment).nullable(true),
     modules: sub
       .field('modules[]')

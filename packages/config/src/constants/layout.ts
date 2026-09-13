@@ -54,7 +54,7 @@ export const CONTENT_ALIGNMENT = {
 export type TContentAlignment = TValueOf<typeof CONTENT_ALIGNMENT>;
 
 export type THeadingBlock = {
-  heading?: string;
+  heading: string;
   supportingText?: string;
 };
 

@@ -32,17 +32,6 @@ describe(toPostFeaturedModule, () => {
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
 
-  it('leaves every headingBlock field undefined when the field itself is unset (no faked default)', () => {
-    const raw = makeRawPostFeaturedModule({ headingBlock: null });
-
-    const module = toPostFeaturedModule(raw);
-
-    expect(module.headingBlock).toEqual({
-      heading: undefined,
-      supportingText: undefined,
-    });
-  });
-
   it('leaves contentAlignment undefined when unset (no faked default)', () => {
     const raw = makeRawPostFeaturedModule({ contentAlignment: null });
 

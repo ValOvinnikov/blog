@@ -1,5 +1,6 @@
 import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { HeroSlot } from './hero-slot';
@@ -109,8 +110,9 @@ describe('HERO_MAP', () => {
         brandVariant: BRAND_VARIANT.PRIMARY,
         variant: HERO_VARIANT.SPLIT,
         eyebrow: undefined,
-        heading: 'Build faster, ship sooner',
-        supportingText: undefined,
+        headingBlock: makeHeadingBlock({
+          heading: 'Build faster, ship sooner',
+        }),
         sanityImage: undefined,
         actions: undefined,
         contentPosition: undefined,

@@ -19,8 +19,7 @@ export const HeroStatementModuleView = ({
   brandVariant,
   variant,
   eyebrow,
-  heading,
-  supportingText,
+  headingBlock,
   sanityImage,
   actions,
   contentPosition,
@@ -29,6 +28,7 @@ export const HeroStatementModuleView = ({
   layout,
 }: IHeroStatementModuleViewProps) => {
   const titleId = `hero-statement-${id}`;
+  const { heading, supportingText } = headingBlock;
 
   return (
     <Section

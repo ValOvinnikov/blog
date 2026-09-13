@@ -185,22 +185,6 @@ describe('HomePage', () => {
     expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
     expect(screen.queryByText('Welcome to the blog')).not.toBeInTheDocument();
   });
-
-  it('renders nothing in the heading region when there is no hero and no heading', async () => {
-    getHomePageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock(),
-        hero: undefined,
-        modules: [],
-        seo: makeSeo(),
-      },
-    });
-
-    await setup();
-
-    expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
-  });
 });
 
 describe('generateMetadata', () => {

@@ -1,5 +1,5 @@
 import { makeRawTagIndexPage } from '@blog/service/testing/pages/fixtures';
-import { makeRawOptionalHeadingBlock } from '@blog/service/testing/shared/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 
 import { tagIndexPageQuery } from './query';
 
@@ -8,14 +8,19 @@ describe('tagIndexPageQuery', () => {
     expect(tagIndexPageQuery.query).toContain('_type == "page_tagIndex"');
   });
 
-  it('parses a tag index page with no headingBlock/hero/modules', () => {
+  it('parses a tag index page with no hero/modules', () => {
     const raw = makeRawTagIndexPage({
-      headingBlock: null,
       hero: null,
       modules: null,
     });
 
     expect(() => tagIndexPageQuery.parse(raw)).not.toThrow();
+  });
+
+  it('rejects a tag index page with no headingBlock', () => {
+    const raw = { ...makeRawTagIndexPage(), headingBlock: null };
+
+    expect(() => tagIndexPageQuery.parse(raw)).toThrow();
   });
 
   it('rejects a tag index page with no authored SEO', () => {
@@ -45,9 +50,7 @@ describe('tagIndexPageQuery', () => {
 
   it('parses a tag index page with an authored headingBlock', () => {
     const raw = makeRawTagIndexPage({
-      headingBlock: makeRawOptionalHeadingBlock({
-        heading: 'Browse by tag',
-      }),
+      headingBlock: makeRawHeadingBlock('Browse by tag'),
     });
 
     expect(() => tagIndexPageQuery.parse(raw)).not.toThrow();

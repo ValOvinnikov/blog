@@ -37,7 +37,6 @@ const meta = {
     titleId: 'topic-list-title',
     dataTestId: 'taxonomy-list-module-topic-list-1',
     headingLevel: 2,
-    accessibleTitle: 'Topics',
     emptyMessage: 'No topics yet.',
     showLatestPosts: true,
   },
@@ -54,7 +53,6 @@ export const Topics: TStory = {
     items: topicsListItems,
     titleId: 'topic-list-title',
     dataTestId: 'taxonomy-list-module-topic-list-1',
-    accessibleTitle: 'Topics',
     emptyMessage: 'No topics yet.',
   },
 };
@@ -65,14 +63,7 @@ export const Tags: TStory = {
     items: tagsListItems,
     titleId: 'tag-list-title',
     dataTestId: 'taxonomy-list-module-tag-list-1',
-    accessibleTitle: 'Tags',
     emptyMessage: 'No tags yet.',
-  },
-};
-
-export const WithoutCmsHeading: TStory = {
-  args: {
-    headingBlock: makeHeadingBlock(),
   },
 };
 

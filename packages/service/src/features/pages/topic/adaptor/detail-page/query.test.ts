@@ -1,5 +1,5 @@
 import { makeRawTopicPage } from '@blog/service/testing/pages/fixtures';
-import { makeRawOptionalHeadingBlock } from '@blog/service/testing/shared/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 
 import { topicPageQuery } from './query';
 
@@ -43,10 +43,16 @@ describe('topicPageQuery', () => {
 
   it('parses a topic page with an authored headingBlock', () => {
     const raw = makeRawTopicPage({
-      headingBlock: makeRawOptionalHeadingBlock({ heading: 'Engineering' }),
+      headingBlock: makeRawHeadingBlock('Engineering'),
     });
 
     expect(() => topicPageQuery.parse(raw)).not.toThrow();
+  });
+
+  it('rejects a topic page with no headingBlock', () => {
+    const raw = { ...makeRawTopicPage(), headingBlock: null };
+
+    expect(() => topicPageQuery.parse(raw)).toThrow();
   });
 
   it('parses null as no matching page_topic document, rather than throwing', () => {

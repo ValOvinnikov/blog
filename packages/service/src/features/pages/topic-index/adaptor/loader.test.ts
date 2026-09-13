@@ -1,7 +1,7 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawTopicIndexPage } from '@blog/service/testing/pages/fixtures';
 import {
-  makeRawOptionalHeadingBlock,
+  makeRawHeadingBlock,
   makeRawSeo,
 } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
@@ -19,8 +19,7 @@ describe('getIndexPage', () => {
   it('exposes the headingBlock from the page_topicIndex singleton', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawTopicIndexPage({
-        headingBlock: makeRawOptionalHeadingBlock({
-          heading: 'Browse by topic',
+        headingBlock: makeRawHeadingBlock('Browse by topic', {
           supportingText: 'Find posts by subject.',
         }),
         seo: makeRawSeo({
@@ -39,20 +38,6 @@ describe('getIndexPage', () => {
     });
     expect(result.seo.title).toBe('Topics — Blog');
     expect(result.seo.description).toBe('Find posts by subject.');
-  });
-
-  it('falls the headingBlock back to an empty object when unset', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTopicIndexPage({ headingBlock: null }),
-    );
-
-    const result = await getIndexPage(tenant);
-    if (!result) throw new Error('expected a topic index page');
-
-    expect(result.headingBlock).toEqual({
-      heading: undefined,
-      supportingText: undefined,
-    });
   });
 
   it('maps the thin page-builder modules array to module refs', async () => {

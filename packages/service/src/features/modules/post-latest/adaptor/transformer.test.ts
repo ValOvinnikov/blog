@@ -36,17 +36,6 @@ describe('toPostLatestModule', () => {
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
 
-  it('leaves every headingBlock field undefined when the field itself is unset (no faked default)', () => {
-    const raw = makeRawPostLatestModule({ headingBlock: null });
-
-    const module = toPostLatestModule(raw, rawPosts);
-
-    expect(module.headingBlock).toEqual({
-      heading: undefined,
-      supportingText: undefined,
-    });
-  });
-
   it('leaves contentAlignment undefined when unset (no faked default)', () => {
     const raw = makeRawPostLatestModule({ contentAlignment: null });
 

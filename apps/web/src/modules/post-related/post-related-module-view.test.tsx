@@ -30,7 +30,6 @@ const setup = customRender(PostRelatedModuleView, {
   contentAlignment: undefined,
   titleId: 'related-posts-title',
   dataTestId: 'post-related-module-post-related-1',
-  accessibleTitle: 'Related reading',
 });
 
 describe(`<${PostRelatedModuleView.name}/>`, () => {
@@ -47,21 +46,6 @@ describe(`<${PostRelatedModuleView.name}/>`, () => {
       'data-testid',
       'post-related-module-post-related-1',
     );
-    expect(
-      screen.getByRole('region', { name: 'Related reading' }),
-    ).toBeInTheDocument();
-  });
-
-  it('renders a visually hidden heading from accessibleTitle when headingBlock.heading is undefined', () => {
-    setup({
-      headingBlock: makeHeadingBlock(),
-    });
-
-    const heading = screen.getByRole('heading', {
-      level: 2,
-      name: 'Related reading',
-    });
-    expect(heading).toHaveClass('sr-only');
     expect(
       screen.getByRole('region', { name: 'Related reading' }),
     ).toBeInTheDocument();

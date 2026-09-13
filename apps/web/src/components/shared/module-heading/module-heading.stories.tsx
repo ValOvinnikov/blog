@@ -21,7 +21,6 @@ const meta = {
   },
   args: {
     headingBlock: makeHeadingBlock({ heading: 'Latest posts' }),
-    accessibleTitle: 'Posts',
     id: 'module-heading-story-title',
     level: 2,
     align: undefined,
@@ -40,10 +39,6 @@ export const WithSupportingText: TStory = {
       supportingText: 'Fresh from the blog, updated weekly.',
     }),
   },
-};
-
-export const BlankHeadingFallback: TStory = {
-  args: { headingBlock: makeHeadingBlock() },
 };
 
 export const CenterAligned: TStory = {

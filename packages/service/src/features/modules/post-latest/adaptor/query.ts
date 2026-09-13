@@ -20,7 +20,7 @@ export const postLatestModuleQuery = q
     headingBlock: sub
       .field('headingBlock')
       .project(headingBlockFragment)
-      .nullable(true),
+      .notNull(),
     limit: sub.field('limit').notNull(),
     layout: sub.field('layout').project(layoutFragment).nullable(true),
     contentAlignment: sub.field('contentAlignment').nullable(true),

@@ -7,7 +7,6 @@ export const postLatestModuleViewVariants = tv({
       'font-mono text-label font-normal uppercase tracking-label text-subtle',
       'm-0 mb-3',
     ],
-    labelFallback: ['sr-only'],
     supportingText: ['font-body text-prose text-muted', 'm-0 mb-5'],
     grid: ['gap-3.5 md:gap-5 lg:gap-7'],
   },

@@ -1,6 +1,6 @@
 import { q } from '@blog/service/sanity/query';
 import { actionGroupFragment } from '@blog/service/shared/fragments/action-group';
-import { requiredHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block';
+import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image';
 import { layoutFragment } from '@blog/service/shared/fragments/layout';
 import { linkFragment } from '@blog/service/shared/fragments/link';
@@ -17,7 +17,7 @@ export const ctaModuleQuery = q
     eyebrow: sub.field('eyebrow').nullable(true),
     headingBlock: sub
       .field('headingBlock')
-      .project(requiredHeadingBlockFragment)
+      .project(headingBlockFragment)
       .notNull(),
     // Blocks are spread as-is (`'...': true`); only `markDefs` is
     // re-projected, to deref `link` annotations' `internalReference`.

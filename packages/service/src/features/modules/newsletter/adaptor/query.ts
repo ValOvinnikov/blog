@@ -1,6 +1,6 @@
 import { NEWSLETTER_VARIANT } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
-import { requiredHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block';
+import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { layoutFragment } from '@blog/service/shared/fragments/layout';
 import { z } from 'zod';
 
@@ -19,7 +19,7 @@ export const newsletterModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(requiredHeadingBlockFragment)
+      .project(headingBlockFragment)
       .notNull(),
     variant: sub.raw(NEWSLETTER_VARIANT_EXPRESSION, newsletterVariantParser),
     layout: sub.field('layout').project(layoutFragment).nullable(true),

@@ -23,7 +23,7 @@ describe(getHeroStatement, () => {
     const hero = await getHeroStatement('hero-statement-1', tenant);
 
     expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(hero.heading).toBe('Ship confidently');
+    expect(hero.headingBlock.heading).toBe('Ship confidently');
   });
 
   it('propagates when the module document is missing', async () => {

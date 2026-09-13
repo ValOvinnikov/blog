@@ -42,17 +42,6 @@ describe('toPostListModule', () => {
     expect(module.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
   });
 
-  it('leaves every headingBlock field undefined when the field itself is unset (no faked default)', () => {
-    const raw = makeRawPostListModule({ headingBlock: null });
-
-    const module = toPostListModule(raw, rawPosts, pagination);
-
-    expect(module.headingBlock).toEqual({
-      heading: undefined,
-      supportingText: undefined,
-    });
-  });
-
   it('leaves contentAlignment undefined when unset (no faked default)', () => {
     const raw = makeRawPostListModule({ contentAlignment: null });
 

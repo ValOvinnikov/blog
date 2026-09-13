@@ -1,4 +1,4 @@
-import { toRequiredHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
+import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import type { InferResultType } from 'groqd';
 
@@ -14,7 +14,7 @@ export function toNewsletterModule(
 ): TNewsletterModule {
   return {
     brandVariant: raw.brandVariant,
-    headingBlock: toRequiredHeadingBlock(raw.headingBlock),
+    headingBlock: toHeadingBlock(raw.headingBlock),
     variant: raw.variant,
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,

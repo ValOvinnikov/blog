@@ -2,6 +2,7 @@ import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { STATIC_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { HeroStatementModule } from './hero-statement-module';
@@ -27,8 +28,7 @@ const makeHeroStatementData = (overrides: Record<string, unknown> = {}) => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
   variant: HERO_VARIANT.SPLIT,
   eyebrow: undefined,
-  heading: 'Build faster, ship sooner',
-  supportingText: undefined,
+  headingBlock: makeHeadingBlock({ heading: 'Build faster, ship sooner' }),
   sanityImage: undefined,
   actions: undefined,
   contentPosition: undefined,
@@ -86,7 +86,9 @@ describe(`<${HeroStatementModule.name}/>`, () => {
   it('renders the resolved heading', async () => {
     getHeroStatementMock.mockResolvedValue({
       ok: true,
-      data: makeHeroStatementData({ heading: 'Hello World' }),
+      data: makeHeroStatementData({
+        headingBlock: makeHeadingBlock({ heading: 'Hello World' }),
+      }),
     });
 
     await setup();

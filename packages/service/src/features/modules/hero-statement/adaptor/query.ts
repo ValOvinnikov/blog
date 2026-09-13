@@ -1,6 +1,6 @@
 import { q } from '@blog/service/sanity/query';
 import { actionGroupFragment } from '@blog/service/shared/fragments/action-group';
-import { requiredHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block';
+import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image';
 import { heroLayoutFragment } from '@blog/service/shared/fragments/layout';
 
@@ -15,7 +15,7 @@ export const heroStatementModuleQuery = q
     eyebrow: sub.field('eyebrow').nullable(true),
     headingBlock: sub
       .field('headingBlock')
-      .project(requiredHeadingBlockFragment)
+      .project(headingBlockFragment)
       .notNull(),
     image: sub.field('image').project(sanityImageFragment).nullable(true),
     actions: sub.field('actions').project(actionGroupFragment).nullable(true),
