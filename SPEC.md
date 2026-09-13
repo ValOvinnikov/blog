@@ -312,8 +312,14 @@ test asserting every registered `module_hero*` schema appears in it.
 
 Three kinds are registered. **`module_hero`** is the original, kept until
 #2813 retires it. **`module_heroBlog`** is the featured-post hero: its
-heading, image and primary action all derive from a post, and publish is
-blocked when none resolves. **`module_heroStatement`** is the plainest
+copy, image and primary action all derive from a post, and publish is
+blocked when none resolves. It authors no heading or supporting text of its
+own — those are the post's, and a hero without a post is broken rather than
+sparse, since its action is built from that post and would link nowhere. Its
+only authored copy is an optional `eyebrow`, overriding the post's topic
+title. When no post resolves at render time — a pinned post unpublished
+after the fact, or no featured post left — the hero renders nothing and the
+page's own required `headingBlock` heading becomes the `<h1>`. **`module_heroStatement`** is the plainest
 member — a headline, a line of support and up to two actions, with nothing
 derived from anything — and is the hero a marketing, agency, product or
 consultant home page opens with.
