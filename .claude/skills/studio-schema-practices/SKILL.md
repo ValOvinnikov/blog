@@ -150,18 +150,19 @@ a single word displays poorly" is a consequence, survives a change to
 `max()`, and is genuinely more useful. When a rule is real but unenforced,
 express it qualitatively rather than reintroducing the number.
 
-Two guards in `schema-types/index.test.ts` fail the build when a type or a
-field ships without a description — one over the `schemaTypes` registry, one
-over each registered type's own fields. **They check presence, not quality**;
-nothing but review catches a description that is present and useless. The only
-exemption is a type no editor ever opens (`migrationState`, the migration
-tooling's own ledger), named explicitly in the guard's `NOT_EDITOR_FACING`
-set — extend that set only for another genuinely hidden system type, never to
-silence a real gap.
+**Nothing enforces this automatically** — there is no registry test asserting
+every type and field carries a description, deliberately. It falls to whoever
+writes and whoever reviews the schema. A mechanical check could only ever
+confirm a description is present, which is the easy half; the half that
+matters is whether it tells an editor something true and useful, and that
+needs a reader.
 
-Where the same description would be pasted into more than one schema, it is a
-shared constant like any other repeated literal (`PAGE_HEADING_DESCRIPTION`
-beside `headingBlockField`), not copy-paste.
+Where a shared field factory would otherwise have every caller pass the same
+description, the default belongs **on the factory**, not repeated at each call
+site — `headingBlockField` carries one generic default that suits both a page
+and a module, and only a caller with genuinely different copy passes its own.
+A description repeated verbatim across call sites is the same duplication
+problem as any other repeated literal.
 
 ### Option lists — dropdown by default, radio when the field is required
 

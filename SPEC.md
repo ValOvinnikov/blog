@@ -809,10 +809,13 @@ They **never restate validation** — the Studio already renders the required
 marker and the character counter, so a prose copy is redundant when written
 and wrong once the rule changes; where a real but unenforced expectation is
 worth stating, it is expressed as a consequence ("a single word displays
-poorly") rather than a number. Two guards in
-`packages/studio/src/schema-types/index.test.ts` fail the build on a type or
-field that ships without one, with a single exemption for `migrationState`,
-which no editor ever opens. The guards check presence, not quality.
+poorly") rather than a number. The rule is held by authoring and review, not
+by a test: a mechanical check can only confirm a description exists, which is
+the easy half, while whether it tells an editor something true and useful
+needs a reader. Where a shared field factory would otherwise have every caller
+repeat the same text, the default lives on the factory — `headingBlockField`
+carries one generic default covering both pages and modules, and only a caller
+with genuinely different copy overrides it.
 
 `titleField()` is the internal Studio label on every document that has one,
 and its one default description says so — the field is never rendered. It
