@@ -1,4 +1,5 @@
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic/topic';
+import { getCustomValidatorWithLevel } from '@blog/studio/testing/create-mock-validation-rule';
 import type { SanityDocument, ValidationContext } from 'sanity';
 
 type TCustomFn = (
@@ -9,42 +10,8 @@ type TCustomFn = (
 const MISSING_PAGE_WARNING =
   'No Topic Page references this topic yet — /topics/{slug} will 404 until one is created.';
 
-/**
- * `validateHasPageTopic` is private to topic.ts; the document-level
- * `validation` builder registers it via `rule.custom(fn).warning()`, so a
- * minimal chainable mock rule captures both calls the same way other schema
- * tests capture a field's custom validator — no export needed.
- */
-const getHasPageTopicValidator = (): { fn: TCustomFn; isWarning: boolean } => {
-  if (!topicSchema.validation) {
-    throw new Error('Expected topicSchema to define document validation.');
-  }
-
-  let customFn: TCustomFn | undefined;
-  let warningCalled = false;
-
-  const rule = {
-    custom: (fn: TCustomFn) => {
-      customFn = fn;
-      return rule;
-    },
-    warning: () => {
-      warningCalled = true;
-      return rule;
-    },
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (topicSchema.validation as any)(rule);
-
-  if (!customFn) {
-    throw new Error(
-      'Expected topicSchema validation to register a custom() rule.',
-    );
-  }
-
-  return { fn: customFn, isWarning: warningCalled };
-};
+const getHasPageTopicValidator = (): { fn: TCustomFn; isWarning: boolean } =>
+  getCustomValidatorWithLevel<TCustomFn>(topicSchema);
 
 const createMockContext = (referencingCount: number) => {
   const fetchCalls: { query: string; params: unknown }[] = [];

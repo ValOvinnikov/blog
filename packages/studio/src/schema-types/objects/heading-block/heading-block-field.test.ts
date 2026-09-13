@@ -1,33 +1,11 @@
+import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
+
 import { headingBlockField } from './heading-block-field';
 
 type TCustomFn = (
   value: { heading?: string } | undefined,
   context: { parent?: unknown },
 ) => string | true;
-
-const getCustomValidator = (field: { validation?: unknown }): TCustomFn => {
-  if (!field.validation) {
-    throw new Error('Expected field to define validation.');
-  }
-
-  let customFn: TCustomFn | undefined;
-
-  const rule = {
-    custom: (fn: TCustomFn) => {
-      customFn = fn;
-      return rule;
-    },
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (field.validation as any)(rule);
-
-  if (!customFn) {
-    throw new Error('Expected field validation to register a custom() rule.');
-  }
-
-  return customFn;
-};
 
 describe('headingBlockField', () => {
   it('defaults to the shared headingBlock object type with no validation', () => {
@@ -52,7 +30,7 @@ describe('headingBlockField', () => {
   });
 
   it('blocks publish on an empty heading when required, with a default message', () => {
-    const validate = getCustomValidator(
+    const validate = getCustomValidator<TCustomFn>(
       headingBlockField({ requireHeading: true }),
     );
 
@@ -62,7 +40,7 @@ describe('headingBlockField', () => {
   });
 
   it('carries a custom required message through the field-level rule', () => {
-    const validate = getCustomValidator(
+    const validate = getCustomValidator<TCustomFn>(
       headingBlockField({
         requireHeading: true,
         requiredMessage: 'A statement hero is its heading. Give it one.',

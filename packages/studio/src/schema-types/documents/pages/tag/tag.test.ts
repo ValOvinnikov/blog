@@ -3,6 +3,11 @@ import { tagPageSchema } from '@blog/studio/schema-types/documents/pages/tag/tag
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
+import {
+  getCustomValidator,
+  getRecordedValidators,
+  type TRecordedValidator,
+} from '@blog/studio/testing/create-mock-validation-rule';
 import type { ValidationContext } from 'sanity';
 
 type TReferenceFieldDefinition = {
@@ -127,28 +132,8 @@ describe('pageTagSchema headingBlock field', () => {
     const headingBlockField = getField('headingBlock') as
       { validation?: unknown } | undefined;
 
-    if (!headingBlockField?.validation) {
-      throw new Error(
-        'Expected pageTagSchema headingBlock to define validation.',
-      );
-    }
-
-    let customFn: THeadingBlockCustomFn | undefined;
-    const rule = {
-      custom: (fn: THeadingBlockCustomFn) => {
-        customFn = fn;
-        return rule;
-      },
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    (headingBlockField.validation as any)(rule);
-
-    if (!customFn) {
-      throw new Error(
-        'Expected pageTagSchema headingBlock validation to register a custom() rule.',
-      );
-    }
+    const customFn =
+      getCustomValidator<THeadingBlockCustomFn>(headingBlockField);
 
     expect(customFn(undefined)).toBe('Heading is required.');
     expect(customFn({ heading: 'Design' })).toBe(true);
@@ -287,38 +272,10 @@ type TCustomFn = (
 const TAG_UNIQUENESS_ERROR =
   'Another Tag Page already references this tag — each tag can only back one Tag Page.';
 
-/**
- * `validateUniqueTagReference` is private to tag.ts; the `tag` field's
- * `validation` builder registers it via `rule.custom(fn)`, so a minimal
- * chainable mock rule captures it the same way home.test.ts captures
- * its modules-field custom validator — no export needed.
- */
-const getUniqueTagValidator = (): TCustomFn => {
-  const tagField = tagPageSchema.fields?.find((field) => field.name === 'tag');
-
-  if (!tagField?.validation) {
-    throw new Error('Expected tag field validation to register custom().');
-  }
-
-  let customFn: TCustomFn | undefined;
-
-  const rule = {
-    required: () => rule,
-    custom: (fn: TCustomFn) => {
-      customFn = fn;
-      return rule;
-    },
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (tagField.validation as any)(rule);
-
-  if (!customFn) {
-    throw new Error('Expected tag field validation to register custom().');
-  }
-
-  return customFn;
-};
+const getUniqueTagValidator = (): TCustomFn =>
+  getCustomValidator<TCustomFn>(
+    tagPageSchema.fields?.find((field) => field.name === 'tag'),
+  );
 
 const createMockContext = (fetchResult: unknown, documentId = 'page-tag-1') => {
   const fetchCalls: { query: string; params: unknown }[] = [];
@@ -398,33 +355,8 @@ type TDocumentCustomFn = (
   context: ValidationContext,
 ) => string | true | Promise<string | true>;
 
-type TDocumentMockRule = {
-  level: 'error' | 'warning';
-  fn?: TDocumentCustomFn;
-  custom: (fn: TDocumentCustomFn) => TDocumentMockRule;
-  warning: () => TDocumentMockRule;
-};
-
-const createDocumentMockRule = (
-  level: TDocumentMockRule['level'] = 'error',
-  fn?: TDocumentCustomFn,
-): TDocumentMockRule => ({
-  level,
-  fn,
-  custom: (nextFn) => createDocumentMockRule('error', nextFn),
-  warning: () => createDocumentMockRule('warning', fn),
-});
-
-const buildDocumentRules = (): TDocumentMockRule[] => {
-  if (!tagPageSchema.validation) {
-    throw new Error('Expected tagPageSchema to define a validation rule.');
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  return (tagPageSchema.validation as any)(
-    createDocumentMockRule(),
-  ) as TDocumentMockRule[];
-};
+const buildDocumentRules = (): TRecordedValidator<TDocumentCustomFn>[] =>
+  getRecordedValidators<TDocumentCustomFn>(tagPageSchema);
 
 describe('pageTagSchema document validation — modules[] post list count', () => {
   it('errors when more than one module_postList is referenced', () => {

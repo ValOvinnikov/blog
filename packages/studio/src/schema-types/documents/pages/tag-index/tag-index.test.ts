@@ -11,6 +11,10 @@ import {
   type TModuleReference,
   type TModulesCustomFn,
 } from '@blog/studio/testing/create-mock-modules-rule';
+import {
+  getRecordedValidators,
+  type TRecordedValidator,
+} from '@blog/studio/testing/create-mock-validation-rule';
 import type { ValidationContext } from 'sanity';
 
 type TArrayFieldDefinition = {
@@ -28,23 +32,6 @@ type TFieldDefinition = {
 };
 
 type TDocumentCustomFn = (document: Record<string, unknown>) => string | true;
-
-type TDocumentMockRule = {
-  level: 'error' | 'warning';
-  fn?: TDocumentCustomFn;
-  custom: (fn: TDocumentCustomFn) => TDocumentMockRule;
-  warning: () => TDocumentMockRule;
-};
-
-const createDocumentMockRule = (
-  level: TDocumentMockRule['level'] = 'error',
-  fn?: TDocumentCustomFn,
-): TDocumentMockRule => ({
-  level,
-  fn,
-  custom: (nextFn) => createDocumentMockRule('error', nextFn),
-  warning: () => createDocumentMockRule('warning', fn),
-});
 
 const getField = (name: string): TFieldDefinition | undefined =>
   tagIndexPageSchema.fields?.find((field) => field.name === name) as
@@ -69,16 +56,8 @@ const getModulesCustomValidators = (): TModulesCustomFn[] => {
   return customFns;
 };
 
-const buildDocumentRules = (): TDocumentMockRule[] => {
-  if (!tagIndexPageSchema.validation) {
-    throw new Error('Expected tagIndexPageSchema to define a validation rule.');
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  return (tagIndexPageSchema.validation as any)(
-    createDocumentMockRule(),
-  ) as TDocumentMockRule[];
-};
+const buildDocumentRules = (): TRecordedValidator<TDocumentCustomFn>[] =>
+  getRecordedValidators<TDocumentCustomFn>(tagIndexPageSchema);
 
 describe('tagIndexPageSchema field order', () => {
   it('orders fields title, headingBlock, hero, modules, seo, then the deprecated taxonomyList field', () => {

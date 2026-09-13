@@ -3,6 +3,11 @@ import { topicPageSchema } from '@blog/studio/schema-types/documents/pages/topic
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
+import {
+  getCustomValidator,
+  getRecordedValidators,
+  type TRecordedValidator,
+} from '@blog/studio/testing/create-mock-validation-rule';
 import type { ValidationContext } from 'sanity';
 
 type TReferenceFieldDefinition = {
@@ -127,28 +132,8 @@ describe('pageTopicSchema headingBlock field', () => {
     const headingBlockField = getField('headingBlock') as
       { validation?: unknown } | undefined;
 
-    if (!headingBlockField?.validation) {
-      throw new Error(
-        'Expected pageTopicSchema headingBlock to define validation.',
-      );
-    }
-
-    let customFn: THeadingBlockCustomFn | undefined;
-    const rule = {
-      custom: (fn: THeadingBlockCustomFn) => {
-        customFn = fn;
-        return rule;
-      },
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    (headingBlockField.validation as any)(rule);
-
-    if (!customFn) {
-      throw new Error(
-        'Expected pageTopicSchema headingBlock validation to register a custom() rule.',
-      );
-    }
+    const customFn =
+      getCustomValidator<THeadingBlockCustomFn>(headingBlockField);
 
     expect(customFn(undefined)).toBe('Heading is required.');
     expect(customFn({ heading: 'Design' })).toBe(true);
@@ -291,40 +276,10 @@ type TCustomFn = (
 const UNIQUENESS_ERROR =
   'Another Topic Page already references this topic — each topic can only back one Topic Page.';
 
-/**
- * `validateUniqueTopicReference` is private to topic.ts; the `topic`
- * field's `validation` builder registers it via `rule.custom(fn)`, so a
- * minimal chainable mock rule captures it the same way home.test.ts
- * captures its modules-field custom validator — no export needed.
- */
-const getUniqueTopicValidator = (): TCustomFn => {
-  const topicField = topicPageSchema.fields?.find(
-    (field) => field.name === 'topic',
+const getUniqueTopicValidator = (): TCustomFn =>
+  getCustomValidator<TCustomFn>(
+    topicPageSchema.fields?.find((field) => field.name === 'topic'),
   );
-
-  if (!topicField?.validation) {
-    throw new Error('Expected topic field validation to register custom().');
-  }
-
-  let customFn: TCustomFn | undefined;
-
-  const rule = {
-    required: () => rule,
-    custom: (fn: TCustomFn) => {
-      customFn = fn;
-      return rule;
-    },
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (topicField.validation as any)(rule);
-
-  if (!customFn) {
-    throw new Error('Expected topic field validation to register custom().');
-  }
-
-  return customFn;
-};
 
 const createMockContext = (
   fetchResult: unknown,
@@ -407,33 +362,8 @@ type TDocumentCustomFn = (
   context: ValidationContext,
 ) => string | true | Promise<string | true>;
 
-type TDocumentMockRule = {
-  level: 'error' | 'warning';
-  fn?: TDocumentCustomFn;
-  custom: (fn: TDocumentCustomFn) => TDocumentMockRule;
-  warning: () => TDocumentMockRule;
-};
-
-const createDocumentMockRule = (
-  level: TDocumentMockRule['level'] = 'error',
-  fn?: TDocumentCustomFn,
-): TDocumentMockRule => ({
-  level,
-  fn,
-  custom: (nextFn) => createDocumentMockRule('error', nextFn),
-  warning: () => createDocumentMockRule('warning', fn),
-});
-
-const buildDocumentRules = (): TDocumentMockRule[] => {
-  if (!topicPageSchema.validation) {
-    throw new Error('Expected topicPageSchema to define a validation rule.');
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  return (topicPageSchema.validation as any)(
-    createDocumentMockRule(),
-  ) as TDocumentMockRule[];
-};
+const buildDocumentRules = (): TRecordedValidator<TDocumentCustomFn>[] =>
+  getRecordedValidators<TDocumentCustomFn>(topicPageSchema);
 
 describe('pageTopicSchema document validation — modules[] post list count', () => {
   it('errors when more than one module_postList is referenced', () => {
