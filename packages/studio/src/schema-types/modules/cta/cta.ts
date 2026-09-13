@@ -13,7 +13,7 @@ import { actionGroupField } from '@blog/studio/schema-types/objects/action-group
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
-import { basicTextSchema } from '@blog/studio/schema-types/portable-text/basic-text/basic-text';
+import { inlineTextSchema } from '@blog/studio/schema-types/portable-text/inline-text/inline-text';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Megaphone } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -104,7 +104,7 @@ export const ctaSchema = defineType({
     defineField({
       name: 'content',
       title: 'Content',
-      type: basicTextSchema.name,
+      type: inlineTextSchema.name,
       description: 'Optional rich text, separate from the supporting text.',
     }),
     defineField({

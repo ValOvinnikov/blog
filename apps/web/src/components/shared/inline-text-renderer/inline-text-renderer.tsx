@@ -1,4 +1,4 @@
-import type { BasicText, Link } from '@blog/config';
+import type { InlineText, Link } from '@blog/config';
 import { ProseLink } from '@blog/ui/atoms/prose-link';
 import {
   PortableText,
@@ -7,13 +7,13 @@ import {
 } from '@portabletext/react';
 import { SmartLink } from '@web/components/shared/smart-link';
 
-import { basicTextRendererVariants } from './basic-text-renderer-variants';
+import { inlineTextRendererVariants } from './inline-text-renderer-variants';
 
-export interface IBasicTextRendererProps {
-  value: BasicText;
+export interface IInlineTextRendererProps {
+  value: InlineText;
 }
 
-const s = basicTextRendererVariants();
+const s = inlineTextRendererVariants();
 
 const components: PortableTextComponents = {
   block: {
@@ -50,6 +50,6 @@ const components: PortableTextComponents = {
  * and inline links only (no headings, images, code, or asides). `link`
  * annotations route through `SmartLink`.
  */
-export const BasicTextRenderer = ({ value }: IBasicTextRendererProps) => (
+export const InlineTextRenderer = ({ value }: IInlineTextRendererProps) => (
   <PortableText value={value} components={components} />
 );

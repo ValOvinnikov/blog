@@ -1,6 +1,6 @@
 import type {
-  BlockText,
   ISanityImage,
+  ProseText,
   TMaybeUndefined,
   TPortableTextBody,
 } from '@blog/config';
@@ -17,7 +17,7 @@ export type TPostDetailAuthor = {
   profilePageSlug: TMaybeUndefined<string>;
   image: TMaybeUndefined<ISanityImage>;
   role: TMaybeUndefined<string>;
-  bio: TMaybeUndefined<BlockText>;
+  bio: TMaybeUndefined<ProseText>;
   socialLinks: TSocialLink[];
 };
 

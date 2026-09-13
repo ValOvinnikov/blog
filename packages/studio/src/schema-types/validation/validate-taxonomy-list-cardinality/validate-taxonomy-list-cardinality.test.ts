@@ -1,3 +1,4 @@
+import { PAGE_TOPIC_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/topic-index/topic-index-type';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import {
   validateHasTaxonomyListModule,
@@ -11,7 +12,7 @@ const buildDocument = (
   modules: TModuleReference[],
 ): SanityDocument & { modules: TModuleReference[] } => ({
   _id: 'doc-1',
-  _type: 'page_topicIndex',
+  _type: PAGE_TOPIC_INDEX_TYPE,
   _createdAt: '2026-01-01T00:00:00.000Z',
   _updatedAt: '2026-01-01T00:00:00.000Z',
   _rev: 'rev-1',

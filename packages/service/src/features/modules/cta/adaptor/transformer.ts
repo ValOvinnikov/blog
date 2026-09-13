@@ -1,7 +1,7 @@
 import {
   CTA_VARIANT,
   LINK_TYPE,
-  type BasicText,
+  type InlineText,
   type TContentAlignment,
   type TMaybeUndefined,
 } from '@blog/config';
@@ -25,7 +25,7 @@ export type TRawCtaContentBlock = NonNullable<TRawCtaModule['content']>[number];
 export type TRawCtaContentMarkDef = NonNullable<
   TRawCtaContentBlock['markDefs']
 >[number];
-type TCtaContentMarkDef = NonNullable<BasicText[number]['markDefs']>[number];
+type TCtaContentMarkDef = NonNullable<InlineText[number]['markDefs']>[number];
 
 // Unlike an action, a malformed content link degrades to plain text rather
 // than dropping the block — the renderer already handles a missing `url`.
@@ -49,14 +49,14 @@ function toContentLinkAnnotation(
   };
 }
 
-function toContentBlock(raw: TRawCtaContentBlock): BasicText[number] {
+function toContentBlock(raw: TRawCtaContentBlock): InlineText[number] {
   return {
     ...raw,
     markDefs: raw.markDefs?.map(toContentLinkAnnotation) ?? undefined,
   };
 }
 
-function toContent(raw: TRawCtaModule['content']): TMaybeUndefined<BasicText> {
+function toContent(raw: TRawCtaModule['content']): TMaybeUndefined<InlineText> {
   if (!raw || raw.length === 0) return undefined;
   return raw.map(toContentBlock);
 }

@@ -1,9 +1,9 @@
 import { linkSchema } from '@blog/studio/schema-types/objects/link/link';
 import { defineArrayMember, defineType } from 'sanity';
 
-export const basicTextSchema = defineType({
-  name: 'basicText',
-  title: 'Basic Text',
+export const inlineTextSchema = defineType({
+  name: 'inlineText',
+  title: 'Inline Text',
   type: 'array',
   description:
     'Short formatted text with bold, italics, lists, and links, but no headings or images.',

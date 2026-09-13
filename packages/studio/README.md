@@ -49,7 +49,7 @@ Studio from one deployment.
 - `src/schema-types/objects/` — shared object types (`link`, `socialLink`,
   `brand`, `imageWithAlt`, `seo`, `openGraph`, …)
 - `src/schema-types/portable-text/` — the Portable Text block editors
-  (`richText`, `blockText`, `basicText`)
+  (`richText`, `proseText`, `inlineText`)
 - `src/schema-types/fields/` — DRY field factories reused across schemas
   (e.g. `title-field`, `slug-field`, `modules-field`); a factory that serves one
   object or schema lives beside it instead

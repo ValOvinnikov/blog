@@ -1,38 +1,11 @@
 import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/tag/tag-type';
 import { slugField } from '@blog/studio/schema-types/fields/slug-field/slug-field';
-import { getDraftsClient } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { validateHasPage } from '@blog/studio/schema-types/validation/validate-has-page/validate-has-page';
 import { Tag } from 'lucide-react';
-import {
-  defineField,
-  defineType,
-  type SanityDocument,
-  type ValidationContext,
-} from 'sanity';
+import { defineField, defineType } from 'sanity';
 
-/**
- * Warns (does not block publishing) when no `page_tag` references this tag
- * — `/tags/{slug}` 404s with no runtime fallback in that state, so the
- * editor should see the gap on the document they'd fix it from.
- */
-const validateHasPageTag = async (
-  document: SanityDocument | undefined,
-  context: ValidationContext,
-): Promise<string | true> => {
-  const publishedId = document?._id.replace(/^drafts\./, '');
-
-  if (!publishedId) return true;
-
-  const client = getDraftsClient(context);
-
-  const referencingCount = await client.fetch<number>(
-    `count(*[_type == $type && tag._ref == $tagId])`,
-    { type: PAGE_TAG_TYPE, tagId: publishedId },
-  );
-
-  return referencingCount > 0
-    ? true
-    : 'No Tag Page references this tag yet — /tags/{slug} will 404 until one is created.';
-};
+const MISSING_PAGE_WARNING =
+  'No Tag Page references this tag yet — /tags/{slug} will 404 until one is created.';
 
 export const tagSchema = defineType({
   name: 'blog_tag',
@@ -41,7 +14,10 @@ export const tagSchema = defineType({
   description:
     'A keyword used to label posts, powering tag chips, related posts, and the tag archive page.',
   icon: Tag,
-  validation: (rule) => rule.custom(validateHasPageTag).warning(),
+  validation: (rule) =>
+    rule
+      .custom(validateHasPage(PAGE_TAG_TYPE, 'tag', MISSING_PAGE_WARNING))
+      .warning(),
   fields: [
     defineField({
       name: 'title',

@@ -1,3 +1,4 @@
+import { PAGE_POST_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/post-index/post-index-type';
 import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-field';
 import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
@@ -42,7 +43,7 @@ const validatePostListModulePresent = (
     : true;
 
 export const postIndexPageSchema = defineType({
-  name: 'page_postIndex',
+  name: PAGE_POST_INDEX_TYPE,
   title: 'Post Index Page',
   type: 'document',
   description:

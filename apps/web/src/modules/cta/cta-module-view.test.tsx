@@ -122,7 +122,7 @@ describe(`<${CtaModuleView.name}/>`, () => {
     expect(links[1]).toHaveTextContent('Learn more');
   });
 
-  it('renders the optional content field via BasicTextRenderer', () => {
+  it('renders the optional content field via InlineTextRenderer', () => {
     setup({ content: ctaContentDemo });
 
     expect(screen.getByText('14-day trial')).toBeVisible();

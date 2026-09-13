@@ -1,8 +1,6 @@
 /**
- * `page_post`'s own `_type` name, in its own file so schema code that needs
- * to reference `page_post` — `objects/link.ts` and several module schemas —
- * can do so without an import cycle back through `post.ts`. Import this
- * module directly rather than through the folder's `index.ts` barrel, which
- * re-exports `postPageSchema` and would pull the same cycle back in.
+ * `page_post`'s own `_type` name, kept in its own file so a schema outside
+ * `post.ts` can reference `page_post` without an import cycle back through
+ * it — import this module directly rather than through a barrel.
  */
 export const PAGE_POST_TYPE = 'page_post';

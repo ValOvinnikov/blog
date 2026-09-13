@@ -1,4 +1,5 @@
 import { RESERVED_SLUGS } from '@blog/config/constants';
+import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-field';
 import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
 import { slugField } from '@blog/studio/schema-types/fields/slug-field/slug-field';
@@ -20,7 +21,7 @@ import { defineType } from 'sanity';
 const landingSlugUrlPreviewInput = createSlugUrlPreviewInput('/');
 
 export const landingPageSchema = defineType({
-  name: 'page_landing',
+  name: PAGE_LANDING_TYPE,
   title: 'Landing Page',
   type: 'document',
   description:

@@ -180,7 +180,7 @@ src/schema-types/modules/hero-blog/
   `newsletterSchema`). Blog, modules, objects and portable-text use the bare
   form.
 - `objects/` holds `type: 'object'`/image types only; the `type: 'array'`
-  block editors (`richText`, `blockText`, `basicText`) live in
+  block editors (`richText`, `proseText`, `inlineText`) live in
   `portable-text/`.
 - A field factory goes where its reach is: used by exactly one schema → a
   local, non-exported function inside that schema file (`modeFieldPair` in
@@ -206,7 +206,7 @@ singletons `settings_site`, `settings_navigation`, `settings_footer`,
 `module_newsletter`, `module_postFeatured`, `module_postLatest`,
 `module_postList`, `module_postRelated`, `module_taxonomyList`. Shared
 objects: unified `link`, `socialLink`, `brand`, `imageWithAlt`,
-`seo`/`openGraph`, `blockText`/`richText`.
+`seo`/`openGraph`, `proseText`/`richText`.
 
 **The post is `page_post`.** There is no separate post document — `blog_post`
 was retired, and a Sanity `_type` is immutable, so that retirement was a

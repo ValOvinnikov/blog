@@ -1,5 +1,5 @@
-import { basicTextSchema } from './basic-text/basic-text';
-import { blockTextSchema } from './block-text/block-text';
+import { inlineTextSchema } from './inline-text/inline-text';
+import { proseTextSchema } from './prose-text/prose-text';
 import { richTextSchema } from './rich-text/rich-text';
 
-export const portableText = [richTextSchema, blockTextSchema, basicTextSchema];
+export const portableText = [richTextSchema, proseTextSchema, inlineTextSchema];
