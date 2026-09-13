@@ -1,7 +1,6 @@
 import { authorSchema } from '@blog/studio/schema-types/documents/blog/author/author';
 import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag/tag';
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic/topic';
-import { blogPageSchema } from '@blog/studio/schema-types/documents/pages/blog/blog';
 import { postPageSchema } from '@blog/studio/schema-types/documents/pages/post/post';
 import { postIndexPageSchema } from '@blog/studio/schema-types/documents/pages/post-index/post-index';
 import { tagPageSchema } from '@blog/studio/schema-types/documents/pages/tag/tag';
@@ -21,7 +20,6 @@ export const blogSection: TStructureSection = {
       title: 'Pages',
       items: [
         { schema: postIndexPageSchema, mode: 'singleton' },
-        { schema: blogPageSchema, mode: 'singleton' },
         { schema: postPageSchema },
         { schema: topicIndexPageSchema, mode: 'singleton' },
         { schema: topicPageSchema },
