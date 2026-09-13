@@ -14,6 +14,14 @@ const getField = (name: string) => {
   return field;
 };
 
+const getLayout = (field: { options?: unknown }) => {
+  const options = field.options;
+
+  return options && typeof options === 'object' && 'layout' in options
+    ? (options as { layout?: string }).layout
+    : undefined;
+};
+
 const getOptionValues = (field: { options?: unknown }) => {
   const options = field.options;
   const list =
@@ -53,5 +61,9 @@ describe('newsletterSchema variant field', () => {
 
   it('is optional — no validation() builder attached', () => {
     expect(getField('variant').validation).toBeUndefined();
+  });
+
+  it('converts to a dropdown: optional, no field depends on it', () => {
+    expect(getLayout(getField('variant'))).toBe('dropdown');
   });
 });

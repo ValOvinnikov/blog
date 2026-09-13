@@ -41,7 +41,7 @@ export const ctaActionSchema = defineType({
       description:
         'How this action looks: Contained (filled/bordered button) or Inline (text link). Available on both Primary and Secondary.',
       options: {
-        layout: 'radio',
+        layout: 'dropdown',
         list: Object.values(CTA_ACTION_APPEARANCE).map((value) => ({
           title: toTitleCase(value),
           value,

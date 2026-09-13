@@ -25,7 +25,7 @@ export const newsletterSchema = defineType({
       type: 'string',
       description: 'Full form, or a compact variant for tighter layouts.',
       options: {
-        layout: 'radio',
+        layout: 'dropdown',
         list: Object.values(NEWSLETTER_VARIANT).map((value) => ({
           title: toTitleCase(value),
           value,

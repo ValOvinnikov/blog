@@ -224,7 +224,7 @@ export const heroBlogSchema = defineType({
       description:
         'How the primary action looks: Contained (filled button) or Inline (text link).',
       options: {
-        layout: 'radio',
+        layout: 'dropdown',
         list: Object.values(CTA_ACTION_APPEARANCE).map((value) => ({
           title: toTitleCase(value),
           value,

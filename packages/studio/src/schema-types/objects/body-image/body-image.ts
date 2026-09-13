@@ -29,7 +29,7 @@ export const bodyImageSchema = defineType({
       description:
         'How the image is positioned in body content. Leave unset to use the default (Inline).',
       options: {
-        layout: 'radio',
+        layout: 'dropdown',
         list: Object.values(IMAGE_LAYOUT).map((value) => ({
           title: toTitleCase(value),
           value,
