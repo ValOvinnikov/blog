@@ -25,6 +25,8 @@ export const asideSchema = defineType({
   name: 'aside',
   title: 'Aside',
   type: 'object',
+  description:
+    'A side note — such as a tip or warning — set apart from the main body text.',
   icon: MessageSquareText,
   fields: [
     defineField({

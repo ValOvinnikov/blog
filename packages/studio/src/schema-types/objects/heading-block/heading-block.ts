@@ -4,6 +4,7 @@ export const headingBlockSchema = defineType({
   name: 'headingBlock',
   title: 'Heading Block',
   type: 'object',
+  description: "The page's main heading and its optional supporting line.",
   options: { collapsible: true, collapsed: false },
   fields: [
     defineField({

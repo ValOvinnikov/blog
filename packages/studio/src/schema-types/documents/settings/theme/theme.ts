@@ -14,6 +14,8 @@ export const themeSettingsSchema = defineType({
   name: 'settings_theme',
   title: 'Theme',
   type: 'document',
+  description:
+    'The overall site look — color, fonts, corner roundness, and spacing.',
   icon: Palette,
   preview: {
     select: { title: 'title' },

@@ -18,6 +18,8 @@ export const homePageSchema = defineType({
   name: 'page_home',
   title: 'Home Page',
   type: 'document',
+  description:
+    'The home page — the first thing readers see, built from a hero, a heading, and a stack of modules.',
   icon: House,
   preview: {
     select: {

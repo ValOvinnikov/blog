@@ -30,6 +30,8 @@ export const postLatestSchema = defineType({
   name: 'module_postLatest',
   title: 'Latest Posts',
   type: 'document',
+  description:
+    'A short list or carousel of the newest posts, used to surface recent content on any page.',
   icon: Clock,
   validation: (rule) => rule.custom(validateCarouselHasEnoughPosts).warning(),
   fields: [

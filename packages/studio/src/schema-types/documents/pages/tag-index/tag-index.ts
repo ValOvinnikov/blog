@@ -27,6 +27,8 @@ export const tagIndexPageSchema = defineType({
   name: 'page_tagIndex',
   title: 'Tag Index Page',
   type: 'document',
+  description:
+    'The page that lists every tag, for readers browsing by keyword.',
   icon: Tag,
   validation: (rule) => [
     rule.custom(validateSingleTaxonomyListModule),

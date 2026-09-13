@@ -12,6 +12,8 @@ export const newsletterSchema = defineType({
   name: 'module_newsletter',
   title: 'Newsletter Signup',
   type: 'document',
+  description:
+    'A newsletter signup form, in a full or compact layout, used to collect subscriber emails.',
   icon: Mail,
   fields: [
     titleField({ description: 'Internal label shown in the Studio.' }),

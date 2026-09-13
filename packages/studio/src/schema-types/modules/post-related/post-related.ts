@@ -11,6 +11,7 @@ export const postRelatedSchema = defineType({
   name: 'module_postRelated',
   title: 'Related Reading',
   type: 'document',
+  description: 'A list of related posts shown at the end of a post.',
   icon: BookOpen,
   fields: [
     titleField(),

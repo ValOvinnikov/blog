@@ -8,6 +8,8 @@ export const authorSchema = defineType({
   name: 'blog_author',
   title: 'Author',
   type: 'document',
+  description:
+    'A contributor profile — name, photo, and bio — credited on the posts they wrote and shown on the author page.',
   icon: UserRound,
   fields: [
     defineField({

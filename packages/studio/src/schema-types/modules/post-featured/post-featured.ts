@@ -62,6 +62,8 @@ export const postFeaturedSchema = defineType({
   name: 'module_postFeatured',
   title: 'Post Featured',
   type: 'document',
+  description:
+    'A spotlight of one to three hand-picked or newest-featured posts.',
   icon: Pin,
   validation: (rule) => [
     rule.custom(validateNewestFeaturedHasCandidate('spotlight')),

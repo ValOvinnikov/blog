@@ -8,6 +8,8 @@ export const imageWithAltSchema = defineType({
   name: 'imageWithAlt',
   title: 'Image with Alt Text',
   type: 'image',
+  description:
+    'An image together with its required alt text, for accessibility and search engines.',
   options: imageHotspotOptions,
   fields: [imageAltField()],
 });

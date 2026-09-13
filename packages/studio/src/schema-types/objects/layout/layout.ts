@@ -8,6 +8,8 @@ export const layoutSchema = defineType({
   name: 'layout',
   title: 'Layout',
   type: 'object',
+  description:
+    'Shared spacing, divider, and width controls available on most modules.',
   icon: SlidersHorizontal,
   options: { collapsible: true, collapsed: true },
   fields: [

@@ -6,6 +6,8 @@ export const brandSchema = defineType({
   name: 'brand',
   title: 'Brand',
   type: 'object',
+  description:
+    'The site name, logo, and optional status line shown in the header and footer.',
   options: { collapsible: true, collapsed: false },
   fields: [
     defineField({

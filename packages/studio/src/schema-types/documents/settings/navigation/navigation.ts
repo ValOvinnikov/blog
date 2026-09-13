@@ -7,6 +7,7 @@ export const navigationSettingsSchema = defineType({
   name: 'settings_navigation',
   title: 'Navigation',
   type: 'document',
+  description: 'The links shown in the main site navigation.',
   icon: Menu,
   preview: { select: { title: 'title' } },
   fields: [

@@ -38,6 +38,8 @@ export const tagSchema = defineType({
   name: 'blog_tag',
   title: 'Tag',
   type: 'document',
+  description:
+    'A keyword used to label posts, powering tag chips, related posts, and the tag archive page.',
   icon: Tag,
   validation: (rule) => rule.custom(validateHasPageTag).warning(),
   fields: [

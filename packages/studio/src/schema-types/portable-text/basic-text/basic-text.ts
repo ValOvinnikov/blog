@@ -5,6 +5,8 @@ export const basicTextSchema = defineType({
   name: 'basicText',
   title: 'Basic Text',
   type: 'array',
+  description:
+    'Short formatted text with bold, italics, lists, and links, but no headings or images.',
   of: [
     defineArrayMember({
       type: 'block',

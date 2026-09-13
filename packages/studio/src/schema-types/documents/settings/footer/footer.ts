@@ -7,6 +7,7 @@ export const footerSettingsSchema = defineType({
   name: 'settings_footer',
   title: 'Footer',
   type: 'document',
+  description: 'What appears in the site footer, at the bottom of every page.',
   icon: PanelBottom,
   preview: { select: { title: 'title' } },
   fields: [

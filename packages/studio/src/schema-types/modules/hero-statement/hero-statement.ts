@@ -8,6 +8,8 @@ export const heroStatementSchema = defineType({
   name: 'module_heroStatement',
   title: 'Statement Hero',
   type: 'document',
+  description:
+    'A hero that leads with a bold statement heading, with no image or post required.',
   icon: Quote,
   fields: [
     titleField(),
