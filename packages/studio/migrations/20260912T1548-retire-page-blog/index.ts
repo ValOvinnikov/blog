@@ -3,12 +3,16 @@
  * (`page_blog`) and draft (`drafts.page_blog`).
  *
  * Steps, per visited document:
- *   1. Verify at run time, never trusting a prior check against a
+ *   1. Resolve its `page_postIndex` counterpart id from the fixed singleton
+ *      map; abort the whole run if the document's `_id` is not one of the
+ *      two known singleton ids — an unrecognized id is a data anomaly to
+ *      surface, not a document to silently skip.
+ *   2. Verify at run time, never trusting a prior check against a
  *      now-possibly-moved dataset, that its `page_postIndex` counterpart
  *      exists with a non-empty `modules` array and nothing still references
  *      the `page_blog` id (`assertPageBlogDeletable`, throws to abort the
  *      whole run otherwise).
- *   2. `del` it.
+ *   3. `del` it.
  *
  * Idempotency: a re-run is a no-op — a `page_blog` id already deleted is
  * never visited again.
@@ -42,7 +46,11 @@ export default defineMigration({
       const doc = rawDoc as unknown as TRawDocument;
       const postIndexId = PAGE_BLOG_TO_POST_INDEX_ID_MAP.get(doc._id);
 
-      if (!postIndexId) return [];
+      if (!postIndexId) {
+        throw new Error(
+          `Encountered page_blog "${doc._id}", which is not one of the known singleton ids. It was NOT deleted — a human must decide how to handle it before this migration can proceed.`,
+        );
+      }
 
       await assertPageBlogDeletable(context, doc._id, postIndexId);
 

@@ -66,11 +66,21 @@ describe('retire-page-blog migration', () => {
     );
   });
 
-  it('is a no-op for a page_blog id with no known counterpart (idempotent on re-run)', async () => {
+  it('throws for a page_blog id that is not one of the known singleton ids', async () => {
     const doc = { ...baseDoc, _id: 'some-other-id', _type: 'page_blog' };
 
-    const mutations = await migration.migrate.document(doc, deletableContext);
+    await expect(
+      migration.migrate.document(doc, deletableContext),
+    ).rejects.toThrow(/some-other-id/);
+  });
 
-    expect(mutations).toEqual([]);
+  it('is idempotent: the same document produces the same deletion mutation on every invocation', async () => {
+    const doc = { ...baseDoc, _id: 'page_blog', _type: 'page_blog' };
+
+    const firstRun = await migration.migrate.document(doc, deletableContext);
+    const secondRun = await migration.migrate.document(doc, deletableContext);
+
+    expect(firstRun).toEqual([del('page_blog')]);
+    expect(secondRun).toEqual([del('page_blog')]);
   });
 });
