@@ -1,3 +1,5 @@
+import { makeRawPostRelatedModule } from '@blog/service/testing/modules/fixtures';
+
 import { postRelatedModuleQuery } from './query';
 
 describe('postRelatedModuleQuery', () => {
@@ -6,6 +8,12 @@ describe('postRelatedModuleQuery', () => {
       '_type == "module_postRelated"',
     );
     expect(postRelatedModuleQuery.query).toContain('_id == $id');
+  });
+
+  it('rejects a module with no headingBlock', () => {
+    const raw = { ...makeRawPostRelatedModule(), headingBlock: null };
+
+    expect(() => postRelatedModuleQuery.parse(raw)).toThrow();
   });
 
   it('projects brandVariant and limit', () => {
