@@ -12,7 +12,7 @@ import { defineType } from 'sanity';
  */
 export const heroLayoutSchema = defineType({
   name: 'heroLayout',
-  title: 'Layout',
+  title: 'Hero Layout',
   type: 'object',
   description: 'Spacing and divider controls for a hero module.',
   icon: SlidersHorizontal,

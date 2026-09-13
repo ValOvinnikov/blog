@@ -1,9 +1,6 @@
 /**
- * `page_tag`'s own `_type` name. Lives in its own file (rather than being
- * imported from `tag.ts`) so `blog_tag`'s missing-page warning validation
- * can reference it without an import cycle back through `tag.ts`, which
- * itself imports `tagSchema`. Import this module directly rather than
- * through the folder's `index.ts` barrel, which re-exports `tagPageSchema`
- * and would pull the same cycle back in.
+ * `page_tag`'s own `_type` name, kept in its own file so `blog_tag` can
+ * reference it without an import cycle back through `tag.ts` — import this
+ * module directly rather than through a barrel.
  */
 export const PAGE_TAG_TYPE = 'page_tag';

@@ -1,6 +1,8 @@
 import { SOCIAL_PLATFORMS, LINK_TYPE } from '@blog/config/constants';
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic/topic';
+import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
+import { PAGE_POST_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/post-index/post-index-type';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Link2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -62,11 +64,8 @@ export const linkSchema = defineType({
       to: [
         { type: PAGE_POST_TYPE },
         { type: topicSchema.name },
-        // Literal (not `landingPageSchema.name` / `postIndexPageSchema.name`):
-        // importing landing.ts or post-index.ts here closes a circular import
-        // (landing/post-index → module-cta → link) — typegen fails otherwise.
-        { type: 'page_landing' },
-        { type: 'page_postIndex' },
+        { type: PAGE_LANDING_TYPE },
+        { type: PAGE_POST_INDEX_TYPE },
       ],
       hidden: ({ parent }) => !isLinkType(parent, LINK_TYPE.INTERNAL),
       validation: (rule) =>

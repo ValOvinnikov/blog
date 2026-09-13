@@ -1,8 +1,8 @@
 import { defineArrayMember, defineType } from 'sanity';
 
-export const blockTextSchema = defineType({
-  name: 'blockText',
-  title: 'Block Text',
+export const proseTextSchema = defineType({
+  name: 'proseText',
+  title: 'Prose Text',
   type: 'array',
   description:
     'Plain paragraph text with no images or embeds, used for short bios and descriptions.',

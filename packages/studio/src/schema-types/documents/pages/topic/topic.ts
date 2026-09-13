@@ -11,67 +11,23 @@ import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
-import { getDraftsClient } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
-import { Tags } from 'lucide-react';
 import {
-  defineField,
-  defineType,
-  type SanityDocument,
-  type ValidationContext,
-} from 'sanity';
+  validateHasPostListModule,
+  validateSinglePostListModule,
+} from '@blog/studio/schema-types/validation/validate-post-list-cardinality/validate-post-list-cardinality';
+import { validateUniquePostListReference } from '@blog/studio/schema-types/validation/validate-unique-post-list-reference/validate-unique-post-list-reference';
+import { validateUniqueTaxonomyReference } from '@blog/studio/schema-types/validation/validate-unique-taxonomy-reference/validate-unique-taxonomy-reference';
+import { Tags } from 'lucide-react';
+import { defineField, defineType } from 'sanity';
 
 const topicSlugUrlPreviewInput = createSlugUrlPreviewInput('/topics/');
 
-type TReferenceValue = { _ref?: string } | undefined;
-
-/**
- * Rejects a second `page_topic` referencing an already-covered `blog_topic`
- * — `/topics/{slug}` would otherwise be ambiguous. `perspective: 'drafts'`
- * so an unpublished conflicting page still counts.
- */
-const validateUniqueTopicReference = async (
-  value: TReferenceValue,
-  context: ValidationContext,
-): Promise<string | true> => {
-  if (!value?._ref) return true;
-
-  const publishedId = context.document?._id.replace(/^drafts\./, '');
-
-  if (!publishedId) return true;
-
-  const client = getDraftsClient(context);
-
-  const conflictingCount = await client.fetch<number>(
-    `count(*[_type == $type && topic._ref == $topicId && !(_id in [$publishedId, "drafts." + $publishedId])])`,
-    { type: PAGE_TOPIC_TYPE, topicId: value._ref, publishedId },
-  );
-
-  return conflictingCount > 0
-    ? 'Another Topic Page already references this topic — each topic can only back one Topic Page.'
-    : true;
-};
-
-const MULTIPLE_POST_LIST_ERROR =
-  'Only one Post List module is allowed per page.';
 const NO_POST_LIST_WARNING =
   'This page has no Post List module — the archive will be empty until one is added.';
-
-type TModuleReference = { _type?: string; _ref?: string };
-
-const countPostListModules = (document: SanityDocument | undefined): number =>
-  (
-    (document as { modules?: TModuleReference[] } | undefined)?.modules ?? []
-  ).filter((module) => module._type === postListSchema.name).length;
-
-const validateSinglePostListModule = (
-  document: SanityDocument | undefined,
-): string | true =>
-  countPostListModules(document) > 1 ? MULTIPLE_POST_LIST_ERROR : true;
-
-const validateHasPostListModule = (
-  document: SanityDocument | undefined,
-): string | true =>
-  countPostListModules(document) === 0 ? NO_POST_LIST_WARNING : true;
+const TOPIC_UNIQUENESS_ERROR =
+  'Another Topic Page already references this topic — each topic can only back one Topic Page.';
+const POST_LIST_UNIQUENESS_ERROR =
+  'Another Topic Page already references this Post List — each Post List can only back one Topic Page.';
 
 export const topicPageSchema = defineType({
   name: PAGE_TOPIC_TYPE,
@@ -82,14 +38,20 @@ export const topicPageSchema = defineType({
   icon: Tags,
   validation: (rule) => [
     rule.custom(validateSinglePostListModule),
-    rule.custom(validateHasPostListModule).warning(),
+    rule.custom(validateHasPostListModule(NO_POST_LIST_WARNING)).warning(),
+    rule.custom(
+      validateUniquePostListReference(
+        PAGE_TOPIC_TYPE,
+        POST_LIST_UNIQUENESS_ERROR,
+      ),
+    ),
   ],
   fields: [
     titleField(),
     // Sanity's default slug `isUnique` check — scoped to this document type
     // — is exactly the scope this field needs: /topics/{slug} collisions
     // only matter within page_topic itself, never against page_landing's
-    // /{slug}. No custom `isUnique` override is needed on top of it.
+    // /{slug}. No custom `isUnique` is needed on top of it.
     slugField({
       description: 'URL path segment — auto-generated from title.',
       previewInput: topicSlugUrlPreviewInput,
@@ -101,7 +63,15 @@ export const topicPageSchema = defineType({
       description: 'The topic this page represents.',
       to: [{ type: topicSchema.name }],
       validation: (rule) =>
-        rule.required().custom(validateUniqueTopicReference),
+        rule
+          .required()
+          .custom(
+            validateUniqueTaxonomyReference(
+              PAGE_TOPIC_TYPE,
+              'topic',
+              TOPIC_UNIQUENESS_ERROR,
+            ),
+          ),
     }),
     headingBlockField({
       requireHeading: true,

@@ -1,6 +1,7 @@
+import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { socialLinkSchema } from '@blog/studio/schema-types/objects/social-link/social-link';
-import { blockTextSchema } from '@blog/studio/schema-types/portable-text/block-text/block-text';
+import { proseTextSchema } from '@blog/studio/schema-types/portable-text/prose-text/prose-text';
 import { UserRound } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
@@ -29,7 +30,7 @@ export const authorSchema = defineType({
     defineField({
       name: 'bio',
       title: 'Bio',
-      type: blockTextSchema.name,
+      type: proseTextSchema.name,
       description: 'Short biography displayed on the author page.',
     }),
     defineField({
@@ -52,10 +53,7 @@ export const authorSchema = defineType({
       title: 'Profile Page',
       type: 'reference',
       description: "Optional page this author's byline links to.",
-      // Literal (not `landingPageSchema.name`): importing landing.ts here closes
-      // a circular import (landing → module-cta → link → post → author) —
-      // typegen fails otherwise.
-      to: [{ type: 'page_landing' }],
+      to: [{ type: PAGE_LANDING_TYPE }],
     }),
   ],
   preview: {

@@ -6,7 +6,7 @@ import { defineField, defineType } from 'sanity';
 
 export const layoutSchema = defineType({
   name: 'layout',
-  title: 'Layout',
+  title: 'Section Layout',
   type: 'object',
   description:
     'Shared spacing, divider, and width controls available on most modules.',

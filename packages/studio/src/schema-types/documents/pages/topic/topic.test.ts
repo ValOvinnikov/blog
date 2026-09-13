@@ -1,5 +1,6 @@
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic/topic';
 import { topicPageSchema } from '@blog/studio/schema-types/documents/pages/topic/topic';
+import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic/topic-type';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
@@ -41,6 +42,10 @@ describe('topicPageSchema field order', () => {
 });
 
 describe('topicPageSchema shape', () => {
+  it('is named page_topic', () => {
+    expect(topicPageSchema.name).toBe(PAGE_TOPIC_TYPE);
+  });
+
   it('title is required via the shared titleField() helper', () => {
     const titleFieldDefinition = getField('title');
 
@@ -224,9 +229,6 @@ describe('topicPageSchema slug field', () => {
   });
 
   it('relies on the default per-document-type isUnique scope rather than overriding it', () => {
-    // /topics/{slug} collisions only matter within page_topic itself, which
-    // is exactly Sanity's default slug uniqueness scope — no custom
-    // `isUnique` is needed on top of it.
     const slugField = getSlugField();
 
     expect(slugField?.options?.isUnique).toBeUndefined();
@@ -257,7 +259,7 @@ describe('topicPageSchema topic field', () => {
     ]);
   });
 
-  it('is required', () => {
+  it('is required and registers the unique-taxonomy-reference validator', () => {
     const topicField = getTopicField();
 
     if (!topicField?.validation) {
@@ -267,138 +269,23 @@ describe('topicPageSchema topic field', () => {
     }
 
     let requiredCalled = false;
+    let customCalled = false;
     const rule: TValidationRule = {
       required: () => {
         requiredCalled = true;
         return rule;
       },
-      custom: () => rule,
+      custom: () => {
+        customCalled = true;
+        return rule;
+      },
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
     (topicField.validation as any)(rule);
 
     expect(requiredCalled).toBe(true);
-  });
-});
-
-type TReferenceValue = { _ref?: string } | undefined;
-type TCustomFn = (
-  value: TReferenceValue,
-  context: ValidationContext,
-) => Promise<string | true>;
-
-const UNIQUENESS_ERROR =
-  'Another Topic Page already references this topic — each topic can only back one Topic Page.';
-
-/**
- * `validateUniqueTopicReference` is private to topic.ts; the `topic`
- * field's `validation` builder registers it via `rule.custom(fn)`, so a
- * minimal chainable mock rule captures it the same way home.test.ts
- * captures its modules-field custom validator — no export needed.
- */
-const getUniqueTopicValidator = (): TCustomFn => {
-  const topicField = topicPageSchema.fields?.find(
-    (field) => field.name === 'topic',
-  );
-
-  if (!topicField?.validation) {
-    throw new Error('Expected topic field validation to register custom().');
-  }
-
-  let customFn: TCustomFn | undefined;
-
-  const rule = {
-    required: () => rule,
-    custom: (fn: TCustomFn) => {
-      customFn = fn;
-      return rule;
-    },
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (topicField.validation as any)(rule);
-
-  if (!customFn) {
-    throw new Error('Expected topic field validation to register custom().');
-  }
-
-  return customFn;
-};
-
-const createMockContext = (
-  fetchResult: unknown,
-  documentId = 'page-topic-1',
-) => {
-  const fetchCalls: { query: string; params: unknown }[] = [];
-  const withConfigCalls: unknown[] = [];
-
-  const getClient = () => ({
-    withConfig: (config: unknown) => {
-      withConfigCalls.push(config);
-
-      return {
-        fetch: async (query: string, params: unknown) => {
-          fetchCalls.push({ query, params });
-          return fetchResult;
-        },
-      };
-    },
-  });
-
-  const context = {
-    getClient,
-    document: { _id: documentId },
-  } as unknown as ValidationContext;
-
-  return { context, fetchCalls, withConfigCalls };
-};
-
-describe('validateUniqueTopicReference', () => {
-  it('passes without querying when no reference is set', async () => {
-    const validate = getUniqueTopicValidator();
-    const { context, fetchCalls } = createMockContext(0);
-
-    await expect(validate(undefined, context)).resolves.toBe(true);
-    expect(fetchCalls).toHaveLength(0);
-  });
-
-  it('passes when no other page_topic references the same topic', async () => {
-    const validate = getUniqueTopicValidator();
-    const { context } = createMockContext(0);
-
-    await expect(validate({ _ref: 'topic-1' }, context)).resolves.toBe(true);
-  });
-
-  it('flags a conflicting page_topic referencing the same topic', async () => {
-    const validate = getUniqueTopicValidator();
-    const { context } = createMockContext(1);
-
-    await expect(validate({ _ref: 'topic-1' }, context)).resolves.toBe(
-      UNIQUENESS_ERROR,
-    );
-  });
-
-  it('excludes both the draft and published id of the current document', async () => {
-    const validate = getUniqueTopicValidator();
-    const { context, fetchCalls } = createMockContext(0, 'drafts.page-topic-1');
-
-    await validate({ _ref: 'topic-1' }, context);
-
-    expect(fetchCalls[0]?.params).toEqual({
-      type: 'page_topic',
-      topicId: 'topic-1',
-      publishedId: 'page-topic-1',
-    });
-  });
-
-  it('requests the drafts perspective so an unpublished conflict still counts', async () => {
-    const validate = getUniqueTopicValidator();
-    const { context, withConfigCalls } = createMockContext(0);
-
-    await validate({ _ref: 'topic-1' }, context);
-
-    expect(withConfigCalls).toEqual([{ perspective: 'drafts' }]);
+    expect(customCalled).toBe(true);
   });
 });
 
@@ -435,11 +322,21 @@ const buildDocumentRules = (): TDocumentMockRule[] => {
   ) as TDocumentMockRule[];
 };
 
-describe('pageTopicSchema document validation — modules[] post list count', () => {
-  it('errors when more than one module_postList is referenced', () => {
+describe('topicPageSchema document validation wiring', () => {
+  it('registers single, has, and unique-post-list-reference rules at the right severities', () => {
+    const rules = buildDocumentRules();
+
+    expect(rules).toHaveLength(3);
+    expect(rules.map((rule) => rule.level)).toEqual([
+      'error',
+      'warning',
+      'error',
+    ]);
+  });
+
+  it('the single-post-list rule errors when more than one module_postList is referenced', () => {
     const [singlePostListRule] = buildDocumentRules();
 
-    expect(singlePostListRule?.level).toBe('error');
     expect(
       singlePostListRule?.fn?.(
         {
@@ -453,26 +350,9 @@ describe('pageTopicSchema document validation — modules[] post list count', ()
     ).toBe('Only one Post List module is allowed per page.');
   });
 
-  it('passes with exactly one module_postList reference', () => {
-    const [singlePostListRule, hasPostListRule] = buildDocumentRules();
-
-    const document = {
-      modules: [
-        { _type: postListSchema.name, _ref: 'list-1' },
-        { _type: postLatestSchema.name, _ref: 'latest-1' },
-      ],
-    };
-
-    expect(singlePostListRule?.fn?.(document, {} as ValidationContext)).toBe(
-      true,
-    );
-    expect(hasPostListRule?.fn?.(document, {} as ValidationContext)).toBe(true);
-  });
-
-  it('warns when no module_postList is referenced', () => {
+  it('the has-post-list rule warns with page-scoped copy when none is referenced', () => {
     const [, hasPostListRule] = buildDocumentRules();
 
-    expect(hasPostListRule?.level).toBe('warning');
     expect(
       hasPostListRule?.fn?.(
         { modules: [{ _type: postLatestSchema.name, _ref: 'latest-1' }] },
@@ -483,11 +363,32 @@ describe('pageTopicSchema document validation — modules[] post list count', ()
     );
   });
 
-  it('warns when modules is undefined', () => {
-    const [, hasPostListRule] = buildDocumentRules();
+  it('the unique-post-list-reference rule flags a conflicting page_topic with page-scoped copy', async () => {
+    const [, , uniquePostListRule] = buildDocumentRules();
+    const fetchCalls: { query: string; params: unknown }[] = [];
 
-    expect(hasPostListRule?.fn?.({}, {} as ValidationContext)).toBe(
-      'This page has no Post List module — the archive will be empty until one is added.',
+    const context = {
+      getClient: () => ({
+        withConfig: () => ({
+          fetch: async (query: string, params: unknown) => {
+            fetchCalls.push({ query, params });
+            return 1;
+          },
+        }),
+      }),
+    } as unknown as ValidationContext;
+
+    await expect(
+      uniquePostListRule?.fn?.(
+        {
+          _id: 'page-topic-1',
+          modules: [{ _type: postListSchema.name, _ref: 'post-list-1' }],
+        },
+        context,
+      ),
+    ).resolves.toBe(
+      'Another Topic Page already references this Post List — each Post List can only back one Topic Page.',
     );
+    expect(fetchCalls[0]?.params).toMatchObject({ type: PAGE_TOPIC_TYPE });
   });
 });
