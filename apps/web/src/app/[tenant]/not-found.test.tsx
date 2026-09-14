@@ -63,4 +63,51 @@ describe('TenantNotFound ([tenant] not-found route)', () => {
     });
     expect(headersMock).not.toHaveBeenCalled();
   });
+
+  describe('given the layout seeded the unresolved-tenant placeholder', () => {
+    afterEach(() => {
+      vi.doUnmock('react');
+      vi.doUnmock('@web/server/tenant/remembered-tenant');
+      vi.resetModules();
+    });
+
+    it('renders the defaults path — the placeholder never reaches StandaloneNotFoundPage as a tenant id', async () => {
+      vi.doMock('react', async (importOriginal) => {
+        const actual = await importOriginal<typeof import('react')>();
+        return {
+          ...actual,
+          cache: (fn: () => unknown) => {
+            let called = false;
+            let result: unknown;
+            return () => {
+              if (!called) {
+                result = fn();
+                called = true;
+              }
+              return result;
+            };
+          },
+        };
+      });
+      vi.doUnmock('@web/server/tenant/remembered-tenant');
+      vi.resetModules();
+
+      const { rememberRequestTenantId } =
+        await import('@web/server/tenant/remembered-tenant');
+      const { UNRESOLVED_TENANT_PLACEHOLDER } =
+        await import('@web/server/tenant/unresolved-tenant-placeholder');
+      const { default: FreshTenantNotFound } = await import('./not-found');
+
+      const ui = { type: 'div', props: {} };
+      standaloneNotFoundPageMock.mockResolvedValue(ui);
+
+      rememberRequestTenantId(UNRESOLVED_TENANT_PLACEHOLDER);
+
+      await expect(FreshTenantNotFound()).resolves.toBe(ui);
+      expect(standaloneNotFoundPageMock).toHaveBeenCalledWith({
+        tenant: undefined,
+      });
+      expect(headersMock).not.toHaveBeenCalled();
+    });
+  });
 });

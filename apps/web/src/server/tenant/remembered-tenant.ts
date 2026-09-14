@@ -1,5 +1,7 @@
 import { cache } from 'react';
 
+import { UNRESOLVED_TENANT_PLACEHOLDER } from './unresolved-tenant-placeholder';
+
 type TRememberedTenantStore = { tenant?: string };
 
 /**
@@ -10,7 +12,13 @@ type TRememberedTenantStore = { tenant?: string };
  */
 const getStore = cache((): TRememberedTenantStore => ({}));
 
+/**
+ * Refuses `UNRESOLVED_TENANT_PLACEHOLDER` at this, its one write site — same
+ * chokepoint convention as `getRequestTenantId`/`resolveRequestTenant` — so
+ * `getRememberedTenantId` can never hand it downstream as a real tenant id.
+ */
 export const rememberRequestTenantId = (tenant: string): void => {
+  if (tenant === UNRESOLVED_TENANT_PLACEHOLDER) return;
   getStore().tenant = tenant;
 };
 

@@ -1,3 +1,5 @@
+import { UNRESOLVED_TENANT_PLACEHOLDER } from './unresolved-tenant-placeholder';
+
 describe('remembered-tenant', () => {
   afterEach(() => {
     vi.doUnmock('react');
@@ -37,6 +39,15 @@ describe('remembered-tenant', () => {
 
   it('returns undefined when nothing was remembered', async () => {
     const { getRememberedTenantId } = await withCachedReact();
+
+    expect(getRememberedTenantId()).toBeUndefined();
+  });
+
+  it('never yields the unresolved-tenant placeholder back, even when seeded with it', async () => {
+    const { rememberRequestTenantId, getRememberedTenantId } =
+      await withCachedReact();
+
+    rememberRequestTenantId(UNRESOLVED_TENANT_PLACEHOLDER);
 
     expect(getRememberedTenantId()).toBeUndefined();
   });
