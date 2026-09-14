@@ -48,11 +48,6 @@ describe('TenantLocaleNotFound ([tenant]/[locale] not-found route)', () => {
     });
   });
 
-  // Covers a tenant route whose backing document is absent (e.g.
-  // `guardPageLoaderResult`'s `notFound()`, or the blog pagination-overflow
-  // guards) bubbling up to this boundary, one segment above the page that
-  // threw — the layout that rendered `Header`/`Footer` above it already
-  // succeeded, so this must render without re-reading any tenant context.
   it('renders NotFoundPage without resolving any site config, theme, or message context', () => {
     const ui = TenantLocaleNotFound();
 
