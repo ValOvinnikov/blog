@@ -261,10 +261,11 @@ module-level field, below).
 `module_cta`/`module_postList`/`module_postLatest`/`module_postFeatured`/`module_postRelated`/`module_taxonomyList`/`module_newsletter`
 additionally carry a `headingBlock` object (`heading` and `supportingText`
 only). There is **one registered `headingBlock` type**, and requiredness is
-a property of the **field**, not of the type: `headingBlockField({
-requireHeading })` attaches a field-level rule checking the nested
-`heading`. `heading` is **required on every call site** — every module and every
-page — so no layer has to reason about which case it is holding. Neither
+a property of the **field**, not of the type: `headingBlockField()`
+attaches a field-level rule checking the nested `heading`. It takes no
+options — `heading` is **required on every call site**, every module and
+every page, so no layer has to reason about which case it is holding and
+no caller can opt out. Neither
 field carries a length cap; forced `max()` validation was removed as
 editor-hostile.
 
@@ -822,9 +823,11 @@ poorly") rather than a number. The rule is held by authoring and review, not
 by a test: a mechanical check can only confirm a description exists, which is
 the easy half, while whether it tells an editor something true and useful
 needs a reader. Where a shared field factory would otherwise have every caller
-repeat the same text, the default lives on the factory — `headingBlockField`
-carries one generic default covering both pages and modules, and only a caller
-with genuinely different copy overrides it.
+repeat the same text, the copy lives on the factory — `headingBlockField`
+carries one generic description covering both pages and modules, and no
+caller can override it. Two per-surface overrides existed and were dropped
+deliberately: one text everywhere is worth more than a sentence tuned per
+call site.
 
 `titleField()` is the internal Studio label on every document that has one,
 and its one default description says so — the field is never rendered. It

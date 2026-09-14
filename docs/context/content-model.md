@@ -78,8 +78,8 @@ independent of its display fields, immediately followed by a **required**
 `@blog/config`'s `BRAND_VARIANT` const, `PRIMARY`/`SECONDARY` by default;
 `module_hero` passes the wider `BRAND_PRIMARY`/`PRIMARY`/`SECONDARY` option
 list. `module_cta`/`module_postList`/`module_newsletter` also get a
-`headingBlock` field via the shared `headingBlockField({ requireHeading?
-})` helper (`schema-types/objects/heading-block/heading-block-field.ts`) — see the
+`headingBlock` field via the shared `headingBlockField()` helper
+(`schema-types/objects/heading-block/heading-block-field.ts`) — see the
 `headingBlock` object below. Every module document (incl. `module_hero`)
 also gets an optional `layout` field via the shared `layoutField`/
 `heroLayoutField` values (`schema-types/objects/hero-layout/hero-layout-field.ts`) — see the
@@ -214,7 +214,7 @@ unset-vs-set and rendering defaults), `headingBlock` (`heading` (string)
 and `supportingText` (text) — neither carries a length cap, forced `max()`
 validation having been removed as editor-hostile). There is **one**
 registered `headingBlock` type; requiredness is a property of the field,
-not the type, attached via `headingBlockField({ requireHeading? })`, which
+not the type, attached via `headingBlockField()`, which takes no options and
 adds a field-level rule checking the nested `heading`. The heading is
 **required on every call site** — every module and every page — so no layer
 has to reason about which case it is holding; `module_content` and
