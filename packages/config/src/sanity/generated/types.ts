@@ -445,7 +445,6 @@ export type Settings_site = {
   _rev: string;
   title?: string;
   brand?: Brand;
-  description?: string;
 };
 
 export type Blog_tagReference = {
