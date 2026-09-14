@@ -87,6 +87,98 @@ describe('Sanity client module loading', () => {
     vi.doUnmock('next-sanity');
   });
 
+  it('rebuilds the cached client when the token changes for the same project/dataset', async () => {
+    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'test-project';
+    vi.resetModules();
+
+    const createClientMock = vi.fn().mockImplementation(() => ({}));
+    vi.doMock('next-sanity', () => ({ createClient: createClientMock }));
+
+    const { getClient } = await import('./client');
+    const first = getClient({
+      projectId: 'tenant-a',
+      dataset: 'production',
+      token: 'tok-old',
+    });
+    const second = getClient({
+      projectId: 'tenant-a',
+      dataset: 'production',
+      token: 'tok-new',
+    });
+
+    expect(createClientMock).toHaveBeenCalledTimes(2);
+    expect(createClientMock).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ token: 'tok-new' }),
+    );
+    expect(second).not.toBe(first);
+
+    const third = getClient({
+      projectId: 'tenant-a',
+      dataset: 'production',
+      token: 'tok-new',
+    });
+    expect(createClientMock).toHaveBeenCalledTimes(2);
+    expect(third).toBe(second);
+
+    vi.doUnmock('next-sanity');
+  });
+
+  it('evicts the least-recently-used tenant once the cache exceeds its cap', async () => {
+    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'test-project';
+    vi.resetModules();
+
+    const createClientMock = vi.fn().mockImplementation(() => ({}));
+    vi.doMock('next-sanity', () => ({ createClient: createClientMock }));
+
+    const { getClient } = await import('./client');
+    const MAX_CACHED_TENANT_CLIENTS = 20;
+
+    for (let i = 0; i < MAX_CACHED_TENANT_CLIENTS; i++) {
+      getClient({
+        projectId: `tenant-${i}`,
+        dataset: 'production',
+        token: `tok-${i}`,
+      });
+    }
+
+    getClient({
+      projectId: 'tenant-0',
+      dataset: 'production',
+      token: 'tok-0',
+    });
+    expect(createClientMock).toHaveBeenCalledTimes(MAX_CACHED_TENANT_CLIENTS);
+
+    getClient({
+      projectId: 'tenant-overflow',
+      dataset: 'production',
+      token: 'tok-overflow',
+    });
+    expect(createClientMock).toHaveBeenCalledTimes(
+      MAX_CACHED_TENANT_CLIENTS + 1,
+    );
+
+    getClient({
+      projectId: 'tenant-0',
+      dataset: 'production',
+      token: 'tok-0',
+    });
+    expect(createClientMock).toHaveBeenCalledTimes(
+      MAX_CACHED_TENANT_CLIENTS + 1,
+    );
+
+    getClient({
+      projectId: 'tenant-1',
+      dataset: 'production',
+      token: 'tok-1',
+    });
+    expect(createClientMock).toHaveBeenCalledTimes(
+      MAX_CACHED_TENANT_CLIENTS + 2,
+    );
+
+    vi.doUnmock('next-sanity');
+  });
+
   it('builds the platform tenant context from env vars', async () => {
     process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'platform-project';
     process.env['SANITY_API_READ_TOKEN'] = 'platform-read-token';
