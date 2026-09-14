@@ -24,13 +24,13 @@ export const WithinLayoutChrome: TStory = {
   decorators: [
     (Story) => (
       <div className="flex min-h-dvh flex-col">
-        <div className="bg-brand-primary p-4 text-center text-white">
+        <div className="bg-brand-primary text-brand-primary-contrast p-4 text-center">
           Header
         </div>
         <div className="flex flex-1 flex-col">
           <Story />
         </div>
-        <div className="bg-brand-primary p-4 text-center text-white">
+        <div className="bg-brand-primary text-brand-primary-contrast p-4 text-center">
           Footer
         </div>
       </div>

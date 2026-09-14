@@ -16,6 +16,7 @@ import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 import LocaleLayout, { generateMetadata, generateStaticParams } from './layout';
+import { localeLayoutVariants } from './layout-variants';
 
 const {
   getSiteSettingsMock,
@@ -188,6 +189,16 @@ describe('LocaleLayout', () => {
     getSanityImageBaseUrlMock.mockReturnValue(
       'https://cdn.sanity.io/images/mock-project/mock-dataset/',
     );
+  });
+
+  describe('localeLayoutVariants', () => {
+    it('keeps the content slot a flex column container that grows to fill its parent', () => {
+      const contentClassName = localeLayoutVariants().content();
+
+      expect(contentClassName).toContain('flex-1');
+      expect(contentClassName).toContain('flex-col');
+      expect(contentClassName).toMatch(/(^|\s)flex(\s|$)/);
+    });
   });
 
   describe('generateStaticParams', () => {
