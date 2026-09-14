@@ -16,11 +16,14 @@
  *     [--plan=FREE|GROWTH] [--status=ACTIVE|SUSPENDED] \
  *     [--domain=extra.example.com ...] [--sanity-read-token=<token>]
  *
- * Idempotent: re-running with the same `--primary-domain` reuses the
- * existing tenant row instead of creating a duplicate, and every write below
- * (domain, membership) is itself a no-op-safe upsert. `--owner-email` must
- * already have a `users` row — this script does not create one; the owner
- * signs in once first (via the site's normal Auth.js flow) so a real,
+ * Idempotent: re-running resolves the tenant by primary domain or, failing
+ * that, by Sanity project id, and reuses the existing row instead of
+ * creating a duplicate — so a run interrupted partway through (e.g. between
+ * creating the tenant and writing its domain row) recovers on re-run rather
+ * than failing on a unique-constraint conflict. Every write below (domain,
+ * membership) is itself a no-op-safe upsert. `--owner-email` must already
+ * have a `users` row — this script does not create one; the owner signs in
+ * once first (via the site's normal Auth.js flow) so a real,
  * correctly-linked account exists before it is granted a membership.
  *
  * `db:seed-tenant`'s `--conditions=react-server` node flag makes `getDb()`'s
@@ -43,7 +46,12 @@ import {
   addTenantDomain,
   getTenantByDomain,
 } from '@blog/db/queries/tenant-domains';
-import { createTenant, setTenantSanityToken } from '@blog/db/queries/tenants';
+import {
+  createTenant,
+  getTenantById,
+  getTenantIdBySanityProjectId,
+  setTenantSanityToken,
+} from '@blog/db/queries/tenants';
 import { users } from '@blog/db/schema/auth';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
@@ -145,6 +153,27 @@ export async function resolveOrCreateTenant(
       `Tenant "${existing.name}" already exists (${existing.id}) — reusing it.`,
     );
     return existing;
+  }
+
+  const existingId = await getTenantIdBySanityProjectId(args.sanityProjectId);
+  if (existingId) {
+    const existingBySanityProjectId = await getTenantById(existingId, {
+      includeArchived: true,
+    });
+    if (!existingBySanityProjectId) {
+      throw new Error(
+        `seed-tenant: Sanity project id "${args.sanityProjectId}" resolved to tenant id "${existingId}", but that tenant no longer exists.`,
+      );
+    }
+    if (existingBySanityProjectId.deprovisionedAt !== null) {
+      throw new Error(
+        `seed-tenant: Sanity project id "${args.sanityProjectId}" is already held by archived tenant "${existingBySanityProjectId.id}".`,
+      );
+    }
+    console.warn(
+      `Tenant "${existingBySanityProjectId.name}" (${existingBySanityProjectId.id}) already holds Sanity project "${args.sanityProjectId}" but is missing its domain row — resuming.`,
+    );
+    return existingBySanityProjectId;
   }
 
   const created = await createTenant({
