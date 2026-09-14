@@ -1,14 +1,11 @@
 import NotFound, { generateMetadata } from './not-found';
 
-const {
-  standaloneNotFoundPageMock,
-  buildNotFoundMetadataMock,
-  getRequestTenantIdMock,
-} = vi.hoisted(() => ({
-  standaloneNotFoundPageMock: vi.fn(),
-  buildNotFoundMetadataMock: vi.fn(),
-  getRequestTenantIdMock: vi.fn(),
-}));
+const { standaloneNotFoundPageMock, buildNotFoundMetadataMock } = vi.hoisted(
+  () => ({
+    standaloneNotFoundPageMock: vi.fn(),
+    buildNotFoundMetadataMock: vi.fn(),
+  }),
+);
 
 vi.mock('@web/components/pages/standalone-not-found-page', () => ({
   StandaloneNotFoundPage: standaloneNotFoundPageMock,
@@ -16,10 +13,6 @@ vi.mock('@web/components/pages/standalone-not-found-page', () => ({
 
 vi.mock('@web/metadata/not-found-metadata', () => ({
   buildNotFoundMetadata: buildNotFoundMetadataMock,
-}));
-
-vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
-  getRequestTenantId: getRequestTenantIdMock,
 }));
 
 describe('NotFound (root not-found route)', () => {
@@ -36,14 +29,11 @@ describe('NotFound (root not-found route)', () => {
     });
   });
 
-  it('renders StandaloneNotFoundPage with the tenant resolved from the request header', async () => {
+  it('renders StandaloneNotFoundPage with no tenant, never reading the request header', async () => {
     const ui = { type: 'div', props: {} };
-    getRequestTenantIdMock.mockResolvedValue('tenant-1');
     standaloneNotFoundPageMock.mockResolvedValue(ui);
 
     await expect(NotFound()).resolves.toBe(ui);
-    expect(standaloneNotFoundPageMock).toHaveBeenCalledWith({
-      tenant: 'tenant-1',
-    });
+    expect(standaloneNotFoundPageMock).toHaveBeenCalledWith();
   });
 });
