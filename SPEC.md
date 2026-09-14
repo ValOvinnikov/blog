@@ -676,13 +676,19 @@ analytics gating or chrome): `app/[tenant]/not-found.tsx` exists because a
 segment's own `not-found.tsx` wraps only that segment's children, never its
 own layout, so a `notFound()` thrown inside `[tenant]/[locale]/layout.tsx`
 is catchable only one segment up — without it that throw escaped to a 500 on
-every route. It passes `shouldResolveTenant: false` and renders with default
-theme tokens and base, un-voiced messages: it runs on the prerendered
-`/[tenant]/[locale]` route, so reading `x-tenant-id` there would bail the
-render out of static and — with no `pages/500.html` to fall back on — return
-a bare 500 in place of the 404 (#3191). Only the root `app/not-found.tsx`
-still resolves a tenant by header, on `/_not-found`, which is already
-dynamic and has no route param to thread. `i18n/request.ts`
+every route. It runs on the prerendered `/[tenant]/[locale]` route, so
+reading `x-tenant-id` there would bail the render out of static and — with
+no `pages/500.html` to fall back on — return a bare 500 in place of the 404
+(#3191). It stays themed anyway: `[tenant]/[locale]/layout.tsx` seeds
+`rememberRequestTenantId(tenant)` from its own route param immediately after
+awaiting `params`, ahead of both of its `notFound()` calls, and the boundary
+reads it back with `getRememberedTenantId()`. The tenant's theme survives
+that throw because tokens and voice overrides come from the `@blog/db`
+`site_config` row, not from the Sanity `settings_site` fetch whose failure
+raised the 404. Absent a remembered tenant it renders default tokens and
+base messages — never a header read, which would reintroduce the bailout.
+Only the root `app/not-found.tsx` resolves a tenant by header, on
+`/_not-found`, which is already dynamic and has no route param to thread. `i18n/request.ts`
 is likewise tenant-independent, returning the base locale messages only.
 This split exists because the root layout and `getRequestConfig` both sit
 above any future `[tenant]` route segment and so can never receive it as a
@@ -1006,9 +1012,7 @@ that read the request (`getRequestTenantId`, `resolveRequestTenant`, in
 `headers()` when not given one. That fallback serves Server Actions, the
 root `app/not-found.tsx` boundary (no boundary receives route params under
 Next's file convention, and this one has no layout above it to inherit a
-resolved tenant from — the other two boundaries avoid the fallback instead,
-because they run on a prerendered route where it would force a dynamic
-bailout), and the root-level `Host`-resolved routes
+resolved tenant from), and the root-level `Host`-resolved routes
 (`robots.ts`/`sitemap.ts`/`rss.xml`) — none of which have route params to
 thread — and also the `account`/`bookmarks` compositions, which do sit under a
 route carrying `tenant` but deliberately leave it unthreaded: `force-dynamic`
