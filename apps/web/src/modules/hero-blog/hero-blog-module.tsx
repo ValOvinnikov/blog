@@ -23,12 +23,12 @@ export const HeroBlogModule = async ({ id, tenant }: IHeroBlogModuleProps) => {
 
   if (!result.ok) return null;
 
-  const { hasPost, heading } = result.data;
+  const { data } = result;
 
-  if (!hasPost || !heading) {
+  if (!data.hasPost) {
     logger.error('hero_blog_module.post_unresolved', { id });
     return null;
   }
 
-  return <HeroBlogModuleView id={id} {...result.data} heading={heading} />;
+  return <HeroBlogModuleView id={id} {...data} />;
 };

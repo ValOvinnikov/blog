@@ -1,12 +1,12 @@
 import type { TMaybeUndefined } from '@blog/config';
-import type { TPostSkim } from '@blog/service';
+import type { TPostTakeaways } from '@blog/service';
 import { SwitchToReadButton } from '@web/components/shared/switch-to-read-button';
 import { getTranslations } from 'next-intl/server';
 
 import { skimPanelVariants } from './skim-panel-variants';
 
 export interface ISkimPanelProps {
-  skim: TMaybeUndefined<TPostSkim>;
+  takeaways: TMaybeUndefined<TPostTakeaways>;
 }
 
 const s = skimPanelVariants();
@@ -19,20 +19,20 @@ const s = skimPanelVariants();
  * `READ`/`DEEP` body — CSS (`group-data-[depth=SKIM]/depth:flex`, keyed off
  * the nearest `DepthProvider` wrapper) is the only thing gating visibility,
  * so switching depth never re-fetches anything. Renders nothing when the
- * post has no approved skim.
+ * post has no approved takeaways.
  *
  * @example
- * <SkimPanel skim={post.skim} />
+ * <SkimPanel takeaways={post.postTakeaways} />
  */
-export const SkimPanel = async ({ skim }: ISkimPanelProps) => {
-  if (!skim) return null;
+export const SkimPanel = async ({ takeaways }: ISkimPanelProps) => {
+  if (!takeaways) return null;
 
   const t = await getTranslations('blogPostPage');
 
   return (
     <section className={s.root()} aria-label={t('skimPanel.label')}>
       <ul className={s.list()}>
-        {skim.takeaways.map((takeaway, index) => (
+        {takeaways.takeaways.map((takeaway, index) => (
           // Index key is safe here: a static, once-rendered list (the
           // pipeline never reorders or filters takeaways in place) — and
           // avoids a collision if two generated takeaways are ever identical.

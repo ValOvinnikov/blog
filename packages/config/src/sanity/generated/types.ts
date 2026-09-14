@@ -238,8 +238,8 @@ export type ProseText = Array<{
   _key: string;
 }>;
 
-export type Skim = {
-  _type: 'skim';
+export type PostTakeaways = {
+  _type: 'postTakeaways';
   takeaways?: Array<string>;
   generatedAt?: string;
   model?: string;
@@ -249,11 +249,11 @@ export type Brand = {
   _type: 'brand';
   name?: string;
   logo?: ImageWithAlt;
-  specLine?: SpecLine;
+  tagline?: BrandTagline;
 };
 
-export type SpecLine = {
-  _type: 'specLine';
+export type BrandTagline = {
+  _type: 'brandTagline';
   items?: Array<string>;
   separator?: 'DOT' | 'PIPE' | 'BULLET' | 'SLASH';
 };
@@ -445,7 +445,6 @@ export type Settings_site = {
   _rev: string;
   title?: string;
   brand?: Brand;
-  description?: string;
 };
 
 export type Blog_tagReference = {
@@ -913,7 +912,7 @@ export type Page_post = {
       } & Module_ctaReference)
   >;
   publishedAt?: string;
-  skim?: Skim;
+  postTakeaways?: PostTakeaways;
   seo?: Seo;
 };
 
@@ -1074,9 +1073,9 @@ export type AllSanitySchemaTypes =
   | Module_postLatest
   | Module_postList
   | ProseText
-  | Skim
+  | PostTakeaways
   | Brand
-  | SpecLine
+  | BrandTagline
   | Seo
   | OpenGraph
   | CtaAction

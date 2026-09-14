@@ -7,8 +7,7 @@ export const siteSettingsSchema = defineType({
   name: 'settings_site',
   title: 'Site Settings',
   type: 'document',
-  description:
-    'Site-wide identity and default SEO copy used across every page.',
+  description: 'Site-wide identity used across every page.',
   icon: Settings,
   preview: {
     select: { title: 'title' },
@@ -17,15 +16,6 @@ export const siteSettingsSchema = defineType({
       subtitle: 'Site settings',
     }),
   },
-  fieldsets: [
-    {
-      name: 'seo',
-      title: 'SEO',
-      description:
-        'Site-wide SEO and social defaults, used when a page does not set its own.',
-      options: { collapsible: true, collapsed: true },
-    },
-  ],
   fields: [
     titleField(),
     defineField({
@@ -35,15 +25,6 @@ export const siteSettingsSchema = defineType({
       description:
         "The site's identity — name, logo, and optional status line — used across the header and footer.",
       validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'description',
-      title: 'Site Description',
-      type: 'text',
-      description:
-        'Used as the meta, Open Graph and Twitter description for any page that leaves its own empty, and as the RSS feed description.',
-      validation: (rule) => rule.required().min(50).max(160),
-      fieldset: 'seo',
     }),
   ],
 });

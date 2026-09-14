@@ -5,6 +5,7 @@ import {
   MEDIA_ORDER,
 } from '@blog/config/constants';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
+import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
 
 type TCustomFn = (
   value: unknown,
@@ -57,29 +58,8 @@ const getImageField = () => {
   return imageField;
 };
 
-const getImageValidator = (): TCustomFn => {
-  const imageField = getImageField();
-
-  let customFn: TCustomFn | undefined;
-
-  const rule = {
-    custom: (fn: TCustomFn) => {
-      customFn = fn;
-      return rule;
-    },
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (imageField.validation as any)(rule);
-
-  if (!customFn) {
-    throw new Error(
-      'Expected image field validation to register a custom() rule.',
-    );
-  }
-
-  return customFn;
-};
+const getImageValidator = (): TCustomFn =>
+  getCustomValidator<TCustomFn>(getImageField());
 
 describe('ctaSchema image validation', () => {
   it('requires an image for Banner', () => {
@@ -272,34 +252,8 @@ describe('ctaSchema bandTone field', () => {
 });
 
 describe('ctaSchema bandTone validation', () => {
-  const getBandToneWarningValidator = (): TCustomFn => {
-    const field = getField('bandTone');
-
-    if (!('validation' in field) || !field.validation) {
-      throw new Error('Expected bandTone field to define validation.');
-    }
-
-    let customFn: TCustomFn | undefined;
-
-    const rule = {
-      required: () => 'required-rule',
-      custom: (fn: TCustomFn) => {
-        customFn = fn;
-        return { warning: () => 'warning-rule' };
-      },
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    (field.validation as any)(rule);
-
-    if (!customFn) {
-      throw new Error(
-        'Expected bandTone validation to register a custom() warning rule.',
-      );
-    }
-
-    return customFn;
-  };
+  const getBandToneWarningValidator = (): TCustomFn =>
+    getCustomValidator<TCustomFn>(getField('bandTone'));
 
   it('registers a required rule alongside the warning rule', () => {
     const field = getField('bandTone');

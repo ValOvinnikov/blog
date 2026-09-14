@@ -21,7 +21,7 @@ export type TPostDetailAuthor = {
   socialLinks: TSocialLink[];
 };
 
-export type TPostSkim = {
+export type TPostTakeaways = {
   takeaways: string[];
   generatedAt: TMaybeUndefined<string>;
   model: TMaybeUndefined<string>;
@@ -29,7 +29,7 @@ export type TPostSkim = {
 
 export type TPostDetail = Omit<TPostCard, 'author' | 'topic'> & {
   body: TPortableTextBody;
-  skim: TMaybeUndefined<TPostSkim>;
+  postTakeaways: TMaybeUndefined<TPostTakeaways>;
   hasAsides: boolean;
   seo: TSeoResolved;
   author: TPostDetailAuthor;

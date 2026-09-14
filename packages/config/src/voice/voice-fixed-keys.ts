@@ -88,7 +88,6 @@ export const VOICE_FIXED_KEYS = [
   'accountPage.metaDescription',
   'bookmarksPage.metaDescription',
   'rss.fallbackTitle',
-  'rss.fallbackDescription',
 
   // Fixed operational newsletter form and landing-page copy.
   'newsletterForm.submitLabel',

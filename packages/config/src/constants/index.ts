@@ -1,6 +1,7 @@
 export * from './alert';
 export * from './audit';
 export * from './aside';
+export * from './brand-tagline';
 export * from './cache';
 export * from './capability';
 export * from './cta';
@@ -20,6 +21,5 @@ export * from './path';
 export * from './preset';
 export * from './reserved-slug';
 export * from './size';
-export * from './spec-line';
 export * from './taxonomy';
 export * from './toast';

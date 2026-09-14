@@ -242,7 +242,7 @@ no faked defaults), the module-registry mechanism, and the editorial write path:
 Source of truth: `packages/studio/src/schema-types/` — documents (`post`, `author`,
 `topic`, `tag`, page documents, singletons), standalone `module_*`
 page-builder documents, and shared objects (`link`, `imageWithAlt`, `bodyImage`,
-`seo`, `aside`, `skim`, …). Naming convention `{group}_{name}` is being applied
+`seo`, `aside`, `postTakeaways`, …). Naming convention `{group}_{name}` is being applied
 incrementally (#251).
 
 Every `module_*` document also carries a **required** `brandVariant` field
@@ -363,7 +363,7 @@ rather than rendering a blank page.
 
 **The post is the page.** `page_post` carries the post itself — `slug`,
 `headingBlock`, `heroImage`, `content`, `featured`, `author`, `topic`,
-`tags`, `publishedAt`, `skim` and `seo` — rather than wrapping a separate
+`tags`, `publishedAt`, `postTakeaways` and `seo` — rather than wrapping a separate
 `blog_post` and dereferencing it. Every post read in `@blog/service`
 projects those fields off `page_post` directly, and `apps/web` names
 `page_post` as the post's document type wherever it needs one: the
@@ -414,7 +414,7 @@ field optional, the view model carries `T | undefined`. The two are kept in
 step deliberately, so the type a consumer sees is the same promise the
 editing experience makes. `headingBlock.heading`, `publishedAt`, `author`,
 `topic`, `content` and `seo` are required on both sides; `excerpt`
-(`headingBlock.supportingText`), `heroImage`, `tags`, `featured` and `skim`
+(`headingBlock.supportingText`), `heroImage`, `tags`, `featured` and `postTakeaways`
 are optional on both.
 
 **An incomplete post is not published.** `PUBLISHED_POST_FILTER` is what
@@ -1029,11 +1029,12 @@ outside `production`, and the accessibility non-negotiables (no hardcoded
 `aria-label`s in `ui`, semantic heading tags, Lighthouse ≥ 95 target).
 
 **SEO is authored-only: what an editor types is what ships, and what they
-leave empty is omitted — with one sanctioned site default, `description`,
-described below.** There is no fallback ladder. `resolveSeo` reads the
+leave empty is omitted.** There is no fallback ladder. `resolveSeo` reads the
 authored `seo` object and the tenant image context, nothing else — no
-content-derived tier, and no site defaults anywhere in `service` or the
-routes.
+content-derived tier, no site defaults. `settings_site` carries no SEO
+fields at all: a page's `<meta description>` is its own `metaDescription` or
+nothing, and the RSS channel `<description>` is the blog index page's
+(`page_postIndex`) `metaDescription`, omitted from the feed when unauthored.
 
 **The `seo` object is required on every page document type**, via the shared
 `seoField()` helper, and `seo.metaTitle` is required within it at 30–60
@@ -1052,17 +1053,12 @@ carries no guard and throws nothing of its own. Studio validation never runs
 on writes made through the Sanity client, so the query is what actually
 holds — the schema rule is the editing experience, not the guarantee.
 
-Everything else is optional. An unauthored `metaDescription` is the one
-field with a site default: `toMetadata` leaves the `description` key out of
-the returned `Metadata` rather than setting it to `undefined`, so Next's
-segment merge keeps the locale layout's `description` —
-`settings_site.description` — and Next's own OG/Twitter inheritance then
-fills `og:description`/`twitter:description` from it. The default is Next's
-layout→page inheritance, not a `??` chain in this codebase; `resolveSeo`
-still sees only authored data. `ogTitle`/`ogDescription`/`ogImage` are
-authored per page or absent — `og:title` is never inherited from the meta
-title, and there is no site-wide default OG image nor a post-hero-image
-substitute.
+Everything else is optional and omitted when unset: an unauthored
+`metaDescription` emits no `description` tag (the locale layout sets none
+either, so there is nothing for a page to inherit), and `ogTitle`/
+`ogDescription`/`ogImage` are authored per page or absent — `og:title` is
+never inherited from the meta title, and there is no site-wide default OG
+image nor a post-hero-image substitute.
 
 A page document's own `title` is a Studio list label and never reaches the
 web in any form (§6). **Fallbacks on SEO are forbidden generally**: a new

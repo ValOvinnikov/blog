@@ -8,12 +8,11 @@ import {
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { Section } from '@web/components/shared/section';
 
-export interface IHeroBlogModuleViewProps extends Omit<
+export interface IHeroBlogModuleViewProps extends Extract<
   THeroBlogModule,
-  'hasPost' | 'heading'
+  { hasPost: true }
 > {
   id: string;
-  heading: string;
 }
 
 const toActionGroupAction = (

@@ -10,12 +10,10 @@ import type {
 import type { TCtaAction } from '@blog/service/shared/transformers/to-cta-action';
 import type { THeroPrimaryAction } from '@blog/service/shared/transformers/to-hero-primary-action';
 
-export type THeroBlogModule = {
+export type THeroBlogModuleBase = {
   brandVariant: TFullBrandVariant;
   variant: THeroVariant;
-  hasPost: boolean;
   eyebrow: TMaybeUndefined<string>;
-  heading: TMaybeUndefined<string>;
   supportingText: TMaybeUndefined<string>;
   sanityImage: TMaybeUndefined<ISanityImage>;
   primaryAction: TMaybeUndefined<THeroPrimaryAction>;
@@ -25,3 +23,7 @@ export type THeroBlogModule = {
   mediaOrder: TMaybeUndefined<TMediaOrder>;
   layout: TMaybeUndefined<TLayout>;
 };
+
+export type THeroBlogModule =
+  | (THeroBlogModuleBase & { hasPost: true; heading: string })
+  | (THeroBlogModuleBase & { hasPost: false });

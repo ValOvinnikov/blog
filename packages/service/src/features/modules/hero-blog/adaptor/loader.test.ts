@@ -23,6 +23,7 @@ describe(getHeroBlog, () => {
     const hero = await getHeroBlog('hero-blog-1', tenant);
 
     expect(mockRun).toHaveBeenCalledTimes(1);
+    if (!hero.hasPost) throw new Error('expected a resolved post');
     expect(hero.heading).toBe('Hello World');
     expect(hero.primaryAction?.href).toBe('/blog/hello-world');
   });

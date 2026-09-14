@@ -8,27 +8,27 @@ export type TBrandLockupProps = IWithClassName &
     /** Uploaded brand-mark image source; falls through to `BrandMark`'s polygon fallback when unset. */
     src?: string;
     size?: TBrandMarkProps['size'];
-    specLine?: string;
+    tagline?: string;
   };
 
 /**
- * BrandLockup molecule — the brand mark plus an optional monospace spec
- * line, stacked with the mark above. The spec line reveals at `md`
- * (≥768px), only when `specLine` is supplied.
+ * BrandLockup molecule — the brand mark plus an optional monospace tagline,
+ * stacked with the mark above. The tagline reveals at `md` (≥768px), only
+ * when `tagline` is supplied.
  */
 export const BrandLockup = ({
   src,
   size,
-  specLine,
+  tagline,
   className,
   dataTestId,
 }: TBrandLockupProps) => {
-  const { root, specLine: specLineSlot } = brandLockupVariants();
+  const { root, tagline: taglineSlot } = brandLockupVariants();
 
   return (
     <div className={root({ class: className })} data-testid={dataTestId}>
-      <BrandMark src={src} size={size} isStacked={Boolean(specLine)} />
-      {specLine && <span className={specLineSlot()}>{specLine}</span>}
+      <BrandMark src={src} size={size} isStacked={Boolean(tagline)} />
+      {tagline && <span className={taglineSlot()}>{tagline}</span>}
     </div>
   );
 };

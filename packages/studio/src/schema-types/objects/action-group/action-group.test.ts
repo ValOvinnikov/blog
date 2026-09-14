@@ -6,15 +6,11 @@ import {
   actionGroupSchema,
   ctaActionSchema,
 } from '@blog/studio/schema-types/objects/action-group/action-group';
+import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
 import { toTitleCase } from '@blog/utils/primitives';
 
 type TCustomFn = (value: unknown) => string | true;
 
-/**
- * The `actions` field's `validation` builder chains `rule.max(2).custom(fn)`;
- * a minimal chainable mock rule captures `fn` the same way other schema
- * tests capture a field-level custom validator.
- */
 const getActionsField = () => {
   const actionsField = actionGroupSchema.fields?.find(
     (field): field is typeof field & { name: 'actions' } =>
@@ -34,30 +30,8 @@ const getActionsField = () => {
   return actionsField;
 };
 
-const getActionsValidator = (): TCustomFn => {
-  const actionsField = getActionsField();
-
-  let customFn: TCustomFn | undefined;
-
-  const rule = {
-    max: () => rule,
-    custom: (fn: TCustomFn) => {
-      customFn = fn;
-      return rule;
-    },
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (actionsField.validation as any)(rule);
-
-  if (!customFn) {
-    throw new Error(
-      'Expected actions field validation to register a custom() rule.',
-    );
-  }
-
-  return customFn;
-};
+const getActionsValidator = (): TCustomFn =>
+  getCustomValidator<TCustomFn>(getActionsField());
 
 describe('actionGroupSchema actions validation', () => {
   it('is valid with an empty array', () => {

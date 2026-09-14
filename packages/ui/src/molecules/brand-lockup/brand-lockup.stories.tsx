@@ -21,14 +21,14 @@ export const WithWideImageSource: TStory = {
   args: { src: 'https://placehold.co/320x64' },
 };
 
-export const WithSpecLine: TStory = {
-  args: { specLine: 'v1.0.0 · build/local' },
+export const WithTagline: TStory = {
+  args: { tagline: 'v1.0.0 · build/local' },
 };
 
-export const WithWideImageSourceAndSpecLine: TStory = {
+export const WithWideImageSourceAndTagline: TStory = {
   args: {
     src: 'https://placehold.co/320x64',
-    specLine: 'v1.0.0 · build/local',
+    tagline: 'v1.0.0 · build/local',
   },
 };
 
@@ -37,13 +37,13 @@ export const NarrowViewport: TStory = {
   globals: { viewport: 'phone' },
 };
 
-// Below `md` the spec line is hidden, so the mark must render with the same
-// sizing as the no-spec-line case — regression coverage for the mobile
+// Below `md` the tagline is hidden, so the mark must render with the same
+// sizing as the no-tagline case — regression coverage for the mobile
 // stacked-sizing bug.
-export const NarrowViewportWithWideImageSourceAndSpecLine: TStory = {
+export const NarrowViewportWithWideImageSourceAndTagline: TStory = {
   globals: { viewport: 'phone' },
   args: {
     src: 'https://placehold.co/320x64',
-    specLine: 'v1.0.0 · build/local',
+    tagline: 'v1.0.0 · build/local',
   },
 };
