@@ -198,9 +198,9 @@ required, 30–60 characters; every other field optional — an empty
 `metaDescription` inherits `settings_site.description` through the locale
 layout's metadata, everything else is omitted from the page head when
 unset) + `openGraph`,
-`blockText` / `richText`, `aside` (deep-dive block type registered in
+`proseText` / `richText`, `aside` (deep-dive block type registered in
 `richText`'s portable-text array; `kind` from `ASIDE_KIND`, required; `body`
-via `blockText`, required — part of the choose-your-depth reading feature,
+via `proseText`, required — part of the choose-your-depth reading feature,
 #957), `skim` (see `post` above), `layout`/`heroLayout` (all-optional
 fields, no defaults set at the schema level: `spacingTop`/`spacingBottom`
 (`SPACING_SCALE`), `containerWidth` (`CONTAINER_WIDTH`, `layout` only —

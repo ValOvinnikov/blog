@@ -268,7 +268,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "basicText"
+          "name": "inlineText"
         },
         "optional": true
       },
@@ -504,7 +504,7 @@
     }
   },
   {
-    "name": "basicText",
+    "name": "inlineText",
     "type": "type",
     "value": {
       "type": "array",
@@ -1489,7 +1489,7 @@
     }
   },
   {
-    "name": "blockText",
+    "name": "proseText",
     "type": "type",
     "value": {
       "type": "array",
@@ -2224,7 +2224,7 @@
           "type": "objectAttribute",
           "value": {
             "type": "inline",
-            "name": "blockText"
+            "name": "proseText"
           },
           "optional": true
         }
@@ -4644,7 +4644,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "blockText"
+          "name": "proseText"
         },
         "optional": true
       },

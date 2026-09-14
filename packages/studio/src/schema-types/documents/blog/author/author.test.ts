@@ -1,4 +1,5 @@
 import { authorSchema } from '@blog/studio/schema-types/documents/blog/author/author';
+import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 
 type TReferenceFieldDefinition = {
   type: 'reference';
@@ -23,7 +24,7 @@ describe('authorSchema profilePage field', () => {
     }
 
     expect(profilePageField.to?.map((target) => target.type)).toEqual([
-      'page_landing',
+      PAGE_LANDING_TYPE,
     ]);
   });
 

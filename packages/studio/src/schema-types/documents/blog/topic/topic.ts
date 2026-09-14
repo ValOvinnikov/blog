@@ -1,38 +1,11 @@
 import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic/topic-type';
 import { slugField } from '@blog/studio/schema-types/fields/slug-field/slug-field';
-import { getDraftsClient } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { validateHasPage } from '@blog/studio/schema-types/validation/validate-has-page/validate-has-page';
 import { Tags } from 'lucide-react';
-import {
-  defineField,
-  defineType,
-  type SanityDocument,
-  type ValidationContext,
-} from 'sanity';
+import { defineField, defineType } from 'sanity';
 
-/**
- * Warns (does not block publishing) when no `page_topic` references this
- * topic — `/topics/{slug}` 404s with no runtime fallback in that state, so
- * the editor should see the gap on the document they'd fix it from.
- */
-const validateHasPageTopic = async (
-  document: SanityDocument | undefined,
-  context: ValidationContext,
-): Promise<string | true> => {
-  const publishedId = document?._id.replace(/^drafts\./, '');
-
-  if (!publishedId) return true;
-
-  const client = getDraftsClient(context);
-
-  const referencingCount = await client.fetch<number>(
-    `count(*[_type == $type && topic._ref == $topicId])`,
-    { type: PAGE_TOPIC_TYPE, topicId: publishedId },
-  );
-
-  return referencingCount > 0
-    ? true
-    : 'No Topic Page references this topic yet — /topics/{slug} will 404 until one is created.';
-};
+const MISSING_PAGE_WARNING =
+  'No Topic Page references this topic yet — /topics/{slug} will 404 until one is created.';
 
 export const topicSchema = defineType({
   name: 'blog_topic',
@@ -41,7 +14,10 @@ export const topicSchema = defineType({
   description:
     'A subject category used to classify posts, powering topic filters and the topic archive page.',
   icon: Tags,
-  validation: (rule) => rule.custom(validateHasPageTopic).warning(),
+  validation: (rule) =>
+    rule
+      .custom(validateHasPage(PAGE_TOPIC_TYPE, 'topic', MISSING_PAGE_WARNING))
+      .warning(),
   fields: [
     defineField({
       name: 'title',
@@ -63,4 +39,14 @@ export const topicSchema = defineType({
       validation: (rule) => rule.max(300),
     }),
   ],
+  preview: {
+    select: {
+      title: 'title',
+    },
+    prepare({ title }: { title?: string }) {
+      return {
+        title: title ?? 'Untitled',
+      };
+    },
+  },
 });

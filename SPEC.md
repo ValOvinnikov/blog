@@ -444,7 +444,7 @@ the schema: the feed omits its `<description>` and the card omits its lead.
 full-bleed image covers the section entirely, and carrying a non-blocking
 warning when it equals `brandVariant`, since a matching band and card is
 occasionally deliberate), an optional `eyebrow`,
-an optional `content` (`basicText` — a constrained Portable Text block:
+an optional `content` (`inlineText` — a constrained Portable Text block:
 paragraphs, bullet/numbered lists, bold/italic, and `link` annotations
 only, no headings/images/code/asides — distinct from the fuller `richText`
 used elsewhere), an optional `image` (`imageWithAlt`, required for

@@ -1,86 +1,60 @@
 import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag/tag';
+import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/tag/tag-type';
+import { createMockCountContext } from '@blog/studio/testing/create-mock-count-context';
 import { getCustomValidatorWithLevel } from '@blog/studio/testing/create-mock-validation-rule';
-import type { SanityDocument, ValidationContext } from 'sanity';
+import type { ValidationContext } from 'sanity';
 
-type TCustomFn = (
-  document: SanityDocument | undefined,
+type TDocFn = (
+  document: { _id: string } | undefined,
   context: ValidationContext,
 ) => Promise<string | true>;
 
 const MISSING_PAGE_WARNING =
   'No Tag Page references this tag yet — /tags/{slug} will 404 until one is created.';
 
-const getHasPageTagValidator = (): { fn: TCustomFn; isWarning: boolean } =>
-  getCustomValidatorWithLevel<TCustomFn>(tagSchema);
+const getHasPageValidator = () =>
+  getCustomValidatorWithLevel<TDocFn>(tagSchema);
 
-const createMockContext = (referencingCount: number) => {
-  const fetchCalls: { query: string; params: unknown }[] = [];
-  const withConfigCalls: unknown[] = [];
-
-  const getClient = () => ({
-    withConfig: (config: unknown) => {
-      withConfigCalls.push(config);
-
-      return {
-        fetch: async (query: string, params: unknown) => {
-          fetchCalls.push({ query, params });
-          return referencingCount;
-        },
-      };
-    },
-  });
-
-  const context = { getClient } as unknown as ValidationContext;
-
-  return { context, fetchCalls, withConfigCalls };
-};
-
-describe('validateHasPageTag', () => {
-  it('is registered at warning severity, not error', () => {
-    const { isWarning } = getHasPageTagValidator();
+describe('tagSchema validation', () => {
+  it('registers validateHasPage at warning severity, not error', () => {
+    const { isWarning } = getHasPageValidator();
 
     expect(isWarning).toBe(true);
   });
 
   it('passes without querying when the document has no id', async () => {
-    const { fn: validate } = getHasPageTagValidator();
-    const { context, fetchCalls } = createMockContext(0);
+    const { fn: validate } = getHasPageValidator();
+    const { context, fetchCalls } = createMockCountContext(0);
 
     await expect(validate(undefined, context)).resolves.toBe(true);
     expect(fetchCalls).toHaveLength(0);
   });
 
   it('passes when a page_tag references this tag', async () => {
-    const { fn: validate } = getHasPageTagValidator();
-    const { context } = createMockContext(1);
-    const document = { _id: 'tag-1', _type: 'blog_tag' } as SanityDocument;
+    const { fn: validate } = getHasPageValidator();
+    const { context } = createMockCountContext(1);
 
-    await expect(validate(document, context)).resolves.toBe(true);
+    await expect(validate({ _id: 'tag-1' }, context)).resolves.toBe(true);
   });
 
   it('warns when no page_tag references this tag', async () => {
-    const { fn: validate } = getHasPageTagValidator();
-    const { context } = createMockContext(0);
-    const document = { _id: 'tag-1', _type: 'blog_tag' } as SanityDocument;
+    const { fn: validate } = getHasPageValidator();
+    const { context } = createMockCountContext(0);
 
-    await expect(validate(document, context)).resolves.toBe(
+    await expect(validate({ _id: 'tag-1' }, context)).resolves.toBe(
       MISSING_PAGE_WARNING,
     );
   });
 
   it('strips the drafts. prefix and queries the drafts perspective', async () => {
-    const { fn: validate } = getHasPageTagValidator();
-    const { context, fetchCalls, withConfigCalls } = createMockContext(0);
-    const document = {
-      _id: 'drafts.tag-1',
-      _type: 'blog_tag',
-    } as SanityDocument;
+    const { fn: validate } = getHasPageValidator();
+    const { context, fetchCalls, withConfigCalls } = createMockCountContext(0);
 
-    await validate(document, context);
+    await validate({ _id: 'drafts.tag-1' }, context);
 
     expect(fetchCalls[0]?.params).toEqual({
-      type: 'page_tag',
-      tagId: 'tag-1',
+      type: PAGE_TAG_TYPE,
+      id: 'tag-1',
     });
     expect(withConfigCalls).toEqual([{ perspective: 'drafts' }]);
   });

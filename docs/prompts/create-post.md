@@ -86,7 +86,7 @@ its own task, outside this prompt. When in doubt, leave `modules` off entirely.
 
 `name` (**required**, ≤ 100) · `image` (optional `imageWithAlt`; `alt` required
 when present — omit the image and the byline shows initials) · `bio`
-(`blockText`, an unrestricted default Portable Text array — keep it to plain
+(`proseText`, an unrestricted default Portable Text array — keep it to plain
 paragraphs) · `role` (≤ 100, e.g. "Senior Engineer") ·
 `socialLinks` (array of `socialLink`: `platform` and `url`, both required) ·
 `profilePage` (optional ref → `page_landing`, the page the byline links to).
@@ -165,7 +165,7 @@ use anything outside it:
   - `highlightedLines` (optional array of 1-based line numbers to emphasize).
 - **Asides** (`aside`): a labelled side note with a **required** `kind` —
   `WHY_NOT`, `DIGRESSION` or `CONTEXT` — and a **required** `body`
-  (`blockText`, same unrestricted default array as an author bio; keep it to
+  (`proseText`, same unrestricted default array as an author bio; keep it to
   plain paragraphs). Use them for the argument that would otherwise interrupt
   the through-line.
 

@@ -1,3 +1,4 @@
+import { PAGE_HOME_TYPE } from '@blog/studio/schema-types/documents/pages/home/home-type';
 import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-field';
 import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
@@ -15,7 +16,7 @@ import { House } from 'lucide-react';
 import { defineType } from 'sanity';
 
 export const homePageSchema = defineType({
-  name: 'page_home',
+  name: PAGE_HOME_TYPE,
   title: 'Home Page',
   type: 'document',
   description:

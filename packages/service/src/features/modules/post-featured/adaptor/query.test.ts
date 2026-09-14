@@ -1,3 +1,5 @@
+import { makeRawPostFeaturedModule } from '@blog/service/testing/modules/fixtures';
+
 import { postFeaturedModuleQuery } from './query';
 
 describe('postFeaturedModuleQuery', () => {
@@ -6,6 +8,12 @@ describe('postFeaturedModuleQuery', () => {
       '_type == "module_postFeatured"',
     );
     expect(postFeaturedModuleQuery.query).toContain('_id == $id');
+  });
+
+  it('rejects a module with no headingBlock', () => {
+    const raw = { ...makeRawPostFeaturedModule(), headingBlock: null };
+
+    expect(() => postFeaturedModuleQuery.parse(raw)).toThrow();
   });
 
   it('derefs pinned posts and drops unpublished ones, preserving authored order', () => {

@@ -5,6 +5,8 @@ export type TRecordedValidator<TFn> = {
   level: TValidatorLevel;
 };
 
+type TValidatedSource = { validation?: unknown; name?: string };
+
 type TMockValidationRule<TFn> = {
   custom: (fn: TFn) => TMockValidationRule<TFn>;
   warning: () => TMockValidationRule<TFn>;
@@ -48,10 +50,14 @@ const createRecordingRule = <TFn>(
  * `.custom()` call.
  */
 export const getRecordedValidators = <TFn>(
-  source: { validation?: unknown } | undefined,
+  source: TValidatedSource | undefined,
 ): TRecordedValidator<TFn>[] => {
   if (typeof source?.validation !== 'function') {
-    throw new Error('Expected validation to define a builder function.');
+    throw new Error(
+      source?.name
+        ? `Expected ${source.name} to define validation.`
+        : 'Expected validation to define a builder function.',
+    );
   }
 
   const recorded: TRecordedValidator<TFn>[] = [];
@@ -63,17 +69,18 @@ export const getRecordedValidators = <TFn>(
 };
 
 const getSingleRecordedValidator = <TFn>(
-  source: { validation?: unknown } | undefined,
+  source: TValidatedSource | undefined,
 ): TRecordedValidator<TFn> => {
   const validators = getRecordedValidators<TFn>(source);
+  const label = source?.name ? `${source.name} validation` : 'validation';
 
   if (validators.length === 0) {
-    throw new Error('Expected validation to register a custom() rule.');
+    throw new Error(`Expected ${label} to register a custom() rule.`);
   }
 
   if (validators.length > 1) {
     throw new Error(
-      `Expected validation to register exactly one custom() rule, found ${validators.length}.`,
+      `Expected ${label} to register exactly one custom() rule, found ${validators.length}.`,
     );
   }
 
@@ -85,15 +92,17 @@ const getSingleRecordedValidator = <TFn>(
  * returns its callback, for the common case of a single field-level check.
  */
 export const getCustomValidator = <TFn>(
-  source: { validation?: unknown } | undefined,
+  source: TValidatedSource | undefined,
 ): TFn => getSingleRecordedValidator<TFn>(source).fn;
 
 /**
  * Same as `getCustomValidator`, but also reports whether that single rule
- * was chained to `.warning()` rather than left at the default error severity.
+ * was chained to `.warning()` rather than left at the default error severity
+ * — for schemas (typically documents) that keep the validator private and
+ * never export it directly.
  */
 export const getCustomValidatorWithLevel = <TFn>(
-  source: { validation?: unknown } | undefined,
+  source: TValidatedSource | undefined,
 ): { fn: TFn; isWarning: boolean } => {
   const validator = getSingleRecordedValidator<TFn>(source);
 

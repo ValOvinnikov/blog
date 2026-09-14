@@ -1,3 +1,5 @@
+import { makeRawPostLatestModule } from '@blog/service/testing/modules/fixtures';
+
 import { postLatestModuleQuery } from './query';
 
 describe('postLatestModuleQuery', () => {
@@ -6,6 +8,12 @@ describe('postLatestModuleQuery', () => {
       '_type == "module_postLatest"',
     );
     expect(postLatestModuleQuery.query).toContain('_id == $id');
+  });
+
+  it('rejects a module with no headingBlock', () => {
+    const raw = { ...makeRawPostLatestModule(), headingBlock: null };
+
+    expect(() => postLatestModuleQuery.parse(raw)).toThrow();
   });
 
   it('projects contentAlignment', () => {

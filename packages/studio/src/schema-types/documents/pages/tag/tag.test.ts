@@ -1,5 +1,6 @@
 import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag/tag';
 import { tagPageSchema } from '@blog/studio/schema-types/documents/pages/tag/tag';
+import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/tag/tag-type';
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
@@ -46,6 +47,10 @@ describe('tagPageSchema field order', () => {
 });
 
 describe('tagPageSchema shape', () => {
+  it('is named page_tag', () => {
+    expect(tagPageSchema.name).toBe(PAGE_TAG_TYPE);
+  });
+
   it('title is required via the shared titleField() helper', () => {
     const titleFieldDefinition = getField('title');
 
@@ -209,9 +214,6 @@ describe('tagPageSchema slug field', () => {
   });
 
   it('relies on the default per-document-type isUnique scope rather than overriding it', () => {
-    // /tags/{slug} collisions only matter within page_tag itself, which is
-    // exactly Sanity's default slug uniqueness scope — no custom `isUnique`
-    // is needed on top of it.
     const slugField = getSlugField();
 
     expect(slugField?.options?.isUnique).toBeUndefined();
@@ -240,7 +242,7 @@ describe('tagPageSchema tag field', () => {
     expect(tagField.to?.map((target) => target.type)).toEqual([tagSchema.name]);
   });
 
-  it('is required', () => {
+  it('is required and registers the unique-taxonomy-reference validator', () => {
     const tagField = getTagField();
 
     if (!tagField?.validation) {
@@ -248,105 +250,23 @@ describe('tagPageSchema tag field', () => {
     }
 
     let requiredCalled = false;
+    let customCalled = false;
     const rule: TValidationRule = {
       required: () => {
         requiredCalled = true;
         return rule;
       },
-      custom: () => rule,
+      custom: () => {
+        customCalled = true;
+        return rule;
+      },
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
     (tagField.validation as any)(rule);
 
     expect(requiredCalled).toBe(true);
-  });
-});
-
-type TReferenceValue = { _ref?: string } | undefined;
-type TCustomFn = (
-  value: TReferenceValue,
-  context: ValidationContext,
-) => Promise<string | true>;
-
-const TAG_UNIQUENESS_ERROR =
-  'Another Tag Page already references this tag — each tag can only back one Tag Page.';
-
-const getUniqueTagValidator = (): TCustomFn =>
-  getCustomValidator<TCustomFn>(
-    tagPageSchema.fields?.find((field) => field.name === 'tag'),
-  );
-
-const createMockContext = (fetchResult: unknown, documentId = 'page-tag-1') => {
-  const fetchCalls: { query: string; params: unknown }[] = [];
-  const withConfigCalls: unknown[] = [];
-
-  const getClient = () => ({
-    withConfig: (config: unknown) => {
-      withConfigCalls.push(config);
-
-      return {
-        fetch: async (query: string, params: unknown) => {
-          fetchCalls.push({ query, params });
-          return fetchResult;
-        },
-      };
-    },
-  });
-
-  const context = {
-    getClient,
-    document: { _id: documentId },
-  } as unknown as ValidationContext;
-
-  return { context, fetchCalls, withConfigCalls };
-};
-
-describe('validateUniqueTagReference', () => {
-  it('passes without querying when no reference is set', async () => {
-    const validate = getUniqueTagValidator();
-    const { context, fetchCalls } = createMockContext(0);
-
-    await expect(validate(undefined, context)).resolves.toBe(true);
-    expect(fetchCalls).toHaveLength(0);
-  });
-
-  it('passes when no other page_tag references the same tag', async () => {
-    const validate = getUniqueTagValidator();
-    const { context } = createMockContext(0);
-
-    await expect(validate({ _ref: 'tag-1' }, context)).resolves.toBe(true);
-  });
-
-  it('flags a conflicting page_tag referencing the same tag', async () => {
-    const validate = getUniqueTagValidator();
-    const { context } = createMockContext(1);
-
-    await expect(validate({ _ref: 'tag-1' }, context)).resolves.toBe(
-      TAG_UNIQUENESS_ERROR,
-    );
-  });
-
-  it('excludes both the draft and published id of the current document', async () => {
-    const validate = getUniqueTagValidator();
-    const { context, fetchCalls } = createMockContext(0, 'drafts.page-tag-1');
-
-    await validate({ _ref: 'tag-1' }, context);
-
-    expect(fetchCalls[0]?.params).toEqual({
-      type: 'page_tag',
-      tagId: 'tag-1',
-      publishedId: 'page-tag-1',
-    });
-  });
-
-  it('requests the drafts perspective so an unpublished conflict still counts', async () => {
-    const validate = getUniqueTagValidator();
-    const { context, withConfigCalls } = createMockContext(0);
-
-    await validate({ _ref: 'tag-1' }, context);
-
-    expect(withConfigCalls).toEqual([{ perspective: 'drafts' }]);
+    expect(customCalled).toBe(true);
   });
 });
 
@@ -358,11 +278,21 @@ type TDocumentCustomFn = (
 const buildDocumentRules = (): TRecordedValidator<TDocumentCustomFn>[] =>
   getRecordedValidators<TDocumentCustomFn>(tagPageSchema);
 
-describe('pageTagSchema document validation — modules[] post list count', () => {
-  it('errors when more than one module_postList is referenced', () => {
+describe('tagPageSchema document validation wiring', () => {
+  it('registers single, has, and unique-post-list-reference rules at the right severities', () => {
+    const rules = buildDocumentRules();
+
+    expect(rules).toHaveLength(3);
+    expect(rules.map((rule) => rule.level)).toEqual([
+      'error',
+      'warning',
+      'error',
+    ]);
+  });
+
+  it('the single-post-list rule errors when more than one module_postList is referenced', () => {
     const [singlePostListRule] = buildDocumentRules();
 
-    expect(singlePostListRule?.level).toBe('error');
     expect(
       singlePostListRule?.fn?.(
         {
@@ -376,26 +306,9 @@ describe('pageTagSchema document validation — modules[] post list count', () =
     ).toBe('Only one Post List module is allowed per page.');
   });
 
-  it('passes with exactly one module_postList reference', () => {
-    const [singlePostListRule, hasPostListRule] = buildDocumentRules();
-
-    const document = {
-      modules: [
-        { _type: postListSchema.name, _ref: 'list-1' },
-        { _type: postLatestSchema.name, _ref: 'latest-1' },
-      ],
-    };
-
-    expect(singlePostListRule?.fn?.(document, {} as ValidationContext)).toBe(
-      true,
-    );
-    expect(hasPostListRule?.fn?.(document, {} as ValidationContext)).toBe(true);
-  });
-
-  it('warns when no module_postList is referenced', () => {
+  it('the has-post-list rule warns with page-scoped copy when none is referenced', () => {
     const [, hasPostListRule] = buildDocumentRules();
 
-    expect(hasPostListRule?.level).toBe('warning');
     expect(
       hasPostListRule?.fn?.(
         { modules: [{ _type: postLatestSchema.name, _ref: 'latest-1' }] },
@@ -406,45 +319,20 @@ describe('pageTagSchema document validation — modules[] post list count', () =
     );
   });
 
-  it('warns when modules is undefined', () => {
-    const [, hasPostListRule] = buildDocumentRules();
-
-    expect(hasPostListRule?.fn?.({}, {} as ValidationContext)).toBe(
-      'This page has no Post List module — the archive will be empty until one is added.',
-    );
-  });
-});
-
-const POST_LIST_UNIQUENESS_ERROR =
-  'Another Tag Page already references this Post List — each Post List can only back one Tag Page.';
-
-describe('tagPageSchema document validation — unique post list reference', () => {
-  it('passes without querying when modules[] carries no post list reference', async () => {
+  it('the unique-post-list-reference rule flags a conflicting page_tag with page-scoped copy', async () => {
     const [, , uniquePostListRule] = buildDocumentRules();
-    const { context, fetchCalls } = createMockContext(0);
+    const fetchCalls: { query: string; params: unknown }[] = [];
 
-    await expect(uniquePostListRule?.fn?.({}, context)).resolves.toBe(true);
-    expect(fetchCalls).toHaveLength(0);
-  });
-
-  it('reads the reference from modules[] when present', async () => {
-    const [, , uniquePostListRule] = buildDocumentRules();
-    const { context, fetchCalls } = createMockContext(0);
-
-    await uniquePostListRule?.fn?.(
-      {
-        _id: 'page-tag-1',
-        modules: [{ _type: postListSchema.name, _ref: 'post-list-1' }],
-      },
-      context,
-    );
-
-    expect(fetchCalls[0]?.params).toMatchObject({ postListId: 'post-list-1' });
-  });
-
-  it('flags a conflicting page_tag referencing the same modules[] post list', async () => {
-    const [, , uniquePostListRule] = buildDocumentRules();
-    const { context } = createMockContext(1);
+    const context = {
+      getClient: () => ({
+        withConfig: () => ({
+          fetch: async (query: string, params: unknown) => {
+            fetchCalls.push({ query, params });
+            return 1;
+          },
+        }),
+      }),
+    } as unknown as ValidationContext;
 
     await expect(
       uniquePostListRule?.fn?.(
@@ -454,40 +342,9 @@ describe('tagPageSchema document validation — unique post list reference', () 
         },
         context,
       ),
-    ).resolves.toBe(POST_LIST_UNIQUENESS_ERROR);
-  });
-
-  it('excludes both the draft and published id of the current document', async () => {
-    const [, , uniquePostListRule] = buildDocumentRules();
-    const { context, fetchCalls } = createMockContext(0, 'drafts.page-tag-1');
-
-    await uniquePostListRule?.fn?.(
-      {
-        _id: 'drafts.page-tag-1',
-        modules: [{ _type: postListSchema.name, _ref: 'post-list-1' }],
-      },
-      context,
+    ).resolves.toBe(
+      'Another Tag Page already references this Post List — each Post List can only back one Tag Page.',
     );
-
-    expect(fetchCalls[0]?.params).toEqual({
-      type: 'page_tag',
-      postListId: 'post-list-1',
-      publishedId: 'page-tag-1',
-    });
-  });
-
-  it('requests the drafts perspective so an unpublished conflict still counts', async () => {
-    const [, , uniquePostListRule] = buildDocumentRules();
-    const { context, withConfigCalls } = createMockContext(0);
-
-    await uniquePostListRule?.fn?.(
-      {
-        _id: 'page-tag-1',
-        modules: [{ _type: postListSchema.name, _ref: 'post-list-1' }],
-      },
-      context,
-    );
-
-    expect(withConfigCalls).toEqual([{ perspective: 'drafts' }]);
+    expect(fetchCalls[0]?.params).toMatchObject({ type: PAGE_TAG_TYPE });
   });
 });
