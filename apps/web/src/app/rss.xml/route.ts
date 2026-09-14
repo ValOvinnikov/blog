@@ -18,9 +18,10 @@ const toRssItem = (post: TFeedPost, siteUrl: string): TRssItem => {
 
 /**
  * RSS 2.0 feed of every published post, newest posts first. Falls back to a
- * generic channel title/description when site settings fail to load — a
- * broken feed must never break because of an unrelated global-content fetch
- * failure.
+ * generic channel title when site settings fail to load — a broken feed
+ * must never break because of an unrelated global-content fetch failure.
+ * The channel description is the blog index page's own Meta Description,
+ * omitted when unauthored or when that page fails to load.
  */
 export async function GET(): Promise<Response> {
   const siteUrl = (await getTenantBaseUrl()) ?? '';
@@ -31,11 +32,13 @@ export async function GET(): Promise<Response> {
   }
   const { tenant } = hostTenant;
 
-  const [postsResult, siteSettingsResult, t] = await Promise.all([
-    service.entities.posts.v1.getAllPublishedPosts(tenant),
-    service.global.siteSettings.v1.getSiteSettings(tenant),
-    getTranslations('rss'),
-  ]);
+  const [postsResult, siteSettingsResult, indexPageResult, t] =
+    await Promise.all([
+      service.entities.posts.v1.getAllPublishedPosts(tenant),
+      service.global.siteSettings.v1.getSiteSettings(tenant),
+      service.pages.blog.v1.getIndexPage(tenant),
+      getTranslations('rss'),
+    ]);
 
   // A single unpaginated query: a failure yields the whole feed empty, not a
   // partially-populated one.
@@ -47,14 +50,20 @@ export async function GET(): Promise<Response> {
   const title = siteSettingsResult.ok
     ? siteSettingsResult.data.brand.name
     : t('fallbackTitle');
-  const description = siteSettingsResult.ok
-    ? siteSettingsResult.data.description
-    : t('fallbackDescription');
   if (!siteSettingsResult.ok) {
     logger.error('rss.site_settings_fetch_failed', {
       error: siteSettingsResult.error,
     });
   }
+
+  if (!indexPageResult.ok) {
+    logger.error('rss.index_page_fetch_failed', {
+      error: indexPageResult.error,
+    });
+  }
+  const description = indexPageResult.ok
+    ? indexPageResult.data?.seo.description
+    : undefined;
 
   const xml = buildRssFeed(
     { title, description, siteUrl },

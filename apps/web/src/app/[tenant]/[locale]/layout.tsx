@@ -64,9 +64,7 @@ export async function generateMetadata({
 
   // Every route's own `openGraph`/`twitter` replaces (not merges with) this
   // root segment's. `metadataBase` inherits down, letting a leaf's relative
-  // fallback image path resolve to an absolute URL, and `description`
-  // inherits too whenever a page's `toMetadata` call has none of its own
-  // (see `toMetadata`).
+  // fallback image path resolve to an absolute URL.
   const tenantBaseUrl = await getTenantBaseUrl(tenant);
   const metadataBase = tenantBaseUrl ? new URL(tenantBaseUrl) : undefined;
 
@@ -89,7 +87,7 @@ export async function generateMetadata({
     return { metadataBase, ...robotsMetadata };
   }
 
-  const { brand, description } = result.data;
+  const { brand } = result.data;
 
   return {
     metadataBase,
@@ -97,7 +95,6 @@ export async function generateMetadata({
       default: brand.name,
       template: `%s | ${brand.name}`,
     },
-    description,
     ...robotsMetadata,
   };
 }
