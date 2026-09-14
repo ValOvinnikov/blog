@@ -4,7 +4,7 @@ packages:
   - "packages/*"
 
 catalog:
-  eslint: ^10.7.0
+  eslint: ^10.10.0
   prettier: ^3.9.5
   react: ^19.0.0
   react-dom: ^19.0.0
