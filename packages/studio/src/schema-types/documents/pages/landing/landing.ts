@@ -50,9 +50,7 @@ export const landingPageSchema = defineType({
         return true;
       },
     }),
-    headingBlockField({
-      requireHeading: true,
-    }),
+    headingBlockField(),
     heroField(),
     modulesField({
       allow: [

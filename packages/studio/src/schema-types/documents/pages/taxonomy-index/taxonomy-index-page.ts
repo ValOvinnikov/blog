@@ -75,9 +75,7 @@ export const taxonomyIndexPage = ({
     },
     fields: [
       titleField(),
-      headingBlockField({
-        requireHeading: true,
-      }),
+      headingBlockField(),
       heroField(),
       modulesField({
         allow: [

@@ -158,9 +158,9 @@ matters is whether it tells an editor something true and useful, and that
 needs a reader.
 
 Where a shared field factory would otherwise have every caller pass the same
-description, the default belongs **on the factory**, not repeated at each call
-site — `headingBlockField` carries one generic default that suits both a page
-and a module, and only a caller with genuinely different copy passes its own.
+description, the copy belongs **on the factory**, not repeated at each call
+site — `headingBlockField` carries one generic description that suits both a
+page and a module, and takes no option to override it.
 A description repeated verbatim across call sites is the same duplication
 problem as any other repeated literal.
 

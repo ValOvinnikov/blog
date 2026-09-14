@@ -18,7 +18,7 @@ export const newsletterSchema = defineType({
   fields: [
     titleField({ description: 'Internal label shown in the Studio.' }),
     brandVariantField(),
-    headingBlockField({ requireHeading: true }),
+    headingBlockField(),
     defineField({
       name: 'variant',
       title: 'Variant',

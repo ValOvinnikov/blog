@@ -72,7 +72,7 @@ export const postFeaturedSchema = defineType({
   fields: [
     titleField(),
     brandVariantField(),
-    headingBlockField({ requireHeading: true }),
+    headingBlockField(),
     showImagesField(),
     displayModeField(),
     defineField({

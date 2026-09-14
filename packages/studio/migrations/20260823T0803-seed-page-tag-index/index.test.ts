@@ -4,12 +4,31 @@ import {
   SEO_META_TITLE_MAX_LENGTH,
   SEO_META_TITLE_MIN_LENGTH,
 } from '@blog/studio/schema-types/objects/seo/seo';
-import { assertSatisfiesRequiredFields } from '@blog/studio/testing/assert-satisfies-required-fields';
+import {
+  assertSatisfiesRequiredFields,
+  type TExemptField,
+} from '@blog/studio/testing/assert-satisfies-required-fields';
 import { createIfNotExists } from 'sanity/migrate';
 
 import { PAGE_TAG_INDEX_ID, TAXONOMY_LIST_TAGS_ID } from './ids';
 
 import migration from './index';
+
+const TAXONOMY_LIST_HEADING_BLOCK_EXEMPTION: TExemptField[] = [
+  {
+    name: 'headingBlock',
+    reason:
+      'this migration seeds module_taxonomyList with only title and brandVariant — no heading of any kind — so there is nothing here to satisfy the required headingBlock',
+  },
+];
+
+const TAG_INDEX_PAGE_HEADING_BLOCK_EXEMPTION: TExemptField[] = [
+  {
+    name: 'headingBlock',
+    reason:
+      'this migration writes the flat heading/supportingText fields directly on page_tagIndex, never a nested headingBlock',
+  },
+];
 
 const anchorDoc = {
   _id: 'settings_site',
@@ -42,8 +61,16 @@ const expectedMutations = [
 
 describe('seed-page-tag-index migration', () => {
   it('creates module_taxonomyList and page_tagIndex from a settings_site anchor', () => {
-    assertSatisfiesRequiredFields(taxonomyListSchema, taxonomyListPayload);
-    assertSatisfiesRequiredFields(tagIndexPageSchema, pageTagIndexPayload);
+    assertSatisfiesRequiredFields(
+      taxonomyListSchema,
+      taxonomyListPayload,
+      TAXONOMY_LIST_HEADING_BLOCK_EXEMPTION,
+    );
+    assertSatisfiesRequiredFields(
+      tagIndexPageSchema,
+      pageTagIndexPayload,
+      TAG_INDEX_PAGE_HEADING_BLOCK_EXEMPTION,
+    );
 
     expect(migration.migrate.document(anchorDoc)).toEqual(expectedMutations);
   });

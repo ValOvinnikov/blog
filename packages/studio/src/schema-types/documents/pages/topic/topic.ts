@@ -73,9 +73,7 @@ export const topicPageSchema = defineType({
             ),
           ),
     }),
-    headingBlockField({
-      requireHeading: true,
-    }),
+    headingBlockField(),
     heroField(),
     modulesField({
       allow: [

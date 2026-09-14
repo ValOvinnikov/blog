@@ -73,9 +73,7 @@ export const tagPageSchema = defineType({
             ),
           ),
     }),
-    headingBlockField({
-      requireHeading: true,
-    }),
+    headingBlockField(),
     heroField(),
     modulesField({
       allow: [
