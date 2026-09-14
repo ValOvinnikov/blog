@@ -63,7 +63,7 @@ export type ActionGroup = {
   actions?: Array<
     {
       _key: string;
-    } & CtaAction
+    } & CtaActionRef
   >;
 };
 
@@ -95,7 +95,7 @@ export type InlineText = Array<{
   markDefs?: Array<
     {
       _key: string;
-    } & Link
+    } & SharedLinkAnnotation
   >;
   level?: number;
   _type: 'block';
@@ -124,11 +124,16 @@ export type RichText = Array<
       }>;
       style?: 'normal' | 'h2' | 'h3' | 'h4' | 'blockquote';
       listItem?: 'bullet' | 'number';
-      markDefs?: Array<{
-        href?: string;
-        _type: 'link';
-        _key: string;
-      }>;
+      markDefs?: Array<
+        | ({
+            _key: string;
+          } & SharedLinkAnnotation)
+        | {
+            href?: string;
+            _type: 'link';
+            _key: string;
+          }
+      >;
       level?: number;
       _type: 'block';
       _key: string;
@@ -228,11 +233,16 @@ export type ProseText = Array<{
   }>;
   style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote';
   listItem?: 'bullet' | 'number';
-  markDefs?: Array<{
-    href?: string;
-    _type: 'link';
-    _key: string;
-  }>;
+  markDefs?: Array<
+    | ({
+        _key: string;
+      } & SharedLinkAnnotation)
+    | {
+        href?: string;
+        _type: 'link';
+        _key: string;
+      }
+  >;
   level?: number;
   _type: 'block';
   _key: string;
@@ -272,46 +282,28 @@ export type OpenGraph = {
   ogImage?: ImageWithAlt;
 };
 
-export type CtaAction = {
-  _type: 'ctaAction';
+export type Shared_linkReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'shared_link';
+};
+
+export type SharedLinkAnnotation = {
+  _type: 'sharedLinkAnnotation';
+  link?: Shared_linkReference;
+};
+
+export type CtaActionRef = {
+  _type: 'ctaActionRef';
   variant?: 'PRIMARY' | 'SECONDARY';
   appearance?: 'CONTAINED' | 'INLINE';
-  link?: Link;
+  link?: Shared_linkReference;
+  labelOverride?: string;
 };
 
-export type Blog_topicReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'blog_topic';
-};
-
-export type Page_landingReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_landing';
-};
-
-export type Page_postIndexReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_postIndex';
-};
-
-export type Link = {
-  _type: 'link';
-  label?: string;
-  accessibleLabel?: string;
-  linkType?: 'INTERNAL' | 'EXTERNAL';
-  internalReference?:
-    | Page_postReference
-    | Blog_topicReference
-    | Page_landingReference
-    | Page_postIndexReference;
-  url?: string;
-  openInNewTab?: boolean;
+export type SocialLinkRef = {
+  _type: 'socialLinkRef';
   platform?:
     | 'X'
     | 'GITHUB'
@@ -323,12 +315,14 @@ export type Link = {
     | 'FACEBOOK'
     | 'THREADS'
     | 'RSS';
+  link?: Shared_linkReference;
+  labelOverride?: string;
 };
 
-export type SocialLink = {
-  _type: 'socialLink';
-  platform?: string;
-  url?: string;
+export type LinkRef = {
+  _type: 'linkRef';
+  link?: Shared_linkReference;
+  labelOverride?: string;
 };
 
 export type Aside = {
@@ -379,6 +373,45 @@ export type MigrationState = {
   }>;
 };
 
+export type Blog_topicReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'blog_topic';
+};
+
+export type Page_landingReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_landing';
+};
+
+export type Page_postIndexReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_postIndex';
+};
+
+export type Shared_link = {
+  _id: string;
+  _type: 'shared_link';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  label?: string;
+  linkType?: 'INTERNAL' | 'EXTERNAL';
+  internalReference?:
+    | Page_postReference
+    | Blog_topicReference
+    | Page_landingReference
+    | Page_postIndexReference;
+  url?: string;
+  openInNewTab?: boolean;
+};
+
 export type Settings_theme = {
   _id: string;
   _type: 'settings_theme';
@@ -419,7 +452,7 @@ export type Settings_footer = {
   social?: Array<
     {
       _key: string;
-    } & Link
+    } & SocialLinkRef
   >;
 };
 
@@ -433,7 +466,7 @@ export type Settings_navigation = {
   items?: Array<
     {
       _key: string;
-    } & Link
+    } & LinkRef
   >;
 };
 
@@ -757,7 +790,7 @@ export type Blog_author = {
   socialLinks?: Array<
     {
       _key: string;
-    } & SocialLink
+    } & SocialLinkRef
   >;
   profilePage?: Page_landingReference;
 };
@@ -833,7 +866,11 @@ export type Module_heroBlog = {
   image?: ImageWithAlt;
   primaryActionLabel?: string;
   primaryActionAppearance?: 'CONTAINED' | 'INLINE';
-  secondaryAction?: CtaAction;
+  actions?: Array<
+    {
+      _key: string;
+    } & CtaActionRef
+  >;
   variant?: 'SPLIT' | 'STACKED' | 'BANNER';
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   contentPositionSplit?: 'LEFT' | 'RIGHT';
@@ -841,7 +878,6 @@ export type Module_heroBlog = {
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   mediaOrderSplit?: 'LAST' | 'FIRST';
   mediaOrderStacked?: 'LAST' | 'FIRST';
-  actions?: ActionGroup;
   layout?: HeroLayout;
 };
 
@@ -863,7 +899,11 @@ export type Module_hero = {
   heroImageMode?: 'POST_IMAGE' | 'CUSTOM' | 'NONE';
   heroImage?: ImageWithAlt;
   primaryActionLabel?: string;
-  secondaryAction?: Link;
+  actions?: Array<
+    {
+      _key: string;
+    } & CtaActionRef
+  >;
   layout?: HeroLayout;
 };
 
@@ -1078,17 +1118,20 @@ export type AllSanitySchemaTypes =
   | BrandTagline
   | Seo
   | OpenGraph
-  | CtaAction
-  | Blog_topicReference
-  | Page_landingReference
-  | Page_postIndexReference
-  | Link
-  | SocialLink
+  | Shared_linkReference
+  | SharedLinkAnnotation
+  | CtaActionRef
+  | SocialLinkRef
+  | LinkRef
   | Aside
   | BodyImage
   | HeroLayout
   | Layout
   | MigrationState
+  | Blog_topicReference
+  | Page_landingReference
+  | Page_postIndexReference
+  | Shared_link
   | Settings_theme
   | Settings_newsletter
   | Settings_footer

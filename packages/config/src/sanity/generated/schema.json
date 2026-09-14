@@ -410,7 +410,7 @@
               },
               "rest": {
                 "type": "inline",
-                "name": "ctaAction"
+                "name": "ctaActionRef"
               }
             }
           },
@@ -604,7 +604,7 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "link"
+                  "name": "sharedLinkAnnotation"
                 }
               }
             },
@@ -825,34 +825,54 @@
                 "value": {
                   "type": "array",
                   "of": {
-                    "type": "object",
-                    "attributes": {
-                      "href": {
-                        "type": "objectAttribute",
-                        "value": {
-                          "type": "string"
+                    "type": "union",
+                    "of": [
+                      {
+                        "type": "object",
+                        "attributes": {
+                          "_key": {
+                            "type": "objectAttribute",
+                            "value": {
+                              "type": "string"
+                            }
+                          }
                         },
-                        "optional": true
-                      },
-                      "_type": {
-                        "type": "objectAttribute",
-                        "value": {
-                          "type": "string",
-                          "value": "link"
+                        "rest": {
+                          "type": "inline",
+                          "name": "sharedLinkAnnotation"
                         }
-                      }
-                    },
-                    "rest": {
-                      "type": "object",
-                      "attributes": {
-                        "_key": {
-                          "type": "objectAttribute",
-                          "value": {
-                            "type": "string"
+                      },
+                      {
+                        "type": "object",
+                        "attributes": {
+                          "href": {
+                            "type": "objectAttribute",
+                            "value": {
+                              "type": "string"
+                            },
+                            "optional": true
+                          },
+                          "_type": {
+                            "type": "objectAttribute",
+                            "value": {
+                              "type": "string",
+                              "value": "link"
+                            }
+                          }
+                        },
+                        "rest": {
+                          "type": "object",
+                          "attributes": {
+                            "_key": {
+                              "type": "objectAttribute",
+                              "value": {
+                                "type": "string"
+                              }
+                            }
                           }
                         }
                       }
-                    }
+                    ]
                   }
                 },
                 "optional": true
@@ -1606,34 +1626,54 @@
             "value": {
               "type": "array",
               "of": {
-                "type": "object",
-                "attributes": {
-                  "href": {
-                    "type": "objectAttribute",
-                    "value": {
-                      "type": "string"
+                "type": "union",
+                "of": [
+                  {
+                    "type": "object",
+                    "attributes": {
+                      "_key": {
+                        "type": "objectAttribute",
+                        "value": {
+                          "type": "string"
+                        }
+                      }
                     },
-                    "optional": true
-                  },
-                  "_type": {
-                    "type": "objectAttribute",
-                    "value": {
-                      "type": "string",
-                      "value": "link"
+                    "rest": {
+                      "type": "inline",
+                      "name": "sharedLinkAnnotation"
                     }
-                  }
-                },
-                "rest": {
-                  "type": "object",
-                  "attributes": {
-                    "_key": {
-                      "type": "objectAttribute",
-                      "value": {
-                        "type": "string"
+                  },
+                  {
+                    "type": "object",
+                    "attributes": {
+                      "href": {
+                        "type": "objectAttribute",
+                        "value": {
+                          "type": "string"
+                        },
+                        "optional": true
+                      },
+                      "_type": {
+                        "type": "objectAttribute",
+                        "value": {
+                          "type": "string",
+                          "value": "link"
+                        }
+                      }
+                    },
+                    "rest": {
+                      "type": "object",
+                      "attributes": {
+                        "_key": {
+                          "type": "objectAttribute",
+                          "value": {
+                            "type": "string"
+                          }
+                        }
                       }
                     }
                   }
-                }
+                ]
               }
             },
             "optional": true
@@ -1874,7 +1914,37 @@
     }
   },
   {
-    "name": "ctaAction",
+    "type": "type",
+    "name": "shared_link.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "shared_link"
+    }
+  },
+  {
+    "name": "sharedLinkAnnotation",
     "type": "type",
     "value": {
       "type": "object",
@@ -1883,7 +1953,31 @@
           "type": "objectAttribute",
           "value": {
             "type": "string",
-            "value": "ctaAction"
+            "value": "sharedLinkAnnotation"
+          }
+        },
+        "link": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "shared_link.reference"
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
+    "name": "ctaActionRef",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "ctaActionRef"
           }
         },
         "variant": {
@@ -1924,7 +2018,14 @@
           "type": "objectAttribute",
           "value": {
             "type": "inline",
-            "name": "link"
+            "name": "shared_link.reference"
+          },
+          "optional": true
+        },
+        "labelOverride": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
           },
           "optional": true
         }
@@ -1932,97 +2033,7 @@
     }
   },
   {
-    "type": "type",
-    "name": "blog_topic.reference",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_ref": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          }
-        },
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "reference"
-          }
-        },
-        "_weak": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      },
-      "dereferencesTo": "blog_topic"
-    }
-  },
-  {
-    "type": "type",
-    "name": "page_landing.reference",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_ref": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          }
-        },
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "reference"
-          }
-        },
-        "_weak": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      },
-      "dereferencesTo": "page_landing"
-    }
-  },
-  {
-    "type": "type",
-    "name": "page_postIndex.reference",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_ref": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          }
-        },
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "reference"
-          }
-        },
-        "_weak": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      },
-      "dereferencesTo": "page_postIndex"
-    }
-  },
-  {
-    "name": "link",
+    "name": "socialLinkRef",
     "type": "type",
     "value": {
       "type": "object",
@@ -2031,78 +2042,8 @@
           "type": "objectAttribute",
           "value": {
             "type": "string",
-            "value": "link"
+            "value": "socialLinkRef"
           }
-        },
-        "label": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          },
-          "optional": true
-        },
-        "accessibleLabel": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          },
-          "optional": true
-        },
-        "linkType": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "union",
-            "of": [
-              {
-                "type": "string",
-                "value": "INTERNAL"
-              },
-              {
-                "type": "string",
-                "value": "EXTERNAL"
-              }
-            ]
-          },
-          "optional": true
-        },
-        "internalReference": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "union",
-            "of": [
-              {
-                "type": "inline",
-                "name": "page_post.reference"
-              },
-              {
-                "type": "inline",
-                "name": "blog_topic.reference"
-              },
-              {
-                "type": "inline",
-                "name": "page_landing.reference"
-              },
-              {
-                "type": "inline",
-                "name": "page_postIndex.reference"
-              }
-            ]
-          },
-          "optional": true
-        },
-        "url": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          },
-          "optional": true
-        },
-        "openInNewTab": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
         },
         "platform": {
           "type": "objectAttribute",
@@ -2152,12 +2093,27 @@
             ]
           },
           "optional": true
+        },
+        "link": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "shared_link.reference"
+          },
+          "optional": true
+        },
+        "labelOverride": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
         }
       }
     }
   },
   {
-    "name": "socialLink",
+    "name": "linkRef",
     "type": "type",
     "value": {
       "type": "object",
@@ -2166,17 +2122,18 @@
           "type": "objectAttribute",
           "value": {
             "type": "string",
-            "value": "socialLink"
+            "value": "linkRef"
           }
         },
-        "platform": {
+        "link": {
           "type": "objectAttribute",
           "value": {
-            "type": "string"
+            "type": "inline",
+            "name": "shared_link.reference"
           },
           "optional": true
         },
-        "url": {
+        "labelOverride": {
           "type": "objectAttribute",
           "value": {
             "type": "string"
@@ -2596,6 +2553,203 @@
     }
   },
   {
+    "type": "type",
+    "name": "blog_topic.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "blog_topic"
+    }
+  },
+  {
+    "type": "type",
+    "name": "page_landing.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "page_landing"
+    }
+  },
+  {
+    "type": "type",
+    "name": "page_postIndex.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "page_postIndex"
+    }
+  },
+  {
+    "name": "shared_link",
+    "type": "document",
+    "attributes": {
+      "_id": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_type": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string",
+          "value": "shared_link"
+        }
+      },
+      "_createdAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_updatedAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_rev": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "title": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "label": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "linkType": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "INTERNAL"
+            },
+            {
+              "type": "string",
+              "value": "EXTERNAL"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "internalReference": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "inline",
+              "name": "page_post.reference"
+            },
+            {
+              "type": "inline",
+              "name": "blog_topic.reference"
+            },
+            {
+              "type": "inline",
+              "name": "page_landing.reference"
+            },
+            {
+              "type": "inline",
+              "name": "page_postIndex.reference"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "url": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "openInNewTab": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      }
+    }
+  },
+  {
     "name": "settings_theme",
     "type": "document",
     "attributes": {
@@ -2896,7 +3050,7 @@
             },
             "rest": {
               "type": "inline",
-              "name": "link"
+              "name": "socialLinkRef"
             }
           }
         },
@@ -2962,7 +3116,7 @@
             },
             "rest": {
               "type": "inline",
-              "name": "link"
+              "name": "linkRef"
             }
           }
         },
@@ -4664,7 +4818,7 @@
             },
             "rest": {
               "type": "inline",
-              "name": "socialLink"
+              "name": "socialLinkRef"
             }
           }
         },
@@ -5216,11 +5370,25 @@
         },
         "optional": true
       },
-      "secondaryAction": {
+      "actions": {
         "type": "objectAttribute",
         "value": {
-          "type": "inline",
-          "name": "ctaAction"
+          "type": "array",
+          "of": {
+            "type": "object",
+            "attributes": {
+              "_key": {
+                "type": "objectAttribute",
+                "value": {
+                  "type": "string"
+                }
+              }
+            },
+            "rest": {
+              "type": "inline",
+              "name": "ctaActionRef"
+            }
+          }
         },
         "optional": true
       },
@@ -5356,14 +5524,6 @@
               "value": "FIRST"
             }
           ]
-        },
-        "optional": true
-      },
-      "actions": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "actionGroup"
         },
         "optional": true
       },
@@ -5556,11 +5716,25 @@
         },
         "optional": true
       },
-      "secondaryAction": {
+      "actions": {
         "type": "objectAttribute",
         "value": {
-          "type": "inline",
-          "name": "link"
+          "type": "array",
+          "of": {
+            "type": "object",
+            "attributes": {
+              "_key": {
+                "type": "objectAttribute",
+                "value": {
+                  "type": "string"
+                }
+              }
+            },
+            "rest": {
+              "type": "inline",
+              "name": "ctaActionRef"
+            }
+          }
         },
         "optional": true
       },
