@@ -61,9 +61,12 @@ export type Module_cta = {
 export type ActionGroup = {
   _type: 'actionGroup';
   actions?: Array<
-    {
-      _key: string;
-    } & CtaAction
+    | ({
+        _key: string;
+      } & CtaAction)
+    | ({
+        _key: string;
+      } & CtaActionRef)
   >;
 };
 
@@ -124,11 +127,16 @@ export type RichText = Array<
       }>;
       style?: 'normal' | 'h2' | 'h3' | 'h4' | 'blockquote';
       listItem?: 'bullet' | 'number';
-      markDefs?: Array<{
-        href?: string;
-        _type: 'link';
-        _key: string;
-      }>;
+      markDefs?: Array<
+        | ({
+            _key: string;
+          } & SharedLinkAnnotation)
+        | {
+            href?: string;
+            _type: 'link';
+            _key: string;
+          }
+      >;
       level?: number;
       _type: 'block';
       _key: string;
@@ -228,15 +236,63 @@ export type ProseText = Array<{
   }>;
   style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote';
   listItem?: 'bullet' | 'number';
-  markDefs?: Array<{
-    href?: string;
-    _type: 'link';
-    _key: string;
-  }>;
+  markDefs?: Array<
+    | ({
+        _key: string;
+      } & SharedLinkAnnotation)
+    | {
+        href?: string;
+        _type: 'link';
+        _key: string;
+      }
+  >;
   level?: number;
   _type: 'block';
   _key: string;
 }>;
+
+export type Shared_linkReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'shared_link';
+};
+
+export type SharedLinkAnnotation = {
+  _type: 'sharedLinkAnnotation';
+  link?: Shared_linkReference;
+};
+
+export type CtaActionRef = {
+  _type: 'ctaActionRef';
+  variant?: 'PRIMARY' | 'SECONDARY';
+  appearance?: 'CONTAINED' | 'INLINE';
+  link?: Shared_linkReference;
+  labelOverride?: string;
+};
+
+export type SocialLinkRef = {
+  _type: 'socialLinkRef';
+  platform?:
+    | 'X'
+    | 'GITHUB'
+    | 'LINKEDIN'
+    | 'YOUTUBE'
+    | 'INSTAGRAM'
+    | 'MASTODON'
+    | 'BLUESKY'
+    | 'FACEBOOK'
+    | 'THREADS'
+    | 'RSS';
+  link?: Shared_linkReference;
+  labelOverride?: string;
+};
+
+export type LinkRef = {
+  _type: 'linkRef';
+  link?: Shared_linkReference;
+  labelOverride?: string;
+};
 
 export type PostTakeaways = {
   _type: 'postTakeaways';
@@ -379,6 +435,24 @@ export type MigrationState = {
   }>;
 };
 
+export type Shared_link = {
+  _id: string;
+  _type: 'shared_link';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  label?: string;
+  linkType?: 'INTERNAL' | 'EXTERNAL';
+  internalReference?:
+    | Page_postReference
+    | Blog_topicReference
+    | Page_landingReference
+    | Page_postIndexReference;
+  url?: string;
+  openInNewTab?: boolean;
+};
+
 export type Settings_theme = {
   _id: string;
   _type: 'settings_theme';
@@ -417,9 +491,12 @@ export type Settings_footer = {
   _rev: string;
   title?: string;
   social?: Array<
-    {
-      _key: string;
-    } & Link
+    | ({
+        _key: string;
+      } & Link)
+    | ({
+        _key: string;
+      } & SocialLinkRef)
   >;
 };
 
@@ -431,9 +508,12 @@ export type Settings_navigation = {
   _rev: string;
   title?: string;
   items?: Array<
-    {
-      _key: string;
-    } & Link
+    | ({
+        _key: string;
+      } & Link)
+    | ({
+        _key: string;
+      } & LinkRef)
   >;
 };
 
@@ -756,9 +836,12 @@ export type Blog_author = {
   bio?: ProseText;
   role?: string;
   socialLinks?: Array<
-    {
-      _key: string;
-    } & SocialLink
+    | ({
+        _key: string;
+      } & SocialLink)
+    | ({
+        _key: string;
+      } & SocialLinkRef)
   >;
   profilePage?: Page_landingReference;
 };
@@ -835,6 +918,11 @@ export type Module_heroBlog = {
   primaryActionLabel?: string;
   primaryActionAppearance?: 'CONTAINED' | 'INLINE';
   secondaryAction?: CtaAction;
+  secondaryLink?: Array<
+    {
+      _key: string;
+    } & CtaActionRef
+  >;
   variant?: 'SPLIT' | 'STACKED' | 'BANNER';
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   contentPositionSplit?: 'LEFT' | 'RIGHT';
@@ -865,6 +953,11 @@ export type Module_hero = {
   heroImage?: ImageWithAlt;
   primaryActionLabel?: string;
   secondaryAction?: Link;
+  secondaryLink?: Array<
+    {
+      _key: string;
+    } & LinkRef
+  >;
   layout?: HeroLayout;
 };
 
@@ -1074,6 +1167,11 @@ export type AllSanitySchemaTypes =
   | Module_postLatest
   | Module_postList
   | ProseText
+  | Shared_linkReference
+  | SharedLinkAnnotation
+  | CtaActionRef
+  | SocialLinkRef
+  | LinkRef
   | PostTakeaways
   | Brand
   | BrandTagline
@@ -1090,6 +1188,7 @@ export type AllSanitySchemaTypes =
   | HeroLayout
   | Layout
   | MigrationState
+  | Shared_link
   | Settings_theme
   | Settings_newsletter
   | Settings_footer
