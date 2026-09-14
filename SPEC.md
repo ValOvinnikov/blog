@@ -662,15 +662,27 @@ the leak where every tenant was served the first `tenants` row's config
 owns only the static document shell (`<html lang>`, the Sanity CDN
 preconnect, the dark-mode bootstrap script, `<body>`) and reads no Dynamic
 API. Theme tokens, font variables, analytics gating and the tenant's voice
-overrides all resolve in `[locale]/layout.tsx`; the two `not-found.tsx`
-boundaries that render outside that layout — `app/not-found.tsx` and
-`app/[tenant]/not-found.tsx` — resolve their own theme tokens and messages
-(neither has analytics gating or `Header`/`Footer` chrome), sharing one
-`StandaloneNotFoundPage` composition so they cannot drift. The `[tenant]`
-one exists because a segment's own `not-found.tsx` wraps only that segment's
-children, never its own layout: a `notFound()` thrown inside
-`[tenant]/[locale]/layout.tsx` is catchable only one segment up, and without
-that boundary it escaped to a 500 on every route. `i18n/request.ts`
+overrides all resolve in `[locale]/layout.tsx`. **There are three
+`not-found.tsx` boundaries, and which one catches a `notFound()` decides
+whether that route may read the request header at all.**
+`[tenant]/[locale]/not-found.tsx` catches everything thrown by that
+segment's page tree (an absent backing document, a pagination-overflow
+guard); the layout above it has already rendered, so it renders the bare
+`NotFoundPage` body and inherits that layout's `ThemeScope`,
+`NextIntlClientProvider` and `Header`/`Footer` chrome, resolving nothing
+itself. The other two render outside that layout and share one
+`StandaloneNotFoundPage` composition so they cannot drift (neither has
+analytics gating or chrome): `app/[tenant]/not-found.tsx` exists because a
+segment's own `not-found.tsx` wraps only that segment's children, never its
+own layout, so a `notFound()` thrown inside `[tenant]/[locale]/layout.tsx`
+is catchable only one segment up — without it that throw escaped to a 500 on
+every route. It passes `shouldResolveTenant: false` and renders with default
+theme tokens and base, un-voiced messages: it runs on the prerendered
+`/[tenant]/[locale]` route, so reading `x-tenant-id` there would bail the
+render out of static and — with no `pages/500.html` to fall back on — return
+a bare 500 in place of the 404 (#3191). Only the root `app/not-found.tsx`
+still resolves a tenant by header, on `/_not-found`, which is already
+dynamic and has no route param to thread. `i18n/request.ts`
 is likewise tenant-independent, returning the base locale messages only.
 This split exists because the root layout and `getRequestConfig` both sit
 above any future `[tenant]` route segment and so can never receive it as a
@@ -991,10 +1003,12 @@ hides the locale), and routes pass `params.tenant` down explicitly —
 `ITenantLocalizedParams` in `@blog/config` types the pair. The two functions
 that read the request (`getRequestTenantId`, `resolveRequestTenant`, in
 `apps/web/src/server/tenant/`) take the tenant as an argument and only touch
-`headers()` when not given one. That fallback serves Server Actions, both
-`not-found.tsx` boundaries (`app/` and `app/[tenant]/`, neither of which
-receives route params under Next's file convention), and the root-level
-`Host`-resolved routes
+`headers()` when not given one. That fallback serves Server Actions, the
+root `app/not-found.tsx` boundary (no boundary receives route params under
+Next's file convention, and this one has no layout above it to inherit a
+resolved tenant from — the other two boundaries avoid the fallback instead,
+because they run on a prerendered route where it would force a dynamic
+bailout), and the root-level `Host`-resolved routes
 (`robots.ts`/`sitemap.ts`/`rss.xml`) — none of which have route params to
 thread — and also the `account`/`bookmarks` compositions, which do sit under a
 route carrying `tenant` but deliberately leave it unthreaded: `force-dynamic`
