@@ -14,7 +14,6 @@ export function makeRawSiteSettings(
       tagline: null,
       logo: makeRawSanityImage('Logo'),
     },
-    description: 'A blog about things',
     ...overrides,
   };
 }

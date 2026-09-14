@@ -26,7 +26,6 @@ describe('getSiteSettings', () => {
   it('maps raw site settings into a domain object', async () => {
     mockRun.mockResolvedValue(
       makeRawSiteSettings({
-        description: 'Great content',
         brand: {
           name: 'Awesome Blog',
           tagline: {
@@ -40,7 +39,6 @@ describe('getSiteSettings', () => {
 
     const result = await getSiteSettings(tenant);
 
-    expect(result.description).toBe('Great content');
     expect(result.brand.name).toBe('Awesome Blog');
     expect(result.brand.tagline).toBe(
       `build 2026.07 ${BRAND_TAGLINE_SEPARATOR_CHARS.DOT} online`,

@@ -8,5 +8,4 @@ export type TBrand = {
 
 export type TSiteSettings = {
   brand: TBrand;
-  description: string;
 };
