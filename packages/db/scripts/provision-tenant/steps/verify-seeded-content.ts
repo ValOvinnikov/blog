@@ -59,6 +59,16 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
+// Mirrors `seoSchema`'s own bounds in `packages/studio` — kept here since
+// `db` cannot import that package.
+const SEO_META_TITLE_MIN_LENGTH = 30;
+const SEO_META_TITLE_MAX_LENGTH = 60;
+
+type THomePageParseFields = {
+  headingBlock: { heading?: string | null } | null;
+  seo: { metaTitle?: string | null } | null;
+} | null;
+
 /**
  * Step 6 — the last step in the sequence: asserts every external resource
  * the run claims to have created is actually real and working, rather than
@@ -112,6 +122,47 @@ export async function verifyTenantSeededContent(
   if (missingTypes.length > 0) {
     throw new Error(
       `verifyTenantSeededContent: tenant "${tenant.id}"'s dataset is missing required starter document(s): ${missingTypes.join(', ')}.`,
+    );
+  }
+
+  const homePage = await readWithGrantPropagationRetry<THomePageParseFields>(
+    () =>
+      client.fetch<THomePageParseFields>(
+        '*[_type == "page_home"][0]{ headingBlock, seo }',
+      ),
+    retryOptions,
+    (error) =>
+      new Error(
+        `verifyTenantSeededContent: tenant "${tenant.id}"'s "page_home" read failed: ${errorMessage(error)}`,
+        { cause: error },
+      ),
+  );
+
+  if (!homePage) {
+    throw new Error(
+      `verifyTenantSeededContent: tenant "${tenant.id}"'s dataset has no "page_home" document — re-run the "Seed content" step.`,
+    );
+  }
+
+  if (!homePage.headingBlock?.heading) {
+    throw new Error(
+      `verifyTenantSeededContent: tenant "${tenant.id}"'s "page_home" is missing a non-empty headingBlock.heading, which the home page's render query requires — re-run the "Seed content" step.`,
+    );
+  }
+
+  if (!homePage.seo?.metaTitle) {
+    throw new Error(
+      `verifyTenantSeededContent: tenant "${tenant.id}"'s "page_home" is missing a non-empty seo.metaTitle, which the home page's render query requires — re-run the "Seed content" step.`,
+    );
+  }
+
+  const metaTitleLength = homePage.seo.metaTitle.length;
+  if (
+    metaTitleLength < SEO_META_TITLE_MIN_LENGTH ||
+    metaTitleLength > SEO_META_TITLE_MAX_LENGTH
+  ) {
+    throw new Error(
+      `verifyTenantSeededContent: tenant "${tenant.id}"'s "page_home" has a seo.metaTitle of ${metaTitleLength} characters, outside the ${SEO_META_TITLE_MIN_LENGTH}-${SEO_META_TITLE_MAX_LENGTH} bound the SEO schema requires — re-run the "Seed content" step.`,
     );
   }
 

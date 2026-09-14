@@ -119,4 +119,67 @@ describe(buildStarterDocuments, () => {
     expect(home.title).toBeTruthy();
     expect(home.hero._ref).toBe(STARTER_DOCUMENT_IDS.HERO_BLOG);
   });
+
+  it('page_home carries a non-empty headingBlock.heading, as homePageQuery requires', () => {
+    const home = buildStarterDocuments(tenant).find(
+      (doc) => doc._id === STARTER_DOCUMENT_IDS.HOME,
+    ) as unknown as {
+      headingBlock: { _type: string; heading: string };
+    };
+
+    expect(home.headingBlock._type).toBe('headingBlock');
+    expect(home.headingBlock.heading.length).toBeGreaterThan(0);
+  });
+
+  it('page_home carries a populated seo object, as homePageQuery requires', () => {
+    const home = buildStarterDocuments(tenant).find(
+      (doc) => doc._id === STARTER_DOCUMENT_IDS.HOME,
+    ) as unknown as {
+      seo: {
+        _type: string;
+        metaTitle: string;
+        metaDescription?: string;
+        openGraph?: { _type: string; ogTitle?: string; ogDescription?: string };
+      };
+    };
+
+    expect(home.seo._type).toBe('seo');
+    expect(home.seo.metaTitle.length).toBeGreaterThanOrEqual(30);
+    expect(home.seo.metaTitle.length).toBeLessThanOrEqual(60);
+  });
+
+  it.each([
+    ['a 1-character tenant name', 'x'],
+    ['a 200-character tenant name', 'x'.repeat(200)],
+  ])(
+    'page_home.seo stays within every schema bound for %s (not derived from tenant.name)',
+    (_label, name) => {
+      const home = buildStarterDocuments({ name }).find(
+        (doc) => doc._id === STARTER_DOCUMENT_IDS.HOME,
+      ) as unknown as {
+        seo: {
+          metaTitle: string;
+          metaDescription: string;
+          openGraph: { ogTitle: string; ogDescription: string };
+        };
+      };
+
+      expect(home.seo.metaTitle.length).toBeGreaterThanOrEqual(30);
+      expect(home.seo.metaTitle.length).toBeLessThanOrEqual(60);
+      expect(home.seo.metaDescription.length).toBeLessThanOrEqual(160);
+      expect(home.seo.openGraph.ogTitle.length).toBeLessThanOrEqual(70);
+      expect(home.seo.openGraph.ogDescription.length).toBeLessThanOrEqual(200);
+    },
+  );
+
+  it('page_home.seo copy points editors at this page, not Site Settings', () => {
+    const home = buildStarterDocuments(tenant).find(
+      (doc) => doc._id === STARTER_DOCUMENT_IDS.HOME,
+    ) as unknown as {
+      seo: { metaDescription: string; openGraph: { ogDescription: string } };
+    };
+
+    expect(home.seo.metaDescription).not.toMatch(/site settings/i);
+    expect(home.seo.openGraph.ogDescription).not.toMatch(/site settings/i);
+  });
 });

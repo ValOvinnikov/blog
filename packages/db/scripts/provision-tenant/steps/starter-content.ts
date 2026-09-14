@@ -32,6 +32,15 @@ export type TSanityDocument = Record<string, unknown> & {
   _type: string;
 };
 
+// Static, not derived from `tenant.name` — the platform only validates that
+// name as `min(1)`, so a name-derived value can't be sized to satisfy
+// `seoSchema`'s bounds (`metaTitle` 30-60 chars) for every tenant.
+const HOME_SEO_META_TITLE =
+  'Welcome to your new site — built and ready to customize';
+const HOME_SEO_META_DESCRIPTION =
+  'This home page was seeded automatically during provisioning. Edit its ' +
+  'Heading Block and SEO fields on this page once you have real copy.';
+
 export function buildStarterDocuments(
   tenant: Pick<TTenant, 'name'>,
 ): TSanityDocument[] {
@@ -142,7 +151,21 @@ export function buildStarterDocuments(
     _id: STARTER_DOCUMENT_IDS.HOME,
     _type: 'page_home',
     title: 'Home',
+    headingBlock: {
+      _type: 'headingBlock',
+      heading: `Welcome to ${tenant.name}`,
+    },
     hero: { _type: 'reference', _ref: STARTER_DOCUMENT_IDS.HERO_BLOG },
+    seo: {
+      _type: 'seo',
+      metaTitle: HOME_SEO_META_TITLE,
+      metaDescription: HOME_SEO_META_DESCRIPTION,
+      openGraph: {
+        _type: 'openGraph',
+        ogTitle: HOME_SEO_META_TITLE,
+        ogDescription: HOME_SEO_META_DESCRIPTION,
+      },
+    },
   };
 
   return [
