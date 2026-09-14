@@ -13,6 +13,11 @@ export type TTenantSanityContext = {
   token: string;
 };
 
+type TCachedTenantClient = {
+  client: TSanityClient;
+  token: string;
+};
+
 const API_VERSION = '2024-01-01';
 // Next's tagged data cache is the caching layer (webhook-driven
 // revalidation). Reading through Sanity's CDN on top of it lets a
@@ -24,10 +29,24 @@ const USE_CDN = false;
 // sized for "tens of tenants" per the multi-tenant design's target scale,
 // not meant to hold every tenant that has ever existed.
 const MAX_CACHED_TENANT_CLIENTS = 20;
-const tenantClients = new Map<string, TSanityClient>();
+const tenantClients = new Map<string, TCachedTenantClient>();
 
 function tenantClientKey(tenant: TTenantSanityContext): string {
   return `${tenant.projectId}:${tenant.dataset}`;
+}
+
+function buildTenantClient(tenant: TTenantSanityContext): TCachedTenantClient {
+  return {
+    client: createClient({
+      projectId: tenant.projectId,
+      dataset: tenant.dataset,
+      apiVersion: API_VERSION,
+      useCdn: USE_CDN,
+      token: tenant.token,
+      perspective: 'published',
+    }),
+    token: tenant.token,
+  };
 }
 
 /**
@@ -35,35 +54,27 @@ function tenantClientKey(tenant: TTenantSanityContext): string {
  * project/dataset/token. There is no no-arg form — every caller states
  * which project it means to read, the platform's own included (via
  * `getPlatformSanityContext()`), so omitting one is a compile error rather
- * than a silent fallback.
+ * than a silent fallback. A rotated token for an already-cached
+ * project/dataset rebuilds that entry instead of serving the stale client.
  */
 export function getClient(tenant: TTenantSanityContext): TSanityClient {
   const key = tenantClientKey(tenant);
   const cached = tenantClients.get(key);
-  if (cached) {
-    // Re-inserting moves the key to the Map's end — the LRU's
-    // most-recently-used position — without creating a new client.
-    tenantClients.delete(key);
-    tenantClients.set(key, cached);
-    return cached;
-  }
+  const entry =
+    cached && cached.token === tenant.token
+      ? cached
+      : buildTenantClient(tenant);
 
-  const client = createClient({
-    projectId: tenant.projectId,
-    dataset: tenant.dataset,
-    apiVersion: API_VERSION,
-    useCdn: USE_CDN,
-    token: tenant.token,
-    perspective: 'published',
-  });
-
-  tenantClients.set(key, client);
+  // Re-inserting moves the key to the Map's end — the LRU's
+  // most-recently-used position.
+  tenantClients.delete(key);
+  tenantClients.set(key, entry);
   if (tenantClients.size > MAX_CACHED_TENANT_CLIENTS) {
     const oldestKey = tenantClients.keys().next().value;
     if (oldestKey !== undefined) tenantClients.delete(oldestKey);
   }
 
-  return client;
+  return entry.client;
 }
 
 /**
