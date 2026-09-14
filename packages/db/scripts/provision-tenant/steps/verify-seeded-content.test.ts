@@ -65,6 +65,11 @@ const baseCredentials = {
   provisioningStatus: 'PROVISIONING' as const,
 };
 
+const VALID_HOME_PAGE = {
+  headingBlock: { heading: 'Welcome to Acme' },
+  seo: { metaTitle: 'Welcome to Acme — starter site' },
+};
+
 function createClientStub(fetch: ReturnType<typeof vi.fn>) {
   const client = { fetch };
   return {
@@ -77,8 +82,19 @@ function createClientStub(fetch: ReturnType<typeof vi.fn>) {
   };
 }
 
-function createClientStubResolving(foundTypes: string[]) {
-  return createClientStub(vi.fn().mockResolvedValue(foundTypes));
+function createClientStubResolving(
+  foundTypes: string[],
+  homePage: unknown = VALID_HOME_PAGE,
+) {
+  return createClientStub(
+    vi
+      .fn()
+      .mockImplementation((query: string) =>
+        query.includes('_type in $types')
+          ? Promise.resolve(foundTypes)
+          : Promise.resolve(homePage),
+      ),
+  );
 }
 
 function grantError(): ClientError {
@@ -142,6 +158,9 @@ describe(verifyTenantSeededContent, () => {
     expect(fetch).toHaveBeenCalledWith('*[_type in $types]._type', {
       types: ['settings_site', 'settings_navigation', 'settings_footer'],
     });
+    expect(fetch).toHaveBeenCalledWith(
+      '*[_type == "page_home"][0]{ headingBlock, seo }',
+    );
     expect(createClient).toHaveBeenCalledWith(
       expect.objectContaining({
         projectId: 'proj123',
@@ -185,6 +204,73 @@ describe(verifyTenantSeededContent, () => {
     );
   });
 
+  it('fails the run when the dataset has no page_home document', async () => {
+    const tenant = baseTenant();
+    const { createClient } = createClientStubResolving(
+      ['settings_site', 'settings_navigation', 'settings_footer'],
+      null,
+    );
+
+    await expect(
+      verifyTenantSeededContent(tenant, env, baseDeps({ createClient })),
+    ).rejects.toThrow(/dataset has no "page_home" document/);
+  });
+
+  it('fails the run when the seeded page_home has no headingBlock.heading', async () => {
+    const tenant = baseTenant();
+    const { createClient } = createClientStubResolving(
+      ['settings_site', 'settings_navigation', 'settings_footer'],
+      { headingBlock: null, seo: VALID_HOME_PAGE.seo },
+    );
+
+    await expect(
+      verifyTenantSeededContent(tenant, env, baseDeps({ createClient })),
+    ).rejects.toThrow(/missing a non-empty headingBlock\.heading/);
+  });
+
+  it('fails the run when the seeded page_home has no seo.metaTitle', async () => {
+    const tenant = baseTenant();
+    const { createClient } = createClientStubResolving(
+      ['settings_site', 'settings_navigation', 'settings_footer'],
+      { headingBlock: VALID_HOME_PAGE.headingBlock, seo: null },
+    );
+
+    await expect(
+      verifyTenantSeededContent(tenant, env, baseDeps({ createClient })),
+    ).rejects.toThrow(/missing a non-empty seo\.metaTitle/);
+  });
+
+  it('fails the run when the seeded page_home has a seo.metaTitle shorter than the 30 character schema minimum', async () => {
+    const tenant = baseTenant();
+    const { createClient } = createClientStubResolving(
+      ['settings_site', 'settings_navigation', 'settings_footer'],
+      { headingBlock: VALID_HOME_PAGE.headingBlock, seo: { metaTitle: 'x' } },
+    );
+
+    await expect(
+      verifyTenantSeededContent(tenant, env, baseDeps({ createClient })),
+    ).rejects.toThrow(
+      /has a seo\.metaTitle of 1 characters, outside the 30-60 bound/,
+    );
+  });
+
+  it('fails the run when the seeded page_home has a seo.metaTitle longer than the 60 character schema maximum', async () => {
+    const tenant = baseTenant();
+    const { createClient } = createClientStubResolving(
+      ['settings_site', 'settings_navigation', 'settings_footer'],
+      {
+        headingBlock: VALID_HOME_PAGE.headingBlock,
+        seo: { metaTitle: 'x'.repeat(61) },
+      },
+    );
+
+    await expect(
+      verifyTenantSeededContent(tenant, env, baseDeps({ createClient })),
+    ).rejects.toThrow(
+      /has a seo\.metaTitle of 61 characters, outside the 30-60 bound/,
+    );
+  });
+
   it('throws when the tenant has no persisted Sanity read token yet', async () => {
     const tenant = baseTenant();
     getTenantSanityCredentialsMock.mockResolvedValue(undefined);
@@ -205,7 +291,8 @@ describe(verifyTenantSeededContent, () => {
         'settings_site',
         'settings_navigation',
         'settings_footer',
-      ]);
+      ])
+      .mockResolvedValueOnce(VALID_HOME_PAGE);
     const { createClient } = createClientStub(fetch);
     const sleep = vi.fn().mockResolvedValue(undefined);
 
@@ -215,7 +302,7 @@ describe(verifyTenantSeededContent, () => {
       baseDeps({ createClient, sleep }),
     );
 
-    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(fetch).toHaveBeenCalledTimes(3);
     expect(sleep).toHaveBeenCalledTimes(1);
   });
 
