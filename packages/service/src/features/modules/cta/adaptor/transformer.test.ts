@@ -221,7 +221,7 @@ describe('toCtaModule', () => {
 
     expect(cta.content?.[0]?.markDefs?.[0]).toMatchObject({
       _key: 'mark-1',
-      _type: 'link',
+      _type: 'inlineLink',
       url: '/blog/hello-world',
     });
   });
