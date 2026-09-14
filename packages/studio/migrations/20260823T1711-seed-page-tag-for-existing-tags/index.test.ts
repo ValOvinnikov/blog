@@ -4,12 +4,23 @@ import {
   SEO_META_TITLE_MAX_LENGTH,
   SEO_META_TITLE_MIN_LENGTH,
 } from '@blog/studio/schema-types/objects/seo/seo';
-import { assertSatisfiesRequiredFields } from '@blog/studio/testing/assert-satisfies-required-fields';
+import {
+  assertSatisfiesRequiredFields,
+  type TExemptField,
+} from '@blog/studio/testing/assert-satisfies-required-fields';
 import { createIfNotExists } from 'sanity/migrate';
 
 import { toPageTagId, toTagPostListId } from './id';
 
 import migration, { buildTagMetaTitle } from './index';
+
+const HEADING_BLOCK_EXEMPTION: TExemptField[] = [
+  {
+    name: 'headingBlock',
+    reason:
+      'headingBlock became required after this migration was already applied; the later backfill-missing-heading-block-heading migration closes the gap on existing documents',
+  },
+];
 
 const baseDoc = {
   _createdAt: '2026-01-01T00:00:00Z',
@@ -49,8 +60,16 @@ describe('seed-page-tag-for-existing-tags migration', () => {
       seo: { _type: 'seo', metaTitle: buildTagMetaTitle('React') },
     };
 
-    assertSatisfiesRequiredFields(postListSchema, postListPayload);
-    assertSatisfiesRequiredFields(tagPageSchema, pageTagPayload);
+    assertSatisfiesRequiredFields(
+      postListSchema,
+      postListPayload,
+      HEADING_BLOCK_EXEMPTION,
+    );
+    assertSatisfiesRequiredFields(
+      tagPageSchema,
+      pageTagPayload,
+      HEADING_BLOCK_EXEMPTION,
+    );
 
     expect(migration.migrate.document(tagDoc)).toEqual([
       createIfNotExists(postListPayload),
@@ -93,7 +112,11 @@ describe('seed-page-tag-for-existing-tags migration', () => {
       seo: { _type: 'seo', metaTitle: buildTagMetaTitle('TypeScript') },
     };
 
-    assertSatisfiesRequiredFields(tagPageSchema, pageTagPayload);
+    assertSatisfiesRequiredFields(
+      tagPageSchema,
+      pageTagPayload,
+      HEADING_BLOCK_EXEMPTION,
+    );
 
     expect(pageTagMutation).toEqual(createIfNotExists(pageTagPayload));
   });

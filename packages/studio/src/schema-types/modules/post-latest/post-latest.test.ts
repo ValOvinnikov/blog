@@ -1,7 +1,6 @@
 import { DISPLAY_MODE } from '@blog/config/constants';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import {
-  getCustomValidator,
   getRecordedValidators,
   type TRecordedValidator,
 } from '@blog/studio/testing/create-mock-validation-rule';
@@ -38,13 +37,25 @@ describe('postLatestSchema showImages field', () => {
 });
 
 describe('postLatestSchema headingBlock field', () => {
-  it('blocks publish on an empty heading', () => {
-    const customFn = getCustomValidator<
-      (value: { heading?: string } | undefined) => string | true
-    >(getField('headingBlock'));
+  it('is required at the field level', () => {
+    const field = getField('headingBlock');
 
-    expect(customFn(undefined)).toBe('Heading is required.');
-    expect(customFn({ heading: 'Latest posts' })).toBe(true);
+    if (typeof field.validation !== 'function') {
+      throw new Error('Expected headingBlock field to define validation.');
+    }
+
+    let requiredCalled = false;
+    const rule = {
+      required: () => {
+        requiredCalled = true;
+        return rule;
+      },
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (field.validation as any)(rule);
+
+    expect(requiredCalled).toBe(true);
   });
 });
 

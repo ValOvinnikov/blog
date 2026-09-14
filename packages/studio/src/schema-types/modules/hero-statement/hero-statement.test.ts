@@ -53,11 +53,25 @@ describe('heroStatementSchema headingBlock field', () => {
     expect(field.type).toBe('headingBlock');
   });
 
-  it('is required with the default headingBlockField message', () => {
-    const validate = getFieldCustomValidator(getField('headingBlock'));
+  it('is required at the field level', () => {
+    const field = getField('headingBlock');
 
-    expect(validate(undefined, {})).toBe('Heading is required.');
-    expect(validate({ heading: 'We build things.' }, {})).toBe(true);
+    if (typeof field.validation !== 'function') {
+      throw new Error('Expected headingBlock field to define validation.');
+    }
+
+    let requiredCalled = false;
+    const rule = {
+      required: () => {
+        requiredCalled = true;
+        return rule;
+      },
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (field.validation as any)(rule);
+
+    expect(requiredCalled).toBe(true);
   });
 });
 

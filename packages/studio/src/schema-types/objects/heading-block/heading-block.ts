@@ -12,6 +12,7 @@ export const headingBlockSchema = defineType({
       title: 'Heading',
       type: 'string',
       description: 'The heading text shown to readers.',
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'supportingText',

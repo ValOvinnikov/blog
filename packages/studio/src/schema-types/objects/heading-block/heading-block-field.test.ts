@@ -1,11 +1,23 @@
-import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
-
 import { headingBlockField } from './heading-block-field';
 
-type TCustomFn = (
-  value: { heading?: string } | undefined,
-  context: { parent?: unknown },
-) => string | true;
+const wasRequiredCalled = (field: { validation?: unknown }) => {
+  if (!field.validation) {
+    throw new Error('Expected field to define validation.');
+  }
+
+  let requiredCalled = false;
+  const rule = {
+    required: () => {
+      requiredCalled = true;
+      return rule;
+    },
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+  (field.validation as any)(rule);
+
+  return requiredCalled;
+};
 
 describe('headingBlockField', () => {
   it('defaults to the shared headingBlock object type', () => {
@@ -22,11 +34,7 @@ describe('headingBlockField', () => {
     );
   });
 
-  it('blocks publish on an empty heading, with a default message', () => {
-    const validate = getCustomValidator<TCustomFn>(headingBlockField());
-
-    expect(validate(undefined, {})).toBe('Heading is required.');
-    expect(validate({ heading: '' }, {})).toBe('Heading is required.');
-    expect(validate({ heading: 'Latest posts' }, {})).toBe(true);
+  it('is required, so the headingBlock object itself must be present', () => {
+    expect(wasRequiredCalled(headingBlockField())).toBe(true);
   });
 });

@@ -24,6 +24,18 @@ type TSchemaWithFields = {
   fields?: readonly TValidatableField[];
 };
 
+/**
+ * A field a migration is deliberately allowed to omit, with the reason a
+ * required reader — not just the author — needs: typically that the field
+ * became required after this migration was already applied, so its own
+ * historical output can never satisfy today's schema and a later migration
+ * is what closes the gap.
+ */
+export type TExemptField = {
+  name: string;
+  reason: string;
+};
+
 const createTrackingRule = (): { rule: never; wasRequired: () => boolean } => {
   let required = false;
 
@@ -59,15 +71,21 @@ const getRequiredFieldNames = (schemaType: TSchemaWithFields): string[] =>
 
 /**
  * Asserts `payload` sets every field `schemaType` marks required (a
- * `validation` chain that calls `.required()`). Throws, naming the missing
- * field(s), if any are absent or explicitly `undefined`.
+ * `validation` chain that calls `.required()`), skipping any field named in
+ * `exemptFields` — each entry must carry a `reason` so an exemption reads as
+ * a deliberate, explained decision rather than a suppressed failure. Throws,
+ * naming the missing field(s), if any non-exempt one is absent or explicitly
+ * `undefined`.
  */
 export const assertSatisfiesRequiredFields = (
   schemaType: TSchemaWithFields,
   payload: Record<string, unknown>,
+  exemptFields: TExemptField[] = [],
 ): void => {
+  const exemptNames = new Set(exemptFields.map((exempt) => exempt.name));
+
   const missing = getRequiredFieldNames(schemaType).filter(
-    (name) => payload[name] === undefined,
+    (name) => !exemptNames.has(name) && payload[name] === undefined,
   );
 
   if (missing.length > 0) {

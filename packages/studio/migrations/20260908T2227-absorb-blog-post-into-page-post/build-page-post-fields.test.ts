@@ -1,11 +1,22 @@
 import { postPageSchema } from '@blog/studio/schema-types/documents/pages/post/post';
-import { assertSatisfiesRequiredFields } from '@blog/studio/testing/assert-satisfies-required-fields';
+import {
+  assertSatisfiesRequiredFields,
+  type TExemptField,
+} from '@blog/studio/testing/assert-satisfies-required-fields';
 
 import {
   buildPagePostFields,
   type TBlogPostDoc,
 } from './build-page-post-fields';
 import { SHARED_MODULE_IDS } from './shared-modules';
+
+const HEADING_BLOCK_EXEMPTION: TExemptField[] = [
+  {
+    name: 'headingBlock',
+    reason:
+      'headingBlock became required after this migration was already applied — it still writes the pre-rename sectionHeader field — and the later backfill-missing-heading-block-heading migration closes the gap on existing documents',
+  },
+];
 
 const basePost: TBlogPostDoc = {
   _id: 'post-1',
@@ -124,11 +135,15 @@ describe('buildPagePostFields — no existing page_post (production shape)', () 
   it('produces a payload satisfying every field page_post requires', () => {
     const fields = buildPagePostFields(basePost, undefined, new Map());
 
-    assertSatisfiesRequiredFields(postPageSchema, {
-      _id: 'page_post-post-1',
-      _type: 'page_post',
-      ...fields,
-    });
+    assertSatisfiesRequiredFields(
+      postPageSchema,
+      {
+        _id: 'page_post-post-1',
+        _type: 'page_post',
+        ...fields,
+      },
+      HEADING_BLOCK_EXEMPTION,
+    );
   });
 });
 

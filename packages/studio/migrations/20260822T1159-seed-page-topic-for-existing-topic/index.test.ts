@@ -4,12 +4,23 @@ import {
   SEO_META_TITLE_MAX_LENGTH,
   SEO_META_TITLE_MIN_LENGTH,
 } from '@blog/studio/schema-types/objects/seo/seo';
-import { assertSatisfiesRequiredFields } from '@blog/studio/testing/assert-satisfies-required-fields';
+import {
+  assertSatisfiesRequiredFields,
+  type TExemptField,
+} from '@blog/studio/testing/assert-satisfies-required-fields';
 import { createIfNotExists } from 'sanity/migrate';
 
 import { toPageTopicId, toTopicPostListId } from './id';
 
 import migration, { buildTopicMetaTitle } from './index';
+
+const HEADING_BLOCK_EXEMPTION: TExemptField[] = [
+  {
+    name: 'headingBlock',
+    reason:
+      'headingBlock became required after this migration was already applied; the later backfill-missing-heading-block-heading migration closes the gap on existing documents',
+  },
+];
 
 const baseDoc = {
   _createdAt: '2026-01-01T00:00:00Z',
@@ -49,8 +60,16 @@ describe('seed-page-topic-for-existing-topic migration', () => {
       seo: { _type: 'seo', metaTitle: buildTopicMetaTitle('React') },
     };
 
-    assertSatisfiesRequiredFields(postListSchema, postListPayload);
-    assertSatisfiesRequiredFields(topicPageSchema, pageTopicPayload);
+    assertSatisfiesRequiredFields(
+      postListSchema,
+      postListPayload,
+      HEADING_BLOCK_EXEMPTION,
+    );
+    assertSatisfiesRequiredFields(
+      topicPageSchema,
+      pageTopicPayload,
+      HEADING_BLOCK_EXEMPTION,
+    );
 
     expect(migration.migrate.document(topicDoc)).toEqual([
       createIfNotExists(postListPayload),
@@ -93,7 +112,11 @@ describe('seed-page-topic-for-existing-topic migration', () => {
       seo: { _type: 'seo', metaTitle: buildTopicMetaTitle('TypeScript') },
     };
 
-    assertSatisfiesRequiredFields(topicPageSchema, pageTopicPayload);
+    assertSatisfiesRequiredFields(
+      topicPageSchema,
+      pageTopicPayload,
+      HEADING_BLOCK_EXEMPTION,
+    );
 
     expect(pageTopicMutation).toEqual(createIfNotExists(pageTopicPayload));
   });
