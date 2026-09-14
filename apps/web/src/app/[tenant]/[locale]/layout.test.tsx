@@ -191,16 +191,6 @@ describe('LocaleLayout', () => {
     );
   });
 
-  describe('localeLayoutVariants', () => {
-    it('keeps the content slot a flex column container that grows to fill its parent', () => {
-      const contentClassName = localeLayoutVariants().content();
-
-      expect(contentClassName).toContain('flex-1');
-      expect(contentClassName).toContain('flex-col');
-      expect(contentClassName).toMatch(/(^|\s)flex(\s|$)/);
-    });
-  });
-
   describe('generateStaticParams', () => {
     it('returns params for every supported locale', () => {
       expect(generateStaticParams()).toEqual([{ locale: LOCALE_ISO_CODES.EN }]);
@@ -625,5 +615,15 @@ describe('LocaleLayout', () => {
         rememberRequestTenantIdMock.mock.invocationCallOrder[0],
       ).toBeLessThan(vi.mocked(notFound).mock.invocationCallOrder[0]!);
     });
+  });
+});
+
+describe(localeLayoutVariants, () => {
+  it('keeps the content slot a flex column container that grows to fill its parent', () => {
+    const contentClassName = localeLayoutVariants().content();
+
+    expect(contentClassName).toContain('flex-1');
+    expect(contentClassName).toContain('flex-col');
+    expect(contentClassName).toMatch(/(^|\s)flex(\s|$)/);
   });
 });
