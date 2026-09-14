@@ -32,6 +32,7 @@ type TCachedDocumentType =
   | 'blog_author'
   | 'blog_topic'
   | 'blog_tag'
+  | 'shared_link'
   | 'settings_site'
   | 'settings_navigation'
   | 'settings_footer'
@@ -58,6 +59,7 @@ const REVALIDATE_TAGS = {
   blog_author: ['author', 'posts'],
   blog_topic: ['topic', 'topics', 'posts'],
   blog_tag: ['tag', 'tags', 'posts'],
+  shared_link: ['shared_link'],
   settings_site: ['site-settings'],
   settings_navigation: ['navigation'],
   settings_footer: ['footer'],

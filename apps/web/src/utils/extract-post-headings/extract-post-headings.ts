@@ -1,4 +1,4 @@
-import type { TPortableTextBody } from '@blog/config';
+import type { TPortableTextBody } from '@blog/service';
 
 /** A post needs at least this many H2 headings before a table-of-contents rail earns its place. */
 export const MIN_H2_HEADINGS_FOR_RAIL = 3;

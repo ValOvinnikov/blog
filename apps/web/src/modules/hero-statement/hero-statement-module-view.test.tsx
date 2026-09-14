@@ -20,7 +20,6 @@ const primaryAction = {
     href: '/get-started',
     target: undefined,
     platform: undefined,
-    ariaLabel: undefined,
   },
 };
 
@@ -32,7 +31,6 @@ const secondaryAction = {
     href: '/about-us',
     target: undefined,
     platform: undefined,
-    ariaLabel: undefined,
   },
 };
 
@@ -103,14 +101,33 @@ describe(`<${HeroStatementModuleView.name}/>`, () => {
   it('reverses the non-primary action for legibility on a Banner over an image', () => {
     setup({ variant: HERO_VARIANT.BANNER, actions: [secondaryAction] });
 
-    const link = screen.getByRole('link', { name: 'Learn more' });
+    const link = screen.getByRole('link', {
+      name: 'Learn more: Build faster, ship sooner',
+    });
     expect(link.className).toContain('border-white/55');
   });
 
   it('does not reverse the non-primary action on Split or Stacked', () => {
     setup({ variant: HERO_VARIANT.SPLIT, actions: [secondaryAction] });
 
-    const link = screen.getByRole('link', { name: 'Learn more' });
+    const link = screen.getByRole('link', {
+      name: 'Learn more: Build faster, ship sooner',
+    });
     expect(link.className).not.toContain('border-white/55');
+  });
+
+  it("suffixes each action's accessible name with the module heading, so identically labelled shared_link actions in different modules stay distinguishable", () => {
+    setup({ actions: [primaryAction, secondaryAction] });
+
+    expect(
+      screen.getByRole('link', {
+        name: 'Get started: Build faster, ship sooner',
+      }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('link', {
+        name: 'Learn more: Build faster, ship sooner',
+      }),
+    ).toBeVisible();
   });
 });

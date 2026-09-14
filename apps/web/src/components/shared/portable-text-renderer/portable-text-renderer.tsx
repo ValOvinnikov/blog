@@ -4,8 +4,8 @@ import {
   type Code,
   type IBodyImageBlock,
   type TAsideKind,
-  type TPortableTextBody,
 } from '@blog/config';
+import type { TPortableTextBody, TSharedLinkAnnotation } from '@blog/service';
 import { Heading } from '@blog/ui/atoms/heading';
 import { InlineCode } from '@blog/ui/atoms/inline-code';
 import { Prose } from '@blog/ui/atoms/prose';
@@ -158,6 +158,17 @@ export const PortableTextRenderer = ({
       }: PortableTextMarkComponentProps<ILinkAnnotation>) =>
         annotation?.href ? (
           <ProseLink as={SmartLink} href={annotation.href}>
+            {children}
+          </ProseLink>
+        ) : (
+          <>{children}</>
+        ),
+      sharedLinkAnnotation: ({
+        children,
+        value: annotation,
+      }: PortableTextMarkComponentProps<TSharedLinkAnnotation>) =>
+        annotation?.link?.href ? (
+          <ProseLink as={SmartLink} href={annotation.link.href}>
             {children}
           </ProseLink>
         ) : (

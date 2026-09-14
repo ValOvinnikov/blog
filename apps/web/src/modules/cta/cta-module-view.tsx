@@ -5,6 +5,7 @@ import { ActionGroup } from '@web/components/shared/action-group';
 import { InlineTextRenderer } from '@web/components/shared/inline-text-renderer';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { Section } from '@web/components/shared/section';
+import { toActionGroupAction } from '@web/utils/to-action-group-action';
 
 export interface ICtaModuleViewProps extends TCtaModule {
   id: string;
@@ -63,7 +64,9 @@ export const CtaModuleView = ({
         actions={
           actions.length > 0 ? (
             <ActionGroup
-              actions={actions}
+              actions={actions.map((action) =>
+                toActionGroupAction(action, heading),
+              )}
               isOnDark={variant === CTA_VARIANT.BANNER}
             />
           ) : undefined

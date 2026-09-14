@@ -21,25 +21,25 @@ const VOICE_VALUE: TVoicePortableText = [
 ];
 
 describe(voicePortableTextToInlineText, () => {
-  it("renames a link markDef's href to url, leaving other fields untouched", () => {
+  it('strips markDefs and the link mark key, leaving the span text untouched', () => {
     const result = voicePortableTextToInlineText(VOICE_VALUE);
 
-    expect(result[0]?.markDefs).toEqual([
-      { _key: 'link-1', _type: 'link', url: 'https://example.com/docs' },
+    expect(result[0]?.markDefs).toBeUndefined();
+    expect(result[0]?.children).toEqual([
+      { _type: 'span', _key: 's1', text: 'Read the ', marks: [] },
+      { _type: 'span', _key: 's2', text: 'docs', marks: [] },
+      { _type: 'span', _key: 's3', text: ' for more.', marks: [] },
     ]);
-    expect(result[0]?.children).toEqual(VOICE_VALUE[0]?.children);
   });
 
-  it('produces a value InlineTextRenderer renders as a working anchor', () => {
+  it('produces a value InlineTextRenderer renders as plain text, not a dead anchor', () => {
     const setup = customRender(InlineTextRenderer, {
       value: voicePortableTextToInlineText(VOICE_VALUE),
     });
 
     setup();
 
-    expect(screen.getByRole('link', { name: 'docs' })).toHaveAttribute(
-      'href',
-      'https://example.com/docs',
-    );
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(screen.getByText('Read the docs for more.')).toBeVisible();
   });
 });

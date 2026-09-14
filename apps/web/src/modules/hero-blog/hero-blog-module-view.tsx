@@ -23,7 +23,6 @@ const toActionGroupAction = (
     href: action.href,
     target: action.target,
     platform: action.platform,
-    ariaLabel: undefined,
   },
   variant: CTA_ACTION_VARIANT.PRIMARY,
   appearance: action.appearance,

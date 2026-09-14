@@ -44,9 +44,9 @@ export const toIsReversedOnDark = (
 
 /**
  * Renders a list of link-shaped actions in authored order, mapping each
- * item's variant/appearance to a `Button` style, forwarding `ariaLabel` for
- * a distinguishing accessible name, and rendering an optional
- * `hiddenLabelSuffix` as real (sr-only) text inside that accessible name.
+ * item's variant/appearance to a `Button` style and rendering an optional
+ * `hiddenLabelSuffix` as real (sr-only) text appended to the visible label —
+ * the only way a short button earns a fuller accessible name.
  */
 export const ActionGroup = ({ actions, isOnDark }: IActionGroupProps) => (
   <>
@@ -59,7 +59,6 @@ export const ActionGroup = ({ actions, isOnDark }: IActionGroupProps) => (
           as={SmartLink}
           href={action.link.href}
           target={action.link.target}
-          aria-label={action.link.ariaLabel}
           variant={variant}
           className={actionGroupVariants({
             isOnDark: toIsReversedOnDark(isOnDark, variant),

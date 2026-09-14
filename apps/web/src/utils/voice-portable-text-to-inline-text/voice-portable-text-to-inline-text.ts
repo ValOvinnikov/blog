@@ -1,18 +1,28 @@
-import type { InlineText, TVoicePortableText } from '@blog/config';
+import type { TVoicePortableText } from '@blog/config';
+import type { TCtaContent } from '@blog/service';
 
 /**
- * Adapts a Voice rich-text value for `InlineTextRenderer` by renaming each
- * link markDef's `href` (the field Voice stores) to `url` (the field
- * `InlineTextRenderer`'s link handler reads) — the two names otherwise leave
- * a voice link type-checking but rendering as plain text.
+ * Adapts a Voice rich-text value for `InlineTextRenderer`. Voice stores an
+ * inline link as a raw `href`, with no way to reference a `shared_link`
+ * library document — and `inlineText` (CTA copy) now resolves only the
+ * library's `sharedLinkAnnotation` mark — so a Voice-authored link has
+ * nothing to resolve to and is stripped to its plain text instead of
+ * rendering a dead anchor.
  */
 export const voicePortableTextToInlineText = (
   value: TVoicePortableText,
-): InlineText =>
-  value.map((block) => ({
-    ...block,
-    markDefs: block.markDefs?.map(({ href, ...markDef }) => ({
-      ...markDef,
-      url: href,
-    })),
-  }));
+): TCtaContent =>
+  value.map((block) => {
+    const linkKeys = new Set(
+      (block.markDefs ?? []).map((markDef) => markDef._key),
+    );
+
+    return {
+      ...block,
+      children: block.children.map((span) => ({
+        ...span,
+        marks: span.marks?.filter((mark) => !linkKeys.has(mark)),
+      })),
+      markDefs: undefined,
+    };
+  });

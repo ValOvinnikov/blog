@@ -130,7 +130,6 @@ describe(`<${HeroBlogModuleView.name}/>`, () => {
           href: '/blog',
           target: undefined,
           platform: undefined,
-          ariaLabel: undefined,
         },
       },
     });
@@ -165,7 +164,6 @@ describe(`<${HeroBlogModuleView.name}/>`, () => {
           href: '/blog',
           target: undefined,
           platform: undefined,
-          ariaLabel: undefined,
         },
       },
     });
@@ -185,7 +183,6 @@ describe(`<${HeroBlogModuleView.name}/>`, () => {
           href: '/blog',
           target: undefined,
           platform: undefined,
-          ariaLabel: undefined,
         },
       },
     });

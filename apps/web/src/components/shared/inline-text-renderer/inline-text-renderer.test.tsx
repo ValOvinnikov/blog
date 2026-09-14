@@ -1,9 +1,9 @@
-import type { InlineText } from '@blog/config';
+import type { TCtaContent } from '@blog/service';
 import { customRender, screen } from '@web/testing/custom-render';
 
 import { InlineTextRenderer } from './inline-text-renderer';
 
-const value: InlineText = [
+const value: TCtaContent = [
   {
     _type: 'block',
     _key: 'b1',
@@ -15,6 +15,7 @@ const value: InlineText = [
       { _type: 'span', _key: 's4', text: 'italic', marks: ['em'] },
       { _type: 'span', _key: 's5', text: ' text.' },
     ],
+    markDefs: undefined,
   },
   {
     _type: 'block',
@@ -22,6 +23,7 @@ const value: InlineText = [
     style: 'normal',
     listItem: 'bullet',
     children: [{ _type: 'span', _key: 's6', text: 'First bullet' }],
+    markDefs: undefined,
   },
   {
     _type: 'block',
@@ -29,6 +31,7 @@ const value: InlineText = [
     style: 'normal',
     listItem: 'bullet',
     children: [{ _type: 'span', _key: 's7', text: 'Second bullet' }],
+    markDefs: undefined,
   },
   {
     _type: 'block',
@@ -42,10 +45,13 @@ const value: InlineText = [
     markDefs: [
       {
         _key: 'link-1',
-        _type: 'link',
-        label: 'link',
-        linkType: 'EXTERNAL',
-        url: 'https://example.com',
+        _type: 'sharedLinkAnnotation',
+        link: {
+          label: 'link',
+          href: 'https://example.com',
+          target: undefined,
+          platform: undefined,
+        },
       },
     ],
   },
@@ -69,7 +75,7 @@ describe(`<${InlineTextRenderer.name}/>`, () => {
     expect(screen.getAllByRole('listitem')).toHaveLength(2);
   });
 
-  it("routes an EXTERNAL link annotation's href through the rendered link", () => {
+  it("routes a sharedLinkAnnotation mark's resolved href through the rendered link", () => {
     setup();
 
     expect(screen.getByRole('link', { name: 'link' })).toHaveAttribute(
@@ -78,7 +84,7 @@ describe(`<${InlineTextRenderer.name}/>`, () => {
     );
   });
 
-  it('renders an unresolved (internal) link annotation as plain text, not a broken anchor', () => {
+  it('renders a sharedLinkAnnotation mark with no resolved link as plain text, not a broken anchor', () => {
     setup({
       value: [
         {
@@ -86,21 +92,16 @@ describe(`<${InlineTextRenderer.name}/>`, () => {
           _key: 'b5',
           style: 'normal',
           children: [
-            { _type: 'span', _key: 's11', text: 'internal', marks: ['link-2'] },
+            { _type: 'span', _key: 's11', text: 'dangling', marks: ['link-2'] },
           ],
           markDefs: [
-            {
-              _key: 'link-2',
-              _type: 'link',
-              label: 'internal',
-              linkType: 'INTERNAL',
-            },
+            { _key: 'link-2', _type: 'sharedLinkAnnotation', link: undefined },
           ],
         },
       ],
     });
 
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
-    expect(screen.getByText('internal')).toBeVisible();
+    expect(screen.getByText('dangling')).toBeVisible();
   });
 });

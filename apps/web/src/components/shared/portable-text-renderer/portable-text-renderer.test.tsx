@@ -1,4 +1,5 @@
-import { ASIDE_KIND, type TPortableTextBody } from '@blog/config';
+import { ASIDE_KIND } from '@blog/config';
+import type { TPortableTextBody } from '@blog/service';
 import {
   customRender,
   renderElement,
@@ -155,6 +156,53 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
 
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
     expect(screen.getByText('incomplete link')).toBeVisible();
+  });
+
+  it('renders a sharedLinkAnnotation mark as a link', () => {
+    const value: TPortableTextBody = [
+      richTextBlock(
+        'normal',
+        [richTextSpan('a library link', ['shared-link-1'])],
+        [
+          {
+            _type: 'sharedLinkAnnotation',
+            _key: 'shared-link-1',
+            link: {
+              label: 'a library link',
+              href: 'https://example.com',
+              target: undefined,
+              platform: undefined,
+            },
+          },
+        ],
+      ),
+    ];
+
+    setup({ value });
+
+    const link = screen.getByRole('link', { name: 'a library link' });
+    expect(link).toHaveAttribute('href', 'https://example.com');
+  });
+
+  it('renders a sharedLinkAnnotation mark with no resolved link as plain text, not a dead link', () => {
+    const value: TPortableTextBody = [
+      richTextBlock(
+        'normal',
+        [richTextSpan('dangling library link', ['shared-link-1'])],
+        [
+          {
+            _type: 'sharedLinkAnnotation',
+            _key: 'shared-link-1',
+            link: undefined,
+          },
+        ],
+      ),
+    ];
+
+    setup({ value });
+
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(screen.getByText('dangling library link')).toBeVisible();
   });
 
   it('renders sibling blocks as direct children of the root, with no per-block wrapper', () => {

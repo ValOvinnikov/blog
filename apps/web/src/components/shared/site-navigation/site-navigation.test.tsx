@@ -76,21 +76,18 @@ const links = [
     href: '/',
     target: undefined,
     platform: undefined,
-    ariaLabel: undefined,
   },
   {
     label: 'Blog',
     href: '/blog',
     target: undefined,
     platform: undefined,
-    ariaLabel: undefined,
   },
   {
     label: 'About',
     href: '/about',
     target: undefined,
     platform: undefined,
-    ariaLabel: undefined,
   },
 ];
 

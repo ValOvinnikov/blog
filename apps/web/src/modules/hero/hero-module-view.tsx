@@ -68,7 +68,6 @@ export const HeroModuleView = ({
                 href={secondaryAction.href}
                 target={secondaryAction.target}
                 variant="link"
-                aria-label={secondaryAction.ariaLabel}
               >
                 {secondaryAction.label}
               </LinkButton>

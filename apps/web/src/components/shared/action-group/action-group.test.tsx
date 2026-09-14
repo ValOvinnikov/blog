@@ -15,7 +15,6 @@ const primaryAction = {
     href: '/blog',
     target: undefined,
     platform: undefined,
-    ariaLabel: undefined,
   },
 };
 
@@ -27,7 +26,6 @@ const secondaryAction = {
     href: '/about-us',
     target: undefined,
     platform: undefined,
-    ariaLabel: 'Learn more about our subscription plans',
   },
 };
 
@@ -46,20 +44,10 @@ describe(`<${ActionGroup.name}/>`, () => {
     expect(links[1]).toHaveTextContent('Learn more');
   });
 
-  // Fails against a stub that omits `aria-label`, confirming this checks forwarding.
-  it('forwards the authored ariaLabel to the rendered link accessible name', () => {
+  it('uses the authored label as the accessible name', () => {
     setup();
 
-    expect(
-      screen.getByRole('link', {
-        name: 'Learn more about our subscription plans',
-      }),
-    ).toBeVisible();
-  });
-
-  it('falls back to the label as the accessible name when no ariaLabel is authored', () => {
-    setup();
-
+    expect(screen.getByRole('link', { name: 'Learn more' })).toBeVisible();
     expect(screen.getByRole('link', { name: 'Subscribe now' })).toBeVisible();
   });
 });
@@ -119,7 +107,6 @@ describe('ActionGroup — hiddenLabelSuffix', () => {
       href: '/blog/welcome-to-the-blog',
       target: undefined,
       platform: undefined,
-      ariaLabel: undefined,
     },
     hiddenLabelSuffix: 'Welcome to the blog',
   };

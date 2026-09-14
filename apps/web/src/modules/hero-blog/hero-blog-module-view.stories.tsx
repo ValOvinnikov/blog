@@ -77,7 +77,6 @@ export const WithSecondaryAction: TStory = {
         href: '/blog',
         target: undefined,
         platform: undefined,
-        ariaLabel: undefined,
       },
     },
   },

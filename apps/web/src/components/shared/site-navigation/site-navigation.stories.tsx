@@ -11,21 +11,18 @@ const links: ILink[] = [
     href: '/',
     target: undefined,
     platform: undefined,
-    ariaLabel: undefined,
   },
   {
     label: 'Blog',
     href: '/blog',
     target: undefined,
     platform: undefined,
-    ariaLabel: undefined,
   },
   {
     label: 'Topics',
     href: '/topics',
     target: undefined,
     platform: undefined,
-    ariaLabel: undefined,
   },
 ];
 

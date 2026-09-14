@@ -1,4 +1,5 @@
-import { IMAGE_LAYOUT, type TPortableTextBody } from '@blog/config';
+import { IMAGE_LAYOUT } from '@blog/config';
+import type { TPortableTextBody } from '@blog/service';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 
 export type TRichTextBlock = Extract<
@@ -29,7 +30,7 @@ export const richTextBlock = (
   _key: nextKey('block'),
   style,
   children,
-  ...(markDefs ? { markDefs } : {}),
+  markDefs,
 });
 
 /**

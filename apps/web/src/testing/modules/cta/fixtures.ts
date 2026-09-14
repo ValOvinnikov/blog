@@ -1,9 +1,5 @@
-import {
-  CTA_ACTION_APPEARANCE,
-  CTA_ACTION_VARIANT,
-  type InlineText,
-} from '@blog/config';
-import type { TCtaModule } from '@blog/service';
+import { CTA_ACTION_APPEARANCE, CTA_ACTION_VARIANT } from '@blog/config';
+import type { TCtaContent, TCtaModule } from '@blog/service';
 
 type TCtaAction = NonNullable<TCtaModule['actions']>[number];
 
@@ -16,7 +12,6 @@ export const ctaActionsDemo: TCtaAction[] = [
       href: '/blog',
       target: undefined,
       platform: undefined,
-      ariaLabel: undefined,
     },
   },
   {
@@ -27,12 +22,11 @@ export const ctaActionsDemo: TCtaAction[] = [
       href: '/about-us',
       target: undefined,
       platform: undefined,
-      ariaLabel: 'Learn more about our subscription plans',
     },
   },
 ];
 
-export const ctaContentDemo: InlineText = [
+export const ctaContentDemo: TCtaContent = [
   {
     _type: 'block',
     _key: 'cta-content-b1',
@@ -51,6 +45,7 @@ export const ctaContentDemo: InlineText = [
       },
       { _type: 'span', _key: 'cta-content-s3', text: '.' },
     ],
+    markDefs: undefined,
   },
   {
     _type: 'block',
@@ -64,6 +59,7 @@ export const ctaContentDemo: InlineText = [
         text: 'Unlimited posts and drafts',
       },
     ],
+    markDefs: undefined,
   },
   {
     _type: 'block',
@@ -73,5 +69,6 @@ export const ctaContentDemo: InlineText = [
     children: [
       { _type: 'span', _key: 'cta-content-s5', text: 'Priority support' },
     ],
+    markDefs: undefined,
   },
 ];
