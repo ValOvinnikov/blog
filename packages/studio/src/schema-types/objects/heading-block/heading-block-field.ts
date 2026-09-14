@@ -10,29 +10,18 @@ const DEFAULT_HEADING_BLOCK_DESCRIPTION =
   'The heading shown at the top of this page or module, with its optional supporting line.';
 
 /**
- * The shared `headingBlock` object field. `requireHeading` adds a
- * field-level rule blocking publish on an empty nested `heading`, with an
- * optional `requiredMessage` override — requiredness lives on the field,
- * not on a second registered type.
+ * The shared `headingBlock` object field. A nested `heading` is always
+ * required to publish — requiredness lives on the field, not on a second
+ * registered type.
  */
-export const headingBlockField = (
-  options: {
-    requireHeading?: boolean;
-    description?: string;
-    requiredMessage?: string;
-  } = {},
-) =>
+export const headingBlockField = () =>
   defineField({
     name: 'headingBlock',
     title: 'Heading Block',
     type: headingBlockSchema.name,
-    description: options.description ?? DEFAULT_HEADING_BLOCK_DESCRIPTION,
-    validation: options.requireHeading
-      ? (rule) =>
-          rule.custom((value: THeadingBlockValue | undefined) =>
-            value?.heading
-              ? true
-              : (options.requiredMessage ?? DEFAULT_REQUIRED_HEADING_MESSAGE),
-          )
-      : undefined,
+    description: DEFAULT_HEADING_BLOCK_DESCRIPTION,
+    validation: (rule) =>
+      rule.custom((value: THeadingBlockValue | undefined) =>
+        value?.heading ? true : DEFAULT_REQUIRED_HEADING_MESSAGE,
+      ),
   });

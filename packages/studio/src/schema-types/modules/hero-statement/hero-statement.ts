@@ -19,10 +19,7 @@ export const heroStatementSchema = defineType({
       type: 'string',
       description: 'Optional small line above the heading.',
     }),
-    headingBlockField({
-      requireHeading: true,
-      requiredMessage: 'A statement hero is its heading. Give it one.',
-    }),
+    headingBlockField(),
     ...heroFields(),
   ],
   preview: {

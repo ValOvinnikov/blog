@@ -53,12 +53,10 @@ describe('heroStatementSchema headingBlock field', () => {
     expect(field.type).toBe('headingBlock');
   });
 
-  it('is required with the statement hero custom message', () => {
+  it('is required with the default headingBlockField message', () => {
     const validate = getFieldCustomValidator(getField('headingBlock'));
 
-    expect(validate(undefined, {})).toBe(
-      'A statement hero is its heading. Give it one.',
-    );
+    expect(validate(undefined, {})).toBe('Heading is required.');
     expect(validate({ heading: 'We build things.' }, {})).toBe(true);
   });
 });

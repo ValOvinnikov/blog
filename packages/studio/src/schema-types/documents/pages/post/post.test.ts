@@ -99,12 +99,12 @@ describe('postPageSchema shape', () => {
     expect(customFn({ heading: 'Understanding GROQ' })).toBe(true);
   });
 
-  it('headingBlock describes the field as the post title, with no hero wording', () => {
+  it('headingBlock carries the shared headingBlockField description', () => {
     const headingBlockFieldDefinition = getField('headingBlock') as
       { type?: string; description?: string } | undefined;
 
     expect(headingBlockFieldDefinition?.description).toBe(
-      "The post title, shown as the page's H1.",
+      'The heading shown at the top of this page or module, with its optional supporting line.',
     );
   });
 

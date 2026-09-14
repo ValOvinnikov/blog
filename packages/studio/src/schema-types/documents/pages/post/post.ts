@@ -37,10 +37,7 @@ export const postPageSchema = defineType({
       description: 'URL path segment — auto-generated from title.',
       previewInput: postSlugUrlPreviewInput,
     }),
-    headingBlockField({
-      requireHeading: true,
-      description: "The post title, shown as the page's H1.",
-    }),
+    headingBlockField(),
     defineField({
       name: 'heroImage',
       title: 'Hero Image',
