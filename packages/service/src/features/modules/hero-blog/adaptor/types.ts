@@ -10,7 +10,7 @@ import type {
 import type { TCtaAction } from '@blog/service/shared/transformers/to-cta-action';
 import type { THeroPrimaryAction } from '@blog/service/shared/transformers/to-hero-primary-action';
 
-type THeroBlogModuleBase = {
+export type THeroBlogModuleBase = {
   brandVariant: TFullBrandVariant;
   variant: THeroVariant;
   eyebrow: TMaybeUndefined<string>;
