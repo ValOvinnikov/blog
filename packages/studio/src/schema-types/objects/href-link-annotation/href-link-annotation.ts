@@ -14,6 +14,7 @@ export const hrefLinkAnnotation = () =>
     type: 'object',
     name: 'link',
     title: 'Link',
+    options: { modal: { type: 'popover' } },
     fields: [
       defineField({
         name: 'href',

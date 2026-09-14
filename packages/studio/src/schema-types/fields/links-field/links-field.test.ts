@@ -1,6 +1,7 @@
 import { linksField } from '@blog/studio/schema-types/fields/links-field/links-field';
 import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
 import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
+import type { ArrayRule } from 'sanity';
 
 type TCallLog = { method: string; args: unknown[] }[];
 
@@ -70,6 +71,35 @@ describe('linksField', () => {
     expect(callLog[0]).toEqual({ method: 'max', args: [1] });
   });
 
+  it('chains min() before max() and the duplicate-guard custom(), when both are given', () => {
+    const callLog: TCallLog = [];
+    const field = linksField({
+      name: 'links',
+      title: 'Links',
+      min: 1,
+      max: 3,
+    });
+
+    runFieldValidation(field, callLog);
+
+    expect(callLog.map((call) => call.method)).toEqual([
+      'min',
+      'max',
+      'custom',
+    ]);
+    expect(callLog[0]).toEqual({ method: 'min', args: [1] });
+  });
+
+  it('chains min() alone when only min is given', () => {
+    const callLog: TCallLog = [];
+    const field = linksField({ name: 'links', title: 'Links', min: 2 });
+
+    runFieldValidation(field, callLog);
+
+    expect(callLog.map((call) => call.method)).toEqual(['min', 'custom']);
+    expect(callLog[0]).toEqual({ method: 'min', args: [2] });
+  });
+
   it('chains no bounds when min/max are omitted', () => {
     const callLog: TCallLog = [];
     const field = linksField({ name: 'links', title: 'Links' });
@@ -77,6 +107,34 @@ describe('linksField', () => {
     runFieldValidation(field, callLog);
 
     expect(callLog.map((call) => call.method)).toEqual(['custom']);
+  });
+
+  describe('when validateCustom is supplied', () => {
+    it('receives the rule after the duplicate-guard custom(), and its return value becomes the final rule', () => {
+      const callLog: TCallLog = [];
+      let receivedRulePath: string | undefined;
+
+      const field = linksField({
+        name: 'secondaryLink',
+        title: 'Secondary Link',
+        max: 1,
+        validateCustom: (rule) => {
+          receivedRulePath = (rule as unknown as TMockRule).path;
+          const next = (rule as unknown as TMockRule).custom(() => true);
+          return next as unknown as ArrayRule<unknown[]>;
+        },
+      });
+
+      const result = runFieldValidation(field, callLog);
+
+      expect(receivedRulePath).toBe('rule.max().custom()');
+      expect(callLog.map((call) => call.method)).toEqual([
+        'max',
+        'custom',
+        'custom',
+      ]);
+      expect(result.path).toBe('rule.max().custom().custom()');
+    });
   });
 });
 

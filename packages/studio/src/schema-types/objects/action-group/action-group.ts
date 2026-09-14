@@ -2,6 +2,7 @@ import {
   CTA_ACTION_APPEARANCE,
   CTA_ACTION_VARIANT,
 } from '@blog/config/constants';
+import { ctaActionFields } from '@blog/studio/schema-types/fields/cta-action-fields/cta-action-fields';
 import { ctaActionRefSchema } from '@blog/studio/schema-types/objects/cta-action-ref/cta-action-ref';
 import { linkSchema } from '@blog/studio/schema-types/objects/link/link';
 import { toTitleCase } from '@blog/utils/primitives';
@@ -20,36 +21,7 @@ export const ctaActionSchema = defineType({
     appearance: CTA_ACTION_APPEARANCE.CONTAINED,
   },
   fields: [
-    defineField({
-      name: 'variant',
-      title: 'Variant',
-      type: 'string',
-      description:
-        'Primary is the main action. Secondary is the supporting action.',
-      options: {
-        layout: 'radio',
-        list: Object.values(CTA_ACTION_VARIANT).map((value) => ({
-          title: toTitleCase(value),
-          value,
-        })),
-      },
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'appearance',
-      title: 'Appearance',
-      type: 'string',
-      description:
-        'How this action looks: Contained (filled/bordered button) or Inline (text link). Available on both Primary and Secondary.',
-      options: {
-        layout: 'dropdown',
-        list: Object.values(CTA_ACTION_APPEARANCE).map((value) => ({
-          title: toTitleCase(value),
-          value,
-        })),
-      },
-      initialValue: CTA_ACTION_APPEARANCE.CONTAINED,
-    }),
+    ...ctaActionFields(),
     defineField({
       name: 'link',
       title: 'Link',

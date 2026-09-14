@@ -239,9 +239,20 @@ export const heroBlogSchema = defineType({
       name: 'secondaryLink',
       title: 'Secondary Link',
       description:
-        'Optional secondary action shown next to the primary action, authored by choosing a shared link.',
+        'Optional secondary action shown next to the primary action, authored by choosing a shared link. Must use the Secondary variant.',
       of: [ctaActionRefSchema.name],
       max: 1,
+      validateCustom: (rule) =>
+        rule.custom((value) => {
+          const items = (value ?? []) as { variant?: string }[];
+          const hasInvalidVariant = items.some(
+            (item) => item.variant !== CTA_ACTION_VARIANT.SECONDARY,
+          );
+
+          return hasInvalidVariant
+            ? 'Secondary Link must use the Secondary variant.'
+            : true;
+        }),
     }),
     ...heroFields({ image: false }),
   ],

@@ -1,5 +1,5 @@
 import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
-import { defineArrayMember, defineField } from 'sanity';
+import { defineArrayMember, defineField, type ArrayRule } from 'sanity';
 
 type TLinkRefItem = {
   link?: { _ref?: string };
@@ -20,6 +20,10 @@ const validateUniqueSharedLink = (value: unknown) => {
  * duplicate here since these array members are wrapper objects rather than
  * bare references, so this always guards against the same shared link being
  * picked twice.
+ *
+ * `validateCustom`, when given, receives the rule after the built-in
+ * min/max/duplicate-guard chain and returns it further chained — for a
+ * call site with its own per-item constraint (e.g. a Secondary-only slot).
  */
 export const linksField = ({
   name,
@@ -28,6 +32,7 @@ export const linksField = ({
   of,
   max,
   min,
+  validateCustom,
 }: {
   name: string;
   title: string;
@@ -35,6 +40,7 @@ export const linksField = ({
   of?: string[];
   max?: number;
   min?: number;
+  validateCustom?: (rule: ArrayRule<unknown[]>) => ArrayRule<unknown[]>;
 }) =>
   defineField({
     name,
@@ -48,6 +54,10 @@ export const linksField = ({
       if (typeof min === 'number') nextRule = nextRule.min(min);
       if (typeof max === 'number') nextRule = nextRule.max(max);
 
-      return nextRule.custom(validateUniqueSharedLink);
+      const withDuplicateGuard = nextRule.custom(validateUniqueSharedLink);
+
+      return validateCustom
+        ? validateCustom(withDuplicateGuard)
+        : withDuplicateGuard;
     },
   });
