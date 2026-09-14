@@ -1,7 +1,8 @@
+import { linksField } from '@blog/studio/schema-types/fields/links-field/links-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { linkSchema } from '@blog/studio/schema-types/objects/link/link';
+import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
 import { Menu } from 'lucide-react';
-import { defineArrayMember, defineField, defineType } from 'sanity';
+import { defineType } from 'sanity';
 
 export const navigationSettingsSchema = defineType({
   name: 'settings_navigation',
@@ -12,12 +13,11 @@ export const navigationSettingsSchema = defineType({
   preview: { select: { title: 'title' } },
   fields: [
     titleField(),
-    defineField({
+    linksField({
       name: 'items',
       title: 'Header Links',
-      type: 'array',
       description: 'Top-level nav links rendered in the site header.',
-      of: [defineArrayMember({ type: linkSchema.name })],
+      of: [linkRefSchema.name],
     }),
   ],
 });

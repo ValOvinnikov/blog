@@ -1,5 +1,6 @@
 import {
   CONTENT_ALIGNMENT,
+  CTA_ACTION_VARIANT,
   FULL_BRAND_VARIANT_LIST,
   HERO_VARIANT,
   MEDIA_ORDER,
@@ -7,7 +8,9 @@ import {
 } from '@blog/config/constants';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { linksField } from '@blog/studio/schema-types/fields/links-field/links-field';
 import { actionGroupField } from '@blog/studio/schema-types/objects/action-group/action-group-field';
+import { ctaActionRefSchema } from '@blog/studio/schema-types/objects/cta-action-ref/cta-action-ref';
 import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { toTitleCase } from '@blog/utils/primitives';
@@ -28,6 +31,8 @@ type THeroFieldsOptions = {
   variants?: readonly THeroVariant[];
   /** Pass `false` when the kind supplies its own image field in this position. */
   image?: false;
+  /** Pass `false` when the kind builds its own `actions` field instead, e.g. via `postHeroActionsField()`. */
+  actions?: false;
 };
 
 /**
@@ -142,7 +147,35 @@ export const heroFields = (options: THeroFieldsOptions = {}) => {
       initialValue: MEDIA_ORDER.LAST,
       hidden: isNotVariant(HERO_VARIANT.STACKED),
     }),
-    actionGroupField(),
+    ...(options.actions === false ? [] : [actionGroupField()]),
     heroLayoutField,
   ];
 };
+
+const validateSecondaryOnly = (value: unknown) => {
+  const items = (value ?? []) as { variant?: string }[];
+  const hasInvalidVariant = items.some(
+    (item) => item.variant !== CTA_ACTION_VARIANT.SECONDARY,
+  );
+
+  return hasInvalidVariant
+    ? 'Actions must use the Secondary variant.'
+    : true;
+};
+
+/**
+ * The `actions` field for a hero whose primary action is derived from a
+ * resolved post rather than authored — a single optional Secondary-only
+ * slot, in place of the Primary+Secondary `actionGroupField()` every other
+ * hero kind uses.
+ */
+export const postHeroActionsField = () =>
+  linksField({
+    name: 'actions',
+    title: 'Actions',
+    description:
+      'Optional secondary action shown next to the primary action, which always links to the resolved post. Must use the Secondary variant.',
+    of: [ctaActionRefSchema.name],
+    max: 1,
+    validateCustom: (rule) => rule.custom(validateSecondaryOnly),
+  });

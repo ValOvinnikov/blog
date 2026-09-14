@@ -3,6 +3,7 @@ import { richTextSchema } from '@blog/studio/schema-types/portable-text/rich-tex
 type TBlockArrayMember = {
   type: string;
   styles?: { title: string; value: string }[];
+  marks?: { annotations?: { name?: string; type?: string }[] };
 };
 
 const getBlockMember = () => {
@@ -26,6 +27,17 @@ describe('richTextSchema block styles', () => {
       'h3',
       'h4',
       'blockquote',
+    ]);
+  });
+});
+
+describe('richTextSchema block annotations', () => {
+  it('offers both the shared-link annotation and the href-based paste-a-URL annotation', () => {
+    const { marks } = getBlockMember();
+
+    expect(marks?.annotations).toEqual([
+      { type: 'sharedLinkAnnotation' },
+      expect.objectContaining({ name: 'link', type: 'object' }),
     ]);
   });
 });

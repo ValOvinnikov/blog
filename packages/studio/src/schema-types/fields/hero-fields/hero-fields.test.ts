@@ -1,6 +1,12 @@
-import { HERO_VARIANT, MEDIA_ORDER } from '@blog/config/constants';
-import { heroFields } from '@blog/studio/schema-types/fields/hero-fields/hero-fields';
-import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
+import { CTA_ACTION_VARIANT, HERO_VARIANT, MEDIA_ORDER } from '@blog/config/constants';
+import {
+  heroFields,
+  postHeroActionsField,
+} from '@blog/studio/schema-types/fields/hero-fields/hero-fields';
+import {
+  getCustomValidator,
+  getRecordedValidators,
+} from '@blog/studio/testing/create-mock-validation-rule';
 
 type TCustomFn = (
   value: unknown,
@@ -258,5 +264,61 @@ describe('heroFields shared tail', () => {
       .map((field) => field.name);
 
     expect(names.slice(-2)).toEqual(['actions', 'layout']);
+  });
+
+  it('suppresses the actions field when actions: false, keeping layout', () => {
+    const fields = heroFields({ actions: false });
+
+    expect(
+      fields.some((field) => 'name' in field && field.name === 'actions'),
+    ).toBe(false);
+    expect(
+      fields.some((field) => 'name' in field && field.name === 'layout'),
+    ).toBe(true);
+  });
+});
+
+describe('postHeroActionsField', () => {
+  const getVariantGuard = () => {
+    const validators = getRecordedValidators<
+      (value: unknown) => string | true
+    >(postHeroActionsField());
+    const variantGuard = validators.at(-1);
+
+    if (!variantGuard) {
+      throw new Error(
+        'Expected postHeroActionsField() to register a Secondary-variant guard.',
+      );
+    }
+
+    return variantGuard.fn;
+  };
+
+  it('is named actions, of ctaActionRef, capped at 1', () => {
+    const field = postHeroActionsField();
+
+    expect(field.name).toBe('actions');
+    expect(field.of).toEqual([{ type: 'ctaActionRef' }]);
+  });
+
+  it('is valid when unset or empty', () => {
+    const validate = getVariantGuard();
+
+    expect(validate(undefined)).toBe(true);
+    expect(validate([])).toBe(true);
+  });
+
+  it('is valid with a single Secondary-variant member', () => {
+    const validate = getVariantGuard();
+
+    expect(validate([{ variant: CTA_ACTION_VARIANT.SECONDARY }])).toBe(true);
+  });
+
+  it('errors with a Primary-variant member', () => {
+    const validate = getVariantGuard();
+
+    expect(validate([{ variant: CTA_ACTION_VARIANT.PRIMARY }])).toBe(
+      'Actions must use the Secondary variant.',
+    );
   });
 });

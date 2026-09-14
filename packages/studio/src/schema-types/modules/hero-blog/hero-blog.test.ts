@@ -270,27 +270,54 @@ describe('heroBlogSchema image field', () => {
   });
 });
 
-describe('heroBlogSchema secondaryAction field', () => {
+describe('heroBlogSchema actions field', () => {
+  const getVariantGuard = (): TCustomFn => {
+    const validators = getRecordedValidators<TCustomFn>(getField('actions'));
+    const variantGuard = validators.at(-1);
+
+    if (!variantGuard) {
+      throw new Error(
+        'Expected actions to register a Secondary-variant guard.',
+      );
+    }
+
+    return variantGuard.fn;
+  };
+
   it('is valid when unset', () => {
-    const validate = getFieldCustomValidator(getField('secondaryAction'));
+    const validate = getVariantGuard();
 
     expect(validate(undefined, { parent: {} })).toBe(true);
   });
 
+  it('is valid with an empty array', () => {
+    const validate = getVariantGuard();
+
+    expect(validate([], { parent: {} })).toBe(true);
+  });
+
   it('is valid with the Secondary variant', () => {
-    const validate = getFieldCustomValidator(getField('secondaryAction'));
+    const validate = getVariantGuard();
 
     expect(
-      validate({ variant: CTA_ACTION_VARIANT.SECONDARY }, { parent: {} }),
+      validate([{ variant: CTA_ACTION_VARIANT.SECONDARY }], { parent: {} }),
     ).toBe(true);
   });
 
   it('errors with the Primary variant', () => {
-    const validate = getFieldCustomValidator(getField('secondaryAction'));
+    const validate = getVariantGuard();
 
     expect(
-      validate({ variant: CTA_ACTION_VARIANT.PRIMARY }, { parent: {} }),
-    ).toBe('Secondary Action must use the Secondary variant.');
+      validate([{ variant: CTA_ACTION_VARIANT.PRIMARY }], { parent: {} }),
+    ).toBe('Actions must use the Secondary variant.');
+  });
+
+  it('has no bespoke secondaryAction field', () => {
+    expect(
+      heroBlogSchema.fields?.find(
+        (field) => 'name' in field && field.name === 'secondaryAction',
+      ),
+    ).toBeUndefined();
   });
 });
 

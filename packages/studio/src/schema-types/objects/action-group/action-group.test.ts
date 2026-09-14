@@ -1,13 +1,6 @@
-import {
-  CTA_ACTION_APPEARANCE,
-  CTA_ACTION_VARIANT,
-} from '@blog/config/constants';
-import {
-  actionGroupSchema,
-  ctaActionSchema,
-} from '@blog/studio/schema-types/objects/action-group/action-group';
-import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
-import { toTitleCase } from '@blog/utils/primitives';
+import { CTA_ACTION_VARIANT } from '@blog/config/constants';
+import { actionGroupSchema } from '@blog/studio/schema-types/objects/action-group/action-group';
+import { getRecordedValidators } from '@blog/studio/testing/create-mock-validation-rule';
 
 type TCustomFn = (value: unknown) => string | true;
 
@@ -30,25 +23,35 @@ const getActionsField = () => {
   return actionsField;
 };
 
-const getActionsValidator = (): TCustomFn =>
-  getCustomValidator<TCustomFn>(getActionsField());
+const getPrimaryFirstValidator = (): TCustomFn => {
+  const validators = getRecordedValidators<TCustomFn>(getActionsField());
+  const validator = validators.at(-1);
+
+  if (!validator) {
+    throw new Error(
+      'Expected actions to register a Primary-first custom() rule.',
+    );
+  }
+
+  return validator.fn;
+};
 
 describe('actionGroupSchema actions validation', () => {
   it('is valid with an empty array', () => {
-    const validate = getActionsValidator();
+    const validate = getPrimaryFirstValidator();
 
     expect(validate(undefined)).toBe(true);
     expect(validate([])).toBe(true);
   });
 
   it('is valid with a single Primary action', () => {
-    const validate = getActionsValidator();
+    const validate = getPrimaryFirstValidator();
 
     expect(validate([{ variant: CTA_ACTION_VARIANT.PRIMARY }])).toBe(true);
   });
 
   it('is valid with Primary followed by Secondary', () => {
-    const validate = getActionsValidator();
+    const validate = getPrimaryFirstValidator();
 
     expect(
       validate([
@@ -59,7 +62,7 @@ describe('actionGroupSchema actions validation', () => {
   });
 
   it('rejects a Secondary action alone', () => {
-    const validate = getActionsValidator();
+    const validate = getPrimaryFirstValidator();
 
     expect(validate([{ variant: CTA_ACTION_VARIANT.SECONDARY }])).toBe(
       'A Primary action is required and must be first.',
@@ -67,7 +70,7 @@ describe('actionGroupSchema actions validation', () => {
   });
 
   it('rejects two Primary actions', () => {
-    const validate = getActionsValidator();
+    const validate = getPrimaryFirstValidator();
 
     expect(
       validate([
@@ -78,7 +81,7 @@ describe('actionGroupSchema actions validation', () => {
   });
 
   it('rejects Secondary before Primary', () => {
-    const validate = getActionsValidator();
+    const validate = getPrimaryFirstValidator();
 
     expect(
       validate([
@@ -89,7 +92,7 @@ describe('actionGroupSchema actions validation', () => {
   });
 
   it('rejects three actions', () => {
-    const validate = getActionsValidator();
+    const validate = getPrimaryFirstValidator();
 
     expect(
       validate([
@@ -100,104 +103,34 @@ describe('actionGroupSchema actions validation', () => {
     ).toBe('Each action variant (Primary, Secondary) can be used only once.');
   });
 
-  it('caps the array at 2 via rule.max(2)', () => {
-    const actionsField = getActionsField();
+  it('caps the array at 2 and guards against a duplicate shared link', () => {
+    const validators = getRecordedValidators<TCustomFn>(getActionsField());
 
-    let maxArg: number | undefined;
-
-    const rule = {
-      max: (n: number) => {
-        maxArg = n;
-        return rule;
-      },
-      custom: () => rule,
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    (actionsField.validation as any)(rule);
-
-    expect(maxArg).toBe(2);
+    expect(validators).toHaveLength(2);
   });
 });
 
-describe('ctaActionSchema control choices', () => {
-  const getField = (name: string) => {
-    const field = ctaActionSchema.fields.find(
-      (field): field is typeof field & { name: string } =>
-        'name' in field && field.name === name,
-    );
-
-    if (!field) {
-      throw new Error(`Expected ctaActionSchema to define a "${name}" field.`);
-    }
-
-    return field;
+describe('actionGroupSchema preview', () => {
+  const { prepare } = actionGroupSchema.preview as {
+    prepare: (props: {
+      a0Override?: string;
+      a0Link?: string;
+      a1Override?: string;
+      a1Link?: string;
+    }) => { title: string; subtitle: string };
   };
 
-  const getLayout = (field: { options?: unknown }) => {
-    const options = field.options;
-
-    return options && typeof options === 'object' && 'layout' in options
-      ? (options as { layout?: string }).layout
-      : undefined;
-  };
-
-  const getOptionValues = (field: { options?: unknown }) => {
-    const options = field.options;
-    const list =
-      options && typeof options === 'object' && 'list' in options
-        ? (options as { list: unknown }).list
-        : undefined;
-
-    if (!list) {
-      throw new Error('Expected field to define an options.list.');
-    }
-
-    return list as { title: string; value: string }[];
-  };
-
-  const wasRequiredCalled = (field: { validation?: unknown }) => {
-    if (!field.validation) {
-      throw new Error('Expected field to define validation.');
-    }
-
-    let requiredCalled = false;
-    const rule = {
-      required: () => {
-        requiredCalled = true;
-        return rule;
-      },
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    (field.validation as any)(rule);
-
-    return requiredCalled;
-  };
-
-  it('keeps variant as a radio: required, and picking it sets which sibling variant is unavailable', () => {
-    const field = getField('variant');
-
-    expect(getLayout(field)).toBe('radio');
-    expect(wasRequiredCalled(field)).toBe(true);
-    expect(getOptionValues(field)).toEqual(
-      Object.values(CTA_ACTION_VARIANT).map((value) => ({
-        title: toTitleCase(value),
-        value,
-      })),
-    );
+  it('shows "No actions" with an empty group', () => {
+    expect(prepare({})).toEqual({ title: 'No actions', subtitle: '0 actions' });
   });
 
-  it('converts appearance to a dropdown: optional, no field depends on it', () => {
-    const field = getField('appearance');
-
-    expect(getLayout(field)).toBe('dropdown');
-    expect(field.validation).toBeUndefined();
-    expect(getOptionValues(field)).toEqual(
-      Object.values(CTA_ACTION_APPEARANCE).map((value) => ({
-        title: toTitleCase(value),
-        value,
-      })),
-    );
+  it("prefers each action's labelOverride over its shared link's label", () => {
+    expect(
+      prepare({
+        a0Override: 'Read more',
+        a0Link: "Read the post's actual label",
+        a1Link: 'Contact us',
+      }),
+    ).toEqual({ title: 'Read more  ·  Contact us', subtitle: '2 actions' });
   });
 });

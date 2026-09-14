@@ -14,6 +14,7 @@ import { navigationSettingsSchema } from './settings/navigation/navigation';
 import { newsletterSettingsSchema } from './settings/newsletter/newsletter';
 import { siteSettingsSchema } from './settings/site-settings/site-settings';
 import { themeSettingsSchema } from './settings/theme/theme';
+import { sharedLinkSchema } from './shared/link/link';
 import { migrationStateSchema } from './system/migration-state/migration-state';
 
 export const documents = [
@@ -33,5 +34,6 @@ export const documents = [
   footerSettingsSchema,
   newsletterSettingsSchema,
   themeSettingsSchema,
+  sharedLinkSchema,
   migrationStateSchema,
 ];

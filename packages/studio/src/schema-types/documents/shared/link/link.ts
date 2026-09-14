@@ -1,44 +1,46 @@
-import { SOCIAL_PLATFORMS, LINK_TYPE } from '@blog/config/constants';
+import { LINK_TYPE } from '@blog/config/constants';
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic/topic';
 import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { PAGE_POST_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/post-index/post-index-type';
-import { toTitleCase } from '@blog/utils/primitives';
+import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { Link2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
-type TLinkParent = {
+type TSharedLinkParent = {
   linkType?: string;
 };
 
 const isLinkType = (parent: unknown, linkType: string) =>
-  (parent as TLinkParent | undefined)?.linkType === linkType;
+  (parent as TSharedLinkParent | undefined)?.linkType === linkType;
 
-export const linkSchema = defineType({
-  name: 'link',
+/**
+ * The one place a destination is authored — every `linkRef`/`socialLinkRef`/
+ * `ctaActionRef` and Portable Text link points here instead of retyping it.
+ */
+export const sharedLinkSchema = defineType({
+  name: 'shared_link',
   title: 'Link',
-  type: 'object',
+  type: 'document',
   description:
-    'A link to either an internal page or an external URL, with its own visible label.',
+    'A reusable link — page or URL — that navigation, footer, buttons, and body text can all point to instead of retyping the same destination.',
   icon: Link2,
   initialValue: {
     linkType: LINK_TYPE.INTERNAL,
     openInNewTab: false,
   },
   fields: [
+    titleField({
+      description:
+        'Library name used to find this link in Studio search and lists — not shown on the site.',
+    }),
     defineField({
       name: 'label',
       title: 'Label',
       type: 'string',
-      description: 'Visible link text.',
-      validation: (rule) => rule.required().max(40),
-    }),
-    defineField({
-      name: 'accessibleLabel',
-      title: 'Accessible Label',
-      type: 'string',
       description:
-        "Optional: override the accessible name announced by screen readers and used by search engines, when the visible link text alone isn't descriptive enough — e.g. a generic 'Read more' button. Leave empty to use the visible text as-is.",
+        'Default visible link text, shown wherever this link is used unless overridden for that use.',
+      validation: (rule) => rule.required().max(40),
     }),
     defineField({
       name: 'linkType',
@@ -109,22 +111,10 @@ export const linkSchema = defineType({
       initialValue: false,
       hidden: ({ parent }) => !isLinkType(parent, LINK_TYPE.EXTERNAL),
     }),
-    defineField({
-      name: 'platform',
-      title: 'Platform',
-      type: 'string',
-      description: 'Optional social platform, used for icon selection.',
-      options: {
-        list: Object.values(SOCIAL_PLATFORMS).map((value) => ({
-          title: toTitleCase(value),
-          value,
-        })),
-      },
-    }),
   ],
   preview: {
     select: {
-      title: 'label',
+      title: 'title',
       linkType: 'linkType',
       url: 'url',
       internalTitle: 'internalReference.title',

@@ -1,6 +1,5 @@
 import {
   CTA_ACTION_APPEARANCE,
-  CTA_ACTION_VARIANT,
   HERO_IMAGE_SOURCE,
   POST_SOURCE,
   HERO_VARIANT,
@@ -9,9 +8,11 @@ import {
   type THeroVariant,
 } from '@blog/config/constants';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
-import { heroFields } from '@blog/studio/schema-types/fields/hero-fields/hero-fields';
+import {
+  heroFields,
+  postHeroActionsField,
+} from '@blog/studio/schema-types/fields/hero-fields/hero-fields';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { ctaActionSchema } from '@blog/studio/schema-types/objects/action-group/action-group';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { getDraftsClient } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
 import {
@@ -218,22 +219,8 @@ export const heroBlogSchema = defineType({
       },
       initialValue: CTA_ACTION_APPEARANCE.CONTAINED,
     }),
-    defineField({
-      name: 'secondaryAction',
-      title: 'Secondary Action',
-      type: ctaActionSchema.name,
-      description:
-        'Optional secondary action shown next to the primary action. Must use the Secondary variant.',
-      validation: (rule) =>
-        rule.custom((value) => {
-          const action = value as { variant?: string } | undefined;
-
-          return action && action.variant !== CTA_ACTION_VARIANT.SECONDARY
-            ? 'Secondary Action must use the Secondary variant.'
-            : true;
-        }),
-    }),
-    ...heroFields({ image: false }),
+    postHeroActionsField(),
+    ...heroFields({ image: false, actions: false }),
   ],
   preview: {
     select: {

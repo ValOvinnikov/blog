@@ -5,10 +5,10 @@ import {
 } from '@blog/config/constants';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { postHeroActionsField } from '@blog/studio/schema-types/fields/hero-fields/hero-fields';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
-import { linkSchema } from '@blog/studio/schema-types/objects/link/link';
 import { Sparkles } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -169,12 +169,7 @@ export const heroSchema = defineType({
         'Primary action links to the selected hero post. Defaults to "Read more".',
       validation: (rule) => rule.max(40),
     }),
-    defineField({
-      name: 'secondaryAction',
-      title: 'Secondary Action',
-      type: linkSchema.name,
-      description: 'Optional secondary CTA shown next to the primary action.',
-    }),
+    postHeroActionsField(),
     heroLayoutField,
   ],
   preview: {

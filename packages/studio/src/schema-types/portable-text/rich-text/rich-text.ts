@@ -1,5 +1,7 @@
 import { asideSchema } from '@blog/studio/schema-types/objects/aside/aside';
 import { bodyImageSchema } from '@blog/studio/schema-types/objects/body-image/body-image';
+import { hrefLinkAnnotation } from '@blog/studio/schema-types/objects/href-link-annotation/href-link-annotation';
+import { sharedLinkAnnotationSchema } from '@blog/studio/schema-types/objects/shared-link-annotation/shared-link-annotation';
 import { defineArrayMember, defineType } from 'sanity';
 
 export const richTextSchema = defineType({
@@ -22,6 +24,12 @@ export const richTextSchema = defineType({
         { title: 'H4', value: 'h4' },
         { title: 'Quote', value: 'blockquote' },
       ],
+      marks: {
+        annotations: [
+          { type: sharedLinkAnnotationSchema.name },
+          hrefLinkAnnotation(),
+        ],
+      },
     }),
     defineArrayMember({ type: bodyImageSchema.name }),
     defineArrayMember({ type: 'code' }),

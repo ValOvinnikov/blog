@@ -1,4 +1,4 @@
-import { linkSchema } from '@blog/studio/schema-types/objects/link/link';
+import { sharedLinkAnnotationSchema } from '@blog/studio/schema-types/objects/shared-link-annotation/shared-link-annotation';
 import { defineArrayMember, defineType } from 'sanity';
 
 export const inlineTextSchema = defineType({
@@ -20,7 +20,7 @@ export const inlineTextSchema = defineType({
           { title: 'Bold', value: 'strong' },
           { title: 'Italic', value: 'em' },
         ],
-        annotations: [{ type: linkSchema.name }],
+        annotations: [{ type: sharedLinkAnnotationSchema.name }],
       },
     }),
   ],
