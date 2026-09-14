@@ -36,6 +36,7 @@ vi.mock('@web/utils/logger/logger', () => ({
 const makeHeroBlogData = (overrides: Record<string, unknown> = {}) => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
   variant: HERO_VARIANT.SPLIT,
+  hasPost: true,
   eyebrow: undefined,
   heading: 'Welcome',
   supportingText: undefined,
@@ -102,10 +103,10 @@ describe(`<${HeroBlogModule.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('logs and renders nothing when the resolved post no longer exists (unfeatured, unpublished, or deleted after publish)', async () => {
+  it('logs and renders nothing when no post resolves (unfeatured, unpublished, or deleted after publish)', async () => {
     getHeroBlogMock.mockResolvedValue({
       ok: true,
-      data: makeHeroBlogData({ heading: undefined }),
+      data: makeHeroBlogData({ hasPost: false, heading: undefined }),
     });
 
     const { container } = await setup();

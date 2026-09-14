@@ -1,4 +1,5 @@
 import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
+import { PageIntro } from '@web/components/shared/page-intro';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
@@ -79,6 +80,7 @@ describe('HERO_MAP', () => {
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
         variant: HERO_VARIANT.SPLIT,
+        hasPost: true,
         eyebrow: undefined,
         heading: 'Featured this week',
         supportingText: undefined,
@@ -132,6 +134,72 @@ describe('HERO_MAP', () => {
       screen.getByRole('heading', {
         level: 1,
         name: 'Build faster, ship sooner',
+      }),
+    ).toBeVisible();
+  });
+
+  it('dispatches module_heroBlog through the real registry to nothing, and logs, when no post resolves', async () => {
+    getHeroBlogMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        variant: HERO_VARIANT.SPLIT,
+        hasPost: false,
+        eyebrow: undefined,
+        heading: undefined,
+        supportingText: undefined,
+        sanityImage: undefined,
+        primaryAction: undefined,
+        secondaryAction: undefined,
+        contentPosition: undefined,
+        contentAlignment: undefined,
+        mediaOrder: undefined,
+        layout: undefined,
+      },
+    });
+
+    const { container } = await setup({
+      id: 'hero-blog-1',
+      type: 'module_heroBlog',
+    });
+
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('falls back to the page heading, as the sole h1, when a page composes a Blog Hero that hides because no post resolved', async () => {
+    getHeroBlogMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        variant: HERO_VARIANT.SPLIT,
+        hasPost: false,
+        eyebrow: undefined,
+        heading: 'Stale hero title left over from an unpublished post',
+        supportingText: undefined,
+        sanityImage: undefined,
+        primaryAction: undefined,
+        secondaryAction: undefined,
+        contentPosition: undefined,
+        contentAlignment: undefined,
+        mediaOrder: undefined,
+        layout: undefined,
+      },
+    });
+
+    const setupPageIntro = customRenderAsync(PageIntro, {
+      hero: { id: 'hero-blog-1', type: 'module_heroBlog' },
+      headingBlock: makeHeadingBlock({ heading: 'Notes on building things' }),
+      locale: 'en',
+      tenant: 'tenant-1',
+    });
+
+    await setupPageIntro();
+
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+        name: 'Notes on building things',
       }),
     ).toBeVisible();
   });

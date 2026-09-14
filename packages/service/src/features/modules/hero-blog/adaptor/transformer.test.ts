@@ -57,11 +57,12 @@ describe(toHeroBlogModule, () => {
     expect(hero.primaryAction?.href).toBe('/blog/hello-world');
   });
 
-  it('has no derived copy, image or primary action when no post resolves at all', () => {
+  it('reports hasPost false and has no derived copy, image or primary action when no post resolves at all', () => {
     const raw = makeRawHeroBlogModule({ post: null });
 
     const hero = toHeroBlogModule(raw);
 
+    expect(hero.hasPost).toBe(false);
     expect(hero.eyebrow).toBeUndefined();
     expect(hero.heading).toBeUndefined();
     expect(hero.supportingText).toBeUndefined();
@@ -69,16 +70,15 @@ describe(toHeroBlogModule, () => {
     expect(hero.primaryAction).toBeUndefined();
   });
 
-  it('falls back to the resolved post eyebrow/heading/supportingText when unset', () => {
+  it('reports hasPost true and derives heading/supportingText from the resolved post', () => {
     const raw = makeRawHeroBlogModule({
       post: makeRawPostCard(),
       eyebrow: null,
-      heading: null,
-      supportingText: null,
     });
 
     const hero = toHeroBlogModule(raw);
 
+    expect(hero.hasPost).toBe(true);
     expect(hero.eyebrow).toBe('Engineering');
     expect(hero.heading).toBe('Hello World');
     expect(hero.supportingText).toBe(
@@ -86,19 +86,15 @@ describe(toHeroBlogModule, () => {
     );
   });
 
-  it('trusts an authored eyebrow/heading/supportingText over the resolved post', () => {
+  it('trusts an authored eyebrow over the resolved post topic', () => {
     const raw = makeRawHeroBlogModule({
       post: makeRawPostCard(),
       eyebrow: 'Field notes',
-      heading: 'Custom heading',
-      supportingText: 'Custom supporting text.',
     });
 
     const hero = toHeroBlogModule(raw);
 
     expect(hero.eyebrow).toBe('Field notes');
-    expect(hero.heading).toBe('Custom heading');
-    expect(hero.supportingText).toBe('Custom supporting text.');
   });
 
   it('uses the resolved post image when imageSource is POST', () => {
