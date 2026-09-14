@@ -95,7 +95,7 @@ export function buildStarterDocuments(
     title: 'Primary Navigation',
     items: [
       {
-        _type: 'link',
+        _type: 'inlineLink',
         _key: 'starter-nav-blog',
         label: 'Blog',
         linkType: LINK_TYPE.EXTERNAL,
