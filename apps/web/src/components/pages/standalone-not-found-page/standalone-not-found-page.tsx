@@ -1,28 +1,53 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_ISO_CODES, type TThemeTokens } from '@blog/config';
 import { NotFoundPage } from '@web/components/pages/not-found-page';
 import { ThemeScope } from '@web/components/shared/theme-scope';
 import { getThemeTokens } from '@web/utils/get-theme-tokens';
 import { resolveTenantMessages } from '@web/utils/resolve-tenant-messages';
+import { toThemeTokens } from '@web/utils/to-theme-tokens';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 
-/**
- * StandaloneNotFoundPage — the body every `not-found.tsx` boundary outside
- * `[tenant]/[locale]/layout.tsx` renders (the root `app/not-found.tsx` for
- * unmatched URLs, and `app/[tenant]/not-found.tsx` for a `notFound()` thrown
- * by that layout itself). Both sit above or outside that layout, so it
- * resolves its own theme tokens and locale messages rather than inheriting
- * them — `getThemeTokens`/`resolveTenantMessages` fall through to the
- * `x-tenant-id` request header when called with no `tenant` argument, since
- * neither boundary receives route params.
- */
-export const StandaloneNotFoundPage = async () => {
-  setRequestLocale(LOCALE_ISO_CODES.EN);
-  const [baseMessages, themeTokens] = await Promise.all([
-    getMessages(),
+type TNotFoundThemeContext = {
+  messages: Record<string, unknown>;
+  themeTokens: TThemeTokens;
+};
+
+const resolveTenantThemeContext = async (
+  baseMessages: Record<string, unknown>,
+): Promise<TNotFoundThemeContext> => {
+  const [resolved, themeTokens] = await Promise.all([
+    resolveTenantMessages(baseMessages),
     getThemeTokens(),
   ]);
-  const { messages } = await resolveTenantMessages(baseMessages);
+
+  return { messages: resolved.messages, themeTokens };
+};
+
+type TStandaloneNotFoundPageProps = {
+  shouldResolveTenant?: boolean;
+};
+
+/**
+ * StandaloneNotFoundPage — the body every `not-found.tsx` boundary outside
+ * `[tenant]/[locale]/layout.tsx`'s children renders, since neither receives
+ * route params to inherit theme/locale context from. The root
+ * `app/not-found.tsx` (an unmatched URL, genuinely tenant-less) uses the
+ * default `shouldResolveTenant={true}`, which falls through to the
+ * `x-tenant-id` request header. `app/[tenant]/not-found.tsx` (a failed
+ * `[tenant]/[locale]/layout.tsx` render) passes `shouldResolveTenant={false}`
+ * to render with default theme tokens and base messages instead — the
+ * layout that would have supplied a tenant just failed, and reading the
+ * header here would turn a prerendered route dynamic at runtime.
+ */
+export const StandaloneNotFoundPage = async ({
+  shouldResolveTenant = true,
+}: TStandaloneNotFoundPageProps = {}) => {
+  setRequestLocale(LOCALE_ISO_CODES.EN);
+  const baseMessages = await getMessages();
+
+  const { messages, themeTokens } = shouldResolveTenant
+    ? await resolveTenantThemeContext(baseMessages)
+    : { messages: baseMessages, themeTokens: toThemeTokens(undefined) };
 
   return (
     <ThemeScope themeTokens={themeTokens}>

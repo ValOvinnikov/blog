@@ -29,10 +29,13 @@ describe('TenantNotFound ([tenant] not-found route)', () => {
     });
   });
 
-  it('renders StandaloneNotFoundPage, independent of the tenant layout', async () => {
+  it('renders StandaloneNotFoundPage with tenant resolution disabled', async () => {
     const ui = { type: 'div', props: {} };
     standaloneNotFoundPageMock.mockResolvedValue(ui);
 
     await expect(TenantNotFound()).resolves.toBe(ui);
+    expect(standaloneNotFoundPageMock).toHaveBeenCalledWith({
+      shouldResolveTenant: false,
+    });
   });
 });
