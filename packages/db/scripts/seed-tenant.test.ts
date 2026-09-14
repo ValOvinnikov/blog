@@ -6,8 +6,14 @@ import { resolveOrCreateTenant } from './seed-tenant';
 const { getTenantByDomainMock } = vi.hoisted(() => ({
   getTenantByDomainMock: vi.fn(),
 }));
-const { createTenantMock } = vi.hoisted(() => ({
+const {
+  createTenantMock,
+  getTenantIdBySanityProjectIdMock,
+  getTenantByIdMock,
+} = vi.hoisted(() => ({
   createTenantMock: vi.fn(),
+  getTenantIdBySanityProjectIdMock: vi.fn(),
+  getTenantByIdMock: vi.fn(),
 }));
 
 vi.mock('@blog/db/queries/tenant-domains', () => ({
@@ -16,6 +22,8 @@ vi.mock('@blog/db/queries/tenant-domains', () => ({
 }));
 vi.mock('@blog/db/queries/tenants', () => ({
   createTenant: createTenantMock,
+  getTenantById: getTenantByIdMock,
+  getTenantIdBySanityProjectId: getTenantIdBySanityProjectIdMock,
   setTenantSanityToken: vi.fn(),
 }));
 
@@ -58,11 +66,14 @@ function tenant(overrides: Partial<TTenant> = {}): TTenant {
 beforeEach(() => {
   getTenantByDomainMock.mockReset();
   createTenantMock.mockReset();
+  getTenantIdBySanityProjectIdMock.mockReset();
+  getTenantByIdMock.mockReset();
 });
 
 describe(resolveOrCreateTenant, () => {
   it('creates a new tenant when no row exists for the domain', async () => {
     getTenantByDomainMock.mockResolvedValue(undefined);
+    getTenantIdBySanityProjectIdMock.mockResolvedValue(undefined);
     createTenantMock.mockResolvedValue({ ok: true, data: tenant() });
 
     const result = await resolveOrCreateTenant(args);
@@ -82,6 +93,7 @@ describe(resolveOrCreateTenant, () => {
 
   it('throws when createTenant fails', async () => {
     getTenantByDomainMock.mockResolvedValue(undefined);
+    getTenantIdBySanityProjectIdMock.mockResolvedValue(undefined);
     createTenantMock.mockResolvedValue({
       ok: false,
       error: 'DB_INVALID_DOMAIN',
@@ -90,5 +102,43 @@ describe(resolveOrCreateTenant, () => {
     await expect(resolveOrCreateTenant(args)).rejects.toThrow(
       'seed-tenant: createTenant failed (DB_INVALID_DOMAIN).',
     );
+  });
+
+  it('resumes a tenant that was created but never got its domain row', async () => {
+    getTenantByDomainMock.mockResolvedValue(undefined);
+    getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-1');
+    getTenantByIdMock.mockResolvedValue(tenant());
+
+    const result = await resolveOrCreateTenant(args);
+
+    expect(getTenantByIdMock).toHaveBeenCalledWith('tenant-1', {
+      includeArchived: true,
+    });
+    expect(createTenantMock).not.toHaveBeenCalled();
+    expect(result.id).toBe('tenant-1');
+  });
+
+  it('rejects when the Sanity project id belongs to an archived tenant', async () => {
+    getTenantByDomainMock.mockResolvedValue(undefined);
+    getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-1');
+    getTenantByIdMock.mockResolvedValue(
+      tenant({ deprovisionedAt: new Date('2026-02-01T00:00:00.000Z') }),
+    );
+
+    await expect(resolveOrCreateTenant(args)).rejects.toThrow(
+      'seed-tenant: Sanity project id "proj-acme" is already held by archived tenant "tenant-1".',
+    );
+    expect(createTenantMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects when the Sanity project id resolves to an id with no tenant row', async () => {
+    getTenantByDomainMock.mockResolvedValue(undefined);
+    getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-1');
+    getTenantByIdMock.mockResolvedValue(undefined);
+
+    await expect(resolveOrCreateTenant(args)).rejects.toThrow(
+      'seed-tenant: Sanity project id "proj-acme" resolved to tenant id "tenant-1", but that tenant no longer exists.',
+    );
+    expect(createTenantMock).not.toHaveBeenCalled();
   });
 });
