@@ -2,7 +2,7 @@ import type { ISanityImage, TMaybeUndefined } from '@blog/config';
 
 export type TBrand = {
   name: string;
-  specLine: TMaybeUndefined<string>;
+  tagline: TMaybeUndefined<string>;
   logo: TMaybeUndefined<ISanityImage>;
 };
 

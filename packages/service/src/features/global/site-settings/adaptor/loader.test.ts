@@ -1,4 +1,7 @@
-import { SPEC_LINE_SEPARATOR_CHARS, SPEC_LINE_SEPARATORS } from '@blog/config';
+import {
+  BRAND_TAGLINE_SEPARATOR_CHARS,
+  BRAND_TAGLINE_SEPARATORS,
+} from '@blog/config';
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
@@ -26,9 +29,9 @@ describe('getSiteSettings', () => {
         description: 'Great content',
         brand: {
           name: 'Awesome Blog',
-          specLine: {
+          tagline: {
             items: ['build 2026.07', 'online'],
-            separator: SPEC_LINE_SEPARATORS.DOT,
+            separator: BRAND_TAGLINE_SEPARATORS.DOT,
           },
           logo: makeRawSanityImage('Logo'),
         },
@@ -39,17 +42,17 @@ describe('getSiteSettings', () => {
 
     expect(result.description).toBe('Great content');
     expect(result.brand.name).toBe('Awesome Blog');
-    expect(result.brand.specLine).toBe(
-      `build 2026.07 ${SPEC_LINE_SEPARATOR_CHARS.DOT} online`,
+    expect(result.brand.tagline).toBe(
+      `build 2026.07 ${BRAND_TAGLINE_SEPARATOR_CHARS.DOT} online`,
     );
   });
 
-  it('maps a missing spec line to undefined', async () => {
+  it('maps a missing tagline to undefined', async () => {
     mockRun.mockResolvedValue(
       makeRawSiteSettings({
         brand: {
           name: 'Awesome Blog',
-          specLine: null,
+          tagline: null,
           logo: makeRawSanityImage('Logo'),
         },
       }),
@@ -57,17 +60,17 @@ describe('getSiteSettings', () => {
 
     const result = await getSiteSettings(tenant);
 
-    expect(result.brand.specLine).toBeUndefined();
+    expect(result.brand.tagline).toBeUndefined();
   });
 
-  it('joins multiple spec-line items with the mapped separator', async () => {
+  it('joins multiple tagline items with the mapped separator', async () => {
     mockRun.mockResolvedValue(
       makeRawSiteSettings({
         brand: {
           name: 'Awesome Blog',
-          specLine: {
+          tagline: {
             items: ['build 2026.07', 'online'],
-            separator: SPEC_LINE_SEPARATORS.PIPE,
+            separator: BRAND_TAGLINE_SEPARATORS.PIPE,
           },
           logo: makeRawSanityImage('Logo'),
         },
@@ -76,19 +79,19 @@ describe('getSiteSettings', () => {
 
     const result = await getSiteSettings(tenant);
 
-    expect(result.brand.specLine).toBe(
-      `build 2026.07 ${SPEC_LINE_SEPARATOR_CHARS.PIPE} online`,
+    expect(result.brand.tagline).toBe(
+      `build 2026.07 ${BRAND_TAGLINE_SEPARATOR_CHARS.PIPE} online`,
     );
   });
 
-  it('joins spec-line items with the Bullet separator', async () => {
+  it('joins tagline items with the Bullet separator', async () => {
     mockRun.mockResolvedValue(
       makeRawSiteSettings({
         brand: {
           name: 'Awesome Blog',
-          specLine: {
+          tagline: {
             items: ['build 2026.07', 'online'],
-            separator: SPEC_LINE_SEPARATORS.BULLET,
+            separator: BRAND_TAGLINE_SEPARATORS.BULLET,
           },
           logo: makeRawSanityImage('Logo'),
         },
@@ -97,19 +100,19 @@ describe('getSiteSettings', () => {
 
     const result = await getSiteSettings(tenant);
 
-    expect(result.brand.specLine).toBe(
-      `build 2026.07 ${SPEC_LINE_SEPARATOR_CHARS.BULLET} online`,
+    expect(result.brand.tagline).toBe(
+      `build 2026.07 ${BRAND_TAGLINE_SEPARATOR_CHARS.BULLET} online`,
     );
   });
 
-  it('joins spec-line items with the Slash separator', async () => {
+  it('joins tagline items with the Slash separator', async () => {
     mockRun.mockResolvedValue(
       makeRawSiteSettings({
         brand: {
           name: 'Awesome Blog',
-          specLine: {
+          tagline: {
             items: ['build 2026.07', 'online'],
-            separator: SPEC_LINE_SEPARATORS.SLASH,
+            separator: BRAND_TAGLINE_SEPARATORS.SLASH,
           },
           logo: makeRawSanityImage('Logo'),
         },
@@ -118,17 +121,20 @@ describe('getSiteSettings', () => {
 
     const result = await getSiteSettings(tenant);
 
-    expect(result.brand.specLine).toBe(
-      `build 2026.07 ${SPEC_LINE_SEPARATOR_CHARS.SLASH} online`,
+    expect(result.brand.tagline).toBe(
+      `build 2026.07 ${BRAND_TAGLINE_SEPARATOR_CHARS.SLASH} online`,
     );
   });
 
-  it('joins a single spec-line item with no separator character', async () => {
+  it('joins a single tagline item with no separator character', async () => {
     mockRun.mockResolvedValue(
       makeRawSiteSettings({
         brand: {
           name: 'Awesome Blog',
-          specLine: { items: ['online'], separator: SPEC_LINE_SEPARATORS.DOT },
+          tagline: {
+            items: ['online'],
+            separator: BRAND_TAGLINE_SEPARATORS.DOT,
+          },
           logo: makeRawSanityImage('Logo'),
         },
       }),
@@ -136,15 +142,15 @@ describe('getSiteSettings', () => {
 
     const result = await getSiteSettings(tenant);
 
-    expect(result.brand.specLine).toBe('online');
+    expect(result.brand.tagline).toBe('online');
   });
 
-  it('maps an empty spec-line items list to undefined', async () => {
+  it('maps an empty tagline items list to undefined', async () => {
     mockRun.mockResolvedValue(
       makeRawSiteSettings({
         brand: {
           name: 'Awesome Blog',
-          specLine: { items: [], separator: SPEC_LINE_SEPARATORS.DOT },
+          tagline: { items: [], separator: BRAND_TAGLINE_SEPARATORS.DOT },
           logo: makeRawSanityImage('Logo'),
         },
       }),
@@ -152,7 +158,7 @@ describe('getSiteSettings', () => {
 
     const result = await getSiteSettings(tenant);
 
-    expect(result.brand.specLine).toBeUndefined();
+    expect(result.brand.tagline).toBeUndefined();
   });
 
   it('leaves logo undefined when no logo is uploaded', async () => {
@@ -160,7 +166,7 @@ describe('getSiteSettings', () => {
       makeRawSiteSettings({
         brand: {
           name: 'Awesome Blog',
-          specLine: null,
+          tagline: null,
           logo: null,
         },
       }),
@@ -176,7 +182,7 @@ describe('getSiteSettings', () => {
       makeRawSiteSettings({
         brand: {
           name: 'Awesome Blog',
-          specLine: null,
+          tagline: null,
           logo: makeRawSanityImage('Logo'),
         },
       }),

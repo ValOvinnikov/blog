@@ -9,11 +9,11 @@ export const siteSettingsQuery = q.star
       .field('brand')
       .project((b) => ({
         name: b.field('name').notNull(),
-        specLine: b
-          .field('specLine')
-          .project((sl) => ({
-            items: sl.field('items[]').nullable(true),
-            separator: sl.field('separator').notNull(),
+        tagline: b
+          .field('tagline')
+          .project((t) => ({
+            items: t.field('items[]').nullable(true),
+            separator: t.field('separator').notNull(),
           }))
           .nullable(true),
         logo: b.field('logo').project(sanityImageFragment).nullable(true),

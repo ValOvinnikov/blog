@@ -7,7 +7,7 @@ const meta = {
   component: BrandLockupLink,
   tags: ['autodocs'],
   parameters: { layout: 'centered' },
-  args: { logoUrl: undefined, specLine: 'engineering journal' },
+  args: { logoUrl: undefined, tagline: 'engineering journal' },
 } satisfies Meta<typeof BrandLockupLink>;
 
 export default meta;
@@ -15,7 +15,7 @@ type TStory = StoryObj<typeof meta>;
 
 export const Default: TStory = {};
 
-/** No `specLine` — the mark renders alone, with no monospace line beneath it. */
-export const NoSpecLine: TStory = {
-  args: { specLine: undefined },
+/** No `tagline` — the mark renders alone, with no monospace line beneath it. */
+export const NoTagline: TStory = {
+  args: { tagline: undefined },
 };

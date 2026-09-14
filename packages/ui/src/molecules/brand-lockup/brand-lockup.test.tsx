@@ -25,15 +25,15 @@ describe(`<${BrandLockup.name}/>`, () => {
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
-  it('does not render a spec line by default', () => {
-    const specLine = faker.hacker.phrase();
+  it('does not render a tagline by default', () => {
+    const tagline = faker.hacker.phrase();
     setup();
-    expect(screen.queryByText(specLine)).not.toBeInTheDocument();
+    expect(screen.queryByText(tagline)).not.toBeInTheDocument();
   });
 
-  it('renders the spec line when specLine is set', () => {
-    const specLine = faker.hacker.phrase();
-    setup({ specLine });
-    expect(screen.getByText(specLine)).toBeVisible();
+  it('renders the tagline when tagline is set', () => {
+    const tagline = faker.hacker.phrase();
+    setup({ tagline });
+    expect(screen.getByText(tagline)).toBeVisible();
   });
 });

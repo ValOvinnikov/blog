@@ -22,8 +22,8 @@ describe(`<${BrandLockupLink.name}/>`, () => {
     expect(container.querySelector('svg')).toBeInTheDocument();
   });
 
-  it('passes the spec line through to the brand lockup when set', () => {
-    setup({ specLine: 'Est. 2026 · Berlin' });
+  it('passes the tagline through to the brand lockup when set', () => {
+    setup({ tagline: 'Est. 2026 · Berlin' });
 
     expect(screen.getByText('Est. 2026 · Berlin')).toBeVisible();
   });

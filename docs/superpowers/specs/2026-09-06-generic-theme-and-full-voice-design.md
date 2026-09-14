@@ -36,7 +36,7 @@ Two tasks, delivered in order:
 
 - Removing the `CONSOLE` preset or migrating tenants off it. The `preset_id`
   enum, the preset picker and the tenant rows are untouched.
-- Removing `brand.specLine` from the Studio brand object. It is an optional,
+- Removing `brand.tagline` from the Studio brand object. It is an optional,
   authored "build-tag" line under the logo rendered by `BrandLockup`; it
   reads as terminal idiom only when a tenant chooses to write one, so it is
   content, not a hardcoded symbol.

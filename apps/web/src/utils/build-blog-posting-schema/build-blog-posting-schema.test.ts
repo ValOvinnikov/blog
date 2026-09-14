@@ -23,7 +23,7 @@ const post: TPostDetail = {
   heroImage,
   featured: false,
   body: [],
-  skim: undefined,
+  postTakeaways: undefined,
   hasAsides: false,
   modules: [],
   seo: {

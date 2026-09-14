@@ -179,9 +179,9 @@ describe('postPageSchema shape', () => {
     expect(getField('post')).toBeUndefined();
   });
 
-  it('featured and skim stay optional — no validation() builder attached', () => {
+  it('featured and postTakeaways stay optional — no validation() builder attached', () => {
     expect(getField('featured')?.validation).toBeUndefined();
-    expect(getField('skim')?.validation).toBeUndefined();
+    expect(getField('postTakeaways')?.validation).toBeUndefined();
   });
 
   it('has no newsletterEnabled field — the newsletter module in modules[] is the toggle', () => {
@@ -306,7 +306,7 @@ describe('postPageSchema field order', () => {
       'tags',
       'modules',
       'publishedAt',
-      'skim',
+      'postTakeaways',
       'seo',
     ]);
   });

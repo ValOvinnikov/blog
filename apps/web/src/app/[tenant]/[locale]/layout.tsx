@@ -198,7 +198,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
                     <Header.Brand>
                       <BrandLockupLink
                         logoUrl={brandLogoUrl}
-                        specLine={brand.specLine}
+                        tagline={brand.tagline}
                       />
                     </Header.Brand>
                     <SiteNavigation

@@ -1,4 +1,4 @@
-import type { Skim } from '@blog/config';
+import type { PostTakeaways } from '@blog/config';
 import type { TTenantSanityContext } from '@blog/service/sanity/query';
 import { getWriteClient } from '@blog/service/sanity/write-client';
 
@@ -17,11 +17,11 @@ function toPublishedId(postId: string): string {
 }
 
 /**
- * Patches `skim` onto a post's *draft* only — never the published document —
- * so a generated skim always needs human approval (a Studio publish) before
- * readers see it. Idempotent: re-running always targets the same draft id
- * and `.set()`s the whole `skim` object, so it only ever overwrites that one
- * field, never other draft content and never the published document.
+ * Patches `postTakeaways` onto a post's *draft* only — never the published
+ * document — so generated takeaways always need human approval (a Studio
+ * publish) before readers see them. Idempotent: re-running always targets the
+ * same draft id and `.set()`s the whole object, so it only ever overwrites
+ * that one field, never other draft content and never the published document.
  */
 export async function saveSkimDraft(
   { postId, takeaways, model }: TSaveSkimDraftInput,
@@ -38,8 +38,8 @@ export async function saveSkimDraft(
     );
   }
 
-  const skim: Skim = {
-    _type: 'skim',
+  const postTakeaways: PostTakeaways = {
+    _type: 'postTakeaways',
     takeaways,
     generatedAt: new Date().toISOString(),
     model,
@@ -51,6 +51,6 @@ export async function saveSkimDraft(
     // or an editor's own unpublished edit) — never overwrites an existing
     // draft's other fields.
     .createIfNotExists({ ...published, _id: draftId })
-    .patch(draftId, { set: { skim } })
+    .patch(draftId, { set: { postTakeaways } })
     .commit();
 }

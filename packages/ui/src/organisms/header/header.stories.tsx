@@ -48,7 +48,7 @@ export const WithBrandLockup: TStory = {
           <a href="/">
             <BrandLockup
               src="https://placehold.co/64x64"
-              specLine="v1.0.0 · build/local"
+              tagline="v1.0.0 · build/local"
             />
           </a>
         </Header.Brand>
