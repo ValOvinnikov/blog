@@ -294,6 +294,51 @@ describe('heroBlogSchema secondaryAction field', () => {
   });
 });
 
+describe('heroBlogSchema secondaryLink field', () => {
+  const getVariantGuard = (): TCustomFn => {
+    const validators = getRecordedValidators<TCustomFn>(
+      getField('secondaryLink'),
+    );
+    const variantGuard = validators.at(-1);
+
+    if (!variantGuard) {
+      throw new Error(
+        'Expected secondaryLink to register a Secondary-variant guard.',
+      );
+    }
+
+    return variantGuard.fn;
+  };
+
+  it('is valid when unset', () => {
+    const validate = getVariantGuard();
+
+    expect(validate(undefined, { parent: {} })).toBe(true);
+  });
+
+  it('is valid with an empty array', () => {
+    const validate = getVariantGuard();
+
+    expect(validate([], { parent: {} })).toBe(true);
+  });
+
+  it('is valid with the Secondary variant', () => {
+    const validate = getVariantGuard();
+
+    expect(
+      validate([{ variant: CTA_ACTION_VARIANT.SECONDARY }], { parent: {} }),
+    ).toBe(true);
+  });
+
+  it('errors with the Primary variant', () => {
+    const validate = getVariantGuard();
+
+    expect(
+      validate([{ variant: CTA_ACTION_VARIANT.PRIMARY }], { parent: {} }),
+    ).toBe('Secondary Link must use the Secondary variant.');
+  });
+});
+
 describe('heroBlogSchema document validation', () => {
   it('registers four document-level rules: two errors then two warnings', () => {
     const validators = getDocumentValidators();
