@@ -2,6 +2,7 @@ import {
   CTA_ACTION_APPEARANCE,
   CTA_ACTION_VARIANT,
 } from '@blog/config/constants';
+import { ctaActionRefSchema } from '@blog/studio/schema-types/objects/cta-action-ref/cta-action-ref';
 import { linkSchema } from '@blog/studio/schema-types/objects/link/link';
 import { toTitleCase } from '@blog/utils/primitives';
 import { MousePointerClick } from 'lucide-react';
@@ -87,7 +88,10 @@ export const actionGroupSchema = defineType({
       type: 'array',
       description:
         'The buttons or links offered here — Primary drives the main click, Secondary offers an alternative alongside it.',
-      of: [defineArrayMember({ type: ctaActionSchema.name })],
+      of: [
+        defineArrayMember({ type: ctaActionSchema.name }),
+        defineArrayMember({ type: ctaActionRefSchema.name }),
+      ],
       validation: (rule) =>
         rule.max(2).custom((value) => {
           const items = (value ?? []) as TActionItem[];

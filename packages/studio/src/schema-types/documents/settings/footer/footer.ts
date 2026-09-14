@@ -1,5 +1,6 @@
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { linkSchema } from '@blog/studio/schema-types/objects/link/link';
+import { socialLinkRefSchema } from '@blog/studio/schema-types/objects/social-link-ref/social-link-ref';
 import { PanelBottom } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
@@ -17,7 +18,10 @@ export const footerSettingsSchema = defineType({
       title: 'Social Links',
       type: 'array',
       description: 'Social profile links shown in the site footer.',
-      of: [defineArrayMember({ type: linkSchema.name })],
+      of: [
+        defineArrayMember({ type: linkSchema.name }),
+        defineArrayMember({ type: socialLinkRefSchema.name }),
+      ],
     }),
   ],
 });

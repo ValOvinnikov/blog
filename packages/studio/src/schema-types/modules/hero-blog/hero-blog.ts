@@ -10,8 +10,10 @@ import {
 } from '@blog/config/constants';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { heroFields } from '@blog/studio/schema-types/fields/hero-fields/hero-fields';
+import { linksField } from '@blog/studio/schema-types/fields/links-field/links-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { ctaActionSchema } from '@blog/studio/schema-types/objects/action-group/action-group';
+import { ctaActionRefSchema } from '@blog/studio/schema-types/objects/cta-action-ref/cta-action-ref';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { getDraftsClient } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
 import {
@@ -232,6 +234,14 @@ export const heroBlogSchema = defineType({
             ? 'Secondary Action must use the Secondary variant.'
             : true;
         }),
+    }),
+    linksField({
+      name: 'secondaryLink',
+      title: 'Secondary Link',
+      description:
+        'Optional secondary action shown next to the primary action, authored by choosing a shared link.',
+      of: [ctaActionRefSchema.name],
+      max: 1,
     }),
     ...heroFields({ image: false }),
   ],

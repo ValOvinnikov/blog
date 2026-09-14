@@ -5,6 +5,7 @@ import {
 } from '@blog/config/constants';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { linksField } from '@blog/studio/schema-types/fields/links-field/links-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
@@ -174,6 +175,13 @@ export const heroSchema = defineType({
       title: 'Secondary Action',
       type: linkSchema.name,
       description: 'Optional secondary CTA shown next to the primary action.',
+    }),
+    linksField({
+      name: 'secondaryLink',
+      title: 'Secondary Link',
+      description:
+        'Optional secondary CTA shown next to the primary action, authored by choosing a shared link.',
+      max: 1,
     }),
     heroLayoutField,
   ],
