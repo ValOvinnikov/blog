@@ -2,6 +2,7 @@ import { headers } from 'next/headers';
 import { cache } from 'react';
 
 import { TENANT_ID_HEADER } from './tenant-id-header';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from './unresolved-tenant-placeholder';
 
 /**
  * getRequestTenantId — resolves the request's tenant id, preferring an
@@ -13,9 +14,11 @@ import { TENANT_ID_HEADER } from './tenant-id-header';
  * that genuinely can't (Server Actions, the auth-gated `account`/`bookmarks`
  * pages, and the `not-found.tsx` boundaries outside `[tenant]/[locale]`'s
  * layout — the root one and `[tenant]/not-found.tsx`). `undefined` means
- * neither is available
- * (only possible outside production — an unmatched host in production never
- * reaches here, proxy.ts 404s first).
+ * neither is available (only possible outside production — an unmatched
+ * host in production never reaches here, proxy.ts 404s first), which is
+ * also what a `tenant`/header value equal to `UNRESOLVED_TENANT_PLACEHOLDER`
+ * resolves to — this is the sole chokepoint that refuses it, so it never
+ * reaches a database lookup as a real tenant id.
  *
  * Wrapped in React's `cache()` so every Server Component/module in the same
  * render pass sharing the same argument shares one result instead of
@@ -23,9 +26,13 @@ import { TENANT_ID_HEADER } from './tenant-id-header';
  */
 export const getRequestTenantId = cache(
   async (tenant?: string): Promise<string | undefined> => {
-    if (tenant) return tenant;
+    if (tenant && tenant !== UNRESOLVED_TENANT_PLACEHOLDER) return tenant;
 
     const headersList = await headers();
-    return headersList.get(TENANT_ID_HEADER) ?? undefined;
+    const headerTenantId = headersList.get(TENANT_ID_HEADER);
+    if (!headerTenantId || headerTenantId === UNRESOLVED_TENANT_PLACEHOLDER) {
+      return undefined;
+    }
+    return headerTenantId;
   },
 );

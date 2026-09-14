@@ -2,6 +2,7 @@ import { queries, TENANT_STATUS } from '@blog/db';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 
 import { getTenantSanityContext } from './get-tenant-sanity-context';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from './unresolved-tenant-placeholder';
 
 const {
   getPlatformSanityContextMock,
@@ -163,5 +164,35 @@ describe('getTenantSanityContext memoization', () => {
     await freshGetTenantSanityContext();
 
     expect(queries.tenants.getTenantSanityCredentials).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('getTenantSanityContext with the real getRequestTenantId chokepoint', () => {
+  afterEach(() => {
+    vi.doUnmock('@web/server/tenant/get-request-tenant-id');
+    vi.doUnmock('next/headers');
+    vi.resetModules();
+  });
+
+  it('falls back to the platform Sanity context for the unresolved-tenant placeholder segment, without ever querying tenant credentials with it', async () => {
+    getPlatformSanityContextMock.mockReset();
+    getPlatformSanityContextMock.mockReturnValue(platformTenant);
+    isProductionEnvironmentMock.mockReset();
+    isProductionEnvironmentMock.mockReturnValue(false);
+    vi.mocked(queries.tenants.getTenantSanityCredentials).mockReset();
+
+    vi.doUnmock('@web/server/tenant/get-request-tenant-id');
+    vi.doMock('next/headers', () => ({
+      headers: vi.fn().mockResolvedValue(new Headers()),
+    }));
+    vi.resetModules();
+
+    const { getTenantSanityContext: freshGetTenantSanityContext } =
+      await import('./get-tenant-sanity-context');
+
+    await expect(
+      freshGetTenantSanityContext(UNRESOLVED_TENANT_PLACEHOLDER),
+    ).resolves.toBe(platformTenant);
+    expect(queries.tenants.getTenantSanityCredentials).not.toHaveBeenCalled();
   });
 });
