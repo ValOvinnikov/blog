@@ -52,6 +52,13 @@ describe(buildRssFeed, () => {
     expect(itemXml).not.toContain('<description>');
   });
 
+  it('omits the channel description element entirely when the channel has none', () => {
+    const xml = buildRssFeed({ ...channel, description: undefined }, [item]);
+    const channelXml = xml.slice(0, xml.indexOf('<item>'));
+
+    expect(channelXml).not.toContain('<description>');
+  });
+
   it('produces an empty channel (no items) without throwing', () => {
     const xml = buildRssFeed(channel, []);
 

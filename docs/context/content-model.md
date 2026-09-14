@@ -144,7 +144,9 @@ replacing a hand-duplicated block per page document.
   back to a default mark when unset; `tagline` is
   a `brandTagline` object, `{ items: string[] (max 4, each max 15 chars),
 separator: BRAND_TAGLINE_SEPARATORS }`, replacing a plain string so the
-  service layer can join it with a chosen separator glyph), description.
+  service layer can join it with a chosen separator glyph). Carries no SEO
+  fields — page metadata and the RSS channel description are authored on the
+  pages themselves.
 - `settings_theme` (singleton, `themeSettingsSchema`) — `titleField` (bare; see
   helper note below), `preset` (required, `PRESET_ID` stored value:
   `CONSOLE`/`EDITORIAL`), `accentHue`/`logoHue` (optional numbers, 0-360,
@@ -194,10 +196,8 @@ from `IMAGE_LAYOUT`, undefined = Inline — shares its `alt`/hotspot shape with
 `imageWithAlt` via the `image-alt-field` helper, but is a distinct type
 registered only as `richText`'s body-array image member, so the layout
 choice can't leak into hero/avatar/OG/brand images), `seo` (`metaTitle`
-required, 30–60 characters; every other field optional — an empty
-`metaDescription` inherits `settings_site.description` through the locale
-layout's metadata, everything else is omitted from the page head when
-unset) + `openGraph`,
+required, 30–60 characters; every other field optional and omitted from the
+page head when unset — there is no fallback) + `openGraph`,
 `proseText` / `richText`, `aside` (deep-dive block type registered in
 `richText`'s portable-text array; `kind` from `ASIDE_KIND`, required; `body`
 via `proseText`, required — part of the choose-your-depth reading feature,

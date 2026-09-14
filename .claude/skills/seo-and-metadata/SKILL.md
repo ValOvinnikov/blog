@@ -16,13 +16,9 @@ feeding `metadataBase` in `[locale]/layout.tsx`).
 **The service layer owns SEO resolution, and it is authored-only.** Page
 view-models from `@blog/service` carry `seo: TSeoResolved` holding exactly
 what an editor typed. There is **no fallback ladder** — no content-derived
-tier, no site defaults in `service` or the routes. Anything unauthored is
-`undefined` and must be **omitted** from the document head, never emitted
-as an empty tag. The one site default is `description`: `toMetadata` leaves
-the key out entirely when a page's `metaDescription` is empty, so Next's
-segment merge keeps the locale layout's `settings_site.description` (and
-fills OG/Twitter descriptions from it) — inheritance in Next, not a `??`
-chain here:
+tier, no site defaults (the locale layout sets no `description`, so nothing
+is there to inherit). Anything unauthored is `undefined` and must be
+**omitted** from the document head, never emitted as an empty tag:
 
 ```ts
 type TSeoResolved = {
@@ -93,7 +89,8 @@ export async function generateMetadata({ params }: TProps): Promise<Metadata> {
 - `robots.ts` — allow all, `sitemap` at `${NEXT_PUBLIC_SITE_URL}/sitemap.xml`.
 - `rss.xml/route.ts` — Route Handler, `Content-Type: application/xml`, built
   from the posts loader (title, link, `pubDate`, description from `excerpt`;
-  channel description from `siteSettings.description`).
+  channel title from `siteSettings.brand.name`, channel description from the
+  blog index page's `seo.description`, omitted when unauthored).
 
 ## Rules
 

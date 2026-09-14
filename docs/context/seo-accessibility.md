@@ -12,13 +12,13 @@
 - **SEO resolution lives in `service`**, not the routes, and is
   **authored-only**: a single `resolveSeo` transformer reads the authored
   `seo` object and the tenant image context, nothing else. There is no
-  fallback ladder — no content-derived tier, and no site defaults in
-  `service` or the routes. `web` maps the result to `Metadata` with one
-  shared `toMetadata` helper — no `??` fallback chains in route files. The
-  single site default is `description`: `toMetadata` omits the key when a
-  page's `metaDescription` is empty, so Next's segment merge keeps the
-  locale layout's `settings_site.description` (and fills OG/Twitter
-  descriptions from it). Page loaders return `seo: TSeoResolved`.
+  fallback ladder — no content-derived tier and no site defaults; the locale
+  layout sets no `description`, so a page's `metaDescription` is its own or
+  nothing. `web` maps the result to `Metadata` with one shared `toMetadata`
+  helper — no `??` fallback chains in route files. Page loaders return
+  `seo: TSeoResolved`. The RSS channel `<description>` follows the same
+  rule: it is the blog index page's `metaDescription`, omitted when
+  unauthored.
   The `seo` object itself is required on every page document type, and
   `metaTitle` is required within it (30–60 characters) — Sanity skips
   validation for an object that is absent, so requiring only `metaTitle`

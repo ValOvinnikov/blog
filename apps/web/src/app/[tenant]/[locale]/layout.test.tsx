@@ -190,7 +190,7 @@ describe('LocaleLayout', () => {
   });
 
   describe('generateMetadata', () => {
-    it('builds title and description from site settings', async () => {
+    it('builds title from site settings and emits no description', async () => {
       const metadata = await generateMetadata({
         params: Promise.resolve({
           tenant: 'tenant-1',
@@ -201,9 +201,9 @@ describe('LocaleLayout', () => {
       expect(metadata).toEqual(
         expect.objectContaining({
           title: { default: 'Blog', template: '%s | Blog' },
-          description: 'A blog',
         }),
       );
+      expect(metadata).not.toHaveProperty('description');
     });
 
     it('falls back to metadataBase only when site settings fail', async () => {
