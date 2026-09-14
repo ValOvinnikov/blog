@@ -2,6 +2,10 @@ import { StandaloneNotFoundPage } from '@web/components/pages/standalone-not-fou
 import { buildNotFoundMetadata } from '@web/metadata/not-found-metadata';
 import type { Metadata } from 'next';
 
+export async function generateMetadata(): Promise<Metadata> {
+  return buildNotFoundMetadata();
+}
+
 /**
  * The root-level not-found boundary — it renders outside
  * `[tenant]/[locale]/layout.tsx` entirely (see `app/layout.tsx`'s doc
@@ -10,13 +14,10 @@ import type { Metadata } from 'next';
  * depending on that layout's providers. It never reads the request header
  * for a tenant id — Next treats `headers()` as fatal inside a route it has
  * committed to static generation, so this boundary always renders the
- * default, unthemed 404: a tenant-scoped 404 for a URL that carries one is
- * `[tenant]/[locale]/not-found.tsx`'s job, not this one's.
+ * default, unthemed 404. That static-generation window covers every
+ * content `notFound()` under `[tenant]/[locale]` today, not just a
+ * genuinely tenant-less URL, so this is the boundary most 404s actually hit.
  */
-export async function generateMetadata(): Promise<Metadata> {
-  return buildNotFoundMetadata();
-}
-
 export default async function NotFound() {
   return await StandaloneNotFoundPage();
 }

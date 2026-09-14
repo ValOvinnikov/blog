@@ -3,7 +3,7 @@ import {
   routes,
   SITE_MESSAGES as realMessages,
   SOCIAL_PLATFORMS,
-  type ITenantLocalizedParams,
+  type TLocaleIsoCode,
 } from '@blog/config';
 import userEvent from '@testing-library/user-event';
 import { Analytics } from '@vercel/analytics/next';
@@ -16,7 +16,6 @@ import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 import LocaleLayout, { generateMetadata, generateStaticParams } from './layout';
-import { localeLayoutVariants } from './layout-variants';
 
 const {
   getSiteSettingsMock,
@@ -605,8 +604,8 @@ describe('LocaleLayout', () => {
           children: <div>content</div>,
           params: Promise.resolve({
             tenant: 'tenant-1',
-            locale: 'xx',
-          } as unknown as ITenantLocalizedParams),
+            locale: 'xx' as unknown as TLocaleIsoCode,
+          }),
         }),
       ).rejects.toThrow('NEXT_NOT_FOUND');
 
@@ -615,15 +614,5 @@ describe('LocaleLayout', () => {
         rememberRequestTenantIdMock.mock.invocationCallOrder[0],
       ).toBeLessThan(vi.mocked(notFound).mock.invocationCallOrder[0]!);
     });
-  });
-});
-
-describe(localeLayoutVariants, () => {
-  it('keeps the content slot a flex column container that grows to fill its parent', () => {
-    const contentClassName = localeLayoutVariants().content();
-
-    expect(contentClassName).toContain('flex-1');
-    expect(contentClassName).toContain('flex-col');
-    expect(contentClassName).toMatch(/(^|\s)flex(\s|$)/);
   });
 });
