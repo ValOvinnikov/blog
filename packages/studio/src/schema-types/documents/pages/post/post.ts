@@ -11,8 +11,8 @@ import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/n
 import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
+import { postTakeawaysSchema } from '@blog/studio/schema-types/objects/post-takeaways/post-takeaways';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
-import { skimSchema } from '@blog/studio/schema-types/objects/skim/skim';
 import { richTextSchema } from '@blog/studio/schema-types/portable-text/rich-text/rich-text';
 import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/validation/validate-single-blank-heading-per-type/validate-single-blank-heading-per-type';
 import { Newspaper } from 'lucide-react';
@@ -108,9 +108,9 @@ export const postPageSchema = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'skim',
-      title: 'Skim',
-      type: skimSchema.name,
+      name: 'postTakeaways',
+      title: 'Takeaways',
+      type: postTakeawaysSchema.name,
       description:
         '30-second-skim takeaways for the choose-your-depth reading experience.',
     }),

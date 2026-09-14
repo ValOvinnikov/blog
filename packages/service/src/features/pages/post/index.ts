@@ -1,6 +1,6 @@
 export type {
   TPostDetail,
   TPostDetailAuthor,
-  TPostSkim,
+  TPostTakeaways,
 } from './adaptor/detail-page/types';
 export { createPostService } from './application/service';

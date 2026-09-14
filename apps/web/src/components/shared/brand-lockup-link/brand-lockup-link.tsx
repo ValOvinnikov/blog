@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 export interface IBrandLockupLinkProps {
   /** The brand logo, already resolved to a rendered URL by the caller. */
   logoUrl?: string;
-  specLine?: string;
+  tagline?: string;
 }
 
 /**
@@ -16,13 +16,13 @@ export interface IBrandLockupLinkProps {
  */
 export const BrandLockupLink = ({
   logoUrl,
-  specLine,
+  tagline,
 }: IBrandLockupLinkProps) => {
   const t = useTranslations('brandLockupLink');
 
   return (
     <SmartLink href="/" aria-label={t('ariaLabel')}>
-      <BrandLockup src={logoUrl} specLine={specLine} />
+      <BrandLockup src={logoUrl} tagline={tagline} />
     </SmartLink>
   );
 };

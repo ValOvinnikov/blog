@@ -10,11 +10,13 @@ import { tagFragment } from './tag';
 import { topicFragment } from './topic';
 import { WORD_COUNT_EXPRESSION, wordCountParser } from './word-count';
 
-const skimFragment = q.fragmentForType<'skim'>().project((sub) => ({
-  takeaways: sub.field('takeaways[]').nullable(true),
-  generatedAt: sub.field('generatedAt').nullable(true),
-  model: sub.field('model').nullable(true),
-}));
+const postTakeawaysFragment = q
+  .fragmentForType<'postTakeaways'>()
+  .project((sub) => ({
+    takeaways: sub.field('takeaways[]').nullable(true),
+    generatedAt: sub.field('generatedAt').nullable(true),
+    model: sub.field('model').nullable(true),
+  }));
 
 export const postCardFragment = q
   .fragmentForType<'page_post'>()
@@ -55,7 +57,10 @@ export const postDetailFragment = q
       .field('content[]')
       .project(portableTextBodyItemFragment)
       .notNull(),
-    skim: sub.field('skim').project(skimFragment).nullable(true),
+    postTakeaways: sub
+      .field('postTakeaways')
+      .project(postTakeawaysFragment)
+      .nullable(true),
     seo: sub.field('seo').project(seoFragment).notNull(),
     author: sub.field('author').deref().project(authorDetailFragment).notNull(),
     topic: sub.field('topic').deref().project(topicFragment).notNull(),

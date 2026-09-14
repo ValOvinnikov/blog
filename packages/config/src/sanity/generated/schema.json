@@ -1668,7 +1668,7 @@
     }
   },
   {
-    "name": "skim",
+    "name": "postTakeaways",
     "type": "type",
     "value": {
       "type": "object",
@@ -1677,7 +1677,7 @@
           "type": "objectAttribute",
           "value": {
             "type": "string",
-            "value": "skim"
+            "value": "postTakeaways"
           }
         },
         "takeaways": {
@@ -1735,11 +1735,11 @@
           },
           "optional": true
         },
-        "specLine": {
+        "tagline": {
           "type": "objectAttribute",
           "value": {
             "type": "inline",
-            "name": "specLine"
+            "name": "brandTagline"
           },
           "optional": true
         }
@@ -1747,7 +1747,7 @@
     }
   },
   {
-    "name": "specLine",
+    "name": "brandTagline",
     "type": "type",
     "value": {
       "type": "object",
@@ -1756,7 +1756,7 @@
           "type": "objectAttribute",
           "value": {
             "type": "string",
-            "value": "specLine"
+            "value": "brandTagline"
           }
         },
         "items": {
@@ -5824,11 +5824,11 @@
         },
         "optional": true
       },
-      "skim": {
+      "postTakeaways": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "skim"
+          "name": "postTakeaways"
         },
         "optional": true
       },
