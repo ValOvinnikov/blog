@@ -17,8 +17,9 @@ import { UNRESOLVED_TENANT_PLACEHOLDER } from './unresolved-tenant-placeholder';
  * neither is available (only possible outside production — an unmatched
  * host in production never reaches here, proxy.ts 404s first), which is
  * also what a `tenant`/header value equal to `UNRESOLVED_TENANT_PLACEHOLDER`
- * resolves to — this is the sole chokepoint that refuses it, so it never
- * reaches a database lookup as a real tenant id.
+ * resolves to. This is the chokepoint for id-only callers; a caller needing
+ * the full tenant row goes through `resolveRequestTenant` instead, which
+ * refuses the same placeholder on its own path.
  *
  * Wrapped in React's `cache()` so every Server Component/module in the same
  * render pass sharing the same argument shares one result instead of
@@ -26,7 +27,8 @@ import { UNRESOLVED_TENANT_PLACEHOLDER } from './unresolved-tenant-placeholder';
  */
 export const getRequestTenantId = cache(
   async (tenant?: string): Promise<string | undefined> => {
-    if (tenant && tenant !== UNRESOLVED_TENANT_PLACEHOLDER) return tenant;
+    if (tenant === UNRESOLVED_TENANT_PLACEHOLDER) return undefined;
+    if (tenant) return tenant;
 
     const headersList = await headers();
     const headerTenantId = headersList.get(TENANT_ID_HEADER);
