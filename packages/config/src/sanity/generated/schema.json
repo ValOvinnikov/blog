@@ -604,7 +604,7 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "link"
+                  "name": "inlineLink"
                 }
               }
             },
@@ -1924,7 +1924,7 @@
           "type": "objectAttribute",
           "value": {
             "type": "inline",
-            "name": "link"
+            "name": "inlineLink"
           },
           "optional": true
         }
@@ -2022,7 +2022,7 @@
     }
   },
   {
-    "name": "link",
+    "name": "inlineLink",
     "type": "type",
     "value": {
       "type": "object",
@@ -2031,7 +2031,7 @@
           "type": "objectAttribute",
           "value": {
             "type": "string",
-            "value": "link"
+            "value": "inlineLink"
           }
         },
         "label": {
@@ -2896,7 +2896,7 @@
             },
             "rest": {
               "type": "inline",
-              "name": "link"
+              "name": "inlineLink"
             }
           }
         },
@@ -2962,7 +2962,7 @@
             },
             "rest": {
               "type": "inline",
-              "name": "link"
+              "name": "inlineLink"
             }
           }
         },
@@ -4130,189 +4130,6 @@
   },
   {
     "type": "type",
-    "name": "module_postFeatured.reference",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_ref": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          }
-        },
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "reference"
-          }
-        },
-        "_weak": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      },
-      "dereferencesTo": "module_postFeatured"
-    }
-  },
-  {
-    "name": "page_postIndex",
-    "type": "document",
-    "attributes": {
-      "_id": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        }
-      },
-      "_type": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string",
-          "value": "page_postIndex"
-        }
-      },
-      "_createdAt": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        }
-      },
-      "_updatedAt": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        }
-      },
-      "_rev": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        }
-      },
-      "title": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
-      "headingBlock": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "headingBlock"
-        },
-        "optional": true
-      },
-      "hero": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "inline",
-              "name": "module_hero.reference"
-            },
-            {
-              "type": "inline",
-              "name": "module_heroBlog.reference"
-            },
-            {
-              "type": "inline",
-              "name": "module_heroStatement.reference"
-            }
-          ]
-        },
-        "optional": true
-      },
-      "modules": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "array",
-          "of": {
-            "type": "union",
-            "of": [
-              {
-                "type": "object",
-                "attributes": {
-                  "_key": {
-                    "type": "objectAttribute",
-                    "value": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "rest": {
-                  "type": "inline",
-                  "name": "module_postList.reference"
-                }
-              },
-              {
-                "type": "object",
-                "attributes": {
-                  "_key": {
-                    "type": "objectAttribute",
-                    "value": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "rest": {
-                  "type": "inline",
-                  "name": "module_cta.reference"
-                }
-              },
-              {
-                "type": "object",
-                "attributes": {
-                  "_key": {
-                    "type": "objectAttribute",
-                    "value": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "rest": {
-                  "type": "inline",
-                  "name": "module_newsletter.reference"
-                }
-              },
-              {
-                "type": "object",
-                "attributes": {
-                  "_key": {
-                    "type": "objectAttribute",
-                    "value": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "rest": {
-                  "type": "inline",
-                  "name": "module_postFeatured.reference"
-                }
-              }
-            ]
-          }
-        },
-        "optional": true
-      },
-      "seo": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "seo"
-        },
-        "optional": true
-      }
-    }
-  },
-  {
-    "type": "type",
     "name": "module_content.reference",
     "value": {
       "type": "object",
@@ -4339,6 +4156,36 @@
         }
       },
       "dereferencesTo": "module_content"
+    }
+  },
+  {
+    "type": "type",
+    "name": "module_postFeatured.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "module_postFeatured"
     }
   },
   {
@@ -4492,6 +4339,298 @@
                 "rest": {
                   "type": "inline",
                   "name": "module_taxonomyList.reference"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "module_postFeatured.reference"
+                }
+              }
+            ]
+          }
+        },
+        "optional": true
+      },
+      "seo": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "seo"
+        },
+        "optional": true
+      }
+    }
+  },
+  {
+    "name": "link",
+    "type": "document",
+    "attributes": {
+      "_id": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_type": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string",
+          "value": "link"
+        }
+      },
+      "_createdAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_updatedAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_rev": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "title": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "label": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "internalReference": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "inline",
+              "name": "page_post.reference"
+            },
+            {
+              "type": "inline",
+              "name": "blog_topic.reference"
+            },
+            {
+              "type": "inline",
+              "name": "page_landing.reference"
+            },
+            {
+              "type": "inline",
+              "name": "page_postIndex.reference"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "url": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "openInNewTab": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
+      "platform": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "X"
+            },
+            {
+              "type": "string",
+              "value": "GITHUB"
+            },
+            {
+              "type": "string",
+              "value": "LINKEDIN"
+            },
+            {
+              "type": "string",
+              "value": "YOUTUBE"
+            },
+            {
+              "type": "string",
+              "value": "INSTAGRAM"
+            },
+            {
+              "type": "string",
+              "value": "MASTODON"
+            },
+            {
+              "type": "string",
+              "value": "BLUESKY"
+            },
+            {
+              "type": "string",
+              "value": "FACEBOOK"
+            },
+            {
+              "type": "string",
+              "value": "THREADS"
+            },
+            {
+              "type": "string",
+              "value": "RSS"
+            }
+          ]
+        },
+        "optional": true
+      }
+    }
+  },
+  {
+    "name": "page_postIndex",
+    "type": "document",
+    "attributes": {
+      "_id": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_type": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string",
+          "value": "page_postIndex"
+        }
+      },
+      "_createdAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_updatedAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_rev": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "title": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "headingBlock": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "headingBlock"
+        },
+        "optional": true
+      },
+      "hero": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "inline",
+              "name": "module_hero.reference"
+            },
+            {
+              "type": "inline",
+              "name": "module_heroBlog.reference"
+            },
+            {
+              "type": "inline",
+              "name": "module_heroStatement.reference"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "modules": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "array",
+          "of": {
+            "type": "union",
+            "of": [
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "module_postList.reference"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "module_cta.reference"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "module_newsletter.reference"
                 }
               },
               {
@@ -5560,7 +5699,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "link"
+          "name": "inlineLink"
         },
         "optional": true
       },

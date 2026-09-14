@@ -95,7 +95,7 @@ export type InlineText = Array<{
   markDefs?: Array<
     {
       _key: string;
-    } & Link
+    } & InlineLink
   >;
   level?: number;
   _type: 'block';
@@ -276,7 +276,7 @@ export type CtaAction = {
   _type: 'ctaAction';
   variant?: 'PRIMARY' | 'SECONDARY';
   appearance?: 'CONTAINED' | 'INLINE';
-  link?: Link;
+  link?: InlineLink;
 };
 
 export type Blog_topicReference = {
@@ -300,8 +300,8 @@ export type Page_postIndexReference = {
   [internalGroqTypeReferenceTo]?: 'page_postIndex';
 };
 
-export type Link = {
-  _type: 'link';
+export type InlineLink = {
+  _type: 'inlineLink';
   label?: string;
   accessibleLabel?: string;
   linkType?: 'INTERNAL' | 'EXTERNAL';
@@ -419,7 +419,7 @@ export type Settings_footer = {
   social?: Array<
     {
       _key: string;
-    } & Link
+    } & InlineLink
   >;
 };
 
@@ -433,7 +433,7 @@ export type Settings_navigation = {
   items?: Array<
     {
       _key: string;
-    } & Link
+    } & InlineLink
   >;
 };
 
@@ -655,47 +655,18 @@ export type Module_taxonomyList = {
   layout?: Layout;
 };
 
-export type Module_postFeaturedReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_postFeatured';
-};
-
-export type Page_postIndex = {
-  _id: string;
-  _type: 'page_postIndex';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  headingBlock?: HeadingBlock;
-  hero?:
-    | Module_heroReference
-    | Module_heroBlogReference
-    | Module_heroStatementReference;
-  modules?: Array<
-    | ({
-        _key: string;
-      } & Module_postListReference)
-    | ({
-        _key: string;
-      } & Module_ctaReference)
-    | ({
-        _key: string;
-      } & Module_newsletterReference)
-    | ({
-        _key: string;
-      } & Module_postFeaturedReference)
-  >;
-  seo?: Seo;
-};
-
 export type Module_contentReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
   [internalGroqTypeReferenceTo]?: 'module_content';
+};
+
+export type Module_postFeaturedReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_postFeatured';
 };
 
 export type Page_home = {
@@ -726,6 +697,63 @@ export type Page_home = {
     | ({
         _key: string;
       } & Module_taxonomyListReference)
+    | ({
+        _key: string;
+      } & Module_postFeaturedReference)
+  >;
+  seo?: Seo;
+};
+
+export type Link = {
+  _id: string;
+  _type: 'link';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  label?: string;
+  internalReference?:
+    | Page_postReference
+    | Blog_topicReference
+    | Page_landingReference
+    | Page_postIndexReference;
+  url?: string;
+  openInNewTab?: boolean;
+  platform?:
+    | 'X'
+    | 'GITHUB'
+    | 'LINKEDIN'
+    | 'YOUTUBE'
+    | 'INSTAGRAM'
+    | 'MASTODON'
+    | 'BLUESKY'
+    | 'FACEBOOK'
+    | 'THREADS'
+    | 'RSS';
+};
+
+export type Page_postIndex = {
+  _id: string;
+  _type: 'page_postIndex';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  headingBlock?: HeadingBlock;
+  hero?:
+    | Module_heroReference
+    | Module_heroBlogReference
+    | Module_heroStatementReference;
+  modules?: Array<
+    | ({
+        _key: string;
+      } & Module_postListReference)
+    | ({
+        _key: string;
+      } & Module_ctaReference)
+    | ({
+        _key: string;
+      } & Module_newsletterReference)
     | ({
         _key: string;
       } & Module_postFeaturedReference)
@@ -863,7 +891,7 @@ export type Module_hero = {
   heroImageMode?: 'POST_IMAGE' | 'CUSTOM' | 'NONE';
   heroImage?: ImageWithAlt;
   primaryActionLabel?: string;
-  secondaryAction?: Link;
+  secondaryAction?: InlineLink;
   layout?: HeroLayout;
 };
 
@@ -1082,7 +1110,7 @@ export type AllSanitySchemaTypes =
   | Blog_topicReference
   | Page_landingReference
   | Page_postIndexReference
-  | Link
+  | InlineLink
   | SocialLink
   | Aside
   | BodyImage
@@ -1109,10 +1137,11 @@ export type AllSanitySchemaTypes =
   | Page_topic
   | Page_topicIndex
   | Module_taxonomyList
-  | Module_postFeaturedReference
-  | Page_postIndex
   | Module_contentReference
+  | Module_postFeaturedReference
   | Page_home
+  | Link
+  | Page_postIndex
   | Blog_tag
   | Blog_author
   | Page_landing
