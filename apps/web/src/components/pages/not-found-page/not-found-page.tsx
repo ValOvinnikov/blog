@@ -8,18 +8,22 @@ import { useTranslations } from 'next-intl';
 
 import { notFoundPageVariants } from './not-found-page-variants';
 
-const s = notFoundPageVariants();
+type TNotFoundPageProps = {
+  shouldFillViewport?: boolean;
+};
 
 /**
- * NotFoundPage — the 404 body content. Rendered from the root
- * `not-found.tsx`, which sits outside the `[tenant]/[locale]` route tree
- * (this app's `Header`/`Footer` chrome lives in `[tenant]/[locale]/layout.tsx`),
- * so this stays a self-contained, centered composition: an optional eyebrow,
- * the page heading, supporting text, and a link home.
+ * NotFoundPage — the centered 404 body content shared by every not-found
+ * boundary; `shouldFillViewport` (default `true`) sizes it to the full viewport
+ * for the two boundaries that render with no surrounding chrome, or set it
+ * to `false` to instead fill the space handed to it by a layout.
  */
-export const NotFoundPage = () => {
+export const NotFoundPage = ({
+  shouldFillViewport = true,
+}: TNotFoundPageProps) => {
   const t = useTranslations('notFound');
   const eyebrow = t('eyebrow');
+  const s = notFoundPageVariants({ shouldFillViewport });
 
   return (
     <main className={s.root()}>

@@ -36,4 +36,17 @@ describe(`<${NotFoundPage.name}/>`, () => {
       within(link).getByTestId('not-found-arrow-icon'),
     ).toBeInTheDocument();
   });
+
+  it('sizes to the full viewport by default', () => {
+    expect(screen.getByRole('main')).toHaveClass('min-h-dvh');
+  });
+});
+
+describe(`<${NotFoundPage.name}/> given shouldFillViewport={false}`, () => {
+  it('fills its container instead of the full viewport', () => {
+    const { getByRole } = setup({ shouldFillViewport: false });
+
+    expect(getByRole('main')).toHaveClass('flex-1');
+    expect(getByRole('main')).not.toHaveClass('min-h-dvh');
+  });
 });

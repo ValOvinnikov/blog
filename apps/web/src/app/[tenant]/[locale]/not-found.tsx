@@ -8,12 +8,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 /**
  * Catches every `notFound()` thrown inside `[tenant]/[locale]`'s page tree —
- * pagination overflow, an absent backing document. `[tenant]/[locale]/layout.tsx`
- * has already rendered successfully by the time this runs, so it renders only
- * the bare `NotFoundPage` body and inherits the layout's `ThemeScope`,
- * `NextIntlClientProvider`, and `Header`/`Footer` chrome rather than
- * resolving any of it itself.
+ * pagination overflow, an absent backing document.
  */
 export default function TenantLocaleNotFound() {
-  return <NotFoundPage />;
+  return <NotFoundPage shouldFillViewport={false} />;
 }

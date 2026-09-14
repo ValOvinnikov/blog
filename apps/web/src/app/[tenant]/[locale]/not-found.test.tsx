@@ -57,4 +57,10 @@ describe('TenantLocaleNotFound ([tenant]/[locale] not-found route)', () => {
     expect(getThemeTokensMock).not.toHaveBeenCalled();
     expect(resolveTenantMessagesMock).not.toHaveBeenCalled();
   });
+
+  it('renders NotFoundPage sized to fill the layout chrome, not the full viewport', () => {
+    const ui = TenantLocaleNotFound();
+
+    expect(ui.props.shouldFillViewport).toBe(false);
+  });
 });

@@ -4,7 +4,7 @@ export const notFoundPageVariants = tv({
   slots: {
     root: [
       'bg-primary-subtle text-text',
-      'flex min-h-dvh flex-col items-center justify-center',
+      'flex flex-col items-center justify-center',
       'gap-6 px-gutter py-section text-center',
     ],
     copy: ['max-w-copy mx-auto'],
@@ -17,5 +17,14 @@ export const notFoundPageVariants = tv({
       'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
     ],
     arrow: ['size-4'],
+  },
+  variants: {
+    shouldFillViewport: {
+      true: { root: ['min-h-dvh'] },
+      false: { root: ['flex-1'] },
+    },
+  },
+  defaultVariants: {
+    shouldFillViewport: true,
   },
 });
