@@ -6,6 +6,10 @@ import {
   type TModuleReference,
   type TModulesCustomFn,
 } from '@blog/studio/testing/create-mock-modules-rule';
+import {
+  getRecordedValidators,
+  type TRecordedValidator,
+} from '@blog/studio/testing/create-mock-validation-rule';
 import type { ValidationContext } from 'sanity';
 
 type TArrayFieldDefinition = {
@@ -22,23 +26,6 @@ type TFieldDefinition = {
 };
 
 type TDocumentCustomFn = (document: Record<string, unknown>) => string | true;
-
-type TDocumentMockRule = {
-  level: 'error' | 'warning';
-  fn?: TDocumentCustomFn;
-  custom: (fn: TDocumentCustomFn) => TDocumentMockRule;
-  warning: () => TDocumentMockRule;
-};
-
-const createDocumentMockRule = (
-  level: TDocumentMockRule['level'] = 'error',
-  fn?: TDocumentCustomFn,
-): TDocumentMockRule => ({
-  level,
-  fn,
-  custom: (nextFn) => createDocumentMockRule('error', nextFn),
-  warning: () => createDocumentMockRule('warning', fn),
-});
 
 const getField = (name: string) =>
   postIndexPageSchema.fields?.find((field) => field.name === name) as
@@ -167,18 +154,8 @@ describe('postIndexPageSchema removed legacy fields', () => {
 });
 
 describe('postIndexPageSchema document validation', () => {
-  const buildDocumentRules = (): TDocumentMockRule[] => {
-    if (!postIndexPageSchema.validation) {
-      throw new Error(
-        'Expected postIndexPageSchema to define a validation rule.',
-      );
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    return (postIndexPageSchema.validation as any)(
-      createDocumentMockRule(),
-    ) as TDocumentMockRule[];
-  };
+  const buildDocumentRules = (): TRecordedValidator<TDocumentCustomFn>[] =>
+    getRecordedValidators<TDocumentCustomFn>(postIndexPageSchema);
 
   describe('post list module count', () => {
     const postListModule = (ref: string) => ({

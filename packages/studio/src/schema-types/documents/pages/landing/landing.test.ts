@@ -8,6 +8,7 @@ import {
   type TModuleReference,
   type TModulesCustomFn,
 } from '@blog/studio/testing/create-mock-modules-rule';
+import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
 import type { ValidationContext } from 'sanity';
 
 const getModulesCustomValidators = (): TModulesCustomFn[] => {
@@ -67,54 +68,38 @@ describe('landingPageSchema modules validateCustom chaining', () => {
   );
 });
 
-type TValidationRule = {
-  required: () => TValidationRule;
-  custom: (
-    fn: (value: { current?: string } | undefined) => string | true,
-  ) => TValidationRule;
-};
+type TSlugCustomFn = (value: { current?: string } | undefined) => string | true;
 
-/**
- * `field.validation` is a builder function `(rule) => rule.required().custom(fn)`
- * — invoking it with a minimal chainable mock rule captures the `fn` passed to
- * `.custom()` without spinning up a full Sanity Studio schema/rule instance.
- */
-const getSlugCustomValidator = () => {
-  const slugField = landingPageSchema.fields?.find(
-    (field) => field.name === 'slug',
-  );
+const getSlugField = () =>
+  landingPageSchema.fields?.find((field) => field.name === 'slug');
 
-  if (!slugField?.validation) {
-    throw new Error(
-      'Expected landingPageSchema to define a slug field with validation.',
-    );
+const wasRequiredCalled = (field: { validation?: unknown }) => {
+  if (typeof field.validation !== 'function') {
+    throw new Error('Expected field to define validation.');
   }
 
   let requiredCalled = false;
-  let customFn:
-    ((value: { current?: string } | undefined) => string | true) | undefined;
-
-  const rule: TValidationRule = {
+  const rule = {
     required: () => {
       requiredCalled = true;
       return rule;
     },
-    custom: (fn) => {
-      customFn = fn;
-      return rule;
-    },
+    custom: () => rule,
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (slugField.validation as any)(rule);
+  (field.validation as any)(rule);
 
-  if (!customFn) {
-    throw new Error(
-      'Expected slug field validation to register a custom() rule.',
-    );
-  }
+  return requiredCalled;
+};
 
-  return { customFn, requiredCalled };
+const getSlugCustomValidator = () => {
+  const slugField = getSlugField();
+
+  return {
+    customFn: getCustomValidator<TSlugCustomFn>(slugField),
+    requiredCalled: wasRequiredCalled(slugField ?? {}),
+  };
 };
 
 describe('landingPageSchema slug validation', () => {

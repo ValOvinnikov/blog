@@ -1,5 +1,6 @@
 import { TAXONOMY_KIND, TAXONOMY_SORT } from '@blog/config/constants';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
+import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
 
 type TValidationRule = {
   integer: () => TValidationRule;
@@ -161,32 +162,9 @@ describe('taxonomyListSchema showLatestPosts field', () => {
 
 describe('taxonomyListSchema headingBlock field', () => {
   it('blocks publish on an empty heading', () => {
-    const field = getField('headingBlock');
-
-    if (!('validation' in field) || typeof field.validation !== 'function') {
-      throw new Error('Expected headingBlock field to define validation.');
-    }
-
-    let customFn:
-      ((value: { heading?: string } | undefined) => string | true) | undefined;
-
-    const rule = {
-      custom: (
-        fn: (value: { heading?: string } | undefined) => string | true,
-      ) => {
-        customFn = fn;
-        return rule;
-      },
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    (field.validation as any)(rule);
-
-    if (!customFn) {
-      throw new Error(
-        'Expected headingBlock validation to register a custom() rule.',
-      );
-    }
+    const customFn = getCustomValidator<
+      (value: { heading?: string } | undefined) => string | true
+    >(getField('headingBlock'));
 
     expect(customFn(undefined)).toBe('Heading is required.');
     expect(customFn({ heading: 'Browse topics' })).toBe(true);
