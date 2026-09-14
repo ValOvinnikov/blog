@@ -11,7 +11,7 @@ import { toReadingTimeMinutes } from '@blog/utils';
 import type { InferResultType } from 'groqd';
 
 import type { postPageQuery } from './query';
-import type { TPostDetail, TPostDetailAuthor, TPostSkim } from './types';
+import type { TPostDetail, TPostDetailAuthor, TPostTakeaways } from './types';
 
 export type TRawPostDetail = NonNullable<InferResultType<typeof postPageQuery>>;
 
@@ -27,9 +27,11 @@ function toPostDetailAuthor(raw: TRawPostDetail['author']): TPostDetailAuthor {
   };
 }
 
-// Mirrors the schema's own `min(3)` takeaways rule (`skim.ts`) — fewer than
-// 3 takeaways is treated the same as no `skim` at all, never a partial list.
-function toPostSkim(raw: TRawPostDetail['skim']): TMaybeUndefined<TPostSkim> {
+// Mirrors the schema's own `min(3)` takeaways rule — fewer than 3 takeaways
+// is treated the same as none at all, never a partial list.
+function toPostTakeaways(
+  raw: TRawPostDetail['postTakeaways'],
+): TMaybeUndefined<TPostTakeaways> {
   if (!raw?.takeaways || raw.takeaways.length < 3) return undefined;
 
   return {
@@ -51,7 +53,7 @@ export function toPostDetail(raw: TRawPostDetail): TPostDetail {
     heroImage: toSanityImage(raw.heroImage),
     featured: raw.featured ?? false,
     body: toPortableTextBody(raw.body),
-    skim: toPostSkim(raw.skim),
+    postTakeaways: toPostTakeaways(raw.postTakeaways),
     hasAsides: raw.body.some((block) => block._type === 'aside'),
     seo: resolveSeo(raw.seo),
     author: toPostDetailAuthor(raw.author),

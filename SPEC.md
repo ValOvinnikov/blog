@@ -242,7 +242,7 @@ no faked defaults), the module-registry mechanism, and the editorial write path:
 Source of truth: `packages/studio/src/schema-types/` — documents (`post`, `author`,
 `topic`, `tag`, page documents, singletons), standalone `module_*`
 page-builder documents, and shared objects (`link`, `imageWithAlt`, `bodyImage`,
-`seo`, `aside`, `skim`, …). Naming convention `{group}_{name}` is being applied
+`seo`, `aside`, `postTakeaways`, …). Naming convention `{group}_{name}` is being applied
 incrementally (#251).
 
 Every `module_*` document also carries a **required** `brandVariant` field
@@ -363,7 +363,7 @@ rather than rendering a blank page.
 
 **The post is the page.** `page_post` carries the post itself — `slug`,
 `headingBlock`, `heroImage`, `content`, `featured`, `author`, `topic`,
-`tags`, `publishedAt`, `skim` and `seo` — rather than wrapping a separate
+`tags`, `publishedAt`, `postTakeaways` and `seo` — rather than wrapping a separate
 `blog_post` and dereferencing it. Every post read in `@blog/service`
 projects those fields off `page_post` directly, and `apps/web` names
 `page_post` as the post's document type wherever it needs one: the
@@ -414,7 +414,7 @@ field optional, the view model carries `T | undefined`. The two are kept in
 step deliberately, so the type a consumer sees is the same promise the
 editing experience makes. `headingBlock.heading`, `publishedAt`, `author`,
 `topic`, `content` and `seo` are required on both sides; `excerpt`
-(`headingBlock.supportingText`), `heroImage`, `tags`, `featured` and `skim`
+(`headingBlock.supportingText`), `heroImage`, `tags`, `featured` and `postTakeaways`
 are optional on both.
 
 **An incomplete post is not published.** `PUBLISHED_POST_FILTER` is what

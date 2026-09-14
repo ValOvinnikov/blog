@@ -1,6 +1,9 @@
-import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import {
+  makeHeroBlogData,
+  makeUnresolvedHeroBlogData,
+} from '@web/testing/modules/hero-blog/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { HeroBlogModule } from './hero-blog-module';
@@ -32,23 +35,6 @@ vi.mock('@web/utils/logger/logger', () => ({
     debug: vi.fn(),
   },
 }));
-
-const makeHeroBlogData = (overrides: Record<string, unknown> = {}) => ({
-  brandVariant: BRAND_VARIANT.PRIMARY,
-  variant: HERO_VARIANT.SPLIT,
-  hasPost: true,
-  eyebrow: undefined,
-  heading: 'Welcome',
-  supportingText: undefined,
-  sanityImage: undefined,
-  primaryAction: undefined,
-  secondaryAction: undefined,
-  contentPosition: undefined,
-  contentAlignment: undefined,
-  mediaOrder: undefined,
-  layout: undefined,
-  ...overrides,
-});
 
 const setup = customRenderAsync(HeroBlogModule, {
   id: 'hero-blog-1',
@@ -106,7 +92,7 @@ describe(`<${HeroBlogModule.name}/>`, () => {
   it('logs and renders nothing when no post resolves (unfeatured, unpublished, or deleted after publish)', async () => {
     getHeroBlogMock.mockResolvedValue({
       ok: true,
-      data: makeHeroBlogData({ hasPost: false, heading: undefined }),
+      data: makeUnresolvedHeroBlogData(),
     });
 
     const { container } = await setup();

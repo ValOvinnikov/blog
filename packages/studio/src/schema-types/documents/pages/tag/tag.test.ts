@@ -4,6 +4,11 @@ import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/tag/tag
 import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
+import {
+  getCustomValidator,
+  getRecordedValidators,
+  type TRecordedValidator,
+} from '@blog/studio/testing/create-mock-validation-rule';
 import type { ValidationContext } from 'sanity';
 
 type TReferenceFieldDefinition = {
@@ -132,28 +137,8 @@ describe('pageTagSchema headingBlock field', () => {
     const headingBlockField = getField('headingBlock') as
       { validation?: unknown } | undefined;
 
-    if (!headingBlockField?.validation) {
-      throw new Error(
-        'Expected pageTagSchema headingBlock to define validation.',
-      );
-    }
-
-    let customFn: THeadingBlockCustomFn | undefined;
-    const rule = {
-      custom: (fn: THeadingBlockCustomFn) => {
-        customFn = fn;
-        return rule;
-      },
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    (headingBlockField.validation as any)(rule);
-
-    if (!customFn) {
-      throw new Error(
-        'Expected pageTagSchema headingBlock validation to register a custom() rule.',
-      );
-    }
+    const customFn =
+      getCustomValidator<THeadingBlockCustomFn>(headingBlockField);
 
     expect(customFn(undefined)).toBe('Heading is required.');
     expect(customFn({ heading: 'Design' })).toBe(true);
@@ -290,33 +275,8 @@ type TDocumentCustomFn = (
   context: ValidationContext,
 ) => string | true | Promise<string | true>;
 
-type TDocumentMockRule = {
-  level: 'error' | 'warning';
-  fn?: TDocumentCustomFn;
-  custom: (fn: TDocumentCustomFn) => TDocumentMockRule;
-  warning: () => TDocumentMockRule;
-};
-
-const createDocumentMockRule = (
-  level: TDocumentMockRule['level'] = 'error',
-  fn?: TDocumentCustomFn,
-): TDocumentMockRule => ({
-  level,
-  fn,
-  custom: (nextFn) => createDocumentMockRule('error', nextFn),
-  warning: () => createDocumentMockRule('warning', fn),
-});
-
-const buildDocumentRules = (): TDocumentMockRule[] => {
-  if (!tagPageSchema.validation) {
-    throw new Error('Expected tagPageSchema to define a validation rule.');
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  return (tagPageSchema.validation as any)(
-    createDocumentMockRule(),
-  ) as TDocumentMockRule[];
-};
+const buildDocumentRules = (): TRecordedValidator<TDocumentCustomFn>[] =>
+  getRecordedValidators<TDocumentCustomFn>(tagPageSchema);
 
 describe('tagPageSchema document validation wiring', () => {
   it('registers single, has, and unique-post-list-reference rules at the right severities', () => {

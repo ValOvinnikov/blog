@@ -1,6 +1,11 @@
 import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
 import { PageIntro } from '@web/components/shared/page-intro';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import {
+  makeHeroBlogData,
+  makeStaleUnresolvedHeroBlogData,
+  makeUnresolvedHeroBlogData,
+} from '@web/testing/modules/hero-blog/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
@@ -77,21 +82,7 @@ describe('HERO_MAP', () => {
   it('dispatches module_heroBlog through the real registry to the real HeroBlogModule', async () => {
     getHeroBlogMock.mockResolvedValue({
       ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        variant: HERO_VARIANT.SPLIT,
-        hasPost: true,
-        eyebrow: undefined,
-        heading: 'Featured this week',
-        supportingText: undefined,
-        sanityImage: undefined,
-        primaryAction: undefined,
-        secondaryAction: undefined,
-        contentPosition: undefined,
-        contentAlignment: undefined,
-        mediaOrder: undefined,
-        layout: undefined,
-      },
+      data: makeHeroBlogData({ heading: 'Featured this week' }),
     });
 
     await setup({ id: 'hero-blog-1', type: 'module_heroBlog' });
@@ -141,21 +132,7 @@ describe('HERO_MAP', () => {
   it('dispatches module_heroBlog through the real registry to nothing, and logs, when no post resolves', async () => {
     getHeroBlogMock.mockResolvedValue({
       ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        variant: HERO_VARIANT.SPLIT,
-        hasPost: false,
-        eyebrow: undefined,
-        heading: undefined,
-        supportingText: undefined,
-        sanityImage: undefined,
-        primaryAction: undefined,
-        secondaryAction: undefined,
-        contentPosition: undefined,
-        contentAlignment: undefined,
-        mediaOrder: undefined,
-        layout: undefined,
-      },
+      data: makeUnresolvedHeroBlogData(),
     });
 
     const { container } = await setup({
@@ -169,21 +146,9 @@ describe('HERO_MAP', () => {
   it('falls back to the page heading, as the sole h1, when a page composes a Blog Hero that hides because no post resolved', async () => {
     getHeroBlogMock.mockResolvedValue({
       ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        variant: HERO_VARIANT.SPLIT,
-        hasPost: false,
-        eyebrow: undefined,
-        heading: 'Stale hero title left over from an unpublished post',
-        supportingText: undefined,
-        sanityImage: undefined,
-        primaryAction: undefined,
-        secondaryAction: undefined,
-        contentPosition: undefined,
-        contentAlignment: undefined,
-        mediaOrder: undefined,
-        layout: undefined,
-      },
+      data: makeStaleUnresolvedHeroBlogData(
+        'Stale hero title left over from an unpublished post',
+      ),
     });
 
     const setupPageIntro = customRenderAsync(PageIntro, {

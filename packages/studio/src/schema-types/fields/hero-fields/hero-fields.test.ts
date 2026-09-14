@@ -1,5 +1,6 @@
 import { HERO_VARIANT, MEDIA_ORDER } from '@blog/config/constants';
 import { heroFields } from '@blog/studio/schema-types/fields/hero-fields/hero-fields';
+import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
 
 type TCustomFn = (
   value: unknown,
@@ -51,31 +52,6 @@ const getHidden = (field: { hidden?: unknown }): THiddenFn => {
   }
 
   return field.hidden as THiddenFn;
-};
-
-const getCustomValidator = (field: { validation?: unknown }): TCustomFn => {
-  if (!field.validation) {
-    throw new Error('Expected field to define validation.');
-  }
-
-  let customFn: TCustomFn | undefined;
-
-  const rule = {
-    custom: (fn: TCustomFn) => {
-      customFn = fn;
-      return rule;
-    },
-    required: () => rule,
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (field.validation as any)(rule);
-
-  if (!customFn) {
-    throw new Error('Expected field validation to register a custom() rule.');
-  }
-
-  return customFn;
 };
 
 const wasRequiredCalled = (field: { validation?: unknown }) => {
@@ -154,7 +130,9 @@ describe('heroFields image field', () => {
   });
 
   it('requires an image for Split and Banner, not Stacked', () => {
-    const validate = getCustomValidator(getField(heroFields(), 'image'));
+    const validate = getCustomValidator<TCustomFn>(
+      getField(heroFields(), 'image'),
+    );
 
     expect(
       validate(undefined, { parent: { variant: HERO_VARIANT.SPLIT } }),
@@ -168,7 +146,9 @@ describe('heroFields image field', () => {
   });
 
   it('is valid when an image is present, regardless of variant', () => {
-    const validate = getCustomValidator(getField(heroFields(), 'image'));
+    const validate = getCustomValidator<TCustomFn>(
+      getField(heroFields(), 'image'),
+    );
 
     expect(
       validate(

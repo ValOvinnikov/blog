@@ -222,10 +222,10 @@ describe('getPost', () => {
     expect(result.readingTimeMinutes).toBe(1);
   });
 
-  it('maps a skim with 3+ takeaways onto the post detail', async () => {
+  it('maps takeaways with 3+ entries onto the post detail', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawPostDetail({
-        skim: {
+        postTakeaways: {
           takeaways: ['One', 'Two', 'Three'],
           generatedAt: '2026-07-20T00:00:00Z',
           model: 'claude-haiku-4-5',
@@ -236,26 +236,26 @@ describe('getPost', () => {
     const result = await getPost('hello-world', tenant);
     if (!result) throw new Error('expected a post detail');
 
-    expect(result.skim).toEqual({
+    expect(result.postTakeaways).toEqual({
       takeaways: ['One', 'Two', 'Three'],
       generatedAt: '2026-07-20T00:00:00Z',
       model: 'claude-haiku-4-5',
     });
   });
 
-  it('treats an absent skim as undefined', async () => {
-    mockRun.mockResolvedValueOnce(makeRawPostDetail({ skim: null }));
+  it('treats absent takeaways as undefined', async () => {
+    mockRun.mockResolvedValueOnce(makeRawPostDetail({ postTakeaways: null }));
 
     const result = await getPost('hello-world', tenant);
     if (!result) throw new Error('expected a post detail');
 
-    expect(result.skim).toBeUndefined();
+    expect(result.postTakeaways).toBeUndefined();
   });
 
-  it('treats a skim with fewer than 3 takeaways as undefined, mirroring the schema min(3) rule', async () => {
+  it('treats fewer than 3 takeaways as undefined, mirroring the schema min(3) rule', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawPostDetail({
-        skim: {
+        postTakeaways: {
           takeaways: ['One', 'Two'],
           generatedAt: null,
           model: null,
@@ -266,7 +266,7 @@ describe('getPost', () => {
     const result = await getPost('hello-world', tenant);
     if (!result) throw new Error('expected a post detail');
 
-    expect(result.skim).toBeUndefined();
+    expect(result.postTakeaways).toBeUndefined();
   });
 
   it('reports hasAsides true when the body contains an aside block', async () => {

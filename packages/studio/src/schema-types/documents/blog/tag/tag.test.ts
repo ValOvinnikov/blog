@@ -1,20 +1,29 @@
 import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag/tag';
 import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/tag/tag-type';
 import { createMockCountContext } from '@blog/studio/testing/create-mock-count-context';
-import { getDocumentValidator } from '@blog/studio/testing/get-document-validator';
+import { getCustomValidatorWithLevel } from '@blog/studio/testing/create-mock-validation-rule';
+import type { ValidationContext } from 'sanity';
+
+type TDocFn = (
+  document: { _id: string } | undefined,
+  context: ValidationContext,
+) => Promise<string | true>;
 
 const MISSING_PAGE_WARNING =
   'No Tag Page references this tag yet — /tags/{slug} will 404 until one is created.';
 
+const getHasPageValidator = () =>
+  getCustomValidatorWithLevel<TDocFn>(tagSchema);
+
 describe('tagSchema validation', () => {
   it('registers validateHasPage at warning severity, not error', () => {
-    const { isWarning } = getDocumentValidator(tagSchema);
+    const { isWarning } = getHasPageValidator();
 
     expect(isWarning).toBe(true);
   });
 
   it('passes without querying when the document has no id', async () => {
-    const { fn: validate } = getDocumentValidator(tagSchema);
+    const { fn: validate } = getHasPageValidator();
     const { context, fetchCalls } = createMockCountContext(0);
 
     await expect(validate(undefined, context)).resolves.toBe(true);
@@ -22,14 +31,14 @@ describe('tagSchema validation', () => {
   });
 
   it('passes when a page_tag references this tag', async () => {
-    const { fn: validate } = getDocumentValidator(tagSchema);
+    const { fn: validate } = getHasPageValidator();
     const { context } = createMockCountContext(1);
 
     await expect(validate({ _id: 'tag-1' }, context)).resolves.toBe(true);
   });
 
   it('warns when no page_tag references this tag', async () => {
-    const { fn: validate } = getDocumentValidator(tagSchema);
+    const { fn: validate } = getHasPageValidator();
     const { context } = createMockCountContext(0);
 
     await expect(validate({ _id: 'tag-1' }, context)).resolves.toBe(
@@ -38,7 +47,7 @@ describe('tagSchema validation', () => {
   });
 
   it('strips the drafts. prefix and queries the drafts perspective', async () => {
-    const { fn: validate } = getDocumentValidator(tagSchema);
+    const { fn: validate } = getHasPageValidator();
     const { context, fetchCalls, withConfigCalls } = createMockCountContext(0);
 
     await validate({ _id: 'drafts.tag-1' }, context);

@@ -11,7 +11,7 @@ export function makeRawSiteSettings(
   return {
     brand: {
       name: 'My Blog',
-      specLine: null,
+      tagline: null,
       logo: makeRawSanityImage('Logo'),
     },
     description: 'A blog about things',

@@ -14,7 +14,7 @@ export type TBrandMarkProps = IWithClassName &
     title?: string;
     /** Uploaded brand-mark image source; renders in place of the polygon mark when set. */
     src?: string;
-    /** Sizes the uploaded image to span the available width with a bounded height at `md` and above, instead of a fixed height — for rendering above a spec line at the breakpoint the spec line itself is visible. No effect below `md`, and no effect on the polygon fallback, which is always square. */
+    /** Sizes the uploaded image to span the available width with a bounded height at `md` and above, instead of a fixed height — for rendering above a tagline at the breakpoint the tagline itself is visible. No effect below `md`, and no effect on the polygon fallback, which is always square. */
     isStacked?: boolean;
   };
 

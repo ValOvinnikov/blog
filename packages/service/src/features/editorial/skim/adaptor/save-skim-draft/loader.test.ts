@@ -79,8 +79,8 @@ describe(saveSkimDraft, () => {
       'drafts.post-1',
       expect.objectContaining({
         set: {
-          skim: expect.objectContaining({
-            _type: 'skim',
+          postTakeaways: expect.objectContaining({
+            _type: 'postTakeaways',
             takeaways: ['One', 'Two', 'Three'],
             model: 'claude-haiku-4-5',
           }),

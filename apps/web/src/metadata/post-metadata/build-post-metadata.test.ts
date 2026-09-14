@@ -33,7 +33,7 @@ const basePost: TPostDetail = {
   heroImage: ogImage,
   featured: false,
   body: [],
-  skim: undefined,
+  postTakeaways: undefined,
   hasAsides: false,
   modules: [],
   seo: makeSeo({

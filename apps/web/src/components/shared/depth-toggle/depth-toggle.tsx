@@ -23,7 +23,7 @@ export interface IDepthToggleProps {
  * than a toggle with only one meaningful option.
  *
  * @example
- * <DepthToggle hasSkim={Boolean(post.skim)} hasDeep={post.hasAsides} />
+ * <DepthToggle hasSkim={Boolean(post.postTakeaways)} hasDeep={post.hasAsides} />
  */
 export const DepthToggle = ({
   hasSkim,
