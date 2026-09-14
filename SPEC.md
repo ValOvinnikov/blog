@@ -241,9 +241,49 @@ no faked defaults), the module-registry mechanism, and the editorial write path:
 
 Source of truth: `packages/studio/src/schema-types/` — documents (`post`, `author`,
 `topic`, `tag`, page documents, singletons), standalone `module_*`
-page-builder documents, and shared objects (`link`, `imageWithAlt`, `bodyImage`,
+page-builder documents, and shared objects (`linkRef`, `imageWithAlt`, `bodyImage`,
 `seo`, `aside`, `postTakeaways`, …). Naming convention `{group}_{name}` is being applied
 incrementally (#251).
+
+### Links are a library, never authored inline
+
+A link is two different things wearing one name, and the content model splits
+them. **Where it goes** is shared data: a `shared_link` document, created once
+in the Studio's **Links** section, holding `title` (the library name editors
+search for, never rendered), `label` (the default visible text), `linkType`
+(`INTERNAL`/`EXTERNAL`), an `internalReference` or a `url`, and
+`openInNewTab`. **How it reads and looks at one call site** is not shared at
+all — the same destination is a filled button in a CTA, an icon in the footer,
+and a word in a sentence — so it lives on a thin wrapper object that
+references the document: `linkRef` (`link` + `labelOverride`),
+`socialLinkRef` (adds `platform`, which selects an icon and is therefore
+per-use, not part of the destination), and `ctaActionRef` (adds `variant` and
+`appearance`).
+
+Every link field in every schema is an array built by `linksField()`, with
+`max: 1` where a call site takes a single link. **No schema declares its own
+link field**: a call site needing something extra extends its wrapper via the
+`linkRefFields()` spread, and never adds a field to the library document or
+inlines a destination. The post-driven heroes derive their primary action from
+the resolved post, so they keep a `primaryActionLabel` string — a label for a
+destination the module computes, not an authored link — and constrain their
+`actions` to a single `SECONDARY` member.
+
+There is no authored accessible name. The accessible name is `label` (or the
+call site's `labelOverride`), which `NavLink` keeps in the DOM as visually
+hidden text when a link renders icon-only; where a button must stay visually
+short, the view composes a `hiddenLabelSuffix` rendered as real `sr-only`
+text, which is what Lighthouse's SEO `link-text` audit reads and `aria-label`
+is not.
+
+Body text is the one exception, for a data-model reason: Portable Text
+annotations cannot be arrays, and a URL pasted mid-sentence cannot become a
+reference. `richText` and `proseText` therefore carry two annotations — the
+reference-based `sharedLinkAnnotation` and an `href`-based `link` that
+preserves the editor's paste-a-URL shortcut — while `inlineText` (CTA copy)
+carries `sharedLinkAnnotation` only. The service resolves the reference-based
+annotation wherever those fields are queried, so an authored library link is
+never delivered to the client unresolved.
 
 Every `module_*` document also carries a **required** `brandVariant` field
 (stored values from `@blog/config`'s `BRAND_VARIANT` const —
@@ -456,14 +496,14 @@ full-bleed image covers the section entirely, and carrying a non-blocking
 warning when it equals `brandVariant`, since a matching band and card is
 occasionally deliberate), an optional `eyebrow`,
 an optional `content` (`inlineText` — a constrained Portable Text block:
-paragraphs, bullet/numbered lists, bold/italic, and `link` annotations
-only, no headings/images/code/asides — distinct from the fuller `richText`
+paragraphs, bullet/numbered lists, bold/italic, and `sharedLinkAnnotation`
+marks only, no headings/images/code/asides — distinct from the fuller `richText`
 used elsewhere), an optional `image` (`imageWithAlt`, required for
 `BANNER`/`SPLIT` via a custom validator, since Sanity can't make
 `.required()` conditional on a sibling field), two independent alignment
 axes (below), `mobileMediaOrder` (Split only), an optional `actions` (`actionGroup` — a
 reusable object under `objects/action-group/`, not CTA-specific: an `actions`
-array of `ctaAction` items, each with its own `variant` (`PRIMARY`/
+array of `ctaActionRef` items, each with its own `variant` (`PRIMARY`/
 `SECONDARY`) and `appearance` (`CONTAINED`/`INLINE`, available on either
 variant), validated so a `PRIMARY` item is required and comes first,
 `SECONDARY` is optional, max two), and an optional `footnote`.
