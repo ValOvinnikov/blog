@@ -25,11 +25,11 @@ type TSchemaWithFields = {
 };
 
 /**
- * A field a migration is deliberately allowed to omit, with the reason a
- * required reader — not just the author — needs: typically that the field
- * became required after this migration was already applied, so its own
- * historical output can never satisfy today's schema and a later migration
- * is what closes the gap.
+ * A field a migration is deliberately allowed to omit. `reason` must state
+ * only what this migration and its own payload write or omit — never a
+ * claim about another migration's coverage or a type-level claim. A reader
+ * must be able to verify it from the migration under test alone, without
+ * opening another file.
  */
 export type TExemptField = {
   name: string;
