@@ -4,7 +4,6 @@ import { Hero } from '@blog/ui/organisms/hero';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { Section } from '@web/components/shared/section';
-import { toActionGroupAction } from '@web/utils/to-action-group-action';
 
 export interface IHeroStatementModuleViewProps extends THeroStatementModule {
   id: string;
@@ -52,9 +51,7 @@ export const HeroStatementModuleView = ({
         {actions && actions.length > 0 && (
           <Hero.Cta>
             <ActionGroup
-              actions={actions.map((action) =>
-                toActionGroupAction(action, heading),
-              )}
+              actions={actions}
               isOnDark={variant === HERO_VARIANT.BANNER}
             />
           </Hero.Cta>

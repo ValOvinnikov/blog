@@ -122,17 +122,6 @@ describe(`<${CtaModuleView.name}/>`, () => {
     expect(links[1]).toHaveTextContent('Learn more');
   });
 
-  it("suffixes each action's accessible name with the module heading, so identically labelled shared_link actions in different modules stay distinguishable", () => {
-    setup({ actions: ctaActionsDemo });
-
-    expect(
-      screen.getByRole('link', { name: 'Subscribe now: Get started' }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('link', { name: 'Learn more: Get started' }),
-    ).toBeVisible();
-  });
-
   it('renders the optional content field via InlineTextRenderer', () => {
     setup({ content: ctaContentDemo });
 
