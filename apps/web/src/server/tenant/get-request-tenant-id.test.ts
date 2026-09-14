@@ -1,4 +1,5 @@
 import { getRequestTenantId } from './get-request-tenant-id';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from './unresolved-tenant-placeholder';
 
 const { headersMock } = vi.hoisted(() => ({ headersMock: vi.fn() }));
 
@@ -27,6 +28,22 @@ describe(getRequestTenantId, () => {
     );
 
     expect(headersMock).not.toHaveBeenCalled();
+  });
+
+  it('returns undefined for the unresolved-tenant placeholder supplied as the tenant param, without forwarding it as a real id', async () => {
+    headersMock.mockResolvedValue(new Headers());
+
+    await expect(
+      getRequestTenantId(UNRESOLVED_TENANT_PLACEHOLDER),
+    ).resolves.toBeUndefined();
+  });
+
+  it('returns undefined for the unresolved-tenant placeholder read from the header', async () => {
+    headersMock.mockResolvedValue(
+      new Headers({ 'x-tenant-id': UNRESOLVED_TENANT_PLACEHOLDER }),
+    );
+
+    await expect(getRequestTenantId()).resolves.toBeUndefined();
   });
 });
 

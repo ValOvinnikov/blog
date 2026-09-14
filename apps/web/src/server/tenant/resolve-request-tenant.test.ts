@@ -2,6 +2,7 @@ import { queries, TENANT_STATUS } from '@blog/db';
 
 import { resolveRequestTenant } from './resolve-request-tenant';
 import { resolveTenant, resolveTenantById } from './resolve-tenant';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from './unresolved-tenant-placeholder';
 
 const { headersMock } = vi.hoisted(() => ({ headersMock: vi.fn() }));
 
@@ -29,6 +30,7 @@ describe(resolveRequestTenant, () => {
   beforeEach(() => {
     headersMock.mockReset();
     vi.mocked(resolveTenant).mockReset();
+    vi.mocked(resolveTenantById).mockReset();
     vi.mocked(queries.tenants.getTenantById).mockReset();
   });
 
@@ -95,6 +97,16 @@ describe(resolveRequestTenant, () => {
     expect(headersMock).not.toHaveBeenCalled();
     expect(resolveTenant).not.toHaveBeenCalled();
     expect(resolveTenantById).toHaveBeenCalledWith('tenant-1');
+  });
+
+  it('resolves undefined for the unresolved-tenant placeholder, without looking it up by id or by Host', async () => {
+    await expect(
+      resolveRequestTenant(UNRESOLVED_TENANT_PLACEHOLDER),
+    ).resolves.toBeUndefined();
+
+    expect(resolveTenantById).not.toHaveBeenCalled();
+    expect(resolveTenant).not.toHaveBeenCalled();
+    expect(headersMock).not.toHaveBeenCalled();
   });
 });
 

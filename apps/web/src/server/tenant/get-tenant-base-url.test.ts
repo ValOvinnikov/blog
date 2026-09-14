@@ -1,5 +1,6 @@
 import { getTenantBaseUrl } from './get-tenant-base-url';
 import { resolveRequestTenant } from './resolve-request-tenant';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from './unresolved-tenant-placeholder';
 
 vi.mock('./resolve-request-tenant', () => ({
   resolveRequestTenant: vi.fn(),
@@ -75,5 +76,39 @@ describe(getTenantBaseUrl, () => {
     vi.mocked(freshResolveRequestTenant).mockResolvedValue(undefined);
 
     await expect(freshGetTenantBaseUrl()).resolves.toBeUndefined();
+  });
+});
+
+describe('getTenantBaseUrl with the real resolveRequestTenant chokepoint', () => {
+  afterEach(() => {
+    vi.doUnmock('./resolve-request-tenant');
+    vi.doUnmock('@blog/db');
+    vi.doUnmock('@web/utils/env/env');
+    vi.resetModules();
+  });
+
+  it('falls back to NEXT_PUBLIC_SITE_URL for the unresolved-tenant placeholder segment, without ever querying tenant data', async () => {
+    vi.doUnmock('./resolve-request-tenant');
+    vi.doMock('@web/utils/env/env', () => ({
+      env: { NEXT_PUBLIC_SITE_URL: 'https://blog-dev.valstack.dev' },
+    }));
+    vi.doMock('@blog/db', () => ({
+      queries: {
+        tenants: { getTenantById: vi.fn() },
+        tenantDomains: { getTenantByDomain: vi.fn() },
+      },
+    }));
+    vi.resetModules();
+
+    const { getTenantBaseUrl: freshGetTenantBaseUrl } =
+      await import('./get-tenant-base-url');
+    const { queries } = await import('@blog/db');
+
+    await expect(
+      freshGetTenantBaseUrl(UNRESOLVED_TENANT_PLACEHOLDER),
+    ).resolves.toBe('https://blog-dev.valstack.dev');
+
+    expect(queries.tenants.getTenantById).not.toHaveBeenCalled();
+    expect(queries.tenantDomains.getTenantByDomain).not.toHaveBeenCalled();
   });
 });

@@ -6,19 +6,12 @@ import createMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/routing';
 import { resolveTenantId } from './server/tenant/resolve-tenant-id';
 import { TENANT_ID_HEADER } from './server/tenant/tenant-id-header';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from './server/tenant/unresolved-tenant-placeholder';
 import { isProductionEnvironment } from './utils/is-production-environment';
 
 const handleI18nRouting = createMiddleware(routing);
 
 const DOTTED_PATH_PATTERN = /\./;
-
-/**
- * A request with no tenant resolved (only possible outside production) still
- * needs a non-empty `[tenant]` segment to match the route tree. `proxy.ts` is
- * the segment's sole writer either way, and no route reads it as a real
- * tenant id yet, so a stable placeholder is safe here.
- */
-const UNRESOLVED_TENANT_PLACEHOLDER = 'unresolved-tenant';
 
 /**
  * Decodes only the first path segment, after splitting on `/` — decoding
