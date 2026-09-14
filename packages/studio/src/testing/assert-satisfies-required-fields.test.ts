@@ -63,4 +63,26 @@ describe('assertSatisfiesRequiredFields', () => {
       assertSatisfiesRequiredFields(noValidationSchema, {}),
     ).not.toThrow();
   });
+
+  it('does not throw when a missing required field is named in exemptFields', () => {
+    expect(() =>
+      assertSatisfiesRequiredFields(fixtureSchema, { title: 'Hello' }, [
+        {
+          name: 'pageSize',
+          reason: 'became required after this fixture was written',
+        },
+      ]),
+    ).not.toThrow();
+  });
+
+  it('an exemption never masks a different, non-exempt missing required field', () => {
+    expect(() =>
+      assertSatisfiesRequiredFields(fixtureSchema, {}, [
+        {
+          name: 'pageSize',
+          reason: 'became required after this fixture was written',
+        },
+      ]),
+    ).toThrow(/title/);
+  });
 });

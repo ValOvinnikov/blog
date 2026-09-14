@@ -62,7 +62,7 @@ export const taxonomyListSchema = defineType({
         "Lists each term's two newest posts under its description, as links. A term with no posts shows only its title, description and count.",
       initialValue: true,
     }),
-    headingBlockField({ requireHeading: true }),
+    headingBlockField(),
     ...alignmentFields([]),
     layoutField,
   ],

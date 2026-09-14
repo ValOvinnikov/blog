@@ -100,7 +100,7 @@ export const ctaSchema = defineType({
       type: 'string',
       description: 'Optional kicker label shown above the heading.',
     }),
-    headingBlockField({ requireHeading: true }),
+    headingBlockField(),
     defineField({
       name: 'content',
       title: 'Content',

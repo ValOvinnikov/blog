@@ -1,21 +1,32 @@
-import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
-
 import { headingBlockField } from './heading-block-field';
 
-type TCustomFn = (
-  value: { heading?: string } | undefined,
-  context: { parent?: unknown },
-) => string | true;
+const wasRequiredCalled = (field: { validation?: unknown }) => {
+  if (!field.validation) {
+    throw new Error('Expected field to define validation.');
+  }
+
+  let requiredCalled = false;
+  const rule = {
+    required: () => {
+      requiredCalled = true;
+      return rule;
+    },
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+  (field.validation as any)(rule);
+
+  return requiredCalled;
+};
 
 describe('headingBlockField', () => {
-  it('defaults to the shared headingBlock object type with no validation', () => {
+  it('defaults to the shared headingBlock object type', () => {
     const field = headingBlockField();
 
     expect(field.type).toBe('headingBlock');
-    expect(field.validation).toBeUndefined();
   });
 
-  it('carries a default description', () => {
+  it('carries the shared description', () => {
     const field = headingBlockField();
 
     expect(field.description).toBe(
@@ -23,32 +34,7 @@ describe('headingBlockField', () => {
     );
   });
 
-  it('accepts a description override', () => {
-    const field = headingBlockField({ description: 'Custom copy.' });
-
-    expect(field.description).toBe('Custom copy.');
-  });
-
-  it('blocks publish on an empty heading when required, with a default message', () => {
-    const validate = getCustomValidator<TCustomFn>(
-      headingBlockField({ requireHeading: true }),
-    );
-
-    expect(validate(undefined, {})).toBe('Heading is required.');
-    expect(validate({ heading: '' }, {})).toBe('Heading is required.');
-    expect(validate({ heading: 'Latest posts' }, {})).toBe(true);
-  });
-
-  it('carries a custom required message through the field-level rule', () => {
-    const validate = getCustomValidator<TCustomFn>(
-      headingBlockField({
-        requireHeading: true,
-        requiredMessage: 'A statement hero is its heading. Give it one.',
-      }),
-    );
-
-    expect(validate(undefined, {})).toBe(
-      'A statement hero is its heading. Give it one.',
-    );
+  it('is required, so the headingBlock object itself must be present', () => {
+    expect(wasRequiredCalled(headingBlockField())).toBe(true);
   });
 });

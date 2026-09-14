@@ -14,6 +14,25 @@ const findField = (schema: ObjectDefinition, name: string) => {
   return field;
 };
 
+const wasRequiredCalled = (field: { validation?: unknown }) => {
+  if (!field.validation) {
+    throw new Error('Expected field to define validation.');
+  }
+
+  let requiredCalled = false;
+  const rule = {
+    required: () => {
+      requiredCalled = true;
+      return rule;
+    },
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+  (field.validation as any)(rule);
+
+  return requiredCalled;
+};
+
 describe('headingBlockSchema shape', () => {
   it('carries only heading and supportingText', () => {
     expect(fieldNames(headingBlockSchema)).toEqual([
@@ -33,10 +52,10 @@ describe('headingBlockSchema shape', () => {
     });
   });
 
-  it('defines no validation on heading', () => {
+  it('requires heading', () => {
     const field = findField(headingBlockSchema, 'heading');
 
-    expect(field.validation).toBeUndefined();
+    expect(wasRequiredCalled(field)).toBe(true);
   });
 
   it('defines no validation on supportingText', () => {

@@ -35,9 +35,7 @@ export const homePageSchema = defineType({
   },
   fields: [
     titleField(),
-    headingBlockField({
-      requireHeading: true,
-    }),
+    headingBlockField(),
     heroField(),
     modulesField({
       allow: [

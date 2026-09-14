@@ -1,5 +1,4 @@
 import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
-import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
 
 const getField = (name: string) => {
   const field = postRelatedSchema.fields?.find(
@@ -76,13 +75,19 @@ describe('postRelatedSchema shape', () => {
 });
 
 describe('postRelatedSchema headingBlock field', () => {
-  it('blocks publish on an empty heading', () => {
-    const customFn = getCustomValidator<
-      (value: { heading?: string } | undefined) => string | true
-    >(getField('headingBlock'));
+  it('is required at the field level', () => {
+    const field = getField('headingBlock');
 
-    expect(customFn(undefined)).toBe('Heading is required.');
-    expect(customFn({ heading: 'Related reading' })).toBe(true);
+    if (typeof field.validation !== 'function') {
+      throw new Error('Expected headingBlock field to define validation.');
+    }
+
+    const { rule, calls } = createTrackingRule();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (field.validation as any)(rule);
+
+    expect(calls.required).toBe(true);
   });
 });
 

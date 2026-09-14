@@ -5,7 +5,6 @@ import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import {
-  getCustomValidator,
   getRecordedValidators,
   type TRecordedValidator,
 } from '@blog/studio/testing/create-mock-validation-rule';
@@ -119,11 +118,8 @@ describe('topicPageSchema shape', () => {
 type THeadingBlockFieldDefinition = {
   type: string;
   description?: string;
+  validation?: unknown;
 };
-
-type THeadingBlockCustomFn = (
-  value: { heading?: string } | undefined,
-) => string | true;
 
 describe('pageTopicSchema headingBlock field', () => {
   it('is built via headingBlockField()', () => {
@@ -135,13 +131,27 @@ describe('pageTopicSchema headingBlock field', () => {
 
   it('is required at the field level', () => {
     const headingBlockField = getField('headingBlock') as
-      { validation?: unknown } | undefined;
+      THeadingBlockFieldDefinition | undefined;
 
-    const customFn =
-      getCustomValidator<THeadingBlockCustomFn>(headingBlockField);
+    if (!headingBlockField?.validation) {
+      throw new Error(
+        'Expected topicPageSchema to define a headingBlock field.',
+      );
+    }
 
-    expect(customFn(undefined)).toBe('Heading is required.');
-    expect(customFn({ heading: 'Design' })).toBe(true);
+    let requiredCalled = false;
+    const rule: TValidationRule = {
+      required: () => {
+        requiredCalled = true;
+        return rule;
+      },
+      custom: () => rule,
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (headingBlockField.validation as any)(rule);
+
+    expect(requiredCalled).toBe(true);
   });
 });
 

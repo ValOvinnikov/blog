@@ -2,7 +2,6 @@ import { postPageSchema } from '@blog/studio/schema-types/documents/pages/post/p
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
-import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
 
 type TReferenceFieldDefinition = {
   type: 'reference';
@@ -91,20 +90,26 @@ describe('postPageSchema shape', () => {
 
     expect(headingBlockFieldDefinition?.type).toBe('headingBlock');
 
-    const customFn = getCustomValidator<
-      (value: { heading?: string } | undefined) => string | true
-    >(headingBlockFieldDefinition);
+    if (!headingBlockFieldDefinition?.validation) {
+      throw new Error(
+        'Expected postPageSchema to define a headingBlock field.',
+      );
+    }
 
-    expect(customFn(undefined)).toBe('Heading is required.');
-    expect(customFn({ heading: 'Understanding GROQ' })).toBe(true);
+    const { rule, calls } = createTrackingRule();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (headingBlockFieldDefinition.validation as any)(rule);
+
+    expect(calls.required).toBe(true);
   });
 
-  it('headingBlock describes the field as the post title, with no hero wording', () => {
+  it('headingBlock carries the shared headingBlockField description', () => {
     const headingBlockFieldDefinition = getField('headingBlock') as
       { type?: string; description?: string } | undefined;
 
     expect(headingBlockFieldDefinition?.description).toBe(
-      "The post title, shown as the page's H1.",
+      'The heading shown at the top of this page or module, with its optional supporting line.',
     );
   });
 
