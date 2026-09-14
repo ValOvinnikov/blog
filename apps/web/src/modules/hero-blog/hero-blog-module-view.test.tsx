@@ -13,6 +13,7 @@ const sanityImage = makeSanityImage();
 
 const setup = customRender(HeroBlogModuleView, {
   id: 'hero-blog-1',
+  hasPost: true,
   brandVariant: BRAND_VARIANT.PRIMARY,
   variant: HERO_VARIANT.SPLIT,
   eyebrow: undefined,
