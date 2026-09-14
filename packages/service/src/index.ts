@@ -85,7 +85,7 @@ export type { TThemeTokens } from './features/global/theme-settings';
 export type { TContentModule } from './features/modules/content';
 export type {
   TCtaContent,
-  TCtaContentMarkDef,
+  TCtaContentBlock,
   TCtaModule,
 } from './features/modules/cta';
 export type { THeroModule } from './features/modules/hero';
@@ -123,11 +123,25 @@ export type { TCtaAction } from './shared/transformers/to-cta-action';
 export type { THeroPrimaryAction } from './shared/transformers/to-hero-primary-action';
 export type { TModule } from './shared/transformers/to-module';
 export type {
+  TPortableTextAsideBlock,
+  TPortableTextBody,
+  TPortableTextTextBlock,
+} from './shared/transformers/to-portable-text-body';
+export type {
   TPostCard,
   TPostCardAuthor,
   TPostCardTopic,
 } from './shared/transformers/to-post-card';
 export type { TPostLink } from './shared/transformers/to-post-link';
+export type {
+  TProseTextBlock,
+  TProseTextBody,
+} from './shared/transformers/to-prose-text-body';
 export type { TSeoResolved } from './shared/transformers/resolve-seo';
+export type {
+  THrefLinkAnnotation,
+  TPortableTextMarkDef,
+  TSharedLinkAnnotation,
+} from './shared/transformers/to-shared-link-annotation';
 export type { TTag } from './shared/transformers/to-tag';
 export type { TTopic } from './shared/transformers/to-topic';

@@ -1,6 +1,7 @@
 import { q } from '@blog/service/sanity/query';
 
 import { sanityImageFragment } from './image';
+import { proseTextBodyItemFragment } from './portable-text-body';
 import { socialLinkRefFragment } from './social-link';
 
 // `profilePage` is optional and restricted to `page_landing` in the schema
@@ -37,7 +38,7 @@ export const authorDetailFragment = q
       }))
       .nullable(true),
     role: sub.field('role').nullable(true),
-    bio: sub.field('bio[]').nullable(true),
+    bio: sub.field('bio[]').project(proseTextBodyItemFragment).nullable(true),
     socialLinks: sub
       .field('socialLinks[]')
       .project(socialLinkRefFragment)

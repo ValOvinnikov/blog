@@ -1,5 +1,4 @@
 import type {
-  ILink,
   ISanityImage,
   InlineText,
   TContentAlignment,
@@ -11,17 +10,12 @@ import type {
   TMediaOrder,
 } from '@blog/config';
 import type { TCtaAction } from '@blog/service/shared/transformers/to-cta-action';
+import type { TSharedLinkAnnotation } from '@blog/service/shared/transformers/to-shared-link-annotation';
 
 export type { TCtaAction };
 
-export type TCtaContentMarkDef = {
-  _key: string;
-  _type: 'sharedLinkAnnotation';
-  link: TMaybeUndefined<ILink>;
-};
-
 export type TCtaContentBlock = Omit<InlineText[number], 'markDefs'> & {
-  markDefs: TMaybeUndefined<TCtaContentMarkDef[]>;
+  markDefs: TMaybeUndefined<TSharedLinkAnnotation[]>;
 };
 
 export type TCtaContent = TCtaContentBlock[];

@@ -1,6 +1,6 @@
 export type {
   TCtaContent,
-  TCtaContentMarkDef,
+  TCtaContentBlock,
   TCtaModule,
 } from './adaptor/types';
 export { createCtaModuleService } from './application/service';

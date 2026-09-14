@@ -118,6 +118,46 @@ describe('contentModuleQuery', () => {
     expect(parsed.body[0]).toEqual(richBlock);
   });
 
+  it('resolves a sharedLinkAnnotation mark in the body to its shared_link destination', () => {
+    const parsed = contentModuleQuery.parse({
+      brandVariant: 'PRIMARY',
+      body: [
+        {
+          _type: 'block',
+          _key: 'block-1',
+          style: 'normal',
+          markDefs: [
+            {
+              _key: 'mark-1',
+              _type: 'sharedLinkAnnotation',
+              link: {
+                label: 'Read more',
+                linkType: 'EXTERNAL',
+                url: 'https://example.com',
+                internalReference: null,
+                openInNewTab: null,
+              },
+            },
+          ],
+          children: [
+            { _type: 'span', _key: 'span-1', text: 'Read more', marks: [] },
+          ],
+        },
+      ],
+      layout: null,
+    });
+
+    expect(parsed.body[0]).toMatchObject({
+      markDefs: [
+        {
+          _key: 'mark-1',
+          _type: 'sharedLinkAnnotation',
+          link: { label: 'Read more', url: 'https://example.com' },
+        },
+      ],
+    });
+  });
+
   it('keeps a rich code block intact alongside a resolved bodyImage block', () => {
     const codeBlock = {
       _type: 'code',

@@ -220,6 +220,7 @@ describe('postPageQuery', () => {
           _key: 'aside-block-1',
           style: 'normal',
           children: [{ _type: 'span', _key: 'aside-span-1', text: 'Because.' }],
+          markDefs: null,
         },
       ],
     };
@@ -239,7 +240,7 @@ describe('postPageQuery', () => {
       layout: 'FLOAT_LEFT',
     };
     const raw = makeRawPostDetail({
-      body: [asideBlock, bodyImageBlock] as TRawPostDetail['body'],
+      body: [asideBlock, bodyImageBlock] as unknown as TRawPostDetail['body'],
     });
 
     const parsed = postPageQuery.parse(raw);
@@ -249,6 +250,98 @@ describe('postPageQuery', () => {
       _type: 'bodyImage',
       layout: 'FLOAT_LEFT',
       asset: { _id: 'image-abc123-800x600-jpg' },
+    });
+  });
+
+  it('resolves a sharedLinkAnnotation mark in the body to its shared_link destination', () => {
+    const raw = makeRawPostDetail({
+      body: [
+        {
+          _type: 'block',
+          _key: 'block-1',
+          style: 'normal',
+          markDefs: [
+            {
+              _key: 'mark-1',
+              _type: 'sharedLinkAnnotation',
+              link: {
+                label: 'Read more',
+                linkType: 'EXTERNAL',
+                url: 'https://example.com',
+                internalReference: null,
+                openInNewTab: null,
+              },
+            },
+          ],
+          children: [
+            { _type: 'span', _key: 'span-1', text: 'Read more', marks: [] },
+          ],
+        },
+      ] as unknown as TRawPostDetail['body'],
+    });
+
+    const parsed = postPageQuery.parse(raw);
+
+    expect(parsed?.body?.[0]).toMatchObject({
+      markDefs: [
+        {
+          _key: 'mark-1',
+          _type: 'sharedLinkAnnotation',
+          link: { label: 'Read more', url: 'https://example.com' },
+        },
+      ],
+    });
+  });
+
+  it('resolves a sharedLinkAnnotation mark inside an aside block body', () => {
+    const raw = makeRawPostDetail({
+      body: [
+        {
+          _type: 'aside',
+          _key: 'aside-1',
+          kind: 'WHY_NOT',
+          body: [
+            {
+              _type: 'block',
+              _key: 'aside-block-1',
+              style: 'normal',
+              markDefs: [
+                {
+                  _key: 'mark-1',
+                  _type: 'sharedLinkAnnotation',
+                  link: {
+                    label: 'Aside link',
+                    linkType: 'EXTERNAL',
+                    url: 'https://example.com/aside',
+                    internalReference: null,
+                    openInNewTab: null,
+                  },
+                },
+              ],
+              children: [
+                { _type: 'span', _key: 'aside-span-1', text: 'Because.' },
+              ],
+            },
+          ],
+        },
+      ] as unknown as TRawPostDetail['body'],
+    });
+
+    const parsed = postPageQuery.parse(raw);
+
+    expect(parsed?.body?.[0]).toMatchObject({
+      _type: 'aside',
+      body: [
+        {
+          markDefs: [
+            {
+              _key: 'mark-1',
+              _type: 'sharedLinkAnnotation',
+              link: { label: 'Aside link', url: 'https://example.com/aside' },
+            },
+          ],
+        },
+      ],
     });
   });
 });

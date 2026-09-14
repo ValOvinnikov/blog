@@ -3,6 +3,7 @@ import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
 import { toModule } from '@blog/service/shared/transformers/to-module';
 import { toPortableTextBody } from '@blog/service/shared/transformers/to-portable-text-body';
 import { toPostHeading } from '@blog/service/shared/transformers/to-post-heading';
+import { toProseTextBody } from '@blog/service/shared/transformers/to-prose-text-body';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import { toSocialLink } from '@blog/service/shared/transformers/to-social-link';
 import { toTag } from '@blog/service/shared/transformers/to-tag';
@@ -22,7 +23,7 @@ function toPostDetailAuthor(raw: TRawPostDetail['author']): TPostDetailAuthor {
     profilePageSlug: raw.profilePage?.slug ?? undefined,
     image: toSanityImage(raw.image),
     role: raw.role ?? undefined,
-    bio: raw.bio ?? undefined,
+    bio: raw.bio ? toProseTextBody(raw.bio) : undefined,
     socialLinks: (raw.socialLinks ?? []).flatMap(
       (item) => toSocialLink(item) ?? [],
     ),

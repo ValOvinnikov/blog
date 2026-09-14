@@ -271,7 +271,9 @@ describe('getPost', () => {
 
   it('reports hasAsides true when the body contains an aside block', async () => {
     mockRun.mockResolvedValueOnce(
-      makeRawPostDetail({ body: [{ _type: 'aside', _key: 'a1' }] }),
+      makeRawPostDetail({
+        body: [{ _type: 'aside', _key: 'a1', body: null }],
+      }),
     );
 
     const result = await getPost('hello-world', tenant);

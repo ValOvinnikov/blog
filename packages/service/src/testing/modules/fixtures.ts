@@ -169,7 +169,7 @@ export function makeRawContentModule(
     // `portableTextBodyItemFragment`'s `'...'` spread on this heterogeneous
     // array can't statically type a member's other fields, though the query
     // does return them at runtime.
-    body: [{ _type: 'block', _key: 'block-1' }],
+    body: [{ _type: 'block', _key: 'block-1', markDefs: null }],
     layout: null,
     ...overrides,
   };

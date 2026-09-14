@@ -6,8 +6,8 @@ import {
 import { toCtaAction } from '@blog/service/shared/transformers/to-cta-action';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
-import { toLink } from '@blog/service/shared/transformers/to-link';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
+import { toSharedLinkAnnotation } from '@blog/service/shared/transformers/to-shared-link-annotation';
 import type { InferResultType } from 'groqd';
 
 import type { ctaModuleQuery } from './query';
@@ -15,7 +15,6 @@ import type {
   TCtaAction,
   TCtaContent,
   TCtaContentBlock,
-  TCtaContentMarkDef,
   TCtaModule,
 } from './types';
 
@@ -30,18 +29,10 @@ export type TRawCtaContentMarkDef = NonNullable<
   TRawCtaContentBlock['markDefs']
 >[number];
 
-function toContentMarkDef(raw: TRawCtaContentMarkDef): TCtaContentMarkDef {
-  return {
-    _key: raw._key,
-    _type: 'sharedLinkAnnotation',
-    link: toLink(raw),
-  };
-}
-
 function toContentBlock(raw: TRawCtaContentBlock): TCtaContentBlock {
   return {
     ...raw,
-    markDefs: raw.markDefs?.map(toContentMarkDef) ?? undefined,
+    markDefs: raw.markDefs?.map(toSharedLinkAnnotation) ?? undefined,
   };
 }
 
