@@ -13,8 +13,7 @@ import { SHARED_MODULE_IDS } from './shared-modules';
 const HEADING_BLOCK_EXEMPTION: TExemptField[] = [
   {
     name: 'headingBlock',
-    reason:
-      'headingBlock became required after this migration was already applied — it still writes the pre-rename sectionHeader field — and the later rename-section-header-to-heading-block migration converts it to headingBlock',
+    reason: 'buildPagePostFields sets sectionHeader, not headingBlock',
   },
 ];
 

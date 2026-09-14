@@ -16,7 +16,7 @@ const POST_RELATED_HEADING_BLOCK_EXEMPTION: TExemptField[] = [
   {
     name: 'headingBlock',
     reason:
-      "module_postRelated's headingBlock is authored by hand in Studio — this shared document was created with no sectionHeader to rename and no migration ever sets headingBlock for it",
+      'sharedPostRelatedModule carries only _id, _type, title, brandVariant and limit — no sectionHeader or headingBlock of any kind',
   },
 ];
 
@@ -24,7 +24,7 @@ const NEWSLETTER_HEADING_BLOCK_EXEMPTION: TExemptField[] = [
   {
     name: 'headingBlock',
     reason:
-      'headingBlock became required after this migration was already applied — it still writes the pre-rename sectionHeader field — and the later rename-section-header-to-heading-block migration converts it to headingBlock',
+      'sharedNewsletterModule sets sectionHeader, not headingBlock',
   },
 ];
 

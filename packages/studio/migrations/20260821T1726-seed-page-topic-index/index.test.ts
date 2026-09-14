@@ -18,7 +18,7 @@ const TAXONOMY_LIST_HEADING_BLOCK_EXEMPTION: TExemptField[] = [
   {
     name: 'headingBlock',
     reason:
-      "module_taxonomyList's headingBlock is authored by hand in Studio — no migration, including this one, ever sets it for this type",
+      'this migration seeds module_taxonomyList with only title and brandVariant — no heading of any kind — so there is nothing here to satisfy the required headingBlock',
   },
 ];
 
@@ -26,7 +26,7 @@ const TOPIC_INDEX_PAGE_HEADING_BLOCK_EXEMPTION: TExemptField[] = [
   {
     name: 'headingBlock',
     reason:
-      'headingBlock became required after this migration was already applied — it still writes the pre-rename flat heading/supportingText fields — and the later fold-page-topic-index-into-modules migration backfills headingBlock from that pair',
+      'this migration writes the flat heading/supportingText fields directly on page_topicIndex, never a nested headingBlock',
   },
 ];
 

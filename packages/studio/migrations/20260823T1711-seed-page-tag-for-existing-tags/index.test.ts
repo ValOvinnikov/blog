@@ -18,7 +18,7 @@ const HEADING_BLOCK_EXEMPTION: TExemptField[] = [
   {
     name: 'headingBlock',
     reason:
-      'headingBlock became required after this migration was already applied; the later backfill-missing-heading-block-heading migration closes the gap on existing documents',
+      'this migration creates module_postList and page_tag with no heading field of any kind — nothing here to satisfy the required headingBlock',
   },
 ];
 
