@@ -39,6 +39,7 @@ describe(toHeroBlogModule, () => {
 
     const hero = toHeroBlogModule(raw);
 
+    if (!hero.hasPost) throw new Error('expected a resolved post');
     expect(hero.heading).toBe('Pinned title');
     expect(hero.primaryAction?.href).toBe('/blog/hello-world');
   });
@@ -53,6 +54,7 @@ describe(toHeroBlogModule, () => {
 
     const hero = toHeroBlogModule(raw);
 
+    if (!hero.hasPost) throw new Error('expected a resolved post');
     expect(hero.heading).toBe('Newest featured title');
     expect(hero.primaryAction?.href).toBe('/blog/hello-world');
   });
@@ -64,7 +66,7 @@ describe(toHeroBlogModule, () => {
 
     expect(hero.hasPost).toBe(false);
     expect(hero.eyebrow).toBeUndefined();
-    expect(hero.heading).toBeUndefined();
+    expect('heading' in hero).toBe(false);
     expect(hero.supportingText).toBeUndefined();
     expect(hero.sanityImage).toBeUndefined();
     expect(hero.primaryAction).toBeUndefined();
@@ -78,7 +80,7 @@ describe(toHeroBlogModule, () => {
 
     const hero = toHeroBlogModule(raw);
 
-    expect(hero.hasPost).toBe(true);
+    if (!hero.hasPost) throw new Error('expected a resolved post');
     expect(hero.eyebrow).toBe('Engineering');
     expect(hero.heading).toBe('Hello World');
     expect(hero.supportingText).toBe(
