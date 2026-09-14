@@ -10,7 +10,7 @@ import { Section } from '@web/components/shared/section';
 
 export interface IHeroBlogModuleViewProps extends Omit<
   THeroBlogModule,
-  'heading'
+  'hasPost' | 'heading'
 > {
   id: string;
   heading: string;

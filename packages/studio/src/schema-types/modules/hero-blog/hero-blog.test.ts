@@ -175,12 +175,22 @@ describe('heroBlogSchema post field', () => {
 });
 
 describe('heroBlogSchema copy fields', () => {
-  it('eyebrow, heading and supportingText are plain optional fields', () => {
+  it('eyebrow is a plain optional field', () => {
     expect(getField('eyebrow').validation).toBeUndefined();
-    expect(getField('heading').validation).toBeDefined();
     expect('hidden' in getField('eyebrow')).toBe(false);
-    expect('hidden' in getField('heading')).toBe(false);
-    expect('hidden' in getField('supportingText')).toBe(false);
+  });
+
+  it('has no heading or supportingText fields', () => {
+    expect(
+      heroBlogSchema.fields?.find(
+        (field) => 'name' in field && field.name === 'heading',
+      ),
+    ).toBeUndefined();
+    expect(
+      heroBlogSchema.fields?.find(
+        (field) => 'name' in field && field.name === 'supportingText',
+      ),
+    ).toBeUndefined();
   });
 });
 
