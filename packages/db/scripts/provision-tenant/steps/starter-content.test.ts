@@ -11,17 +11,6 @@ describe(buildStarterDocuments, () => {
     expect(ids.every((id) => !id.startsWith('drafts.'))).toBe(true);
   });
 
-  it('site settings has description within the schema bounds (50-160 chars)', () => {
-    const site = buildStarterDocuments(tenant).find(
-      (doc) => doc._id === STARTER_DOCUMENT_IDS.SITE,
-    );
-
-    const description = (site as unknown as { description: string })
-      .description;
-    expect(description.length).toBeGreaterThanOrEqual(50);
-    expect(description.length).toBeLessThanOrEqual(160);
-  });
-
   it('post excerpt is within the schema bounds (50-300 chars)', () => {
     const post = buildStarterDocuments(tenant).find(
       (doc) => doc._id === STARTER_DOCUMENT_IDS.POST,

@@ -104,8 +104,8 @@ const getBootstrapScriptServerSnapshot = () => {
  * rendering on the client" warning about it.
  *
  * @example
- * <DepthProvider hasSkim={Boolean(post.skim)} hasDeep={post.hasAsides}>
- *   <DepthToggle hasSkim={Boolean(post.skim)} hasDeep={post.hasAsides} labels={labels} />
+ * <DepthProvider hasSkim={Boolean(post.postTakeaways)} hasDeep={post.hasAsides}>
+ *   <DepthToggle hasSkim={Boolean(post.postTakeaways)} hasDeep={post.hasAsides} labels={labels} />
  *   <Article>...</Article>
  * </DepthProvider>
  */

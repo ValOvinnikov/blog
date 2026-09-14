@@ -33,8 +33,8 @@ export const BlogPostPage = async ({
   const post = guardPageLoaderResult(result, 'blog_post_page.fetch_failed', {
     slug,
   });
-  const { id, skim, hasAsides, modules } = post;
-  const hasSkim = Boolean(skim);
+  const { id, postTakeaways, hasAsides, modules } = post;
+  const hasSkim = Boolean(postTakeaways);
 
   return (
     <>
@@ -49,7 +49,7 @@ export const BlogPostPage = async ({
             className={s.depthToggle()}
           />
           <PostArticle slug={slug} tenant={tenant} />
-          <SkimPanel skim={skim} />
+          <SkimPanel takeaways={postTakeaways} />
         </DepthProvider>
 
         <ModuleRenderer

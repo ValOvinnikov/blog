@@ -171,7 +171,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
       ok: true,
       data: {
         ...mockPostDetail,
-        skim: {
+        postTakeaways: {
           takeaways: ['First.', 'Second.', 'Third.'],
           generatedAt: '2026-01-01T00:00:00.000Z',
           model: 'claude-haiku-4-5',

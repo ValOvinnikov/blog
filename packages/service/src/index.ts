@@ -101,7 +101,7 @@ export type { TLandingPage } from './features/pages/landing';
 export type {
   TPostDetail,
   TPostDetailAuthor,
-  TPostSkim,
+  TPostTakeaways,
 } from './features/pages/post';
 export type { TBlogIndexPage } from './features/pages/post-index';
 export type { TTagDetailPage } from './features/pages/tag';

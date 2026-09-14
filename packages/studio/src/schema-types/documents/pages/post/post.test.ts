@@ -2,6 +2,7 @@ import { postPageSchema } from '@blog/studio/schema-types/documents/pages/post/p
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
+import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
 
 type TReferenceFieldDefinition = {
   type: 'reference';
@@ -90,32 +91,9 @@ describe('postPageSchema shape', () => {
 
     expect(headingBlockFieldDefinition?.type).toBe('headingBlock');
 
-    if (!headingBlockFieldDefinition?.validation) {
-      throw new Error(
-        'Expected postPageSchema headingBlock to define validation.',
-      );
-    }
-
-    let customFn:
-      ((value: { heading?: string } | undefined) => string | true) | undefined;
-
-    const rule = {
-      custom: (
-        fn: (value: { heading?: string } | undefined) => string | true,
-      ) => {
-        customFn = fn;
-        return rule;
-      },
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    (headingBlockFieldDefinition.validation as any)(rule);
-
-    if (!customFn) {
-      throw new Error(
-        'Expected postPageSchema headingBlock validation to register a custom() rule.',
-      );
-    }
+    const customFn = getCustomValidator<
+      (value: { heading?: string } | undefined) => string | true
+    >(headingBlockFieldDefinition);
 
     expect(customFn(undefined)).toBe('Heading is required.');
     expect(customFn({ heading: 'Understanding GROQ' })).toBe(true);
@@ -201,9 +179,9 @@ describe('postPageSchema shape', () => {
     expect(getField('post')).toBeUndefined();
   });
 
-  it('featured and skim stay optional — no validation() builder attached', () => {
+  it('featured and postTakeaways stay optional — no validation() builder attached', () => {
     expect(getField('featured')?.validation).toBeUndefined();
-    expect(getField('skim')?.validation).toBeUndefined();
+    expect(getField('postTakeaways')?.validation).toBeUndefined();
   });
 
   it('has no newsletterEnabled field — the newsletter module in modules[] is the toggle', () => {
@@ -328,7 +306,7 @@ describe('postPageSchema field order', () => {
       'tags',
       'modules',
       'publishedAt',
-      'skim',
+      'postTakeaways',
       'seo',
     ]);
   });

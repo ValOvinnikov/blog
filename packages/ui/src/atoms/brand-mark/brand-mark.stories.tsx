@@ -54,7 +54,7 @@ export const StackedWithWideImageSource: TStory = {
 };
 
 // `isStacked` sizing only takes effect at `md` and above; below that it must
-// render identically to the non-stacked case (see `BrandLockup`'s spec line,
+// render identically to the non-stacked case (see `BrandLockup`'s tagline,
 // which reveals at the same breakpoint).
 export const StackedWithWideImageSourceNarrowViewport: TStory = {
   globals: { viewport: 'phone' },

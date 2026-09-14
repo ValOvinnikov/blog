@@ -6,11 +6,13 @@ import type { TFeedPost } from '@blog/service';
 const {
   getAllPublishedPostsMock,
   getSiteSettingsMock,
+  getIndexPageMock,
   getHostTenantSanityContextMock,
   getTenantBaseUrlMock,
 } = vi.hoisted(() => ({
   getAllPublishedPostsMock: vi.fn(),
   getSiteSettingsMock: vi.fn(),
+  getIndexPageMock: vi.fn(),
   getHostTenantSanityContextMock: vi.fn(),
   getTenantBaseUrlMock: vi.fn(),
 }));
@@ -21,6 +23,7 @@ vi.mock('@blog/service', () => ({
       posts: { v1: { getAllPublishedPosts: getAllPublishedPostsMock } },
     },
     global: { siteSettings: { v1: { getSiteSettings: getSiteSettingsMock } } },
+    pages: { blog: { v1: { getIndexPage: getIndexPageMock } } },
   },
 }));
 
@@ -46,12 +49,14 @@ describe('GET /rss.xml', () => {
       tenant: undefined,
     });
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');
+    getIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
   });
 
   afterEach(() => {
     vi.resetModules();
     getAllPublishedPostsMock.mockReset();
     getSiteSettingsMock.mockReset();
+    getIndexPageMock.mockReset();
     getHostTenantSanityContextMock.mockReset();
     getTenantBaseUrlMock.mockReset();
   });
@@ -60,10 +65,11 @@ describe('GET /rss.xml', () => {
     getAllPublishedPostsMock.mockResolvedValue({ ok: true, data: [post] });
     getSiteSettingsMock.mockResolvedValue({
       ok: true,
-      data: {
-        brand: { name: 'My Blog' },
-        description: 'A blog about things',
-      },
+      data: { brand: { name: 'My Blog' } },
+    });
+    getIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: { seo: { description: 'A blog about things' } },
     });
     const { GET } = await import('./route');
 
@@ -94,7 +100,7 @@ describe('GET /rss.xml', () => {
     );
   });
 
-  it('falls back to a generic channel title/description when site settings fail', async () => {
+  it('falls back to a generic channel title when site settings fail', async () => {
     getAllPublishedPostsMock.mockResolvedValue({ ok: true, data: [] });
     getSiteSettingsMock.mockResolvedValue({
       ok: false,
@@ -107,9 +113,42 @@ describe('GET /rss.xml', () => {
     const doc = new DOMParser().parseFromString(xml, 'application/xml');
 
     expect(doc.querySelector('channel > title')?.textContent).toBe('Blog');
-    expect(doc.querySelector('channel > description')?.textContent).toBe(
-      'Latest posts',
-    );
+    expect(doc.querySelector('channel > description')).toBeNull();
+  });
+
+  it('omits the channel description when the index page fails to load', async () => {
+    getAllPublishedPostsMock.mockResolvedValue({ ok: true, data: [] });
+    getSiteSettingsMock.mockResolvedValue({
+      ok: true,
+      data: { brand: { name: 'My Blog' } },
+    });
+    getIndexPageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
+    const { GET } = await import('./route');
+
+    const response = await GET();
+    const xml = await response.text();
+    const doc = new DOMParser().parseFromString(xml, 'application/xml');
+
+    expect(doc.querySelector('channel > description')).toBeNull();
+  });
+
+  it('omits the channel description when the index page has none authored', async () => {
+    getAllPublishedPostsMock.mockResolvedValue({ ok: true, data: [] });
+    getSiteSettingsMock.mockResolvedValue({
+      ok: true,
+      data: { brand: { name: 'My Blog' } },
+    });
+    getIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: { seo: { description: undefined } },
+    });
+    const { GET } = await import('./route');
+
+    const response = await GET();
+    const xml = await response.text();
+    const doc = new DOMParser().parseFromString(xml, 'application/xml');
+
+    expect(doc.querySelector('channel > description')).toBeNull();
   });
 
   it('returns an empty feed (no items) when the posts fetch fails', async () => {
@@ -119,7 +158,7 @@ describe('GET /rss.xml', () => {
     });
     getSiteSettingsMock.mockResolvedValue({
       ok: true,
-      data: { brand: { name: 'My Blog' }, description: 'desc' },
+      data: { brand: { name: 'My Blog' } },
     });
     const { GET } = await import('./route');
 
@@ -143,7 +182,7 @@ describe('GET /rss.xml', () => {
     getAllPublishedPostsMock.mockResolvedValue({ ok: true, data: [] });
     getSiteSettingsMock.mockResolvedValue({
       ok: true,
-      data: { brand: { name: 'My Blog' }, description: 'desc' },
+      data: { brand: { name: 'My Blog' } },
     });
     const { GET } = await import('./route');
 
@@ -151,6 +190,7 @@ describe('GET /rss.xml', () => {
 
     expect(getAllPublishedPostsMock).toHaveBeenCalledWith(tenant);
     expect(getSiteSettingsMock).toHaveBeenCalledWith(tenant);
+    expect(getIndexPageMock).toHaveBeenCalledWith(tenant);
   });
 
   it('returns a 404 without querying any content when the host is unresolvable', async () => {

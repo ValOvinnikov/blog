@@ -1,6 +1,7 @@
 import { HERO_VARIANT } from '@blog/config/constants';
 import { actionGroupSchema } from '@blog/studio/schema-types/objects/action-group/action-group';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
+import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
 
 import { heroStatementSchema } from './hero-statement';
 
@@ -24,31 +25,8 @@ const getField = (name: string) => {
   return field;
 };
 
-const getFieldCustomValidator = (field: {
-  validation?: unknown;
-}): TCustomFn => {
-  if (!field.validation) {
-    throw new Error('Expected field to define validation.');
-  }
-
-  let customFn: TCustomFn | undefined;
-
-  const rule = {
-    custom: (fn: TCustomFn) => {
-      customFn = fn;
-      return rule;
-    },
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (field.validation as any)(rule);
-
-  if (!customFn) {
-    throw new Error('Expected field validation to register a custom() rule.');
-  }
-
-  return customFn;
-};
+const getFieldCustomValidator = (field: { validation?: unknown }): TCustomFn =>
+  getCustomValidator<TCustomFn>(field);
 
 describe('heroStatementSchema field order', () => {
   it('places title, eyebrow, headingBlock before the shared hero tail', () => {

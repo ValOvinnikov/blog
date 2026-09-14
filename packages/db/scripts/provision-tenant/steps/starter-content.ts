@@ -125,9 +125,6 @@ export function buildStarterDocuments(
       _type: 'brand',
       name: tenant.name,
     },
-    description:
-      `${tenant.name} was just provisioned on the platform. Edit this ` +
-      'default description in Site Settings once you have real copy.',
   };
 
   const heroBlog: TSanityDocument = {

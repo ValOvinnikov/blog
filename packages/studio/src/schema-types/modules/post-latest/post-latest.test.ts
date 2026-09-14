@@ -1,37 +1,16 @@
 import { DISPLAY_MODE } from '@blog/config/constants';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
+import {
+  getCustomValidator,
+  getRecordedValidators,
+  type TRecordedValidator,
+} from '@blog/studio/testing/create-mock-validation-rule';
 import type { SanityDocument } from 'sanity';
 
 type TDocFn = (document: SanityDocument | undefined) => string | true;
 
-type TDocValidator = { fn: TDocFn; level: 'error' | 'warning' };
-
-const getDocumentValidators = (): TDocValidator[] => {
-  const collected: TDocValidator[] = [];
-
-  const rule = {
-    custom: (fn: TDocFn) => {
-      const record: TDocValidator = { fn, level: 'error' };
-      collected.push(record);
-
-      return {
-        warning: () => {
-          record.level = 'warning';
-          return record;
-        },
-      };
-    },
-  };
-
-  if (!postLatestSchema.validation) {
-    throw new Error('Expected postLatestSchema to define document validation.');
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (postLatestSchema.validation as any)(rule);
-
-  return collected;
-};
+const getDocumentValidators = (): TRecordedValidator<TDocFn>[] =>
+  getRecordedValidators<TDocFn>(postLatestSchema);
 
 const getField = (name: string) => {
   const field = postLatestSchema.fields?.find(
@@ -60,32 +39,9 @@ describe('postLatestSchema showImages field', () => {
 
 describe('postLatestSchema headingBlock field', () => {
   it('blocks publish on an empty heading', () => {
-    const field = getField('headingBlock');
-
-    if (!field.validation) {
-      throw new Error('Expected headingBlock field to define validation.');
-    }
-
-    let customFn:
-      ((value: { heading?: string } | undefined) => string | true) | undefined;
-
-    const rule = {
-      custom: (
-        fn: (value: { heading?: string } | undefined) => string | true,
-      ) => {
-        customFn = fn;
-        return rule;
-      },
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    (field.validation as any)(rule);
-
-    if (!customFn) {
-      throw new Error(
-        'Expected headingBlock validation to register a custom() rule.',
-      );
-    }
+    const customFn = getCustomValidator<
+      (value: { heading?: string } | undefined) => string | true
+    >(getField('headingBlock'));
 
     expect(customFn(undefined)).toBe('Heading is required.');
     expect(customFn({ heading: 'Latest posts' })).toBe(true);

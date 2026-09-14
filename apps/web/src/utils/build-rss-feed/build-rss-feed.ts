@@ -2,7 +2,7 @@ import { escapeXml } from '@web/utils/escape-xml';
 
 export type TRssChannel = {
   title: string;
-  description: string;
+  description?: string;
   siteUrl: string;
 };
 
@@ -38,13 +38,15 @@ export const buildRssFeed = (
   items: TRssItem[],
 ): string => {
   const itemsXml = items.map(toRssItemXml).join('\n');
+  const descriptionLine = channel.description
+    ? `\n    <description>${escapeXml(channel.description)}</description>`
+    : '';
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
     <title>${escapeXml(channel.title)}</title>
-    <link>${escapeXml(channel.siteUrl)}</link>
-    <description>${escapeXml(channel.description)}</description>
+    <link>${escapeXml(channel.siteUrl)}</link>${descriptionLine}
 ${itemsXml}
   </channel>
 </rss>`;

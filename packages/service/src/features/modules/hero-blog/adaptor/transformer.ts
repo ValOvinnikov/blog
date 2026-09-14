@@ -15,7 +15,7 @@ import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image
 import type { InferResultType } from 'groqd';
 
 import type { heroBlogModuleQuery } from './query';
-import type { THeroBlogModule } from './types';
+import type { THeroBlogModule, THeroBlogModuleBase } from './types';
 
 export type TRawHeroBlogModule = InferResultType<typeof heroBlogModuleQuery>;
 
@@ -37,12 +37,10 @@ export function toHeroBlogModule(raw: TRawHeroBlogModule): THeroBlogModule {
   const post = raw.post ? toPostCard(raw.post) : undefined;
   const { contentPosition, mediaOrder } = toHeroPresentation(raw);
 
-  return {
+  const base: THeroBlogModuleBase = {
     brandVariant: raw.brandVariant,
     variant: raw.variant,
-    hasPost: post !== undefined,
     eyebrow: raw.eyebrow ?? post?.topic?.title,
-    heading: post?.title,
     supportingText: post?.excerpt,
     sanityImage: toImage(raw, post),
     primaryAction: toHeroPrimaryAction(
@@ -58,4 +56,8 @@ export function toHeroBlogModule(raw: TRawHeroBlogModule): THeroBlogModule {
     mediaOrder,
     layout: toLayout(raw.layout),
   };
+
+  return post
+    ? { ...base, hasPost: true, heading: post.title }
+    : { ...base, hasPost: false };
 }

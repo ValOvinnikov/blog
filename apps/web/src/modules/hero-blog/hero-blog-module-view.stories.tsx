@@ -25,6 +25,7 @@ const meta = {
   },
   args: {
     id: 'hero-blog-1',
+    hasPost: true,
     brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
     variant: HERO_VARIANT.SPLIT,
     eyebrow: 'Engineering',

@@ -22,7 +22,7 @@ export const mockPostDetail: TPostDetail = {
       children: [{ _type: 'span', _key: 's1', text: 'Body text.' }],
     },
   ],
-  skim: undefined,
+  postTakeaways: undefined,
   hasAsides: false,
   modules: [{ id: 'related-1', type: 'module_postRelated' }],
   seo: {

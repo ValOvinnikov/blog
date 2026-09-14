@@ -98,7 +98,7 @@ export function makeRawPostDetail(
     heroImage: makeRawSanityImage(),
     featured: false,
     body: [],
-    skim: null,
+    postTakeaways: null,
     seo: makeRawSeo(),
     author: makeRawAuthor(),
     topic: {
