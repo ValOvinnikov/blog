@@ -261,11 +261,15 @@ module-level field, below).
 `module_cta`/`module_postList`/`module_postLatest`/`module_postFeatured`/`module_postRelated`/`module_taxonomyList`/`module_newsletter`
 additionally carry a `headingBlock` object (`heading` and `supportingText`
 only). There is **one registered `headingBlock` type**, and requiredness is
-a property of the **field**, not of the type: `headingBlockField()`
-attaches a field-level rule checking the nested `heading`. It takes no
-options — `heading` is **required on every call site**, every module and
-every page, so no layer has to reason about which case it is holding and
-no caller can opt out. Neither
+enforced at **two levels**, because Sanity never descends into an absent
+object: the registered type marks its own nested `heading` `required()`,
+and `headingBlockField()` marks the containing field `required()` so the
+object is always there for that nested rule to run against. Either alone
+would miss a case — the nested rule never fires on a document with no
+`headingBlock`, and the field rule alone would accept an empty heading
+inside one. `headingBlockField()` takes no options, so `heading` is
+**required on every call site**, every module and every page: no layer has
+to reason about which case it is holding, and no caller can opt out. Neither
 field carries a length cap; forced `max()` validation was removed as
 editor-hostile.
 
