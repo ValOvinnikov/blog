@@ -383,6 +383,8 @@ describe('getPost', () => {
             't:tenant-a:topic',
             't:tenant-a:tag',
             't:tenant-a:shared_link',
+            't:tenant-a:page_landing',
+            't:tenant-a:page_postIndex',
           ],
         }),
       }),

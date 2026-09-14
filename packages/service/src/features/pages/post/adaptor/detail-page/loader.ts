@@ -13,14 +13,25 @@ export async function getPost(
   slug: string,
   tenant: TTenantSanityContext,
 ): Promise<TMaybeUndefined<TPostDetail>> {
-  // `postPageQuery` derefs `author`/`topic`/`tags[]`, and the author's
-  // `socialLinks[]` further derefs `shared_link` — all four tags must ride
-  // alongside `page_post` (tag-scope contract, `sanity/query.ts`).
+  // `postPageQuery` derefs `author`/`topic`/`tags[]`, and `shared_link` —
+  // via the body's `sharedLinkAnnotation` marks and the author's
+  // `socialLinks[]` — whose `internalReference` can itself resolve to
+  // `page_post`/`blog_topic`/`page_landing`/`page_postIndex` — every one of
+  // those types' tags must ride alongside `page_post` (tag-scope contract,
+  // `sanity/query.ts`).
   const raw = await runQuery(postPageQuery, {
     parameters: { slug },
     tenant,
     ...isr(
-      ['page_post', 'author', 'topic', 'tag', 'shared_link'],
+      [
+        'page_post',
+        'author',
+        'topic',
+        'tag',
+        'shared_link',
+        'page_landing',
+        'page_postIndex',
+      ],
       tenant.projectId,
     ),
   });

@@ -36,7 +36,15 @@ describe('getContent', () => {
       expect.objectContaining({
         tenant,
         next: expect.objectContaining({
-          tags: ['t:tenant-a:modules:content', 't:tenant-a:module:content-1'],
+          tags: [
+            't:tenant-a:modules:content',
+            't:tenant-a:module:content-1',
+            't:tenant-a:shared_link',
+            't:tenant-a:page_post',
+            't:tenant-a:topic',
+            't:tenant-a:page_landing',
+            't:tenant-a:page_postIndex',
+          ],
         }),
       }),
     );
