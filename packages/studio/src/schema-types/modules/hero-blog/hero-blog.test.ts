@@ -7,6 +7,11 @@ import {
 } from '@blog/config/constants';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
+import {
+  getCustomValidator,
+  getRecordedValidators,
+  type TRecordedValidator,
+} from '@blog/studio/testing/create-mock-validation-rule';
 import type { SanityDocument, ValidationContext } from 'sanity';
 
 type TCustomFn = (
@@ -85,61 +90,11 @@ const wasRequiredCalled = (field: { validation?: unknown }) => {
   return requiredCalled;
 };
 
-const getFieldCustomValidator = (field: {
-  validation?: unknown;
-}): TCustomFn => {
-  if (!field.validation) {
-    throw new Error('Expected field to define validation.');
-  }
+const getFieldCustomValidator = (field: { validation?: unknown }): TCustomFn =>
+  getCustomValidator<TCustomFn>(field);
 
-  let customFn: TCustomFn | undefined;
-
-  const rule = {
-    custom: (fn: TCustomFn) => {
-      customFn = fn;
-      return rule;
-    },
-    required: () => rule,
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (field.validation as any)(rule);
-
-  if (!customFn) {
-    throw new Error('Expected field validation to register a custom() rule.');
-  }
-
-  return customFn;
-};
-
-type TDocValidator = { fn: TDocFn; level: 'error' | 'warning' };
-
-const getDocumentValidators = (): TDocValidator[] => {
-  const collected: TDocValidator[] = [];
-
-  const rule = {
-    custom: (fn: TDocFn) => {
-      const record: TDocValidator = { fn, level: 'error' };
-      collected.push(record);
-
-      return {
-        warning: () => {
-          record.level = 'warning';
-          return record;
-        },
-      };
-    },
-  };
-
-  if (!heroBlogSchema.validation) {
-    throw new Error('Expected heroBlogSchema to define document validation.');
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (heroBlogSchema.validation as any)(rule);
-
-  return collected;
-};
+const getDocumentValidators = (): TRecordedValidator<TDocFn>[] =>
+  getRecordedValidators<TDocFn>(heroBlogSchema);
 
 const createMockContext = (
   fetchImpl: (query: string, params?: unknown) => unknown,
