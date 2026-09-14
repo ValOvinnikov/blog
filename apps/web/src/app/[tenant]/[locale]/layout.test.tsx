@@ -3,6 +3,7 @@ import {
   routes,
   SITE_MESSAGES as realMessages,
   SOCIAL_PLATFORMS,
+  type ITenantLocalizedParams,
 } from '@blog/config';
 import userEvent from '@testing-library/user-event';
 import { Analytics } from '@vercel/analytics/next';
@@ -36,6 +37,7 @@ const {
   getTenantBaseUrlMock,
   getSanityImageBaseUrlMock,
   urlForSanityImageMock,
+  rememberRequestTenantIdMock,
 } = vi.hoisted(() => ({
   getSiteSettingsMock: vi.fn(),
   getNavigationMock: vi.fn(),
@@ -56,6 +58,7 @@ const {
   getTenantBaseUrlMock: vi.fn(),
   getSanityImageBaseUrlMock: vi.fn(),
   urlForSanityImageMock: vi.fn(),
+  rememberRequestTenantIdMock: vi.fn(),
 }));
 
 vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
@@ -64,6 +67,10 @@ vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
 
 vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
   getTenantBaseUrl: getTenantBaseUrlMock,
+}));
+
+vi.mock('@web/server/tenant/remembered-tenant', () => ({
+  rememberRequestTenantId: rememberRequestTenantIdMock,
 }));
 
 vi.mock('@blog/auth/utils/oauth-providers/oauth-providers', () => ({
@@ -574,6 +581,38 @@ describe('LocaleLayout', () => {
         ),
       ).toBe(true);
       errorSpy.mockRestore();
+    });
+
+    it('remembers the tenant id ahead of the notFound() it throws', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      getSiteSettingsMock.mockResolvedValue({ ok: false, error: 'boom' });
+
+      await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+
+      expect(rememberRequestTenantIdMock).toHaveBeenCalledWith('tenant-1');
+      expect(
+        rememberRequestTenantIdMock.mock.invocationCallOrder[0],
+      ).toBeLessThan(vi.mocked(notFound).mock.invocationCallOrder[0]!);
+      errorSpy.mockRestore();
+    });
+  });
+
+  describe('when the locale is invalid', () => {
+    it('remembers the tenant id before calling notFound()', async () => {
+      await expect(
+        LocaleLayout({
+          children: <div>content</div>,
+          params: Promise.resolve({
+            tenant: 'tenant-1',
+            locale: 'xx',
+          } as unknown as ITenantLocalizedParams),
+        }),
+      ).rejects.toThrow('NEXT_NOT_FOUND');
+
+      expect(rememberRequestTenantIdMock).toHaveBeenCalledWith('tenant-1');
+      expect(
+        rememberRequestTenantIdMock.mock.invocationCallOrder[0],
+      ).toBeLessThan(vi.mocked(notFound).mock.invocationCallOrder[0]!);
     });
   });
 });

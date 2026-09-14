@@ -30,6 +30,7 @@ import { routing } from '@web/i18n/routing';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
 import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { rememberRequestTenantId } from '@web/server/tenant/remembered-tenant';
 import { getThemeTokens } from '@web/utils/get-theme-tokens';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
 import { isWebAnalyticsEnabled } from '@web/utils/is-web-analytics-enabled';
@@ -110,6 +111,7 @@ type TProps = {
 
 export default async function LocaleLayout({ children, params }: TProps) {
   const { locale, tenant } = await params;
+  rememberRequestTenantId(tenant);
 
   if (!hasLocale(routing.locales, locale)) {
     notFound();

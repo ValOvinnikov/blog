@@ -76,24 +76,27 @@ describe(`<${StandaloneNotFoundPage.name}/>`, () => {
     );
   });
 
-  describe('with shouldResolveTenant defaulted to true (the root boundary)', () => {
-    it('resolves theme tokens and messages with no tenant argument, falling through to the request header', async () => {
-      await StandaloneNotFoundPage();
+  describe('given a tenant', () => {
+    it('resolves theme tokens and messages with that tenant', async () => {
+      await StandaloneNotFoundPage({ tenant: 'tenant-1' });
 
-      expect(getThemeTokensMock).toHaveBeenCalledWith();
-      expect(resolveTenantMessagesMock).toHaveBeenCalledWith(messages);
+      expect(getThemeTokensMock).toHaveBeenCalledWith('tenant-1');
+      expect(resolveTenantMessagesMock).toHaveBeenCalledWith(
+        messages,
+        'tenant-1',
+      );
       expect(toThemeTokensMock).not.toHaveBeenCalled();
     });
 
     it('passes the resolved theme tokens through to ThemeScope', async () => {
-      const ui = await StandaloneNotFoundPage();
+      const ui = await StandaloneNotFoundPage({ tenant: 'tenant-1' });
 
       expect(ui.type).toBe(ThemeScope);
       expect(ui.props.themeTokens).toBe(THEME_TOKENS);
     });
 
     it('wraps NotFoundPage in its own NextIntlClientProvider, independent of any ancestor provider', async () => {
-      const ui = await StandaloneNotFoundPage();
+      const ui = await StandaloneNotFoundPage({ tenant: 'tenant-1' });
       const provider = ui.props.children;
 
       expect(provider.type).toBe(NextIntlClientProvider);
@@ -103,16 +106,16 @@ describe(`<${StandaloneNotFoundPage.name}/>`, () => {
     });
   });
 
-  describe('with shouldResolveTenant={false} (the [tenant] boundary)', () => {
+  describe('given no tenant', () => {
     it('never calls getThemeTokens or resolveTenantMessages', async () => {
-      await StandaloneNotFoundPage({ shouldResolveTenant: false });
+      await StandaloneNotFoundPage();
 
       expect(getThemeTokensMock).not.toHaveBeenCalled();
       expect(resolveTenantMessagesMock).not.toHaveBeenCalled();
     });
 
     it('renders with default theme tokens and the base, un-voiced messages', async () => {
-      const ui = await StandaloneNotFoundPage({ shouldResolveTenant: false });
+      const ui = await StandaloneNotFoundPage();
 
       expect(toThemeTokensMock).toHaveBeenCalledWith(undefined);
       expect(ui.props.themeTokens).toBe(DEFAULT_THEME_TOKENS);

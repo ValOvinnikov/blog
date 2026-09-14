@@ -14,39 +14,38 @@ type TNotFoundThemeContext = {
 
 const resolveTenantThemeContext = async (
   baseMessages: Record<string, unknown>,
+  tenant: string,
 ): Promise<TNotFoundThemeContext> => {
   const [resolved, themeTokens] = await Promise.all([
-    resolveTenantMessages(baseMessages),
-    getThemeTokens(),
+    resolveTenantMessages(baseMessages, tenant),
+    getThemeTokens(tenant),
   ]);
 
   return { messages: resolved.messages, themeTokens };
 };
 
 type TStandaloneNotFoundPageProps = {
-  shouldResolveTenant?: boolean;
+  tenant?: string;
 };
 
 /**
  * StandaloneNotFoundPage — the body every `not-found.tsx` boundary outside
  * `[tenant]/[locale]/layout.tsx`'s children renders, since neither receives
- * route params to inherit theme/locale context from. The root
- * `app/not-found.tsx` (an unmatched URL, genuinely tenant-less) uses the
- * default `shouldResolveTenant={true}`, which falls through to the
- * `x-tenant-id` request header. `app/[tenant]/not-found.tsx` (a failed
- * `[tenant]/[locale]/layout.tsx` render) passes `shouldResolveTenant={false}`
- * to render with default theme tokens and base messages instead — the
- * layout that would have supplied a tenant just failed, and reading the
- * header here would turn a prerendered route dynamic at runtime.
+ * route params to inherit theme/locale context from. Each caller resolves
+ * its own tenant id (the root boundary from the request header, the
+ * `[tenant]` boundary from what the layout remembered before it threw) and
+ * passes it in; given one, this renders with that tenant's theme tokens and
+ * voice-overridden messages, and otherwise falls back to default tokens and
+ * base messages — never to a header read of its own.
  */
 export const StandaloneNotFoundPage = async ({
-  shouldResolveTenant = true,
+  tenant,
 }: TStandaloneNotFoundPageProps = {}) => {
   setRequestLocale(LOCALE_ISO_CODES.EN);
   const baseMessages = await getMessages();
 
-  const { messages, themeTokens } = shouldResolveTenant
-    ? await resolveTenantThemeContext(baseMessages)
+  const { messages, themeTokens } = tenant
+    ? await resolveTenantThemeContext(baseMessages, tenant)
     : { messages: baseMessages, themeTokens: toThemeTokens(undefined) };
 
   return (
