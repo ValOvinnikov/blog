@@ -7,7 +7,6 @@ import {
   HERO_FIELD_MODE,
   HERO_IMAGE_SOURCE,
   HERO_VARIANT,
-  LINK_TYPE,
   NEWSLETTER_VARIANT,
   POST_SOURCE,
   TAXONOMY_KIND,
@@ -32,7 +31,10 @@ import type {
   TRawTaxonomyEntry,
   TRawTaxonomyListModule,
 } from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
-import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
+import {
+  makeRawHeadingBlock,
+  makeRawSharedLink,
+} from '@blog/service/testing/shared/fixtures';
 
 export function makeRawHeroModule(
   overrides: Partial<TRawHeroModule> = {},
@@ -49,7 +51,7 @@ export function makeRawHeroModule(
     heroImageMode: HERO_FIELD_MODE.POST_IMAGE,
     heroImageAsset: null,
     primaryActionLabel: null,
-    secondaryAction: null,
+    actions: null,
     layout: null,
     ...overrides,
   };
@@ -65,7 +67,7 @@ export function makeRawHeroBlogModule(
     image: null,
     primaryActionLabel: null,
     primaryActionAppearance: null,
-    secondaryAction: null,
+    actions: null,
     variant: HERO_VARIANT.SPLIT,
     brandVariant: BRAND_VARIANT.PRIMARY,
     contentPositionSplit: null,
@@ -203,15 +205,8 @@ export function makeRawCtaAction(
   return {
     variant: CTA_ACTION_VARIANT.PRIMARY,
     appearance: CTA_ACTION_APPEARANCE.CONTAINED,
-    link: {
-      label: 'Subscribe',
-      linkType: LINK_TYPE.EXTERNAL,
-      url: '/newsletter',
-      internalReference: null,
-      openInNewTab: null,
-      platform: null,
-      accessibleLabel: null,
-    },
+    labelOverride: null,
+    link: makeRawSharedLink({ label: 'Subscribe' }),
     ...overrides,
   };
 }
@@ -221,14 +216,11 @@ export function makeRawContentMarkDef(
 ): TRawCtaContentMarkDef {
   return {
     _key: 'mark-1',
-    _type: 'link',
-    label: 'Learn more',
-    linkType: LINK_TYPE.EXTERNAL,
-    url: 'https://example.com',
-    internalReference: null,
-    openInNewTab: null,
-    platform: null,
-    accessibleLabel: null,
+    _type: 'sharedLinkAnnotation',
+    link: makeRawSharedLink({
+      label: 'Learn more',
+      url: 'https://example.com',
+    }),
     ...overrides,
   };
 }

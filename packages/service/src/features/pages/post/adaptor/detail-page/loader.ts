@@ -13,12 +13,16 @@ export async function getPost(
   slug: string,
   tenant: TTenantSanityContext,
 ): Promise<TMaybeUndefined<TPostDetail>> {
-  // `postPageQuery` derefs `author`/`topic`/`tags[]` — all three tags must
-  // ride alongside `page_post` (tag-scope contract, `sanity/query.ts`).
+  // `postPageQuery` derefs `author`/`topic`/`tags[]`, and the author's
+  // `socialLinks[]` further derefs `shared_link` — all four tags must ride
+  // alongside `page_post` (tag-scope contract, `sanity/query.ts`).
   const raw = await runQuery(postPageQuery, {
     parameters: { slug },
     tenant,
-    ...isr(['page_post', 'author', 'topic', 'tag'], tenant.projectId),
+    ...isr(
+      ['page_post', 'author', 'topic', 'tag', 'shared_link'],
+      tenant.projectId,
+    ),
   });
   if (!raw) return undefined;
 

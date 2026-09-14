@@ -1,4 +1,5 @@
 import type {
+  ILink,
   ISanityImage,
   ProseText,
   TMaybeUndefined,
@@ -7,7 +8,6 @@ import type {
 import type { TSeoResolved } from '@blog/service/shared/transformers/resolve-seo';
 import type { TModule } from '@blog/service/shared/transformers/to-module';
 import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
-import type { TSocialLink } from '@blog/service/shared/transformers/to-social-link';
 import type { TTag } from '@blog/service/shared/transformers/to-tag';
 import type { TTopic } from '@blog/service/shared/transformers/to-topic';
 
@@ -18,7 +18,7 @@ export type TPostDetailAuthor = {
   image: TMaybeUndefined<ISanityImage>;
   role: TMaybeUndefined<string>;
   bio: TMaybeUndefined<ProseText>;
-  socialLinks: TSocialLink[];
+  socialLinks: ILink[];
 };
 
 export type TPostTakeaways = {

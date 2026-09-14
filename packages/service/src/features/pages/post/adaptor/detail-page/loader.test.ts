@@ -380,6 +380,7 @@ describe('getPost', () => {
             't:tenant-a:author',
             't:tenant-a:topic',
             't:tenant-a:tag',
+            't:tenant-a:shared_link',
           ],
         }),
       }),

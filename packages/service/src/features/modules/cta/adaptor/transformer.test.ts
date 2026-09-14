@@ -5,7 +5,6 @@ import {
   CTA_ACTION_VARIANT,
   CONTENT_ALIGNMENT,
   CTA_VARIANT,
-  LINK_TYPE,
 } from '@blog/config';
 import {
   makeRawContentBlock,
@@ -16,6 +15,7 @@ import {
 import {
   makeRawHeadingBlock,
   makeRawSanityImage,
+  makeRawSharedLink,
 } from '@blog/service/testing/shared/fixtures';
 
 import { toCtaModule } from './transformer';
@@ -209,8 +209,13 @@ describe('toCtaModule', () => {
         makeRawContentBlock({
           markDefs: [
             makeRawContentMarkDef({
-              linkType: LINK_TYPE.INTERNAL,
-              internalReference: { _type: 'page_post', slug: 'hello-world' },
+              link: makeRawSharedLink({
+                linkType: 'INTERNAL',
+                internalReference: {
+                  _type: 'page_post',
+                  slug: 'hello-world',
+                },
+              }),
             }),
           ],
         }),
@@ -219,10 +224,15 @@ describe('toCtaModule', () => {
 
     const cta = toCtaModule(raw);
 
-    expect(cta.content?.[0]?.markDefs?.[0]).toMatchObject({
+    expect(cta.content?.[0]?.markDefs?.[0]).toEqual({
       _key: 'mark-1',
-      _type: 'link',
-      url: '/blog/hello-world',
+      _type: 'sharedLinkAnnotation',
+      link: {
+        label: 'Learn more',
+        href: '/blog/hello-world',
+        target: undefined,
+        platform: undefined,
+      },
     });
   });
 
@@ -232,8 +242,13 @@ describe('toCtaModule', () => {
         makeRawContentBlock({
           markDefs: [
             makeRawContentMarkDef({
-              linkType: LINK_TYPE.INTERNAL,
-              internalReference: { _type: 'blog_topic', slug: 'engineering' },
+              link: makeRawSharedLink({
+                linkType: 'INTERNAL',
+                internalReference: {
+                  _type: 'blog_topic',
+                  slug: 'engineering',
+                },
+              }),
             }),
           ],
         }),
@@ -244,18 +259,20 @@ describe('toCtaModule', () => {
         makeRawContentBlock({
           markDefs: [
             makeRawContentMarkDef({
-              linkType: LINK_TYPE.INTERNAL,
-              internalReference: { _type: 'page_landing', slug: 'about' },
+              link: makeRawSharedLink({
+                linkType: 'INTERNAL',
+                internalReference: { _type: 'page_landing', slug: 'about' },
+              }),
             }),
           ],
         }),
       ],
     });
 
-    expect(toCtaModule(topicRaw).content?.[0]?.markDefs?.[0]?.url).toBe(
+    expect(toCtaModule(topicRaw).content?.[0]?.markDefs?.[0]?.link?.href).toBe(
       '/topics/engineering',
     );
-    expect(toCtaModule(pageRaw).content?.[0]?.markDefs?.[0]?.url).toBe(
+    expect(toCtaModule(pageRaw).content?.[0]?.markDefs?.[0]?.link?.href).toBe(
       '/about',
     );
   });
@@ -266,8 +283,10 @@ describe('toCtaModule', () => {
         makeRawContentBlock({
           markDefs: [
             makeRawContentMarkDef({
-              linkType: LINK_TYPE.EXTERNAL,
-              url: 'https://example.com',
+              link: makeRawSharedLink({
+                linkType: 'EXTERNAL',
+                url: 'https://example.com',
+              }),
             }),
           ],
         }),
@@ -276,18 +295,22 @@ describe('toCtaModule', () => {
 
     const cta = toCtaModule(raw);
 
-    expect(cta.content?.[0]?.markDefs?.[0]?.url).toBe('https://example.com');
+    expect(cta.content?.[0]?.markDefs?.[0]?.link?.href).toBe(
+      'https://example.com',
+    );
   });
 
-  it('degrades a malformed content link (no url, no reference) to an unresolved url rather than throwing', () => {
+  it('drops the resolved link (but keeps the mark) when it cannot resolve to an href', () => {
     const raw = makeRawCtaModule({
       content: [
         makeRawContentBlock({
           markDefs: [
             makeRawContentMarkDef({
-              linkType: LINK_TYPE.INTERNAL,
-              internalReference: null,
-              url: null,
+              link: makeRawSharedLink({
+                linkType: 'INTERNAL',
+                internalReference: null,
+                url: null,
+              }),
             }),
           ],
         }),
@@ -296,8 +319,22 @@ describe('toCtaModule', () => {
 
     expect(() => toCtaModule(raw)).not.toThrow();
     const cta = toCtaModule(raw);
-    expect(cta.content?.[0]?.markDefs?.[0]?.url).toBeUndefined();
+    expect(cta.content?.[0]?.markDefs?.[0]?.link).toBeUndefined();
     expect(cta.content?.[0]?.markDefs?.[0]?._key).toBe('mark-1');
+  });
+
+  it('drops the resolved link when the shared link reference is dangling', () => {
+    const raw = makeRawCtaModule({
+      content: [
+        makeRawContentBlock({
+          markDefs: [makeRawContentMarkDef({ link: null })],
+        }),
+      ],
+    });
+
+    const cta = toCtaModule(raw);
+
+    expect(cta.content?.[0]?.markDefs?.[0]?.link).toBeUndefined();
   });
 
   it('leaves image undefined when unset', () => {
@@ -355,7 +392,6 @@ describe('toCtaModule', () => {
           href: '/newsletter',
           target: undefined,
           platform: undefined,
-          ariaLabel: undefined,
         },
       },
     ]);
@@ -369,15 +405,10 @@ describe('toCtaModule', () => {
           makeRawCtaAction({
             variant: CTA_ACTION_VARIANT.SECONDARY,
             appearance: CTA_ACTION_APPEARANCE.INLINE,
-            link: {
+            link: makeRawSharedLink({
               label: 'Learn more',
-              linkType: LINK_TYPE.EXTERNAL,
               url: '/learn-more',
-              internalReference: null,
-              openInNewTab: null,
-              platform: null,
-              accessibleLabel: null,
-            },
+            }),
           }),
         ],
       },
@@ -415,15 +446,12 @@ describe('toCtaModule', () => {
       actions: {
         actions: [
           makeRawCtaAction({
-            link: {
+            link: makeRawSharedLink({
               label: 'Broken',
-              linkType: LINK_TYPE.INTERNAL,
+              linkType: 'INTERNAL',
               url: null,
               internalReference: null,
-              openInNewTab: null,
-              platform: null,
-              accessibleLabel: null,
-            },
+            }),
           }),
         ],
       },
@@ -434,30 +462,16 @@ describe('toCtaModule', () => {
     expect(cta.actions).toEqual([]);
   });
 
-  it('survives accessibleLabel into the view-model as ariaLabel', () => {
+  it('drops an action whose shared link reference is dangling', () => {
     const raw = makeRawCtaModule({
       actions: {
-        actions: [
-          makeRawCtaAction({
-            link: {
-              label: 'Subscribe',
-              linkType: LINK_TYPE.EXTERNAL,
-              url: '/newsletter',
-              internalReference: null,
-              openInNewTab: null,
-              platform: null,
-              accessibleLabel: 'Subscribe to the newsletter',
-            },
-          }),
-        ],
+        actions: [makeRawCtaAction({ link: null })],
       },
     });
 
     const cta = toCtaModule(raw);
 
-    expect(cta.actions?.[0]?.link.ariaLabel).toBe(
-      'Subscribe to the newsletter',
-    );
+    expect(cta.actions).toEqual([]);
   });
 
   it('maps a fully-authored layout object 1:1', () => {

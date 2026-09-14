@@ -1,5 +1,6 @@
 import { makeRawNavigation } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeRawSharedLink } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getNavigation } from './loader';
@@ -31,13 +32,8 @@ describe('getNavigation', () => {
       makeRawNavigation({
         items: [
           {
-            label: 'Blog',
-            linkType: 'EXTERNAL',
-            url: '/blog',
-            internalReference: null,
-            openInNewTab: null,
-            platform: null,
-            accessibleLabel: null,
+            labelOverride: null,
+            link: makeRawSharedLink({ label: 'Blog', url: '/blog' }),
           },
         ],
       }),
@@ -51,7 +47,6 @@ describe('getNavigation', () => {
         href: '/blog',
         target: undefined,
         platform: undefined,
-        ariaLabel: undefined,
       },
     ]);
   });
@@ -68,6 +63,7 @@ describe('getNavigation', () => {
         next: expect.objectContaining({
           tags: [
             't:tenant-a:navigation',
+            't:tenant-a:shared_link',
             't:tenant-a:page_post',
             't:tenant-a:topic',
             't:tenant-a:page_landing',

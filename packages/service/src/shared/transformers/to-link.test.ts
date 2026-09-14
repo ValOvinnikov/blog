@@ -1,55 +1,57 @@
-import { LINK_TYPE } from '@blog/config';
+import {
+  makeRawLinkRef,
+  makeRawSharedLink,
+} from '@blog/service/testing/shared/fixtures';
 
-import { toLink, type TRawLink } from './to-link';
-
-function makeRawLink(overrides: Partial<TRawLink> = {}): TRawLink {
-  return {
-    label: 'Learn more',
-    linkType: LINK_TYPE.EXTERNAL,
-    url: '/newsletter',
-    internalReference: null,
-    openInNewTab: null,
-    platform: null,
-    accessibleLabel: null,
-    ...overrides,
-  };
-}
+import { toLink } from './to-link';
 
 describe('toLink', () => {
-  it('returns undefined for a null/undefined raw link', () => {
+  it('returns undefined for a null/undefined raw wrapper', () => {
     expect(toLink(null)).toBeUndefined();
     expect(toLink(undefined)).toBeUndefined();
   });
 
+  it('returns undefined when the shared link reference is dangling', () => {
+    const result = toLink(makeRawLinkRef({ link: null }));
+
+    expect(result).toBeUndefined();
+  });
+
   it('resolves an external link to its raw url', () => {
-    const result = toLink(makeRawLink({ url: 'https://example.com' }));
+    const result = toLink(
+      makeRawLinkRef({
+        link: makeRawSharedLink({ url: 'https://example.com' }),
+      }),
+    );
 
     expect(result).toEqual({
       label: 'Learn more',
       href: 'https://example.com',
       target: undefined,
       platform: undefined,
-      ariaLabel: undefined,
     });
   });
 
-  it('threads accessibleLabel through to ariaLabel when present', () => {
-    const result = toLink(
-      makeRawLink({ accessibleLabel: 'Read the full announcement' }),
-    );
+  it("uses labelOverride instead of the shared link's own label when set", () => {
+    const result = toLink(makeRawLinkRef({ labelOverride: 'Read this' }));
 
-    expect(result?.ariaLabel).toBe('Read the full announcement');
+    expect(result?.label).toBe('Read this');
   });
 
-  it('leaves ariaLabel undefined when accessibleLabel is absent', () => {
-    const result = toLink(makeRawLink({ accessibleLabel: null }));
+  it("falls back to the shared link's own label when labelOverride is absent", () => {
+    const result = toLink(makeRawLinkRef({ labelOverride: null }));
 
-    expect(result?.ariaLabel).toBeUndefined();
+    expect(result?.label).toBe('Learn more');
   });
 
   it('opens external links in a new tab when flagged', () => {
     const result = toLink(
-      makeRawLink({ url: 'https://example.com', openInNewTab: true }),
+      makeRawLinkRef({
+        link: makeRawSharedLink({
+          url: 'https://example.com',
+          openInNewTab: true,
+        }),
+      }),
     );
 
     expect(result?.target).toBe('_blank');
@@ -57,9 +59,11 @@ describe('toLink', () => {
 
   it('resolves an internal page_post reference to its post route', () => {
     const result = toLink(
-      makeRawLink({
-        linkType: LINK_TYPE.INTERNAL,
-        internalReference: { _type: 'page_post', slug: 'hello-world' },
+      makeRawLinkRef({
+        link: makeRawSharedLink({
+          linkType: 'INTERNAL',
+          internalReference: { _type: 'page_post', slug: 'hello-world' },
+        }),
       }),
     );
 
@@ -68,9 +72,11 @@ describe('toLink', () => {
 
   it('resolves an internal blog_topic reference to its topic route', () => {
     const result = toLink(
-      makeRawLink({
-        linkType: LINK_TYPE.INTERNAL,
-        internalReference: { _type: 'blog_topic', slug: 'engineering' },
+      makeRawLinkRef({
+        link: makeRawSharedLink({
+          linkType: 'INTERNAL',
+          internalReference: { _type: 'blog_topic', slug: 'engineering' },
+        }),
       }),
     );
 
@@ -79,9 +85,11 @@ describe('toLink', () => {
 
   it('resolves an internal page_landing reference to its landing-page route', () => {
     const result = toLink(
-      makeRawLink({
-        linkType: LINK_TYPE.INTERNAL,
-        internalReference: { _type: 'page_landing', slug: 'about' },
+      makeRawLinkRef({
+        link: makeRawSharedLink({
+          linkType: 'INTERNAL',
+          internalReference: { _type: 'page_landing', slug: 'about' },
+        }),
       }),
     );
 
@@ -90,9 +98,11 @@ describe('toLink', () => {
 
   it('resolves an internal page_postIndex reference to the blog index — no slug required', () => {
     const result = toLink(
-      makeRawLink({
-        linkType: LINK_TYPE.INTERNAL,
-        internalReference: { _type: 'page_postIndex', slug: null },
+      makeRawLinkRef({
+        link: makeRawSharedLink({
+          linkType: 'INTERNAL',
+          internalReference: { _type: 'page_postIndex', slug: null },
+        }),
       }),
     );
 
@@ -101,9 +111,11 @@ describe('toLink', () => {
 
   it('returns undefined when a slug-having internal reference is genuinely missing its slug', () => {
     const result = toLink(
-      makeRawLink({
-        linkType: LINK_TYPE.INTERNAL,
-        internalReference: { _type: 'page_post', slug: null },
+      makeRawLinkRef({
+        link: makeRawSharedLink({
+          linkType: 'INTERNAL',
+          internalReference: { _type: 'page_post', slug: null },
+        }),
       }),
     );
 
@@ -112,10 +124,12 @@ describe('toLink', () => {
 
   it('returns undefined when an internal link has no reference and no url', () => {
     const result = toLink(
-      makeRawLink({
-        linkType: LINK_TYPE.INTERNAL,
-        internalReference: null,
-        url: null,
+      makeRawLinkRef({
+        link: makeRawSharedLink({
+          linkType: 'INTERNAL',
+          internalReference: null,
+          url: null,
+        }),
       }),
     );
 

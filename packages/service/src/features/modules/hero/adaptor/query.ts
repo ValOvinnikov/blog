@@ -1,7 +1,7 @@
 import { q } from '@blog/service/sanity/query';
+import { ctaActionRefFragment } from '@blog/service/shared/fragments/action-group';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image';
 import { heroLayoutFragment } from '@blog/service/shared/fragments/layout';
-import { linkFragment } from '@blog/service/shared/fragments/link';
 import { postCardFragment } from '@blog/service/shared/fragments/post';
 
 export const heroModuleQuery = q
@@ -28,9 +28,11 @@ export const heroModuleQuery = q
       .project(sanityImageFragment)
       .nullable(true),
     primaryActionLabel: sub.field('primaryActionLabel').nullable(true),
-    secondaryAction: sub
-      .field('secondaryAction')
-      .project(linkFragment)
+    // Capped to a single item by the schema (`postHeroActionsField`), so
+    // index 0 is the secondary action.
+    actions: sub
+      .field('actions[]')
+      .project(ctaActionRefFragment)
       .nullable(true),
     layout: sub.field('layout').project(heroLayoutFragment).nullable(true),
   }))

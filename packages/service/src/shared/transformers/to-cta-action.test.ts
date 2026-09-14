@@ -1,9 +1,6 @@
-import {
-  CTA_ACTION_APPEARANCE,
-  CTA_ACTION_VARIANT,
-  LINK_TYPE,
-} from '@blog/config';
+import { CTA_ACTION_APPEARANCE, CTA_ACTION_VARIANT } from '@blog/config';
 import { makeRawCtaAction } from '@blog/service/testing/modules/fixtures';
+import { makeRawSharedLink } from '@blog/service/testing/shared/fixtures';
 
 import { toCtaAction } from './to-cta-action';
 
@@ -19,7 +16,6 @@ describe(toCtaAction, () => {
         href: '/newsletter',
         target: undefined,
         platform: undefined,
-        ariaLabel: undefined,
       },
     });
   });
@@ -33,17 +29,20 @@ describe(toCtaAction, () => {
   it('returns undefined when the link cannot resolve to an href', () => {
     const action = toCtaAction(
       makeRawCtaAction({
-        link: {
+        link: makeRawSharedLink({
           label: 'Broken',
-          linkType: LINK_TYPE.INTERNAL,
+          linkType: 'INTERNAL',
           url: null,
           internalReference: null,
-          openInNewTab: null,
-          platform: null,
-          accessibleLabel: null,
-        },
+        }),
       }),
     );
+
+    expect(action).toBeUndefined();
+  });
+
+  it('returns undefined when the shared link reference is dangling', () => {
+    const action = toCtaAction(makeRawCtaAction({ link: null }));
 
     expect(action).toBeUndefined();
   });

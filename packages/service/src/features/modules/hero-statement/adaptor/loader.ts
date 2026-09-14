@@ -21,6 +21,7 @@ export async function getHeroStatement(
       [
         'modules:heroStatement',
         `module:${id}`,
+        'shared_link',
         'page_landing',
         'page_postIndex',
         'page_post',

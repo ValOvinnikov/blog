@@ -25,6 +25,7 @@ export async function getHeroBlog(
         'posts',
         'author',
         'topic',
+        'shared_link',
         'page_post',
         'page_landing',
         'page_postIndex',

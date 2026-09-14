@@ -3,7 +3,7 @@ import { actionGroupFragment } from '@blog/service/shared/fragments/action-group
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image';
 import { layoutFragment } from '@blog/service/shared/fragments/layout';
-import { linkFragment } from '@blog/service/shared/fragments/link';
+import { sharedLinkAnnotationFragment } from '@blog/service/shared/fragments/link';
 
 export const ctaModuleQuery = q
   .parameters<{ id: string }>()
@@ -20,7 +20,7 @@ export const ctaModuleQuery = q
       .project(headingBlockFragment)
       .notNull(),
     // Blocks are spread as-is (`'...': true`); only `markDefs` is
-    // re-projected, to deref `link` annotations' `internalReference`.
+    // re-projected, to deref each `sharedLinkAnnotation`'s `link`.
     content: sub
       .field('content[]')
       .project((blockSub) => ({
@@ -30,7 +30,7 @@ export const ctaModuleQuery = q
           .project({
             _key: true,
             _type: true,
-            ...linkFragment,
+            ...sharedLinkAnnotationFragment,
           })
           .nullable(true),
       }))

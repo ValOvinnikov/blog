@@ -1,7 +1,7 @@
 import { POST_SOURCE } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
-import { ctaActionFragment } from '@blog/service/shared/fragments/action-group';
+import { ctaActionRefFragment } from '@blog/service/shared/fragments/action-group';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image';
 import { heroLayoutFragment } from '@blog/service/shared/fragments/layout';
 import { postCardFragment } from '@blog/service/shared/fragments/post';
@@ -43,9 +43,11 @@ export const heroBlogModuleQuery = q
     primaryActionAppearance: sub
       .field('primaryActionAppearance')
       .nullable(true),
-    secondaryAction: sub
-      .field('secondaryAction')
-      .project(ctaActionFragment)
+    // Capped to a single item by the schema (`postHeroActionsField`), so
+    // index 0 is the secondary action.
+    actions: sub
+      .field('actions[]')
+      .project(ctaActionRefFragment)
       .nullable(true),
     variant: sub.field('variant').notNull(),
     brandVariant: sub.field('brandVariant').notNull(),

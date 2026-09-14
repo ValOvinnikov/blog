@@ -1,2 +1,6 @@
-export type { TCtaModule } from './adaptor/types';
+export type {
+  TCtaContent,
+  TCtaContentMarkDef,
+  TCtaModule,
+} from './adaptor/types';
 export { createCtaModuleService } from './application/service';

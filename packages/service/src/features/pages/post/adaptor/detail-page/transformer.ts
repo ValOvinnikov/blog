@@ -23,7 +23,9 @@ function toPostDetailAuthor(raw: TRawPostDetail['author']): TPostDetailAuthor {
     image: toSanityImage(raw.image),
     role: raw.role ?? undefined,
     bio: raw.bio ?? undefined,
-    socialLinks: (raw.socialLinks ?? []).map(toSocialLink),
+    socialLinks: (raw.socialLinks ?? []).flatMap(
+      (item) => toSocialLink(item) ?? [],
+    ),
   };
 }
 

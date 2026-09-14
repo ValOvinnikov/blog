@@ -120,7 +120,6 @@ describe(toHeroStatementModule, () => {
           href: '/newsletter',
           target: undefined,
           platform: undefined,
-          ariaLabel: undefined,
         },
       },
     ]);

@@ -1,19 +1,23 @@
 import {
   CTA_VARIANT,
-  LINK_TYPE,
-  type InlineText,
   type TContentAlignment,
   type TMaybeUndefined,
 } from '@blog/config';
 import { toCtaAction } from '@blog/service/shared/transformers/to-cta-action';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
-import { toInternalHref } from '@blog/service/shared/transformers/to-link';
+import { toLink } from '@blog/service/shared/transformers/to-link';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import type { InferResultType } from 'groqd';
 
 import type { ctaModuleQuery } from './query';
-import type { TCtaAction, TCtaModule } from './types';
+import type {
+  TCtaAction,
+  TCtaContent,
+  TCtaContentBlock,
+  TCtaContentMarkDef,
+  TCtaModule,
+} from './types';
 
 export type TRawCtaModule = InferResultType<typeof ctaModuleQuery>;
 
@@ -25,38 +29,25 @@ export type TRawCtaContentBlock = NonNullable<TRawCtaModule['content']>[number];
 export type TRawCtaContentMarkDef = NonNullable<
   TRawCtaContentBlock['markDefs']
 >[number];
-type TCtaContentMarkDef = NonNullable<InlineText[number]['markDefs']>[number];
 
-// Unlike an action, a malformed content link degrades to plain text rather
-// than dropping the block — the renderer already handles a missing `url`.
-function toContentLinkAnnotation(
-  raw: TRawCtaContentMarkDef,
-): TCtaContentMarkDef {
-  const url =
-    raw.linkType === LINK_TYPE.INTERNAL && raw.internalReference
-      ? toInternalHref(raw.internalReference)
-      : (raw.url ?? undefined);
-
+function toContentMarkDef(raw: TRawCtaContentMarkDef): TCtaContentMarkDef {
   return {
     _key: raw._key,
-    _type: 'link',
-    label: raw.label,
-    linkType: raw.linkType,
-    url,
-    openInNewTab: raw.openInNewTab ?? undefined,
-    platform: raw.platform ?? undefined,
-    accessibleLabel: raw.accessibleLabel ?? undefined,
+    _type: 'sharedLinkAnnotation',
+    link: toLink(raw),
   };
 }
 
-function toContentBlock(raw: TRawCtaContentBlock): InlineText[number] {
+function toContentBlock(raw: TRawCtaContentBlock): TCtaContentBlock {
   return {
     ...raw,
-    markDefs: raw.markDefs?.map(toContentLinkAnnotation) ?? undefined,
+    markDefs: raw.markDefs?.map(toContentMarkDef) ?? undefined,
   };
 }
 
-function toContent(raw: TRawCtaModule['content']): TMaybeUndefined<InlineText> {
+function toContent(
+  raw: TRawCtaModule['content'],
+): TMaybeUndefined<TCtaContent> {
   if (!raw || raw.length === 0) return undefined;
   return raw.map(toContentBlock);
 }

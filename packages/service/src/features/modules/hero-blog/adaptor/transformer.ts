@@ -48,9 +48,7 @@ export function toHeroBlogModule(raw: TRawHeroBlogModule): THeroBlogModule {
       post,
       raw.primaryActionAppearance,
     ),
-    secondaryAction: raw.secondaryAction
-      ? toCtaAction(raw.secondaryAction)
-      : undefined,
+    secondaryAction: raw.actions?.[0] ? toCtaAction(raw.actions[0]) : undefined,
     contentPosition,
     contentAlignment: raw.contentAlignment ?? undefined,
     mediaOrder,

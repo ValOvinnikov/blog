@@ -1,7 +1,7 @@
 import { q } from '@blog/service/sanity/query';
 
 import { sanityImageFragment } from './image';
-import { socialLinkFragment } from './social-link';
+import { socialLinkRefFragment } from './social-link';
 
 // `profilePage` is optional and restricted to `page_landing` in the schema
 // (`to: [{ type: 'page_landing' }]`), so a single deref projection covers it
@@ -40,6 +40,6 @@ export const authorDetailFragment = q
     bio: sub.field('bio[]').nullable(true),
     socialLinks: sub
       .field('socialLinks[]')
-      .project(socialLinkFragment)
+      .project(socialLinkRefFragment)
       .nullable(true),
   }));

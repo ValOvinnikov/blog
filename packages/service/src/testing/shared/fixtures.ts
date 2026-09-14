@@ -1,7 +1,13 @@
+import { LINK_TYPE } from '@blog/config';
 import type { TRawSeo } from '@blog/service/shared/transformers/resolve-seo';
 import type { TRawHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
+import type {
+  TRawLinkRef,
+  TRawSharedLink,
+} from '@blog/service/shared/transformers/to-link';
 import type { TRawPostLink } from '@blog/service/shared/transformers/to-post-link';
 import type { TRawSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
+import type { TRawSocialLinkRef } from '@blog/service/shared/transformers/to-social-link';
 
 export function makeRawHeadingBlock(
   heading: string,
@@ -30,6 +36,40 @@ export function makeRawSeo(overrides: Partial<TRawSeo> = {}): TRawSeo {
     metaTitle: 'A sufficiently descriptive meta title for testing',
     metaDescription: null,
     openGraph: null,
+    ...overrides,
+  };
+}
+
+export function makeRawSharedLink(
+  overrides: Partial<TRawSharedLink> = {},
+): TRawSharedLink {
+  return {
+    label: 'Learn more',
+    linkType: LINK_TYPE.EXTERNAL,
+    url: '/newsletter',
+    internalReference: null,
+    openInNewTab: null,
+    ...overrides,
+  };
+}
+
+export function makeRawLinkRef(
+  overrides: Partial<TRawLinkRef> = {},
+): TRawLinkRef {
+  return {
+    labelOverride: null,
+    link: makeRawSharedLink(),
+    ...overrides,
+  };
+}
+
+export function makeRawSocialLinkRef(
+  overrides: Partial<TRawSocialLinkRef> = {},
+): TRawSocialLinkRef {
+  return {
+    platform: 'GITHUB',
+    labelOverride: null,
+    link: makeRawSharedLink(),
     ...overrides,
   };
 }

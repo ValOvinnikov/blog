@@ -68,7 +68,7 @@ export function toHeroModule(
     // be an editor-overridden hero title that no longer matches the post
     // the CTA actually links to.
     primaryAction: toHeroPrimaryAction(raw.primaryActionLabel, heroPost),
-    secondaryAction: toLink(raw.secondaryAction),
+    secondaryAction: toLink(raw.actions?.[0]),
     layout: toLayout(raw.layout),
   };
 }

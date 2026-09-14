@@ -12,6 +12,7 @@ import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
 import {
   makeRawHeadingBlock,
   makeRawSanityImage,
+  makeRawSharedLink,
 } from '@blog/service/testing/shared/fixtures';
 
 import { toHeroBlogModule } from './transformer';
@@ -193,28 +194,28 @@ describe(toHeroBlogModule, () => {
   });
 
   it('leaves secondaryAction undefined when unset', () => {
-    const raw = makeRawHeroBlogModule({ secondaryAction: null });
+    const raw = makeRawHeroBlogModule({ actions: null });
 
     const hero = toHeroBlogModule(raw);
 
     expect(hero.secondaryAction).toBeUndefined();
   });
 
-  it('maps an authored secondaryAction', () => {
+  it('maps an authored secondaryAction from the first (and only) action', () => {
     const raw = makeRawHeroBlogModule({
-      secondaryAction: {
-        variant: CTA_ACTION_VARIANT.SECONDARY,
-        appearance: null,
-        link: {
-          label: 'View all posts',
-          linkType: 'INTERNAL',
-          url: null,
-          internalReference: { _type: 'page_postIndex', slug: null },
-          openInNewTab: null,
-          platform: null,
-          accessibleLabel: null,
+      actions: [
+        {
+          variant: CTA_ACTION_VARIANT.SECONDARY,
+          appearance: null,
+          labelOverride: null,
+          link: makeRawSharedLink({
+            label: 'View all posts',
+            linkType: 'INTERNAL',
+            url: null,
+            internalReference: { _type: 'page_postIndex', slug: null },
+          }),
         },
-      },
+      ],
     });
 
     const hero = toHeroBlogModule(raw);
@@ -227,7 +228,6 @@ describe(toHeroBlogModule, () => {
         href: '/blog',
         target: undefined,
         platform: undefined,
-        ariaLabel: undefined,
       },
     });
   });

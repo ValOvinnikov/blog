@@ -1,5 +1,6 @@
 import { makeRawFooter } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeRawSharedLink } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getFooter } from './loader';
@@ -31,13 +32,12 @@ describe('getFooter', () => {
       makeRawFooter({
         social: [
           {
-            label: 'GitHub',
-            linkType: 'EXTERNAL',
-            url: 'https://github.com/val',
-            internalReference: null,
-            openInNewTab: null,
             platform: 'GITHUB',
-            accessibleLabel: null,
+            labelOverride: null,
+            link: makeRawSharedLink({
+              label: 'GitHub',
+              url: 'https://github.com/val',
+            }),
           },
         ],
       }),
@@ -51,7 +51,6 @@ describe('getFooter', () => {
         href: 'https://github.com/val',
         target: undefined,
         platform: 'GITHUB',
-        ariaLabel: undefined,
       },
     ]);
   });
@@ -68,6 +67,7 @@ describe('getFooter', () => {
         next: expect.objectContaining({
           tags: [
             't:tenant-a:footer',
+            't:tenant-a:shared_link',
             't:tenant-a:page_post',
             't:tenant-a:topic',
             't:tenant-a:page_landing',

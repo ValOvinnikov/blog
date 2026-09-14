@@ -48,6 +48,7 @@ describe(getHeroStatement, () => {
           tags: [
             't:tenant-a:modules:heroStatement',
             't:tenant-a:module:hero-statement-1',
+            't:tenant-a:shared_link',
             't:tenant-a:page_landing',
             't:tenant-a:page_postIndex',
             't:tenant-a:page_post',

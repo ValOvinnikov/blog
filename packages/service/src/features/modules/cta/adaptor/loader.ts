@@ -8,8 +8,9 @@ import { ctaModuleQuery } from './query';
 import { toCtaModule } from './transformer';
 import type { TCtaModule } from './types';
 
-// Both `actions` links and `content`'s inline links resolve to the same
-// post/topic/page document types, so one ISR tag list covers both.
+// Both `actions` links and `content`'s inline links deref `shared_link` and
+// resolve to the same post/topic/page document types, so one ISR tag list
+// covers both.
 export async function getCta(
   id: string,
   tenant: TTenantSanityContext,
@@ -21,6 +22,7 @@ export async function getCta(
       [
         'modules:cta',
         `module:${id}`,
+        'shared_link',
         'page_post',
         'topic',
         'page_landing',
