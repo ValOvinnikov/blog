@@ -221,7 +221,7 @@ export function makeRawContentMarkDef(
 ): TRawCtaContentMarkDef {
   return {
     _key: 'mark-1',
-    _type: 'link',
+    _type: 'inlineLink',
     label: 'Learn more',
     linkType: LINK_TYPE.EXTERNAL,
     url: 'https://example.com',
