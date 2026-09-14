@@ -14,11 +14,19 @@ import { PAGE_TOPIC_INDEX_ID, TAXONOMY_LIST_TOPICS_ID } from './ids';
 
 import migration from './index';
 
-const HEADING_BLOCK_EXEMPTION: TExemptField[] = [
+const TAXONOMY_LIST_HEADING_BLOCK_EXEMPTION: TExemptField[] = [
   {
     name: 'headingBlock',
     reason:
-      'headingBlock became required after this migration was already applied — it still writes the pre-rename flat heading/supportingText fields — and a later migration closes the gap on existing documents',
+      "module_taxonomyList's headingBlock is authored by hand in Studio — no migration, including this one, ever sets it for this type",
+  },
+];
+
+const TOPIC_INDEX_PAGE_HEADING_BLOCK_EXEMPTION: TExemptField[] = [
+  {
+    name: 'headingBlock',
+    reason:
+      'headingBlock became required after this migration was already applied — it still writes the pre-rename flat heading/supportingText fields — and the later fold-page-topic-index-into-modules migration backfills headingBlock from that pair',
   },
 ];
 
@@ -56,12 +64,12 @@ describe('seed-page-topic-index migration', () => {
     assertSatisfiesRequiredFields(
       taxonomyListSchema,
       taxonomyListPayload,
-      HEADING_BLOCK_EXEMPTION,
+      TAXONOMY_LIST_HEADING_BLOCK_EXEMPTION,
     );
     assertSatisfiesRequiredFields(
       topicIndexPageSchema,
       pageTopicIndexPayload,
-      HEADING_BLOCK_EXEMPTION,
+      TOPIC_INDEX_PAGE_HEADING_BLOCK_EXEMPTION,
     );
 
     expect(migration.migrate.document(anchorDoc)).toEqual(expectedMutations);

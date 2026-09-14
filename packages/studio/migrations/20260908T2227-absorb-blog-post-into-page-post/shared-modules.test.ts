@@ -12,11 +12,19 @@ import {
   sharedPostRelatedModule,
 } from './shared-modules';
 
-const HEADING_BLOCK_EXEMPTION: TExemptField[] = [
+const POST_RELATED_HEADING_BLOCK_EXEMPTION: TExemptField[] = [
   {
     name: 'headingBlock',
     reason:
-      'headingBlock became required after this migration was already applied; the later backfill-missing-heading-block-heading migration closes the gap on existing documents',
+      "module_postRelated's headingBlock is authored by hand in Studio — this shared document was created with no sectionHeader to rename and no migration ever sets headingBlock for it",
+  },
+];
+
+const NEWSLETTER_HEADING_BLOCK_EXEMPTION: TExemptField[] = [
+  {
+    name: 'headingBlock',
+    reason:
+      'headingBlock became required after this migration was already applied — it still writes the pre-rename sectionHeader field — and the later rename-section-header-to-heading-block migration converts it to headingBlock',
   },
 ];
 
@@ -29,7 +37,7 @@ describe('sharedPostRelatedModule', () => {
     assertSatisfiesRequiredFields(
       postRelatedSchema,
       sharedPostRelatedModule,
-      HEADING_BLOCK_EXEMPTION,
+      POST_RELATED_HEADING_BLOCK_EXEMPTION,
     );
   });
 });
@@ -43,7 +51,7 @@ describe('sharedNewsletterModule', () => {
     assertSatisfiesRequiredFields(
       newsletterSchema,
       sharedNewsletterModule,
-      HEADING_BLOCK_EXEMPTION,
+      NEWSLETTER_HEADING_BLOCK_EXEMPTION,
     );
   });
 

@@ -14,7 +14,7 @@ const HEADING_BLOCK_EXEMPTION: TExemptField[] = [
   {
     name: 'headingBlock',
     reason:
-      'headingBlock became required after this migration was already applied — it still writes the pre-rename sectionHeader field — and the later backfill-missing-heading-block-heading migration closes the gap on existing documents',
+      'headingBlock became required after this migration was already applied — it still writes the pre-rename sectionHeader field — and the later rename-section-header-to-heading-block migration converts it to headingBlock',
   },
 ];
 
