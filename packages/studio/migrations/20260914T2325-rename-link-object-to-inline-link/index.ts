@@ -6,6 +6,8 @@ import { renameInlineLinkType, type TInlineLinkNode } from './transform';
 export default defineMigration({
   title: 'Rename inline link object type from link to inlineLink',
   documentTypes: [
+    'settings_footer',
+    'settings_navigation',
     'module_cta',
     'module_hero',
     'module_heroBlog',

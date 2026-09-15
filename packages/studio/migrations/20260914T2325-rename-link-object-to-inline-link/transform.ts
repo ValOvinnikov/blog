@@ -13,6 +13,14 @@ export type TInlineLinkNode = {
 const isKeyedSegment = (segment: Path[number] | undefined): boolean =>
   typeof segment === 'object' && segment !== null && '_key' in segment;
 
+/** `settings_footer.social[]` — each array member is an inline link. */
+const isFooterSocialLinkPath = (path: Path): boolean =>
+  path.length === 2 && path[0] === 'social' && isKeyedSegment(path[1]);
+
+/** `settings_navigation.items[]` — each array member is an inline link. */
+const isNavigationItemLinkPath = (path: Path): boolean =>
+  path.length === 2 && path[0] === 'items' && isKeyedSegment(path[1]);
+
 /** `module_hero.secondaryAction` — a single, non-array inline link field. */
 const isHeroSecondaryActionPath = (path: Path): boolean =>
   path.length === 1 && path[0] === 'secondaryAction';
@@ -39,6 +47,8 @@ const isHeroBlogSecondaryActionLinkPath = (path: Path): boolean =>
 
 /** True only for a path at one of the known locations where the legacy `link` object is actually used. */
 export const isInlineLinkPath = (path: Path): boolean =>
+  isFooterSocialLinkPath(path) ||
+  isNavigationItemLinkPath(path) ||
   isHeroSecondaryActionPath(path) ||
   isCtaActionLinkPath(path) ||
   isCtaContentAnnotationPath(path) ||
