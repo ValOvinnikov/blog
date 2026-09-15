@@ -28,7 +28,7 @@ export const CtaModuleView = ({
   contentPosition,
   contentAlignment,
   mobileMediaOrder,
-  actions,
+  ctaButtons,
   footnote,
   layout,
 }: ICtaModuleViewProps) => {
@@ -61,9 +61,9 @@ export const CtaModuleView = ({
           ) : undefined
         }
         actions={
-          actions.length > 0 ? (
+          ctaButtons.length > 0 ? (
             <ActionGroup
-              actions={actions}
+              actions={ctaButtons}
               isOnDark={variant === CTA_VARIANT.BANNER}
             />
           ) : undefined

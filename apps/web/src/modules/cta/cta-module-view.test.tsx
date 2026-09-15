@@ -54,7 +54,7 @@ const setup = customRender(CtaModuleView, {
   contentPosition: undefined,
   contentAlignment: undefined,
   mobileMediaOrder: undefined,
-  actions: [],
+  ctaButtons: [],
   footnote: undefined,
   layout: undefined,
 });
@@ -113,13 +113,19 @@ describe(`<${CtaModuleView.name}/>`, () => {
     expect(container.querySelector('.bg-brand-primary-muted')).not.toBeNull();
   });
 
-  it('renders authored actions through ActionGroup, in order', () => {
-    setup({ actions: ctaActionsDemo });
+  it('renders authored primary and secondary ctaButtons through ActionGroup, in order', () => {
+    setup({ ctaButtons: ctaActionsDemo });
 
     const links = screen.getAllByRole('link');
     expect(links).toHaveLength(2);
     expect(links[0]).toHaveTextContent('Subscribe now');
     expect(links[1]).toHaveTextContent('Learn more');
+  });
+
+  it('renders no buttons when ctaButtons is empty', () => {
+    setup({ ctaButtons: [] });
+
+    expect(screen.queryAllByRole('link')).toHaveLength(0);
   });
 
   it('renders the optional content field via InlineTextRenderer', () => {

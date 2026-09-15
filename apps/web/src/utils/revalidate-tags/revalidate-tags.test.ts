@@ -94,6 +94,10 @@ describe('getRevalidateTagsForType', () => {
     ).toEqual(['newsletter-settings']);
   });
 
+  it('maps the link document type to its ISR tag', () => {
+    expect(getRevalidateTagsForType('link', 'link-1')).toEqual(['link']);
+  });
+
   it('returns an empty list for an unknown type', () => {
     expect(getRevalidateTagsForType('nope', 'x')).toEqual([]);
   });

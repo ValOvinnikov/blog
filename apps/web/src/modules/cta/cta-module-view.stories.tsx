@@ -58,7 +58,7 @@ const meta = {
     contentPosition: undefined,
     contentAlignment: undefined,
     mobileMediaOrder: undefined,
-    actions: ctaActionsDemo,
+    ctaButtons: ctaActionsDemo,
     footnote: undefined,
     layout: undefined,
   },
