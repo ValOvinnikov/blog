@@ -114,6 +114,17 @@ describe('ctaButtonsField', () => {
         ]),
       ).toBe('Only one Primary button is allowed.');
     });
+
+    it('rejects two Secondary buttons', () => {
+      const validate = getValidator(ctaButtonsField());
+
+      expect(
+        validate([
+          { variant: CTA_ACTION_VARIANT.SECONDARY },
+          { variant: CTA_ACTION_VARIANT.SECONDARY },
+        ]),
+      ).toBe('Only one Secondary button is allowed.');
+    });
   });
 
   describe('allowVariants', () => {

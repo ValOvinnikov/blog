@@ -9,8 +9,8 @@ import { defineArrayMember, defineField } from 'sanity';
 type TCtaButtonItem = { variant?: string };
 
 /**
- * Builds the `ctaButtons` array field — up to two `ctaButton` entries, with
- * a Primary (if present) required to lead the list and never duplicated.
+ * Builds the `ctaButtons` array field — each variant may appear at most
+ * once, and a Primary (if present) must lead the list.
  */
 export const ctaButtonsField = ({
   title = 'Buttons',
@@ -50,11 +50,13 @@ export const ctaButtonsField = ({
             return `Only ${allowVariants.map((variant) => toTitleCase(variant)).join(' and ')} buttons are allowed here.`;
           }
 
-          const primaryCount = items.filter(
-            (item) => item.variant === CTA_ACTION_VARIANT.PRIMARY,
-          ).length;
-          if (primaryCount > 1) {
-            return 'Only one Primary button is allowed.';
+          const seenVariants = new Set<string>();
+          for (const item of items) {
+            if (!item.variant) continue;
+            if (seenVariants.has(item.variant)) {
+              return `Only one ${toTitleCase(item.variant)} button is allowed.`;
+            }
+            seenVariants.add(item.variant);
           }
 
           const primaryIndex = items.findIndex(
