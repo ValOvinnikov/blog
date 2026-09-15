@@ -53,18 +53,13 @@ export type Module_cta = {
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   mobileMediaOrder?: 'LAST' | 'FIRST';
-  actions?: ActionGroup;
-  footnote?: string;
-  layout?: Layout;
-};
-
-export type ActionGroup = {
-  _type: 'actionGroup';
-  actions?: Array<
+  ctaButtons?: Array<
     {
       _key: string;
-    } & CtaAction
+    } & CtaButton
   >;
+  footnote?: string;
+  layout?: Layout;
 };
 
 export type SanityImageAssetReference = {
@@ -272,11 +267,39 @@ export type OpenGraph = {
   ogImage?: ImageWithAlt;
 };
 
+export type LinkReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'link';
+};
+
+export type CtaButton = {
+  _type: 'ctaButton';
+  variant?: 'PRIMARY' | 'SECONDARY';
+  appearance?: 'CONTAINED' | 'INLINE';
+  link?: LinkReference;
+};
+
+export type ActionGroup = {
+  _type: 'actionGroup';
+  actions?: Array<
+    {
+      _key: string;
+    } & CtaAction
+  >;
+};
+
 export type CtaAction = {
   _type: 'ctaAction';
   variant?: 'PRIMARY' | 'SECONDARY';
   appearance?: 'CONTAINED' | 'INLINE';
   link?: InlineLink;
+};
+
+export type LinkRef = {
+  _type: 'linkRef';
+  link?: LinkReference;
 };
 
 export type Blog_topicReference = {
@@ -1118,7 +1141,6 @@ export type AllSanitySchemaTypes =
   | Module_newsletter
   | HeadingBlock
   | Module_cta
-  | ActionGroup
   | SanityImageAssetReference
   | ImageWithAlt
   | InlineText
@@ -1135,7 +1157,11 @@ export type AllSanitySchemaTypes =
   | BrandTagline
   | Seo
   | OpenGraph
+  | LinkReference
+  | CtaButton
+  | ActionGroup
   | CtaAction
+  | LinkRef
   | Blog_topicReference
   | Page_landingReference
   | Page_postIndexReference
