@@ -227,7 +227,6 @@ export function makeRawCtaButton(
       label: 'Subscribe',
       linkType: LINK_TYPE.EXTERNAL,
       url: '/newsletter',
-      internalReference: null,
       openInNewTab: null,
     },
     ...overrides,

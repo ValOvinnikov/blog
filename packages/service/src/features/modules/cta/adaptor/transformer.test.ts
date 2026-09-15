@@ -372,7 +372,6 @@ describe('toCtaModule', () => {
             label: 'Learn more',
             linkType: LINK_TYPE.EXTERNAL,
             url: '/learn-more',
-            internalReference: null,
             openInNewTab: null,
           },
         }),
@@ -413,7 +412,6 @@ describe('toCtaModule', () => {
           link: {
             label: 'Broken',
             linkType: LINK_TYPE.INTERNAL,
-            url: null,
             internalReference: null,
             openInNewTab: null,
           },
@@ -433,7 +431,6 @@ describe('toCtaModule', () => {
           link: {
             label: 'Read the post',
             linkType: LINK_TYPE.INTERNAL,
-            url: null,
             internalReference: { _type: 'page_post', slug: 'hello-world' },
             openInNewTab: null,
           },
