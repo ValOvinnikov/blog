@@ -1,5 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import { actionGroupFragment } from '@blog/service/shared/fragments/action-group';
+import { ctaButtonFragment } from '@blog/service/shared/fragments/cta-button';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image';
 import { heroLayoutFragment } from '@blog/service/shared/fragments/layout';
@@ -18,7 +18,10 @@ export const heroStatementModuleQuery = q
       .project(headingBlockFragment)
       .notNull(),
     image: sub.field('image').project(sanityImageFragment).nullable(true),
-    actions: sub.field('actions').project(actionGroupFragment).nullable(true),
+    ctaButtons: sub
+      .field('ctaButtons[]')
+      .project(ctaButtonFragment)
+      .nullable(true),
     contentPositionSplit: sub.field('contentPositionSplit').nullable(true),
     contentPositionBanner: sub.field('contentPositionBanner').nullable(true),
     contentAlignment: sub.field('contentAlignment').nullable(true),

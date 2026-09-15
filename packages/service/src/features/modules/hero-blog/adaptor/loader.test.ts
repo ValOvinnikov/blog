@@ -25,7 +25,7 @@ describe(getHeroBlog, () => {
     expect(mockRun).toHaveBeenCalledTimes(1);
     if (!hero.hasPost) throw new Error('expected a resolved post');
     expect(hero.heading).toBe('Hello World');
-    expect(hero.primaryAction?.href).toBe('/blog/hello-world');
+    expect(hero.ctaButtons[0]?.link.href).toBe('/blog/hello-world');
   });
 
   it('propagates when the module document is missing', async () => {
@@ -52,10 +52,16 @@ describe(getHeroBlog, () => {
             't:tenant-a:module:hero-blog-1',
             't:tenant-a:posts',
             't:tenant-a:author',
-            't:tenant-a:topic',
-            't:tenant-a:page_post',
+            't:tenant-a:link',
+            't:tenant-a:homePage',
             't:tenant-a:page_landing',
+            't:tenant-a:page_post',
             't:tenant-a:page_postIndex',
+            't:tenant-a:page_topic',
+            't:tenant-a:page_topicIndex',
+            't:tenant-a:page_tag',
+            't:tenant-a:page_tagIndex',
+            't:tenant-a:topic',
           ],
         }),
       }),

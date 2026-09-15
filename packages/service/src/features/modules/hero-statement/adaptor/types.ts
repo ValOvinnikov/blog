@@ -8,7 +8,9 @@ import type {
   TMaybeUndefined,
   TMediaOrder,
 } from '@blog/config';
-import type { TCtaAction } from '@blog/service/shared/transformers/to-cta-action';
+import type { TCtaButton } from '@blog/service/shared/transformers/to-cta-button';
+
+export type { TCtaButton };
 
 export type THeroStatementModule = {
   brandVariant: TFullBrandVariant;
@@ -16,7 +18,7 @@ export type THeroStatementModule = {
   headingBlock: THeadingBlock;
   eyebrow: TMaybeUndefined<string>;
   sanityImage: TMaybeUndefined<ISanityImage>;
-  actions: TMaybeUndefined<readonly TCtaAction[]>;
+  ctaButtons: TCtaButton[];
   contentPosition: TMaybeUndefined<TContentAlignment>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
   mediaOrder: TMaybeUndefined<TMediaOrder>;

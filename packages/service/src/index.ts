@@ -85,7 +85,10 @@ export type { TThemeTokens } from './features/global/theme-settings';
 export type { TContentModule } from './features/modules/content';
 export type { TCtaModule } from './features/modules/cta';
 export type { THeroModule } from './features/modules/hero';
-export type { THeroBlogModule } from './features/modules/hero-blog';
+export type {
+  THeroBlogButton,
+  THeroBlogModule,
+} from './features/modules/hero-blog';
 export type { THeroStatementModule } from './features/modules/hero-statement';
 export type { TNewsletterModule } from './features/modules/newsletter';
 export type { TPostFeaturedModule } from './features/modules/post-featured';
