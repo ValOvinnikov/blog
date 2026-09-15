@@ -7,7 +7,7 @@ type TCustomFn = (value: unknown) => string | true;
 const getValidator = (field: ReturnType<typeof ctaButtonsField>): TCustomFn =>
   getCustomValidator<TCustomFn>(field);
 
-describe('ctaButtonsField', () => {
+describe(ctaButtonsField, () => {
   it('names the field ctaButtons', () => {
     expect(ctaButtonsField().name).toBe('ctaButtons');
   });

@@ -15,7 +15,7 @@ function makeRawLinkDocument(
   };
 }
 
-describe('toLinkDocument', () => {
+describe(toLinkDocument, () => {
   it('returns undefined for a null/undefined raw link', () => {
     expect(toLinkDocument(null)).toBeUndefined();
     expect(toLinkDocument(undefined)).toBeUndefined();
