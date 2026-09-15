@@ -2034,30 +2034,6 @@
     }
   },
   {
-    "name": "linkRef",
-    "type": "type",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "linkRef"
-          }
-        },
-        "link": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "inline",
-            "name": "link.reference"
-          },
-          "optional": true
-        }
-      }
-    }
-  },
-  {
     "type": "type",
     "name": "blog_topic.reference",
     "value": {
@@ -2276,6 +2252,30 @@
                 "value": "RSS"
               }
             ]
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
+    "name": "linkRef",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "linkRef"
+          }
+        },
+        "link": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "link.reference"
           },
           "optional": true
         }
@@ -5470,11 +5470,25 @@
         },
         "optional": true
       },
-      "actions": {
+      "ctaButtons": {
         "type": "objectAttribute",
         "value": {
-          "type": "inline",
-          "name": "actionGroup"
+          "type": "array",
+          "of": {
+            "type": "object",
+            "attributes": {
+              "_key": {
+                "type": "objectAttribute",
+                "value": {
+                  "type": "string"
+                }
+              }
+            },
+            "rest": {
+              "type": "inline",
+              "name": "ctaButton"
+            }
+          }
         },
         "optional": true
       },
@@ -5615,14 +5629,6 @@
         },
         "optional": true
       },
-      "secondaryAction": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "ctaAction"
-        },
-        "optional": true
-      },
       "variant": {
         "type": "objectAttribute",
         "value": {
@@ -5758,11 +5764,25 @@
         },
         "optional": true
       },
-      "actions": {
+      "ctaButtons": {
         "type": "objectAttribute",
         "value": {
-          "type": "inline",
-          "name": "actionGroup"
+          "type": "array",
+          "of": {
+            "type": "object",
+            "attributes": {
+              "_key": {
+                "type": "objectAttribute",
+                "value": {
+                  "type": "string"
+                }
+              }
+            },
+            "rest": {
+              "type": "inline",
+              "name": "ctaButton"
+            }
+          }
         },
         "optional": true
       },

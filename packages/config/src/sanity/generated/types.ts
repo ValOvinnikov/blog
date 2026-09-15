@@ -297,11 +297,6 @@ export type CtaAction = {
   link?: InlineLink;
 };
 
-export type LinkRef = {
-  _type: 'linkRef';
-  link?: LinkReference;
-};
-
 export type Blog_topicReference = {
   _ref: string;
   _type: 'reference';
@@ -346,6 +341,11 @@ export type InlineLink = {
     | 'FACEBOOK'
     | 'THREADS'
     | 'RSS';
+};
+
+export type LinkRef = {
+  _type: 'linkRef';
+  link?: LinkReference;
 };
 
 export type SocialLink = {
@@ -895,7 +895,11 @@ export type Module_heroStatement = {
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   mediaOrderSplit?: 'LAST' | 'FIRST';
   mediaOrderStacked?: 'LAST' | 'FIRST';
-  actions?: ActionGroup;
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
   layout?: HeroLayout;
 };
 
@@ -913,7 +917,6 @@ export type Module_heroBlog = {
   image?: ImageWithAlt;
   primaryActionLabel?: string;
   primaryActionAppearance?: 'CONTAINED' | 'INLINE';
-  secondaryAction?: CtaAction;
   variant?: 'SPLIT' | 'STACKED' | 'BANNER';
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   contentPositionSplit?: 'LEFT' | 'RIGHT';
@@ -921,7 +924,11 @@ export type Module_heroBlog = {
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   mediaOrderSplit?: 'LAST' | 'FIRST';
   mediaOrderStacked?: 'LAST' | 'FIRST';
-  actions?: ActionGroup;
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
   layout?: HeroLayout;
 };
 
@@ -1161,11 +1168,11 @@ export type AllSanitySchemaTypes =
   | CtaButton
   | ActionGroup
   | CtaAction
-  | LinkRef
   | Blog_topicReference
   | Page_landingReference
   | Page_postIndexReference
   | InlineLink
+  | LinkRef
   | SocialLink
   | Aside
   | BodyImage
