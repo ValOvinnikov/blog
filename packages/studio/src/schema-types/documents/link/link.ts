@@ -37,28 +37,27 @@ export const linkSchema = defineType({
       title: 'Link Type',
       type: 'string',
       description:
-        'Whether this link goes to a page within the site or to an external address.',
+        'Whether this goes to a page within the site (Internal Link) or a web address outside it (External Link).',
       options: {
         layout: 'radio',
         list: [
-          { title: 'Internal document', value: LINK_TYPE.INTERNAL },
-          { title: 'URL or path', value: LINK_TYPE.EXTERNAL },
+          { title: 'Internal Link', value: LINK_TYPE.INTERNAL },
+          { title: 'External Link', value: LINK_TYPE.EXTERNAL },
         ],
       },
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'internalReference',
-      title: 'Internal Document',
+      title: 'Internal Link',
       type: 'reference',
-      description:
-        'The page this link goes to, when Link Type is Internal document.',
+      description: 'The page this links to, when Link Type is Internal Link.',
       to: LINK_PAGE_TYPES.map((type) => ({ type })),
       hidden: ({ document }) => !isLinkType(document, LINK_TYPE.INTERNAL),
       validation: (rule) =>
         rule.custom((value, context) => {
           if (isLinkType(context.document, LINK_TYPE.INTERNAL) && !value) {
-            return 'Choose a document for an internal link.';
+            return 'Choose a page for an internal link.';
           }
 
           return true;
@@ -66,10 +65,10 @@ export const linkSchema = defineType({
     }),
     defineField({
       name: 'url',
-      title: 'URL or Path',
+      title: 'External Link',
       type: 'string',
       description:
-        'Use a relative path such as /blog or a full URL such as https://example.com.',
+        'The full web address this links to, when Link Type is External Link.',
       hidden: ({ document }) => !isLinkType(document, LINK_TYPE.EXTERNAL),
       validation: (rule) =>
         rule.custom((value, context) => {
@@ -78,11 +77,19 @@ export const linkSchema = defineType({
           }
 
           if (!value) {
-            return 'Enter a URL or path.';
+            return 'Enter a full web address, including https://.';
           }
 
-          if (!value.startsWith('/') && !/^https?:\/\//.test(value)) {
-            return 'Use a relative path starting with / or a full http(s) URL.';
+          let parsedUrl: URL;
+
+          try {
+            parsedUrl = new URL(value);
+          } catch {
+            return 'Enter a full web address starting with https:// or http://, including a host, e.g. https://example.com.';
+          }
+
+          if (!/^https?:$/.test(parsedUrl.protocol) || !parsedUrl.hostname) {
+            return 'Enter a full web address starting with https:// or http://, including a host, e.g. https://example.com.';
           }
 
           return true;

@@ -98,7 +98,7 @@ describe('linkSchema internalReference field', () => {
 
     expect(
       validate(undefined, { document: { linkType: LINK_TYPE.INTERNAL } }),
-    ).toBe('Choose a document for an internal link.');
+    ).toBe('Choose a page for an internal link.');
   });
 
   it('passes when linkType is internal and a value is set', () => {
@@ -151,15 +151,27 @@ describe('linkSchema url field', () => {
 
     expect(
       validate(undefined, { document: { linkType: LINK_TYPE.EXTERNAL } }),
-    ).toBe('Enter a URL or path.');
+    ).toBe('Enter a full web address, including https://.');
   });
 
-  it('accepts a relative path', () => {
+  it('rejects a relative path', () => {
     const validate = getCustomValidator<TCustomFn>(getField('url'));
 
     expect(
       validate('/blog', { document: { linkType: LINK_TYPE.EXTERNAL } }),
-    ).toBe(true);
+    ).toBe(
+      'Enter a full web address starting with https:// or http://, including a host, e.g. https://example.com.',
+    );
+  });
+
+  it('rejects a bare scheme with no host', () => {
+    const validate = getCustomValidator<TCustomFn>(getField('url'));
+
+    expect(
+      validate('https://', { document: { linkType: LINK_TYPE.EXTERNAL } }),
+    ).toBe(
+      'Enter a full web address starting with https:// or http://, including a host, e.g. https://example.com.',
+    );
   });
 
   it('accepts a full http(s) URL', () => {
@@ -177,7 +189,9 @@ describe('linkSchema url field', () => {
 
     expect(
       validate('example.com', { document: { linkType: LINK_TYPE.EXTERNAL } }),
-    ).toBe('Use a relative path starting with / or a full http(s) URL.');
+    ).toBe(
+      'Enter a full web address starting with https:// or http://, including a host, e.g. https://example.com.',
+    );
   });
 });
 
