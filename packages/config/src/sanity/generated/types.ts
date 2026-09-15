@@ -95,7 +95,7 @@ export type InlineText = Array<{
   markDefs?: Array<
     {
       _key: string;
-    } & Link
+    } & InlineLink
   >;
   level?: number;
   _type: 'block';
@@ -276,7 +276,7 @@ export type CtaAction = {
   _type: 'ctaAction';
   variant?: 'PRIMARY' | 'SECONDARY';
   appearance?: 'CONTAINED' | 'INLINE';
-  link?: Link;
+  link?: InlineLink;
 };
 
 export type Blog_topicReference = {
@@ -300,8 +300,8 @@ export type Page_postIndexReference = {
   [internalGroqTypeReferenceTo]?: 'page_postIndex';
 };
 
-export type Link = {
-  _type: 'link';
+export type InlineLink = {
+  _type: 'inlineLink';
   label?: string;
   accessibleLabel?: string;
   linkType?: 'INTERNAL' | 'EXTERNAL';
@@ -419,7 +419,7 @@ export type Settings_footer = {
   social?: Array<
     {
       _key: string;
-    } & Link
+    } & InlineLink
   >;
 };
 
@@ -433,7 +433,7 @@ export type Settings_navigation = {
   items?: Array<
     {
       _key: string;
-    } & Link
+    } & InlineLink
   >;
 };
 
@@ -863,7 +863,7 @@ export type Module_hero = {
   heroImageMode?: 'POST_IMAGE' | 'CUSTOM' | 'NONE';
   heroImage?: ImageWithAlt;
   primaryActionLabel?: string;
-  secondaryAction?: Link;
+  secondaryAction?: InlineLink;
   layout?: HeroLayout;
 };
 
@@ -1082,7 +1082,7 @@ export type AllSanitySchemaTypes =
   | Blog_topicReference
   | Page_landingReference
   | Page_postIndexReference
-  | Link
+  | InlineLink
   | SocialLink
   | Aside
   | BodyImage

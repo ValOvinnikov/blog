@@ -604,7 +604,7 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "link"
+                  "name": "inlineLink"
                 }
               }
             },
@@ -1924,7 +1924,7 @@
           "type": "objectAttribute",
           "value": {
             "type": "inline",
-            "name": "link"
+            "name": "inlineLink"
           },
           "optional": true
         }
@@ -2022,7 +2022,7 @@
     }
   },
   {
-    "name": "link",
+    "name": "inlineLink",
     "type": "type",
     "value": {
       "type": "object",
@@ -2031,7 +2031,7 @@
           "type": "objectAttribute",
           "value": {
             "type": "string",
-            "value": "link"
+            "value": "inlineLink"
           }
         },
         "label": {
@@ -2896,7 +2896,7 @@
             },
             "rest": {
               "type": "inline",
-              "name": "link"
+              "name": "inlineLink"
             }
           }
         },
@@ -2962,7 +2962,7 @@
             },
             "rest": {
               "type": "inline",
-              "name": "link"
+              "name": "inlineLink"
             }
           }
         },
@@ -5560,7 +5560,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "link"
+          "name": "inlineLink"
         },
         "optional": true
       },
