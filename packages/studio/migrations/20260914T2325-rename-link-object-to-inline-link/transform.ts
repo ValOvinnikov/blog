@@ -25,7 +25,13 @@ const isNavigationItemLinkPath = (path: Path): boolean =>
 const isHeroSecondaryActionPath = (path: Path): boolean =>
   path.length === 1 && path[0] === 'secondaryAction';
 
-/** `module_cta.actions.actions[].link` — the `link` field of each `ctaAction`. */
+/**
+ * `<...>.actions.actions[].link` — the `link` field of each `ctaAction` held
+ * by an `actionGroup`'s `actions` field. Shared by every document that
+ * carries an `actionGroup` field: `module_cta` (`actionGroupField()`
+ * directly) and `module_heroBlog`/`module_heroStatement` (via the shared
+ * `heroFields()` field tail).
+ */
 const isCtaActionLinkPath = (path: Path): boolean =>
   path.length === 4 &&
   path[0] === 'actions' &&
@@ -45,21 +51,26 @@ const isCtaContentAnnotationPath = (path: Path): boolean =>
   path[2] === 'markDefs' &&
   isKeyedSegment(path[3]);
 
+/** `module_heroBlog.secondaryAction.link` — a standalone `ctaAction` field, not one held by an `actionGroup`. */
+const isHeroBlogSecondaryActionLinkPath = (path: Path): boolean =>
+  path.length === 2 && path[0] === 'secondaryAction' && path[1] === 'link';
+
 /**
- * True only for a path at one of the five known locations where the legacy
- * `link` object is actually used. This is what keeps the migration from ever
+ * True only for a path at one of the known locations where the legacy `link`
+ * object is actually used. This is what keeps the migration from ever
  * touching a `richText`/`proseText` field's default `link` href annotation —
  * those live on document types (`page_post`, `module_content`, …) that are
  * never included in this migration's `documentTypes`, and even within the
- * four document types that are included, no other field happens to reuse
- * this same path shape.
+ * document types that are included, no other field happens to reuse one of
+ * these same path shapes.
  */
 export const isInlineLinkPath = (path: Path): boolean =>
   isFooterSocialLinkPath(path) ||
   isNavigationItemLinkPath(path) ||
   isHeroSecondaryActionPath(path) ||
   isCtaActionLinkPath(path) ||
-  isCtaContentAnnotationPath(path);
+  isCtaContentAnnotationPath(path) ||
+  isHeroBlogSecondaryActionLinkPath(path);
 
 /**
  * Pure transform: renames a legacy `link` node's `_type` to `inlineLink`,

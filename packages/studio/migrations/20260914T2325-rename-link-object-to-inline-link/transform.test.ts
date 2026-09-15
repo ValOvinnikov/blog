@@ -13,10 +13,14 @@ describe(isInlineLinkPath, () => {
     expect(isInlineLinkPath(['secondaryAction'])).toBe(true);
   });
 
-  it('is true for a ctaAction link inside module_cta.actions.actions[]', () => {
+  it('is true for a ctaAction link inside an actionGroup actions[] (module_cta, module_heroBlog, module_heroStatement)', () => {
     expect(
       isInlineLinkPath(['actions', 'actions', { _key: 'a1' }, 'link']),
     ).toBe(true);
+  });
+
+  it('is true for module_heroBlog.secondaryAction.link', () => {
+    expect(isInlineLinkPath(['secondaryAction', 'link'])).toBe(true);
   });
 
   it('is true for a markDef annotation inside module_cta.content[]', () => {
@@ -76,7 +80,7 @@ describe(renameInlineLinkType, () => {
     expect(result).toEqual({ ...node, _type: 'inlineLink' });
   });
 
-  it('renames a legacy link node inside a ctaAction', () => {
+  it('renames a legacy link node inside a ctaAction held by an actionGroup', () => {
     const node = { _type: 'link', label: 'Get started', url: '/signup' };
 
     const result = renameInlineLinkType(node, [
@@ -85,6 +89,14 @@ describe(renameInlineLinkType, () => {
       { _key: 'a1' },
       'link',
     ]);
+
+    expect(result).toEqual({ ...node, _type: 'inlineLink' });
+  });
+
+  it('renames a legacy link node at module_heroBlog.secondaryAction.link', () => {
+    const node = { _type: 'link', label: 'Learn more', url: '/about' };
+
+    const result = renameInlineLinkType(node, ['secondaryAction', 'link']);
 
     expect(result).toEqual({ ...node, _type: 'inlineLink' });
   });

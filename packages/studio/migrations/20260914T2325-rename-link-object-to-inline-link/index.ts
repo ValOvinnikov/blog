@@ -4,25 +4,22 @@
  * `../../src/schema-types/documents/link/link.ts` and
  * `../../src/schema-types/objects/inline-link/inline-link.ts`).
  *
- * Scoping: only `settings_footer`, `settings_navigation`, `module_hero`, and
- * `module_cta` are visited (`documentTypes` below — the only document types
- * with a field of the legacy `link` object type), and within those, only the
- * five known field paths in `./transform.ts` (`isInlineLinkPath`) are
- * eligible. Every other document type — including `page_post` and
- * `module_content`, which carry `richText`/`proseText` fields — is never
- * visited by this migration at all, so their default `link` href annotation
- * (a different, Sanity-builtin object sharing only the `_type` string with
- * ours) is never touched.
+ * Scoping: `documentTypes` below lists every document type that embeds an
+ * `inlineLink` field, directly or through a shared field factory
+ * (`heroFields()` spreads `actionGroupField()` into `module_heroBlog` and
+ * `module_heroStatement`) — see `./index.test.ts` for the schema-graph
+ * derivation this list is checked against. Within those, only the known
+ * field paths in `./transform.ts` (`isInlineLinkPath`) are eligible. Every
+ * other document type — including `page_post` and `module_content`, which
+ * carry `richText`/`proseText` fields — is never visited by this migration
+ * at all, so their default `link` href annotation (a different,
+ * Sanity-builtin object sharing only the `_type` string with ours) is never
+ * touched.
  *
  * Idempotency: `renameInlineLinkType` only acts on nodes whose `_type` is
  * still the legacy `link`; a node already renamed to `inlineLink` (from a
  * prior partial run) no longer matches and is left untouched — safe to
- * re-run.
- *
- * Workflow (see ../README.md for the full guardrails):
- *   1. `pnpm --filter @blog/studio dataset:export -- migrations/backups/production-<date>.tar.gz`
- *   2. `pnpm --filter @blog/studio migrate:dry` — inspect the diff
- *   3. `pnpm --filter @blog/studio migrate:run` — human-gated, mutates `production`
+ * re-run. See `../README.md` for the dry-run/backup/apply workflow.
  *
  * Deploy-ordering constraint: run this against `production` *before*
  * deploying Studio code that expects the legacy inline link object to be
@@ -39,8 +36,10 @@ export default defineMigration({
   documentTypes: [
     'settings_footer',
     'settings_navigation',
-    'module_hero',
     'module_cta',
+    'module_hero',
+    'module_heroBlog',
+    'module_heroStatement',
   ],
   migrate: {
     object(node, path) {
