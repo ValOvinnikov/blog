@@ -23,6 +23,7 @@ export type TStructureSection = {
   icon: ComponentType;
   groups: TStructureGroup[];
   dividerBefore?: boolean;
+  flattenSingleItem?: boolean;
 };
 
 const requireSchemaField = <TValue>(
@@ -73,11 +74,36 @@ export const buildGroupedListItems = (
       ...group.items.map((item) => buildGroupItem(S, item)),
     ]);
 
+const getFlattenableItem = (
+  section: TStructureSection,
+): TStructureGroupItem | undefined => {
+  const items = section.groups.flatMap((group) => group.items);
+  const [item] = items;
+  return items.length === 1 && item?.mode !== 'singleton' ? item : undefined;
+};
+
 export const buildSection = (
   S: StructureBuilder,
   section: TStructureSection,
-): ListItemBuilder =>
-  S.listItem()
+): ListItemBuilder => {
+  if (section.flattenSingleItem) {
+    const item = getFlattenableItem(section);
+    if (!item) {
+      throw new Error(
+        `Studio desk section "${section.id}" sets flattenSingleItem but has no single non-singleton item to flatten.`,
+      );
+    }
+    const { name } = item.schema;
+    const title = requireSchemaField(item.schema.title, name, 'title');
+
+    return S.listItem()
+      .title(section.title)
+      .id(section.id)
+      .icon(section.icon)
+      .child(S.documentTypeList(name).title(title));
+  }
+
+  return S.listItem()
     .title(section.title)
     .id(section.id)
     .icon(section.icon)
@@ -86,6 +112,7 @@ export const buildSection = (
         .title(section.title)
         .items(buildGroupedListItems(S, section.groups)),
     );
+};
 
 export const buildSections = (
   S: StructureBuilder,

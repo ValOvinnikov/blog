@@ -6,6 +6,7 @@ export const linksSection: TStructureSection = {
   title: 'Links',
   id: 'links',
   icon: Link2,
+  flattenSingleItem: true,
   groups: [
     {
       items: [{ schema: linkSchema }],
