@@ -11,10 +11,14 @@ type TLinkDocument = {
 const isLinkType = (document: unknown, linkType: string): boolean =>
   (document as TLinkDocument | undefined)?.linkType === linkType;
 
-const LINK_TYPE_LABEL: Record<string, string> = {
-  [LINK_TYPE.INTERNAL]: 'Internal Link',
-  [LINK_TYPE.EXTERNAL]: 'External Link',
-};
+const LINK_TYPE_OPTIONS = [
+  { title: 'Internal Link', value: LINK_TYPE.INTERNAL },
+  { title: 'External Link', value: LINK_TYPE.EXTERNAL },
+];
+
+const LINK_TYPE_LABEL: Record<string, string> = Object.fromEntries(
+  LINK_TYPE_OPTIONS.map(({ title, value }) => [value, title]),
+);
 
 export const linkSchema = defineType({
   name: 'link',
@@ -45,10 +49,7 @@ export const linkSchema = defineType({
         'Whether this goes to a page within the site (Internal Link) or a web address outside it (External Link).',
       options: {
         layout: 'radio',
-        list: [
-          { title: 'Internal Link', value: LINK_TYPE.INTERNAL },
-          { title: 'External Link', value: LINK_TYPE.EXTERNAL },
-        ],
+        list: LINK_TYPE_OPTIONS,
       },
       validation: (rule) => rule.required(),
     }),
