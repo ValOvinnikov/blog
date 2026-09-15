@@ -1,14 +1,6 @@
 import { isInlineLinkPath, renameInlineLinkType } from './transform';
 
 describe(isInlineLinkPath, () => {
-  it('is true for a keyed element of settings_footer.social[]', () => {
-    expect(isInlineLinkPath(['social', { _key: 'a1' }])).toBe(true);
-  });
-
-  it('is true for a keyed element of settings_navigation.items[]', () => {
-    expect(isInlineLinkPath(['items', { _key: 'a1' }])).toBe(true);
-  });
-
   it('is true for module_hero.secondaryAction', () => {
     expect(isInlineLinkPath(['secondaryAction'])).toBe(true);
   });
@@ -49,6 +41,11 @@ describe(isInlineLinkPath, () => {
     expect(isInlineLinkPath(['title'])).toBe(false);
   });
 
+  it('is false for settings_footer.social[] and settings_navigation.items[] — those documents no longer embed inlineLink', () => {
+    expect(isInlineLinkPath(['social', { _key: 'a1' }])).toBe(false);
+    expect(isInlineLinkPath(['items', { _key: 'a1' }])).toBe(false);
+  });
+
   it('is false for a path nested deeper than the ctaAction link field itself', () => {
     expect(
       isInlineLinkPath(['actions', 'actions', { _key: 'a1' }, 'link', 'label']),
@@ -57,21 +54,6 @@ describe(isInlineLinkPath, () => {
 });
 
 describe(renameInlineLinkType, () => {
-  it('renames a legacy link node in settings_footer.social[], preserving other fields', () => {
-    const node = {
-      _type: 'link',
-      _key: 'a1',
-      label: 'GitHub',
-      platform: 'GITHUB',
-      url: 'https://github.com',
-      openInNewTab: true,
-    };
-
-    const result = renameInlineLinkType(node, ['social', { _key: 'a1' }]);
-
-    expect(result).toEqual({ ...node, _type: 'inlineLink' });
-  });
-
   it('renames a legacy link node at module_hero.secondaryAction', () => {
     const node = { _type: 'link', label: 'See more', url: '/blog' };
 
@@ -138,7 +120,7 @@ describe(renameInlineLinkType, () => {
   it('leaves unrelated object types at a known link path alone', () => {
     const node = { _type: 'socialLink', platform: 'X', url: 'https://x.com' };
 
-    const result = renameInlineLinkType(node, ['social', { _key: 'a1' }]);
+    const result = renameInlineLinkType(node, ['secondaryAction']);
 
     expect(result).toBeUndefined();
   });
