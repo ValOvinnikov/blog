@@ -30,7 +30,7 @@ export const ctaButtonSchema = defineType({
       description:
         'Primary is the main action. Secondary is the supporting action.',
       options: {
-        layout: 'radio',
+        layout: 'dropdown',
         list: Object.values(CTA_ACTION_VARIANT).map((value) => ({
           title: toTitleCase(value),
           value,

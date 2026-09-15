@@ -61,10 +61,10 @@ const wasRequiredCalled = (field: { validation?: unknown }) => {
 };
 
 describe('ctaButtonSchema control choices', () => {
-  it('keeps variant as a required radio', () => {
+  it('keeps variant as a required dropdown', () => {
     const field = getField('variant');
 
-    expect(getLayout(field)).toBe('radio');
+    expect(getLayout(field)).toBe('dropdown');
     expect(wasRequiredCalled(field)).toBe(true);
     expect(getOptionValues(field)).toEqual(
       Object.values(CTA_ACTION_VARIANT).map((value) => ({
