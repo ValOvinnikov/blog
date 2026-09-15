@@ -343,6 +343,22 @@ export type InlineLink = {
     | 'RSS';
 };
 
+export type SocialProfile = {
+  _type: 'socialProfile';
+  link?: LinkReference;
+  platform?:
+    | 'X'
+    | 'GITHUB'
+    | 'LINKEDIN'
+    | 'YOUTUBE'
+    | 'INSTAGRAM'
+    | 'MASTODON'
+    | 'BLUESKY'
+    | 'FACEBOOK'
+    | 'THREADS'
+    | 'RSS';
+};
+
 export type LinkRef = {
   _type: 'linkRef';
   link?: LinkReference;
@@ -442,7 +458,7 @@ export type Settings_footer = {
   social?: Array<
     {
       _key: string;
-    } & InlineLink
+    } & SocialProfile
   >;
 };
 
@@ -456,7 +472,7 @@ export type Settings_navigation = {
   items?: Array<
     {
       _key: string;
-    } & InlineLink
+    } & LinkRef
   >;
 };
 
@@ -1172,6 +1188,7 @@ export type AllSanitySchemaTypes =
   | Page_landingReference
   | Page_postIndexReference
   | InlineLink
+  | SocialProfile
   | LinkRef
   | SocialLink
   | Aside
