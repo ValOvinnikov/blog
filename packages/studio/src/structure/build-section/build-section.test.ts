@@ -380,7 +380,8 @@ describe(buildSection, () => {
     const childList = childArgs?.[0] as TMockBuilder;
     expect(childList.kind).toBe('documentTypeList');
     expect(childList.documentType).toBe('link');
-    expect(callArgs(childList, 'title')).toEqual(['Link']);
+    // The flattened pane keeps the section's title ("Links"), not the item schema's ("Link") — flattening removes a nesting level, not the plural label.
+    expect(callArgs(childList, 'title')).toEqual(['Links']);
     expect(S.documentTypeList).toHaveBeenCalledTimes(1);
     expect(S.list).not.toHaveBeenCalled();
   });

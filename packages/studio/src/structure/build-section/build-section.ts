@@ -94,13 +94,12 @@ export const buildSection = (
       );
     }
     const { name } = item.schema;
-    const title = requireSchemaField(item.schema.title, name, 'title');
 
     return S.listItem()
       .title(section.title)
       .id(section.id)
       .icon(section.icon)
-      .child(S.documentTypeList(name).title(title));
+      .child(S.documentTypeList(name).title(section.title));
   }
 
   return S.listItem()
