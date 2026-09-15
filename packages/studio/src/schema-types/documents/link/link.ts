@@ -11,6 +11,11 @@ type TLinkDocument = {
 const isLinkType = (document: unknown, linkType: string): boolean =>
   (document as TLinkDocument | undefined)?.linkType === linkType;
 
+const LINK_TYPE_LABEL: Record<string, string> = {
+  [LINK_TYPE.INTERNAL]: 'Internal Link',
+  [LINK_TYPE.EXTERNAL]: 'External Link',
+};
+
 export const linkSchema = defineType({
   name: 'link',
   title: 'Link',
@@ -107,20 +112,15 @@ export const linkSchema = defineType({
   preview: {
     select: {
       title: 'title',
-      label: 'label',
       linkType: 'linkType',
-      internalTitle: 'internalReference.title',
-      url: 'url',
     },
-    prepare({ title, label, linkType, internalTitle, url }) {
-      const destination =
-        linkType === LINK_TYPE.INTERNAL
-          ? String(internalTitle ?? 'No page selected')
-          : String(url ?? 'No destination set');
+    prepare({ title, linkType }) {
+      const linkTypeLabel =
+        LINK_TYPE_LABEL[String(linkType)] ?? 'No link type set';
 
       return {
         title: String(title ?? 'Untitled Link'),
-        subtitle: label ? `${String(label)} — ${destination}` : destination,
+        subtitle: linkTypeLabel,
       };
     },
   },
