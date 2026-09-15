@@ -695,14 +695,14 @@ thread even when one exists in the URL, and never resolves a tenant at all:
 it renders `StandaloneNotFoundPage` with no argument, always falling back to
 default theme tokens and base messages. A `notFound()` thrown by a _page_
 under `[tenant]/[locale]` — as opposed to one thrown by the layout itself —
-is observed to escalate past `app/[tenant]/not-found.tsx` too, landing here
+appears to escalate past `app/[tenant]/not-found.tsx` too, landing here
 instead: curling four content-404 URLs against a production build (`/tags`,
 an index page with no `generateStaticParams` of its own; `/nonexistent-xyz`;
 `/blog/page/abc`; `/blog/page/999`), three came back unthemed — default
 theme tokens rather than the tenant's own — which is the discriminator that
-actually matters; all four also lacked `Header`/`Footer` chrome, but that
-proves nothing on its own, since neither remaining boundary renders that
-chrome. Unthemed only rules out `app/[tenant]/not-found.tsx` having caught
+actually matters; the fourth's theming was not recorded. All four also
+lacked `Header`/`Footer` chrome, but that proves nothing on its own, since
+neither remaining boundary renders that chrome. Unthemed only rules out `app/[tenant]/not-found.tsx` having caught
 these if its `getRememberedTenantId()` hand-off genuinely survives the
 `notFound()` unwind — itself unverified, per the paragraph above — so this
 observation doesn't fully rule out that boundary catching these and merely
