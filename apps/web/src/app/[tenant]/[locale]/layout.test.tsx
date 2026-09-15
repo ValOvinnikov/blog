@@ -109,8 +109,20 @@ vi.mock('@blog/service', () => ({
   urlForSanityImage: urlForSanityImageMock,
 }));
 
-const rssTranslations: Record<string, string> = {
+const translations: Record<string, string> = {
   feedLinkLabel: 'RSS feed',
+  socialLinkAriaLabel: '{platform} profile',
+};
+
+// A minimal stand-in for next-intl's ICU interpolation — sufficient for the
+// one `{platform}` placeholder this file's messages use.
+const translate = (key: string, values?: Record<string, string>): string => {
+  const template = translations[key] ?? key;
+  if (!values) return template;
+  return Object.entries(values).reduce(
+    (acc, [name, value]) => acc.replaceAll(`{${name}}`, value),
+    template,
+  );
 };
 
 vi.mock('next-intl/server', () => ({
@@ -177,9 +189,7 @@ describe('LocaleLayout', () => {
     getMessagesMock.mockResolvedValue(realMessages);
     getNowMock.mockResolvedValue(now);
     getTimeZoneMock.mockResolvedValue('UTC');
-    getTranslationsMock.mockResolvedValue(
-      (key: string) => rssTranslations[key] ?? key,
-    );
+    getTranslationsMock.mockResolvedValue(translate);
     isProductionEnvironmentMock.mockReturnValue(true);
     useSessionMock.mockReturnValue({ data: null, status: 'unauthenticated' });
     getEnabledOAuthProviderIdsMock.mockReturnValue(['github', 'google']);
@@ -446,16 +456,20 @@ describe('LocaleLayout', () => {
     expect(within(link).getByTestId('rss-icon')).toBeVisible();
   });
 
-  it('renders a mapped social link icon-only, keeping its label as the accessible name', async () => {
+  it('renders a mapped social link icon-only, with an accessible name derived from its platform', async () => {
     getFooterMock.mockResolvedValue({
       ok: true,
       data: {
         social: [
           {
-            label: 'LinkedIn',
-            href: 'https://www.linkedin.com/in/example',
-            target: '_blank',
             platform: SOCIAL_PLATFORMS.LINKEDIN,
+            link: {
+              label: 'LinkedIn',
+              href: 'https://www.linkedin.com/in/example',
+              target: '_blank',
+              platform: undefined,
+              ariaLabel: undefined,
+            },
           },
         ],
       },
@@ -463,14 +477,16 @@ describe('LocaleLayout', () => {
 
     await setup();
 
-    const link = screen.getByRole('link', { name: 'LinkedIn' });
+    // Asserts the corrected `SOCIAL_PLATFORM_LABEL` casing, not a naive
+    // `toTitleCase('LINKEDIN')` ("Linkedin").
+    const link = screen.getByRole('link', { name: 'LinkedIn profile' });
 
     expect(link).toHaveAttribute('href', 'https://www.linkedin.com/in/example');
     // A mapped platform renders icon-only (`hasLabel={false}`), traced the
     // same way as the RSS link above.
-    expect(link).toHaveAttribute('title', 'LinkedIn');
-    // `dataTestId={`social-icon-${link.platform}`}` in `layout.tsx` — asserts
-    // the *LinkedIn* icon rendered, not just any icon.
+    expect(link).toHaveAttribute('title', 'LinkedIn profile');
+    // `dataTestId={`social-icon-${platform}`}` in `FooterSocialLinks` —
+    // asserts the *LinkedIn* icon rendered, not just any icon.
     expect(
       within(link).getByTestId(`social-icon-${SOCIAL_PLATFORMS.LINKEDIN}`),
     ).toBeVisible();
@@ -482,10 +498,14 @@ describe('LocaleLayout', () => {
       data: {
         social: [
           {
-            label: 'Mastodon',
-            href: 'https://mastodon.social/@example',
-            target: '_blank',
             platform: SOCIAL_PLATFORMS.MASTODON,
+            link: {
+              label: 'Mastodon',
+              href: 'https://mastodon.social/@example',
+              target: '_blank',
+              platform: undefined,
+              ariaLabel: undefined,
+            },
           },
         ],
       },
@@ -499,9 +519,9 @@ describe('LocaleLayout', () => {
     // An unmapped platform keeps `hasLabel` true — no icon, and no `title`
     // since the visible label text is already the accessible name.
     expect(link).not.toHaveAttribute('title');
-    // No `iconName` is resolved for an unmapped platform, so `layout.tsx`
-    // never even renders an `<Icon>` (no `dataTestId` to attach either) —
-    // restoring the original "no icon at all" coverage.
+    // No `iconName` is resolved for an unmapped platform, so
+    // `FooterSocialLinks` never even renders an `<Icon>` (no `dataTestId` to
+    // attach either) — restoring the original "no icon at all" coverage.
     expect(
       within(link).queryByTestId(`social-icon-${SOCIAL_PLATFORMS.MASTODON}`),
     ).not.toBeInTheDocument();
