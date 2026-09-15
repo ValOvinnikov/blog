@@ -77,9 +77,8 @@ function toSecondaryButtons(
     .map((button) => ({ ...button, hiddenLabelSuffix: undefined }));
 }
 
-// Only one PRIMARY-role button exists in this list, and it is always the
-// derived one placed first — Studio constrains authored `ctaButtons` here to
-// SECONDARY only.
+// The derived primary button, when present, is placed first; authored
+// buttons from `ctaButtons` follow in stored order.
 function toCtaButtons(
   raw: TRawHeroBlogModule,
   post: TPostCard | undefined,
