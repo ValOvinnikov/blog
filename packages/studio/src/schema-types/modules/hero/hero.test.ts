@@ -21,3 +21,9 @@ describe('heroSchema featuredPost field', () => {
     expect(field.to).toEqual([{ type: PAGE_POST_TYPE }]);
   });
 });
+
+describe('heroSchema deprecation', () => {
+  it('carries a deprecated marker with a non-empty reason', () => {
+    expect(heroSchema.deprecated?.reason).toBeTruthy();
+  });
+});
