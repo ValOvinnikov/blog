@@ -10,8 +10,6 @@ import type {
 } from '@blog/config';
 import type { TCtaButton } from '@blog/service/shared/transformers/to-cta-button';
 
-export type { TCtaButton };
-
 export type THeroStatementModule = {
   brandVariant: TFullBrandVariant;
   variant: THeroVariant;
