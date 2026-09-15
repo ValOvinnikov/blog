@@ -8,17 +8,28 @@ import { footerQuery } from './query';
 import { toFooter } from './transformer';
 import type { TFooter } from './types';
 
-// `footerQuery` projects `social[]` through `linkFragment`, whose
-// `internalReference` can resolve to `page_post`/`blog_topic`/
-// `page_landing`/`page_postIndex` — every one of those types'
-// tags must be included (tag-scope contract, `sanity/query.ts`).
+// `footerQuery` derefs each entry's `link` through `linkDocumentFragment`,
+// whose `internalReference` can resolve to any page type below — every one
+// of those types' tags must be included (tag-scope contract, `sanity/query.ts`).
 export async function getFooter(
   tenant: TTenantSanityContext,
 ): Promise<TFooter> {
   const raw = await runQuery(footerQuery, {
     tenant,
     ...isr(
-      ['footer', 'page_post', 'topic', 'page_landing', 'page_postIndex'],
+      [
+        'footer',
+        'page_post',
+        'topic',
+        'page_landing',
+        'page_postIndex',
+        'link',
+        'homePage',
+        'page_topic',
+        'page_topicIndex',
+        'page_tag',
+        'page_tagIndex',
+      ],
       tenant.projectId,
     ),
   });
