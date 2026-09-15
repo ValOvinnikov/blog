@@ -77,8 +77,7 @@ function toSecondaryButtons(
     .map((button) => ({ ...button, hiddenLabelSuffix: undefined }));
 }
 
-// The derived primary button, when present, is placed first; authored
-// buttons from `ctaButtons` follow in stored order.
+/** Orders the hero's CTA buttons with any derived primary first, followed by authored `ctaButtons` in stored order. */
 function toCtaButtons(
   raw: TRawHeroBlogModule,
   post: TPostCard | undefined,
