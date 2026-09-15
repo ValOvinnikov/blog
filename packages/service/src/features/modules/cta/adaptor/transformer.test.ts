@@ -10,7 +10,7 @@ import {
 import {
   makeRawContentBlock,
   makeRawContentMarkDef,
-  makeRawCtaAction,
+  makeRawCtaButton,
   makeRawCtaModule,
 } from '@blog/service/testing/modules/fixtures';
 import {
@@ -323,30 +323,30 @@ describe('toCtaModule', () => {
     });
   });
 
-  it('returns an empty array for an absent actions field', () => {
-    const raw = makeRawCtaModule({ actions: null });
+  it('returns an empty array for an absent ctaButtons field', () => {
+    const raw = makeRawCtaModule({ ctaButtons: null });
 
     const cta = toCtaModule(raw);
 
-    expect(cta.actions).toEqual([]);
+    expect(cta.ctaButtons).toEqual([]);
   });
 
-  it('returns an empty array when the actions array is present but empty', () => {
-    const raw = makeRawCtaModule({ actions: { actions: [] } });
+  it('returns an empty array when the ctaButtons array is present but empty', () => {
+    const raw = makeRawCtaModule({ ctaButtons: [] });
 
     const cta = toCtaModule(raw);
 
-    expect(cta.actions).toEqual([]);
+    expect(cta.ctaButtons).toEqual([]);
   });
 
-  it('maps a single PRIMARY action', () => {
+  it('maps a single PRIMARY button', () => {
     const raw = makeRawCtaModule({
-      actions: { actions: [makeRawCtaAction()] },
+      ctaButtons: [makeRawCtaButton()],
     });
 
     const cta = toCtaModule(raw);
 
-    expect(cta.actions).toEqual([
+    expect(cta.ctaButtons).toEqual([
       {
         variant: CTA_ACTION_VARIANT.PRIMARY,
         appearance: CTA_ACTION_APPEARANCE.CONTAINED,
@@ -361,35 +361,31 @@ describe('toCtaModule', () => {
     ]);
   });
 
-  it('maps PRIMARY and SECONDARY actions, preserving order', () => {
+  it('maps PRIMARY and SECONDARY buttons, preserving order', () => {
     const raw = makeRawCtaModule({
-      actions: {
-        actions: [
-          makeRawCtaAction({ variant: CTA_ACTION_VARIANT.PRIMARY }),
-          makeRawCtaAction({
-            variant: CTA_ACTION_VARIANT.SECONDARY,
-            appearance: CTA_ACTION_APPEARANCE.INLINE,
-            link: {
-              label: 'Learn more',
-              linkType: LINK_TYPE.EXTERNAL,
-              url: '/learn-more',
-              internalReference: null,
-              openInNewTab: null,
-              platform: null,
-              accessibleLabel: null,
-            },
-          }),
-        ],
-      },
+      ctaButtons: [
+        makeRawCtaButton({ variant: CTA_ACTION_VARIANT.PRIMARY }),
+        makeRawCtaButton({
+          variant: CTA_ACTION_VARIANT.SECONDARY,
+          appearance: CTA_ACTION_APPEARANCE.INLINE,
+          link: {
+            label: 'Learn more',
+            linkType: LINK_TYPE.EXTERNAL,
+            url: '/learn-more',
+            internalReference: null,
+            openInNewTab: null,
+          },
+        }),
+      ],
     });
 
     const cta = toCtaModule(raw);
 
-    expect(cta.actions).toHaveLength(2);
-    expect(cta.actions?.[0]).toMatchObject({
+    expect(cta.ctaButtons).toHaveLength(2);
+    expect(cta.ctaButtons?.[0]).toMatchObject({
       variant: CTA_ACTION_VARIANT.PRIMARY,
     });
-    expect(cta.actions?.[1]).toMatchObject({
+    expect(cta.ctaButtons?.[1]).toMatchObject({
       variant: CTA_ACTION_VARIANT.SECONDARY,
       appearance: CTA_ACTION_APPEARANCE.INLINE,
     });
@@ -402,62 +398,52 @@ describe('toCtaModule', () => {
     [CTA_ACTION_VARIANT.SECONDARY, CTA_ACTION_APPEARANCE.INLINE],
   ])('maps variant %s with appearance %s', (variant, appearance) => {
     const raw = makeRawCtaModule({
-      actions: { actions: [makeRawCtaAction({ variant, appearance })] },
+      ctaButtons: [makeRawCtaButton({ variant, appearance })],
     });
 
     const cta = toCtaModule(raw);
 
-    expect(cta.actions?.[0]).toMatchObject({ variant, appearance });
+    expect(cta.ctaButtons?.[0]).toMatchObject({ variant, appearance });
   });
 
-  it('drops an action whose link cannot resolve to an href', () => {
+  it('drops a button whose link cannot resolve to an href', () => {
     const raw = makeRawCtaModule({
-      actions: {
-        actions: [
-          makeRawCtaAction({
-            link: {
-              label: 'Broken',
-              linkType: LINK_TYPE.INTERNAL,
-              url: null,
-              internalReference: null,
-              openInNewTab: null,
-              platform: null,
-              accessibleLabel: null,
-            },
-          }),
-        ],
-      },
+      ctaButtons: [
+        makeRawCtaButton({
+          link: {
+            label: 'Broken',
+            linkType: LINK_TYPE.INTERNAL,
+            url: null,
+            internalReference: null,
+            openInNewTab: null,
+          },
+        }),
+      ],
     });
 
     const cta = toCtaModule(raw);
 
-    expect(cta.actions).toEqual([]);
+    expect(cta.ctaButtons).toEqual([]);
   });
 
-  it('survives accessibleLabel into the view-model as ariaLabel', () => {
+  it('resolves a ctaButton pointing at an internal page to that page route', () => {
     const raw = makeRawCtaModule({
-      actions: {
-        actions: [
-          makeRawCtaAction({
-            link: {
-              label: 'Subscribe',
-              linkType: LINK_TYPE.EXTERNAL,
-              url: '/newsletter',
-              internalReference: null,
-              openInNewTab: null,
-              platform: null,
-              accessibleLabel: 'Subscribe to the newsletter',
-            },
-          }),
-        ],
-      },
+      ctaButtons: [
+        makeRawCtaButton({
+          link: {
+            label: 'Read the post',
+            linkType: LINK_TYPE.INTERNAL,
+            url: null,
+            internalReference: { _type: 'page_post', slug: 'hello-world' },
+            openInNewTab: null,
+          },
+        }),
+      ],
     });
 
     const cta = toCtaModule(raw);
 
-    expect(cta.actions?.[0]?.link.ariaLabel).toBe(
-      'Subscribe to the newsletter',
-    );
+    expect(cta.ctaButtons?.[0]?.link.href).toBe('/blog/hello-world');
   });
 
   it('maps a fully-authored layout object 1:1', () => {

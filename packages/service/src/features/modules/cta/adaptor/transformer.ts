@@ -5,7 +5,7 @@ import {
   type TContentAlignment,
   type TMaybeUndefined,
 } from '@blog/config';
-import { toCtaAction } from '@blog/service/shared/transformers/to-cta-action';
+import { toCtaButton } from '@blog/service/shared/transformers/to-cta-button';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import { toInternalHref } from '@blog/service/shared/transformers/to-link';
@@ -13,13 +13,9 @@ import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image
 import type { InferResultType } from 'groqd';
 
 import type { ctaModuleQuery } from './query';
-import type { TCtaAction, TCtaModule } from './types';
+import type { TCtaButton, TCtaModule } from './types';
 
 export type TRawCtaModule = InferResultType<typeof ctaModuleQuery>;
-
-export type TRawCtaAction = NonNullable<
-  NonNullable<TRawCtaModule['actions']>['actions']
->[number];
 
 export type TRawCtaContentBlock = NonNullable<TRawCtaModule['content']>[number];
 export type TRawCtaContentMarkDef = NonNullable<
@@ -74,13 +70,12 @@ function toContentPosition(
   }
 }
 
-function toCtaActions(raw: TRawCtaModule['actions']): TCtaAction[] {
-  const items = raw?.actions;
-  if (!items || items.length === 0) return [];
+function toCtaButtons(raw: TRawCtaModule['ctaButtons']): TCtaButton[] {
+  if (!raw || raw.length === 0) return [];
 
-  return items
-    .map(toCtaAction)
-    .filter((action): action is TCtaAction => action !== undefined);
+  return raw
+    .map(toCtaButton)
+    .filter((button): button is TCtaButton => button !== undefined);
 }
 
 export function toCtaModule(raw: TRawCtaModule): TCtaModule {
@@ -95,7 +90,7 @@ export function toCtaModule(raw: TRawCtaModule): TCtaModule {
     contentPosition: toContentPosition(raw),
     contentAlignment: raw.contentAlignment ?? undefined,
     mobileMediaOrder: raw.mobileMediaOrder ?? undefined,
-    actions: toCtaActions(raw.actions),
+    ctaButtons: toCtaButtons(raw.ctaButtons),
     footnote: raw.footnote ?? undefined,
     layout: toLayout(raw.layout),
   };

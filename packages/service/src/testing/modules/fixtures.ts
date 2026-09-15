@@ -15,7 +15,6 @@ import {
 } from '@blog/config';
 import type { TRawContentModule } from '@blog/service/features/modules/content/adaptor/transformer';
 import type {
-  TRawCtaAction,
   TRawCtaContentBlock,
   TRawCtaContentMarkDef,
   TRawCtaModule,
@@ -32,6 +31,8 @@ import type {
   TRawTaxonomyEntry,
   TRawTaxonomyListModule,
 } from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
+import type { TRawCtaAction } from '@blog/service/shared/transformers/to-cta-action';
+import type { TRawCtaButton } from '@blog/service/shared/transformers/to-cta-button';
 import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 
 export function makeRawHeroModule(
@@ -190,7 +191,7 @@ export function makeRawCtaModule(
     contentPositionBanner: null,
     contentAlignment: null,
     mobileMediaOrder: null,
-    actions: null,
+    ctaButtons: null,
     footnote: null,
     layout: null,
     ...overrides,
@@ -211,6 +212,23 @@ export function makeRawCtaAction(
       openInNewTab: null,
       platform: null,
       accessibleLabel: null,
+    },
+    ...overrides,
+  };
+}
+
+export function makeRawCtaButton(
+  overrides: Partial<TRawCtaButton> = {},
+): TRawCtaButton {
+  return {
+    variant: CTA_ACTION_VARIANT.PRIMARY,
+    appearance: CTA_ACTION_APPEARANCE.CONTAINED,
+    link: {
+      label: 'Subscribe',
+      linkType: LINK_TYPE.EXTERNAL,
+      url: '/newsletter',
+      internalReference: null,
+      openInNewTab: null,
     },
     ...overrides,
   };
