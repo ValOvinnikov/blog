@@ -693,24 +693,24 @@ fallback, never a 500.
 The root `app/not-found.tsx` boundary has no `[tenant]` route param to
 thread even when one exists in the URL, and never resolves a tenant at all:
 it renders `StandaloneNotFoundPage` with no argument, always falling back to
-default theme tokens and base messages. A `notFound()` thrown by a _page_
-under `[tenant]/[locale]` — as opposed to one thrown by the layout itself —
-appears to escalate past `app/[tenant]/not-found.tsx` too, landing here
-instead: curling four content-404 URLs against a production build (`/tags`,
-an index page with no `generateStaticParams` of its own; `/nonexistent-xyz`;
-`/blog/page/abc`; `/blog/page/999`), three came back unthemed — default
-theme tokens rather than the tenant's own — which is the discriminator that
-actually matters; the fourth's theming was not recorded. All four also
-lacked `Header`/`Footer` chrome, but that proves nothing on its own, since
-neither remaining boundary renders that chrome. Unthemed only rules out `app/[tenant]/not-found.tsx` having caught
-these if its `getRememberedTenantId()` hand-off genuinely survives the
-`notFound()` unwind — itself unverified, per the paragraph above — so this
-observation doesn't fully rule out that boundary catching these and merely
-rendering unthemed anyway. All four were direct document GETs — a soft
-client-side navigation into a 404 takes a different router path and wasn't
-tested. The cause isn't confirmed: `[tenant]/[locale]/layout.tsx` keeping
-its own `generateStaticParams` (`locale` only) classifies the whole subtree
-for on-demand blocking generation, which is a plausible contributor, but it
+default theme tokens and base messages. What was actually checked: curling
+four content-404 URLs against a production build — `/tags` (an index page
+with no `generateStaticParams` of its own), `/nonexistent-xyz`,
+`/blog/page/abc`, `/blog/page/999` — returned 404 with no `Header`/`Footer`
+chrome in any response; that is the whole of the evidence. Chrome-absence
+rules out the 404 having rendered inside the locale layout (the deleted
+`[tenant]/[locale]/not-found.tsx` would have carried that chrome) and
+nothing more: which of the two remaining boundaries served these four was
+not determined, since neither one renders chrome and theme tokens were
+never checked. Whether a `notFound()` thrown by a _page_ under
+`[tenant]/[locale]` — as opposed to one thrown by the layout itself —
+escalates past `app/[tenant]/not-found.tsx` to land here is therefore an
+open question, not a finding, tracked in #3209. All four were direct
+document GETs — a soft client-side navigation into a 404 takes a different
+router path and wasn't tested. The escalation's cause, if there is one,
+isn't confirmed either: `[tenant]/[locale]/layout.tsx` keeping its own
+`generateStaticParams` (`locale` only) classifies the whole subtree for
+on-demand blocking generation, which is a plausible contributor, but it
 can't be the whole explanation on its own — it would equally predict
 `app/[tenant]/not-found.tsx` being bypassed for the layout's own throw,
 which the paragraph above says it is not. `i18n/request.ts`
