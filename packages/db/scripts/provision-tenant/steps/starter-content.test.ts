@@ -64,14 +64,20 @@ describe(buildStarterDocuments, () => {
     expect(newsletter.trustCues).toEqual(['No spam', 'Unsubscribe anytime']);
   });
 
-  it('the external nav link satisfies the link schema union (label + linkType + url)', () => {
+  it('the external nav link is an inlineLink satisfying the schema union (label + linkType + url)', () => {
     const navigation = buildStarterDocuments(tenant).find(
       (doc) => doc._id === STARTER_DOCUMENT_IDS.NAVIGATION,
     ) as unknown as {
-      items: Array<{ label: string; linkType: string; url: string }>;
+      items: Array<{
+        _type: string;
+        label: string;
+        linkType: string;
+        url: string;
+      }>;
     };
 
     expect(navigation.items[0]).toMatchObject({
+      _type: 'inlineLink',
       label: 'Blog',
       linkType: 'EXTERNAL',
       url: '/blog',

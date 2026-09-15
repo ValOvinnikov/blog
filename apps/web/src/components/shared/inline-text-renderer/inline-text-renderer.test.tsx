@@ -42,7 +42,7 @@ const value: InlineText = [
     markDefs: [
       {
         _key: 'link-1',
-        _type: 'link',
+        _type: 'inlineLink',
         label: 'link',
         linkType: 'EXTERNAL',
         url: 'https://example.com',
@@ -91,7 +91,7 @@ describe(`<${InlineTextRenderer.name}/>`, () => {
           markDefs: [
             {
               _key: 'link-2',
-              _type: 'link',
+              _type: 'inlineLink',
               label: 'internal',
               linkType: 'INTERNAL',
             },

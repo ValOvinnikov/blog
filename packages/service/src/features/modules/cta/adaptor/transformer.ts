@@ -39,7 +39,7 @@ function toContentLinkAnnotation(
 
   return {
     _key: raw._key,
-    _type: 'link',
+    _type: 'inlineLink',
     label: raw.label,
     linkType: raw.linkType,
     url,

@@ -2,7 +2,7 @@ import {
   CTA_ACTION_APPEARANCE,
   CTA_ACTION_VARIANT,
 } from '@blog/config/constants';
-import { linkSchema } from '@blog/studio/schema-types/objects/link/link';
+import { inlineLinkSchema } from '@blog/studio/schema-types/objects/inline-link/inline-link';
 import { toTitleCase } from '@blog/utils/primitives';
 import { MousePointerClick } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
@@ -52,7 +52,7 @@ export const ctaActionSchema = defineType({
     defineField({
       name: 'link',
       title: 'Link',
-      type: linkSchema.name,
+      type: inlineLinkSchema.name,
       description: 'Where this action goes, and its visible label.',
       validation: (rule) => rule.required(),
     }),

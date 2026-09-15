@@ -21,11 +21,11 @@ const VOICE_VALUE: TVoicePortableText = [
 ];
 
 describe(voicePortableTextToInlineText, () => {
-  it("renames a link markDef's href to url, leaving other fields untouched", () => {
+  it('converts a link markDef to inlineLink, renaming href to url', () => {
     const result = voicePortableTextToInlineText(VOICE_VALUE);
 
     expect(result[0]?.markDefs).toEqual([
-      { _key: 'link-1', _type: 'link', url: 'https://example.com/docs' },
+      { _key: 'link-1', _type: 'inlineLink', url: 'https://example.com/docs' },
     ]);
     expect(result[0]?.children).toEqual(VOICE_VALUE[0]?.children);
   });

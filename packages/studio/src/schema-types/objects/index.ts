@@ -9,8 +9,8 @@ import { brandTaglineSchema } from './brand-tagline/brand-tagline';
 import { headingBlockSchema } from './heading-block/heading-block';
 import { heroLayoutSchema } from './hero-layout/hero-layout';
 import { imageWithAltSchema } from './image-with-alt/image-with-alt';
+import { inlineLinkSchema } from './inline-link/inline-link';
 import { layoutSchema } from './layout/layout';
-import { linkSchema } from './link/link';
 import { openGraphSchema } from './open-graph/open-graph';
 import { postTakeawaysSchema } from './post-takeaways/post-takeaways';
 import { seoSchema } from './seo/seo';
@@ -24,7 +24,7 @@ export const objects = [
   bodyImageSchema,
   asideSchema,
   socialLinkSchema,
-  linkSchema,
+  inlineLinkSchema,
   ctaActionSchema,
   actionGroupSchema,
   openGraphSchema,

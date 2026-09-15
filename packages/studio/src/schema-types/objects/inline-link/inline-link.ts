@@ -14,8 +14,8 @@ type TLinkParent = {
 const isLinkType = (parent: unknown, linkType: string) =>
   (parent as TLinkParent | undefined)?.linkType === linkType;
 
-export const linkSchema = defineType({
-  name: 'link',
+export const inlineLinkSchema = defineType({
+  name: 'inlineLink',
   title: 'Link',
   type: 'object',
   description:
