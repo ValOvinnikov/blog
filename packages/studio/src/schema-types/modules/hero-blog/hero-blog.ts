@@ -11,7 +11,6 @@ import {
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { heroFields } from '@blog/studio/schema-types/fields/hero-fields/hero-fields';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { ctaActionSchema } from '@blog/studio/schema-types/objects/action-group/action-group';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { getDraftsClient } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
 import {
@@ -218,22 +217,10 @@ export const heroBlogSchema = defineType({
       },
       initialValue: CTA_ACTION_APPEARANCE.CONTAINED,
     }),
-    defineField({
-      name: 'secondaryAction',
-      title: 'Secondary Action',
-      type: ctaActionSchema.name,
-      description:
-        'Optional secondary action shown next to the primary action. Must use the Secondary variant.',
-      validation: (rule) =>
-        rule.custom((value) => {
-          const action = value as { variant?: string } | undefined;
-
-          return action && action.variant !== CTA_ACTION_VARIANT.SECONDARY
-            ? 'Secondary Action must use the Secondary variant.'
-            : true;
-        }),
+    ...heroFields({
+      image: false,
+      buttons: { max: 1, allowVariants: [CTA_ACTION_VARIANT.SECONDARY] },
     }),
-    ...heroFields({ image: false }),
   ],
   preview: {
     select: {

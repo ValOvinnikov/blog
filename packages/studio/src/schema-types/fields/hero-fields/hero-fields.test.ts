@@ -1,4 +1,8 @@
-import { HERO_VARIANT, MEDIA_ORDER } from '@blog/config/constants';
+import {
+  CTA_ACTION_VARIANT,
+  HERO_VARIANT,
+  MEDIA_ORDER,
+} from '@blog/config/constants';
 import { heroFields } from '@blog/studio/schema-types/fields/hero-fields/hero-fields';
 import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
 
@@ -239,24 +243,78 @@ describe('heroFields media order fields', () => {
 });
 
 describe('heroFields shared tail', () => {
-  it('emits an actions field and a layout field', () => {
+  it('emits a ctaButtons field and a layout field', () => {
     const fields = heroFields();
 
     expect(
-      fields.some((field) => 'name' in field && field.name === 'actions'),
+      fields.some((field) => 'name' in field && field.name === 'ctaButtons'),
     ).toBe(true);
     expect(
       fields.some((field) => 'name' in field && field.name === 'layout'),
     ).toBe(true);
   });
 
-  it('ends with actions then layout', () => {
+  it('ends with ctaButtons then layout', () => {
     const names = heroFields()
       .filter(
         (field): field is typeof field & { name: string } => 'name' in field,
       )
       .map((field) => field.name);
 
-    expect(names.slice(-2)).toEqual(['actions', 'layout']);
+    expect(names.slice(-2)).toEqual(['ctaButtons', 'layout']);
+  });
+});
+
+describe('heroFields buttons option', () => {
+  it('defaults ctaButtons to the shared field defaults', () => {
+    const field = getField(heroFields(), 'ctaButtons');
+    const validate =
+      getCustomValidator<(value: unknown) => string | true>(field);
+
+    expect(
+      validate([
+        { variant: CTA_ACTION_VARIANT.PRIMARY },
+        { variant: CTA_ACTION_VARIANT.SECONDARY },
+      ]),
+    ).toBe(true);
+  });
+
+  it('passes allowVariants through to ctaButtonsField', () => {
+    const field = getField(
+      heroFields({
+        buttons: { max: 1, allowVariants: [CTA_ACTION_VARIANT.SECONDARY] },
+      }),
+      'ctaButtons',
+    );
+    const validate =
+      getCustomValidator<(value: unknown) => string | true>(field);
+
+    expect(validate([{ variant: CTA_ACTION_VARIANT.PRIMARY }])).toBe(
+      'Only Secondary buttons are allowed here.',
+    );
+    expect(validate([{ variant: CTA_ACTION_VARIANT.SECONDARY }])).toBe(true);
+  });
+
+  it('passes max through to ctaButtonsField', () => {
+    const field = getField(heroFields({ buttons: { max: 1 } }), 'ctaButtons');
+    let maxArg: number | undefined;
+
+    const rule = {
+      min: () => rule,
+      max: (n: number) => {
+        maxArg = n;
+        return rule;
+      },
+      custom: () => rule,
+    };
+
+    if (!field.validation) {
+      throw new Error('Expected ctaButtons field to define validation.');
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (field.validation as any)(rule);
+
+    expect(maxArg).toBe(1);
   });
 });

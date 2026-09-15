@@ -1,5 +1,5 @@
-import { HERO_VARIANT } from '@blog/config/constants';
-import { actionGroupSchema } from '@blog/studio/schema-types/objects/action-group/action-group';
+import { CTA_ACTION_VARIANT, HERO_VARIANT } from '@blog/config/constants';
+import { ctaButtonSchema } from '@blog/studio/schema-types/objects/cta-button/cta-button';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
 
@@ -108,10 +108,28 @@ describe('heroStatementSchema hero tail', () => {
     expect(field.type).toBe(imageWithAltSchema.name);
   });
 
-  it('renders actions through the shared actionGroup object', () => {
-    const field = getField('actions') as { type: string };
+  it('authors its buttons through the shared ctaButtons field', () => {
+    const field = getField('ctaButtons') as {
+      type: string;
+      of?: { type: string }[];
+    };
 
-    expect(field.type).toBe(actionGroupSchema.name);
+    expect(field.type).toBe('array');
+    expect(field.of?.[0]?.type).toBe(ctaButtonSchema.name);
+  });
+
+  it('allows both a primary and a secondary button', () => {
+    const validate = getFieldCustomValidator(getField('ctaButtons'));
+
+    expect(
+      validate(
+        [
+          { variant: CTA_ACTION_VARIANT.PRIMARY },
+          { variant: CTA_ACTION_VARIANT.SECONDARY },
+        ],
+        { parent: {} },
+      ),
+    ).toBe(true);
   });
 });
 
