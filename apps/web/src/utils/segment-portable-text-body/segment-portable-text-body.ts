@@ -1,8 +1,5 @@
-import {
-  IMAGE_LAYOUT,
-  type IBodyImageBlock,
-  type TPortableTextBody,
-} from '@blog/config';
+import { IMAGE_LAYOUT, type IBodyImageBlock } from '@blog/config';
+import type { TPortableTextBody } from '@blog/service';
 
 export type TPortableTextSegment =
   | { kind: 'PROSE'; blocks: TPortableTextBody }

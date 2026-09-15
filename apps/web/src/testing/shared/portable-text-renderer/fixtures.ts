@@ -1,4 +1,5 @@
-import { IMAGE_LAYOUT, type TPortableTextBody } from '@blog/config';
+import { IMAGE_LAYOUT } from '@blog/config';
+import type { TPortableTextBody } from '@blog/service';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 
 export type TRichTextBlock = Extract<
@@ -29,7 +30,7 @@ export const richTextBlock = (
   _key: nextKey('block'),
   style,
   children,
-  ...(markDefs ? { markDefs } : {}),
+  markDefs,
 });
 
 /**
@@ -71,7 +72,19 @@ export const richTextDemo: TPortableTextBody = [
       richTextSpan('link', ['link-1']),
       richTextSpan(' in it.'),
     ],
-    [{ _type: 'link', _key: 'link-1', href: 'https://example.com' }],
+    [
+      {
+        _type: 'linkRef',
+        _key: 'link-1',
+        link: {
+          label: 'link',
+          href: 'https://example.com',
+          target: undefined,
+          platform: undefined,
+          ariaLabel: undefined,
+        },
+      },
+    ],
   ),
   {
     _type: 'code',

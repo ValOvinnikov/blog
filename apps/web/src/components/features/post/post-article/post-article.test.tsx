@@ -1,5 +1,5 @@
-import type { ISanityImage, TPortableTextBody } from '@blog/config';
-import { urlForSanityImage } from '@blog/service';
+import type { ISanityImage } from '@blog/config';
+import { type TPortableTextBody, urlForSanityImage } from '@blog/service';
 import userEvent from '@testing-library/user-event';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import {

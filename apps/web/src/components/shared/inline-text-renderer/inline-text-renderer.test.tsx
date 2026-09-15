@@ -1,9 +1,9 @@
-import type { InlineText } from '@blog/config';
+import type { TResolvedCtaContentBlock } from '@blog/service';
 import { customRender, screen } from '@web/testing/custom-render';
 
 import { InlineTextRenderer } from './inline-text-renderer';
 
-const value: InlineText = [
+const value: TResolvedCtaContentBlock[] = [
   {
     _type: 'block',
     _key: 'b1',
@@ -15,6 +15,7 @@ const value: InlineText = [
       { _type: 'span', _key: 's4', text: 'italic', marks: ['em'] },
       { _type: 'span', _key: 's5', text: ' text.' },
     ],
+    markDefs: undefined,
   },
   {
     _type: 'block',
@@ -22,6 +23,7 @@ const value: InlineText = [
     style: 'normal',
     listItem: 'bullet',
     children: [{ _type: 'span', _key: 's6', text: 'First bullet' }],
+    markDefs: undefined,
   },
   {
     _type: 'block',
@@ -29,6 +31,7 @@ const value: InlineText = [
     style: 'normal',
     listItem: 'bullet',
     children: [{ _type: 'span', _key: 's7', text: 'Second bullet' }],
+    markDefs: undefined,
   },
   {
     _type: 'block',
@@ -42,10 +45,14 @@ const value: InlineText = [
     markDefs: [
       {
         _key: 'link-1',
-        _type: 'inlineLink',
-        label: 'link',
-        linkType: 'EXTERNAL',
-        url: 'https://example.com',
+        _type: 'linkRef',
+        link: {
+          label: 'link',
+          href: 'https://example.com',
+          target: undefined,
+          platform: undefined,
+          ariaLabel: undefined,
+        },
       },
     ],
   },
@@ -78,7 +85,7 @@ describe(`<${InlineTextRenderer.name}/>`, () => {
     );
   });
 
-  it('renders an unresolved (internal) link annotation as plain text, not a broken anchor', () => {
+  it('renders a dangling linkRef annotation as plain text, not a broken anchor', () => {
     setup({
       value: [
         {
@@ -88,14 +95,7 @@ describe(`<${InlineTextRenderer.name}/>`, () => {
           children: [
             { _type: 'span', _key: 's11', text: 'internal', marks: ['link-2'] },
           ],
-          markDefs: [
-            {
-              _key: 'link-2',
-              _type: 'inlineLink',
-              label: 'internal',
-              linkType: 'INTERNAL',
-            },
-          ],
+          markDefs: [{ _key: 'link-2', _type: 'linkRef', link: undefined }],
         },
       ],
     });

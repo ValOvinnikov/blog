@@ -1,4 +1,5 @@
-import { ASIDE_KIND, type TPortableTextBody } from '@blog/config';
+import { ASIDE_KIND } from '@blog/config';
+import type { TPortableTextBody } from '@blog/service';
 import {
   customRender,
   renderElement,
@@ -127,12 +128,24 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
     expect(screen.getByText('const x = 1').tagName).toBe('CODE');
   });
 
-  it('renders a link annotation as a link', () => {
+  it('renders a resolved linkRef annotation as a link', () => {
     const value: TPortableTextBody = [
       richTextBlock(
         'normal',
         [richTextSpan('a link', ['link-1'])],
-        [{ _type: 'link', _key: 'link-1', href: 'https://example.com' }],
+        [
+          {
+            _type: 'linkRef',
+            _key: 'link-1',
+            link: {
+              label: 'a link',
+              href: 'https://example.com',
+              target: undefined,
+              platform: undefined,
+              ariaLabel: undefined,
+            },
+          },
+        ],
       ),
     ];
 
@@ -142,12 +155,12 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
     expect(link).toHaveAttribute('href', 'https://example.com');
   });
 
-  it('renders a link annotation without an href as plain text, not a dead link', () => {
+  it('renders a dangling linkRef annotation as plain text, not a broken anchor', () => {
     const value: TPortableTextBody = [
       richTextBlock(
         'normal',
         [richTextSpan('incomplete link', ['link-1'])],
-        [{ _type: 'link', _key: 'link-1' }],
+        [{ _type: 'linkRef', _key: 'link-1', link: undefined }],
       ),
     ];
 

@@ -4,8 +4,8 @@ import {
   type Code,
   type IBodyImageBlock,
   type TAsideKind,
-  type TPortableTextBody,
 } from '@blog/config';
+import type { IPortableTextLinkMark, TPortableTextBody } from '@blog/service';
 import { Heading } from '@blog/ui/atoms/heading';
 import { InlineCode } from '@blog/ui/atoms/inline-code';
 import { Prose } from '@blog/ui/atoms/prose';
@@ -45,11 +45,6 @@ export interface IPortableTextRendererProps {
    * in the rare case an `aside` block appears without it.
    */
   asideKindLabels?: Partial<Record<TAsideKind, string>>;
-}
-
-interface ILinkAnnotation {
-  _type: 'link';
-  href?: string;
 }
 
 const s = portableTextRendererVariants();
@@ -152,12 +147,16 @@ export const PortableTextRenderer = ({
       code: ({ children }: PortableTextMarkComponentProps) => (
         <InlineCode>{children}</InlineCode>
       ),
-      link: ({
+      linkRef: ({
         children,
         value: annotation,
-      }: PortableTextMarkComponentProps<ILinkAnnotation>) =>
-        annotation?.href ? (
-          <ProseLink as={SmartLink} href={annotation.href}>
+      }: PortableTextMarkComponentProps<IPortableTextLinkMark>) =>
+        annotation?.link ? (
+          <ProseLink
+            as={SmartLink}
+            href={annotation.link.href}
+            target={annotation.link.target}
+          >
             {children}
           </ProseLink>
         ) : (
