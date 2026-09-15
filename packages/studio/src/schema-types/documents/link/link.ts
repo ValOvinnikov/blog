@@ -51,7 +51,7 @@ export const linkSchema = defineType({
       name: 'internalReference',
       title: 'Internal Link',
       type: 'reference',
-      description: 'The page this links to, when Link Type is Internal Link.',
+      description: 'The page this links to.',
       to: LINK_PAGE_TYPES.map((type) => ({ type })),
       hidden: ({ document }) => !isLinkType(document, LINK_TYPE.INTERNAL),
       validation: (rule) =>
@@ -67,8 +67,7 @@ export const linkSchema = defineType({
       name: 'url',
       title: 'External Link',
       type: 'string',
-      description:
-        'The full web address this links to, when Link Type is External Link.',
+      description: 'The full web address this links to, including https://.',
       hidden: ({ document }) => !isLinkType(document, LINK_TYPE.EXTERNAL),
       validation: (rule) =>
         rule.custom((value, context) => {
