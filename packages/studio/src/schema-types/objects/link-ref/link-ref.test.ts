@@ -14,7 +14,7 @@ const getLinkField = () => {
   return field;
 };
 
-describe(linkRefSchema, () => {
+describe('linkRefSchema', () => {
   it('references the link document', () => {
     const field = getLinkField();
 
