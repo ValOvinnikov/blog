@@ -98,6 +98,10 @@ export const heroSchema = defineType({
   description:
     'A hero built around a featured post, pulling its image, heading, and excerpt, or letting each be overridden by hand.',
   icon: Sparkles,
+  deprecated: {
+    reason:
+      'Superseded by the Blog Hero module. Do not use this module for new content.',
+  },
   fields: [
     titleField(),
     brandVariantField({ list: FULL_BRAND_VARIANT_LIST }),
