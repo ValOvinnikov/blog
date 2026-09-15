@@ -31,11 +31,7 @@ type TStandaloneNotFoundPageProps = {
 /**
  * StandaloneNotFoundPage — the body every `not-found.tsx` boundary outside
  * `[tenant]/[locale]/layout.tsx`'s children renders, since neither receives
- * route params to inherit theme/locale context from. The `[tenant]`
- * boundary passes the tenant its layout remembered before it threw; the
- * root boundary passes nothing. Given a tenant, this renders with that
- * tenant's theme tokens and voice-overridden messages; otherwise it falls
- * back to default tokens and base messages — never a header read of its own.
+ * route params to inherit theme/locale context from.
  */
 export const StandaloneNotFoundPage = async ({
   tenant,

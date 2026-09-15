@@ -3,9 +3,8 @@ import { tv } from 'tailwind-variants';
 export const notFoundPageVariants = tv({
   slots: {
     root: [
-      'min-h-dvh',
       'bg-primary-subtle text-text',
-      'flex flex-col items-center justify-center',
+      'flex min-h-dvh flex-col items-center justify-center',
       'gap-6 px-gutter py-section text-center',
     ],
     copy: ['max-w-copy mx-auto'],

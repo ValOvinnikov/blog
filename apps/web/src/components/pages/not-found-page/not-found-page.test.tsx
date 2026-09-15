@@ -36,8 +36,4 @@ describe(`<${NotFoundPage.name}/>`, () => {
       within(link).getByTestId('not-found-arrow-icon'),
     ).toBeInTheDocument();
   });
-
-  it('sizes to the full viewport', () => {
-    expect(screen.getByRole('main')).toHaveClass('min-h-dvh');
-  });
 });

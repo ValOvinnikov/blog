@@ -251,5 +251,7 @@ detected`, and a re-export with `it mustn't be reexported`, so a wrong form
   `[tenant]/[locale]/layout.tsx` itself, which a same-segment boundary cannot
   reach. Both render outside the `[locale]` tree, so neither has
   `Header`/`Footer` chrome — just the terminal-styled 404 body (#491) — and
-  both mount their own `ThemeScope` and resolve their own messages rather
-  than inheriting either.
+  both mount their own `ThemeScope`, but only `app/[tenant]/not-found.tsx`
+  resolves tenant-scoped theme tokens and messages, from the tenant its
+  layout remembered before throwing; `app/not-found.tsx` resolves neither,
+  rendering default tokens and base messages instead.

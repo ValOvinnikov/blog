@@ -8,11 +8,12 @@ import { useTranslations } from 'next-intl';
 
 import { notFoundPageVariants } from './not-found-page-variants';
 
+const s = notFoundPageVariants();
+
 /** NotFoundPage — the centered, full-viewport 404 body shared by every not-found boundary. */
 export const NotFoundPage = () => {
   const t = useTranslations('notFound');
   const eyebrow = t('eyebrow');
-  const s = notFoundPageVariants();
 
   return (
     <main className={s.root()}>

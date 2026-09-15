@@ -674,16 +674,21 @@ route's static/dynamic classification. `[tenant]/[locale]/layout.tsx` seeds
 awaiting `params`, ahead of both of its `notFound()` calls, and
 `app/[tenant]/not-found.tsx` reads it back with `getRememberedTenantId()`
 rather than the request header — a real `headers()` read there, on the same
-prerendered `/[tenant]/[locale]` route, would bail the render out of static
-and — with no `pages/500.html` to fall back on — return a bare 500 in place
-of the 404, the same failure #3191 fixed at the root boundary. Tokens and
-voice overrides come from the `@blog/db` `site_config` row rather than the
-Sanity `settings_site` fetch whose failure can be what raised the 404, so
-the tenant's theme should survive that throw; this isn't independently
-verified against a real layout-level `notFound()` in a production build,
-though — every existing test of this path mocks `getRememberedTenantId`
-directly. Absent a remembered tenant it renders default tokens and base
-messages — never a header read.
+prerendered `/[tenant]/[locale]` route, would be expected to bail the render
+out of static and — with no `pages/500.html` to fall back on — return a
+bare 500 in place of the 404, the same failure #3191 fixed at the root
+boundary. Tokens and voice overrides come from the `@blog/db` `site_config`
+row rather than the Sanity `settings_site` fetch whose failure can be what
+raised the 404, so the _data_ a themed render would use is unaffected by
+that failure — but whether it renders themed at all turns on whether
+`getRememberedTenantId()` can still see what `rememberRequestTenantId`
+wrote into its `cache()`-scoped store once `notFound()` has unwound the
+throwing render, and that hand-off isn't independently verified against a
+real layout-level `notFound()` in a production build: every existing test
+of this path mocks `getRememberedTenantId` directly rather than exercising
+the store. If the hand-off doesn't survive, `getRememberedTenantId()`
+returns `undefined` and the boundary renders unthemed — a graceful
+fallback, never a 500.
 
 The root `app/not-found.tsx` boundary has no `[tenant]` route param to
 thread even when one exists in the URL, and never resolves a tenant at all:
@@ -693,12 +698,19 @@ under `[tenant]/[locale]` — as opposed to one thrown by the layout itself —
 is observed to escalate past `app/[tenant]/not-found.tsx` too, landing here
 instead: curling four content-404 URLs against a production build (`/tags`,
 an index page with no `generateStaticParams` of its own; `/nonexistent-xyz`;
-`/blog/page/abc`; `/blog/page/999`) returned no `Header`/`Footer` chrome in
-any response. All four were direct document GETs — a soft client-side
-navigation into a 404 takes a different router path and wasn't tested. The
-cause isn't confirmed: `[tenant]/[locale]/layout.tsx` keeping its own
-`generateStaticParams` (`locale` only) classifies the whole subtree for
-on-demand blocking generation, which is a plausible contributor, but it
+`/blog/page/abc`; `/blog/page/999`), three came back unthemed — default
+theme tokens rather than the tenant's own — which is the discriminator that
+actually matters; all four also lacked `Header`/`Footer` chrome, but that
+proves nothing on its own, since neither remaining boundary renders that
+chrome. Unthemed only rules out `app/[tenant]/not-found.tsx` having caught
+these if its `getRememberedTenantId()` hand-off genuinely survives the
+`notFound()` unwind — itself unverified, per the paragraph above — so this
+observation doesn't fully rule out that boundary catching these and merely
+rendering unthemed anyway. All four were direct document GETs — a soft
+client-side navigation into a 404 takes a different router path and wasn't
+tested. The cause isn't confirmed: `[tenant]/[locale]/layout.tsx` keeping
+its own `generateStaticParams` (`locale` only) classifies the whole subtree
+for on-demand blocking generation, which is a plausible contributor, but it
 can't be the whole explanation on its own — it would equally predict
 `app/[tenant]/not-found.tsx` being bypassed for the layout's own throw,
 which the paragraph above says it is not. `i18n/request.ts`
