@@ -9,9 +9,9 @@ import type {
   TMaybeUndefined,
   TMediaOrder,
 } from '@blog/config';
-import type { TCtaAction } from '@blog/service/shared/transformers/to-cta-action';
+import type { TCtaButton } from '@blog/service/shared/transformers/to-cta-button';
 
-export type { TCtaAction };
+export type { TCtaButton };
 
 export type TCtaModule = {
   variant: TCtaVariant;
@@ -24,7 +24,7 @@ export type TCtaModule = {
   contentPosition: TMaybeUndefined<TContentAlignment>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
   mobileMediaOrder: TMaybeUndefined<TMediaOrder>;
-  actions: TCtaAction[];
+  ctaButtons: TCtaButton[];
   footnote: TMaybeUndefined<string>;
   layout: TMaybeUndefined<TLayout>;
 };

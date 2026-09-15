@@ -11,6 +11,15 @@ type TLinkDocument = {
 const isLinkType = (document: unknown, linkType: string): boolean =>
   (document as TLinkDocument | undefined)?.linkType === linkType;
 
+const LINK_TYPE_OPTIONS = [
+  { title: 'Internal Link', value: LINK_TYPE.INTERNAL },
+  { title: 'External Link', value: LINK_TYPE.EXTERNAL },
+];
+
+const LINK_TYPE_LABEL: Record<string, string> = Object.fromEntries(
+  LINK_TYPE_OPTIONS.map(({ title, value }) => [value, title]),
+);
+
 export const linkSchema = defineType({
   name: 'link',
   title: 'Link',
@@ -40,10 +49,7 @@ export const linkSchema = defineType({
         'Whether this goes to a page within the site (Internal Link) or a web address outside it (External Link).',
       options: {
         layout: 'radio',
-        list: [
-          { title: 'Internal Link', value: LINK_TYPE.INTERNAL },
-          { title: 'External Link', value: LINK_TYPE.EXTERNAL },
-        ],
+        list: LINK_TYPE_OPTIONS,
       },
       validation: (rule) => rule.required(),
     }),
@@ -107,20 +113,15 @@ export const linkSchema = defineType({
   preview: {
     select: {
       title: 'title',
-      label: 'label',
       linkType: 'linkType',
-      internalTitle: 'internalReference.title',
-      url: 'url',
     },
-    prepare({ title, label, linkType, internalTitle, url }) {
-      const destination =
-        linkType === LINK_TYPE.INTERNAL
-          ? String(internalTitle ?? 'No page selected')
-          : String(url ?? 'No destination set');
+    prepare({ title, linkType }) {
+      const linkTypeLabel =
+        LINK_TYPE_LABEL[String(linkType)] ?? 'No link type set';
 
       return {
         title: String(title ?? 'Untitled Link'),
-        subtitle: label ? `${String(label)} — ${destination}` : destination,
+        subtitle: linkTypeLabel,
       };
     },
   },

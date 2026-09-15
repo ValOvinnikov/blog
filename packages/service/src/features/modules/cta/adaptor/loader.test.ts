@@ -1,6 +1,6 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import {
-  makeRawCtaAction,
+  makeRawCtaButton,
   makeRawCtaModule,
 } from '@blog/service/testing/modules/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
@@ -17,13 +17,13 @@ const tenant = makeTenant();
 describe('getCta', () => {
   it('maps the cta module document', async () => {
     mockRun.mockResolvedValueOnce(
-      makeRawCtaModule({ actions: { actions: [makeRawCtaAction()] } }),
+      makeRawCtaModule({ ctaButtons: [makeRawCtaButton()] }),
     );
 
     const cta = await getCta('cta-1', tenant);
 
     expect(cta.headingBlock.heading).toBe('Subscribe to the newsletter');
-    expect(cta.actions?.[0]?.link.href).toBe('/newsletter');
+    expect(cta.ctaButtons?.[0]?.link.href).toBe('/newsletter');
   });
 
   it('propagates when the module document is missing', async () => {
@@ -45,10 +45,16 @@ describe('getCta', () => {
           tags: [
             't:tenant-a:modules:cta',
             't:tenant-a:module:cta-1',
-            't:tenant-a:page_post',
-            't:tenant-a:topic',
+            't:tenant-a:link',
+            't:tenant-a:homePage',
             't:tenant-a:page_landing',
+            't:tenant-a:page_post',
             't:tenant-a:page_postIndex',
+            't:tenant-a:page_topic',
+            't:tenant-a:page_topicIndex',
+            't:tenant-a:page_tag',
+            't:tenant-a:page_tagIndex',
+            't:tenant-a:topic',
           ],
         }),
       }),

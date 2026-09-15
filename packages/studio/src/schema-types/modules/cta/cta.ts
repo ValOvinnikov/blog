@@ -8,8 +8,8 @@ import {
 } from '@blog/config/constants';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { actionGroupField } from '@blog/studio/schema-types/objects/action-group/action-group-field';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
@@ -48,7 +48,7 @@ export const ctaSchema = defineType({
       description:
         'Which shape this call to action takes: Banner uses the image as a full-bleed background, Split places it alongside the copy, and Callout keeps it in a simple card with the image above the content.',
       options: {
-        layout: 'radio',
+        layout: 'dropdown',
         list: Object.values(CTA_VARIANT).map((value) => ({
           title: toTitleCase(value),
           value,
@@ -167,7 +167,7 @@ export const ctaSchema = defineType({
       initialValue: MEDIA_ORDER.LAST,
       hidden: isNotSplitVariant,
     }),
-    actionGroupField(),
+    ctaButtonsField(),
     defineField({
       name: 'footnote',
       title: 'Footnote',

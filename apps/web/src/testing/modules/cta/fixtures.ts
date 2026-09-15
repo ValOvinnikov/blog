@@ -3,11 +3,9 @@ import {
   CTA_ACTION_VARIANT,
   type InlineText,
 } from '@blog/config';
-import type { TCtaModule } from '@blog/service';
+import type { TCtaButton } from '@blog/service';
 
-type TCtaAction = NonNullable<TCtaModule['actions']>[number];
-
-export const ctaActionsDemo: TCtaAction[] = [
+export const ctaActionsDemo: TCtaButton[] = [
   {
     variant: CTA_ACTION_VARIANT.PRIMARY,
     appearance: CTA_ACTION_APPEARANCE.CONTAINED,

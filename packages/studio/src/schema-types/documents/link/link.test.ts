@@ -335,41 +335,62 @@ describe('linkSchema required fields', () => {
 });
 
 describe('linkSchema preview', () => {
-  it('shows the referenced document title when internal', () => {
+  const prepare = (input: {
+    title: string | undefined;
+    linkType: string | undefined;
+  }) => {
     if (!linkSchema.preview?.prepare) {
       throw new Error('Expected linkSchema to define preview.prepare.');
     }
 
-    const result = linkSchema.preview.prepare({
+    return linkSchema.preview.prepare(input);
+  };
+
+  it('shows "Internal Link" when internal', () => {
+    const result = prepare({
       title: 'Homepage CTA',
-      label: 'Get started',
       linkType: LINK_TYPE.INTERNAL,
-      internalTitle: 'Landing Page',
-      url: undefined,
     });
 
     expect(result).toEqual({
       title: 'Homepage CTA',
-      subtitle: 'Get started — Landing Page',
+      subtitle: 'Internal Link',
     });
   });
 
-  it('shows the url when external', () => {
-    if (!linkSchema.preview?.prepare) {
-      throw new Error('Expected linkSchema to define preview.prepare.');
-    }
-
-    const result = linkSchema.preview.prepare({
+  it('shows "External Link" when external', () => {
+    const result = prepare({
       title: 'Docs Link',
-      label: 'Read the docs',
       linkType: LINK_TYPE.EXTERNAL,
-      internalTitle: undefined,
-      url: 'https://example.com/docs',
     });
 
     expect(result).toEqual({
       title: 'Docs Link',
-      subtitle: 'Read the docs — https://example.com/docs',
+      subtitle: 'External Link',
+    });
+  });
+
+  it('falls back to "Untitled Link" when there is no title', () => {
+    const result = prepare({
+      title: undefined,
+      linkType: LINK_TYPE.INTERNAL,
+    });
+
+    expect(result).toEqual({
+      title: 'Untitled Link',
+      subtitle: 'Internal Link',
+    });
+  });
+
+  it('falls back to "No link type set" when linkType is missing', () => {
+    const result = prepare({
+      title: 'Broken Link',
+      linkType: undefined,
+    });
+
+    expect(result).toEqual({
+      title: 'Broken Link',
+      subtitle: 'No link type set',
     });
   });
 });

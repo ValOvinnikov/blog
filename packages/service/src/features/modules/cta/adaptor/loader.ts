@@ -8,8 +8,7 @@ import { ctaModuleQuery } from './query';
 import { toCtaModule } from './transformer';
 import type { TCtaModule } from './types';
 
-// Both `actions` links and `content`'s inline links resolve to the same
-// post/topic/page document types, so one ISR tag list covers both.
+/** Fetches a `module_cta` document and maps it to its view-model. */
 export async function getCta(
   id: string,
   tenant: TTenantSanityContext,
@@ -21,10 +20,16 @@ export async function getCta(
       [
         'modules:cta',
         `module:${id}`,
-        'page_post',
-        'topic',
+        'link',
+        'homePage',
         'page_landing',
+        'page_post',
         'page_postIndex',
+        'page_topic',
+        'page_topicIndex',
+        'page_tag',
+        'page_tagIndex',
+        'topic',
       ],
       tenant.projectId,
     ),

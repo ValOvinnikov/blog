@@ -356,11 +356,25 @@
         },
         "optional": true
       },
-      "actions": {
+      "ctaButtons": {
         "type": "objectAttribute",
         "value": {
-          "type": "inline",
-          "name": "actionGroup"
+          "type": "array",
+          "of": {
+            "type": "object",
+            "attributes": {
+              "_key": {
+                "type": "objectAttribute",
+                "value": {
+                  "type": "string"
+                }
+              }
+            },
+            "rest": {
+              "type": "inline",
+              "name": "ctaButton"
+            }
+          }
         },
         "optional": true
       },
@@ -378,44 +392,6 @@
           "name": "layout"
         },
         "optional": true
-      }
-    }
-  },
-  {
-    "name": "actionGroup",
-    "type": "type",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "actionGroup"
-          }
-        },
-        "actions": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "array",
-            "of": {
-              "type": "object",
-              "attributes": {
-                "_key": {
-                  "type": "objectAttribute",
-                  "value": {
-                    "type": "string"
-                  }
-                }
-              },
-              "rest": {
-                "type": "inline",
-                "name": "ctaAction"
-              }
-            }
-          },
-          "optional": true
-        }
       }
     }
   },
@@ -1874,6 +1850,132 @@
     }
   },
   {
+    "type": "type",
+    "name": "link.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "link"
+    }
+  },
+  {
+    "name": "ctaButton",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "ctaButton"
+          }
+        },
+        "variant": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "PRIMARY"
+              },
+              {
+                "type": "string",
+                "value": "SECONDARY"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "appearance": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "CONTAINED"
+              },
+              {
+                "type": "string",
+                "value": "INLINE"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "link": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "link.reference"
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
+    "name": "actionGroup",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "actionGroup"
+          }
+        },
+        "actions": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "array",
+            "of": {
+              "type": "object",
+              "attributes": {
+                "_key": {
+                  "type": "objectAttribute",
+                  "value": {
+                    "type": "string"
+                  }
+                }
+              },
+              "rest": {
+                "type": "inline",
+                "name": "ctaAction"
+              }
+            }
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
     "name": "ctaAction",
     "type": "type",
     "value": {
@@ -1925,6 +2027,30 @@
           "value": {
             "type": "inline",
             "name": "inlineLink"
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
+    "name": "linkRef",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "linkRef"
+          }
+        },
+        "link": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "link.reference"
           },
           "optional": true
         }

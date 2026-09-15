@@ -344,10 +344,10 @@ const wasRequiredCalled = (field: ReturnType<typeof getField>) => {
 };
 
 describe('ctaSchema variant field', () => {
-  it('keeps variant as a radio: required, and it drives several other fields', () => {
+  it('keeps variant as a dropdown: required, and it drives several other fields', () => {
     const field = getField('variant');
 
-    expect(getLayout(field)).toBe('radio');
+    expect(getLayout(field)).toBe('dropdown');
     expect(wasRequiredCalled(field)).toBe(true);
   });
 });

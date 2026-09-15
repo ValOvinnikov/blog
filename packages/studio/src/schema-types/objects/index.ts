@@ -6,11 +6,13 @@ import { asideSchema } from './aside/aside';
 import { bodyImageSchema } from './body-image/body-image';
 import { brandSchema } from './brand/brand';
 import { brandTaglineSchema } from './brand-tagline/brand-tagline';
+import { ctaButtonSchema } from './cta-button/cta-button';
 import { headingBlockSchema } from './heading-block/heading-block';
 import { heroLayoutSchema } from './hero-layout/hero-layout';
 import { imageWithAltSchema } from './image-with-alt/image-with-alt';
 import { inlineLinkSchema } from './inline-link/inline-link';
 import { layoutSchema } from './layout/layout';
+import { linkRefSchema } from './link-ref/link-ref';
 import { openGraphSchema } from './open-graph/open-graph';
 import { postTakeawaysSchema } from './post-takeaways/post-takeaways';
 import { seoSchema } from './seo/seo';
@@ -25,8 +27,10 @@ export const objects = [
   asideSchema,
   socialLinkSchema,
   inlineLinkSchema,
+  linkRefSchema,
   ctaActionSchema,
   actionGroupSchema,
+  ctaButtonSchema,
   openGraphSchema,
   seoSchema,
   brandTaglineSchema,
