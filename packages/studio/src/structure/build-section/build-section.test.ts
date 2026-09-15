@@ -1,4 +1,4 @@
-import { House, List, Settings, Tag } from 'lucide-react';
+import { House, Link2, List, Settings, Tag } from 'lucide-react';
 import type { StructureBuilder } from 'sanity/structure';
 
 import {
@@ -47,6 +47,9 @@ const makeMockStructureBuilder = () => ({
   listItem: vi.fn(() => makeMockBuilder('listItem')),
   documentTypeListItem: vi.fn((documentType: string) =>
     makeMockBuilder('documentTypeListItem', documentType),
+  ),
+  documentTypeList: vi.fn((documentType: string) =>
+    makeMockBuilder('documentTypeList', documentType),
   ),
   document: vi.fn(() => makeMockBuilder('document')),
   list: vi.fn(() => makeMockBuilder('list')),
@@ -347,6 +350,90 @@ describe(buildSection, () => {
     const items = callArgs(childList, 'items')?.[0] as TMockBuilder[];
     expect(items.map((item) => item.kind)).toEqual(['documentTypeListItem']);
     expect(S.list).toHaveBeenCalledTimes(1);
+  });
+
+  it('skips the middle list and children straight into the document list when flattenSingleItem is set on a single non-singleton item', () => {
+    const section: TStructureSection = {
+      title: 'Links',
+      id: 'links',
+      icon: Link2,
+      flattenSingleItem: true,
+      groups: [
+        {
+          items: [{ schema: { name: 'link', title: 'Link', icon: Link2 } }],
+        },
+      ],
+    };
+
+    const S = makeMockStructureBuilder();
+    const result = buildSection(
+      asStructureBuilder(S),
+      section,
+    ) as unknown as TMockBuilder;
+
+    expect(result.kind).toBe('listItem');
+    expect(callArgs(result, 'title')).toEqual(['Links']);
+    expect(callArgs(result, 'id')).toEqual(['links']);
+    expect(callArgs(result, 'icon')).toEqual([Link2]);
+
+    const childArgs = callArgs(result, 'child');
+    const childList = childArgs?.[0] as TMockBuilder;
+    expect(childList.kind).toBe('documentTypeList');
+    expect(childList.documentType).toBe('link');
+    // The flattened pane keeps the section's title ("Links"), not the item schema's ("Link") — flattening removes a nesting level, not the plural label.
+    expect(callArgs(childList, 'title')).toEqual(['Links']);
+    expect(S.documentTypeList).toHaveBeenCalledTimes(1);
+    expect(S.list).not.toHaveBeenCalled();
+  });
+
+  it('throws when flattenSingleItem is set but the section has more than one item', () => {
+    const section: TStructureSection = {
+      title: 'Modules',
+      id: 'modules',
+      icon: List,
+      flattenSingleItem: true,
+      groups: [
+        {
+          items: [
+            { schema: { name: 'moduleOne', title: 'Module One', icon: List } },
+            { schema: { name: 'moduleTwo', title: 'Module Two', icon: Tag } },
+          ],
+        },
+      ],
+    };
+
+    const S = makeMockStructureBuilder();
+    expect(() => buildSection(asStructureBuilder(S), section)).toThrow(
+      /flattenSingleItem/,
+    );
+  });
+
+  it('throws when flattenSingleItem is set but the single item is a singleton', () => {
+    const section: TStructureSection = {
+      title: 'Settings',
+      id: 'settings',
+      icon: Settings,
+      flattenSingleItem: true,
+      groups: [
+        {
+          items: [
+            {
+              schema: {
+                name: 'siteSettings',
+                title: 'Site Settings',
+                icon: Settings,
+              },
+              mode: 'singleton',
+            },
+          ],
+        },
+      ],
+    };
+
+    const S = makeMockStructureBuilder();
+    expect(() => buildSection(asStructureBuilder(S), section)).toThrow(
+      /flattenSingleItem/,
+    );
   });
 });
 
