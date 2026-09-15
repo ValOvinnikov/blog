@@ -5,7 +5,7 @@ import type { footerQuery } from './query';
 import type { TFooter, TFooterSocialLink } from './types';
 
 export type TRawFooter = NonNullable<InferResultType<typeof footerQuery>>;
-export type TRawFooterSocialLink = NonNullable<TRawFooter['social']>[number];
+type TRawFooterSocialLink = NonNullable<TRawFooter['social']>[number];
 
 function toFooterSocialLink(
   raw: TRawFooterSocialLink,

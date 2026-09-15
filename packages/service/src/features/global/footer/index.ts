@@ -1,2 +1,2 @@
-export type { TFooter, TFooterSocialLink } from './adaptor/types';
+export type { TFooter } from './adaptor/types';
 export { createFooterService } from './application/service';
