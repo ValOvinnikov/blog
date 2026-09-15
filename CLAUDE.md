@@ -117,6 +117,61 @@ investigate → plan → delegate each layer → test → review → commit (dep
 human-gated) — and it says which subagent owns which step. Subagents are not an
 automatic pipeline; this skill is how the right ones get used in the right order.
 
+## Planning work — mandatory, not advisory
+
+These are requirements, not guidance. They exist because a bundled PR wastes
+review time and hides what actually changed.
+
+### Split by workspace, always
+
+**The main workspaces are the unit of work: `studio`, `service`, `ui`, `web`,
+`platform`.** Plan every non-trivial task as one chunk per workspace, and ship
+one PR per chunk. The supporting packages — `config`, `utils`, `db`, `auth`,
+`insight`, `email` — do not get a chunk of their own by default: a small change
+to one rides along in the PR of whichever main workspace needs it.
+
+**Combine chunks only when splitting them would break.** The test is mechanical:
+would the earlier PR merge to `main` green on its own? Renaming a shared `_type`,
+symbol or generated type reds `type-check` in every consumer until they all land,
+so those consumers belong in one PR. Anything that merges green alone ships
+alone. "It's all one feature", "the split is more work" and "they're small" are
+not reasons to combine.
+
+This strengthens "Prefer per-layer PRs" below from a preference into a
+requirement; the green-alone test is the same test.
+
+### Say what it touches before starting
+
+Before the first dispatch — and again whenever the answer changes mid-task —
+state plainly:
+
+- **Parts touched** — every workspace, not just the obvious one.
+- **Dependencies** — what must land before what, what can run in parallel.
+- **Constraints** — migrations, human gates, anything that cannot be split.
+- **Doubts** — including scope you suspect but have not yet confirmed.
+
+**If anything blocks, ask and wait for an answer.** Never proceed on an
+assumption, and never absorb newly-discovered scope silently. Discovering
+mid-task that a change reaches three more workspaces than the ticket said is
+precisely the moment to stop and ask — editing the ticket to match what you
+already built is backwards. Adopted 2026-09-15 after #3202 shipped as one PR
+spanning studio, service, web and db when the request had been a studio-only
+schema addition; the rename that dragged the other three in was approved, but
+its blast radius was never put to the user.
+
+### Reuse before you create
+
+**Search for what already exists before adding a function, schema type, field
+helper, constant or type.** A near-duplicate is the most expensive kind of
+mistake to find later, because nothing fails — both versions work.
+
+When you or a subagent notices something similar already exists and it is not
+obvious whether to extend it or add alongside it, that is **not** a judgement
+call to settle quietly. Investigate properly — who calls the existing one, what
+`SPEC.md` and the agent/skill docs say, what changing it would break — and if it
+is still unclear, ask. A subagent reporting "there was already an X, but I added
+a new one because…" is a flag to raise, not a decision to rubber-stamp.
+
 ## Mid-task decisions land in the ticket/spec before work continues
 
 When a design/scope/behavior decision gets settled in conversation — the user
@@ -662,7 +717,9 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   require the checks to pass before commit and CI re-runs them on the PR, so a
   hand-ticked copy proves nothing. Full contract and the exception list in
   `open-pull-request`'s "PR body template" section.
-- **Prefer per-layer PRs.** Split a multi-layer feature into separate PRs per
+- **Per-layer PRs are required, not preferred** — see "Planning work — mandatory,
+  not advisory" above, which governs; this bullet carries the mechanics.
+  Split a multi-layer feature into separate PRs per
   layer (`config → studio → service → ui → web` when config changes are involved,
   otherwise `studio → service → ui → web`; dependency order) so each review stays
   small and focused. **Split only when each layer's PR merges to `main` green
