@@ -12,7 +12,7 @@ export interface IHeroStatementModuleViewProps extends THeroStatementModule {
 /**
  * Pure view for `HeroStatementModule` — the web-side wiring the `@blog/ui`
  * `Hero` organism can't own itself: the `Section` full-bleed landmark, the
- * `SanityImage` bridge, and the authored actions via `ActionGroup`.
+ * `SanityImage` bridge, and the authored `ctaButtons` via `ActionGroup`.
  */
 export const HeroStatementModuleView = ({
   id,
@@ -21,7 +21,7 @@ export const HeroStatementModuleView = ({
   eyebrow,
   headingBlock,
   sanityImage,
-  actions,
+  ctaButtons,
   contentPosition,
   contentAlignment,
   mediaOrder,
@@ -48,10 +48,10 @@ export const HeroStatementModuleView = ({
         contentAlignment={contentAlignment}
         mediaOrder={mediaOrder}
       >
-        {actions && actions.length > 0 && (
+        {ctaButtons.length > 0 && (
           <Hero.Cta>
             <ActionGroup
-              actions={actions}
+              actions={ctaButtons}
               isOnDark={variant === HERO_VARIANT.BANNER}
             />
           </Hero.Cta>

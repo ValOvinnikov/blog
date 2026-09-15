@@ -30,7 +30,7 @@ const makeHeroStatementData = (overrides: Record<string, unknown> = {}) => ({
   eyebrow: undefined,
   headingBlock: makeHeadingBlock({ heading: 'Build faster, ship sooner' }),
   sanityImage: undefined,
-  actions: undefined,
+  ctaButtons: [],
   contentPosition: undefined,
   contentAlignment: undefined,
   mediaOrder: undefined,

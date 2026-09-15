@@ -9,6 +9,32 @@ import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 
 import { HeroBlogModuleView } from './hero-blog-module-view';
 
+const primaryButton = {
+  variant: CTA_ACTION_VARIANT.PRIMARY,
+  appearance: CTA_ACTION_APPEARANCE.CONTAINED,
+  link: {
+    label: 'Read more',
+    href: '/blog/building-a-design-system',
+    target: undefined,
+    platform: undefined,
+    ariaLabel: undefined,
+  },
+  hiddenLabelSuffix: 'Building a Design System from Scratch',
+};
+
+const secondaryButton = {
+  variant: CTA_ACTION_VARIANT.SECONDARY,
+  appearance: CTA_ACTION_APPEARANCE.CONTAINED,
+  link: {
+    label: 'View all posts',
+    href: '/blog',
+    target: undefined,
+    platform: undefined,
+    ariaLabel: undefined,
+  },
+  hiddenLabelSuffix: undefined,
+};
+
 const meta = {
   title: 'Modules/HeroBlogModule',
   component: HeroBlogModuleView,
@@ -33,15 +59,7 @@ const meta = {
     supportingText:
       'A deep dive into Atomic Design principles, Tailwind CSS v4, and class-variance-authority — all working together in a portable component library.',
     sanityImage: makeSanityImage(),
-    primaryAction: {
-      label: 'Read more',
-      href: '/blog/building-a-design-system',
-      target: undefined,
-      platform: undefined,
-      hiddenLabelSuffix: 'Building a Design System from Scratch',
-      appearance: CTA_ACTION_APPEARANCE.CONTAINED,
-    },
-    secondaryAction: undefined,
+    ctaButtons: [primaryButton],
     contentPosition: undefined,
     contentAlignment: undefined,
     mediaOrder: undefined,
@@ -56,30 +74,18 @@ export const Default: TStory = {};
 
 export const InlinePrimaryAction: TStory = {
   args: {
-    primaryAction: {
-      label: 'Read more',
-      href: '/blog/building-a-design-system',
-      target: undefined,
-      platform: undefined,
-      hiddenLabelSuffix: 'Building a Design System from Scratch',
-      appearance: CTA_ACTION_APPEARANCE.INLINE,
-    },
+    ctaButtons: [
+      {
+        ...primaryButton,
+        appearance: CTA_ACTION_APPEARANCE.INLINE,
+      },
+    ],
   },
 };
 
 export const WithSecondaryAction: TStory = {
   args: {
-    secondaryAction: {
-      variant: CTA_ACTION_VARIANT.SECONDARY,
-      appearance: CTA_ACTION_APPEARANCE.CONTAINED,
-      link: {
-        label: 'View all posts',
-        href: '/blog',
-        target: undefined,
-        platform: undefined,
-        ariaLabel: undefined,
-      },
-    },
+    ctaButtons: [primaryButton, secondaryButton],
   },
 };
 

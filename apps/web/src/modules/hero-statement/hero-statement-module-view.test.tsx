@@ -12,7 +12,7 @@ import { HeroStatementModuleView } from './hero-statement-module-view';
 
 const sanityImage = makeSanityImage();
 
-const primaryAction = {
+const primaryButton = {
   variant: CTA_ACTION_VARIANT.PRIMARY,
   appearance: CTA_ACTION_APPEARANCE.CONTAINED,
   link: {
@@ -24,7 +24,7 @@ const primaryAction = {
   },
 };
 
-const secondaryAction = {
+const secondaryButton = {
   variant: CTA_ACTION_VARIANT.SECONDARY,
   appearance: CTA_ACTION_APPEARANCE.CONTAINED,
   link: {
@@ -43,7 +43,7 @@ const setup = customRender(HeroStatementModuleView, {
   eyebrow: undefined,
   headingBlock: makeHeadingBlock({ heading: 'Build faster, ship sooner' }),
   sanityImage: undefined,
-  actions: undefined,
+  ctaButtons: [],
   contentPosition: undefined,
   contentAlignment: undefined,
   mediaOrder: undefined,
@@ -77,22 +77,22 @@ describe(`<${HeroStatementModuleView.name}/>`, () => {
     expect(img.getAttribute('src')).toContain('h=675');
   });
 
-  it('renders no Hero.Cta slot when no actions are authored', () => {
-    setup({ actions: undefined });
+  it('renders no Hero.Cta slot when ctaButtons is empty', () => {
+    setup({ ctaButtons: [] });
 
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
-  it('renders a single authored action', () => {
-    setup({ actions: [primaryAction] });
+  it('renders a single authored button', () => {
+    setup({ ctaButtons: [primaryButton] });
 
     const links = screen.getAllByRole('link');
     expect(links).toHaveLength(1);
     expect(links[0]).toHaveTextContent('Get started');
   });
 
-  it('renders every authored action, in order', () => {
-    setup({ actions: [primaryAction, secondaryAction] });
+  it('renders every authored button, in order', () => {
+    setup({ ctaButtons: [primaryButton, secondaryButton] });
 
     const links = screen.getAllByRole('link');
     expect(links).toHaveLength(2);
@@ -100,15 +100,15 @@ describe(`<${HeroStatementModuleView.name}/>`, () => {
     expect(links[1]).toHaveTextContent('Learn more');
   });
 
-  it('reverses the non-primary action for legibility on a Banner over an image', () => {
-    setup({ variant: HERO_VARIANT.BANNER, actions: [secondaryAction] });
+  it('reverses the non-primary button for legibility on a Banner over an image', () => {
+    setup({ variant: HERO_VARIANT.BANNER, ctaButtons: [secondaryButton] });
 
     const link = screen.getByRole('link', { name: 'Learn more' });
     expect(link.className).toContain('border-white/55');
   });
 
-  it('does not reverse the non-primary action on Split or Stacked', () => {
-    setup({ variant: HERO_VARIANT.SPLIT, actions: [secondaryAction] });
+  it('does not reverse the non-primary button on Split or Stacked', () => {
+    setup({ variant: HERO_VARIANT.SPLIT, ctaButtons: [secondaryButton] });
 
     const link = screen.getByRole('link', { name: 'Learn more' });
     expect(link.className).not.toContain('border-white/55');
