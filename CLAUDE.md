@@ -117,6 +117,86 @@ investigate → plan → delegate each layer → test → review → commit (dep
 human-gated) — and it says which subagent owns which step. Subagents are not an
 automatic pipeline; this skill is how the right ones get used in the right order.
 
+## Planning work — mandatory, not advisory
+
+These are requirements, not guidance. They exist because a bundled PR wastes
+review time and hides what actually changed.
+
+### Split by workspace, always
+
+**The main workspaces are the unit of work: `studio`, `service`, `ui`, `web`,
+`platform`.** Plan every non-trivial task as one chunk per workspace, and ship
+one PR per chunk. The supporting packages — `config`, `utils`, `db`, `auth`,
+`insight`, `email` — do not get a chunk of their own by default: a small change
+to one rides along in the PR of whichever main workspace needs it.
+
+**Combine chunks only when splitting them would break.** The test is mechanical:
+would the earlier PR merge to `main` green on its own? Renaming a shared `_type`,
+symbol or generated type reds `type-check` in every consumer until they all land,
+so those consumers belong in one PR. Anything that merges green alone ships
+alone. "It's all one feature", "the split is more work" and "they're small" are
+not reasons to combine.
+
+This strengthens "Prefer per-layer PRs" below from a preference into a
+requirement; the green-alone test is the same test.
+
+### Split by surface too, not only by workspace
+
+Workspace is one axis; **consumers are the other**. When a feature introduces
+something that several places must then adopt — a new schema type, a shared
+component, a field helper, a constant — introducing it is one PR, and **each
+place that starts using it is another**. Never bundle "add X" with "and convert
+the six places that will use X".
+
+Epic #3164 is the worked example: (1) add the `link` document and its Links
+sidebar section, (2) re-use it in the CTA module, (3) navigation and footer,
+(4) hero modules, (5) Portable Text, (6) retire the legacy shapes. Six PRs, not
+one — each adoption is independently reviewable and independently revertible,
+and a problem with one does not block the other five.
+
+This axis compounds with the workspace rule rather than replacing it: an
+adopting PR that spans studio + service + web because a schema shape changed is
+still one PR, because splitting it further would red `type-check`.
+
+### Put the split to the user before starting
+
+Whatever split you arrive at, **state it and get agreement before the first
+dispatch**: which PRs, in what order, what each contains, and what you have
+deliberately left out of scope. The split is the user's decision to accept or
+change — not a status update delivered after the work is already under way.
+
+### Say what it touches before starting
+
+Before the first dispatch — and again whenever the answer changes mid-task —
+state plainly:
+
+- **Parts touched** — every workspace, not just the obvious one.
+- **Dependencies** — what must land before what, what can run in parallel.
+- **Constraints** — migrations, human gates, anything that cannot be split.
+- **Doubts** — including scope you suspect but have not yet confirmed.
+
+**If anything blocks, ask and wait for an answer.** Never proceed on an
+assumption, and never absorb newly-discovered scope silently. Discovering
+mid-task that a change reaches three more workspaces than the ticket said is
+precisely the moment to stop and ask — editing the ticket to match what you
+already built is backwards. Adopted 2026-09-15 after #3202 shipped as one PR
+spanning studio, service, web and db when the request had been a studio-only
+schema addition; the rename that dragged the other three in was approved, but
+its blast radius was never put to the user.
+
+### Reuse before you create
+
+**Search for what already exists before adding a function, schema type, field
+helper, constant or type.** A near-duplicate is the most expensive kind of
+mistake to find later, because nothing fails — both versions work.
+
+When you or a subagent notices something similar already exists and it is not
+obvious whether to extend it or add alongside it, that is **not** a judgement
+call to settle quietly. Investigate properly — who calls the existing one, what
+`SPEC.md` and the agent/skill docs say, what changing it would break — and if it
+is still unclear, ask. A subagent reporting "there was already an X, but I added
+a new one because…" is a flag to raise, not a decision to rubber-stamp.
+
 ## Mid-task decisions land in the ticket/spec before work continues
 
 When a design/scope/behavior decision gets settled in conversation — the user
@@ -422,6 +502,21 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
   implementation walkthrough, it's too long — cut it down to the one
   sentence a future reader actually needs to know before calling it.
 
+  **Doc comments stay — the rule is length, not removal.** A function or
+  component keeps its one doc comment; it just must not run long, and it must
+  never describe which arguments, props or variables the function uses. The
+  type signature already documents that, and prose restating it goes stale the
+  moment a parameter changes.
+
+  **Trim on touch — there is no scheduled comment sweep.** Whenever you or a
+  subagent edits a file, every over-long comment **in that file** gets cut to
+  one sentence as part of the same change. Say so in the dispatch prompt, so
+  the owning layer agent does it rather than the orchestrator hand-editing.
+  This is deliberately opportunistic: a repo-wide sweep would touch ~690
+  over-long comments across 11 workspaces at once and conflict with every open
+  PR, whereas trimming on touch converges on the same result without ever
+  colliding with in-flight work.
+
   **REQUIRED — a source comment must never reference project-management
   state.** This is a hard prohibition, not a length guideline. Specifically,
   never write into a comment in any `packages/*` or `apps/*` source file:
@@ -662,7 +757,9 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   require the checks to pass before commit and CI re-runs them on the PR, so a
   hand-ticked copy proves nothing. Full contract and the exception list in
   `open-pull-request`'s "PR body template" section.
-- **Prefer per-layer PRs.** Split a multi-layer feature into separate PRs per
+- **Per-layer PRs are required, not preferred** — see "Planning work — mandatory,
+  not advisory" above, which governs; this bullet carries the mechanics.
+  Split a multi-layer feature into separate PRs per
   layer (`config → studio → service → ui → web` when config changes are involved,
   otherwise `studio → service → ui → web`; dependency order) so each review stays
   small and focused. **Split only when each layer's PR merges to `main` green

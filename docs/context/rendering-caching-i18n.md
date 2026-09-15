@@ -40,7 +40,9 @@
   page already forced dynamic rendering. `/_not-found` is different: it
   renders outside `[locale]/layout.tsx` and had no `headers()` dependency
   before #2477, so it was one of the two routes #2440 measured as static; it
-  now resolves its own theme tokens and so keeps one. A `pnpm --filter web build` on the #2477 branch confirms
+  now resolves its own theme tokens and so keeps one — no longer true after
+  #3191, which stopped this boundary resolving a tenant at all. A
+  `pnpm --filter web build` on the #2477 branch confirms
   `/_not-found` is now `ƒ` (Dynamic) too — only `/robots.txt` remains `○`
   (Static), and the prerender manifest bakes 2 routes (`/_global-error`,
   `/robots.txt`) instead of #2440's baseline of 3. #2440 remains the open
@@ -251,5 +253,7 @@ detected`, and a re-export with `it mustn't be reexported`, so a wrong form
   `[tenant]/[locale]/layout.tsx` itself, which a same-segment boundary cannot
   reach. Both render outside the `[locale]` tree, so neither has
   `Header`/`Footer` chrome — just the terminal-styled 404 body (#491) — and
-  both mount their own `ThemeScope` and resolve their own messages rather
-  than inheriting either.
+  both mount their own `ThemeScope`, but only `app/[tenant]/not-found.tsx`
+  resolves tenant-scoped theme tokens and messages, from the tenant its
+  layout remembered before throwing; `app/not-found.tsx` resolves neither,
+  rendering default tokens and base messages instead.
