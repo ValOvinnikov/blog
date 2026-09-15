@@ -3,7 +3,7 @@ import { ctaButtonFragment } from '@blog/service/shared/fragments/cta-button';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image';
 import { layoutFragment } from '@blog/service/shared/fragments/layout';
-import { linkFragment } from '@blog/service/shared/fragments/link';
+import { portableTextMarkDefFragment } from '@blog/service/shared/fragments/portable-text-mark-def';
 
 export const ctaModuleQuery = q
   .parameters<{ id: string }>()
@@ -20,18 +20,14 @@ export const ctaModuleQuery = q
       .project(headingBlockFragment)
       .notNull(),
     // Blocks are spread as-is (`'...': true`); only `markDefs` is
-    // re-projected, to deref `link` annotations' `internalReference`.
+    // re-projected, to resolve each `linkRef` mark's `link` document.
     content: sub
       .field('content[]')
       .project((blockSub) => ({
         '...': true,
         markDefs: blockSub
           .field('markDefs[]')
-          .project({
-            _key: true,
-            _type: true,
-            ...linkFragment,
-          })
+          .project(portableTextMarkDefFragment)
           .nullable(true),
       }))
       .nullable(true),

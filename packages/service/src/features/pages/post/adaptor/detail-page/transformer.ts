@@ -2,6 +2,7 @@ import type { TMaybeUndefined } from '@blog/config';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
 import { toModule } from '@blog/service/shared/transformers/to-module';
 import { toPortableTextBody } from '@blog/service/shared/transformers/to-portable-text-body';
+import { toPortableTextBlockWithResolvedLinks } from '@blog/service/shared/transformers/to-portable-text-mark-def';
 import { toPostHeading } from '@blog/service/shared/transformers/to-post-heading';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import { toSocialLink } from '@blog/service/shared/transformers/to-social-link';
@@ -22,7 +23,7 @@ function toPostDetailAuthor(raw: TRawPostDetail['author']): TPostDetailAuthor {
     profilePageSlug: raw.profilePage?.slug ?? undefined,
     image: toSanityImage(raw.image),
     role: raw.role ?? undefined,
-    bio: raw.bio ?? undefined,
+    bio: raw.bio?.map(toPortableTextBlockWithResolvedLinks) ?? undefined,
     socialLinks: (raw.socialLinks ?? []).map(toSocialLink),
   };
 }

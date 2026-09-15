@@ -10,8 +10,13 @@ import type {
   TMediaOrder,
 } from '@blog/config';
 import type { TCtaButton } from '@blog/service/shared/transformers/to-cta-button';
+import type { TPortableTextBlockWithResolvedLinks } from '@blog/service/shared/transformers/to-portable-text-mark-def';
 
 export type { TCtaButton };
+
+export type TResolvedCtaContentBlock = TPortableTextBlockWithResolvedLinks<
+  InlineText[number]
+>;
 
 export type TCtaModule = {
   variant: TCtaVariant;
@@ -19,7 +24,7 @@ export type TCtaModule = {
   bandTone: TFullBrandVariant;
   eyebrow: TMaybeUndefined<string>;
   headingBlock: THeadingBlock;
-  content: TMaybeUndefined<InlineText>;
+  content: TMaybeUndefined<TResolvedCtaContentBlock[]>;
   image: TMaybeUndefined<ISanityImage>;
   contentPosition: TMaybeUndefined<TContentAlignment>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;

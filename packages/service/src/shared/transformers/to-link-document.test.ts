@@ -2,31 +2,27 @@ import { LINK_TYPE } from '@blog/config';
 
 import { toLinkDocument, type TRawLinkDocument } from './to-link-document';
 
-type TRawExternalLinkDocument = Extract<TRawLinkDocument, { url: unknown }>;
-type TRawInternalLinkDocument = Extract<
-  TRawLinkDocument,
-  { internalReference: unknown }
->;
-
 function makeRawExternalLink(
-  overrides: Partial<TRawExternalLinkDocument> = {},
+  overrides: Partial<TRawLinkDocument> = {},
 ): TRawLinkDocument {
   return {
     label: 'Subscribe',
     linkType: LINK_TYPE.EXTERNAL,
     url: '/newsletter',
+    internalReference: null,
     openInNewTab: null,
     ...overrides,
   };
 }
 
 function makeRawInternalLink(
-  overrides: Partial<TRawInternalLinkDocument> = {},
+  overrides: Partial<TRawLinkDocument> = {},
 ): TRawLinkDocument {
   return {
     label: 'Subscribe',
     linkType: LINK_TYPE.INTERNAL,
     internalReference: null,
+    url: null,
     openInNewTab: null,
     ...overrides,
   };

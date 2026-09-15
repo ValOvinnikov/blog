@@ -1,0 +1,41 @@
+import type { ILink, TMaybeUndefined } from '@blog/config';
+import type { portableTextMarkDefFragment } from '@blog/service/shared/fragments/portable-text-mark-def';
+import { toLinkDocument } from '@blog/service/shared/transformers/to-link-document';
+import type { InferFragmentType } from 'groqd';
+
+export type TRawPortableTextMarkDef = InferFragmentType<
+  typeof portableTextMarkDefFragment
+>;
+
+/** A Portable Text `linkRef` mark with its `link` document resolved; an absent `link` means a dangling reference, which the renderer degrades to plain text. */
+export interface IPortableTextLinkMark {
+  _key: string;
+  _type: 'linkRef';
+  link: TMaybeUndefined<ILink>;
+}
+
+export type TPortableTextBlockWithResolvedLinks<
+  TBlock extends { markDefs?: unknown },
+> = Omit<TBlock, 'markDefs'> & {
+  markDefs: TMaybeUndefined<IPortableTextLinkMark[]>;
+};
+
+function toPortableTextMarkDef(
+  raw: TRawPortableTextMarkDef,
+): IPortableTextLinkMark {
+  return {
+    _key: raw._key,
+    _type: 'linkRef',
+    link: toLinkDocument(raw.link),
+  };
+}
+
+/** Resolves a Portable Text block's `markDefs` through the shared `link` document, keeping every other field on the block unchanged. */
+export function toPortableTextBlockWithResolvedLinks<
+  TBlock extends { markDefs?: TRawPortableTextMarkDef[] | null },
+>(raw: TBlock): TPortableTextBlockWithResolvedLinks<TBlock> {
+  return {
+    ...raw,
+    markDefs: raw.markDefs?.map(toPortableTextMarkDef) ?? undefined,
+  };
+}

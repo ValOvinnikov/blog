@@ -194,7 +194,16 @@ describe('postPageQuery', () => {
       listItem: 'bullet',
       level: 1,
       markDefs: [
-        { _type: 'link', _key: 'link-1', href: 'https://example.com' },
+        {
+          _type: 'linkRef',
+          _key: 'link-1',
+          link: {
+            label: 'Learn more',
+            linkType: 'EXTERNAL',
+            openInNewTab: null,
+            url: 'https://example.com',
+          },
+        },
       ],
       children: [
         { _type: 'span', _key: 'span-1', text: 'Hello', marks: ['strong'] },
@@ -220,6 +229,7 @@ describe('postPageQuery', () => {
           _key: 'aside-block-1',
           style: 'normal',
           children: [{ _type: 'span', _key: 'aside-span-1', text: 'Because.' }],
+          markDefs: null,
         },
       ],
     };

@@ -37,6 +37,7 @@ describe(toCtaButton, () => {
           label: 'Broken',
           linkType: LINK_TYPE.INTERNAL,
           internalReference: null,
+          url: null,
           openInNewTab: null,
         },
       }),

@@ -9,13 +9,7 @@ import type { InferFragmentType } from 'groqd';
 
 export type TRawLinkDocument = InferFragmentType<typeof linkDocumentFragment>;
 
-type TInternalLinkDocument = Extract<
-  TRawLinkDocument,
-  { internalReference: unknown }
->;
-type TInternalReference = NonNullable<
-  TInternalLinkDocument['internalReference']
->;
+type TInternalReference = NonNullable<TRawLinkDocument['internalReference']>;
 
 const INTERNAL_HREF_BUILDERS: Record<
   TInternalReference['_type'],
@@ -43,7 +37,7 @@ export function toLinkDocument(
   if (!raw) return undefined;
 
   const href =
-    'internalReference' in raw
+    raw.linkType === LINK_TYPE.INTERNAL
       ? raw.internalReference && toInternalHref(raw.internalReference)
       : raw.url;
 
