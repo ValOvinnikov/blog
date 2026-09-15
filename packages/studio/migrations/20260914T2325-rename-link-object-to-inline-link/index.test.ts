@@ -1,3 +1,5 @@
+import { schemaTypes } from '@blog/studio/schema-types';
+import { inlineLinkSchema } from '@blog/studio/schema-types/objects/inline-link/inline-link';
 import { set } from 'sanity/migrate';
 
 import migration from './index';
@@ -8,6 +10,63 @@ const objectHandler = migration.migrate.object;
 if (!objectHandler) {
   throw new Error('Expected the migration to define an object() node handler.');
 }
+
+type TTypeNode = {
+  name?: string;
+  type?: string;
+  fields?: TTypeNode[];
+  of?: TTypeNode[];
+  marks?: { annotations?: TTypeNode[] };
+};
+
+const collectDirectTypeRefs = (nodes: TTypeNode[] | undefined): Set<string> => {
+  const refs = new Set<string>();
+
+  const visit = (node: TTypeNode | undefined): void => {
+    if (!node) return;
+    if (typeof node.type === 'string') refs.add(node.type);
+    node.fields?.forEach(visit);
+    node.of?.forEach(visit);
+    node.marks?.annotations?.forEach(visit);
+  };
+
+  nodes?.forEach(visit);
+
+  return refs;
+};
+
+/**
+ * Every registered schema type (document or object) that embeds `targetName`
+ * — directly, or transitively through another type already in the set —
+ * found by walking each type's own `fields`/`of`/annotation declarations.
+ * `to` (reference targets) is deliberately not walked: a reference to a
+ * type doesn't embed it.
+ */
+const typesEmbedding = (targetName: string): Set<string> => {
+  const embedding = new Set([targetName]);
+  let changed = true;
+
+  while (changed) {
+    changed = false;
+
+    for (const schemaType of schemaTypes as TTypeNode[]) {
+      const name = schemaType.name;
+
+      if (!name || embedding.has(name)) continue;
+
+      const directRefs = collectDirectTypeRefs(
+        schemaType.fields ?? schemaType.of,
+      );
+
+      if ([...directRefs].some((ref) => embedding.has(ref))) {
+        embedding.add(name);
+        changed = true;
+      }
+    }
+  }
+
+  return embedding;
+};
 
 describe('rename-link-object-to-inline-link migration wiring', () => {
   it('returns a set() operation for a legacy inline link at a known path', () => {
@@ -31,12 +90,19 @@ describe('rename-link-object-to-inline-link migration wiring', () => {
     expect(result).toBeUndefined();
   });
 
-  it('is scoped to settings_footer, settings_navigation, module_hero, and module_cta only', () => {
-    expect(migration.documentTypes).toEqual([
-      'settings_footer',
-      'settings_navigation',
-      'module_hero',
-      'module_cta',
-    ]);
+  it('is scoped to exactly the document types the real schema graph embeds inlineLink in', () => {
+    const embedding = typesEmbedding(inlineLinkSchema.name);
+
+    const derivedDocumentTypes = (schemaTypes as TTypeNode[])
+      .filter(
+        (schemaType) =>
+          schemaType.type === 'document' &&
+          schemaType.name !== undefined &&
+          embedding.has(schemaType.name),
+      )
+      .map((schemaType) => schemaType.name as string)
+      .sort();
+
+    expect([...migration.documentTypes].sort()).toEqual(derivedDocumentTypes);
   });
 });
