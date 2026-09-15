@@ -1,8 +1,7 @@
 /**
  * Renames the legacy inline `link` object's stored `_type` to `inlineLink`,
- * freeing the name `link` for the new library document type (see
- * `../../src/schema-types/documents/link/link.ts` and
- * `../../src/schema-types/objects/inline-link/inline-link.ts`).
+ * matching the object type as renamed in
+ * `../../src/schema-types/objects/inline-link/inline-link.ts`.
  *
  * Scoping: `documentTypes` below lists every document type that embeds an
  * `inlineLink` field, directly or through a shared field factory
