@@ -662,49 +662,46 @@ the leak where every tenant was served the first `tenants` row's config
 owns only the static document shell (`<html lang>`, the Sanity CDN
 preconnect, the dark-mode bootstrap script, `<body>`) and reads no Dynamic
 API. Theme tokens, font variables, analytics gating and the tenant's voice
-overrides all resolve in `[locale]/layout.tsx`. **There are three
-`not-found.tsx` boundaries, and which one catches a `notFound()` decides
-whether that route may read the request header at all.**
-`[tenant]/[locale]/not-found.tsx` exists to catch a `notFound()` thrown by
-that segment's own page tree, and would render the bare `NotFoundPage` body,
-inheriting the layout's `ThemeScope`, `NextIntlClientProvider` and
-`Header`/`Footer` chrome — but in the current build it never actually does.
-`[tenant]/[locale]/layout.tsx` keeps its own `generateStaticParams`
-(`locale` only), so Next classifies the whole subtree as static with zero
-concrete routes and serves every request through on-demand blocking
-generation; every content `notFound()` in that subtree — an absent backing
-document, a pagination-overflow guard, even an index page (`/tags`) with no
-`generateStaticParams` of its own — escalates straight past this boundary to
-the unthemed root instead. A themed content 404 is not something this build
-currently produces. The other two boundaries render outside
-`[tenant]/[locale]/layout.tsx` and share one `StandaloneNotFoundPage`
-composition so they cannot drift (neither has analytics gating or chrome):
-`app/[tenant]/not-found.tsx` exists because a segment's own `not-found.tsx`
-wraps only that segment's children, never its own layout, so a `notFound()`
-thrown inside `[tenant]/[locale]/layout.tsx` is catchable only one segment
-up — without it that throw escaped to a 500 on every route. It runs on the
-same prerendered `/[tenant]/[locale]` route, so reading `x-tenant-id` there
-would bail the render out of static and — with no `pages/500.html` to fall
-back on — return a bare 500 in place of the 404. It stays themed anyway:
-`[tenant]/[locale]/layout.tsx` seeds `rememberRequestTenantId(tenant)` from
-its own route param immediately after awaiting `params`, ahead of both of
-its `notFound()` calls, and the boundary reads it back with
-`getRememberedTenantId()`. The tenant's theme survives that throw because
-tokens and voice overrides come from the `@blog/db` `site_config` row, not
-from the Sanity `settings_site` fetch whose failure raised the 404. Absent a
-remembered tenant it renders default tokens and base messages — never a
-header read, which would reintroduce the bailout. The root `app/not-found.tsx`
-has no `[tenant]` route param to thread even when one exists in the URL, and
-unlike the other two it never resolves a tenant at all: it renders
-`StandaloneNotFoundPage` with no argument, always falling back to default
-theme tokens and base messages. This is not an edge case reserved for a
-genuinely tenant-less URL — it is `/_not-found`, the path Next's on-demand
-blocking generation falls through to for every content `notFound()` under
-`[tenant]/[locale]` today, per the previous paragraph. An unthemed 404 is
-the norm for this build, a themed one the exception, which is the reverse of
-what the file layout suggests (#3191) — precisely because a `headers()` read
-is fatal in that static-generation window, so this boundary must never
-attempt one. `i18n/request.ts`
+overrides all resolve in `[locale]/layout.tsx`. **There are two
+`not-found.tsx` boundaries outside `[tenant]/[locale]/layout.tsx`'s own
+children.** `app/[tenant]/not-found.tsx` exists because a segment's own
+`not-found.tsx` wraps only that segment's children, never its own layout,
+so a `notFound()` thrown inside `[tenant]/[locale]/layout.tsx` itself is
+catchable only one segment up — without it that throw escaped to a 500 on
+every route. That is a Next.js file-convention rule, independent of the
+route's static/dynamic classification. `[tenant]/[locale]/layout.tsx` seeds
+`rememberRequestTenantId(tenant)` from its own route param immediately after
+awaiting `params`, ahead of both of its `notFound()` calls, and
+`app/[tenant]/not-found.tsx` reads it back with `getRememberedTenantId()`
+rather than the request header — a real `headers()` read there, on the same
+prerendered `/[tenant]/[locale]` route, would bail the render out of static
+and — with no `pages/500.html` to fall back on — return a bare 500 in place
+of the 404, the same failure #3191 fixed at the root boundary. Tokens and
+voice overrides come from the `@blog/db` `site_config` row rather than the
+Sanity `settings_site` fetch whose failure can be what raised the 404, so
+the tenant's theme should survive that throw; this isn't independently
+verified against a real layout-level `notFound()` in a production build,
+though — every existing test of this path mocks `getRememberedTenantId`
+directly. Absent a remembered tenant it renders default tokens and base
+messages — never a header read.
+
+The root `app/not-found.tsx` boundary has no `[tenant]` route param to
+thread even when one exists in the URL, and never resolves a tenant at all:
+it renders `StandaloneNotFoundPage` with no argument, always falling back to
+default theme tokens and base messages. A `notFound()` thrown by a _page_
+under `[tenant]/[locale]` — as opposed to one thrown by the layout itself —
+is observed to escalate past `app/[tenant]/not-found.tsx` too, landing here
+instead: curling four content-404 URLs against a production build (`/tags`,
+an index page with no `generateStaticParams` of its own; `/nonexistent-xyz`;
+`/blog/page/abc`; `/blog/page/999`) returned no `Header`/`Footer` chrome in
+any response. All four were direct document GETs — a soft client-side
+navigation into a 404 takes a different router path and wasn't tested. The
+cause isn't confirmed: `[tenant]/[locale]/layout.tsx` keeping its own
+`generateStaticParams` (`locale` only) classifies the whole subtree for
+on-demand blocking generation, which is a plausible contributor, but it
+can't be the whole explanation on its own — it would equally predict
+`app/[tenant]/not-found.tsx` being bypassed for the layout's own throw,
+which the paragraph above says it is not. `i18n/request.ts`
 is likewise tenant-independent, returning the base locale messages only.
 This split exists because the root layout and `getRequestConfig` both sit
 above any future `[tenant]` route segment and so can never receive it as a
@@ -719,7 +716,17 @@ is `○` (Static) once more, and the prerender manifest bakes the same 3 routes
 #2440 measured (`/_global-error`, `/_not-found`, `/robots.txt`). #2440 holds
 the measured baseline and the open decision of whether/how to claw back the
 rest of it (e.g. Cache Components/PPR) — neither #2477 nor #3191 revisits or
-changes that decision. The
+changes that decision. That #2477 reclassification was benign: reading
+`headers()` in an otherwise-fully-static route just moved it to `ƒ` at build
+time. The identical kind of read was fatal, not benign, when
+`app/not-found.tsx` made it before #3191 — at that point it ran as the
+fallback for `[tenant]/[locale]`'s on-demand blocking generation, a route
+Next had already committed to a static/ISR shape at build time, and
+encountering a Dynamic API call while serving that fallback errored instead
+of quietly reclassifying. This distinction is inferred from the two
+observed outcomes here, not verified against Next's own source or docs — so
+`app/not-found.tsx` avoids the read rather than relying on any general claim
+about when Next treats it as fatal. The
 Sanity `settings_theme` schema this superseded is
 retained only as a rollback path (unused by any read path) until the
 transition's retirement epic deletes it. The favicon route
@@ -1031,8 +1038,8 @@ compositions, which do sit under a route carrying `tenant` but deliberately
 leave it unthreaded: `force-dynamic` already excludes them from the cache,
 so resolving from the request costs them nothing. The root `app/not-found.tsx`
 boundary reads neither function: it renders unthemed rather than resolving a
-tenant at all, since a `headers()` read is fatal in a route Next has
-committed to static generation.
+tenant at all — a `headers()` read there was what produced #3191's 500 (see
+above), so it avoids the read rather than resolving a tenant a different way.
 
 A route cannot validate its own tenant param — doing so means reading `Host`,
 which would force the dynamic rendering this arrangement removes. `proxy.ts`

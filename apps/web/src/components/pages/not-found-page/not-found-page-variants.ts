@@ -3,6 +3,7 @@ import { tv } from 'tailwind-variants';
 export const notFoundPageVariants = tv({
   slots: {
     root: [
+      'min-h-dvh',
       'bg-primary-subtle text-text',
       'flex flex-col items-center justify-center',
       'gap-6 px-gutter py-section text-center',
@@ -17,14 +18,5 @@ export const notFoundPageVariants = tv({
       'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
     ],
     arrow: ['size-4'],
-  },
-  variants: {
-    shouldFillViewport: {
-      true: { root: ['min-h-dvh'] },
-      false: { root: ['flex-1'] },
-    },
-  },
-  defaultVariants: {
-    shouldFillViewport: true,
   },
 });

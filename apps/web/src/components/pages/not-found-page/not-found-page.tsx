@@ -8,22 +8,11 @@ import { useTranslations } from 'next-intl';
 
 import { notFoundPageVariants } from './not-found-page-variants';
 
-type TNotFoundPageProps = {
-  shouldFillViewport?: boolean;
-};
-
-/**
- * NotFoundPage — the centered 404 body content shared by every not-found
- * boundary; `shouldFillViewport` (default `true`) sizes it to the full viewport
- * for the two boundaries that render with no surrounding chrome, or set it
- * to `false` to instead fill the space handed to it by a layout.
- */
-export const NotFoundPage = ({
-  shouldFillViewport = true,
-}: TNotFoundPageProps) => {
+/** NotFoundPage — the centered, full-viewport 404 body shared by every not-found boundary. */
+export const NotFoundPage = () => {
   const t = useTranslations('notFound');
   const eyebrow = t('eyebrow');
-  const s = notFoundPageVariants({ shouldFillViewport });
+  const s = notFoundPageVariants();
 
   return (
     <main className={s.root()}>
