@@ -7,22 +7,25 @@ import type { TLegacyInlineLink } from './transform';
 const LINK_ID_PREFIX = 'link-';
 
 /**
- * The string a destination collapses to for dedup — two legacy
- * `inlineLink`s with the same key resolve to one created `link` document.
- * Keyed on the destination itself (the referenced document, or the URL),
- * never on `label` — two links can share a label and point elsewhere.
+ * The string a link collapses to for dedup — two legacy `inlineLink`s with
+ * the same key resolve to one created `link` document. Keyed on destination
+ * *and* label together: a `link` document has one required `label`, so two
+ * legacy links at the same destination but with different visible wording
+ * must stay distinct `link` documents, not merge and silently pick one.
  */
 export const toLinkIdentityKey = (
   link: TLegacyInlineLink,
 ): string | undefined => {
   if (link.linkType === LINK_TYPE.INTERNAL) {
     return link.internalReference?._ref
-      ? `internal:${link.internalReference._ref}`
+      ? `internal:${link.internalReference._ref}|label:${link.label ?? ''}`
       : undefined;
   }
 
   if (link.linkType === LINK_TYPE.EXTERNAL) {
-    return link.url ? `external:${link.url}` : undefined;
+    return link.url
+      ? `external:${link.url}|label:${link.label ?? ''}`
+      : undefined;
   }
 
   return undefined;
