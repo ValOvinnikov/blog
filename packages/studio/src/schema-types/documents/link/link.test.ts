@@ -193,6 +193,86 @@ describe('linkSchema url field', () => {
       'Enter a full web address starting with https:// or http://, including a host, e.g. https://example.com.',
     );
   });
+
+  it('rejects a javascript: URL', () => {
+    const validate = getCustomValidator<TCustomFn>(getField('url'));
+
+    expect(
+      validate('javascript:alert(1)', {
+        document: { linkType: LINK_TYPE.EXTERNAL },
+      }),
+    ).toBe(
+      'Enter a full web address starting with https:// or http://, including a host, e.g. https://example.com.',
+    );
+  });
+
+  it('rejects a data: URL', () => {
+    const validate = getCustomValidator<TCustomFn>(getField('url'));
+
+    expect(
+      validate('data:text/html,<script>alert(1)</script>', {
+        document: { linkType: LINK_TYPE.EXTERNAL },
+      }),
+    ).toBe(
+      'Enter a full web address starting with https:// or http://, including a host, e.g. https://example.com.',
+    );
+  });
+
+  it('rejects a vbscript: URL', () => {
+    const validate = getCustomValidator<TCustomFn>(getField('url'));
+
+    expect(
+      validate('vbscript:msgbox(1)', {
+        document: { linkType: LINK_TYPE.EXTERNAL },
+      }),
+    ).toBe(
+      'Enter a full web address starting with https:// or http://, including a host, e.g. https://example.com.',
+    );
+  });
+
+  it('rejects a protocol-relative URL', () => {
+    const validate = getCustomValidator<TCustomFn>(getField('url'));
+
+    expect(
+      validate('//evil.example.com', {
+        document: { linkType: LINK_TYPE.EXTERNAL },
+      }),
+    ).toBe(
+      'Enter a full web address starting with https:// or http://, including a host, e.g. https://example.com.',
+    );
+  });
+
+  it('rejects an obfuscated scheme that normalises to javascript:', () => {
+    const validate = getCustomValidator<TCustomFn>(getField('url'));
+
+    expect(
+      validate('java\tscript:alert(1)', {
+        document: { linkType: LINK_TYPE.EXTERNAL },
+      }),
+    ).toBe(
+      'Enter a full web address starting with https:// or http://, including a host, e.g. https://example.com.',
+    );
+  });
+
+  it('accepts an uppercase HTTPS scheme', () => {
+    const validate = getCustomValidator<TCustomFn>(getField('url'));
+
+    expect(
+      validate('HTTPS://example.com', {
+        document: { linkType: LINK_TYPE.EXTERNAL },
+      }),
+    ).toBe(true);
+  });
+
+  it('accepts a URL with a port, path, query and fragment', () => {
+    const validate = getCustomValidator<TCustomFn>(getField('url'));
+
+    expect(
+      validate('https://example.com:8080/path?query=1#frag', {
+        document: { linkType: LINK_TYPE.EXTERNAL },
+      }),
+    ).toBe(true);
+  });
 });
 
 describe('linkSchema openInNewTab field', () => {
