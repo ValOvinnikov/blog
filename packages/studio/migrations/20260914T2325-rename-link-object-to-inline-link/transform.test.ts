@@ -23,7 +23,7 @@ describe(isInlineLinkPath, () => {
     expect(isInlineLinkPath(['secondaryAction', 'link'])).toBe(true);
   });
 
-  it('is true for a markDef annotation inside module_cta.content[]', () => {
+  it('is false for a markDef annotation inside module_cta.content[] — that field now annotates through linkRef, not the legacy link object', () => {
     expect(
       isInlineLinkPath([
         'content',
@@ -31,7 +31,7 @@ describe(isInlineLinkPath, () => {
         'markDefs',
         { _key: 'mark1' },
       ]),
-    ).toBe(true);
+    ).toBe(false);
   });
 
   it('is false for a richText/proseText markDefs annotation path (a different field name)', () => {
@@ -101,7 +101,7 @@ describe(renameInlineLinkType, () => {
     expect(result).toEqual({ ...node, _type: 'inlineLink' });
   });
 
-  it('renames a legacy link markDef annotation inside module_cta.content[]', () => {
+  it('leaves a markDef annotation inside module_cta.content[] alone — no longer a known inlineLink path', () => {
     const node = { _type: 'link', _key: 'mark1', label: 'Docs', url: '/docs' };
 
     const result = renameInlineLinkType(node, [
@@ -111,7 +111,7 @@ describe(renameInlineLinkType, () => {
       { _key: 'mark1' },
     ]);
 
-    expect(result).toEqual({ ...node, _type: 'inlineLink' });
+    expect(result).toBeUndefined();
   });
 
   it('is idempotent — a node already renamed to inlineLink is left alone', () => {

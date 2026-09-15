@@ -33,14 +33,6 @@ const isCtaActionLinkPath = (path: Path): boolean =>
   isKeyedSegment(path[2]) &&
   path[3] === 'link';
 
-/** `module_cta.content[].markDefs[]` — the `link` annotation on the `inlineText` field. */
-const isCtaContentAnnotationPath = (path: Path): boolean =>
-  path.length === 4 &&
-  path[0] === 'content' &&
-  isKeyedSegment(path[1]) &&
-  path[2] === 'markDefs' &&
-  isKeyedSegment(path[3]);
-
 /** `module_heroBlog.secondaryAction.link` — a standalone `ctaAction` field, not one held by an `actionGroup`. */
 const isHeroBlogSecondaryActionLinkPath = (path: Path): boolean =>
   path.length === 2 && path[0] === 'secondaryAction' && path[1] === 'link';
@@ -51,7 +43,6 @@ export const isInlineLinkPath = (path: Path): boolean =>
   isNavigationItemLinkPath(path) ||
   isHeroSecondaryActionPath(path) ||
   isCtaActionLinkPath(path) ||
-  isCtaContentAnnotationPath(path) ||
   isHeroBlogSecondaryActionLinkPath(path);
 
 /** Pure transform: renames a legacy `link` node's `_type` to `inlineLink`, preserving every other field. */

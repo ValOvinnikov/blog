@@ -8,7 +8,6 @@ export default defineMigration({
   documentTypes: [
     'settings_footer',
     'settings_navigation',
-    'module_cta',
     'module_hero',
     'module_heroBlog',
     'module_heroStatement',

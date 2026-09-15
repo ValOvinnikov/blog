@@ -1,8 +1,13 @@
+import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
 import { richTextSchema } from '@blog/studio/schema-types/portable-text/rich-text/rich-text';
 
 type TBlockArrayMember = {
   type: string;
   styles?: { title: string; value: string }[];
+  marks?: {
+    decorators?: { title: string; value: string }[];
+    annotations?: { type: string }[];
+  };
 };
 
 const getBlockMember = () => {
@@ -27,5 +32,19 @@ describe('richTextSchema block styles', () => {
       'h4',
       'blockquote',
     ]);
+  });
+});
+
+describe('richTextSchema block marks', () => {
+  it('annotates links through the link library, not the built-in raw-href annotation', () => {
+    const { marks } = getBlockMember();
+
+    expect(marks?.annotations).toEqual([{ type: linkRefSchema.name }]);
+  });
+
+  it('leaves decorators undeclared so the default set (bold, italic, code, underline, strike-through) still applies', () => {
+    const { marks } = getBlockMember();
+
+    expect(marks?.decorators).toBeUndefined();
   });
 });

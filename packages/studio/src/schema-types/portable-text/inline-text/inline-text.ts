@@ -1,4 +1,4 @@
-import { inlineLinkSchema } from '@blog/studio/schema-types/objects/inline-link/inline-link';
+import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
 import { defineArrayMember, defineType } from 'sanity';
 
 export const inlineTextSchema = defineType({
@@ -20,7 +20,7 @@ export const inlineTextSchema = defineType({
           { title: 'Bold', value: 'strong' },
           { title: 'Italic', value: 'em' },
         ],
-        annotations: [{ type: inlineLinkSchema.name }],
+        annotations: [{ type: linkRefSchema.name }],
       },
     }),
   ],
