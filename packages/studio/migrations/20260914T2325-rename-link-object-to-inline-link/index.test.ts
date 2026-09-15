@@ -35,13 +35,7 @@ const collectDirectTypeRefs = (nodes: TTypeNode[] | undefined): Set<string> => {
   return refs;
 };
 
-/**
- * Every registered schema type (document or object) that embeds `targetName`
- * — directly, or transitively through another type already in the set —
- * found by walking each type's own `fields`/`of`/annotation declarations.
- * `to` (reference targets) is deliberately not walked: a reference to a
- * type doesn't embed it.
- */
+/** Every registered schema type that embeds `targetName`, directly or transitively. */
 const typesEmbedding = (targetName: string): Set<string> => {
   const embedding = new Set([targetName]);
   let changed = true;

@@ -25,13 +25,7 @@ const isNavigationItemLinkPath = (path: Path): boolean =>
 const isHeroSecondaryActionPath = (path: Path): boolean =>
   path.length === 1 && path[0] === 'secondaryAction';
 
-/**
- * `<...>.actions.actions[].link` — the `link` field of each `ctaAction` held
- * by an `actionGroup`'s `actions` field. Shared by every document that
- * carries an `actionGroup` field: `module_cta` (`actionGroupField()`
- * directly) and `module_heroBlog`/`module_heroStatement` (via the shared
- * `heroFields()` field tail).
- */
+/** `<...>.actions.actions[].link` — the `link` field of each `ctaAction` held by an `actionGroup`'s `actions` field. */
 const isCtaActionLinkPath = (path: Path): boolean =>
   path.length === 4 &&
   path[0] === 'actions' &&
@@ -39,11 +33,7 @@ const isCtaActionLinkPath = (path: Path): boolean =>
   isKeyedSegment(path[2]) &&
   path[3] === 'link';
 
-/**
- * `module_cta.content[].markDefs[]` — `content` is an `inlineText` field,
- * which (unlike `richText`/`proseText`) explicitly declares its own `link`
- * annotation rather than inheriting Sanity's default `link` href annotation.
- */
+/** `module_cta.content[].markDefs[]` — the `link` annotation on the `inlineText` field. */
 const isCtaContentAnnotationPath = (path: Path): boolean =>
   path.length === 4 &&
   path[0] === 'content' &&
@@ -55,15 +45,7 @@ const isCtaContentAnnotationPath = (path: Path): boolean =>
 const isHeroBlogSecondaryActionLinkPath = (path: Path): boolean =>
   path.length === 2 && path[0] === 'secondaryAction' && path[1] === 'link';
 
-/**
- * True only for a path at one of the known locations where the legacy `link`
- * object is actually used. This is what keeps the migration from ever
- * touching a `richText`/`proseText` field's default `link` href annotation —
- * those live on document types (`page_post`, `module_content`, …) that are
- * never included in this migration's `documentTypes`, and even within the
- * document types that are included, no other field happens to reuse one of
- * these same path shapes.
- */
+/** True only for a path at one of the known locations where the legacy `link` object is actually used. */
 export const isInlineLinkPath = (path: Path): boolean =>
   isFooterSocialLinkPath(path) ||
   isNavigationItemLinkPath(path) ||
@@ -72,13 +54,7 @@ export const isInlineLinkPath = (path: Path): boolean =>
   isCtaContentAnnotationPath(path) ||
   isHeroBlogSecondaryActionLinkPath(path);
 
-/**
- * Pure transform: renames a legacy `link` node's `_type` to `inlineLink`,
- * preserving every other field. Returns `undefined` (no-op) for anything
- * that isn't a legacy inline link at one of the known paths — this is both
- * the scoping guard and the idempotency guard: a node already renamed to
- * `inlineLink` no longer matches `LEGACY_TYPE` and is left alone.
- */
+/** Pure transform: renames a legacy `link` node's `_type` to `inlineLink`, preserving every other field. */
 export const renameInlineLinkType = (
   node: TInlineLinkNode,
   path: Path,
