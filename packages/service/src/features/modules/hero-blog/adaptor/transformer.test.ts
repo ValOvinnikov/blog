@@ -5,9 +5,13 @@ import {
   CTA_ACTION_VARIANT,
   HERO_IMAGE_SOURCE,
   HERO_VARIANT,
+  LINK_TYPE,
   MEDIA_ORDER,
 } from '@blog/config';
-import { makeRawHeroBlogModule } from '@blog/service/testing/modules/fixtures';
+import {
+  makeRawCtaButton,
+  makeRawHeroBlogModule,
+} from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
 import {
   makeRawHeadingBlock,
@@ -41,7 +45,7 @@ describe(toHeroBlogModule, () => {
 
     if (!hero.hasPost) throw new Error('expected a resolved post');
     expect(hero.heading).toBe('Pinned title');
-    expect(hero.primaryAction?.href).toBe('/blog/hello-world');
+    expect(hero.ctaButtons[0]?.link.href).toBe('/blog/hello-world');
   });
 
   it('renders using the resolved newest-featured fallback post', () => {
@@ -56,10 +60,10 @@ describe(toHeroBlogModule, () => {
 
     if (!hero.hasPost) throw new Error('expected a resolved post');
     expect(hero.heading).toBe('Newest featured title');
-    expect(hero.primaryAction?.href).toBe('/blog/hello-world');
+    expect(hero.ctaButtons[0]?.link.href).toBe('/blog/hello-world');
   });
 
-  it('reports hasPost false and has no derived copy, image or primary action when no post resolves at all', () => {
+  it('reports hasPost false and has no derived copy, image or ctaButtons when no post resolves at all', () => {
     const raw = makeRawHeroBlogModule({ post: null });
 
     const hero = toHeroBlogModule(raw);
@@ -69,7 +73,7 @@ describe(toHeroBlogModule, () => {
     expect('heading' in hero).toBe(false);
     expect(hero.supportingText).toBeUndefined();
     expect(hero.sanityImage).toBeUndefined();
-    expect(hero.primaryAction).toBeUndefined();
+    expect(hero.ctaButtons).toEqual([]);
   });
 
   it('reports hasPost true and derives heading/supportingText from the resolved post', () => {
@@ -144,11 +148,16 @@ describe(toHeroBlogModule, () => {
 
     const hero = toHeroBlogModule(raw);
 
-    expect(hero.primaryAction).toEqual({
-      label: 'Read more',
-      href: '/blog/hello-world',
-      target: undefined,
-      platform: undefined,
+    expect(hero.ctaButtons[0]).toEqual({
+      variant: CTA_ACTION_VARIANT.PRIMARY,
+      appearance: undefined,
+      link: {
+        label: 'Read more',
+        href: '/blog/hello-world',
+        target: undefined,
+        platform: undefined,
+        ariaLabel: undefined,
+      },
       hiddenLabelSuffix: 'Hello World',
     });
   });
@@ -161,14 +170,14 @@ describe(toHeroBlogModule, () => {
 
     const hero = toHeroBlogModule(raw);
 
-    expect(hero.primaryAction).toMatchObject({
-      label: 'Discover the story',
+    expect(hero.ctaButtons[0]).toMatchObject({
+      link: { label: 'Discover the story' },
       hiddenLabelSuffix: undefined,
     });
   });
 
   it.each([CTA_ACTION_APPEARANCE.CONTAINED, CTA_ACTION_APPEARANCE.INLINE])(
-    'carries the authored primaryActionAppearance %s onto the primary action',
+    'carries the authored primaryActionAppearance %s onto the primary button',
     (appearance) => {
       const raw = makeRawHeroBlogModule({
         post: makeRawPostCard(),
@@ -177,11 +186,11 @@ describe(toHeroBlogModule, () => {
 
       const hero = toHeroBlogModule(raw);
 
-      expect(hero.primaryAction?.appearance).toBe(appearance);
+      expect(hero.ctaButtons[0]?.appearance).toBe(appearance);
     },
   );
 
-  it('leaves primaryAction.appearance undefined when unset (no faked default)', () => {
+  it('leaves the primary button appearance undefined when unset (no faked default)', () => {
     const raw = makeRawHeroBlogModule({
       post: makeRawPostCard(),
       primaryActionAppearance: null,
@@ -189,37 +198,41 @@ describe(toHeroBlogModule, () => {
 
     const hero = toHeroBlogModule(raw);
 
-    expect(hero.primaryAction?.appearance).toBeUndefined();
+    expect(hero.ctaButtons[0]?.appearance).toBeUndefined();
   });
 
-  it('leaves secondaryAction undefined when unset', () => {
-    const raw = makeRawHeroBlogModule({ secondaryAction: null });
+  it('has no ctaButtons when there is no post and no authored secondary', () => {
+    const raw = makeRawHeroBlogModule({ post: null, ctaButtons: null });
 
     const hero = toHeroBlogModule(raw);
 
-    expect(hero.secondaryAction).toBeUndefined();
+    expect(hero.ctaButtons).toEqual([]);
   });
 
-  it('maps an authored secondaryAction', () => {
+  it('places the derived primary before the authored secondary', () => {
     const raw = makeRawHeroBlogModule({
-      secondaryAction: {
-        variant: CTA_ACTION_VARIANT.SECONDARY,
-        appearance: null,
-        link: {
-          label: 'View all posts',
-          linkType: 'INTERNAL',
-          url: null,
-          internalReference: { _type: 'page_postIndex', slug: null },
-          openInNewTab: null,
-          platform: null,
-          accessibleLabel: null,
-        },
-      },
+      post: makeRawPostCard(),
+      ctaButtons: [
+        makeRawCtaButton({
+          variant: CTA_ACTION_VARIANT.SECONDARY,
+          appearance: null,
+          link: {
+            label: 'View all posts',
+            linkType: LINK_TYPE.INTERNAL,
+            internalReference: { _type: 'page_postIndex', slug: null },
+            openInNewTab: null,
+          },
+        }),
+      ],
     });
 
     const hero = toHeroBlogModule(raw);
 
-    expect(hero.secondaryAction).toEqual({
+    expect(hero.ctaButtons).toHaveLength(2);
+    expect(hero.ctaButtons[0]).toMatchObject({
+      variant: CTA_ACTION_VARIANT.PRIMARY,
+    });
+    expect(hero.ctaButtons[1]).toEqual({
       variant: CTA_ACTION_VARIANT.SECONDARY,
       appearance: undefined,
       link: {
@@ -230,6 +243,26 @@ describe(toHeroBlogModule, () => {
         ariaLabel: undefined,
       },
     });
+  });
+
+  it('drops an authored secondary whose link cannot resolve to an href', () => {
+    const raw = makeRawHeroBlogModule({
+      post: null,
+      ctaButtons: [
+        makeRawCtaButton({
+          link: {
+            label: 'Broken',
+            linkType: LINK_TYPE.INTERNAL,
+            internalReference: null,
+            openInNewTab: null,
+          },
+        }),
+      ],
+    });
+
+    const hero = toHeroBlogModule(raw);
+
+    expect(hero.ctaButtons).toEqual([]);
   });
 
   it('takes contentPosition from contentPositionSplit on Split, ignoring contentPositionBanner', () => {

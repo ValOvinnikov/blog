@@ -1,9 +1,13 @@
 import {
+  CTA_ACTION_VARIANT,
   HERO_IMAGE_SOURCE,
   type ISanityImage,
   type TMaybeUndefined,
 } from '@blog/config';
-import { toCtaAction } from '@blog/service/shared/transformers/to-cta-action';
+import {
+  toCtaButton,
+  type TCtaButton,
+} from '@blog/service/shared/transformers/to-cta-button';
 import { toHeroPresentation } from '@blog/service/shared/transformers/to-hero-presentation';
 import { toHeroPrimaryAction } from '@blog/service/shared/transformers/to-hero-primary-action';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
@@ -15,7 +19,11 @@ import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image
 import type { InferResultType } from 'groqd';
 
 import type { heroBlogModuleQuery } from './query';
-import type { THeroBlogModule, THeroBlogModuleBase } from './types';
+import type {
+  THeroBlogButton,
+  THeroBlogModule,
+  THeroBlogModuleBase,
+} from './types';
 
 export type TRawHeroBlogModule = InferResultType<typeof heroBlogModuleQuery>;
 
@@ -33,6 +41,52 @@ function toImage(
   }
 }
 
+function toPrimaryButton(
+  raw: TRawHeroBlogModule,
+  post: TPostCard | undefined,
+): THeroBlogButton | undefined {
+  const primaryAction = toHeroPrimaryAction(
+    raw.primaryActionLabel,
+    post,
+    raw.primaryActionAppearance,
+  );
+  if (!primaryAction) return undefined;
+
+  return {
+    variant: CTA_ACTION_VARIANT.PRIMARY,
+    appearance: primaryAction.appearance,
+    link: {
+      label: primaryAction.label,
+      href: primaryAction.href,
+      target: primaryAction.target,
+      platform: primaryAction.platform,
+      ariaLabel: undefined,
+    },
+    hiddenLabelSuffix: primaryAction.hiddenLabelSuffix,
+  };
+}
+
+function toSecondaryButtons(
+  raw: TRawHeroBlogModule['ctaButtons'],
+): THeroBlogButton[] {
+  if (!raw || raw.length === 0) return [];
+
+  return raw
+    .map(toCtaButton)
+    .filter((button): button is TCtaButton => button !== undefined)
+    .map((button) => ({ ...button, hiddenLabelSuffix: undefined }));
+}
+
+/** Orders the hero's CTA buttons with any derived primary first, followed by authored `ctaButtons` in stored order. */
+function toCtaButtons(
+  raw: TRawHeroBlogModule,
+  post: TPostCard | undefined,
+): THeroBlogButton[] {
+  const primary = toPrimaryButton(raw, post);
+  const secondary = toSecondaryButtons(raw.ctaButtons);
+  return primary ? [primary, ...secondary] : secondary;
+}
+
 export function toHeroBlogModule(raw: TRawHeroBlogModule): THeroBlogModule {
   const post = raw.post ? toPostCard(raw.post) : undefined;
   const { contentPosition, mediaOrder } = toHeroPresentation(raw);
@@ -43,14 +97,7 @@ export function toHeroBlogModule(raw: TRawHeroBlogModule): THeroBlogModule {
     eyebrow: raw.eyebrow ?? post?.topic?.title,
     supportingText: post?.excerpt,
     sanityImage: toImage(raw, post),
-    primaryAction: toHeroPrimaryAction(
-      raw.primaryActionLabel,
-      post,
-      raw.primaryActionAppearance,
-    ),
-    secondaryAction: raw.secondaryAction
-      ? toCtaAction(raw.secondaryAction)
-      : undefined,
+    ctaButtons: toCtaButtons(raw, post),
     contentPosition,
     contentAlignment: raw.contentAlignment ?? undefined,
     mediaOrder,

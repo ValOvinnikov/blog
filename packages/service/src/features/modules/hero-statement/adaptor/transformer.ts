@@ -1,8 +1,7 @@
-import type { TMaybeUndefined } from '@blog/config';
 import {
-  toCtaAction,
-  type TCtaAction,
-} from '@blog/service/shared/transformers/to-cta-action';
+  toCtaButton,
+  type TCtaButton,
+} from '@blog/service/shared/transformers/to-cta-button';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toHeroPresentation } from '@blog/service/shared/transformers/to-hero-presentation';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
@@ -16,17 +15,14 @@ export type TRawHeroStatementModule = InferResultType<
   typeof heroStatementModuleQuery
 >;
 
-function toActions(
-  raw: TRawHeroStatementModule['actions'],
-): TMaybeUndefined<readonly TCtaAction[]> {
-  const items = raw?.actions;
-  if (!items || items.length === 0) return undefined;
+function toCtaButtons(
+  raw: TRawHeroStatementModule['ctaButtons'],
+): TCtaButton[] {
+  if (!raw || raw.length === 0) return [];
 
-  const actions = items
-    .map(toCtaAction)
-    .filter((action): action is TCtaAction => action !== undefined);
-
-  return actions.length > 0 ? actions : undefined;
+  return raw
+    .map(toCtaButton)
+    .filter((button): button is TCtaButton => button !== undefined);
 }
 
 export function toHeroStatementModule(
@@ -40,7 +36,7 @@ export function toHeroStatementModule(
     headingBlock: toHeadingBlock(raw.headingBlock),
     eyebrow: raw.eyebrow ?? undefined,
     sanityImage: toSanityImage(raw.image),
-    actions: toActions(raw.actions),
+    ctaButtons: toCtaButtons(raw.ctaButtons),
     contentPosition,
     contentAlignment: raw.contentAlignment ?? undefined,
     mediaOrder,

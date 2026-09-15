@@ -270,27 +270,64 @@ describe('heroBlogSchema image field', () => {
   });
 });
 
-describe('heroBlogSchema secondaryAction field', () => {
+describe('heroBlogSchema ctaButtons field', () => {
   it('is valid when unset', () => {
-    const validate = getFieldCustomValidator(getField('secondaryAction'));
+    const validate = getFieldCustomValidator(getField('ctaButtons'));
 
     expect(validate(undefined, { parent: {} })).toBe(true);
   });
 
-  it('is valid with the Secondary variant', () => {
-    const validate = getFieldCustomValidator(getField('secondaryAction'));
+  it('is valid with a single Secondary button', () => {
+    const validate = getFieldCustomValidator(getField('ctaButtons'));
 
     expect(
-      validate({ variant: CTA_ACTION_VARIANT.SECONDARY }, { parent: {} }),
+      validate([{ variant: CTA_ACTION_VARIANT.SECONDARY }], { parent: {} }),
     ).toBe(true);
   });
 
-  it('errors with the Primary variant', () => {
-    const validate = getFieldCustomValidator(getField('secondaryAction'));
+  it('rejects an authored Primary button — the primary is derived from the resolved post', () => {
+    const validate = getFieldCustomValidator(getField('ctaButtons'));
 
     expect(
-      validate({ variant: CTA_ACTION_VARIANT.PRIMARY }, { parent: {} }),
-    ).toBe('Secondary Action must use the Secondary variant.');
+      validate([{ variant: CTA_ACTION_VARIANT.PRIMARY }], { parent: {} }),
+    ).toBe('Only Secondary buttons are allowed here.');
+  });
+
+  it('rejects a duplicate Secondary button', () => {
+    const validate = getFieldCustomValidator(getField('ctaButtons'));
+
+    expect(
+      validate(
+        [
+          { variant: CTA_ACTION_VARIANT.SECONDARY },
+          { variant: CTA_ACTION_VARIANT.SECONDARY },
+        ],
+        { parent: {} },
+      ),
+    ).toBe('Only one Secondary button is allowed.');
+  });
+
+  it('caps at one button via heroFields({ buttons: { max: 1 } })', () => {
+    const field = getField('ctaButtons');
+    let maxArg: number | undefined;
+
+    const rule = {
+      min: () => rule,
+      max: (n: number) => {
+        maxArg = n;
+        return rule;
+      },
+      custom: () => rule,
+    };
+
+    if (!field.validation) {
+      throw new Error('Expected ctaButtons field to define validation.');
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (field.validation as any)(rule);
+
+    expect(maxArg).toBe(1);
   });
 });
 

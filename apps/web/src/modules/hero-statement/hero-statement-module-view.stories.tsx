@@ -31,7 +31,7 @@ const meta = {
         'A marketing hero for a landing or home page — an authored statement rather than a resolved post, with zero, one, or two authored actions.',
     }),
     sanityImage: makeSanityImage(),
-    actions: ctaActionsDemo.slice(0, 1),
+    ctaButtons: ctaActionsDemo.slice(0, 1),
     contentPosition: undefined,
     contentAlignment: undefined,
     mediaOrder: undefined,
@@ -46,13 +46,13 @@ export const Default: TStory = {};
 
 export const NoActions: TStory = {
   args: {
-    actions: undefined,
+    ctaButtons: [],
   },
 };
 
 export const TwoActions: TStory = {
   args: {
-    actions: ctaActionsDemo,
+    ctaButtons: ctaActionsDemo,
   },
 };
 
@@ -65,6 +65,6 @@ export const Stacked: TStory = {
 export const Banner: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
-    actions: ctaActionsDemo,
+    ctaButtons: ctaActionsDemo,
   },
 };

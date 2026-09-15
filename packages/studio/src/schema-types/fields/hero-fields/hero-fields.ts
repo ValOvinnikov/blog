@@ -3,11 +3,12 @@ import {
   FULL_BRAND_VARIANT_LIST,
   HERO_VARIANT,
   MEDIA_ORDER,
+  type TCtaActionVariant,
   type THeroVariant,
 } from '@blog/config/constants';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
-import { actionGroupField } from '@blog/studio/schema-types/objects/action-group/action-group-field';
+import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { toTitleCase } from '@blog/utils/primitives';
@@ -28,6 +29,8 @@ type THeroFieldsOptions = {
   variants?: readonly THeroVariant[];
   /** Pass `false` when the kind supplies its own image field in this position. */
   image?: false;
+  /** Constrains the shared ctaButtons field, for a kind whose primary is derived rather than authored. */
+  buttons?: { max?: number; allowVariants?: TCtaActionVariant[] };
 };
 
 /**
@@ -142,7 +145,7 @@ export const heroFields = (options: THeroFieldsOptions = {}) => {
       initialValue: MEDIA_ORDER.LAST,
       hidden: isNotVariant(HERO_VARIANT.STACKED),
     }),
-    actionGroupField(),
+    ctaButtonsField(options.buttons),
     heroLayoutField,
   ];
 };

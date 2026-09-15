@@ -107,7 +107,7 @@ describe('HERO_MAP', () => {
           heading: 'Build faster, ship sooner',
         }),
         sanityImage: undefined,
-        actions: undefined,
+        ctaButtons: [],
         contentPosition: undefined,
         contentAlignment: undefined,
         mediaOrder: undefined,

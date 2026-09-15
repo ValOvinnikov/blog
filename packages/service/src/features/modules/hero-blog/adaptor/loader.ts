@@ -8,9 +8,8 @@ import { heroBlogModuleQuery } from './query';
 import { toHeroBlogModule } from './transformer';
 import type { THeroBlogModule } from './types';
 
-// The tags below must cover every document type the query derefs — the
-// resolved post's author/topic and the secondary action's link target —
-// not just the module itself.
+// The tags below cover every document type the query derefs: the resolved
+// post's author/topic, and every page type a `ctaButtons` link can target.
 export async function getHeroBlog(
   id: string,
   tenant: TTenantSanityContext,
@@ -24,10 +23,16 @@ export async function getHeroBlog(
         `module:${id}`,
         'posts',
         'author',
-        'topic',
-        'page_post',
+        'link',
+        'homePage',
         'page_landing',
+        'page_post',
         'page_postIndex',
+        'page_topic',
+        'page_topicIndex',
+        'page_tag',
+        'page_tagIndex',
+        'topic',
       ],
       tenant.projectId,
     ),

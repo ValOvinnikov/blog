@@ -86,7 +86,14 @@ describe('rename-link-object-to-inline-link migration wiring', () => {
     expect(result).toBeUndefined();
   });
 
-  it('is scoped to exactly the document types the real schema graph embeds inlineLink in', () => {
+  /**
+   * A migration's `documentTypes` targets data as it existed when the
+   * migration was written, not the live schema — so it may keep covering a
+   * document type whose schema embedding of `inlineLink` has since been
+   * removed, but it must never omit a type the schema currently embeds it
+   * in.
+   */
+  it('covers every document type the real schema graph currently embeds inlineLink in', () => {
     const embedding = typesEmbedding(inlineLinkSchema.name);
 
     const derivedDocumentTypes = (schemaTypes as TTypeNode[])
@@ -96,9 +103,13 @@ describe('rename-link-object-to-inline-link migration wiring', () => {
           schemaType.name !== undefined &&
           embedding.has(schemaType.name),
       )
-      .map((schemaType) => schemaType.name as string)
-      .sort();
+      .map((schemaType) => schemaType.name as string);
 
-    expect([...migration.documentTypes].sort()).toEqual(derivedDocumentTypes);
+    const documentTypes = new Set(migration.documentTypes);
+    const missingFromMigration = derivedDocumentTypes.filter(
+      (type) => !documentTypes.has(type),
+    );
+
+    expect(missingFromMigration).toEqual([]);
   });
 });

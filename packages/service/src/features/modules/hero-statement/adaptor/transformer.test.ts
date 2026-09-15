@@ -4,10 +4,11 @@ import {
   CTA_ACTION_APPEARANCE,
   CTA_ACTION_VARIANT,
   HERO_VARIANT,
+  LINK_TYPE,
   MEDIA_ORDER,
 } from '@blog/config';
 import {
-  makeRawCtaAction,
+  makeRawCtaButton,
   makeRawHeroStatementModule,
 } from '@blog/service/testing/modules/fixtures';
 import {
@@ -81,37 +82,30 @@ describe(toHeroStatementModule, () => {
     expect(hero.sanityImage?.alt).toBe('Custom alt');
   });
 
-  it('leaves actions undefined when the group is unset', () => {
-    const raw = makeRawHeroStatementModule({ actions: null });
+  it('returns an empty array for an absent ctaButtons field', () => {
+    const raw = makeRawHeroStatementModule({ ctaButtons: null });
 
     const hero = toHeroStatementModule(raw);
 
-    expect(hero.actions).toBeUndefined();
+    expect(hero.ctaButtons).toEqual([]);
   });
 
-  it('leaves actions undefined when the group has an empty actions array', () => {
-    const raw = makeRawHeroStatementModule({ actions: { actions: [] } });
+  it('returns an empty array when the ctaButtons array is present but empty', () => {
+    const raw = makeRawHeroStatementModule({ ctaButtons: [] });
 
     const hero = toHeroStatementModule(raw);
 
-    expect(hero.actions).toBeUndefined();
+    expect(hero.ctaButtons).toEqual([]);
   });
 
-  it('maps authored actions through toCtaAction', () => {
+  it('maps a single PRIMARY button', () => {
     const raw = makeRawHeroStatementModule({
-      actions: {
-        actions: [
-          makeRawCtaAction({
-            variant: CTA_ACTION_VARIANT.PRIMARY,
-            appearance: CTA_ACTION_APPEARANCE.CONTAINED,
-          }),
-        ],
-      },
+      ctaButtons: [makeRawCtaButton()],
     });
 
     const hero = toHeroStatementModule(raw);
 
-    expect(hero.actions).toEqual([
+    expect(hero.ctaButtons).toEqual([
       {
         variant: CTA_ACTION_VARIANT.PRIMARY,
         appearance: CTA_ACTION_APPEARANCE.CONTAINED,
@@ -124,6 +118,54 @@ describe(toHeroStatementModule, () => {
         },
       },
     ]);
+  });
+
+  it('maps PRIMARY and SECONDARY buttons, preserving order', () => {
+    const raw = makeRawHeroStatementModule({
+      ctaButtons: [
+        makeRawCtaButton({ variant: CTA_ACTION_VARIANT.PRIMARY }),
+        makeRawCtaButton({
+          variant: CTA_ACTION_VARIANT.SECONDARY,
+          appearance: CTA_ACTION_APPEARANCE.INLINE,
+          link: {
+            label: 'Learn more',
+            linkType: LINK_TYPE.EXTERNAL,
+            url: '/learn-more',
+            openInNewTab: null,
+          },
+        }),
+      ],
+    });
+
+    const hero = toHeroStatementModule(raw);
+
+    expect(hero.ctaButtons).toHaveLength(2);
+    expect(hero.ctaButtons[0]).toMatchObject({
+      variant: CTA_ACTION_VARIANT.PRIMARY,
+    });
+    expect(hero.ctaButtons[1]).toMatchObject({
+      variant: CTA_ACTION_VARIANT.SECONDARY,
+      appearance: CTA_ACTION_APPEARANCE.INLINE,
+    });
+  });
+
+  it('drops a button whose link cannot resolve to an href', () => {
+    const raw = makeRawHeroStatementModule({
+      ctaButtons: [
+        makeRawCtaButton({
+          link: {
+            label: 'Broken',
+            linkType: LINK_TYPE.INTERNAL,
+            internalReference: null,
+            openInNewTab: null,
+          },
+        }),
+      ],
+    });
+
+    const hero = toHeroStatementModule(raw);
+
+    expect(hero.ctaButtons).toEqual([]);
   });
 
   it('takes contentPosition from contentPositionSplit on Split, ignoring contentPositionBanner', () => {

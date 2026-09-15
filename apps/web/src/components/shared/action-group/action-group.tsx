@@ -16,7 +16,7 @@ import {
 
 type TActionButtonVariant = 'primary' | 'ghost' | 'link';
 
-export interface IActionGroupAction {
+interface IActionGroupAction {
   link: ILink;
   variant: TCtaActionVariant;
   appearance: TMaybeUndefined<TCtaActionAppearance>;
