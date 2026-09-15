@@ -1,8 +1,7 @@
+import { LINK_TYPE } from '@blog/config/constants';
 import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
-import {
-  getCustomValidator,
-  getRecordedValidators,
-} from '@blog/studio/testing/create-mock-validation-rule';
+import { LINK_PAGE_TYPES } from '@blog/studio/schema-types/documents/link/link-page-types';
+import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
 
 type TCustomFn = (
   value: unknown,
@@ -24,115 +23,186 @@ const getField = (name: string) => {
   return field;
 };
 
-describe('linkSchema exactly-one-target validation', () => {
-  const getInternalReferenceValidator = (): TCustomFn =>
-    getCustomValidator<TCustomFn>(getField('internalReference'));
+const getOptionValues = (field: ReturnType<typeof getField>) => {
+  const options = 'options' in field ? field.options : undefined;
+  const list =
+    options && typeof options === 'object' && 'list' in options
+      ? options.list
+      : undefined;
 
-  const getUrlExactlyOneValidator = (): TCustomFn =>
-    getRecordedValidators<TCustomFn>(getField('url'))[0]!.fn;
+  if (!list) {
+    throw new Error('Expected field to define an options.list.');
+  }
 
-  it('rejects when neither internalReference nor url is set', () => {
-    const validate = getInternalReferenceValidator();
+  return (list as { title: string; value: string }[]).map(
+    (option) => option.value,
+  );
+};
 
-    expect(validate(undefined, { document: {} })).toBe(
-      'Choose an internal page or enter a URL.',
-    );
+const getOptionsLayout = (field: ReturnType<typeof getField>) => {
+  const options = 'options' in field ? field.options : undefined;
+
+  return options && typeof options === 'object' && 'layout' in options
+    ? (options as { layout?: string }).layout
+    : undefined;
+};
+
+const getHiddenFn = (field: ReturnType<typeof getField>): THiddenFn => {
+  if (!('hidden' in field) || typeof field.hidden !== 'function') {
+    throw new Error(`Expected "${field.name}" field to define a hidden() fn.`);
+  }
+
+  return field.hidden as THiddenFn;
+};
+
+describe('linkSchema linkType field', () => {
+  it('is required and offers internal/external as radio options', () => {
+    expect(getOptionValues(getField('linkType'))).toEqual([
+      LINK_TYPE.INTERNAL,
+      LINK_TYPE.EXTERNAL,
+    ]);
+    expect(getOptionsLayout(getField('linkType'))).toBe('radio');
   });
 
-  it('rejects when both internalReference and url are set', () => {
-    const validate = getInternalReferenceValidator();
-
-    expect(
-      validate(undefined, {
-        document: {
-          internalReference: { _ref: 'page-1' },
-          url: '/blog',
-        },
-      }),
-    ).toBe('Choose either an internal page or a URL — not both.');
-  });
-
-  it('passes with only internalReference set', () => {
-    const validate = getInternalReferenceValidator();
-
-    expect(
-      validate(undefined, {
-        document: { internalReference: { _ref: 'page-1' } },
-      }),
-    ).toBe(true);
-  });
-
-  it('passes with only url set', () => {
-    const validate = getUrlExactlyOneValidator();
-
-    expect(validate(undefined, { document: { url: '/blog' } })).toBe(true);
-  });
-
-  it('the url field registers the same exactly-one-target check as internalReference', () => {
-    const validate = getUrlExactlyOneValidator();
-
-    expect(validate(undefined, { document: {} })).toBe(
-      'Choose an internal page or enter a URL.',
-    );
+  it('defaults to internal', () => {
+    expect(linkSchema.initialValue).toMatchObject({
+      linkType: LINK_TYPE.INTERNAL,
+    });
   });
 });
 
-describe('linkSchema url format validation', () => {
-  const getUrlFormatValidator = (): TCustomFn =>
-    getRecordedValidators<TCustomFn>(getField('url'))[1]!.fn;
+describe('linkSchema internalReference field', () => {
+  it('targets exactly the eight page document types', () => {
+    const field = getField('internalReference');
+    const to = 'to' in field ? field.to : undefined;
 
-  it('accepts an empty value (format check only applies once a value exists)', () => {
-    const validate = getUrlFormatValidator();
+    expect(to).toEqual(LINK_PAGE_TYPES.map((type) => ({ type })));
+  });
 
-    expect(validate(undefined, { document: {} })).toBe(true);
+  it('is visible when linkType is internal', () => {
+    const hidden = getHiddenFn(getField('internalReference'));
+
+    expect(hidden({ document: { linkType: LINK_TYPE.INTERNAL } })).toBe(false);
+  });
+
+  it('is hidden when linkType is external', () => {
+    const hidden = getHiddenFn(getField('internalReference'));
+
+    expect(hidden({ document: { linkType: LINK_TYPE.EXTERNAL } })).toBe(true);
+  });
+
+  it('requires a value when linkType is internal', () => {
+    const validate = getCustomValidator<TCustomFn>(
+      getField('internalReference'),
+    );
+
+    expect(
+      validate(undefined, { document: { linkType: LINK_TYPE.INTERNAL } }),
+    ).toBe('Choose a document for an internal link.');
+  });
+
+  it('passes when linkType is internal and a value is set', () => {
+    const validate = getCustomValidator<TCustomFn>(
+      getField('internalReference'),
+    );
+
+    expect(
+      validate(
+        { _ref: 'page-1' },
+        { document: { linkType: LINK_TYPE.INTERNAL } },
+      ),
+    ).toBe(true);
+  });
+
+  it('skips the check when linkType is external', () => {
+    const validate = getCustomValidator<TCustomFn>(
+      getField('internalReference'),
+    );
+
+    expect(
+      validate(undefined, { document: { linkType: LINK_TYPE.EXTERNAL } }),
+    ).toBe(true);
+  });
+});
+
+describe('linkSchema url field', () => {
+  it('is hidden when linkType is internal', () => {
+    const hidden = getHiddenFn(getField('url'));
+
+    expect(hidden({ document: { linkType: LINK_TYPE.INTERNAL } })).toBe(true);
+  });
+
+  it('is visible when linkType is external', () => {
+    const hidden = getHiddenFn(getField('url'));
+
+    expect(hidden({ document: { linkType: LINK_TYPE.EXTERNAL } })).toBe(false);
+  });
+
+  it('skips the check when linkType is internal', () => {
+    const validate = getCustomValidator<TCustomFn>(getField('url'));
+
+    expect(
+      validate(undefined, { document: { linkType: LINK_TYPE.INTERNAL } }),
+    ).toBe(true);
+  });
+
+  it('requires a value when linkType is external', () => {
+    const validate = getCustomValidator<TCustomFn>(getField('url'));
+
+    expect(
+      validate(undefined, { document: { linkType: LINK_TYPE.EXTERNAL } }),
+    ).toBe('Enter a URL or path.');
   });
 
   it('accepts a relative path', () => {
-    const validate = getUrlFormatValidator();
+    const validate = getCustomValidator<TCustomFn>(getField('url'));
 
-    expect(validate('/blog', { document: { url: '/blog' } })).toBe(true);
+    expect(
+      validate('/blog', { document: { linkType: LINK_TYPE.EXTERNAL } }),
+    ).toBe(true);
   });
 
   it('accepts a full http(s) URL', () => {
-    const validate = getUrlFormatValidator();
+    const validate = getCustomValidator<TCustomFn>(getField('url'));
 
     expect(
       validate('https://example.com', {
-        document: { url: 'https://example.com' },
+        document: { linkType: LINK_TYPE.EXTERNAL },
       }),
     ).toBe(true);
   });
 
   it('rejects a bare domain with no scheme or leading slash', () => {
-    const validate = getUrlFormatValidator();
+    const validate = getCustomValidator<TCustomFn>(getField('url'));
 
-    expect(validate('example.com', { document: { url: 'example.com' } })).toBe(
-      'Use a relative path starting with / or a full http(s) URL.',
-    );
+    expect(
+      validate('example.com', { document: { linkType: LINK_TYPE.EXTERNAL } }),
+    ).toBe('Use a relative path starting with / or a full http(s) URL.');
   });
 });
 
 describe('linkSchema openInNewTab field', () => {
-  it('is hidden when no url is set', () => {
-    const field = getField('openInNewTab');
+  it('is hidden when linkType is internal', () => {
+    const hidden = getHiddenFn(getField('openInNewTab'));
 
-    if (!('hidden' in field) || typeof field.hidden !== 'function') {
-      throw new Error('Expected openInNewTab field to define a hidden() fn.');
-    }
-
-    const hidden = field.hidden as THiddenFn;
-
-    expect(hidden({ document: {} })).toBe(true);
-    expect(hidden({ document: { internalReference: { _ref: 'p1' } } })).toBe(
-      true,
-    );
+    expect(hidden({ document: { linkType: LINK_TYPE.INTERNAL } })).toBe(true);
   });
 
-  it('is visible once a url is set', () => {
-    const field = getField('openInNewTab');
-    const hidden = field.hidden as THiddenFn;
+  it('is visible when linkType is external', () => {
+    const hidden = getHiddenFn(getField('openInNewTab'));
 
-    expect(hidden({ document: { url: '/blog' } })).toBe(false);
+    expect(hidden({ document: { linkType: LINK_TYPE.EXTERNAL } })).toBe(false);
+  });
+});
+
+describe('linkSchema has no platform field', () => {
+  it('does not define a platform field', () => {
+    const field = linkSchema.fields.find(
+      (field): field is typeof field & { name: string } =>
+        'name' in field && field.name === 'platform',
+    );
+
+    expect(field).toBeUndefined();
   });
 });
 
@@ -164,6 +234,10 @@ describe('linkSchema required fields', () => {
   it('requires label', () => {
     expect(wasRequiredCalled(getField('label'))).toBe(true);
   });
+
+  it('requires linkType', () => {
+    expect(wasRequiredCalled(getField('linkType'))).toBe(true);
+  });
 });
 
 describe('linkSchema preview', () => {
@@ -175,6 +249,7 @@ describe('linkSchema preview', () => {
     const result = linkSchema.preview.prepare({
       title: 'Homepage CTA',
       label: 'Get started',
+      linkType: LINK_TYPE.INTERNAL,
       internalTitle: 'Landing Page',
       url: undefined,
     });
@@ -193,6 +268,7 @@ describe('linkSchema preview', () => {
     const result = linkSchema.preview.prepare({
       title: 'Docs Link',
       label: 'Read the docs',
+      linkType: LINK_TYPE.EXTERNAL,
       internalTitle: undefined,
       url: 'https://example.com/docs',
     });
