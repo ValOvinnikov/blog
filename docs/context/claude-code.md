@@ -69,6 +69,17 @@ contracts:
     contract substituted a raw `curl` of the vendor's docs site instead. The
     read-only agents below are deliberately not granted them — they review and
     report rather than implement against an API.
+  - Those ten, plus `test-writer`, also carry an identical trailing pair of
+    sections: **Comments in files you touch** and **Reuse before you create**.
+    The first makes comment cleanup opportunistic — an agent trims every
+    over-long comment in any file it edits, so the repo converges without a
+    sweep; a one-shot sweep would have touched ~690 over-long comments across
+    11 workspaces and conflicted with every open PR. The second requires
+    searching for an existing function, type, schema definition or helper
+    before adding one, and surfacing an extend-vs-add-alongside call to the
+    orchestrator as a question rather than settling it silently. Both are
+    duplicated per agent rather than shared, because agent definitions have no
+    include mechanism — change one, change all eleven.
   - `verify-runner` — read-only, Haiku-model runner for the integration
     verify pass (`develop-feature` §5: `type-check`/`lint`/`test`,
     the exact scenario-specific sequence it's given). `build` is not part of

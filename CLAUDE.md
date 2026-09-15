@@ -140,6 +140,31 @@ not reasons to combine.
 This strengthens "Prefer per-layer PRs" below from a preference into a
 requirement; the green-alone test is the same test.
 
+### Split by surface too, not only by workspace
+
+Workspace is one axis; **consumers are the other**. When a feature introduces
+something that several places must then adopt — a new schema type, a shared
+component, a field helper, a constant — introducing it is one PR, and **each
+place that starts using it is another**. Never bundle "add X" with "and convert
+the six places that will use X".
+
+Epic #3164 is the worked example: (1) add the `link` document and its Links
+sidebar section, (2) re-use it in the CTA module, (3) navigation and footer,
+(4) hero modules, (5) Portable Text, (6) retire the legacy shapes. Six PRs, not
+one — each adoption is independently reviewable and independently revertible,
+and a problem with one does not block the other five.
+
+This axis compounds with the workspace rule rather than replacing it: an
+adopting PR that spans studio + service + web because a schema shape changed is
+still one PR, because splitting it further would red `type-check`.
+
+### Put the split to the user before starting
+
+Whatever split you arrive at, **state it and get agreement before the first
+dispatch**: which PRs, in what order, what each contains, and what you have
+deliberately left out of scope. The split is the user's decision to accept or
+change — not a status update delivered after the work is already under way.
+
 ### Say what it touches before starting
 
 Before the first dispatch — and again whenever the answer changes mid-task —
@@ -476,6 +501,21 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
   starting to read like a changelog, a design-doc summary, or an
   implementation walkthrough, it's too long — cut it down to the one
   sentence a future reader actually needs to know before calling it.
+
+  **Doc comments stay — the rule is length, not removal.** A function or
+  component keeps its one doc comment; it just must not run long, and it must
+  never describe which arguments, props or variables the function uses. The
+  type signature already documents that, and prose restating it goes stale the
+  moment a parameter changes.
+
+  **Trim on touch — there is no scheduled comment sweep.** Whenever you or a
+  subagent edits a file, every over-long comment **in that file** gets cut to
+  one sentence as part of the same change. Say so in the dispatch prompt, so
+  the owning layer agent does it rather than the orchestrator hand-editing.
+  This is deliberately opportunistic: a repo-wide sweep would touch ~690
+  over-long comments across 11 workspaces at once and conflict with every open
+  PR, whereas trimming on touch converges on the same result without ever
+  colliding with in-flight work.
 
   **REQUIRED — a source comment must never reference project-management
   state.** This is a hard prohibition, not a length guideline. Specifically,

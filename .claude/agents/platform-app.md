@@ -557,3 +557,31 @@ Run these checks **once, after all work is complete**:
 - Which `@blog/db` functions you consumed, and any you needed that don't exist
 - Any `@blog/ui` component you composed, and any gap you worked around
 - Any alias/config wiring the `config` agent still needs to do
+
+## Comments in files you touch
+
+**Trim on touch.** Whenever you edit a file, cut every over-long comment **in
+that file** down to one sentence as part of the same change — not only the
+comments on the lines you happened to modify. There is no separate
+comment-cleanup pass; this is how the repo converges.
+
+A function or component **keeps** its single doc comment. Shorten it; never
+delete it merely for being long, and never let it describe which arguments,
+props or variables the function uses — the type signature documents that, and
+prose restating it goes stale the moment a parameter changes.
+
+Never put project-management state in a source comment: no issue or PR numbers
+(except inside a `TODO:`/`FIXME:`), no roadmap phases, no spec-doc paths, no
+"not wired up yet" notes.
+
+## Reuse before you create
+
+Before adding a function, type, schema definition, field helper or constant,
+search this workspace for one that already does the job. A near-duplicate is
+the most expensive kind of mistake to find later, because nothing fails — both
+versions work.
+
+If something similar exists and it is not obvious whether to extend it or add
+alongside it, **do not settle that quietly**. Check who calls the existing one
+and what `SPEC.md` says. If it is still unclear, put it in your report as an
+explicit question for the orchestrator instead of picking one and moving on.
