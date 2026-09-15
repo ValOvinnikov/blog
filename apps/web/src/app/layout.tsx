@@ -26,8 +26,10 @@ const SANITY_IMAGE_CDN_ORIGIN = 'https://cdn.sanity.io';
  * Tenant-independent by design: it sits above where the tenant is resolved,
  * so it owns only the static document shell. Theme tokens, font variables,
  * and analytics gating live in `[tenant]/[locale]/layout.tsx`; the
- * `not-found.tsx` boundaries that render outside that layout (this one and
- * `[tenant]/not-found.tsx`) resolve their own.
+ * `not-found.tsx` boundaries that render outside it resolve their own
+ * instead — `[tenant]/not-found.tsx` from the tenant that layout remembered
+ * before it threw, the root one by rendering unthemed (it never resolves a
+ * tenant at all).
  */
 export default function RootLayout({ children }: TProps) {
   return (

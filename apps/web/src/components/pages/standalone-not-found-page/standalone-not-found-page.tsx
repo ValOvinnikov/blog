@@ -1,28 +1,47 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_ISO_CODES, type TThemeTokens } from '@blog/config';
 import { NotFoundPage } from '@web/components/pages/not-found-page';
 import { ThemeScope } from '@web/components/shared/theme-scope';
 import { getThemeTokens } from '@web/utils/get-theme-tokens';
 import { resolveTenantMessages } from '@web/utils/resolve-tenant-messages';
+import { toThemeTokens } from '@web/utils/to-theme-tokens';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 
+type TNotFoundThemeContext = {
+  messages: Record<string, unknown>;
+  themeTokens: TThemeTokens;
+};
+
+const resolveTenantThemeContext = async (
+  baseMessages: Record<string, unknown>,
+  tenant: string,
+): Promise<TNotFoundThemeContext> => {
+  const [resolved, themeTokens] = await Promise.all([
+    resolveTenantMessages(baseMessages, tenant),
+    getThemeTokens(tenant),
+  ]);
+
+  return { messages: resolved.messages, themeTokens };
+};
+
+type TStandaloneNotFoundPageProps = {
+  tenant?: string;
+};
+
 /**
  * StandaloneNotFoundPage — the body every `not-found.tsx` boundary outside
- * `[tenant]/[locale]/layout.tsx` renders (the root `app/not-found.tsx` for
- * unmatched URLs, and `app/[tenant]/not-found.tsx` for a `notFound()` thrown
- * by that layout itself). Both sit above or outside that layout, so it
- * resolves its own theme tokens and locale messages rather than inheriting
- * them — `getThemeTokens`/`resolveTenantMessages` fall through to the
- * `x-tenant-id` request header when called with no `tenant` argument, since
- * neither boundary receives route params.
+ * `[tenant]/[locale]/layout.tsx`'s children renders, since neither receives
+ * route params to inherit theme/locale context from.
  */
-export const StandaloneNotFoundPage = async () => {
+export const StandaloneNotFoundPage = async ({
+  tenant,
+}: TStandaloneNotFoundPageProps = {}) => {
   setRequestLocale(LOCALE_ISO_CODES.EN);
-  const [baseMessages, themeTokens] = await Promise.all([
-    getMessages(),
-    getThemeTokens(),
-  ]);
-  const { messages } = await resolveTenantMessages(baseMessages);
+  const baseMessages = await getMessages();
+
+  const { messages, themeTokens } = tenant
+    ? await resolveTenantThemeContext(baseMessages, tenant)
+    : { messages: baseMessages, themeTokens: toThemeTokens(undefined) };
 
   return (
     <ThemeScope themeTokens={themeTokens}>

@@ -75,12 +75,11 @@ export interface ITenantMessages {
  * messages returned by `getMessages()`, and resolves the same overrides'
  * RICH fields unflattened for `VoiceRichProvider`. Called from every route
  * that builds its own `NextIntlClientProvider` tree
- * (`[tenant]/[locale]/layout.tsx`, and the `not-found.tsx` boundaries that
- * render outside it) — `i18n/request.ts`'s `getRequestConfig` only resolves
- * the base, un-voiced messages since it has no tenant to read. Accepts the
- * `[tenant]` route param and forwards it to `getSiteConfig`; a
- * `not-found.tsx` boundary has no param to supply and falls through to the
- * header.
+ * (`[tenant]/[locale]/layout.tsx`, and `StandaloneNotFoundPage` for the
+ * `not-found.tsx` boundaries that render outside it) — `i18n/request.ts`'s
+ * `getRequestConfig` only resolves the base, un-voiced messages since it has
+ * no tenant to read. Accepts the `[tenant]` route param and forwards it to
+ * `getSiteConfig`.
  */
 export const resolveTenantMessages = async (
   base: Record<string, unknown>,

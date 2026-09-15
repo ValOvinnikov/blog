@@ -29,10 +29,11 @@ describe('NotFound (root not-found route)', () => {
     });
   });
 
-  it('renders StandaloneNotFoundPage', async () => {
+  it('renders StandaloneNotFoundPage with no tenant, never reading the request header', async () => {
     const ui = { type: 'div', props: {} };
     standaloneNotFoundPageMock.mockResolvedValue(ui);
 
     await expect(NotFound()).resolves.toBe(ui);
+    expect(standaloneNotFoundPageMock).toHaveBeenCalledWith();
   });
 });

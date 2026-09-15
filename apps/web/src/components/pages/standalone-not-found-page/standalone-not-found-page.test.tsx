@@ -10,11 +10,13 @@ const {
   setRequestLocaleMock,
   getThemeTokensMock,
   resolveTenantMessagesMock,
+  toThemeTokensMock,
 } = vi.hoisted(() => ({
   getMessagesMock: vi.fn(),
   setRequestLocaleMock: vi.fn(),
   getThemeTokensMock: vi.fn(),
   resolveTenantMessagesMock: vi.fn(),
+  toThemeTokensMock: vi.fn(),
 }));
 
 vi.mock('next-intl/server', () => ({
@@ -30,11 +32,23 @@ vi.mock('@web/utils/resolve-tenant-messages', () => ({
   resolveTenantMessages: resolveTenantMessagesMock,
 }));
 
+vi.mock('@web/utils/to-theme-tokens', () => ({
+  toThemeTokens: toThemeTokensMock,
+}));
+
 const messages = { notFound: { commandNotFound: 'Not found' } };
 const voicedMessages = { notFound: { commandNotFound: 'command not found' } };
 
 const THEME_TOKENS = {
   accentHue: 250,
+  headingFont: 'SPACE_GROTESK',
+  bodyFont: 'NEWSREADER',
+  radiusScale: 'MD',
+  density: 'DEFAULT',
+};
+
+const DEFAULT_THEME_TOKENS = {
+  accentHue: 200,
   headingFont: 'SPACE_GROTESK',
   bodyFont: 'NEWSREADER',
   radiusScale: 'MD',
@@ -50,6 +64,7 @@ describe(`<${StandaloneNotFoundPage.name}/>`, () => {
       messages: voicedMessages,
       rich: {},
     });
+    toThemeTokensMock.mockReturnValue(DEFAULT_THEME_TOKENS);
   });
 
   it('pins the request locale before resolving messages', async () => {
@@ -61,27 +76,52 @@ describe(`<${StandaloneNotFoundPage.name}/>`, () => {
     );
   });
 
-  it('resolves theme tokens and messages with no tenant argument, falling through to the request header', async () => {
-    await StandaloneNotFoundPage();
+  describe('given a tenant', () => {
+    it('resolves theme tokens and messages with that tenant', async () => {
+      await StandaloneNotFoundPage({ tenant: 'tenant-1' });
 
-    expect(getThemeTokensMock).toHaveBeenCalledWith();
-    expect(resolveTenantMessagesMock).toHaveBeenCalledWith(messages);
+      expect(getThemeTokensMock).toHaveBeenCalledWith('tenant-1');
+      expect(resolveTenantMessagesMock).toHaveBeenCalledWith(
+        messages,
+        'tenant-1',
+      );
+      expect(toThemeTokensMock).not.toHaveBeenCalled();
+    });
+
+    it('passes the resolved theme tokens through to ThemeScope', async () => {
+      const ui = await StandaloneNotFoundPage({ tenant: 'tenant-1' });
+
+      expect(ui.type).toBe(ThemeScope);
+      expect(ui.props.themeTokens).toBe(THEME_TOKENS);
+    });
+
+    it('wraps NotFoundPage in its own NextIntlClientProvider, independent of any ancestor provider', async () => {
+      const ui = await StandaloneNotFoundPage({ tenant: 'tenant-1' });
+      const provider = ui.props.children;
+
+      expect(provider.type).toBe(NextIntlClientProvider);
+      expect(provider.props.locale).toBe(LOCALE_ISO_CODES.EN);
+      expect(provider.props.messages).toBe(voicedMessages);
+      expect(provider.props.children.type).toBe(NotFoundPage);
+    });
   });
 
-  it('passes the resolved theme tokens through to ThemeScope', async () => {
-    const ui = await StandaloneNotFoundPage();
+  describe('given no tenant', () => {
+    it('never calls getThemeTokens or resolveTenantMessages', async () => {
+      await StandaloneNotFoundPage();
 
-    expect(ui.type).toBe(ThemeScope);
-    expect(ui.props.themeTokens).toBe(THEME_TOKENS);
-  });
+      expect(getThemeTokensMock).not.toHaveBeenCalled();
+      expect(resolveTenantMessagesMock).not.toHaveBeenCalled();
+    });
 
-  it('wraps NotFoundPage in its own NextIntlClientProvider, independent of any ancestor provider', async () => {
-    const ui = await StandaloneNotFoundPage();
-    const provider = ui.props.children;
+    it('renders with default theme tokens and the base, un-voiced messages', async () => {
+      const ui = await StandaloneNotFoundPage();
 
-    expect(provider.type).toBe(NextIntlClientProvider);
-    expect(provider.props.locale).toBe(LOCALE_ISO_CODES.EN);
-    expect(provider.props.messages).toBe(voicedMessages);
-    expect(provider.props.children.type).toBe(NotFoundPage);
+      expect(toThemeTokensMock).toHaveBeenCalledWith(undefined);
+      expect(ui.props.themeTokens).toBe(DEFAULT_THEME_TOKENS);
+
+      const provider = ui.props.children;
+      expect(provider.props.messages).toBe(messages);
+    });
   });
 });

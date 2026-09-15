@@ -10,13 +10,7 @@ import { notFoundPageVariants } from './not-found-page-variants';
 
 const s = notFoundPageVariants();
 
-/**
- * NotFoundPage — the 404 body content. Rendered from the root
- * `not-found.tsx`, which sits outside the `[tenant]/[locale]` route tree
- * (this app's `Header`/`Footer` chrome lives in `[tenant]/[locale]/layout.tsx`),
- * so this stays a self-contained, centered composition: an optional eyebrow,
- * the page heading, supporting text, and a link home.
- */
+/** NotFoundPage — the centered, full-viewport 404 body shared by every not-found boundary. */
 export const NotFoundPage = () => {
   const t = useTranslations('notFound');
   const eyebrow = t('eyebrow');
