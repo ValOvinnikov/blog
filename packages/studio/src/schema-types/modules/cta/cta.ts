@@ -48,7 +48,7 @@ export const ctaSchema = defineType({
       description:
         'Which shape this call to action takes: Banner uses the image as a full-bleed background, Split places it alongside the copy, and Callout keeps it in a simple card with the image above the content.',
       options: {
-        layout: 'radio',
+        layout: 'dropdown',
         list: Object.values(CTA_VARIANT).map((value) => ({
           title: toTitleCase(value),
           value,
