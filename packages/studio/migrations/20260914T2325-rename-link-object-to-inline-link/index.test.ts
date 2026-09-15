@@ -54,9 +54,11 @@ const typesEmbedding = (targetName: string): Set<string> => {
 
       if (!name || embedding.has(name)) continue;
 
-      const directRefs = collectDirectTypeRefs(
-        schemaType.fields ?? schemaType.of,
-      );
+      const directRefs = collectDirectTypeRefs([
+        ...(schemaType.fields ?? []),
+        ...(schemaType.of ?? []),
+        ...(schemaType.marks?.annotations ?? []),
+      ]);
 
       if ([...directRefs].some((ref) => embedding.has(ref))) {
         embedding.add(name);
