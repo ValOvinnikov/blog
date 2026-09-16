@@ -9,7 +9,6 @@ import { Fragment, type ElementType } from 'react';
 
 export type TSocialLinksProps = {
   social: TSocialProfile[];
-  /** Wraps each rendered link — pass `'li'` when the parent is a `<ul>`. Defaults to `Fragment`. */
   itemAs?: ElementType;
 };
 
