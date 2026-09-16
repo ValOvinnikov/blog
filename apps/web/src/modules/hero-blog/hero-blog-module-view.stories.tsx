@@ -13,13 +13,12 @@ const primaryButton = {
   variant: CTA_ACTION_VARIANT.PRIMARY,
   appearance: CTA_ACTION_APPEARANCE.CONTAINED,
   link: {
-    label: 'Read more',
+    label: 'Read the post',
     href: '/blog/building-a-design-system',
     target: undefined,
     platform: undefined,
     ariaLabel: undefined,
   },
-  hiddenLabelSuffix: 'Building a Design System from Scratch',
 };
 
 const secondaryButton = {
@@ -32,7 +31,6 @@ const secondaryButton = {
     platform: undefined,
     ariaLabel: undefined,
   },
-  hiddenLabelSuffix: undefined,
 };
 
 const meta = {

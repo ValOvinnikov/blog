@@ -15,13 +15,12 @@ const derivedPrimaryButton = {
   variant: CTA_ACTION_VARIANT.PRIMARY,
   appearance: undefined,
   link: {
-    label: 'Read more',
+    label: 'Read the post',
     href: '/blog/welcome-to-the-blog',
     target: undefined,
     platform: undefined,
     ariaLabel: undefined,
   },
-  hiddenLabelSuffix: 'Welcome to the blog',
 };
 
 const secondaryButton = {
@@ -34,7 +33,6 @@ const secondaryButton = {
     platform: undefined,
     ariaLabel: undefined,
   },
-  hiddenLabelSuffix: undefined,
 };
 
 const setup = customRender(HeroBlogModuleView, {
@@ -83,35 +81,12 @@ describe(`<${HeroBlogModuleView.name}/>`, () => {
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
-  it('gives the default "Read more" primary CTA a descriptive accessible name via visually-hidden text', () => {
+  it('renders the authored primary label as the link text', () => {
     setup({ ctaButtons: [derivedPrimaryButton] });
 
-    const link = screen.getByRole('link', {
-      name: 'Read more: Welcome to the blog',
-    });
+    const link = screen.getByRole('link', { name: 'Read the post' });
     expect(link).toBeVisible();
-    expect(link).toHaveTextContent('Read more: Welcome to the blog');
-  });
-
-  it('renders no hidden suffix when a custom (already-descriptive) label is authored', () => {
-    setup({
-      ctaButtons: [
-        {
-          ...derivedPrimaryButton,
-          link: {
-            ...derivedPrimaryButton.link,
-            label: 'Explore our latest stories',
-          },
-          hiddenLabelSuffix: undefined,
-        },
-      ],
-    });
-
-    const link = screen.getByRole('link', {
-      name: 'Explore our latest stories',
-    });
-    expect(link).toBeVisible();
-    expect(link).toHaveTextContent('Explore our latest stories');
+    expect(link).toHaveTextContent('Read the post');
   });
 
   it.each([
@@ -125,13 +100,12 @@ describe(`<${HeroBlogModuleView.name}/>`, () => {
         ctaButtons: [
           {
             ...derivedPrimaryButton,
-            hiddenLabelSuffix: undefined,
             appearance,
           },
         ],
       });
 
-      const link = screen.getByRole('link', { name: 'Read more' });
+      const link = screen.getByRole('link', { name: 'Read the post' });
       expect(link).toBeVisible();
       expect(link.className).toContain(expectedClass);
     },
@@ -142,7 +116,7 @@ describe(`<${HeroBlogModuleView.name}/>`, () => {
 
     const links = screen.getAllByRole('link');
     expect(links).toHaveLength(2);
-    expect(links[0]).toHaveTextContent('Read more: Welcome to the blog');
+    expect(links[0]).toHaveTextContent('Read the post');
     expect(links[1]).toHaveTextContent('View all posts');
   });
 

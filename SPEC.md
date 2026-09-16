@@ -337,8 +337,10 @@ paragraphs is a landing page that has not been split into modules yet),
 plus the shared `ctaButtons` array (up to two `ctaButton`s). It then calls
 `heroFields()` with **no options**, so the shared tail's own `image` is
 the module's, where `module_heroBlog` replaces it with a post-sourced one.
-Actions are not part of the tail: `module_heroBlog`'s primary is derived
-from the post (`primaryActionLabel` / `primaryActionAppearance`) and its
+Actions are not part of the tail: `module_heroBlog`'s primary links to the
+resolved post, with a **required** authored `primaryActionLabel` and
+`primaryActionAppearance` (no "Read more" fallback — an unlabelled hero is
+a validation error, not a default), and its
 one optional secondary is a `secondaryAction` of type `ctaSecondaryButton`
 — the same stored shape as `ctaButton`, with `variant` fixed to
 `SECONDARY` and `link` optional, since Sanity seeds the nested object on

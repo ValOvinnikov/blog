@@ -85,6 +85,7 @@ const wasRequiredCalled = (field: { validation?: unknown }) => {
       requiredCalled = true;
       return rule;
     },
+    max: () => rule,
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
@@ -255,11 +256,15 @@ describe('heroBlogSchema primaryActionLabel and primaryActionAppearance fields',
     expect(field.initialValue).toBe(CTA_ACTION_APPEARANCE.CONTAINED);
   });
 
-  it('primaryActionAppearance renders as a dropdown: optional, no field depends on it', () => {
+  it('primaryActionAppearance renders as a required dropdown', () => {
     const field = getField('primaryActionAppearance');
 
     expect(getLayout(field)).toBe('dropdown');
-    expect(field.validation).toBeUndefined();
+    expect(wasRequiredCalled(field)).toBe(true);
+  });
+
+  it('primaryActionLabel is required — the hero has no fallback label', () => {
+    expect(wasRequiredCalled(getField('primaryActionLabel'))).toBe(true);
   });
 });
 

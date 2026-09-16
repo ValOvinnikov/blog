@@ -9,10 +9,7 @@ import type {
 } from '@blog/config';
 import type { TCtaButton } from '@blog/service/shared/transformers/to-cta-button';
 
-/** A hero-blog CTA button — a `TCtaButton` plus the sr-only suffix the derived primary carries when it falls back to its default label. */
-export type THeroBlogButton = TCtaButton & {
-  hiddenLabelSuffix: TMaybeUndefined<string>;
-};
+export type THeroBlogButton = TCtaButton;
 
 export type THeroBlogModuleBase = {
   brandVariant: TFullBrandVariant;
