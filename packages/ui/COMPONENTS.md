@@ -16,7 +16,7 @@ Variants: type: ALERT_TYPE.SUCCESS|ALERT_TYPE.WARNING|ALERT_TYPE.ERROR|ALERT_TYP
 
 Avatar atom — renders a provided image, or an initials badge derived from `name` when no image is supplied.
 Props: src?: string · alt: string · name: string · size?: TAvatarVariants['size'] · className?: string · onImageError?: () => void _(extends IWithDataTestId)_
-Variants: size: SIZE.SM|SIZE.MD|SIZE.LG
+Variants: size: SIZE.SM|SIZE.MD|SIZE.LG|SIZE.XL|SIZE.XXL
 
 ### BackToTop — `atoms/back-to-top/back-to-top.tsx`
 
@@ -331,10 +331,10 @@ Variants: variant: HERO_VARIANT.SPLIT|HERO_VARIANT.STACKED|HERO_VARIANT.BANNER �
 
 Slots:
 
-- **Hero.Avatar** — the portrait slot of a `Hero`, rendered before the eyebrow; a round frame for a person's photo on the profile hero. Props: contentAlignment?: THeroAvatarVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
+- **Hero.Avatar** — the portrait slot of a `Hero`, rendered before the eyebrow; a styled `<div>` for the caller's own `Avatar` or image. Props: contentAlignment?: THeroAvatarVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
 - **Hero.Media** — the media slot of a `Hero`; frames its content via `MediaFrame`, at a configurable ratio (16:9 by default). Props: isFramed?: boolean · ratio?: TMediaFrameRatio · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: ratio: video|square|portrait|classic
 - **Hero.Cta** — the call-to-action slot of a `Hero`; a styled `<div>` for the hero's buttons or links. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **Hero.Social** — the social-links slot of a `Hero`, rendered after `Hero.Cta`; a labelled list the caller fills with its own link items. Props: ariaLabel: string · contentAlignment?: THeroSocialVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
+- **Hero.Social** — the trailing slot of a `Hero`, rendered after `Hero.Cta`; a styled `<div>` for the caller's own social links, typically a labelled list. Props: contentAlignment?: THeroSocialVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
 
 ### NewsletterSignup — `organisms/newsletter-signup/newsletter-signup.tsx`
 

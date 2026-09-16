@@ -6,6 +6,7 @@ import {
   MEDIA_ORDER,
   SIZE,
 } from '@blog/config';
+import { Avatar } from '@blog/ui/atoms/avatar';
 import { Icon } from '@blog/ui/atoms/icon';
 import { ShareLink } from '@blog/ui/molecules/share-link';
 import { objectKeys } from '@blog/utils/primitives';
@@ -34,36 +35,40 @@ const bannerContent = (alt: string) => (
 const profileContent = (
   <>
     <Hero.Avatar>
-      <img
+      <Avatar
         src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=256&h=256&fit=crop"
         alt="Portrait of Jane Doe"
+        name="Jane Doe"
+        size={SIZE.XXL}
       />
     </Hero.Avatar>
     <Hero.Cta>
       <NavLink href="/posts/design-system">Read more</NavLink>
     </Hero.Cta>
-    <Hero.Social ariaLabel="Find Jane Doe elsewhere">
-      <li>
-        <ShareLink
-          href="https://github.com/janedoe"
-          label="GitHub"
-          icon={<Icon name={ICONS.GITHUB} size={SIZE.SM} />}
-        />
-      </li>
-      <li>
-        <ShareLink
-          href="https://linkedin.com/in/janedoe"
-          label="LinkedIn"
-          icon={<Icon name={ICONS.LINKEDIN} size={SIZE.SM} />}
-        />
-      </li>
-      <li>
-        <ShareLink
-          href="https://x.com/janedoe"
-          label="X"
-          icon={<Icon name={ICONS.X} size={SIZE.SM} />}
-        />
-      </li>
+    <Hero.Social>
+      <ul aria-label="Find Jane Doe elsewhere" className="flex flex-wrap gap-2">
+        <li>
+          <ShareLink
+            href="https://github.com/janedoe"
+            label="GitHub"
+            icon={<Icon name={ICONS.GITHUB} size={SIZE.SM} />}
+          />
+        </li>
+        <li>
+          <ShareLink
+            href="https://linkedin.com/in/janedoe"
+            label="LinkedIn"
+            icon={<Icon name={ICONS.LINKEDIN} size={SIZE.SM} />}
+          />
+        </li>
+        <li>
+          <ShareLink
+            href="https://x.com/janedoe"
+            label="X"
+            icon={<Icon name={ICONS.X} size={SIZE.SM} />}
+          />
+        </li>
+      </ul>
     </Hero.Social>
   </>
 );

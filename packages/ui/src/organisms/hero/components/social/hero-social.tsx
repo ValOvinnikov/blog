@@ -8,27 +8,24 @@ import {
 
 export type THeroSocialProps = IWithClassName &
   IWithDataTestId & {
-    ariaLabel: string;
     contentAlignment?: THeroSocialVariants['contentAlignment'];
     children?: ReactNode;
   };
 
 /**
- * HeroSocial — the social-links slot of a `Hero`, rendered after `Hero.Cta`; a
- * labelled list the caller fills with its own link items.
+ * HeroSocial — the trailing slot of a `Hero`, rendered after `Hero.Cta`; a
+ * styled `<div>` for the caller's own social links, typically a labelled list.
  */
 export const HeroSocial = ({
-  ariaLabel,
   contentAlignment,
   className,
   dataTestId,
   children,
 }: THeroSocialProps) => (
-  <ul
-    aria-label={ariaLabel}
+  <div
     className={heroSocialVariants({ contentAlignment, class: className })}
     data-testid={dataTestId}
   >
     {children}
-  </ul>
+  </div>
 );

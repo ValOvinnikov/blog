@@ -4,6 +4,7 @@ import {
   HERO_VARIANT,
   MEDIA_ORDER,
 } from '@blog/config';
+import { Avatar } from '@blog/ui/atoms/avatar';
 import { AZURE_SCRIM, NEUTRAL_SCRIM } from '@blog/ui/lib/styling';
 import {
   customRender,
@@ -495,11 +496,23 @@ describe(`<${Hero.name}/>`, () => {
     ).toBeTruthy();
   });
 
-  it('does not render an avatar frame when Hero.Avatar is omitted', () => {
+  it('does not render avatar content when Hero.Avatar is omitted', () => {
     setup();
     expect(
       screen.queryByAltText('Portrait of Jane Doe'),
     ).not.toBeInTheDocument();
+  });
+
+  it('renders arbitrary children inside Hero.Avatar, not just an image', () => {
+    renderElement(
+      <Hero title="Building a Design System" titleId="hero-title">
+        <Hero.Avatar>
+          <Avatar alt="Jane Doe" name="Jane Doe" />
+        </Hero.Avatar>
+      </Hero>,
+    );
+
+    expect(screen.getByText('JD')).toBeVisible();
   });
 
   it.each([
@@ -551,10 +564,12 @@ describe(`<${Hero.name}/>`, () => {
         <Hero.Cta>
           <a href="/posts/design-system">Read more</a>
         </Hero.Cta>
-        <Hero.Social ariaLabel="Find Jane elsewhere">
-          <li>
-            <a href="https://github.com/janedoe">GitHub</a>
-          </li>
+        <Hero.Social>
+          <ul aria-label="Find Jane elsewhere">
+            <li>
+              <a href="https://github.com/janedoe">GitHub</a>
+            </li>
+          </ul>
         </Hero.Social>
       </Hero>,
     );
@@ -567,23 +582,19 @@ describe(`<${Hero.name}/>`, () => {
     ).toBeTruthy();
   });
 
-  it('renders the ariaLabel on the Hero.Social list', () => {
+  it('renders arbitrary children inside Hero.Social, not just a list', () => {
     renderElement(
       <Hero title="Building a Design System" titleId="hero-title">
-        <Hero.Social ariaLabel="Find Jane elsewhere">
-          <li>
-            <a href="https://github.com/janedoe">GitHub</a>
-          </li>
+        <Hero.Social>
+          <a href="https://github.com/janedoe">GitHub</a>
         </Hero.Social>
       </Hero>,
     );
 
-    expect(
-      screen.getByRole('list', { name: 'Find Jane elsewhere' }),
-    ).toBeVisible();
+    expect(screen.getByRole('link', { name: 'GitHub' })).toBeVisible();
   });
 
-  it('does not render a social list when Hero.Social is omitted', () => {
+  it('does not render social content when Hero.Social is omitted', () => {
     setup();
     expect(screen.queryByRole('list')).not.toBeInTheDocument();
   });
@@ -601,17 +612,17 @@ describe(`<${Hero.name}/>`, () => {
           titleId="hero-title"
           contentAlignment={alignment}
         >
-          <Hero.Social ariaLabel="Find Jane elsewhere">
-            <li>
-              <a href="https://github.com/janedoe">GitHub</a>
-            </li>
+          <Hero.Social dataTestId="hero-social">
+            <ul aria-label="Find Jane elsewhere">
+              <li>
+                <a href="https://github.com/janedoe">GitHub</a>
+              </li>
+            </ul>
           </Hero.Social>
         </Hero>,
       );
 
-      expect(
-        screen.getByRole('list', { name: 'Find Jane elsewhere' }),
-      ).toHaveClass(expectedClass);
+      expect(screen.getByTestId('hero-social')).toHaveClass(expectedClass);
     },
   );
 
@@ -665,10 +676,12 @@ describe(`<${Hero.name}/>`, () => {
           <Hero.Cta>
             <a href="/posts/design-system">Read more</a>
           </Hero.Cta>
-          <Hero.Social ariaLabel="Find Jane elsewhere">
-            <li>
-              <a href="https://github.com/janedoe">GitHub</a>
-            </li>
+          <Hero.Social>
+            <ul aria-label="Find Jane elsewhere">
+              <li>
+                <a href="https://github.com/janedoe">GitHub</a>
+              </li>
+            </ul>
           </Hero.Social>
         </Hero>,
       );

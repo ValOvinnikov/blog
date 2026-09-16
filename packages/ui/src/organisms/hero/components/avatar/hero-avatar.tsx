@@ -14,7 +14,7 @@ export type THeroAvatarProps = IWithClassName &
 
 /**
  * HeroAvatar — the portrait slot of a `Hero`, rendered before the eyebrow; a
- * round frame for a person's photo on the profile hero.
+ * styled `<div>` for the caller's own `Avatar` or image.
  */
 export const HeroAvatar = ({
   contentAlignment,
