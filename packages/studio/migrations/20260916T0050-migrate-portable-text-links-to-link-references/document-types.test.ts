@@ -27,9 +27,42 @@ const collectDirectTypeRefs = (nodes: TTypeNode[] | undefined): Set<string> => {
   return refs;
 };
 
-/** Every registered schema type that embeds `targetName`, directly or transitively. */
+const collectAnnotationRefs = (schemaType: TTypeNode): Set<string> => {
+  const refs = new Set<string>();
+
+  const visit = (node: TTypeNode | undefined, viaAnnotation: boolean): void => {
+    if (!node) return;
+    if (typeof node.type === 'string' && viaAnnotation) refs.add(node.type);
+    node.fields?.forEach((child) => visit(child, viaAnnotation));
+    node.of?.forEach((child) => visit(child, viaAnnotation));
+    node.marks?.annotations?.forEach((child) => visit(child, true));
+  };
+
+  schemaType.fields?.forEach((node) => visit(node, false));
+  schemaType.of?.forEach((node) => visit(node, false));
+  schemaType.marks?.annotations?.forEach((node) => visit(node, true));
+
+  return refs;
+};
+
+/**
+ * Every registered schema type reachable from a `marks.annotations`
+ * declaration of `targetName`, directly or transitively.
+ * An array `of:` membership or a plain field does not seed the set by
+ * itself — only an annotation edge does, though ordinary field/array
+ * composition still propagates the set upward once seeded.
+ */
 const typesEmbedding = (targetName: string): Set<string> => {
-  const embedding = new Set([targetName]);
+  const embedding = new Set<string>();
+
+  for (const schemaType of schemaTypes as TTypeNode[]) {
+    const name = schemaType.name;
+
+    if (name && collectAnnotationRefs(schemaType).has(targetName)) {
+      embedding.add(name);
+    }
+  }
+
   let changed = true;
 
   while (changed) {
