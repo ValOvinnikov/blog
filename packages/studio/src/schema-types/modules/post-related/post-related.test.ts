@@ -1,3 +1,4 @@
+import { BRAND_VARIANT } from '@blog/config/constants';
 import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
 
 const getField = (name: string) => {
@@ -116,16 +117,22 @@ describe('postRelatedSchema limit field', () => {
 });
 
 describe('postRelatedSchema preview', () => {
-  it('shows the limit as the subtitle', () => {
+  it('shows the brand variant and the limit as the subtitle', () => {
     const prepare = postRelatedSchema.preview?.prepare;
 
     if (!prepare) {
       throw new Error('Expected postRelatedSchema to define preview.prepare.');
     }
 
-    expect(prepare({ title: 'Related reading', limit: 3 })).toEqual({
+    expect(
+      prepare({
+        title: 'Related reading',
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        limit: 3,
+      }),
+    ).toEqual({
       title: 'Related reading',
-      subtitle: 'Limit: 3',
+      subtitle: 'Primary · Limit: 3',
     });
   });
 
@@ -136,7 +143,9 @@ describe('postRelatedSchema preview', () => {
       throw new Error('Expected postRelatedSchema to define preview.prepare.');
     }
 
-    expect(prepare({ title: undefined, limit: undefined })).toEqual({
+    expect(
+      prepare({ title: undefined, brandVariant: undefined, limit: undefined }),
+    ).toEqual({
       title: 'Unknown',
       subtitle: undefined,
     });

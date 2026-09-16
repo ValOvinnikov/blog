@@ -1,4 +1,8 @@
-import { DISPLAY_MODE, POST_SOURCE } from '@blog/config/constants';
+import {
+  BRAND_VARIANT,
+  DISPLAY_MODE,
+  POST_SOURCE,
+} from '@blog/config/constants';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import {
@@ -508,13 +512,14 @@ describe('postFeaturedSchema preview', () => {
     expect(
       prepare({
         title: 'Spotlight',
+        brandVariant: BRAND_VARIANT.SECONDARY,
         postSource: POST_SOURCE.PINNED,
         posts: [{ _ref: 'post-1' }, { _ref: 'post-2' }],
         limit: undefined,
       }),
     ).toEqual({
       title: 'Spotlight',
-      subtitle: 'Pinned: 2 posts',
+      subtitle: 'Secondary · Pinned: 2 posts',
     });
   });
 
@@ -526,6 +531,7 @@ describe('postFeaturedSchema preview', () => {
     expect(
       prepare({
         title: 'Spotlight',
+        brandVariant: undefined,
         postSource: POST_SOURCE.PINNED,
         posts: [{ _ref: 'post-1' }],
         limit: undefined,
@@ -544,13 +550,14 @@ describe('postFeaturedSchema preview', () => {
     expect(
       prepare({
         title: 'Spotlight',
+        brandVariant: BRAND_VARIANT.PRIMARY,
         postSource: POST_SOURCE.NEWEST_FEATURED,
         posts: undefined,
         limit: 3,
       }),
     ).toEqual({
       title: 'Spotlight',
-      subtitle: 'Newest featured (limit 3)',
+      subtitle: 'Primary · Newest featured (limit 3)',
     });
   });
 });

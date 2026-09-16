@@ -8,7 +8,7 @@ export const displayModeField = () =>
     title: 'Display Mode',
     type: 'string',
     description:
-      "Grid stacks the posts in rows. Carousel puts them in one row the reader swipes or steps through. On a wide screen where every post already fits, the carousel's buttons stay disabled.",
+      'Grid lays the posts out in rows. Carousel puts them in a single row the reader can swipe or step through.',
     options: {
       layout: 'dropdown',
       list: Object.values(DISPLAY_MODE).map((value) => ({
