@@ -1018,6 +1018,22 @@ gates, is unchanged.)
    full diff — fix blocking findings and re-dispatch until it returns
    `APPROVE`. Never **push** without an `APPROVE` on the diff as it
    stands; new changes invalidate a prior `APPROVE`.
+
+   **A docs-only diff skips the `reviewer` and gets an inline identifier
+   check instead.** When the diff touches nothing outside `docs/**`,
+   `SPEC.md`, `README.md`, `CLAUDE.md` and `.claude/**`, the code-review
+   checklist has nothing to apply and the dispatch costs ~10 minutes and
+   ~150k tokens to re-derive context the orchestrator already holds. What
+   those reviews actually caught — a fragment name that does not exist, a
+   helper cited by its pre-rename name, two copies of a decision that
+   disagree — is an identifier cross-check, so do that by hand before
+   committing: grep every code identifier, path and issue number the diff
+   names against `origin/main` and `gh`, and re-read any sibling doc the
+   change duplicates a decision into (`docs/BACKLOG.md`, an epic body).
+   State in the push ask that the diff was docs-only and identifier-checked.
+   Adopted 2026-09-16 after three spec reviews in one session, each ~10
+   minutes, whose only findings were of that kind.
+
 5. **Commit** the reviewed work — no approval needed; committing is free (local
    and reversible). Don't push it yet.
 6. **Ask to push** — explicit approval required; separate question; wait for answer

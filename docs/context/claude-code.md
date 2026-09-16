@@ -104,7 +104,9 @@ contracts:
     purely mechanical pass/fail job.
   - `reviewer` — read-only pre-commit review of the full diff; gates the
     commit ask on an `APPROVE` verdict. Trusts `verify-runner`'s already-passed
-    `type-check`/`lint`/`test` result rather than re-running it.
+    `type-check`/`lint`/`test` result rather than re-running it. Not
+    dispatched for a docs-only diff — those get the orchestrator's inline
+    identifier check instead (`CLAUDE.md`, delivery gate step 4).
   - `a11y-reviewer` — read-only accessibility audit of
     `packages/ui`/`apps/web`/`apps/platform` diffs against
     `ui-library-practices`' non-negotiable rules; dispatched alongside

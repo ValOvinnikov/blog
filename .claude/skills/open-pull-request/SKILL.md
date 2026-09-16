@@ -163,7 +163,10 @@ and its actual merge commit message, not just the former.
   Committing is local and reversible; the human gates are push and PR.
 - **Never push (Gate 3) before the `reviewer` subagent has returned
   `APPROVE` on the final diff.** New changes after an APPROVE invalidate it —
-  re-review before pushing again.
+  re-review before pushing again. A **docs-only** diff (nothing outside
+  `docs/**`, `SPEC.md`, `README.md`, `CLAUDE.md`, `.claude/**`) is the one
+  exception: it takes the inline identifier check `CLAUDE.md`'s delivery
+  gate step 4 describes instead of a `reviewer` dispatch.
 - **Never merge.** Merging is the human's call only.
 - **Never deploy.** `sanity deploy` and Vercel deploys are human-run only.
 - **Never set `--assignee` or `--reviewer` on the PR.** The repo owner cannot
@@ -235,7 +238,8 @@ Work through these gates in order. **Committing is free; stop at the push and PR
   final diff — it applies `code-review-practices` (mechanical scan + contract
   pass + general pass). Fix any blocking findings, re-verify, and re-dispatch
   until it returns `APPROVE`. Do not move to Gate 2 without an `APPROVE` on
-  the diff as it stands.
+  the diff as it stands. Skip the dispatch for a docs-only diff and run the
+  inline identifier check from `CLAUDE.md`'s gate step 4 instead.
 - Report results, including the review verdict. Do not proceed past Gate 1 if
   any check is red.
 
