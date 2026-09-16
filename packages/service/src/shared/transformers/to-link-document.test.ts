@@ -1,32 +1,9 @@
-import { LINK_TYPE } from '@blog/config';
+import {
+  makeRawExternalLinkDocument,
+  makeRawInternalLinkDocument,
+} from '@blog/service/testing/shared/fixtures';
 
-import { toLinkDocument, type TRawLinkDocument } from './to-link-document';
-
-function makeRawExternalLink(
-  overrides: Partial<TRawLinkDocument> = {},
-): TRawLinkDocument {
-  return {
-    label: 'Subscribe',
-    linkType: LINK_TYPE.EXTERNAL,
-    url: '/newsletter',
-    internalReference: null,
-    openInNewTab: null,
-    ...overrides,
-  };
-}
-
-function makeRawInternalLink(
-  overrides: Partial<TRawLinkDocument> = {},
-): TRawLinkDocument {
-  return {
-    label: 'Subscribe',
-    linkType: LINK_TYPE.INTERNAL,
-    internalReference: null,
-    url: null,
-    openInNewTab: null,
-    ...overrides,
-  };
-}
+import { toLinkDocument } from './to-link-document';
 
 describe(toLinkDocument, () => {
   it('returns undefined for a null/undefined raw link', () => {
@@ -36,11 +13,11 @@ describe(toLinkDocument, () => {
 
   it('resolves an external link to its raw url', () => {
     const result = toLinkDocument(
-      makeRawExternalLink({ url: 'https://example.com' }),
+      makeRawExternalLinkDocument({ url: 'https://example.com' }),
     );
 
     expect(result).toEqual({
-      label: 'Subscribe',
+      label: 'Learn more',
       href: 'https://example.com',
       target: undefined,
       platform: undefined,
@@ -50,14 +27,17 @@ describe(toLinkDocument, () => {
 
   it('opens external links in a new tab when flagged', () => {
     const result = toLinkDocument(
-      makeRawExternalLink({ url: 'https://example.com', openInNewTab: true }),
+      makeRawExternalLinkDocument({
+        url: 'https://example.com',
+        openInNewTab: true,
+      }),
     );
 
     expect(result?.target).toBe('_blank');
   });
 
   it('returns undefined for an external link with a missing url', () => {
-    const result = toLinkDocument(makeRawExternalLink({ url: null }));
+    const result = toLinkDocument(makeRawExternalLinkDocument({ url: null }));
 
     expect(result).toBeUndefined();
   });
@@ -75,7 +55,7 @@ describe(toLinkDocument, () => {
     'resolves an internal %s reference to its route',
     (_type, slug, href) => {
       const result = toLinkDocument(
-        makeRawInternalLink({
+        makeRawInternalLinkDocument({
           internalReference: { _type, slug: slug ?? null },
         }),
       );
@@ -86,7 +66,7 @@ describe(toLinkDocument, () => {
 
   it('resolves a slugless page_postIndex reference without requiring a slug', () => {
     const result = toLinkDocument(
-      makeRawInternalLink({
+      makeRawInternalLinkDocument({
         internalReference: { _type: 'page_postIndex', slug: null },
       }),
     );
@@ -96,7 +76,7 @@ describe(toLinkDocument, () => {
 
   it('returns undefined when a slug-having internal reference is genuinely missing its slug', () => {
     const result = toLinkDocument(
-      makeRawInternalLink({
+      makeRawInternalLinkDocument({
         internalReference: { _type: 'page_post', slug: null },
       }),
     );
@@ -106,7 +86,7 @@ describe(toLinkDocument, () => {
 
   it('returns undefined for a dangling internal reference rather than throwing', () => {
     const result = toLinkDocument(
-      makeRawInternalLink({ internalReference: null }),
+      makeRawInternalLinkDocument({ internalReference: null }),
     );
 
     expect(result).toBeUndefined();
@@ -114,7 +94,7 @@ describe(toLinkDocument, () => {
 
   it('returns undefined for a dangling/unresolvable reference type', () => {
     const result = toLinkDocument(
-      makeRawInternalLink({
+      makeRawInternalLinkDocument({
         internalReference: {
           // @ts-expect-error — simulating a reference target outside the known union (schema drift).
           _type: 'page_unknown',

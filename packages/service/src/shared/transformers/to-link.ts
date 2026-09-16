@@ -9,15 +9,9 @@ import type { InferFragmentType } from 'groqd';
 
 export type TRawLink = InferFragmentType<typeof linkFragment>;
 
-export type TInternalReference = NonNullable<TRawLink['internalReference']>;
+type TInternalReference = NonNullable<TRawLink['internalReference']>;
 
-// Keyed by the generated document `_type` union rather than a hand-typed
-// switch: renaming/removing one of these types in the schema (link.ts's
-// `to: [...]`) fails this object literal at compile time instead of leaving
-// a silently-dead case branch. `page_postIndex` is a slug-less singleton, so
-// its builder ignores the slug argument and always resolves to `/blog`; the
-// other three return `undefined` when the slug is genuinely missing (bad
-// data) rather than building a broken href.
+// Keyed by the generated document `_type` union so removing a target from the schema fails this object literal at compile time.
 const INTERNAL_HREF_BUILDERS: Record<
   TInternalReference['_type'],
   (slug: string | null) => TMaybeUndefined<string>
@@ -28,14 +22,8 @@ const INTERNAL_HREF_BUILDERS: Record<
   page_postIndex: () => routes.blogIndex(),
 };
 
-export function toInternalHref(
-  raw: TInternalReference,
-): TMaybeUndefined<string> {
-  // `_type` is typed as the reference union, but it comes from Sanity at
-  // runtime and could fall outside it (unexpected reference target / schema
-  // drift) — return undefined rather than crash, mirroring the old switch's
-  // `default`. The Record stays exhaustive so adding a schema type is a
-  // compile error here.
+function toInternalHref(raw: TInternalReference): TMaybeUndefined<string> {
+  // `_type` reflects the reference union but comes from Sanity at runtime, so an unmatched target returns undefined rather than crashing.
   const build = INTERNAL_HREF_BUILDERS[raw._type];
   return build?.(raw.slug);
 }

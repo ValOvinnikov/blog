@@ -23,7 +23,7 @@ type TRawBodyImageBlock = Extract<
 type TRawAsideBlock = Extract<TRawPortableTextBody[number], { _type: 'aside' }>;
 type TRawTextBlock = Extract<TRawPortableTextBody[number], { _type: 'block' }>;
 
-export type TResolvedAsideBlock = Omit<TRawAsideBlock, 'body'> & {
+type TResolvedAsideBlock = Omit<TRawAsideBlock, 'body'> & {
   body: TMaybeUndefined<
     Array<TPortableTextBlockWithResolvedLinks<ProseText[number]>>
   >;
@@ -64,9 +64,7 @@ export function toPortableTextBody(
       case 'block':
         return toPortableTextBlockWithResolvedLinks(block);
       default:
-        // `code` is the only block type `portableTextBodyItemFragment` leaves
-        // unhandled, so it's the only one `conditionalByType` narrows down to
-        // `{ _type }` in the static type — safe to assert back to its real shape.
+        // `code` is the only block type left unhandled, so it's safe to assert back to its real shape.
         return block as Extract<RichText[number], { _type: 'code' }>;
     }
   });
