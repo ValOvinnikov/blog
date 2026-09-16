@@ -4,33 +4,29 @@ import { Fragment, type ReactNode } from 'react';
 
 import { MODULE_MAP, type TModuleComponentProps } from './module-map';
 
-export interface IModuleRendererProps {
+type TModuleMap = Record<
+  string,
+  (props: TModuleComponentProps) => Promise<ReactNode>
+>;
+
+export interface IRenderModulesProps {
   modules: TModule[];
+  map: TModuleMap;
   locale: string;
   tenant: string;
   context?: TModuleComponentProps['context'];
 }
 
-/**
- * ModuleRenderer — maps each thin `TModule` (from a page's `modules[]`)
- * to its registered per-module Server Component and renders it, keyed by
- * the module's `_id` (a page can't reference the same module twice — enforced
- * by a CMS uniqueness rule). Unknown module types render nothing and log a
- * warning rather than failing the whole page. `MODULE_MAP` deliberately
- * excludes every `TSlotModuleType` from its key type (see `module-map.ts`),
- * so the lookup below casts to `keyof typeof MODULE_MAP` — a hero module
- * reaching here (it renders through its own page's dedicated slot instead)
- * would still hit the "unknown module type" fallback rather than type-error.
- */
-export const ModuleRenderer = async ({
+export const renderModules = async ({
   modules,
+  map,
   locale,
   tenant,
   context,
-}: IModuleRendererProps): Promise<ReactNode> => {
+}: IRenderModulesProps): Promise<ReactNode> => {
   const rendered = await Promise.all(
     modules.map(async (module) => {
-      const Component = MODULE_MAP[module.type as keyof typeof MODULE_MAP];
+      const Component = map[module.type];
 
       if (!Component) {
         logger.warn('module_renderer.unknown_module_type', {
@@ -54,3 +50,37 @@ export const ModuleRenderer = async ({
     </>
   );
 };
+
+export interface IRenderHeroModuleProps {
+  hero: TModule;
+  map: TModuleMap;
+  locale: string;
+  tenant: string;
+}
+
+export const renderHeroModule = async ({
+  hero,
+  map,
+  locale,
+  tenant,
+}: IRenderHeroModuleProps): Promise<ReactNode> => {
+  const Component = map[hero.type];
+
+  if (!Component) {
+    logger.warn('hero_slot.unknown_hero_type', { heroType: hero.type });
+    return null;
+  }
+
+  return Component({ id: hero.id, locale, tenant });
+};
+
+export interface IModuleRendererProps {
+  modules: TModule[];
+  locale: string;
+  tenant: string;
+  context?: TModuleComponentProps['context'];
+}
+
+export const ModuleRenderer = async (
+  props: IModuleRendererProps,
+): Promise<ReactNode> => renderModules({ ...props, map: MODULE_MAP });

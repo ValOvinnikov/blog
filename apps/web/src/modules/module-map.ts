@@ -14,13 +14,6 @@ export type TModuleComponentProps = {
   id: string;
   locale: string;
   tenant: string;
-  /**
-   * Context a module may need beyond `id`/`locale`/`tenant`: the post it
-   * renders alongside, when it sits on a `page_post`'s `modules[]`; the
-   * current page number, on a paginated listing page; and the taxonomy
-   * archive it lists posts for, on a `/topics/{slug}` or `/tags/{slug}`
-   * page. All absent everywhere else.
-   */
   context?: {
     post?: { id: string };
     page?: number;
@@ -28,15 +21,6 @@ export type TModuleComponentProps = {
   };
 };
 
-/**
- * Registry mapping every generic page-builder module `_type` to the
- * per-module Server Component that fetches and renders it. Typed as
- * `Record<Exclude<TModuleType, TSlotModuleType>, …>` so adding a module type
- * without registering it here is a compile error. Every remaining
- * `TSlotModuleType` member (the hero family) renders through its own page's
- * dedicated slot instead of a page's `modules[]` array, so it never reaches
- * this generic `ModuleRenderer` pipeline.
- */
 export const MODULE_MAP: Record<
   Exclude<TModuleType, TSlotModuleType>,
   (props: TModuleComponentProps) => Promise<ReactNode>
