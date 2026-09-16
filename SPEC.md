@@ -361,7 +361,7 @@ drops out the day it is deleted. The studio's equivalent guard is
 `HERO_SCHEMA_TYPES`, the list every page's `hero` `to:` points at, with a
 test asserting every registered `module_hero*` schema appears in it.
 
-Three kinds are registered. **`module_hero`** is the original, kept until
+Four kinds are registered. **`module_hero`** is the original, kept until
 #2813 retires it. **`module_heroBlog`** is the featured-post hero: its
 copy, image and primary action all derive from a post, and publish is
 blocked when none resolves. It authors no heading or supporting text of its
@@ -373,7 +373,11 @@ after the fact, or no featured post left — the hero renders nothing and the
 page's own required `headingBlock` heading becomes the `<h1>`. **`module_heroStatement`** is the plainest
 member — a headline, a line of support and up to two actions, with nothing
 derived from anything — and is the hero a marketing, agency, product or
-consultant home page opens with.
+consultant home page opens with. **`module_heroProfile`** is the person
+hero, for the personal, freelancer or consultant page that opens with who is
+behind it: it **references a `blog_author`** for the photo and the social
+profiles _only_, and its copy is entirely the editor's — nothing is derived
+from the author's `name`, `role` or `bio`.
 
 `module_heroStatement`'s own content fields are `title` (Studio's list
 label, never rendered), an optional `eyebrow` (max 40), a **required**
@@ -391,6 +395,21 @@ one optional secondary is a `secondaryAction` of type `ctaSecondaryButton`
 — the same stored shape as `ctaButton`, with `variant` fixed to
 `SECONDARY` and `link` optional, since Sanity seeds the nested object on
 document creation and an empty link means "no secondary action".
+
+`module_heroProfile`'s fields are `title`, `brandVariant` over the full list,
+the shared `headingBlock` (`heading` **required**, always the page `<h1>`;
+`supportingText` optional), an optional `eyebrow`, a **required** `author`
+reference to `blog_author`, an `imageSource` dropdown over
+`PROFILE_IMAGE_SOURCE` (`AUTHOR`/`CUSTOM`/`NONE`, initially `AUTHOR` — its own
+constant rather than `HERO_IMAGE_SOURCE`, whose first value is `POST`), an
+`image` shown and required only under `CUSTOM`, the shared `ctaButtons` array,
+and a `showSocialLinks` toggle defaulting on. Its tail is
+`heroFields({ image: false, mediaOrderStacked: false })`: the photo is placed
+by the variant, so Stacked needs no media order, while Split keeps
+`mediaOrderSplit`. Publish is blocked without a heading, without an author,
+and on `SPLIT`/`BANNER` with `imageSource: NONE`; two async warnings read the
+referenced author through `getDraftsClient` to flag a photo or social links
+the author has not filled in yet.
 
 Every module's fields open `title → brandVariant → headingBlock → …`, and
 the heroes group theirs into fieldsets (`post`, `image`, `primaryAction`,
@@ -664,6 +683,17 @@ apply on `BANNER` unconditionally, and white copy over an unscrimmed
 photograph is less legible than no treatment at all. Each hero view passes
 `isOnDark` to its `ActionGroup` on Banner, so the actions are painted for a
 dark ground too.
+
+`Hero` exposes four compound slots. `Hero.Media` holds the photo — framed at
+a `ratio` (16:9 by default, square for the profile hero's Split) or full-bleed
+on Banner — and `Hero.Cta` the actions. `Hero.Avatar` is a portrait rendered
+first in the copy column, so the DOM order is avatar → eyebrow → `<h1>`, and
+`Hero.Social` a trailing row after the actions. `Avatar` and `Social` are
+**pure containers**: they position and space their contents and impose no
+semantics on them: the consumer supplies the portrait (the `Avatar` atom, or a
+`SanityImage` carrying its own `rounded-full`, as `module_heroProfile` does)
+and its own labelled `<ul>` of links. The library guarantees placement; the
+view owns meaning.
 
 **Theme-as-content** (Phase 2 of the configurability epic, #1285/#1287,
 storage cut over to Postgres by the config-to-Postgres transition's E5): a
