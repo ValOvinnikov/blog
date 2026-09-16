@@ -74,13 +74,7 @@ export const richTextDemo: TPortableTextBody = [
       {
         _type: 'linkRef',
         _key: 'link-1',
-        link: {
-          label: 'link',
-          href: 'https://example.com',
-          target: undefined,
-          platform: undefined,
-          ariaLabel: undefined,
-        },
+        link: { href: 'https://example.com', target: undefined },
       },
     ],
   ),

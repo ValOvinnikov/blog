@@ -134,6 +134,7 @@ export type { TPostLink } from './shared/transformers/to-post-link';
 export type {
   IPortableTextLinkMark,
   TPortableTextBlockWithResolvedLinks,
+  TPortableTextLink,
 } from './shared/transformers/to-portable-text-mark-def';
 export type { TPortableTextBody } from './shared/transformers/to-portable-text-body';
 export type { TSeoResolved } from './shared/transformers/resolve-seo';

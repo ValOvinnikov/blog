@@ -13,12 +13,6 @@ export const voicePortableTextToInlineText = (
     markDefs: block.markDefs?.map(({ href, _key }) => ({
       _key,
       _type: 'linkRef' as const,
-      link: {
-        label: href,
-        href,
-        target: undefined,
-        platform: undefined,
-        ariaLabel: undefined,
-      },
+      link: { href, target: undefined },
     })),
   }));

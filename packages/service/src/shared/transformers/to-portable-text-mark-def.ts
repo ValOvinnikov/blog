@@ -7,11 +7,14 @@ export type TRawPortableTextMarkDef = InferFragmentType<
   typeof portableTextMarkDefFragment
 >;
 
+/** An inline mark's anchor text comes from its span children, so the resolved link carries only the destination, not a label. */
+export type TPortableTextLink = Pick<ILink, 'href' | 'target'>;
+
 /** A Portable Text `linkRef` mark with its `link` document resolved; an absent `link` means a dangling reference, which the renderer degrades to plain text. */
 export interface IPortableTextLinkMark {
   _key: string;
   _type: 'linkRef';
-  link: TMaybeUndefined<ILink>;
+  link: TMaybeUndefined<TPortableTextLink>;
 }
 
 export type TPortableTextBlockWithResolvedLinks<
@@ -23,10 +26,12 @@ export type TPortableTextBlockWithResolvedLinks<
 function toPortableTextMarkDef(
   raw: TRawPortableTextMarkDef,
 ): IPortableTextLinkMark {
+  const link = toLinkDocument(raw.link);
+
   return {
     _key: raw._key,
     _type: 'linkRef',
-    link: toLinkDocument(raw.link),
+    link: link && { href: link.href, target: link.target },
   };
 }
 

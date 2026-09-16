@@ -16,11 +16,8 @@ describe(toPortableTextBlockWithResolvedLinks, () => {
       _key: 'mark-1',
       _type: 'linkRef',
       link: {
-        label: 'Learn more',
         href: 'https://example.com',
         target: undefined,
-        platform: undefined,
-        ariaLabel: undefined,
       },
     });
   });

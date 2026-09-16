@@ -28,13 +28,7 @@ describe(voicePortableTextToInlineText, () => {
       {
         _key: 'link-1',
         _type: 'linkRef',
-        link: {
-          label: 'https://example.com/docs',
-          href: 'https://example.com/docs',
-          target: undefined,
-          platform: undefined,
-          ariaLabel: undefined,
-        },
+        link: { href: 'https://example.com/docs', target: undefined },
       },
     ]);
     expect(result[0]?.children).toEqual(VOICE_VALUE[0]?.children);
