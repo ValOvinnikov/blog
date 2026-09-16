@@ -36,6 +36,8 @@ type THeroFieldsOptions = {
   variants?: readonly THeroVariant[];
   /** Pass `false` when the kind supplies its own image field in this position. */
   image?: false;
+  /** Pass `false` when the kind has no Stacked layout, so no media order is needed for it. */
+  mediaOrderStacked?: false;
 };
 
 /**
@@ -71,6 +73,27 @@ export const heroFields = (options: THeroFieldsOptions = {}) => {
 
                 return true;
               }),
+          }),
+        ];
+
+  const mediaOrderStackedFields =
+    options.mediaOrderStacked === false
+      ? []
+      : [
+          defineField({
+            name: 'mediaOrderStacked',
+            title: 'Media Order',
+            type: 'string',
+            description: 'Whether the image comes before or after the text.',
+            options: {
+              layout: 'dropdown',
+              list: Object.values(MEDIA_ORDER).map((value) => ({
+                title: toTitleCase(value),
+                value,
+              })),
+            },
+            initialValue: MEDIA_ORDER.LAST,
+            hidden: isNotVariant(HERO_VARIANT.STACKED),
           }),
         ];
 
@@ -137,21 +160,7 @@ export const heroFields = (options: THeroFieldsOptions = {}) => {
       initialValue: MEDIA_ORDER.LAST,
       hidden: isNotVariant(HERO_VARIANT.SPLIT),
     }),
-    defineField({
-      name: 'mediaOrderStacked',
-      title: 'Media Order',
-      type: 'string',
-      description: 'Whether the image comes before or after the text.',
-      options: {
-        layout: 'dropdown',
-        list: Object.values(MEDIA_ORDER).map((value) => ({
-          title: toTitleCase(value),
-          value,
-        })),
-      },
-      initialValue: MEDIA_ORDER.LAST,
-      hidden: isNotVariant(HERO_VARIANT.STACKED),
-    }),
+    ...mediaOrderStackedFields,
     heroLayoutField,
   ];
 };

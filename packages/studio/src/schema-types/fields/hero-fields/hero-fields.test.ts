@@ -266,6 +266,21 @@ describe('heroFields media order fields', () => {
       expect(hidden({ parent: { variant: HERO_VARIANT.BANNER } })).toBe(true);
     }
   });
+
+  it('is suppressed entirely when mediaOrderStacked: false, leaving mediaOrderSplit', () => {
+    const fields = heroFields({ mediaOrderStacked: false });
+
+    expect(
+      fields.some(
+        (field) => 'name' in field && field.name === 'mediaOrderStacked',
+      ),
+    ).toBe(false);
+    expect(
+      fields.some(
+        (field) => 'name' in field && field.name === 'mediaOrderSplit',
+      ),
+    ).toBe(true);
+  });
 });
 
 describe('heroFields shared tail', () => {
