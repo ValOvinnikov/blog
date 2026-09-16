@@ -42,40 +42,24 @@ export type Module_cta = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  variant?: 'BANNER' | 'SPLIT' | 'CALLOUT';
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  bandTone?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  eyebrow?: string;
   headingBlock?: HeadingBlock;
-  content?: InlineText;
+  eyebrow?: string;
   image?: ImageWithAlt;
-  contentPositionSplit?: 'LEFT' | 'RIGHT';
-  contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  mobileMediaOrder?: 'LAST' | 'FIRST';
+  content?: InlineText;
   ctaButtons?: Array<
     {
       _key: string;
     } & CtaButton
   >;
   footnote?: string;
+  variant?: 'BANNER' | 'SPLIT' | 'CALLOUT';
+  bandTone?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  contentPositionSplit?: 'LEFT' | 'RIGHT';
+  contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  mobileMediaOrder?: 'LAST' | 'FIRST';
   layout?: Layout;
-};
-
-export type SanityImageAssetReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
-};
-
-export type ImageWithAlt = {
-  _type: 'imageWithAlt';
-  asset?: SanityImageAssetReference;
-  media?: unknown;
-  hotspot?: SanityImageHotspot;
-  crop?: SanityImageCrop;
-  alt?: string;
 };
 
 export type InlineText = Array<{
@@ -96,6 +80,22 @@ export type InlineText = Array<{
   _type: 'block';
   _key: string;
 }>;
+
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
+};
+
+export type ImageWithAlt = {
+  _type: 'imageWithAlt';
+  asset?: SanityImageAssetReference;
+  media?: unknown;
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  alt?: string;
+};
 
 export type Module_content = {
   _id: string;
@@ -148,8 +148,8 @@ export type Module_postRelated = {
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
   headingBlock?: HeadingBlock;
-  showImages?: boolean;
   limit?: number;
+  showImages?: boolean;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
 };
@@ -170,8 +170,6 @@ export type Module_postFeatured = {
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
   headingBlock?: HeadingBlock;
-  showImages?: boolean;
-  displayMode?: 'GRID' | 'CAROUSEL';
   postSource?: 'PINNED' | 'NEWEST_FEATURED';
   posts?: Array<
     {
@@ -179,6 +177,8 @@ export type Module_postFeatured = {
     } & Page_postReference
   >;
   limit?: number;
+  showImages?: boolean;
+  displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
 };
@@ -192,10 +192,10 @@ export type Module_postLatest = {
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
   headingBlock?: HeadingBlock;
+  limit?: number;
   showImages?: boolean;
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  limit?: number;
   layout?: Layout;
 };
 
@@ -208,9 +208,9 @@ export type Module_postList = {
   title?: string;
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   headingBlock?: HeadingBlock;
+  pageSize?: number;
   showImages?: boolean;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  pageSize?: number;
   layout?: Layout;
 };
 
@@ -718,11 +718,11 @@ export type Module_taxonomyList = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
+  headingBlock?: HeadingBlock;
   taxonomy?: 'TOPICS' | 'TAGS';
   sortOrder?: 'ALPHABETICAL' | 'MOST_POSTS';
   limit?: number;
   showLatestPosts?: boolean;
-  headingBlock?: HeadingBlock;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
 };
@@ -1167,9 +1167,9 @@ export type AllSanitySchemaTypes =
   | Module_newsletter
   | HeadingBlock
   | Module_cta
+  | InlineText
   | SanityImageAssetReference
   | ImageWithAlt
-  | InlineText
   | Module_content
   | RichText
   | Module_postRelated
