@@ -1,7 +1,3 @@
-import {
-  actionGroupSchema,
-  ctaActionSchema,
-} from './action-group/action-group';
 import { asideSchema } from './aside/aside';
 import { bodyImageSchema } from './body-image/body-image';
 import { brandSchema } from './brand/brand';
@@ -33,8 +29,6 @@ export const objects = [
   inlineLinkSchema,
   linkRefSchema,
   socialProfileSchema,
-  ctaActionSchema,
-  actionGroupSchema,
   ctaButtonSchema,
   ctaSecondaryButtonSchema,
   openGraphSchema,
