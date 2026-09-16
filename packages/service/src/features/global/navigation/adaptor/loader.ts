@@ -8,9 +8,6 @@ import { navigationQuery } from './query';
 import { toNavigation } from './transformer';
 import type { TNavigation } from './types';
 
-// `navigationQuery` derefs each item's `link` through `linkDocumentFragment`,
-// whose `internalReference` can resolve to any page type below — every one
-// of those types' tags must be included (tag-scope contract, `sanity/query.ts`).
 export async function getNavigation(
   tenant: TTenantSanityContext,
 ): Promise<TNavigation> {

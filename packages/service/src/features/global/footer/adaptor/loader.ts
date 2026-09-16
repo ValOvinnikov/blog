@@ -8,9 +8,6 @@ import { footerQuery } from './query';
 import { toFooter } from './transformer';
 import type { TFooter } from './types';
 
-// `footerQuery` derefs each entry's `link` through `linkDocumentFragment`,
-// whose `internalReference` can resolve to any page type below — every one
-// of those types' tags must be included (tag-scope contract, `sanity/query.ts`).
 export async function getFooter(
   tenant: TTenantSanityContext,
 ): Promise<TFooter> {
