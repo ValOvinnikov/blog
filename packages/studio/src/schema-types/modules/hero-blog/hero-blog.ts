@@ -255,7 +255,7 @@ export const heroBlogSchema = defineType({
       title: 'Secondary Action',
       type: ctaSecondaryButtonSchema.name,
       description:
-        'Optional supporting action next to the primary one. Leave the link empty to show none.',
+        'An optional supporting action. Leave the link empty to show none.',
     }),
     ...heroFields({ image: false }),
   ],
