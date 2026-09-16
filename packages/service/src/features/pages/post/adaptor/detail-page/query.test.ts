@@ -4,7 +4,10 @@ import {
   makeRawAuthor,
   makeRawPostDetail,
 } from '@blog/service/testing/pages/fixtures';
-import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
+import {
+  makeRawExternalLinkDocument,
+  makeRawHeadingBlock,
+} from '@blog/service/testing/shared/fixtures';
 
 import { postPageQuery } from './query';
 
@@ -197,12 +200,7 @@ describe('postPageQuery', () => {
         {
           _type: 'linkRef',
           _key: 'link-1',
-          link: {
-            label: 'Learn more',
-            linkType: 'EXTERNAL',
-            openInNewTab: null,
-            url: 'https://example.com',
-          },
+          link: makeRawExternalLinkDocument(),
         },
       ],
       children: [

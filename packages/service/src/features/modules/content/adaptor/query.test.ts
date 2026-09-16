@@ -1,4 +1,5 @@
 import { makeRawContentModule } from '@blog/service/testing/modules/fixtures';
+import { makeRawExternalLinkDocument } from '@blog/service/testing/shared/fixtures';
 
 import { contentModuleQuery } from './query';
 
@@ -105,12 +106,7 @@ describe('contentModuleQuery', () => {
         {
           _type: 'linkRef',
           _key: 'link-1',
-          link: {
-            label: 'Learn more',
-            linkType: 'EXTERNAL',
-            openInNewTab: null,
-            url: 'https://example.com',
-          },
+          link: makeRawExternalLinkDocument(),
         },
       ],
       children: [

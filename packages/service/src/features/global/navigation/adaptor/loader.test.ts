@@ -1,5 +1,6 @@
 import { makeRawNavigation } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeRawExternalLinkDocument } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getNavigation } from './loader';
@@ -31,12 +32,10 @@ describe('getNavigation', () => {
       makeRawNavigation({
         items: [
           {
-            link: {
+            link: makeRawExternalLinkDocument({
               label: 'Blog',
-              linkType: 'EXTERNAL',
               url: '/blog',
-              openInNewTab: null,
-            },
+            }),
           },
         ],
       }),
