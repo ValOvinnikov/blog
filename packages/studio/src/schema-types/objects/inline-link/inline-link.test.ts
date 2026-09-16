@@ -31,19 +31,21 @@ const getOptionValues = (field: { options?: unknown }) => {
   return list as { title: string; value: string }[];
 };
 
-describe('inlineLinkSchema platform options', () => {
-  it('titles each option from SOCIAL_PLATFORM_LABEL, not toTitleCase', () => {
-    const field = getPlatformField();
-    const list = getOptionValues(field);
+describe('inlineLinkSchema', () => {
+  describe('platform options', () => {
+    it('titles each option from SOCIAL_PLATFORM_LABEL, not toTitleCase', () => {
+      const field = getPlatformField();
+      const list = getOptionValues(field);
 
-    expect(list).toEqual(
-      Object.values(SOCIAL_PLATFORMS).map((value) => ({
-        title: SOCIAL_PLATFORM_LABEL[value],
-        value,
-      })),
-    );
-    expect(
-      list.find((option) => option.value === SOCIAL_PLATFORMS.GITHUB)?.title,
-    ).toBe('GitHub');
+      expect(list).toEqual(
+        Object.values(SOCIAL_PLATFORMS).map((value) => ({
+          title: SOCIAL_PLATFORM_LABEL[value],
+          value,
+        })),
+      );
+      expect(
+        list.find((option) => option.value === SOCIAL_PLATFORMS.GITHUB)?.title,
+      ).toBe('GitHub');
+    });
   });
 });

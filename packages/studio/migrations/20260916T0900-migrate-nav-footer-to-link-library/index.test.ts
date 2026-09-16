@@ -235,7 +235,65 @@ describe('migrate-nav-footer-to-link-library wiring', () => {
       });
     });
 
-    it('warns and drops an item whose url is a relative path rather than a full address', async () => {
+    it('warns and leaves the document untouched when an item has an unrecognized _type', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const doc = {
+        ...baseDoc,
+        _id: 'nav-5',
+        _type: 'settings_navigation',
+        items: [
+          {
+            _key: 'legacy',
+            _type: 'someOtherType',
+            label: 'Mystery',
+          },
+        ],
+      };
+
+      const mutations = await runMigration(doc);
+
+      expect(mutations).toEqual([]);
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('neither "link" nor "inlineLink"'),
+      );
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('The document was left untouched'),
+      );
+
+      warnSpy.mockRestore();
+    });
+
+    it('warns and leaves the document untouched when an item has no resolvable destination', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const doc = {
+        ...baseDoc,
+        _id: 'nav-6',
+        _type: 'settings_navigation',
+        items: [
+          {
+            _key: 'legacy',
+            _type: 'link',
+            label: 'Nowhere',
+          },
+        ],
+      };
+
+      const mutations = await runMigration(doc);
+
+      expect(mutations).toEqual([]);
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('no resolvable destination'),
+      );
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('The document was left untouched'),
+      );
+
+      warnSpy.mockRestore();
+    });
+
+    it('warns and leaves the document untouched when an item has a url that is a relative path rather than a full address', async () => {
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
       const doc = {
@@ -254,19 +312,46 @@ describe('migrate-nav-footer-to-link-library wiring', () => {
       };
 
       const mutations = await runMigration(doc);
-      const patchMutation = mutations.find(isPatch);
 
-      if (!patchMutation) throw new Error('Expected a patch mutation.');
-
-      const itemsPatch = patchMutation.patches[0] as {
-        op: { value: unknown[] };
-      };
-
-      expect(mutations.filter(isCreateIfNotExists)).toHaveLength(0);
-      expect(itemsPatch.op.value).toEqual([]);
+      expect(mutations).toEqual([]);
       expect(warnSpy).toHaveBeenCalledWith(
         expect.stringContaining('is not a full http(s) address'),
       );
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('The document was left untouched'),
+      );
+
+      warnSpy.mockRestore();
+    });
+
+    it('leaves the whole document untouched even when only one of several entries is unresolvable', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const doc = {
+        ...baseDoc,
+        _id: 'nav-7',
+        _type: 'settings_navigation',
+        items: [
+          {
+            _key: 'good',
+            _type: 'link',
+            label: 'Contact',
+            linkType: 'EXTERNAL',
+            url: 'https://example.com/contact',
+          },
+          {
+            _key: 'bad',
+            _type: 'link',
+            label: 'Old Blog',
+            linkType: 'EXTERNAL',
+            url: '/blog',
+          },
+        ],
+      };
+
+      const mutations = await runMigration(doc);
+
+      expect(mutations).toEqual([]);
 
       warnSpy.mockRestore();
     });

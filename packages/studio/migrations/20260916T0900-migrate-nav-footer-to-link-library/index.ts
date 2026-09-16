@@ -14,9 +14,13 @@
  * `link` document.
  *
  * Accepts a nested item of `_type` `link` or `inlineLink` — the rename
- * migration may not have run yet on every target dataset — and reports
- * anything matching neither, or an unresolvable url/destination, via
- * `console.warn` rather than guessing.
+ * migration may not have run yet on every target dataset. If any entry in a
+ * document has an unrecognized `_type`, no resolvable destination, or an
+ * external `url` the new `link.url` validator would reject, the *entire
+ * document* is left untouched and a `console.warn` names the offending
+ * entry — the array is rebuilt wholesale via `set(...)`, so silently
+ * dropping just that one entry would delete live content instead of
+ * merely deferring it.
  *
  * Idempotency: an entry already at its target `_type` (`linkRef`/
  * `socialProfile`) is passed through unchanged; a document with no legacy
@@ -76,6 +80,37 @@ const isAlreadyMigrated = (
   targetType: string,
 ): boolean => item._type === targetType;
 
+const UNTOUCHED_SUFFIX =
+  'The document was left untouched — fix this entry in Studio, then re-run the migration.';
+
+/** Finds the first legacy entry a document can't be migrated past, without mutating anything. */
+const findFatalIssue = (
+  items: TLegacyLinkEntry[],
+  targetType: string,
+): string | undefined => {
+  for (const item of items) {
+    if (isAlreadyMigrated(item, targetType)) continue;
+
+    if (!hasRecognizedLinkShape(item)) {
+      return `a link entry (key "${item._key}") has _type "${String(item._type)}", neither "link" nor "inlineLink"`;
+    }
+
+    if (!toLinkIdentityKey(item)) {
+      return `a link entry (key "${item._key}") has no resolvable destination (neither internalReference nor url set)`;
+    }
+
+    if (!hasResolvableUrl(item)) {
+      return `a link entry (key "${item._key}")'s url "${String(item.url)}" is not a full http(s) address with a host — the new link.url requires one`;
+    }
+  }
+
+  return undefined;
+};
+
+const warnDocumentSkipped = (docId: string, issue: string): void => {
+  warn(`${docId}: ${issue}. ${UNTOUCHED_SUFFIX}`);
+};
+
 export const resolveDestinationTitle = async (
   context: MigrationContext,
   item: TLegacyLinkEntry,
@@ -114,34 +149,24 @@ const reportLinkAnomalies = (
   }
 };
 
+/**
+ * Builds/dedupes the `link` document for one already-validated entry —
+ * callers only reach this after `findFatalIssue` has cleared every entry in
+ * the document.
+ */
 const resolveLinkIdForItem = async (
   docId: string,
   item: TLegacyLinkEntry,
   context: MigrationContext,
   queuedLinkIds: Set<string>,
   mutations: Mutation[],
-): Promise<string | undefined> => {
-  if (!hasRecognizedLinkShape(item)) {
-    warn(
-      `${docId}: a link entry has _type "${String(item._type)}", neither "link" nor "inlineLink" — skipped rather than guessed at.`,
-    );
-    return undefined;
-  }
-
+): Promise<string> => {
   const identityKey = toLinkIdentityKey(item);
 
   if (!identityKey) {
-    warn(
-      `${docId}: skipping a link entry with no resolvable destination (neither internalReference nor url set).`,
+    throw new Error(
+      `${docId}: a link entry passed the pre-migration validation scan but has no resolvable destination.`,
     );
-    return undefined;
-  }
-
-  if (!hasResolvableUrl(item)) {
-    warn(
-      `${docId}: a link entry's url "${String(item.url)}" is not a full http(s) address with a host — the new link.url requires one, so this entry was left un-migrated. Fix it manually in Studio.`,
-    );
-    return undefined;
   }
 
   reportLinkAnomalies(docId, identityKey, item);
@@ -172,6 +197,13 @@ const migrateNavigation = async (
 
   if (items.length === 0 || !hasLegacyItem) return [];
 
+  const fatalIssue = findFatalIssue(items, LINK_REF_TYPE);
+
+  if (fatalIssue) {
+    warnDocumentSkipped(doc._id, fatalIssue);
+    return [];
+  }
+
   const mutations: Mutation[] = [];
   const queuedLinkIds = new Set<string>();
   const nextItems: (TLinkRefNode | TLegacyLinkEntry)[] = [];
@@ -189,8 +221,6 @@ const migrateNavigation = async (
       queuedLinkIds,
       mutations,
     );
-
-    if (!linkId) continue;
 
     nextItems.push(buildLinkRef(item, linkId));
   }
@@ -210,6 +240,13 @@ const migrateFooter = async (
   );
 
   if (social.length === 0 || !hasLegacyItem) return [];
+
+  const fatalIssue = findFatalIssue(social, SOCIAL_PROFILE_TYPE);
+
+  if (fatalIssue) {
+    warnDocumentSkipped(doc._id, fatalIssue);
+    return [];
+  }
 
   const mutations: Mutation[] = [];
   const queuedLinkIds = new Set<string>();
@@ -234,8 +271,6 @@ const migrateFooter = async (
       queuedLinkIds,
       mutations,
     );
-
-    if (!linkId) continue;
 
     nextSocial.push(buildSocialProfile(item, linkId));
   }
