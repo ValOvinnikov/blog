@@ -17,7 +17,6 @@ export async function getNavigation(
       [
         'navigation',
         'page_post',
-        'topic',
         'page_landing',
         'page_postIndex',
         'link',
