@@ -143,38 +143,13 @@ When invoked, before writing any code:
 - **Extract at the second repetition.** A constant shape, type helper, or
   preset fragment used by two consumers becomes a shared export here — never
   copy-paste a third instance into a downstream package.
-- **Inline comments forbidden by default; doc comments state purpose, not
-  internals.** See `## Comments` below.
+- **Comments: see `## Comments` below.**
 
 ## Comments
 
-**Inline comments are forbidden by default.** No comment inside a
-function/helper body narrating what a line does — if that feels necessary,
-restructure the code or rename something instead. The single narrow
-exception: one line for a genuine non-obvious constraint the code can't
-express on its own — e.g. why a value must match a CMS/service string
-exactly.
-
-**A doc comment is the only other kind allowed — at most one per
-function/export, and only when the name doesn't already make the purpose
-obvious.** State what it's **for**, in one short sentence — never how it
-works internally: never restate what the code already says, never list every
-field/consumer, never narrate a decision history by issue number.
-
-**Never reference project-management state in a comment.** No
-`docs/superpowers/**` path, no roadmap phase ("Phase 0", "Phase 8", "this
-milestone"), no issue number as narrative, no "not wired up yet / future
-consumer will…" note. Each is guaranteed to go stale: spec and plan docs are
-**deleted** once their work ships, phases get renumbered and re-scoped, and
-"nothing reads this yet" stops being true the moment someone adds a caller —
-without touching the comment. All of it belongs in the PR description, which is
-dated and reachable via `git blame`.
-
-Test to apply: _would this still be true and useful in a year if the roadmap
-were reorganised and the spec docs deleted?_ If no, delete it.
-
-Exception: a `TODO:`/`FIXME:` may cite an issue number, in its own comment
-block — it points at open work rather than narrating closed work.
+`CLAUDE.md` → `## Conventions` → "Comments default to zero" is the single
+source for comment rules, including the three-step test and the
+delete-don't-shorten rule. It is not restated here; follow it as written.
 
 ## Testing
 
@@ -222,22 +197,6 @@ Run these checks **once, after all work is complete**:
 - Any alias wiring added (workspace + dependency + files touched)
 - Any downstream work needed in `studio`/`service`/`ui`/`web`, described
   precisely enough that the next agent can act without re-reading this layer
-
-## Comments in files you touch
-
-**Trim on touch.** Whenever you edit a file, cut every over-long comment **in
-that file** down to one sentence as part of the same change — not only the
-comments on the lines you happened to modify. There is no separate
-comment-cleanup pass; this is how the repo converges.
-
-A function or component **keeps** its single doc comment. Shorten it; never
-delete it merely for being long, and never let it describe which arguments,
-props or variables the function uses — the type signature documents that, and
-prose restating it goes stale the moment a parameter changes.
-
-Never put project-management state in a source comment: no issue or PR numbers
-(except inside a `TODO:`/`FIXME:`), no roadmap phases, no spec-doc paths, no
-"not wired up yet" notes.
 
 ## Reuse before you create
 
