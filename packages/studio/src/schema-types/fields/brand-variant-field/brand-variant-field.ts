@@ -2,23 +2,29 @@ import { BRAND_VARIANT, type TBrandVariant } from '@blog/config/constants';
 import { toTitleCase } from '@blog/utils/primitives';
 import { defineField } from 'sanity';
 
+const DEFAULT_LIST: readonly TBrandVariant[] = [
+  BRAND_VARIANT.PRIMARY,
+  BRAND_VARIANT.SECONDARY,
+];
+
 export const brandVariantField = (options?: {
   list?: readonly TBrandVariant[];
   description?: string;
   initialValue?: TBrandVariant;
-}) =>
-  defineField({
+}) => {
+  const list = options?.list ?? DEFAULT_LIST;
+
+  return defineField({
     name: 'brandVariant',
     title: 'Brand Variant',
     type: 'string',
     description:
       options?.description ??
-      "Sets this section's background color, so it reads as its own block against the sections around it.",
+      "Which brand color this section's background uses.",
     options: {
-      list: (
-        options?.list ?? [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY]
-      ).map((value) => ({ title: toTitleCase(value), value })),
+      list: list.map((value) => ({ title: toTitleCase(value), value })),
     },
-    initialValue: options?.initialValue,
+    initialValue: options?.initialValue ?? list[0],
     validation: (rule) => rule.required(),
   });
+};

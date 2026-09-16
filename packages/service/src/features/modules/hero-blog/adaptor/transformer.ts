@@ -4,10 +4,7 @@ import {
   type ISanityImage,
   type TMaybeUndefined,
 } from '@blog/config';
-import {
-  toCtaButton,
-  type TCtaButton,
-} from '@blog/service/shared/transformers/to-cta-button';
+import { toCtaButton } from '@blog/service/shared/transformers/to-cta-button';
 import { toHeroPresentation } from '@blog/service/shared/transformers/to-hero-presentation';
 import { toHeroPrimaryAction } from '@blog/service/shared/transformers/to-hero-primary-action';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
@@ -66,25 +63,23 @@ function toPrimaryButton(
   };
 }
 
-function toSecondaryButtons(
-  raw: TRawHeroBlogModule['ctaButtons'],
-): THeroBlogButton[] {
-  if (!raw || raw.length === 0) return [];
+function toSecondaryButton(
+  raw: TRawHeroBlogModule['secondaryAction'],
+): THeroBlogButton | undefined {
+  const button = raw ? toCtaButton(raw) : undefined;
 
-  return raw
-    .map(toCtaButton)
-    .filter((button): button is TCtaButton => button !== undefined)
-    .map((button) => ({ ...button, hiddenLabelSuffix: undefined }));
+  return button ? { ...button, hiddenLabelSuffix: undefined } : undefined;
 }
 
-/** Orders the hero's CTA buttons with any derived primary first, followed by authored `ctaButtons` in stored order. */
+/** Orders the hero's CTA buttons with the derived primary first, then the authored secondary. */
 function toCtaButtons(
   raw: TRawHeroBlogModule,
   post: TPostCard | undefined,
 ): THeroBlogButton[] {
-  const primary = toPrimaryButton(raw, post);
-  const secondary = toSecondaryButtons(raw.ctaButtons);
-  return primary ? [primary, ...secondary] : secondary;
+  return [
+    toPrimaryButton(raw, post),
+    toSecondaryButton(raw.secondaryAction),
+  ].filter((button): button is THeroBlogButton => button !== undefined);
 }
 
 export function toHeroBlogModule(raw: TRawHeroBlogModule): THeroBlogModule {

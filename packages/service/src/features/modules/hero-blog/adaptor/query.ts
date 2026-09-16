@@ -1,7 +1,7 @@
 import { POST_SOURCE } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
-import { ctaButtonFragment } from '@blog/service/shared/fragments/cta-button';
+import { ctaSecondaryButtonFragment } from '@blog/service/shared/fragments/cta-button';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image';
 import { heroLayoutFragment } from '@blog/service/shared/fragments/layout';
 import { postCardFragment } from '@blog/service/shared/fragments/post';
@@ -21,9 +21,6 @@ export const heroBlogModuleQuery = q
   .filterRaw('_id == $id')
   .slice(0)
   .project((sub) => ({
-    // `select()`, not `coalesce()` — the branch must follow `postSource`,
-    // not the pinned reference's emptiness, or an editor's deliberate
-    // `NEWEST_FEATURED` choice would silently render a stale pinned post.
     post: sub
       .select(
         {
@@ -43,9 +40,9 @@ export const heroBlogModuleQuery = q
     primaryActionAppearance: sub
       .field('primaryActionAppearance')
       .nullable(true),
-    ctaButtons: sub
-      .field('ctaButtons[]')
-      .project(ctaButtonFragment)
+    secondaryAction: sub
+      .field('secondaryAction')
+      .project(ctaSecondaryButtonFragment)
       .nullable(true),
     variant: sub.field('variant').notNull(),
     brandVariant: sub.field('brandVariant').notNull(),

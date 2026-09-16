@@ -1850,6 +1850,64 @@
     }
   },
   {
+    "name": "ctaSecondaryButton",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "ctaSecondaryButton"
+          }
+        },
+        "variant": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "PRIMARY"
+              },
+              {
+                "type": "string",
+                "value": "SECONDARY"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "appearance": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "CONTAINED"
+              },
+              {
+                "type": "string",
+                "value": "INLINE"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "link": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "link.reference"
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
     "name": "ctaButton",
     "type": "type",
     "value": {
@@ -5355,10 +5413,24 @@
         },
         "optional": true
       },
-      "eyebrow": {
+      "brandVariant": {
         "type": "objectAttribute",
         "value": {
-          "type": "string"
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "SECONDARY"
+            }
+          ]
         },
         "optional": true
       },
@@ -5367,6 +5439,35 @@
         "value": {
           "type": "inline",
           "name": "headingBlock"
+        },
+        "optional": true
+      },
+      "eyebrow": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "ctaButtons": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "array",
+          "of": {
+            "type": "object",
+            "attributes": {
+              "_key": {
+                "type": "objectAttribute",
+                "value": {
+                  "type": "string"
+                }
+              }
+            },
+            "rest": {
+              "type": "inline",
+              "name": "ctaButton"
+            }
+          }
         },
         "optional": true
       },
@@ -5386,27 +5487,6 @@
             {
               "type": "string",
               "value": "BANNER"
-            }
-          ]
-        },
-        "optional": true
-      },
-      "brandVariant": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "BRAND_PRIMARY"
-            },
-            {
-              "type": "string",
-              "value": "PRIMARY"
-            },
-            {
-              "type": "string",
-              "value": "SECONDARY"
             }
           ]
         },
@@ -5510,28 +5590,6 @@
               "value": "FIRST"
             }
           ]
-        },
-        "optional": true
-      },
-      "ctaButtons": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "array",
-          "of": {
-            "type": "object",
-            "attributes": {
-              "_key": {
-                "type": "objectAttribute",
-                "value": {
-                  "type": "string"
-                }
-              }
-            },
-            "rest": {
-              "type": "inline",
-              "name": "ctaButton"
-            }
-          }
         },
         "optional": true
       },
@@ -5587,6 +5645,27 @@
         },
         "optional": true
       },
+      "brandVariant": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "SECONDARY"
+            }
+          ]
+        },
+        "optional": true
+      },
       "postSource": {
         "type": "objectAttribute",
         "value": {
@@ -5609,13 +5688,6 @@
         "value": {
           "type": "inline",
           "name": "page_post.reference"
-        },
-        "optional": true
-      },
-      "eyebrow": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
         },
         "optional": true
       },
@@ -5648,6 +5720,13 @@
         },
         "optional": true
       },
+      "eyebrow": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
       "primaryActionLabel": {
         "type": "objectAttribute",
         "value": {
@@ -5672,6 +5751,14 @@
         },
         "optional": true
       },
+      "secondaryAction": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "ctaSecondaryButton"
+        },
+        "optional": true
+      },
       "variant": {
         "type": "objectAttribute",
         "value": {
@@ -5688,27 +5775,6 @@
             {
               "type": "string",
               "value": "BANNER"
-            }
-          ]
-        },
-        "optional": true
-      },
-      "brandVariant": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "BRAND_PRIMARY"
-            },
-            {
-              "type": "string",
-              "value": "PRIMARY"
-            },
-            {
-              "type": "string",
-              "value": "SECONDARY"
             }
           ]
         },
@@ -5804,28 +5870,6 @@
               "value": "FIRST"
             }
           ]
-        },
-        "optional": true
-      },
-      "ctaButtons": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "array",
-          "of": {
-            "type": "object",
-            "attributes": {
-              "_key": {
-                "type": "objectAttribute",
-                "value": {
-                  "type": "string"
-                }
-              }
-            },
-            "rest": {
-              "type": "inline",
-              "name": "ctaButton"
-            }
-          }
         },
         "optional": true
       },

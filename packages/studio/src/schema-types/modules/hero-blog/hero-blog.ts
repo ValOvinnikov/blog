@@ -1,16 +1,21 @@
 import {
   CTA_ACTION_APPEARANCE,
-  CTA_ACTION_VARIANT,
   HERO_IMAGE_SOURCE,
   POST_SOURCE,
   HERO_VARIANT,
   type THeroImageSource,
   type TPostSource,
   type THeroVariant,
+  FULL_BRAND_VARIANT_LIST,
 } from '@blog/config/constants';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
-import { heroFields } from '@blog/studio/schema-types/fields/hero-fields/hero-fields';
+import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import {
+  heroFields,
+  heroFieldsets,
+} from '@blog/studio/schema-types/fields/hero-fields/hero-fields';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { ctaSecondaryButtonSchema } from '@blog/studio/schema-types/objects/cta-button/cta-button';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { getDraftsClient } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
 import {
@@ -106,6 +111,10 @@ const validatePostImageFallback = async (
     : true;
 };
 
+const FIELDSET_POST = 'post';
+const FIELDSET_IMAGE = 'image';
+const FIELDSET_PRIMARY_ACTION = 'primaryAction';
+
 export const heroBlogSchema = defineType({
   name: 'module_heroBlog',
   title: 'Blog Hero',
@@ -113,6 +122,24 @@ export const heroBlogSchema = defineType({
   description:
     'A hero built around one blog post — pinned or the newest featured — with its image, heading, and a link to read it.',
   icon: Star,
+  fieldsets: [
+    {
+      name: FIELDSET_POST,
+      title: 'Post',
+      description: 'Which post this hero features.',
+    },
+    {
+      name: FIELDSET_IMAGE,
+      title: 'Image',
+      description: "Where the hero's image comes from.",
+    },
+    {
+      name: FIELDSET_PRIMARY_ACTION,
+      title: 'Primary Action',
+      description: 'The main action. It always links to the featured post.',
+    },
+    ...heroFieldsets,
+  ],
   validation: (rule) => [
     rule.custom(validateNewestFeaturedHasCandidate('hero')),
     rule.custom(validateVariantRequiresImage),
@@ -121,27 +148,30 @@ export const heroBlogSchema = defineType({
   ],
   fields: [
     titleField(),
+    brandVariantField({ list: FULL_BRAND_VARIANT_LIST }),
     defineField({
       name: 'postSource',
-      title: 'Post Source',
+      title: 'Source',
       type: 'string',
       description:
-        'Which post this hero renders: a specific pinned post, or the newest post marked Featured.',
+        'A specific post you pin, or the newest post marked Featured.',
+      fieldset: FIELDSET_POST,
       options: {
-        layout: 'radio',
+        layout: 'dropdown',
         list: Object.values(POST_SOURCE).map((value) => ({
           title: toTitleCase(value),
           value,
         })),
       },
-      initialValue: POST_SOURCE.PINNED,
+      initialValue: POST_SOURCE.NEWEST_FEATURED,
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'post',
       title: 'Post',
       type: 'reference',
-      description: 'The pinned post this hero renders.',
+      description: 'The pinned post.',
+      fieldset: FIELDSET_POST,
       to: [{ type: PAGE_POST_TYPE }],
       hidden: ({ parent }) =>
         (parent as THeroBlogDocument | undefined)?.postSource !==
@@ -156,19 +186,13 @@ export const heroBlogSchema = defineType({
         }),
     }),
     defineField({
-      name: 'eyebrow',
-      title: 'Eyebrow',
-      type: 'string',
-      description:
-        "Optional kicker label. Empty renders the resolved post's topic title.",
-    }),
-    defineField({
       name: 'imageSource',
-      title: 'Image Source',
+      title: 'Source',
       type: 'string',
-      description: "Where this hero's image comes from.",
+      description: "The post's own hero image, a custom image, or no image.",
+      fieldset: FIELDSET_IMAGE,
       options: {
-        layout: 'radio',
+        layout: 'dropdown',
         list: Object.values(HERO_IMAGE_SOURCE).map((value) => ({
           title: toTitleCase(value),
           value,
@@ -179,9 +203,10 @@ export const heroBlogSchema = defineType({
     }),
     defineField({
       name: 'image',
-      title: 'Image',
+      title: 'Custom Image',
       type: imageWithAltSchema.name,
-      description: 'Custom image, used when Image Source is Custom.',
+      description: 'Used when Source is Custom.',
+      fieldset: FIELDSET_IMAGE,
       hidden: ({ parent }) =>
         (parent as THeroBlogDocument | undefined)?.imageSource !==
         HERO_IMAGE_SOURCE.CUSTOM,
@@ -190,24 +215,31 @@ export const heroBlogSchema = defineType({
           const parent = context.parent as THeroBlogDocument | undefined;
 
           return parent?.imageSource === HERO_IMAGE_SOURCE.CUSTOM && !value
-            ? 'Custom image is required when Image Source is Custom.'
+            ? 'A custom image is required when Source is Custom.'
             : true;
         }),
     }),
     defineField({
-      name: 'primaryActionLabel',
-      title: 'Primary Action Label',
+      name: 'eyebrow',
+      title: 'Eyebrow',
       type: 'string',
       description:
-        'Empty renders "Read more". The link always targets the resolved post.',
+        "Short line above the heading. Defaults to the post's topic.",
+    }),
+    defineField({
+      name: 'primaryActionLabel',
+      title: 'Label',
+      type: 'string',
+      description: 'Text of the action. Defaults to "Read more".',
+      fieldset: FIELDSET_PRIMARY_ACTION,
       validation: (rule) => rule.max(40),
     }),
     defineField({
       name: 'primaryActionAppearance',
-      title: 'Primary Action Appearance',
+      title: 'Appearance',
       type: 'string',
-      description:
-        'How the primary action looks: Contained (filled button) or Inline (text link).',
+      description: 'How the action is styled.',
+      fieldset: FIELDSET_PRIMARY_ACTION,
       options: {
         layout: 'dropdown',
         list: Object.values(CTA_ACTION_APPEARANCE).map((value) => ({
@@ -217,10 +249,14 @@ export const heroBlogSchema = defineType({
       },
       initialValue: CTA_ACTION_APPEARANCE.CONTAINED,
     }),
-    ...heroFields({
-      image: false,
-      buttons: { max: 1, allowVariants: [CTA_ACTION_VARIANT.SECONDARY] },
+    defineField({
+      name: 'secondaryAction',
+      title: 'Secondary Action',
+      type: ctaSecondaryButtonSchema.name,
+      description:
+        'Optional supporting action next to the primary one. Leave the link empty to show none.',
     }),
+    ...heroFields({ image: false }),
   ],
   preview: {
     select: {

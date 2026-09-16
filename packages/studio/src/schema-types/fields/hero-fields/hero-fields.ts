@@ -1,18 +1,14 @@
 import {
   CONTENT_ALIGNMENT,
-  FULL_BRAND_VARIANT_LIST,
   HERO_VARIANT,
   MEDIA_ORDER,
-  type TCtaActionVariant,
   type THeroVariant,
 } from '@blog/config/constants';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
-import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
-import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { toTitleCase } from '@blog/utils/primitives';
-import { defineField } from 'sanity';
+import { defineField, type FieldsetDefinition } from 'sanity';
 
 type THeroFieldsParent = { variant?: string };
 
@@ -24,19 +20,27 @@ const isNotVariant =
   ({ parent }: { parent?: unknown }): boolean =>
     !isVariant(parent, variant);
 
+export const HERO_FIELDSET_CONTENT_POSITION = 'contentPosition';
+
+/** The fieldset every hero kind declares to group its position/alignment fields. */
+export const heroFieldsets: FieldsetDefinition[] = [
+  {
+    name: HERO_FIELDSET_CONTENT_POSITION,
+    title: 'Content Position',
+    description: 'Where the text sits in the hero and how it is aligned.',
+  },
+];
+
 type THeroFieldsOptions = {
   /** Restricts the Variant field's option set, for a kind that can't sensibly be a Banner. */
   variants?: readonly THeroVariant[];
   /** Pass `false` when the kind supplies its own image field in this position. */
   image?: false;
-  /** Constrains the shared ctaButtons field, for a kind whose primary is derived rather than authored. */
-  buttons?: { max?: number; allowVariants?: TCtaActionVariant[] };
 };
 
 /**
  * The field tail shared by every hero kind, appended after that kind's own
- * content fields: variant, brand variant, image, content position/alignment,
- * media order and layout.
+ * content fields: variant, image, content position/alignment and media order.
  */
 export const heroFields = (options: THeroFieldsOptions = {}) => {
   const variantList = options.variants ?? Object.values(HERO_VARIANT);
@@ -76,9 +80,9 @@ export const heroFields = (options: THeroFieldsOptions = {}) => {
       title: 'Variant',
       type: 'string',
       description:
-        'Which shape the hero takes: Split shows the image beside the heading and copy, Stacked shows it below the copy, and Banner uses it as a full-bleed background behind the copy.',
+        'Split puts the image beside the copy, Stacked puts it below, Banner uses it as a full-bleed background.',
       options: {
-        layout: 'radio',
+        layout: 'dropdown',
         list: variantList.map((value) => ({
           title: toTitleCase(value),
           value,
@@ -89,37 +93,40 @@ export const heroFields = (options: THeroFieldsOptions = {}) => {
         : variantList[0],
       validation: (rule) => rule.required(),
     }),
-    brandVariantField({ list: FULL_BRAND_VARIANT_LIST }),
     ...imageFields,
-    ...alignmentFields([
-      {
-        name: 'contentPositionSplit',
-        title: 'Content Position',
-        description:
-          'Where the content sits relative to the image, on the Split grid.',
-        allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.RIGHT],
-        initialValue: CONTENT_ALIGNMENT.LEFT,
-        hidden: isNotVariant(HERO_VARIANT.SPLIT),
-      },
-      {
-        name: 'contentPositionBanner',
-        title: 'Content Position',
-        description:
-          'Where the content sits relative to the image, over the full-bleed background.',
-        allow: [
-          CONTENT_ALIGNMENT.LEFT,
-          CONTENT_ALIGNMENT.CENTER,
-          CONTENT_ALIGNMENT.RIGHT,
-        ],
-        initialValue: CONTENT_ALIGNMENT.LEFT,
-        hidden: isNotVariant(HERO_VARIANT.BANNER),
-      },
-    ]),
+    ...alignmentFields(
+      [
+        {
+          name: 'contentPositionSplit',
+          title: 'Position',
+          description: 'Which side of the image the text sits on.',
+          allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.RIGHT],
+          initialValue: CONTENT_ALIGNMENT.LEFT,
+          hidden: isNotVariant(HERO_VARIANT.SPLIT),
+          fieldset: HERO_FIELDSET_CONTENT_POSITION,
+        },
+        {
+          name: 'contentPositionBanner',
+          title: 'Position',
+          description: 'Where the text sits over the background image.',
+          allow: [
+            CONTENT_ALIGNMENT.LEFT,
+            CONTENT_ALIGNMENT.CENTER,
+            CONTENT_ALIGNMENT.RIGHT,
+          ],
+          initialValue: CONTENT_ALIGNMENT.LEFT,
+          hidden: isNotVariant(HERO_VARIANT.BANNER),
+          fieldset: HERO_FIELDSET_CONTENT_POSITION,
+        },
+      ],
+      { fieldset: HERO_FIELDSET_CONTENT_POSITION },
+    ),
     defineField({
       name: 'mediaOrderSplit',
       title: 'Mobile Media Order',
       type: 'string',
-      description: 'Order of media once the two columns collapse on mobile.',
+      description:
+        'Whether the image comes before or after the text once the columns stack on small screens.',
       options: {
         layout: 'dropdown',
         list: Object.values(MEDIA_ORDER).map((value) => ({
@@ -134,7 +141,7 @@ export const heroFields = (options: THeroFieldsOptions = {}) => {
       name: 'mediaOrderStacked',
       title: 'Media Order',
       type: 'string',
-      description: 'Order of media and content at every width.',
+      description: 'Whether the image comes before or after the text.',
       options: {
         layout: 'dropdown',
         list: Object.values(MEDIA_ORDER).map((value) => ({
@@ -145,7 +152,6 @@ export const heroFields = (options: THeroFieldsOptions = {}) => {
       initialValue: MEDIA_ORDER.LAST,
       hidden: isNotVariant(HERO_VARIANT.STACKED),
     }),
-    ctaButtonsField(options.buttons),
     heroLayoutField,
   ];
 };

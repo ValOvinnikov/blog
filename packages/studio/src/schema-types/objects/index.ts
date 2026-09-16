@@ -6,7 +6,10 @@ import { asideSchema } from './aside/aside';
 import { bodyImageSchema } from './body-image/body-image';
 import { brandSchema } from './brand/brand';
 import { brandTaglineSchema } from './brand-tagline/brand-tagline';
-import { ctaButtonSchema } from './cta-button/cta-button';
+import {
+  ctaButtonSchema,
+  ctaSecondaryButtonSchema,
+} from './cta-button/cta-button';
 import { headingBlockSchema } from './heading-block/heading-block';
 import { heroLayoutSchema } from './hero-layout/hero-layout';
 import { imageWithAltSchema } from './image-with-alt/image-with-alt';
@@ -33,6 +36,7 @@ export const objects = [
   ctaActionSchema,
   actionGroupSchema,
   ctaButtonSchema,
+  ctaSecondaryButtonSchema,
   openGraphSchema,
   seoSchema,
   brandTaglineSchema,

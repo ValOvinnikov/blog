@@ -42,6 +42,15 @@ describe('alignmentFields with no extras', () => {
     ]);
   });
 
+  it('defaults to Left unless the caller overrides it', () => {
+    expect(getBaselineField().initialValue).toBe(CONTENT_ALIGNMENT.LEFT);
+    expect(
+      alignmentFields([], { initialValue: CONTENT_ALIGNMENT.CENTER }).find(
+        (field) => field.name === 'contentAlignment',
+      )?.initialValue,
+    ).toBe(CONTENT_ALIGNMENT.CENTER);
+  });
+
   it('describes itself in terms true of any caller, not CTA specifically', () => {
     const field = getBaselineField();
 
@@ -56,6 +65,16 @@ describe('alignmentFields with no extras', () => {
 
     expect(field.options?.layout).toBe('dropdown');
   });
+
+  it('carries no fieldset when the caller passes none', () => {
+    expect(getBaselineField().fieldset).toBeUndefined();
+  });
+
+  it('places the baseline in the given fieldset', () => {
+    const [field] = alignmentFields([], { fieldset: 'contentPosition' });
+
+    expect(field?.fieldset).toBe('contentPosition');
+  });
 });
 
 describe('alignmentFields with a variant-scoped extra', () => {
@@ -68,6 +87,7 @@ describe('alignmentFields with a variant-scoped extra', () => {
         allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.RIGHT],
         initialValue: CONTENT_ALIGNMENT.LEFT,
         hidden: () => false,
+        fieldset: 'contentPosition',
       },
     ]);
 
@@ -87,5 +107,9 @@ describe('alignmentFields with a variant-scoped extra', () => {
       CONTENT_ALIGNMENT.LEFT,
       CONTENT_ALIGNMENT.RIGHT,
     ]);
+  });
+
+  it('carries the fieldset the extra declares', () => {
+    expect(getExtraField().fieldset).toBe('contentPosition');
   });
 });

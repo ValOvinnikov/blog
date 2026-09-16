@@ -1,4 +1,4 @@
-import { routes } from './routes';
+import { pageHref, routes } from './routes';
 
 describe('routes', () => {
   it('builds the home path', () => {
@@ -79,5 +79,28 @@ describe('routes', () => {
     expect(routes.newsletterUnsubscribe('a b&c=d')).toBe(
       '/api/newsletter/unsubscribe?token=a%20b%26c%3Dd',
     );
+  });
+});
+
+describe('pageHref', () => {
+  it('builds static paths for slug-less page types', () => {
+    expect(pageHref('page_home')).toBe('/');
+    expect(pageHref('page_postIndex')).toBe('/blog');
+    expect(pageHref('page_topicIndex')).toBe('/topics');
+    expect(pageHref('page_tagIndex')).toBe('/tags');
+  });
+
+  it('builds slugged paths for slugged page types', () => {
+    expect(pageHref('page_post', 'hello')).toBe('/blog/hello');
+    expect(pageHref('page_topic', 'design')).toBe('/topics/design');
+    expect(pageHref('page_tag', 'react')).toBe('/tags/react');
+    expect(pageHref('page_landing', 'about')).toBe('/about');
+  });
+
+  it('returns undefined for a slugged type with no slug, or an unknown type', () => {
+    expect(pageHref('page_post')).toBeUndefined();
+    expect(pageHref('page_post', null)).toBeUndefined();
+    expect(pageHref('settings')).toBeUndefined();
+    expect(pageHref(undefined)).toBeUndefined();
   });
 });
