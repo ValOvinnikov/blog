@@ -156,6 +156,26 @@ describe(`<${PostArticle.name}/>`, () => {
     );
   });
 
+  it('renders the author link with whatever href service resolved, even for a non-landing-page target', async () => {
+    getPostPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...mockPostDetail,
+        author: {
+          ...mockPostDetail.author,
+          profilePageHref: '/blog/tag/writers',
+        },
+      },
+    });
+
+    await setup();
+
+    expect(screen.getByRole('link', { name: 'Jane Doe' })).toHaveAttribute(
+      'href',
+      '/blog/tag/writers',
+    );
+  });
+
   it('renders BookmarkButtonGate beside the share widget, forwarding the post id', async () => {
     getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 

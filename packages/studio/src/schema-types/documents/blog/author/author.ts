@@ -1,6 +1,6 @@
-import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
+import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
-import { socialLinkSchema } from '@blog/studio/schema-types/objects/social-link/social-link';
+import { socialProfileSchema } from '@blog/studio/schema-types/objects/social-profile/social-profile';
 import { proseTextSchema } from '@blog/studio/schema-types/portable-text/prose-text/prose-text';
 import { UserRound } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
@@ -46,14 +46,14 @@ export const authorSchema = defineType({
       title: 'Social Links',
       type: 'array',
       description: 'Links to social profiles shown on the author page.',
-      of: [defineArrayMember({ type: socialLinkSchema.name })],
+      of: [defineArrayMember({ type: socialProfileSchema.name })],
     }),
     defineField({
       name: 'profilePage',
       title: 'Profile Page',
       type: 'reference',
       description: "Optional page this author's byline links to.",
-      to: [{ type: PAGE_LANDING_TYPE }],
+      to: [{ type: linkSchema.name }],
     }),
   ],
   preview: {

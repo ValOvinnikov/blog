@@ -1,7 +1,9 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawPostDetail } from '@blog/service/testing/pages/fixtures';
 import {
+  makeRawExternalLinkDocument,
   makeRawHeadingBlock,
+  makeRawInternalLinkDocument,
   makeRawPortableTextMarkDef,
   makeRawSanityImage,
   makeRawSeo,
@@ -63,7 +65,9 @@ describe('getPost', () => {
           _id: 'author-9',
           name: 'Jane Doe',
           image: makeRawSanityImage('Jane avatar'),
-          profilePage: { slug: 'jane-doe' },
+          profilePage: makeRawInternalLinkDocument({
+            internalReference: { _type: 'page_landing', slug: 'jane-doe' },
+          }),
           role: 'Editor',
           bio: null,
           socialLinks: null,
@@ -77,12 +81,75 @@ describe('getPost', () => {
     expect(result.author).toEqual({
       id: 'author-9',
       name: 'Jane Doe',
-      profilePageSlug: 'jane-doe',
+      profilePageHref: '/jane-doe',
       image: expect.objectContaining({ assetId: 'image-abc123-800x600-jpg' }),
       role: 'Editor',
       bio: undefined,
       socialLinks: [],
     });
+  });
+
+  it('resolves the author profilePage through a non-landing page type', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawPostDetail({
+        author: {
+          _id: 'author-9',
+          name: 'Jane Doe',
+          image: null,
+          profilePage: makeRawInternalLinkDocument({
+            internalReference: { _type: 'page_tag', slug: 'news' },
+          }),
+          role: null,
+          bio: null,
+          socialLinks: null,
+        },
+      }),
+    );
+
+    const result = await getPost('hello-world', tenant);
+    if (!result) throw new Error('expected a post detail');
+
+    expect(result.author.profilePageHref).toBe('/tags/news');
+  });
+
+  it('maps the author socialLinks through the shared social profile resolver', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawPostDetail({
+        author: {
+          _id: 'author-9',
+          name: 'Jane Doe',
+          image: null,
+          profilePage: null,
+          role: null,
+          bio: null,
+          socialLinks: [
+            {
+              platform: 'GITHUB',
+              link: makeRawExternalLinkDocument({
+                label: 'GitHub',
+                url: 'https://github.com/janedoe',
+              }),
+            },
+          ],
+        },
+      }),
+    );
+
+    const result = await getPost('hello-world', tenant);
+    if (!result) throw new Error('expected a post detail');
+
+    expect(result.author.socialLinks).toEqual([
+      {
+        platform: 'GITHUB',
+        link: {
+          label: 'GitHub',
+          href: 'https://github.com/janedoe',
+          target: undefined,
+          platform: undefined,
+          ariaLabel: undefined,
+        },
+      },
+    ]);
   });
 
   it('maps an author with no image to an undefined image', async () => {

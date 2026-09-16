@@ -1,8 +1,9 @@
 import { q } from '@blog/service/sanity/query';
+import { linkDocumentFragment } from '@blog/service/shared/fragments/link-document';
 import { portableTextMarkDefFragment } from '@blog/service/shared/fragments/portable-text-mark-def';
 
 import { sanityImageFragment } from './image';
-import { socialLinkFragment } from './social-link';
+import { socialProfileFragment } from './social-profile';
 
 export const authorCardFragment = q
   .fragmentForType<'blog_author'>()
@@ -13,9 +14,7 @@ export const authorCardFragment = q
     profilePage: sub
       .field('profilePage')
       .deref()
-      .project((ref) => ({
-        slug: ref.field('slug.current').notNull(),
-      }))
+      .project(linkDocumentFragment)
       .nullable(true),
   }));
 
@@ -28,9 +27,7 @@ export const authorDetailFragment = q
     profilePage: sub
       .field('profilePage')
       .deref()
-      .project((ref) => ({
-        slug: ref.field('slug.current').notNull(),
-      }))
+      .project(linkDocumentFragment)
       .nullable(true),
     role: sub.field('role').nullable(true),
     bio: sub
@@ -45,6 +42,6 @@ export const authorDetailFragment = q
       .nullable(true),
     socialLinks: sub
       .field('socialLinks[]')
-      .project(socialLinkFragment)
+      .project(socialProfileFragment)
       .nullable(true),
   }));

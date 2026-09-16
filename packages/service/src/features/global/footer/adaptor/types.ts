@@ -1,10 +1,5 @@
-import type { ILink, TSocialPlatform } from '@blog/config';
-
-export type TFooterSocialLink = {
-  platform: TSocialPlatform;
-  link: ILink;
-};
+import type { TSocialProfile } from '@blog/service/shared/transformers/to-social-profile';
 
 export type TFooter = {
-  social: TFooterSocialLink[];
+  social: TSocialProfile[];
 };

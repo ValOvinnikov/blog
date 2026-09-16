@@ -46,8 +46,8 @@ Studio from one deployment.
   `module_cta`, `module_hero`, `module_heroBlog`, `module_newsletter`,
   `module_postFeatured`, `module_postLatest`, `module_postList`,
   `module_postRelated`, `module_taxonomyList`)
-- `src/schema-types/objects/` — shared object types (`link`, `socialLink`,
-  `brand`, `imageWithAlt`, `seo`, `openGraph`, …)
+- `src/schema-types/objects/` — shared object types (`linkRef`, `ctaButton`,
+  `socialProfile`, `brand`, `imageWithAlt`, `seo`, `openGraph`, …)
 - `src/schema-types/portable-text/` — the Portable Text block editors
   (`richText`, `proseText`, `inlineText`)
 - `src/schema-types/fields/` — DRY field factories reused across schemas

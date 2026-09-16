@@ -15,7 +15,6 @@ import { linkRefSchema } from './link-ref/link-ref';
 import { openGraphSchema } from './open-graph/open-graph';
 import { postTakeawaysSchema } from './post-takeaways/post-takeaways';
 import { seoSchema } from './seo/seo';
-import { socialLinkSchema } from './social-link/social-link';
 import { socialProfileSchema } from './social-profile/social-profile';
 
 export const objects = [
@@ -25,7 +24,6 @@ export const objects = [
   imageWithAltSchema,
   bodyImageSchema,
   asideSchema,
-  socialLinkSchema,
   inlineLinkSchema,
   linkRefSchema,
   socialProfileSchema,

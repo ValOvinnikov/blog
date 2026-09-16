@@ -88,8 +88,11 @@ its own task, outside this prompt. When in doubt, leave `modules` off entirely.
 when present — omit the image and the byline shows initials) · `bio`
 (`proseText`, an unrestricted default Portable Text array — keep it to plain
 paragraphs) · `role` (≤ 100, e.g. "Senior Engineer") ·
-`socialLinks` (array of `socialLink`: `platform` and `url`, both required) ·
-`profilePage` (optional ref → `page_landing`, the page the byline links to).
+`socialLinks` (array of `socialProfile`: a `platform` from `SOCIAL_PLATFORMS`
+plus a reference to a `link` document — the destination is authored once in
+the Links section, not typed here) · `profilePage` (optional ref → a `link`
+document, the page the byline links to; it may target any page type, not
+only a landing page).
 
 **An author has no slug and no route of its own** — do not invent one.
 

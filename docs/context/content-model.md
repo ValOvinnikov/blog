@@ -131,8 +131,9 @@ replacing a hand-duplicated block per page document.
   (`skim` object, **optional** — `takeaways` (3-7 items, each max 160 chars),
   `generatedAt`/`model` read-only in Studio; pipeline-populated for the
   choose-your-depth reading feature, #957).
-- `author` — name, slug, image, bio, role, socialLinks (unified `link`-based),
-  profilePage (optional ref, restricted to `page_landing`).
+- `author` — name, image, bio, role, socialLinks (array of `socialProfile`),
+  profilePage (optional ref → a `link` document, so any page type it can
+  target).
 - `category` — title, slug, description.
 - `tag` — title, slug, description (topic taxonomy for posts; drives the
   `/tag` archives + related-posts, alongside the section-level `category`).
@@ -187,8 +188,9 @@ empty. Singletons resolve their Studio label via `preview.prepare` instead
 (select `title`, fall back to `'Unknown'`). Content/module documents pass
 `max` for an editable headline.
 
-**Objects** — `link` (unified internal/external, `LINK_TYPE` const),
-`socialLink`, `brand`, `brandTagline` (structured tagline: `items` + a
+**Objects** — `linkRef`, `ctaButton`, `ctaSecondaryButton` and
+`socialProfile` (each wrapping a reference to a `link` **document**),
+`brand`, `brandTagline` (structured tagline: `items` + a
 `BRAND_TAGLINE_SEPARATORS`-driven `separator`), `imageWithAlt` (required alt —
 used by `heroImage`, `author.avatar`, `brand`, `openGraph.image`, and
 site-settings favicon/logo), `bodyImage` (required alt; optional `layout`
