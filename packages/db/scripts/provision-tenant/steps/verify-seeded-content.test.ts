@@ -244,6 +244,19 @@ describe(verifyTenantSeededContent, () => {
     );
   });
 
+  it('does not throw when settings_navigation has no items field (GROQ evaluates items[] to null, not [])', async () => {
+    const tenant = baseTenant();
+    const { createClient } = createClientStubResolving(
+      ['settings_site', 'settings_navigation', 'settings_footer'],
+      VALID_HOME_PAGE,
+      null,
+    );
+
+    await expect(
+      verifyTenantSeededContent(tenant, env, baseDeps({ createClient })),
+    ).resolves.toBeUndefined();
+  });
+
   it('fails the run when the dataset has no page_home document', async () => {
     const tenant = baseTenant();
     const { createClient } = createClientStubResolving(

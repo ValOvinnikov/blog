@@ -130,10 +130,10 @@ export async function verifyTenantSeededContent(
   }
 
   const navigationItems = await readWithGrantPropagationRetry<
-    TNavigationItemLinkCheck[]
+    TNavigationItemLinkCheck[] | null
   >(
     () =>
-      client.fetch<TNavigationItemLinkCheck[]>(
+      client.fetch<TNavigationItemLinkCheck[] | null>(
         '*[_type == "settings_navigation"][0].items[]{ "resolved": defined(link->_id) }',
       ),
     retryOptions,
@@ -144,7 +144,7 @@ export async function verifyTenantSeededContent(
       ),
   );
 
-  const unresolvedNavigationItemCount = navigationItems.filter(
+  const unresolvedNavigationItemCount = (navigationItems ?? []).filter(
     (item) => !item.resolved,
   ).length;
 
