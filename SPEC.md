@@ -250,21 +250,27 @@ incrementally (#251).
 else.** `link` is a document — not a shared object — carrying `label`, a
 `linkType` (`INTERNAL`/`EXTERNAL` from `LINK_TYPE`), and exactly one
 destination: an `internalReference` to a page document, or a `url` validated
-as an absolute `http(s)` address. Three shared objects wrap a reference to
-it, each adding only what its surface needs: `linkRef` (nothing — a bare
-reference, used by navigation items and Portable Text annotations),
-`ctaButton` (`variant` and `appearance`), and `socialProfile` (`platform`).
-Nothing stores a destination inline alongside a reference, so changing where
-a link points is a single edit that every consumer picks up.
+as an absolute `http(s)` address. Shared objects wrap a reference to it, each
+adding only what its surface needs: `linkRef` (nothing — a bare reference,
+used by navigation items and Portable Text annotations), `ctaButton`
+(`variant` and `appearance`), `ctaSecondaryButton` (`ctaButton`'s
+variant-locked sibling, detailed with `module_heroBlog` below), and
+`socialProfile` (`platform`). None of them stores a destination of its own,
+so changing where a link points is a single edit that every consumer picks
+up.
+
+The one shape still holding a destination inline is `inlineLink`, surviving
+solely as `module_hero.secondaryAction`'s type until #2813 retires that
+module.
 
 **Body-text links are annotations, not stored hrefs.** `richText`, `proseText`
 and `inlineText` each declare `marks.annotations` explicitly as `linkRef`,
 and `@blog/service` dereferences it while projecting the block. Because the
 annotation holds a reference rather than a URL, a link whose target document
 was deleted resolves to nothing and renders as **plain text** rather than a
-dead anchor. Declaring `annotations` explicitly also overrides Sanity's
-built-in annotation, which is what removes the paste-a-URL shortcut in prose:
-an author picks an existing `link` document instead, which is the point.
+dead anchor. Declaring `annotations` explicitly also replaces the default
+annotation set, so prose offers no paste-a-URL annotation of its own — an
+author picks an existing `link` document instead, which is the point.
 
 **`settings_navigation` and `settings_footer` both author through the
 library.** `settings_navigation.items` is an array of `linkRef`, so a
