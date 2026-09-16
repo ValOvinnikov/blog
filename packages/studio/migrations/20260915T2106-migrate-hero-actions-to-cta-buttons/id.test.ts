@@ -1,25 +1,27 @@
 import { toLinkId, toLinkIdentityKey } from './id';
 
 describe(toLinkIdentityKey, () => {
-  it('keys an internal link on the referenced document id', () => {
+  it('keys an internal link on the referenced document id and label', () => {
     const key = toLinkIdentityKey({
       linkType: 'INTERNAL',
+      label: 'Blog',
       internalReference: { _ref: 'page-post-1' },
     });
 
-    expect(key).toBe('internal:page-post-1');
+    expect(key).toBe('internal:page-post-1|label:Blog');
   });
 
-  it('keys an external link on the url', () => {
+  it('keys an external link on the url and label', () => {
     const key = toLinkIdentityKey({
       linkType: 'EXTERNAL',
+      label: 'Pricing',
       url: 'https://example.com/pricing',
     });
 
-    expect(key).toBe('external:https://example.com/pricing');
+    expect(key).toBe('external:https://example.com/pricing|label:Pricing');
   });
 
-  it('never keys on label — two links can share a label and point elsewhere', () => {
+  it('keys two links with the same label but different destinations differently', () => {
     const a = toLinkIdentityKey({
       linkType: 'EXTERNAL',
       label: 'Learn more',
@@ -32,6 +34,36 @@ describe(toLinkIdentityKey, () => {
     });
 
     expect(a).not.toBe(b);
+  });
+
+  it('keys two links with the same destination but different labels differently', () => {
+    const a = toLinkIdentityKey({
+      linkType: 'INTERNAL',
+      label: 'Blog',
+      internalReference: { _ref: 'page-post-1' },
+    });
+    const b = toLinkIdentityKey({
+      linkType: 'INTERNAL',
+      label: 'Read Latest',
+      internalReference: { _ref: 'page-post-1' },
+    });
+
+    expect(a).not.toBe(b);
+  });
+
+  it('keys two links with the same destination and label the same, for dedup', () => {
+    const a = toLinkIdentityKey({
+      linkType: 'INTERNAL',
+      label: 'Blog',
+      internalReference: { _ref: 'page-post-1' },
+    });
+    const b = toLinkIdentityKey({
+      linkType: 'INTERNAL',
+      label: 'Blog',
+      internalReference: { _ref: 'page-post-1' },
+    });
+
+    expect(a).toBe(b);
   });
 
   it('is undefined for an internal link with no internalReference set', () => {

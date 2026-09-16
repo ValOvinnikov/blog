@@ -17,6 +17,7 @@ import { openGraphSchema } from './open-graph/open-graph';
 import { postTakeawaysSchema } from './post-takeaways/post-takeaways';
 import { seoSchema } from './seo/seo';
 import { socialLinkSchema } from './social-link/social-link';
+import { socialProfileSchema } from './social-profile/social-profile';
 
 export const objects = [
   layoutSchema,
@@ -28,6 +29,7 @@ export const objects = [
   socialLinkSchema,
   inlineLinkSchema,
   linkRefSchema,
+  socialProfileSchema,
   ctaActionSchema,
   actionGroupSchema,
   ctaButtonSchema,

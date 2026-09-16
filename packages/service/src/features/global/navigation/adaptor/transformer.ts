@@ -1,4 +1,4 @@
-import { toLink } from '@blog/service/shared/transformers/to-link';
+import { toLinkDocument } from '@blog/service/shared/transformers/to-link-document';
 import type { InferResultType } from 'groqd';
 
 import type { navigationQuery } from './query';
@@ -10,6 +10,6 @@ export type TRawNavigation = NonNullable<
 
 export function toNavigation(raw: TRawNavigation): TNavigation {
   return {
-    items: (raw.items ?? []).flatMap((item) => toLink(item) ?? []),
+    items: (raw.items ?? []).flatMap((item) => toLinkDocument(item.link) ?? []),
   };
 }

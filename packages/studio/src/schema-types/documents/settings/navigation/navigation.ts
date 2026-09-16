@@ -1,5 +1,5 @@
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { inlineLinkSchema } from '@blog/studio/schema-types/objects/inline-link/inline-link';
+import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
 import { Menu } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
@@ -17,7 +17,7 @@ export const navigationSettingsSchema = defineType({
       title: 'Header Links',
       type: 'array',
       description: 'Top-level nav links rendered in the site header.',
-      of: [defineArrayMember({ type: inlineLinkSchema.name })],
+      of: [defineArrayMember({ type: linkRefSchema.name })],
     }),
   ],
 });

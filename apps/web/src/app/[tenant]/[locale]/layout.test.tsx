@@ -109,8 +109,20 @@ vi.mock('@blog/service', () => ({
   urlForSanityImage: urlForSanityImageMock,
 }));
 
-const rssTranslations: Record<string, string> = {
+const translations: Record<string, string> = {
   feedLinkLabel: 'RSS feed',
+  socialLinkAriaLabel: '{platform} profile',
+};
+
+// A minimal stand-in for next-intl's ICU interpolation — sufficient for the
+// one `{platform}` placeholder this file's messages use.
+const translate = (key: string, values?: Record<string, string>): string => {
+  const template = translations[key] ?? key;
+  if (!values) return template;
+  return Object.entries(values).reduce(
+    (acc, [name, value]) => acc.replaceAll(`{${name}}`, value),
+    template,
+  );
 };
 
 vi.mock('next-intl/server', () => ({
@@ -121,11 +133,6 @@ vi.mock('next-intl/server', () => ({
   setRequestLocale: setRequestLocaleMock,
 }));
 
-// `LocaleLayout`'s resolved tree renders a real `SessionProvider` (`AuthMenu`
-// reads the session client-side). Mocked here (not just `useSession`) so
-// mounting it under `render()` never fires next-auth's real session fetch —
-// a plain pass-through, the same stance `auth-menu.test.tsx` takes on this
-// module.
 vi.mock('next-auth/react', () => ({
   useSession: useSessionMock,
   signIn: vi.fn(),
@@ -144,13 +151,6 @@ const THEME_TOKENS = {
   density: 'DEFAULT',
 };
 
-// `LocaleLayout` is an async Server Component — `customRenderAsync` awaits
-// it, then mounts the resolved element tree via RTL's `render()`. The real
-// catalog messages (not a minimal stub) flow through the mocked
-// `getMessages()` below so every client component nested under `Header`/
-// `Footer` (`SiteNavigation`, `BrandLockupLink`, `AuthMenu`, ...) finds its
-// own namespace on the real `NextIntlClientProvider` `LocaleLayout` renders,
-// instead of throwing/falling back on a missing-message error.
 const setup = customRenderAsync(LocaleLayout, {
   children: <div>content</div>,
   params: Promise.resolve({
@@ -177,9 +177,7 @@ describe('LocaleLayout', () => {
     getMessagesMock.mockResolvedValue(realMessages);
     getNowMock.mockResolvedValue(now);
     getTimeZoneMock.mockResolvedValue('UTC');
-    getTranslationsMock.mockResolvedValue(
-      (key: string) => rssTranslations[key] ?? key,
-    );
+    getTranslationsMock.mockResolvedValue(translate);
     isProductionEnvironmentMock.mockReturnValue(true);
     useSessionMock.mockReturnValue({ data: null, status: 'unauthenticated' });
     getEnabledOAuthProviderIdsMock.mockReturnValue(['github', 'google']);
@@ -283,10 +281,8 @@ describe('LocaleLayout', () => {
     });
   });
 
-  // These call `LocaleLayout` directly and read props off the resolved
-  // element tree — the root element is now `ThemeScope`, whose `children`
-  // prop is `NextIntlClientProvider` followed by the conditional analytics
-  // components.
+  // The resolved tree's root is `ThemeScope`, whose `children` is
+  // `NextIntlClientProvider` followed by the conditional analytics components.
   it('passes real messages, locale, now, and timeZone to NextIntlClientProvider', async () => {
     const html = await LocaleLayout({
       children: <div>content</div>,
@@ -437,25 +433,24 @@ describe('LocaleLayout', () => {
     const link = screen.getByRole('link', { name: 'RSS feed' });
 
     expect(link).toHaveAttribute('href', routes.rssFeed());
-    // `hasLabel={false}` sets the link's `title` to its own label text (see
-    // `NavLink`) — the one DOM-observable trace of that prop being `false`.
     expect(link).toHaveAttribute('title', 'RSS feed');
-    // The decorative icon is `aria-hidden` with no role, so a fixed
-    // `dataTestId` (`rss-icon`, from `layout.tsx`) is the only way to assert
-    // the *correct* icon rendered, not just any icon.
     expect(within(link).getByTestId('rss-icon')).toBeVisible();
   });
 
-  it('renders a mapped social link icon-only, keeping its label as the accessible name', async () => {
+  it('renders a mapped social link icon-only, with an accessible name derived from its platform', async () => {
     getFooterMock.mockResolvedValue({
       ok: true,
       data: {
         social: [
           {
-            label: 'LinkedIn',
-            href: 'https://www.linkedin.com/in/example',
-            target: '_blank',
             platform: SOCIAL_PLATFORMS.LINKEDIN,
+            link: {
+              label: 'LinkedIn',
+              href: 'https://www.linkedin.com/in/example',
+              target: '_blank',
+              platform: undefined,
+              ariaLabel: undefined,
+            },
           },
         ],
       },
@@ -463,14 +458,10 @@ describe('LocaleLayout', () => {
 
     await setup();
 
-    const link = screen.getByRole('link', { name: 'LinkedIn' });
+    const link = screen.getByRole('link', { name: 'LinkedIn profile' });
 
     expect(link).toHaveAttribute('href', 'https://www.linkedin.com/in/example');
-    // A mapped platform renders icon-only (`hasLabel={false}`), traced the
-    // same way as the RSS link above.
-    expect(link).toHaveAttribute('title', 'LinkedIn');
-    // `dataTestId={`social-icon-${link.platform}`}` in `layout.tsx` — asserts
-    // the *LinkedIn* icon rendered, not just any icon.
+    expect(link).toHaveAttribute('title', 'LinkedIn profile');
     expect(
       within(link).getByTestId(`social-icon-${SOCIAL_PLATFORMS.LINKEDIN}`),
     ).toBeVisible();
@@ -482,10 +473,14 @@ describe('LocaleLayout', () => {
       data: {
         social: [
           {
-            label: 'Mastodon',
-            href: 'https://mastodon.social/@example',
-            target: '_blank',
             platform: SOCIAL_PLATFORMS.MASTODON,
+            link: {
+              label: 'Mastodon',
+              href: 'https://mastodon.social/@example',
+              target: '_blank',
+              platform: undefined,
+              ariaLabel: undefined,
+            },
           },
         ],
       },
@@ -496,12 +491,7 @@ describe('LocaleLayout', () => {
     const link = screen.getByRole('link', { name: 'Mastodon' });
 
     expect(link).toHaveAttribute('href', 'https://mastodon.social/@example');
-    // An unmapped platform keeps `hasLabel` true — no icon, and no `title`
-    // since the visible label text is already the accessible name.
     expect(link).not.toHaveAttribute('title');
-    // No `iconName` is resolved for an unmapped platform, so `layout.tsx`
-    // never even renders an `<Icon>` (no `dataTestId` to attach either) —
-    // restoring the original "no icon at all" coverage.
     expect(
       within(link).queryByTestId(`social-icon-${SOCIAL_PLATFORMS.MASTODON}`),
     ).not.toBeInTheDocument();

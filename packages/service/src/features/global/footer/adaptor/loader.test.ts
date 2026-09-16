@@ -31,13 +31,13 @@ describe('getFooter', () => {
       makeRawFooter({
         social: [
           {
-            label: 'GitHub',
-            linkType: 'EXTERNAL',
-            url: 'https://github.com/val',
-            internalReference: null,
-            openInNewTab: null,
             platform: 'GITHUB',
-            accessibleLabel: null,
+            link: {
+              label: 'GitHub',
+              linkType: 'EXTERNAL',
+              url: 'https://github.com/val',
+              openInNewTab: null,
+            },
           },
         ],
       }),
@@ -47,11 +47,14 @@ describe('getFooter', () => {
 
     expect(result.social).toEqual([
       {
-        label: 'GitHub',
-        href: 'https://github.com/val',
-        target: undefined,
         platform: 'GITHUB',
-        ariaLabel: undefined,
+        link: {
+          label: 'GitHub',
+          href: 'https://github.com/val',
+          target: undefined,
+          platform: undefined,
+          ariaLabel: undefined,
+        },
       },
     ]);
   });
@@ -72,6 +75,12 @@ describe('getFooter', () => {
             't:tenant-a:topic',
             't:tenant-a:page_landing',
             't:tenant-a:page_postIndex',
+            't:tenant-a:link',
+            't:tenant-a:homePage',
+            't:tenant-a:page_topic',
+            't:tenant-a:page_topicIndex',
+            't:tenant-a:page_tag',
+            't:tenant-a:page_tagIndex',
           ],
         }),
       }),
