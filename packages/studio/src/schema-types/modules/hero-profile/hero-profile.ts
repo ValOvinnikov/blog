@@ -185,7 +185,7 @@ export const heroProfileSchema = defineType({
         "Whether to display the author's social profile links in this hero.",
       initialValue: true,
     }),
-    ...heroFields({ image: false, mediaOrderStacked: false }),
+    ...heroFields({ hasOwnImage: true, hasStackedLayout: false }),
   ],
   preview: {
     select: {

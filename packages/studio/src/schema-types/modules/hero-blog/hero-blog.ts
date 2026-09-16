@@ -257,7 +257,7 @@ export const heroBlogSchema = defineType({
       description:
         'Optional supporting action next to the primary one. Leave the link empty to show none.',
     }),
-    ...heroFields({ image: false }),
+    ...heroFields({ hasOwnImage: true }),
   ],
   preview: {
     select: {

@@ -239,7 +239,7 @@ describe('heroProfileSchema showSocialLinks field', () => {
 });
 
 describe('heroProfileSchema hero tail', () => {
-  it('has no image field of its own type from heroFields (image: false)', () => {
+  it('has no image field of its own type from heroFields (hasOwnImage: true)', () => {
     const imageFields = heroProfileSchema.fields?.filter(
       (field) => 'name' in field && field.name === 'image',
     );

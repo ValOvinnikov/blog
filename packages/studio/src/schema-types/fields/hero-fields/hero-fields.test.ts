@@ -138,8 +138,8 @@ describe('heroFields image field', () => {
     ).toBe(true);
   });
 
-  it('is suppressed entirely when image: false', () => {
-    const fields = heroFields({ image: false });
+  it('is suppressed entirely when hasOwnImage: true', () => {
+    const fields = heroFields({ hasOwnImage: true });
 
     expect(
       fields.some((field) => 'name' in field && field.name === 'image'),
@@ -267,8 +267,8 @@ describe('heroFields media order fields', () => {
     }
   });
 
-  it('is suppressed entirely when mediaOrderStacked: false, leaving mediaOrderSplit', () => {
-    const fields = heroFields({ mediaOrderStacked: false });
+  it('is suppressed entirely when hasStackedLayout: false, leaving mediaOrderSplit', () => {
+    const fields = heroFields({ hasStackedLayout: false });
 
     expect(
       fields.some(

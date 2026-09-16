@@ -34,10 +34,8 @@ export const heroFieldsets: FieldsetDefinition[] = [
 type THeroFieldsOptions = {
   /** Restricts the Variant field's option set, for a kind that can't sensibly be a Banner. */
   variants?: readonly THeroVariant[];
-  /** Pass `false` when the kind supplies its own image field in this position. */
-  image?: false;
-  /** Pass `false` when the kind has no Stacked layout, so no media order is needed for it. */
-  mediaOrderStacked?: false;
+  hasOwnImage?: boolean;
+  hasStackedLayout?: boolean;
 };
 
 /**
@@ -47,37 +45,35 @@ type THeroFieldsOptions = {
 export const heroFields = (options: THeroFieldsOptions = {}) => {
   const variantList = options.variants ?? Object.values(HERO_VARIANT);
 
-  const imageFields =
-    options.image === false
-      ? []
-      : [
-          defineField({
-            name: 'image',
-            title: 'Image',
-            type: imageWithAltSchema.name,
-            description:
-              "The hero's image — sits beside the copy for Split, below the copy for Stacked, or behind the copy as a full-bleed background for Banner.",
-            validation: (rule) =>
-              rule.custom((value, context) => {
-                const variant = (
-                  context.parent as THeroFieldsParent | undefined
-                )?.variant;
+  const imageFields = options.hasOwnImage
+    ? []
+    : [
+        defineField({
+          name: 'image',
+          title: 'Image',
+          type: imageWithAltSchema.name,
+          description:
+            "The hero's image — sits beside the copy for Split, below the copy for Stacked, or behind the copy as a full-bleed background for Banner.",
+          validation: (rule) =>
+            rule.custom((value, context) => {
+              const variant = (context.parent as THeroFieldsParent | undefined)
+                ?.variant;
 
-                if (
-                  !value &&
-                  (variant === HERO_VARIANT.SPLIT ||
-                    variant === HERO_VARIANT.BANNER)
-                ) {
-                  return 'Image is required for the Split and Banner variants.';
-                }
+              if (
+                !value &&
+                (variant === HERO_VARIANT.SPLIT ||
+                  variant === HERO_VARIANT.BANNER)
+              ) {
+                return 'Image is required for the Split and Banner variants.';
+              }
 
-                return true;
-              }),
-          }),
-        ];
+              return true;
+            }),
+        }),
+      ];
 
   const mediaOrderStackedFields =
-    options.mediaOrderStacked === false
+    options.hasStackedLayout === false
       ? []
       : [
           defineField({
