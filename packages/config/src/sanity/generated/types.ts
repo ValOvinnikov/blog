@@ -355,12 +355,6 @@ export type InlineLink = {
     | 'RSS';
 };
 
-export type SocialLink = {
-  _type: 'socialLink';
-  platform?: string;
-  url?: string;
-};
-
 export type Aside = {
   _type: 'aside';
   kind?: 'WHY_NOT' | 'DIGRESSION' | 'CONTEXT';
@@ -475,6 +469,24 @@ export type Settings_site = {
   _rev: string;
   title?: string;
   brand?: Brand;
+};
+
+export type Blog_author = {
+  _id: string;
+  _type: 'blog_author';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  image?: ImageWithAlt;
+  bio?: ProseText;
+  role?: string;
+  socialLinks?: Array<
+    {
+      _key: string;
+    } & SocialProfile
+  >;
+  profilePage?: LinkReference;
 };
 
 export type Page_homeReference = {
@@ -658,6 +670,17 @@ export type Page_tag = {
   seo?: Seo;
 };
 
+export type Blog_tag = {
+  _id: string;
+  _type: 'blog_tag';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  description?: string;
+};
+
 export type Slug = {
   _type: 'slug';
   current?: string;
@@ -785,70 +808,6 @@ export type Module_contentReference = {
   [internalGroqTypeReferenceTo]?: 'module_content';
 };
 
-export type Page_home = {
-  _id: string;
-  _type: 'page_home';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  headingBlock?: HeadingBlock;
-  hero?:
-    | Module_heroReference
-    | Module_heroBlogReference
-    | Module_heroStatementReference;
-  modules?: Array<
-    | ({
-        _key: string;
-      } & Module_contentReference)
-    | ({
-        _key: string;
-      } & Module_ctaReference)
-    | ({
-        _key: string;
-      } & Module_newsletterReference)
-    | ({
-        _key: string;
-      } & Module_postLatestReference)
-    | ({
-        _key: string;
-      } & Module_taxonomyListReference)
-    | ({
-        _key: string;
-      } & Module_postFeaturedReference)
-  >;
-  seo?: Seo;
-};
-
-export type Blog_tag = {
-  _id: string;
-  _type: 'blog_tag';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  slug?: Slug;
-  description?: string;
-};
-
-export type Blog_author = {
-  _id: string;
-  _type: 'blog_author';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  name?: string;
-  image?: ImageWithAlt;
-  bio?: ProseText;
-  role?: string;
-  socialLinks?: Array<
-    {
-      _key: string;
-    } & SocialLink
-  >;
-  profilePage?: Page_landingReference;
-};
-
 export type Page_landing = {
   _id: string;
   _type: 'page_landing';
@@ -881,6 +840,41 @@ export type Page_landing = {
     | ({
         _key: string;
       } & Module_taxonomyListReference)
+  >;
+  seo?: Seo;
+};
+
+export type Page_home = {
+  _id: string;
+  _type: 'page_home';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  headingBlock?: HeadingBlock;
+  hero?:
+    | Module_heroReference
+    | Module_heroBlogReference
+    | Module_heroStatementReference;
+  modules?: Array<
+    | ({
+        _key: string;
+      } & Module_contentReference)
+    | ({
+        _key: string;
+      } & Module_ctaReference)
+    | ({
+        _key: string;
+      } & Module_newsletterReference)
+    | ({
+        _key: string;
+      } & Module_postLatestReference)
+    | ({
+        _key: string;
+      } & Module_taxonomyListReference)
+    | ({
+        _key: string;
+      } & Module_postFeaturedReference)
   >;
   seo?: Seo;
 };
@@ -1176,7 +1170,6 @@ export type AllSanitySchemaTypes =
   | Page_landingReference
   | Page_postIndexReference
   | InlineLink
-  | SocialLink
   | Aside
   | BodyImage
   | HeroLayout
@@ -1187,6 +1180,7 @@ export type AllSanitySchemaTypes =
   | Settings_footer
   | Settings_navigation
   | Settings_site
+  | Blog_author
   | Page_homeReference
   | Page_topicReference
   | Page_topicIndexReference
@@ -1204,6 +1198,7 @@ export type AllSanitySchemaTypes =
   | Blog_tagReference
   | Module_postListReference
   | Page_tag
+  | Blog_tag
   | Slug
   | Page_topicIndex
   | Module_taxonomyList
@@ -1211,10 +1206,8 @@ export type AllSanitySchemaTypes =
   | Module_postFeaturedReference
   | Page_postIndex
   | Module_contentReference
-  | Page_home
-  | Blog_tag
-  | Blog_author
   | Page_landing
+  | Page_home
   | Module_heroStatement
   | Module_heroBlog
   | Module_hero
