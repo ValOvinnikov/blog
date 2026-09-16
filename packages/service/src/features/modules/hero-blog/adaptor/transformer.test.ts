@@ -140,39 +140,25 @@ describe(toHeroBlogModule, () => {
     expect(hero.sanityImage).toBeUndefined();
   });
 
-  it('falls back to "Read more" with a hidden suffix when primaryActionLabel is unset', () => {
+  it('builds the primary button from the authored label, linking to the resolved post', () => {
     const raw = makeRawHeroBlogModule({
       post: makeRawPostCard(),
-      primaryActionLabel: null,
+      primaryActionLabel: 'Discover the story',
+      primaryActionAppearance: CTA_ACTION_APPEARANCE.CONTAINED,
     });
 
     const hero = toHeroBlogModule(raw);
 
     expect(hero.ctaButtons[0]).toEqual({
       variant: CTA_ACTION_VARIANT.PRIMARY,
-      appearance: undefined,
+      appearance: CTA_ACTION_APPEARANCE.CONTAINED,
       link: {
-        label: 'Read more',
+        label: 'Discover the story',
         href: '/blog/hello-world',
         target: undefined,
         platform: undefined,
         ariaLabel: undefined,
       },
-      hiddenLabelSuffix: 'Hello World',
-    });
-  });
-
-  it('trusts an authored primaryActionLabel and omits the hidden suffix', () => {
-    const raw = makeRawHeroBlogModule({
-      post: makeRawPostCard(),
-      primaryActionLabel: 'Discover the story',
-    });
-
-    const hero = toHeroBlogModule(raw);
-
-    expect(hero.ctaButtons[0]).toMatchObject({
-      link: { label: 'Discover the story' },
-      hiddenLabelSuffix: undefined,
     });
   });
 
@@ -189,17 +175,6 @@ describe(toHeroBlogModule, () => {
       expect(hero.ctaButtons[0]?.appearance).toBe(appearance);
     },
   );
-
-  it('leaves the primary button appearance undefined when unset (no faked default)', () => {
-    const raw = makeRawHeroBlogModule({
-      post: makeRawPostCard(),
-      primaryActionAppearance: null,
-    });
-
-    const hero = toHeroBlogModule(raw);
-
-    expect(hero.ctaButtons[0]?.appearance).toBeUndefined();
-  });
 
   it('has no ctaButtons when there is no post and no authored secondary', () => {
     const raw = makeRawHeroBlogModule({ post: null, secondaryAction: null });

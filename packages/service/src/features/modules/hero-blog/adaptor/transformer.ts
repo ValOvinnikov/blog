@@ -1,12 +1,12 @@
 import {
   CTA_ACTION_VARIANT,
   HERO_IMAGE_SOURCE,
+  routes,
   type ISanityImage,
   type TMaybeUndefined,
 } from '@blog/config';
 import { toCtaButton } from '@blog/service/shared/transformers/to-cta-button';
 import { toHeroPresentation } from '@blog/service/shared/transformers/to-hero-presentation';
-import { toHeroPrimaryAction } from '@blog/service/shared/transformers/to-hero-primary-action';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import {
   toPostCard,
@@ -42,33 +42,25 @@ function toPrimaryButton(
   raw: TRawHeroBlogModule,
   post: TPostCard | undefined,
 ): THeroBlogButton | undefined {
-  const primaryAction = toHeroPrimaryAction(
-    raw.primaryActionLabel,
-    post,
-    raw.primaryActionAppearance,
-  );
-  if (!primaryAction) return undefined;
+  if (!post) return undefined;
 
   return {
     variant: CTA_ACTION_VARIANT.PRIMARY,
-    appearance: primaryAction.appearance,
+    appearance: raw.primaryActionAppearance,
     link: {
-      label: primaryAction.label,
-      href: primaryAction.href,
-      target: primaryAction.target,
-      platform: primaryAction.platform,
+      label: raw.primaryActionLabel,
+      href: routes.post(post.slug),
+      target: undefined,
+      platform: undefined,
       ariaLabel: undefined,
     },
-    hiddenLabelSuffix: primaryAction.hiddenLabelSuffix,
   };
 }
 
 function toSecondaryButton(
   raw: TRawHeroBlogModule['secondaryAction'],
 ): THeroBlogButton | undefined {
-  const button = raw ? toCtaButton(raw) : undefined;
-
-  return button ? { ...button, hiddenLabelSuffix: undefined } : undefined;
+  return raw ? toCtaButton(raw) : undefined;
 }
 
 /** Orders the hero's CTA buttons with the derived primary first, then the authored secondary. */

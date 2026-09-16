@@ -230,9 +230,9 @@ export const heroBlogSchema = defineType({
       name: 'primaryActionLabel',
       title: 'Label',
       type: 'string',
-      description: 'Text of the action. Defaults to "Read more".',
+      description: 'Text of the action.',
       fieldset: FIELDSET_PRIMARY_ACTION,
-      validation: (rule) => rule.max(40),
+      validation: (rule) => rule.required().max(40),
     }),
     defineField({
       name: 'primaryActionAppearance',
@@ -248,6 +248,7 @@ export const heroBlogSchema = defineType({
         })),
       },
       initialValue: CTA_ACTION_APPEARANCE.CONTAINED,
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'secondaryAction',
