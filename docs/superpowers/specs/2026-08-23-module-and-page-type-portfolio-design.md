@@ -1100,8 +1100,9 @@ mediaOrderStacked option` (#3079) — the schema at
   `schema-types/modules/hero-profile/hero-profile.ts`, the helper's third
   option, `HERO_SCHEMA_TYPES`, desk, typegen.
 - **service** · `feat(service): heroProfile loader` (#3080) — query, view
-  model, tags; the footer's social-link fragment and transformer promoted to
-  shared.
+  model, tags. The social-link fragment and transformer are already shared
+  (`TSocialProfile`, promoted by #3216), so this reuses them rather than
+  promoting anything.
 - **web** · `feat(web): heroProfile view + HERO_MAP entry` (#3081) —
   module, view, the shared `SocialLinks` component and its message key, the
   fixed Voice key, `REVALIDATE_TAGS`, story, tests.

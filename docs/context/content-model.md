@@ -131,8 +131,9 @@ replacing a hand-duplicated block per page document.
   (`skim` object, **optional** — `takeaways` (3-7 items, each max 160 chars),
   `generatedAt`/`model` read-only in Studio; pipeline-populated for the
   choose-your-depth reading feature, #957).
-- `author` — name, slug, image, bio, role, socialLinks (unified `link`-based),
-  profilePage (optional ref, restricted to `page_landing`).
+- `author` — name, image, bio, role, socialLinks (array of `socialProfile`),
+  profilePage (optional ref → a `link` document, so any page type it can
+  target).
 - `category` — title, slug, description.
 - `tag` — title, slug, description (topic taxonomy for posts; drives the
   `/tag` archives + related-posts, alongside the section-level `category`).
