@@ -1966,7 +1966,7 @@
     }
   },
   {
-    "name": "actionGroup",
+    "name": "socialProfile",
     "type": "type",
     "value": {
       "type": "object",
@@ -1975,28 +1975,63 @@
           "type": "objectAttribute",
           "value": {
             "type": "string",
-            "value": "actionGroup"
+            "value": "socialProfile"
           }
         },
-        "actions": {
+        "link": {
           "type": "objectAttribute",
           "value": {
-            "type": "array",
-            "of": {
-              "type": "object",
-              "attributes": {
-                "_key": {
-                  "type": "objectAttribute",
-                  "value": {
-                    "type": "string"
-                  }
-                }
+            "type": "inline",
+            "name": "link.reference"
+          },
+          "optional": true
+        },
+        "platform": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "X"
               },
-              "rest": {
-                "type": "inline",
-                "name": "ctaAction"
+              {
+                "type": "string",
+                "value": "GITHUB"
+              },
+              {
+                "type": "string",
+                "value": "LINKEDIN"
+              },
+              {
+                "type": "string",
+                "value": "YOUTUBE"
+              },
+              {
+                "type": "string",
+                "value": "INSTAGRAM"
+              },
+              {
+                "type": "string",
+                "value": "MASTODON"
+              },
+              {
+                "type": "string",
+                "value": "BLUESKY"
+              },
+              {
+                "type": "string",
+                "value": "FACEBOOK"
+              },
+              {
+                "type": "string",
+                "value": "THREADS"
+              },
+              {
+                "type": "string",
+                "value": "RSS"
               }
-            }
+            ]
           },
           "optional": true
         }
@@ -2004,7 +2039,7 @@
     }
   },
   {
-    "name": "ctaAction",
+    "name": "linkRef",
     "type": "type",
     "value": {
       "type": "object",
@@ -2013,48 +2048,14 @@
           "type": "objectAttribute",
           "value": {
             "type": "string",
-            "value": "ctaAction"
+            "value": "linkRef"
           }
-        },
-        "variant": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "union",
-            "of": [
-              {
-                "type": "string",
-                "value": "PRIMARY"
-              },
-              {
-                "type": "string",
-                "value": "SECONDARY"
-              }
-            ]
-          },
-          "optional": true
-        },
-        "appearance": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "union",
-            "of": [
-              {
-                "type": "string",
-                "value": "CONTAINED"
-              },
-              {
-                "type": "string",
-                "value": "INLINE"
-              }
-            ]
-          },
-          "optional": true
         },
         "link": {
           "type": "objectAttribute",
           "value": {
             "type": "inline",
-            "name": "inlineLink"
+            "name": "link.reference"
           },
           "optional": true
         }
@@ -2280,103 +2281,6 @@
                 "value": "RSS"
               }
             ]
-          },
-          "optional": true
-        }
-      }
-    }
-  },
-  {
-    "name": "socialProfile",
-    "type": "type",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "socialProfile"
-          }
-        },
-        "link": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "inline",
-            "name": "link.reference"
-          },
-          "optional": true
-        },
-        "platform": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "union",
-            "of": [
-              {
-                "type": "string",
-                "value": "X"
-              },
-              {
-                "type": "string",
-                "value": "GITHUB"
-              },
-              {
-                "type": "string",
-                "value": "LINKEDIN"
-              },
-              {
-                "type": "string",
-                "value": "YOUTUBE"
-              },
-              {
-                "type": "string",
-                "value": "INSTAGRAM"
-              },
-              {
-                "type": "string",
-                "value": "MASTODON"
-              },
-              {
-                "type": "string",
-                "value": "BLUESKY"
-              },
-              {
-                "type": "string",
-                "value": "FACEBOOK"
-              },
-              {
-                "type": "string",
-                "value": "THREADS"
-              },
-              {
-                "type": "string",
-                "value": "RSS"
-              }
-            ]
-          },
-          "optional": true
-        }
-      }
-    }
-  },
-  {
-    "name": "linkRef",
-    "type": "type",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "linkRef"
-          }
-        },
-        "link": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "inline",
-            "name": "link.reference"
           },
           "optional": true
         }
