@@ -1,6 +1,7 @@
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
 import {
   makeRawHeadingBlock,
+  makeRawInternalLinkDocument,
   makeRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
 
@@ -34,7 +35,9 @@ describe('toPostCard', () => {
           _id: 'author-1',
           name: 'Jane Doe',
           image: makeRawSanityImage('Jane avatar'),
-          profilePage: { slug: 'jane-doe' },
+          profilePage: makeRawInternalLinkDocument({
+            internalReference: { _type: 'page_landing', slug: 'jane-doe' },
+          }),
         },
       }),
     );
@@ -42,7 +45,7 @@ describe('toPostCard', () => {
     expect(result.author).toEqual({
       id: 'author-1',
       name: 'Jane Doe',
-      profilePageSlug: 'jane-doe',
+      profilePageHref: '/jane-doe',
       image: expect.objectContaining({ assetId: 'image-abc123-800x600-jpg' }),
     });
   });
@@ -62,10 +65,10 @@ describe('toPostCard', () => {
     expect(result.author.image).toBeUndefined();
   });
 
-  it('maps a missing profilePage reference to an undefined profilePageSlug', () => {
+  it('maps a missing profilePage reference to an undefined profilePageHref', () => {
     const result = toPostCard(makeRawPostCard());
 
-    expect(result.author.profilePageSlug).toBeUndefined();
+    expect(result.author.profilePageHref).toBeUndefined();
   });
 
   it('maps the topic', () => {

@@ -1,11 +1,12 @@
 import type { TMaybeUndefined } from '@blog/config';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
+import { toLinkDocument } from '@blog/service/shared/transformers/to-link-document';
 import { toModule } from '@blog/service/shared/transformers/to-module';
 import { toPortableTextBody } from '@blog/service/shared/transformers/to-portable-text-body';
 import { toPortableTextBlockWithResolvedLinks } from '@blog/service/shared/transformers/to-portable-text-mark-def';
 import { toPostHeading } from '@blog/service/shared/transformers/to-post-heading';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
-import { toSocialLink } from '@blog/service/shared/transformers/to-social-link';
+import { toSocialProfile } from '@blog/service/shared/transformers/to-social-profile';
 import { toTag } from '@blog/service/shared/transformers/to-tag';
 import { toTopic } from '@blog/service/shared/transformers/to-topic';
 import { toReadingTimeMinutes } from '@blog/utils';
@@ -20,11 +21,13 @@ function toPostDetailAuthor(raw: TRawPostDetail['author']): TPostDetailAuthor {
   return {
     id: raw._id,
     name: raw.name,
-    profilePageSlug: raw.profilePage?.slug ?? undefined,
+    profilePageHref: toLinkDocument(raw.profilePage)?.href,
     image: toSanityImage(raw.image),
     role: raw.role ?? undefined,
     bio: raw.bio?.map(toPortableTextBlockWithResolvedLinks) ?? undefined,
-    socialLinks: (raw.socialLinks ?? []).map(toSocialLink),
+    socialLinks: (raw.socialLinks ?? []).flatMap(
+      (item) => toSocialProfile(item) ?? [],
+    ),
   };
 }
 

@@ -137,6 +137,6 @@ export type {
 } from './shared/transformers/to-portable-text-mark-def';
 export type { TPortableTextBody } from './shared/transformers/to-portable-text-body';
 export type { TSeoResolved } from './shared/transformers/resolve-seo';
-export type { TSocialLink } from './shared/transformers/to-social-link';
+export type { TSocialProfile } from './shared/transformers/to-social-profile';
 export type { TTag } from './shared/transformers/to-tag';
 export type { TTopic } from './shared/transformers/to-topic';

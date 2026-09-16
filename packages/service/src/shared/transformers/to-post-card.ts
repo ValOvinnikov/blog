@@ -1,5 +1,6 @@
 import type { ISanityImage, TMaybeUndefined } from '@blog/config';
 import type { postCardFragment } from '@blog/service/shared/fragments/post';
+import { toLinkDocument } from '@blog/service/shared/transformers/to-link-document';
 import { toPostHeading } from '@blog/service/shared/transformers/to-post-heading';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import { toReadingTimeMinutes } from '@blog/utils';
@@ -10,7 +11,7 @@ export type TRawPostCard = InferFragmentType<typeof postCardFragment>;
 export type TPostCardAuthor = {
   id: string;
   name: string;
-  profilePageSlug: TMaybeUndefined<string>;
+  profilePageHref: TMaybeUndefined<string>;
   image: TMaybeUndefined<ISanityImage>;
 };
 
@@ -37,7 +38,7 @@ function toPostCardAuthor(raw: TRawPostCard['author']): TPostCardAuthor {
   return {
     id: raw._id,
     name: raw.name,
-    profilePageSlug: raw.profilePage?.slug ?? undefined,
+    profilePageHref: toLinkDocument(raw.profilePage)?.href,
     image: toSanityImage(raw.image),
   };
 }
