@@ -106,10 +106,8 @@ asking nicely.
   `@blog/config` today, so such a const belongs to whichever layer reads it, not
   to you; if you find yourself needing one internally, that is a signal to
   reconsider the shape rather than to add the dependency.
-- **Inline comments are forbidden by default** (except the HTML-email carve-out
-  above). At most one doc comment per exported symbol, saying what it is FOR,
-  never how it works. Never an issue/PR number, roadmap phase, or spec-doc path
-  in a source comment.
+- **Comments: see `## Comments` below**, plus the HTML-email carve-out above,
+  which is this layer's only exception.
 
 ## When a consumer changes
 
@@ -118,21 +116,11 @@ Adding an export is not enough — a workspace that starts consuming you needs
 `vitest.config.ts` `resolve.alias`, or type-check, test and build break. Verify
 in every consumer you touch.
 
-## Comments in files you touch
+## Comments
 
-**Trim on touch.** Whenever you edit a file, cut every over-long comment **in
-that file** down to one sentence as part of the same change — not only the
-comments on the lines you happened to modify. There is no separate
-comment-cleanup pass; this is how the repo converges.
-
-A function or component **keeps** its single doc comment. Shorten it; never
-delete it merely for being long, and never let it describe which arguments,
-props or variables the function uses — the type signature documents that, and
-prose restating it goes stale the moment a parameter changes.
-
-Never put project-management state in a source comment: no issue or PR numbers
-(except inside a `TODO:`/`FIXME:`), no roadmap phases, no spec-doc paths, no
-"not wired up yet" notes.
+`CLAUDE.md` → `## Conventions` → "Comments default to zero" is the single
+source for comment rules, including the three-step test and the
+delete-don't-shorten rule. It is not restated here; follow it as written.
 
 ## Reuse before you create
 

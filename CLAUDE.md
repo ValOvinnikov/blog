@@ -480,104 +480,77 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
 
 ## Conventions
 
-- **Inline comments are forbidden by default.** No comment inside a
-  function/component body narrating what a line, branch, or step does — if
-  that feels necessary, restructure the code or rename something instead of
-  explaining it (a competent developer can read the code). The single narrow
-  exception: one line for something genuinely non-obvious the code truly
-  cannot express on its own — a hidden constraint, a real gotcha, a
-  workaround for a specific bug. That exception is rare; reach for it only
-  when the alternative is a future reader silently re-breaking the same
-  thing — never to restate what the code already says.
-- **A doc comment is the only other kind allowed — at most one per
-  function/component, and only when the name doesn't already make the
-  purpose obvious.** It states what the function/component is **for**, in
-  one short sentence — never **how** it works internally. That means: never
-  a step-by-step walkthrough of its branches/hooks/implementation, never an
-  exhaustive listing of props/functionality (the type signature already
-  documents that), and never a decision-history narrative walking through
-  every issue number that touched the file (that belongs in the PR
-  description and rots as the code evolves further). If a doc comment is
-  starting to read like a changelog, a design-doc summary, or an
-  implementation walkthrough, it's too long — cut it down to the one
-  sentence a future reader actually needs to know before calling it.
+- **Comments default to zero.** Not "few" — zero. Every comment must survive
+  the test below, and most do not.
 
-  **Doc comments stay — the rule is length, not removal.** A function or
-  component keeps its one doc comment; it just must not run long, and it must
-  never describe which arguments, props or variables the function uses. The
-  type signature already documents that, and prose restating it goes stale the
-  moment a parameter changes.
+  **Never comment:**
 
-  **Trim on touch — there is no scheduled comment sweep.** Whenever you or a
-  subagent edits a file, every over-long comment **in that file** gets cut to
-  one sentence as part of the same change. Say so in the dispatch prompt, so
-  the owning layer agent does it rather than the orchestrator hand-editing.
-  This is deliberately opportunistic: a repo-wide sweep would touch ~690
-  over-long comments across 11 workspaces at once and conflict with every open
-  PR, whereas trimming on touch converges on the same result without ever
-  colliding with in-flight work.
+  - **A property, field, or prop.** The type signature already documents it. A
+    prop needing explanation is a naming failure — rename it or restructure
+    the type. `image?: false` needing "pass `false` when the kind supplies its
+    own image field" should have been `hasOwnImage?: boolean`.
+  - **A key/value constant.** The name is the meaning and the values are the
+    vocabulary. `packages/config/src/constants/cta.ts` is the model: zero
+    comments, perfectly readable.
+  - **Anything inside a function body** narrating what a line, branch or step
+    does. If that feels necessary, restructure or rename instead.
+  - **A contract that holds at more than one call site.** It belongs at the
+    contract's definition, stated once — never restated where it is used.
+  - **Project-management state**: a `docs/superpowers/specs/*` or `plans/*`
+    path, a roadmap phase, a `§4.2`-style section reference, an issue or PR
+    number as narrative, or a "not wired up yet" note. Each is guaranteed to
+    become false — spec docs are deleted once shipped, phases get renumbered
+    mid-programme, and "nothing reads this yet" stops being true the moment
+    someone adds a caller, without the comment changing. All of it belongs in
+    the PR description, which is dated and discoverable via `git blame`. The
+    one exception is a `TODO:`/`FIXME:`, which may cite an issue number, in
+    its own comment block, because it points at open work rather than
+    narrating closed work.
+  - **The history or mechanism of a change.** State what is true now, not how
+    it came to be true. A comment that reads like a commit message is this
+    mistake: `basic-text-renderer.tsx` once explained how a link-resolution
+    bug had been fixed, when the fact a reader needed was simply that `url` is
+    already resolved for both link types.
+  - **A shared component's purpose tied to its first consumer.** `ActionGroup`
+    is general-purpose, but its doc comment described "a CTA module's
+    actions" — CTA is its first caller, not its scope. Describe the actual,
+    general contract.
 
-  **REQUIRED — a source comment must never reference project-management
-  state.** This is a hard prohibition, not a length guideline. Specifically,
-  never write into a comment in any `packages/*` or `apps/*` source file:
+  **The only comments allowed:**
 
-  - a path into `docs/superpowers/specs/*` or `docs/superpowers/plans/*`
-  - a roadmap phase ("Phase 0", "Phase 8", "this milestone")
-  - an issue or PR number (`#1234`) as narrative — see the TODO exception below
-  - a "not wired up yet" / "future consumer will…" / "ships later" note
+  1. **One doc comment per function or component**, and only when the name
+     does not already make the purpose obvious — one sentence, saying what it
+     is _for_. Never how it works, and never which arguments or props it
+     reads; the type signature documents that and prose restating it goes
+     stale the moment a parameter changes.
+  2. **One line for a tuned value or a real gotcha** — something a competent
+     reader would otherwise get wrong. A magic number's rationale, or a
+     constraint the code cannot express (Next's route segment config requires
+     a literal, so no route can import `CONTENT_ROUTE_REVALIDATE_SECONDS`).
 
-  **Why these specifically, beyond being verbose.** Each one is guaranteed to
-  become false:
+  **The test, when you believe you have an exception — ask in order:**
 
-  - Spec and plan docs are **deleted** once their work ships and `SPEC.md`
-    reflects the final shape (see the design-doc retention rule below), so a
-    comment citing one is a dead link by construction.
-  - Roadmap phases get renumbered and re-scoped. "Phase 8" was split and a new
-    "Phase 0" inserted ahead of it mid-programme; every comment naming a phase
-    silently went stale that day.
-  - "Nothing reads this yet" is self-evident from the absence of callers, and
-    stops being true the moment someone adds one — without touching the
-    comment.
+  1. Would a competent developer reading only the code get this wrong? If no,
+     delete it.
+  2. Could renaming or restructuring stop them getting it wrong? If yes, do
+     that instead.
+  3. Does this same fact hold at other call sites? If yes, it belongs at the
+     definition, not here.
 
-  All four belong in the **PR description**, which is dated, immutable, and
-  discoverable via `git blame`. Code comments are none of those things.
+  Only what survives all three earns a comment.
 
-  The test to apply: _would this sentence still be true and useful in a year if
-  the roadmap were reorganised and the spec docs deleted?_ If no, delete it.
+  **This rule overrides "write code that reads like the surrounding code".**
+  The repo's existing comment density is the drift being corrected, not the
+  standard to match. Nine `service` loaders repeating the same ISR tag-scope
+  rule in nine wordings are not permission to write a tenth.
 
-  **The one exception:** a `TODO:`/`FIXME:` may carry an issue number, in its
-  own comment block, because it is a pointer to open work rather than a
-  narrative about closed work.
-
-  **Two more failure shapes, beyond the four above — state the current fact,
-  not the fix's history.** Seen repeatedly across the CTA epic (#2300)
-  despite dispatch prompts already carrying the general comment-discipline
-  instruction:
-
-  - **Narrating the mechanism or history of a change instead of the current
-    invariant.** `basic-text-renderer.tsx`'s link handler once read: "Both
-    `EXTERNAL` and `INTERNAL` links carry a resolved `url` here — the service
-    derefs `content`'s markDefs before this component ever sees them, same as
-    CTA `actions`." That's how a bug got fixed, not what the code does today.
-    The fact a reader needs: `url` is already resolved for both link types;
-    the fallback below handles one that failed to resolve. If a comment reads
-    like it belongs in a commit message or PR description — explaining _why a
-    change was made_ rather than _what holds true now_ — cut it down to the
-    fact.
-  - **Tying a shared/reusable component's own doc comment to its first
-    specific consumer.** `ActionGroup` (`apps/web/src/components/shared/`) is
-    general-purpose — CTA is its first caller, not its scope — but its doc
-    comment read "renders a **CTA module's** authored actions," and a prop
-    comment cited "Banner's dark scrim (D15)," a design-decision id from a doc
-    that's since been deleted. Describe the component's actual, general
-    contract; name the specific case that prompted it only if the doc comment
-    would be meaningless without that context (rare for a component meant to
-    be reused).
-
-  **A `§4.2`-style section reference is the same dead-link problem as a
-  `docs/superpowers/specs/*` path, just spelled differently — a design-doc
-  section number is worthless once that doc is deleted per the retention
-  rule below, which happens routinely within the same epic. Never cite one.**
+  **When you touch a file, delete the comments in it that fail the test — do
+  not shorten them.** A shortened comment that should not exist is still a
+  comment that should not exist; trimming is only for a comment that earns its
+  place but runs long. This is deliberately opportunistic: there is no
+  scheduled comment sweep, because a repo-wide pass would collide with every
+  open PR, whereas converging file-by-file reaches the same result without
+  ever doing so.
 
 - All workspace source files live under `src/` within each package/app.
   Exceptions: root-level config files required by their tool (`sanity.config.ts`,

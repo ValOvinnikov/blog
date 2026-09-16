@@ -69,17 +69,21 @@ contracts:
     contract substituted a raw `curl` of the vendor's docs site instead. The
     read-only agents below are deliberately not granted them — they review and
     report rather than implement against an API.
-  - Those ten, plus `test-writer`, also carry an identical trailing pair of
-    sections: **Comments in files you touch** and **Reuse before you create**.
-    The first makes comment cleanup opportunistic — an agent trims every
-    over-long comment in any file it edits, so the repo converges without a
-    sweep; a one-shot sweep would have touched ~690 over-long comments across
-    11 workspaces and conflicted with every open PR. The second requires
-    searching for an existing function, type, schema definition or helper
-    before adding one, and surfacing an extend-vs-add-alongside call to the
-    orchestrator as a question rather than settling it silently. Both are
-    duplicated per agent rather than shared, because agent definitions have no
-    include mechanism — change one, change all eleven.
+  - Those ten, plus `test-writer`, also carry a **Reuse before you create**
+    section, requiring a search for an existing function, type, schema
+    definition or helper before adding one, and surfacing an
+    extend-vs-add-alongside call to the orchestrator as a question rather than
+    settling it silently. It is duplicated per agent because agent definitions
+    have no include mechanism — change one, change all eleven.
+  - They no longer carry comment rules of their own. Each points at
+    `CLAUDE.md`'s `## Conventions` → "Comments default to zero", the single
+    source. **A dispatched subagent inherits both the project and the user
+    `CLAUDE.md`**, so restating the rules per agent was never necessary — this
+    was verified by probing a `service` and an `explore` agent, each of which
+    reproduced `CLAUDE.md`'s `## Don't` section verbatim without opening a
+    file. Eleven paraphrases had drifted apart, and one instructed agents to
+    _shorten_ an over-long comment rather than delete it, which is why comment
+    density kept growing while the rule said otherwise.
   - `verify-runner` — read-only, Haiku-model runner for the integration
     verify pass (`develop-feature` §5: `type-check`/`lint`/`test`,
     the exact scenario-specific sequence it's given). `build` is not part of
