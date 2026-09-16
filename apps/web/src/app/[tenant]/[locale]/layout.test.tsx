@@ -587,6 +587,46 @@ describe('LocaleLayout', () => {
     });
   });
 
+  describe('when navigation fails to load', () => {
+    it('logs navigation.layout_fetch_failed and renders with an empty nav', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      getNavigationMock.mockResolvedValue({ ok: false, error: 'boom' });
+
+      await setup();
+
+      expect(
+        errorSpy.mock.calls.some((call) =>
+          call.some(
+            (arg) =>
+              typeof arg === 'string' &&
+              arg.includes('navigation.layout_fetch_failed'),
+          ),
+        ),
+      ).toBe(true);
+      errorSpy.mockRestore();
+    });
+  });
+
+  describe('when the footer fails to load', () => {
+    it('logs footer.layout_fetch_failed and renders with no social links', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      getFooterMock.mockResolvedValue({ ok: false, error: 'boom' });
+
+      await setup();
+
+      expect(
+        errorSpy.mock.calls.some((call) =>
+          call.some(
+            (arg) =>
+              typeof arg === 'string' &&
+              arg.includes('footer.layout_fetch_failed'),
+          ),
+        ),
+      ).toBe(true);
+      errorSpy.mockRestore();
+    });
+  });
+
   describe('when the locale is invalid', () => {
     it('remembers the tenant id before calling notFound()', async () => {
       await expect(
