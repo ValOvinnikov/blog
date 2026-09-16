@@ -7,6 +7,7 @@ import { showImagesField } from '@blog/studio/schema-types/fields/show-images-fi
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
+import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { getDraftsClient } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
 import { validateNewestFeaturedHasCandidate } from '@blog/studio/schema-types/validation/validate-newest-featured-has-candidate/validate-newest-featured-has-candidate';
 import { toTitleCase } from '@blog/utils/primitives';
@@ -18,6 +19,8 @@ import {
   type SanityDocument,
   type ValidationContext,
 } from 'sanity';
+
+const POSTS_FIELDSET = 'posts';
 
 type TPostFeaturedDocument = {
   postSource?: TPostSource;
@@ -63,26 +66,32 @@ export const postFeaturedSchema = defineType({
   title: 'Post Featured',
   type: 'document',
   description:
-    'A spotlight of one to three hand-picked or newest-featured posts.',
+    'A spotlight on up to three posts, with the first shown larger as the lead. Pin the posts yourself, or let it pick the newest ones marked Featured.',
   icon: Pin,
   validation: (rule) => [
     rule.custom(validateNewestFeaturedHasCandidate('spotlight')),
     rule.custom(validatePinnedPostsPublishDate).warning(),
   ],
+  fieldsets: [
+    {
+      name: POSTS_FIELDSET,
+      title: 'Posts',
+      description: 'Which posts this spotlight features.',
+    },
+  ],
   fields: [
     titleField(),
     brandVariantField(),
     headingBlockField(),
-    showImagesField(),
-    displayModeField(),
     defineField({
       name: 'postSource',
-      title: 'Post Source',
+      title: 'Source',
       type: 'string',
+      fieldset: POSTS_FIELDSET,
       description:
-        'Which posts this spotlight renders: specific pinned posts, or the newest posts marked Featured.',
+        'Specific posts you pin, or the newest posts marked Featured.',
       options: {
-        layout: 'radio',
+        layout: 'dropdown',
         list: Object.values(POST_SOURCE).map((value) => ({
           title: toTitleCase(value),
           value,
@@ -93,10 +102,10 @@ export const postFeaturedSchema = defineType({
     }),
     defineField({
       name: 'posts',
-      title: 'Posts',
+      title: 'Pinned Posts',
       type: 'array',
-      description:
-        'Pinned posts, in display order — the first is the lead post.',
+      fieldset: POSTS_FIELDSET,
+      description: 'In display order — the first is the lead post.',
       of: [
         defineArrayMember({
           type: 'reference',
@@ -124,6 +133,7 @@ export const postFeaturedSchema = defineType({
       name: 'limit',
       title: 'Limit',
       type: 'number',
+      fieldset: POSTS_FIELDSET,
       description: 'Maximum number of newest featured posts to show.',
       initialValue: 3,
       hidden: ({ parent }) =>
@@ -142,25 +152,33 @@ export const postFeaturedSchema = defineType({
               : true;
           }),
     }),
-    ...alignmentFields([]),
+    showImagesField(),
+    displayModeField(),
+    ...alignmentFields([], {
+      title: 'Heading Alignment',
+      description: 'Horizontal alignment of the heading and supporting text.',
+    }),
     layoutField,
   ],
   preview: {
     select: {
       title: 'title',
+      brandVariant: 'brandVariant',
       postSource: 'postSource',
       posts: 'posts',
       limit: 'limit',
     },
-    prepare({ title, postSource, posts, limit }) {
+    prepare({ title, brandVariant, postSource, posts, limit }) {
       const pinnedCount = Array.isArray(posts) ? posts.length : 0;
 
       return {
         title: title ?? 'Unknown',
-        subtitle:
+        subtitle: moduleSubtitle(
+          brandVariant,
           postSource === POST_SOURCE.PINNED
             ? `Pinned: ${String(pinnedCount)} post${pinnedCount === 1 ? '' : 's'}`
             : `Newest featured (limit ${String(limit ?? 3)})`,
+        ),
       };
     },
   },

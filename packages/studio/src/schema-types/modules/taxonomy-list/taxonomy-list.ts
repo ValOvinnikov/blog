@@ -4,26 +4,38 @@ import { brandVariantField } from '@blog/studio/schema-types/fields/brand-varian
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
+import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { toTitleCase } from '@blog/utils/primitives';
 import { LayoutGrid } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
+
+const TERMS_FIELDSET = 'terms';
 
 export const taxonomyListSchema = defineType({
   name: 'module_taxonomyList',
   title: 'Taxonomy List',
   type: 'document',
   description:
-    'A list of topics or tags, used on the topic and tag index pages and anywhere else readers browse by category.',
+    'A browsable list of topics or tags, each with its description and post count, so readers can explore the site by subject.',
   icon: LayoutGrid,
+  fieldsets: [
+    {
+      name: TERMS_FIELDSET,
+      title: 'Terms',
+      description: 'Which terms to list, in what order, and how many.',
+    },
+  ],
   fields: [
     titleField(),
     brandVariantField(),
+    headingBlockField(),
     defineField({
       name: 'taxonomy',
       title: 'Taxonomy',
       type: 'string',
+      fieldset: TERMS_FIELDSET,
       description:
-        'Which terms to list. The Topics and Tags pages list their own, so their module can leave this empty.',
+        'Topics or tags. Leave empty to list whatever the page itself is about.',
       options: {
         layout: 'dropdown',
         list: Object.values(TAXONOMY_KIND).map((value) => ({
@@ -36,8 +48,8 @@ export const taxonomyListSchema = defineType({
       name: 'sortOrder',
       title: 'Sort Order',
       type: 'string',
-      description:
-        'How the listed terms are ordered — alphabetically, or by how many posts each has.',
+      fieldset: TERMS_FIELDSET,
+      description: 'How the terms are ordered.',
       options: {
         layout: 'dropdown',
         list: Object.values(TAXONOMY_SORT).map((value) => ({
@@ -51,28 +63,36 @@ export const taxonomyListSchema = defineType({
       name: 'limit',
       title: 'Limit',
       type: 'number',
+      fieldset: TERMS_FIELDSET,
       description: 'Show at most this many terms. Empty shows all of them.',
       validation: (rule) => rule.integer().min(1),
     }),
     defineField({
       name: 'showLatestPosts',
-      title: 'Show latest posts',
+      title: 'Show Latest Posts',
       type: 'boolean',
-      description:
-        "Lists each term's two newest posts under its description, as links. A term with no posts shows only its title, description and count.",
+      description: "Adds links to each term's two newest posts beneath it.",
       initialValue: true,
     }),
-    headingBlockField(),
-    ...alignmentFields([]),
+    ...alignmentFields([], {
+      title: 'Heading Alignment',
+      description: 'Horizontal alignment of the heading and supporting text.',
+    }),
     layoutField,
   ],
   preview: {
     select: {
       title: 'title',
+      brandVariant: 'brandVariant',
+      taxonomy: 'taxonomy',
     },
-    prepare({ title }) {
+    prepare({ title, brandVariant, taxonomy }) {
       return {
         title: title ?? 'Unknown',
+        subtitle: moduleSubtitle(
+          brandVariant,
+          typeof taxonomy === 'string' ? toTitleCase(taxonomy) : undefined,
+        ),
       };
     },
   },

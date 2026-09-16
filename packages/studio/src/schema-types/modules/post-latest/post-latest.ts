@@ -6,6 +6,7 @@ import { showImagesField } from '@blog/studio/schema-types/fields/show-images-fi
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
+import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { Clock } from 'lucide-react';
 import { defineField, defineType, type SanityDocument } from 'sanity';
 
@@ -38,9 +39,6 @@ export const postLatestSchema = defineType({
     titleField(),
     brandVariantField(),
     headingBlockField(),
-    showImagesField(),
-    displayModeField(),
-    ...alignmentFields([]),
     defineField({
       name: 'limit',
       title: 'Limit',
@@ -48,17 +46,27 @@ export const postLatestSchema = defineType({
       description: 'Maximum number of posts to show.',
       validation: (rule) => rule.required().integer().min(1).max(12),
     }),
+    showImagesField(),
+    displayModeField(),
+    ...alignmentFields([], {
+      title: 'Heading Alignment',
+      description: 'Horizontal alignment of the heading and supporting text.',
+    }),
     layoutField,
   ],
   preview: {
     select: {
       title: 'title',
+      brandVariant: 'brandVariant',
       limit: 'limit',
     },
-    prepare({ title, limit }) {
+    prepare({ title, brandVariant, limit }) {
       return {
         title: title ?? 'Unknown',
-        subtitle: limit ? `Limit: ${String(limit)}` : undefined,
+        subtitle: moduleSubtitle(
+          brandVariant,
+          limit ? `Limit: ${String(limit)}` : undefined,
+        ),
       };
     },
   },

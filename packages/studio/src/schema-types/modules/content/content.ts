@@ -2,6 +2,7 @@ import { brandVariantField } from '@blog/studio/schema-types/fields/brand-varian
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
 import { richTextSchema } from '@blog/studio/schema-types/portable-text/rich-text/rich-text';
+import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { FileText } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -10,7 +11,7 @@ export const contentSchema = defineType({
   title: 'Content',
   type: 'document',
   description:
-    'A block of freeform rich text, used for prose sections outside the main post body.',
+    'A section of written content — headings, paragraphs, lists, images and code — for any page that needs prose between its other modules.',
   icon: FileText,
   fields: [
     titleField(),
@@ -19,8 +20,7 @@ export const contentSchema = defineType({
       name: 'body',
       title: 'Body',
       type: richTextSchema.name,
-      description:
-        'Page content — supports rich text, images, and code blocks.',
+      description: 'The text itself, with images and code blocks as needed.',
       validation: (rule) => rule.required(),
     }),
     layoutField,
@@ -28,10 +28,12 @@ export const contentSchema = defineType({
   preview: {
     select: {
       title: 'title',
+      brandVariant: 'brandVariant',
     },
-    prepare({ title }) {
+    prepare({ title, brandVariant }) {
       return {
         title: title ?? 'Unknown',
+        subtitle: moduleSubtitle(brandVariant),
       };
     },
   },

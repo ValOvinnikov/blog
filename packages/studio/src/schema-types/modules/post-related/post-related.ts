@@ -4,6 +4,7 @@ import { showImagesField } from '@blog/studio/schema-types/fields/show-images-fi
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
+import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { BookOpen } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -11,13 +12,13 @@ export const postRelatedSchema = defineType({
   name: 'module_postRelated',
   title: 'Related Reading',
   type: 'document',
-  description: 'A list of related posts shown at the end of a post.',
+  description:
+    'Other posts the reader might want next, chosen automatically from the tags and topic of the post being read. Only available on post pages.',
   icon: BookOpen,
   fields: [
     titleField(),
     brandVariantField(),
     headingBlockField(),
-    showImagesField(),
     defineField({
       name: 'limit',
       title: 'Limit',
@@ -26,18 +27,26 @@ export const postRelatedSchema = defineType({
       initialValue: 3,
       validation: (rule) => rule.required().integer().min(1).max(6),
     }),
-    ...alignmentFields([]),
+    showImagesField(),
+    ...alignmentFields([], {
+      title: 'Heading Alignment',
+      description: 'Horizontal alignment of the heading and supporting text.',
+    }),
     layoutField,
   ],
   preview: {
     select: {
       title: 'title',
+      brandVariant: 'brandVariant',
       limit: 'limit',
     },
-    prepare({ title, limit }) {
+    prepare({ title, brandVariant, limit }) {
       return {
         title: title ?? 'Unknown',
-        subtitle: limit ? `Limit: ${String(limit)}` : undefined,
+        subtitle: moduleSubtitle(
+          brandVariant,
+          limit ? `Limit: ${String(limit)}` : undefined,
+        ),
       };
     },
   },

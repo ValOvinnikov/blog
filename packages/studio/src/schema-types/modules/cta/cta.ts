@@ -37,16 +37,60 @@ export const ctaSchema = defineType({
   title: 'Call to Action',
   type: 'document',
   description:
-    'A short prompt with one or two buttons, used to send readers somewhere specific.',
+    'A focused section that asks the reader to do one thing — subscribe, get in touch, read on — with a headline, a line of copy, up to two actions and an optional image.',
   icon: Megaphone,
   fields: [
     titleField(),
+    brandVariantField({
+      list: FULL_BRAND_VARIANT_LIST,
+      description: 'Fill color of the card itself.',
+      initialValue: BRAND_VARIANT.SECONDARY,
+    }),
+    headingBlockField(),
+    defineField({
+      name: 'eyebrow',
+      title: 'Eyebrow',
+      type: 'string',
+      description: 'Short line above the heading.',
+    }),
+    defineField({
+      name: 'image',
+      title: 'Image',
+      type: imageWithAltSchema.name,
+      description: 'Optional image, placed according to the Variant.',
+      validation: (rule) =>
+        rule.custom((value, context) => {
+          const variant = (context.parent as TCtaParent | undefined)?.variant;
+
+          if (
+            !value &&
+            (variant === CTA_VARIANT.BANNER || variant === CTA_VARIANT.SPLIT)
+          ) {
+            return 'Image is required for the Banner and Split variants.';
+          }
+
+          return true;
+        }),
+    }),
+    defineField({
+      name: 'content',
+      title: 'Content',
+      type: inlineTextSchema.name,
+      description: 'Optional longer text below the heading.',
+    }),
+    ctaButtonsField(),
+    defineField({
+      name: 'footnote',
+      title: 'Footnote',
+      type: 'string',
+      description: 'Small print below the actions.',
+      validation: (rule) => rule.max(120),
+    }),
     defineField({
       name: 'variant',
       title: 'Variant',
       type: 'string',
-      description:
-        'Which shape this call to action takes: Banner uses the image as a full-bleed background, Split places it alongside the copy, and Callout keeps it in a simple card with the image above the content.',
+      description: 'Which shape this section takes.',
       options: {
         layout: 'dropdown',
         list: Object.values(CTA_VARIANT).map((value) => ({
@@ -57,18 +101,11 @@ export const ctaSchema = defineType({
       initialValue: CTA_VARIANT.CALLOUT,
       validation: (rule) => rule.required(),
     }),
-    brandVariantField({
-      list: FULL_BRAND_VARIANT_LIST,
-      description:
-        'On this module: the card fill for Split/Callout, or the overlay tint for Banner — not the full-bleed band tone every other module uses this field for.',
-      initialValue: BRAND_VARIANT.SECONDARY,
-    }),
     defineField({
       name: 'bandTone',
       title: 'Band Tone',
       type: 'string',
-      description:
-        'Background tone for the full-bleed section band behind the CTA card — distinct from Brand Variant, which is the card’s own fill or overlay.',
+      description: 'Background color of the full-width band behind the card.',
       options: {
         list: FULL_BRAND_VARIANT_LIST.map((value) => ({
           title: toTitleCase(value),
@@ -94,45 +131,11 @@ export const ctaSchema = defineType({
           .warning(),
       ],
     }),
-    defineField({
-      name: 'eyebrow',
-      title: 'Eyebrow',
-      type: 'string',
-      description: 'Optional kicker label shown above the heading.',
-    }),
-    headingBlockField(),
-    defineField({
-      name: 'content',
-      title: 'Content',
-      type: inlineTextSchema.name,
-      description: 'Optional rich text, separate from the supporting text.',
-    }),
-    defineField({
-      name: 'image',
-      title: 'Image',
-      type: imageWithAltSchema.name,
-      description:
-        "This CTA's image — the full-bleed background for Banner, alongside the copy for Split, or above the content for Callout.",
-      validation: (rule) =>
-        rule.custom((value, context) => {
-          const variant = (context.parent as TCtaParent | undefined)?.variant;
-
-          if (
-            !value &&
-            (variant === CTA_VARIANT.BANNER || variant === CTA_VARIANT.SPLIT)
-          ) {
-            return 'Image is required for the Banner and Split variants.';
-          }
-
-          return true;
-        }),
-    }),
     ...alignmentFields([
       {
         name: 'contentPositionSplit',
         title: 'Content Position',
-        description:
-          'Where the content sits relative to the image, on this variant’s grid.',
+        description: 'Which side of the image the text sits on.',
         allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.RIGHT],
         initialValue: CONTENT_ALIGNMENT.LEFT,
         hidden: isNotSplitVariant,
@@ -140,8 +143,7 @@ export const ctaSchema = defineType({
       {
         name: 'contentPositionBanner',
         title: 'Content Position',
-        description:
-          'Where the content sits relative to the image, over the full-bleed background.',
+        description: 'Where the text sits over the background image.',
         allow: [
           CONTENT_ALIGNMENT.LEFT,
           CONTENT_ALIGNMENT.CENTER,
@@ -156,7 +158,7 @@ export const ctaSchema = defineType({
       title: 'Mobile Media Order',
       type: 'string',
       description:
-        'Order of media and content once the two columns collapse on mobile.',
+        'Whether the image comes before or after the text once the columns stack on small screens.',
       options: {
         layout: 'dropdown',
         list: Object.values(MEDIA_ORDER).map((value) => ({
@@ -166,14 +168,6 @@ export const ctaSchema = defineType({
       },
       initialValue: MEDIA_ORDER.LAST,
       hidden: isNotSplitVariant,
-    }),
-    ctaButtonsField(),
-    defineField({
-      name: 'footnote',
-      title: 'Footnote',
-      type: 'string',
-      description: 'Optional small text shown below the actions.',
-      validation: (rule) => rule.max(120),
     }),
     layoutField,
   ],
