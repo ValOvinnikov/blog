@@ -82,18 +82,25 @@ function createClientStub(fetch: ReturnType<typeof vi.fn>) {
   };
 }
 
+const VALID_NAVIGATION_ITEMS = [{ resolved: true }];
+
 function createClientStubResolving(
   foundTypes: string[],
   homePage: unknown = VALID_HOME_PAGE,
+  navigationItems: unknown = VALID_NAVIGATION_ITEMS,
 ) {
   return createClientStub(
-    vi
-      .fn()
-      .mockImplementation((query: string) =>
-        query.includes('_type in $types')
-          ? Promise.resolve(foundTypes)
-          : Promise.resolve(homePage),
-      ),
+    vi.fn().mockImplementation((query: string) => {
+      if (query.includes('_type in $types')) {
+        return Promise.resolve(foundTypes);
+      }
+
+      if (query.includes('settings_navigation')) {
+        return Promise.resolve(navigationItems);
+      }
+
+      return Promise.resolve(homePage);
+    }),
   );
 }
 
@@ -159,6 +166,9 @@ describe(verifyTenantSeededContent, () => {
       types: ['settings_site', 'settings_navigation', 'settings_footer'],
     });
     expect(fetch).toHaveBeenCalledWith(
+      '*[_type == "settings_navigation"][0].items[]{ "resolved": defined(link->_id) }',
+    );
+    expect(fetch).toHaveBeenCalledWith(
       '*[_type == "page_home"][0]{ headingBlock, seo }',
     );
     expect(createClient).toHaveBeenCalledWith(
@@ -202,6 +212,49 @@ describe(verifyTenantSeededContent, () => {
     ).rejects.toThrow(
       /missing required starter document\(s\): settings_site, settings_navigation, settings_footer/,
     );
+  });
+
+  it('fails the run when a seeded navigation item has no resolvable link reference', async () => {
+    const tenant = baseTenant();
+    const { createClient } = createClientStubResolving(
+      ['settings_site', 'settings_navigation', 'settings_footer'],
+      VALID_HOME_PAGE,
+      [{ resolved: false }],
+    );
+
+    await expect(
+      verifyTenantSeededContent(tenant, env, baseDeps({ createClient })),
+    ).rejects.toThrow(
+      /"settings_navigation" has 1 item\(s\) with no resolvable "link" reference/,
+    );
+  });
+
+  it('fails the run and counts every unresolved item when navigation mixes resolved and unresolved items', async () => {
+    const tenant = baseTenant();
+    const { createClient } = createClientStubResolving(
+      ['settings_site', 'settings_navigation', 'settings_footer'],
+      VALID_HOME_PAGE,
+      [{ resolved: true }, { resolved: false }, { resolved: false }],
+    );
+
+    await expect(
+      verifyTenantSeededContent(tenant, env, baseDeps({ createClient })),
+    ).rejects.toThrow(
+      /"settings_navigation" has 2 item\(s\) with no resolvable "link" reference/,
+    );
+  });
+
+  it('does not throw when settings_navigation has no items field (GROQ evaluates items[] to null, not [])', async () => {
+    const tenant = baseTenant();
+    const { createClient } = createClientStubResolving(
+      ['settings_site', 'settings_navigation', 'settings_footer'],
+      VALID_HOME_PAGE,
+      null,
+    );
+
+    await expect(
+      verifyTenantSeededContent(tenant, env, baseDeps({ createClient })),
+    ).resolves.toBeUndefined();
   });
 
   it('fails the run when the dataset has no page_home document', async () => {
@@ -292,6 +345,7 @@ describe(verifyTenantSeededContent, () => {
         'settings_navigation',
         'settings_footer',
       ])
+      .mockResolvedValueOnce(VALID_NAVIGATION_ITEMS)
       .mockResolvedValueOnce(VALID_HOME_PAGE);
     const { createClient } = createClientStub(fetch);
     const sleep = vi.fn().mockResolvedValue(undefined);
@@ -302,7 +356,7 @@ describe(verifyTenantSeededContent, () => {
       baseDeps({ createClient, sleep }),
     );
 
-    expect(fetch).toHaveBeenCalledTimes(3);
+    expect(fetch).toHaveBeenCalledTimes(4);
     expect(sleep).toHaveBeenCalledTimes(1);
   });
 

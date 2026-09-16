@@ -69,6 +69,10 @@ type THomePageParseFields = {
   seo: { metaTitle?: string | null } | null;
 } | null;
 
+type TNavigationItemLinkCheck = {
+  resolved: boolean;
+};
+
 /**
  * Step 6 — the last step in the sequence: asserts every external resource
  * the run claims to have created is actually real and working, rather than
@@ -122,6 +126,31 @@ export async function verifyTenantSeededContent(
   if (missingTypes.length > 0) {
     throw new Error(
       `verifyTenantSeededContent: tenant "${tenant.id}"'s dataset is missing required starter document(s): ${missingTypes.join(', ')}.`,
+    );
+  }
+
+  const navigationItems = await readWithGrantPropagationRetry<
+    TNavigationItemLinkCheck[] | null
+  >(
+    () =>
+      client.fetch<TNavigationItemLinkCheck[] | null>(
+        '*[_type == "settings_navigation"][0].items[]{ "resolved": defined(link->_id) }',
+      ),
+    retryOptions,
+    (error) =>
+      new Error(
+        `verifyTenantSeededContent: tenant "${tenant.id}"'s "settings_navigation" items read failed: ${errorMessage(error)}`,
+        { cause: error },
+      ),
+  );
+
+  const unresolvedNavigationItemCount = (navigationItems ?? []).filter(
+    (item) => !item.resolved,
+  ).length;
+
+  if (unresolvedNavigationItemCount > 0) {
+    throw new Error(
+      `verifyTenantSeededContent: tenant "${tenant.id}"'s "settings_navigation" has ${unresolvedNavigationItemCount} item(s) with no resolvable "link" reference — re-run the "Seed content" step.`,
     );
   }
 

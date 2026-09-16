@@ -64,24 +64,39 @@ describe(buildStarterDocuments, () => {
     expect(newsletter.trustCues).toEqual(['No spam', 'Unsubscribe anytime']);
   });
 
-  it('the external nav link is an inlineLink satisfying the schema union (label + linkType + url)', () => {
+  it('the nav item is a linkRef with no inline label/linkType/url, referencing the starter link document', () => {
     const navigation = buildStarterDocuments(tenant).find(
       (doc) => doc._id === STARTER_DOCUMENT_IDS.NAVIGATION,
     ) as unknown as {
-      items: Array<{
-        _type: string;
-        label: string;
-        linkType: string;
-        url: string;
-      }>;
+      items: Array<{ _type: string; link: { _ref: string } }>;
     };
 
-    expect(navigation.items[0]).toMatchObject({
-      _type: 'inlineLink',
-      label: 'Blog',
-      linkType: 'EXTERNAL',
-      url: '/blog',
-    });
+    const item = navigation.items[0];
+    expect(item).toBeDefined();
+    expect(item?._type).toBe('linkRef');
+    expect(item?.link._ref).toBe(STARTER_DOCUMENT_IDS.NAV_HOME_LINK);
+    expect(item).not.toHaveProperty('label');
+    expect(item).not.toHaveProperty('linkType');
+    expect(item).not.toHaveProperty('url');
+  });
+
+  it('the starter link document is an INTERNAL link to the seeded home page, satisfying the link schema', () => {
+    const link = buildStarterDocuments(tenant).find(
+      (doc) => doc._id === STARTER_DOCUMENT_IDS.NAV_HOME_LINK,
+    ) as unknown as {
+      _type: string;
+      title: string;
+      label: string;
+      linkType: string;
+      internalReference: { _ref: string };
+    };
+
+    expect(link._type).toBe('link');
+    expect(link.title).toBeTruthy();
+    expect(link.label).toBe('Home');
+    expect(link.linkType).toBe('INTERNAL');
+    expect(link.internalReference._ref).toBe(STARTER_DOCUMENT_IDS.HOME);
+    expect(link).not.toHaveProperty('url');
   });
 
   it('builds a module_heroBlog document pinned to the starter post, with no copy overrides', () => {

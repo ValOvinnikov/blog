@@ -18,6 +18,7 @@ export const STARTER_DOCUMENT_IDS = {
   AUTHOR: 'provisioning.author.starter',
   TOPIC: 'provisioning.topic.starter',
   POST: 'provisioning.post.starter',
+  NAV_HOME_LINK: 'provisioning.link.nav-home',
   NAVIGATION: 'provisioning.settings.navigation',
   FOOTER: 'provisioning.settings.footer',
   THEME: 'provisioning.settings.theme',
@@ -89,18 +90,24 @@ export function buildStarterDocuments(
     modules: [],
   };
 
+  const navHomeLink: TSanityDocument = {
+    _id: STARTER_DOCUMENT_IDS.NAV_HOME_LINK,
+    _type: 'link',
+    title: 'Home',
+    label: 'Home',
+    linkType: LINK_TYPE.INTERNAL,
+    internalReference: { _type: 'reference', _ref: STARTER_DOCUMENT_IDS.HOME },
+  };
+
   const navigation: TSanityDocument = {
     _id: STARTER_DOCUMENT_IDS.NAVIGATION,
     _type: 'settings_navigation',
     title: 'Primary Navigation',
     items: [
       {
-        _type: 'inlineLink',
-        _key: 'starter-nav-blog',
-        label: 'Blog',
-        linkType: LINK_TYPE.EXTERNAL,
-        url: '/blog',
-        openInNewTab: false,
+        _type: 'linkRef',
+        _key: 'starter-nav-home',
+        link: { _type: 'reference', _ref: STARTER_DOCUMENT_IDS.NAV_HOME_LINK },
       },
     ],
   };
@@ -172,6 +179,7 @@ export function buildStarterDocuments(
     author,
     topic,
     post,
+    navHomeLink,
     navigation,
     footer,
     theme,
