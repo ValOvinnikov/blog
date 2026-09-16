@@ -470,4 +470,60 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
 
     expect(screen.getByText('Context')).toBeVisible();
   });
+
+  it('renders a resolved linkRef annotation nested in an aside body as a link', () => {
+    const value: TPortableTextBody = [
+      {
+        _type: 'aside',
+        _key: 'aside-1',
+        kind: ASIDE_KIND.CONTEXT,
+        body: [
+          richTextBlock(
+            'normal',
+            [richTextSpan('a nested link', ['link-1'])],
+            [
+              {
+                _type: 'linkRef',
+                _key: 'link-1',
+                link: {
+                  label: 'a nested link',
+                  href: 'https://example.com',
+                  target: undefined,
+                  platform: undefined,
+                  ariaLabel: undefined,
+                },
+              },
+            ],
+          ),
+        ],
+      },
+    ];
+
+    setup({ value });
+
+    const link = screen.getByRole('link', { name: 'a nested link' });
+    expect(link).toHaveAttribute('href', 'https://example.com');
+  });
+
+  it('renders a dangling linkRef annotation nested in an aside body as plain text', () => {
+    const value: TPortableTextBody = [
+      {
+        _type: 'aside',
+        _key: 'aside-1',
+        kind: ASIDE_KIND.CONTEXT,
+        body: [
+          richTextBlock(
+            'normal',
+            [richTextSpan('incomplete nested link', ['link-1'])],
+            [{ _type: 'linkRef', _key: 'link-1', link: undefined }],
+          ),
+        ],
+      },
+    ];
+
+    setup({ value });
+
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(screen.getByText('incomplete nested link')).toBeVisible();
+  });
 });

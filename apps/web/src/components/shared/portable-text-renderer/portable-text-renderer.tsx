@@ -1,6 +1,5 @@
 import {
   ASIDE_KIND,
-  type Aside as TAsideBlock,
   type Code,
   type IBodyImageBlock,
   type TAsideKind,
@@ -176,7 +175,11 @@ export const PortableTextRenderer = ({
         renderBodyImage(block),
       // Unknown/missing `kind` renders as CONTEXT — forward-compat with a
       // future `ASIDE_KIND` value this renderer doesn't know about.
-      aside: ({ value: asideValue }: { value: TAsideBlock }) => {
+      aside: ({
+        value: asideValue,
+      }: {
+        value: Extract<TPortableTextBody[number], { _type: 'aside' }>;
+      }) => {
         const kind = asideValue.kind ?? ASIDE_KIND.CONTEXT;
         const label = asideKindLabels?.[kind] ?? kind;
 
