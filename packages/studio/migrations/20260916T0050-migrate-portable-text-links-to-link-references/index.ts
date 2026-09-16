@@ -1,41 +1,7 @@
 /**
- * Migrates every Portable Text body-text link to the shared `link` library.
- *
- * Two legacy annotation shapes exist in stored `markDefs`:
- *   - `link` — Sanity's built-in raw-`href` annotation, inherited by
- *     `richText`/`proseText` before they declared `marks.annotations`
- *     explicitly.
- *   - `inlineLink` — the structured annotation `inlineText` declared before
- *     switching to `linkRef`.
- *
- * Per Portable Text block found anywhere in a scanned document (any nesting
- * depth, including a `richText` block's nested `aside.body`):
- *   1. Resolve each legacy markDef's destination — a `/blog/<slug>` href
- *      against `page_post` by slug, a full `https?://` URL as-is, or an
- *      already-structured `inlineLink`'s own reference/url.
- *   2. `createIfNotExists` a `link` document for each resolved destination,
- *      deduped by a deterministic id derived from the destination itself
- *      (`id.ts`) — the same destination collapses onto one `link` document
- *      wherever it recurs.
- *   3. Replace the markDef with a `linkRef` pointing at that document.
- *   4. When a destination resolves to nothing (an internal path matching no
- *      `page_post`), remove the markDef and the mark referencing it from
- *      every span instead, leaving the words as plain text — reported via
- *      `console.warn` rather than dropped silently.
- *
- * A markDef carries no visible label, so the seeded `link.label` is derived:
- * the resolved `page_post`'s title for an internal destination, a short
- * hostname-based string for an external one — both reported via
- * `console.warn` so an editor can review them before a real run.
- *
- * Idempotency: a document with no legacy markDef anywhere returns no
- * mutations; `link` document creation is `createIfNotExists`, so a re-run
- * creates nothing twice.
- *
- * Workflow (see ../README.md for the full guardrails):
- *   1. `pnpm --filter @blog/studio dataset:export -- migrations/backups/production-<date>.tar.gz`
- *   2. `pnpm --filter @blog/studio migrate:dry` — inspect the diff and warnings
- *   3. `pnpm --filter @blog/studio migrate:run` — human-gated, mutates the dataset
+ * Migrates every Portable Text body-text link — both the built-in raw-`href`
+ * markDef and the structured `inlineLink` annotation — onto `linkRef`
+ * references to standalone `link` documents.
  */
 import {
   at,

@@ -6,12 +6,7 @@ import type { TLegacyInlineLink } from './transform';
 
 const LINK_ID_PREFIX = 'link-';
 
-/**
- * The string a destination collapses to for dedup — two legacy
- * `inlineLink`s with the same key resolve to one created `link` document.
- * Keyed on destination *and* label, because two links can share a
- * destination while carrying different visible wording.
- */
+/** The string a destination collapses to for dedup, keyed on destination *and* label — two links can share a destination but carry different visible wording. */
 export const toLinkIdentityKey = (
   link: TLegacyInlineLink,
 ): string | undefined => {
@@ -30,10 +25,6 @@ export const toLinkIdentityKey = (
   return undefined;
 };
 
-/**
- * Deterministic `link` document id for a destination identity key — the
- * same destination always resolves to the same id, whether it recurs
- * within one document, across documents, or across a re-run.
- */
+/** Deterministic `link` document id for a destination identity key. */
 export const toLinkId = (identityKey: string): string =>
   `${LINK_ID_PREFIX}${createHash('sha1').update(identityKey).digest('hex').slice(0, 16)}`;

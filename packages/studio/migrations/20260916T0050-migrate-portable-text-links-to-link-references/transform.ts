@@ -83,12 +83,7 @@ const hasLegacyMarkDef = (block: TBlock): boolean =>
 
 export type TBlockLocation = { path: Path; block: TBlock };
 
-/**
- * Finds every Portable Text block carrying at least one legacy raw-href or
- * `inlineLink` markDef, at any nesting depth — including a `richText`
- * block's nested `aside.body` — so no Portable Text field needs listing by
- * name.
- */
+/** Finds every Portable Text block carrying a legacy link markDef, at any nesting depth in the raw document. */
 export const findLegacyLinkBlocks = (
   node: unknown,
   path: Path = [],
@@ -122,7 +117,6 @@ export type TDestination = TLegacyInlineLink & {
   label: string;
 };
 
-/** Truncates on the last whole word within the limit, never leaving a trailing partial word or space. */
 const truncateLabel = (label: string): string => {
   const truncated = label.slice(0, LINK_LABEL_MAX_LENGTH);
   const lastSpace = truncated.lastIndexOf(' ');
@@ -166,12 +160,7 @@ const resolveInternalPostBySlug = async (
   return results.find((doc) => !doc._id.startsWith('drafts.')) ?? results[0];
 };
 
-/**
- * Resolves the built-in raw-`href` annotation to its destination — an
- * internal `/blog/<slug>` path resolved against `page_post`, or a full
- * `https?://` URL. Anything else — including a `/blog/<slug>` matching no
- * post — resolves to `undefined`, which the caller treats as unresolvable.
- */
+/** Resolves a raw-`href` markDef to its destination — an internal `/blog/<slug>` path against `page_post`, or a full `https?://` URL; anything else, including a slug matching no post, resolves to `undefined`. */
 export const resolveRawHrefDestination = async (
   context: MigrationContext,
   href: string | undefined,
@@ -208,11 +197,6 @@ export const resolveRawHrefDestination = async (
   return undefined;
 };
 
-/**
- * Resolves an already-structured `inlineLink` annotation to its destination.
- * Unlike the raw-`href` case this carries its own `label`, used as-is when
- * present.
- */
 export const resolveInlineLinkDestination = async (
   context: MigrationContext,
   markDef: TInlineLinkMarkDef,
@@ -300,10 +284,7 @@ export type TMarkDefOutcome =
   | { outcome: 'CONVERTED'; key: string; linkId: string }
   | { outcome: 'STRIPPED'; key: string };
 
-/**
- * Applies pre-resolved per-markDef outcomes to a block: converts a markDef to
- * `linkRef`, or removes it along with the mark referencing it on every span.
- */
+/** Applies pre-resolved per-markDef outcomes to a block. Stripping removes both the markDef and the mark referencing it on every span — dropping only one would leave a dangling mark. */
 export const applyMarkDefOutcomes = (
   block: TBlock,
   outcomes: TMarkDefOutcome[],
