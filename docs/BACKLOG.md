@@ -1225,9 +1225,15 @@ One epic per module, each: design sub-issue → `studio → service → ui → w
 Read-only modules are one issue per layer and nothing else; the contact form
 adds `config`, `db` and `email`. Order by archetypes unlocked:
 
-1. **`module_featureGrid`**, **`module_testimonial`**, **`module_logoWall`**,
-   **`module_stats`** — together they complete the agency and product pages;
-   file as one batch.
+1. **`module_featureList`** (#3246, designed 2026-09-16 — section
+   "`module_featureList` — the features grid" in the spec of record; ui
+   #3247 first, then studio #3248 + service #3249 + web #3250 as one PR, a
+   visual icon picker after), **`module_testimonial`**, **`module_logoWall`**,
+   **`module_stats`** — together they complete the agency and product pages.
+   Their reusable pieces are `block_*` documents in the Studio's new Blocks
+   section (Feature Cards and the moved Links first; testimonials and client
+   logos as they land). #3245 carries the post modules' matching image shape
+   and card alignment.
 2. **`module_contactForm`** — the first write path. Extra sub-issues:
    **config** (`CAPABILITY` key), **db** (`leads` table + `settings_features`
    column, two generated migrations), **email** (lead-notification template),

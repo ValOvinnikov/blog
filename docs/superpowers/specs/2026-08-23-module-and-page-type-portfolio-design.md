@@ -130,7 +130,8 @@ end rather than renumbering):
   `module_projectGrid`; the page-architecture programme's two-modules-per-mode
   rule splits it.)
 - `module_gallery` — image/media grid with lightbox.
-- `module_featureGrid` — icon + title + text grid (services / skills).
+- `module_featureList` — icon or image + title + text cards (services /
+  skills), referencing reusable `block_feature` documents; designed below.
 - `module_testimonial` — quote + attribution.
 - `module_logoWall` — client / tech logos.
 - `module_stats` — metric figures ("40% faster", "3M users").
@@ -149,16 +150,24 @@ module has a heading + `layoutField()`) and add it to the relevant pages'
 `defineModulesField({ allow })`; run `pnpm typegen` so `TModuleType` picks up
 the new `_type`; add `service.modules.<type>.v1` (query + transformer +
 view-model + cache tags — plus a `REVALIDATE_TAGS` entry in `apps/web`, which
-every module type requires regardless of how it renders); add a pure
-`@blog/ui` organism (+ stories + tests); register the web component in
-`MODULE_MAP`, wrapped in `apps/web`'s `Section`.
+every module type requires regardless of how it renders); compose the
+section in `apps/web` from existing `@blog/ui` primitives (a new atom or
+molecule only where one is genuinely missing — never a per-module "section
+organism"); register the web component in `MODULE_MAP`, wrapped in
+`apps/web`'s `Section`. Reusable pieces a module references (a feature card,
+a testimonial, a client logo) are `block_*` documents in the Studio's Blocks
+section, not inline objects.
 
 **Migration.** None — new module types and widening `allow` lists are
 additive.
 
-**Ticketing.** Each module is small enough to be **one issue** (single-ish
-layer chain), _not_ a multi-layer epic — file each under #1919 when work on
-it starts, same pattern as any other item added to this catalogue.
+**Ticketing.** One epic per module under #1919 with a sub-issue per layer
+touched, filed when its design is settled (`CLAUDE.md`'s "a feature spanning
+2+ layers always gets an epic"); the studio + service + web sub-issues ship
+as one PR because the exhaustive `MODULE_MAP` Record reds `type-check` until
+every layer lands, and a ui sub-issue, when there is one, ships first on its
+own. _(Superseded 2026-09-16: the earlier "one issue per module" rule
+predates the mandatory epic-per-feature rule.)_
 
 ## Hero family & the generic home page
 
@@ -1129,6 +1138,266 @@ publish the module without the heading; that heading is the page's only
 portrait on Split and a legible background on Banner; social links render
 with icons or platform labels and can be switched off; `pnpm type-check &&
 pnpm lint && pnpm test && pnpm knip && pnpm gen:ui-index:check` green.
+
+## `module_featureList` — the features grid
+
+**Goal:** the "what we offer / what this is made of" section every marketing
+page carries between the hero and the proof — two to eight features, each an
+image or icon, a title, a line of text and an optional link, in an even grid
+a visitor scans instead of reading. Services, skills, what's included, how it
+works. Design of record for epic #3246, the first of Phase 3's batch.
+
+Interactive mock of the rendered module on every shape, tone and display
+mode, the Studio sidebar and forms, the view model, the validation states
+and the decisions: <https://claude.ai/artifact/LedHa7VtrVUdNfjc6mHVxY>.
+
+### It is the post grid with authored items
+
+`module_featureList` renders through `PostGrid` and `PostCard` — media,
+title, excerpt, and nothing else (no meta row, footer or tags) — with the
+post modules' `showImages` and `displayMode` (Grid / Carousel), the shared
+`brandVariant`, `headingBlock`, `contentAlignment` and `layout`. An editor
+who has used Latest Posts already knows this module; what differs is where
+the items come from, one new image-shape control, and card alignment.
+
+"Grid" is deliberately not in the name: the post modules are named by what
+they show, not how (`postLatest`, `taxonomyList`), and `displayMode` makes
+every one of them a grid or a carousel. `featureList` follows
+`taxonomyList`; the Studio title is "Features".
+
+### Feature cards are documents, in a Blocks section
+
+Features are **`block_feature` documents** ("Feature Card"), referenced by
+the module, not inline objects on it. A service or skill written once is
+reused on the home page and a landing page, and Sanity's strong reference
+refuses to delete a card a published module still uses. This is the same
+call the link library made for links and this epic's siblings make for
+testimonials and client logos.
+
+They live in a new **Blocks** desk section — the home for every reusable
+piece a module references — with "Feature Cards" and "Links" groups. The
+standalone Links section folds into it; Testimonials and Client Logos join
+it as their designs land. The **`block_` prefix** is the family's naming
+convention, so the section and any future guard can derive membership the
+way `module_hero*` does for the hero family, rather than hand-listing it.
+
+`block_feature`:
+
+| Field   | Type                    | Notes                                                                                    |
+| ------- | ----------------------- | ---------------------------------------------------------------------------------------- |
+| `title` | string, required        | Rendered as the card heading                                                             |
+| `text`  | text, 3 rows            | The card's one line of copy                                                              |
+| `icon`  | string, `FEATURE_ICONS` | Used when a Features module shows the Icon shape; a dropdown first, a visual picker next |
+| `image` | `imageWithAlt`          | Used for the Wide, Square and Circle shapes                                              |
+| `link`  | reference → `link`      | Optional; makes the card clickable                                                       |
+
+A card carries **both** `icon` and `image`, always visible, because the
+same card can sit in an icon-shaped module on one page and a wide-shaped
+one on another; the module's shape decides which renders. Preview: title,
+the link's label or "No link", the image as media.
+
+### Fields
+
+The form opens `title → brandVariant → headingBlock → …` as every module
+does:
+
+| Field              | Type                                                            | Notes                                                                                  |
+| ------------------ | --------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `title`            | `titleField()`                                                  | Editor-facing name, never rendered                                                     |
+| `brandVariant`     | `brandVariantField({ list: FULL_BRAND_VARIANT_LIST })`          |                                                                                        |
+| `headingBlock`     | `headingBlockField()`                                           | Required heading, optional supporting text                                             |
+| `features`         | array of references → `block_feature`, `unique()`, 2–8          | Authored order is display order                                                        |
+| `ctaButtons`       | `ctaButtonsField()`                                             | 0–2 actions under the grid — "See all services", "Get in touch"                        |
+| `showImages`       | `showImagesField()`                                             | The post modules' toggle; off renders title and text only                              |
+| `imageShape`       | `CARD_IMAGE_SHAPE` dropdown, required, initial `ICON`           | `WIDE` (16:9, edge to edge) · `SQUARE` · `CIRCLE` (inset, round) · `ICON` (48 px tile) |
+| `displayMode`      | `displayModeField()`                                            | Grid or Carousel                                                                       |
+| `contentAlignment` | `alignmentFields([])`                                           | Moves the heading                                                                      |
+| `cardAlignment`    | `CONTENT_ALIGNMENT` `LEFT` / `CENTER`, required, initial `LEFT` | Moves the image, title and text inside each card                                       |
+| `layout`           | `layoutField`                                                   |                                                                                        |
+
+Dropdowns throughout, no radios; every field carries an editor-facing
+description.
+
+**Image shape is one field on the module, not per card,** so the grid stays
+even. `CARD_IMAGE_SHAPE = { WIDE, SQUARE, CIRCLE, ICON }` lands in
+`@blog/config` and is shared with the post modules' own shape control
+(#3245, which takes `WIDE` and `SQUARE` only). Icon draws from a curated
+**`FEATURE_ICONS`** subset of `ICONS` — about 24 pictograms for services
+and skills — rendered through the `Icon` atom in `currentColor`, so it
+follows dark mode and the brand band; the other three shapes render the
+card's uploaded `imageWithAlt`. **No SVG upload for icons** (decided
+2026-09-16, for simplicity): an uploaded SVG keeps its own colours and
+cannot follow the theme, and a services grid of eight editor-sourced files
+never matches in weight.
+
+**Icons exist on two surfaces, from one key list.** `@blog/ui`'s icons are
+hand-kept SVG assets, and the Studio cannot import `@blog/ui`. So the web
+gets 24 new assets in `packages/ui/src/assets/icons/` registered in
+`ICON_REGISTRY`, and the Studio gets a visual picker drawing the same glyphs
+from `lucide-react`, which it already depends on for schema icons. Taking
+the ui assets from lucide, glyph for glyph, is what keeps the two identical;
+the `FEATURE_ICONS` key list in `@blog/config` keeps them in step. The
+picker is its own ticket after the schema (#3252), so the schema ships
+with a plain dropdown first.
+
+**Heading and cards align independently.** `contentAlignment` moves the
+heading, as on every module; `cardAlignment` moves the card contents. A
+centred heading over left-aligned cards is the common marketing layout and
+one field cannot express it; both centred is the icon-strip look. The post
+modules gain the same card control in #3245.
+
+**Columns are derived from the count — there is no field.** The web view
+picks columns so every count fills its rows within one card: 2 → 2, 3 → 3,
+4 → 4, 5 → 3 + 2, 6 → 3 + 3, 7 → 4 + 3, 8 → 4 + 4. The only thing a columns
+field would add is the ability to pick a worse layout, which is what its
+warning would have existed to catch. Carousel shows three per view as the
+post modules do. Decided 2026-09-16 after a first cut with an explicit
+2 / 3 / 4 dropdown.
+
+**A linked card is one link, on its title.** The whole card is clickable
+through the title's overlay, the `PostCardItem` pattern, so the accessible
+name is the title. An unlinked card is plain text.
+
+### Validation
+
+| State                                                         | Level   | Message                                                         |
+| ------------------------------------------------------------- | ------- | --------------------------------------------------------------- |
+| fewer than 2 references                                       | Error   | A features section needs at least two feature cards.            |
+| more than 8 references                                        | Error   | A features section holds at most eight feature cards.           |
+| the same card twice                                           | Error   | `unique()` on the array                                         |
+| no `headingBlock.heading`                                     | Error   | (the shared `headingBlockField()` rule)                         |
+| `ctaButtons` rule violations                                  | Error   | (the shared `ctaButtonsField()` rules)                          |
+| Show Images on, Icon shape, a referenced card has no `icon`   | Warning | Some feature cards have no icon, so the grid will look uneven.  |
+| Show Images on, other shape, a referenced card has no `image` | Warning | Some feature cards have no image, so the grid will look uneven. |
+
+The two warnings are async, through `getDraftsClient(context)`, because a
+reference carries only the `_ref` — the `module_heroBlog` mechanism.
+Card-level rules (`title` required, image alt) live on `block_feature`.
+
+### Service
+
+`service.modules.featureList.v1`, the `post-latest` layout:
+
+```groq
+*[_type == "module_featureList" && _id == $id][0]{
+  brandVariant, headingBlock{ ...headingBlockFragment },
+  features[]->{ _id, title, text, icon, image{ ...sanityImageFragment },
+                link->{ ...linkDocumentFragment } },
+  ctaButtons[]{ ...ctaButtonFragment },
+  "showImages": SHOW_IMAGES_EXPRESSION, imageShape,
+  "displayMode": DISPLAY_MODE_EXPRESSION,
+  contentAlignment, cardAlignment, layout
+}
+```
+
+```ts
+type TFeatureListItem = {
+  id: string;
+  title: string;
+  text: TMaybeUndefined<string>;
+  sanityImage: TMaybeUndefined<ISanityImage>;
+  icon: TMaybeUndefined<TIconName>;
+  link: TMaybeUndefined<ILink>;
+};
+
+type TFeatureListModule = {
+  brandVariant: TFullBrandVariant;
+  headingBlock: THeadingBlock;
+  items: TFeatureListItem[];
+  ctaButtons: TCtaButton[];
+  showImages: boolean;
+  imageShape: TCardImageShape;
+  displayMode: TDisplayMode;
+  contentAlignment: TMaybeUndefined<TContentAlignment>;
+  cardAlignment: TContentAlignment;
+  layout: TMaybeUndefined<TLayout>;
+};
+```
+
+Items keep authored order; `link` goes through `toLinkDocument()` and is
+`undefined` when it cannot resolve; `sanityImage` through `toSanityImage()`;
+`ctaButtons` through `toCtaButton()`. No faked defaults.
+
+**Cache tags:** `modules:featureList`, `module:<id>`, `block_feature` (the
+dereference), plus the `link` + page-type set the statement hero's loader
+carries. `REVALIDATE_TAGS` gains `module_featureList: ['modules:featureList']`.
+
+### `@blog/ui`
+
+No new component. Three additive changes:
+
+- **`PostCard.Media` `shape: wide | square | circle | icon`** (default
+  `wide`, so posts are unchanged): `wide` is today's 16:9 (4:3 with
+  `isLead`); `square` is 1:1 at full width (also with `isLead`); `circle`
+  is a `size-28 rounded-full` frame inside the card's padding; `icon` is a
+  `size-12 rounded-md` tile, `bg-brand-primary-muted text-brand-primary`,
+  whose child renders in `currentColor`.
+- **`PostCard` `align: left | center`** (default `left`): `center` centres
+  media, meta, title, excerpt, tags and footer.
+- **`PostGrid` `columns: 4`.**
+- The `FEATURE_ICONS` SVG assets, registered in `ICON_REGISTRY`.
+
+Stories and tests for each variant; `COMPONENTS.md` regenerated. #3245
+(the post modules' shape and alignment) reuses these same variants.
+
+### Web
+
+`apps/web/src/modules/feature-list/` — `FeatureListModule` (loader + view,
+the `post-latest` shape) and `FeatureListModuleView`: `Section` with
+`brandVariant` and `layout`; `ModuleHeading` at the caller's level with
+`contentAlignment`; then `PostGrid` with the derived column count, or the
+`Carousel` organism as `PostsCarousel` composes it; `ActionGroup` under the
+grid when there are buttons. Each card composes `PostCard align={cardAlignment}`
+directly: `PostCard.Media shape={imageShape}` holding a `SanityImage` sized
+per shape, or an `Icon` for the Icon shape; `PostCard.Title` with a
+`SmartLink` when the card has a link; `excerpt` from `text`. `showImages`
+off drops the media slot. `MODULE_MAP` gains `module_featureList`.
+
+### Pages and desk
+
+Allowed in `page_home` and `page_landing`'s `modulesField({ allow })` — not
+on post or index pages, which are lists, not pitches. A module desk entry
+beside the other modules; the Blocks section as above.
+
+### Migration
+
+None — two new document types, two new consts, additive `@blog/ui` variants,
+a desk regrouping.
+
+### Per-layer scope and PRs
+
+Epic #3246, five sub-issues:
+
+- **ui** · #3247 — `PostCard.Media` `shape`, `PostCard` `align`, `PostGrid`
+  `columns: 4`, the `FEATURE_ICONS` assets; the `ICONS` keys ride in it.
+  Own PR, additive, first.
+- **studio** · #3248 — `block_feature`, the Blocks section, the module
+  schema, `CARD_IMAGE_SHAPE` riding in it, typegen.
+- **service** · #3249 — the loader.
+- **web** · #3250 — the view and `MODULE_MAP` entry; completing PR with the
+  `SPEC.md` sync.
+- **studio** · #3252 — the visual icon picker; after #3248, independent of
+  the rest.
+
+**PRs:** ui alone; then studio + service + web as one — typegen widening
+`TModuleType` reds the exhaustive `MODULE_MAP` Record until the web entry
+lands, and the const has no consumer without studio. The picker is its own
+PR after.
+
+### Not in scope
+
+- Inline features on the module (the Blocks section is the point).
+- An SVG or image upload for the Icon shape.
+- A columns field.
+- A "used on" preview subtitle for blocks (a parked Studio idea).
+- The post modules' own shape and alignment controls (#3245).
+
+**Acceptance:** an editor can create Feature Cards under Blocks, add a
+Features module to the home page or a landing page referencing two to eight
+of them, choose a shape, and see an even grid (or carousel) with the heading
+and cards aligned independently; a linked card is clickable by its title;
+Links appears under Blocks; `pnpm type-check && pnpm lint && pnpm test &&
+pnpm knip && pnpm gen:ui-index:check` green.
 
 ## Post grid images and the `showImages` toggle
 
@@ -2526,6 +2795,21 @@ point; the graph stays acyclic.
   the `socialProfile` shape #3216 gives the author, resolved through the
   footer's fragment/transformer and rendered by a shared `SocialLinks`
   component, so the combined PR waits on #3216 (2026-09-16, #2776).
+
+- **`module_featureList` is the post grid with authored items, and Phase 3's
+  reusable pieces are `block_*` documents in a Blocks desk section** — the
+  module references 2–8 `block_feature` cards (title, text, icon, image,
+  link), renders through `PostGrid` + `PostCard` with the post modules'
+  `showImages`/`displayMode`, adds `imageShape` (`CARD_IMAGE_SHAPE`: Wide /
+  Square / Circle / Icon, one field on the module) and `cardAlignment`
+  beside the heading's `contentAlignment`, derives columns from the count (no
+  field), draws Icon-shape glyphs from a curated `FEATURE_ICONS` set (no SVG
+  upload) rendered on the web from `@blog/ui` assets and in the Studio from
+  `lucide-react` through a visual picker that ships after the schema; the
+  Blocks section holds Feature Cards and the moved Links, and the `block_`
+  prefix names the family; ui alone, then studio + service + web as one PR
+  (2026-09-16, #3246). The post modules gain the same shape (Wide / Square)
+  and card alignment in #3245.
 
 - **The `page_postIndex` expand ships as one PR, and the copy migration runs
   before its deploy** — studio adds `page_postIndex` beside `page_blog`, and
