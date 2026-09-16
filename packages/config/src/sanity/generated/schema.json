@@ -2259,6 +2259,79 @@
     }
   },
   {
+    "name": "socialProfile",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "socialProfile"
+          }
+        },
+        "link": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "link.reference"
+          },
+          "optional": true
+        },
+        "platform": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "X"
+              },
+              {
+                "type": "string",
+                "value": "GITHUB"
+              },
+              {
+                "type": "string",
+                "value": "LINKEDIN"
+              },
+              {
+                "type": "string",
+                "value": "YOUTUBE"
+              },
+              {
+                "type": "string",
+                "value": "INSTAGRAM"
+              },
+              {
+                "type": "string",
+                "value": "MASTODON"
+              },
+              {
+                "type": "string",
+                "value": "BLUESKY"
+              },
+              {
+                "type": "string",
+                "value": "FACEBOOK"
+              },
+              {
+                "type": "string",
+                "value": "THREADS"
+              },
+              {
+                "type": "string",
+                "value": "RSS"
+              }
+            ]
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
     "name": "linkRef",
     "type": "type",
     "value": {
@@ -3022,7 +3095,7 @@
             },
             "rest": {
               "type": "inline",
-              "name": "inlineLink"
+              "name": "socialProfile"
             }
           }
         },
@@ -3088,7 +3161,7 @@
             },
             "rest": {
               "type": "inline",
-              "name": "inlineLink"
+              "name": "linkRef"
             }
           }
         },

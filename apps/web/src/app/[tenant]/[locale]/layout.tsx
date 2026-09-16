@@ -19,6 +19,7 @@ import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { AuthMenu } from '@web/components/shared/auth-menu';
 import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
+import { FooterSocialLinks } from '@web/components/shared/footer-social-links';
 import { SiteNavigation } from '@web/components/shared/site-navigation';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { ThemeScope } from '@web/components/shared/theme-scope';
@@ -36,7 +37,6 @@ import { isProductionEnvironment } from '@web/utils/is-production-environment';
 import { isWebAnalyticsEnabled } from '@web/utils/is-web-analytics-enabled';
 import { logger } from '@web/utils/logger/logger';
 import { resolveTenantMessages } from '@web/utils/resolve-tenant-messages';
-import { toSocialIconName } from '@web/utils/to-social-icon-name';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { SessionProvider } from 'next-auth/react';
@@ -165,6 +165,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
   const brandLogoUrl = brand.logo
     ? urlForSanityImage(brand.logo, tenantContext)
     : undefined;
+  const footerSocialLinks = await FooterSocialLinks({ social });
 
   return (
     // `<html>` (owned by the tenant-independent root layout above) has no
@@ -214,36 +215,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
                   <Footer dataTestId="site-footer">
                     <Footer.Copyright title={brand.name} year={currentYear} />
                     <Footer.Nav>
-                      {social.map((link) => {
-                        // `link.platform` is optional and free-form beyond the
-                        // `SOCIAL_PLATFORMS` enum's known icon set — an unmapped
-                        // platform falls back to the original label-only rendering
-                        // (no `icon`, `hasLabel` stays true) rather than hiding
-                        // the link.
-                        const iconName =
-                          link.platform && toSocialIconName(link.platform);
-
-                        return (
-                          <NavLink
-                            key={link.href}
-                            as={SmartLink}
-                            href={link.href}
-                            target={link.target}
-                            icon={
-                              iconName ? (
-                                <Icon
-                                  name={iconName}
-                                  size={SIZE.SM}
-                                  dataTestId={`social-icon-${link.platform}`}
-                                />
-                              ) : undefined
-                            }
-                            hasLabel={!iconName}
-                          >
-                            {link.label}
-                          </NavLink>
-                        );
-                      })}
+                      {footerSocialLinks}
                       <NavLink
                         as={SmartLink}
                         href={routes.rssFeed()}

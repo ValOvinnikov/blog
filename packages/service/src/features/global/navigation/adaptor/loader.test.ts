@@ -31,13 +31,12 @@ describe('getNavigation', () => {
       makeRawNavigation({
         items: [
           {
-            label: 'Blog',
-            linkType: 'EXTERNAL',
-            url: '/blog',
-            internalReference: null,
-            openInNewTab: null,
-            platform: null,
-            accessibleLabel: null,
+            link: {
+              label: 'Blog',
+              linkType: 'EXTERNAL',
+              url: '/blog',
+              openInNewTab: null,
+            },
           },
         ],
       }),
@@ -72,6 +71,12 @@ describe('getNavigation', () => {
             't:tenant-a:topic',
             't:tenant-a:page_landing',
             't:tenant-a:page_postIndex',
+            't:tenant-a:link',
+            't:tenant-a:homePage',
+            't:tenant-a:page_topic',
+            't:tenant-a:page_topicIndex',
+            't:tenant-a:page_tag',
+            't:tenant-a:page_tagIndex',
           ],
         }),
       }),

@@ -1,9 +1,12 @@
-import { SOCIAL_PLATFORMS, LINK_TYPE } from '@blog/config/constants';
+import {
+  SOCIAL_PLATFORMS,
+  SOCIAL_PLATFORM_LABEL,
+  LINK_TYPE,
+} from '@blog/config/constants';
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic/topic';
 import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { PAGE_POST_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/post-index/post-index-type';
-import { toTitleCase } from '@blog/utils/primitives';
 import { Link2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -115,8 +118,9 @@ export const inlineLinkSchema = defineType({
       type: 'string',
       description: 'Optional social platform, used for icon selection.',
       options: {
+        layout: 'dropdown',
         list: Object.values(SOCIAL_PLATFORMS).map((value) => ({
-          title: toTitleCase(value),
+          title: SOCIAL_PLATFORM_LABEL[value],
           value,
         })),
       },
