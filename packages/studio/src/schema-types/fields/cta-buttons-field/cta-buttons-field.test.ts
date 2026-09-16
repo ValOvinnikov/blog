@@ -76,7 +76,7 @@ describe(ctaButtonsField, () => {
       expect(validate([])).toBe(true);
     });
 
-    it('is valid with a Secondary button alone', () => {
+    it('is valid with a Secondary action alone', () => {
       const validate = getValidator(ctaButtonsField());
 
       expect(validate([{ variant: CTA_ACTION_VARIANT.SECONDARY }])).toBe(true);
@@ -101,10 +101,10 @@ describe(ctaButtonsField, () => {
           { variant: CTA_ACTION_VARIANT.SECONDARY },
           { variant: CTA_ACTION_VARIANT.PRIMARY },
         ]),
-      ).toBe('A Primary button must be listed first.');
+      ).toBe('A Primary action must be listed first.');
     });
 
-    it('rejects two Primary buttons', () => {
+    it('rejects two Primary actions', () => {
       const validate = getValidator(ctaButtonsField());
 
       expect(
@@ -112,10 +112,10 @@ describe(ctaButtonsField, () => {
           { variant: CTA_ACTION_VARIANT.PRIMARY },
           { variant: CTA_ACTION_VARIANT.PRIMARY },
         ]),
-      ).toBe('Only one Primary button is allowed.');
+      ).toBe('Only one Primary action is allowed.');
     });
 
-    it('rejects two Secondary buttons', () => {
+    it('rejects two Secondary actions', () => {
       const validate = getValidator(ctaButtonsField());
 
       expect(
@@ -123,27 +123,7 @@ describe(ctaButtonsField, () => {
           { variant: CTA_ACTION_VARIANT.SECONDARY },
           { variant: CTA_ACTION_VARIANT.SECONDARY },
         ]),
-      ).toBe('Only one Secondary button is allowed.');
-    });
-  });
-
-  describe('allowVariants', () => {
-    it('defaults to allowing both Primary and Secondary', () => {
-      const validate = getValidator(ctaButtonsField());
-
-      expect(validate([{ variant: CTA_ACTION_VARIANT.PRIMARY }])).toBe(true);
-      expect(validate([{ variant: CTA_ACTION_VARIANT.SECONDARY }])).toBe(true);
-    });
-
-    it('lets a consumer restrict to Secondary only', () => {
-      const validate = getValidator(
-        ctaButtonsField({ allowVariants: [CTA_ACTION_VARIANT.SECONDARY] }),
-      );
-
-      expect(validate([{ variant: CTA_ACTION_VARIANT.SECONDARY }])).toBe(true);
-      expect(validate([{ variant: CTA_ACTION_VARIANT.PRIMARY }])).toBe(
-        'Only Secondary buttons are allowed here.',
-      );
+      ).toBe('Only one Secondary action is allowed.');
     });
   });
 });

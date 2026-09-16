@@ -4,11 +4,17 @@ import type {
   TCtaActionVariant,
   TMaybeUndefined,
 } from '@blog/config';
-import type { ctaButtonFragment } from '@blog/service/shared/fragments/cta-button';
+import type {
+  ctaButtonFragment,
+  ctaSecondaryButtonFragment,
+} from '@blog/service/shared/fragments/cta-button';
 import { toLinkDocument } from '@blog/service/shared/transformers/to-link-document';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawCtaButton = InferFragmentType<typeof ctaButtonFragment>;
+type TRawCtaSecondaryButton = InferFragmentType<
+  typeof ctaSecondaryButtonFragment
+>;
 
 export type TCtaButton = {
   variant: TCtaActionVariant;
@@ -16,7 +22,9 @@ export type TCtaButton = {
   link: ILink;
 };
 
-export function toCtaButton(raw: TRawCtaButton): TCtaButton | undefined {
+export function toCtaButton(
+  raw: TRawCtaButton | TRawCtaSecondaryButton,
+): TCtaButton | undefined {
   const link = toLinkDocument(raw.link);
   if (!link) return undefined;
 

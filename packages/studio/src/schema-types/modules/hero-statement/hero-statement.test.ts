@@ -29,12 +29,41 @@ const getFieldCustomValidator = (field: { validation?: unknown }): TCustomFn =>
   getCustomValidator<TCustomFn>(field);
 
 describe('heroStatementSchema field order', () => {
-  it('places title, eyebrow, headingBlock before the shared hero tail', () => {
+  it('places title, brandVariant, headingBlock, eyebrow, ctaButtons before the shared hero tail', () => {
     const names = heroStatementSchema.fields
       ?.map((field) => ('name' in field ? field.name : undefined))
-      .slice(0, 3);
+      .slice(0, 5);
 
-    expect(names).toEqual(['title', 'eyebrow', 'headingBlock']);
+    expect(names).toEqual([
+      'title',
+      'brandVariant',
+      'headingBlock',
+      'eyebrow',
+      'ctaButtons',
+    ]);
+  });
+});
+
+describe('heroStatementSchema brandVariant field', () => {
+  it('is required, matching what the service reads as non-null', () => {
+    const field = getField('brandVariant');
+
+    if (typeof field.validation !== 'function') {
+      throw new Error('Expected brandVariant field to define validation.');
+    }
+
+    let requiredCalled = false;
+    const rule = {
+      required: () => {
+        requiredCalled = true;
+        return rule;
+      },
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (field.validation as any)(rule);
+
+    expect(requiredCalled).toBe(true);
   });
 });
 

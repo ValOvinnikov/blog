@@ -274,6 +274,13 @@ export type LinkReference = {
   [internalGroqTypeReferenceTo]?: 'link';
 };
 
+export type CtaSecondaryButton = {
+  _type: 'ctaSecondaryButton';
+  variant?: 'PRIMARY' | 'SECONDARY';
+  appearance?: 'CONTAINED' | 'INLINE';
+  link?: LinkReference;
+};
+
 export type CtaButton = {
   _type: 'ctaButton';
   variant?: 'PRIMARY' | 'SECONDARY';
@@ -901,21 +908,21 @@ export type Module_heroStatement = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  eyebrow?: string;
-  headingBlock?: HeadingBlock;
-  variant?: 'SPLIT' | 'STACKED' | 'BANNER';
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  headingBlock?: HeadingBlock;
+  eyebrow?: string;
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
+  variant?: 'SPLIT' | 'STACKED' | 'BANNER';
   image?: ImageWithAlt;
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   mediaOrderSplit?: 'LAST' | 'FIRST';
   mediaOrderStacked?: 'LAST' | 'FIRST';
-  ctaButtons?: Array<
-    {
-      _key: string;
-    } & CtaButton
-  >;
   layout?: HeroLayout;
 };
 
@@ -926,25 +933,21 @@ export type Module_heroBlog = {
   _updatedAt: string;
   _rev: string;
   title?: string;
+  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   postSource?: 'PINNED' | 'NEWEST_FEATURED';
   post?: Page_postReference;
-  eyebrow?: string;
   imageSource?: 'POST' | 'CUSTOM' | 'NONE';
   image?: ImageWithAlt;
+  eyebrow?: string;
   primaryActionLabel?: string;
   primaryActionAppearance?: 'CONTAINED' | 'INLINE';
+  secondaryAction?: CtaSecondaryButton;
   variant?: 'SPLIT' | 'STACKED' | 'BANNER';
-  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   mediaOrderSplit?: 'LAST' | 'FIRST';
   mediaOrderStacked?: 'LAST' | 'FIRST';
-  ctaButtons?: Array<
-    {
-      _key: string;
-    } & CtaButton
-  >;
   layout?: HeroLayout;
 };
 
@@ -1181,6 +1184,7 @@ export type AllSanitySchemaTypes =
   | Seo
   | OpenGraph
   | LinkReference
+  | CtaSecondaryButton
   | CtaButton
   | ActionGroup
   | CtaAction

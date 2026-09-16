@@ -1,10 +1,15 @@
 import {
-  CTA_ACTION_VARIANT,
+  CONTENT_ALIGNMENT,
   HERO_VARIANT,
   MEDIA_ORDER,
 } from '@blog/config/constants';
-import { heroFields } from '@blog/studio/schema-types/fields/hero-fields/hero-fields';
 import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
+
+import {
+  HERO_FIELDSET_CONTENT_POSITION,
+  heroFields,
+  heroFieldsets,
+} from './hero-fields';
 
 type TCustomFn = (
   value: unknown,
@@ -77,6 +82,14 @@ const wasRequiredCalled = (field: { validation?: unknown }) => {
   return requiredCalled;
 };
 
+describe('heroFieldsets', () => {
+  it('declares one contentPosition fieldset', () => {
+    expect(heroFieldsets).toEqual([
+      expect.objectContaining({ name: HERO_FIELDSET_CONTENT_POSITION }),
+    ]);
+  });
+});
+
 describe('heroFields variant field', () => {
   it('offers Split, Stacked and Banner by default, defaulting to Split', () => {
     const field = getField(heroFields(), 'variant');
@@ -89,10 +102,10 @@ describe('heroFields variant field', () => {
     expect(field.initialValue).toBe(HERO_VARIANT.SPLIT);
   });
 
-  it('keeps variant as a radio: required, and it drives which other fields show', () => {
+  it('is a required dropdown that drives which other fields show', () => {
     const field = getField(heroFields(), 'variant');
 
-    expect(getLayout(field)).toBe('radio');
+    expect(getLayout(field)).toBe('dropdown');
     expect(wasRequiredCalled(field)).toBe(true);
   });
 
@@ -172,30 +185,43 @@ describe('heroFields image field', () => {
 });
 
 describe('heroFields content position fields', () => {
-  it('shows contentPositionSplit only for Split', () => {
-    const hidden = getHidden(getField(heroFields(), 'contentPositionSplit'));
+  it('shows contentPositionSplit only for Split, and tags it into the shared fieldset', () => {
+    const field = getField(heroFields(), 'contentPositionSplit');
+    const hidden = getHidden(field);
 
     expect(hidden({ parent: { variant: HERO_VARIANT.SPLIT } })).toBe(false);
     expect(hidden({ parent: { variant: HERO_VARIANT.BANNER } })).toBe(true);
     expect(hidden({ parent: { variant: HERO_VARIANT.STACKED } })).toBe(true);
+    expect((field as { fieldset?: string }).fieldset).toBe(
+      HERO_FIELDSET_CONTENT_POSITION,
+    );
   });
 
-  it('shows contentPositionBanner only for Banner', () => {
-    const hidden = getHidden(getField(heroFields(), 'contentPositionBanner'));
+  it('shows contentPositionBanner only for Banner, and tags it into the shared fieldset', () => {
+    const field = getField(heroFields(), 'contentPositionBanner');
+    const hidden = getHidden(field);
 
     expect(hidden({ parent: { variant: HERO_VARIANT.BANNER } })).toBe(false);
     expect(hidden({ parent: { variant: HERO_VARIANT.SPLIT } })).toBe(true);
     expect(hidden({ parent: { variant: HERO_VARIANT.STACKED } })).toBe(true);
+    expect((field as { fieldset?: string }).fieldset).toBe(
+      HERO_FIELDSET_CONTENT_POSITION,
+    );
   });
 
-  it('always emits the contentAlignment baseline', () => {
+  it('always emits the contentAlignment baseline, tagged into the shared fieldset', () => {
     const fields = heroFields();
+    const field = getField(fields, 'contentAlignment') as {
+      fieldset?: string;
+    };
 
-    expect(
-      fields.some(
-        (field) => 'name' in field && field.name === 'contentAlignment',
-      ),
-    ).toBe(true);
+    expect(field.fieldset).toBe(HERO_FIELDSET_CONTENT_POSITION);
+  });
+
+  it('defaults contentAlignment to Left', () => {
+    expect(getField(heroFields(), 'contentAlignment').initialValue).toBe(
+      CONTENT_ALIGNMENT.LEFT,
+    );
   });
 });
 
@@ -243,78 +269,14 @@ describe('heroFields media order fields', () => {
 });
 
 describe('heroFields shared tail', () => {
-  it('emits a ctaButtons field and a layout field', () => {
-    const fields = heroFields();
-
-    expect(
-      fields.some((field) => 'name' in field && field.name === 'ctaButtons'),
-    ).toBe(true);
-    expect(
-      fields.some((field) => 'name' in field && field.name === 'layout'),
-    ).toBe(true);
-  });
-
-  it('ends with ctaButtons then layout', () => {
+  it('ends with the layout field, and emits no ctaButtons field', () => {
     const names = heroFields()
       .filter(
         (field): field is typeof field & { name: string } => 'name' in field,
       )
       .map((field) => field.name);
 
-    expect(names.slice(-2)).toEqual(['ctaButtons', 'layout']);
-  });
-});
-
-describe('heroFields buttons option', () => {
-  it('defaults ctaButtons to the shared field defaults', () => {
-    const field = getField(heroFields(), 'ctaButtons');
-    const validate =
-      getCustomValidator<(value: unknown) => string | true>(field);
-
-    expect(
-      validate([
-        { variant: CTA_ACTION_VARIANT.PRIMARY },
-        { variant: CTA_ACTION_VARIANT.SECONDARY },
-      ]),
-    ).toBe(true);
-  });
-
-  it('passes allowVariants through to ctaButtonsField', () => {
-    const field = getField(
-      heroFields({
-        buttons: { max: 1, allowVariants: [CTA_ACTION_VARIANT.SECONDARY] },
-      }),
-      'ctaButtons',
-    );
-    const validate =
-      getCustomValidator<(value: unknown) => string | true>(field);
-
-    expect(validate([{ variant: CTA_ACTION_VARIANT.PRIMARY }])).toBe(
-      'Only Secondary buttons are allowed here.',
-    );
-    expect(validate([{ variant: CTA_ACTION_VARIANT.SECONDARY }])).toBe(true);
-  });
-
-  it('passes max through to ctaButtonsField', () => {
-    const field = getField(heroFields({ buttons: { max: 1 } }), 'ctaButtons');
-    let maxArg: number | undefined;
-
-    const rule = {
-      min: () => rule,
-      max: (n: number) => {
-        maxArg = n;
-        return rule;
-      },
-      custom: () => rule,
-    };
-
-    if (!field.validation) {
-      throw new Error('Expected ctaButtons field to define validation.');
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    (field.validation as any)(rule);
-
-    expect(maxArg).toBe(1);
+    expect(names.at(-1)).toBe('layout');
+    expect(names).not.toContain('ctaButtons');
   });
 });

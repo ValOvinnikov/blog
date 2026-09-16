@@ -188,10 +188,10 @@ describe('ctaSchema contentAlignment field', () => {
     ]);
   });
 
-  it('has no initial value', () => {
+  it('defaults to Left', () => {
     const field = getField('contentAlignment');
 
-    expect(field.initialValue).toBeUndefined();
+    expect(field.initialValue).toBe(CONTENT_ALIGNMENT.LEFT);
   });
 
   it('is visible on every variant', () => {
