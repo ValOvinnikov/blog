@@ -240,10 +240,48 @@ no faked defaults), the module-registry mechanism, and the editorial write path:
 ## 6. Content model
 
 Source of truth: `packages/studio/src/schema-types/` — documents (`post`, `author`,
-`topic`, `tag`, page documents, singletons), standalone `module_*`
-page-builder documents, and shared objects (`link`, `imageWithAlt`, `bodyImage`,
+`topic`, `tag`, `link`, page documents, singletons), standalone `module_*`
+page-builder documents, and shared objects (`linkRef`, `ctaButton`,
+`socialProfile`, `imageWithAlt`, `bodyImage`,
 `seo`, `aside`, `postTakeaways`, …). Naming convention `{group}_{name}` is being applied
 incrementally (#251).
+
+**A link is authored once, as a `link` document, and referenced everywhere
+else.** `link` is a document — not a shared object — carrying `label`, a
+`linkType` (`INTERNAL`/`EXTERNAL` from `LINK_TYPE`), and exactly one
+destination: an `internalReference` to a page document, or a `url` validated
+as an absolute `http(s)` address. Shared objects wrap a reference to it, each
+adding only what its surface needs: `linkRef` (nothing — a bare reference,
+used by navigation items and Portable Text annotations), `ctaButton`
+(`variant` and `appearance`), `ctaSecondaryButton` (`ctaButton`'s
+variant-locked sibling, detailed with `module_heroBlog` below), and
+`socialProfile` (`platform`). None of them stores a destination of its own,
+so changing where a link points is a single edit that every consumer picks
+up.
+
+The one shape still holding a destination inline is `inlineLink`, surviving
+solely as `module_hero.secondaryAction`'s type until #2813 retires that
+module.
+
+**Body-text links are annotations, not stored hrefs.** `richText`, `proseText`
+and `inlineText` each declare `marks.annotations` explicitly as `linkRef`,
+and `@blog/service` dereferences it while projecting the block. Because the
+annotation holds a reference rather than a URL, a link whose target document
+was deleted resolves to nothing and renders as **plain text** rather than a
+dead anchor. Declaring `annotations` explicitly also replaces the default
+annotation set, so prose offers no paste-a-URL annotation of its own — an
+author picks an existing `link` document instead, which is the point.
+
+**`settings_navigation` and `settings_footer` both author through the
+library.** `settings_navigation.items` is an array of `linkRef`, so a
+navigation item carries no label of its own — the label comes from the `link`
+document, and editing it there updates every surface at once.
+`settings_footer.social` is an array of `socialProfile`, pairing a `link`
+reference with a `platform` from `SOCIAL_PLATFORMS`. A social link's
+accessible name is **derived** from that `platform` via the
+`siteFooter.socialLinkAriaLabel` message rather than stored per link, so it
+stays translated and consistent instead of depending on each author typing
+one.
 
 Every `module_*` document also carries a **required** `brandVariant` field
 (stored values from `@blog/config`'s `BRAND_VARIANT` const —
@@ -471,17 +509,16 @@ full-bleed image covers the section entirely, and carrying a non-blocking
 warning when it equals `brandVariant`, since a matching band and card is
 occasionally deliberate), an optional `eyebrow`,
 an optional `content` (`inlineText` — a constrained Portable Text block:
-paragraphs, bullet/numbered lists, bold/italic, and `link` annotations
+paragraphs, bullet/numbered lists, bold/italic, and `linkRef` annotations
 only, no headings/images/code/asides — distinct from the fuller `richText`
 used elsewhere), an optional `image` (`imageWithAlt`, required for
 `BANNER`/`SPLIT` via a custom validator, since Sanity can't make
 `.required()` conditional on a sibling field), two independent alignment
-axes (below), `mobileMediaOrder` (Split only), an optional `actions` (`actionGroup` — a
-reusable object under `objects/action-group/`, not CTA-specific: an `actions`
-array of `ctaAction` items, each with its own `variant` (`PRIMARY`/
-`SECONDARY`) and `appearance` (`CONTAINED`/`INLINE`, available on either
-variant), validated so a `PRIMARY` item is required and comes first,
-`SECONDARY` is optional, max two), and an optional `footnote`.
+axes (below), `mobileMediaOrder` (Split only), an optional `ctaButtons` (an
+array of `ctaButton` — each a reference to a `link` document plus its own
+`variant` (`PRIMARY`/`SECONDARY`) and `appearance` (`CONTAINED`/`INLINE`,
+available on either variant), validated so each variant appears at most once
+and a `PRIMARY` leads, max two), and an optional `footnote`.
 
 `module_cta`'s two alignment axes are deliberately separate. **Content
 position** is where the content block sits relative to the image — which grid

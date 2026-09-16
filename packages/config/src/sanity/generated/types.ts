@@ -288,20 +288,25 @@ export type CtaButton = {
   link?: LinkReference;
 };
 
-export type ActionGroup = {
-  _type: 'actionGroup';
-  actions?: Array<
-    {
-      _key: string;
-    } & CtaAction
-  >;
+export type SocialProfile = {
+  _type: 'socialProfile';
+  link?: LinkReference;
+  platform?:
+    | 'X'
+    | 'GITHUB'
+    | 'LINKEDIN'
+    | 'YOUTUBE'
+    | 'INSTAGRAM'
+    | 'MASTODON'
+    | 'BLUESKY'
+    | 'FACEBOOK'
+    | 'THREADS'
+    | 'RSS';
 };
 
-export type CtaAction = {
-  _type: 'ctaAction';
-  variant?: 'PRIMARY' | 'SECONDARY';
-  appearance?: 'CONTAINED' | 'INLINE';
-  link?: InlineLink;
+export type LinkRef = {
+  _type: 'linkRef';
+  link?: LinkReference;
 };
 
 export type Blog_topicReference = {
@@ -348,27 +353,6 @@ export type InlineLink = {
     | 'FACEBOOK'
     | 'THREADS'
     | 'RSS';
-};
-
-export type SocialProfile = {
-  _type: 'socialProfile';
-  link?: LinkReference;
-  platform?:
-    | 'X'
-    | 'GITHUB'
-    | 'LINKEDIN'
-    | 'YOUTUBE'
-    | 'INSTAGRAM'
-    | 'MASTODON'
-    | 'BLUESKY'
-    | 'FACEBOOK'
-    | 'THREADS'
-    | 'RSS';
-};
-
-export type LinkRef = {
-  _type: 'linkRef';
-  link?: LinkReference;
 };
 
 export type SocialLink = {
@@ -1186,14 +1170,12 @@ export type AllSanitySchemaTypes =
   | LinkReference
   | CtaSecondaryButton
   | CtaButton
-  | ActionGroup
-  | CtaAction
+  | SocialProfile
+  | LinkRef
   | Blog_topicReference
   | Page_landingReference
   | Page_postIndexReference
   | InlineLink
-  | SocialProfile
-  | LinkRef
   | SocialLink
   | Aside
   | BodyImage
