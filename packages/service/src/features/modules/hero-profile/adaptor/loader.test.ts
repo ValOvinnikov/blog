@@ -1,0 +1,67 @@
+import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeRawHeroProfileModule } from '@blog/service/testing/modules/fixtures';
+import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
+import { makeTenant } from '@blog/service/testing/tenant';
+
+import { getHeroProfile } from './loader';
+
+vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
+  runQuery: vi.fn(),
+}));
+
+const tenant = makeTenant();
+
+describe(getHeroProfile, () => {
+  it('resolves the hero in a single round trip — exactly one runQuery call', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawHeroProfileModule({
+        headingBlock: makeRawHeadingBlock('Meet the author'),
+      }),
+    );
+
+    const hero = await getHeroProfile('hero-profile-1', tenant);
+
+    expect(mockRun).toHaveBeenCalledTimes(1);
+    expect(hero.headingBlock.heading).toBe('Meet the author');
+  });
+
+  it('propagates when the module document is missing', async () => {
+    mockRun.mockRejectedValueOnce(new Error('ValidationError'));
+
+    await expect(getHeroProfile('missing', tenant)).rejects.toThrow();
+    expect(mockRun).toHaveBeenCalledTimes(1);
+  });
+
+  it('threads tenant context and scopes cache tags to it', async () => {
+    mockRun.mockResolvedValueOnce(makeRawHeroProfileModule());
+
+    await getHeroProfile('hero-profile-1', tenant);
+
+    expect(mockRun).toHaveBeenCalledTimes(1);
+    expect(mockRun).toHaveBeenNthCalledWith(
+      1,
+      expect.anything(),
+      expect.objectContaining({
+        tenant,
+        next: expect.objectContaining({
+          tags: [
+            't:tenant-a:modules:heroProfile',
+            't:tenant-a:module:hero-profile-1',
+            't:tenant-a:author',
+            't:tenant-a:link',
+            't:tenant-a:homePage',
+            't:tenant-a:page_landing',
+            't:tenant-a:page_post',
+            't:tenant-a:page_postIndex',
+            't:tenant-a:page_topic',
+            't:tenant-a:page_topicIndex',
+            't:tenant-a:page_tag',
+            't:tenant-a:page_tagIndex',
+            't:tenant-a:topic',
+          ],
+        }),
+      }),
+    );
+  });
+});
