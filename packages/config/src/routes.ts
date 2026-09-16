@@ -48,7 +48,7 @@ const PAGE_HREF_BUILDERS = {
   (slug: string | null | undefined) => string | undefined
 >;
 
-export type TLinkablePageType = keyof typeof PAGE_HREF_BUILDERS;
+type TLinkablePageType = keyof typeof PAGE_HREF_BUILDERS;
 
 const isLinkablePageType = (type: string): type is TLinkablePageType =>
   type in PAGE_HREF_BUILDERS;

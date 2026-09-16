@@ -66,7 +66,7 @@ export function makeRawHeroBlogModule(
     image: null,
     primaryActionLabel: null,
     primaryActionAppearance: null,
-    ctaButtons: null,
+    secondaryAction: null,
     variant: HERO_VARIANT.SPLIT,
     brandVariant: BRAND_VARIANT.PRIMARY,
     contentPositionSplit: null,

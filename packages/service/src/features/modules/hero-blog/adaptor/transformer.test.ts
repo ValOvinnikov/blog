@@ -202,7 +202,7 @@ describe(toHeroBlogModule, () => {
   });
 
   it('has no ctaButtons when there is no post and no authored secondary', () => {
-    const raw = makeRawHeroBlogModule({ post: null, ctaButtons: null });
+    const raw = makeRawHeroBlogModule({ post: null, secondaryAction: null });
 
     const hero = toHeroBlogModule(raw);
 
@@ -212,18 +212,16 @@ describe(toHeroBlogModule, () => {
   it('places the derived primary before the authored secondary', () => {
     const raw = makeRawHeroBlogModule({
       post: makeRawPostCard(),
-      ctaButtons: [
-        makeRawCtaButton({
-          variant: CTA_ACTION_VARIANT.SECONDARY,
-          appearance: null,
-          link: {
-            label: 'View all posts',
-            linkType: LINK_TYPE.INTERNAL,
-            internalReference: { _type: 'page_postIndex', slug: null },
-            openInNewTab: null,
-          },
-        }),
-      ],
+      secondaryAction: makeRawCtaButton({
+        variant: CTA_ACTION_VARIANT.SECONDARY,
+        appearance: null,
+        link: {
+          label: 'View all posts',
+          linkType: LINK_TYPE.INTERNAL,
+          internalReference: { _type: 'page_postIndex', slug: null },
+          openInNewTab: null,
+        },
+      }),
     });
 
     const hero = toHeroBlogModule(raw);
@@ -248,16 +246,30 @@ describe(toHeroBlogModule, () => {
   it('drops an authored secondary whose link cannot resolve to an href', () => {
     const raw = makeRawHeroBlogModule({
       post: null,
-      ctaButtons: [
-        makeRawCtaButton({
-          link: {
-            label: 'Broken',
-            linkType: LINK_TYPE.INTERNAL,
-            internalReference: null,
-            openInNewTab: null,
-          },
-        }),
-      ],
+      secondaryAction: makeRawCtaButton({
+        variant: CTA_ACTION_VARIANT.SECONDARY,
+        link: {
+          label: 'Broken',
+          linkType: LINK_TYPE.INTERNAL,
+          internalReference: null,
+          openInNewTab: null,
+        },
+      }),
+    });
+
+    const hero = toHeroBlogModule(raw);
+
+    expect(hero.ctaButtons).toEqual([]);
+  });
+
+  it('drops a seeded secondary whose link was never set', () => {
+    const raw = makeRawHeroBlogModule({
+      post: null,
+      secondaryAction: {
+        variant: CTA_ACTION_VARIANT.SECONDARY,
+        appearance: CTA_ACTION_APPEARANCE.CONTAINED,
+        link: null,
+      },
     });
 
     const hero = toHeroBlogModule(raw);

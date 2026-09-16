@@ -15,7 +15,7 @@ export const heroStatementSchema = defineType({
   title: 'Statement Hero',
   type: 'document',
   description:
-    'A hero that leads with a bold statement heading, with no image or post required.',
+    'A full-width opening section for making one bold statement: a headline you write yourself, a supporting line, up to two actions and an optional image. Use it when the page needs a clear message and a call to action rather than featured content.',
   icon: Quote,
   fieldsets: [...heroFieldsets],
   fields: [

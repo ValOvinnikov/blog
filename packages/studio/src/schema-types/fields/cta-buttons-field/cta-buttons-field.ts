@@ -11,7 +11,7 @@ type TCtaButtonItem = { variant?: string };
  */
 export const ctaButtonsField = ({
   title = 'Actions',
-  description = 'A list of actions associated with  this content, such as links to other pages or external sites.',
+  description = 'A list of actions associated with this content, such as links to other pages or external sites.',
   min = 0,
   max = 2,
 }: {
