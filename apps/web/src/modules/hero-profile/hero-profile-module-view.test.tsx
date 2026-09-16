@@ -69,6 +69,14 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
     expect(screen.queryByTestId('hero-media')).not.toBeInTheDocument();
   });
 
+  it('does not set fetchpriority on the Stacked avatar', () => {
+    setup({ variant: HERO_VARIANT.STACKED, sanityImage });
+
+    expect(
+      screen.getByRole('img', { name: sanityImage.alt }),
+    ).not.toHaveAttribute('fetchpriority');
+  });
+
   it('places the photo inside Hero.Media at a square ratio on Split', () => {
     setup({ variant: HERO_VARIANT.SPLIT, sanityImage });
 
@@ -78,6 +86,15 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
     expect(img.getAttribute('src')).toContain('h=900');
   });
 
+  it('sets fetchpriority="high" on the Split photo (confirmed LCP element)', () => {
+    setup({ variant: HERO_VARIANT.SPLIT, sanityImage });
+
+    expect(screen.getByRole('img', { name: sanityImage.alt })).toHaveAttribute(
+      'fetchpriority',
+      'high',
+    );
+  });
+
   it('places the photo inside Hero.Media as the Banner background', () => {
     setup({ variant: HERO_VARIANT.BANNER, sanityImage });
 
@@ -85,6 +102,15 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
     const img = within(media).getByRole('img', { name: sanityImage.alt });
 
     expect(img.getAttribute('src')).toContain('h=675');
+  });
+
+  it('sets fetchpriority="high" on the Banner photo (confirmed LCP element)', () => {
+    setup({ variant: HERO_VARIANT.BANNER, sanityImage });
+
+    expect(screen.getByRole('img', { name: sanityImage.alt })).toHaveAttribute(
+      'fetchpriority',
+      'high',
+    );
   });
 
   it('renders no Hero.Cta slot when ctaButtons is empty', () => {
