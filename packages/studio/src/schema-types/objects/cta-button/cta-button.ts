@@ -12,7 +12,7 @@ import { defineField, defineType } from 'sanity';
 type TCtaButtonTypeConfig = {
   name: string;
   variant: TCtaActionVariant;
-  variantReadOnly?: boolean;
+  variantHidden?: boolean;
   linkRequired: boolean;
 };
 
@@ -22,7 +22,7 @@ const NO_LINK_SUBTITLE = 'No link yet';
 const buildCtaButtonSchema = ({
   name,
   variant,
-  variantReadOnly,
+  variantHidden,
   linkRequired,
 }: TCtaButtonTypeConfig) =>
   defineType({
@@ -49,7 +49,7 @@ const buildCtaButtonSchema = ({
           })),
         },
         initialValue: variant,
-        readOnly: variantReadOnly,
+        hidden: variantHidden,
         validation: (rule) => rule.required(),
       }),
       defineField({
@@ -108,6 +108,6 @@ export const ctaButtonSchema = buildCtaButtonSchema({
 export const ctaSecondaryButtonSchema = buildCtaButtonSchema({
   name: 'ctaSecondaryButton',
   variant: CTA_ACTION_VARIANT.SECONDARY,
-  variantReadOnly: true,
+  variantHidden: true,
   linkRequired: false,
 });

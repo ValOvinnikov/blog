@@ -67,10 +67,11 @@ const wasRequiredCalled = (field: { validation?: unknown }) => {
 };
 
 describe('ctaButtonSchema control choices', () => {
-  it('keeps variant as a required dropdown', () => {
+  it('keeps variant as a visible, required dropdown', () => {
     const field = getField(ctaButtonSchema, 'variant');
 
     expect(getLayout(field)).toBe('dropdown');
+    expect((field as { hidden?: boolean }).hidden).toBeUndefined();
     expect(wasRequiredCalled(field)).toBe(true);
     expect(getOptionValues(field)).toEqual(
       Object.values(CTA_ACTION_VARIANT).map((value) => ({
@@ -161,11 +162,11 @@ describe('ctaButtonSchema copy', () => {
 });
 
 describe('ctaSecondaryButtonSchema control choices', () => {
-  it('fixes variant to Secondary and marks it read-only', () => {
+  it('fixes variant to Secondary and hides the control', () => {
     const field = getField(ctaSecondaryButtonSchema, 'variant');
 
     expect(field.initialValue).toBe(CTA_ACTION_VARIANT.SECONDARY);
-    expect((field as { readOnly?: boolean }).readOnly).toBe(true);
+    expect((field as { hidden?: boolean }).hidden).toBe(true);
     expect(wasRequiredCalled(field)).toBe(true);
   });
 
