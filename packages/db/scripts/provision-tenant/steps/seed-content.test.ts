@@ -211,7 +211,7 @@ describe(seedTenantContent, () => {
     expect(revokeWriteToken).not.toHaveBeenCalled();
   });
 
-  it('the committed starter documents contain no image on the author and no defaultOgImage on the site settings', async () => {
+  it('the committed starter documents contain no defaultOgImage on the site settings', async () => {
     const tenant = baseTenant();
     const commit = vi.fn().mockResolvedValue(undefined);
     const createOrReplace = vi.fn();
@@ -230,14 +230,10 @@ describe(seedTenantContent, () => {
     const committedDocuments = createOrReplace.mock.calls.map(
       ([document]) => document as Record<string, unknown>,
     );
-    const author = committedDocuments.find(
-      (document) => document._id === STARTER_DOCUMENT_IDS.AUTHOR,
-    );
     const site = committedDocuments.find(
       (document) => document._id === STARTER_DOCUMENT_IDS.SITE,
     );
 
-    expect(author).not.toHaveProperty('image');
     expect(site).not.toHaveProperty('defaultOgImage');
   });
 

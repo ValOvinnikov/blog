@@ -32,9 +32,9 @@ const defaultDeps: TSeedContentDeps = {
 const SITE_SETTINGS_EXISTS_QUERY = '*[_type == "settings_site"][0]._id';
 
 /**
- * Step 2 — seeds the fixed starter content template (singletons + one
- * starter post + navigation, see `starter-content.ts`) into the tenant's
- * dataset, using an Editor-scoped Sanity token minted for this run.
+ * Step 2 — seeds the tenant's starter content (`buildStarterDocuments` in
+ * `starter-content.ts`) into its dataset, using an Editor-scoped Sanity
+ * token minted for this run.
  *
  * Idempotency is derived from the dataset's own observed state — whether
  * `settings_site` already exists — not from `tenants.seededAt`, so an
