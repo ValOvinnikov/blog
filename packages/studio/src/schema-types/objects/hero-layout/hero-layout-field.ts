@@ -6,5 +6,5 @@ export const heroLayoutField = defineField({
   name: 'layout',
   title: 'Layout',
   type: heroLayoutSchema.name,
-  description: 'Optional visual overrides — spacing, dividers.',
+  description: 'Optional spacing and divider overrides.',
 });

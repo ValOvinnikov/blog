@@ -1,7 +1,4 @@
-import {
-  CTA_ACTION_VARIANT,
-  type TCtaActionVariant,
-} from '@blog/config/constants';
+import { CTA_ACTION_VARIANT } from '@blog/config/constants';
 import { ctaButtonSchema } from '@blog/studio/schema-types/objects/cta-button/cta-button';
 import { toTitleCase } from '@blog/utils/primitives';
 import { defineArrayMember, defineField } from 'sanity';
@@ -13,25 +10,21 @@ type TCtaButtonItem = { variant?: string };
  * once, and a Primary (if present) must lead the list.
  */
 export const ctaButtonsField = ({
-  title = 'Buttons',
-  description,
+  title = 'Actions',
+  description = 'A list of actions associated with  this content, such as links to other pages or external sites.',
   min = 0,
   max = 2,
-  allowVariants = Object.values(CTA_ACTION_VARIANT),
 }: {
   title?: string;
   description?: string;
   min?: number;
   max?: number;
-  allowVariants?: TCtaActionVariant[];
 } = {}) =>
   defineField({
     name: 'ctaButtons',
     title,
+    description,
     type: 'array',
-    description:
-      description ??
-      'The buttons offered here — Primary drives the main click, Secondary offers an alternative alongside it.',
     of: [defineArrayMember({ type: ctaButtonSchema.name })],
     validation: (rule) =>
       rule
@@ -41,20 +34,11 @@ export const ctaButtonsField = ({
           const items = (value ?? []) as TCtaButtonItem[];
           if (items.length === 0) return true;
 
-          const disallowed = items.some(
-            (item) =>
-              item.variant &&
-              !allowVariants.includes(item.variant as TCtaActionVariant),
-          );
-          if (disallowed) {
-            return `Only ${allowVariants.map((variant) => toTitleCase(variant)).join(' and ')} buttons are allowed here.`;
-          }
-
           const seenVariants = new Set<string>();
           for (const item of items) {
             if (!item.variant) continue;
             if (seenVariants.has(item.variant)) {
-              return `Only one ${toTitleCase(item.variant)} button is allowed.`;
+              return `Only one ${toTitleCase(item.variant)} action is allowed.`;
             }
             seenVariants.add(item.variant);
           }
@@ -63,7 +47,7 @@ export const ctaButtonsField = ({
             (item) => item.variant === CTA_ACTION_VARIANT.PRIMARY,
           );
           if (primaryIndex > 0) {
-            return 'A Primary button must be listed first.';
+            return 'A Primary action must be listed first.';
           }
 
           return true;

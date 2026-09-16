@@ -1,4 +1,10 @@
-import { heroFields } from '@blog/studio/schema-types/fields/hero-fields/hero-fields';
+import { FULL_BRAND_VARIANT_LIST } from '@blog/config/constants';
+import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
+import {
+  heroFields,
+  heroFieldsets,
+} from '@blog/studio/schema-types/fields/hero-fields/hero-fields';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { Quote } from 'lucide-react';
@@ -11,15 +17,18 @@ export const heroStatementSchema = defineType({
   description:
     'A hero that leads with a bold statement heading, with no image or post required.',
   icon: Quote,
+  fieldsets: [...heroFieldsets],
   fields: [
     titleField(),
+    brandVariantField({ list: FULL_BRAND_VARIANT_LIST }),
+    headingBlockField(),
     defineField({
       name: 'eyebrow',
       title: 'Eyebrow',
       type: 'string',
-      description: 'Optional small line above the heading.',
+      description: 'Short line above the heading.',
     }),
-    headingBlockField(),
+    ctaButtonsField(),
     ...heroFields(),
   ],
   preview: {

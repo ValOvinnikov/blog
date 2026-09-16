@@ -1,12 +1,12 @@
 import {
   CTA_ACTION_APPEARANCE,
-  CTA_ACTION_VARIANT,
   HERO_IMAGE_SOURCE,
   POST_SOURCE,
   HERO_VARIANT,
 } from '@blog/config/constants';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
+import { ctaSecondaryButtonSchema } from '@blog/studio/schema-types/objects/cta-button/cta-button';
 import {
   getCustomValidator,
   getRecordedValidators,
@@ -63,6 +63,9 @@ const getLayout = (field: { options?: unknown }) => {
     : undefined;
 };
 
+const getFieldset = (field: { fieldset?: unknown }) =>
+  field.fieldset as string | undefined;
+
 const getHidden = (field: { hidden?: unknown }): THiddenFn => {
   if (typeof field.hidden !== 'function') {
     throw new Error('Expected field to define a hidden() fn.');
@@ -109,30 +112,48 @@ const createMockContext = (
   return { getClient } as unknown as ValidationContext;
 };
 
+describe('heroBlogSchema fieldsets', () => {
+  it('declares post, image, primaryAction and the shared content position fieldset', () => {
+    const names = heroBlogSchema.fieldsets?.map((fieldset) => fieldset.name);
+
+    expect(names).toEqual([
+      'post',
+      'image',
+      'primaryAction',
+      'contentPosition',
+    ]);
+  });
+});
+
 describe('heroBlogSchema postSource field', () => {
-  it('offers Pinned and Newest Featured, defaulting to Pinned', () => {
+  it('offers Pinned and Newest Featured, defaulting to Newest Featured', () => {
     const field = getField('postSource');
 
     expect(getOptionValues(field)).toEqual([
       POST_SOURCE.PINNED,
       POST_SOURCE.NEWEST_FEATURED,
     ]);
-    expect(field.initialValue).toBe(POST_SOURCE.PINNED);
+    expect(field.initialValue).toBe(POST_SOURCE.NEWEST_FEATURED);
   });
 
-  it('keeps postSource as a radio: required, and it drives the post field', () => {
+  it('is a required dropdown in the post fieldset, and drives the post field', () => {
     const field = getField('postSource');
 
-    expect(getLayout(field)).toBe('radio');
+    expect(getLayout(field)).toBe('dropdown');
     expect(wasRequiredCalled(field)).toBe(true);
+    expect(getFieldset(field)).toBe('post');
   });
 });
 
 describe('heroBlogSchema post field', () => {
-  it('only accepts page_post references', () => {
-    const field = getField('post') as { to?: { type: string }[] };
+  it('only accepts page_post references, in the post fieldset', () => {
+    const field = getField('post') as {
+      to?: { type: string }[];
+      fieldset?: string;
+    };
 
     expect(field.to).toEqual([{ type: PAGE_POST_TYPE }]);
+    expect(getFieldset(field)).toBe('post');
   });
 
   it('is hidden unless Post Source is Pinned', () => {
@@ -175,9 +196,10 @@ describe('heroBlogSchema post field', () => {
 });
 
 describe('heroBlogSchema copy fields', () => {
-  it('eyebrow is a plain optional field', () => {
+  it('eyebrow is a plain optional field with no fieldset', () => {
     expect(getField('eyebrow').validation).toBeUndefined();
     expect('hidden' in getField('eyebrow')).toBe(false);
+    expect(getFieldset(getField('eyebrow'))).toBeUndefined();
   });
 
   it('has no heading or supportingText fields', () => {
@@ -206,16 +228,24 @@ describe('heroBlogSchema imageSource field', () => {
     expect(field.initialValue).toBe(HERO_IMAGE_SOURCE.POST);
   });
 
-  it('keeps imageSource as a radio: required, and it drives the image field', () => {
+  it('is a required dropdown in the image fieldset, and drives the image field', () => {
     const field = getField('imageSource');
 
-    expect(getLayout(field)).toBe('radio');
+    expect(getLayout(field)).toBe('dropdown');
     expect(wasRequiredCalled(field)).toBe(true);
+    expect(getFieldset(field)).toBe('image');
   });
 });
 
-describe('heroBlogSchema primaryActionAppearance field', () => {
-  it('offers Contained and Inline, defaulting to Contained', () => {
+describe('heroBlogSchema primaryActionLabel and primaryActionAppearance fields', () => {
+  it('are both in the primaryAction fieldset', () => {
+    expect(getFieldset(getField('primaryActionLabel'))).toBe('primaryAction');
+    expect(getFieldset(getField('primaryActionAppearance'))).toBe(
+      'primaryAction',
+    );
+  });
+
+  it('primaryActionAppearance offers Contained and Inline, defaulting to Contained', () => {
     const field = getField('primaryActionAppearance');
 
     expect(getOptionValues(field)).toEqual([
@@ -225,7 +255,7 @@ describe('heroBlogSchema primaryActionAppearance field', () => {
     expect(field.initialValue).toBe(CTA_ACTION_APPEARANCE.CONTAINED);
   });
 
-  it('converts to a dropdown: optional, no field depends on it', () => {
+  it('primaryActionAppearance renders as a dropdown: optional, no field depends on it', () => {
     const field = getField('primaryActionAppearance');
 
     expect(getLayout(field)).toBe('dropdown');
@@ -234,9 +264,11 @@ describe('heroBlogSchema primaryActionAppearance field', () => {
 });
 
 describe('heroBlogSchema image field', () => {
-  it('is hidden unless Image Source is Custom', () => {
-    const hidden = getHidden(getField('image'));
+  it('is in the image fieldset and hidden unless Image Source is Custom', () => {
+    const field = getField('image');
+    const hidden = getHidden(field);
 
+    expect(getFieldset(field)).toBe('image');
     expect(hidden({ parent: { imageSource: HERO_IMAGE_SOURCE.CUSTOM } })).toBe(
       false,
     );
@@ -255,7 +287,7 @@ describe('heroBlogSchema image field', () => {
       validate(undefined, {
         parent: { imageSource: HERO_IMAGE_SOURCE.CUSTOM },
       }),
-    ).toBe('Custom image is required when Image Source is Custom.');
+    ).toBe('A custom image is required when Source is Custom.');
   });
 
   it('is valid with no image when Image Source is Post or None', () => {
@@ -270,64 +302,19 @@ describe('heroBlogSchema image field', () => {
   });
 });
 
-describe('heroBlogSchema ctaButtons field', () => {
-  it('is valid when unset', () => {
-    const validate = getFieldCustomValidator(getField('ctaButtons'));
+describe('heroBlogSchema secondaryAction field', () => {
+  it('uses the fixed-Secondary ctaSecondaryButton object type', () => {
+    const field = getField('secondaryAction') as { type: string };
 
-    expect(validate(undefined, { parent: {} })).toBe(true);
+    expect(field.type).toBe(ctaSecondaryButtonSchema.name);
   });
 
-  it('is valid with a single Secondary button', () => {
-    const validate = getFieldCustomValidator(getField('ctaButtons'));
-
+  it('has no ctaButtons field left over', () => {
     expect(
-      validate([{ variant: CTA_ACTION_VARIANT.SECONDARY }], { parent: {} }),
-    ).toBe(true);
-  });
-
-  it('rejects an authored Primary button — the primary is derived from the resolved post', () => {
-    const validate = getFieldCustomValidator(getField('ctaButtons'));
-
-    expect(
-      validate([{ variant: CTA_ACTION_VARIANT.PRIMARY }], { parent: {} }),
-    ).toBe('Only Secondary buttons are allowed here.');
-  });
-
-  it('rejects a duplicate Secondary button', () => {
-    const validate = getFieldCustomValidator(getField('ctaButtons'));
-
-    expect(
-      validate(
-        [
-          { variant: CTA_ACTION_VARIANT.SECONDARY },
-          { variant: CTA_ACTION_VARIANT.SECONDARY },
-        ],
-        { parent: {} },
+      heroBlogSchema.fields?.find(
+        (field) => 'name' in field && field.name === 'ctaButtons',
       ),
-    ).toBe('Only one Secondary button is allowed.');
-  });
-
-  it('caps at one button via heroFields({ buttons: { max: 1 } })', () => {
-    const field = getField('ctaButtons');
-    let maxArg: number | undefined;
-
-    const rule = {
-      min: () => rule,
-      max: (n: number) => {
-        maxArg = n;
-        return rule;
-      },
-      custom: () => rule,
-    };
-
-    if (!field.validation) {
-      throw new Error('Expected ctaButtons field to define validation.');
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    (field.validation as any)(rule);
-
-    expect(maxArg).toBe(1);
+    ).toBeUndefined();
   });
 });
 

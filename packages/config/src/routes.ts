@@ -33,3 +33,29 @@ export const routes = {
   /** No pagination variant — always the tag's base path + `/rss.xml`. */
   tagRssFeed: (slug: string) => `${routes.tag(slug)}/rss.xml`,
 } as const;
+
+const PAGE_HREF_BUILDERS = {
+  page_home: () => routes.home(),
+  page_landing: (slug) => (slug ? routes.landingPage(slug) : undefined),
+  page_post: (slug) => (slug ? routes.post(slug) : undefined),
+  page_postIndex: () => routes.blogIndex(),
+  page_topic: (slug) => (slug ? routes.topic(slug) : undefined),
+  page_topicIndex: () => routes.topics(),
+  page_tag: (slug) => (slug ? routes.tag(slug) : undefined),
+  page_tagIndex: () => routes.tags(),
+} satisfies Record<
+  string,
+  (slug: string | null | undefined) => string | undefined
+>;
+
+export type TLinkablePageType = keyof typeof PAGE_HREF_BUILDERS;
+
+const isLinkablePageType = (type: string): type is TLinkablePageType =>
+  type in PAGE_HREF_BUILDERS;
+
+/** Resolves the site path of a page document a link points at; undefined when the type is unknown or a slugged page has no slug yet. */
+export const pageHref = (
+  type: string | null | undefined,
+  slug?: string | null,
+): string | undefined =>
+  type && isLinkablePageType(type) ? PAGE_HREF_BUILDERS[type](slug) : undefined;

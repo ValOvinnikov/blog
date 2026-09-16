@@ -12,6 +12,7 @@ type TAlignmentField = {
   list?: readonly TContentAlignment[];
   initialValue?: TContentAlignment;
   hidden?: StringDefinition['hidden'];
+  fieldset?: string;
 };
 
 const alignmentField = ({
@@ -21,6 +22,7 @@ const alignmentField = ({
   list,
   initialValue,
   hidden,
+  fieldset,
 }: TAlignmentField) =>
   defineField({
     name,
@@ -36,6 +38,7 @@ const alignmentField = ({
     },
     initialValue,
     hidden,
+    fieldset,
   });
 
 type TAlignmentFieldExtra = {
@@ -45,6 +48,12 @@ type TAlignmentFieldExtra = {
   allow: readonly TContentAlignment[];
   initialValue?: TContentAlignment;
   hidden: StringDefinition['hidden'];
+  fieldset?: string;
+};
+
+type TAlignmentFieldsOptions = {
+  fieldset?: string;
+  initialValue?: TContentAlignment;
 };
 
 /**
@@ -53,7 +62,10 @@ type TAlignmentFieldExtra = {
  * extra covers one variant's allowed subset, alongside one baseline field
  * offering every alignment value.
  */
-export const alignmentFields = (extras: readonly TAlignmentFieldExtra[]) => [
+export const alignmentFields = (
+  extras: readonly TAlignmentFieldExtra[],
+  options?: TAlignmentFieldsOptions,
+) => [
   ...extras.map((extra) =>
     alignmentField({
       name: extra.name,
@@ -62,11 +74,14 @@ export const alignmentFields = (extras: readonly TAlignmentFieldExtra[]) => [
       list: extra.allow,
       initialValue: extra.initialValue,
       hidden: extra.hidden,
+      fieldset: extra.fieldset,
     }),
   ),
   alignmentField({
     name: 'contentAlignment',
     title: 'Content Alignment',
     description: "Horizontal alignment of this module's content.",
+    initialValue: options?.initialValue ?? CONTENT_ALIGNMENT.LEFT,
+    fieldset: options?.fieldset,
   }),
 ];
