@@ -1202,16 +1202,20 @@ implementation sub-issues. `service` returns a per-kind view model; the `ui`
   Sub-issues: ui (own PR, first), then studio + service + web as one PR
   (typegen reds `HERO_MAP` until the web entry lands); service adds a shared
   `toHeroPresentation()` collapse that `heroBlog` moves onto.
-- **2.2 `module_heroProfile`** (#2776, designed 2026-09-11 in #2808 —
-  section "`module_heroProfile` — the person hero" in the spec of record)
-  — a reference to `blog_author` plus `heroBlog`-style copy overrides, so
-  name, role, photo, bio and social links come from the document the
-  bylines already use; one photo chosen by a new `PROFILE_IMAGE_SOURCE`
-  mode and placed by the variant (round `Hero.Avatar` on Stacked, square
-  `Hero.Media` on Split, background on Banner); the author's social links
-  behind `showSocialLinks` in a new `Hero.Social` slot; the tail gains
-  `mediaOrderStacked: false`. Sub-issues: ui (slots + `Hero.Media` ratio, own PR,
-  first), then config + studio + service + web as one PR.
+- **2.2 `module_heroProfile`** (#2776, designed 2026-09-11 in #2808 and
+  resynced 2026-09-16 — section "`module_heroProfile` — the person hero" in
+  the spec of record) — a reference to `blog_author` for the photo and
+  social links the bylines already use, with the copy fully the editor's
+  (the shared required `headingBlock` plus an optional eyebrow, nothing
+  derived from the author); up to two
+  `ctaButtons`; one photo chosen by a new `PROFILE_IMAGE_SOURCE` mode and
+  placed by the variant (round `Hero.Avatar` on Stacked, square `Hero.Media`
+  on Split, background on Banner); the author's social profiles behind
+  `showSocialLinks` in a new `Hero.Social` slot, rendered by the footer's
+  shared `SocialLinks`; the tail gains `mediaOrderStacked: false`.
+  Sub-issues: ui (slots + `Hero.Media` ratio, own PR, first), then config +
+  studio + service + web as one PR, after #3216 moves the author's social
+  links onto `socialProfile`.
 - **`module_heroProject`** stays with #1291 in M9 — it needs the `project`
   entity.
 
