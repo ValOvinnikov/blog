@@ -5,7 +5,7 @@ import type { VariantProps } from 'tailwind-variants';
 export const heroSocialVariants = tv({
   base: ['flex flex-wrap gap-2'],
   variants: {
-    alignment: {
+    contentAlignment: {
       [CONTENT_ALIGNMENT.LEFT]: ['justify-start'],
       [CONTENT_ALIGNMENT.CENTER]: ['justify-center'],
       [CONTENT_ALIGNMENT.RIGHT]: ['justify-end'],

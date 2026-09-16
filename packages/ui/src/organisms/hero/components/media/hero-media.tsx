@@ -7,9 +7,8 @@ import { heroMediaVariants } from './hero-media-variants';
 
 export type THeroMediaProps = IWithClassName &
   IWithDataTestId & {
-    /** Set by `Hero` on Banner, whose media is an edge-to-edge background rather than a framed block. */
     isFramed?: boolean;
-    /** Defaults to the 16:9 `video` ratio; ignored on Banner, whose media is unframed. */
+    /** Ignored on Banner, whose media is unframed. */
     ratio?: TMediaFrameRatio;
     children?: ReactNode;
   };

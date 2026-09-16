@@ -9,8 +9,7 @@ import {
 export type THeroSocialProps = IWithClassName &
   IWithDataTestId & {
     ariaLabel: string;
-    /** Set by `Hero` — mirrors the resolved `contentAlignment` so the list's flex justification matches the copy column. */
-    alignment?: THeroSocialVariants['alignment'];
+    contentAlignment?: THeroSocialVariants['contentAlignment'];
     children?: ReactNode;
   };
 
@@ -20,14 +19,14 @@ export type THeroSocialProps = IWithClassName &
  */
 export const HeroSocial = ({
   ariaLabel,
-  alignment,
+  contentAlignment,
   className,
   dataTestId,
   children,
 }: THeroSocialProps) => (
   <ul
     aria-label={ariaLabel}
-    className={heroSocialVariants({ alignment, class: className })}
+    className={heroSocialVariants({ contentAlignment, class: className })}
     data-testid={dataTestId}
   >
     {children}

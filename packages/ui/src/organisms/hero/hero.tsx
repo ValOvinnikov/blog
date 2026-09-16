@@ -113,7 +113,7 @@ const HeroRoot = ({
         <div className={s.copy()} data-testid="hero-copy">
           {slots.Avatar &&
             cloneElement(slots.Avatar as ReactElement<THeroAvatarProps>, {
-              alignment: resolvedAlignment,
+              contentAlignment: resolvedAlignment,
             })}
           {eyebrow && <Eyebrow className={s.eyebrow()}>{eyebrow}</Eyebrow>}
           <div className={s.title()}>
@@ -134,7 +134,7 @@ const HeroRoot = ({
           {slots.Cta}
           {slots.Social &&
             cloneElement(slots.Social as ReactElement<THeroSocialProps>, {
-              alignment: resolvedAlignment,
+              contentAlignment: resolvedAlignment,
             })}
         </div>
         {slots.Media && (

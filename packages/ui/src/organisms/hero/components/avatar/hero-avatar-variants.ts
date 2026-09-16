@@ -10,7 +10,7 @@ export const heroAvatarVariants = tv({
     '[&>*]:size-full [&>*]:object-cover',
   ],
   variants: {
-    alignment: {
+    contentAlignment: {
       [CONTENT_ALIGNMENT.LEFT]: ['self-start'],
       [CONTENT_ALIGNMENT.CENTER]: ['self-center'],
       [CONTENT_ALIGNMENT.RIGHT]: ['self-end'],

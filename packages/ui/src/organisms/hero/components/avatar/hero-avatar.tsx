@@ -8,8 +8,7 @@ import {
 
 export type THeroAvatarProps = IWithClassName &
   IWithDataTestId & {
-    /** Set by `Hero` — mirrors the resolved `contentAlignment` so the frame sits under the copy the same way the heading and CTA do. */
-    alignment?: THeroAvatarVariants['alignment'];
+    contentAlignment?: THeroAvatarVariants['contentAlignment'];
     children?: ReactNode;
   };
 
@@ -18,13 +17,13 @@ export type THeroAvatarProps = IWithClassName &
  * round frame for a person's photo on the profile hero.
  */
 export const HeroAvatar = ({
-  alignment,
+  contentAlignment,
   className,
   dataTestId,
   children,
 }: THeroAvatarProps) => (
   <div
-    className={heroAvatarVariants({ alignment, class: className })}
+    className={heroAvatarVariants({ contentAlignment, class: className })}
     data-testid={dataTestId}
   >
     {children}
