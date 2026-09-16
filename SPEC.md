@@ -404,7 +404,7 @@ reference to `blog_author`, an `imageSource` dropdown over
 constant rather than `HERO_IMAGE_SOURCE`, whose first value is `POST`), an
 `image` shown and required only under `CUSTOM`, the shared `ctaButtons` array,
 and a `showSocialLinks` toggle defaulting on. Its tail is
-`heroFields({ image: false, mediaOrderStacked: false })`: the photo is placed
+`heroFields({ hasOwnImage: true, hasStackedLayout: false })`: the photo is placed
 by the variant, so Stacked needs no media order, while Split keeps
 `mediaOrderSplit`. Publish is blocked without a heading, without an author,
 and on `SPLIT`/`BANNER` with `imageSource: NONE`; two async warnings read the
