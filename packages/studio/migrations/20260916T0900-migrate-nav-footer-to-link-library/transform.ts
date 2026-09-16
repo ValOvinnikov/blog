@@ -7,11 +7,7 @@ export const SOCIAL_PROFILE_TYPE = 'socialProfile';
 /** Mirrors `link.ts`'s `label` field — `rule.required().max(60)`. */
 export const LINK_LABEL_MAX_LENGTH = 60;
 
-/**
- * Both a pre-rename `link` object and its post-rename `inlineLink`
- * successor are valid legacy shapes — the rename migration has not
- * necessarily run on every dataset this migration targets.
- */
+/** Both a pre-rename `link` object and its post-rename `inlineLink` successor are valid legacy shapes, since the rename migration may not have run on every target dataset. */
 const RECOGNIZED_LEGACY_LINK_TYPES = new Set(['link', 'inlineLink']);
 
 export type TLegacyInlineLink = {
@@ -25,7 +21,6 @@ export type TLegacyInlineLink = {
   platform?: string;
 };
 
-/** A legacy array entry — the destination fields above plus the array `_key` every entry carries. */
 export type TLegacyLinkEntry = TLegacyInlineLink & { _key: string };
 
 export type TLinkDocumentFields = {
@@ -42,11 +37,7 @@ export type TLinkDocumentFields = {
 export const hasRecognizedLinkShape = (item: TLegacyInlineLink): boolean =>
   item._type === undefined || RECOGNIZED_LEGACY_LINK_TYPES.has(item._type);
 
-/**
- * Whether an external item's `url` would pass `link.ts`'s validator — a
- * full `http(s)://` address with a host. The legacy `inlineLink` shape also
- * permitted a relative path (e.g. `/blog`), which `link` does not accept.
- */
+/** The legacy `inlineLink` shape also permitted a relative `url` (e.g. `/blog`), which `link`'s validator rejects. */
 export const hasResolvableUrl = (item: TLegacyInlineLink): boolean => {
   if (item.linkType !== LINK_TYPE.EXTERNAL) return true;
   if (!item.url) return false;
@@ -59,11 +50,7 @@ export const hasResolvableUrl = (item: TLegacyInlineLink): boolean => {
   }
 };
 
-/**
- * Builds the `link` document for one destination. `platform` and
- * `accessibleLabel` have no field on `link` and are dropped by omission —
- * the migration reports every non-empty occurrence separately.
- */
+/** `platform` and `accessibleLabel` have no field on `link` and are dropped by omission; each non-empty occurrence is reported separately. */
 export const buildLinkDocumentFields = (
   linkId: string,
   title: string,
@@ -94,7 +81,6 @@ export type TLinkRefNode = {
   link: { _type: 'reference'; _ref: string };
 };
 
-/** Builds a `linkRef` entry pointing at the deduped `link` document. */
 export const buildLinkRef = (
   item: TLegacyLinkEntry,
   linkId: string,
@@ -111,10 +97,7 @@ export type TSocialProfileNode = {
   link: { _type: 'reference'; _ref: string };
 };
 
-/**
- * Builds a `socialProfile` entry, keeping `platform` on the wrapper — the
- * `link` document itself has no `platform` field.
- */
+/** Keeps `platform` on the wrapper, since the `link` document itself has no `platform` field. */
 export const buildSocialProfile = (
   item: TLegacyLinkEntry,
   linkId: string,

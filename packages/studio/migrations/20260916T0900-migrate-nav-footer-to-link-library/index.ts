@@ -1,31 +1,11 @@
 /**
  * Migrates `settings_navigation.items[]` and `settings_footer.social[]`
- * entries — each currently a legacy `link`/`inlineLink` object embedding its
- * destination — onto `linkRef` (navigation) and `socialProfile` (footer),
- * each pointing at a standalone `link` document instead.
+ * legacy link entries onto `linkRef`/`socialProfile` references to
+ * standalone `link` documents.
  *
- * Per entry: `createIfNotExists` a `link` document for its destination,
- * deduped by a deterministic id derived from the destination *and* label
- * (`id.ts`) — a `link` document has one required `label`, so two entries
- * with different visible wording stay distinct even at the same
- * destination. `settings_footer`'s `accessibleLabel` is dropped: the
- * footer's accessible name is now derived from `platform`, not stored on
- * the link. `platform` itself stays on the `socialProfile` wrapper, not the
- * `link` document.
- *
- * Accepts a nested item of `_type` `link` or `inlineLink` — the rename
- * migration may not have run yet on every target dataset. If any entry in a
- * document has an unrecognized `_type`, no resolvable destination, or an
- * external `url` the new `link.url` validator would reject, the *entire
- * document* is left untouched and a `console.warn` names the offending
- * entry — the array is rebuilt wholesale via `set(...)`, so silently
- * dropping just that one entry would delete live content instead of
- * merely deferring it.
- *
- * Idempotency: an entry already at its target `_type` (`linkRef`/
- * `socialProfile`) is passed through unchanged; a document with no legacy
- * entries left in the array is skipped entirely; `link` document creation is
- * `createIfNotExists`, so a re-run creates nothing twice.
+ * When any entry in a document is unmigratable, the whole document is left
+ * untouched — the array is rebuilt wholesale via `set(...)`, so dropping just
+ * the bad entry would delete live content instead of deferring it.
  */
 import { LINK_TYPE } from '@blog/config/constants';
 import {
@@ -83,7 +63,6 @@ const isAlreadyMigrated = (
 const UNTOUCHED_SUFFIX =
   'The document was left untouched — fix this entry in Studio, then re-run the migration.';
 
-/** Finds the first legacy entry a document can't be migrated past, without mutating anything. */
 const findFatalIssue = (
   items: TLegacyLinkEntry[],
   targetType: string,
@@ -149,11 +128,7 @@ const reportLinkAnomalies = (
   }
 };
 
-/**
- * Builds/dedupes the `link` document for one already-validated entry —
- * callers only reach this after `findFatalIssue` has cleared every entry in
- * the document.
- */
+/** Assumes `findFatalIssue` has already cleared every entry in the document. */
 const resolveLinkIdForItem = async (
   docId: string,
   item: TLegacyLinkEntry,
