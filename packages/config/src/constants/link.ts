@@ -21,7 +21,6 @@ export const SOCIAL_PLATFORMS = {
 export type TSocialPlatform =
   (typeof SOCIAL_PLATFORMS)[keyof typeof SOCIAL_PLATFORMS];
 
-/** Display name for each social platform; casing (GitHub, YouTube, RSS, …) can't be derived from the enum key. */
 export const SOCIAL_PLATFORM_LABEL: Record<TSocialPlatform, string> = {
   [SOCIAL_PLATFORMS.X]: 'X',
   [SOCIAL_PLATFORMS.GITHUB]: 'GitHub',
