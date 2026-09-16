@@ -1,4 +1,5 @@
-import { BRAND_VARIANT, type TPortableTextBody } from '@blog/config';
+import { BRAND_VARIANT } from '@blog/config';
+import type { TPortableTextBody } from '@blog/service';
 import { customRenderAsync, within } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';

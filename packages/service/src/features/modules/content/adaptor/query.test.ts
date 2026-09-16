@@ -1,4 +1,5 @@
 import { makeRawContentModule } from '@blog/service/testing/modules/fixtures';
+import { makeRawExternalLinkDocument } from '@blog/service/testing/shared/fixtures';
 
 import { contentModuleQuery } from './query';
 
@@ -102,7 +103,11 @@ describe('contentModuleQuery', () => {
       listItem: 'bullet',
       level: 1,
       markDefs: [
-        { _type: 'link', _key: 'link-1', href: 'https://example.com' },
+        {
+          _type: 'linkRef',
+          _key: 'link-1',
+          link: makeRawExternalLinkDocument(),
+        },
       ],
       children: [
         { _type: 'span', _key: 'span-1', text: 'Hello', marks: ['strong'] },

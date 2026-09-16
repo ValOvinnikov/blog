@@ -1,6 +1,5 @@
 import type { TImageLayout } from '@blog/config/constants/image-layout';
 import type { TSocialPlatform } from '@blog/config/constants/link';
-import type { RichText } from '@blog/config/sanity/generated/types';
 import type { TMaybeUndefined } from '@blog/config/types';
 
 export interface ISanityImageHotspot {
@@ -50,7 +49,3 @@ export interface IBodyImageBlock {
   layout: TMaybeUndefined<TImageLayout>;
   image: TMaybeUndefined<ISanityImage>;
 }
-
-export type TPortableTextBody = Array<
-  Exclude<RichText[number], { _type: 'bodyImage' }> | IBodyImageBlock
->;

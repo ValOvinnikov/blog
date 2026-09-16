@@ -1,3 +1,5 @@
+import { makeRawPortableTextMarkDef } from '@blog/service/testing/shared/fixtures';
+
 import {
   toPortableTextBody,
   type TRawPortableTextBody,
@@ -79,12 +81,98 @@ describe('toPortableTextBody', () => {
     expect(result[0]).toMatchObject({ layout: undefined });
   });
 
-  it('passes non-bodyImage blocks through unchanged', () => {
-    const block = { _type: 'block' as const, _key: 'block-1' };
+  it('passes a code block through unchanged', () => {
+    const block = { _type: 'code' as const, _key: 'code-1', code: 'a();' };
     const raw = [block] as TRawPortableTextBody;
 
     const result = toPortableTextBody(raw);
 
     expect(result).toEqual([block]);
+  });
+
+  it('resolves a plain block with no markDefs, leaving markDefs undefined', () => {
+    const block = { _type: 'block' as const, _key: 'block-1', markDefs: null };
+    const raw = [block] as TRawPortableTextBody;
+
+    const result = toPortableTextBody(raw);
+
+    expect(result).toEqual([{ ...block, markDefs: undefined }]);
+  });
+
+  it("resolves a block's linkRef mark to its link document href", () => {
+    const raw = [
+      {
+        _type: 'block' as const,
+        _key: 'block-1',
+        markDefs: [makeRawPortableTextMarkDef()],
+      },
+    ] as TRawPortableTextBody;
+
+    const result = toPortableTextBody(raw);
+
+    expect(result[0]).toMatchObject({
+      markDefs: [
+        {
+          _key: 'mark-1',
+          _type: 'linkRef',
+          link: { href: 'https://example.com' },
+        },
+      ],
+    });
+  });
+
+  it('degrades a dangling linkRef mark to an absent link rather than throwing', () => {
+    const raw = [
+      {
+        _type: 'block' as const,
+        _key: 'block-1',
+        markDefs: [makeRawPortableTextMarkDef({ link: null })],
+      },
+    ] as TRawPortableTextBody;
+
+    expect(() => toPortableTextBody(raw)).not.toThrow();
+    const result = toPortableTextBody(raw);
+    expect(result[0]).toMatchObject({
+      markDefs: [{ _key: 'mark-1', link: undefined }],
+    });
+  });
+
+  it("resolves an aside block's nested body markDefs the same way", () => {
+    const raw = [
+      {
+        _type: 'aside' as const,
+        _key: 'aside-1',
+        kind: 'CONTEXT',
+        body: [
+          {
+            _type: 'block' as const,
+            _key: 'aside-block-1',
+            markDefs: [makeRawPortableTextMarkDef()],
+          },
+        ],
+      },
+    ] as TRawPortableTextBody;
+
+    const result = toPortableTextBody(raw);
+
+    expect(result[0]).toMatchObject({
+      _type: 'aside',
+      body: [
+        {
+          _key: 'aside-block-1',
+          markDefs: [{ link: { href: 'https://example.com' } }],
+        },
+      ],
+    });
+  });
+
+  it('leaves an aside block with no body blocks undefined (no faked default)', () => {
+    const raw = [
+      { _type: 'aside' as const, _key: 'aside-1', kind: 'CONTEXT', body: null },
+    ] as TRawPortableTextBody;
+
+    const result = toPortableTextBody(raw);
+
+    expect(result[0]).toMatchObject({ body: undefined });
   });
 });

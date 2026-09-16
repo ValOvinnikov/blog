@@ -2,6 +2,7 @@ import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawPostDetail } from '@blog/service/testing/pages/fixtures';
 import {
   makeRawHeadingBlock,
+  makeRawPortableTextMarkDef,
   makeRawSanityImage,
   makeRawSeo,
 } from '@blog/service/testing/shared/fixtures';
@@ -103,6 +104,64 @@ describe('getPost', () => {
     if (!result) throw new Error('expected a post detail');
 
     expect(result.author.image).toBeUndefined();
+  });
+
+  it('resolves a linkRef mark in the author bio to its link document href', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawPostDetail({
+        author: {
+          _id: 'author-9',
+          name: 'Jane Doe',
+          image: null,
+          profilePage: null,
+          role: null,
+          bio: [
+            {
+              _type: 'block',
+              _key: 'bio-block-1',
+              markDefs: [makeRawPortableTextMarkDef()],
+            },
+          ],
+          socialLinks: null,
+        },
+      }),
+    );
+
+    const result = await getPost('hello-world', tenant);
+    if (!result) throw new Error('expected a post detail');
+
+    expect(result.author.bio?.[0]).toMatchObject({
+      markDefs: [{ link: { href: 'https://example.com' } }],
+    });
+  });
+
+  it('degrades a dangling linkRef mark in the author bio rather than throwing', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawPostDetail({
+        author: {
+          _id: 'author-9',
+          name: 'Jane Doe',
+          image: null,
+          profilePage: null,
+          role: null,
+          bio: [
+            {
+              _type: 'block',
+              _key: 'bio-block-1',
+              markDefs: [makeRawPortableTextMarkDef({ link: null })],
+            },
+          ],
+          socialLinks: null,
+        },
+      }),
+    );
+
+    const result = await getPost('hello-world', tenant);
+    if (!result) throw new Error('expected a post detail');
+
+    expect(result.author.bio?.[0]).toMatchObject({
+      markDefs: [{ link: undefined }],
+    });
   });
 
   it('maps a post with no heroImage to an undefined heroImage', async () => {
@@ -271,7 +330,9 @@ describe('getPost', () => {
 
   it('reports hasAsides true when the body contains an aside block', async () => {
     mockRun.mockResolvedValueOnce(
-      makeRawPostDetail({ body: [{ _type: 'aside', _key: 'a1' }] }),
+      makeRawPostDetail({
+        body: [{ _type: 'aside', _key: 'a1', body: null }],
+      }),
     );
 
     const result = await getPost('hello-world', tenant);
@@ -380,6 +441,14 @@ describe('getPost', () => {
             't:tenant-a:author',
             't:tenant-a:topic',
             't:tenant-a:tag',
+            't:tenant-a:link',
+            't:tenant-a:homePage',
+            't:tenant-a:page_landing',
+            't:tenant-a:page_postIndex',
+            't:tenant-a:page_topic',
+            't:tenant-a:page_topicIndex',
+            't:tenant-a:page_tag',
+            't:tenant-a:page_tagIndex',
           ],
         }),
       }),

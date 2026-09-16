@@ -1,7 +1,47 @@
+import { LINK_TYPE } from '@blog/config';
 import type { TRawSeo } from '@blog/service/shared/transformers/resolve-seo';
 import type { TRawHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
+import type { TRawLinkDocument } from '@blog/service/shared/transformers/to-link-document';
+import type { TRawPortableTextMarkDef } from '@blog/service/shared/transformers/to-portable-text-mark-def';
 import type { TRawPostLink } from '@blog/service/shared/transformers/to-post-link';
 import type { TRawSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
+
+export function makeRawExternalLinkDocument(
+  overrides: Partial<TRawLinkDocument> = {},
+): TRawLinkDocument {
+  return {
+    label: 'Learn more',
+    linkType: LINK_TYPE.EXTERNAL,
+    url: 'https://example.com',
+    internalReference: null,
+    openInNewTab: null,
+    ...overrides,
+  };
+}
+
+export function makeRawInternalLinkDocument(
+  overrides: Partial<TRawLinkDocument> = {},
+): TRawLinkDocument {
+  return {
+    label: 'Learn more',
+    linkType: LINK_TYPE.INTERNAL,
+    internalReference: null,
+    url: null,
+    openInNewTab: null,
+    ...overrides,
+  };
+}
+
+export function makeRawPortableTextMarkDef(
+  overrides: Partial<TRawPortableTextMarkDef> = {},
+): TRawPortableTextMarkDef {
+  return {
+    _key: 'mark-1',
+    _type: 'linkRef',
+    link: makeRawExternalLinkDocument(),
+    ...overrides,
+  };
+}
 
 export function makeRawHeadingBlock(
   heading: string,

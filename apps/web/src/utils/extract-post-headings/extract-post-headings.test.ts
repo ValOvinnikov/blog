@@ -1,4 +1,4 @@
-import type { TPortableTextBody } from '@blog/config';
+import type { TPortableTextBody } from '@blog/service';
 import {
   richTextBlock,
   richTextSpan,

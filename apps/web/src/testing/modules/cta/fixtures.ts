@@ -1,9 +1,5 @@
-import {
-  CTA_ACTION_APPEARANCE,
-  CTA_ACTION_VARIANT,
-  type InlineText,
-} from '@blog/config';
-import type { TCtaButton } from '@blog/service';
+import { CTA_ACTION_APPEARANCE, CTA_ACTION_VARIANT } from '@blog/config';
+import type { TCtaButton, TResolvedCtaContentBlock } from '@blog/service';
 
 export const ctaActionsDemo: TCtaButton[] = [
   {
@@ -30,7 +26,7 @@ export const ctaActionsDemo: TCtaButton[] = [
   },
 ];
 
-export const ctaContentDemo: InlineText = [
+export const ctaContentDemo: TResolvedCtaContentBlock[] = [
   {
     _type: 'block',
     _key: 'cta-content-b1',
@@ -49,6 +45,7 @@ export const ctaContentDemo: InlineText = [
       },
       { _type: 'span', _key: 'cta-content-s3', text: '.' },
     ],
+    markDefs: undefined,
   },
   {
     _type: 'block',
@@ -62,6 +59,7 @@ export const ctaContentDemo: InlineText = [
         text: 'Unlimited posts and drafts',
       },
     ],
+    markDefs: undefined,
   },
   {
     _type: 'block',
@@ -71,5 +69,6 @@ export const ctaContentDemo: InlineText = [
     children: [
       { _type: 'span', _key: 'cta-content-s5', text: 'Priority support' },
     ],
+    markDefs: undefined,
   },
 ];

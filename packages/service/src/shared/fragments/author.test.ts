@@ -1,5 +1,8 @@
 import { q } from '@blog/service/sanity/query';
-import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
+import {
+  makeRawPortableTextMarkDef,
+  makeRawSanityImage,
+} from '@blog/service/testing/shared/fixtures';
 
 import { authorCardFragment, authorDetailFragment } from './author';
 
@@ -54,5 +57,28 @@ describe('authorDetailFragment', () => {
 
     expect(() => authorDetailDocQuery.parse(raw)).not.toThrow();
     expect(authorDetailDocQuery.parse(raw)?.image).toBeNull();
+  });
+
+  it('keeps a bio linkRef mark through a real parse', () => {
+    const raw = {
+      _id: 'author-1',
+      name: 'Jane Doe',
+      image: null,
+      profilePage: null,
+      role: null,
+      bio: [
+        {
+          _type: 'block',
+          _key: 'bio-block-1',
+          markDefs: [makeRawPortableTextMarkDef()],
+        },
+      ],
+      socialLinks: null,
+    };
+
+    expect(() => authorDetailDocQuery.parse(raw)).not.toThrow();
+    expect(authorDetailDocQuery.parse(raw)?.bio?.[0]).toMatchObject({
+      markDefs: [{ link: { url: 'https://example.com' } }],
+    });
   });
 });

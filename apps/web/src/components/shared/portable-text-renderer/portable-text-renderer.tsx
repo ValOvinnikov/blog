@@ -1,11 +1,10 @@
 import {
   ASIDE_KIND,
-  type Aside as TAsideBlock,
   type Code,
   type IBodyImageBlock,
   type TAsideKind,
-  type TPortableTextBody,
 } from '@blog/config';
+import type { IPortableTextLinkMark, TPortableTextBody } from '@blog/service';
 import { Heading } from '@blog/ui/atoms/heading';
 import { InlineCode } from '@blog/ui/atoms/inline-code';
 import { Prose } from '@blog/ui/atoms/prose';
@@ -30,35 +29,13 @@ import { portableTextRendererVariants } from './portable-text-renderer-variants'
 
 export interface IPortableTextRendererProps {
   value: TPortableTextBody;
-  /**
-   * The precomputed `extractPostHeadings(value)` outline; when passed, each
-   * matching h2/h3 renders with that heading's `id` so anchor links resolve.
-   * Omit it where the same body could render more than once (e.g. a
-   * repeatable page-builder module) to avoid colliding ids.
-   */
   headings?: TPostHeading[];
-  /**
-   * Translated label per `ASIDE_KIND`, for an `aside` block's `DeepAside`
-   * wrapper — supplied by the caller (next-intl at the page level). A body
-   * with no `aside` blocks (the common case outside the post detail route)
-   * can omit this; an untranslated fallback (the raw `kind` value) is used
-   * in the rare case an `aside` block appears without it.
-   */
   asideKindLabels?: Partial<Record<TAsideKind, string>>;
-}
-
-interface ILinkAnnotation {
-  _type: 'link';
-  href?: string;
 }
 
 const s = portableTextRendererVariants();
 
-/**
- * Builds the `h2`/`h3` block renderers, stamping each rendered heading with
- * the `id` from its matching entry in `headings` (empty by default) so it
- * resolves to the anchor `PostContentsRail` links to.
- */
+/** Builds `h2`/`h3` block renderers that stamp each heading with its matching `id` from `headings`. */
 const headingBlockComponents = (
   headings: TPostHeading[],
 ): Record<'h2' | 'h3', PortableTextBlockComponent> => {
@@ -93,13 +70,8 @@ const headingBlockComponents = (
 };
 
 /**
- * PortableTextRenderer — web-owned bridge from a Sanity Portable Text field
- * to rendered markup, via `@portabletext/react`. Maps block styles and marks
- * to `@blog/ui` atoms, a `code` block to a syntax-highlighted `CodeBlock`,
- * and a `bodyImage` block to `SanityImage` wrapped in `ImageWithCaption`
- * (carrying the editor-chosen `layout`), keeping `@blog/ui` itself
- * Sanity-free. Optionally stamps `h2`/`h3` headings with stable anchor ids
- * via `headings`, for use with `PostContentsRail`.
+ * Bridges a Sanity Portable Text field to rendered markup, keeping
+ * `@blog/ui` itself Sanity-free.
  *
  * @example
  * <ContentModule title={title}>
@@ -152,12 +124,16 @@ export const PortableTextRenderer = ({
       code: ({ children }: PortableTextMarkComponentProps) => (
         <InlineCode>{children}</InlineCode>
       ),
-      link: ({
+      linkRef: ({
         children,
         value: annotation,
-      }: PortableTextMarkComponentProps<ILinkAnnotation>) =>
-        annotation?.href ? (
-          <ProseLink as={SmartLink} href={annotation.href}>
+      }: PortableTextMarkComponentProps<IPortableTextLinkMark>) =>
+        annotation?.link ? (
+          <ProseLink
+            as={SmartLink}
+            href={annotation.link.href}
+            target={annotation.link.target}
+          >
             {children}
           </ProseLink>
         ) : (
@@ -177,7 +153,11 @@ export const PortableTextRenderer = ({
         renderBodyImage(block),
       // Unknown/missing `kind` renders as CONTEXT — forward-compat with a
       // future `ASIDE_KIND` value this renderer doesn't know about.
-      aside: ({ value: asideValue }: { value: TAsideBlock }) => {
+      aside: ({
+        value: asideValue,
+      }: {
+        value: Extract<TPortableTextBody[number], { _type: 'aside' }>;
+      }) => {
         const kind = asideValue.kind ?? ASIDE_KIND.CONTEXT;
         const label = asideKindLabels?.[kind] ?? kind;
 
@@ -196,7 +176,6 @@ export const PortableTextRenderer = ({
   const segments = segmentPortableTextBody(value);
   const hasBreakout = segments.some((segment) => segment.kind === 'BREAKOUT');
 
-  // Common case: skip the segment loop so the DOM stays identical to before FULL_BLEED support was added.
   if (!hasBreakout) {
     return (
       <Prose className={s.root()}>
@@ -205,11 +184,9 @@ export const PortableTextRenderer = ({
     );
   }
 
-  // At least one `FULL_BLEED` image: each `PROSE` run keeps its own
-  // `Prose` wrapper (reading-measure width), rendered as a sibling of the
-  // breakout image rather than nesting the image inside it — that's what
-  // lets the image fill the full "breakout-safe" width of `content`
-  // (`blog-post-page-variants.ts`) instead of being capped to the measure.
+  // Each PROSE run keeps its own Prose wrapper as a sibling of the breakout
+  // image, not nested inside it, so the image can fill the full width of the
+  // surrounding breakout-safe box instead of being capped to the measure.
   return (
     <div className={s.segments()}>
       {segments.map((segment, index) =>

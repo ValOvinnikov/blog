@@ -1,4 +1,5 @@
-import { IMAGE_LAYOUT, type TPortableTextBody } from '@blog/config';
+import { IMAGE_LAYOUT } from '@blog/config';
+import type { TPortableTextBody } from '@blog/service';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 
 export type TRichTextBlock = Extract<
@@ -29,14 +30,12 @@ export const richTextBlock = (
   _key: nextKey('block'),
   style,
   children,
-  ...(markDefs ? { markDefs } : {}),
+  markDefs,
 });
 
 /**
- * Multiple sibling block types back to back (heading, paragraphs, marks, a
- * code block) — exercises the layout regression this component fixes:
- * missing vertical spacing between sibling blocks, which renders as one
- * unbroken block of text.
+ * Multiple sibling block types back to back, to exercise the layout
+ * regression this fixes: missing vertical spacing between sibling blocks.
  */
 export const richTextDemo: TPortableTextBody = [
   richTextBlock('normal', [
@@ -71,7 +70,19 @@ export const richTextDemo: TPortableTextBody = [
       richTextSpan('link', ['link-1']),
       richTextSpan(' in it.'),
     ],
-    [{ _type: 'link', _key: 'link-1', href: 'https://example.com' }],
+    [
+      {
+        _type: 'linkRef',
+        _key: 'link-1',
+        link: {
+          label: 'link',
+          href: 'https://example.com',
+          target: undefined,
+          platform: undefined,
+          ariaLabel: undefined,
+        },
+      },
+    ],
   ),
   {
     _type: 'code',
@@ -87,9 +98,8 @@ export const richTextDemo: TPortableTextBody = [
     _type: 'bodyImage',
     _key: nextKey('image'),
     image: makeSanityImage({ alt: 'A scenic mountain range at sunset' }),
-    // A non-default layout (rather than the more common INLINE) so this
-    // fixture also exercises the floated width/wrap treatment, not just the
-    // full-width default.
+    // FLOAT_LEFT (not the more common INLINE) so this fixture also
+    // exercises the floated width/wrap treatment.
     layout: IMAGE_LAYOUT.FLOAT_LEFT,
   },
   richTextBlock('normal', [

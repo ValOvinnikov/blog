@@ -1,5 +1,6 @@
 import { asideSchema } from '@blog/studio/schema-types/objects/aside/aside';
 import { bodyImageSchema } from '@blog/studio/schema-types/objects/body-image/body-image';
+import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
 import { defineArrayMember, defineType } from 'sanity';
 
 export const richTextSchema = defineType({
@@ -11,10 +12,7 @@ export const richTextSchema = defineType({
   of: [
     defineArrayMember({
       type: 'block',
-      // Excludes H1: the post/page title already renders its own H1 outside
-      // this field, so an editor picking H1 here would produce a second,
-      // competing top-level heading. H2–H4 keep body headings subordinate
-      // to that title.
+      // Excludes H1 so the body never competes with the post/page title's own heading.
       styles: [
         { title: 'Normal', value: 'normal' },
         { title: 'H2', value: 'h2' },
@@ -22,6 +20,9 @@ export const richTextSchema = defineType({
         { title: 'H4', value: 'h4' },
         { title: 'Quote', value: 'blockquote' },
       ],
+      marks: {
+        annotations: [{ type: linkRefSchema.name }],
+      },
     }),
     defineArrayMember({ type: bodyImageSchema.name }),
     defineArrayMember({ type: 'code' }),

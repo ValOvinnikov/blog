@@ -1,5 +1,6 @@
 import { makeRawFooter } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeRawExternalLinkDocument } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getFooter } from './loader';
@@ -32,12 +33,10 @@ describe('getFooter', () => {
         social: [
           {
             platform: 'GITHUB',
-            link: {
+            link: makeRawExternalLinkDocument({
               label: 'GitHub',
-              linkType: 'EXTERNAL',
               url: 'https://github.com/val',
-              openInNewTab: null,
-            },
+            }),
           },
         ],
       }),

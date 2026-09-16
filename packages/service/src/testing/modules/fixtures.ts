@@ -33,7 +33,10 @@ import type {
 } from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
 import type { TRawCtaAction } from '@blog/service/shared/transformers/to-cta-action';
 import type { TRawCtaButton } from '@blog/service/shared/transformers/to-cta-button';
-import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
+import {
+  makeRawHeadingBlock,
+  makeRawPortableTextMarkDef,
+} from '@blog/service/testing/shared/fixtures';
 
 export function makeRawHeroModule(
   overrides: Partial<TRawHeroModule> = {},
@@ -164,11 +167,7 @@ export function makeRawContentModule(
 ): TRawContentModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    // Only `_key`/`_type` are typeable here for a non-`bodyImage` block —
-    // `portableTextBodyItemFragment`'s `'...'` spread on this heterogeneous
-    // array can't statically type a member's other fields, though the query
-    // does return them at runtime.
-    body: [{ _type: 'block', _key: 'block-1' }],
+    body: [{ _type: 'block', _key: 'block-1', markDefs: null }],
     layout: null,
     ...overrides,
   };
@@ -227,6 +226,7 @@ export function makeRawCtaButton(
       label: 'Subscribe',
       linkType: LINK_TYPE.EXTERNAL,
       url: '/newsletter',
+      internalReference: null,
       openInNewTab: null,
     },
     ...overrides,
@@ -236,18 +236,7 @@ export function makeRawCtaButton(
 export function makeRawContentMarkDef(
   overrides: Partial<TRawCtaContentMarkDef> = {},
 ): TRawCtaContentMarkDef {
-  return {
-    _key: 'mark-1',
-    _type: 'inlineLink',
-    label: 'Learn more',
-    linkType: LINK_TYPE.EXTERNAL,
-    url: 'https://example.com',
-    internalReference: null,
-    openInNewTab: null,
-    platform: null,
-    accessibleLabel: null,
-    ...overrides,
-  };
+  return makeRawPortableTextMarkDef(overrides);
 }
 
 export function makeRawContentBlock(

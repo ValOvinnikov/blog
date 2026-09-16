@@ -83,7 +83,10 @@ export type { TNewsletterSettings } from './features/global/newsletter-settings'
 export type { TBrand, TSiteSettings } from './features/global/site-settings';
 export type { TThemeTokens } from './features/global/theme-settings';
 export type { TContentModule } from './features/modules/content';
-export type { TCtaModule } from './features/modules/cta';
+export type {
+  TCtaModule,
+  TResolvedCtaContentBlock,
+} from './features/modules/cta';
 export type { THeroModule } from './features/modules/hero';
 export type {
   THeroBlogButton,
@@ -128,6 +131,11 @@ export type {
   TPostCardTopic,
 } from './shared/transformers/to-post-card';
 export type { TPostLink } from './shared/transformers/to-post-link';
+export type {
+  IPortableTextLinkMark,
+  TPortableTextBlockWithResolvedLinks,
+} from './shared/transformers/to-portable-text-mark-def';
+export type { TPortableTextBody } from './shared/transformers/to-portable-text-body';
 export type { TSeoResolved } from './shared/transformers/resolve-seo';
 export type { TSocialLink } from './shared/transformers/to-social-link';
 export type { TTag } from './shared/transformers/to-tag';

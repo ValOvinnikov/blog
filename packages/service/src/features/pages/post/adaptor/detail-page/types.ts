@@ -1,11 +1,8 @@
-import type {
-  ISanityImage,
-  ProseText,
-  TMaybeUndefined,
-  TPortableTextBody,
-} from '@blog/config';
+import type { ISanityImage, ProseText, TMaybeUndefined } from '@blog/config';
 import type { TSeoResolved } from '@blog/service/shared/transformers/resolve-seo';
 import type { TModule } from '@blog/service/shared/transformers/to-module';
+import type { TPortableTextBody } from '@blog/service/shared/transformers/to-portable-text-body';
+import type { TPortableTextBlockWithResolvedLinks } from '@blog/service/shared/transformers/to-portable-text-mark-def';
 import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
 import type { TSocialLink } from '@blog/service/shared/transformers/to-social-link';
 import type { TTag } from '@blog/service/shared/transformers/to-tag';
@@ -17,7 +14,9 @@ export type TPostDetailAuthor = {
   profilePageSlug: TMaybeUndefined<string>;
   image: TMaybeUndefined<ISanityImage>;
   role: TMaybeUndefined<string>;
-  bio: TMaybeUndefined<ProseText>;
+  bio: TMaybeUndefined<
+    Array<TPortableTextBlockWithResolvedLinks<ProseText[number]>>
+  >;
   socialLinks: TSocialLink[];
 };
 

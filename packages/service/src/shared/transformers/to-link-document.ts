@@ -16,7 +16,7 @@ export function toLinkDocument(
   if (!raw) return undefined;
 
   const href =
-    'internalReference' in raw
+    raw.linkType === LINK_TYPE.INTERNAL
       ? raw.internalReference &&
         pageHref(raw.internalReference._type, raw.internalReference.slug)
       : raw.url;

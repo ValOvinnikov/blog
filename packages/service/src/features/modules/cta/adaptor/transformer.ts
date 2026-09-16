@@ -1,19 +1,17 @@
 import {
   CTA_VARIANT,
-  LINK_TYPE,
-  type InlineText,
   type TContentAlignment,
   type TMaybeUndefined,
 } from '@blog/config';
 import { toCtaButton } from '@blog/service/shared/transformers/to-cta-button';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
-import { toInternalHref } from '@blog/service/shared/transformers/to-link';
+import { toPortableTextBlockWithResolvedLinks } from '@blog/service/shared/transformers/to-portable-text-mark-def';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import type { InferResultType } from 'groqd';
 
 import type { ctaModuleQuery } from './query';
-import type { TCtaButton, TCtaModule } from './types';
+import type { TCtaButton, TCtaModule, TResolvedCtaContentBlock } from './types';
 
 export type TRawCtaModule = InferResultType<typeof ctaModuleQuery>;
 
@@ -21,40 +19,12 @@ export type TRawCtaContentBlock = NonNullable<TRawCtaModule['content']>[number];
 export type TRawCtaContentMarkDef = NonNullable<
   TRawCtaContentBlock['markDefs']
 >[number];
-type TCtaContentMarkDef = NonNullable<InlineText[number]['markDefs']>[number];
 
-// Unlike an action, a malformed content link degrades to plain text rather
-// than dropping the block — the renderer already handles a missing `url`.
-function toContentLinkAnnotation(
-  raw: TRawCtaContentMarkDef,
-): TCtaContentMarkDef {
-  const url =
-    raw.linkType === LINK_TYPE.INTERNAL && raw.internalReference
-      ? toInternalHref(raw.internalReference)
-      : (raw.url ?? undefined);
-
-  return {
-    _key: raw._key,
-    _type: 'inlineLink',
-    label: raw.label,
-    linkType: raw.linkType,
-    url,
-    openInNewTab: raw.openInNewTab ?? undefined,
-    platform: raw.platform ?? undefined,
-    accessibleLabel: raw.accessibleLabel ?? undefined,
-  };
-}
-
-function toContentBlock(raw: TRawCtaContentBlock): InlineText[number] {
-  return {
-    ...raw,
-    markDefs: raw.markDefs?.map(toContentLinkAnnotation) ?? undefined,
-  };
-}
-
-function toContent(raw: TRawCtaModule['content']): TMaybeUndefined<InlineText> {
+function toContent(
+  raw: TRawCtaModule['content'],
+): TMaybeUndefined<TResolvedCtaContentBlock[]> {
   if (!raw || raw.length === 0) return undefined;
-  return raw.map(toContentBlock);
+  return raw.map(toPortableTextBlockWithResolvedLinks);
 }
 
 function toContentPosition(

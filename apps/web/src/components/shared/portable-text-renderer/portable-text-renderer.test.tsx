@@ -1,4 +1,5 @@
-import { ASIDE_KIND, type TPortableTextBody } from '@blog/config';
+import { ASIDE_KIND } from '@blog/config';
+import type { TPortableTextBody } from '@blog/service';
 import {
   customRender,
   renderElement,
@@ -15,9 +16,8 @@ import type { ReactNode } from 'react';
 
 import { PortableTextRenderer } from './portable-text-renderer';
 
-// Faking `ImageWithCaption` keeps the `layout` pass-through assertion
-// behavioural (a `data-layout` attribute) rather than a CSS-class assertion
-// on the real component's `tv()` output.
+// Mocking ImageWithCaption keeps the layout assertion behavioural (a
+// data-layout attribute) rather than a CSS-class assertion.
 vi.mock('@blog/ui/molecules/image-with-caption', () => ({
   ImageWithCaption: ({
     layout,
@@ -49,9 +49,8 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
 
   it('renders an h1-style block downgraded to a level 2 heading, never a bare h1', () => {
     const value: TPortableTextBody = [
-      // The generated `style` union no longer includes 'h1' (Studio can't
-      // author one anymore), but the renderer still defends against a
-      // legacy/malformed one reaching this component via another write path.
+      // 'h1' is no longer in the generated style union (Studio can't author
+      // one), but a legacy/malformed block could still reach this renderer.
       richTextBlock('h1' as TRichTextBlock['style'], [
         richTextSpan('Heading 1'),
       ]),
@@ -127,12 +126,24 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
     expect(screen.getByText('const x = 1').tagName).toBe('CODE');
   });
 
-  it('renders a link annotation as a link', () => {
+  it('renders a resolved linkRef annotation as a link', () => {
     const value: TPortableTextBody = [
       richTextBlock(
         'normal',
         [richTextSpan('a link', ['link-1'])],
-        [{ _type: 'link', _key: 'link-1', href: 'https://example.com' }],
+        [
+          {
+            _type: 'linkRef',
+            _key: 'link-1',
+            link: {
+              label: 'a link',
+              href: 'https://example.com',
+              target: undefined,
+              platform: undefined,
+              ariaLabel: undefined,
+            },
+          },
+        ],
       ),
     ];
 
@@ -142,12 +153,12 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
     expect(link).toHaveAttribute('href', 'https://example.com');
   });
 
-  it('renders a link annotation without an href as plain text, not a dead link', () => {
+  it('renders a dangling linkRef annotation as plain text, not a broken anchor', () => {
     const value: TPortableTextBody = [
       richTextBlock(
         'normal',
         [richTextSpan('incomplete link', ['link-1'])],
-        [{ _type: 'link', _key: 'link-1' }],
+        [{ _type: 'linkRef', _key: 'link-1', link: undefined }],
       ),
     ];
 
@@ -243,8 +254,6 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
       richTextBlock('h2', [richTextSpan('Summary')]),
     ];
     const secondModuleBody: TPortableTextBody = [
-      // Same heading text as the first module's outline — this is exactly
-      // the scenario `module_content` can hit twice on one `page_landing`.
       richTextBlock('h2', [richTextSpan('Overview')]),
       richTextBlock('h2', [richTextSpan('Details')]),
       richTextBlock('h2', [richTextSpan('Summary')]),
@@ -264,8 +273,6 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
       (heading) => heading.getAttribute('id'),
     );
 
-    // Neither instance was opted in (no `headings` prop), so neither stamps
-    // any id at all — the collision the un-gated behaviour used to risk.
     expect(firstIds.every((id) => id === null)).toBe(true);
     expect(secondIds.every((id) => id === null)).toBe(true);
   });
@@ -456,5 +463,61 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
     setup({ value, asideKindLabels: { [ASIDE_KIND.CONTEXT]: 'Context' } });
 
     expect(screen.getByText('Context')).toBeVisible();
+  });
+
+  it('renders a resolved linkRef annotation nested in an aside body as a link', () => {
+    const value: TPortableTextBody = [
+      {
+        _type: 'aside',
+        _key: 'aside-1',
+        kind: ASIDE_KIND.CONTEXT,
+        body: [
+          richTextBlock(
+            'normal',
+            [richTextSpan('a nested link', ['link-1'])],
+            [
+              {
+                _type: 'linkRef',
+                _key: 'link-1',
+                link: {
+                  label: 'a nested link',
+                  href: 'https://example.com',
+                  target: undefined,
+                  platform: undefined,
+                  ariaLabel: undefined,
+                },
+              },
+            ],
+          ),
+        ],
+      },
+    ];
+
+    setup({ value });
+
+    const link = screen.getByRole('link', { name: 'a nested link' });
+    expect(link).toHaveAttribute('href', 'https://example.com');
+  });
+
+  it('renders a dangling linkRef annotation nested in an aside body as plain text', () => {
+    const value: TPortableTextBody = [
+      {
+        _type: 'aside',
+        _key: 'aside-1',
+        kind: ASIDE_KIND.CONTEXT,
+        body: [
+          richTextBlock(
+            'normal',
+            [richTextSpan('incomplete nested link', ['link-1'])],
+            [{ _type: 'linkRef', _key: 'link-1', link: undefined }],
+          ),
+        ],
+      },
+    ];
+
+    setup({ value });
+
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(screen.getByText('incomplete nested link')).toBeVisible();
   });
 });

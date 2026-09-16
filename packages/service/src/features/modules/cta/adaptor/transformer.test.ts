@@ -209,8 +209,13 @@ describe('toCtaModule', () => {
         makeRawContentBlock({
           markDefs: [
             makeRawContentMarkDef({
-              linkType: LINK_TYPE.INTERNAL,
-              internalReference: { _type: 'page_post', slug: 'hello-world' },
+              link: {
+                label: 'Learn more',
+                linkType: LINK_TYPE.INTERNAL,
+                internalReference: { _type: 'page_post', slug: 'hello-world' },
+                url: null,
+                openInNewTab: null,
+              },
             }),
           ],
         }),
@@ -221,19 +226,24 @@ describe('toCtaModule', () => {
 
     expect(cta.content?.[0]?.markDefs?.[0]).toMatchObject({
       _key: 'mark-1',
-      _type: 'inlineLink',
-      url: '/blog/hello-world',
+      _type: 'linkRef',
+      link: { href: '/blog/hello-world' },
     });
   });
 
-  it('resolves an internal blog_topic and page_landing reference the same way toLink does', () => {
+  it('resolves an internal page_topic and page_landing reference the same way toLinkDocument does', () => {
     const topicRaw = makeRawCtaModule({
       content: [
         makeRawContentBlock({
           markDefs: [
             makeRawContentMarkDef({
-              linkType: LINK_TYPE.INTERNAL,
-              internalReference: { _type: 'blog_topic', slug: 'engineering' },
+              link: {
+                label: 'Learn more',
+                linkType: LINK_TYPE.INTERNAL,
+                internalReference: { _type: 'page_topic', slug: 'engineering' },
+                url: null,
+                openInNewTab: null,
+              },
             }),
           ],
         }),
@@ -244,18 +254,23 @@ describe('toCtaModule', () => {
         makeRawContentBlock({
           markDefs: [
             makeRawContentMarkDef({
-              linkType: LINK_TYPE.INTERNAL,
-              internalReference: { _type: 'page_landing', slug: 'about' },
+              link: {
+                label: 'Learn more',
+                linkType: LINK_TYPE.INTERNAL,
+                internalReference: { _type: 'page_landing', slug: 'about' },
+                url: null,
+                openInNewTab: null,
+              },
             }),
           ],
         }),
       ],
     });
 
-    expect(toCtaModule(topicRaw).content?.[0]?.markDefs?.[0]?.url).toBe(
+    expect(toCtaModule(topicRaw).content?.[0]?.markDefs?.[0]?.link?.href).toBe(
       '/topics/engineering',
     );
-    expect(toCtaModule(pageRaw).content?.[0]?.markDefs?.[0]?.url).toBe(
+    expect(toCtaModule(pageRaw).content?.[0]?.markDefs?.[0]?.link?.href).toBe(
       '/about',
     );
   });
@@ -266,8 +281,13 @@ describe('toCtaModule', () => {
         makeRawContentBlock({
           markDefs: [
             makeRawContentMarkDef({
-              linkType: LINK_TYPE.EXTERNAL,
-              url: 'https://example.com',
+              link: {
+                label: 'Learn more',
+                linkType: LINK_TYPE.EXTERNAL,
+                url: 'https://example.com',
+                internalReference: null,
+                openInNewTab: null,
+              },
             }),
           ],
         }),
@@ -276,27 +296,23 @@ describe('toCtaModule', () => {
 
     const cta = toCtaModule(raw);
 
-    expect(cta.content?.[0]?.markDefs?.[0]?.url).toBe('https://example.com');
+    expect(cta.content?.[0]?.markDefs?.[0]?.link?.href).toBe(
+      'https://example.com',
+    );
   });
 
-  it('degrades a malformed content link (no url, no reference) to an unresolved url rather than throwing', () => {
+  it('degrades a dangling content link to an absent link rather than throwing', () => {
     const raw = makeRawCtaModule({
       content: [
         makeRawContentBlock({
-          markDefs: [
-            makeRawContentMarkDef({
-              linkType: LINK_TYPE.INTERNAL,
-              internalReference: null,
-              url: null,
-            }),
-          ],
+          markDefs: [makeRawContentMarkDef({ link: null })],
         }),
       ],
     });
 
     expect(() => toCtaModule(raw)).not.toThrow();
     const cta = toCtaModule(raw);
-    expect(cta.content?.[0]?.markDefs?.[0]?.url).toBeUndefined();
+    expect(cta.content?.[0]?.markDefs?.[0]?.link).toBeUndefined();
     expect(cta.content?.[0]?.markDefs?.[0]?._key).toBe('mark-1');
   });
 
@@ -372,6 +388,7 @@ describe('toCtaModule', () => {
             label: 'Learn more',
             linkType: LINK_TYPE.EXTERNAL,
             url: '/learn-more',
+            internalReference: null,
             openInNewTab: null,
           },
         }),
@@ -413,6 +430,7 @@ describe('toCtaModule', () => {
             label: 'Broken',
             linkType: LINK_TYPE.INTERNAL,
             internalReference: null,
+            url: null,
             openInNewTab: null,
           },
         }),
@@ -432,6 +450,7 @@ describe('toCtaModule', () => {
             label: 'Read the post',
             linkType: LINK_TYPE.INTERNAL,
             internalReference: { _type: 'page_post', slug: 'hello-world' },
+            url: null,
             openInNewTab: null,
           },
         }),

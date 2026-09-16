@@ -1,4 +1,7 @@
-import type { InlineLink, InlineText } from '@blog/config';
+import type {
+  IPortableTextLinkMark,
+  TResolvedCtaContentBlock,
+} from '@blog/service';
 import { ProseLink } from '@blog/ui/atoms/prose-link';
 import {
   PortableText,
@@ -10,7 +13,7 @@ import { SmartLink } from '@web/components/shared/smart-link';
 import { inlineTextRendererVariants } from './inline-text-renderer-variants';
 
 export interface IInlineTextRendererProps {
-  value: InlineText;
+  value: TResolvedCtaContentBlock[];
 }
 
 const s = inlineTextRendererVariants();
@@ -30,13 +33,16 @@ const components: PortableTextComponents = {
   marks: {
     strong: ({ children }) => <strong>{children}</strong>,
     em: ({ children }) => <em>{children}</em>,
-    inlineLink: ({
+    linkRef: ({
       children,
       value: annotation,
-    }: PortableTextMarkComponentProps<InlineLink>) =>
-      // `url` is already resolved for both link types; the fallback is only for an unresolved reference.
-      annotation?.url ? (
-        <ProseLink as={SmartLink} href={annotation.url}>
+    }: PortableTextMarkComponentProps<IPortableTextLinkMark>) =>
+      annotation?.link ? (
+        <ProseLink
+          as={SmartLink}
+          href={annotation.link.href}
+          target={annotation.link.target}
+        >
           {children}
         </ProseLink>
       ) : (
@@ -47,8 +53,7 @@ const components: PortableTextComponents = {
 
 /**
  * Renders a constrained Portable Text shape — paragraphs, lists, bold/italic,
- * and inline links only (no headings, images, code, or asides). `inlineLink`
- * annotations route through `SmartLink`.
+ * and inline links only (no headings, images, code, or asides).
  */
 export const InlineTextRenderer = ({ value }: IInlineTextRendererProps) => (
   <PortableText value={value} components={components} />

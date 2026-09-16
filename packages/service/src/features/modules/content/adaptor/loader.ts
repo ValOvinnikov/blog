@@ -15,7 +15,22 @@ export async function getContent(
   const raw = await runQuery(contentModuleQuery, {
     parameters: { id },
     tenant,
-    ...isr(['modules:content', `module:${id}`], tenant.projectId),
+    ...isr(
+      [
+        'modules:content',
+        `module:${id}`,
+        'link',
+        'homePage',
+        'page_landing',
+        'page_post',
+        'page_postIndex',
+        'page_topic',
+        'page_topicIndex',
+        'page_tag',
+        'page_tagIndex',
+      ],
+      tenant.projectId,
+    ),
   });
 
   return toContentModule(raw);

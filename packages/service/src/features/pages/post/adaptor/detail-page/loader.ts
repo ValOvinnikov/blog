@@ -13,12 +13,26 @@ export async function getPost(
   slug: string,
   tenant: TTenantSanityContext,
 ): Promise<TMaybeUndefined<TPostDetail>> {
-  // `postPageQuery` derefs `author`/`topic`/`tags[]` — all three tags must
-  // ride alongside `page_post` (tag-scope contract, `sanity/query.ts`).
   const raw = await runQuery(postPageQuery, {
     parameters: { slug },
     tenant,
-    ...isr(['page_post', 'author', 'topic', 'tag'], tenant.projectId),
+    ...isr(
+      [
+        'page_post',
+        'author',
+        'topic',
+        'tag',
+        'link',
+        'homePage',
+        'page_landing',
+        'page_postIndex',
+        'page_topic',
+        'page_topicIndex',
+        'page_tag',
+        'page_tagIndex',
+      ],
+      tenant.projectId,
+    ),
   });
   if (!raw) return undefined;
 

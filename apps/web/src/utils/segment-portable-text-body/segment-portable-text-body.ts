@@ -1,23 +1,14 @@
-import {
-  IMAGE_LAYOUT,
-  type IBodyImageBlock,
-  type TPortableTextBody,
-} from '@blog/config';
+import { IMAGE_LAYOUT, type IBodyImageBlock } from '@blog/config';
+import type { TPortableTextBody } from '@blog/service';
 
 export type TPortableTextSegment =
   | { kind: 'PROSE'; blocks: TPortableTextBody }
   | { kind: 'BREAKOUT'; block: IBodyImageBlock };
 
 /**
- * segmentPortableTextBody — splits a Portable Text body into alternating
- * runs of ordinary blocks (`PROSE`) and standalone `FULL_BLEED` `bodyImage`
- * blocks (`BREAKOUT`), so `PortableTextRenderer` can keep every ordinary
- * block flowing through the same reading-measure-capped `Prose` wrapper it
- * always has, while a `FULL_BLEED` image renders as `Prose`'s own sibling —
- * free to fill the full width of whatever "breakout-safe" box contains both
- * (see `blog-post-page-variants.ts`'s `content` slot), with no viewport-
- * relative math needed. A body with no `FULL_BLEED` image collapses to a
- * single `PROSE` segment holding every block, in original order.
+ * Splits a Portable Text body into alternating PROSE and BREAKOUT
+ * (`FULL_BLEED` `bodyImage`) runs, so `PortableTextRenderer` can render each
+ * `FULL_BLEED` image as a sibling of `Prose` rather than nested inside it.
  */
 export const segmentPortableTextBody = (
   value: TPortableTextBody,
