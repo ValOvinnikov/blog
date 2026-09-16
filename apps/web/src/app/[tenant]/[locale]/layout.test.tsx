@@ -588,7 +588,7 @@ describe('LocaleLayout', () => {
   });
 
   describe('when navigation fails to load', () => {
-    it('logs navigation.layout_fetch_failed and renders with an empty nav', async () => {
+    it('preserves the navigation.layout_fetch_failed log call', async () => {
       const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       getNavigationMock.mockResolvedValue({ ok: false, error: 'boom' });
 
@@ -608,7 +608,7 @@ describe('LocaleLayout', () => {
   });
 
   describe('when the footer fails to load', () => {
-    it('logs footer.layout_fetch_failed and renders with no social links', async () => {
+    it('preserves the footer.layout_fetch_failed log call', async () => {
       const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       getFooterMock.mockResolvedValue({ ok: false, error: 'boom' });
 
