@@ -46,13 +46,7 @@ const value: TResolvedCtaContentBlock[] = [
       {
         _key: 'link-1',
         _type: 'linkRef',
-        link: {
-          label: 'link',
-          href: 'https://example.com',
-          target: undefined,
-          platform: undefined,
-          ariaLabel: undefined,
-        },
+        link: { href: 'https://example.com', target: undefined },
       },
     ],
   },
