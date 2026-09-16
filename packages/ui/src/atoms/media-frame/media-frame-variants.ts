@@ -17,3 +17,4 @@ export const mediaFrameVariants = tv({
 });
 
 export type TMediaFrameVariants = VariantProps<typeof mediaFrameVariants>;
+export type TMediaFrameRatio = NonNullable<TMediaFrameVariants['ratio']>;

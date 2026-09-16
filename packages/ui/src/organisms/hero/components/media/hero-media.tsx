@@ -1,5 +1,6 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import { MediaFrame } from '@blog/ui/atoms/media-frame';
+import type { TMediaFrameRatio } from '@blog/ui/atoms/media-frame/media-frame-variants';
 import type { ReactNode } from 'react';
 
 import { heroMediaVariants } from './hero-media-variants';
@@ -8,23 +9,26 @@ export type THeroMediaProps = IWithClassName &
   IWithDataTestId & {
     /** Set by `Hero` on Banner, whose media is an edge-to-edge background rather than a framed block. */
     isFramed?: boolean;
+    /** Defaults to the 16:9 `video` ratio; ignored on Banner, whose media is unframed. */
+    ratio?: TMediaFrameRatio;
     children?: ReactNode;
   };
 
 /**
- * HeroMedia — the media slot of a `Hero`; frames its content at a 16:9 ratio via
- * `MediaFrame`.
+ * HeroMedia — the media slot of a `Hero`; frames its content via `MediaFrame`,
+ * at a configurable ratio (16:9 by default).
  */
 export const HeroMedia = ({
   isFramed = true,
+  ratio = 'video',
   className,
   dataTestId,
   children,
 }: THeroMediaProps) =>
   isFramed ? (
     <MediaFrame
-      ratio="video"
-      className={heroMediaVariants({ class: className })}
+      ratio={ratio}
+      className={heroMediaVariants({ ratio, class: className })}
       dataTestId={dataTestId}
     >
       {children}

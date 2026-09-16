@@ -2,8 +2,12 @@ import {
   BRAND_VARIANT,
   CONTENT_ALIGNMENT,
   HERO_VARIANT,
+  ICONS,
   MEDIA_ORDER,
+  SIZE,
 } from '@blog/config';
+import { Icon } from '@blog/ui/atoms/icon';
+import { ShareLink } from '@blog/ui/molecules/share-link';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -24,6 +28,43 @@ const bannerContent = (alt: string) => (
     <Hero.Cta>
       <NavLink href="/posts/design-system">Read more</NavLink>
     </Hero.Cta>
+  </>
+);
+
+const profileContent = (
+  <>
+    <Hero.Avatar>
+      <img
+        src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=256&h=256&fit=crop"
+        alt="Portrait of Jane Doe"
+      />
+    </Hero.Avatar>
+    <Hero.Cta>
+      <NavLink href="/posts/design-system">Read more</NavLink>
+    </Hero.Cta>
+    <Hero.Social ariaLabel="Find Jane Doe elsewhere">
+      <li>
+        <ShareLink
+          href="https://github.com/janedoe"
+          label="GitHub"
+          icon={<Icon name={ICONS.GITHUB} size={SIZE.SM} />}
+        />
+      </li>
+      <li>
+        <ShareLink
+          href="https://linkedin.com/in/janedoe"
+          label="LinkedIn"
+          icon={<Icon name={ICONS.LINKEDIN} size={SIZE.SM} />}
+        />
+      </li>
+      <li>
+        <ShareLink
+          href="https://x.com/janedoe"
+          label="X"
+          icon={<Icon name={ICONS.X} size={SIZE.SM} />}
+        />
+      </li>
+    </Hero.Social>
   </>
 );
 
@@ -217,5 +258,61 @@ export const StackedMediaOrderLast: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
     mediaOrder: MEDIA_ORDER.LAST,
+  },
+};
+
+export const StackedProfileToneBrandPrimary: TStory = {
+  args: {
+    variant: HERO_VARIANT.STACKED,
+    tone: BRAND_VARIANT.BRAND_PRIMARY,
+    eyebrow: 'Senior frontend engineer',
+    title: 'Jane Doe',
+    excerpt:
+      'Architecture, performance, and design systems — from fintech and retail.',
+    children: profileContent,
+  },
+};
+
+export const StackedProfileTonePrimary: TStory = {
+  args: {
+    variant: HERO_VARIANT.STACKED,
+    tone: BRAND_VARIANT.PRIMARY,
+    eyebrow: 'Senior frontend engineer',
+    title: 'Jane Doe',
+    excerpt:
+      'Architecture, performance, and design systems — from fintech and retail.',
+    children: profileContent,
+  },
+};
+
+export const StackedProfileToneSecondary: TStory = {
+  args: {
+    variant: HERO_VARIANT.STACKED,
+    tone: BRAND_VARIANT.SECONDARY,
+    eyebrow: 'Senior frontend engineer',
+    title: 'Jane Doe',
+    excerpt:
+      'Architecture, performance, and design systems — from fintech and retail.',
+    children: profileContent,
+  },
+};
+
+export const SplitSquarePortrait: TStory = {
+  args: {
+    variant: HERO_VARIANT.SPLIT,
+    children: (
+      <>
+        <Hero.Media ratio="square">
+          <img
+            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&h=800&fit=crop"
+            alt="Portrait of Jane Doe"
+            className="size-full object-cover"
+          />
+        </Hero.Media>
+        <Hero.Cta>
+          <NavLink href="/posts/design-system">Read more</NavLink>
+        </Hero.Cta>
+      </>
+    ),
   },
 };

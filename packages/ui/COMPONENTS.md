@@ -325,14 +325,16 @@ Slots:
 
 ### Hero — `organisms/hero/hero.tsx`
 
-the page-top hero band shared by every hero kind: renders `title` as an `<h1>` with optional `eyebrow`/`excerpt`, plus `Hero.Cta` and `Hero.Media` slots.
+the page-top hero band shared by every hero kind: renders `title` as an `<h1>` with optional `eyebrow`/`excerpt`, plus `Hero.Avatar`, `Hero.Cta`, `Hero.Media`, and `Hero.Social` slots.
 Props: title: string · titleId: string · eyebrow?: string · excerpt?: string · variant?: THeroVariant · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mediaOrder?: TMediaOrder · tone?: TFullBrandVariant · children?: TCompoundChildren<typeof HeroParts> _(extends IWithClassName, IWithDataTestId)_
 Variants: variant: HERO_VARIANT.SPLIT|HERO_VARIANT.STACKED|HERO_VARIANT.BANNER · hasMedia: (boolean) · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mediaOrder: MEDIA_ORDER.FIRST|MEDIA_ORDER.LAST · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY
 
 Slots:
 
-- **Hero.Media** — the media slot of a `Hero`; frames its content at a 16:9 ratio via `MediaFrame`. Props: isFramed?: boolean · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Hero.Avatar** — the portrait slot of a `Hero`, rendered before the eyebrow; a round frame for a person's photo on the profile hero. Props: alignment?: THeroAvatarVariants['alignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
+- **Hero.Media** — the media slot of a `Hero`; frames its content via `MediaFrame`, at a configurable ratio (16:9 by default). Props: isFramed?: boolean · ratio?: TMediaFrameRatio · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: ratio: video|square|portrait|classic
 - **Hero.Cta** — the call-to-action slot of a `Hero`; a styled `<div>` for the hero's buttons or links. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Hero.Social** — the social-links slot of a `Hero`, rendered after `Hero.Cta`; a labelled list the caller fills with its own link items. Props: ariaLabel: string · alignment?: THeroSocialVariants['alignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
 
 ### NewsletterSignup — `organisms/newsletter-signup/newsletter-signup.tsx`
 
