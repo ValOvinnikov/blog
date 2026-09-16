@@ -83,8 +83,10 @@ export type { TNewsletterSettings } from './features/global/newsletter-settings'
 export type { TBrand, TSiteSettings } from './features/global/site-settings';
 export type { TThemeTokens } from './features/global/theme-settings';
 export type { TContentModule } from './features/modules/content';
-export type { TCtaModule } from './features/modules/cta';
-export type { TResolvedCtaContentBlock } from './features/modules/cta/adaptor/types';
+export type {
+  TCtaModule,
+  TResolvedCtaContentBlock,
+} from './features/modules/cta';
 export type { THeroModule } from './features/modules/hero';
 export type {
   THeroBlogButton,
