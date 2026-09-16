@@ -934,21 +934,18 @@ avatar and is fine.
 
 ### Social links: a `Hero.Social` slot, the footer's data and rendering
 
-The author's social links are mid-migration. Today `blog_author.socialLinks`
-is an array of the legacy `socialLink` object (`{ platform: free text,
-url }`); #3216 replaces it with `socialProfile` — `{ platform:
-SOCIAL_PLATFORMS, link → link }`, the wrapper the footer already uses — and
-#3207 then deletes `socialLink`. **The profile hero is designed against the
-`socialProfile` shape and waits for #3216**, rather than shipping against an
-object scheduled for deletion and then being migrated a second time.
+`blog_author.socialLinks` is an array of `socialProfile` — `{ platform:
+SOCIAL_PLATFORMS, link → link }`, the same wrapper the footer uses. #3216
+moved it there and deleted the legacy `socialLink` object, so the profile
+hero builds against that shape directly and no second migration is owed.
 
 That makes the hero's social links the footer's social links, end to end:
 
-- **Service:** the footer's `{ platform, link: ILink }` pair becomes the
-  shared social-link view model — `TFooterSocialLink` today, renamed
-  `TSocialProfile` and moved under `shared/` — and
-  the profile loader resolves `author.socialLinks[]` through the same
-  fragment and transformer the footer query uses. Nothing hero-specific.
+- **Service:** the `{ platform, link: ILink }` pair is already the shared
+  social-link view model — `TSocialProfile` under `shared/`, which #3216
+  renamed from `TFooterSocialLink` and which the footer and author both
+  resolve through. The profile loader reuses that same fragment and
+  transformer. Nothing hero-specific.
 - **Web:** `FooterSocialLinks` generalises into a shared `SocialLinks`
   component that both the footer and the hero render — the platform icon
   where `toSocialIconName()` has one, the platform label from

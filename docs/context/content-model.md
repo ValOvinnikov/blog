@@ -187,8 +187,9 @@ empty. Singletons resolve their Studio label via `preview.prepare` instead
 (select `title`, fall back to `'Unknown'`). Content/module documents pass
 `max` for an editable headline.
 
-**Objects** — `link` (unified internal/external, `LINK_TYPE` const),
-`socialLink`, `brand`, `brandTagline` (structured tagline: `items` + a
+**Objects** — `linkRef`, `ctaButton`, `ctaSecondaryButton` and
+`socialProfile` (each wrapping a reference to a `link` **document**),
+`brand`, `brandTagline` (structured tagline: `items` + a
 `BRAND_TAGLINE_SEPARATORS`-driven `separator`), `imageWithAlt` (required alt —
 used by `heroImage`, `author.avatar`, `brand`, `openGraph.image`, and
 site-settings favicon/logo), `bodyImage` (required alt; optional `layout`
