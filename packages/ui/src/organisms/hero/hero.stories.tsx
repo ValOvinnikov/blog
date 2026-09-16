@@ -46,7 +46,7 @@ const profileContent = (
       <NavLink href="/posts/design-system">Read more</NavLink>
     </Hero.Cta>
     <Hero.Social>
-      <ul aria-label="Find Jane Doe elsewhere" className="flex flex-wrap gap-2">
+      <ul aria-label="Find Jane Doe elsewhere">
         <li>
           <ShareLink
             href="https://github.com/janedoe"
