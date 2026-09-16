@@ -69,6 +69,16 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
     expect(screen.queryByTestId('hero-media')).not.toBeInTheDocument();
   });
 
+  it('renders the Stacked avatar at a fixed responsive size, not a percentage of its container', () => {
+    setup({ variant: HERO_VARIANT.STACKED, sanityImage });
+
+    const img = screen.getByRole('img', { name: sanityImage.alt });
+
+    expect(img.className).toContain('size-24');
+    expect(img.className).toContain('sm:size-32');
+    expect(img.className).not.toContain('size-full');
+  });
+
   it('does not set fetchpriority on the Stacked avatar', () => {
     setup({ variant: HERO_VARIANT.STACKED, sanityImage });
 

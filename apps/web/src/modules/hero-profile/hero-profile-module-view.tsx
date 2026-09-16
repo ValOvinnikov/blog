@@ -74,7 +74,7 @@ export const HeroProfileModuleView = ({
               image={sanityImage}
               width={256}
               height={256}
-              className="size-full rounded-full object-cover"
+              className="size-24 rounded-full object-cover sm:size-32"
             />
           </Hero.Avatar>
         )}
