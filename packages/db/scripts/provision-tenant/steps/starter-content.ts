@@ -1,30 +1,15 @@
-import {
-  BRAND_VARIANT,
-  HERO_IMAGE_SOURCE,
-  POST_SOURCE,
-  HERO_VARIANT,
-  PRESET_ID,
-  LINK_TYPE,
-} from '@blog/config/constants';
+import { PRESET_ID } from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
-// Fixed document ids (published, not `drafts.`-prefixed) — every field
-// each seeded document type requires per its schema in
-// `packages/studio/src/schema-types`, so the seeded dataset validates
-// against the real schema rather than an invented shape. No generated
+// Fixed document ids (published, not `drafts.`-prefixed). No generated
 // `@blog/config` types exist for a not-yet-created project's dataset, so
 // these stay loosely typed (`TSanityDocument`), not `any`.
 export const STARTER_DOCUMENT_IDS = {
-  AUTHOR: 'provisioning.author.starter',
-  TOPIC: 'provisioning.topic.starter',
-  POST: 'provisioning.post.starter',
-  NAV_HOME_LINK: 'provisioning.link.nav-home',
   NAVIGATION: 'provisioning.settings.navigation',
   FOOTER: 'provisioning.settings.footer',
   THEME: 'provisioning.settings.theme',
   NEWSLETTER: 'provisioning.settings.newsletter',
   SITE: 'provisioning.settings.site',
-  HERO_BLOG: 'provisioning.module.hero-blog',
   HOME: 'provisioning.settings.home',
 } as const;
 
@@ -45,71 +30,11 @@ const HOME_SEO_META_DESCRIPTION =
 export function buildStarterDocuments(
   tenant: Pick<TTenant, 'name'>,
 ): TSanityDocument[] {
-  const now = new Date().toISOString();
-
-  const author: TSanityDocument = {
-    _id: STARTER_DOCUMENT_IDS.AUTHOR,
-    _type: 'blog_author',
-    name: `${tenant.name} Team`,
-  };
-
-  const topic: TSanityDocument = {
-    _id: STARTER_DOCUMENT_IDS.TOPIC,
-    _type: 'blog_topic',
-    title: 'Announcements',
-    slug: { _type: 'slug', current: 'announcements' },
-  };
-
-  const post: TSanityDocument = {
-    _id: STARTER_DOCUMENT_IDS.POST,
-    _type: 'page_post',
-    title: `Welcome to ${tenant.name}`,
-    slug: { _type: 'slug', current: 'welcome' },
-    excerpt:
-      `This is the first post on ${tenant.name}. Edit or delete it from ` +
-      'the Studio once you are ready to publish real content here.',
-    author: { _type: 'reference', _ref: STARTER_DOCUMENT_IDS.AUTHOR },
-    topic: { _type: 'reference', _ref: STARTER_DOCUMENT_IDS.TOPIC },
-    publishedAt: now,
-    body: [
-      {
-        _type: 'block',
-        _key: 'starter-block',
-        style: 'normal',
-        markDefs: [],
-        children: [
-          {
-            _type: 'span',
-            _key: 'starter-span',
-            marks: [],
-            text: `Welcome to ${tenant.name}. This starter post was created automatically during provisioning — replace it with your own.`,
-          },
-        ],
-      },
-    ],
-    modules: [],
-  };
-
-  const navHomeLink: TSanityDocument = {
-    _id: STARTER_DOCUMENT_IDS.NAV_HOME_LINK,
-    _type: 'link',
-    title: 'Home',
-    label: 'Home',
-    linkType: LINK_TYPE.INTERNAL,
-    internalReference: { _type: 'reference', _ref: STARTER_DOCUMENT_IDS.HOME },
-  };
-
   const navigation: TSanityDocument = {
     _id: STARTER_DOCUMENT_IDS.NAVIGATION,
     _type: 'settings_navigation',
     title: 'Primary Navigation',
-    items: [
-      {
-        _type: 'linkRef',
-        _key: 'starter-nav-home',
-        link: { _type: 'reference', _ref: STARTER_DOCUMENT_IDS.NAV_HOME_LINK },
-      },
-    ],
+    items: [],
   };
 
   const footer: TSanityDocument = {
@@ -143,26 +68,16 @@ export function buildStarterDocuments(
     },
   };
 
-  const heroBlog: TSanityDocument = {
-    _id: STARTER_DOCUMENT_IDS.HERO_BLOG,
-    _type: 'module_heroBlog',
-    title: 'Welcome Hero',
-    brandVariant: BRAND_VARIANT.PRIMARY,
-    postSource: POST_SOURCE.PINNED,
-    post: { _type: 'reference', _ref: STARTER_DOCUMENT_IDS.POST },
-    imageSource: HERO_IMAGE_SOURCE.POST,
-    variant: HERO_VARIANT.SPLIT,
-  };
-
   const home: TSanityDocument = {
     _id: STARTER_DOCUMENT_IDS.HOME,
     _type: 'page_home',
     title: 'Home',
     headingBlock: {
       _type: 'headingBlock',
-      heading: `Welcome to ${tenant.name}`,
+      heading: 'Welcome',
+      supportingText:
+        'Your new site is ready — start adding pages, posts, and content whenever you like.',
     },
-    hero: { _type: 'reference', _ref: STARTER_DOCUMENT_IDS.HERO_BLOG },
     seo: {
       _type: 'seo',
       metaTitle: HOME_SEO_META_TITLE,
@@ -175,17 +90,5 @@ export function buildStarterDocuments(
     },
   };
 
-  return [
-    author,
-    topic,
-    post,
-    navHomeLink,
-    navigation,
-    footer,
-    theme,
-    newsletter,
-    site,
-    heroBlog,
-    home,
-  ];
+  return [navigation, footer, theme, newsletter, site, home];
 }
