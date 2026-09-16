@@ -31,7 +31,6 @@ import type {
   TRawTaxonomyEntry,
   TRawTaxonomyListModule,
 } from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
-import type { TRawCtaAction } from '@blog/service/shared/transformers/to-cta-action';
 import type { TRawCtaButton } from '@blog/service/shared/transformers/to-cta-button';
 import {
   makeRawHeadingBlock,
@@ -193,25 +192,6 @@ export function makeRawCtaModule(
     ctaButtons: null,
     footnote: null,
     layout: null,
-    ...overrides,
-  };
-}
-
-export function makeRawCtaAction(
-  overrides: Partial<TRawCtaAction> = {},
-): TRawCtaAction {
-  return {
-    variant: CTA_ACTION_VARIANT.PRIMARY,
-    appearance: CTA_ACTION_APPEARANCE.CONTAINED,
-    link: {
-      label: 'Subscribe',
-      linkType: LINK_TYPE.EXTERNAL,
-      url: '/newsletter',
-      internalReference: null,
-      openInNewTab: null,
-      platform: null,
-      accessibleLabel: null,
-    },
     ...overrides,
   };
 }
