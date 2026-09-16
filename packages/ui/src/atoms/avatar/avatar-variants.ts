@@ -14,6 +14,8 @@ export const avatarVariants = tv({
       [SIZE.SM]: 'h-8 w-8 text-xs',
       [SIZE.MD]: 'h-10 w-10 text-sm',
       [SIZE.LG]: 'h-14 w-14 text-base',
+      [SIZE.XL]: 'h-24 w-24 text-lg',
+      [SIZE.XXL]: 'h-32 w-32 text-xl',
     },
   },
   defaultVariants: {

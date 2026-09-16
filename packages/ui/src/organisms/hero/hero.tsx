@@ -24,13 +24,23 @@ import {
   type ReactElement,
 } from 'react';
 
+import {
+  HeroAvatar,
+  type THeroAvatarProps,
+} from './components/avatar/hero-avatar';
 import { HeroCta } from './components/cta/hero-cta';
 import { HeroMedia, type THeroMediaProps } from './components/media/hero-media';
+import {
+  HeroSocial,
+  type THeroSocialProps,
+} from './components/social/hero-social';
 import { heroVariants } from './hero-variants';
 
 const HeroParts = {
+  Avatar: HeroAvatar,
   Media: HeroMedia,
   Cta: HeroCta,
+  Social: HeroSocial,
 } satisfies Record<string, ElementType>;
 
 export type THeroProps = IWithClassName &
@@ -54,9 +64,10 @@ export type THeroProps = IWithClassName &
 
 /**
  * Hero — the page-top hero band shared by every hero kind: renders `title` as
- * an `<h1>` with optional `eyebrow`/`excerpt`, plus `Hero.Cta` and `Hero.Media`
- * slots. DOM order is always copy before media — `contentPosition` and
- * `mediaOrder` only move things visually, via CSS.
+ * an `<h1>` with optional `eyebrow`/`excerpt`, plus `Hero.Avatar`, `Hero.Cta`,
+ * `Hero.Media`, and `Hero.Social` slots. DOM order is always copy before
+ * media — `contentPosition` and `mediaOrder` only move things visually, via
+ * CSS.
  */
 const HeroRoot = ({
   title,
@@ -100,6 +111,10 @@ const HeroRoot = ({
     <div className={s.root({ class: className })} data-testid={dataTestId}>
       <div className={s.grid()}>
         <div className={s.copy()} data-testid="hero-copy">
+          {slots.Avatar &&
+            cloneElement(slots.Avatar as ReactElement<THeroAvatarProps>, {
+              contentAlignment: resolvedAlignment,
+            })}
           {eyebrow && <Eyebrow className={s.eyebrow()}>{eyebrow}</Eyebrow>}
           <div className={s.title()}>
             <Heading
@@ -117,6 +132,10 @@ const HeroRoot = ({
             </Text>
           )}
           {slots.Cta}
+          {slots.Social &&
+            cloneElement(slots.Social as ReactElement<THeroSocialProps>, {
+              contentAlignment: resolvedAlignment,
+            })}
         </div>
         {slots.Media && (
           <div className={s.media()} data-testid="hero-media">

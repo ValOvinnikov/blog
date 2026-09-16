@@ -4,6 +4,7 @@ import {
   HERO_VARIANT,
   MEDIA_ORDER,
 } from '@blog/config';
+import { Avatar } from '@blog/ui/atoms/avatar';
 import { AZURE_SCRIM, NEUTRAL_SCRIM } from '@blog/ui/lib/styling';
 import {
   customRender,
@@ -472,4 +473,233 @@ describe(`<${Hero.name}/>`, () => {
 
     expect(withToneHtml).toBe(withoutTone.innerHTML);
   });
+
+  it('renders Hero.Avatar before the eyebrow in the DOM', () => {
+    renderElement(
+      <Hero
+        title="Building a Design System"
+        titleId="hero-title"
+        eyebrow="Senior frontend engineer"
+      >
+        <Hero.Avatar>
+          <img src="/img/jane.jpg" alt="Portrait of Jane Doe" />
+        </Hero.Avatar>
+      </Hero>,
+    );
+
+    const avatar = screen.getByAltText('Portrait of Jane Doe');
+    const eyebrowText = screen.getByText('Senior frontend engineer');
+
+    expect(
+      avatar.compareDocumentPosition(eyebrowText) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it('does not render avatar content when Hero.Avatar is omitted', () => {
+    setup();
+    expect(
+      screen.queryByAltText('Portrait of Jane Doe'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders arbitrary children inside Hero.Avatar, not just an image', () => {
+    renderElement(
+      <Hero title="Building a Design System" titleId="hero-title">
+        <Hero.Avatar>
+          <Avatar alt="Jane Doe" name="Jane Doe" />
+        </Hero.Avatar>
+      </Hero>,
+    );
+
+    expect(screen.getByText('JD')).toBeVisible();
+  });
+
+  it.each([
+    [CONTENT_ALIGNMENT.LEFT, 'self-start'],
+    [CONTENT_ALIGNMENT.CENTER, 'self-center'],
+    [CONTENT_ALIGNMENT.RIGHT, 'self-end'],
+  ])(
+    'aligns Hero.Avatar to %s under contentAlignment',
+    (alignment, expectedClass) => {
+      renderElement(
+        <Hero
+          title="Building a Design System"
+          titleId="hero-title"
+          contentAlignment={alignment}
+        >
+          <Hero.Avatar>
+            <img src="/img/jane.jpg" alt="Portrait of Jane Doe" />
+          </Hero.Avatar>
+        </Hero>,
+      );
+
+      expect(
+        screen.getByAltText('Portrait of Jane Doe').parentElement,
+      ).toHaveClass(expectedClass);
+    },
+  );
+
+  it('centers Hero.Avatar by default on Stacked, where contentAlignment defaults to CENTER', () => {
+    renderElement(
+      <Hero
+        title="Building a Design System"
+        titleId="hero-title"
+        variant={HERO_VARIANT.STACKED}
+      >
+        <Hero.Avatar>
+          <img src="/img/jane.jpg" alt="Portrait of Jane Doe" />
+        </Hero.Avatar>
+      </Hero>,
+    );
+
+    expect(
+      screen.getByAltText('Portrait of Jane Doe').parentElement,
+    ).toHaveClass('self-center');
+  });
+
+  it('renders Hero.Social after Hero.Cta in the DOM', () => {
+    renderElement(
+      <Hero title="Building a Design System" titleId="hero-title">
+        <Hero.Cta>
+          <a href="/posts/design-system">Read more</a>
+        </Hero.Cta>
+        <Hero.Social>
+          <ul aria-label="Find Jane elsewhere">
+            <li>
+              <a href="https://github.com/janedoe">GitHub</a>
+            </li>
+          </ul>
+        </Hero.Social>
+      </Hero>,
+    );
+
+    const cta = screen.getByRole('link', { name: 'Read more' });
+    const social = screen.getByRole('link', { name: 'GitHub' });
+
+    expect(
+      cta.compareDocumentPosition(social) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it('renders arbitrary children inside Hero.Social, not just a list', () => {
+    renderElement(
+      <Hero title="Building a Design System" titleId="hero-title">
+        <Hero.Social>
+          <a href="https://github.com/janedoe">GitHub</a>
+        </Hero.Social>
+      </Hero>,
+    );
+
+    expect(screen.getByRole('link', { name: 'GitHub' })).toBeVisible();
+  });
+
+  it('does not render social content when Hero.Social is omitted', () => {
+    setup();
+    expect(screen.queryByRole('list')).not.toBeInTheDocument();
+  });
+
+  it.each([
+    [CONTENT_ALIGNMENT.LEFT, 'justify-start'],
+    [CONTENT_ALIGNMENT.CENTER, 'justify-center'],
+    [CONTENT_ALIGNMENT.RIGHT, 'justify-end'],
+  ])(
+    'justifies Hero.Social to %s under contentAlignment',
+    (alignment, expectedClass) => {
+      renderElement(
+        <Hero
+          title="Building a Design System"
+          titleId="hero-title"
+          contentAlignment={alignment}
+        >
+          <Hero.Social dataTestId="hero-social">
+            <ul aria-label="Find Jane elsewhere">
+              <li>
+                <a href="https://github.com/janedoe">GitHub</a>
+              </li>
+            </ul>
+          </Hero.Social>
+        </Hero>,
+      );
+
+      expect(screen.getByTestId('hero-social')).toHaveClass(expectedClass);
+    },
+  );
+
+  it('defaults Hero.Media to the 16:9 video ratio when omitted', () => {
+    renderElement(
+      <Hero title="Building a Design System" titleId="hero-title">
+        <Hero.Media>
+          <img src="/img/hero.jpg" alt="Hero cover photo" />
+        </Hero.Media>
+      </Hero>,
+    );
+
+    const frame = screen.getByAltText('Hero cover photo').parentElement;
+    expect(frame).toHaveClass('aspect-video');
+    expect(frame).toHaveClass('lg:aspect-[4/3]');
+  });
+
+  it('passes a square ratio through Hero.Media to MediaFrame', () => {
+    renderElement(
+      <Hero
+        title="Building a Design System"
+        titleId="hero-title"
+        variant={HERO_VARIANT.SPLIT}
+      >
+        <Hero.Media ratio="square">
+          <img src="/img/jane.jpg" alt="Portrait of Jane Doe" />
+        </Hero.Media>
+      </Hero>,
+    );
+
+    const frame = screen.getByAltText('Portrait of Jane Doe').parentElement;
+    expect(frame).toHaveClass('aspect-square');
+    expect(frame).not.toHaveClass('aspect-video');
+    expect(frame).not.toHaveClass('lg:aspect-[4/3]');
+  });
+
+  it.each(Object.values(BRAND_VARIANT))(
+    'renders a Stacked hero portrait above the eyebrow and a labelled link list after the actions, on %s tone',
+    (tone) => {
+      const { unmount } = renderElement(
+        <Hero
+          title="Building a Design System"
+          titleId="hero-title"
+          eyebrow="Senior frontend engineer"
+          variant={HERO_VARIANT.STACKED}
+          tone={tone}
+        >
+          <Hero.Avatar>
+            <img src="/img/jane.jpg" alt="Portrait of Jane Doe" />
+          </Hero.Avatar>
+          <Hero.Cta>
+            <a href="/posts/design-system">Read more</a>
+          </Hero.Cta>
+          <Hero.Social>
+            <ul aria-label="Find Jane elsewhere">
+              <li>
+                <a href="https://github.com/janedoe">GitHub</a>
+              </li>
+            </ul>
+          </Hero.Social>
+        </Hero>,
+      );
+
+      const avatar = screen.getByAltText('Portrait of Jane Doe');
+      const eyebrowText = screen.getByText('Senior frontend engineer');
+      const cta = screen.getByRole('link', { name: 'Read more' });
+      const social = screen.getByRole('list', { name: 'Find Jane elsewhere' });
+
+      expect(
+        avatar.compareDocumentPosition(eyebrowText) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+      expect(
+        cta.compareDocumentPosition(social) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+
+      unmount();
+    },
+  );
 });
