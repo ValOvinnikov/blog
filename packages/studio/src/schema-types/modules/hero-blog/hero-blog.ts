@@ -7,8 +7,10 @@ import {
   type THeroImageSource,
   type TPostSource,
   type THeroVariant,
+  FULL_BRAND_VARIANT_LIST,
 } from '@blog/config/constants';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
+import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { heroFields } from '@blog/studio/schema-types/fields/hero-fields/hero-fields';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
@@ -121,6 +123,7 @@ export const heroBlogSchema = defineType({
   ],
   fields: [
     titleField(),
+    brandVariantField({ list: FULL_BRAND_VARIANT_LIST }),
     defineField({
       name: 'postSource',
       title: 'Post Source',
@@ -128,13 +131,13 @@ export const heroBlogSchema = defineType({
       description:
         'Which post this hero renders: a specific pinned post, or the newest post marked Featured.',
       options: {
-        layout: 'radio',
+        layout: 'dropdown',
         list: Object.values(POST_SOURCE).map((value) => ({
           title: toTitleCase(value),
           value,
         })),
       },
-      initialValue: POST_SOURCE.PINNED,
+      initialValue: POST_SOURCE.NEWEST_FEATURED,
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -156,19 +159,12 @@ export const heroBlogSchema = defineType({
         }),
     }),
     defineField({
-      name: 'eyebrow',
-      title: 'Eyebrow',
-      type: 'string',
-      description:
-        "Optional kicker label. Empty renders the resolved post's topic title.",
-    }),
-    defineField({
       name: 'imageSource',
       title: 'Image Source',
       type: 'string',
       description: "Where this hero's image comes from.",
       options: {
-        layout: 'radio',
+        layout: 'dropdown',
         list: Object.values(HERO_IMAGE_SOURCE).map((value) => ({
           title: toTitleCase(value),
           value,
@@ -194,6 +190,14 @@ export const heroBlogSchema = defineType({
             : true;
         }),
     }),
+    defineField({
+      name: 'eyebrow',
+      title: 'Eyebrow',
+      type: 'string',
+      description:
+        "Overline shown above the title. Falls back to the post's topic if empty",
+    }),
+
     defineField({
       name: 'primaryActionLabel',
       title: 'Primary Action Label',

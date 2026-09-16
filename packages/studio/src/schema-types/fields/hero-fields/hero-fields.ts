@@ -1,13 +1,11 @@
 import {
   CONTENT_ALIGNMENT,
-  FULL_BRAND_VARIANT_LIST,
   HERO_VARIANT,
   MEDIA_ORDER,
   type TCtaActionVariant,
   type THeroVariant,
 } from '@blog/config/constants';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
-import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
@@ -78,7 +76,7 @@ export const heroFields = (options: THeroFieldsOptions = {}) => {
       description:
         'Which shape the hero takes: Split shows the image beside the heading and copy, Stacked shows it below the copy, and Banner uses it as a full-bleed background behind the copy.',
       options: {
-        layout: 'radio',
+        layout: 'dropdown',
         list: variantList.map((value) => ({
           title: toTitleCase(value),
           value,
@@ -89,7 +87,6 @@ export const heroFields = (options: THeroFieldsOptions = {}) => {
         : variantList[0],
       validation: (rule) => rule.required(),
     }),
-    brandVariantField({ list: FULL_BRAND_VARIANT_LIST }),
     ...imageFields,
     ...alignmentFields([
       {
