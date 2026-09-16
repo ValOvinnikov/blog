@@ -104,9 +104,7 @@ export const PostArticle = async ({ slug, tenant }: TPostArticleProps) => {
           author: {
             name: author.name,
             imageUrl: authorImageUrl,
-            href: author.profilePageSlug
-              ? routes.landingPage(author.profilePageSlug)
-              : undefined,
+            href: author.profilePageHref,
           },
           publishedAt,
           formattedDate,

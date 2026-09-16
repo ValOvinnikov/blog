@@ -6,7 +6,7 @@ export const makePostCardAuthor = (
   return {
     id: 'author-1',
     name: 'Jane Doe',
-    profilePageSlug: 'jane-doe',
+    profilePageHref: '/jane-doe',
     image: undefined,
     ...overrides,
   };
