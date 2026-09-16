@@ -154,7 +154,19 @@ export default async function LocaleLayout({ children, params }: TProps) {
 
   const { messages, rich } = await resolveTenantMessages(baseMessages, tenant);
   const { brand } = settingsResult.data;
+
+  if (!navResult.ok) {
+    logger.error('navigation.layout_fetch_failed', {
+      error: navResult.error,
+    });
+  }
   const navItems = navResult.ok ? navResult.data.items : [];
+
+  if (!footerResult.ok) {
+    logger.error('footer.layout_fetch_failed', {
+      error: footerResult.error,
+    });
+  }
   const social = footerResult.ok ? footerResult.data.social : [];
   const currentYear = new Date().getFullYear();
   const s = localeLayoutVariants();
