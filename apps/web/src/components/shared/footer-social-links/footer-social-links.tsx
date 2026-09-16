@@ -10,11 +10,6 @@ export type TFooterSocialLinksProps = {
   social: TFooter['social'];
 };
 
-/**
- * FooterSocialLinks — renders the footer's social platform links, picking
- * each one's icon from its `platform` and deriving its accessible name from
- * that same platform rather than any authored label.
- */
 export const FooterSocialLinks = async ({
   social,
 }: TFooterSocialLinksProps) => {

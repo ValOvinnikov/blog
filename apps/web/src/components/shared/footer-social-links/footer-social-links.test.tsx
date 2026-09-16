@@ -35,8 +35,6 @@ describe(`<${FooterSocialLinks.name}/>`, () => {
       social: [{ platform: SOCIAL_PLATFORMS.LINKEDIN, link: linkedInLink }],
     });
 
-    // `toTitleCase('LINKEDIN')` would produce "Linkedin" — this asserts the
-    // corrected `SOCIAL_PLATFORM_LABEL` casing made it into the announced name.
     const link = screen.getByRole('link', { name: 'LinkedIn profile' });
 
     expect(link).toHaveAttribute('href', 'https://www.linkedin.com/in/example');
