@@ -75,6 +75,7 @@ const REVALIDATE_TAGS = {
   module_hero: ['modules:hero'],
   module_heroBlog: ['modules:heroBlog'],
   module_heroStatement: ['modules:heroStatement'],
+  module_heroProfile: ['modules:heroProfile'],
   module_postList: ['modules:postList'],
   module_taxonomyList: ['modules:taxonomyList'],
   module_postLatest: ['modules:postLatest'],

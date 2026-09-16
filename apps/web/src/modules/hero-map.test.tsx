@@ -15,11 +15,13 @@ const {
   getHeroMock,
   getHeroBlogMock,
   getHeroStatementMock,
+  getHeroProfileMock,
   getTenantSanityContextMock,
 } = vi.hoisted(() => ({
   getHeroMock: vi.fn(),
   getHeroBlogMock: vi.fn(),
   getHeroStatementMock: vi.fn(),
+  getHeroProfileMock: vi.fn(),
   getTenantSanityContextMock: vi.fn(),
 }));
 
@@ -29,6 +31,7 @@ vi.mock('@blog/service', () => ({
       hero: { v1: { getHero: getHeroMock } },
       heroBlog: { v1: { getHeroBlog: getHeroBlogMock } },
       heroStatement: { v1: { getHeroStatement: getHeroStatementMock } },
+      heroProfile: { v1: { getHeroProfile: getHeroProfileMock } },
     },
   },
 }));
@@ -49,6 +52,7 @@ describe('HERO_MAP', () => {
     getHeroMock.mockReset();
     getHeroBlogMock.mockReset();
     getHeroStatementMock.mockReset();
+    getHeroProfileMock.mockReset();
     getTenantSanityContextMock.mockReset();
     getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
@@ -126,6 +130,35 @@ describe('HERO_MAP', () => {
         level: 1,
         name: 'Build faster, ship sooner',
       }),
+    ).toBeVisible();
+  });
+
+  it('dispatches module_heroProfile through the real registry to the real HeroProfileModule', async () => {
+    getHeroProfileMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        variant: HERO_VARIANT.STACKED,
+        eyebrow: undefined,
+        headingBlock: makeHeadingBlock({ heading: 'Jane Doe' }),
+        sanityImage: undefined,
+        socialLinks: [],
+        ctaButtons: [],
+        contentPosition: undefined,
+        contentAlignment: undefined,
+        mediaOrder: undefined,
+        layout: undefined,
+      },
+    });
+
+    await setup({ id: 'hero-profile-1', type: 'module_heroProfile' });
+
+    expect(getHeroProfileMock).toHaveBeenCalledWith(
+      'hero-profile-1',
+      DEFAULT_TENANT_SANITY_CONTEXT,
+    );
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Jane Doe' }),
     ).toBeVisible();
   });
 

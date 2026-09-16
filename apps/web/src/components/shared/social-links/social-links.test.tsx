@@ -1,7 +1,7 @@
 import { SOCIAL_PLATFORMS } from '@blog/config';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 
-import { FooterSocialLinks } from './footer-social-links';
+import { SocialLinks } from './social-links';
 
 const linkedInLink = {
   label: 'LinkedIn',
@@ -27,9 +27,9 @@ const mastodonLink = {
   ariaLabel: undefined,
 };
 
-const setup = customRenderAsync(FooterSocialLinks, { social: [] });
+const setup = customRenderAsync(SocialLinks, { social: [] });
 
-describe(`<${FooterSocialLinks.name}/>`, () => {
+describe(`<${SocialLinks.name}/>`, () => {
   it('derives the accessible name for a mapped platform from SOCIAL_PLATFORM_LABEL, not a naive title-case', async () => {
     await setup({
       social: [{ platform: SOCIAL_PLATFORMS.LINKEDIN, link: linkedInLink }],
@@ -70,5 +70,32 @@ describe(`<${FooterSocialLinks.name}/>`, () => {
     await setup({ social: [] });
 
     expect(screen.queryAllByRole('link')).toHaveLength(0);
+  });
+
+  it('renders each link unwrapped by default, so it composes directly into a flat nav', async () => {
+    const { container } = await setup({
+      social: [{ platform: SOCIAL_PLATFORMS.LINKEDIN, link: linkedInLink }],
+    });
+
+    expect(container.querySelectorAll('li')).toHaveLength(0);
+  });
+
+  it('wraps each link in the given itemAs element, for composing into a list', async () => {
+    await setup({
+      social: [
+        { platform: SOCIAL_PLATFORMS.LINKEDIN, link: linkedInLink },
+        { platform: SOCIAL_PLATFORMS.GITHUB, link: githubLink },
+      ],
+      itemAs: 'li',
+    });
+
+    const items = screen.getAllByRole('listitem');
+    expect(items).toHaveLength(2);
+    expect(within(items[0]!).getByRole('link')).toHaveAccessibleName(
+      'LinkedIn profile',
+    );
+    expect(within(items[1]!).getByRole('link')).toHaveAccessibleName(
+      'GitHub profile',
+    );
   });
 });
