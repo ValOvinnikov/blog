@@ -53,8 +53,7 @@ const components: PortableTextComponents = {
 
 /**
  * Renders a constrained Portable Text shape — paragraphs, lists, bold/italic,
- * and inline links only (no headings, images, code, or asides). `linkRef`
- * annotations route through `SmartLink`.
+ * and inline links only (no headings, images, code, or asides).
  */
 export const InlineTextRenderer = ({ value }: IInlineTextRendererProps) => (
   <PortableText value={value} components={components} />

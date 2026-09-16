@@ -34,12 +34,9 @@ vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
   getTenantSanityContext: getTenantSanityContextMock,
 }));
 
-// `BookmarkButtonGate` is itself an async Server Component — real RSC
-// async-component nesting inside another async component isn't renderable
-// through `@testing-library/react`'s client renderer. Stubbed as a plain
-// sync component rendering the `postId` it received, so this suite can
-// assert `PostArticle` composes it correctly; its own capability-gating
-// behavior is covered by `bookmark-button-gate.test.tsx`.
+// BookmarkButtonGate is an async Server Component, which can't render
+// nested inside another async component under @testing-library/react —
+// stubbed here; its own behavior is covered by bookmark-button-gate.test.tsx.
 vi.mock('@web/components/features/post/bookmark-button-gate', () => ({
   BookmarkButtonGate: ({ postId }: { postId: string }) => (
     <div data-testid="bookmark-button-gate">{postId}</div>

@@ -34,10 +34,8 @@ export const richTextBlock = (
 });
 
 /**
- * Multiple sibling block types back to back (heading, paragraphs, marks, a
- * code block) — exercises the layout regression this component fixes:
- * missing vertical spacing between sibling blocks, which renders as one
- * unbroken block of text.
+ * Multiple sibling block types back to back, to exercise the layout
+ * regression this fixes: missing vertical spacing between sibling blocks.
  */
 export const richTextDemo: TPortableTextBody = [
   richTextBlock('normal', [
@@ -100,9 +98,8 @@ export const richTextDemo: TPortableTextBody = [
     _type: 'bodyImage',
     _key: nextKey('image'),
     image: makeSanityImage({ alt: 'A scenic mountain range at sunset' }),
-    // A non-default layout (rather than the more common INLINE) so this
-    // fixture also exercises the floated width/wrap treatment, not just the
-    // full-width default.
+    // FLOAT_LEFT (not the more common INLINE) so this fixture also
+    // exercises the floated width/wrap treatment.
     layout: IMAGE_LAYOUT.FLOAT_LEFT,
   },
   richTextBlock('normal', [

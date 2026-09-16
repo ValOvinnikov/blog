@@ -6,11 +6,9 @@ export const MIN_H2_HEADINGS_FOR_RAIL = 3;
 type TPostHeadingLevel = 2 | 3;
 
 export type TPostHeading = {
-  /** Stable, URL-safe slug — also the rendered heading's DOM `id` (wired by `PortableTextRenderer`). */
   id: string;
   text: string;
   level: TPostHeadingLevel;
-  /** The source block's Portable Text `_key` — lets `PortableTextRenderer` match its own render of this block back to this id without re-deriving the slug. */
   key: string;
 };
 
@@ -35,10 +33,8 @@ const slugify = (text: string): string =>
     .replace(/^-+|-+$/g, '');
 
 /**
- * extractPostHeadings — returns the ordered `h2`/`h3` outline of a post's
- * Portable Text `body`, each with a stable, deduped slug `id`. Returns `[]`
- * unless the body has at least `MIN_H2_HEADINGS_FOR_RAIL` H2s — the same gate
- * `BlogPostPage` uses, so a non-empty result is always render-worthy.
+ * Returns the ordered h2/h3 outline of a post body, gated to the same
+ * threshold `BlogPostPage` uses so a non-empty result is always render-worthy.
  */
 export const extractPostHeadings = (
   body: TPortableTextBody | undefined,
