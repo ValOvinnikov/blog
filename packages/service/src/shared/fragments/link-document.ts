@@ -1,9 +1,6 @@
 import { q } from '@blog/service/sanity/query';
 
-// Both fields are projected unconditionally, not gated behind a
-// `linkType`-keyed `sub.conditional()` — groqd's conditional parser union
-// silently drops the matching branch's own field at parse time, so
-// `toLinkDocument` discriminates on `linkType` at the transform layer instead.
+// Projected unconditionally — groqd's `sub.conditional()` union silently drops the matching branch's own field at parse time.
 /** Projects a `link` document down to the fields `toLinkDocument` needs to resolve it. */
 export const linkDocumentFragment = q
   .fragmentForType<'link'>()

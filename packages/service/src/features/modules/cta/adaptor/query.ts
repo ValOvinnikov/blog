@@ -19,8 +19,6 @@ export const ctaModuleQuery = q
       .field('headingBlock')
       .project(headingBlockFragment)
       .notNull(),
-    // Blocks are spread as-is (`'...': true`); only `markDefs` is
-    // re-projected, to resolve each `linkRef` mark's `link` document.
     content: sub
       .field('content[]')
       .project((blockSub) => ({

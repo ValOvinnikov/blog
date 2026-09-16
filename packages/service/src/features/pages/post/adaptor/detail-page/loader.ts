@@ -13,9 +13,6 @@ export async function getPost(
   slug: string,
   tenant: TTenantSanityContext,
 ): Promise<TMaybeUndefined<TPostDetail>> {
-  // `postPageQuery` derefs `author`/`topic`/`tags[]`, and its body/bio
-  // `linkRef` marks resolve through `link` documents targeting any page
-  // type — every one of those tags rides alongside `page_post`.
   const raw = await runQuery(postPageQuery, {
     parameters: { slug },
     tenant,

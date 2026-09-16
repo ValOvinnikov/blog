@@ -12,8 +12,6 @@ export async function getContent(
   id: string,
   tenant: TTenantSanityContext,
 ): Promise<TContentModule> {
-  // `contentModuleQuery`'s body resolves `linkRef` marks through `link`
-  // documents, which can target any page type — every one rides alongside.
   const raw = await runQuery(contentModuleQuery, {
     parameters: { id },
     tenant,

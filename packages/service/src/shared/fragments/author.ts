@@ -4,11 +4,6 @@ import { portableTextMarkDefFragment } from '@blog/service/shared/fragments/port
 import { sanityImageFragment } from './image';
 import { socialLinkFragment } from './social-link';
 
-// `profilePage` is optional and restricted to `page_landing` in the schema
-// (`to: [{ type: 'page_landing' }]`), so a single deref projection covers it
-// — unlike `link.ts`'s `internalReference`, there's no polymorphic type to
-// switch on. Unset reference -> `null`; the byline renders as plain text.
-
 export const authorCardFragment = q
   .fragmentForType<'blog_author'>()
   .project((sub) => ({

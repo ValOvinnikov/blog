@@ -11,7 +11,6 @@ export type TRawLink = InferFragmentType<typeof linkFragment>;
 
 type TInternalReference = NonNullable<TRawLink['internalReference']>;
 
-// Keyed by the generated document `_type` union so removing a target from the schema fails this object literal at compile time.
 const INTERNAL_HREF_BUILDERS: Record<
   TInternalReference['_type'],
   (slug: string | null) => TMaybeUndefined<string>
@@ -23,7 +22,6 @@ const INTERNAL_HREF_BUILDERS: Record<
 };
 
 function toInternalHref(raw: TInternalReference): TMaybeUndefined<string> {
-  // `_type` reflects the reference union but comes from Sanity at runtime, so an unmatched target returns undefined rather than crashing.
   const build = INTERNAL_HREF_BUILDERS[raw._type];
   return build?.(raw.slug);
 }
