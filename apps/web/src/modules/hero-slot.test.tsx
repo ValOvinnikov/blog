@@ -15,6 +15,10 @@ vi.mock('./hero-map', () => ({
   },
 }));
 
+vi.mock('./module-map', () => ({
+  MODULE_MAP: {},
+}));
+
 vi.mock('@web/utils/logger/logger', () => ({
   logger: {
     error: vi.fn(),
