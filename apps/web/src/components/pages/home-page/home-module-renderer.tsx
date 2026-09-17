@@ -2,6 +2,7 @@ import type {
   THeadingBlock,
   THeroModuleType,
   TMaybeUndefined,
+  TPageHomeModuleTypes,
 } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { PageHeading } from '@web/components/shared/page-heading';
@@ -10,7 +11,7 @@ import { CtaModule } from '@web/modules/cta/cta-module';
 import { HeroModule } from '@web/modules/hero/hero-module';
 import { HeroBlogModule } from '@web/modules/hero-blog/hero-blog-module';
 import { HeroStatementModule } from '@web/modules/hero-statement/hero-statement-module';
-import type { TModuleComponentProps } from '@web/modules/module-map';
+import type { TModuleComponent } from '@web/modules/module-map';
 import { renderHeroModule, renderModules } from '@web/modules/module-renderer';
 import { NewsletterModule } from '@web/modules/newsletter/newsletter-module';
 import { PostFeaturedModule } from '@web/modules/post-featured/post-featured-module';
@@ -18,26 +19,23 @@ import { PostLatestModule } from '@web/modules/post-latest/post-latest-module';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
 import type { ReactNode } from 'react';
 
-const HOME_HERO_MAP = {
+const HOME_HERO_MAP: Record<TPageHomeModuleTypes['hero'], TModuleComponent> = {
   module_hero: HeroModule,
   module_heroBlog: HeroBlogModule,
   module_heroStatement: HeroStatementModule,
-} satisfies Record<
-  string,
-  (props: TModuleComponentProps) => Promise<ReactNode>
->;
+};
 
-const HOME_MODULE_MAP = {
+const HOME_MODULE_MAP: Record<
+  TPageHomeModuleTypes['modules'],
+  TModuleComponent
+> = {
   module_content: ContentModule,
   module_cta: CtaModule,
   module_newsletter: NewsletterModule,
   module_postLatest: PostLatestModule,
   module_taxonomyList: TaxonomyListModule,
   module_postFeatured: PostFeaturedModule,
-} satisfies Record<
-  string,
-  (props: TModuleComponentProps) => Promise<ReactNode>
->;
+};
 
 export interface IHomeModuleRendererProps {
   hero: TMaybeUndefined<TModule<THeroModuleType>>;

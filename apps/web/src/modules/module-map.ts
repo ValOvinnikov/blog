@@ -21,6 +21,10 @@ export type TModuleComponentProps = {
   };
 };
 
+export type TModuleComponent = (
+  props: TModuleComponentProps,
+) => Promise<ReactNode>;
+
 export const MODULE_MAP: Record<
   Exclude<TModuleType, TSlotModuleType>,
   (props: TModuleComponentProps) => Promise<ReactNode>
