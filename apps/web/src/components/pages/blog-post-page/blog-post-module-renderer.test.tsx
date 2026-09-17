@@ -1,3 +1,4 @@
+import type { TPagePostType } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { customRender, screen } from '@web/testing/custom-render';
 
@@ -42,11 +43,8 @@ vi.mock('@web/utils/logger/logger', () => ({
   },
 }));
 
-type TBlogPostModuleType =
-  'module_postRelated' | 'module_newsletter' | 'module_cta';
-
 const setup = customRender(BlogPostModuleRenderer, {
-  modules: [] as TModule<TBlogPostModuleType>[],
+  modules: [] as TModule<TPagePostType>[],
   locale: 'en',
   tenant: 'tenant-1',
 });
@@ -80,7 +78,7 @@ describe(`<${BlogPostModuleRenderer.name}/>`, () => {
     setup({
       modules: [
         { id: 'hero-1', type: 'module_hero' },
-      ] as unknown as TModule<TBlogPostModuleType>[],
+      ] as unknown as TModule<TPagePostType>[],
     });
 
     expect(screen.queryByText('hero-1')).not.toBeInTheDocument();

@@ -122,7 +122,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
     );
   });
 
-  it("passes the post's modules, locale, tenant, and post context to ModuleRenderer", async () => {
+  it("passes the post's modules, locale, tenant, and post context to BlogPostModuleRenderer", async () => {
     getPostPageMock.mockResolvedValue({
       ok: true,
       data: {
