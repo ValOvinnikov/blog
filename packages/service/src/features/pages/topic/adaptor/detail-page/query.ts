@@ -1,4 +1,4 @@
-import type { TPageTopicModuleTypes } from '@blog/config';
+import type { TPageTopicType } from '@blog/config';
 import { q, type TSlugParams } from '@blog/service/sanity/query';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import {
@@ -23,9 +23,7 @@ export const topicPageQuery = q
       .field('hero')
       .deref()
       .project(
-        moduleFragmentRoot<TPageTopicModuleTypes['hero']>().project(
-          MODULE_FIELDS_PROJECTION,
-        ),
+        moduleFragmentRoot<TPageTopicType>().project(MODULE_FIELDS_PROJECTION),
       )
       .nullable(true),
     // Page-builder placement (`postList`/`postLatest`/`cta`/`newsletter`),
@@ -35,9 +33,7 @@ export const topicPageQuery = q
       .field('modules[]')
       .deref()
       .project(
-        moduleFragmentRoot<TPageTopicModuleTypes['modules']>().project(
-          MODULE_FIELDS_PROJECTION,
-        ),
+        moduleFragmentRoot<TPageTopicType>().project(MODULE_FIELDS_PROJECTION),
       )
       .nullable(true),
     seo: sub.field('seo').project(seoFragment).notNull(),

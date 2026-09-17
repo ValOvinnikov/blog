@@ -1,7 +1,7 @@
 import type {
   THeadingBlock,
   TMaybeUndefined,
-  TPageTagModuleTypes,
+  TPageTagType,
 } from '@blog/config';
 import type { TSeoResolved } from '@blog/service/shared/transformers/resolve-seo';
 import type { TModule } from '@blog/service/shared/transformers/to-module';
@@ -19,7 +19,7 @@ export type TTagDetailPageTag = {
 export type TTagDetailPage = {
   tag: TTagDetailPageTag;
   headingBlock: THeadingBlock;
-  hero: TMaybeUndefined<TModule<TPageTagModuleTypes['hero']>>;
-  modules: TModule<TPageTagModuleTypes['modules']>[];
+  hero: TMaybeUndefined<TModule<TPageTagType>>;
+  modules: TModule<TPageTagType>[];
   seo: TSeoResolved;
 };

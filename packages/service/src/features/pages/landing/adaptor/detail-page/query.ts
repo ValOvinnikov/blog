@@ -1,4 +1,4 @@
-import type { TPageLandingModuleTypes } from '@blog/config';
+import type { TPageLandingType } from '@blog/config';
 import { q, type TSlugParams } from '@blog/service/sanity/query';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import {
@@ -22,7 +22,7 @@ export const landingPageQuery = q
       .field('hero')
       .deref()
       .project(
-        moduleFragmentRoot<TPageLandingModuleTypes['hero']>().project(
+        moduleFragmentRoot<TPageLandingType>().project(
           MODULE_FIELDS_PROJECTION,
         ),
       )
@@ -31,7 +31,7 @@ export const landingPageQuery = q
       .field('modules[]')
       .deref()
       .project(
-        moduleFragmentRoot<TPageLandingModuleTypes['modules']>().project(
+        moduleFragmentRoot<TPageLandingType>().project(
           MODULE_FIELDS_PROJECTION,
         ),
       )

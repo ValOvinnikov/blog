@@ -1,4 +1,4 @@
-import type { TPagePostModuleTypes } from '@blog/config';
+import type { TPagePostType } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import {
@@ -73,9 +73,7 @@ export const postDetailFragment = q
       .field('modules[]')
       .deref()
       .project(
-        moduleFragmentRoot<TPagePostModuleTypes['modules']>().project(
-          MODULE_FIELDS_PROJECTION,
-        ),
+        moduleFragmentRoot<TPagePostType>().project(MODULE_FIELDS_PROJECTION),
       )
       .nullable(true),
     wordCount: sub.raw(WORD_COUNT_EXPRESSION, wordCountParser),
