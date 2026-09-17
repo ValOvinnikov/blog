@@ -32,9 +32,9 @@ export class InvalidHeroModuleTypeError extends Error {
   }
 }
 
-export function toHeroSlot<T extends THeroModuleType = THeroModuleType>(
+export function toHeroSlot<T extends TModuleType = TModuleType>(
   raw: TRawModule<T> | null | undefined,
-): TMaybeUndefined<TModule<T>> {
+): TMaybeUndefined<TModule<T & THeroModuleType>> {
   if (!raw) return undefined;
 
   if (!isHeroModuleType(raw._type)) {
