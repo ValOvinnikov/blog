@@ -23,9 +23,6 @@ export const topicPageQuery = q
       .project(moduleFragment)
       .as<TRawModule<TPageTopicType>>()
       .nullable(),
-    // Page-builder placement (`postList`/`postLatest`/`cta`/`newsletter`),
-    // mirroring `page_postIndex`'s own thin `modules[]` ref projection —
-    // resolved to a real component by `ModuleRenderer` (`apps/web`).
     modules: sub
       .field('modules[]')
       .deref()
