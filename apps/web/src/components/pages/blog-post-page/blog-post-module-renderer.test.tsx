@@ -50,13 +50,6 @@ const setup = customRender(BlogPostModuleRenderer, {
 });
 
 describe(`<${BlogPostModuleRenderer.name}/>`, () => {
-  beforeEach(() => {
-    ctaModuleMock.mockClear();
-    newsletterModuleMock.mockClear();
-    postRelatedModuleMock.mockClear();
-    loggerWarnMock.mockClear();
-  });
-
   it('renders every allowed module keyed by its id, in the given order', () => {
     setup({
       modules: [
