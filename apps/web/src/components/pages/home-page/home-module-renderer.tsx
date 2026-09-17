@@ -2,7 +2,7 @@ import type {
   THeadingBlock,
   THeroModuleType,
   TMaybeUndefined,
-  TPageHomeModuleTypes,
+  TPageHomeType,
 } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { PageHeading } from '@web/components/shared/page-heading';
@@ -19,16 +19,10 @@ import { PostLatestModule } from '@web/modules/post-latest/post-latest-module';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
 import type { ReactNode } from 'react';
 
-const HOME_HERO_MAP: Record<TPageHomeModuleTypes['hero'], TModuleComponent> = {
+const HOME_MAP: Record<TPageHomeType, TModuleComponent> = {
   module_hero: HeroModule,
   module_heroBlog: HeroBlogModule,
   module_heroStatement: HeroStatementModule,
-};
-
-const HOME_MODULE_MAP: Record<
-  TPageHomeModuleTypes['modules'],
-  TModuleComponent
-> = {
   module_content: ContentModule,
   module_cta: CtaModule,
   module_newsletter: NewsletterModule,
@@ -57,13 +51,13 @@ export const HomeModuleRenderer = async ({
   tenant,
 }: IHomeModuleRendererProps): Promise<ReactNode> => {
   const heroNode = hero
-    ? await renderHeroModule({ hero, map: HOME_HERO_MAP, locale, tenant })
+    ? await renderHeroModule({ hero, map: HOME_MAP, locale, tenant })
     : null;
 
   return (
     <>
       {heroNode ?? <PageHeading headingBlock={headingBlock} />}
-      {renderModules({ modules, map: HOME_MODULE_MAP, locale, tenant })}
+      {renderModules({ modules, map: HOME_MAP, locale, tenant })}
     </>
   );
 };
