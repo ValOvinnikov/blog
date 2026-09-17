@@ -4,27 +4,24 @@ import { notFound } from 'next/navigation';
 
 import { LandingPage } from './landing-page';
 
-const { getLandingPageMock, moduleRendererMock, pageIntroMock } = vi.hoisted(
-  () => ({
-    getLandingPageMock: vi.fn(),
-    pageIntroMock: vi.fn(
-      ({
-        hero,
-        headingBlock,
-      }: {
-        hero?: { id: string };
-        headingBlock: { heading: string };
-      }) => (
-        <h1 data-testid="page-intro">
-          {hero ? hero.id : headingBlock.heading}
-        </h1>
-      ),
+const { getLandingPageMock, landingModuleRendererMock } = vi.hoisted(() => ({
+  getLandingPageMock: vi.fn(),
+  landingModuleRendererMock: vi.fn(
+    ({
+      hero,
+      headingBlock,
+      modules,
+    }: {
+      hero?: { id: string };
+      headingBlock: { heading: string };
+      modules: { id: string }[];
+    }) => (
+      <div data-testid="landing-module-renderer">
+        {hero ? hero.id : headingBlock.heading} — {modules.length} modules
+      </div>
     ),
-    moduleRendererMock: vi.fn(({ modules }: { modules: { id: string }[] }) => (
-      <div data-testid="module-renderer">{modules.length} modules</div>
-    )),
-  }),
-);
+  ),
+}));
 
 vi.mock('@web/server/landing/get-landing-page', () => ({
   getLandingPage: getLandingPageMock,
@@ -38,12 +35,8 @@ vi.mock('@web/components/features/landing/landing-breadcrumbs', () => ({
   ),
 }));
 
-vi.mock('@web/components/shared/page-intro', () => ({
-  PageIntro: pageIntroMock,
-}));
-
-vi.mock('@web/modules/module-renderer', () => ({
-  ModuleRenderer: moduleRendererMock,
+vi.mock('./landing-module-renderer', () => ({
+  LandingModuleRenderer: landingModuleRendererMock,
 }));
 
 const setup = customRenderAsync(LandingPage, {
@@ -55,8 +48,7 @@ const setup = customRenderAsync(LandingPage, {
 describe(`<${LandingPage.name}/>`, () => {
   beforeEach(() => {
     getLandingPageMock.mockReset();
-    moduleRendererMock.mockClear();
-    pageIntroMock.mockClear();
+    landingModuleRendererMock.mockClear();
   });
 
   it('calls notFound() and logs when the fetch fails', async () => {
@@ -86,7 +78,7 @@ describe(`<${LandingPage.name}/>`, () => {
     errorSpy.mockRestore();
   });
 
-  it('renders the parts in order: breadcrumbs, then the title heading, then module renderer', async () => {
+  it('renders the parts in order: breadcrumbs, then the module renderer', async () => {
     getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
 
     const { container } = await setup();
@@ -95,11 +87,7 @@ describe(`<${LandingPage.name}/>`, () => {
       container.querySelectorAll<HTMLElement>('[data-testid]'),
     ).map((el) => el.getAttribute('data-testid'));
 
-    expect(order).toEqual([
-      'landing-breadcrumbs',
-      'page-intro',
-      'module-renderer',
-    ]);
+    expect(order).toEqual(['landing-breadcrumbs', 'landing-module-renderer']);
   });
 
   it('renders through PageShell: breadcrumbs outside the main landmark, module renderer inside it', async () => {
@@ -108,7 +96,9 @@ describe(`<${LandingPage.name}/>`, () => {
     await setup();
 
     const main = screen.getByRole('main');
-    expect(main).toContainElement(screen.getByTestId('module-renderer'));
+    expect(main).toContainElement(
+      screen.getByTestId('landing-module-renderer'),
+    );
     expect(
       screen.getByTestId('landing-breadcrumbs').closest('main'),
     ).toBeNull();
@@ -124,98 +114,45 @@ describe(`<${LandingPage.name}/>`, () => {
     );
   });
 
-  it('dispatches PageIntro with the page title', async () => {
-    getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
+  it('dispatches LandingModuleRenderer with the fetched hero, heading, and modules', async () => {
+    getLandingPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...mockLandingPage,
+        hero: { id: 'hero-1', type: 'module_hero' },
+        modules: [{ id: 'module-1', type: 'module_content' }],
+      },
+    });
 
     await setup();
 
-    expect(pageIntroMock).toHaveBeenCalledWith(
-      expect.objectContaining({
+    expect(landingModuleRendererMock).toHaveBeenCalledWith(
+      {
+        hero: { id: 'hero-1', type: 'module_hero' },
         headingBlock: mockLandingPage.headingBlock,
+        modules: [{ id: 'module-1', type: 'module_content' }],
         locale: 'EN',
         tenant: 'tenant-1',
-      }),
+      },
       undefined,
     );
-    expect(screen.getByTestId('page-intro')).toHaveTextContent('About Us');
+    expect(screen.getByTestId('landing-module-renderer')).toHaveTextContent(
+      'hero-1 — 1 modules',
+    );
   });
 
-  it('passes an empty modules array to ModuleRenderer when the editor has not added any', async () => {
+  it('dispatches LandingModuleRenderer with no hero when the page has none', async () => {
     getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
 
     await setup();
 
-    expect(moduleRendererMock).toHaveBeenCalledWith(
-      {
-        modules: [],
-        locale: 'EN',
-        tenant: 'tenant-1',
-      },
+    expect(landingModuleRendererMock).toHaveBeenCalledWith(
+      expect.objectContaining({ hero: undefined }),
       undefined,
     );
-  });
-
-  it('passes the fetched modules and locale through to ModuleRenderer when an editor has added some', async () => {
-    getLandingPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        ...mockLandingPage,
-        modules: [{ id: 'module-1', type: 'module_content' }],
-      },
-    });
-
-    await setup();
-
-    expect(moduleRendererMock).toHaveBeenCalledWith(
-      {
-        modules: [{ id: 'module-1', type: 'module_content' }],
-        locale: 'EN',
-        tenant: 'tenant-1',
-      },
-      undefined,
+    expect(screen.getByTestId('landing-module-renderer')).toHaveTextContent(
+      'About Us — 0 modules',
     );
-    expect(screen.getByTestId('module-renderer')).toHaveTextContent(
-      '1 modules',
-    );
-  });
-
-  it('renders ModuleRenderer as a direct child of main, with no constrained wrapper around it', async () => {
-    getLandingPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        ...mockLandingPage,
-        modules: [{ id: 'module-1', type: 'module_content' }],
-      },
-    });
-
-    await setup();
-
-    const main = screen.getByRole('main');
-    const moduleRenderer = screen.getByTestId('module-renderer');
-
-    expect(moduleRenderer.parentElement).toBe(main);
-  });
-
-  it('dispatches PageIntro with the hero when a hero is set', async () => {
-    getLandingPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        ...mockLandingPage,
-        hero: { id: 'hero-1', type: 'module_hero' },
-      },
-    });
-
-    await setup();
-
-    expect(pageIntroMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        hero: { id: 'hero-1', type: 'module_hero' },
-        locale: 'EN',
-        tenant: 'tenant-1',
-      }),
-      undefined,
-    );
-    expect(screen.getByTestId('page-intro')).toHaveTextContent('hero-1');
   });
 
   it('forwards the resolved slug/tenant to getLandingPage', async () => {
