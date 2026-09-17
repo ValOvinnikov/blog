@@ -1,6 +1,5 @@
 import type {
   THeadingBlock,
-  THeroModuleType,
   TMaybeUndefined,
   TPageHomeType,
 } from '@blog/config';
@@ -32,7 +31,7 @@ const HOME_MAP: Record<TPageHomeType, TModuleComponent> = {
 };
 
 export interface IHomeModuleRendererProps {
-  hero: TMaybeUndefined<TModule<THeroModuleType>>;
+  hero: TMaybeUndefined<TModule<TPageHomeType>>;
   headingBlock: THeadingBlock;
   modules: TModule[];
   locale: string;
