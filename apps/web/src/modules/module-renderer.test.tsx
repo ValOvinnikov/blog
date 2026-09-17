@@ -1,4 +1,8 @@
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import {
+  customRender,
+  customRenderAsync,
+  screen,
+} from '@web/testing/custom-render';
 
 import {
   ModuleRenderer,
@@ -8,10 +12,10 @@ import {
 
 const { ctaModuleMock, postListModuleMock, heroModuleMock, loggerWarnMock } =
   vi.hoisted(() => ({
-    ctaModuleMock: vi.fn(async ({ id }: { id: string; locale: string }) => (
+    ctaModuleMock: vi.fn(({ id }: { id: string; locale: string }) => (
       <div data-testid="stub-cta">{id}</div>
     )),
-    postListModuleMock: vi.fn(async ({ id }: { id: string }) => (
+    postListModuleMock: vi.fn(({ id }: { id: string }) => (
       <div data-testid="stub-post-list">{id}</div>
     )),
     heroModuleMock: vi.fn(async ({ id }: { id: string }) => (
@@ -54,39 +58,48 @@ beforeEach(() => {
 });
 
 describe(renderModules.name, () => {
-  const setup = customRenderAsync(renderModules, {
+  const setup = customRender(renderModules, {
     modules: [{ type: 'module_cta', id: 'cta-doc-id' }],
     map: moduleMap,
     locale: 'en',
     tenant: 'tenant-1',
   });
 
-  it('renders the mapped component for a known module type with its id', async () => {
-    await setup();
+  it('renders the mapped component for a known module type with its id', () => {
+    setup();
 
     expect(screen.getByTestId('stub-cta')).toHaveTextContent('cta-doc-id');
   });
 
-  it('forwards id, locale, and tenant to every module component', async () => {
-    await setup();
-
-    expect(ctaModuleMock).toHaveBeenCalledWith({
-      id: 'cta-doc-id',
-      locale: 'en',
-      tenant: 'tenant-1',
-    });
-  });
-
-  it('forwards a caller-provided context, including page, to every module component', async () => {
-    await setup({ context: { page: 2 } });
+  it('forwards id, locale, and tenant to every module component', () => {
+    setup();
 
     expect(ctaModuleMock).toHaveBeenCalledWith(
-      expect.objectContaining({ context: { page: 2 } }),
+      {
+        id: 'cta-doc-id',
+        locale: 'en',
+        tenant: 'tenant-1',
+      },
+      undefined,
     );
   });
 
-  it('renders a module_postList entry through the given map', async () => {
-    await setup({
+  it('forwards a caller-provided context, including page, to every module component', () => {
+    setup({ context: { page: 2 } });
+
+    expect(ctaModuleMock).toHaveBeenCalledWith(
+      {
+        id: 'cta-doc-id',
+        locale: 'en',
+        tenant: 'tenant-1',
+        context: { page: 2 },
+      },
+      undefined,
+    );
+  });
+
+  it('renders a module_postList entry through the given map', () => {
+    setup({
       modules: [{ type: 'module_postList', id: 'post-list-id' }],
     });
 
@@ -95,8 +108,8 @@ describe(renderModules.name, () => {
     );
   });
 
-  it('renders nothing for an unknown module type and warns once', async () => {
-    const { container } = await setup({
+  it('renders nothing for an unknown module type and warns once', () => {
+    const { container } = setup({
       modules: [{ type: 'module_unknown' as never, id: 'x-id' }],
     });
 
@@ -106,6 +119,21 @@ describe(renderModules.name, () => {
       'module_renderer.unknown_module_type',
       { moduleType: 'module_unknown' },
     );
+  });
+
+  it('renders every module keyed by its id, in the given order', () => {
+    setup({
+      modules: [
+        { type: 'module_cta', id: 'cta-doc-id' },
+        { type: 'module_postList', id: 'post-list-id' },
+      ],
+    });
+
+    const stubs = screen.getAllByTestId(/^stub-/);
+    expect(stubs.map((node) => node.textContent)).toEqual([
+      'cta-doc-id',
+      'post-list-id',
+    ]);
   });
 });
 
@@ -147,23 +175,29 @@ describe(renderHeroModule.name, () => {
 });
 
 describe(`<${ModuleRenderer.name}/>`, () => {
-  const setup = customRenderAsync(ModuleRenderer, {
+  const setup = customRender(ModuleRenderer, {
     modules: [{ type: 'module_cta', id: 'cta-doc-id' }],
     locale: 'en',
     tenant: 'tenant-1',
   });
 
-  it('renders through the global MODULE_MAP', async () => {
-    await setup();
+  it('renders through the global MODULE_MAP', () => {
+    setup();
 
     expect(screen.getByTestId('stub-cta')).toHaveTextContent('cta-doc-id');
   });
 
-  it('forwards a caller-provided context to the global MODULE_MAP', async () => {
-    await setup({ context: { page: 2 } });
+  it('forwards a caller-provided context to the global MODULE_MAP', () => {
+    setup({ context: { page: 2 } });
 
     expect(ctaModuleMock).toHaveBeenCalledWith(
-      expect.objectContaining({ context: { page: 2 } }),
+      {
+        id: 'cta-doc-id',
+        locale: 'en',
+        tenant: 'tenant-1',
+        context: { page: 2 },
+      },
+      undefined,
     );
   });
 });

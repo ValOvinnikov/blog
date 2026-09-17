@@ -1,12 +1,12 @@
 import type { TModule } from '@blog/service';
 import { logger } from '@web/utils/logger/logger';
-import { Fragment, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 import { MODULE_MAP, type TModuleComponentProps } from './module-map';
 
 type TModuleMap = Record<
   string,
-  (props: TModuleComponentProps) => Promise<ReactNode>
+  (props: TModuleComponentProps) => ReactNode | Promise<ReactNode>
 >;
 
 export interface IRenderModulesProps {
@@ -17,39 +17,33 @@ export interface IRenderModulesProps {
   context?: TModuleComponentProps['context'];
 }
 
-export const renderModules = async ({
+export const renderModules = ({
   modules,
   map,
   locale,
   tenant,
   context,
-}: IRenderModulesProps): Promise<ReactNode> => {
-  const rendered = await Promise.all(
-    modules.map(async (module) => {
-      const Component = map[module.type];
+}: IRenderModulesProps): ReactNode =>
+  modules.map((module) => {
+    const Component = map[module.type];
 
-      if (!Component) {
-        logger.warn('module_renderer.unknown_module_type', {
-          moduleType: module.type,
-        });
-        return null;
-      }
+    if (!Component) {
+      logger.warn('module_renderer.unknown_module_type', {
+        moduleType: module.type,
+      });
+      return null;
+    }
 
-      return {
-        key: module.id,
-        node: await Component({ id: module.id, locale, tenant, context }),
-      };
-    }),
-  );
-
-  return (
-    <>
-      {rendered.map((entry) =>
-        entry ? <Fragment key={entry.key}>{entry.node}</Fragment> : null,
-      )}
-    </>
-  );
-};
+    return (
+      <Component
+        key={module.id}
+        id={module.id}
+        locale={locale}
+        tenant={tenant}
+        context={context}
+      />
+    );
+  });
 
 export interface IRenderHeroModuleProps {
   hero: TModule;
@@ -81,6 +75,5 @@ export interface IModuleRendererProps {
   context?: TModuleComponentProps['context'];
 }
 
-export const ModuleRenderer = async (
-  props: IModuleRendererProps,
-): Promise<ReactNode> => renderModules({ ...props, map: MODULE_MAP });
+export const ModuleRenderer = (props: IModuleRendererProps): ReactNode =>
+  renderModules({ ...props, map: MODULE_MAP });
