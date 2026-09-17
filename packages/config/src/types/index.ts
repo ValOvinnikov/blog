@@ -1,5 +1,7 @@
 import type { TLocaleIsoCode } from '@blog/config/constants';
 
+export * from './page-module';
+
 /**
  * A value that may be `undefined` (never `null` — the repo convention).
  * Use for view-model fields that always exist as a property but whose value
