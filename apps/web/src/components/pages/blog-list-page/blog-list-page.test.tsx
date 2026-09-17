@@ -1,34 +1,34 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { notFound } from 'next/navigation';
+import type { ReactNode } from 'react';
 
 import { BlogListPage } from './blog-list-page';
 
-const { getBlogListPageMock, moduleRendererMock, pageIntroMock } = vi.hoisted(
-  () => ({
-    getBlogListPageMock: vi.fn(),
-    pageIntroMock: vi.fn(
-      ({
-        hero,
-        headingBlock,
-      }: {
-        hero?: { id: string };
-        headingBlock: { heading: string };
-      }) => (
-        <h1 data-testid="page-intro">
-          {hero ? hero.id : headingBlock.heading}
-        </h1>
-      ),
+const { getBlogListPageMock, blogListModuleRendererMock } = vi.hoisted(() => ({
+  getBlogListPageMock: vi.fn(),
+  blogListModuleRendererMock: vi.fn(
+    ({
+      hero,
+      headingBlock,
+      modules,
+      context,
+      children,
+    }: {
+      hero?: { id: string };
+      headingBlock: { heading: string };
+      modules: { id: string; type: string }[];
+      context?: { page: number };
+      children?: ReactNode;
+    }) => (
+      <div data-testid="blog-list-module-renderer">
+        {hero ? hero.id : headingBlock.heading} —{' '}
+        {modules.map((module) => module.type).join(',')} — page {context?.page}
+        {children}
+      </div>
     ),
-    moduleRendererMock: vi.fn(
-      ({ modules }: { modules: { id: string; type: string }[] }) => (
-        <div data-testid="module-renderer-stub">
-          {modules.map((module) => module.type).join(',')}
-        </div>
-      ),
-    ),
-  }),
-);
+  ),
+}));
 
 vi.mock('@web/server/blog-list/get-blog-list-page', () => ({
   getBlogListPage: getBlogListPageMock,
@@ -46,12 +46,8 @@ vi.mock('@web/components/features/blog-list/blog-list-topic-chips', () => ({
   ),
 }));
 
-vi.mock('@web/components/shared/page-intro', () => ({
-  PageIntro: pageIntroMock,
-}));
-
-vi.mock('@web/modules/module-renderer', () => ({
-  ModuleRenderer: moduleRendererMock,
+vi.mock('./blog-list-module-renderer', () => ({
+  BlogListModuleRenderer: blogListModuleRendererMock,
 }));
 
 const setup = customRenderAsync(BlogListPage, {
@@ -63,8 +59,7 @@ const setup = customRenderAsync(BlogListPage, {
 describe(`<${BlogListPage.name}/>`, () => {
   beforeEach(() => {
     getBlogListPageMock.mockReset();
-    moduleRendererMock.mockClear();
-    pageIntroMock.mockClear();
+    blogListModuleRendererMock.mockClear();
   });
 
   it('calls notFound() when the fetch fails', async () => {
@@ -93,7 +88,7 @@ describe(`<${BlogListPage.name}/>`, () => {
     errorSpy.mockRestore();
   });
 
-  it('dispatches PageIntro with the fetched page shell', async () => {
+  it('dispatches BlogListModuleRenderer with the fetched page shell', async () => {
     getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -104,7 +99,7 @@ describe(`<${BlogListPage.name}/>`, () => {
 
     await setup();
 
-    expect(pageIntroMock).toHaveBeenCalledWith(
+    expect(blogListModuleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({
         headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         locale: 'en',
@@ -112,11 +107,13 @@ describe(`<${BlogListPage.name}/>`, () => {
       }),
       undefined,
     );
-    expect(screen.getByTestId('page-intro')).toHaveTextContent('Blog');
+    expect(screen.getByTestId('blog-list-module-renderer')).toHaveTextContent(
+      'Blog',
+    );
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('renders the parts in order: breadcrumbs, topic chips, module renderer', async () => {
+  it('renders the parts in order: breadcrumbs, then the module renderer with the topic chips nested inside', async () => {
     getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -136,13 +133,12 @@ describe(`<${BlogListPage.name}/>`, () => {
 
     expect(order).toEqual([
       'blog-list-breadcrumbs',
-      'page-intro',
+      'blog-list-module-renderer',
       'blog-list-topic-chips',
-      'module-renderer-stub',
     ]);
   });
 
-  it('renders through PageShell: breadcrumbs outside main, everything else inside it', async () => {
+  it('renders through PageShell: breadcrumbs outside main, the module renderer inside it', async () => {
     getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -154,14 +150,15 @@ describe(`<${BlogListPage.name}/>`, () => {
     await setup();
 
     const main = screen.getByRole('main');
-    expect(main).toContainElement(screen.getByTestId('blog-list-topic-chips'));
-    expect(main).toContainElement(screen.getByTestId('module-renderer-stub'));
+    expect(main).toContainElement(
+      screen.getByTestId('blog-list-module-renderer'),
+    );
     expect(
       screen.getByTestId('blog-list-breadcrumbs').closest('main'),
     ).toBeNull();
   });
 
-  it('passes the current page as context to ModuleRenderer', async () => {
+  it('passes the current page as context to BlogListModuleRenderer', async () => {
     getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -172,13 +169,13 @@ describe(`<${BlogListPage.name}/>`, () => {
 
     await setup({ page: 2 });
 
-    expect(moduleRendererMock).toHaveBeenCalledWith(
+    expect(blogListModuleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({ context: { page: 2 } }),
       undefined,
     );
   });
 
-  it('passes an empty modules array to ModuleRenderer when the editor has not added any', async () => {
+  it('passes an empty modules array to BlogListModuleRenderer when the editor has not added any', async () => {
     getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -189,13 +186,13 @@ describe(`<${BlogListPage.name}/>`, () => {
 
     await setup();
 
-    expect(moduleRendererMock).toHaveBeenCalledWith(
+    expect(blogListModuleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({ modules: [], locale: 'en' }),
       undefined,
     );
   });
 
-  it('passes the page-builder modules through to ModuleRenderer, including the post list module', async () => {
+  it('passes the page-builder modules through to BlogListModuleRenderer, including the post list module', async () => {
     getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -209,7 +206,7 @@ describe(`<${BlogListPage.name}/>`, () => {
 
     await setup();
 
-    expect(moduleRendererMock).toHaveBeenCalledWith(
+    expect(blogListModuleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({
         modules: [
           { id: 'post-list-1', type: 'module_postList' },
@@ -219,12 +216,12 @@ describe(`<${BlogListPage.name}/>`, () => {
       }),
       undefined,
     );
-    expect(screen.getByTestId('module-renderer-stub')).toHaveTextContent(
+    expect(screen.getByTestId('blog-list-module-renderer')).toHaveTextContent(
       'module_postList,module_newsletter',
     );
   });
 
-  it('dispatches PageIntro with the hero when a hero is set', async () => {
+  it('dispatches BlogListModuleRenderer with the hero when a hero is set', async () => {
     getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -236,7 +233,7 @@ describe(`<${BlogListPage.name}/>`, () => {
 
     await setup();
 
-    expect(pageIntroMock).toHaveBeenCalledWith(
+    expect(blogListModuleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({
         hero: { id: 'hero-1', type: 'module_hero' },
         locale: 'en',
@@ -244,7 +241,9 @@ describe(`<${BlogListPage.name}/>`, () => {
       }),
       undefined,
     );
-    expect(screen.getByTestId('page-intro')).toHaveTextContent('hero-1');
+    expect(screen.getByTestId('blog-list-module-renderer')).toHaveTextContent(
+      'hero-1',
+    );
   });
 
   it('forwards the tenant to getBlogListPage, BlogListBreadcrumbs, and BlogListTopicChips', async () => {
