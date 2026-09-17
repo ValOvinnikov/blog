@@ -1,9 +1,12 @@
-import { SIZE, SOCIAL_PLATFORM_LABEL } from '@blog/config';
+import {
+  SIZE,
+  SOCIAL_PLATFORM_ICON,
+  SOCIAL_PLATFORM_LABEL,
+} from '@blog/config';
 import type { TFooter } from '@blog/service';
 import { Icon } from '@blog/ui/atoms/icon';
 import { NavLink } from '@blog/ui/atoms/nav-link';
 import { SmartLink } from '@web/components/shared/smart-link';
-import { toSocialIconName } from '@web/utils/to-social-icon-name';
 import { getTranslations } from 'next-intl/server';
 
 export type TFooterSocialLinksProps = {
@@ -18,9 +21,7 @@ export const FooterSocialLinks = async ({
   return (
     <>
       {social.map(({ platform, link }) => {
-        const iconName = toSocialIconName(platform);
         const platformLabel = SOCIAL_PLATFORM_LABEL[platform];
-        const hasLabel = !iconName;
 
         return (
           <NavLink
@@ -29,19 +30,15 @@ export const FooterSocialLinks = async ({
             href={link.href}
             target={link.target}
             icon={
-              iconName ? (
-                <Icon
-                  name={iconName}
-                  size={SIZE.SM}
-                  dataTestId={`social-icon-${platform}`}
-                />
-              ) : undefined
+              <Icon
+                name={SOCIAL_PLATFORM_ICON[platform]}
+                size={SIZE.SM}
+                dataTestId={`social-icon-${platform}`}
+              />
             }
-            hasLabel={hasLabel}
+            hasLabel={false}
           >
-            {hasLabel
-              ? platformLabel
-              : t('socialLinkAriaLabel', { platform: platformLabel })}
+            {t('socialLinkAriaLabel', { platform: platformLabel })}
           </NavLink>
         );
       })}

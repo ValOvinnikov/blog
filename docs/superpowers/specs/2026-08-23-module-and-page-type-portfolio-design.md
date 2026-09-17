@@ -957,9 +957,10 @@ That makes the hero's social links the footer's social links, end to end:
   transformer. Nothing hero-specific.
 - **Web:** `FooterSocialLinks` generalises into a shared `SocialLinks`
   component that both the footer and the hero render — the platform icon
-  where `toSocialIconName()` has one, the platform label from
-  `SOCIAL_PLATFORM_LABEL` as a text link where it does not, the icon-only
-  accessible name from the existing `{platform} profile` message. That
+  from `SOCIAL_PLATFORM_ICON`, which is total over `TSocialPlatform`, so
+  there is no label-only fallback branch; the icon-only accessible name
+  comes from `SOCIAL_PLATFORM_LABEL` and the existing
+  `{platform} profile` message. That
   message key moves from `siteFooter.socialLinkAriaLabel` to a neutral
   `socialLinks.linkAriaLabel` in the same change, since it no longer
   belongs to the footer.
