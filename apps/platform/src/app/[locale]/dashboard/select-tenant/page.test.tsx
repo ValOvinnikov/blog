@@ -36,7 +36,6 @@ describe(`<${SelectTenantPage.name}/>`, () => {
     listTenantsByIdsMock.mockReset();
     getAdminByUserIdMock.mockReset();
     getAdminByUserIdMock.mockResolvedValue(undefined);
-    vi.mocked(redirect).mockClear();
   });
 
   it('redirects to sign-in without a session', async () => {

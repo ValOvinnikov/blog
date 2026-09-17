@@ -37,10 +37,6 @@ describe('BlogListNumberedPage', () => {
     expect(revalidate).toBe(CONTENT_ROUTE_REVALIDATE_SECONDS);
   });
 
-  beforeEach(() => {
-    permanentRedirectMock.mockClear();
-  });
-
   it('redirects /blog/page/1 to /blog (canonical page 1 has one URL)', async () => {
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 

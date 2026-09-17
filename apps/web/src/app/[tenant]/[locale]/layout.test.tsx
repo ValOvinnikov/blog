@@ -161,7 +161,6 @@ const setup = customRenderAsync(LocaleLayout, {
 
 describe('LocaleLayout', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
     getSiteSettingsMock.mockResolvedValue({
       ok: true,
       data: { brand, description: 'A blog' },
@@ -467,7 +466,7 @@ describe('LocaleLayout', () => {
     ).toBeVisible();
   });
 
-  it('falls back to label-only rendering for a social link with an unmapped platform', async () => {
+  it('renders an icon-only social link for a platform outside the original 6-key set', async () => {
     getFooterMock.mockResolvedValue({
       ok: true,
       data: {
@@ -488,13 +487,13 @@ describe('LocaleLayout', () => {
 
     await setup();
 
-    const link = screen.getByRole('link', { name: 'Mastodon' });
+    const link = screen.getByRole('link', { name: 'Mastodon profile' });
 
     expect(link).toHaveAttribute('href', 'https://mastodon.social/@example');
-    expect(link).not.toHaveAttribute('title');
+    expect(link).toHaveAttribute('title', 'Mastodon profile');
     expect(
-      within(link).queryByTestId(`social-icon-${SOCIAL_PLATFORMS.MASTODON}`),
-    ).not.toBeInTheDocument();
+      within(link).getByTestId(`social-icon-${SOCIAL_PLATFORMS.MASTODON}`),
+    ).toBeVisible();
   });
 
   it('wires the enabled OAuth provider ids from getEnabledOAuthProviderIds into AuthMenu', async () => {

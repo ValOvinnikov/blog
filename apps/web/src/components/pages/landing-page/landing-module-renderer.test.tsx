@@ -1,7 +1,9 @@
+import type { TPageLandingType } from '@blog/config';
+import type { TModule } from '@blog/service';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
-import { HomeModuleRenderer } from './home-module-renderer';
+import { LandingModuleRenderer } from './landing-module-renderer';
 
 const {
   contentModuleMock,
@@ -78,21 +80,21 @@ vi.mock('@web/utils/logger/logger', () => ({
   },
 }));
 
-const setup = customRenderAsync(HomeModuleRenderer, {
+const setup = customRenderAsync(LandingModuleRenderer, {
   hero: undefined,
-  headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
+  headingBlock: makeHeadingBlock({ heading: 'About Us' }),
   modules: [],
   locale: 'en',
   tenant: 'tenant-1',
 });
 
-describe(`<${HomeModuleRenderer.name}/>`, () => {
+describe(`<${LandingModuleRenderer.name}/>`, () => {
   it('renders the page heading, with exactly one h1, when the page has no hero', async () => {
     await setup();
 
     const headings = screen.getAllByRole('heading', { level: 1 });
     expect(headings).toHaveLength(1);
-    expect(headings[0]).toHaveTextContent('Welcome to the blog');
+    expect(headings[0]).toHaveTextContent('About Us');
   });
 
   it('renders the resolved hero, with exactly one h1, when the hero resolves to content', async () => {
@@ -125,13 +127,15 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
 
     const headings = screen.getAllByRole('heading', { level: 1 });
     expect(headings).toHaveLength(1);
-    expect(headings[0]).toHaveTextContent('Welcome to the blog');
+    expect(headings[0]).toHaveTextContent('About Us');
     expect(screen.queryByTestId('stub-hero')).not.toBeInTheDocument();
   });
 
-  it('renders nothing and warns once for a module absent from the home page allow-list', async () => {
+  it('renders nothing and warns once for a module absent from the landing page allow-list', async () => {
     await setup({
-      modules: [{ id: 'post-list-1', type: 'module_postList' }],
+      modules: [
+        { id: 'post-list-1', type: 'module_postList' },
+      ] as unknown as TModule<TPageLandingType>[],
     });
 
     expect(screen.queryByText('post-list-1')).not.toBeInTheDocument();

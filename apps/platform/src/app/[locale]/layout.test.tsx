@@ -22,7 +22,6 @@ const setup = customRenderAsync(LocaleLayout, {
 
 describe('LocaleLayout', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
     getMessagesMock.mockResolvedValue(realMessages);
   });
 

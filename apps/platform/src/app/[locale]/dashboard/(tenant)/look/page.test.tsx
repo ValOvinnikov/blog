@@ -39,7 +39,6 @@ describe(`<${DashboardLookPage.name}/>`, () => {
     listTenantsByIdsMock.mockReset();
     getAdminByUserIdMock.mockReset();
     getSiteConfigMock.mockReset();
-    vi.mocked(redirect).mockClear();
 
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);

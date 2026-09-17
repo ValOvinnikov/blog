@@ -49,7 +49,6 @@ const setup = customRenderAsync(TopicsPage, {
 describe(`<${TopicsPage.name}/>`, () => {
   beforeEach(() => {
     getTopicsIndexPageMock.mockReset();
-    topicsModuleRendererMock.mockClear();
   });
 
   it('calls notFound() when the fetch fails', async () => {

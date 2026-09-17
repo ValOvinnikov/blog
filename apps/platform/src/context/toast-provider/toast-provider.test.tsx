@@ -75,7 +75,6 @@ const ToastHarness = () => {
 describe(ToastProvider, () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    successAction.mockClear();
     vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
       callback(0);
       return 0;

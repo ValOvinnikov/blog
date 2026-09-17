@@ -31,7 +31,6 @@ describe(revalidateSiteConfig, () => {
 
   beforeEach(() => {
     fetchMock.mockReset();
-    consoleErrorSpy.mockClear();
     vi.stubGlobal('fetch', fetchMock);
     envMock.WEB_APP_URL = undefined;
     envMock.SITE_CONFIG_REVALIDATE_SECRET = undefined;

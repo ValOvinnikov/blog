@@ -1,8 +1,7 @@
-import { ICONS, SIZE } from '@blog/config';
+import { SIZE, SOCIAL_PLATFORM_ICON } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import { PostShare } from '@web/components/shared/post-share';
 import { buildShareLinks } from '@web/utils/build-share-links';
-import { toSocialIconName } from '@web/utils/to-social-icon-name';
 
 export type TPostShareLinksProps = {
   url: string;
@@ -17,12 +16,7 @@ export type TPostShareLinksProps = {
 export const PostShareLinks = ({ url, title }: TPostShareLinksProps) => {
   const shareLinks = buildShareLinks({ url, title }).map((link) => ({
     ...link,
-    icon: (
-      <Icon
-        name={toSocialIconName(link.platform) ?? ICONS.EXTERNAL_LINK}
-        size={SIZE.SM}
-      />
-    ),
+    icon: <Icon name={SOCIAL_PLATFORM_ICON[link.platform]} size={SIZE.SM} />,
   }));
 
   return <PostShare url={url} title={title} links={shareLinks} />;
