@@ -86,7 +86,6 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     cookiesMock.mockReset();
     resolveIsSidebarCollapsedMock.mockReset();
     resolveIsSidebarCollapsedMock.mockResolvedValue(false);
-    vi.mocked(redirect).mockClear();
   });
 
   it('redirects to sign-in without querying memberships when there is no session', async () => {

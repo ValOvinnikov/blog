@@ -52,7 +52,6 @@ describe(`<${DisplayNameControl.name}/>`, () => {
   beforeEach(() => {
     routerRefreshMock.mockReset();
     updateDisplayNameActionMock.mockReset();
-    toastPromiseMock.mockClear();
     toastPromiseMock.mockImplementation((promise: Promise<unknown>) => promise);
   });
 

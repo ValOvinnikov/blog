@@ -63,8 +63,6 @@ const setup = customRenderAsync(BlogListPage, {
 describe(`<${BlogListPage.name}/>`, () => {
   beforeEach(() => {
     getBlogListPageMock.mockReset();
-    moduleRendererMock.mockClear();
-    pageIntroMock.mockClear();
   });
 
   it('calls notFound() when the fetch fails', async () => {

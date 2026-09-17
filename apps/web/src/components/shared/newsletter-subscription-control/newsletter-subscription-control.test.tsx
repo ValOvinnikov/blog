@@ -57,7 +57,6 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
     routerRefreshMock.mockReset();
     unsubscribeActionMock.mockReset();
     resendConfirmationActionMock.mockReset();
-    toastPromiseMock.mockClear();
     toastPromiseMock.mockImplementation((promise: Promise<unknown>) => promise);
   });
 

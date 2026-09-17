@@ -43,7 +43,6 @@ describe(`<${DashboardFeaturesPage.name}/>`, () => {
     getAdminByUserIdMock.mockReset();
     getSettingsFeaturesMock.mockReset();
     getSiteConfigMock.mockReset();
-    vi.mocked(redirect).mockClear();
 
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);

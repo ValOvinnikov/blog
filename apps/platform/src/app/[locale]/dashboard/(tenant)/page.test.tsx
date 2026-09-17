@@ -65,7 +65,6 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
     getDomainVerificationStatusMock.mockReset();
     getDomainVerificationStatusMock.mockResolvedValue('VERIFIED');
     cookiesMock.mockReset();
-    vi.mocked(redirect).mockClear();
   });
 
   it('redirects to sign-in without querying memberships when there is no session', async () => {
