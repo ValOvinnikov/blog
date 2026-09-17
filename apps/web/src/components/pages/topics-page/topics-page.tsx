@@ -25,15 +25,13 @@ export const TopicsPage = async ({ locale, tenant }: TTopicsPageProps) => {
       <PageShell.Breadcrumbs>
         <TopicsIndexBreadcrumbs tenant={tenant} />
       </PageShell.Breadcrumbs>
-      <PageShell.Content>
-        <TopicsModuleRenderer
-          hero={hero}
-          headingBlock={headingBlock}
-          modules={modules}
-          locale={locale}
-          tenant={tenant}
-        />
-      </PageShell.Content>
+      <TopicsModuleRenderer
+        hero={hero}
+        headingBlock={headingBlock}
+        modules={modules}
+        locale={locale}
+        tenant={tenant}
+      />
     </PageShell>
   );
 };
