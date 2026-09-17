@@ -1,9 +1,10 @@
 import { TAXONOMY_KIND } from '@blog/config';
 import { TagBreadcrumbs } from '@web/components/features/tag/tag-breadcrumbs';
 import { PageShell } from '@web/components/page-templates/page-shell';
+import { PageIntro } from '@web/components/shared/page-intro';
+import { ModuleRenderer } from '@web/modules/module-renderer';
 import { getTagPage } from '@web/server/tag/get-tag-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
-import { resolvePageIntroAndContent } from '@web/utils/resolve-page-intro-and-content';
 
 type TTagPageProps = {
   slug: string;
@@ -31,26 +32,32 @@ export const TagPage = async ({
   const { tag, headingBlock, hero, modules } = pageData;
 
   const currentPage = page ?? 1;
-  const { intro, content } = await resolvePageIntroAndContent({
-    hero,
-    headingBlock,
-    hasTrailingSpace: false,
-    modules,
-    context: {
-      page: currentPage,
-      archive: { kind: TAXONOMY_KIND.TAGS, slug, name: tag.title },
-    },
-    locale,
-    tenant,
-  });
 
   return (
     <PageShell>
       <PageShell.Breadcrumbs>
         <TagBreadcrumbs slug={slug} tenant={tenant} />
       </PageShell.Breadcrumbs>
-      <PageShell.Heading>{intro}</PageShell.Heading>
-      <PageShell.Content>{content}</PageShell.Content>
+      <PageShell.Heading>
+        <PageIntro
+          hero={hero}
+          headingBlock={headingBlock}
+          hasTrailingSpace={false}
+          locale={locale}
+          tenant={tenant}
+        />
+      </PageShell.Heading>
+      <PageShell.Content>
+        <ModuleRenderer
+          modules={modules}
+          context={{
+            page: currentPage,
+            archive: { kind: TAXONOMY_KIND.TAGS, slug, name: tag.title },
+          }}
+          locale={locale}
+          tenant={tenant}
+        />
+      </PageShell.Content>
     </PageShell>
   );
 };

@@ -4,19 +4,22 @@ import { notFound } from 'next/navigation';
 
 import { BlogListPage } from './blog-list-page';
 
-const { getBlogListPageMock, moduleRendererMock, heroSlotMock } = vi.hoisted(
+const { getBlogListPageMock, moduleRendererMock, pageIntroMock } = vi.hoisted(
   () => ({
     getBlogListPageMock: vi.fn(),
-    heroSlotMock: vi.fn(({ id }: { id: string }) => (
-      <h1 data-testid="hero-slot">{id}</h1>
-    )),
-    // `ModuleRenderer` is an async Server Component — real RSC
-    // async-component nesting isn't renderable through
-    // `@testing-library/react`'s client renderer (`blog-post-page.test.tsx`
-    // follows the same pattern). Stubbed as a plain sync component so this
-    // suite can assert `BlogListPage` composes it with the right props; its
-    // own dispatch logic — including resolving a `module_postList` entry —
-    // is covered by its own test file (`module-renderer.test.tsx`).
+    pageIntroMock: vi.fn(
+      ({
+        hero,
+        headingBlock,
+      }: {
+        hero?: { id: string };
+        headingBlock: { heading: string };
+      }) => (
+        <h1 data-testid="page-intro">
+          {hero ? hero.id : headingBlock.heading}
+        </h1>
+      ),
+    ),
     moduleRendererMock: vi.fn(
       ({ modules }: { modules: { id: string; type: string }[] }) => (
         <div data-testid="module-renderer-stub">
@@ -43,12 +46,12 @@ vi.mock('@web/components/features/blog-list/blog-list-topic-chips', () => ({
   ),
 }));
 
-vi.mock('@web/modules/module-renderer', () => ({
-  ModuleRenderer: moduleRendererMock,
+vi.mock('@web/components/shared/page-intro', () => ({
+  PageIntro: pageIntroMock,
 }));
 
-vi.mock('@web/modules/hero-slot', () => ({
-  HeroSlot: heroSlotMock,
+vi.mock('@web/modules/module-renderer', () => ({
+  ModuleRenderer: moduleRendererMock,
 }));
 
 const setup = customRenderAsync(BlogListPage, {
@@ -61,7 +64,7 @@ describe(`<${BlogListPage.name}/>`, () => {
   beforeEach(() => {
     getBlogListPageMock.mockReset();
     moduleRendererMock.mockClear();
-    heroSlotMock.mockClear();
+    pageIntroMock.mockClear();
   });
 
   it('calls notFound() when the fetch fails', async () => {
@@ -90,7 +93,7 @@ describe(`<${BlogListPage.name}/>`, () => {
     errorSpy.mockRestore();
   });
 
-  it('renders the h1 from the fetched page shell', async () => {
+  it('dispatches PageIntro with the fetched page shell', async () => {
     getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -101,9 +104,15 @@ describe(`<${BlogListPage.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Blog' }),
-    ).toBeVisible();
+    expect(pageIntroMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
+        locale: 'en',
+        tenant: 'tenant-1',
+      }),
+      undefined,
+    );
+    expect(screen.getByTestId('page-intro')).toHaveTextContent('Blog');
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
@@ -127,6 +136,7 @@ describe(`<${BlogListPage.name}/>`, () => {
 
     expect(order).toEqual([
       'blog-list-breadcrumbs',
+      'page-intro',
       'blog-list-topic-chips',
       'module-renderer-stub',
     ]);
@@ -164,6 +174,7 @@ describe(`<${BlogListPage.name}/>`, () => {
 
     expect(moduleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({ context: { page: 2 } }),
+      undefined,
     );
   });
 
@@ -180,6 +191,7 @@ describe(`<${BlogListPage.name}/>`, () => {
 
     expect(moduleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({ modules: [], locale: 'en' }),
+      undefined,
     );
   });
 
@@ -205,28 +217,14 @@ describe(`<${BlogListPage.name}/>`, () => {
         ],
         locale: 'en',
       }),
+      undefined,
     );
     expect(screen.getByTestId('module-renderer-stub')).toHaveTextContent(
       'module_postList,module_newsletter',
     );
   });
 
-  it('renders the fetched heading as the only h1 when no hero is set', async () => {
-    getBlogListPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-        modules: [],
-      },
-    });
-
-    await setup();
-
-    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-    expect(heroSlotMock).not.toHaveBeenCalled();
-  });
-
-  it('dispatches the hero through HeroSlot and keeps exactly one h1 when a hero is set', async () => {
+  it('dispatches PageIntro with the hero when a hero is set', async () => {
     getBlogListPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -238,13 +236,15 @@ describe(`<${BlogListPage.name}/>`, () => {
 
     await setup();
 
-    expect(heroSlotMock).toHaveBeenCalledWith({
-      id: 'hero-1',
-      type: 'module_hero',
-      locale: 'en',
-      tenant: 'tenant-1',
-    });
-    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(pageIntroMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        hero: { id: 'hero-1', type: 'module_hero' },
+        locale: 'en',
+        tenant: 'tenant-1',
+      }),
+      undefined,
+    );
+    expect(screen.getByTestId('page-intro')).toHaveTextContent('hero-1');
   });
 
   it('forwards the tenant to getBlogListPage, BlogListBreadcrumbs, and BlogListTopicChips', async () => {

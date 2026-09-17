@@ -4,21 +4,24 @@ import { notFound } from 'next/navigation';
 
 import { LandingPage } from './landing-page';
 
-const { getLandingPageMock, moduleRendererMock, heroSlotMock } = vi.hoisted(
+const { getLandingPageMock, moduleRendererMock, pageIntroMock } = vi.hoisted(
   () => ({
     getLandingPageMock: vi.fn(),
-    // `ModuleRenderer`/`HeroSlot` are async Server Components — real RSC
-    // async-component nesting isn't renderable through
-    // `@testing-library/react`'s client renderer (`blog-post-page.test.tsx`
-    // follows the same pattern). Each is stubbed as a plain sync component
-    // so this suite can assert `LandingPage` passes the right props through
-    // without needing a real async render; their own dispatch logic is
-    // covered by `module-renderer.test.tsx`/`hero-slot.test.tsx`.
+    pageIntroMock: vi.fn(
+      ({
+        hero,
+        headingBlock,
+      }: {
+        hero?: { id: string };
+        headingBlock: { heading: string };
+      }) => (
+        <h1 data-testid="page-intro">
+          {hero ? hero.id : headingBlock.heading}
+        </h1>
+      ),
+    ),
     moduleRendererMock: vi.fn(({ modules }: { modules: { id: string }[] }) => (
       <div data-testid="module-renderer">{modules.length} modules</div>
-    )),
-    heroSlotMock: vi.fn(({ id }: { id: string }) => (
-      <h1 data-testid="hero-slot">{id}</h1>
     )),
   }),
 );
@@ -35,12 +38,12 @@ vi.mock('@web/components/features/landing/landing-breadcrumbs', () => ({
   ),
 }));
 
-vi.mock('@web/modules/module-renderer', () => ({
-  ModuleRenderer: moduleRendererMock,
+vi.mock('@web/components/shared/page-intro', () => ({
+  PageIntro: pageIntroMock,
 }));
 
-vi.mock('@web/modules/hero-slot', () => ({
-  HeroSlot: heroSlotMock,
+vi.mock('@web/modules/module-renderer', () => ({
+  ModuleRenderer: moduleRendererMock,
 }));
 
 const setup = customRenderAsync(LandingPage, {
@@ -53,7 +56,7 @@ describe(`<${LandingPage.name}/>`, () => {
   beforeEach(() => {
     getLandingPageMock.mockReset();
     moduleRendererMock.mockClear();
-    heroSlotMock.mockClear();
+    pageIntroMock.mockClear();
   });
 
   it('calls notFound() and logs when the fetch fails', async () => {
@@ -92,7 +95,11 @@ describe(`<${LandingPage.name}/>`, () => {
       container.querySelectorAll<HTMLElement>('[data-testid]'),
     ).map((el) => el.getAttribute('data-testid'));
 
-    expect(order).toEqual(['landing-breadcrumbs', 'module-renderer']);
+    expect(order).toEqual([
+      'landing-breadcrumbs',
+      'page-intro',
+      'module-renderer',
+    ]);
   });
 
   it('renders through PageShell: breadcrumbs outside the main landmark, module renderer inside it', async () => {
@@ -117,14 +124,20 @@ describe(`<${LandingPage.name}/>`, () => {
     );
   });
 
-  it('renders the page title as the h1', async () => {
+  it('dispatches PageIntro with the page title', async () => {
     getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
 
     await setup();
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'About Us' }),
-    ).toBeInTheDocument();
+    expect(pageIntroMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        headingBlock: mockLandingPage.headingBlock,
+        locale: 'EN',
+        tenant: 'tenant-1',
+      }),
+      undefined,
+    );
+    expect(screen.getByTestId('page-intro')).toHaveTextContent('About Us');
   });
 
   it('passes an empty modules array to ModuleRenderer when the editor has not added any', async () => {
@@ -132,11 +145,14 @@ describe(`<${LandingPage.name}/>`, () => {
 
     await setup();
 
-    expect(moduleRendererMock).toHaveBeenCalledWith({
-      modules: [],
-      locale: 'EN',
-      tenant: 'tenant-1',
-    });
+    expect(moduleRendererMock).toHaveBeenCalledWith(
+      {
+        modules: [],
+        locale: 'EN',
+        tenant: 'tenant-1',
+      },
+      undefined,
+    );
   });
 
   it('passes the fetched modules and locale through to ModuleRenderer when an editor has added some', async () => {
@@ -150,11 +166,14 @@ describe(`<${LandingPage.name}/>`, () => {
 
     await setup();
 
-    expect(moduleRendererMock).toHaveBeenCalledWith({
-      modules: [{ id: 'module-1', type: 'module_content' }],
-      locale: 'EN',
-      tenant: 'tenant-1',
-    });
+    expect(moduleRendererMock).toHaveBeenCalledWith(
+      {
+        modules: [{ id: 'module-1', type: 'module_content' }],
+        locale: 'EN',
+        tenant: 'tenant-1',
+      },
+      undefined,
+    );
     expect(screen.getByTestId('module-renderer')).toHaveTextContent(
       '1 modules',
     );
@@ -177,16 +196,7 @@ describe(`<${LandingPage.name}/>`, () => {
     expect(moduleRenderer.parentElement).toBe(main);
   });
 
-  it('renders the page title as the only h1 when no hero is set', async () => {
-    getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
-
-    await setup();
-
-    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-    expect(heroSlotMock).not.toHaveBeenCalled();
-  });
-
-  it('dispatches the hero through HeroSlot and keeps exactly one h1 when a hero is set', async () => {
+  it('dispatches PageIntro with the hero when a hero is set', async () => {
     getLandingPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -197,13 +207,15 @@ describe(`<${LandingPage.name}/>`, () => {
 
     await setup();
 
-    expect(heroSlotMock).toHaveBeenCalledWith({
-      id: 'hero-1',
-      type: 'module_hero',
-      locale: 'EN',
-      tenant: 'tenant-1',
-    });
-    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(pageIntroMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        hero: { id: 'hero-1', type: 'module_hero' },
+        locale: 'EN',
+        tenant: 'tenant-1',
+      }),
+      undefined,
+    );
+    expect(screen.getByTestId('page-intro')).toHaveTextContent('hero-1');
   });
 
   it('forwards the resolved slug/tenant to getLandingPage', async () => {

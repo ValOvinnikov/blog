@@ -33,8 +33,13 @@ export const customRender = <P extends object>(
 /**
  * Async-server-component variant: binds an async component + default props;
  * `await setup(overrides?)` awaits the component with the merged props, then
- * renders the result. Also lets `await expect(setup({…})).rejects.toThrow(…)`
- * work for pages that throw (e.g. notFound()) before returning JSX.
+ * RTL-renders the returned tree. Also lets
+ * `await expect(setup({…})).rejects.toThrow(…)` work for pages that throw
+ * (e.g. notFound()) before returning JSX. Awaiting only the top-level
+ * component resolves its own promise, not any async Server Component still
+ * unresolved in the JSX it returns — RTL's client renderer cannot render
+ * those (`<X> is an async Client Component`), so any such child must be
+ * mocked as a plain sync component in the test.
  */
 export const customRenderAsync = <P extends object>(
   Component: (props: P) => Promise<ReactNode>,
