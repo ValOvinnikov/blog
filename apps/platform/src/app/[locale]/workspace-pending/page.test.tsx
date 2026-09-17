@@ -12,7 +12,6 @@ const setup = customRenderAsync(WorkspacePendingPage, {});
 describe(`<${WorkspacePendingPage.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
-    vi.mocked(redirect).mockClear();
   });
 
   it('redirects to sign-in without rendering when there is no session', async () => {

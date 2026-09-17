@@ -38,7 +38,6 @@ describe(listSessionTenants, () => {
     listTenantsByIdsMock.mockReset();
     listTenantsMock.mockReset();
     getAdminByUserIdMock.mockReset();
-    vi.mocked(redirect).mockClear();
   });
 
   it('redirects to sign-in without querying memberships when there is no session', async () => {

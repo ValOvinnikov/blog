@@ -39,7 +39,6 @@ function tenant(overrides: Partial<TTenant> = {}): TTenant {
 }
 
 beforeEach(() => {
-  vi.clearAllMocks();
   vi.spyOn(console, 'warn').mockImplementation(() => {});
 });
 

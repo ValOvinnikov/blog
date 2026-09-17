@@ -1,4 +1,4 @@
-import { notFound, redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 
 import { resolveDashboardTenant } from './resolve-dashboard-tenant';
 
@@ -38,8 +38,6 @@ describe(resolveDashboardTenant, () => {
   beforeEach(() => {
     listSessionTenantsMock.mockReset();
     cookiesMock.mockReset();
-    vi.mocked(redirect).mockClear();
-    vi.mocked(notFound).mockClear();
   });
 
   it('404s when the single membership points at a tenant that no longer exists', async () => {

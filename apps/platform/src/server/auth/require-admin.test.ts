@@ -21,8 +21,6 @@ describe(requireAdmin, () => {
   beforeEach(() => {
     authMock.mockReset();
     getAdminByUserIdMock.mockReset();
-    vi.mocked(redirect).mockClear();
-    vi.mocked(notFound).mockClear();
   });
 
   it('redirects to sign-in without querying admins when there is no session', async () => {

@@ -5,6 +5,8 @@ import ArrowUpComponent from '@blog/ui/assets/icons/arrow-up.svg';
 import ArrowUpUrl from '@blog/ui/assets/icons/arrow-up.svg?url';
 import ArrowComponent from '@blog/ui/assets/icons/arrow.svg';
 import ArrowUrl from '@blog/ui/assets/icons/arrow.svg?url';
+import BlueskyComponent from '@blog/ui/assets/icons/bluesky.svg';
+import BlueskyUrl from '@blog/ui/assets/icons/bluesky.svg?url';
 import BookmarkComponent from '@blog/ui/assets/icons/bookmark.svg';
 import BookmarkUrl from '@blog/ui/assets/icons/bookmark.svg?url';
 import CheckSheetComponent from '@blog/ui/assets/icons/check-sheet.svg';
@@ -37,10 +39,14 @@ import HouseComponent from '@blog/ui/assets/icons/house.svg';
 import HouseUrl from '@blog/ui/assets/icons/house.svg?url';
 import InfoComponent from '@blog/ui/assets/icons/info.svg';
 import InfoUrl from '@blog/ui/assets/icons/info.svg?url';
+import InstagramComponent from '@blog/ui/assets/icons/instagram.svg';
+import InstagramUrl from '@blog/ui/assets/icons/instagram.svg?url';
 import LinkedInComponent from '@blog/ui/assets/icons/linkedin.svg';
 import LinkedInUrl from '@blog/ui/assets/icons/linkedin.svg?url';
 import MailComponent from '@blog/ui/assets/icons/mail.svg';
 import MailUrl from '@blog/ui/assets/icons/mail.svg?url';
+import MastodonComponent from '@blog/ui/assets/icons/mastodon.svg';
+import MastodonUrl from '@blog/ui/assets/icons/mastodon.svg?url';
 import MenuRowsComponent from '@blog/ui/assets/icons/menu-rows.svg';
 import MenuRowsUrl from '@blog/ui/assets/icons/menu-rows.svg?url';
 import MenuComponent from '@blog/ui/assets/icons/menu.svg';
@@ -69,12 +75,16 @@ import StudioComponent from '@blog/ui/assets/icons/studio.svg';
 import StudioUrl from '@blog/ui/assets/icons/studio.svg?url';
 import SunComponent from '@blog/ui/assets/icons/sun.svg';
 import SunUrl from '@blog/ui/assets/icons/sun.svg?url';
+import ThreadsComponent from '@blog/ui/assets/icons/threads.svg';
+import ThreadsUrl from '@blog/ui/assets/icons/threads.svg?url';
 import UsersComponent from '@blog/ui/assets/icons/users.svg';
 import UsersUrl from '@blog/ui/assets/icons/users.svg?url';
 import WarningComponent from '@blog/ui/assets/icons/warning.svg';
 import WarningUrl from '@blog/ui/assets/icons/warning.svg?url';
 import XComponent from '@blog/ui/assets/icons/x.svg';
 import XUrl from '@blog/ui/assets/icons/x.svg?url';
+import YouTubeComponent from '@blog/ui/assets/icons/youtube.svg';
+import YouTubeUrl from '@blog/ui/assets/icons/youtube.svg?url';
 
 export type TIconRegistryEntry = {
   component: FC<SVGProps<SVGSVGElement>>;
@@ -114,6 +124,11 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
   [ICONS.HOUSE]: { component: HouseComponent, url: HouseUrl },
   [ICONS.LINKEDIN]: { component: LinkedInComponent, url: LinkedInUrl },
   [ICONS.FACEBOOK]: { component: FacebookComponent, url: FacebookUrl },
+  [ICONS.YOUTUBE]: { component: YouTubeComponent, url: YouTubeUrl },
+  [ICONS.INSTAGRAM]: { component: InstagramComponent, url: InstagramUrl },
+  [ICONS.MASTODON]: { component: MastodonComponent, url: MastodonUrl },
+  [ICONS.BLUESKY]: { component: BlueskyComponent, url: BlueskyUrl },
+  [ICONS.THREADS]: { component: ThreadsComponent, url: ThreadsUrl },
   [ICONS.RSS]: { component: RssComponent, url: RssUrl },
   [ICONS.ARROW_UP]: { component: ArrowUpComponent, url: ArrowUpUrl },
   [ICONS.ARROW]: { component: ArrowComponent, url: ArrowUrl },
