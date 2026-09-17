@@ -121,7 +121,6 @@ describe('createTenantAction', () => {
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     loggerErrorMock.mockReset();
     loggerWarnMock.mockReset();
-    vi.mocked(redirect).mockClear();
   });
 
   it('returns field errors for an invalid domain without touching the database', async () => {

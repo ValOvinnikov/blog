@@ -26,10 +26,6 @@ const { PostsCarousel } = vi.hoisted(() => ({
 
 vi.mock('@web/components/shared/posts-carousel', () => ({ PostsCarousel }));
 
-beforeEach(() => {
-  PostsCarousel.mockClear();
-});
-
 const leadPost = makePostListItem({
   id: 'post-1',
   title: 'Lead post',

@@ -33,7 +33,6 @@ describe(`<${LookPage.name}/>`, () => {
     getAdminByUserIdMock.mockReset();
     getTenantByIdMock.mockReset();
     getSiteConfigMock.mockReset();
-    vi.mocked(redirect).mockClear();
   });
 
   it('redirects to sign-in without querying the tenant when there is no session', async () => {

@@ -27,10 +27,6 @@ vi.mock('@web/server/tenant/remembered-tenant', () => ({
 vi.mock('next/headers', () => ({ headers: headersMock }));
 
 describe('TenantNotFound ([tenant] not-found route)', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   describe('generateMetadata', () => {
     it('delegates to buildNotFoundMetadata', async () => {
       const metadata = { title: 'Page not found' };

@@ -46,7 +46,6 @@ describe(`<${HeroBlogModule.name}/>`, () => {
   beforeEach(() => {
     getHeroBlogMock.mockReset();
     getTenantSanityContextMock.mockReset();
-    loggerErrorMock.mockClear();
     getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 

@@ -51,7 +51,6 @@ describe('deprovisionTenantAction', () => {
       id: 'admin-1',
       role: 'SUPERADMIN',
     });
-    vi.mocked(redirect).mockClear();
     authMock.mockReset();
     authMock.mockResolvedValue({
       user: { id: 'operator-1', email: 'operator@example.com' },

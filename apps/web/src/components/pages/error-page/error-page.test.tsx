@@ -20,11 +20,6 @@ const reset = vi.fn();
 const setup = customRender(ErrorPage, { error, reset });
 
 describe(`<${ErrorPage.name}/>`, () => {
-  beforeEach(() => {
-    reportClientErrorMock.mockClear();
-    reset.mockClear();
-  });
-
   it('renders a heading and a try-again action', () => {
     setup();
 

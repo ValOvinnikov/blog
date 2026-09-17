@@ -47,7 +47,6 @@ describe(`<${DeleteAccountControl.name}/>`, () => {
   beforeEach(() => {
     signOutMock.mockReset();
     deleteAccountActionMock.mockReset();
-    toastPromiseMock.mockClear();
     toastPromiseMock.mockImplementation((promise: Promise<unknown>) => promise);
   });
 

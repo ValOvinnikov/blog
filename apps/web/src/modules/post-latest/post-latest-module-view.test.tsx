@@ -26,10 +26,6 @@ const { PostsCarousel } = vi.hoisted(() => ({
 
 vi.mock('@web/components/shared/posts-carousel', () => ({ PostsCarousel }));
 
-beforeEach(() => {
-  PostsCarousel.mockClear();
-});
-
 const post = makePostListItem();
 
 const setup = customRender(PostLatestModuleView, {
