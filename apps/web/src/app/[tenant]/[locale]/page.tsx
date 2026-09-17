@@ -1,11 +1,9 @@
 import type { ITenantLocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { PageShell } from '@web/components/page-templates/page-shell';
+import { HomePage } from '@web/components/pages/home-page';
 import { toMetadata } from '@web/metadata/to-metadata';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
-import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { logger } from '@web/utils/logger/logger';
-import { resolvePageIntroAndContent } from '@web/utils/resolve-page-intro-and-content';
 import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 
@@ -37,28 +35,9 @@ export async function generateMetadata({ params }: TProps): Promise<Metadata> {
   });
 }
 
-export default async function HomePage({ params }: TProps) {
+export default async function HomeRoute({ params }: TProps) {
   const { locale, tenant } = await params;
   setRequestLocale(locale);
 
-  const tenantContext = await getTenantSanityContext(tenant);
-  const result = await service.pages.home.v1.getHomePage(tenantContext);
-  const { headingBlock, hero, modules } = guardPageLoaderResult(
-    result,
-    'home_page.fetch_failed',
-  );
-  const { intro, content } = await resolvePageIntroAndContent({
-    hero,
-    headingBlock,
-    modules,
-    locale,
-    tenant,
-  });
-
-  return (
-    <PageShell>
-      <PageShell.Heading>{intro}</PageShell.Heading>
-      <PageShell.Content>{content}</PageShell.Content>
-    </PageShell>
-  );
+  return <HomePage locale={locale} tenant={tenant} />;
 }

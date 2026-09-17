@@ -6,33 +6,39 @@ import { notFound } from 'next/navigation';
 
 import { TagPage } from './tag-page';
 
-const { getTagPageMock, tagBreadcrumbsMock, moduleRendererMock, heroSlotMock } =
-  vi.hoisted(() => ({
-    getTagPageMock: vi.fn(),
-    tagBreadcrumbsMock: vi.fn(
-      ({ slug, tenant }: { slug: string; tenant: string }) => (
-        <div data-testid="tag-breadcrumbs">
-          {slug}:{tenant}
-        </div>
-      ),
+const {
+  getTagPageMock,
+  tagBreadcrumbsMock,
+  moduleRendererMock,
+  pageIntroMock,
+} = vi.hoisted(() => ({
+  getTagPageMock: vi.fn(),
+  tagBreadcrumbsMock: vi.fn(
+    ({ slug, tenant }: { slug: string; tenant: string }) => (
+      <div data-testid="tag-breadcrumbs">
+        {slug}:{tenant}
+      </div>
     ),
-    heroSlotMock: vi.fn(({ id }: { id: string }) => (
-      <h1 data-testid="hero-slot">{id}</h1>
-    )),
-    // `ModuleRenderer` is an async Server Component — real RSC async-component
-    // nesting isn't renderable through `@testing-library/react`'s client
-    // renderer. Stubbed as a plain sync component so this suite can assert
-    // `TagPage` composes it with the right props; its own behavior (and the
-    // post-list module it renders) is covered by `module-renderer.test.tsx`
-    // and `post-list-module.test.tsx`.
-    moduleRendererMock: vi.fn(
-      ({ modules }: { modules: { id: string; type: string }[] }) => (
-        <div data-testid="module-renderer-stub">
-          {modules.map((module) => module.type).join(',')}
-        </div>
-      ),
+  ),
+  pageIntroMock: vi.fn(
+    ({
+      hero,
+      headingBlock,
+    }: {
+      hero?: { id: string };
+      headingBlock: { heading: string };
+    }) => (
+      <h1 data-testid="page-intro">{hero ? hero.id : headingBlock.heading}</h1>
     ),
-  }));
+  ),
+  moduleRendererMock: vi.fn(
+    ({ modules }: { modules: { id: string; type: string }[] }) => (
+      <div data-testid="module-renderer-stub">
+        {modules.map((module) => module.type).join(',')}
+      </div>
+    ),
+  ),
+}));
 
 vi.mock('@web/server/tag/get-tag-page', () => ({
   getTagPage: getTagPageMock,
@@ -42,12 +48,12 @@ vi.mock('@web/components/features/tag/tag-breadcrumbs', () => ({
   TagBreadcrumbs: tagBreadcrumbsMock,
 }));
 
-vi.mock('@web/modules/module-renderer', () => ({
-  ModuleRenderer: moduleRendererMock,
+vi.mock('@web/components/shared/page-intro', () => ({
+  PageIntro: pageIntroMock,
 }));
 
-vi.mock('@web/modules/hero-slot', () => ({
-  HeroSlot: heroSlotMock,
+vi.mock('@web/modules/module-renderer', () => ({
+  ModuleRenderer: moduleRendererMock,
 }));
 
 const tag = makeTag({
@@ -67,7 +73,7 @@ describe(`<${TagPage.name}/>`, () => {
     getTagPageMock.mockReset();
     tagBreadcrumbsMock.mockClear();
     moduleRendererMock.mockClear();
-    heroSlotMock.mockClear();
+    pageIntroMock.mockClear();
   });
 
   it('calls notFound() and logs when the fetch fails', async () => {
@@ -99,7 +105,7 @@ describe(`<${TagPage.name}/>`, () => {
     errorSpy.mockRestore();
   });
 
-  it('renders the h1 and supporting text from the view model headingBlock', async () => {
+  it('dispatches PageIntro with the view-model headingBlock and hasTrailingSpace false', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -115,10 +121,19 @@ describe(`<${TagPage.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'TypeScript' }),
-    ).toBeVisible();
-    expect(screen.getByText('Posts about TypeScript.')).toBeVisible();
+    expect(pageIntroMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        headingBlock: makeHeadingBlock({
+          heading: 'TypeScript',
+          supportingText: 'Posts about TypeScript.',
+        }),
+        hasTrailingSpace: false,
+        locale: 'en',
+        tenant: 'tenant-1',
+      }),
+      undefined,
+    );
+    expect(screen.getByTestId('page-intro')).toHaveTextContent('TypeScript');
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
@@ -139,7 +154,11 @@ describe(`<${TagPage.name}/>`, () => {
       container.querySelectorAll<HTMLElement>('[data-testid]'),
     ).map((el) => el.getAttribute('data-testid'));
 
-    expect(order).toEqual(['tag-breadcrumbs', 'module-renderer-stub']);
+    expect(order).toEqual([
+      'tag-breadcrumbs',
+      'page-intro',
+      'module-renderer-stub',
+    ]);
   });
 
   it('renders through PageShell: breadcrumbs outside main, everything else inside it', async () => {
@@ -184,6 +203,7 @@ describe(`<${TagPage.name}/>`, () => {
           },
         },
       }),
+      undefined,
     );
   });
 
@@ -211,6 +231,7 @@ describe(`<${TagPage.name}/>`, () => {
           },
         },
       }),
+      undefined,
     );
   });
 
@@ -232,30 +253,14 @@ describe(`<${TagPage.name}/>`, () => {
         modules: [{ id: 'newsletter-1', type: 'module_newsletter' }],
         locale: 'en',
       }),
+      undefined,
     );
     expect(screen.getByTestId('module-renderer-stub')).toHaveTextContent(
       'module_newsletter',
     );
   });
 
-  it('renders the view-model headingBlock heading as the only h1 when no hero is set', async () => {
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        tag,
-        headingBlock: makeHeadingBlock({ heading: 'TypeScript' }),
-        modules: [],
-        seo: {},
-      },
-    });
-
-    await setup();
-
-    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-    expect(heroSlotMock).not.toHaveBeenCalled();
-  });
-
-  it('dispatches the hero through HeroSlot and keeps exactly one h1 when a hero is set', async () => {
+  it('dispatches PageIntro with the hero when a hero is set', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -269,13 +274,15 @@ describe(`<${TagPage.name}/>`, () => {
 
     await setup();
 
-    expect(heroSlotMock).toHaveBeenCalledWith({
-      id: 'hero-1',
-      type: 'module_hero',
-      locale: 'en',
-      tenant: 'tenant-1',
-    });
-    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(pageIntroMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        hero: { id: 'hero-1', type: 'module_hero' },
+        locale: 'en',
+        tenant: 'tenant-1',
+      }),
+      undefined,
+    );
+    expect(screen.getByTestId('page-intro')).toHaveTextContent('hero-1');
   });
 
   it('forwards the slug and tenant to getTagPage and TagBreadcrumbs', async () => {

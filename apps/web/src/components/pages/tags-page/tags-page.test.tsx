@@ -4,19 +4,22 @@ import { notFound } from 'next/navigation';
 
 import { TagsPage } from './tags-page';
 
-const { getTagsIndexPageMock, moduleRendererMock, heroSlotMock } = vi.hoisted(
+const { getTagsIndexPageMock, moduleRendererMock, pageIntroMock } = vi.hoisted(
   () => ({
     getTagsIndexPageMock: vi.fn(),
-    heroSlotMock: vi.fn(({ id }: { id: string }) => (
-      <h1 data-testid="hero-slot">{id}</h1>
-    )),
-    // `ModuleRenderer` is an async Server Component — real RSC
-    // async-component nesting isn't renderable through
-    // `@testing-library/react`'s client renderer. Stubbed as a plain sync
-    // component so this suite can assert `TagsPage` composes it with the
-    // right props; its own dispatch logic — including resolving a
-    // `module_taxonomyList` entry — is covered by its own test file
-    // (`module-renderer.test.tsx`).
+    pageIntroMock: vi.fn(
+      ({
+        hero,
+        headingBlock,
+      }: {
+        hero?: { id: string };
+        headingBlock: { heading: string };
+      }) => (
+        <h1 data-testid="page-intro">
+          {hero ? hero.id : headingBlock.heading}
+        </h1>
+      ),
+    ),
     moduleRendererMock: vi.fn(
       ({ modules }: { modules: { id: string; type: string }[] }) => (
         <div data-testid="module-renderer-stub">
@@ -37,12 +40,12 @@ vi.mock('@web/components/features/tags-index/tags-index-breadcrumbs', () => ({
   ),
 }));
 
-vi.mock('@web/modules/module-renderer', () => ({
-  ModuleRenderer: moduleRendererMock,
+vi.mock('@web/components/shared/page-intro', () => ({
+  PageIntro: pageIntroMock,
 }));
 
-vi.mock('@web/modules/hero-slot', () => ({
-  HeroSlot: heroSlotMock,
+vi.mock('@web/modules/module-renderer', () => ({
+  ModuleRenderer: moduleRendererMock,
 }));
 
 const setup = customRenderAsync(TagsPage, {
@@ -54,7 +57,7 @@ describe(`<${TagsPage.name}/>`, () => {
   beforeEach(() => {
     getTagsIndexPageMock.mockReset();
     moduleRendererMock.mockClear();
-    heroSlotMock.mockClear();
+    pageIntroMock.mockClear();
   });
 
   it('calls notFound() when the fetch fails', async () => {
@@ -83,7 +86,7 @@ describe(`<${TagsPage.name}/>`, () => {
     errorSpy.mockRestore();
   });
 
-  it('renders the h1 from the fetched headingBlock when there is no hero', async () => {
+  it('dispatches PageIntro with the fetched headingBlock and hasTrailingSpace false', async () => {
     getTagsIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -97,15 +100,23 @@ describe(`<${TagsPage.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Tags' }),
-    ).toBeVisible();
-    expect(screen.getByText('Browse every post by tag.')).toBeVisible();
+    expect(pageIntroMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        headingBlock: makeHeadingBlock({
+          heading: 'Tags',
+          supportingText: 'Browse every post by tag.',
+        }),
+        hasTrailingSpace: false,
+        locale: 'en',
+        tenant: 'tenant-1',
+      }),
+      undefined,
+    );
+    expect(screen.getByTestId('page-intro')).toHaveTextContent('Tags');
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
-    expect(heroSlotMock).not.toHaveBeenCalled();
   });
 
-  it('dispatches the hero through HeroSlot and keeps exactly one h1 when a hero is set', async () => {
+  it('dispatches PageIntro with the hero when a hero is set', async () => {
     getTagsIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -117,13 +128,15 @@ describe(`<${TagsPage.name}/>`, () => {
 
     await setup();
 
-    expect(heroSlotMock).toHaveBeenCalledWith({
-      id: 'hero-1',
-      type: 'module_hero',
-      locale: 'en',
-      tenant: 'tenant-1',
-    });
-    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(pageIntroMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        hero: { id: 'hero-1', type: 'module_hero' },
+        locale: 'en',
+        tenant: 'tenant-1',
+      }),
+      undefined,
+    );
+    expect(screen.getByTestId('page-intro')).toHaveTextContent('hero-1');
   });
 
   it('renders the parts in order: breadcrumbs, then the module renderer', async () => {
@@ -141,7 +154,11 @@ describe(`<${TagsPage.name}/>`, () => {
       container.querySelectorAll<HTMLElement>('[data-testid]'),
     ).map((el) => el.getAttribute('data-testid'));
 
-    expect(order).toEqual(['tags-index-breadcrumbs', 'module-renderer-stub']);
+    expect(order).toEqual([
+      'tags-index-breadcrumbs',
+      'page-intro',
+      'module-renderer-stub',
+    ]);
   });
 
   it('renders through PageShell: breadcrumbs outside main, module renderer inside it', async () => {
@@ -184,6 +201,7 @@ describe(`<${TagsPage.name}/>`, () => {
         ],
         locale: 'en',
       }),
+      undefined,
     );
     expect(screen.getByTestId('module-renderer-stub')).toHaveTextContent(
       'module_taxonomyList,module_newsletter',
