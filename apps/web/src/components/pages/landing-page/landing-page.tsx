@@ -1,10 +1,10 @@
 import type { ITenantLocalizedParams } from '@blog/config';
 import { LandingBreadcrumbs } from '@web/components/features/landing/landing-breadcrumbs';
 import { PageShell } from '@web/components/page-templates/page-shell';
-import { PageIntro } from '@web/components/shared/page-intro';
-import { ModuleRenderer } from '@web/modules/module-renderer';
 import { getLandingPage } from '@web/server/landing/get-landing-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
+
+import { LandingModuleRenderer } from './landing-module-renderer';
 
 type TLandingPageProps = ITenantLocalizedParams & { slug: string };
 
@@ -32,16 +32,14 @@ export const LandingPage = async ({
       <PageShell.Breadcrumbs>
         <LandingBreadcrumbs slug={slug} tenant={tenant} />
       </PageShell.Breadcrumbs>
-      <PageShell.Heading>
-        <PageIntro
+      <PageShell.Content>
+        <LandingModuleRenderer
           hero={hero}
           headingBlock={headingBlock}
+          modules={modules}
           locale={locale}
           tenant={tenant}
         />
-      </PageShell.Heading>
-      <PageShell.Content>
-        <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />
       </PageShell.Content>
     </PageShell>
   );
