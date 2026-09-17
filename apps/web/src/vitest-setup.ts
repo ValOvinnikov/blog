@@ -1,5 +1,4 @@
 import { SITE_MESSAGES } from '@blog/config';
-import { notFound } from 'next/navigation';
 import { createTranslator } from 'next-intl';
 
 import '@testing-library/jest-dom/vitest';
@@ -148,7 +147,3 @@ vi.mock('next/navigation', () => ({
     refresh: vi.fn(),
   })),
 }));
-
-beforeEach(() => {
-  vi.mocked(notFound).mockClear();
-});

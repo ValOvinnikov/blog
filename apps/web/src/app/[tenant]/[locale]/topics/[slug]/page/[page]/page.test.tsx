@@ -53,7 +53,6 @@ describe('TopicNumberedPage', () => {
   });
 
   beforeEach(() => {
-    permanentRedirectMock.mockClear();
     getTenantSanityContextMock.mockReset();
     getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });

@@ -47,7 +47,6 @@ describe(getTenantSanityContext, () => {
     getPlatformSanityContextMock.mockReturnValue(platformTenant);
     isProductionEnvironmentMock.mockReset();
     isProductionEnvironmentMock.mockReturnValue(false);
-    notFoundMock.mockClear();
   });
 
   it('falls back to the platform Sanity context when no tenant is resolved for the request', async () => {

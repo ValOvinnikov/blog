@@ -56,8 +56,6 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
     getAdminByUserIdMock.mockReset();
     getAdminByUserIdMock.mockResolvedValue(undefined);
     getTenantSanityCredentialsMock.mockReset();
-    studioMountMock.mockClear();
-    vi.mocked(redirect).mockClear();
   });
 
   it('redirects to sign-in without resolving credentials when there is no session', async () => {

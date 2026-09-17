@@ -59,7 +59,6 @@ describe(`<${DashboardDomainPage.name}/>`, () => {
     getDomainDnsRecordsMock.mockResolvedValue([
       { type: 'A', name: '@', value: '76.76.21.21' },
     ]);
-    vi.mocked(redirect).mockClear();
   });
 
   it('redirects to sign-in without resolving a tenant when there is no session', async () => {

@@ -42,7 +42,6 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
     getTenantByIdMock.mockReset();
     resolveIsSidebarCollapsedMock.mockReset();
     resolveIsSidebarCollapsedMock.mockResolvedValue(false);
-    vi.mocked(redirect).mockClear();
   });
 
   it('redirects to sign-in without querying the tenant when there is no session', async () => {

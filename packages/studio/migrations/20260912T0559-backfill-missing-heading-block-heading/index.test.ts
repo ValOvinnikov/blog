@@ -222,10 +222,6 @@ describe(resolvePostListHeading, () => {
 describe('backfill headingBlock.heading document() wiring', () => {
   const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 
-  beforeEach(() => {
-    warnSpy.mockClear();
-  });
-
   it('skips a document that already has a heading, without any lookups', async () => {
     const fetch = vi.fn(async () => null);
     const context = { client: { fetch } } as unknown as MigrationContext;

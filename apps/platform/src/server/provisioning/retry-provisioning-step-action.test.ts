@@ -39,7 +39,6 @@ describe('retryProvisioningStepAction', () => {
       id: 'admin-1',
       role: 'SUPERADMIN',
     });
-    vi.mocked(redirect).mockClear();
     dispatchProvisioningWorkflowMock.mockReset();
     dispatchProvisioningWorkflowMock.mockResolvedValue(true);
     getTenantByIdMock.mockReset();

@@ -16,10 +16,6 @@ vi.mock('@web/utils/logger/logger', () => ({
 }));
 
 describe(guardPageLoaderResult.name, () => {
-  beforeEach(() => {
-    loggerErrorMock.mockClear();
-  });
-
   it('returns the narrowed data when the result is ok and data is present', () => {
     const data = guardPageLoaderResult(
       { ok: true, data: { title: 'Hello' } },

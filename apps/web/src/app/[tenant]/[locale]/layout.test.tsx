@@ -161,7 +161,6 @@ const setup = customRenderAsync(LocaleLayout, {
 
 describe('LocaleLayout', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
     getSiteSettingsMock.mockResolvedValue({
       ok: true,
       data: { brand, description: 'A blog' },

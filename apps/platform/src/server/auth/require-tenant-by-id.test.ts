@@ -26,7 +26,6 @@ describe(requireTenantById, () => {
     authMock.mockReset();
     getAdminByUserIdMock.mockReset();
     getTenantByIdMock.mockReset();
-    vi.mocked(redirect).mockClear();
   });
 
   it('redirects to sign-in without querying admins or the tenant when there is no session', async () => {
