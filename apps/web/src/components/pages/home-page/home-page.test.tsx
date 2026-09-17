@@ -2,33 +2,29 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
-import type { ReactNode } from 'react';
 
 import { HomePage } from './home-page';
 
-const {
-  getHomePageMock,
-  getTenantSanityContextMock,
-  pageIntroMock,
-  moduleRendererMock,
-} = vi.hoisted(() => ({
-  getHomePageMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
-  pageIntroMock: vi.fn(
-    ({
-      hero,
-      headingBlock,
-    }: {
-      hero?: { id: string };
-      headingBlock: { heading: string };
-    }): ReactNode => (
-      <h1 data-testid="page-intro">{hero ? hero.id : headingBlock.heading}</h1>
+const { getHomePageMock, getTenantSanityContextMock, homeModuleRendererMock } =
+  vi.hoisted(() => ({
+    getHomePageMock: vi.fn(),
+    getTenantSanityContextMock: vi.fn(),
+    homeModuleRendererMock: vi.fn(
+      ({
+        hero,
+        headingBlock,
+        modules,
+      }: {
+        hero?: { id: string };
+        headingBlock: { heading: string };
+        modules: { id: string }[];
+      }) => (
+        <div data-testid="home-module-renderer">
+          {hero ? hero.id : headingBlock.heading} — {modules.length} modules
+        </div>
+      ),
     ),
-  ),
-  moduleRendererMock: vi.fn(({ modules }: { modules: { id: string }[] }) => (
-    <div data-testid="module-renderer">{modules.length} modules</div>
-  )),
-}));
+  }));
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -42,12 +38,8 @@ vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
   getTenantSanityContext: getTenantSanityContextMock,
 }));
 
-vi.mock('@web/components/shared/page-intro', () => ({
-  PageIntro: pageIntroMock,
-}));
-
-vi.mock('@web/modules/module-renderer', () => ({
-  ModuleRenderer: moduleRendererMock,
+vi.mock('./home-module-renderer', () => ({
+  HomeModuleRenderer: homeModuleRendererMock,
 }));
 
 const setup = customRenderAsync(HomePage, {
@@ -60,8 +52,7 @@ describe(`<${HomePage.name}/>`, () => {
     getHomePageMock.mockReset();
     getTenantSanityContextMock.mockReset();
     getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
-    pageIntroMock.mockClear();
-    moduleRendererMock.mockClear();
+    homeModuleRendererMock.mockClear();
   });
 
   it('calls notFound() and logs when the fetch fails', async () => {
@@ -90,96 +81,67 @@ describe(`<${HomePage.name}/>`, () => {
     errorSpy.mockRestore();
   });
 
-  it('dispatches PageIntro with the heading and no hero when the page has none', async () => {
+  it('renders through PageShell: the module renderer inside a single main landmark', async () => {
     getHomePageMock.mockResolvedValue({
       ok: true,
       data: {
         headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
-        hero: undefined,
-        modules: [],
-      },
-    });
-
-    await setup();
-
-    expect(pageIntroMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        hero: undefined,
-        headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
-        locale: 'en',
-        tenant: 'tenant-1',
-      }),
-      undefined,
-    );
-    expect(screen.getByTestId('page-intro')).toHaveTextContent(
-      'Welcome to the blog',
-    );
-  });
-
-  it('dispatches PageIntro with the hero when the page has one', async () => {
-    getHomePageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
-        hero: { id: 'hero-1', type: 'module_hero' },
-        modules: [],
-      },
-    });
-
-    await setup();
-
-    expect(pageIntroMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        hero: { id: 'hero-1', type: 'module_hero' },
-        locale: 'en',
-        tenant: 'tenant-1',
-      }),
-      undefined,
-    );
-    expect(screen.getByTestId('page-intro')).toHaveTextContent('hero-1');
-  });
-
-  it('renders through PageShell: the intro then the module renderer, inside a single main landmark', async () => {
-    getHomePageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock(),
         hero: { id: 'hero-1', type: 'module_hero' },
         modules: [{ id: 'module-1', type: 'module_content' }],
       },
     });
 
-    const { container } = await setup();
+    await setup();
 
     const main = screen.getByRole('main');
-    expect(main).toContainElement(screen.getByTestId('page-intro'));
-    expect(main).toContainElement(screen.getByTestId('module-renderer'));
-
-    const order = Array.from(
-      container.querySelectorAll<HTMLElement>('[data-testid]'),
-    ).map((el) => el.getAttribute('data-testid'));
-    expect(order).toEqual(['page-intro', 'module-renderer']);
+    expect(main).toContainElement(screen.getByTestId('home-module-renderer'));
   });
 
-  it('passes the fetched modules and locale through to ModuleRenderer', async () => {
+  it('dispatches HomeModuleRenderer with the fetched hero, heading, and modules', async () => {
     getHomePageMock.mockResolvedValue({
       ok: true,
       data: {
-        headingBlock: makeHeadingBlock(),
-        hero: undefined,
+        headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
+        hero: { id: 'hero-1', type: 'module_hero' },
         modules: [{ id: 'module-1', type: 'module_content' }],
       },
     });
 
     await setup();
 
-    expect(moduleRendererMock).toHaveBeenCalledWith(
+    expect(homeModuleRendererMock).toHaveBeenCalledWith(
       {
+        hero: { id: 'hero-1', type: 'module_hero' },
+        headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
         modules: [{ id: 'module-1', type: 'module_content' }],
         locale: 'en',
         tenant: 'tenant-1',
       },
       undefined,
+    );
+    expect(screen.getByTestId('home-module-renderer')).toHaveTextContent(
+      'hero-1 — 1 modules',
+    );
+  });
+
+  it('dispatches HomeModuleRenderer with no hero when the page has none', async () => {
+    getHomePageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
+        hero: undefined,
+        modules: [],
+      },
+    });
+
+    await setup();
+
+    expect(homeModuleRendererMock).toHaveBeenCalledWith(
+      expect.objectContaining({ hero: undefined }),
+      undefined,
+    );
+    expect(screen.getByTestId('home-module-renderer')).toHaveTextContent(
+      'Welcome to the blog — 0 modules',
     );
   });
 
