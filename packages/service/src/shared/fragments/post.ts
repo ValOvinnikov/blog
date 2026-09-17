@@ -1,6 +1,8 @@
+import type { TPagePostType } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module';
+import type { TRawModule } from '@blog/service/shared/transformers/to-module';
 
 import { authorCardFragment, authorDetailFragment } from './author';
 import { sanityImageFragment } from './image';
@@ -69,6 +71,7 @@ export const postDetailFragment = q
       .field('modules[]')
       .deref()
       .project(moduleFragment)
-      .nullable(true),
+      .as<TRawModule<TPagePostType>[]>()
+      .nullable(),
     wordCount: sub.raw(WORD_COUNT_EXPRESSION, wordCountParser),
   }));
