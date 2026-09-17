@@ -12,6 +12,7 @@ export default mergeConfig(
   defineConfig({
     test: {
       environment: 'node',
+      pool: 'vmThreads',
       mockReset: true,
       include: ['src/**/*.{test,spec}.ts'],
       env: {
