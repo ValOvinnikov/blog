@@ -3,7 +3,7 @@ import { q } from '@blog/service/sanity/query';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import {
   MODULE_FIELDS_PROJECTION,
-  moduleFragmentRoot,
+  moduleFragment,
 } from '@blog/service/shared/fragments/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo';
 
@@ -19,9 +19,7 @@ export const blogPageQuery = q.star
       .field('hero')
       .deref()
       .project(
-        moduleFragmentRoot<TPagePostIndexType>().project(
-          MODULE_FIELDS_PROJECTION,
-        ),
+        moduleFragment<TPagePostIndexType>().project(MODULE_FIELDS_PROJECTION),
       )
       .nullable(true),
     // Page-builder placement (`cta`/`newsletter`/`postList`), mirroring
@@ -31,9 +29,7 @@ export const blogPageQuery = q.star
       .field('modules[]')
       .deref()
       .project(
-        moduleFragmentRoot<TPagePostIndexType>().project(
-          MODULE_FIELDS_PROJECTION,
-        ),
+        moduleFragment<TPagePostIndexType>().project(MODULE_FIELDS_PROJECTION),
       )
       .nullable(true),
     seo: sub.field('seo').project(seoFragment).notNull(),

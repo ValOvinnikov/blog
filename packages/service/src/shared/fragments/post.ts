@@ -3,7 +3,7 @@ import { q } from '@blog/service/sanity/query';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import {
   MODULE_FIELDS_PROJECTION,
-  moduleFragmentRoot,
+  moduleFragment,
 } from '@blog/service/shared/fragments/module';
 
 import { authorCardFragment, authorDetailFragment } from './author';
@@ -73,7 +73,7 @@ export const postDetailFragment = q
       .field('modules[]')
       .deref()
       .project(
-        moduleFragmentRoot<TPagePostType>().project(MODULE_FIELDS_PROJECTION),
+        moduleFragment<TPagePostType>().project(MODULE_FIELDS_PROJECTION),
       )
       .nullable(true),
     wordCount: sub.raw(WORD_COUNT_EXPRESSION, wordCountParser),

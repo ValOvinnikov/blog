@@ -8,7 +8,7 @@ import { q } from '@blog/service/sanity/query';
  * check can't resolve `_type: true` while `T` is still a naked type parameter,
  * so `MODULE_FIELDS_PROJECTION` is applied once `T` is concrete, at each call site.
  */
-export function moduleFragmentRoot<T extends TModuleType = TModuleType>() {
+export function moduleFragment<T extends TModuleType = TModuleType>() {
   return q.fragment<{ _id: string; _type: T }>();
 }
 
