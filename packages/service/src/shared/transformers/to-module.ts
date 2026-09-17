@@ -4,17 +4,20 @@ import {
   type TMaybeUndefined,
   type TModuleType,
 } from '@blog/config';
-import type { moduleFragment } from '@blog/service/shared/fragments/module';
-import type { InferFragmentType } from 'groqd';
 
-export type TRawModule = InferFragmentType<typeof moduleFragment>;
+export type TRawModule<T extends TModuleType = TModuleType> = {
+  _id: string;
+  _type: T;
+};
 
 export type TModule<T extends TModuleType = TModuleType> = {
   id: string;
   type: T;
 };
 
-export function toModule(raw: TRawModule): TModule {
+export function toModule<T extends TModuleType = TModuleType>(
+  raw: TRawModule<T>,
+): TModule<T> {
   return {
     id: raw._id,
     type: raw._type,
@@ -29,9 +32,9 @@ export class InvalidHeroModuleTypeError extends Error {
   }
 }
 
-export function toHeroSlot(
-  raw: TRawModule | null | undefined,
-): TMaybeUndefined<TModule<THeroModuleType>> {
+export function toHeroSlot<T extends TModuleType = TModuleType>(
+  raw: TRawModule<T> | null | undefined,
+): TMaybeUndefined<TModule<T & THeroModuleType>> {
   if (!raw) return undefined;
 
   if (!isHeroModuleType(raw._type)) {

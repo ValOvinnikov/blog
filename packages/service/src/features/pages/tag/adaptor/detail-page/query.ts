@@ -1,8 +1,10 @@
+import type { TPageTagType } from '@blog/config';
 import { q, type TSlugParams } from '@blog/service/sanity/query';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo';
 import { tagFragment } from '@blog/service/shared/fragments/tag';
+import type { TRawModule } from '@blog/service/shared/transformers/to-module';
 
 export const tagPageQuery = q
   .parameters<TSlugParams>()
@@ -26,12 +28,18 @@ export const tagPageQuery = q
       .field('headingBlock')
       .project(headingBlockFragment)
       .notNull(),
-    hero: sub.field('hero').deref().project(moduleFragment).nullable(true),
+    hero: sub
+      .field('hero')
+      .deref()
+      .project(moduleFragment)
+      .as<TRawModule<TPageTagType>>()
+      .nullable(),
     modules: sub
       .field('modules[]')
       .deref()
       .project(moduleFragment)
-      .nullable(true),
+      .as<TRawModule<TPageTagType>[]>()
+      .nullable(),
     seo: sub.field('seo').project(seoFragment).notNull(),
   }))
   // Nullable, not `.notNull()`: no matching `page_tag` is an ordinary

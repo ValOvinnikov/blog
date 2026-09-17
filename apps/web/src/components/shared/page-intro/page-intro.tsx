@@ -1,11 +1,11 @@
-import type { THeadingBlock, THeroModuleType } from '@blog/config';
+import type { THeadingBlock } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { PageHeading } from '@web/components/shared/page-heading';
 import { HeroSlot } from '@web/modules/hero-slot';
 import type { ReactNode } from 'react';
 
 export interface IPageIntroProps {
-  hero?: TModule<THeroModuleType>;
+  hero?: TModule;
   headingBlock: THeadingBlock;
   hasTrailingSpace?: boolean;
   locale: string;

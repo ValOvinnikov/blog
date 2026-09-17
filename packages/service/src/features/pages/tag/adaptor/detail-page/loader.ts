@@ -15,7 +15,6 @@ export async function getTagPage(
 ): Promise<TMaybeUndefined<TTagDetailPage>> {
   // `tagPageQuery` derefs `tag`'s full fragment — that tag must ride
   // alongside `page_tag` (tag-scope contract, `sanity/query.ts`).
-  // `hero`/`modules[]` stay thin (`moduleFragment`), so no tag of their own.
   const rawPage = await runQuery(tagPageQuery, {
     parameters: { slug },
     tenant,
