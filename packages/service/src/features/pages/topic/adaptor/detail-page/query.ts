@@ -1,6 +1,10 @@
+import type { TPageTopicModuleTypes } from '@blog/config';
 import { q, type TSlugParams } from '@blog/service/sanity/query';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
-import { moduleFragment } from '@blog/service/shared/fragments/module';
+import {
+  MODULE_FIELDS_PROJECTION,
+  moduleFragmentRoot,
+} from '@blog/service/shared/fragments/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo';
 import { topicFragment } from '@blog/service/shared/fragments/topic';
 
@@ -15,14 +19,26 @@ export const topicPageQuery = q
       .field('headingBlock')
       .project(headingBlockFragment)
       .notNull(),
-    hero: sub.field('hero').deref().project(moduleFragment).nullable(true),
+    hero: sub
+      .field('hero')
+      .deref()
+      .project(
+        moduleFragmentRoot<TPageTopicModuleTypes['hero']>().project(
+          MODULE_FIELDS_PROJECTION,
+        ),
+      )
+      .nullable(true),
     // Page-builder placement (`postList`/`postLatest`/`cta`/`newsletter`),
     // mirroring `page_postIndex`'s own thin `modules[]` ref projection —
     // resolved to a real component by `ModuleRenderer` (`apps/web`).
     modules: sub
       .field('modules[]')
       .deref()
-      .project(moduleFragment)
+      .project(
+        moduleFragmentRoot<TPageTopicModuleTypes['modules']>().project(
+          MODULE_FIELDS_PROJECTION,
+        ),
+      )
       .nullable(true),
     seo: sub.field('seo').project(seoFragment).notNull(),
   }))

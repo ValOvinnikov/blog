@@ -1,6 +1,10 @@
+import type { TPageTopicIndexModuleTypes } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
-import { moduleFragment } from '@blog/service/shared/fragments/module';
+import {
+  MODULE_FIELDS_PROJECTION,
+  moduleFragmentRoot,
+} from '@blog/service/shared/fragments/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo';
 
 export const topicIndexPageQuery = q.star
@@ -11,11 +15,23 @@ export const topicIndexPageQuery = q.star
       .field('headingBlock')
       .project(headingBlockFragment)
       .notNull(),
-    hero: sub.field('hero').deref().project(moduleFragment).nullable(true),
+    hero: sub
+      .field('hero')
+      .deref()
+      .project(
+        moduleFragmentRoot<TPageTopicIndexModuleTypes['hero']>().project(
+          MODULE_FIELDS_PROJECTION,
+        ),
+      )
+      .nullable(true),
     modules: sub
       .field('modules[]')
       .deref()
-      .project(moduleFragment)
+      .project(
+        moduleFragmentRoot<TPageTopicIndexModuleTypes['modules']>().project(
+          MODULE_FIELDS_PROJECTION,
+        ),
+      )
       .nullable(true),
     seo: sub.field('seo').project(seoFragment).notNull(),
   }))

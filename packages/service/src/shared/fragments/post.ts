@@ -1,6 +1,10 @@
+import type { TPagePostModuleTypes } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
-import { moduleFragment } from '@blog/service/shared/fragments/module';
+import {
+  MODULE_FIELDS_PROJECTION,
+  moduleFragmentRoot,
+} from '@blog/service/shared/fragments/module';
 
 import { authorCardFragment, authorDetailFragment } from './author';
 import { sanityImageFragment } from './image';
@@ -68,7 +72,11 @@ export const postDetailFragment = q
     modules: sub
       .field('modules[]')
       .deref()
-      .project(moduleFragment)
+      .project(
+        moduleFragmentRoot<TPagePostModuleTypes['modules']>().project(
+          MODULE_FIELDS_PROJECTION,
+        ),
+      )
       .nullable(true),
     wordCount: sub.raw(WORD_COUNT_EXPRESSION, wordCountParser),
   }));

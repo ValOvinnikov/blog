@@ -1,4 +1,9 @@
-import type { ISanityImage, ProseText, TMaybeUndefined } from '@blog/config';
+import type {
+  ISanityImage,
+  ProseText,
+  TMaybeUndefined,
+  TPagePostModuleTypes,
+} from '@blog/config';
 import type { TSeoResolved } from '@blog/service/shared/transformers/resolve-seo';
 import type { TModule } from '@blog/service/shared/transformers/to-module';
 import type { TPortableTextBody } from '@blog/service/shared/transformers/to-portable-text-body';
@@ -34,6 +39,6 @@ export type TPostDetail = Omit<TPostCard, 'author' | 'topic'> & {
   author: TPostDetailAuthor;
   topic: TTopic;
   tags: TTag[];
-  modules: TModule[];
+  modules: TModule<TPagePostModuleTypes['modules']>[];
   readingTimeMinutes: number;
 };
