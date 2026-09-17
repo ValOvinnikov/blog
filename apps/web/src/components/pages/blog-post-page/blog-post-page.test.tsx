@@ -10,14 +10,6 @@ vi.mock('@web/server/post/get-post-page', () => ({
   getPostPage: getPostPageMock,
 }));
 
-// The remaining self-fetching parts are all async Server Components — real
-// RSC async-component nesting isn't renderable through
-// `@testing-library/react`'s client renderer (`blog-list-page.test.tsx`
-// follows the same pattern). Each is stubbed as a plain sync component
-// rendering its own testid plus the props it received, so this suite can
-// assert `BlogPostPage` composes them in the right order with the right
-// props, without needing a real async render; each part's own behavior is
-// covered by its own test file.
 vi.mock('@web/components/features/post/blog-posting-schema', () => ({
   BlogPostingSchema: ({ slug, tenant }: { slug: string; tenant: string }) => (
     <div data-testid="blog-posting-schema">
@@ -37,7 +29,7 @@ vi.mock('@web/components/features/post/post-breadcrumbs', () => ({
 vi.mock('@web/components/features/post/post-article', () => ({
   PostArticle: ({ slug, tenant }: { slug: string; tenant: string }) => (
     <div data-testid="post-article">
-      {slug}:{tenant}
+      <h1>{slug}</h1>:{tenant}
     </div>
   ),
 }));
@@ -46,8 +38,8 @@ vi.mock('@web/components/shared/skim-panel', () => ({
   SkimPanel: () => <div data-testid="skim-panel" />,
 }));
 
-vi.mock('@web/modules/module-renderer', () => ({
-  ModuleRenderer: ({
+vi.mock('./blog-post-module-renderer', () => ({
+  BlogPostModuleRenderer: ({
     modules,
     locale,
     tenant,
@@ -190,5 +182,15 @@ describe(`<${BlogPostPage.name}/>`, () => {
     await setup();
 
     expect(getPostPageMock).toHaveBeenCalledWith('hello-world', 'tenant-1');
+  });
+
+  it('renders exactly one h1, from the post, with no heading fallback', async () => {
+    getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
+
+    await setup();
+
+    const headings = screen.getAllByRole('heading', { level: 1 });
+    expect(headings).toHaveLength(1);
+    expect(headings[0]).toHaveTextContent('hello-world');
   });
 });
