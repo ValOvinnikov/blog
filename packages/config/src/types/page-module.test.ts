@@ -1,20 +1,20 @@
 import type {
-  TPageHomeModuleType,
-  TPageLandingModuleType,
-  TPagePostIndexModuleType,
-  TPagePostModuleType,
-  TPageTagIndexModuleType,
-  TPageTagModuleType,
-  TPageTopicIndexModuleType,
-  TPageTopicModuleType,
+  TPageHomeModuleTypes,
+  TPageLandingModuleTypes,
+  TPagePostIndexModuleTypes,
+  TPagePostModuleTypes,
+  TPageTagIndexModuleTypes,
+  TPageTagModuleTypes,
+  TPageTopicIndexModuleTypes,
+  TPageTopicModuleTypes,
 } from './page-module';
 
 describe('page module type unions', () => {
   it('resolves page_home to its heroField and modulesField({ allow }) kinds', () => {
-    expectTypeOf<TPageHomeModuleType>().toEqualTypeOf<
-      | 'module_hero'
-      | 'module_heroBlog'
-      | 'module_heroStatement'
+    expectTypeOf<TPageHomeModuleTypes['hero']>().toEqualTypeOf<
+      'module_hero' | 'module_heroBlog' | 'module_heroStatement'
+    >();
+    expectTypeOf<TPageHomeModuleTypes['modules']>().toEqualTypeOf<
       | 'module_content'
       | 'module_cta'
       | 'module_newsletter'
@@ -24,17 +24,20 @@ describe('page module type unions', () => {
     >();
   });
 
-  it('resolves page_post from modules[] alone, with no hero field', () => {
-    expectTypeOf<TPagePostModuleType>().toEqualTypeOf<
+  it('resolves page_post from modules[] alone, with no hero key', () => {
+    expectTypeOf<TPagePostModuleTypes['modules']>().toEqualTypeOf<
       'module_postRelated' | 'module_newsletter' | 'module_cta'
     >();
+    expectTypeOf<
+      'hero' extends keyof TPagePostModuleTypes ? true : false
+    >().toEqualTypeOf<false>();
   });
 
   it('resolves page_landing', () => {
-    expectTypeOf<TPageLandingModuleType>().toEqualTypeOf<
-      | 'module_hero'
-      | 'module_heroBlog'
-      | 'module_heroStatement'
+    expectTypeOf<TPageLandingModuleTypes['hero']>().toEqualTypeOf<
+      'module_hero' | 'module_heroBlog' | 'module_heroStatement'
+    >();
+    expectTypeOf<TPageLandingModuleTypes['modules']>().toEqualTypeOf<
       | 'module_content'
       | 'module_cta'
       | 'module_postLatest'
@@ -45,10 +48,10 @@ describe('page module type unions', () => {
   });
 
   it('resolves page_postIndex', () => {
-    expectTypeOf<TPagePostIndexModuleType>().toEqualTypeOf<
-      | 'module_hero'
-      | 'module_heroBlog'
-      | 'module_heroStatement'
+    expectTypeOf<TPagePostIndexModuleTypes['hero']>().toEqualTypeOf<
+      'module_hero' | 'module_heroBlog' | 'module_heroStatement'
+    >();
+    expectTypeOf<TPagePostIndexModuleTypes['modules']>().toEqualTypeOf<
       | 'module_postList'
       | 'module_cta'
       | 'module_newsletter'
@@ -57,10 +60,10 @@ describe('page module type unions', () => {
   });
 
   it('resolves page_tag', () => {
-    expectTypeOf<TPageTagModuleType>().toEqualTypeOf<
-      | 'module_hero'
-      | 'module_heroBlog'
-      | 'module_heroStatement'
+    expectTypeOf<TPageTagModuleTypes['hero']>().toEqualTypeOf<
+      'module_hero' | 'module_heroBlog' | 'module_heroStatement'
+    >();
+    expectTypeOf<TPageTagModuleTypes['modules']>().toEqualTypeOf<
       | 'module_postList'
       | 'module_postLatest'
       | 'module_cta'
@@ -69,10 +72,10 @@ describe('page module type unions', () => {
   });
 
   it('resolves page_tagIndex', () => {
-    expectTypeOf<TPageTagIndexModuleType>().toEqualTypeOf<
-      | 'module_hero'
-      | 'module_heroBlog'
-      | 'module_heroStatement'
+    expectTypeOf<TPageTagIndexModuleTypes['hero']>().toEqualTypeOf<
+      'module_hero' | 'module_heroBlog' | 'module_heroStatement'
+    >();
+    expectTypeOf<TPageTagIndexModuleTypes['modules']>().toEqualTypeOf<
       | 'module_taxonomyList'
       | 'module_postLatest'
       | 'module_cta'
@@ -81,10 +84,10 @@ describe('page module type unions', () => {
   });
 
   it('resolves page_topic', () => {
-    expectTypeOf<TPageTopicModuleType>().toEqualTypeOf<
-      | 'module_hero'
-      | 'module_heroBlog'
-      | 'module_heroStatement'
+    expectTypeOf<TPageTopicModuleTypes['hero']>().toEqualTypeOf<
+      'module_hero' | 'module_heroBlog' | 'module_heroStatement'
+    >();
+    expectTypeOf<TPageTopicModuleTypes['modules']>().toEqualTypeOf<
       | 'module_postList'
       | 'module_postLatest'
       | 'module_cta'
@@ -93,10 +96,10 @@ describe('page module type unions', () => {
   });
 
   it('resolves page_topicIndex', () => {
-    expectTypeOf<TPageTopicIndexModuleType>().toEqualTypeOf<
-      | 'module_hero'
-      | 'module_heroBlog'
-      | 'module_heroStatement'
+    expectTypeOf<TPageTopicIndexModuleTypes['hero']>().toEqualTypeOf<
+      'module_hero' | 'module_heroBlog' | 'module_heroStatement'
+    >();
+    expectTypeOf<TPageTopicIndexModuleTypes['modules']>().toEqualTypeOf<
       | 'module_taxonomyList'
       | 'module_postLatest'
       | 'module_cta'

@@ -28,26 +28,45 @@ type THeroKind<TPage extends { hero?: unknown }> = TReferencedType<
 type TModuleKind<TPage extends { modules?: readonly unknown[] }> =
   TReferencedType<NonNullable<TPage['modules']>[number]>;
 
-export type TPageHomeModuleType = THeroKind<Page_home> | TModuleKind<Page_home>;
+export type TPageHomeModuleTypes = {
+  hero: THeroKind<Page_home>;
+  modules: TModuleKind<Page_home>;
+};
 
-export type TPageLandingModuleType =
-  THeroKind<Page_landing> | TModuleKind<Page_landing>;
+export type TPageLandingModuleTypes = {
+  hero: THeroKind<Page_landing>;
+  modules: TModuleKind<Page_landing>;
+};
 
-export type TPagePostIndexModuleType =
-  THeroKind<Page_postIndex> | TModuleKind<Page_postIndex>;
+export type TPagePostIndexModuleTypes = {
+  hero: THeroKind<Page_postIndex>;
+  modules: TModuleKind<Page_postIndex>;
+};
 
 /**
- * `page_post` has no `hero` field, so this comes from `modules[]` alone.
+ * `page_post` has no `hero` field, so it has no `hero` key — reading one is
+ * a compile error rather than a silently empty union.
  */
-export type TPagePostModuleType = TModuleKind<Page_post>;
+export type TPagePostModuleTypes = {
+  modules: TModuleKind<Page_post>;
+};
 
-export type TPageTagModuleType = THeroKind<Page_tag> | TModuleKind<Page_tag>;
+export type TPageTagModuleTypes = {
+  hero: THeroKind<Page_tag>;
+  modules: TModuleKind<Page_tag>;
+};
 
-export type TPageTagIndexModuleType =
-  THeroKind<Page_tagIndex> | TModuleKind<Page_tagIndex>;
+export type TPageTagIndexModuleTypes = {
+  hero: THeroKind<Page_tagIndex>;
+  modules: TModuleKind<Page_tagIndex>;
+};
 
-export type TPageTopicModuleType =
-  THeroKind<Page_topic> | TModuleKind<Page_topic>;
+export type TPageTopicModuleTypes = {
+  hero: THeroKind<Page_topic>;
+  modules: TModuleKind<Page_topic>;
+};
 
-export type TPageTopicIndexModuleType =
-  THeroKind<Page_topicIndex> | TModuleKind<Page_topicIndex>;
+export type TPageTopicIndexModuleTypes = {
+  hero: THeroKind<Page_topicIndex>;
+  modules: TModuleKind<Page_topicIndex>;
+};
