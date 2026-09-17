@@ -41,7 +41,6 @@ describe(`<${VoicePage.name}/>`, () => {
     getAdminByUserIdMock.mockReset();
     getTenantByIdMock.mockReset();
     getSiteConfigMock.mockReset();
-    vi.mocked(redirect).mockClear();
 
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });

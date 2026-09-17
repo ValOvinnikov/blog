@@ -73,17 +73,6 @@ const setup = customRenderAsync(TopicModuleRenderer, {
 });
 
 describe(`<${TopicModuleRenderer.name}/>`, () => {
-  beforeEach(() => {
-    ctaModuleMock.mockClear();
-    newsletterModuleMock.mockClear();
-    postLatestModuleMock.mockClear();
-    postListModuleMock.mockClear();
-    heroModuleMock.mockClear();
-    heroBlogModuleMock.mockClear();
-    heroStatementModuleMock.mockClear();
-    loggerWarnMock.mockClear();
-  });
-
   it('renders the page heading, with exactly one h1, when the page has no hero', async () => {
     await setup();
 
