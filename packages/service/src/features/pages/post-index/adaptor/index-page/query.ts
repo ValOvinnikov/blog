@@ -19,9 +19,6 @@ export const blogPageQuery = q.star
       .project(moduleFragment)
       .as<TRawModule<TPagePostIndexType>>()
       .nullable(),
-    // Page-builder placement (`cta`/`newsletter`/`postList`), mirroring
-    // `page_home`/`page_landing`'s own thin `modules[]` ref projection —
-    // resolved to a real component by `ModuleRenderer` (`apps/web`).
     modules: sub
       .field('modules[]')
       .deref()
