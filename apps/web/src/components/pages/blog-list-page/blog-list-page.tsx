@@ -28,18 +28,16 @@ export const BlogListPage = async ({
       <PageShell.Breadcrumbs>
         <BlogListBreadcrumbs tenant={tenant} />
       </PageShell.Breadcrumbs>
-      <PageShell.Content>
-        <BlogListModuleRenderer
-          hero={hero}
-          headingBlock={headingBlock}
-          modules={modules}
-          context={{ page }}
-          locale={locale}
-          tenant={tenant}
-        >
-          <BlogListTopicChips tenant={tenant} />
-        </BlogListModuleRenderer>
-      </PageShell.Content>
+      <BlogListModuleRenderer
+        hero={hero}
+        headingBlock={headingBlock}
+        modules={modules}
+        context={{ page }}
+        locale={locale}
+        tenant={tenant}
+      >
+        <BlogListTopicChips tenant={tenant} />
+      </BlogListModuleRenderer>
     </PageShell>
   );
 };
