@@ -52,7 +52,6 @@ describe(`<${HomePage.name}/>`, () => {
     getHomePageMock.mockReset();
     getTenantSanityContextMock.mockReset();
     getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
-    homeModuleRendererMock.mockClear();
   });
 
   it('calls notFound() and logs when the fetch fails', async () => {

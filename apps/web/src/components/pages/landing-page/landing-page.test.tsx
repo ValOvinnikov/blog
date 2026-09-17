@@ -48,7 +48,6 @@ const setup = customRenderAsync(LandingPage, {
 describe(`<${LandingPage.name}/>`, () => {
   beforeEach(() => {
     getLandingPageMock.mockReset();
-    landingModuleRendererMock.mockClear();
   });
 
   it('calls notFound() and logs when the fetch fails', async () => {

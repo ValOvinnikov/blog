@@ -50,13 +50,6 @@ const heroMap = {
   module_hero: heroModuleMock,
 };
 
-beforeEach(() => {
-  ctaModuleMock.mockClear();
-  postListModuleMock.mockClear();
-  heroModuleMock.mockClear();
-  loggerWarnMock.mockClear();
-});
-
 describe(renderModules.name, () => {
   const setup = customRender(renderModules, {
     modules: [{ type: 'module_cta', id: 'cta-doc-id' }],

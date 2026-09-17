@@ -57,7 +57,6 @@ const DEFAULT_THEME_TOKENS = {
 
 describe(`<${StandaloneNotFoundPage.name}/>`, () => {
   beforeEach(() => {
-    vi.clearAllMocks();
     getMessagesMock.mockResolvedValue(messages);
     getThemeTokensMock.mockResolvedValue(THEME_TOKENS);
     resolveTenantMessagesMock.mockResolvedValue({

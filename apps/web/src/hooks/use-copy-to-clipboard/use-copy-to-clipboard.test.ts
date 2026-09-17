@@ -26,7 +26,6 @@ describe(useCopyToClipboard, () => {
   beforeEach(() => {
     writeText = vi.fn().mockResolvedValue(undefined);
     setClipboard({ writeText });
-    reportClientErrorMock.mockClear();
   });
 
   afterEach(() => {

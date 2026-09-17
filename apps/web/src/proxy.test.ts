@@ -99,7 +99,6 @@ describe('proxy matcher', () => {
 describe('proxy security guard', () => {
   beforeEach(() => {
     resolveTenantIdMock.mockReset();
-    intlMiddlewareMock.mockClear();
     isProductionEnvironmentMock.mockReset();
     isProductionEnvironmentMock.mockReturnValue(false);
     loggerErrorMock.mockReset();
@@ -196,7 +195,6 @@ describe('proxy security guard', () => {
 describe('proxy dotted-path pass-through', () => {
   beforeEach(() => {
     resolveTenantIdMock.mockReset();
-    intlMiddlewareMock.mockClear();
     isProductionEnvironmentMock.mockReset();
     isProductionEnvironmentMock.mockReturnValue(false);
     loggerErrorMock.mockReset();
@@ -255,7 +253,6 @@ describe('proxy dotted-path pass-through', () => {
 describe('proxy tenant resolution', () => {
   beforeEach(() => {
     resolveTenantIdMock.mockReset();
-    intlMiddlewareMock.mockClear();
     isProductionEnvironmentMock.mockReset();
     isProductionEnvironmentMock.mockReturnValue(false);
     loggerErrorMock.mockReset();
@@ -338,7 +335,6 @@ describe('proxy tenant resolution', () => {
 describe('proxy tenant segment rewrite', () => {
   beforeEach(() => {
     resolveTenantIdMock.mockReset();
-    intlMiddlewareMock.mockClear();
     isProductionEnvironmentMock.mockReset();
     isProductionEnvironmentMock.mockReturnValue(false);
     loggerErrorMock.mockReset();
@@ -409,7 +405,6 @@ describe('proxy tenant segment rewrite', () => {
 describe('proxy tenant lookup failure', () => {
   beforeEach(() => {
     resolveTenantIdMock.mockReset();
-    intlMiddlewareMock.mockClear();
     isProductionEnvironmentMock.mockReset();
     isProductionEnvironmentMock.mockReturnValue(false);
     loggerErrorMock.mockReset();

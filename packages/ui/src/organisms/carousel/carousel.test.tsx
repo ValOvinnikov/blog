@@ -64,7 +64,6 @@ vi.mock('embla-carousel-react', () => ({
 }));
 
 beforeEach(() => {
-  vi.clearAllMocks();
   listeners.clear();
   mockViewport = { scrollLeft: 0 };
   mockSlides = [];

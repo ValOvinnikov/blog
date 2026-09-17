@@ -61,8 +61,6 @@ const setup = customRenderAsync(TagPage, {
 describe(`<${TagPage.name}/>`, () => {
   beforeEach(() => {
     getTagPageMock.mockReset();
-    tagBreadcrumbsMock.mockClear();
-    tagModuleRendererMock.mockClear();
   });
 
   it('calls notFound() and logs when the fetch fails', async () => {

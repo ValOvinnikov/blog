@@ -41,7 +41,6 @@ describe(`<${FeaturesPage.name}/>`, () => {
     getTenantByIdMock.mockReset();
     getSettingsFeaturesMock.mockReset();
     getSiteConfigMock.mockReset();
-    vi.mocked(redirect).mockClear();
   });
 
   it('redirects to sign-in without querying the tenant when there is no session', async () => {

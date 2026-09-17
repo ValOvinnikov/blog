@@ -36,11 +36,6 @@ const setup = customRenderAsync(HeroSlot, {
 });
 
 describe(`<${HeroSlot.name}/>`, () => {
-  beforeEach(() => {
-    heroModuleMock.mockClear();
-    loggerWarnMock.mockClear();
-  });
-
   it('dispatches to the registered hero component for a known type', async () => {
     await setup();
 

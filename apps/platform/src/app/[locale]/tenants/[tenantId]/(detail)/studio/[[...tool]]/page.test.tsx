@@ -1,7 +1,6 @@
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
-import { redirect } from 'next/navigation';
 
 import TenantStudioPage from './page';
 
@@ -51,8 +50,6 @@ describe(`<${TenantStudioPage.name}/>`, () => {
     getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
     getTenantByIdMock.mockReset();
     getTenantSanityCredentialsMock.mockReset();
-    studioMountMock.mockClear();
-    vi.mocked(redirect).mockClear();
   });
 
   it('redirects to sign-in without querying the tenant when there is no session', async () => {
