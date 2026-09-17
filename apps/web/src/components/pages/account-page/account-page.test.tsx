@@ -40,7 +40,6 @@ const authedSession = {
 describe(`<${AccountPage.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
-    privacySectionMock.mockClear();
   });
 
   it('redirects home when there is no session', async () => {

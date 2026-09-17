@@ -1,8 +1,7 @@
-import { ICONS, SIZE } from '@blog/config';
+import { SIZE, SOCIAL_PLATFORM_ICON } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { buildShareLinks } from '@web/utils/build-share-links';
-import { toSocialIconName } from '@web/utils/to-social-icon-name';
 import { userEvent, within } from 'storybook/test';
 
 import { PostShare } from './post-share';
@@ -12,12 +11,7 @@ const title = 'How we ship reviews faster';
 
 const links = buildShareLinks({ url, title }).map((link) => ({
   ...link,
-  icon: (
-    <Icon
-      name={toSocialIconName(link.platform) ?? ICONS.EXTERNAL_LINK}
-      size={SIZE.SM}
-    />
-  ),
+  icon: <Icon name={SOCIAL_PLATFORM_ICON[link.platform]} size={SIZE.SM} />,
 }));
 
 const meta = {

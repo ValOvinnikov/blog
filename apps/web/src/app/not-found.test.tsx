@@ -16,10 +16,6 @@ vi.mock('@web/metadata/not-found-metadata', () => ({
 }));
 
 describe('NotFound (root not-found route)', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   describe('generateMetadata', () => {
     it('delegates to buildNotFoundMetadata', async () => {
       const metadata = { title: 'Page not found' };

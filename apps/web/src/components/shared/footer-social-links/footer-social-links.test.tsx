@@ -53,17 +53,17 @@ describe(`<${FooterSocialLinks.name}/>`, () => {
     ).toHaveAttribute('href', 'https://github.com/example');
   });
 
-  it('falls back to label-only rendering for a platform with no mapped icon', async () => {
+  it('renders an icon and the translated accessible name for a platform outside the original 6-key set', async () => {
     await setup({
       social: [{ platform: SOCIAL_PLATFORMS.MASTODON, link: mastodonLink }],
     });
 
-    const link = screen.getByRole('link', { name: 'Mastodon' });
+    const link = screen.getByRole('link', { name: 'Mastodon profile' });
 
     expect(link).toHaveAttribute('href', 'https://mastodon.social/@example');
     expect(
-      within(link).queryByTestId(`social-icon-${SOCIAL_PLATFORMS.MASTODON}`),
-    ).not.toBeInTheDocument();
+      within(link).getByTestId(`social-icon-${SOCIAL_PLATFORMS.MASTODON}`),
+    ).toBeVisible();
   });
 
   it('renders no links when social is empty', async () => {

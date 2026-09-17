@@ -21,11 +21,6 @@ const reset = vi.fn();
 const setup = customRender(LocaleErrorPage, { error, reset });
 
 describe(`<${LocaleErrorPage.name}/>`, () => {
-  beforeEach(() => {
-    reportClientErrorMock.mockClear();
-    reset.mockClear();
-  });
-
   it('renders the translated heading, copy, and actions', () => {
     setup();
 

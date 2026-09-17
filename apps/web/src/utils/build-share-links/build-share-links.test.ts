@@ -1,3 +1,5 @@
+import { SOCIAL_PLATFORMS } from '@blog/config';
+
 import { buildShareLinks } from './build-share-links';
 
 describe(buildShareLinks, () => {
@@ -34,10 +36,13 @@ describe(buildShareLinks, () => {
     ]);
   });
 
-  it('returns a platform identifier matching each link (x, linkedin)', () => {
+  it('returns a platform identifier matching each link (X, LinkedIn)', () => {
     const links = buildShareLinks({ url, title });
 
-    expect(links.map((link) => link.platform)).toEqual(['x', 'linkedin']);
+    expect(links.map((link) => link.platform)).toEqual([
+      SOCIAL_PLATFORMS.X,
+      SOCIAL_PLATFORMS.LINKEDIN,
+    ]);
   });
 
   it('returns items matching the TShareLinkItem shape (href + label + platform, no icon)', () => {

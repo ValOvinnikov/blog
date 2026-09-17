@@ -1,6 +1,6 @@
 import { usePathname } from '@platform/i18n/navigation';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
-import { notFound, redirect, useParams } from 'next/navigation';
+import { redirect, useParams } from 'next/navigation';
 import type { ComponentPropsWithoutRef } from 'react';
 
 import OperatorLayout from './layout';
@@ -61,8 +61,6 @@ describe(`<${OperatorLayout.name}/>`, () => {
     getAdminByUserIdMock.mockReset();
     resolveIsSidebarCollapsedMock.mockReset();
     resolveIsSidebarCollapsedMock.mockResolvedValue(false);
-    vi.mocked(redirect).mockClear();
-    vi.mocked(notFound).mockClear();
     vi.mocked(usePathname).mockReturnValue('/tenants');
     vi.mocked(useParams).mockReturnValue({});
   });

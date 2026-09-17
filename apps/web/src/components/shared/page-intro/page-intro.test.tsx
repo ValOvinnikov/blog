@@ -25,10 +25,6 @@ const setup = customRenderAsync(PageIntro, {
 });
 
 describe(`<${PageIntro.name}/>`, () => {
-  beforeEach(() => {
-    heroSlotMock.mockClear();
-  });
-
   it('renders the hero and not the heading when a hero resolves to content', async () => {
     await setup({
       hero: { id: 'hero-1', type: 'module_hero' },
