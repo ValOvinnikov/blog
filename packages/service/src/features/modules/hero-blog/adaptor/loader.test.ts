@@ -55,7 +55,6 @@ describe(getHeroBlog, () => {
             't:tenant-a:link',
             't:tenant-a:homePage',
             't:tenant-a:page_landing',
-            't:tenant-a:page_post',
             't:tenant-a:page_postIndex',
             't:tenant-a:page_topic',
             't:tenant-a:page_topicIndex',
