@@ -1,6 +1,6 @@
 import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-field';
 
-describe('heroField', () => {
+describe(heroField, () => {
   it('builds an optional reference scoped to exactly the given allow list', () => {
     const field = heroField({ allow: ['module_heroBlog'] });
 
