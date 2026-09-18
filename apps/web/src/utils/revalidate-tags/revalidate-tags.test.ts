@@ -112,6 +112,7 @@ describe('getRevalidateTagsForType', () => {
     'module_taxonomyList',
     'module_postLatest',
     'module_postRelated',
+    'module_featureList',
     'module_content',
     'module_cta',
     'module_newsletter',

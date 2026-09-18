@@ -12,6 +12,11 @@ import {
   getRecordedValidators,
   type TRecordedValidator,
 } from '@blog/studio/testing/create-mock-validation-rule';
+import { getField } from '@blog/studio/testing/get-field';
+import { getFieldset } from '@blog/studio/testing/get-field-fieldset';
+import { getHidden } from '@blog/studio/testing/get-field-hidden';
+import { getLayout } from '@blog/studio/testing/get-field-layout';
+import { wasRequiredCalled } from '@blog/studio/testing/was-required-called';
 import type { SanityDocument, ValidationContext } from 'sanity';
 
 type TCustomFn = (
@@ -19,25 +24,12 @@ type TCustomFn = (
   context: { parent?: unknown },
 ) => string | true;
 
-type THiddenFn = (context: { parent?: unknown }) => boolean;
-
 type TDocFn = (
   document: SanityDocument | undefined,
   context: ValidationContext,
 ) => Promise<string | true> | string | true;
 
-const getField = (name: string) => {
-  const field = heroBlogSchema.fields?.find(
-    (field): field is typeof field & { name: string } =>
-      'name' in field && field.name === name,
-  );
-
-  if (!field) {
-    throw new Error(`Expected heroBlogSchema to define a "${name}" field.`);
-  }
-
-  return field;
-};
+const getHeroBlogField = (name: string) => getField(heroBlogSchema, name);
 
 const getOptionValues = (field: { options?: unknown }) => {
   const options = field.options;
@@ -54,48 +46,6 @@ const getOptionValues = (field: { options?: unknown }) => {
     (option) => option.value,
   );
 };
-
-const getLayout = (field: { options?: unknown }) => {
-  const options = field.options;
-
-  return options && typeof options === 'object' && 'layout' in options
-    ? (options as { layout?: string }).layout
-    : undefined;
-};
-
-const getFieldset = (field: { fieldset?: unknown }) =>
-  field.fieldset as string | undefined;
-
-const getHidden = (field: { hidden?: unknown }): THiddenFn => {
-  if (typeof field.hidden !== 'function') {
-    throw new Error('Expected field to define a hidden() fn.');
-  }
-
-  return field.hidden as THiddenFn;
-};
-
-const wasRequiredCalled = (field: { validation?: unknown }) => {
-  if (!field.validation) {
-    throw new Error('Expected field to define validation.');
-  }
-
-  let requiredCalled = false;
-  const rule = {
-    required: () => {
-      requiredCalled = true;
-      return rule;
-    },
-    max: () => rule,
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (field.validation as any)(rule);
-
-  return requiredCalled;
-};
-
-const getFieldCustomValidator = (field: { validation?: unknown }): TCustomFn =>
-  getCustomValidator<TCustomFn>(field);
 
 const getDocumentValidators = (): TRecordedValidator<TDocFn>[] =>
   getRecordedValidators<TDocFn>(heroBlogSchema);
@@ -128,7 +78,7 @@ describe('heroBlogSchema fieldsets', () => {
 
 describe('heroBlogSchema postSource field', () => {
   it('offers Pinned and Newest Featured, defaulting to Newest Featured', () => {
-    const field = getField('postSource');
+    const field = getHeroBlogField('postSource');
 
     expect(getOptionValues(field)).toEqual([
       POST_SOURCE.PINNED,
@@ -138,7 +88,7 @@ describe('heroBlogSchema postSource field', () => {
   });
 
   it('is a required dropdown in the post fieldset, and drives the post field', () => {
-    const field = getField('postSource');
+    const field = getHeroBlogField('postSource');
 
     expect(getLayout(field)).toBe('dropdown');
     expect(wasRequiredCalled(field)).toBe(true);
@@ -148,7 +98,7 @@ describe('heroBlogSchema postSource field', () => {
 
 describe('heroBlogSchema post field', () => {
   it('only accepts page_post references, in the post fieldset', () => {
-    const field = getField('post') as {
+    const field = getHeroBlogField('post') as {
       to?: { type: string }[];
       fieldset?: string;
     };
@@ -158,7 +108,7 @@ describe('heroBlogSchema post field', () => {
   });
 
   it('is hidden unless Post Source is Pinned', () => {
-    const hidden = getHidden(getField('post'));
+    const hidden = getHidden(getHeroBlogField('post'));
 
     expect(hidden({ parent: { postSource: POST_SOURCE.PINNED } })).toBe(false);
     expect(
@@ -167,7 +117,7 @@ describe('heroBlogSchema post field', () => {
   });
 
   it('errors when Pinned with no post chosen', () => {
-    const validate = getFieldCustomValidator(getField('post'));
+    const validate = getCustomValidator<TCustomFn>(getHeroBlogField('post'));
 
     expect(
       validate(undefined, { parent: { postSource: POST_SOURCE.PINNED } }),
@@ -175,7 +125,7 @@ describe('heroBlogSchema post field', () => {
   });
 
   it('is valid when Pinned with a post chosen', () => {
-    const validate = getFieldCustomValidator(getField('post'));
+    const validate = getCustomValidator<TCustomFn>(getHeroBlogField('post'));
 
     expect(
       validate(
@@ -186,7 +136,7 @@ describe('heroBlogSchema post field', () => {
   });
 
   it('is valid with no post when Post Source is Newest Featured', () => {
-    const validate = getFieldCustomValidator(getField('post'));
+    const validate = getCustomValidator<TCustomFn>(getHeroBlogField('post'));
 
     expect(
       validate(undefined, {
@@ -198,9 +148,9 @@ describe('heroBlogSchema post field', () => {
 
 describe('heroBlogSchema copy fields', () => {
   it('eyebrow is a plain optional field with no fieldset', () => {
-    expect(getField('eyebrow').validation).toBeUndefined();
-    expect('hidden' in getField('eyebrow')).toBe(false);
-    expect(getFieldset(getField('eyebrow'))).toBeUndefined();
+    expect(getHeroBlogField('eyebrow').validation).toBeUndefined();
+    expect('hidden' in getHeroBlogField('eyebrow')).toBe(false);
+    expect(getFieldset(getHeroBlogField('eyebrow'))).toBeUndefined();
   });
 
   it('has no heading or supportingText fields', () => {
@@ -219,7 +169,7 @@ describe('heroBlogSchema copy fields', () => {
 
 describe('heroBlogSchema imageSource field', () => {
   it('offers Post, Custom and None, defaulting to Post', () => {
-    const field = getField('imageSource');
+    const field = getHeroBlogField('imageSource');
 
     expect(getOptionValues(field)).toEqual([
       HERO_IMAGE_SOURCE.POST,
@@ -230,7 +180,7 @@ describe('heroBlogSchema imageSource field', () => {
   });
 
   it('is a required radio in the image fieldset, and drives the image field', () => {
-    const field = getField('imageSource');
+    const field = getHeroBlogField('imageSource');
 
     expect(getLayout(field)).toBe('radio');
     expect(wasRequiredCalled(field)).toBe(true);
@@ -240,14 +190,16 @@ describe('heroBlogSchema imageSource field', () => {
 
 describe('heroBlogSchema primaryActionLabel and primaryActionAppearance fields', () => {
   it('are both in the primaryAction fieldset', () => {
-    expect(getFieldset(getField('primaryActionLabel'))).toBe('primaryAction');
-    expect(getFieldset(getField('primaryActionAppearance'))).toBe(
+    expect(getFieldset(getHeroBlogField('primaryActionLabel'))).toBe(
+      'primaryAction',
+    );
+    expect(getFieldset(getHeroBlogField('primaryActionAppearance'))).toBe(
       'primaryAction',
     );
   });
 
   it('primaryActionAppearance offers Contained and Inline, defaulting to Contained', () => {
-    const field = getField('primaryActionAppearance');
+    const field = getHeroBlogField('primaryActionAppearance');
 
     expect(getOptionValues(field)).toEqual([
       CTA_ACTION_APPEARANCE.CONTAINED,
@@ -257,20 +209,22 @@ describe('heroBlogSchema primaryActionLabel and primaryActionAppearance fields',
   });
 
   it('primaryActionAppearance renders as a required dropdown', () => {
-    const field = getField('primaryActionAppearance');
+    const field = getHeroBlogField('primaryActionAppearance');
 
     expect(getLayout(field)).toBe('dropdown');
     expect(wasRequiredCalled(field)).toBe(true);
   });
 
   it('primaryActionLabel is required — the hero has no fallback label', () => {
-    expect(wasRequiredCalled(getField('primaryActionLabel'))).toBe(true);
+    expect(wasRequiredCalled(getHeroBlogField('primaryActionLabel'))).toBe(
+      true,
+    );
   });
 });
 
 describe('heroBlogSchema image field', () => {
   it('is in the image fieldset and hidden unless Image Source is Custom', () => {
-    const field = getField('image');
+    const field = getHeroBlogField('image');
     const hidden = getHidden(field);
 
     expect(getFieldset(field)).toBe('image');
@@ -286,7 +240,7 @@ describe('heroBlogSchema image field', () => {
   });
 
   it('errors when Custom with no image chosen', () => {
-    const validate = getFieldCustomValidator(getField('image'));
+    const validate = getCustomValidator<TCustomFn>(getHeroBlogField('image'));
 
     expect(
       validate(undefined, {
@@ -296,7 +250,7 @@ describe('heroBlogSchema image field', () => {
   });
 
   it('is valid with no image when Image Source is Post or None', () => {
-    const validate = getFieldCustomValidator(getField('image'));
+    const validate = getCustomValidator<TCustomFn>(getHeroBlogField('image'));
 
     expect(
       validate(undefined, { parent: { imageSource: HERO_IMAGE_SOURCE.POST } }),
@@ -309,7 +263,7 @@ describe('heroBlogSchema image field', () => {
 
 describe('heroBlogSchema secondaryAction field', () => {
   it('uses the fixed-Secondary ctaSecondaryButton object type', () => {
-    const field = getField('secondaryAction') as { type: string };
+    const field = getHeroBlogField('secondaryAction') as { type: string };
 
     expect(field.type).toBe(ctaSecondaryButtonSchema.name);
   });

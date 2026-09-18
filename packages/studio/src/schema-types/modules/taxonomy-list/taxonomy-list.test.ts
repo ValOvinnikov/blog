@@ -1,25 +1,16 @@
 import { TAXONOMY_KIND, TAXONOMY_SORT } from '@blog/config/constants';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
+import { getField } from '@blog/studio/testing/get-field';
 
 type TValidationRule = {
   integer: () => TValidationRule;
   min: (value: number) => TValidationRule;
 };
 
-const getField = (name: string) => {
-  const field = taxonomyListSchema.fields?.find(
-    (field): field is typeof field & { name: string } =>
-      'name' in field && field.name === name,
-  );
+const getTaxonomyListField = (name: string) =>
+  getField(taxonomyListSchema, name);
 
-  if (!field) {
-    throw new Error(`Expected taxonomyListSchema to define a "${name}" field.`);
-  }
-
-  return field;
-};
-
-const getOptions = (field: ReturnType<typeof getField>) => {
+const getOptions = (field: ReturnType<typeof getTaxonomyListField>) => {
   const options = 'options' in field ? field.options : undefined;
 
   if (!options || typeof options !== 'object') {
@@ -32,7 +23,7 @@ const getOptions = (field: ReturnType<typeof getField>) => {
   };
 };
 
-const getOptionValues = (field: ReturnType<typeof getField>) => {
+const getOptionValues = (field: ReturnType<typeof getTaxonomyListField>) => {
   const { list } = getOptions(field);
 
   if (!list) {
@@ -44,13 +35,13 @@ const getOptionValues = (field: ReturnType<typeof getField>) => {
 
 describe('taxonomyListSchema contentAlignment field', () => {
   it('includes a contentAlignment field', () => {
-    expect(getField('contentAlignment')).toBeDefined();
+    expect(getTaxonomyListField('contentAlignment')).toBeDefined();
   });
 });
 
 describe('taxonomyListSchema taxonomy field', () => {
   it('is a select list over the taxonomy kinds', () => {
-    const field = getField('taxonomy');
+    const field = getTaxonomyListField('taxonomy');
 
     expect(field.type).toBe('string');
     expect(getOptions(field).layout).toBe('dropdown');
@@ -61,7 +52,7 @@ describe('taxonomyListSchema taxonomy field', () => {
   });
 
   it('has no initial value and no validation — it is optional', () => {
-    const field = getField('taxonomy');
+    const field = getTaxonomyListField('taxonomy');
 
     expect(field.initialValue).toBeUndefined();
     expect(
@@ -70,7 +61,7 @@ describe('taxonomyListSchema taxonomy field', () => {
   });
 
   it('defines no hidden() callback', () => {
-    const field = getField('taxonomy');
+    const field = getTaxonomyListField('taxonomy');
 
     expect('hidden' in field ? field.hidden : undefined).toBeUndefined();
   });
@@ -78,7 +69,7 @@ describe('taxonomyListSchema taxonomy field', () => {
 
 describe('taxonomyListSchema sortOrder field', () => {
   it('is a select list over the sort orders', () => {
-    const field = getField('sortOrder');
+    const field = getTaxonomyListField('sortOrder');
 
     expect(field.type).toBe('string');
     expect(getOptions(field).layout).toBe('dropdown');
@@ -89,7 +80,7 @@ describe('taxonomyListSchema sortOrder field', () => {
   });
 
   it('defaults to Alphabetical', () => {
-    const field = getField('sortOrder');
+    const field = getTaxonomyListField('sortOrder');
 
     expect(field.initialValue).toBe(TAXONOMY_SORT.ALPHABETICAL);
   });
@@ -97,13 +88,13 @@ describe('taxonomyListSchema sortOrder field', () => {
 
 describe('taxonomyListSchema limit field', () => {
   it('is a number field', () => {
-    const field = getField('limit');
+    const field = getTaxonomyListField('limit');
 
     expect(field.type).toBe('number');
   });
 
   it('requires a positive integer when a value is provided', () => {
-    const field = getField('limit');
+    const field = getTaxonomyListField('limit');
 
     if (!('validation' in field) || !field.validation) {
       throw new Error('Expected limit field to define validation.');
@@ -140,18 +131,18 @@ describe('taxonomyListSchema showLatestPosts field', () => {
 
     expect(showLatestPostsIndex).toBe((limitIndex ?? -1) + 1);
 
-    const field = getField('showLatestPosts');
+    const field = getTaxonomyListField('showLatestPosts');
     expect(field.type).toBe('boolean');
   });
 
   it('defaults to true', () => {
-    const field = getField('showLatestPosts');
+    const field = getTaxonomyListField('showLatestPosts');
 
     expect(field.initialValue).toBe(true);
   });
 
   it('defines no validation rule — it is optional so existing documents are not invalidated', () => {
-    const field = getField('showLatestPosts');
+    const field = getTaxonomyListField('showLatestPosts');
 
     expect(
       'validation' in field ? field.validation : undefined,
@@ -161,7 +152,7 @@ describe('taxonomyListSchema showLatestPosts field', () => {
 
 describe('taxonomyListSchema headingBlock field', () => {
   it('is required at the field level', () => {
-    const field = getField('headingBlock');
+    const field = getTaxonomyListField('headingBlock');
 
     if (!('validation' in field) || !field.validation) {
       throw new Error('Expected headingBlock field to define validation.');

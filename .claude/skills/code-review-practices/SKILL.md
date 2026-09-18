@@ -238,6 +238,10 @@ pass does not skip the later ones:
      handling/propagation, off-by-one, **migration idempotency** (a re-run must
      not overwrite/lose data).
    - **Maintainability:** naming, single responsibility, duplication, test coverage.
+     Duplication is checked against the **repo**, not the diff — the copy a new
+     helper duplicates lives in a file the diff does not touch, so reading the
+     diff alone never reveals it, and a confirmed duplicate is blocking. The
+     mechanics are in `.claude/agents/reviewer.md`; don't restate them here.
 
 There is no CI-side review workflow — the `reviewer` subagent's pre-commit
 pass, run before every push, is the only gate. (A `claude-code-review` CI

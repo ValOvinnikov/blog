@@ -1,5 +1,6 @@
 import { contentSchema } from './content/content';
 import { ctaSchema } from './cta/cta';
+import { featureListSchema } from './feature-list/feature-list';
 import { heroSchema } from './hero/hero';
 import { heroBlogSchema } from './hero-blog/hero-blog';
 import { heroProfileSchema } from './hero-profile/hero-profile';
@@ -21,6 +22,7 @@ export const modules = [
   postFeaturedSchema,
   postRelatedSchema,
   taxonomyListSchema,
+  featureListSchema,
   contentSchema,
   ctaSchema,
   newsletterSchema,

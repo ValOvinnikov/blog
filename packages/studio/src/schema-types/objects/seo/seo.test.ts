@@ -3,6 +3,7 @@ import {
   SEO_META_TITLE_MIN_LENGTH,
   seoSchema,
 } from '@blog/studio/schema-types/objects/seo/seo';
+import { getField } from '@blog/studio/testing/get-field';
 
 type TCallLog = { method: string; args: unknown[] }[];
 
@@ -29,17 +30,12 @@ const createMockRule = (callLog: TCallLog, path = 'rule'): TMockRule => ({
   },
 });
 
-const getField = (name: string) =>
-  seoSchema.fields?.find((field) => field.name === name);
-
 const runFieldValidation = (
-  field: ReturnType<typeof getField>,
+  field: { validation?: unknown },
   callLog: TCallLog,
 ): TMockRule => {
-  if (!field || !('validation' in field) || !field.validation) {
-    throw new Error(
-      `Expected seoSchema field "${String(field)}" to define validation.`,
-    );
+  if (!field.validation) {
+    throw new Error('Expected seoSchema field to define validation.');
   }
 
   const baseRule = createMockRule(callLog);
@@ -52,7 +48,7 @@ describe('seoSchema metaTitle validation', () => {
   it('is required, with min(30) then max(60)', () => {
     const callLog: TCallLog = [];
 
-    runFieldValidation(getField('metaTitle'), callLog);
+    runFieldValidation(getField(seoSchema, 'metaTitle'), callLog);
 
     expect(callLog).toEqual([
       { method: 'required', args: [] },
@@ -67,11 +63,15 @@ describe('seoSchema metaTitle validation', () => {
   });
 
   it('does not claim an empty value falls back to page content', () => {
-    expect(getField('metaTitle')?.description).not.toMatch(/page content/i);
-    expect(getField('metaDescription')?.description).not.toMatch(
+    expect(getField(seoSchema, 'metaTitle')?.description).not.toMatch(
       /page content/i,
     );
-    expect(getField('openGraph')?.description).not.toMatch(/page content/i);
+    expect(getField(seoSchema, 'metaDescription')?.description).not.toMatch(
+      /page content/i,
+    );
+    expect(getField(seoSchema, 'openGraph')?.description).not.toMatch(
+      /page content/i,
+    );
   });
 });
 
@@ -79,7 +79,7 @@ describe('seoSchema metaDescription validation', () => {
   it('keeps max(160) only, unchanged', () => {
     const callLog: TCallLog = [];
 
-    runFieldValidation(getField('metaDescription'), callLog);
+    runFieldValidation(getField(seoSchema, 'metaDescription'), callLog);
 
     expect(callLog).toEqual([{ method: 'max', args: [160] }]);
   });
@@ -87,6 +87,6 @@ describe('seoSchema metaDescription validation', () => {
 
 describe('seoSchema openGraph field', () => {
   it('stays optional — no validation declared', () => {
-    expect(getField('openGraph')?.validation).toBeUndefined();
+    expect(getField(seoSchema, 'openGraph')?.validation).toBeUndefined();
   });
 });

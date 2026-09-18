@@ -95,6 +95,7 @@ describe('homePageSchema modules allow-list', () => {
       'module_postLatest',
       'module_taxonomyList',
       'module_postFeatured',
+      'module_featureList',
     ]);
     expect(allowedTypes).not.toContain('module_postList');
   });

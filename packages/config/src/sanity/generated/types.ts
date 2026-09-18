@@ -139,6 +139,39 @@ export type RichText = Array<
     } & Aside)
 >;
 
+export type Block_featureReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'block_feature';
+};
+
+export type Module_featureList = {
+  _id: string;
+  _type: 'module_featureList';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  headingBlock?: HeadingBlock;
+  features?: Array<
+    {
+      _key: string;
+    } & Block_featureReference
+  >;
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
+  imageShape?: 'WIDE' | 'SQUARE' | 'CIRCLE';
+  displayMode?: 'GRID' | 'CAROUSEL';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  cardAlignment?: 'LEFT' | 'CENTER';
+  layout?: Layout;
+};
+
 export type Module_postRelated = {
   _id: string;
   _type: 'module_postRelated';
@@ -493,6 +526,50 @@ export type Settings_site = {
   brand?: Brand;
 };
 
+export type Block_feature = {
+  _id: string;
+  _type: 'block_feature';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  headingBlock?: HeadingBlock;
+  icon?:
+    | 'CODE'
+    | 'LAYERS'
+    | 'CPU'
+    | 'WRENCH'
+    | 'SETTINGS'
+    | 'ROCKET'
+    | 'ZAP'
+    | 'TARGET'
+    | 'CHART'
+    | 'TRENDING_UP'
+    | 'SEARCH'
+    | 'CHECK'
+    | 'SHIELD_CHECK'
+    | 'LOCK'
+    | 'CLOCK'
+    | 'CLOUD'
+    | 'GRID'
+    | 'PALETTE'
+    | 'STAR'
+    | 'LIGHTBULB'
+    | 'BOOK'
+    | 'PEN'
+    | 'USERS'
+    | 'COMMENT'
+    | 'MAIL'
+    | 'PHONE'
+    | 'SMILE'
+    | 'HEART'
+    | 'GLOBE'
+    | 'MAP_PIN'
+    | 'CAMERA';
+  image?: ImageWithAlt;
+  link?: LinkReference;
+};
+
 export type Blog_author = {
   _id: string;
   _type: 'blog_author';
@@ -824,6 +901,13 @@ export type Module_contentReference = {
   [internalGroqTypeReferenceTo]?: 'module_content';
 };
 
+export type Module_featureListReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_featureList';
+};
+
 export type Page_landing = {
   _id: string;
   _type: 'page_landing';
@@ -856,6 +940,9 @@ export type Page_landing = {
     | ({
         _key: string;
       } & Module_taxonomyListReference)
+    | ({
+        _key: string;
+      } & Module_featureListReference)
   >;
   seo?: Seo;
 };
@@ -891,6 +978,9 @@ export type Page_home = {
     | ({
         _key: string;
       } & Module_postFeaturedReference)
+    | ({
+        _key: string;
+      } & Module_featureListReference)
   >;
   seo?: Seo;
 };
@@ -913,7 +1003,6 @@ export type Module_heroProfile = {
   headingBlock?: HeadingBlock;
   eyebrow?: string;
   author?: Blog_authorReference;
-  imageSource?: 'AUTHOR' | 'CUSTOM' | 'NONE';
   image?: ImageWithAlt;
   ctaButtons?: Array<
     {
@@ -1171,6 +1260,8 @@ export type AllSanitySchemaTypes =
   | ImageWithAlt
   | Module_content
   | RichText
+  | Block_featureReference
+  | Module_featureList
   | Module_postRelated
   | Page_postReference
   | Module_postFeatured
@@ -1202,6 +1293,7 @@ export type AllSanitySchemaTypes =
   | Settings_footer
   | Settings_navigation
   | Settings_site
+  | Block_feature
   | Blog_author
   | Page_homeReference
   | Page_topicReference
@@ -1228,6 +1320,7 @@ export type AllSanitySchemaTypes =
   | Module_heroStatementReference
   | Module_heroProfileReference
   | Module_contentReference
+  | Module_featureListReference
   | Page_landing
   | Page_home
   | Blog_authorReference

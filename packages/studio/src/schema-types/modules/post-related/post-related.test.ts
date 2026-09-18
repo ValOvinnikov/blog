@@ -1,18 +1,8 @@
 import { BRAND_VARIANT } from '@blog/config/constants';
 import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
+import { getField } from '@blog/studio/testing/get-field';
 
-const getField = (name: string) => {
-  const field = postRelatedSchema.fields?.find(
-    (field): field is typeof field & { name: string } =>
-      'name' in field && field.name === name,
-  );
-
-  if (!field) {
-    throw new Error(`Expected postRelatedSchema to define a "${name}" field.`);
-  }
-
-  return field;
-};
+const getPostRelatedField = (name: string) => getField(postRelatedSchema, name);
 
 type TRule = {
   required: () => TRule;
@@ -77,7 +67,7 @@ describe('postRelatedSchema shape', () => {
 
 describe('postRelatedSchema headingBlock field', () => {
   it('is required at the field level', () => {
-    const field = getField('headingBlock');
+    const field = getPostRelatedField('headingBlock');
 
     if (typeof field.validation !== 'function') {
       throw new Error('Expected headingBlock field to define validation.');
@@ -94,11 +84,11 @@ describe('postRelatedSchema headingBlock field', () => {
 
 describe('postRelatedSchema limit field', () => {
   it('defaults to 3', () => {
-    expect(getField('limit').initialValue).toBe(3);
+    expect(getPostRelatedField('limit').initialValue).toBe(3);
   });
 
   it('requires an integer between 1 and 6', () => {
-    const field = getField('limit');
+    const field = getPostRelatedField('limit');
 
     if (typeof field.validation !== 'function') {
       throw new Error('Expected limit field to define validation.');

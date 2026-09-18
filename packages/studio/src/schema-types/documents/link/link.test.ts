@@ -2,6 +2,8 @@ import { LINK_TYPE } from '@blog/config/constants';
 import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
 import { LINK_PAGE_TYPES } from '@blog/studio/schema-types/documents/link/link-page-types';
 import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
+import { getField } from '@blog/studio/testing/get-field';
+import { wasRequiredCalled } from '@blog/studio/testing/was-required-called';
 
 type TCustomFn = (
   value: unknown,
@@ -10,20 +12,9 @@ type TCustomFn = (
 
 type THiddenFn = (context: { document?: unknown }) => boolean;
 
-const getField = (name: string) => {
-  const field = linkSchema.fields.find(
-    (field): field is typeof field & { name: string } =>
-      'name' in field && field.name === name,
-  );
+const getLinkField = (name: string) => getField(linkSchema, name);
 
-  if (!field) {
-    throw new Error(`Expected linkSchema to define a "${name}" field.`);
-  }
-
-  return field;
-};
-
-const getOptionValues = (field: ReturnType<typeof getField>) => {
+const getOptionValues = (field: ReturnType<typeof getLinkField>) => {
   const options = 'options' in field ? field.options : undefined;
   const list =
     options && typeof options === 'object' && 'list' in options
@@ -39,7 +30,7 @@ const getOptionValues = (field: ReturnType<typeof getField>) => {
   );
 };
 
-const getOptionsLayout = (field: ReturnType<typeof getField>) => {
+const getOptionsLayout = (field: ReturnType<typeof getLinkField>) => {
   const options = 'options' in field ? field.options : undefined;
 
   return options && typeof options === 'object' && 'layout' in options
@@ -47,7 +38,7 @@ const getOptionsLayout = (field: ReturnType<typeof getField>) => {
     : undefined;
 };
 
-const getHiddenFn = (field: ReturnType<typeof getField>): THiddenFn => {
+const getHiddenFn = (field: ReturnType<typeof getLinkField>): THiddenFn => {
   if (!('hidden' in field) || typeof field.hidden !== 'function') {
     throw new Error(`Expected "${field.name}" field to define a hidden() fn.`);
   }
@@ -57,11 +48,11 @@ const getHiddenFn = (field: ReturnType<typeof getField>): THiddenFn => {
 
 describe('linkSchema linkType field', () => {
   it('is required and offers internal/external as radio options', () => {
-    expect(getOptionValues(getField('linkType'))).toEqual([
+    expect(getOptionValues(getLinkField('linkType'))).toEqual([
       LINK_TYPE.INTERNAL,
       LINK_TYPE.EXTERNAL,
     ]);
-    expect(getOptionsLayout(getField('linkType'))).toBe('radio');
+    expect(getOptionsLayout(getLinkField('linkType'))).toBe('radio');
   });
 
   it('defaults to internal', () => {
@@ -73,27 +64,27 @@ describe('linkSchema linkType field', () => {
 
 describe('linkSchema internalReference field', () => {
   it('targets exactly the eight page document types', () => {
-    const field = getField('internalReference');
+    const field = getLinkField('internalReference');
     const to = 'to' in field ? field.to : undefined;
 
     expect(to).toEqual(LINK_PAGE_TYPES.map((type) => ({ type })));
   });
 
   it('is visible when linkType is internal', () => {
-    const hidden = getHiddenFn(getField('internalReference'));
+    const hidden = getHiddenFn(getLinkField('internalReference'));
 
     expect(hidden({ document: { linkType: LINK_TYPE.INTERNAL } })).toBe(false);
   });
 
   it('is hidden when linkType is external', () => {
-    const hidden = getHiddenFn(getField('internalReference'));
+    const hidden = getHiddenFn(getLinkField('internalReference'));
 
     expect(hidden({ document: { linkType: LINK_TYPE.EXTERNAL } })).toBe(true);
   });
 
   it('requires a value when linkType is internal', () => {
     const validate = getCustomValidator<TCustomFn>(
-      getField('internalReference'),
+      getLinkField('internalReference'),
     );
 
     expect(
@@ -103,7 +94,7 @@ describe('linkSchema internalReference field', () => {
 
   it('passes when linkType is internal and a value is set', () => {
     const validate = getCustomValidator<TCustomFn>(
-      getField('internalReference'),
+      getLinkField('internalReference'),
     );
 
     expect(
@@ -116,7 +107,7 @@ describe('linkSchema internalReference field', () => {
 
   it('skips the check when linkType is external', () => {
     const validate = getCustomValidator<TCustomFn>(
-      getField('internalReference'),
+      getLinkField('internalReference'),
     );
 
     expect(
@@ -127,19 +118,19 @@ describe('linkSchema internalReference field', () => {
 
 describe('linkSchema url field', () => {
   it('is hidden when linkType is internal', () => {
-    const hidden = getHiddenFn(getField('url'));
+    const hidden = getHiddenFn(getLinkField('url'));
 
     expect(hidden({ document: { linkType: LINK_TYPE.INTERNAL } })).toBe(true);
   });
 
   it('is visible when linkType is external', () => {
-    const hidden = getHiddenFn(getField('url'));
+    const hidden = getHiddenFn(getLinkField('url'));
 
     expect(hidden({ document: { linkType: LINK_TYPE.EXTERNAL } })).toBe(false);
   });
 
   it('skips the check when linkType is internal', () => {
-    const validate = getCustomValidator<TCustomFn>(getField('url'));
+    const validate = getCustomValidator<TCustomFn>(getLinkField('url'));
 
     expect(
       validate(undefined, { document: { linkType: LINK_TYPE.INTERNAL } }),
@@ -147,7 +138,7 @@ describe('linkSchema url field', () => {
   });
 
   it('requires a value when linkType is external', () => {
-    const validate = getCustomValidator<TCustomFn>(getField('url'));
+    const validate = getCustomValidator<TCustomFn>(getLinkField('url'));
 
     expect(
       validate(undefined, { document: { linkType: LINK_TYPE.EXTERNAL } }),
@@ -155,7 +146,7 @@ describe('linkSchema url field', () => {
   });
 
   it('rejects a relative path', () => {
-    const validate = getCustomValidator<TCustomFn>(getField('url'));
+    const validate = getCustomValidator<TCustomFn>(getLinkField('url'));
 
     expect(
       validate('/blog', { document: { linkType: LINK_TYPE.EXTERNAL } }),
@@ -165,7 +156,7 @@ describe('linkSchema url field', () => {
   });
 
   it('rejects a bare scheme with no host', () => {
-    const validate = getCustomValidator<TCustomFn>(getField('url'));
+    const validate = getCustomValidator<TCustomFn>(getLinkField('url'));
 
     expect(
       validate('https://', { document: { linkType: LINK_TYPE.EXTERNAL } }),
@@ -175,7 +166,7 @@ describe('linkSchema url field', () => {
   });
 
   it('accepts a full http(s) URL', () => {
-    const validate = getCustomValidator<TCustomFn>(getField('url'));
+    const validate = getCustomValidator<TCustomFn>(getLinkField('url'));
 
     expect(
       validate('https://example.com', {
@@ -185,7 +176,7 @@ describe('linkSchema url field', () => {
   });
 
   it('rejects a bare domain with no scheme or leading slash', () => {
-    const validate = getCustomValidator<TCustomFn>(getField('url'));
+    const validate = getCustomValidator<TCustomFn>(getLinkField('url'));
 
     expect(
       validate('example.com', { document: { linkType: LINK_TYPE.EXTERNAL } }),
@@ -195,7 +186,7 @@ describe('linkSchema url field', () => {
   });
 
   it('rejects a javascript: URL', () => {
-    const validate = getCustomValidator<TCustomFn>(getField('url'));
+    const validate = getCustomValidator<TCustomFn>(getLinkField('url'));
 
     expect(
       validate('javascript:alert(1)', {
@@ -207,7 +198,7 @@ describe('linkSchema url field', () => {
   });
 
   it('rejects a data: URL', () => {
-    const validate = getCustomValidator<TCustomFn>(getField('url'));
+    const validate = getCustomValidator<TCustomFn>(getLinkField('url'));
 
     expect(
       validate('data:text/html,<script>alert(1)</script>', {
@@ -219,7 +210,7 @@ describe('linkSchema url field', () => {
   });
 
   it('rejects a vbscript: URL', () => {
-    const validate = getCustomValidator<TCustomFn>(getField('url'));
+    const validate = getCustomValidator<TCustomFn>(getLinkField('url'));
 
     expect(
       validate('vbscript:msgbox(1)', {
@@ -231,7 +222,7 @@ describe('linkSchema url field', () => {
   });
 
   it('rejects a protocol-relative URL', () => {
-    const validate = getCustomValidator<TCustomFn>(getField('url'));
+    const validate = getCustomValidator<TCustomFn>(getLinkField('url'));
 
     expect(
       validate('//evil.example.com', {
@@ -243,7 +234,7 @@ describe('linkSchema url field', () => {
   });
 
   it('rejects an obfuscated scheme that normalises to javascript:', () => {
-    const validate = getCustomValidator<TCustomFn>(getField('url'));
+    const validate = getCustomValidator<TCustomFn>(getLinkField('url'));
 
     expect(
       validate('java\tscript:alert(1)', {
@@ -255,7 +246,7 @@ describe('linkSchema url field', () => {
   });
 
   it('accepts an uppercase HTTPS scheme', () => {
-    const validate = getCustomValidator<TCustomFn>(getField('url'));
+    const validate = getCustomValidator<TCustomFn>(getLinkField('url'));
 
     expect(
       validate('HTTPS://example.com', {
@@ -265,7 +256,7 @@ describe('linkSchema url field', () => {
   });
 
   it('accepts a URL with a port, path, query and fragment', () => {
-    const validate = getCustomValidator<TCustomFn>(getField('url'));
+    const validate = getCustomValidator<TCustomFn>(getLinkField('url'));
 
     expect(
       validate('https://example.com:8080/path?query=1#frag', {
@@ -277,13 +268,13 @@ describe('linkSchema url field', () => {
 
 describe('linkSchema openInNewTab field', () => {
   it('is hidden when linkType is internal', () => {
-    const hidden = getHiddenFn(getField('openInNewTab'));
+    const hidden = getHiddenFn(getLinkField('openInNewTab'));
 
     expect(hidden({ document: { linkType: LINK_TYPE.INTERNAL } })).toBe(true);
   });
 
   it('is visible when linkType is external', () => {
-    const hidden = getHiddenFn(getField('openInNewTab'));
+    const hidden = getHiddenFn(getLinkField('openInNewTab'));
 
     expect(hidden({ document: { linkType: LINK_TYPE.EXTERNAL } })).toBe(false);
   });
@@ -301,36 +292,16 @@ describe('linkSchema has no platform field', () => {
 });
 
 describe('linkSchema required fields', () => {
-  const wasRequiredCalled = (field: { validation?: unknown }): boolean => {
-    if (!field.validation) {
-      throw new Error('Expected field to define validation.');
-    }
-
-    let requiredCalled = false;
-    const rule = {
-      required: () => {
-        requiredCalled = true;
-        return rule;
-      },
-      max: () => rule,
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    (field.validation as any)(rule);
-
-    return requiredCalled;
-  };
-
   it('requires title', () => {
-    expect(wasRequiredCalled(getField('title'))).toBe(true);
+    expect(wasRequiredCalled(getLinkField('title'))).toBe(true);
   });
 
   it('requires label', () => {
-    expect(wasRequiredCalled(getField('label'))).toBe(true);
+    expect(wasRequiredCalled(getLinkField('label'))).toBe(true);
   });
 
   it('requires linkType', () => {
-    expect(wasRequiredCalled(getField('linkType'))).toBe(true);
+    expect(wasRequiredCalled(getLinkField('linkType'))).toBe(true);
   });
 });
 
