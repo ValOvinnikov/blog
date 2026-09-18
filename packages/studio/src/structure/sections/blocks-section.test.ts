@@ -4,13 +4,13 @@ import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
 import { blocksSection } from './blocks-section';
 
 describe('blocksSection', () => {
-  it('groups Feature Cards and Links, each holding exactly one item', () => {
+  it('groups Cards and Links, each holding exactly one item', () => {
     expect(blocksSection.groups).toHaveLength(2);
 
-    const [featureCardsGroup, linksGroup] = blocksSection.groups;
+    const [cardsGroup, linksGroup] = blocksSection.groups;
 
-    expect(featureCardsGroup?.title).toBe('Feature Cards');
-    expect(featureCardsGroup?.items).toEqual([{ schema: featureBlockSchema }]);
+    expect(cardsGroup?.title).toBe('Cards');
+    expect(cardsGroup?.items).toEqual([{ schema: featureBlockSchema }]);
 
     expect(linksGroup?.title).toBe('Links');
     expect(linksGroup?.items).toEqual([{ schema: linkSchema }]);

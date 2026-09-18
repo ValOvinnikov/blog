@@ -9,7 +9,7 @@ export const blocksSection: TStructureSection = {
   icon: Boxes,
   groups: [
     {
-      title: 'Feature Cards',
+      title: 'Cards',
       items: [{ schema: featureBlockSchema }],
     },
     {
