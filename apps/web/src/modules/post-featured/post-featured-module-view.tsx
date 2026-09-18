@@ -1,6 +1,6 @@
 import { DISPLAY_MODE } from '@blog/config';
 import type { TPostFeaturedModule } from '@blog/service';
-import { PostGrid } from '@blog/ui/organisms/post-grid';
+import { CardGrid } from '@blog/ui/organisms/card-grid';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import {
   type IPostCardData,
@@ -25,7 +25,7 @@ export interface IPostFeaturedModuleViewProps extends Omit<
  * PostFeaturedModuleView — render shell for `PostFeaturedModule`: a labeled
  * `Section` wrapping either a `PostsCarousel` or the default spotlight
  * arrangement — the first item as a lead `PostCardItem`, then either the one
- * remaining item (also full-width) or a two-column `PostGrid` of the rest.
+ * remaining item (also full-width) or a two-column `CardGrid` of the rest.
  * Never called with an empty `items` — `PostFeaturedModule` renders nothing
  * itself in that case.
  */
@@ -86,7 +86,7 @@ export const PostFeaturedModuleView = ({
             />
           )}
           {tailPosts.length > 1 && (
-            <PostGrid
+            <CardGrid
               columns={2}
               className={s.grid()}
               dataTestId={`${dataTestId}-tail-grid`}
@@ -94,7 +94,7 @@ export const PostFeaturedModuleView = ({
               {tailPosts.map((post) => (
                 <PostCardItem key={post.id} item={post} hasImage={hasImages} />
               ))}
-            </PostGrid>
+            </CardGrid>
           )}
         </div>
       )}

@@ -1,7 +1,7 @@
 import type { TTaxonomyListModule } from '@blog/service';
 import type { THeadingLevel } from '@blog/ui/lib/react';
 import { TaxonomyCard } from '@blog/ui/molecules/taxonomy-card';
-import { PostGrid } from '@blog/ui/organisms/post-grid';
+import { CardGrid } from '@blog/ui/organisms/card-grid';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';
@@ -38,7 +38,7 @@ export interface ITaxonomyListModuleViewProps extends Omit<
 
 /**
  * TaxonomyListModuleView — render shell for `TaxonomyListModule`: a labeled
- * `Section` wrapping either a `PostGrid` of `TaxonomyCard`s or the empty
+ * `Section` wrapping either a `CardGrid` of `TaxonomyCard`s or the empty
  * message. Built from primitives — `PostCardItem` is shaped around a blog
  * post, not a taxonomy entry, so no listing organism fits here.
  */
@@ -73,7 +73,7 @@ export const TaxonomyListModuleView = ({
       {isEmpty ? (
         <p className={s.emptyMessage()}>{emptyMessage}</p>
       ) : (
-        <PostGrid>
+        <CardGrid>
           {items.map((item) => (
             <TaxonomyCard
               key={item.id}
@@ -92,7 +92,7 @@ export const TaxonomyListModuleView = ({
               )}
             </TaxonomyCard>
           ))}
-        </PostGrid>
+        </CardGrid>
       )}
     </Section>
   );

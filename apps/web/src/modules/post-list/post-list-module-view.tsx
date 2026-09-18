@@ -1,6 +1,6 @@
 import type { TPostListModule } from '@blog/service';
+import { CardGrid } from '@blog/ui/organisms/card-grid';
 import { Pagination } from '@blog/ui/organisms/pagination';
-import { PostGrid } from '@blog/ui/organisms/post-grid';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import {
   type IPostCardData,
@@ -34,7 +34,7 @@ export interface IPostListModuleViewProps extends Omit<
 
 /**
  * PostListModuleView — render shell for `PostListModule`: a labeled
- * `Section` wrapping a `PostGrid` of `PostCardItem`s (or the empty message)
+ * `Section` wrapping a `CardGrid` of `PostCardItem`s (or the empty message)
  * plus an optional `Pagination`.
  */
 export const PostListModuleView = ({
@@ -68,11 +68,11 @@ export const PostListModuleView = ({
       {isEmpty ? (
         <p className={s.emptyMessage()}>{emptyMessage}</p>
       ) : (
-        <PostGrid className={s.grid()}>
+        <CardGrid className={s.grid()}>
           {items.map((item) => (
             <PostCardItem key={item.id} item={item} hasImage={hasImages} />
           ))}
-        </PostGrid>
+        </CardGrid>
       )}
       {pagination ? (
         <Pagination
