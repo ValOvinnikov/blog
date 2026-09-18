@@ -35,7 +35,7 @@ describe('tagPageQuery', () => {
 
   it('parses a tag page with its hero slot set', () => {
     const raw = makeRawTagPage({
-      hero: { _id: 'hero-1', _type: 'module_hero' },
+      hero: { _id: 'hero-1', _type: 'module_heroBlog' },
     });
 
     expect(() => tagPageQuery.parse(raw)).not.toThrow();

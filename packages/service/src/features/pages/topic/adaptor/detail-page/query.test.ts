@@ -35,7 +35,7 @@ describe('topicPageQuery', () => {
 
   it('parses a topic page with its hero slot set', () => {
     const raw = makeRawTopicPage({
-      hero: { _id: 'hero-1', _type: 'module_hero' },
+      hero: { _id: 'hero-1', _type: 'module_heroBlog' },
     });
 
     expect(() => topicPageQuery.parse(raw)).not.toThrow();

@@ -112,13 +112,13 @@ describe('getTagPage', () => {
 
   it('maps a set page_tag.hero to a hero slot', async () => {
     mockRun.mockResolvedValueOnce(
-      makeRawTagPage({ hero: { _id: 'hero-1', _type: 'module_hero' } }),
+      makeRawTagPage({ hero: { _id: 'hero-1', _type: 'module_heroBlog' } }),
     );
 
     const result = await getTagPage('typescript', tenant);
     if (!result) throw new Error('expected a tag page');
 
-    expect(result.hero).toEqual({ id: 'hero-1', type: 'module_hero' });
+    expect(result.hero).toEqual({ id: 'hero-1', type: 'module_heroBlog' });
   });
 
   it('rejects when page_tag.hero resolves to a non-hero module type', async () => {

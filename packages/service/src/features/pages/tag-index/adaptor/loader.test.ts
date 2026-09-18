@@ -76,14 +76,14 @@ describe('getIndexPage', () => {
   it('maps a set page_tagIndex.hero to a hero slot', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawTagIndexPage({
-        hero: { _id: 'hero-1', _type: 'module_hero' },
+        hero: { _id: 'hero-1', _type: 'module_heroBlog' },
       }),
     );
 
     const result = await getIndexPage(tenant);
     if (!result) throw new Error('expected a tag index page');
 
-    expect(result.hero).toEqual({ id: 'hero-1', type: 'module_hero' });
+    expect(result.hero).toEqual({ id: 'hero-1', type: 'module_heroBlog' });
   });
 
   it('rejects when page_tagIndex.hero resolves to a non-hero module type', async () => {
