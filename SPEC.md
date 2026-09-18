@@ -358,8 +358,20 @@ and never through `modules[]`, which is how `MODULE_MAP` excludes them
 (`Record<Exclude<TModuleType, TSlotModuleType>, …>`). Nothing is
 hand-listed, so a new hero kind joins the union the day its schema lands and
 drops out the day it is deleted. The studio's equivalent guard is
-`HERO_SCHEMA_TYPES`, the list every page's `hero` `to:` points at, with a
-test asserting every registered `module_hero*` schema appears in it.
+`HERO_SCHEMA_TYPES`, the registry of every hero schema, with a test
+asserting every registered `module_hero*` schema appears in it.
+
+**A page accepts only the hero kinds it names.** `heroField({ allow })`
+takes an explicit list per page, the way `modulesField({ allow })` already
+does, so the registry is no longer what a page's `hero` `to:` points at.
+`page_home` accepts all three kinds, the legacy `module_hero` included —
+production's only page document is a `page_home` whose hero is one, so it
+stays until #2813 retires the schema. `page_landing` accepts Blog and
+Statement. `page_postIndex`, `page_tag`, `page_topic`, `page_tagIndex` and
+`page_topicIndex` accept Blog only — a statement hero belongs on a
+marketing page, not an archive. `page_post` has no `hero` field at all.
+Narrowing a page is what turns a surplus entry in its `apps/web` module map
+from dead code into a `type-check` error.
 
 Three kinds are registered. **`module_hero`** is the original, kept until
 #2813 retires it. **`module_heroBlog`** is the featured-post hero: its
