@@ -3,12 +3,7 @@ import { fireEvent, screen } from '@web/testing/custom-render';
 
 const getTrigger = () => screen.getByRole('button', { name: 'trigger' });
 
-/**
- * The open/close/focus contract every dismissible-menu-style hook shares —
- * `usePopover`, `useDismissibleMenu`'s default options, and
- * `useMobileNavToggle` all render a harness with a "trigger" button and a
- * panel containing "first"/"second" buttons.
- */
+/** The open/close/focus contract every dismissible-menu-style hook shares. */
 export const testCoreDismissibleMenuBehavior = () => {
   it('starts closed, with the panel contents unreachable', () => {
     expect(getTrigger()).toHaveAttribute('aria-expanded', 'false');
@@ -116,40 +111,37 @@ export const testCoreDismissibleMenuBehavior = () => {
  * `useMobileNavToggle`'s own test suite.
  */
 export const testArrowUpAndHomeBehavior = () => {
-  it('moves focus to the previous item on ArrowUp, wrapping from the first to the last', async () => {
-    const user = userEvent.setup();
-    await user.click(getTrigger());
-
-    const last = screen.getByRole('button', { name: 'second' });
-
-    fireEvent.keyDown(document, { key: 'ArrowUp' });
-
-    expect(document.activeElement).toBe(last);
-  });
-
-  it('moves focus to the previous item on ArrowUp when not on the first item', async () => {
-    const user = userEvent.setup();
-    await user.click(getTrigger());
-
-    const first = screen.getByRole('button', { name: 'first' });
-    const last = screen.getByRole('button', { name: 'second' });
-    last.focus();
-
-    fireEvent.keyDown(document, { key: 'ArrowUp' });
-
-    expect(document.activeElement).toBe(first);
-  });
-
-  it('focuses the first item on Home', async () => {
+  it.each([
+    {
+      name: 'moves focus to the previous item on ArrowUp, wrapping from the first to the last',
+      key: 'ArrowUp',
+      focusLastFirst: false,
+      expected: 'last',
+    },
+    {
+      name: 'moves focus to the previous item on ArrowUp when not on the first item',
+      key: 'ArrowUp',
+      focusLastFirst: true,
+      expected: 'first',
+    },
+    {
+      name: 'focuses the first item on Home',
+      key: 'Home',
+      focusLastFirst: true,
+      expected: 'first',
+    },
+  ] as const)('$name', async ({ key, focusLastFirst, expected }) => {
     const user = userEvent.setup();
     await user.click(getTrigger());
 
     const first = screen.getByRole('button', { name: 'first' });
     const last = screen.getByRole('button', { name: 'second' });
-    last.focus();
+    if (focusLastFirst) {
+      last.focus();
+    }
 
-    fireEvent.keyDown(document, { key: 'Home' });
+    fireEvent.keyDown(document, { key });
 
-    expect(document.activeElement).toBe(first);
+    expect(document.activeElement).toBe(expected === 'first' ? first : last);
   });
 };

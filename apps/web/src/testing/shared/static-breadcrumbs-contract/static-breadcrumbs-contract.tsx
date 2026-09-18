@@ -1,9 +1,13 @@
-import type { RenderResult } from '@testing-library/react';
 import { screen, within } from '@web/testing/custom-render';
+import type { TAsyncSetup } from '@web/testing/shared/async-setup/async-setup';
+import {
+  testBreadcrumbsJsonLdSchema,
+  testNoJsonLdWithoutBaseUrl,
+} from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
 import type { Mock } from 'vitest';
 
 interface IStaticBreadcrumbsContractOptions {
-  setup: (overrides?: Record<string, unknown>) => Promise<RenderResult>;
+  setup: TAsyncSetup;
   getTenantBaseUrlMock: Mock;
   label: string;
   path: string;
@@ -28,28 +32,8 @@ export const testStaticBreadcrumbsContract = ({
     expect(current.tagName).not.toBe('A');
   });
 
-  it('renders the JSON-LD BreadcrumbList schema script', async () => {
-    const { container } = await setup();
-
-    const script = container.querySelector(
-      'script[type="application/ld+json"]',
-    );
-    expect(script).not.toBeNull();
-    expect(script?.textContent).toContain('"@type":"BreadcrumbList"');
-    expect(script?.textContent).toContain(
-      `"item":"https://example.com${path}"`,
-    );
-  });
-
-  it('renders no JSON-LD script when the base URL cannot be resolved', async () => {
-    getTenantBaseUrlMock.mockResolvedValue(undefined);
-
-    const { container } = await setup();
-
-    expect(
-      container.querySelector('script[type="application/ld+json"]'),
-    ).not.toBeInTheDocument();
-  });
+  testBreadcrumbsJsonLdSchema({ setup, itemPath: path });
+  testNoJsonLdWithoutBaseUrl({ setup, getTenantBaseUrlMock });
 
   it('forwards the tenant to getTenantBaseUrl', async () => {
     await setup();

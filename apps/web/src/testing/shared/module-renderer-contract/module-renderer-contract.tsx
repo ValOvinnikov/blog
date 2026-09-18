@@ -1,10 +1,6 @@
-import type { RenderResult } from '@testing-library/react';
 import { screen } from '@web/testing/custom-render';
+import type { TAsyncSetup } from '@web/testing/shared/async-setup/async-setup';
 import type { Mock } from 'vitest';
-
-type TAsyncSetup = (
-  overrides?: Record<string, unknown>,
-) => Promise<RenderResult>;
 
 interface IWithSetup {
   setup: TAsyncSetup;

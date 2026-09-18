@@ -1,11 +1,7 @@
-import type { RenderResult } from '@testing-library/react';
 import { screen, within } from '@web/testing/custom-render';
+import type { TAsyncSetup } from '@web/testing/shared/async-setup/async-setup';
 import { notFound } from 'next/navigation';
 import type { Mock } from 'vitest';
-
-type TAsyncSetup = (
-  overrides?: Record<string, unknown>,
-) => Promise<RenderResult>;
 
 interface IBreadcrumbTrailStep {
   label: string;
@@ -91,9 +87,12 @@ export const testBreadcrumbsJsonLdSchema = <TData,>({
   setup,
   successData,
   itemPath,
-}: IWithSuccessData<TData> & { itemPath: string }) => {
+}: Partial<IWithSuccessData<TData>> & {
+  setup: TAsyncSetup;
+  itemPath: string;
+}) => {
   it('renders the JSON-LD BreadcrumbList schema script', async () => {
-    pageLoaderMock.mockResolvedValue({ ok: true, data: successData });
+    pageLoaderMock?.mockResolvedValue({ ok: true, data: successData });
 
     const { container } = await setup();
 
@@ -113,9 +112,12 @@ export const testNoJsonLdWithoutBaseUrl = <TData,>({
   setup,
   successData,
   getTenantBaseUrlMock,
-}: IWithSuccessData<TData> & { getTenantBaseUrlMock: Mock }) => {
+}: Partial<IWithSuccessData<TData>> & {
+  setup: TAsyncSetup;
+  getTenantBaseUrlMock: Mock;
+}) => {
   it('renders no JSON-LD script when the base URL cannot be resolved', async () => {
-    pageLoaderMock.mockResolvedValue({ ok: true, data: successData });
+    pageLoaderMock?.mockResolvedValue({ ok: true, data: successData });
     getTenantBaseUrlMock.mockResolvedValue(undefined);
 
     const { container } = await setup();
