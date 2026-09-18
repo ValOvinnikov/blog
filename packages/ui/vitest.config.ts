@@ -52,6 +52,7 @@ export default mergeConfig(
     },
     test: {
       environment: 'jsdom',
+      isolate: false,
       setupFiles: ['./src/test-setup.ts'],
       css: {
         // `?raw` CSS imports (e.g. the design-token gallery's theme.css?raw)
