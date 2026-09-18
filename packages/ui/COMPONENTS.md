@@ -192,12 +192,12 @@ Props: className?: string _(extends IWithDataTestId, VariantProps<typeof buttonV
 ### MediaCard — `molecules/media-card/media-card.tsx`
 
 a media-led summary card for any linked item, rendered as an `<article>`.
-Props: excerpt?: string · tags?: string[] · isSplit?: TMediaCardVariants['isSplit'] · isLead?: TMediaCardVariants['isLead'] · children?: TCompoundChildren<typeof MediaCardParts> _(extends IWithClassName, IWithDataTestId)_
-Variants: isSplit: (boolean) · isLead: (boolean)
+Props: excerpt?: string · tags?: string[] · isSplit?: TMediaCardVariants['isSplit'] · isLead?: TMediaCardVariants['isLead'] · align?: TMediaCardVariants['align'] · children?: TCompoundChildren<typeof MediaCardParts> _(extends IWithClassName, IWithDataTestId)_
+Variants: isSplit: (boolean) · isLead: (boolean) · align: left|center
 
 Slots:
 
-- **MediaCard.Media** — the media region of a `MediaCard`; a styled `<div>` wrapper you fill with an image or `MediaFrame`. Props: isLead?: TMediaCardMediaVariants['isLead'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isLead: (boolean)
+- **MediaCard.Media** — the media region of a `MediaCard`; a styled `<div>` wrapper you fill with an image or `MediaFrame`. Props: isLead?: TMediaCardMediaVariants['isLead'] · shape?: TMediaCardMediaVariants['shape'] · align?: TMediaCardMediaVariants['align'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: shape: wide|square|circle|icon · isLead: (boolean) · align: left|center
 - **MediaCard.Meta** — compact metadata row for cards. Props: dateValue: string · dateLabel: string · readingTime?: string _(extends IWithClassName, IWithDataTestId)_
 - **MediaCard.Title** — the heading inside a `MediaCard`, rendered at the caller-specified heading depth with the card title's visual treatment. Props: level: THeadingLevel · isLead?: boolean · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **MediaCard.Footer** — the byline row at the bottom of a `MediaCard`. Props: authorName?: string · authorAvatarSrc?: string · publishedAt?: string · formattedDate?: string · topic?: string · leadingIcon?: ReactNode · trailingIcon?: ReactNode _(extends IWithClassName, IWithDataTestId)_
@@ -288,7 +288,7 @@ Props: rows: IBookmarkRow[] · emptyMessage: string · hint?: string · prefix?:
 
 the responsive grid container that lays out cards (or any children) in columns.
 Props: columns?: TCardGridVariants['columns'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
-Variants: columns: 1|2|3
+Variants: columns: 1|2|3|4
 
 ### Carousel — `organisms/carousel/carousel.tsx`
 

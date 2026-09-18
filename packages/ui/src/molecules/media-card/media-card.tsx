@@ -38,19 +38,9 @@ export type TMediaCardProps = IWithClassName &
   IWithDataTestId & {
     excerpt?: string;
     tags?: string[];
-    /**
-     * From `md`, lays the media and copy side by side (media first) in an
-     * equal 1:1 split; below `md` the layout is unchanged (media stacked
-     * above copy). Has no effect without a `MediaCard.Media` slot — the copy
-     * stays full-width.
-     */
     isSplit?: TMediaCardVariants['isSplit'];
-    /**
-     * Renders the title at display size, clamps the excerpt to three lines
-     * instead of two, and gives the media a taller frame — for a single
-     * editor-pinned spotlight card.
-     */
     isLead?: TMediaCardVariants['isLead'];
+    align?: TMediaCardVariants['align'];
     children?: TCompoundChildren<typeof MediaCardParts>;
   };
 
@@ -63,6 +53,7 @@ const MediaCardRoot = ({
   tags,
   isSplit,
   isLead,
+  align,
   children,
   className,
   dataTestId,
@@ -70,14 +61,14 @@ const MediaCardRoot = ({
   const { slots, unmatched } = mapCompoundSlots(children, MediaCardParts);
   const hasMedia = Boolean(slots.Media);
   const isSplitLayout = Boolean(isSplit) && hasMedia;
-  const s = mediaCardVariants({ isSplit: isSplitLayout, isLead });
+  const s = mediaCardVariants({ isSplit: isSplitLayout, isLead, align });
 
-  const media =
-    isLead && slots.Media
-      ? cloneElement(slots.Media as ReactElement<TMediaCardMediaProps>, {
-          isLead: true,
-        })
-      : slots.Media;
+  const media = slots.Media
+    ? cloneElement(slots.Media as ReactElement<TMediaCardMediaProps>, {
+        ...(isLead ? { isLead: true } : {}),
+        ...(align === 'center' ? { align } : {}),
+      })
+    : slots.Media;
 
   return (
     <article className={s.root({ class: className })} data-testid={dataTestId}>

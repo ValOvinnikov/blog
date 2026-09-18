@@ -1,4 +1,4 @@
-import { ICONS, type TIconName } from '@blog/config';
+import { FEATURE_ICONS, ICONS, type TIconName } from '@blog/config';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 
 import { Icon } from './icon';
@@ -65,5 +65,13 @@ describe('ICON_REGISTRY', () => {
       expect(ICON_REGISTRY[name].component).toBeDefined();
       expect(ICON_REGISTRY[name].url.length).toBeGreaterThan(0);
     });
+  });
+});
+
+describe.each(FEATURE_ICONS)('<%s Icon/>', (name) => {
+  it('renders', () => {
+    setup({ name, dataTestId: 'feature-icon' });
+
+    expect(screen.getByTestId('feature-icon')).toBeVisible();
   });
 });

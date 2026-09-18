@@ -48,4 +48,14 @@ describe(`<${CardGrid.name}/>`, () => {
     expect(container.firstChild).not.toHaveClass('sm:grid-cols-2');
     expect(container.firstChild).not.toHaveClass('md:grid-cols-3');
   });
+
+  it('applies the four-column classes for columns={4}', () => {
+    const { container } = setup({ columns: 4 });
+    expect(container.firstChild).toHaveClass(
+      'grid-cols-1',
+      'sm:grid-cols-2',
+      'md:grid-cols-3',
+      'lg:grid-cols-4',
+    );
+  });
 });

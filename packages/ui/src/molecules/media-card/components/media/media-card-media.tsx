@@ -8,8 +8,9 @@ import {
 
 export type TMediaCardMediaProps = IWithClassName &
   IWithDataTestId & {
-    /** Set by `MediaCard` on lead cards — swaps the default 16:9 frame for a taller 4:3 one. */
     isLead?: TMediaCardMediaVariants['isLead'];
+    shape?: TMediaCardMediaVariants['shape'];
+    align?: TMediaCardMediaVariants['align'];
     children?: ReactNode;
   };
 
@@ -19,12 +20,19 @@ export type TMediaCardMediaProps = IWithClassName &
  */
 export const MediaCardMedia = ({
   isLead,
+  shape,
+  align,
   className,
   dataTestId,
   children,
 }: TMediaCardMediaProps) => (
   <div
-    className={mediaCardMediaVariants({ isLead, class: className })}
+    className={mediaCardMediaVariants({
+      isLead,
+      shape,
+      align,
+      class: className,
+    })}
     data-testid={dataTestId}
   >
     {children}

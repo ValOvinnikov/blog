@@ -291,4 +291,217 @@ describe(`<${MediaCard.name}/>`, () => {
     );
     expect(screen.getByTestId('media-card-media')).toHaveClass('aspect-video');
   });
+
+  it('renders the wide shape identically to the pre-existing default, with and without isLead', () => {
+    const { unmount } = renderElement(
+      <MediaCard>
+        <MediaCard.Media shape="wide" dataTestId="media-card-media">
+          <img src="/cover.jpg" alt="Cover photo" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    expect(screen.getByTestId('media-card-media')).toHaveClass(
+      'w-full',
+      'aspect-video',
+    );
+    unmount();
+
+    renderElement(
+      <MediaCard isLead={true}>
+        <MediaCard.Media shape="wide" dataTestId="media-card-media">
+          <img src="/cover.jpg" alt="Cover photo" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    expect(screen.getByTestId('media-card-media')).toHaveClass(
+      'w-full',
+      'aspect-[4/3]',
+    );
+  });
+
+  it('renders the square shape edge to edge and 1:1, unaffected by isLead', () => {
+    const { unmount } = renderElement(
+      <MediaCard>
+        <MediaCard.Media shape="square" dataTestId="media-card-media">
+          <img src="/cover.jpg" alt="Cover photo" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    expect(screen.getByTestId('media-card-media')).toHaveClass(
+      'w-full',
+      'aspect-square',
+    );
+    unmount();
+
+    renderElement(
+      <MediaCard isLead={true}>
+        <MediaCard.Media shape="square" dataTestId="media-card-media">
+          <img src="/cover.jpg" alt="Cover photo" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    expect(screen.getByTestId('media-card-media')).toHaveClass(
+      'w-full',
+      'aspect-square',
+    );
+  });
+
+  it('frames a circle shape inside the card padding instead of edge to edge', () => {
+    renderElement(
+      <MediaCard>
+        <MediaCard.Media shape="circle" dataTestId="media-card-media">
+          <img src="/avatar.jpg" alt="Author photo" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    const media = screen.getByTestId('media-card-media');
+    expect(media).toHaveClass(
+      'size-28',
+      'rounded-full',
+      'mt-card-y',
+      'mx-card-x',
+    );
+    expect(media).not.toHaveClass('w-full');
+  });
+
+  it('frames an icon shape as a tile inside the card padding, styled for currentColor children', () => {
+    renderElement(
+      <MediaCard>
+        <MediaCard.Media shape="icon" dataTestId="media-card-media">
+          <span data-testid="glyph" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    const media = screen.getByTestId('media-card-media');
+    expect(media).toHaveClass(
+      'size-12',
+      'rounded-md',
+      'mt-card-y',
+      'mx-card-x',
+      'bg-brand-primary-muted',
+      'text-brand-primary',
+    );
+    expect(media).not.toHaveClass('w-full');
+  });
+
+  it('centres every row of the card when align is center, including meta and footer', () => {
+    renderElement(
+      <MediaCard
+        align="center"
+        excerpt="A short summary."
+        tags={['react']}
+        dataTestId="media-card"
+      >
+        <MediaCard.Meta
+          dateValue="2024-01-01"
+          dateLabel="Jan 1, 2024"
+          dataTestId="media-card-meta"
+        />
+        <MediaCard.Title level={3}>
+          <a href="/posts/hello-world">Hello World</a>
+        </MediaCard.Title>
+        <MediaCard.Footer
+          authorName="Jane Doe"
+          dataTestId="media-card-footer"
+        />
+      </MediaCard>,
+    );
+    const content = screen.getByTestId('media-card-content');
+    expect(content).toHaveClass('items-center', 'text-center');
+    expect(content).toContainElement(screen.getByTestId('media-card-meta'));
+    expect(content).toContainElement(screen.getByRole('heading', { level: 3 }));
+    expect(content).toContainElement(screen.getByText('A short summary.'));
+    expect(content).toContainElement(screen.getByText('react'));
+    expect(content).toContainElement(screen.getByTestId('media-card-footer'));
+  });
+
+  it('does not centre the card content when align is left (default)', () => {
+    renderElement(<MediaCard dataTestId="media-card" />);
+    expect(screen.getByTestId('media-card-content')).not.toHaveClass(
+      'items-center',
+    );
+  });
+
+  it('centres an inset circle/icon frame by cloning align onto MediaCard.Media, the same mechanism used for isLead', () => {
+    renderElement(
+      <MediaCard align="center">
+        <MediaCard.Media shape="circle" dataTestId="media-card-media">
+          <img src="/avatar.jpg" alt="Author photo" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    const media = screen.getByTestId('media-card-media');
+    expect(media).toHaveClass('mx-auto');
+    expect(media).not.toHaveClass('mx-card-x');
+  });
+
+  it('leaves the circle shape unaffected by isLead, since no compound variant targets it', () => {
+    const { unmount } = renderElement(
+      <MediaCard>
+        <MediaCard.Media shape="circle" dataTestId="media-card-media">
+          <img src="/avatar.jpg" alt="Author photo" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    const withoutLead = screen.getByTestId('media-card-media').className;
+    unmount();
+
+    renderElement(
+      <MediaCard isLead={true}>
+        <MediaCard.Media shape="circle" dataTestId="media-card-media">
+          <img src="/avatar.jpg" alt="Author photo" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    expect(screen.getByTestId('media-card-media').className).toBe(withoutLead);
+  });
+
+  it('leaves the icon shape unaffected by isLead, since no compound variant targets it', () => {
+    const { unmount } = renderElement(
+      <MediaCard>
+        <MediaCard.Media shape="icon" dataTestId="media-card-media">
+          <span data-testid="glyph" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    const withoutLead = screen.getByTestId('media-card-media').className;
+    unmount();
+
+    renderElement(
+      <MediaCard isLead={true}>
+        <MediaCard.Media shape="icon" dataTestId="media-card-media">
+          <span data-testid="glyph" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    expect(screen.getByTestId('media-card-media').className).toBe(withoutLead);
+  });
+
+  it('wraps a circle-shaped media in the split container without stretching the inset frame', () => {
+    renderElement(
+      <MediaCard isSplit={true}>
+        <MediaCard.Media shape="circle" dataTestId="media-card-media">
+          <img src="/avatar.jpg" alt="Author photo" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    const media = screen.getByTestId('media-card-media');
+    expect(media.parentElement).toHaveClass('md:w-1/2');
+    expect(media).toHaveClass('size-28', 'rounded-full', 'mx-card-x');
+    expect(media).not.toHaveClass('w-full');
+  });
+
+  it('wraps an icon-shaped media in the split container without stretching the inset frame', () => {
+    renderElement(
+      <MediaCard isSplit={true}>
+        <MediaCard.Media shape="icon" dataTestId="media-card-media">
+          <span data-testid="glyph" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    const media = screen.getByTestId('media-card-media');
+    expect(media.parentElement).toHaveClass('md:w-1/2');
+    expect(media).toHaveClass('size-12', 'rounded-md', 'mx-card-x');
+    expect(media).not.toHaveClass('w-full');
+  });
 });
