@@ -45,7 +45,7 @@ const setPathname = (pathname: string) => {
   usePathnameMock.mockReturnValue(pathname);
 };
 
-describe(Sidebar, () => {
+describe(`<${Sidebar.name}/>`, () => {
   beforeEach(() => {
     setPathname('/');
   });

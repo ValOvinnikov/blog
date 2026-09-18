@@ -64,7 +64,7 @@ vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
   updateTenantDetailsAction: updateTenantDetailsActionMock,
 }));
 
-describe(TenantDetailsPanel, () => {
+describe(`<${TenantDetailsPanel.name}/>`, () => {
   const refreshMock = vi.fn();
 
   beforeEach(() => {

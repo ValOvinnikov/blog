@@ -43,7 +43,7 @@ const PLATFORM_TENANTS_SECTION = [
   },
 ];
 
-describe(TopbarNavMenu, () => {
+describe(`<${TopbarNavMenu.name}/>`, () => {
   beforeEach(() => {
     setPathname('/');
   });

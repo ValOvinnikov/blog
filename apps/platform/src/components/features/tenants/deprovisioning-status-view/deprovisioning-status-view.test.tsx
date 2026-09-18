@@ -41,7 +41,7 @@ const Wrapper = ({
   return <DeprovisioningStatusView poll={poll} />;
 };
 
-describe(DeprovisioningStatusView, () => {
+describe(`<${DeprovisioningStatusView.name}/>`, () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
     getTenantDeprovisioningStatusActionMock.mockReset();
