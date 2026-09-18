@@ -2,9 +2,9 @@ import { SIZE, type IWithClassName, type IWithDataTestId } from '@blog/config';
 import { Avatar } from '@blog/ui/atoms/avatar';
 import type { ReactNode } from 'react';
 
-import { postCardFooterVariants } from './post-card-footer-variants';
+import { mediaCardFooterVariants } from './media-card-footer-variants';
 
-export type TPostCardFooterProps = IWithClassName &
+export type TMediaCardFooterProps = IWithClassName &
   IWithDataTestId & {
     authorName?: string;
     authorAvatarSrc?: string;
@@ -18,13 +18,12 @@ export type TPostCardFooterProps = IWithClassName &
     trailingIcon?: ReactNode;
   };
 
-const s = postCardFooterVariants();
+const s = mediaCardFooterVariants();
 
 /**
- * PostCardFooter — the byline row at the bottom of a `PostCard`: optional author
- * avatar and name, published date, and a topic tag.
+ * MediaCardFooter — the byline row at the bottom of a `MediaCard`.
  */
-export const PostCardFooter = ({
+export const MediaCardFooter = ({
   authorName,
   authorAvatarSrc,
   publishedAt,
@@ -34,7 +33,7 @@ export const PostCardFooter = ({
   trailingIcon,
   className,
   dataTestId,
-}: TPostCardFooterProps) => (
+}: TMediaCardFooterProps) => (
   <div className={s.root({ class: className })} data-testid={dataTestId}>
     {authorName && (
       <Avatar

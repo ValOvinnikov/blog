@@ -13,50 +13,52 @@ import {
   type ReactElement,
 } from 'react';
 
-import { PostCardFooter } from './components/footer/post-card-footer';
+import { MediaCardFooter } from './components/footer/media-card-footer';
 import {
-  PostCardMedia,
-  type TPostCardMediaProps,
-} from './components/media/post-card-media';
+  MediaCardMedia,
+  type TMediaCardMediaProps,
+} from './components/media/media-card-media';
 import {
-  PostCardTitle,
-  type TPostCardTitleProps,
-} from './components/title/post-card-title';
-import { postCardVariants, type TPostCardVariants } from './post-card-variants';
+  MediaCardTitle,
+  type TMediaCardTitleProps,
+} from './components/title/media-card-title';
+import {
+  mediaCardVariants,
+  type TMediaCardVariants,
+} from './media-card-variants';
 
-const PostCardParts = {
-  Media: PostCardMedia,
+const MediaCardParts = {
+  Media: MediaCardMedia,
   Meta: CardMeta,
-  Title: PostCardTitle,
-  Footer: PostCardFooter,
+  Title: MediaCardTitle,
+  Footer: MediaCardFooter,
 } satisfies Record<string, ElementType>;
 
-export type TPostCardProps = IWithClassName &
+export type TMediaCardProps = IWithClassName &
   IWithDataTestId & {
     excerpt?: string;
     tags?: string[];
     /**
      * From `md`, lays the media and copy side by side (media first) in an
      * equal 1:1 split; below `md` the layout is unchanged (media stacked
-     * above copy). Has no effect without a `PostCard.Media` slot — the copy
+     * above copy). Has no effect without a `MediaCard.Media` slot — the copy
      * stays full-width.
      */
-    isSplit?: TPostCardVariants['isSplit'];
+    isSplit?: TMediaCardVariants['isSplit'];
     /**
      * Renders the title at display size, clamps the excerpt to three lines
      * instead of two, and gives the media a taller frame — for a single
      * editor-pinned spotlight card.
      */
-    isLead?: TPostCardVariants['isLead'];
-    children?: TCompoundChildren<typeof PostCardParts>;
+    isLead?: TMediaCardVariants['isLead'];
+    children?: TCompoundChildren<typeof MediaCardParts>;
   };
 
 /**
- * PostCard — the article summary card used in listings; composes
- * `PostCard.Media`, `PostCard.Meta`, `PostCard.Title`, and `PostCard.Footer`
- * slots around an optional `excerpt` and `tags` row, rendered as an `<article>`.
+ * MediaCard — a media-led summary card for any linked item, rendered as an
+ * `<article>`.
  */
-const PostCardRoot = ({
+const MediaCardRoot = ({
   excerpt,
   tags,
   isSplit,
@@ -64,15 +66,15 @@ const PostCardRoot = ({
   children,
   className,
   dataTestId,
-}: TPostCardProps) => {
-  const { slots, unmatched } = mapCompoundSlots(children, PostCardParts);
+}: TMediaCardProps) => {
+  const { slots, unmatched } = mapCompoundSlots(children, MediaCardParts);
   const hasMedia = Boolean(slots.Media);
   const isSplitLayout = Boolean(isSplit) && hasMedia;
-  const s = postCardVariants({ isSplit: isSplitLayout, isLead });
+  const s = mediaCardVariants({ isSplit: isSplitLayout, isLead });
 
   const media =
     isLead && slots.Media
-      ? cloneElement(slots.Media as ReactElement<TPostCardMediaProps>, {
+      ? cloneElement(slots.Media as ReactElement<TMediaCardMediaProps>, {
           isLead: true,
         })
       : slots.Media;
@@ -80,10 +82,10 @@ const PostCardRoot = ({
   return (
     <article className={s.root({ class: className })} data-testid={dataTestId}>
       {isSplitLayout ? <div className={s.media()}>{media}</div> : media}
-      <div className={s.content()} data-testid="post-card-content">
+      <div className={s.content()} data-testid="media-card-content">
         {slots.Meta}
         {isLead && slots.Title
-          ? cloneElement(slots.Title as ReactElement<TPostCardTitleProps>, {
+          ? cloneElement(slots.Title as ReactElement<TMediaCardTitleProps>, {
               isLead: true,
             })
           : slots.Title}
@@ -104,7 +106,7 @@ const PostCardRoot = ({
   );
 };
 
-export const PostCard: TCompoundComponent<
-  typeof PostCardRoot,
-  typeof PostCardParts
-> = Object.assign(PostCardRoot, PostCardParts);
+export const MediaCard: TCompoundComponent<
+  typeof MediaCardRoot,
+  typeof MediaCardParts
+> = Object.assign(MediaCardRoot, MediaCardParts);

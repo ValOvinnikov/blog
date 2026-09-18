@@ -1,7 +1,7 @@
 import { DISPLAY_MODE } from '@blog/config';
 import type { TPostLatestModule } from '@blog/service';
 import { Heading } from '@blog/ui/atoms/heading';
-import { PostGrid } from '@blog/ui/organisms/post-grid';
+import { CardGrid } from '@blog/ui/organisms/card-grid';
 import {
   type IPostCardData,
   PostCardItem,
@@ -23,7 +23,7 @@ export interface IPostLatestModuleViewProps extends Omit<
 
 /**
  * PostLatestModuleView — render shell for `PostLatestModule`: a labeled
- * `Section` wrapping either a `PostsCarousel` or a `PostGrid` of
+ * `Section` wrapping either a `PostsCarousel` or a `CardGrid` of
  * `PostCardItem`s. Never called with an empty `items` — `PostLatestModule`
  * renders nothing itself in that case.
  */
@@ -60,11 +60,11 @@ export const PostLatestModuleView = ({
           tone={brandVariant}
         />
       ) : (
-        <PostGrid className={s.grid()}>
+        <CardGrid className={s.grid()}>
           {items.map((item) => (
             <PostCardItem key={item.id} item={item} hasImage={hasImages} />
           ))}
-        </PostGrid>
+        </CardGrid>
       )}
     </Section>
   );

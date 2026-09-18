@@ -1,15 +1,15 @@
 import { renderElement, screen } from '@blog/ui/testing/custom-render';
 
-import { PostCard } from './post-card';
+import { MediaCard } from './media-card';
 
-describe(`<${PostCard.name}/>`, () => {
-  it('renders PostCard.Title at the caller-specified heading level', () => {
+describe(`<${MediaCard.name}/>`, () => {
+  it('renders MediaCard.Title at the caller-specified heading level', () => {
     renderElement(
-      <PostCard>
-        <PostCard.Title level={3}>
+      <MediaCard>
+        <MediaCard.Title level={3}>
           <a href="/posts/hello-world">Hello World</a>
-        </PostCard.Title>
-      </PostCard>,
+        </MediaCard.Title>
+      </MediaCard>,
     );
     expect(screen.getByRole('heading', { level: 3 })).toBeVisible();
     expect(screen.getByRole('link')).toHaveAttribute(
@@ -18,61 +18,61 @@ describe(`<${PostCard.name}/>`, () => {
     );
   });
 
-  it('renders PostCard.Title at a different caller-specified heading level', () => {
+  it('renders MediaCard.Title at a different caller-specified heading level', () => {
     renderElement(
-      <PostCard>
-        <PostCard.Title level={2}>
+      <MediaCard>
+        <MediaCard.Title level={2}>
           <a href="/posts/hello-world">Hello World</a>
-        </PostCard.Title>
-      </PostCard>,
+        </MediaCard.Title>
+      </MediaCard>,
     );
     expect(screen.getByRole('heading', { level: 2 })).toBeVisible();
     expect(screen.queryByRole('heading', { level: 3 })).not.toBeInTheDocument();
   });
 
-  it('renders PostCard.Media content', () => {
+  it('renders MediaCard.Media content', () => {
     renderElement(
-      <PostCard>
-        <PostCard.Media>
+      <MediaCard>
+        <MediaCard.Media>
           <img src="/cover.jpg" alt="Cover photo" />
-        </PostCard.Media>
-      </PostCard>,
+        </MediaCard.Media>
+      </MediaCard>,
     );
     expect(screen.getByRole('img', { name: 'Cover photo' })).toBeVisible();
   });
 
-  it('does not render media when PostCard.Media is omitted', () => {
+  it('does not render media when MediaCard.Media is omitted', () => {
     renderElement(
-      <PostCard>
-        <PostCard.Title level={3}>
+      <MediaCard>
+        <MediaCard.Title level={3}>
           <a href="/posts/hello-world">Hello World</a>
-        </PostCard.Title>
-      </PostCard>,
+        </MediaCard.Title>
+      </MediaCard>,
     );
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
   it('renders excerpt when provided', () => {
-    renderElement(<PostCard excerpt="A short summary." />);
+    renderElement(<MediaCard excerpt="A short summary." />);
     expect(screen.getByText('A short summary.')).toBeVisible();
   });
 
   it('does not render excerpt element when omitted', () => {
-    renderElement(<PostCard />);
+    renderElement(<MediaCard />);
     expect(screen.queryByText(/summary/i)).not.toBeInTheDocument();
   });
 
   it('renders all provided tags', () => {
-    renderElement(<PostCard tags={['react', 'typescript']} />);
+    renderElement(<MediaCard tags={['react', 'typescript']} />);
     expect(screen.getByText('react')).toBeVisible();
     expect(screen.getByText('typescript')).toBeVisible();
   });
 
-  it('renders author name when provided via PostCard.Footer', () => {
+  it('renders author name when provided via MediaCard.Footer', () => {
     renderElement(
-      <PostCard>
-        <PostCard.Footer authorName="Jane Doe" />
-      </PostCard>,
+      <MediaCard>
+        <MediaCard.Footer authorName="Jane Doe" />
+      </MediaCard>,
     );
     // `sr-only` is the sole observable that distinguishes the visible name
     // span from the Avatar's visually-hidden duplicate of the same text.
@@ -83,16 +83,16 @@ describe(`<${PostCard.name}/>`, () => {
   });
 
   it('does not render author section when authorName is omitted', () => {
-    renderElement(<PostCard />);
+    renderElement(<MediaCard />);
     expect(screen.queryByText('Jane Doe')).not.toBeInTheDocument();
   });
 
   it('renders a time element with the correct dateTime and display text', () => {
     const iso = '2024-01-15T00:00:00Z';
     renderElement(
-      <PostCard>
-        <PostCard.Footer publishedAt={iso} formattedDate="January 15, 2024" />
-      </PostCard>,
+      <MediaCard>
+        <MediaCard.Footer publishedAt={iso} formattedDate="January 15, 2024" />
+      </MediaCard>,
     );
     const timeEl = screen.getByRole('time');
     expect(timeEl).toBeVisible();
@@ -102,153 +102,155 @@ describe(`<${PostCard.name}/>`, () => {
 
   it('does not render time element when publishedAt is omitted', () => {
     renderElement(
-      <PostCard>
-        <PostCard.Footer formattedDate="January 15, 2024" />
-      </PostCard>,
+      <MediaCard>
+        <MediaCard.Footer formattedDate="January 15, 2024" />
+      </MediaCard>,
     );
     expect(screen.queryByRole('time')).not.toBeInTheDocument();
   });
 
   it('does not render time element when formattedDate is omitted', () => {
     renderElement(
-      <PostCard>
-        <PostCard.Footer publishedAt="2024-01-15T00:00:00Z" />
-      </PostCard>,
+      <MediaCard>
+        <MediaCard.Footer publishedAt="2024-01-15T00:00:00Z" />
+      </MediaCard>,
     );
     expect(screen.queryByRole('time')).not.toBeInTheDocument();
   });
 
   it('renders unmatched children without dropping them', () => {
     renderElement(
-      <PostCard>
+      <MediaCard>
         <span>stray content</span>
-      </PostCard>,
+      </MediaCard>,
     );
     expect(screen.getByText('stray content')).toBeVisible();
   });
 
-  it('renders PostCard.Meta content', () => {
+  it('renders MediaCard.Meta content', () => {
     renderElement(
-      <PostCard>
-        <PostCard.Meta dateValue="2024-01-01" dateLabel="Jan 1, 2024" />
-      </PostCard>,
+      <MediaCard>
+        <MediaCard.Meta dateValue="2024-01-01" dateLabel="Jan 1, 2024" />
+      </MediaCard>,
     );
     expect(screen.getByText('Jan 1, 2024')).toBeVisible();
   });
 
-  it('renders the topic lowercased via PostCard.Footer', () => {
+  it('renders the topic lowercased via MediaCard.Footer', () => {
     renderElement(
-      <PostCard>
-        <PostCard.Footer topic="Design Systems" />
-      </PostCard>,
+      <MediaCard>
+        <MediaCard.Footer topic="Design Systems" />
+      </MediaCard>,
     );
     expect(screen.getByText(/design systems/)).toBeVisible();
   });
 
-  it('renders a caller-supplied trailing icon via PostCard.Footer', () => {
+  it('renders a caller-supplied trailing icon via MediaCard.Footer', () => {
     renderElement(
-      <PostCard>
-        <PostCard.Footer
+      <MediaCard>
+        <MediaCard.Footer
           topic="Design Systems"
           trailingIcon={<span data-testid="custom-icon" />}
         />
-      </PostCard>,
+      </MediaCard>,
     );
     expect(screen.getByTestId('custom-icon')).toBeVisible();
   });
 
   it('renders leadingIcon and trailingIcon with matching spacing around the topic text', () => {
     renderElement(
-      <PostCard>
-        <PostCard.Footer
+      <MediaCard>
+        <MediaCard.Footer
           topic="Design Systems"
           leadingIcon={<span aria-hidden="true">L</span>}
           trailingIcon={<span aria-hidden="true">R</span>}
         />
-      </PostCard>,
+      </MediaCard>,
     );
     const topicText = screen.getByText(/design systems/);
     expect(topicText.textContent).toBe('L design systems R');
   });
 
   it('forwards data-testid to root element', () => {
-    renderElement(<PostCard dataTestId="post-card" />);
-    expect(screen.getByTestId('post-card')).toBeVisible();
+    renderElement(<MediaCard dataTestId="media-card" />);
+    expect(screen.getByTestId('media-card')).toBeVisible();
   });
 
   it('applies the split layout class to the root when isSplit is set and Media is present', () => {
     renderElement(
-      <PostCard isSplit={true} dataTestId="post-card">
-        <PostCard.Media>
+      <MediaCard isSplit={true} dataTestId="media-card">
+        <MediaCard.Media>
           <img src="/cover.jpg" alt="Cover photo" />
-        </PostCard.Media>
-      </PostCard>,
+        </MediaCard.Media>
+      </MediaCard>,
     );
-    expect(screen.getByTestId('post-card')).toHaveClass('md:flex-row');
-    expect(screen.getByTestId('post-card-content')).toHaveClass('md:w-1/2');
+    expect(screen.getByTestId('media-card')).toHaveClass('md:flex-row');
+    expect(screen.getByTestId('media-card-content')).toHaveClass('md:w-1/2');
   });
 
   it('does not apply the split layout class when isSplit is unset', () => {
-    renderElement(<PostCard dataTestId="post-card" />);
-    expect(screen.getByTestId('post-card')).not.toHaveClass('md:flex-row');
+    renderElement(<MediaCard dataTestId="media-card" />);
+    expect(screen.getByTestId('media-card')).not.toHaveClass('md:flex-row');
   });
 
   it('does not apply the split layout when isSplit is set but no Media slot is present', () => {
     renderElement(
-      <PostCard isSplit={true} dataTestId="post-card">
-        <PostCard.Title level={3}>
+      <MediaCard isSplit={true} dataTestId="media-card">
+        <MediaCard.Title level={3}>
           <a href="/posts/hello-world">Hello World</a>
-        </PostCard.Title>
-      </PostCard>,
+        </MediaCard.Title>
+      </MediaCard>,
     );
-    expect(screen.getByTestId('post-card')).not.toHaveClass('md:flex-row');
-    expect(screen.getByTestId('post-card-content')).not.toHaveClass('md:w-1/2');
+    expect(screen.getByTestId('media-card')).not.toHaveClass('md:flex-row');
+    expect(screen.getByTestId('media-card-content')).not.toHaveClass(
+      'md:w-1/2',
+    );
   });
 
-  it('wraps PostCard.Media in a split container only when isSplit is set and Media is present', () => {
+  it('wraps MediaCard.Media in a split container only when isSplit is set and Media is present', () => {
     renderElement(
-      <PostCard isSplit={true}>
-        <PostCard.Media dataTestId="post-card-media">
+      <MediaCard isSplit={true}>
+        <MediaCard.Media dataTestId="media-card-media">
           <img src="/cover.jpg" alt="Cover photo" />
-        </PostCard.Media>
-      </PostCard>,
+        </MediaCard.Media>
+      </MediaCard>,
     );
-    const media = screen.getByTestId('post-card-media');
+    const media = screen.getByTestId('media-card-media');
     const article = screen.getByRole('article');
     expect(media.parentElement).not.toBe(article);
     expect(media.parentElement?.parentElement).toBe(article);
   });
 
-  it('renders PostCard.Media as a direct child of the article when isSplit is unset', () => {
+  it('renders MediaCard.Media as a direct child of the article when isSplit is unset', () => {
     renderElement(
-      <PostCard>
-        <PostCard.Media dataTestId="post-card-media">
+      <MediaCard>
+        <MediaCard.Media dataTestId="media-card-media">
           <img src="/cover.jpg" alt="Cover photo" />
-        </PostCard.Media>
-      </PostCard>,
+        </MediaCard.Media>
+      </MediaCard>,
     );
-    const media = screen.getByTestId('post-card-media');
+    const media = screen.getByTestId('media-card-media');
     const article = screen.getByRole('article');
     expect(media.parentElement).toBe(article);
   });
 
   it('clamps the excerpt to three lines when isLead is set', () => {
-    renderElement(<PostCard isLead={true} excerpt="A short summary." />);
+    renderElement(<MediaCard isLead={true} excerpt="A short summary." />);
     expect(screen.getByText('A short summary.')).toHaveClass('line-clamp-3');
   });
 
   it('clamps the excerpt to two lines when isLead is unset', () => {
-    renderElement(<PostCard excerpt="A short summary." />);
+    renderElement(<MediaCard excerpt="A short summary." />);
     expect(screen.getByText('A short summary.')).toHaveClass('line-clamp-2');
   });
 
   it('renders the title at display size when isLead is set', () => {
     renderElement(
-      <PostCard isLead={true}>
-        <PostCard.Title level={3}>
+      <MediaCard isLead={true}>
+        <MediaCard.Title level={3}>
           <a href="/posts/hello-world">Hello World</a>
-        </PostCard.Title>
-      </PostCard>,
+        </MediaCard.Title>
+      </MediaCard>,
     );
     expect(screen.getByRole('heading', { level: 3 })).toHaveClass(
       'text-post-title',
@@ -257,11 +259,11 @@ describe(`<${PostCard.name}/>`, () => {
 
   it('renders the title at card size when isLead is unset', () => {
     renderElement(
-      <PostCard>
-        <PostCard.Title level={3}>
+      <MediaCard>
+        <MediaCard.Title level={3}>
           <a href="/posts/hello-world">Hello World</a>
-        </PostCard.Title>
-      </PostCard>,
+        </MediaCard.Title>
+      </MediaCard>,
     );
     expect(screen.getByRole('heading', { level: 3 })).toHaveClass(
       'text-card-title',
@@ -270,23 +272,23 @@ describe(`<${PostCard.name}/>`, () => {
 
   it('renders a taller media frame when isLead is set', () => {
     renderElement(
-      <PostCard isLead={true}>
-        <PostCard.Media dataTestId="post-card-media">
+      <MediaCard isLead={true}>
+        <MediaCard.Media dataTestId="media-card-media">
           <img src="/cover.jpg" alt="Cover photo" />
-        </PostCard.Media>
-      </PostCard>,
+        </MediaCard.Media>
+      </MediaCard>,
     );
-    expect(screen.getByTestId('post-card-media')).toHaveClass('aspect-[4/3]');
+    expect(screen.getByTestId('media-card-media')).toHaveClass('aspect-[4/3]');
   });
 
   it('renders the default media frame when isLead is unset', () => {
     renderElement(
-      <PostCard>
-        <PostCard.Media dataTestId="post-card-media">
+      <MediaCard>
+        <MediaCard.Media dataTestId="media-card-media">
           <img src="/cover.jpg" alt="Cover photo" />
-        </PostCard.Media>
-      </PostCard>,
+        </MediaCard.Media>
+      </MediaCard>,
     );
-    expect(screen.getByTestId('post-card-media')).toHaveClass('aspect-video');
+    expect(screen.getByTestId('media-card-media')).toHaveClass('aspect-video');
   });
 });

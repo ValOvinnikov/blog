@@ -1,7 +1,7 @@
 import { ICONS, SIZE, type IWithDataTestId } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import type { THeadingLevel } from '@blog/ui/lib/react';
-import { PostCard } from '@blog/ui/molecules/post-card';
+import { MediaCard } from '@blog/ui/molecules/media-card';
 import { SmartLink } from '@web/components/shared/smart-link';
 import type { ReactNode } from 'react';
 
@@ -26,7 +26,7 @@ export interface IPostCardData {
 
 export type TPostCardItemProps = IWithDataTestId & {
   item: IPostCardData;
-  /** Renders a `PostCard.Media` region — the empty frame when `item.image` is absent. Omit to render no media region at all. */
+  /** Renders a `MediaCard.Media` region — the empty frame when `item.image` is absent. Omit to render no media region at all. */
   hasImage?: boolean;
   /** Heading depth for the card's title — the caller decides based on where the listing sits in the page outline. Defaults to `3`. */
   headingLevel?: THeadingLevel;
@@ -38,7 +38,7 @@ const s = postCardItemVariants();
 
 /**
  * PostCardItem — the one post-to-card mapping every listing in `apps/web`
- * renders: an `IPostCardData` item into `PostCard`'s `Media`/`Meta`/`Title`/
+ * renders: an `IPostCardData` item into `MediaCard`'s `Media`/`Meta`/`Title`/
  * `Footer` slots, titled via `SmartLink`.
  */
 export const PostCardItem = ({
@@ -49,26 +49,28 @@ export const PostCardItem = ({
   isSplit,
   dataTestId,
 }: TPostCardItemProps) => (
-  <PostCard
+  <MediaCard
     excerpt={item.excerpt}
     isLead={isLead}
     isSplit={isSplit}
     dataTestId={dataTestId}
   >
     {hasImage && (
-      <PostCard.Media dataTestId="post-card-media">{item.image}</PostCard.Media>
+      <MediaCard.Media dataTestId="post-card-media">
+        {item.image}
+      </MediaCard.Media>
     )}
-    <PostCard.Meta
+    <MediaCard.Meta
       dateValue={item.publishedAt}
       dateLabel={item.formattedDate}
       readingTime={item.readingTime}
     />
-    <PostCard.Title level={headingLevel}>
+    <MediaCard.Title level={headingLevel}>
       <SmartLink href={item.href} className={s.titleLink()}>
         {item.title}
       </SmartLink>
-    </PostCard.Title>
-    <PostCard.Footer
+    </MediaCard.Title>
+    <MediaCard.Footer
       topic={item.topic.title}
       trailingIcon={
         <Icon
@@ -78,5 +80,5 @@ export const PostCardItem = ({
         />
       }
     />
-  </PostCard>
+  </MediaCard>
 );
