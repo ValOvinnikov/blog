@@ -176,10 +176,10 @@ describe('heroProfileSchema imageSource field', () => {
     expect(field.initialValue).toBe(PROFILE_IMAGE_SOURCE.AUTHOR);
   });
 
-  it('is a required dropdown in the image fieldset, and drives the image field', () => {
+  it('is a required radio in the image fieldset, and drives the image field — required because it gates a hidden: predicate', () => {
     const field = getField('imageSource');
 
-    expect(getLayout(field)).toBe('dropdown');
+    expect(getLayout(field)).toBe('radio');
     expect(wasRequiredCalled(field)).toBe(true);
     expect(getFieldset(field)).toBe('image');
   });

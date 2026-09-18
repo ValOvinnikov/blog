@@ -150,7 +150,7 @@ export const heroProfileSchema = defineType({
       description: "The author's own photo, a custom image, or no image.",
       fieldset: FIELDSET_IMAGE,
       options: {
-        layout: 'dropdown',
+        layout: 'radio',
         list: Object.values(PROFILE_IMAGE_SOURCE).map((value) => ({
           title: toTitleCase(value),
           value,
