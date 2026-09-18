@@ -1,6 +1,14 @@
-import { customRenderAsync, screen, within } from '@web/testing/custom-render';
+import { customRenderAsync } from '@web/testing/custom-render';
 import { mockLandingPage } from '@web/testing/pages/landing-page/fixtures';
-import { notFound } from 'next/navigation';
+import {
+  testBreadcrumbsJsonLdSchema,
+  testBreadcrumbsTrail,
+  testForwardsArgsToLoader,
+  testNoJsonLdWithoutBaseUrl,
+  testNotFoundOnFetchFailure,
+  testNotFoundWithoutLog,
+} from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
+import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { LandingBreadcrumbs } from './landing-breadcrumbs';
 
@@ -18,18 +26,7 @@ vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
 }));
 
 vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: ({
-    href,
-    children,
-    ...rest
-  }: {
-    href: string;
-    children: React.ReactNode;
-  }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
+  SmartLink: SmartLinkMock,
 }));
 
 const setup = customRenderAsync(LandingBreadcrumbs, {
@@ -44,68 +41,36 @@ describe(`<${LandingBreadcrumbs.name}/>`, () => {
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');
   });
 
-  it('calls notFound() without logging when no page_landing matches the slug', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getLandingPageMock.mockResolvedValue({ ok: true, data: undefined });
-
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
-
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(errorSpy).not.toHaveBeenCalled();
-    errorSpy.mockRestore();
+  testNotFoundWithoutLog({ pageLoaderMock: getLandingPageMock, setup });
+  testNotFoundOnFetchFailure({
+    pageLoaderMock: getLandingPageMock,
+    setup,
+    eventFragment: 'landing_breadcrumbs.fetch_failed',
   });
-
-  it('calls notFound() and logs when the fetch fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getLandingPageMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
-
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('landing_breadcrumbs.fetch_failed'),
-    );
-    errorSpy.mockRestore();
+  testBreadcrumbsTrail({
+    pageLoaderMock: getLandingPageMock,
+    setup,
+    successData: mockLandingPage,
+    linkSteps: [{ label: 'Home', href: '/' }],
+    currentLabel: 'About Us',
   });
-
-  it('renders the Home › {title} breadcrumbs trail', async () => {
-    getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
-
-    await setup();
-
-    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
-
-    const homeLink = within(nav).getByRole('link', { name: 'Home' });
-    expect(homeLink).toHaveAttribute('href', '/');
-
-    const current = within(nav).getByText('About Us');
-    expect(current).toHaveAttribute('aria-current', 'page');
-    expect(current.tagName).not.toBe('A');
+  testBreadcrumbsJsonLdSchema({
+    pageLoaderMock: getLandingPageMock,
+    setup,
+    successData: mockLandingPage,
+    itemPath: '/about-us',
   });
-
-  it('renders the JSON-LD BreadcrumbList schema script', async () => {
-    getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
-
-    const { container } = await setup();
-
-    const script = container.querySelector(
-      'script[type="application/ld+json"]',
-    );
-    expect(script).not.toBeNull();
-    expect(script?.textContent).toContain('"@type":"BreadcrumbList"');
-    expect(script?.textContent).toContain(
-      '"item":"https://example.com/about-us"',
-    );
+  testNoJsonLdWithoutBaseUrl({
+    pageLoaderMock: getLandingPageMock,
+    setup,
+    successData: mockLandingPage,
+    getTenantBaseUrlMock,
   });
-
-  it('forwards the slug and tenant to getLandingPage', async () => {
-    getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
-
-    await setup();
-
-    expect(getLandingPageMock).toHaveBeenCalledWith('about-us', 'tenant-1');
+  testForwardsArgsToLoader({
+    pageLoaderMock: getLandingPageMock,
+    setup,
+    successData: mockLandingPage,
+    description: 'forwards the slug and tenant to getLandingPage',
+    expectedArgs: ['about-us', 'tenant-1'],
   });
 });

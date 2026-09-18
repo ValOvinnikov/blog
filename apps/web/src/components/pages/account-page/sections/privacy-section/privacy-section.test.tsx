@@ -1,21 +1,11 @@
 import { customRender, screen } from '@web/testing/custom-render';
 import { makePrivacySection } from '@web/testing/pages/account-page/privacy-section-fixtures';
+import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { PrivacySection } from './privacy-section';
 
 vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: ({
-    href,
-    children,
-    ...rest
-  }: {
-    href: string;
-    children: React.ReactNode;
-  }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
+  SmartLink: SmartLinkMock,
 }));
 
 vi.mock('@web/components/shared/delete-account-control', () => ({

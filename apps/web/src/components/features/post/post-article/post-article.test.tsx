@@ -10,6 +10,7 @@ import {
   richTextBlock,
   richTextSpan,
 } from '@web/testing/shared/portable-text-renderer/fixtures';
+import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
@@ -44,18 +45,7 @@ vi.mock('@web/components/features/post/bookmark-button-gate', () => ({
 }));
 
 vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: ({
-    href,
-    children,
-    ...rest
-  }: {
-    href: string;
-    children: React.ReactNode;
-  }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
+  SmartLink: SmartLinkMock,
 }));
 
 const setup = customRenderAsync(PostArticle, {

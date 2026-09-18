@@ -161,36 +161,6 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/tags/typescript/page/3');
   });
 
-  it('omits topic pagination pages when the fetch resolves to a failure result', async () => {
-    mockAllEmpty();
-    getTopicPaginationParamsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-    const sitemap = (await import('./sitemap')).default;
-
-    const entries = await sitemap();
-    const urls = entries.map((entry) => entry.url);
-
-    expect(urls).not.toContain('https://example.com/topics/news/page/2');
-    expect(urls).toContain('https://example.com/');
-  });
-
-  it('omits tag pagination pages when the fetch resolves to a failure result', async () => {
-    mockAllEmpty();
-    getTagPaginationParamsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-    const sitemap = (await import('./sitemap')).default;
-
-    const entries = await sitemap();
-    const urls = entries.map((entry) => entry.url);
-
-    expect(urls).not.toContain('https://example.com/tags/typescript/page/2');
-    expect(urls).toContain('https://example.com/');
-  });
-
   it('sets lastModified on post entries from publishedAt, but not on entries without a date source', async () => {
     mockAllEmpty();
     getPostParamsMock.mockResolvedValue({
@@ -226,135 +196,92 @@ describe('sitemap', () => {
     });
   });
 
-  it('omits the /blog entry and numbered blog pages when the params fetch fails', async () => {
+  const FAILURE_RESULT = { ok: false, error: new Error('boom') } as const;
+  const EMPTY_DOCUMENT_RESULT = { ok: true, data: undefined } as const;
+
+  it.each([
+    {
+      name: 'omits topic pagination pages when the fetch resolves to a failure result',
+      getMock: () => getTopicPaginationParamsMock,
+      result: FAILURE_RESULT,
+      missingUrls: ['/topics/news/page/2'],
+    },
+    {
+      name: 'omits tag pagination pages when the fetch resolves to a failure result',
+      getMock: () => getTagPaginationParamsMock,
+      result: FAILURE_RESULT,
+      missingUrls: ['/tags/typescript/page/2'],
+    },
+    {
+      name: 'omits the /blog entry and numbered blog pages when the params fetch fails',
+      getMock: () => getIndexPageParamsMock,
+      result: FAILURE_RESULT,
+      missingUrls: ['/blog/page/2', '/blog'],
+    },
+    {
+      name: 'omits the /topics entry when the topic index page fetch resolves to a failure result',
+      getMock: () => getTopicIndexPageMock,
+      result: FAILURE_RESULT,
+      missingUrls: ['/topics'],
+    },
+    {
+      name: 'omits the /topics entry when the topic index page fetch resolves ok with no document',
+      getMock: () => getTopicIndexPageMock,
+      result: EMPTY_DOCUMENT_RESULT,
+      missingUrls: ['/topics'],
+    },
+    {
+      name: 'omits the /tags entry when the tag index page fetch resolves to a failure result',
+      getMock: () => getTagIndexPageMock,
+      result: FAILURE_RESULT,
+      missingUrls: ['/tags'],
+    },
+    {
+      name: 'omits the /tags entry when the tag index page fetch resolves ok with no document',
+      getMock: () => getTagIndexPageMock,
+      result: EMPTY_DOCUMENT_RESULT,
+      missingUrls: ['/tags'],
+    },
+    {
+      name: 'omits landing pages when the slugs fetch fails',
+      getMock: () => getPageSlugsMock,
+      result: FAILURE_RESULT,
+      missingUrls: ['/about'],
+    },
+    {
+      name: 'omits posts when the post params fetch resolves to a failure result',
+      getMock: () => getPostParamsMock,
+      result: FAILURE_RESULT,
+      missingUrls: ['/blog/first-post'],
+      presentUrls: ['/blog'],
+    },
+    {
+      name: 'omits topics when the topic params fetch resolves to a failure result',
+      getMock: () => getTopicParamsMock,
+      result: FAILURE_RESULT,
+      missingUrls: ['/topics/news'],
+    },
+    {
+      name: 'omits tags when the tag params fetch resolves to a failure result',
+      getMock: () => getTagParamsMock,
+      result: FAILURE_RESULT,
+      missingUrls: ['/tags/typescript'],
+    },
+  ])('$name', async ({ getMock, result, missingUrls, presentUrls = [] }) => {
     mockAllEmpty();
-    getIndexPageParamsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
+    getMock().mockResolvedValue(result);
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+    const urls = entries.map((entry) => entry.url);
+
+    missingUrls.forEach((path) => {
+      expect(urls).not.toContain(`https://example.com${path}`);
     });
-    const sitemap = (await import('./sitemap')).default;
-
-    const entries = await sitemap();
-    const urls = entries.map((entry) => entry.url);
-
-    expect(urls).not.toContain('https://example.com/blog/page/2');
     expect(urls).toContain('https://example.com/');
-    expect(urls).not.toContain('https://example.com/blog');
-  });
-
-  it('omits the /topics entry when the topic index page fetch resolves to a failure result', async () => {
-    mockAllEmpty();
-    getTopicIndexPageMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
+    presentUrls.forEach((path) => {
+      expect(urls).toContain(`https://example.com${path}`);
     });
-    const sitemap = (await import('./sitemap')).default;
-
-    const entries = await sitemap();
-    const urls = entries.map((entry) => entry.url);
-
-    expect(urls).not.toContain('https://example.com/topics');
-    expect(urls).toContain('https://example.com/');
-  });
-
-  it('omits the /topics entry when the topic index page fetch resolves ok with no document', async () => {
-    mockAllEmpty();
-    getTopicIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
-    const sitemap = (await import('./sitemap')).default;
-
-    const entries = await sitemap();
-    const urls = entries.map((entry) => entry.url);
-
-    expect(urls).not.toContain('https://example.com/topics');
-    expect(urls).toContain('https://example.com/');
-  });
-
-  it('omits the /tags entry when the tag index page fetch resolves to a failure result', async () => {
-    mockAllEmpty();
-    getTagIndexPageMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-    const sitemap = (await import('./sitemap')).default;
-
-    const entries = await sitemap();
-    const urls = entries.map((entry) => entry.url);
-
-    expect(urls).not.toContain('https://example.com/tags');
-    expect(urls).toContain('https://example.com/');
-  });
-
-  it('omits the /tags entry when the tag index page fetch resolves ok with no document', async () => {
-    mockAllEmpty();
-    getTagIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
-    const sitemap = (await import('./sitemap')).default;
-
-    const entries = await sitemap();
-    const urls = entries.map((entry) => entry.url);
-
-    expect(urls).not.toContain('https://example.com/tags');
-    expect(urls).toContain('https://example.com/');
-  });
-
-  it('omits landing pages when the slugs fetch fails', async () => {
-    mockAllEmpty();
-    getPageSlugsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-    const sitemap = (await import('./sitemap')).default;
-
-    const entries = await sitemap();
-    const urls = entries.map((entry) => entry.url);
-
-    expect(urls).not.toContain('https://example.com/about');
-    expect(urls).toContain('https://example.com/');
-  });
-
-  it('omits posts when the post params fetch resolves to a failure result', async () => {
-    mockAllEmpty();
-    getPostParamsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-    const sitemap = (await import('./sitemap')).default;
-
-    const entries = await sitemap();
-    const urls = entries.map((entry) => entry.url);
-
-    expect(urls).not.toContain('https://example.com/blog/first-post');
-    expect(urls).toContain('https://example.com/');
-    expect(urls).toContain('https://example.com/blog');
-  });
-
-  it('omits topics when the topic params fetch resolves to a failure result', async () => {
-    mockAllEmpty();
-    getTopicParamsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-    const sitemap = (await import('./sitemap')).default;
-
-    const entries = await sitemap();
-    const urls = entries.map((entry) => entry.url);
-
-    expect(urls).not.toContain('https://example.com/topics/news');
-    expect(urls).toContain('https://example.com/');
-  });
-
-  it('omits tags when the tag params fetch resolves to a failure result', async () => {
-    mockAllEmpty();
-    getTagParamsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-    const sitemap = (await import('./sitemap')).default;
-
-    const entries = await sitemap();
-    const urls = entries.map((entry) => entry.url);
-
-    expect(urls).not.toContain('https://example.com/tags/typescript');
-    expect(urls).toContain('https://example.com/');
   });
 
   it('forwards the resolved tenant Sanity context to every loader', async () => {
