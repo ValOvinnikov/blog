@@ -794,7 +794,7 @@ flowchart TD
   P1f["1.6 topic cards list latest posts"]
   P1g["1.7 page composition<br/>retire PostsSection · post page modules"]
   P2["Phase 2 · Hero family<br/>heroStatement · heroProfile"]
-  P3["Phase 3 · Marketing modules<br/>featureGrid · testimonial · logoWall · stats · faq · embed<br/>featureHighlights · team · location · contactForm"]
+  P3["Phase 3 · Marketing modules<br/>featureList · testimonial · logoWall · stats · faq · embed<br/>featureHighlights · team · location · contactForm"]
   P4["Phase 4 · Onboarding templates<br/>site-kind at tenant creation"]
   M9["Portfolio strand (#1919, same milestone)<br/>project entity · page_work · heroProject · projectList/Latest"]
   P0 --> P1a & P1b & P1e
