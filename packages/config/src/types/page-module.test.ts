@@ -12,7 +12,6 @@ import type {
 describe('page module type unions', () => {
   it('resolves page_home to its heroField and modulesField({ allow }) kinds', () => {
     expectTypeOf<TPageHomeType>().toEqualTypeOf<
-      | 'module_hero'
       | 'module_heroBlog'
       | 'module_heroStatement'
       | 'module_content'
@@ -50,6 +49,7 @@ describe('page module type unions', () => {
       | 'module_cta'
       | 'module_newsletter'
       | 'module_postFeatured'
+      | 'module_taxonomyList'
     >();
   });
 
@@ -60,6 +60,7 @@ describe('page module type unions', () => {
       | 'module_postLatest'
       | 'module_cta'
       | 'module_newsletter'
+      | 'module_taxonomyList'
     >();
   });
 
@@ -80,6 +81,7 @@ describe('page module type unions', () => {
       | 'module_postLatest'
       | 'module_cta'
       | 'module_newsletter'
+      | 'module_taxonomyList'
     >();
   });
 
