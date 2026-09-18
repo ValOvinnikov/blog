@@ -6,10 +6,10 @@ import { BackToTopButton } from '@web/components/shared/back-to-top-button';
 import { DepthToggle } from '@web/components/shared/depth-toggle';
 import { SkimPanel } from '@web/components/shared/skim-panel';
 import { DepthProvider } from '@web/context/depth-provider';
-import { ModuleRenderer } from '@web/modules/module-renderer';
 import { getPostPage } from '@web/server/post/get-post-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 
+import { BlogPostModuleRenderer } from './blog-post-module-renderer';
 import { blogPostPageVariants } from './blog-post-page-variants';
 
 type TBlogPostPageProps = ITenantLocalizedParams & { slug: string };
@@ -52,7 +52,7 @@ export const BlogPostPage = async ({
           <SkimPanel takeaways={postTakeaways} />
         </DepthProvider>
 
-        <ModuleRenderer
+        <BlogPostModuleRenderer
           modules={modules}
           locale={locale}
           tenant={tenant}
