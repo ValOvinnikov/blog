@@ -80,6 +80,7 @@ const REVALIDATE_TAGS = {
   module_postLatest: ['modules:postLatest'],
   module_postFeatured: ['modules:postFeatured'],
   module_postRelated: ['modules:postRelated'],
+  module_featureList: ['modules:featureList'],
   module_content: ['modules:content'],
   module_cta: ['modules:cta'],
   module_newsletter: ['modules:newsletter'],
