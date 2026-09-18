@@ -13,8 +13,6 @@ import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with
 import { UserCircle } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
-const FIELDSET_IMAGE = 'image';
-
 export const heroProfileSchema = defineType({
   name: 'module_heroProfile',
   title: 'Profile Hero',
@@ -22,15 +20,7 @@ export const heroProfileSchema = defineType({
   description:
     'A hero built around a person — their photo and social profiles drawn from an author, alongside a heading and actions you write yourself. Use it to introduce a specific author or team member.',
   icon: UserCircle,
-  fieldsets: [
-    {
-      name: FIELDSET_IMAGE,
-      title: 'Image',
-      description:
-        "The hero's image. Optional — the author's own photo is used when none is set here.",
-    },
-    ...heroFieldsets,
-  ],
+  fieldsets: [...heroFieldsets],
   fields: [
     titleField(),
     brandVariantField({ list: FULL_BRAND_VARIANT_LIST }),
@@ -57,7 +47,6 @@ export const heroProfileSchema = defineType({
       type: imageWithAltSchema.name,
       description:
         "Upload an image to use it here. Leave empty to use the author's own photo.",
-      fieldset: FIELDSET_IMAGE,
     }),
     ctaButtonsField(),
     defineField({
