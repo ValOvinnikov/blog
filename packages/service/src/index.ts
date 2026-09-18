@@ -11,6 +11,7 @@ import { createSiteSettingsService } from './features/global/site-settings';
 import { createThemeSettingsService } from './features/global/theme-settings';
 import { createContentModuleService } from './features/modules/content';
 import { createCtaModuleService } from './features/modules/cta';
+import { createFeatureListModuleService } from './features/modules/feature-list';
 import { createHeroModuleService } from './features/modules/hero';
 import { createHeroBlogModuleService } from './features/modules/hero-blog';
 import { createHeroStatementModuleService } from './features/modules/hero-statement';
@@ -55,6 +56,7 @@ export const service = {
     cta: createCtaModuleService(),
     newsletter: createNewsletterModuleService(),
     taxonomyList: createTaxonomyListModuleService(),
+    featureList: createFeatureListModuleService(),
   },
   entities: {
     topics: createTopicsService(),
@@ -87,6 +89,10 @@ export type {
   TCtaModule,
   TResolvedCtaContentBlock,
 } from './features/modules/cta';
+export type {
+  TFeatureListItem,
+  TFeatureListModule,
+} from './features/modules/feature-list';
 export type { THeroModule } from './features/modules/hero';
 export type {
   THeroBlogButton,

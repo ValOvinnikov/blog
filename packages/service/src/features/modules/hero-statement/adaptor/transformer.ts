@@ -1,7 +1,4 @@
-import {
-  toCtaButton,
-  type TCtaButton,
-} from '@blog/service/shared/transformers/to-cta-button';
+import { toCtaButtons } from '@blog/service/shared/transformers/to-cta-buttons';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toHeroPresentation } from '@blog/service/shared/transformers/to-hero-presentation';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
@@ -14,16 +11,6 @@ import type { THeroStatementModule } from './types';
 export type TRawHeroStatementModule = InferResultType<
   typeof heroStatementModuleQuery
 >;
-
-function toCtaButtons(
-  raw: TRawHeroStatementModule['ctaButtons'],
-): TCtaButton[] {
-  if (!raw || raw.length === 0) return [];
-
-  return raw
-    .map(toCtaButton)
-    .filter((button): button is TCtaButton => button !== undefined);
-}
 
 export function toHeroStatementModule(
   raw: TRawHeroStatementModule,
