@@ -51,6 +51,8 @@ export type TMediaCardProps = IWithClassName &
      * editor-pinned spotlight card.
      */
     isLead?: TMediaCardVariants['isLead'];
+    /** Centres every row of the card — media, meta, title, excerpt, tags and footer. */
+    align?: TMediaCardVariants['align'];
     children?: TCompoundChildren<typeof MediaCardParts>;
   };
 
@@ -63,6 +65,7 @@ const MediaCardRoot = ({
   tags,
   isSplit,
   isLead,
+  align,
   children,
   className,
   dataTestId,
@@ -70,14 +73,14 @@ const MediaCardRoot = ({
   const { slots, unmatched } = mapCompoundSlots(children, MediaCardParts);
   const hasMedia = Boolean(slots.Media);
   const isSplitLayout = Boolean(isSplit) && hasMedia;
-  const s = mediaCardVariants({ isSplit: isSplitLayout, isLead });
+  const s = mediaCardVariants({ isSplit: isSplitLayout, isLead, align });
 
-  const media =
-    isLead && slots.Media
-      ? cloneElement(slots.Media as ReactElement<TMediaCardMediaProps>, {
-          isLead: true,
-        })
-      : slots.Media;
+  const media = slots.Media
+    ? cloneElement(slots.Media as ReactElement<TMediaCardMediaProps>, {
+        ...(isLead ? { isLead: true } : {}),
+        ...(align === 'center' ? { align } : {}),
+      })
+    : slots.Media;
 
   return (
     <article className={s.root({ class: className })} data-testid={dataTestId}>

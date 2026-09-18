@@ -28,6 +28,12 @@ export const mediaCardVariants = tv({
         excerpt: ['line-clamp-3'],
       },
     },
+    align: {
+      left: {},
+      center: {
+        content: ['items-center text-center'],
+      },
+    },
   },
 });
 

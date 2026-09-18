@@ -291,4 +291,129 @@ describe(`<${MediaCard.name}/>`, () => {
     );
     expect(screen.getByTestId('media-card-media')).toHaveClass('aspect-video');
   });
+
+  it('renders the wide shape identically to the pre-existing default, with and without isLead', () => {
+    const { unmount } = renderElement(
+      <MediaCard>
+        <MediaCard.Media shape="wide" dataTestId="media-card-media">
+          <img src="/cover.jpg" alt="Cover photo" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    expect(screen.getByTestId('media-card-media')).toHaveClass(
+      'w-full',
+      'aspect-video',
+    );
+    unmount();
+
+    renderElement(
+      <MediaCard isLead={true}>
+        <MediaCard.Media shape="wide" dataTestId="media-card-media">
+          <img src="/cover.jpg" alt="Cover photo" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    expect(screen.getByTestId('media-card-media')).toHaveClass(
+      'w-full',
+      'aspect-[4/3]',
+    );
+  });
+
+  it('renders the square shape edge to edge and 1:1, unaffected by isLead', () => {
+    const { unmount } = renderElement(
+      <MediaCard>
+        <MediaCard.Media shape="square" dataTestId="media-card-media">
+          <img src="/cover.jpg" alt="Cover photo" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    expect(screen.getByTestId('media-card-media')).toHaveClass(
+      'w-full',
+      'aspect-square',
+    );
+    unmount();
+
+    renderElement(
+      <MediaCard isLead={true}>
+        <MediaCard.Media shape="square" dataTestId="media-card-media">
+          <img src="/cover.jpg" alt="Cover photo" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    expect(screen.getByTestId('media-card-media')).toHaveClass(
+      'w-full',
+      'aspect-square',
+    );
+  });
+
+  it('frames a circle shape inside the card padding instead of edge to edge', () => {
+    renderElement(
+      <MediaCard>
+        <MediaCard.Media shape="circle" dataTestId="media-card-media">
+          <img src="/avatar.jpg" alt="Author photo" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    const media = screen.getByTestId('media-card-media');
+    expect(media).toHaveClass('size-28', 'rounded-full', 'mx-card-x');
+    expect(media).not.toHaveClass('w-full');
+  });
+
+  it('frames an icon shape as a tile inside the card padding, styled for currentColor children', () => {
+    renderElement(
+      <MediaCard>
+        <MediaCard.Media shape="icon" dataTestId="media-card-media">
+          <span data-testid="glyph" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    const media = screen.getByTestId('media-card-media');
+    expect(media).toHaveClass(
+      'size-12',
+      'rounded-md',
+      'mx-card-x',
+      'bg-brand-primary-muted',
+      'text-brand-primary',
+    );
+    expect(media).not.toHaveClass('w-full');
+  });
+
+  it('centres every row of the card when align is center', () => {
+    renderElement(
+      <MediaCard
+        align="center"
+        excerpt="A short summary."
+        tags={['react']}
+        dataTestId="media-card"
+      >
+        <MediaCard.Title level={3}>
+          <a href="/posts/hello-world">Hello World</a>
+        </MediaCard.Title>
+      </MediaCard>,
+    );
+    expect(screen.getByTestId('media-card-content')).toHaveClass(
+      'items-center',
+      'text-center',
+    );
+  });
+
+  it('does not centre the card content when align is left (default)', () => {
+    renderElement(<MediaCard dataTestId="media-card" />);
+    expect(screen.getByTestId('media-card-content')).not.toHaveClass(
+      'items-center',
+    );
+  });
+
+  it('centres an inset circle/icon frame by cloning align onto MediaCard.Media, the same mechanism used for isLead', () => {
+    renderElement(
+      <MediaCard align="center">
+        <MediaCard.Media shape="circle" dataTestId="media-card-media">
+          <img src="/avatar.jpg" alt="Author photo" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    const media = screen.getByTestId('media-card-media');
+    expect(media).toHaveClass('mx-auto');
+    expect(media).not.toHaveClass('mx-card-x');
+  });
 });

@@ -35,6 +35,16 @@ const posts = [
     formattedDate: 'April 20, 2024',
     authorName: 'Jane Doe',
   },
+  {
+    href: '/posts/accessible-forms',
+    title: 'Building Accessible Forms',
+    excerpt:
+      'Practical patterns for labels, error states, and keyboard navigation in forms.',
+    tags: ['accessibility', 'forms'],
+    publishedAt: '2024-03-05T00:00:00Z',
+    formattedDate: 'March 5, 2024',
+    authorName: 'Jane Doe',
+  },
 ];
 
 const renderMediaCards = (items: typeof posts) =>
@@ -69,11 +79,11 @@ const meta = {
   argTypes: {
     columns: {
       control: 'select',
-      options: [1, 2, 3],
+      options: [1, 2, 3, 4],
     },
   },
   args: {
-    children: renderMediaCards(posts),
+    children: renderMediaCards(posts.slice(0, 3)),
   },
 } satisfies Meta<typeof CardGrid>;
 
@@ -92,4 +102,8 @@ export const TwoColumns: TStory = {
 
 export const SingleColumn: TStory = {
   args: { columns: 1, children: renderMediaCards(posts.slice(0, 1)) },
+};
+
+export const FourColumns: TStory = {
+  args: { columns: 4, children: renderMediaCards(posts) },
 };

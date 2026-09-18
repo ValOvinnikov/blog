@@ -1,14 +1,22 @@
 import { ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
+import { objectKeys } from '@blog/utils';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { MediaCard } from './media-card';
+import { mediaCardVariants } from './media-card-variants';
 
 const meta = {
   title: 'Molecules/MediaCard',
   component: MediaCard,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
+  argTypes: {
+    align: {
+      control: 'select',
+      options: objectKeys(mediaCardVariants.variants.align),
+    },
+  },
   args: {
     excerpt:
       'A step-by-step guide to building a scalable, token-driven design system using Tailwind CSS, tailwind-variants, and Atomic Design principles.',
@@ -171,6 +179,101 @@ export const WithAuthorFooter: TStory = {
           authorName="Jane Doe"
           authorAvatarSrc="https://i.pravatar.cc/150?img=1"
         />
+      </>
+    ),
+  },
+};
+
+export const WideMedia: TStory = {
+  args: {
+    children: (
+      <>
+        <MediaCard.Media shape="wide">
+          <img
+            src="https://picsum.photos/seed/wide/800/450"
+            alt="Abstract design elements on a dark background"
+          />
+        </MediaCard.Media>
+        <MediaCard.Title level={3}>
+          <a href="/posts/building-a-design-system">
+            Building a Design System from Scratch
+          </a>
+        </MediaCard.Title>
+      </>
+    ),
+  },
+};
+
+export const SquareMedia: TStory = {
+  args: {
+    children: (
+      <>
+        <MediaCard.Media shape="square">
+          <img
+            src="https://picsum.photos/seed/square/600/600"
+            alt="Abstract design elements on a dark background"
+          />
+        </MediaCard.Media>
+        <MediaCard.Title level={3}>
+          <a href="/posts/building-a-design-system">
+            Building a Design System from Scratch
+          </a>
+        </MediaCard.Title>
+      </>
+    ),
+  },
+};
+
+export const CircleMedia: TStory = {
+  args: {
+    excerpt: undefined,
+    tags: undefined,
+    children: (
+      <>
+        <MediaCard.Media shape="circle">
+          <img
+            src="https://i.pravatar.cc/224?img=12"
+            alt="Portrait of the featured author"
+          />
+        </MediaCard.Media>
+        <MediaCard.Title level={3}>
+          <a href="/team/jane-doe">Jane Doe</a>
+        </MediaCard.Title>
+      </>
+    ),
+  },
+};
+
+export const IconMedia: TStory = {
+  args: {
+    excerpt: 'Ship features faster with a shared, token-driven component set.',
+    tags: undefined,
+    children: (
+      <>
+        <MediaCard.Media shape="icon">
+          <Icon name={ICONS.ROCKET} size={SIZE.MD} />
+        </MediaCard.Media>
+        <MediaCard.Title level={3}>
+          <a href="/features/design-system">Built for speed</a>
+        </MediaCard.Title>
+      </>
+    ),
+  },
+};
+
+export const CenterAligned: TStory = {
+  args: {
+    align: 'center',
+    excerpt: 'Ship features faster with a shared, token-driven component set.',
+    tags: undefined,
+    children: (
+      <>
+        <MediaCard.Media shape="icon">
+          <Icon name={ICONS.ROCKET} size={SIZE.MD} />
+        </MediaCard.Media>
+        <MediaCard.Title level={3}>
+          <a href="/features/design-system">Built for speed</a>
+        </MediaCard.Title>
       </>
     ),
   },
