@@ -85,6 +85,36 @@ Review for what a contract check won't catch:
 - **Maintainability:** naming, duplication, dead code, missing tests for
   changed behaviour, stale comments/docs contradicting the code.
 
+### Duplication is checked against the repo, not against the diff
+
+A diff that adds a helper is almost never duplicated _within itself_ — the
+copy it duplicates lives in a file the diff does not touch, so reading the
+diff alone will never reveal it. Checking for that is a deliberate step, not
+something the other passes produce as a by-product.
+
+**For every function, type, constant or fragment the diff adds, search the
+repo for an existing equivalent before approving.** Search by what it does,
+not by its name — a duplicate that mattered would have been spotted already
+if it shared a name. Two useful handles: grep for the symbols it calls (a new
+wrapper around an existing helper will be near that helper's other call
+sites), and grep for a distinctive line of its body.
+
+**A confirmed duplicate is blocking.** This repo's rule is that the second
+occurrence of a function moves to the folder that owns its kind, so a diff
+introducing a second or third copy is adding a defect, not a style problem —
+report it with the path of the copy it duplicates and say where the shared
+version belongs. Nothing fails when this ships, which is precisely why
+review is the only place it gets caught: both copies work, and they diverge
+silently later when someone fixes a bug in one of them.
+
+This applies even when the diff was written to follow an existing sibling
+feature. Copying a sibling's private helper is the most common way a
+duplicate enters, and it always looks locally consistent.
+
+Judgement still applies: near-identical code that is genuinely coincidental,
+or where sharing would couple two things that should stay independent, is not
+a duplicate. Say so rather than flagging it.
+
 ## Report format
 
 Report back to the orchestrator with exactly these sections:
