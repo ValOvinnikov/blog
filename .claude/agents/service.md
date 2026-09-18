@@ -227,8 +227,20 @@ every field** (`.notNull()` or `.nullable(true)`).
   wins) in a comment and confirm the schema enforces the cardinality you
   assume — if it doesn't, report the gap instead of silently ignoring editor
   input.
-- **Extract at the second repetition.** A projection/transform pattern used
-  twice becomes a fragment or shared transformer; never copy-paste a third.
+- **The second occurrence of any function moves to a dedicated folder.** Not
+  just projections and transforms — _any_ function. The moment the same
+  function exists in two features, it stops belonging to either: move it to
+  the folder that owns its kind (`shared/transformers/`,
+  `shared/fragments/`, and so on, one per file), and point both call sites at
+  it. Do this at the second occurrence, in the same change that would have
+  created it — never write the third copy, and never leave the second sitting
+  locally "for now".
+- **Reuse before you write, on every slice — new or existing.** Whenever you
+  build a new service or touch an existing one, the first step is to read
+  what `shared/` already provides and use it. A function you are about to
+  write that resembles one already there is the single most expensive mistake
+  available here, because nothing fails: both copies work, both pass review,
+  and the divergence only surfaces when someone fixes a bug in one of them.
 - **List `shared/transformers/` and `shared/fragments/` before writing any
   helper**, and do it even when told to follow a named sibling feature. A
   sibling is a guide to structure, not a source to copy from: its private
