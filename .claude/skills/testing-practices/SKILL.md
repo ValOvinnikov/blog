@@ -309,6 +309,16 @@ export default mergeConfig(
 - Assert behaviour, semantics, and rendered output; never static styling. A
   restyle that changes no prop-driven behaviour has no unit-test surface —
   Storybook + `no-tests-needed`.
+- **Never assert copy verbatim.** A test that pins an editor-facing
+  `description`, a label, a placeholder or any other human sentence to its
+  exact literal —
+  `expect(displayModeField().description).toBe('Grid lays the posts out in rows. …')`
+  — only restates the source. The sole change that can fail it is a deliberate
+  rewording, so it reports intentional edits as breakage and catches no defect.
+  The same goes for a field helper's default-vs-override precedence: that is
+  `??`, not a contract worth a test. If a field having _some_ description
+  matters, assert that it is non-empty; never assert which words it contains.
+  Copy is reviewed in the diff, not pinned by a test.
 - **No snapshot tests** — they couple tests to markup and break on unrelated changes.
 - **No implementation details** — test what a component does, not how it does it.
 - **No network calls** — always mock the Sanity client and `service` functions.
