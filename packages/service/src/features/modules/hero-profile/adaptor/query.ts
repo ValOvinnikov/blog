@@ -19,7 +19,6 @@ export const heroProfileModuleQuery = q
       .field('headingBlock')
       .project(headingBlockFragment)
       .notNull(),
-    imageSource: sub.field('imageSource').notNull(),
     image: sub.field('image').project(sanityImageFragment).nullable(true),
     showSocialLinks: sub.raw('coalesce(showSocialLinks, true)', z.boolean()),
     author: sub

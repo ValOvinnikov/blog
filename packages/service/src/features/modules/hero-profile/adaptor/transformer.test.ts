@@ -6,7 +6,6 @@ import {
   HERO_VARIANT,
   LINK_TYPE,
   MEDIA_ORDER,
-  PROFILE_IMAGE_SOURCE,
   SOCIAL_PLATFORMS,
 } from '@blog/config';
 import {
@@ -55,36 +54,9 @@ describe(toHeroProfileModule, () => {
     expect(hero.eyebrow).toBe('Field notes');
   });
 
-  describe('imageSource', () => {
-    it('maps the author photo when imageSource is AUTHOR and the author has one', () => {
+  describe('image precedence', () => {
+    it("uses the hero's own image when set, ignoring the author photo", () => {
       const raw = makeRawHeroProfileModule({
-        imageSource: PROFILE_IMAGE_SOURCE.AUTHOR,
-        image: null,
-        author: {
-          image: makeRawSanityImage('Author photo'),
-          socialLinks: null,
-        },
-      });
-
-      const hero = toHeroProfileModule(raw);
-
-      expect(hero.sanityImage?.alt).toBe('Author photo');
-    });
-
-    it('leaves sanityImage undefined when imageSource is AUTHOR and the author has no photo (a supported state)', () => {
-      const raw = makeRawHeroProfileModule({
-        imageSource: PROFILE_IMAGE_SOURCE.AUTHOR,
-        author: { image: null, socialLinks: null },
-      });
-
-      const hero = toHeroProfileModule(raw);
-
-      expect(hero.sanityImage).toBeUndefined();
-    });
-
-    it('maps the authored custom image when imageSource is CUSTOM, ignoring the author photo', () => {
-      const raw = makeRawHeroProfileModule({
-        imageSource: PROFILE_IMAGE_SOURCE.CUSTOM,
         image: makeRawSanityImage('Custom alt'),
         author: {
           image: makeRawSanityImage('Author photo'),
@@ -97,14 +69,24 @@ describe(toHeroProfileModule, () => {
       expect(hero.sanityImage?.alt).toBe('Custom alt');
     });
 
-    it('leaves sanityImage undefined when imageSource is NONE, ignoring both image fields', () => {
+    it("falls back to the author's photo when the hero has no image of its own", () => {
       const raw = makeRawHeroProfileModule({
-        imageSource: PROFILE_IMAGE_SOURCE.NONE,
-        image: makeRawSanityImage('Custom alt'),
+        image: null,
         author: {
           image: makeRawSanityImage('Author photo'),
           socialLinks: null,
         },
+      });
+
+      const hero = toHeroProfileModule(raw);
+
+      expect(hero.sanityImage?.alt).toBe('Author photo');
+    });
+
+    it('leaves sanityImage undefined when neither the hero nor the author has a photo (a supported state)', () => {
+      const raw = makeRawHeroProfileModule({
+        image: null,
+        author: { image: null, socialLinks: null },
       });
 
       const hero = toHeroProfileModule(raw);

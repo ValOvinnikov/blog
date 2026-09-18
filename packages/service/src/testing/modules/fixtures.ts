@@ -10,7 +10,6 @@ import {
   LINK_TYPE,
   NEWSLETTER_VARIANT,
   POST_SOURCE,
-  PROFILE_IMAGE_SOURCE,
   TAXONOMY_KIND,
   TAXONOMY_SORT,
 } from '@blog/config';
@@ -111,7 +110,6 @@ export function makeRawHeroProfileModule(
     variant: HERO_VARIANT.SPLIT,
     eyebrow: null,
     headingBlock: makeRawHeadingBlock('Profile heading'),
-    imageSource: PROFILE_IMAGE_SOURCE.AUTHOR,
     image: null,
     showSocialLinks: true,
     author: {
