@@ -8,17 +8,9 @@ import {
   type TCompoundComponent,
   type THeadingLevel,
 } from '@blog/ui/lib/react';
-import {
-  cloneElement,
-  Fragment,
-  type ElementType,
-  type ReactElement,
-} from 'react';
+import { cloneElement, Fragment, type ElementType } from 'react';
 
-import {
-  TaxonomyCardPosts,
-  type TTaxonomyCardPostsProps,
-} from './components/posts/taxonomy-card-posts';
+import { TaxonomyCardPosts } from './components/posts/taxonomy-card-posts';
 import { taxonomyCardVariants } from './taxonomy-card-variants';
 
 const TaxonomyCardParts = {
@@ -63,7 +55,7 @@ const TaxonomyCardRoot = ({
   const LinkComponent = resolveComponent(linkAs, 'a');
   const { slots, unmatched } = mapCompoundSlots(children, TaxonomyCardParts);
   const posts = slots.Posts
-    ? cloneElement(slots.Posts as ReactElement<TTaxonomyCardPostsProps>, {
+    ? cloneElement(slots.Posts, {
         linkAs: LinkComponent as TAnchorElementType,
       })
     : slots.Posts;

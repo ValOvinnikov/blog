@@ -6,22 +6,11 @@ import {
   type TCompoundComponent,
 } from '@blog/ui/lib/react';
 import { CardMeta } from '@blog/ui/molecules/card-meta';
-import {
-  cloneElement,
-  Fragment,
-  type ElementType,
-  type ReactElement,
-} from 'react';
+import { cloneElement, Fragment, type ElementType } from 'react';
 
 import { MediaCardFooter } from './components/footer/media-card-footer';
-import {
-  MediaCardMedia,
-  type TMediaCardMediaProps,
-} from './components/media/media-card-media';
-import {
-  MediaCardTitle,
-  type TMediaCardTitleProps,
-} from './components/title/media-card-title';
+import { MediaCardMedia } from './components/media/media-card-media';
+import { MediaCardTitle } from './components/title/media-card-title';
 import {
   mediaCardVariants,
   type TMediaCardVariants,
@@ -63,12 +52,13 @@ const MediaCardRoot = ({
   const isSplitLayout = Boolean(isSplit) && hasMedia;
   const s = mediaCardVariants({ isSplit: isSplitLayout, isLead, align });
 
-  const media = slots.Media
-    ? cloneElement(slots.Media as ReactElement<TMediaCardMediaProps>, {
-        ...(isLead ? { isLead: true } : {}),
-        ...(align === 'center' ? { align } : {}),
-      })
-    : slots.Media;
+  const media =
+    slots.Media && (isLead || align === 'center')
+      ? cloneElement(slots.Media, {
+          ...(isLead ? { isLead: true } : {}),
+          ...(align === 'center' ? { align } : {}),
+        })
+      : slots.Media;
 
   return (
     <article className={s.root({ class: className })} data-testid={dataTestId}>
@@ -76,9 +66,7 @@ const MediaCardRoot = ({
       <div className={s.content()} data-testid="media-card-content">
         {slots.Meta}
         {isLead && slots.Title
-          ? cloneElement(slots.Title as ReactElement<TMediaCardTitleProps>, {
-              isLead: true,
-            })
+          ? cloneElement(slots.Title, { isLead: true })
           : slots.Title}
         {unmatched.map((node, i) => (
           <Fragment key={i}>{node}</Fragment>

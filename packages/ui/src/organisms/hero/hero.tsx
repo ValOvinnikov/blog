@@ -17,23 +17,12 @@ import {
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@blog/ui/lib/react';
-import {
-  cloneElement,
-  Fragment,
-  type ElementType,
-  type ReactElement,
-} from 'react';
+import { cloneElement, Fragment, type ElementType } from 'react';
 
-import {
-  HeroAvatar,
-  type THeroAvatarProps,
-} from './components/avatar/hero-avatar';
+import { HeroAvatar } from './components/avatar/hero-avatar';
 import { HeroCta } from './components/cta/hero-cta';
-import { HeroMedia, type THeroMediaProps } from './components/media/hero-media';
-import {
-  HeroSocial,
-  type THeroSocialProps,
-} from './components/social/hero-social';
+import { HeroMedia } from './components/media/hero-media';
+import { HeroSocial } from './components/social/hero-social';
 import { heroVariants } from './hero-variants';
 
 const HeroParts = {
@@ -112,7 +101,7 @@ const HeroRoot = ({
       <div className={s.grid()}>
         <div className={s.copy()} data-testid="hero-copy">
           {slots.Avatar &&
-            cloneElement(slots.Avatar as ReactElement<THeroAvatarProps>, {
+            cloneElement(slots.Avatar, {
               contentAlignment: resolvedAlignment,
             })}
           {eyebrow && <Eyebrow className={s.eyebrow()}>{eyebrow}</Eyebrow>}
@@ -133,16 +122,14 @@ const HeroRoot = ({
           )}
           {slots.Cta}
           {slots.Social &&
-            cloneElement(slots.Social as ReactElement<THeroSocialProps>, {
+            cloneElement(slots.Social, {
               contentAlignment: resolvedAlignment,
             })}
         </div>
         {slots.Media && (
           <div className={s.media()} data-testid="hero-media">
             {isBanner
-              ? cloneElement(slots.Media as ReactElement<THeroMediaProps>, {
-                  isFramed: false,
-                })
+              ? cloneElement(slots.Media, { isFramed: false })
               : slots.Media}
           </div>
         )}
