@@ -36,12 +36,9 @@ const getOptionValues = (field: ReturnType<typeof getCtaField>) => {
 };
 
 const getImageField = () => {
-  const imageField = ctaSchema.fields?.find(
-    (field): field is typeof field & { name: 'image' } =>
-      'name' in field && field.name === 'image',
-  );
+  const imageField = getField(ctaSchema, 'image');
 
-  if (!imageField || !('validation' in imageField) || !imageField.validation) {
+  if (!('validation' in imageField) || !imageField.validation) {
     throw new Error(
       'Expected ctaSchema to define an image field with validation.',
     );

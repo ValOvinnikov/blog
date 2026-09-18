@@ -3,19 +3,9 @@ import {
   SOCIAL_PLATFORM_LABEL,
 } from '@blog/config/constants';
 import { inlineLinkSchema } from '@blog/studio/schema-types/objects/inline-link/inline-link';
+import { getField } from '@blog/studio/testing/get-field';
 
-const getPlatformField = () => {
-  const field = inlineLinkSchema.fields.find(
-    (field): field is typeof field & { name: 'platform' } =>
-      'name' in field && field.name === 'platform',
-  );
-
-  if (!field) {
-    throw new Error('Expected inlineLinkSchema to define a "platform" field.');
-  }
-
-  return field;
-};
+const getPlatformField = () => getField(inlineLinkSchema, 'platform');
 
 const getOptionValues = (field: { options?: unknown }) => {
   const options = field.options;

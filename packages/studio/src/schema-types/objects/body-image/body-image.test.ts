@@ -1,19 +1,9 @@
 import { IMAGE_LAYOUT } from '@blog/config/constants';
 import { bodyImageSchema } from '@blog/studio/schema-types/objects/body-image/body-image';
+import { getField } from '@blog/studio/testing/get-field';
 import { getLayout } from '@blog/studio/testing/get-field-layout';
 
-const getLayoutField = () => {
-  const field = bodyImageSchema.fields?.find(
-    (field): field is typeof field & { name: string } =>
-      'name' in field && field.name === 'layout',
-  );
-
-  if (!field) {
-    throw new Error('Expected bodyImageSchema to define a "layout" field.');
-  }
-
-  return field;
-};
+const getLayoutField = () => getField(bodyImageSchema, 'layout');
 
 const getOptionValues = (field: { options?: unknown }) => {
   const options = field.options;

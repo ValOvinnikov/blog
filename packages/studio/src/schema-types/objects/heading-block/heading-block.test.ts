@@ -1,19 +1,10 @@
 import { headingBlockSchema } from '@blog/studio/schema-types/objects/heading-block/heading-block';
+import { getField } from '@blog/studio/testing/get-field';
 import { wasRequiredCalled } from '@blog/studio/testing/was-required-called';
 import type { ObjectDefinition } from 'sanity';
 
 const fieldNames = (schema: ObjectDefinition) =>
   schema.fields?.map((field) => field.name);
-
-const findField = (schema: ObjectDefinition, name: string) => {
-  const field = schema.fields?.find((candidate) => candidate.name === name);
-
-  if (!field) {
-    throw new Error(`Expected ${schema.name} to define a "${name}" field.`);
-  }
-
-  return field;
-};
 
 describe('headingBlockSchema shape', () => {
   it('carries only heading and supportingText', () => {
@@ -35,13 +26,13 @@ describe('headingBlockSchema shape', () => {
   });
 
   it('requires heading', () => {
-    const field = findField(headingBlockSchema, 'heading');
+    const field = getField(headingBlockSchema, 'heading');
 
     expect(wasRequiredCalled(field)).toBe(true);
   });
 
   it('defines no validation on supportingText', () => {
-    const field = findField(headingBlockSchema, 'supportingText');
+    const field = getField(headingBlockSchema, 'supportingText');
 
     expect(field.validation).toBeUndefined();
   });

@@ -11,6 +11,7 @@ import {
   type TModulesCustomFn,
 } from '@blog/studio/testing/create-mock-modules-rule';
 import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
+import { getField } from '@blog/studio/testing/get-field';
 import { wasRequiredCalled } from '@blog/studio/testing/was-required-called';
 import type { ValidationContext } from 'sanity';
 
@@ -73,15 +74,14 @@ describe('landingPageSchema modules validateCustom chaining', () => {
 
 type TSlugCustomFn = (value: { current?: string } | undefined) => string | true;
 
-const getSlugField = () =>
-  landingPageSchema.fields?.find((field) => field.name === 'slug');
+const getSlugField = () => getField(landingPageSchema, 'slug');
 
 const getSlugCustomValidator = () => {
   const slugField = getSlugField();
 
   return {
     customFn: getCustomValidator<TSlugCustomFn>(slugField),
-    requiredCalled: wasRequiredCalled(slugField ?? {}),
+    requiredCalled: wasRequiredCalled(slugField),
   };
 };
 
