@@ -17,7 +17,7 @@ export const VOICE_FIXED_KEYS = [
   'postShare.panelAriaLabel',
   'siteNavigation.toggleMenu',
   'brandLockupLink.ariaLabel',
-  'siteFooter.socialLinkAriaLabel',
+  'socialLinks.linkAriaLabel',
   'topicChipList.ariaLabel',
   'blogListPage.paginationAriaLabel',
   'blogPostPage.depthToggle.ariaLabel',

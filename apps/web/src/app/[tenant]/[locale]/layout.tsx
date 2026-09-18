@@ -19,9 +19,9 @@ import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { AuthMenu } from '@web/components/shared/auth-menu';
 import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
-import { FooterSocialLinks } from '@web/components/shared/footer-social-links';
 import { SiteNavigation } from '@web/components/shared/site-navigation';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { SocialLinks } from '@web/components/shared/social-links';
 import { ThemeScope } from '@web/components/shared/theme-scope';
 import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
 import { SanityImageBaseUrlProvider } from '@web/context/sanity-image-base-url-provider';
@@ -177,7 +177,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
   const brandLogoUrl = brand.logo
     ? urlForSanityImage(brand.logo, tenantContext)
     : undefined;
-  const footerSocialLinks = await FooterSocialLinks({ social });
+  const footerSocialLinks = await SocialLinks({ profiles: social });
 
   return (
     // `<html>` (owned by the tenant-independent root layout above) has no

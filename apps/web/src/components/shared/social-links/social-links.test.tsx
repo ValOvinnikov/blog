@@ -1,7 +1,7 @@
 import { SOCIAL_PLATFORMS } from '@blog/config';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 
-import { FooterSocialLinks } from './footer-social-links';
+import { SocialLinks } from './social-links';
 
 const linkedInLink = {
   label: 'LinkedIn',
@@ -27,12 +27,12 @@ const mastodonLink = {
   ariaLabel: undefined,
 };
 
-const setup = customRenderAsync(FooterSocialLinks, { social: [] });
+const setup = customRenderAsync(SocialLinks, { profiles: [] });
 
-describe(`<${FooterSocialLinks.name}/>`, () => {
+describe(`<${SocialLinks.name}/>`, () => {
   it('derives the accessible name for a mapped platform from SOCIAL_PLATFORM_LABEL, not a naive title-case', async () => {
     await setup({
-      social: [{ platform: SOCIAL_PLATFORMS.LINKEDIN, link: linkedInLink }],
+      profiles: [{ platform: SOCIAL_PLATFORMS.LINKEDIN, link: linkedInLink }],
     });
 
     const link = screen.getByRole('link', { name: 'LinkedIn profile' });
@@ -45,7 +45,7 @@ describe(`<${FooterSocialLinks.name}/>`, () => {
 
   it('derives the accessible name for GitHub with corrected casing', async () => {
     await setup({
-      social: [{ platform: SOCIAL_PLATFORMS.GITHUB, link: githubLink }],
+      profiles: [{ platform: SOCIAL_PLATFORMS.GITHUB, link: githubLink }],
     });
 
     expect(
@@ -55,7 +55,7 @@ describe(`<${FooterSocialLinks.name}/>`, () => {
 
   it('renders an icon and the translated accessible name for a platform outside the original 6-key set', async () => {
     await setup({
-      social: [{ platform: SOCIAL_PLATFORMS.MASTODON, link: mastodonLink }],
+      profiles: [{ platform: SOCIAL_PLATFORMS.MASTODON, link: mastodonLink }],
     });
 
     const link = screen.getByRole('link', { name: 'Mastodon profile' });
@@ -66,8 +66,8 @@ describe(`<${FooterSocialLinks.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('renders no links when social is empty', async () => {
-    await setup({ social: [] });
+  it('renders no links when profiles is empty', async () => {
+    await setup({ profiles: [] });
 
     expect(screen.queryAllByRole('link')).toHaveLength(0);
   });

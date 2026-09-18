@@ -37,8 +37,8 @@
   "brandLockupLink": {
     "ariaLabel": "Home"
   },
-  "siteFooter": {
-    "socialLinkAriaLabel": "{platform} profile"
+  "socialLinks": {
+    "linkAriaLabel": "{platform} profile"
   },
   "topicChipList": {
     "ariaLabel": "Topics",

@@ -111,7 +111,7 @@ vi.mock('@blog/service', () => ({
 
 const translations: Record<string, string> = {
   feedLinkLabel: 'RSS feed',
-  socialLinkAriaLabel: '{platform} profile',
+  linkAriaLabel: '{platform} profile',
 };
 
 // A minimal stand-in for next-intl's ICU interpolation — sufficient for the
