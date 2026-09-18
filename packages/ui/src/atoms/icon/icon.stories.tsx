@@ -1,4 +1,4 @@
-import { ICONS, SIZE } from '@blog/config';
+import { FEATURE_ICONS, ICONS, SIZE, type TIconName } from '@blog/config';
 import { objectKeys, toTitleCase } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -7,9 +7,9 @@ import { iconVariants } from './icon-variants';
 
 const iconNames = objectKeys(ICONS);
 
-const IconGallery = () => (
+const IconGallery = ({ names }: { names: readonly TIconName[] }) => (
   <div className="grid grid-cols-3 gap-6 sm:grid-cols-5">
-    {iconNames.map((name) => (
+    {names.map((name) => (
       <div
         key={name}
         className="flex flex-col items-center gap-2 rounded-md border border-border p-4 text-center"
@@ -64,5 +64,9 @@ export const WithAccessibleLabel: TStory = {
 };
 
 export const Gallery: TStory = {
-  render: () => <IconGallery />,
+  render: () => <IconGallery names={iconNames} />,
+};
+
+export const FeatureIconGallery: TStory = {
+  render: () => <IconGallery names={FEATURE_ICONS} />,
 };
