@@ -4837,8 +4837,17 @@
       "hero": {
         "type": "objectAttribute",
         "value": {
-          "type": "inline",
-          "name": "module_heroStatement.reference"
+          "type": "union",
+          "of": [
+            {
+              "type": "inline",
+              "name": "module_heroBlog.reference"
+            },
+            {
+              "type": "inline",
+              "name": "module_heroStatement.reference"
+            }
+          ]
         },
         "optional": true
       },
