@@ -1,5 +1,5 @@
 import { postIndexPageSchema } from '@blog/studio/schema-types/documents/pages/post-index/post-index';
-import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
+import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import {
   createMockModulesRule,
@@ -62,7 +62,7 @@ describe('postIndexPageSchema headingBlock field', () => {
 });
 
 describe('postIndexPageSchema hero field', () => {
-  it('is an optional reference to the hero family', () => {
+  it('is an optional reference scoped to heroBlog only', () => {
     const heroField = getField('hero');
 
     if (!heroField) {
@@ -70,9 +70,9 @@ describe('postIndexPageSchema hero field', () => {
     }
 
     expect(heroField.type).toBe('reference');
-    expect(heroField.to?.map((entry) => entry.type)).toEqual(
-      HERO_SCHEMA_TYPES.map((schema) => schema.name),
-    );
+    expect(heroField.to?.map((entry) => entry.type)).toEqual([
+      heroBlogSchema.name,
+    ]);
     expect(heroField.validation).toBeUndefined();
   });
 });

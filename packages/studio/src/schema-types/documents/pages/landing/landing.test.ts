@@ -1,5 +1,5 @@
 import { landingPageSchema } from '@blog/studio/schema-types/documents/pages/landing/landing';
-import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
+import { heroStatementSchema } from '@blog/studio/schema-types/modules/hero-statement/hero-statement';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/validation/validate-taxonomy-list-has-taxonomy/validate-taxonomy-list-has-taxonomy';
@@ -150,16 +150,16 @@ describe('landingPageSchema slug validation', () => {
 });
 
 describe('landingPageSchema hero field', () => {
-  it('is an optional reference to the hero family', () => {
+  it('is an optional reference scoped to heroStatement only', () => {
     const heroField = landingPageSchema.fields?.find(
       (field) => field.name === 'hero',
     ) as { type: string; to?: Array<{ type: string }>; validation?: unknown };
 
     expect(heroField).toBeDefined();
     expect(heroField.type).toBe('reference');
-    expect(heroField.to?.map((entry) => entry.type)).toEqual(
-      HERO_SCHEMA_TYPES.map((schema) => schema.name),
-    );
+    expect(heroField.to?.map((entry) => entry.type)).toEqual([
+      heroStatementSchema.name,
+    ]);
     expect(heroField.validation).toBeUndefined();
   });
 });

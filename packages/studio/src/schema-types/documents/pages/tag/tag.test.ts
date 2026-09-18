@@ -1,7 +1,7 @@
 import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag/tag';
 import { tagPageSchema } from '@blog/studio/schema-types/documents/pages/tag/tag';
 import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/tag/tag-type';
-import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
+import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import {
@@ -154,7 +154,7 @@ describe('pageTagSchema headingBlock field', () => {
 });
 
 describe('tagPageSchema hero field', () => {
-  it('is an optional reference to the hero family via heroField()', () => {
+  it('is an optional reference scoped to heroBlog only', () => {
     const heroField = getField('hero') as
       | { type: string; to?: Array<{ type: string }>; validation?: unknown }
       | undefined;
@@ -164,9 +164,9 @@ describe('tagPageSchema hero field', () => {
     }
 
     expect(heroField.type).toBe('reference');
-    expect(heroField.to?.map((entry) => entry.type)).toEqual(
-      HERO_SCHEMA_TYPES.map((schema) => schema.name),
-    );
+    expect(heroField.to?.map((entry) => entry.type)).toEqual([
+      heroBlogSchema.name,
+    ]);
     expect(heroField.validation).toBeUndefined();
   });
 });
