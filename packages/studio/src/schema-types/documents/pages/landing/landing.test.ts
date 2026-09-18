@@ -170,6 +170,7 @@ describe('landingPageSchema modules allow-list', () => {
       'module_postFeatured',
       'module_newsletter',
       'module_taxonomyList',
+      'module_featureList',
     ]);
   });
 });

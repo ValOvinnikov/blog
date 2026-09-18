@@ -1,3 +1,4 @@
+import { featureBlockSchema } from './blocks/feature/feature';
 import { authorSchema } from './blog/author/author';
 import { tagSchema } from './blog/tag/tag';
 import { topicSchema } from './blog/topic/topic';
@@ -21,6 +22,7 @@ export const documents = [
   authorSchema,
   topicSchema,
   tagSchema,
+  featureBlockSchema,
   linkSchema,
   landingPageSchema,
   homePageSchema,

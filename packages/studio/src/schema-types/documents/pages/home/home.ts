@@ -4,6 +4,7 @@ import { modulesField } from '@blog/studio/schema-types/fields/modules-field/mod
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
+import { featureListSchema } from '@blog/studio/schema-types/modules/feature-list/feature-list';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import { heroProfileSchema } from '@blog/studio/schema-types/modules/hero-profile/hero-profile';
 import { heroStatementSchema } from '@blog/studio/schema-types/modules/hero-statement/hero-statement';
@@ -54,6 +55,7 @@ export const homePageSchema = defineType({
         postLatestSchema.name,
         taxonomyListSchema.name,
         postFeaturedSchema.name,
+        featureListSchema.name,
       ],
       validateCustom: (rule) =>
         rule
