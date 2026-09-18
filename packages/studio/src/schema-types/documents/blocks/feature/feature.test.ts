@@ -156,8 +156,7 @@ describe('featureBlockSchema preview', () => {
       prepare({
         title: 'Fast Builds',
         linkLabel: 'Learn more',
-        image: undefined,
-        icon: undefined,
+        media: undefined,
       }),
     ).toEqual({
       title: 'Fast Builds',
@@ -168,12 +167,7 @@ describe('featureBlockSchema preview', () => {
 
   it('falls back to "No link" when no link is set', () => {
     expect(
-      prepare({
-        title: 'Fast Builds',
-        linkLabel: undefined,
-        image: undefined,
-        icon: undefined,
-      }),
+      prepare({ title: 'Fast Builds', linkLabel: undefined, media: undefined }),
     ).toEqual({
       title: 'Fast Builds',
       subtitle: 'No link',
@@ -183,12 +177,7 @@ describe('featureBlockSchema preview', () => {
 
   it('falls back to "Unknown" when there is no title', () => {
     expect(
-      prepare({
-        title: undefined,
-        linkLabel: undefined,
-        image: undefined,
-        icon: undefined,
-      }),
+      prepare({ title: undefined, linkLabel: undefined, media: undefined }),
     ).toEqual({
       title: 'Unknown',
       subtitle: 'No link',
@@ -197,41 +186,21 @@ describe('featureBlockSchema preview', () => {
   });
 
   it('uses the image as media when one is set', () => {
-    const image = { asset: { _ref: 'image-abc' } };
+    const media = { asset: { _ref: 'image-abc' } };
 
     expect(
-      prepare({
-        title: 'Fast Builds',
-        linkLabel: undefined,
-        image,
-        icon: 'CODE',
-      }),
+      prepare({ title: 'Fast Builds', linkLabel: undefined, media }),
     ).toEqual({
       title: 'Fast Builds',
       subtitle: 'No link',
-      media: image,
+      media,
     });
   });
 
-  it('falls back to a rendered icon as media when there is no image', () => {
-    const result = prepare({
-      title: 'Fast Builds',
-      linkLabel: undefined,
-      image: undefined,
-      icon: 'CODE',
-    });
-
-    expect(result.media).toBeDefined();
-  });
-
-  it('has no media when neither an image nor an icon is set', () => {
+  it('has no media when no image is set', () => {
     expect(
-      prepare({
-        title: 'Fast Builds',
-        linkLabel: undefined,
-        image: undefined,
-        icon: undefined,
-      }).media,
+      prepare({ title: 'Fast Builds', linkLabel: undefined, media: undefined })
+        .media,
     ).toBeUndefined();
   });
 });

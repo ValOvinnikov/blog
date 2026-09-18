@@ -1,89 +1,11 @@
-import { FEATURE_ICONS, type TFeatureIconName } from '@blog/config/constants';
+import { FEATURE_ICONS } from '@blog/config/constants';
 import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { toTitleCase } from '@blog/utils/primitives';
-import {
-  Book,
-  Camera,
-  ChartNoAxesCombined,
-  Check,
-  Clock,
-  Cloud,
-  Code,
-  Cpu,
-  Globe,
-  Grid2x2,
-  Heart,
-  IdCard,
-  Layers,
-  Lightbulb,
-  Lock,
-  Mail,
-  MapPin,
-  MessageSquareText,
-  Palette,
-  Pen,
-  Phone,
-  Rocket,
-  Search,
-  Settings,
-  ShieldCheck,
-  Smile,
-  Star,
-  Target,
-  TrendingUp,
-  Users,
-  Wrench,
-  Zap,
-  type LucideIcon,
-} from 'lucide-react';
-import { createElement, type ReactNode } from 'react';
+import { IdCard } from 'lucide-react';
 import { defineField, defineType, type SanityDocument } from 'sanity';
-
-const FEATURE_ICON_COMPONENT: Record<TFeatureIconName, LucideIcon> = {
-  CODE: Code,
-  LAYERS: Layers,
-  CPU: Cpu,
-  WRENCH: Wrench,
-  SETTINGS: Settings,
-  ROCKET: Rocket,
-  ZAP: Zap,
-  TARGET: Target,
-  CHART: ChartNoAxesCombined,
-  TRENDING_UP: TrendingUp,
-  SEARCH: Search,
-  CHECK: Check,
-  SHIELD_CHECK: ShieldCheck,
-  LOCK: Lock,
-  CLOCK: Clock,
-  CLOUD: Cloud,
-  GRID: Grid2x2,
-  PALETTE: Palette,
-  STAR: Star,
-  LIGHTBULB: Lightbulb,
-  BOOK: Book,
-  PEN: Pen,
-  USERS: Users,
-  COMMENT: MessageSquareText,
-  MAIL: Mail,
-  PHONE: Phone,
-  SMILE: Smile,
-  HEART: Heart,
-  GLOBE: Globe,
-  MAP_PIN: MapPin,
-  CAMERA: Camera,
-};
-
-const isFeatureIconName = (value: unknown): value is TFeatureIconName =>
-  typeof value === 'string' &&
-  (FEATURE_ICONS as readonly string[]).includes(value);
-
-const iconMedia = (icon: unknown): ReactNode =>
-  isFeatureIconName(icon)
-    ? createElement(FEATURE_ICON_COMPONENT[icon])
-    : undefined;
 
 type TFeatureBlockDocument = {
   icon?: string;
@@ -148,14 +70,13 @@ export const featureBlockSchema = defineType({
     select: {
       title: 'title',
       linkLabel: 'link.label',
-      image: 'image',
-      icon: 'icon',
+      media: 'image',
     },
-    prepare({ title, linkLabel, image, icon }) {
+    prepare({ title, linkLabel, media }) {
       return {
         title: String(title ?? 'Unknown'),
         subtitle: typeof linkLabel === 'string' ? linkLabel : 'No link',
-        media: image ?? iconMedia(icon),
+        media: media ?? undefined,
       };
     },
   },
