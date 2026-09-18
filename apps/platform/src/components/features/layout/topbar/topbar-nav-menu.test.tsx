@@ -36,6 +36,13 @@ const setPathname = (pathname: string) => {
   usePathnameMock.mockReturnValue(pathname);
 };
 
+const PLATFORM_TENANTS_SECTION = [
+  {
+    label: 'Platform',
+    items: [{ label: 'Tenants', icon: ICONS.GRID, href: '/tenants' }],
+  },
+];
+
 describe(TopbarNavMenu, () => {
   beforeEach(() => {
     setPathname('/');
@@ -155,16 +162,7 @@ describe(TopbarNavMenu, () => {
 
   it('closes the popup after clicking a link item', async () => {
     const user = userEvent.setup();
-    render(
-      <TopbarNavMenu
-        sections={[
-          {
-            label: 'Platform',
-            items: [{ label: 'Tenants', icon: ICONS.GRID, href: '/tenants' }],
-          },
-        ]}
-      />,
-    );
+    render(<TopbarNavMenu sections={PLATFORM_TENANTS_SECTION} />);
 
     await user.click(screen.getByRole('button', { name: 'Menu' }));
     const menu = await screen.findByRole('menu');
@@ -178,12 +176,7 @@ describe(TopbarNavMenu, () => {
     render(
       <TopbarNavMenu
         switcher={<div>Tenant switcher</div>}
-        sections={[
-          {
-            label: 'Platform',
-            items: [{ label: 'Tenants', icon: ICONS.GRID, href: '/tenants' }],
-          },
-        ]}
+        sections={PLATFORM_TENANTS_SECTION}
       />,
     );
 
@@ -199,16 +192,7 @@ describe(TopbarNavMenu, () => {
 
   it('renders no switcher slot when none is provided', async () => {
     const user = userEvent.setup();
-    render(
-      <TopbarNavMenu
-        sections={[
-          {
-            label: 'Platform',
-            items: [{ label: 'Tenants', icon: ICONS.GRID, href: '/tenants' }],
-          },
-        ]}
-      />,
-    );
+    render(<TopbarNavMenu sections={PLATFORM_TENANTS_SECTION} />);
 
     await user.click(screen.getByRole('button', { name: 'Menu' }));
     await screen.findByRole('menu');

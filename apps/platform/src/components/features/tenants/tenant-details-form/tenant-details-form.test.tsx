@@ -29,7 +29,34 @@ const fillValidForm = async (user: ReturnType<typeof userEvent.setup>) => {
   );
 };
 
-describe(TenantDetailsForm, () => {
+const clickBeginProvisioning = async (
+  user: ReturnType<typeof userEvent.setup>,
+) => {
+  await user.click(screen.getByRole('button', { name: /begin provisioning/i }));
+};
+
+const clickConfirmInviteOwner = async (
+  user: ReturnType<typeof userEvent.setup>,
+) => {
+  await user.click(
+    await screen.findByRole('button', { name: /confirm & invite owner/i }),
+  );
+};
+
+/** Queues the first submit's "unregistered owner" confirmation, then a second-submit success — the shared arrangement of every confirm-and-resubmit test below. */
+const mockOwnerInviteConfirmation = (overrides: {
+  email: string;
+  token?: string;
+  message: string;
+}) => {
+  createTenantActionMock.mockResolvedValueOnce({
+    ok: false,
+    ownerInviteConfirmation: overrides,
+  });
+  createTenantActionMock.mockResolvedValueOnce({ ok: false });
+};
+
+describe(`<${TenantDetailsForm.name}/>`, () => {
   beforeEach(() => {
     createTenantActionMock.mockReset();
     createTenantActionMock.mockResolvedValue({ ok: false });
@@ -59,9 +86,7 @@ describe(TenantDetailsForm, () => {
 
     await fillValidForm(user);
     await user.click(screen.getByRole('button', { name: 'Growth' }));
-    await user.click(
-      screen.getByRole('button', { name: /begin provisioning/i }),
-    );
+    await clickBeginProvisioning(user);
 
     expect(createTenantActionMock).toHaveBeenCalledWith({
       name: 'Acme',
@@ -80,9 +105,7 @@ describe(TenantDetailsForm, () => {
     render(<TenantDetailsForm />);
 
     await fillValidForm(user);
-    await user.click(
-      screen.getByRole('button', { name: /begin provisioning/i }),
-    );
+    await clickBeginProvisioning(user);
 
     expect(
       await screen.findByText('No registered user matches this email.'),
@@ -101,9 +124,7 @@ describe(TenantDetailsForm, () => {
     render(<TenantDetailsForm />);
 
     await fillValidForm(user);
-    await user.click(
-      screen.getByRole('button', { name: /begin provisioning/i }),
-    );
+    await clickBeginProvisioning(user);
 
     expect(
       screen.getByRole('status', { name: 'Beginning provisioning…' }),
@@ -145,12 +166,8 @@ describe(TenantDetailsForm, () => {
     render(<TenantDetailsForm />);
 
     await fillValidForm(user);
-    await user.click(
-      screen.getByRole('button', { name: /begin provisioning/i }),
-    );
-    await user.click(
-      await screen.findByRole('button', { name: /confirm & invite owner/i }),
-    );
+    await clickBeginProvisioning(user);
+    await clickConfirmInviteOwner(user);
 
     expect(
       screen.getByRole('status', { name: 'Inviting owner…' }),
@@ -180,9 +197,7 @@ describe(TenantDetailsForm, () => {
     render(<TenantDetailsForm />);
 
     await fillValidForm(user);
-    await user.click(
-      screen.getByRole('button', { name: /begin provisioning/i }),
-    );
+    await clickBeginProvisioning(user);
 
     expect(
       await screen.findByRole('button', { name: /confirm & invite owner/i }),
@@ -195,25 +210,16 @@ describe(TenantDetailsForm, () => {
   });
 
   it('resubmits with confirmOwnerInviteToken set once the operator confirms an unchanged owner email', async () => {
-    createTenantActionMock.mockResolvedValueOnce({
-      ok: false,
-      ownerInviteConfirmation: {
-        email: 'owner@example.com',
-        message: 'No account found for owner@example.com.',
-      },
+    mockOwnerInviteConfirmation({
+      email: 'owner@example.com',
+      message: 'No account found for owner@example.com.',
     });
-    createTenantActionMock.mockResolvedValueOnce({ ok: false });
     const user = userEvent.setup();
     render(<TenantDetailsForm />);
 
     await fillValidForm(user);
-    await user.click(
-      screen.getByRole('button', { name: /begin provisioning/i }),
-    );
-
-    await user.click(
-      await screen.findByRole('button', { name: /confirm & invite owner/i }),
-    );
+    await clickBeginProvisioning(user);
+    await clickConfirmInviteOwner(user);
 
     expect(createTenantActionMock).toHaveBeenLastCalledWith(
       expect.objectContaining({
@@ -223,14 +229,10 @@ describe(TenantDetailsForm, () => {
   });
 
   it('resubmits with confirmOwnerInviteToken set when the owner email only differs from the server-normalized form by case or whitespace', async () => {
-    createTenantActionMock.mockResolvedValueOnce({
-      ok: false,
-      ownerInviteConfirmation: {
-        email: 'john.doe@example.com',
-        message: 'No account found for john.doe@example.com.',
-      },
+    mockOwnerInviteConfirmation({
+      email: 'john.doe@example.com',
+      message: 'No account found for john.doe@example.com.',
     });
-    createTenantActionMock.mockResolvedValueOnce({ ok: false });
     const user = userEvent.setup();
     render(<TenantDetailsForm />);
 
@@ -246,13 +248,8 @@ describe(TenantDetailsForm, () => {
       screen.getByRole('textbox', { name: 'Owner email' }),
       'John.Doe@Example.com',
     );
-    await user.click(
-      screen.getByRole('button', { name: /begin provisioning/i }),
-    );
-
-    await user.click(
-      await screen.findByRole('button', { name: /confirm & invite owner/i }),
-    );
+    await clickBeginProvisioning(user);
+    await clickConfirmInviteOwner(user);
 
     expect(createTenantActionMock).toHaveBeenLastCalledWith(
       expect.objectContaining({
@@ -262,21 +259,15 @@ describe(TenantDetailsForm, () => {
   });
 
   it('drops the stale confirmation and re-requires a fresh confirm once the owner email is edited', async () => {
-    createTenantActionMock.mockResolvedValueOnce({
-      ok: false,
-      ownerInviteConfirmation: {
-        email: 'owner@example.com',
-        message: 'No account found for owner@example.com.',
-      },
+    mockOwnerInviteConfirmation({
+      email: 'owner@example.com',
+      message: 'No account found for owner@example.com.',
     });
-    createTenantActionMock.mockResolvedValueOnce({ ok: false });
     const user = userEvent.setup();
     render(<TenantDetailsForm />);
 
     await fillValidForm(user);
-    await user.click(
-      screen.getByRole('button', { name: /begin provisioning/i }),
-    );
+    await clickBeginProvisioning(user);
     await screen.findByText('No account found for owner@example.com.');
 
     await user.type(
@@ -290,9 +281,7 @@ describe(TenantDetailsForm, () => {
       await screen.findByRole('button', { name: /begin provisioning/i }),
     ).toBeVisible();
 
-    await user.click(
-      screen.getByRole('button', { name: /begin provisioning/i }),
-    );
+    await clickBeginProvisioning(user);
 
     expect(createTenantActionMock).toHaveBeenLastCalledWith(
       expect.objectContaining({
@@ -302,26 +291,17 @@ describe(TenantDetailsForm, () => {
   });
 
   it('echoes the confirmation token back once the operator confirms an unchanged owner email', async () => {
-    createTenantActionMock.mockResolvedValueOnce({
-      ok: false,
-      ownerInviteConfirmation: {
-        email: 'owner@example.com',
-        token: 'confirmation-token-for-owner-example-com',
-        message: 'No account found for owner@example.com.',
-      },
+    mockOwnerInviteConfirmation({
+      email: 'owner@example.com',
+      token: 'confirmation-token-for-owner-example-com',
+      message: 'No account found for owner@example.com.',
     });
-    createTenantActionMock.mockResolvedValueOnce({ ok: false });
     const user = userEvent.setup();
     render(<TenantDetailsForm />);
 
     await fillValidForm(user);
-    await user.click(
-      screen.getByRole('button', { name: /begin provisioning/i }),
-    );
-
-    await user.click(
-      await screen.findByRole('button', { name: /confirm & invite owner/i }),
-    );
+    await clickBeginProvisioning(user);
+    await clickConfirmInviteOwner(user);
 
     expect(createTenantActionMock).toHaveBeenLastCalledWith(
       expect.objectContaining({
@@ -332,31 +312,23 @@ describe(TenantDetailsForm, () => {
   });
 
   it('drops the stale token along with the stale confirmation once the owner email is edited', async () => {
-    createTenantActionMock.mockResolvedValueOnce({
-      ok: false,
-      ownerInviteConfirmation: {
-        email: 'owner@example.com',
-        token: 'confirmation-token-for-owner-example-com',
-        message: 'No account found for owner@example.com.',
-      },
+    mockOwnerInviteConfirmation({
+      email: 'owner@example.com',
+      token: 'confirmation-token-for-owner-example-com',
+      message: 'No account found for owner@example.com.',
     });
-    createTenantActionMock.mockResolvedValueOnce({ ok: false });
     const user = userEvent.setup();
     render(<TenantDetailsForm />);
 
     await fillValidForm(user);
-    await user.click(
-      screen.getByRole('button', { name: /begin provisioning/i }),
-    );
+    await clickBeginProvisioning(user);
     await screen.findByText('No account found for owner@example.com.');
 
     await user.type(
       screen.getByRole('textbox', { name: 'Owner email' }),
       '.uk',
     );
-    await user.click(
-      await screen.findByRole('button', { name: /begin provisioning/i }),
-    );
+    await clickBeginProvisioning(user);
 
     expect(createTenantActionMock).toHaveBeenLastCalledWith(
       expect.objectContaining({
@@ -375,9 +347,7 @@ describe(TenantDetailsForm, () => {
     render(<TenantDetailsForm />);
 
     await fillValidForm(user);
-    await user.click(
-      screen.getByRole('button', { name: /begin provisioning/i }),
-    );
+    await clickBeginProvisioning(user);
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
       "Couldn't create the tenant",

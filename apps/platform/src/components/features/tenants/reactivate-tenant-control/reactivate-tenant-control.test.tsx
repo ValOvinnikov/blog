@@ -1,11 +1,9 @@
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { customRender, screen } from '@platform/testing/custom-render';
+import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
 import userEvent from '@testing-library/user-event';
-import { useRouter } from 'next/navigation';
 
 import { ReactivateTenantControl } from './reactivate-tenant-control';
-
-const render = renderWithIntl;
 
 const { reactivateTenantActionMock } = vi.hoisted(() => ({
   reactivateTenantActionMock: vi.fn(),
@@ -15,30 +13,26 @@ vi.mock('@platform/server/provisioning/reactivate-tenant-action', () => ({
   reactivateTenantAction: reactivateTenantActionMock,
 }));
 
-const ARCHIVED = {
+const ARCHIVED_TENANT = makeTenant({
   deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
-};
+});
 
-describe(ReactivateTenantControl, () => {
+const setup = customRender(ReactivateTenantControl, {
+  tenant: ARCHIVED_TENANT,
+});
+
+describe(`<${ReactivateTenantControl.name}/>`, () => {
   const refreshMock = vi.fn();
 
   beforeEach(() => {
     reactivateTenantActionMock.mockReset();
     reactivateTenantActionMock.mockResolvedValue({ ok: true });
     refreshMock.mockReset();
-    vi.mocked(useRouter).mockReturnValue({
-      push: vi.fn(),
-      replace: vi.fn(),
-      prefetch: vi.fn(),
-      back: vi.fn(),
-      forward: vi.fn(),
-      refresh: refreshMock,
-      bfcacheId: '',
-    });
+    mockRouterRefresh(refreshMock);
   });
 
   it('titles the card "Reactivate this tenant"', () => {
-    render(<ReactivateTenantControl tenant={makeTenant(ARCHIVED)} />);
+    setup();
 
     expect(
       screen.getByRole('heading', { level: 2, name: 'Reactivate this tenant' }),
@@ -47,7 +41,7 @@ describe(ReactivateTenantControl, () => {
 
   it('opens a confirm dialog requiring the tenant name, disabled until it matches', async () => {
     const user = userEvent.setup();
-    render(<ReactivateTenantControl tenant={makeTenant(ARCHIVED)} />);
+    setup();
 
     await user.click(screen.getByRole('button', { name: 'Reactivate tenant' }));
 
@@ -61,8 +55,7 @@ describe(ReactivateTenantControl, () => {
 
   it('calls the action with the typed name and refreshes on success', async () => {
     const user = userEvent.setup();
-    const tenant = makeTenant(ARCHIVED);
-    render(<ReactivateTenantControl tenant={tenant} />);
+    setup();
 
     await user.click(screen.getByRole('button', { name: 'Reactivate tenant' }));
     await user.type(
@@ -75,9 +68,10 @@ describe(ReactivateTenantControl, () => {
 
     await user.click(confirmButton);
 
-    expect(reactivateTenantActionMock).toHaveBeenCalledWith(tenant.id, {
-      confirm: 'Acme Inc.',
-    });
+    expect(reactivateTenantActionMock).toHaveBeenCalledWith(
+      ARCHIVED_TENANT.id,
+      { confirm: 'Acme Inc.' },
+    );
     await vi.waitFor(() => expect(refreshMock).toHaveBeenCalled());
   });
 
@@ -87,7 +81,7 @@ describe(ReactivateTenantControl, () => {
       error: 'Provisioning is already running.',
     });
     const user = userEvent.setup();
-    render(<ReactivateTenantControl tenant={makeTenant(ARCHIVED)} />);
+    setup();
 
     await user.click(screen.getByRole('button', { name: 'Reactivate tenant' }));
     await user.type(

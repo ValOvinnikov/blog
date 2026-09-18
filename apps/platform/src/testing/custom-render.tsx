@@ -7,7 +7,7 @@ import {
   type RenderResult,
 } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
-import type { ReactNode } from 'react';
+import { createElement, type ComponentType, type ReactNode } from 'react';
 
 type TRenderOpts = Omit<RenderOptions, 'wrapper'>;
 
@@ -52,6 +52,24 @@ export const renderWithIntl = (
   ui: ReactNode,
   options?: TRenderOpts,
 ): RenderResult => rtlRender(<>{withIntl(ui)}</>, options);
+
+/**
+ * Bind a (sync) component + its default props once, get a `setup(overrides?)`
+ * renderer — the sync counterpart of `customRenderAsync`, for the common case
+ * of many tests rendering the same component with one or two props varied.
+ */
+export const customRender = <P extends object>(
+  Component: ComponentType<P>,
+  defaultProps: NoInfer<P>,
+) => {
+  return (overrides?: Partial<P>, options?: TRenderOpts): RenderResult =>
+    rtlRender(
+      <>
+        {withIntl(createElement(Component, { ...defaultProps, ...overrides }))}
+      </>,
+      options,
+    );
+};
 
 // Re-export the full RTL surface so tests import screen/fireEvent/etc. from here.
 export * from '@testing-library/react';

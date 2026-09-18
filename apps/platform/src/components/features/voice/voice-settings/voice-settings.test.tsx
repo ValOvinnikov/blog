@@ -1,25 +1,17 @@
 import {
-  renderWithIntl,
-  screen,
-  within,
-} from '@platform/testing/custom-render';
+  expectArchivedDisablesSave,
+  expectArchivedSaveDescribedByNotice,
+} from '@platform/testing/assert-archived-save';
+import { customRender, screen, within } from '@platform/testing/custom-render';
+import { mockRouterRefresh } from '@platform/testing/mock-router';
 import userEvent from '@testing-library/user-event';
-import { useRouter } from 'next/navigation';
 
 import { VoiceSettings } from './voice-settings';
 
-const render = renderWithIntl;
-
-vi.mocked(useRouter).mockReturnValue({
-  push: vi.fn(),
-  replace: vi.fn(),
-  prefetch: vi.fn(),
-  back: vi.fn(),
-  forward: vi.fn(),
-  refresh: vi.fn(),
-} as unknown as ReturnType<typeof useRouter>);
+mockRouterRefresh();
 
 const ADVANCED_SUMMARY = 'Advanced — 8 curated strings, 2 groups';
+const ARCHIVED_AT = new Date('2026-08-26T00:00:00.000Z');
 
 // Advanced starts collapsed (matching the Look tab) — every test that reads
 // or interacts with a curated field opens it first, same as a real user
@@ -28,15 +20,15 @@ const openAdvanced = async (user: ReturnType<typeof userEvent.setup>) => {
   await user.click(screen.getByText(ADVANCED_SUMMARY));
 };
 
-describe(VoiceSettings, () => {
+const setup = customRender(VoiceSettings, {
+  tenantId: 'tenant-1',
+  initialOverrides: {},
+  saveAction: vi.fn(),
+});
+
+describe(`<${VoiceSettings.name}/>`, () => {
   it('renders Basic empty, with a stated reason', () => {
-    render(
-      <VoiceSettings
-        tenantId="tenant-1"
-        initialOverrides={{}}
-        saveAction={vi.fn()}
-      />,
-    );
+    setup();
 
     expect(screen.getByRole('heading', { name: 'Basic' })).toBeVisible();
     expect(screen.getByText(/Nothing required here\./)).toBeVisible();
@@ -49,13 +41,7 @@ describe(VoiceSettings, () => {
   });
 
   it('starts the Advanced section collapsed', () => {
-    render(
-      <VoiceSettings
-        tenantId="tenant-1"
-        initialOverrides={{}}
-        saveAction={vi.fn()}
-      />,
-    );
+    setup();
 
     expect(
       screen.getByText(ADVANCED_SUMMARY).closest('details'),
@@ -64,13 +50,7 @@ describe(VoiceSettings, () => {
   });
 
   it('shows a chevron affordance on the Advanced disclosure toggle', () => {
-    render(
-      <VoiceSettings
-        tenantId="tenant-1"
-        initialOverrides={{}}
-        saveAction={vi.fn()}
-      />,
-    );
+    setup();
 
     const summary = screen.getByText(ADVANCED_SUMMARY).closest('summary');
     expect(summary?.querySelector('svg')).not.toBeNull();
@@ -78,13 +58,7 @@ describe(VoiceSettings, () => {
 
   it('expands the Advanced section on click', async () => {
     const user = userEvent.setup();
-    render(
-      <VoiceSettings
-        tenantId="tenant-1"
-        initialOverrides={{}}
-        saveAction={vi.fn()}
-      />,
-    );
+    setup();
 
     await openAdvanced(user);
 
@@ -96,13 +70,7 @@ describe(VoiceSettings, () => {
 
   it('renders all 8 fields across the 2 named groups, with none invented, once expanded', async () => {
     const user = userEvent.setup();
-    render(
-      <VoiceSettings
-        tenantId="tenant-1"
-        initialOverrides={{}}
-        saveAction={vi.fn()}
-      />,
-    );
+    setup();
 
     await openAdvanced(user);
 
@@ -115,13 +83,7 @@ describe(VoiceSettings, () => {
 
   it('leaves an untouched field blank with no placeholder', async () => {
     const user = userEvent.setup();
-    render(
-      <VoiceSettings
-        tenantId="tenant-1"
-        initialOverrides={{}}
-        saveAction={vi.fn()}
-      />,
-    );
+    setup();
     await openAdvanced(user);
 
     const input = screen.getByRole('textbox', { name: 'Not Found Heading' });
@@ -131,13 +93,7 @@ describe(VoiceSettings, () => {
 
   it('shows an explicit stored override as the field value, not just the placeholder', async () => {
     const user = userEvent.setup();
-    render(
-      <VoiceSettings
-        tenantId="tenant-1"
-        initialOverrides={{ notFoundHeading: 'Nothing here' }}
-        saveAction={vi.fn()}
-      />,
-    );
+    setup({ initialOverrides: { notFoundHeading: 'Nothing here' } });
     await openAdvanced(user);
 
     expect(
@@ -148,13 +104,10 @@ describe(VoiceSettings, () => {
   it('saves every current field value, including a just-cleared override as an empty string', async () => {
     const user = userEvent.setup();
     const saveAction = vi.fn().mockResolvedValue({ ok: true });
-    render(
-      <VoiceSettings
-        tenantId="tenant-1"
-        initialOverrides={{ notFoundHeading: 'Nothing here' }}
-        saveAction={saveAction}
-      />,
-    );
+    setup({
+      initialOverrides: { notFoundHeading: 'Nothing here' },
+      saveAction,
+    });
     await openAdvanced(user);
 
     await user.clear(
@@ -178,23 +131,9 @@ describe(VoiceSettings, () => {
 
   it('shows a save-confirmation toast and refreshes after a successful save', async () => {
     const user = userEvent.setup();
-    const refresh = vi.fn();
-    vi.mocked(useRouter).mockReturnValue({
-      push: vi.fn(),
-      replace: vi.fn(),
-      prefetch: vi.fn(),
-      back: vi.fn(),
-      forward: vi.fn(),
-      refresh,
-    } as unknown as ReturnType<typeof useRouter>);
+    const refresh = mockRouterRefresh();
     const saveAction = vi.fn().mockResolvedValue({ ok: true });
-    render(
-      <VoiceSettings
-        tenantId="tenant-1"
-        initialOverrides={{}}
-        saveAction={saveAction}
-      />,
-    );
+    setup({ saveAction });
 
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
@@ -204,23 +143,9 @@ describe(VoiceSettings, () => {
 
   it('shows an error alert and does not refresh when the save fails', async () => {
     const user = userEvent.setup();
-    const refresh = vi.fn();
-    vi.mocked(useRouter).mockReturnValue({
-      push: vi.fn(),
-      replace: vi.fn(),
-      prefetch: vi.fn(),
-      back: vi.fn(),
-      forward: vi.fn(),
-      refresh,
-    } as unknown as ReturnType<typeof useRouter>);
+    const refresh = mockRouterRefresh();
     const saveAction = vi.fn().mockResolvedValue({ ok: false });
-    render(
-      <VoiceSettings
-        tenantId="tenant-1"
-        initialOverrides={{}}
-        saveAction={saveAction}
-      />,
-    );
+    setup({ saveAction });
 
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
@@ -237,13 +162,7 @@ describe(VoiceSettings, () => {
         }),
     );
     const user = userEvent.setup();
-    render(
-      <VoiceSettings
-        tenantId="tenant-1"
-        initialOverrides={{}}
-        saveAction={saveAction}
-      />,
-    );
+    setup({ saveAction });
 
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
@@ -256,72 +175,39 @@ describe(VoiceSettings, () => {
     resolveAction({ ok: true });
   });
 
-  it('shows an archived notice and disables Save for an archived tenant', async () => {
-    const user = userEvent.setup();
-    const saveAction = vi.fn().mockResolvedValue({ ok: true });
-    render(
-      <VoiceSettings
-        tenantId="tenant-1"
-        initialOverrides={{}}
-        saveAction={saveAction}
-        archivedAt={new Date('2026-08-26T00:00:00.000Z')}
-      />,
-    );
+  describe('archived tenant', () => {
+    it('shows an archived notice and disables Save', async () => {
+      const user = userEvent.setup();
+      const saveAction = vi.fn().mockResolvedValue({ ok: true });
+      setup({ saveAction, archivedAt: ARCHIVED_AT });
 
-    expect(screen.getByText('This tenant is archived')).toBeVisible();
+      await expectArchivedDisablesSave(user, saveAction);
+    });
 
-    const saveButton = screen.getByRole('button', { name: 'Save changes' });
-    expect(saveButton).toBeDisabled();
+    it('describes the disabled Save button with the archived notice text, for a screen-reader user', () => {
+      setup({ archivedAt: ARCHIVED_AT });
 
-    await user.click(saveButton);
-    expect(saveAction).not.toHaveBeenCalled();
-  });
+      expectArchivedSaveDescribedByNotice();
+    });
 
-  it('describes the disabled Save button with the archived notice text, for a screen-reader user', () => {
-    render(
-      <VoiceSettings
-        tenantId="tenant-1"
-        initialOverrides={{}}
-        saveAction={vi.fn()}
-        archivedAt={new Date('2026-08-26T00:00:00.000Z')}
-      />,
-    );
+    it('makes every curated voice field read-only, not disabled', async () => {
+      const user = userEvent.setup();
+      setup({ archivedAt: ARCHIVED_AT });
 
-    expect(
-      screen.getByRole('button', { name: 'Save changes' }),
-    ).toHaveAccessibleDescription(/This tenant is archived/);
-  });
+      await openAdvanced(user);
 
-  it('makes every curated voice field read-only, not disabled, for an archived tenant', async () => {
-    const user = userEvent.setup();
-    render(
-      <VoiceSettings
-        tenantId="tenant-1"
-        initialOverrides={{}}
-        saveAction={vi.fn()}
-        archivedAt={new Date('2026-08-26T00:00:00.000Z')}
-      />,
-    );
-
-    await openAdvanced(user);
-
-    const fields = screen.getAllByRole('textbox');
-    expect(fields).toHaveLength(8);
-    for (const field of fields) {
-      expect(field).toHaveAttribute('readonly');
-      expect(field).toBeEnabled();
-    }
+      const fields = screen.getAllByRole('textbox');
+      expect(fields).toHaveLength(8);
+      for (const field of fields) {
+        expect(field).toHaveAttribute('readonly');
+        expect(field).toBeEnabled();
+      }
+    });
   });
 
   it('leaves every curated voice field editable for a non-archived tenant', async () => {
     const user = userEvent.setup();
-    render(
-      <VoiceSettings
-        tenantId="tenant-1"
-        initialOverrides={{}}
-        saveAction={vi.fn()}
-      />,
-    );
+    setup();
 
     await openAdvanced(user);
 

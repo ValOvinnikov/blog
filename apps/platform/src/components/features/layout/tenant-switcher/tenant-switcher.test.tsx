@@ -1,14 +1,8 @@
+import { customRender, screen, within } from '@platform/testing/custom-render';
 import {
-  TENANT_PROVISIONING_STATUS,
-  TENANT_PROVISIONING_STEP,
-  TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db';
-import {
-  renderWithIntl,
-  screen,
-  within,
-} from '@platform/testing/custom-render';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+  makeReadyTenant,
+  makeTenant,
+} from '@platform/testing/tenants/fixtures';
 import userEvent from '@testing-library/user-event';
 import type { ComponentPropsWithoutRef } from 'react';
 
@@ -30,43 +24,16 @@ vi.mock('@platform/i18n/navigation', () => ({
   ),
 }));
 
-const tenant = makeTenant({
-  sanityProjectId: 'proj-1',
-  sanityDataset: 'production',
-  locale: 'en',
-  provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-  provisioningSteps: {
-    [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-    },
-    [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
-      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-    },
-    [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
-      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-    },
-    [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-    },
-    [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
-      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-    },
-    [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: {
-      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-    },
-    [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
-      status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
-    },
-  },
-  seededAt: new Date('2026-01-01T00:00:00.000Z'),
-  webhookCreatedAt: new Date('2026-01-01T00:00:00.000Z'),
+const tenant = makeReadyTenant();
+
+const setup = customRender(TenantSwitcher, {
+  tenants: [tenant],
+  activeTenantId: 'tenant-1',
 });
 
-describe(TenantSwitcher, () => {
+describe(`<${TenantSwitcher.name}/>`, () => {
   it('shows the active tenant on the trigger', () => {
-    renderWithIntl(
-      <TenantSwitcher tenants={[tenant]} activeTenantId="tenant-1" />,
-    );
+    setup();
 
     expect(
       screen.getByRole('button', { name: /acme inc\./i }),
@@ -75,9 +42,7 @@ describe(TenantSwitcher, () => {
 
   it('opens a menu whose accessible name is the active tenant (from the trigger), listing every tenant the user can switch into and linking to its route', async () => {
     const user = userEvent.setup();
-    renderWithIntl(
-      <TenantSwitcher tenants={[tenant]} activeTenantId="tenant-1" />,
-    );
+    setup();
 
     await user.click(screen.getByRole('button', { name: /acme inc\./i }));
 
@@ -88,13 +53,9 @@ describe(TenantSwitcher, () => {
 
   it('links each tenant through a caller-supplied hrefFor instead of the default /tenants/{id} route', async () => {
     const user = userEvent.setup();
-    renderWithIntl(
-      <TenantSwitcher
-        tenants={[tenant]}
-        activeTenantId="tenant-1"
-        hrefFor={(t) => `/dashboard/select-tenant?tenantId=${t.id}`}
-      />,
-    );
+    setup({
+      hrefFor: (t) => `/dashboard/select-tenant?tenantId=${t.id}`,
+    });
 
     await user.click(screen.getByRole('button', { name: /acme inc\./i }));
 
@@ -114,12 +75,7 @@ describe(TenantSwitcher, () => {
       primaryDomain: 'globex.example.com',
       deprovisionedAt: new Date('2026-02-01T00:00:00.000Z'),
     });
-    renderWithIntl(
-      <TenantSwitcher
-        tenants={[tenant, archivedTenant]}
-        activeTenantId="tenant-1"
-      />,
-    );
+    setup({ tenants: [tenant, archivedTenant] });
 
     await user.click(screen.getByRole('button', { name: /acme inc\./i }));
 
@@ -139,12 +95,7 @@ describe(TenantSwitcher, () => {
       primaryDomain: 'globex.example.com',
       deprovisionedAt: new Date('2026-02-01T00:00:00.000Z'),
     });
-    renderWithIntl(
-      <TenantSwitcher
-        tenants={[tenant, archivedTenant]}
-        activeTenantId="tenant-2"
-      />,
-    );
+    setup({ tenants: [tenant, archivedTenant], activeTenantId: 'tenant-2' });
 
     expect(
       screen.getByRole('button', { name: /globex corp.*archived/i }),
