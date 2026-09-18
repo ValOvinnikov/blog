@@ -3495,36 +3495,6 @@
   },
   {
     "type": "type",
-    "name": "module_hero.reference",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_ref": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          }
-        },
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "reference"
-          }
-        },
-        "_weak": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      },
-      "dereferencesTo": "module_hero"
-    }
-  },
-  {
-    "type": "type",
     "name": "module_heroBlog.reference",
     "value": {
       "type": "object",
@@ -3551,36 +3521,6 @@
         }
       },
       "dereferencesTo": "module_heroBlog"
-    }
-  },
-  {
-    "type": "type",
-    "name": "module_heroStatement.reference",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_ref": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          }
-        },
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "reference"
-          }
-        },
-        "_weak": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      },
-      "dereferencesTo": "module_heroStatement"
     }
   },
   {
@@ -3756,21 +3696,8 @@
       "hero": {
         "type": "objectAttribute",
         "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "inline",
-              "name": "module_hero.reference"
-            },
-            {
-              "type": "inline",
-              "name": "module_heroBlog.reference"
-            },
-            {
-              "type": "inline",
-              "name": "module_heroStatement.reference"
-            }
-          ]
+          "type": "inline",
+          "name": "module_heroBlog.reference"
         },
         "optional": true
       },
@@ -3993,21 +3920,8 @@
       "hero": {
         "type": "objectAttribute",
         "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "inline",
-              "name": "module_hero.reference"
-            },
-            {
-              "type": "inline",
-              "name": "module_heroBlog.reference"
-            },
-            {
-              "type": "inline",
-              "name": "module_heroStatement.reference"
-            }
-          ]
+          "type": "inline",
+          "name": "module_heroBlog.reference"
         },
         "optional": true
       },
@@ -4235,21 +4149,8 @@
       "hero": {
         "type": "objectAttribute",
         "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "inline",
-              "name": "module_hero.reference"
-            },
-            {
-              "type": "inline",
-              "name": "module_heroBlog.reference"
-            },
-            {
-              "type": "inline",
-              "name": "module_heroStatement.reference"
-            }
-          ]
+          "type": "inline",
+          "name": "module_heroBlog.reference"
         },
         "optional": true
       },
@@ -4558,21 +4459,8 @@
       "hero": {
         "type": "objectAttribute",
         "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "inline",
-              "name": "module_hero.reference"
-            },
-            {
-              "type": "inline",
-              "name": "module_heroBlog.reference"
-            },
-            {
-              "type": "inline",
-              "name": "module_heroStatement.reference"
-            }
-          ]
+          "type": "inline",
+          "name": "module_heroBlog.reference"
         },
         "optional": true
       },
@@ -4741,21 +4629,8 @@
       "hero": {
         "type": "objectAttribute",
         "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "inline",
-              "name": "module_hero.reference"
-            },
-            {
-              "type": "inline",
-              "name": "module_heroBlog.reference"
-            },
-            {
-              "type": "inline",
-              "name": "module_heroStatement.reference"
-            }
-          ]
+          "type": "inline",
+          "name": "module_heroBlog.reference"
         },
         "optional": true
       },
@@ -4839,6 +4714,36 @@
         },
         "optional": true
       }
+    }
+  },
+  {
+    "type": "type",
+    "name": "module_heroStatement.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "module_heroStatement"
     }
   },
   {
@@ -4932,21 +4837,8 @@
       "hero": {
         "type": "objectAttribute",
         "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "inline",
-              "name": "module_hero.reference"
-            },
-            {
-              "type": "inline",
-              "name": "module_heroBlog.reference"
-            },
-            {
-              "type": "inline",
-              "name": "module_heroStatement.reference"
-            }
-          ]
+          "type": "inline",
+          "name": "module_heroStatement.reference"
         },
         "optional": true
       },
@@ -5060,6 +4952,36 @@
         },
         "optional": true
       }
+    }
+  },
+  {
+    "type": "type",
+    "name": "module_hero.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "module_hero"
     }
   },
   {

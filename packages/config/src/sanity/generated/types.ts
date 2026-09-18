@@ -546,25 +546,11 @@ export type Link = {
   openInNewTab?: boolean;
 };
 
-export type Module_heroReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_hero';
-};
-
 export type Module_heroBlogReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
   [internalGroqTypeReferenceTo]?: 'module_heroBlog';
-};
-
-export type Module_heroStatementReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_heroStatement';
 };
 
 export type Module_taxonomyListReference = {
@@ -603,10 +589,7 @@ export type Page_tagIndex = {
   _rev: string;
   title?: string;
   headingBlock?: HeadingBlock;
-  hero?:
-    | Module_heroReference
-    | Module_heroBlogReference
-    | Module_heroStatementReference;
+  hero?: Module_heroBlogReference;
   modules?: Array<
     | ({
         _key: string;
@@ -649,10 +632,7 @@ export type Page_tag = {
   slug?: Slug;
   tag?: Blog_tagReference;
   headingBlock?: HeadingBlock;
-  hero?:
-    | Module_heroReference
-    | Module_heroBlogReference
-    | Module_heroStatementReference;
+  hero?: Module_heroBlogReference;
   modules?: Array<
     | ({
         _key: string;
@@ -695,10 +675,7 @@ export type Page_topicIndex = {
   _rev: string;
   title?: string;
   headingBlock?: HeadingBlock;
-  hero?:
-    | Module_heroReference
-    | Module_heroBlogReference
-    | Module_heroStatementReference;
+  hero?: Module_heroBlogReference;
   modules?: Array<
     | ({
         _key: string;
@@ -744,10 +721,7 @@ export type Page_topic = {
   slug?: Slug;
   topic?: Blog_topicReference;
   headingBlock?: HeadingBlock;
-  hero?:
-    | Module_heroReference
-    | Module_heroBlogReference
-    | Module_heroStatementReference;
+  hero?: Module_heroBlogReference;
   modules?: Array<
     | ({
         _key: string;
@@ -780,10 +754,7 @@ export type Page_postIndex = {
   _rev: string;
   title?: string;
   headingBlock?: HeadingBlock;
-  hero?:
-    | Module_heroReference
-    | Module_heroBlogReference
-    | Module_heroStatementReference;
+  hero?: Module_heroBlogReference;
   modules?: Array<
     | ({
         _key: string;
@@ -799,6 +770,13 @@ export type Page_postIndex = {
       } & Module_postFeaturedReference)
   >;
   seo?: Seo;
+};
+
+export type Module_heroStatementReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_heroStatement';
 };
 
 export type Module_contentReference = {
@@ -817,10 +795,7 @@ export type Page_landing = {
   title?: string;
   slug?: Slug;
   headingBlock?: HeadingBlock;
-  hero?:
-    | Module_heroReference
-    | Module_heroBlogReference
-    | Module_heroStatementReference;
+  hero?: Module_heroStatementReference;
   modules?: Array<
     | ({
         _key: string;
@@ -842,6 +817,13 @@ export type Page_landing = {
       } & Module_taxonomyListReference)
   >;
   seo?: Seo;
+};
+
+export type Module_heroReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_hero';
 };
 
 export type Page_home = {
@@ -1187,9 +1169,7 @@ export type AllSanitySchemaTypes =
   | Page_tagReference
   | Page_tagIndexReference
   | Link
-  | Module_heroReference
   | Module_heroBlogReference
-  | Module_heroStatementReference
   | Module_taxonomyListReference
   | Module_postLatestReference
   | Module_ctaReference
@@ -1205,8 +1185,10 @@ export type AllSanitySchemaTypes =
   | Page_topic
   | Module_postFeaturedReference
   | Page_postIndex
+  | Module_heroStatementReference
   | Module_contentReference
   | Page_landing
+  | Module_heroReference
   | Page_home
   | Module_heroStatement
   | Module_heroBlog
