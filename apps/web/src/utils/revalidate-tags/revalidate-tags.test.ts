@@ -98,6 +98,12 @@ describe('getRevalidateTagsForType', () => {
     expect(getRevalidateTagsForType('link', 'link-1')).toEqual(['link']);
   });
 
+  it('maps the feature card document type to its ISR tag', () => {
+    expect(getRevalidateTagsForType('block_feature', 'feature-1')).toEqual([
+      'block_feature',
+    ]);
+  });
+
   it('returns an empty list for an unknown type', () => {
     expect(getRevalidateTagsForType('nope', 'x')).toEqual([]);
   });

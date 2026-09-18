@@ -37,7 +37,8 @@ type TCachedDocumentType =
   | 'settings_footer'
   | 'settings_newsletter'
   | 'settings_theme'
-  | 'link';
+  | 'link'
+  | 'block_feature';
 
 /**
  * Base ISR tags to revalidate per Sanity document `_type`, for the revalidation
@@ -86,6 +87,7 @@ const REVALIDATE_TAGS = {
   module_cta: ['modules:cta'],
   module_newsletter: ['modules:newsletter'],
   link: ['link'],
+  block_feature: ['block_feature'],
 } as const satisfies Record<
   TModuleType | TCachedDocumentType,
   readonly string[]
