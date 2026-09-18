@@ -20,6 +20,7 @@ describe('page module type unions', () => {
       | 'module_postLatest'
       | 'module_taxonomyList'
       | 'module_postFeatured'
+      | 'module_featureList'
     >();
   });
 
@@ -39,6 +40,7 @@ describe('page module type unions', () => {
       | 'module_postFeatured'
       | 'module_newsletter'
       | 'module_taxonomyList'
+      | 'module_featureList'
     >();
   });
 
