@@ -132,7 +132,8 @@ end rather than renumbering):
 - `module_gallery` — image/media grid with lightbox.
 - `module_featureList` — icon or image + title + text cards (services /
   skills), referencing reusable `block_feature` documents; designed below.
-- `module_testimonial` — quote + attribution.
+- `module_testimonial` — quote + attribution as `QuoteCard`s, referencing
+  reusable `block_testimonial` documents; designed below.
 - `module_logoWall` — client / tech logos.
 - `module_stats` — metric figures ("40% faster", "3M users").
 - `module_faq` — accordion (interactive; the disclosure lives in a `web`
@@ -845,7 +846,7 @@ and the decisions: <https://claude.ai/artifact/LedHa7VtrVUdNfjc6mHVxY>.
 
 ### It is the post grid with authored items
 
-`module_featureList` renders through `PostGrid` and `PostCard` — media,
+`module_featureList` renders through `CardGrid` and `MediaCard` — media,
 title, excerpt, and nothing else (no meta row, footer or tags) — with the
 post modules' `showImages` and `displayMode` (Grid / Carousel), the shared
 `brandVariant`, `headingBlock`, `contentAlignment` and `layout`. An editor
@@ -950,7 +951,7 @@ post modules do. Decided 2026-09-16 after a first cut with an explicit
 2 / 3 / 4 dropdown.
 
 **A linked card is one link, on its title.** The whole card is clickable
-through the title's overlay, the `PostCardItem` pattern, so the accessible
+through the title's overlay, the `MediaCardItem` (#3318) pattern, so the accessible
 name is the title. An unlinked card is plain text.
 
 ### Validation
@@ -1021,15 +1022,15 @@ carries. `REVALIDATE_TAGS` gains `module_featureList: ['modules:featureList']`.
 
 No new component. Three additive changes:
 
-- **`PostCard.Media` `shape: wide | square | circle | icon`** (default
+- **`MediaCard.Media` `shape: wide | square | circle | icon`** (default
   `wide`, so posts are unchanged): `wide` is today's 16:9 (4:3 with
   `isLead`); `square` is 1:1 at full width (also with `isLead`); `circle`
   is a `size-28 rounded-full` frame inside the card's padding; `icon` is a
   `size-12 rounded-md` tile, `bg-brand-primary-muted text-brand-primary`,
   whose child renders in `currentColor`.
-- **`PostCard` `align: left | center`** (default `left`): `center` centres
+- **`MediaCard` `align: left | center`** (default `left`): `center` centres
   media, meta, title, excerpt, tags and footer.
-- **`PostGrid` `columns: 4`.**
+- **`CardGrid` `columns: 4`.**
 - The `FEATURE_ICONS` SVG assets, registered in `ICON_REGISTRY`.
 
 Stories and tests for each variant; `COMPONENTS.md` regenerated. #3245
@@ -1040,13 +1041,16 @@ Stories and tests for each variant; `COMPONENTS.md` regenerated. #3245
 `apps/web/src/modules/feature-list/` — `FeatureListModule` (loader + view,
 the `post-latest` shape) and `FeatureListModuleView`: `Section` with
 `brandVariant` and `layout`; `ModuleHeading` at the caller's level with
-`contentAlignment`; then `PostGrid` with the derived column count, or the
-`Carousel` organism as `PostsCarousel` composes it; `ActionGroup` under the
-grid when there are buttons. Each card composes `PostCard align={cardAlignment}`
-directly: `PostCard.Media shape={imageShape}` holding a `SanityImage` sized
-per shape, or an `Icon` for the Icon shape; `PostCard.Title` with a
-`SmartLink` when the card has a link; `excerpt` from `text`. `showImages`
-off drops the media slot. `MODULE_MAP` gains `module_featureList`.
+`contentAlignment`, which also aligns the `ActionGroup`; then `CardGrid`
+with the derived column count, or the `Carousel` organism as `CardCarousel`
+(#3318) composes it; `ActionGroup` under the grid when there are buttons.
+Each card composes `MediaCard align={cardAlignment}` directly:
+`MediaCard.Media shape={imageShape}` holding a `SanityImage` sized per
+shape, or an `Icon` for the Icon shape; `MediaCard.Title` with a `SmartLink`
+when the card has a link; `excerpt` from `text`. `showImages` off drops the
+media slot. `HOME_MAP` and `LANDING_MAP` gain `module_featureList` — the
+global `MODULE_MAP` is gone (#3269); each page's map is a `Record` over its
+own union from `page-module.ts`.
 
 ### Pages and desk
 
@@ -1063,19 +1067,19 @@ a desk regrouping.
 
 Epic #3246, five sub-issues:
 
-- **ui** · #3247 — `PostCard.Media` `shape`, `PostCard` `align`, `PostGrid`
+- **ui** · #3247 — `MediaCard.Media` `shape`, `MediaCard` `align`, `CardGrid`
   `columns: 4`, the `FEATURE_ICONS` assets; the `ICONS` keys ride in it.
   Own PR, additive, first.
 - **studio** · #3248 — `block_feature`, the Blocks section, the module
   schema, `CARD_IMAGE_SHAPE` riding in it, typegen.
 - **service** · #3249 — the loader.
-- **web** · #3250 — the view and `MODULE_MAP` entry; completing PR with the
+- **web** · #3250 — the view and the `HOME_MAP` / `LANDING_MAP` entries; completing PR with the
   `SPEC.md` sync.
 - **studio** · #3252 — the visual icon picker; after #3248, independent of
   the rest.
 
 **PRs:** ui alone; then studio + service + web as one — typegen widening
-`TModuleType` reds the exhaustive `MODULE_MAP` Record until the web entry
+`TPageHomeType` / `TPageLandingType` reds the page maps until the web entry
 lands, and the const has no consumer without studio. The picker is its own
 PR after.
 
@@ -1093,6 +1097,203 @@ of them, choose a shape, and see an even grid (or carousel) with the heading
 and cards aligned independently; a linked card is clickable by its title;
 Links appears under Blocks; `pnpm type-check && pnpm lint && pnpm test &&
 pnpm knip && pnpm gen:ui-index:check` green.
+
+## `module_testimonial` — the quotes
+
+**Goal:** social proof — one to eight quotes from clients or readers, each
+with who said it, a photo and an optional link, as quote cards in a grid or
+carousel, or one large spotlight quote. Design of record for epic #3322, the
+second of Phase 3's batch (feature list → testimonials → logo wall → stats).
+
+Interactive mock of the rendered module on every count, tone and display
+mode, the Studio forms, the view model, the validation states and the
+decisions: <https://claude.ai/artifact/MNyKjaCPuX66qFTuXZVfNm>.
+
+### Quotes are documents, in the Blocks section
+
+Testimonials are **`block_testimonial` documents** ("Testimonial") under
+Blocks → Testimonials, beside Feature Cards and Links, referenced by the
+module in authored order — the same call `module_featureList` makes for
+`block_feature`, for the same reasons: a quote is written once and reused
+on the home page and any landing page, and a published module's reference
+keeps it from being deleted.
+
+`block_testimonial`:
+
+| Field   | Type                   | Notes                                                                                |
+| ------- | ---------------------- | ------------------------------------------------------------------------------------ |
+| `quote` | text, 4 rows, required | Their words, without quotation marks — the site adds them; warns past 280 characters |
+| `name`  | string, required       | Who said it                                                                          |
+| `role`  | string                 | One line under the name — title, company, or both, punctuated by the editor          |
+| `photo` | `imageWithAlt`         | A small round portrait beside the name; without one the site shows initials          |
+| `link`  | reference → `link`     | Optional; makes the name a link — their site, or the case study                      |
+
+**Role is one line, not `role` + `company`,** because it renders as one
+line and the editor decides the separator. A company logo belongs to the
+logo wall. Preview: the quote, subtitle `name — role`, the photo as media.
+
+### Fields
+
+| Field              | Type                                                            | Notes                                                                           |
+| ------------------ | --------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `title`            | `titleField()`                                                  | Editor-facing name, never rendered                                              |
+| `brandVariant`     | `brandVariantField({ list: FULL_BRAND_VARIANT_LIST })`          |                                                                                 |
+| `headingBlock`     | `headingBlockField()`                                           | Required heading, optional supporting text                                      |
+| `testimonials`     | array of references → `block_testimonial`, `unique()`, 1–8      | Authored order is display order                                                 |
+| `ctaButtons`       | `ctaButtonsField()`                                             | 0–2 actions under the quotes — "Read the case studies", "Work with me"          |
+| `showImages`       | `showImagesField()`, titled "Show Photos"                       | Off hides the photos and initials                                               |
+| `displayMode`      | `displayModeField()`                                            | Grid or Carousel; ignored for a single quote                                    |
+| `contentAlignment` | `alignmentFields([])`, titled "Content Alignment"               | Moves the heading, supporting text and actions together, as on the feature list |
+| `cardAlignment`    | `CONTENT_ALIGNMENT` `LEFT` / `CENTER`, required, initial `LEFT` | Moves the quote and the person inside each card                                 |
+| `layout`           | `layoutField`                                                   |                                                                                 |
+
+**One quote is a spotlight — derived, not a field.** The most common
+testimonial treatment on a landing page is a single large quote. A count of
+1 renders `QuoteCard isSpotlight` — no surface, larger type, centred, the
+heading and actions centred with it — and `displayMode` and `cardAlignment`
+are ignored; the field descriptions say so. There is no third display mode.
+
+**No image-shape field.** The photo is the person, sized to the byline, so
+the feature list's `imageShape` does not apply; it is always a round
+portrait. `showImages` stays, as on every module.
+
+**Columns are derived from the count and cap at three:** 2 → 2, 3 → 3,
+4 → 2, 5 → 3, 6 → 3, 7 → 3, 8 → 2. A quote needs about forty characters a
+line to read, which four columns cannot give; `CardGrid`'s existing
+`columns: 1 | 2 | 3` covers it. Carousel shows three per view.
+
+**A linked testimonial links the name,** not the card: it is the person or
+their case study that is the target. Nothing else in the card is
+interactive, so there is no overlay.
+
+### Validation
+
+| State                                         | Level   | Message                                                             |
+| --------------------------------------------- | ------- | ------------------------------------------------------------------- |
+| No testimonials                               | Error   | Pick at least one testimonial.                                      |
+| More than 8                                   | Error   | A testimonials module holds at most eight quotes.                   |
+| The same testimonial twice                    | Error   | `unique()` on the array                                             |
+| No `headingBlock.heading`; `ctaButtons` rules | Error   | The shared helpers' rules                                           |
+| `block_testimonial.quote` / `name` empty      | Error   | On the block: "A testimonial needs the quote." / "Say who said it." |
+| `block_testimonial.quote` over 280 characters | Warning | Long quotes make uneven cards — keep it to a couple of sentences.   |
+| Show Photos on, a testimonial without a photo | —       | No rule: `Avatar` falls back to initials, so the row stays even     |
+
+No async rule on the module — unlike the feature list there is no shape to
+check against the referenced blocks.
+
+### Service
+
+`service.modules.testimonial.v1`, the `feature-list` layout:
+
+```groq
+*[_type == "module_testimonial" && _id == $id][0]{
+  brandVariant, headingBlock{ ...headingBlockFragment },
+  testimonials[]->{ _id, quote, name, role, photo{ ...sanityImageFragment },
+                    link->{ ...linkDocumentFragment } },
+  ctaButtons[]{ ...ctaButtonFragment },
+  "showImages": SHOW_IMAGES_EXPRESSION,
+  "displayMode": DISPLAY_MODE_EXPRESSION,
+  contentAlignment, cardAlignment, layout
+}
+```
+
+```ts
+type TTestimonialItem = {
+  id: string;
+  quote: string;
+  name: string;
+  role: TMaybeUndefined<string>;
+  photo: TMaybeUndefined<ISanityImage>;
+  link: TMaybeUndefined<ILink>;
+};
+
+type TTestimonialModule = {
+  brandVariant: TFullBrandVariant;
+  headingBlock: THeadingBlock;
+  testimonials: TTestimonialItem[];
+  ctaButtons: TCtaButton[];
+  showImages: boolean;
+  displayMode: TDisplayMode;
+  contentAlignment: TMaybeUndefined<TContentAlignment>;
+  cardAlignment: TContentAlignment;
+  layout: TMaybeUndefined<TLayout>;
+};
+```
+
+`toTestimonialModule()` maps `photo` through `toSanityImage()`, `link`
+through `toLinkDocument()` — an item whose link cannot resolve keeps the
+item and drops the link — and `ctaButtons` through `toCtaButton()`.
+
+**Cache tags:** `modules:testimonial`, `module:<id>`, `block_testimonial`,
+`link` and the page types a link can target, as `getHeroStatement` lists
+them. `REVALIDATE_TAGS.module_testimonial = ['modules:testimonial']`.
+
+### `@blog/ui`
+
+One new molecule, **`QuoteCard`** — a `<figure>` with a decorative opening
+quote mark, a `<blockquote>` and a `<figcaption>` holding `Avatar`
+(initials fallback), the name and the role. `MediaCard` is not reused: it
+is an `<article>` whose slots assume a title, and a testimonial has none;
+forcing the quote through it costs the semantics and gains nothing.
+`QuoteCard` borrows `MediaCard`'s surface, accent rule and `align` variant
+so the two sit side by side on a page. `isSpotlight` drops the surface and
+rule, caps the width at ~52ch, centres, and scales the quote and avatar up.
+The name links through the polymorphic `linkAs`, never a bare `<a>`. Stories
+and tests; `COMPONENTS.md` regenerated.
+
+### Web
+
+`apps/web/src/modules/testimonial/` — `TestimonialModule` (loader + view,
+the `feature-list` shape) and `TestimonialModuleView`: `Section` with
+`brandVariant` and `layout`; `ModuleHeading` at the caller's level with
+`contentAlignment`, which also aligns the `ActionGroup`; then one of a
+single `QuoteCard isSpotlight` (count 1), a `CardGrid` with the derived
+column count, or a `CardCarousel` (#3318) of `QuoteCard`s; `ActionGroup`
+under the quotes when there are buttons. Each item composes `QuoteCard`
+with `showAvatar={showImages}`, `align={cardAlignment}` and the name as a
+`SmartLink` when the item has a link. `HOME_MAP` and `LANDING_MAP` gain
+`module_testimonial`.
+
+### Pages and desk
+
+Allowed in `page_home` and `page_landing`'s `modulesField({ allow })` only —
+not on the blog listing pages or the post page. A module desk entry beside
+Features; the Testimonials group in the Blocks section.
+
+### Migration
+
+None — two new document types, one new molecule.
+
+### Per-layer scope and PRs
+
+Epic #3322, four sub-issues:
+
+- **ui** · #3323 — `QuoteCard`. Own PR, additive, first; no dependency on
+  #3247.
+- **studio** · #3324 — `block_testimonial`, the Testimonials desk entry,
+  the module schema, typegen. After #3248 (the Blocks section it extends).
+- **service** · #3325 — the loader.
+- **web** · #3326 — the view and the two page-map entries; completing PR
+  with the `SPEC.md` sync.
+
+**PRs:** ui alone; then studio + service + web as one — typegen widening
+`TPageHomeType` / `TPageLandingType` reds the page maps until the web entry
+lands.
+
+### Not in scope
+
+- Star ratings (a `rating` field and glyphs — additive later, no migration).
+- Video testimonials, auto-rotation.
+- Company logos (the logo wall, next).
+- schema.org `Review` markup — testimonials are not product reviews.
+
+**Acceptance:** an editor can create Testimonials under Blocks, add a
+Testimonials module to the home page or a landing page referencing one to
+eight of them, and see a spotlight quote for one or an even grid (or
+carousel) of quote cards for more, with the heading and cards aligned
+independently; a linked testimonial links its name; a testimonial without a
+photo shows initials; `pnpm type-check && pnpm lint && pnpm test && pnpm
+knip && pnpm gen:ui-index:check` green.
 
 ## Post grid images and the `showImages` toggle
 
@@ -2505,6 +2706,18 @@ point; the graph stays acyclic.
   prefix names the family; ui alone, then studio + service + web as one PR
   (2026-09-16, #3246). The post modules gain the same shape (Wide / Square)
   and card alignment in #3245.
+
+- **`module_testimonial` renders `block_testimonial` documents as a new
+  `QuoteCard` molecule, and one quote is a spotlight** — quotes live under
+  Blocks → Testimonials (quote, name, one `role` line, photo, optional link
+  on the name); `QuoteCard` is a `<figure>`/`<blockquote>`/`<figcaption>`
+  borrowing `MediaCard`'s surface, rule and `align`, with `Avatar`'s
+  initials fallback so a missing photo needs no warning; a count of 1
+  renders `isSpotlight` (no third display mode), columns derive from the
+  count and cap at three, no image-shape field; `contentAlignment` moves
+  heading, supporting text and actions together (also applied to the
+  feature list); home and landing only; ui alone, then studio + service +
+  web as one PR (2026-09-18, #3322).
 
 - **The `page_postIndex` expand ships as one PR, and the copy migration runs
   before its deploy** — studio adds `page_postIndex` beside `page_blog`, and
