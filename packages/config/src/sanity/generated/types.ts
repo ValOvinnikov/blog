@@ -892,13 +892,13 @@ export type Module_heroStatement = {
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   headingBlock?: HeadingBlock;
   eyebrow?: string;
+  image?: ImageWithAlt;
   ctaButtons?: Array<
     {
       _key: string;
     } & CtaButton
   >;
   variant?: 'SPLIT' | 'STACKED' | 'BANNER';
-  image?: ImageWithAlt;
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';

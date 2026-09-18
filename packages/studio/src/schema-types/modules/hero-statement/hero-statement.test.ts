@@ -29,16 +29,17 @@ const getFieldCustomValidator = (field: { validation?: unknown }): TCustomFn =>
   getCustomValidator<TCustomFn>(field);
 
 describe('heroStatementSchema field order', () => {
-  it('places title, brandVariant, headingBlock, eyebrow, ctaButtons before the shared hero tail', () => {
+  it('places title, brandVariant, headingBlock, eyebrow, image, ctaButtons before the shared hero tail', () => {
     const names = heroStatementSchema.fields
       ?.map((field) => ('name' in field ? field.name : undefined))
-      .slice(0, 5);
+      .slice(0, 6);
 
     expect(names).toEqual([
       'title',
       'brandVariant',
       'headingBlock',
       'eyebrow',
+      'image',
       'ctaButtons',
     ]);
   });

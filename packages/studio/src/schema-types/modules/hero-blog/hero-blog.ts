@@ -10,12 +10,13 @@ import {
 } from '@blog/config/constants';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
-import {
-  heroFields,
-  heroFieldsets,
-} from '@blog/studio/schema-types/fields/hero-fields/hero-fields';
+import { heroContentPositionFields } from '@blog/studio/schema-types/fields/hero-content-position-fields/hero-content-position-fields';
+import { heroMediaOrderFields } from '@blog/studio/schema-types/fields/hero-media-order-fields/hero-media-order-fields';
+import { heroVariantField } from '@blog/studio/schema-types/fields/hero-variant-field/hero-variant-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { heroFieldsets } from '@blog/studio/schema-types/modules/hero-fieldsets/hero-fieldsets';
 import { ctaSecondaryButtonSchema } from '@blog/studio/schema-types/objects/cta-button/cta-button';
+import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { getDraftsClient } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
 import {
@@ -257,7 +258,10 @@ export const heroBlogSchema = defineType({
       description:
         'An optional supporting action. Leave the link empty to show none.',
     }),
-    ...heroFields({ image: false }),
+    heroVariantField(),
+    ...heroContentPositionFields(),
+    ...heroMediaOrderFields(),
+    heroLayoutField,
   ],
   preview: {
     select: {

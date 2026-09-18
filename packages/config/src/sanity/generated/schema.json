@@ -5462,6 +5462,14 @@
         },
         "optional": true
       },
+      "image": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "imageWithAlt"
+        },
+        "optional": true
+      },
       "ctaButtons": {
         "type": "objectAttribute",
         "value": {
@@ -5502,14 +5510,6 @@
               "value": "BANNER"
             }
           ]
-        },
-        "optional": true
-      },
-      "image": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "imageWithAlt"
         },
         "optional": true
       },
