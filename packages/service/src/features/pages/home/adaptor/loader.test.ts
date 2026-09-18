@@ -24,7 +24,7 @@ describe('getHomePage', () => {
 
     expect(page.hero).toEqual({
       id: 'hero-1',
-      type: 'module_hero',
+      type: 'module_heroBlog',
     });
     expect(page.modules).toEqual([
       { id: 'post-latest-1', type: 'module_postLatest' },
@@ -60,7 +60,7 @@ describe('getHomePage', () => {
     const page = await getHomePage(tenant);
     if (!page) throw new Error('expected a home page');
 
-    expect(page.hero).toEqual({ id: 'hero-1', type: 'module_hero' });
+    expect(page.hero).toEqual({ id: 'hero-1', type: 'module_heroBlog' });
     expect(page.headingBlock.heading).toBe('Welcome');
     expect(page.headingBlock.supportingText).toBe('A subtitle');
   });

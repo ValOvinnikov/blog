@@ -1,5 +1,6 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import type { ReactNode } from 'react';
 
 import { TopicModuleRenderer } from './topic-module-renderer';
 
@@ -8,9 +9,8 @@ const {
   newsletterModuleMock,
   postLatestModuleMock,
   postListModuleMock,
-  heroModuleMock,
+  taxonomyListModuleMock,
   heroBlogModuleMock,
-  heroStatementModuleMock,
   loggerWarnMock,
 } = vi.hoisted(() => ({
   ctaModuleMock: vi.fn(({ id }: { id: string }) => (
@@ -25,13 +25,14 @@ const {
   postListModuleMock: vi.fn(({ id }: { id: string }) => (
     <div data-testid="stub-post-list">{id}</div>
   )),
-  heroModuleMock: vi.fn(async ({ id }: { id: string }) => (
-    <h1 data-testid="stub-hero">{id}</h1>
+  taxonomyListModuleMock: vi.fn(({ id }: { id: string }) => (
+    <div data-testid="stub-taxonomy-list">{id}</div>
   )),
-  heroBlogModuleMock: vi.fn(async () => null),
-  heroStatementModuleMock: vi.fn(async ({ id }: { id: string }) => (
-    <h1 data-testid="stub-hero-statement">{id}</h1>
-  )),
+  heroBlogModuleMock: vi.fn(
+    async ({ id }: { id: string }): Promise<ReactNode> => (
+      <h1 data-testid="stub-hero">{id}</h1>
+    ),
+  ),
   loggerWarnMock: vi.fn(),
 }));
 
@@ -45,14 +46,11 @@ vi.mock('@web/modules/post-latest/post-latest-module', () => ({
 vi.mock('@web/modules/post-list/post-list-module', () => ({
   PostListModule: postListModuleMock,
 }));
-vi.mock('@web/modules/hero/hero-module', () => ({
-  HeroModule: heroModuleMock,
+vi.mock('@web/modules/taxonomy-list/taxonomy-list-module', () => ({
+  TaxonomyListModule: taxonomyListModuleMock,
 }));
 vi.mock('@web/modules/hero-blog/hero-blog-module', () => ({
   HeroBlogModule: heroBlogModuleMock,
-}));
-vi.mock('@web/modules/hero-statement/hero-statement-module', () => ({
-  HeroStatementModule: heroStatementModuleMock,
 }));
 
 vi.mock('@web/utils/logger/logger', () => ({
@@ -82,7 +80,7 @@ describe(`<${TopicModuleRenderer.name}/>`, () => {
   });
 
   it('renders the resolved hero, with exactly one h1, when the hero resolves to content', async () => {
-    await setup({ hero: { id: 'hero-1', type: 'module_hero' } });
+    await setup({ hero: { id: 'hero-1', type: 'module_heroBlog' } });
 
     const headings = screen.getAllByRole('heading', { level: 1 });
     expect(headings).toHaveLength(1);
@@ -90,6 +88,8 @@ describe(`<${TopicModuleRenderer.name}/>`, () => {
   });
 
   it('falls back to the page heading, still exactly one h1, when the hero resolves to nothing', async () => {
+    heroBlogModuleMock.mockResolvedValueOnce(null);
+
     await setup({ hero: { id: 'hero-2', type: 'module_heroBlog' } });
 
     const headings = screen.getAllByRole('heading', { level: 1 });
@@ -100,7 +100,7 @@ describe(`<${TopicModuleRenderer.name}/>`, () => {
 
   it('renders the given children between the hero and the modules', async () => {
     await setup({
-      hero: { id: 'hero-1', type: 'module_hero' },
+      hero: { id: 'hero-1', type: 'module_heroBlog' },
       modules: [{ id: 'cta-1', type: 'module_cta' }],
       children: <div data-testid="stub-children">chips</div>,
     });
@@ -131,6 +131,7 @@ describe(`<${TopicModuleRenderer.name}/>`, () => {
       modules: [
         { id: 'post-list-1', type: 'module_postList' },
         { id: 'post-latest-1', type: 'module_postLatest' },
+        { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
         { id: 'cta-1', type: 'module_cta' },
         { id: 'newsletter-1', type: 'module_newsletter' },
       ],
@@ -140,6 +141,7 @@ describe(`<${TopicModuleRenderer.name}/>`, () => {
     expect(stubs.map((node) => node.textContent)).toEqual([
       'post-list-1',
       'post-latest-1',
+      'taxonomy-list-1',
       'cta-1',
       'newsletter-1',
     ]);

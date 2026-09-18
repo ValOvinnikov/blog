@@ -30,7 +30,7 @@ describe('blogPageQuery', () => {
 
   it('parses a blog page with its hero slot set', () => {
     const raw = makeRawBlogPage({
-      hero: { _id: 'hero-1', _type: 'module_hero' },
+      hero: { _id: 'hero-1', _type: 'module_heroBlog' },
     });
 
     expect(() => blogPageQuery.parse(raw)).not.toThrow();

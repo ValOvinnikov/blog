@@ -7,7 +7,6 @@ import type { TModule } from '@blog/service';
 import { PageHeading } from '@web/components/shared/page-heading';
 import { ContentModule } from '@web/modules/content/content-module';
 import { CtaModule } from '@web/modules/cta/cta-module';
-import { HeroModule } from '@web/modules/hero/hero-module';
 import { HeroBlogModule } from '@web/modules/hero-blog/hero-blog-module';
 import { HeroStatementModule } from '@web/modules/hero-statement/hero-statement-module';
 import {
@@ -22,7 +21,6 @@ import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-mod
 import type { ReactNode } from 'react';
 
 const HOME_MAP: Record<TPageHomeType, TModuleComponent> = {
-  module_hero: HeroModule,
   module_heroBlog: HeroBlogModule,
   module_heroStatement: HeroStatementModule,
   module_content: ContentModule,

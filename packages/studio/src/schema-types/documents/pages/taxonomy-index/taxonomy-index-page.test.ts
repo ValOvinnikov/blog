@@ -3,8 +3,8 @@ import { tagIndexPageSchema } from '@blog/studio/schema-types/documents/pages/ta
 import { PAGE_TAG_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/tag-index/tag-index-type';
 import { topicIndexPageSchema } from '@blog/studio/schema-types/documents/pages/topic-index/topic-index';
 import { PAGE_TOPIC_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/topic-index/topic-index-type';
-import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
+import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
@@ -167,7 +167,7 @@ describe.each(fixtures)(
       ]);
     });
 
-    it('hero field is an optional reference to the hero family', () => {
+    it('hero field is an optional reference scoped to heroBlog only', () => {
       const heroField = getField(schema, 'hero') as
         | { type: string; to?: Array<{ type: string }>; validation?: unknown }
         | undefined;
@@ -177,9 +177,9 @@ describe.each(fixtures)(
       }
 
       expect(heroField.type).toBe('reference');
-      expect(heroField.to?.map((entry) => entry.type)).toEqual(
-        HERO_SCHEMA_TYPES.map((heroSchema) => heroSchema.name),
-      );
+      expect(heroField.to?.map((entry) => entry.type)).toEqual([
+        heroBlogSchema.name,
+      ]);
       expect(heroField.validation).toBeUndefined();
     });
 

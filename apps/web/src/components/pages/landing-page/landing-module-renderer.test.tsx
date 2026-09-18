@@ -2,6 +2,7 @@ import type { TPageLandingType } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import type { ReactNode } from 'react';
 
 import { LandingModuleRenderer } from './landing-module-renderer';
 
@@ -12,7 +13,6 @@ const {
   postLatestModuleMock,
   taxonomyListModuleMock,
   postFeaturedModuleMock,
-  heroModuleMock,
   heroBlogModuleMock,
   heroStatementModuleMock,
   loggerWarnMock,
@@ -35,10 +35,11 @@ const {
   postFeaturedModuleMock: vi.fn(({ id }: { id: string }) => (
     <div data-testid="stub-post-featured">{id}</div>
   )),
-  heroModuleMock: vi.fn(async ({ id }: { id: string }) => (
-    <h1 data-testid="stub-hero">{id}</h1>
-  )),
-  heroBlogModuleMock: vi.fn(async () => null),
+  heroBlogModuleMock: vi.fn(
+    async ({ id }: { id: string }): Promise<ReactNode> => (
+      <h1 data-testid="stub-hero">{id}</h1>
+    ),
+  ),
   heroStatementModuleMock: vi.fn(async ({ id }: { id: string }) => (
     <h1 data-testid="stub-hero-statement">{id}</h1>
   )),
@@ -60,9 +61,6 @@ vi.mock('@web/modules/taxonomy-list/taxonomy-list-module', () => ({
 }));
 vi.mock('@web/modules/post-featured/post-featured-module', () => ({
   PostFeaturedModule: postFeaturedModuleMock,
-}));
-vi.mock('@web/modules/hero/hero-module', () => ({
-  HeroModule: heroModuleMock,
 }));
 vi.mock('@web/modules/hero-blog/hero-blog-module', () => ({
   HeroBlogModule: heroBlogModuleMock,
@@ -98,7 +96,7 @@ describe(`<${LandingModuleRenderer.name}/>`, () => {
   });
 
   it('renders the resolved hero, with exactly one h1, when the hero resolves to content', async () => {
-    await setup({ hero: { id: 'hero-1', type: 'module_hero' } });
+    await setup({ hero: { id: 'hero-1', type: 'module_heroBlog' } });
 
     const headings = screen.getAllByRole('heading', { level: 1 });
     expect(headings).toHaveLength(1);
@@ -107,7 +105,7 @@ describe(`<${LandingModuleRenderer.name}/>`, () => {
 
   it('renders the resolved hero before the modules when the page has both', async () => {
     await setup({
-      hero: { id: 'hero-1', type: 'module_hero' },
+      hero: { id: 'hero-1', type: 'module_heroBlog' },
       modules: [
         { id: 'cta-1', type: 'module_cta' },
         { id: 'content-1', type: 'module_content' },
@@ -123,6 +121,8 @@ describe(`<${LandingModuleRenderer.name}/>`, () => {
   });
 
   it('falls back to the page heading, still exactly one h1, when the hero resolves to nothing', async () => {
+    heroBlogModuleMock.mockResolvedValueOnce(null);
+
     await setup({ hero: { id: 'hero-2', type: 'module_heroBlog' } });
 
     const headings = screen.getAllByRole('heading', { level: 1 });

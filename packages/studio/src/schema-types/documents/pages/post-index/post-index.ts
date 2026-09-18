@@ -3,9 +3,11 @@ import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-fiel
 import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
+import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
+import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
 import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/validation/validate-single-blank-heading-per-type/validate-single-blank-heading-per-type';
@@ -67,13 +69,14 @@ export const postIndexPageSchema = defineType({
   fields: [
     titleField(),
     headingBlockField(),
-    heroField(),
+    heroField({ allow: [heroBlogSchema.name] }),
     modulesField({
       allow: [
         postListSchema.name,
         ctaSchema.name,
         newsletterSchema.name,
         postFeaturedSchema.name,
+        taxonomyListSchema.name,
       ],
       validateCustom: (rule) =>
         rule.custom(

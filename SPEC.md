@@ -359,8 +359,20 @@ and never through `modules[]`, which is how `MODULE_MAP` excludes them
 (`Record<Exclude<TModuleType, TSlotModuleType>, …>`). Nothing is
 hand-listed, so a new hero kind joins the union the day its schema lands and
 drops out the day it is deleted. The studio's equivalent guard is
-`HERO_SCHEMA_TYPES`, the list every page's `hero` `to:` points at, with a
-test asserting every registered `module_hero*` schema appears in it.
+`HERO_SCHEMA_TYPES`, the registry of every hero schema, with a test
+asserting every registered `module_hero*` schema appears in it.
+
+**A page accepts only the hero kinds it names.** `heroField({ allow })`
+takes an explicit list per page, the way `modulesField({ allow })` already
+does, so the registry is no longer what a page's `hero` `to:` points at.
+`page_home` and `page_landing` accept Blog and Statement. `page_postIndex`,
+`page_tag`, `page_topic`, `page_tagIndex` and `page_topicIndex` accept Blog
+only — a statement hero belongs on a marketing page, not an archive.
+`page_post` has no `hero` field at all. The deprecated `module_hero` is
+named by no page: its schema stays registered in `HERO_SCHEMA_TYPES` until
+#2813 retires it, but no picker offers it. Narrowing a page is what turns a
+surplus entry in its `apps/web` module map from dead code into a
+`type-check` error.
 
 Three kinds are registered. **`module_hero`** is the original, kept until
 #2813 retires it. **`module_heroBlog`** is the featured-post hero: its
@@ -559,8 +571,9 @@ not warrant separate types. It previously did have two: `CTA_ALIGNMENT` and
 one generated field described by two names and one of them named after what
 had become only one of its five callers.
 
-`module_taxonomyList` reaches `ModuleRenderer` through `MODULE_MAP` wherever it
-is placed — `page_home.modules[]`, `page_landing.modules[]`,
+`module_taxonomyList` renders through its page's own module map wherever it is
+placed — `page_home.modules[]`, `page_landing.modules[]`,
+`page_postIndex.modules[]`, `page_topic.modules[]`, `page_tag.modules[]`,
 `page_topicIndex.modules[]` and `page_tagIndex.modules[]`. It used to render a
 second way as well, through a dedicated `taxonomyList` reference on each
 taxonomy index page; neither page has one any more, and both fields are
@@ -614,10 +627,10 @@ schema allows), `layout` as `TLayout | undefined`, and (where applicable)
 `headingBlock` as a required `THeadingBlock` — with no faked defaults
 anywhere: what is unset stays unset end to end. In `apps/web`, every module
 component that renders a `@blog/ui` organism — including those reached through a
-dedicated slot rather than `MODULE_MAP`'s generic `ModuleRenderer` pipeline
-(§5 above): the hero family, via each page's `hero` slot, is now the only such
-case — `module_taxonomyList` and `module_postList` both render through
-`MODULE_MAP` wherever they sit — all
+dedicated slot rather than a page's `modules[]` (§5 above): the hero family,
+via each page's `hero` slot, is now the only such case — `module_taxonomyList`
+and `module_postList` both render through their page's own module map
+wherever they sit — all
 still styled the same way as every other module — no exception — wraps it in `apps/web`'s own
 `Section` component (`apps/web/src/components/shared/section`, relocated
 from `packages/ui`), passing `brandVariant` and `layout` straight through,
