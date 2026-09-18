@@ -50,3 +50,29 @@ jobs:
       # Files-changed view; the plain summary still prints to the job log.
       - name: Knip
         run: pnpm knip --reporter github-actions --treat-config-hints-as-errors
+
+  knip-production:
+    name: Knip (production graph, advisory)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # ADVISORY — not a required check, and `continue-on-error` keeps a finding
+    # from failing the run: an advisory job that reds the run makes every PR
+    # look broken to ci-watcher, which is the exact noise `document-validation`
+    # in ci.yml is being moved out of. `--production` drops test files,
+    # stories and other dev entries from the import graph, so what it reports
+    # is code only tests reach — an export kept alive to be asserted, a helper
+    # whose last real consumer was deleted. Each hit is a candidate for the
+    # test-only-exports cleanup (#3376), never a blocker for the PR at hand.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Knip (production graph)
+        run: pnpm knip --production --reporter github-actions

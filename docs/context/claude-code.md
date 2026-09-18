@@ -126,7 +126,11 @@ contracts:
     bypass that would otherwise move or overwrite a file outside the
     Edit/Write check entirely. A needed product-code change comes back as a
     finding for the orchestrator to route, never a fix this agent makes
-    itself. Sees the product change it's covering via the same "Sequential
+    itself. Holds the `testing-practices` bar in both directions (#3366): it
+    adds only what protects behaviour and **deletes** a new test that
+    restates its source or clones a sibling block, reporting added and
+    removed counts — "nothing to add" is a complete outcome. Sees the
+    product change it's covering via the same "Sequential
     agent worktrees compose" mechanism below (#1796) rather than any seeding
     step of its own — the orchestrator must land the layer agent's commit
     first. The fail-without-the-fix check for a regression test is likewise

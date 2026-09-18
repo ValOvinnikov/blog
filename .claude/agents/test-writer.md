@@ -92,6 +92,24 @@ Before writing anything:
    behaviour needs a test here — don't rewrite passing, already-adequate
    existing tests just because you're in the file.
 
+## Budget, not coverage
+
+Your output is judged by what the suite protects, not by how much it grew.
+Before adding a test, apply `testing-practices` → "What not to test": a test
+whose expected value is a literal copied from the file under test (a
+schema's field list, an option list, a default, a fieldset, a barrel
+"exposes X", a constant's value) restates the source and is not written.
+Sibling cases go in one `it.each`, never copied blocks.
+
+The same rule applies to tests already in the diff. A layer agent's new test
+that fails it is **deleted**, not left alone — you are the pass that holds
+the bar, and every test file you touch leaves clean. A file left with no
+cases is removed outright (`rm <file>.test.ts` — Vitest fails on an empty
+suite), never left as a shell. Tests outside the diff are not yours to
+prune: note them as a finding.
+
+"Nothing to add" is a valid, complete outcome. Report it as such.
+
 ## Per-layer conventions (from testing-practices — read it, this is a pointer not a summary)
 
 - **`@blog/ui`** components: Testing Library, query by role/text, assert
@@ -128,9 +146,10 @@ Run, per package touched, **once after all test files are written**:
 
 **Report back to the orchestrator** with:
 
-- Test files added/extended, one line each on what they cover.
-- Any coverage gaps you deliberately left (and why — e.g. out of scope for
-  this feature).
+- Test cases **added** and **removed**, as two counts, then one line per
+  file on what it now covers. A removal names the rule the test failed.
+- Any gap you judged not worth a test (and why — declarative config, out of
+  scope for this feature, already covered by type-check).
 - Any product-code findings: file, what's wrong, why a test can't pass
   without fixing it, and a suggested fix — for the orchestrator to route to
   the owning layer agent.

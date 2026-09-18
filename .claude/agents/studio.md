@@ -156,13 +156,19 @@ its own `icon`.
 
 **One schema per directory, and one kind of thing per folder.** Everything
 registered in `schemaTypes` — `documents/**`, `modules/`, `objects/`,
-`portable-text/` — gets its own directory, single-file units included; the
-test lives beside the schema:
+`portable-text/` — gets its own directory, single-file units included. A
+test lives beside the schema **only when the schema carries logic** — a
+`rule.custom` validation, a conditional `hidden`, a preview `prepare`, a
+field factory with branches. A schema that is pure declaration (fields,
+options, defaults, fieldsets, groups, order, title, icon) gets no test file:
+typegen and `type-check` already guard the shape, and a test that restates
+it fails on every intentional change while protecting nothing
+(`testing-practices` → "What not to test").
 
 ```
 src/schema-types/modules/hero-blog/
 ├─ hero-blog.ts        heroBlogSchema
-└─ hero-blog.test.ts
+└─ hero-blog.test.ts   custom rules, hidden logic, preview — never the field list
 ```
 
 - Directory name is the `_type` minus its `{group}_` prefix, kebab-cased:
@@ -273,6 +279,9 @@ Run these checks **once, after all schema work is complete**:
   in `@blog/config`); restructures kept validation parity (or the dropped
   constraint is called out in the report); previews present; any new migration
   has a target-state idempotency guard on every branch and a co-located test.
+- No test asserts a field list, option list, default, fieldset, group, order,
+  title, icon or registry membership — only validation, hidden logic,
+  previews, factories with branches, and migrations get tests.
 - Every new type and field carries an editor-facing `description` that says
   what it is **for** and never restates validation, and every new
   `options.list` states its `layout` — radio only where the field is

@@ -18,10 +18,11 @@ writes tests for what it implements — that responsibility isn't removed. The
 `test-writer` subagent (`.claude/agents/test-writer.md`) runs afterward as a
 dedicated, fresh-context pass over the same diff, per `develop-feature` step
 4: it catches gaps a layer agent's attention thins out on by the end of its
-own run, and is the one that owns raising coverage if thresholds land later
-(#396). Overlap where a layer agent already wrote thorough coverage is
-expected and fine — `test-writer` adds only what's missing, it doesn't
-duplicate or rewrite adequate existing tests.
+own run (#396). It holds the bar in both directions: it adds only what
+protects behaviour, and it deletes a new test that fails "What not to test"
+below. Overlap where a layer agent already wrote thorough coverage is
+expected and fine — `test-writer` doesn't duplicate or rewrite adequate
+existing tests, and "nothing to add" is a complete outcome.
 
 ## Where tests live
 
@@ -290,6 +291,21 @@ export default mergeConfig(
 
 ## What not to test
 
+- **Never assert declarative config back at itself.** A schema's field list,
+  option list, default, fieldset, group, field order, title, icon or registry
+  membership; a barrel "exposes X as a function"; an exported constant's
+  value; a component's static prop defaults. **The test: if the expected value
+  is a literal copied out of the file under test, the test restates the
+  source — delete it.** Typegen, `type-check` and the Studio itself already
+  guard those shapes, so the test protects nothing and fails on every
+  intentional change. Test the _logic_ attached to config instead: a
+  `rule.custom` validation, a conditional `hidden`, a preview `prepare`, a
+  transformer, a migration.
+- **Sibling cases use `it.each`, never copied blocks.** Three `it`s that
+  differ only in an input and an expected value are one table-driven test.
+  A test file that repeats an arrangement it already contains is fixed in
+  the same change, not later; two files that need the same arrangement share
+  a builder in `testing/` (see "Where tests live").
 - **Never assert a class the component applies unconditionally.** If a utility
   never varies with the component's input — layout (`w-full`, `max-w-page`,
   `grid`, `flex`), spacing (`mt-*`/`px-*`/`gap-*`), colour/background/border
@@ -324,7 +340,7 @@ Think pyramid: **many** fast, focused unit tests (`ui`/`service`/migrations),
 **few** heavier route/integration tests. Spend coverage on what matters —
 **business-critical paths, edge cases (empty/null/limits), error & empty
 handling, and data integrity/idempotency**. **Skip** trivial getters, framework
-code, and one-off scripts. When adding a feature, do a quick **gap scan**: does
+code, one-off scripts, and declarative config (see "What not to test"). When adding a feature, do a quick **gap scan**: does
 each new critical path _and_ each error/empty branch have a test? Note gaps
 rather than leaving them silent.
 
