@@ -4,30 +4,25 @@ import { notFound } from 'next/navigation';
 
 import { TopicsPage } from './topics-page';
 
-const { getTopicsIndexPageMock, moduleRendererMock, pageIntroMock } =
-  vi.hoisted(() => ({
-    getTopicsIndexPageMock: vi.fn(),
-    pageIntroMock: vi.fn(
-      ({
-        hero,
-        headingBlock,
-      }: {
-        hero?: { id: string };
-        headingBlock: { heading: string };
-      }) => (
-        <h1 data-testid="page-intro">
-          {hero ? hero.id : headingBlock.heading}
-        </h1>
-      ),
+const { getTopicsIndexPageMock, topicsModuleRendererMock } = vi.hoisted(() => ({
+  getTopicsIndexPageMock: vi.fn(),
+  topicsModuleRendererMock: vi.fn(
+    ({
+      hero,
+      headingBlock,
+      modules,
+    }: {
+      hero?: { id: string };
+      headingBlock: { heading: string };
+      modules: { id: string; type: string }[];
+    }) => (
+      <div data-testid="topics-module-renderer">
+        {hero ? hero.id : headingBlock.heading} —{' '}
+        {modules.map((module) => module.type).join(',')}
+      </div>
     ),
-    moduleRendererMock: vi.fn(
-      ({ modules }: { modules: { id: string; type: string }[] }) => (
-        <div data-testid="module-renderer-stub">
-          {modules.map((module) => module.type).join(',')}
-        </div>
-      ),
-    ),
-  }));
+  ),
+}));
 
 vi.mock('@web/server/topics-index/get-topics-index-page', () => ({
   getTopicsIndexPage: getTopicsIndexPageMock,
@@ -42,12 +37,8 @@ vi.mock(
   }),
 );
 
-vi.mock('@web/components/shared/page-intro', () => ({
-  PageIntro: pageIntroMock,
-}));
-
-vi.mock('@web/modules/module-renderer', () => ({
-  ModuleRenderer: moduleRendererMock,
+vi.mock('./topics-module-renderer', () => ({
+  TopicsModuleRenderer: topicsModuleRendererMock,
 }));
 
 const setup = customRenderAsync(TopicsPage, {
@@ -86,7 +77,7 @@ describe(`<${TopicsPage.name}/>`, () => {
     errorSpy.mockRestore();
   });
 
-  it('dispatches PageIntro with the fetched headingBlock and hasTrailingSpace false', async () => {
+  it('dispatches TopicsModuleRenderer with the fetched headingBlock and modules', async () => {
     getTopicsIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -100,23 +91,26 @@ describe(`<${TopicsPage.name}/>`, () => {
 
     await setup();
 
-    expect(pageIntroMock).toHaveBeenCalledWith(
-      expect.objectContaining({
+    expect(topicsModuleRendererMock).toHaveBeenCalledWith(
+      {
+        hero: undefined,
         headingBlock: makeHeadingBlock({
           heading: 'Topics',
           supportingText: 'Browse every post by topic.',
         }),
-        hasTrailingSpace: false,
+        modules: [],
         locale: 'en',
         tenant: 'tenant-1',
-      }),
+      },
       undefined,
     );
-    expect(screen.getByTestId('page-intro')).toHaveTextContent('Topics');
+    expect(screen.getByTestId('topics-module-renderer')).toHaveTextContent(
+      'Topics',
+    );
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('dispatches PageIntro with the hero when a hero is set', async () => {
+  it('dispatches TopicsModuleRenderer with the hero when a hero is set', async () => {
     getTopicsIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -128,7 +122,7 @@ describe(`<${TopicsPage.name}/>`, () => {
 
     await setup();
 
-    expect(pageIntroMock).toHaveBeenCalledWith(
+    expect(topicsModuleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({
         hero: { id: 'hero-1', type: 'module_hero' },
         locale: 'en',
@@ -136,7 +130,9 @@ describe(`<${TopicsPage.name}/>`, () => {
       }),
       undefined,
     );
-    expect(screen.getByTestId('page-intro')).toHaveTextContent('hero-1');
+    expect(screen.getByTestId('topics-module-renderer')).toHaveTextContent(
+      'hero-1',
+    );
   });
 
   it('renders the parts in order: breadcrumbs, then the module renderer', async () => {
@@ -156,12 +152,11 @@ describe(`<${TopicsPage.name}/>`, () => {
 
     expect(order).toEqual([
       'topics-index-breadcrumbs',
-      'page-intro',
-      'module-renderer-stub',
+      'topics-module-renderer',
     ]);
   });
 
-  it('renders through PageShell: breadcrumbs outside main, module renderer inside it', async () => {
+  it('renders through PageShell: the module renderer inside a single main landmark', async () => {
     getTopicsIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -173,13 +168,13 @@ describe(`<${TopicsPage.name}/>`, () => {
     await setup();
 
     const main = screen.getByRole('main');
-    expect(main).toContainElement(screen.getByTestId('module-renderer-stub'));
+    expect(main).toContainElement(screen.getByTestId('topics-module-renderer'));
     expect(
       screen.getByTestId('topics-index-breadcrumbs').closest('main'),
     ).toBeNull();
   });
 
-  it('passes the page-builder modules through to ModuleRenderer, in order, including the taxonomy list module', async () => {
+  it('passes the page-builder modules through to TopicsModuleRenderer, in order, including the taxonomy list module', async () => {
     getTopicsIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -193,7 +188,7 @@ describe(`<${TopicsPage.name}/>`, () => {
 
     await setup();
 
-    expect(moduleRendererMock).toHaveBeenCalledWith(
+    expect(topicsModuleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({
         modules: [
           { id: 'topic-list-1', type: 'module_taxonomyList' },
@@ -203,7 +198,7 @@ describe(`<${TopicsPage.name}/>`, () => {
       }),
       undefined,
     );
-    expect(screen.getByTestId('module-renderer-stub')).toHaveTextContent(
+    expect(screen.getByTestId('topics-module-renderer')).toHaveTextContent(
       'module_taxonomyList,module_newsletter',
     );
   });
