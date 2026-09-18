@@ -72,6 +72,6 @@ describe.each(FEATURE_ICONS)('<%s Icon/>', (name) => {
   it('renders', () => {
     setup({ name, dataTestId: 'feature-icon' });
 
-    expect(screen.getByTestId('feature-icon')).toBeInTheDocument();
+    expect(screen.getByTestId('feature-icon')).toBeVisible();
   });
 });

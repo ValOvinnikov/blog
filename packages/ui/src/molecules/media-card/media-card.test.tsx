@@ -355,7 +355,12 @@ describe(`<${MediaCard.name}/>`, () => {
       </MediaCard>,
     );
     const media = screen.getByTestId('media-card-media');
-    expect(media).toHaveClass('size-28', 'rounded-full', 'mx-card-x');
+    expect(media).toHaveClass(
+      'size-28',
+      'rounded-full',
+      'mt-card-y',
+      'mx-card-x',
+    );
     expect(media).not.toHaveClass('w-full');
   });
 
@@ -371,6 +376,7 @@ describe(`<${MediaCard.name}/>`, () => {
     expect(media).toHaveClass(
       'size-12',
       'rounded-md',
+      'mt-card-y',
       'mx-card-x',
       'bg-brand-primary-muted',
       'text-brand-primary',
@@ -378,7 +384,7 @@ describe(`<${MediaCard.name}/>`, () => {
     expect(media).not.toHaveClass('w-full');
   });
 
-  it('centres every row of the card when align is center', () => {
+  it('centres every row of the card when align is center, including meta and footer', () => {
     renderElement(
       <MediaCard
         align="center"
@@ -386,15 +392,27 @@ describe(`<${MediaCard.name}/>`, () => {
         tags={['react']}
         dataTestId="media-card"
       >
+        <MediaCard.Meta
+          dateValue="2024-01-01"
+          dateLabel="Jan 1, 2024"
+          dataTestId="media-card-meta"
+        />
         <MediaCard.Title level={3}>
           <a href="/posts/hello-world">Hello World</a>
         </MediaCard.Title>
+        <MediaCard.Footer
+          authorName="Jane Doe"
+          dataTestId="media-card-footer"
+        />
       </MediaCard>,
     );
-    expect(screen.getByTestId('media-card-content')).toHaveClass(
-      'items-center',
-      'text-center',
-    );
+    const content = screen.getByTestId('media-card-content');
+    expect(content).toHaveClass('items-center', 'text-center');
+    expect(content).toContainElement(screen.getByTestId('media-card-meta'));
+    expect(content).toContainElement(screen.getByRole('heading', { level: 3 }));
+    expect(content).toContainElement(screen.getByText('A short summary.'));
+    expect(content).toContainElement(screen.getByText('react'));
+    expect(content).toContainElement(screen.getByTestId('media-card-footer'));
   });
 
   it('does not centre the card content when align is left (default)', () => {
