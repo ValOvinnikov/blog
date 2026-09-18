@@ -97,6 +97,7 @@ export const FeatureListCard = ({
           <SmartLink
             href={item.link.href}
             target={item.link.target}
+            aria-label={item.link.ariaLabel}
             className={s.titleLink()}
           >
             {heading}

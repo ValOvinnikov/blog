@@ -100,6 +100,28 @@ describe(`<${FeatureListCard.name}/>`, () => {
     expect(link).toHaveAttribute('href', '/features/fast');
   });
 
+  it('exposes the link under its ariaLabel override, not the heading text, when the item link sets one', () => {
+    setup({
+      item: makeFeatureListItem({
+        link: {
+          label: 'Learn more',
+          href: '/features/fast',
+          target: undefined,
+          platform: undefined,
+          ariaLabel: 'Read the full engineering deep-dive',
+        },
+      }),
+    });
+
+    const link = screen.getByRole('link', {
+      name: 'Read the full engineering deep-dive',
+    });
+    expect(link).toHaveAttribute('href', '/features/fast');
+    expect(
+      screen.queryByRole('link', { name: item.headingBlock.heading }),
+    ).not.toBeInTheDocument();
+  });
+
   it('renders no link when the item has none', () => {
     setup();
 

@@ -138,12 +138,14 @@ describe(`<${FeatureListModuleView.name}/>`, () => {
   it('renders the resolved cta buttons when present', () => {
     setup({ ctaButtons: ctaActionsDemo });
 
-    ctaActionsDemo.forEach((action) => {
-      expect(
-        screen.getByRole('link', {
-          name: action.link.ariaLabel ?? action.link.label,
-        }),
-      ).toHaveAttribute('href', action.link.href);
-    });
+    expect(screen.getByRole('link', { name: 'Subscribe now' })).toHaveAttribute(
+      'href',
+      '/blog',
+    );
+    expect(
+      screen.getByRole('link', {
+        name: 'Learn more about our subscription plans',
+      }),
+    ).toHaveAttribute('href', '/about-us');
   });
 });
