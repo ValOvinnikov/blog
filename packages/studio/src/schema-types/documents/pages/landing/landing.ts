@@ -7,6 +7,7 @@ import { titleField } from '@blog/studio/schema-types/fields/title-field/title-f
 import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/slug-url-preview/slug-url-preview-input';
 import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
+import { featureListSchema } from '@blog/studio/schema-types/modules/feature-list/feature-list';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import { heroStatementSchema } from '@blog/studio/schema-types/modules/hero-statement/hero-statement';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
@@ -62,6 +63,7 @@ export const landingPageSchema = defineType({
         postFeaturedSchema.name,
         newsletterSchema.name,
         taxonomyListSchema.name,
+        featureListSchema.name,
       ],
       validateCustom: (rule) =>
         rule

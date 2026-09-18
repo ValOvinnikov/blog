@@ -1,5 +1,6 @@
 import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
+import { featureListSchema } from '@blog/studio/schema-types/modules/feature-list/feature-list';
 import { heroSchema } from '@blog/studio/schema-types/modules/hero/hero';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import { heroStatementSchema } from '@blog/studio/schema-types/modules/hero-statement/hero-statement';
@@ -36,6 +37,7 @@ export const modulesSection: TStructureSection = {
         { schema: contentSchema },
         { schema: ctaSchema },
         { schema: newsletterSchema },
+        { schema: featureListSchema },
       ],
     },
   ],
