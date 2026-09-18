@@ -8,6 +8,7 @@ import {
   getRecordedValidators,
   type TRecordedValidator,
 } from '@blog/studio/testing/create-mock-validation-rule';
+import { getField } from '@blog/studio/testing/get-field';
 import type { ValidationContext } from 'sanity';
 
 type TReferenceFieldDefinition = {
@@ -28,8 +29,7 @@ type TValidationRule = {
   custom: (fn: unknown) => TValidationRule;
 };
 
-const getField = (name: string) =>
-  topicPageSchema.fields?.find((field) => field.name === name);
+const getTopicPageField = (name: string) => getField(topicPageSchema, name);
 
 describe('topicPageSchema field order', () => {
   it('orders fields title, slug, topic, headingBlock, hero, modules, seo', () => {
@@ -51,7 +51,7 @@ describe('topicPageSchema shape', () => {
   });
 
   it('title is required via the shared titleField() helper', () => {
-    const titleFieldDefinition = getField('title');
+    const titleFieldDefinition = getTopicPageField('title');
 
     if (!titleFieldDefinition?.validation) {
       throw new Error('Expected topicPageSchema to define a title field.');
@@ -73,11 +73,13 @@ describe('topicPageSchema shape', () => {
   });
 
   it('has no deprecated postList field', () => {
-    expect(getField('postList')).toBeUndefined();
+    expect(
+      topicPageSchema.fields?.find((field) => field.name === 'postList'),
+    ).toBeUndefined();
   });
 
   it('modules allows module_postList, module_postLatest, module_cta, module_newsletter, and module_taxonomyList', () => {
-    const modulesField = getField('modules') as
+    const modulesField = getTopicPageField('modules') as
       TArrayFieldDefinition | undefined;
 
     if (!modulesField || modulesField.type !== 'array' || !modulesField.of) {
@@ -94,7 +96,7 @@ describe('topicPageSchema shape', () => {
   });
 
   it('seo is required via the shared seoField() helper', () => {
-    const seoFieldDefinition = getField('seo');
+    const seoFieldDefinition = getTopicPageField('seo');
 
     if (!seoFieldDefinition?.validation) {
       throw new Error('Expected topicPageSchema to define a seo field.');
@@ -124,14 +126,14 @@ type THeadingBlockFieldDefinition = {
 
 describe('pageTopicSchema headingBlock field', () => {
   it('is built via headingBlockField()', () => {
-    const headingBlockField = getField('headingBlock') as
+    const headingBlockField = getTopicPageField('headingBlock') as
       THeadingBlockFieldDefinition | undefined;
 
     expect(headingBlockField?.type).toBe('headingBlock');
   });
 
   it('is required at the field level', () => {
-    const headingBlockField = getField('headingBlock') as
+    const headingBlockField = getTopicPageField('headingBlock') as
       THeadingBlockFieldDefinition | undefined;
 
     if (!headingBlockField?.validation) {
@@ -158,7 +160,7 @@ describe('pageTopicSchema headingBlock field', () => {
 
 describe('topicPageSchema hero field', () => {
   it('is an optional reference scoped to heroBlog only', () => {
-    const heroField = getField('hero') as
+    const heroField = getTopicPageField('hero') as
       | { type: string; to?: Array<{ type: string }>; validation?: unknown }
       | undefined;
 
@@ -187,7 +189,7 @@ type TSlugFieldDefinition = {
 
 describe('topicPageSchema slug field', () => {
   const getSlugField = () =>
-    getField('slug') as TSlugFieldDefinition | undefined;
+    getTopicPageField('slug') as TSlugFieldDefinition | undefined;
 
   it('is sourced from title with a 96-char max', () => {
     const slugField = getSlugField();
@@ -239,7 +241,7 @@ describe('topicPageSchema slug field', () => {
 
 describe('topicPageSchema topic field', () => {
   const getTopicField = () =>
-    getField('topic') as TReferenceFieldDefinition | undefined;
+    getTopicPageField('topic') as TReferenceFieldDefinition | undefined;
 
   it('references blog_topic', () => {
     const topicField = getTopicField();

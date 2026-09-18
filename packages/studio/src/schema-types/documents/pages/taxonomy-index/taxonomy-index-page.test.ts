@@ -14,6 +14,7 @@ import {
   type TModuleReference,
   type TModulesCustomFn,
 } from '@blog/studio/testing/create-mock-modules-rule';
+import { getField } from '@blog/studio/testing/get-field';
 import type { SchemaTypeDefinition, ValidationContext } from 'sanity';
 
 type TArrayFieldDefinition = {
@@ -49,18 +50,12 @@ const createDocumentMockRule = (
   warning: () => createDocumentMockRule('warning', fn),
 });
 
-const getField = (
-  schema: SchemaTypeDefinition,
-  name: string,
-): TFieldDefinition | undefined =>
-  (schema as { fields?: TFieldDefinition[] }).fields?.find(
-    (field) => field.name === name,
-  );
+type TIndexedSchema = { name?: string; fields?: TFieldDefinition[] };
 
 const getModulesCustomValidators = (
   schema: SchemaTypeDefinition,
 ): TModulesCustomFn[] => {
-  const modulesField = getField(schema, 'modules');
+  const modulesField = getField(schema as TIndexedSchema, 'modules');
 
   if (!modulesField?.validation) {
     throw new Error(

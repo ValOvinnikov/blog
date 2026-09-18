@@ -1,19 +1,11 @@
 import { HERO_VARIANT, MEDIA_ORDER } from '@blog/config/constants';
+import { getHidden } from '@blog/studio/testing/get-field-hidden';
+import { getLayout } from '@blog/studio/testing/get-field-layout';
 
 import {
   heroMediaOrderSplitField,
   heroMediaOrderStackedField,
 } from './hero-media-order-fields';
-
-type THiddenFn = (context: { parent?: unknown }) => boolean;
-
-const getLayout = (field: { options?: unknown }) => {
-  const options = field.options;
-
-  return options && typeof options === 'object' && 'layout' in options
-    ? (options as { layout?: string }).layout
-    : undefined;
-};
 
 const getOptionValues = (field: { options?: unknown }) => {
   const options = field.options;
@@ -29,14 +21,6 @@ const getOptionValues = (field: { options?: unknown }) => {
   return (list as { title: string; value: string }[]).map(
     (option) => option.value,
   );
-};
-
-const getHidden = (field: { hidden?: unknown }): THiddenFn => {
-  if (typeof field.hidden !== 'function') {
-    throw new Error('Expected field to define a hidden() fn.');
-  }
-
-  return field.hidden as THiddenFn;
 };
 
 describe(heroMediaOrderSplitField, () => {

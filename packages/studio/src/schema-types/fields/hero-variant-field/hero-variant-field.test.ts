@@ -1,4 +1,6 @@
 import { HERO_VARIANT } from '@blog/config/constants';
+import { getLayout } from '@blog/studio/testing/get-field-layout';
+import { wasRequiredCalled } from '@blog/studio/testing/was-required-called';
 
 import { heroVariantField } from './hero-variant-field';
 
@@ -16,33 +18,6 @@ const getOptionValues = (field: { options?: unknown }) => {
   return (list as { title: string; value: string }[]).map(
     (option) => option.value,
   );
-};
-
-const getLayout = (field: { options?: unknown }) => {
-  const options = field.options;
-
-  return options && typeof options === 'object' && 'layout' in options
-    ? (options as { layout?: string }).layout
-    : undefined;
-};
-
-const wasRequiredCalled = (field: { validation?: unknown }) => {
-  if (!field.validation) {
-    throw new Error('Expected field to define validation.');
-  }
-
-  let requiredCalled = false;
-  const rule = {
-    required: () => {
-      requiredCalled = true;
-      return rule;
-    },
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (field.validation as any)(rule);
-
-  return requiredCalled;
 };
 
 describe(heroVariantField, () => {

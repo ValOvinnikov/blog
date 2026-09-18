@@ -1,18 +1,8 @@
 import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
 import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
+import { getField } from '@blog/studio/testing/get-field';
 
-const getLinkField = () => {
-  const field = linkRefSchema.fields.find(
-    (field): field is typeof field & { name: 'link' } =>
-      'name' in field && field.name === 'link',
-  );
-
-  if (!field) {
-    throw new Error('Expected linkRefSchema to define a "link" field.');
-  }
-
-  return field;
-};
+const getLinkField = () => getField(linkRefSchema, 'link');
 
 describe('linkRefSchema', () => {
   it('references the link document', () => {

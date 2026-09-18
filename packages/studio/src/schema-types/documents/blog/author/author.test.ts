@@ -1,6 +1,7 @@
 import { authorSchema } from '@blog/studio/schema-types/documents/blog/author/author';
 import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
 import { socialProfileSchema } from '@blog/studio/schema-types/objects/social-profile/social-profile';
+import { getField } from '@blog/studio/testing/get-field';
 
 type TReferenceFieldDefinition = {
   type: 'reference';
@@ -13,12 +14,9 @@ type TArrayFieldDefinition = {
   of?: Array<{ type?: string }>;
 };
 
-const getField = (name: string) =>
-  authorSchema.fields?.find((field) => field.name === name);
-
 describe('authorSchema profilePage field', () => {
   const getProfilePageField = () =>
-    getField('profilePage') as TReferenceFieldDefinition | undefined;
+    getField(authorSchema, 'profilePage') as TReferenceFieldDefinition;
 
   it('references the link document, not a specific page type', () => {
     const profilePageField = getProfilePageField();
@@ -41,10 +39,12 @@ describe('authorSchema profilePage field', () => {
 
 describe('authorSchema socialLinks field', () => {
   it('is an array of socialProfile', () => {
-    const socialLinksField = getField('socialLinks') as
-      TArrayFieldDefinition | undefined;
+    const socialLinksField = getField(
+      authorSchema,
+      'socialLinks',
+    ) as TArrayFieldDefinition;
 
-    if (!socialLinksField || socialLinksField.type !== 'array') {
+    if (socialLinksField.type !== 'array') {
       throw new Error(
         'Expected authorSchema to define a socialLinks array field.',
       );
@@ -58,6 +58,8 @@ describe('authorSchema socialLinks field', () => {
 
 describe('authorSchema slug field', () => {
   it('is not defined — removed in favor of profilePage', () => {
-    expect(getField('slug')).toBeUndefined();
+    expect(
+      authorSchema.fields?.find((field) => field.name === 'slug'),
+    ).toBeUndefined();
   });
 });

@@ -1,37 +1,10 @@
 import { headingBlockSchema } from '@blog/studio/schema-types/objects/heading-block/heading-block';
+import { getField } from '@blog/studio/testing/get-field';
+import { wasRequiredCalled } from '@blog/studio/testing/was-required-called';
 import type { ObjectDefinition } from 'sanity';
 
 const fieldNames = (schema: ObjectDefinition) =>
   schema.fields?.map((field) => field.name);
-
-const findField = (schema: ObjectDefinition, name: string) => {
-  const field = schema.fields?.find((candidate) => candidate.name === name);
-
-  if (!field) {
-    throw new Error(`Expected ${schema.name} to define a "${name}" field.`);
-  }
-
-  return field;
-};
-
-const wasRequiredCalled = (field: { validation?: unknown }) => {
-  if (!field.validation) {
-    throw new Error('Expected field to define validation.');
-  }
-
-  let requiredCalled = false;
-  const rule = {
-    required: () => {
-      requiredCalled = true;
-      return rule;
-    },
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (field.validation as any)(rule);
-
-  return requiredCalled;
-};
 
 describe('headingBlockSchema shape', () => {
   it('carries only heading and supportingText', () => {
@@ -53,13 +26,13 @@ describe('headingBlockSchema shape', () => {
   });
 
   it('requires heading', () => {
-    const field = findField(headingBlockSchema, 'heading');
+    const field = getField(headingBlockSchema, 'heading');
 
     expect(wasRequiredCalled(field)).toBe(true);
   });
 
   it('defines no validation on supportingText', () => {
-    const field = findField(headingBlockSchema, 'supportingText');
+    const field = getField(headingBlockSchema, 'supportingText');
 
     expect(field.validation).toBeUndefined();
   });
