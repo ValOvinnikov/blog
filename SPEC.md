@@ -212,11 +212,12 @@ that one directory; every other admin surface uses admin's own primitives.
 Sanity schema → `pnpm typegen` → `@blog/config` generated types →
 `@blog/service` (thin page queries + per-module fetchers, plus a scoped
 `service.editorial.*` write path for the skim pipeline) → `apps/web`
-(`ModuleRenderer` maps each module reference through `MODULE_MAP` to a
-Server Component, which fetches its own module data and maps it onto a pure
-`@blog/ui` organism). A page's dedicated `hero` slot dispatches the same
-way, through `HeroSlot` and `HERO_MAP` — keyed on `THeroModuleType`, so a
-hero kind with no registered component is a compile error. Typegen output is
+(each page's own module renderer maps a module reference through that page's
+map to a Server Component, which fetches its own module data and maps it onto
+a pure `@blog/ui` organism). A page's dedicated `hero` slot dispatches the
+same way, through the same map — annotated `Record<TPageXType,
+TModuleComponent>`, so a type the page allows with no component, or a
+component for a type it cannot reference, is a compile error. Typegen output is
 committed and can be non-deterministic — re-run until minimal.
 
 Images follow the same direction of travel: `@blog/service` describes an image
