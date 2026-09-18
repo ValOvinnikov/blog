@@ -7,6 +7,7 @@ import {
   LINK_TYPE,
   MEDIA_ORDER,
   PROFILE_IMAGE_SOURCE,
+  SOCIAL_PLATFORMS,
 } from '@blog/config';
 import {
   makeRawCtaButton,
@@ -120,7 +121,7 @@ describe(toHeroProfileModule, () => {
           image: null,
           socialLinks: [
             {
-              platform: 'GITHUB',
+              platform: SOCIAL_PLATFORMS.GITHUB,
               link: makeRawExternalLinkDocument({
                 label: 'GitHub',
                 url: 'https://github.com/val',
@@ -134,7 +135,7 @@ describe(toHeroProfileModule, () => {
 
       expect(hero.socialLinks).toEqual([
         {
-          platform: 'GITHUB',
+          platform: SOCIAL_PLATFORMS.GITHUB,
           link: {
             label: 'GitHub',
             href: 'https://github.com/val',
@@ -153,7 +154,7 @@ describe(toHeroProfileModule, () => {
           image: null,
           socialLinks: [
             {
-              platform: 'GITHUB',
+              platform: SOCIAL_PLATFORMS.GITHUB,
               link: makeRawExternalLinkDocument(),
             },
           ],
@@ -183,7 +184,7 @@ describe(toHeroProfileModule, () => {
           image: null,
           socialLinks: [
             {
-              platform: 'GITHUB',
+              platform: SOCIAL_PLATFORMS.GITHUB,
               link: {
                 label: 'Broken',
                 linkType: LINK_TYPE.INTERNAL,
