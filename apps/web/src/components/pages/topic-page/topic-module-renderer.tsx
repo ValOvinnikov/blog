@@ -19,7 +19,7 @@ import { PostListModule } from '@web/modules/post-list/post-list-module';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
 import type { ReactNode } from 'react';
 
-const TOPIC_MAP: Record<TPageTopicType, TModuleComponent> = {
+const TOPIC_MAP: Partial<Record<TPageTopicType, TModuleComponent>> = {
   module_heroBlog: HeroBlogModule,
   module_postList: PostListModule,
   module_postLatest: PostLatestModule,

@@ -18,9 +18,11 @@ export type TModuleComponent = (
   props: TModuleComponentProps,
 ) => Promise<ReactNode>;
 
-type TModuleMap = Record<
-  string,
-  (props: TModuleComponentProps) => ReactNode | Promise<ReactNode>
+type TModuleMap = Partial<
+  Record<
+    string,
+    (props: TModuleComponentProps) => ReactNode | Promise<ReactNode>
+  >
 >;
 
 export interface IRenderModulesProps {
