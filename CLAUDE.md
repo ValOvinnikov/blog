@@ -670,6 +670,15 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   automatically an `error` — branch on the `ERROR_CODE` and log only what a
   human would act on. Full contract in `SPEC.md` §17.
 - Co-locate `*.test.ts(x)`; `pnpm test` must pass.
+- **Never assert copy verbatim in a test.** An editor-facing `description`, a
+  label, a placeholder, a helper sentence — pinning one to its exact literal
+  only restates the source. The sole change that can fail such a test is a
+  deliberate rewording, so it reports intentional edits as breakage and
+  catches no defect. A field helper's default-vs-override precedence is the
+  same: that is `??`, not a contract. Assert a description is non-empty where
+  its absence would be a bug; never assert which words it contains. Copy is
+  reviewed in the diff. Full rule and examples in `testing-practices` →
+  "What not to test".
 - After a schema change: `pnpm typegen`, then commit the regenerated files in
   `packages/config/src/sanity/generated/`. Typegen can be non-deterministic —
   re-run until the diff is minimal.
