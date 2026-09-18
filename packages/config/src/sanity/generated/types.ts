@@ -1003,7 +1003,6 @@ export type Module_heroProfile = {
   headingBlock?: HeadingBlock;
   eyebrow?: string;
   author?: Blog_authorReference;
-  imageSource?: 'AUTHOR' | 'CUSTOM' | 'NONE';
   image?: ImageWithAlt;
   ctaButtons?: Array<
     {

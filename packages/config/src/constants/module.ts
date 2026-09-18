@@ -74,11 +74,3 @@ export const HERO_IMAGE_SOURCE = {
 } as const;
 
 export type THeroImageSource = TValueOf<typeof HERO_IMAGE_SOURCE>;
-
-export const PROFILE_IMAGE_SOURCE = {
-  AUTHOR: 'AUTHOR',
-  CUSTOM: 'CUSTOM',
-  NONE: 'NONE',
-} as const;
-
-export type TProfileImageSource = TValueOf<typeof PROFILE_IMAGE_SOURCE>;
