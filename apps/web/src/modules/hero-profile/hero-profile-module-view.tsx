@@ -66,13 +66,13 @@ export const HeroProfileModuleView = ({
         contentAlignment={contentAlignment}
         mediaOrder={mediaOrder}
       >
-        {ctaButtons.length > 0 ? (
+        {ctaButtons.length > 0 && (
           <Hero.Cta>
             <ActionGroup actions={ctaButtons} isOnDark={isBanner} />
           </Hero.Cta>
-        ) : undefined}
+        )}
 
-        {variant === HERO_VARIANT.STACKED ? (
+        {variant === HERO_VARIANT.STACKED && (
           <Hero.Avatar>
             {sanityImage ? (
               <SanityImage
@@ -89,9 +89,9 @@ export const HeroProfileModuleView = ({
               />
             )}
           </Hero.Avatar>
-        ) : undefined}
+        )}
 
-        {variant === HERO_VARIANT.SPLIT ? (
+        {variant === HERO_VARIANT.SPLIT && (
           <Hero.Media ratio="square">
             {sanityImage ? (
               <SanityImage
@@ -107,9 +107,9 @@ export const HeroProfileModuleView = ({
               </div>
             )}
           </Hero.Media>
-        ) : undefined}
+        )}
 
-        {isBanner ? (
+        {isBanner && (
           <Hero.Media>
             {sanityImage ? (
               <SanityImage
@@ -121,12 +121,15 @@ export const HeroProfileModuleView = ({
                 className="size-full object-cover"
               />
             ) : (
-              <div className={heroProfileMediaFallbackVariants()}>
+              <div
+                aria-hidden="true"
+                className={heroProfileMediaFallbackVariants()}
+              >
                 <Avatar alt={avatarName} name={avatarName} size={SIZE.XXL} />
               </div>
             )}
           </Hero.Media>
-        ) : undefined}
+        )}
 
         {socialLinksItems ? (
           <Hero.Social>

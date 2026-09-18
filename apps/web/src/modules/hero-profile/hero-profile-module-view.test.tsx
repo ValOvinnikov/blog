@@ -98,28 +98,37 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
   // no `image`) collapse to the same `sanityImage: undefined` before this
   // view ever sees it, so one case per variant is the full input space here
   // — the route distinction itself is covered by the loader's own tests.
-  it('renders initials derived from the author name (never the heading) instead of an empty avatar when no image resolves on Stacked', () => {
+  it('renders initials derived from the author name (never the heading) instead of an empty avatar when no image resolves on Stacked, exposing the full name to the accessibility tree', () => {
     setup({ variant: HERO_VARIANT.STACKED, sanityImage: undefined });
 
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
     expect(screen.getByText('JR')).toBeVisible();
     expect(screen.queryByText('BB')).not.toBeInTheDocument();
+    expect(
+      screen.getByText(avatarName).closest('[aria-hidden="true"]'),
+    ).toBeNull();
   });
 
-  it('renders initials derived from the author name (never the heading) instead of an empty media area when no image resolves on Split', () => {
+  it('renders initials derived from the author name (never the heading) instead of an empty media area when no image resolves on Split, exposing the full name to the accessibility tree', () => {
     setup({ variant: HERO_VARIANT.SPLIT, sanityImage: undefined });
 
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
     expect(screen.getByText('JR')).toBeVisible();
     expect(screen.queryByText('BB')).not.toBeInTheDocument();
+    expect(
+      screen.getByText(avatarName).closest('[aria-hidden="true"]'),
+    ).toBeNull();
   });
 
-  it('renders initials derived from the author name (never the heading) instead of an empty media area when no image resolves on Banner', () => {
+  it('renders initials derived from the author name (never the heading) instead of an empty media area when no image resolves on Banner, but hides the fallback from the accessibility tree since the media is a decorative backdrop there', () => {
     setup({ variant: HERO_VARIANT.BANNER, sanityImage: undefined });
 
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
     expect(screen.getByText('JR')).toBeVisible();
     expect(screen.queryByText('BB')).not.toBeInTheDocument();
+    expect(
+      screen.getByText(avatarName).closest('[aria-hidden="true"]'),
+    ).not.toBeNull();
   });
 
   it('renders no Hero.Cta slot when ctaButtons is empty', () => {

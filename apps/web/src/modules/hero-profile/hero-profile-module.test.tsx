@@ -150,4 +150,49 @@ describe(`<${HeroProfileModule.name}/>`, () => {
       within(link).getByTestId(`social-icon-${SOCIAL_PLATFORMS.GITHUB}`),
     ).toBeVisible();
   });
+
+  it('renders one list item per resolved social link', async () => {
+    getHeroProfileMock.mockResolvedValue({
+      ok: true,
+      data: makeHeroProfileData({
+        socialLinks: [
+          {
+            platform: SOCIAL_PLATFORMS.GITHUB,
+            link: {
+              label: 'GitHub',
+              href: 'https://github.com/example',
+              target: '_blank',
+              platform: undefined,
+              ariaLabel: undefined,
+            },
+          },
+          {
+            platform: SOCIAL_PLATFORMS.X,
+            link: {
+              label: 'X',
+              href: 'https://x.com/example',
+              target: '_blank',
+              platform: undefined,
+              ariaLabel: undefined,
+            },
+          },
+          {
+            platform: SOCIAL_PLATFORMS.LINKEDIN,
+            link: {
+              label: 'LinkedIn',
+              href: 'https://linkedin.com/in/example',
+              target: '_blank',
+              platform: undefined,
+              ariaLabel: undefined,
+            },
+          },
+        ],
+      }),
+    });
+
+    await setup();
+
+    const list = screen.getByRole('list', { name: 'Profiles' });
+    expect(within(list).getAllByRole('listitem')).toHaveLength(3);
+  });
 });
