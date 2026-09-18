@@ -345,6 +345,45 @@ describe('featureListSchema document validation', () => {
       ),
     ).resolves.toBe(true);
   });
+
+  it('queries by the referenced feature card ids', async () => {
+    const [validate] = getDocumentValidators();
+    let receivedQuery = '';
+    let receivedParams: unknown;
+    const context = createMockContext((query, params) => {
+      receivedQuery = query;
+      receivedParams = params;
+      return [{ icon: 'CODE' }, { icon: 'ZAP' }];
+    });
+
+    await validate!.fn(
+      {
+        showImages: true,
+        imageShape: CARD_IMAGE_SHAPE.ICON,
+        features: [{ _ref: 'card-1' }, { _ref: 'card-2' }],
+      } as unknown as SanityDocument,
+      context,
+    );
+
+    expect(receivedQuery).toBe('*[_id in $ids]{ icon, image }');
+    expect(receivedParams).toEqual({ ids: ['card-1', 'card-2'] });
+  });
+
+  it('resolves true when the referenced cards no longer exist', async () => {
+    const [validate] = getDocumentValidators();
+    const context = createMockContext(() => []);
+
+    await expect(
+      validate!.fn(
+        {
+          showImages: true,
+          imageShape: CARD_IMAGE_SHAPE.ICON,
+          features: [{ _ref: 'deleted-card' }],
+        } as unknown as SanityDocument,
+        context,
+      ),
+    ).resolves.toBe(true);
+  });
 });
 
 describe('featureListSchema preview', () => {
