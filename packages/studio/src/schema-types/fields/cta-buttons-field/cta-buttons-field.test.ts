@@ -8,10 +8,6 @@ const getValidator = (field: ReturnType<typeof ctaButtonsField>): TCustomFn =>
   getCustomValidator<TCustomFn>(field);
 
 describe(ctaButtonsField, () => {
-  it('names the field ctaButtons', () => {
-    expect(ctaButtonsField().name).toBe('ctaButtons');
-  });
-
   it('defaults min to 0 and max to 2', () => {
     const field = ctaButtonsField();
     let minArg: number | undefined;

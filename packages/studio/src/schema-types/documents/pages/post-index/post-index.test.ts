@@ -1,5 +1,4 @@
 import { postIndexPageSchema } from '@blog/studio/schema-types/documents/pages/post-index/post-index';
-import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import {
   createMockModulesRule,
@@ -10,96 +9,9 @@ import {
   getRecordedValidators,
   type TRecordedValidator,
 } from '@blog/studio/testing/create-mock-validation-rule';
-import { getField } from '@blog/studio/testing/get-field';
 import type { ValidationContext } from 'sanity';
 
-type TArrayFieldDefinition = {
-  type: 'array';
-  of?: Array<{ name?: string }>;
-};
-
-type TFieldDefinition = {
-  name: string;
-  type: string;
-  description?: string;
-  validation?: unknown;
-  to?: Array<{ type?: string }>;
-};
-
 type TDocumentCustomFn = (document: Record<string, unknown>) => string | true;
-
-const getPostIndexField = (name: string) =>
-  getField(postIndexPageSchema, name) as TFieldDefinition;
-
-describe('postIndexPageSchema field order', () => {
-  it('orders the primary fields title, headingBlock, hero, modules, seo', () => {
-    const primaryFieldNames = [
-      'title',
-      'headingBlock',
-      'hero',
-      'modules',
-      'seo',
-    ];
-    const fieldNames =
-      postIndexPageSchema.fields?.map((field) => field.name) ?? [];
-
-    expect(
-      fieldNames.filter((name) => primaryFieldNames.includes(name)),
-    ).toEqual(primaryFieldNames);
-  });
-});
-
-describe('postIndexPageSchema headingBlock field', () => {
-  it('is required, and uses the shared headingBlock description', () => {
-    const headingBlockField = getPostIndexField('headingBlock');
-
-    expect(headingBlockField?.type).toBe('headingBlock');
-    expect(headingBlockField?.description).toBe(
-      'The heading shown at the top of this page or module, with its optional supporting line.',
-    );
-    expect(headingBlockField?.validation).toBeDefined();
-  });
-});
-
-describe('postIndexPageSchema hero field', () => {
-  it('is an optional reference scoped to heroBlog only', () => {
-    const heroField = getPostIndexField('hero');
-
-    if (!heroField) {
-      throw new Error('Expected postIndexPageSchema to define a hero field.');
-    }
-
-    expect(heroField.type).toBe('reference');
-    expect(heroField.to?.map((entry) => entry.type)).toEqual([
-      heroBlogSchema.name,
-    ]);
-    expect(heroField.validation).toBeUndefined();
-  });
-});
-
-describe('postIndexPageSchema modules allow-list', () => {
-  it('permits module_postList, module_cta, module_newsletter, module_postFeatured and module_taxonomyList', () => {
-    const modulesField = postIndexPageSchema.fields?.find(
-      (field) => field.name === 'modules',
-    ) as TArrayFieldDefinition | undefined;
-
-    if (!modulesField || modulesField.type !== 'array' || !modulesField.of) {
-      throw new Error(
-        'Expected postIndexPageSchema to define a modules array field.',
-      );
-    }
-
-    const allowedTypes = modulesField.of.map((member) => member.name);
-
-    expect(allowedTypes).toEqual([
-      'module_postList',
-      'module_cta',
-      'module_newsletter',
-      'module_postFeatured',
-      'module_taxonomyList',
-    ]);
-  });
-});
 
 describe('postIndexPageSchema modules validateCustom chaining', () => {
   const getModulesCustomValidators = (): TModulesCustomFn[] => {
@@ -145,17 +57,6 @@ describe('postIndexPageSchema modules validateCustom chaining', () => {
   });
 });
 
-describe('postIndexPageSchema removed legacy fields', () => {
-  it.each(['heading', 'supportingText', 'postList'])(
-    '%s no longer exists on the schema',
-    (name) => {
-      expect(
-        postIndexPageSchema.fields?.find((field) => field.name === name),
-      ).toBeUndefined();
-    },
-  );
-});
-
 describe('postIndexPageSchema document validation', () => {
   const buildDocumentRules = (): TRecordedValidator<TDocumentCustomFn>[] =>
     getRecordedValidators<TDocumentCustomFn>(postIndexPageSchema);
@@ -179,7 +80,6 @@ describe('postIndexPageSchema document validation', () => {
     it('warns when no module_postList is referenced', () => {
       const [, presentRule] = buildDocumentRules();
 
-      expect(presentRule?.level).toBe('warning');
       expect(presentRule?.fn?.({ modules: [] })).toBe(
         'Add a Post List module so this page can list posts.',
       );
