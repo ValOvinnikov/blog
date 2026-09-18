@@ -1,4 +1,4 @@
-import { toSocialProfile } from '@blog/service/shared/transformers/to-social-profile';
+import { toSocialProfiles } from '@blog/service/shared/transformers/to-social-profiles';
 import type { InferResultType } from 'groqd';
 
 import type { footerQuery } from './query';
@@ -8,6 +8,6 @@ export type TRawFooter = NonNullable<InferResultType<typeof footerQuery>>;
 
 export function toFooter(raw: TRawFooter): TFooter {
   return {
-    social: (raw.social ?? []).flatMap((item) => toSocialProfile(item) ?? []),
+    social: toSocialProfiles(raw.social),
   };
 }
