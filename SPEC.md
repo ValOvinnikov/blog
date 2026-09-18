@@ -353,12 +353,11 @@ own dedicated schema, unrelated to this shared shape.
 **The hero family.** A hero is any module whose schema `name` starts with
 `module_hero`; membership is that naming convention and nothing else.
 `@blog/config` derives `THeroModuleType` from it as
-``Extract<TModuleType, `module_hero${string}`>``, alongside
-`TSlotModuleType` — every module reached _only_ through a dedicated page slot
-and never through `modules[]`, which is how `MODULE_MAP` excludes them
-(`Record<Exclude<TModuleType, TSlotModuleType>, …>`). Nothing is
+``Extract<TModuleType, `module_hero${string}`>``. Nothing is
 hand-listed, so a new hero kind joins the union the day its schema lands and
-drops out the day it is deleted. The studio's equivalent guard is
+drops out the day it is deleted. A page's own map covers both its `hero` slot
+and its `modules[]`, so nothing needs to subtract slot-only kinds from a
+wider set. The studio's equivalent guard is
 `HERO_SCHEMA_TYPES`, the registry of every hero schema, with a test
 asserting every registered `module_hero*` schema appears in it.
 
@@ -589,7 +588,7 @@ lives on the pages instead: every page placing one must set it, enforced by an
 async rule on `modules[]` that fetches each referenced module and rejects one
 that has not.
 
-Nothing overrides that field at read time. `ModuleRenderer` calls every module
+Nothing overrides that field at read time. `renderModules` calls every module
 with the same arguments, so there is no channel by which a page could supply a
 kind the module itself lacks, and
 `service.modules.taxonomyList.v1.getTaxonomyList(id, tenant)` projects the
@@ -913,7 +912,7 @@ already depend on `db` directly. `apps/web`'s
 `is-capability-enabled.ts` (`apps/web/src/server/settings-features/`)
 resolves the two-layer check per request and never throws; a disabled
 capability is omitted silently at its own render site (`module_newsletter`
-in `ModuleRenderer`; the bookmark button on the post-detail page; Vercel
+in `renderModules`; the bookmark button on the post-detail page; Vercel
 Analytics/Speed Insights in `[locale]/layout.tsx`, ANDed with the
 pre-existing `WEB_ANALYTICS_ENABLED` env gate) — same pattern as an unknown
 module type,
@@ -1051,7 +1050,7 @@ composes those regions and nothing else — there is no per-page layout.
 
 `Heading` holds the hero when the document has one, and otherwise the
 `headingBlock` `<h1>` with its `supportingText` (§6). `Content` holds the
-page's chips where it has them, then `ModuleRenderer` over `modules[]`. No
+page's chips where it has them, then its own renderer over `modules[]`. No
 page owns a bespoke list slot: a post list is a `module_postList` in
 `modules[]` like any other module, which is what lets one shell serve the
 home, landing, blog, topic, tag and taxonomy-index pages alike.
