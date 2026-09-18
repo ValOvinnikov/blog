@@ -9,6 +9,11 @@ import {
   getRecordedValidators,
   type TRecordedValidator,
 } from '@blog/studio/testing/create-mock-validation-rule';
+import {
+  getFieldOptionsLayout,
+  getFieldOptionValues,
+} from '@blog/studio/testing/get-field-options';
+import { getSchemaField } from '@blog/studio/testing/get-schema-field';
 import type { SanityDocument, ValidationContext } from 'sanity';
 
 type TDocFn = (
@@ -16,42 +21,7 @@ type TDocFn = (
   context: ValidationContext,
 ) => Promise<string | true> | string | true;
 
-const getField = (name: string) => {
-  const field = featureListSchema.fields?.find(
-    (field): field is typeof field & { name: string } =>
-      'name' in field && field.name === name,
-  );
-
-  if (!field) {
-    throw new Error(`Expected featureListSchema to define a "${name}" field.`);
-  }
-
-  return field;
-};
-
-const getOptionValues = (field: { options?: unknown }) => {
-  const options = field.options;
-  const list =
-    options && typeof options === 'object' && 'list' in options
-      ? (options as { list: unknown }).list
-      : undefined;
-
-  if (!list) {
-    throw new Error('Expected field to define an options.list.');
-  }
-
-  return (list as { title: string; value: string }[]).map(
-    (option) => option.value,
-  );
-};
-
-const getOptionsLayout = (field: { options?: unknown }) => {
-  const options = field.options;
-
-  return options && typeof options === 'object' && 'layout' in options
-    ? (options as { layout?: string }).layout
-    : undefined;
-};
+const getField = (name: string) => getSchemaField(featureListSchema, name);
 
 type TCall = { method: string; args: unknown[] };
 
@@ -106,7 +76,7 @@ const createMockContext = (
 
 describe('featureListSchema brandVariant field', () => {
   it('offers the full brand variant list', () => {
-    expect(getOptionValues(getField('brandVariant'))).toEqual([
+    expect(getFieldOptionValues(getField('brandVariant'))).toEqual([
       ...FULL_BRAND_VARIANT_LIST,
     ]);
   });
@@ -142,8 +112,10 @@ describe('featureListSchema imageShape field', () => {
   it('offers every CARD_IMAGE_SHAPE value as a dropdown, defaulting to ICON', () => {
     const field = getField('imageShape');
 
-    expect(getOptionValues(field)).toEqual(Object.values(CARD_IMAGE_SHAPE));
-    expect(getOptionsLayout(field)).toBe('dropdown');
+    expect(getFieldOptionValues(field)).toEqual(
+      Object.values(CARD_IMAGE_SHAPE),
+    );
+    expect(getFieldOptionsLayout(field)).toBe('dropdown');
     expect(field.initialValue).toBe(CARD_IMAGE_SHAPE.ICON);
   });
 
@@ -193,11 +165,11 @@ describe('featureListSchema cardAlignment field', () => {
   it('offers only LEFT and CENTER as a dropdown, defaulting to LEFT', () => {
     const field = getField('cardAlignment');
 
-    expect(getOptionValues(field)).toEqual([
+    expect(getFieldOptionValues(field)).toEqual([
       CONTENT_ALIGNMENT.LEFT,
       CONTENT_ALIGNMENT.CENTER,
     ]);
-    expect(getOptionsLayout(field)).toBe('dropdown');
+    expect(getFieldOptionsLayout(field)).toBe('dropdown');
     expect(field.initialValue).toBe(CONTENT_ALIGNMENT.LEFT);
   });
 

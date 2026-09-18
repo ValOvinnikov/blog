@@ -2,35 +2,10 @@ import { FEATURE_ICONS } from '@blog/config/constants';
 import { featureBlockSchema } from '@blog/studio/schema-types/documents/blocks/feature/feature';
 import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
+import { getFieldOptionValues } from '@blog/studio/testing/get-field-options';
+import { getSchemaField } from '@blog/studio/testing/get-schema-field';
 
-const getField = (name: string) => {
-  const field = featureBlockSchema.fields.find(
-    (field): field is typeof field & { name: string } =>
-      'name' in field && field.name === name,
-  );
-
-  if (!field) {
-    throw new Error(`Expected featureBlockSchema to define a "${name}" field.`);
-  }
-
-  return field;
-};
-
-const getOptionValues = (field: { options?: unknown }) => {
-  const options = field.options;
-  const list =
-    options && typeof options === 'object' && 'list' in options
-      ? (options as { list: unknown }).list
-      : undefined;
-
-  if (!list) {
-    throw new Error('Expected field to define an options.list.');
-  }
-
-  return (list as { title: string; value: string }[]).map(
-    (option) => option.value,
-  );
-};
+const getField = (name: string) => getSchemaField(featureBlockSchema, name);
 
 describe('featureBlockSchema title field', () => {
   it('is required', () => {
@@ -68,7 +43,7 @@ describe('featureBlockSchema icon field', () => {
   it('offers every FEATURE_ICONS value, and stays optional', () => {
     const field = getField('icon');
 
-    expect(getOptionValues(field)).toEqual([...FEATURE_ICONS]);
+    expect(getFieldOptionValues(field)).toEqual([...FEATURE_ICONS]);
     expect(field.validation).toBeUndefined();
   });
 });
