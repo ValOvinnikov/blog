@@ -76,7 +76,7 @@ describe('tagPageSchema shape', () => {
     expect(getField('postList')).toBeUndefined();
   });
 
-  it('modules allows module_postList, module_postLatest, module_cta, and module_newsletter', () => {
+  it('modules allows module_postList, module_postLatest, module_cta, module_newsletter, and module_taxonomyList', () => {
     const modulesField = getField('modules') as
       TArrayFieldDefinition | undefined;
 
@@ -89,6 +89,7 @@ describe('tagPageSchema shape', () => {
       'module_postLatest',
       'module_cta',
       'module_newsletter',
+      'module_taxonomyList',
     ]);
   });
 

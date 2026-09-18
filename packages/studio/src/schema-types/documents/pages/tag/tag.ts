@@ -10,6 +10,7 @@ import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
+import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
 import {
@@ -82,6 +83,7 @@ export const tagPageSchema = defineType({
         postLatestSchema.name,
         ctaSchema.name,
         newsletterSchema.name,
+        taxonomyListSchema.name,
       ],
     }),
     seoField(),

@@ -1,5 +1,4 @@
 import { homePageSchema } from '@blog/studio/schema-types/documents/pages/home/home';
-import { heroSchema } from '@blog/studio/schema-types/modules/hero/hero';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import { heroStatementSchema } from '@blog/studio/schema-types/modules/hero-statement/hero-statement';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
@@ -113,7 +112,7 @@ describe('homePageSchema field order', () => {
 });
 
 describe('homePageSchema hero field', () => {
-  it('is an optional reference to hero, heroBlog and heroStatement', () => {
+  it('is an optional reference to heroBlog and heroStatement', () => {
     const heroField = homePageSchema.fields?.find(
       (field) => field.name === 'hero',
     ) as
@@ -126,7 +125,6 @@ describe('homePageSchema hero field', () => {
 
     expect(heroField.type).toBe('reference');
     expect(heroField.to?.map((entry) => entry.type)).toEqual([
-      heroSchema.name,
       heroBlogSchema.name,
       heroStatementSchema.name,
     ]);

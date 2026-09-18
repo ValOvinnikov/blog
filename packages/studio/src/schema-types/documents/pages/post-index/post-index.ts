@@ -7,6 +7,7 @@ import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
+import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
 import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/validation/validate-single-blank-heading-per-type/validate-single-blank-heading-per-type';
@@ -75,6 +76,7 @@ export const postIndexPageSchema = defineType({
         ctaSchema.name,
         newsletterSchema.name,
         postFeaturedSchema.name,
+        taxonomyListSchema.name,
       ],
       validateCustom: (rule) =>
         rule.custom(

@@ -4,7 +4,6 @@ import { modulesField } from '@blog/studio/schema-types/fields/modules-field/mod
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
-import { heroSchema } from '@blog/studio/schema-types/modules/hero/hero';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import { heroStatementSchema } from '@blog/studio/schema-types/modules/hero-statement/hero-statement';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
@@ -40,7 +39,7 @@ export const homePageSchema = defineType({
     titleField(),
     headingBlockField(),
     heroField({
-      allow: [heroSchema.name, heroBlogSchema.name, heroStatementSchema.name],
+      allow: [heroBlogSchema.name, heroStatementSchema.name],
     }),
     modulesField({
       allow: [

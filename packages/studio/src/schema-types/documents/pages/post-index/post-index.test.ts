@@ -78,7 +78,7 @@ describe('postIndexPageSchema hero field', () => {
 });
 
 describe('postIndexPageSchema modules allow-list', () => {
-  it('permits module_postList, module_cta, module_newsletter and module_postFeatured', () => {
+  it('permits module_postList, module_cta, module_newsletter, module_postFeatured and module_taxonomyList', () => {
     const modulesField = postIndexPageSchema.fields?.find(
       (field) => field.name === 'modules',
     ) as TArrayFieldDefinition | undefined;
@@ -96,6 +96,7 @@ describe('postIndexPageSchema modules allow-list', () => {
       'module_cta',
       'module_newsletter',
       'module_postFeatured',
+      'module_taxonomyList',
     ]);
   });
 });
