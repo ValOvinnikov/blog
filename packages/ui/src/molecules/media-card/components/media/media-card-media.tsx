@@ -8,17 +8,8 @@ import {
 
 export type TMediaCardMediaProps = IWithClassName &
   IWithDataTestId & {
-    /** Set by `MediaCard` on lead cards — swaps the default 16:9 frame for a taller 4:3 one. */
     isLead?: TMediaCardMediaVariants['isLead'];
-    /**
-     * `wide` and `square` fill the card edge to edge; `circle` and `icon`
-     * are inset tiles sized to their content instead.
-     */
     shape?: TMediaCardMediaVariants['shape'];
-    /**
-     * Set by `MediaCard` when the card is center-aligned — centres an inset
-     * `circle`/`icon` frame instead of hugging the card's left edge.
-     */
     align?: TMediaCardMediaVariants['align'];
     children?: ReactNode;
   };

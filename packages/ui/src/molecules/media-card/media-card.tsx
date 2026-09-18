@@ -38,20 +38,8 @@ export type TMediaCardProps = IWithClassName &
   IWithDataTestId & {
     excerpt?: string;
     tags?: string[];
-    /**
-     * From `md`, lays the media and copy side by side (media first) in an
-     * equal 1:1 split; below `md` the layout is unchanged (media stacked
-     * above copy). Has no effect without a `MediaCard.Media` slot — the copy
-     * stays full-width.
-     */
     isSplit?: TMediaCardVariants['isSplit'];
-    /**
-     * Renders the title at display size, clamps the excerpt to three lines
-     * instead of two, and gives the media a taller frame — for a single
-     * editor-pinned spotlight card.
-     */
     isLead?: TMediaCardVariants['isLead'];
-    /** Centres every row of the card — media, meta, title, excerpt, tags and footer. */
     align?: TMediaCardVariants['align'];
     children?: TCompoundChildren<typeof MediaCardParts>;
   };
