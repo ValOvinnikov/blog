@@ -4,17 +4,17 @@ import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
 import { headingBlockSchema } from '@blog/studio/schema-types/objects/heading-block/heading-block';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { getCustomValidatorWithLevel } from '@blog/studio/testing/create-mock-validation-rule';
-import { getFieldOptionValues } from '@blog/studio/testing/get-field-options';
-import { getSchemaField } from '@blog/studio/testing/get-schema-field';
+import { getField } from '@blog/studio/testing/get-field';
+import { getOptionValues } from '@blog/studio/testing/get-field-option-values';
 import type { SanityDocument } from 'sanity';
 
-const getField = (name: string) => getSchemaField(featureBlockSchema, name);
+const getFeatureField = (name: string) => getField(featureBlockSchema, name);
 
 type TDocFn = (document: SanityDocument | undefined) => string | true;
 
 describe('featureBlockSchema title field', () => {
   it('is required', () => {
-    const field = getField('title');
+    const field = getFeatureField('title');
 
     if (typeof field.validation !== 'function') {
       throw new Error('Expected title field to define validation.');
@@ -37,7 +37,7 @@ describe('featureBlockSchema title field', () => {
 
 describe('featureBlockSchema headingBlock field', () => {
   it('is a required headingBlock field', () => {
-    const field = getField('headingBlock');
+    const field = getFeatureField('headingBlock');
 
     expect(field.type).toBe(headingBlockSchema.name);
 
@@ -62,16 +62,16 @@ describe('featureBlockSchema headingBlock field', () => {
 
 describe('featureBlockSchema icon field', () => {
   it('offers every FEATURE_ICONS value, and stays optional', () => {
-    const field = getField('icon');
+    const field = getFeatureField('icon');
 
-    expect(getFieldOptionValues(field)).toEqual([...FEATURE_ICONS]);
+    expect(getOptionValues(field)).toEqual([...FEATURE_ICONS]);
     expect(field.validation).toBeUndefined();
   });
 });
 
 describe('featureBlockSchema image field', () => {
   it('is an imageWithAlt field, and stays optional', () => {
-    const field = getField('image');
+    const field = getFeatureField('image');
 
     expect(field.type).toBe(imageWithAltSchema.name);
     expect(field.validation).toBeUndefined();
@@ -80,7 +80,7 @@ describe('featureBlockSchema image field', () => {
 
 describe('featureBlockSchema link field', () => {
   it('references only the link document, and stays optional', () => {
-    const field = getField('link') as {
+    const field = getFeatureField('link') as {
       type: string;
       to?: { type: string }[];
       validation?: unknown;

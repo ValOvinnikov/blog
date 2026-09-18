@@ -6,18 +6,16 @@ import {
   FULL_BRAND_VARIANT_LIST,
 } from '@blog/config/constants';
 import { featureListSchema } from '@blog/studio/schema-types/modules/feature-list/feature-list';
-import {
-  getFieldOptionsLayout,
-  getFieldOptionValues,
-} from '@blog/studio/testing/get-field-options';
-import { getSchemaField } from '@blog/studio/testing/get-schema-field';
+import { getField } from '@blog/studio/testing/get-field';
+import { getLayout } from '@blog/studio/testing/get-field-layout';
+import { getOptionValues } from '@blog/studio/testing/get-field-option-values';
 
-const getField = (name: string) => getSchemaField(featureListSchema, name);
+const getFeatureListField = (name: string) => getField(featureListSchema, name);
 
 type TCall = { method: string; args: unknown[] };
 
 const getFeaturesValidatorCalls = (): TCall[] => {
-  const field = getField('features');
+  const field = getFeatureListField('features');
 
   if (typeof field.validation !== 'function') {
     throw new Error('Expected features field to define validation.');
@@ -51,9 +49,9 @@ const getFeaturesValidatorCalls = (): TCall[] => {
 
 describe('featureListSchema brandVariant field', () => {
   it('offers the full brand variant list, defaulting to PRIMARY', () => {
-    const field = getField('brandVariant');
+    const field = getFeatureListField('brandVariant');
 
-    expect(getFieldOptionValues(field)).toEqual([...FULL_BRAND_VARIANT_LIST]);
+    expect(getOptionValues(field)).toEqual([...FULL_BRAND_VARIANT_LIST]);
     expect(field.initialValue).toBe(BRAND_VARIANT.PRIMARY);
   });
 });
@@ -76,7 +74,7 @@ describe('featureListSchema features field', () => {
   });
 
   it('only accepts block_feature references', () => {
-    const field = getField('features') as {
+    const field = getFeatureListField('features') as {
       of?: { to?: { type: string }[] }[];
     };
 
@@ -86,17 +84,15 @@ describe('featureListSchema features field', () => {
 
 describe('featureListSchema imageShape field', () => {
   it('offers every CARD_IMAGE_SHAPE value as a dropdown, defaulting to WIDE', () => {
-    const field = getField('imageShape');
+    const field = getFeatureListField('imageShape');
 
-    expect(getFieldOptionValues(field)).toEqual(
-      Object.values(CARD_IMAGE_SHAPE),
-    );
-    expect(getFieldOptionsLayout(field)).toBe('dropdown');
+    expect(getOptionValues(field)).toEqual(Object.values(CARD_IMAGE_SHAPE));
+    expect(getLayout(field)).toBe('dropdown');
     expect(field.initialValue).toBe(CARD_IMAGE_SHAPE.WIDE);
   });
 
   it('is required', () => {
-    const field = getField('imageShape');
+    const field = getFeatureListField('imageShape');
 
     if (typeof field.validation !== 'function') {
       throw new Error('Expected imageShape field to define validation.');
@@ -131,24 +127,26 @@ describe('featureListSchema displayMode field', () => {
   });
 
   it('defaults to GRID', () => {
-    expect(getField('displayMode').initialValue).toBe(DISPLAY_MODE.GRID);
+    expect(getFeatureListField('displayMode').initialValue).toBe(
+      DISPLAY_MODE.GRID,
+    );
   });
 });
 
 describe('featureListSchema cardAlignment field', () => {
   it('offers only LEFT and CENTER as a dropdown, defaulting to LEFT', () => {
-    const field = getField('cardAlignment');
+    const field = getFeatureListField('cardAlignment');
 
-    expect(getFieldOptionValues(field)).toEqual([
+    expect(getOptionValues(field)).toEqual([
       CONTENT_ALIGNMENT.LEFT,
       CONTENT_ALIGNMENT.CENTER,
     ]);
-    expect(getFieldOptionsLayout(field)).toBe('dropdown');
+    expect(getLayout(field)).toBe('dropdown');
     expect(field.initialValue).toBe(CONTENT_ALIGNMENT.LEFT);
   });
 
   it('is required', () => {
-    const field = getField('cardAlignment');
+    const field = getFeatureListField('cardAlignment');
 
     if (typeof field.validation !== 'function') {
       throw new Error('Expected cardAlignment field to define validation.');
