@@ -26,4 +26,17 @@ describe('displayModeField', () => {
 
     expect(field.validation).toBeUndefined();
   });
+
+  it('defaults the description to the posts wording', () => {
+    expect(displayModeField().description).toBe(
+      'Grid lays the posts out in rows. Carousel puts them in a single row the reader can swipe or step through.',
+    );
+  });
+
+  it('uses a supplied description over the default', () => {
+    expect(
+      displayModeField({ description: 'Grid lays the cards out in rows.' })
+        .description,
+    ).toBe('Grid lays the cards out in rows.');
+  });
 });

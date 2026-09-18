@@ -101,7 +101,10 @@ export const featureListSchema = defineType({
           .error('A features section holds at most eight feature cards.'),
     }),
     ctaButtonsField(),
-    showImagesField(),
+    showImagesField({
+      description:
+        "Show each card's icon or image, per the shape chosen below.",
+    }),
     defineField({
       name: 'imageShape',
       title: 'Image Shape',
@@ -118,7 +121,10 @@ export const featureListSchema = defineType({
       initialValue: CARD_IMAGE_SHAPE.ICON,
       validation: (rule) => rule.required(),
     }),
-    displayModeField(),
+    displayModeField({
+      description:
+        'Grid lays the cards out in rows. Carousel puts them in a single row the reader can swipe or step through.',
+    }),
     ...alignmentFields([], {
       description:
         'Horizontal alignment of the heading, supporting text and actions. Cards have their own alignment.',
