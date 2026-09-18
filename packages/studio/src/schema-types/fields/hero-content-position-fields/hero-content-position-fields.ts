@@ -1,7 +1,7 @@
 import { CONTENT_ALIGNMENT, HERO_VARIANT } from '@blog/config/constants';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
-import { HERO_FIELDSET_CONTENT_POSITION } from '@blog/studio/schema-types/fields/hero-fieldsets/hero-fieldsets';
-import { isNotHeroVariant } from '@blog/studio/schema-types/fields/hero-variant-predicate/hero-variant-predicate';
+import { isNotHeroVariant } from '@blog/studio/schema-types/fields/hero-variant-field/hero-variant-predicate';
+import { HERO_FIELDSET_CONTENT_POSITION } from '@blog/studio/schema-types/modules/hero-fieldsets/hero-fieldsets';
 
 export const heroContentPositionFields = () =>
   alignmentFields(

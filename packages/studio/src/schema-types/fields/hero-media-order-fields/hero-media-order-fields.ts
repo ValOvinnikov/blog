@@ -1,5 +1,5 @@
 import { HERO_VARIANT, MEDIA_ORDER } from '@blog/config/constants';
-import { isNotHeroVariant } from '@blog/studio/schema-types/fields/hero-variant-predicate/hero-variant-predicate';
+import { isNotHeroVariant } from '@blog/studio/schema-types/fields/hero-variant-field/hero-variant-predicate';
 import { toTitleCase } from '@blog/utils/primitives';
 import { defineField } from 'sanity';
 
