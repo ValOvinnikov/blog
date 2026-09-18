@@ -9,8 +9,11 @@ import { CtaModule } from '@web/modules/cta/cta-module';
 import { HeroModule } from '@web/modules/hero/hero-module';
 import { HeroBlogModule } from '@web/modules/hero-blog/hero-blog-module';
 import { HeroStatementModule } from '@web/modules/hero-statement/hero-statement-module';
-import type { TModuleComponent } from '@web/modules/module-map';
-import { renderHeroModule, renderModules } from '@web/modules/module-renderer';
+import {
+  renderHeroModule,
+  renderModules,
+  type TModuleComponent,
+} from '@web/modules/module-renderer';
 import { NewsletterModule } from '@web/modules/newsletter/newsletter-module';
 import { PostLatestModule } from '@web/modules/post-latest/post-latest-module';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
