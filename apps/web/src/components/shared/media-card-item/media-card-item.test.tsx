@@ -55,7 +55,7 @@ describe(`<${MediaCardItem.name}/>`, () => {
   it('renders no media region when hasImage is omitted', () => {
     renderElement(<MediaCardItem item={item} />);
 
-    expect(screen.queryByTestId('post-card-media')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('media-card-media')).not.toBeInTheDocument();
   });
 
   it('renders the pre-rendered image node inside MediaCard.Media when hasImage is true', () => {
@@ -66,7 +66,7 @@ describe(`<${MediaCardItem.name}/>`, () => {
       />,
     );
 
-    expect(screen.getByTestId('post-card-media')).toBeInTheDocument();
+    expect(screen.getByTestId('media-card-media')).toBeInTheDocument();
     expect(screen.getByTestId('post-image')).toBeInTheDocument();
   });
 

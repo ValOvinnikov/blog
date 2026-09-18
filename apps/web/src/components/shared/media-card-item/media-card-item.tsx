@@ -56,7 +56,7 @@ export const MediaCardItem = ({
     dataTestId={dataTestId}
   >
     {hasImage && (
-      <MediaCard.Media dataTestId="post-card-media">
+      <MediaCard.Media dataTestId="media-card-media">
         {item.image}
       </MediaCard.Media>
     )}
@@ -76,7 +76,7 @@ export const MediaCardItem = ({
         <Icon
           name={ICONS.ARROW}
           size={SIZE.SM}
-          dataTestId="post-card-footer-arrow"
+          dataTestId="media-card-footer-arrow"
         />
       }
     />

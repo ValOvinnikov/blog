@@ -165,13 +165,13 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
   it('renders no media region when hasImages is not given', () => {
     setup();
 
-    expect(screen.queryByTestId('post-card-media')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('media-card-media')).not.toBeInTheDocument();
   });
 
   it('renders a media region for the lead card when hasImages is true', () => {
     setup({ hasImages: true });
 
-    expect(screen.getByTestId('post-card-media')).toBeInTheDocument();
+    expect(screen.getByTestId('media-card-media')).toBeInTheDocument();
     expect(screen.getByTestId('lead-image')).toBeInTheDocument();
   });
 

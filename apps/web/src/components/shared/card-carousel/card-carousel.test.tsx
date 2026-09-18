@@ -111,7 +111,7 @@ describe(`<${CardCarousel.name}/>`, () => {
 
     renderElement(<>{renderItem({ item: itemsWithImages[0], index: 0 })}</>);
 
-    expect(screen.getByTestId('post-card-media')).toBeInTheDocument();
+    expect(screen.getByTestId('media-card-media')).toBeInTheDocument();
     expect(screen.getByTestId('image-1')).toBeInTheDocument();
   });
 
@@ -121,7 +121,7 @@ describe(`<${CardCarousel.name}/>`, () => {
 
     renderElement(<>{renderItem({ item: items[0], index: 0 })}</>);
 
-    expect(screen.getByTestId('post-card-media')).toBeEmptyDOMElement();
+    expect(screen.getByTestId('media-card-media')).toBeEmptyDOMElement();
   });
 
   it('renderItem renders no media region when hasImages is omitted', () => {
@@ -130,6 +130,6 @@ describe(`<${CardCarousel.name}/>`, () => {
 
     renderElement(<>{renderItem({ item: items[0], index: 0 })}</>);
 
-    expect(screen.queryByTestId('post-card-media')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('media-card-media')).not.toBeInTheDocument();
   });
 });

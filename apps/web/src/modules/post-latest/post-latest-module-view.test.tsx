@@ -77,7 +77,7 @@ describe(`<${PostLatestModuleView.name}/>`, () => {
   it('renders no media region when hasImages is not given', () => {
     setup();
 
-    expect(screen.queryByTestId('post-card-media')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('media-card-media')).not.toBeInTheDocument();
   });
 
   it('renders a media region for each item when hasImages is true', () => {
@@ -86,7 +86,7 @@ describe(`<${PostLatestModuleView.name}/>`, () => {
       items: [{ ...post, image: <div data-testid="post-image" /> }],
     });
 
-    expect(screen.getByTestId('post-card-media')).toBeInTheDocument();
+    expect(screen.getByTestId('media-card-media')).toBeInTheDocument();
     expect(screen.getByTestId('post-image')).toBeInTheDocument();
   });
 
