@@ -12,7 +12,9 @@ export type TRawFeatureListModule = InferResultType<
   typeof featureListModuleQuery
 >;
 
-export type TRawFeatureListItem = TRawFeatureListModule['features'][number];
+export type TRawFeatureListItem = NonNullable<
+  TRawFeatureListModule['features']
+>[number];
 
 function toFeatureListItem(raw: TRawFeatureListItem): TFeatureListItem {
   return {
@@ -24,13 +26,23 @@ function toFeatureListItem(raw: TRawFeatureListItem): TFeatureListItem {
   };
 }
 
+// Mirrors the schema's own `min(2)` cards rule — an absent `features` field
+// degrades to an empty list rather than failing the whole module.
+function toFeatureListItems(
+  raw: TRawFeatureListModule['features'],
+): TFeatureListItem[] {
+  if (!raw || raw.length === 0) return [];
+
+  return raw.map(toFeatureListItem);
+}
+
 export function toFeatureListModule(
   raw: TRawFeatureListModule,
 ): TFeatureListModule {
   return {
     brandVariant: raw.brandVariant,
     headingBlock: toHeadingBlock(raw.headingBlock),
-    items: raw.features.map(toFeatureListItem),
+    items: toFeatureListItems(raw.features),
     ctaButtons: toCtaButtons(raw.ctaButtons),
     imageShape: raw.imageShape,
     displayMode: raw.displayMode,

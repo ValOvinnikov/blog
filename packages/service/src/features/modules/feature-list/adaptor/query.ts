@@ -40,7 +40,7 @@ export const featureListModuleQuery = q
           .project(linkDocumentFragment)
           .nullable(true),
       }))
-      .notNull(),
+      .nullable(true),
     ctaButtons: sub
       .field('ctaButtons[]')
       .project(ctaButtonFragment)

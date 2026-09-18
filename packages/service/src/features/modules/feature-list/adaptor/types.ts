@@ -28,6 +28,6 @@ export type TFeatureListModule = {
   imageShape: TCardImageShape;
   displayMode: TDisplayMode;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
-  cardAlignment: TContentAlignment;
+  cardAlignment: Extract<TContentAlignment, 'LEFT' | 'CENTER'>;
   layout: TMaybeUndefined<TLayout>;
 };

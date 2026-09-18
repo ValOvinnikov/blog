@@ -37,6 +37,14 @@ describe(getFeatureList, () => {
     ]);
   });
 
+  it('resolves with an empty items array rather than throwing when features is unset', async () => {
+    mockRun.mockResolvedValueOnce(makeRawFeatureListModule({ features: null }));
+
+    const featureList = await getFeatureList('feature-list-1', tenant);
+
+    expect(featureList.items).toEqual([]);
+  });
+
   it('propagates when the module document is missing', async () => {
     mockRun.mockRejectedValueOnce(new Error('ValidationError'));
 

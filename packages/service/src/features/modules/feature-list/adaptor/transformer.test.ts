@@ -56,6 +56,14 @@ describe('toFeatureListModule', () => {
     expect(module.items.map((item) => item.id)).toEqual(['card-b', 'card-a']);
   });
 
+  it('degrades to an empty items array when features is unset (no throw)', () => {
+    const raw = makeRawFeatureListModule({ features: null });
+
+    const module = toFeatureListModule(raw);
+
+    expect(module.items).toEqual([]);
+  });
+
   it('maps a card with only an icon, leaving sanityImage undefined', () => {
     const raw = makeRawFeatureListModule({
       features: [makeRawFeatureListItem({ icon: 'ROCKET', image: null })],
