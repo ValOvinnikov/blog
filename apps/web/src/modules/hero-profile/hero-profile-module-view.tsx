@@ -25,10 +25,8 @@ export interface IHeroProfileModuleViewProps extends Omit<
 /**
  * Pure view for `HeroProfileModule` — the web-side wiring the `@blog/ui`
  * `Hero` organism can't own itself: the `Section` full-bleed landmark, the
- * photo's placement per variant (a `SanityImage` when one resolves, an
- * `Avatar` initials badge when it doesn't), the authored `ctaButtons` via
- * `ActionGroup`, and the labelled `<ul>` `Hero.Social` no longer builds
- * itself.
+ * `SanityImage`/`Avatar` bridge, and the authored `ctaButtons` via
+ * `ActionGroup`.
  */
 export const HeroProfileModuleView = ({
   id,

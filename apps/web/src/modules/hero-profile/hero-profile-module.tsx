@@ -13,8 +13,8 @@ export interface IHeroProfileModuleProps {
 }
 
 /**
- * HeroProfileModule — fetches `module_heroProfile` data, resolves the social
- * links list into `<li>` items, and hands both to `HeroProfileModuleView`.
+ * HeroProfileModule — fetches `module_heroProfile` data and hands it to
+ * `HeroProfileModuleView`.
  */
 export const HeroProfileModule = async ({
   id,
