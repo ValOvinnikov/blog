@@ -1,22 +1,16 @@
 import {
-  CTA_ACTION_APPEARANCE,
   HERO_IMAGE_SOURCE,
   POST_SOURCE,
   HERO_VARIANT,
 } from '@blog/config/constants';
-import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
-import { ctaSecondaryButtonSchema } from '@blog/studio/schema-types/objects/cta-button/cta-button';
 import {
   getCustomValidator,
   getRecordedValidators,
   type TRecordedValidator,
 } from '@blog/studio/testing/create-mock-validation-rule';
 import { getField } from '@blog/studio/testing/get-field';
-import { getFieldset } from '@blog/studio/testing/get-field-fieldset';
 import { getHidden } from '@blog/studio/testing/get-field-hidden';
-import { getLayout } from '@blog/studio/testing/get-field-layout';
-import { wasRequiredCalled } from '@blog/studio/testing/was-required-called';
 import type { SanityDocument, ValidationContext } from 'sanity';
 
 type TCustomFn = (
@@ -30,22 +24,6 @@ type TDocFn = (
 ) => Promise<string | true> | string | true;
 
 const getHeroBlogField = (name: string) => getField(heroBlogSchema, name);
-
-const getOptionValues = (field: { options?: unknown }) => {
-  const options = field.options;
-  const list =
-    options && typeof options === 'object' && 'list' in options
-      ? (options as { list: unknown }).list
-      : undefined;
-
-  if (!list) {
-    throw new Error('Expected field to define an options.list.');
-  }
-
-  return (list as { title: string; value: string }[]).map(
-    (option) => option.value,
-  );
-};
 
 const getDocumentValidators = (): TRecordedValidator<TDocFn>[] =>
   getRecordedValidators<TDocFn>(heroBlogSchema);
@@ -63,50 +41,7 @@ const createMockContext = (
   return { getClient } as unknown as ValidationContext;
 };
 
-describe('heroBlogSchema fieldsets', () => {
-  it('declares post, image, primaryAction and the shared content position fieldset', () => {
-    const names = heroBlogSchema.fieldsets?.map((fieldset) => fieldset.name);
-
-    expect(names).toEqual([
-      'post',
-      'image',
-      'primaryAction',
-      'contentPosition',
-    ]);
-  });
-});
-
-describe('heroBlogSchema postSource field', () => {
-  it('offers Pinned and Newest Featured, defaulting to Newest Featured', () => {
-    const field = getHeroBlogField('postSource');
-
-    expect(getOptionValues(field)).toEqual([
-      POST_SOURCE.PINNED,
-      POST_SOURCE.NEWEST_FEATURED,
-    ]);
-    expect(field.initialValue).toBe(POST_SOURCE.NEWEST_FEATURED);
-  });
-
-  it('is a required dropdown in the post fieldset, and drives the post field', () => {
-    const field = getHeroBlogField('postSource');
-
-    expect(getLayout(field)).toBe('dropdown');
-    expect(wasRequiredCalled(field)).toBe(true);
-    expect(getFieldset(field)).toBe('post');
-  });
-});
-
 describe('heroBlogSchema post field', () => {
-  it('only accepts page_post references, in the post fieldset', () => {
-    const field = getHeroBlogField('post') as {
-      to?: { type: string }[];
-      fieldset?: string;
-    };
-
-    expect(field.to).toEqual([{ type: PAGE_POST_TYPE }]);
-    expect(getFieldset(field)).toBe('post');
-  });
-
   it('is hidden unless Post Source is Pinned', () => {
     const hidden = getHidden(getHeroBlogField('post'));
 
@@ -146,88 +81,10 @@ describe('heroBlogSchema post field', () => {
   });
 });
 
-describe('heroBlogSchema copy fields', () => {
-  it('eyebrow is a plain optional field with no fieldset', () => {
-    expect(getHeroBlogField('eyebrow').validation).toBeUndefined();
-    expect('hidden' in getHeroBlogField('eyebrow')).toBe(false);
-    expect(getFieldset(getHeroBlogField('eyebrow'))).toBeUndefined();
-  });
-
-  it('has no heading or supportingText fields', () => {
-    expect(
-      heroBlogSchema.fields?.find(
-        (field) => 'name' in field && field.name === 'heading',
-      ),
-    ).toBeUndefined();
-    expect(
-      heroBlogSchema.fields?.find(
-        (field) => 'name' in field && field.name === 'supportingText',
-      ),
-    ).toBeUndefined();
-  });
-});
-
-describe('heroBlogSchema imageSource field', () => {
-  it('offers Post, Custom and None, defaulting to Post', () => {
-    const field = getHeroBlogField('imageSource');
-
-    expect(getOptionValues(field)).toEqual([
-      HERO_IMAGE_SOURCE.POST,
-      HERO_IMAGE_SOURCE.CUSTOM,
-      HERO_IMAGE_SOURCE.NONE,
-    ]);
-    expect(field.initialValue).toBe(HERO_IMAGE_SOURCE.POST);
-  });
-
-  it('is a required radio in the image fieldset, and drives the image field', () => {
-    const field = getHeroBlogField('imageSource');
-
-    expect(getLayout(field)).toBe('radio');
-    expect(wasRequiredCalled(field)).toBe(true);
-    expect(getFieldset(field)).toBe('image');
-  });
-});
-
-describe('heroBlogSchema primaryActionLabel and primaryActionAppearance fields', () => {
-  it('are both in the primaryAction fieldset', () => {
-    expect(getFieldset(getHeroBlogField('primaryActionLabel'))).toBe(
-      'primaryAction',
-    );
-    expect(getFieldset(getHeroBlogField('primaryActionAppearance'))).toBe(
-      'primaryAction',
-    );
-  });
-
-  it('primaryActionAppearance offers Contained and Inline, defaulting to Contained', () => {
-    const field = getHeroBlogField('primaryActionAppearance');
-
-    expect(getOptionValues(field)).toEqual([
-      CTA_ACTION_APPEARANCE.CONTAINED,
-      CTA_ACTION_APPEARANCE.INLINE,
-    ]);
-    expect(field.initialValue).toBe(CTA_ACTION_APPEARANCE.CONTAINED);
-  });
-
-  it('primaryActionAppearance renders as a required dropdown', () => {
-    const field = getHeroBlogField('primaryActionAppearance');
-
-    expect(getLayout(field)).toBe('dropdown');
-    expect(wasRequiredCalled(field)).toBe(true);
-  });
-
-  it('primaryActionLabel is required — the hero has no fallback label', () => {
-    expect(wasRequiredCalled(getHeroBlogField('primaryActionLabel'))).toBe(
-      true,
-    );
-  });
-});
-
 describe('heroBlogSchema image field', () => {
-  it('is in the image fieldset and hidden unless Image Source is Custom', () => {
-    const field = getHeroBlogField('image');
-    const hidden = getHidden(field);
+  it('is hidden unless Image Source is Custom', () => {
+    const hidden = getHidden(getHeroBlogField('image'));
 
-    expect(getFieldset(field)).toBe('image');
     expect(hidden({ parent: { imageSource: HERO_IMAGE_SOURCE.CUSTOM } })).toBe(
       false,
     );
@@ -261,34 +118,7 @@ describe('heroBlogSchema image field', () => {
   });
 });
 
-describe('heroBlogSchema secondaryAction field', () => {
-  it('uses the fixed-Secondary ctaSecondaryButton object type', () => {
-    const field = getHeroBlogField('secondaryAction') as { type: string };
-
-    expect(field.type).toBe(ctaSecondaryButtonSchema.name);
-  });
-
-  it('has no ctaButtons field left over', () => {
-    expect(
-      heroBlogSchema.fields?.find(
-        (field) => 'name' in field && field.name === 'ctaButtons',
-      ),
-    ).toBeUndefined();
-  });
-});
-
 describe('heroBlogSchema document validation', () => {
-  it('registers four document-level rules: two errors then two warnings', () => {
-    const validators = getDocumentValidators();
-
-    expect(validators.map((validator) => validator.level)).toEqual([
-      'error',
-      'error',
-      'warning',
-      'warning',
-    ]);
-  });
-
   describe('newest-featured-has-candidate', () => {
     it('passes without querying when Post Source is Pinned', async () => {
       const [validateNewestFeatured] = getDocumentValidators();

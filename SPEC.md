@@ -362,9 +362,9 @@ own dedicated schema, unrelated to this shared shape.
 hand-listed, so a new hero kind joins the union the day its schema lands and
 drops out the day it is deleted. A page's own map covers both its `hero` slot
 and its `modules[]`, so nothing needs to subtract slot-only kinds from a
-wider set. The studio's equivalent guard is
-`HERO_SCHEMA_TYPES`, the registry of every hero schema, with a test
-asserting every registered `module_hero*` schema appears in it.
+wider set. The studio keeps no hero registry of its own: every hero schema
+is registered in `modules` like any other module, and the pages name the
+kinds they accept.
 
 **A page accepts only the hero kinds it names.** `heroField({ allow })`
 takes an explicit list per page, the way `modulesField({ allow })` already
@@ -374,8 +374,8 @@ does, so the registry is no longer what a page's `hero` `to:` points at.
 `page_tag`, `page_topic`, `page_tagIndex` and `page_topicIndex` accept Blog
 only — a statement hero belongs on a marketing page, not an archive.
 `page_post` has no `hero` field at all. The deprecated `module_hero` is
-named by no page: its schema stays registered in `HERO_SCHEMA_TYPES` until
-#2813 retires it, but no picker offers it. Narrowing a page is what turns a
+named by no page: its schema stays registered in `modules` until #2813
+retires it, but no picker offers it. Narrowing a page is what turns a
 surplus entry in its `apps/web` module map from dead code into a
 `type-check` error.
 

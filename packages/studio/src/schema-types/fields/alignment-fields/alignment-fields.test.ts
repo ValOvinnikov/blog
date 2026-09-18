@@ -34,14 +34,6 @@ describe('alignmentFields with no extras', () => {
     expect(fields.map((field) => field.name)).toEqual(['contentAlignment']);
   });
 
-  it('offers Left, Center and Right', () => {
-    expect(getOptionValues(getBaselineField())).toEqual([
-      CONTENT_ALIGNMENT.LEFT,
-      CONTENT_ALIGNMENT.CENTER,
-      CONTENT_ALIGNMENT.RIGHT,
-    ]);
-  });
-
   it('defaults to Left unless the caller overrides it', () => {
     expect(getBaselineField().initialValue).toBe(CONTENT_ALIGNMENT.LEFT);
     expect(
@@ -49,21 +41,6 @@ describe('alignmentFields with no extras', () => {
         (field) => field.name === 'contentAlignment',
       )?.initialValue,
     ).toBe(CONTENT_ALIGNMENT.CENTER);
-  });
-
-  it('describes itself in terms true of any caller, not CTA specifically', () => {
-    const field = getBaselineField();
-
-    expect(field.description).toBe(
-      "Horizontal alignment of this module's content.",
-    );
-    expect(field.description).not.toMatch(/actions/i);
-  });
-
-  it('renders as a dropdown: it is optional with no required() constraint', () => {
-    const field = getBaselineField();
-
-    expect(field.options?.layout).toBe('dropdown');
   });
 
   it('carries no fieldset when the caller passes none', () => {

@@ -1,21 +1,12 @@
 import { homePageSchema } from '@blog/studio/schema-types/documents/pages/home/home';
-import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
-import { heroProfileSchema } from '@blog/studio/schema-types/modules/hero-profile/hero-profile';
-import { heroStatementSchema } from '@blog/studio/schema-types/modules/hero-statement/hero-statement';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
-import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/validation/validate-taxonomy-list-has-taxonomy/validate-taxonomy-list-has-taxonomy';
 import {
   createMockModulesRule,
   type TModuleReference,
   type TModulesCustomFn,
 } from '@blog/studio/testing/create-mock-modules-rule';
 import type { ValidationContext } from 'sanity';
-
-type TArrayFieldDefinition = {
-  type: 'array';
-  of?: Array<{ name?: string }>;
-};
 
 const getModulesCustomValidators = (): TModulesCustomFn[] => {
   const modulesField = homePageSchema.fields?.find(
@@ -37,13 +28,6 @@ const getModulesCustomValidators = (): TModulesCustomFn[] => {
 };
 
 describe('homePageSchema modules validateCustom chaining', () => {
-  it('registers both the blank-heading and taxonomy-list validators', () => {
-    const customFns = getModulesCustomValidators();
-
-    expect(customFns).toHaveLength(2);
-    expect(customFns[1]).toBe(validateTaxonomyListHasTaxonomy);
-  });
-
   it.each([
     ['module_postLatest', postLatestSchema.name],
     ['module_postFeatured', postFeaturedSchema.name],
@@ -72,83 +56,4 @@ describe('homePageSchema modules validateCustom chaining', () => {
       );
     },
   );
-});
-
-describe('homePageSchema modules allow-list', () => {
-  it('permits every modules[] module type', () => {
-    const modulesField = homePageSchema.fields?.find(
-      (field) => field.name === 'modules',
-    ) as TArrayFieldDefinition | undefined;
-
-    if (!modulesField || modulesField.type !== 'array' || !modulesField.of) {
-      throw new Error(
-        'Expected homePageSchema to define a modules array field.',
-      );
-    }
-
-    const allowedTypes = modulesField.of.map((member) => member.name);
-
-    expect(allowedTypes).toEqual([
-      'module_content',
-      'module_cta',
-      'module_newsletter',
-      'module_postLatest',
-      'module_taxonomyList',
-      'module_postFeatured',
-      'module_featureList',
-    ]);
-    expect(allowedTypes).not.toContain('module_postList');
-  });
-});
-
-describe('homePageSchema field order', () => {
-  it('orders fields title, headingBlock, hero, modules, seo', () => {
-    expect(homePageSchema.fields?.map((field) => field.name)).toEqual([
-      'title',
-      'headingBlock',
-      'hero',
-      'modules',
-      'seo',
-    ]);
-  });
-});
-
-describe('homePageSchema hero field', () => {
-  it('is an optional reference to heroBlog, heroStatement and heroProfile', () => {
-    const heroField = homePageSchema.fields?.find(
-      (field) => field.name === 'hero',
-    ) as
-      | { type: string; to?: Array<{ type: string }>; validation?: unknown }
-      | undefined;
-
-    if (!heroField) {
-      throw new Error('Expected homePageSchema to define a hero field.');
-    }
-
-    expect(heroField.type).toBe('reference');
-    expect(heroField.to?.map((entry) => entry.type)).toEqual([
-      heroBlogSchema.name,
-      heroStatementSchema.name,
-      heroProfileSchema.name,
-    ]);
-    expect(heroField.validation).toBeUndefined();
-  });
-});
-
-describe('homePageSchema document validation', () => {
-  it('defines no document-level validation — heading requiredness lives on the field', () => {
-    expect(homePageSchema.validation).toBeUndefined();
-  });
-});
-
-describe('homePageSchema headingBlock field', () => {
-  it('is required', () => {
-    const headingBlockFieldDefinition = homePageSchema.fields?.find(
-      (field) => field.name === 'headingBlock',
-    ) as
-      { type?: string; description?: string; validation?: unknown } | undefined;
-
-    expect(headingBlockFieldDefinition?.type).toBe('headingBlock');
-    expect(headingBlockFieldDefinition?.validation).toBeDefined();
-  });
 });

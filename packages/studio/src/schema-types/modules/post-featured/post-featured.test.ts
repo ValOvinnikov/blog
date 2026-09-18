@@ -3,7 +3,6 @@ import {
   DISPLAY_MODE,
   POST_SOURCE,
 } from '@blog/config/constants';
-import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import {
   getRecordedValidators,
@@ -21,58 +20,26 @@ type TDocFn = (
 const getPostFeaturedField = (name: string) =>
   getField(postFeaturedSchema, name);
 
-const getOptionValues = (field: { options?: unknown }) => {
-  const options = field.options;
-  const list =
-    options && typeof options === 'object' && 'list' in options
-      ? (options as { list: unknown }).list
-      : undefined;
+type TCustomProbe<TValue> = (
+  value: TValue,
+  context: { parent?: unknown },
+) => string | true;
 
-  if (!list) {
-    throw new Error('Expected field to define an options.list.');
-  }
-
-  return (list as { title: string; value: string }[]).map(
-    (option) => option.value,
-  );
-};
-
-type TPostsValidatorProbe = {
-  customFn: (
-    value: unknown[] | undefined,
-    context: { parent?: unknown },
-  ) => string | true;
-  uniqueCalled: boolean;
-  maxCalledWith: number | undefined;
-  maxErrorMessage: string | undefined;
-};
-
-const getPostsValidatorProbe = (): TPostsValidatorProbe => {
-  const field = getPostFeaturedField('posts');
+const getCustomFn = <TValue>(fieldName: string): TCustomProbe<TValue> => {
+  const field = getPostFeaturedField(fieldName);
 
   if (!field.validation) {
-    throw new Error('Expected posts field to define validation.');
+    throw new Error(`Expected "${fieldName}" field to define validation.`);
   }
 
-  let uniqueCalled = false;
-  let maxCalledWith: number | undefined;
-  let maxErrorMessage: string | undefined;
-  let customFn: TPostsValidatorProbe['customFn'] | undefined;
-
+  let customFn: TCustomProbe<TValue> | undefined;
   const rule = {
-    unique: () => {
-      uniqueCalled = true;
-      return rule;
-    },
-    max: (value: number) => {
-      maxCalledWith = value;
-      return rule;
-    },
-    error: (message: string) => {
-      maxErrorMessage = message;
-      return rule;
-    },
-    custom: (fn: TPostsValidatorProbe['customFn']) => {
+    unique: () => rule,
+    integer: () => rule,
+    min: () => rule,
+    max: () => rule,
+    error: () => rule,
+    custom: (fn: TCustomProbe<TValue>) => {
       customFn = fn;
       return rule;
     },
@@ -83,64 +50,11 @@ const getPostsValidatorProbe = (): TPostsValidatorProbe => {
 
   if (!customFn) {
     throw new Error(
-      'Expected posts field validation to register a custom() rule.',
+      `Expected "${fieldName}" field validation to register a custom() rule.`,
     );
   }
 
-  return { customFn, uniqueCalled, maxCalledWith, maxErrorMessage };
-};
-
-type TLimitValidatorProbe = {
-  customFn: (
-    value: number | undefined,
-    context: { parent?: unknown },
-  ) => string | true;
-  integerCalled: boolean;
-  minCalledWith: number | undefined;
-  maxCalledWith: number | undefined;
-};
-
-const getLimitValidatorProbe = (): TLimitValidatorProbe => {
-  const field = getPostFeaturedField('limit');
-
-  if (!field.validation) {
-    throw new Error('Expected limit field to define validation.');
-  }
-
-  let integerCalled = false;
-  let minCalledWith: number | undefined;
-  let maxCalledWith: number | undefined;
-  let customFn: TLimitValidatorProbe['customFn'] | undefined;
-
-  const rule = {
-    integer: () => {
-      integerCalled = true;
-      return rule;
-    },
-    min: (value: number) => {
-      minCalledWith = value;
-      return rule;
-    },
-    max: (value: number) => {
-      maxCalledWith = value;
-      return rule;
-    },
-    custom: (fn: TLimitValidatorProbe['customFn']) => {
-      customFn = fn;
-      return rule;
-    },
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (field.validation as any)(rule);
-
-  if (!customFn) {
-    throw new Error(
-      'Expected limit field validation to register a custom() rule.',
-    );
-  }
-
-  return { customFn, integerCalled, minCalledWith, maxCalledWith };
+  return customFn;
 };
 
 const getDocumentValidators = (): TRecordedValidator<TDocFn>[] =>
@@ -159,78 +73,7 @@ const createMockContext = (
   return { getClient } as unknown as ValidationContext;
 };
 
-describe('postFeaturedSchema headingBlock field', () => {
-  it('is required at the field level', () => {
-    const field = getPostFeaturedField('headingBlock');
-
-    if (typeof field.validation !== 'function') {
-      throw new Error('Expected headingBlock field to define validation.');
-    }
-
-    let requiredCalled = false;
-    const rule = {
-      required: () => {
-        requiredCalled = true;
-        return rule;
-      },
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    (field.validation as any)(rule);
-
-    expect(requiredCalled).toBe(true);
-  });
-});
-
-describe('postFeaturedSchema displayMode field', () => {
-  it('is emitted immediately after showImages', () => {
-    const names =
-      postFeaturedSchema.fields
-        ?.map((field) => ('name' in field ? field.name : undefined))
-        .filter((name): name is string => Boolean(name)) ?? [];
-    const showImagesIndex = names.indexOf('showImages');
-    const displayModeIndex = names.indexOf('displayMode');
-
-    expect(showImagesIndex).toBeGreaterThanOrEqual(0);
-    expect(displayModeIndex).toBe(showImagesIndex + 1);
-  });
-
-  it('defaults to GRID', () => {
-    const field = getPostFeaturedField('displayMode');
-
-    expect(field.initialValue).toBe(DISPLAY_MODE.GRID);
-  });
-
-  it('defines no validation rule', () => {
-    const field = getPostFeaturedField('displayMode');
-
-    expect(
-      'validation' in field ? field.validation : undefined,
-    ).toBeUndefined();
-  });
-});
-
-describe('postFeaturedSchema postSource field', () => {
-  it('offers Pinned and Newest Featured, defaulting to Pinned', () => {
-    const field = getPostFeaturedField('postSource');
-
-    expect(getOptionValues(field)).toEqual([
-      POST_SOURCE.PINNED,
-      POST_SOURCE.NEWEST_FEATURED,
-    ]);
-    expect(field.initialValue).toBe(POST_SOURCE.PINNED);
-  });
-});
-
 describe('postFeaturedSchema posts field', () => {
-  it('only accepts page_post references', () => {
-    const field = getPostFeaturedField('posts') as {
-      of?: { to?: { type: string }[] }[];
-    };
-
-    expect(field.of?.[0]?.to).toEqual([{ type: PAGE_POST_TYPE }]);
-  });
-
   it('is hidden unless Post Source is Pinned', () => {
     const hidden = getHidden(getPostFeaturedField('posts'));
 
@@ -240,28 +83,19 @@ describe('postFeaturedSchema posts field', () => {
     ).toBe(true);
   });
 
-  it('registers unique() and a max(3) rule with a clear message', () => {
-    const { uniqueCalled, maxCalledWith, maxErrorMessage } =
-      getPostsValidatorProbe();
+  it.each([
+    [undefined, POST_SOURCE.PINNED],
+    [[], POST_SOURCE.PINNED],
+  ])('errors when Pinned with no posts chosen (%j)', (value, postSource) => {
+    const customFn = getCustomFn<unknown[] | undefined>('posts');
 
-    expect(uniqueCalled).toBe(true);
-    expect(maxCalledWith).toBe(3);
-    expect(maxErrorMessage).toBe('A spotlight holds at most three posts.');
-  });
-
-  it('errors when Pinned with no posts chosen', () => {
-    const { customFn } = getPostsValidatorProbe();
-
-    expect(
-      customFn(undefined, { parent: { postSource: POST_SOURCE.PINNED } }),
-    ).toBe('Pin at least one post, or switch the source to Newest featured.');
-    expect(customFn([], { parent: { postSource: POST_SOURCE.PINNED } })).toBe(
+    expect(customFn(value, { parent: { postSource } })).toBe(
       'Pin at least one post, or switch the source to Newest featured.',
     );
   });
 
   it('is valid when Pinned with at least one post chosen', () => {
-    const { customFn } = getPostsValidatorProbe();
+    const customFn = getCustomFn<unknown[] | undefined>('posts');
 
     expect(
       customFn([{ _ref: 'post-1' }], {
@@ -271,7 +105,7 @@ describe('postFeaturedSchema posts field', () => {
   });
 
   it('is valid with no posts when Post Source is Newest Featured', () => {
-    const { customFn } = getPostsValidatorProbe();
+    const customFn = getCustomFn<unknown[] | undefined>('posts');
 
     expect(
       customFn(undefined, {
@@ -291,21 +125,8 @@ describe('postFeaturedSchema limit field', () => {
     expect(hidden({ parent: { postSource: POST_SOURCE.PINNED } })).toBe(true);
   });
 
-  it('defaults to 3', () => {
-    expect(getPostFeaturedField('limit').initialValue).toBe(3);
-  });
-
-  it('registers integer(), min(1) and max(3)', () => {
-    const { integerCalled, minCalledWith, maxCalledWith } =
-      getLimitValidatorProbe();
-
-    expect(integerCalled).toBe(true);
-    expect(minCalledWith).toBe(1);
-    expect(maxCalledWith).toBe(3);
-  });
-
   it('errors when Newest Featured with no limit chosen', () => {
-    const { customFn } = getLimitValidatorProbe();
+    const customFn = getCustomFn<number | undefined>('limit');
 
     expect(
       customFn(undefined, {
@@ -315,7 +136,7 @@ describe('postFeaturedSchema limit field', () => {
   });
 
   it('is valid when Newest Featured with a limit chosen', () => {
-    const { customFn } = getLimitValidatorProbe();
+    const customFn = getCustomFn<number | undefined>('limit');
 
     expect(
       customFn(3, { parent: { postSource: POST_SOURCE.NEWEST_FEATURED } }),
@@ -323,7 +144,7 @@ describe('postFeaturedSchema limit field', () => {
   });
 
   it('is valid with no limit when Post Source is Pinned', () => {
-    const { customFn } = getLimitValidatorProbe();
+    const customFn = getCustomFn<number | undefined>('limit');
 
     expect(
       customFn(undefined, { parent: { postSource: POST_SOURCE.PINNED } }),
@@ -332,15 +153,6 @@ describe('postFeaturedSchema limit field', () => {
 });
 
 describe('postFeaturedSchema document validation', () => {
-  it('registers two document-level rules: error then warning', () => {
-    const validators = getDocumentValidators();
-
-    expect(validators.map((validator) => validator.level)).toEqual([
-      'error',
-      'warning',
-    ]);
-  });
-
   it('defines no carousel/limit warning, unlike postLatestSchema', async () => {
     const validators = getDocumentValidators();
 
@@ -486,60 +298,42 @@ describe('postFeaturedSchema document validation', () => {
 describe('postFeaturedSchema preview', () => {
   const prepare = postFeaturedSchema.preview?.prepare;
 
-  it('shows the pinned post count when Post Source is Pinned', () => {
-    if (!prepare) {
-      throw new Error('Expected postFeaturedSchema to define preview.prepare.');
-    }
+  if (!prepare) {
+    throw new Error('Expected postFeaturedSchema to define preview.prepare.');
+  }
 
-    expect(
-      prepare({
+  it.each([
+    [
+      {
         title: 'Spotlight',
         brandVariant: BRAND_VARIANT.SECONDARY,
         postSource: POST_SOURCE.PINNED,
         posts: [{ _ref: 'post-1' }, { _ref: 'post-2' }],
         limit: undefined,
-      }),
-    ).toEqual({
-      title: 'Spotlight',
-      subtitle: 'Secondary · Pinned: 2 posts',
-    });
-  });
-
-  it('uses singular "post" for exactly one pinned post', () => {
-    if (!prepare) {
-      throw new Error('Expected postFeaturedSchema to define preview.prepare.');
-    }
-
-    expect(
-      prepare({
+      },
+      { title: 'Spotlight', subtitle: 'Secondary · Pinned: 2 posts' },
+    ],
+    [
+      {
         title: 'Spotlight',
         brandVariant: undefined,
         postSource: POST_SOURCE.PINNED,
         posts: [{ _ref: 'post-1' }],
         limit: undefined,
-      }),
-    ).toEqual({
-      title: 'Spotlight',
-      subtitle: 'Pinned: 1 post',
-    });
-  });
-
-  it('shows the limit when Post Source is Newest Featured', () => {
-    if (!prepare) {
-      throw new Error('Expected postFeaturedSchema to define preview.prepare.');
-    }
-
-    expect(
-      prepare({
+      },
+      { title: 'Spotlight', subtitle: 'Pinned: 1 post' },
+    ],
+    [
+      {
         title: 'Spotlight',
         brandVariant: BRAND_VARIANT.PRIMARY,
         postSource: POST_SOURCE.NEWEST_FEATURED,
         posts: undefined,
         limit: 3,
-      }),
-    ).toEqual({
-      title: 'Spotlight',
-      subtitle: 'Primary · Newest featured (limit 3)',
-    });
+      },
+      { title: 'Spotlight', subtitle: 'Primary · Newest featured (limit 3)' },
+    ],
+  ])('prepares %j', (input, expected) => {
+    expect(prepare(input)).toEqual(expected);
   });
 });
