@@ -1,11 +1,11 @@
 import type { TPagePostType } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { CtaModule } from '@web/modules/cta/cta-module';
-import type {
-  TModuleComponent,
-  TModuleComponentProps,
-} from '@web/modules/module-map';
-import { renderModules } from '@web/modules/module-renderer';
+import {
+  renderModules,
+  type TModuleComponent,
+  type TModuleComponentProps,
+} from '@web/modules/module-renderer';
 import { NewsletterModule } from '@web/modules/newsletter/newsletter-module';
 import { PostRelatedModule } from '@web/modules/post-related/post-related-module';
 import type { ReactNode } from 'react';

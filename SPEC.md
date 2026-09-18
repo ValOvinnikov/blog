@@ -212,11 +212,12 @@ that one directory; every other admin surface uses admin's own primitives.
 Sanity schema → `pnpm typegen` → `@blog/config` generated types →
 `@blog/service` (thin page queries + per-module fetchers, plus a scoped
 `service.editorial.*` write path for the skim pipeline) → `apps/web`
-(`ModuleRenderer` maps each module reference through `MODULE_MAP` to a
-Server Component, which fetches its own module data and maps it onto a pure
-`@blog/ui` organism). A page's dedicated `hero` slot dispatches the same
-way, through `HeroSlot` and `HERO_MAP` — keyed on `THeroModuleType`, so a
-hero kind with no registered component is a compile error. Typegen output is
+(each page's own module renderer maps a module reference through that page's
+map to a Server Component, which fetches its own module data and maps it onto
+a pure `@blog/ui` organism). A page's dedicated `hero` slot dispatches the
+same way, through the same map — annotated `Record<TPageXType,
+TModuleComponent>`, so a type the page allows with no component, or a
+component for a type it cannot reference, is a compile error. Typegen output is
 committed and can be non-deterministic — re-run until minimal.
 
 Images follow the same direction of travel: `@blog/service` describes an image
@@ -352,14 +353,25 @@ own dedicated schema, unrelated to this shared shape.
 **The hero family.** A hero is any module whose schema `name` starts with
 `module_hero`; membership is that naming convention and nothing else.
 `@blog/config` derives `THeroModuleType` from it as
-``Extract<TModuleType, `module_hero${string}`>``, alongside
-`TSlotModuleType` — every module reached _only_ through a dedicated page slot
-and never through `modules[]`, which is how `MODULE_MAP` excludes them
-(`Record<Exclude<TModuleType, TSlotModuleType>, …>`). Nothing is
+``Extract<TModuleType, `module_hero${string}`>``. Nothing is
 hand-listed, so a new hero kind joins the union the day its schema lands and
-drops out the day it is deleted. The studio's equivalent guard is
-`HERO_SCHEMA_TYPES`, the list every page's `hero` `to:` points at, with a
-test asserting every registered `module_hero*` schema appears in it.
+drops out the day it is deleted. A page's own map covers both its `hero` slot
+and its `modules[]`, so nothing needs to subtract slot-only kinds from a
+wider set. The studio's equivalent guard is
+`HERO_SCHEMA_TYPES`, the registry of every hero schema, with a test
+asserting every registered `module_hero*` schema appears in it.
+
+**A page accepts only the hero kinds it names.** `heroField({ allow })`
+takes an explicit list per page, the way `modulesField({ allow })` already
+does, so the registry is no longer what a page's `hero` `to:` points at.
+`page_home` and `page_landing` accept Blog and Statement. `page_postIndex`,
+`page_tag`, `page_topic`, `page_tagIndex` and `page_topicIndex` accept Blog
+only — a statement hero belongs on a marketing page, not an archive.
+`page_post` has no `hero` field at all. The deprecated `module_hero` is
+named by no page: its schema stays registered in `HERO_SCHEMA_TYPES` until
+#2813 retires it, but no picker offers it. Narrowing a page is what turns a
+surplus entry in its `apps/web` module map from dead code into a
+`type-check` error.
 
 Three kinds are registered. **`module_hero`** is the original, kept until
 #2813 retires it. **`module_heroBlog`** is the featured-post hero: its
@@ -558,8 +570,9 @@ not warrant separate types. It previously did have two: `CTA_ALIGNMENT` and
 one generated field described by two names and one of them named after what
 had become only one of its five callers.
 
-`module_taxonomyList` reaches `ModuleRenderer` through `MODULE_MAP` wherever it
-is placed — `page_home.modules[]`, `page_landing.modules[]`,
+`module_taxonomyList` renders through its page's own module map wherever it is
+placed — `page_home.modules[]`, `page_landing.modules[]`,
+`page_postIndex.modules[]`, `page_topic.modules[]`, `page_tag.modules[]`,
 `page_topicIndex.modules[]` and `page_tagIndex.modules[]`. It used to render a
 second way as well, through a dedicated `taxonomyList` reference on each
 taxonomy index page; neither page has one any more, and both fields are
@@ -575,7 +588,7 @@ lives on the pages instead: every page placing one must set it, enforced by an
 async rule on `modules[]` that fetches each referenced module and rejects one
 that has not.
 
-Nothing overrides that field at read time. `ModuleRenderer` calls every module
+Nothing overrides that field at read time. `renderModules` calls every module
 with the same arguments, so there is no channel by which a page could supply a
 kind the module itself lacks, and
 `service.modules.taxonomyList.v1.getTaxonomyList(id, tenant)` projects the
@@ -613,10 +626,10 @@ schema allows), `layout` as `TLayout | undefined`, and (where applicable)
 `headingBlock` as a required `THeadingBlock` — with no faked defaults
 anywhere: what is unset stays unset end to end. In `apps/web`, every module
 component that renders a `@blog/ui` organism — including those reached through a
-dedicated slot rather than `MODULE_MAP`'s generic `ModuleRenderer` pipeline
-(§5 above): the hero family, via each page's `hero` slot, is now the only such
-case — `module_taxonomyList` and `module_postList` both render through
-`MODULE_MAP` wherever they sit — all
+dedicated slot rather than a page's `modules[]` (§5 above): the hero family,
+via each page's `hero` slot, is now the only such case — `module_taxonomyList`
+and `module_postList` both render through their page's own module map
+wherever they sit — all
 still styled the same way as every other module — no exception — wraps it in `apps/web`'s own
 `Section` component (`apps/web/src/components/shared/section`, relocated
 from `packages/ui`), passing `brandVariant` and `layout` straight through,
@@ -899,7 +912,7 @@ already depend on `db` directly. `apps/web`'s
 `is-capability-enabled.ts` (`apps/web/src/server/settings-features/`)
 resolves the two-layer check per request and never throws; a disabled
 capability is omitted silently at its own render site (`module_newsletter`
-in `ModuleRenderer`; the bookmark button on the post-detail page; Vercel
+in `renderModules`; the bookmark button on the post-detail page; Vercel
 Analytics/Speed Insights in `[locale]/layout.tsx`, ANDed with the
 pre-existing `WEB_ANALYTICS_ENABLED` env gate) — same pattern as an unknown
 module type,
@@ -1037,7 +1050,7 @@ composes those regions and nothing else — there is no per-page layout.
 
 `Heading` holds the hero when the document has one, and otherwise the
 `headingBlock` `<h1>` with its `supportingText` (§6). `Content` holds the
-page's chips where it has them, then `ModuleRenderer` over `modules[]`. No
+page's chips where it has them, then its own renderer over `modules[]`. No
 page owns a bespoke list slot: a post list is a `module_postList` in
 `modules[]` like any other module, which is what lets one shell serve the
 home, landing, blog, topic, tag and taxonomy-index pages alike.

@@ -1,5 +1,5 @@
 import { service } from '@blog/service';
-import type { TModuleComponentProps } from '@web/modules/module-map';
+import type { TModuleComponentProps } from '@web/modules/module-renderer';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import { renderPostCardImage } from '@web/utils/render-post-card-image';

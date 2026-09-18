@@ -1,5 +1,5 @@
 import { HEADING_LEVELS } from '@blog/ui/lib/react';
-import { PostGrid } from '@blog/ui/organisms/post-grid';
+import { CardGrid } from '@blog/ui/organisms/card-grid';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { TaxonomyCard } from './taxonomy-card';
@@ -106,7 +106,7 @@ export const WithNoPosts: TStory = {
 
 export const Grid: TStory = {
   render: () => (
-    <PostGrid>
+    <CardGrid>
       <TaxonomyCard
         title="Engineering"
         href="/topics/engineering"
@@ -154,6 +154,6 @@ export const Grid: TStory = {
         headingLevel={2}
         postCountLabel="1 post"
       />
-    </PostGrid>
+    </CardGrid>
   ),
 };

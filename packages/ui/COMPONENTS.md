@@ -175,7 +175,7 @@ Variants: isCurrent: (boolean)
 
 ### CardMeta — `molecules/card-meta/card-meta.tsx`
 
-compact metadata row for post cards.
+compact metadata row for cards.
 Props: dateValue: string · dateLabel: string · readingTime?: string _(extends IWithClassName, IWithDataTestId)_
 
 ### ImageWithCaption — `molecules/image-with-caption/image-with-caption.tsx`
@@ -188,6 +188,19 @@ Variants: layout: IMAGE_LAYOUT.INLINE|IMAGE_LAYOUT.FULL_BLEED|IMAGE_LAYOUT.FLOAT
 
 a navigation link that looks like a `Button`: applies the shared `buttonVariants` to an anchor (or any `as` element), so links can read as buttons.
 Props: className?: string _(extends IWithDataTestId, VariantProps<typeof buttonVariants>)_
+
+### MediaCard — `molecules/media-card/media-card.tsx`
+
+a media-led summary card for any linked item, rendered as an `<article>`.
+Props: excerpt?: string · tags?: string[] · isSplit?: TMediaCardVariants['isSplit'] · isLead?: TMediaCardVariants['isLead'] · children?: TCompoundChildren<typeof MediaCardParts> _(extends IWithClassName, IWithDataTestId)_
+Variants: isSplit: (boolean) · isLead: (boolean)
+
+Slots:
+
+- **MediaCard.Media** — the media region of a `MediaCard`; a styled `<div>` wrapper you fill with an image or `MediaFrame`. Props: isLead?: TMediaCardMediaVariants['isLead'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isLead: (boolean)
+- **MediaCard.Meta** — compact metadata row for cards. Props: dateValue: string · dateLabel: string · readingTime?: string _(extends IWithClassName, IWithDataTestId)_
+- **MediaCard.Title** — the heading inside a `MediaCard`, rendered at the caller-specified heading depth with the card title's visual treatment. Props: level: THeadingLevel · isLead?: boolean · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **MediaCard.Footer** — the byline row at the bottom of a `MediaCard`. Props: authorName?: string · authorAvatarSrc?: string · publishedAt?: string · formattedDate?: string · topic?: string · leadingIcon?: ReactNode · trailingIcon?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Panel — `molecules/panel/panel.tsx`
 
@@ -210,19 +223,6 @@ Slots:
 - **PopoverMenu.Panel** — the non-modal menu surface (`role="menu"`) a `PopoverMenu.Trigger` opens. Props: id: string · isOpen: boolean · ariaLabel?: string · children?: ReactNode · ref?: Ref<HTMLDivElement> _(extends IWithClassName, IWithDataTestId)_
 - **PopoverMenu.Item** — a single rounded-rectangle row inside a `PopoverMenu.Panel` (`role="menuitem"`). Props: className?: string · icon?: ReactNode _(extends TPopoverMenuItemVariants, IWithDataTestId)_ · Variants: variant: bordered
 - **PopoverMenu.Separator** — a thin hairline dividing groups of `PopoverMenu.Item`s inside a `PopoverMenu.Panel` (e.g. a "Copy link" action from a list of social-share links). Props: className?: string _(extends IWithDataTestId)_
-
-### PostCard — `molecules/post-card/post-card.tsx`
-
-the article summary card used in listings; composes `PostCard.Media`, `PostCard.Meta`, `PostCard.Title`, and `PostCard.Footer` slots around an optional `excerpt` and `tags` row, rendered as an `<article>`.
-Props: excerpt?: string · tags?: string[] · isSplit?: TPostCardVariants['isSplit'] · isLead?: TPostCardVariants['isLead'] · children?: TCompoundChildren<typeof PostCardParts> _(extends IWithClassName, IWithDataTestId)_
-Variants: isSplit: (boolean) · isLead: (boolean)
-
-Slots:
-
-- **PostCard.Media** — the media region of a `PostCard`; a styled `<div>` wrapper you fill with an image or `MediaFrame`. Props: isLead?: TPostCardMediaVariants['isLead'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isLead: (boolean)
-- **PostCard.Meta** — compact metadata row for post cards. Props: dateValue: string · dateLabel: string · readingTime?: string _(extends IWithClassName, IWithDataTestId)_
-- **PostCard.Title** — the post heading inside a `PostCard`, rendered at the caller-specified heading depth with the card title's visual treatment. Props: level: THeadingLevel · isLead?: boolean · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **PostCard.Footer** — the byline row at the bottom of a `PostCard`: optional author avatar and name, published date, and a topic tag. Props: authorName?: string · authorAvatarSrc?: string · publishedAt?: string · formattedDate?: string · topic?: string · leadingIcon?: ReactNode · trailingIcon?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### PostMeta — `molecules/post-meta/post-meta.tsx`
 
@@ -283,6 +283,12 @@ Slots:
 
 renders a reader's saved posts as one row per bookmark, each with a date and a link to the post, or `emptyMessage` when there are none.
 Props: rows: IBookmarkRow[] · emptyMessage: string · hint?: string · prefix?: ReactNode · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
+
+### CardGrid — `organisms/card-grid/card-grid.tsx`
+
+the responsive grid container that lays out cards (or any children) in columns.
+Props: columns?: TCardGridVariants['columns'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
+Variants: columns: 1|2|3
 
 ### Carousel — `organisms/carousel/carousel.tsx`
 
@@ -350,12 +356,6 @@ Compound component:
 prev/next + numbered links for paginated listings, route-agnostic (`createHref`) and polymorphic (`linkAs`); renders nothing when there is a single page.
 Props: currentPage: number · totalPages: number · createHref: (page: number) => string · ariaLabel: string · previousLabel: string · nextLabel: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 Variants: current: (boolean)
-
-### PostGrid — `organisms/post-grid/post-grid.tsx`
-
-the responsive grid container that lays out `PostCard`s (or any children) in columns.
-Props: columns?: TPostGridVariants['columns'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
-Variants: columns: 1|2|3
 
 ### ToastViewport — `organisms/toast-viewport/toast-viewport.tsx`
 

@@ -1,5 +1,5 @@
 import type { TPostRelatedModule } from '@blog/service';
-import { PostGrid } from '@blog/ui/organisms/post-grid';
+import { CardGrid } from '@blog/ui/organisms/card-grid';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import {
   type IPostCardData,
@@ -21,7 +21,7 @@ export interface IPostRelatedModuleViewProps extends Omit<
 
 /**
  * PostRelatedModuleView — render shell for `PostRelatedModule`: a labeled
- * `Section` wrapping a `PostGrid` of `PostCardItem`s. Never called with an
+ * `Section` wrapping a `CardGrid` of `PostCardItem`s. Never called with an
  * empty `items` — `PostRelatedModule` renders nothing itself in that case.
  */
 export const PostRelatedModuleView = ({
@@ -49,11 +49,11 @@ export const PostRelatedModuleView = ({
         level={2}
         align={contentAlignment}
       />
-      <PostGrid className={s.grid()}>
+      <CardGrid className={s.grid()}>
         {items.map((item) => (
           <PostCardItem key={item.id} item={item} hasImage={hasImages} />
         ))}
-      </PostGrid>
+      </CardGrid>
     </Section>
   );
 };

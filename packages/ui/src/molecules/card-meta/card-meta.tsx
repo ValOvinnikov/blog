@@ -22,7 +22,7 @@ export type TCardMetaProps = IWithClassName &
 const s = cardMetaVariants();
 
 /**
- * CardMeta — compact metadata row for post cards.
+ * CardMeta — compact metadata row for cards.
  * Renders: ❯ date [· readingTime]
  */
 export const CardMeta = ({

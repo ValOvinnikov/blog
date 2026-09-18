@@ -2,6 +2,7 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
   makeHeroBlogData,
+  makeStaleUnresolvedHeroBlogData,
   makeUnresolvedHeroBlogData,
 } from '@web/testing/modules/hero-blog/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
@@ -92,6 +93,23 @@ describe(`<${HeroBlogModule.name}/>`, () => {
     getHeroBlogMock.mockResolvedValue({
       ok: true,
       data: makeUnresolvedHeroBlogData(),
+    });
+
+    const { container } = await setup();
+
+    expect(container).toBeEmptyDOMElement();
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      'hero_blog_module.post_unresolved',
+      { id: 'hero-blog-1' },
+    );
+  });
+
+  it('logs and renders nothing for a stale hasPost: false result that still carries a heading', async () => {
+    getHeroBlogMock.mockResolvedValue({
+      ok: true,
+      data: makeStaleUnresolvedHeroBlogData(
+        'Stale hero title left over from an unpublished post',
+      ),
     });
 
     const { container } = await setup();

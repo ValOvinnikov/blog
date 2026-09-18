@@ -3,6 +3,7 @@ import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-fiel
 import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
+import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
@@ -76,7 +77,7 @@ export const taxonomyIndexPage = ({
     fields: [
       titleField(),
       headingBlockField(),
-      heroField(),
+      heroField({ allow: [heroBlogSchema.name] }),
       modulesField({
         allow: [
           taxonomyListSchema.name,

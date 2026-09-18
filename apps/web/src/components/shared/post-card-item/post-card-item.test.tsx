@@ -58,7 +58,7 @@ describe(`<${PostCardItem.name}/>`, () => {
     expect(screen.queryByTestId('post-card-media')).not.toBeInTheDocument();
   });
 
-  it('renders the pre-rendered image node inside PostCard.Media when hasImage is true', () => {
+  it('renders the pre-rendered image node inside MediaCard.Media when hasImage is true', () => {
     renderElement(
       <PostCardItem
         item={{ ...item, image: <div data-testid="post-image" /> }}
@@ -83,13 +83,13 @@ describe(`<${PostCardItem.name}/>`, () => {
     expect(screen.getByText(/engineering/)).toBeVisible();
   });
 
-  it('forwards dataTestId to the underlying PostCard', () => {
+  it('forwards dataTestId to the underlying MediaCard', () => {
     renderElement(<PostCardItem item={item} dataTestId="lead-card" />);
 
     expect(screen.getByTestId('lead-card')).toBeInTheDocument();
   });
 
-  it('renders no dataTestId on the underlying PostCard when omitted', () => {
+  it('renders no dataTestId on the underlying MediaCard when omitted', () => {
     const { container } = renderElement(<PostCardItem item={item} />);
 
     expect(container.querySelector('article')).not.toHaveAttribute(

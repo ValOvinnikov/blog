@@ -7,11 +7,13 @@ import type { TModule } from '@blog/service';
 import { PageHeading } from '@web/components/shared/page-heading';
 import { ContentModule } from '@web/modules/content/content-module';
 import { CtaModule } from '@web/modules/cta/cta-module';
-import { HeroModule } from '@web/modules/hero/hero-module';
 import { HeroBlogModule } from '@web/modules/hero-blog/hero-blog-module';
 import { HeroStatementModule } from '@web/modules/hero-statement/hero-statement-module';
-import type { TModuleComponent } from '@web/modules/module-map';
-import { renderHeroModule, renderModules } from '@web/modules/module-renderer';
+import {
+  renderHeroModule,
+  renderModules,
+  type TModuleComponent,
+} from '@web/modules/module-renderer';
 import { NewsletterModule } from '@web/modules/newsletter/newsletter-module';
 import { PostFeaturedModule } from '@web/modules/post-featured/post-featured-module';
 import { PostLatestModule } from '@web/modules/post-latest/post-latest-module';
@@ -19,7 +21,6 @@ import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-mod
 import type { ReactNode } from 'react';
 
 const LANDING_MAP: Record<TPageLandingType, TModuleComponent> = {
-  module_hero: HeroModule,
   module_heroBlog: HeroBlogModule,
   module_heroStatement: HeroStatementModule,
   module_content: ContentModule,

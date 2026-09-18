@@ -42,7 +42,7 @@ describe('tagIndexPageQuery', () => {
 
   it('parses a tag index page with its hero slot set', () => {
     const raw = makeRawTagIndexPage({
-      hero: { _id: 'hero-1', _type: 'module_hero' },
+      hero: { _id: 'hero-1', _type: 'module_heroBlog' },
     });
 
     expect(() => tagIndexPageQuery.parse(raw)).not.toThrow();

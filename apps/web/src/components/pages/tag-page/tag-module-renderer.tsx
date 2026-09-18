@@ -6,25 +6,24 @@ import type {
 import type { TModule } from '@blog/service';
 import { PageHeading } from '@web/components/shared/page-heading';
 import { CtaModule } from '@web/modules/cta/cta-module';
-import { HeroModule } from '@web/modules/hero/hero-module';
 import { HeroBlogModule } from '@web/modules/hero-blog/hero-blog-module';
-import { HeroStatementModule } from '@web/modules/hero-statement/hero-statement-module';
-import type {
-  TModuleComponent,
-  TModuleComponentProps,
-} from '@web/modules/module-map';
-import { renderHeroModule, renderModules } from '@web/modules/module-renderer';
+import {
+  renderHeroModule,
+  renderModules,
+  type TModuleComponent,
+  type TModuleComponentProps,
+} from '@web/modules/module-renderer';
 import { NewsletterModule } from '@web/modules/newsletter/newsletter-module';
 import { PostLatestModule } from '@web/modules/post-latest/post-latest-module';
 import { PostListModule } from '@web/modules/post-list/post-list-module';
+import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
 import type { ReactNode } from 'react';
 
 const TAG_MAP: Record<TPageTagType, TModuleComponent> = {
-  module_hero: HeroModule,
   module_heroBlog: HeroBlogModule,
-  module_heroStatement: HeroStatementModule,
   module_postList: PostListModule,
   module_postLatest: PostLatestModule,
+  module_taxonomyList: TaxonomyListModule,
   module_cta: CtaModule,
   module_newsletter: NewsletterModule,
 };

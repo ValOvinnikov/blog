@@ -78,12 +78,6 @@ const config: StorybookConfig = {
       '@web/server/topics-index/get-topics-index-page': fileURLToPath(
         new URL('./mocks/get-topics-index-page.ts', import.meta.url),
       ),
-      // `PageIntro` dispatches a page's `hero` slot through this module,
-      // which fetches its own `module_hero*` document — same live-Sanity
-      // problem as the loader above.
-      '@web/modules/hero-slot': fileURLToPath(
-        new URL('./mocks/hero-slot.tsx', import.meta.url),
-      ),
       // `TopicsPage` renders this for its breadcrumb trail, which resolves
       // the request tenant through `@blog/db` for its base URL — no
       // database connection is available in Storybook.

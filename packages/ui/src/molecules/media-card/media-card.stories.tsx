@@ -2,11 +2,11 @@ import { ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { PostCard } from './post-card';
+import { MediaCard } from './media-card';
 
 const meta = {
-  title: 'Molecules/PostCard',
-  component: PostCard,
+  title: 'Molecules/MediaCard',
+  component: MediaCard,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
   args: {
@@ -15,30 +15,30 @@ const meta = {
     tags: ['design-system', 'tailwind', 'react'],
     children: (
       <>
-        <PostCard.Media>
+        <MediaCard.Media>
           <img
             src="https://picsum.photos/seed/designsystem/800/450"
             alt="Abstract design elements on a dark background"
           />
-        </PostCard.Media>
-        <PostCard.Meta
+        </MediaCard.Media>
+        <MediaCard.Meta
           dateValue="2024-03-10"
           dateLabel="March 10, 2024"
           readingTime="9 min"
         />
-        <PostCard.Title level={3}>
+        <MediaCard.Title level={3}>
           <a href="/posts/building-a-design-system">
             Building a Design System from Scratch
           </a>
-        </PostCard.Title>
-        <PostCard.Footer
+        </MediaCard.Title>
+        <MediaCard.Footer
           topic="design-system"
           trailingIcon={<Icon name={ICONS.ARROW} size={SIZE.SM} />}
         />
       </>
     ),
   },
-} satisfies Meta<typeof PostCard>;
+} satisfies Meta<typeof MediaCard>;
 
 export default meta;
 type TStory = StoryObj<typeof meta>;
@@ -50,9 +50,9 @@ export const Minimal: TStory = {
     excerpt: undefined,
     tags: undefined,
     children: (
-      <PostCard.Title level={3}>
+      <MediaCard.Title level={3}>
         <a href="/posts/minimal">A Minimal Post</a>
-      </PostCard.Title>
+      </MediaCard.Title>
     ),
   },
 };
@@ -61,16 +61,16 @@ export const WithoutFooter: TStory = {
   args: {
     children: (
       <>
-        <PostCard.Meta
+        <MediaCard.Meta
           dateValue="2024-03-10"
           dateLabel="March 10, 2024"
           readingTime="9 min"
         />
-        <PostCard.Title level={3}>
+        <MediaCard.Title level={3}>
           <a href="/posts/building-a-design-system">
             Building a Design System from Scratch
           </a>
-        </PostCard.Title>
+        </MediaCard.Title>
       </>
     ),
   },
@@ -83,10 +83,10 @@ export const WithTags: TStory = {
     tags: ['typescript', 'javascript', 'tips'],
     children: (
       <>
-        <PostCard.Title level={3}>
+        <MediaCard.Title level={3}>
           <a href="/posts/typescript-tips">TypeScript Tips for 2024</a>
-        </PostCard.Title>
-        <PostCard.Footer
+        </MediaCard.Title>
+        <MediaCard.Footer
           topic="typescript"
           trailingIcon={<Icon name={ICONS.ARROW} size={SIZE.SM} />}
         />
@@ -102,10 +102,10 @@ export const WithFooterLeadingIcon: TStory = {
     tags: ['typescript', 'javascript', 'tips'],
     children: (
       <>
-        <PostCard.Title level={3}>
+        <MediaCard.Title level={3}>
           <a href="/posts/typescript-tips">TypeScript Tips for 2024</a>
-        </PostCard.Title>
-        <PostCard.Footer
+        </MediaCard.Title>
+        <MediaCard.Footer
           topic="typescript"
           leadingIcon={<Icon name={ICONS.BOOKMARK} size={SIZE.SM} />}
           trailingIcon={<Icon name={ICONS.ARROW} size={SIZE.SM} />}
@@ -119,12 +119,12 @@ export const AsSecondLevelHeading: TStory = {
   args: {
     children: (
       <>
-        <PostCard.Title level={2}>
+        <MediaCard.Title level={2}>
           <a href="/posts/building-a-design-system">
             Building a Design System from Scratch
           </a>
-        </PostCard.Title>
-        <PostCard.Footer
+        </MediaCard.Title>
+        <MediaCard.Footer
           topic="design-system"
           trailingIcon={<Icon name={ICONS.ARROW} size={SIZE.SM} />}
         />
@@ -160,12 +160,12 @@ export const WithAuthorFooter: TStory = {
   args: {
     children: (
       <>
-        <PostCard.Title level={3}>
+        <MediaCard.Title level={3}>
           <a href="/posts/building-a-design-system">
             Building a Design System from Scratch
           </a>
-        </PostCard.Title>
-        <PostCard.Footer
+        </MediaCard.Title>
+        <MediaCard.Footer
           publishedAt="2024-03-10T09:00:00Z"
           formattedDate="March 10, 2024"
           authorName="Jane Doe"

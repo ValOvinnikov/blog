@@ -12,7 +12,7 @@ const seo: TTagIndexPage['seo'] = {
 
 const withHero: TTagIndexPage = {
   headingBlock: { heading: 'Tags' },
-  hero: { id: 'tags-hero-1', type: 'module_hero' },
+  hero: { id: 'tags-hero-1', type: 'module_heroBlog' },
   modules: [],
   seo,
 };

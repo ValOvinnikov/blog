@@ -18,12 +18,6 @@ export type TModuleType = Extract<
  */
 export type THeroModuleType = Extract<TModuleType, `module_hero${string}`>;
 
-/**
- * Every module that renders only through a page's dedicated slot, never
- * through `modules[]`.
- */
-export type TSlotModuleType = THeroModuleType;
-
 export const isHeroModuleType = (type: string): type is THeroModuleType =>
   type.startsWith('module_hero');
 

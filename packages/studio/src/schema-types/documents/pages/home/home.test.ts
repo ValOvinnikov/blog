@@ -1,5 +1,6 @@
 import { homePageSchema } from '@blog/studio/schema-types/documents/pages/home/home';
-import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
+import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
+import { heroStatementSchema } from '@blog/studio/schema-types/modules/hero-statement/hero-statement';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/validation/validate-taxonomy-list-has-taxonomy/validate-taxonomy-list-has-taxonomy';
@@ -111,7 +112,7 @@ describe('homePageSchema field order', () => {
 });
 
 describe('homePageSchema hero field', () => {
-  it('is an optional reference to the hero family', () => {
+  it('is an optional reference to heroBlog and heroStatement', () => {
     const heroField = homePageSchema.fields?.find(
       (field) => field.name === 'hero',
     ) as
@@ -123,9 +124,10 @@ describe('homePageSchema hero field', () => {
     }
 
     expect(heroField.type).toBe('reference');
-    expect(heroField.to?.map((entry) => entry.type)).toEqual(
-      HERO_SCHEMA_TYPES.map((schema) => schema.name),
-    );
+    expect(heroField.to?.map((entry) => entry.type)).toEqual([
+      heroBlogSchema.name,
+      heroStatementSchema.name,
+    ]);
     expect(heroField.validation).toBeUndefined();
   });
 });

@@ -1,7 +1,7 @@
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic/topic';
 import { topicPageSchema } from '@blog/studio/schema-types/documents/pages/topic/topic';
 import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic/topic-type';
-import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
+import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import {
@@ -76,7 +76,7 @@ describe('topicPageSchema shape', () => {
     expect(getField('postList')).toBeUndefined();
   });
 
-  it('modules allows module_postList, module_postLatest, module_cta, and module_newsletter', () => {
+  it('modules allows module_postList, module_postLatest, module_cta, module_newsletter, and module_taxonomyList', () => {
     const modulesField = getField('modules') as
       TArrayFieldDefinition | undefined;
 
@@ -89,6 +89,7 @@ describe('topicPageSchema shape', () => {
       'module_postLatest',
       'module_cta',
       'module_newsletter',
+      'module_taxonomyList',
     ]);
   });
 
@@ -156,7 +157,7 @@ describe('pageTopicSchema headingBlock field', () => {
 });
 
 describe('topicPageSchema hero field', () => {
-  it('is an optional reference to the hero family via heroField()', () => {
+  it('is an optional reference scoped to heroBlog only', () => {
     const heroField = getField('hero') as
       | { type: string; to?: Array<{ type: string }>; validation?: unknown }
       | undefined;
@@ -166,9 +167,9 @@ describe('topicPageSchema hero field', () => {
     }
 
     expect(heroField.type).toBe('reference');
-    expect(heroField.to?.map((entry) => entry.type)).toEqual(
-      HERO_SCHEMA_TYPES.map((schema) => schema.name),
-    );
+    expect(heroField.to?.map((entry) => entry.type)).toEqual([
+      heroBlogSchema.name,
+    ]);
     expect(heroField.validation).toBeUndefined();
   });
 });

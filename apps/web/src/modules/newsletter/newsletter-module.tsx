@@ -22,7 +22,7 @@ export interface INewsletterModuleProps {
  * always a non-empty string here.
  *
  * Renders nothing when the tenant isn't entitled to (or hasn't enabled) the
- * `NEWSLETTER` capability — same silent-omission fallback `ModuleRenderer`
+ * `NEWSLETTER` capability — same silent-omission fallback `renderModules`
  * uses for an unrecognized module type.
  */
 export const NewsletterModule = async ({
