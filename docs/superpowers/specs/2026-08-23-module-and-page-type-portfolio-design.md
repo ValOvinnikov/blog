@@ -2469,10 +2469,14 @@ point; the graph stays acyclic.
   #2806).
 
 - **`module_heroProfile` references a `blog_author` rather than re-declaring
-  the person** — the photo and social profiles come through the reference,
-  while every word of copy is the editor's. Superseded in detail as it
-  shipped: see #2776, which is the design of record (2026-09-11, #2808;
-  retired here 2026-09-18).
+  the person** — name, role, photo, bio and social links come through the
+  reference with the `heroBlog`-style optional copy overrides; one photo,
+  placed by the variant (a round `Hero.Avatar` on Stacked, a square
+  `Hero.Media` on Split, the background on Banner), chosen by a new
+  `PROFILE_IMAGE_SOURCE` mode; the author's social links behind a
+  `showSocialLinks` toggle in a new `Hero.Social` slot; the tail gains
+  `mediaOrderStacked: false`; ui alone, then config + studio + service + web as
+  one PR (2026-09-11, #2808).
 
 - **`module_heroProfile` resynced against the shipped Blog Hero and the link
   library** — the copy is fully the editor's: the shared `headingBlockField()`
