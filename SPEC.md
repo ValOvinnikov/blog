@@ -626,10 +626,10 @@ schema allows), `layout` as `TLayout | undefined`, and (where applicable)
 `headingBlock` as a required `THeadingBlock` — with no faked defaults
 anywhere: what is unset stays unset end to end. In `apps/web`, every module
 component that renders a `@blog/ui` organism — including those reached through a
-dedicated slot rather than `MODULE_MAP`'s generic `ModuleRenderer` pipeline
-(§5 above): the hero family, via each page's `hero` slot, is now the only such
-case — `module_taxonomyList` and `module_postList` both render through
-`MODULE_MAP` wherever they sit — all
+dedicated slot rather than a page's `modules[]` (§5 above): the hero family,
+via each page's `hero` slot, is now the only such case — `module_taxonomyList`
+and `module_postList` both render through their page's own module map
+wherever they sit — all
 still styled the same way as every other module — no exception — wraps it in `apps/web`'s own
 `Section` component (`apps/web/src/components/shared/section`, relocated
 from `packages/ui`), passing `brandVariant` and `layout` straight through,
