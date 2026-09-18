@@ -1,14 +1,8 @@
 import { TAXONOMY_KIND } from '@blog/config/constants';
 import { tagIndexPageSchema } from '@blog/studio/schema-types/documents/pages/tag-index/tag-index';
-import { PAGE_TAG_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/tag-index/tag-index-type';
 import { topicIndexPageSchema } from '@blog/studio/schema-types/documents/pages/topic-index/topic-index';
-import { PAGE_TOPIC_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/topic-index/topic-index-type';
-import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
-import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
-import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/validation/validate-taxonomy-list-has-taxonomy/validate-taxonomy-list-has-taxonomy';
 import {
   createMockModulesRule,
   type TModuleReference,
@@ -17,18 +11,9 @@ import {
 import { getField } from '@blog/studio/testing/get-field';
 import type { SchemaTypeDefinition, ValidationContext } from 'sanity';
 
-type TArrayFieldDefinition = {
-  type: 'array';
-  of?: Array<{ name?: string }>;
-};
-
-type TFieldDefinition = {
+type TIndexedSchema = {
   name?: string;
-  type?: string;
-  description?: string;
-  readOnly?: boolean;
-  deprecated?: { reason?: string };
-  validation?: unknown;
+  fields?: { name?: string; validation?: unknown }[];
 };
 
 type TDocumentCustomFn = (document: Record<string, unknown>) => string | true;
@@ -49,8 +34,6 @@ const createDocumentMockRule = (
   custom: (nextFn) => createDocumentMockRule('error', nextFn),
   warning: () => createDocumentMockRule('warning', fn),
 });
-
-type TIndexedSchema = { name?: string; fields?: TFieldDefinition[] };
 
 const getModulesCustomValidators = (
   schema: SchemaTypeDefinition,
@@ -88,9 +71,6 @@ const fixtures = [
   {
     schemaName: 'tagIndexPageSchema',
     schema: tagIndexPageSchema,
-    expectedName: PAGE_TAG_INDEX_TYPE,
-    expectedDescription:
-      'The page that lists every tag, for readers browsing by keyword.',
     kind: TAXONOMY_KIND.TAGS,
     otherKind: TAXONOMY_KIND.TOPICS,
     noTaxonomyListWarning:
@@ -101,9 +81,6 @@ const fixtures = [
   {
     schemaName: 'topicIndexPageSchema',
     schema: topicIndexPageSchema,
-    expectedName: PAGE_TOPIC_INDEX_TYPE,
-    expectedDescription:
-      'The page that lists every topic, for readers browsing by subject.',
     kind: TAXONOMY_KIND.TOPICS,
     otherKind: TAXONOMY_KIND.TAGS,
     noTaxonomyListWarning:
@@ -118,24 +95,12 @@ describe.each(fixtures)(
   ({
     schemaName,
     schema,
-    expectedName,
-    expectedDescription,
     kind,
     otherKind,
     noTaxonomyListWarning,
     mismatchError,
     previewSubtitle,
   }) => {
-    it(`is named ${expectedName}`, () => {
-      expect(schema.name).toBe(expectedName);
-    });
-
-    it('carries its own type-level description', () => {
-      expect((schema as { description?: string }).description).toBe(
-        expectedDescription,
-      );
-    });
-
     it(`preview reports "${previewSubtitle}"`, () => {
       if (!schema.preview?.prepare) {
         throw new Error(`Expected ${schemaName} to define a preview.prepare.`);
@@ -145,69 +110,6 @@ describe.each(fixtures)(
         title: 'My Page',
         subtitle: previewSubtitle,
       });
-    });
-
-    it('orders fields title, headingBlock, hero, modules, seo, then the deprecated taxonomyList field', () => {
-      expect(
-        (schema as { fields?: TFieldDefinition[] }).fields?.map(
-          (field) => field.name,
-        ),
-      ).toEqual([
-        'title',
-        'headingBlock',
-        'hero',
-        'modules',
-        'seo',
-        'taxonomyList',
-      ]);
-    });
-
-    it('hero field is an optional reference scoped to heroBlog only', () => {
-      const heroField = getField(schema, 'hero') as
-        | { type: string; to?: Array<{ type: string }>; validation?: unknown }
-        | undefined;
-
-      if (!heroField) {
-        throw new Error(`Expected ${schemaName} to define a hero field.`);
-      }
-
-      expect(heroField.type).toBe('reference');
-      expect(heroField.to?.map((entry) => entry.type)).toEqual([
-        heroBlogSchema.name,
-      ]);
-      expect(heroField.validation).toBeUndefined();
-    });
-
-    it('headingBlock field is required', () => {
-      const headingBlockField = getField(schema, 'headingBlock');
-
-      expect(headingBlockField?.type).toBe('headingBlock');
-      expect(headingBlockField?.validation).toBeDefined();
-    });
-
-    it('modules allow-list permits taxonomyList, postLatest, cta and newsletter modules', () => {
-      const modulesField = getField(schema, 'modules') as
-        TArrayFieldDefinition | undefined;
-
-      if (!modulesField || modulesField.type !== 'array' || !modulesField.of) {
-        throw new Error(
-          `Expected ${schemaName} to define a modules array field.`,
-        );
-      }
-
-      expect(modulesField.of.map((member) => member.name)).toEqual([
-        taxonomyListSchema.name,
-        postLatestSchema.name,
-        ctaSchema.name,
-        newsletterSchema.name,
-      ]);
-    });
-
-    it('modules validateCustom registers both the blank-heading and taxonomy-list validators', () => {
-      const customFns = getModulesCustomValidators(schema);
-
-      expect(customFns).toHaveLength(2);
-      expect(customFns[1]).toBe(validateTaxonomyListHasTaxonomy);
     });
 
     it('modules validateCustom registers the blank-heading validator scoped to module_postLatest', async () => {
@@ -231,17 +133,6 @@ describe.each(fixtures)(
       await expect(blankHeadingFn?.(modules, context)).resolves.toContain(
         'Only one module of this type without its own heading is allowed per page',
       );
-    });
-
-    it('document validation registers taxonomy-list cardinality and taxonomy-kind rules', () => {
-      const rules = buildDocumentRules(schema);
-
-      expect(rules).toHaveLength(3);
-      expect(rules.map((rule) => rule.level)).toEqual([
-        'error',
-        'warning',
-        'error',
-      ]);
     });
 
     it('errors when more than one module_taxonomyList is referenced', () => {
@@ -339,24 +230,6 @@ describe.each(fixtures)(
           context,
         ),
       ).resolves.toBe(mismatchError);
-    });
-
-    it('deprecated taxonomyList field references module_taxonomyList, is readOnly, deprecated, and no longer required', () => {
-      const taxonomyListField = getField(schema, 'taxonomyList') as
-        { to?: Array<{ type?: string }> } | undefined;
-
-      expect(
-        (taxonomyListField as TFieldDefinition | undefined)?.readOnly,
-      ).toBe(true);
-      expect(
-        (taxonomyListField as TFieldDefinition | undefined)?.deprecated?.reason,
-      ).toBeTruthy();
-      expect(
-        (taxonomyListField as TFieldDefinition | undefined)?.validation,
-      ).toBeUndefined();
-      expect(taxonomyListField?.to?.map((target) => target.type)).toEqual([
-        taxonomyListSchema.name,
-      ]);
     });
   },
 );

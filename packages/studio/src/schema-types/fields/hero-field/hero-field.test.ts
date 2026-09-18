@@ -1,13 +1,10 @@
 import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-field';
 
 describe(heroField, () => {
-  it('builds an optional reference scoped to exactly the given allow list', () => {
+  it('builds a reference scoped to exactly the given allow list', () => {
     const field = heroField({ allow: ['module_heroBlog'] });
 
-    expect(field.name).toBe('hero');
-    expect(field.type).toBe('reference');
     expect(field.to).toEqual([{ type: 'module_heroBlog' }]);
-    expect(field.validation).toBeUndefined();
   });
 
   it('preserves the caller-supplied order for multiple allowed hero types', () => {

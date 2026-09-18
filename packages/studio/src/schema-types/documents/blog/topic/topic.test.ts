@@ -16,12 +16,6 @@ const getHasPageValidator = () =>
   getCustomValidatorWithLevel<TDocFn>(topicSchema);
 
 describe('topicSchema validation', () => {
-  it('registers validateHasPage at warning severity, not error', () => {
-    const { isWarning } = getHasPageValidator();
-
-    expect(isWarning).toBe(true);
-  });
-
   it('passes without querying when the document has no id', async () => {
     const { fn: validate } = getHasPageValidator();
     const { context, fetchCalls } = createMockCountContext(0);

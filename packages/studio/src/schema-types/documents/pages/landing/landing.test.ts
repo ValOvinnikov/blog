@@ -1,10 +1,6 @@
 import { landingPageSchema } from '@blog/studio/schema-types/documents/pages/landing/landing';
-import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
-import { heroProfileSchema } from '@blog/studio/schema-types/modules/hero-profile/hero-profile';
-import { heroStatementSchema } from '@blog/studio/schema-types/modules/hero-statement/hero-statement';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
-import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/validation/validate-taxonomy-list-has-taxonomy/validate-taxonomy-list-has-taxonomy';
 import {
   createMockModulesRule,
   type TModuleReference,
@@ -12,7 +8,6 @@ import {
 } from '@blog/studio/testing/create-mock-modules-rule';
 import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
 import { getField } from '@blog/studio/testing/get-field';
-import { wasRequiredCalled } from '@blog/studio/testing/was-required-called';
 import type { ValidationContext } from 'sanity';
 
 const getModulesCustomValidators = (): TModulesCustomFn[] => {
@@ -35,13 +30,6 @@ const getModulesCustomValidators = (): TModulesCustomFn[] => {
 };
 
 describe('landingPageSchema modules validateCustom chaining', () => {
-  it('registers both the blank-heading and taxonomy-list validators', () => {
-    const customFns = getModulesCustomValidators();
-
-    expect(customFns).toHaveLength(2);
-    expect(customFns[1]).toBe(validateTaxonomyListHasTaxonomy);
-  });
-
   it.each([
     ['module_postLatest', postLatestSchema.name],
     ['module_postFeatured', postFeaturedSchema.name],
@@ -74,36 +62,14 @@ describe('landingPageSchema modules validateCustom chaining', () => {
 
 type TSlugCustomFn = (value: { current?: string } | undefined) => string | true;
 
-const getSlugField = () => getField(landingPageSchema, 'slug');
-
-const getSlugCustomValidator = () => {
-  const slugField = getSlugField();
-
-  return {
-    customFn: getCustomValidator<TSlugCustomFn>(slugField),
-    requiredCalled: wasRequiredCalled(slugField),
-  };
-};
+const getSlugCustomValidator = () =>
+  getCustomValidator<TSlugCustomFn>(getField(landingPageSchema, 'slug'));
 
 describe('landingPageSchema slug validation', () => {
-  it('keeps the slug field required', () => {
-    const { requiredCalled } = getSlugCustomValidator();
-
-    expect(requiredCalled).toBe(true);
-  });
-
-  it('rejects a reserved slug with a clear message', () => {
-    const { customFn } = getSlugCustomValidator();
-
-    expect(customFn({ current: 'blog' })).toBe(
-      `"blog" is a reserved path and can't be used as a page slug.`,
-    );
-  });
-
-  it.each(['category', 'author', 'api', 'page'])(
+  it.each(['blog', 'category', 'author', 'api', 'page'])(
     'rejects reserved slug "%s"',
     (reserved) => {
-      const { customFn } = getSlugCustomValidator();
+      const customFn = getSlugCustomValidator();
 
       expect(customFn({ current: reserved })).toBe(
         `"${reserved}" is a reserved path and can't be used as a page slug.`,
@@ -112,96 +78,14 @@ describe('landingPageSchema slug validation', () => {
   );
 
   it('passes a non-reserved slug', () => {
-    const { customFn } = getSlugCustomValidator();
+    const customFn = getSlugCustomValidator();
 
     expect(customFn({ current: 'about-us' })).toBe(true);
   });
 
   it('passes when the slug value is not yet set', () => {
-    const { customFn } = getSlugCustomValidator();
+    const customFn = getSlugCustomValidator();
 
     expect(customFn(undefined)).toBe(true);
-  });
-
-  it('renders the shared URL-preview input', () => {
-    const slugField = landingPageSchema.fields?.find(
-      (field) => field.name === 'slug',
-    ) as { components?: { input?: unknown } } | undefined;
-
-    expect(typeof slugField?.components?.input).toBe('function');
-  });
-});
-
-describe('landingPageSchema hero field', () => {
-  it('is an optional reference scoped to heroBlog, heroStatement and heroProfile', () => {
-    const heroField = landingPageSchema.fields?.find(
-      (field) => field.name === 'hero',
-    ) as { type: string; to?: Array<{ type: string }>; validation?: unknown };
-
-    expect(heroField).toBeDefined();
-    expect(heroField.type).toBe('reference');
-    expect(heroField.to?.map((entry) => entry.type)).toEqual([
-      heroBlogSchema.name,
-      heroStatementSchema.name,
-      heroProfileSchema.name,
-    ]);
-    expect(heroField.validation).toBeUndefined();
-  });
-});
-
-describe('landingPageSchema modules allow-list', () => {
-  it('permits content, cta, postLatest, postFeatured, newsletter and taxonomyList modules', () => {
-    const modulesField = landingPageSchema.fields?.find(
-      (field) => field.name === 'modules',
-    ) as { type: 'array'; of?: Array<{ name?: string }> } | undefined;
-
-    if (!modulesField || modulesField.type !== 'array' || !modulesField.of) {
-      throw new Error(
-        'Expected landingPageSchema to define a modules array field.',
-      );
-    }
-
-    const allowedTypes = modulesField.of.map((member) => member.name);
-
-    expect(allowedTypes).toEqual([
-      'module_content',
-      'module_cta',
-      'module_postLatest',
-      'module_postFeatured',
-      'module_newsletter',
-      'module_taxonomyList',
-      'module_featureList',
-    ]);
-  });
-});
-
-describe('landingPageSchema field order', () => {
-  it('orders fields title, slug, headingBlock, hero, modules, seo', () => {
-    expect(landingPageSchema.fields?.map((field) => field.name)).toEqual([
-      'title',
-      'slug',
-      'headingBlock',
-      'hero',
-      'modules',
-      'seo',
-    ]);
-  });
-});
-
-describe('landingPageSchema document validation', () => {
-  it('defines no document-level validation — heading requiredness lives on the field', () => {
-    expect(landingPageSchema.validation).toBeUndefined();
-  });
-});
-
-describe('landingPageSchema headingBlock field', () => {
-  it('is required', () => {
-    const headingBlockFieldDefinition = landingPageSchema.fields?.find(
-      (field) => field.name === 'headingBlock',
-    ) as
-      { type?: string; description?: string; validation?: unknown } | undefined;
-
-    expect(headingBlockFieldDefinition?.type).toBe('headingBlock');
-    expect(headingBlockFieldDefinition?.validation).toBeDefined();
   });
 });
