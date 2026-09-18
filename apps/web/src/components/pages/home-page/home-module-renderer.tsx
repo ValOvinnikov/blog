@@ -20,7 +20,7 @@ import { PostLatestModule } from '@web/modules/post-latest/post-latest-module';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
 import type { ReactNode } from 'react';
 
-const HOME_MAP: Record<TPageHomeType, TModuleComponent> = {
+const HOME_MAP: Partial<Record<TPageHomeType, TModuleComponent>> = {
   module_heroBlog: HeroBlogModule,
   module_heroStatement: HeroStatementModule,
   module_content: ContentModule,

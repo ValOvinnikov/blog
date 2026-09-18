@@ -10,7 +10,7 @@ import { NewsletterModule } from '@web/modules/newsletter/newsletter-module';
 import { PostRelatedModule } from '@web/modules/post-related/post-related-module';
 import type { ReactNode } from 'react';
 
-const BLOG_POST_MAP: Record<TPagePostType, TModuleComponent> = {
+const BLOG_POST_MAP: Partial<Record<TPagePostType, TModuleComponent>> = {
   module_postRelated: PostRelatedModule,
   module_newsletter: NewsletterModule,
   module_cta: CtaModule,
