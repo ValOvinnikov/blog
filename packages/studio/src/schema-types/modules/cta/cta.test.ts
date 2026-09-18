@@ -6,6 +6,9 @@ import {
 } from '@blog/config/constants';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
+import { getField } from '@blog/studio/testing/get-field';
+import { getLayout } from '@blog/studio/testing/get-field-layout';
+import { wasRequiredCalled } from '@blog/studio/testing/was-required-called';
 
 type TCustomFn = (
   value: unknown,
@@ -14,20 +17,9 @@ type TCustomFn = (
 
 type THiddenFn = (context: { parent?: unknown }) => boolean;
 
-const getField = (name: string) => {
-  const field = ctaSchema.fields?.find(
-    (field): field is typeof field & { name: string } =>
-      'name' in field && field.name === name,
-  );
+const getCtaField = (name: string) => getField(ctaSchema, name);
 
-  if (!field) {
-    throw new Error(`Expected ctaSchema to define a "${name}" field.`);
-  }
-
-  return field;
-};
-
-const getOptionValues = (field: ReturnType<typeof getField>) => {
+const getOptionValues = (field: ReturnType<typeof getCtaField>) => {
   const options = 'options' in field ? field.options : undefined;
   const list =
     options && typeof options === 'object' && 'list' in options
@@ -44,12 +36,9 @@ const getOptionValues = (field: ReturnType<typeof getField>) => {
 };
 
 const getImageField = () => {
-  const imageField = ctaSchema.fields?.find(
-    (field): field is typeof field & { name: 'image' } =>
-      'name' in field && field.name === 'image',
-  );
+  const imageField = getField(ctaSchema, 'image');
 
-  if (!imageField || !('validation' in imageField) || !imageField.validation) {
+  if (!('validation' in imageField) || !imageField.validation) {
     throw new Error(
       'Expected ctaSchema to define an image field with validation.',
     );
@@ -112,7 +101,7 @@ describe('ctaSchema image validation', () => {
 
 describe('ctaSchema contentPositionSplit field', () => {
   it('offers only Left and Right', () => {
-    const field = getField('contentPositionSplit');
+    const field = getCtaField('contentPositionSplit');
 
     expect(getOptionValues(field)).toEqual([
       CONTENT_ALIGNMENT.LEFT,
@@ -121,13 +110,13 @@ describe('ctaSchema contentPositionSplit field', () => {
   });
 
   it('defaults to Left', () => {
-    const field = getField('contentPositionSplit');
+    const field = getCtaField('contentPositionSplit');
 
     expect(field.initialValue).toBe(CONTENT_ALIGNMENT.LEFT);
   });
 
   it('is visible only for Split', () => {
-    const field = getField('contentPositionSplit');
+    const field = getCtaField('contentPositionSplit');
 
     if (!('hidden' in field) || typeof field.hidden !== 'function') {
       throw new Error(
@@ -145,7 +134,7 @@ describe('ctaSchema contentPositionSplit field', () => {
 
 describe('ctaSchema contentPositionBanner field', () => {
   it('offers Left, Center and Right', () => {
-    const field = getField('contentPositionBanner');
+    const field = getCtaField('contentPositionBanner');
 
     expect(getOptionValues(field)).toEqual([
       CONTENT_ALIGNMENT.LEFT,
@@ -155,13 +144,13 @@ describe('ctaSchema contentPositionBanner field', () => {
   });
 
   it('defaults to Left', () => {
-    const field = getField('contentPositionBanner');
+    const field = getCtaField('contentPositionBanner');
 
     expect(field.initialValue).toBe(CONTENT_ALIGNMENT.LEFT);
   });
 
   it('is visible only for Banner', () => {
-    const field = getField('contentPositionBanner');
+    const field = getCtaField('contentPositionBanner');
 
     if (!('hidden' in field) || typeof field.hidden !== 'function') {
       throw new Error(
@@ -179,7 +168,7 @@ describe('ctaSchema contentPositionBanner field', () => {
 
 describe('ctaSchema contentAlignment field', () => {
   it('offers Left, Center and Right', () => {
-    const field = getField('contentAlignment');
+    const field = getCtaField('contentAlignment');
 
     expect(getOptionValues(field)).toEqual([
       CONTENT_ALIGNMENT.LEFT,
@@ -189,13 +178,13 @@ describe('ctaSchema contentAlignment field', () => {
   });
 
   it('defaults to Left', () => {
-    const field = getField('contentAlignment');
+    const field = getCtaField('contentAlignment');
 
     expect(field.initialValue).toBe(CONTENT_ALIGNMENT.LEFT);
   });
 
   it('is visible on every variant', () => {
-    const field = getField('contentAlignment');
+    const field = getCtaField('contentAlignment');
 
     expect('hidden' in field ? field.hidden : undefined).toBeUndefined();
   });
@@ -203,13 +192,13 @@ describe('ctaSchema contentAlignment field', () => {
 
 describe('ctaSchema brandVariant field', () => {
   it('defaults to Secondary', () => {
-    const field = getField('brandVariant');
+    const field = getCtaField('brandVariant');
 
     expect(field.initialValue).toBe(BRAND_VARIANT.SECONDARY);
   });
 
   it('offers Brand Primary, Primary and Secondary', () => {
-    const field = getField('brandVariant');
+    const field = getCtaField('brandVariant');
 
     expect(getOptionValues(field)).toEqual([
       BRAND_VARIANT.BRAND_PRIMARY,
@@ -221,7 +210,7 @@ describe('ctaSchema brandVariant field', () => {
 
 describe('ctaSchema bandTone field', () => {
   it('offers Brand Primary, Primary and Secondary', () => {
-    const field = getField('bandTone');
+    const field = getCtaField('bandTone');
 
     expect(getOptionValues(field)).toEqual([
       BRAND_VARIANT.BRAND_PRIMARY,
@@ -231,13 +220,13 @@ describe('ctaSchema bandTone field', () => {
   });
 
   it('defaults to Primary', () => {
-    const field = getField('bandTone');
+    const field = getCtaField('bandTone');
 
     expect(field.initialValue).toBe(BRAND_VARIANT.PRIMARY);
   });
 
   it('is hidden for Banner, visible for the other variants', () => {
-    const field = getField('bandTone');
+    const field = getCtaField('bandTone');
 
     if (!('hidden' in field) || typeof field.hidden !== 'function') {
       throw new Error('Expected bandTone field to define a hidden() fn.');
@@ -253,10 +242,10 @@ describe('ctaSchema bandTone field', () => {
 
 describe('ctaSchema bandTone validation', () => {
   const getBandToneWarningValidator = (): TCustomFn =>
-    getCustomValidator<TCustomFn>(getField('bandTone'));
+    getCustomValidator<TCustomFn>(getCtaField('bandTone'));
 
   it('registers a required rule alongside the warning rule', () => {
-    const field = getField('bandTone');
+    const field = getCtaField('bandTone');
 
     if (!('validation' in field) || !field.validation) {
       throw new Error('Expected bandTone field to define validation.');
@@ -314,38 +303,9 @@ describe('ctaSchema bandTone validation', () => {
   });
 });
 
-const getLayout = (field: ReturnType<typeof getField>) => {
-  const options = 'options' in field ? field.options : undefined;
-
-  return options && typeof options === 'object' && 'layout' in options
-    ? (options as { layout?: string }).layout
-    : undefined;
-};
-
-const wasRequiredCalled = (field: ReturnType<typeof getField>) => {
-  const validation = 'validation' in field ? field.validation : undefined;
-
-  if (!validation) {
-    throw new Error('Expected field to define validation.');
-  }
-
-  let requiredCalled = false;
-  const rule = {
-    required: () => {
-      requiredCalled = true;
-      return rule;
-    },
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (validation as any)(rule);
-
-  return requiredCalled;
-};
-
 describe('ctaSchema variant field', () => {
   it('keeps variant as a dropdown: required, and it drives several other fields', () => {
-    const field = getField('variant');
+    const field = getCtaField('variant');
 
     expect(getLayout(field)).toBe('dropdown');
     expect(wasRequiredCalled(field)).toBe(true);
@@ -354,7 +314,7 @@ describe('ctaSchema variant field', () => {
 
 describe('ctaSchema mobileMediaOrder field', () => {
   it('offers Last and First, defaulting to Last', () => {
-    const field = getField('mobileMediaOrder');
+    const field = getCtaField('mobileMediaOrder');
 
     expect(getOptionValues(field)).toEqual([
       MEDIA_ORDER.LAST,
@@ -364,7 +324,7 @@ describe('ctaSchema mobileMediaOrder field', () => {
   });
 
   it('converts to a dropdown: optional, no field depends on it', () => {
-    const field = getField('mobileMediaOrder');
+    const field = getCtaField('mobileMediaOrder');
 
     expect(getLayout(field)).toBe('dropdown');
     expect(

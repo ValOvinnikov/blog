@@ -11,7 +11,10 @@ import {
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { heroContentPositionFields } from '@blog/studio/schema-types/fields/hero-content-position-fields/hero-content-position-fields';
-import { heroMediaOrderFields } from '@blog/studio/schema-types/fields/hero-media-order-fields/hero-media-order-fields';
+import {
+  heroMediaOrderSplitField,
+  heroMediaOrderStackedField,
+} from '@blog/studio/schema-types/fields/hero-media-order-fields/hero-media-order-fields';
 import { heroVariantField } from '@blog/studio/schema-types/fields/hero-variant-field/hero-variant-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { heroFieldsets } from '@blog/studio/schema-types/modules/hero-fieldsets/hero-fieldsets';
@@ -193,7 +196,7 @@ export const heroBlogSchema = defineType({
       description: "The post's own hero image, a custom image, or no image.",
       fieldset: FIELDSET_IMAGE,
       options: {
-        layout: 'dropdown',
+        layout: 'radio',
         list: Object.values(HERO_IMAGE_SOURCE).map((value) => ({
           title: toTitleCase(value),
           value,
@@ -260,7 +263,8 @@ export const heroBlogSchema = defineType({
     }),
     heroVariantField(),
     ...heroContentPositionFields(),
-    ...heroMediaOrderFields(),
+    heroMediaOrderSplitField(),
+    heroMediaOrderStackedField(),
     heroLayoutField,
   ],
   preview: {

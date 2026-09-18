@@ -1,28 +1,11 @@
 import { HERO_VARIANT, MEDIA_ORDER } from '@blog/config/constants';
+import { getHidden } from '@blog/studio/testing/get-field-hidden';
+import { getLayout } from '@blog/studio/testing/get-field-layout';
 
-import { heroMediaOrderFields } from './hero-media-order-fields';
-
-type THiddenFn = (context: { parent?: unknown }) => boolean;
-
-const getField = (name: string) => {
-  const field = heroMediaOrderFields().find((field) => field.name === name);
-
-  if (!field) {
-    throw new Error(
-      `Expected heroMediaOrderFields() to define a "${name}" field.`,
-    );
-  }
-
-  return field;
-};
-
-const getLayout = (field: { options?: unknown }) => {
-  const options = field.options;
-
-  return options && typeof options === 'object' && 'layout' in options
-    ? (options as { layout?: string }).layout
-    : undefined;
-};
+import {
+  heroMediaOrderSplitField,
+  heroMediaOrderStackedField,
+} from './hero-media-order-fields';
 
 const getOptionValues = (field: { options?: unknown }) => {
   const options = field.options;
@@ -40,17 +23,9 @@ const getOptionValues = (field: { options?: unknown }) => {
   );
 };
 
-const getHidden = (field: { hidden?: unknown }): THiddenFn => {
-  if (typeof field.hidden !== 'function') {
-    throw new Error('Expected field to define a hidden() fn.');
-  }
-
-  return field.hidden as THiddenFn;
-};
-
-describe(heroMediaOrderFields, () => {
-  it('shows mediaOrderSplit only for Split, defaulting to Last', () => {
-    const field = getField('mediaOrderSplit');
+describe(heroMediaOrderSplitField, () => {
+  it('shows only for Split, defaulting to Last', () => {
+    const field = heroMediaOrderSplitField();
     const hidden = getHidden(field);
 
     expect(getOptionValues(field)).toEqual([
@@ -64,9 +39,11 @@ describe(heroMediaOrderFields, () => {
     expect(getLayout(field)).toBe('dropdown');
     expect(field.validation).toBeUndefined();
   });
+});
 
-  it('shows mediaOrderStacked only for Stacked, defaulting to Last', () => {
-    const field = getField('mediaOrderStacked');
+describe(heroMediaOrderStackedField, () => {
+  it('shows only for Stacked, defaulting to Last', () => {
+    const field = heroMediaOrderStackedField();
     const hidden = getHidden(field);
 
     expect(getOptionValues(field)).toEqual([
@@ -80,11 +57,19 @@ describe(heroMediaOrderFields, () => {
     expect(getLayout(field)).toBe('dropdown');
     expect(field.validation).toBeUndefined();
   });
+});
 
-  it('Banner emits neither media order field', () => {
-    for (const name of ['mediaOrderSplit', 'mediaOrderStacked']) {
-      const hidden = getHidden(getField(name));
-      expect(hidden({ parent: { variant: HERO_VARIANT.BANNER } })).toBe(true);
-    }
+describe('heroMediaOrderSplitField and heroMediaOrderStackedField', () => {
+  it('both stay hidden for Banner', () => {
+    expect(
+      getHidden(heroMediaOrderSplitField())({
+        parent: { variant: HERO_VARIANT.BANNER },
+      }),
+    ).toBe(true);
+    expect(
+      getHidden(heroMediaOrderStackedField())({
+        parent: { variant: HERO_VARIANT.BANNER },
+      }),
+    ).toBe(true);
   });
 });

@@ -3,6 +3,7 @@ import { ctaSchema } from './cta/cta';
 import { featureListSchema } from './feature-list/feature-list';
 import { heroSchema } from './hero/hero';
 import { heroBlogSchema } from './hero-blog/hero-blog';
+import { heroProfileSchema } from './hero-profile/hero-profile';
 import { heroStatementSchema } from './hero-statement/hero-statement';
 import { newsletterSchema } from './newsletter/newsletter';
 import { postFeaturedSchema } from './post-featured/post-featured';
@@ -15,6 +16,7 @@ export const modules = [
   heroSchema,
   heroBlogSchema,
   heroStatementSchema,
+  heroProfileSchema,
   postListSchema,
   postLatestSchema,
   postFeaturedSchema,
@@ -36,4 +38,5 @@ export const HERO_SCHEMA_TYPES = [
   heroSchema,
   heroBlogSchema,
   heroStatementSchema,
+  heroProfileSchema,
 ];

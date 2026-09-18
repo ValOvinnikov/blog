@@ -9,27 +9,17 @@ import {
   getRecordedValidators,
   type TRecordedValidator,
 } from '@blog/studio/testing/create-mock-validation-rule';
+import { getField } from '@blog/studio/testing/get-field';
+import { getHidden } from '@blog/studio/testing/get-field-hidden';
 import type { SanityDocument, ValidationContext } from 'sanity';
-
-type THiddenFn = (context: { parent?: unknown }) => boolean;
 
 type TDocFn = (
   document: SanityDocument | undefined,
   context: ValidationContext,
 ) => Promise<string | true> | string | true;
 
-const getField = (name: string) => {
-  const field = postFeaturedSchema.fields?.find(
-    (field): field is typeof field & { name: string } =>
-      'name' in field && field.name === name,
-  );
-
-  if (!field) {
-    throw new Error(`Expected postFeaturedSchema to define a "${name}" field.`);
-  }
-
-  return field;
-};
+const getPostFeaturedField = (name: string) =>
+  getField(postFeaturedSchema, name);
 
 const getOptionValues = (field: { options?: unknown }) => {
   const options = field.options;
@@ -47,14 +37,6 @@ const getOptionValues = (field: { options?: unknown }) => {
   );
 };
 
-const getHidden = (field: { hidden?: unknown }): THiddenFn => {
-  if (typeof field.hidden !== 'function') {
-    throw new Error('Expected field to define a hidden() fn.');
-  }
-
-  return field.hidden as THiddenFn;
-};
-
 type TPostsValidatorProbe = {
   customFn: (
     value: unknown[] | undefined,
@@ -66,7 +48,7 @@ type TPostsValidatorProbe = {
 };
 
 const getPostsValidatorProbe = (): TPostsValidatorProbe => {
-  const field = getField('posts');
+  const field = getPostFeaturedField('posts');
 
   if (!field.validation) {
     throw new Error('Expected posts field to define validation.');
@@ -119,7 +101,7 @@ type TLimitValidatorProbe = {
 };
 
 const getLimitValidatorProbe = (): TLimitValidatorProbe => {
-  const field = getField('limit');
+  const field = getPostFeaturedField('limit');
 
   if (!field.validation) {
     throw new Error('Expected limit field to define validation.');
@@ -179,7 +161,7 @@ const createMockContext = (
 
 describe('postFeaturedSchema headingBlock field', () => {
   it('is required at the field level', () => {
-    const field = getField('headingBlock');
+    const field = getPostFeaturedField('headingBlock');
 
     if (typeof field.validation !== 'function') {
       throw new Error('Expected headingBlock field to define validation.');
@@ -214,13 +196,13 @@ describe('postFeaturedSchema displayMode field', () => {
   });
 
   it('defaults to GRID', () => {
-    const field = getField('displayMode');
+    const field = getPostFeaturedField('displayMode');
 
     expect(field.initialValue).toBe(DISPLAY_MODE.GRID);
   });
 
   it('defines no validation rule', () => {
-    const field = getField('displayMode');
+    const field = getPostFeaturedField('displayMode');
 
     expect(
       'validation' in field ? field.validation : undefined,
@@ -230,7 +212,7 @@ describe('postFeaturedSchema displayMode field', () => {
 
 describe('postFeaturedSchema postSource field', () => {
   it('offers Pinned and Newest Featured, defaulting to Pinned', () => {
-    const field = getField('postSource');
+    const field = getPostFeaturedField('postSource');
 
     expect(getOptionValues(field)).toEqual([
       POST_SOURCE.PINNED,
@@ -242,7 +224,7 @@ describe('postFeaturedSchema postSource field', () => {
 
 describe('postFeaturedSchema posts field', () => {
   it('only accepts page_post references', () => {
-    const field = getField('posts') as {
+    const field = getPostFeaturedField('posts') as {
       of?: { to?: { type: string }[] }[];
     };
 
@@ -250,7 +232,7 @@ describe('postFeaturedSchema posts field', () => {
   });
 
   it('is hidden unless Post Source is Pinned', () => {
-    const hidden = getHidden(getField('posts'));
+    const hidden = getHidden(getPostFeaturedField('posts'));
 
     expect(hidden({ parent: { postSource: POST_SOURCE.PINNED } })).toBe(false);
     expect(
@@ -301,7 +283,7 @@ describe('postFeaturedSchema posts field', () => {
 
 describe('postFeaturedSchema limit field', () => {
   it('is hidden unless Post Source is Newest Featured', () => {
-    const hidden = getHidden(getField('limit'));
+    const hidden = getHidden(getPostFeaturedField('limit'));
 
     expect(
       hidden({ parent: { postSource: POST_SOURCE.NEWEST_FEATURED } }),
@@ -310,7 +292,7 @@ describe('postFeaturedSchema limit field', () => {
   });
 
   it('defaults to 3', () => {
-    expect(getField('limit').initialValue).toBe(3);
+    expect(getPostFeaturedField('limit').initialValue).toBe(3);
   });
 
   it('registers integer(), min(1) and max(3)', () => {

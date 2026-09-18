@@ -1,35 +1,22 @@
 import { CONTENT_ALIGNMENT, HERO_VARIANT } from '@blog/config/constants';
 import { HERO_FIELDSET_CONTENT_POSITION } from '@blog/studio/schema-types/modules/hero-fieldsets/hero-fieldsets';
+import { getField } from '@blog/studio/testing/get-field';
+import { getHidden } from '@blog/studio/testing/get-field-hidden';
 
 import { heroContentPositionFields } from './hero-content-position-fields';
 
-type THiddenFn = (context: { parent?: unknown }) => boolean;
-
-const getField = (name: string) => {
-  const field = heroContentPositionFields().find(
-    (field) => field.name === name,
+const getContentPositionField = (name: string) =>
+  getField(
+    {
+      name: 'heroContentPositionFields()',
+      fields: heroContentPositionFields(),
+    },
+    name,
   );
-
-  if (!field) {
-    throw new Error(
-      `Expected heroContentPositionFields() to define a "${name}" field.`,
-    );
-  }
-
-  return field;
-};
-
-const getHidden = (field: { hidden?: unknown }): THiddenFn => {
-  if (typeof field.hidden !== 'function') {
-    throw new Error('Expected field to define a hidden() fn.');
-  }
-
-  return field.hidden as THiddenFn;
-};
 
 describe(heroContentPositionFields, () => {
   it('shows contentPositionSplit only for Split, and tags it into the shared fieldset', () => {
-    const field = getField('contentPositionSplit');
+    const field = getContentPositionField('contentPositionSplit');
     const hidden = getHidden(field);
 
     expect(hidden({ parent: { variant: HERO_VARIANT.SPLIT } })).toBe(false);
@@ -41,7 +28,7 @@ describe(heroContentPositionFields, () => {
   });
 
   it('shows contentPositionBanner only for Banner, and tags it into the shared fieldset', () => {
-    const field = getField('contentPositionBanner');
+    const field = getContentPositionField('contentPositionBanner');
     const hidden = getHidden(field);
 
     expect(hidden({ parent: { variant: HERO_VARIANT.BANNER } })).toBe(false);
@@ -53,13 +40,15 @@ describe(heroContentPositionFields, () => {
   });
 
   it('always emits the contentAlignment baseline, tagged into the shared fieldset', () => {
-    const field = getField('contentAlignment') as { fieldset?: string };
+    const field = getContentPositionField('contentAlignment') as {
+      fieldset?: string;
+    };
 
     expect(field.fieldset).toBe(HERO_FIELDSET_CONTENT_POSITION);
   });
 
   it('defaults contentAlignment to Left', () => {
-    expect(getField('contentAlignment').initialValue).toBe(
+    expect(getContentPositionField('contentAlignment').initialValue).toBe(
       CONTENT_ALIGNMENT.LEFT,
     );
   });

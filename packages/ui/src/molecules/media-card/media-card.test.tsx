@@ -1,6 +1,12 @@
 import { renderElement, screen } from '@blog/ui/testing/custom-render';
+import { cloneElement } from 'react';
 
 import { MediaCard } from './media-card';
+
+vi.mock('react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('react')>();
+  return { ...actual, cloneElement: vi.fn(actual.cloneElement) };
+});
 
 describe(`<${MediaCard.name}/>`, () => {
   it('renders MediaCard.Title at the caller-specified heading level', () => {
@@ -503,5 +509,45 @@ describe(`<${MediaCard.name}/>`, () => {
     expect(media.parentElement).toHaveClass('md:w-1/2');
     expect(media).toHaveClass('size-12', 'rounded-md', 'mx-card-x');
     expect(media).not.toHaveClass('w-full');
+  });
+
+  describe('cloning the Media slot', () => {
+    beforeEach(() => {
+      vi.mocked(cloneElement).mockClear();
+    });
+
+    it('passes the Media slot through unmodified when isLead is unset and align is not center', () => {
+      renderElement(
+        <MediaCard>
+          <MediaCard.Media dataTestId="media-card-media">
+            <img src="/cover.jpg" alt="Cover photo" />
+          </MediaCard.Media>
+        </MediaCard>,
+      );
+      expect(cloneElement).not.toHaveBeenCalled();
+      expect(screen.getByTestId('media-card-media')).toBeVisible();
+    });
+
+    it('clones the Media slot when isLead is set', () => {
+      renderElement(
+        <MediaCard isLead={true}>
+          <MediaCard.Media dataTestId="media-card-media">
+            <img src="/cover.jpg" alt="Cover photo" />
+          </MediaCard.Media>
+        </MediaCard>,
+      );
+      expect(cloneElement).toHaveBeenCalledTimes(1);
+    });
+
+    it('clones the Media slot when align is "center"', () => {
+      renderElement(
+        <MediaCard align="center">
+          <MediaCard.Media dataTestId="media-card-media">
+            <img src="/cover.jpg" alt="Cover photo" />
+          </MediaCard.Media>
+        </MediaCard>,
+      );
+      expect(cloneElement).toHaveBeenCalledTimes(1);
+    });
   });
 });

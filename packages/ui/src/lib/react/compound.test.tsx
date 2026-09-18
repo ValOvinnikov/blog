@@ -1,10 +1,19 @@
 import { renderElement, screen, within } from '@blog/ui/testing/custom-render';
-import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import {
+  cloneElement,
+  type ComponentPropsWithoutRef,
+  type ReactNode,
+} from 'react';
 
 import { mapCompoundSlots } from './compound';
 
-const Alpha = ({ children }: ComponentPropsWithoutRef<'span'>) => (
-  <span data-testid="alpha">{children}</span>
+const Alpha = ({
+  children,
+  emphasis,
+}: ComponentPropsWithoutRef<'span'> & { emphasis?: boolean }) => (
+  <span data-testid="alpha" data-emphasis={emphasis}>
+    {children}
+  </span>
 );
 const Beta = ({ children }: ComponentPropsWithoutRef<'span'>) => (
   <span data-testid="beta">{children}</span>
@@ -15,9 +24,12 @@ const TestHarness = ({ children }: { children: ReactNode }) => {
     alpha: Alpha,
     beta: Beta,
   });
+  const alpha = slots.alpha
+    ? cloneElement(slots.alpha, { emphasis: true })
+    : slots.alpha;
   return (
     <div>
-      <div data-testid="slot-alpha">{slots.alpha}</div>
+      <div data-testid="slot-alpha">{alpha}</div>
       <div data-testid="slot-beta">{slots.beta}</div>
       <div data-testid="unmatched">
         {unmatched.map((node, i) => (
@@ -39,6 +51,18 @@ describe(mapCompoundSlots, () => {
     );
     expect(screen.getByTestId('alpha')).toBeVisible();
     expect(screen.getByTestId('alpha')).toHaveTextContent('one');
+  });
+
+  it('types a matched slot with its own component props, needing no cast to clone it', () => {
+    renderElement(
+      <TestHarness>
+        <Alpha>one</Alpha>
+      </TestHarness>,
+    );
+    expect(screen.getByTestId('alpha')).toHaveAttribute(
+      'data-emphasis',
+      'true',
+    );
   });
 
   it('matches multiple different known slots', () => {

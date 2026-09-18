@@ -1,5 +1,6 @@
 import { landingPageSchema } from '@blog/studio/schema-types/documents/pages/landing/landing';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
+import { heroProfileSchema } from '@blog/studio/schema-types/modules/hero-profile/hero-profile';
 import { heroStatementSchema } from '@blog/studio/schema-types/modules/hero-statement/hero-statement';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
@@ -10,6 +11,8 @@ import {
   type TModulesCustomFn,
 } from '@blog/studio/testing/create-mock-modules-rule';
 import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
+import { getField } from '@blog/studio/testing/get-field';
+import { wasRequiredCalled } from '@blog/studio/testing/was-required-called';
 import type { ValidationContext } from 'sanity';
 
 const getModulesCustomValidators = (): TModulesCustomFn[] => {
@@ -71,35 +74,14 @@ describe('landingPageSchema modules validateCustom chaining', () => {
 
 type TSlugCustomFn = (value: { current?: string } | undefined) => string | true;
 
-const getSlugField = () =>
-  landingPageSchema.fields?.find((field) => field.name === 'slug');
-
-const wasRequiredCalled = (field: { validation?: unknown }) => {
-  if (typeof field.validation !== 'function') {
-    throw new Error('Expected field to define validation.');
-  }
-
-  let requiredCalled = false;
-  const rule = {
-    required: () => {
-      requiredCalled = true;
-      return rule;
-    },
-    custom: () => rule,
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (field.validation as any)(rule);
-
-  return requiredCalled;
-};
+const getSlugField = () => getField(landingPageSchema, 'slug');
 
 const getSlugCustomValidator = () => {
   const slugField = getSlugField();
 
   return {
     customFn: getCustomValidator<TSlugCustomFn>(slugField),
-    requiredCalled: wasRequiredCalled(slugField ?? {}),
+    requiredCalled: wasRequiredCalled(slugField),
   };
 };
 
@@ -151,7 +133,7 @@ describe('landingPageSchema slug validation', () => {
 });
 
 describe('landingPageSchema hero field', () => {
-  it('is an optional reference scoped to heroBlog and heroStatement', () => {
+  it('is an optional reference scoped to heroBlog, heroStatement and heroProfile', () => {
     const heroField = landingPageSchema.fields?.find(
       (field) => field.name === 'hero',
     ) as { type: string; to?: Array<{ type: string }>; validation?: unknown };
@@ -161,6 +143,7 @@ describe('landingPageSchema hero field', () => {
     expect(heroField.to?.map((entry) => entry.type)).toEqual([
       heroBlogSchema.name,
       heroStatementSchema.name,
+      heroProfileSchema.name,
     ]);
     expect(heroField.validation).toBeUndefined();
   });

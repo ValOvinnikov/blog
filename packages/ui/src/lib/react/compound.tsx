@@ -11,7 +11,9 @@ import {
 type TComponentMap = Record<string, ElementType>;
 
 interface ICompoundSlots<M extends TComponentMap> {
-  slots: { [K in keyof M]?: ReactElement };
+  slots: {
+    [K in keyof M]?: ReactElement<ComponentProps<M[K]>, M[K]>;
+  };
   unmatched: ReactNode[];
 }
 
@@ -58,8 +60,10 @@ export const mapCompoundSlots = <M extends TComponentMap>(
       ([key, Component]) =>
         child.type === Component && slots[key] === undefined,
     );
-    if (match) slots[match[0]] = child;
-    else unmatched.push(child);
+    if (match) {
+      const [key] = match;
+      slots[key] = child as ICompoundSlots<M>['slots'][typeof key];
+    } else unmatched.push(child);
   });
 
   return { slots, unmatched };

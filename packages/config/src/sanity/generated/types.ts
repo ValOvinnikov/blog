@@ -887,6 +887,13 @@ export type Module_heroStatementReference = {
   [internalGroqTypeReferenceTo]?: 'module_heroStatement';
 };
 
+export type Module_heroProfileReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_heroProfile';
+};
+
 export type Module_contentReference = {
   _ref: string;
   _type: 'reference';
@@ -910,7 +917,10 @@ export type Page_landing = {
   title?: string;
   slug?: Slug;
   headingBlock?: HeadingBlock;
-  hero?: Module_heroBlogReference | Module_heroStatementReference;
+  hero?:
+    | Module_heroBlogReference
+    | Module_heroStatementReference
+    | Module_heroProfileReference;
   modules?: Array<
     | ({
         _key: string;
@@ -945,7 +955,10 @@ export type Page_home = {
   _rev: string;
   title?: string;
   headingBlock?: HeadingBlock;
-  hero?: Module_heroBlogReference | Module_heroStatementReference;
+  hero?:
+    | Module_heroBlogReference
+    | Module_heroStatementReference
+    | Module_heroProfileReference;
   modules?: Array<
     | ({
         _key: string;
@@ -970,6 +983,40 @@ export type Page_home = {
       } & Module_featureListReference)
   >;
   seo?: Seo;
+};
+
+export type Blog_authorReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'blog_author';
+};
+
+export type Module_heroProfile = {
+  _id: string;
+  _type: 'module_heroProfile';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  headingBlock?: HeadingBlock;
+  eyebrow?: string;
+  author?: Blog_authorReference;
+  imageSource?: 'AUTHOR' | 'CUSTOM' | 'NONE';
+  image?: ImageWithAlt;
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
+  showSocialLinks?: boolean;
+  variant?: 'SPLIT' | 'STACKED' | 'BANNER';
+  contentPositionSplit?: 'LEFT' | 'RIGHT';
+  contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  mediaOrderSplit?: 'LAST' | 'FIRST';
+  layout?: HeroLayout;
 };
 
 export type Module_heroStatement = {
@@ -1020,13 +1067,6 @@ export type Module_heroBlog = {
   mediaOrderSplit?: 'LAST' | 'FIRST';
   mediaOrderStacked?: 'LAST' | 'FIRST';
   layout?: HeroLayout;
-};
-
-export type Blog_authorReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'blog_author';
 };
 
 export type Module_postRelatedReference = {
@@ -1279,13 +1319,15 @@ export type AllSanitySchemaTypes =
   | Module_postFeaturedReference
   | Page_postIndex
   | Module_heroStatementReference
+  | Module_heroProfileReference
   | Module_contentReference
   | Module_featureListReference
   | Page_landing
   | Page_home
+  | Blog_authorReference
+  | Module_heroProfile
   | Module_heroStatement
   | Module_heroBlog
-  | Blog_authorReference
   | Module_postRelatedReference
   | Page_post
   | Blog_topic

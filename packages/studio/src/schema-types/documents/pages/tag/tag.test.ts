@@ -8,6 +8,7 @@ import {
   getRecordedValidators,
   type TRecordedValidator,
 } from '@blog/studio/testing/create-mock-validation-rule';
+import { getField } from '@blog/studio/testing/get-field';
 import type { ValidationContext } from 'sanity';
 
 type TReferenceFieldDefinition = {
@@ -28,8 +29,7 @@ type TValidationRule = {
   custom: (fn: unknown) => TValidationRule;
 };
 
-const getField = (name: string) =>
-  tagPageSchema.fields?.find((field) => field.name === name);
+const getTagPageField = (name: string) => getField(tagPageSchema, name);
 
 describe('tagPageSchema field order', () => {
   it('orders fields title, slug, tag, headingBlock, hero, modules, seo', () => {
@@ -51,7 +51,7 @@ describe('tagPageSchema shape', () => {
   });
 
   it('title is required via the shared titleField() helper', () => {
-    const titleFieldDefinition = getField('title');
+    const titleFieldDefinition = getTagPageField('title');
 
     if (!titleFieldDefinition?.validation) {
       throw new Error('Expected tagPageSchema to define a title field.');
@@ -73,11 +73,13 @@ describe('tagPageSchema shape', () => {
   });
 
   it('no longer defines a postList field', () => {
-    expect(getField('postList')).toBeUndefined();
+    expect(
+      tagPageSchema.fields?.find((field) => field.name === 'postList'),
+    ).toBeUndefined();
   });
 
   it('modules allows module_postList, module_postLatest, module_cta, module_newsletter, and module_taxonomyList', () => {
-    const modulesField = getField('modules') as
+    const modulesField = getTagPageField('modules') as
       TArrayFieldDefinition | undefined;
 
     if (!modulesField || modulesField.type !== 'array' || !modulesField.of) {
@@ -94,7 +96,7 @@ describe('tagPageSchema shape', () => {
   });
 
   it('seo is required via the shared seoField() helper', () => {
-    const seoFieldDefinition = getField('seo');
+    const seoFieldDefinition = getTagPageField('seo');
 
     if (!seoFieldDefinition?.validation) {
       throw new Error('Expected tagPageSchema to define a seo field.');
@@ -124,14 +126,14 @@ type THeadingBlockFieldDefinition = {
 
 describe('pageTagSchema headingBlock field', () => {
   it('is built via headingBlockField()', () => {
-    const headingBlockField = getField('headingBlock') as
+    const headingBlockField = getTagPageField('headingBlock') as
       THeadingBlockFieldDefinition | undefined;
 
     expect(headingBlockField?.type).toBe('headingBlock');
   });
 
   it('is required at the field level', () => {
-    const headingBlockField = getField('headingBlock') as
+    const headingBlockField = getTagPageField('headingBlock') as
       THeadingBlockFieldDefinition | undefined;
 
     if (!headingBlockField?.validation) {
@@ -156,7 +158,7 @@ describe('pageTagSchema headingBlock field', () => {
 
 describe('tagPageSchema hero field', () => {
   it('is an optional reference scoped to heroBlog only', () => {
-    const heroField = getField('hero') as
+    const heroField = getTagPageField('hero') as
       | { type: string; to?: Array<{ type: string }>; validation?: unknown }
       | undefined;
 
@@ -185,7 +187,7 @@ type TSlugFieldDefinition = {
 
 describe('tagPageSchema slug field', () => {
   const getSlugField = () =>
-    getField('slug') as TSlugFieldDefinition | undefined;
+    getTagPageField('slug') as TSlugFieldDefinition | undefined;
 
   it('is sourced from title with a 96-char max', () => {
     const slugField = getSlugField();
@@ -237,7 +239,7 @@ describe('tagPageSchema slug field', () => {
 
 describe('tagPageSchema tag field', () => {
   const getTagField = () =>
-    getField('tag') as TReferenceFieldDefinition | undefined;
+    getTagPageField('tag') as TReferenceFieldDefinition | undefined;
 
   it('references blog_tag', () => {
     const tagField = getTagField();

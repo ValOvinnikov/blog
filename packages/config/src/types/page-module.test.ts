@@ -14,6 +14,7 @@ describe('page module type unions', () => {
     expectTypeOf<TPageHomeType>().toEqualTypeOf<
       | 'module_heroBlog'
       | 'module_heroStatement'
+      | 'module_heroProfile'
       | 'module_content'
       | 'module_cta'
       | 'module_newsletter'
@@ -34,6 +35,7 @@ describe('page module type unions', () => {
     expectTypeOf<TPageLandingType>().toEqualTypeOf<
       | 'module_heroBlog'
       | 'module_heroStatement'
+      | 'module_heroProfile'
       | 'module_content'
       | 'module_cta'
       | 'module_postLatest'

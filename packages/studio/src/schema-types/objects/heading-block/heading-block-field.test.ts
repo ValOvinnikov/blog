@@ -1,23 +1,6 @@
+import { wasRequiredCalled } from '@blog/studio/testing/was-required-called';
+
 import { headingBlockField } from './heading-block-field';
-
-const wasRequiredCalled = (field: { validation?: unknown }) => {
-  if (!field.validation) {
-    throw new Error('Expected field to define validation.');
-  }
-
-  let requiredCalled = false;
-  const rule = {
-    required: () => {
-      requiredCalled = true;
-      return rule;
-    },
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (field.validation as any)(rule);
-
-  return requiredCalled;
-};
 
 describe('headingBlockField', () => {
   it('defaults to the shared headingBlock object type', () => {
