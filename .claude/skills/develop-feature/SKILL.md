@@ -61,6 +61,13 @@ each requiring explicit user approval. Never bundle them. See
   Read or grep inline only to verify a specific, already-named file (named by
   the user, the issue body, a prior `explore` dispatch, or this step's own
   prior output).
+  **Ask `explore` for the nearest existing sibling too** — the schema,
+  loader, component, view or migration most like what is being built — as
+  a path plus one line on how it differs. That path goes into every layer
+  agent's brief (step 3, item 6): an agent that starts cold with no sibling
+  named re-invents the shape, and the repo's clones (a toast provider copied
+  whole between the two apps, migration helpers copied across three folders)
+  are what that costs.
   **"I already have context from a prior session" is not an exemption** —
   cached memory can be stale (`feedback_memory_staleness_check.md`) and
   doesn't change whether what you're about to run is a _verification_ of a
@@ -153,6 +160,10 @@ prompt must include:
    component names) — copy the relevant signatures, not just a description
 4. Which specific files to read or create
 5. Definition of done for that layer (what "finished" looks like)
+6. The nearest existing sibling to model on (from step 1), as a path — the
+   agent extends or mirrors it rather than re-inventing; if it finds itself
+   copying more than a few lines out of it, that is a shared helper to
+   extract, and the report says so
 
 If you do a layer yourself instead of delegating, still apply that layer's
 agent rules and skill.

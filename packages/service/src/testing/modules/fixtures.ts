@@ -1,5 +1,7 @@
 import {
   BRAND_VARIANT,
+  CARD_IMAGE_SHAPE,
+  CONTENT_ALIGNMENT,
   CTA_ACTION_APPEARANCE,
   CTA_ACTION_VARIANT,
   CTA_VARIANT,
@@ -19,6 +21,10 @@ import type {
   TRawCtaContentMarkDef,
   TRawCtaModule,
 } from '@blog/service/features/modules/cta/adaptor/transformer';
+import type {
+  TRawFeatureListItem,
+  TRawFeatureListModule,
+} from '@blog/service/features/modules/feature-list/adaptor/transformer';
 import type { TRawHeroModule } from '@blog/service/features/modules/hero/adaptor/transformer';
 import type { TRawHeroBlogModule } from '@blog/service/features/modules/hero-blog/adaptor/transformer';
 import type { TRawHeroProfileModule } from '@blog/service/features/modules/hero-profile/adaptor/transformer';
@@ -299,6 +305,39 @@ export function makeRawNewsletterModule(
     variant: NEWSLETTER_VARIANT.FULL,
     layout: null,
     contentAlignment: null,
+    ...overrides,
+  };
+}
+
+export function makeRawFeatureListItem(
+  overrides: Partial<TRawFeatureListItem> = {},
+): TRawFeatureListItem {
+  return {
+    _id: 'block-feature-1',
+    headingBlock: makeRawHeadingBlock('Ship faster'),
+    icon: 'ROCKET',
+    image: null,
+    link: null,
+    ...overrides,
+  };
+}
+
+export function makeRawFeatureListModule(
+  overrides: Partial<TRawFeatureListModule> = {},
+): TRawFeatureListModule {
+  return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
+    headingBlock: makeRawHeadingBlock('Features'),
+    features: [
+      makeRawFeatureListItem(),
+      makeRawFeatureListItem({ _id: 'block-feature-2' }),
+    ],
+    ctaButtons: null,
+    imageShape: CARD_IMAGE_SHAPE.WIDE,
+    displayMode: DISPLAY_MODE.GRID,
+    contentAlignment: null,
+    cardAlignment: CONTENT_ALIGNMENT.LEFT,
+    layout: null,
     ...overrides,
   };
 }
