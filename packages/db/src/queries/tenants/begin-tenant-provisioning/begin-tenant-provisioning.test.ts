@@ -9,10 +9,9 @@ import {
   tenants,
   type TTenantProvisioningState,
 } from '@blog/db/schema/tenants';
-import { createTestDb } from '@blog/db/testing/create-test-db';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { eq, sql } from 'drizzle-orm';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { setTenantProvisioningStatus } from '../set-tenant-provisioning-status';
 
@@ -22,7 +21,7 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
+const db = useQueryTestDb(getDbMock);
 
 function minutesAgo(minutes: number): string {
   return new Date(Date.now() - minutes * 60_000).toISOString();
@@ -38,23 +37,15 @@ const WEDGED_STARTED_AT = minutesAgo(
 async function insertTenant(overrides?: {
   provisioningStatus?: (typeof TENANT_PROVISIONING_STATUS)[keyof typeof TENANT_PROVISIONING_STATUS];
 }): Promise<string> {
-  const tenant = await insertTestTenant(db, {
+  const tenant = await insertTestTenant(db(), {
     provisioningStatus: overrides?.provisioningStatus,
   });
 
   return tenant.id;
 }
 
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
-
 afterEach(async () => {
-  await db.delete(schema.tenants);
+  await db().delete(schema.tenants);
 });
 
 describe(beginTenantProvisioning, () => {
@@ -114,7 +105,7 @@ describe(beginTenantProvisioning, () => {
       error: ERROR_CODE.DB_ALREADY_PROVISIONING,
     });
 
-    const [row] = await db
+    const [row] = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenantId));
@@ -142,7 +133,7 @@ describe(beginTenantProvisioning, () => {
       error: ERROR_CODE.DB_ALREADY_PROVISIONING,
     });
 
-    const [row] = await db
+    const [row] = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenantId));
@@ -166,7 +157,7 @@ describe(beginTenantProvisioning, () => {
       OWNER_ELEVATION: { status: 'IDLE' },
       run: { startedAt: WEDGED_STARTED_AT },
     };
-    const tenant = await insertTestTenant(db, {
+    const tenant = await insertTestTenant(db(), {
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
       provisioningSteps,
     });
@@ -208,7 +199,7 @@ describe(beginTenantProvisioning, () => {
       OWNER_ELEVATION: { status: 'IDLE' },
       run: { startedAt: WEDGED_STARTED_AT },
     };
-    const tenant = await insertTestTenant(db, {
+    const tenant = await insertTestTenant(db(), {
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
       provisioningSteps,
     });
@@ -220,7 +211,7 @@ describe(beginTenantProvisioning, () => {
       error: ERROR_CODE.DB_ALREADY_PROVISIONING,
     });
 
-    const [row] = await db
+    const [row] = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenant.id));
@@ -243,7 +234,7 @@ describe(beginTenantProvisioning, () => {
         finishedAt: minutesAgo(TENANT_PROVISIONING_RETRY_DEBOUNCE_MINUTES),
       },
     };
-    const tenant = await insertTestTenant(db, {
+    const tenant = await insertTestTenant(db(), {
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
       provisioningSteps,
     });
@@ -270,7 +261,7 @@ describe(beginTenantProvisioning, () => {
       OWNER_ELEVATION: { status: 'IDLE' },
       run: { startedAt: staleStartedAt },
     };
-    const tenant = await insertTestTenant(db, {
+    const tenant = await insertTestTenant(db(), {
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
       provisioningSteps,
     });
@@ -294,7 +285,7 @@ describe(beginTenantProvisioning, () => {
       OWNER_ELEVATION: { status: 'IDLE' },
       run: { startedAt: new Date().toISOString() },
     };
-    const tenant = await insertTestTenant(db, {
+    const tenant = await insertTestTenant(db(), {
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
       provisioningSteps,
     });
@@ -306,7 +297,7 @@ describe(beginTenantProvisioning, () => {
       error: ERROR_CODE.DB_ALREADY_PROVISIONING,
     });
 
-    const [row] = await db
+    const [row] = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenant.id));
@@ -330,7 +321,7 @@ describe(beginTenantProvisioning, () => {
       OWNER_ELEVATION: { status: 'IDLE' },
       run: { startedAt: WEDGED_STARTED_AT },
     };
-    const tenant = await insertTestTenant(db, {
+    const tenant = await insertTestTenant(db(), {
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
       provisioningSteps,
     });
@@ -353,7 +344,7 @@ describe(beginTenantProvisioning, () => {
     const debouncedAdmittedAt = minutesAgo(
       TENANT_PROVISIONING_RETRY_DEBOUNCE_MINUTES + 1,
     );
-    await db
+    await db()
       .update(tenants)
       .set({
         provisioningSteps: sql`jsonb_set(
@@ -395,7 +386,7 @@ describe(beginTenantProvisioning, () => {
       OWNER_ELEVATION: { status: 'IDLE' },
       run: { startedAt: WEDGED_STARTED_AT },
     };
-    const tenant = await insertTestTenant(db, {
+    const tenant = await insertTestTenant(db(), {
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
       provisioningSteps,
     });
@@ -416,7 +407,7 @@ describe(beginTenantProvisioning, () => {
       error: ERROR_CODE.DB_ALREADY_PROVISIONING,
     });
 
-    const [row] = await db
+    const [row] = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenant.id));

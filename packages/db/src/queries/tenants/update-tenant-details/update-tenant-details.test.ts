@@ -14,10 +14,9 @@ import {
   tenants,
   type TTenantProvisioningState,
 } from '@blog/db/schema/tenants';
-import { createTestDb } from '@blog/db/testing/create-test-db';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { and, eq } from 'drizzle-orm';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import {
   updateTenantDetails,
@@ -28,7 +27,7 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
+const db = useQueryTestDb(getDbMock);
 
 const validInput: TUpdateTenantDetailsInput = {
   name: 'Acme Updated',
@@ -45,7 +44,7 @@ async function insertTenantWithDomain(overrides?: {
 }): Promise<string> {
   const domain = overrides?.domain ?? 'acme.example.com';
 
-  const tenant = await insertTestTenant(db, {
+  const tenant = await insertTestTenant(db(), {
     name: 'Acme',
     primaryDomain: domain,
     sanityProjectId: overrides?.sanityProjectId,
@@ -53,7 +52,7 @@ async function insertTenantWithDomain(overrides?: {
     provisioningSteps: overrides?.provisioningSteps,
   });
 
-  await db.insert(tenantDomains).values({ tenantId: tenant.id, domain });
+  await db().insert(tenantDomains).values({ tenantId: tenant.id, domain });
 
   return tenant.id;
 }
@@ -62,7 +61,7 @@ async function insertOwnerInvite(
   tenantId: string,
   email: string,
 ): Promise<string> {
-  const [invite] = await db
+  const [invite] = await db()
     .insert(membershipInvites)
     .values({ tenantId, email, role: MEMBERSHIP_ROLE.OWNER })
     .returning();
@@ -77,10 +76,10 @@ async function insertJoinedOwner(
   tenantId: string,
   email?: string,
 ): Promise<void> {
-  const [user] = await db.insert(users).values({ email }).returning();
+  const [user] = await db().insert(users).values({ email }).returning();
   if (!user) throw new Error('setup: user insert returned no row.');
 
-  await db
+  await db()
     .insert(memberships)
     .values({ tenantId, userId: user.id, role: MEMBERSHIP_ROLE.OWNER });
 }
@@ -101,18 +100,10 @@ function stepsWith(
   };
 }
 
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
-
 afterEach(async () => {
-  await db.delete(schema.tenantDomains);
-  await db.delete(schema.tenants);
-  await db.delete(schema.users);
+  await db().delete(schema.tenantDomains);
+  await db().delete(schema.tenants);
+  await db().delete(schema.users);
 });
 
 describe(updateTenantDetails, () => {
@@ -149,7 +140,7 @@ describe(updateTenantDetails, () => {
     }
     expect(result.tenant.primaryDomain).toBe('acme-new.example.com');
 
-    const domainRows = await db
+    const domainRows = await db()
       .select()
       .from(tenantDomains)
       .where(eq(tenantDomains.tenantId, tenantId));
@@ -171,7 +162,7 @@ describe(updateTenantDetails, () => {
 
     expect(result).toEqual({ outcome: 'domain-taken' });
 
-    const [row] = await db
+    const [row] = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, secondTenantId));
@@ -182,7 +173,7 @@ describe(updateTenantDetails, () => {
       locale: 'en',
     });
 
-    const domainRows = await db
+    const domainRows = await db()
       .select()
       .from(tenantDomains)
       .where(eq(tenantDomains.tenantId, secondTenantId));
@@ -196,7 +187,7 @@ describe(updateTenantDetails, () => {
     });
     // The pre-check doesn't exclude the tenant's own tenant_domains rows, so
     // this collides the same way a cross-tenant one would.
-    await db
+    await db()
       .insert(tenantDomains)
       .values({ tenantId, domain: 'acme-alt.example.com' });
 
@@ -207,7 +198,7 @@ describe(updateTenantDetails, () => {
 
     expect(result).toEqual({ outcome: 'domain-taken' });
 
-    const [row] = await db
+    const [row] = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenantId));
@@ -218,7 +209,7 @@ describe(updateTenantDetails, () => {
       locale: 'en',
     });
 
-    const domainRows = await db
+    const domainRows = await db()
       .select()
       .from(tenantDomains)
       .where(eq(tenantDomains.tenantId, tenantId));
@@ -310,7 +301,7 @@ describe(updateTenantDetails, () => {
 
     expect(result).toEqual({ outcome: 'provisioning-started' });
 
-    const [row] = await db
+    const [row] = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenantId));
@@ -348,7 +339,7 @@ describe(updateTenantDetails, () => {
 
     expect(result).toEqual({ outcome: 'provisioning-started' });
 
-    const [row] = await db
+    const [row] = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenantId));
@@ -411,7 +402,7 @@ describe(updateTenantDetails, () => {
 
     expect(result).toEqual({ outcome: 'provisioning-started' });
 
-    const [row] = await db
+    const [row] = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenantId));
@@ -437,7 +428,7 @@ describe(updateTenantDetails, () => {
 
     expect(result).toEqual({ outcome: 'provisioning-started' });
 
-    const [row] = await db
+    const [row] = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenantId));
@@ -488,7 +479,7 @@ describe(updateTenantDetails, () => {
       blockingStep: 'MAP_DOMAIN',
     });
 
-    const [row] = await db
+    const [row] = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenantId));
@@ -649,7 +640,7 @@ describe(updateTenantDetails, () => {
 
     expect(result).toMatchObject({ outcome: 'updated' });
 
-    const [invite] = await db
+    const [invite] = await db()
       .select()
       .from(membershipInvites)
       .where(eq(membershipInvites.tenantId, tenantId));
@@ -667,7 +658,7 @@ describe(updateTenantDetails, () => {
 
     expect(result).toMatchObject({ outcome: 'updated' });
 
-    const [invite] = await db
+    const [invite] = await db()
       .select()
       .from(membershipInvites)
       .where(eq(membershipInvites.tenantId, tenantId));
@@ -695,7 +686,7 @@ describe(updateTenantDetails, () => {
 
     expect(result).toEqual({ outcome: 'provisioning-started' });
 
-    const [invite] = await db
+    const [invite] = await db()
       .select()
       .from(membershipInvites)
       .where(eq(membershipInvites.tenantId, tenantId));
@@ -714,13 +705,13 @@ describe(updateTenantDetails, () => {
 
     expect(result).toEqual({ outcome: 'owner-already-joined' });
 
-    const [row] = await db
+    const [row] = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenantId));
     expect(row?.name).toBe('Acme');
 
-    const inviteRows = await db
+    const inviteRows = await db()
       .select()
       .from(membershipInvites)
       .where(eq(membershipInvites.tenantId, tenantId));
@@ -730,7 +721,7 @@ describe(updateTenantDetails, () => {
   it('returns owner-email-taken and leaves the invite untouched when the new email collides with another invite on the tenant', async () => {
     const tenantId = await insertTenantWithDomain();
     await insertOwnerInvite(tenantId, 'owner@example.com');
-    await db.insert(membershipInvites).values({
+    await db().insert(membershipInvites).values({
       tenantId,
       email: 'member@example.com',
       role: MEMBERSHIP_ROLE.EDITOR,
@@ -743,7 +734,7 @@ describe(updateTenantDetails, () => {
 
     expect(result).toEqual({ outcome: 'owner-email-taken' });
 
-    const [ownerInvite] = await db
+    const [ownerInvite] = await db()
       .select()
       .from(membershipInvites)
       .where(
@@ -802,7 +793,7 @@ describe(updateTenantDetails, () => {
       tenant: { name: 'New Name' },
     });
 
-    const [invite] = await db
+    const [invite] = await db()
       .select()
       .from(membershipInvites)
       .where(eq(membershipInvites.tenantId, tenantId));
@@ -821,7 +812,7 @@ describe(updateTenantDetails, () => {
 
     expect(result).toEqual({ outcome: 'owner-already-joined' });
 
-    const [row] = await db
+    const [row] = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenantId));
@@ -845,7 +836,7 @@ describe(updateTenantDetails, () => {
 
       expect(result).toEqual({ outcome: 'domain-invalid' });
 
-      const [row] = await db
+      const [row] = await db()
         .select()
         .from(tenants)
         .where(eq(tenants.id, tenantId));
@@ -854,7 +845,7 @@ describe(updateTenantDetails, () => {
         primaryDomain: 'acme.example.com',
       });
 
-      const domainRows = await db
+      const domainRows = await db()
         .select()
         .from(tenantDomains)
         .where(eq(tenantDomains.tenantId, tenantId));

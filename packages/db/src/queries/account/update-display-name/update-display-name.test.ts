@@ -1,42 +1,31 @@
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
 import { insertTestUser } from '@blog/db/testing/fixtures';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { updateDisplayName } from './update-display-name';
 
 const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
-// Only `getDb`'s return value is swapped for an in-memory Postgres — every
-// query these functions build still runs as real SQL (see
-// src/testing/create-test-db.ts).
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
+const db = useQueryTestDb(getDbMock);
 
 // One in-memory Postgres instance for the whole file (spinning up pglite's
 // WASM engine is the slow part — seconds, not milliseconds) — `afterEach`
 // clears rows between tests instead of paying that cost per test.
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
 
 afterEach(async () => {
-  await db.delete(schema.users);
+  await db().delete(schema.users);
 });
 
 describe(updateDisplayName, () => {
   it('persists the new name', async () => {
-    const user = await insertTestUser(db, { name: 'Old Name' });
+    const user = await insertTestUser(db(), { name: 'Old Name' });
 
     await updateDisplayName(user.id, 'New Name');
 
-    const [updated] = await db
+    const [updated] = await db()
       .select()
       .from(schema.users)
       .where(eq(schema.users.id, user.id));
@@ -44,12 +33,12 @@ describe(updateDisplayName, () => {
   });
 
   it("does not change another user's name", async () => {
-    const user = await insertTestUser(db, { name: 'User One' });
-    const otherUser = await insertTestUser(db, { name: 'User Two' });
+    const user = await insertTestUser(db(), { name: 'User One' });
+    const otherUser = await insertTestUser(db(), { name: 'User Two' });
 
     await updateDisplayName(user.id, 'Renamed');
 
-    const [untouched] = await db
+    const [untouched] = await db()
       .select()
       .from(schema.users)
       .where(eq(schema.users.id, otherUser.id));

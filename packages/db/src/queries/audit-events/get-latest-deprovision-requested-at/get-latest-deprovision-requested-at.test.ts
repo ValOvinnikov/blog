@@ -1,7 +1,6 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { getLatestDeprovisionRequestedAt } from './get-latest-deprovision-requested-at';
 
@@ -9,33 +8,27 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
+const db = useQueryTestDb(getDbMock);
 
 async function insertEvent(overrides: {
   targetId: string;
   createdAt: Date;
   action?: (typeof AUDIT_ACTION)[keyof typeof AUDIT_ACTION];
 }): Promise<void> {
-  await db.insert(schema.auditEvents).values({
-    actorId: 'admin-1',
-    actorEmail: 'admin-1@example.com',
-    action: overrides.action ?? AUDIT_ACTION.DEPROVISION_REQUESTED,
-    targetType: AUDIT_TARGET_TYPE.TENANT,
-    targetId: overrides.targetId,
-    createdAt: overrides.createdAt,
-  });
+  await db()
+    .insert(schema.auditEvents)
+    .values({
+      actorId: 'admin-1',
+      actorEmail: 'admin-1@example.com',
+      action: overrides.action ?? AUDIT_ACTION.DEPROVISION_REQUESTED,
+      targetType: AUDIT_TARGET_TYPE.TENANT,
+      targetId: overrides.targetId,
+      createdAt: overrides.createdAt,
+    });
 }
 
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
-
 afterEach(async () => {
-  await db.delete(schema.auditEvents);
+  await db().delete(schema.auditEvents);
 });
 
 describe(getLatestDeprovisionRequestedAt, () => {
@@ -63,7 +56,10 @@ describe(getLatestDeprovisionRequestedAt, () => {
   });
 
   it('ignores events for a different tenant', async () => {
-    await insertEvent({ targetId: 'tenant-2', createdAt: new Date(2026, 0, 1) });
+    await insertEvent({
+      targetId: 'tenant-2',
+      createdAt: new Date(2026, 0, 1),
+    });
 
     const result = await getLatestDeprovisionRequestedAt('tenant-1');
 
