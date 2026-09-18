@@ -113,6 +113,7 @@ export function makeRawHeroProfileModule(
     image: null,
     showSocialLinks: true,
     author: {
+      name: 'Jamie Rivera',
       image: null,
       socialLinks: null,
     },
