@@ -282,7 +282,7 @@ so a navigation item carries no label of its own — the label comes from the
 `SOCIAL_PLATFORMS`, and both resolve through one shared
 fragment/transformer pair rather than a type each. A social link's
 accessible name is **derived** from that `platform` via the
-`siteFooter.socialLinkAriaLabel` message rather than stored per link, so it
+`socialLinks.linkAriaLabel` message rather than stored per link, so it
 stays translated and consistent instead of depending on each author typing
 one.
 
