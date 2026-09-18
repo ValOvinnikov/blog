@@ -10,6 +10,7 @@ const {
   postLatestModuleMock,
   taxonomyListModuleMock,
   postFeaturedModuleMock,
+  featureListModuleMock,
   heroBlogModuleMock,
   heroStatementModuleMock,
   loggerWarnMock,
@@ -31,6 +32,9 @@ const {
   )),
   postFeaturedModuleMock: vi.fn(({ id }: { id: string }) => (
     <div data-testid="stub-post-featured">{id}</div>
+  )),
+  featureListModuleMock: vi.fn(({ id }: { id: string }) => (
+    <div data-testid="stub-feature-list">{id}</div>
   )),
   heroBlogModuleMock: vi.fn(async () => null),
   heroStatementModuleMock: vi.fn(async ({ id }: { id: string }) => (
@@ -54,6 +58,9 @@ vi.mock('@web/modules/taxonomy-list/taxonomy-list-module', () => ({
 }));
 vi.mock('@web/modules/post-featured/post-featured-module', () => ({
   PostFeaturedModule: postFeaturedModuleMock,
+}));
+vi.mock('@web/modules/feature-list/feature-list-module', () => ({
+  FeatureListModule: featureListModuleMock,
 }));
 vi.mock('@web/modules/hero-blog/hero-blog-module', () => ({
   HeroBlogModule: heroBlogModuleMock,
@@ -146,6 +153,7 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
         { id: 'post-latest-1', type: 'module_postLatest' },
         { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
         { id: 'post-featured-1', type: 'module_postFeatured' },
+        { id: 'feature-list-1', type: 'module_featureList' },
       ],
     });
 
@@ -157,6 +165,7 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
       'post-latest-1',
       'taxonomy-list-1',
       'post-featured-1',
+      'feature-list-1',
     ]);
   });
 });
