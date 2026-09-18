@@ -364,14 +364,14 @@ asserting every registered `module_hero*` schema appears in it.
 **A page accepts only the hero kinds it names.** `heroField({ allow })`
 takes an explicit list per page, the way `modulesField({ allow })` already
 does, so the registry is no longer what a page's `hero` `to:` points at.
-`page_home` accepts all three kinds, the legacy `module_hero` included —
-production's only page document is a `page_home` whose hero is one, so it
-stays until #2813 retires the schema. `page_landing` accepts Blog and
-Statement. `page_postIndex`, `page_tag`, `page_topic`, `page_tagIndex` and
-`page_topicIndex` accept Blog only — a statement hero belongs on a
-marketing page, not an archive. `page_post` has no `hero` field at all.
-Narrowing a page is what turns a surplus entry in its `apps/web` module map
-from dead code into a `type-check` error.
+`page_home` and `page_landing` accept Blog and Statement. `page_postIndex`,
+`page_tag`, `page_topic`, `page_tagIndex` and `page_topicIndex` accept Blog
+only — a statement hero belongs on a marketing page, not an archive.
+`page_post` has no `hero` field at all. The deprecated `module_hero` is
+named by no page: its schema stays registered in `HERO_SCHEMA_TYPES` until
+#2813 retires it, but no picker offers it. Narrowing a page is what turns a
+surplus entry in its `apps/web` module map from dead code into a
+`type-check` error.
 
 Three kinds are registered. **`module_hero`** is the original, kept until
 #2813 retires it. **`module_heroBlog`** is the featured-post hero: its
@@ -570,8 +570,9 @@ not warrant separate types. It previously did have two: `CTA_ALIGNMENT` and
 one generated field described by two names and one of them named after what
 had become only one of its five callers.
 
-`module_taxonomyList` reaches `ModuleRenderer` through `MODULE_MAP` wherever it
-is placed — `page_home.modules[]`, `page_landing.modules[]`,
+`module_taxonomyList` renders through its page's own module map wherever it is
+placed — `page_home.modules[]`, `page_landing.modules[]`,
+`page_postIndex.modules[]`, `page_topic.modules[]`, `page_tag.modules[]`,
 `page_topicIndex.modules[]` and `page_tagIndex.modules[]`. It used to render a
 second way as well, through a dedicated `taxonomyList` reference on each
 taxonomy index page; neither page has one any more, and both fields are
