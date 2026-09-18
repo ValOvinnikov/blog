@@ -165,8 +165,7 @@ export type Module_featureList = {
       _key: string;
     } & CtaButton
   >;
-  showImages?: boolean;
-  imageShape?: 'WIDE' | 'SQUARE' | 'CIRCLE' | 'ICON';
+  imageShape?: 'WIDE' | 'SQUARE' | 'CIRCLE';
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   cardAlignment?: 'LEFT' | 'CENTER';
@@ -534,7 +533,7 @@ export type Block_feature = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  text?: string;
+  headingBlock?: HeadingBlock;
   icon?:
     | 'CODE'
     | 'LAYERS'

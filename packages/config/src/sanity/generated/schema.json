@@ -1039,13 +1039,6 @@
         },
         "optional": true
       },
-      "showImages": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "boolean"
-        },
-        "optional": true
-      },
       "imageShape": {
         "type": "objectAttribute",
         "value": {
@@ -1062,10 +1055,6 @@
             {
               "type": "string",
               "value": "CIRCLE"
-            },
-            {
-              "type": "string",
-              "value": "ICON"
             }
           ]
         },
@@ -3604,10 +3593,11 @@
         },
         "optional": true
       },
-      "text": {
+      "headingBlock": {
         "type": "objectAttribute",
         "value": {
-          "type": "string"
+          "type": "inline",
+          "name": "headingBlock"
         },
         "optional": true
       },
