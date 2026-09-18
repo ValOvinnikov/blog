@@ -3,7 +3,7 @@ import {
   type TContentAlignment,
   type TMaybeUndefined,
 } from '@blog/config';
-import { toCtaButton } from '@blog/service/shared/transformers/to-cta-button';
+import { toCtaButtons } from '@blog/service/shared/transformers/to-cta-buttons';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import { toPortableTextBlockWithResolvedLinks } from '@blog/service/shared/transformers/to-portable-text-mark-def';
@@ -11,7 +11,7 @@ import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image
 import type { InferResultType } from 'groqd';
 
 import type { ctaModuleQuery } from './query';
-import type { TCtaButton, TCtaModule, TResolvedCtaContentBlock } from './types';
+import type { TCtaModule, TResolvedCtaContentBlock } from './types';
 
 export type TRawCtaModule = InferResultType<typeof ctaModuleQuery>;
 
@@ -38,14 +38,6 @@ function toContentPosition(
     case CTA_VARIANT.CALLOUT:
       return undefined;
   }
-}
-
-function toCtaButtons(raw: TRawCtaModule['ctaButtons']): TCtaButton[] {
-  if (!raw || raw.length === 0) return [];
-
-  return raw
-    .map(toCtaButton)
-    .filter((button): button is TCtaButton => button !== undefined);
 }
 
 export function toCtaModule(raw: TRawCtaModule): TCtaModule {

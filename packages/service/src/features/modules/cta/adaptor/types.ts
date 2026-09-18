@@ -12,8 +12,6 @@ import type {
 import type { TCtaButton } from '@blog/service/shared/transformers/to-cta-button';
 import type { TPortableTextBlockWithResolvedLinks } from '@blog/service/shared/transformers/to-portable-text-mark-def';
 
-export type { TCtaButton };
-
 export type TResolvedCtaContentBlock = TPortableTextBlockWithResolvedLinks<
   InlineText[number]
 >;
