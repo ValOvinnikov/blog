@@ -64,9 +64,12 @@ them. Do not skip a pass because an earlier one found problems.
 
 Read the `code-review-practices` skill
 (`.claude/skills/code-review-practices/SKILL.md`) — its **section 0** is the
-authoritative command list. Run every command over the full diff; every hit
-is a blocking finding unless the skill explicitly allows it. Also scan the
-diff by eye for commented-out code blocks (grep can't catch those reliably).
+authoritative command list. Run every command over the full diff — including
+the test-restates-source grep and the `jscpd` clone run at the end of it;
+every hit is a blocking finding unless the skill explicitly allows it. Also
+scan the diff by eye for commented-out code blocks (grep can't catch those
+reliably) and for tests whose expected values are literals copied from the
+file under test — the grep only narrows that one.
 
 ### Pass 2 — Contract pass
 
@@ -82,8 +85,11 @@ Review for what a contract check won't catch:
 - **Security:** injection/XSS, secrets, unsafe deserialization, missing
   verification on webhook/API routes.
 - **Performance:** over-fetching, N+1, unbounded queries, work in hot paths.
-- **Maintainability:** naming, duplication, dead code, missing tests for
-  changed behaviour, stale comments/docs contradicting the code.
+- **Maintainability:** naming, dead code, missing tests for changed
+  behaviour, stale comments/docs contradicting the code. Duplication is
+  reported from the clone run in Pass 1 — a copied helper/component/hook is
+  blocking (share it); a repeated test arrangement is non-blocking (`it.each`,
+  filed). Name the sibling it should have extended.
 
 ### Duplication is checked against the repo, not against the diff
 

@@ -54,6 +54,21 @@ git diff "$BASE"...HEAD --name-only | grep -E '^\.env'
 # fake), but it flags the exact injection vector for a manual look: a real
 # Access API error string copy-pasted into a test.
 D | grep -nE '^\+.*/access/project/[a-z0-9]{8}/'
+
+# Tests that restate their source (testing-practices → "What not to test"):
+# an expected value copied verbatim out of the file under test — a field
+# list, an option list, a default, "exposes X as a function", a constant's
+# value. The grep narrows; the judgement is by eye, and a hit is blocking.
+D | grep -nE '^\+.*(fields\.map\(\(f\) => f\.name\)|typeof [^)]*\)\.toBe\(.function.\)|\.name\)\.toBe\()'
+
+# Clones. Run over every workspace the diff touches, then read the hits that
+# involve a changed file. A whole helper/component/hook copied instead of
+# shared is blocking; a repeated test arrangement that wants `it.each` is
+# non-blocking and gets filed. ~5s for the whole repo.
+WS=$( (git diff "$BASE"...HEAD --name-only; git diff --name-only) | grep -E '\.(ts|tsx)$' | cut -d/ -f1-2 | sort -u )
+[ -n "$WS" ] && pnpm dlx jscpd@4 --min-tokens 60 --min-lines 8 \
+  --ignore '**/node_modules/**,**/generated/**,**/.next/**' --reporters console $WS 2>/dev/null \
+  | grep -A2 'Clone found'
 ```
 
 Also scan the diff by eye for commented-out code blocks — grep can't catch
@@ -157,6 +172,14 @@ CI-enforced guard was deliberately not added.
 - New/changed `ui` components have a co-located `*.test.tsx` and a Storybook
   story (follow `ui-storybook` skill). Both are required, not optional.
 - New/changed `service` functions have a co-located `*.test.ts`.
+- **"Required" means behaviour coverage, not a file.** A schema, registry,
+  constant or barrel change with no logic in it gets no test, and a test
+  whose expected value is a literal copied out of the file under test
+  (field list, option list, default, fieldset, "exposes X as a function",
+  constant value) is **blocking** — delete it, don't keep it (full rule:
+  `testing-practices` → "What not to test"). Sibling cases that differ only
+  in an input and an expected value are one `it.each`; a copied block is
+  non-blocking and gets filed.
 - Bug fixes include a regression test that failed before the fix.
 - **Suite labels — a component takes ``describe(`<${Component.name}/>`, …)``,
   everything else takes the bare symbol `describe(theSymbol, …)`.** A string

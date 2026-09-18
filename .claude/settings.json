@@ -40,6 +40,7 @@
       "Bash(mv:*)",
       "Bash(npm view*)",
       "Bash(pnpm knip*)",
+      "Bash(pnpm dlx jscpd@4:*)",
       "mcp__plugin_context7_context7__query-docs",
       "mcp__plugin_context7_context7__resolve-library-id",
       "mcp__plugin_vercel_vercel__list_deployments",
