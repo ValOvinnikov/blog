@@ -1,9 +1,9 @@
 import { TagsIndexBreadcrumbs } from '@web/components/features/tags-index/tags-index-breadcrumbs';
 import { PageShell } from '@web/components/page-templates/page-shell';
-import { PageIntro } from '@web/components/shared/page-intro';
-import { ModuleRenderer } from '@web/modules/module-renderer';
 import { getTagsIndexPage } from '@web/server/tags-index/get-tags-index-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
+
+import { TagsModuleRenderer } from './tags-module-renderer';
 
 type TTagsPageProps = { locale: string; tenant: string };
 
@@ -25,18 +25,13 @@ export const TagsPage = async ({ locale, tenant }: TTagsPageProps) => {
       <PageShell.Breadcrumbs>
         <TagsIndexBreadcrumbs tenant={tenant} />
       </PageShell.Breadcrumbs>
-      <PageShell.Heading>
-        <PageIntro
-          hero={hero}
-          headingBlock={headingBlock}
-          hasTrailingSpace={false}
-          locale={locale}
-          tenant={tenant}
-        />
-      </PageShell.Heading>
-      <PageShell.Content>
-        <ModuleRenderer modules={modules} locale={locale} tenant={tenant} />
-      </PageShell.Content>
+      <TagsModuleRenderer
+        hero={hero}
+        headingBlock={headingBlock}
+        modules={modules}
+        locale={locale}
+        tenant={tenant}
+      />
     </PageShell>
   );
 };

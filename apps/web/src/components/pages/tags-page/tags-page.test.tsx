@@ -4,31 +4,25 @@ import { notFound } from 'next/navigation';
 
 import { TagsPage } from './tags-page';
 
-const { getTagsIndexPageMock, moduleRendererMock, pageIntroMock } = vi.hoisted(
-  () => ({
-    getTagsIndexPageMock: vi.fn(),
-    pageIntroMock: vi.fn(
-      ({
-        hero,
-        headingBlock,
-      }: {
-        hero?: { id: string };
-        headingBlock: { heading: string };
-      }) => (
-        <h1 data-testid="page-intro">
-          {hero ? hero.id : headingBlock.heading}
-        </h1>
-      ),
+const { getTagsIndexPageMock, tagsModuleRendererMock } = vi.hoisted(() => ({
+  getTagsIndexPageMock: vi.fn(),
+  tagsModuleRendererMock: vi.fn(
+    ({
+      hero,
+      headingBlock,
+      modules,
+    }: {
+      hero?: { id: string };
+      headingBlock: { heading: string };
+      modules: { id: string; type: string }[];
+    }) => (
+      <div data-testid="tags-module-renderer">
+        {hero ? hero.id : headingBlock.heading} —{' '}
+        {modules.map((module) => module.type).join(',')}
+      </div>
     ),
-    moduleRendererMock: vi.fn(
-      ({ modules }: { modules: { id: string; type: string }[] }) => (
-        <div data-testid="module-renderer-stub">
-          {modules.map((module) => module.type).join(',')}
-        </div>
-      ),
-    ),
-  }),
-);
+  ),
+}));
 
 vi.mock('@web/server/tags-index/get-tags-index-page', () => ({
   getTagsIndexPage: getTagsIndexPageMock,
@@ -40,12 +34,8 @@ vi.mock('@web/components/features/tags-index/tags-index-breadcrumbs', () => ({
   ),
 }));
 
-vi.mock('@web/components/shared/page-intro', () => ({
-  PageIntro: pageIntroMock,
-}));
-
-vi.mock('@web/modules/module-renderer', () => ({
-  ModuleRenderer: moduleRendererMock,
+vi.mock('./tags-module-renderer', () => ({
+  TagsModuleRenderer: tagsModuleRendererMock,
 }));
 
 const setup = customRenderAsync(TagsPage, {
@@ -84,7 +74,7 @@ describe(`<${TagsPage.name}/>`, () => {
     errorSpy.mockRestore();
   });
 
-  it('dispatches PageIntro with the fetched headingBlock and hasTrailingSpace false', async () => {
+  it('dispatches TagsModuleRenderer with the fetched headingBlock and modules', async () => {
     getTagsIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -98,23 +88,25 @@ describe(`<${TagsPage.name}/>`, () => {
 
     await setup();
 
-    expect(pageIntroMock).toHaveBeenCalledWith(
+    expect(tagsModuleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({
         headingBlock: makeHeadingBlock({
           heading: 'Tags',
           supportingText: 'Browse every post by tag.',
         }),
-        hasTrailingSpace: false,
+        modules: [],
         locale: 'en',
         tenant: 'tenant-1',
       }),
       undefined,
     );
-    expect(screen.getByTestId('page-intro')).toHaveTextContent('Tags');
+    expect(screen.getByTestId('tags-module-renderer')).toHaveTextContent(
+      'Tags',
+    );
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('dispatches PageIntro with the hero when a hero is set', async () => {
+  it('dispatches TagsModuleRenderer with the hero when a hero is set', async () => {
     getTagsIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -126,7 +118,7 @@ describe(`<${TagsPage.name}/>`, () => {
 
     await setup();
 
-    expect(pageIntroMock).toHaveBeenCalledWith(
+    expect(tagsModuleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({
         hero: { id: 'hero-1', type: 'module_hero' },
         locale: 'en',
@@ -134,7 +126,9 @@ describe(`<${TagsPage.name}/>`, () => {
       }),
       undefined,
     );
-    expect(screen.getByTestId('page-intro')).toHaveTextContent('hero-1');
+    expect(screen.getByTestId('tags-module-renderer')).toHaveTextContent(
+      'hero-1',
+    );
   });
 
   it('renders the parts in order: breadcrumbs, then the module renderer', async () => {
@@ -152,11 +146,7 @@ describe(`<${TagsPage.name}/>`, () => {
       container.querySelectorAll<HTMLElement>('[data-testid]'),
     ).map((el) => el.getAttribute('data-testid'));
 
-    expect(order).toEqual([
-      'tags-index-breadcrumbs',
-      'page-intro',
-      'module-renderer-stub',
-    ]);
+    expect(order).toEqual(['tags-index-breadcrumbs', 'tags-module-renderer']);
   });
 
   it('renders through PageShell: breadcrumbs outside main, module renderer inside it', async () => {
@@ -171,13 +161,13 @@ describe(`<${TagsPage.name}/>`, () => {
     await setup();
 
     const main = screen.getByRole('main');
-    expect(main).toContainElement(screen.getByTestId('module-renderer-stub'));
+    expect(main).toContainElement(screen.getByTestId('tags-module-renderer'));
     expect(
       screen.getByTestId('tags-index-breadcrumbs').closest('main'),
     ).toBeNull();
   });
 
-  it('passes the page-builder modules through to ModuleRenderer, in order, including the taxonomy list module', async () => {
+  it('passes the page-builder modules through to TagsModuleRenderer, in order, including the taxonomy list module', async () => {
     getTagsIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -191,7 +181,7 @@ describe(`<${TagsPage.name}/>`, () => {
 
     await setup();
 
-    expect(moduleRendererMock).toHaveBeenCalledWith(
+    expect(tagsModuleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({
         modules: [
           { id: 'tag-list-1', type: 'module_taxonomyList' },
@@ -201,7 +191,7 @@ describe(`<${TagsPage.name}/>`, () => {
       }),
       undefined,
     );
-    expect(screen.getByTestId('module-renderer-stub')).toHaveTextContent(
+    expect(screen.getByTestId('tags-module-renderer')).toHaveTextContent(
       'module_taxonomyList,module_newsletter',
     );
   });
