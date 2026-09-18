@@ -229,10 +229,10 @@ describe('heroBlogSchema imageSource field', () => {
     expect(field.initialValue).toBe(HERO_IMAGE_SOURCE.POST);
   });
 
-  it('is a required dropdown in the image fieldset, and drives the image field', () => {
+  it('is a required radio in the image fieldset, and drives the image field', () => {
     const field = getField('imageSource');
 
-    expect(getLayout(field)).toBe('dropdown');
+    expect(getLayout(field)).toBe('radio');
     expect(wasRequiredCalled(field)).toBe(true);
     expect(getFieldset(field)).toBe('image');
   });
