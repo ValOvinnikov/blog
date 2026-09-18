@@ -3,7 +3,7 @@ import { SanityImage } from '@web/components/shared/sanity-image';
 import type { ReactNode } from 'react';
 
 /**
- * Builds the `image` node a lead `PostCardItem` renders, or `undefined` when
+ * Builds the `image` node a lead `MediaCardItem` renders, or `undefined` when
  * the post has no hero image. Never sets `priority` — a spotlight lead never
  * owns the page's LCP hero.
  */

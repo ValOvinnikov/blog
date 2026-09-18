@@ -2,11 +2,11 @@ import { DISPLAY_MODE } from '@blog/config';
 import type { TPostLatestModule } from '@blog/service';
 import { Heading } from '@blog/ui/atoms/heading';
 import { CardGrid } from '@blog/ui/organisms/card-grid';
+import { CardCarousel } from '@web/components/shared/card-carousel';
 import {
-  type IPostCardData,
-  PostCardItem,
-} from '@web/components/shared/post-card-item';
-import { PostsCarousel } from '@web/components/shared/posts-carousel';
+  type IMediaCardData,
+  MediaCardItem,
+} from '@web/components/shared/media-card-item';
 import { Section } from '@web/components/shared/section';
 
 import { postLatestModuleViewVariants } from './post-latest-module-view-variants';
@@ -15,7 +15,7 @@ export interface IPostLatestModuleViewProps extends Omit<
   TPostLatestModule,
   'posts' | 'showImages'
 > {
-  items: IPostCardData[];
+  items: IMediaCardData[];
   titleId: string;
   dataTestId: string;
   hasImages?: boolean;
@@ -23,8 +23,8 @@ export interface IPostLatestModuleViewProps extends Omit<
 
 /**
  * PostLatestModuleView — render shell for `PostLatestModule`: a labeled
- * `Section` wrapping either a `PostsCarousel` or a `CardGrid` of
- * `PostCardItem`s. Never called with an empty `items` — `PostLatestModule`
+ * `Section` wrapping either a `CardCarousel` or a `CardGrid` of
+ * `MediaCardItem`s. Never called with an empty `items` — `PostLatestModule`
  * renders nothing itself in that case.
  */
 export const PostLatestModuleView = ({
@@ -53,7 +53,7 @@ export const PostLatestModuleView = ({
       </Heading>
       {supportingText && <p className={s.supportingText()}>{supportingText}</p>}
       {displayMode === DISPLAY_MODE.CAROUSEL ? (
-        <PostsCarousel
+        <CardCarousel
           items={items}
           hasImages={hasImages}
           title={heading}
@@ -62,7 +62,7 @@ export const PostLatestModuleView = ({
       ) : (
         <CardGrid className={s.grid()}>
           {items.map((item) => (
-            <PostCardItem key={item.id} item={item} hasImage={hasImages} />
+            <MediaCardItem key={item.id} item={item} hasImage={hasImages} />
           ))}
         </CardGrid>
       )}

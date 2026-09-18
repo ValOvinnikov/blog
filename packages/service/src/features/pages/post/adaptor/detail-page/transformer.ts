@@ -6,7 +6,7 @@ import { toPortableTextBody } from '@blog/service/shared/transformers/to-portabl
 import { toPortableTextBlockWithResolvedLinks } from '@blog/service/shared/transformers/to-portable-text-mark-def';
 import { toPostHeading } from '@blog/service/shared/transformers/to-post-heading';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
-import { toSocialProfile } from '@blog/service/shared/transformers/to-social-profile';
+import { toSocialProfiles } from '@blog/service/shared/transformers/to-social-profiles';
 import { toTag } from '@blog/service/shared/transformers/to-tag';
 import { toTopic } from '@blog/service/shared/transformers/to-topic';
 import { toReadingTimeMinutes } from '@blog/utils';
@@ -25,9 +25,7 @@ function toPostDetailAuthor(raw: TRawPostDetail['author']): TPostDetailAuthor {
     image: toSanityImage(raw.image),
     role: raw.role ?? undefined,
     bio: raw.bio?.map(toPortableTextBlockWithResolvedLinks) ?? undefined,
-    socialLinks: (raw.socialLinks ?? []).flatMap(
-      (item) => toSocialProfile(item) ?? [],
-    ),
+    socialLinks: toSocialProfiles(raw.socialLinks),
   };
 }
 

@@ -20,11 +20,11 @@ vi.mock('@web/components/shared/smart-link', () => ({
   ),
 }));
 
-const { PostsCarousel } = vi.hoisted(() => ({
-  PostsCarousel: vi.fn(() => <div data-testid="posts-carousel-stub" />),
+const { CardCarousel } = vi.hoisted(() => ({
+  CardCarousel: vi.fn(() => <div data-testid="card-carousel-stub" />),
 }));
 
-vi.mock('@web/components/shared/posts-carousel', () => ({ PostsCarousel }));
+vi.mock('@web/components/shared/card-carousel', () => ({ CardCarousel }));
 
 const leadPost = makePostListItem({
   id: 'post-1',
@@ -165,33 +165,33 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
   it('renders no media region when hasImages is not given', () => {
     setup();
 
-    expect(screen.queryByTestId('post-card-media')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('media-card-media')).not.toBeInTheDocument();
   });
 
   it('renders a media region for the lead card when hasImages is true', () => {
     setup({ hasImages: true });
 
-    expect(screen.getByTestId('post-card-media')).toBeInTheDocument();
+    expect(screen.getByTestId('media-card-media')).toBeInTheDocument();
     expect(screen.getByTestId('lead-image')).toBeInTheDocument();
   });
 
-  it('renders PostsCarousel with the view items when displayMode is CAROUSEL', () => {
+  it('renders CardCarousel with the view items when displayMode is CAROUSEL', () => {
     setup({
       items: [leadPost, secondPost, thirdPost],
       displayMode: DISPLAY_MODE.CAROUSEL,
     });
 
-    expect(screen.getByTestId('posts-carousel-stub')).toBeInTheDocument();
-    expect(PostsCarousel).toHaveBeenCalledWith(
+    expect(screen.getByTestId('card-carousel-stub')).toBeInTheDocument();
+    expect(CardCarousel).toHaveBeenCalledWith(
       expect.objectContaining({ items: [leadPost, secondPost, thirdPost] }),
       undefined,
     );
     expect(screen.queryByRole('article')).not.toBeInTheDocument();
   });
 
-  it('never renders PostsCarousel when displayMode is GRID', () => {
+  it('never renders CardCarousel when displayMode is GRID', () => {
     setup();
 
-    expect(PostsCarousel).not.toHaveBeenCalled();
+    expect(CardCarousel).not.toHaveBeenCalled();
   });
 });
