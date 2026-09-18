@@ -26,12 +26,12 @@ function toFeatureListItem(raw: TRawFeatureListItem): TFeatureListItem {
   };
 }
 
-// Mirrors the schema's own `min(2)` cards rule — an absent `features` field
-// degrades to an empty list rather than failing the whole module.
+// Mirrors the schema's own `min(2)` cards rule — fewer than 2 cards degrades
+// to an empty list rather than failing the whole module.
 function toFeatureListItems(
   raw: TRawFeatureListModule['features'],
 ): TFeatureListItem[] {
-  if (!raw || raw.length === 0) return [];
+  if (!raw || raw.length < 2) return [];
 
   return raw.map(toFeatureListItem);
 }

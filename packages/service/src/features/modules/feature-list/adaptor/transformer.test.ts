@@ -64,9 +64,30 @@ describe('toFeatureListModule', () => {
     expect(module.items).toEqual([]);
   });
 
+  it('degrades to an empty items array when features is present but empty', () => {
+    const raw = makeRawFeatureListModule({ features: [] });
+
+    const module = toFeatureListModule(raw);
+
+    expect(module.items).toEqual([]);
+  });
+
+  it('degrades to an empty items array when features has only one card (below the schema minimum)', () => {
+    const raw = makeRawFeatureListModule({
+      features: [makeRawFeatureListItem()],
+    });
+
+    const module = toFeatureListModule(raw);
+
+    expect(module.items).toEqual([]);
+  });
+
   it('maps a card with only an icon, leaving sanityImage undefined', () => {
     const raw = makeRawFeatureListModule({
-      features: [makeRawFeatureListItem({ icon: 'ROCKET', image: null })],
+      features: [
+        makeRawFeatureListItem({ icon: 'ROCKET', image: null }),
+        makeRawFeatureListItem(),
+      ],
     });
 
     const module = toFeatureListModule(raw);
@@ -82,6 +103,7 @@ describe('toFeatureListModule', () => {
           icon: null,
           image: makeRawSanityImage('A feature illustration'),
         }),
+        makeRawFeatureListItem(),
       ],
     });
 
@@ -98,6 +120,7 @@ describe('toFeatureListModule', () => {
           icon: 'ROCKET',
           image: makeRawSanityImage('A feature illustration'),
         }),
+        makeRawFeatureListItem(),
       ],
     });
 
@@ -109,7 +132,10 @@ describe('toFeatureListModule', () => {
 
   it('leaves a card with neither icon nor image fully undefined for both', () => {
     const raw = makeRawFeatureListModule({
-      features: [makeRawFeatureListItem({ icon: null, image: null })],
+      features: [
+        makeRawFeatureListItem({ icon: null, image: null }),
+        makeRawFeatureListItem(),
+      ],
     });
 
     const module = toFeatureListModule(raw);
@@ -130,6 +156,7 @@ describe('toFeatureListModule', () => {
             openInNewTab: null,
           },
         }),
+        makeRawFeatureListItem(),
       ],
     });
 
@@ -146,7 +173,10 @@ describe('toFeatureListModule', () => {
 
   it('leaves a card link undefined when the card has none', () => {
     const raw = makeRawFeatureListModule({
-      features: [makeRawFeatureListItem({ link: null })],
+      features: [
+        makeRawFeatureListItem({ link: null }),
+        makeRawFeatureListItem(),
+      ],
     });
 
     const module = toFeatureListModule(raw);
@@ -166,6 +196,7 @@ describe('toFeatureListModule', () => {
             openInNewTab: null,
           },
         }),
+        makeRawFeatureListItem(),
       ],
     });
 
