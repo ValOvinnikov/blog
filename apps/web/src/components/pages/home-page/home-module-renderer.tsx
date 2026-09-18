@@ -8,6 +8,7 @@ import { PageHeading } from '@web/components/shared/page-heading';
 import { ContentModule } from '@web/modules/content/content-module';
 import { CtaModule } from '@web/modules/cta/cta-module';
 import { HeroBlogModule } from '@web/modules/hero-blog/hero-blog-module';
+import { HeroProfileModule } from '@web/modules/hero-profile/hero-profile-module';
 import { HeroStatementModule } from '@web/modules/hero-statement/hero-statement-module';
 import {
   renderHeroModule,
@@ -22,6 +23,7 @@ import type { ReactNode } from 'react';
 
 const HOME_MAP: Partial<Record<TPageHomeType, TModuleComponent>> = {
   module_heroBlog: HeroBlogModule,
+  module_heroProfile: HeroProfileModule,
   module_heroStatement: HeroStatementModule,
   module_content: ContentModule,
   module_cta: CtaModule,
