@@ -29,6 +29,7 @@ const makeHeroProfileData = (overrides: Record<string, unknown> = {}) => ({
   variant: HERO_VARIANT.SPLIT,
   eyebrow: undefined,
   headingBlock: makeHeadingBlock({ heading: "Hi, I'm Jane" }),
+  avatarName: 'Jamie Rivera',
   sanityImage: undefined,
   socialLinks: [],
   ctaButtons: [],

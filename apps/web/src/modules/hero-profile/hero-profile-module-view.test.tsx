@@ -30,12 +30,16 @@ const socialLinksItems = (
   </li>
 );
 
+const heading = 'Building better products';
+const avatarName = 'Jamie Rivera';
+
 const setup = customRender(HeroProfileModuleView, {
   id: 'hero-profile-1',
   brandVariant: BRAND_VARIANT.PRIMARY,
   variant: HERO_VARIANT.SPLIT,
   eyebrow: undefined,
-  headingBlock: makeHeadingBlock({ heading: "Hi, I'm Jane" }),
+  headingBlock: makeHeadingBlock({ heading }),
+  avatarName,
   sanityImage: undefined,
   socialLinksItems: undefined,
   socialLinksAriaLabel: 'Profiles',
@@ -50,14 +54,17 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
   it('renders the heading as the top-level heading, labelling the Section via a unique id derived from the module id', () => {
     setup();
 
-    const heading = screen.getByRole('heading', {
+    const renderedHeading = screen.getByRole('heading', {
       level: 1,
-      name: "Hi, I'm Jane",
+      name: heading,
     });
-    expect(heading).toBeVisible();
-    expect(heading).toHaveAttribute('id', 'hero-profile-hero-profile-1');
+    expect(renderedHeading).toBeVisible();
+    expect(renderedHeading).toHaveAttribute(
+      'id',
+      'hero-profile-hero-profile-1',
+    );
 
-    const section = heading.closest('section');
+    const section = renderedHeading.closest('section');
     expect(section).toHaveAttribute(
       'aria-labelledby',
       'hero-profile-hero-profile-1',
@@ -87,25 +94,32 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
     expect(img).toHaveAttribute('fetchpriority', 'high');
   });
 
-  it('renders initials instead of an empty avatar when no image resolves on Stacked', () => {
+  // Both routes to a missing photo (`imageSource: NONE`, and an author with
+  // no `image`) collapse to the same `sanityImage: undefined` before this
+  // view ever sees it, so one case per variant is the full input space here
+  // — the route distinction itself is covered by the loader's own tests.
+  it('renders initials derived from the author name (never the heading) instead of an empty avatar when no image resolves on Stacked', () => {
     setup({ variant: HERO_VARIANT.STACKED, sanityImage: undefined });
 
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.getByText('HI')).toBeVisible();
+    expect(screen.getByText('JR')).toBeVisible();
+    expect(screen.queryByText('BB')).not.toBeInTheDocument();
   });
 
-  it('renders initials instead of an empty media area when no image resolves on Split', () => {
+  it('renders initials derived from the author name (never the heading) instead of an empty media area when no image resolves on Split', () => {
     setup({ variant: HERO_VARIANT.SPLIT, sanityImage: undefined });
 
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.getByText('HI')).toBeVisible();
+    expect(screen.getByText('JR')).toBeVisible();
+    expect(screen.queryByText('BB')).not.toBeInTheDocument();
   });
 
-  it('renders initials instead of an empty media area when no image resolves on Banner', () => {
+  it('renders initials derived from the author name (never the heading) instead of an empty media area when no image resolves on Banner', () => {
     setup({ variant: HERO_VARIANT.BANNER, sanityImage: undefined });
 
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.getByText('HI')).toBeVisible();
+    expect(screen.getByText('JR')).toBeVisible();
+    expect(screen.queryByText('BB')).not.toBeInTheDocument();
   });
 
   it('renders no Hero.Cta slot when ctaButtons is empty', () => {

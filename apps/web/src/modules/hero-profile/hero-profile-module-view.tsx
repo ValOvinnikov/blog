@@ -36,6 +36,7 @@ export const HeroProfileModuleView = ({
   variant,
   eyebrow,
   headingBlock,
+  avatarName,
   sanityImage,
   socialLinksItems,
   socialLinksAriaLabel,
@@ -84,8 +85,8 @@ export const HeroProfileModuleView = ({
               />
             ) : (
               <Avatar
-                alt={heading}
-                name={heading}
+                alt={avatarName}
+                name={avatarName}
                 className={heroProfileAvatarFallbackVariants()}
               />
             )}
@@ -104,7 +105,7 @@ export const HeroProfileModuleView = ({
               />
             ) : (
               <div className={heroProfileMediaFallbackVariants()}>
-                <Avatar alt={heading} name={heading} size={SIZE.XXL} />
+                <Avatar alt={avatarName} name={avatarName} size={SIZE.XXL} />
               </div>
             )}
           </Hero.Media>
@@ -123,7 +124,7 @@ export const HeroProfileModuleView = ({
               />
             ) : (
               <div className={heroProfileMediaFallbackVariants()}>
-                <Avatar alt={heading} name={heading} size={SIZE.XXL} />
+                <Avatar alt={avatarName} name={avatarName} size={SIZE.XXL} />
               </div>
             )}
           </Hero.Media>

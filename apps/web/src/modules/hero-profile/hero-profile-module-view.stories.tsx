@@ -55,6 +55,7 @@ const meta = {
       supportingText:
         'I design and build products for teams who care about craft.',
     }),
+    avatarName: 'Jane Cooper',
     sanityImage: makeSanityImage(),
     socialLinksItems,
     socialLinksAriaLabel: 'Profiles',
