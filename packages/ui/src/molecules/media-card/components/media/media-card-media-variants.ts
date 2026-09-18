@@ -5,7 +5,7 @@ import type { VariantProps } from 'tailwind-variants';
  * `isLead`'s 4:3 ratio must always match `mediaFrameVariants`'s `classic`
  * ratio, not a value invented locally.
  */
-export const postCardMediaVariants = tv({
+export const mediaCardMediaVariants = tv({
   base: ['relative w-full overflow-hidden', 'bg-surface-2'],
   variants: {
     isLead: {
@@ -16,4 +16,6 @@ export const postCardMediaVariants = tv({
   defaultVariants: { isLead: false },
 });
 
-export type TPostCardMediaVariants = VariantProps<typeof postCardMediaVariants>;
+export type TMediaCardMediaVariants = VariantProps<
+  typeof mediaCardMediaVariants
+>;

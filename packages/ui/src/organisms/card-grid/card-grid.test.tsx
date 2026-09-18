@@ -1,8 +1,8 @@
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 
-import { PostGrid } from './post-grid';
+import { CardGrid } from './card-grid';
 
-const setup = customRender(PostGrid, {
+const setup = customRender(CardGrid, {
   children: (
     <>
       <article>First</article>
@@ -12,7 +12,7 @@ const setup = customRender(PostGrid, {
   ),
 });
 
-describe(`<${PostGrid.name}/>`, () => {
+describe(`<${CardGrid.name}/>`, () => {
   it('renders children inside the grid wrapper', () => {
     setup();
     expect(screen.getAllByRole('article')).toHaveLength(3);

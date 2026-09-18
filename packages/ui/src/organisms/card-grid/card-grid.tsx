@@ -1,26 +1,26 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import type { ReactNode } from 'react';
 
-import { postGridVariants, type TPostGridVariants } from './post-grid-variants';
+import { cardGridVariants, type TCardGridVariants } from './card-grid-variants';
 
-export type TPostGridProps = IWithClassName &
+export type TCardGridProps = IWithClassName &
   IWithDataTestId & {
-    columns?: TPostGridVariants['columns'];
+    columns?: TCardGridVariants['columns'];
     children: ReactNode;
   };
 
 /**
- * PostGrid — the responsive grid container that lays out `PostCard`s (or any
+ * CardGrid — the responsive grid container that lays out cards (or any
  * children) in columns. Layout only — no data or per-item chrome of its own.
  */
-export const PostGrid = ({
+export const CardGrid = ({
   columns,
   children,
   className,
   dataTestId,
-}: TPostGridProps) => (
+}: TCardGridProps) => (
   <div
-    className={postGridVariants({ columns, class: className })}
+    className={cardGridVariants({ columns, class: className })}
     data-testid={dataTestId}
   >
     {children}

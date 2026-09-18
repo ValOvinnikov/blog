@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { PostCard } from '../../molecules/post-card';
+import { MediaCard } from '../../molecules/media-card';
 
-import { PostGrid } from './post-grid';
+import { CardGrid } from './card-grid';
 
 const posts = [
   {
@@ -37,7 +37,7 @@ const posts = [
   },
 ];
 
-const renderPostCards = (items: typeof posts) =>
+const renderMediaCards = (items: typeof posts) =>
   items.map(
     ({
       href,
@@ -48,22 +48,22 @@ const renderPostCards = (items: typeof posts) =>
       formattedDate,
       authorName,
     }) => (
-      <PostCard key={href} excerpt={excerpt} tags={tags}>
-        <PostCard.Title level={3}>
+      <MediaCard key={href} excerpt={excerpt} tags={tags}>
+        <MediaCard.Title level={3}>
           <a href={href}>{title}</a>
-        </PostCard.Title>
-        <PostCard.Footer
+        </MediaCard.Title>
+        <MediaCard.Footer
           publishedAt={publishedAt}
           formattedDate={formattedDate}
           authorName={authorName}
         />
-      </PostCard>
+      </MediaCard>
     ),
   );
 
 const meta = {
-  title: 'Organisms/PostGrid',
-  component: PostGrid,
+  title: 'Organisms/CardGrid',
+  component: CardGrid,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
   argTypes: {
@@ -73,9 +73,9 @@ const meta = {
     },
   },
   args: {
-    children: renderPostCards(posts),
+    children: renderMediaCards(posts),
   },
-} satisfies Meta<typeof PostGrid>;
+} satisfies Meta<typeof CardGrid>;
 
 export default meta;
 type TStory = StoryObj<typeof meta>;
@@ -87,9 +87,9 @@ export const ThreeColumns: TStory = {
 };
 
 export const TwoColumns: TStory = {
-  args: { columns: 2, children: renderPostCards(posts.slice(0, 2)) },
+  args: { columns: 2, children: renderMediaCards(posts.slice(0, 2)) },
 };
 
 export const SingleColumn: TStory = {
-  args: { columns: 1, children: renderPostCards(posts.slice(0, 1)) },
+  args: { columns: 1, children: renderMediaCards(posts.slice(0, 1)) },
 };

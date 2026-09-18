@@ -1,7 +1,7 @@
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
-export const postCardVariants = tv({
+export const mediaCardVariants = tv({
   slots: {
     root: [
       'relative flex h-full flex-col overflow-hidden',
@@ -31,4 +31,4 @@ export const postCardVariants = tv({
   },
 });
 
-export type TPostCardVariants = VariantProps<typeof postCardVariants>;
+export type TMediaCardVariants = VariantProps<typeof mediaCardVariants>;

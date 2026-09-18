@@ -1,7 +1,7 @@
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
-export const postGridVariants = tv({
+export const cardGridVariants = tv({
   base: ['grid', 'gap-3.5'],
   variants: {
     columns: {
@@ -13,4 +13,4 @@ export const postGridVariants = tv({
   defaultVariants: { columns: 3 },
 });
 
-export type TPostGridVariants = VariantProps<typeof postGridVariants>;
+export type TCardGridVariants = VariantProps<typeof cardGridVariants>;
