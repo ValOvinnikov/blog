@@ -1,10 +1,10 @@
 import type { TPostRelatedModule } from '@blog/service';
 import { CardGrid } from '@blog/ui/organisms/card-grid';
-import { ModuleHeading } from '@web/components/shared/module-heading';
 import {
-  type IPostCardData,
-  PostCardItem,
-} from '@web/components/shared/post-card-item';
+  type IMediaCardData,
+  MediaCardItem,
+} from '@web/components/shared/media-card-item';
+import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
 
 import { postRelatedModuleViewVariants } from './post-related-module-view-variants';
@@ -13,7 +13,7 @@ export interface IPostRelatedModuleViewProps extends Omit<
   TPostRelatedModule,
   'posts' | 'showImages'
 > {
-  items: IPostCardData[];
+  items: IMediaCardData[];
   titleId: string;
   dataTestId: string;
   hasImages?: boolean;
@@ -21,7 +21,7 @@ export interface IPostRelatedModuleViewProps extends Omit<
 
 /**
  * PostRelatedModuleView — render shell for `PostRelatedModule`: a labeled
- * `Section` wrapping a `CardGrid` of `PostCardItem`s. Never called with an
+ * `Section` wrapping a `CardGrid` of `MediaCardItem`s. Never called with an
  * empty `items` — `PostRelatedModule` renders nothing itself in that case.
  */
 export const PostRelatedModuleView = ({
@@ -51,7 +51,7 @@ export const PostRelatedModuleView = ({
       />
       <CardGrid className={s.grid()}>
         {items.map((item) => (
-          <PostCardItem key={item.id} item={item} hasImage={hasImages} />
+          <MediaCardItem key={item.id} item={item} hasImage={hasImages} />
         ))}
       </CardGrid>
     </Section>

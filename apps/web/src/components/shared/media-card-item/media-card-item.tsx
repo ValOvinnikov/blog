@@ -5,13 +5,13 @@ import { MediaCard } from '@blog/ui/molecules/media-card';
 import { SmartLink } from '@web/components/shared/smart-link';
 import type { ReactNode } from 'react';
 
-import { postCardItemVariants } from './post-card-item-variants';
+import { mediaCardItemVariants } from './media-card-item-variants';
 
-interface IPostCardTopicData {
+interface IMediaCardTopicData {
   title: string;
 }
 
-export interface IPostCardData {
+export interface IMediaCardData {
   id: string;
   href: string;
   title: string;
@@ -19,13 +19,13 @@ export interface IPostCardData {
   publishedAt: string;
   formattedDate: string;
   readingTime?: string;
-  topic: IPostCardTopicData;
+  topic: IMediaCardTopicData;
   /** Pre-rendered image node the web layer builds; never a URL for this component to resolve. */
   image?: ReactNode;
 }
 
-export type TPostCardItemProps = IWithDataTestId & {
-  item: IPostCardData;
+export type TMediaCardItemProps = IWithDataTestId & {
+  item: IMediaCardData;
   /** Renders a `MediaCard.Media` region — the empty frame when `item.image` is absent. Omit to render no media region at all. */
   hasImage?: boolean;
   /** Heading depth for the card's title — the caller decides based on where the listing sits in the page outline. Defaults to `3`. */
@@ -34,21 +34,21 @@ export type TPostCardItemProps = IWithDataTestId & {
   isSplit?: boolean;
 };
 
-const s = postCardItemVariants();
+const s = mediaCardItemVariants();
 
 /**
- * PostCardItem — the one post-to-card mapping every listing in `apps/web`
- * renders: an `IPostCardData` item into `MediaCard`'s `Media`/`Meta`/`Title`/
+ * MediaCardItem — the one post-to-card mapping every listing in `apps/web`
+ * renders: an `IMediaCardData` item into `MediaCard`'s `Media`/`Meta`/`Title`/
  * `Footer` slots, titled via `SmartLink`.
  */
-export const PostCardItem = ({
+export const MediaCardItem = ({
   item,
   hasImage,
   headingLevel = 3,
   isLead,
   isSplit,
   dataTestId,
-}: TPostCardItemProps) => (
+}: TMediaCardItemProps) => (
   <MediaCard
     excerpt={item.excerpt}
     isLead={isLead}

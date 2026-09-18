@@ -1,6 +1,6 @@
 import { tv } from 'tailwind-variants';
 
-export const postCardItemVariants = tv({
+export const mediaCardItemVariants = tv({
   slots: {
     titleLink: ['before:absolute before:inset-0'],
   },

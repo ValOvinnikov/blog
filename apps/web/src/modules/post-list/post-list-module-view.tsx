@@ -1,11 +1,11 @@
 import type { TPostListModule } from '@blog/service';
 import { CardGrid } from '@blog/ui/organisms/card-grid';
 import { Pagination } from '@blog/ui/organisms/pagination';
-import { ModuleHeading } from '@web/components/shared/module-heading';
 import {
-  type IPostCardData,
-  PostCardItem,
-} from '@web/components/shared/post-card-item';
+  type IMediaCardData,
+  MediaCardItem,
+} from '@web/components/shared/media-card-item';
+import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';
 
@@ -24,7 +24,7 @@ export interface IPostListModuleViewProps extends Omit<
   TPostListModule,
   'posts' | 'currentPage' | 'totalPages' | 'showImages'
 > {
-  items: IPostCardData[];
+  items: IMediaCardData[];
   titleId: string;
   dataTestId: string;
   emptyMessage?: string;
@@ -34,7 +34,7 @@ export interface IPostListModuleViewProps extends Omit<
 
 /**
  * PostListModuleView — render shell for `PostListModule`: a labeled
- * `Section` wrapping a `CardGrid` of `PostCardItem`s (or the empty message)
+ * `Section` wrapping a `CardGrid` of `MediaCardItem`s (or the empty message)
  * plus an optional `Pagination`.
  */
 export const PostListModuleView = ({
@@ -70,7 +70,7 @@ export const PostListModuleView = ({
       ) : (
         <CardGrid className={s.grid()}>
           {items.map((item) => (
-            <PostCardItem key={item.id} item={item} hasImage={hasImages} />
+            <MediaCardItem key={item.id} item={item} hasImage={hasImages} />
           ))}
         </CardGrid>
       )}

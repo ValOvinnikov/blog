@@ -1,8 +1,8 @@
-import type { IPostCardData } from '@web/components/shared/post-card-item';
+import type { IMediaCardData } from '@web/components/shared/media-card-item';
 
 export const makePostListItem = (
-  overrides: Partial<IPostCardData> = {},
-): IPostCardData => {
+  overrides: Partial<IMediaCardData> = {},
+): IMediaCardData => {
   return {
     id: 'post-1',
     href: '/blog/first-post',

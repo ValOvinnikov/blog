@@ -1,6 +1,6 @@
 import { renderElement, screen } from '@web/testing/custom-render';
 
-import { PostCardItem, type IPostCardData } from './post-card-item';
+import { MediaCardItem, type IMediaCardData } from './media-card-item';
 
 vi.mock('@web/components/shared/smart-link', () => ({
   SmartLink: ({
@@ -17,7 +17,7 @@ vi.mock('@web/components/shared/smart-link', () => ({
   ),
 }));
 
-const item: IPostCardData = {
+const item: IMediaCardData = {
   id: 'post-1',
   href: '/blog/hello-world',
   title: 'Hello World',
@@ -28,16 +28,16 @@ const item: IPostCardData = {
   topic: { title: 'Engineering' },
 };
 
-describe(`<${PostCardItem.name}/>`, () => {
+describe(`<${MediaCardItem.name}/>`, () => {
   it('renders the title linked via SmartLink to item.href', () => {
-    renderElement(<PostCardItem item={item} />);
+    renderElement(<MediaCardItem item={item} />);
 
     const link = screen.getByRole('link', { name: 'Hello World' });
     expect(link).toHaveAttribute('href', '/blog/hello-world');
   });
 
   it('defaults to heading level 3', () => {
-    renderElement(<PostCardItem item={item} />);
+    renderElement(<MediaCardItem item={item} />);
 
     expect(
       screen.getByRole('heading', { level: 3, name: 'Hello World' }),
@@ -45,7 +45,7 @@ describe(`<${PostCardItem.name}/>`, () => {
   });
 
   it('renders the title at the given headingLevel', () => {
-    renderElement(<PostCardItem item={item} headingLevel={2} />);
+    renderElement(<MediaCardItem item={item} headingLevel={2} />);
 
     expect(
       screen.getByRole('heading', { level: 2, name: 'Hello World' }),
@@ -53,14 +53,14 @@ describe(`<${PostCardItem.name}/>`, () => {
   });
 
   it('renders no media region when hasImage is omitted', () => {
-    renderElement(<PostCardItem item={item} />);
+    renderElement(<MediaCardItem item={item} />);
 
     expect(screen.queryByTestId('post-card-media')).not.toBeInTheDocument();
   });
 
   it('renders the pre-rendered image node inside MediaCard.Media when hasImage is true', () => {
     renderElement(
-      <PostCardItem
+      <MediaCardItem
         item={{ ...item, image: <div data-testid="post-image" /> }}
         hasImage={true}
       />,
@@ -71,26 +71,26 @@ describe(`<${PostCardItem.name}/>`, () => {
   });
 
   it('renders the formatted date and reading time', () => {
-    renderElement(<PostCardItem item={item} />);
+    renderElement(<MediaCardItem item={item} />);
 
     expect(screen.getByText('January 15, 2026')).toBeVisible();
     expect(screen.getByText(/4 min/)).toBeVisible();
   });
 
   it('renders the topic in the footer', () => {
-    renderElement(<PostCardItem item={item} />);
+    renderElement(<MediaCardItem item={item} />);
 
     expect(screen.getByText(/engineering/)).toBeVisible();
   });
 
   it('forwards dataTestId to the underlying MediaCard', () => {
-    renderElement(<PostCardItem item={item} dataTestId="lead-card" />);
+    renderElement(<MediaCardItem item={item} dataTestId="lead-card" />);
 
     expect(screen.getByTestId('lead-card')).toBeInTheDocument();
   });
 
   it('renders no dataTestId on the underlying MediaCard when omitted', () => {
-    const { container } = renderElement(<PostCardItem item={item} />);
+    const { container } = renderElement(<MediaCardItem item={item} />);
 
     expect(container.querySelector('article')).not.toHaveAttribute(
       'data-testid',
@@ -99,7 +99,7 @@ describe(`<${PostCardItem.name}/>`, () => {
 
   it('applies the split layout class when isSplit is true and a media region is present', () => {
     renderElement(
-      <PostCardItem
+      <MediaCardItem
         item={{ ...item, image: <div data-testid="post-image" /> }}
         hasImage={true}
         isSplit={true}
@@ -112,7 +112,7 @@ describe(`<${PostCardItem.name}/>`, () => {
 
   it('does not apply the split layout class when isSplit is omitted', () => {
     renderElement(
-      <PostCardItem
+      <MediaCardItem
         item={{ ...item, image: <div data-testid="post-image" /> }}
         hasImage={true}
         dataTestId="card"
@@ -123,13 +123,13 @@ describe(`<${PostCardItem.name}/>`, () => {
   });
 
   it('clamps the excerpt to three lines when isLead is true', () => {
-    renderElement(<PostCardItem item={item} isLead={true} />);
+    renderElement(<MediaCardItem item={item} isLead={true} />);
 
     expect(screen.getByText('An excerpt.')).toHaveClass('line-clamp-3');
   });
 
   it('clamps the excerpt to two lines when isLead is omitted', () => {
-    renderElement(<PostCardItem item={item} />);
+    renderElement(<MediaCardItem item={item} />);
 
     expect(screen.getByText('An excerpt.')).toHaveClass('line-clamp-2');
   });
