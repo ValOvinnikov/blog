@@ -10,7 +10,6 @@ const {
   postLatestModuleMock,
   taxonomyListModuleMock,
   postFeaturedModuleMock,
-  heroModuleMock,
   heroBlogModuleMock,
   heroStatementModuleMock,
   loggerWarnMock,
@@ -32,9 +31,6 @@ const {
   )),
   postFeaturedModuleMock: vi.fn(({ id }: { id: string }) => (
     <div data-testid="stub-post-featured">{id}</div>
-  )),
-  heroModuleMock: vi.fn(async ({ id }: { id: string }) => (
-    <h1 data-testid="stub-hero">{id}</h1>
   )),
   heroBlogModuleMock: vi.fn(async () => null),
   heroStatementModuleMock: vi.fn(async ({ id }: { id: string }) => (
@@ -58,9 +54,6 @@ vi.mock('@web/modules/taxonomy-list/taxonomy-list-module', () => ({
 }));
 vi.mock('@web/modules/post-featured/post-featured-module', () => ({
   PostFeaturedModule: postFeaturedModuleMock,
-}));
-vi.mock('@web/modules/hero/hero-module', () => ({
-  HeroModule: heroModuleMock,
 }));
 vi.mock('@web/modules/hero-blog/hero-blog-module', () => ({
   HeroBlogModule: heroBlogModuleMock,
@@ -96,16 +89,18 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
   });
 
   it('renders the resolved hero, with exactly one h1, when the hero resolves to content', async () => {
-    await setup({ hero: { id: 'hero-1', type: 'module_hero' } });
+    await setup({ hero: { id: 'hero-1', type: 'module_heroStatement' } });
 
     const headings = screen.getAllByRole('heading', { level: 1 });
     expect(headings).toHaveLength(1);
-    expect(screen.getByTestId('stub-hero')).toHaveTextContent('hero-1');
+    expect(screen.getByTestId('stub-hero-statement')).toHaveTextContent(
+      'hero-1',
+    );
   });
 
   it('renders the resolved hero before the modules when the page has both', async () => {
     await setup({
-      hero: { id: 'hero-1', type: 'module_hero' },
+      hero: { id: 'hero-1', type: 'module_heroStatement' },
       modules: [
         { id: 'cta-1', type: 'module_cta' },
         { id: 'content-1', type: 'module_content' },
@@ -114,7 +109,7 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
 
     const nodes = screen.getAllByTestId(/^stub-/);
     expect(nodes.map((node) => node.getAttribute('data-testid'))).toEqual([
-      'stub-hero',
+      'stub-hero-statement',
       'stub-cta',
       'stub-content',
     ]);

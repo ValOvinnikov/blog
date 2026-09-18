@@ -9,6 +9,7 @@ const {
   newsletterModuleMock,
   postFeaturedModuleMock,
   postListModuleMock,
+  taxonomyListModuleMock,
   heroBlogModuleMock,
   loggerWarnMock,
 } = vi.hoisted(() => ({
@@ -23,6 +24,9 @@ const {
   )),
   postListModuleMock: vi.fn(({ id }: { id: string }) => (
     <div data-testid="stub-post-list">{id}</div>
+  )),
+  taxonomyListModuleMock: vi.fn(({ id }: { id: string }) => (
+    <div data-testid="stub-taxonomy-list">{id}</div>
   )),
   heroBlogModuleMock: vi.fn(
     async ({ id }: { id: string }): Promise<ReactNode> => (
@@ -41,6 +45,9 @@ vi.mock('@web/modules/post-featured/post-featured-module', () => ({
 }));
 vi.mock('@web/modules/post-list/post-list-module', () => ({
   PostListModule: postListModuleMock,
+}));
+vi.mock('@web/modules/taxonomy-list/taxonomy-list-module', () => ({
+  TaxonomyListModule: taxonomyListModuleMock,
 }));
 vi.mock('@web/modules/hero-blog/hero-blog-module', () => ({
   HeroBlogModule: heroBlogModuleMock,
@@ -123,6 +130,7 @@ describe(`<${BlogListModuleRenderer.name}/>`, () => {
     await setup({
       modules: [
         { id: 'post-list-1', type: 'module_postList' },
+        { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
         { id: 'cta-1', type: 'module_cta' },
         { id: 'newsletter-1', type: 'module_newsletter' },
         { id: 'post-featured-1', type: 'module_postFeatured' },
@@ -132,6 +140,7 @@ describe(`<${BlogListModuleRenderer.name}/>`, () => {
     const stubs = screen.getAllByTestId(/^stub-/);
     expect(stubs.map((node) => node.textContent)).toEqual([
       'post-list-1',
+      'taxonomy-list-1',
       'cta-1',
       'newsletter-1',
       'post-featured-1',

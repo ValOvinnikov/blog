@@ -15,12 +15,14 @@ import { renderHeroModule, renderModules } from '@web/modules/module-renderer';
 import { NewsletterModule } from '@web/modules/newsletter/newsletter-module';
 import { PostLatestModule } from '@web/modules/post-latest/post-latest-module';
 import { PostListModule } from '@web/modules/post-list/post-list-module';
+import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
 import type { ReactNode } from 'react';
 
 const TOPIC_MAP: Record<TPageTopicType, TModuleComponent> = {
   module_heroBlog: HeroBlogModule,
   module_postList: PostListModule,
   module_postLatest: PostLatestModule,
+  module_taxonomyList: TaxonomyListModule,
   module_cta: CtaModule,
   module_newsletter: NewsletterModule,
 };
