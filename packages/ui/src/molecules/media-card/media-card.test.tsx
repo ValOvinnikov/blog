@@ -434,4 +434,74 @@ describe(`<${MediaCard.name}/>`, () => {
     expect(media).toHaveClass('mx-auto');
     expect(media).not.toHaveClass('mx-card-x');
   });
+
+  it('leaves the circle shape unaffected by isLead, since no compound variant targets it', () => {
+    const { unmount } = renderElement(
+      <MediaCard>
+        <MediaCard.Media shape="circle" dataTestId="media-card-media">
+          <img src="/avatar.jpg" alt="Author photo" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    const withoutLead = screen.getByTestId('media-card-media').className;
+    unmount();
+
+    renderElement(
+      <MediaCard isLead={true}>
+        <MediaCard.Media shape="circle" dataTestId="media-card-media">
+          <img src="/avatar.jpg" alt="Author photo" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    expect(screen.getByTestId('media-card-media').className).toBe(withoutLead);
+  });
+
+  it('leaves the icon shape unaffected by isLead, since no compound variant targets it', () => {
+    const { unmount } = renderElement(
+      <MediaCard>
+        <MediaCard.Media shape="icon" dataTestId="media-card-media">
+          <span data-testid="glyph" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    const withoutLead = screen.getByTestId('media-card-media').className;
+    unmount();
+
+    renderElement(
+      <MediaCard isLead={true}>
+        <MediaCard.Media shape="icon" dataTestId="media-card-media">
+          <span data-testid="glyph" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    expect(screen.getByTestId('media-card-media').className).toBe(withoutLead);
+  });
+
+  it('wraps a circle-shaped media in the split container without stretching the inset frame', () => {
+    renderElement(
+      <MediaCard isSplit={true}>
+        <MediaCard.Media shape="circle" dataTestId="media-card-media">
+          <img src="/avatar.jpg" alt="Author photo" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    const media = screen.getByTestId('media-card-media');
+    expect(media.parentElement).toHaveClass('md:w-1/2');
+    expect(media).toHaveClass('size-28', 'rounded-full', 'mx-card-x');
+    expect(media).not.toHaveClass('w-full');
+  });
+
+  it('wraps an icon-shaped media in the split container without stretching the inset frame', () => {
+    renderElement(
+      <MediaCard isSplit={true}>
+        <MediaCard.Media shape="icon" dataTestId="media-card-media">
+          <span data-testid="glyph" />
+        </MediaCard.Media>
+      </MediaCard>,
+    );
+    const media = screen.getByTestId('media-card-media');
+    expect(media.parentElement).toHaveClass('md:w-1/2');
+    expect(media).toHaveClass('size-12', 'rounded-md', 'mx-card-x');
+    expect(media).not.toHaveClass('w-full');
+  });
 });
