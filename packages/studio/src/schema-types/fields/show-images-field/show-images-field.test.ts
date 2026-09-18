@@ -14,17 +14,4 @@ describe('showImagesField', () => {
 
     expect(field.validation).toBeUndefined();
   });
-
-  it("defaults the description to the post's image wording", () => {
-    expect(showImagesField().description).toBe(
-      "Show each post's image on its card.",
-    );
-  });
-
-  it('uses a supplied description over the default', () => {
-    expect(
-      showImagesField({ description: 'Show each card its visual.' })
-        .description,
-    ).toBe('Show each card its visual.');
-  });
 });

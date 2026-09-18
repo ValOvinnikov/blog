@@ -1,10 +1,10 @@
 import { defineField } from 'sanity';
 
-export const showImagesField = (options?: { description?: string }) =>
+export const showImagesField = () =>
   defineField({
     name: 'showImages',
     title: 'Show Images',
     type: 'boolean',
-    description: options?.description ?? "Show each post's image on its card.",
+    description: "Show each post's image on its card.",
     initialValue: true,
   });

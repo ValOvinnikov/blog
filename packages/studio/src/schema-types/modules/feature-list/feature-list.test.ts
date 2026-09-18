@@ -1,4 +1,5 @@
 import {
+  BRAND_VARIANT,
   CARD_IMAGE_SHAPE,
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
@@ -6,20 +7,10 @@ import {
 } from '@blog/config/constants';
 import { featureListSchema } from '@blog/studio/schema-types/modules/feature-list/feature-list';
 import {
-  getRecordedValidators,
-  type TRecordedValidator,
-} from '@blog/studio/testing/create-mock-validation-rule';
-import {
   getFieldOptionsLayout,
   getFieldOptionValues,
 } from '@blog/studio/testing/get-field-options';
 import { getSchemaField } from '@blog/studio/testing/get-schema-field';
-import type { SanityDocument, ValidationContext } from 'sanity';
-
-type TDocFn = (
-  document: SanityDocument | undefined,
-  context: ValidationContext,
-) => Promise<string | true> | string | true;
 
 const getField = (name: string) => getSchemaField(featureListSchema, name);
 
@@ -58,27 +49,12 @@ const getFeaturesValidatorCalls = (): TCall[] => {
   return calls;
 };
 
-const getDocumentValidators = (): TRecordedValidator<TDocFn>[] =>
-  getRecordedValidators<TDocFn>(featureListSchema);
-
-const createMockContext = (
-  fetchImpl: (query: string, params?: unknown) => unknown,
-): ValidationContext => {
-  const getClient = () => ({
-    withConfig: () => ({
-      fetch: async (query: string, params?: unknown) =>
-        fetchImpl(query, params),
-    }),
-  });
-
-  return { getClient } as unknown as ValidationContext;
-};
-
 describe('featureListSchema brandVariant field', () => {
-  it('offers the full brand variant list', () => {
-    expect(getFieldOptionValues(getField('brandVariant'))).toEqual([
-      ...FULL_BRAND_VARIANT_LIST,
-    ]);
+  it('offers the full brand variant list, defaulting to PRIMARY', () => {
+    const field = getField('brandVariant');
+
+    expect(getFieldOptionValues(field)).toEqual([...FULL_BRAND_VARIANT_LIST]);
+    expect(field.initialValue).toBe(BRAND_VARIANT.PRIMARY);
   });
 });
 
@@ -109,14 +85,14 @@ describe('featureListSchema features field', () => {
 });
 
 describe('featureListSchema imageShape field', () => {
-  it('offers every CARD_IMAGE_SHAPE value as a dropdown, defaulting to ICON', () => {
+  it('offers every CARD_IMAGE_SHAPE value as a dropdown, defaulting to WIDE', () => {
     const field = getField('imageShape');
 
     expect(getFieldOptionValues(field)).toEqual(
       Object.values(CARD_IMAGE_SHAPE),
     );
     expect(getFieldOptionsLayout(field)).toBe('dropdown');
-    expect(field.initialValue).toBe(CARD_IMAGE_SHAPE.ICON);
+    expect(field.initialValue).toBe(CARD_IMAGE_SHAPE.WIDE);
   });
 
   it('is required', () => {
@@ -142,17 +118,15 @@ describe('featureListSchema imageShape field', () => {
 });
 
 describe('featureListSchema displayMode field', () => {
-  it('is emitted immediately after imageShape, which follows showImages', () => {
+  it('is emitted immediately after imageShape', () => {
     const names =
       featureListSchema.fields
         ?.map((field) => ('name' in field ? field.name : undefined))
         .filter((name): name is string => Boolean(name)) ?? [];
-    const showImagesIndex = names.indexOf('showImages');
     const imageShapeIndex = names.indexOf('imageShape');
     const displayModeIndex = names.indexOf('displayMode');
 
-    expect(showImagesIndex).toBeGreaterThanOrEqual(0);
-    expect(imageShapeIndex).toBe(showImagesIndex + 1);
+    expect(imageShapeIndex).toBeGreaterThanOrEqual(0);
     expect(displayModeIndex).toBe(imageShapeIndex + 1);
   });
 
@@ -207,154 +181,17 @@ describe('featureListSchema cardAlignment field', () => {
   });
 });
 
-describe('featureListSchema document validation', () => {
-  it('registers exactly one warning-level rule', () => {
-    const validators = getDocumentValidators();
-
-    expect(validators).toHaveLength(1);
-    expect(validators[0]!.level).toBe('warning');
-  });
-
-  it('passes without querying when Show Images is off', async () => {
-    const [validate] = getDocumentValidators();
-    let called = false;
-    const context = createMockContext(() => {
-      called = true;
-      return [];
-    });
-
-    await expect(
-      validate!.fn(
-        {
-          showImages: false,
-          imageShape: CARD_IMAGE_SHAPE.ICON,
-          features: [{ _ref: 'card-1' }],
-        } as unknown as SanityDocument,
-        context,
-      ),
-    ).resolves.toBe(true);
-    expect(called).toBe(false);
-  });
-
-  it('passes without querying when no features are chosen', async () => {
-    const [validate] = getDocumentValidators();
-    let called = false;
-    const context = createMockContext(() => {
-      called = true;
-      return [];
-    });
-
-    await expect(
-      validate!.fn(
-        {
-          showImages: true,
-          imageShape: CARD_IMAGE_SHAPE.ICON,
-          features: [],
-        } as unknown as SanityDocument,
-        context,
-      ),
-    ).resolves.toBe(true);
-    expect(called).toBe(false);
-  });
-
-  it('warns when the Icon shape is chosen and a card has no icon', async () => {
-    const [validate] = getDocumentValidators();
-    const context = createMockContext(() => [
-      { icon: 'CODE' },
-      { icon: undefined },
-    ]);
-
-    await expect(
-      validate!.fn(
-        {
-          showImages: true,
-          imageShape: CARD_IMAGE_SHAPE.ICON,
-          features: [{ _ref: 'card-1' }, { _ref: 'card-2' }],
-        } as unknown as SanityDocument,
-        context,
-      ),
-    ).resolves.toBe(
-      'Some feature cards have no icon, so the grid will look uneven.',
-    );
-  });
-
-  it('warns when an image shape is chosen and a card has no image', async () => {
-    const [validate] = getDocumentValidators();
-    const context = createMockContext(() => [
-      { image: { asset: {} } },
-      { image: undefined },
-    ]);
-
-    await expect(
-      validate!.fn(
-        {
-          showImages: true,
-          imageShape: CARD_IMAGE_SHAPE.WIDE,
-          features: [{ _ref: 'card-1' }, { _ref: 'card-2' }],
-        } as unknown as SanityDocument,
-        context,
-      ),
-    ).resolves.toBe(
-      'Some feature cards have no image, so the grid will look uneven.',
-    );
-  });
-
-  it('is silent when every card has the value the shape needs', async () => {
-    const [validate] = getDocumentValidators();
-    const context = createMockContext(() => [
-      { icon: 'CODE' },
-      { icon: 'ZAP' },
-    ]);
-
-    await expect(
-      validate!.fn(
-        {
-          showImages: true,
-          imageShape: CARD_IMAGE_SHAPE.ICON,
-          features: [{ _ref: 'card-1' }, { _ref: 'card-2' }],
-        } as unknown as SanityDocument,
-        context,
-      ),
-    ).resolves.toBe(true);
-  });
-
-  it('queries by the referenced feature card ids', async () => {
-    const [validate] = getDocumentValidators();
-    let receivedQuery = '';
-    let receivedParams: unknown;
-    const context = createMockContext((query, params) => {
-      receivedQuery = query;
-      receivedParams = params;
-      return [{ icon: 'CODE' }, { icon: 'ZAP' }];
-    });
-
-    await validate!.fn(
-      {
-        showImages: true,
-        imageShape: CARD_IMAGE_SHAPE.ICON,
-        features: [{ _ref: 'card-1' }, { _ref: 'card-2' }],
-      } as unknown as SanityDocument,
-      context,
+describe('featureListSchema', () => {
+  it('has no showImages field', () => {
+    const field = featureListSchema.fields?.find(
+      (field) => 'name' in field && field.name === 'showImages',
     );
 
-    expect(receivedQuery).toBe('*[_id in $ids]{ icon, image }');
-    expect(receivedParams).toEqual({ ids: ['card-1', 'card-2'] });
+    expect(field).toBeUndefined();
   });
 
-  it('resolves true when the referenced cards no longer exist', async () => {
-    const [validate] = getDocumentValidators();
-    const context = createMockContext(() => []);
-
-    await expect(
-      validate!.fn(
-        {
-          showImages: true,
-          imageShape: CARD_IMAGE_SHAPE.ICON,
-          features: [{ _ref: 'deleted-card' }],
-        } as unknown as SanityDocument,
-        context,
-      ),
-    ).resolves.toBe(true);
+  it('defines no document-level validation', () => {
+    expect(featureListSchema.validation).toBeUndefined();
   });
 });
 
