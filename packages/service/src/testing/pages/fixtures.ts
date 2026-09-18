@@ -119,7 +119,7 @@ export function makeRawHomePage(
 ): TRawHomePage {
   return {
     headingBlock: makeRawHeadingBlock('Welcome'),
-    hero: { _id: 'hero-1', _type: 'module_hero' },
+    hero: { _id: 'hero-1', _type: 'module_heroBlog' },
     modules: [
       { _id: 'post-latest-1', _type: 'module_postLatest' },
       { _id: 'cta-1', _type: 'module_cta' },

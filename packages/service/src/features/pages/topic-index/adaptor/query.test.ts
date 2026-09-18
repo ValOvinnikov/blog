@@ -42,7 +42,7 @@ describe('topicIndexPageQuery', () => {
 
   it('parses a topic index page with its hero slot set', () => {
     const raw = makeRawTopicIndexPage({
-      hero: { _id: 'hero-1', _type: 'module_hero' },
+      hero: { _id: 'hero-1', _type: 'module_heroBlog' },
     });
 
     expect(() => topicIndexPageQuery.parse(raw)).not.toThrow();

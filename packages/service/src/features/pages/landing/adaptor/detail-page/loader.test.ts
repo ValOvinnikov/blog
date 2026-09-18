@@ -56,13 +56,15 @@ describe('getPage', () => {
 
   it('maps a set page_landing.hero to a hero slot', async () => {
     mockRun.mockResolvedValueOnce(
-      makeRawLandingPage({ hero: { _id: 'hero-1', _type: 'module_hero' } }),
+      makeRawLandingPage({
+        hero: { _id: 'hero-1', _type: 'module_heroBlog' },
+      }),
     );
 
     const page = await getPage('about', tenant);
     if (!page) throw new Error('expected a landing page');
 
-    expect(page.hero).toEqual({ id: 'hero-1', type: 'module_hero' });
+    expect(page.hero).toEqual({ id: 'hero-1', type: 'module_heroBlog' });
   });
 
   it('rejects when page_landing.hero resolves to a non-hero module type', async () => {

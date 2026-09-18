@@ -6,9 +6,11 @@ import { slugField } from '@blog/studio/schema-types/fields/slug-field/slug-fiel
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/slug-url-preview/slug-url-preview-input';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
+import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
+import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
 import {
@@ -74,13 +76,14 @@ export const tagPageSchema = defineType({
           ),
     }),
     headingBlockField(),
-    heroField(),
+    heroField({ allow: [heroBlogSchema.name] }),
     modulesField({
       allow: [
         postListSchema.name,
         postLatestSchema.name,
         ctaSchema.name,
         newsletterSchema.name,
+        taxonomyListSchema.name,
       ],
     }),
     seoField(),

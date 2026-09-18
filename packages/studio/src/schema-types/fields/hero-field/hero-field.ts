@@ -1,11 +1,13 @@
-import { HERO_SCHEMA_TYPES } from '@blog/studio/schema-types/modules';
 import { defineField } from 'sanity';
 
-export const heroField = () =>
+/**
+ * Builds the `hero` reference field, pointing it at the hero schemas the page allows.
+ */
+export const heroField = ({ allow }: { allow: string[] }) =>
   defineField({
     name: 'hero',
     title: 'Hero',
     type: 'reference',
     description: "Optional. Replaces the page's heading and owns the h1.",
-    to: HERO_SCHEMA_TYPES.map((schema) => ({ type: schema.name })),
+    to: allow.map((type) => ({ type })),
   });

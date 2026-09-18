@@ -12,7 +12,7 @@ const seo: TTopicIndexPage['seo'] = {
 
 const withHero: TTopicIndexPage = {
   headingBlock: { heading: 'Topics' },
-  hero: { id: 'topics-hero-1', type: 'module_hero' },
+  hero: { id: 'topics-hero-1', type: 'module_heroBlog' },
   modules: [],
   seo,
 };

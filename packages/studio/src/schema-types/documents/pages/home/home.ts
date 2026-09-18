@@ -4,6 +4,8 @@ import { modulesField } from '@blog/studio/schema-types/fields/modules-field/mod
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
+import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
+import { heroStatementSchema } from '@blog/studio/schema-types/modules/hero-statement/hero-statement';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
@@ -36,7 +38,9 @@ export const homePageSchema = defineType({
   fields: [
     titleField(),
     headingBlockField(),
-    heroField(),
+    heroField({
+      allow: [heroBlogSchema.name, heroStatementSchema.name],
+    }),
     modulesField({
       allow: [
         contentSchema.name,
