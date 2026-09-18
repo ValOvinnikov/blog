@@ -5538,27 +5538,6 @@
         },
         "optional": true
       },
-      "imageSource": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "AUTHOR"
-            },
-            {
-              "type": "string",
-              "value": "CUSTOM"
-            },
-            {
-              "type": "string",
-              "value": "NONE"
-            }
-          ]
-        },
-        "optional": true
-      },
       "image": {
         "type": "objectAttribute",
         "value": {
