@@ -215,9 +215,14 @@ Sanity schema → `pnpm typegen` → `@blog/config` generated types →
 (each page's own module renderer maps a module reference through that page's
 map to a Server Component, which fetches its own module data and maps it onto
 a pure `@blog/ui` organism). A page's dedicated `hero` slot dispatches the
-same way, through the same map — annotated `Record<TPageXType,
-TModuleComponent>`, so a type the page allows with no component, or a
-component for a type it cannot reference, is a compile error. Typegen output is
+same way, through the same map — annotated `Partial<Record<TPageXType,
+TModuleComponent>>`, so a component for a type the page cannot reference is a
+compile error, while a type the page allows with no component is a tolerated
+state: the renderer logs `module_renderer.unknown_module_type` (or
+`hero_slot.unknown_hero_type`) and renders nothing. That asymmetry is
+deliberate — it is what lets a module be added in `studio`, consumed in
+`service` and rendered in `web` as three independent PRs, instead of the
+schema and the component having to land together. Typegen output is
 committed and can be non-deterministic — re-run until minimal.
 
 Images follow the same direction of travel: `@blog/service` describes an image
@@ -364,7 +369,8 @@ asserting every registered `module_hero*` schema appears in it.
 **A page accepts only the hero kinds it names.** `heroField({ allow })`
 takes an explicit list per page, the way `modulesField({ allow })` already
 does, so the registry is no longer what a page's `hero` `to:` points at.
-`page_home` and `page_landing` accept Blog and Statement. `page_postIndex`,
+`page_home` and `page_landing` accept Blog, Statement and Profile.
+`page_postIndex`,
 `page_tag`, `page_topic`, `page_tagIndex` and `page_topicIndex` accept Blog
 only — a statement hero belongs on a marketing page, not an archive.
 `page_post` has no `hero` field at all. The deprecated `module_hero` is
