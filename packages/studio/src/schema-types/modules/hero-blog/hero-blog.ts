@@ -193,7 +193,7 @@ export const heroBlogSchema = defineType({
       description: "The post's own hero image, a custom image, or no image.",
       fieldset: FIELDSET_IMAGE,
       options: {
-        layout: 'dropdown',
+        layout: 'radio',
         list: Object.values(HERO_IMAGE_SOURCE).map((value) => ({
           title: toTitleCase(value),
           value,
