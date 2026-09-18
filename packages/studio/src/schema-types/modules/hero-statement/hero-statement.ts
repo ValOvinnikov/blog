@@ -2,7 +2,7 @@ import { FULL_BRAND_VARIANT_LIST } from '@blog/config/constants';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { heroContentPositionFields } from '@blog/studio/schema-types/fields/hero-content-position-fields/hero-content-position-fields';
-import { heroFieldsets } from '@blog/studio/schema-types/fields/hero-fields/hero-fields';
+import { heroFieldsets } from '@blog/studio/schema-types/fields/hero-fieldsets/hero-fieldsets';
 import { heroImageField } from '@blog/studio/schema-types/fields/hero-image-field/hero-image-field';
 import { heroMediaOrderFields } from '@blog/studio/schema-types/fields/hero-media-order-fields/hero-media-order-fields';
 import { heroVariantField } from '@blog/studio/schema-types/fields/hero-variant-field/hero-variant-field';

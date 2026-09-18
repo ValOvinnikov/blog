@@ -1,17 +1,7 @@
-import {
-  HERO_VARIANT,
-  MEDIA_ORDER,
-  type THeroVariant,
-} from '@blog/config/constants';
+import { HERO_VARIANT, MEDIA_ORDER } from '@blog/config/constants';
+import { isNotHeroVariant } from '@blog/studio/schema-types/fields/hero-variant-predicate/hero-variant-predicate';
 import { toTitleCase } from '@blog/utils/primitives';
 import { defineField } from 'sanity';
-
-type THeroMediaOrderParent = { variant?: string };
-
-const isNotVariant =
-  (variant: THeroVariant) =>
-  ({ parent }: { parent?: unknown }): boolean =>
-    (parent as THeroMediaOrderParent | undefined)?.variant !== variant;
 
 export const heroMediaOrderFields = () => [
   defineField({
@@ -28,7 +18,7 @@ export const heroMediaOrderFields = () => [
       })),
     },
     initialValue: MEDIA_ORDER.LAST,
-    hidden: isNotVariant(HERO_VARIANT.SPLIT),
+    hidden: isNotHeroVariant(HERO_VARIANT.SPLIT),
   }),
   defineField({
     name: 'mediaOrderStacked',
@@ -43,6 +33,6 @@ export const heroMediaOrderFields = () => [
       })),
     },
     initialValue: MEDIA_ORDER.LAST,
-    hidden: isNotVariant(HERO_VARIANT.STACKED),
+    hidden: isNotHeroVariant(HERO_VARIANT.STACKED),
   }),
 ];

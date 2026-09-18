@@ -1,17 +1,7 @@
-import {
-  CONTENT_ALIGNMENT,
-  HERO_VARIANT,
-  type THeroVariant,
-} from '@blog/config/constants';
+import { CONTENT_ALIGNMENT, HERO_VARIANT } from '@blog/config/constants';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
-import { HERO_FIELDSET_CONTENT_POSITION } from '@blog/studio/schema-types/fields/hero-fields/hero-fields';
-
-type THeroContentPositionParent = { variant?: string };
-
-const isNotVariant =
-  (variant: THeroVariant) =>
-  ({ parent }: { parent?: unknown }): boolean =>
-    (parent as THeroContentPositionParent | undefined)?.variant !== variant;
+import { HERO_FIELDSET_CONTENT_POSITION } from '@blog/studio/schema-types/fields/hero-fieldsets/hero-fieldsets';
+import { isNotHeroVariant } from '@blog/studio/schema-types/fields/hero-variant-predicate/hero-variant-predicate';
 
 export const heroContentPositionFields = () =>
   alignmentFields(
@@ -22,7 +12,7 @@ export const heroContentPositionFields = () =>
         description: 'Which side of the image the text sits on.',
         allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.RIGHT],
         initialValue: CONTENT_ALIGNMENT.LEFT,
-        hidden: isNotVariant(HERO_VARIANT.SPLIT),
+        hidden: isNotHeroVariant(HERO_VARIANT.SPLIT),
         fieldset: HERO_FIELDSET_CONTENT_POSITION,
       },
       {
@@ -35,7 +25,7 @@ export const heroContentPositionFields = () =>
           CONTENT_ALIGNMENT.RIGHT,
         ],
         initialValue: CONTENT_ALIGNMENT.LEFT,
-        hidden: isNotVariant(HERO_VARIANT.BANNER),
+        hidden: isNotHeroVariant(HERO_VARIANT.BANNER),
         fieldset: HERO_FIELDSET_CONTENT_POSITION,
       },
     ],

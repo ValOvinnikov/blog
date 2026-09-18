@@ -1,5 +1,5 @@
 import { CONTENT_ALIGNMENT, HERO_VARIANT } from '@blog/config/constants';
-import { HERO_FIELDSET_CONTENT_POSITION } from '@blog/studio/schema-types/fields/hero-fields/hero-fields';
+import { HERO_FIELDSET_CONTENT_POSITION } from '@blog/studio/schema-types/fields/hero-fieldsets/hero-fieldsets';
 
 import { heroContentPositionFields } from './hero-content-position-fields';
 
