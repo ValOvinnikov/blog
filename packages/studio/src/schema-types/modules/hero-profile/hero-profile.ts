@@ -1,8 +1,6 @@
 import {
   FULL_BRAND_VARIANT_LIST,
-  HERO_VARIANT,
   PROFILE_IMAGE_SOURCE,
-  type THeroVariant,
   type TProfileImageSource,
 } from '@blog/config/constants';
 import { authorSchema } from '@blog/studio/schema-types/documents/blog/author/author';
@@ -16,90 +14,11 @@ import { heroFieldsets } from '@blog/studio/schema-types/modules/hero-fieldsets/
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
-import { getDraftsClient } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
 import { toTitleCase } from '@blog/utils/primitives';
 import { UserCircle } from 'lucide-react';
-import {
-  defineField,
-  defineType,
-  type SanityDocument,
-  type ValidationContext,
-} from 'sanity';
+import { defineField, defineType } from 'sanity';
 
-type THeroProfileDocument = {
-  variant?: THeroVariant;
-  imageSource?: TProfileImageSource;
-  author?: { _ref?: string };
-  showSocialLinks?: boolean;
-};
-
-type TResolvedAuthor = {
-  image: unknown;
-  socialLinks: unknown[] | null;
-};
-
-const asHeroProfileDocument = (
-  document: SanityDocument | undefined,
-): THeroProfileDocument | undefined =>
-  document as THeroProfileDocument | undefined;
-
-const fetchAuthor = async (
-  document: THeroProfileDocument,
-  context: ValidationContext,
-): Promise<TResolvedAuthor | null> => {
-  const ref = document.author?._ref;
-
-  if (!ref) return null;
-
-  const client = getDraftsClient(context);
-
-  return client.fetch<TResolvedAuthor | null>(
-    `*[_id == $id][0]{ image, socialLinks }`,
-    { id: ref },
-  );
-};
-
-const validateVariantRequiresPhoto = (
-  document: SanityDocument | undefined,
-): string | true => {
-  const doc = asHeroProfileDocument(document);
-  const variantNeedsPhoto =
-    doc?.variant === HERO_VARIANT.SPLIT || doc?.variant === HERO_VARIANT.BANNER;
-
-  return variantNeedsPhoto && doc?.imageSource === PROFILE_IMAGE_SOURCE.NONE
-    ? 'These variants are built around a photo.'
-    : true;
-};
-
-const validateAuthorHasPhoto = async (
-  document: SanityDocument | undefined,
-  context: ValidationContext,
-): Promise<string | true> => {
-  const doc = asHeroProfileDocument(document);
-
-  if (doc?.imageSource !== PROFILE_IMAGE_SOURCE.AUTHOR) return true;
-
-  const author = await fetchAuthor(doc, context);
-
-  return author && !author.image
-    ? 'This author has no photo yet, so the hero renders without one.'
-    : true;
-};
-
-const validateAuthorHasSocialLinks = async (
-  document: SanityDocument | undefined,
-  context: ValidationContext,
-): Promise<string | true> => {
-  const doc = asHeroProfileDocument(document);
-
-  if (!doc?.showSocialLinks) return true;
-
-  const author = await fetchAuthor(doc, context);
-
-  return author && (!author.socialLinks || author.socialLinks.length === 0)
-    ? 'This author has no social links yet, so none will show.'
-    : true;
-};
+type TImageSourceParent = { imageSource?: TProfileImageSource };
 
 const FIELDSET_IMAGE = 'image';
 
@@ -117,11 +36,6 @@ export const heroProfileSchema = defineType({
       description: "Where the hero's image comes from.",
     },
     ...heroFieldsets,
-  ],
-  validation: (rule) => [
-    rule.custom(validateVariantRequiresPhoto),
-    rule.custom(validateAuthorHasPhoto).warning(),
-    rule.custom(validateAuthorHasSocialLinks).warning(),
   ],
   fields: [
     titleField(),
@@ -166,11 +80,11 @@ export const heroProfileSchema = defineType({
       description: 'Used when Source is Custom.',
       fieldset: FIELDSET_IMAGE,
       hidden: ({ parent }) =>
-        (parent as THeroProfileDocument | undefined)?.imageSource !==
+        (parent as TImageSourceParent | undefined)?.imageSource !==
         PROFILE_IMAGE_SOURCE.CUSTOM,
       validation: (rule) =>
         rule.custom((value, context) => {
-          const parent = context.parent as THeroProfileDocument | undefined;
+          const parent = context.parent as TImageSourceParent | undefined;
 
           return parent?.imageSource === PROFILE_IMAGE_SOURCE.CUSTOM && !value
             ? 'A custom image is required when Source is Custom.'

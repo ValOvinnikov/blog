@@ -1,12 +1,7 @@
-import { HERO_VARIANT, PROFILE_IMAGE_SOURCE } from '@blog/config/constants';
+import { PROFILE_IMAGE_SOURCE } from '@blog/config/constants';
 import { authorSchema } from '@blog/studio/schema-types/documents/blog/author/author';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
-import {
-  getCustomValidator,
-  getRecordedValidators,
-  type TRecordedValidator,
-} from '@blog/studio/testing/create-mock-validation-rule';
-import type { SanityDocument, ValidationContext } from 'sanity';
+import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
 
 import { heroProfileSchema } from './hero-profile';
 
@@ -16,11 +11,6 @@ type TCustomFn = (
 ) => string | true;
 
 type THiddenFn = (context: { parent?: unknown }) => boolean;
-
-type TDocFn = (
-  document: SanityDocument | undefined,
-  context: ValidationContext,
-) => Promise<string | true> | string | true;
 
 const getField = (name: string) => {
   const field = heroProfileSchema.fields?.find(
@@ -92,22 +82,6 @@ const wasRequiredCalled = (field: { validation?: unknown }) => {
 
 const getFieldCustomValidator = (field: { validation?: unknown }): TCustomFn =>
   getCustomValidator<TCustomFn>(field);
-
-const getDocumentValidators = (): TRecordedValidator<TDocFn>[] =>
-  getRecordedValidators<TDocFn>(heroProfileSchema);
-
-const createMockContext = (
-  fetchImpl: (query: string, params?: unknown) => unknown,
-): ValidationContext => {
-  const getClient = () => ({
-    withConfig: () => ({
-      fetch: async (query: string, params?: unknown) =>
-        fetchImpl(query, params),
-    }),
-  });
-
-  return { getClient } as unknown as ValidationContext;
-};
 
 describe('heroProfileSchema fieldsets', () => {
   it('declares image and the shared content position fieldset', () => {
@@ -258,192 +232,6 @@ describe('heroProfileSchema hero tail', () => {
         (field) => 'name' in field && field.name === 'mediaOrderStacked',
       ),
     ).toBe(false);
-  });
-});
-
-describe('heroProfileSchema document validation', () => {
-  it('registers three document-level rules: one error then two warnings', () => {
-    const validators = getDocumentValidators();
-
-    expect(validators.map((validator) => validator.level)).toEqual([
-      'error',
-      'warning',
-      'warning',
-    ]);
-  });
-
-  describe('variant-requires-photo', () => {
-    it('errors when Split with Image Source None', () => {
-      const [validateVariantPhoto] = getDocumentValidators();
-
-      expect(
-        validateVariantPhoto!.fn(
-          {
-            variant: HERO_VARIANT.SPLIT,
-            imageSource: PROFILE_IMAGE_SOURCE.NONE,
-          } as unknown as SanityDocument,
-          undefined as unknown as ValidationContext,
-        ),
-      ).toBe('These variants are built around a photo.');
-    });
-
-    it('errors when Banner with Image Source None', () => {
-      const [validateVariantPhoto] = getDocumentValidators();
-
-      expect(
-        validateVariantPhoto!.fn(
-          {
-            variant: HERO_VARIANT.BANNER,
-            imageSource: PROFILE_IMAGE_SOURCE.NONE,
-          } as unknown as SanityDocument,
-          undefined as unknown as ValidationContext,
-        ),
-      ).toBe('These variants are built around a photo.');
-    });
-
-    it('passes when Stacked with Image Source None', () => {
-      const [validateVariantPhoto] = getDocumentValidators();
-
-      expect(
-        validateVariantPhoto!.fn(
-          {
-            variant: HERO_VARIANT.STACKED,
-            imageSource: PROFILE_IMAGE_SOURCE.NONE,
-          } as unknown as SanityDocument,
-          undefined as unknown as ValidationContext,
-        ),
-      ).toBe(true);
-    });
-
-    it('passes when Split with an image source', () => {
-      const [validateVariantPhoto] = getDocumentValidators();
-
-      expect(
-        validateVariantPhoto!.fn(
-          {
-            variant: HERO_VARIANT.SPLIT,
-            imageSource: PROFILE_IMAGE_SOURCE.AUTHOR,
-          } as unknown as SanityDocument,
-          undefined as unknown as ValidationContext,
-        ),
-      ).toBe(true);
-    });
-  });
-
-  describe('author-has-photo', () => {
-    it('passes without querying when Image Source is not Author', async () => {
-      const [, validateAuthorPhoto] = getDocumentValidators();
-      let called = false;
-      const context = createMockContext(() => {
-        called = true;
-        return null;
-      });
-
-      await expect(
-        validateAuthorPhoto!.fn(
-          {
-            imageSource: PROFILE_IMAGE_SOURCE.CUSTOM,
-          } as unknown as SanityDocument,
-          context,
-        ),
-      ).resolves.toBe(true);
-      expect(called).toBe(false);
-    });
-
-    it('warns when the referenced author has no image', async () => {
-      const [, validateAuthorPhoto] = getDocumentValidators();
-      const context = createMockContext(() => ({
-        image: undefined,
-        socialLinks: null,
-      }));
-
-      await expect(
-        validateAuthorPhoto!.fn(
-          {
-            imageSource: PROFILE_IMAGE_SOURCE.AUTHOR,
-            author: { _ref: 'author-1' },
-          } as unknown as SanityDocument,
-          context,
-        ),
-      ).resolves.toBe(
-        'This author has no photo yet, so the hero renders without one.',
-      );
-    });
-
-    it('passes when the referenced author has an image', async () => {
-      const [, validateAuthorPhoto] = getDocumentValidators();
-      const context = createMockContext(() => ({
-        image: { asset: { _ref: 'image-abc' } },
-        socialLinks: null,
-      }));
-
-      await expect(
-        validateAuthorPhoto!.fn(
-          {
-            imageSource: PROFILE_IMAGE_SOURCE.AUTHOR,
-            author: { _ref: 'author-1' },
-          } as unknown as SanityDocument,
-          context,
-        ),
-      ).resolves.toBe(true);
-    });
-  });
-
-  describe('author-has-social-links', () => {
-    it('passes without querying when showSocialLinks is off', async () => {
-      const [, , validateAuthorSocial] = getDocumentValidators();
-      let called = false;
-      const context = createMockContext(() => {
-        called = true;
-        return null;
-      });
-
-      await expect(
-        validateAuthorSocial!.fn(
-          { showSocialLinks: false } as unknown as SanityDocument,
-          context,
-        ),
-      ).resolves.toBe(true);
-      expect(called).toBe(false);
-    });
-
-    it('warns when the referenced author has no social links', async () => {
-      const [, , validateAuthorSocial] = getDocumentValidators();
-      const context = createMockContext(() => ({
-        image: undefined,
-        socialLinks: [],
-      }));
-
-      await expect(
-        validateAuthorSocial!.fn(
-          {
-            showSocialLinks: true,
-            author: { _ref: 'author-1' },
-          } as unknown as SanityDocument,
-          context,
-        ),
-      ).resolves.toBe(
-        'This author has no social links yet, so none will show.',
-      );
-    });
-
-    it('passes when the referenced author has social links', async () => {
-      const [, , validateAuthorSocial] = getDocumentValidators();
-      const context = createMockContext(() => ({
-        image: undefined,
-        socialLinks: [{ _type: 'socialProfile' }],
-      }));
-
-      await expect(
-        validateAuthorSocial!.fn(
-          {
-            showSocialLinks: true,
-            author: { _ref: 'author-1' },
-          } as unknown as SanityDocument,
-          context,
-        ),
-      ).resolves.toBe(true);
-    });
   });
 });
 
