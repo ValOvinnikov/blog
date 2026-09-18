@@ -3,6 +3,7 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { makeTopic } from '@web/testing/shared/topic/fixtures';
 import { notFound } from 'next/navigation';
+import type { ReactNode } from 'react';
 
 import { TopicPage } from './topic-page';
 
@@ -10,8 +11,7 @@ const {
   getTopicPageMock,
   topicBreadcrumbsMock,
   topicChipsMock,
-  moduleRendererMock,
-  pageIntroMock,
+  topicModuleRendererMock,
 } = vi.hoisted(() => ({
   getTopicPageMock: vi.fn(),
   topicBreadcrumbsMock: vi.fn(
@@ -28,21 +28,26 @@ const {
       </div>
     ),
   ),
-  pageIntroMock: vi.fn(
+  topicModuleRendererMock: vi.fn(
     ({
       hero,
       headingBlock,
+      modules,
+      children,
     }: {
       hero?: { id: string };
       headingBlock: { heading: string };
+      modules: { id: string; type: string }[];
+      children?: ReactNode;
     }) => (
-      <h1 data-testid="page-intro">{hero ? hero.id : headingBlock.heading}</h1>
-    ),
-  ),
-  moduleRendererMock: vi.fn(
-    ({ modules }: { modules: { id: string; type: string }[] }) => (
-      <div data-testid="module-renderer-stub">
-        {modules.map((module) => module.type).join(',')}
+      <div data-testid="topic-module-renderer">
+        <span data-testid="page-intro">
+          {hero ? hero.id : headingBlock.heading}
+        </span>
+        {children}
+        <div data-testid="module-renderer-stub">
+          {modules.map((module) => module.type).join(',')}
+        </div>
       </div>
     ),
   ),
@@ -60,12 +65,8 @@ vi.mock('@web/components/features/topic/topic-chips', () => ({
   TopicChips: topicChipsMock,
 }));
 
-vi.mock('@web/components/shared/page-intro', () => ({
-  PageIntro: pageIntroMock,
-}));
-
-vi.mock('@web/modules/module-renderer', () => ({
-  ModuleRenderer: moduleRendererMock,
+vi.mock('./topic-module-renderer', () => ({
+  TopicModuleRenderer: topicModuleRendererMock,
 }));
 
 const topic = makeTopic({
@@ -114,7 +115,7 @@ describe(`<${TopicPage.name}/>`, () => {
     errorSpy.mockRestore();
   });
 
-  it('dispatches PageIntro with the view-model headingBlock', async () => {
+  it('dispatches TopicModuleRenderer with the view-model headingBlock', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -130,7 +131,7 @@ describe(`<${TopicPage.name}/>`, () => {
 
     await setup();
 
-    expect(pageIntroMock).toHaveBeenCalledWith(
+    expect(topicModuleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({
         headingBlock: makeHeadingBlock({
           heading: 'News',
@@ -145,7 +146,7 @@ describe(`<${TopicPage.name}/>`, () => {
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('renders the parts in order: breadcrumbs, topic chips, module renderer', async () => {
+  it('renders the parts in order: breadcrumbs, hero/heading, topic chips, module renderer', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -164,6 +165,7 @@ describe(`<${TopicPage.name}/>`, () => {
 
     expect(order).toEqual([
       'topic-breadcrumbs',
+      'topic-module-renderer',
       'page-intro',
       'topic-chips',
       'module-renderer-stub',
@@ -189,7 +191,7 @@ describe(`<${TopicPage.name}/>`, () => {
     expect(screen.getByTestId('topic-breadcrumbs').closest('main')).toBeNull();
   });
 
-  it('passes the current page and the topic archive scope as context to ModuleRenderer', async () => {
+  it('passes the current page and the topic archive scope as context to TopicModuleRenderer', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -202,7 +204,7 @@ describe(`<${TopicPage.name}/>`, () => {
 
     await setup({ page: 3 });
 
-    expect(moduleRendererMock).toHaveBeenCalledWith(
+    expect(topicModuleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({
         context: {
           page: 3,
@@ -213,7 +215,7 @@ describe(`<${TopicPage.name}/>`, () => {
     );
   });
 
-  it('defaults the ModuleRenderer context page to 1 when no page is given', async () => {
+  it('defaults the TopicModuleRenderer context page to 1 when no page is given', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -226,7 +228,7 @@ describe(`<${TopicPage.name}/>`, () => {
 
     await setup();
 
-    expect(moduleRendererMock).toHaveBeenCalledWith(
+    expect(topicModuleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({
         context: {
           page: 1,
@@ -237,7 +239,7 @@ describe(`<${TopicPage.name}/>`, () => {
     );
   });
 
-  it('passes the page-builder modules through to ModuleRenderer', async () => {
+  it('passes the page-builder modules through to TopicModuleRenderer', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -250,7 +252,7 @@ describe(`<${TopicPage.name}/>`, () => {
 
     await setup();
 
-    expect(moduleRendererMock).toHaveBeenCalledWith(
+    expect(topicModuleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({
         modules: [{ id: 'newsletter-1', type: 'module_newsletter' }],
         locale: 'en',
@@ -262,7 +264,7 @@ describe(`<${TopicPage.name}/>`, () => {
     );
   });
 
-  it('dispatches PageIntro with the hero when a hero is set', async () => {
+  it('dispatches TopicModuleRenderer with the hero when a hero is set', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -276,7 +278,7 @@ describe(`<${TopicPage.name}/>`, () => {
 
     await setup();
 
-    expect(pageIntroMock).toHaveBeenCalledWith(
+    expect(topicModuleRendererMock).toHaveBeenCalledWith(
       expect.objectContaining({
         hero: { id: 'hero-1', type: 'module_hero' },
         locale: 'en',
