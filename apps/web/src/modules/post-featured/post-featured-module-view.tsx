@@ -1,12 +1,12 @@
 import { DISPLAY_MODE } from '@blog/config';
 import type { TPostFeaturedModule } from '@blog/service';
 import { CardGrid } from '@blog/ui/organisms/card-grid';
-import { ModuleHeading } from '@web/components/shared/module-heading';
+import { CardCarousel } from '@web/components/shared/card-carousel';
 import {
-  type IPostCardData,
-  PostCardItem,
-} from '@web/components/shared/post-card-item';
-import { PostsCarousel } from '@web/components/shared/posts-carousel';
+  type IMediaCardData,
+  MediaCardItem,
+} from '@web/components/shared/media-card-item';
+import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
 
 import { postFeaturedModuleViewVariants } from './post-featured-module-view-variants';
@@ -15,7 +15,7 @@ export interface IPostFeaturedModuleViewProps extends Omit<
   TPostFeaturedModule,
   'posts' | 'showImages'
 > {
-  items: IPostCardData[];
+  items: IMediaCardData[];
   titleId: string;
   dataTestId: string;
   hasImages?: boolean;
@@ -23,8 +23,8 @@ export interface IPostFeaturedModuleViewProps extends Omit<
 
 /**
  * PostFeaturedModuleView — render shell for `PostFeaturedModule`: a labeled
- * `Section` wrapping either a `PostsCarousel` or the default spotlight
- * arrangement — the first item as a lead `PostCardItem`, then either the one
+ * `Section` wrapping either a `CardCarousel` or the default spotlight
+ * arrangement — the first item as a lead `MediaCardItem`, then either the one
  * remaining item (also full-width) or a two-column `CardGrid` of the rest.
  * Never called with an empty `items` — `PostFeaturedModule` renders nothing
  * itself in that case.
@@ -61,7 +61,7 @@ export const PostFeaturedModuleView = ({
         align={contentAlignment}
       />
       {leadPost && displayMode === DISPLAY_MODE.CAROUSEL && (
-        <PostsCarousel
+        <CardCarousel
           items={items}
           hasImages={hasImages}
           title={heading}
@@ -70,7 +70,7 @@ export const PostFeaturedModuleView = ({
       )}
       {leadPost && displayMode !== DISPLAY_MODE.CAROUSEL && (
         <div className={s.leadGroup()}>
-          <PostCardItem
+          <MediaCardItem
             item={leadPost}
             isLead={true}
             isSplit={true}
@@ -78,7 +78,7 @@ export const PostFeaturedModuleView = ({
             dataTestId={`${dataTestId}-lead`}
           />
           {tailPosts.length === 1 && soloTailPost && (
-            <PostCardItem
+            <MediaCardItem
               item={soloTailPost}
               isSplit={true}
               hasImage={hasImages}
@@ -92,7 +92,7 @@ export const PostFeaturedModuleView = ({
               dataTestId={`${dataTestId}-tail-grid`}
             >
               {tailPosts.map((post) => (
-                <PostCardItem key={post.id} item={post} hasImage={hasImages} />
+                <MediaCardItem key={post.id} item={post} hasImage={hasImages} />
               ))}
             </CardGrid>
           )}

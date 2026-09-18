@@ -7,8 +7,8 @@ import {
 } from '@web/testing/custom-render';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
 
-import { PostsCarousel } from './posts-carousel';
-import { postsCarouselVariants } from './posts-carousel-variants';
+import { CardCarousel } from './card-carousel';
+import { cardCarouselVariants } from './card-carousel-variants';
 
 vi.mock('@web/components/shared/smart-link', () => ({
   SmartLink: ({
@@ -25,7 +25,7 @@ vi.mock('@web/components/shared/smart-link', () => ({
   ),
 }));
 
-// `PostsCarousel`'s contract is what it hands to `Carousel`, not what
+// `CardCarousel`'s contract is what it hands to `Carousel`, not what
 // `Carousel` renders — mocked out entirely so this file never exercises
 // Embla (already covered by `packages/ui`'s own carousel tests).
 vi.mock('@blog/ui/organisms/carousel', () => ({
@@ -37,7 +37,7 @@ const items = [
   makePostListItem({ id: 'post-2', title: 'Second post' }),
 ];
 
-const setup = customRender(PostsCarousel, {
+const setup = customRender(CardCarousel, {
   items,
   title: 'Latest posts',
 });
@@ -50,7 +50,7 @@ const getCarouselProps = () => {
   return props;
 };
 
-describe(`<${PostsCarousel.name}/>`, () => {
+describe(`<${CardCarousel.name}/>`, () => {
   it('composes the region label from the carousel.regionLabel Voice key rather than passing the title straight through, with the Voice-fixed previous/next labels', () => {
     setup();
 
@@ -61,7 +61,7 @@ describe(`<${PostsCarousel.name}/>`, () => {
     });
   });
 
-  it('renderItem renders exactly one PostCardItem per item, with no lead treatment', () => {
+  it('renderItem renders exactly one MediaCardItem per item, with no lead treatment', () => {
     setup();
     const { renderItem } = getCarouselProps();
 
@@ -88,7 +88,7 @@ describe(`<${PostsCarousel.name}/>`, () => {
   it('passes the slide column-width classes through slideClassName', () => {
     setup();
 
-    const s = postsCarouselVariants();
+    const s = cardCarouselVariants();
     expect(getCarouselProps().slideClassName).toBe(s.slide());
   });
 
@@ -111,7 +111,7 @@ describe(`<${PostsCarousel.name}/>`, () => {
 
     renderElement(<>{renderItem({ item: itemsWithImages[0], index: 0 })}</>);
 
-    expect(screen.getByTestId('post-card-media')).toBeInTheDocument();
+    expect(screen.getByTestId('media-card-media')).toBeInTheDocument();
     expect(screen.getByTestId('image-1')).toBeInTheDocument();
   });
 
@@ -121,7 +121,7 @@ describe(`<${PostsCarousel.name}/>`, () => {
 
     renderElement(<>{renderItem({ item: items[0], index: 0 })}</>);
 
-    expect(screen.getByTestId('post-card-media')).toBeEmptyDOMElement();
+    expect(screen.getByTestId('media-card-media')).toBeEmptyDOMElement();
   });
 
   it('renderItem renders no media region when hasImages is omitted', () => {
@@ -130,6 +130,6 @@ describe(`<${PostsCarousel.name}/>`, () => {
 
     renderElement(<>{renderItem({ item: items[0], index: 0 })}</>);
 
-    expect(screen.queryByTestId('post-card-media')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('media-card-media')).not.toBeInTheDocument();
   });
 });

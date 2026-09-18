@@ -1,6 +1,6 @@
 import { tv } from 'tailwind-variants';
 
-export const postsCarouselVariants = tv({
+export const cardCarouselVariants = tv({
   slots: {
     slide: [
       'basis-[85%]',
