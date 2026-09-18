@@ -229,6 +229,24 @@ every field** (`.notNull()` or `.nullable(true)`).
   input.
 - **Extract at the second repetition.** A projection/transform pattern used
   twice becomes a fragment or shared transformer; never copy-paste a third.
+- **List `shared/transformers/` and `shared/fragments/` before writing any
+  helper**, and do it even when told to follow a named sibling feature. A
+  sibling is a guide to structure, not a source to copy from: its private
+  helpers are exactly the things most likely to be duplicated, because copying
+  one feels like consistency.
+- **A local helper that maps a shared transformer over an array is the
+  signature of this mistake.** `shared/transformers/` holds singular
+  transformers, so the plural wrapper — dropping entries that do not
+  resolve — gets rewritten per feature instead of shared. Before writing one,
+  grep for the singular transformer's other call sites; if any of them already
+  wraps it the same way, the wrapper belongs in `shared/`, and adding a second
+  copy is a finding to report rather than a line to write.
+  Both shapes count as the same pattern: `flatMap((x) => f(x) ?? [])` and
+  `.map(f).filter((v): v is T => v !== undefined)` differ only in idiom.
+  Adopted 2026-09-18, after `toSocialProfiles` and `toCtaButtons` were each
+  copy-pasted into a third feature under a dispatch that said "follow
+  `getHeroStatement`" — both passed review, because each diff looked
+  self-consistent in isolation.
 
 ## Comments
 
