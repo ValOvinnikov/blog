@@ -1,4 +1,5 @@
 import { landingPageSchema } from '@blog/studio/schema-types/documents/pages/landing/landing';
+import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import { heroStatementSchema } from '@blog/studio/schema-types/modules/hero-statement/hero-statement';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
@@ -150,7 +151,7 @@ describe('landingPageSchema slug validation', () => {
 });
 
 describe('landingPageSchema hero field', () => {
-  it('is an optional reference scoped to heroStatement only', () => {
+  it('is an optional reference scoped to heroBlog and heroStatement', () => {
     const heroField = landingPageSchema.fields?.find(
       (field) => field.name === 'hero',
     ) as { type: string; to?: Array<{ type: string }>; validation?: unknown };
@@ -158,6 +159,7 @@ describe('landingPageSchema hero field', () => {
     expect(heroField).toBeDefined();
     expect(heroField.type).toBe('reference');
     expect(heroField.to?.map((entry) => entry.type)).toEqual([
+      heroBlogSchema.name,
       heroStatementSchema.name,
     ]);
     expect(heroField.validation).toBeUndefined();
