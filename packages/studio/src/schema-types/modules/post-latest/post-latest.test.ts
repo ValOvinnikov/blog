@@ -4,6 +4,7 @@ import {
   getRecordedValidators,
   type TRecordedValidator,
 } from '@blog/studio/testing/create-mock-validation-rule';
+import { getField } from '@blog/studio/testing/get-field';
 import type { SanityDocument } from 'sanity';
 
 type TDocFn = (document: SanityDocument | undefined) => string | true;
@@ -11,34 +12,23 @@ type TDocFn = (document: SanityDocument | undefined) => string | true;
 const getDocumentValidators = (): TRecordedValidator<TDocFn>[] =>
   getRecordedValidators<TDocFn>(postLatestSchema);
 
-const getField = (name: string) => {
-  const field = postLatestSchema.fields?.find(
-    (field): field is typeof field & { name: string } =>
-      'name' in field && field.name === name,
-  );
-
-  if (!field) {
-    throw new Error(`Expected postLatestSchema to define a "${name}" field.`);
-  }
-
-  return field;
-};
+const getPostLatestField = (name: string) => getField(postLatestSchema, name);
 
 describe('postLatestSchema contentAlignment field', () => {
   it('includes a contentAlignment field', () => {
-    expect(getField('contentAlignment')).toBeDefined();
+    expect(getPostLatestField('contentAlignment')).toBeDefined();
   });
 });
 
 describe('postLatestSchema showImages field', () => {
   it('includes a showImages field', () => {
-    expect(getField('showImages')).toBeDefined();
+    expect(getPostLatestField('showImages')).toBeDefined();
   });
 });
 
 describe('postLatestSchema headingBlock field', () => {
   it('is required at the field level', () => {
-    const field = getField('headingBlock');
+    const field = getPostLatestField('headingBlock');
 
     if (typeof field.validation !== 'function') {
       throw new Error('Expected headingBlock field to define validation.');
@@ -73,13 +63,13 @@ describe('postLatestSchema displayMode field', () => {
   });
 
   it('defaults to GRID', () => {
-    const field = getField('displayMode');
+    const field = getPostLatestField('displayMode');
 
     expect(field.initialValue).toBe(DISPLAY_MODE.GRID);
   });
 
   it('defines no validation rule', () => {
-    const field = getField('displayMode');
+    const field = getPostLatestField('displayMode');
 
     expect(
       'validation' in field ? field.validation : undefined,

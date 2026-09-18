@@ -1,26 +1,7 @@
 import { NEWSLETTER_VARIANT } from '@blog/config/constants';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
-
-const getField = (name: string) => {
-  const field = newsletterSchema.fields?.find(
-    (field): field is typeof field & { name: string } =>
-      'name' in field && field.name === name,
-  );
-
-  if (!field) {
-    throw new Error(`Expected newsletterSchema to define a "${name}" field.`);
-  }
-
-  return field;
-};
-
-const getLayout = (field: { options?: unknown }) => {
-  const options = field.options;
-
-  return options && typeof options === 'object' && 'layout' in options
-    ? (options as { layout?: string }).layout
-    : undefined;
-};
+import { getField } from '@blog/studio/testing/get-field';
+import { getLayout } from '@blog/studio/testing/get-field-layout';
 
 const getOptionValues = (field: { options?: unknown }) => {
   const options = field.options;
@@ -50,7 +31,7 @@ describe('newsletterSchema contentAlignment field', () => {
 
 describe('newsletterSchema variant field', () => {
   it('offers Full and Compact, defaulting to Full', () => {
-    const field = getField('variant');
+    const field = getField(newsletterSchema, 'variant');
 
     expect(getOptionValues(field)).toEqual([
       NEWSLETTER_VARIANT.FULL,
@@ -60,10 +41,10 @@ describe('newsletterSchema variant field', () => {
   });
 
   it('is optional — no validation() builder attached', () => {
-    expect(getField('variant').validation).toBeUndefined();
+    expect(getField(newsletterSchema, 'variant').validation).toBeUndefined();
   });
 
   it('converts to a dropdown: optional, no field depends on it', () => {
-    expect(getLayout(getField('variant'))).toBe('dropdown');
+    expect(getLayout(getField(newsletterSchema, 'variant'))).toBe('dropdown');
   });
 });

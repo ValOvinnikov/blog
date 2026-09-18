@@ -7,31 +7,10 @@ import {
   ctaButtonSchema,
   ctaSecondaryButtonSchema,
 } from '@blog/studio/schema-types/objects/cta-button/cta-button';
+import { getField } from '@blog/studio/testing/get-field';
+import { getLayout } from '@blog/studio/testing/get-field-layout';
+import { wasRequiredCalled } from '@blog/studio/testing/was-required-called';
 import { toTitleCase } from '@blog/utils/primitives';
-
-const getField = (
-  schema: typeof ctaButtonSchema | typeof ctaSecondaryButtonSchema,
-  name: string,
-) => {
-  const field = schema.fields.find(
-    (field): field is typeof field & { name: string } =>
-      'name' in field && field.name === name,
-  );
-
-  if (!field) {
-    throw new Error(`Expected ${schema.name} to define a "${name}" field.`);
-  }
-
-  return field;
-};
-
-const getLayout = (field: { options?: unknown }) => {
-  const options = field.options;
-
-  return options && typeof options === 'object' && 'layout' in options
-    ? (options as { layout?: string }).layout
-    : undefined;
-};
 
 const getOptionValues = (field: { options?: unknown }) => {
   const options = field.options;
@@ -45,25 +24,6 @@ const getOptionValues = (field: { options?: unknown }) => {
   }
 
   return list as { title: string; value: string }[];
-};
-
-const wasRequiredCalled = (field: { validation?: unknown }) => {
-  if (!field.validation) {
-    throw new Error('Expected field to define validation.');
-  }
-
-  let requiredCalled = false;
-  const rule = {
-    required: () => {
-      requiredCalled = true;
-      return rule;
-    },
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (field.validation as any)(rule);
-
-  return requiredCalled;
 };
 
 describe('ctaButtonSchema control choices', () => {

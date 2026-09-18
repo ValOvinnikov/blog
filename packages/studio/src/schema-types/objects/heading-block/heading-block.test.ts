@@ -1,4 +1,5 @@
 import { headingBlockSchema } from '@blog/studio/schema-types/objects/heading-block/heading-block';
+import { wasRequiredCalled } from '@blog/studio/testing/was-required-called';
 import type { ObjectDefinition } from 'sanity';
 
 const fieldNames = (schema: ObjectDefinition) =>
@@ -12,25 +13,6 @@ const findField = (schema: ObjectDefinition, name: string) => {
   }
 
   return field;
-};
-
-const wasRequiredCalled = (field: { validation?: unknown }) => {
-  if (!field.validation) {
-    throw new Error('Expected field to define validation.');
-  }
-
-  let requiredCalled = false;
-  const rule = {
-    required: () => {
-      requiredCalled = true;
-      return rule;
-    },
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (field.validation as any)(rule);
-
-  return requiredCalled;
 };
 
 describe('headingBlockSchema shape', () => {

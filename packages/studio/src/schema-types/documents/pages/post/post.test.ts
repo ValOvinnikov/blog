@@ -2,6 +2,7 @@ import { postPageSchema } from '@blog/studio/schema-types/documents/pages/post/p
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
+import { getField } from '@blog/studio/testing/get-field';
 
 type TReferenceFieldDefinition = {
   type: 'reference';
@@ -16,8 +17,7 @@ type TValidationRule = {
   custom: (fn: unknown) => TValidationRule;
 };
 
-const getField = (name: string) =>
-  postPageSchema.fields?.find((field) => field.name === name);
+const getPostPageField = (name: string) => getField(postPageSchema, name);
 
 const createTrackingRule = () => {
   const calls = {
@@ -47,7 +47,7 @@ const createTrackingRule = () => {
 
 describe('postPageSchema shape', () => {
   it('title is required via the shared titleField() helper — an internal label, not the rendered headline', () => {
-    const titleFieldDefinition = getField('title');
+    const titleFieldDefinition = getPostPageField('title');
 
     if (!titleFieldDefinition?.validation) {
       throw new Error('Expected postPageSchema to define a title field.');
@@ -63,7 +63,7 @@ describe('postPageSchema shape', () => {
   });
 
   it('publishedAt is a required datetime field', () => {
-    const publishedAtField = getField('publishedAt') as
+    const publishedAtField = getPostPageField('publishedAt') as
       { type: string; validation?: unknown } | undefined;
 
     if (!publishedAtField || publishedAtField.type !== 'datetime') {
@@ -81,11 +81,13 @@ describe('postPageSchema shape', () => {
   });
 
   it('has no top-level excerpt field — the excerpt lives in headingBlock.supportingText', () => {
-    expect(getField('excerpt')).toBeUndefined();
+    expect(
+      postPageSchema.fields?.find((field) => field.name === 'excerpt'),
+    ).toBeUndefined();
   });
 
   it('headingBlock uses the shared headingBlock object type, required at the field level — the heading is the post headline', () => {
-    const headingBlockFieldDefinition = getField('headingBlock') as
+    const headingBlockFieldDefinition = getPostPageField('headingBlock') as
       { type?: string; validation?: unknown } | undefined;
 
     expect(headingBlockFieldDefinition?.type).toBe('headingBlock');
@@ -105,7 +107,7 @@ describe('postPageSchema shape', () => {
   });
 
   it('headingBlock carries the shared headingBlockField description', () => {
-    const headingBlockFieldDefinition = getField('headingBlock') as
+    const headingBlockFieldDefinition = getPostPageField('headingBlock') as
       { type?: string; description?: string } | undefined;
 
     expect(headingBlockFieldDefinition?.description).toBe(
@@ -114,11 +116,11 @@ describe('postPageSchema shape', () => {
   });
 
   it('heroImage stays optional — no validation() builder attached', () => {
-    expect(getField('heroImage')?.validation).toBeUndefined();
+    expect(getPostPageField('heroImage')?.validation).toBeUndefined();
   });
 
   it('author is a required reference', () => {
-    const authorField = getField('author') as
+    const authorField = getPostPageField('author') as
       TReferenceFieldDefinition | undefined;
 
     if (!authorField?.validation) {
@@ -134,7 +136,7 @@ describe('postPageSchema shape', () => {
   });
 
   it('topic is a required reference', () => {
-    const topicField = getField('topic') as
+    const topicField = getPostPageField('topic') as
       TReferenceFieldDefinition | undefined;
 
     if (!topicField?.validation) {
@@ -150,7 +152,7 @@ describe('postPageSchema shape', () => {
   });
 
   it('tags caps at 6 and is optional', () => {
-    const tagsField = getField('tags');
+    const tagsField = getPostPageField('tags');
 
     if (!tagsField?.validation) {
       throw new Error('Expected postPageSchema to define a tags field.');
@@ -166,7 +168,7 @@ describe('postPageSchema shape', () => {
   });
 
   it('content is a required richText field', () => {
-    const contentField = getField('content');
+    const contentField = getPostPageField('content');
 
     if (!contentField?.validation) {
       throw new Error('Expected postPageSchema to define a content field.');
@@ -181,24 +183,32 @@ describe('postPageSchema shape', () => {
   });
 
   it('has no top-level post reference — the page absorbed the post directly', () => {
-    expect(getField('post')).toBeUndefined();
+    expect(
+      postPageSchema.fields?.find((field) => field.name === 'post'),
+    ).toBeUndefined();
   });
 
   it('featured and postTakeaways stay optional — no validation() builder attached', () => {
-    expect(getField('featured')?.validation).toBeUndefined();
-    expect(getField('postTakeaways')?.validation).toBeUndefined();
+    expect(getPostPageField('featured')?.validation).toBeUndefined();
+    expect(getPostPageField('postTakeaways')?.validation).toBeUndefined();
   });
 
   it('has no newsletterEnabled field — the newsletter module in modules[] is the toggle', () => {
-    expect(getField('newsletterEnabled')).toBeUndefined();
+    expect(
+      postPageSchema.fields?.find(
+        (field) => field.name === 'newsletterEnabled',
+      ),
+    ).toBeUndefined();
   });
 
   it('has no postList slot', () => {
-    expect(getField('postList')).toBeUndefined();
+    expect(
+      postPageSchema.fields?.find((field) => field.name === 'postList'),
+    ).toBeUndefined();
   });
 
   it('seo is required via the shared seoField() helper', () => {
-    const seoFieldDefinition = getField('seo');
+    const seoFieldDefinition = getPostPageField('seo');
 
     if (!seoFieldDefinition?.validation) {
       throw new Error('Expected postPageSchema to define a seo field.');
@@ -226,7 +236,7 @@ type TSlugFieldDefinition = {
 
 describe('postPageSchema slug field', () => {
   const getSlugField = () =>
-    getField('slug') as TSlugFieldDefinition | undefined;
+    getPostPageField('slug') as TSlugFieldDefinition | undefined;
 
   it('is sourced from title with a 96-char max', () => {
     const slugField = getSlugField();
@@ -274,7 +284,7 @@ describe('postPageSchema slug field', () => {
 
 describe('postPageSchema modules field', () => {
   const getModulesField = () =>
-    getField('modules') as
+    getPostPageField('modules') as
       | { type: 'array'; of?: Array<{ to?: Array<{ type: string }> }> }
       | undefined;
 

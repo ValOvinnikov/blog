@@ -11,6 +11,7 @@ import {
   type TModulesCustomFn,
 } from '@blog/studio/testing/create-mock-modules-rule';
 import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
+import { wasRequiredCalled } from '@blog/studio/testing/was-required-called';
 import type { ValidationContext } from 'sanity';
 
 const getModulesCustomValidators = (): TModulesCustomFn[] => {
@@ -74,26 +75,6 @@ type TSlugCustomFn = (value: { current?: string } | undefined) => string | true;
 
 const getSlugField = () =>
   landingPageSchema.fields?.find((field) => field.name === 'slug');
-
-const wasRequiredCalled = (field: { validation?: unknown }) => {
-  if (typeof field.validation !== 'function') {
-    throw new Error('Expected field to define validation.');
-  }
-
-  let requiredCalled = false;
-  const rule = {
-    required: () => {
-      requiredCalled = true;
-      return rule;
-    },
-    custom: () => rule,
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (field.validation as any)(rule);
-
-  return requiredCalled;
-};
 
 const getSlugCustomValidator = () => {
   const slugField = getSlugField();

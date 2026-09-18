@@ -4,29 +4,9 @@ import {
 } from '@blog/config/constants';
 import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
 import { socialProfileSchema } from '@blog/studio/schema-types/objects/social-profile/social-profile';
-
-const getField = (name: string) => {
-  const field = socialProfileSchema.fields.find(
-    (field): field is typeof field & { name: string } =>
-      'name' in field && field.name === name,
-  );
-
-  if (!field) {
-    throw new Error(
-      `Expected socialProfileSchema to define a "${name}" field.`,
-    );
-  }
-
-  return field;
-};
-
-const getLayout = (field: { options?: unknown }) => {
-  const options = field.options;
-
-  return options && typeof options === 'object' && 'layout' in options
-    ? (options as { layout?: string }).layout
-    : undefined;
-};
+import { getField } from '@blog/studio/testing/get-field';
+import { getLayout } from '@blog/studio/testing/get-field-layout';
+import { wasRequiredCalled } from '@blog/studio/testing/was-required-called';
 
 const getOptionValues = (field: { options?: unknown }) => {
   const options = field.options;
@@ -42,28 +22,9 @@ const getOptionValues = (field: { options?: unknown }) => {
   return list as { title: string; value: string }[];
 };
 
-const wasRequiredCalled = (field: { validation?: unknown }) => {
-  if (!field.validation) {
-    throw new Error('Expected field to define validation.');
-  }
-
-  let requiredCalled = false;
-  const rule = {
-    required: () => {
-      requiredCalled = true;
-      return rule;
-    },
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (field.validation as any)(rule);
-
-  return requiredCalled;
-};
-
 describe('socialProfileSchema fields', () => {
   it('requires a link reference to the link document', () => {
-    const field = getField('link');
+    const field = getField(socialProfileSchema, 'link');
 
     expect(field.type).toBe('reference');
     expect('to' in field ? field.to : undefined).toEqual([
@@ -73,7 +34,7 @@ describe('socialProfileSchema fields', () => {
   });
 
   it('requires platform as a radio, titled from SOCIAL_PLATFORM_LABEL', () => {
-    const field = getField('platform');
+    const field = getField(socialProfileSchema, 'platform');
 
     expect(getLayout(field)).toBe('radio');
     expect(wasRequiredCalled(field)).toBe(true);

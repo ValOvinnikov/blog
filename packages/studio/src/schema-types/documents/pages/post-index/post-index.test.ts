@@ -10,6 +10,7 @@ import {
   getRecordedValidators,
   type TRecordedValidator,
 } from '@blog/studio/testing/create-mock-validation-rule';
+import { getField } from '@blog/studio/testing/get-field';
 import type { ValidationContext } from 'sanity';
 
 type TArrayFieldDefinition = {
@@ -27,9 +28,8 @@ type TFieldDefinition = {
 
 type TDocumentCustomFn = (document: Record<string, unknown>) => string | true;
 
-const getField = (name: string) =>
-  postIndexPageSchema.fields?.find((field) => field.name === name) as
-    TFieldDefinition | undefined;
+const getPostIndexField = (name: string) =>
+  getField(postIndexPageSchema, name) as TFieldDefinition;
 
 describe('postIndexPageSchema field order', () => {
   it('orders the primary fields title, headingBlock, hero, modules, seo', () => {
@@ -51,7 +51,7 @@ describe('postIndexPageSchema field order', () => {
 
 describe('postIndexPageSchema headingBlock field', () => {
   it('is required, and uses the shared headingBlock description', () => {
-    const headingBlockField = getField('headingBlock');
+    const headingBlockField = getPostIndexField('headingBlock');
 
     expect(headingBlockField?.type).toBe('headingBlock');
     expect(headingBlockField?.description).toBe(
@@ -63,7 +63,7 @@ describe('postIndexPageSchema headingBlock field', () => {
 
 describe('postIndexPageSchema hero field', () => {
   it('is an optional reference scoped to heroBlog only', () => {
-    const heroField = getField('hero');
+    const heroField = getPostIndexField('hero');
 
     if (!heroField) {
       throw new Error('Expected postIndexPageSchema to define a hero field.');
@@ -149,7 +149,9 @@ describe('postIndexPageSchema removed legacy fields', () => {
   it.each(['heading', 'supportingText', 'postList'])(
     '%s no longer exists on the schema',
     (name) => {
-      expect(getField(name)).toBeUndefined();
+      expect(
+        postIndexPageSchema.fields?.find((field) => field.name === name),
+      ).toBeUndefined();
     },
   );
 });

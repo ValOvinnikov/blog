@@ -2,6 +2,7 @@ import { CTA_ACTION_VARIANT, HERO_VARIANT } from '@blog/config/constants';
 import { ctaButtonSchema } from '@blog/studio/schema-types/objects/cta-button/cta-button';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
+import { getField } from '@blog/studio/testing/get-field';
 
 import { heroStatementSchema } from './hero-statement';
 
@@ -10,23 +11,8 @@ type TCustomFn = (
   context: { parent?: unknown },
 ) => string | true;
 
-const getField = (name: string) => {
-  const field = heroStatementSchema.fields?.find(
-    (field): field is typeof field & { name: string } =>
-      'name' in field && field.name === name,
-  );
-
-  if (!field) {
-    throw new Error(
-      `Expected heroStatementSchema to define a "${name}" field.`,
-    );
-  }
-
-  return field;
-};
-
-const getFieldCustomValidator = (field: { validation?: unknown }): TCustomFn =>
-  getCustomValidator<TCustomFn>(field);
+const getHeroStatementField = (name: string) =>
+  getField(heroStatementSchema, name);
 
 describe('heroStatementSchema field order', () => {
   it('places title, brandVariant, headingBlock, eyebrow, image, ctaButtons before the shared hero tail', () => {
@@ -47,7 +33,7 @@ describe('heroStatementSchema field order', () => {
 
 describe('heroStatementSchema brandVariant field', () => {
   it('is required, matching what the service reads as non-null', () => {
-    const field = getField('brandVariant');
+    const field = getHeroStatementField('brandVariant');
 
     if (typeof field.validation !== 'function') {
       throw new Error('Expected brandVariant field to define validation.');
@@ -70,7 +56,7 @@ describe('heroStatementSchema brandVariant field', () => {
 
 describe('heroStatementSchema eyebrow field', () => {
   it('is optional with no length cap', () => {
-    const field = getField('eyebrow');
+    const field = getHeroStatementField('eyebrow');
 
     expect(field.validation).toBeUndefined();
   });
@@ -78,13 +64,13 @@ describe('heroStatementSchema eyebrow field', () => {
 
 describe('heroStatementSchema headingBlock field', () => {
   it('uses the shared headingBlock object type', () => {
-    const field = getField('headingBlock') as { type: string };
+    const field = getHeroStatementField('headingBlock') as { type: string };
 
     expect(field.type).toBe('headingBlock');
   });
 
   it('is required at the field level', () => {
-    const field = getField('headingBlock');
+    const field = getHeroStatementField('headingBlock');
 
     if (typeof field.validation !== 'function') {
       throw new Error('Expected headingBlock field to define validation.');
@@ -107,7 +93,7 @@ describe('heroStatementSchema headingBlock field', () => {
 
 describe('heroStatementSchema hero tail', () => {
   it('offers every hero variant, defaulting to Split', () => {
-    const field = getField('variant') as {
+    const field = getHeroStatementField('variant') as {
       options?: { list?: { value: string }[] };
       initialValue?: string;
     };
@@ -119,7 +105,9 @@ describe('heroStatementSchema hero tail', () => {
   });
 
   it('requires an image only for Split and Banner', () => {
-    const validate = getFieldCustomValidator(getField('image'));
+    const validate = getCustomValidator<TCustomFn>(
+      getHeroStatementField('image'),
+    );
 
     expect(
       validate(undefined, { parent: { variant: HERO_VARIANT.SPLIT } }),
@@ -133,13 +121,13 @@ describe('heroStatementSchema hero tail', () => {
   });
 
   it('image field uses the shared imageWithAlt object', () => {
-    const field = getField('image') as { type: string };
+    const field = getHeroStatementField('image') as { type: string };
 
     expect(field.type).toBe(imageWithAltSchema.name);
   });
 
   it('authors its buttons through the shared ctaButtons field', () => {
-    const field = getField('ctaButtons') as {
+    const field = getHeroStatementField('ctaButtons') as {
       type: string;
       of?: { type: string }[];
     };
@@ -149,7 +137,9 @@ describe('heroStatementSchema hero tail', () => {
   });
 
   it('allows both a primary and a secondary button', () => {
-    const validate = getFieldCustomValidator(getField('ctaButtons'));
+    const validate = getCustomValidator<TCustomFn>(
+      getHeroStatementField('ctaButtons'),
+    );
 
     expect(
       validate(

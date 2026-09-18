@@ -1,5 +1,6 @@
 import { IMAGE_LAYOUT } from '@blog/config/constants';
 import { bodyImageSchema } from '@blog/studio/schema-types/objects/body-image/body-image';
+import { getLayout } from '@blog/studio/testing/get-field-layout';
 
 const getLayoutField = () => {
   const field = bodyImageSchema.fields?.find(
@@ -12,14 +13,6 @@ const getLayoutField = () => {
   }
 
   return field;
-};
-
-const getLayout = (field: { options?: unknown }) => {
-  const options = field.options;
-
-  return options && typeof options === 'object' && 'layout' in options
-    ? (options as { layout?: string }).layout
-    : undefined;
 };
 
 const getOptionValues = (field: { options?: unknown }) => {
