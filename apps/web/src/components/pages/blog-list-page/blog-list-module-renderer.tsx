@@ -7,11 +7,12 @@ import type { TModule } from '@blog/service';
 import { PageHeading } from '@web/components/shared/page-heading';
 import { CtaModule } from '@web/modules/cta/cta-module';
 import { HeroBlogModule } from '@web/modules/hero-blog/hero-blog-module';
-import type {
-  TModuleComponent,
-  TModuleComponentProps,
-} from '@web/modules/module-map';
-import { renderHeroModule, renderModules } from '@web/modules/module-renderer';
+import {
+  renderHeroModule,
+  renderModules,
+  type TModuleComponent,
+  type TModuleComponentProps,
+} from '@web/modules/module-renderer';
 import { NewsletterModule } from '@web/modules/newsletter/newsletter-module';
 import { PostFeaturedModule } from '@web/modules/post-featured/post-featured-module';
 import { PostListModule } from '@web/modules/post-list/post-list-module';

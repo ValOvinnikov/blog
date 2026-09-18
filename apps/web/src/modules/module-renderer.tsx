@@ -1,8 +1,22 @@
+import type { TTaxonomyKind } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { logger } from '@web/utils/logger/logger';
 import type { ReactNode } from 'react';
 
-import { MODULE_MAP, type TModuleComponentProps } from './module-map';
+export type TModuleComponentProps = {
+  id: string;
+  locale: string;
+  tenant: string;
+  context?: {
+    post?: { id: string };
+    page?: number;
+    archive?: { kind: TTaxonomyKind; slug: string; name: string };
+  };
+};
+
+export type TModuleComponent = (
+  props: TModuleComponentProps,
+) => Promise<ReactNode>;
 
 type TModuleMap = Record<
   string,
@@ -67,13 +81,3 @@ export const renderHeroModule = async ({
 
   return Component({ id: hero.id, locale, tenant });
 };
-
-export interface IModuleRendererProps {
-  modules: TModule[];
-  locale: string;
-  tenant: string;
-  context?: TModuleComponentProps['context'];
-}
-
-export const ModuleRenderer = (props: IModuleRendererProps): ReactNode =>
-  renderModules({ ...props, map: MODULE_MAP });

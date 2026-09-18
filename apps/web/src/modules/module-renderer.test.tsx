@@ -4,11 +4,7 @@ import {
   screen,
 } from '@web/testing/custom-render';
 
-import {
-  ModuleRenderer,
-  renderHeroModule,
-  renderModules,
-} from './module-renderer';
+import { renderHeroModule, renderModules } from './module-renderer';
 
 const { ctaModuleMock, postListModuleMock, heroModuleMock, loggerWarnMock } =
   vi.hoisted(() => ({
@@ -23,14 +19,6 @@ const { ctaModuleMock, postListModuleMock, heroModuleMock, loggerWarnMock } =
     )),
     loggerWarnMock: vi.fn(),
   }));
-
-vi.mock('./module-map', () => ({
-  MODULE_MAP: {
-    module_content: undefined,
-    module_cta: ctaModuleMock,
-    module_postList: postListModuleMock,
-  },
-}));
 
 vi.mock('@web/utils/logger/logger', () => ({
   logger: {
@@ -164,33 +152,5 @@ describe(renderHeroModule.name, () => {
     expect(loggerWarnMock).toHaveBeenCalledWith('hero_slot.unknown_hero_type', {
       heroType: 'module_heroUnknown',
     });
-  });
-});
-
-describe(`<${ModuleRenderer.name}/>`, () => {
-  const setup = customRender(ModuleRenderer, {
-    modules: [{ type: 'module_cta', id: 'cta-doc-id' }],
-    locale: 'en',
-    tenant: 'tenant-1',
-  });
-
-  it('renders through the global MODULE_MAP', () => {
-    setup();
-
-    expect(screen.getByTestId('stub-cta')).toHaveTextContent('cta-doc-id');
-  });
-
-  it('forwards a caller-provided context to the global MODULE_MAP', () => {
-    setup({ context: { page: 2 } });
-
-    expect(ctaModuleMock).toHaveBeenCalledWith(
-      {
-        id: 'cta-doc-id',
-        locale: 'en',
-        tenant: 'tenant-1',
-        context: { page: 2 },
-      },
-      undefined,
-    );
   });
 });

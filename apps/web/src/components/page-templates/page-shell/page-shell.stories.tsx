@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { PageIntro } from '@web/components/shared/page-intro';
+import { PageHeading } from '@web/components/shared/page-heading';
 
 import { PageShell } from './page-shell';
 
@@ -14,14 +14,12 @@ const meta = {
           <nav aria-label="Breadcrumb">Home / Blog</nav>
         </PageShell.Breadcrumbs>
         <PageShell.Heading>
-          <PageIntro
+          <PageHeading
             headingBlock={{
               heading: 'Notes on building things',
               supportingText:
                 'Essays and notes from the team, published as we ship.',
             }}
-            locale="en"
-            tenant="tenant-1"
           />
         </PageShell.Heading>
         <PageShell.Content>
@@ -44,10 +42,8 @@ export const NoBreadcrumbs: TStory = {
     children: (
       <>
         <PageShell.Heading>
-          <PageIntro
+          <PageHeading
             headingBlock={{ heading: 'Home', supportingText: undefined }}
-            locale="en"
-            tenant="tenant-1"
           />
         </PageShell.Heading>
         <PageShell.Content>
@@ -64,13 +60,11 @@ export const HeadingOnly: TStory = {
   args: {
     children: (
       <PageShell.Heading>
-        <PageIntro
+        <PageHeading
           headingBlock={{
             heading: 'Only a heading, no content region',
             supportingText: undefined,
           }}
-          locale="en"
-          tenant="tenant-1"
         />
       </PageShell.Heading>
     ),
