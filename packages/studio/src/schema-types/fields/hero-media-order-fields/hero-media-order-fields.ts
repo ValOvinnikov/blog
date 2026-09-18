@@ -3,7 +3,7 @@ import { isNotHeroVariant } from '@blog/studio/schema-types/fields/hero-variant-
 import { toTitleCase } from '@blog/utils/primitives';
 import { defineField } from 'sanity';
 
-export const heroMediaOrderFields = () => [
+export const heroMediaOrderSplitField = () =>
   defineField({
     name: 'mediaOrderSplit',
     title: 'Mobile Media Order',
@@ -19,7 +19,9 @@ export const heroMediaOrderFields = () => [
     },
     initialValue: MEDIA_ORDER.LAST,
     hidden: isNotHeroVariant(HERO_VARIANT.SPLIT),
-  }),
+  });
+
+export const heroMediaOrderStackedField = () =>
   defineField({
     name: 'mediaOrderStacked',
     title: 'Media Order',
@@ -34,5 +36,4 @@ export const heroMediaOrderFields = () => [
     },
     initialValue: MEDIA_ORDER.LAST,
     hidden: isNotHeroVariant(HERO_VARIANT.STACKED),
-  }),
-];
+  });

@@ -3,7 +3,10 @@ import { brandVariantField } from '@blog/studio/schema-types/fields/brand-varian
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { heroContentPositionFields } from '@blog/studio/schema-types/fields/hero-content-position-fields/hero-content-position-fields';
 import { heroImageField } from '@blog/studio/schema-types/fields/hero-image-field/hero-image-field';
-import { heroMediaOrderFields } from '@blog/studio/schema-types/fields/hero-media-order-fields/hero-media-order-fields';
+import {
+  heroMediaOrderSplitField,
+  heroMediaOrderStackedField,
+} from '@blog/studio/schema-types/fields/hero-media-order-fields/hero-media-order-fields';
 import { heroVariantField } from '@blog/studio/schema-types/fields/hero-variant-field/hero-variant-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { heroFieldsets } from '@blog/studio/schema-types/modules/hero-fieldsets/hero-fieldsets';
@@ -34,7 +37,8 @@ export const heroStatementSchema = defineType({
     ctaButtonsField(),
     heroVariantField(),
     ...heroContentPositionFields(),
-    ...heroMediaOrderFields(),
+    heroMediaOrderSplitField(),
+    heroMediaOrderStackedField(),
     heroLayoutField,
   ],
   preview: {

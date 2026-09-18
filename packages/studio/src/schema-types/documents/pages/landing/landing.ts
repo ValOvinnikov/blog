@@ -8,6 +8,7 @@ import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/slug
 import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
+import { heroProfileSchema } from '@blog/studio/schema-types/modules/hero-profile/hero-profile';
 import { heroStatementSchema } from '@blog/studio/schema-types/modules/hero-statement/hero-statement';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
@@ -53,7 +54,13 @@ export const landingPageSchema = defineType({
       },
     }),
     headingBlockField(),
-    heroField({ allow: [heroBlogSchema.name, heroStatementSchema.name] }),
+    heroField({
+      allow: [
+        heroBlogSchema.name,
+        heroStatementSchema.name,
+        heroProfileSchema.name,
+      ],
+    }),
     modulesField({
       allow: [
         contentSchema.name,
