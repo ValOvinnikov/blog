@@ -197,6 +197,22 @@ call to settle quietly. Investigate properly — who calls the existing one, wha
 is still unclear, ask. A subagent reporting "there was already an X, but I added
 a new one because…" is a flag to raise, not a decision to rubber-stamp.
 
+**Creating a shared file is not an inline fix.** "Findings found mid-work get
+fixed in the current work" (below) holds for changes confined to the ticket's
+own files. When the fix means **adding a new file other tickets will plausibly
+touch** — a helper in a `shared/`/`testing/` directory, a transformer, a
+constant module — prefer filing it over extracting it inline while parallel
+sessions are running. Two sessions applying "never write the third copy" to the
+same duplication converge on the same path _and_ the same name, because the
+conventions here are specific enough to determine both; neither can see the
+other's branch, so git first reports it as an add/add conflict at merge, and
+whichever branch merges second pays the rework. It happened twice on
+2026-09-18 within hours: `packages/studio/src/testing/`'s field-lookup helpers
+(#3340 vs. #3248) and `packages/service/src/shared/transformers/to-cta-buttons.ts`
+(#3249 vs. a concurrent session). Both resolved the same way — **whatever is on
+`main` wins and the branch adopts it**, regardless of which was written first.
+Inline fixes scoped to files the ticket already touches are unaffected.
+
 ## Mid-task decisions land in the ticket/spec before work continues
 
 When a design/scope/behavior decision gets settled in conversation — the user
@@ -670,6 +686,15 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   automatically an `error` — branch on the `ERROR_CODE` and log only what a
   human would act on. Full contract in `SPEC.md` §17.
 - Co-locate `*.test.ts(x)`; `pnpm test` must pass.
+- **Never assert copy verbatim in a test.** An editor-facing `description`, a
+  label, a placeholder, a helper sentence — pinning one to its exact literal
+  only restates the source. The sole change that can fail such a test is a
+  deliberate rewording, so it reports intentional edits as breakage and
+  catches no defect. A field helper's default-vs-override precedence is the
+  same: that is `??`, not a contract. Assert a description is non-empty where
+  its absence would be a bug; never assert which words it contains. Copy is
+  reviewed in the diff. Full rule and examples in `testing-practices` →
+  "What not to test".
 - After a schema change: `pnpm typegen`, then commit the regenerated files in
   `packages/config/src/sanity/generated/`. Typegen can be non-deterministic —
   re-run until the diff is minimal.
