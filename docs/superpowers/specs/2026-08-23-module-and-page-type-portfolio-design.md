@@ -1086,8 +1086,10 @@ the new fixed key. `HERO_MAP` gains `module_heroProfile`.
 
 ### Pages and desk
 
-`module_heroProfile` joins `HERO_SCHEMA_TYPES`; a desk entry beside the
-other heroes. Starter content unchanged (blog tenants keep `heroBlog`); the
+`module_heroProfile` joins `HERO_SCHEMA_TYPES` and the `heroField({ allow })`
+lists of `page_home` and `page_landing` only — the blog listing pages keep
+the Blog Hero alone (#3257); a desk entry beside the other heroes. Starter
+content unchanged (blog tenants keep `heroBlog`); the
 site-kind templates (#2798) seed it for a personal site.
 
 ### Migration
@@ -1202,19 +1204,19 @@ the link's label or "No link", the image as media.
 The form opens `title → brandVariant → headingBlock → …` as every module
 does:
 
-| Field              | Type                                                            | Notes                                                                                  |
-| ------------------ | --------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `title`            | `titleField()`                                                  | Editor-facing name, never rendered                                                     |
-| `brandVariant`     | `brandVariantField({ list: FULL_BRAND_VARIANT_LIST })`          |                                                                                        |
-| `headingBlock`     | `headingBlockField()`                                           | Required heading, optional supporting text                                             |
-| `features`         | array of references → `block_feature`, `unique()`, 2–8          | Authored order is display order                                                        |
-| `ctaButtons`       | `ctaButtonsField()`                                             | 0–2 actions under the grid — "See all services", "Get in touch"                        |
-| `showImages`       | `showImagesField()`                                             | The post modules' toggle; off renders title and text only                              |
-| `imageShape`       | `CARD_IMAGE_SHAPE` dropdown, required, initial `ICON`           | `WIDE` (16:9, edge to edge) · `SQUARE` · `CIRCLE` (inset, round) · `ICON` (48 px tile) |
-| `displayMode`      | `displayModeField()`                                            | Grid or Carousel                                                                       |
-| `contentAlignment` | `alignmentFields([])`                                           | Moves the heading                                                                      |
-| `cardAlignment`    | `CONTENT_ALIGNMENT` `LEFT` / `CENTER`, required, initial `LEFT` | Moves the image, title and text inside each card                                       |
-| `layout`           | `layoutField`                                                   |                                                                                        |
+| Field              | Type                                                            | Notes                                                                                   |
+| ------------------ | --------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `title`            | `titleField()`                                                  | Editor-facing name, never rendered                                                      |
+| `brandVariant`     | `brandVariantField({ list: FULL_BRAND_VARIANT_LIST })`          |                                                                                         |
+| `headingBlock`     | `headingBlockField()`                                           | Required heading, optional supporting text                                              |
+| `features`         | array of references → `block_feature`, `unique()`, 2–8          | Authored order is display order                                                         |
+| `ctaButtons`       | `ctaButtonsField()`                                             | 0–2 actions under the grid — "See all services", "Get in touch"                         |
+| `showImages`       | `showImagesField()`                                             | The post modules' toggle; off renders title and text only                               |
+| `imageShape`       | `CARD_IMAGE_SHAPE` dropdown, required, initial `ICON`           | `WIDE` (16:9, edge to edge) · `SQUARE` · `CIRCLE` (inset, round) · `ICON` (48 px tile)  |
+| `displayMode`      | `displayModeField()`                                            | Grid or Carousel                                                                        |
+| `contentAlignment` | `alignmentFields([])`, titled "Content Alignment"               | Moves the heading, supporting text and actions together, as on the CTA and hero modules |
+| `cardAlignment`    | `CONTENT_ALIGNMENT` `LEFT` / `CENTER`, required, initial `LEFT` | Moves the image, title and text inside each card                                        |
+| `layout`           | `layoutField`                                                   |                                                                                         |
 
 Dropdowns throughout, no radios; every field carries an editor-facing
 description.
@@ -1241,8 +1243,11 @@ the `FEATURE_ICONS` key list in `@blog/config` keeps them in step. The
 picker is its own ticket after the schema (#3252), so the schema ships
 with a plain dropdown first.
 
-**Heading and cards align independently.** `contentAlignment` moves the
-heading, as on every module; `cardAlignment` moves the card contents. A
+**Content and cards align independently.** `contentAlignment` moves the
+heading, supporting text and actions as one block — the CTA and hero
+modules' precedent, where the buttons follow the copy; its description says
+so, and that cards have their own control. `cardAlignment` moves the card
+contents. A
 centred heading over left-aligned cards is the common marketing layout and
 one field cannot express it; both centred is the icon-strip look. The post
 modules gain the same card control in #3245.
