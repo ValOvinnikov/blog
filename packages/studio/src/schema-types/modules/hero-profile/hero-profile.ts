@@ -26,7 +26,8 @@ export const heroProfileSchema = defineType({
     {
       name: FIELDSET_IMAGE,
       title: 'Image',
-      description: "Where the hero's image comes from.",
+      description:
+        "The hero's image. Optional — the author's own photo is used when none is set here.",
     },
     ...heroFieldsets,
   ],
