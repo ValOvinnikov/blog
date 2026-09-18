@@ -13,10 +13,6 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
-// One in-memory Postgres instance for the whole file (spinning up pglite's
-// WASM engine is the slow part — seconds, not milliseconds) — `afterEach`
-// clears rows between tests instead of paying that cost per test.
-
 afterEach(async () => {
   await db().delete(schema.bookmarks);
   await db().delete(schema.tenants);
