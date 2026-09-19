@@ -484,9 +484,12 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
   would otherwise guess at.
 - `superpowers:systematic-debugging` on any bug or failing test, before
   proposing a fix.
-- `superpowers:test-driven-development` when implementing any feature or
-  bugfix, before writing implementation code — pairs with this repo's own
-  `testing-practices` for what a good test looks like here.
+- `superpowers:test-driven-development` for a bugfix: the owning layer agent
+  writes the failing regression test first, before the fix, then makes it
+  pass — pairs with this repo's own `testing-practices` for what a good test
+  looks like here. New-feature coverage instead comes from the `test-writer`
+  subagent's pass after implementation lands (`develop-feature` §3/§4); a
+  layer agent building new feature code does not pre-write its own tests.
 - `superpowers:verification-before-completion` before any "done"/"fixed"/
   "passing" claim — run the verification commands and confirm their output
   first.
