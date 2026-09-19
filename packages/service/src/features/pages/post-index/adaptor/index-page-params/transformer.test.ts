@@ -19,9 +19,6 @@ describe('toIndexPageParams', () => {
     );
   });
 
-  // Regression guard for the decision that an unauthored list module is
-  // never a substituted page size: no module_postList in modules[] means
-  // a single, unpaginated page, however large the corpus is.
   it('returns an empty array when modules[] has no module_postList entry, regardless of corpus size', () => {
     expect(
       toIndexPageParams({ blogPosts: { total: 200 }, pageSize: null }),

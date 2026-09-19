@@ -63,7 +63,6 @@ function toSecondaryButton(
   return raw ? toCtaButton(raw) : undefined;
 }
 
-/** Orders the hero's CTA buttons with the derived primary first, then the authored secondary. */
 function toCtaButtons(
   raw: TRawHeroBlogModule,
   post: TPostCard | undefined,

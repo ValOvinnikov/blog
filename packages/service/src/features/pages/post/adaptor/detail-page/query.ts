@@ -12,6 +12,4 @@ export const postPageQuery = q
   .filterRaw(PUBLISHED_POST_FILTER)
   .slice(0)
   .project(postDetailFragment)
-  // Nullable, not `.notNull()`: no matching `page_post` is an ordinary
-  // not-found, not a parse failure — the loader turns `null` into `undefined`.
   .nullable(true);

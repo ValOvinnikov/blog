@@ -134,9 +134,6 @@ describe('postPageQuery', () => {
     expect(() => postPageQuery.parse(raw)).toThrow();
   });
 
-  // A bodyImage block's asset is `.nullable(true)`, not `.notNull()` — an
-  // image never selected (or pointing at a deleted asset) must not throw the
-  // whole query; `layout` survives regardless.
   it('allows a bodyImage body block with no asset selected and no layout', () => {
     const raw = makeRawPostDetail({
       body: [
@@ -160,7 +157,6 @@ describe('postPageQuery', () => {
     });
   });
 
-  // `alt` is `.nullable(true)` — missing alt text must not 404 the post.
   it('allows a bodyImage body block with no alt text', () => {
     const raw = makeRawPostDetail({
       body: [

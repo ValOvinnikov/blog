@@ -8,7 +8,6 @@ import { taxonomyListModuleQuery } from './query';
 import { toTaxonomyListModule } from './transformer';
 import type { TTaxonomyListModule } from './types';
 
-/** Resolves a `module_taxonomyList` placement's authored terms and entries. */
 export async function getTaxonomyList(
   id: string,
   tenant: TTenantSanityContext,

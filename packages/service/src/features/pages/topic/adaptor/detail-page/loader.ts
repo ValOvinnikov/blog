@@ -13,8 +13,6 @@ export async function getTopicPage(
   slug: string,
   tenant: TTenantSanityContext,
 ): Promise<TMaybeUndefined<TTopicDetailPage>> {
-  // `topicPageQuery` derefs `topic`'s full fragment — that tag must ride
-  // alongside `page_topic` (tag-scope contract, `sanity/query.ts`).
   const rawPage = await runQuery(topicPageQuery, {
     parameters: { slug },
     tenant,

@@ -11,9 +11,6 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
 const tenant = makeTenant();
 
 describe('getIndexPageParams', () => {
-  // Branch coverage (empty corpus, single-page corpus, multi-page corpus)
-  // lives in `./transformer.test.ts` — this loader has no logic beyond
-  // delegating the raw query result to it.
   it('delegates the raw query result to the pagination transformer', async () => {
     mockRun.mockResolvedValueOnce({
       blogPosts: { total: 20 },

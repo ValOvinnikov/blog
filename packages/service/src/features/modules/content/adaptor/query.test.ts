@@ -40,9 +40,6 @@ describe('contentModuleQuery', () => {
     });
   });
 
-  // A bodyImage block's asset is `.nullable(true)`, not `.notNull()` — an
-  // image never selected (or pointing at a deleted asset) must not throw the
-  // whole query; `layout` survives regardless.
   it('allows a bodyImage body block with no asset selected and no layout', () => {
     const raw = makeRawContentModule({
       body: [
@@ -66,7 +63,6 @@ describe('contentModuleQuery', () => {
     });
   });
 
-  // `alt` is `.nullable(true)` — missing alt text must not throw the query.
   it('allows a bodyImage body block with no alt text', () => {
     const raw = makeRawContentModule({
       body: [
