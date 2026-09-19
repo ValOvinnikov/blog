@@ -7,11 +7,6 @@ export type TBookmarkButtonGateProps = {
   tenant: string;
 };
 
-/**
- * BookmarkButtonGate — renders `BookmarkButton` only when the tenant is
- * entitled to (and has enabled) the `BOOKMARKS` capability; renders nothing
- * otherwise.
- */
 export const BookmarkButtonGate = async ({
   postId,
   tenant,

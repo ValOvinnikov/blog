@@ -4,8 +4,8 @@ const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
 
 /**
- * isTenantShapedPathSegment — true when a path segment is UUID-shaped, the
- * format `proxy.ts` writes the `[tenant]` route param in. A legitimate
+ * True when a path segment is UUID-shaped, the format `proxy.ts` writes the
+ * `[tenant]` route param in. A legitimate
  * inbound request never carries one; used to refuse a client-supplied
  * segment before it can be trusted as a route param.
  *

@@ -8,11 +8,6 @@ export type TPostShareLinksProps = {
   title: string;
 };
 
-/**
- * PostShareLinks — builds the post's share links (`buildShareLinks`) and
- * attaches each platform's icon, then hands them to the interactive
- * `PostShare` widget.
- */
 export const PostShareLinks = ({ url, title }: TPostShareLinksProps) => {
   const shareLinks = buildShareLinks({ url, title }).map((link) => ({
     ...link,

@@ -75,10 +75,6 @@ describe(addBookmark, () => {
     ).rejects.toThrow();
   });
 
-  // pglite serves a single connection, so a real concurrent DELETE landing
-  // between this call's no-op insert and its follow-up read can't be forced
-  // here — `removeBookmark` deleting the same tuple is the real-world
-  // trigger. The follow-up read is spied to simulate that exact window.
   it('returns DB_NOT_FOUND when the conflicting row vanishes before the follow-up read', async () => {
     await insertTestUser(db(), { id: 'user-1' });
     const { id: tenantId } = await insertTestTenant(db());

@@ -7,6 +7,11 @@ export type TRecordedValidator<TFn> = {
 
 type TValidatedSource = { validation?: unknown; name?: string };
 
+export type TRecordedBounds = {
+  min?: number;
+  max?: number;
+};
+
 type TMockValidationRule<TFn> = {
   custom: (fn: TFn) => TMockValidationRule<TFn>;
   warning: () => TMockValidationRule<TFn>;
@@ -20,6 +25,7 @@ type TMockValidationRule<TFn> = {
 
 const createRecordingRule = <TFn>(
   recorded: TRecordedValidator<TFn>[],
+  bounds: TRecordedBounds,
 ): TMockValidationRule<TFn> => {
   const rule: TMockValidationRule<TFn> = {
     custom: (fn) => {
@@ -35,11 +41,31 @@ const createRecordingRule = <TFn>(
     required: () => rule,
     unique: () => rule,
     integer: () => rule,
-    min: () => rule,
-    max: () => rule,
+    min: (value) => {
+      bounds.min = value;
+      return rule;
+    },
+    max: (value) => {
+      bounds.max = value;
+      return rule;
+    },
   };
 
   return rule;
+};
+
+const asValidationFn = (
+  source: TValidatedSource | undefined,
+): ((rule: never) => unknown) => {
+  if (typeof source?.validation !== 'function') {
+    throw new Error(
+      source?.name
+        ? `Expected ${source.name} to define validation.`
+        : 'Expected validation to define a builder function.',
+    );
+  }
+
+  return source.validation as (rule: never) => unknown;
 };
 
 /**
@@ -52,20 +78,28 @@ const createRecordingRule = <TFn>(
 export const getRecordedValidators = <TFn>(
   source: TValidatedSource | undefined,
 ): TRecordedValidator<TFn>[] => {
-  if (typeof source?.validation !== 'function') {
-    throw new Error(
-      source?.name
-        ? `Expected ${source.name} to define validation.`
-        : 'Expected validation to define a builder function.',
-    );
-  }
-
+  const validate = asValidationFn(source);
   const recorded: TRecordedValidator<TFn>[] = [];
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (source.validation as any)(createRecordingRule<TFn>(recorded));
+  validate(createRecordingRule<TFn>(recorded, {}) as never);
 
   return recorded;
+};
+
+/**
+ * Same as `getRecordedValidators`, but returns the numeric arguments passed
+ * to `.min()`/`.max()` in the chain — for asserting behaviour against a
+ * schema's real bound instead of a value copied out of the schema file.
+ */
+export const getRecordedBounds = (
+  source: TValidatedSource | undefined,
+): TRecordedBounds => {
+  const validate = asValidationFn(source);
+  const bounds: TRecordedBounds = {};
+
+  validate(createRecordingRule<never>([], bounds) as never);
+
+  return bounds;
 };
 
 const getSingleRecordedValidator = <TFn>(

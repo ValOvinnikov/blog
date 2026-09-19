@@ -9,8 +9,6 @@
  * added without deciding which.
  */
 export const VOICE_FIXED_KEYS = [
-  // Accessibility-only: an aria-label, aria-live announcement, or visually
-  // hidden label whose text never reaches a sighted reader.
   'breadcrumbs.ariaLabel',
   'localeErrorPage.announcement',
   'postShare.shareAriaLabel',
@@ -42,20 +40,15 @@ export const VOICE_FIXED_KEYS = [
   'carousel.regionLabel',
   'hero.socialLinksAriaLabel',
 
-  // Archive/breadcrumb labels derived from Studio content rather than
-  // authored directly.
   'breadcrumbs.home',
   'breadcrumbs.topics',
   'breadcrumbs.tags',
   'breadcrumbs.blog',
 
-  // A taxonomy label tied to a Sanity-modelled enum (`ASIDE_KIND`) rather
-  // than freestanding site chrome.
   'blogPostPage.asideKind.WHY_NOT',
   'blogPostPage.asideKind.DIGRESSION',
   'blogPostPage.asideKind.CONTEXT',
 
-  // Generic operation feedback rendered by a toast, not curated voice.
   'bookmarkButton.error',
   'bookmarkButton.toastSavedMessage',
   'bookmarkButton.toastRemovedMessage',
@@ -79,19 +72,16 @@ export const VOICE_FIXED_KEYS = [
   'accountPage.identity.saveToastSuccessMessage',
   'accountPage.identity.saveError',
 
-  // Counters carrying ICU plural syntax; they read the same in every voice.
   'pagination.pageSuffix',
   'taxonomyListModule.topics.postsCount',
   'taxonomyListModule.tags.postsCount',
   'toastProvider.mergeCountSuffix',
   'bookmarksPage.hint',
 
-  // Metadata with no visible counterpart.
   'accountPage.metaDescription',
   'bookmarksPage.metaDescription',
   'rss.fallbackTitle',
 
-  // Fixed operational newsletter form and landing-page copy.
   'newsletterForm.submitLabel',
   'newsletterForm.emailAriaLabel',
   'newsletterForm.placeholder',
@@ -115,8 +105,6 @@ export const VOICE_FIXED_KEYS = [
   'newsletterUnsubscribe.invalidMessage',
   'newsletterUnsubscribe.returnHome',
 
-  // Sign-in interface mechanics — auth prompts, OAuth/magic-link flow
-  // states, and account controls, identical for every tenant.
   'authMenu.signIn',
   'authMenu.signInHeading',
   'authMenu.accountHeading',

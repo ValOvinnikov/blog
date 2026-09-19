@@ -11,18 +11,11 @@ import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
 
 export type TNewsletterSubscriptionControlProps = {
-  /**
-   * Which 6b action this button triggers — the `SettingRow` control slot
-   * for the `active` (`'unsubscribe'`) and `pending` (`'resend'`) states
-   * respectively.
-   */
   action: 'unsubscribe' | 'resend';
 };
 
 /**
- * Slotted into `SettingRow.children` as the sole client boundary: a single
- * button whose copy and server action are picked by `action`. Mirrors
- * `DeleteAccountControl`'s pattern, but a successful unsubscribe/resend
+ * Mirrors `DeleteAccountControl`'s pattern, but a successful unsubscribe/resend
  * calls `router.refresh()` instead of navigating away, so it re-runs
  * `NewsletterSection`'s server-side `getSubscriptionStatus` call and the UI
  * reflects the new state.

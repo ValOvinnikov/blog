@@ -43,10 +43,6 @@ export interface IHomeModuleRendererProps {
   tenant: string;
 }
 
-/**
- * HomeModuleRenderer — the home page's own hero and heading fallback,
- * followed by the modules the home page's schema allows.
- */
 export const HomeModuleRenderer = async ({
   hero,
   headingBlock,

@@ -65,11 +65,6 @@ function deriveProvisioningState(
   provisioningStatus: TTenant['provisioningStatus'],
   steps: TTenant['provisioningSteps'],
 ): TProvisioningState {
-  // A workflow can be dispatched (`provisioningStatus` moved to
-  // PROVISIONING by `beginTenantProvisioning`) before its runner reports its
-  // first step — every step is still IDLE for that whole window, so the
-  // column, not the steps map, is the only signal a workflow is already
-  // running.
   if (provisioningStatus === TENANT_PROVISIONING_STATUS.PROVISIONING) {
     return 'RUNNING';
   }
@@ -186,15 +181,6 @@ export async function updateTenantDetails(
     }
   }
 
-  // `ownerEmail` targets the tenant's pending OWNER `membershipInvites` row
-  // (see `createTenantDraft`'s `TDraftOwner` union) — not gated by
-  // provisioning state, an invited owner can already have signed in and
-  // been consumed into a real `memberships` row (see
-  // `consumeMembershipInvite`/`getTenantOwnerEmail`). A submitted email that
-  // matches the current owner (e.g. an unrelated name edit resubmitting
-  // the same value) is a no-op for this concern; only a genuine change is
-  // treated as an ownership-transfer attempt and, once a real owner has
-  // joined, refused as a distinct outcome instead of silently reassigning it.
   let normalizedOwnerEmail: string | undefined;
   let ownerInviteId: string | undefined;
 
@@ -279,11 +265,6 @@ export async function updateTenantDetails(
       .where(eq(tenants.id, tenantId));
   }
 
-  // No multi-statement transaction on the runtime `neon-http` driver (see
-  // `createTenantDraft`), so each dependent write below is a separate
-  // statement with a manual compensating rollback on failure — otherwise a
-  // failure partway through could leave `tenants`, `tenant_domains`, and
-  // `membership_invites` silently diverged.
   const domainChanged = input.primaryDomain !== existing.primaryDomain;
 
   if (domainChanged) {

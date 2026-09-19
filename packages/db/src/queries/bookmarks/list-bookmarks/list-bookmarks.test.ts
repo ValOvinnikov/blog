@@ -40,9 +40,6 @@ describe(listBookmarks, () => {
   it('orders results by most recently bookmarked first', async () => {
     await insertTestUser(db(), { id: 'user-1' });
     const { id: tenantId } = await insertTestTenant(db());
-    // Insert directly with explicit timestamps rather than relying on two
-    // calls to addBookmark() landing in different clock ticks (defaultNow()
-    // could otherwise collide within the same statement/transaction).
     await db()
       .insert(schema.bookmarks)
       .values([

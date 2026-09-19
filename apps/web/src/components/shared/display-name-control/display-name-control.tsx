@@ -14,15 +14,12 @@ import { useState, useTransition } from 'react';
 import { displayNameControlVariants } from './display-name-control-variants';
 
 export type TDisplayNameControlProps = {
-  /** The current display name, read from the session server-side. */
   initialName: string;
   email?: string | null;
   image?: string | null;
 };
 
 /**
- * `Avatar` + a controlled `TextInput` + a solid "save" `Button`, slotted
- * into `SettingRow.children` from the server-rendered `IdentitySection`.
  * Only the editable `TextInput` strictly requires the client boundary, but
  * `Avatar`/`Button` ride along with it as part of the same control-slot
  * composition. Mirrors `NewsletterSubscriptionControl`'s save pattern;

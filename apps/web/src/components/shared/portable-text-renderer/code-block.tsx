@@ -11,10 +11,9 @@ export interface ICodeBlockProps {
 }
 
 /**
- * CodeBlock — syntax-highlighted rendering of a `code` Portable Text block,
- * scoped to the `PortableTextRenderer` that owns it. Not a `@blog/ui`
- * component: it wraps the third-party `react-syntax-highlighter`, which
- * `@blog/ui` must stay free of per the layer contract.
+ * Not a `@blog/ui` component: it wraps the third-party
+ * `react-syntax-highlighter`, which `@blog/ui` must stay free of per the
+ * layer contract.
  */
 export const CodeBlock = ({
   code,

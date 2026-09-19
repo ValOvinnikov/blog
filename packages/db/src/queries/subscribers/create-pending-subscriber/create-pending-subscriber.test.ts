@@ -16,9 +16,6 @@ afterEach(async () => {
   await db().delete(schema.tenants);
 });
 
-// Unwraps a successful `TResult`, failing the test with the error code
-// otherwise — every case below expects success, so this keeps each
-// assertion focused on the resolved `data` shape.
 function unwrapOk<T>(result: { ok: boolean; data?: T; error?: unknown }): T {
   if (!result.ok) {
     throw new Error(`expected ok:true, got error "${String(result.error)}"`);
@@ -79,8 +76,6 @@ describe(createPendingSubscriber, () => {
       ok: true,
       data: { outcome: 'already-pending', subscriber: first.subscriber },
     });
-    // The token is not rotated — the already-sent confirmation email's link
-    // must keep working.
     expect(unwrapOk(second).subscriber.confirmationToken).toBe(
       first.subscriber.confirmationToken,
     );
@@ -125,16 +120,6 @@ describe(createPendingSubscriber, () => {
     expect(rows).toHaveLength(2);
   });
 
-  // pglite serves a single connection, so two calls kicked off together
-  // still execute their statements one at a time under the hood — this
-  // can't force the true interleaving (both INSERTs racing at the storage
-  // layer) that a real concurrent hit against Neon could produce. What it
-  // does verify is that calling concurrently for a brand-new email never
-  // throws and always settles into a sane pair of outcomes with exactly
-  // one row persisted. The actual race safety comes from
-  // `.onConflictDoNothing()` making the `(tenantId, email)` uniqueness
-  // check Postgres's job rather than a racy read-then-decide — see the
-  // docstring on `createPendingSubscriber`.
   it('resolves two concurrent calls for the same brand-new email without an uncaught constraint error', async () => {
     const { id: tenantId } = await insertTestTenant(db());
 
@@ -150,10 +135,6 @@ describe(createPendingSubscriber, () => {
     expect(rows).toHaveLength(1);
   });
 
-  // pglite serves a single connection, so a real concurrent DELETE landing
-  // between this call's no-op insert and its follow-up read can't be
-  // forced here — `unsubscribe` deleting the same row is the real-world
-  // trigger. The follow-up read is spied to simulate that exact window.
   it('returns DB_NOT_FOUND when the conflicting row vanishes before the follow-up read', async () => {
     const { id: tenantId } = await insertTestTenant(db());
     await createPendingSubscriber(tenantId, 'reader@example.com');

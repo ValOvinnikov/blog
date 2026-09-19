@@ -51,8 +51,6 @@ describe(createMembershipInvite, () => {
     );
 
     expect(second.outcome).toBe('already-pending');
-    // Not escalated to EDITOR — a duplicate call leaves the existing
-    // invite's role untouched.
     expect(second.invite).toEqual(first.invite);
     const rows = await db().select().from(schema.membershipInvites);
     expect(rows).toHaveLength(1);

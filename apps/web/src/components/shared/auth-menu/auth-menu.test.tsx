@@ -52,9 +52,7 @@ describe(`<${AuthMenu.name}/>`, () => {
     const status = screen.getByRole('status', {
       name: 'Loading account status',
     });
-    // A live region, never an interactive element — no button role at all.
     expect(status.tagName).toBe('SPAN');
-    // Neither final state's label leaks into the neutral placeholder.
     expect(status).not.toHaveTextContent('Sign in');
   });
 
@@ -90,9 +88,6 @@ describe(`<${AuthMenu.name}/>`, () => {
       await user.click(screen.getByRole('button', { name: 'Sign in' }));
       const panel = screen.getByRole('menu');
 
-      // `role="menu"` doesn't own heading elements per the ARIA menu
-      // pattern, and this panel renders ahead of every page's own `<h1>` —
-      // the title must stay a plain styled label, never a real heading.
       expect(within(panel).queryByRole('heading')).not.toBeInTheDocument();
       expect(within(panel).getByText('Sign in')).toBeVisible();
       expect(within(panel).getByText(/Choose a sign-in method/)).toBeVisible();
@@ -257,7 +252,6 @@ describe(`<${AuthMenu.name}/>`, () => {
         email: 'reader@example.com',
         redirect: false,
       });
-      // `role="status"` so the confirmation is announced, not just visible.
       expect(await screen.findByRole('status')).toHaveTextContent(
         'Check your inbox for a sign-in link.',
       );
@@ -313,7 +307,6 @@ describe(`<${AuthMenu.name}/>`, () => {
       );
       await user.click(screen.getByRole('button', { name: 'Send link' }));
 
-      // `role="status"` so the failure is announced, not just visible.
       expect(await screen.findByRole('status')).toHaveTextContent(
         "Couldn't send the link. Try again.",
       );
@@ -326,9 +319,6 @@ describe(`<${AuthMenu.name}/>`, () => {
       setLocationSearch('?error=OAuthAccountNotLinked');
       setup();
 
-      // Reachable/announced immediately — not gated behind opening the
-      // (default-closed) popover, since a redirect-back happens before the
-      // reader has done anything else on the page.
       expect(await screen.findByRole('alert')).toHaveTextContent(
         'Sign-in failed. Please try again.',
       );
@@ -361,8 +351,6 @@ describe(`<${AuthMenu.name}/>`, () => {
       await user.click(screen.getByRole('button', { name: 'Account menu' }));
       const panel = screen.getByRole('menu');
 
-      // Two "Jane Doe" occurrences (the avatar's sr-only name span and the
-      // account header) — scope to the panel and use `getAllByText`.
       expect(within(panel).getAllByText('Jane Doe').length).toBeGreaterThan(0);
       expect(within(panel).getByText('jane@example.com')).toBeVisible();
       expect(screen.getByRole('menuitem', { name: 'Sign out' })).toBeVisible();
@@ -381,9 +369,6 @@ describe(`<${AuthMenu.name}/>`, () => {
       await user.click(screen.getByRole('button', { name: 'Account menu' }));
       const panel = screen.getByRole('menu');
 
-      // `role="menu"` doesn't own heading elements per the ARIA menu
-      // pattern, and this panel renders ahead of every page's own `<h1>` —
-      // the title must stay a plain styled label, never a real heading.
       expect(within(panel).queryByRole('heading')).not.toBeInTheDocument();
       expect(within(panel).getByText('Account')).toBeVisible();
     });

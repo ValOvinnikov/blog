@@ -4,9 +4,7 @@ import type { InferResultType } from 'groqd';
 import type { topicsQuery } from './query';
 import type { TTopicsList, TTopicWithPostCount } from './types';
 
-export type TRawTopicWithPostCount = InferResultType<
-  typeof topicsQuery
->[number];
+type TRawTopicWithPostCount = InferResultType<typeof topicsQuery>[number];
 
 function toTopicWithPostCount(
   raw: TRawTopicWithPostCount,

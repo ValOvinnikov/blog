@@ -43,7 +43,7 @@ function toPostCardAuthor(raw: TRawPostCard['author']): TPostCardAuthor {
   };
 }
 
-export function toPostCardTopic(raw: TRawPostCard['topic']): TPostCardTopic {
+function toPostCardTopic(raw: TRawPostCard['topic']): TPostCardTopic {
   return {
     id: raw._id,
     title: raw.title,

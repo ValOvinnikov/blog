@@ -42,9 +42,6 @@ describe(`<${PostContentsRail.name}/>`, () => {
   it('labels the desktop list with a real "Topics" heading that names the nav landmark', () => {
     setup();
 
-    // The desktop label is a real `<h2>` — it joins the document outline
-    // (reachable via screen-reader heading navigation) — and it's what names
-    // the surrounding `<nav>` landmark via `aria-labelledby`.
     const heading = screen.getByRole('heading', { level: 2, name: 'Topics' });
     expect(screen.getByRole('navigation', { name: 'Topics' })).toContainElement(
       heading,
@@ -84,8 +81,6 @@ describe(`<${PostContentsRail.name}/>`, () => {
 
     const trigger = getMobileTrigger();
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    // One link per heading (the always-visible desktop copy) while the
-    // `hidden`-attributed mobile panel's duplicate copy is excluded.
     expect(screen.getAllByRole('link')).toHaveLength(mockPostHeadings.length);
   });
 
@@ -96,9 +91,6 @@ describe(`<${PostContentsRail.name}/>`, () => {
     await user.click(getMobileTrigger());
 
     expect(getMobileTrigger()).toHaveAttribute('aria-expanded', 'true');
-    // Both the always-visible desktop copy and the now-visible mobile
-    // disclosure's copy stay plain links — this is in-page navigation, not a
-    // command menu, so neither carries a `role="menu"`/`"menuitem"` override.
     expect(screen.getAllByRole('link')).toHaveLength(
       mockPostHeadings.length * 2,
     );
@@ -173,8 +165,6 @@ describe(`<${PostContentsRail.name}/>`, () => {
 
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
     expect(panel).toHaveAttribute('hidden');
-    // The panel's own copy of the links is gone from the accessibility tree
-    // again — only the always-visible desktop copy remains.
     expect(screen.getAllByRole('link')).toHaveLength(mockPostHeadings.length);
   });
 

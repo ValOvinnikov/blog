@@ -35,9 +35,23 @@
       "entry": ["src/testing/server-only-stub.ts"]
     },
     "packages/db": {
-      // Same reason as packages/service above: reachable only through a
-      // string in vitest.config.ts's `resolve.alias`.
-      "entry": ["src/testing/server-only-stub.ts"]
+      // src/testing/server-only-stub.ts: same reason as packages/service
+      // above — reachable only through a string in vitest.config.ts's
+      // `resolve.alias`.
+      //
+      // scripts/*.ts, scripts/*/run.ts: package.json `scripts` invokes each
+      // via `tsx`, which knip's default mode already reaches — but
+      // `--production` ignores the `scripts` field, so mark them production
+      // entries (`!`) too, as globs rather than literal paths: a literal
+      // path here trips knip's redundant-entry-pattern hint against its own
+      // scripts-field auto-detection, a glob doesn't. `scripts/*/run.ts`
+      // never collides with a `run.test.ts` sibling; the `*.test.ts` files
+      // `scripts/*.ts` also matches stay classified as tests regardless.
+      "entry": [
+        "src/testing/server-only-stub.ts",
+        "scripts/*.ts!",
+        "scripts/*/run.ts!"
+      ]
     },
     "packages/auth": {
       // Same reason as packages/service/packages/db above: reachable only
@@ -83,31 +97,7 @@
       // import graph can't see a bare string naming a package. Strict pnpm
       // (no hoisting) still requires it as a real apps/platform devDependency so
       // Turbopack can resolve it.
-      "ignoreDependencies": ["@svgr/webpack"],
-      // src/components/shared/{icon,text,button,link-button,status-badge,text-input,alert,heading,textarea,avatar,spinner,brand-mark,setting-row,page-header,disclosure,segmented-control,card}/index.ts:
-      // platform-owned primitives, each built ahead of its call sites as part
-      // of a bottom-up migration off @blog/ui. Mark each an entry so its
-      // exports aren't reported unused; the Next.js plugin still contributes
-      // the app-router entries.
-      "entry": [
-        "src/components/shared/icon/index.ts",
-        "src/components/shared/text/index.ts",
-        "src/components/shared/button/index.ts",
-        "src/components/shared/link-button/index.ts",
-        "src/components/shared/status-badge/index.ts",
-        "src/components/shared/text-input/index.ts",
-        "src/components/shared/alert/index.ts",
-        "src/components/shared/heading/index.ts",
-        "src/components/shared/textarea/index.ts",
-        "src/components/shared/avatar/index.ts",
-        "src/components/shared/spinner/index.ts",
-        "src/components/shared/brand-mark/index.ts",
-        "src/components/shared/setting-row/index.ts",
-        "src/components/shared/page-header/index.ts",
-        "src/components/shared/disclosure/index.ts",
-        "src/components/shared/segmented-control/index.ts",
-        "src/components/shared/card/index.ts"
-      ]
+      "ignoreDependencies": ["@svgr/webpack"]
     }
   }
 }

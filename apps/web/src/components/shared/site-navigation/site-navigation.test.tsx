@@ -19,13 +19,6 @@ type TFakeMobileToggle = {
   panelId: string;
 };
 
-// `PrimaryNavigation`/`NavLink` render `isActive` as styling only (no
-// `aria-current` yet — see the reported a11y gap); this test cares about
-// what `SiteNavigation` computes, so it swaps in a fake that surfaces
-// `isActive` as an assertable `aria-current` rather than asserting classes.
-// The fake also mirrors the real `mobileToggle` markup (a toggle button
-// linked to a panel via `aria-controls`/`id`) closely enough to exercise
-// `SiteNavigation`'s own open/close wiring end-to-end.
 vi.mock('@blog/ui/molecules/primary-navigation', () => ({
   PrimaryNavigation: ({
     links,

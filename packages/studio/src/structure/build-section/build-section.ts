@@ -6,12 +6,12 @@ type TDividerBuilder = ReturnType<StructureBuilder['divider']>;
 
 type TStructureSchema = Pick<SchemaTypeDefinition, 'name' | 'title' | 'icon'>;
 
-export type TStructureGroupItem = {
+type TStructureGroupItem = {
   schema: TStructureSchema;
   mode?: 'list' | 'singleton';
 };
 
-export type TStructureGroup = {
+type TStructureGroup = {
   title?: string;
   dividerBefore?: boolean;
   items: TStructureGroupItem[];
@@ -59,7 +59,7 @@ const buildGroupItem = (
 };
 
 /** Flattens groups into a flat item list, prefixing a titled group with a divider and leaving an untitled group bare. */
-export const buildGroupedListItems = (
+const buildGroupedListItems = (
   S: StructureBuilder,
   groups: TStructureGroup[],
 ): (ListItemBuilder | TDividerBuilder)[] =>
@@ -82,7 +82,7 @@ const getFlattenableItem = (
   return items.length === 1 && item?.mode !== 'singleton' ? item : undefined;
 };
 
-export const buildSection = (
+const buildSection = (
   S: StructureBuilder,
   section: TStructureSection,
 ): ListItemBuilder => {

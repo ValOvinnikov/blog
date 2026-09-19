@@ -9,17 +9,13 @@ import {
 } from '@blog/email/portable-text';
 
 export type TNewsletterConfirmationEmailInput = {
-  /** The subject to send, already merged by the caller over its own default. */
   subject: string;
-  /** The body to render, already merged by the caller over its own default. */
   body: TPortableTextContent;
   confirmationUrl: string;
   unsubscribeUrl: string;
   brand: TTenantEmailBrand;
   brandName: string;
-  /** An uploaded tenant or per-template logo image; falls back to the generated mark when omitted. */
   logoImageUrl?: string;
-  /** Rendered beneath the copyright line in the footer. Omit for a send with no bulk-mail postal-address obligation. */
   footerPostalAddress?: string;
 };
 

@@ -21,8 +21,7 @@ export interface INewsletterSectionViewProps {
 }
 
 /**
- * Pure view for `NewsletterSection`: the active/pending subscription
- * `SettingRow`. Whether the section renders at all (not-subscribed, no
+ * Whether the section renders at all (not-subscribed, no
  * tenant, signed out) is the wrapper's own business call — this component
  * only ever receives an already-decided `active`/`pending` state.
  */

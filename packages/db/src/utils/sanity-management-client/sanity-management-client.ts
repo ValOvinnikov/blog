@@ -210,10 +210,6 @@ export async function createSanityRobotToken(input: {
     }),
   });
 
-  // The Access API docs don't fully spell out the response shape — falling
-  // back from `id` to `tokenId`, and from `token` to `key`, guards against
-  // either field name until a real provisioning run confirms which one the
-  // API actually sends.
   const robotId = result.id ?? result.tokenId;
   const mintedToken = result.token ?? result.key;
   if (!robotId || !mintedToken) {

@@ -1194,9 +1194,9 @@ true deletion), scoped to the tenant resolved from that project-id header.
 `getClient()`/`getWriteClient()`/`runQuery()`/`isr()` all **require** a tenant
 context: omitting one is a compile error, not a silent fall back to the
 platform's own project. Code that legitimately wants the platform's project
-says so explicitly through `getPlatformSanityContext()`,
-`getPlatformSanityWriteContext()` or `getPlatformClient()` — which is what the
-single-tenant dev/preview fallback path uses. No build-time caller enumerates
+says so explicitly through `getPlatformSanityContext()` or
+`getPlatformSanityWriteContext()` — which is what the single-tenant
+dev/preview fallback path uses. No build-time caller enumerates
 content: the content routes' `generateStaticParams` return an empty list, with
 `dynamicParams` at its default, so each `(tenant, locale, slug)` path is
 rendered and cached on first request rather than baked. Enumerating tenants at

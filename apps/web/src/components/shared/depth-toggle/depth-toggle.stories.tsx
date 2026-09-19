@@ -35,7 +35,6 @@ export const DeepOnly: TStory = {
   args: { hasSkim: false },
 };
 
-/** Neither `hasSkim` nor `hasDeep` — the toggle renders nothing. */
 export const NoOptions: TStory = {
   args: { hasSkim: false, hasDeep: false },
 };

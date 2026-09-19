@@ -1,8 +1,8 @@
 const WHITESPACE_PATTERN = /\s/;
 
 /**
- * isValidEmail — shared email-format check for the newsletter signup flow.
- * Deliberately loose — not RFC 5322 validation. Gates `NewsletterForm`'s
+ * Shared email-format check for the newsletter signup flow. Deliberately
+ * loose — not RFC 5322 validation. Gates `NewsletterForm`'s
  * client-side check and `subscribeToNewsletterAction`'s server-side
  * re-check; real deliverability is Resend's problem, not this function's.
  *

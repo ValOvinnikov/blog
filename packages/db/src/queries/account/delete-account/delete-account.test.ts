@@ -37,9 +37,6 @@ afterEach(async () => {
   await db().delete(schema.tenants);
 });
 
-// Seeds a full "signed-in user" fixture — a users row plus one row in every
-// table with a cascading FK to it — so the cascade assertions below prove
-// the real FK behavior, not just that `deleteAccount` issues a DELETE.
 async function seedUserWithRelatedRows(userId: string): Promise<void> {
   await db().insert(schema.users).values({ id: userId });
   await db()

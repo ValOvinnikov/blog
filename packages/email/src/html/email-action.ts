@@ -4,10 +4,8 @@ import { FONT_STACK } from './email-layout';
 import { escapeHtml } from './escape-html';
 
 export type TEmailAction = {
-  /** The visible action text — a tenant may relabel this, but this is the only part of the action they can change. */
   label: string;
   url: string;
-  /** `button` (the default) for a primary call to action; `link` for a lower-emphasis action such as an unsubscribe. */
   variant?: 'button' | 'link';
 };
 

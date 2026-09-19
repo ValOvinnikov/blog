@@ -22,11 +22,9 @@ export type TPostShareProps = {
 /**
  * PostShare — the self-contained interactive share widget, passed into
  * `PostMeta`'s `share` slot (it never wraps `PostMeta` — see
- * `web-component-practices` Rule 1). Composes `@blog/ui`'s `PopoverMenu`
- * directly: a trigger, a "Copy link" item with a Copied state, and one item
- * per platform share link. Open/close/focus behaviour lives in `usePopover`;
- * clipboard state lives in `useCopyToClipboard` — this component only wires
- * refs and reads their results.
+ * `web-component-practices` Rule 1). Open/close/focus behaviour lives in
+ * `usePopover`; clipboard state lives in `useCopyToClipboard` — this
+ * component only wires refs and reads their results.
  *
  * @example
  * <PostMeta author={post.author} share={<PostShare url={url} title={post.title} links={shareLinks} />} />

@@ -185,8 +185,6 @@ describe(updateTenantDetails, () => {
     const tenantId = await insertTenantWithDomain({
       domain: 'acme.example.com',
     });
-    // The pre-check doesn't exclude the tenant's own tenant_domains rows, so
-    // this collides the same way a cross-tenant one would.
     await db()
       .insert(tenantDomains)
       .values({ tenantId, domain: 'acme-alt.example.com' });

@@ -63,8 +63,6 @@ vi.mock('@web/server/tenant/is-tenant-active', () => ({
 
 const TENANT_ID = 'tenant-1';
 
-// The real `@t3-oss/env-nextjs` module throws when a server var is read
-// under jsdom — mock it the same way `send-email.test.ts` does.
 vi.mock('@web/utils/env/env', () => ({
   env: { NEWSLETTER_FROM_ADDRESS: undefined },
 }));

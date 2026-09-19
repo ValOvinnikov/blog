@@ -297,8 +297,6 @@ describe(`<${BookmarkButton.name}/>`, () => {
     });
     expect(setBookmarkStatusMock).toHaveBeenCalledTimes(2);
     expect(setBookmarkStatusMock).toHaveBeenNthCalledWith(2, 'post-1', true);
-    // The undo's own success path is always `toast.info`, regardless of
-    // which direction it reverted — this is the second `info` call.
     expect(toastInfoMock).toHaveBeenNthCalledWith(2, {
       message: 'Reverted',
     });
@@ -328,15 +326,12 @@ describe(`<${BookmarkButton.name}/>`, () => {
     const { action } = toastSuccessMock.mock.calls[0]![0];
     await act(async () => action.onAct());
 
-    // Rolls back to the committed (saved) state the undo started from.
     await waitFor(() => {
       expect(
         screen.getByRole('button', { name: 'Remove bookmark' }),
       ).toHaveAttribute('aria-pressed', 'true');
     });
     expect(setBookmarkStatusMock).toHaveBeenCalledTimes(2);
-    // Deliberate: no `action` on the undo-failure toast, to avoid an
-    // unbounded retry/undo chain.
     expect(toastErrorMock).toHaveBeenCalledWith({
       message: "Couldn't save that. Try again.",
     });

@@ -7,12 +7,6 @@ import { TopicsModuleRenderer } from './topics-module-renderer';
 
 type TTopicsPageProps = { locale: string; tenant: string };
 
-/**
- * TopicsPage — `/topics` composition. Fetches the `page_topicIndex`
- * document once — for its hero/heading and `modules[]` — and composes every
- * other concern as a self-fetching part reading the same cached
- * `getTopicsIndexPage` loader or its own data.
- */
 export const TopicsPage = async ({ locale, tenant }: TTopicsPageProps) => {
   const result = await getTopicsIndexPage(tenant);
   const { headingBlock, hero, modules } = guardPageLoaderResult(

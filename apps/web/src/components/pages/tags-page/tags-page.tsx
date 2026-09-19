@@ -7,12 +7,6 @@ import { TagsModuleRenderer } from './tags-module-renderer';
 
 type TTagsPageProps = { locale: string; tenant: string };
 
-/**
- * TagsPage — `/tags` composition. Fetches the `page_tagIndex` document once
- * — for its hero/heading and `modules[]` — and composes every other concern
- * as a self-fetching part reading the same cached `getTagsIndexPage` loader
- * or its own data.
- */
 export const TagsPage = async ({ locale, tenant }: TTagsPageProps) => {
   const result = await getTagsIndexPage(tenant);
   const { headingBlock, hero, modules } = guardPageLoaderResult(

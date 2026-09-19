@@ -129,7 +129,6 @@ export { getSanityImageBaseUrl } from './sanity/image-base-url';
 export type { TTenantSanityContext } from './sanity/query';
 export { getPlatformSanityContext } from './sanity/client';
 export { getPlatformSanityWriteContext } from './sanity/write-client';
-export type { TArchivePostCard } from './shared/transformers/to-archive-post-card';
 export type { TCtaButton } from './shared/transformers/to-cta-button';
 export type { THeroPrimaryAction } from './shared/transformers/to-hero-primary-action';
 export type { TModule } from './shared/transformers/to-module';

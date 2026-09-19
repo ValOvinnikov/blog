@@ -18,13 +18,9 @@ export type TRenderEmailShellInput = {
   brandName: string;
   previewText?: string;
   bodyHtml: string;
-  /** Already-assembled, already-escaped HTML for a locked structural fact — content the authored body must not be able to omit, reorder, or displace — rendered between the body and the action. The caller is responsible for escaping any interpolated values. Omit for an email with no such content. */
   structuralHtml?: string;
-  /** Already-assembled, already-escaped HTML for the one locked action element, rendered after any structural content and before the footer. Omit for an email with no action. */
   actionHtml?: string;
-  /** An uploaded logo image; falls back to the generated triangle mark when omitted or when the URL fails validation. */
   logoImageUrl?: string;
-  /** Rendered beneath the copyright line in the footer. Omit for a send with no bulk-mail postal-address obligation. */
   footerPostalAddress?: string;
 };
 

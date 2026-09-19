@@ -17,8 +17,6 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-// `unstable_cache` requires a Next.js request-scoped store this test
-// doesn't set up — pass the wrapped function straight through instead.
 vi.mock('next/cache', () => ({
   unstable_cache: (fn: (...args: unknown[]) => unknown) => fn,
 }));

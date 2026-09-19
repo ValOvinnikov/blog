@@ -20,10 +20,6 @@ const escapeJsonForScript = (json: string): string => {
 };
 
 /**
- * JsonLd — renders a schema.org object as a `<script type="application/ld+json">`
- * tag. Generic over the schema shape so any structured-data builder (e.g.
- * `buildBlogPostingSchema`) can feed it directly.
- *
  * The serialized JSON is escaped (see `escapeJsonForScript`) before being
  * injected, so a `</script>` sequence embedded in a string field can't
  * prematurely close the script element; this is the only reason

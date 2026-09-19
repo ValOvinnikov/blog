@@ -200,8 +200,6 @@ describe(createLogger, () => {
     const logger = createLogger();
     const error = new Error('within limit');
 
-    // 4 wrapper levels puts the object holding `error` one level short of
-    // the recursion bound, so it should still be reached and unwrapped.
     let value: unknown = { error };
     for (let i = 0; i < 4; i++) {
       value = { nested: value };
@@ -221,9 +219,6 @@ describe(createLogger, () => {
     const logger = createLogger();
     const error = new Error('too deep');
 
-    // 5 wrapper levels puts the object holding `error` exactly at the
-    // recursion bound, so it should be replaced by the depth marker instead
-    // of being recursed into.
     let value: unknown = { error };
     for (let i = 0; i < 5; i++) {
       value = { nested: value };

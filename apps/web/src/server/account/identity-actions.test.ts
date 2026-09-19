@@ -41,10 +41,6 @@ describe('unlinkProviderAction', () => {
   });
 
   it('rejects a provider that is not literally "github" or "google" at runtime, without logging or querying it', async () => {
-    // `provider` is compile-time only — a `'use server'` action can be
-    // invoked with an arbitrary string at runtime, bypassing TypeScript.
-    // This cast simulates that, exercising the runtime `isLinkableProvider`
-    // guard.
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     authMock.mockResolvedValue(session);
     const { unlinkProviderAction } = await import('./identity-actions');

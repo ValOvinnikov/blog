@@ -13,16 +13,12 @@ import { AccountMenu } from './components/account-menu/account-menu';
 import { SignInMenu } from './components/sign-in-menu/sign-in-menu';
 
 /**
- * The header sign-in/account client island. Reads the Auth.js session
- * itself (`useSession`); a thin dispatcher that owns the single
- * `usePopover()` call and renders `AccountMenu` (logged-in) or `SignInMenu`
- * (logged-out). While the session is resolving it renders a neutral,
- * non-interactive spinner — shaped like neither the sign-in button nor the
- * account avatar, so whichever one mounts never flashes through the
- * *other* state's shape first.
+ * While the session is resolving it renders a neutral, non-interactive
+ * spinner — shaped like neither the sign-in button nor the account avatar,
+ * so whichever one mounts never flashes through the *other* state's shape
+ * first.
  */
 export interface IAuthMenuProps {
-  /** Auth.js provider ids to offer for sign-in, server-derived from credential presence. */
   oauthProviderIds: readonly TOAuthProviderId[];
 }
 

@@ -10,12 +10,6 @@ import { useId } from 'react';
 
 import { AccountMenu, type TAccountMenuProps } from './account-menu';
 
-/**
- * `AccountMenu` is fully controlled — `open`/`toggle`/the refs come from the
- * parent's single `usePopover()` call (see the component's own doc comment).
- * This wrapper stands in for that parent so the panel can actually open/close
- * under test the same way it does inside `AuthMenu`.
- */
 type TWrapperProps = Pick<TAccountMenuProps, 'name' | 'email' | 'image'>;
 
 const Wrapper = ({ name, email, image }: TWrapperProps) => {
@@ -42,10 +36,6 @@ const setup = customRender(Wrapper, {
   image: 'https://example.com/broken-avatar.png',
 });
 
-// `Avatar`'s `<img>` is rendered with `alt=""` here (decorative — the
-// account name is already announced separately), which gives it the
-// implicit `presentation` role rather than `img` — query it directly
-// rather than through `getByRole('img')`.
 const getTriggerImage = () => {
   const trigger = screen.getByRole('button', { name: 'Account menu' });
 
@@ -104,9 +94,6 @@ describe(`<${AccountMenu.name}/>`, () => {
     await user.click(screen.getByRole('button', { name: 'Account menu' }));
     const panel = screen.getByRole('menu');
 
-    // `role="menu"` doesn't own heading elements per the ARIA menu pattern,
-    // and this panel renders ahead of every page's own `<h1>` — the title
-    // must stay a plain styled label, never a real heading.
     expect(within(panel).queryByRole('heading')).not.toBeInTheDocument();
     expect(within(panel).getByText('Account')).toBeVisible();
     expect(within(panel).getAllByText('Jane Doe').length).toBeGreaterThan(0);

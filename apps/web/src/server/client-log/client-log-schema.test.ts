@@ -104,7 +104,7 @@ describe('sanitizeClientLogPayload', () => {
 
     const sanitized = sanitizeClientLogPayload(parsed);
 
-    // eslint-disable-next-line no-control-regex -- intentional: asserting the sanitized output contains none of these characters, same range `sanitizeLogMessage` itself strips
+    // eslint-disable-next-line no-control-regex
     expect(sanitized.message).not.toMatch(/[\x00-\x1f\x7f]/);
     expect(sanitized.message).not.toContain('\n');
   });
