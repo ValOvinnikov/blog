@@ -1,10 +1,6 @@
 import { tagIndexPageSchema } from '@blog/studio/schema-types/documents/pages/tag-index/tag-index';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import {
-  SEO_META_TITLE_MAX_LENGTH,
-  SEO_META_TITLE_MIN_LENGTH,
-} from '@blog/studio/schema-types/objects/seo/seo';
-import {
   assertSatisfiesRequiredFields,
   type TExemptField,
 } from '@blog/studio/testing/assert-satisfies-required-fields';
@@ -13,6 +9,9 @@ import { createIfNotExists } from 'sanity/migrate';
 import { PAGE_TAG_INDEX_ID, TAXONOMY_LIST_TAGS_ID } from './ids';
 
 import migration from './index';
+
+const SEO_META_TITLE_MIN_LENGTH = 30;
+const SEO_META_TITLE_MAX_LENGTH = 60;
 
 const TAXONOMY_LIST_HEADING_BLOCK_EXEMPTION: TExemptField[] = [
   {
