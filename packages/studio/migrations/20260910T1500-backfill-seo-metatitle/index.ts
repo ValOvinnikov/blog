@@ -54,6 +54,8 @@ import {
   type NodePatch,
 } from 'sanity/migrate';
 
+import { resolveEntityTitle } from '../lib/resolve-entity-title';
+
 import {
   buildEntityPageMetaTitle,
   buildHeadingMetaTitle,
@@ -89,8 +91,6 @@ type TSettingsSiteDoc = {
   tagline?: string;
   description?: string;
 };
-
-type TEntityDoc = { title?: string };
 
 type THeroDoc = {
   _type?: string;
@@ -129,20 +129,6 @@ const getSettingsSite = (
 
 const resolvePadText = (settings: TSettingsSiteDoc | undefined): string =>
   settings?.tagline?.trim() || settings?.description?.trim() || '';
-
-const resolveEntityTitle = async (
-  context: MigrationContext,
-  ref: string | undefined,
-): Promise<string | undefined> => {
-  if (!ref) return undefined;
-
-  const entity = await context.client.fetch<TEntityDoc | null>(
-    '*[_id == $ref][0]{ title }',
-    { ref },
-  );
-
-  return entity?.title?.trim() || undefined;
-};
 
 /**
  * The hero's own title field differs by type — `module_hero` stores it as
