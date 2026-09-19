@@ -3,10 +3,6 @@
 import { useEffect, useState } from 'react';
 
 /**
- * useActiveHeadingId — returns the `id` of the given headings currently in
- * view, for `PostContentsRail`'s active-item highlighting; `null` until the
- * user scrolls past the first heading.
- *
  * `ids` need not be deduped or memoized by the caller — a fresh array
  * reference each render is safe.
  */

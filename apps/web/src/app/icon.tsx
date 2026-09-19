@@ -56,13 +56,11 @@ const buildFallbackResponse = (): Response => {
 };
 
 /**
- * Dynamic favicon route (Next.js's code-generated `icon` file convention) —
- * fetches the tenant's uploaded logo (`settings_site.brand.logo`) through as
- * a small square crop, passing the CDN's own `Content-Type` header through
- * unchanged. Falls back to a single default mark (`FALLBACK_MARK_SVG`, which
- * embeds its own `prefers-color-scheme` media query) whenever no logo is
- * uploaded, or the fetch fails for any reason — a broken favicon must never
- * break the page it's attached to.
+ * Next.js's code-generated `icon` file convention. Falls back to a single
+ * default mark (`FALLBACK_MARK_SVG`, which embeds its own
+ * `prefers-color-scheme` media query) whenever no logo is uploaded, or the
+ * fetch fails for any reason — a broken favicon must never break the page
+ * it's attached to.
  */
 export default async function Icon() {
   const hostTenant = await getHostTenantSanityContext();

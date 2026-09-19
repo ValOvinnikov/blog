@@ -8,14 +8,6 @@ import { renderToString } from 'react-dom/server';
 
 import { DepthProvider, useDepth } from './depth-provider';
 
-/**
- * Renders `ui` against real server-rendered markup via `hydrateRoot` —
- * genuinely hydrating a matching server-rendered `<script>`, the one case
- * the plain `renderElement` (`createRoot`) calls elsewhere in this file
- * can't exercise, since those mirror a plain client-side mount (e.g. an App
- * Router client-side navigation into this route segment) rather than a
- * genuine hydration pass.
- */
 const renderHydrated = (ui: ReactElement) => {
   const wrapped = (
     <NextIntlClientProvider locale="en" messages={SITE_MESSAGES}>
@@ -145,9 +137,6 @@ describe(`<${DepthProvider.name}/>`, () => {
       expect(screen.getByTestId('depth')).toHaveTextContent(DEPTH.DEEP),
     );
 
-    // Same component instance (no remount) — a client-side navigation to a
-    // post with no asides would look exactly like this: new props, no new
-    // `useEffect(() => …, [])` mount.
     rerender(
       <DepthProvider hasSkim={false} hasDeep={false}>
         <ReadDepth />
@@ -192,16 +181,11 @@ describe(`<${DepthProvider.name}/>`, () => {
       </DepthProvider>,
     );
 
-    // Wait for the mount effects (including the hydration-consistency check
-    // that flips the bootstrap-script snapshot to `false`) to settle before
-    // re-rendering, same as a real client-side navigation would.
     await waitFor(() =>
       expect(screen.getByTestId('depth')).toHaveTextContent(DEPTH.READ),
     );
     expect(container.querySelector('script')).toBeNull();
 
-    // Same component instance (no remount) — the client-side-navigation-to-
-    // a-different-post case that used to re-render the script tag.
     rerender(
       <DepthProvider hasSkim={true} hasDeep={false}>
         <ReadDepth />

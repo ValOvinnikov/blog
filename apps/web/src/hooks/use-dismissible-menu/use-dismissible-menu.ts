@@ -11,40 +11,11 @@ const getFocusables = (panel: HTMLElement | null) =>
 export type TDismissibleMenuAccessors = {
   getTrigger: () => HTMLElement | null;
   getPanel: () => HTMLElement | null;
-  /**
-   * Optional wider "inside" boundary for the outside-click check — a
-   * pointer-down anywhere inside `getContainer()` also counts as inside,
-   * so a sibling sharing that container never triggers a dismiss.
-   */
   getContainer?: () => HTMLElement | null;
-  /**
-   * When `false`, skips the Tab focus-trap and Arrow/Home/End roving focus
-   * (Escape/outside-click still apply). Defaults to `true` for command-style
-   * menus; set `false` for a plain in-page navigation disclosure.
-   */
   trapFocus?: boolean;
-  /**
-   * When `true`, closes the menu as soon as focus moves outside both trigger
-   * and panel, without returning focus to the trigger. Defaults to `false`.
-   * Needed for a non-modal overlay panel left open while focus moves past it
-   * (WCAG 2.4.11).
-   */
   closeOnFocusOut?: boolean;
 };
 
-/**
- * useDismissibleMenu — the shared open-state/focus/dismissal core behind
- * `usePopover` and `useMobileNavToggle`: focus-into-panel on open,
- * Escape/outside-click dismissal, and focus-return-to-trigger on every close
- * path. By default it also layers a Tab focus-trap and Arrow/Home/End
- * roving focus over the panel's focusable items (WAI-ARIA APG menu pattern);
- * `trapFocus: false` opts out of both and keeps ordinary Tab order.
- *
- * Trigger/panel DOM nodes are located through `getTrigger`/`getPanel`
- * accessor callbacks rather than concrete refs, so callers can adapt
- * whatever DOM-lookup strategy fits their markup without duplicating the
- * dismissal/focus-trap/roving-focus logic itself.
- */
 export const useDismissibleMenu = ({
   getTrigger,
   getPanel,

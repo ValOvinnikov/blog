@@ -14,10 +14,6 @@ export interface IVoiceRichProviderProps {
 }
 
 /**
- * VoiceRichProvider — holds every RICH voice field already resolved to its
- * stored override, or the catalog default wrapped as a single paragraph,
- * for `useVoiceRich` to read from a client component.
- *
  * @example
  * <VoiceRichProvider values={rich}>
  *   <App />

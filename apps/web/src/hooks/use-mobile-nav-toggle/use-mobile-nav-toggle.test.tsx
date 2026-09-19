@@ -5,15 +5,6 @@ import { useId } from 'react';
 
 import { useMobileNavToggle } from './use-mobile-nav-toggle';
 
-/**
- * Minimal harness mirroring how `SiteNavigation` composes this hook:
- * `containerRef` wraps the whole tree, and the toggle button / panel are
- * linked to each other (and located by the hook) via `panelId`, exactly like
- * `PrimaryNavigation`'s real `mobileToggle` markup. The "sibling action"
- * button mirrors `SiteNavigation`'s always-visible `actions` slot (e.g.
- * `ThemeToggleButton`) — it lives inside `containerRef` but is neither the
- * resolved trigger nor the resolved panel.
- */
 const Harness = () => {
   const panelId = useId();
   const { open, toggle, containerRef } = useMobileNavToggle(panelId);

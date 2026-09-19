@@ -10,9 +10,6 @@ import type { ReactNode } from 'react';
 
 import { CtaModuleView } from './cta-module-view';
 
-// Wraps the real implementation (so every other assertion in this file keeps
-// exercising actual render behaviour) purely to observe the props it is
-// called with — never its own rendered output.
 vi.mock('@blog/ui/organisms/cta-module', async (importOriginal) => {
   const actual =
     await importOriginal<typeof import('@blog/ui/organisms/cta-module')>();
@@ -22,8 +19,6 @@ vi.mock('@blog/ui/organisms/cta-module', async (importOriginal) => {
   };
 });
 
-// Fakes `Section` so tests can read `brandVariant` from a `data-*`
-// attribute instead of the rendered `tv()` background class.
 vi.mock('@web/components/shared/section', () => ({
   Section: ({
     brandVariant,

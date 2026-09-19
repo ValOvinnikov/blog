@@ -16,8 +16,6 @@ const { getTopicPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
   getTenantSanityContextMock: vi.fn(),
 }));
 
-// Isolates the redirect/404 branches — none of the tested
-// paths should ever reach the real service/fetch chain.
 vi.mock('@blog/service', () => ({
   service: {
     pages: {

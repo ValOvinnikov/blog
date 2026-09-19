@@ -429,11 +429,6 @@ describe('POST /api/generate-skim', () => {
     expect(getPublishedPostBodyMock).not.toHaveBeenCalled();
   });
 
-  // `vi.doMock` overrides the module registry's mock factory for
-  // `@web/utils/env/env` for every subsequent dynamic `import('./route')` in
-  // this file (`vi.resetModules()` clears cached instances, not the
-  // registered factory) — these two config-missing cases stay last, same as
-  // `/api/revalidate`'s own equivalent case.
   it('returns 503 when ANTHROPIC_API_KEY is not configured', async () => {
     vi.doMock('@web/utils/env/env', () => ({
       env: { SANITY_GENERATE_SECRET: 'test-secret' },

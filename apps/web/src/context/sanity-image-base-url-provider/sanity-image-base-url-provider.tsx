@@ -10,9 +10,7 @@ export interface ISanityImageBaseUrlProviderProps {
 }
 
 /**
- * SanityImageBaseUrlProvider — makes the current request's tenant Sanity CDN
- * base URL available to every `SanityImage` in the tree, resolved once per
- * request instead of once per image.
+ * Resolved once per request instead of once per image.
  *
  * @example
  * <SanityImageBaseUrlProvider baseUrl={getSanityImageBaseUrl(tenantContext)}>

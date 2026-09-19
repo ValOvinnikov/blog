@@ -13,12 +13,6 @@ export interface IHeroModuleViewProps extends Omit<THeroModule, 'title'> {
   title: string;
 }
 
-/**
- * Pure view for `HeroModule` — the web-side wiring the `@blog/ui` `Hero`
- * organism can't own itself: the `Section` full-bleed landmark for the
- * CMS-authored `brandVariant`/`layout`, `SmartLink`-composed CTAs, the
- * `SanityImage` bridge, and the visually-hidden CTA label suffix.
- */
 export const HeroModuleView = ({
   id,
   brandVariant,

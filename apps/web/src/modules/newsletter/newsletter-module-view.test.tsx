@@ -13,9 +13,6 @@ vi.mock('@web/server/newsletter/newsletter-actions', () => ({
   subscribeToNewsletterAction: vi.fn(),
 }));
 
-// Wraps the real implementation (so every other assertion in this file keeps
-// exercising actual render behaviour) purely to observe the props it is
-// called with — never its own rendered output.
 vi.mock('@web/components/shared/newsletter-form', async (importOriginal) => {
   const actual =
     await importOriginal<

@@ -11,10 +11,9 @@ export interface ICtaModuleViewProps extends TCtaModule {
 }
 
 /**
- * Pure view for `CtaModule` — wraps the `CtaModule` organism in a `Section`
- * landmark. `bandTone` and `brandVariant` are distinct concerns: `bandTone`
- * colors the full-bleed section band, `brandVariant` colors the card/overlay
- * the organism paints itself.
+ * `bandTone` and `brandVariant` are distinct concerns: `bandTone` colors the
+ * full-bleed section band, `brandVariant` colors the card/overlay the
+ * organism paints itself.
  */
 export const CtaModuleView = ({
   id,

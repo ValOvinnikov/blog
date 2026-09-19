@@ -9,10 +9,6 @@ export interface IContentModuleProps {
   tenant: string;
 }
 
-/**
- * ContentModule — fetches `module_content` data and hands it to
- * `ContentModuleView`.
- */
 export const ContentModule = async ({ id, tenant }: IContentModuleProps) => {
   const tenantContext = await getTenantSanityContext(tenant);
   const result = await service.modules.content.v1.getContent(id, tenantContext);

@@ -11,10 +11,6 @@ export interface IPostLatestModuleProps {
   tenant: string;
 }
 
-/**
- * PostLatestModule — fetches `module_postLatest` data (a latest-N teaser,
- * never paginated) and hands it to `PostLatestModuleView`.
- */
 export const PostLatestModule = async ({
   id,
   tenant,

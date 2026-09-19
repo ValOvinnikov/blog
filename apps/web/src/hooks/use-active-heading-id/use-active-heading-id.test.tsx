@@ -8,13 +8,6 @@ type TObserverEntryInit = {
   top: number;
 };
 
-/**
- * jsdom has no real `IntersectionObserver` — this fake captures every
- * instance created (keyed by the elements it observes) so tests can trigger
- * its callback directly with hand-built entries, mirroring the real
- * observer's `(entries) => void` contract closely enough to exercise the
- * hook's "topmost intersecting heading wins" selection logic.
- */
 class FakeIntersectionObserver implements IntersectionObserver {
   static instances: FakeIntersectionObserver[] = [];
 
@@ -74,7 +67,6 @@ const Harness = ({ ids }: { ids: string[] }) => {
 
 const setup = customRender(Harness, { ids: [] });
 
-/** The hook creates exactly one observer per non-empty `ids` render — asserted directly by callers that expect one to exist. */
 const getObserver = (): FakeIntersectionObserver => {
   const [observer] = FakeIntersectionObserver.instances;
   if (!observer) {

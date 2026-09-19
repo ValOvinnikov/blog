@@ -31,16 +31,13 @@ export interface ITaxonomyListModuleViewProps extends Omit<
   items: ITaxonomyListModuleItem[];
   titleId: string;
   dataTestId: string;
-  /** Heading depth for the section title — the caller decides based on where the module sits in the page outline. */
   headingLevel: THeadingLevel;
   emptyMessage: string;
 }
 
 /**
- * TaxonomyListModuleView — render shell for `TaxonomyListModule`: a labeled
- * `Section` wrapping either a `CardGrid` of `TaxonomyCard`s or the empty
- * message. Built from primitives — `MediaCardItem` is shaped around a blog
- * post, not a taxonomy entry, so no listing organism fits here.
+ * Built from primitives — `MediaCardItem` is shaped around a blog post, not
+ * a taxonomy entry, so no listing organism fits here.
  */
 export const TaxonomyListModuleView = ({
   brandVariant,

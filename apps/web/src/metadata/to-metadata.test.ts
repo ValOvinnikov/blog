@@ -4,11 +4,6 @@ import {
   type TSeoResolved,
   urlForSanityImage,
 } from '@blog/service';
-// Next's real per-segment metadata resolver — used below to prove an absent
-// `ogImage` resolves to no image at all, the way the App Router does it
-// at request time, rather than an injected default. Not a public `next`
-// export, but there's no other way to verify this without standing up a
-// full Next render.
 import {
   resolveOpenGraph,
   resolveTwitter,
@@ -202,10 +197,6 @@ describe('toMetadata', () => {
 });
 
 describe('toMetadata output resolved by Next itself', () => {
-  // Mirrors `[locale]/layout.tsx`'s `metadataBase` — the leaf route (this
-  // function's output) never sets its own, so Next's resolver falls back to
-  // this parent-segment value even though the leaf's `openGraph`/`twitter`
-  // objects themselves are NOT merged with the parent's.
   const metadataBase = new URL('https://example.com');
   const metadataContext = {
     trailingSlash: false,

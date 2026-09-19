@@ -7,11 +7,6 @@ import {
 
 import { usePopover } from './use-popover';
 
-/**
- * Minimal harness that wires the hook's refs onto a real trigger + panel so
- * the DOM-dependent behaviour (focus management, outside-click, Tab-trap) can
- * be exercised directly against the hook, independent of any component.
- */
 const Harness = () => {
   const { open, toggle, close, triggerRef, panelRef } = usePopover();
 

@@ -8,10 +8,10 @@ interface IRowActivity {
 }
 
 /**
- * useToastRowPause — the per-row hover/focus-within pause-resume sub-flow
- * behind `ToastProvider`'s toast rows (§4.3): tracks hover and keyboard
- * focus as two independent flags per toast id and calls `onActivate`/
- * `onDeactivate` only on the 0↔1 transition of "either is active", not on
+ * The per-row hover/focus-within pause-resume sub-flow behind
+ * `ToastProvider`'s toast rows: tracks hover and keyboard focus as two
+ * independent flags per toast id and calls `onActivate`/`onDeactivate` only
+ * on the 0↔1 transition of "either is active", not on
  * every individual enter/leave/focus/blur event. This matters because the
  * two can overlap — e.g. the mouse hovers a toast, focus then tabs into its
  * action button, and the mouse leaves without focus moving: the toast must

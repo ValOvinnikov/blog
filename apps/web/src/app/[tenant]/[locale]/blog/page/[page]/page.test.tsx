@@ -14,8 +14,6 @@ const { getIndexPageMock } = vi.hoisted(() => ({
   getIndexPageMock: vi.fn(),
 }));
 
-// Isolates the redirect/404 branch — neither tested path (page 1 redirect,
-// non-canonical hard-404) should ever reach the real service/fetch chain.
 vi.mock('@blog/service', () => ({
   service: {
     pages: {
