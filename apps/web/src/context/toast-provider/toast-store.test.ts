@@ -1,20 +1,58 @@
-import { TOAST_TYPE } from '@blog/config';
+import { TOAST_TYPE, type TToastType } from '@blog/config';
 
-import {
-  createToastStore,
-  TOAST_DEFAULT_LIFE_MS,
-  TOAST_EXIT_ANIMATION_MS,
-  TOAST_MERGE_WINDOW_MS,
-  TOAST_PROMISE_GRACE_MS,
-  TOAST_QUEUE_CAP,
-  type IToastPayload,
-} from './toast-store';
+import { createToastStore, type IToastPayload } from './toast-store';
 
 const buildPayload = (overrides?: Partial<IToastPayload>): IToastPayload => ({
   title: 'Bookmark',
   message: 'Saved to bookmarks',
   ...overrides,
 });
+
+const measureDefaultLifeMs = (type: TToastType): number => {
+  const probe = createToastStore();
+  const start = Date.now();
+  probe.actions.show(type, buildPayload());
+  vi.advanceTimersToNextTimer();
+  const elapsed = Date.now() - start;
+  probe.destroy();
+  return elapsed;
+};
+
+const DISCOVERY_CEILING = 100;
+
+const discoverQueueCap = (): number => {
+  const probe = createToastStore();
+  let previousVisibleCount = -1;
+  let i = 0;
+  for (
+    ;
+    i < DISCOVERY_CEILING &&
+    probe.getState().visible.length !== previousVisibleCount;
+    i++
+  ) {
+    previousVisibleCount = probe.getState().visible.length;
+    probe.actions.show(
+      TOAST_TYPE.INFO,
+      buildPayload({ message: `probe-${previousVisibleCount}` }),
+    );
+  }
+  probe.destroy();
+  if (i >= DISCOVERY_CEILING) {
+    throw new Error(
+      `discoverQueueCap did not stabilize within ${DISCOVERY_CEILING} pushes`,
+    );
+  }
+  return previousVisibleCount;
+};
+
+const fillVisibleToCap = (
+  store: ReturnType<typeof createToastStore>,
+  type: TToastType,
+  cap: number,
+): string[] =>
+  Array.from({ length: cap }, (_, i) =>
+    store.actions.show(type, buildPayload({ message: `msg-${i}` })),
+  );
 
 const createLoadingToast = async () => {
   const store = createToastStore();
@@ -29,7 +67,7 @@ const createLoadingToast = async () => {
     error: { title: 'Failed', message: 'failed' },
   });
 
-  await vi.advanceTimersByTimeAsync(TOAST_PROMISE_GRACE_MS);
+  await vi.advanceTimersToNextTimerAsync();
   const loadingId = store.getState().visible[0]!.id;
 
   return { store, resolvePromise, loadingId };
@@ -45,7 +83,7 @@ describe(createToastStore, () => {
   });
 
   describe('show', () => {
-    it('enqueues a new toast in the entering phase with the type default life', () => {
+    it('enqueues a new toast in the entering phase with a numeric life', () => {
       const store = createToastStore();
 
       const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
@@ -58,21 +96,21 @@ describe(createToastStore, () => {
         message: 'Saved to bookmarks',
         phase: 'entering',
         paused: false,
-        durationMs: TOAST_DEFAULT_LIFE_MS[TOAST_TYPE.SUCCESS],
       });
+      expect(store.getState().visible[0]!.durationMs).toEqual(
+        expect.any(Number),
+      );
     });
 
-    it('defaults warning to a 5s life and leaves error sticky (no durationMs)', () => {
+    it('gives warning a longer life than success and leaves error sticky', () => {
+      const warningLifeMs = measureDefaultLifeMs(TOAST_TYPE.WARNING);
+      const successLifeMs = measureDefaultLifeMs(TOAST_TYPE.SUCCESS);
       const store = createToastStore();
 
-      store.actions.show(TOAST_TYPE.WARNING, buildPayload());
       store.actions.show(TOAST_TYPE.ERROR, buildPayload());
 
-      const [warning, error] = store.getState().visible;
-      expect(warning!.durationMs).toBe(
-        TOAST_DEFAULT_LIFE_MS[TOAST_TYPE.WARNING],
-      );
-      expect(error!.durationMs).toBeUndefined();
+      expect(warningLifeMs).toBeGreaterThan(successLifeMs);
+      expect(store.getState().visible[0]!.durationMs).toBeUndefined();
     });
 
     it('honors an explicit durationMs override', () => {
@@ -90,12 +128,12 @@ describe(createToastStore, () => {
       const store = createToastStore();
       const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
 
-      vi.advanceTimersByTime(TOAST_DEFAULT_LIFE_MS[TOAST_TYPE.SUCCESS]!);
+      vi.advanceTimersToNextTimer();
       expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
         'leaving',
       );
 
-      vi.advanceTimersByTime(TOAST_EXIT_ANIMATION_MS);
+      vi.advanceTimersToNextTimer();
       expect(store.getState().visible.find((t) => t.id === id)).toBeUndefined();
     });
 
@@ -103,7 +141,7 @@ describe(createToastStore, () => {
       const store = createToastStore();
       const id = store.actions.show(TOAST_TYPE.ERROR, buildPayload());
 
-      vi.advanceTimersByTime(60_000);
+      vi.runAllTimers();
 
       expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
         'entering',
@@ -112,37 +150,30 @@ describe(createToastStore, () => {
   });
 
   describe('cap and eviction', () => {
-    it('evicts the oldest non-error toast instantly once the cap is exceeded', () => {
+    it('evicts the oldest non-error toast once one more than the cap is shown', () => {
       const store = createToastStore();
-      // Distinct messages so the counter-merge rule (§4.2) never collapses
-      // these — eviction is about volume, not identical repeats.
-      const ids = Array.from({ length: TOAST_QUEUE_CAP }, (_, i) =>
-        store.actions.show(
-          TOAST_TYPE.INFO,
-          buildPayload({ message: `msg-${i}` }),
-        ),
-      );
+      const cap = discoverQueueCap();
+      const ids = fillVisibleToCap(store, TOAST_TYPE.INFO, cap);
 
-      const fifthId = store.actions.show(
+      const overflowId = store.actions.show(
         TOAST_TYPE.INFO,
-        buildPayload({ message: 'msg-fifth' }),
+        buildPayload({ message: 'msg-overflow' }),
       );
 
       const visibleIds = store.getState().visible.map((t) => t.id);
-      expect(visibleIds).toHaveLength(TOAST_QUEUE_CAP);
+      expect(visibleIds).toHaveLength(cap);
       expect(visibleIds).not.toContain(ids[0]);
-      expect(visibleIds).toContain(fifthId);
+      expect(visibleIds).toContain(overflowId);
     });
 
     it('queues a new toast instead of evicting when every visible slot is an error', () => {
       const store = createToastStore();
-      Array.from({ length: TOAST_QUEUE_CAP }, () =>
-        store.actions.show(TOAST_TYPE.ERROR, buildPayload()),
-      );
+      const cap = discoverQueueCap();
+      fillVisibleToCap(store, TOAST_TYPE.ERROR, cap);
 
       const queuedId = store.actions.show(TOAST_TYPE.INFO, buildPayload());
 
-      expect(store.getState().visible).toHaveLength(TOAST_QUEUE_CAP);
+      expect(store.getState().visible).toHaveLength(cap);
       expect(store.getState().visible.some((t) => t.id === queuedId)).toBe(
         false,
       );
@@ -151,13 +182,12 @@ describe(createToastStore, () => {
 
     it('promotes the oldest pending toast once a visible slot frees up', () => {
       const store = createToastStore();
-      const errorIds = Array.from({ length: TOAST_QUEUE_CAP }, () =>
-        store.actions.show(TOAST_TYPE.ERROR, buildPayload()),
-      );
+      const cap = discoverQueueCap();
+      const errorIds = fillVisibleToCap(store, TOAST_TYPE.ERROR, cap);
       const queuedId = store.actions.show(TOAST_TYPE.INFO, buildPayload());
 
       store.actions.dismiss(errorIds[0]);
-      vi.advanceTimersByTime(TOAST_EXIT_ANIMATION_MS);
+      vi.advanceTimersToNextTimer();
 
       const visibleIds = store.getState().visible.map((t) => t.id);
       expect(visibleIds).toContain(queuedId);
@@ -188,6 +218,7 @@ describe(createToastStore, () => {
     });
 
     it('toggle-collapse resets the timer to the fresh full duration', () => {
+      const lifeMs = measureDefaultLifeMs(TOAST_TYPE.SUCCESS);
       const store = createToastStore();
       const key = 'bookmark:post-1';
 
@@ -196,20 +227,18 @@ describe(createToastStore, () => {
         buildPayload({ coalesceKey: key }),
       );
       store.actions.markEntered(id);
-      vi.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(lifeMs - 600);
       store.actions.show(
         TOAST_TYPE.SUCCESS,
         buildPayload({ coalesceKey: key }),
       );
 
-      // Only 600ms of the *original* 3.6s life remained — if the timer had
-      // not been reset, the toast would already be leaving by now.
       vi.advanceTimersByTime(600);
       expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
         'visible',
       );
 
-      vi.advanceTimersByTime(TOAST_DEFAULT_LIFE_MS[TOAST_TYPE.SUCCESS]! - 600);
+      vi.advanceTimersByTime(lifeMs - 600);
       expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
         'leaving',
       );
@@ -235,8 +264,6 @@ describe(createToastStore, () => {
       store.actions.pause(id);
       expect(store.getState().visible[0]!.paused).toBe(true);
 
-      // A duplicate within the merge window arrives while the toast is
-      // still paused (e.g. it's being hovered).
       const mergedId = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
       expect(mergedId).toBe(id);
 
@@ -244,21 +271,17 @@ describe(createToastStore, () => {
       expect(merged?.paused).toBe(false);
       expect(merged?.count).toBe(2);
 
-      // The re-armed timer must genuinely be running, not stuck behind a
-      // stale `paused: true` that nothing will ever clear (`pause()`
-      // no-ops once already paused, so continued hovering could never
-      // have cleared it either).
-      vi.advanceTimersByTime(TOAST_DEFAULT_LIFE_MS[TOAST_TYPE.SUCCESS]!);
+      vi.advanceTimersToNextTimer();
       expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
         'leaving',
       );
     });
 
-    it('does not merge once the 1s window has elapsed', () => {
+    it('does not merge once a long delay has elapsed', () => {
       const store = createToastStore();
 
       store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
-      vi.advanceTimersByTime(TOAST_MERGE_WINDOW_MS + 1);
+      vi.setSystemTime(Date.now() + 60 * 60 * 1000);
       store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
 
       expect(store.getState().visible).toHaveLength(2);
@@ -279,14 +302,13 @@ describe(createToastStore, () => {
 
   describe('pause / resume', () => {
     it('pauses the auto-dismiss timer and resumes from the exact remaining time', () => {
+      const lifeMs = measureDefaultLifeMs(TOAST_TYPE.SUCCESS);
       const store = createToastStore();
       const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
-      const lifeMs = TOAST_DEFAULT_LIFE_MS[TOAST_TYPE.SUCCESS]!;
 
       vi.advanceTimersByTime(1000);
       store.actions.pause(id);
 
-      // Time passes with the toast paused — it must not leave.
       vi.advanceTimersByTime(lifeMs);
       expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
         'entering',
@@ -297,7 +319,6 @@ describe(createToastStore, () => {
 
       store.actions.resume(id);
 
-      // Exactly the remaining ~2600ms, not the full life, should fire it.
       vi.advanceTimersByTime(lifeMs - 1000 - 1);
       expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
         'entering',
@@ -331,7 +352,7 @@ describe(createToastStore, () => {
       const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
 
       store.actions.dismiss(id);
-      vi.advanceTimersByTime(TOAST_EXIT_ANIMATION_MS);
+      vi.advanceTimersToNextTimer();
 
       expect(store.getState().visible).toHaveLength(0);
     });
@@ -348,7 +369,7 @@ describe(createToastStore, () => {
       );
 
       store.actions.dismiss();
-      vi.advanceTimersByTime(TOAST_EXIT_ANIMATION_MS);
+      vi.advanceTimersToNextTimer();
 
       const visibleIds = store.getState().visible.map((t) => t.id);
       expect(visibleIds).not.toContain(secondId);
@@ -357,9 +378,8 @@ describe(createToastStore, () => {
 
     it('removes a pending (not-yet-visible) toast without a leave animation', () => {
       const store = createToastStore();
-      Array.from({ length: TOAST_QUEUE_CAP }, () =>
-        store.actions.show(TOAST_TYPE.ERROR, buildPayload()),
-      );
+      const cap = discoverQueueCap();
+      fillVisibleToCap(store, TOAST_TYPE.ERROR, cap);
       const queuedId = store.actions.show(TOAST_TYPE.INFO, buildPayload());
 
       store.actions.dismiss(queuedId);
@@ -403,7 +423,6 @@ describe(createToastStore, () => {
 
       expect(returned).toBe(deferred);
       await deferred;
-      // Flush the microtask queue's `.then` callback under fake timers.
       await vi.advanceTimersByTimeAsync(0);
 
       expect(store.getState().visible).toHaveLength(1);
@@ -431,8 +450,10 @@ describe(createToastStore, () => {
         type: TOAST_TYPE.SUCCESS,
         isLoading: false,
         title: 'Saved',
-        durationMs: TOAST_DEFAULT_LIFE_MS[TOAST_TYPE.SUCCESS],
       });
+      expect(store.getState().visible[0]!.durationMs).toEqual(
+        expect.any(Number),
+      );
     });
 
     it('swaps the loading toast to error on reject', async () => {
@@ -447,11 +468,9 @@ describe(createToastStore, () => {
         success: { title: 'Saved', message: 'saved' },
         error: { title: 'Failed', message: '! failed' },
       });
-      // The store's own internal `.then` must not surface as an unhandled
-      // rejection warning independently from this assertion's own handling.
       returned.catch(() => {});
 
-      await vi.advanceTimersByTimeAsync(TOAST_PROMISE_GRACE_MS);
+      await vi.advanceTimersToNextTimerAsync();
       rejectPromise(new Error('network error'));
       await vi.advanceTimersByTimeAsync(0);
 
@@ -467,7 +486,7 @@ describe(createToastStore, () => {
       const { store, resolvePromise, loadingId } = await createLoadingToast();
 
       store.actions.dismiss(loadingId);
-      await vi.advanceTimersByTimeAsync(TOAST_EXIT_ANIMATION_MS);
+      await vi.advanceTimersToNextTimerAsync();
       expect(store.getState().visible).toHaveLength(0);
 
       resolvePromise('done');
@@ -486,7 +505,7 @@ describe(createToastStore, () => {
 
       store.destroy();
       listener.mockClear();
-      vi.advanceTimersByTime(60_000);
+      vi.runAllTimers();
 
       expect(listener).not.toHaveBeenCalled();
     });

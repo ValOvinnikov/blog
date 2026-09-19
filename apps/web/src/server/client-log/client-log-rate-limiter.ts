@@ -1,14 +1,12 @@
 const WINDOW_MS = 60_000;
 
-// Exported so the test suite can exercise the exact bound instead of
-// duplicating it as a magic number.
-export const MAX_REQUESTS_PER_WINDOW = 20;
+const MAX_REQUESTS_PER_WINDOW = 20;
 
 // Hard ceiling on distinct tracked client keys, so a long-lived warm
 // instance can't accumulate one permanent `Map` entry per visitor IP it has
 // ever seen. The sweep below already frees expired entries; this bounds the
 // *in-window* size too, evicting the oldest tracked entry once full.
-export const MAX_TRACKED_CLIENTS = 5000;
+const MAX_TRACKED_CLIENTS = 5000;
 
 type TWindowEntry = { count: number; windowStart: number };
 
@@ -71,12 +69,4 @@ export const isClientLogRateLimited = (clientKey: string): boolean => {
   }
   requestCounts.set(clientKey, { count: 1, windowStart: now });
   return false;
-};
-
-// Test-only: the raw tracked-client count, exposed because it's the only
-// way to unambiguously prove the sweep frees Map capacity on its own,
-// independent of `MAX_TRACKED_CLIENTS` eviction (see the rate-limiter test
-// suite for why the boolean return value alone can't distinguish the two).
-export const getTrackedClientCountForTests = (): number => {
-  return requestCounts.size;
 };

@@ -1,11 +1,11 @@
 import { ICONS, SIZE } from '@blog/config';
 import { Button } from '@blog/ui/atoms/button';
 import { Icon } from '@blog/ui/atoms/icon';
+import { identitySectionVariants } from '@web/components/pages/account-page/sections/identity-section/identity-section-variants';
 import type {
   IIdentityProviderRow,
   IIdentitySectionViewProps,
-} from '@web/components/pages/account-page/sections/identity-section';
-import { identitySectionVariants } from '@web/components/pages/account-page/sections/identity-section/identity-section-variants';
+} from '@web/components/pages/account-page/sections/identity-section/identity-section-view';
 
 const s = identitySectionVariants();
 

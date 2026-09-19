@@ -28,7 +28,7 @@ export interface IActionGroupProps {
   isOnDark?: boolean;
 }
 
-export const toButtonVariant = (
+const toButtonVariant = (
   variant: TCtaActionVariant,
   appearance: TMaybeUndefined<TCtaActionAppearance>,
 ): TActionButtonVariant => {
@@ -36,7 +36,7 @@ export const toButtonVariant = (
   return variant === CTA_ACTION_VARIANT.PRIMARY ? 'primary' : 'ghost';
 };
 
-export const toIsReversedOnDark = (
+const toIsReversedOnDark = (
   isOnDark: boolean | undefined,
   variant: TActionButtonVariant,
 ): boolean => Boolean(isOnDark) && variant !== 'primary';

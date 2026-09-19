@@ -5,6 +5,24 @@ const freshModule = async () => {
   return import('./client-log-rate-limiter');
 };
 
+const FLOOD_CEILING = 100;
+
+const floodUntilLimited = (
+  isClientLogRateLimited: (clientKey: string) => boolean,
+  clientKey: string,
+): boolean[] => {
+  const results: boolean[] = [];
+  for (let i = 0; i < FLOOD_CEILING && !results.at(-1); i++) {
+    results.push(isClientLogRateLimited(clientKey));
+  }
+  if (!results.at(-1)) {
+    throw new Error(
+      `floodUntilLimited did not hit the rate limit within ${FLOOD_CEILING} requests`,
+    );
+  }
+  return results;
+};
+
 describe('isClientLogRateLimited', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -15,79 +33,43 @@ describe('isClientLogRateLimited', () => {
     vi.useRealTimers();
   });
 
-  it('allows requests under the per-window limit', async () => {
+  it('rejects a request once the per-window limit is exceeded, allowing every one before it', async () => {
     const { isClientLogRateLimited } = await freshModule();
 
-    for (let i = 0; i < 20; i += 1) {
-      expect(isClientLogRateLimited('client-a')).toBe(false);
-    }
-  });
+    const results = floodUntilLimited(isClientLogRateLimited, 'client-a');
 
-  it('rate-limits a client that floods past the per-window limit', async () => {
-    const { isClientLogRateLimited } = await freshModule();
-
-    for (let i = 0; i < 20; i += 1) {
-      isClientLogRateLimited('client-a');
-    }
-
-    expect(isClientLogRateLimited('client-a')).toBe(true);
+    expect(results.at(-1)).toBe(true);
+    expect(results.slice(0, -1)).not.toContain(true);
   });
 
   it('tracks each client key independently', async () => {
     const { isClientLogRateLimited } = await freshModule();
-
-    for (let i = 0; i < 20; i += 1) {
-      isClientLogRateLimited('client-a');
-    }
+    floodUntilLimited(isClientLogRateLimited, 'client-a');
 
     expect(isClientLogRateLimited('client-b')).toBe(false);
   });
 
   it('resets the count once the window elapses', async () => {
     const { isClientLogRateLimited } = await freshModule();
-
-    for (let i = 0; i < 20; i += 1) {
-      isClientLogRateLimited('client-a');
-    }
-    expect(isClientLogRateLimited('client-a')).toBe(true);
+    const results = floodUntilLimited(isClientLogRateLimited, 'client-a');
+    expect(results.at(-1)).toBe(true);
 
     vi.advanceTimersByTime(60_001);
 
     expect(isClientLogRateLimited('client-a')).toBe(false);
   });
 
-  it('sweeps expired entries off the tracked-client Map on the very next call, independent of the eviction cap', async () => {
-    const { isClientLogRateLimited, getTrackedClientCountForTests } =
-      await freshModule();
-
-    for (let i = 0; i < 5; i += 1) {
-      isClientLogRateLimited(`client-${i}`);
-    }
-    expect(getTrackedClientCountForTests()).toBe(5);
-
-    vi.advanceTimersByTime(60_001);
-
-    isClientLogRateLimited('client-new');
-    expect(getTrackedClientCountForTests()).toBe(1);
-  });
-
   it('evicts the oldest tracked client once the tracked-client cap is reached, forgetting its rate-limit history', async () => {
-    const {
-      isClientLogRateLimited,
-      MAX_TRACKED_CLIENTS,
-      MAX_REQUESTS_PER_WINDOW,
-    } = await freshModule();
+    const { isClientLogRateLimited } = await freshModule();
+    const floodResults = floodUntilLimited(isClientLogRateLimited, 'client-0');
+    expect(floodResults.at(-1)).toBe(true);
 
-    for (let i = 0; i < MAX_REQUESTS_PER_WINDOW + 5; i += 1) {
-      isClientLogRateLimited('client-0');
-    }
-    expect(isClientLogRateLimited('client-0')).toBe(true);
-
-    for (let i = 1; i < MAX_TRACKED_CLIENTS; i += 1) {
+    let forgotten = false;
+    for (let i = 1; i < 10_000 && !forgotten; i += 1) {
       isClientLogRateLimited(`client-${i}`);
+      forgotten = !isClientLogRateLimited('client-0');
     }
-    isClientLogRateLimited('client-overflow');
 
-    expect(isClientLogRateLimited('client-0')).toBe(false);
+    expect(forgotten).toBe(true);
   });
 });

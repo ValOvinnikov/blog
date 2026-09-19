@@ -3,23 +3,23 @@ import type { IToastAction } from '@blog/ui/molecules/toast';
 import type { ReactNode } from 'react';
 
 /** Visible-slot cap (§9) — a 5th toast evicts the oldest non-error toast. */
-export const TOAST_QUEUE_CAP = 4;
+const TOAST_QUEUE_CAP = 4;
 
 /** Default auto-dismiss life per type, in ms (§9) — `undefined` = sticky. */
-export const TOAST_DEFAULT_LIFE_MS: Partial<Record<TToastType, number>> = {
+const TOAST_DEFAULT_LIFE_MS: Partial<Record<TToastType, number>> = {
   [TOAST_TYPE.SUCCESS]: 3600,
   [TOAST_TYPE.INFO]: 3600,
   [TOAST_TYPE.WARNING]: 5000,
 };
 
 /** Grace period before a pending `toast.promise` shows a `loading` toast (§4.6). */
-export const TOAST_PROMISE_GRACE_MS = 400;
+const TOAST_PROMISE_GRACE_MS = 400;
 
 /** Counter-merge window for identical success/info toasts (§4.2/§9). */
-export const TOAST_MERGE_WINDOW_MS = 1000;
+const TOAST_MERGE_WINDOW_MS = 1000;
 
 /** Exit-animation fallback before a `leaving` toast is actually removed (§5). */
-export const TOAST_EXIT_ANIMATION_MS = 360;
+const TOAST_EXIT_ANIMATION_MS = 360;
 
 export interface IToastPayload {
   /** Short label shown beside the type icon — omit for a message-only toast. */
