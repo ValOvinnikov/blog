@@ -1,6 +1,5 @@
 import { toTitleCase } from '@blog/utils/primitives';
 
-/** Builds a module's preview subtitle: its brand variant, then any module-specific detail, separated by a middle dot. */
 export const moduleSubtitle = (
   brandVariant: unknown,
   ...details: (string | undefined)[]

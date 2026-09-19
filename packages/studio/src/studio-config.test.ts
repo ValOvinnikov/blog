@@ -3,12 +3,6 @@ import type { DocumentActionComponent, DocumentActionsContext } from 'sanity';
 
 import { buildStudioConfig } from './studio-config';
 
-// `sanity/structure`, `sanity-plugin-media`, `@sanity/vision` and
-// `@sanity/code-input` pull in the Studio's UI dependency tree (down to
-// `@sanity-labs/ui-poc`'s bundled CSS), which Node's loader can't parse
-// under Vitest — mock them rather than load the real Studio UI for a test
-// that only asserts config wiring. `vi.mock` calls are hoisted above the
-// import above by Vitest's transform.
 vi.mock('sanity/structure', () => ({
   structureTool: (options: unknown) => ({ name: 'structureTool', options }),
 }));

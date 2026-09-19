@@ -50,10 +50,6 @@ export const topicPageSchema = defineType({
   ],
   fields: [
     titleField(),
-    // Sanity's default slug `isUnique` check — scoped to this document type
-    // — is exactly the scope this field needs: /topics/{slug} collisions
-    // only matter within page_topic itself, never against page_landing's
-    // /{slug}. No custom `isUnique` is needed on top of it.
     slugField({
       description: 'URL path segment — auto-generated from title.',
       previewInput: topicSlugUrlPreviewInput,

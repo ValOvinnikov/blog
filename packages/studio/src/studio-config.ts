@@ -46,8 +46,6 @@ export const buildStudioConfig = ({
       types: schemaTypes,
     },
 
-    // migrationState is a system ledger, not authorable content — never
-    // creatable/editable and never listed in the new-document menu.
     document: {
       actions: (prev, { schemaType }) =>
         schemaType === migrationStateSchema.name ? [] : prev,

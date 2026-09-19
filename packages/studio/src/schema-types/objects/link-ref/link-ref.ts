@@ -2,10 +2,6 @@ import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
 import { Link2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
-/**
- * A single reference to a `link` document — the generic wrapper for any
- * field or annotation that points at a reusable link.
- */
 export const linkRefSchema = defineType({
   name: 'linkRef',
   title: 'Link',

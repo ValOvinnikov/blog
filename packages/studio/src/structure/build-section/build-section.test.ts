@@ -329,7 +329,7 @@ describe(buildSections, () => {
     expect(S.list).toHaveBeenCalledTimes(1);
   });
 
-  it('skips the middle list and children straight into the document list when flattenSingleItem is set on a single non-singleton item', () => {
+  it('skips the middle list and children straight into the document list when flattenSingleItem is set on a single non-singleton item, keeping the section title rather than the item schema title', () => {
     const S = makeMockStructureBuilder();
     const result = buildOneSection(S, {
       title: 'Links',
