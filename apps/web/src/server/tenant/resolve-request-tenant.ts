@@ -6,9 +6,9 @@ import { resolveTenant, resolveTenantById } from './resolve-tenant';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from './unresolved-tenant-placeholder';
 
 /**
- * resolveRequestTenant — the single per-request tenant lookup, deduped via
- * `cache()`, that every tenant helper needing the full row (not just the id)
- * builds on. Prefers an explicitly supplied `tenant` id (the `[tenant]`
+ * The single per-request tenant lookup, deduped via `cache()`, that every
+ * tenant helper needing the full row (not just the id) builds on. Prefers
+ * an explicitly supplied `tenant` id (the `[tenant]`
  * route param, threaded down from a page/layout/metadata builder that
  * already has it) over reading `Host` — reading `Host` is what makes a
  * route dynamic. Never resolves from the `x-tenant-id` header `proxy.ts`

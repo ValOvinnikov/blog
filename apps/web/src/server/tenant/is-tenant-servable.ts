@@ -3,10 +3,10 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
 
 /**
- * isTenantServable — the read-side gate `resolveTenant()` applies to a
- * matched tenant row: an archived tenant, or one still mid-provisioning
- * with no Sanity project/dataset/read token persisted yet, must never be
- * resolved as though it were ready to serve content. In production, a
+ * The read-side gate `resolveTenant()` applies to a matched tenant row: an
+ * archived tenant, or one still mid-provisioning with no Sanity
+ * project/dataset/read token persisted yet, must never be resolved as
+ * though it were ready to serve content. In production, a
  * tenant whose provisioning hasn't reached `READY` is refused too, even if
  * credentials are present — a failed or interrupted run can leave a tenant
  * with credentials but no content (e.g. no `settings_site`), which must

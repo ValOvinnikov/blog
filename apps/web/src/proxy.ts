@@ -85,9 +85,6 @@ export default async function proxy(
     return new NextResponse(null, { status: 404 });
   }
 
-  // Root-level metadata/feed routes (sitemap.xml, robots.txt, rss.xml,
-  // favicon.ico, per-tag rss feeds) resolve their own tenant from `Host` and
-  // are never rewritten — the guard above already ran on them.
   if (DOTTED_PATH_PATTERN.test(pathname)) {
     request.headers.delete(TENANT_ID_HEADER);
     return NextResponse.next({ request: { headers: request.headers } });

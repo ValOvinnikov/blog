@@ -60,8 +60,7 @@ export const unlinkProviderAction = async (
 };
 
 /**
- * `DisplayNameControl`'s server write. Reads the session itself rather than
- * trusting a caller-supplied `userId`. `queries.account.updateDisplayName`
+ * `DisplayNameControl`'s server write. `queries.account.updateDisplayName`
  * performs no validation of its own, so this trims `name` and rejects an
  * empty result before ever reaching the database.
  */
