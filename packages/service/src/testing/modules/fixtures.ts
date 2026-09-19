@@ -16,15 +16,8 @@ import {
   TAXONOMY_SORT,
 } from '@blog/config';
 import type { TRawContentModule } from '@blog/service/features/modules/content/adaptor/transformer';
-import type {
-  TRawCtaContentBlock,
-  TRawCtaContentMarkDef,
-  TRawCtaModule,
-} from '@blog/service/features/modules/cta/adaptor/transformer';
-import type {
-  TRawFeatureListItem,
-  TRawFeatureListModule,
-} from '@blog/service/features/modules/feature-list/adaptor/transformer';
+import type { TRawCtaModule } from '@blog/service/features/modules/cta/adaptor/transformer';
+import type { TRawFeatureListModule } from '@blog/service/features/modules/feature-list/adaptor/transformer';
 import type { TRawHeroModule } from '@blog/service/features/modules/hero/adaptor/transformer';
 import type { TRawHeroBlogModule } from '@blog/service/features/modules/hero-blog/adaptor/transformer';
 import type { TRawHeroProfileModule } from '@blog/service/features/modules/hero-profile/adaptor/transformer';
@@ -34,15 +27,21 @@ import type { TRawPostFeaturedModule } from '@blog/service/features/modules/post
 import type { TRawPostLatestModule } from '@blog/service/features/modules/post-latest/adaptor/transformer';
 import type { TRawPostListModule } from '@blog/service/features/modules/post-list/adaptor/transformer';
 import type { TRawPostRelatedModule } from '@blog/service/features/modules/post-related/adaptor/transformer';
-import type {
-  TRawTaxonomyEntry,
-  TRawTaxonomyListModule,
-} from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
+import type { TRawTaxonomyListModule } from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
 import type { TRawCtaButton } from '@blog/service/shared/transformers/to-cta-button';
 import {
   makeRawHeadingBlock,
   makeRawPortableTextMarkDef,
 } from '@blog/service/testing/shared/fixtures';
+
+type TRawCtaContentBlock = NonNullable<TRawCtaModule['content']>[number];
+type TRawCtaContentMarkDef = NonNullable<
+  TRawCtaContentBlock['markDefs']
+>[number];
+type TRawFeatureListItem = NonNullable<
+  TRawFeatureListModule['features']
+>[number];
+type TRawTaxonomyEntry = NonNullable<TRawTaxonomyListModule['entries']>[number];
 
 export function makeRawHeroModule(
   overrides: Partial<TRawHeroModule> = {},

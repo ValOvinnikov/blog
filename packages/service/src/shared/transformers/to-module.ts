@@ -24,7 +24,7 @@ export function toModule<T extends TModuleType = TModuleType>(
   };
 }
 
-export class InvalidHeroModuleTypeError extends Error {
+class InvalidHeroModuleTypeError extends Error {
   readonly code = 'INVALID_HERO_MODULE_TYPE' as const;
 
   constructor(type: string) {
