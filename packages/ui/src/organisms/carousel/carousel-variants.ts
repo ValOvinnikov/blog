@@ -25,9 +25,30 @@ export const carouselVariants = tv({
         ],
       },
     },
+    perView: {
+      1: {
+        slide: ['basis-full'],
+      },
+      2: {
+        slide: [
+          'basis-[85%]',
+          'sm:basis-[calc(50%-0.4375rem)]',
+          'md:basis-[calc(50%-0.625rem)]',
+          'lg:basis-[calc(50%-0.875rem)]',
+        ],
+      },
+      3: {
+        slide: [
+          'basis-[85%]',
+          'md:basis-[calc(33.333%-0.8333rem)]',
+          'lg:basis-[calc(33.333%-1.1667rem)]',
+        ],
+      },
+    },
   },
   defaultVariants: {
     isEnhanced: false,
+    perView: 3,
   },
 });
 

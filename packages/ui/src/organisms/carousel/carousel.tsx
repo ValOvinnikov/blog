@@ -10,7 +10,7 @@ import { Icon } from '@blog/ui/atoms/icon';
 import { IconButton } from '@blog/ui/atoms/icon-button';
 import type { Key, ReactNode } from 'react';
 
-import { carouselVariants } from './carousel-variants';
+import { carouselVariants, type TCarouselVariants } from './carousel-variants';
 import { useCarousel } from './use-carousel';
 
 export interface ICarouselProps<T> extends IWithClassName, IWithDataTestId {
@@ -22,6 +22,7 @@ export interface ICarouselProps<T> extends IWithClassName, IWithDataTestId {
   previousLabel: string;
   nextLabel: string;
   tone?: TBrandVariant;
+  perView?: TCarouselVariants['perView'];
 }
 
 /** A generic swipeable row of slides. */
@@ -34,6 +35,7 @@ export const Carousel = <T,>({
   previousLabel,
   nextLabel,
   tone = BRAND_VARIANT.PRIMARY,
+  perView,
   className,
   dataTestId,
 }: ICarouselProps<T>) => {
@@ -49,7 +51,8 @@ export const Carousel = <T,>({
     scrollNext,
   } = useCarousel();
 
-  const s = carouselVariants({ isEnhanced });
+  const s = carouselVariants({ isEnhanced, perView });
+  const hasNothingToScroll = isPreviousDisabled && isNextDisabled;
 
   return (
     <div
@@ -73,30 +76,32 @@ export const Carousel = <T,>({
           ))}
         </ul>
       </div>
-      <div className={s.controls()}>
-        <IconButton
-          ref={previousButtonRef}
-          ariaLabel={previousLabel}
-          title={previousLabel}
-          onClick={scrollPrev}
-          isDisabled={isPreviousDisabled}
-          variant="control"
-          tone={tone}
-        >
-          <Icon name={ICONS.CHEVRON_LEFT} size={SIZE.SM} />
-        </IconButton>
-        <IconButton
-          ref={nextButtonRef}
-          ariaLabel={nextLabel}
-          title={nextLabel}
-          onClick={scrollNext}
-          isDisabled={isNextDisabled}
-          variant="control"
-          tone={tone}
-        >
-          <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
-        </IconButton>
-      </div>
+      {!hasNothingToScroll && (
+        <div className={s.controls()}>
+          <IconButton
+            ref={previousButtonRef}
+            ariaLabel={previousLabel}
+            title={previousLabel}
+            onClick={scrollPrev}
+            isDisabled={isPreviousDisabled}
+            variant="control"
+            tone={tone}
+          >
+            <Icon name={ICONS.CHEVRON_LEFT} size={SIZE.SM} />
+          </IconButton>
+          <IconButton
+            ref={nextButtonRef}
+            ariaLabel={nextLabel}
+            title={nextLabel}
+            onClick={scrollNext}
+            isDisabled={isNextDisabled}
+            variant="control"
+            tone={tone}
+          >
+            <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
+          </IconButton>
+        </div>
+      )}
     </div>
   );
 };

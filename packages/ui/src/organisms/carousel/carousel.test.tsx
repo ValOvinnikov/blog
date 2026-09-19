@@ -190,6 +190,47 @@ describe(`<${Carousel.name}/>`, () => {
     }
   });
 
+  it('applies the perView=3 basis classes by default, subtracting the track gap at each breakpoint', () => {
+    renderCarousel({ items: ['Slide one'] });
+
+    const [slide] = screen.getAllByRole('listitem');
+    expect(slide).toHaveClass(
+      'basis-[85%]',
+      'md:basis-[calc(33.333%-0.8333rem)]',
+      'lg:basis-[calc(33.333%-1.1667rem)]',
+    );
+  });
+
+  it('applies the perView=1 basis-full class', () => {
+    renderCarousel({ items: ['Slide one'], perView: 1 });
+
+    const [slide] = screen.getAllByRole('listitem');
+    expect(slide).toHaveClass('basis-full');
+  });
+
+  it('applies the perView=2 basis classes, subtracting the track gap at each breakpoint', () => {
+    renderCarousel({ items: ['Slide one'], perView: 2 });
+
+    const [slide] = screen.getAllByRole('listitem');
+    expect(slide).toHaveClass(
+      'basis-[85%]',
+      'sm:basis-[calc(50%-0.4375rem)]',
+      'md:basis-[calc(50%-0.625rem)]',
+      'lg:basis-[calc(50%-0.875rem)]',
+    );
+  });
+
+  it('still applies slideClassName alongside the perView basis classes', () => {
+    renderCarousel({
+      items: ['Slide one'],
+      perView: 1,
+      slideClassName: 'shadow-lg',
+    });
+
+    const [slide] = screen.getAllByRole('listitem');
+    expect(slide).toHaveClass('basis-full', 'shadow-lg');
+  });
+
   it('forwards data-testid to the root element', () => {
     renderCarousel({ dataTestId: 'posts-carousel' });
 
@@ -305,6 +346,34 @@ describe(`<${Carousel.name}/>`, () => {
     emitEvent('reInit');
 
     expect(getNavButtons().next).toBeDisabled();
+  });
+
+  it('hides the controls row once neither direction can scroll', () => {
+    renderCarousel();
+
+    emblaApi.canScrollPrev.mockReturnValue(false);
+    emblaApi.canScrollNext.mockReturnValue(false);
+    emitEvent('select');
+
+    expect(
+      screen.queryByRole('button', { name: previousLabel }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: nextLabel }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows the controls row again once a direction becomes scrollable', () => {
+    renderCarousel();
+
+    emblaApi.canScrollPrev.mockReturnValue(false);
+    emblaApi.canScrollNext.mockReturnValue(false);
+    emitEvent('select');
+
+    emblaApi.canScrollNext.mockReturnValue(true);
+    emitEvent('select');
+
+    expect(getNavButtons().next).toBeEnabled();
   });
 
   it("configures Embla with the design's fixed options", () => {

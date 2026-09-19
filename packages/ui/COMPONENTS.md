@@ -293,8 +293,8 @@ Variants: columns: 1|2|3|4
 ### Carousel — `organisms/carousel/carousel.tsx`
 
 A generic swipeable row of slides.
-Props: items: readonly T[] · renderItem: (args: { item: T; index: number }) => ReactNode · getItemKey?: (args: { item: T; index: number }) => Key · slideClassName?: string · ariaLabel: string · previousLabel: string · nextLabel: string · tone?: TBrandVariant _(extends IWithClassName, IWithDataTestId)_
-Variants: isEnhanced: (boolean)
+Props: items: readonly T[] · renderItem: (args: { item: T; index: number }) => ReactNode · getItemKey?: (args: { item: T; index: number }) => Key · slideClassName?: string · ariaLabel: string · previousLabel: string · nextLabel: string · tone?: TBrandVariant · perView?: TCarouselVariants['perView'] _(extends IWithClassName, IWithDataTestId)_
+Variants: isEnhanced: (boolean) · perView: 1|2|3
 
 ### ContentModule — `organisms/content-module/content-module.tsx`
 

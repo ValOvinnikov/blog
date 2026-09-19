@@ -53,6 +53,10 @@ const meta = {
       control: 'select',
       options: Object.values(BRAND_VARIANT),
     },
+    perView: {
+      control: 'select',
+      options: [1, 2, 3],
+    },
   },
   args: {
     ariaLabel: 'Latest posts',
@@ -60,7 +64,6 @@ const meta = {
     nextLabel: 'Next slide',
     items: buildItems(3),
     renderItem: renderSampleItem,
-    slideClassName: 'basis-[85%] sm:basis-1/2 md:basis-1/3',
   },
 } satisfies Meta<typeof Carousel<TSampleItem>>;
 
@@ -75,15 +78,36 @@ export const RowThatScrolls: TStory = {
   },
 };
 
+export const PerViewOne: TStory = {
+  args: {
+    items: buildItems(4),
+    perView: 1,
+  },
+};
+
+export const PerViewTwo: TStory = {
+  args: {
+    items: buildItems(6),
+    perView: 2,
+  },
+};
+
 export const WithPlainImages: TStory = {
   render: () => (
     <Carousel
       items={buildImageItems(6)}
       renderItem={renderImageItem}
-      slideClassName="basis-full"
+      perView={1}
       ariaLabel="Latest posts"
       previousLabel="Previous slide"
       nextLabel="Next slide"
     />
   ),
+};
+
+export const WithoutEnoughSlidesToScroll: TStory = {
+  args: {
+    items: buildItems(2),
+    perView: 3,
+  },
 };
