@@ -12,14 +12,6 @@ import { drizzle } from 'drizzle-orm/pglite';
 
 const BACKFILL_MIGRATION = '0024_faithful_kree.sql';
 
-// Regression coverage for the same bug class as
-// admins-granted-via-migration.test.ts/tenants-name-migration.test.ts/
-// bookmarks-subscribers-tenant-id-migration.test.ts: adding a NOT NULL
-// UNIQUE column with no default against a table that can already have rows.
-// A single shared default would satisfy NOT NULL but immediately violate
-// UNIQUE, so this proves the nullable-add -> per-row backfill -> SET NOT
-// NULL -> UNIQUE sequence actually gives every pre-existing row its own
-// distinct value rather than a constant.
 describe('0024_faithful_kree (subscribers unsubscribe_token backfill)', () => {
   it(
     'backfills every pre-existing subscriber row with a distinct, non-null unsubscribe_token',
@@ -36,12 +28,6 @@ describe('0024_faithful_kree (subscribers unsubscribe_token backfill)', () => {
         await applyMigrationFile(db, file);
       }
 
-      // Raw SQL rather than `insertTestTenant`/`db.insert(schema.tenants)` —
-      // the current schema's `tenants` table carries columns added by
-      // migrations later than this one (e.g. `deprovisioning_steps`), which a
-      // typed insert against a database only migrated up to this point would
-      // reference before it exists (see
-      // bookmarks-subscribers-tenant-id-migration.test.ts).
       const insertedTenant = await db.execute<{ id: string }>(
         sql.raw(
           `insert into "tenants" ("name", "primary_domain", "locale", "plan", "status") values ('Acme', 'acme.example.com', 'en', 'FREE', 'ACTIVE') returning "id"`,
@@ -50,9 +36,6 @@ describe('0024_faithful_kree (subscribers unsubscribe_token backfill)', () => {
       const tenant = insertedTenant.rows[0];
       if (!tenant) throw new Error('failed to seed a tenant row');
 
-      // The `subscribers` shape before this migration: no
-      // `unsubscribe_token` column yet, matching rows created before this
-      // migration ever ran.
       await db.execute(
         sql.raw(`
         insert into "subscribers"

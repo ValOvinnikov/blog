@@ -316,7 +316,6 @@ describe(runSteps, () => {
       token: 'sanity-token',
       projectId: 'proj-abc',
     });
-    // Un-archiving happens before the first step reports RUNNING.
     const [unarchiveCallOrder] =
       unarchiveSanityProjectMock.mock.invocationCallOrder;
     const [firstReportCallOrder] =

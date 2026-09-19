@@ -3,8 +3,6 @@ import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { and, eq, isNull } from 'drizzle-orm';
 
 export type TGetTenantByIdOptions = {
-  // A deprovisioned tenant's id stays valid for lookup by callers that must
-  // see it regardless — e.g. a platform operator viewing an archived tenant.
   includeArchived?: boolean;
 };
 

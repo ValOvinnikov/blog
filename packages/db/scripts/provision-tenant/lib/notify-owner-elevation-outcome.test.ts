@@ -7,9 +7,6 @@ const { notifyOperatorsOfOwnerElevationOutcomeMock } = vi.hoisted(() => ({
   notifyOperatorsOfOwnerElevationOutcomeMock: vi.fn(),
 }));
 
-// `isNotifiableOutcome` is left as the real implementation — only the send
-// itself is mocked — so this file exercises the actual notifiability check
-// this module runs, not a stubbed stand-in for it.
 vi.mock(
   '../../recheck-tenant-owners/lib/notify-operators',
   async (importOriginal) => {

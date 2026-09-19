@@ -162,8 +162,6 @@ describe(runRecheck, () => {
     });
     expect(elevateTenantOwnerMock).toHaveBeenCalledTimes(3);
     expect(hasSystemicFailures(summary)).toBe(true);
-    // The throwing candidate (t2) never reaches `reportOwnerElevationOutcome`
-    // — only the two that resolved do.
     expect(reportOwnerElevationOutcomeMock).toHaveBeenCalledTimes(2);
     expect(reportOwnerElevationOutcomeMock).toHaveBeenCalledWith(
       't1',

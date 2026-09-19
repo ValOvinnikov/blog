@@ -8,14 +8,6 @@ import { runSteps } from '../provision-tenant/run';
 
 import { runRecheck } from './run';
 
-/**
- * Exercises `provision-tenant/run.ts` and `recheck-tenant-owners/run.ts`
- * together, against the same tenant row in a real Postgres, to cover the
- * de-dup boundary between a provisioning-time owner-elevation notification
- * and the first sweep that follows it — a defect only visible across both
- * entrypoints, never inside either one in isolation.
- */
-
 const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 

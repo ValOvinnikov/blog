@@ -117,8 +117,6 @@ export async function runRecheck(env: TRecheckEnv): Promise<TRecheckSummary> {
   summary.checked = candidates.length;
 
   for (const tenant of candidates) {
-    // Each tenant is independent — one tenant's network/API failure must
-    // never abort the sweep for the rest.
     await recheckOne(tenant, env, summary);
   }
 

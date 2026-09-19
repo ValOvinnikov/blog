@@ -73,10 +73,7 @@ describe(setTenantSanityProject, () => {
     });
   });
 
-  it('rejects for a tenant id that does not exist', async () => {
-    // No row updated; the underlying query resolves without error since a
-    // zero-row UPDATE is not itself a Postgres error — asserting on row
-    // count elsewhere in this file is what actually catches a bad id.
+  it('resolves without updating any row for a tenant id that does not exist', async () => {
     await expect(
       setTenantSanityProject('00000000-0000-0000-0000-000000000000', {
         sanityProjectId: 'abc123',

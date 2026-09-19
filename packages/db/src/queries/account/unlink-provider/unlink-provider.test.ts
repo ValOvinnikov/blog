@@ -84,16 +84,6 @@ describe(unlinkProvider, () => {
     expect(await findAccount(otherUser.id, 'github')).toHaveLength(1);
   });
 
-  // Regression test for the atomic-guard fix: two concurrent calls for the
-  // same user, targeting *different* providers, must never both succeed —
-  // exactly one of them has to win and leave the user with at least one
-  // linked method. A naive JS-level "read count, then delete" would let
-  // both calls read "2 methods linked" before either delete lands and both
-  // proceed, leaving zero. (pglite is a single-connection embedded engine,
-  // so this doesn't exercise genuine cross-connection lock contention the
-  // way two real Postgres connections would — but it still asserts the
-  // invariant this guard exists to protect holds regardless of call order,
-  // and that the `FOR UPDATE` CTE-based SQL executes correctly back-to-back.)
   it('never lets two concurrent calls both remove the last two linked methods', async () => {
     const user = await insertTestUser(db());
     await insertTestAccount(db(), user.id, 'github');

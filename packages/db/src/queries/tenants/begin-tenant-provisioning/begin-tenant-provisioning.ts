@@ -42,10 +42,6 @@ export async function beginTenantProvisioning(
     Date.now() - TENANT_PROVISIONING_RUN_STALE_AFTER_MINUTES * 60_000,
   ).toISOString();
 
-  // `run.admittedAt` (merged below, never touching `startedAt` or any step)
-  // is the concurrency marker; a `FAILED` step or `finishedAt` only counts
-  // as evidence of death when it postdates the current run's own `startedAt`
-  // — otherwise it's residue from an earlier attempt.
   const runIsNotLive = sql`(
     ${tenants.provisioningSteps} IS NOT NULL
     AND (
