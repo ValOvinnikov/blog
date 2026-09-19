@@ -55,6 +55,7 @@ export const HeroProfileModuleView = ({
       layout={layout}
       dataTestId={`hero-profile-module-${id}`}
       ctaButtons={ctaButtons}
+      sanityImage={undefined}
     >
       {variant === HERO_VARIANT.STACKED && (
         <Hero.Avatar>

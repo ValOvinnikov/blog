@@ -27,7 +27,7 @@ export interface IHeroModuleShellProps extends IWithDataTestId {
   mediaOrder: TMaybeUndefined<TMediaOrder>;
   layout: TMaybeUndefined<TLayout>;
   ctaButtons: TCtaButton[];
-  sanityImage?: TMaybeUndefined<ISanityImage>;
+  sanityImage: TMaybeUndefined<ISanityImage>;
   children?: THeroProps['children'];
 }
 
