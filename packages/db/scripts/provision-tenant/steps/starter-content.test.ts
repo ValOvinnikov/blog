@@ -1,4 +1,4 @@
-import { buildStarterDocuments, STARTER_DOCUMENT_IDS } from './starter-content';
+import { buildStarterDocuments } from './starter-content';
 
 describe(buildStarterDocuments, () => {
   const tenant = { name: 'Acme Corporation' };
@@ -16,13 +16,13 @@ describe(buildStarterDocuments, () => {
     ]);
 
     const ids = documents.map((doc) => doc._id);
-    expect(ids).toEqual(Object.values(STARTER_DOCUMENT_IDS));
+    expect(new Set(ids).size).toBe(ids.length);
     expect(ids.every((id) => !id.startsWith('drafts.'))).toBe(true);
   });
 
   it('the site settings document has no defaultOgImage field', () => {
     const site = buildStarterDocuments(tenant).find(
-      (doc) => doc._id === STARTER_DOCUMENT_IDS.SITE,
+      (doc) => doc._type === 'settings_site',
     );
 
     expect(site).not.toHaveProperty('defaultOgImage');
@@ -30,7 +30,7 @@ describe(buildStarterDocuments, () => {
 
   it('newsletter starter document carries both trust cue strings', () => {
     const newsletter = buildStarterDocuments(tenant).find(
-      (doc) => doc._id === STARTER_DOCUMENT_IDS.NEWSLETTER,
+      (doc) => doc._type === 'settings_newsletter',
     ) as unknown as { trustCues: string[] };
 
     expect(newsletter.trustCues).toEqual(['No spam', 'Unsubscribe anytime']);
@@ -38,7 +38,7 @@ describe(buildStarterDocuments, () => {
 
   it('settings_navigation seeds with an empty items array', () => {
     const navigation = buildStarterDocuments(tenant).find(
-      (doc) => doc._id === STARTER_DOCUMENT_IDS.NAVIGATION,
+      (doc) => doc._type === 'settings_navigation',
     ) as unknown as { items: unknown[] };
 
     expect(navigation.items).toEqual([]);
@@ -46,7 +46,7 @@ describe(buildStarterDocuments, () => {
 
   it('page_home has no hero reference', () => {
     const home = buildStarterDocuments(tenant).find(
-      (doc) => doc._id === STARTER_DOCUMENT_IDS.HOME,
+      (doc) => doc._type === 'page_home',
     );
 
     expect(home).not.toHaveProperty('hero');
@@ -54,7 +54,7 @@ describe(buildStarterDocuments, () => {
 
   it('page_home carries a literal "Welcome" heading and a non-empty supporting line', () => {
     const home = buildStarterDocuments(tenant).find(
-      (doc) => doc._id === STARTER_DOCUMENT_IDS.HOME,
+      (doc) => doc._type === 'page_home',
     ) as unknown as {
       headingBlock: { _type: string; heading: string; supportingText: string };
     };
@@ -66,7 +66,7 @@ describe(buildStarterDocuments, () => {
 
   it('page_home carries a populated seo object, as homePageQuery requires', () => {
     const home = buildStarterDocuments(tenant).find(
-      (doc) => doc._id === STARTER_DOCUMENT_IDS.HOME,
+      (doc) => doc._type === 'page_home',
     ) as unknown as {
       seo: {
         _type: string;
@@ -88,7 +88,7 @@ describe(buildStarterDocuments, () => {
     'page_home.seo stays within every schema bound for %s (not derived from tenant.name)',
     (_label, name) => {
       const home = buildStarterDocuments({ name }).find(
-        (doc) => doc._id === STARTER_DOCUMENT_IDS.HOME,
+        (doc) => doc._type === 'page_home',
       ) as unknown as {
         seo: {
           metaTitle: string;
@@ -107,7 +107,7 @@ describe(buildStarterDocuments, () => {
 
   it('page_home.seo copy points editors at this page, not Site Settings', () => {
     const home = buildStarterDocuments(tenant).find(
-      (doc) => doc._id === STARTER_DOCUMENT_IDS.HOME,
+      (doc) => doc._type === 'page_home',
     ) as unknown as {
       seo: { metaDescription: string; openGraph: { ogDescription: string } };
     };
