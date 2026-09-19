@@ -43,6 +43,7 @@
   },
   "devDependencies": {
     "@blog/eslint-config": "workspace:*",
+    "@blog/next-config": "workspace:*",
     "@blog/prettier-config": "workspace:*",
     "@blog/tsconfig": "workspace:*",
     "@blog/vitest-config": "workspace:*",
@@ -59,7 +60,6 @@
     "prettier": "catalog:",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "typescript": "catalog:",
-    "vite-plugin-svgr": "catalog:",
     "vitest": "catalog:"
   }
 }

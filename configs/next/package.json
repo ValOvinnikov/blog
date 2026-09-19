@@ -1,5 +1,5 @@
 {
-  "name": "@blog/vitest-config",
+  "name": "@blog/next-config",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -10,12 +10,12 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@vitejs/plugin-react": "^6.1.1",
-    "vite-plugin-svgr": "catalog:",
-    "vitest": "catalog:"
+    "next": "^16.3.3",
+    "next-intl": "^4.13.2"
   },
   "devDependencies": {
     "@blog/eslint-config": "workspace:*",
+    "@types/node": "^26",
     "eslint": "catalog:"
   }
 }

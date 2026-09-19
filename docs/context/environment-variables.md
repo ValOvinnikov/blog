@@ -178,7 +178,8 @@ Mechanics and the CI wiring are in
   declares the `configs/*` presets it reads via `inputs` using the
   `$TURBO_ROOT$` microsyntax (repo-root-relative, cross-package): `lint` ←
   `configs/eslint`, `type-check` ← `configs/tsconfig`, `test` ← `configs/vitest`,
-  `build`/`storybook:build` ← `configs/tsconfig` + `configs/tailwind`. Without
+  `build` ← `configs/tsconfig` + `configs/tailwind` + `configs/next`,
+  `storybook:build` ← `configs/tsconfig` + `configs/tailwind`. Without
   this, editing a preset (e.g. `configs/eslint/base.js`) left `lint` a
   `FULL TURBO` cache hit against stale rules. The tasks that actually needed the
   fix are `lint` and `storybook:build` — the two with **no** `dependsOn: ["^…"]`,
