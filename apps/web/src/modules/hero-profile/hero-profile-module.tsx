@@ -12,10 +12,6 @@ export interface IHeroProfileModuleProps {
   tenant: string;
 }
 
-/**
- * HeroProfileModule — fetches `module_heroProfile` data and hands it to
- * `HeroProfileModuleView`.
- */
 export const HeroProfileModule = async ({
   id,
   tenant,
