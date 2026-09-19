@@ -1,14 +1,7 @@
-const DRAFTS_PREFIX = 'drafts.';
+import { withPrefix } from '../lib/with-prefix';
+
 const PAGE_TAG_PREFIX = 'page_tag-';
 const POST_LIST_PREFIX = 'postList-tag-';
-
-const withPrefix = (id: string, prefix: string): string => {
-  const isDraft = id.startsWith(DRAFTS_PREFIX);
-  const bare = isDraft ? id.slice(DRAFTS_PREFIX.length) : id;
-  const prefixed = bare.startsWith(prefix) ? bare : `${prefix}${bare}`;
-
-  return isDraft ? `${DRAFTS_PREFIX}${prefixed}` : prefixed;
-};
 
 /** Fixed `page_tag` id derived from the `blog_tag` it represents. */
 export const toPageTagId = (tagId: string): string =>

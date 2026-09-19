@@ -44,6 +44,8 @@ import {
   type NodePatch,
 } from 'sanity/migrate';
 
+import { resolveEntityTitle } from '../lib/resolve-entity-title';
+
 const PAGE_TAG_TYPE = 'page_tag';
 const PAGE_TOPIC_TYPE = 'page_topic';
 const PAGE_HOME_TYPE = 'page_home';
@@ -65,7 +67,6 @@ type TPageTagDoc = THeadingBlockDoc & { tag?: { _ref?: string } };
 type TPageTopicDoc = THeadingBlockDoc & { topic?: { _ref?: string } };
 type TPageHomeDoc = THeadingBlockDoc & { hero?: { _ref?: string } };
 
-type TEntityDoc = { title?: string };
 type THeroDoc = { _type?: string; heroTitle?: string; heading?: string };
 type TOwningPageDoc = {
   _type?: string;
@@ -81,20 +82,6 @@ export const toHeadingMutations = (heading: string): NodePatch[] => [
 
 export const toPublishedId = (id: string): string =>
   id.startsWith(DRAFTS_PREFIX) ? id.slice(DRAFTS_PREFIX.length) : id;
-
-export const resolveEntityTitle = async (
-  context: MigrationContext,
-  ref: string | undefined,
-): Promise<string | undefined> => {
-  if (!ref) return undefined;
-
-  const entity = await context.client.fetch<TEntityDoc | null>(
-    '*[_id == $ref][0]{ title }',
-    { ref },
-  );
-
-  return entity?.title?.trim() || undefined;
-};
 
 /**
  * The hero's own title field differs by type — `module_hero` stores it as
