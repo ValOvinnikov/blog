@@ -3,11 +3,9 @@
 import { ALERT_TYPE } from '@blog/config';
 import { VoiceFieldGroup } from '@platform/components/features/voice/voice-field-group';
 import { Alert } from '@platform/components/shared/alert';
-import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
-import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { Disclosure } from '@platform/components/shared/disclosure';
-import { PageHeader } from '@platform/components/shared/page-header';
+import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
 import { useToast } from '@platform/context/toast-provider';
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import {
@@ -76,43 +74,26 @@ export const VoiceSettings = ({
       },
     });
 
-  const { root, alert, advancedBody } = voiceSettingsVariants();
+  const { advancedBody } = voiceSettingsVariants();
 
   const handleFieldChange = (key: TVoiceOverrideKey, value: string) => {
     setValues((prev) => ({ ...prev, [key]: value }));
   };
 
   return (
-    <div className={root()}>
-      <PageHeader
-        title={t('heading')}
-        description={t('description')}
-        actions={
-          <Button
-            variant="primary"
-            onClick={handleSubmit}
-            isDisabled={isArchived}
-            isPending={isPending}
-            pendingLabel={t('savingButton')}
-            aria-describedby={isArchived ? archivedNoticeId : undefined}
-          >
-            {t('saveButton')}
-          </Button>
-        }
-      />
-
-      {archivedAt && (
-        <ArchivedTenantNotice id={archivedNoticeId} archivedAt={archivedAt} />
-      )}
-
-      {status === 'error' && (
-        <Alert
-          type={ALERT_TYPE.ERROR}
-          title={t('alertError')}
-          className={alert()}
-        />
-      )}
-
+    <SettingsFormShell
+      title={t('heading')}
+      description={t('description')}
+      saveButtonLabel={t('saveButton')}
+      savingButtonLabel={t('savingButton')}
+      onSave={handleSubmit}
+      isSaveDisabled={isArchived}
+      isPending={isPending}
+      archivedAt={archivedAt}
+      archivedNoticeId={archivedNoticeId}
+      hasError={status === 'error'}
+      errorTitle={t('alertError')}
+    >
       <Card>
         <Card.Header title={t('basicHeading')} headingLevel={2} />
         <Card.Body>
@@ -140,6 +121,6 @@ export const VoiceSettings = ({
           ))}
         </div>
       </Disclosure>
-    </div>
+    </SettingsFormShell>
   );
 };

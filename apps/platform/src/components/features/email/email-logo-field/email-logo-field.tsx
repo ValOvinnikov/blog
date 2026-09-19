@@ -1,8 +1,6 @@
 'use client';
 
-import { ALERT_TYPE, SIZE } from '@blog/config';
-import { Alert } from '@platform/components/shared/alert';
-import { Button } from '@platform/components/shared/button';
+import { AssetUploadField } from '@platform/components/shared/asset-upload-field';
 import { clearEmailLogoAction } from '@platform/server/email/clear-email-logo-action';
 import { uploadEmailLogoAction } from '@platform/server/email/upload-email-logo-action';
 import {
@@ -10,18 +8,8 @@ import {
   quickClientEmailLogoCheck,
 } from '@platform/utils/email-logo-limits/email-logo-limits';
 import type { TEmailLogoTarget } from '@platform/utils/email-logo-target/email-logo-target';
-import Image from 'next/image';
-import { unstable_rethrow } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import {
-  type AriaAttributes,
-  type ChangeEvent,
-  useRef,
-  useState,
-  useTransition,
-} from 'react';
-
-import { emailLogoFieldVariants } from './email-logo-field-variants';
+import type { AriaAttributes } from 'react';
 
 export type TEmailLogoFieldProps = {
   tenantId: string;
@@ -53,136 +41,37 @@ export const EmailLogoField = ({
   'aria-describedby': ariaDescribedBy,
 }: TEmailLogoFieldProps) => {
   const t = useTranslations('emailLogoField');
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [error, setError] = useState<string | undefined>(undefined);
-  const [isPending, startTransition] = useTransition();
-
-  const {
-    root,
-    top,
-    thumb,
-    thumbImage,
-    text,
-    title,
-    hint: hintSlot,
-    actions,
-    input,
-  } = emailLogoFieldVariants();
-
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.target.value = '';
-    if (!file) return;
-
-    const quickError = quickClientEmailLogoCheck(file);
-    if (quickError) {
-      setError(
-        quickError.key === 'unsupportedType'
-          ? t('unsupportedType')
-          : t('tooLarge', { limit: quickError.limit }),
-      );
-      return;
-    }
-
-    setError(undefined);
-    const formData = new FormData();
-    formData.append('file', file);
-
-    startTransition(async () => {
-      try {
-        const result = await uploadEmailLogoAction(tenantId, target, formData);
-        if (result.ok) {
-          onChange(result.url);
-        } else {
-          setError(result.error);
-        }
-      } catch (thrownError) {
-        unstable_rethrow(thrownError);
-        setError(t('unexpectedError'));
-      }
-    });
-  };
-
-  const handleRemove = () => {
-    setError(undefined);
-    startTransition(async () => {
-      try {
-        const result = await clearEmailLogoAction(tenantId, target);
-        if (result.ok) {
-          onChange(undefined);
-        } else {
-          setError(result.error);
-        }
-      } catch (thrownError) {
-        unstable_rethrow(thrownError);
-        setError(t('unexpectedError'));
-      }
-    });
-  };
-
   const lowerLabel = label.toLowerCase();
 
+  const validateFile = (file: File): string | undefined => {
+    const quickError = quickClientEmailLogoCheck(file);
+    if (!quickError) return undefined;
+    return quickError.key === 'unsupportedType'
+      ? t('unsupportedType')
+      : t('tooLarge', { limit: quickError.limit });
+  };
+
   return (
-    <div className={root()}>
-      <div className={top()}>
-        <span className={thumb()}>
-          {currentUrl ? (
-            <Image
-              src={currentUrl}
-              alt={t('currentAlt', { label: lowerLabel })}
-              fill={true}
-              sizes="48px"
-              className={thumbImage()}
-            />
-          ) : (
-            <span aria-hidden="true">—</span>
-          )}
-        </span>
-        <div className={text()}>
-          <p className={title()}>{label}</p>
-          <p className={hintSlot()}>{hint}</p>
-        </div>
-      </div>
-
-      <div className={actions()}>
-        <input
-          ref={inputRef}
-          type="file"
-          accept={ACCEPTED_EMAIL_LOGO_MIME_TYPES.join(',')}
-          className={input()}
-          onChange={handleFileChange}
-          tabIndex={-1}
-          aria-hidden="true"
-        />
-        <Button
-          type="button"
-          size={SIZE.SM}
-          variant="secondary"
-          onClick={() => inputRef.current?.click()}
-          isDisabled={isPending || isDisabled}
-          aria-describedby={ariaDescribedBy}
-        >
-          {isPending
-            ? t('uploading')
-            : currentUrl
-              ? t('replace', { label: lowerLabel })
-              : t('upload', { label: lowerLabel })}
-        </Button>
-        {currentUrl && (
-          <Button
-            type="button"
-            size={SIZE.SM}
-            variant="ghost"
-            onClick={handleRemove}
-            isDisabled={isPending || isDisabled}
-            aria-describedby={ariaDescribedBy}
-          >
-            {t('remove')}
-          </Button>
-        )}
-      </div>
-
-      {error && <Alert type={ALERT_TYPE.ERROR} title={error} />}
-    </div>
+    <AssetUploadField
+      label={label}
+      hint={hint}
+      currentUrl={currentUrl}
+      currentAlt={t('currentAlt', { label: lowerLabel })}
+      acceptedMimeTypes={ACCEPTED_EMAIL_LOGO_MIME_TYPES}
+      uploadLabel={
+        currentUrl
+          ? t('replace', { label: lowerLabel })
+          : t('upload', { label: lowerLabel })
+      }
+      uploadingLabel={t('uploading')}
+      removeLabel={t('remove')}
+      unexpectedErrorLabel={t('unexpectedError')}
+      onValidateFile={validateFile}
+      onUpload={(formData) => uploadEmailLogoAction(tenantId, target, formData)}
+      onClear={() => clearEmailLogoAction(tenantId, target)}
+      onChange={onChange}
+      isDisabled={isDisabled}
+      aria-describedby={ariaDescribedBy}
+    />
   );
 };

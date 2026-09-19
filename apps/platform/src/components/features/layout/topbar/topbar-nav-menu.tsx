@@ -2,12 +2,12 @@
 
 import { Menu } from '@base-ui/react/menu';
 import { ICONS, SIZE } from '@blog/config';
+import { NavItemContent } from '@platform/components/features/layout/nav-item-content';
 import {
   sidebarVariants,
   type TSidebarNavSection,
 } from '@platform/components/features/layout/sidebar';
 import { Icon } from '@platform/components/shared/icon';
-import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Link, usePathname } from '@platform/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
@@ -32,18 +32,7 @@ export const TopbarNavMenu = ({ sections, switcher }: TTopbarNavMenuProps) => {
   const t = useTranslations('topbarNavMenu');
   const pathname = usePathname();
   const { trigger, popup } = topbarNavMenuVariants();
-  const {
-    switcherSlot,
-    section,
-    sectionLabel,
-    row,
-    rowIcon,
-    rowBody,
-    rowLabel,
-    rowReason,
-    badgeSlot,
-    note,
-  } = sidebarVariants();
+  const { switcherSlot, section, sectionLabel, row, note } = sidebarVariants();
 
   return (
     <Menu.Root>
@@ -66,15 +55,6 @@ export const TopbarNavMenu = ({ sections, switcher }: TTopbarNavMenuProps) => {
                 </Menu.GroupLabel>
                 {navSection.items.length > 0
                   ? navSection.items.map((item) => {
-                      const badge = item.badge && (
-                        <StatusBadge
-                          tone={item.badge.tone}
-                          className={badgeSlot()}
-                        >
-                          {item.badge.label}
-                        </StatusBadge>
-                      );
-
                       if (item.href) {
                         const isActive = pathname === item.href;
 
@@ -92,15 +72,11 @@ export const TopbarNavMenu = ({ sections, switcher }: TTopbarNavMenuProps) => {
                               state: isActive ? 'active' : 'resting',
                             })}
                           >
-                            <Icon
-                              name={item.icon}
-                              size={SIZE.SM}
-                              className={rowIcon()}
+                            <NavItemContent
+                              icon={item.icon}
+                              label={item.label}
+                              badge={item.badge}
                             />
-                            <span className={rowBody()}>
-                              <span className={rowLabel()}>{item.label}</span>
-                            </span>
-                            {badge}
                           </Menu.LinkItem>
                         );
                       }
@@ -110,20 +86,12 @@ export const TopbarNavMenu = ({ sections, switcher }: TTopbarNavMenuProps) => {
                           key={item.label}
                           className={row({ state: 'inert' })}
                         >
-                          <Icon
-                            name={item.icon}
-                            size={SIZE.SM}
-                            className={rowIcon()}
+                          <NavItemContent
+                            icon={item.icon}
+                            label={item.label}
+                            disabledReason={item.disabledReason}
+                            badge={item.badge}
                           />
-                          <span className={rowBody()}>
-                            <span className={rowLabel()}>{item.label}</span>
-                            {item.disabledReason && (
-                              <span className={rowReason()}>
-                                {item.disabledReason}
-                              </span>
-                            )}
-                          </span>
-                          {badge}
                         </div>
                       );
                     })

@@ -1,9 +1,4 @@
-import { ALERT_TYPE } from '@blog/config';
-import { queries } from '@blog/db';
-import { StudioMount } from '@blog/studio';
-import { Alert } from '@platform/components/shared/alert';
-import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
-import { PageHeader } from '@platform/components/shared/page-header';
+import { StudioMountView } from '@platform/components/features/studio/studio-mount-view';
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { Metadata } from 'next';
@@ -27,40 +22,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function TenantStudioPage({ params }: TProps) {
   const { tenantId } = await params;
   const { tenant } = await requireTenantById(tenantId);
-  const t = await getTranslations('studioPage');
 
-  if (tenant.deprovisionedAt) {
-    return (
-      <>
-        <PageHeader title={t('title')} />
-        <ArchivedTenantNotice archivedAt={tenant.deprovisionedAt} />
-      </>
-    );
-  }
-
-  const credentials = await queries.tenants.getTenantSanityCredentials(
-    tenant.id,
-  );
-
-  if (!credentials) {
-    return (
-      <>
-        <PageHeader title={t('title')} />
-        <Alert
-          type={ALERT_TYPE.WARNING}
-          title={t('notProvisionedTitle')}
-          description={t('notProvisionedDescription')}
-        />
-      </>
-    );
-  }
-
-  return (
-    <StudioMount
-      projectId={credentials.projectId}
-      dataset={credentials.dataset}
-      basePath={adminRoutes.tenantStudio(tenant.id)}
-      title={tenant.name}
-    />
-  );
+  return StudioMountView({
+    tenant,
+    basePath: adminRoutes.tenantStudio(tenant.id),
+  });
 }

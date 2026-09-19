@@ -1,10 +1,7 @@
-import { SIZE, type TIconName } from '@blog/config';
+import type { TIconName } from '@blog/config';
+import { NavItemContent } from '@platform/components/features/layout/nav-item-content';
 import { BrandMark } from '@platform/components/shared/brand-mark';
-import { Icon } from '@platform/components/shared/icon';
-import {
-  StatusBadge,
-  type TStatusBadgeProps,
-} from '@platform/components/shared/status-badge';
+import type { TStatusBadgeProps } from '@platform/components/shared/status-badge';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
@@ -72,11 +69,6 @@ export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
     sectionLabel,
     list,
     row,
-    rowIcon,
-    rowBody,
-    rowLabel,
-    rowReason,
-    badgeSlot,
     note,
   } = sidebarVariants();
 
@@ -100,29 +92,15 @@ export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
             <nav aria-label={navSection.label}>
               <ul className={list()}>
                 {navSection.items.map((item) => {
-                  const badge = item.badge && (
-                    <StatusBadge
-                      tone={item.badge.tone}
-                      hasDot={item.badge.hasDot}
-                      className={badgeSlot()}
-                    >
-                      {item.badge.label}
-                    </StatusBadge>
-                  );
-
                   if (item.href) {
                     return (
                       <li key={item.label}>
                         <SidebarNavLink href={item.href}>
-                          <Icon
-                            name={item.icon}
-                            size={SIZE.SM}
-                            className={rowIcon()}
+                          <NavItemContent
+                            icon={item.icon}
+                            label={item.label}
+                            badge={item.badge}
                           />
-                          <span className={rowBody()}>
-                            <span className={rowLabel()}>{item.label}</span>
-                          </span>
-                          {badge}
                         </SidebarNavLink>
                       </li>
                     );
@@ -131,20 +109,12 @@ export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
                   return (
                     <li key={item.label}>
                       <div className={row({ state: 'inert' })}>
-                        <Icon
-                          name={item.icon}
-                          size={SIZE.SM}
-                          className={rowIcon()}
+                        <NavItemContent
+                          icon={item.icon}
+                          label={item.label}
+                          disabledReason={item.disabledReason}
+                          badge={item.badge}
                         />
-                        <span className={rowBody()}>
-                          <span className={rowLabel()}>{item.label}</span>
-                          {item.disabledReason && (
-                            <span className={rowReason()}>
-                              {item.disabledReason}
-                            </span>
-                          )}
-                        </span>
-                        {badge}
                       </div>
                     </li>
                   );
