@@ -1062,11 +1062,13 @@ gates, is unchanged.)
 
 1. Set issue → In Progress on the board
 2. Checkout branch from `main`
-3. Do the work + run quality gates
+3. Do the work + run quality gates — merge `origin/main` in before verify
+   (`develop-feature` §5).
 4. **Dispatch the `reviewer` subagent** (`.claude/agents/reviewer.md`) over the
    full diff — fix blocking findings and re-dispatch until it returns
    `APPROVE`. Never **push** without an `APPROVE` on the diff as it
-   stands; new changes invalidate a prior `APPROVE`.
+   stands; new changes invalidate a prior `APPROVE`, including a later merge
+   from `origin/main`.
 
    **A docs-only diff skips the `reviewer` and gets an inline identifier
    check instead.** When the diff touches nothing outside `docs/**`,
