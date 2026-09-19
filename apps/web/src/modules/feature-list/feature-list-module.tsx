@@ -1,0 +1,32 @@
+import { service } from '@blog/service';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+
+import { FeatureListModuleView } from './feature-list-module-view';
+
+export interface IFeatureListModuleProps {
+  id: string;
+  locale: string;
+  tenant: string;
+}
+
+export const FeatureListModule = async ({
+  id,
+  tenant,
+}: IFeatureListModuleProps) => {
+  const tenantContext = await getTenantSanityContext(tenant);
+  const result = await service.modules.featureList.v1.getFeatureList(
+    id,
+    tenantContext,
+  );
+
+  if (!result.ok) return null;
+  if (result.data.items.length === 0) return null;
+
+  return (
+    <FeatureListModuleView
+      {...result.data}
+      titleId={`feature-list-${id}`}
+      dataTestId={`feature-list-module-${id}`}
+    />
+  );
+};

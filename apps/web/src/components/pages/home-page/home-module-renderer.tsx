@@ -7,6 +7,7 @@ import type { TModule } from '@blog/service';
 import { PageHeading } from '@web/components/shared/page-heading';
 import { ContentModule } from '@web/modules/content/content-module';
 import { CtaModule } from '@web/modules/cta/cta-module';
+import { FeatureListModule } from '@web/modules/feature-list/feature-list-module';
 import { HeroBlogModule } from '@web/modules/hero-blog/hero-blog-module';
 import { HeroProfileModule } from '@web/modules/hero-profile/hero-profile-module';
 import { HeroStatementModule } from '@web/modules/hero-statement/hero-statement-module';
@@ -31,6 +32,7 @@ const HOME_MAP: Partial<Record<TPageHomeType, TModuleComponent>> = {
   module_postLatest: PostLatestModule,
   module_taxonomyList: TaxonomyListModule,
   module_postFeatured: PostFeaturedModule,
+  module_featureList: FeatureListModule,
 };
 
 export interface IHomeModuleRendererProps {

@@ -1,6 +1,7 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
+  testFeatureListModule,
   testHeadingWithoutHero,
   testHeroProfileHero,
   testRendersAllowedModulesInOrder,
@@ -16,6 +17,7 @@ const {
   postLatestModuleMock,
   taxonomyListModuleMock,
   postFeaturedModuleMock,
+  featureListModuleMock,
   heroBlogModuleMock,
   heroProfileModuleMock,
   heroStatementModuleMock,
@@ -38,6 +40,9 @@ const {
   )),
   postFeaturedModuleMock: vi.fn(({ id }: { id: string }) => (
     <div data-testid="stub-post-featured">{id}</div>
+  )),
+  featureListModuleMock: vi.fn(({ id }: { id: string }) => (
+    <div data-testid="stub-feature-list">{id}</div>
   )),
   heroBlogModuleMock: vi.fn(async () => null),
   heroProfileModuleMock: vi.fn(async ({ id }: { id: string }) => (
@@ -64,6 +69,9 @@ vi.mock('@web/modules/taxonomy-list/taxonomy-list-module', () => ({
 }));
 vi.mock('@web/modules/post-featured/post-featured-module', () => ({
   PostFeaturedModule: postFeaturedModuleMock,
+}));
+vi.mock('@web/modules/feature-list/feature-list-module', () => ({
+  FeatureListModule: featureListModuleMock,
 }));
 vi.mock('@web/modules/hero-blog/hero-blog-module', () => ({
   HeroBlogModule: heroBlogModuleMock,
@@ -140,6 +148,7 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
     description:
       'renders nothing and warns once for a module absent from the home page allow-list',
   });
+  testFeatureListModule({ setup, loggerWarnMock });
   testRendersAllowedModulesInOrder({
     setup,
     modules: [

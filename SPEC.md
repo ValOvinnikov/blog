@@ -247,7 +247,8 @@ no faked defaults), the module-registry mechanism, and the editorial write path:
 
 Source of truth: `packages/studio/src/schema-types/` — documents (`post`, `author`,
 `topic`, `tag`, `link`, page documents, singletons), standalone `module_*`
-page-builder documents, and shared objects (`linkRef`, `ctaButton`,
+page-builder documents, `block_*` documents those modules compose
+(`block_feature`), and shared objects (`linkRef`, `ctaButton`,
 `socialProfile`, `imageWithAlt`, `bodyImage`,
 `seo`, `aside`, `postTakeaways`, …). Naming convention `{group}_{name}` is being applied
 incrementally (#251).
@@ -651,6 +652,67 @@ exposes the flag; `apps/web` branches in one place and renders them through
 supplied as an accessibility-only voice key. Because the module builds its own
 term projections, `entities.topics.v1` and `entities.tags.v1` keep their
 shapes for the other pages that read them.
+
+**A feature card is a document, not an inline array member.** `block_feature`
+carries a `title` (its Studio label), a `headingBlock` (`heading` required,
+`supportingText` optional — the same registered type the modules use), an
+optional `icon` from `FEATURE_ICONS`, an optional `image` (`imageWithAlt`)
+and an optional `link` reference. Making it a document is what lets one card
+appear in more than one Features section without being retyped, and it is why
+the Studio's sidebar groups it under **Blocks → Cards** rather than under
+Modules: a block is content a module composes, not a section an editor places
+on a page.
+
+**A published card always has something to show**, enforced by a
+document-level `rule.custom` rather than by marking either field required.
+The requirement is "icon _or_ image", which two independent `.required()`
+calls cannot express. Its severity is `error`, so a card with neither cannot
+be published — which is what lets every consumer below treat the visual as
+guaranteed instead of testing for its absence.
+
+`module_featureList` ("Features") references those cards through a `features`
+array, `unique()` and validated `min(2).max(8)`. Two is the floor because a
+lone card is a statement rather than a grid; eight is the ceiling because the
+column rule below stops producing balanced rows past it. It carries the usual
+module furniture — `title`, `brandVariant` (the full three-value list,
+defaulting to `PRIMARY`), `headingBlock`, `layout`, `ctaButtons` — plus
+`displayMode` (grid or carousel), `contentAlignment` from `alignmentFields([])`
+with no position axis, and two fields of its own: `imageShape` and
+`cardAlignment`. It is allowed in `page_home.modules[]` and
+`page_landing.modules[]`, rendering through each page's own module map like
+every other module in those arrays.
+
+**The web layer decides icon versus image, per card, at render time.**
+`imageShape` offers `WIDE`/`SQUARE`/`CIRCLE` from `CARD_IMAGE_SHAPE` and
+deliberately no `ICON`: the shape an image is cropped to and the fallback a
+card falls back to when it has no image are different questions, and one
+dropdown answering both let an editor pick a crop that silently discarded an
+uploaded image. A card's `image` therefore wins over its `icon` whenever both
+are set, and `imageShape` describes only the former. `@blog/ui`'s lowercase
+`icon` shape variant is still how an icon tile renders — it is now chosen by
+the data rather than by the editor. There is no `showImages` switch for the
+same reason: the card's own content already answers it.
+
+**Grid columns are derived from the card count, not authored** — 2→2, 3→3,
+4→4, 5→3, 6→3, 7→4, 8→4. Five and six take three columns rather than four,
+and seven takes four rather than three, so the last row is never left with a
+single orphaned card. `toFeatureGridColumns` in `apps/web` is the whole rule;
+the carousel ignores it.
+
+`cardAlignment` is a casing seam worth naming: it stores UPPERCASE
+`CONTENT_ALIGNMENT` values and offers only `LEFT`/`CENTER`, while `@blog/ui`'s
+`MediaCard` takes a lowercase `left | center` `align` prop. `@blog/service`
+narrows the projected type to those two values rather than the wider
+three-value union, and `apps/web` maps the casing explicitly instead of
+passing the stored value straight through.
+
+**A misconfigured module renders nothing rather than throwing.** `features` is
+modelled nullable — `min(2)` is a validation rule, not `.required()`, and
+validation never applies to a document written outside Studio — so
+`service.modules.featureList.v1.getFeatureList` yields an empty `items` array
+whenever the authored array is absent, empty, or below two, matching how
+`postTakeaways` degrades below its own `min(3)`. The view returns `null` on an
+empty array, so the page loses the section instead of the render.
 
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its

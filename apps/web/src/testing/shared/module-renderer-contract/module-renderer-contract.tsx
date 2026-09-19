@@ -75,6 +75,22 @@ export const testHeroProfileHero = ({
   });
 };
 
+export const testFeatureListModule = ({
+  setup,
+  loggerWarnMock,
+}: IWithSetup & { loggerWarnMock: Mock }) => {
+  it('renders a module_featureList module via the map', async () => {
+    await setup({
+      modules: [{ id: 'feature-list-1', type: 'module_featureList' }],
+    });
+
+    expect(screen.getByTestId('stub-feature-list')).toHaveTextContent(
+      'feature-list-1',
+    );
+    expect(loggerWarnMock).not.toHaveBeenCalled();
+  });
+};
+
 export const testWarnsForUnknownModule = ({
   setup,
   loggerWarnMock,
