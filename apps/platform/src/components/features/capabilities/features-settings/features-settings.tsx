@@ -1,13 +1,10 @@
 'use client';
 
 import { Switch } from '@base-ui/react/switch';
-import { ALERT_TYPE, type TCapability } from '@blog/config';
-import { Alert } from '@platform/components/shared/alert';
-import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
-import { Button } from '@platform/components/shared/button';
+import type { TCapability } from '@blog/config';
 import { Card } from '@platform/components/shared/card';
-import { PageHeader } from '@platform/components/shared/page-header';
 import { SettingRow } from '@platform/components/shared/setting-row';
+import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
 import { useToast } from '@platform/context/toast-provider';
 import {
   CAPABILITY_TOGGLES,
@@ -75,8 +72,7 @@ export const FeaturesSettings = ({
 
   const isDirty = !valuesEqual(values, savedValues);
 
-  const { root, alert, switchTrack, switchThumb, switchLabel } =
-    featuresSettingsVariants();
+  const { switchTrack, switchThumb, switchLabel } = featuresSettingsVariants();
 
   const handleToggle = (
     field: keyof TSettingsFeaturesValues,
@@ -86,36 +82,19 @@ export const FeaturesSettings = ({
   };
 
   return (
-    <div className={root()}>
-      <PageHeader
-        title={t('heading')}
-        description={t('description')}
-        actions={
-          <Button
-            variant="primary"
-            onClick={handleSubmit}
-            isDisabled={!isDirty || isArchived}
-            isPending={isPending}
-            pendingLabel={t('savingButton')}
-            aria-describedby={isArchived ? archivedNoticeId : undefined}
-          >
-            {t('saveButton')}
-          </Button>
-        }
-      />
-
-      {archivedAt && (
-        <ArchivedTenantNotice id={archivedNoticeId} archivedAt={archivedAt} />
-      )}
-
-      {status === 'error' && (
-        <Alert
-          type={ALERT_TYPE.ERROR}
-          title={t('alertError')}
-          className={alert()}
-        />
-      )}
-
+    <SettingsFormShell
+      title={t('heading')}
+      description={t('description')}
+      saveButtonLabel={t('saveButton')}
+      savingButtonLabel={t('savingButton')}
+      onSave={handleSubmit}
+      isSaveDisabled={!isDirty || isArchived}
+      isPending={isPending}
+      archivedAt={archivedAt}
+      archivedNoticeId={archivedNoticeId}
+      hasError={status === 'error'}
+      errorTitle={t('alertError')}
+    >
       <Card>
         <Card.Header title={t('capabilitiesHeading')} headingLevel={2} />
         <Card.Body>
@@ -149,6 +128,6 @@ export const FeaturesSettings = ({
           })}
         </Card.Body>
       </Card>
-    </div>
+    </SettingsFormShell>
   );
 };

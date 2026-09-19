@@ -1,6 +1,6 @@
 import { tv } from '@platform/utils/tv/tv';
 
-export const brandAssetFieldVariants = tv({
+export const assetUploadFieldVariants = tv({
   slots: {
     root: [
       'flex flex-col rounded-admin border-[1.5px] border-dashed border-admin-line bg-admin-surface-2 p-[14px]',
@@ -18,12 +18,12 @@ export const brandAssetFieldVariants = tv({
     input: ['sr-only'],
   },
   variants: {
-    kind: {
-      logo: { thumb: ['size-12 rounded-[10px]'] },
-      favicon: { thumb: ['size-10 rounded-[8px]'] },
+    size: {
+      md: { thumb: ['size-12 rounded-[10px]'] },
+      sm: { thumb: ['size-10 rounded-[8px]'] },
     },
   },
   defaultVariants: {
-    kind: 'logo',
+    size: 'md',
   },
 });

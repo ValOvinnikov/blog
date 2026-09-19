@@ -1,6 +1,6 @@
 import { SIZE } from '@blog/config';
 import type { TFinding } from '@blog/db/schema/findings';
-import { Card } from '@platform/components/shared/card';
+import { DataTableShell } from '@platform/components/shared/data-table-shell';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { formatDate } from '@platform/utils/format-date/format-date';
@@ -32,70 +32,52 @@ export const FindingsTable = ({
   const { card, table, head, row, cell, noTenant, empty } =
     findingsTableVariants();
 
-  if (findings.length === 0) {
-    return (
-      <Card className={card()}>
-        <Card.Body>
-          <p className={empty()}>{t('empty')}</p>
-        </Card.Body>
-      </Card>
-    );
-  }
-
   return (
-    <Card className={card()}>
-      <table className={table()}>
-        <thead>
-          <tr>
-            <th className={head()} scope="col">
-              {t('columnTenant')}
-            </th>
-            <th className={head()} scope="col">
-              {t('columnSource')}
-            </th>
-            <th className={head()} scope="col">
-              {t('columnKind')}
-            </th>
-            <th className={head()} scope="col">
-              {t('columnSeverity')}
-            </th>
-            <th className={head()} scope="col">
-              {t('columnLastSeen')}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {findings.map((finding) => (
-            <tr className={row()} key={finding.id}>
-              <td className={cell()}>
-                {finding.tenantId ? (
-                  <LinkButton
-                    href={adminRoutes.tenantOverview(finding.tenantId)}
-                    variant="secondary"
-                    size={SIZE.SM}
-                  >
-                    {tenantNamesById[finding.tenantId] ?? finding.tenantId}
-                  </LinkButton>
-                ) : (
-                  <span className={noTenant()}>{t('noTenant')}</span>
-                )}
-              </td>
-              <td className={cell()}>{tSource(finding.source)}</td>
-              <td className={cell()}>{tKind(finding.kind)}</td>
-              <td className={cell()}>
-                <StatusBadge tone={findingSeverityTone(finding.severity)}>
-                  {tSeverity(finding.severity)}
-                </StatusBadge>
-              </td>
-              <td className={cell()}>
-                <time dateTime={finding.lastSeenAt.toISOString()}>
-                  {formatDate(finding.lastSeenAt)}
-                </time>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </Card>
+    <DataTableShell
+      items={findings}
+      emptyMessage={t('empty')}
+      classNames={{
+        card: card(),
+        table: table(),
+        head: head(),
+        empty: empty(),
+      }}
+      columns={[
+        { key: 'tenant', label: t('columnTenant') },
+        { key: 'source', label: t('columnSource') },
+        { key: 'kind', label: t('columnKind') },
+        { key: 'severity', label: t('columnSeverity') },
+        { key: 'lastSeen', label: t('columnLastSeen') },
+      ]}
+      renderRow={(finding) => (
+        <tr className={row()} key={finding.id}>
+          <td className={cell()}>
+            {finding.tenantId ? (
+              <LinkButton
+                href={adminRoutes.tenantOverview(finding.tenantId)}
+                variant="secondary"
+                size={SIZE.SM}
+              >
+                {tenantNamesById[finding.tenantId] ?? finding.tenantId}
+              </LinkButton>
+            ) : (
+              <span className={noTenant()}>{t('noTenant')}</span>
+            )}
+          </td>
+          <td className={cell()}>{tSource(finding.source)}</td>
+          <td className={cell()}>{tKind(finding.kind)}</td>
+          <td className={cell()}>
+            <StatusBadge tone={findingSeverityTone(finding.severity)}>
+              {tSeverity(finding.severity)}
+            </StatusBadge>
+          </td>
+          <td className={cell()}>
+            <time dateTime={finding.lastSeenAt.toISOString()}>
+              {formatDate(finding.lastSeenAt)}
+            </time>
+          </td>
+        </tr>
+      )}
+    />
   );
 };

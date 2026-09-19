@@ -2,8 +2,6 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const featuresSettingsVariants = tv({
   slots: {
-    root: ['flex max-w-3xl flex-col gap-6'],
-    alert: ['w-fit'],
     switchTrack: [
       'relative h-5 w-9 shrink-0 cursor-pointer rounded-full bg-admin-line',
       'transition-colors duration-150',
