@@ -56,8 +56,6 @@ describe('Sanity client module loading', () => {
         projectId: 'tenant-a',
         dataset: 'production',
         token: 'tok-a',
-        // Next's tagged data cache is the sole caching layer — a CDN read
-        // after a tag purge can re-cache stale content.
         useCdn: false,
       }),
     );

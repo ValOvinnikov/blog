@@ -30,7 +30,6 @@ describe('getPostList', () => {
 
     const postList = await getPostList('post-list-1', 1, tenant);
 
-    // The module's `pageSize` is threaded into the GROQ posts query's slice bound.
     expect(mockRun.mock.calls[1]?.[0]?.query).toContain('[0...3]');
     expect(postList.headingBlock.heading).toBe('Recent writing');
     expect(postList.posts.map((p) => p.id)).toEqual(['a']);

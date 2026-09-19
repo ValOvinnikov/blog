@@ -31,6 +31,4 @@ export const topicPageQuery = q
       .nullable(),
     seo: sub.field('seo').project(seoFragment).notNull(),
   }))
-  // Nullable, not `.notNull()`: no matching `page_topic` is an ordinary
-  // not-found, not a parse failure — the loader turns `null` into `undefined`.
   .nullable(true);

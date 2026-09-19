@@ -9,12 +9,6 @@ import { heroModuleQuery } from './query';
 import { toHeroModule } from './transformer';
 import type { THeroModule } from './types';
 
-// `heroModuleQuery` dereferences `featuredPost` (via `postCardFragment`,
-// which further derefs `author`/`topic`) and `secondaryAction` (via
-// `linkFragment`, whose `internalReference` can resolve to `page_post`/
-// `blog_topic`/`page_landing`/`page_postIndex`) — every one of
-// those types' tags must be included alongside the module's own tags
-// (tag-scope contract, `sanity/query.ts`).
 export async function getHero(
   id: string,
   tenant: TTenantSanityContext,

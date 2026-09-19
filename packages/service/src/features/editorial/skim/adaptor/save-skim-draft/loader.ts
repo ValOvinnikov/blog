@@ -47,9 +47,6 @@ export async function saveSkimDraft(
 
   await client
     .transaction()
-    // No-ops once a draft already exists (from this pipeline's own prior run,
-    // or an editor's own unpublished edit) — never overwrites an existing
-    // draft's other fields.
     .createIfNotExists({ ...published, _id: draftId })
     .patch(draftId, { set: { postTakeaways } })
     .commit();

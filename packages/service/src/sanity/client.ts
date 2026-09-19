@@ -65,8 +65,6 @@ export function getClient(tenant: TTenantSanityContext): TSanityClient {
       ? cached
       : buildTenantClient(tenant);
 
-  // Re-inserting moves the key to the Map's end — the LRU's
-  // most-recently-used position.
   tenantClients.delete(key);
   tenantClients.set(key, entry);
   if (tenantClients.size > MAX_CACHED_TENANT_CLIENTS) {
