@@ -1,7 +1,5 @@
 import { LINK_TYPE } from '@blog/config/constants';
 
-import { LINK_LABEL_MAX_LENGTH } from '../lib/link-label-max-length';
-
 export const LINK_REF_TYPE = 'linkRef';
 export const SOCIAL_PROFILE_TYPE = 'socialProfile';
 
@@ -69,9 +67,3 @@ export const buildSocialProfile = (
   platform: item.platform,
   link: { _type: 'reference', _ref: linkId },
 });
-
-export const hasMissingLabel = (item: TLegacyInlineLink): boolean =>
-  !item.label?.trim();
-
-export const hasOversizedLabel = (item: TLegacyInlineLink): boolean =>
-  Boolean(item.label && item.label.length > LINK_LABEL_MAX_LENGTH);

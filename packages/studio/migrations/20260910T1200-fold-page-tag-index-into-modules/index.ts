@@ -40,6 +40,7 @@
  * service/web code that reads `modules[]`/`headingBlock` instead of
  * `taxonomyList`/`heading`/`supportingText`.
  */
+import { TAXONOMY_KIND } from '@blog/config/constants';
 import {
   at,
   defineMigration,
@@ -48,13 +49,12 @@ import {
   type MigrationContext,
 } from 'sanity/migrate';
 
-import { backfillHeadingBlock } from '../lib/backfill-heading-block';
-import { getReferencedTaxonomyListIds } from '../lib/referenced-taxonomy-list-ids';
-
 import {
   authorTaxonomyOnModule,
   type TTaxonomyListModuleDoc,
-} from './author-taxonomy-on-module';
+} from '../lib/author-taxonomy-on-module';
+import { backfillHeadingBlock } from '../lib/backfill-heading-block';
+import { getReferencedTaxonomyListIds } from '../lib/referenced-taxonomy-list-ids';
 
 const PAGE_TAG_INDEX_TYPE = 'page_tagIndex';
 const TAXONOMY_LIST_MODULE_TYPE = 'module_taxonomyList';
@@ -125,6 +125,7 @@ export default defineMigration({
           authorTaxonomyOnModule(
             doc as unknown as TTaxonomyListModuleDoc,
             referencedIds,
+            TAXONOMY_KIND.TAGS,
           ) ?? []
         );
       }

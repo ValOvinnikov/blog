@@ -1,10 +1,6 @@
-import { LINK_LABEL_MAX_LENGTH } from '../lib/link-label-max-length';
-
 import {
   buildLinkRef,
   buildSocialProfile,
-  hasMissingLabel,
-  hasOversizedLabel,
   hasRecognizedLinkShape,
   hasResolvableUrl,
 } from './transform';
@@ -36,38 +32,6 @@ describe(buildSocialProfile, () => {
       platform: 'LINKEDIN',
       link: { _type: 'reference', _ref: 'link-def456' },
     });
-  });
-});
-
-describe(hasMissingLabel, () => {
-  it('is true for an absent label', () => {
-    expect(hasMissingLabel({})).toBe(true);
-  });
-
-  it('is true for a whitespace-only label', () => {
-    expect(hasMissingLabel({ label: '   ' })).toBe(true);
-  });
-
-  it('is false for a real label', () => {
-    expect(hasMissingLabel({ label: 'Blog' })).toBe(false);
-  });
-});
-
-describe(hasOversizedLabel, () => {
-  it('is false for a label at the limit', () => {
-    expect(
-      hasOversizedLabel({ label: 'x'.repeat(LINK_LABEL_MAX_LENGTH) }),
-    ).toBe(false);
-  });
-
-  it('is true for a label over the limit', () => {
-    expect(
-      hasOversizedLabel({ label: 'x'.repeat(LINK_LABEL_MAX_LENGTH + 1) }),
-    ).toBe(true);
-  });
-
-  it('is false for a missing label', () => {
-    expect(hasOversizedLabel({})).toBe(false);
   });
 });
 

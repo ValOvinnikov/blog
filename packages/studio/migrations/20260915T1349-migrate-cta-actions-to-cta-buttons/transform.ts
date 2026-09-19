@@ -1,7 +1,5 @@
 import { CTA_ACTION_VARIANT } from '@blog/config/constants';
 
-import { LINK_LABEL_MAX_LENGTH } from '../lib/link-label-max-length';
-
 const CTA_BUTTON_TYPE = 'ctaButton';
 
 /** Mirrors `cta-buttons-field.ts`'s default `max` for the `ctaButtons` array. */
@@ -47,12 +45,6 @@ export const buildCtaButton = (
   appearance: action.appearance,
   link: { _type: 'reference', _ref: linkId },
 });
-
-export const hasMissingLabel = (link: TLegacyInlineLink): boolean =>
-  !link.label?.trim();
-
-export const hasOversizedLabel = (link: TLegacyInlineLink): boolean =>
-  Boolean(link.label && link.label.length > LINK_LABEL_MAX_LENGTH);
 
 export type TOrderingIssue =
   | { type: 'TOO_MANY_BUTTONS'; count: number }

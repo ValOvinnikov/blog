@@ -46,13 +46,12 @@ import {
 
 import { buildLinkDocumentFields } from '../lib/build-link-document-fields';
 import { toLinkId, toLinkIdentityKey } from '../lib/link-identity';
+import { hasMissingLabel, hasOversizedLabel } from '../lib/link-label-checks';
 import { LINK_LABEL_MAX_LENGTH } from '../lib/link-label-max-length';
 
 import {
   buildCtaButton,
   detectOrderingIssues,
-  hasMissingLabel,
-  hasOversizedLabel,
   type TCtaButtonNode,
   type TLegacyCtaAction,
   type TLegacyInlineLink,
