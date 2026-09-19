@@ -1,13 +1,8 @@
 import { PRESET_ID } from '@blog/config';
-import {
-  TENANT_PROVISIONING_STATUS,
-  TENANT_PROVISIONING_STEP,
-  TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
 
 import { FeaturesPageContent } from './features-page-content';
 
@@ -30,41 +25,8 @@ vi.mock('@blog/db', async () => ({
 // call at import time.
 vi.mock('@platform/server/auth/auth', () => ({ auth: vi.fn() }));
 
-const provisioningSteps = {
-  [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-    status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-  },
-  [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
-    status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-  },
-  [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
-    status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-  },
-  [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-    status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-  },
-  [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
-    status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-  },
-  [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: {
-    status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-  },
-  [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
-    status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
-  },
-};
-
 const buildTenant = (plan: 'FREE' | 'GROWTH'): TTenant =>
-  makeTenant({
-    sanityProjectId: 'proj-1',
-    sanityDataset: 'production',
-    locale: 'en',
-    plan,
-    provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-    provisioningSteps,
-    seededAt: new Date('2026-01-01T00:00:00.000Z'),
-    webhookCreatedAt: new Date('2026-01-01T00:00:00.000Z'),
-  });
+  makeReadyTenant({ plan });
 
 const setup = customRenderAsync(FeaturesPageContent, {
   tenant: buildTenant('FREE'),

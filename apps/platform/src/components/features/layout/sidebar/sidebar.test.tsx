@@ -45,7 +45,7 @@ const setPathname = (pathname: string) => {
   usePathnameMock.mockReturnValue(pathname);
 };
 
-describe(Sidebar, () => {
+describe(`<${Sidebar.name}/>`, () => {
   beforeEach(() => {
     setPathname('/');
   });
@@ -156,72 +156,45 @@ describe(Sidebar, () => {
     );
   });
 
-  it('marks Studio active when its own route is open, same as any other nav item', () => {
-    setPathname('/tenants/tenant-1/studio');
+  it.each([
+    {
+      description:
+        'marks Studio active when its own route is open, same as any other nav item',
+      pathname: '/tenants/tenant-1/studio',
+      items: [
+        {
+          label: 'Studio',
+          icon: ICONS.STUDIO,
+          href: '/tenants/tenant-1/studio',
+        },
+        { label: 'Look', icon: ICONS.PALETTE, href: '/tenants/tenant-1/look' },
+      ],
+      activeLabel: 'Studio',
+      inactiveLabel: 'Look',
+    },
+    {
+      description:
+        'switches which item is active when the route changes — the case a shared href could not express',
+      pathname: '/tenants/tenant-1/voice',
+      items: [
+        { label: 'Look', icon: ICONS.PALETTE, href: '/tenants/tenant-1/look' },
+        { label: 'Voice', icon: ICONS.QUOTE, href: '/tenants/tenant-1/voice' },
+      ],
+      activeLabel: 'Voice',
+      inactiveLabel: 'Look',
+    },
+  ])('$description', ({ pathname, items, activeLabel, inactiveLabel }) => {
+    setPathname(pathname);
 
-    render(
-      <Sidebar
-        sections={[
-          {
-            label: 'Tenant · acme',
-            items: [
-              {
-                label: 'Studio',
-                icon: ICONS.STUDIO,
-                href: '/tenants/tenant-1/studio',
-              },
-              {
-                label: 'Look',
-                icon: ICONS.PALETTE,
-                href: '/tenants/tenant-1/look',
-              },
-            ],
-          },
-        ]}
-      />,
-    );
+    render(<Sidebar sections={[{ label: 'Tenant · acme', items }]} />);
 
-    expect(screen.getByRole('link', { name: 'Studio' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: activeLabel })).toHaveAttribute(
       'aria-current',
       'page',
     );
-    expect(screen.getByRole('link', { name: 'Look' })).not.toHaveAttribute(
-      'aria-current',
-    );
-  });
-
-  it('switches which item is active when the route changes — the case a shared href could not express', () => {
-    setPathname('/tenants/tenant-1/voice');
-
-    render(
-      <Sidebar
-        sections={[
-          {
-            label: 'Tenant · acme',
-            items: [
-              {
-                label: 'Look',
-                icon: ICONS.PALETTE,
-                href: '/tenants/tenant-1/look',
-              },
-              {
-                label: 'Voice',
-                icon: ICONS.QUOTE,
-                href: '/tenants/tenant-1/voice',
-              },
-            ],
-          },
-        ]}
-      />,
-    );
-
-    expect(screen.getByRole('link', { name: 'Voice' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
-    expect(screen.getByRole('link', { name: 'Look' })).not.toHaveAttribute(
-      'aria-current',
-    );
+    expect(
+      screen.getByRole('link', { name: inactiveLabel }),
+    ).not.toHaveAttribute('aria-current');
   });
 
   it('renders an unbuilt destination as an inert, non-navigable row carrying its badge as real text, and never as active even at its own path', () => {

@@ -1,10 +1,13 @@
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import type { TDeprovisioningRun } from '@blog/db/schema/tenants';
+import { customRender, screen } from '@platform/testing/custom-render';
 
 import { RunCard } from './run-card';
 
-const render = renderWithIntl;
+const setup = customRender(RunCard, {
+  run: { startedAt: '2026-08-12T14:18:00.000Z' } as TDeprovisioningRun,
+});
 
-describe(RunCard, () => {
+describe(`<${RunCard.name}/>`, () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['Date'] });
   });
@@ -16,15 +19,13 @@ describe(RunCard, () => {
   it('renders the started and finished times as relative and absolute UTC together when the run has finished', () => {
     vi.setSystemTime(new Date('2026-08-12T14:24:00.000Z'));
 
-    render(
-      <RunCard
-        run={{
-          startedAt: '2026-08-12T14:18:00.000Z',
-          finishedAt: '2026-08-12T14:22:00.000Z',
-          workflowRunUrl: 'https://github.com/example/actions/runs/1',
-        }}
-      />,
-    );
+    setup({
+      run: {
+        startedAt: '2026-08-12T14:18:00.000Z',
+        finishedAt: '2026-08-12T14:22:00.000Z',
+        workflowRunUrl: 'https://github.com/example/actions/runs/1',
+      } as TDeprovisioningRun,
+    });
 
     const started = screen.getByText('6m ago · Aug 12, 2026, 2:18 PM UTC');
     const finished = screen.getByText('2m ago · Aug 12, 2026, 2:22 PM UTC');
@@ -35,7 +36,7 @@ describe(RunCard, () => {
   });
 
   it('shows an em-dash placeholder for Finished while the run is still in flight, with no <time> element', () => {
-    render(<RunCard run={{ startedAt: '2026-08-12T14:18:00.000Z' }} />);
+    setup();
 
     const placeholder = screen.getByText('—');
     expect(placeholder).toBeVisible();
@@ -43,14 +44,12 @@ describe(RunCard, () => {
   });
 
   it('renders no workflow log link when the run has no workflowRunUrl', () => {
-    render(
-      <RunCard
-        run={{
-          startedAt: '2026-08-12T14:18:00.000Z',
-          finishedAt: '2026-08-12T14:22:00.000Z',
-        }}
-      />,
-    );
+    setup({
+      run: {
+        startedAt: '2026-08-12T14:18:00.000Z',
+        finishedAt: '2026-08-12T14:22:00.000Z',
+      } as TDeprovisioningRun,
+    });
 
     expect(
       screen.queryByRole('link', { name: /workflow log/i }),
@@ -58,14 +57,12 @@ describe(RunCard, () => {
   });
 
   it('links out to the workflow run when workflowRunUrl is present', () => {
-    render(
-      <RunCard
-        run={{
-          startedAt: '2026-08-12T14:18:00.000Z',
-          workflowRunUrl: 'https://github.com/example/actions/runs/1',
-        }}
-      />,
-    );
+    setup({
+      run: {
+        startedAt: '2026-08-12T14:18:00.000Z',
+        workflowRunUrl: 'https://github.com/example/actions/runs/1',
+      } as TDeprovisioningRun,
+    });
 
     const link = screen.getByRole('link', { name: /workflow log/i });
     expect(link).toHaveAttribute(
@@ -77,7 +74,7 @@ describe(RunCard, () => {
   });
 
   it('nests the card title one level under the page heading', () => {
-    render(<RunCard run={{ startedAt: '2026-08-12T14:18:00.000Z' }} />);
+    setup();
 
     expect(
       screen.getByRole('heading', { level: 2, name: 'Run' }),
@@ -85,12 +82,7 @@ describe(RunCard, () => {
   });
 
   it('renders actions in the card header', () => {
-    render(
-      <RunCard
-        run={{ startedAt: '2026-08-12T14:18:00.000Z' }}
-        actions={<span>Complete</span>}
-      />,
-    );
+    setup({ actions: <span>Complete</span> });
 
     expect(screen.getByText('Complete')).toBeVisible();
   });

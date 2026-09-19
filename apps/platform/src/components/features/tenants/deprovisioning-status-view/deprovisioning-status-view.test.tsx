@@ -5,6 +5,7 @@ import {
 import type { TTenant } from '@blog/db/schema/tenants';
 import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
 import {
+  doneDeprovisioningSteps,
   idleDeprovisioningSteps,
   makeTenant,
 } from '@platform/testing/tenants/fixtures';
@@ -40,7 +41,7 @@ const Wrapper = ({
   return <DeprovisioningStatusView poll={poll} />;
 };
 
-describe(DeprovisioningStatusView, () => {
+describe(`<${DeprovisioningStatusView.name}/>`, () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
     getTenantDeprovisioningStatusActionMock.mockReset();
@@ -144,15 +145,9 @@ describe(DeprovisioningStatusView, () => {
   });
 
   it('shows the Complete badge once every step is done', () => {
-    const done = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
     const tenant = makeTenant({
       deprovisioningSteps: {
-        [DEPROVISIONING_STEP.REMOVE_DOMAIN]: done,
-        [DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT]: done,
-        [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: done,
-        [DEPROVISIONING_STEP.CLEAR_ARTIFACTS]: done,
-        [DEPROVISIONING_STEP.ARCHIVE_TENANT]: done,
-        [DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE]: done,
+        ...doneDeprovisioningSteps(),
         run: {
           startedAt: '2026-08-12T14:18:00.000Z',
           finishedAt: '2026-08-12T14:20:00.000Z',
@@ -258,15 +253,9 @@ describe(DeprovisioningStatusView, () => {
     });
 
     it('is collapsed by default once every step is already done on mount', () => {
-      const done = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
       const tenant = makeTenant({
         deprovisioningSteps: {
-          [DEPROVISIONING_STEP.REMOVE_DOMAIN]: done,
-          [DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT]: done,
-          [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: done,
-          [DEPROVISIONING_STEP.CLEAR_ARTIFACTS]: done,
-          [DEPROVISIONING_STEP.ARCHIVE_TENANT]: done,
-          [DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE]: done,
+          ...doneDeprovisioningSteps(),
           run: {
             startedAt: '2026-08-12T14:18:00.000Z',
             finishedAt: '2026-08-12T14:20:00.000Z',
@@ -279,7 +268,6 @@ describe(DeprovisioningStatusView, () => {
     });
 
     it('auto-collapses once the run completes, and a later re-render does not undo a user-initiated reopen', async () => {
-      const done = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
       const runningSteps = {
         ...idleDeprovisioningSteps(),
         [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
@@ -290,12 +278,7 @@ describe(DeprovisioningStatusView, () => {
       const tenant = makeTenant({ deprovisioningSteps: runningSteps });
       getTenantDeprovisioningStatusActionMock.mockResolvedValue({
         deprovisioningSteps: {
-          [DEPROVISIONING_STEP.REMOVE_DOMAIN]: done,
-          [DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT]: done,
-          [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: done,
-          [DEPROVISIONING_STEP.CLEAR_ARTIFACTS]: done,
-          [DEPROVISIONING_STEP.ARCHIVE_TENANT]: done,
-          [DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE]: done,
+          ...doneDeprovisioningSteps(),
           run: {
             startedAt: '2026-08-12T14:18:00.000Z',
             finishedAt: '2026-08-12T14:20:00.000Z',

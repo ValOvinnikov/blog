@@ -1,25 +1,16 @@
 import { CAPABILITY } from '@blog/config';
 import {
-  renderWithIntl,
-  screen,
-  waitFor,
-} from '@platform/testing/custom-render';
+  expectArchivedDisablesSave,
+  expectArchivedSaveDescribedByNotice,
+} from '@platform/testing/assert-archived-save';
+import { customRender, screen, waitFor } from '@platform/testing/custom-render';
+import { mockRouterRefresh } from '@platform/testing/mock-router';
 import type { TSettingsFeaturesValues } from '@platform/utils/settings-features-fields/settings-features-fields';
 import userEvent from '@testing-library/user-event';
-import { useRouter } from 'next/navigation';
 
 import { FeaturesSettings } from './features-settings';
 
-const render = renderWithIntl;
-
-vi.mocked(useRouter).mockReturnValue({
-  push: vi.fn(),
-  replace: vi.fn(),
-  prefetch: vi.fn(),
-  back: vi.fn(),
-  forward: vi.fn(),
-  refresh: vi.fn(),
-} as unknown as ReturnType<typeof useRouter>);
+mockRouterRefresh();
 
 const ALL_ENTITLED = [
   CAPABILITY.COMMENTS,
@@ -43,16 +34,18 @@ const INITIAL_VALUES: TSettingsFeaturesValues = {
   analyticsEnabled: false,
 };
 
-describe(FeaturesSettings, () => {
+const ARCHIVED_AT = new Date('2026-08-26T00:00:00.000Z');
+
+const setup = customRender(FeaturesSettings, {
+  tenantId: 'tenant-1',
+  entitledCapabilities: ALL_ENTITLED,
+  initialValues: INITIAL_VALUES,
+  saveAction: vi.fn(),
+});
+
+describe(`<${FeaturesSettings.name}/>`, () => {
   it('renders one toggle per v1 capability, reflecting the initial values', () => {
-    render(
-      <FeaturesSettings
-        tenantId="tenant-1"
-        entitledCapabilities={ALL_ENTITLED}
-        initialValues={INITIAL_VALUES}
-        saveAction={vi.fn()}
-      />,
-    );
+    setup();
 
     expect(screen.getByRole('switch', { name: 'Comments' })).toHaveAttribute(
       'data-checked',
@@ -66,14 +59,7 @@ describe(FeaturesSettings, () => {
   });
 
   it('disables an out-of-plan toggle and shows a plan-locked badge, without hiding it', () => {
-    render(
-      <FeaturesSettings
-        tenantId="tenant-1"
-        entitledCapabilities={FREE_ENTITLED}
-        initialValues={INITIAL_VALUES}
-        saveAction={vi.fn()}
-      />,
-    );
+    setup({ entitledCapabilities: FREE_ENTITLED });
 
     expect(screen.getByRole('switch', { name: 'Newsletter' })).toHaveAttribute(
       'data-disabled',
@@ -90,14 +76,7 @@ describe(FeaturesSettings, () => {
   });
 
   it('makes a locked toggle inert (unreachable and unclickable) while leaving an entitled toggle interactive, same as a provisioning-locked field', () => {
-    render(
-      <FeaturesSettings
-        tenantId="tenant-1"
-        entitledCapabilities={FREE_ENTITLED}
-        initialValues={INITIAL_VALUES}
-        saveAction={vi.fn()}
-      />,
-    );
+    setup({ entitledCapabilities: FREE_ENTITLED });
 
     const lockedSwitch = screen.getByRole('switch', { name: 'Newsletter' });
     const lockedWrapper = lockedSwitch.closest('div');
@@ -109,14 +88,7 @@ describe(FeaturesSettings, () => {
   });
 
   it('renders the page heading and a section heading without skipping a level; toggle rows are labelled rows, not further headings', () => {
-    render(
-      <FeaturesSettings
-        tenantId="tenant-1"
-        entitledCapabilities={ALL_ENTITLED}
-        initialValues={INITIAL_VALUES}
-        saveAction={vi.fn()}
-      />,
-    );
+    setup();
 
     expect(
       screen.getByRole('heading', { level: 1, name: 'Features' }),
@@ -129,14 +101,7 @@ describe(FeaturesSettings, () => {
 
   it('toggles an entitled capability on click', async () => {
     const user = userEvent.setup();
-    render(
-      <FeaturesSettings
-        tenantId="tenant-1"
-        entitledCapabilities={ALL_ENTITLED}
-        initialValues={INITIAL_VALUES}
-        saveAction={vi.fn()}
-      />,
-    );
+    setup();
 
     await user.click(screen.getByRole('switch', { name: 'Comments' }));
 
@@ -147,28 +112,14 @@ describe(FeaturesSettings, () => {
   });
 
   it('disables Save on initial render, with values unchanged', () => {
-    render(
-      <FeaturesSettings
-        tenantId="tenant-1"
-        entitledCapabilities={ALL_ENTITLED}
-        initialValues={INITIAL_VALUES}
-        saveAction={vi.fn()}
-      />,
-    );
+    setup();
 
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
   });
 
   it('enables Save after toggling an entitled capability, and disables it again once toggled back', async () => {
     const user = userEvent.setup();
-    render(
-      <FeaturesSettings
-        tenantId="tenant-1"
-        entitledCapabilities={ALL_ENTITLED}
-        initialValues={INITIAL_VALUES}
-        saveAction={vi.fn()}
-      />,
-    );
+    setup();
 
     const saveButton = screen.getByRole('button', { name: 'Save changes' });
     const newsletterSwitch = screen.getByRole('switch', {
@@ -185,14 +136,7 @@ describe(FeaturesSettings, () => {
   it('disables Save again after a successful save, without a remount', async () => {
     const user = userEvent.setup();
     const saveAction = vi.fn().mockResolvedValue({ ok: true });
-    render(
-      <FeaturesSettings
-        tenantId="tenant-1"
-        entitledCapabilities={ALL_ENTITLED}
-        initialValues={INITIAL_VALUES}
-        saveAction={saveAction}
-      />,
-    );
+    setup({ saveAction });
 
     const saveButton = screen.getByRole('button', { name: 'Save changes' });
     await user.click(screen.getByRole('switch', { name: 'Newsletter' }));
@@ -206,14 +150,7 @@ describe(FeaturesSettings, () => {
   it('saves the current toggle state through saveAction', async () => {
     const user = userEvent.setup();
     const saveAction = vi.fn().mockResolvedValue({ ok: true });
-    render(
-      <FeaturesSettings
-        tenantId="tenant-1"
-        entitledCapabilities={ALL_ENTITLED}
-        initialValues={INITIAL_VALUES}
-        saveAction={saveAction}
-      />,
-    );
+    setup({ saveAction });
 
     await user.click(screen.getByRole('switch', { name: 'Ratings' }));
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
@@ -226,24 +163,9 @@ describe(FeaturesSettings, () => {
 
   it('shows a save-confirmation toast and refreshes after a successful save', async () => {
     const user = userEvent.setup();
-    const refresh = vi.fn();
-    vi.mocked(useRouter).mockReturnValue({
-      push: vi.fn(),
-      replace: vi.fn(),
-      prefetch: vi.fn(),
-      back: vi.fn(),
-      forward: vi.fn(),
-      refresh,
-    } as unknown as ReturnType<typeof useRouter>);
+    const refresh = mockRouterRefresh();
     const saveAction = vi.fn().mockResolvedValue({ ok: true });
-    render(
-      <FeaturesSettings
-        tenantId="tenant-1"
-        entitledCapabilities={ALL_ENTITLED}
-        initialValues={INITIAL_VALUES}
-        saveAction={saveAction}
-      />,
-    );
+    setup({ saveAction });
 
     await user.click(screen.getByRole('switch', { name: 'Newsletter' }));
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
@@ -261,14 +183,7 @@ describe(FeaturesSettings, () => {
         }),
     );
     const user = userEvent.setup();
-    render(
-      <FeaturesSettings
-        tenantId="tenant-1"
-        entitledCapabilities={ALL_ENTITLED}
-        initialValues={INITIAL_VALUES}
-        saveAction={saveAction}
-      />,
-    );
+    setup({ saveAction });
 
     await user.click(screen.getByRole('switch', { name: 'Newsletter' }));
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
@@ -288,24 +203,9 @@ describe(FeaturesSettings, () => {
 
   it('shows an error alert and does not refresh when the save fails', async () => {
     const user = userEvent.setup();
-    const refresh = vi.fn();
-    vi.mocked(useRouter).mockReturnValue({
-      push: vi.fn(),
-      replace: vi.fn(),
-      prefetch: vi.fn(),
-      back: vi.fn(),
-      forward: vi.fn(),
-      refresh,
-    } as unknown as ReturnType<typeof useRouter>);
+    const refresh = mockRouterRefresh();
     const saveAction = vi.fn().mockResolvedValue({ ok: false });
-    render(
-      <FeaturesSettings
-        tenantId="tenant-1"
-        entitledCapabilities={ALL_ENTITLED}
-        initialValues={INITIAL_VALUES}
-        saveAction={saveAction}
-      />,
-    );
+    setup({ saveAction });
 
     await user.click(screen.getByRole('switch', { name: 'Newsletter' }));
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
@@ -314,75 +214,38 @@ describe(FeaturesSettings, () => {
     expect(refresh).not.toHaveBeenCalled();
   });
 
-  it('shows an archived notice and disables Save for an archived tenant', async () => {
-    const user = userEvent.setup();
-    const saveAction = vi.fn().mockResolvedValue({ ok: true });
-    render(
-      <FeaturesSettings
-        tenantId="tenant-1"
-        entitledCapabilities={ALL_ENTITLED}
-        initialValues={INITIAL_VALUES}
-        saveAction={saveAction}
-        archivedAt={new Date('2026-08-26T00:00:00.000Z')}
-      />,
-    );
+  describe('archived tenant', () => {
+    it('shows an archived notice and disables Save', async () => {
+      const user = userEvent.setup();
+      const saveAction = vi.fn().mockResolvedValue({ ok: true });
+      setup({ saveAction, archivedAt: ARCHIVED_AT });
 
-    expect(screen.getByText('This tenant is archived')).toBeVisible();
+      await expectArchivedDisablesSave(user, saveAction);
+    });
 
-    const saveButton = screen.getByRole('button', { name: 'Save changes' });
-    expect(saveButton).toBeDisabled();
+    it('describes the disabled Save button with the archived notice text, for a screen-reader user', () => {
+      setup({ archivedAt: ARCHIVED_AT });
 
-    await user.click(saveButton);
-    expect(saveAction).not.toHaveBeenCalled();
-  });
+      expectArchivedSaveDescribedByNotice();
+    });
 
-  it('describes the disabled Save button with the archived notice text, for a screen-reader user', () => {
-    render(
-      <FeaturesSettings
-        tenantId="tenant-1"
-        entitledCapabilities={ALL_ENTITLED}
-        initialValues={INITIAL_VALUES}
-        saveAction={vi.fn()}
-        archivedAt={new Date('2026-08-26T00:00:00.000Z')}
-      />,
-    );
+    it('disables every capability toggle, including entitled ones', async () => {
+      const user = userEvent.setup();
+      setup({ archivedAt: ARCHIVED_AT });
 
-    expect(
-      screen.getByRole('button', { name: 'Save changes' }),
-    ).toHaveAccessibleDescription(/This tenant is archived/);
-  });
+      const commentsSwitch = screen.getByRole('switch', { name: 'Comments' });
+      expect(commentsSwitch).toHaveAttribute('data-disabled', '');
+      expect(commentsSwitch).toHaveAccessibleDescription(
+        /This tenant is archived/,
+      );
 
-  it('disables every capability toggle, including entitled ones, for an archived tenant', async () => {
-    const user = userEvent.setup();
-    render(
-      <FeaturesSettings
-        tenantId="tenant-1"
-        entitledCapabilities={ALL_ENTITLED}
-        initialValues={INITIAL_VALUES}
-        saveAction={vi.fn()}
-        archivedAt={new Date('2026-08-26T00:00:00.000Z')}
-      />,
-    );
-
-    const commentsSwitch = screen.getByRole('switch', { name: 'Comments' });
-    expect(commentsSwitch).toHaveAttribute('data-disabled', '');
-    expect(commentsSwitch).toHaveAccessibleDescription(
-      /This tenant is archived/,
-    );
-
-    await user.click(commentsSwitch);
-    expect(commentsSwitch).toHaveAttribute('data-checked', '');
+      await user.click(commentsSwitch);
+      expect(commentsSwitch).toHaveAttribute('data-checked', '');
+    });
   });
 
   it('leaves entitled capability toggles enabled for a non-archived tenant', () => {
-    render(
-      <FeaturesSettings
-        tenantId="tenant-1"
-        entitledCapabilities={ALL_ENTITLED}
-        initialValues={INITIAL_VALUES}
-        saveAction={vi.fn()}
-      />,
-    );
+    setup();
 
     expect(
       screen.getByRole('switch', { name: 'Comments' }),

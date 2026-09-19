@@ -16,6 +16,24 @@ const buildPayload = (overrides?: Partial<IToastPayload>): IToastPayload => ({
   ...overrides,
 });
 
+/** Starts a promise-toast with the same loading/success/error copy shared by every "grace period already elapsed" test below. */
+const showPendingPromiseToast = (
+  store: ReturnType<typeof createToastStore>,
+) => {
+  let resolvePromise!: (value: string) => void;
+  const pending = new Promise<string>((resolve) => {
+    resolvePromise = resolve;
+  });
+
+  store.actions.promise(pending, {
+    loading: { title: 'Saving', message: 'saving…' },
+    success: { title: 'Saved', message: 'saved' },
+    error: { title: 'Failed', message: 'failed' },
+  });
+
+  return { resolvePromise };
+};
+
 describe(createToastStore, () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -392,16 +410,7 @@ describe(createToastStore, () => {
 
     it('shows a loading toast after the grace period, then swaps it in place on resolve', async () => {
       const store = createToastStore();
-      let resolvePromise!: (value: string) => void;
-      const pending = new Promise<string>((resolve) => {
-        resolvePromise = resolve;
-      });
-
-      store.actions.promise(pending, {
-        loading: { title: 'Saving', message: 'saving…' },
-        success: { title: 'Saved', message: 'saved' },
-        error: { title: 'Failed', message: 'failed' },
-      });
+      const { resolvePromise } = showPendingPromiseToast(store);
 
       await vi.advanceTimersByTimeAsync(TOAST_PROMISE_GRACE_MS);
       expect(store.getState().visible).toHaveLength(1);
@@ -455,16 +464,7 @@ describe(createToastStore, () => {
 
     it('does not resurrect a loading toast the reader already dismissed before it settled', async () => {
       const store = createToastStore();
-      let resolvePromise!: (value: string) => void;
-      const pending = new Promise<string>((resolve) => {
-        resolvePromise = resolve;
-      });
-
-      store.actions.promise(pending, {
-        loading: { title: 'Saving', message: 'saving…' },
-        success: { title: 'Saved', message: 'saved' },
-        error: { title: 'Failed', message: 'failed' },
-      });
+      const { resolvePromise } = showPendingPromiseToast(store);
 
       await vi.advanceTimersByTimeAsync(TOAST_PROMISE_GRACE_MS);
       const loadingId = store.getState().visible[0]!.id;

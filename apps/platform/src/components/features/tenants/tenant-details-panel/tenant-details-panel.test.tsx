@@ -7,11 +7,11 @@ import {
   screen,
   waitFor,
 } from '@platform/testing/custom-render';
+import { mockRouter } from '@platform/testing/mock-router';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
 import type { TTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';
 import { render as rtlRender } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useRouter } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
 import type { ReactElement } from 'react';
 
@@ -64,21 +64,13 @@ vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
   updateTenantDetailsAction: updateTenantDetailsActionMock,
 }));
 
-describe(TenantDetailsPanel, () => {
+describe(`<${TenantDetailsPanel.name}/>`, () => {
   const refreshMock = vi.fn();
 
   beforeEach(() => {
     updateTenantDetailsActionMock.mockReset();
     refreshMock.mockReset();
-    vi.mocked(useRouter).mockReturnValue({
-      push: vi.fn(),
-      replace: vi.fn(),
-      prefetch: vi.fn(),
-      back: vi.fn(),
-      forward: vi.fn(),
-      refresh: refreshMock,
-      bfcacheId: '',
-    });
+    mockRouter({ refresh: refreshMock });
   });
 
   describe('every field unlocked (fieldLocks={})', () => {
