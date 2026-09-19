@@ -41,19 +41,17 @@
  * `taxonomyList`/`heading`/`supportingText`.
  */
 import { TAXONOMY_KIND } from '@blog/config/constants';
-import {
-  at,
-  defineMigration,
-  prepend,
-  setIfMissing,
-  type MigrationContext,
-} from 'sanity/migrate';
+import { defineMigration, type MigrationContext } from 'sanity/migrate';
 
 import {
   authorTaxonomyOnModule,
   type TTaxonomyListModuleDoc,
 } from '../lib/author-taxonomy-on-module';
 import { backfillHeadingBlock } from '../lib/backfill-heading-block';
+import {
+  foldTaxonomyListIntoModules,
+  toTaxonomyListModuleKey,
+} from '../lib/fold-taxonomy-list-into-modules';
 import { getReferencedTaxonomyListIds } from '../lib/referenced-taxonomy-list-ids';
 
 const PAGE_TAG_INDEX_TYPE = 'page_tagIndex';
@@ -69,36 +67,11 @@ export type TTagIndexPageDoc = {
   headingBlock?: unknown;
 };
 
-export const toTaxonomyListModuleKey = (ref: string): string =>
-  `taxonomyList-${ref}`;
-
-export const foldTaxonomyListIntoModules = (doc: TTagIndexPageDoc) => {
-  const ref = doc.taxonomyList?._ref;
-
-  if (!ref) return undefined;
-
-  const alreadyReferenced = (doc.modules ?? []).some(
-    (module) => module._ref === ref,
-  );
-
-  if (alreadyReferenced) return undefined;
-
-  return [
-    at('modules', setIfMissing([])),
-    at(
-      'modules',
-      prepend([
-        {
-          _key: toTaxonomyListModuleKey(ref),
-          _type: TAXONOMY_LIST_MODULE_TYPE,
-          _ref: ref,
-        },
-      ]),
-    ),
-  ];
+export {
+  foldTaxonomyListIntoModules,
+  toTaxonomyListModuleKey,
+  backfillHeadingBlock,
 };
-
-export { backfillHeadingBlock };
 
 export const migrateTagIndexPage = (doc: TTagIndexPageDoc) => {
   const patches = [

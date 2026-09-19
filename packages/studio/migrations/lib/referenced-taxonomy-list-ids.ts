@@ -10,11 +10,7 @@ type TIndexPageRefs = {
   moduleRefs?: (string | null)[] | null;
 };
 
-/**
- * Keyed by `context` then `pageType` — a plain module-level variable would
- * leak one page type's/run's result across another sharing the same
- * process, and across tests sharing the same module instance.
- */
+// Keyed by context then pageType — a plain module-level variable would leak across runs/tests sharing the same module instance.
 const referencedIdsCache = new WeakMap<
   MigrationContext,
   Map<string, Promise<Set<string>>>

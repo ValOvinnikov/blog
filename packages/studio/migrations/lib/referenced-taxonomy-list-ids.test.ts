@@ -24,7 +24,7 @@ const createMockContext = (
   };
 };
 
-describe('stripDraftPrefix', () => {
+describe(stripDraftPrefix, () => {
   it('removes a drafts. prefix', () => {
     expect(stripDraftPrefix('drafts.list-1')).toBe('list-1');
   });
@@ -34,7 +34,7 @@ describe('stripDraftPrefix', () => {
   });
 });
 
-describe('getReferencedTaxonomyListIds', () => {
+describe(getReferencedTaxonomyListIds, () => {
   it('collects ids from both taxonomyList and modules[] refs', async () => {
     const { context } = createMockContext([
       { taxonomyRef: 'list-1', moduleRefs: [] },

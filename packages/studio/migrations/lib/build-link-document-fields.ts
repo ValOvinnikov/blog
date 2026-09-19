@@ -23,11 +23,7 @@ export type TLinkDocumentFields = {
   url?: string;
 };
 
-/**
- * Builds the `link` document for one destination. `platform` and
- * `accessibleLabel` have no field on `link` and are dropped by omission —
- * the migration reports every non-empty occurrence separately.
- */
+// `platform`/`accessibleLabel` are dropped by omission here — callers report each non-empty occurrence separately.
 export const buildLinkDocumentFields = (
   linkId: string,
   title: string,

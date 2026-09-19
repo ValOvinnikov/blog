@@ -30,6 +30,5 @@ export const toLinkIdentityKey = (
   return undefined;
 };
 
-/** Deterministic `link` document id for a destination identity key. */
 export const toLinkId = (identityKey: string): string =>
   `${LINK_ID_PREFIX}${createHash('sha1').update(identityKey).digest('hex').slice(0, 16)}`;
