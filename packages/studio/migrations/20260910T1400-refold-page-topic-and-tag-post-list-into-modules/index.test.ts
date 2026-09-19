@@ -1,6 +1,6 @@
 import { at, prepend, setIfMissing, unset } from 'sanity/migrate';
 
-import { toPostListModuleKey } from '../20260909T2100-fold-page-topic-post-list-into-modules/module-key';
+import { toPostListModuleKey } from '../lib/post-list-module-key';
 
 import { refoldPostListIntoModules, type TFoldableDoc } from './index';
 

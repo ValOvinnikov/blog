@@ -1,70 +1,13 @@
+import { LINK_LABEL_MAX_LENGTH } from '../lib/link-label-max-length';
+
 import {
-  buildLinkDocumentFields,
   buildLinkRef,
   buildSocialProfile,
   hasMissingLabel,
   hasOversizedLabel,
   hasRecognizedLinkShape,
   hasResolvableUrl,
-  LINK_LABEL_MAX_LENGTH,
 } from './transform';
-
-describe(buildLinkDocumentFields, () => {
-  it('carries label/linkType/openInNewTab and the internalReference for an internal link', () => {
-    const fields = buildLinkDocumentFields('link-abc123', 'Link to Blog', {
-      label: 'Blog',
-      linkType: 'INTERNAL',
-      internalReference: { _ref: 'page_postIndex' },
-      openInNewTab: false,
-    });
-
-    expect(fields).toEqual({
-      _id: 'link-abc123',
-      _type: 'link',
-      title: 'Link to Blog',
-      label: 'Blog',
-      linkType: 'INTERNAL',
-      openInNewTab: false,
-      internalReference: { _type: 'reference', _ref: 'page_postIndex' },
-    });
-  });
-
-  it('carries url instead of internalReference for an external link', () => {
-    const fields = buildLinkDocumentFields(
-      'link-def456',
-      'Link to https://www.linkedin.com/in/val-ovinnikov',
-      {
-        label: 'Linkedin',
-        linkType: 'EXTERNAL',
-        url: 'https://www.linkedin.com/in/val-ovinnikov',
-        openInNewTab: true,
-      },
-    );
-
-    expect(fields).toEqual({
-      _id: 'link-def456',
-      _type: 'link',
-      title: 'Link to https://www.linkedin.com/in/val-ovinnikov',
-      label: 'Linkedin',
-      linkType: 'EXTERNAL',
-      openInNewTab: true,
-      url: 'https://www.linkedin.com/in/val-ovinnikov',
-    });
-  });
-
-  it('drops platform and accessibleLabel — link has no field for either', () => {
-    const fields = buildLinkDocumentFields('link-ghi789', 'Link to Linkedin', {
-      label: 'Linkedin',
-      accessibleLabel: 'Linkedin profile',
-      linkType: 'EXTERNAL',
-      url: 'https://www.linkedin.com/in/val-ovinnikov',
-      platform: 'LINKEDIN',
-    });
-
-    expect(fields).not.toHaveProperty('platform');
-    expect(fields).not.toHaveProperty('accessibleLabel');
-  });
-});
 
 describe(buildLinkRef, () => {
   it('preserves the original _key and points at the given link id', () => {

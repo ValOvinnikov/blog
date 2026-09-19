@@ -1,11 +1,9 @@
 import { LINK_TYPE } from '@blog/config/constants';
 
-const LINK_DOCUMENT_TYPE = 'link';
+import { LINK_LABEL_MAX_LENGTH } from '../lib/link-label-max-length';
+
 export const LINK_REF_TYPE = 'linkRef';
 export const SOCIAL_PROFILE_TYPE = 'socialProfile';
-
-/** Mirrors `link.ts`'s `label` field — `rule.required().max(60)`. */
-export const LINK_LABEL_MAX_LENGTH = 60;
 
 /** Both a pre-rename `link` object and its post-rename `inlineLink` successor are valid legacy shapes, since the rename migration may not have run on every target dataset. */
 const RECOGNIZED_LEGACY_LINK_TYPES = new Set(['link', 'inlineLink']);
@@ -23,17 +21,6 @@ export type TLegacyInlineLink = {
 
 export type TLegacyLinkEntry = TLegacyInlineLink & { _key: string };
 
-export type TLinkDocumentFields = {
-  _id: string;
-  _type: typeof LINK_DOCUMENT_TYPE;
-  title: string;
-  label?: string;
-  linkType?: string;
-  openInNewTab?: boolean;
-  internalReference?: { _type: 'reference'; _ref: string };
-  url?: string;
-};
-
 export const hasRecognizedLinkShape = (item: TLegacyInlineLink): boolean =>
   item._type === undefined || RECOGNIZED_LEGACY_LINK_TYPES.has(item._type);
 
@@ -49,31 +36,6 @@ export const hasResolvableUrl = (item: TLegacyInlineLink): boolean => {
     return false;
   }
 };
-
-/** `platform` and `accessibleLabel` have no field on `link` and are dropped by omission; each non-empty occurrence is reported separately. */
-export const buildLinkDocumentFields = (
-  linkId: string,
-  title: string,
-  item: TLegacyInlineLink,
-): TLinkDocumentFields => ({
-  _id: linkId,
-  _type: LINK_DOCUMENT_TYPE,
-  title,
-  label: item.label,
-  linkType: item.linkType,
-  openInNewTab: item.openInNewTab,
-  ...(item.linkType === LINK_TYPE.INTERNAL && item.internalReference?._ref
-    ? {
-        internalReference: {
-          _type: 'reference' as const,
-          _ref: item.internalReference._ref,
-        },
-      }
-    : {}),
-  ...(item.linkType === LINK_TYPE.EXTERNAL && item.url
-    ? { url: item.url }
-    : {}),
-});
 
 export type TLinkRefNode = {
   _key: string;

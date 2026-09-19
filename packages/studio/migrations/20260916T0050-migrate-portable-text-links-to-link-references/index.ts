@@ -14,7 +14,8 @@ import {
   type NodePatch,
 } from 'sanity/migrate';
 
-import { toLinkId, toLinkIdentityKey } from './id';
+import { toLinkId, toLinkIdentityKey } from '../lib/link-identity';
+
 import {
   applyMarkDefOutcomes,
   buildLinkDocumentFields,

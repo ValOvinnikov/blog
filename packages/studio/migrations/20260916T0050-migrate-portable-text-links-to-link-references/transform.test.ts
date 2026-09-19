@@ -1,12 +1,13 @@
 import type { MigrationContext } from 'sanity/migrate';
 
+import { LINK_LABEL_MAX_LENGTH } from '../lib/link-label-max-length';
+
 import {
   applyMarkDefOutcomes,
   buildLinkDocumentFields,
   deriveExternalLabel,
   describeMarkDef,
   findLegacyLinkBlocks,
-  LINK_LABEL_MAX_LENGTH,
   resolveInlineLinkDestination,
   resolveRawHrefDestination,
   type TBlock,

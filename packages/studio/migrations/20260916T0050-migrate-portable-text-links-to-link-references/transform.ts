@@ -1,6 +1,8 @@
 import { LINK_TYPE } from '@blog/config/constants';
 import type { MigrationContext, Path } from 'sanity/migrate';
 
+import { LINK_LABEL_MAX_LENGTH } from '../lib/link-label-max-length';
+
 const LINK_DOCUMENT_TYPE = 'link';
 const LINK_REF_TYPE = 'linkRef';
 const RAW_HREF_MARK_TYPE = 'link';
@@ -9,10 +11,7 @@ const INLINE_LINK_MARK_TYPE = 'inlineLink';
 const BLOG_POST_HREF_PATTERN = /^\/blog\/([^/]+)\/?$/;
 const EXTERNAL_URL_PATTERN = /^https?:\/\//;
 
-/** Mirrors `link.ts`'s `label` field — `rule.required().max(60)`. */
-export const LINK_LABEL_MAX_LENGTH = 60;
-
-export type TLegacyInlineLink = {
+type TLegacyInlineLink = {
   label?: string;
   accessibleLabel?: string;
   linkType?: string;

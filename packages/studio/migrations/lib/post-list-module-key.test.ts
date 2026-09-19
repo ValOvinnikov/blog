@@ -1,4 +1,4 @@
-import { toPostListModuleKey } from './module-key';
+import { toPostListModuleKey } from './post-list-module-key';
 
 describe(toPostListModuleKey, () => {
   it('is deterministic for the same reference', () => {

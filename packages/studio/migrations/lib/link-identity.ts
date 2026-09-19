@@ -2,13 +2,18 @@ import { createHash } from 'node:crypto';
 
 import { LINK_TYPE } from '@blog/config/constants';
 
-import type { TLegacyInlineLink } from './transform';
-
 const LINK_ID_PREFIX = 'link-';
 
-/** The string a destination collapses to for dedup, keyed on destination *and* label — two links can share a destination but carry different visible wording. */
+export type TLinkIdentitySource = {
+  label?: string;
+  linkType?: string;
+  internalReference?: { _ref?: string };
+  url?: string;
+};
+
+/** Includes the label in the dedup key, since a `link` document has one required label and destination-only dedup would silently merge two links with different wording. */
 export const toLinkIdentityKey = (
-  link: TLegacyInlineLink,
+  link: TLinkIdentitySource,
 ): string | undefined => {
   if (link.linkType === LINK_TYPE.INTERNAL) {
     return link.internalReference?._ref

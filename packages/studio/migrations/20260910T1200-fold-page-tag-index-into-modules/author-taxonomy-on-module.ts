@@ -1,7 +1,7 @@
 import { TAXONOMY_KIND } from '@blog/config/constants';
 import { at, set, type NodePatch } from 'sanity/migrate';
 
-import { stripDraftPrefix } from './referenced-taxonomy-list-ids';
+import { stripDraftPrefix } from '../lib/referenced-taxonomy-list-ids';
 
 export type TTaxonomyListModuleDoc = {
   _id: string;

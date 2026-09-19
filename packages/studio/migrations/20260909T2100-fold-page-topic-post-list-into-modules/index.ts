@@ -12,7 +12,7 @@
  * `postList` reference is also a no-op, not an error.
  *
  * The inserted array item's `_key` is derived deterministically from
- * `postList._ref` (see `./module-key.ts`), so a re-run computes the exact
+ * `postList._ref` (see `../lib/post-list-module-key.ts`), so a re-run computes the exact
  * same key rather than a fresh random one.
  *
  * Workflow (see ../README.md for the full guardrails):
@@ -27,7 +27,7 @@
  */
 import { at, defineMigration, prepend } from 'sanity/migrate';
 
-import { toPostListModuleKey } from './module-key';
+import { toPostListModuleKey } from '../lib/post-list-module-key';
 
 const POST_LIST_MODULE_TYPE = 'module_postList';
 

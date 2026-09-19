@@ -1,10 +1,8 @@
-import { CTA_ACTION_VARIANT, LINK_TYPE } from '@blog/config/constants';
+import { CTA_ACTION_VARIANT } from '@blog/config/constants';
 
-const LINK_DOCUMENT_TYPE = 'link';
+import { LINK_LABEL_MAX_LENGTH } from '../lib/link-label-max-length';
+
 const CTA_BUTTON_TYPE = 'ctaButton';
-
-/** Mirrors `link.ts`'s `label` field — `rule.required().max(60)`. */
-export const LINK_LABEL_MAX_LENGTH = 60;
 
 /** Mirrors `cta-buttons-field.ts`'s default `max` for the `ctaButtons` array. */
 const CTA_BUTTONS_MAX = 2;
@@ -25,46 +23,6 @@ export type TLegacyCtaAction = {
   appearance?: string;
   link?: TLegacyInlineLink;
 };
-
-export type TLinkDocumentFields = {
-  _id: string;
-  _type: typeof LINK_DOCUMENT_TYPE;
-  title: string;
-  label?: string;
-  linkType?: string;
-  openInNewTab?: boolean;
-  internalReference?: { _type: 'reference'; _ref: string };
-  url?: string;
-};
-
-/**
- * Builds the `link` document for one destination. `platform` and
- * `accessibleLabel` have no field on `link` and are dropped by omission —
- * the migration reports every non-empty occurrence separately.
- */
-export const buildLinkDocumentFields = (
-  linkId: string,
-  title: string,
-  link: TLegacyInlineLink,
-): TLinkDocumentFields => ({
-  _id: linkId,
-  _type: LINK_DOCUMENT_TYPE,
-  title,
-  label: link.label,
-  linkType: link.linkType,
-  openInNewTab: link.openInNewTab,
-  ...(link.linkType === LINK_TYPE.INTERNAL && link.internalReference?._ref
-    ? {
-        internalReference: {
-          _type: 'reference' as const,
-          _ref: link.internalReference._ref,
-        },
-      }
-    : {}),
-  ...(link.linkType === LINK_TYPE.EXTERNAL && link.url
-    ? { url: link.url }
-    : {}),
-});
 
 export type TCtaButtonNode = {
   _key: string;

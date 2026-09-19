@@ -1,4 +1,4 @@
-import { toLinkId, toLinkIdentityKey } from './id';
+import { toLinkId, toLinkIdentityKey } from './link-identity';
 
 describe(toLinkIdentityKey, () => {
   it('keys an internal link on the referenced document id and label', () => {
@@ -49,6 +49,7 @@ describe(toLinkIdentityKey, () => {
     });
 
     expect(a).not.toBe(b);
+    expect(toLinkId(a as string)).not.toBe(toLinkId(b as string));
   });
 
   it('keys two links with the same destination and label the same, for dedup', () => {
@@ -64,6 +65,21 @@ describe(toLinkIdentityKey, () => {
     });
 
     expect(a).toBe(b);
+  });
+
+  it('treats a missing label as the empty string, distinct from an explicit one', () => {
+    const withoutLabel = toLinkIdentityKey({
+      linkType: 'EXTERNAL',
+      url: 'https://example.com/a',
+    });
+    const withLabel = toLinkIdentityKey({
+      linkType: 'EXTERNAL',
+      url: 'https://example.com/a',
+      label: '',
+    });
+
+    expect(withoutLabel).toBe('external:https://example.com/a|label:');
+    expect(withoutLabel).toBe(withLabel);
   });
 
   it('is undefined for an internal link with no internalReference set', () => {

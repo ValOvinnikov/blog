@@ -41,7 +41,7 @@ describe('getReferencedTaxonomyListIds', () => {
       { taxonomyRef: null, moduleRefs: ['list-2'] },
     ]);
 
-    const ids = await getReferencedTaxonomyListIds(context);
+    const ids = await getReferencedTaxonomyListIds(context, 'page_topicIndex');
 
     expect(ids).toEqual(new Set(['list-1', 'list-2']));
   });
@@ -51,20 +51,31 @@ describe('getReferencedTaxonomyListIds', () => {
       { taxonomyRef: 'drafts.list-1', moduleRefs: [] },
     ]);
 
-    const ids = await getReferencedTaxonomyListIds(context);
+    const ids = await getReferencedTaxonomyListIds(context, 'page_topicIndex');
 
     expect(ids).toEqual(new Set(['list-1']));
   });
 
-  it('caches the result per context, fetching only once', async () => {
+  it('caches the result per context and pageType, fetching only once', async () => {
     const { context, fetchCalls } = createMockContext([
       { taxonomyRef: 'list-1', moduleRefs: [] },
     ]);
 
-    await getReferencedTaxonomyListIds(context);
-    await getReferencedTaxonomyListIds(context);
+    await getReferencedTaxonomyListIds(context, 'page_topicIndex');
+    await getReferencedTaxonomyListIds(context, 'page_topicIndex');
 
     expect(fetchCalls).toHaveLength(1);
+  });
+
+  it('fetches separately per pageType against the same context', async () => {
+    const { context, fetchCalls } = createMockContext([
+      { taxonomyRef: 'list-1', moduleRefs: [] },
+    ]);
+
+    await getReferencedTaxonomyListIds(context, 'page_topicIndex');
+    await getReferencedTaxonomyListIds(context, 'page_tagIndex');
+
+    expect(fetchCalls).toHaveLength(2);
   });
 
   it('produces an empty set when no page references anything', async () => {
@@ -72,7 +83,7 @@ describe('getReferencedTaxonomyListIds', () => {
       { taxonomyRef: null, moduleRefs: null },
     ]);
 
-    const ids = await getReferencedTaxonomyListIds(context);
+    const ids = await getReferencedTaxonomyListIds(context, 'page_topicIndex');
 
     expect(ids).toEqual(new Set());
   });

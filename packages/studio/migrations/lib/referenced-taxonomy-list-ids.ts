@@ -1,36 +1,35 @@
 import type { MigrationContext } from 'sanity/migrate';
 
-const PAGE_TOPIC_INDEX_TYPE = 'page_topicIndex';
 const TAXONOMY_LIST_MODULE_TYPE = 'module_taxonomyList';
 
 export const stripDraftPrefix = (id: string): string =>
   id.replace(/^drafts\./, '');
 
-type TPageTopicIndexRefs = {
+type TIndexPageRefs = {
   taxonomyRef?: string | null;
   moduleRefs?: (string | null)[] | null;
 };
 
 /**
- * Keyed by `context` (one stable object per migration run, per `run()` in
- * `@sanity/migrate`) — a plain module-level variable would leak the first
- * run's result across later runs sharing the same process, and across tests
- * sharing the same module instance.
+ * Keyed by `context` then `pageType` — a plain module-level variable would
+ * leak one page type's/run's result across another sharing the same
+ * process, and across tests sharing the same module instance.
  */
 const referencedIdsCache = new WeakMap<
   MigrationContext,
-  Promise<Set<string>>
+  Map<string, Promise<Set<string>>>
 >();
 
 const fetchReferencedTaxonomyListIds = async (
   context: MigrationContext,
+  pageType: string,
 ): Promise<Set<string>> => {
-  const docs = await context.client.fetch<TPageTopicIndexRefs[]>(
+  const docs = await context.client.fetch<TIndexPageRefs[]>(
     `*[_type == $pageType]{
       "taxonomyRef": taxonomyList._ref,
       "moduleRefs": modules[_type == $moduleType]._ref
     }`,
-    { pageType: PAGE_TOPIC_INDEX_TYPE, moduleType: TAXONOMY_LIST_MODULE_TYPE },
+    { pageType, moduleType: TAXONOMY_LIST_MODULE_TYPE },
   );
 
   const ids = docs.flatMap((doc) => [
@@ -45,16 +44,22 @@ const fetchReferencedTaxonomyListIds = async (
   );
 };
 
+/** Every `module_taxonomyList` id referenced (directly or via `modules[]`) by a document of `pageType`, published or draft. */
 export const getReferencedTaxonomyListIds = (
   context: MigrationContext,
+  pageType: string,
 ): Promise<Set<string>> => {
-  const cached = referencedIdsCache.get(context);
+  const byPageType = referencedIdsCache.get(context) ?? new Map();
+
+  referencedIdsCache.set(context, byPageType);
+
+  const cached = byPageType.get(pageType);
 
   if (cached) return cached;
 
-  const computed = fetchReferencedTaxonomyListIds(context);
+  const computed = fetchReferencedTaxonomyListIds(context, pageType);
 
-  referencedIdsCache.set(context, computed);
+  byPageType.set(pageType, computed);
 
   return computed;
 };

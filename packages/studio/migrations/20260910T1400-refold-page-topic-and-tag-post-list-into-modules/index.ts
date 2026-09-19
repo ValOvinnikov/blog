@@ -11,9 +11,8 @@
  *     skipped document keeps it.
  *
  * The inserted array item's `_key` is derived deterministically from
- * `postList._ref` (see
- * `../20260909T2100-fold-page-topic-post-list-into-modules/module-key.ts`),
- * so a re-run computes the exact same key rather than a fresh random one.
+ * `postList._ref` (see `../lib/post-list-module-key.ts`), so a re-run
+ * computes the exact same key rather than a fresh random one.
  *
  * Workflow (see ../README.md for the full guardrails):
  *   1. `pnpm --filter @blog/studio dataset:export -- migrations/backups/production-<date>.tar.gz`
@@ -28,7 +27,7 @@ import {
   unset,
 } from 'sanity/migrate';
 
-import { toPostListModuleKey } from '../20260909T2100-fold-page-topic-post-list-into-modules/module-key';
+import { toPostListModuleKey } from '../lib/post-list-module-key';
 
 const POST_LIST_MODULE_TYPE = 'module_postList';
 

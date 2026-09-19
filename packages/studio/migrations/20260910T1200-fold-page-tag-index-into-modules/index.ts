@@ -48,12 +48,15 @@ import {
   type MigrationContext,
 } from 'sanity/migrate';
 
+import { backfillHeadingBlock } from '../lib/backfill-heading-block';
+import { getReferencedTaxonomyListIds } from '../lib/referenced-taxonomy-list-ids';
+
 import {
   authorTaxonomyOnModule,
   type TTaxonomyListModuleDoc,
 } from './author-taxonomy-on-module';
-import { getReferencedTaxonomyListIds } from './referenced-taxonomy-list-ids';
 
+const PAGE_TAG_INDEX_TYPE = 'page_tagIndex';
 const TAXONOMY_LIST_MODULE_TYPE = 'module_taxonomyList';
 
 type TModuleReference = { _key: string; _type: string; _ref: string };
@@ -95,22 +98,7 @@ export const foldTaxonomyListIntoModules = (doc: TTagIndexPageDoc) => {
   ];
 };
 
-export const backfillHeadingBlock = (doc: TTagIndexPageDoc) => {
-  if (doc.headingBlock !== undefined) return undefined;
-  if (doc.heading === undefined && doc.supportingText === undefined) {
-    return undefined;
-  }
-
-  return [
-    at(
-      'headingBlock',
-      setIfMissing({
-        heading: doc.heading,
-        supportingText: doc.supportingText,
-      }),
-    ),
-  ];
-};
+export { backfillHeadingBlock };
 
 export const migrateTagIndexPage = (doc: TTagIndexPageDoc) => {
   const patches = [
@@ -124,11 +112,14 @@ export const migrateTagIndexPage = (doc: TTagIndexPageDoc) => {
 export default defineMigration({
   title:
     'Fold page_tagIndex taxonomyList into modules[], backfill headingBlock, and author module taxonomy',
-  documentTypes: ['page_tagIndex', TAXONOMY_LIST_MODULE_TYPE],
+  documentTypes: [PAGE_TAG_INDEX_TYPE, TAXONOMY_LIST_MODULE_TYPE],
   migrate: {
     async document(doc, context: MigrationContext) {
       if (doc._type === TAXONOMY_LIST_MODULE_TYPE) {
-        const referencedIds = await getReferencedTaxonomyListIds(context);
+        const referencedIds = await getReferencedTaxonomyListIds(
+          context,
+          PAGE_TAG_INDEX_TYPE,
+        );
 
         return (
           authorTaxonomyOnModule(

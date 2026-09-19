@@ -90,42 +90,6 @@ describe('foldTaxonomyListIntoModules', () => {
   });
 });
 
-describe('backfillHeadingBlock', () => {
-  it('sets headingBlock from heading and supportingText', () => {
-    const doc = {
-      ...baseDoc,
-      heading: 'Tags',
-      supportingText: 'Browse every tag.',
-    };
-
-    expect(backfillHeadingBlock(doc)).toEqual([
-      at(
-        'headingBlock',
-        setIfMissing({
-          heading: 'Tags',
-          supportingText: 'Browse every tag.',
-        }),
-      ),
-    ]);
-  });
-
-  it('is a no-op when headingBlock is already set', () => {
-    const doc = {
-      ...baseDoc,
-      heading: 'Tags',
-      headingBlock: { heading: 'Tags' },
-    };
-
-    expect(backfillHeadingBlock(doc)).toBeUndefined();
-  });
-
-  it('is a no-op when neither heading nor supportingText is set', () => {
-    const doc = { ...baseDoc } as TTagIndexPageDoc;
-
-    expect(backfillHeadingBlock(doc)).toBeUndefined();
-  });
-});
-
 describe('migrateTagIndexPage', () => {
   it('applies both the fold and the backfill for a fully legacy document', () => {
     const doc = {
