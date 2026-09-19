@@ -1,6 +1,6 @@
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
-import type { ReactNode } from 'react';
+import type { AnchorHTMLAttributes } from 'react';
 
 import { type IBookmarkRow, BookmarksList } from './bookmarks-list';
 
@@ -101,10 +101,7 @@ describe(`<${BookmarksList.name}/>`, () => {
     const CustomLink = ({
       href,
       children,
-    }: {
-      href: string;
-      children?: ReactNode;
-    }) => (
+    }: AnchorHTMLAttributes<HTMLAnchorElement>) => (
       <a href={href} data-testid="custom-link">
         {children}
       </a>

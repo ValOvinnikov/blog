@@ -213,9 +213,18 @@ describe(`<${MediaCard.name}/>`, () => {
     );
   });
 
-  it('wraps MediaCard.Media in a split container only when isSplit is set and Media is present', () => {
+  it.each([
+    {
+      name: 'wraps MediaCard.Media in a split container only when isSplit is set and Media is present',
+      isSplit: true,
+    },
+    {
+      name: 'renders MediaCard.Media as a direct child of the article when isSplit is unset',
+      isSplit: undefined,
+    },
+  ])('$name', ({ isSplit }) => {
     renderElement(
-      <MediaCard isSplit={true}>
+      <MediaCard isSplit={isSplit}>
         <MediaCard.Media dataTestId="media-card-media">
           <img src="/cover.jpg" alt="Cover photo" />
         </MediaCard.Media>
@@ -223,21 +232,13 @@ describe(`<${MediaCard.name}/>`, () => {
     );
     const media = screen.getByTestId('media-card-media');
     const article = screen.getByRole('article');
-    expect(media.parentElement).not.toBe(article);
-    expect(media.parentElement?.parentElement).toBe(article);
-  });
 
-  it('renders MediaCard.Media as a direct child of the article when isSplit is unset', () => {
-    renderElement(
-      <MediaCard>
-        <MediaCard.Media dataTestId="media-card-media">
-          <img src="/cover.jpg" alt="Cover photo" />
-        </MediaCard.Media>
-      </MediaCard>,
-    );
-    const media = screen.getByTestId('media-card-media');
-    const article = screen.getByRole('article');
-    expect(media.parentElement).toBe(article);
+    if (isSplit) {
+      expect(media.parentElement).not.toBe(article);
+      expect(media.parentElement?.parentElement).toBe(article);
+    } else {
+      expect(media.parentElement).toBe(article);
+    }
   });
 
   it('clamps the excerpt to three lines when isLead is set', () => {

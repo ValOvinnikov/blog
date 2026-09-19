@@ -4,6 +4,17 @@ import { createRef } from 'react';
 
 import { PopoverMenu } from './popover-menu';
 
+const openMenuChildren = (
+  <>
+    <PopoverMenu.Trigger ariaLabel="Open menu" isOpen={true} panelId="p1">
+      Trigger
+    </PopoverMenu.Trigger>
+    <PopoverMenu.Panel id="p1" isOpen={true}>
+      <PopoverMenu.Item>Item one</PopoverMenu.Item>
+    </PopoverMenu.Panel>
+  </>
+);
+
 describe(`<${PopoverMenu.name}/>`, () => {
   it('renders a trigger with the correct menu-button ARIA attributes', () => {
     renderElement(
@@ -132,14 +143,7 @@ describe(`<${PopoverMenu.name}/>`, () => {
 
   it('forwards data-testid', () => {
     renderElement(
-      <PopoverMenu dataTestId="popover-menu">
-        <PopoverMenu.Trigger ariaLabel="Open menu" isOpen={true} panelId="p1">
-          Trigger
-        </PopoverMenu.Trigger>
-        <PopoverMenu.Panel id="p1" isOpen={true}>
-          <PopoverMenu.Item>Item one</PopoverMenu.Item>
-        </PopoverMenu.Panel>
-      </PopoverMenu>,
+      <PopoverMenu dataTestId="popover-menu">{openMenuChildren}</PopoverMenu>,
     );
 
     expect(screen.getByTestId('popover-menu')).toBeVisible();
@@ -148,12 +152,7 @@ describe(`<${PopoverMenu.name}/>`, () => {
   it('merges extra className', () => {
     renderElement(
       <PopoverMenu className="mt-4" dataTestId="popover-menu">
-        <PopoverMenu.Trigger ariaLabel="Open menu" isOpen={true} panelId="p1">
-          Trigger
-        </PopoverMenu.Trigger>
-        <PopoverMenu.Panel id="p1" isOpen={true}>
-          <PopoverMenu.Item>Item one</PopoverMenu.Item>
-        </PopoverMenu.Panel>
+        {openMenuChildren}
       </PopoverMenu>,
     );
 

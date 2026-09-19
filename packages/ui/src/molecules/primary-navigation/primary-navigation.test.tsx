@@ -1,7 +1,7 @@
 import { customRender, screen, within } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 import userEvent from '@testing-library/user-event';
-import type { ReactNode } from 'react';
+import type { AnchorHTMLAttributes } from 'react';
 
 import { PrimaryNavigation } from './primary-navigation';
 
@@ -68,10 +68,7 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
     const CustomLink = ({
       href,
       children,
-    }: {
-      href: string;
-      children?: ReactNode;
-    }) => (
+    }: AnchorHTMLAttributes<HTMLAnchorElement>) => (
       <a href={href} data-testid="custom-link">
         {children}
       </a>
