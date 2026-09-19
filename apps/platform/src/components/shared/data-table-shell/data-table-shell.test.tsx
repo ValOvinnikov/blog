@@ -18,7 +18,7 @@ const twoItems: TItem[] = [
   { id: '2', name: 'Globex' },
 ];
 
-describe(DataTableShell, () => {
+describe(`<${DataTableShell.name}/>`, () => {
   it('shows the empty message and no table when items is empty', () => {
     const { container } = render(
       <DataTableShell

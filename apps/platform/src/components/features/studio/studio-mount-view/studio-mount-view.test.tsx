@@ -21,7 +21,7 @@ vi.mock('@blog/studio', () => ({
   },
 }));
 
-describe(StudioMountView, () => {
+describe(`<${StudioMountView.name}/>`, () => {
   beforeEach(() => {
     getTenantSanityCredentialsMock.mockReset();
     studioMountMock.mockReset();

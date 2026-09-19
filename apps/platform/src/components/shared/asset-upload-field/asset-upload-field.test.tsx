@@ -25,7 +25,7 @@ const baseProps: TAssetUploadFieldProps = {
 
 const pngFile = () => new File(['bytes'], 'logo.png', { type: 'image/png' });
 
-describe(AssetUploadField, () => {
+describe(`<${AssetUploadField.name}/>`, () => {
   it('shows no thumbnail or Remove control before any value is set', () => {
     const { container } = render(<AssetUploadField {...baseProps} />);
 

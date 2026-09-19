@@ -19,7 +19,7 @@ const baseProps: TSettingsFormShellProps = {
   children: <p>tab body</p>,
 };
 
-describe(SettingsFormShell, () => {
+describe(`<${SettingsFormShell.name}/>`, () => {
   it('renders the title, description and children', () => {
     renderWithIntl(<SettingsFormShell {...baseProps} />);
 

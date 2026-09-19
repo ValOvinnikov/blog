@@ -21,7 +21,7 @@ vi.mock('@platform/server/email/clear-email-logo-action', () => ({
   clearEmailLogoAction: clearEmailLogoActionMock,
 }));
 
-describe(EmailLogoField, () => {
+describe(`<${EmailLogoField.name}/>`, () => {
   beforeEach(() => {
     uploadEmailLogoActionMock.mockReset();
     clearEmailLogoActionMock.mockReset();

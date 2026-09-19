@@ -25,7 +25,7 @@ vi.mock('@platform/server/site-config/clear-brand-asset-action', () => ({
   clearBrandAssetAction: clearBrandAssetActionMock,
 }));
 
-describe(BrandAssetField, () => {
+describe(`<${BrandAssetField.name}/>`, () => {
   beforeEach(() => {
     uploadBrandAssetActionMock.mockReset();
     clearBrandAssetActionMock.mockReset();

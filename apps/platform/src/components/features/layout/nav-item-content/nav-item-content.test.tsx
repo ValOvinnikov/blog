@@ -3,7 +3,7 @@ import { render, screen } from '@platform/testing/custom-render';
 
 import { NavItemContent } from './nav-item-content';
 
-describe(NavItemContent, () => {
+describe(`<${NavItemContent.name}/>`, () => {
   it('renders the icon and label', () => {
     const { container } = render(
       <NavItemContent icon={ICONS.GRID} label="Tenants" />,
