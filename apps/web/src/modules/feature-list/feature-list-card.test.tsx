@@ -2,22 +2,12 @@ import { CARD_IMAGE_SHAPE, ICONS } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import { makeFeatureListItem } from '@web/testing/modules/feature-list/fixtures';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { FeatureListCard } from './feature-list-card';
 
 vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: ({
-    href,
-    children,
-    ...rest
-  }: {
-    href: string;
-    children: React.ReactNode;
-  }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
+  SmartLink: SmartLinkMock,
 }));
 
 const item = makeFeatureListItem();
