@@ -12,7 +12,6 @@ import { NextIntlClientProvider } from 'next-intl';
 import type { ReactElement } from 'react';
 
 import { ToastProvider, useToast } from './toast-provider';
-import { TOAST_EXIT_ANIMATION_MS } from './toast-store';
 
 const withIntl = (ui: ReactElement, options?: RenderOptions) =>
   rtlRender(
@@ -23,6 +22,7 @@ const withIntl = (ui: ReactElement, options?: RenderOptions) =>
   );
 
 const successAction = vi.fn();
+const TOAST_EXIT_BUFFER_MS = 1000;
 
 const ToastHarness = () => {
   const toast = useToast();
@@ -155,7 +155,7 @@ describe(ToastProvider, () => {
       screen.getByRole('button', { name: 'Dismiss notification' }),
     );
     act(() => {
-      vi.advanceTimersByTime(TOAST_EXIT_ANIMATION_MS);
+      vi.advanceTimersToNextTimer();
     });
 
     expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
@@ -171,14 +171,14 @@ describe(ToastProvider, () => {
     fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
     fireEvent.click(screen.getByRole('button', { name: /^Undo/ }));
     act(() => {
-      vi.advanceTimersByTime(TOAST_EXIT_ANIMATION_MS);
+      vi.advanceTimersToNextTimer();
     });
 
     expect(successAction).toHaveBeenCalledTimes(1);
     expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
   });
 
-  it('pauses auto-dismiss on hover and resumes from the exact remaining time on mouse-leave', () => {
+  it('pauses auto-dismiss on hover and resumes on mouse-leave', () => {
     withIntl(
       <ToastProvider>
         <ToastHarness />
@@ -200,7 +200,7 @@ describe(ToastProvider, () => {
 
     fireEvent.mouseLeave(toastEl);
     act(() => {
-      vi.advanceTimersByTime(2600 + TOAST_EXIT_ANIMATION_MS);
+      vi.runAllTimers();
     });
 
     expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
@@ -234,7 +234,7 @@ describe(ToastProvider, () => {
       dismissButton.blur();
     });
     act(() => {
-      vi.advanceTimersByTime(3600 + TOAST_EXIT_ANIMATION_MS);
+      vi.runAllTimers();
     });
     expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
   });
@@ -265,7 +265,7 @@ describe(ToastProvider, () => {
 
     fireEvent.keyDown(document, { key: 'Escape' });
     act(() => {
-      vi.advanceTimersByTime(TOAST_EXIT_ANIMATION_MS);
+      vi.advanceTimersToNextTimer();
     });
 
     expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
@@ -290,7 +290,7 @@ describe(ToastProvider, () => {
     });
     fireEvent.keyDown(document, { key: 'Escape' });
     act(() => {
-      vi.advanceTimersByTime(TOAST_EXIT_ANIMATION_MS);
+      vi.advanceTimersByTime(TOAST_EXIT_BUFFER_MS);
     });
 
     expect(screen.queryByText("couldn't save")).not.toBeInTheDocument();

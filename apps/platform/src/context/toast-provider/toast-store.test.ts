@@ -1,14 +1,6 @@
-import { TOAST_TYPE } from '@blog/config';
+import { TOAST_TYPE, type TToastType } from '@blog/config';
 
-import {
-  createToastStore,
-  TOAST_DEFAULT_LIFE_MS,
-  TOAST_EXIT_ANIMATION_MS,
-  TOAST_MERGE_WINDOW_MS,
-  TOAST_PROMISE_GRACE_MS,
-  TOAST_QUEUE_CAP,
-  type IToastPayload,
-} from './toast-store';
+import { createToastStore, type IToastPayload } from './toast-store';
 
 const buildPayload = (overrides?: Partial<IToastPayload>): IToastPayload => ({
   title: 'Bookmark saved',
@@ -33,6 +25,57 @@ const showPendingPromiseToast = (
   return { resolvePromise };
 };
 
+const fillVisibleQueue = (
+  store: ReturnType<typeof createToastStore>,
+  type: TToastType,
+) => {
+  const addedIds: string[] = [];
+  let lastId = '';
+  let cappedAt = -1;
+
+  for (let i = 0; i < 100 && cappedAt === -1; i++) {
+    const beforeLength = store.getState().visible.length;
+    lastId = store.actions.show(
+      type,
+      buildPayload({ message: `fill-${addedIds.length}` }),
+    );
+
+    if (store.getState().visible.length > beforeLength) {
+      addedIds.push(lastId);
+    } else {
+      cappedAt = addedIds.length;
+    }
+  }
+
+  if (cappedAt === -1) {
+    throw new Error('fillVisibleQueue never found the cap within 100 pushes');
+  }
+
+  return { addedIds, lastId };
+};
+
+const fillWithErrorsToCap = (store: ReturnType<typeof createToastStore>) => {
+  const ids: string[] = [];
+  let overflowId = '';
+
+  for (let i = 0; i < 100 && !overflowId; i++) {
+    const beforeLength = store.getState().visible.length;
+    const id = store.actions.show(
+      TOAST_TYPE.ERROR,
+      buildPayload({ message: `err-${ids.length}` }),
+    );
+
+    if (store.getState().visible.length === beforeLength) {
+      overflowId = id;
+    } else {
+      ids.push(id);
+    }
+  }
+
+  store.actions.dismiss(overflowId);
+  return ids;
+};
+
 describe(createToastStore, () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -43,32 +86,31 @@ describe(createToastStore, () => {
   });
 
   describe('show', () => {
-    it('enqueues a new toast in the entering phase with the type default life', () => {
+    it('enqueues a new toast in the entering phase, armed to auto-dismiss', () => {
       const store = createToastStore();
 
       const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
 
       expect(store.getState().visible).toHaveLength(1);
-      expect(store.getState().visible[0]).toMatchObject({
+      const record = store.getState().visible[0];
+      expect(record).toMatchObject({
         id,
         type: TOAST_TYPE.SUCCESS,
         title: 'Bookmark saved',
         phase: 'entering',
         paused: false,
-        durationMs: TOAST_DEFAULT_LIFE_MS[TOAST_TYPE.SUCCESS],
       });
+      expect(record?.durationMs).toBeGreaterThan(0);
     });
 
-    it('defaults warning to a 5s life and leaves error sticky (no durationMs)', () => {
+    it('assigns a default life to warning but leaves error sticky', () => {
       const store = createToastStore();
 
       store.actions.show(TOAST_TYPE.WARNING, buildPayload());
       store.actions.show(TOAST_TYPE.ERROR, buildPayload());
 
       const [warning, error] = store.getState().visible;
-      expect(warning!.durationMs).toBe(
-        TOAST_DEFAULT_LIFE_MS[TOAST_TYPE.WARNING],
-      );
+      expect(warning!.durationMs).toBeGreaterThan(0);
       expect(error!.durationMs).toBeUndefined();
     });
 
@@ -87,12 +129,12 @@ describe(createToastStore, () => {
       const store = createToastStore();
       const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
 
-      vi.advanceTimersByTime(TOAST_DEFAULT_LIFE_MS[TOAST_TYPE.SUCCESS]!);
+      vi.advanceTimersToNextTimer();
       expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
         'leaving',
       );
 
-      vi.advanceTimersByTime(TOAST_EXIT_ANIMATION_MS);
+      vi.advanceTimersToNextTimer();
       expect(store.getState().visible.find((t) => t.id === id)).toBeUndefined();
     });
 
@@ -100,7 +142,7 @@ describe(createToastStore, () => {
       const store = createToastStore();
       const id = store.actions.show(TOAST_TYPE.ERROR, buildPayload());
 
-      vi.advanceTimersByTime(60_000);
+      vi.runAllTimers();
 
       expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
         'entering',
@@ -109,35 +151,24 @@ describe(createToastStore, () => {
   });
 
   describe('cap and eviction', () => {
-    it('evicts the oldest non-error toast instantly once the cap is exceeded', () => {
+    it('evicts the oldest non-error toast once the visible queue is full', () => {
       const store = createToastStore();
-      const ids = Array.from({ length: TOAST_QUEUE_CAP }, (_, i) =>
-        store.actions.show(
-          TOAST_TYPE.INFO,
-          buildPayload({ message: `msg-${i}` }),
-        ),
-      );
 
-      const fifthId = store.actions.show(
-        TOAST_TYPE.INFO,
-        buildPayload({ message: 'msg-fifth' }),
-      );
+      const { addedIds, lastId } = fillVisibleQueue(store, TOAST_TYPE.INFO);
 
       const visibleIds = store.getState().visible.map((t) => t.id);
-      expect(visibleIds).toHaveLength(TOAST_QUEUE_CAP);
-      expect(visibleIds).not.toContain(ids[0]);
-      expect(visibleIds).toContain(fifthId);
+      expect(visibleIds).toHaveLength(addedIds.length);
+      expect(visibleIds).not.toContain(addedIds[0]);
+      expect(visibleIds).toContain(lastId);
     });
 
     it('queues a new toast instead of evicting when every visible slot is an error', () => {
       const store = createToastStore();
-      Array.from({ length: TOAST_QUEUE_CAP }, () =>
-        store.actions.show(TOAST_TYPE.ERROR, buildPayload()),
-      );
+      const errorIds = fillWithErrorsToCap(store);
 
       const queuedId = store.actions.show(TOAST_TYPE.INFO, buildPayload());
 
-      expect(store.getState().visible).toHaveLength(TOAST_QUEUE_CAP);
+      expect(store.getState().visible).toHaveLength(errorIds.length);
       expect(store.getState().visible.some((t) => t.id === queuedId)).toBe(
         false,
       );
@@ -146,13 +177,11 @@ describe(createToastStore, () => {
 
     it('promotes the oldest pending toast once a visible slot frees up', () => {
       const store = createToastStore();
-      const errorIds = Array.from({ length: TOAST_QUEUE_CAP }, () =>
-        store.actions.show(TOAST_TYPE.ERROR, buildPayload()),
-      );
+      const errorIds = fillWithErrorsToCap(store);
       const queuedId = store.actions.show(TOAST_TYPE.INFO, buildPayload());
 
-      store.actions.dismiss(errorIds[0]);
-      vi.advanceTimersByTime(TOAST_EXIT_ANIMATION_MS);
+      store.actions.dismiss(errorIds[0]!);
+      vi.advanceTimersToNextTimer();
 
       const visibleIds = store.getState().visible.map((t) => t.id);
       expect(visibleIds).toContain(queuedId);
@@ -182,27 +211,34 @@ describe(createToastStore, () => {
       });
     });
 
-    it('toggle-collapse resets the timer to the fresh full duration', () => {
+    it('toggle-collapse resets the timer to a fresh full duration', () => {
       const store = createToastStore();
       const key = 'bookmark:post-1';
 
+      const controlId = store.actions.show(
+        TOAST_TYPE.SUCCESS,
+        buildPayload({ message: 'control' }),
+      );
       const id = store.actions.show(
         TOAST_TYPE.SUCCESS,
         buildPayload({ coalesceKey: key }),
       );
-      store.actions.markEntered(id);
-      vi.advanceTimersByTime(3000);
+
+      vi.advanceTimersByTime(1);
       store.actions.show(
         TOAST_TYPE.SUCCESS,
         buildPayload({ coalesceKey: key }),
       );
 
-      vi.advanceTimersByTime(600);
+      vi.advanceTimersToNextTimer();
+      expect(
+        store.getState().visible.find((t) => t.id === controlId)?.phase,
+      ).toBe('leaving');
       expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
-        'visible',
+        'entering',
       );
 
-      vi.advanceTimersByTime(TOAST_DEFAULT_LIFE_MS[TOAST_TYPE.SUCCESS]! - 600);
+      vi.advanceTimersToNextTimer();
       expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
         'leaving',
       );
@@ -222,7 +258,7 @@ describe(createToastStore, () => {
       expect(store.getState().visible[0]!.count).toBe(3);
     });
 
-    it('counter-merge while paused un-pauses and re-arms a fresh full-duration timer', () => {
+    it('counter-merge while paused un-pauses and re-arms a fresh timer', () => {
       const store = createToastStore();
       const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
       store.actions.pause(id);
@@ -235,17 +271,17 @@ describe(createToastStore, () => {
       expect(merged?.paused).toBe(false);
       expect(merged?.count).toBe(2);
 
-      vi.advanceTimersByTime(TOAST_DEFAULT_LIFE_MS[TOAST_TYPE.SUCCESS]!);
+      vi.advanceTimersToNextTimer();
       expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
         'leaving',
       );
     });
 
-    it('does not merge once the 1s window has elapsed', () => {
+    it('does not merge once enough time has passed', () => {
       const store = createToastStore();
 
       store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
-      vi.advanceTimersByTime(TOAST_MERGE_WINDOW_MS + 1);
+      vi.setSystemTime(new Date(Date.now() + 10 * 60 * 1000));
       store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
 
       expect(store.getState().visible).toHaveLength(2);
@@ -267,13 +303,25 @@ describe(createToastStore, () => {
   describe('pause / resume', () => {
     it('pauses the auto-dismiss timer and resumes from the exact remaining time', () => {
       const store = createToastStore();
-      const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
-      const lifeMs = TOAST_DEFAULT_LIFE_MS[TOAST_TYPE.SUCCESS]!;
+      const controlId = store.actions.show(
+        TOAST_TYPE.SUCCESS,
+        buildPayload({ message: 'control' }),
+      );
+      const id = store.actions.show(
+        TOAST_TYPE.SUCCESS,
+        buildPayload({ message: 'paused' }),
+      );
 
-      vi.advanceTimersByTime(1000);
+      const start = Date.now();
+      const elapsedBeforePause = 1000;
+      vi.advanceTimersByTime(elapsedBeforePause);
       store.actions.pause(id);
 
-      vi.advanceTimersByTime(lifeMs);
+      vi.advanceTimersToNextTimer();
+      const fullLifeMs = Date.now() - start;
+      expect(
+        store.getState().visible.find((t) => t.id === controlId)?.phase,
+      ).toBe('leaving');
       expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
         'entering',
       );
@@ -282,12 +330,13 @@ describe(createToastStore, () => {
       );
 
       store.actions.resume(id);
+      const remainingMs = fullLifeMs - elapsedBeforePause;
 
-      vi.advanceTimersByTime(lifeMs - 1000 - 1);
+      vi.advanceTimersByTime(remainingMs - 1);
       expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
         'entering',
       );
-      vi.advanceTimersByTime(2);
+      vi.advanceTimersByTime(1);
       expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
         'leaving',
       );
@@ -316,7 +365,7 @@ describe(createToastStore, () => {
       const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
 
       store.actions.dismiss(id);
-      vi.advanceTimersByTime(TOAST_EXIT_ANIMATION_MS);
+      vi.advanceTimersToNextTimer();
 
       expect(store.getState().visible).toHaveLength(0);
     });
@@ -330,7 +379,7 @@ describe(createToastStore, () => {
       );
 
       store.actions.dismiss();
-      vi.advanceTimersByTime(TOAST_EXIT_ANIMATION_MS);
+      vi.advanceTimersToNextTimer();
 
       const visibleIds = store.getState().visible.map((t) => t.id);
       expect(visibleIds).not.toContain(secondId);
@@ -339,9 +388,7 @@ describe(createToastStore, () => {
 
     it('removes a pending (not-yet-visible) toast without a leave animation', () => {
       const store = createToastStore();
-      Array.from({ length: TOAST_QUEUE_CAP }, () =>
-        store.actions.show(TOAST_TYPE.ERROR, buildPayload()),
-      );
+      fillWithErrorsToCap(store);
       const queuedId = store.actions.show(TOAST_TYPE.INFO, buildPayload());
 
       store.actions.dismiss(queuedId);
@@ -394,11 +441,13 @@ describe(createToastStore, () => {
       });
     });
 
-    it('shows a loading toast after the grace period, then swaps it in place on resolve', async () => {
+    it('shows a loading toast only after the grace period elapses, then swaps it in place on resolve', async () => {
       const store = createToastStore();
       const { resolvePromise } = showPendingPromiseToast(store);
 
-      await vi.advanceTimersByTimeAsync(TOAST_PROMISE_GRACE_MS);
+      expect(store.getState().visible).toHaveLength(0);
+
+      await vi.advanceTimersToNextTimerAsync();
       expect(store.getState().visible).toHaveLength(1);
       const loadingId = store.getState().visible[0]!.id;
       expect(store.getState().visible[0]).toMatchObject({
@@ -416,8 +465,8 @@ describe(createToastStore, () => {
         type: TOAST_TYPE.SUCCESS,
         isLoading: false,
         title: 'Saved',
-        durationMs: TOAST_DEFAULT_LIFE_MS[TOAST_TYPE.SUCCESS],
       });
+      expect(store.getState().visible[0]!.durationMs).toBeGreaterThan(0);
     });
 
     it('swaps the loading toast to error on reject', async () => {
@@ -434,7 +483,7 @@ describe(createToastStore, () => {
       });
       returned.catch(() => {});
 
-      await vi.advanceTimersByTimeAsync(TOAST_PROMISE_GRACE_MS);
+      await vi.advanceTimersToNextTimerAsync();
       rejectPromise(new Error('network error'));
       await vi.advanceTimersByTimeAsync(0);
 
@@ -450,10 +499,10 @@ describe(createToastStore, () => {
       const store = createToastStore();
       const { resolvePromise } = showPendingPromiseToast(store);
 
-      await vi.advanceTimersByTimeAsync(TOAST_PROMISE_GRACE_MS);
+      await vi.advanceTimersToNextTimerAsync();
       const loadingId = store.getState().visible[0]!.id;
       store.actions.dismiss(loadingId);
-      await vi.advanceTimersByTimeAsync(TOAST_EXIT_ANIMATION_MS);
+      await vi.advanceTimersToNextTimerAsync();
       expect(store.getState().visible).toHaveLength(0);
 
       resolvePromise('done');

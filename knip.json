@@ -84,17 +84,12 @@
       // (no hoisting) still requires it as a real apps/platform devDependency so
       // Turbopack can resolve it.
       "ignoreDependencies": ["@svgr/webpack"],
-      // next-intl navigation helpers (Link/usePathname), scaffolded to
-      // mirror apps/web's i18n/navigation.ts but not yet consumed by any
-      // component. Mark it an entry so its exports aren't reported unused;
-      // the Next.js plugin still contributes the app-router entries.
-      //
       // src/components/shared/{icon,text,button,link-button,status-badge,text-input,alert,heading,textarea,avatar,spinner,brand-mark,setting-row,page-header,disclosure,segmented-control,card}/index.ts:
       // platform-owned primitives, each built ahead of its call sites as part
-      // of a bottom-up migration off @blog/ui. Mark each an entry for the
-      // same reason as the navigation helpers above.
+      // of a bottom-up migration off @blog/ui. Mark each an entry so its
+      // exports aren't reported unused; the Next.js plugin still contributes
+      // the app-router entries.
       "entry": [
-        "src/i18n/navigation.ts",
         "src/components/shared/icon/index.ts",
         "src/components/shared/text/index.ts",
         "src/components/shared/button/index.ts",

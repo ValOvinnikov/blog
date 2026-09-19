@@ -4,10 +4,7 @@ import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db';
-import {
-  ToastProvider,
-  TOAST_EXIT_ANIMATION_MS,
-} from '@platform/context/toast-provider';
+import { ToastProvider } from '@platform/context/toast-provider';
 import messages from '@platform/i18n/messages/en.json';
 import {
   idleProvisioningSteps,
@@ -26,12 +23,9 @@ import { STEP_ORDER, useProvisioningPoll } from './use-provisioning-poll';
 
 const STEP_POLL_INTERVAL_MS = 4000;
 const DOMAIN_POLL_INTERVAL_MS = 10000;
-// Mirrors the hook's own `RETRY_BASELINE_MAX_TICKS`.
+const TOAST_EXIT_BUFFER_MS = 1000;
 const RETRY_BASELINE_MAX_TICKS = 75;
 
-// The hook reads `useTranslations`/`useToast` — every `renderHook` call
-// below needs both contexts, so this shadows the RTL import once rather
-// than passing `{ wrapper }` at each of its call sites.
 const Wrapper = ({ children }: { children: ReactNode }) => (
   <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={messages}>
     <ToastProvider>{children}</ToastProvider>
@@ -678,7 +672,7 @@ describe(useProvisioningPoll, () => {
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(
-          STEP_POLL_INTERVAL_MS + TOAST_EXIT_ANIMATION_MS,
+          STEP_POLL_INTERVAL_MS + TOAST_EXIT_BUFFER_MS,
         );
       });
       expect(
