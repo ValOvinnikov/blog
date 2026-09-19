@@ -16,7 +16,6 @@ import { topbarNavMenuVariants } from './topbar-nav-menu-variants';
 
 export type TTopbarNavMenuProps = {
   sections: TSidebarNavSection[];
-  /** e.g. the tenant switcher, rendered above the nav sections — same slot the desktop sidebar gives it. */
   switcher?: ReactNode;
 };
 

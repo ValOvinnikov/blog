@@ -12,11 +12,9 @@ import { runCardVariants } from './run-card-variants';
 
 type TRunCardProps = {
   run: TDeprovisioningRun;
-  /** Right-aligned in the card header, e.g. the overall status badge. */
   actions?: ReactNode;
 };
 
-/** The teardown run's own record — when it started, when (or whether) it finished, and where to inspect it, independent of the per-step statuses in the steps card. */
 export const RunCard = ({ run, actions }: TRunCardProps) => {
   const t = useTranslations('deprovisioningStatusView');
   const { workflowLogLink } = runCardVariants();

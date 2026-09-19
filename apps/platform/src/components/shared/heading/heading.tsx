@@ -12,9 +12,7 @@ const HEADING_TAGS = {
 export type THeadingLevel = keyof typeof HEADING_TAGS;
 
 export type THeadingProps = {
-  /** Document-outline depth — picks the rendered `h1`–`h4` tag. */
   level: THeadingLevel;
-  /** Visual treatment, independent of `level` — a level-2 heading can render at any size. */
   size: NonNullable<THeadingVariants['size']>;
   children: ReactNode;
   className?: string;

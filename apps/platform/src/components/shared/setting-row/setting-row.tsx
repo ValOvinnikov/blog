@@ -8,10 +8,8 @@ import {
 export type TSettingRowProps = {
   label: string;
   description?: string;
-  /** Plan-gated or provisioning-locked rows read the same: a faded control plus a visible reason. */
   isLocked?: TSettingRowVariants['isLocked'];
   lockedReason?: string;
-  /** The right-aligned control — a switch, segmented control, picker, or any other interactive element. */
   children: ReactNode;
   className?: string;
 };

@@ -32,7 +32,6 @@ export type TTenantDetailsPanelProps = {
   tenant: TTenant;
   fieldLocks: TTenantFieldLocks;
   ownerEmail: string | undefined;
-  /** The page's `ArchivedTenantNotice` id, so the Save button can point its `aria-describedby` at it when archived. */
   archivedNoticeId?: string;
 };
 

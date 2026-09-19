@@ -14,7 +14,6 @@ export type THueSliderProps = {
   onChange: (value: number) => void;
   isDisabled?: boolean;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
-  /** The gradient track — callers own the color formula (`accentHueGradient`). */
   trackStyle?: CSSProperties;
   className?: string;
 };

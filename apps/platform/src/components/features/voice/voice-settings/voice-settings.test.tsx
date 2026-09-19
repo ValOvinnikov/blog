@@ -32,7 +32,6 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
     expect(screen.getByRole('heading', { name: 'Basic' })).toBeVisible();
     expect(screen.getByText(/Nothing required here\./)).toBeVisible();
-    // Basic explains itself; it renders no input fields of its own.
     expect(
       within(
         screen.getByRole('heading', { name: 'Basic' }).parentElement!,

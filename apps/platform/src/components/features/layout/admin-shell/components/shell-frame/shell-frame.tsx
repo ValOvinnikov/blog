@@ -11,7 +11,6 @@ export type TShellFrameProps = {
   sidebar: ReactNode;
   topbar: ReactNode;
   children: ReactNode;
-  /** Seeded from the cookie `AdminShell`'s caller read server-side. */
   isSidebarInitiallyCollapsed?: boolean;
 };
 

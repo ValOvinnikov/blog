@@ -13,14 +13,8 @@ import { ShellFrame } from './components/shell-frame/shell-frame';
 export type TAdminShellProps = {
   sections: TSidebarNavSection[];
   switcher?: ReactNode;
-  /** A rendered breadcrumb trail — see `@platform/components/shared/breadcrumbs`. */
   crumb: ReactNode;
   roleChip: TRoleChipProps;
-  /**
-   * Seeded from `resolveIsSidebarCollapsed`, read by the caller (not here) so
-   * this component stays a synchronous Server Component — a plain render in
-   * a test can't await a nested async component the way Next.js can.
-   */
   isSidebarInitiallyCollapsed?: boolean;
   children: ReactNode;
 };

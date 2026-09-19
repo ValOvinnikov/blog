@@ -4,7 +4,6 @@ import { breadcrumbsVariants } from './breadcrumbs-variants';
 
 export type TBreadcrumbItem = {
   label: string;
-  /** Omitted for an ancestor with nowhere to link — rendered as the current, non-clickable label same as the trail's last item. */
   href?: string;
 };
 

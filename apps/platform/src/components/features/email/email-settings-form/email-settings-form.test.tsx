@@ -105,7 +105,6 @@ describe(EmailSettingsForm, () => {
     const saveButton = await screen.findByRole('button', { name: 'Saving…' });
     expect(saveButton).toBeDisabled();
     expect(saveButton).toHaveAttribute('aria-busy', 'true');
-    // A disabled button is force-blurred; this live region carries the real announcement.
     expect(saveButton.nextElementSibling).toHaveTextContent('Saving…');
 
     resolveAction({ ok: true });
