@@ -106,7 +106,18 @@ contracts:
     commit ask on an `APPROVE` verdict. Trusts `verify-runner`'s already-passed
     `type-check`/`lint`/`test` result rather than re-running it. Not
     dispatched for a docs-only diff — those get the orchestrator's inline
-    identifier check instead (`CLAUDE.md`, delivery gate step 4).
+    identifier check instead (`CLAUDE.md`, delivery gate step 4). Its
+    mechanical pass (`code-review-practices` §0) greps added lines for
+    tests that restate their source, runs `jscpd` over the touched
+    workspaces, and — since 2026-09-19 — greps for the comments agents
+    produce most: a doc block opening `Name — does X`, a doc block of three
+    or more lines, a `//` inside a function body, and any comment at all in
+    a `*.test.ts(x)` file. Each hit is blocking; "the siblings have the same
+    block" is not a defence, because the siblings are the drift being
+    corrected. The greps were added after every module on `main` was found
+    carrying an identical `XModule — fetches module_x and hands it to
+XModuleView` block that the rule already forbade and no review had
+    flagged.
   - `a11y-reviewer` — read-only accessibility audit of
     `packages/ui`/`apps/web`/`apps/platform` diffs against
     `ui-library-practices`' non-negotiable rules; dispatched alongside

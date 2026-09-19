@@ -65,11 +65,14 @@ them. Do not skip a pass because an earlier one found problems.
 Read the `code-review-practices` skill
 (`.claude/skills/code-review-practices/SKILL.md`) — its **section 0** is the
 authoritative command list. Run every command over the full diff — including
-the test-restates-source grep and the `jscpd` clone run at the end of it;
-every hit is a blocking finding unless the skill explicitly allows it. Also
-scan the diff by eye for commented-out code blocks (grep can't catch those
-reliably) and for tests whose expected values are literals copied from the
-file under test — the grep only narrows that one.
+the test-restates-source grep, the four comment greps (`Name — does X` doc
+blocks, doc blocks of three or more lines, `//` inside a body, any comment in
+a test file) and the `jscpd` clone run at the end of it; every hit is a
+blocking finding unless the skill explicitly allows it. A doc comment that
+merely matches its siblings is still a hit — the siblings are the drift.
+Also scan the diff by eye for commented-out code blocks (grep can't catch
+those reliably) and for tests whose expected values are literals copied from
+the file under test — the grep only narrows that one.
 
 ### Pass 2 — Contract pass
 
