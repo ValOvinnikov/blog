@@ -97,13 +97,7 @@
       // import graph can't see a bare string naming a package. Strict pnpm
       // (no hoisting) still requires it as a real apps/platform devDependency so
       // Turbopack can resolve it.
-      "ignoreDependencies": ["@svgr/webpack"],
-      // next-intl navigation helpers (Link/usePathname/permanentRedirect/
-      // useRouter), consumed by 10 files. Kept as an entry (rather than the
-      // other 17 stale barrels removed above) because dropping it surfaces
-      // `permanentRedirect` as a genuinely unused named export — a
-      // source-file fix out of this tooling slice's scope.
-      "entry": ["src/i18n/navigation.ts"]
+      "ignoreDependencies": ["@svgr/webpack"]
     }
   }
 }

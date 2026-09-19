@@ -1,9 +1,10 @@
 import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
 import { render, screen } from '@platform/testing/custom-render';
+import type { ComponentProps } from 'react';
 
-import { StepList, type TStepListStep } from './step-list';
+import { StepList } from './step-list';
 
-const steps: TStepListStep[] = [
+const steps: ComponentProps<typeof StepList>['steps'] = [
   {
     key: 'one',
     title: 'Sanity project',

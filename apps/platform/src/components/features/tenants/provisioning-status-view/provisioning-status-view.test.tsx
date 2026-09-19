@@ -3,7 +3,6 @@ import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db';
-import { TOAST_EXIT_ANIMATION_MS } from '@platform/context/toast-provider';
 import {
   act,
   fireEvent,
@@ -23,7 +22,7 @@ import { ProvisioningStatusView } from './provisioning-status-view';
 const render = renderWithIntl;
 
 const STEP_POLL_INTERVAL_MS = 4000;
-// Mirrors the component's own `RETRY_BASELINE_MAX_TICKS`.
+const TOAST_EXIT_BUFFER_MS = 1000;
 const RETRY_BASELINE_MAX_TICKS = 75;
 
 const {
@@ -1325,12 +1324,9 @@ describe(ProvisioningStatusView, () => {
         },
       });
 
-      // The interval never stopped — the very next tick succeeds on its own,
-      // which dismisses the warning toast (its own exit animation is what
-      // the extra advance below flushes).
       await act(async () => {
         await vi.advanceTimersByTimeAsync(
-          STEP_POLL_INTERVAL_MS + TOAST_EXIT_ANIMATION_MS,
+          STEP_POLL_INTERVAL_MS + TOAST_EXIT_BUFFER_MS,
         );
       });
 
