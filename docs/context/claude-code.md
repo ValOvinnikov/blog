@@ -445,7 +445,8 @@ file` are all denied alike) — an earlier version only handled the
     _worktree's own source_ while external packages resolve through the root
     symlink into the primary checkout's store. A fresh worktree costs ~80 MB
     (source + farms) instead of ~1.2 GB, and removal is fast.
-  - `apps/web/next.config.ts` anchors `turbopack.root` at the checkout that
+  - `configs/next/preset.ts` (the `createNextConfig` preset both apps'
+    `next.config.ts` call) anchors `turbopack.root` at the checkout that
     physically hosts the dependencies (via `realpath` of `node_modules`) —
     Turbopack otherwise refuses to resolve through a symlink that leaves its
     project root. In the primary checkout and on Vercel this resolves to the

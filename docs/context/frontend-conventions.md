@@ -49,10 +49,11 @@ a typed React component; the `?url` suffix bypasses SVGR and resolves to the
 emitted asset's URL instead — same two-shape convention everywhere it's
 configured:
 
-- **Next.js/Turbopack** (`apps/web/next.config.ts`) — `turbopack.rules` with
+- **Next.js/Turbopack** (`configs/next/preset.ts`, the `createNextConfig`
+  preset both apps' `next.config.ts` call) — `turbopack.rules` with
   `@svgr/webpack`, split by a `condition.query` match on `?url`. `@blog/ui`
-  ships from source (`transpilePackages`), so Turbopack sees these imports
-  directly wherever `@blog/ui` is consumed.
+  ships from source (`apps/web`'s `transpilePackages`), so Turbopack sees
+  these imports directly wherever `@blog/ui` is consumed.
 - **Storybook** (`packages/ui/.storybook/main.ts`, `apps/web/.storybook/main.ts`)
   and **Vitest** (`packages/ui/vitest.config.ts`, `apps/web/vitest.config.ts`)
   — both Vite-based, so `vite-plugin-svgr` (`include: '**/*.svg'`) handles the
