@@ -48,6 +48,7 @@
   },
   "devDependencies": {
     "@blog/eslint-config": "workspace:*",
+    "@blog/next-config": "workspace:*",
     "@blog/prettier-config": "workspace:*",
     "@blog/tsconfig": "workspace:*",
     "@blog/vitest-config": "workspace:*",

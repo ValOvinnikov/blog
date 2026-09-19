@@ -7,7 +7,8 @@
         "$TURBO_DEFAULT$",
         "$TURBO_ROOT$/configs/tsconfig/*.json",
         "$TURBO_ROOT$/configs/tailwind/*.ts",
-        "$TURBO_ROOT$/configs/tailwind/*.css"
+        "$TURBO_ROOT$/configs/tailwind/*.css",
+        "$TURBO_ROOT$/configs/next/*.ts"
       ],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"],
       "env": [
