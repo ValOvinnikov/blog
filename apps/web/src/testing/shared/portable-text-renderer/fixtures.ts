@@ -34,8 +34,8 @@ export const richTextBlock = (
 });
 
 /**
- * Multiple sibling block types back to back, to exercise the layout
- * regression this fixes: missing vertical spacing between sibling blocks.
+ * Multiple sibling block types back to back, so any missing vertical
+ * spacing between sibling blocks is immediately visible.
  */
 export const richTextDemo: TPortableTextBody = [
   richTextBlock('normal', [

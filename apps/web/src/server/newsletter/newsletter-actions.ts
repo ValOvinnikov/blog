@@ -118,16 +118,6 @@ export const subscribeToNewsletterAction = async (
   }
 };
 
-/**
- * markNewsletterSubscribedSafely — wraps `markNewsletterSubscribed` in its
- * own try/catch, deliberately separate from the outer one above. By the
- * point either call site calls this, the actual subscription (the db write,
- * and for a brand-new/re-pending signup the confirmation email) has already
- * succeeded — a failure setting the cookie afterward shouldn't turn that
- * real success into a reported `'server-error'`, it should just mean this
- * one reader sees the form again on their next visit. Logged, never
- * rethrown.
- */
 const markNewsletterSubscribedSafely = async (): Promise<void> => {
   try {
     await markNewsletterSubscribed();

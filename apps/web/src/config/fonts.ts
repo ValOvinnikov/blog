@@ -18,18 +18,6 @@ const BODY_FONTS: Partial<Record<TFontChoice, TFontModule>> = {
   [FONT_CHOICE.INTER]: inter,
 };
 
-/**
- * Resolves the `next/font` CSS variable classes to apply to the tenant
- * layout's font wrapper for the given theme tokens' `headingFont`/
- * `bodyFont`. `jetbrainsMono` has no
- * per-preset selection (no theme token names a dedicated UI font) and is
- * always included, backing `--font-ui`. Falls back to the Console picks
- * (`spaceGrotesk`/`newsreader`) for any `TFontChoice` not mapped to its role
- * (e.g. a mono choice picked for `headingFont`).
- *
- * @example
- * resolveFontVariableClassName('FRAUNCES', 'INTER') // '--font-display-family --font-body-family --font-mono-family' classes
- */
 export const resolveFontVariableClassName = (
   headingFont: TFontChoice,
   bodyFont: TFontChoice,
