@@ -41,7 +41,3 @@ describe(getAdminByUserId, () => {
     expect(result).toBeUndefined();
   });
 });
-
-// FK cascade and unique-constraint coverage for the admins table lives in
-// create-admin.test.ts, which exercises them through the real write path
-// (createAdmin) rather than duplicating raw-insert assertions here.

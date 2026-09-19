@@ -4,13 +4,6 @@ import type { TTenant } from '@blog/db/schema/tenants';
 
 import { runSteps } from './run';
 
-/**
- * Exercises the audit-event side effect `runSteps` writes at each of its
- * terminal points — `recordProvisioningAuditEvent` mocked away here, unlike
- * `run.test.ts`'s step-sequencing coverage, so each call's action/step
- * argument can be asserted directly.
- */
-
 const { reactivateTenantMock } = vi.hoisted(() => ({
   reactivateTenantMock: vi.fn(),
 }));

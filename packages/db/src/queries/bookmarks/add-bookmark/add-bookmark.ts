@@ -35,7 +35,6 @@ export async function addBookmark(
     );
 
   if (!existing) {
-    // A real, if narrow, race: the insert no-ops on a (tenantId, userId, postId) conflict, but `removeBookmark` can delete that row before this read.
     return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
   }
 

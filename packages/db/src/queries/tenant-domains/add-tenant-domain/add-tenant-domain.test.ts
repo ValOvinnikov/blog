@@ -64,11 +64,6 @@ describe(addTenantDomain, () => {
     });
   });
 
-  // pglite serves a single connection, so a real concurrent DELETE landing
-  // between this call's no-op insert and its follow-up read can't be forced
-  // here — `updateTenantDetails` rewriting a row's `domain` value is the
-  // real-world trigger. The follow-up read is spied to simulate that exact
-  // window instead.
   it('returns DB_NOT_FOUND when the conflicting row vanishes before the follow-up read', async () => {
     const { id: tenantId } = await insertTestTenant(db(), {
       primaryDomain: 'acme.example.com',

@@ -70,7 +70,6 @@ export async function createPendingSubscriber(
     );
 
   if (!existing) {
-    // A real, if narrow, race: the insert no-ops on a (tenantId, email) conflict, but `unsubscribe` can delete that row before this read.
     return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
   }
 

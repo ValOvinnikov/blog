@@ -156,8 +156,6 @@ describe(createTenantDraft, () => {
       .where(eq(schema.memberships.userId, 'user-2'));
     expect(secondMembershipRows).toHaveLength(0);
 
-    // The first tenant's own domain row is untouched by the second call's
-    // failure and cleanup.
     const domainRows = await db()
       .select()
       .from(schema.tenantDomains)

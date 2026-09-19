@@ -187,8 +187,6 @@ async function validateCandidates(
   summary.checked = candidates.length;
 
   for (const tenant of candidates) {
-    // Each tenant is independent — one tenant's CLI/network failure must
-    // never abort the sweep for the rest.
     await validateOne(tenant, summary);
   }
 

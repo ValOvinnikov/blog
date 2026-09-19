@@ -13,11 +13,6 @@ import { admins } from './admins';
 
 const BACKFILL_MIGRATION = '0007_wide_silver_samurai.sql';
 
-// Regression coverage for the bug this migration originally shipped with:
-// adding a NOT NULL column with no default against a table that can already
-// have rows (every pre-existing row comes from `scripts/seed-admin.ts`, the
-// only grant path that existed before this migration introduced `PROMOTION`
-// as an alternative to it).
 describe('0007_wide_silver_samurai (granted_via backfill)', () => {
   it(
     'backfills a pre-existing admin row to BREAK_GLASS instead of failing NOT NULL',
@@ -34,9 +29,6 @@ describe('0007_wide_silver_samurai (granted_via backfill)', () => {
         await applyMigrationFile(db, file);
       }
 
-      // The `admins` shape before this migration: no
-      // `granted_by`/`granted_via`/`granted_at` columns yet, matching a row
-      // `seed-admin.ts` created before this migration ever ran.
       await db.execute(sql.raw(`insert into "users" ("id") values ('user-1')`));
       await db.execute(
         sql.raw(

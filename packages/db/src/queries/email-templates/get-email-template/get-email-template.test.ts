@@ -35,10 +35,6 @@ describe(getEmailTemplate, () => {
     });
   });
 
-  // The behaviour the merge exists for: a row that only ever had `subject`
-  // written to it (never `body`) must still render the default body, proving
-  // the merge happens per field rather than "the row exists, so use the
-  // whole row as-is."
   it('renders the default body when only the subject has been authored', async () => {
     const { id: tenantId } = await insertTestTenant(db());
     await db().insert(schema.emailTemplates).values({
