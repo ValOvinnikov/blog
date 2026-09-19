@@ -114,8 +114,6 @@ const translations: Record<string, string> = {
   linkAriaLabel: '{platform} profile',
 };
 
-// A minimal stand-in for next-intl's ICU interpolation — sufficient for the
-// one `{platform}` placeholder this file's messages use.
 const translate = (key: string, values?: Record<string, string>): string => {
   const template = translations[key] ?? key;
   if (!values) return template;
@@ -280,8 +278,6 @@ describe('LocaleLayout', () => {
     });
   });
 
-  // The resolved tree's root is `ThemeScope`, whose `children` is
-  // `NextIntlClientProvider` followed by the conditional analytics components.
   it('passes real messages, locale, now, and timeZone to NextIntlClientProvider', async () => {
     const html = await LocaleLayout({
       children: <div>content</div>,

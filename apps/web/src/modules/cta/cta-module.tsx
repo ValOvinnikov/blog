@@ -9,9 +9,6 @@ export interface ICtaModuleProps {
   tenant: string;
 }
 
-/**
- * CtaModule — fetches `module_cta` data and hands it to `CtaModuleView`.
- */
 export const CtaModule = async ({ id, tenant }: ICtaModuleProps) => {
   const tenantContext = await getTenantSanityContext(tenant);
   const result = await service.modules.cta.v1.getCta(id, tenantContext);

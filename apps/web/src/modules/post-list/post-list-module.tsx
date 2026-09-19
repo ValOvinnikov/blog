@@ -34,12 +34,11 @@ const ARCHIVE_TITLE_ID: Record<TTaxonomyKind, string> = {
 };
 
 /**
- * PostListModule — an archive's post list: fetches a `module_postList`
- * document for the given page and hands it to `PostListModuleView`. Unlike
- * every other module, it always renders — an archive must say something even
- * with zero posts — and 404s (after logging) both when the fetch fails and
- * when an explicit page number exceeds the corpus's page count, since either
- * would otherwise render the page's primary content as silently missing.
+ * Unlike every other module, this always renders — an archive must say
+ * something even with zero posts — and 404s (after logging) both when the
+ * fetch fails and when an explicit page number exceeds the corpus's page
+ * count, since either would otherwise render the page's primary content as
+ * silently missing.
  */
 export const PostListModule = async ({
   id,

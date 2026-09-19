@@ -9,11 +9,6 @@ export type TTextInputProps = {
   value: string;
   onChange: (value: string) => void;
   ariaLabel?: string;
-  /**
-   * Marks that a sibling component (not a `FormField` ancestor) renders this
-   * input's associated `<label htmlFor>` — satisfies the accessible-name
-   * lint rule without this component rendering anything extra.
-   */
   hasExternalLabel?: boolean;
   id?: string;
   type?: string;

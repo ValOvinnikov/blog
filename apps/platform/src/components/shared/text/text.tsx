@@ -4,11 +4,9 @@ import { textVariants, type TTextVariants } from './text-variants';
 
 export type TTextProps = {
   variant?: TTextVariants['variant'];
-  /** Which element to render. Defaults to `p`; use `span` for inline text. */
   as?: 'p' | 'span';
   children: ReactNode;
   className?: string;
-  /** Lets another control's `aria-describedby` point at this text. */
   id?: string;
 };
 

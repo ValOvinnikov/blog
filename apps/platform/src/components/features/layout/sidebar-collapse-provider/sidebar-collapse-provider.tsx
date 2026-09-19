@@ -24,7 +24,6 @@ const SidebarCollapseContext = createContext<
 >(undefined);
 
 export type TSidebarCollapseProviderProps = {
-  /** Seeded from the cookie `resolveIsSidebarCollapsed` read server-side. */
   isInitiallyCollapsed: boolean;
   children: ReactNode;
 };

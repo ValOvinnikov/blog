@@ -1,8 +1,5 @@
 import { defineField } from 'sanity';
 
-/**
- * Builds the `hero` reference field, pointing it at the hero schemas the page allows.
- */
 export const heroField = ({ allow }: { allow: string[] }) =>
   defineField({
     name: 'hero',

@@ -2,34 +2,31 @@ import { TOAST_TYPE, type TToastType } from '@blog/config';
 import type { IToastAction } from '@blog/ui/molecules/toast';
 import type { ReactNode } from 'react';
 
-/** Visible-slot cap (§9) — a 5th toast evicts the oldest non-error toast. */
+/** Visible-slot cap — a 5th toast evicts the oldest non-error toast. */
 const TOAST_QUEUE_CAP = 4;
 
-/** Default auto-dismiss life per type, in ms (§9) — `undefined` = sticky. */
+/** Default auto-dismiss life per type, in ms — `undefined` = sticky. */
 const TOAST_DEFAULT_LIFE_MS: Partial<Record<TToastType, number>> = {
   [TOAST_TYPE.SUCCESS]: 3600,
   [TOAST_TYPE.INFO]: 3600,
   [TOAST_TYPE.WARNING]: 5000,
 };
 
-/** Grace period before a pending `toast.promise` shows a `loading` toast (§4.6). */
+/** Grace period before a pending `toast.promise` shows a `loading` toast. */
 const TOAST_PROMISE_GRACE_MS = 400;
 
-/** Counter-merge window for identical success/info toasts (§4.2/§9). */
+/** Counter-merge window for identical success/info toasts. */
 const TOAST_MERGE_WINDOW_MS = 1000;
 
-/** Exit-animation fallback before a `leaving` toast is actually removed (§5). */
+/** Exit-animation fallback before a `leaving` toast is actually removed. */
 const TOAST_EXIT_ANIMATION_MS = 360;
 
 export interface IToastPayload {
-  /** Short label shown beside the type icon — omit for a message-only toast. */
   title?: ReactNode;
   message: ReactNode;
   time?: string;
   action?: IToastAction;
-  /** Overrides the per-type default life; `undefined` keeps the default (or sticky, for error). */
   durationMs?: number;
-  /** `(feature, entityId)` toggle-collapse key — a second call with the same key replaces this toast in place (§4.2). */
   coalesceKey?: string;
 }
 
@@ -46,7 +43,6 @@ type TToastPhase = 'entering' | 'visible' | 'leaving';
 export interface IToastRecord {
   id: string;
   type: TToastType;
-  /** True while a `toast.promise` call is still in flight (§4.6). */
   isLoading?: boolean;
   title?: ReactNode;
   message: ReactNode;
@@ -56,7 +52,6 @@ export interface IToastRecord {
   coalesceKey?: string;
   phase: TToastPhase;
   paused: boolean;
-  /** Set once a counter-merge collapses ≥2 identical toasts (§4.2). */
   count?: number;
   createdAt: number;
 }
@@ -86,11 +81,7 @@ const isMergeableType = (type: TToastType) =>
   type === TOAST_TYPE.SUCCESS || type === TOAST_TYPE.INFO;
 
 /**
- * createToastStore — the framework-free state machine behind `ToastProvider`:
- * the visible/pending queue, per-toast auto-dismiss timers (with
- * pause/resume tracking exact remaining time), coalescing (toggle-collapse +
- * counter-merge), the cap/eviction policy, and `toast.promise` in-place
- * swapping. No React, no DOM/rAF — `ToastProvider` subscribes to it via
+ * No React, no DOM/rAF — `ToastProvider` subscribes to it via
  * `useSyncExternalStore` and separately owns the enter-transition's
  * double-`requestAnimationFrame` paint timing (a rendering, not a queueing,
  * concern) by calling `markEntered` once the browser has painted the

@@ -30,10 +30,6 @@ type TTaxonomyIndexPageOptions = {
   previewSubtitle: string;
 };
 
-/**
- * Shared body for the tag-index and topic-index singletons, which differ
- * only in which taxonomy kind they list and the copy naming it.
- */
 export const taxonomyIndexPage = ({
   name,
   title,

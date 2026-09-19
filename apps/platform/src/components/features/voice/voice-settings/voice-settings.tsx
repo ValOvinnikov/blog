@@ -22,13 +22,11 @@ import { voiceSettingsVariants } from './voice-settings-variants';
 
 export type TVoiceSettingsProps = {
   tenantId: string;
-  /** The tenant's saved `site_config.voiceOverrides`, already projected to plain text by `plainTextVoiceOverrides`. */
   initialOverrides: Record<string, string>;
   saveAction: (
     tenantId: string,
     overrides: TVoiceOverrides,
   ) => Promise<{ ok: boolean }>;
-  /** When set, the tenant is archived: Save is disabled and a notice explains why. */
   archivedAt?: Date;
 };
 

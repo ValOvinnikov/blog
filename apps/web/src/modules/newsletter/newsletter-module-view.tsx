@@ -8,12 +8,6 @@ export interface INewsletterModuleViewProps extends TNewsletterModule {
   trustCues: TMaybeUndefined<string[]>;
 }
 
-/**
- * Pure view for `NewsletterModule` — the `Section` full-bleed landmark
- * wrapping the `NewsletterForm` client island as its direct child, with no
- * extra wrapping element in between. Density follows the module's own
- * `variant` field.
- */
 export const NewsletterModuleView = ({
   id,
   brandVariant,

@@ -7,7 +7,6 @@ import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
 import { Share2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
-/** A social platform paired with the reusable link to that profile. */
 export const socialProfileSchema = defineType({
   name: 'socialProfile',
   title: 'Social Profile',

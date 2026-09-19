@@ -20,11 +20,6 @@ const newsletterContentFields = () => [
   }),
 ];
 
-/**
- * Site-wide newsletter signup copy, authored once and reused wherever the
- * newsletter form renders (the Blog page's `module_newsletter` full variant
- * and the per-post compact variant on post pages).
- */
 export const newsletterSettingsSchema = defineType({
   name: 'settings_newsletter',
   title: 'Newsletter',

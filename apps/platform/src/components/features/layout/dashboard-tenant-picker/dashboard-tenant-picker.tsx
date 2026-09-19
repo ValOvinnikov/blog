@@ -8,7 +8,6 @@ import { useTranslations } from 'next-intl';
 import { dashboardTenantPickerVariants } from './dashboard-tenant-picker-variants';
 
 export type TDashboardTenantPickerProps = {
-  /** Every tenant the signed-in user has a membership on — always more than one; a single membership resolves without ever reaching this page. */
   tenants: TTenant[];
 };
 

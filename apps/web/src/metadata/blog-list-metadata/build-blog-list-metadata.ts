@@ -7,16 +7,12 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
 /**
- * Metadata for a blog list page. Every page self-canonicalizes — page 2+
- * must NEVER canonical to /blog (spec do-not-change rule). Every page also
- * advertises the site-wide RSS feed (`/rss.xml`) via
- * `alternates.types['application/rss+xml']` — the blog list is the page
- * whose content (every published post) matches the feed's content, and it's
- * the same feed regardless of which page of the list is showing.
- *
- * Reads the same cached `getBlogListPage` loader the route's own
- * `BlogListPage` composition reads, so building metadata costs no second
- * Sanity fetch.
+ * Every page self-canonicalizes — page 2+ must NEVER canonical to /blog
+ * (spec do-not-change rule). Every page also advertises the site-wide RSS
+ * feed (`/rss.xml`) via `alternates.types['application/rss+xml']` — the
+ * blog list is the page whose content (every published post) matches the
+ * feed's content, and it's the same feed regardless of which page of the
+ * list is showing.
  */
 export const buildBlogListMetadata = async (
   page: number,

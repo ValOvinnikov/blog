@@ -3,7 +3,6 @@ import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db';
-import { TOAST_EXIT_ANIMATION_MS } from '@platform/context/toast-provider';
 import {
   act,
   fireEvent,
@@ -23,7 +22,7 @@ import { ProvisioningStatusView } from './provisioning-status-view';
 const render = renderWithIntl;
 
 const STEP_POLL_INTERVAL_MS = 4000;
-// Mirrors the component's own `RETRY_BASELINE_MAX_TICKS`.
+const TOAST_EXIT_BUFFER_MS = 1000;
 const RETRY_BASELINE_MAX_TICKS = 75;
 
 const {
@@ -1163,9 +1162,6 @@ describe(ProvisioningStatusView, () => {
     });
 
     it('stops polling once the retry-baseline wait is exhausted after Start, when every step stays idle', async () => {
-      // Models pressing Start (not Retry) whose dispatched workflow never
-      // actually starts — every tick reports the same all-idle snapshot
-      // forever, so `shouldContinuePolling` alone would never stop it.
       const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
       getTenantProvisioningStatusActionMock.mockResolvedValue({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
@@ -1184,18 +1180,12 @@ describe(ProvisioningStatusView, () => {
         );
       });
 
-      // Advance well past the cap, one tick's worth of real time at a time
-      // (rather than in a single large jump) so each tick's resulting state
-      // change — including the interval being torn down once the cap
-      // fires — is actually committed before the next tick is simulated.
       for (let tick = 0; tick < RETRY_BASELINE_MAX_TICKS + 5; tick += 1) {
         await act(async () => {
           await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
         });
       }
 
-      // Polling must have stopped once the cap was reached — it never grew
-      // past that regardless of how much further time was simulated.
       expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(
         RETRY_BASELINE_MAX_TICKS,
       );
@@ -1334,12 +1324,9 @@ describe(ProvisioningStatusView, () => {
         },
       });
 
-      // The interval never stopped — the very next tick succeeds on its own,
-      // which dismisses the warning toast (its own exit animation is what
-      // the extra advance below flushes).
       await act(async () => {
         await vi.advanceTimersByTimeAsync(
-          STEP_POLL_INTERVAL_MS + TOAST_EXIT_ANIMATION_MS,
+          STEP_POLL_INTERVAL_MS + TOAST_EXIT_BUFFER_MS,
         );
       });
 

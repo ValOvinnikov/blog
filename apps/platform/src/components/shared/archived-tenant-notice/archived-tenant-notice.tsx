@@ -4,11 +4,9 @@ import { useTranslations } from 'next-intl';
 
 export type TArchivedTenantNoticeProps = {
   archivedAt: Date;
-  /** Lets a disabled control elsewhere on the page point its `aria-describedby` here. */
   id?: string;
 };
 
-/** Tells an operator viewing an archived tenant's detail pages that everything here is read-only. */
 export const ArchivedTenantNotice = ({
   archivedAt,
   id,

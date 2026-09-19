@@ -60,16 +60,15 @@ const getBootstrapScriptServerSnapshot = () => {
 };
 
 /**
- * DepthProvider — owns the reader's chosen article depth (30s skim / read /
- * deep dive) for the wrapped subtree. `hasSkim`/`hasDeep` describe what
- * *this* post supports (the same booleans passed to `DepthToggle`) — a
- * depth persisted in `localStorage` from a different post is only honored
- * if it's still valid here; otherwise both the pre-hydration script and the
- * mount effect below fall back to `READ`, so a reader can never land on a
- * post with, say, `SKIM` stamped but no skim to show and no toggle option
- * to get back (`readStoredDepth`/`buildDepthBootstrapScript` in
- * `@web/config/depth-script` own that clamping rule; both call it, so the
- * pre- and post-hydration outcomes always agree).
+ * `hasSkim`/`hasDeep` describe what *this* post supports (the same booleans
+ * passed to `DepthToggle`) — a depth persisted in `localStorage` from a
+ * different post is only honored if it's still valid here; otherwise both
+ * the pre-hydration script and the mount effect below fall back to `READ`,
+ * so a reader can never land on a post with, say, `SKIM` stamped but no
+ * skim to show and no toggle option to get back
+ * (`readStoredDepth`/`buildDepthBootstrapScript` in `@web/config/depth-script`
+ * own that clamping rule; both call it, so the pre- and post-hydration
+ * outcomes always agree).
  *
  * The pre-hydration inline script (`buildDepthBootstrapScript`, built fresh
  * per render from this post's availability) reads the persisted choice and
@@ -96,12 +95,7 @@ const getBootstrapScriptServerSnapshot = () => {
  * (e.g. the `hasSkim`/`hasDeep` change above). After a real hydration match,
  * React re-checks the snapshot post-commit, finds it now disagrees
  * (`getBootstrapScriptClientSnapshot` is always `false`), and schedules one
- * more render that omits the script — the same "renders once, through
- * mount, then never again" lifecycle the previous ref-based guard had, but
- * one that also skips the script entirely on a mount React was never going
- * to hydrate in the first place, instead of rendering it there only to have
- * React log a "Scripts inside React components are never executed when
- * rendering on the client" warning about it.
+ * more render that omits the script.
  *
  * @example
  * <DepthProvider hasSkim={Boolean(post.postTakeaways)} hasDeep={post.hasAsides}>

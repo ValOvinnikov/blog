@@ -10,10 +10,8 @@ import { PostRelatedModuleView } from './post-related-module-view';
 export type TPostRelatedModuleProps = TModuleComponentProps;
 
 /**
- * PostRelatedModule — fetches `module_postRelated` data (posts related to
- * the `page_post` it sits on) and hands it to `PostRelatedModuleView`.
- * Renders nothing when the renderer didn't supply the anchor post via
- * `context.post` — this module only ever sits on a post page's `modules[]`.
+ * This module only ever sits on a post page's `modules[]`, so a missing
+ * `context.post` means the renderer didn't supply the anchor post.
  */
 export const PostRelatedModule = async ({
   id,

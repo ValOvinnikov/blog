@@ -26,14 +26,6 @@ const createMockRule = (callLog: TCallLog, path = 'rule'): TMockRule => ({
   },
 });
 
-/**
- * `modulesField`'s `validation` builder is
- * `(rule) => validateCustom ? validateCustom(uniqueRule) : uniqueRule` —
- * invoking it against a minimal chainable mock rule (each call returns a
- * fresh, path-tagged instance) makes both the call sequence and the exact
- * rule instance handed to `validateCustom` observable without a real Sanity
- * Rule.
- */
 const runFieldValidation = (
   field: ReturnType<typeof modulesField>,
   callLog: TCallLog,

@@ -18,7 +18,6 @@ type TCtaButtonTypeConfig = {
 
 const NO_LINK_SUBTITLE = 'No link yet';
 
-/** Builds an action object type pointing at a reusable link, shared by `ctaButton` and `ctaSecondaryButton`. */
 const buildCtaButtonSchema = ({
   name,
   variant,

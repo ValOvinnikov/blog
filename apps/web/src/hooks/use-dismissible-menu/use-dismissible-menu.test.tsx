@@ -8,13 +8,6 @@ import { useCallback, useRef } from 'react';
 
 import { useDismissibleMenu } from './use-dismissible-menu';
 
-/**
- * Minimal harness exercising the shared primitive directly through the
- * accessor-callback contract (not through either adapter), wiring two plain
- * refs onto a real trigger + panel so the DOM-dependent behaviour (focus
- * management, outside-click, Tab-trap, roving focus) can be verified in
- * isolation from `usePopover`/`useMobileNavToggle`.
- */
 const Harness = () => {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -42,14 +35,6 @@ const Harness = () => {
   );
 };
 
-/**
- * Harness exercising `trapFocus: false` — mirrors `PostContentsRail`'s
- * mobile disclosure, which opts out of the Tab-trap/roving-focus behaviour
- * because it's a plain in-page navigation panel, not a command menu. Adds a
- * focusable element after the panel (like the article body Tab would land in
- * next) so a non-trapping Tab from the panel's last item has somewhere real
- * to prove it isn't wrapped back to the first item.
- */
 const HarnessNoTrap = () => {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -82,13 +67,6 @@ const HarnessNoTrap = () => {
   );
 };
 
-/**
- * Harness exercising `closeOnFocusOut: true` alongside `trapFocus: false` —
- * mirrors `PostContentsRail`'s mobile disclosure exactly: a non-trapping,
- * opaque-overlay panel that must close the moment focus genuinely leaves it.
- * Adds the same "after panel" focusable target as `HarnessNoTrap` so a Tab
- * past the last item has somewhere real outside the panel/trigger to land.
- */
 const HarnessCloseOnFocusOut = () => {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -122,12 +100,6 @@ const HarnessCloseOnFocusOut = () => {
   );
 };
 
-/**
- * Harness exercising the optional `getContainer` accessor: a "sibling
- * action" button shares a common ancestor with the trigger/panel (mirroring
- * `SiteNavigation`'s `actions` slot sharing `containerRef` with
- * `PrimaryNavigation`) but is neither the resolved trigger nor panel.
- */
 const HarnessWithContainer = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);

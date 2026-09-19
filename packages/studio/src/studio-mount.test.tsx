@@ -2,11 +2,6 @@ import { renderToStaticMarkup } from 'react-dom/server';
 
 import { StudioMount } from './studio-mount';
 
-// `StudioMount` calls `buildStudioConfig`, which imports `sanity/structure`,
-// `sanity-plugin-media`, `@sanity/vision` and `@sanity/code-input` — these
-// pull in the Studio's UI dependency tree (down to `@sanity-labs/ui-poc`'s
-// bundled CSS), which Node's loader can't parse under Vitest. Mocked here
-// for the same reason as `studio-config.test.ts`.
 vi.mock('sanity/structure', () => ({
   structureTool: (options: unknown) => ({ name: 'structureTool', options }),
 }));

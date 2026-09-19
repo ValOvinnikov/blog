@@ -12,15 +12,9 @@ import { findingsTableVariants } from './findings-table-variants';
 
 export type TFindingsTableProps = {
   findings: TFinding[];
-  /** Names for every tenant a listed finding references, keyed by tenant id — resolved by the page, not this presentational component. */
   tenantNamesById: Record<string, string>;
 };
 
-/**
- * Every currently open finding across the platform, including ones with no
- * tenant reference. Purely presentational — the page calling `listOpenFindings()`
- * owns the data.
- */
 export const FindingsTable = ({
   findings,
   tenantNamesById,

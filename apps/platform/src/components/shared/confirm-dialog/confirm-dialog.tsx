@@ -22,20 +22,15 @@ export type TConfirmDialogProps = {
   confirmHint: string;
   confirmValue: string;
   onConfirmValueChange: (value: string) => void;
-  /** The typed confirmation text must match this exactly before the confirm button is enabled. */
   expectedValue: string;
   onConfirm: () => void;
   isPending: boolean;
   confirmButtonLabel: ReactNode;
   confirmingButtonLabel: ReactNode;
   cancelLabel: ReactNode;
-  /** Extra content between the confirmation field and the action buttons, e.g. a dry-run toggle. */
   children?: ReactNode;
-  /** Button styling for the trigger and confirm actions. */
   tone?: 'danger' | 'primary';
-  /** Disables the trigger without removing it — e.g. while a dispatched run for the same action is already in progress. */
   isTriggerDisabled?: boolean;
-  /** Associates the disabled trigger with an explanatory hint rendered elsewhere on the page. */
   triggerAriaDescribedBy?: string;
 };
 

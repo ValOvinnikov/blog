@@ -1,13 +1,7 @@
 import { House, Link2, List, Settings, Tag } from 'lucide-react';
 import type { StructureBuilder } from 'sanity/structure';
 
-import {
-  buildGroupedListItems,
-  buildSection,
-  buildSections,
-  type TStructureGroup,
-  type TStructureSection,
-} from './build-section';
+import { buildSections, type TStructureSection } from './build-section';
 
 type TCall = { method: string; args: unknown[] };
 
@@ -58,9 +52,34 @@ const makeMockStructureBuilder = () => ({
 const asStructureBuilder = (S: ReturnType<typeof makeMockStructureBuilder>) =>
   S as unknown as StructureBuilder;
 
-describe(buildGroupedListItems, () => {
+const buildOneSection = (
+  S: ReturnType<typeof makeMockStructureBuilder>,
+  section: TStructureSection,
+): TMockBuilder => {
+  const [result] = buildSections(asStructureBuilder(S), [
+    section,
+  ]) as unknown as TMockBuilder[];
+  return result!;
+};
+
+const getGroupItems = (
+  S: ReturnType<typeof makeMockStructureBuilder>,
+  groups: TStructureSection['groups'],
+): TMockBuilder[] => {
+  const sectionItem = buildOneSection(S, {
+    title: 'Section',
+    id: 'section',
+    icon: List,
+    groups,
+  });
+  const childList = callArgs(sectionItem, 'child')?.[0] as TMockBuilder;
+  return callArgs(childList, 'items')?.[0] as TMockBuilder[];
+};
+
+describe(buildSections, () => {
   it('flattens 3 groups into divider + items, preserving declared order with no leading/trailing extra divider', () => {
-    const groups: TStructureGroup[] = [
+    const S = makeMockStructureBuilder();
+    const items = getGroupItems(S, [
       {
         title: 'Group A',
         items: [
@@ -91,15 +110,9 @@ describe(buildGroupedListItems, () => {
           },
         ],
       },
-    ];
+    ]);
 
-    const S = makeMockStructureBuilder();
-    const result = buildGroupedListItems(
-      asStructureBuilder(S),
-      groups,
-    ) as unknown as TMockBuilder[];
-
-    expect(result.map((builder) => builder.kind)).toEqual([
+    expect(items.map((builder) => builder.kind)).toEqual([
       'divider',
       'documentTypeListItem',
       'documentTypeListItem',
@@ -110,22 +123,20 @@ describe(buildGroupedListItems, () => {
       'listItem',
     ]);
 
-    // A divider precedes every group, including the first, carrying its title.
-    expect(callArgs(result[0]!, 'title')).toEqual(['Group A']);
-    expect(callArgs(result[3]!, 'title')).toEqual(['Group B']);
-    expect(callArgs(result[5]!, 'title')).toEqual(['Group C']);
-    // Nothing trails the last group's items.
-    expect(result.at(-1)?.kind).not.toBe('divider');
+    expect(callArgs(items[0]!, 'title')).toEqual(['Group A']);
+    expect(callArgs(items[3]!, 'title')).toEqual(['Group B']);
+    expect(callArgs(items[5]!, 'title')).toEqual(['Group C']);
+    expect(items.at(-1)?.kind).not.toBe('divider');
 
-    // Items preserve declared order within a group, not sorted.
-    expect(result[1]?.documentType).toBe('moduleOne');
-    expect(result[2]?.documentType).toBe('moduleTwo');
-    expect(result[6]?.documentType).toBe('tagPage');
-    expect(callArgs(result[7]!, 'id')).toEqual(['siteSettings']);
+    expect(items[1]?.documentType).toBe('moduleOne');
+    expect(items[2]?.documentType).toBe('moduleTwo');
+    expect(items[6]?.documentType).toBe('tagPage');
+    expect(callArgs(items[7]!, 'id')).toEqual(['siteSettings']);
   });
 
   it('drops an empty group entirely, including its divider, without crashing', () => {
-    const groups: TStructureGroup[] = [
+    const S = makeMockStructureBuilder();
+    const items = getGroupItems(S, [
       {
         title: 'Group A',
         items: [
@@ -139,26 +150,21 @@ describe(buildGroupedListItems, () => {
           { schema: { name: 'moduleTwo', title: 'Module Two', icon: Tag } },
         ],
       },
-    ];
+    ]);
 
-    const S = makeMockStructureBuilder();
-    const result = buildGroupedListItems(
-      asStructureBuilder(S),
-      groups,
-    ) as unknown as TMockBuilder[];
-
-    expect(result.map((builder) => builder.kind)).toEqual([
+    expect(items.map((builder) => builder.kind)).toEqual([
       'divider',
       'documentTypeListItem',
       'divider',
       'documentTypeListItem',
     ]);
-    expect(callArgs(result[0]!, 'title')).toEqual(['Group A']);
-    expect(callArgs(result[2]!, 'title')).toEqual(['Group C']);
+    expect(callArgs(items[0]!, 'title')).toEqual(['Group A']);
+    expect(callArgs(items[2]!, 'title')).toEqual(['Group C']);
   });
 
   it('builds a list item via S.documentTypeListItem() and a singleton item via S.listItem()/S.document()', () => {
-    const groups: TStructureGroup[] = [
+    const S = makeMockStructureBuilder();
+    const items = getGroupItems(S, [
       {
         title: 'Group',
         items: [
@@ -173,15 +179,9 @@ describe(buildGroupedListItems, () => {
           },
         ],
       },
-    ];
+    ]);
 
-    const S = makeMockStructureBuilder();
-    const result = buildGroupedListItems(
-      asStructureBuilder(S),
-      groups,
-    ) as unknown as TMockBuilder[];
-
-    const [, listItemBuilder, singletonBuilder] = result;
+    const [, listItemBuilder, singletonBuilder] = items;
 
     expect(listItemBuilder?.kind).toBe('documentTypeListItem');
     expect(listItemBuilder?.documentType).toBe('listType');
@@ -204,7 +204,8 @@ describe(buildGroupedListItems, () => {
   });
 
   it('treats an omitted mode the same as an explicit "list" mode', () => {
-    const groups: TStructureGroup[] = [
+    const S = makeMockStructureBuilder();
+    const items = getGroupItems(S, [
       {
         title: 'Group',
         items: [
@@ -217,26 +218,20 @@ describe(buildGroupedListItems, () => {
           },
         ],
       },
-    ];
+    ]);
 
-    const S = makeMockStructureBuilder();
-    const result = buildGroupedListItems(
-      asStructureBuilder(S),
-      groups,
-    ) as unknown as TMockBuilder[];
-
-    expect(result.map((builder) => builder.kind)).toEqual([
+    expect(items.map((builder) => builder.kind)).toEqual([
       'divider',
       'documentTypeListItem',
       'documentTypeListItem',
     ]);
     expect(S.documentTypeListItem).toHaveBeenCalledTimes(2);
-    expect(S.listItem).not.toHaveBeenCalled();
     expect(S.document).not.toHaveBeenCalled();
   });
 
   it('emits an untitled group with no divider while a titled group still gets one', () => {
-    const groups: TStructureGroup[] = [
+    const S = makeMockStructureBuilder();
+    const items = getGroupItems(S, [
       {
         items: [
           {
@@ -260,28 +255,23 @@ describe(buildGroupedListItems, () => {
           },
         ],
       },
-    ];
+    ]);
 
-    const S = makeMockStructureBuilder();
-    const result = buildGroupedListItems(
-      asStructureBuilder(S),
-      groups,
-    ) as unknown as TMockBuilder[];
-
-    expect(result.map((builder) => builder.kind)).toEqual([
+    expect(items.map((builder) => builder.kind)).toEqual([
       'listItem',
       'documentTypeListItem',
       'divider',
       'documentTypeListItem',
     ]);
     expect(S.divider).toHaveBeenCalledTimes(1);
-    expect(callArgs(result[2]!, 'title')).toEqual(['Settings']);
-    expect(callArgs(result[0]!, 'id')).toEqual(['homePage']);
-    expect(callArgs(result[1]!, 'title')).toEqual(['Landing Page']);
+    expect(callArgs(items[2]!, 'title')).toEqual(['Settings']);
+    expect(callArgs(items[0]!, 'id')).toEqual(['homePage']);
+    expect(callArgs(items[1]!, 'title')).toEqual(['Landing Page']);
   });
 
   it('emits a bare divider before an untitled group carrying dividerBefore', () => {
-    const groups: TStructureGroup[] = [
+    const S = makeMockStructureBuilder();
+    const items = getGroupItems(S, [
       {
         items: [
           { schema: { name: 'navigation', title: 'Navigation', icon: List } },
@@ -299,26 +289,19 @@ describe(buildGroupedListItems, () => {
           },
         ],
       },
-    ];
+    ]);
 
-    const S = makeMockStructureBuilder();
-    const result = buildGroupedListItems(
-      asStructureBuilder(S),
-      groups,
-    ) as unknown as TMockBuilder[];
-
-    expect(result.map((builder) => builder.kind)).toEqual([
+    expect(items.map((builder) => builder.kind)).toEqual([
       'documentTypeListItem',
       'divider',
       'documentTypeListItem',
     ]);
-    expect(callArgs(result[1]!, 'title')).toBeUndefined();
+    expect(callArgs(items[1]!, 'title')).toBeUndefined();
   });
-});
 
-describe(buildSection, () => {
   it('builds a listItem with the section title/id/icon and a matching child list', () => {
-    const section: TStructureSection = {
+    const S = makeMockStructureBuilder();
+    const result = buildOneSection(S, {
       title: 'Pages',
       id: 'pages',
       icon: List,
@@ -329,13 +312,7 @@ describe(buildSection, () => {
           ],
         },
       ],
-    };
-
-    const S = makeMockStructureBuilder();
-    const result = buildSection(
-      asStructureBuilder(S),
-      section,
-    ) as unknown as TMockBuilder;
+    });
 
     expect(result.kind).toBe('listItem');
     expect(callArgs(result, 'title')).toEqual(['Pages']);
@@ -352,8 +329,9 @@ describe(buildSection, () => {
     expect(S.list).toHaveBeenCalledTimes(1);
   });
 
-  it('skips the middle list and children straight into the document list when flattenSingleItem is set on a single non-singleton item', () => {
-    const section: TStructureSection = {
+  it('skips the middle list and children straight into the document list when flattenSingleItem is set on a single non-singleton item, keeping the section title rather than the item schema title', () => {
+    const S = makeMockStructureBuilder();
+    const result = buildOneSection(S, {
       title: 'Links',
       id: 'links',
       icon: Link2,
@@ -363,13 +341,7 @@ describe(buildSection, () => {
           items: [{ schema: { name: 'link', title: 'Link', icon: Link2 } }],
         },
       ],
-    };
-
-    const S = makeMockStructureBuilder();
-    const result = buildSection(
-      asStructureBuilder(S),
-      section,
-    ) as unknown as TMockBuilder;
+    });
 
     expect(result.kind).toBe('listItem');
     expect(callArgs(result, 'title')).toEqual(['Links']);
@@ -380,13 +352,13 @@ describe(buildSection, () => {
     const childList = childArgs?.[0] as TMockBuilder;
     expect(childList.kind).toBe('documentTypeList');
     expect(childList.documentType).toBe('link');
-    // The flattened pane keeps the section's title ("Links"), not the item schema's ("Link") — flattening removes a nesting level, not the plural label.
     expect(callArgs(childList, 'title')).toEqual(['Links']);
     expect(S.documentTypeList).toHaveBeenCalledTimes(1);
     expect(S.list).not.toHaveBeenCalled();
   });
 
   it('throws when flattenSingleItem is set but the section has more than one item', () => {
+    const S = makeMockStructureBuilder();
     const section: TStructureSection = {
       title: 'Modules',
       id: 'modules',
@@ -402,13 +374,13 @@ describe(buildSection, () => {
       ],
     };
 
-    const S = makeMockStructureBuilder();
-    expect(() => buildSection(asStructureBuilder(S), section)).toThrow(
+    expect(() => buildSections(asStructureBuilder(S), [section])).toThrow(
       /flattenSingleItem/,
     );
   });
 
   it('throws when flattenSingleItem is set but the single item is a singleton', () => {
+    const S = makeMockStructureBuilder();
     const section: TStructureSection = {
       title: 'Settings',
       id: 'settings',
@@ -430,14 +402,11 @@ describe(buildSection, () => {
       ],
     };
 
-    const S = makeMockStructureBuilder();
-    expect(() => buildSection(asStructureBuilder(S), section)).toThrow(
+    expect(() => buildSections(asStructureBuilder(S), [section])).toThrow(
       /flattenSingleItem/,
     );
   });
-});
 
-describe(buildSections, () => {
   it('places no divider before the first section and none between sections without dividerBefore', () => {
     const sections: TStructureSection[] = [
       {

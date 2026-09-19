@@ -24,7 +24,6 @@ export type TEmailSettingsFormValues = {
 export type TEmailSettingsFormProps = {
   tenantId: string;
   initialValues: TEmailSettingsFormValues;
-  /** Reported up so a sibling template editor's logo-fallback preview stays in sync with an immediate (not staged-behind-Save) logo change. */
   onLogoChange?: (url: string | undefined) => void;
   isArchived?: boolean;
   archivedNoticeId?: string;

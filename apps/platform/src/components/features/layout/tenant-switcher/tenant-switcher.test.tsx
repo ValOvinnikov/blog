@@ -8,10 +8,6 @@ import type { ComponentPropsWithoutRef } from 'react';
 
 import { TenantSwitcher } from './tenant-switcher';
 
-// `TenantSwitcher` links each tenant through `@platform/i18n/navigation`'s
-// `Link` (next-intl's locale-aware navigation), not plain `next/link` —
-// mocking the wrong module here would let a broken import ship unnoticed
-// (see `sidebar.test.tsx`'s identical mock for `sidebar-nav-link.tsx`).
 vi.mock('@platform/i18n/navigation', () => ({
   Link: ({
     href,

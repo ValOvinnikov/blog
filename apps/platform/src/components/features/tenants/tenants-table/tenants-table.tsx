@@ -24,10 +24,6 @@ const manageHrefFor = (tenant: TTenant): string =>
     ? adminRoutes.tenantOverview(tenant.id)
     : adminRoutes.tenantProvisioning(tenant.id);
 
-/**
- * Every tenant on the platform, with status and plan visible at a glance.
- * Purely presentational — the page fetching `listTenants()` owns the data.
- */
 export const TenantsTable = ({ tenants }: TTenantsTableProps) => {
   const t = useTranslations('tenantsTable');
   const { card, table, head, row, cell, tname, name, domain, empty } =

@@ -9,7 +9,6 @@ type TToMetadataOptions = {
   canonical: string;
   ogType: 'website' | 'article';
   titleAbsolute?: boolean;
-  /** RSS feed URL for this page's content scope (site-wide or per-tag). Omit when no feed covers this page. */
   feedUrl?: string;
   article?: {
     publishedTime?: string;
@@ -18,9 +17,8 @@ type TToMetadataOptions = {
 };
 
 /**
- * Maps an authored `TSeoResolved` view-model to Next `Metadata`, passing
- * unauthored fields through as `undefined` so they are omitted rather than
- * inheriting a parent segment's value.
+ * Unauthored fields pass through as `undefined` so they are omitted rather
+ * than inheriting a parent segment's value.
  *
  * @example
  * return toMetadata(result.data.seo, tenantContext, { canonical: '/', ogType: 'website', titleAbsolute: true });

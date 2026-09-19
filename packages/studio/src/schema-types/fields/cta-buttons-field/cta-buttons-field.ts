@@ -5,10 +5,6 @@ import { defineArrayMember, defineField } from 'sanity';
 
 type TCtaButtonItem = { variant?: string };
 
-/**
- * Builds the `ctaButtons` array field — each variant may appear at most
- * once, and a Primary (if present) must lead the list.
- */
 export const ctaButtonsField = ({
   title = 'Actions',
   description = 'A list of actions associated with this content, such as links to other pages or external sites.',

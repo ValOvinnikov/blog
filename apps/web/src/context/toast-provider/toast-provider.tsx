@@ -32,7 +32,6 @@ interface IUseToast {
     promise: Promise<T>,
     messages: IToastPromiseMessages<T>,
   ) => Promise<T>;
-  /** Dismisses the toast with the given id, or the newest toast when omitted. */
   dismiss: (id?: string) => void;
 }
 
@@ -45,15 +44,8 @@ export interface IToastProviderProps {
 const s = toastProviderVariants();
 
 /**
- * ToastProvider — mounted once near the app root (`[tenant]/[locale]/layout.tsx`).
- * Owns the toast queue through a framework-free `createToastStore` instance
- * (subscribed via `useSyncExternalStore`, so it renders an always-empty
- * queue on the server and never ships a toast in the static HTML), the
- * enter-transition's double-`requestAnimationFrame` paint timing, per-toast
- * hover/focus-within pause–resume, and the global `Esc`-dismisses-the-
- * focused-or-newest-toast shortcut (§4.3/§4.4 of the toast design doc).
- * Renders `ToastViewport` + `Toast` (`@blog/ui`) fed entirely by this state —
- * those stay pure and prop-driven.
+ * Subscribed via `useSyncExternalStore`, so this renders an always-empty
+ * queue on the server and never ships a toast in the static HTML.
  *
  * @example
  * <ToastProvider>
@@ -117,8 +109,6 @@ export const ToastProvider = ({ children }: IToastProviderProps) => {
     }
   }, [state.visible, store]);
 
-  // Esc dismisses whichever toast currently holds focus, or the newest
-  // toast when focus is elsewhere (§4.4).
   useEffect(() => {
     if (state.visible.length === 0) return;
 

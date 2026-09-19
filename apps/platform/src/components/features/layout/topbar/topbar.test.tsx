@@ -9,9 +9,6 @@ import type { ComponentPropsWithoutRef } from 'react';
 
 import { Topbar } from './topbar';
 
-// `TopbarNavMenu` (rendered when `sections` is passed) resolves its active
-// link via `@platform/i18n/navigation`'s `usePathname` and links through its
-// `Link` — mocked the same way as `sidebar.test.tsx`/`topbar-nav-menu.test.tsx`.
 vi.mock('@platform/i18n/navigation', () => ({
   usePathname: () => '/',
   Link: ({

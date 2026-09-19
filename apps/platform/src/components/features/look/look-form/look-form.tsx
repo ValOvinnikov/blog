@@ -25,7 +25,6 @@ export type TLookFormProps = {
   tenantName: string;
   primaryDomain: string;
   initialValues: TLookFormValues;
-  /** When set, the tenant is archived: Save is disabled and a notice explains why. */
   archivedAt?: Date;
 };
 
@@ -85,10 +84,6 @@ export const LookForm = ({
   const archivedNoticeId = useId();
   const toast = useToast();
   const t = useTranslations('lookForm');
-  // The last known-persisted state: the submitted fields on a successful
-  // save, plus the two brand-asset URLs the instant their own
-  // (independently persisted) upload/remove action succeeds — everything
-  // `isDirty` compares `values` against.
   const [savedValues, setSavedValues] =
     useState<TLookFormValues>(initialValues);
   const { values, setValues, status, isPending, handleSubmit } =

@@ -10,9 +10,6 @@ import type { ComponentPropsWithoutRef } from 'react';
 
 import { AdminShell } from './admin-shell';
 
-// `Topbar`'s nav menu (rendered here since `sections` is always passed) and
-// the desktop `Sidebar` both resolve active links via `@platform/i18n/navigation`
-// — mocked the same way as `sidebar.test.tsx`/`topbar-nav-menu.test.tsx`.
 vi.mock('@platform/i18n/navigation', () => ({
   usePathname: () => '/',
   Link: ({

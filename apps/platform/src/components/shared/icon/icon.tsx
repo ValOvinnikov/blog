@@ -6,7 +6,6 @@ import { iconVariants, type TIconVariants } from './icon-variants';
 export type TIconProps = {
   name: TIconName;
   size?: TIconVariants['size'];
-  /** Omit to keep the icon decorative — it then renders `aria-hidden`. */
   ariaLabel?: string;
   className?: string;
 };

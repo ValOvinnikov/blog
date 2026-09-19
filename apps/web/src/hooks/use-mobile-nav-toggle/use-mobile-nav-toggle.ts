@@ -4,10 +4,6 @@ import { useDismissibleMenu } from '@web/hooks/use-dismissible-menu';
 import { useCallback, useRef } from 'react';
 
 /**
- * useMobileNavToggle — thin adapter over `useDismissibleMenu` (the shared
- * Escape/outside-click/focus-trap/roving-focus core, also consumed by
- * `usePopover`), adapted for `PrimaryNavigation`'s `mobileToggle` prop.
- *
  * `PrimaryNavigation` renders the toggle button and dropdown panel itself
  * and doesn't forward refs for either, so this hook can't wire separate
  * `triggerRef`/`panelRef` the way `usePopover` does. Instead the caller wraps

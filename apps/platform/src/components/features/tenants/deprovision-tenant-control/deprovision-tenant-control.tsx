@@ -16,7 +16,6 @@ import { deprovisionTenantControlVariants } from './deprovision-tenant-control-v
 
 export type TDeprovisionTenantControlProps = {
   tenant: TTenant;
-  /** Disables the trigger, without hiding it, while a dispatched run for this tenant is already in progress. */
   isDeprovisioningInProgress?: boolean;
 };
 

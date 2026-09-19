@@ -31,10 +31,6 @@ const postRequest = (
   });
 };
 
-// Simulates a genuine chunked-transfer request: a `ReadableStream` body has
-// no synchronously-known length, so unlike `postRequest`'s plain string
-// body, the runtime never populates a `content-length` header for it at
-// all — this is the shape the pre-read byte-cap enforcement exists for.
 const postStreamRequest = (byteLength: number) => {
   const stream = new ReadableStream<Uint8Array>({
     start(controller) {

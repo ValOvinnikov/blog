@@ -58,7 +58,6 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-/** Resolves every params mock to an empty result; tests override as needed. */
 const mockAllEmpty = () => {
   getPostParamsMock.mockResolvedValue({ ok: true, data: [] });
   getTopicParamsMock.mockResolvedValue({ ok: true, data: [] });

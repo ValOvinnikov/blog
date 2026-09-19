@@ -21,12 +21,6 @@ export interface IPostLatestModuleViewProps extends Omit<
   hasImages?: boolean;
 }
 
-/**
- * PostLatestModuleView — render shell for `PostLatestModule`: a labeled
- * `Section` wrapping either a `CardCarousel` or a `CardGrid` of
- * `MediaCardItem`s. Never called with an empty `items` — `PostLatestModule`
- * renders nothing itself in that case.
- */
 export const PostLatestModuleView = ({
   brandVariant,
   headingBlock,

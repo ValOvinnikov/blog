@@ -21,14 +21,6 @@ export interface IPostFeaturedModuleViewProps extends Omit<
   hasImages?: boolean;
 }
 
-/**
- * PostFeaturedModuleView — render shell for `PostFeaturedModule`: a labeled
- * `Section` wrapping either a `CardCarousel` or the default spotlight
- * arrangement — the first item as a lead `MediaCardItem`, then either the one
- * remaining item (also full-width) or a two-column `CardGrid` of the rest.
- * Never called with an empty `items` — `PostFeaturedModule` renders nothing
- * itself in that case.
- */
 export const PostFeaturedModuleView = ({
   brandVariant,
   headingBlock,

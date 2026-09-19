@@ -15,7 +15,7 @@ const OWNER_ELEVATION_ROLE = 'administrator';
 // How long an owner may sit un-accepted before a run reports STALLED rather
 // than PENDING_ACCEPTANCE — long enough that a same-day signup isn't flagged,
 // short enough that a quiet non-acceptance still surfaces promptly.
-export const OWNER_ACCEPTANCE_STALL_THRESHOLD_MS = 1000 * 60 * 60 * 24 * 3;
+const OWNER_ACCEPTANCE_STALL_THRESHOLD_MS = 1000 * 60 * 60 * 24 * 3;
 
 /**
  * Promotes the tenant owner from `viewer` to `administrator` once they've

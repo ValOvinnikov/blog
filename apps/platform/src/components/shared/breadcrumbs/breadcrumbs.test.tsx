@@ -3,9 +3,6 @@ import type { ComponentPropsWithoutRef } from 'react';
 
 import { Breadcrumbs } from './breadcrumbs';
 
-// `Breadcrumbs` links through `@platform/i18n/navigation`'s `Link`, which needs
-// real routing context this test environment doesn't provide — mocked the
-// same way `link-button.test.tsx`/`sidebar.test.tsx` do for their own links.
 vi.mock('@platform/i18n/navigation', () => ({
   Link: ({
     href,

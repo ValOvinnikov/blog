@@ -6,7 +6,6 @@ import { useTranslations } from 'next-intl';
 import { Tile } from './components/tile/tile';
 import { makeItYoursCardVariants } from './make-it-yours-card-variants';
 
-/** The owner home's routes onward — Look, Voice and Features, the three settings surfaces an owner actually edits. */
 export const MakeItYoursCard = () => {
   const t = useTranslations('ownerHomePage');
   const { grid } = makeItYoursCardVariants();

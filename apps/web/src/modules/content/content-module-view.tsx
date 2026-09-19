@@ -8,11 +8,9 @@ export interface IContentModuleViewProps extends TContentModule {
 }
 
 /**
- * Pure view for `ContentModule` — the `Section` full-bleed landmark around
- * the `ContentModule` organism, with the Portable Text body rendered by the
- * web-owned `PortableTextRenderer`. No `titleId` is passed to `Section` —
- * this module renders no heading of its own (its rich-text `body` supplies
- * any in-content headings), so the landmark has no unique element to label.
+ * No `titleId` is passed to `Section` — this module renders no heading of
+ * its own (its rich-text `body` supplies any in-content headings), so the
+ * landmark has no unique element to label.
  */
 export const ContentModuleView = ({
   id,

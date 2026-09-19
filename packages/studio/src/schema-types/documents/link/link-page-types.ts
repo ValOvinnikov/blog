@@ -7,10 +7,6 @@ import { PAGE_TAG_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/t
 import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic/topic-type';
 import { PAGE_TOPIC_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/topic-index/topic-index-type';
 
-/**
- * Every page document `_type` — the full, single-edit-to-extend set of
- * valid `internalReference` targets for the `link` document.
- */
 export const LINK_PAGE_TYPES = [
   PAGE_HOME_TYPE,
   PAGE_LANDING_TYPE,

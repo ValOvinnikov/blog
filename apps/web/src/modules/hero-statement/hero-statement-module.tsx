@@ -9,10 +9,6 @@ export interface IHeroStatementModuleProps {
   tenant: string;
 }
 
-/**
- * HeroStatementModule — fetches `module_heroStatement` data and hands it to
- * `HeroStatementModuleView`.
- */
 export const HeroStatementModule = async ({
   id,
   tenant,

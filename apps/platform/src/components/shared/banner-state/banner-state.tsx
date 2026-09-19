@@ -17,7 +17,6 @@ export type TBannerStateProps = {
   title: ReactNode;
   description: ReactNode;
   action: ReactNode;
-  /** Lets a caller point a disabled control's `aria-describedby` at this banner. */
   id?: string;
 };
 

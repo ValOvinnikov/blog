@@ -200,11 +200,6 @@ describe('POST /api/revalidate-site-config', () => {
     expect(revalidateTagMock).not.toHaveBeenCalled();
   });
 
-  // `vi.doMock` overrides the module registry's mock factory for
-  // `@web/utils/env/env` for every subsequent dynamic `import('./route')` in
-  // this file (`vi.resetModules()` clears cached instances, not the
-  // registered factory) — this config-missing case stays last, same as
-  // `/api/revalidate`'s own equivalent case.
   it('returns 500 when SITE_CONFIG_REVALIDATE_SECRET is not configured', async () => {
     vi.doMock('@web/utils/env/env', () => ({ env: {} }));
     const { POST } = await import('./route');

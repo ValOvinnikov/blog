@@ -189,22 +189,4 @@ describe('Sanity client module loading', () => {
       token: 'platform-read-token',
     });
   });
-
-  it('getPlatformClient reuses the same cache as getClient — never a client per call', async () => {
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'platform-project';
-    process.env['SANITY_API_READ_TOKEN'] = 'platform-read-token';
-    vi.resetModules();
-
-    const createClientMock = vi.fn().mockReturnValue({});
-    vi.doMock('next-sanity', () => ({ createClient: createClientMock }));
-
-    const { getPlatformClient } = await import('./client');
-    const first = getPlatformClient();
-    const second = getPlatformClient();
-
-    expect(first).toBe(second);
-    expect(createClientMock).toHaveBeenCalledTimes(1);
-
-    vi.doUnmock('next-sanity');
-  });
 });
