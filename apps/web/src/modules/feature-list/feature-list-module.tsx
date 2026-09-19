@@ -9,12 +9,6 @@ export interface IFeatureListModuleProps {
   tenant: string;
 }
 
-/**
- * FeatureListModule — fetches `module_featureList` data and hands it to
- * `FeatureListModuleView`. Renders nothing when the fetch fails, or when the
- * authored cards degrade to an empty list (fewer than the schema's two-card
- * minimum).
- */
 export const FeatureListModule = async ({
   id,
   tenant,

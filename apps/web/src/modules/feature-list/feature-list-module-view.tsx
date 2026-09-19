@@ -25,14 +25,6 @@ export interface IFeatureListModuleViewProps extends TFeatureListModule {
   dataTestId: string;
 }
 
-/**
- * FeatureListModuleView — render shell for `FeatureListModule`: a labeled
- * `Section` wrapping either a `CardGrid` or a `FeatureListCarousel` of
- * feature cards, with `ActionGroup` beneath when the module has buttons.
- * Renders nothing for an empty `items` (the schema's two-card minimum
- * degrades to `[]` rather than a single-card grid) — never an empty
- * `Section` landmark with a dangling `aria-labelledby`.
- */
 export const FeatureListModuleView = ({
   brandVariant,
   headingBlock,

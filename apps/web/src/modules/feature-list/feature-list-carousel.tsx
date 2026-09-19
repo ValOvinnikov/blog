@@ -25,12 +25,6 @@ export interface IFeatureListCarouselProps
 
 const s = featureListCarouselVariants();
 
-/**
- * FeatureListCarousel — the `'use client'` wrapper that gives a row of
- * feature cards a swipeable carousel via `@blog/ui`'s `Carousel`.
- * `renderItem` is defined here rather than in a Server Component view
- * because a function prop can never cross the server→client boundary.
- */
 export const FeatureListCarousel = ({
   items,
   imageShape,

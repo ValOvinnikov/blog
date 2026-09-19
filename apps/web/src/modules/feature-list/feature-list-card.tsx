@@ -39,12 +39,6 @@ export interface IFeatureListCardProps extends IWithDataTestId {
 
 const s = featureListCardVariants();
 
-/**
- * FeatureListCard — a `module_featureList` card: `MediaCard` holding either
- * the card's image (shaped per the module's `imageShape`) or its icon when
- * it has no image, titled via `SmartLink` when the card has a link (the
- * whole card becomes clickable, `MediaCardItem`'s overlay pattern).
- */
 export const FeatureListCard = ({
   item,
   imageShape,

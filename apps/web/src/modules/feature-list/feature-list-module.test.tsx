@@ -67,21 +67,7 @@ describe(`<${FeatureListModule.name}/>`, () => {
     getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
-  it('calls getFeatureList with the module id and resolved tenant Sanity context', async () => {
-    getFeatureListMock.mockResolvedValue({
-      ok: true,
-      data: { ...baseModule, items: [] },
-    });
-
-    await setup();
-
-    expect(getFeatureListMock).toHaveBeenCalledWith(
-      'feature-list-1',
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
-  });
-
-  it('forwards the resolved tenant Sanity context to getFeatureList', async () => {
+  it('calls getFeatureList with the module id and the tenant Sanity context resolved from the tenant slug', async () => {
     const tenant = {
       projectId: 'tenant-project',
       dataset: 'production',

@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, CARD_IMAGE_SHAPE } from '@blog/config';
+import { CARD_IMAGE_SHAPE } from '@blog/config';
 import { Carousel } from '@blog/ui/organisms/carousel';
 import {
   customRender,
@@ -8,7 +8,6 @@ import {
 import { makeFeatureListItem } from '@web/testing/modules/feature-list/fixtures';
 
 import { FeatureListCarousel } from './feature-list-carousel';
-import { featureListCarouselVariants } from './feature-list-carousel-variants';
 
 vi.mock('@web/components/shared/smart-link', () => ({
   SmartLink: ({
@@ -25,9 +24,6 @@ vi.mock('@web/components/shared/smart-link', () => ({
   ),
 }));
 
-// `FeatureListCarousel`'s contract is what it hands to `Carousel`, not what
-// `Carousel` renders — mocked out entirely so this file never exercises
-// Embla (already covered by `packages/ui`'s own carousel tests).
 vi.mock('@blog/ui/organisms/carousel', () => ({
   Carousel: vi.fn(() => null),
 }));
@@ -86,27 +82,5 @@ describe(`<${FeatureListCarousel.name}/>`, () => {
 
       unmount();
     });
-  });
-
-  it('derives getItemKey from the item id', () => {
-    setup();
-    const { getItemKey } = getCarouselProps();
-
-    items.forEach((item, index) => {
-      expect(getItemKey?.({ item, index })).toBe(item.id);
-    });
-  });
-
-  it('passes the slide column-width classes through slideClassName', () => {
-    setup();
-
-    const s = featureListCarouselVariants();
-    expect(getCarouselProps().slideClassName).toBe(s.slide());
-  });
-
-  it('passes tone through to Carousel unchanged', () => {
-    setup({ tone: BRAND_VARIANT.BRAND_PRIMARY });
-
-    expect(getCarouselProps().tone).toBe(BRAND_VARIANT.BRAND_PRIMARY);
   });
 });

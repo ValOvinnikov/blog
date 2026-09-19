@@ -103,24 +103,29 @@ describe(`<${FeatureListModuleView.name}/>`, () => {
     );
   });
 
-  it('renders FeatureListCarousel instead of the grid when displayMode is CAROUSEL', () => {
-    setup({ displayMode: DISPLAY_MODE.CAROUSEL });
+  it.each([
+    [DISPLAY_MODE.CAROUSEL, true],
+    [DISPLAY_MODE.GRID, false],
+  ])(
+    'renders FeatureListCarousel instead of the grid only when displayMode is %s: %s',
+    (displayMode, expectedCarousel) => {
+      setup({ displayMode });
 
-    expect(
-      screen.getByTestId('feature-list-carousel-stub'),
-    ).toBeInTheDocument();
-    expect(FeatureListCarousel).toHaveBeenCalledWith(
-      expect.objectContaining({ items }),
-      undefined,
-    );
-    expect(screen.queryByRole('article')).not.toBeInTheDocument();
-  });
-
-  it('never renders FeatureListCarousel when displayMode is GRID', () => {
-    setup();
-
-    expect(FeatureListCarousel).not.toHaveBeenCalled();
-  });
+      expect(FeatureListCarousel).toHaveBeenCalledTimes(
+        expectedCarousel ? 1 : 0,
+      );
+      if (expectedCarousel) {
+        expect(
+          screen.getByTestId('feature-list-carousel-stub'),
+        ).toBeInTheDocument();
+        expect(FeatureListCarousel).toHaveBeenCalledWith(
+          expect.objectContaining({ items }),
+          undefined,
+        );
+        expect(screen.queryByRole('article')).not.toBeInTheDocument();
+      }
+    },
+  );
 
   it('renders nothing when items is empty, never an empty landmark with a dangling aria-labelledby', () => {
     const { container } = setup({ items: [] });
