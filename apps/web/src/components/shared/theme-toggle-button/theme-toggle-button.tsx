@@ -3,12 +3,6 @@
 import { ThemeToggle } from '@blog/ui/atoms/theme-toggle';
 import { useEffect, useState } from 'react';
 
-/**
- * Client-side wrapper that owns theme state for `ThemeToggle`. Reads the
- * current theme from `document.documentElement` on mount, and on toggle
- * updates the `dark` class, `color-scheme`, and persists the choice to
- * `localStorage`.
- */
 export const ThemeToggleButton = () => {
   const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);

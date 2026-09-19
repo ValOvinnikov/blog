@@ -90,19 +90,10 @@ export async function createTenantSanityProject(
   const ownerEmail = await getTenantOwnerEmail(tenant.id);
 
   if (!ownerEmail) {
-    // Tenant creation always inserts an OWNER membership, so this should
-    // only happen on a genuine data anomaly. Provisioning must still
-    // complete — logging is the only trace an operator gets that the
-    // tenant's owner has no Sanity Studio invite and needs one by hand.
     console.error(
       `create-sanity-project: no resolvable owner email for tenant "${tenant.id}" — skipping Sanity Studio invite.`,
     );
   } else {
-    // Listing invites can fail the same way inviting can (a token permission
-    // gap, a transient Access API error). Without it there's no reliable way
-    // to tell whether the owner is already invited, so the invite is skipped
-    // for this run rather than risking duplicate-invite noise — a later
-    // retry re-lists and catches up.
     let alreadyInvited: boolean | undefined;
     try {
       const invites = await listSanityProjectInvites({
@@ -119,10 +110,6 @@ export async function createTenantSanityProject(
     }
 
     if (alreadyInvited === false) {
-      // Sanity Studio's login flow requires project membership, but a
-      // failed invite must not block the rest of provisioning (dataset
-      // seeding, the read-only token, domain mapping, the webhook) — an
-      // operator can always send the invite by hand afterward.
       try {
         await createSanityProjectInvite({
           token: env.sanityManagementToken,

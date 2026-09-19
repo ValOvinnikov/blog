@@ -1,6 +1,7 @@
 import {
   getCustomValidator,
   getCustomValidatorWithLevel,
+  getRecordedBounds,
   getRecordedValidators,
 } from '@blog/studio/testing/create-mock-validation-rule';
 import { defineField, defineType } from 'sanity';
@@ -35,6 +36,13 @@ const noValidationField = defineField({
   type: 'string',
 });
 
+const boundedField = defineField({
+  name: 'summary',
+  title: 'Summary',
+  type: 'string',
+  validation: (rule) => rule.required().min(3).max(10),
+});
+
 const documentType = defineType({
   name: 'testing_document',
   title: 'Testing Document',
@@ -59,6 +67,20 @@ describe(getRecordedValidators, () => {
     expect(() =>
       getRecordedValidators<TStringCustomFn>(noValidationField),
     ).toThrow(/validation/);
+  });
+});
+
+describe(getRecordedBounds, () => {
+  it('captures the numeric arguments passed to min() and max()', () => {
+    expect(getRecordedBounds(boundedField)).toEqual({ min: 3, max: 10 });
+  });
+
+  it('leaves a bound unset when the chain never calls it', () => {
+    expect(getRecordedBounds(singleRuleField)).toEqual({});
+  });
+
+  it('throws when the source defines no validation builder', () => {
+    expect(() => getRecordedBounds(noValidationField)).toThrow(/validation/);
   });
 });
 

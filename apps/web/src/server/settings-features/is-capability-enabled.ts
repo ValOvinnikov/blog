@@ -6,13 +6,12 @@ import { logger } from '@web/utils/logger/logger';
 import { getEffectiveSettingsFeatures } from './get-effective-settings-features';
 
 /**
- * isCapabilityEnabled — most-restrictive-wins capability gate: a capability
- * is enabled only when the tenant's plan entitles it (`PLAN_REGISTRY`) *and*
- * its own effective `settings_features` toggle is on. Every failure path —
- * no tenant resolved, a fetch error — resolves `false` rather than
- * throwing, so a render site can gate on this with a plain `if` and a
- * capability simply omits rather than breaking the page. Accepts the
- * `[tenant]` route param and forwards it to both reads below.
+ * Most-restrictive-wins capability gate: a capability is enabled only when
+ * the tenant's plan entitles it (`PLAN_REGISTRY`) *and* its own effective
+ * `settings_features` toggle is on. Every failure path — no tenant
+ * resolved, a fetch error — resolves `false` rather than throwing, so a
+ * render site can gate on this with a plain `if` and a capability simply
+ * omits rather than breaking the page.
  */
 export const isCapabilityEnabled = async (
   capability: TCapability,

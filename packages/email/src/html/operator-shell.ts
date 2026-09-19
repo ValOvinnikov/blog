@@ -4,9 +4,7 @@ import { PLATFORM_EMAIL_BRAND } from './platform-email-brand';
 const OPERATOR_BRAND_NAME = 'Tenant Alerts';
 
 export type TBuildOperatorShellInput = {
-  /** The inbox preview snippet shown alongside the subject line, before the email is opened. */
   previewText?: string;
-  /** Already-assembled, already-escaped HTML for the message-specific content. */
   bodyHtml: string;
 };
 

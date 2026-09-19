@@ -27,7 +27,4 @@ export const blogPageQuery = q.star
       .nullable(),
     seo: sub.field('seo').project(seoFragment).notNull(),
   }))
-  // Nullable, not `.notNull()`: no `page_postIndex` document is an ordinary
-  // not-found, not a parse failure — the loader turns `null` into
-  // `undefined`.
   .nullable(true);

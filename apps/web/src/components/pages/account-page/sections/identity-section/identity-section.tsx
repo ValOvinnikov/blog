@@ -17,7 +17,6 @@ import {
 const s = identitySectionVariants();
 
 /**
- * IdentitySection — the `/account` "connected accounts / identity" wrapper.
  * Provider rows render as plain flex-row markup rather than `SettingRow`
  * (its label+description+control model doesn't fit a single-line
  * icon+name+status+action row). GitHub's `Icon` renders one `SIZE` step

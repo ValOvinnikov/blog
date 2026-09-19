@@ -12,9 +12,7 @@ export type TRawTaxonomyListModule = InferResultType<
   typeof taxonomyListModuleQuery
 >;
 
-export type TRawTaxonomyEntry = NonNullable<
-  TRawTaxonomyListModule['entries']
->[number];
+type TRawTaxonomyEntry = NonNullable<TRawTaxonomyListModule['entries']>[number];
 
 function toTaxonomyEntry(raw: TRawTaxonomyEntry): TTaxonomyEntry {
   return {

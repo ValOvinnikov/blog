@@ -13,13 +13,6 @@ import { subscribers } from './subscribers';
 
 const BACKFILL_MIGRATION = '0008_silly_xorn.sql';
 
-// Regression coverage for the bug 0007_wide_silver_samurai.sql originally
-// shipped with (see admins-granted-via-migration.test.ts): adding a NOT
-// NULL column with no default against a table that can already have rows
-// fails outright. `bookmarks` and `subscribers` both predate the tenant
-// registry and already hold live rows, so this proves the nullable-add ->
-// backfill -> SET NOT NULL sequence resolves every pre-existing row to the
-// sole tenant that exists at migration time, without hardcoding its id.
 describe('0008_silly_xorn (bookmarks/subscribers tenant_id backfill)', () => {
   it(
     'backfills pre-existing bookmark and subscriber rows to the sole existing tenant',
@@ -36,13 +29,6 @@ describe('0008_silly_xorn (bookmarks/subscribers tenant_id backfill)', () => {
         await applyMigrationFile(db, file);
       }
 
-      // The `bookmarks`/`subscribers` shape before this migration: no
-      // `tenant_id` column yet, matching rows created before this migration
-      // ever ran. Raw SQL rather than `db.insert(schema.tenants)` — the
-      // current schema's `name` column postdates this migration too (see
-      // tenants-name-migration.test.ts), so a typed insert against a table
-      // that only has migrations up to this one applied would reference a
-      // column that doesn't exist yet.
       await db.execute(sql.raw(`insert into "users" ("id") values ('user-1')`));
       const insertedTenant = await db.execute<{ id: string }>(
         sql.raw(
@@ -65,11 +51,6 @@ describe('0008_silly_xorn (bookmarks/subscribers tenant_id backfill)', () => {
 
       await applyMigrationFile(db, BACKFILL_MIGRATION);
 
-      // Raw SQL selecting only `tenant_id`, for the same reason the seed
-      // inserts above use it: the live `bookmarks`/`subscribers` schema
-      // objects carry columns added by migrations later than this one, which
-      // don't exist yet against a database only migrated up to
-      // `BACKFILL_MIGRATION`.
       const bookmarkRow = await db.execute<{ tenant_id: string }>(
         sql.raw(`select "tenant_id" from "bookmarks"`),
       );

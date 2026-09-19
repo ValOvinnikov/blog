@@ -11,8 +11,7 @@ import { getSiteConfig } from './get-site-config';
 /**
  * Resolves a single RICH voice field for a Server Component — the tenant's
  * stored override where one exists, otherwise the catalog default wrapped
- * as a single paragraph. Falls through to the request's tenant when called
- * with no `tenant` argument.
+ * as a single paragraph.
  */
 export const getVoiceRich = async (
   id: TVoiceRichFieldId,

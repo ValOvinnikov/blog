@@ -116,7 +116,6 @@ type TDispatchNoticeKind =
   'not-found' | 'archived' | 'already-in-progress' | 'other';
 
 export type TUseProvisioningPollResult = {
-  /** Non-undefined when the last Start/Retry dispatch didn't result in a fresh run — `already-in-progress` means one is genuinely in flight, the rest are real failures. */
   dispatchNotice: TDispatchNoticeKind | undefined;
   isStarting: boolean;
   isRetrying: boolean;
@@ -124,25 +123,19 @@ export type TUseProvisioningPollResult = {
   handleRetry: () => void;
   provisioningStatus: TTenantProvisioningStatus | null;
   provisioningSteps: TTenantProvisioningState | null;
-  /** `PROVISIONING` while a Start/Retry dispatch is in flight, whatever the last-polled status was. */
   effectiveProvisioningStatus: TTenantProvisioningStatus | null;
   stepStatuses: TTenantProvisioningStepStatus[];
-  /** `stepStatuses`, but with any stale FAILED entry masked to IDLE while `isProvisioningRunning` — what the step list should actually render. */
   displayStepStatuses: TTenantProvisioningStepStatus[];
-  /** Each step's last status-change timestamp, parallel to `stepStatuses` and `STEP_ORDER` — `undefined` for a step with none recorded. */
   stepUpdatedAt: (string | undefined)[];
-  /** The overall run this set of steps belongs to — `undefined` for a tenant that has never been provisioned, or one provisioned before this field existed. */
   provisioningRun: TProvisioningRun | undefined;
   allIdle: boolean;
   isProvisioningRunning: boolean;
   overallStepStatus: TTenantProvisioningStepStatus;
-  /** True only when the tenant's own `effectiveProvisioningStatus` is also FAILED — a step still showing FAILED from a prior run while a retry is genuinely in progress does not count. */
   isOverallFailed: boolean;
   displayOverallStatus: Exclude<TTenantProvisioningStepStatus, 'FAILED'>;
   failedStepError: string | undefined;
   errorKind: TProvisioningErrorKind | undefined;
   domainStatus: TDomainVerificationStatus;
-  /** The most recent `elevateTenantOwner` check's outcome, independent of the core provisioning step sequence above. `undefined` before any check has run. */
   ownerElevationOutcome: TElevateTenantOwnerOutcome | undefined;
 };
 

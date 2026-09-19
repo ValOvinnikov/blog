@@ -22,7 +22,6 @@ export type TEmailFormProps = {
   templates: TEmailTemplatesSectionProps['templates'];
   brand: TTenantEmailBrand;
   brandName: string;
-  /** When set, the tenant is archived: every save action is disabled and a notice explains why. */
   archivedAt?: Date;
 };
 

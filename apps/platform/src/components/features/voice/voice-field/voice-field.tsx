@@ -9,7 +9,6 @@ export type TVoiceFieldProps = {
   fieldKey: TVoiceOverrideKey;
   value: string;
   onChange: (value: string) => void;
-  /** Shown as the placeholder, since a blank field means "inherit" rather than "blank". */
   placeholder?: string;
   isMultiline?: boolean;
   isDisabled?: boolean;

@@ -13,8 +13,7 @@ export interface IAccountPageViewProps {
 }
 
 /**
- * Pure view for `AccountPage` — the page heading plus the three section
- * slots. Each slot arrives pre-rendered by its own wrapper (`IdentitySection`,
+ * Each slot arrives pre-rendered by its own wrapper (`IdentitySection`,
  * `NewsletterSection`, `PrivacySection`) since whether a section renders at
  * all is that wrapper's own business call, not something this component can
  * decide from presentation alone. `newsletterSection` is optional because it

@@ -119,12 +119,6 @@ describe('getTenantSanityContext memoization', () => {
   });
 
   it('dedupes the tenant credentials query when called more than once in the same render pass', async () => {
-    // `getRequestTenantId`/`queries` are replaced module-wide by the
-    // `vi.mock()` calls above — that replacement is pinned for the whole
-    // file and survives `resetModules()`, so the fresh, `resetModules()`-
-    // triggered re-evaluation below reuses these same mock instances; only
-    // `get-tenant-sanity-context.ts` itself (a plain, non-mocked module)
-    // needs re-importing to pick up the mocked `react.cache`.
     vi.mocked(getRequestTenantId).mockReset();
     vi.mocked(queries.tenants.getTenantSanityCredentials).mockReset();
     vi.mocked(getRequestTenantId).mockResolvedValue('tenant-uuid');

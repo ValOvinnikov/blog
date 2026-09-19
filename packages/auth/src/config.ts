@@ -10,9 +10,6 @@ import type { NextAuthConfig } from 'next-auth';
 import GitHub from 'next-auth/providers/github';
 import Google from 'next-auth/providers/google';
 
-/**
- * Builds the Auth.js configuration both apps pass to their own `NextAuth()` call.
- */
 export function buildAuthConfig(): NextAuthConfig {
   const githubCredentials = getOAuthProviderCredentials('github');
   const googleCredentials = getOAuthProviderCredentials('google');

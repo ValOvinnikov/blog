@@ -13,11 +13,9 @@ import { runCardVariants } from './run-card-variants';
 
 type TRunCardProps = {
   run: TProvisioningRun;
-  /** Right-aligned in the card header, e.g. the overall status badge and the retry button. */
   actions?: ReactNode;
 };
 
-/** The provisioning page's own record of the dispatched workflow run — when it started, when (or whether) it finished, and where to inspect it, independent of the per-step statuses in the Steps card. */
 export const RunCard = ({ run, actions }: TRunCardProps) => {
   const t = useTranslations('provisioningStatusView');
   const { workflowLogLink } = runCardVariants();

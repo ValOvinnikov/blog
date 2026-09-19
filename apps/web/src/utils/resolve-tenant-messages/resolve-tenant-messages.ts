@@ -78,8 +78,7 @@ export interface ITenantMessages {
  * (`[tenant]/[locale]/layout.tsx`, and `StandaloneNotFoundPage` for the
  * `not-found.tsx` boundaries that render outside it) — `i18n/request.ts`'s
  * `getRequestConfig` only resolves the base, un-voiced messages since it has
- * no tenant to read. Accepts the `[tenant]` route param and forwards it to
- * `getSiteConfig`.
+ * no tenant to read.
  */
 export const resolveTenantMessages = async (
   base: Record<string, unknown>,

@@ -57,8 +57,6 @@ describe('getDomainVerificationStatusAction', () => {
     const result = await getDomainVerificationStatusAction('tenant-1');
 
     expect(listTenantsByIdsMock).toHaveBeenCalledWith(['tenant-1']);
-    // The underlying check is called with the tenant's own stored domain —
-    // the action's own argument (a tenant id, not a domain) never reaches it.
     expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
       'acme.example.com',
     );

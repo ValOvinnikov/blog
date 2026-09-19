@@ -26,7 +26,6 @@ describe('getPostLatest', () => {
 
     const postLatest = await getPostLatest('post-latest-1', tenant);
 
-    // The module's `limit` is threaded into the GROQ posts query's slice bound.
     expect(mockRun.mock.calls[1]?.[0]?.query).toContain('[0...3]');
     expect(postLatest.headingBlock.heading).toBe('Recent writing');
     expect(postLatest.posts.map((p) => p.id)).toEqual(['a']);

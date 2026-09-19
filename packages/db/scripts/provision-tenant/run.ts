@@ -99,9 +99,6 @@ export async function runSteps(
   tenantId: string,
   env: TProvisionEnv,
 ): Promise<{ ok: boolean }> {
-  // Reactivates a re-provisioned tenant's row before any step runs, so it
-  // stays deprovisionable once this run succeeds — see `reactivateTenant`
-  // for why a SUSPENDED tenant is left untouched.
   const reactivateResult = await reactivateTenant(tenantId);
   if (!reactivateResult.ok) {
     console.error(
@@ -117,11 +114,6 @@ export async function runSteps(
 
   let tenant = reactivateResult.data;
 
-  // A re-provisioned tenant already has a `sanityProjectId` from its first
-  // run — deprovisioning archived that project (blocking its API/CDN
-  // access) rather than deleting it, so without this the tenant row now
-  // reads ACTIVE while its content API is still blocked. Idempotent, and a
-  // no-op for a first-time provision (no project yet).
   if (tenant.sanityProjectId) {
     try {
       await unarchiveSanityProject({
@@ -192,10 +184,6 @@ export async function runSteps(
         step.key,
       );
 
-      // Stop here — later steps stay at whatever status they were already
-      // in (idle, on a first run). The admin UI's per-step Retry button
-      // re-dispatches this whole workflow, which resumes at this step via
-      // its own idempotency check.
       return { ok: false };
     }
   }
@@ -203,9 +191,6 @@ export async function runSteps(
   await reportProvisioningRunFinish(tenantId);
   await recordProvisioningAuditEvent(tenantId, env, AUDIT_ACTION.PROVISIONED);
 
-  // Best-effort — a missing row falls back to `EMAIL_TEMPLATE_DEFAULT_COPY`
-  // per field on every read, so a seeding failure never affects this run's
-  // own result.
   try {
     await seedEmailTemplateDefaults(tenantId);
   } catch (error) {
@@ -214,10 +199,6 @@ export async function runSteps(
     );
   }
 
-  // Runs only once the tenant is fully provisioned and never affects this
-  // run's own result — the owner accepting their invite is outside this
-  // script's control, so PENDING_ACCEPTANCE/STALLED are expected, common
-  // outcomes, not failures.
   try {
     const outcome = await elevateTenantOwner(tenant, env);
     const notifiedOutcome = await notifyOwnerElevationOutcome({

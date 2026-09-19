@@ -15,9 +15,6 @@ vi.mock('@web/components/shared/smart-link', () => ({
   SmartLink: SmartLinkMock,
 }));
 
-// `CardCarousel`'s contract is what it hands to `Carousel`, not what
-// `Carousel` renders — mocked out entirely so this file never exercises
-// Embla (already covered by `packages/ui`'s own carousel tests).
 vi.mock('@blog/ui/organisms/carousel', () => ({
   Carousel: vi.fn(() => null),
 }));

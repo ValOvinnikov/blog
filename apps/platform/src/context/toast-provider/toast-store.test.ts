@@ -16,7 +16,6 @@ const buildPayload = (overrides?: Partial<IToastPayload>): IToastPayload => ({
   ...overrides,
 });
 
-/** Starts a promise-toast with the same loading/success/error copy shared by every "grace period already elapsed" test below. */
 const showPendingPromiseToast = (
   store: ReturnType<typeof createToastStore>,
 ) => {
@@ -112,8 +111,6 @@ describe(createToastStore, () => {
   describe('cap and eviction', () => {
     it('evicts the oldest non-error toast instantly once the cap is exceeded', () => {
       const store = createToastStore();
-      // Distinct messages so the counter-merge rule never collapses these —
-      // eviction is about volume, not identical repeats.
       const ids = Array.from({ length: TOAST_QUEUE_CAP }, (_, i) =>
         store.actions.show(
           TOAST_TYPE.INFO,
@@ -200,8 +197,6 @@ describe(createToastStore, () => {
         buildPayload({ coalesceKey: key }),
       );
 
-      // Only 600ms of the *original* 3.6s life remained — if the timer had
-      // not been reset, the toast would already be leaving by now.
       vi.advanceTimersByTime(600);
       expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
         'visible',
@@ -233,8 +228,6 @@ describe(createToastStore, () => {
       store.actions.pause(id);
       expect(store.getState().visible[0]!.paused).toBe(true);
 
-      // A duplicate within the merge window arrives while the toast is
-      // still paused (e.g. it's being hovered).
       const mergedId = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
       expect(mergedId).toBe(id);
 
@@ -242,10 +235,6 @@ describe(createToastStore, () => {
       expect(merged?.paused).toBe(false);
       expect(merged?.count).toBe(2);
 
-      // The re-armed timer must genuinely be running, not stuck behind a
-      // stale `paused: true` that nothing will ever clear (`pause()`
-      // no-ops once already paused, so continued hovering could never
-      // have cleared it either).
       vi.advanceTimersByTime(TOAST_DEFAULT_LIFE_MS[TOAST_TYPE.SUCCESS]!);
       expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
         'leaving',
@@ -284,7 +273,6 @@ describe(createToastStore, () => {
       vi.advanceTimersByTime(1000);
       store.actions.pause(id);
 
-      // Time passes with the toast paused — it must not leave.
       vi.advanceTimersByTime(lifeMs);
       expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
         'entering',
@@ -295,7 +283,6 @@ describe(createToastStore, () => {
 
       store.actions.resume(id);
 
-      // Exactly the remaining ~2600ms, not the full life, should fire it.
       vi.advanceTimersByTime(lifeMs - 1000 - 1);
       expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
         'entering',
@@ -398,7 +385,6 @@ describe(createToastStore, () => {
 
       expect(returned).toBe(deferred);
       await deferred;
-      // Flush the microtask queue's `.then` callback under fake timers.
       await vi.advanceTimersByTimeAsync(0);
 
       expect(store.getState().visible).toHaveLength(1);
@@ -446,8 +432,6 @@ describe(createToastStore, () => {
         success: { title: 'Saved', message: 'saved' },
         error: { title: 'Failed', message: '! failed' },
       });
-      // The store's own internal `.then` must not surface as an unhandled
-      // rejection warning independently from this assertion's own handling.
       returned.catch(() => {});
 
       await vi.advanceTimersByTimeAsync(TOAST_PROMISE_GRACE_MS);

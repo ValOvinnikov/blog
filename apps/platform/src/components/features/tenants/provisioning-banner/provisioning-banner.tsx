@@ -28,7 +28,6 @@ export type TProvisioningBannerProps = {
   isOverallFailed: boolean;
   isProvisioningRunning: boolean;
   errorKind: TProvisioningErrorKind | undefined;
-  /** Only rendered once provisioning is READY, and only for the two outcomes an operator can act on (`STALLED` / `AMBIGUOUS_MEMBERSHIP`) — see `ownerElevationTone`. */
   ownerElevationOutcome: TElevateTenantOwnerOutcome | undefined;
 };
 

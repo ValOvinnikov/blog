@@ -24,7 +24,6 @@ export type TLookFormAdvancedSectionProps = {
   archivedNoticeId: string;
 };
 
-/** Fonts, radius, and density — the controls collapsed under "Advanced" by default. */
 export const LookFormAdvancedSection = ({
   headingFont,
   bodyFont,

@@ -69,7 +69,6 @@ export function urlForImage(
   return image.url();
 }
 
-/** Builds a rendered URL for an `ISanityImage` view-model, at the project/options the caller supplies. */
 export function urlForSanityImage(
   image: ISanityImage,
   project: TSanityProjectRef,

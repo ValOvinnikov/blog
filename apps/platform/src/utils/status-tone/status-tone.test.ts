@@ -7,10 +7,6 @@ import {
   sanityValidationMarkerTone,
 } from './status-tone';
 
-// Only `ownerElevationTone` is covered here — the other exported tone
-// functions in this file (`tenantStatusTone`, `provisioningStepTone`,
-// `domainVerificationTone`) predate this coverage and are a pre-existing
-// gap, not one this test adds.
 describe(ownerElevationTone, () => {
   it('is "ok" for ELEVATED', () => {
     expect(ownerElevationTone(ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED)).toBe(

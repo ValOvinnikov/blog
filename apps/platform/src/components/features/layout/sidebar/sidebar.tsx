@@ -12,7 +12,6 @@ import { sidebarVariants } from './sidebar-variants';
 type TSidebarNavBadge = {
   label: string;
   tone: TStatusBadgeProps['tone'];
-  /** Suppress the tone dot for a badge that carries no state meaning — e.g. a "platform" scope marker rather than a status. */
   hasDot?: boolean;
 };
 
@@ -36,16 +35,11 @@ type TSidebarNavItem = TSidebarNavItemBase &
 export type TSidebarNavSection = {
   label: string;
   items: TSidebarNavItem[];
-  /**
-   * Shown in place of the item list when `items` is empty — states why
-   * there's nothing to link to yet, instead of a dead nav link.
-   */
   note?: string;
 };
 
 export type TSidebarProps = {
   sections: TSidebarNavSection[];
-  /** e.g. the tenant switcher, rendered above the nav sections. */
   switcher?: ReactNode;
 };
 

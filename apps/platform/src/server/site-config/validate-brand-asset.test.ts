@@ -2,7 +2,6 @@ import { MAX_UPLOAD_BYTES } from '@platform/utils/brand-asset-limits/brand-asset
 
 import { validateBrandAssetUpload } from './validate-brand-asset';
 
-/** A minimal, CRC-less PNG — `image-size` only reads the IHDR chunk's fixed byte offsets, never validates checksums or decodes pixel data. */
 const buildPngBuffer = (width: number, height: number): Buffer => {
   const buffer = Buffer.alloc(33);
   buffer.write('\x89PNG\r\n\x1a\n', 0, 'latin1');
@@ -10,8 +9,8 @@ const buildPngBuffer = (width: number, height: number): Buffer => {
   buffer.write('IHDR', 12, 'latin1');
   buffer.writeUInt32BE(width, 16);
   buffer.writeUInt32BE(height, 20);
-  buffer[24] = 8; // bit depth
-  buffer[25] = 6; // color type (RGBA)
+  buffer[24] = 8;
+  buffer[25] = 6;
   return buffer;
 };
 
@@ -83,8 +82,8 @@ describe(validateBrandAssetUpload, () => {
   it('rejects a format it can read but never lets through, regardless of the declared MIME type', async () => {
     const gifBuffer = Buffer.alloc(10);
     gifBuffer.write('GIF89a', 0, 'latin1');
-    gifBuffer.writeUInt16LE(64, 6); // width
-    gifBuffer.writeUInt16LE(64, 8); // height
+    gifBuffer.writeUInt16LE(64, 6);
+    gifBuffer.writeUInt16LE(64, 8);
     const file = new File([new Uint8Array(gifBuffer)], 'upload.gif', {
       type: 'image/gif',
     });

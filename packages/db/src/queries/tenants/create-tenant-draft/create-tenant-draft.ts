@@ -112,11 +112,7 @@ export async function createTenantDraft(
             role: MEMBERSHIP_ROLE.OWNER,
           })
           .returning()
-      : // A plain insert, not `createMembershipInvite`'s idempotent
-        // conflict-handling: `tenant.id` is brand new, so the
-        // (tenantId, email) unique constraint can't already have a row to
-        // collide with.
-        db
+      : db
           .insert(membershipInvites)
           .values({
             tenantId: tenant.id,

@@ -7,9 +7,6 @@ const { signOutMock, deleteAccountActionMock, toastPromiseMock } = vi.hoisted(
   () => ({
     signOutMock: vi.fn(),
     deleteAccountActionMock: vi.fn(),
-    // Mirrors the real `toast.promise`'s contract closely enough for these
-    // tests: it forwards the given promise unchanged, so awaiting/rejecting
-    // it in the component under test behaves the same as the real store.
     toastPromiseMock: vi.fn((promise: Promise<unknown>) => promise),
   }),
 );

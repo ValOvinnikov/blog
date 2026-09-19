@@ -31,8 +31,6 @@ async function sanityManagementRequest<T>(
     );
   }
 
-  // DELETE (and some POSTs) return an empty 2xx body — `.json()` on that
-  // throws, so only parse when there's actually a body to parse.
   const text = await response.text();
   return (text ? JSON.parse(text) : undefined) as T;
 }

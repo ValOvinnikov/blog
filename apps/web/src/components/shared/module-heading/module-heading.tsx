@@ -11,10 +11,6 @@ export interface IModuleHeadingProps {
   align?: TContentAlignment;
 }
 
-/**
- * ModuleHeading — the mono uppercase label that names a module's
- * surrounding `Section` via `id`.
- */
 export const ModuleHeading = ({
   headingBlock,
   id,

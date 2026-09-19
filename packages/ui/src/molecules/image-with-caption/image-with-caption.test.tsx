@@ -40,14 +40,11 @@ describe(`<${ImageWithCaption.name}/>`, () => {
     expect(container.querySelector('figcaption')).toBeNull();
   });
 
-  it('forwards className to MediaFrame, not the figure root', () => {
+  it('forwards className to MediaFrame, not the figure root, observable via its class list since it has no role/text of its own here', () => {
     const { container } = setup({
       className: 'custom-class',
       children: undefined,
     });
-    // MediaFrame has no role/text of its own here (children is empty), so
-    // its class list is the sole observable that className routed to the
-    // frame rather than the <figure> root.
     expect(container.firstChild?.firstChild).toHaveClass('custom-class');
   });
 

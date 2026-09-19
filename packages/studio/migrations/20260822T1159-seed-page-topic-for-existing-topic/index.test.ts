@@ -1,18 +1,21 @@
 import { topicPageSchema } from '@blog/studio/schema-types/documents/pages/topic/topic';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
-import {
-  SEO_META_TITLE_MAX_LENGTH,
-  SEO_META_TITLE_MIN_LENGTH,
-} from '@blog/studio/schema-types/objects/seo/seo';
+import { seoSchema } from '@blog/studio/schema-types/objects/seo/seo';
 import {
   assertSatisfiesRequiredFields,
   type TExemptField,
 } from '@blog/studio/testing/assert-satisfies-required-fields';
+import { getRecordedBounds } from '@blog/studio/testing/create-mock-validation-rule';
+import { getField } from '@blog/studio/testing/get-field';
 import { createIfNotExists } from 'sanity/migrate';
 
 import { toPageTopicId, toTopicPostListId } from './id';
 
 import migration, { buildTopicMetaTitle } from './index';
+
+const metaTitleBounds = getRecordedBounds(getField(seoSchema, 'metaTitle'));
+const SEO_META_TITLE_MIN_LENGTH = metaTitleBounds.min!;
+const SEO_META_TITLE_MAX_LENGTH = metaTitleBounds.max!;
 
 const HEADING_BLOCK_EXEMPTION: TExemptField[] = [
   {

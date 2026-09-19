@@ -23,7 +23,6 @@ export type TLookFormBasicSectionProps = {
   archivedNoticeId: string;
 };
 
-/** The preset picker, accent hue, and logo hue controls — the settings a preset choice seeds directly. */
 export const LookFormBasicSection = ({
   preset,
   onPresetChange,

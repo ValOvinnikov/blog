@@ -13,7 +13,6 @@ import { listSessionTenants } from './list-session-tenants';
 export type TDashboardTenantContext = {
   tenant: TTenant;
   membership: TMembership;
-  /** Every tenant the signed-in user can switch into — feeds the sidebar's `TenantSwitcher` when there's more than one. */
   tenants: TTenant[];
 };
 

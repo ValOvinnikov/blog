@@ -1,7 +1,6 @@
 import { brandMarkVariants } from './brand-mark-variants';
 
 export type TBrandMarkProps = {
-  /** Accessible name for standalone use; omit to keep the mark decorative. */
   title?: string;
   className?: string;
 };

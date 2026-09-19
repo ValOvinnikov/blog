@@ -19,5 +19,4 @@ export type TVoicePortableTextBlock = {
   markDefs?: TVoicePortableTextLink[];
 };
 
-/** A Voice rich-text field's stored shape — Portable Text restricted to bold, italic, link and plain paragraphs. */
 export type TVoicePortableText = TVoicePortableTextBlock[];

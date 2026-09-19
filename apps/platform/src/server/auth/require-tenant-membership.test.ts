@@ -111,8 +111,6 @@ describe(requireTenantMembership, () => {
     authMock.mockResolvedValue({ user: { id: 'user-from-tenant-a' } });
     getTenantByIdMock.mockResolvedValue({ id: 'tenant-b' });
     getAdminByUserIdMock.mockResolvedValue(undefined);
-    // The user genuinely has a membership — just not on tenant B, the tenant
-    // named in the forged payload.
     getMembershipMock.mockResolvedValue(undefined);
 
     await expect(requireTenantMembership('tenant-b')).rejects.toThrow(

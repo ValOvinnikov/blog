@@ -8,7 +8,6 @@ import { ctaModuleQuery } from './query';
 import { toCtaModule } from './transformer';
 import type { TCtaModule } from './types';
 
-/** Fetches a `module_cta` document and maps it to its view-model. */
 export async function getCta(
   id: string,
   tenant: TTenantSanityContext,

@@ -15,11 +15,6 @@ import type { TCtaModule, TResolvedCtaContentBlock } from './types';
 
 export type TRawCtaModule = InferResultType<typeof ctaModuleQuery>;
 
-export type TRawCtaContentBlock = NonNullable<TRawCtaModule['content']>[number];
-export type TRawCtaContentMarkDef = NonNullable<
-  TRawCtaContentBlock['markDefs']
->[number];
-
 function toContent(
   raw: TRawCtaModule['content'],
 ): TMaybeUndefined<TResolvedCtaContentBlock[]> {

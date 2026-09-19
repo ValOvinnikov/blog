@@ -12,17 +12,12 @@ export interface ISkimPanelProps {
 const s = skimPanelVariants();
 
 /**
- * SkimPanel — the `SKIM` depth's takeaways panel: a short bullet list plus
- * a "read the full article" affordance that switches back to `READ`. Stays
- * a server component (the one interactive bit lives in `SwitchToReadButton`,
- * per `web-component-practices`) and renders in the same static HTML as the
- * `READ`/`DEEP` body — CSS (`group-data-[depth=SKIM]/depth:flex`, keyed off
- * the nearest `DepthProvider` wrapper) is the only thing gating visibility,
- * so switching depth never re-fetches anything. Renders nothing when the
- * post has no approved takeaways.
- *
- * @example
- * <SkimPanel takeaways={post.postTakeaways} />
+ * Stays a server component (the one interactive bit lives in
+ * `SwitchToReadButton`, per `web-component-practices`) and renders in the
+ * same static HTML as the `READ`/`DEEP` body — CSS
+ * (`group-data-[depth=SKIM]/depth:flex`, keyed off the nearest
+ * `DepthProvider` wrapper) is the only thing gating visibility, so
+ * switching depth never re-fetches anything.
  */
 export const SkimPanel = async ({ takeaways }: ISkimPanelProps) => {
   if (!takeaways) return null;

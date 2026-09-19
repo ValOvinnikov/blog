@@ -11,7 +11,6 @@ import type { TSiteConfigResult } from '@blog/db/queries/site-config';
 export type TLookFormValues = {
   preset: TPresetId;
   accentHue: number;
-  /** `undefined` means "follows the accent hue" — a real, saved value here is what makes the wordmark's tint independent. */
   logoHue: number | undefined;
   headingFont: TFontChoice;
   bodyFont: TFontChoice;

@@ -18,9 +18,6 @@ export type TProviderLinkControlProps = {
 };
 
 /**
- * A single button whose behaviour switches on `action`, slotted into
- * `SettingRow.children` from the server-rendered `IdentitySection`.
- *
  * **"link"**: Auth.js v5 treats a provider-scoped `signIn(provider)` call
  * made from an *already-authenticated* session as an account-link rather
  * than a fresh sign-in, so `redirectTo` is pinned to `routes.account()` to

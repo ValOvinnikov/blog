@@ -38,10 +38,6 @@ export interface ITopicModuleRendererProps {
   children?: ReactNode;
 }
 
-/**
- * TopicModuleRenderer — the topic page's own hero and heading fallback,
- * the topic-navigation row between them, and the modules its schema allows.
- */
 export const TopicModuleRenderer = async ({
   hero,
   headingBlock,

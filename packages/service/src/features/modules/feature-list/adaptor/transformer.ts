@@ -12,7 +12,7 @@ export type TRawFeatureListModule = InferResultType<
   typeof featureListModuleQuery
 >;
 
-export type TRawFeatureListItem = NonNullable<
+type TRawFeatureListItem = NonNullable<
   TRawFeatureListModule['features']
 >[number];
 

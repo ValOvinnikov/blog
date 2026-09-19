@@ -154,7 +154,6 @@ describe(`<${LookForm.name}/>`, () => {
     const saveButton = await screen.findByRole('button', { name: 'Saving…' });
     expect(saveButton).toHaveAttribute('aria-busy', 'true');
     expect(saveButton).toBeDisabled();
-    // A disabled button is force-blurred; this live region carries the real announcement.
     expect(saveButton.nextElementSibling).toHaveTextContent('Saving…');
 
     resolveAction({ ok: true });

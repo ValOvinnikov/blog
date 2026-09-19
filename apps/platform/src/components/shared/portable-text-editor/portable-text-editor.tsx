@@ -17,7 +17,6 @@ import { PortableTextEditorToolbar } from './components/toolbar/portable-text-ed
 import { portableTextEditorVariants } from './portable-text-editor-variants';
 
 export type TPortableTextEditorProps = {
-  /** Only read once, at mount — this editor owns its own value after that. Force a remount (e.g. `key={templateType}`) to load a different document. */
   initialValue: TPortableTextBlock[];
   onChange: (value: TPortableTextBlock[]) => void;
   ariaLabel: string;

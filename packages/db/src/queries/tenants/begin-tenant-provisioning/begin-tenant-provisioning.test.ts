@@ -27,9 +27,6 @@ function minutesAgo(minutes: number): string {
   return new Date(Date.now() - minutes * 60_000).toISOString();
 }
 
-// Older than the debounce but well within the long staleness backstop — the
-// shape of a genuinely wedged run's `startedAt`, not a run still within its
-// own dispatch round-trip.
 const WEDGED_STARTED_AT = minutesAgo(
   TENANT_PROVISIONING_RETRY_DEBOUNCE_MINUTES + 1,
 );

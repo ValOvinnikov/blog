@@ -7,7 +7,6 @@ import VoicePage from './page';
 
 const ADVANCED_SUMMARY = 'Advanced — 8 curated strings, 2 groups';
 
-// Advanced starts collapsed — open it before reading any curated field.
 const openAdvanced = async () => {
   await userEvent.setup().click(screen.getByText(ADVANCED_SUMMARY));
 };

@@ -25,8 +25,6 @@ const { SYNTHETIC_MULTILINE_FIELD_ID, SYNTHETIC_MULTILINE_FIELD_MAX } =
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-// VOICE_FIELDS has no MULTILINE member, so validateTextField's line-break
-// branch for non-TEXT fields is only reachable via a synthetic entry here.
 vi.mock('@blog/config', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@blog/config')>();
   return {
@@ -561,10 +559,6 @@ describe('voice overrides — placeholders', () => {
   });
 });
 
-// Look and Voice save from separate admin-panel tabs, so a field absent from
-// one tab's submission must never overwrite what the other tab already set —
-// only an explicit value (or, for nullable columns, an explicit `null`)
-// changes anything.
 describe('partial updates — omission leaves a field untouched, explicit null clears it', () => {
   it('preserves voice overrides when a later update omits the field entirely', async () => {
     const { id: tenantId } = await insertTestTenant(db());

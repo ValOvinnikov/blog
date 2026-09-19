@@ -49,8 +49,6 @@ describe(consumePendingInvitesOnSignIn, () => {
       { id: 'invite-1', tenantId: 'tenant-1' },
       { id: 'invite-2', tenantId: 'tenant-2' },
     ]);
-    // Simulates a race where invite-1 was already consumed elsewhere:
-    // `consumeMembershipInvite` resolves to `undefined` for it.
     consumeMembershipInviteMock.mockImplementation((inviteId: string) =>
       Promise.resolve(
         inviteId === 'invite-1'

@@ -4,21 +4,11 @@ import { act } from 'react';
 
 import { BackToTopButton } from './back-to-top-button';
 
-/**
- * jsdom has no real `IntersectionObserver` (the global `vitest-setup.ts`
- * stub is a no-op that never fires) — this fake captures the instance
- * created for the `<footer data-testid="site-footer">` element so tests can
- * trigger its callback directly, mirroring
- * `use-active-heading-id.test.tsx`'s approach.
- */
 class FakeIntersectionObserver implements IntersectionObserver {
   static instances: FakeIntersectionObserver[] = [];
 
   root = null;
   rootMargin = '';
-  // Unused by this fake's own logic, but required to satisfy TypeScript's
-  // `IntersectionObserver` interface (lib.dom.d.ts) — omitting it fails
-  // type-check, so it stays despite not being read anywhere.
   scrollMargin = '';
   thresholds: number[] = [];
   callback: IntersectionObserverCallback;
@@ -170,9 +160,6 @@ describe(`<${BackToTopButton.name}/>`, () => {
   });
 
   it('observes the site footer by test id, not an earlier in-DOM article footer', () => {
-    // Mirrors a tagged post's real DOM: `Article.Footer` renders an
-    // untagged `<footer>` inside `<article>`, earlier in document order
-    // than the site chrome `Footer` rendered by `[locale]/layout.tsx`.
     document.body.innerHTML =
       '<footer></footer><footer data-testid="site-footer"></footer>';
 

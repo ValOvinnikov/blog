@@ -9,9 +9,7 @@ import { cardVariants } from '../../card-variants';
 export type TCardHeaderProps = {
   title: ReactNode;
   supportingText?: ReactNode;
-  /** Right-aligned, e.g. a button or menu trigger. */
   actions?: ReactNode;
-  /** Document-outline depth for the title heading — defaults to 3, one level under a typical page h1/h2. */
   headingLevel?: THeadingLevel;
   className?: string;
 };

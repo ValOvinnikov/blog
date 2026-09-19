@@ -14,9 +14,7 @@ export type TExternalLinkButtonProps = {
   children?: ReactNode;
   className?: string;
   ariaLabel?: string;
-  /** Only needed alongside `ariaLabel` when `children` is a bare glyph rather than descriptive text — an icon-only control needs both. */
   title?: string;
-  /** Appends a decorative arrow plus a visually-hidden "opens in new tab" hint. */
   hasArrow?: boolean;
 };
 

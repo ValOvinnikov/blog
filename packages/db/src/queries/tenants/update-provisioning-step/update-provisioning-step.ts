@@ -18,24 +18,9 @@ export type TUpdateProvisioningStepInput = {
   tenantId: string;
   step: TTenantProvisioningStep;
   status: TTenantProvisioningStepStatus;
-  // Only meaningful (and only ever set) alongside `status: FAILED`. No
-  // faked default — omitted entirely rather than stored as `''` when there
-  // is no error.
   error?: string;
-  // Only meaningful (and only ever set) for the `OWNER_ELEVATION` step —
-  // `elevateTenantOwner`'s outcome. Omitted entirely, never a sentinel, when
-  // there is none.
   detail?: TElevateTenantOwnerOutcome;
-  // Set only on the workflow's last step (success or failure) — every
-  // earlier step's call omits this and leaves the tenant's overall
-  // `provisioningStatus` untouched.
   provisioningStatus?: TTenantProvisioningStatus;
-  // Only meaningful (and only ever set) alongside the `OWNER_ELEVATION`
-  // step, when this same call is also recording that `detail`'s outcome has
-  // just been communicated to operators. Written straight to the
-  // `lastNotifiedOwnerElevationOutcome` column, not into the `detail` JSONB
-  // path above. Omitted entirely, never a sentinel, when this call isn't
-  // also marking a notification sent.
   notifiedOwnerElevationOutcome?: TElevateTenantOwnerOutcome;
 };
 

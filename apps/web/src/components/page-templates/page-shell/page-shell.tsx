@@ -30,11 +30,9 @@ type TPageShellProps = IWithClassName &
   };
 
 /**
- * PageShell — the structural skeleton every CMS page but the post renders
- * through: an optional `Breadcrumbs` trail before `<main>`, then an optional
- * `Heading` and `Content` region inside it. Owns only the landmark and the
- * region order — never a heading fallback, a container width, the spacing
- * between regions, or any knowledge of what a region contains.
+ * Owns only the landmark and the region order — never a heading fallback, a
+ * container width, the spacing between regions, or any knowledge of what a
+ * region contains.
  */
 const PageShellRoot = ({
   children,

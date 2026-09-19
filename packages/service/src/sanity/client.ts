@@ -65,8 +65,6 @@ export function getClient(tenant: TTenantSanityContext): TSanityClient {
       ? cached
       : buildTenantClient(tenant);
 
-  // Re-inserting moves the key to the Map's end — the LRU's
-  // most-recently-used position.
   tenantClients.delete(key);
   tenantClients.set(key, entry);
   if (tenantClients.size > MAX_CACHED_TENANT_CLIENTS) {
@@ -89,9 +87,4 @@ export function getPlatformSanityContext(): TTenantSanityContext {
     dataset: env.NEXT_PUBLIC_SANITY_DATASET,
     token: env.SANITY_API_READ_TOKEN ?? '',
   };
-}
-
-/** `getClient(getPlatformSanityContext())` — reuses the same tenant-keyed cache, never a client per call. */
-export function getPlatformClient(): TSanityClient {
-  return getClient(getPlatformSanityContext());
 }

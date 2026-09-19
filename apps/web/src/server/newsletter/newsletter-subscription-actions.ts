@@ -49,15 +49,6 @@ export const unsubscribeAction = async (): Promise<TUnsubscribeResult> => {
   }
 };
 
-/**
- * clearNewsletterSubscribedCookieSafely — wraps
- * `clearNewsletterSubscribedCookie` in its own try/catch, mirroring
- * `newsletter-actions.ts`'s `markNewsletterSubscribedSafely`. By the point
- * this runs, the db unsubscribe has already succeeded — a failure clearing
- * the cookie afterward shouldn't turn that real success into a reported
- * `{ ok: false }`, it should just mean this one reader doesn't see the form
- * again until the cookie expires. Logged, never rethrown.
- */
 const clearNewsletterSubscribedCookieSafely = async (): Promise<void> => {
   try {
     await clearNewsletterSubscribedCookie();

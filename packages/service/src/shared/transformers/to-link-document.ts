@@ -9,7 +9,6 @@ import type { InferFragmentType } from 'groqd';
 
 export type TRawLinkDocument = InferFragmentType<typeof linkDocumentFragment>;
 
-/** Resolves a `link` document's raw query result to a renderable `ILink`. */
 export function toLinkDocument(
   raw: TRawLinkDocument | null | undefined,
 ): TMaybeUndefined<ILink> {

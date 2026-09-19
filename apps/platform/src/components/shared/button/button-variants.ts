@@ -11,7 +11,6 @@ export const buttonVariants = tv({
       'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-[.45]',
       'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
     ],
-    /** Announces the pending label to assistive tech once the button itself is force-blurred by becoming `disabled`. */
     srOnlyStatus: ['sr-only'],
   },
   variants: {

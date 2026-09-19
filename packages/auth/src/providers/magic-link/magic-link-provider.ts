@@ -12,9 +12,6 @@ import { resolveMagicLinkEmailSettings } from './resolve-magic-link-email-settin
 import { resolveMagicLinkFromAddress } from './resolve-magic-link-from-address';
 import { resolveTenantEmailIdentity } from './resolve-tenant-email-identity';
 
-/**
- * Builds the Auth.js Email (magic-link) provider shared by both apps.
- */
 export function buildMagicLinkProvider(): EmailConfig {
   const from = resolveMagicLinkFromAddress(env.MAGIC_LINK_FROM_ADDRESS);
 

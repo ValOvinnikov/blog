@@ -6,7 +6,6 @@ import { auth } from '@platform/server/auth/auth';
 import { logger } from '@platform/utils/logger/logger';
 
 export type TRecordAuditEventInput = {
-  /** Static, call-site-specific event name to log under if the write fails. */
   logEvent: string;
   action: TAuditAction;
   targetType: TAuditTargetType;

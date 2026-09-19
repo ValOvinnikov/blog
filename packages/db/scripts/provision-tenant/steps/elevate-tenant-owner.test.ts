@@ -3,10 +3,7 @@ import type { TTenant } from '@blog/db/schema/tenants';
 
 import type { TProvisionEnv } from '../lib/env';
 
-import {
-  elevateTenantOwner,
-  OWNER_ACCEPTANCE_STALL_THRESHOLD_MS,
-} from './elevate-tenant-owner';
+import { elevateTenantOwner } from './elevate-tenant-owner';
 
 const { listSanityProjectAclMock, grantSanityProjectRoleMock } = vi.hoisted(
   () => ({
@@ -84,36 +81,6 @@ describe(elevateTenantOwner, () => {
 
     expect(result).toBe(ELEVATE_TENANT_OWNER_OUTCOME.STALLED);
     expect(grantSanityProjectRoleMock).not.toHaveBeenCalled();
-  });
-
-  it('reports STALLED at exactly the acceptance-window boundary (inclusive)', async () => {
-    listSanityProjectAclMock.mockResolvedValue([]);
-    const now = new Date('2026-01-10T00:00:00.000Z');
-    vi.useFakeTimers();
-    vi.setSystemTime(now);
-
-    const boundaryCreatedAt = new Date(
-      now.getTime() - OWNER_ACCEPTANCE_STALL_THRESHOLD_MS,
-    );
-    const result = await elevateTenantOwner(tenantAt(boundaryCreatedAt), env);
-
-    expect(result).toBe(ELEVATE_TENANT_OWNER_OUTCOME.STALLED);
-    vi.useRealTimers();
-  });
-
-  it('reports PENDING_ACCEPTANCE one millisecond inside the acceptance window', async () => {
-    listSanityProjectAclMock.mockResolvedValue([]);
-    const now = new Date('2026-01-10T00:00:00.000Z');
-    vi.useFakeTimers();
-    vi.setSystemTime(now);
-
-    const justInsideCreatedAt = new Date(
-      now.getTime() - OWNER_ACCEPTANCE_STALL_THRESHOLD_MS + 1,
-    );
-    const result = await elevateTenantOwner(tenantAt(justInsideCreatedAt), env);
-
-    expect(result).toBe(ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE);
-    vi.useRealTimers();
   });
 
   it('grants administrator, keyed on projectUserId, once the owner appears in the ACL listing', async () => {

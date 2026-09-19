@@ -3,8 +3,6 @@ import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { asc, isNull } from 'drizzle-orm';
 
 export type TListTenantsOptions = {
-  // Excludes deprovisioned tenants by default — pass `true` for a view that
-  // genuinely needs to see archived rows too (e.g. an operator audit list).
   includeArchived?: boolean;
 };
 

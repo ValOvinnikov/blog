@@ -14,11 +14,6 @@ import { postRelatedModuleQuery } from './query';
 import { toPostRelatedModule, toRelatedPosts } from './transformer';
 import type { TPostRelatedModule } from './types';
 
-/**
- * Resolves `module_postRelated`'s own fields alongside up to `limit` other
- * published posts related to `postId` — shared-tag rank descending, then
- * `publishedAt` descending, backfilled from the same topic.
- */
 export async function getPostRelated(
   id: string,
   postId: string,
@@ -30,9 +25,6 @@ export async function getPostRelated(
     ...isr(['modules:postRelated', `module:${id}`], tenant.projectId),
   });
 
-  // `relatedPostAnchorQuery` derefs the anchor post's own `tags[]`/`topic` —
-  // both tags must ride alongside `posts` (tag-scope contract,
-  // `sanity/query.ts`).
   const anchor = await runQuery(relatedPostAnchorQuery, {
     parameters: { postId },
     tenant,
