@@ -4,7 +4,7 @@ import type { TTenant } from '@blog/db/schema/tenants';
 // Fixed document ids (published, not `drafts.`-prefixed). No generated
 // `@blog/config` types exist for a not-yet-created project's dataset, so
 // these stay loosely typed (`TSanityDocument`), not `any`.
-export const STARTER_DOCUMENT_IDS = {
+const STARTER_DOCUMENT_IDS = {
   NAVIGATION: 'provisioning.settings.navigation',
   FOOTER: 'provisioning.settings.footer',
   THEME: 'provisioning.settings.theme',
