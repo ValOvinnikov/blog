@@ -10,10 +10,6 @@ export interface IHeroBlogModuleProps {
   tenant: string;
 }
 
-/**
- * HeroBlogModule — fetches `module_heroBlog` data and renders nothing when
- * no post resolves for it.
- */
 export const HeroBlogModule = async ({ id, tenant }: IHeroBlogModuleProps) => {
   const tenantContext = await getTenantSanityContext(tenant);
   const result = await service.modules.heroBlog.v1.getHeroBlog(

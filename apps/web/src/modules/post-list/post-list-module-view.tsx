@@ -32,11 +32,6 @@ export interface IPostListModuleViewProps extends Omit<
   hasImages?: boolean;
 }
 
-/**
- * PostListModuleView — render shell for `PostListModule`: a labeled
- * `Section` wrapping a `CardGrid` of `MediaCardItem`s (or the empty message)
- * plus an optional `Pagination`.
- */
 export const PostListModuleView = ({
   brandVariant,
   headingBlock,

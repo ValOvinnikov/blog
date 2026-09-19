@@ -7,13 +7,8 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
 /**
- * Metadata for a `/tags/[slug]` page (page 1, `pageNumber` omitted) or a
- * `/tags/[slug]/page/[page]` page (`pageNumber` ≥ 2), built from the
- * `page_tag` document's own resolved `seo`. Every page self-canonicalizes —
- * page 2+ must never canonical to `/tags/[slug]`.
- *
- * Reads the same cached `getTagPage` loader the route's own `TagPage`
- * composition reads, so building metadata costs no second Sanity fetch.
+ * Every page self-canonicalizes — page 2+ must never canonical to
+ * `/tags/[slug]`.
  *
  * Every page also advertises the tag's own RSS feed
  * (`/tags/[slug]/rss.xml`) via `alternates.types['application/rss+xml']` —

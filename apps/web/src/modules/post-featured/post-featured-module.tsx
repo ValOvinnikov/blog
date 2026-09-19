@@ -12,11 +12,6 @@ export interface IPostFeaturedModuleProps {
   tenant: string;
 }
 
-/**
- * PostFeaturedModule — fetches `module_postFeatured` data (one to three
- * editor-pinned posts) and hands it to `PostFeaturedModuleView`, which
- * renders the first post as a full-width lead card.
- */
 export const PostFeaturedModule = async ({
   id,
   tenant,

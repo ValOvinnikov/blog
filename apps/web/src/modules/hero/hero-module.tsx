@@ -9,9 +9,6 @@ export interface IHeroModuleProps {
   tenant: string;
 }
 
-/**
- * HeroModule — fetches `module_hero` data and hands it to `HeroModuleView`.
- */
 export const HeroModule = async ({ id, tenant }: IHeroModuleProps) => {
   const tenantContext = await getTenantSanityContext(tenant);
   const result = await service.modules.hero.v1.getHero(id, tenantContext);

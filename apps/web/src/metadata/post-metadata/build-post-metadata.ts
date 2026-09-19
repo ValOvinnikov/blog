@@ -6,11 +6,8 @@ import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 
 /**
- * Metadata for a post detail page (`/blog/{slug}`) — canonical, OG, Twitter,
- * via the shared `toMetadata` mapper. Reads the same cached `getPostPage`
- * loader the route's own `BlogPostPage` composition reads, so building
- * metadata costs no second Sanity fetch. Returns empty metadata when the
- * post doesn't exist; the route itself calls `notFound()` for the actual 404.
+ * Returns empty metadata when the post doesn't exist; the route itself
+ * calls `notFound()` for the actual 404.
  */
 export const buildPostMetadata = async (
   slug: string,

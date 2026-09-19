@@ -16,11 +16,6 @@ export interface ITaxonomyListModuleProps {
   tenant: string;
 }
 
-/**
- * TaxonomyListModule — fetches a `module_taxonomyList` document's entries
- * and hands them to `TaxonomyListModuleView`, resolving the taxonomy kind,
- * per-entry hrefs and post-count copy from the fetched view model itself.
- */
 export const TaxonomyListModule = async ({
   id,
   tenant,

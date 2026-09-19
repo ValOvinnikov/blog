@@ -7,13 +7,8 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
 /**
- * Metadata for a `/topics/[slug]` page (page 1, `pageNumber` omitted) or a
- * `/topics/[slug]/page/[page]` page (`pageNumber` ≥ 2), built from the
- * `page_topic` document's own authored `seo`. Every page self-canonicalizes —
- * page 2+ must never canonical to `/topics/[slug]`.
- *
- * Reads the same cached `getTopicPage` loader the route's own `TopicPage`
- * composition reads, so building metadata costs no second Sanity fetch.
+ * Every page self-canonicalizes — page 2+ must never canonical to
+ * `/topics/[slug]`.
  */
 export const buildTopicMetadata = async (
   slug: string,

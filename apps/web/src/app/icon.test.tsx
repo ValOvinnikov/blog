@@ -1,10 +1,4 @@
 // @vitest-environment node
-//
-// `icon.tsx` runs the real `@sanity/image-url` transform (`urlForSanityImage`)
-// against `@blog/service`'s validated env module, which throws on any
-// server-var access when `typeof window !== 'undefined'` (`@t3-oss/env-core`'s
-// client/server guard) — the default jsdom environment defines `window`, so
-// this file overrides to `node` to let that real transform run unmocked.
 import type { ISanityImage } from '@blog/config';
 import { type TTenantSanityContext, urlForSanityImage } from '@blog/service';
 
@@ -48,10 +42,6 @@ const DEFAULT_TENANT: TTenantSanityContext = {
   token: 'tenant-token',
 };
 
-// Computed via the real (unmocked) `urlForSanityImage`/`urlForImage`
-// transform, the same one `icon.tsx` must call — asserting against this,
-// rather than a hand-typed string, is what would catch a regression back to
-// building the URL against the wrong (e.g. platform) tenant project/dataset.
 const EXPECTED_ICON_URL = urlForSanityImage(logo, DEFAULT_TENANT, {
   width: 64,
   height: 64,

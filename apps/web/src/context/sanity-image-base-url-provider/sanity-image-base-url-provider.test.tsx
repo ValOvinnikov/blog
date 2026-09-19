@@ -54,9 +54,6 @@ describe(`<${SanityImageBaseUrlProvider.name}/>`, () => {
       .spyOn(console, 'error')
       .mockImplementation(() => {});
 
-    // Unwrapped `render` (not `renderElement`) — the shared test `Providers`
-    // wrapper mounts its own `SanityImageBaseUrlProvider` by default, which
-    // would mask this outside-provider case.
     expect(() => render(<ReadBaseUrl />)).toThrow(
       'useSanityImageBaseUrl must be used within a SanityImageBaseUrlProvider',
     );

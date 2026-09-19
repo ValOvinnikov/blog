@@ -19,11 +19,6 @@ export interface IPostRelatedModuleViewProps extends Omit<
   hasImages?: boolean;
 }
 
-/**
- * PostRelatedModuleView — render shell for `PostRelatedModule`: a labeled
- * `Section` wrapping a `CardGrid` of `MediaCardItem`s. Never called with an
- * empty `items` — `PostRelatedModule` renders nothing itself in that case.
- */
 export const PostRelatedModuleView = ({
   brandVariant,
   headingBlock,
