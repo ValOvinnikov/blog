@@ -1,11 +1,5 @@
 import { TAXONOMY_KIND } from '@blog/config/constants';
-import {
-  at,
-  prepend,
-  set,
-  setIfMissing,
-  type MigrationContext,
-} from 'sanity/migrate';
+import { at, set, type MigrationContext } from 'sanity/migrate';
 
 import migration, {
   backfillHeadingBlock,
@@ -22,109 +16,6 @@ const baseDoc = {
   _updatedAt: '2026-01-01T00:00:00Z',
   _rev: 'rev-1',
 };
-
-describe('toTaxonomyListModuleKey', () => {
-  it('derives a deterministic key from the ref', () => {
-    expect(toTaxonomyListModuleKey('list-1')).toBe('taxonomyList-list-1');
-    expect(toTaxonomyListModuleKey('list-1')).toBe(
-      toTaxonomyListModuleKey('list-1'),
-    );
-  });
-});
-
-describe('foldTaxonomyListIntoModules', () => {
-  it('inserts a module_taxonomyList item at index 0 when modules[] is absent', () => {
-    const doc = { ...baseDoc, taxonomyList: { _ref: 'list-1' } };
-
-    expect(foldTaxonomyListIntoModules(doc)).toEqual([
-      at('modules', setIfMissing([])),
-      at(
-        'modules',
-        prepend([
-          {
-            _key: toTaxonomyListModuleKey('list-1'),
-            _type: 'module_taxonomyList',
-            _ref: 'list-1',
-          },
-        ]),
-      ),
-    ]);
-  });
-
-  it('inserts before existing modules[] entries', () => {
-    const doc = {
-      ...baseDoc,
-      taxonomyList: { _ref: 'list-1' },
-      modules: [{ _key: 'k1', _type: 'module_cta', _ref: 'cta-1' }],
-    };
-
-    expect(foldTaxonomyListIntoModules(doc)).toEqual([
-      at('modules', setIfMissing([])),
-      at(
-        'modules',
-        prepend([
-          {
-            _key: toTaxonomyListModuleKey('list-1'),
-            _type: 'module_taxonomyList',
-            _ref: 'list-1',
-          },
-        ]),
-      ),
-    ]);
-  });
-
-  it('is a no-op when the reference is already in modules[]', () => {
-    const doc = {
-      ...baseDoc,
-      taxonomyList: { _ref: 'list-1' },
-      modules: [{ _key: 'k1', _type: 'module_taxonomyList', _ref: 'list-1' }],
-    };
-
-    expect(foldTaxonomyListIntoModules(doc)).toBeUndefined();
-  });
-
-  it('is a no-op, not an error, when there is no taxonomyList reference', () => {
-    const doc = { ...baseDoc } as TTopicIndexPageDoc;
-
-    expect(foldTaxonomyListIntoModules(doc)).toBeUndefined();
-  });
-});
-
-describe('backfillHeadingBlock', () => {
-  it('sets headingBlock from heading and supportingText', () => {
-    const doc = {
-      ...baseDoc,
-      heading: 'Topics',
-      supportingText: 'Browse every topic.',
-    };
-
-    expect(backfillHeadingBlock(doc)).toEqual([
-      at(
-        'headingBlock',
-        setIfMissing({
-          heading: 'Topics',
-          supportingText: 'Browse every topic.',
-        }),
-      ),
-    ]);
-  });
-
-  it('is a no-op when headingBlock is already set', () => {
-    const doc = {
-      ...baseDoc,
-      heading: 'Topics',
-      headingBlock: { heading: 'Topics' },
-    };
-
-    expect(backfillHeadingBlock(doc)).toBeUndefined();
-  });
-
-  it('is a no-op when neither heading nor supportingText is set', () => {
-    const doc = { ...baseDoc } as TTopicIndexPageDoc;
-
-    expect(backfillHeadingBlock(doc)).toBeUndefined();
-  });
-});
 
 describe('migrateTopicIndexPage', () => {
   it('applies both the fold and the backfill for a fully legacy document', () => {

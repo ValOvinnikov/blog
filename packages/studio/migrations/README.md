@@ -27,6 +27,7 @@ order across migrations authored on different branches/dates:
 packages/studio/migrations/
   <timestamp>-<slug>/
     index.ts        # export default defineMigration({ ... })
+  lib/               # pure helpers shared by two or more migrations
   backups/           # dataset export backups — gitignored, see below
   README.md          # this file
 ```
@@ -36,6 +37,24 @@ template (see the `template()` in `scripts/migrate.mjs`), which shows the
 `defineMigration` / `at` / `set` / `unset` API shape from `sanity/migrate`.
 Un-timestamped legacy folder names (from before this scheme) sort before every
 timestamped one — see `scripts/migrate-lib.mjs` for the ordering rules.
+
+### `lib/` — shared helpers
+
+Once a helper (an id/key derivation, a field-building function, a shared
+constant) is needed by a second migration, move it into `lib/` — one file per
+helper, its `*.test.ts` moved alongside it — and have every migration that
+needs it import from `../lib/<name>` instead of copy-pasting or reaching into
+another migration folder. A migration still owns the transform and test that
+are specific to it; only the genuinely repeated piece moves.
+
+**The one rule `lib/` must never break: a file under `lib/` may depend on
+nothing beyond `@blog/config`, `@blog/utils`, `sanity/migrate` and Node
+built-ins — never `src/schema-types` or anything that pulls in `sanity`
+(the full package) or React.** Every migration's `index.ts` is loaded to
+build the list `sanity migrations list`/`migrate:run` show, so a `lib/`
+import that drags in a schema module or the Studio's UI dependency tree
+breaks that load for every migration at once, not just the one that added
+the import.
 
 ## Workflow
 

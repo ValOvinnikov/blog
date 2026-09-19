@@ -1,6 +1,6 @@
 import { at, prepend } from 'sanity/migrate';
 
-import { toPostListModuleKey } from './module-key';
+import { toPostListModuleKey } from '../lib/post-list-module-key';
 
 import { foldPostListIntoModules, type TPageTagDoc } from './index';
 

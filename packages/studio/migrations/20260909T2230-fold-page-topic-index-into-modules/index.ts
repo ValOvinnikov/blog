@@ -41,20 +41,21 @@
  * service/web code that reads `modules[]`/`headingBlock` instead of
  * `taxonomyList`/`heading`/`supportingText`.
  */
-import {
-  at,
-  defineMigration,
-  prepend,
-  setIfMissing,
-  type MigrationContext,
-} from 'sanity/migrate';
+import { TAXONOMY_KIND } from '@blog/config/constants';
+import { defineMigration, type MigrationContext } from 'sanity/migrate';
 
 import {
   authorTaxonomyOnModule,
   type TTaxonomyListModuleDoc,
-} from './author-taxonomy-on-module';
-import { getReferencedTaxonomyListIds } from './referenced-taxonomy-list-ids';
+} from '../lib/author-taxonomy-on-module';
+import { backfillHeadingBlock } from '../lib/backfill-heading-block';
+import {
+  foldTaxonomyListIntoModules,
+  toTaxonomyListModuleKey,
+} from '../lib/fold-taxonomy-list-into-modules';
+import { getReferencedTaxonomyListIds } from '../lib/referenced-taxonomy-list-ids';
 
+const PAGE_TOPIC_INDEX_TYPE = 'page_topicIndex';
 const TAXONOMY_LIST_MODULE_TYPE = 'module_taxonomyList';
 
 type TModuleReference = { _key: string; _type: string; _ref: string };
@@ -67,50 +68,10 @@ export type TTopicIndexPageDoc = {
   headingBlock?: unknown;
 };
 
-export const toTaxonomyListModuleKey = (ref: string): string =>
-  `taxonomyList-${ref}`;
-
-export const foldTaxonomyListIntoModules = (doc: TTopicIndexPageDoc) => {
-  const ref = doc.taxonomyList?._ref;
-
-  if (!ref) return undefined;
-
-  const alreadyReferenced = (doc.modules ?? []).some(
-    (module) => module._ref === ref,
-  );
-
-  if (alreadyReferenced) return undefined;
-
-  return [
-    at('modules', setIfMissing([])),
-    at(
-      'modules',
-      prepend([
-        {
-          _key: toTaxonomyListModuleKey(ref),
-          _type: TAXONOMY_LIST_MODULE_TYPE,
-          _ref: ref,
-        },
-      ]),
-    ),
-  ];
-};
-
-export const backfillHeadingBlock = (doc: TTopicIndexPageDoc) => {
-  if (doc.headingBlock !== undefined) return undefined;
-  if (doc.heading === undefined && doc.supportingText === undefined) {
-    return undefined;
-  }
-
-  return [
-    at(
-      'headingBlock',
-      setIfMissing({
-        heading: doc.heading,
-        supportingText: doc.supportingText,
-      }),
-    ),
-  ];
+export {
+  foldTaxonomyListIntoModules,
+  toTaxonomyListModuleKey,
+  backfillHeadingBlock,
 };
 
 export const migrateTopicIndexPage = (doc: TTopicIndexPageDoc) => {
@@ -125,16 +86,20 @@ export const migrateTopicIndexPage = (doc: TTopicIndexPageDoc) => {
 export default defineMigration({
   title:
     'Fold page_topicIndex taxonomyList into modules[], backfill headingBlock, and author module taxonomy',
-  documentTypes: ['page_topicIndex', TAXONOMY_LIST_MODULE_TYPE],
+  documentTypes: [PAGE_TOPIC_INDEX_TYPE, TAXONOMY_LIST_MODULE_TYPE],
   migrate: {
     async document(doc, context: MigrationContext) {
       if (doc._type === TAXONOMY_LIST_MODULE_TYPE) {
-        const referencedIds = await getReferencedTaxonomyListIds(context);
+        const referencedIds = await getReferencedTaxonomyListIds(
+          context,
+          PAGE_TOPIC_INDEX_TYPE,
+        );
 
         return (
           authorTaxonomyOnModule(
             doc as unknown as TTaxonomyListModuleDoc,
             referencedIds,
+            TAXONOMY_KIND.TOPICS,
           ) ?? []
         );
       }

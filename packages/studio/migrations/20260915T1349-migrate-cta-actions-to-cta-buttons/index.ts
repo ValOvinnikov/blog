@@ -7,8 +7,9 @@
  * Per `module_cta` document:
  *   1. For every legacy `ctaAction`, `createIfNotExists` a `link` document
  *      for its destination — deduped by a deterministic id derived from the
- *      destination itself (`id.ts`), so two actions (in this document or
- *      any other) pointing at the same page/URL collapse onto one `link`.
+ *      destination itself (`../lib/link-identity.ts`), so two actions (in
+ *      this document or any other) pointing at the same page/URL collapse
+ *      onto one `link`.
  *   2. Build the matching `ctaButton`, preserving `_key`/`variant`/
  *      `appearance` and original array order.
  *   3. `set` the resulting `ctaButtons[]` and `unset` the legacy `actions`
@@ -43,14 +44,14 @@ import {
   type Mutation,
 } from 'sanity/migrate';
 
-import { toLinkId, toLinkIdentityKey } from './id';
+import { buildLinkDocumentFields } from '../lib/build-link-document-fields';
+import { toLinkId, toLinkIdentityKey } from '../lib/link-identity';
+import { hasMissingLabel, hasOversizedLabel } from '../lib/link-label-checks';
+import { LINK_LABEL_MAX_LENGTH } from '../lib/link-label-max-length';
+
 import {
   buildCtaButton,
-  buildLinkDocumentFields,
   detectOrderingIssues,
-  hasMissingLabel,
-  hasOversizedLabel,
-  LINK_LABEL_MAX_LENGTH,
   type TCtaButtonNode,
   type TLegacyCtaAction,
   type TLegacyInlineLink,

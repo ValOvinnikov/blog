@@ -18,16 +18,16 @@ import {
   type Mutation,
 } from 'sanity/migrate';
 
-import { toLinkId, toLinkIdentityKey } from './id';
+import { buildLinkDocumentFields } from '../lib/build-link-document-fields';
+import { toLinkId, toLinkIdentityKey } from '../lib/link-identity';
+import { hasMissingLabel, hasOversizedLabel } from '../lib/link-label-checks';
+import { LINK_LABEL_MAX_LENGTH } from '../lib/link-label-max-length';
+
 import {
-  buildLinkDocumentFields,
   buildLinkRef,
   buildSocialProfile,
-  hasMissingLabel,
-  hasOversizedLabel,
   hasRecognizedLinkShape,
   hasResolvableUrl,
-  LINK_LABEL_MAX_LENGTH,
   LINK_REF_TYPE,
   SOCIAL_PROFILE_TYPE,
   type TLegacyLinkEntry,
