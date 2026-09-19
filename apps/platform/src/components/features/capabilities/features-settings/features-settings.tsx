@@ -24,14 +24,12 @@ const valuesEqual = (
 
 export type TFeaturesSettingsProps = {
   tenantId: string;
-  /** Which capabilities the tenant's plan entitles — everything else renders locked, visible but disabled. */
   entitledCapabilities: TCapability[];
   initialValues: TSettingsFeaturesValues;
   saveAction: (
     tenantId: string,
     values: TSettingsFeaturesValues,
   ) => Promise<{ ok: boolean }>;
-  /** When set, the tenant is archived: Save is disabled and a notice explains why. */
   archivedAt?: Date;
 };
 
@@ -61,7 +59,6 @@ export const FeaturesSettings = ({
       initialValues,
       onSubmit: (vals) => saveAction(tenantId, vals),
       onSuccess: (submittedValues) => {
-        // router.refresh() re-renders the server component but doesn't reset this hook's state, so the saved baseline is updated explicitly here.
         setSavedValues(submittedValues);
         toast.success({
           message: t('alertSuccess'),

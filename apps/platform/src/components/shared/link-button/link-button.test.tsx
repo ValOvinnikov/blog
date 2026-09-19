@@ -4,10 +4,6 @@ import type { ComponentPropsWithoutRef } from 'react';
 
 import { LinkButton } from './link-button';
 
-// `LinkButton` defaults `as` to `@platform/i18n/navigation`'s `Link`
-// (next-intl's locale-aware navigation), which needs real routing context
-// this test environment doesn't provide — mock it the same way
-// `tenant-switcher.test.tsx` and `sidebar.test.tsx` do for their own links.
 vi.mock('@platform/i18n/navigation', () => ({
   Link: ({
     href,

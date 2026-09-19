@@ -5,11 +5,9 @@ import { useState, type ReactNode, type SyntheticEvent } from 'react';
 import { disclosureVariants } from './disclosure-variants';
 
 export type TDisclosureProps = {
-  /** Content of the collapsed row's label, rendered before the chevron. */
   summary: ReactNode;
   children: ReactNode;
   isDefaultOpen?: boolean;
-  /** Switches to controlled mode: open state comes from `isOpen`, not internal state, and every toggle calls `onOpenChange`. */
   isOpen?: boolean;
   onOpenChange?: (isOpen: boolean) => void;
   className?: string;

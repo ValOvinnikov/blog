@@ -19,10 +19,6 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-// `FeaturesSettings` -> `updateFeaturesAction` -> `requireTenantMembership`
-// imports the real `./auth` module — mocked here (unused by this test
-// otherwise) purely so that chain never evaluates the real `NextAuth()`
-// call at import time.
 vi.mock('@platform/server/auth/auth', () => ({ auth: vi.fn() }));
 
 const buildTenant = (plan: 'FREE' | 'GROWTH'): TTenant =>

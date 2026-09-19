@@ -13,7 +13,6 @@ import { logoHueFieldVariants } from './logo-hue-field-variants';
 
 export type TLogoHueFieldProps = {
   accentHue: number;
-  /** `undefined` means "follows the accent hue". */
   logoHue: number | undefined;
   onChange: (logoHue: number | undefined) => void;
   isDark: boolean;
