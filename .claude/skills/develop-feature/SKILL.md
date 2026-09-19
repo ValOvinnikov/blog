@@ -161,9 +161,14 @@ prompt must include:
 4. Which specific files to read or create
 5. Definition of done for that layer (what "finished" looks like)
 6. The nearest existing sibling to model on (from step 1), as a path — the
-   agent extends or mirrors it rather than re-inventing; if it finds itself
-   copying more than a few lines out of it, that is a shared helper to
-   extract, and the report says so
+   agent extends or mirrors its structure and naming rather than
+   re-inventing; if it finds itself copying more than a few lines out of it,
+   that is a shared helper to extract, and the report says so. **Its
+   comments are not part of the model**: a sibling's doc block is drift to
+   leave behind (and to delete where the sibling itself is touched), never a
+   template — say so in the brief, because every module on `main` carries
+   the same `XModule — fetches module_x` block and an agent left to itself
+   writes the eleventh
 
 If you do a layer yourself instead of delegating, still apply that layer's
 agent rules and skill.

@@ -1,9 +1,7 @@
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { customRender, screen } from '@platform/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 
 import { VoiceFieldGroup } from './voice-field-group';
-
-const render = renderWithIntl;
 
 const fields = [
   { key: 'notFoundHeading' as const, label: 'Not Found Heading' },
@@ -13,17 +11,17 @@ const fields = [
   },
 ];
 
-describe(VoiceFieldGroup, () => {
+const setup = customRender(VoiceFieldGroup, {
+  title: '404 page',
+  fields,
+  values: { notFoundHeading: '', notFoundSupportingText: '' } as never,
+  placeholders: {},
+  onFieldChange: vi.fn(),
+});
+
+describe(`<${VoiceFieldGroup.name}/>`, () => {
   it('renders the group title, field count, and every field label', () => {
-    render(
-      <VoiceFieldGroup
-        title="404 page"
-        fields={fields}
-        values={{ notFoundHeading: '', notFoundSupportingText: '' } as never}
-        placeholders={{}}
-        onFieldChange={vi.fn()}
-      />,
-    );
+    setup();
 
     expect(screen.getByText('404 page')).toBeVisible();
     expect(screen.getByText('2 fields')).toBeVisible();
@@ -36,15 +34,7 @@ describe(VoiceFieldGroup, () => {
   });
 
   it('keeps the group title as the only heading, associating each field label with its control instead', () => {
-    render(
-      <VoiceFieldGroup
-        title="404 page"
-        fields={fields}
-        values={{ notFoundHeading: '', notFoundSupportingText: '' } as never}
-        placeholders={{}}
-        onFieldChange={vi.fn()}
-      />,
-    );
+    setup();
 
     expect(
       screen.getByRole('heading', { level: 2, name: '404 page' }),
@@ -72,15 +62,7 @@ describe(VoiceFieldGroup, () => {
 
   it('focuses a field input when its visible label is clicked', async () => {
     const user = userEvent.setup();
-    render(
-      <VoiceFieldGroup
-        title="404 page"
-        fields={fields}
-        values={{ notFoundHeading: '', notFoundSupportingText: '' } as never}
-        placeholders={{}}
-        onFieldChange={vi.fn()}
-      />,
-    );
+    setup();
 
     const label = screen.getByText('Not Found Heading', {
       selector: 'label',
@@ -94,31 +76,14 @@ describe(VoiceFieldGroup, () => {
   });
 
   it('shows each field storage key next to its label', () => {
-    render(
-      <VoiceFieldGroup
-        title="404 page"
-        fields={fields}
-        values={{ notFoundHeading: '', notFoundSupportingText: '' } as never}
-        placeholders={{}}
-        onFieldChange={vi.fn()}
-      />,
-    );
+    setup();
 
     expect(screen.getByText('notFoundHeading')).toBeVisible();
     expect(screen.getByText('notFoundSupportingText')).toBeVisible();
   });
 
   it('makes every field read-only, not disabled, when isReadOnly is true', () => {
-    render(
-      <VoiceFieldGroup
-        title="404 page"
-        fields={fields}
-        values={{ notFoundHeading: '', notFoundSupportingText: '' } as never}
-        placeholders={{}}
-        onFieldChange={vi.fn()}
-        isReadOnly={true}
-      />,
-    );
+    setup({ isReadOnly: true });
 
     for (const field of screen.getAllByRole('textbox')) {
       expect(field).toHaveAttribute('readonly');
@@ -129,15 +94,7 @@ describe(VoiceFieldGroup, () => {
   it('forwards a field change with its own key', async () => {
     const user = userEvent.setup();
     const onFieldChange = vi.fn();
-    render(
-      <VoiceFieldGroup
-        title="404 page"
-        fields={fields}
-        values={{ notFoundHeading: '', notFoundSupportingText: '' } as never}
-        placeholders={{}}
-        onFieldChange={onFieldChange}
-      />,
-    );
+    setup({ onFieldChange });
 
     const input = screen.getByRole('textbox', { name: 'Not Found Heading' });
     await user.type(input, 'x');
