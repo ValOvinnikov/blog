@@ -36,15 +36,13 @@ describe(`<${Breadcrumbs.name}/>`, () => {
     }
   });
 
-  it('renders the first item as a link with a decorative House icon, keeping the label as its accessible name', () => {
+  it('renders the first item as a link with a decorative House icon, keeping the label sr-only as its accessible name rather than shown alongside the icon', () => {
     setup();
     const homeLink = screen.getByRole('link', { name: firstItem.label });
     const icon = homeLink.querySelector('svg');
     const labelText = screen.getByText(firstItem.label);
 
     expect(icon).toHaveAttribute('aria-hidden', 'true');
-    // `sr-only` is the sole observable that the label text is kept for
-    // accessibility rather than shown alongside the icon.
     expect(labelText).toHaveClass('sr-only');
   });
 
