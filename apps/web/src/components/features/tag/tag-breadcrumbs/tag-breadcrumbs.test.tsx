@@ -1,6 +1,14 @@
-import { customRenderAsync, screen, within } from '@web/testing/custom-render';
+import { customRenderAsync } from '@web/testing/custom-render';
+import {
+  testBreadcrumbsJsonLdSchema,
+  testBreadcrumbsTrail,
+  testForwardsArgsToLoader,
+  testNoJsonLdWithoutBaseUrl,
+  testNotFoundOnFetchFailure,
+  testNotFoundWithoutLog,
+} from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
+import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 import { makeTag } from '@web/testing/shared/tag/fixtures';
-import { notFound } from 'next/navigation';
 
 import { TagBreadcrumbs } from './tag-breadcrumbs';
 
@@ -18,21 +26,11 @@ vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
 }));
 
 vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: ({
-    href,
-    children,
-    ...rest
-  }: {
-    href: string;
-    children: React.ReactNode;
-  }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
+  SmartLink: SmartLinkMock,
 }));
 
 const tag = makeTag({ title: 'TypeScript', slug: 'typescript' });
+const successData = { tag, modules: [], seo: {} };
 
 const setup = customRenderAsync(TagBreadcrumbs, {
   slug: 'typescript',
@@ -46,91 +44,36 @@ describe(`<${TagBreadcrumbs.name}/>`, () => {
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');
   });
 
-  it('calls notFound() without logging when no page_tag matches the slug', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getTagPageMock.mockResolvedValue({ ok: true, data: undefined });
-
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
-
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(errorSpy).not.toHaveBeenCalled();
-    errorSpy.mockRestore();
+  testNotFoundWithoutLog({ pageLoaderMock: getTagPageMock, setup });
+  testNotFoundOnFetchFailure({
+    pageLoaderMock: getTagPageMock,
+    setup,
+    eventFragment: 'tag_breadcrumbs.fetch_failed',
   });
-
-  it('calls notFound() and logs when the fetch fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getTagPageMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
-
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('tag_breadcrumbs.fetch_failed'),
-    );
-    errorSpy.mockRestore();
+  testBreadcrumbsTrail({
+    pageLoaderMock: getTagPageMock,
+    setup,
+    successData,
+    linkSteps: [{ label: 'Home', href: '/' }],
+    currentLabel: 'TypeScript',
   });
-
-  it('renders the Home › {tag} breadcrumbs trail', async () => {
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: { tag, modules: [], seo: {} },
-    });
-
-    await setup();
-
-    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
-
-    const homeLink = within(nav).getByRole('link', { name: 'Home' });
-    expect(homeLink).toHaveAttribute('href', '/');
-
-    const current = within(nav).getByText('TypeScript');
-    expect(current).toHaveAttribute('aria-current', 'page');
-    expect(current.tagName).not.toBe('A');
+  testBreadcrumbsJsonLdSchema({
+    pageLoaderMock: getTagPageMock,
+    setup,
+    successData,
+    itemPath: '/tags/typescript',
   });
-
-  it('renders the JSON-LD BreadcrumbList schema script', async () => {
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: { tag, modules: [], seo: {} },
-    });
-
-    const { container } = await setup();
-
-    const script = container.querySelector(
-      'script[type="application/ld+json"]',
-    );
-    expect(script).not.toBeNull();
-    expect(script?.textContent).toContain('"@type":"BreadcrumbList"');
-    expect(script?.textContent).toContain(
-      '"item":"https://example.com/tags/typescript"',
-    );
+  testNoJsonLdWithoutBaseUrl({
+    pageLoaderMock: getTagPageMock,
+    setup,
+    successData,
+    getTenantBaseUrlMock,
   });
-
-  it('renders no JSON-LD script when the base URL cannot be resolved', async () => {
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: { tag, modules: [], seo: {} },
-    });
-    getTenantBaseUrlMock.mockResolvedValue(undefined);
-
-    const { container } = await setup();
-
-    expect(
-      container.querySelector('script[type="application/ld+json"]'),
-    ).not.toBeInTheDocument();
-  });
-
-  it('forwards the slug and tenant to getTagPage', async () => {
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: { tag, modules: [], seo: {} },
-    });
-
-    await setup();
-
-    expect(getTagPageMock).toHaveBeenCalledWith('typescript', 'tenant-1');
+  testForwardsArgsToLoader({
+    pageLoaderMock: getTagPageMock,
+    setup,
+    successData,
+    description: 'forwards the slug and tenant to getTagPage',
+    expectedArgs: ['typescript', 'tenant-1'],
   });
 });

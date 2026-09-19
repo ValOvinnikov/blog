@@ -380,7 +380,7 @@ retires it, but no picker offers it. Narrowing a page is what turns a
 surplus entry in its `apps/web` module map from dead code into a
 `type-check` error.
 
-Three kinds are registered. **`module_hero`** is the original, kept until
+Four kinds are registered. **`module_hero`** is the original, kept until
 #2813 retires it. **`module_heroBlog`** is the featured-post hero: its
 copy, image and primary action all derive from a post, and publish is
 blocked when none resolves. It authors no heading or supporting text of its
@@ -392,16 +392,42 @@ after the fact, or no featured post left — the hero renders nothing and the
 page's own required `headingBlock` heading becomes the `<h1>`. **`module_heroStatement`** is the plainest
 member — a headline, a line of support and up to two actions, with nothing
 derived from anything — and is the hero a marketing, agency, product or
-consultant home page opens with.
+consultant home page opens with. **`module_heroProfile`** is the person
+hero: it references a `blog_author` for a photo and social profiles only,
+and authors all of its own copy, so nothing is derived from the author's
+`name`, `role` or `bio`.
+
+`module_heroProfile`'s fields are `title`, `brandVariant`, the shared
+`headingBlock`, an optional `eyebrow`, a **required** `author` reference to
+`blog_author`, an optional `image`, the shared `ctaButtons`, and a
+`showSocialLinks` toggle defaulting on, before its composed tail. **The
+photo resolves by precedence, not by a mode**: the module's own `image`
+when set, otherwise the author's, otherwise neither — and the view then
+renders initials through `Avatar`, exactly as the author page does.
+`blog_author.image` is optional by design, so a photoless author is a
+supported state rather than a failure, which is why the schema declares
+**no document-level validation at all**: it validates what the editor
+cannot see, not what they just chose. The photo is placed by variant — a
+round `Hero.Avatar` on Stacked, a square `Hero.Media` on Split, the
+background on Banner — its actions render in `Hero.Cta`, and the author's
+profiles in `Hero.Social`. Those four slots are the `Hero` organism's whole
+surface. `Hero.Social` imposes no semantics of its own, so the view
+supplies its own labelled list around the shared `SocialLinks`.
 
 `module_heroStatement`'s own content fields are `title` (Studio's list
 label, never rendered), an optional `eyebrow` (max 40), a **required**
 `heading` (max 120, always the page `<h1>`) and an optional
 `supportingText` (plain `text`, not Portable Text — a hero with two
 paragraphs is a landing page that has not been split into modules yet),
-plus the shared `ctaButtons` array (up to two `ctaButton`s). It then calls
-`heroFields()` with **no options**, so the shared tail's own `image` is
-the module's, where `module_heroBlog` replaces it with a post-sourced one.
+plus the shared `ctaButtons` array (up to two `ctaButton`s). It then
+composes its tail from named field builders — variant, content position,
+both media-order fields and layout — and passes no configuration object.
+A single `heroFields({ … })` helper taking option flags used to build that
+tail for every hero; #3275 deleted it, because omission is how a hero says
+it lacks a field, and a flag list is a worse way to say the same thing. So
+the statement hero's `image` is its own, where `module_heroBlog` has a
+post-sourced one and `module_heroProfile` has the author-fallback pair
+above.
 Actions are not part of the tail: `module_heroBlog`'s primary links to the
 resolved post, with a **required** authored `primaryActionLabel` and
 `primaryActionAppearance` (no "Read more" fallback — an unlabelled hero is

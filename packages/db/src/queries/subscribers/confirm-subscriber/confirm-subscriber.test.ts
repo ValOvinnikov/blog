@@ -1,41 +1,26 @@
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { confirmSubscriber } from './confirm-subscriber';
 
 const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
-// Only `getDb`'s return value is swapped for an in-memory Postgres — every
-// query these functions build still runs as real SQL (see
-// src/testing/create-test-db.ts).
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
-
-// One in-memory Postgres instance for the whole file (spinning up pglite's
-// WASM engine is the slow part — seconds, not milliseconds) — `afterEach`
-// clears rows between tests instead of paying that cost per test.
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
+const db = useQueryTestDb(getDbMock);
 
 afterEach(async () => {
-  await db.delete(schema.subscribers);
-  await db.delete(schema.tenants);
+  await db().delete(schema.subscribers);
+  await db().delete(schema.tenants);
 });
 
 async function insertPendingSubscriber(
   tenantId: string,
   overrides: Partial<typeof schema.subscribers.$inferInsert> = {},
 ): Promise<schema.TSubscriber> {
-  const [inserted] = await db
+  const [inserted] = await db()
     .insert(schema.subscribers)
     .values({ tenantId, email: 'reader@example.com', ...overrides })
     .returning();
@@ -47,7 +32,7 @@ async function insertPendingSubscriber(
 
 describe(confirmSubscriber, () => {
   it('flips a pending subscriber to active and stamps confirmedAt', async () => {
-    const { id: tenantId } = await insertTestTenant(db);
+    const { id: tenantId } = await insertTestTenant(db());
     const pending = await insertPendingSubscriber(tenantId);
 
     const result = await confirmSubscriber(tenantId, pending.confirmationToken);
@@ -57,7 +42,7 @@ describe(confirmSubscriber, () => {
     expect(result.subscriber.status).toBe('active');
     expect(result.subscriber.confirmedAt).not.toBeNull();
 
-    const [row] = await db
+    const [row] = await db()
       .select()
       .from(schema.subscribers)
       .where(eq(schema.subscribers.id, pending.id));
@@ -65,7 +50,7 @@ describe(confirmSubscriber, () => {
   });
 
   it('is idempotent-safe: confirming an already-active row again does not error or restamp confirmedAt', async () => {
-    const { id: tenantId } = await insertTestTenant(db);
+    const { id: tenantId } = await insertTestTenant(db());
     const pending = await insertPendingSubscriber(tenantId);
     const first = await confirmSubscriber(tenantId, pending.confirmationToken);
     if (first.outcome !== 'confirmed') throw new Error('expected confirmed');
@@ -79,7 +64,7 @@ describe(confirmSubscriber, () => {
   });
 
   it('returns not-found for an unrecognized token', async () => {
-    const { id: tenantId } = await insertTestTenant(db);
+    const { id: tenantId } = await insertTestTenant(db());
 
     const result = await confirmSubscriber(tenantId, 'does-not-exist');
 
@@ -87,8 +72,8 @@ describe(confirmSubscriber, () => {
   });
 
   it("returns not-found for another tenant's token", async () => {
-    const { id: tenantOneId } = await insertTestTenant(db);
-    const { id: tenantTwoId } = await insertTestTenant(db);
+    const { id: tenantOneId } = await insertTestTenant(db());
+    const { id: tenantTwoId } = await insertTestTenant(db());
     const pending = await insertPendingSubscriber(tenantOneId);
 
     const result = await confirmSubscriber(
@@ -110,7 +95,7 @@ describe(confirmSubscriber, () => {
   // two racing calls can ever match that `WHERE`, not from this test — see
   // the docstring on `confirmSubscriber`.
   it('resolves two concurrent confirms of the same token into exactly one confirmed outcome', async () => {
-    const { id: tenantId } = await insertTestTenant(db);
+    const { id: tenantId } = await insertTestTenant(db());
     const pending = await insertPendingSubscriber(tenantId);
 
     const [first, second] = await Promise.all([
@@ -125,7 +110,7 @@ describe(confirmSubscriber, () => {
     if (confirmed.outcome !== 'confirmed') {
       throw new Error('expected one confirmed outcome');
     }
-    const [row] = await db
+    const [row] = await db()
       .select()
       .from(schema.subscribers)
       .where(eq(schema.subscribers.id, pending.id));

@@ -25,6 +25,7 @@ export const heroProfileModuleQuery = q
       .field('author')
       .deref()
       .project((authorSub) => ({
+        name: authorSub.field('name').notNull(),
         image: authorSub
           .field('image')
           .project(sanityImageFragment)

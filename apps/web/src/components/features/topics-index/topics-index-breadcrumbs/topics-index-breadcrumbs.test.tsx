@@ -1,4 +1,6 @@
-import { customRenderAsync, screen, within } from '@web/testing/custom-render';
+import { customRenderAsync } from '@web/testing/custom-render';
+import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
+import { testStaticBreadcrumbsContract } from '@web/testing/shared/static-breadcrumbs-contract/static-breadcrumbs-contract';
 
 import { TopicsIndexBreadcrumbs } from './topics-index-breadcrumbs';
 
@@ -11,18 +13,7 @@ vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
 }));
 
 vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: ({
-    href,
-    children,
-    ...rest
-  }: {
-    href: string;
-    children: React.ReactNode;
-  }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
+  SmartLink: SmartLinkMock,
 }));
 
 const setup = customRenderAsync(TopicsIndexBreadcrumbs, {
@@ -35,45 +26,10 @@ describe(`<${TopicsIndexBreadcrumbs.name}/>`, () => {
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');
   });
 
-  it('renders the Home › Topics breadcrumbs trail', async () => {
-    await setup();
-
-    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
-
-    const homeLink = within(nav).getByRole('link', { name: 'Home' });
-    expect(homeLink).toHaveAttribute('href', '/');
-
-    const current = within(nav).getByText('Topics');
-    expect(current).toHaveAttribute('aria-current', 'page');
-    expect(current.tagName).not.toBe('A');
-  });
-
-  it('renders the JSON-LD BreadcrumbList schema script', async () => {
-    const { container } = await setup();
-
-    const script = container.querySelector(
-      'script[type="application/ld+json"]',
-    );
-    expect(script).not.toBeNull();
-    expect(script?.textContent).toContain('"@type":"BreadcrumbList"');
-    expect(script?.textContent).toContain(
-      '"item":"https://example.com/topics"',
-    );
-  });
-
-  it('renders no JSON-LD script when the base URL cannot be resolved', async () => {
-    getTenantBaseUrlMock.mockResolvedValue(undefined);
-
-    const { container } = await setup();
-
-    expect(
-      container.querySelector('script[type="application/ld+json"]'),
-    ).not.toBeInTheDocument();
-  });
-
-  it('forwards the tenant to getTenantBaseUrl', async () => {
-    await setup();
-
-    expect(getTenantBaseUrlMock).toHaveBeenCalledWith('tenant-1');
+  testStaticBreadcrumbsContract({
+    setup,
+    getTenantBaseUrlMock,
+    label: 'Topics',
+    path: '/topics',
   });
 });

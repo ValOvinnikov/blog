@@ -7,9 +7,8 @@ import {
 } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
-import { createTestDb } from '@blog/db/testing/create-test-db';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { clearTenantProvisioningArtifacts } from './clear-tenant-provisioning-artifacts';
 
@@ -17,10 +16,10 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
+const db = useQueryTestDb(getDbMock);
 
 async function insertProvisionedTenant(): Promise<string> {
-  const [tenant] = await db
+  const [tenant] = await db()
     .insert(schema.tenants)
     .values({
       name: 'Acme',
@@ -65,16 +64,8 @@ async function insertProvisionedTenant(): Promise<string> {
   return tenant.id;
 }
 
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
-
 afterEach(async () => {
-  await db.delete(schema.tenants);
+  await db().delete(schema.tenants);
 });
 
 describe(clearTenantProvisioningArtifacts, () => {
@@ -83,7 +74,7 @@ describe(clearTenantProvisioningArtifacts, () => {
 
     await clearTenantProvisioningArtifacts(tenantId);
 
-    const [row] = await db
+    const [row] = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenantId));
@@ -104,7 +95,7 @@ describe(clearTenantProvisioningArtifacts, () => {
 
     await clearTenantProvisioningArtifacts(tenantId);
 
-    const [row] = await db
+    const [row] = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenantId));

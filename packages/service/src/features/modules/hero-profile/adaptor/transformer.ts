@@ -40,6 +40,7 @@ export function toHeroProfileModule(
     variant: raw.variant,
     headingBlock: toHeadingBlock(raw.headingBlock),
     eyebrow: raw.eyebrow ?? undefined,
+    avatarName: raw.author.name,
     sanityImage: toImage(raw),
     socialLinks: toSocialLinks(raw),
     ctaButtons: toCtaButtons(raw.ctaButtons),

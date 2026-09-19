@@ -1,31 +1,18 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { insertAuditEvent } from './insert-audit-event';
 
 const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
-// Only `getDb`'s return value is swapped for an in-memory Postgres — every
-// query this function builds still runs as real SQL (see
-// src/testing/create-test-db.ts), so the NOT NULL constraints under test
-// are the real Postgres constraints, not a mocked stand-in.
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
-
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
+const db = useQueryTestDb(getDbMock);
 
 afterEach(async () => {
-  await db.delete(schema.auditEvents);
+  await db().delete(schema.auditEvents);
 });
 
 describe(insertAuditEvent, () => {
@@ -50,7 +37,7 @@ describe(insertAuditEvent, () => {
     });
     expect(event.createdAt).toBeInstanceOf(Date);
 
-    const [row] = await db
+    const [row] = await db()
       .select()
       .from(schema.auditEvents)
       .where(eq(schema.auditEvents.id, event.id));
@@ -90,7 +77,7 @@ describe(insertAuditEvent, () => {
       targetId: 'tenant-789',
     });
 
-    const rows = await db
+    const rows = await db()
       .select()
       .from(schema.auditEvents)
       .where(eq(schema.auditEvents.targetId, 'tenant-789'));

@@ -1,5 +1,13 @@
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { customRenderAsync } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import {
+  testFallsBackToHeadingWithoutHero,
+  testHeadingWithoutHero,
+  testHeroBeforeModules,
+  testRendersAllowedModulesInOrder,
+  testResolvedHero,
+  testWarnsForUnknownModule,
+} from '@web/testing/shared/module-renderer-contract/module-renderer-contract';
 import type { ReactNode } from 'react';
 
 import { TagModuleRenderer } from './tag-module-renderer';
@@ -72,81 +80,43 @@ const setup = customRenderAsync(TagModuleRenderer, {
 });
 
 describe(`<${TagModuleRenderer.name}/>`, () => {
-  it('renders the page heading, with exactly one h1, when the page has no hero', async () => {
-    await setup();
-
-    const headings = screen.getAllByRole('heading', { level: 1 });
-    expect(headings).toHaveLength(1);
-    expect(headings[0]).toHaveTextContent('TypeScript');
+  testHeadingWithoutHero({ setup, headingText: 'TypeScript' });
+  testResolvedHero({ setup });
+  testHeroBeforeModules({
+    setup,
+    modules: [
+      { id: 'cta-1', type: 'module_cta' },
+      { id: 'post-list-1', type: 'module_postList' },
+    ],
+    expectedTestIds: ['stub-hero', 'stub-cta', 'stub-post-list'],
   });
-
-  it('renders the resolved hero, with exactly one h1, when the hero resolves to content', async () => {
-    await setup({ hero: { id: 'hero-1', type: 'module_heroBlog' } });
-
-    const headings = screen.getAllByRole('heading', { level: 1 });
-    expect(headings).toHaveLength(1);
-    expect(screen.getByTestId('stub-hero')).toHaveTextContent('hero-1');
+  testFallsBackToHeadingWithoutHero({
+    setup,
+    heroBlogModuleMock,
+    headingText: 'TypeScript',
   });
-
-  it('renders the resolved hero before the modules when the page has both', async () => {
-    await setup({
-      hero: { id: 'hero-1', type: 'module_heroBlog' },
-      modules: [
-        { id: 'cta-1', type: 'module_cta' },
-        { id: 'post-list-1', type: 'module_postList' },
-      ],
-    });
-
-    const nodes = screen.getAllByTestId(/^stub-/);
-    expect(nodes.map((node) => node.getAttribute('data-testid'))).toEqual([
-      'stub-hero',
-      'stub-cta',
-      'stub-post-list',
-    ]);
+  testWarnsForUnknownModule({
+    setup,
+    loggerWarnMock,
+    unknownModule: { id: 'content-1', type: 'module_content' },
+    description:
+      'renders nothing and warns once for a module absent from the tag page allow-list',
   });
-
-  it('falls back to the page heading, still exactly one h1, when the hero resolves to nothing', async () => {
-    heroBlogModuleMock.mockResolvedValueOnce(null);
-
-    await setup({ hero: { id: 'hero-2', type: 'module_heroBlog' } });
-
-    const headings = screen.getAllByRole('heading', { level: 1 });
-    expect(headings).toHaveLength(1);
-    expect(headings[0]).toHaveTextContent('TypeScript');
-    expect(screen.queryByTestId('stub-hero')).not.toBeInTheDocument();
-  });
-
-  it('renders nothing and warns once for a module absent from the tag page allow-list', async () => {
-    await setup({
-      modules: [{ id: 'content-1', type: 'module_content' as never }],
-    });
-
-    expect(screen.queryByText('content-1')).not.toBeInTheDocument();
-    expect(loggerWarnMock).toHaveBeenCalledTimes(1);
-    expect(loggerWarnMock).toHaveBeenCalledWith(
-      'module_renderer.unknown_module_type',
-      { moduleType: 'module_content' },
-    );
-  });
-
-  it('renders every allowed module keyed by its id, in the given order', async () => {
-    await setup({
-      modules: [
-        { id: 'post-list-1', type: 'module_postList' },
-        { id: 'post-latest-1', type: 'module_postLatest' },
-        { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
-        { id: 'cta-1', type: 'module_cta' },
-        { id: 'newsletter-1', type: 'module_newsletter' },
-      ],
-    });
-
-    const stubs = screen.getAllByTestId(/^stub-/);
-    expect(stubs.map((node) => node.textContent)).toEqual([
+  testRendersAllowedModulesInOrder({
+    setup,
+    modules: [
+      { id: 'post-list-1', type: 'module_postList' },
+      { id: 'post-latest-1', type: 'module_postLatest' },
+      { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
+      { id: 'cta-1', type: 'module_cta' },
+      { id: 'newsletter-1', type: 'module_newsletter' },
+    ],
+    expectedOrder: [
       'post-list-1',
       'post-latest-1',
       'taxonomy-list-1',
       'cta-1',
       'newsletter-1',
-    ]);
+    ],
   });
 });

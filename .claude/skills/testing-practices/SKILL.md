@@ -291,16 +291,22 @@ export default mergeConfig(
 
 ## What not to test
 
-- **Never assert declarative config back at itself.** A schema's field list,
+- **Never assert the source back at itself.** A schema's field list,
   option list, default, fieldset, group, field order, title, icon or registry
   membership; a barrel "exposes X as a function"; an exported constant's
-  value; a component's static prop defaults. **The test: if the expected value
-  is a literal copied out of the file under test, the test restates the
-  source — delete it.** Typegen, `type-check` and the Studio itself already
-  guard those shapes, so the test protects nothing and fails on every
-  intentional change. Test the _logic_ attached to config instead: a
-  `rule.custom` validation, a conditional `hidden`, a preview `prepare`, a
-  transformer, a migration.
+  value; a component's static prop defaults; editor-facing copy — a
+  `description`, a label, a placeholder or any other human sentence pinned to
+  its exact literal
+  (`expect(displayModeField().description).toBe('Grid lays the posts out in rows. …')`);
+  a field helper's default-vs-override precedence, which is `??`, not a
+  contract. **The test: if the expected value is a literal copied out of the
+  file under test, the test restates the source — delete it.** Typegen,
+  `type-check` and the Studio itself already guard the shapes, and copy is
+  reviewed in the diff, so the test protects nothing and fails on every
+  intentional change. If a field having _some_ description matters, assert
+  that it is non-empty; never which words it contains. Test the _logic_
+  attached to config instead: a `rule.custom` validation, a conditional
+  `hidden`, a preview `prepare`, a transformer, a migration.
 - **Sibling cases use `it.each`, never copied blocks.** Three `it`s that
   differ only in an input and an expected value are one table-driven test.
   A test file that repeats an arrangement it already contains is fixed in
@@ -325,16 +331,14 @@ export default mergeConfig(
 - Assert behaviour, semantics, and rendered output; never static styling. A
   restyle that changes no prop-driven behaviour has no unit-test surface —
   Storybook + `no-tests-needed`.
-- **Never assert copy verbatim.** A test that pins an editor-facing
-  `description`, a label, a placeholder or any other human sentence to its
-  exact literal —
-  `expect(displayModeField().description).toBe('Grid lays the posts out in rows. …')`
-  — only restates the source. The sole change that can fail it is a deliberate
-  rewording, so it reports intentional edits as breakage and catches no defect.
-  The same goes for a field helper's default-vs-override precedence: that is
-  `??`, not a contract worth a test. If a field having _some_ description
-  matters, assert that it is non-empty; never assert which words it contains.
-  Copy is reviewed in the diff, not pinned by a test.
+- **No comments in a test file — none.** The `describe` and `it` titles are
+  the documentation: a "why this case exists" belongs in the `it` title, a
+  "why this mock" belongs in the helper's name, and a "the other route is
+  covered by the loader's tests" is a title that grew a paragraph. The
+  general comment rule's one-line-gotcha exception does not apply here —
+  a test with a gotcha worth a sentence is a test whose title or fixture
+  is wrong. The reviewer greps every added comment line in `*.test.ts(x)`
+  and each hit is blocking.
 - **No snapshot tests** — they couple tests to markup and break on unrelated changes.
 - **No implementation details** — test what a component does, not how it does it.
 - **No network calls** — always mock the Sanity client and `service` functions.

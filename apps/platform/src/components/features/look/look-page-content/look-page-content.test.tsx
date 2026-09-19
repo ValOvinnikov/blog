@@ -1,12 +1,7 @@
 import { PRESET_ID } from '@blog/config';
-import {
-  TENANT_PROVISIONING_STATUS,
-  TENANT_PROVISIONING_STEP,
-  TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
 
 import { LookPageContent } from './look-page-content';
 
@@ -25,37 +20,7 @@ vi.mock('@blog/db', async () => ({
 // evaluates the real `NextAuth()` call at import time.
 vi.mock('@platform/server/auth/auth', () => ({ auth: vi.fn() }));
 
-const tenant = makeTenant({
-  sanityProjectId: 'proj-1',
-  sanityDataset: 'production',
-  locale: 'en',
-  provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-  provisioningSteps: {
-    [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-    },
-    [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
-      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-    },
-    [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
-      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-    },
-    [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-    },
-    [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
-      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-    },
-    [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: {
-      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-    },
-    [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
-      status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
-    },
-  },
-  seededAt: new Date('2026-01-01T00:00:00.000Z'),
-  webhookCreatedAt: new Date('2026-01-01T00:00:00.000Z'),
-});
+const tenant = makeReadyTenant();
 
 const setup = customRenderAsync(LookPageContent, { tenant });
 

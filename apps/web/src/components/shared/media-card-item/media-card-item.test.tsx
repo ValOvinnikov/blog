@@ -1,20 +1,10 @@
 import { renderElement, screen } from '@web/testing/custom-render';
+import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { MediaCardItem, type IMediaCardData } from './media-card-item';
 
 vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: ({
-    href,
-    children,
-    ...rest
-  }: {
-    href: string;
-    children: React.ReactNode;
-  }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
+  SmartLink: SmartLinkMock,
 }));
 
 const item: IMediaCardData = {

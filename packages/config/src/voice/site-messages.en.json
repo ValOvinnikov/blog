@@ -230,5 +230,8 @@
     "previousAriaLabel": "Previous slide",
     "nextAriaLabel": "Next slide",
     "regionLabel": "{title} carousel"
+  },
+  "hero": {
+    "socialLinksAriaLabel": "Profiles"
   }
 }

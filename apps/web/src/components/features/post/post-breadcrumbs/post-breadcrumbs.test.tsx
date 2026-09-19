@@ -1,6 +1,13 @@
-import { customRenderAsync, screen, within } from '@web/testing/custom-render';
+import { customRenderAsync } from '@web/testing/custom-render';
 import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
-import { notFound } from 'next/navigation';
+import {
+  testBreadcrumbsJsonLdSchema,
+  testBreadcrumbsTrail,
+  testForwardsArgsToLoader,
+  testNotFoundOnFetchFailure,
+  testNotFoundWithoutLog,
+} from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
+import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { PostBreadcrumbs } from './post-breadcrumbs';
 
@@ -18,18 +25,7 @@ vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
 }));
 
 vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: ({
-    href,
-    children,
-    ...rest
-  }: {
-    href: string;
-    children: React.ReactNode;
-  }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
+  SmartLink: SmartLinkMock,
 }));
 
 const setup = customRenderAsync(PostBreadcrumbs, {
@@ -44,65 +40,29 @@ describe(`<${PostBreadcrumbs.name}/>`, () => {
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');
   });
 
-  it('calls notFound() without logging when no page_post matches the slug', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getPostPageMock.mockResolvedValue({ ok: true, data: undefined });
-
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
-
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(errorSpy).not.toHaveBeenCalled();
-    errorSpy.mockRestore();
+  testNotFoundWithoutLog({ pageLoaderMock: getPostPageMock, setup });
+  testNotFoundOnFetchFailure({ pageLoaderMock: getPostPageMock, setup });
+  testBreadcrumbsTrail({
+    pageLoaderMock: getPostPageMock,
+    setup,
+    successData: mockPostDetail,
+    linkSteps: [
+      { label: 'Home', href: '/' },
+      { label: 'Engineering', href: '/topics/engineering' },
+    ],
+    currentLabel: 'Hello World',
   });
-
-  it('calls notFound() when the fetch fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getPostPageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
-
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
-
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    errorSpy.mockRestore();
+  testBreadcrumbsJsonLdSchema({
+    pageLoaderMock: getPostPageMock,
+    setup,
+    successData: mockPostDetail,
+    itemPath: '/topics/engineering',
   });
-
-  it('renders the Home › Topic › Post breadcrumbs trail', async () => {
-    getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
-
-    await setup();
-
-    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
-
-    const homeLink = within(nav).getByRole('link', { name: 'Home' });
-    expect(homeLink).toHaveAttribute('href', '/');
-
-    const topicLink = within(nav).getByRole('link', { name: 'Engineering' });
-    expect(topicLink).toHaveAttribute('href', '/topics/engineering');
-
-    const current = within(nav).getByText('Hello World');
-    expect(current).toHaveAttribute('aria-current', 'page');
-    expect(current.tagName).not.toBe('A');
-  });
-
-  it('renders the JSON-LD BreadcrumbList schema script', async () => {
-    getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
-
-    const { container } = await setup();
-
-    const script = container.querySelector(
-      'script[type="application/ld+json"]',
-    );
-    expect(script).not.toBeNull();
-    expect(script?.textContent).toContain('"@type":"BreadcrumbList"');
-    expect(script?.textContent).toContain(
-      '"item":"https://example.com/topics/engineering"',
-    );
-  });
-
-  it('forwards the slug and tenant to getPostPage', async () => {
-    getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
-
-    await setup();
-
-    expect(getPostPageMock).toHaveBeenCalledWith('hello-world', 'tenant-1');
+  testForwardsArgsToLoader({
+    pageLoaderMock: getPostPageMock,
+    setup,
+    successData: mockPostDetail,
+    description: 'forwards the slug and tenant to getPostPage',
+    expectedArgs: ['hello-world', 'tenant-1'],
   });
 });

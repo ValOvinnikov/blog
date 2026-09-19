@@ -15,7 +15,7 @@ import type { TFinding } from '@blog/db/schema/findings';
 import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
 import {
   act,
-  renderWithIntl,
+  customRender,
   screen,
   within,
 } from '@platform/testing/custom-render';
@@ -24,9 +24,10 @@ import {
   makeTenant,
 } from '@platform/testing/tenants/fixtures';
 
-import { TenantOverviewView } from './tenant-overview-view';
-
-const render = renderWithIntl;
+import {
+  TenantOverviewView,
+  type TTenantOverviewViewProps,
+} from './tenant-overview-view';
 
 const STEP_POLL_INTERVAL_MS = 4000;
 
@@ -87,7 +88,19 @@ const makeFinding = (overrides: Partial<TFinding> = {}): TFinding => ({
   ...overrides,
 });
 
-describe(TenantOverviewView, () => {
+const defaultProps: TTenantOverviewViewProps = {
+  tenant: makeTenant(),
+  domainVerificationStatus: 'NOT_CONFIGURED',
+  ownerEmail: 'owner@example.com',
+  ownerJoinedAt: 'Aug 12, 2026',
+  ownerJoinedAtIso: '2026-08-12T00:00:00.000Z',
+  auditEvents: [],
+  findings: [],
+};
+
+const setup = customRender(TenantOverviewView, defaultProps);
+
+describe(`<${TenantOverviewView.name}/>`, () => {
   // Rendering a non-terminal `provisioningStatus` starts a real
   // `setInterval` poll loop that can outlive a test's own cleanup under
   // parallel load — faking setInterval/clearInterval closes that off, same
@@ -107,18 +120,7 @@ describe(TenantOverviewView, () => {
   });
 
   it('renders the tenant name and status/plan badges', () => {
-    const tenant = makeTenant({ name: 'Acme Inc.', status: 'ACTIVE' });
-    render(
-      <TenantOverviewView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-        ownerJoinedAt="Aug 12, 2026"
-        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[]}
-        findings={[]}
-      />,
-    );
+    setup({ tenant: makeTenant({ name: 'Acme Inc.', status: 'ACTIVE' }) });
 
     const heading = screen.getByRole('heading', {
       level: 1,
@@ -133,18 +135,7 @@ describe(TenantOverviewView, () => {
   });
 
   it("nests every card's title one level under the page's own h1, with no h3 skip", () => {
-    const tenant = makeTenant();
-    render(
-      <TenantOverviewView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-        ownerJoinedAt="Aug 12, 2026"
-        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[]}
-        findings={[]}
-      />,
-    );
+    setup();
 
     expect(
       screen.getByRole('heading', { level: 2, name: 'Tenant details' }),
@@ -168,43 +159,24 @@ describe(TenantOverviewView, () => {
   });
 
   it('renders the provisioning banner', () => {
-    const tenant = makeTenant({
-      provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-      provisioningSteps: Object.fromEntries(
-        Object.values(TENANT_PROVISIONING_STEP).map((step) => [
-          step,
-          { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-        ]),
-      ) as unknown as TTenantProvisioningState,
+    setup({
+      tenant: makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+        provisioningSteps: Object.fromEntries(
+          Object.values(TENANT_PROVISIONING_STEP).map((step) => [
+            step,
+            { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+          ]),
+        ) as unknown as TTenantProvisioningState,
+      }),
+      domainVerificationStatus: 'VERIFIED',
     });
-    render(
-      <TenantOverviewView
-        tenant={tenant}
-        domainVerificationStatus="VERIFIED"
-        ownerEmail="owner@example.com"
-        ownerJoinedAt="Aug 12, 2026"
-        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[]}
-        findings={[]}
-      />,
-    );
 
     expect(screen.getByText('Provisioned')).toBeVisible();
   });
 
   it('relocates the tenant details panel here as the Identity card', () => {
-    const tenant = makeTenant({ name: 'Acme Inc.' });
-    render(
-      <TenantOverviewView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-        ownerJoinedAt="Aug 12, 2026"
-        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[]}
-        findings={[]}
-      />,
-    );
+    setup({ tenant: makeTenant({ name: 'Acme Inc.' }) });
 
     expect(screen.getByText('Tenant details')).toBeVisible();
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue(
@@ -213,25 +185,16 @@ describe(TenantOverviewView, () => {
   });
 
   it('locks every tenant details field while a step is running, stating why', () => {
-    const tenant = makeTenant({
-      provisioningSteps: {
-        ...idleProvisioningSteps(),
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+    setup({
+      tenant: makeTenant({
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+          },
         },
-      },
+      }),
     });
-    render(
-      <TenantOverviewView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-        ownerJoinedAt="Aug 12, 2026"
-        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[]}
-        findings={[]}
-      />,
-    );
 
     const nameInput = screen.getByRole('textbox', { name: 'Name' });
     expect(nameInput).toBeDisabled();
@@ -242,38 +205,29 @@ describe(TenantOverviewView, () => {
   });
 
   it('locks primaryDomain once MAP_DOMAIN has completed and a later step failed, leaving the field that caused the failure editable', () => {
-    const tenant = makeTenant({
-      provisioningSteps: {
-        ...idleProvisioningSteps(),
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+    setup({
+      tenant: makeTenant({
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+          },
+          [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+          },
+          [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+          },
+          [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+          },
+          [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+            error: 'boom',
+          },
         },
-        [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error: 'boom',
-        },
-      },
+      }),
     });
-    render(
-      <TenantOverviewView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-        ownerJoinedAt="Aug 12, 2026"
-        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[]}
-        findings={[]}
-      />,
-    );
 
     const domainInput = screen.getByRole('textbox', {
       name: 'Primary domain',
@@ -290,21 +244,12 @@ describe(TenantOverviewView, () => {
     // Provisioning was just (re)started — `provisioningStatus` already
     // moved to PROVISIONING but every step is still IDLE, since a runner
     // hasn't picked the workflow up yet.
-    const tenant = makeTenant({
-      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-      provisioningSteps: idleProvisioningSteps(),
+    setup({
+      tenant: makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: idleProvisioningSteps(),
+      }),
     });
-    render(
-      <TenantOverviewView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-        ownerJoinedAt="Aug 12, 2026"
-        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[]}
-        findings={[]}
-      />,
-    );
 
     expect(screen.getByRole('textbox', { name: 'Name' })).toBeDisabled();
     expect(
@@ -335,17 +280,7 @@ describe(TenantOverviewView, () => {
       ) as unknown as TTenantProvisioningState,
     });
 
-    render(
-      <TenantOverviewView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-        ownerJoinedAt="Aug 12, 2026"
-        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[]}
-        findings={[]}
-      />,
-    );
+    setup({ tenant });
 
     expect(screen.getByText('Provisioning — step 2 of 6')).toBeVisible();
     expect(
@@ -371,21 +306,15 @@ describe(TenantOverviewView, () => {
     // Each card's own rendering is covered by its own co-located test —
     // this only confirms `TenantOverviewView` actually threads the right
     // prop through to each one.
-    const tenant = makeTenant({
-      primaryDomain: 'acme.example.com',
-      sanityProjectId: 'proj-1',
+    setup({
+      tenant: makeTenant({
+        primaryDomain: 'acme.example.com',
+        sanityProjectId: 'proj-1',
+      }),
+      domainVerificationStatus: 'VERIFIED',
+      auditEvents: [makeEvent()],
+      findings: [makeFinding()],
     });
-    render(
-      <TenantOverviewView
-        tenant={tenant}
-        domainVerificationStatus="VERIFIED"
-        ownerEmail="owner@example.com"
-        ownerJoinedAt="Aug 12, 2026"
-        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[makeEvent()]}
-        findings={[makeFinding()]}
-      />,
-    );
 
     expect(screen.getByText('acme.example.com')).toBeVisible();
     expect(screen.getByText('Aug 12, 2026')).toBeVisible();
@@ -395,18 +324,7 @@ describe(TenantOverviewView, () => {
   });
 
   it('always renders "Open site", linking to the tenant\'s live domain', () => {
-    const tenant = makeTenant({ primaryDomain: 'acme.example.com' });
-    render(
-      <TenantOverviewView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-        ownerJoinedAt="Aug 12, 2026"
-        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[]}
-        findings={[]}
-      />,
-    );
+    setup({ tenant: makeTenant({ primaryDomain: 'acme.example.com' }) });
 
     const link = screen.getByRole('link', {
       name: 'Open site (opens in new tab)',
@@ -416,77 +334,35 @@ describe(TenantOverviewView, () => {
   });
 
   it('never renders an "Open Studio" action — the sidebar is the only entry point to Studio', () => {
-    const tenant = makeTenant();
-    render(
-      <TenantOverviewView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-        ownerJoinedAt="Aug 12, 2026"
-        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[]}
-        findings={[]}
-      />,
-    );
+    setup();
 
     expect(
       screen.queryByRole('link', { name: 'Open Studio →' }),
     ).not.toBeInTheDocument();
   });
 
-  it('shows the archived notice for a deprovisioned tenant', () => {
+  describe('archived tenant', () => {
     const archivedTenant = makeTenant({
       deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
     });
-    render(
-      <TenantOverviewView
-        tenant={archivedTenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-        ownerJoinedAt="Aug 12, 2026"
-        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[]}
-        findings={[]}
-      />,
-    );
 
-    expect(screen.getByText('This tenant is archived')).toBeVisible();
-  });
+    it('shows the archived notice', () => {
+      setup({ tenant: archivedTenant });
 
-  it("describes the details panel's disabled Save button with the archived notice, end to end", () => {
-    const archivedTenant = makeTenant({
-      deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      expect(screen.getByText('This tenant is archived')).toBeVisible();
     });
-    render(
-      <TenantOverviewView
-        tenant={archivedTenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-        ownerJoinedAt="Aug 12, 2026"
-        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[]}
-        findings={[]}
-      />,
-    );
 
-    expect(
-      screen.getByRole('button', { name: 'Save changes' }),
-    ).toHaveAccessibleDescription(/This tenant is archived/);
+    it("describes the details panel's disabled Save button with the archived notice, end to end", () => {
+      setup({ tenant: archivedTenant });
+
+      expect(
+        screen.getByRole('button', { name: 'Save changes' }),
+      ).toHaveAccessibleDescription(/This tenant is archived/);
+    });
   });
 
   it('does not show the archived notice for a live tenant', () => {
-    const liveTenant = makeTenant({ deprovisionedAt: null });
-    render(
-      <TenantOverviewView
-        tenant={liveTenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-        ownerJoinedAt="Aug 12, 2026"
-        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[]}
-        findings={[]}
-      />,
-    );
+    setup({ tenant: makeTenant({ deprovisionedAt: null }) });
 
     expect(
       screen.queryByText('This tenant is archived'),

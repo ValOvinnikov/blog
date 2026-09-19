@@ -1,8 +1,7 @@
 import { ERROR_CODE } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { updateDeprovisioningStep } from './update-deprovisioning-step';
 
@@ -10,10 +9,10 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
+const db = useQueryTestDb(getDbMock);
 
 async function insertDeprovisioningTenant(): Promise<string> {
-  const [tenant] = await db
+  const [tenant] = await db()
     .insert(schema.tenants)
     .values({
       name: 'Acme',
@@ -39,18 +38,13 @@ async function insertDeprovisioningTenant(): Promise<string> {
 
 const NOW = '2026-09-02T12:00:00.000Z';
 
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
 beforeEach(() => {
-  getDbMock.mockReturnValue(db);
   vi.useFakeTimers();
   vi.setSystemTime(new Date(NOW));
 });
 
 afterEach(async () => {
-  await db.delete(schema.tenants);
+  await db().delete(schema.tenants);
   vi.useRealTimers();
 });
 

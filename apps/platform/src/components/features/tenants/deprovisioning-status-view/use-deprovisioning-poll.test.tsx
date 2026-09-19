@@ -3,6 +3,7 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
 import {
+  doneDeprovisioningSteps,
   idleDeprovisioningSteps,
   makeTenant,
 } from '@platform/testing/tenants/fixtures';
@@ -24,6 +25,22 @@ vi.mock(
       getTenantDeprovisioningStatusActionMock,
   }),
 );
+
+/** A tenant whose REVOKE_SANITY_TOKENS step failed on a run that already finished — the shared arrangement every "stale FAILED run" test below starts from. */
+const makeFailedRevokeTenant = () =>
+  makeTenant({
+    deprovisioningSteps: {
+      ...idleDeprovisioningSteps(),
+      [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: {
+        status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+        error: 'Sanity Access API returned 403',
+      },
+      run: {
+        startedAt: '2026-08-12T14:18:00.000Z',
+        finishedAt: '2026-08-12T14:19:00.000Z',
+      },
+    },
+  });
 
 describe(useDeprovisioningPoll, () => {
   beforeEach(() => {
@@ -86,20 +103,9 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('reports FAILED with the failing step and its error when a step fails and nothing else is running', () => {
-      const tenant = makeTenant({
-        deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
-          [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error: 'Sanity Access API returned 403',
-          },
-          run: {
-            startedAt: '2026-08-12T14:18:00.000Z',
-            finishedAt: '2026-08-12T14:19:00.000Z',
-          },
-        },
-      });
-      const { result } = renderHook(() => useDeprovisioningPoll(tenant));
+      const { result } = renderHook(() =>
+        useDeprovisioningPoll(makeFailedRevokeTenant()),
+      );
 
       expect(result.current.overallStatus).toBe(
         TENANT_PROVISIONING_STEP_STATUS.FAILED,
@@ -116,21 +122,11 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('treats a deprovision request newer than a stale FAILED run as a fresh start, not the old failure', () => {
-      const tenant = makeTenant({
-        deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
-          [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error: 'Sanity Access API returned 403',
-          },
-          run: {
-            startedAt: '2026-08-12T14:18:00.000Z',
-            finishedAt: '2026-08-12T14:19:00.000Z',
-          },
-        },
-      });
       const { result } = renderHook(() =>
-        useDeprovisioningPoll(tenant, '2026-08-12T14:25:00.000Z'),
+        useDeprovisioningPoll(
+          makeFailedRevokeTenant(),
+          '2026-08-12T14:25:00.000Z',
+        ),
       );
 
       expect(result.current.deprovisioningSteps).toBeNull();
@@ -143,21 +139,11 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('keeps showing a stale FAILED run when the deprovision request is not newer than it', () => {
-      const tenant = makeTenant({
-        deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
-          [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error: 'Sanity Access API returned 403',
-          },
-          run: {
-            startedAt: '2026-08-12T14:18:00.000Z',
-            finishedAt: '2026-08-12T14:19:00.000Z',
-          },
-        },
-      });
       const { result } = renderHook(() =>
-        useDeprovisioningPoll(tenant, '2026-08-12T14:15:00.000Z'),
+        useDeprovisioningPoll(
+          makeFailedRevokeTenant(),
+          '2026-08-12T14:15:00.000Z',
+        ),
       );
 
       expect(result.current.overallStatus).toBe(
@@ -171,15 +157,9 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('reports DONE only once every step is done', () => {
-      const done = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
       const tenant = makeTenant({
         deprovisioningSteps: {
-          [DEPROVISIONING_STEP.REMOVE_DOMAIN]: done,
-          [DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT]: done,
-          [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: done,
-          [DEPROVISIONING_STEP.CLEAR_ARTIFACTS]: done,
-          [DEPROVISIONING_STEP.ARCHIVE_TENANT]: done,
-          [DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE]: done,
+          ...doneDeprovisioningSteps(),
           run: {
             startedAt: '2026-08-12T14:18:00.000Z',
             finishedAt: '2026-08-12T14:20:00.000Z',
@@ -273,24 +253,7 @@ describe(useDeprovisioningPoll, () => {
         run: { startedAt: '2026-08-12T14:18:00.000Z' },
       };
       const doneSteps = {
-        [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [DEPROVISIONING_STEP.CLEAR_ARTIFACTS]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [DEPROVISIONING_STEP.ARCHIVE_TENANT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
+        ...doneDeprovisioningSteps(),
         run: {
           startedAt: '2026-08-12T14:18:00.000Z',
           finishedAt: '2026-08-12T14:20:00.000Z',

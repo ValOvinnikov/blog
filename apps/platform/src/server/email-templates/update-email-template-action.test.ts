@@ -40,6 +40,30 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
+/** The shared happy-path arrangement: a resolved membership, plus whatever `upsertEmailTemplateMock` should resolve to for that test. */
+const mockMembershipAndUpsert = (
+  upsertResult: Partial<{
+    tenantId: string;
+    templateType: string;
+    subject: string | null;
+    body: TUpdateEmailTemplateInput['body'];
+    logoAssetUrl: string | undefined;
+  }> = {},
+) => {
+  requireTenantMembershipMock.mockResolvedValue({
+    tenant: { id: 'tenant-1' },
+    membership: { role: 'OWNER' },
+  });
+  upsertEmailTemplateMock.mockResolvedValue({
+    tenantId: 'tenant-1',
+    templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+    subject: VALID_INPUT.subject,
+    body: VALID_INPUT.body,
+    logoAssetUrl: undefined,
+    ...upsertResult,
+  });
+};
+
 const VALID_INPUT: TUpdateEmailTemplateInput = {
   subject: 'Sign in to Acme Co',
   body: [
@@ -67,17 +91,7 @@ describe(updateEmailTemplateAction, () => {
   });
 
   it('re-resolves the tenant from the session against the routed tenant id before writing anything', async () => {
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: 'tenant-1' },
-      membership: { role: 'OWNER' },
-    });
-    upsertEmailTemplateMock.mockResolvedValue({
-      tenantId: 'tenant-1',
-      templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      subject: VALID_INPUT.subject,
-      body: VALID_INPUT.body,
-      logoAssetUrl: undefined,
-    });
+    mockMembershipAndUpsert();
 
     const result = await updateEmailTemplateAction(
       'tenant-1',
@@ -117,17 +131,7 @@ describe(updateEmailTemplateAction, () => {
   });
 
   it('accepts a body whose link markDef has a safe href', async () => {
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: 'tenant-1' },
-      membership: { role: 'OWNER' },
-    });
-    upsertEmailTemplateMock.mockResolvedValue({
-      tenantId: 'tenant-1',
-      templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      subject: VALID_INPUT.subject,
-      body: VALID_INPUT.body,
-      logoAssetUrl: undefined,
-    });
+    mockMembershipAndUpsert();
 
     const input: TUpdateEmailTemplateInput = {
       subject: 'Sign in',
@@ -255,17 +259,7 @@ describe(updateEmailTemplateAction, () => {
   });
 
   it('accepts explicit nulls as "revert to product default"', async () => {
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: 'tenant-1' },
-      membership: { role: 'OWNER' },
-    });
-    upsertEmailTemplateMock.mockResolvedValue({
-      tenantId: 'tenant-1',
-      templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      subject: 'Default subject',
-      body: [],
-      logoAssetUrl: undefined,
-    });
+    mockMembershipAndUpsert({ subject: 'Default subject', body: [] });
 
     const result = await updateEmailTemplateAction(
       'tenant-1',
@@ -299,17 +293,7 @@ describe(updateEmailTemplateAction, () => {
   });
 
   it('records a SETTINGS_UPDATED audit event, with the operator as actor', async () => {
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: 'tenant-1' },
-      membership: { role: 'OWNER' },
-    });
-    upsertEmailTemplateMock.mockResolvedValue({
-      tenantId: 'tenant-1',
-      templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      subject: VALID_INPUT.subject,
-      body: VALID_INPUT.body,
-      logoAssetUrl: undefined,
-    });
+    mockMembershipAndUpsert();
 
     await updateEmailTemplateAction(
       'tenant-1',
@@ -327,35 +311,25 @@ describe(updateEmailTemplateAction, () => {
     });
   });
 
-  it('propagates the sign-in redirect the tenant gate throws when unauthenticated', async () => {
-    requireTenantMembershipMock.mockImplementation(() => {
-      throw new Error('NEXT_REDIRECT');
-    });
+  it.each([
+    ['the sign-in redirect', 'unauthenticated', 'NEXT_REDIRECT'],
+    ['the 404', 'the session has no membership', 'NEXT_NOT_FOUND'],
+  ])(
+    'propagates %s the tenant gate throws when %s',
+    async (_description, _reason, digest) => {
+      requireTenantMembershipMock.mockImplementation(() => {
+        throw new Error(digest);
+      });
 
-    await expect(
-      updateEmailTemplateAction(
-        'tenant-1',
-        EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-        VALID_INPUT,
-      ),
-    ).rejects.toThrow('NEXT_REDIRECT');
+      await expect(
+        updateEmailTemplateAction(
+          'tenant-1',
+          EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+          VALID_INPUT,
+        ),
+      ).rejects.toThrow(digest);
 
-    expect(upsertEmailTemplateMock).not.toHaveBeenCalled();
-  });
-
-  it('propagates the 404 the tenant gate throws when the session has no membership', async () => {
-    requireTenantMembershipMock.mockImplementation(() => {
-      throw new Error('NEXT_NOT_FOUND');
-    });
-
-    await expect(
-      updateEmailTemplateAction(
-        'tenant-1',
-        EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-        VALID_INPUT,
-      ),
-    ).rejects.toThrow('NEXT_NOT_FOUND');
-
-    expect(upsertEmailTemplateMock).not.toHaveBeenCalled();
-  });
+      expect(upsertEmailTemplateMock).not.toHaveBeenCalled();
+    },
+  );
 });

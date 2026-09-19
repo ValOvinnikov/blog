@@ -2,10 +2,9 @@ import { ERROR_CODE } from '@blog/config/constants';
 import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
-import { createTestDb } from '@blog/db/testing/create-test-db';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { setTenantProvisioningStatus } from './set-tenant-provisioning-status';
 
@@ -13,12 +12,12 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
+const db = useQueryTestDb(getDbMock);
 
 async function insertTenant(overrides?: {
   provisioningStatus?: (typeof TENANT_PROVISIONING_STATUS)[keyof typeof TENANT_PROVISIONING_STATUS];
 }): Promise<string> {
-  const tenant = await insertTestTenant(db, {
+  const tenant = await insertTestTenant(db(), {
     name: 'Acme',
     provisioningStatus: overrides?.provisioningStatus,
   });
@@ -26,16 +25,8 @@ async function insertTenant(overrides?: {
   return tenant.id;
 }
 
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
-
 afterEach(async () => {
-  await db.delete(schema.tenants);
+  await db().delete(schema.tenants);
 });
 
 describe(setTenantProvisioningStatus, () => {
@@ -76,7 +67,7 @@ describe(setTenantProvisioningStatus, () => {
       TENANT_PROVISIONING_STATUS.FAILED,
     );
 
-    const [row] = await db
+    const [row] = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenantId));

@@ -1,15 +1,9 @@
 import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
 import type { TTenantEmailBrand } from '@blog/email/html';
-import {
-  renderWithIntl,
-  screen,
-  waitFor,
-} from '@platform/testing/custom-render';
+import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 
 import { EmailTemplateEditor } from './email-template-editor';
-
-const render = renderWithIntl;
 
 const { updateEmailTemplateActionMock } = vi.hoisted(() => ({
   updateEmailTemplateActionMock: vi.fn(),
@@ -54,7 +48,19 @@ const BODY_WITH_TEXT = [
   },
 ];
 
-describe(EmailTemplateEditor, () => {
+const setup = customRender(EmailTemplateEditor, {
+  tenantId: 'tenant-1',
+  templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+  initialValues: {
+    subject: 'Sign in',
+    body: BODY_WITH_TEXT,
+    logoAssetUrl: undefined,
+  },
+  brand: BRAND,
+  brandName: 'Acme Co',
+});
+
+describe(`<${EmailTemplateEditor.name}/>`, () => {
   beforeEach(() => {
     updateEmailTemplateActionMock.mockReset();
     updateEmailTemplateActionMock.mockResolvedValue({
@@ -70,19 +76,13 @@ describe(EmailTemplateEditor, () => {
   });
 
   it('renders the given subject and template label', () => {
-    render(
-      <EmailTemplateEditor
-        tenantId="tenant-1"
-        templateType={EMAIL_TEMPLATE_TYPE.MAGIC_LINK}
-        initialValues={{
-          subject: 'Sign in to Acme Co',
-          body: BODY_WITH_TEXT,
-          logoAssetUrl: undefined,
-        }}
-        brand={BRAND}
-        brandName="Acme Co"
-      />,
-    );
+    setup({
+      initialValues: {
+        subject: 'Sign in to Acme Co',
+        body: BODY_WITH_TEXT,
+        logoAssetUrl: undefined,
+      },
+    });
 
     expect(screen.getByDisplayValue('Sign in to Acme Co')).toBeInTheDocument();
     expect(
@@ -91,19 +91,7 @@ describe(EmailTemplateEditor, () => {
   });
 
   it('states that the locked action always renders and cannot be edited here', () => {
-    render(
-      <EmailTemplateEditor
-        tenantId="tenant-1"
-        templateType={EMAIL_TEMPLATE_TYPE.MAGIC_LINK}
-        initialValues={{
-          subject: 'Sign in',
-          body: BODY_WITH_TEXT,
-          logoAssetUrl: undefined,
-        }}
-        brand={BRAND}
-        brandName="Acme Co"
-      />,
-    );
+    setup();
 
     expect(
       screen.getByText(/always renders and can't be edited here/),
@@ -111,19 +99,7 @@ describe(EmailTemplateEditor, () => {
   });
 
   it('saves an edited subject as-is', async () => {
-    render(
-      <EmailTemplateEditor
-        tenantId="tenant-1"
-        templateType={EMAIL_TEMPLATE_TYPE.MAGIC_LINK}
-        initialValues={{
-          subject: 'Sign in',
-          body: BODY_WITH_TEXT,
-          logoAssetUrl: undefined,
-        }}
-        brand={BRAND}
-        brandName="Acme Co"
-      />,
-    );
+    setup();
 
     const user = userEvent.setup();
     const subjectInput = screen.getByDisplayValue('Sign in');
@@ -141,19 +117,7 @@ describe(EmailTemplateEditor, () => {
   });
 
   it('sends null, not an empty string, when the subject is cleared', async () => {
-    render(
-      <EmailTemplateEditor
-        tenantId="tenant-1"
-        templateType={EMAIL_TEMPLATE_TYPE.MAGIC_LINK}
-        initialValues={{
-          subject: 'Sign in',
-          body: BODY_WITH_TEXT,
-          logoAssetUrl: undefined,
-        }}
-        brand={BRAND}
-        brandName="Acme Co"
-      />,
-    );
+    setup();
 
     const user = userEvent.setup();
     await user.clear(screen.getByDisplayValue('Sign in'));
@@ -169,19 +133,13 @@ describe(EmailTemplateEditor, () => {
   });
 
   it('sends null for a body that is blank (a single empty default paragraph)', async () => {
-    render(
-      <EmailTemplateEditor
-        tenantId="tenant-1"
-        templateType={EMAIL_TEMPLATE_TYPE.MAGIC_LINK}
-        initialValues={{
-          subject: 'Sign in',
-          body: [],
-          logoAssetUrl: undefined,
-        }}
-        brand={BRAND}
-        brandName="Acme Co"
-      />,
-    );
+    setup({
+      initialValues: {
+        subject: 'Sign in',
+        body: [],
+        logoAssetUrl: undefined,
+      },
+    });
 
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
@@ -203,19 +161,7 @@ describe(EmailTemplateEditor, () => {
           resolveAction = resolve;
         }),
     );
-    render(
-      <EmailTemplateEditor
-        tenantId="tenant-1"
-        templateType={EMAIL_TEMPLATE_TYPE.MAGIC_LINK}
-        initialValues={{
-          subject: 'Sign in',
-          body: BODY_WITH_TEXT,
-          logoAssetUrl: undefined,
-        }}
-        brand={BRAND}
-        brandName="Acme Co"
-      />,
-    );
+    setup();
 
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Save changes' }));

@@ -2,10 +2,9 @@ import { PRESET_ID } from '@blog/config/constants';
 import { MEMBERSHIP_ROLE, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
-import { createTestDb } from '@blog/db/testing/create-test-db';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { deleteTenant } from './delete-tenant';
 
@@ -13,7 +12,7 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
+const db = useQueryTestDb(getDbMock);
 
 async function insertTenant(
   options: {
@@ -23,7 +22,7 @@ async function insertTenant(
 ): Promise<string> {
   const { archived = true, sanityProjectId } = options;
 
-  const tenant = await insertTestTenant(db, {
+  const tenant = await insertTestTenant(db(), {
     name: 'Acme',
     status: archived ? TENANT_STATUS.ARCHIVED : TENANT_STATUS.ACTIVE,
     deprovisionedAt: archived ? new Date() : undefined,
@@ -33,22 +32,14 @@ async function insertTenant(
   return tenant.id;
 }
 
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
-
 afterEach(async () => {
-  await db.delete(schema.siteConfig);
-  await db.delete(schema.tenantDomains);
-  await db.delete(schema.bookmarks);
-  await db.delete(schema.subscribers);
-  await db.delete(schema.memberships);
-  await db.delete(schema.users);
-  await db.delete(schema.tenants);
+  await db().delete(schema.siteConfig);
+  await db().delete(schema.tenantDomains);
+  await db().delete(schema.bookmarks);
+  await db().delete(schema.subscribers);
+  await db().delete(schema.memberships);
+  await db().delete(schema.users);
+  await db().delete(schema.tenants);
 });
 
 describe(deleteTenant, () => {
@@ -59,7 +50,7 @@ describe(deleteTenant, () => {
 
     expect(result).toEqual({ outcome: 'deleted', sanityProject: 'no-project' });
 
-    const remaining = await db
+    const remaining = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenantId));
@@ -73,7 +64,7 @@ describe(deleteTenant, () => {
 
     expect(result).toEqual({ outcome: 'not-archived' });
 
-    const remaining = await db
+    const remaining = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenantId));
@@ -90,26 +81,26 @@ describe(deleteTenant, () => {
 
   it('cascades to dependent membership and tenant_domains rows for that tenant', async () => {
     const tenantId = await insertTenant({ archived: true });
-    await db.insert(schema.users).values({ id: 'user-1' });
-    await db.insert(schema.memberships).values({
+    await db().insert(schema.users).values({ id: 'user-1' });
+    await db().insert(schema.memberships).values({
       userId: 'user-1',
       tenantId,
       role: MEMBERSHIP_ROLE.OWNER,
     });
-    await db.insert(schema.tenantDomains).values({
+    await db().insert(schema.tenantDomains).values({
       tenantId,
       domain: 'acme.example.com',
     });
 
     await deleteTenant(tenantId);
 
-    const remainingMemberships = await db
+    const remainingMemberships = await db()
       .select()
       .from(schema.memberships)
       .where(eq(schema.memberships.tenantId, tenantId));
     expect(remainingMemberships).toEqual([]);
 
-    const remainingDomains = await db
+    const remainingDomains = await db()
       .select()
       .from(schema.tenantDomains)
       .where(eq(schema.tenantDomains.tenantId, tenantId));
@@ -118,7 +109,7 @@ describe(deleteTenant, () => {
 
   it('cascades to a dependent site_config row for that tenant', async () => {
     const tenantId = await insertTenant({ archived: true });
-    await db.insert(schema.siteConfig).values({
+    await db().insert(schema.siteConfig).values({
       tenantId,
       preset: PRESET_ID.CONSOLE,
       accentHue: 250,
@@ -130,7 +121,7 @@ describe(deleteTenant, () => {
 
     await deleteTenant(tenantId);
 
-    const remainingSiteConfig = await db
+    const remainingSiteConfig = await db()
       .select()
       .from(schema.siteConfig)
       .where(eq(schema.siteConfig.tenantId, tenantId));
@@ -139,12 +130,12 @@ describe(deleteTenant, () => {
 
   it('cascades to dependent subscriber and bookmark rows for that tenant', async () => {
     const tenantId = await insertTenant({ archived: true });
-    await db.insert(schema.users).values({ id: 'user-1' });
-    await db.insert(schema.subscribers).values({
+    await db().insert(schema.users).values({ id: 'user-1' });
+    await db().insert(schema.subscribers).values({
       tenantId,
       email: 'reader@example.com',
     });
-    await db.insert(schema.bookmarks).values({
+    await db().insert(schema.bookmarks).values({
       tenantId,
       userId: 'user-1',
       postId: 'post-1',
@@ -152,13 +143,13 @@ describe(deleteTenant, () => {
 
     await deleteTenant(tenantId);
 
-    const remainingSubscribers = await db
+    const remainingSubscribers = await db()
       .select()
       .from(schema.subscribers)
       .where(eq(schema.subscribers.tenantId, tenantId));
     expect(remainingSubscribers).toEqual([]);
 
-    const remainingBookmarks = await db
+    const remainingBookmarks = await db()
       .select()
       .from(schema.bookmarks)
       .where(eq(schema.bookmarks.tenantId, tenantId));
@@ -232,7 +223,7 @@ describe('deleteTenant — Sanity project deletion', () => {
       sanityProject: 'already-gone',
     });
 
-    const remaining = await db
+    const remaining = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenantId));
@@ -263,7 +254,7 @@ describe('deleteTenant — Sanity project deletion', () => {
       sanityProject: 'left-archived',
     });
 
-    const remaining = await db
+    const remaining = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenantId));
@@ -279,7 +270,7 @@ describe('deleteTenant — Sanity project deletion', () => {
 
     await expect(deleteTenant(tenantId, 'mgmt-token')).rejects.toThrow(/403/);
 
-    const remaining = await db
+    const remaining = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenantId));
