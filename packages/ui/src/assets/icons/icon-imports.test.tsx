@@ -3,11 +3,6 @@ import { render, screen } from '@testing-library/react';
 import SunIcon from './sun.svg';
 import sunIconUrl from './sun.svg?url';
 
-// Smoke test for the build-tooling contract the icon registry depends on:
-// a bare `.svg` import resolves to an SVGR React component, and the `?url`
-// suffix resolves to the emitted asset URL — see packages/ui/vitest.config.ts,
-// packages/ui/.storybook/main.ts, and apps/web/next.config.ts for the
-// per-bundler config this proves.
 describe('svg import tooling', () => {
   it('resolves a bare .svg import to a renderable React component (SVGR)', () => {
     render(<SunIcon data-testid="sun-icon" />);

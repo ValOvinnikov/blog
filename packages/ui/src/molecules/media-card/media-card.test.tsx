@@ -74,14 +74,12 @@ describe(`<${MediaCard.name}/>`, () => {
     expect(screen.getByText('typescript')).toBeVisible();
   });
 
-  it('renders author name when provided via MediaCard.Footer', () => {
+  it("renders author name when provided via MediaCard.Footer, distinguished from the Avatar's visually-hidden duplicate by its missing sr-only class", () => {
     renderElement(
       <MediaCard>
         <MediaCard.Footer authorName="Jane Doe" />
       </MediaCard>,
     );
-    // `sr-only` is the sole observable that distinguishes the visible name
-    // span from the Avatar's visually-hidden duplicate of the same text.
     const visibleName = screen
       .getAllByText('Jane Doe')
       .find((el) => !el.classList.contains('sr-only'));
