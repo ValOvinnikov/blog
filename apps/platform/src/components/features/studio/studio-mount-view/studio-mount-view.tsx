@@ -13,9 +13,8 @@ export type TStudioMountViewProps = {
 };
 
 /**
- * Studio owns everything under its catch-all with its own client-side
- * router — shared by the platform-operator and tenant-dashboard Studio
- * routes, which differ only in how `tenant` and `basePath` are resolved.
+ * Studio owns everything under its catch-all route with its own
+ * client-side router.
  */
 export const StudioMountView = async ({
   tenant,
