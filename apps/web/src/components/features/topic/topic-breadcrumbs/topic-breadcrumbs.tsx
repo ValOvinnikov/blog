@@ -17,11 +17,6 @@ export type TTopicBreadcrumbsProps = {
   tenant: string;
 };
 
-/**
- * TopicBreadcrumbs — the topic archive's Home › {topic} trail, rendered
- * alongside its `BreadcrumbList` JSON-LD. Fetches the cached page and its
- * own `breadcrumbs` copy.
- */
 export const TopicBreadcrumbs = async ({
   slug,
   tenant,

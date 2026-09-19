@@ -97,10 +97,6 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
   });
 
   it("does not re-report when `t`'s identity changes but the error does not", () => {
-    // `NextIntlClientProvider` memoizes `t` on its `messages` prop identity
-    // (among other things) — a fresh object with the same content forces a
-    // genuinely new `t` reference on the next render, independent of the
-    // app's current (incidental) provider stability.
     const { rerender } = render(
       <NextIntlClientProvider locale="en" messages={{ ...SITE_MESSAGES }}>
         <LocaleErrorPage error={error} reset={reset} />

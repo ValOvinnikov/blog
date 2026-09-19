@@ -27,9 +27,7 @@ export interface IIdentitySectionViewProps {
 }
 
 /**
- * Pure view for `IdentitySection`: the connected-accounts panel (provider
- * rows + display-name control). Each row and the display-name control
- * arrive already resolved by the wrapper — this component has no knowledge
+ * Each row and the display-name control arrive already resolved by the wrapper — this component has no knowledge
  * of the session, `@blog/db`, or translations.
  */
 export const IdentitySectionView = ({

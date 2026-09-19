@@ -6,7 +6,6 @@ import { deepAsideVariants } from './deep-aside-variants';
 
 export interface IDeepAsideProps {
   kind: TAsideKind;
-  /** Translated label for `kind` — supplied by the caller (`PortableTextRenderer`). */
   label: string;
   children: ReactNode;
 }
@@ -14,11 +13,10 @@ export interface IDeepAsideProps {
 const s = deepAsideVariants();
 
 /**
- * DeepAside — wraps `@blog/ui`'s `Aside` molecule in the CSS gate that
- * limits it to the `DEEP` reading depth. No client-side JS: visibility is
- * driven entirely by the nearest `DepthProvider` wrapper's `data-depth`
- * attribute via a `group-data-[depth=DEEP]/depth` selector, so it renders
- * server-side in the same static HTML at every depth.
+ * No client-side JS: visibility is driven entirely by the nearest
+ * `DepthProvider` wrapper's `data-depth` attribute via a
+ * `group-data-[depth=DEEP]/depth` selector, so it renders server-side in
+ * the same static HTML at every depth.
  *
  * @example
  * <DeepAside kind={ASIDE_KIND.DIGRESSION} label={t('asideKind.DIGRESSION')}>

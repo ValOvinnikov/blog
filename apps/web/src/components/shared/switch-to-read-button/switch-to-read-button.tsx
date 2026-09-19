@@ -5,12 +5,10 @@ import { Button } from '@blog/ui/atoms/button';
 import { useDepth } from '@web/context/depth-provider';
 
 export interface ISwitchToReadButtonProps {
-  /** Button copy — supplied by the caller (next-intl at the page level). */
   label: string;
 }
 
 /**
- * SwitchToReadButton — the `SkimPanel`'s "read the full article" affordance.
  * A small client leaf so `SkimPanel` itself can stay a server component
  * (per `web-component-practices`, the interactive bit is isolated to the
  * smallest leaf that actually needs `useDepth()`).

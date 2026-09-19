@@ -25,9 +25,7 @@ export type TAccountMenuProps = {
 };
 
 /**
- * `AuthMenu`'s logged-in render branch: an `Avatar`-triggered `PopoverMenu`
- * showing the session's name/email, "My bookmarks", "Account settings", and
- * "Sign out". The title is a plain styled label, not a heading —
+ * The title is a plain styled label, not a heading —
  * `role="menu"` doesn't own heading elements per the ARIA menu pattern, and
  * this panel renders ahead of every page's own `<h1>` in
  * `[tenant]/[locale]/layout.tsx`. Open/close state and refs come from the

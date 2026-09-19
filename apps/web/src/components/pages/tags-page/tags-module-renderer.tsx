@@ -33,10 +33,6 @@ export interface ITagsModuleRendererProps {
   tenant: string;
 }
 
-/**
- * TagsModuleRenderer — the tags-index page's own hero and heading fallback,
- * followed by the modules its schema allows.
- */
 export const TagsModuleRenderer = async ({
   hero,
   headingBlock,

@@ -12,13 +12,6 @@ vi.mock('next-auth/react', () => ({
   signIn: signInMock,
 }));
 
-/**
- * Minimal harness that wires the hook's state onto real form controls so the
- * DOM-dependent behaviour (focus-on-expand, submit, reset-on-close) can be
- * exercised directly against the hook, independent of `SignInMenu`. The
- * "toggle open" button stands in for `AuthMenu`'s own `usePopover()` state,
- * which this hook receives as a parameter rather than owning itself.
- */
 const Harness = () => {
   const [open, setOpen] = useState(true);
   const {

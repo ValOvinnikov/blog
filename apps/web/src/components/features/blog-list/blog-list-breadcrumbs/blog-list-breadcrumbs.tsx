@@ -14,10 +14,6 @@ export type TBlogListBreadcrumbsProps = {
   tenant: string;
 };
 
-/**
- * BlogListBreadcrumbs — the blog index's Home › Blog trail, rendered
- * alongside its `BreadcrumbList` JSON-LD.
- */
 export const BlogListBreadcrumbs = async ({
   tenant,
 }: TBlogListBreadcrumbsProps) => {

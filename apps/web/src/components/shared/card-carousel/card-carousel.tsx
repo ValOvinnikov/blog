@@ -24,12 +24,10 @@ export interface ICardCarouselProps extends IWithClassName, IWithDataTestId {
 const s = cardCarouselVariants();
 
 /**
- * CardCarousel — the `'use client'` wrapper that gives a row of cards
- * a swipeable carousel via `@blog/ui`'s `Carousel`. `renderItem` is defined
- * here rather than in a Server Component view because a function prop can
- * never cross the server→client boundary. The inner region is named
- * distinctly from the enclosing `Section`'s landmark so the two don't share
- * an identical name in the accessibility tree.
+ * `renderItem` is defined here rather than in a Server Component view
+ * because a function prop can never cross the server→client boundary. The
+ * inner region is named distinctly from the enclosing `Section`'s landmark
+ * so the two don't share an identical name in the accessibility tree.
  */
 export const CardCarousel = ({
   items,

@@ -16,8 +16,6 @@ import type { ReactNode } from 'react';
 
 import { PortableTextRenderer } from './portable-text-renderer';
 
-// Mocking ImageWithCaption keeps the layout assertion behavioural (a
-// data-layout attribute) rather than a CSS-class assertion.
 vi.mock('@blog/ui/molecules/image-with-caption', () => ({
   ImageWithCaption: ({
     layout,
@@ -49,8 +47,6 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
 
   it('renders an h1-style block downgraded to a level 2 heading, never a bare h1', () => {
     const value: TPortableTextBody = [
-      // 'h1' is no longer in the generated style union (Studio can't author
-      // one), but a legacy/malformed block could still reach this renderer.
       richTextBlock('h1' as TRichTextBlock['style'], [
         richTextSpan('Heading 1'),
       ]),

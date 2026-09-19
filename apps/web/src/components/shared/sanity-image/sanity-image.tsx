@@ -13,11 +13,6 @@ export interface ISanityImageProps {
   mode?: 'cover' | 'contain';
   sizes?: string;
   loading?: 'eager' | 'lazy';
-  /**
-   * Set on the confirmed LCP image of a page (e.g. a hero) to hint
-   * `fetchPriority="high"` on the image request. Never set by default —
-   * only one image per page should carry it.
-   */
   priority?: boolean;
   className?: string;
   alt?: string;

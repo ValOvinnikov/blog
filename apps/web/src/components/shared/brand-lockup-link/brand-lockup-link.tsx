@@ -3,16 +3,14 @@ import { SmartLink } from '@web/components/shared/smart-link';
 import { useTranslations } from 'next-intl';
 
 export interface IBrandLockupLinkProps {
-  /** The brand logo, already resolved to a rendered URL by the caller. */
   logoUrl?: string;
   tagline?: string;
 }
 
 /**
- * BrandLockupLink — the primary brand identity (logo mark), linked home.
  * Framework-coupled composition of `SmartLink` (routing) and `BrandLockup`
  * (`@blog/ui`, pure/prop-driven) — kept in `apps/web` because linking stays
- * out of `@blog/ui`. Used in the site header.
+ * out of `@blog/ui`.
  */
 export const BrandLockupLink = ({
   logoUrl,

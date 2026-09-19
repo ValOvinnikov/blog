@@ -17,11 +17,6 @@ export type TTagBreadcrumbsProps = {
   tenant: string;
 };
 
-/**
- * TagBreadcrumbs — the tag archive's Home › {tag} trail, rendered
- * alongside its `BreadcrumbList` JSON-LD. Fetches the cached page and its
- * own `breadcrumbs` copy.
- */
 export const TagBreadcrumbs = async ({
   slug,
   tenant,

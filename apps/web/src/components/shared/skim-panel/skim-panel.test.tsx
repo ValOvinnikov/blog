@@ -13,12 +13,6 @@ const takeaways: TPostTakeaways = {
   model: 'claude-haiku-4-5',
 };
 
-// `SkimPanel` renders `SwitchToReadButton`, a client leaf that reads
-// `useDepth()` — every render needs a `DepthProvider` ancestor, matching how
-// `BlogPostPage` composes it in practice. `SkimPanel` is itself an async
-// Server Component now (it reads its own translations), so this awaits its
-// resolved element before wrapping it in the provider for a synchronous RTL
-// render.
 const setup = async (overrides?: Partial<ISkimPanelProps>) => {
   const element = await SkimPanel({ takeaways, ...overrides });
   return renderElement(

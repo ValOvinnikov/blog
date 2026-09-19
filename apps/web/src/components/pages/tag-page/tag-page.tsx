@@ -13,12 +13,6 @@ type TTagPageProps = {
   tenant: string;
 };
 
-/**
- * TagPage — shared composition for `/tags/[slug]` (page 1, `page`
- * omitted) and `/tags/[slug]/page/[page]` (pages ≥ 2, `page` provided).
- * Fetches the `page_tag` shell once, then composes every other concern
- * as a self-fetching part reading the same cached `getTagPage` loader.
- */
 export const TagPage = async ({
   slug,
   page,

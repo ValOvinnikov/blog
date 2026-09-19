@@ -8,11 +8,6 @@ import { HomeModuleRenderer } from './home-module-renderer';
 
 type THomePageProps = ITenantLocalizedParams;
 
-/**
- * HomePage — `/` composition. Fetches the `page_home` document once and
- * composes every other concern as a self-fetching part reading the same
- * `getHomePage` call.
- */
 export const HomePage = async ({ locale, tenant }: THomePageProps) => {
   const tenantContext = await getTenantSanityContext(tenant);
   const result = await service.pages.home.v1.getHomePage(tenantContext);

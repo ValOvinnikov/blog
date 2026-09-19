@@ -24,12 +24,10 @@ const isNavItemActive = (pathname: string, href: string): boolean => {
 };
 
 /**
- * SiteNavigation — client wrapper around `PrimaryNavigation` that marks the
- * item matching the current route as active, and wires up the mobile
- * hamburger toggle. Open/closed state, focus management, and Escape/
- * outside-click dismissal live in `useMobileNavToggle` — this component only
- * supplies the real accessible name and closes the panel whenever the route
- * changes (so a nav link click never leaves it open on the next page).
+ * Open/closed state, focus management, and Escape/outside-click dismissal
+ * live in `useMobileNavToggle` — this component only supplies the real
+ * accessible name and closes the panel whenever the route changes (so a nav
+ * link click never leaves it open on the next page).
  */
 export const SiteNavigation = ({ links, actions }: TSiteNavigationProps) => {
   const t = useTranslations('siteNavigation');

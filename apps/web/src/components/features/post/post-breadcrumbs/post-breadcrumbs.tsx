@@ -17,11 +17,6 @@ export type TPostBreadcrumbsProps = {
   tenant: string;
 };
 
-/**
- * PostBreadcrumbs — the post detail's Home › Topic › Post trail, rendered
- * alongside its `BreadcrumbList` JSON-LD. Fetches the cached post and its
- * own `breadcrumbs` copy.
- */
 export const PostBreadcrumbs = async ({
   slug,
   tenant,

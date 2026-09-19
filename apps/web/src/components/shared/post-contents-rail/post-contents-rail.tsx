@@ -16,12 +16,6 @@ export type TPostContentsRailProps = {
 
 const s = postContentsRailVariants();
 
-/**
- * PostContentsRail — the "Topics" table of contents for long posts, rendered
- * by `BlogPostPage` once it has 3+ headings. A sticky rail at `lg:` and up
- * keeps the full list; below `lg:` a bordered selector shows the current
- * topic and opens a closed-by-default disclosure with the full list.
- */
 export const PostContentsRail = ({
   headings,
   className,

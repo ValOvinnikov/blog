@@ -10,7 +10,6 @@ export type TBlogPostingSchemaProps = {
   tenant: string;
 };
 
-/** BlogPostingSchema — the post detail's `BlogPosting` JSON-LD script. */
 export const BlogPostingSchema = async ({
   slug,
   tenant,
