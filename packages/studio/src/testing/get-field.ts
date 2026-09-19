@@ -3,11 +3,6 @@ type TSchemaWithFields<TField> = {
   fields?: readonly TField[];
 };
 
-/**
- * Looks up a field by name on a schema's `fields` array, throwing a clear
- * error naming the missing field and its schema — the lookup nearly every
- * schema test needs before asserting on a specific field's shape.
- */
 export const getField = <TField>(
   schema: TSchemaWithFields<TField>,
   name: string,

@@ -15,11 +15,6 @@ type TPostSourceDocument = { postSource?: string };
 export const PUBLISHED_POST_CONDITION =
   'publishedAt <= now() && defined(headingBlock.heading) && defined(author) && defined(topic) && defined(content) && defined(seo.metaTitle)';
 
-/**
- * Builds a document-level validator erroring when Post Source is Newest
- * Featured but no published post is marked Featured — shared by every
- * module offering that source, each supplying the noun for its own message.
- */
 export const validateNewestFeaturedHasCandidate =
   (renderTarget: string) =>
   async (

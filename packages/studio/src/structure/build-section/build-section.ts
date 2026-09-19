@@ -58,7 +58,6 @@ const buildGroupItem = (
   return S.documentTypeListItem(name).title(title).icon(icon);
 };
 
-/** Flattens groups into a flat item list, prefixing a titled group with a divider and leaving an untitled group bare. */
 export const buildGroupedListItems = (
   S: StructureBuilder,
   groups: TStructureGroup[],

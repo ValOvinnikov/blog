@@ -110,14 +110,11 @@ describe(buildGroupedListItems, () => {
       'listItem',
     ]);
 
-    // A divider precedes every group, including the first, carrying its title.
     expect(callArgs(result[0]!, 'title')).toEqual(['Group A']);
     expect(callArgs(result[3]!, 'title')).toEqual(['Group B']);
     expect(callArgs(result[5]!, 'title')).toEqual(['Group C']);
-    // Nothing trails the last group's items.
     expect(result.at(-1)?.kind).not.toBe('divider');
 
-    // Items preserve declared order within a group, not sorted.
     expect(result[1]?.documentType).toBe('moduleOne');
     expect(result[2]?.documentType).toBe('moduleTwo');
     expect(result[6]?.documentType).toBe('tagPage');
@@ -352,7 +349,7 @@ describe(buildSection, () => {
     expect(S.list).toHaveBeenCalledTimes(1);
   });
 
-  it('skips the middle list and children straight into the document list when flattenSingleItem is set on a single non-singleton item', () => {
+  it('skips the middle list and children straight into the document list when flattenSingleItem is set on a single non-singleton item, keeping the section title rather than the item schema title', () => {
     const section: TStructureSection = {
       title: 'Links',
       id: 'links',
@@ -380,7 +377,6 @@ describe(buildSection, () => {
     const childList = childArgs?.[0] as TMockBuilder;
     expect(childList.kind).toBe('documentTypeList');
     expect(childList.documentType).toBe('link');
-    // The flattened pane keeps the section's title ("Links"), not the item schema's ("Link") — flattening removes a nesting level, not the plural label.
     expect(callArgs(childList, 'title')).toEqual(['Links']);
     expect(S.documentTypeList).toHaveBeenCalledTimes(1);
     expect(S.list).not.toHaveBeenCalled();
