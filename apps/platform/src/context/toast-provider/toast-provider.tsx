@@ -32,7 +32,6 @@ interface IUseToast {
     promise: Promise<T>,
     messages: IToastPromiseMessages<T>,
   ) => Promise<T>;
-  /** Dismisses the toast with the given id, or the newest toast when omitted. */
   dismiss: (id?: string) => void;
 }
 
@@ -45,7 +44,7 @@ type TToastProviderProps = {
 const s = toastProviderVariants();
 
 /**
- * ToastProvider — mounted once near the app root (`[locale]/layout.tsx`).
+ * Mounted once near the app root (`[locale]/layout.tsx`).
  * Owns the toast queue through a framework-free `createToastStore` instance
  * (subscribed via `useSyncExternalStore`, so it renders an always-empty
  * queue on the server and never ships a toast in the static HTML), the
@@ -117,8 +116,6 @@ export const ToastProvider = ({ children }: TToastProviderProps) => {
     }
   }, [state.visible, store]);
 
-  // Esc dismisses whichever toast currently holds focus, or the newest
-  // toast when focus is elsewhere.
   useEffect(() => {
     if (state.visible.length === 0) return;
 

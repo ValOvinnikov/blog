@@ -31,8 +31,6 @@ const createTenantInputSchema = z.object({
     .regex(DOMAIN_PATTERN, 'Enter a valid domain.'),
   plan: z.enum(Object.values(TENANT_PLAN) as [TTenantPlan, ...TTenantPlan[]]),
   ownerEmail: z.string().trim().toLowerCase().email('Enter a valid email.'),
-  // Echoed back from the previously-shown ownerInviteConfirmation; verified
-  // server-side via HMAC before the not-found-owner branch may proceed.
   confirmOwnerInviteToken: z.string().optional(),
 });
 
@@ -46,11 +44,6 @@ export type TCreateTenantResult = {
   ok: false;
   error?: string;
   fieldErrors?: TCreateTenantFieldErrors;
-  // Present only for the not-yet-confirmed not-found-owner case: the Details
-  // form shows this message and lets the operator resubmit (unchanged
-  // email) to actually proceed down the invite path. `token` must be echoed
-  // back unchanged on that resubmit — it's what proves the confirmation was
-  // actually issued for this exact email.
   ownerInviteConfirmation?: { email: string; message: string; token: string };
 };
 

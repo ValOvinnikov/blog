@@ -19,7 +19,6 @@ export type TVoiceOverrides = Record<TVoiceOverrideKey, string>;
 
 export type TVoiceField = {
   key: TVoiceOverrideKey;
-  /** Longer-form copy (descriptions, empty states) renders as a `Textarea`; short prompts/commands/labels render as a single-line `TextInput`. */
   multiline?: boolean;
 };
 

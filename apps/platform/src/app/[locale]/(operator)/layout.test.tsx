@@ -22,8 +22,6 @@ vi.mock('@blog/db', () => ({
   queries: { admins: { getAdminByUserId: getAdminByUserIdMock } },
 }));
 
-// `OperatorBreadcrumb` links through `@platform/i18n/navigation`'s
-// `Link`/`usePathname` — mocked the same way as `sidebar.test.tsx`.
 vi.mock('@platform/i18n/navigation', () => ({
   usePathname: vi.fn(() => '/tenants'),
   Link: ({
@@ -37,9 +35,6 @@ vi.mock('@platform/i18n/navigation', () => ({
   ),
 }));
 
-// Widens the global `next/navigation` mock (`vitest-setup.ts`) with
-// `useParams`, which `OperatorBreadcrumb` now reads directly — that mock is
-// total, so a test needing an export it doesn't already stub must add it here.
 vi.mock('next/navigation', () => ({
   redirect: vi.fn(() => {
     throw new Error('NEXT_REDIRECT');

@@ -24,7 +24,6 @@ const withIntl = (ui: ReactElement, options?: RenderOptions) =>
 
 const successAction = vi.fn();
 
-/** Fires a distinct, known toast per button so tests can target one precisely. */
 const ToastHarness = () => {
   const toast = useToast();
 
@@ -170,8 +169,6 @@ describe(ToastProvider, () => {
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
-    // The accessible name concatenates the label and key-hint with no
-    // separating space ("Undo⌘Z"), so match by substring.
     fireEvent.click(screen.getByRole('button', { name: /^Undo/ }));
     act(() => {
       vi.advanceTimersByTime(TOAST_EXIT_ANIMATION_MS);
@@ -196,8 +193,6 @@ describe(ToastProvider, () => {
     });
     fireEvent.mouseEnter(toastEl);
 
-    // The default 3.6s life would have elapsed by now if the timer had kept
-    // running while hovered — it must still be present.
     act(() => {
       vi.advanceTimersByTime(4000);
     });
@@ -224,31 +219,17 @@ describe(ToastProvider, () => {
       name: 'Dismiss notification',
     });
 
-    // Hover pauses, then focus also enters (tabbing to the dismiss button)
-    // before the mouse leaves without focus moving. `.focus()`/`.blur()` are
-    // used directly (not `fireEvent.focus`/`fireEvent.blur`, which dispatch
-    // only the non-bubbling `focus`/`blur` events) so jsdom also fires the
-    // bubbling `focusin`/`focusout` React's delegated onFocus/onBlur listens
-    // for.
     fireEvent.mouseEnter(toastEl);
     act(() => {
       dismissButton.focus();
     });
-    // `relatedTarget` must be something *outside* the toast — React only
-    // synthesizes a `mouseleave` when the pointer's destination isn't a
-    // descendant of the element (moving onto a child, like the dismiss
-    // button, correctly does not count as leaving).
     fireEvent.mouseLeave(toastEl, { relatedTarget: document.body });
 
-    // The default 3.6s life would have elapsed by now if leaving with the
-    // mouse alone had resumed the timer — it must not have, since focus is
-    // still inside the toast.
     act(() => {
       vi.advanceTimersByTime(4000);
     });
     expect(screen.getByText('Saved to bookmarks')).toBeVisible();
 
-    // Only once focus *also* leaves does the timer actually resume.
     act(() => {
       dismissButton.blur();
     });
@@ -304,8 +285,6 @@ describe(ToastProvider, () => {
     const errorDismiss = screen.getAllByRole('button', {
       name: 'Dismiss notification',
     })[0]!;
-    // `fireEvent.focus` only dispatches the event — it doesn't move
-    // `document.activeElement` in jsdom, which the Esc handler reads.
     act(() => {
       errorDismiss.focus();
     });
@@ -327,8 +306,6 @@ describe(ToastProvider, () => {
 
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'fire-promise' }));
-      // Flushes the already-resolved promise's microtask so the `.then`
-      // callback (which enqueues the toast) runs before assertions.
       await Promise.resolve();
     });
 

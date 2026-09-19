@@ -5,9 +5,6 @@ import {
 
 describe('EMAIL_PORTABLE_TEXT_SCHEMA', () => {
   it('offers no block object or inline object types', () => {
-    // The action element (sign-in button, invite accept, unsubscribe link)
-    // must never be authorable from inside the body — no schema entry means
-    // the editor has no way to insert or represent one.
     expect(EMAIL_PORTABLE_TEXT_SCHEMA).not.toHaveProperty('blockObjects');
     expect(EMAIL_PORTABLE_TEXT_SCHEMA).not.toHaveProperty('inlineObjects');
   });

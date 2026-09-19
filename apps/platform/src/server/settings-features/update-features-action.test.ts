@@ -136,10 +136,6 @@ describe(updateFeaturesAction, () => {
     });
     upsertSettingsFeaturesMock.mockResolvedValue({});
 
-    // Simulates the post-downgrade payload: `newsletterEnabled` was a
-    // stale `true` from when the tenant was GROWTH, but the client clamps
-    // it to `false` before this action ever sees it (see
-    // `clampToEntitlement`) — only `commentsEnabled` was actually changed.
     const result = await updateFeaturesAction('tenant-1', {
       ...VALID_INPUT,
       commentsEnabled: false,

@@ -34,8 +34,6 @@ describe(computeTenantFieldLocks, () => {
       },
     };
 
-    // primaryDomain — the field that actually caused the failure — stays
-    // editable, since MAP_DOMAIN itself never reached DONE.
     expect(
       computeTenantFieldLocks(
         failedAtMapDomain,
@@ -138,10 +136,6 @@ describe(computeTenantFieldLocks, () => {
       TENANT_PROVISIONING_STATUS.READY,
     );
 
-    // A hypothetical FAILED OWNER_ELEVATION entry is the strongest possible
-    // proof the allowlist truly excludes it — if this leaked into the fold
-    // (e.g. via `Object.values(steps ?? {})`), the state would flip to
-    // 'FAILED' and every field lock below would change.
     const withFailedOwnerElevation = computeTenantFieldLocks(
       {
         ...coreStepsDone,
@@ -164,10 +158,6 @@ describe(computeTenantFieldLocks, () => {
   });
 
   it('locks every field with a "running" reason once provisioningStatus is PROVISIONING, even while every step is still IDLE', () => {
-    // This is the actual regression: `beginTenantProvisioning` moves the
-    // column to PROVISIONING before its runner reports any step, so the
-    // steps map alone can't be trusted to decide whether provisioning is
-    // in flight.
     expect(
       computeTenantFieldLocks(
         idleProvisioningSteps(),
