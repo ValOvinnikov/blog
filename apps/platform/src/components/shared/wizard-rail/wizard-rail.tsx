@@ -9,7 +9,6 @@ export type TWizardRailStep = {
 
 type TWizardRailProps = {
   steps: TWizardRailStep[];
-  /** Zero-based index of the step currently underway. */
   activeIndex: number;
   ariaLabel: string;
   className?: string;

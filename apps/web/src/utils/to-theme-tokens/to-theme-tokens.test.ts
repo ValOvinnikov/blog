@@ -6,9 +6,6 @@ import {
 
 import { toThemeTokens } from './to-theme-tokens';
 
-// The guard itself is covered by @blog/config's own accent-hue-guard.test.ts;
-// mocked here so one test below can force the AA-fallback branch without
-// depending on which hues happen to pass or fail the real contrast math.
 vi.mock('@blog/config', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/config')>()),
   isAccentHueAccessible: vi.fn(),

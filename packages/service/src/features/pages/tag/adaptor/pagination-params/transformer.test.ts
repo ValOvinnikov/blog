@@ -27,9 +27,6 @@ describe('toTagPaginationParams', () => {
     ).toEqual([]);
   });
 
-  // A tag page with no list module in modules[] contributes no extra pages
-  // rather than failing the whole site's static params — see the rationale
-  // in transformer.ts.
   it('contributes no entries for a tag page with no list module in modules[]', () => {
     expect(
       toTagPaginationParams([

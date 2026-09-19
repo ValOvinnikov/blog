@@ -30,6 +30,4 @@ export const landingPageQuery = q
       .nullable(),
     seo: sub.field('seo').project(seoFragment).notNull(),
   }))
-  // Nullable, not `.notNull()`: no matching `page_landing` is an ordinary
-  // not-found, not a parse failure — the loader turns `null` into `undefined`.
   .nullable(true);

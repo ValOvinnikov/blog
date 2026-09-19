@@ -13,10 +13,6 @@ const { usePathnameMock } = vi.hoisted(() => ({
   usePathnameMock: vi.fn(),
 }));
 
-// `TopbarNavMenu` resolves each link's active state via `@platform/i18n/navigation`
-// (next-intl's locale-aware `usePathname`) and links through its `Link`, not
-// plain `next/link`/`next/navigation` — mocking the wrong module here would
-// let a broken import ship unnoticed (see `sidebar.test.tsx`'s identical mock).
 vi.mock('@platform/i18n/navigation', () => ({
   usePathname: usePathnameMock,
   Link: ({

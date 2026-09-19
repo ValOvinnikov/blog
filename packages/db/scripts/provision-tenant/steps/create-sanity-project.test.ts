@@ -202,9 +202,6 @@ describe(createTenantSanityProject, () => {
       sanityDataset: 'test-dataset',
     });
 
-    // The persist call must land immediately after project creation and
-    // before any dataset/CORS work — a retry after a later failure must
-    // never re-mint a project it can no longer find.
     expect(callOrder.indexOf('createSanityProject')).toBe(0);
     expect(callOrder.indexOf('setTenantSanityProject')).toBe(1);
     expect(callOrder.indexOf('setTenantSanityProject')).toBeLessThan(
@@ -430,8 +427,6 @@ describe(createTenantSanityProject, () => {
       sanityProjectId: 'proj456',
       sanityDataset: 'test-dataset',
     });
-    // The project, dataset, and CORS work already landed before the invite
-    // call — a retry must not re-do that work.
     expect(setTenantSanityProjectMock).toHaveBeenCalledWith('tenant-1', {
       sanityProjectId: 'proj456',
       sanityDataset: 'test-dataset',

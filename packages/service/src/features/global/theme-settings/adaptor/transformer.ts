@@ -15,8 +15,6 @@ export function toThemeTokens(raw: TRawThemeSettings): TThemeTokens {
   const base = PRESET_REGISTRY[preset].themeTokens;
 
   const requestedAccentHue = raw?.accentHue ?? base.accentHue;
-  // A tenant override that fails AA falls back to the preset's own accentHue,
-  // so an inaccessible tint never ships.
   const accentHue = isAccentHueAccessible(requestedAccentHue)
     ? requestedAccentHue
     : base.accentHue;

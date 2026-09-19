@@ -14,10 +14,6 @@ export type TTopicsIndexBreadcrumbsProps = {
   tenant: string;
 };
 
-/**
- * TopicsIndexBreadcrumbs — the topics index's Home › Topics trail, rendered
- * alongside its `BreadcrumbList` JSON-LD.
- */
 export const TopicsIndexBreadcrumbs = async ({
   tenant,
 }: TTopicsIndexBreadcrumbsProps) => {

@@ -256,9 +256,6 @@ describe(checkDomainAvailability, () => {
   });
 
   it('returns ERROR without a false AVAILABLE when the page cap is exhausted without a conclusive answer', async () => {
-    // A fresh Response per call — reusing one instance across calls throws
-    // on the second `.json()` read and would mask the real exhaustion path
-    // behind the network-error branch instead.
     fetchMock.mockImplementation(() =>
       Promise.resolve(
         new Response(

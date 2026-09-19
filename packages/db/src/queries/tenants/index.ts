@@ -1,5 +1,3 @@
-// Barrel for the tenants query domain — one folder per query, re-exported
-// here as the `tenants` namespace (see ../index.ts).
 export * from './archive-tenant';
 export * from './begin-tenant-provisioning';
 export * from './clear-tenant-provisioning-artifacts';

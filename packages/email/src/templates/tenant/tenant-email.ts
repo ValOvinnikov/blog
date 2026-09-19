@@ -16,11 +16,8 @@ export type TBuildTenantEmailInput = {
   brandName: string;
   previewText?: string;
   body: TPortableTextContent;
-  /** Positioned after the body and before the footer, independent of `body` — omit for an email with no action. */
   action?: TEmailAction;
-  /** An uploaded tenant or per-template logo image; falls back to the generated mark when omitted. */
   logoImageUrl?: string;
-  /** Rendered beneath the copyright line in the footer. Omit for a send with no bulk-mail postal-address obligation. */
   footerPostalAddress?: string;
 };
 

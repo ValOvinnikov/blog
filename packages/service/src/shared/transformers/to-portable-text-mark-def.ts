@@ -35,7 +35,6 @@ function toPortableTextMarkDef(
   };
 }
 
-/** Resolves a Portable Text block's `markDefs` through the shared `link` document, keeping every other field on the block unchanged. */
 export function toPortableTextBlockWithResolvedLinks<
   TBlock extends { markDefs?: TRawPortableTextMarkDef[] | null },
 >(raw: TBlock): TPortableTextBlockWithResolvedLinks<TBlock> {

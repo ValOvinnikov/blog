@@ -2,14 +2,6 @@ import type { TTenant } from '@blog/db/schema/tenants';
 
 import { runSteps } from './run';
 
-/**
- * Exercises the real `archive-sanity-project` step (and the real
- * `sanity-management-client` beneath it) against a stubbed `fetch` — proving
- * deprovisioning archives the Sanity project via `isDisabledByUser`, rather
- * than mocking that step away like `run.test.ts` does for its
- * step-sequencing coverage.
- */
-
 const { removeTenantDomainMock } = vi.hoisted(() => ({
   removeTenantDomainMock: vi.fn(),
 }));

@@ -11,10 +11,6 @@ vi.mock('./get-effective-settings-features', () => ({
   getEffectiveSettingsFeatures: vi.fn(),
 }));
 
-// `isCapabilityEnabled` imports `PLAN_REGISTRY` directly from `@blog/db` —
-// mocked here (mirroring `@blog/db`'s real value) so this test never pulls
-// in the package's real `client.ts`, which validates `DATABASE_URL` at
-// import time.
 vi.mock('@blog/db', () => ({
   PLAN_REGISTRY: {
     FREE: ['COMMENTS', 'RATINGS', 'BOOKMARKS'],

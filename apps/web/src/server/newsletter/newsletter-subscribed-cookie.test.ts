@@ -34,9 +34,6 @@ describe(markNewsletterSubscribed, () => {
       expect.objectContaining({
         maxAge: 60 * 60 * 24 * 365,
         sameSite: 'lax',
-        // Not httpOnly — `NewsletterForm` reads this cookie client-side via
-        // `document.cookie` (see `has-newsletter-subscribed-cookie.ts`), so
-        // client JS must be able to see it.
         httpOnly: false,
       }),
     );

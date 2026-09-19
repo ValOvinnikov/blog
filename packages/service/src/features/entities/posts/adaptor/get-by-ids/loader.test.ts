@@ -28,9 +28,6 @@ describe(getPostsByIds, () => {
   });
 
   it('excludes ids that no longer resolve to a published post', async () => {
-    // A deleted/unpublished/future-dated post simply doesn't match the
-    // query's filters, so it's absent from the raw result — nothing extra
-    // for the loader/transformer to check.
     mockRun.mockResolvedValue([makeRawPostCard({ _id: 'a' })]);
 
     const result = await getPostsByIds(['a', 'deleted-id'], tenant);

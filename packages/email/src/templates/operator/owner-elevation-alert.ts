@@ -14,7 +14,6 @@ export type TOwnerElevationAlertInput = {
   outcome: keyof typeof OUTCOME_COPY;
 };
 
-/** Operator alert for a tenant whose owner elevation needs a human. */
 export function buildOwnerElevationAlertEmail({
   tenantName,
   tenantId,

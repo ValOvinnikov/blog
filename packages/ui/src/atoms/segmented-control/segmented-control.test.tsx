@@ -113,7 +113,7 @@ describe(`<${SegmentedControl.name}/>`, () => {
     expect(screen.getByRole('radio', { name: 'Deep' })).toHaveFocus();
   });
 
-  it('treats ArrowDown the same as ArrowRight, and ArrowUp the same as ArrowLeft', async () => {
+  it('treats ArrowDown the same as ArrowRight, and ArrowUp the same as ArrowLeft, re-rendering with the new value between presses since the controlled component re-derives currentIndex from value', async () => {
     const onChange = vi.fn();
     const { rerender } = setup({ onChange, value: DEPTH.READ });
     screen.getByRole('radio', { name: 'Read' }).focus();
@@ -122,8 +122,6 @@ describe(`<${SegmentedControl.name}/>`, () => {
     expect(onChange).toHaveBeenLastCalledWith(DEPTH.DEEP);
     expect(screen.getByRole('radio', { name: 'Deep' })).toHaveFocus();
 
-    // Simulate the caller applying the change before the next key press —
-    // a purely controlled component re-derives currentIndex from `value`.
     rerender(
       <SegmentedControl
         options={options}

@@ -12,10 +12,6 @@ import { useState, useTransition } from 'react';
 import { deleteAccountControlVariants } from './delete-account-control-variants';
 
 export type TDeleteAccountControlProps = {
-  /**
-   * The signed-in reader's derived handle (`toSessionUsername`) — the exact
-   * string (case-insensitively) they must retype to arm the delete button.
-   */
   handle: string;
 };
 

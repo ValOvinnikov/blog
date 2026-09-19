@@ -9,11 +9,9 @@ type TThemeScopeProps = {
 };
 
 /**
- * ThemeScope — establishes the given theme tokens for `children`: a
- * `next/font` variable class on a wrapper element, plus the resolved theme
- * `<style>` block. The `<style>` carries `precedence`/`href` so React
- * hoists it into `<head>` itself — this component can mount anywhere in
- * the tree with no ordering constraint on its siblings.
+ * The `<style>` carries `precedence`/`href` so React hoists it into
+ * `<head>` itself — this component can mount anywhere in the tree with no
+ * ordering constraint on its siblings.
  */
 export const ThemeScope = ({ themeTokens, children }: TThemeScopeProps) => {
   const fontVariableClassName = resolveFontVariableClassName(

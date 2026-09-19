@@ -8,23 +8,12 @@ import { topicChipListVariants } from './topic-chip-list-variants';
 
 export interface ITopicChipListProps {
   topics: TTopicsList;
-  /**
-   * Slug of the topic currently being viewed. Highlights that chip and
-   * marks it `aria-current="page"`; omit on `/blog` so the "All" chip is
-   * highlighted instead.
-   */
   activeSlug?: string;
 }
 
 /**
- * TopicChipList — static navigation row of topic archive links plus
- * an "All" chip back to the unfiltered blog index. Renders on `/blog` (no
- * `activeSlug`, "All" highlighted) and on `/topics/[slug]` archives
- * (`activeSlug` highlights the matching topic chip instead). Every link
- * is a real `<a>` via `SmartLink` — SEO navigation, not a client-side filter.
- *
- * @example
- * <TopicChipList topics={topics} activeSlug={topic.slug} />
+ * Every link is a real `<a>` via `SmartLink` — SEO navigation, not a
+ * client-side filter.
  */
 export const TopicChipList = ({ topics, activeSlug }: ITopicChipListProps) => {
   const t = useTranslations('topicChipList');

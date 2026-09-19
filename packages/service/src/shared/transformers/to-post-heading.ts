@@ -6,10 +6,6 @@ export type TPostHeading = {
   excerpt: TMaybeUndefined<string>;
 };
 
-/**
- * Maps a `page_post`'s `headingBlock` into its `title`/`excerpt` view-model
- * fields.
- */
 export function toPostHeading(raw: TRawHeadingBlock): TPostHeading {
   return { title: raw.heading, excerpt: raw.supportingText ?? undefined };
 }

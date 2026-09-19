@@ -32,11 +32,6 @@ export async function getTenantSanityCredentials(
     .from(tenants)
     .where(eq(tenants.id, tenantId));
 
-  // `sanityProjectId`/`sanityDataset` are nullable (a draft tenant has
-  // neither until provisioning step 1 runs), but provisioning always sets
-  // them before it ever persists a read token (step 3) — so a token without
-  // both is an inconsistent state this treats the same as "not set up yet"
-  // rather than a value to trust.
   if (
     !tenant?.sanityReadTokenEncrypted ||
     !tenant.sanityProjectId ||

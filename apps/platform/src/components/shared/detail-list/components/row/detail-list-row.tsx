@@ -7,11 +7,8 @@ import {
 
 export type TDetailListRowProps = {
   label: string;
-  /** Applies monospace styling to the value (a domain, id, or hostname). */
   isMono?: TDetailListVariants['isMono'];
-  /** The row's primary value — plain text or a `StatusBadge`. */
   children: ReactNode;
-  /** An optional trailing link/button, rendered after the value. */
   action?: ReactNode;
   className?: string;
 };

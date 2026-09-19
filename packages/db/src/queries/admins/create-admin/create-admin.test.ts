@@ -66,9 +66,6 @@ describe(createAdmin, () => {
       GRANTED_VIA.BREAK_GLASS,
     );
 
-    // A no-op insert leaves the existing row (and its role) as-is —
-    // re-granting a different role is a distinct, deliberate action this
-    // function does not perform implicitly.
     expect(second).toEqual(first);
     expect(second.role).toBe(ADMIN_ROLE.SUPERADMIN);
   });
@@ -130,9 +127,6 @@ describe(createAdmin, () => {
       .from(schema.admins)
       .where(eq(schema.admins.id, admin.id));
 
-    // grantedBy went NULL along with the deleted granter, but grantedVia
-    // still distinguishes this from a break-glass grant — the whole point
-    // of not overloading grantedBy's NULL with two meanings.
     expect(row?.grantedBy).toBeNull();
     expect(row?.grantedVia).toBe(GRANTED_VIA.PROMOTION);
   });

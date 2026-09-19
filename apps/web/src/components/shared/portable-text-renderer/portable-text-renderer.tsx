@@ -35,7 +35,6 @@ export interface IPortableTextRendererProps {
 
 const s = portableTextRendererVariants();
 
-/** Builds `h2`/`h3` block renderers that stamp each heading with its matching `id` from `headings`. */
 const headingBlockComponents = (
   headings: TPostHeading[],
 ): Record<'h2' | 'h3', PortableTextBlockComponent> => {

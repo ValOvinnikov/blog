@@ -25,10 +25,6 @@ async function setUpDbWithSiteConfigRow(
   const client = new PGlite();
   const db = drizzle(client, { schema });
 
-  // Every migration except the one under test runs up front, so the seed
-  // inserts below (built from the current Drizzle schema) always match the
-  // physical table — RETIRE_MIGRATION is a data-only UPDATE with no DDL of
-  // its own, so applying it last doesn't change what it's testing.
   const otherMigrations = listMigrationFiles().filter(
     (file) => file !== RETIRE_MIGRATION,
   );
@@ -77,8 +73,6 @@ async function readVoiceOverrides(
   return row.voiceOverrides;
 }
 
-// 0029 rewrites the single `voice_overrides` jsonb blob rather than a typed
-// column, so every case below asserts the object shape directly.
 describe(`${RETIRE_MIGRATION} (voiceOverrides key retirement + 404 key renames)`, () => {
   it(
     'strips every retired key and leaves the surviving keys untouched',
@@ -213,9 +207,6 @@ describe(`${RETIRE_MIGRATION} (voiceOverrides key retirement + 404 key renames)`
       await applyRetireMigration(db);
       const afterFirstRun = await readVoiceOverrides(db);
 
-      // The migration's own WHERE clause guards re-application; running its
-      // UPDATE statement again must be a genuine no-op, not just an
-      // observably-equal result.
       await applyMigrationFile(db, RETIRE_MIGRATION);
       const afterSecondRun = await readVoiceOverrides(db);
 

@@ -22,20 +22,16 @@ export type TSignInMenuProps = {
   triggerRef: RefObject<HTMLButtonElement | null>;
   panelRef: RefObject<HTMLDivElement | null>;
   oauthError: string | null;
-  /** Auth.js provider ids to render a button for, server-derived from credential presence. */
   oauthProviderIds: readonly TOAuthProviderId[];
 };
 
 /**
- * `AuthMenu`'s logged-out render branch: a `PopoverMenu.Panel` offering
- * GitHub, Google, and an inline-expanding email (magic-link) sign-in, plus
- * the OAuth redirect-back error notice. The title is a plain styled label,
- * not a heading — `role="menu"` doesn't own heading elements per the ARIA
- * menu pattern, and this panel renders ahead of every page's own `<h1>` in
- * `[tenant]/[locale]/layout.tsx`. The email sub-flow's state machine lives
- * in `useEmailSignIn`; open/close state and refs come from the parent's
- * single `usePopover()` call — this component never calls `usePopover()`
- * itself.
+ * The title is a plain styled label, not a heading — `role="menu"` doesn't
+ * own heading elements per the ARIA menu pattern, and this panel renders
+ * ahead of every page's own `<h1>` in `[tenant]/[locale]/layout.tsx`. The
+ * email sub-flow's state machine lives in `useEmailSignIn`; open/close state
+ * and refs come from the parent's single `usePopover()` call — this
+ * component never calls `usePopover()` itself.
  */
 export const SignInMenu = ({
   panelId,

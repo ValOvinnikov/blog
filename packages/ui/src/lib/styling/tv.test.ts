@@ -16,13 +16,7 @@ describe(tv, () => {
     expect(styles({ class: 'font-read' })).toBe('font-read');
   });
 
-  // Guards the same class of bug as the font-family cases above: without the
-  // custom `font-size` classGroup registration, tailwind-merge lumps custom
-  // text-<size> utilities (text-copy, text-lead, ...) into the same conflict
-  // group as custom text-<color> utilities (text-brand-primary,
-  // text-brand-primary-contrast, ...) and silently drops one when both are
-  // applied to the same element.
-  it('does not drop a text-<color> utility when a text-<size> utility is also applied', () => {
+  it('does not drop a text-<color> utility when a text-<size> utility is also applied, guarding against tailwind-merge lumping both into one conflict group and silently dropping one', () => {
     const styles = tv({ base: 'text-copy' });
     expect(styles({ class: 'text-brand-primary-contrast' })).toBe(
       'text-copy text-brand-primary-contrast',
@@ -36,13 +30,7 @@ describe(tv, () => {
     );
   });
 
-  // Guards the same class of bug as the font-size/font-family cases above:
-  // without the custom spacing classGroup registration, tailwind-merge has no
-  // catch-all for padding utilities, so a custom py-<token> (py-section) and
-  // the standard py-0 were classified as non-conflicting and both landed on
-  // the element, leaving the winner up to stylesheet order instead of tv()'s
-  // override intent.
-  it('resolves a conflicting custom py-<token> utility so the last one wins', () => {
+  it('resolves a conflicting custom py-<token> utility so the last one wins, guarding against tailwind-merge treating py-section and py-0 as non-conflicting with no padding catch-all', () => {
     const styles = tv({ base: 'py-section' });
     expect(styles({ class: 'py-0' })).toBe('py-0');
   });
@@ -52,12 +40,7 @@ describe(tv, () => {
     expect(styles({ class: 'py-0' })).toBe('px-gutter py-0');
   });
 
-  // Guards the same class of bug as the padding cases above: without the
-  // custom `tracking` classGroup registration, a base `tracking-tight` and a
-  // caller-supplied `tracking-label` were classified as non-conflicting and
-  // both landed on the element, leaving the winner up to stylesheet order
-  // instead of tv()'s override intent.
-  it('resolves a conflicting custom tracking-<token> utility so the last one wins', () => {
+  it('resolves a conflicting custom tracking-<token> utility so the last one wins, guarding against tailwind-merge treating tracking-tight and tracking-label as non-conflicting', () => {
     const styles = tv({ base: 'tracking-tight' });
     expect(styles({ class: 'tracking-label' })).toBe('tracking-label');
   });

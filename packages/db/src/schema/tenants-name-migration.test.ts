@@ -12,14 +12,6 @@ import { tenants } from './tenants';
 
 const BACKFILL_MIGRATION = '0009_quick_jazinda.sql';
 
-// Regression coverage for the same bug 0007_wide_silver_samurai.sql and
-// 0008_silly_xorn.sql originally shipped with (see
-// admins-granted-via-migration.test.ts): adding a NOT NULL column with no
-// default against a table that can already have rows fails outright.
-// `tenants` predates this column and already holds live rows (the sole
-// tenant seeded via `scripts/seed-tenant.ts`), so this proves the
-// nullable-add -> backfill -> SET NOT NULL sequence derives every
-// pre-existing row's name from its slug via SQL, not a hardcoded value.
 describe('0009_quick_jazinda (tenants name backfill)', () => {
   it(
     'backfills pre-existing tenant rows to a title-cased version of their slug',
@@ -39,8 +31,6 @@ describe('0009_quick_jazinda (tenants name backfill)', () => {
         await applyMigrationFile(db, file);
       }
 
-      // The `tenants` shape before this migration: no `name` column yet,
-      // matching rows created before this migration ever ran.
       await db.execute(
         sql.raw(`
         insert into "tenants"
@@ -54,16 +44,10 @@ describe('0009_quick_jazinda (tenants name backfill)', () => {
 
       await applyMigrationFile(db, BACKFILL_MIGRATION);
 
-      // Every migration after the one under test still needs applying too —
-      // the typed `tenants` table below reflects the current schema code, not
-      // just the state as of BACKFILL_MIGRATION, so a later additive column
-      // (e.g. the encrypted Sanity token) must exist in this test db as well
-      // for the select to succeed.
       for (const file of laterMigrations) {
         await applyMigrationFile(db, file);
       }
 
-      // Keyed by `primaryDomain`: this select must not depend on `slug`.
       const rows = await db
         .select()
         .from(tenants)

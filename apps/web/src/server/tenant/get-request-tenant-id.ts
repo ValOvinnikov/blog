@@ -5,9 +5,9 @@ import { TENANT_ID_HEADER } from './tenant-id-header';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from './unresolved-tenant-placeholder';
 
 /**
- * getRequestTenantId — resolves the request's tenant id, preferring an
- * explicitly supplied `tenant` (the `[tenant]` route param) over reading
- * the request header, since the header read is what makes a route dynamic.
+ * Resolves the request's tenant id, preferring an explicitly supplied
+ * `tenant` (the `[tenant]` route param) over reading the request header,
+ * since the header read is what makes a route dynamic.
  * `undefined` means neither is available, which is also what
  * `UNRESOLVED_TENANT_PLACEHOLDER` resolves to; a caller needing the full
  * tenant row goes through `resolveRequestTenant` instead.

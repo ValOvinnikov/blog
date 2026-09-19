@@ -38,10 +38,6 @@ export interface ITagModuleRendererProps {
   tenant: string;
 }
 
-/**
- * TagModuleRenderer — the tag page's own hero and heading fallback,
- * followed by the modules the tag page's schema allows.
- */
 export const TagModuleRenderer = async ({
   hero,
   headingBlock,

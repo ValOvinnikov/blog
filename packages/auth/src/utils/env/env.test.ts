@@ -22,8 +22,6 @@ function restoreEnv(): void {
   }
 }
 
-// `env.ts` validates eagerly on import (createEnv runs at module evaluation),
-// so each case needs a fresh module instance via resetModules + dynamic import.
 async function importEnv(): Promise<typeof import('./env')> {
   vi.resetModules();
   return import('./env');
@@ -50,8 +48,6 @@ describe('env', () => {
   describe('validation failure', () => {
     let consoleError: ReturnType<typeof vi.spyOn>;
 
-    // createEnv logs `❌ Invalid environment variables: [...]` via console.error
-    // right before throwing; suppress that expected output in these tests.
     beforeEach(() => {
       consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
     });

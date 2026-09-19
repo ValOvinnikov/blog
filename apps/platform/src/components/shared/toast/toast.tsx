@@ -11,9 +11,7 @@ export interface IToastAction {
 
 export type TToastProps = {
   type: TToastType;
-  /** Overlays the type glyph with a spinner for an in-flight `toast.promise` state. */
   isLoading?: boolean;
-  /** Short label shown, bolded, ahead of `message` — omit for a message-only toast. */
   title?: ReactNode;
   message: ReactNode;
   time?: string;

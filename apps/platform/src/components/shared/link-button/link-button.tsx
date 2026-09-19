@@ -21,7 +21,6 @@ export type TLinkButtonProps = {
   children?: ReactNode;
   className?: string;
   ariaLabel?: string;
-  /** Appends a decorative arrow, hidden from the accessible name. */
   hasArrow?: boolean;
 };
 

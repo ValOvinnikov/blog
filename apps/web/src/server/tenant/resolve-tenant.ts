@@ -5,8 +5,8 @@ import { isProductionEnvironment } from '@web/utils/is-production-environment';
 import { isTenantServable } from './is-tenant-servable';
 
 /**
- * resolveTenant — host→tenant lookup against `tenant_domains`, returning the
- * full tenant row (not just its id) so callers needing more than the id —
+ * Host→tenant lookup against `tenant_domains`, returning the full tenant
+ * row (not just its id) so callers needing more than the id —
  * `primaryDomain`, Sanity credentials — don't have to re-fetch it a second
  * time. A host matching a row that isn't `isTenantServable` (archived, or
  * still mid-provisioning with no Sanity credentials) resolves to `undefined`
@@ -49,9 +49,9 @@ const resolveSoleTenant = async (): Promise<TTenant | undefined> => {
 };
 
 /**
- * resolveTenantById — the `[tenant]` route param's counterpart to
- * `resolveTenant`'s `Host`-based lookup: given the tenant id `proxy.ts`
- * already validated and wrote onto the path, returns the full tenant row.
+ * The `[tenant]` route param's counterpart to `resolveTenant`'s `Host`-based
+ * lookup: given the tenant id `proxy.ts` already validated and wrote onto
+ * the path, returns the full tenant row.
  * No sole-tenant dev fallback — an id that fails to resolve is a data
  * integrity gap, not "no host matched".
  */

@@ -89,7 +89,7 @@ describe(`<${Pagination.name}/>`, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders links via linkAs when provided', () => {
+  it('renders links via linkAs when provided, one per page link plus prev and next', () => {
     const CustomLink = ({
       href,
       children,
@@ -104,7 +104,6 @@ describe(`<${Pagination.name}/>`, () => {
 
     setup({ linkAs: CustomLink });
 
-    // 3 page links + prev + next
     expect(screen.getAllByTestId('custom-link')).toHaveLength(5);
   });
 

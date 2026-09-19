@@ -35,9 +35,6 @@ vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
   getTenantSanityContext: getTenantSanityContextMock,
 }));
 
-// BookmarkButtonGate is an async Server Component, which can't render
-// nested inside another async component under @testing-library/react —
-// stubbed here; its own behavior is covered by bookmark-button-gate.test.tsx.
 vi.mock('@web/components/features/post/bookmark-button-gate', () => ({
   BookmarkButtonGate: ({ postId }: { postId: string }) => (
     <div data-testid="bookmark-button-gate">{postId}</div>

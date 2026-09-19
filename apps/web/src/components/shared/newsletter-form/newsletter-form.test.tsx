@@ -38,8 +38,6 @@ describe(`<${NewsletterForm.name}/>`, () => {
   });
 
   afterEach(() => {
-    // jsdom's `document.cookie` jar persists across `it`s in the same file —
-    // expire anything a test set so it never leaks into the next one.
     document.cookie =
       'newsletter_subscribed=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
   });

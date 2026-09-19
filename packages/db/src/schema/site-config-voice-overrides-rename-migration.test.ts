@@ -26,10 +26,6 @@ async function setUpDbWithSiteConfigRow(
   const client = new PGlite();
   const db = drizzle(client, { schema });
 
-  // Every migration except the one under test runs up front, so the seed
-  // inserts below (built from the current Drizzle schema) always match the
-  // physical table — RENAME_MIGRATION is a data-only UPDATE with no DDL of
-  // its own, so applying it last doesn't change what it's testing.
   const otherMigrations = listMigrationFiles().filter(
     (file) => file !== RENAME_MIGRATION,
   );
@@ -78,8 +74,6 @@ async function readVoiceOverrides(
   return row.voiceOverrides;
 }
 
-// 0018 rewrites the single `voice_overrides` jsonb blob rather than a typed
-// column, so every case below asserts the object shape directly.
 describe(`${RENAME_MIGRATION} (voiceOverrides categoryEmpty -> topicEmpty rename)`, () => {
   it(
     'renames categoryEmpty to topicEmpty and preserves its value alongside other keys',
@@ -154,9 +148,6 @@ describe(`${RENAME_MIGRATION} (voiceOverrides categoryEmpty -> topicEmpty rename
       await applyRenameMigration(db);
       const afterFirstRun = await readVoiceOverrides(db);
 
-      // The migration's own WHERE clause guards re-application; running its
-      // UPDATE statement again must be a genuine no-op, not just an
-      // observably-equal result.
       await applyMigrationFile(db, RENAME_MIGRATION);
       const afterSecondRun = await readVoiceOverrides(db);
 

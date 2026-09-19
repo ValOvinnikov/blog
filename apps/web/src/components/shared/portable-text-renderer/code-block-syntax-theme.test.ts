@@ -1,10 +1,5 @@
 import { codeBlockSyntaxTheme } from './code-block-syntax-theme';
 
-// This theme object is what makes the code block follow the site's active
-// `.dark` class instead of always rendering `oneDark`'s fixed dark palette:
-// the base surface entries must not carry a literal background, and every
-// token color must be a CSS custom property (resolved per-theme by
-// `:root`/`.dark` in `index.css`), never a literal hex/hsl value.
 describe('codeBlockSyntaxTheme', () => {
   it('strips the hard-coded background from both the code and pre base entries', () => {
     expect(codeBlockSyntaxTheme['code[class*="language-"]']?.background).toBe(

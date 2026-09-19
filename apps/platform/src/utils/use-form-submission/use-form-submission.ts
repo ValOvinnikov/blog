@@ -12,7 +12,6 @@ type TFormSubmissionStatus = 'idle' | 'success' | 'error';
 export type TUseFormSubmissionArgs<TValues, TResult extends { ok: boolean }> = {
   initialValues: TValues | (() => TValues);
   onSubmit: (values: TValues) => Promise<TResult>;
-  /** Runs only after a successful submit, with the values that were just submitted. */
   onSuccess?: (values: TValues, result: TResult) => void;
 };
 

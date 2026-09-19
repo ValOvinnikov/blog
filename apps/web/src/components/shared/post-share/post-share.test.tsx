@@ -28,9 +28,6 @@ const setup = customRender(PostShare, {
 const getTrigger = () =>
   screen.getByRole('button', { name: 'Share "Hello World"' });
 
-// Popover open/close/focus/dismissal mechanics are covered directly against the
-// hook in `@web/hooks/use-popover`; these tests cover only how `PostShare`
-// composes `PopoverMenu` (labels, the copy action, and the per-link items).
 describe(`<${PostShare.name}/>`, () => {
   beforeEach(() => {
     setup();
@@ -40,13 +37,6 @@ describe(`<${PostShare.name}/>`, () => {
     const trigger = getTrigger();
 
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    // Guards apps/web's `vitest.config.ts` SVGR setup: compiling this
-    // `@blog/ui` icon through apps/web's own Vitest bundling pipeline must
-    // keep `viewBox`, or the icon would render cropped once `Icon` resizes
-    // it via CSS to anything other than its native 24x24. The equivalent for
-    // the Turbopack rule in `next.config.ts` — the pipeline actually used by
-    // `next dev`/`next build` — isn't practically unit-testable at this
-    // layer; that fix is verified by a live dev-server check instead.
     expect(trigger.querySelector('svg')).toHaveAttribute(
       'viewBox',
       '0 0 24 24',

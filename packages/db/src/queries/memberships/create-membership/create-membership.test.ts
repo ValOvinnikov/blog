@@ -51,7 +51,6 @@ describe(createMembership, () => {
       MEMBERSHIP_ROLE.EDITOR,
     );
 
-    // Not updated to EDITOR — a no-op insert leaves the existing row as-is.
     expect(second).toEqual(first);
     const rows = await db().select().from(schema.memberships);
     expect(rows).toHaveLength(1);

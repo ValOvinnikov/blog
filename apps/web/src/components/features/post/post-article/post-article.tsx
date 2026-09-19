@@ -37,12 +37,6 @@ const AUTHOR_AVATAR_TRANSFORM: TImageTransformOptions = {
   quality: 75,
 };
 
-/**
- * PostArticle — the post detail's `Article.Header`/`Body`/`Footer` shell:
- * hero image, topic eyebrow, meta strip (bookmark + share), body with an
- * optional contents rail, and the tags footer. Fetches the cached post
- * itself.
- */
 export const PostArticle = async ({ slug, tenant }: TPostArticleProps) => {
   const result = await getPostPage(slug, tenant);
   const post = guardPageLoaderResult(result, 'post_article.fetch_failed', {

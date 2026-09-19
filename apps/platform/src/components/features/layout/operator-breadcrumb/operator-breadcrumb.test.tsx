@@ -4,8 +4,6 @@ import type { ComponentPropsWithoutRef } from 'react';
 
 import { OperatorBreadcrumb } from './operator-breadcrumb';
 
-// Links through `@platform/i18n/navigation`'s `Link`/`usePathname`, mocked the
-// same way as `sidebar.test.tsx`/`topbar-nav-menu.test.tsx`.
 vi.mock('@platform/i18n/navigation', () => ({
   usePathname: vi.fn(() => '/tenants'),
   Link: ({

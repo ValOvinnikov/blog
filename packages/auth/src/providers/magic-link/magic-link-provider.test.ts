@@ -67,10 +67,6 @@ describe(buildMagicLinkProvider, () => {
     expect(provider.type).toBe('email');
   });
 
-  // `env.ts` reads MAGIC_LINK_FROM_ADDRESS eagerly on import, and it's unset
-  // in this package's vitest env (`vitest.config.ts`) — so the default
-  // module state already exercises the fallback branch;
-  // `resolve-magic-link-from-address.test.ts` covers the configured case.
   it('resolves the from address via resolveMagicLinkFromAddress', () => {
     const provider = buildMagicLinkProvider();
 
@@ -80,8 +76,6 @@ describe(buildMagicLinkProvider, () => {
   it("delivers the sign-in link through @blog/email's sendEmail", async () => {
     const provider = buildMagicLinkProvider();
 
-    // `sendVerificationRequest` only reads `identifier`/`url`; the rest are
-    // filled with placeholders that satisfy the full param type.
     await provider.sendVerificationRequest({
       identifier: 'jane@example.com',
       url: 'https://example.com/api/auth/callback/email?token=abc',

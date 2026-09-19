@@ -2,11 +2,6 @@ import { FONT_CHOICE } from '@blog/config';
 
 import { resolveFontVariableClassName } from './fonts';
 
-// Overrides the global `next/font/google` stub from `vitest-setup.ts` (which
-// echoes back the `variable` *option* it was given — indistinguishable here,
-// since every heading font shares `--font-display-family` and every body
-// font shares `--font-body-family`) with one keyed by font name instead, so
-// assertions below can tell which specific font actually resolved.
 vi.mock('next/font/google', () => {
   const createFontMock = (fontName: string) => () => ({
     className: `mock-${fontName}-className`,

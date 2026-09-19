@@ -12,13 +12,13 @@ export interface ISectionProps extends IWithDataTestId {
 }
 
 /**
- * Section — the sole per-module landmark. Full-bleed `<section>` background
- * driven by `brandVariant`, vertical spacing as padding (not margin) so
- * stacked Sections tile edge-to-edge, wrapping a constrained inner `<div>`.
- * Module organisms compose into `children` without rendering their own
- * `<section>` landmark or outer spacing. `titleId` is optional — a module
- * with no unique heading (e.g. `ContentModule`) renders the landmark without
- * an `aria-labelledby` rather than pointing at an element that never renders.
+ * Full-bleed `<section>` background driven by `brandVariant`, vertical
+ * spacing as padding (not margin) so stacked Sections tile edge-to-edge,
+ * wrapping a constrained inner `<div>`. Module organisms compose into
+ * `children` without rendering their own `<section>` landmark or outer
+ * spacing. `titleId` is optional — a module with no unique heading (e.g.
+ * `ContentModule`) renders the landmark without an `aria-labelledby` rather
+ * than pointing at an element that never renders.
  */
 export const Section = ({
   brandVariant,

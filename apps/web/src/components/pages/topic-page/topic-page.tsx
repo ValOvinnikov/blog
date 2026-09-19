@@ -14,12 +14,6 @@ type TTopicPageProps = {
   tenant: string;
 };
 
-/**
- * TopicPage — shared composition for `/topics/[slug]` (page 1, `page`
- * omitted) and `/topics/[slug]/page/[page]` (pages ≥ 2, `page` provided).
- * Fetches the `page_topic` shell once, then composes every other concern
- * as a self-fetching part reading the same cached `getTopicPage` loader.
- */
 export const TopicPage = async ({
   slug,
   page,

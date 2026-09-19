@@ -94,7 +94,6 @@ describe(consumeMembershipInvite, () => {
       .where(eq(schema.membershipInvites.id, inviteId));
     expect(invite!.consumedAt).toBeNull();
 
-    // Retryable once a real user exists for that id.
     await insertTestUser(db(), { id: 'missing-user' });
     const membership = await consumeMembershipInvite(inviteId, 'missing-user');
     expect(membership).toMatchObject({ userId: 'missing-user', tenantId });
@@ -115,8 +114,6 @@ describe(consumeMembershipInvite, () => {
 
     const membership = await consumeMembershipInvite(inviteId, 'user-1');
 
-    // The pre-existing membership's role is untouched — this function only
-    // creates a membership, it never mutates an existing one.
     expect(membership).toEqual(existingMembership);
     const rows = await db().select().from(schema.memberships);
     expect(rows).toHaveLength(1);

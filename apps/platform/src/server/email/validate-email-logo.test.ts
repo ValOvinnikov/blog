@@ -2,7 +2,6 @@ import { MAX_EMAIL_LOGO_BYTES } from '@platform/utils/email-logo-limits/email-lo
 
 import { validateEmailLogoUpload } from './validate-email-logo';
 
-/** A minimal, CRC-less PNG — `image-size` only reads the IHDR chunk's fixed byte offsets, never validates checksums or decodes pixel data. */
 const buildPngBuffer = (width: number, height: number): Buffer => {
   const buffer = Buffer.alloc(33);
   buffer.write('\x89PNG\r\n\x1a\n', 0, 'latin1');
@@ -43,7 +42,6 @@ const gifFile = (width: number, height: number) => {
   );
 };
 
-/** A minimal lossy (VP8) WebP — real header/chunk bytes so `image-size` classifies it as `webp`, which is all this validator needs to reject it. */
 const buildWebpBuffer = (width: number, height: number): Buffer => {
   const buffer = Buffer.alloc(30);
   buffer.write('RIFF', 0, 'latin1');
@@ -99,11 +97,7 @@ describe(validateEmailLogoUpload, () => {
     expect(result.ok).toBe(true);
   });
 
-  // Regression test: the site-logo validator (`validateBrandAssetUpload`)
-  // accepts and sanitises SVG. This one must not — a future "unify the two
-  // validators" refactor should fail this test, not silently start
-  // accepting SVG email logos that render as nothing in Gmail/Outlook/Yahoo.
-  it('rejects an SVG even though it is well-formed and safe', async () => {
+  it('rejects an SVG even though it is well-formed and safe, unlike the site-logo validator', async () => {
     const result = await validateEmailLogoUpload(
       svgFile(
         '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"></svg>',

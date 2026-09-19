@@ -14,10 +14,6 @@ vi.mock('@blog/db', async () => ({
   queries: { siteConfig: { getSiteConfig: getSiteConfigMock } },
 }));
 
-// `LookForm` imports `updateLookAction`, which imports
-// `requireTenantMembership`, which imports the real `./auth` module —
-// mocked here (unused by this test otherwise) purely so that chain never
-// evaluates the real `NextAuth()` call at import time.
 vi.mock('@platform/server/auth/auth', () => ({ auth: vi.fn() }));
 
 const tenant = makeReadyTenant();

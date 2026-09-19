@@ -3,14 +3,6 @@ import type { TTenant } from '@blog/db/schema/tenants';
 
 import { runSteps } from './run';
 
-/**
- * Exercises the real `unarchiveSanityProject` client (via a stubbed
- * `fetch`) end to end through `runSteps`, proving that re-provisioning a
- * tenant `deprovision-tenant` had archived actually restores its Sanity
- * project's API/CDN access, rather than mocking the client away like
- * `run.test.ts` does for its step-sequencing coverage.
- */
-
 const { reactivateTenantMock } = vi.hoisted(() => ({
   reactivateTenantMock: vi.fn(),
 }));

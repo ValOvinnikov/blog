@@ -30,9 +30,6 @@ const getCachedEffectiveSettingsFeaturesForTenant = (tenantId: string) =>
     },
   )(tenantId);
 
-// `getRequestTenantId`'s `headers()` read must stay outside this
-// `safeAsync` boundary: its `DynamicServerError` is Next's signal that the
-// route is dynamic, and swallowing it renders the route static, then 500s.
 const getEffectiveSettingsFeaturesForTenantId = safeAsync(
   async (
     tenantId?: string,
@@ -43,15 +40,12 @@ const getEffectiveSettingsFeaturesForTenantId = safeAsync(
 );
 
 /**
- * getEffectiveSettingsFeatures — the `settings_features` counterpart to
- * `getSiteConfig`: resolves the tenant's current per-capability toggle
- * state, falling back to their *live* `site_config.preset`'s
- * `featureDefaults` when no `settings_features` row exists yet. Read at
- * request time rather than eagerly seeded at provisioning, so a later
- * preset change is always reflected — `settings_features` is never
- * eagerly inserted anywhere (mirrors `site_config`'s own lazy-default
- * precedent). Cached per tenant, same as `getSiteConfig`. Accepts the
- * `[tenant]` route param and forwards it to `getRequestTenantId`.
+ * Resolves the tenant's current per-capability toggle state, falling back to
+ * their *live* `site_config.preset`'s `featureDefaults` when no
+ * `settings_features` row exists yet. Read at request time rather than
+ * eagerly seeded at provisioning, so a later preset change is always
+ * reflected — `settings_features` is never eagerly inserted anywhere
+ * (mirrors `site_config`'s own lazy-default precedent).
  */
 export const getEffectiveSettingsFeatures = async (tenant?: string) =>
   getEffectiveSettingsFeaturesForTenantId(await getRequestTenantId(tenant));

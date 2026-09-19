@@ -2,8 +2,8 @@ import { openGraphSchema } from '@blog/studio/schema-types/objects/open-graph/op
 import { defineField, defineType } from 'sanity';
 
 /** Must stay in sync with the backfill migration's own copy of these bounds. */
-export const SEO_META_TITLE_MIN_LENGTH = 30;
-export const SEO_META_TITLE_MAX_LENGTH = 60;
+const SEO_META_TITLE_MIN_LENGTH = 30;
+const SEO_META_TITLE_MAX_LENGTH = 60;
 
 export const seoSchema = defineType({
   name: 'seo',

@@ -25,7 +25,6 @@ interface IActionGroupAction {
 
 export interface IActionGroupProps {
   actions: readonly IActionGroupAction[];
-  /** Reverses non-primary button colors for use on a dark or image background. */
   isOnDark?: boolean;
 }
 
@@ -42,12 +41,6 @@ export const toIsReversedOnDark = (
   variant: TActionButtonVariant,
 ): boolean => Boolean(isOnDark) && variant !== 'primary';
 
-/**
- * Renders a list of link-shaped actions in authored order, mapping each
- * item's variant/appearance to a `Button` style, forwarding `ariaLabel` for
- * a distinguishing accessible name, and rendering an optional
- * `hiddenLabelSuffix` as real (sr-only) text inside that accessible name.
- */
 export const ActionGroup = ({ actions, isOnDark }: IActionGroupProps) => (
   <>
     {actions.map((action, index) => {

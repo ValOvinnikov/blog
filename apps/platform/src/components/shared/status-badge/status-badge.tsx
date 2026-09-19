@@ -5,7 +5,6 @@ import {
 
 export type TStatusBadgeProps = {
   tone?: TStatusBadgeVariants['tone'];
-  /** The tone dot reads as decoration; suppress it for chips with no state meaning (e.g. a plan name). */
   hasDot?: boolean;
   children: React.ReactNode;
   className?: string;

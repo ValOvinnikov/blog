@@ -11,7 +11,6 @@ export type TSendEmailInput = {
   subject: string;
   html: string;
   headers?: Record<string, string>;
-  /** A tenant-supplied reply-to address. Must be a syntactically well-formed email address; domain authorisation and deliverability policy are the caller's concern. */
   replyTo?: string;
 };
 
