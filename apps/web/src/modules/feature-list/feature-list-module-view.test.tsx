@@ -64,6 +64,14 @@ describe(`<${FeatureListModuleView.name}/>`, () => {
     expect(section).toHaveAttribute('data-testid', dataTestId);
   });
 
+  it('renders the heading with the section visual, not the post modules mono label', () => {
+    setup();
+
+    const label = screen.getByText('Why choose us');
+    expect(label).toHaveClass('text-title-2xl');
+    expect(label).not.toHaveClass('font-mono', 'uppercase');
+  });
+
   it('renders one article with an h3 title per item', () => {
     setup();
 

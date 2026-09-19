@@ -9,6 +9,7 @@ export interface IModuleHeadingProps {
   id: string;
   level: THeadingLevel;
   align?: TContentAlignment;
+  variant?: 'label' | 'section';
 }
 
 export const ModuleHeading = ({
@@ -16,13 +17,19 @@ export const ModuleHeading = ({
   id,
   level,
   align,
+  variant = 'label',
 }: IModuleHeadingProps) => {
   const { heading, supportingText } = headingBlock;
-  const s = moduleHeadingVariants({ align });
+  const s = moduleHeadingVariants({ variant, align });
 
   return (
     <>
-      <Heading level={level} id={id} className={s.label()}>
+      <Heading
+        level={level}
+        id={id}
+        visual={variant === 'section' ? 'section' : undefined}
+        className={s.label()}
+      >
         {heading}
       </Heading>
       {supportingText && <p className={s.supportingText()}>{supportingText}</p>}

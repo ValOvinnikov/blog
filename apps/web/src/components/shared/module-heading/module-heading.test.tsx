@@ -84,4 +84,59 @@ describe(`<${ModuleHeading.name}/>`, () => {
     );
     expect(screen.getByText('Fresh from the blog.')).toHaveClass('text-right');
   });
+
+  it('renders the mono uppercase label by default', () => {
+    setup();
+
+    expect(screen.getByRole('heading', { name: 'Latest posts' })).toHaveClass(
+      'font-mono',
+      'uppercase',
+    );
+  });
+
+  it('renders the section visual and drops the mono label when variant is section', () => {
+    setup({ variant: 'section' });
+
+    const heading = screen.getByRole('heading', { name: 'Latest posts' });
+    expect(heading).toHaveClass('text-title-2xl');
+    expect(heading).not.toHaveClass('font-mono', 'uppercase', 'tracking-label');
+  });
+
+  it.each([['label' as const], ['section' as const]])(
+    'caps supporting text at max-w-prose when variant is %s',
+    (variant) => {
+      setup({
+        variant,
+        headingBlock: makeHeadingBlock({
+          supportingText: 'Fresh from the blog.',
+        }),
+      });
+
+      expect(screen.getByText('Fresh from the blog.')).toHaveClass(
+        'max-w-prose',
+      );
+    },
+  );
+
+  it('centers the supporting text width cap with mx-auto when align is CENTER', () => {
+    setup({
+      align: CONTENT_ALIGNMENT.CENTER,
+      headingBlock: makeHeadingBlock({
+        supportingText: 'Fresh from the blog.',
+      }),
+    });
+
+    expect(screen.getByText('Fresh from the blog.')).toHaveClass('mx-auto');
+  });
+
+  it('pushes the supporting text width cap with ml-auto when align is RIGHT', () => {
+    setup({
+      align: CONTENT_ALIGNMENT.RIGHT,
+      headingBlock: makeHeadingBlock({
+        supportingText: 'Fresh from the blog.',
+      }),
+    });
+
+    expect(screen.getByText('Fresh from the blog.')).toHaveClass('ml-auto');
+  });
 });

@@ -18,6 +18,10 @@ const meta = {
       control: 'select',
       options: Object.values(CONTENT_ALIGNMENT),
     },
+    variant: {
+      control: 'select',
+      options: ['label', 'section'],
+    },
   },
   args: {
     headingBlock: makeHeadingBlock({ heading: 'Latest posts' }),
@@ -56,6 +60,16 @@ export const RightAligned: TStory = {
     align: CONTENT_ALIGNMENT.RIGHT,
     headingBlock: makeHeadingBlock({
       heading: 'Latest posts',
+      supportingText: 'Fresh from the blog, updated weekly.',
+    }),
+  },
+};
+
+export const SectionVariant: TStory = {
+  args: {
+    variant: 'section',
+    headingBlock: makeHeadingBlock({
+      heading: 'Why choose us',
       supportingText: 'Fresh from the blog, updated weekly.',
     }),
   },
