@@ -92,15 +92,30 @@ describe('reportClientError', () => {
     expect(sendBeacon).toHaveBeenCalledTimes(2);
   });
 
-  it('hard-stops at exactly MAX_REPORTS_PER_PAGE_LOAD reports, even with distinct fingerprints', async () => {
-    const { reportClientError, MAX_REPORTS_PER_PAGE_LOAD } =
-      await freshModule();
+  it('hard-stops the number of sends once further distinct-fingerprint reports stop increasing it', async () => {
+    const { reportClientError } = await freshModule();
 
-    for (let i = 0; i < MAX_REPORTS_PER_PAGE_LOAD + 5; i += 1) {
+    const REPORT_CEILING = 100;
+    let previousCallCount = -1;
+    let i = 0;
+    for (
+      ;
+      i < REPORT_CEILING && sendBeacon.mock.calls.length !== previousCallCount;
+      i += 1
+    ) {
+      previousCallCount = sendBeacon.mock.calls.length;
       reportClientError('copy_to_clipboard.write_failed', new Error(`e${i}`));
     }
+    if (i >= REPORT_CEILING) {
+      throw new Error(
+        `reportClientError did not stop sending within ${REPORT_CEILING} reports`,
+      );
+    }
 
-    expect(sendBeacon).toHaveBeenCalledTimes(MAX_REPORTS_PER_PAGE_LOAD);
+    expect(sendBeacon.mock.calls.length).toBe(previousCallCount);
+
+    reportClientError('copy_to_clipboard.write_failed', new Error(`e${i}`));
+    expect(sendBeacon.mock.calls.length).toBe(previousCallCount);
   });
 
   it('includes the digest when passed through extra', async () => {

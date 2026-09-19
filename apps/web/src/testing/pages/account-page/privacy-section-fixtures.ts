@@ -1,4 +1,4 @@
-import type { IPrivacySectionProps } from '@web/components/pages/account-page/sections/privacy-section';
+import type { IPrivacySectionProps } from '@web/components/pages/account-page/sections/privacy-section/privacy-section';
 
 export const makePrivacySection = (
   overrides: Partial<IPrivacySectionProps> = {},

@@ -1,11 +1,7 @@
 import { CTA_ACTION_APPEARANCE, CTA_ACTION_VARIANT } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 
-import {
-  ActionGroup,
-  toButtonVariant,
-  toIsReversedOnDark,
-} from './action-group';
+import { ActionGroup } from './action-group';
 
 const primaryAction = {
   variant: CTA_ACTION_VARIANT.PRIMARY,
@@ -61,51 +57,70 @@ describe(`<${ActionGroup.name}/>`, () => {
 
     expect(screen.getByRole('link', { name: 'Subscribe now' })).toBeVisible();
   });
-});
 
-describe(toButtonVariant, () => {
-  it('maps a PRIMARY + CONTAINED action to the primary button variant', () => {
+  it('renders a PRIMARY + CONTAINED action with the primary button styling', () => {
+    setup();
+
     expect(
-      toButtonVariant(
-        CTA_ACTION_VARIANT.PRIMARY,
-        CTA_ACTION_APPEARANCE.CONTAINED,
-      ),
-    ).toBe('primary');
+      screen.getByRole('link', { name: 'Subscribe now' }).className,
+    ).toContain('bg-brand-primary-solid');
   });
 
-  it('maps a SECONDARY + CONTAINED action to the ghost button variant', () => {
+  it('renders a SECONDARY + CONTAINED action with the ghost button styling', () => {
+    setup();
+
     expect(
-      toButtonVariant(
-        CTA_ACTION_VARIANT.SECONDARY,
-        CTA_ACTION_APPEARANCE.CONTAINED,
-      ),
-    ).toBe('ghost');
+      screen.getByRole('link', {
+        name: 'Learn more about our subscription plans',
+      }).className,
+    ).toContain('border-border-strong');
   });
 
-  it('maps an INLINE appearance action to the link variant regardless of its variant', () => {
+  it.each([
+    { action: primaryAction, name: 'Subscribe now' },
+    {
+      action: secondaryAction,
+      name: 'Learn more about our subscription plans',
+    },
+  ])(
+    'renders an INLINE appearance action with link styling regardless of its cta variant ($name)',
+    ({ action, name }) => {
+      const inlineSetup = customRender(ActionGroup, {
+        actions: [{ ...action, appearance: CTA_ACTION_APPEARANCE.INLINE }],
+        isOnDark: undefined,
+      });
+      inlineSetup();
+
+      expect(screen.getByRole('link', { name }).className).toContain(
+        'underline',
+      );
+    },
+  );
+
+  it('reverses a non-primary action styling on a dark background', () => {
+    const darkSetup = customRender(ActionGroup, {
+      actions: [secondaryAction],
+      isOnDark: true,
+    });
+    darkSetup();
+
     expect(
-      toButtonVariant(CTA_ACTION_VARIANT.PRIMARY, CTA_ACTION_APPEARANCE.INLINE),
-    ).toBe('link');
+      screen.getByRole('link', {
+        name: 'Learn more about our subscription plans',
+      }).className,
+    ).toContain('text-white');
+  });
+
+  it('leaves a primary action styling untouched on a dark background', () => {
+    const darkSetup = customRender(ActionGroup, {
+      actions: [primaryAction],
+      isOnDark: true,
+    });
+    darkSetup();
+
     expect(
-      toButtonVariant(
-        CTA_ACTION_VARIANT.SECONDARY,
-        CTA_ACTION_APPEARANCE.INLINE,
-      ),
-    ).toBe('link');
-  });
-});
-
-describe(toIsReversedOnDark, () => {
-  it('reverses a non-primary button when isOnDark is set', () => {
-    expect(toIsReversedOnDark(true, 'ghost')).toBe(true);
-  });
-
-  it('leaves the primary button untouched even when isOnDark is set', () => {
-    expect(toIsReversedOnDark(true, 'primary')).toBe(false);
-  });
-
-  it('does not reverse a non-primary button when isOnDark is not set', () => {
-    expect(toIsReversedOnDark(undefined, 'ghost')).toBe(false);
+      screen.getByRole('link', { name: 'Subscribe now' }).className,
+    ).not.toContain('text-white');
   });
 });
 

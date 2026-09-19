@@ -1,6 +1,6 @@
-import type { IAccountPageViewProps } from '@web/components/pages/account-page';
-import { IdentitySectionView } from '@web/components/pages/account-page/sections/identity-section';
-import { NewsletterSectionView } from '@web/components/pages/account-page/sections/newsletter-section';
+import type { IAccountPageViewProps } from '@web/components/pages/account-page/account-page-view';
+import { IdentitySectionView } from '@web/components/pages/account-page/sections/identity-section/identity-section-view';
+import { NewsletterSectionView } from '@web/components/pages/account-page/sections/newsletter-section/newsletter-section-view';
 import { PrivacySection } from '@web/components/pages/account-page/sections/privacy-section';
 
 import { makeIdentitySectionView } from './identity-section-fixtures';
