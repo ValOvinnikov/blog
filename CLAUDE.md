@@ -1070,9 +1070,15 @@ gates, is unchanged.)
 
    **A docs-only diff skips the `reviewer` and gets an inline identifier
    check instead.** When the diff touches nothing outside `docs/**`,
-   `SPEC.md`, `README.md`, `CLAUDE.md` and `.claude/**`, the code-review
+   `SPEC.md`, `README.md`, `CLAUDE.md` and `.claude/**/*.md`, the code-review
    checklist has nothing to apply and the dispatch costs ~10 minutes and
-   ~150k tokens to re-derive context the orchestrator already holds. What
+   ~150k tokens to re-derive context the orchestrator already holds. This
+   scope is deliberately narrower than "everything under `.claude/`" — a
+   `.sh`/`.js` file there (a hook, a guard script) is executable tooling
+   that drives every dispatch, not prose, and gets a `reviewer` dispatch
+   like any other code change; `.claude/hooks/**` and `scripts/*.sh` changes
+   also need the local `shellcheck` + guard-test pass in `develop-feature`
+   §5 before commit. What
    those reviews actually caught — a fragment name that does not exist, a
    helper cited by its pre-rename name, two copies of a decision that
    disagree — is an identifier cross-check, so do that by hand before
