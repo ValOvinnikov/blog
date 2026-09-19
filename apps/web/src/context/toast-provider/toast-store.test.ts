@@ -16,6 +16,25 @@ const buildPayload = (overrides?: Partial<IToastPayload>): IToastPayload => ({
   ...overrides,
 });
 
+const createLoadingToast = async () => {
+  const store = createToastStore();
+  let resolvePromise!: (value: string) => void;
+  const pending = new Promise<string>((resolve) => {
+    resolvePromise = resolve;
+  });
+
+  store.actions.promise(pending, {
+    loading: { title: 'Saving', message: 'saving…' },
+    success: { title: 'Saved', message: 'saved' },
+    error: { title: 'Failed', message: 'failed' },
+  });
+
+  await vi.advanceTimersByTimeAsync(TOAST_PROMISE_GRACE_MS);
+  const loadingId = store.getState().visible[0]!.id;
+
+  return { store, resolvePromise, loadingId };
+};
+
 describe(createToastStore, () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -395,21 +414,8 @@ describe(createToastStore, () => {
     });
 
     it('shows a loading toast after the grace period, then swaps it in place on resolve', async () => {
-      const store = createToastStore();
-      let resolvePromise!: (value: string) => void;
-      const pending = new Promise<string>((resolve) => {
-        resolvePromise = resolve;
-      });
-
-      store.actions.promise(pending, {
-        loading: { title: 'Saving', message: 'saving…' },
-        success: { title: 'Saved', message: 'saved' },
-        error: { title: 'Failed', message: 'failed' },
-      });
-
-      await vi.advanceTimersByTimeAsync(TOAST_PROMISE_GRACE_MS);
+      const { store, resolvePromise, loadingId } = await createLoadingToast();
       expect(store.getState().visible).toHaveLength(1);
-      const loadingId = store.getState().visible[0]!.id;
       expect(store.getState().visible[0]).toMatchObject({
         type: TOAST_TYPE.INFO,
         isLoading: true,
@@ -458,20 +464,8 @@ describe(createToastStore, () => {
     });
 
     it('does not resurrect a loading toast the reader already dismissed before it settled', async () => {
-      const store = createToastStore();
-      let resolvePromise!: (value: string) => void;
-      const pending = new Promise<string>((resolve) => {
-        resolvePromise = resolve;
-      });
+      const { store, resolvePromise, loadingId } = await createLoadingToast();
 
-      store.actions.promise(pending, {
-        loading: { title: 'Saving', message: 'saving…' },
-        success: { title: 'Saved', message: 'saved' },
-        error: { title: 'Failed', message: 'failed' },
-      });
-
-      await vi.advanceTimersByTimeAsync(TOAST_PROMISE_GRACE_MS);
-      const loadingId = store.getState().visible[0]!.id;
       store.actions.dismiss(loadingId);
       await vi.advanceTimersByTimeAsync(TOAST_EXIT_ANIMATION_MS);
       expect(store.getState().visible).toHaveLength(0);

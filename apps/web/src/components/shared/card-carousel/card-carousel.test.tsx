@@ -6,23 +6,13 @@ import {
   screen,
 } from '@web/testing/custom-render';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
+import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { CardCarousel } from './card-carousel';
 import { cardCarouselVariants } from './card-carousel-variants';
 
 vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: ({
-    href,
-    children,
-    ...rest
-  }: {
-    href: string;
-    children: React.ReactNode;
-  }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
+  SmartLink: SmartLinkMock,
 }));
 
 // `CardCarousel`'s contract is what it hands to `Carousel`, not what

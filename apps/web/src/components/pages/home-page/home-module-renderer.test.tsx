@@ -1,5 +1,11 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import {
+  testHeadingWithoutHero,
+  testHeroProfileHero,
+  testRendersAllowedModulesInOrder,
+  testWarnsForUnknownModule,
+} from '@web/testing/shared/module-renderer-contract/module-renderer-contract';
 
 import { HomeModuleRenderer } from './home-module-renderer';
 
@@ -87,13 +93,7 @@ const setup = customRenderAsync(HomeModuleRenderer, {
 });
 
 describe(`<${HomeModuleRenderer.name}/>`, () => {
-  it('renders the page heading, with exactly one h1, when the page has no hero', async () => {
-    await setup();
-
-    const headings = screen.getAllByRole('heading', { level: 1 });
-    expect(headings).toHaveLength(1);
-    expect(headings[0]).toHaveTextContent('Welcome to the blog');
-  });
+  testHeadingWithoutHero({ setup, headingText: 'Welcome to the blog' });
 
   it('renders the resolved hero, with exactly one h1, when the hero resolves to content', async () => {
     await setup({ hero: { id: 'hero-1', type: 'module_heroStatement' } });
@@ -131,48 +131,32 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
     expect(screen.queryByTestId('stub-hero')).not.toBeInTheDocument();
   });
 
-  it('renders a module_heroProfile hero via the map', async () => {
-    await setup({ hero: { id: 'hero-3', type: 'module_heroProfile' } });
+  testHeroProfileHero({ setup, loggerWarnMock });
 
-    const headings = screen.getAllByRole('heading', { level: 1 });
-    expect(headings).toHaveLength(1);
-    expect(screen.getByTestId('stub-hero-profile')).toHaveTextContent('hero-3');
-    expect(loggerWarnMock).not.toHaveBeenCalled();
+  testWarnsForUnknownModule({
+    setup,
+    loggerWarnMock,
+    unknownModule: { id: 'post-list-1', type: 'module_postList' },
+    description:
+      'renders nothing and warns once for a module absent from the home page allow-list',
   });
-
-  it('renders nothing and warns once for a module absent from the home page allow-list', async () => {
-    await setup({
-      modules: [{ id: 'post-list-1', type: 'module_postList' }],
-    });
-
-    expect(screen.queryByText('post-list-1')).not.toBeInTheDocument();
-    expect(loggerWarnMock).toHaveBeenCalledTimes(1);
-    expect(loggerWarnMock).toHaveBeenCalledWith(
-      'module_renderer.unknown_module_type',
-      { moduleType: 'module_postList' },
-    );
-  });
-
-  it('renders every allowed module keyed by its id, in the given order', async () => {
-    await setup({
-      modules: [
-        { id: 'cta-1', type: 'module_cta' },
-        { id: 'content-1', type: 'module_content' },
-        { id: 'newsletter-1', type: 'module_newsletter' },
-        { id: 'post-latest-1', type: 'module_postLatest' },
-        { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
-        { id: 'post-featured-1', type: 'module_postFeatured' },
-      ],
-    });
-
-    const stubs = screen.getAllByTestId(/^stub-/);
-    expect(stubs.map((node) => node.textContent)).toEqual([
+  testRendersAllowedModulesInOrder({
+    setup,
+    modules: [
+      { id: 'cta-1', type: 'module_cta' },
+      { id: 'content-1', type: 'module_content' },
+      { id: 'newsletter-1', type: 'module_newsletter' },
+      { id: 'post-latest-1', type: 'module_postLatest' },
+      { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
+      { id: 'post-featured-1', type: 'module_postFeatured' },
+    ],
+    expectedOrder: [
       'cta-1',
       'content-1',
       'newsletter-1',
       'post-latest-1',
       'taxonomy-list-1',
       'post-featured-1',
-    ]);
+    ],
   });
 });

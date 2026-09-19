@@ -1,20 +1,10 @@
 import { customRender, screen } from '@web/testing/custom-render';
+import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { TopicChipList } from './topic-chip-list';
 
 vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: ({
-    href,
-    children,
-    ...rest
-  }: {
-    href: string;
-    children: React.ReactNode;
-  }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
+  SmartLink: SmartLinkMock,
 }));
 
 const topics = [

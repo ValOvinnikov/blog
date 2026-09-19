@@ -1,5 +1,12 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import {
+  testFallsBackToHeadingWithoutHero,
+  testHeadingWithoutHero,
+  testRendersAllowedModulesInOrder,
+  testResolvedHero,
+  testWarnsForUnknownModule,
+} from '@web/testing/shared/module-renderer-contract/module-renderer-contract';
 import type { ReactNode } from 'react';
 
 import { BlogListModuleRenderer } from './blog-list-module-renderer';
@@ -71,31 +78,15 @@ const setup = customRenderAsync(BlogListModuleRenderer, {
 });
 
 describe(`<${BlogListModuleRenderer.name}/>`, () => {
-  it('renders the page heading, with exactly one h1, when the page has no hero', async () => {
-    await setup();
-
-    const headings = screen.getAllByRole('heading', { level: 1 });
-    expect(headings).toHaveLength(1);
-    expect(headings[0]).toHaveTextContent('Notes on building things');
+  testHeadingWithoutHero({
+    setup,
+    headingText: 'Notes on building things',
   });
-
-  it('renders the resolved hero, with exactly one h1, when the hero resolves to content', async () => {
-    await setup({ hero: { id: 'hero-1', type: 'module_heroBlog' } });
-
-    const headings = screen.getAllByRole('heading', { level: 1 });
-    expect(headings).toHaveLength(1);
-    expect(screen.getByTestId('stub-hero')).toHaveTextContent('hero-1');
-  });
-
-  it('falls back to the page heading, still exactly one h1, when the hero resolves to nothing', async () => {
-    heroBlogModuleMock.mockResolvedValueOnce(null);
-
-    await setup({ hero: { id: 'hero-2', type: 'module_heroBlog' } });
-
-    const headings = screen.getAllByRole('heading', { level: 1 });
-    expect(headings).toHaveLength(1);
-    expect(headings[0]).toHaveTextContent('Notes on building things');
-    expect(screen.queryByTestId('stub-hero')).not.toBeInTheDocument();
+  testResolvedHero({ setup });
+  testFallsBackToHeadingWithoutHero({
+    setup,
+    heroBlogModuleMock,
+    headingText: 'Notes on building things',
   });
 
   it('renders the given children between the hero and the modules', async () => {
@@ -113,38 +104,29 @@ describe(`<${BlogListModuleRenderer.name}/>`, () => {
     ]);
   });
 
-  it('renders nothing and warns once for a module absent from the blog list allow-list', async () => {
-    await setup({
-      modules: [{ id: 'content-1', type: 'module_content' as never }],
-    });
-
-    expect(screen.queryByText('content-1')).not.toBeInTheDocument();
-    expect(loggerWarnMock).toHaveBeenCalledTimes(1);
-    expect(loggerWarnMock).toHaveBeenCalledWith(
-      'module_renderer.unknown_module_type',
-      { moduleType: 'module_content' },
-    );
+  testWarnsForUnknownModule({
+    setup,
+    loggerWarnMock,
+    unknownModule: { id: 'content-1', type: 'module_content' },
+    description:
+      'renders nothing and warns once for a module absent from the blog list allow-list',
   });
-
-  it('renders every allowed module keyed by its id, in the given order', async () => {
-    await setup({
-      modules: [
-        { id: 'post-list-1', type: 'module_postList' },
-        { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
-        { id: 'cta-1', type: 'module_cta' },
-        { id: 'newsletter-1', type: 'module_newsletter' },
-        { id: 'post-featured-1', type: 'module_postFeatured' },
-      ],
-    });
-
-    const stubs = screen.getAllByTestId(/^stub-/);
-    expect(stubs.map((node) => node.textContent)).toEqual([
+  testRendersAllowedModulesInOrder({
+    setup,
+    modules: [
+      { id: 'post-list-1', type: 'module_postList' },
+      { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
+      { id: 'cta-1', type: 'module_cta' },
+      { id: 'newsletter-1', type: 'module_newsletter' },
+      { id: 'post-featured-1', type: 'module_postFeatured' },
+    ],
+    expectedOrder: [
       'post-list-1',
       'taxonomy-list-1',
       'cta-1',
       'newsletter-1',
       'post-featured-1',
-    ]);
+    ],
   });
 
   it('forwards the given context to the modules', async () => {
