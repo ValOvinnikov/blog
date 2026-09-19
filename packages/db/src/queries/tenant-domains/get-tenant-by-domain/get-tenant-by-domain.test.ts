@@ -1,7 +1,6 @@
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { getTenantByDomain } from './get-tenant-by-domain';
 
@@ -9,27 +8,19 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
-
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
+const db = useQueryTestDb(getDbMock);
 
 afterEach(async () => {
-  await db.delete(schema.tenantDomains);
-  await db.delete(schema.tenants);
+  await db().delete(schema.tenantDomains);
+  await db().delete(schema.tenants);
 });
 
 describe(getTenantByDomain, () => {
   it('resolves the owning tenant via a tenant_domains row', async () => {
-    const { id: tenantId } = await insertTestTenant(db, {
+    const { id: tenantId } = await insertTestTenant(db(), {
       primaryDomain: 'acme.example.com',
     });
-    await db
+    await db()
       .insert(schema.tenantDomains)
       .values({ tenantId, domain: 'acme.example.com' });
 
@@ -45,16 +36,18 @@ describe(getTenantByDomain, () => {
   });
 
   it('does not cross-match a domain belonging to a different tenant', async () => {
-    const { id: tenantId } = await insertTestTenant(db, {
+    const { id: tenantId } = await insertTestTenant(db(), {
       primaryDomain: 'acme.example.com',
     });
-    const { id: otherTenantId } = await insertTestTenant(db, {
+    const { id: otherTenantId } = await insertTestTenant(db(), {
       primaryDomain: 'other.example.com',
     });
-    await db.insert(schema.tenantDomains).values([
-      { tenantId, domain: 'acme.example.com' },
-      { tenantId: otherTenantId, domain: 'other.example.com' },
-    ]);
+    await db()
+      .insert(schema.tenantDomains)
+      .values([
+        { tenantId, domain: 'acme.example.com' },
+        { tenantId: otherTenantId, domain: 'other.example.com' },
+      ]);
 
     const result = await getTenantByDomain('other.example.com');
 

@@ -1,8 +1,7 @@
 import { ADMIN_ROLE, GRANTED_VIA } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
 import { insertTestUser } from '@blog/db/testing/fixtures';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { getFirstAdminEmail } from './get-first-admin-email';
 
@@ -10,14 +9,14 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
+const db = useQueryTestDb(getDbMock);
 
 async function insertAdmin(
   userId: string,
   createdAt: Date,
   role: (typeof ADMIN_ROLE)[keyof typeof ADMIN_ROLE] = ADMIN_ROLE.SUPERADMIN,
 ): Promise<void> {
-  await db.insert(schema.admins).values({
+  await db().insert(schema.admins).values({
     userId,
     role,
     grantedVia: GRANTED_VIA.BREAK_GLASS,
@@ -25,23 +24,15 @@ async function insertAdmin(
   });
 }
 
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
-
 afterEach(async () => {
-  await db.delete(schema.admins);
-  await db.delete(schema.users);
+  await db().delete(schema.admins);
+  await db().delete(schema.users);
 });
 
 describe(getFirstAdminEmail, () => {
   it('returns the email of the earliest-created admin row', async () => {
-    await insertTestUser(db, { id: 'user-1', email: 'first@example.com' });
-    await insertTestUser(db, { id: 'user-2', email: 'second@example.com' });
+    await insertTestUser(db(), { id: 'user-1', email: 'first@example.com' });
+    await insertTestUser(db(), { id: 'user-2', email: 'second@example.com' });
     await insertAdmin('user-1', new Date('2026-01-01T00:00:00Z'));
     await insertAdmin('user-2', new Date('2026-02-01T00:00:00Z'));
 
@@ -51,8 +42,8 @@ describe(getFirstAdminEmail, () => {
   });
 
   it('ignores insertion order and only orders by createdAt', async () => {
-    await insertTestUser(db, { id: 'user-1', email: 'later@example.com' });
-    await insertTestUser(db, { id: 'user-2', email: 'earlier@example.com' });
+    await insertTestUser(db(), { id: 'user-1', email: 'later@example.com' });
+    await insertTestUser(db(), { id: 'user-2', email: 'earlier@example.com' });
     await insertAdmin('user-1', new Date('2026-03-01T00:00:00Z'));
     await insertAdmin('user-2', new Date('2026-01-15T00:00:00Z'));
 
@@ -68,7 +59,7 @@ describe(getFirstAdminEmail, () => {
   });
 
   it('returns undefined when the earliest admin has no email on file', async () => {
-    await insertTestUser(db, { id: 'user-1', email: null });
+    await insertTestUser(db(), { id: 'user-1', email: null });
     await insertAdmin('user-1', new Date('2026-01-01T00:00:00Z'));
 
     const result = await getFirstAdminEmail();
@@ -77,8 +68,14 @@ describe(getFirstAdminEmail, () => {
   });
 
   it('is not filtered by role — the earliest row wins regardless of its role value', async () => {
-    await insertTestUser(db, { id: 'user-1', email: 'moderator@example.com' });
-    await insertTestUser(db, { id: 'user-2', email: 'superadmin@example.com' });
+    await insertTestUser(db(), {
+      id: 'user-1',
+      email: 'moderator@example.com',
+    });
+    await insertTestUser(db(), {
+      id: 'user-2',
+      email: 'superadmin@example.com',
+    });
     await insertAdmin(
       'user-1',
       new Date('2026-01-01T00:00:00Z'),

@@ -1,8 +1,7 @@
 import { ERROR_CODE } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { startDeprovisioningRun } from './start-deprovisioning-run';
 
@@ -10,28 +9,23 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
+const db = useQueryTestDb(getDbMock);
 
 const NOW = '2026-09-02T12:00:00.000Z';
 
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
 beforeEach(() => {
-  getDbMock.mockReturnValue(db);
   vi.useFakeTimers();
   vi.setSystemTime(new Date(NOW));
 });
 
 afterEach(async () => {
-  await db.delete(schema.tenants);
+  await db().delete(schema.tenants);
   vi.useRealTimers();
 });
 
 describe(startDeprovisioningRun, () => {
   it('writes startedAt and workflowRunUrl when supplied', async () => {
-    const tenant = await insertTestTenant(db);
+    const tenant = await insertTestTenant(db());
 
     const result = await startDeprovisioningRun({
       tenantId: tenant.id,
@@ -46,7 +40,7 @@ describe(startDeprovisioningRun, () => {
   });
 
   it('omits workflowRunUrl entirely when not supplied', async () => {
-    const tenant = await insertTestTenant(db);
+    const tenant = await insertTestTenant(db());
 
     const result = await startDeprovisioningRun({ tenantId: tenant.id });
 
@@ -55,7 +49,7 @@ describe(startDeprovisioningRun, () => {
   });
 
   it('replaces a previous run wholesale rather than merging', async () => {
-    const tenant = await insertTestTenant(db);
+    const tenant = await insertTestTenant(db());
 
     await startDeprovisioningRun({
       tenantId: tenant.id,
@@ -72,7 +66,7 @@ describe(startDeprovisioningRun, () => {
   });
 
   it('leaves every step entry untouched', async () => {
-    const tenant = await insertTestTenant(db, {
+    const tenant = await insertTestTenant(db(), {
       deprovisioningSteps: {
         REMOVE_DOMAIN: { status: 'DONE' },
         ARCHIVE_SANITY_PROJECT: { status: 'IDLE' },

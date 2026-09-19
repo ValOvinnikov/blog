@@ -1,8 +1,7 @@
 import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { listTenantsWedgedInProvisioning } from './list-tenants-wedged-in-provisioning';
 
@@ -10,23 +9,15 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
-
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
+const db = useQueryTestDb(getDbMock);
 
 afterEach(async () => {
-  await db.delete(schema.tenants);
+  await db().delete(schema.tenants);
 });
 
 describe(listTenantsWedgedInProvisioning, () => {
   it('includes a PROVISIONING tenant with a FAILED step', async () => {
-    const tenant = await insertTestTenant(db, {
+    const tenant = await insertTestTenant(db(), {
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
       provisioningSteps: {
         SANITY_PROJECT: { status: 'DONE' },
@@ -45,7 +36,7 @@ describe(listTenantsWedgedInProvisioning, () => {
   });
 
   it('excludes a PROVISIONING tenant with no FAILED step (a genuine in-flight run)', async () => {
-    await insertTestTenant(db, {
+    await insertTestTenant(db(), {
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
       provisioningSteps: {
         SANITY_PROJECT: { status: 'DONE' },
@@ -64,7 +55,7 @@ describe(listTenantsWedgedInProvisioning, () => {
   });
 
   it('excludes a PROVISIONING tenant with no provisioningSteps at all', async () => {
-    await insertTestTenant(db, {
+    await insertTestTenant(db(), {
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
     });
 
@@ -80,7 +71,7 @@ describe(listTenantsWedgedInProvisioning, () => {
   ])(
     'excludes a tenant with a FAILED step but overall status %s',
     async (status) => {
-      await insertTestTenant(db, {
+      await insertTestTenant(db(), {
         provisioningStatus: status,
         provisioningSteps: {
           SANITY_PROJECT: { status: 'FAILED', error: 'boom' },

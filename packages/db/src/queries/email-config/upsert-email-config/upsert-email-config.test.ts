@@ -1,7 +1,6 @@
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { upsertEmailConfig } from './upsert-email-config';
 
@@ -9,24 +8,16 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
-
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
+const db = useQueryTestDb(getDbMock);
 
 afterEach(async () => {
-  await db.delete(schema.emailConfig);
-  await db.delete(schema.tenants);
+  await db().delete(schema.emailConfig);
+  await db().delete(schema.tenants);
 });
 
 describe(upsertEmailConfig, () => {
   it('inserts a new row when the tenant has no email config yet', async () => {
-    const { id: tenantId } = await insertTestTenant(db);
+    const { id: tenantId } = await insertTestTenant(db());
 
     const result = await upsertEmailConfig(tenantId, {
       senderName: 'Acme Weekly',
@@ -43,7 +34,7 @@ describe(upsertEmailConfig, () => {
   });
 
   it('updates the existing row in place rather than inserting a second one', async () => {
-    const { id: tenantId } = await insertTestTenant(db);
+    const { id: tenantId } = await insertTestTenant(db());
     await upsertEmailConfig(tenantId, { senderName: 'Acme Weekly' });
 
     const result = await upsertEmailConfig(tenantId, {
@@ -51,12 +42,12 @@ describe(upsertEmailConfig, () => {
     });
 
     expect(result.senderName).toBe('Acme Digest');
-    const rows = await db.select().from(schema.emailConfig);
+    const rows = await db().select().from(schema.emailConfig);
     expect(rows).toHaveLength(1);
   });
 
   it('rejects a malformed reply-to address', async () => {
-    const { id: tenantId } = await insertTestTenant(db);
+    const { id: tenantId } = await insertTestTenant(db());
 
     await expect(
       upsertEmailConfig(tenantId, { replyToAddress: 'not-an-email' }),
@@ -74,7 +65,7 @@ describe(upsertEmailConfig, () => {
 
 describe('partial updates — omission leaves a field untouched, explicit null clears it', () => {
   it('preserves footerPostalAddress when a later update omits the field', async () => {
-    const { id: tenantId } = await insertTestTenant(db);
+    const { id: tenantId } = await insertTestTenant(db());
     await upsertEmailConfig(tenantId, {
       footerPostalAddress: '123 Main St, Springfield',
     });
@@ -87,7 +78,7 @@ describe('partial updates — omission leaves a field untouched, explicit null c
   });
 
   it('clears footerPostalAddress when explicitly set to null', async () => {
-    const { id: tenantId } = await insertTestTenant(db);
+    const { id: tenantId } = await insertTestTenant(db());
     await upsertEmailConfig(tenantId, {
       footerPostalAddress: '123 Main St, Springfield',
     });

@@ -1,10 +1,9 @@
 import { ERROR_CODE } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
 import { insertTestUser } from '@blog/db/testing/fixtures';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import {
   createTenantDraft,
@@ -15,7 +14,7 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
+const db = useQueryTestDb(getDbMock);
 
 const draftInput: TCreateTenantDraftInput = {
   name: 'Acme',
@@ -25,25 +24,17 @@ const draftInput: TCreateTenantDraftInput = {
   owner: { type: 'user', userId: 'user-1' },
 };
 
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
-
 afterEach(async () => {
-  await db.delete(schema.memberships);
-  await db.delete(schema.membershipInvites);
-  await db.delete(schema.tenantDomains);
-  await db.delete(schema.tenants);
-  await db.delete(schema.users);
+  await db().delete(schema.memberships);
+  await db().delete(schema.membershipInvites);
+  await db().delete(schema.tenantDomains);
+  await db().delete(schema.tenants);
+  await db().delete(schema.users);
 });
 
 describe(createTenantDraft, () => {
   it('inserts a tenant row left in PENDING with an idle per-step map and no Sanity project yet', async () => {
-    await insertTestUser(db, { id: 'user-1' });
+    await insertTestUser(db(), { id: 'user-1' });
 
     const result = await createTenantDraft(draftInput);
 
@@ -70,12 +61,12 @@ describe(createTenantDraft, () => {
   });
 
   it('inserts the primary domain into tenant_domains', async () => {
-    await insertTestUser(db, { id: 'user-1' });
+    await insertTestUser(db(), { id: 'user-1' });
 
     const result = await createTenantDraft(draftInput);
 
     if (!result.ok) throw new Error('expected ok:true');
-    const [domainRow] = await db
+    const [domainRow] = await db()
       .select()
       .from(schema.tenantDomains)
       .where(eq(schema.tenantDomains.tenantId, result.data.id));
@@ -87,12 +78,12 @@ describe(createTenantDraft, () => {
   });
 
   it('inserts an OWNER membership row for the given owner user id', async () => {
-    await insertTestUser(db, { id: 'user-1' });
+    await insertTestUser(db(), { id: 'user-1' });
 
     const result = await createTenantDraft(draftInput);
 
     if (!result.ok) throw new Error('expected ok:true');
-    const [membershipRow] = await db
+    const [membershipRow] = await db()
       .select()
       .from(schema.memberships)
       .where(eq(schema.memberships.tenantId, result.data.id));
@@ -112,7 +103,7 @@ describe(createTenantDraft, () => {
 
     if (!result.ok) throw new Error('expected ok:true');
 
-    const [inviteRow] = await db
+    const [inviteRow] = await db()
       .select()
       .from(schema.membershipInvites)
       .where(eq(schema.membershipInvites.tenantId, result.data.id));
@@ -124,7 +115,7 @@ describe(createTenantDraft, () => {
       consumedAt: null,
     });
 
-    const membershipRows = await db
+    const membershipRows = await db()
       .select()
       .from(schema.memberships)
       .where(eq(schema.memberships.tenantId, result.data.id));
@@ -134,10 +125,10 @@ describe(createTenantDraft, () => {
   it('rejects when the owner user id does not exist, and leaves no orphaned tenant or domain row behind', async () => {
     await expect(createTenantDraft(draftInput)).rejects.toThrow();
 
-    const tenantRows = await db.select().from(schema.tenants);
+    const tenantRows = await db().select().from(schema.tenants);
     expect(tenantRows).toHaveLength(0);
 
-    const domainRows = await db
+    const domainRows = await db()
       .select()
       .from(schema.tenantDomains)
       .where(eq(schema.tenantDomains.domain, draftInput.domain));
@@ -145,8 +136,8 @@ describe(createTenantDraft, () => {
   });
 
   it('rejects on a colliding domain and leaves the second tenant and its dependents cleaned up', async () => {
-    await insertTestUser(db, { id: 'user-1' });
-    await insertTestUser(db, { id: 'user-2' });
+    await insertTestUser(db(), { id: 'user-1' });
+    await insertTestUser(db(), { id: 'user-2' });
     await createTenantDraft(draftInput);
 
     await expect(
@@ -156,10 +147,10 @@ describe(createTenantDraft, () => {
       }),
     ).rejects.toThrow();
 
-    const tenantRows = await db.select().from(schema.tenants);
+    const tenantRows = await db().select().from(schema.tenants);
     expect(tenantRows).toHaveLength(1);
 
-    const secondMembershipRows = await db
+    const secondMembershipRows = await db()
       .select()
       .from(schema.memberships)
       .where(eq(schema.memberships.userId, 'user-2'));
@@ -167,7 +158,7 @@ describe(createTenantDraft, () => {
 
     // The first tenant's own domain row is untouched by the second call's
     // failure and cleanup.
-    const domainRows = await db
+    const domainRows = await db()
       .select()
       .from(schema.tenantDomains)
       .where(eq(schema.tenantDomains.domain, draftInput.domain));
@@ -187,10 +178,10 @@ describe(createTenantDraft, () => {
       }),
     ).rejects.toThrow();
 
-    const tenantRows = await db.select().from(schema.tenants);
+    const tenantRows = await db().select().from(schema.tenants);
     expect(tenantRows).toHaveLength(1);
 
-    const secondInviteRows = await db
+    const secondInviteRows = await db()
       .select()
       .from(schema.membershipInvites)
       .where(eq(schema.membershipInvites.email, 'owner-2@example.com'));
@@ -204,7 +195,7 @@ describe(createTenantDraft, () => {
   ])(
     'rejects %s for domain without writing any row',
     async (_description, domain) => {
-      await insertTestUser(db, { id: 'user-1' });
+      await insertTestUser(db(), { id: 'user-1' });
 
       const result = await createTenantDraft({ ...draftInput, domain });
 
@@ -213,13 +204,13 @@ describe(createTenantDraft, () => {
         error: ERROR_CODE.DB_INVALID_DOMAIN,
       });
 
-      const tenantRows = await db.select().from(schema.tenants);
+      const tenantRows = await db().select().from(schema.tenants);
       expect(tenantRows).toHaveLength(0);
 
-      const domainRows = await db.select().from(schema.tenantDomains);
+      const domainRows = await db().select().from(schema.tenantDomains);
       expect(domainRows).toHaveLength(0);
 
-      const membershipRows = await db.select().from(schema.memberships);
+      const membershipRows = await db().select().from(schema.memberships);
       expect(membershipRows).toHaveLength(0);
     },
   );

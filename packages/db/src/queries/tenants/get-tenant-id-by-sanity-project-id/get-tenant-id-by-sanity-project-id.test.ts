@@ -1,7 +1,6 @@
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { getTenantIdBySanityProjectId } from './get-tenant-id-by-sanity-project-id';
 
@@ -9,26 +8,18 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
+const db = useQueryTestDb(getDbMock);
 
 async function insertTenant(sanityProjectId: string | null): Promise<string> {
-  const tenant = await insertTestTenant(db, {
+  const tenant = await insertTestTenant(db(), {
     sanityProjectId,
     sanityDataset: sanityProjectId ? 'production' : null,
   });
   return tenant.id;
 }
 
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
-
 afterEach(async () => {
-  await db.delete(schema.tenants);
+  await db().delete(schema.tenants);
 });
 
 describe(getTenantIdBySanityProjectId, () => {

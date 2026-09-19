@@ -6,39 +6,26 @@ import {
   FINDING_STATUS,
 } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { openFinding } from './open-finding';
 
 const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
-// Only `getDb`'s return value is swapped for an in-memory Postgres — every
-// query this function builds still runs as real SQL (see
-// src/testing/create-test-db.ts), so the partial unique index under test is
-// the real Postgres constraint, not a mocked stand-in.
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
-
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
+const db = useQueryTestDb(getDbMock);
 
 afterEach(async () => {
-  await db.delete(schema.findings);
-  await db.delete(schema.tenants);
+  await db().delete(schema.findings);
+  await db().delete(schema.tenants);
 });
 
 describe(openFinding, () => {
   it('inserts a fresh OPEN finding when none exists for the condition', async () => {
-    const { id: tenantId } = await insertTestTenant(db);
+    const { id: tenantId } = await insertTestTenant(db());
 
     const result = await openFinding({
       tenantId,
@@ -64,7 +51,7 @@ describe(openFinding, () => {
   });
 
   it('detecting the same condition twice yields one open row, not two', async () => {
-    const { id: tenantId } = await insertTestTenant(db);
+    const { id: tenantId } = await insertTestTenant(db());
     const input = {
       tenantId,
       source: FINDING_SOURCE.RECHECK_TENANT_OWNERS,
@@ -93,7 +80,7 @@ describe(openFinding, () => {
       },
     });
 
-    const rows = await db
+    const rows = await db()
       .select()
       .from(schema.findings)
       .where(eq(schema.findings.tenantId, tenantId));
@@ -101,7 +88,7 @@ describe(openFinding, () => {
   });
 
   it('bumps lastSeenAt without changing firstSeenAt on a repeat sighting', async () => {
-    const { id: tenantId } = await insertTestTenant(db);
+    const { id: tenantId } = await insertTestTenant(db());
     const input = {
       tenantId,
       source: FINDING_SOURCE.DOCUMENT_VALIDATION,
@@ -126,7 +113,7 @@ describe(openFinding, () => {
   });
 
   it('reopens as a new row once the prior finding for the same condition was resolved', async () => {
-    const { id: tenantId } = await insertTestTenant(db);
+    const { id: tenantId } = await insertTestTenant(db());
     const input = {
       tenantId,
       source: FINDING_SOURCE.SITE_CONFIG_REVALIDATION,
@@ -138,7 +125,7 @@ describe(openFinding, () => {
     const first = await openFinding(input);
     expect(first.ok).toBe(true);
     if (!first.ok) return;
-    await db
+    await db()
       .update(schema.findings)
       .set({ status: FINDING_STATUS.RESOLVED, resolvedAt: new Date() })
       .where(eq(schema.findings.id, first.data.finding.id));
@@ -149,7 +136,7 @@ describe(openFinding, () => {
       ok: true,
       data: { finding: expect.anything(), isNewlyOpened: true },
     });
-    const rows = await db
+    const rows = await db()
       .select()
       .from(schema.findings)
       .where(eq(schema.findings.tenantId, tenantId));
@@ -174,7 +161,7 @@ describe(openFinding, () => {
   });
 
   it('returns DB_NOT_FOUND when the open row vanishes before the follow-up update', async () => {
-    const { id: tenantId } = await insertTestTenant(db);
+    const { id: tenantId } = await insertTestTenant(db());
     const input = {
       tenantId,
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,
@@ -184,14 +171,14 @@ describe(openFinding, () => {
     };
     await openFinding(input);
 
-    const insertSpy = vi.spyOn(db, 'insert').mockReturnValueOnce({
+    const insertSpy = vi.spyOn(db(), 'insert').mockReturnValueOnce({
       values: () => ({
         onConflictDoNothing: () => ({ returning: () => Promise.resolve([]) }),
       }),
-    } as unknown as ReturnType<typeof db.insert>);
-    const updateSpy = vi.spyOn(db, 'update').mockReturnValueOnce({
+    } as unknown as ReturnType<ReturnType<typeof db>['insert']>);
+    const updateSpy = vi.spyOn(db(), 'update').mockReturnValueOnce({
       set: () => ({ where: () => ({ returning: () => Promise.resolve([]) }) }),
-    } as unknown as ReturnType<typeof db.update>);
+    } as unknown as ReturnType<ReturnType<typeof db>['update']>);
 
     const result = await openFinding(input);
 
@@ -203,7 +190,7 @@ describe(openFinding, () => {
 
 describe('foreign-key cascade', () => {
   it('removes a finding when its owning tenant is deleted', async () => {
-    const { id: tenantId } = await insertTestTenant(db);
+    const { id: tenantId } = await insertTestTenant(db());
     await openFinding({
       tenantId,
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,
@@ -212,9 +199,9 @@ describe('foreign-key cascade', () => {
       identifier: 'acme.example.com',
     });
 
-    await db.delete(schema.tenants).where(eq(schema.tenants.id, tenantId));
+    await db().delete(schema.tenants).where(eq(schema.tenants.id, tenantId));
 
-    const rows = await db.select().from(schema.findings);
+    const rows = await db().select().from(schema.findings);
     expect(rows).toHaveLength(0);
   });
 });

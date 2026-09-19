@@ -10,8 +10,7 @@ import { setTenantSanityToken } from '@blog/db/queries/tenants/set-tenant-sanity
 import { setTenantSanityWriteToken } from '@blog/db/queries/tenants/set-tenant-sanity-write-token';
 import * as schema from '@blog/db/schema';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { createTestDb } from '@blog/db/testing/create-test-db';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { getTenantSanityWriteCredentials } from './get-tenant-sanity-write-credentials';
 
@@ -33,21 +32,16 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
+const db = useQueryTestDb(getDbMock);
 const originalKey = process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
 
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
 beforeEach(() => {
-  getDbMock.mockReturnValue(db);
   process.env['TENANT_TOKEN_ENCRYPTION_KEY'] =
     'wF3n9s6q0Zc7yq2z8Xh9mS4h9r0kQnW5R2t8jL1oQxo=';
 });
 
 afterEach(async () => {
-  await db.delete(schema.tenants);
+  await db().delete(schema.tenants);
   if (originalKey === undefined) {
     delete process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
   } else {

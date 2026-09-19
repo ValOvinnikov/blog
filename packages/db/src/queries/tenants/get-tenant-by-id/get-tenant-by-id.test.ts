@@ -1,7 +1,6 @@
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { getTenantById } from './get-tenant-by-id';
 
@@ -9,23 +8,15 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
-
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
+const db = useQueryTestDb(getDbMock);
 
 afterEach(async () => {
-  await db.delete(schema.tenants);
+  await db().delete(schema.tenants);
 });
 
 describe(getTenantById, () => {
   it('returns the row for an existing id', async () => {
-    const [inserted] = await db
+    const [inserted] = await db()
       .insert(schema.tenants)
       .values({
         name: 'Acme',
@@ -51,7 +42,7 @@ describe(getTenantById, () => {
   });
 
   it('excludes a deprovisioned tenant by default', async () => {
-    const [inserted] = await db
+    const [inserted] = await db()
       .insert(schema.tenants)
       .values({
         name: 'Acme',
@@ -72,7 +63,7 @@ describe(getTenantById, () => {
   });
 
   it('returns a deprovisioned tenant when includeArchived is true', async () => {
-    const [inserted] = await db
+    const [inserted] = await db()
       .insert(schema.tenants)
       .values({
         name: 'Acme',

@@ -2,10 +2,9 @@ import { ERROR_CODE } from '@blog/config/constants';
 import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
-import { createTestDb } from '@blog/db/testing/create-test-db';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { reactivateTenant } from './reactivate-tenant';
 
@@ -13,7 +12,7 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
+const db = useQueryTestDb(getDbMock);
 
 type TInsertTenantOptions = {
   status: (typeof TENANT_STATUS)[keyof typeof TENANT_STATUS];
@@ -23,7 +22,7 @@ type TInsertTenantOptions = {
 };
 
 async function insertTenant(options: TInsertTenantOptions): Promise<string> {
-  const tenant = await insertTestTenant(db, {
+  const tenant = await insertTestTenant(db(), {
     name: 'Acme',
     status: options.status,
     deprovisionedAt: options.deprovisionedAt,
@@ -34,16 +33,8 @@ async function insertTenant(options: TInsertTenantOptions): Promise<string> {
   return tenant.id;
 }
 
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
-
 afterEach(async () => {
-  await db.delete(schema.tenants);
+  await db().delete(schema.tenants);
 });
 
 describe(reactivateTenant, () => {
@@ -59,7 +50,7 @@ describe(reactivateTenant, () => {
     expect(result.data.deprovisionedAt).toBeNull();
     expect(result.data.status).toBe(TENANT_STATUS.ACTIVE);
 
-    const [row] = await db
+    const [row] = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenantId));
@@ -86,7 +77,7 @@ describe(reactivateTenant, () => {
     expect(result.data.status).toBe(TENANT_STATUS.SUSPENDED);
     expect(result.data.deprovisionedAt).toBeNull();
 
-    const [row] = await db
+    const [row] = await db()
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenantId));
