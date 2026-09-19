@@ -11,6 +11,7 @@ const {
   taxonomyListModuleMock,
   postFeaturedModuleMock,
   heroBlogModuleMock,
+  heroProfileModuleMock,
   heroStatementModuleMock,
   loggerWarnMock,
 } = vi.hoisted(() => ({
@@ -33,6 +34,9 @@ const {
     <div data-testid="stub-post-featured">{id}</div>
   )),
   heroBlogModuleMock: vi.fn(async () => null),
+  heroProfileModuleMock: vi.fn(async ({ id }: { id: string }) => (
+    <h1 data-testid="stub-hero-profile">{id}</h1>
+  )),
   heroStatementModuleMock: vi.fn(async ({ id }: { id: string }) => (
     <h1 data-testid="stub-hero-statement">{id}</h1>
   )),
@@ -57,6 +61,9 @@ vi.mock('@web/modules/post-featured/post-featured-module', () => ({
 }));
 vi.mock('@web/modules/hero-blog/hero-blog-module', () => ({
   HeroBlogModule: heroBlogModuleMock,
+}));
+vi.mock('@web/modules/hero-profile/hero-profile-module', () => ({
+  HeroProfileModule: heroProfileModuleMock,
 }));
 vi.mock('@web/modules/hero-statement/hero-statement-module', () => ({
   HeroStatementModule: heroStatementModuleMock,
@@ -122,6 +129,15 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
     expect(headings).toHaveLength(1);
     expect(headings[0]).toHaveTextContent('Welcome to the blog');
     expect(screen.queryByTestId('stub-hero')).not.toBeInTheDocument();
+  });
+
+  it('renders a module_heroProfile hero via the map', async () => {
+    await setup({ hero: { id: 'hero-3', type: 'module_heroProfile' } });
+
+    const headings = screen.getAllByRole('heading', { level: 1 });
+    expect(headings).toHaveLength(1);
+    expect(screen.getByTestId('stub-hero-profile')).toHaveTextContent('hero-3');
+    expect(loggerWarnMock).not.toHaveBeenCalled();
   });
 
   it('renders nothing and warns once for a module absent from the home page allow-list', async () => {
