@@ -5,8 +5,7 @@ import {
   type TAuditTargetType,
 } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { listAuditEventsForTarget } from './list-audit-events-for-target';
 
@@ -14,7 +13,7 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
+const db = useQueryTestDb(getDbMock);
 
 async function insertEvent(overrides: {
   targetType: TAuditTargetType;
@@ -23,26 +22,20 @@ async function insertEvent(overrides: {
   action?: TAuditAction;
   actorEmail?: string;
 }): Promise<void> {
-  await db.insert(schema.auditEvents).values({
-    actorId: 'admin-1',
-    actorEmail: overrides.actorEmail ?? 'admin-1@example.com',
-    action: overrides.action ?? AUDIT_ACTION.DEPROVISIONED,
-    targetType: overrides.targetType,
-    targetId: overrides.targetId,
-    createdAt: overrides.createdAt,
-  });
+  await db()
+    .insert(schema.auditEvents)
+    .values({
+      actorId: 'admin-1',
+      actorEmail: overrides.actorEmail ?? 'admin-1@example.com',
+      action: overrides.action ?? AUDIT_ACTION.DEPROVISIONED,
+      targetType: overrides.targetType,
+      targetId: overrides.targetId,
+      createdAt: overrides.createdAt,
+    });
 }
 
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
-
 afterEach(async () => {
-  await db.delete(schema.auditEvents);
+  await db().delete(schema.auditEvents);
 });
 
 describe(listAuditEventsForTarget, () => {

@@ -1,8 +1,7 @@
 import { ERROR_CODE } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { startProvisioningRun } from '../start-provisioning-run';
 
@@ -12,28 +11,23 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
+const db = useQueryTestDb(getDbMock);
 
 const NOW = '2026-09-02T12:00:00.000Z';
 
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
 beforeEach(() => {
-  getDbMock.mockReturnValue(db);
   vi.useFakeTimers();
   vi.setSystemTime(new Date(NOW));
 });
 
 afterEach(async () => {
-  await db.delete(schema.tenants);
+  await db().delete(schema.tenants);
   vi.useRealTimers();
 });
 
 describe(finishProvisioningRun, () => {
   it('merges finishedAt without clobbering startedAt/registry/workflowRunUrl', async () => {
-    const tenant = await insertTestTenant(db);
+    const tenant = await insertTestTenant(db());
     await startProvisioningRun({
       tenantId: tenant.id,
       registry: 'production',
@@ -53,7 +47,7 @@ describe(finishProvisioningRun, () => {
   });
 
   it('sets finishedAt on an absent run rather than throwing', async () => {
-    const tenant = await insertTestTenant(db);
+    const tenant = await insertTestTenant(db());
 
     const result = await finishProvisioningRun({ tenantId: tenant.id });
 
@@ -62,7 +56,7 @@ describe(finishProvisioningRun, () => {
   });
 
   it('leaves every step entry untouched', async () => {
-    const tenant = await insertTestTenant(db, {
+    const tenant = await insertTestTenant(db(), {
       provisioningSteps: {
         SANITY_PROJECT: { status: 'FAILED', error: 'boom' },
         SEED_CONTENT: { status: 'IDLE' },

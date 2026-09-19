@@ -61,6 +61,20 @@ export const testFallsBackToHeadingWithoutHero = ({
   });
 };
 
+export const testHeroProfileHero = ({
+  setup,
+  loggerWarnMock,
+}: IWithSetup & { loggerWarnMock: Mock }) => {
+  it('renders a module_heroProfile hero via the map', async () => {
+    await setup({ hero: { id: 'hero-3', type: 'module_heroProfile' } });
+
+    const headings = screen.getAllByRole('heading', { level: 1 });
+    expect(headings).toHaveLength(1);
+    expect(screen.getByTestId('stub-hero-profile')).toHaveTextContent('hero-3');
+    expect(loggerWarnMock).not.toHaveBeenCalled();
+  });
+};
+
 export const testWarnsForUnknownModule = ({
   setup,
   loggerWarnMock,

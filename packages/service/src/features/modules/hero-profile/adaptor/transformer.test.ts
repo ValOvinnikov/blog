@@ -54,11 +54,26 @@ describe(toHeroProfileModule, () => {
     expect(hero.eyebrow).toBe('Field notes');
   });
 
+  it("maps avatarName from the author's name, straight through", () => {
+    const raw = makeRawHeroProfileModule({
+      author: {
+        name: 'Alex Chen',
+        image: null,
+        socialLinks: null,
+      },
+    });
+
+    const hero = toHeroProfileModule(raw);
+
+    expect(hero.avatarName).toBe('Alex Chen');
+  });
+
   describe('image precedence', () => {
     it("uses the hero's own image when set, ignoring the author photo", () => {
       const raw = makeRawHeroProfileModule({
         image: makeRawSanityImage('Custom alt'),
         author: {
+          name: 'Jamie Rivera',
           image: makeRawSanityImage('Author photo'),
           socialLinks: null,
         },
@@ -73,6 +88,7 @@ describe(toHeroProfileModule, () => {
       const raw = makeRawHeroProfileModule({
         image: null,
         author: {
+          name: 'Jamie Rivera',
           image: makeRawSanityImage('Author photo'),
           socialLinks: null,
         },
@@ -86,7 +102,7 @@ describe(toHeroProfileModule, () => {
     it('leaves sanityImage undefined when neither the hero nor the author has a photo (a supported state)', () => {
       const raw = makeRawHeroProfileModule({
         image: null,
-        author: { image: null, socialLinks: null },
+        author: { name: 'Jamie Rivera', image: null, socialLinks: null },
       });
 
       const hero = toHeroProfileModule(raw);
@@ -100,6 +116,7 @@ describe(toHeroProfileModule, () => {
       const raw = makeRawHeroProfileModule({
         showSocialLinks: true,
         author: {
+          name: 'Jamie Rivera',
           image: null,
           socialLinks: [
             {
@@ -133,6 +150,7 @@ describe(toHeroProfileModule, () => {
       const raw = makeRawHeroProfileModule({
         showSocialLinks: false,
         author: {
+          name: 'Jamie Rivera',
           image: null,
           socialLinks: [
             {
@@ -151,7 +169,7 @@ describe(toHeroProfileModule, () => {
     it('returns an empty array when showSocialLinks is on and the author has none (a supported state)', () => {
       const raw = makeRawHeroProfileModule({
         showSocialLinks: true,
-        author: { image: null, socialLinks: null },
+        author: { name: 'Jamie Rivera', image: null, socialLinks: null },
       });
 
       const hero = toHeroProfileModule(raw);
@@ -163,6 +181,7 @@ describe(toHeroProfileModule, () => {
       const raw = makeRawHeroProfileModule({
         showSocialLinks: true,
         author: {
+          name: 'Jamie Rivera',
           image: null,
           socialLinks: [
             {

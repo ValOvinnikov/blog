@@ -2,6 +2,7 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
   testHeadingWithoutHero,
+  testHeroProfileHero,
   testRendersAllowedModulesInOrder,
   testWarnsForUnknownModule,
 } from '@web/testing/shared/module-renderer-contract/module-renderer-contract';
@@ -16,6 +17,7 @@ const {
   taxonomyListModuleMock,
   postFeaturedModuleMock,
   heroBlogModuleMock,
+  heroProfileModuleMock,
   heroStatementModuleMock,
   loggerWarnMock,
 } = vi.hoisted(() => ({
@@ -38,6 +40,9 @@ const {
     <div data-testid="stub-post-featured">{id}</div>
   )),
   heroBlogModuleMock: vi.fn(async () => null),
+  heroProfileModuleMock: vi.fn(async ({ id }: { id: string }) => (
+    <h1 data-testid="stub-hero-profile">{id}</h1>
+  )),
   heroStatementModuleMock: vi.fn(async ({ id }: { id: string }) => (
     <h1 data-testid="stub-hero-statement">{id}</h1>
   )),
@@ -62,6 +67,9 @@ vi.mock('@web/modules/post-featured/post-featured-module', () => ({
 }));
 vi.mock('@web/modules/hero-blog/hero-blog-module', () => ({
   HeroBlogModule: heroBlogModuleMock,
+}));
+vi.mock('@web/modules/hero-profile/hero-profile-module', () => ({
+  HeroProfileModule: heroProfileModuleMock,
 }));
 vi.mock('@web/modules/hero-statement/hero-statement-module', () => ({
   HeroStatementModule: heroStatementModuleMock,
@@ -122,6 +130,8 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
     expect(headings[0]).toHaveTextContent('Welcome to the blog');
     expect(screen.queryByTestId('stub-hero')).not.toBeInTheDocument();
   });
+
+  testHeroProfileHero({ setup, loggerWarnMock });
 
   testWarnsForUnknownModule({
     setup,

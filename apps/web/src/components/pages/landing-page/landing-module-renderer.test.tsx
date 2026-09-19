@@ -4,6 +4,7 @@ import {
   testFallsBackToHeadingWithoutHero,
   testHeadingWithoutHero,
   testHeroBeforeModules,
+  testHeroProfileHero,
   testRendersAllowedModulesInOrder,
   testResolvedHero,
   testWarnsForUnknownModule,
@@ -20,6 +21,7 @@ const {
   taxonomyListModuleMock,
   postFeaturedModuleMock,
   heroBlogModuleMock,
+  heroProfileModuleMock,
   heroStatementModuleMock,
   loggerWarnMock,
 } = vi.hoisted(() => ({
@@ -46,6 +48,9 @@ const {
       <h1 data-testid="stub-hero">{id}</h1>
     ),
   ),
+  heroProfileModuleMock: vi.fn(async ({ id }: { id: string }) => (
+    <h1 data-testid="stub-hero-profile">{id}</h1>
+  )),
   heroStatementModuleMock: vi.fn(async ({ id }: { id: string }) => (
     <h1 data-testid="stub-hero-statement">{id}</h1>
   )),
@@ -70,6 +75,9 @@ vi.mock('@web/modules/post-featured/post-featured-module', () => ({
 }));
 vi.mock('@web/modules/hero-blog/hero-blog-module', () => ({
   HeroBlogModule: heroBlogModuleMock,
+}));
+vi.mock('@web/modules/hero-profile/hero-profile-module', () => ({
+  HeroProfileModule: heroProfileModuleMock,
 }));
 vi.mock('@web/modules/hero-statement/hero-statement-module', () => ({
   HeroStatementModule: heroStatementModuleMock,
@@ -108,6 +116,7 @@ describe(`<${LandingModuleRenderer.name}/>`, () => {
     heroBlogModuleMock,
     headingText: 'About Us',
   });
+  testHeroProfileHero({ setup, loggerWarnMock });
   testWarnsForUnknownModule({
     setup,
     loggerWarnMock,

@@ -17,4 +17,8 @@ describe('heroProfileModuleQuery', () => {
   it('derefs the author reference', () => {
     expect(heroProfileModuleQuery.query).toContain('author->');
   });
+
+  it("projects the author's name for the avatar fallback", () => {
+    expect(heroProfileModuleQuery.query).toContain('name');
+  });
 });

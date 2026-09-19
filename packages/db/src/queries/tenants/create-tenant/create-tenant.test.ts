@@ -1,8 +1,7 @@
 import { ERROR_CODE } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { createTenant, type TCreateTenantInput } from './create-tenant';
 
@@ -10,7 +9,7 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
+const db = useQueryTestDb(getDbMock);
 
 const tenantInput: TCreateTenantInput = {
   name: 'Acme',
@@ -22,16 +21,8 @@ const tenantInput: TCreateTenantInput = {
   status: TENANT_STATUS.ACTIVE,
 };
 
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
-
 afterEach(async () => {
-  await db.delete(schema.tenants);
+  await db().delete(schema.tenants);
 });
 
 describe(createTenant, () => {
@@ -57,7 +48,7 @@ describe(createTenant, () => {
         error: ERROR_CODE.DB_INVALID_DOMAIN,
       });
 
-      const rows = await db.select().from(schema.tenants);
+      const rows = await db().select().from(schema.tenants);
       expect(rows).toHaveLength(0);
     },
   );

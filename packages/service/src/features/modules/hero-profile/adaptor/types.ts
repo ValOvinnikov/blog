@@ -16,6 +16,7 @@ export type THeroProfileModule = {
   variant: THeroVariant;
   headingBlock: THeadingBlock;
   eyebrow: TMaybeUndefined<string>;
+  avatarName: string;
   sanityImage: TMaybeUndefined<ISanityImage>;
   socialLinks: TSocialProfile[];
   ctaButtons: TCtaButton[];

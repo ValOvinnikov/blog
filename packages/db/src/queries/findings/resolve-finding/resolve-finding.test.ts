@@ -6,9 +6,8 @@ import {
   FINDING_STATUS,
 } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { openFinding } from '../open-finding';
 
@@ -18,24 +17,16 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
-
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
+const db = useQueryTestDb(getDbMock);
 
 afterEach(async () => {
-  await db.delete(schema.findings);
-  await db.delete(schema.tenants);
+  await db().delete(schema.findings);
+  await db().delete(schema.tenants);
 });
 
 describe(resolveFinding, () => {
   it('marks an open finding resolved and stamps resolvedAt', async () => {
-    const { id: tenantId } = await insertTestTenant(db);
+    const { id: tenantId } = await insertTestTenant(db());
     const opened = await openFinding({
       tenantId,
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,
@@ -59,7 +50,7 @@ describe(resolveFinding, () => {
   });
 
   it('allows the same condition to reopen after being resolved', async () => {
-    const { id: tenantId } = await insertTestTenant(db);
+    const { id: tenantId } = await insertTestTenant(db());
     const input = {
       tenantId,
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,
@@ -87,7 +78,7 @@ describe(resolveFinding, () => {
   });
 
   it('returns DB_NOT_FOUND when the finding is already resolved', async () => {
-    const { id: tenantId } = await insertTestTenant(db);
+    const { id: tenantId } = await insertTestTenant(db());
     const opened = await openFinding({
       tenantId,
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,

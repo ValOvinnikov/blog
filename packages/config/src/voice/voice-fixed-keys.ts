@@ -40,6 +40,7 @@ export const VOICE_FIXED_KEYS = [
   'carousel.previousAriaLabel',
   'carousel.nextAriaLabel',
   'carousel.regionLabel',
+  'hero.socialLinksAriaLabel',
 
   // Archive/breadcrumb labels derived from Studio content rather than
   // authored directly.

@@ -4,8 +4,7 @@ import {
   TENANT_STATUS,
 } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { listTenantsPendingOwnerElevation } from './list-tenants-pending-owner-elevation';
 
@@ -13,18 +12,10 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
-
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
+const db = useQueryTestDb(getDbMock);
 
 afterEach(async () => {
-  await db.delete(schema.tenants);
+  await db().delete(schema.tenants);
 });
 
 const baseTenant = {
@@ -38,11 +29,13 @@ const baseTenant = {
 
 describe(listTenantsPendingOwnerElevation, () => {
   it('includes an ACTIVE, READY tenant', async () => {
-    await db.insert(schema.tenants).values({
-      ...baseTenant,
-      status: TENANT_STATUS.ACTIVE,
-      provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-    });
+    await db()
+      .insert(schema.tenants)
+      .values({
+        ...baseTenant,
+        status: TENANT_STATUS.ACTIVE,
+        provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+      });
 
     const result = await listTenantsPendingOwnerElevation();
 
@@ -54,11 +47,13 @@ describe(listTenantsPendingOwnerElevation, () => {
     TENANT_PROVISIONING_STATUS.PROVISIONING,
     TENANT_PROVISIONING_STATUS.FAILED,
   ])('excludes a tenant with provisioningStatus %s', async (status) => {
-    await db.insert(schema.tenants).values({
-      ...baseTenant,
-      status: TENANT_STATUS.ACTIVE,
-      provisioningStatus: status,
-    });
+    await db()
+      .insert(schema.tenants)
+      .values({
+        ...baseTenant,
+        status: TENANT_STATUS.ACTIVE,
+        provisioningStatus: status,
+      });
 
     const result = await listTenantsPendingOwnerElevation();
 
@@ -68,14 +63,16 @@ describe(listTenantsPendingOwnerElevation, () => {
   it.each([TENANT_STATUS.SUSPENDED, TENANT_STATUS.ARCHIVED])(
     'excludes a tenant with status %s',
     async (status) => {
-      await db.insert(schema.tenants).values({
-        ...baseTenant,
-        status,
-        provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-        ...(status === TENANT_STATUS.ARCHIVED
-          ? { deprovisionedAt: new Date() }
-          : {}),
-      });
+      await db()
+        .insert(schema.tenants)
+        .values({
+          ...baseTenant,
+          status,
+          provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+          ...(status === TENANT_STATUS.ARCHIVED
+            ? { deprovisionedAt: new Date() }
+            : {}),
+        });
 
       const result = await listTenantsPendingOwnerElevation();
 
@@ -84,12 +81,14 @@ describe(listTenantsPendingOwnerElevation, () => {
   );
 
   it('excludes a deprovisioned tenant', async () => {
-    await db.insert(schema.tenants).values({
-      ...baseTenant,
-      status: TENANT_STATUS.ARCHIVED,
-      provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-      deprovisionedAt: new Date(),
-    });
+    await db()
+      .insert(schema.tenants)
+      .values({
+        ...baseTenant,
+        status: TENANT_STATUS.ARCHIVED,
+        provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+        deprovisionedAt: new Date(),
+      });
 
     const result = await listTenantsPendingOwnerElevation();
 

@@ -5,9 +5,8 @@ import {
   FINDING_STATUS,
 } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { openFinding } from '../open-finding';
 import { resolveFinding } from '../resolve-finding';
@@ -18,25 +17,17 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
-
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
+const db = useQueryTestDb(getDbMock);
 
 afterEach(async () => {
-  await db.delete(schema.findings);
-  await db.delete(schema.tenants);
+  await db().delete(schema.findings);
+  await db().delete(schema.tenants);
 });
 
 describe(listFindingsForTenant, () => {
   it('returns only the given tenant’s findings, most recently seen first', async () => {
-    const { id: tenantOneId } = await insertTestTenant(db);
-    const { id: tenantTwoId } = await insertTestTenant(db);
+    const { id: tenantOneId } = await insertTestTenant(db());
+    const { id: tenantTwoId } = await insertTestTenant(db());
     const olderInput = {
       tenantId: tenantOneId,
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,
@@ -62,7 +53,7 @@ describe(listFindingsForTenant, () => {
   });
 
   it('filters by status when given', async () => {
-    const { id: tenantId } = await insertTestTenant(db);
+    const { id: tenantId } = await insertTestTenant(db());
     const opened = await openFinding({
       tenantId,
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,
@@ -93,7 +84,7 @@ describe(listFindingsForTenant, () => {
   });
 
   it('returns an empty array for a tenant with no findings', async () => {
-    const { id: tenantId } = await insertTestTenant(db);
+    const { id: tenantId } = await insertTestTenant(db());
 
     const result = await listFindingsForTenant(tenantId);
 

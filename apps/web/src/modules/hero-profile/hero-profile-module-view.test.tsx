@@ -1,0 +1,160 @@
+import {
+  BRAND_VARIANT,
+  CTA_ACTION_APPEARANCE,
+  CTA_ACTION_VARIANT,
+  HERO_VARIANT,
+} from '@blog/config';
+import { customRender, screen } from '@web/testing/custom-render';
+import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+
+import { HeroProfileModuleView } from './hero-profile-module-view';
+
+const sanityImage = makeSanityImage();
+
+const primaryButton = {
+  variant: CTA_ACTION_VARIANT.PRIMARY,
+  appearance: CTA_ACTION_APPEARANCE.CONTAINED,
+  link: {
+    label: 'Get in touch',
+    href: '/contact',
+    target: undefined,
+    platform: undefined,
+    ariaLabel: undefined,
+  },
+};
+
+const socialLinksItems = (
+  <li>
+    <a href="https://github.com/example">GitHub profile</a>
+  </li>
+);
+
+const heading = 'Building better products';
+const avatarName = 'Jamie Rivera';
+
+const setup = customRender(HeroProfileModuleView, {
+  id: 'hero-profile-1',
+  brandVariant: BRAND_VARIANT.PRIMARY,
+  variant: HERO_VARIANT.SPLIT,
+  eyebrow: undefined,
+  headingBlock: makeHeadingBlock({ heading }),
+  avatarName,
+  sanityImage: undefined,
+  socialLinksItems: undefined,
+  socialLinksAriaLabel: 'Profiles',
+  ctaButtons: [],
+  contentPosition: undefined,
+  contentAlignment: undefined,
+  mediaOrder: undefined,
+  layout: undefined,
+});
+
+describe(`<${HeroProfileModuleView.name}/>`, () => {
+  it('renders the heading as the top-level heading, labelling the Section via a unique id derived from the module id', () => {
+    setup();
+
+    const renderedHeading = screen.getByRole('heading', {
+      level: 1,
+      name: heading,
+    });
+    expect(renderedHeading).toBeVisible();
+    expect(renderedHeading).toHaveAttribute(
+      'id',
+      'hero-profile-hero-profile-1',
+    );
+
+    const section = renderedHeading.closest('section');
+    expect(section).toHaveAttribute(
+      'aria-labelledby',
+      'hero-profile-hero-profile-1',
+    );
+  });
+
+  it('renders the photo as a round avatar on Stacked', () => {
+    setup({ variant: HERO_VARIANT.STACKED, sanityImage });
+
+    const img = screen.getByRole('img', { name: sanityImage.alt });
+    expect(img).toHaveAttribute('height', '256');
+    expect(img).toHaveClass('rounded-full');
+  });
+
+  it('renders the photo as a square portrait on Split', () => {
+    setup({ variant: HERO_VARIANT.SPLIT, sanityImage });
+
+    const img = screen.getByRole('img', { name: sanityImage.alt });
+    expect(img.getAttribute('src')).toContain('h=900');
+  });
+
+  it('renders the photo as a legible, prioritized background on Banner', () => {
+    setup({ variant: HERO_VARIANT.BANNER, sanityImage });
+
+    const img = screen.getByRole('img', { name: sanityImage.alt });
+    expect(img).toHaveAttribute('height', '675');
+    expect(img).toHaveAttribute('fetchpriority', 'high');
+  });
+
+  // Both routes to a missing photo (`imageSource: NONE`, and an author with
+  // no `image`) collapse to the same `sanityImage: undefined` before this
+  // view ever sees it, so one case per variant is the full input space here
+  // — the route distinction itself is covered by the loader's own tests.
+  it('renders initials derived from the author name (never the heading) instead of an empty avatar when no image resolves on Stacked, exposing the full name to the accessibility tree', () => {
+    setup({ variant: HERO_VARIANT.STACKED, sanityImage: undefined });
+
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    expect(screen.getByText('JR')).toBeVisible();
+    expect(screen.queryByText('BB')).not.toBeInTheDocument();
+    expect(
+      screen.getByText(avatarName).closest('[aria-hidden="true"]'),
+    ).toBeNull();
+  });
+
+  it('renders initials derived from the author name (never the heading) instead of an empty media area when no image resolves on Split, exposing the full name to the accessibility tree', () => {
+    setup({ variant: HERO_VARIANT.SPLIT, sanityImage: undefined });
+
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    expect(screen.getByText('JR')).toBeVisible();
+    expect(screen.queryByText('BB')).not.toBeInTheDocument();
+    expect(
+      screen.getByText(avatarName).closest('[aria-hidden="true"]'),
+    ).toBeNull();
+  });
+
+  it('renders initials derived from the author name (never the heading) instead of an empty media area when no image resolves on Banner, but hides the fallback from the accessibility tree since the media is a decorative backdrop there', () => {
+    setup({ variant: HERO_VARIANT.BANNER, sanityImage: undefined });
+
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    expect(screen.getByText('JR')).toBeVisible();
+    expect(screen.queryByText('BB')).not.toBeInTheDocument();
+    expect(
+      screen.getByText(avatarName).closest('[aria-hidden="true"]'),
+    ).not.toBeNull();
+  });
+
+  it('renders no Hero.Cta slot when ctaButtons is empty', () => {
+    setup({ ctaButtons: [] });
+
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('renders the authored buttons via ActionGroup', () => {
+    setup({ ctaButtons: [primaryButton] });
+
+    const link = screen.getByRole('link', { name: 'Get in touch' });
+    expect(link).toHaveAttribute('href', '/contact');
+  });
+
+  it('renders no Hero.Social slot when there are no social links', () => {
+    setup({ socialLinksItems: undefined });
+
+    expect(screen.queryByRole('list')).not.toBeInTheDocument();
+  });
+
+  it('renders a labelled list carrying the resolved social link items', () => {
+    setup({ socialLinksItems });
+
+    const list = screen.getByRole('list', { name: 'Profiles' });
+    expect(list).toBeVisible();
+    expect(screen.getByRole('link', { name: 'GitHub profile' })).toBeVisible();
+  });
+});

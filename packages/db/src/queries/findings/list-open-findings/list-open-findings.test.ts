@@ -4,9 +4,8 @@ import {
   FINDING_SOURCE,
 } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { openFinding } from '../open-finding';
 import { resolveFinding } from '../resolve-finding';
@@ -17,25 +16,17 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-let db: PgliteDatabase<typeof schema>;
-
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
+const db = useQueryTestDb(getDbMock);
 
 afterEach(async () => {
-  await db.delete(schema.findings);
-  await db.delete(schema.tenants);
+  await db().delete(schema.findings);
+  await db().delete(schema.tenants);
 });
 
 describe(listOpenFindings, () => {
   it('returns open findings across every tenant, excluding resolved ones', async () => {
-    const { id: tenantOneId } = await insertTestTenant(db);
-    const { id: tenantTwoId } = await insertTestTenant(db);
+    const { id: tenantOneId } = await insertTestTenant(db());
+    const { id: tenantTwoId } = await insertTestTenant(db());
     const resolved = await openFinding({
       tenantId: tenantOneId,
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,
