@@ -2,7 +2,7 @@ import { fileURLToPath } from 'node:url';
 
 import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
-import { defineConfig, mergeConfig, type ViteUserConfig } from 'vitest/config';
+import { defineConfig, mergeConfig } from 'vitest/config';
 
 /**
  * Shared Vitest preset.
@@ -39,13 +39,25 @@ export const blogPackageAlias = (pkg: string, importMetaUrl: string) => ({
   replacement: `${fileURLToPath(new URL(`../../packages/${pkg}/src`, importMetaUrl))}/`,
 });
 
-export type TNextAppVitestOverrides = Pick<ViteUserConfig, 'resolve'>;
+type TAliasEntry = ReturnType<typeof blogPackageAlias>;
+
+// server-only throws outside a react-server bundle; stub it to a no-op for tests — the real guard still runs at build time.
+const SERVER_ONLY_STUB_ALIAS = {
+  find: /^server-only$/,
+  replacement: fileURLToPath(new URL('./server-only-stub.ts', import.meta.url)),
+};
+
+export type TNextAppVitestOverrides = {
+  resolve: { alias: TAliasEntry[] };
+};
 
 export function createVitestConfig(overrides: TNextAppVitestOverrides) {
   return mergeConfig(
     preset,
     defineConfig({
-      ...overrides,
+      resolve: {
+        alias: [...overrides.resolve.alias, SERVER_ONLY_STUB_ALIAS],
+      },
       // @blog/ui ships raw .svg imports from source, so both apps' tests need the same SVGR handling as its own Vitest config.
       plugins: [
         svgr({

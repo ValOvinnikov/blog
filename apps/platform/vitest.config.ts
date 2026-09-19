@@ -20,13 +20,6 @@ export default createVitestConfig({
       blogPackageAlias('studio', import.meta.url),
       blogPackageAlias('utils', import.meta.url),
       blogPackageAlias('email', import.meta.url),
-      // import 'server-only' throws outside a react-server bundle; stub it to a no-op for tests — the real guard still runs at build time.
-      {
-        find: /^server-only$/,
-        replacement: fileURLToPath(
-          new URL('./src/testing/server-only-stub.ts', import.meta.url),
-        ),
-      },
     ],
   },
 });
