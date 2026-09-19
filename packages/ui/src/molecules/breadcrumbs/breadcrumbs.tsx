@@ -17,36 +17,14 @@ export interface IBreadcrumbItem {
 
 export type TBreadcrumbsProps = IWithClassName &
   IWithDataTestId & {
-    /** Full trail including the current page as the last item. */
     items: IBreadcrumbItem[];
-    /** aria-label for the nav — passed in (i18n), never hardcoded in @blog/ui. */
     ariaLabel: string;
-    /** Component each link renders as — pass the app router's Link for client-side navigation. Defaults to a plain `<a>`. */
     linkAs?: TAnchorElementType;
   };
 
 const s = breadcrumbsVariants();
 
-/**
- * Breadcrumbs — page-chrome navigation trail (e.g. `Home › Topic ›
- * Post title`). Every item except the last renders as a link; the last item
- * is the current page, rendered as plain text with `aria-current="page"`.
- * The trail stays on a single line at every viewport width; earlier items
- * never shrink, and only the last (current) item truncates with an ellipsis
- * when the full trail doesn't fit — its complete text stays in the DOM (and
- * as its `title`) regardless of truncation, so nothing is lost for
- * assistive tech or sighted hover users.
- * The first item renders a decorative House icon in place of its visible
- * label text — the label itself stays in the DOM as visually-hidden text so
- * the item keeps a real accessible name for assistive tech, and is also set
- * as a `title` attribute so sighted mouse users get a hover tooltip (same
- * convention as other icon-only interactive elements in this library, e.g.
- * `ThemeToggle`). This `title` is applied on whichever element the first
- * item renders as, so a single-item trail (first item also current) is
- * covered too. Separators are decorative CSS `::before` pseudo-elements,
- * kept out of the a11y tree. Pure and independent of page content — render
- * it as a sibling above the content organism, never nested inside one.
- */
+/** Page-chrome navigation trail (e.g. `Home › Topic › Post title`). */
 export const Breadcrumbs = ({
   items,
   ariaLabel,

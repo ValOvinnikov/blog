@@ -7,12 +7,7 @@ export type TMetaSeparatorProps = IWithClassName &
     separator?: string;
   };
 
-/**
- * MetaSeparator atom — decorative separator for inline metadata lists
- * (e.g. "Author · Date · Read time"). Hidden from assistive technology.
- * Defaults to a middle dot but accepts any separator character via the
- * `separator` prop.
- */
+/** Decorative separator for inline metadata lists (e.g. "Author · Date · Read time"). */
 export const MetaSeparator = ({
   separator = '·',
   className,

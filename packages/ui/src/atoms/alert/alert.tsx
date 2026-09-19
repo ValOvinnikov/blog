@@ -22,12 +22,7 @@ export type TAlertProps = IWithClassName &
     id?: string;
   };
 
-/**
- * Alert — a static, type-coded inline message block for form feedback
- * (confirmations, warnings, and errors). Renders its own icon per type and
- * announces itself assertively for the ERROR type and politely for every
- * other type.
- */
+/** A static, type-coded inline message block for form feedback (confirmations, warnings, and errors). */
 export const Alert = ({
   type,
   message,

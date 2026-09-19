@@ -14,10 +14,7 @@ export type TMediaCardMediaProps = IWithClassName &
     children?: ReactNode;
   };
 
-/**
- * MediaCardMedia — the media region of a `MediaCard`; a styled `<div>` wrapper
- * you fill with an image or `MediaFrame`.
- */
+/** The media region of a `MediaCard`; a styled `<div>` wrapper you fill with an image or `MediaFrame`. */
 export const MediaCardMedia = ({
   isLead,
   shape,

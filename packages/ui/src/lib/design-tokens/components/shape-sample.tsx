@@ -4,11 +4,6 @@ export type TShapeSampleProps = {
   tokens: TToken[];
 };
 
-/**
- * Radius boxes, one per token, sized identically so the corner rounding is
- * comparable. Tinted fill + accent border make each radius clearly visible
- * (a white-on-white box reads as square).
- */
 export const ShapeSample = ({ tokens }: TShapeSampleProps) => (
   <div className="flex flex-wrap gap-8">
     {tokens.map((token) => (

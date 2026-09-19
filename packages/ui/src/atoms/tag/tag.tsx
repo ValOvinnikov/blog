@@ -15,10 +15,7 @@ export type TTagProps<C extends ElementType = 'span'> = TPolymorphicProps<
   TTagOwnProps
 >;
 
-/**
- * Tag — small pill-shaped label. Renders as a `<span>` by default; pass `as`
- * (e.g. `'a'` or the app router's `Link`) to render a clickable tag.
- */
+/** Small pill-shaped label. */
 export const Tag = <C extends ElementType = 'span'>({
   className,
   variant,

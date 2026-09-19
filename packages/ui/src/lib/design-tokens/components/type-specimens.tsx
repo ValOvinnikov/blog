@@ -9,11 +9,6 @@ export type TTypeSpecimensProps = {
 
 const SAMPLE = 'The quick brown fox jumps over the lazy dog';
 
-/**
- * One specimen row per typography or font token, styled with the token's own
- * declared value. Rows are divided by a hairline so each specimen is clearly
- * separated (mirrors the colour table's row rhythm).
- */
 export const TypeSpecimens = ({ tokens, isFontOnly }: TTypeSpecimensProps) => (
   <div className="divide-y divide-border">
     {tokens.map((token) => {

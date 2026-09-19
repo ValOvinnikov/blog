@@ -18,13 +18,7 @@ export type TThemeToggleProps = IWithClassName &
     darkLabel?: string;
   };
 
-/**
- * A pure, controlled theme-switch button. The consumer owns the actual theme
- * state (e.g. reading/writing `document.documentElement` and `localStorage`
- * in `apps/web`) and passes it down via `isDark`/`onToggle`. Renders a
- * placeholder while `isMounted` is `false` to avoid a hydration-mismatch flash
- * before the consumer knows the real theme.
- */
+/** A pure, controlled theme-switch button. */
 export const ThemeToggle = ({
   className,
   dataTestId,

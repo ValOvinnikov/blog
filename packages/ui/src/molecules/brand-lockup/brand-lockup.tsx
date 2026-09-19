@@ -5,17 +5,12 @@ import { brandLockupVariants } from './brand-lockup-variants';
 
 export type TBrandLockupProps = IWithClassName &
   IWithDataTestId & {
-    /** Uploaded brand-mark image source; falls through to `BrandMark`'s polygon fallback when unset. */
     src?: string;
     size?: TBrandMarkProps['size'];
     tagline?: string;
   };
 
-/**
- * BrandLockup molecule — the brand mark plus an optional monospace tagline,
- * stacked with the mark above. The tagline reveals at `md` (≥768px), only
- * when `tagline` is supplied.
- */
+/** The brand mark plus an optional monospace tagline, stacked with the mark above. */
 export const BrandLockup = ({
   src,
   size,

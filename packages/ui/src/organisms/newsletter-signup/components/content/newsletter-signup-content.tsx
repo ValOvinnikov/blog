@@ -19,16 +19,11 @@ type TNewsletterSignupContentProps = {
   submitLabel: string;
   emailAriaLabel: string;
   placeholder?: string;
-  /** Decorative leading glyph or icon forwarded to the email `TextInput`'s `leadingIcon`. */
   inputPrompt: ReactNode;
   variant: TNewsletterSignupVariants['variant'];
 };
 
-/**
- * The email input, submit button, and inline error feedback shared by every
- * density of the signup form — `Full` and `Compact` each wrap this with
- * their own surrounding chrome.
- */
+/** The email input, submit button, and inline error feedback shared by every density of the signup form. */
 export const NewsletterSignupContent = ({
   email,
   onChange,

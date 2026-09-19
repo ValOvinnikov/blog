@@ -8,10 +8,7 @@ export type THeaderActionsProps = IWithClassName &
     children?: ReactNode;
   };
 
-/**
- * HeaderActions — the trailing actions cluster in the site `Header` (e.g. theme
- * toggle, auth controls); a styled `<div>` wrapper.
- */
+/** The trailing actions cluster in the site `Header` (e.g. theme toggle, auth controls); a styled `<div>` wrapper. */
 export const HeaderActions = ({
   className,
   dataTestId,

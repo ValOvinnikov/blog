@@ -8,15 +8,11 @@ import { heroMediaVariants } from './hero-media-variants';
 export type THeroMediaProps = IWithClassName &
   IWithDataTestId & {
     isFramed?: boolean;
-    /** Ignored on Banner, whose media is unframed. */
     ratio?: TMediaFrameRatio;
     children?: ReactNode;
   };
 
-/**
- * HeroMedia — the media slot of a `Hero`; frames its content via `MediaFrame`,
- * at a configurable ratio (16:9 by default).
- */
+/** The media slot of a `Hero`; frames its content via `MediaFrame`, at a configurable ratio (16:9 by default). */
 export const HeroMedia = ({
   isFramed = true,
   ratio = 'video',

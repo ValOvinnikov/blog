@@ -12,10 +12,7 @@ export type THeroAvatarProps = IWithClassName &
     children?: ReactNode;
   };
 
-/**
- * HeroAvatar — the portrait slot of a `Hero`, rendered before the eyebrow; a
- * styled `<div>` for the caller's own `Avatar` or image.
- */
+/** The portrait slot of a `Hero`, rendered before the eyebrow; a styled `<div>` for the caller's own `Avatar` or image. */
 export const HeroAvatar = ({
   contentAlignment,
   className,

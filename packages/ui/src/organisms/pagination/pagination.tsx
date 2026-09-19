@@ -6,36 +6,18 @@ import { paginationVariants } from './pagination-variants';
 
 export type TPaginationProps = IWithClassName &
   IWithDataTestId & {
-    /** 1-based current page. */
     currentPage: number;
     totalPages: number;
-    /** Builds the href for a page number — URL scheme stays in the app. */
     createHref: (page: number) => string;
     ariaLabel: string;
     previousLabel: string;
     nextLabel: string;
-    /** Component links render as — pass the app router's Link for client-side navigation. */
     linkAs?: TAnchorElementType;
   };
 
 const s = paginationVariants();
 
-/**
- * Pagination — prev/next + numbered links for paginated listings,
- * route-agnostic (`createHref`) and polymorphic (`linkAs`); renders nothing
- * when there is a single page.
- *
- * @example
- * <Pagination
- *   currentPage={2}
- *   totalPages={5}
- *   createHref={routes.blogIndex}
- *   ariaLabel="Blog pages"
- *   previousLabel="Previous"
- *   nextLabel="Next"
- *   linkAs={Link}
- * />
- */
+/** Prev/next + numbered links for paginated listings, route-agnostic (`createHref`) and polymorphic (`linkAs`); renders nothing when there is a single page. */
 export const Pagination = ({
   currentPage,
   totalPages,

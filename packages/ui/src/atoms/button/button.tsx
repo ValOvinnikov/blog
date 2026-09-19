@@ -14,11 +14,7 @@ export type TButtonProps = IWithClassName &
     'aria-busy'?: AriaAttributes['aria-busy'];
   };
 
-/**
- * Button — the styled `<button>` for in-page actions (submit, toggle, dismiss).
- * Defaults to `type="button"` and takes its look from the shared `variant`/`size`
- * scale; reach for `LinkButton` when the control is really a navigation link.
- */
+/** The styled `<button>` for in-page actions (submit, toggle, dismiss). */
 export const Button = ({
   className,
   variant,

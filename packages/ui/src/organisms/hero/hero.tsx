@@ -38,26 +38,15 @@ export type THeroProps = IWithClassName &
     titleId: string;
     eyebrow?: string;
     excerpt?: string;
-    /** The hero's layout shape — the same three shapes `CtaModule` uses. */
     variant?: THeroVariant;
-    /** Where the copy column sits relative to the media. Split uses LEFT/RIGHT; Banner uses all three; Stacked has no split axis, so it has no effect there. */
     contentPosition?: TContentAlignment;
-    /** How text aligns within the copy column, on every variant. */
     contentAlignment?: TContentAlignment;
-    /** Split applies this below the two-column breakpoint; Stacked at every width; Banner ignores it — its image is the background. */
     mediaOrder?: TMediaOrder;
-    /** Picks Banner's scrim and on-image copy color. Split and Stacked ignore it — their band color stays `Section`'s. */
     tone?: TFullBrandVariant;
     children?: TCompoundChildren<typeof HeroParts>;
   };
 
-/**
- * Hero — the page-top hero band shared by every hero kind: renders `title` as
- * an `<h1>` with optional `eyebrow`/`excerpt`, plus `Hero.Avatar`, `Hero.Cta`,
- * `Hero.Media`, and `Hero.Social` slots. DOM order is always copy before
- * media — `contentPosition` and `mediaOrder` only move things visually, via
- * CSS.
- */
+/** The page-top hero band shared by every hero kind: renders `title` as an `<h1>` with optional `eyebrow`/`excerpt`, plus `Hero.Avatar`, `Hero.Cta`, `Hero.Media`, and `Hero.Social` slots. */
 const HeroRoot = ({
   title,
   titleId,

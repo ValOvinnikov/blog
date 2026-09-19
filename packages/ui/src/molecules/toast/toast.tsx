@@ -23,18 +23,7 @@ export interface IToastAction {
 export type TToastProps = IWithClassName &
   IWithDataTestId & {
     type: TToastType;
-    /**
-     * Overlays the type icon with a `Spinner` for an in-flight action (e.g.
-     * a `toast.promise` pending state). The spinner is type-agnostic — it
-     * always renders in `Spinner`'s own default accent color, so pairing
-     * `isLoading: true` with `type: SUCCESS`/`WARNING`/`ERROR` won't tint it
-     * to match.
-     */
     isLoading?: boolean;
-    /**
-     * Short label shown beside the type icon. Omit alongside `message` for
-     * an icon-and-message-only toast.
-     */
     title?: ReactNode;
     message: ReactNode;
     time?: string;
@@ -63,13 +52,7 @@ const TOAST_ANNOUNCEMENT: Record<
   [TOAST_TYPE.ERROR]: { role: 'alert', live: 'assertive' },
 };
 
-/**
- * Toast — a single compact notification confirming or reporting the result
- * of an engagement action (bookmark, rating, comment, subscription, auth).
- * Purely presentational and controlled: the queue, timers, and phase/pause
- * transitions are owned by a stateful `apps/web` island that re-renders
- * this component with updated props.
- */
+/** A single compact notification confirming or reporting the result of an engagement action (bookmark, rating, comment, subscription, auth). */
 export const Toast = ({
   type,
   isLoading = false,

@@ -12,20 +12,7 @@ export const imageWithCaptionVariants = tv({
         figure: ['w-full'],
       },
       [IMAGE_LAYOUT.FULL_BLEED]: {
-        // Breaks out to `min(100vw, max-w-page)` — capping the *same*
-        // value used for the offset math (not a separate `max-w-page`
-        // layered on top of a fixed `-50vw` margin) is what keeps this
-        // symmetric: `left/right: 50%` shifts the box by half its
-        // *containing block's* width away from its normal-flow position,
-        // then `mx` pulls it back by exactly half of its own (possibly
-        // capped) rendered width. When the containing block is itself
-        // centered on the viewport, those two offsets cancel out to a box
-        // centered on the viewport (or `max-w-page`, once that cap
-        // engages) — regardless of the reading column's own width. A fixed
-        // `-mx-[50vw]` paired with an uncorrelated `max-w-page` cap (the
-        // previous version) breaks that cancellation, because the margin
-        // is sized for the *uncapped* 100vw width while the box itself
-        // renders narrower once capped.
+        // `left/right: 50%` plus a negative margin sized off the same `min(100vw, var(--container-page))` cap cancel out to a centered box at every width; a fixed `-mx-[50vw]` paired with an uncorrelated cap breaks that cancellation.
         figure: [
           'relative left-1/2 right-1/2',
           'w-[min(100vw,var(--container-page))]',
@@ -33,8 +20,7 @@ export const imageWithCaptionVariants = tv({
         ],
       },
       [IMAGE_LAYOUT.FLOAT_LEFT]: {
-        // No float below `md:` — a floated image with wrapped text needs
-        // more width than a phone viewport gives the remaining text.
+        // No float below `md:` — a floated image with wrapped text needs more width than a phone viewport gives the remaining text.
         figure: ['w-full', 'md:float-left md:clear-left md:mr-6 md:w-2/5'],
       },
       [IMAGE_LAYOUT.FLOAT_RIGHT]: {

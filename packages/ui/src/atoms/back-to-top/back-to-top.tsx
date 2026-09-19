@@ -16,12 +16,7 @@ export type TBackToTopProps = IWithClassName &
     ariaLabel: string;
   };
 
-/**
- * BackToTop — a floating icon button that jumps the page back to its top.
- * `isVisible` fully controls its appear/disappear transition; the consumer
- * (`apps/web`) owns the scroll listener and the actual `window.scrollTo`
- * call that decide when it's true.
- */
+/** A floating icon button that jumps the page back to its top. */
 export const BackToTop = ({
   isVisible,
   onClick,

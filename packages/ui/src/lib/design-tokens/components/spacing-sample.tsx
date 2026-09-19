@@ -4,11 +4,7 @@ export type TSpacingSampleProps = {
   tokens: TToken[];
 };
 
-/**
- * Each spacing token as a tinted bar whose width equals the token, so the
- * relative scale is visible at a glance (clamp() tokens render at their
- * current-viewport width).
- */
+/** Each spacing token as a tinted bar whose width equals the token, so the relative scale is visible at a glance (clamp() tokens render at their current-viewport width). */
 export const SpacingSample = ({ tokens }: TSpacingSampleProps) => (
   <div className="space-y-3">
     {tokens.map((token) => (

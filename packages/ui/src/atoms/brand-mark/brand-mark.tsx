@@ -8,24 +8,13 @@ import {
 
 export type TBrandMarkProps = IWithClassName &
   IWithDataTestId & {
-    /** Ignored on the uploaded-image branch at `md` and above when `isStacked` is set — its sizing is container-width-driven there instead. */
     size?: TBrandMarkVariants['size'];
-    /** Accessible title for standalone use. Omit to keep the mark decorative. */
     title?: string;
-    /** Uploaded brand-mark image source; renders in place of the polygon mark when set. */
     src?: string;
-    /** Sizes the uploaded image to span the available width with a bounded height at `md` and above, instead of a fixed height — for rendering above a tagline at the breakpoint the tagline itself is visible. No effect below `md`, and no effect on the polygon fallback, which is always square. */
     isStacked?: boolean;
   };
 
-/**
- * BrandMark atom — the brand mark, rendered from an uploaded image when
- * `src` is supplied, or as three stacked polygon layers coloured from the
- * `--logo-1/2/3` design tokens via inline `style` otherwise (these tokens
- * aren't mirrored into `@theme inline` as Tailwind utilities). Decorative by
- * default (no accessible name); pass `title` when it's used standalone
- * rather than nested inside a labelled composition.
- */
+/** The brand mark, rendered from an uploaded image when `src` is supplied, or as three stacked polygon layers coloured from the `--logo-1/2/3` design tokens via inline `style` otherwise (these tokens aren't mirrored into `@theme inline` as Tailwind utilities). */
 export const BrandMark = ({
   src,
   size,

@@ -8,37 +8,37 @@ _54 components · generated from `packages/ui/src`. Paths are relative to `packa
 
 ### Alert — `atoms/alert/alert.tsx`
 
-a static, type-coded inline message block for form feedback (confirmations, warnings, and errors).
+A static, type-coded inline message block for form feedback (confirmations, warnings, and errors).
 Props: type: NonNullable<TAlertVariants['type']> · message: string · id?: string _(extends IWithClassName, IWithDataTestId)_
 Variants: type: ALERT_TYPE.SUCCESS|ALERT_TYPE.WARNING|ALERT_TYPE.ERROR|ALERT_TYPE.INFO
 
 ### Avatar — `atoms/avatar/avatar.tsx`
 
-Avatar atom — renders a provided image, or an initials badge derived from `name` when no image is supplied.
+Renders a provided image, or an initials badge derived from `name` when no image is supplied.
 Props: src?: string · alt: string · name: string · size?: TAvatarVariants['size'] · className?: string · onImageError?: () => void _(extends IWithDataTestId)_
 Variants: size: SIZE.SM|SIZE.MD|SIZE.LG|SIZE.XL|SIZE.XXL
 
 ### BackToTop — `atoms/back-to-top/back-to-top.tsx`
 
-a floating icon button that jumps the page back to its top.
+A floating icon button that jumps the page back to its top.
 Props: isVisible: boolean · onClick: () => void · ariaLabel: string _(extends IWithClassName, IWithDataTestId)_
 Variants: visible: (boolean)
 
 ### BookmarkToggle — `atoms/bookmark-toggle/bookmark-toggle.tsx`
 
-a pure, controlled icon+label toggle for saving a post to read later.
+A pure, controlled icon+label toggle for saving a post to read later.
 Props: isBookmarked: NonNullable<TBookmarkToggleVariants['isBookmarked']> · onToggle: () => void · label: string · ariaLabel: string · isDisabled?: boolean _(extends IWithClassName, IWithDataTestId)_
 Variants: isBookmarked: (boolean)
 
 ### BrandMark — `atoms/brand-mark/brand-mark.tsx`
 
-BrandMark atom — the brand mark, rendered from an uploaded image when `src` is supplied, or as three stacked polygon layers coloured from the `--logo-1/2/3` design tokens via inline `style` otherwise (these tokens aren't mirrored into `@theme inline` as Tailwind utilities).
+The brand mark, rendered from an uploaded image when `src` is supplied, or as three stacked polygon layers coloured from the `--logo-1/2/3` design tokens via inline `style` otherwise (these tokens aren't mirrored into `@theme inline` as Tailwind utilities).
 Props: size?: TBrandMarkVariants['size'] · title?: string · src?: string · isStacked?: boolean _(extends IWithClassName, IWithDataTestId)_
 Variants: size: SIZE.SM|SIZE.MD|SIZE.LG
 
 ### Button — `atoms/button/button.tsx`
 
-the styled `<button>` for in-page actions (submit, toggle, dismiss).
+The styled `<button>` for in-page actions (submit, toggle, dismiss).
 Props: type?: 'button' | 'submit' | 'reset' · title?: string · children?: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · isDisabled?: boolean · 'aria-busy'?: AriaAttributes['aria-busy'] _(extends IWithClassName, IWithDataTestId, TButtonVariants)_
 Variants: variant: primary|ghost|link|danger · size: SIZE.SM|SIZE.MD|SIZE.LG
 
@@ -49,7 +49,7 @@ Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Eyebrow — `atoms/eyebrow/eyebrow.tsx`
 
-Eyebrow atom — small uppercase label displayed above a heading to provide contextual topic or section context.
+Small uppercase label displayed above a heading to provide contextual topic or section context.
 Props: href?: string · linkAs?: TAnchorElementType · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 Variants: hasHref: (boolean)
 
@@ -61,7 +61,7 @@ Variants: visual: hero|post|card|section|prose-h2|prose-h3|prose-h4|preview|copy
 
 ### Icon — `atoms/icon/icon.tsx`
 
-renders any icon from the bespoke icon set by name.
+Renders any icon from the bespoke icon set by name.
 Props: name: TIconName · size?: TIconVariants['size'] · 'aria-label'?: AriaAttributes['aria-label'] · 'aria-hidden'?: AriaAttributes['aria-hidden'] _(extends IWithClassName, IWithDataTestId)_
 Variants: size: SIZE.SM|SIZE.MD|SIZE.LG
 
@@ -73,7 +73,7 @@ Variants: variant: bordered|avatar|control · tone: BRAND_VARIANT.PRIMARY|BRAND_
 
 ### InlineCode — `atoms/inline-code/inline-code.tsx`
 
-InlineCode atom — a single `<code>` token styled for inline use within running text (e.g. Portable Text `code` marks).
+A single `<code>` token styled for inline use within running text (e.g. Portable Text `code` marks).
 Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### MediaFrame — `atoms/media-frame/media-frame.tsx`
@@ -84,12 +84,12 @@ Variants: ratio: video|square|portrait|classic
 
 ### MetaSeparator — `atoms/meta-separator/meta-separator.tsx`
 
-MetaSeparator atom — decorative separator for inline metadata lists (e.g. "Author · Date · Read time").
+Decorative separator for inline metadata lists (e.g. "Author · Date · Read time").
 Props: separator?: string _(extends IWithClassName, IWithDataTestId)_
 
 ### NavLink — `atoms/nav-link/nav-link.tsx`
 
-NavLink atom — a chrome-level navigation link (header/footer nav items).
+A chrome-level navigation link (header/footer nav items).
 Props: className?: string · isActive?: TNavLinkVariants['isActive'] · hasLabel?: boolean _(extends IWithIcon, IWithDataTestId)_
 Variants: isActive: (boolean)
 
@@ -101,47 +101,47 @@ Variants: size: SIZE.SM|SIZE.MD|SIZE.LG
 
 ### ProseLink — `atoms/prose-link/prose-link.tsx`
 
-ProseLink atom — the accent/underline treatment for inline links inside Portable Text article body copy.
+The accent/underline treatment for inline links inside Portable Text article body copy.
 Props: className?: string _(extends IWithDataTestId)_
 
 ### QuoteBlock — `atoms/quote-block/quote-block.tsx`
 
-QuoteBlock atom — the accent-muted left rule + italic serif treatment for blockquotes inside Portable Text article body copy.
+The accent-muted left rule + italic serif treatment for blockquotes inside Portable Text article body copy.
 Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### SegmentedControl — `atoms/segmented-control/segmented-control.tsx`
 
-a fully controlled switch between a small, mutually exclusive set of views (e.g. a reader's chosen depth for an article).
+A fully controlled switch between a small, mutually exclusive set of views (e.g. a reader's chosen depth for an article).
 Props: options: ISegmentedControlOption<TValue>[] · value: TValue · onChange: (value: TValue) => void · ariaLabel: string _(extends IWithClassName, IWithDataTestId)_
 Variants: selected: (boolean)
 
 ### Spinner — `atoms/spinner/spinner.tsx`
 
-the shared indeterminate loading indicator for every async state (a submitting button, a session resolving, a region fetching on demand).
+The shared indeterminate loading indicator for every async state (a submitting button, a session resolving, a region fetching on demand).
 Props: label: string · hasLabel?: boolean · size?: TSpinnerVariants['size'] · 'aria-hidden'?: AriaAttributes['aria-hidden'] _(extends IWithClassName, IWithDataTestId)_
 Variants: size: SIZE.SM|SIZE.MD|SIZE.LG
 
 ### StatusBadge — `atoms/status-badge/status-badge.tsx`
 
-a small inline pill signalling a state such as "subscribed", "pending confirmation", or "not linked".
+A small inline pill signalling a state such as "subscribed", "pending confirmation", or "not linked".
 Props: tone: NonNullable<TStatusBadgeVariants['tone']> · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 Variants: tone: ok|warn|neutral
 
 ### Tag — `atoms/tag/tag.tsx`
 
-small pill-shaped label.
+Small pill-shaped label.
 Props: className?: string _(extends Omit<TTagVariants, 'interactive'>, IWithDataTestId)_
 Variants: variant: default|accent · interactive: (boolean)
 
 ### Text — `atoms/text/text.tsx`
 
-the body-copy paragraph primitive: applies a `variant` from the type scale to a `<p>`.
+The body-copy paragraph primitive: applies a `variant` from the type scale to a `<p>`.
 Props: style?: CSSProperties · children?: ReactNode _(extends IWithClassName, TTextVariants, IWithDataTestId)_
 Variants: variant: lead|muted|hero|card|supporting|statement|meta|emphasis
 
 ### TextInput — `atoms/text-input/text-input.tsx`
 
-TextInput atom — a pure, controlled single-line field.
+A pure, controlled single-line field.
 Props: value: string · onChange: (value: string) => void · ariaLabel: string · isInvalid?: TTextInputVariants['invalid'] · leadingIcon?: ReactNode · trailingIcon?: ReactNode · id?: string · type?: string · placeholder?: string · isRequired?: boolean · isDisabled?: boolean · 'aria-describedby'?: AriaAttributes['aria-describedby'] _(extends IWithClassName, IWithDataTestId)_
 Variants: invalid: (boolean) · hasLeadingIcon: (boolean) · hasTrailingIcon: (boolean)
 
@@ -154,28 +154,28 @@ Props: isDark: boolean · onToggle: () => void · isMounted?: boolean · lightLa
 
 ### ActionList — `molecules/action-list/action-list.tsx`
 
-flex wrapper for hero CTA buttons.
+Flex wrapper for hero CTA buttons.
 Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Aside — `molecules/aside/aside.tsx`
 
-Aside molecule — an inline deep-dive digression rendered alongside a post's body copy, visually set apart from the surrounding prose.
+An inline deep-dive digression rendered alongside a post's body copy, visually set apart from the surrounding prose.
 Props: kind: TAsideKind · label: string · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### BrandLockup — `molecules/brand-lockup/brand-lockup.tsx`
 
-BrandLockup molecule — the brand mark plus an optional monospace tagline, stacked with the mark above.
+The brand mark plus an optional monospace tagline, stacked with the mark above.
 Props: src?: string · size?: TBrandMarkProps['size'] · tagline?: string _(extends IWithClassName, IWithDataTestId)_
 
 ### Breadcrumbs — `molecules/breadcrumbs/breadcrumbs.tsx`
 
-page-chrome navigation trail (e.g. `Home › Topic › Post title`).
+Page-chrome navigation trail (e.g. `Home › Topic › Post title`).
 Props: items: IBreadcrumbItem[] · ariaLabel: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 Variants: isCurrent: (boolean)
 
 ### CardMeta — `molecules/card-meta/card-meta.tsx`
 
-compact metadata row for cards.
+Compact metadata row for cards.
 Props: dateValue: string · dateLabel: string · readingTime?: string _(extends IWithClassName, IWithDataTestId)_
 
 ### ImageWithCaption — `molecules/image-with-caption/image-with-caption.tsx`
@@ -186,83 +186,83 @@ Variants: layout: IMAGE_LAYOUT.INLINE|IMAGE_LAYOUT.FULL_BLEED|IMAGE_LAYOUT.FLOAT
 
 ### LinkButton — `molecules/link-button/link-button.tsx`
 
-a navigation link that looks like a `Button`: applies the shared `buttonVariants` to an anchor (or any `as` element), so links can read as buttons.
+A navigation link that looks like a `Button`: applies the shared `buttonVariants` to an anchor (or any `as` element), so links can read as buttons.
 Props: className?: string _(extends IWithDataTestId, VariantProps<typeof buttonVariants>)_
 
 ### MediaCard — `molecules/media-card/media-card.tsx`
 
-a media-led summary card for any linked item, rendered as an `<article>`.
+A media-led summary card for any linked item, rendered as an `<article>`.
 Props: excerpt?: string · tags?: string[] · isSplit?: TMediaCardVariants['isSplit'] · isLead?: TMediaCardVariants['isLead'] · align?: TMediaCardVariants['align'] · children?: TCompoundChildren<typeof MediaCardParts> _(extends IWithClassName, IWithDataTestId)_
 Variants: isSplit: (boolean) · isLead: (boolean) · align: left|center
 
 Slots:
 
-- **MediaCard.Media** — the media region of a `MediaCard`; a styled `<div>` wrapper you fill with an image or `MediaFrame`. Props: isLead?: TMediaCardMediaVariants['isLead'] · shape?: TMediaCardMediaVariants['shape'] · align?: TMediaCardMediaVariants['align'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: shape: wide|square|circle|icon · isLead: (boolean) · align: left|center
-- **MediaCard.Meta** — compact metadata row for cards. Props: dateValue: string · dateLabel: string · readingTime?: string _(extends IWithClassName, IWithDataTestId)_
-- **MediaCard.Title** — the heading inside a `MediaCard`, rendered at the caller-specified heading depth with the card title's visual treatment. Props: level: THeadingLevel · isLead?: boolean · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **MediaCard.Footer** — the byline row at the bottom of a `MediaCard`. Props: authorName?: string · authorAvatarSrc?: string · publishedAt?: string · formattedDate?: string · topic?: string · leadingIcon?: ReactNode · trailingIcon?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **MediaCard.Media** — The media region of a `MediaCard`; a styled `<div>` wrapper you fill with an image or `MediaFrame`. Props: isLead?: TMediaCardMediaVariants['isLead'] · shape?: TMediaCardMediaVariants['shape'] · align?: TMediaCardMediaVariants['align'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: shape: wide|square|circle|icon · isLead: (boolean) · align: left|center
+- **MediaCard.Meta** — Compact metadata row for cards. Props: dateValue: string · dateLabel: string · readingTime?: string _(extends IWithClassName, IWithDataTestId)_
+- **MediaCard.Title** — The heading inside a `MediaCard`, rendered at the caller-specified heading depth with the card title's visual treatment. Props: level: THeadingLevel · isLead?: boolean · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **MediaCard.Footer** — The byline row at the bottom of a `MediaCard`. Props: authorName?: string · authorAvatarSrc?: string · publishedAt?: string · formattedDate?: string · topic?: string · leadingIcon?: ReactNode · trailingIcon?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Panel — `molecules/panel/panel.tsx`
 
-a bordered, rounded surface with a titled header bar above a padded body, framing a self-contained feature (auth, account settings, bookmarks, newsletter) as one distinct block on the page.
+A bordered, rounded surface with a titled header bar above a padded body, framing a self-contained feature (auth, account settings, bookmarks, newsletter) as one distinct block on the page.
 Props: children?: TCompoundChildren<typeof PanelSlotParts> _(extends IWithClassName, IWithDataTestId)_
 
 Slots:
 
-- **Panel.Header** — Panel.Header — the panel's title bar, rendered as a real heading so the panel's name takes its place in the page's heading outline. Props: headingLevel: THeadingLevel · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **Panel.Body** — Panel.Body — the padded content slot below a `Panel.Header`. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Panel.Header** — The panel's title bar, rendered as a real heading so the panel's name takes its place in the page's heading outline. Props: headingLevel: THeadingLevel · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Panel.Body** — The padded content slot below a `Panel.Header`. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### PopoverMenu — `molecules/popover-menu/popover-menu.tsx`
 
-positioned trigger + non-modal menu panel primitive (`PopoverMenu.Trigger`, `PopoverMenu.Panel`, `PopoverMenu.Item`, `PopoverMenu.Separator`).
+Positioned trigger + non-modal menu panel primitive (`PopoverMenu.Trigger`, `PopoverMenu.Panel`, `PopoverMenu.Item`, `PopoverMenu.Separator`).
 Props: children?: TCompoundChildren<typeof PopoverMenuSlotParts> _(extends IWithClassName, IWithDataTestId)_
 
 Slots:
 
-- **PopoverMenu.Trigger** — icon-button that opens/closes a `PopoverMenu.Panel`. Props: ariaLabel: string · isOpen: boolean · panelId: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · variant?: TIconButtonVariants['variant'] · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, IWithDataTestId)_
-- **PopoverMenu.Panel** — the non-modal menu surface (`role="menu"`) a `PopoverMenu.Trigger` opens. Props: id: string · isOpen: boolean · ariaLabel?: string · children?: ReactNode · ref?: Ref<HTMLDivElement> _(extends IWithClassName, IWithDataTestId)_
-- **PopoverMenu.Item** — a single rounded-rectangle row inside a `PopoverMenu.Panel` (`role="menuitem"`). Props: className?: string · icon?: ReactNode _(extends TPopoverMenuItemVariants, IWithDataTestId)_ · Variants: variant: bordered
-- **PopoverMenu.Separator** — a thin hairline dividing groups of `PopoverMenu.Item`s inside a `PopoverMenu.Panel` (e.g. a "Copy link" action from a list of social-share links). Props: className?: string _(extends IWithDataTestId)_
+- **PopoverMenu.Trigger** — Icon-button that opens/closes a `PopoverMenu.Panel`. Props: ariaLabel: string · isOpen: boolean · panelId: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · variant?: TIconButtonVariants['variant'] · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, IWithDataTestId)_
+- **PopoverMenu.Panel** — The non-modal menu surface (`role="menu"`) a `PopoverMenu.Trigger` opens. Props: id: string · isOpen: boolean · ariaLabel?: string · children?: ReactNode · ref?: Ref<HTMLDivElement> _(extends IWithClassName, IWithDataTestId)_
+- **PopoverMenu.Item** — A single rounded-rectangle row inside a `PopoverMenu.Panel` (`role="menuitem"`). Props: className?: string · icon?: ReactNode _(extends TPopoverMenuItemVariants, IWithDataTestId)_ · Variants: variant: bordered
+- **PopoverMenu.Separator** — A thin hairline dividing groups of `PopoverMenu.Item`s inside a `PopoverMenu.Panel` (e.g. a "Copy link" action from a list of social-share links). Props: className?: string _(extends IWithDataTestId)_
 
 ### PostMeta — `molecules/post-meta/post-meta.tsx`
 
-post detail metadata strip: author avatar + name, publish date, and estimated reading time.
-Props: author: { name: string; imageUrl?: string; /** Link target for the auth… · publishedAt: string · formattedDate: string · readingTimeMinutes?: number · linkAs?: TAnchorElementType · share?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+Post detail metadata strip: author avatar + name, publish date, and estimated reading time.
+Props: author: { name: string; imageUrl?: string; href?: string; } · publishedAt: string · formattedDate: string · readingTimeMinutes?: number · linkAs?: TAnchorElementType · share?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### PrimaryNavigation — `molecules/primary-navigation/primary-navigation.tsx`
 
-top-level `<nav>` landmark composing `NavLink` items with an optional trailing `actions` slot (e.g. a theme toggle or menu button).
+Top-level `<nav>` landmark composing `NavLink` items with an optional trailing `actions` slot (e.g. a theme toggle or menu button).
 Props: links: INavItem[] · actions?: ReactNode · ariaLabel?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps _(extends IWithClassName, IWithDataTestId)_
 Variants: collapsible: (boolean)
 
 ### SettingRow — `molecules/setting-row/setting-row.tsx`
 
-a label + description + control-slot row shared by every `/account` section (privacy & data, email preferences, connected accounts).
+A label + description + control-slot row shared by every `/account` section (privacy & data, email preferences, connected accounts).
 Props: label: ReactNode · labelLevel?: THeadingProps['level'] · description?: ReactNode · tone?: TSettingRowVariants['tone'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 Variants: tone: default|danger
 
 ### ShareLink — `molecules/share-link/share-link.tsx`
 
-ShareLink molecule — a single external share action (e.g. "Share on X"), rendered through `LinkButton` with `target="_blank"` and `rel="noopener noreferrer"` baked in, since every share link opens the target platform in a new tab.
+A single external share action (e.g. "Share on X"), rendered through `LinkButton` with `target="_blank"` and `rel="noopener noreferrer"` baked in, since every share link opens the target platform in a new tab.
 Props: as?: TAnchorElementType _(extends IShareLinkItem, IWithClassName, IWithDataTestId)_
 
 ### TagList — `molecules/tag-list/tag-list.tsx`
 
-renders a row of `Tag`s from a mixed list of plain labels and `{ label, href }` links; pass `linkAs` (e.g. the app router's `Link`) for client-side navigation on the linked ones.
+Renders a row of `Tag`s from a mixed list of plain labels and `{ label, href }` links; pass `linkAs` (e.g. the app router's `Link`) for client-side navigation on the linked ones.
 Props: tags: (string | ITagListItem)[] · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 
 ### TaxonomyCard — `molecules/taxonomy-card/taxonomy-card.tsx`
 
-summary card for a taxonomy entry (topic or tag) in a listing: title, optional description, and post count, linking to the entry's archive.
+Summary card for a taxonomy entry (topic or tag) in a listing: title, optional description, and post count, linking to the entry's archive.
 Props: title: string · description?: string · postCountLabel: string · href: string · headingLevel: THeadingLevel · accessibleNameSeparator?: string · linkAs?: TAnchorElementType · children?: TCompoundChildren<typeof TaxonomyCardParts> _(extends IWithClassName, IWithDataTestId)_
 
 Slots:
 
-- **TaxonomyCard.Posts** — TaxonomyCard.Posts — the taxonomy's latest posts, listed between the card's description and its post count. Props: posts: TTaxonomyCardPost[] · ariaLabel: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
+- **TaxonomyCard.Posts** — The taxonomy's latest posts, listed between the card's description and its post count. Props: posts: TTaxonomyCardPost[] · ariaLabel: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 
 ### Toast — `molecules/toast/toast.tsx`
 
-a single compact notification confirming or reporting the result of an engagement action (bookmark, rating, comment, subscription, auth).
+A single compact notification confirming or reporting the result of an engagement action (bookmark, rating, comment, subscription, auth).
 Props: type: TToastType · isLoading?: boolean · title?: ReactNode · message: ReactNode · time?: string · action?: IToastAction · dismissLabel: string · isPaused?: boolean · durationMs?: number · onDismiss: () => void · phase: NonNullable<TToastVariants['phase']> _(extends IWithClassName, IWithDataTestId)_
 Variants: type: TOAST_TYPE.SUCCESS|TOAST_TYPE.INFO|TOAST_TYPE.WARNING|TOAST_TYPE.ERROR · phase: entering|visible|leaving · hasTime: (boolean) · paused: (boolean)
 
@@ -270,94 +270,94 @@ Variants: type: TOAST_TYPE.SUCCESS|TOAST_TYPE.INFO|TOAST_TYPE.WARNING|TOAST_TYPE
 
 ### Article — `organisms/article/article.tsx`
 
-the full blog-post layout shell; composes `Article.Header`, `Article.Body`, and `Article.Footer` slots into a single `<article>`.
+The full blog-post layout shell; composes `Article.Header`, `Article.Body`, and `Article.Footer` slots into a single `<article>`.
 Props: children: TCompoundChildren<typeof ArticleParts> _(extends IWithClassName, IWithDataTestId)_
 
 Slots:
 
-- **Article.Header** — Article.Header — post detail heading area: topic eyebrow, title, lead paragraph, metadata strip, and an optional wide cover media slot. Props: title: string · topic?: IArticleHeaderTopic · lead?: string · meta?: Omit<TPostMetaProps, 'className' | 'dataTestId'> · coverMedia?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **Article.Body** — Article.Body — reading-content wrapper for a post detail's body (e.g. a `PortableTextRenderer`). Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **Article.Footer** — Article.Footer — end-of-article furniture; renders the post's tags as a chip list of links. Props: tags: IArticleFooterTag[] · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
+- **Article.Header** — Post detail heading area: topic eyebrow, title, lead paragraph, metadata strip, and an optional wide cover media slot. Props: title: string · topic?: IArticleHeaderTopic · lead?: string · meta?: Omit<TPostMetaProps, 'className' | 'dataTestId'> · coverMedia?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Article.Body** — Reading-content wrapper for a post detail's body (e.g. a `PortableTextRenderer`). Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Article.Footer** — End-of-article furniture; renders the post's tags as a chip list of links. Props: tags: IArticleFooterTag[] · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 
 ### BookmarksList — `organisms/bookmarks-list/bookmarks-list.tsx`
 
-renders a reader's saved posts as one row per bookmark, each with a date and a link to the post, or `emptyMessage` when there are none.
+Renders a reader's saved posts as one row per bookmark, each with a date and a link to the post, or `emptyMessage` when there are none.
 Props: rows: IBookmarkRow[] · emptyMessage: string · hint?: string · prefix?: ReactNode · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 
 ### CardGrid — `organisms/card-grid/card-grid.tsx`
 
-the responsive grid container that lays out cards (or any children) in columns.
+The responsive grid container that lays out cards (or any children) in columns.
 Props: columns?: TCardGridVariants['columns'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 Variants: columns: 1|2|3|4
 
 ### Carousel — `organisms/carousel/carousel.tsx`
 
-a generic swipeable row of slides.
+A generic swipeable row of slides.
 Props: items: readonly T[] · renderItem: (args: { item: T; index: number }) => ReactNode · getItemKey?: (args: { item: T; index: number }) => Key · slideClassName?: string · ariaLabel: string · previousLabel: string · nextLabel: string · tone?: TBrandVariant _(extends IWithClassName, IWithDataTestId)_
 Variants: isEnhanced: (boolean)
 
 ### ContentModule — `organisms/content-module/content-module.tsx`
 
-page-builder organism rendering a portable-text content block.
+Page-builder organism rendering a portable-text content block.
 Props: children: ReactNode · isWrapped?: TContentModuleVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
 Variants: wrapped: (boolean)
 
 ### CtaModule — `organisms/cta-module/cta-module.tsx`
 
-page-builder organism rendering a call-to-action in one of three layouts.
+Page-builder organism rendering a call-to-action in one of three layouts.
 Props: variant: TCtaVariant · tone: TBrandVariant · eyebrow?: string · heading: string · headingId?: string · supportingText?: string · content?: ReactNode · image?: ReactNode · actions?: ReactNode · footnote?: string · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mobileMediaOrder?: TMediaOrder · isWrapped?: TCtaModuleVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
 Variants: variant: CTA_VARIANT.BANNER|CTA_VARIANT.SPLIT|CTA_VARIANT.CALLOUT · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mobileMediaOrder: MEDIA_ORDER.FIRST|MEDIA_ORDER.LAST · wrapped: (boolean)
 
 ### Footer — `organisms/footer/footer.tsx`
 
-the site footer shell; composes `Footer.Nav` and `Footer.Copyright` slots into a `<footer>`.
+The site footer shell; composes `Footer.Nav` and `Footer.Copyright` slots into a `<footer>`.
 Props: children?: TCompoundChildren<typeof FooterParts> _(extends IWithClassName, IWithDataTestId)_
 
 Slots:
 
-- **Footer.Nav** — the navigation region of the site `Footer`; a labelled `<nav>` wrapping the footer links. Props: ariaLabel?: string · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **Footer.Copyright** — the copyright line in the site `Footer`, rendering "© {year} {title}". Props: title: string · year: number _(extends IWithClassName, IWithDataTestId)_
+- **Footer.Nav** — The navigation region of the site `Footer`; a labelled `<nav>` wrapping the footer links. Props: ariaLabel?: string · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Footer.Copyright** — The copyright line in the site `Footer`, rendering "© {year} {title}". Props: title: string · year: number _(extends IWithClassName, IWithDataTestId)_
 
 ### Header — `organisms/header/header.tsx`
 
-the site header shell; composes a `Header.Brand` slot alongside grouped `Header.Nav` and `Header.Actions` slots into a `<header>`.
+The site header shell; composes a `Header.Brand` slot alongside grouped `Header.Nav` and `Header.Actions` slots into a `<header>`.
 Props: children?: TCompoundChildren<typeof HeaderParts> _(extends IWithClassName, IWithDataTestId)_
 
 Slots:
 
-- **Header.Brand** — the brand/logo slot in the site `Header`; a styled `<span>` you place the logo or wordmark in. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **Header.Nav** — the primary navigation region of the site `Header`; a labelled `<nav>` wrapping the header links. Props: ariaLabel?: string · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **Header.Actions** — the trailing actions cluster in the site `Header` (e.g. theme toggle, auth controls); a styled `<div>` wrapper. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Header.Brand** — The brand/logo slot in the site `Header`; a styled `<span>` you place the logo or wordmark in. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Header.Nav** — The primary navigation region of the site `Header`; a labelled `<nav>` wrapping the header links. Props: ariaLabel?: string · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Header.Actions** — The trailing actions cluster in the site `Header` (e.g. theme toggle, auth controls); a styled `<div>` wrapper. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Hero — `organisms/hero/hero.tsx`
 
-the page-top hero band shared by every hero kind: renders `title` as an `<h1>` with optional `eyebrow`/`excerpt`, plus `Hero.Avatar`, `Hero.Cta`, `Hero.Media`, and `Hero.Social` slots.
+The page-top hero band shared by every hero kind: renders `title` as an `<h1>` with optional `eyebrow`/`excerpt`, plus `Hero.Avatar`, `Hero.Cta`, `Hero.Media`, and `Hero.Social` slots.
 Props: title: string · titleId: string · eyebrow?: string · excerpt?: string · variant?: THeroVariant · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mediaOrder?: TMediaOrder · tone?: TFullBrandVariant · children?: TCompoundChildren<typeof HeroParts> _(extends IWithClassName, IWithDataTestId)_
 Variants: variant: HERO_VARIANT.SPLIT|HERO_VARIANT.STACKED|HERO_VARIANT.BANNER · hasMedia: (boolean) · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mediaOrder: MEDIA_ORDER.FIRST|MEDIA_ORDER.LAST · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY
 
 Slots:
 
-- **Hero.Avatar** — the portrait slot of a `Hero`, rendered before the eyebrow; a styled `<div>` for the caller's own `Avatar` or image. Props: contentAlignment?: THeroAvatarVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
-- **Hero.Media** — the media slot of a `Hero`; frames its content via `MediaFrame`, at a configurable ratio (16:9 by default). Props: isFramed?: boolean · ratio?: TMediaFrameRatio · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: ratio: video|square|portrait|classic
-- **Hero.Cta** — the call-to-action slot of a `Hero`; a styled `<div>` for the hero's buttons or links. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **Hero.Social** — the trailing slot of a `Hero`, rendered after `Hero.Cta`; a styled `<div>` for the caller's own social links, typically a labelled list. Props: contentAlignment?: THeroSocialVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
+- **Hero.Avatar** — The portrait slot of a `Hero`, rendered before the eyebrow; a styled `<div>` for the caller's own `Avatar` or image. Props: contentAlignment?: THeroAvatarVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
+- **Hero.Media** — The media slot of a `Hero`; frames its content via `MediaFrame`, at a configurable ratio (16:9 by default). Props: isFramed?: boolean · ratio?: TMediaFrameRatio · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: ratio: video|square|portrait|classic
+- **Hero.Cta** — The call-to-action slot of a `Hero`; a styled `<div>` for the hero's buttons or links. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Hero.Social** — The trailing slot of a `Hero`, rendered after `Hero.Cta`; a styled `<div>` for the caller's own social links, typically a labelled list. Props: contentAlignment?: THeroSocialVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
 
 ### NewsletterSignup — `organisms/newsletter-signup/newsletter-signup.tsx`
 
-a pure, controlled subscribe form built on the `TextInput` atom, exposed as two mutually-exclusive densities rather than a single component with a `variant` switch: `NewsletterSignup.Full` is the rich panel form used by the site footer and the CMS page-builder module; `NewsletterSignup.Compact` is the slim single-row strip for the end of every article.
+A pure, controlled subscribe form built on the `TextInput` atom, exposed as two mutually-exclusive densities rather than a single component with a `variant` switch: `NewsletterSignup.Full` is the rich panel form used by the site footer and the CMS page-builder module; `NewsletterSignup.Compact` is the slim single-row strip for the end of every article.
 
 Compound component:
 
-- **NewsletterSignup.Full** — `NewsletterSignup.Full` — the rich, tinted panel signup form used by the site footer and the CMS page-builder module. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · supportingText?: string · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · trustCues?: INewsletterSignupTrustCue[] · align?: TNewsletterSignupVariants['align'] _(extends IWithClassName, IWithDataTestId)_
-- **NewsletterSignup.Compact** — `NewsletterSignup.Compact` — a slim single-row subscribe strip for the end of every article. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · prefix?: ReactNode · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string _(extends IWithClassName, IWithDataTestId)_
+- **NewsletterSignup.Full** — The rich, tinted panel signup form used by the site footer and the CMS page-builder module. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · supportingText?: string · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · trustCues?: INewsletterSignupTrustCue[] · align?: TNewsletterSignupVariants['align'] _(extends IWithClassName, IWithDataTestId)_
+- **NewsletterSignup.Compact** — A slim single-row subscribe strip for the end of every article. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · prefix?: ReactNode · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string _(extends IWithClassName, IWithDataTestId)_
 
 ### Pagination — `organisms/pagination/pagination.tsx`
 
-prev/next + numbered links for paginated listings, route-agnostic (`createHref`) and polymorphic (`linkAs`); renders nothing when there is a single page.
+Prev/next + numbered links for paginated listings, route-agnostic (`createHref`) and polymorphic (`linkAs`); renders nothing when there is a single page.
 Props: currentPage: number · totalPages: number · createHref: (page: number) => string · ariaLabel: string · previousLabel: string · nextLabel: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 Variants: current: (boolean)
 
 ### ToastViewport — `organisms/toast-viewport/toast-viewport.tsx`
 
-the fixed, corner-anchored region that positions and stacks `Toast` children (desktop bottom-right, mobile bottom full-width).
+The fixed, corner-anchored region that positions and stacks `Toast` children (desktop bottom-right, mobile bottom full-width).
 Props: ariaLabel: string · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_

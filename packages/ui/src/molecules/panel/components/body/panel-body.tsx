@@ -8,12 +8,7 @@ export type TPanelBodyProps = IWithClassName &
     children?: ReactNode;
   };
 
-/**
- * Panel.Body — the padded content slot below a `Panel.Header`. Generic
- * positioning container; the caller supplies whatever feature-specific
- * content (a sign-in provider list, a rating gauge, a comment thread)
- * belongs inside the panel.
- */
+/** The padded content slot below a `Panel.Header`. */
 export const PanelBody = ({
   className,
   dataTestId,

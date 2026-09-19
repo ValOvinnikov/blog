@@ -22,11 +22,7 @@ export type THeaderProps = IWithClassName &
     children?: TCompoundChildren<typeof HeaderParts>;
   };
 
-/**
- * Header — the site header shell; composes a `Header.Brand` slot alongside
- * grouped `Header.Nav` and `Header.Actions` slots into a `<header>`. The
- * nav/actions group only renders when at least one of them is provided.
- */
+/** The site header shell; composes a `Header.Brand` slot alongside grouped `Header.Nav` and `Header.Actions` slots into a `<header>`. */
 const HeaderRoot = ({ children, className, dataTestId }: THeaderProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, HeaderParts);
   const { root, navActionsGroup } = headerVariants();

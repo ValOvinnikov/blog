@@ -16,12 +16,7 @@ export type TSettingRowProps = IWithClassName &
     children?: ReactNode;
   };
 
-/**
- * SettingRow — a label + description + control-slot row shared by every
- * `/account` section (privacy & data, email preferences, connected
- * accounts). `tone="danger"` marks an irreversible action with the
- * destructive treatment; every other row uses the default tone.
- */
+/** A label + description + control-slot row shared by every `/account` section (privacy & data, email preferences, connected accounts). */
 export const SettingRow = ({
   label,
   labelLevel = 3,

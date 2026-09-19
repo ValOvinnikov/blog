@@ -17,14 +17,7 @@ export const brandMarkVariants = tv({
   },
 });
 
-/**
- * Uploaded logo image — a real-world logo is commonly non-square, so it's
- * never boxed into a fixed square. Default sizing bounds height and lets
- * width scale freely; `stacked` (mark rendered above a tagline) instead
- * spans the available width and caps height at `md` and above, matching the
- * breakpoint the tagline itself becomes visible at — below `md` the mark
- * always renders with the same sizing as the no-tagline case.
- */
+/** A real-world logo is commonly non-square, so it's never boxed into a fixed square. */
 export const brandMarkImageVariants = tv({
   base: ['inline-block shrink-0 object-contain'],
   variants: {
@@ -33,6 +26,7 @@ export const brandMarkImageVariants = tv({
       [SIZE.MD]: ['h-7 w-auto'],
       [SIZE.LG]: ['h-9 w-auto'],
     },
+    // The `md:` breakpoint here must match `brand-lockup-variants.ts`'s `tagline` (`hidden md:block`), since `stacked` only makes sense once the tagline it sits above is visible.
     stacked: {
       true: ['md:h-auto md:w-full md:max-h-9 md:object-left'],
     },

@@ -8,11 +8,7 @@ export type TQuoteBlockProps = IWithClassName &
     children?: ReactNode;
   };
 
-/**
- * QuoteBlock atom — the accent-muted left rule + italic serif treatment for
- * blockquotes inside Portable Text article body copy. Always renders a
- * `<blockquote>`; not polymorphic, since a quote is always a `<blockquote>`.
- */
+/** The accent-muted left rule + italic serif treatment for blockquotes inside Portable Text article body copy. */
 export const QuoteBlock = ({
   className,
   dataTestId,

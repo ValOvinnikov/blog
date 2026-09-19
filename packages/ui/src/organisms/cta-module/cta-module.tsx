@@ -22,39 +22,22 @@ import {
 export type TCtaModuleProps = IWithClassName &
   IWithDataTestId & {
     variant: TCtaVariant;
-    /** Card fill for Split/Callout, or the background-image overlay tint for Banner. */
     tone: TBrandVariant;
     eyebrow?: string;
     heading: string;
     headingId?: string;
     supportingText?: string;
-    /** Pre-rendered basic Portable Text, built by the web layer. */
     content?: ReactNode;
-    /** Pre-rendered `<img>`/`next/image`, required by the schema for Banner and Split. */
     image?: ReactNode;
-    /** Pre-rendered action buttons/links, built by the web layer — a plain slot. */
     actions?: ReactNode;
     footnote?: string;
-    /** Where the content block sits relative to the image — not applicable on Callout. */
     contentPosition?: TContentAlignment;
-    /** How text and actions align within the content block, on all three variants. */
     contentAlignment?: TContentAlignment;
-    /** Split only. Defaults to `LAST` (image collapses below content on mobile). */
     mobileMediaOrder?: TMediaOrder;
-    /**
-     * Drops this component's own top margin. Set when a parent (e.g. `Section`)
-     * already owns the vertical spacing around it, so the two don't stack.
-     */
     isWrapped?: TCtaModuleVariants['wrapped'];
   };
 
-/**
- * CtaModule — page-builder organism rendering a call-to-action in one of
- * three layouts. `content`/`image`/`actions` are pre-rendered nodes the web
- * layer builds; this component never constructs a link or image itself. DOM
- * order is always heading/text/actions before the image — `contentPosition`/
- * `mobileMediaOrder` only change the visual position via CSS.
- */
+/** Page-builder organism rendering a call-to-action in one of three layouts. */
 export const CtaModule = ({
   variant,
   tone,

@@ -12,12 +12,7 @@ export type TEyebrowProps = IWithClassName &
     children?: ReactNode;
   };
 
-/**
- * Eyebrow atom — small uppercase label displayed above a heading to provide
- * contextual topic or section context. Renders as a plain `<p>` by
- * default; pass `href` (and optionally `linkAs`, defaulting to `'a'`) to
- * render it as a link to the topic route instead.
- */
+/** Small uppercase label displayed above a heading to provide contextual topic or section context. */
 export const Eyebrow = ({
   href,
   linkAs,

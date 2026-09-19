@@ -9,10 +9,7 @@ export type TCardGridProps = IWithClassName &
     children: ReactNode;
   };
 
-/**
- * CardGrid — the responsive grid container that lays out cards (or any
- * children) in columns. Layout only — no data or per-item chrome of its own.
- */
+/** The responsive grid container that lays out cards (or any children) in columns. */
 export const CardGrid = ({
   columns,
   children,

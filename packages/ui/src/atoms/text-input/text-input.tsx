@@ -12,9 +12,7 @@ export type TTextInputProps = IWithClassName &
     onChange: (value: string) => void;
     ariaLabel: string;
     isInvalid?: TTextInputVariants['invalid'];
-    /** Decorative leading glyph or icon. Purely visual; `ariaLabel` carries the accessible name. */
     leadingIcon?: ReactNode;
-    /** Decorative trailing glyph or icon. Purely visual; `ariaLabel` carries the accessible name. */
     trailingIcon?: ReactNode;
     id?: string;
     type?: string;
@@ -24,12 +22,7 @@ export type TTextInputProps = IWithClassName &
     'aria-describedby'?: AriaAttributes['aria-describedby'];
   };
 
-/**
- * TextInput atom — a pure, controlled single-line field. Holds no state of
- * its own; the caller owns `value` and receives changes via `onChange`. Used
- * as the shared building block for both the comment form and the newsletter
- * signup form.
- */
+/** A pure, controlled single-line field. */
 export const TextInput = ({
   value,
   onChange,

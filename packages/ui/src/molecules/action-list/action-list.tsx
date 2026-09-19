@@ -8,10 +8,7 @@ export type TActionListProps = IWithClassName &
     children?: ReactNode;
   };
 
-/**
- * ActionList — flex wrapper for hero CTA buttons.
- * Children (buttons, links) are passed from outside.
- */
+/** Flex wrapper for hero CTA buttons. */
 export const ActionList = ({
   className,
   dataTestId,

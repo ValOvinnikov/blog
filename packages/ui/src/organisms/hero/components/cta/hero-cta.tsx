@@ -8,10 +8,7 @@ export type THeroCtaProps = IWithClassName &
     children?: ReactNode;
   };
 
-/**
- * HeroCta — the call-to-action slot of a `Hero`; a styled `<div>` for the hero's
- * buttons or links.
- */
+/** The call-to-action slot of a `Hero`; a styled `<div>` for the hero's buttons or links. */
 export const HeroCta = ({ className, dataTestId, children }: THeroCtaProps) => (
   <div
     className={heroCtaVariants({ class: className })}

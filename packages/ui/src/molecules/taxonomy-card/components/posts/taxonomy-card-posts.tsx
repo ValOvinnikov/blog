@@ -14,16 +14,12 @@ export type TTaxonomyCardPostsProps = IWithClassName &
   IWithDataTestId & {
     posts: TTaxonomyCardPost[];
     ariaLabel: string;
-    /** Resolved and passed down by `TaxonomyCard` from its own `linkAs`. */
     linkAs?: TAnchorElementType;
   };
 
 const s = taxonomyCardPostsVariants();
 
-/**
- * TaxonomyCard.Posts — the taxonomy's latest posts, listed between the
- * card's description and its post count.
- */
+/** The taxonomy's latest posts, listed between the card's description and its post count. */
 export const TaxonomyCardPosts = ({
   posts,
   ariaLabel,

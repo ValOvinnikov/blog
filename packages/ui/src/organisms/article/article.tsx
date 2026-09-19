@@ -22,11 +22,7 @@ export type TArticleProps = IWithClassName &
     children: TCompoundChildren<typeof ArticleParts>;
   };
 
-/**
- * Article — the full blog-post layout shell; composes `Article.Header`,
- * `Article.Body`, and `Article.Footer` slots into a single `<article>`.
- * Structure only — each slot owns its own content and styling.
- */
+/** The full blog-post layout shell; composes `Article.Header`, `Article.Body`, and `Article.Footer` slots into a single `<article>`. */
 const ArticleRoot = ({ children, className, dataTestId }: TArticleProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, ArticleParts);
   return (

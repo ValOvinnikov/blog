@@ -10,19 +10,14 @@ export type TMediaCardFooterProps = IWithClassName &
     authorAvatarSrc?: string;
     publishedAt?: string;
     formattedDate?: string;
-    /** Post topic, rendered lowercased alongside `leadingIcon`/`trailingIcon`. */
     topic?: string;
-    /** Icon rendered before the topic text, e.g. `<Icon name={ICONS.X} />`. */
     leadingIcon?: ReactNode;
-    /** Icon rendered after the topic text, e.g. `<Icon name={ICONS.ARROW} />`. */
     trailingIcon?: ReactNode;
   };
 
 const s = mediaCardFooterVariants();
 
-/**
- * MediaCardFooter — the byline row at the bottom of a `MediaCard`.
- */
+/** The byline row at the bottom of a `MediaCard`. */
 export const MediaCardFooter = ({
   authorName,
   authorAvatarSrc,
