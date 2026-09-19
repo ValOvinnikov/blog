@@ -590,7 +590,7 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
   with — measured 2026-09-19 at 673 doc blocks (421 of them four lines or
   longer, 120 of the `Name — does X` form) and 671 line comments inside
   function bodies, 13% of non-blank source — is cleared once by the
-  per-workspace sweep epic (`prio:later`, one `cloud-ok` ticket per
+  per-workspace sweep epic #3392 (`prio:later`, one `cloud-ok` ticket per
   workspace, each pulled when that workspace has no PR in flight).
 
 - All workspace source files live under `src/` within each package/app.
