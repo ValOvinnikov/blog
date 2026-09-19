@@ -213,6 +213,13 @@ whichever branch merges second pays the rework. It happened twice on
 `main` wins and the branch adopts it**, regardless of which was written first.
 Inline fixes scoped to files the ticket already touches are unaffected.
 
+This scopes the reviewer's duplication rule rather than contradicting it. A
+copied helper or block **inside the ticket's own files** is still blocking and
+fixed in place. A finding whose fix is a **new shared file** is blocking only
+when the ticket's own scope is that extraction (a dedupe ticket, a "fold X
+into a shared helper" ticket); otherwise the reviewer files it, and the PR
+ships with the copy it inherited.
+
 ## Mid-task decisions land in the ticket/spec before work continues
 
 When a design/scope/behavior decision gets settled in conversation — the user
@@ -531,18 +538,33 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
     is general-purpose, but its doc comment described "a CTA module's
     actions" — CTA is its first caller, not its scope. Describe the actual,
     general contract.
+  - **Anything the name and signature already say.** "HeroProfileModule —
+    fetches module_heroProfile data and hands it to HeroProfileModuleView"
+    is the name, the return type and the one import, read back as prose. The
+    `Name — does X` form is banned outright: opening with the identifier is
+    the tell that what follows restates it. Same for "pure view for X", "the
+    web-side wiring for X", "renders nothing when …" — the `if` is right
+    there. **The test: if the comment could be regenerated from the name,
+    the parameter names and the return type, delete it.** This is the pattern
+    agents produce most, because every sibling already carries one.
+  - **A sibling's comment.** "Model on the nearest sibling" means its
+    structure and naming, never its comments — a sibling's doc block is
+    drift to delete, not a template to copy. Replicating it is how one
+    `XModule — fetches module_x` block became ten.
 
   **The only comments allowed:**
 
-  1. **One doc comment per function or component**, and only when the name
-     does not already make the purpose obvious — one sentence, saying what it
-     is _for_. Never how it works, and never which arguments or props it
-     reads; the type signature documents that and prose restating it goes
-     stale the moment a parameter changes.
-  2. **One line for a tuned value or a real gotcha** — something a competent
+  1. **One line for a tuned value or a real gotcha** — something a competent
      reader would otherwise get wrong. A magic number's rationale, or a
      constraint the code cannot express (Next's route segment config requires
      a literal, so no route can import `CONTENT_ROUTE_REVALIDATE_SECONDS`).
+  2. **A doc comment only where the name genuinely cannot carry the purpose**
+     — one sentence, saying what it is _for_, above the export and nowhere
+     else. Not a default: a function or component with a descriptive name
+     gets none, and a name that needs a sentence to explain is usually the
+     thing to fix. Never how it works, and never which arguments or props it
+     reads; the type signature documents that and prose restating it goes
+     stale the moment a parameter changes.
 
   **The test, when you believe you have an exception — ask in order:**
 
@@ -563,10 +585,13 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
   **When you touch a file, delete the comments in it that fail the test — do
   not shorten them.** A shortened comment that should not exist is still a
   comment that should not exist; trimming is only for a comment that earns its
-  place but runs long. This is deliberately opportunistic: there is no
-  scheduled comment sweep, because a repo-wide pass would collide with every
-  open PR, whereas converging file-by-file reaches the same result without
-  ever doing so.
+  place but runs long. This is the steady-state mechanism: converging
+  file-by-file never collides with an open PR. The backlog it never caught up
+  with — measured 2026-09-19 at 673 doc blocks (421 of them four lines or
+  longer, 120 of the `Name — does X` form) and 671 line comments inside
+  function bodies, 13% of non-blank source — is cleared once by the
+  per-workspace sweep epic #3392 (`prio:later`, one `cloud-ok` ticket per
+  workspace, each pulled when that workspace has no PR in flight).
 
 - All workspace source files live under `src/` within each package/app.
   Exceptions: root-level config files required by their tool (`sanity.config.ts`,
@@ -685,16 +710,15 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   vague one hides the cause and must be logged. A `TResult` failure is not
   automatically an `error` — branch on the `ERROR_CODE` and log only what a
   human would act on. Full contract in `SPEC.md` §17.
-- Co-locate `*.test.ts(x)`; `pnpm test` must pass.
-- **Never assert copy verbatim in a test.** An editor-facing `description`, a
-  label, a placeholder, a helper sentence — pinning one to its exact literal
-  only restates the source. The sole change that can fail such a test is a
-  deliberate rewording, so it reports intentional edits as breakage and
-  catches no defect. A field helper's default-vs-override precedence is the
-  same: that is `??`, not a contract. Assert a description is non-empty where
-  its absence would be a bug; never assert which words it contains. Copy is
-  reviewed in the diff. Full rule and examples in `testing-practices` →
-  "What not to test".
+- Co-locate `*.test.ts(x)`; `pnpm test` must pass. A test file carries no
+  comments at all — its `describe`/`it` titles are the documentation
+  (`testing-practices` → "What not to test").
+- **Never assert the source back at itself.** Declarative config (a field
+  list, an option list, a default), editor-facing copy (a `description`, a
+  label, a placeholder) and a `??` precedence are all the same mistake: the
+  expected value is a literal copied out of the file under test, so the only
+  change that can fail it is a deliberate edit. One rule, one home —
+  `testing-practices` → "What not to test".
 - After a schema change: `pnpm typegen`, then commit the regenerated files in
   `packages/config/src/sanity/generated/`. Typegen can be non-deterministic —
   re-run until the diff is minimal.

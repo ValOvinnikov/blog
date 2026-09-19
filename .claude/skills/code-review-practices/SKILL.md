@@ -61,6 +61,20 @@ D | grep -nE '^\+.*/access/project/[a-z0-9]{8}/'
 # value. The grep narrows; the judgement is by eye, and a hit is blocking.
 D | grep -nE '^\+.*(fields\.map\(\(f\) => f\.name\)|typeof [^)]*\)\.toBe\(.function.\)|\.name\)\.toBe\()'
 
+# Comments that restate the code (CLAUDE.md → "Comments default to zero").
+# A doc block opening with the identifier (`Name — does X`) restates the
+# name; a doc block three or more lines long is narrating how, not what
+# for; a `//` indented four or more spaces is inside a body. Each hit is
+# blocking unless it is the one-line gotcha the rule allows — read it.
+D | grep -nE '^\+[[:space:]]*\* [A-Z][A-Za-z0-9]+ — '
+D | awk '/^\+[[:space:]]*\/\*\*/{n=0;b=1;next} b&&/^\+[[:space:]]*\*\//{b=0;if(n>=3)print FNR": doc block of "n" lines";next} b&&/^\+/{n++}'
+D | grep -nE '^\+ {4,}// '
+
+# Any comment added to a test file. Test files carry none — the `describe`
+# and `it` titles are the documentation, so a comment there is a title that
+# grew a paragraph. Every hit is blocking (testing-practices → "No comments").
+D | awk '/^\+\+\+ b\//{t=($0 ~ /\.test\.tsx?$/)} t&&/^\+[[:space:]]*(\/\/|\/\*\*|\*[[:space:]])/{print FNR": "$0}'
+
 # Clones. Run over every workspace the diff touches, then read the hits that
 # involve a changed file. A whole helper/component/hook copied instead of
 # shared is blocking; a repeated test arrangement that wants `it.each` is
@@ -179,7 +193,11 @@ CI-enforced guard was deliberately not added.
   constant value) is **blocking** — delete it, don't keep it (full rule:
   `testing-practices` → "What not to test"). Sibling cases that differ only
   in an input and an expected value are one `it.each`; a copied block is
-  non-blocking and gets filed.
+  non-blocking and gets filed. A finding whose fix is a **new shared file**
+  is blocking only when the ticket's own scope is that extraction; otherwise
+  file it — two parallel sessions extracting the same helper meet as an
+  add/add conflict (CLAUDE.md → "Creating a shared file is not an inline
+  fix").
 - Bug fixes include a regression test that failed before the fix.
 - **Suite labels — a component takes ``describe(`<${Component.name}/>`, …)``,
   everything else takes the bare symbol `describe(theSymbol, …)`.** A string
@@ -220,16 +238,23 @@ CI-enforced guard was deliberately not added.
   (a hidden gotcha, a workaround for a specific bug). Everything else inside
   a function body, including `TODO:`/`FIXME:` markers used to explain rather
   than to flag open work, gets flagged.
-- **Doc comment content (blocking).** A doc comment is allowed only above a
-  function/component/export, at most one per, and only when the name doesn't
-  already make the purpose obvious. It must state what the thing is **for**
-  in one short sentence — flag as blocking anything that instead describes
-  **how** it works: a step-by-step walkthrough of internal implementation
-  (what each hook/branch does), a listing of props/behavior the type
-  signature already states, more than ~2 sentences of prose, an issue/PR
-  number cited as narrative (anything outside a `TODO:`/`FIXME:` block), a
-  `docs/superpowers/**` path, a roadmap phase name, or a "not wired up yet"
-  note. A comment that reads like a changelog or a design-doc summary is too
+- **Doc comment content (blocking).** A doc comment is not a default: it
+  is allowed only above a function/component/export, at most one per, and
+  only where the name genuinely cannot carry the purpose. **Flag as
+  blocking any doc comment that could be regenerated from the name, the
+  parameter names and the return type** — `HeroProfileModule — fetches
+module_heroProfile data and hands it to HeroProfileModuleView` is the
+  canonical offender, and the `Name — does X` opening is banned outright
+  whatever follows it. That the sibling files carry the same block is not a
+  defence; it is the drift being corrected, and the diff should be deleting
+  the sibling's copy too where it touches that file. When one is warranted
+  it states what the thing is **for** in one short sentence — flag as
+  blocking anything that instead describes **how** it works: a step-by-step
+  walkthrough of internal implementation (what each hook/branch does), a
+  listing of props/behavior the type signature already states, more than
+  one sentence of prose, an issue/PR number cited as narrative (anything
+  outside a `TODO:`/`FIXME:` block), a `docs/superpowers/**` path, a
+  roadmap phase name, or a "not wired up yet" note. A comment that reads like a changelog or a design-doc summary is too
   long — that content belongs in the PR description (dated, reachable via
   `git blame`), not the source file. This applies per layer agent's own
   `## Comments` section (see e.g. `.claude/agents/web.md`) — the reviewer is
